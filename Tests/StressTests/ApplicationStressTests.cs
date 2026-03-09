@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Xunit.Abstractions;
 
 // ReSharper disable AccessToDisposedClosure
 
@@ -37,7 +36,7 @@ public class ApplicationStressTests
     public async Task InvokeLeakTest ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         Random r = new ();
         TextField tf = new ();
@@ -47,7 +46,7 @@ public class ApplicationStressTests
         _tbCounter = 0;
 
         int pollMs = Debugger.IsAttached ? POLL_MS_DEBUGGER : POLL_MS_NORMAL;
-        Task task = Task.Run (() => RunTest (app, r, tf, NUM_PASSES, NUM_INCREMENTS, pollMs));
+        Task task = Task.Run (() => RunTest (app, r, tf, NUM_PASSES, NUM_INCREMENTS, pollMs), TestContext.Current.CancellationToken);
 
         // blocks here until the RequestStop is processed at the end of the test
         app.Run (top);
@@ -88,7 +87,7 @@ public class ApplicationStressTests
 
                         if (topRunnableWaitMs > maxWaitMs)
                         {
-                            application.Invoke (application.Dispose);
+                            application.Invoke (() => application.RequestStop ());
 
                             throw new TimeoutException (
                                                         $"Timeout: TopRunnableView never started running on pass {j + 1}"
@@ -109,7 +108,7 @@ public class ApplicationStressTests
                     if (elapsedMs > maxWaitMs)
                     {
                         // No change after maximum wait: Idle handlers added via Application.Invoke have gone missing
-                        application.Invoke (application.Dispose);
+                        application.Invoke (() => application.RequestStop ());
 
                         throw new TimeoutException (
                                                     $"Timeout: Increment lost. _tbCounter ({_tbCounter}) didn't "
@@ -120,7 +119,7 @@ public class ApplicationStressTests
                 }
             }
 
-            application.Invoke (application.Dispose);
+            application.Invoke (() => application.RequestStop ());
         }
 
         static void Launch (IApplication application, Random random, TextField textField, int target)

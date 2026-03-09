@@ -1,6 +1,5 @@
 ﻿using Moq;
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace ViewBaseTests.Viewport;
 
@@ -107,7 +106,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     public void Clear_ClearsEntireViewport ()
     {
         using IApplication? app = Application.Create ();
-        app.Init ("Fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var superView = new Runnable
         {
@@ -163,7 +162,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     public void Clear_WithClearVisibleContentOnly_ClearsVisibleContentOnly ()
     {
         using IApplication? app = Application.Create ();
-        app.Init ("Fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var superView = new Runnable
         {
@@ -207,7 +206,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     public void Clear_Viewport_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
     {
         using IApplication? app = Application.Create ();
-        app.Init ("Fake");
+        app.Init (DriverRegistry.Names.ANSI);
         var view = new FrameView {  Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         view.DrawingContent += (s, e) =>
@@ -274,7 +273,7 @@ public class ClearViewportTests (ITestOutputHelper output)
     public void Clear_Can_Use_Driver_AddRune_Or_AddStr_Methods ()
     {
         using IApplication? app = Application.Create ();
-        app.Init ("Fake");
+        app.Init (DriverRegistry.Names.ANSI);
         var view = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Single };
 
         view.DrawingContent += (s, e) =>

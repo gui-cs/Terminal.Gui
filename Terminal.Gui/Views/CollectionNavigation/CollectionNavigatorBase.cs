@@ -58,21 +58,17 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
                 currentSearchString = _searchString;
             }
 
-            Logging.Debug ($"CollectionNavigator began processing '{keyStruck}', it has been {elapsedTime} since last keystroke");
-
             // is it a second or third (etc) keystroke within a short time
             if (currentSearchString.Length > 0 && elapsedTime < TimeSpan.FromMilliseconds (TypingDelay))
             {
                 // "dd" is a candidate
                 candidateState = currentSearchString + keyStruck;
-                Logging.Debug ($"Appending, search is now for '{candidateState}'");
             }
             else
             {
                 // its a fresh keystroke after some time
                 // or its first ever key press
                 SearchString = new (keyStruck, 1);
-                Logging.Debug ("It has been too long since last key press so beginning new search");
             }
 
             int? idxCandidate = GetNextMatchingItem (
@@ -82,8 +78,6 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
                                                      // prefer not to move if there are multiple characters e.g. "ca" + 'r' should stay on "car" and not jump to "cart"
                                                      candidateState.Length > 1
                                                     );
-
-            Logging.Debug ($"CollectionNavigator searching (preferring minimum movement) matched:{idxCandidate}");
 
             if (idxCandidate is { })
             {
@@ -95,13 +89,11 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
 
                 SearchString = candidateState;
 
-                Logging.Debug ($"Found collection item that matched search:{idxCandidate}");
-
                 return idxCandidate;
             }
 
-            //// nothing matches "dd" so discard it as a candidate
-            //// and just cycle "d" instead
+            // nothing matches "dd" so discard it as a candidate
+            // and just cycle "d" instead
             lock (_lock)
             {
                 _lastKeystroke = DateTime.Now;
@@ -109,14 +101,10 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
 
             idxCandidate = GetNextMatchingItem (currentIndex, candidateState);
 
-            Logging.Debug ($"CollectionNavigator searching (any match) matched:{idxCandidate}");
-
             // if a match wasn't found, the user typed a 'wrong' key in their search ("can" + 'z'
             // instead of "can" + 'd').
             if (SearchString.Length > 1 && idxCandidate is null)
             {
-                Logging.Debug ("CollectionNavigator ignored key and returned existing index");
-
                 // ignore it since we're still within the typing delay
                 // don't add it to SearchString either
                 return currentIndex;
@@ -125,8 +113,6 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
             // if no changes to current state manifested
             if (idxCandidate == currentIndex || idxCandidate is null)
             {
-                Logging.Debug ("CollectionNavigator found no changes to current index, so clearing search");
-
                 // clear history and treat as a fresh letter
                 ClearSearchString ();
 
@@ -134,18 +120,12 @@ internal abstract class CollectionNavigatorBase : ICollectionNavigator
                 SearchString = new (keyStruck, 1);
                 idxCandidate = GetNextMatchingItem (currentIndex, SearchString);
 
-                Logging.Debug ($"CollectionNavigator new SearchString {SearchString} matched index:{idxCandidate}");
-
                 return idxCandidate ?? currentIndex;
             }
-
-            Logging.Debug ($"CollectionNavigator final answer was:{idxCandidate}");
 
             // Found another "d" or just leave index as it was
             return idxCandidate;
         }
-
-        Logging.Debug ("CollectionNavigator found key press was not actionable so clearing search and returning null");
 
         // clear state because keypress was a control char
         ClearSearchString ();

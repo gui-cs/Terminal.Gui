@@ -1,42 +1,47 @@
 ---
 uid: Terminal.Gui.Input
-summary: The `Input` namespace provides comprehensive input handling for keyboard, mouse, and command processing.
+summary: Keyboard, mouse, and command processing.
 ---
 
-@Terminal.Gui.Input contains the input processing system for Terminal.Gui applications, including keyboard event handling, mouse interaction, and the command execution framework. This namespace defines the core input primitives and event structures used throughout the framework.
+The `Input` namespace provides input handling for keyboard events, mouse interactions, and the command execution framework.
 
-The input system provides both low-level input events and high-level command abstractions, enabling applications to handle everything from basic key presses to complex gesture recognition and command routing.
+## Key Types
 
-## Key Components
+- **Key** - Keyboard input with modifier support (Ctrl, Alt, Shift)
+- **Mouse** - Mouse event data (position, buttons, modifiers)
+- **Command** - Standard application commands enum
+- **KeyBinding** / **MouseBinding** - Associates input with commands
+- **Responder** - Base class for input handling
 
-- **Key**: Represents keyboard input with modifier support
-- **MouseEventArgs**: Comprehensive mouse event information
-- **Command**: Enumeration of standard application commands
-- **KeyBinding**: Associates keys with commands
-- **MouseBinding**: Associates mouse events with commands
+## Command Pattern
 
-## Example Usage
+Views handle input through commands:
 
 ```csharp
-// First, add command handlers
-AddCommand(Command.Up, commandContext => Move(commandContext, -16));
-AddCommand(Command.Down, commandContext => Move(commandContext, 16));
-AddCommand(Command.Accept, HandleAcceptCommand);
+// 1. Add command handlers
+AddCommand (Command.Accept, ctx => { /* handle */ return true; });
+AddCommand (Command.Cancel, ctx => { /* handle */ return true; });
 
-// Then bind keys to commands
-KeyBindings.Add(Key.CursorUp, Command.Up);
-KeyBindings.Add(Key.CursorDown, Command.Down);
-KeyBindings.Add(Key.Enter, Command.Accept);
+// 2. Bind keys to commands
+KeyBindings.Add (Key.Enter, Command.Accept);
+KeyBindings.Add (Key.Esc, Command.Cancel);
 
-// Then bind mouse events to commands
-MouseBindings.Add(MouseFlags.Button1DoubleClicked, Command.Accept);
-MouseBindings.Add(MouseFlags.WheeledDown, Command.ScrollDown);
-MouseBindings.ReplaceCommands(MouseFlags.Button3Clicked, Command.Context);
+// 3. Bind mouse to commands
+MouseBindings.Add (MouseFlags.Button1Clicked, Command.Accept);
 ```
 
-## Deep Dives
+## Key Modifiers
 
-- [Keyboard Input](~/docs/keyboard.md) - Comprehensive keyboard input handling
-- [Mouse Input](~/docs/mouse.md) - Comprehensive mouse input handling
-- [Commands](~/docs/command.md) - Command execution framework details
+```csharp
+Key.A.WithCtrl      // Ctrl+A
+Key.A.WithAlt       // Alt+A
+Key.A.WithShift     // Shift+A (uppercase)
+Key.F1.WithCtrl.WithShift  // Ctrl+Shift+F1
+```
+
+## See Also
+
+- [Keyboard Deep Dive](~/docs/keyboard.md)
+- [Mouse Deep Dive](~/docs/mouse.md)
+- [Command Deep Dive](~/docs/command.md)
 

@@ -12,6 +12,10 @@
       "commandName": "Project",
       "commandLineArgs": "--driver dotnet -dl Trace"
     },
+    "UICatalog --driver ansi": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver ansi -dl Trace"
+    },
     "WSL: UICatalog": {
       "commandName": "Executable",
       "executablePath": "wsl",
@@ -28,6 +32,12 @@
       "commandName": "Executable",
       "executablePath": "wsl",
       "commandLineArgs": "dotnet UICatalog.dll --driver unix",
+      "distributionName": ""
+    },
+    "WSL: UICatalog --driver ansi": {
+      "commandName": "Executable",
+      "executablePath": "wsl",
+      "commandLineArgs": "dotnet UICatalog.dll --driver ansi",
       "distributionName": ""
     },
     "WSL-Gnome: UICatalog": {
@@ -59,6 +69,10 @@
     "Benchmark All --driver windows": {
       "commandName": "Project",
       "commandLineArgs": "--driver windows --benchmark"
+    },
+    "Benchmark All --driver ansi": {
+      "commandName": "Project",
+      "commandLineArgs": "--driver ansi --benchmark"
     },
     "WSL: Benchmark All": {
       "commandName": "Executable",

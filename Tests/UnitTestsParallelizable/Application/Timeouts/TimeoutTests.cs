@@ -1,4 +1,3 @@
-using Xunit.Abstractions;
 // ReSharper disable AccessToDisposedClosure
 #pragma warning disable xUnit1031
 
@@ -9,38 +8,35 @@ namespace ApplicationTests.Timeout;
 ///     These tests verify that timeouts fire correctly, can be added/removed,
 ///     handle exceptions properly, and work with Application.Run() calls.
 /// </summary>
+[Collection ("Application Timer Tests")]
 public class TimeoutTests
 {
     [Fact]
     public void AddTimeout_Callback_Can_Add_New_Timeout ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var firstFired = false;
         var secondFired = false;
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (50),
+        app.AddTimeout (TimeSpan.FromMilliseconds (50),
                         () =>
                         {
                             firstFired = true;
 
                             // Add another timeout from within callback
-                            app.AddTimeout (
-                                            TimeSpan.FromMilliseconds (50),
+                            app.AddTimeout (TimeSpan.FromMilliseconds (50),
                                             () =>
                                             {
                                                 secondFired = true;
                                                 app.RequestStop ();
 
                                                 return false;
-                                            }
-                                           );
+                                            });
 
                             return false;
-                        }
-                       );
+                        });
 
         // Defensive: use iteration counter instead of time-based safety timeout
         var iterations = 0;
@@ -76,15 +72,15 @@ public class TimeoutTests
     public void AddTimeout_Exception_In_Callback_Propagates ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var exceptionThrown = false;
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (50),
+        app.AddTimeout (TimeSpan.FromMilliseconds (50),
                         () =>
                         {
                             exceptionThrown = true;
+
                             throw new InvalidOperationException ("Test exception");
                         });
 
@@ -120,22 +116,20 @@ public class TimeoutTests
     public void AddTimeout_Fires ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         uint timeoutTime = 100;
         var timeoutFired = false;
 
         // Setup a timeout that will fire
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (timeoutTime),
+        app.AddTimeout (TimeSpan.FromMilliseconds (timeoutTime),
                         () =>
                         {
                             timeoutFired = true;
 
                             // Return false so the timer does not repeat
                             return false;
-                        }
-                       );
+                        });
 
         // The timeout has not fired yet
         Assert.False (timeoutFired);
@@ -155,7 +149,7 @@ public class TimeoutTests
     public void AddTimeout_From_Background_Thread_Fires ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var timeoutFired = false;
         using var taskCompleted = new ManualResetEventSlim (false);
@@ -166,8 +160,7 @@ public class TimeoutTests
 
                       app.Invoke (() =>
                                   {
-                                      app.AddTimeout (
-                                                      TimeSpan.FromMilliseconds (100),
+                                      app.AddTimeout (TimeSpan.FromMilliseconds (100),
                                                       () =>
                                                       {
                                                           timeoutFired = true;
@@ -175,12 +168,10 @@ public class TimeoutTests
                                                           app.RequestStop ();
 
                                                           return false;
-                                                      }
-                                                     );
-                                  }
-                                 );
-                  }
-                 );
+                                                      });
+                                  });
+                  },
+                  TestContext.Current.CancellationToken);
 
         // Use iteration counter for safety instead of time
         var iterations = 0;
@@ -191,7 +182,7 @@ public class TimeoutTests
             app.Run<Runnable> ();
 
             // Defensive: wait with timeout
-            Assert.True (taskCompleted.Wait (TimeSpan.FromSeconds (5)), "Timeout from background thread should have completed");
+            Assert.True (taskCompleted.Wait (TimeSpan.FromSeconds (5), TestContext.Current.CancellationToken), "Timeout from background thread should have completed");
             Assert.True (timeoutFired);
         }
         finally
@@ -217,22 +208,20 @@ public class TimeoutTests
     public void AddTimeout_High_Frequency_All_Fire ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         const int TIMEOUT_COUNT = 50; // Reduced from 100 for performance
         var firedCount = 0;
 
         for (var i = 0; i < TIMEOUT_COUNT; i++)
         {
-            app.AddTimeout (
-                            TimeSpan.FromMilliseconds (10 + i * 5),
+            app.AddTimeout (TimeSpan.FromMilliseconds (10 + i * 5),
                             () =>
                             {
                                 Interlocked.Increment (ref firedCount);
 
                                 return false;
-                            }
-                           );
+                            });
         }
 
         // Use iteration counter and event completion instead of time-based safety
@@ -268,15 +257,14 @@ public class TimeoutTests
     public void Long_Running_Callback_Delays_Subsequent_Timeouts ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var firstStarted = false;
         var secondFired = false;
         var firstCompleted = false;
 
         // Long-running timeout
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (50),
+        app.AddTimeout (TimeSpan.FromMilliseconds (50),
                         () =>
                         {
                             firstStarted = true;
@@ -284,19 +272,16 @@ public class TimeoutTests
                             firstCompleted = true;
 
                             return false;
-                        }
-                       );
+                        });
 
         // This should fire even though first is still running
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (100),
+        app.AddTimeout (TimeSpan.FromMilliseconds (100),
                         () =>
                         {
                             secondFired = true;
 
                             return false;
-                        }
-                       );
+                        });
 
         // Use iteration counter instead of time-based timeout
         var iterations = 0;
@@ -333,12 +318,11 @@ public class TimeoutTests
     public void AddTimeout_Multiple_Fire_In_Order ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         List<int> executionOrder = new ();
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (300),
+        app.AddTimeout (TimeSpan.FromMilliseconds (300),
                         () =>
                         {
                             executionOrder.Add (3);
@@ -346,8 +330,7 @@ public class TimeoutTests
                             return false;
                         });
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (100),
+        app.AddTimeout (TimeSpan.FromMilliseconds (100),
                         () =>
                         {
                             executionOrder.Add (1);
@@ -355,8 +338,7 @@ public class TimeoutTests
                             return false;
                         });
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (200),
+        app.AddTimeout (TimeSpan.FromMilliseconds (200),
                         () =>
                         {
                             executionOrder.Add (2);
@@ -397,22 +379,20 @@ public class TimeoutTests
     public void AddTimeout_Multiple_TimeSpan_Zero_All_Fire ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         const int TIMEOUT_COUNT = 10;
         var firedCount = 0;
 
         for (var i = 0; i < TIMEOUT_COUNT; i++)
         {
-            app.AddTimeout (
-                            TimeSpan.Zero,
+            app.AddTimeout (TimeSpan.Zero,
                             () =>
                             {
                                 Interlocked.Increment (ref firedCount);
 
                                 return false;
-                            }
-                           );
+                            });
         }
 
         var iterations = 0;
@@ -448,49 +428,43 @@ public class TimeoutTests
     public void AddTimeout_Nested_Run_Parent_Timeout_Fires ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var parentTimeoutFired = false;
         var childTimeoutFired = false;
         var nestedRunCompleted = false;
 
         // Parent timeout - fires after child modal opens
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (200),
+        app.AddTimeout (TimeSpan.FromMilliseconds (200),
                         () =>
                         {
                             parentTimeoutFired = true;
 
                             return false;
-                        }
-                       );
+                        });
 
         // After 100ms, open nested modal
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (100),
+        app.AddTimeout (TimeSpan.FromMilliseconds (100),
                         () =>
                         {
                             var childRunnable = new Runnable ();
 
                             // Child timeout
-                            app.AddTimeout (
-                                            TimeSpan.FromMilliseconds (50),
+                            app.AddTimeout (TimeSpan.FromMilliseconds (50),
                                             () =>
                                             {
                                                 childTimeoutFired = true;
                                                 app.RequestStop (childRunnable);
 
                                                 return false;
-                                            }
-                                           );
+                                            });
 
                             app.Run (childRunnable);
                             nestedRunCompleted = true;
                             childRunnable.Dispose ();
 
                             return false;
-                        }
-                       );
+                        });
 
         // Use iteration counter instead of time-based safety
         var iterations = 0;
@@ -527,19 +501,17 @@ public class TimeoutTests
     public void AddTimeout_Repeating_Fires_Multiple_Times ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var fireCount = 0;
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (50),
+        app.AddTimeout (TimeSpan.FromMilliseconds (50),
                         () =>
                         {
                             fireCount++;
 
                             return fireCount < 3; // Repeat 3 times
-                        }
-                       );
+                        });
 
         var iterations = 0;
 
@@ -574,19 +546,17 @@ public class TimeoutTests
     public void AddTimeout_StopAfterFirstIteration_Immediate_Fires ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var timeoutFired = false;
 
-        app.AddTimeout (
-                        TimeSpan.Zero,
+        app.AddTimeout (TimeSpan.Zero,
                         () =>
                         {
                             timeoutFired = true;
 
                             return false;
-                        }
-                       );
+                        });
 
         app.StopAfterFirstIteration = true;
         app.Run<Runnable> ();
@@ -598,11 +568,10 @@ public class TimeoutTests
     public void AddTimeout_TimeSpan_Zero_Fires ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
         var timeoutFired = false;
 
-        app.AddTimeout (
-                        TimeSpan.Zero,
+        app.AddTimeout (TimeSpan.Zero,
                         () =>
                         {
                             timeoutFired = true;
@@ -620,7 +589,7 @@ public class TimeoutTests
     public void RemoveTimeout_Already_Removed_Returns_False ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         object? token = app.AddTimeout (TimeSpan.FromMilliseconds (100), () => false);
 
@@ -637,19 +606,17 @@ public class TimeoutTests
     public void RemoveTimeout_Cancels_Timeout ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var timeoutFired = false;
 
-        object? token = app.AddTimeout (
-                                        TimeSpan.FromMilliseconds (100),
+        object? token = app.AddTimeout (TimeSpan.FromMilliseconds (100),
                                         () =>
                                         {
                                             timeoutFired = true;
 
                                             return false;
-                                        }
-                                       );
+                                        });
 
         // Remove timeout before it fires
         bool removed = app.RemoveTimeout (token!);
@@ -689,7 +656,7 @@ public class TimeoutTests
     public void RemoveTimeout_Invalid_Token_Returns_False ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var fakeToken = new object ();
         bool removed = app.RemoveTimeout (fakeToken);
@@ -701,7 +668,7 @@ public class TimeoutTests
     public void TimedEvents_GetTimeout_Invalid_Token_Returns_Null ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var fakeToken = new object ();
         TimeSpan? actualTimeSpan = app.TimedEvents?.GetTimeout (fakeToken);
@@ -713,7 +680,7 @@ public class TimeoutTests
     public void TimedEvents_GetTimeout_Returns_Correct_TimeSpan ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         TimeSpan expectedTimeSpan = TimeSpan.FromMilliseconds (500);
         object? token = app.AddTimeout (expectedTimeSpan, () => false);
@@ -728,21 +695,19 @@ public class TimeoutTests
     public void TimedEvents_StopAll_Clears_Timeouts ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var firedCount = 0;
 
         for (var i = 0; i < 10; i++)
         {
-            app.AddTimeout (
-                            TimeSpan.FromMilliseconds (100),
+            app.AddTimeout (TimeSpan.FromMilliseconds (100),
                             () =>
                             {
                                 Interlocked.Increment (ref firedCount);
 
                                 return false;
-                            }
-                           );
+                            });
         }
 
         Assert.NotEmpty (app.TimedEvents!.Timeouts);
@@ -785,7 +750,7 @@ public class TimeoutTests
     public void TimedEvents_Timeouts_Property_Is_Thread_Safe ()
     {
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         const int THREAD_COUNT = 10;
         var addedCount = 0;
@@ -799,21 +764,18 @@ public class TimeoutTests
                           app.Invoke (() =>
                                       {
                                           // Add timeout with immediate execution
-                                          app.AddTimeout (
-                                                          TimeSpan.Zero,
+                                          app.AddTimeout (TimeSpan.Zero,
                                                           () =>
                                                           {
                                                               Interlocked.Increment (ref addedCount);
 
                                                               return false;
-                                                          }
-                                                         );
+                                                          });
 
                                           tasksCompleted.Signal ();
-                                      }
-                                     );
-                      }
-                     );
+                                      });
+                      },
+                      TestContext.Current.CancellationToken);
         }
 
         // Use iteration counter to stop when all tasks complete
@@ -854,18 +816,17 @@ public class TimeoutTests
         }
     }
 
-
     [Fact]
     public void Invoke_Adds_Idle ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         Runnable top = new ();
         SessionToken? rs = app.Begin (top);
 
         var actionCalled = 0;
-        app.Invoke ((_) => { actionCalled++; });
+        app.Invoke (_ => { actionCalled++; });
         app.TimedEvents!.RunTimers ();
         Assert.Equal (1, actionCalled);
         top.Dispose ();

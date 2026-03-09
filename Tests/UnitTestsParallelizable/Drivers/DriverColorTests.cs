@@ -4,12 +4,13 @@ using UnitTests;
 
 namespace DriverTests;
 
-public class DriverColorTests : FakeDriverBase
+[Collection ("Driver Tests")]
+public class DriverColorTests : TestDriverBase
 {
     [Fact]
     public void Force16Colors_Sets ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         driver.Force16Colors = true;
         Assert.True (driver.Force16Colors);

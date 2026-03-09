@@ -1,14 +1,14 @@
 ﻿#nullable enable
+using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
-using Xunit.Abstractions;
 
 namespace UnitTests;
 
 /// <summary>
 ///     Provides xUnit-style assertions for <see cref="IDriver"/> contents.
 /// </summary>
-internal partial class DriverAssert
+public partial class DriverAssert
 {
     private const char SPACE_CHAR = ' ';
     private static readonly Rune _spaceRune = (Rune)SPACE_CHAR;
@@ -27,12 +27,7 @@ internal partial class DriverAssert
     /// <param name="output"></param>
     /// <param name="driver">The IDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
     /// <param name="expectedAttributes"></param>
-    public static void AssertDriverAttributesAre (
-        string expectedLook,
-        ITestOutputHelper output,
-        IDriver? driver = null,
-        params Attribute [] expectedAttributes
-    )
+    public static void AssertDriverAttributesAre (string expectedLook, ITestOutputHelper output, IDriver? driver = null, params Attribute [] expectedAttributes)
     {
 #pragma warning restore xUnit1013 // Public method should be marked as test
 
@@ -49,7 +44,7 @@ internal partial class DriverAssert
         }
         ArgumentNullException.ThrowIfNull (driver);
 
-        Cell [,] contents = driver!.Contents!;
+        Cell [,] contents = driver.Contents!;
 
         var line = 0;
 
@@ -64,19 +59,16 @@ internal partial class DriverAssert
                 switch (match.Count)
                 {
                     case 0:
-                        output.WriteLine (
-                                          $"{driver.ToString ()}\n"
+                        output.WriteLine ($"{driver.ToString ()}\n"
                                           + $"Expected Attribute {val} at Contents[{line},{c}] {contents [line, c]} was not found.\n"
                                           + $" Expected: {string.Join (",", expectedAttributes.Select (attr => attr))}\n"
-                                          + $" But Was: <not found>"
-                                         );
+                                          + $" But Was: <not found>");
                         Assert.Empty (match);
 
                         return;
+
                     case > 1:
-                        throw new ArgumentException (
-                                                     $"Bad value for expectedColors, {match.Count} Attributes had the same Value"
-                                                    );
+                        throw new ArgumentException ($"Bad value for expectedColors, {match.Count} Attributes had the same Value");
                 }
 
                 char colorUsed = Array.IndexOf (expectedAttributes, match [0]).ToString () [0];
@@ -149,12 +141,7 @@ internal partial class DriverAssert
     /// <param name="output"></param>
     /// <param name="driver">The IDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
     /// <param name="ignoreLeadingWhitespace"></param>
-    public static void AssertDriverContentsAre (
-        string expectedLook,
-        ITestOutputHelper output,
-        IDriver? driver = null,
-        bool ignoreLeadingWhitespace = false
-    )
+    public static void AssertDriverContentsAre (string expectedLook, ITestOutputHelper output, IDriver? driver = null, bool ignoreLeadingWhitespace = false)
     {
 #pragma warning restore xUnit1013 // Public method should be marked as test
         if (driver is null && ApplicationImpl.ModelUsage == ApplicationModelUsage.LegacyStatic)
@@ -198,11 +185,7 @@ internal partial class DriverAssert
     /// <param name="expectedLook">Expected output with C# escape sequences (e.g., \x1b for ESC)</param>
     /// <param name="output"></param>
     /// <param name="driver">The IDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
-    public static void AssertDriverOutputIs (
-        string expectedLook,
-        ITestOutputHelper output,
-        IDriver? driver = null
-    )
+    public static void AssertDriverOutputIs (string expectedLook, ITestOutputHelper output, IDriver? driver = null)
     {
 #pragma warning restore xUnit1013 // Public method should be marked as test
         if (driver is null && ApplicationImpl.ModelUsage == ApplicationModelUsage.LegacyStatic)
@@ -211,7 +194,7 @@ internal partial class DriverAssert
         }
         ArgumentNullException.ThrowIfNull (driver);
 
-        string? actualLook = driver.GetOutput().GetLastOutput ();
+        string? actualLook = driver.GetOutput ().GetLastOutput ();
 
         // Unescape the expected string to convert C# escape sequences like \x1b to actual characters
         string unescapedExpected = UnescapeString (expectedLook);
@@ -234,6 +217,7 @@ internal partial class DriverAssert
             // Show the difference at the end
             int minLen = Math.Min (unescapedExpected.Length, actualLook.Length);
             output?.WriteLine ($"Lengths: Expected={unescapedExpected.Length}, Actual={actualLook.Length}, MinLen={minLen}");
+
             if (actualLook.Length > unescapedExpected.Length)
             {
                 output?.WriteLine ($"Actual has {actualLook.Length - unescapedExpected.Length} extra characters at the end");
@@ -256,7 +240,7 @@ internal partial class DriverAssert
         }
 
         var result = new StringBuilder (input.Length);
-        int i = 0;
+        var i = 0;
 
         while (i < input.Length)
         {
@@ -269,47 +253,57 @@ internal partial class DriverAssert
                     case 'x' when i + 3 < input.Length:
                         // Handle \xHH (2-digit hex)
                         string hex = input.Substring (i + 2, 2);
-                        if (int.TryParse (hex, System.Globalization.NumberStyles.HexNumber, null, out int hexValue))
+
+                        if (int.TryParse (hex, NumberStyles.HexNumber, null, out int hexValue))
                         {
                             result.Append ((char)hexValue);
                             i += 4; // Skip \xHH
+
                             continue;
                         }
+
                         break;
 
                     case 'n':
                         result.Append ('\n');
                         i += 2;
+
                         continue;
 
                     case 'r':
                         result.Append ('\r');
                         i += 2;
+
                         continue;
 
                     case 't':
                         result.Append ('\t');
                         i += 2;
+
                         continue;
 
                     case '\\':
                         result.Append ('\\');
                         i += 2;
+
                         continue;
 
                     case '"':
                         result.Append ('"');
                         i += 2;
+
                         continue;
 
                     case '\'':
                         result.Append ('\'');
                         i += 2;
+
                         continue;
 
                     case '0':
                         result.Append ('\0');
                         i += 2;
+
                         continue;
                 }
             }
@@ -321,6 +315,7 @@ internal partial class DriverAssert
 
         return result.ToString ();
     }
+
     /// <summary>
     ///     Asserts that the driver contents are equal to the provided string.
     /// </summary>
@@ -328,14 +323,11 @@ internal partial class DriverAssert
     /// <param name="output"></param>
     /// <param name="driver">The IDriver to use. If null <see cref="Application.Driver"/> will be used.</param>
     /// <returns></returns>
-    public static Rectangle AssertDriverContentsWithFrameAre (
-        string expectedLook,
-        ITestOutputHelper output,
-        IDriver? driver = null
-    )
+    public static Rectangle AssertDriverContentsWithFrameAre (string expectedLook, ITestOutputHelper output, IDriver? driver = null)
     {
         List<List<string>> lines = [];
         var sb = new StringBuilder ();
+
         if (driver is null && ApplicationImpl.ModelUsage == ApplicationModelUsage.LegacyStatic)
         {
             driver = Application.Driver;
@@ -438,7 +430,7 @@ internal partial class DriverAssert
 
         if (string.Equals (expectedLook, actualLook))
         {
-            return new (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
+            return new Rectangle (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
         }
 
         // standardize line endings for the comparison
@@ -465,7 +457,7 @@ internal partial class DriverAssert
 
         Assert.Equal (expectedLook, actualLook);
 
-        return new (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
+        return new Rectangle (x > -1 ? x : 0, y > -1 ? y : 0, w > -1 ? w : 0, h > -1 ? h : 0);
     }
 
     /// <summary>
@@ -481,7 +473,8 @@ internal partial class DriverAssert
         {
             driver = Application.Driver;
         }
-        ArgumentNullException.ThrowIfNull (driver); Cell [,] contents = driver?.Contents!;
+        ArgumentNullException.ThrowIfNull (driver);
+        Cell [,] contents = driver?.Contents!;
 
         List<Attribute> toFind = expectedColors.ToList ();
 
@@ -518,7 +511,7 @@ internal partial class DriverAssert
         sb.AppendLine ("The following colors were not used:" + string.Join ("; ", toFind.Select (a => a.ToString ())));
         sb.AppendLine ("Colors used were:" + string.Join ("; ", colorsUsed.Select (a => a.ToString ())));
 
-        throw new (sb.ToString ());
+        throw new Exception (sb.ToString ());
     }
 
     [GeneratedRegex ("^\\s+", RegexOptions.Multiline)]

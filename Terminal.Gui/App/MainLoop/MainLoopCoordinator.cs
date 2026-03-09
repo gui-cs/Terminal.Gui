@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.App;
 
@@ -23,16 +24,16 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     /// <param name="inputQueue">Thread-safe queue for buffering raw console input</param>
     /// <param name="loop">The main application loop instance</param>
     /// <param name="componentFactory">Factory for creating driver-specific components (input, output, etc.)</param>
-    public MainLoopCoordinator (
-        ITimedEvents timedEvents,
-        ConcurrentQueue<TInputRecord> inputQueue,
-        IApplicationMainLoop<TInputRecord> loop,
-        IComponentFactory<TInputRecord> componentFactory
-    )
+    /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
+    public MainLoopCoordinator (ITimedEvents timedEvents,
+                                ConcurrentQueue<TInputRecord> inputQueue,
+                                IApplicationMainLoop<TInputRecord> loop,
+                                IComponentFactory<TInputRecord> componentFactory,
+                                ITimeProvider? timeProvider = null)
     {
         _timedEvents = timedEvents;
         _inputQueue = inputQueue;
-        _inputProcessor = componentFactory.CreateInputProcessor (_inputQueue);
+        _inputProcessor = componentFactory.CreateInputProcessor (_inputQueue, timeProvider);
         _loop = loop;
         _componentFactory = componentFactory;
     }
@@ -42,7 +43,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     private readonly CancellationTokenSource _runCancellationTokenSource = new ();
     private readonly ConcurrentQueue<TInputRecord> _inputQueue;
     private readonly IInputProcessor _inputProcessor;
-    private readonly object _oLockInitialization = new ();
+    private readonly Lock _oLockInitialization = new ();
     private readonly ITimedEvents _timedEvents;
 
     private readonly SemaphoreSlim _startupSemaphore = new (0, 1);
@@ -59,7 +60,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     /// <param name="app">The <see cref="IApplication"/> instance that is running the input loop.</param>
     public async Task StartInputTaskAsync (IApplication? app)
     {
-        Logging.Trace ("Booting... ()");
+        Trace.Lifecycle (app?.MainThreadId.ToString (), "Init", "Booting...");
 
         _inputTask = Task.Run (() => RunInput (app));
 
@@ -81,10 +82,10 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                 throw _inputTask.Exception;
             }
 
-            Logging.Critical ("Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
+            Logging.Critical ($"app: {app?.MainThreadId} Input loop exited during startup instead of entering read loop properly (i.e. and blocking)");
         }
 
-        Logging.Trace ("Booting complete");
+        Trace.Lifecycle (app?.MainThreadId.ToString (), "Init", "Booting complete");
     }
 
     /// <inheritdoc/>
@@ -116,8 +117,6 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
     private void BootMainLoop (IApplication? app)
     {
-        //Logging.Trace ($"_inputProcessor: {_inputProcessor}, _output: {_output}, _componentFactory: {_componentFactory}");
-
         lock (_oLockInitialization)
         {
             // Instance must be constructed on the thread in which it is used.
@@ -130,21 +129,59 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
     private void BuildDriverIfPossible (IApplication? app)
     {
-
-        if (_input != null && _output != null)
+        if (_input == null || _output == null)
         {
-            _driver = new (
-                           _inputProcessor,
-                           _loop.OutputBuffer,
-                           _output,
-                           _loop.AnsiRequestScheduler,
-                           _loop.SizeMonitor);
-
-            app!.Driver = _driver;
-
-            _startupSemaphore.Release ();
-            Logging.Trace ($"Driver: _input: {_input}, _output: {_output}");
+            return;
         }
+        _driver = new DriverImpl (_componentFactory, _inputProcessor, _loop.OutputBuffer, _output, _loop.AnsiRequestScheduler, _loop.SizeMonitor);
+
+        // Initialize the size monitor now that the driver is fully constructed
+        // This allows size monitors to set up platform-specific mechanisms:
+        // - ANSI queries (ANSIDriver)
+        // - Signal handlers (UnixDriver)
+        // - Console events (WindowsDriver)
+        _loop.SizeMonitor.Initialize (_driver);
+
+        app!.Driver = _driver;
+
+        // Detect terminal color capabilities from environment variables
+        TerminalColorCapabilities caps = TerminalEnvironmentDetector.DetectColorCapabilities ();
+
+        _driver.SetColorCapabilities (caps);
+
+        if (caps.Capability is ColorCapabilityLevel.NoColor or ColorCapabilityLevel.Colors16)
+        {
+            Driver.Force16Colors = true;
+        }
+
+        // Detect the terminal's actual default colors via OSC 10/11 queries.
+        // Skip if color capabilities indicate a terminal that won't support OSC.
+        if (_driver.ColorCapabilities is { Capability: ColorCapabilityLevel.Colors256 or ColorCapabilityLevel.TrueColor })
+        {
+            try
+            {
+                TerminalColorDetector colorDetector = new (_driver);
+
+                colorDetector.Detect ((fg, bg) =>
+                                      {
+                                          if (fg is null && bg is null)
+                                          {
+                                              return;
+                                          }
+
+                                          Logging.Trace ($"app: SetDefaultAttribute ({new Attribute (fg ?? new Color (255, 255, 255), bg ?? new Color (0, 0))})");
+
+                                          _driver.SetDefaultAttribute (new Attribute (fg ?? new Color (255, 255, 255), bg ?? new Color (0, 0)));
+                                      });
+            }
+            catch (Exception ex)
+            {
+                Logging.Warning ($"Terminal color detection failed: {ex.Message}");
+            }
+        }
+
+        _startupSemaphore.Release ();
+        Logging.Trace ($"app: {app.MainThreadId} Driver: _input: {_input}, _output: {_output}");
     }
 
     /// <summary>
@@ -175,24 +212,26 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                 _input.Run (_runCancellationTokenSource.Token);
             }
             catch (OperationCanceledException)
-            { }
+            {
+                Trace.Lifecycle (app?.MainThreadId.ToString (), "Init", $"{app?.MainThreadId}Input loop canceled");
+            }
 
             _input.Dispose ();
         }
         catch (Exception e)
         {
-            Logging.Critical ($"Input loop crashed: {e}");
+            Logging.Critical ($"app: {app?.MainThreadId} Input loop crashed: {e}");
 
             throw;
         }
 
         if (_stopCalled)
         {
-            Logging.Information ("Input loop exited cleanly");
+            Trace.Lifecycle (app?.MainThreadId.ToString (), "Init", $"Input loop exited cleanly");
         }
         else
         {
-            Logging.Critical ("Input loop exited early (stop not called)");
+            Logging.Critical ($"app: {app?.MainThreadId}Input loop exited early (stop not called)");
         }
     }
 }

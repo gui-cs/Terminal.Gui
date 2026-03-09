@@ -5,8 +5,8 @@ Paste these commands into your favorite terminal on Windows, Mac, or Linux. This
 (Press `Esc` to exit the app)
 
 ```ps1
-dotnet new --install Terminal.Gui.templates
-dotnet new tui -n myproj
+dotnet new install Terminal.Gui.Templates@2.0.0-beta.*
+dotnet new tui-simple -n myproj
 cd myproj
 dotnet run
 ```
@@ -21,7 +21,11 @@ dotnet add package Terminal.Gui
 
 ## Using the Templates
 
-Use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates).
+Use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates):
+
+```ps1
+dotnet new install Terminal.Gui.Templates@2.0.0-beta.*
+```
 
 ## Sample Usage in C#
 
@@ -31,11 +35,11 @@ The following example shows a basic Terminal.Gui application using the modern in
 
 ### Key aspects of the modern model:
 
-- Use `Application.Create()` to create an `IApplication` instance
-- The application initializes automatically when you call `Run<T>()`  
-- Use `app.Run<ExampleWindow>()` to run a window that implements `IRunnable`
+- Use [Application.Create()](xref:Terminal.Gui.App.Application.Create*) to create an <xref:Terminal.Gui.App.IApplication> instance
+- The application initializes automatically when you call `Run<T>()`
+- Use `app.Run<ExampleWindow>()` to run a window that implements <xref:Terminal.Gui.App.IRunnable>
 - Call `app.Dispose()` to clean up resources and restore the terminal
-- Event handling uses `Accepting` event instead of legacy `Accept` event
+- Event handling uses <xref:Terminal.Gui.ViewBase.View.Accepting> event instead of legacy `Accept` event
 - Set `e.Handled = true` in event handlers to prevent further processing
 
 When run the application looks as follows:

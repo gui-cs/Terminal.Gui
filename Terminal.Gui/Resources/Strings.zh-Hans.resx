@@ -117,27 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="ctxSelectAll" xml:space="preserve">
-    <value>全选 (_S)</value>
-  </data>
-  <data name="ctxDeleteAll" xml:space="preserve">
-    <value>清空 (_D)</value>
-  </data>
-  <data name="ctxCopy" xml:space="preserve">
-    <value>复制 (_C)</value>
-  </data>
-  <data name="ctxCut" xml:space="preserve">
-    <value>剪切 (_T)</value>
-  </data>
-  <data name="ctxPaste" xml:space="preserve">
-    <value>粘贴 (_P)</value>
-  </data>
-  <data name="ctxUndo" xml:space="preserve">
-    <value>撤销 (_U)</value>
-  </data>
-  <data name="ctxRedo" xml:space="preserve">
-    <value>重做 (_R)</value>
-  </data>
   <data name="fdDirectory" xml:space="preserve">
     <value>目录</value>
   </data>
@@ -191,9 +170,6 @@
   </data>
   <data name="fdPathCaption" xml:space="preserve">
     <value>请输入路径</value>
-  </data>
-  <data name="fdSearchCaption" xml:space="preserve">
-    <value>输入以搜索</value>
   </data>
   <data name="fdSize" xml:space="preserve">
     <value>大小</value>
@@ -276,61 +252,88 @@
   <data name="dpTitle" xml:space="preserve">
     <value>日期选择器</value>
   </data>
-  <data name="ctxColors" xml:space="preserve">
-    <value>旗帜 (_L)</value>
-  </data>
-  <data name="cmd.Open" xml:space="preserve">
+  <data name="cmdOpen" xml:space="preserve">
     <value>打开 (_O)</value>
   </data>
-  <data name="cmd.Quit" xml:space="preserve">
-    <value />
-  </data>
-  <data name="cmd.Save" xml:space="preserve">
+  <data name="cmdSave" xml:space="preserve">
     <value>保存 (_S)</value>
   </data>
-  <data name="cmd.SaveAs" xml:space="preserve">
+  <data name="cmdSaveAs" xml:space="preserve">
     <value>另存为 (_A)</value>
   </data>
-  <data name="cmd.Cut" xml:space="preserve">
+  <data name="cmdCut" xml:space="preserve">
     <value>剪切 (_T)</value>
   </data>
-  <data name="cmd.Copy" xml:space="preserve">
+  <data name="cmdCopy" xml:space="preserve">
     <value>复制 (_C)</value>
   </data>
-  <data name="cmd.Paste" xml:space="preserve">
+  <data name="cmdPaste" xml:space="preserve">
     <value>粘贴 (_P)</value>
   </data>
-  <data name="cmd.SelectAll" xml:space="preserve">
+  <data name="cmdSelectAll" xml:space="preserve">
     <value>全选 (_S)</value>
   </data>
-  <data name="cmd.New" xml:space="preserve">
+  <data name="cmdNew" xml:space="preserve">
     <value>新建 (_N)</value>
   </data>
-  <data name="cmd.Open.Help" xml:space="preserve">
-    <value />
+  <data name="cmdOpen_Help" xml:space="preserve">
+    <value>打开文件</value>
   </data>
-  <data name="cmd.Quit.Help" xml:space="preserve">
-    <value />
+  <data name="cmdQuit_Help" xml:space="preserve">
+    <value>退出应用程序</value>
   </data>
-  <data name="cmd.Save.Help" xml:space="preserve">
-    <value />
+  <data name="cmdSaveAs_Help" xml:space="preserve">
+    <value>另存为</value>
   </data>
-  <data name="cmd.SaveAs.Help" xml:space="preserve">
-    <value />
+  <data name="cmdCut_Help" xml:space="preserve">
+    <value>剪切到剪贴板</value>
   </data>
-  <data name="cmd.Cut.Help" xml:space="preserve">
-    <value />
+  <data name="cmdCopy_Help" xml:space="preserve">
+    <value>复制到剪贴板</value>
   </data>
-  <data name="cmd.Copy.Help" xml:space="preserve">
-    <value />
+  <data name="cmdSelectAll_Help" xml:space="preserve">
+    <value>全选</value>
   </data>
-  <data name="cmd.Paste.Help" xml:space="preserve">
-    <value />
+  <data name="cmdNew_Help" xml:space="preserve">
+    <value>新建</value>
   </data>
-  <data name="cmd.SelectAll.Help" xml:space="preserve">
-    <value />
+  <data name="fdSearchCaption" xml:space="preserve">
+    <value>输入以搜索</value>
   </data>
-  <data name="cmd.New.Help" xml:space="preserve">
-    <value />
+  <data name="cmdPaste_Help" xml:space="preserve">
+    <value>从剪贴板粘贴</value>
+  </data>
+  <data name="cmdQuit" xml:space="preserve">
+    <value>退出 (_X)</value>
+  </data>
+  <data name="cmdUndo" xml:space="preserve">
+    <value>撤销 (_U)</value>
+  </data>
+  <data name="cmdUndo_Help" xml:space="preserve">
+    <value>撤销上一步操作</value>
+  </data>
+  <data name="cmdRedo" xml:space="preserve">
+    <value>重做 (_R)</value>
+  </data>
+  <data name="cmdRedo_Help" xml:space="preserve">
+    <value>重做上一步操作</value>
+  </data>
+  <data name="cmdDeleteAll" xml:space="preserve">
+    <value>清空 (_D)</value>
+  </data>
+  <data name="cmdDeleteAll_Help" xml:space="preserve">
+    <value>全部删除</value>
+  </data>
+  <data name="cmdEdit" xml:space="preserve">
+    <value>编辑 (_E)</value>
+  </data>
+  <data name="cmdEdit_Help" xml:space="preserve">
+    <value>编辑</value>
+  </data>
+  <data name="cmdClose_Help" xml:space="preserve">
+    <value>关闭</value>
+  </data>
+  <data name="cmdSave_Help" xml:space="preserve">
+    <value>保存文件</value>
   </data>
 </root>

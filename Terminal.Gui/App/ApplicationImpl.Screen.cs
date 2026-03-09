@@ -23,80 +23,6 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public bool ClearScreenNextIteration { get; set; }
 
-    /// <inheritdoc/>
-    public bool PositionCursor ()
-    {
-        if (Driver is null)
-        {
-            return false;
-        }
-
-        // Find the most focused view and position the cursor there.
-        View? mostFocused = Navigation?.GetFocused ();
-
-        // If the view is not visible or enabled, don't position the cursor
-        if (mostFocused is null || !mostFocused.Visible || !mostFocused.Enabled)
-        {
-            var current = CursorVisibility.Invisible;
-            Driver?.GetCursorVisibility (out current);
-
-            if (current != CursorVisibility.Invisible)
-            {
-                Driver?.SetCursorVisibility (CursorVisibility.Invisible);
-            }
-
-            return false;
-        }
-
-        // If the view is not visible within it's superview, don't position the cursor
-        Rectangle mostFocusedViewport = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = Point.Empty });
-
-        Rectangle superViewViewport =
-            mostFocused.SuperView?.ViewportToScreen (mostFocused.SuperView.Viewport with { Location = Point.Empty }) ?? Driver.Screen;
-
-        if (!superViewViewport.IntersectsWith (mostFocusedViewport))
-        {
-            return false;
-        }
-
-        Point? cursor = mostFocused.PositionCursor ();
-
-        Driver!.GetCursorVisibility (out CursorVisibility currentCursorVisibility);
-
-        if (cursor is { })
-        {
-            // Convert cursor to screen coords
-            cursor = mostFocused.ViewportToScreen (mostFocused.Viewport with { Location = cursor.Value }).Location;
-
-            // If the cursor is not in a visible location in the SuperView, hide it
-            if (!superViewViewport.Contains (cursor.Value))
-            {
-                if (currentCursorVisibility != CursorVisibility.Invisible)
-                {
-                    Driver.SetCursorVisibility (CursorVisibility.Invisible);
-                }
-
-                return false;
-            }
-
-            // Show it
-            if (currentCursorVisibility == CursorVisibility.Invisible)
-            {
-                Driver.SetCursorVisibility (mostFocused.CursorVisibility);
-            }
-
-            return true;
-        }
-
-        if (currentCursorVisibility != CursorVisibility.Invisible)
-        {
-            Driver.SetCursorVisibility (CursorVisibility.Invisible);
-        }
-
-        return false;
-    }
-
-
     /// <summary>
     ///     INTERNAL: Called when the application's screen has changed.
     ///     Raises the <see cref="ScreenChanged"/> event.
@@ -135,11 +61,16 @@ internal partial class ApplicationImpl
 
         List<View?> views = [.. SessionStack!.Select (r => r.Runnable! as View)!];
 
-        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        if (Popovers?.GetActivePopover () is { Visible: true } visiblePopover)
         {
             visiblePopover.SetNeedsDraw ();
             visiblePopover.SetNeedsLayout ();
-            views.Insert (0, visiblePopover);
+
+            // Need View for views.Insert
+            if (visiblePopover is View popoverView)
+            {
+                views.Insert (0, popoverView);
+            }
         }
 
         // Layout

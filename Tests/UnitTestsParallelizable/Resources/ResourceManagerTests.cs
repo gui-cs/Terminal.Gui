@@ -8,14 +8,14 @@ using UnitTests;
 
 namespace ResourcesTests;
 
-public class ResourceManagerTests : FakeDriverBase
+public class ResourceManagerTests : TestDriverBase
 {
     private const string EXISTENT_CULTURE = "pt-PT";
     private const string NO_EXISTENT_CULTURE = "de-DE";
     private const string NO_EXISTENT_KEY = "blabla";
     private const string NO_TRANSLATED_KEY = "fdDeleteTitle";
     private const string NO_TRANSLATED_VALUE = "Delete {0}";
-    private const string TRANSLATED_KEY = "ctxSelectAll";
+    private const string TRANSLATED_KEY = "cmdSelectAll";
     private const string TRANSLATED_VALUE = "_Selecionar Tudo";
 
 
@@ -112,9 +112,11 @@ public class ResourceManagerTests : FakeDriverBase
         CultureInfo.CurrentCulture = new (NO_EXISTENT_CULTURE);
         CultureInfo.CurrentUICulture = new (NO_EXISTENT_CULTURE);
 
-        Assert.Equal (NO_TRANSLATED_VALUE, _stringsNoTranslatedKey);
-
+        Assert.Equal (NO_TRANSLATED_VALUE, GlobalResources.GetString (NO_TRANSLATED_KEY, CultureInfo.CurrentCulture));
+        
         ResetCultureInfo ();
+
+        Assert.Equal (NO_TRANSLATED_VALUE, _stringsNoTranslatedKey);
     }
 
     [Fact]
@@ -126,7 +128,7 @@ public class ResourceManagerTests : FakeDriverBase
         CultureInfo.CurrentUICulture = new (EXISTENT_CULTURE);
 
         // This is really already translated
-        Assert.Equal (TRANSLATED_VALUE, Strings.ctxSelectAll);
+        Assert.Equal (TRANSLATED_VALUE, Strings.cmdSelectAll);
 
         // This isn't already translated
         Assert.Equal (NO_TRANSLATED_VALUE, _stringsNoTranslatedKey);
@@ -140,6 +142,6 @@ public class ResourceManagerTests : FakeDriverBase
         CultureInfo.CurrentUICulture = _savedUICulture!;
 
         _stringsNoTranslatedKey = Strings.fdDeleteTitle;
-        _stringsTranslatedKey = Strings.ctxSelectAll;
+        _stringsTranslatedKey = Strings.cmdSelectAll;
     }
 }

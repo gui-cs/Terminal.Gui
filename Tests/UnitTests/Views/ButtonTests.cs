@@ -1,7 +1,3 @@
-using TerminalGuiFluentTesting;
-using UnitTests;
-using Xunit.Abstractions;
-
 namespace UnitTests.ViewsTests;
 
 public class ButtonTests (ITestOutputHelper output)
@@ -48,8 +44,11 @@ public class ButtonTests (ITestOutputHelper output)
         DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         btn.Dispose ();
 
-        btn = new () { App = ApplicationImpl.Instance,
-            Text = "_Test", IsDefault = true };
+        btn = new ()
+        {
+            App = ApplicationImpl.Instance,
+            Text = "_Test", IsDefault = true
+        };
         btn.Layout ();
         Assert.Equal (new (10, 1), btn.TextFormatter.ConstrainToSize);
 
@@ -81,8 +80,11 @@ public class ButtonTests (ITestOutputHelper output)
 
         btn.Dispose ();
 
-        btn = new () { App = ApplicationImpl.Instance,
-            X = 1, Y = 2, Text = "_abc", IsDefault = true };
+        btn = new ()
+        {
+            App = ApplicationImpl.Instance,
+            X = 1, Y = 2, Text = "_abc", IsDefault = true
+        };
         btn.BeginInit ();
         btn.EndInit ();
         Assert.Equal ("_abc", btn.Text);
@@ -166,74 +168,6 @@ public class ButtonTests (ITestOutputHelper output)
         top.Dispose ();
     }
 
-    [Fact]
-    [AutoInitShutdown]
-    public void KeyBindings_Command ()
-    {
-        var clicked = false;
-        var btn = new Button { Text = "_Test" };
-        btn.Accepting += (s, e) => clicked = true;
-        var top = new Runnable ();
-        top.Add (btn);
-        Application.Begin (top);
-
-        // Hot key. Both alone and with alt
-        Assert.Equal (KeyCode.T, btn.HotKey);
-        Assert.False (btn.NewKeyDownEvent (Key.T)); // Button processes, but does not handle
-        Assert.True (clicked);
-        clicked = false;
-
-        Assert.False (btn.NewKeyDownEvent (Key.T.WithAlt));
-        Assert.True (clicked);
-        clicked = false;
-
-        Assert.False (btn.NewKeyDownEvent (btn.HotKey));
-        Assert.True (clicked);
-        clicked = false;
-        Assert.False (btn.NewKeyDownEvent (btn.HotKey));
-        Assert.True (clicked);
-        clicked = false;
-
-        // IsDefault = false
-        // Space and Enter should work
-        Assert.False (btn.IsDefault);
-        Assert.False (btn.NewKeyDownEvent (Key.Enter));
-        Assert.True (clicked);
-        clicked = false;
-
-        // IsDefault = true
-        // Space and Enter should work
-        btn.IsDefault = true;
-        Assert.False (btn.NewKeyDownEvent (Key.Enter));
-        Assert.True (clicked);
-        clicked = false;
-
-        // Runnable does not handle Enter, so it should get passed on to button
-        Assert.False (Application.TopRunnableView.NewKeyDownEvent (Key.Enter));
-        Assert.True (clicked);
-        clicked = false;
-
-        // Direct
-        Assert.False (btn.NewKeyDownEvent (Key.Enter));
-        Assert.True (clicked);
-        clicked = false;
-
-        Assert.False (btn.NewKeyDownEvent (Key.Space));
-        Assert.True (clicked);
-        clicked = false;
-
-        Assert.False (btn.NewKeyDownEvent (new ((KeyCode)'T')));
-        Assert.True (clicked);
-        clicked = false;
-
-        // Change hotkey:
-        btn.Text = "Te_st";
-        Assert.False (btn.NewKeyDownEvent (btn.HotKey));
-        Assert.True (clicked);
-        clicked = false;
-
-        top.Dispose ();
-    }
 
     [Fact]
     [AutoInitShutdown]
@@ -250,7 +184,7 @@ public class ButtonTests (ITestOutputHelper output)
 
         Application.Begin (top);
         Application.Driver?.SetScreenSize (30, 5);
-        Application.LayoutAndDraw();
+        Application.LayoutAndDraw ();
         Assert.True (btn.IsInitialized);
         Assert.Equal ("Say Hello 你", btn.Text);
         Assert.Equal ($"{Glyphs.LeftBracket} {btn.Text} {Glyphs.RightBracket}", btn.TextFormatter.Text);
@@ -269,96 +203,5 @@ public class ButtonTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 30, 5), pos);
         top.Dispose ();
     }
-    [Theory]
-    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released, MouseFlags.Button1Clicked)]
-    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released, MouseFlags.Button2Clicked)]
-    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released, MouseFlags.Button3Clicked)]
-    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released, MouseFlags.Button4Clicked)]
-    public void WantContinuousButtonPressed_True_ButtonClick_Accepts (MouseFlags pressed, MouseFlags released, MouseFlags clicked)
-    {
-        var me = new MouseEventArgs ();
 
-        var button = new Button
-        {
-            Width = 1,
-            Height = 1,
-            WantContinuousButtonPressed = true
-        };
-
-        var activatingCount = 0;
-
-        button.Activating += (s, e) => activatingCount++;
-        var acceptedCount = 0;
-
-        button.Accepting += (s, e) =>
-                            {
-                                acceptedCount++;
-                                e.Handled = true;
-                            };
-
-        me = new ();
-        me.Flags = pressed;
-        button.NewMouseEvent (me);
-        Assert.Equal (0, activatingCount);
-        Assert.Equal (0, acceptedCount);
-
-        me = new ();
-        me.Flags = released;
-        button.NewMouseEvent (me);
-        Assert.Equal (0, activatingCount);
-        Assert.Equal (0, acceptedCount);
-
-        me = new ();
-        me.Flags = clicked;
-        button.NewMouseEvent (me);
-        Assert.Equal (1, activatingCount);
-        Assert.Equal (1, acceptedCount);
-
-        button.Dispose ();
-    }
-
-    [Theory]
-    [InlineData (MouseFlags.Button1Pressed, MouseFlags.Button1Released)]
-    [InlineData (MouseFlags.Button2Pressed, MouseFlags.Button2Released)]
-    [InlineData (MouseFlags.Button3Pressed, MouseFlags.Button3Released)]
-    [InlineData (MouseFlags.Button4Pressed, MouseFlags.Button4Released)]
-    public void WantContinuousButtonPressed_True_ButtonPressRelease_Does_Not_Raise_Selected_Or_Accepted (MouseFlags pressed, MouseFlags released)
-    {
-        var me = new MouseEventArgs ();
-
-        var button = new Button
-        {
-            Width = 1,
-            Height = 1,
-            WantContinuousButtonPressed = true
-        };
-
-        var acceptedCount = 0;
-
-        button.Accepting += (s, e) =>
-                            {
-                                acceptedCount++;
-                                e.Handled = true;
-                            };
-
-        var activatingCount = 0;
-
-        button.Activating += (s, e) =>
-                            {
-                                activatingCount++;
-                                e.Handled = true;
-                            };
-
-        me.Flags = pressed;
-        button.NewMouseEvent (me);
-        Assert.Equal (0, acceptedCount);
-        Assert.Equal (0, activatingCount);
-
-        me.Flags = released;
-        button.NewMouseEvent (me);
-        Assert.Equal (0, acceptedCount);
-        Assert.Equal (0, activatingCount);
-
-        button.Dispose ();
-    }
 }

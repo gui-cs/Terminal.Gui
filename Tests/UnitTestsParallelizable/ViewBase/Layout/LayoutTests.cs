@@ -40,7 +40,7 @@ public class LayoutTests
     public void Screen_Size_Change_Causes_Layout ()
     {
         IApplication? app = Application.Create ();
-        app.Init ("Fake");
+        app.Init (DriverRegistry.Names.ANSI);
         Runnable<bool>? runnable = new ();
         app.Begin (runnable);
 
@@ -257,7 +257,7 @@ public class LayoutTests
         t.EndInit ();
 
         // f references t and w here; t is f's super-superview and w is f's superview. This is supported!
-        Exception exception = Record.Exception (() => t.Layout ());
+        Exception? exception = Record.Exception (() => t.Layout ());
         Assert.Null (exception);
         Assert.Equal (80, t.Frame.Width);
         Assert.Equal (25, t.Frame.Height);

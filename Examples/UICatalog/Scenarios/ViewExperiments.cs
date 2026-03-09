@@ -1,5 +1,3 @@
-﻿using System;
-
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("View Experiments", "v2 View Experiments")]
@@ -11,15 +9,14 @@ public class ViewExperiments : Scenario
 {
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
 
-        Window app = new ()
-        {
-            Title = GetQuitKeyAndName (),
-            TabStop = TabBehavior.TabGroup
-        };
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        var editor = new AdornmentsEditor
+        using Window window = new () { Title = GetQuitKeyAndName (), TabStop = TabBehavior.TabGroup };
+
+        AdornmentsEditor editor = new ()
         {
             X = 0,
             Y = 0,
@@ -27,35 +24,19 @@ public class ViewExperiments : Scenario
             AutoSelectViewToEdit = true,
             ShowViewIdentifier = true
         };
-        app.Add (editor);
+        window.Add (editor);
 
-        FrameView testFrame = new ()
-        {
-            Title = "_1 Test Frame",
-            X = Pos.Right (editor),
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-        };
+        FrameView testFrame = new () { Title = "_1 Test Frame", X = Pos.Right (editor), Width = Dim.Fill (), Height = Dim.Fill () };
 
-        app.Add (testFrame);
+        window.Add (testFrame);
 
-        Button button = new ()
-        {
-            X = 0,
-            Y = 0,
-            Title = $"TopButton _{GetNextHotKey ()}",
-        };
+        Button button = new () { X = 0, Y = 0, Title = $"TopButton _{GetNextHotKey ()}" };
 
         testFrame.Add (button);
 
-        button = new ()
-        {
-            X = Pos.AnchorEnd (),
-            Y = Pos.AnchorEnd (),
-            Title = $"TopButton _{GetNextHotKey ()}",
-        };
+        button = new Button { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Title = $"TopButton _{GetNextHotKey ()}" };
 
-        var popoverView = new View ()
+        View popoverView = new ()
         {
             X = Pos.Center (),
             Y = Pos.Center (),
@@ -69,12 +50,8 @@ public class ViewExperiments : Scenario
         };
         popoverView.BorderStyle = LineStyle.RoundedDotted;
 
-        Button popoverButton = new ()
-        {
-            X = Pos.Center (),
-            Y = Pos.Center (),
-            Title = $"_Close",
-        };
+        Button popoverButton = new () { X = Pos.Center (), Y = Pos.Center (), Title = Strings.cmdClose };
+
         //popoverButton.Accepting += (sender, e) => App?.Popover!.Visible = false;
         popoverView.Add (popoverButton);
 
@@ -86,19 +63,20 @@ public class ViewExperiments : Scenario
             //App?.Popover!.Visible = true;
         }
 
-        testFrame.Activating += (sender, e) =>
-        {
-            if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
-            {
-                if (mouseArgs.Flags == MouseFlags.Button3Clicked)
-                {
-                    popoverView.X = mouseArgs.ScreenPosition.X;
-                    popoverView.Y = mouseArgs.ScreenPosition.Y;
-                    //App?.Popover = popoverView;
-                    //App?.Popover!.Visible = true;
-                }
-            }
-        };
+        testFrame.Activating += (_, e) =>
+                                {
+                                    if (e.Context?.Binding is MouseBinding { MouseEvent: { } mouseArgs })
+                                    {
+                                        if (mouseArgs.Flags == MouseFlags.RightButtonClicked)
+                                        {
+                                            popoverView.X = mouseArgs.ScreenPosition.X;
+                                            popoverView.Y = mouseArgs.ScreenPosition.Y;
+
+                                            //App?.Popover = popoverView;
+                                            //App?.Popover!.Visible = true;
+                                        }
+                                    }
+                                };
 
         testFrame.Add (button);
 
@@ -106,20 +84,11 @@ public class ViewExperiments : Scenario
         editor.AutoSelectSuperView = testFrame;
         editor.AutoSelectAdornments = true;
 
-        Application.Run (app);
+        app.Run (window);
         popoverView.Dispose ();
-        app.Dispose ();
-
-        Application.Shutdown ();
-
-        return;
     }
-
 
     private int _hotkeyCount;
 
-    private char GetNextHotKey ()
-    {
-        return (char)((int)'A' + _hotkeyCount++);
-    }
+    private char GetNextHotKey () => (char)('A' + _hotkeyCount++);
 }

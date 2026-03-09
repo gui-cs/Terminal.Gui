@@ -1,6 +1,5 @@
 ﻿#nullable disable
 
-using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Dim;
 using static Terminal.Gui.ViewBase.Pos;
 
@@ -72,7 +71,7 @@ public class PosCombineTests (ITestOutputHelper output)
     public void PosCombine_Will_Throws ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var t = new Runnable ();
 
@@ -99,7 +98,7 @@ public class PosCombineTests (ITestOutputHelper output)
     public void PosCombine_Refs_SuperView_Throws ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var top = new Runnable ();
         var w = new Window { X = Left (top) + 2, Y = Top (top) + 2 };

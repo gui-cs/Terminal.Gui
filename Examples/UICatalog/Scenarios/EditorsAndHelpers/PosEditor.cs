@@ -85,7 +85,7 @@ public class PosEditor : EditorBase
         var label = new Label
         {
             X = 0, Y = 0,
-            Text = $"{Title}:"
+            Text = $"{this.ToIdentifyingString ()}:"
         };
         Add (label);
         _posOptionSelector = new () { X = 0, Y = Pos.Bottom (label), Labels = _optionLabels };
@@ -118,7 +118,7 @@ public class PosEditor : EditorBase
         Add (_posOptionSelector);
     }
 
-    private void OnOptionSelectorOnValueChanged (object? s, EventArgs<int?> selected) { PosChanged (); }
+    private void OnOptionSelectorOnValueChanged (object? s, ValueChangedEventArgs<int?> args) { PosChanged (); }
 
     // These need to have same order
     private readonly List<string> _posNames = ["Absolute", "Align", "AnchorEnd", "Center", "Func", "Percent"];
@@ -157,7 +157,7 @@ public class PosEditor : EditorBase
         }
         catch (Exception e)
         {
-            MessageBox.ErrorQuery (App, "Exception", e.Message, "Ok");
+            MessageBox.ErrorQuery (App!, "Exception", e.Message, "Ok");
         }
     }
 }

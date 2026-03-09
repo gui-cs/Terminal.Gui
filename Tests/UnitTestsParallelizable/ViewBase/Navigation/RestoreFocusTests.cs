@@ -1,9 +1,8 @@
 ﻿using UnitTests;
-using Xunit.Abstractions;
 
 namespace ViewBaseTests.Navigation;
 
-[Collection ("Global Test Setup")]
+
 public class RestoreFocusTests () : TestsAllViews
 {
     [Fact]

@@ -18,6 +18,12 @@ namespace Terminal.Gui.Input;
 ///         See the Commands Deep Dive for more information: <see href="https://gui-cs.github.io/Terminal.Gui/docs/command.html"/>.
 ///     </para>
 /// </remarks>
+/// <seealso cref="KeyBinding"/>
+/// <seealso cref="MouseBinding"/>
+/// <seealso cref="ICommandBinding"/>
+/// <seealso cref="View.InvokeCommand(Command)"/>
+/// <seealso cref="CommandContext"/>
+
 public enum Command
 {
     /// <summary>
@@ -30,10 +36,8 @@ public enum Command
     /// <summary>
     ///     Accepts the current state of the View (e.g. list selection, button press, checkbox state, etc.).
     ///     <para>
-    ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseAccepting"/>. If the event is not handled,
-    ///         the command is invoked on:
-    ///             - Any peer-view that is a <see cref="Button"/> with <see cref="Button.IsDefault"/> set to <see langword="true"/>.
-    ///             - The <see cref="View.SuperView"/>. This enables default Accept behavior.
+    ///         The default implementation in <see cref="View"/> raises the <see cref="View.Accepting"/> and
+    ///         <see cref="View.Accepting"/> events.
     ///     </para>
     /// </summary>
     Accept,
@@ -41,8 +45,8 @@ public enum Command
     /// <summary>
     ///     Performs a hot key action (e.g. setting focus, accepting, and/or moving focus to the next View).
     ///     <para>
-    ///         The default implementation in <see cref="View"/> calls <see cref="View.SetFocus"/> and then
-    ///         <see cref="View.RaiseHandlingHotKey"/>.
+    ///         The default implementation in <see cref="View"/> raises the <see cref="View.HandlingHotKey"/> event
+    ///         and if that is not handled, invokes <see cref="Command.Activate"/>.
     ///     </para>
     /// </summary>
     HotKey,
@@ -51,7 +55,8 @@ public enum Command
     ///     Activates the View or an item in the View, changing its state or preparing it for interaction
     ///     (e.g. toggling a checkbox, selecting a list item, focusing a button, navigating a menu item) without necessarily accepting it.
     ///     <para>
-    ///         The default implementation in <see cref="View"/> calls <see cref="View.RaiseActivating"/>.
+    ///         The default implementation in <see cref="View"/> raises the <see cref="View.Activating"/> event. If  <see cref="View.Activating"/> is not
+    ///         handled, <see cref="View.SetFocus"/> will be called and the <see cref="View.Activated"/> event will be raised.
     ///     </para>
     /// </summary>
     Activate,
@@ -163,11 +168,11 @@ public enum Command
 
     #region Editing Commands
 
-    /// <summary>Deletes the characters forwards.</summary>
-    KillWordForwards,
+    /// <summary>Deletes the word to the right of the cursor.</summary>
+    KillWordRight,
 
-    /// <summary>Deletes the characters backwards.</summary>
-    KillWordBackwards,
+    /// <summary>Deletes the word to left to the cursor.</summary>
+    KillWordLeft,
 
     /// <summary>
     ///     Toggles overwrite mode such that newly typed text overwrites the text that is already there (typically
@@ -255,10 +260,10 @@ public enum Command
     Paste,
 
     /// <summary>Cuts to the clipboard the characters from the current position to the end of the line.</summary>
-    CutToEndLine,
+    CutToEndOfLine,
 
     /// <summary>Cuts to the clipboard the characters from the current position to the start of the line.</summary>
-    CutToStartLine,
+    CutToStartOfLine,
 
     #endregion
 
@@ -275,12 +280,6 @@ public enum Command
 
     /// <summary>Moves focus to the next<see cref="TabBehavior.TabGroup"/>.</summary>
     PreviousTabGroup,
-
-    /// <summary>Tabs to the next item.</summary>
-    Tab,
-
-    /// <summary>Tabs back to the previous item.</summary>
-    BackTab,
 
     /// <summary>Enables arrange mode.</summary>
     Arrange,

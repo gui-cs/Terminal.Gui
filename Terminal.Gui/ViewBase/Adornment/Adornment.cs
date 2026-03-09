@@ -1,7 +1,4 @@
-
-
 namespace Terminal.Gui.ViewBase;
-
 
 /// <summary>
 ///     Adornments are a special form of <see cref="View"/> that appear outside the <see cref="View.Viewport"/>:
@@ -31,6 +28,9 @@ public class Adornment : View, IDesignable
         CanFocus = false;
         TabStop = TabBehavior.NoStop;
         Parent = parent;
+
+        // By default, Adornments have no key bindings.
+        KeyBindings.Clear ();
     }
 
     /// <summary>The Parent of this Adornment (the View this Adornment surrounds).</summary>
@@ -78,22 +78,25 @@ public class Adornment : View, IDesignable
     public event EventHandler? ThicknessChanged;
 
     /// <summary>Called whenever the <see cref="Thickness"/> property changes.</summary>
-    public void OnThicknessChanged () { ThicknessChanged?.Invoke (this, EventArgs.Empty); }
+    public void OnThicknessChanged () => ThicknessChanged?.Invoke (this, EventArgs.Empty);
 
     #endregion Thickness
 
     #region View Overrides
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
+    public override string ToDebugString () => $"{GetType ().Name}({Id}) Parent={(Parent is { } ? Parent.ToDebugString () : "null")}";
+
+    /// <inheritdoc/>
     protected override IApplication? GetApp () => Parent?.App;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override IDriver? GetDriver () => Parent?.Driver ?? base.GetDriver ();
 
     // If a scheme is explicitly set, use that. Otherwise, use the scheme of the parent view.
     private Scheme? _scheme;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnGettingScheme (out Scheme? scheme)
     {
         scheme = _scheme ?? Parent?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
@@ -101,12 +104,13 @@ public class Adornment : View, IDesignable
         return true;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args)
     {
         Parent?.SetNeedsDraw ();
 
         _scheme = args.NewValue;
+
         return false;
     }
 
@@ -131,14 +135,14 @@ public class Adornment : View, IDesignable
         {
             // While there are no real use cases for an Adornment being a subview, we support it for
             // testing. E.g. in AllViewsTester.
-            if (SuperView is { })
+            if (SuperView is null)
             {
-                Point super = SuperView.ViewportToScreen (Frame.Location);
-
-                return new (super, Frame.Size);
+                return Frame;
             }
+            Point super = SuperView.ViewportToScreen (Frame.Location);
 
-            return Frame;
+            return new (super, Frame.Size);
+
         }
 
         // Adornments are *Children* of a View, not SubViews. Thus View.FrameToScreen will not work.
@@ -155,16 +159,18 @@ public class Adornment : View, IDesignable
     {
         View? parentOrSuperView = Parent;
 
+        if (parentOrSuperView is { })
+        {
+            return parentOrSuperView.ScreenToFrame (new (location.X - Frame.X, location.Y - Frame.Y));
+        }
+
+        // While there are no real use cases for an Adornment being a subview, we support it for
+        // testing. E.g. in AllViewsTester.
+        parentOrSuperView = SuperView;
+
         if (parentOrSuperView is null)
         {
-            // While there are no real use cases for an Adornment being a subview, we support it for
-            // testing. E.g. in AllViewsTester.
-            parentOrSuperView = SuperView;
-
-            if (parentOrSuperView is null)
-            {
-                return Point.Empty;
-            }
+            return Point.Empty;
         }
 
         return parentOrSuperView.ScreenToFrame (new (location.X - Frame.X, location.Y - Frame.Y));
@@ -193,15 +199,14 @@ public class Adornment : View, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingText () { return Thickness == Thickness.Empty; }
+    protected override bool OnDrawingText () => Thickness == Thickness.Empty;
 
     /// <inheritdoc/>
-    protected override bool OnDrawingSubViews () { return Thickness == Thickness.Empty; }
-
+    protected override bool OnDrawingSubViews () => Thickness == Thickness.Empty;
 
     /// <summary>Does nothing for Adornment</summary>
     /// <returns></returns>
-    protected override bool OnRenderingLineCanvas () { return true; }
+    protected override bool OnRenderingLineCanvas () => true;
 
     /// <summary>
     ///     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this
@@ -244,37 +249,6 @@ public class Adornment : View, IDesignable
         outside.Offset (parentOrSuperView.Frame.Location);
 
         return Thickness.Contains (outside, location);
-    }
-
-    /// <summary>
-    ///     INTERNAL: Gets all Views (Subviews and Adornments) in the of <see cref="Adornment"/> hierarchcy that are at <paramref name="screenLocation"/>,
-    ///     regardless of whether they will be drawn or see mouse events or not. Views with <see cref="View.Visible"/> set to <see langword="false"/> will not be included.
-    ///     The list is ordered by depth. The deepest View is at the end of the list (the topmost View is at element 0).
-    /// </summary>
-    /// <param name="adornment">The root Adornment from which the search for subviews begins.</param>
-    /// <param name="screenLocation">The screen-relative location where the search for views is focused.</param>
-    /// <returns>A list of views that are located under the specified point.</returns>
-    internal static List<View?> GetViewsAtLocation (Adornment? adornment, in Point screenLocation)
-    {
-        List<View?> result = [];
-
-        if (adornment is null || adornment.Thickness == Thickness.Empty)
-        {
-            return result;
-        }
-
-        Point superViewRelativeLocation = adornment.Parent!.SuperView?.ScreenToViewport (screenLocation) ?? screenLocation;
-
-        if (adornment.Contains (superViewRelativeLocation))
-        {
-            List<View?> adornmentResult = GetViewsAtLocation (adornment as View, screenLocation);
-            if (adornmentResult.Count > 0)
-            {
-                result.AddRange (adornmentResult);
-            }
-        }
-
-        return result;
     }
 
     #endregion View Overrides

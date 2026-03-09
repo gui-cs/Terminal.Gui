@@ -1,10 +1,7 @@
-﻿using Xunit.Abstractions;
-
-namespace UnitTests;
+﻿namespace UnitTests;
 
 /// <summary>
 ///     Provides xunit-style assertions for <see cref="ITestOutputHelper"/>.
-///     
 /// </summary>
 internal class OutputAssert
 {

@@ -27,8 +27,8 @@ public class DatePickerTests
         Assert.Equal (datePicker.SubViews.First (v => v.Id == "_nextMonthButton"), datePicker.Focused);
 
         // Change month to December
-        Assert.False (Application.RaiseKeyDownEvent (Key.Enter));
-        Assert.Equal (12, datePicker.Date.Month);
+        Application.RaiseKeyDownEvent (Key.Enter);
+        Assert.Equal (12, datePicker.Value.Month);
 
         // Next month button is disabled, so focus advanced to edit field
         Assert.Equal (datePicker.SubViews.First (v => v.Id == "_previousMonthButton"), datePicker.Focused);
@@ -56,8 +56,8 @@ public class DatePickerTests
         Assert.Equal (datePicker.SubViews.First (v => v.Id == "_previousMonthButton"), datePicker.Focused);
 
         // Change month to January 
-        Assert.False (datePicker.NewKeyDownEvent (Key.Enter));
-        Assert.Equal (1, datePicker.Date.Month);
+        datePicker.NewKeyDownEvent (Key.Enter);
+        Assert.Equal (1, datePicker.Value.Month);
 
         // Next prev button is disabled, so focus advanced to edit button
         Assert.Equal (datePicker.SubViews.First (v => v.Id == "_calendar"), datePicker.Focused);

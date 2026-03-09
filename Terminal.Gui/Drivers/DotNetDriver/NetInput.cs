@@ -1,4 +1,6 @@
 #nullable disable
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
@@ -11,19 +13,25 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
     /// <summary>
     ///     Creates a new instance of the class. Implicitly sends
     ///     console mode settings that enable virtual input (mouse
-    ///     reporting etc).
+    ///     reporting etc.).
     /// </summary>
     public NetInput ()
     {
-        Logging.Information ($"Creating {nameof (NetInput)}");
+        // Check if we have a real console first
+        if (!IsAttachedToTerminal)
+        {
+            Trace.Lifecycle (nameof (NetInput), "Init", "Console is not attached to a terminal. Running in degraded mode.");
+
+            return;
+        }
 
         PlatformID p = Environment.OSVersion.Platform;
 
-        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+        if (p is PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows)
         {
             try
             {
-                _adjustConsole = new ();
+                _adjustConsole = new NetWinVTConsole ();
             }
             catch (ApplicationException ex)
             {
@@ -42,6 +50,10 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
             //Set cursor key to application.
             Console.Out.Write (EscSeqUtils.CSI_HideCursor);
 
+            // CSI_EnableMouseEvents enables
+            // Mode 1003 (any-event) - Reports all mouse events including motion with/without buttons
+            // Mode 1015 (URXVT) - UTF-8 coordinate encoding (fallback for older terminals)
+            // Mode 1006 (SGR) - Modern decimal format with unlimited coordinates (preferred)
             Console.Out.Write (EscSeqUtils.CSI_EnableMouseEvents);
             Console.TreatControlCAsInput = true;
         }
@@ -80,8 +92,8 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
         }
     }
 
-    /// <inheritdoc />
-    public void AddInput (ConsoleKeyInfo input) { throw new NotImplementedException (); }
+    /// <inheritdoc/>
+    public void InjectInput (ConsoleKeyInfo input) => throw new NotImplementedException ();
 
     /// <inheritdoc/>
     public override bool Peek ()

@@ -1,22 +1,21 @@
 namespace InputTests;
 
 /// <summary>
-///     Tests to verify that InputBindings (KeyBindings and MouseBindings) are thread-safe
+///     Tests to verify that CommandBindings (KeyBindings and MouseBindings) are thread-safe
 ///     for concurrent access scenarios.
 /// </summary>
-public class InputBindingsThreadSafetyTests
+public class CommandBindingsThreadSafetyTests
 {
     [Fact]
     public void Add_ConcurrentAccess_NoExceptions ()
     {
         // Arrange
-        var bindings = new TestInputBindings ();
+        var bindings = new TestCommandBindings ();
         const int NUM_THREADS = 10;
         const int ITEMS_PER_THREAD = 100;
 
         // Act
-        Parallel.For (
-                      0,
+        Parallel.For (0,
                       NUM_THREADS,
                       i =>
                       {
@@ -45,7 +44,7 @@ public class InputBindingsThreadSafetyTests
     public void Clear_ConcurrentAccess_NoExceptions ()
     {
         // Arrange
-        var bindings = new TestInputBindings ();
+        var bindings = new TestCommandBindings ();
         const int NUM_THREADS = 10;
 
         // Populate initial data
@@ -55,8 +54,7 @@ public class InputBindingsThreadSafetyTests
         }
 
         // Act - Multiple threads clearing simultaneously
-        Parallel.For (
-                      0,
+        Parallel.For (0,
                       NUM_THREADS,
                       i =>
                       {
@@ -78,7 +76,7 @@ public class InputBindingsThreadSafetyTests
     public void GetAllFromCommands_DuringModification_NoExceptions ()
     {
         // Arrange
-        var bindings = new TestInputBindings ();
+        var bindings = new TestCommandBindings ();
         var continueRunning = true;
         List<Exception> exceptions = new ();
         const int MAX_ADDITIONS = 200; // Limit total additions to prevent infinite loop
@@ -106,15 +104,15 @@ public class InputBindingsThreadSafetyTests
                                                   // Expected
                                               }
                                           }
-                                      });
+                                      },
+                                      TestContext.Current.CancellationToken);
 
         // Act - Reader threads
         List<Task> readerTasks = new ();
 
         for (var i = 0; i < 5; i++)
         {
-            readerTasks.Add (
-                             Task.Run (() =>
+            readerTasks.Add (Task.Run (() =>
                                        {
                                            for (var j = 0; j < 50; j++)
                                            {
@@ -131,13 +129,14 @@ public class InputBindingsThreadSafetyTests
 
                                                Thread.Sleep (1); // Small delay between iterations
                                            }
-                                       }));
+                                       },
+                                       TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (readerTasks.ToArray ());
+        Task.WaitAll (readerTasks.ToArray (), TestContext.Current.CancellationToken);
         continueRunning = false;
-        modifierTask.Wait (TimeSpan.FromSeconds (5)); // Add timeout to prevent indefinite hang
+        modifierTask.Wait (TimeSpan.FromSeconds (5), TestContext.Current.CancellationToken); // Add timeout to prevent indefinite hang
 #pragma warning restore xUnit1031
 
         // Assert
@@ -148,7 +147,7 @@ public class InputBindingsThreadSafetyTests
     public void GetBindings_DuringConcurrentModification_NoExceptions ()
     {
         // Arrange
-        var bindings = new TestInputBindings ();
+        var bindings = new TestCommandBindings ();
         var continueRunning = true;
         List<Exception> exceptions = new ();
         const int MAX_MODIFICATIONS = 200; // Limit total modifications
@@ -186,15 +185,15 @@ public class InputBindingsThreadSafetyTests
 
                                               Thread.Sleep (1); // Small delay to prevent CPU spinning
                                           }
-                                      });
+                                      },
+                                      TestContext.Current.CancellationToken);
 
         // Act - Start reader threads
         List<Task> readerTasks = new ();
 
         for (var i = 0; i < 5; i++)
         {
-            readerTasks.Add (
-                             Task.Run (() =>
+            readerTasks.Add (Task.Run (() =>
                                        {
                                            for (var j = 0; j < 100; j++)
                                            {
@@ -216,14 +215,15 @@ public class InputBindingsThreadSafetyTests
 
                                                Thread.Sleep (1); // Small delay between iterations
                                            }
-                                       }));
+                                       },
+                                       TestContext.Current.CancellationToken));
         }
 
         // Wait for readers to complete
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (readerTasks.ToArray ());
+        Task.WaitAll (readerTasks.ToArray (), TestContext.Current.CancellationToken);
         continueRunning = false;
-        modifierTask.Wait (TimeSpan.FromSeconds (5)); // Add timeout to prevent indefinite hang
+        modifierTask.Wait (TimeSpan.FromSeconds (5), TestContext.Current.CancellationToken); // Add timeout to prevent indefinite hang
 #pragma warning restore xUnit1031
 
         // Assert
@@ -247,8 +247,7 @@ public class InputBindingsThreadSafetyTests
         {
             int threadId = i;
 
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
@@ -270,11 +269,12 @@ public class InputBindingsThreadSafetyTests
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert
@@ -289,7 +289,7 @@ public class InputBindingsThreadSafetyTests
     public void MixedOperations_ConcurrentAccess_NoExceptions ()
     {
         // Arrange
-        var bindings = new TestInputBindings ();
+        var bindings = new TestCommandBindings ();
         List<Exception> exceptions = new ();
         const int OPERATIONS_PER_THREAD = 100;
 
@@ -301,8 +301,7 @@ public class InputBindingsThreadSafetyTests
         {
             int threadId = i;
 
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
@@ -319,14 +318,14 @@ public class InputBindingsThreadSafetyTests
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
         // Reader threads
         for (var i = 0; i < 3; i++)
         {
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
@@ -341,7 +340,8 @@ public class InputBindingsThreadSafetyTests
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
         // Remover threads
@@ -349,8 +349,7 @@ public class InputBindingsThreadSafetyTests
         {
             int threadId = i;
 
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
@@ -363,11 +362,12 @@ public class InputBindingsThreadSafetyTests
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert
@@ -391,14 +391,13 @@ public class InputBindingsThreadSafetyTests
         {
             int threadId = i;
 
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      for (var j = 0; j < OPERATIONS_PER_THREAD; j++)
                                      {
                                          try
                                          {
-                                             MouseFlags flags = MouseFlags.Button1Clicked | (MouseFlags)(threadId * 1000 + j);
+                                             MouseFlags flags = MouseFlags.LeftButtonClicked | (MouseFlags)(threadId * 1000 + j);
                                              mouseBindings.Add (flags, Command.Accept);
                                          }
                                          catch (InvalidOperationException)
@@ -414,11 +413,12 @@ public class InputBindingsThreadSafetyTests
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031 // Test methods should not use blocking task operations - intentional for stress testing
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert
@@ -431,7 +431,7 @@ public class InputBindingsThreadSafetyTests
     public void Remove_ConcurrentAccess_NoExceptions ()
     {
         // Arrange
-        var bindings = new TestInputBindings ();
+        var bindings = new TestCommandBindings ();
         const int NUM_ITEMS = 100;
 
         // Populate data
@@ -441,8 +441,7 @@ public class InputBindingsThreadSafetyTests
         }
 
         // Act - Multiple threads removing items
-        Parallel.For (
-                      0,
+        Parallel.For (0,
                       NUM_ITEMS,
                       i =>
                       {
@@ -464,7 +463,7 @@ public class InputBindingsThreadSafetyTests
     public void Replace_ConcurrentAccess_NoExceptions ()
     {
         // Arrange
-        var bindings = new TestInputBindings ();
+        var bindings = new TestCommandBindings ();
         const string OLD_KEY = "old_key";
         const string NEW_KEY = "new_key";
 
@@ -473,8 +472,7 @@ public class InputBindingsThreadSafetyTests
         // Act - Multiple threads trying to replace
         List<Exception> exceptions = new ();
 
-        Parallel.For (
-                      0,
+        Parallel.For (0,
                       10,
                       i =>
                       {
@@ -500,7 +498,7 @@ public class InputBindingsThreadSafetyTests
     public void TryGet_ConcurrentAccess_ReturnsConsistentResults ()
     {
         // Arrange
-        var bindings = new TestInputBindings ();
+        var bindings = new TestCommandBindings ();
         const string TEST_KEY = "test_key";
 
         bindings.Add (TEST_KEY, Command.Accept);
@@ -508,26 +506,19 @@ public class InputBindingsThreadSafetyTests
         // Act
         var results = new bool [100];
 
-        Parallel.For (
-                      0,
-                      100,
-                      i => { results [i] = bindings.TryGet (TEST_KEY, out _); });
+        Parallel.For (0, 100, i => { results [i] = bindings.TryGet (TEST_KEY, out _); });
 
         // Assert - All threads should consistently find the binding
         Assert.All (results, result => Assert.True (result));
     }
 
     /// <summary>
-    ///     Test implementation of InputBindings for testing purposes.
+    ///     Test implementation of CommandBindings for testing purposes.
     /// </summary>
-    private class TestInputBindings () : InputBindings<string, KeyBinding> (
-                                                                            (commands, evt) => new ()
-                                                                            {
-                                                                                Commands = commands,
-                                                                                Key = Key.Empty
-                                                                            },
-                                                                            StringComparer.OrdinalIgnoreCase)
+    private class TestCommandBindings ()
+        : CommandBindingsBase<string, KeyBinding> ((commands, evt, source) => new KeyBinding { Commands = commands, Key = Key.Empty },
+                                             StringComparer.OrdinalIgnoreCase)
     {
-        public override bool IsValid (string eventArgs) { return !string.IsNullOrEmpty (eventArgs); }
+        public override bool IsValid (string eventArgs) => !string.IsNullOrEmpty (eventArgs);
     }
 }

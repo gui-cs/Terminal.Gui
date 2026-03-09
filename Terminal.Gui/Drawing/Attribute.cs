@@ -17,7 +17,9 @@ namespace Terminal.Gui.Drawing;
 /// <seealso cref="TextStyle"/>
 /// <seealso cref="VisualRole"/>
 /// <seealso cref="Scheme"/>
+#pragma warning disable IL2026 // AttributeJsonConverter is AOT-compatible
 [JsonConverter (typeof (AttributeJsonConverter))]
+#pragma warning restore IL2026
 public readonly record struct Attribute : IEqualityOperators<Attribute, Attribute, bool>
 {
     /// <summary>Default empty attribute.</summary>
@@ -45,12 +47,12 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// <summary>
     ///     Initializes a new instance of the <see cref="Attribute"/> struct with default values.
     /// </summary>
-    public Attribute () { this = Default; }
+    public Attribute () => this = Default;
 
     /// <summary>
     ///     Initializes a new <see cref="Attribute"/> from an existing instance, preserving explicit state.
     /// </summary>
-    public Attribute (in Attribute attr) { this = attr; }
+    public Attribute (in Attribute attr) => this = attr;
 
     /// <summary>
     ///     Initializes an instance using two named colors.
@@ -85,9 +87,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
         Foreground = Color.Parse (foreground);
         Background = Color.Parse (background);
 
-        Style = style is { } && Enum.TryParse (style, true, out TextStyle parsedStyle)
-                    ? parsedStyle
-                    : TextStyle.None;
+        Style = style is { } && Enum.TryParse (style, true, out TextStyle parsedStyle) ? parsedStyle : TextStyle.None;
     }
 
     /// <summary>
@@ -115,8 +115,8 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// <summary>
     ///     Initializes a new instance with foreground and background colors.
     /// </summary>
-    public Attribute (in ColorName16 foreground16Name, in ColorName16 background16Name)
-        : this (new Color (in foreground16Name), new Color (in background16Name))
+    public Attribute (in ColorName16 foreground16Name, in ColorName16 background16Name) : this (new Color (in foreground16Name),
+                                                                                                new Color (in background16Name))
     { }
 
     /// <summary>
@@ -139,9 +139,7 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// <summary>
     ///     Initializes a new instance with foreground and background colors.
     /// </summary>
-    public Attribute (in StandardColor foreground, in StandardColor background)
-        : this (new Color (in foreground), new Color (in background))
-    { }
+    public Attribute (in StandardColor foreground, in StandardColor background) : this (new Color (in foreground), new Color (in background)) { }
 
     /// <summary>
     ///     Initializes a new instance with foreground and background colors.
@@ -161,27 +159,20 @@ public readonly record struct Attribute : IEqualityOperators<Attribute, Attribut
     /// <summary>
     ///     Initializes a new instance with foreground and background colors and a <see cref="TextStyle"/>.
     /// </summary>
-    public Attribute (in StandardColor foreground, in StandardColor background, in TextStyle style) : this (
-                                                                                                            new (in foreground),
+    public Attribute (in StandardColor foreground, in StandardColor background, in TextStyle style) : this (new Color (in foreground),
                                                                                                             new Color (in background),
                                                                                                             style)
     { }
 
     /// <inheritdoc/>
-    public bool Equals (Attribute other)
-    {
-        return Foreground.Equals (other.Foreground)
-               && Background.Equals (other.Background)
-               && Style == other.Style;
-    }
+    public bool Equals (Attribute other) => Foreground.Equals (other.Foreground) && Background.Equals (other.Background) && Style == other.Style;
 
     /// <inheritdoc/>
-    public override int GetHashCode () { return HashCode.Combine (Foreground, Background, Style); }
+    public override int GetHashCode () => HashCode.Combine (Foreground, Background, Style);
 
     /// <inheritdoc/>
-    public override string ToString ()
-    {
+    public override string ToString () =>
+
         // Note: Unit tests are dependent on this format
-        return $"[{Foreground},{Background},{Style}]";
-    }
+        $"[{Foreground},{Background},{Style}]";
 }

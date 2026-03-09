@@ -81,9 +81,11 @@ public class CollectionNavigatorTester : Scenario
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
 
-        Window top = new ()
+        using Window top = new ()
         {
             SchemeName = "Base"
         };
@@ -97,16 +99,16 @@ public class CollectionNavigatorTester : Scenario
             Title = "Allow _Marking"
         };
 
-        _allowMarkingCheckBox.CheckedStateChanged += (s, e) =>
+        _allowMarkingCheckBox.ValueChanged += (_, _) =>
                                                      {
-                                                         if (_listView is { })
+                                                         if (_listView is not null)
                                                          {
-                                                             _listView.AllowsMarking = _allowMarkingCheckBox.CheckedState == CheckState.Checked;
+                                                             _listView.ShowMarks = _allowMarkingCheckBox.Value == CheckState.Checked;
                                                          }
 
-                                                         if (_allowMultiSelectionCheckBox is { })
+                                                         if (_allowMultiSelectionCheckBox is not null)
                                                          {
-                                                             _allowMultiSelectionCheckBox.Enabled = _allowMarkingCheckBox.CheckedState == CheckState.Checked;
+                                                             _allowMultiSelectionCheckBox.Enabled = _allowMarkingCheckBox.Value == CheckState.Checked;
                                                          }
                                                      };
 
@@ -116,12 +118,12 @@ public class CollectionNavigatorTester : Scenario
             Enabled = false
         };
 
-        _allowMultiSelectionCheckBox.CheckedStateChanged += (s, e) =>
+        _allowMultiSelectionCheckBox.ValueChanged += (_, _) =>
                                                             {
-                                                                if (_listView is { })
+                                                                if (_listView is not null)
                                                                 {
-                                                                    _listView.AllowsMultipleSelection =
-                                                                        _allowMultiSelectionCheckBox.CheckedState == CheckState.Checked;
+                                                                    _listView.MarkMultiple =
+                                                                        _allowMultiSelectionCheckBox.Value == CheckState.Checked;
                                                                 }
                                                             };
 
@@ -139,7 +141,7 @@ public class CollectionNavigatorTester : Scenario
                                        },
                                        new MenuItem
                                        {
-                                           Title = "_Quit",
+                                           Title = Strings.cmdQuit,
                                            Key = Application.QuitKey,
                                            Action = Quit
                                        }
@@ -149,11 +151,11 @@ public class CollectionNavigatorTester : Scenario
 
         menu.Add (
                   new MenuBarItem (
-                                   "_Quit",
+                                   Strings.cmdQuit,
                                    [
                                        new MenuItem
                                        {
-                                           Title = "_Quit",
+                                           Title = Strings.cmdQuit,
                                            Key = Application.QuitKey,
                                            Action = Quit
                                        }
@@ -177,9 +179,8 @@ public class CollectionNavigatorTester : Scenario
         top.Add (vsep);
         CreateTreeView ();
 
-        Application.Run (top);
+        app.Run (top);
         top.Dispose ();
-        Application.Shutdown ();
     }
 
     private void CreateListView ()
@@ -206,14 +207,14 @@ public class CollectionNavigatorTester : Scenario
             Y = Pos.Bottom (label),
             Width = Dim.Percent (50) - 1,
             Height = Dim.Fill (),
-            AllowsMarking = false,
-            AllowsMultipleSelection = false
+            ShowMarks = false,
+            MarkMultiple = false
         };
         _top.Add (_listView);
 
         _listView.SetSource (_items);
 
-        _listView.KeystrokeNavigator.SearchStringChanged += (s, e) => { label.Text = $"ListView: {e.SearchString}"; };
+        _listView.KeystrokeNavigator.SearchStringChanged += (_, e) => { label.Text = $"ListView: {e.SearchString}"; };
     }
 
     private void CreateTreeView ()
@@ -261,8 +262,8 @@ public class CollectionNavigatorTester : Scenario
         _treeView.ExpandAll ();
         _treeView.GoToFirst ();
 
-        _treeView.KeystrokeNavigator.SearchStringChanged += (s, e) => { label.Text = $"TreeView: {e.SearchString}"; };
+        _treeView.KeystrokeNavigator.SearchStringChanged += (_, e) => { label.Text = $"TreeView: {e.SearchString}"; };
     }
 
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _top?.RequestStop (); }
 }

@@ -1,7 +1,3 @@
-using System.ComponentModel;
-using UnitTests;
-using Xunit.Abstractions;
-
 // ReSharper disable AccessToModifiedClosure
 
 namespace UnitTests.ViewsTests;
@@ -56,7 +52,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 5), pos);
 
-        checkBox.CheckedState = CheckState.Checked;
+        checkBox.Value = CheckState.Checked;
         Application.LayoutAndDraw ();
 
         expected = @$"
@@ -118,12 +114,12 @@ public class CheckBoxTests (ITestOutputHelper output)
         Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 6), pos);
 
-        checkBox1.CheckedState = CheckState.Checked;
+        checkBox1.Value = CheckState.Checked;
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (1, 1, 25, 1), checkBox1.Frame);
         Assert.Equal (_size25x1, checkBox1.TextFormatter.ConstrainToSize);
 
-        checkBox2.CheckedState = CheckState.Checked;
+        checkBox2.Value = CheckState.Checked;
         AutoInitShutdownAttribute.RunIteration ();
         Assert.Equal (new (1, 2, 25, 1), checkBox2.Frame);
         Assert.Equal (_size25x1, checkBox2.TextFormatter.ConstrainToSize);
@@ -177,7 +173,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 5), pos);
 
-        checkBox.CheckedState = CheckState.Checked;
+        checkBox.Value = CheckState.Checked;
         AutoInitShutdownAttribute.RunIteration ();
 
         expected = @$"
@@ -228,7 +224,7 @@ public class CheckBoxTests (ITestOutputHelper output)
         Rectangle pos = DriverAssert.AssertDriverContentsWithFrameAre (expected, output);
         Assert.Equal (new (0, 0, 30, 5), pos);
 
-        checkBox.CheckedState = CheckState.Checked;
+        checkBox.Value = CheckState.Checked;
         AutoInitShutdownAttribute.RunIteration ();
 
         expected = @$"
@@ -269,15 +265,15 @@ public class CheckBoxTests (ITestOutputHelper output)
         var ckb = new CheckBox { AllowCheckStateNone = true };
         var checkedInvoked = false;
 
-        ckb.CheckedState = initialState;
+        ckb.Value = initialState;
 
         ckb.Activating += OnActivating;
 
-        Assert.Equal (initialState, ckb.CheckedState);
+        Assert.Equal (initialState, ckb.Value);
         bool? ret = ckb.InvokeCommand (Command.Activate);
         Assert.True (ret);
         Assert.True (checkedInvoked);
-        Assert.Equal (initialState, ckb.CheckedState);
+        Assert.Equal (initialState, ckb.Value);
 
         return;
 
@@ -292,26 +288,26 @@ public class CheckBoxTests (ITestOutputHelper output)
     [InlineData (CheckState.Checked)]
     [InlineData (CheckState.UnChecked)]
     [InlineData (CheckState.None)]
-    public void CheckedStateChanging_Cancel_Event_Prevents_Change (CheckState initialState)
+    public void ValueChanging_Cancel_Event_Prevents_Change (CheckState initialState)
     {
         var ckb = new CheckBox { AllowCheckStateNone = true };
         var checkedInvoked = false;
 
-        ckb.CheckedState = initialState;
+        ckb.Value = initialState;
 
-        ckb.CheckedStateChanging += OnCheckedStateChanging;
+        ckb.ValueChanging += OnValueChanging;
 
-        Assert.Equal (initialState, ckb.CheckedState);
+        Assert.Equal (initialState, ckb.Value);
 
         // AdvanceCheckState returns false if the state was changed, true if it was cancelled, null if it was not changed
         bool? ret = ckb.AdvanceCheckState ();
         Assert.True (ret);
         Assert.True (checkedInvoked);
-        Assert.Equal (initialState, ckb.CheckedState);
+        Assert.Equal (initialState, ckb.Value);
 
         return;
 
-        void OnCheckedStateChanging (object sender, ResultEventArgs<CheckState> e)
+        void OnValueChanging (object sender, ValueChangingEventArgs<CheckState> e)
         {
             checkedInvoked = true;
             e.Handled = true;

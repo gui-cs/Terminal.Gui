@@ -1,22 +1,27 @@
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>A sinple color picker that supports the legacy 16 ANSI colors</summary>
-public class ColorPicker16 : View
+public class ColorPicker16 : View, IValue<ColorName16>
 {
-    /// <summary>Initializes a new instance of <see cref="ColorPicker16"/>.</summary>
-    public ColorPicker16 () { SetInitialProperties (); }
-
     /// <summary>Columns of color boxes</summary>
     private const int COLS = 8;
 
     /// <summary>Rows of color boxes</summary>
     private const int ROWS = 2;
 
+    /// <summary>Initializes a new instance of <see cref="ColorPicker16"/>.</summary>
+    public ColorPicker16 ()
+    {
+        CanFocus = true;
+        AddCommands ();
+        AddKeyBindings ();
+
+        Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
+        Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
+        SetContentSize (new Size (_boxWidth * COLS, _boxHeight * ROWS));
+    }
+
     private int _boxHeight = 2;
-    private int _boxWidth = 4;
-    private int _selectColorIndex = (int)Color.Black;
 
     /// <summary>Height of a color box</summary>
     public int BoxHeight
@@ -24,16 +29,19 @@ public class ColorPicker16 : View
         get => _boxHeight;
         set
         {
-            if (_boxHeight != value)
+            if (_boxHeight == value)
             {
-                _boxHeight = value;
-                Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
-                Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
-                SetContentSize (new (_boxWidth * COLS, _boxHeight * ROWS));
-                SetNeedsLayout ();
+                return;
             }
+            _boxHeight = value;
+            Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
+            Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
+            SetContentSize (new Size (_boxWidth * COLS, _boxHeight * ROWS));
+            SetNeedsLayout ();
         }
     }
+
+    private int _boxWidth = 4;
 
     /// <summary>Width of a color box</summary>
     public int BoxWidth
@@ -41,22 +49,22 @@ public class ColorPicker16 : View
         get => _boxWidth;
         set
         {
-            if (_boxWidth != value)
+            if (_boxWidth == value)
             {
-                _boxWidth = value;
-                Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
-                Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
-                SetContentSize (new (_boxWidth * COLS, _boxHeight * ROWS));
-                SetNeedsLayout ();
+                return;
             }
+            _boxWidth = value;
+            Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
+            Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
+            SetContentSize (new Size (_boxWidth * COLS, _boxHeight * ROWS));
+            SetNeedsLayout ();
         }
     }
 
-    /// <summary>Fired when a color is picked.</summary>
-    public event EventHandler<ResultEventArgs<Color>>? ColorChanged;
+    private int _selectColorIndex = (int)Color.Black;
 
     /// <summary>Cursor for the selected color.</summary>
-    public Point Cursor
+    public Point Caret
     {
         get => new (_selectColorIndex % COLS, _selectColorIndex / COLS);
         set
@@ -74,12 +82,15 @@ public class ColorPicker16 : View
         {
             return true;
         }
-        if (Cursor.Y < ROWS - 1)
+
+        if (Caret.Y < ROWS - 1)
         {
             SelectedColor += COLS;
+
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     /// <summary>Moves the selected item index to the previous column.</summary>
@@ -91,10 +102,11 @@ public class ColorPicker16 : View
             return true;
         }
 
-        if (Cursor.X > 0)
+        if (Caret.X <= 0)
         {
-            SelectedColor--;
+            return false;
         }
+        SelectedColor--;
 
         return true;
     }
@@ -107,10 +119,12 @@ public class ColorPicker16 : View
         {
             return true;
         }
-        if (Cursor.X < COLS - 1)
+
+        if (Caret.X >= COLS - 1)
         {
-            SelectedColor++;
+            return false;
         }
+        SelectedColor++;
 
         return true;
     }
@@ -123,10 +137,12 @@ public class ColorPicker16 : View
         {
             return true;
         }
-        if (Cursor.Y > 0)
+
+        if (Caret.Y <= 0)
         {
-            SelectedColor -= COLS;
+            return false;
         }
+        SelectedColor -= COLS;
 
         return true;
     }
@@ -150,14 +166,14 @@ public class ColorPicker16 : View
 
                 if (Enabled)
                 {
-                    SetAttribute (new ((ColorName16)foregroundColorIndex, (ColorName16)colorIndex));
+                    SetAttribute (new Attribute ((ColorName16)foregroundColorIndex, (ColorName16)colorIndex));
                 }
                 else
                 {
-                    SetAttribute (new ((ColorName16)foregroundColorIndex, ((Color)(ColorName16)colorIndex).GetDimColor (), TextStyle.Faint));
+                    SetAttribute (new Attribute ((ColorName16)foregroundColorIndex, ((Color)(ColorName16)colorIndex).GetDimmerColor (), TextStyle.Faint));
                 }
 
-                bool selected = x == Cursor.X && y == Cursor.Y;
+                bool selected = x == Caret.X && y == Caret.Y;
                 DrawColorBox (x, y, selected);
                 colorIndex++;
             }
@@ -166,7 +182,9 @@ public class ColorPicker16 : View
         return true;
     }
 
-    /// <summary>Selected color.</summary>
+    #region IValue<ColorName16> Implementation
+
+    /// <summary>Gets or sets the selected color.</summary>
     public ColorName16 SelectedColor
     {
         get => (ColorName16)_selectColorIndex;
@@ -177,35 +195,93 @@ public class ColorPicker16 : View
                 return;
             }
 
-            _selectColorIndex = (int)value;
+            var oldValue = (ColorName16)_selectColorIndex;
 
-            ColorChanged?.Invoke (
-                                  this,
-                                  new (value)
-                                 );
+            ValueChangingEventArgs<ColorName16> changingArgs = new (oldValue, value);
+
+            if (OnValueChanging (changingArgs) || changingArgs.Handled)
+            {
+                return;
+            }
+
+            ValueChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
+            {
+                return;
+            }
+
+            if (value is < 0 or > (ColorName16)15)
+            {
+                throw new ArgumentOutOfRangeException (nameof (value), @"SelectedColor must be between 0 and 15.");
+            }
+
+            _selectColorIndex = (int)value;
             SetNeedsDraw ();
+
+            ValueChangedEventArgs<ColorName16> changedArgs = new (oldValue, value);
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
+
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, value));
         }
     }
+
+    /// <inheritdoc/>
+    public ColorName16 Value { get => SelectedColor; set => SelectedColor = value; }
+
+    /// <inheritdoc/>
+    object IValue.GetValue () => SelectedColor;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
+    /// <summary>
+    ///     Called when the <see cref="ColorPicker16"/> <see cref="Value"/> is changing.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<ColorName16> args) => false;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<ColorName16>>? ValueChanging;
+
+    /// <summary>
+    ///     Called when the <see cref="ColorPicker16"/> <see cref="Value"/> has changed.
+    /// </summary>
+    /// <param name="args">The event arguments containing old and new values.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<ColorName16> args) { }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<ColorName16>>? ValueChanged;
+
+    #endregion
 
     /// <summary>Add the commands.</summary>
     private void AddCommands ()
     {
-        AddCommand (Command.Left, (ctx) => MoveLeft (ctx));
-        AddCommand (Command.Right, (ctx) => MoveRight (ctx));
-        AddCommand (Command.Up, (ctx) => MoveUp (ctx));
-        AddCommand (Command.Down, (ctx) => MoveDown (ctx));
+        AddCommand (Command.Left, ctx => MoveLeft (ctx));
+        AddCommand (Command.Right, ctx => MoveRight (ctx));
+        AddCommand (Command.Up, ctx => MoveUp (ctx));
+        AddCommand (Command.Down, ctx => MoveDown (ctx));
+    }
 
-        AddCommand (Command.Activate, (ctx) =>
-                                    {
-                                        var set = false;
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? commandContext)
+    {
+        base.OnActivated (commandContext);
 
-                                        if (ctx is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } } mouseCommandContext)
-                                        {
-                                            Cursor = new (mouseCommandContext.Binding.MouseEventArgs.Position.X / _boxWidth, mouseCommandContext.Binding.MouseEventArgs.Position.Y / _boxHeight);
-                                            set = true;
-                                        }
-                                        return RaiseAccepting (ctx) == true || set;
-                                    });
+        if (commandContext?.Binding is MouseBinding { MouseEvent.Position: { } pos })
+        {
+            int col = pos.X / _boxWidth;
+            int row = pos.Y / _boxHeight;
+
+            // Only set Caret if within valid color box bounds
+            if (col is >= 0 and < COLS && row is >= 0 and < ROWS)
+            {
+                Caret = new Point (col, row);
+            }
+        }
     }
 
     /// <summary>Add the KeyBindings.</summary>
@@ -215,6 +291,9 @@ public class ColorPicker16 : View
         KeyBindings.Add (Key.CursorRight, Command.Right);
         KeyBindings.Add (Key.CursorUp, Command.Up);
         KeyBindings.Add (Key.CursorDown, Command.Down);
+
+        MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
+        MouseBindings.Remove (MouseFlags.LeftButtonClicked);
     }
 
     // TODO: Decouple Cursor from SelectedColor so that mouse press-and-hold can show the color under the cursor.
@@ -235,13 +314,13 @@ public class ColorPicker16 : View
 
         if (selected)
         {
-            DrawFocusRect (new (x * BoxWidth, y * BoxHeight, BoxWidth, BoxHeight));
+            DrawFocusRect (new Rectangle (x * BoxWidth, y * BoxHeight, BoxWidth, BoxHeight));
         }
     }
 
     private void DrawFocusRect (Rectangle rect)
     {
-        var lc = new LineCanvas ();
+        LineCanvas lc = new ();
 
         if (rect.Width == 1)
         {
@@ -255,39 +334,16 @@ public class ColorPicker16 : View
         {
             lc.AddLine (rect.Location, rect.Width, Orientation.Horizontal, LineStyle.Dotted);
 
-            lc.AddLine (
-                        rect.Location with { Y = rect.Location.Y + rect.Height - 1 },
-                        rect.Width,
-                        Orientation.Horizontal,
-                        LineStyle.Dotted
-                       );
+            lc.AddLine (rect.Location with { Y = rect.Location.Y + rect.Height - 1 }, rect.Width, Orientation.Horizontal, LineStyle.Dotted);
 
             lc.AddLine (rect.Location, rect.Height, Orientation.Vertical, LineStyle.Dotted);
 
-            lc.AddLine (
-                        rect.Location with { X = rect.Location.X + rect.Width - 1 },
-                        rect.Height,
-                        Orientation.Vertical,
-                        LineStyle.Dotted
-                       );
+            lc.AddLine (rect.Location with { X = rect.Location.X + rect.Width - 1 }, rect.Height, Orientation.Vertical, LineStyle.Dotted);
         }
 
         foreach (KeyValuePair<Point, Rune> p in lc.GetMap ())
         {
             AddRune (p.Key.X, p.Key.Y, p.Value);
         }
-    }
-
-    private void SetInitialProperties ()
-    {
-        HighlightStates = ViewBase.MouseState.PressedOutside | ViewBase.MouseState.Pressed;
-
-        CanFocus = true;
-        AddCommands ();
-        AddKeyBindings ();
-
-        Width = Dim.Auto (minimumContentDim: _boxWidth * COLS);
-        Height = Dim.Auto (minimumContentDim: _boxHeight * ROWS);
-        SetContentSize (new (_boxWidth * COLS, _boxHeight * ROWS));
     }
 }

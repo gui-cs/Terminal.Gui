@@ -1,397 +1,675 @@
-# Terminal.Gui Event Deep Dive
+# Terminal.Gui Events Deep Dive
 
-This document provides a comprehensive overview of how events work in Terminal.Gui. For the conceptual overview of the Cancellable Work Pattern, see [Cancellable Work Pattern](cancellable-work-pattern.md).
+This document provides practical guidance for implementing events in Terminal.Gui using the [Cancellable Work Pattern (CWP)](cancellable-work-pattern.md).
+
+> [!TIP]
+> **New to CWP?** Read the [Cancellable Work Pattern](cancellable-work-pattern.md) conceptual overview first.
+
+## Quick Start: Which Pattern Do I Need?
+
+Use this decision tree to choose the right pattern:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│              Which Event Pattern Should I Use?              │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  Need to notify about something?                            │
+│           │                                                 │
+│           ▼                                                 │
+│  ┌─────────────────┐                                        │
+│  │ Can it be       │──► NO ──► Simple EventHandler          │
+│  │ cancelled?      │          (no CWP needed)               │
+│  └────────┬────────┘                                        │
+│           │ YES                                             │
+│           ▼                                                 │
+│  ┌─────────────────┐                                        │
+│  │ Property or     │──► PROPERTY ──► CWPPropertyHelper      │
+│  │ Action/Workflow?│                 (Recipe 1)             │
+│  └────────┬────────┘                                        │
+│           │ ACTION                                          │
+│           ▼                                                 │
+│       Manual CWP or CWPWorkflowHelper                       │
+│       (Recipe 2)                                            │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+| Scenario | Pattern | Jump to |
+|----------|---------|---------|
+| Property change (cancellable) | `CWPPropertyHelper` | [Recipe 1](#recipe-1-cancellable-property-change) |
+| Action/workflow (cancellable) | Manual CWP or `CWPWorkflowHelper` | [Recipe 2](#recipe-2-cancellable-actionworkflow) |
+| Simple notification (no cancel) | `EventHandler` | [Recipe 3](#recipe-3-simple-notification) |
+| Property notification (MVVM) | `INotifyPropertyChanged` | [Recipe 4](#recipe-4-mvvm-property-notification) |
 
 ## See Also
 
-* [Cancellable Work Pattern](cancellable-work-pattern.md)
-* [Command Deep Dive](command.md)
+* [Cancellable Work Pattern](cancellable-work-pattern.md) - Conceptual overview
+* [Command Deep Dive](command.md) - Command system details
 * [Lexicon & Taxonomy](lexicon.md)
 
 ## Lexicon and Taxonomy
 
 [!INCLUDE [Events Lexicon](~/includes/events-lexicon.md)]
 
-## Event Categories
+---
 
-Terminal.Gui uses several types of events:
+## Recipes: Implementing CWP in Terminal.Gui
 
-1. **UI Interaction Events**: Events triggered by user input (keyboard, mouse)
-2. **View Lifecycle Events**: Events related to view creation, activation, and disposal
-3. **Property Change Events**: Events for property value changes
-4. **Drawing Events**: Events related to view rendering
-5. **Command Events**: Events for command execution and workflow control
+### Recipe 1: Cancellable Property Change
 
-## Event Patterns
+**Use when:** A property change can be vetoed/cancelled by subclasses or subscribers.
 
-### 1. Cancellable Work Pattern (CWP)
-
-The [Cancellable Work Pattern (CWP)](cancellable-work-pattern.md) is a core pattern in Terminal.Gui that provides a consistent way to handle cancellable operations. An "event" has two components:
-
-1. **Virtual Method**: `protected virtual OnMethod()` that can be overridden in a subclass so the subclass can participate
-2. **Event**: `public event EventHandler<>` that allows external subscribers to participate
-
-The virtual method is called first, letting subclasses have priority. Then the event is invoked.
-
-Optional CWP Helper Classes are provided to provide consistency.
-
-#### Manual CWP Implementation
-
-The basic CWP pattern combines a protected virtual method with a public event:
+#### Step 1: Define the Events and Virtual Methods
 
 ```csharp
-public class MyView : View
+public class MyDataView : View
 {
-    // Public event
-    public event EventHandler<MouseEventArgs>? MouseEvent;
+    private object? _dataSource;
 
-    // Protected virtual method
-    protected virtual bool OnMouseEvent(MouseEventArgs args)
-    {
-        // Return true to handle the event and stop propagation
-        return false;
-    }
+    // Pre-change event (cancellable)
+    public event EventHandler<ValueChangingEventArgs<object?>>? DataSourceChanging;
 
-    // Internal method to raise the event
-    internal bool RaiseMouseEvent(MouseEventArgs args)
-    {
-        // Call virtual method first
-        if (OnMouseEvent(args) || args.Handled)
-        {
-            return true;
-        }
+    // Post-change event (notification)
+    public event EventHandler<ValueChangedEventArgs<object?>>? DataSourceChanged;
 
-        // Then raise the event
-        MouseEvent?.Invoke(this, args);
-        return args.Handled;
-    }
+    // Virtual method for subclasses (pre-change) - returns true to cancel
+    protected virtual bool OnDataSourceChanging (ValueChangingEventArgs<object?> args) => false;
+
+    // Virtual method for subclasses (post-change) - void, cannot cancel
+    protected virtual void OnDataSourceChanged (ValueChangedEventArgs<object?> args) { }
 }
 ```
 
-#### CWP with Helper Classes
-
-Terminal.Gui provides static helper classes to implement CWP:
-
-#### Property Changes
-
-For property changes, use `CWPPropertyHelper.ChangeProperty`:
+#### Step 2: Implement the Property with CWPPropertyHelper
 
 ```csharp
-public class MyView : View
+public object? DataSource
 {
-    private string _text = string.Empty;
-    public event EventHandler<ValueChangingEventArgs<string>>? TextChanging;
-    public event EventHandler<ValueChangedEventArgs<string>>? TextChanged;
-
-    public string Text
+    get => _dataSource;
+    set
     {
-        get => _text;
-        set
-        {
-            if (CWPPropertyHelper.ChangeProperty(
-                currentValue: _text,
+        if (CWPPropertyHelper.ChangeProperty (
+                sender: this,
+                currentValue: ref _dataSource,
                 newValue: value,
-                onChanging: args => OnTextChanging(args),
-                changingEvent: TextChanging,
-                onChanged: args => OnTextChanged(args),
-                changedEvent: TextChanged,
-                out string finalValue))
-            {
-                _text = finalValue;
-            }
+                onChanging: OnDataSourceChanging,
+                changingEvent: DataSourceChanging,
+                doWork: newDataSource =>
+                {
+                    // Additional work AFTER value changes but BEFORE Changed events
+                    // e.g., refresh display, update selection
+                    SetNeedsDraw ();
+                },
+                onChanged: OnDataSourceChanged,
+                changedEvent: DataSourceChanged,
+                out _))
+        {
+            // Property was changed (not cancelled)
         }
-    }
-
-    // Virtual method called before the change
-    protected virtual bool OnTextChanging(ValueChangingEventArgs<string> args)
-    {
-        // Return true to cancel the change
-        return false;
-    }
-
-    // Virtual method called after the change
-    protected virtual void OnTextChanged(ValueChangedEventArgs<string> args)
-    {
-        // React to the change
     }
 }
 ```
 
-#### Workflows
-
-For general workflows, use `CWPWorkflowHelper`:
+#### Step 3: Consuming the Events
 
 ```csharp
-public class MyView : View
+// External subscriber (event)
+myDataView.DataSourceChanging += (sender, args) =>
 {
-    public bool? ExecuteWorkflow()
+    if (args.NewValue is null)
     {
-        ResultEventArgs<bool> args = new();
-        return CWPWorkflowHelper.Execute(
-            onMethod: args => OnExecuting(args),
-            eventHandler: Executing,
+        args.Handled = true; // Prevent null assignment
+    }
+};
+
+myDataView.DataSourceChanged += (sender, args) =>
+{
+    Console.WriteLine($"DataSource changed from {args.OldValue} to {args.NewValue}");
+};
+
+// Subclass (virtual method override)
+public class MyCustomDataView : MyDataView
+{
+    protected override bool OnDataSourceChanging (ValueChangingEventArgs<object?> args)
+    {
+        // Validate new data source
+        if (args.NewValue is ICollection { Count: 0 })
+        {
+            return true; // Cancel - don't allow empty collections
+        }
+
+        return false;
+    }
+}
+```
+
+---
+
+### Recipe 2: Cancellable Action/Workflow
+
+**Use when:** An action or operation can be cancelled by subclasses or subscribers.
+
+**Example:** Custom view with an `Executing` event.
+
+#### Option A: Manual CWP Implementation
+
+> [!NOTE]
+> This recipe uses `CancelEventArgs.Cancel` for standalone workflows that are not part of the command system.
+> For command-related events (e.g., <xref:Terminal.Gui.ViewBase.View.Accepting>, <xref:Terminal.Gui.ViewBase.View.Activating>), use `CommandEventArgs.Handled` instead (see [Command Deep Dive](command.md)).
+
+```csharp
+public class MyProcessor : View
+{
+    // Event for external subscribers
+    public event EventHandler<CancelEventArgs>? Processing;
+
+    // Virtual method for subclasses
+    protected virtual bool OnProcessing (CancelEventArgs args)
+    {
+        return false; // Return true to cancel
+    }
+
+    // Internal method that implements CWP
+    public bool Process ()
+    {
+        CancelEventArgs args = new ();
+
+        // Step 1: Call virtual method (subclass gets first chance)
+        if (OnProcessing (args) || args.Cancel)
+        {
+            return false; // Cancelled
+        }
+
+        // Step 2: Raise event (external subscribers get a chance)
+        Processing?.Invoke (this, args);
+
+        if (args.Cancel)
+        {
+            return false; // Cancelled
+        }
+
+        // Step 3: Execute default behavior
+        DoProcessing ();
+
+        return true;
+    }
+
+    private void DoProcessing ()
+    {
+        // Default processing logic
+    }
+}
+```
+
+#### Option B: Using CWPWorkflowHelper
+
+```csharp
+public class MyProcessor : View
+{
+    public event EventHandler<ResultEventArgs<bool>>? Processing;
+
+    protected virtual bool OnProcessing (ResultEventArgs<bool> args)
+    {
+        return false; // Return true to cancel
+    }
+
+    public bool? Process ()
+    {
+        ResultEventArgs<bool> args = new ();
+
+        return CWPWorkflowHelper.Execute (
+            onMethod: OnProcessing,
+            eventHandler: Processing,
             args: args,
             defaultAction: () =>
             {
-                // Main execution logic
-                DoWork();
+                // Default processing logic
+                DoProcessing ();
                 args.Result = true;
             });
     }
 
-    // Virtual method called before execution
-    protected virtual bool OnExecuting(ResultEventArgs<bool> args)
+    private void DoProcessing ()
     {
-        // Return true to cancel execution
-        return false;
-    }
-
-    public event EventHandler<ResultEventArgs<bool>>? Executing;
-}
-```
-
-### 2. Action Callbacks
-
-For simple callbacks without cancellation, use `Action`. For example, in `Shortcut`:
-
-```csharp
-public class Shortcut : View
-{
-    /// <summary>
-    ///     Gets or sets the action to be invoked when the shortcut key is pressed or the shortcut is clicked on with the
-    ///     mouse.
-    /// </summary>
-    /// <remarks>
-    ///     Note, the <see cref="View.Accepting"/> event is fired first, and if cancelled, the event will not be invoked.
-    /// </remarks>
-    public Action? Action { get; set; }
-
-    internal virtual bool? DispatchCommand(ICommandContext? commandContext)
-    {
-        bool cancel = base.DispatchCommand(commandContext) == true;
-
-        if (cancel)
-        {
-            return true;
-        }
-
-        if (Action is { })
-        {
-            Logging.Debug($"{Title} ({commandContext?.Source?.Title}) - Invoke Action...");
-            Action.Invoke();
-
-            // Assume if there's a subscriber to Action, it's handled.
-            cancel = true;
-        }
-
-        return cancel;
+        // Processing logic
     }
 }
 ```
 
-### 3. Property Change Notifications
+---
 
-For property change notifications, implement `INotifyPropertyChanged`. For example, in `Aligner`:
+### Recipe 3: Simple Notification
+
+**Use when:** You just need to notify that something happened (no cancellation needed).
+
+> [!IMPORTANT]
+> The virtual method must be a **no-op by default**. It exists solely for subclasses to override.
+> The event invocation happens in a separate `Raise*` method, NOT in the virtual method.
 
 ```csharp
-public class Aligner : INotifyPropertyChanged
+public class MyView : View
 {
-    private Alignment _alignment;
+    // Simple event - no cancellation
+    public event EventHandler? SelectionMade;
+
+    // Virtual method for subclasses - NO-OP by default
+    protected virtual void OnSelectionMade ()
+    {
+        // Does nothing by default.
+        // Subclasses override this to react to the selection.
+    }
+
+    // Internal method that raises the notification
+    private void RaiseSelectionMade ()
+    {
+        // 1. Call virtual method first (subclasses get priority)
+        OnSelectionMade ();
+
+        // 2. Raise event (external subscribers)
+        SelectionMade?.Invoke (this, EventArgs.Empty);
+    }
+
+    private void HandleSelection ()
+    {
+        // ... selection logic ...
+        RaiseSelectionMade ();
+    }
+}
+
+// Subclass example
+public class MyCustomView : MyView
+{
+    protected override void OnSelectionMade ()
+    {
+        // React to selection in subclass
+        UpdateStatusBar ();
+    }
+}
+```
+
+---
+
+### Recipe 4: MVVM Property Notification
+
+**Use when:** You need data binding support via `INotifyPropertyChanged`.
+
+```csharp
+public class ViewModel : INotifyPropertyChanged
+{
+    private string _name = string.Empty;
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    public Alignment Alignment
+    public string Name
     {
-        get => _alignment;
+        get => _name;
         set
         {
-            _alignment = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Alignment)));
+            if (_name != value)
+            {
+                _name = value;
+                PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (nameof (Name)));
+            }
         }
     }
 }
 ```
 
-### 4. Event Propagation
+---
 
-Events in Terminal.Gui often propagate through the view hierarchy. For example, in `Button`, the `Activating` and `Accepting` events are raised as part of the command handling process:
+## Event Categories in Terminal.Gui
+
+Terminal.Gui uses several types of events:
+
+| Category | Examples | Pattern |
+|----------|----------|---------|
+| **UI Interaction** | `KeyDown`, `MouseClick` | CWP with `Handled` |
+| **View Lifecycle** | `Initialized`, `Disposed` | Simple notification |
+| **Property Change** | `TextChanging`, `TextChanged` | CWP with `Handled` |
+| **Drawing** | `DrawingContent`, `DrawComplete` | CWP with `Handled` |
+| **Command** | <xref:Terminal.Gui.ViewBase.View.Accepting>, <xref:Terminal.Gui.ViewBase.View.Activating> | CWP with `Handled` |
+
+## Event Context and Arguments
+
+### Standard Event Arguments
+
+Terminal.Gui provides these event argument types:
+
+| Type | Use Case | Key Properties |
+|------|----------|----------------|
+| `ValueChangingEventArgs<T>` | Pre-property-change | `CurrentValue`, `NewValue`, `Handled` |
+| `ValueChangedEventArgs<T>` | Post-property-change | `OldValue`, `NewValue` |
+| <xref:Terminal.Gui.Input.CommandEventArgs> | Command execution | `Context`, `Handled` |
+| `CancelEventArgs` | Cancellable operations | `Cancel` |
+| `MouseEventArgs` | Mouse input | `Position`, `Flags`, `Handled` |
+
+### Command Context
+
+When handling command events, rich context is available through <xref:Terminal.Gui.Input.ICommandContext>:
 
 ```csharp
-private bool? HandleHotKeyCommand (ICommandContext commandContext)
+public interface ICommandContext
 {
-    bool cachedIsDefault = IsDefault; // Supports "Swap Default" in Buttons scenario where IsDefault changes
+    Command Command { get; }                    // The command being invoked
+    WeakReference<View>? Source { get; }        // Weak ref to the originating view
+    ICommandBinding? Binding { get; }           // The binding that triggered the command
+    CommandRouting Routing { get; }             // Direct, BubblingUp, DispatchingDown, or Bridged
+    IReadOnlyList<object?> Values { get; }     // Values accumulated as the command propagated
+    object? Value { get; }                      // Most recently appended value (Values[^1])
+}
+```
 
-    if (RaiseActivating (commandContext) is true)
+<xref:Terminal.Gui.Input.CommandContext> is an immutable record struct. Use `WithCommand()`, `WithRouting()`, or `WithValue()` to create modified copies.
+
+- **`Values`** — An append-only chain of values accumulated as the command propagates up the view hierarchy. Each <xref:Terminal.Gui.ViewBase.IValue>-implementing view appends its value. Ordered from innermost (originator) to outermost.
+- **`Value`** — Convenience accessor for `Values[^1]` (the most recently appended value), or `null` if `Values` is empty.
+
+See the [Value Propagation](command.md#value-propagation) section in the Command Deep Dive for details.
+
+> [!NOTE]
+> `Source` is a `WeakReference<View>` to prevent memory leaks during command propagation.
+> Use `ctx.TryGetSource (out View? view)` or `ctx.Source?.TryGetTarget (out View? view)` to safely access the source view.
+
+### Binding Types and Pattern Matching
+
+Terminal.Gui provides three binding types. Use pattern matching to access binding-specific details:
+
+```csharp
+protected override bool OnAccepting (CommandEventArgs args)
+{
+    // Determine what triggered the command
+    switch (args.Context?.Binding)
     {
-        return true;
+        case KeyBinding kb:
+            // Keyboard-triggered
+            Key? key = kb.Key;
+
+            break;
+
+        case MouseBinding mb:
+            // Mouse-triggered
+            Point position = mb.MouseEvent.Position;
+            MouseFlags flags = mb.MouseEvent.Flags;
+
+            break;
+
+        case CommandBinding ib:
+            // Programmatic invocation
+            object? data = ib.Data;
+
+            break;
     }
 
-    bool? handled = RaiseAccepting (commandContext);
+    return false;
+}
 
-    if (handled == true)
-    {
-        return true;
-    }
+// Or use property patterns for concise access:
+if (args.Context?.Binding is MouseBinding { MouseEvent: { } mouse })
+{
+    Point position = mouse.Position;
+}
+```
 
-    SetFocus ();
+### Source Tracking During Propagation
 
-    // If Accept was not handled...
-    if (cachedIsDefault && SuperView is { })
-    {
-        return SuperView.InvokeCommand (Command.Accept);
-    }
+Understanding the difference between sources is important during event propagation:
+
+| Property | Description | Changes During Propagation? |
+|----------|-------------|----------------------------|
+| `ICommandContext.Source` | `WeakReference<View>` to the view that first invoked the command | No (constant) |
+| `ICommandContext.Routing` | <xref:Terminal.Gui.Input.CommandRouting> enum: `Direct`, `BubblingUp`, `DispatchingDown`, `Bridged` | **Yes** (changes at each hop) |
+| `ICommandBinding.Source` | View where binding was defined | No (constant) |
+| `sender` (event parameter) | View currently raising the event | **Yes** |
+
+```csharp
+protected override bool OnAccepting (CommandEventArgs args)
+{
+    // In the Accepting event handler, `this` is the view raising the event (changes as it bubbles).
+    // args.Context?.Source is a WeakReference<View> to the original view that started the command (constant).
+
+    View? originalView = null;
+    args.Context?.Source?.TryGetTarget (out originalView);
 
     return false;
 }
 ```
 
-This example shows how `Button` first raises the `Activating` event, and if not canceled, proceeds to raise the `Accepting` event. If `Accepting` is not handled and the button is the default, it invokes the `Accept` command on the `SuperView`, demonstrating event propagation up the view hierarchy.
+---
 
-## Event Context
+### Value Access: IValue and IValue&lt;T&gt;
 
-### Event Arguments
+Views that represent user-selectable values implement the `IValue<T>` interface, providing standardized access to their primary value. This enables generic programming, value propagation during command handling, and consistent event patterns.
 
-Terminal.Gui provides rich context through event arguments. For example, `CommandEventArgs`:
+#### IValue Interfaces
 
 ```csharp
-public class CommandEventArgs : EventArgs
+/// <summary>
+/// Non-generic interface for accessing a View's value as a boxed object.
+/// Used by command propagation to carry values without knowing the generic type.
+/// </summary>
+public interface IValue
 {
-    public ICommandContext? Context { get; set; }
-    public bool Handled { get; set; }
-    public bool Cancel { get; set; }
+    /// <summary>Gets the value as a boxed object.</summary>
+    object? GetValue ();
+}
+
+/// <summary>
+/// Interface for Views that provide a strongly-typed value.
+/// </summary>
+public interface IValue<TValue> : IValue
+{
+    /// <summary>Gets or sets the value.</summary>
+    TValue? Value { get; set; }
+
+    /// <summary>
+    /// Raised when <see cref="Value"/> is about to change.
+    /// Set <see cref="ValueChangingEventArgs{T}.Handled"/> to cancel.
+    /// </summary>
+    event EventHandler<ValueChangingEventArgs<TValue?>>? ValueChanging;
+
+    /// <summary>
+    /// Raised when <see cref="Value"/> has changed.
+    /// </summary>
+    event EventHandler<ValueChangedEventArgs<TValue?>>? ValueChanged;
+
+    /// <inheritdoc/>
+    object? IValue.GetValue () => Value;
 }
 ```
 
-### Command Context
+#### Views Implementing IValue&lt;T&gt;
 
-Command execution includes context through `ICommandContext`:
+| View | Value Type | Meaning |
+|------|-----------|---------|
+| <xref:Terminal.Gui.Views.CheckBox> | `CheckState` | Current checked state (Unchecked, Checked, CheckedMark) |
+| <xref:Terminal.Gui.Views.TextField> | `string` | Text content |
+| <xref:Terminal.Gui.Views.TextView> | `string` | Full text content |
+| `DateField` | `DateTime?` | Selected date and time |
+| `TimeField` | `TimeSpan` | Selected time |
+| `ScrollBar` | `int` | Current scroll position |
+| `Slider` | `int` | Current slider value |
+| <xref:Terminal.Gui.Views.ListView> | `int` | Selected item index |
+| `OptionSelector` | `int` | Selected option index |
+| `RadioGroup` | `int` | Selected radio button index |
+| `LineCanvas` | `List<Line>` | Collection of lines |
+| `CharMap` | `Rune` | Selected character |
+
+#### Using IValue in Handlers
+
+**Example: Accessing value during command propagation:**
 
 ```csharp
-public interface ICommandContext
+menuBar.Accepting += (_, args) =>
 {
-    View Source { get; }
-    object? Parameter { get; }
-    IDictionary<string, object> State { get; }
+    // Access the value from the originating view via WeakReference
+    View? sourceView = null;
+    args.Context?.Source?.TryGetTarget (out sourceView);
+
+    if (sourceView is IValue valueView)
+    {
+        object? value = valueView.GetValue ();
+
+        // Pattern match on value type
+        if (value is CheckState checkState)
+        {
+            _autoSave = checkState == CheckState.Checked;
+        }
+        else if (value is int optionIndex)
+        {
+            _selectedOption = optionIndex;
+        }
+    }
+};
+```
+
+**Example: Generic value handling:**
+
+```csharp
+void ProcessValueView<T> (IValue<T> valueView)
+{
+    T? currentValue = valueView.Value;
+
+    valueView.ValueChanged += (sender, args) =>
+    {
+        T? newValue = args.NewValue;
+        T? oldValue = args.OldValue;
+        // Handle value change
+    };
 }
 ```
+
+#### Value vs Legacy Properties
+
+Many Views have legacy properties (e.g., `TextField.Text`, `CheckBox.CheckedState`) that predate the `IValue<T>` interface. The `Value` property typically maps to these legacy properties:
+
+```csharp
+// CheckBox example
+public class CheckBox : View, IValue<CheckState>
+{
+    public CheckState CheckedState { get; set; }  // Legacy property
+
+    public CheckState? Value  // IValue<T> property
+    {
+        get => CheckedState;
+        set => CheckedState = value ?? CheckState.None;
+    }
+}
+```
+
+**Best practice:** Use the `Value` property for new code, as it provides consistent access patterns across all value-bearing Views.
 
 ## Best Practices
 
-1. **Event Naming**:
-   - Use past tense for completed events (e.g., `Clicked`, `Changed`)
-   - Use present tense for ongoing events (e.g., `Clicking`, `Changing`)
-   - Use "ing" suffix for cancellable events
+### Naming Conventions
 
-2. **Event Handler Implementation**:
-   - Keep handlers short and focused
-   - Use async/await for long-running tasks
-   - Unsubscribe from events in Dispose
-   - Use weak event patterns for long-lived subscriptions
+| Element | Convention | Example |
+|---------|------------|---------|
+| Pre-change event | `<Property>Changing` | `TextChanging`, `SourceChanging` |
+| Post-change event | `<Property>Changed` | `TextChanged`, `SourceChanged` |
+| Pre-change virtual | `On<Property>Changing` | `OnTextChanging` |
+| Post-change virtual | `On<Property>Changed` | `OnTextChanged` |
+| Handled property | `Handled` | `args.Handled = true` |
 
-3. **Event Context**:
-   - Provide rich context in event args
-   - Include source view and binding details
-   - Add view-specific state when needed
+### Implementation Guidelines
 
-4. **Event Propagation**:
-   - Use appropriate propagation mechanisms
-   - Avoid unnecessary event bubbling
-   - Consider using `PropagatedCommands` for hierarchical views
+1. **Virtual methods return `bool`** for cancellable operations (return `true` to cancel)
+2. **Virtual methods return `void`** for post-change notifications (cannot cancel)
+3. **Always call virtual method BEFORE raising the event** (subclasses get priority)
+4. **Execute default behavior AFTER both checks pass**
+5. **Unsubscribe in Dispose** to prevent memory leaks
+
+```csharp
+// CORRECT order: Virtual -> Event -> Default behavior
+protected void DoSomething ()
+{
+    SomeEventArgs args = new ();
+
+    // 1. Virtual method first
+    if (OnDoingSomething (args))
+    {
+        return; // Cancelled by subclass
+    }
+
+    // 2. Event second
+    DoingSomething?.Invoke (this, args);
+
+    if (args.Handled)
+    {
+        return; // Cancelled by subscriber
+    }
+
+    // 3. Default behavior
+    ExecuteDefaultBehavior ();
+
+    // 4. Post-change notification (if applicable)
+    OnDidSomething (new DidSomethingEventArgs ());
+    DidSomething?.Invoke (this, new DidSomethingEventArgs ());
+}
+```
+
+---
 
 ## Common Pitfalls
 
-1. **Memory Leaks**:
-   ```csharp
-   // BAD: Potential memory leak
-   view.Activating += OnActivating;
-   
-   // GOOD: Unsubscribe in Dispose
-   protected override void Dispose(bool disposing)
-   {
-       if (disposing)
-       {
-           view.Activating -= OnActivating;
-       }
-       base.Dispose(disposing);
-   }
-   ```
+### 1. Memory Leaks from Unsubscribed Events
 
-2. **Incorrect Event Cancellation**:
-   ```csharp
-   // BAD: Using Cancel for event handling
-   args.Cancel = true;  // Wrong for MouseEventArgs
-   
-   // GOOD: Using Handled for event handling
-   args.Handled = true;  // Correct for MouseEventArgs
-   
-   // GOOD: Using Cancel for operation cancellation
-   args.Cancel = true;  // Correct for CancelEventArgs
-   ```
+```csharp
+// BAD: Potential memory leak
+view.Accepting += OnAccepting;
 
-3. **Missing Context**:
-   ```csharp
-   // BAD: Missing context
-   Activating?.Invoke(this, new CommandEventArgs());
-   
-   // GOOD: Including context
-   Activating?.Invoke(this, new CommandEventArgs { Context = ctx });
-   ```
+// GOOD: Unsubscribe in Dispose
+protected override void Dispose (bool disposing)
+{
+    if (disposing)
+    {
+        view.Accepting -= OnAccepting;
+    }
 
-## Useful External Documentation
+    base.Dispose (disposing);
+}
+```
+
+### 2. Using Wrong Cancellation Property
+
+```csharp
+// ❌ WRONG: Using non-existent Cancel property
+args.Cancel = true;  // ValueChangingEventArgs doesn't have Cancel!
+
+// ✅ CORRECT: Use Handled for all CWP events
+args.Handled = true;
+```
+
+### 3. Wrong Order of Virtual Method and Event
+
+```csharp
+// WRONG: Event raised before virtual method
+DoingSomething?.Invoke (this, args);
+if (OnDoingSomething (args)) { return; }  // Too late!
+
+// CORRECT: Virtual method first, then event
+if (OnDoingSomething (args)) { return; }
+DoingSomething?.Invoke (this, args);
+```
+
+### 4. Forgetting to Check Both Cancellation Points
+
+```csharp
+// WRONG: Only checking virtual method
+if (OnDoingSomething (args)) { return; }
+DoingSomething?.Invoke (this, args);
+ExecuteDefault (); // Bug: Event subscribers can't cancel!
+
+// CORRECT: Check both virtual method AND event args
+if (OnDoingSomething (args) || args.Handled) { return; }
+DoingSomething?.Invoke (this, args);
+if (args.Handled) { return; }
+ExecuteDefault ();
+```
+
+---
+
+## External Resources
 
 * [.NET Naming Guidelines - Names of Events](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/names-of-type-members?redirectedfrom=MSDN#names-of-events)
 * [.NET Design for Extensibility - Events and Callbacks](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/events-and-callbacks)
-* [C# Event Implementation Fundamentals, Best Practices and Conventions](https://www.codeproject.com/Articles/20550/C-Event-Implementation-Fundamentals-Best-Practices)
-
-## Naming
-
-TG follows the *naming* advice provided in [.NET Naming Guidelines - Names of Events](https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/names-of-type-members?redirectedfrom=MSDN#names-of-events).
-
-## Known Issues
-
-### Proposed Enhancement: Command Propagation
-
-The *Cancellable Work Pattern* in `View.Command` currently supports local `Command.Activate` and propagating `Command.Accept`. To address hierarchical coordination needs (e.g., `MenuBar` popovers, `Dialog` closing), a `PropagatedCommands` property is proposed (Issue #4050):
-
-- **Change**: Add `IReadOnlyList<Command> PropagatedCommands` to `View`, defaulting to `[Command.Accept]`. `Raise*` methods propagate if the command is in `SuperView?.PropagatedCommands` and `args.Handled` is `false`.
-- **Example**:
-
-  ```csharp
-  public IReadOnlyList<Command> PropagatedCommands { get; set; } = new List<Command> { Command.Accept };
-  protected bool? RaiseAccepting(ICommandContext? ctx)
-  {
-      CommandEventArgs args = new() { Context = ctx };
-      if (OnAccepting(args) || args.Handled)
-      {
-          return true;
-      }
-      Accepting?.Invoke(this, args);
-      if (!args.Handled && SuperView?.PropagatedCommands.Contains(Command.Accept) == true)
-      {
-          return SuperView.InvokeCommand(Command.Accept, ctx);
-      }
-      return Accepting is null ? null : args.Handled;
-  }
-  ```
-
-- **Impact**: Enables `Command.Activate` propagation for `MenuBar` while preserving `Command.Accept` propagation, maintaining decoupling and avoiding noise from irrelevant commands.
-
-### **Conflation in FlagSelector**:
-   - **Issue**: `CheckBox.Activating` triggers `Accepting`, conflating state change and confirmation.
-   - **Recommendation**: Refactor to separate `Activating` and `Accepting`:
-     ```csharp
-     checkbox.Activating += (sender, args) =>
-     {
-         if (RaiseAccepting(args.Context) is true)
-         {
-             args.Handled = true;
-         }
-     };
-     ```
-
-### **Propagation Limitations**:
-   - **Issue**: Local `Command.Activate` restricts `MenuBar` coordination; `Command.Accept` uses hacks (#3925).
-   - **Recommendation**: Adopt `PropagatedCommands` to enable targeted propagation, as proposed.
-
-### **Complexity in Multi-Phase Workflows**:
-   - **Issue**: `View.Draw`'s multi-phase workflow can be complex for developers to customize.
-   - **Recommendation**: Provide clearer phase-specific documentation and examples.

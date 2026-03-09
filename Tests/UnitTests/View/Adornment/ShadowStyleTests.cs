@@ -1,32 +1,26 @@
-﻿using UnitTests;
-using Xunit.Abstractions;
-
-namespace UnitTests.ViewBaseTests;
+﻿namespace UnitTests.ViewBaseTests;
 
 public class ShadowStyleTests (ITestOutputHelper output)
 {
     [Theory]
-    [InlineData (
-                    ShadowStyle.None,
-                    """
-                    011
-                    111
-                    111
-                    """)]
-    [InlineData (
-                    ShadowStyle.Transparent,
-                    """
-                    031
-                    131
-                    111
-                    """)]
-    [InlineData (
-                    ShadowStyle.Opaque,
-                    """
-                    021
-                    221
-                    111
-                    """)]
+    [InlineData (ShadowStyle.None,
+                 """
+                 011
+                 111
+                 111
+                 """)]
+    [InlineData (ShadowStyle.Transparent,
+                 """
+                 031
+                 131
+                 111
+                 """)]
+    [InlineData (ShadowStyle.Opaque,
+                 """
+                 021
+                 221
+                 111
+                 """)]
     [SetupFakeApplication]
     public void ShadowView_Colors (ShadowStyle style, string expectedAttrs)
     {
@@ -38,32 +32,14 @@ public class ShadowStyleTests (ITestOutputHelper output)
         // 1 - SuperView
         // 2 - Opaque - fg is Black, bg is SuperView.Bg
         // 3 - Transparent - fg is darker fg, bg is darker bg
-        Attribute [] attributes =
-        {
-            Attribute.Default,
-            new (fg, bg),
-            new (Color.Black, bg),
-            new (fg.GetDimColor (), bg.GetDimColor ())
-        };
+        Attribute [] attributes = { Attribute.Default, new (fg, bg), new (Color.Black, bg), new (fg.GetDimmerColor (), bg.GetDimmerColor ()) };
 
-        var superView = new Runnable
-        {
-            Driver = ApplicationImpl.Instance.Driver,
-            Height = 3,
-            Width = 3,
-            Text = "012ABC!@#",
-        };
-        superView.SetScheme (new (new Attribute (fg, bg)));
+        var superView = new Runnable { Driver = ApplicationImpl.Instance.Driver, Height = 3, Width = 3, Text = "012ABC!@#" };
+        superView.SetScheme (new Scheme (new Attribute (fg, bg)));
         superView.TextFormatter.WordWrap = true;
 
-        View view = new ()
-        {
-            Width = Dim.Auto (),
-            Height = Dim.Auto (),
-            Text = "*",
-            ShadowStyle = style,
-        };
-        view.SetScheme (new (Attribute.Default));
+        View view = new () { Width = Dim.Auto (), Height = Dim.Auto (), Text = "*", ShadowStyle = style };
+        view.SetScheme (new Scheme (Attribute.Default));
 
         superView.Add (view);
         Application.Begin (superView);
@@ -75,50 +51,36 @@ public class ShadowStyleTests (ITestOutputHelper output)
 
     // Visual tests
     [Theory]
-    [InlineData (
-                    ShadowStyle.None,
-                    """
-                    01#$
-                    AB#$
-                    !@#$
-                    !@#$
-                    """)]
-    [InlineData (
-                    ShadowStyle.Opaque,
-                    """
-                    01▖$
-                    AB▌$
-                    ▝▀▘$
-                    !@#$
-                    """)]
-    [InlineData (
-                    ShadowStyle.Transparent,
-                    """
-                    01#$
-                    AB#$
-                    !@#$
-                    !@#$
-                    """)]
+    [InlineData (ShadowStyle.None,
+                 """
+                 01#$
+                 AB#$
+                 !@#$
+                 !@#$
+                 """)]
+    [InlineData (ShadowStyle.Opaque,
+                 """
+                 01▖$
+                 AB▌$
+                 ▝▀▘$
+                 !@#$
+                 """)]
+    [InlineData (ShadowStyle.Transparent,
+                 """
+                 01#$
+                 AB#$
+                 !@#$
+                 !@#$
+                 """)]
     [SetupFakeApplication]
     public void Visual_Test (ShadowStyle style, string expected)
     {
         Application.Driver!.SetScreenSize (5, 5);
 
-        var superView = new Runnable
-        {
-            Driver = ApplicationImpl.Instance.Driver,
-            Width = 4,
-            Height = 4,
-            Text = "!@#$".Repeat (4)!
-        };
+        var superView = new Runnable { Driver = ApplicationImpl.Instance.Driver, Width = 4, Height = 4, Text = "!@#$".Repeat (4)! };
         superView.TextFormatter.WordWrap = true;
 
-        var view = new View
-        {
-            Text = "01\nAB",
-            Width = Dim.Auto (),
-            Height = Dim.Auto ()
-        };
+        var view = new View { Text = "01\nAB", Width = Dim.Auto (), Height = Dim.Auto () };
         view.ShadowStyle = style;
         superView.Add (view);
         Application.Begin (superView);
@@ -129,26 +91,21 @@ public class ShadowStyleTests (ITestOutputHelper output)
         Application.ResetState (true);
     }
 
-
     [Theory]
     [InlineData (ShadowStyle.None, 0, 0, 0, 0)]
     [InlineData (ShadowStyle.Opaque, 1, 0, 0, 1)]
     [InlineData (ShadowStyle.Transparent, 1, 0, 0, 1)]
     [AutoInitShutdown]
-    public void ShadowStyle_Button1Pressed_Causes_Movement (ShadowStyle style, int expectedLeft, int expectedTop, int expectedRight, int expectedBottom)
+    public void ShadowStyle_LeftButtonPressed_Causes_Movement (ShadowStyle style, int expectedLeft, int expectedTop, int expectedRight, int expectedBottom)
     {
-        var superView = new View
-        {
-            Height = 10, Width = 10,
-            App = ApplicationImpl.Instance
-        };
+        var superView = new View { Height = 10, Width = 10, App = ApplicationImpl.Instance };
 
         View view = new ()
         {
             Width = Dim.Auto (),
             Height = Dim.Auto (),
             Text = "0123",
-            HighlightStates = MouseState.Pressed,
+            MouseHighlightStates = MouseState.Pressed,
             ShadowStyle = style,
             CanFocus = true
         };
@@ -158,13 +115,13 @@ public class ShadowStyleTests (ITestOutputHelper output)
         superView.EndInit ();
 
         Thickness origThickness = view.Margin!.Thickness;
-        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Pressed, Position = new (0, 0) });
-        Assert.Equal (new (expectedLeft, expectedTop, expectedRight, expectedBottom), view.Margin.Thickness);
+        view.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, Position = new Point (0, 0) });
+        Assert.Equal (new Thickness (expectedLeft, expectedTop, expectedRight, expectedBottom), view.Margin.Thickness);
 
-        view.NewMouseEvent (new () { Flags = MouseFlags.Button1Released, Position = new (0, 0) });
+        view.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonReleased, Position = new Point (0, 0) });
         Assert.Equal (origThickness, view.Margin.Thickness);
 
-        // Button1Pressed, Button1Released cause Application.Mouse.MouseGrabView to be set
+        // LeftButtonPressed, LeftButtonReleased cause Application.Mouse.IsGrabbed to be set
         Application.ResetState (true);
     }
 }

@@ -112,7 +112,9 @@ public static class ThemeManager
     ///     hard-coded themes.
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
+#pragma warning disable IL2026 // ConcurrentDictionaryJsonConverter is AOT-compatible
     [JsonConverter (typeof (ConcurrentDictionaryJsonConverter<ThemeScope>))]
+#pragma warning restore IL2026
     [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     public static ConcurrentDictionary<string, ThemeScope>? Themes
     {
@@ -317,7 +319,6 @@ public static class ThemeManager
     /// <summary>Called when the selected theme has changed. Fires the <see cref="ThemeChanged"/> event.</summary>
     internal static void OnThemeChanged (string previousThemeName, string newThemeName)
     {
-        Logging.Debug ($"Themes.OnThemeChanged({previousThemeName}) -> {Theme}");
         EventArgs<string> args = new (newThemeName);
         ThemeChanged?.Invoke (null, args);
     }

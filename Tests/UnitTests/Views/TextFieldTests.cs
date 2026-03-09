@@ -1,15 +1,12 @@
 ﻿using System.Globalization;
 using System.Reflection;
-using System.Text;
-using UnitTests;
-using Xunit.Abstractions;
+using Xunit.v3;
 
 namespace UnitTests.ViewsTests;
 
 public class TextFieldTests (ITestOutputHelper output)
 {
     private static TextField _textField;
-
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
@@ -18,10 +15,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Runnable top = new ();
         var tf = new TextField { Width = Dim.Fill (), CanFocus = false, ReadOnly = true, Text = "some text" };
 
-        var fv = new FrameView
-        {
-            Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = false, Title = "I shouldn't get focus"
-        };
+        var fv = new FrameView { Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = false, Title = "I shouldn't get focus" };
         fv.Add (tf);
         top.Add (fv);
 
@@ -32,9 +26,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.False (fv.CanFocus);
         Assert.False (fv.HasFocus);
 
-        tf.NewMouseEvent (
-                          new () { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked }
-                         );
+        tf.NewMouseEvent (new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.Null (tf.SelectedText);
         Assert.False (tf.CanFocus);
@@ -45,9 +37,7 @@ public class TextFieldTests (ITestOutputHelper output)
         fv.CanFocus = true;
         tf.CanFocus = true;
 
-        tf.NewMouseEvent (
-                          new () { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked }
-                         );
+        tf.NewMouseEvent (new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.Equal ("some ", tf.SelectedText);
         Assert.True (tf.CanFocus);
@@ -57,9 +47,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         fv.CanFocus = false;
 
-        tf.NewMouseEvent (
-                          new () { Position = new (1, 0), Flags = MouseFlags.Button1DoubleClicked }
-                         );
+        tf.NewMouseEvent (new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonDoubleClicked });
 
         Assert.Equal ("some ", tf.SelectedText); // Setting CanFocus to false don't change the SelectedText
         Assert.True (tf.CanFocus); // v2: CanFocus is not longer automatically changed
@@ -169,21 +157,20 @@ public class TextFieldTests (ITestOutputHelper output)
 
         // Set a title (caption)
         tf.Title = "Enter text";
-        
+
         // Remove focus so caption appears
         Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
         tf.SetClipToScreen ();
         tf.Draw ();
-        
+
         // Verify the caption text is rendered
         DriverAssert.AssertDriverContentsAre ("Enter text", output);
 
         // Verify the caption uses dimmed color attribute
-        Attribute captionAttr = new Attribute (
-            tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
-            tf.GetAttributeForRole (VisualRole.Editable).Background);
+        var captionAttr = new Attribute (tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimmerColor (),
+                                         tf.GetAttributeForRole (VisualRole.Editable).Background);
 
         // All characters in "Enter text" should have the caption attribute
         DriverAssert.AssertDriverAttributesAre ("0000000000", output, Application.Driver, captionAttr);
@@ -198,26 +185,25 @@ public class TextFieldTests (ITestOutputHelper output)
         TextField tf = GetTextFieldsInView ();
 
         // Title with hotkey should be rendered with the hotkey underlined when not focused
-        tf.Title = "_Find";
-        
+        tf.Title = Strings.cmdFind;
+
         // Remove focus so caption appears
         Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
         tf.SetClipToScreen ();
         tf.Draw ();
-        
+
         // The hotkey character 'F' should be rendered (without the underscore in the actual text)
         DriverAssert.AssertDriverContentsAre ("Find", output);
 
         // Verify the hotkey character 'F' has underline style
-        Attribute captionAttr = new Attribute (
-            tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
-            tf.GetAttributeForRole (VisualRole.Editable).Background);
-        Attribute hotkeyAttr = new Attribute (
-            tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
-            tf.GetAttributeForRole (VisualRole.Editable).Background,
-            tf.GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
+        var captionAttr = new Attribute (tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimmerColor (),
+                                         tf.GetAttributeForRole (VisualRole.Editable).Background);
+
+        var hotkeyAttr = new Attribute (tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimmerColor (),
+                                        tf.GetAttributeForRole (VisualRole.Editable).Background,
+                                        tf.GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
 
         // F is underlined (index 1), remaining characters use normal caption attribute (index 0)
         DriverAssert.AssertDriverAttributesAre ("1000", output, Application.Driver, captionAttr, hotkeyAttr);
@@ -233,25 +219,24 @@ public class TextFieldTests (ITestOutputHelper output)
 
         // Title with hotkey in middle of text
         tf.Title = "Enter _Text";
-        
+
         // Remove focus so caption appears
         Application.RaiseKeyDownEvent ('\t');
         Assert.False (tf.HasFocus);
 
         tf.SetClipToScreen ();
         tf.Draw ();
-        
+
         // The underscore should not be rendered, 'T' should be underlined
         DriverAssert.AssertDriverContentsAre ("Enter Text", output);
 
         // Verify the hotkey character 'T' has underline style
-        Attribute captionAttr = new Attribute (
-            tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
-            tf.GetAttributeForRole (VisualRole.Editable).Background);
-        Attribute hotkeyAttr = new Attribute (
-            tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimColor (),
-            tf.GetAttributeForRole (VisualRole.Editable).Background,
-            tf.GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
+        var captionAttr = new Attribute (tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimmerColor (),
+                                         tf.GetAttributeForRole (VisualRole.Editable).Background);
+
+        var hotkeyAttr = new Attribute (tf.GetAttributeForRole (VisualRole.Editable).Foreground.GetDimmerColor (),
+                                        tf.GetAttributeForRole (VisualRole.Editable).Background,
+                                        tf.GetAttributeForRole (VisualRole.Editable).Style | TextStyle.Underline);
 
         // "Enter " (6 chars) + "T" (underlined) + "ext" (3 chars)
         DriverAssert.AssertDriverAttributesAre ("0000001000", output, Application.Driver, captionAttr, hotkeyAttr);
@@ -266,10 +251,10 @@ public class TextFieldTests (ITestOutputHelper output)
         _textField.BeginInit ();
         _textField.EndInit ();
         _textField.SelectedStart = 2;
-        Assert.Equal (32, _textField.CursorPosition);
+        Assert.Equal (32, _textField.InsertionPoint);
         Assert.Equal (30, _textField.SelectedLength);
         Assert.Equal ("B to jump between text fields.", _textField.SelectedText);
-        _textField.CursorPosition = 20;
+        _textField.InsertionPoint = 20;
         Assert.Equal (2, _textField.SelectedStart);
         Assert.Equal (18, _textField.SelectedLength);
         Assert.Equal ("B to jump between ", _textField.SelectedText);
@@ -281,7 +266,7 @@ public class TextFieldTests (ITestOutputHelper output)
     {
         _textField.Secret = true;
         _textField.SelectedStart = 20;
-        _textField.CursorPosition = 24;
+        _textField.InsertionPoint = 24;
         _textField.Copy ();
         Assert.Null (_textField.SelectedText);
         _textField.Cut ();
@@ -298,7 +283,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Copy_Or_Cut_And_Paste_With_No_Selection ()
     {
         _textField.SelectedStart = 20;
-        _textField.CursorPosition = 24;
+        _textField.InsertionPoint = 24;
         _textField.Copy ();
         Assert.Equal ("text", _textField.SelectedText);
         Assert.Equal ("TAB to jump between text fields.", _textField.Text);
@@ -319,7 +304,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Copy_Or_Cut_And_Paste_With_Selection ()
     {
         _textField.SelectedStart = 20;
-        _textField.CursorPosition = 24;
+        _textField.InsertionPoint = 24;
         _textField.Copy ();
         Assert.Equal ("text", _textField.SelectedText);
         Assert.Equal ("TAB to jump between text fields.", _textField.Text);
@@ -336,7 +321,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Copy_Or_Cut_Not_Null_If_Has_Selection ()
     {
         _textField.SelectedStart = 20;
-        _textField.CursorPosition = 24;
+        _textField.InsertionPoint = 24;
         _textField.Copy ();
         Assert.Equal ("text", _textField.SelectedText);
         _textField.Cut ();
@@ -362,10 +347,7 @@ public class TextFieldTests (ITestOutputHelper output)
         _textField.SelectAll ();
         _textField.Cut ();
 
-        Assert.Equal (
-                      "TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!",
-                      Application.Driver?.Clipboard!.GetClipboardData ()
-                     );
+        Assert.Equal ("TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", Application.Driver?.Clipboard!.GetClipboardData ());
         Assert.Equal (string.Empty, _textField.Text);
         _textField.Paste ();
         Assert.Equal ("TextField with some more test text. Unicode shouldn't 𝔹Aℝ𝔽!", _textField.Text);
@@ -388,15 +370,15 @@ public class TextFieldTests (ITestOutputHelper output)
             }
         }
 
-        Assert.Equal (32, _textField.CursorPosition);
+        Assert.Equal (32, _textField.InsertionPoint);
         _textField.SelectAll ();
         _textField.Cut ();
         Assert.Equal ("TAB to jump between text fields.", Application.Driver?.Clipboard!.GetClipboardData ());
         Assert.Equal (string.Empty, _textField.Text);
-        Assert.Equal (0, _textField.CursorPosition);
+        Assert.Equal (0, _textField.InsertionPoint);
         _textField.Paste ();
         Assert.Equal ("TAB to jump", _textField.Text);
-        Assert.Equal (11, _textField.CursorPosition);
+        Assert.Equal (11, _textField.InsertionPoint);
 
         _textField.TextChanging -= TextFieldTextChanging;
     }
@@ -409,10 +391,10 @@ public class TextFieldTests (ITestOutputHelper output)
 
         // BUGBUG: IsInitialized is false and
         // CursorPosition wasn't calculated yet
-        Assert.Equal (0, _textField.CursorPosition);
+        Assert.Equal (0, _textField.InsertionPoint);
         _textField.BeginInit ();
         _textField.EndInit ();
-        Assert.Equal (32, _textField.CursorPosition);
+        Assert.Equal (32, _textField.InsertionPoint);
         Assert.Equal (0, _textField.SelectedLength);
         Assert.Null (_textField.SelectedText);
         Assert.Equal ("TAB to jump between text fields.", _textField.Text);
@@ -422,8 +404,8 @@ public class TextFieldTests (ITestOutputHelper output)
     [TextFieldTestsAutoInitShutdown]
     public void CursorPosition_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length ()
     {
-        _textField.CursorPosition = 33;
-        Assert.Equal (32, _textField.CursorPosition);
+        _textField.InsertionPoint = 33;
+        Assert.Equal (32, _textField.InsertionPoint);
         Assert.Equal (0, _textField.SelectedLength);
         Assert.Null (_textField.SelectedText);
     }
@@ -432,8 +414,8 @@ public class TextFieldTests (ITestOutputHelper output)
     [TextFieldTestsAutoInitShutdown]
     public void CursorPosition_With_Value_Less_Than_Zero_Changes_To_Zero ()
     {
-        _textField.CursorPosition = -1;
-        Assert.Equal (0, _textField.CursorPosition);
+        _textField.InsertionPoint = -1;
+        Assert.Equal (0, _textField.InsertionPoint);
         Assert.Equal (0, _textField.SelectedLength);
         Assert.Null (_textField.SelectedText);
     }
@@ -460,7 +442,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         // InsertText
         tf.SelectedStart = 1;
-        tf.CursorPosition = 2;
+        tf.InsertionPoint = 2;
         Assert.Equal (1, tf.SelectedLength);
         Assert.Equal ("1", tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.D2));
@@ -470,7 +452,7 @@ public class TextFieldTests (ITestOutputHelper output)
 
         // DeleteCharLeft
         tf.SelectedStart = 1;
-        tf.CursorPosition = 2;
+        tf.InsertionPoint = 2;
         Assert.Equal (1, tf.SelectedLength);
         Assert.Equal ("2", tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.Backspace));
@@ -481,7 +463,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // DeleteCharRight
         tf.Text = "-1";
         tf.SelectedStart = 1;
-        tf.CursorPosition = 2;
+        tf.InsertionPoint = 2;
         Assert.Equal (1, tf.SelectedLength);
         Assert.Equal ("1", tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.Delete));
@@ -492,7 +474,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // Cut
         tf.Text = "-1";
         tf.SelectedStart = 1;
-        tf.CursorPosition = 2;
+        tf.InsertionPoint = 2;
         Assert.Equal (1, tf.SelectedLength);
         Assert.Equal ("1", tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.X.WithCtrl));
@@ -503,11 +485,7 @@ public class TextFieldTests (ITestOutputHelper output)
         // Delete word with accented char
         tf.Text = "Les Misérables movie.";
 
-        Assert.True (
-                     tf.NewMouseEvent (
-                                       new () { Position = new (7, 1), Flags = MouseFlags.Button1DoubleClicked, View = tf }
-                                      )
-                    );
+        Assert.True (tf.NewMouseEvent (new Mouse { Position = new Point (7, 1), Flags = MouseFlags.LeftButtonDoubleClicked, View = tf }));
         Assert.Equal ("Misérables ", tf.SelectedText);
         Assert.Equal (11, tf.SelectedLength);
         Assert.True (tf.NewKeyDownEvent (Key.Delete));
@@ -526,12 +504,12 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.EndInit ();
 
         Assert.Equal (15, tf.Text.Length);
-        Assert.Equal (15, tf.CursorPosition);
+        Assert.Equal (15, tf.InsertionPoint);
         Assert.False (tf.ReadOnly);
 
         Assert.True (tf.NewKeyDownEvent (Key.Delete));
         Assert.Equal ("This is a test.", tf.Text);
-        tf.CursorPosition = 0;
+        tf.InsertionPoint = 0;
         Assert.True (tf.NewKeyDownEvent (Key.Delete));
         Assert.Equal ("his is a test.", tf.Text);
         tf.ReadOnly = true;
@@ -540,60 +518,60 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.True (tf.NewKeyDownEvent (Key.Delete));
         Assert.Equal ("his is a test.", tf.Text);
         tf.ReadOnly = false;
-        tf.CursorPosition = 1;
+        tf.InsertionPoint = 1;
         Assert.True (tf.NewKeyDownEvent (Key.Backspace));
         Assert.Equal ("is is a test.", tf.Text);
-        tf.CursorPosition = 5;
+        tf.InsertionPoint = 5;
         Assert.True (tf.NewKeyDownEvent (Key.Home.WithShift));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("is is", tf.SelectedText);
-        tf.CursorPosition = 5;
+        tf.InsertionPoint = 5;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.Home.WithShift.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("is is", tf.SelectedText);
-        tf.CursorPosition = 5;
+        tf.InsertionPoint = 5;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.A.WithShift.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("is is", tf.SelectedText);
-        tf.CursorPosition = 5;
+        tf.InsertionPoint = 5;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.End.WithShift));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal (" a test.", tf.SelectedText);
-        tf.CursorPosition = 5;
+        tf.InsertionPoint = 5;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.End.WithShift.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal (" a test.", tf.SelectedText);
-        tf.CursorPosition = 5;
+        tf.InsertionPoint = 5;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.E.WithShift.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal (" a test.", tf.SelectedText);
-        tf.CursorPosition = 5;
+        tf.InsertionPoint = 5;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.Home));
         Assert.Equal ("is is a test.", tf.Text);
-        Assert.Equal (0, tf.CursorPosition);
-        tf.CursorPosition = 5;
+        Assert.Equal (0, tf.InsertionPoint);
+        tf.InsertionPoint = 5;
         Assert.Null (tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.Home.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
-        Assert.Equal (0, tf.CursorPosition);
-        tf.CursorPosition = 5;
+        Assert.Equal (0, tf.InsertionPoint);
+        tf.InsertionPoint = 5;
         Assert.Null (tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.A.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
-        Assert.Equal (tf.Text.Length, tf.CursorPosition);
-        tf.CursorPosition = 5;
+        Assert.Equal (tf.Text.Length, tf.InsertionPoint);
+        tf.InsertionPoint = 5;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithShift));
@@ -608,7 +586,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.True (tf.NewKeyDownEvent (Key.CursorDown.WithShift));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Null (tf.SelectedText);
-        tf.CursorPosition = 7;
+        tf.InsertionPoint = 7;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithShift.WithCtrl));
@@ -624,7 +602,7 @@ public class TextFieldTests (ITestOutputHelper output)
 #endif
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Equal ("is is a", tf.SelectedText);
-        tf.CursorPosition = 3;
+        tf.InsertionPoint = 3;
         tf.SelectedStart = -1;
         Assert.Null (tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithShift.WithCtrl));
@@ -642,33 +620,33 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.Equal ("is a test", tf.SelectedText);
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithShift.WithCtrl));
         Assert.Equal ("is a test.", tf.SelectedText);
-        Assert.Equal (13, tf.CursorPosition);
+        Assert.Equal (13, tf.InsertionPoint);
         Assert.True (tf.NewKeyDownEvent (Key.CursorLeft));
         Assert.Equal ("is is a test.", tf.Text);
         Assert.Null (tf.SelectedText);
-        Assert.Equal (12, tf.CursorPosition);
+        Assert.Equal (12, tf.InsertionPoint);
         Assert.True (tf.NewKeyDownEvent (Key.CursorLeft));
         Assert.Equal ("is is a test.", tf.Text);
-        Assert.Equal (11, tf.CursorPosition);
+        Assert.Equal (11, tf.InsertionPoint);
         Assert.True (tf.NewKeyDownEvent (Key.End));
         Assert.Equal ("is is a test.", tf.Text);
-        Assert.Equal (13, tf.CursorPosition);
-        tf.CursorPosition = 0;
+        Assert.Equal (13, tf.InsertionPoint);
+        tf.InsertionPoint = 0;
         Assert.True (tf.NewKeyDownEvent (Key.End.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
-        Assert.Equal (13, tf.CursorPosition);
-        tf.CursorPosition = 0;
+        Assert.Equal (13, tf.InsertionPoint);
+        tf.InsertionPoint = 0;
         Assert.True (tf.NewKeyDownEvent (Key.E.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
-        Assert.Equal (13, tf.CursorPosition);
-        tf.CursorPosition = 0;
+        Assert.Equal (13, tf.InsertionPoint);
+        tf.InsertionPoint = 0;
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal ("is is a test.", tf.Text);
-        Assert.Equal (1, tf.CursorPosition);
+        Assert.Equal (1, tf.InsertionPoint);
         Assert.True (tf.NewKeyDownEvent (Key.F.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
-        Assert.Equal (2, tf.CursorPosition);
-        tf.CursorPosition = 9;
+        Assert.Equal (2, tf.InsertionPoint);
+        tf.InsertionPoint = 9;
         tf.ReadOnly = true;
         Assert.True (tf.NewKeyDownEvent (Key.K.WithCtrl));
         Assert.Equal ("is is a test.", tf.Text);
@@ -690,37 +668,37 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.Equal ("is is a t", tf.Text);
         Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
-        Assert.Equal (8, tf.CursorPosition);
+        Assert.Equal (8, tf.InsertionPoint);
         Assert.True (tf.NewKeyDownEvent (Key.CursorUp.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
-        Assert.Equal (6, tf.CursorPosition);
+        Assert.Equal (6, tf.InsertionPoint);
 #if UNIX_KEY_BINDINGS
         Assert.True (tf.NewKeyDownEvent (Key.B.WithAlt));
 #else
         Assert.True (tf.NewKeyDownEvent (Key.CursorLeft.WithCtrl));
 #endif
         Assert.Equal ("is is a t", tf.Text);
-        Assert.Equal (3, tf.CursorPosition);
+        Assert.Equal (3, tf.InsertionPoint);
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
-        Assert.Equal (6, tf.CursorPosition);
+        Assert.Equal (6, tf.InsertionPoint);
         Assert.True (tf.NewKeyDownEvent (Key.CursorDown.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
-        Assert.Equal (8, tf.CursorPosition);
+        Assert.Equal (8, tf.InsertionPoint);
 #if UNIX_KEY_BINDINGS
         Assert.True (tf.NewKeyDownEvent (Key.F.WithAlt));
 #else
         Assert.True (tf.NewKeyDownEvent (Key.CursorRight.WithCtrl));
 #endif
         Assert.Equal ("is is a t", tf.Text);
-        Assert.Equal (9, tf.CursorPosition);
+        Assert.Equal (9, tf.InsertionPoint);
         Assert.True (tf.Used);
         Assert.True (tf.NewKeyDownEvent (Key.InsertChar));
         Assert.Equal ("is is a t", tf.Text);
-        Assert.Equal (9, tf.CursorPosition);
+        Assert.Equal (9, tf.InsertionPoint);
         Assert.False (tf.Used);
         tf.SelectedStart = 3;
-        tf.CursorPosition = 7;
+        tf.InsertionPoint = 7;
         Assert.Equal ("is a", tf.SelectedText);
         Assert.Equal ("est.", Clipboard.Contents);
         Assert.True (tf.NewKeyDownEvent (Key.C.WithCtrl));
@@ -732,7 +710,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.True (tf.NewKeyDownEvent (Key.V.WithCtrl));
         Assert.Equal ("is is a t", tf.Text);
         Assert.Equal ("is a", Clipboard.Contents);
-        Assert.Equal (7, tf.CursorPosition);
+        Assert.Equal (7, tf.InsertionPoint);
 #if UNIX_KEY_BINDINGS
         Assert.True (tf.NewKeyDownEvent (Key.K.WithAlt));
 #else
@@ -741,10 +719,10 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.Equal (" t", tf.Text);
         Assert.Equal ("is is a", Clipboard.Contents);
         tf.Text = "TAB to jump between text fields.";
-        Assert.Equal (0, tf.CursorPosition);
+        Assert.Equal (0, tf.InsertionPoint);
         Assert.True (tf.NewKeyDownEvent (Key.Delete.WithCtrl));
         Assert.Equal ("to jump between text fields.", tf.Text);
-        tf.CursorPosition = tf.Text.Length;
+        tf.InsertionPoint = tf.Text.Length;
         Assert.True (tf.NewKeyDownEvent (Key.Backspace.WithCtrl));
         Assert.Equal ("to jump between text fields", tf.Text);
         Assert.True (tf.NewKeyDownEvent (Key.A.WithCtrl));
@@ -758,21 +736,11 @@ public class TextFieldTests (ITestOutputHelper output)
     [InlineData (true, 0)]
     public void Accepted_Handler_Handled_Prevents_Default_Button_Accept (bool handleAccept, int expectedButtonAccepts)
     {
-        var superView = new Window
-        {
-            Id = "superView"
-        };
+        var superView = new Window { Id = "superView" };
 
-        var tf = new TextField
-        {
-            Id = "tf"
-        };
+        var tf = new TextField { Id = "tf" };
 
-        var button = new Button
-        {
-            Id = "button",
-            IsDefault = true
-        };
+        var button = new Button { Id = "button", IsDefault = true };
 
         superView.Add (tf, button);
 
@@ -802,7 +770,7 @@ public class TextFieldTests (ITestOutputHelper output)
             e.Handled = handleAccept;
         }
 
-        void ButtonAccept (object sender, CommandEventArgs e) { buttonAccept++; }
+        void ButtonAccept (object sender, CommandEventArgs e) => buttonAccept++;
     }
 
     [Fact]
@@ -810,7 +778,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Paste_Always_Clear_The_SelectedText ()
     {
         _textField.SelectedStart = 20;
-        _textField.CursorPosition = 24;
+        _textField.InsertionPoint = 24;
         _textField.Copy ();
         Assert.Equal ("text", _textField.SelectedText);
         _textField.Paste ();
@@ -826,7 +794,7 @@ public class TextFieldTests (ITestOutputHelper output)
         tf.EndInit ();
 
         Assert.Equal (0, tf.ScrollOffset);
-        Assert.Equal (16, tf.CursorPosition);
+        Assert.Equal (16, tf.InsertionPoint);
     }
 
     [Fact]
@@ -835,7 +803,7 @@ public class TextFieldTests (ITestOutputHelper output)
     {
         // Proves #3022 is fixed (TextField selected text does not show in v2)
 
-        _textField.CursorPosition = 0;
+        _textField.InsertionPoint = 0;
         var top = new Runnable ();
         top.Add (_textField);
         SessionToken rs = Application.Begin (top);
@@ -843,22 +811,19 @@ public class TextFieldTests (ITestOutputHelper output)
         Attribute [] attributes =
         {
             _textField.GetAttributeForRole (VisualRole.Focus),
-            new (
-                 _textField.GetAttributeForRole (VisualRole.Focus).Background,
-                 _textField.GetAttributeForRole (VisualRole.Focus).Foreground
-                )
+            new (_textField.GetAttributeForRole (VisualRole.Focus).Background, _textField.GetAttributeForRole (VisualRole.Focus).Foreground)
         };
 
         //                                             TAB to jump between text fields.
         DriverAssert.AssertDriverAttributesAre ("0000000", output, Application.Driver, attributes);
 
         // Cursor is at the end
-        Assert.Equal (32, _textField.CursorPosition);
-        _textField.CursorPosition = 0;
+        Assert.Equal (32, _textField.InsertionPoint);
+        _textField.InsertionPoint = 0;
         _textField.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
         AutoInitShutdownAttribute.RunIteration ();
-        Assert.Equal (4, _textField.CursorPosition);
+        Assert.Equal (4, _textField.InsertionPoint);
 
         //                                             TAB to jump between text fields.
         DriverAssert.AssertDriverAttributesAre ("1111000", output, Application.Driver, attributes);
@@ -869,9 +834,9 @@ public class TextFieldTests (ITestOutputHelper output)
     [TextFieldTestsAutoInitShutdown]
     public void SelectedStart_And_CursorPosition_With_Value_Greater_Than_Text_Length_Changes_Both_To_Text_Length ()
     {
-        _textField.CursorPosition = 33;
+        _textField.InsertionPoint = 33;
         _textField.SelectedStart = 33;
-        Assert.Equal (32, _textField.CursorPosition);
+        Assert.Equal (32, _textField.InsertionPoint);
         Assert.Equal (32, _textField.SelectedStart);
         Assert.Equal (0, _textField.SelectedLength);
         Assert.Null (_textField.SelectedText);
@@ -882,7 +847,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void SelectedStart_Greater_Than_CursorPosition_All_Selection_Is_Overwritten_On_Typing ()
     {
         _textField.SelectedStart = 19;
-        _textField.CursorPosition = 12;
+        _textField.InsertionPoint = 12;
         Assert.Equal ("TAB to jump between text fields.", _textField.Text);
         _textField.NewKeyDownEvent (Key.U); // u
         Assert.Equal ("TAB to jump u text fields.", _textField.Text);
@@ -892,7 +857,7 @@ public class TextFieldTests (ITestOutputHelper output)
     [TextFieldTestsAutoInitShutdown]
     public void SelectedStart_With_Value_Greater_Than_Text_Length_Changes_To_Text_Length ()
     {
-        _textField.CursorPosition = 2;
+        _textField.InsertionPoint = 2;
         _textField.SelectedStart = 33;
         Assert.Equal (32, _textField.SelectedStart);
         Assert.Equal (30, _textField.SelectedLength);
@@ -923,36 +888,36 @@ public class TextFieldTests (ITestOutputHelper output)
         top.Add (tf);
         Application.Begin (top);
 
-        var mouseEvent = new MouseEventArgs { Flags = MouseFlags.Button1Clicked, View = tf };
+        var mouse = new Mouse { Flags = MouseFlags.LeftButtonClicked, View = tf };
 
-        Application.RaiseMouseEvent (mouseEvent);
+        Application.RaiseMouseEvent (mouse);
         Assert.Equal (1, clickCounter);
 
         // Get a fresh instance that represents a right click.
         // Should be ignored because of SuppressRightClick callback
-        mouseEvent = new () { Flags = MouseFlags.Button3Clicked, View = tf };
-        Application.RaiseMouseEvent (mouseEvent);
+        mouse = new Mouse { Flags = MouseFlags.RightButtonClicked, View = tf };
+        Application.RaiseMouseEvent (mouse);
         Assert.Equal (1, clickCounter);
 
         Application.MouseEvent -= HandleRightClick;
 
         // Get a fresh instance that represents a right click.
         // Should no longer be ignored as the callback was removed
-        mouseEvent = new () { Flags = MouseFlags.Button3Clicked, View = tf };
+        mouse = new Mouse { Flags = MouseFlags.RightButtonClicked, View = tf };
 
         // In #3183 OnMouseClicked is no longer called before MouseEvent().
         // This call causes the context menu to pop, and MouseEvent() returns true.
         // Thus, the clickCounter is NOT incremented.
         // Which is correct, because the user did NOT click with the left mouse button.
-        Application.RaiseMouseEvent (mouseEvent);
+        Application.RaiseMouseEvent (mouse);
         Assert.Equal (1, clickCounter);
         top.Dispose ();
 
         return;
 
-        void HandleRightClick (object sender, MouseEventArgs arg)
+        void HandleRightClick (object sender, Mouse arg)
         {
-            if (arg.Flags.HasFlag (MouseFlags.Button3Clicked))
+            if (arg.Flags.HasFlag (MouseFlags.RightButtonClicked))
             {
                 arg.Handled = true;
             }
@@ -1011,7 +976,7 @@ public class TextFieldTests (ITestOutputHelper output)
     public void Used_Is_False ()
     {
         _textField.Used = false;
-        _textField.CursorPosition = 10;
+        _textField.InsertionPoint = 10;
         Assert.Equal ("TAB to jump between text fields.", _textField.Text);
         _textField.NewKeyDownEvent (Key.U); // u
         Assert.Equal ("TAB to jumu between text fields.", _textField.Text);
@@ -1027,7 +992,7 @@ public class TextFieldTests (ITestOutputHelper output)
     [TextFieldTestsAutoInitShutdown]
     public void Used_Is_True_By_Default ()
     {
-        _textField.CursorPosition = 10;
+        _textField.InsertionPoint = 10;
         Assert.Equal ("TAB to jump between text fields.", _textField.Text);
         _textField.NewKeyDownEvent (Key.U); // u
         Assert.Equal ("TAB to jumup between text fields.", _textField.Text);
@@ -1043,59 +1008,65 @@ public class TextFieldTests (ITestOutputHelper output)
     [TextFieldTestsAutoInitShutdown]
     public void WordBackward_With_No_Selection ()
     {
-        _textField.CursorPosition = _textField.Text.Length;
+        _textField.InsertionPoint = _textField.Text.Length;
         var iteration = 0;
 
-        while (_textField.CursorPosition > 0)
+        while (_textField.InsertionPoint > 0)
         {
             _textField.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
 
             switch (iteration)
             {
                 case 0:
-                    Assert.Equal (31, _textField.CursorPosition);
+                    Assert.Equal (31, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 1:
-                    Assert.Equal (25, _textField.CursorPosition);
+                    Assert.Equal (25, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 2:
-                    Assert.Equal (20, _textField.CursorPosition);
+                    Assert.Equal (20, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 3:
-                    Assert.Equal (12, _textField.CursorPosition);
+                    Assert.Equal (12, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 4:
-                    Assert.Equal (7, _textField.CursorPosition);
+                    Assert.Equal (7, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 5:
-                    Assert.Equal (4, _textField.CursorPosition);
+                    Assert.Equal (4, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 6:
-                    Assert.Equal (0, _textField.CursorPosition);
+                    Assert.Equal (0, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
@@ -1114,87 +1085,97 @@ public class TextFieldTests (ITestOutputHelper output)
         //                           1         2         3         4         5    
         //                 0123456789012345678901234567890123456789012345678901234=55 (Length)
         _textField.Text = "TAB   t  o  jump         b  etween    t ext   f ields .";
-        _textField.CursorPosition = _textField.Text.Length;
+        _textField.InsertionPoint = _textField.Text.Length;
         var iteration = 0;
 
-        while (_textField.CursorPosition > 0)
+        while (_textField.InsertionPoint > 0)
         {
             _textField.NewKeyDownEvent (Key.CursorLeft.WithCtrl);
 
             switch (iteration)
             {
                 case 0:
-                    Assert.Equal (54, _textField.CursorPosition);
+                    Assert.Equal (54, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 1:
-                    Assert.Equal (48, _textField.CursorPosition);
+                    Assert.Equal (48, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 2:
-                    Assert.Equal (46, _textField.CursorPosition);
+                    Assert.Equal (46, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 3:
-                    Assert.Equal (40, _textField.CursorPosition);
+                    Assert.Equal (40, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 4:
-                    Assert.Equal (38, _textField.CursorPosition);
+                    Assert.Equal (38, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 5:
-                    Assert.Equal (28, _textField.CursorPosition);
+                    Assert.Equal (28, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 6:
-                    Assert.Equal (25, _textField.CursorPosition);
+                    Assert.Equal (25, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 7:
-                    Assert.Equal (12, _textField.CursorPosition);
+                    Assert.Equal (12, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 8:
-                    Assert.Equal (9, _textField.CursorPosition);
+                    Assert.Equal (9, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 9:
-                    Assert.Equal (6, _textField.CursorPosition);
+                    Assert.Equal (6, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 10:
-                    Assert.Equal (0, _textField.CursorPosition);
+                    Assert.Equal (0, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
@@ -1210,64 +1191,66 @@ public class TextFieldTests (ITestOutputHelper output)
     [TextFieldTestsAutoInitShutdown]
     public void WordBackward_With_Selection ()
     {
-        _textField.CursorPosition = _textField.Text.Length;
+        _textField.InsertionPoint = _textField.Text.Length;
         _textField.SelectedStart = _textField.Text.Length;
         var iteration = 0;
 
-        while (_textField.CursorPosition > 0)
+        while (_textField.InsertionPoint > 0)
         {
-            _textField.NewKeyDownEvent (
-                                        new (
-                                             KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask
-                                            )
-                                       );
+            _textField.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask));
 
             switch (iteration)
             {
                 case 0:
-                    Assert.Equal (31, _textField.CursorPosition);
+                    Assert.Equal (31, _textField.InsertionPoint);
                     Assert.Equal (32, _textField.SelectedStart);
                     Assert.Equal (1, _textField.SelectedLength);
                     Assert.Equal (".", _textField.SelectedText);
 
                     break;
+
                 case 1:
-                    Assert.Equal (25, _textField.CursorPosition);
+                    Assert.Equal (25, _textField.InsertionPoint);
                     Assert.Equal (32, _textField.SelectedStart);
                     Assert.Equal (7, _textField.SelectedLength);
                     Assert.Equal ("fields.", _textField.SelectedText);
 
                     break;
+
                 case 2:
-                    Assert.Equal (20, _textField.CursorPosition);
+                    Assert.Equal (20, _textField.InsertionPoint);
                     Assert.Equal (32, _textField.SelectedStart);
                     Assert.Equal (12, _textField.SelectedLength);
                     Assert.Equal ("text fields.", _textField.SelectedText);
 
                     break;
+
                 case 3:
-                    Assert.Equal (12, _textField.CursorPosition);
+                    Assert.Equal (12, _textField.InsertionPoint);
                     Assert.Equal (32, _textField.SelectedStart);
                     Assert.Equal (20, _textField.SelectedLength);
                     Assert.Equal ("between text fields.", _textField.SelectedText);
 
                     break;
+
                 case 4:
-                    Assert.Equal (7, _textField.CursorPosition);
+                    Assert.Equal (7, _textField.InsertionPoint);
                     Assert.Equal (32, _textField.SelectedStart);
                     Assert.Equal (25, _textField.SelectedLength);
                     Assert.Equal ("jump between text fields.", _textField.SelectedText);
 
                     break;
+
                 case 5:
-                    Assert.Equal (4, _textField.CursorPosition);
+                    Assert.Equal (4, _textField.InsertionPoint);
                     Assert.Equal (32, _textField.SelectedStart);
                     Assert.Equal (28, _textField.SelectedLength);
                     Assert.Equal ("to jump between text fields.", _textField.SelectedText);
 
                     break;
+
                 case 6:
-                    Assert.Equal (0, _textField.CursorPosition);
+                    Assert.Equal (0, _textField.InsertionPoint);
                     Assert.Equal (32, _textField.SelectedStart);
                     Assert.Equal (32, _textField.SelectedLength);
                     Assert.Equal ("TAB to jump between text fields.", _textField.SelectedText);
@@ -1281,39 +1264,36 @@ public class TextFieldTests (ITestOutputHelper output)
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void
-        WordBackward_With_The_Same_Values_For_SelectedStart_And_CursorPosition_And_Not_Starting_At_Beginning_Of_The_Text ()
+    public void WordBackward_With_The_Same_Values_For_SelectedStart_And_CursorPosition_And_Not_Starting_At_Beginning_Of_The_Text ()
     {
-        _textField.CursorPosition = 10;
+        _textField.InsertionPoint = 10;
         _textField.SelectedStart = 10;
         var iteration = 0;
 
-        while (_textField.CursorPosition > 0)
+        while (_textField.InsertionPoint > 0)
         {
-            _textField.NewKeyDownEvent (
-                                        new (
-                                             KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask
-                                            )
-                                       );
+            _textField.NewKeyDownEvent (new Key (KeyCode.CursorLeft | KeyCode.CtrlMask | KeyCode.ShiftMask));
 
             switch (iteration)
             {
                 case 0:
-                    Assert.Equal (7, _textField.CursorPosition);
+                    Assert.Equal (7, _textField.InsertionPoint);
                     Assert.Equal (10, _textField.SelectedStart);
                     Assert.Equal (3, _textField.SelectedLength);
                     Assert.Equal ("jum", _textField.SelectedText);
 
                     break;
+
                 case 1:
-                    Assert.Equal (4, _textField.CursorPosition);
+                    Assert.Equal (4, _textField.InsertionPoint);
                     Assert.Equal (10, _textField.SelectedStart);
                     Assert.Equal (6, _textField.SelectedLength);
                     Assert.Equal ("to jum", _textField.SelectedText);
 
                     break;
+
                 case 2:
-                    Assert.Equal (0, _textField.CursorPosition);
+                    Assert.Equal (0, _textField.InsertionPoint);
                     Assert.Equal (10, _textField.SelectedStart);
                     Assert.Equal (10, _textField.SelectedLength);
                     Assert.Equal ("TAB to jum", _textField.SelectedText);
@@ -1329,59 +1309,65 @@ public class TextFieldTests (ITestOutputHelper output)
     [TextFieldTestsAutoInitShutdown]
     public void WordForward_With_No_Selection ()
     {
-        _textField.CursorPosition = 0;
+        _textField.InsertionPoint = 0;
         var iteration = 0;
 
-        while (_textField.CursorPosition < _textField.Text.Length)
+        while (_textField.InsertionPoint < _textField.Text.Length)
         {
             _textField.NewKeyDownEvent (Key.CursorRight.WithCtrl);
 
             switch (iteration)
             {
                 case 0:
-                    Assert.Equal (4, _textField.CursorPosition);
+                    Assert.Equal (4, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 1:
-                    Assert.Equal (7, _textField.CursorPosition);
+                    Assert.Equal (7, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 2:
-                    Assert.Equal (12, _textField.CursorPosition);
+                    Assert.Equal (12, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 3:
-                    Assert.Equal (20, _textField.CursorPosition);
+                    Assert.Equal (20, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 4:
-                    Assert.Equal (25, _textField.CursorPosition);
+                    Assert.Equal (25, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 5:
-                    Assert.Equal (31, _textField.CursorPosition);
+                    Assert.Equal (31, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 6:
-                    Assert.Equal (32, _textField.CursorPosition);
+                    Assert.Equal (32, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
@@ -1400,87 +1386,97 @@ public class TextFieldTests (ITestOutputHelper output)
         //                           1         2         3         4         5    
         //                 0123456789012345678901234567890123456789012345678901234=55 (Length)
         _textField.Text = "TAB   t  o  jump         b  etween    t ext   f ields .";
-        _textField.CursorPosition = 0;
+        _textField.InsertionPoint = 0;
         var iteration = 0;
 
-        while (_textField.CursorPosition < _textField.Text.Length)
+        while (_textField.InsertionPoint < _textField.Text.Length)
         {
             _textField.NewKeyDownEvent (Key.CursorRight.WithCtrl);
 
             switch (iteration)
             {
                 case 0:
-                    Assert.Equal (6, _textField.CursorPosition);
+                    Assert.Equal (6, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 1:
-                    Assert.Equal (9, _textField.CursorPosition);
+                    Assert.Equal (9, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 2:
-                    Assert.Equal (12, _textField.CursorPosition);
+                    Assert.Equal (12, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 3:
-                    Assert.Equal (25, _textField.CursorPosition);
+                    Assert.Equal (25, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 4:
-                    Assert.Equal (28, _textField.CursorPosition);
+                    Assert.Equal (28, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 5:
-                    Assert.Equal (38, _textField.CursorPosition);
+                    Assert.Equal (38, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 6:
-                    Assert.Equal (40, _textField.CursorPosition);
+                    Assert.Equal (40, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 7:
-                    Assert.Equal (46, _textField.CursorPosition);
+                    Assert.Equal (46, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 8:
-                    Assert.Equal (48, _textField.CursorPosition);
+                    Assert.Equal (48, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 9:
-                    Assert.Equal (54, _textField.CursorPosition);
+                    Assert.Equal (54, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
 
                     break;
+
                 case 10:
-                    Assert.Equal (55, _textField.CursorPosition);
+                    Assert.Equal (55, _textField.InsertionPoint);
                     Assert.Equal (-1, _textField.SelectedStart);
                     Assert.Equal (0, _textField.SelectedLength);
                     Assert.Null (_textField.SelectedText);
@@ -1496,60 +1492,66 @@ public class TextFieldTests (ITestOutputHelper output)
     [TextFieldTestsAutoInitShutdown]
     public void WordForward_With_Selection ()
     {
-        _textField.CursorPosition = 0;
+        _textField.InsertionPoint = 0;
         _textField.SelectedStart = 0;
         var iteration = 0;
 
-        while (_textField.CursorPosition < _textField.Text.Length)
+        while (_textField.InsertionPoint < _textField.Text.Length)
         {
             _textField.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
             switch (iteration)
             {
                 case 0:
-                    Assert.Equal (4, _textField.CursorPosition);
+                    Assert.Equal (4, _textField.InsertionPoint);
                     Assert.Equal (0, _textField.SelectedStart);
                     Assert.Equal (4, _textField.SelectedLength);
                     Assert.Equal ("TAB ", _textField.SelectedText);
 
                     break;
+
                 case 1:
-                    Assert.Equal (7, _textField.CursorPosition);
+                    Assert.Equal (7, _textField.InsertionPoint);
                     Assert.Equal (0, _textField.SelectedStart);
                     Assert.Equal (7, _textField.SelectedLength);
                     Assert.Equal ("TAB to ", _textField.SelectedText);
 
                     break;
+
                 case 2:
-                    Assert.Equal (12, _textField.CursorPosition);
+                    Assert.Equal (12, _textField.InsertionPoint);
                     Assert.Equal (0, _textField.SelectedStart);
                     Assert.Equal (12, _textField.SelectedLength);
                     Assert.Equal ("TAB to jump ", _textField.SelectedText);
 
                     break;
+
                 case 3:
-                    Assert.Equal (20, _textField.CursorPosition);
+                    Assert.Equal (20, _textField.InsertionPoint);
                     Assert.Equal (0, _textField.SelectedStart);
                     Assert.Equal (20, _textField.SelectedLength);
                     Assert.Equal ("TAB to jump between ", _textField.SelectedText);
 
                     break;
+
                 case 4:
-                    Assert.Equal (25, _textField.CursorPosition);
+                    Assert.Equal (25, _textField.InsertionPoint);
                     Assert.Equal (0, _textField.SelectedStart);
                     Assert.Equal (25, _textField.SelectedLength);
                     Assert.Equal ("TAB to jump between text ", _textField.SelectedText);
 
                     break;
+
                 case 5:
-                    Assert.Equal (31, _textField.CursorPosition);
+                    Assert.Equal (31, _textField.InsertionPoint);
                     Assert.Equal (0, _textField.SelectedStart);
                     Assert.Equal (31, _textField.SelectedLength);
                     Assert.Equal ("TAB to jump between text fields", _textField.SelectedText);
 
                     break;
+
                 case 6:
-                    Assert.Equal (32, _textField.CursorPosition);
+                    Assert.Equal (32, _textField.InsertionPoint);
                     Assert.Equal (0, _textField.SelectedStart);
                     Assert.Equal (32, _textField.SelectedLength);
                     Assert.Equal ("TAB to jump between text fields.", _textField.SelectedText);
@@ -1563,49 +1565,52 @@ public class TextFieldTests (ITestOutputHelper output)
 
     [Fact]
     [TextFieldTestsAutoInitShutdown]
-    public void
-        WordForward_With_The_Same_Values_For_SelectedStart_And_CursorPosition_And_Not_Starting_At_Beginning_Of_The_Text ()
+    public void WordForward_With_The_Same_Values_For_SelectedStart_And_CursorPosition_And_Not_Starting_At_Beginning_Of_The_Text ()
     {
-        _textField.CursorPosition = 10;
+        _textField.InsertionPoint = 10;
         _textField.SelectedStart = 10;
         var iteration = 0;
 
-        while (_textField.CursorPosition < _textField.Text.Length)
+        while (_textField.InsertionPoint < _textField.Text.Length)
         {
             _textField.NewKeyDownEvent (Key.CursorRight.WithCtrl.WithShift);
 
             switch (iteration)
             {
                 case 0:
-                    Assert.Equal (12, _textField.CursorPosition);
+                    Assert.Equal (12, _textField.InsertionPoint);
                     Assert.Equal (10, _textField.SelectedStart);
                     Assert.Equal (2, _textField.SelectedLength);
                     Assert.Equal ("p ", _textField.SelectedText);
 
                     break;
+
                 case 1:
-                    Assert.Equal (20, _textField.CursorPosition);
+                    Assert.Equal (20, _textField.InsertionPoint);
                     Assert.Equal (10, _textField.SelectedStart);
                     Assert.Equal (10, _textField.SelectedLength);
                     Assert.Equal ("p between ", _textField.SelectedText);
 
                     break;
+
                 case 2:
-                    Assert.Equal (25, _textField.CursorPosition);
+                    Assert.Equal (25, _textField.InsertionPoint);
                     Assert.Equal (10, _textField.SelectedStart);
                     Assert.Equal (15, _textField.SelectedLength);
                     Assert.Equal ("p between text ", _textField.SelectedText);
 
                     break;
+
                 case 3:
-                    Assert.Equal (31, _textField.CursorPosition);
+                    Assert.Equal (31, _textField.InsertionPoint);
                     Assert.Equal (10, _textField.SelectedStart);
                     Assert.Equal (21, _textField.SelectedLength);
                     Assert.Equal ("p between text fields", _textField.SelectedText);
 
                     break;
+
                 case 4:
-                    Assert.Equal (32, _textField.CursorPosition);
+                    Assert.Equal (32, _textField.InsertionPoint);
                     Assert.Equal (10, _textField.SelectedStart);
                     Assert.Equal (22, _textField.SelectedLength);
                     Assert.Equal ("p between text fields.", _textField.SelectedText);
@@ -1621,39 +1626,29 @@ public class TextFieldTests (ITestOutputHelper output)
     [SetupFakeApplication]
     public void Words_With_Accents_Incorrect_Order_Will_Result_With_Wrong_Accent_Place ()
     {
-        var tf = new TextField
-        {
-            Driver = ApplicationImpl.Instance.Driver,
-            Width = 30, Text = "Les Misérables"
-        };
-        tf.SetRelativeLayout (new (100, 100));
+        var tf = new TextField { Driver = ApplicationImpl.Instance.Driver, Width = 30, Text = "Les Misérables" };
+        tf.SetRelativeLayout (new Size (100, 100));
         tf.Draw ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 Les Misérables",
-                                                      output
-                                                     );
+                                                       output);
 
         tf.Text = "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables";
         tf.Draw ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 Les Misérables",
-                                                      output
-                                                     );
+                                                       output);
 
         // incorrect order will result with a wrong accent place
         tf.Text = "Les Mis" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "erables";
         tf.SetClipToScreen ();
         tf.Draw ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                      @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
 Les Miśerables",
-                                                      output
-                                                     );
+                                                       output);
     }
 
     private TextField GetTextFieldsInView ()
@@ -1680,25 +1675,23 @@ Les Miśerables",
     [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
     public class TextFieldTestsAutoInitShutdown : AutoInitShutdownAttribute
     {
-        public override void After (MethodInfo methodUnderTest)
+        public override void After (MethodInfo methodUnderTest, IXunitTest test)
         {
             _textField.Dispose ();
             _textField = null;
-            base.After (methodUnderTest);
+            base.After (methodUnderTest, test);
         }
 
-        public override void Before (MethodInfo methodUnderTest)
+        public override void Before (MethodInfo methodUnderTest, IXunitTest test)
         {
-            base.Before (methodUnderTest);
+            base.Before (methodUnderTest, test);
 
             //Application.TopRunnable.Scheme = Colors.Schemes ["Base"];
-            _textField = new ()
+            _textField = new TextField
             {
-                //                1         2         3 
+                //                1         2         3
                 //      01234567890123456789012345678901=32 (Length)
-                Text = "TAB to jump between text fields.",
-                Width = 32,
-                App = ApplicationImpl.Instance
+                Text = "TAB to jump between text fields.", Width = 32, App = ApplicationImpl.Instance
             };
         }
     }
@@ -1707,11 +1700,7 @@ Les Miśerables",
     [AutoInitShutdown]
     public void Draw_Esc_Rune ()
     {
-        var tf = new TextField
-        {
-            Driver = ApplicationImpl.Instance.Driver,
-            Width = 5, Text = "\u001b"
-        };
+        var tf = new TextField { Driver = ApplicationImpl.Instance.Driver, Width = 5, Text = "\u001b" };
         tf.BeginInit ();
         tf.EndInit ();
         tf.Draw ();

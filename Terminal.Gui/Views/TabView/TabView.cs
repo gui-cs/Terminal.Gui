@@ -1,4 +1,3 @@
-
 namespace Terminal.Gui.Views;
 
 /// <summary>Control that hosts multiple sub views, presenting a single one at once.</summary>
@@ -29,63 +28,54 @@ public class TabView : View
         CanFocus = true;
         TabStop = TabBehavior.TabStop; // Because TabView has focusable subviews, it must be a TabGroup
         _tabsBar = new TabRow (this);
-        _containerView = new ();
+        _containerView = new View ();
         ApplyStyleChanges ();
 
-        base.Add (_tabsBar);
-        base.Add (_containerView);
+        Add (_tabsBar);
+        Add (_containerView);
 
         // Things this view knows how to do
         AddCommand (Command.Left, () => SwitchTabBy (-1));
 
         AddCommand (Command.Right, () => SwitchTabBy (1));
 
-        AddCommand (
-                    Command.LeftStart,
+        AddCommand (Command.LeftStart,
                     () =>
                     {
                         TabScrollOffset = 0;
                         SelectedTab = Tabs.FirstOrDefault ()!;
 
                         return true;
-                    }
-                   );
+                    });
 
-        AddCommand (
-                    Command.RightEnd,
+        AddCommand (Command.RightEnd,
                     () =>
                     {
                         TabScrollOffset = Tabs.Count - 1;
                         SelectedTab = Tabs.LastOrDefault ()!;
 
                         return true;
-                    }
-                   );
+                    });
 
-        AddCommand (
-                    Command.PageDown,
+        AddCommand (Command.PageDown,
                     () =>
                     {
                         TabScrollOffset += _tabLocations!.Length;
                         SelectedTab = Tabs.ElementAt (TabScrollOffset);
 
                         return true;
-                    }
-                   );
+                    });
 
-        AddCommand (
-                    Command.PageUp,
+        AddCommand (Command.PageUp,
                     () =>
                     {
                         TabScrollOffset -= _tabLocations!.Length;
                         SelectedTab = Tabs.ElementAt (TabScrollOffset);
 
                         return true;
-                    }
-                   );
+                    });
 
-        AddCommand (
-                    Command.Up,
+        AddCommand (Command.Up,
                     () =>
                     {
                         if (_style.TabsOnBottom)
@@ -101,13 +91,13 @@ public class TabView : View
                         {
                             if (_containerView is { HasFocus: true })
                             {
-                                var mostFocused = _containerView.MostFocused;
+                                View? mostFocused = _containerView.MostFocused;
 
                                 if (mostFocused is { })
                                 {
                                     for (int? i = mostFocused.SuperView?.SubViews.IndexOf (mostFocused) - 1; i > -1; i--)
                                     {
-                                        var view = mostFocused.SuperView?.SubViews.ElementAt ((int)i);
+                                        View? view = mostFocused.SuperView?.SubViews.ElementAt ((int)i);
 
                                         if (view is { CanFocus: true, Enabled: true, Visible: true })
                                         {
@@ -124,24 +114,22 @@ public class TabView : View
                         }
 
                         return false;
-                    }
-                   );
+                    });
 
-        AddCommand (
-                    Command.Down,
+        AddCommand (Command.Down,
                     () =>
                     {
                         if (_style.TabsOnBottom)
                         {
                             if (_containerView is { HasFocus: true })
                             {
-                                var mostFocused = _containerView.MostFocused;
+                                View? mostFocused = _containerView.MostFocused;
 
                                 if (mostFocused is { })
                                 {
                                     for (int? i = mostFocused.SuperView?.SubViews.IndexOf (mostFocused) + 1; i < mostFocused.SuperView?.SubViews.Count; i++)
                                     {
-                                        var view = mostFocused.SuperView?.SubViews.ElementAt ((int)i);
+                                        View? view = mostFocused.SuperView?.SubViews.ElementAt ((int)i);
 
                                         if (view is { CanFocus: true, Enabled: true, Visible: true })
                                         {
@@ -167,8 +155,7 @@ public class TabView : View
                         }
 
                         return false;
-                    }
-                   );
+                    });
 
         // Default keybindings for this view
         KeyBindings.Add (Key.CursorLeft, Command.Left);
@@ -210,6 +197,7 @@ public class TabView : View
                 if (_selectedTab.View is { })
                 {
                     _selectedTab.View.CanFocusChanged -= ContainerViewCanFocus!;
+
                     // remove old content
                     _containerView.Remove (_selectedTab.View);
                 }
@@ -248,10 +236,7 @@ public class TabView : View
 #pragma warning restore CS8629 // Nullable value type may be null.
     }
 
-    private void ContainerViewCanFocus (object sender, EventArgs eventArgs)
-    {
-        _containerView.CanFocus = _containerView.SubViews.Count (v => v.CanFocus) > 0;
-    }
+    private void ContainerViewCanFocus (object sender, EventArgs eventArgs) => _containerView.CanFocus = _containerView.SubViews.Count (v => v.CanFocus) > 0;
 
     private TabStyle _style = new ();
 
@@ -369,7 +354,7 @@ public class TabView : View
         SetNeedsLayout ();
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnViewportChanged (DrawEventArgs e)
     {
         _tabLocations = CalculateViewport (Viewport).ToArray ();
@@ -397,9 +382,9 @@ public class TabView : View
     /// <param name="value">The value to validate.</param>
     /// <remarks>Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDraw()"/>.</remarks>
     /// <returns>The valid <see cref="TabScrollOffset"/> for the given value.</returns>
-    public int EnsureValidScrollOffsets (int value) { return Math.Max (Math.Min (value, Tabs.Count - 1), 0); }
+    public int EnsureValidScrollOffsets (int value) => Math.Max (Math.Min (value, Tabs.Count - 1), 0);
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
         if (SelectedTab is { HasFocus: false } && !_containerView.CanFocus && focusedView == this)
@@ -478,6 +463,7 @@ public class TabView : View
         if (currentIdx == -1)
         {
             SelectedTab = Tabs.ElementAt (0);
+
             return true;
         }
 
@@ -520,10 +506,7 @@ public class TabView : View
     }
 
     /// <summary>Raises the <see cref="SelectedTabChanged"/> event.</summary>
-    protected virtual void OnSelectedTabChanged (Tab oldTab, Tab newTab)
-    {
-        SelectedTabChanged?.Invoke (this, new TabChangedEventArgs (oldTab, newTab));
-    }
+    protected virtual void OnSelectedTabChanged (Tab oldTab, Tab newTab) => SelectedTabChanged?.Invoke (this, new TabChangedEventArgs (oldTab, newTab));
 
     /// <summary>Returns which tabs to render at each x location.</summary>
     /// <returns></returns>
@@ -549,7 +532,7 @@ public class TabView : View
             tab.Y = 0;
 
             // while there is space for the tab
-            int tabTextWidth = tab.DisplayText.EnumerateRunes ().Sum (c => c.GetColumns ());
+            int tabTextWidth = tab.DisplayText.GetColumns ();
 
             // The maximum number of characters to use for the tab name as specified
             // by the user (MaxTabTextWidth).  But not more than the width of the view
@@ -638,9 +621,30 @@ public class TabView : View
 
     internal void Tab_Selecting (object? sender, CommandEventArgs e)
     {
-        if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+        // When a tab is activated (via mouse or keyboard), select it.
+        // Don't forward the mouse event back to _tabsBar.NewMouseEvent as that causes infinite recursion.
+        var tab = sender as Tab;
+
+        // If sender is a Border, get the parent Tab
+        if (sender is Border border)
         {
-            e.Handled = _tabsBar.NewMouseEvent (mouseArgs) == true;
+            tab = border.Parent as Tab;
+        }
+
+        if (tab is { } && tab != SelectedTab)
+        {
+            SelectedTab = tab;
+            e.Handled = true;
+        }
+        else if (sender is View { Id: "leftScrollIndicator" })
+        {
+            SwitchTabBy (-1);
+            e.Handled = true;
+        }
+        else if (sender is View { Id: "rightScrollIndicator" })
+        {
+            SwitchTabBy (1);
+            e.Handled = true;
         }
     }
 
@@ -649,7 +653,7 @@ public class TabView : View
         if (_tabLocations is null)
         {
             // Ensures unset any visible tab prior to TabScrollOffset
-            for (int i = 0; i < TabScrollOffset; i++)
+            for (var i = 0; i < TabScrollOffset; i++)
             {
                 Tab tab = Tabs.ElementAt (i);
 
@@ -676,7 +680,5 @@ public class TabView : View
 
     /// <summary>Raises the <see cref="TabClicked"/> event.</summary>
     /// <param name="tabMouseEventArgs"></param>
-    internal virtual void OnTabClicked (TabMouseEventArgs tabMouseEventArgs) { TabClicked?.Invoke (this, tabMouseEventArgs); }
-
-
+    internal virtual void OnTabClicked (TabMouseEventArgs tabMouseEventArgs) => TabClicked?.Invoke (this, tabMouseEventArgs);
 }

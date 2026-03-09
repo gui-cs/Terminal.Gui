@@ -1,7 +1,5 @@
 ﻿using System.Text;
 using UnitTests;
-using Xunit.Abstractions;
-
 namespace DrawingTests.Lines;
 
 /// <summary>
@@ -10,7 +8,7 @@ namespace DrawingTests.Lines;
 ///     Note: Tests that verify rendered output (ToString()) cannot be parallelized because LineCanvas
 ///     depends on Application.Driver for glyph resolution and configuration. Those tests remain in UnitTests.
 /// </summary>
-public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
+public class LineCanvasTests (ITestOutputHelper output) : TestDriverBase
 {
     #region Basic API Tests
 
@@ -547,7 +545,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         string expected
     )
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         View v = GetCanvas (driver, out LineCanvas lc);
         v.Width = 10;
         v.Height = 10;
@@ -837,7 +835,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void TestLineCanvas_Window_Heavy ()
     {
-        var driver = CreateFakeDriver ();
+        var driver = CreateTestDriver ();
         View v = GetCanvas (driver, out LineCanvas canvas);
 
         // outer box
@@ -867,7 +865,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData (LineStyle.Rounded)]
     public void TestLineCanvas_Window_HeavyTop_ThinSides (LineStyle thinStyle)
     {
-        var driver = CreateFakeDriver ();
+        var driver = CreateTestDriver ();
         View v = GetCanvas (driver, out LineCanvas canvas);
 
         // outer box
@@ -898,7 +896,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData (LineStyle.Rounded)]
     public void TestLineCanvas_Window_ThinTop_HeavySides (LineStyle thinStyle)
     {
-        var driver = CreateFakeDriver ();
+        var driver = CreateTestDriver ();
         View v = GetCanvas (driver, out LineCanvas canvas);
 
         // outer box
@@ -1024,31 +1022,6 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         OutputAssert.AssertEqual (output, expected, $"{lc}");
     }
 
-    //		[Fact, SetupFakeDriver]
-    //		public void LeaveMargin_Top1_Left1 ()
-    //		{
-    //			var canvas = new LineCanvas ();
-
-    //			// Upper box
-    //			canvas.AddLine (Point.Empty, 9, Orientation.Horizontal, LineStyle.Single);
-    //			canvas.AddLine (new Point (8, 0), 3, Orientation.Vertical, LineStyle.Single);
-    //			canvas.AddLine (new Point (8, 3), -9, Orientation.Horizontal, LineStyle.Single);
-    //			canvas.AddLine (new Point (0, 2), -3, Orientation.Vertical, LineStyle.Single);
-
-    //			// Lower Box
-    //			canvas.AddLine (new Point (5, 0), 2, Orientation.Vertical, LineStyle.Single);
-    //			canvas.AddLine (new Point (0, 2), 9, Orientation.Horizontal, LineStyle.Single);
-
-    //			string looksLike =
-    //@"
-    //┌────┬──┐
-    //│    │  │
-    //├────┼──┤
-    //└────┴──┘
-    //";
-    //			Assert.Equal (looksLike, $"{Environment.NewLine}{canvas}");
-    //		}
-
     [InlineData (0, 0, 0, Orientation.Horizontal, LineStyle.Double, "═")]
     [InlineData (0, 0, 0, Orientation.Vertical, LineStyle.Double, "║")]
     [InlineData (0, 0, 0, Orientation.Horizontal, LineStyle.Single, "─")]
@@ -1071,7 +1044,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
         string expected
     )
     {
-        var driver = CreateFakeDriver ();
+        var driver = CreateTestDriver ();
         View v = GetCanvas (driver, out LineCanvas lc);
         v.Width = 10;
         v.Height = 10;
@@ -1089,7 +1062,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void View_Draws_Corner_Correct ()
     {
-        var driver = CreateFakeDriver ();
+        var driver = CreateTestDriver ();
         View v = GetCanvas (driver, out LineCanvas canvas);
         canvas.AddLine (Point.Empty, 2, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (Point.Empty, 2, Orientation.Vertical, LineStyle.Single);
@@ -1111,7 +1084,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void View_Draws_Corner_NoOverlap ()
     {
-        var driver = CreateFakeDriver ();
+        var driver = CreateTestDriver ();
         View v = GetCanvas (driver, out LineCanvas canvas);
         canvas.AddLine (Point.Empty, 2, Orientation.Horizontal, LineStyle.Single);
         canvas.AddLine (new (0, 1), 2, Orientation.Vertical, LineStyle.Single);
@@ -1132,7 +1105,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Theory]
     public void View_Draws_Horizontal (LineStyle style)
     {
-        var driver = CreateFakeDriver ();
+        var driver = CreateTestDriver ();
         View v = GetCanvas (driver, out LineCanvas canvas);
         canvas.AddLine (Point.Empty, 2, Orientation.Horizontal, style);
 
@@ -1148,7 +1121,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void View_Draws_Horizontal_Double ()
     {
-        var driver = CreateFakeDriver ();
+        var driver = CreateTestDriver ();
         View v = GetCanvas (driver, out LineCanvas canvas);
         canvas.AddLine (Point.Empty, 2, Orientation.Horizontal, LineStyle.Double);
 
@@ -1166,7 +1139,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Theory]
     public void View_Draws_Vertical (LineStyle style)
     {
-        var driver = CreateFakeDriver ();
+        var driver = CreateTestDriver ();
         View v = GetCanvas (driver, out LineCanvas canvas);
         canvas.AddLine (Point.Empty, 2, Orientation.Vertical, style);
 
@@ -1184,7 +1157,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
 
     public void View_Draws_Vertical_Double ()
     {
-        var driver = CreateFakeDriver ();
+        var driver = CreateTestDriver ();
         View v = GetCanvas (driver, out LineCanvas canvas);
         canvas.AddLine (Point.Empty, 2, Orientation.Vertical, LineStyle.Double);
 
@@ -1201,7 +1174,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void View_Draws_Window_Double ()
     {
-        var driver = CreateFakeDriver ();
+        var driver = CreateTestDriver ();
         View v = GetCanvas (driver, out LineCanvas canvas);
 
         // outer box
@@ -1231,7 +1204,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData (LineStyle.Rounded)]
     public void View_Draws_Window_DoubleTop_SingleSides (LineStyle thinStyle)
     {
-        var driver = CreateFakeDriver ();
+        var driver = CreateTestDriver ();
         View v = GetCanvas (driver, out LineCanvas canvas);
 
         // outer box
@@ -1265,7 +1238,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void View_Draws_Window_Rounded ()
     {
-        var driver = CreateFakeDriver ();
+        var driver = CreateTestDriver ();
         View v = GetCanvas (driver, out LineCanvas canvas);
 
         // outer box
@@ -1299,7 +1272,7 @@ public class LineCanvasTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData (LineStyle.Rounded)]
     public void View_Draws_Window_SingleTop_DoubleSides (LineStyle thinStyle)
     {
-        var driver = CreateFakeDriver ();
+        var driver = CreateTestDriver ();
         View v = GetCanvas (driver, out LineCanvas canvas);
 
         // outer box

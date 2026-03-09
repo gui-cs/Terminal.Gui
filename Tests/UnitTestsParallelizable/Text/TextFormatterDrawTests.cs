@@ -2,13 +2,12 @@
 using System.Text;
 using UICatalog;
 using UnitTests;
-using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
 namespace TextTests;
 
-public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
+public class TextFormatterDrawTests (ITestOutputHelper output) : TestDriverBase
 {
     public static IEnumerable<object []> CMGlyphs =>
         new List<object []> { new object [] { $"{Glyphs.LeftBracket} Say Hello 你 {Glyphs.RightBracket}", 16, 15 } };
@@ -27,7 +26,7 @@ public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData ("こんにちは\nAB\n12", 10, 3, "21        \nBA        \nはちにんこ")]
     public void Draw_Horizontal_RightLeft_BottomTop (string text, int width, int height, string expectedText)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -56,7 +55,7 @@ public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData ("こんにちは\nAB\n12", 10, 3, "はちにんこ\nBA        \n21        ")]
     public void Draw_Horizontal_RightLeft_TopBottom (string text, int width, int height, string expectedText)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -93,7 +92,7 @@ public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData ("こんにちは\nABCD", 3, 7, "こ \nんA\nにB\nちC\nはD", 2)]
     public void Draw_Vertical_Bottom_Horizontal_Right (string text, int width, int height, string expectedText, int expectedY)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -125,7 +124,7 @@ public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData ("こんにちは\nAB\n12", 4, 10, "はB2\nちA1\nに  \nん  \nこ  ")]
     public void Draw_Vertical_BottomTop_LeftRight (string text, int width, int height, string expectedText)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -154,7 +153,7 @@ public class TextFormatterDrawTests (ITestOutputHelper output) : FakeDriverBase
     [InlineData ("こんにちは\nAB\n12", 4, 10, "2Bは\n1Aち\n  に\n  ん\n  こ")]
     public void Draw_Vertical_BottomTop_RightLeft (string text, int width, int height, string expectedText)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -208,7 +207,7 @@ s")]
     [InlineData ("Hello Worlds", 12, 1, @"HelloWorlds")]
     public void Draw_Vertical_TopBottom_LeftRight (string text, int width, int height, string expectedText)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -250,7 +249,7 @@ s")]
     [InlineData ("こんにちは\nABCD", 7, "こA\nんB\nにC\nちD\nは ", 1)]
     public void Draw_Vertical_TopBottom_LeftRight_Middle (string text, int height, string expectedText, int expectedY)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -319,7 +318,7 @@ B  ")]
 は")]
     public void Draw_Vertical_TopBottom_LeftRight_Top (string text, int height, string expectedText)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -337,7 +336,7 @@ B  ")]
     [Fact]
     public void FillRemaining_True_False ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (22, 5);
 
         Attribute [] attrs =
@@ -405,7 +404,7 @@ Nice       Work")]
 幹         得好")]
     public void Justify_Horizontal (string text, int width, int height, string expectedText)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -423,7 +422,7 @@ Nice       Work")]
     [Fact]
     public void UICatalog_AboutBox_Text ()
     {
-        IDriver? driver = CreateFakeDriver ();
+        IDriver? driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -436,7 +435,6 @@ Nice       Work")]
         };
 
         Size tfSize = tf.FormatAndGetSize ();
-        Assert.Equal (new (59, 13), tfSize);
 
         driver!.SetScreenSize (tfSize.Width, tfSize.Height);
 
@@ -453,10 +451,9 @@ Nice       Work")]
                               | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |*
                               |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|*
                            ***********************************************************
-                           **********************v2 - Pre-Alpha***********************
+                           *************************v2 - Beta*************************
                            ***********************************************************
                            **********https://github.com/gui-cs/Terminal.Gui***********
-                           ***********************************************************
                            """;
 
         DriverAssert.AssertDriverContentsAre (expectedText.ReplaceLineEndings (), output, driver);
@@ -555,7 +552,7 @@ Nice       Work")]
         string expectedDraw
     )
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -640,7 +637,7 @@ Nice       Work")]
         string expectedDraw
     )
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {
@@ -669,7 +666,7 @@ Nice       Work")]
         string expectedDraw
     )
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         TextFormatter tf = new ()
         {

@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Text;
-using Xunit.Abstractions;
 
 // ReSharper disable InconsistentNaming
 
@@ -52,7 +51,7 @@ public class IListDataSourceTests (ITestOutputHelper output)
 
         public int Count => _items.Count;
 
-        public int Length => _items.Any () ? _items.Max (s => s?.Length ?? 0) : 0;
+        public int MaxItemLength => _items.Any () ? _items.Max (s => s?.Length ?? 0) : 0;
 
         public bool SuspendCollectionChangedEvent { get; set; }
 
@@ -162,7 +161,7 @@ public class IListDataSourceTests (ITestOutputHelper output)
         wrapper.Render (listView, false, 0, 0, 0, 20);
 
         Assert.Equal (1, wrapper.Count);
-        Assert.Equal (0, wrapper.Length); // Empty string has zero length
+        Assert.Equal (0, wrapper.MaxItemLength); // Empty string has zero length
     }
 
     [Fact]
@@ -172,7 +171,7 @@ public class IListDataSourceTests (ITestOutputHelper output)
         ListWrapper<string> wrapper = new (source);
 
         // "Hello 你好" should be: "Hello " (6) + "你" (2) + "好" (2) = 10 columns
-        Assert.True (wrapper.Length >= 10);
+        Assert.True (wrapper.MaxItemLength >= 10);
     }
 
     [Fact]
@@ -187,7 +186,7 @@ public class IListDataSourceTests (ITestOutputHelper output)
 
         wrapper.Render (listView, false, 0, 0, 0, 10);
 
-        Assert.Equal (100, wrapper.Length);
+        Assert.Equal (100, wrapper.MaxItemLength);
     }
 
     [Fact]
@@ -203,7 +202,7 @@ public class IListDataSourceTests (ITestOutputHelper output)
         wrapper.Render (listView, false, 0, 0, 0, 10, 5);
 
         // Should render "56789ABCDE" (starting at position 5)
-        Assert.Equal (16, wrapper.Length);
+        Assert.Equal (16, wrapper.MaxItemLength);
     }
 
     [Fact]
@@ -218,7 +217,7 @@ public class IListDataSourceTests (ITestOutputHelper output)
         // Render with viewport beyond string length
         wrapper.Render (listView, false, 0, 0, 0, 10, 100);
 
-        Assert.Equal (5, wrapper.Length);
+        Assert.Equal (5, wrapper.MaxItemLength);
     }
 
     [Fact]
@@ -249,7 +248,7 @@ public class IListDataSourceTests (ITestOutputHelper output)
         // Render "Hi" in width of 10 - should fill remaining 8 with spaces
         wrapper.Render (listView, false, 0, 0, 0, 10);
 
-        Assert.Equal (2, wrapper.Length);
+        Assert.Equal (2, wrapper.MaxItemLength);
     }
 
     [Fact]
@@ -266,7 +265,7 @@ public class IListDataSourceTests (ITestOutputHelper output)
         wrapper.Render (listView, false, 2, 0, 2, 10);
 
         Assert.Equal (3, wrapper.Count);
-        Assert.True (wrapper.Length >= 2); // "42" is 2 chars, "100" is 3 chars
+        Assert.True (wrapper.MaxItemLength >= 2); // "42" is 2 chars, "100" is 3 chars
     }
 
     #endregion
@@ -280,7 +279,7 @@ public class IListDataSourceTests (ITestOutputHelper output)
         var listView = new ListView { Source = customSource, Width = 20, Height = 5 };
 
         Assert.Equal (3, customSource.Count);
-        Assert.Equal (14, customSource.Length); // "Custom Item 00" is 14 chars
+        Assert.Equal (14, customSource.MaxItemLength); // "Custom Item 00" is 14 chars
 
         // Test marking
         Assert.False (customSource.IsMarked (0));
@@ -297,7 +296,7 @@ public class IListDataSourceTests (ITestOutputHelper output)
         // Test render doesn't throw
         listView.BeginInit ();
         listView.EndInit ();
-        Exception ex = Record.Exception (() => customSource.Render (listView, false, 0, 0, 0, 20));
+        Exception? ex = Record.Exception (() => customSource.Render (listView, false, 0, 0, 0, 20));
         Assert.Null (ex);
     }
 
@@ -364,7 +363,7 @@ public class IListDataSourceTests (ITestOutputHelper output)
         ListWrapper<string> wrapper = new (source);
 
         Assert.Equal (0, wrapper.Count);
-        Assert.Equal (0, wrapper.Length);
+        Assert.Equal (0, wrapper.MaxItemLength);
     }
 
     [Fact]
@@ -373,7 +372,7 @@ public class IListDataSourceTests (ITestOutputHelper output)
         ListWrapper<string> wrapper = new (null);
 
         Assert.Equal (0, wrapper.Count);
-        Assert.Equal (0, wrapper.Length);
+        Assert.Equal (0, wrapper.MaxItemLength);
 
         // ToList should not throw
         IList list = wrapper.ToList ();
@@ -397,7 +396,7 @@ public class IListDataSourceTests (ITestOutputHelper output)
         ObservableCollection<string> source = ["Item1"];
         ListWrapper<string> wrapper = new (source);
 
-        Exception ex = Record.Exception (() => wrapper.SetMark (-1, true));
+        Exception? ex = Record.Exception (() => wrapper.SetMark (-1, true));
         Assert.Null (ex);
 
         ex = Record.Exception (() => wrapper.SetMark (100, true));
@@ -482,14 +481,14 @@ public class IListDataSourceTests (ITestOutputHelper output)
         ObservableCollection<string> source = ["Hi"];
         ListWrapper<string> wrapper = new (source);
 
-        Assert.Equal (2, wrapper.Length);
+        Assert.Equal (2, wrapper.MaxItemLength);
 
         source.Add ("Very Long String Indeed");
-        Assert.Equal (23, wrapper.Length);
+        Assert.Equal (23, wrapper.MaxItemLength);
 
         source.Clear ();
         source.Add ("X");
-        Assert.Equal (1, wrapper.Length);
+        Assert.Equal (1, wrapper.MaxItemLength);
     }
 
     [Fact]

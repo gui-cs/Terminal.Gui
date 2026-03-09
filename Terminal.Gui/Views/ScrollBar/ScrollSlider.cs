@@ -1,5 +1,3 @@
-
-
 using System.ComponentModel;
 
 namespace Terminal.Gui.Views;
@@ -9,7 +7,7 @@ namespace Terminal.Gui.Views;
 ///     Can be dragged with the mouse, constrained by the size of the Viewport of it's superview. Can be
 ///     oriented either vertically or horizontally.
 /// </summary>
-public class ScrollSlider : View, IOrientation, IDesignable
+public sealed class ScrollSlider : View, IOrientation, IDesignable
 {
     /// <summary>
     ///     Initializes a new instance.
@@ -17,16 +15,17 @@ public class ScrollSlider : View, IOrientation, IDesignable
     public ScrollSlider ()
     {
         Id = "scrollSlider";
-        WantMousePositionReports = true;
+        MousePositionTracking = true;
 
+        // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new (this); // Do not use object initializer!
         _orientationHelper.Orientation = Orientation.Vertical;
-        _orientationHelper.OrientationChanging += (sender, e) => OrientationChanging?.Invoke (this, e);
-        _orientationHelper.OrientationChanged += (sender, e) => OrientationChanged?.Invoke (this, e);
+        _orientationHelper.OrientationChanging += (_, e) => OrientationChanging?.Invoke (this, e);
+        _orientationHelper.OrientationChanged += (_, e) => OrientationChanged?.Invoke (this, e);
 
         OnOrientationChanged (Orientation);
 
-        HighlightStates = ViewBase.MouseState.In;
+        MouseHighlightStates = MouseState.In;
     }
 
     #region IOrientation members
@@ -34,11 +33,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
     private readonly OrientationHelper _orientationHelper;
 
     /// <inheritdoc/>
-    public Orientation Orientation
-    {
-        get => _orientationHelper.Orientation;
-        set => _orientationHelper.Orientation = value;
-    }
+    public Orientation Orientation { get => _orientationHelper.Orientation; set => _orientationHelper.Orientation = value; }
 
     /// <inheritdoc/>
     public event EventHandler<CancelEventArgs<Orientation>>? OrientationChanging;
@@ -69,6 +64,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
             Width = Height;
             Height = Dim.Fill ();
         }
+
         SetNeedsLayout ();
     }
 
@@ -85,6 +81,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
         {
             FillRect (Viewport with { Width = Size }, Glyphs.ContinuousMeterSegment);
         }
+
         return true;
     }
 
@@ -113,7 +110,6 @@ public class ScrollSlider : View, IOrientation, IDesignable
 
             _size = Math.Clamp (value, 1, VisibleContentSize);
 
-
             if (Orientation == Orientation.Vertical)
             {
                 Height = _size;
@@ -122,6 +118,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
             {
                 Width = _size;
             }
+
             SetNeedsLayout ();
         }
     }
@@ -149,6 +146,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
             {
                 return;
             }
+
             _visibleContentSize = int.Max (1, value);
 
             if (_position >= _visibleContentSize - _size)
@@ -173,6 +171,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
         set
         {
             int clampedPosition = ClampPosition (value);
+
             if (_position == clampedPosition)
             {
                 return;
@@ -205,18 +204,10 @@ public class ScrollSlider : View, IOrientation, IDesignable
     /// </summary>
     /// <param name="newPosition"></param>
     /// <returns></returns>
-    internal int ClampPosition (int newPosition)
-    {
-        return Math.Clamp (newPosition, 0, Math.Max (SliderPadding / 2, VisibleContentSize - SliderPadding - Size));
-    }
+    internal int ClampPosition (int newPosition) => Math.Clamp (newPosition, 0, Math.Max (SliderPadding / 2, VisibleContentSize - SliderPadding - Size));
 
     private void RaisePositionChangeEvents (int newPosition)
     {
-        if (OnPositionChanging (_position, newPosition))
-        {
-            return;
-        }
-
         CancelEventArgs<int> args = new (ref _position, ref newPosition);
         PositionChanging?.Invoke (this, args);
 
@@ -230,19 +221,12 @@ public class ScrollSlider : View, IOrientation, IDesignable
 
         MoveToPosition (_position);
 
-        OnPositionChanged (_position);
         PositionChanged?.Invoke (this, new (in _position));
 
-        OnScrolled (distance);
         Scrolled?.Invoke (this, new (in distance));
 
-        RaiseActivating (new CommandContext<KeyBinding> (Command.Activate, this, new KeyBinding ([Command.Activate], null, distance)));
+        RaiseActivating (new CommandContext (Command.Activate, new WeakReference<View> (this), new CommandBinding ([Command.Activate], null, distance)));
     }
-
-    /// <summary>
-    ///     Called when <see cref="Position"/> is changing. Return true to cancel the change.
-    /// </summary>
-    protected virtual bool OnPositionChanging (int currentPos, int newPos) { return false; }
 
     /// <summary>
     ///     Raised when the <see cref="Position"/> is changing. Set <see cref="CancelEventArgs.Cancel"/> to
@@ -250,29 +234,22 @@ public class ScrollSlider : View, IOrientation, IDesignable
     /// </summary>
     public event EventHandler<CancelEventArgs<int>>? PositionChanging;
 
-    /// <summary>Called when <see cref="Position"/> has changed.</summary>
-    protected virtual void OnPositionChanged (int position) { }
-
     /// <summary>Raised when the <see cref="Position"/> has changed.</summary>
     public event EventHandler<EventArgs<int>>? PositionChanged;
-
-    /// <summary>Called when <see cref="Position"/> has changed. Indicates how much to scroll.</summary>
-    protected virtual void OnScrolled (int distance) { }
 
     /// <summary>Raised when the <see cref="Position"/> has changed. Indicates how much to scroll.</summary>
     public event EventHandler<EventArgs<int>>? Scrolled;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
     {
-        if (role == VisualRole.Normal)
+        if (role != VisualRole.Normal)
         {
-            currentAttribute = GetAttributeForRole (VisualRole.HotNormal);
-
-            return true;
+            return base.OnGettingAttributeForRole (role, ref currentAttribute);
         }
+        currentAttribute = GetAttributeForRole (VisualRole.HotNormal);
 
-        return base.OnGettingAttributeForRole (role, ref currentAttribute);
+        return true;
     }
 
     private int _lastLocation = -1;
@@ -287,62 +264,63 @@ public class ScrollSlider : View, IOrientation, IDesignable
     public int SliderPadding { get; set; }
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (MouseEventArgs mouseEvent)
+    protected override bool OnMouseEvent (Mouse mouse)
     {
         if (SuperView is null)
         {
             return false;
         }
 
-        if (mouseEvent.IsSingleDoubleOrTripleClicked)
+        if (mouse.IsSingleDoubleOrTripleClicked)
         {
             return true;
         }
 
-        int location = (Orientation == Orientation.Vertical ? mouseEvent.Position.Y : mouseEvent.Position.X);
+        int location = Orientation == Orientation.Vertical ? mouse.Position!.Value.Y : mouse.Position!.Value.X;
         int offsetFromLastLocation = _lastLocation > -1 ? location - _lastLocation : 0;
-        int superViewDimension = VisibleContentSize;
 
-        if (mouseEvent.IsPressed || mouseEvent.IsReleased)
+        if (mouse is { IsPressed: false, IsReleased: false })
         {
-            if (mouseEvent.Flags.HasFlag (MouseFlags.Button1Pressed) && _lastLocation == -1)
-            {
-                if (Application.Mouse.MouseGrabView != this)
-                {
-                    Application.Mouse.GrabMouse (this);
-                    _lastLocation = location;
-                }
-            }
-            else if (mouseEvent.Flags == (MouseFlags.Button1Pressed | MouseFlags.ReportMousePosition))
-            {
-                int currentLocation;
-                if (Orientation == Orientation.Vertical)
-                {
-                    currentLocation = Frame.Y;
-                }
-                else
-                {
-                    currentLocation = Frame.X;
-                }
-
-                currentLocation -= SliderPadding / 2;
-                int newLocation = currentLocation + offsetFromLastLocation;
-                Position = newLocation;
-            }
-            else if (mouseEvent.Flags == MouseFlags.Button1Released)
-            {
-                _lastLocation = -1;
-
-                if (Application.Mouse.MouseGrabView == this)
-                {
-                    Application.Mouse.UngrabMouse ();
-                }
-            }
-
-            return true;
+            return false;
         }
 
-        return false;
+        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed) && _lastLocation == -1)
+        {
+            if (App is { } && App.Mouse.IsGrabbed (this))
+            {
+                return true;
+            }
+            App?.Mouse.GrabMouse (this);
+            _lastLocation = location;
+        }
+        else if (mouse.Flags == (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
+        {
+            int currentLocation;
+
+            if (Orientation == Orientation.Vertical)
+            {
+                currentLocation = Frame.Y;
+            }
+            else
+            {
+                currentLocation = Frame.X;
+            }
+
+            currentLocation -= SliderPadding / 2;
+            int newLocation = currentLocation + offsetFromLastLocation;
+            Position = newLocation;
+        }
+        else if (mouse.Flags == MouseFlags.LeftButtonReleased)
+        {
+            _lastLocation = -1;
+
+            if (App is { } && App.Mouse.IsGrabbed (this))
+            {
+                App.Mouse.UngrabMouse ();
+            }
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -350,16 +328,15 @@ public class ScrollSlider : View, IOrientation, IDesignable
     /// </summary>
     /// <param name="scrollableContentSize">The size of the content.</param>
     /// <param name="visibleContentSize">The size of the visible content.</param>
-    /// <param name="sliderBounds">The bounds of the area the slider moves in (e.g. the size of the <see cref="ScrollBar"/> minus 2).</param>
-    public static int CalculateSize (
-        int scrollableContentSize,
-        int visibleContentSize,
-        int sliderBounds
-    )
+    /// <param name="sliderBounds">
+    ///     The bounds of the area the slider moves in (e.g. the size of the <see cref="ScrollBar"/>
+    ///     minus 2).
+    /// </param>
+    public static int CalculateSize (int scrollableContentSize, int visibleContentSize, int sliderBounds)
     {
         if (scrollableContentSize <= 0 || sliderBounds <= 0)
         {
-            return 1;   // Slider must be at least 1
+            return 1; // Slider must be at least 1
         }
 
         if (visibleContentSize <= 0 || scrollableContentSize <= visibleContentSize)
@@ -367,9 +344,9 @@ public class ScrollSlider : View, IOrientation, IDesignable
             return sliderBounds;
         }
 
-        double sliderSizeD = ((double)visibleContentSize / scrollableContentSize) * sliderBounds;
+        double sliderSizeD = (double)visibleContentSize / scrollableContentSize * sliderBounds;
 
-        int sliderSize = (int)Math.Floor (sliderSizeD);
+        var sliderSize = (int)Math.Floor (sliderSizeD);
 
         return Math.Clamp (sliderSize, 1, sliderBounds);
     }
@@ -380,15 +357,16 @@ public class ScrollSlider : View, IOrientation, IDesignable
     /// <param name="scrollableContentSize">The size of the content.</param>
     /// <param name="visibleContentSize">The size of the visible content.</param>
     /// <param name="contentPosition">The position in the content (between 0 and <paramref name="scrollableContentSize"/>).</param>
-    /// <param name="sliderBounds">The bounds of the area the slider moves in (e.g. the size of the <see cref="ScrollBar"/> minus 2).</param>
+    /// <param name="sliderBounds">
+    ///     The bounds of the area the slider moves in (e.g. the size of the <see cref="ScrollBar"/>
+    ///     minus 2).
+    /// </param>
     /// <param name="direction">The direction the slider is moving.</param>
-    internal static int CalculatePosition (
-        int scrollableContentSize,
-        int visibleContentSize,
-        int contentPosition,
-        int sliderBounds,
-        NavigationDirection direction
-    )
+    internal static int CalculatePosition (int scrollableContentSize,
+                                           int visibleContentSize,
+                                           int contentPosition,
+                                           int sliderBounds,
+                                           NavigationDirection direction)
     {
         if (scrollableContentSize - visibleContentSize <= 0 || sliderBounds <= 0)
         {
@@ -397,7 +375,7 @@ public class ScrollSlider : View, IOrientation, IDesignable
 
         int calculatedSliderSize = CalculateSize (scrollableContentSize, visibleContentSize, sliderBounds);
 
-        double newSliderPosition = ((double)contentPosition / (scrollableContentSize - visibleContentSize)) * (sliderBounds - calculatedSliderSize);
+        double newSliderPosition = (double)contentPosition / (scrollableContentSize - visibleContentSize) * (sliderBounds - calculatedSliderSize);
 
         return Math.Clamp ((int)Math.Round (newSliderPosition), 0, sliderBounds - calculatedSliderSize);
     }
@@ -408,22 +386,21 @@ public class ScrollSlider : View, IOrientation, IDesignable
     /// <param name="scrollableContentSize">The size of the content.</param>
     /// <param name="visibleContentSize">The size of the visible content.</param>
     /// <param name="sliderPosition">The position of the slider.</param>
-    /// <param name="sliderBounds">The bounds of the area the slider moves in (e.g. the size of the <see cref="ScrollBar"/> minus 2).</param>
-    internal static int CalculateContentPosition (
-        int scrollableContentSize,
-        int visibleContentSize,
-        int sliderPosition,
-        int sliderBounds
-    )
+    /// <param name="sliderBounds">
+    ///     The bounds of the area the slider moves in (e.g. the size of the <see cref="ScrollBar"/>
+    ///     minus 2).
+    /// </param>
+    internal static int CalculateContentPosition (int scrollableContentSize, int visibleContentSize, int sliderPosition, int sliderBounds)
     {
         int sliderSize = CalculateSize (scrollableContentSize, visibleContentSize, sliderBounds);
 
-        double pos = ((double)(sliderPosition) / (sliderBounds - sliderSize)) * (scrollableContentSize - visibleContentSize);
+        double pos = (double)sliderPosition / (sliderBounds - sliderSize) * (scrollableContentSize - visibleContentSize);
 
         if (pos is double.NaN)
         {
             return 0;
         }
+
         double rounded = Math.Ceiling (pos);
 
         return (int)Math.Clamp (rounded, 0, Math.Max (0, scrollableContentSize - sliderSize));

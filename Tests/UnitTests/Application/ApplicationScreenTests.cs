@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-namespace UnitTests.ApplicationTests;
+﻿namespace UnitTests.ApplicationTests;
 
 public class ApplicationScreenTests
 {
@@ -73,7 +71,7 @@ public class ApplicationScreenTests
     {
         // Arrange
         Application.ResetState (true);
-        Application.Init ("fake");
+        Application.Init (DriverRegistry.Names.ANSI);
 
         // Act
         Application.ClearScreenNextIteration = true;

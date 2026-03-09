@@ -25,7 +25,7 @@ This document provides an in-depth overview of the new features, improvements, a
 
 Terminal.Gui v2 represents a fundamental redesign of the library's architecture, API, and capabilities. Key improvements include:
 
-- **Instance-Based Application Model** - Move from static singletons to `IApplication` instances
+- **Instance-Based Application Model** - Move from static singletons to <xref:Terminal.Gui.App.IApplication> instances
 - **IRunnable Architecture** - Interface-based pattern for type-safe, runnable views
 - **Proper Resource Management** - Full IDisposable pattern with automatic cleanup
 - **Built-in Scrolling** - Every view supports scrolling inherently
@@ -68,19 +68,19 @@ v2 introduces an instance-based architecture that eliminates global state and en
 ### Key Features
 
 **IApplication Interface:**
-- `Application.Create()` returns an `IApplication` instance
+- [Application.Create()](xref:Terminal.Gui.App.Application.Create*) returns an <xref:Terminal.Gui.App.IApplication> instance
 - Multiple applications can coexist (useful for testing)
 - Each instance manages its own driver, session stack, and resources
 
 **View.App Property:**
-- Every view has an `App` property referencing its `IApplication` context
-- Views access application services through `App` (driver, session management, etc.)
+- Every view has an <xref:Terminal.Gui.ViewBase.View.App> property referencing its <xref:Terminal.Gui.App.IApplication> context
+- Views access application services through <xref:Terminal.Gui.ViewBase.View.App> (driver, session management, etc.)
 - Eliminates static dependencies, improving testability
 
 **Session Management:**
-- `SessionStack` tracks all running sessions as a stack
-- `TopRunnable` property references the currently active session
-- `Begin()` and `End()` methods manage session lifecycle
+- <xref:Terminal.Gui.App.IApplication.SessionStack> tracks all running sessions as a stack
+- <xref:Terminal.Gui.App.IApplication.TopRunnable> property references the currently active session
+- [Begin()](xref:Terminal.Gui.App.IApplication.Begin*) and [End()](xref:Terminal.Gui.App.IApplication.End*) methods manage session lifecycle
 
 ### Example
 
@@ -113,7 +113,7 @@ public class MyView : View
 
 ### Benefits
 
-- **Testability** - Mock `IApplication` for unit tests
+- **Testability** - Mock <xref:Terminal.Gui.App.IApplication> for unit tests
 - **No Global State** - Multiple contexts can coexist
 - **Clear Ownership** - Views explicitly know their context
 - **Proper Cleanup** - IDisposable ensures resources are released
@@ -137,7 +137,7 @@ using (IApplication app = Application.Create ().Init ())
 ```
 
 **Important Changes:**
-- `Shutdown()` method is obsolete - use `Dispose()` instead
+- [Shutdown()](xref:Terminal.Gui.App.Application.Shutdown*) method is obsolete - use `Dispose()` instead
 - Always dispose applications (especially in tests)
 - Input thread runs at ~50 polls/second (20ms throttle) until disposed
 
@@ -147,12 +147,12 @@ using (IApplication app = Application.Create ().Init ())
 
 See the [Application Deep Dive](application.md) for complete details.
 
-v2 introduces `IRunnable<TResult>` - an interface-based pattern for runnable views with type-safe results.
+v2 introduces <xref:Terminal.Gui.App.IRunnable> - an interface-based pattern for runnable views with type-safe results.
 
 ### Key Features
 
 **Interface-Based:**
-- Implement `IRunnable<TResult>` without inheriting from `Runnable`
+- Implement <xref:Terminal.Gui.App.IRunnable> without inheriting from `Runnable`
 - Any view can be runnable
 - Decouples runnability from view hierarchy
 
@@ -232,9 +232,9 @@ using (IApplication app = Application.Create ().Init ())
 ```
 
 **Key Methods:**
-- `Init()` - Returns `IApplication` for chaining
-- `Run<TRunnable>()` - Creates and runs runnable, returns `IApplication`
-- `GetResult<T>()` - Extract typed result after run
+- [Init()](xref:Terminal.Gui.App.IApplication.Init*) - Returns <xref:Terminal.Gui.App.IApplication> for chaining
+- [Run<TRunnable>()](xref:Terminal.Gui.App.IApplication.Run*) - Creates and runs runnable, returns <xref:Terminal.Gui.App.IApplication>
+- [GetResult<T>()](xref:Terminal.Gui.App.IApplication.GetResult*) - Extract typed result after run
 - `Dispose()` - Release all resources
 
 ### Disposal Semantics
@@ -243,7 +243,7 @@ using (IApplication app = Application.Create ().Init ())
 
 | Method | Creator | Owner | Disposal |
 |--------|---------|-------|----------|
-| `Run<TRunnable>()` | Framework | Framework | Automatic when returns |
+| [Run<TRunnable>()](xref:Terminal.Gui.App.IApplication.Run*) | Framework | Framework | Automatic when returns |
 | `Run(IRunnable)` | Caller | Caller | Manual by caller |
 
 ```csharp
@@ -275,7 +275,7 @@ v2 provides full 24-bit color support by default:
 
 - **Implementation**: [Attribute](~/api/Terminal.Gui.Drawing.Attribute.yml) class handles RGB values
 - **Fallback**: Automatic 16-color mode for older terminals
-- **Driver Support**: [IConsoleDriver.SupportsTrueColor](~/api/Terminal.Gui.Drivers.IConsoleDriver.yml#Terminal_Gui_Drivers_IConsoleDriver_SupportsTrueColor) detection
+- **Driver Support**: `IDriver.SupportsTrueColor` detection
 - **Usage**: Direct RGB input via [Color](~/api/Terminal.Gui.Drawing.Color.yml) struct
 
 ```csharp
@@ -404,7 +404,7 @@ view.AdvanceFocus ()
 
 v2 reduces overhead through:
 
-- Smarter `NeedsDraw` system (only draw what changed)
+- Smarter <xref:Terminal.Gui.ViewBase.View.NeedsDraw> system (only draw what changed)
 - Reduced allocations in hot paths (event handling, rendering)
 - Optimized layout calculations
 - Efficient input processing
@@ -428,11 +428,11 @@ v2 clarifies view ownership:
 
 See the [Scrolling Deep Dive](scrolling.md) for complete details.
 
-Every [View](~/api/Terminal.Gui.ViewBase.View.yml) supports scrolling inherently:
+Every [View](~/api/Terminal.Gui.ViewBase.yml) supports scrolling inherently:
 
-- **[Viewport](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Viewport)** - Visible rectangle (can have non-zero location)
-- **[GetContentSize](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_GetContentSize)** - Returns total content size
-- **[SetContentSize](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_SetContentSize_System_Nullable_System_Drawing_Size__)** - Sets scrollable content size
+- **[Viewport](~/api/Terminal.Gui.ViewBase.yml)** - Visible rectangle (can have non-zero location)
+- **[GetContentSize](~/api/Terminal.Gui.ViewBase.yml)** - Returns total content size
+- **[SetContentSize](~/api/Terminal.Gui.ViewBase.yml)** - Sets scrollable content size
 - **ScrollVertical/ScrollHorizontal** - Helper methods
 
 **No need for ScrollView wrapper!**
@@ -445,10 +445,9 @@ view.SetContentSize (new (100, 100));
 view.ScrollVertical (5);
 view.ScrollHorizontal (3);
 
-// Built-in scrollbars
-view.VerticalScrollBar.Visible = true;
-view.HorizontalScrollBar.Visible = true;
-view.VerticalScrollBar.AutoShow = true;
+// Built-in scrollbars with automatic visibility
+view.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+view.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 ```
 
 ### Enhanced ScrollBar
@@ -456,25 +455,26 @@ view.VerticalScrollBar.AutoShow = true;
 v2 replaces `ScrollBarView` with [ScrollBar](~/api/Terminal.Gui.Views.ScrollBar.yml):
 
 - Cleaner implementation
-- Automatic show/hide
+- Automatic show/hide via [ScrollBarVisibilityMode](~/api/Terminal.Gui.Views.ScrollBarVisibilityMode.yml)
 - Proportional sizing with `ScrollSlider`
 - Integrated with View's scrolling system
-- Simple to add via [View.VerticalScrollBar](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_VerticalScrollBar) / [View.HorizontalScrollBar](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_HorizontalScrollBar)
+- Simple to enable via [ViewportSettingsFlags](~/api/Terminal.Gui.ViewBase.ViewportSettingsFlags.yml)
+- Accessible via [View.VerticalScrollBar](~/api/Terminal.Gui.ViewBase.yml) / [View.HorizontalScrollBar](~/api/Terminal.Gui.ViewBase.yml)
 
 ### Advanced Layout Features
 
 See the [Layout Deep Dive](layout.md) and [DimAuto Deep Dive](dimauto.md) for details.
 
-**[Dim.Auto](~/api/Terminal.Gui.Dim.yml#Terminal_Gui_Dim_Auto_Terminal_Gui_DimAutoStyle_Terminal_Gui_Dim_Terminal_Gui_Dim_):**
+**<xref:Terminal.Gui.ViewBase.Dim.Auto*>:**
 - Automatically sizes views based on content or subviews
 - Reduces manual layout calculations
 - Supports multiple styles (Text, Content, Position)
 
-**[Pos.AnchorEnd](~/api/Terminal.Gui.Pos.yml#Terminal_Gui_Pos_AnchorEnd_System_Int32_):**
+**<xref:Terminal.Gui.ViewBase.Pos.AnchorEnd*>:**
 - Anchor to right or bottom of SuperView
 - Enables flexible, responsive layouts
 
-**[Pos.Align](~/api/Terminal.Gui.Pos.yml):**
+**[Pos.Align](~/api/Terminal.Gui.ViewBase.Pos.yml):**
 - Align multiple views (Left, Center, Right)
 - Simplifies creating aligned layouts
 
@@ -496,13 +496,13 @@ label2.X = Pos.Center ();
 
 See the [Arrangement Deep Dive](arrangement.md) for complete details.
 
-[View.Arrangement](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_Arrangement) enables interactive UI:
+[View.Arrangement](~/api/Terminal.Gui.ViewBase.yml) enables interactive UI:
 
 - **[ViewArrangement.Movable](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Drag with mouse or move with keyboard
 - **[ViewArrangement.Resizable](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Resize edges with mouse or keyboard
 - **[ViewArrangement.Overlapped](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Z-order management for overlapping views
 
-**Arrangement Key**: Press `Ctrl+F5` (configurable via [Application.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey)) to enter arrange mode
+**Arrangement Key**: Press `Ctrl+F5` (configurable via `Application.ArrangeKey`) to enter arrange mode
 
 ```csharp
 // Movable and resizable window
@@ -518,8 +518,8 @@ See the [Navigation Deep Dive](navigation.md) for complete details.
 
 v2 decouples navigation concepts:
 
-- **[CanFocus](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_CanFocus)** - Whether view can receive focus (defaults to `false` in v2)
-- **[TabStop](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_TabStop)** - [TabBehavior](~/api/Terminal.Gui.Input.TabBehavior.yml) enum (TabStop, TabGroup, NoStop)
+- **[CanFocus](~/api/Terminal.Gui.ViewBase.yml)** - Whether view can receive focus (defaults to `false` in v2)
+- **[TabStop](~/api/Terminal.Gui.ViewBase.yml)** - [TabBehavior](~/api/Terminal.Gui.ViewBase.TabBehavior.yml) enum (TabStop, TabGroup, NoStop)
 - **[ApplicationNavigation](~/api/Terminal.Gui.App.ApplicationNavigation.yml)** - Centralized navigation logic
 
 **Navigation Keys (Configurable):**
@@ -529,10 +529,10 @@ v2 decouples navigation concepts:
 
 ```csharp
 // Configure navigation keys
-Application.NextTabStopKey = Key.Tab;
-Application.PrevTabStopKey = Key.Tab.WithShift;
-Application.NextTabGroupKey = Key.F6;
-Application.PrevTabGroupKey = Key.F6.WithShift;
+App.Keyboard.NextTabStopKey = Key.Tab;
+App.Keyboard.PrevTabStopKey = Key.Tab.WithShift;
+App.Keyboard.NextTabGroupKey = Key.F6;
+App.Keyboard.PrevTabGroupKey = Key.F6.WithShift;
 
 // Set tab behavior
 view.CanFocus = true;
@@ -557,7 +557,7 @@ See the [Views Overview](views.md) for a complete catalog.
 - **[NumericUpDown<T>](~/api/Terminal.Gui.Views.NumericUpDown-1.yml)** - Type-safe numeric input
 - **[OptionSelector](~/api/Terminal.Gui.Views.OptionSelector.yml)** - Mutually-exclusive option selection
 - **[Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)** - Command display with key bindings
-- **[Slider](~/api/Terminal.Gui.Views.Slider.yml)** - Sophisticated range selection control
+- **[LinearRange](~/api/Terminal.Gui.Views.LinearRange.yml)** - Sophisticated range selection control
 - **[SpinnerView](~/api/Terminal.Gui.Views.SpinnerView.yml)** - Animated progress indicators
 
 ### Significantly Improved Views
@@ -595,7 +595,7 @@ if (key.Ctrl) { }
 **Key Bindings:**
 - Map keys to [Command](~/api/Terminal.Gui.Input.Command.yml) enums
 - Scopes: Application, Focused, HotKey
-- Views declare supported commands via [View.AddCommand](~/api/Terminal.Gui.ViewBase.View.yml)
+- Views declare supported commands via [View.AddCommand](~/api/Terminal.Gui.ViewBase.yml)
 
 ```csharp
 // Add command handler
@@ -612,40 +612,29 @@ private bool HandleAccept ()
 ```
 
 **Configurable Keys:**
-- [Application.QuitKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_QuitKey) - Close app (default: Esc)
-- [Application.ArrangeKey](~/api/Terminal.Gui.App.Application.yml#Terminal_Gui_App_Application_ArrangeKey) - Arrange mode (default: Ctrl+F5)
+- `Application.QuitKey` - Close app (default: Esc)
+- `Application.ArrangeKey` - Arrange mode (default: Ctrl+F5)
 - Navigation keys (Tab, F6, arrows)
 
 ### Mouse API
 
 See the [Mouse Deep Dive](mouse.md) for complete details.
 
-**[MouseEventArgs](~/api/Terminal.Gui.Input.MouseEventArgs.yml):**
+**[MouseEventArgs](~/api/Terminal.Gui.Input.Mouse.yml):**
 - Replaces v1's `MouseEventEventArgs`
 - Cleaner structure for mouse data
 - [MouseFlags](~/api/Terminal.Gui.Input.MouseFlags.yml) for button states
 
 **Granular Events:**
-- [View.MouseClick](~/api/Terminal.Gui.ViewBase.View.yml) - High-level click events
+- [View.MouseClick](~/api/Terminal.Gui.ViewBase.yml) - High-level click events
 - Double-click support
 - Mouse movement tracking
 - Viewport-relative coordinates (not screen-relative)
 
-**Highlight and Continuous Presses:**
-- [View.Highlight](~/api/Terminal.Gui.ViewBase.View.yml) - Visual feedback on hover/click
-- [View.HighlightStyle](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_HighlightStyle) - Configure highlight appearance
-- [View.WantContinuousButtonPresses](~/api/Terminal.Gui.ViewBase.View.yml#Terminal_Gui_ViewBase_View_WantContinuousButtonPresses) - Repeat [Command.Accept](~/api/Terminal.Gui.Input.Command.yml) during button hold
-
-```csharp
-// Highlight on hover
-view.Highlight += (s, e) => { /* Visual feedback */ };
-view.HighlightStyle = HighlightStyle.Hover;
-
-// Continuous button presses
-view.WantContinuousButtonPresses = true;
-```
-
----
+**Highlight and Repeat on Hold:**
+- [View.MouseHighlightStates](~/api/Terminal.Gui.ViewBase.yml) - Allows views to provide visual feedback on hover/click.
+- [View.MouseState](~/api/Terminal.Gui.ViewBase.yml) - Indicates whether the mouse is pressed, hovered, or outside.
+- [View.MouseHoldRepeat](~/api/Terminal.Gui.ViewBase.yml) - Enables or disables whether mouse click events will be repeated when the user holds the mouse down
 
 ## Configuration and Persistence
 
@@ -703,7 +692,7 @@ Logging.Debug ("Rendering view {ViewId}", view.Id);
 
 ### Metrics
 
-[Logging.Meter](~/api/Terminal.Gui.App.Logging.yml#Terminal_Gui_App_Logging_Meter) provides performance metrics:
+`Logging.Meter` provides performance metrics:
 
 - Frame rate tracking
 - Redraw times
@@ -736,7 +725,7 @@ v2 supports the Sixel protocol for rendering images:
 v2 ensures compatibility with Ahead-of-Time compilation:
 
 - Avoid reflection patterns problematic for AOT
-- Source generators for JSON serialization via [SourceGenerationContext](~/api/Terminal.Gui.Configuration.SourceGenerationContext.yml)
+- Source generators for JSON serialization via SourceGenerationContext
 - Single-file deployment support
 - Faster startup, reduced runtime overhead
 

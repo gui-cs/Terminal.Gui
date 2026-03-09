@@ -1,6 +1,4 @@
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace DrawingTests;
 
@@ -10,7 +8,7 @@ namespace DrawingTests;
 ///
 /// Note: Tests that verify rendered output (Draw methods) require Application.Driver and remain in UnitTests as integration tests.
 /// </summary>
-public class RulerTests (ITestOutputHelper output) : FakeDriverBase
+public class RulerTests (ITestOutputHelper output) : TestDriverBase
 {
     [Fact]
     public void Constructor_Defaults ()
@@ -51,7 +49,7 @@ public class RulerTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Draw_Default ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var r = new Ruler ();
         r.Draw (driver: driver, location: Point.Empty);
@@ -61,7 +59,7 @@ public class RulerTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Draw_Horizontal ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var len = 15;
 
@@ -107,7 +105,7 @@ public class RulerTests (ITestOutputHelper output) : FakeDriverBase
     [Fact]
     public void Draw_Vertical ()
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         var len = 15;
 

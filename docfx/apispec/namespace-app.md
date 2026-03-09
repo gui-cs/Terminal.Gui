@@ -1,26 +1,40 @@
 ---
 uid: Terminal.Gui.App
-summary: The `App` namespace holds @Terminal.Gui.Application and associated classes.
+summary: Application lifecycle, initialization, and core runtime services.
 ---
 
-@Terminal.Gui.Application provides the main entry point and core application logic for Terminal.Gui applications. This static singleton class is responsible for initializing and shutting down the Terminal.Gui environment, managing the main event loop, handling input and output, and providing access to global application state.
+The `App` namespace provides the application entry point and core runtime infrastructure for Terminal.Gui applications.
 
-Typical usage involves calling `Application.Init()` to initialize the application, creating and running a `Window`, and then calling `Application.Shutdown()` to clean up resources. The class also provides methods for culture support, idle handlers, and rendering the application state as a string.
+## Key Types
 
-## Example Usage
+- **Application** - Static gateway class providing the main entry point
+- **IApplication** - Instance-based application interface for testability and multiple instances
+- **ApplicationNavigation** - Focus management and cursor positioning
+- **Clipboard** - Cross-platform clipboard access
+
+## Instance-Based Architecture
+
+Terminal.Gui v2 uses an instance-based architecture where `Application` is a static gateway to `IApplication` instances:
 
 ```csharp
-Application.Init();
-var win = new Window()
-{
-    Title = $"Example App ({Application.QuitKey} to quit)"
-};
-Application.Run(win);
-win.Dispose();
-Application.Shutdown();
+// Recommended: Instance-based with automatic cleanup
+using IApplication app = Application.Create ();
+app.Init ();
+
+using Window window = new () { Title = "Hello (Esc to quit)" };
+app.Run (window);
+```
+
+```csharp
+// Legacy: Static API (supported, but not recommended)
+Application.Init ();
+Window window = new () { Title = "Hello (Esc to quit)" };
+Application.Run (window);
+window.Dispose ();
+Application.Shutdown ();
 ```
 
 ## See Also
 
-- [Logging](~/docs/logging.md)
-- [Multitasking](~/docs/multitasking.md)
+- [Application Deep Dive](~/docs/application.md)
+- [Navigation Deep Dive](~/docs/navigation.md)

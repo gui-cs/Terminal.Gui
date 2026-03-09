@@ -1,11 +1,10 @@
-using Xunit.Abstractions;
-
 namespace ApplicationTests.Screen;
 
 /// <summary>
 ///     Parallelizable tests for IApplication.ScreenChanged event and Screen property.
 ///     Tests using the modern instance-based IApplication API.
 /// </summary>
+[Collection("Application Tests")]
 public class ScreenTests (ITestOutputHelper output)
 {
     private readonly ITestOutputHelper _output = output;
@@ -16,7 +15,7 @@ public class ScreenTests (ITestOutputHelper output)
     public void Screen_Size_Changes ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         IDriver? driver = app.Driver;
 
@@ -44,7 +43,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var eventFired = false;
         Rectangle? newScreen = null;
@@ -78,7 +77,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         Rectangle initialScreen = app.Screen;
         Assert.Equal (new (0, 0, 80, 25), initialScreen);
@@ -95,7 +94,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         object? eventSender = null;
 
@@ -123,7 +122,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         Rectangle? capturedRectangle = null;
 
@@ -154,7 +153,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var eventCount = 0;
         List<Size> sizes = new ();
@@ -192,7 +191,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var eventFired = false;
 
@@ -220,7 +219,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var eventCount = 0;
 
@@ -247,7 +246,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         using var runnable = new Runnable ();
         SessionToken? token = app.Begin (runnable);
@@ -281,7 +280,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         using var runnable1 = new Runnable ();
         SessionToken? token1 = app.Begin (runnable1);
@@ -324,7 +323,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var eventFired = false;
 
@@ -356,7 +355,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         // Act
         Rectangle screen = app.Screen;
@@ -384,7 +383,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         // Act & Assert
         var exception = Assert.Throws<NotImplementedException> (() =>
@@ -398,7 +397,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         // Act
         Exception? exception = Record.Exception (() =>
@@ -414,7 +413,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var eventFired = false;
 
@@ -441,7 +440,7 @@ public class ScreenTests (ITestOutputHelper output)
     {
         // Arrange
         using IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         List<Exception> exceptions = new ();
         List<Task> tasks = new ();
@@ -449,8 +448,7 @@ public class ScreenTests (ITestOutputHelper output)
         // Act - Access Screen property from multiple threads
         for (var i = 0; i < 10; i++)
         {
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      try
                                      {
@@ -464,11 +462,12 @@ public class ScreenTests (ITestOutputHelper output)
                                              exceptions.Add (ex);
                                          }
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Assert - No exceptions should occur

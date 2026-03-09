@@ -1,11 +1,11 @@
 ﻿using System.Data;
-#nullable enable
 using JetBrains.Annotations;
+using UnitTests;
 
 namespace ViewsTests;
 
 [TestSubject (typeof (TableView))]
-public class TableViewTests
+public class TableViewTests : TestDriverBase
 {
     [Fact]
     public void CanTabOutOfTableViewUsingCursor_Left ()
@@ -59,7 +59,7 @@ public class TableViewTests
         GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
 
         // Make the selected cell one in from the rightmost column
-        tableView.SelectedColumn = tableView.Table.Columns - 2;
+        tableView.SelectedColumn = tableView.Table!.Columns - 2;
 
         // First press should move us to the rightmost column without changing focus
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorRight);
@@ -74,7 +74,6 @@ public class TableViewTests
 
         Assert.Same (tf2, tableView.App!.TopRunnableView!.MostFocused);
         Assert.True (tf2.HasFocus);
-
     }
 
     [Fact]
@@ -83,7 +82,7 @@ public class TableViewTests
         GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
 
         // Make the selected cell one in from the bottommost row
-        tableView.SelectedRow = tableView.Table.Rows - 2;
+        tableView.SelectedRow = tableView.Table!.Rows - 2;
 
         // First press should move us to the bottommost row without changing focus
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorDown);
@@ -149,6 +148,7 @@ public class TableViewTests
         app.Begin (runnable);
 
         tableView = new ();
+        tableView.Viewport = new (0, 0, 25, 10);
 
         tf1 = new ();
         tf2 = new ();
@@ -225,5 +225,154 @@ public class TableViewTests
         // There is no keybinding for Key.C so it hits collection navigator i.e. we jump to candle
         Assert.True (tableView.NewKeyDownEvent (Key.C));
         Assert.Equal (5, tableView.SelectedRow);
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void TableView_Command_Activate_TogglesSelection ()
+    {
+        var dt = new DataTable ();
+        dt.Columns.Add ("Col1");
+        dt.Rows.Add ("Data1");
+        dt.Rows.Add ("Data2");
+
+        TableView tableView = new () { Table = new DataTableSource (dt) };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+
+        // Space toggles cell selection (Activate command)
+        // Note: Returns false because RaiseActivating has no subscribers
+        // but the selection is still toggled
+        bool? result = tableView.InvokeCommand (Command.Activate);
+
+        // Command toggles selection but returns false (event not handled)
+        Assert.False (result);
+
+        tableView.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void TableView_Command_Accept_FiresCellActivated ()
+    {
+        var dt = new DataTable ();
+        dt.Columns.Add ("Col1");
+        dt.Rows.Add ("Data1");
+
+        TableView tableView = new () { Table = new DataTableSource (dt) };
+        var cellActivatedFired = false;
+
+        tableView.CellActivated += (_, _) => cellActivatedFired = true;
+
+        bool? result = tableView.InvokeCommand (Command.Accept);
+
+        Assert.True (cellActivatedFired);
+        Assert.True (result);
+
+        tableView.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void TableView_Space_TogglesSelection ()
+    {
+        var dt = new DataTable ();
+        dt.Columns.Add ("Col1");
+        dt.Rows.Add ("Data1");
+
+        TableView tableView = new () { Table = new DataTableSource (dt) };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+
+        // Space triggers cell toggle (selection is toggled even though return value is false)
+        // This is because TableView.Activate returns false when no Activating handler sets Handled=true
+        bool? result = tableView.NewKeyDownEvent (Key.Space);
+
+        // Returns false because there's no handler that sets Handled=true
+        Assert.False (result);
+
+        tableView.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
+    // This test verifies current behavior which may change per issue #4473
+    [Fact]
+    public void TableView_Enter_FiresCellActivated ()
+    {
+        var dt = new DataTable ();
+        dt.Columns.Add ("Col1");
+        dt.Rows.Add ("Data1");
+
+        TableView tableView = new () { Table = new DataTableSource (dt) };
+        var cellActivatedFired = false;
+
+        tableView.CellActivated += (_, _) => cellActivatedFired = true;
+
+        // Enter should trigger CellActivated via Accept command
+        bool? result = tableView.NewKeyDownEvent (Key.Enter);
+
+        Assert.True (cellActivatedFired);
+        Assert.True (result);
+
+        tableView.Dispose ();
+    }
+
+    [Fact]
+    public void Test_SumColumnWidth_GraphemeClusters ()
+    {
+        string family = "\U0001F468\u200D\U0001F469\u200D\U0001F466\u200D\U0001F466"; // 👨‍👩‍👦‍👦
+        Assert.Equal (8, family.EnumerateRunes ().Sum (c => c.GetColumns ()));
+        Assert.Equal (2, family.GetColumns ());
+
+        string technologist = "\U0001F469\u200D\U0001F4BB"; // 👩‍💻
+        Assert.Equal (4, technologist.EnumerateRunes ().Sum (c => c.GetColumns ()));
+        Assert.Equal (2, technologist.GetColumns ());
+    }
+
+    [Fact]
+    public void Test_CalculateMaxCellWidth_UsesGraphemeWidth ()
+    {
+        // setup
+        IDriver driver = CreateTestDriver ();
+        string family = "\U0001F468\u200D\U0001F469\u200D\U0001F466\u200D\U0001F466"; // 👨‍👩‍👦‍👦
+
+        var tableView = new TableView { Driver = driver };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.SchemeName = "Runnable";
+        tableView.Viewport = new (0, 0, 25, 5);
+        tableView.Style.ShowHorizontalHeaderUnderline = true;
+        tableView.Style.ShowHorizontalHeaderOverline = false;
+        tableView.Style.AlwaysShowHeaders = true;
+
+        var dt = new DataTable ();
+        dt.Columns.Add ("A");
+        dt.Columns.Add ("B");
+        dt.Rows.Add (family, "ok");
+        tableView.Table = new DataTableSource (dt);
+
+        // execute
+        tableView.Layout ();
+        tableView.SetClipToScreen ();
+        tableView.Draw ();
+
+        // verify
+        string actual = driver.ToString ()!;
+        string [] lines = actual.Replace ("\r\n", "\n").Split ('\n');
+        string headerRow = lines.First (l => l.Contains ('A') && l.Contains ('B'));
+        int separatorIndex = headerRow.IndexOf ('│', 1);
+        int separatorColumn = headerRow [..separatorIndex].GetColumns ();
+
+        Assert.True (
+                     separatorColumn <= 5,
+                     $"Column A should be narrow (grapheme width 2), but separator at column {separatorColumn} suggests over-sized column. Header: '{headerRow}'"
+                    );
     }
 }

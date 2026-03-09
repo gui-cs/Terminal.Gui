@@ -12,22 +12,24 @@ using Terminal.Gui.Views;
 ConfigurationManager.RuntimeConfig = """{ "Theme": "Amber Phosphor" }""";
 ConfigurationManager.Enable (ConfigLocations.All);
 
-IApplication app = Application.Create ();
-
-app.Run<ExampleWindow> ();
-
-// Dispose the app to clean up and enable Console.WriteLine below
+IApplication app = Application.Create ().Init ();
+var userName = app.Run<ExampleWindow> ().GetResult<string> ();
 app.Dispose ();
 
-// To see this output on the screen it must be done after shutdown,
+// To see this output on the screen it must be done after Dispose,
 // which restores the previous screen.
-Console.WriteLine ($@"Username: {ExampleWindow.UserName}");
+if (string.IsNullOrEmpty (userName))
+{
+    Console.WriteLine (@"Login cancelled");
+}
+else
+{
+    Console.WriteLine ($@"Username: {userName}");
+}
 
 // Defines a top-level window with border and title
-public sealed class ExampleWindow : Window
+public sealed class ExampleWindow : Runnable<string?>
 {
-    public static string UserName { get; set; }
-
     public ExampleWindow ()
     {
         Title = $"Example App ({Application.QuitKey} to quit)";
@@ -44,10 +46,7 @@ public sealed class ExampleWindow : Window
             Width = Dim.Fill ()
         };
 
-        var passwordLabel = new Label
-        {
-            Text = "Password:", X = Pos.Left (usernameLabel), Y = Pos.Bottom (usernameLabel) + 1
-        };
+        var passwordLabel = new Label { Text = "Password:", X = Pos.Left (usernameLabel), Y = Pos.Bottom (usernameLabel) + 1 };
 
         var passwordText = new TextField
         {
@@ -75,13 +74,13 @@ public sealed class ExampleWindow : Window
                               {
                                   if (userNameText.Text == "admin" && passwordText.Text == "password")
                                   {
-                                      MessageBox.Query (App, "Logging In", "Login Successful", "Ok");
-                                      UserName = userNameText.Text;
-                                      Application.RequestStop ();
+                                      MessageBox.Query (App!, "Logging In", "Login Successful", "Ok");
+                                      Result = userNameText.Text;
+                                      App!.RequestStop ();
                                   }
                                   else
                                   {
-                                      MessageBox.ErrorQuery (App, "Logging In", "Incorrect username or password", "Ok");
+                                      MessageBox.ErrorQuery ((s as View)?.App!, "Logging In", "Incorrect username or password", "Ok");
                                   }
 
                                   // When Accepting is handled, set e.Handled to true to prevent further processing.

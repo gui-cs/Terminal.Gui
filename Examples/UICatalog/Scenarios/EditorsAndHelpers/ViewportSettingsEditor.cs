@@ -1,4 +1,6 @@
-﻿#nullable enable
+﻿// ReSharper disable MoveLocalFunctionAfterJumpStatement
+
+#nullable enable
 namespace UICatalog.Scenarios;
 
 /// <summary>
@@ -18,104 +20,142 @@ public sealed class ViewportSettingsEditor : EditorBase
     {
         foreach (View subview in SubViews)
         {
-            subview.Enabled = ViewToEdit is not Adornment;
+            subview.Enabled = ViewToEdit is { } and not Adornment;
         }
 
-        if (ViewToEdit is { } and not Adornment)
+        if (ViewToEdit is null or Adornment)
         {
-            //ViewToEdit.VerticalScrollBar.AutoShow = true;
-            //ViewToEdit.HorizontalScrollBar.AutoShow = true;
-
-            _contentSizeWidth!.Value = ViewToEdit.GetContentSize ().Width;
-            _contentSizeHeight!.Value = ViewToEdit.GetContentSize ().Height;
-
-            _cbAllowNegativeX!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeX)
-                                                  ? CheckState.Checked
-                                                  : CheckState.UnChecked;
-
-            _cbAllowNegativeY!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeY)
-                                                  ? CheckState.Checked
-                                                  : CheckState.UnChecked;
-
-            _cbAllowXGreaterThanContentWidth!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowXGreaterThanContentWidth)
-                                                                 ? CheckState.Checked
-                                                                 : CheckState.UnChecked;
-
-            _cbAllowYGreaterThanContentHeight!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowYGreaterThanContentHeight)
-                                                                  ? CheckState.Checked
-                                                                  : CheckState.UnChecked;
-
-            _cbClearContentOnly!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.ClearContentOnly)
-                                                    ? CheckState.Checked
-                                                    : CheckState.UnChecked;
-
-            _cbClipContentOnly!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.ClipContentOnly)
-                                                   ? CheckState.Checked
-                                                   : CheckState.UnChecked;
-
-            _cbTransparent!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)
-                                               ? CheckState.Checked
-                                               : CheckState.UnChecked;
-
-            _cbTransparentMouse!.CheckedState = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse)
-                                                    ? CheckState.Checked
-                                                    : CheckState.UnChecked;
-
-            _cbVerticalScrollBar!.CheckedState = ViewToEdit.VerticalScrollBar.Visible ? CheckState.Checked : CheckState.UnChecked;
-            _cbAutoShowVerticalScrollBar!.CheckedState = ViewToEdit.VerticalScrollBar.AutoShow ? CheckState.Checked : CheckState.UnChecked;
-            _cbHorizontalScrollBar!.CheckedState = ViewToEdit.HorizontalScrollBar.Visible ? CheckState.Checked : CheckState.UnChecked;
-            _cbAutoShowHorizontalScrollBar!.CheckedState = ViewToEdit.HorizontalScrollBar.AutoShow ? CheckState.Checked : CheckState.UnChecked;
+            return;
         }
+
+        _cbAllowNegativeX?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeX) ? CheckState.Checked : CheckState.UnChecked;
+
+        _cbAllowNegativeY?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeY) ? CheckState.Checked : CheckState.UnChecked;
+
+        _cbAllowXGreaterThanContentWidth?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowXGreaterThanContentWidth)
+                                                      ? CheckState.Checked
+                                                      : CheckState.UnChecked;
+
+        _cbAllowYGreaterThanContentHeight?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowYGreaterThanContentHeight)
+                                                       ? CheckState.Checked
+                                                       : CheckState.UnChecked;
+
+        _cbAllowXPlusWidthGreaterThanContentWidth?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowXPlusWidthGreaterThanContentWidth)
+                                                               ? CheckState.Checked
+                                                               : CheckState.UnChecked;
+
+        _cbAllowYPlusHeightGreaterThanContentHeight?.Value =
+            ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowYPlusHeightGreaterThanContentHeight) ? CheckState.Checked : CheckState.UnChecked;
+
+        _cbClearContentOnly?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.ClearContentOnly) ? CheckState.Checked : CheckState.UnChecked;
+
+        _cbClipContentOnly?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.ClipContentOnly) ? CheckState.Checked : CheckState.UnChecked;
+
+        _cbTransparent?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) ? CheckState.Checked : CheckState.UnChecked;
+
+        _cbTransparentMouse?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse) ? CheckState.Checked : CheckState.UnChecked;
+
+        _osVerticalScrollBar?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar)
+                                          ? ScrollBarVisibilityMode.Auto
+                                          : ScrollBarVisibilityMode.None;
+
+        _osHorizontalScrollBar?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar)
+                                            ? ScrollBarVisibilityMode.Auto
+                                            : ScrollBarVisibilityMode.None;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnUpdateLayoutSettings ()
+    {
+        base.OnUpdateLayoutSettings ();
+
+        Enabled = ViewToEdit is not Adornment;
+
+        if (ViewToEdit is null)
+        {
+            return;
+        }
+
+        _viewportEditor?.Value = ViewToEdit?.Viewport;
+        _contentSizeEditor?.Value = ViewToEdit?.GetContentSize ();
     }
 
     private CheckBox? _cbAllowNegativeX;
     private CheckBox? _cbAllowNegativeY;
     private CheckBox? _cbAllowXGreaterThanContentWidth;
     private CheckBox? _cbAllowYGreaterThanContentHeight;
-    private NumericUpDown<int>? _contentSizeWidth;
-    private NumericUpDown<int>? _contentSizeHeight;
+    private CheckBox? _cbAllowXPlusWidthGreaterThanContentWidth;
+    private CheckBox? _cbAllowYPlusHeightGreaterThanContentHeight;
+    private RectangleEditor? _viewportEditor;
+    private TwoIntEditor<Size>? _contentSizeEditor;
     private CheckBox? _cbClearContentOnly;
     private CheckBox? _cbClipContentOnly;
     private CheckBox? _cbTransparent;
     private CheckBox? _cbTransparentMouse;
-    private CheckBox? _cbVerticalScrollBar;
-    private CheckBox? _cbAutoShowVerticalScrollBar;
-    private CheckBox? _cbHorizontalScrollBar;
-    private CheckBox? _cbAutoShowHorizontalScrollBar;
+    private OptionSelector<ScrollBarVisibilityMode>? _osVerticalScrollBar;
+    private OptionSelector<ScrollBarVisibilityMode>? _osHorizontalScrollBar;
 
     private void ViewportSettingsEditor_Initialized (object? s, EventArgs e)
     {
-        _cbAllowNegativeX = new ()
+        Label labelViewport = new () { Title = "Viewport:" };
+
+        _viewportEditor = new RectangleEditor { X = Pos.Right (labelViewport) + 1 };
+        _viewportEditor.ValueChanging += ViewportValueChanging;
+
+        void ViewportValueChanging (object? sender, ValueChangingEventArgs<Rectangle?> vea)
         {
-            Title = "Allow X < 0",
-            CanFocus = true
-        };
+            if (vea.NewValue is null
+                || vea.NewValue.Value.Width < 0
+                || vea.NewValue.Value.Height < 0
+                || vea.NewValue.Value.X < 0
+                || vea.NewValue.Value.Y < 0
+                || ViewToEdit is Adornment)
+            {
+                vea.Handled = true;
+
+                return;
+            }
+
+            ViewToEdit?.Viewport = vea.NewValue.Value;
+        }
+
+        Label labelContentSize = new () { Title = "ContentSize:", X = Pos.Right (_viewportEditor) + 1, Y = Pos.Top (labelViewport) };
+
+        _contentSizeEditor = TwoIntEditor<Size>.ForSize ();
+        _contentSizeEditor.X = Pos.Right (labelContentSize) + 1;
+        _contentSizeEditor.Y = Pos.Top (labelContentSize);
+        _contentSizeEditor.ValueChanging += ContentSizeValueChanging;
+
+        void ContentSizeValueChanging (object? sender, ValueChangingEventArgs<Size?> cea)
+        {
+            if (cea.NewValue is null || cea.NewValue.Value.Width < 0 || cea.NewValue.Value.Height < 0)
+            {
+                cea.Handled = true;
+
+                return;
+            }
+
+            ViewToEdit?.SetContentSize (cea.NewValue.Value);
+        }
+
+        _cbAllowNegativeX = new CheckBox { Y = Pos.Bottom (_contentSizeEditor), Title = "Allow X < 0", CanFocus = true };
 
         Add (_cbAllowNegativeX);
 
-        _cbAllowNegativeY = new ()
-        {
-            Title = "Allow Y < 0",
-            CanFocus = true
-        };
+        _cbAllowNegativeY = new CheckBox { X = Pos.Right (_cbAllowNegativeX) + 1, Y = Pos.Top (_cbAllowNegativeX), Title = "Allow Y < 0", CanFocus = true };
 
         Add (_cbAllowNegativeY);
 
-        _cbAllowXGreaterThanContentWidth = new ()
-        {
-            Title = "Allow X > Content Width",
-            Y = Pos.Bottom (_cbAllowNegativeX),
-            CanFocus = true
-        };
+        _cbAllowXGreaterThanContentWidth = new CheckBox { Title = "Allow X > Content Width", Y = Pos.Bottom (_cbAllowNegativeY), CanFocus = true };
 
-        _cbAllowNegativeX.CheckedStateChanging += AllowNegativeXToggle;
-        _cbAllowXGreaterThanContentWidth.CheckedStateChanging += AllowXGreaterThanContentWidthToggle;
+        _cbAllowNegativeX.ValueChanging += AllowNegativeXToggle;
+        _cbAllowXGreaterThanContentWidth.ValueChanging += AllowXGreaterThanContentWidthToggle;
 
         Add (_cbAllowXGreaterThanContentWidth);
 
-        void AllowNegativeXToggle (object? sender, ResultEventArgs<CheckState> rea)
+        void AllowNegativeXToggle (object? sender, ValueChangingEventArgs<CheckState> rea)
         {
-            if (rea.Result == CheckState.Checked)
+            if (rea.NewValue == CheckState.Checked)
             {
                 ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.AllowNegativeX;
             }
@@ -125,9 +165,9 @@ public sealed class ViewportSettingsEditor : EditorBase
             }
         }
 
-        void AllowXGreaterThanContentWidthToggle (object? sender, ResultEventArgs<CheckState> rea)
+        void AllowXGreaterThanContentWidthToggle (object? sender, ValueChangingEventArgs<CheckState> rea)
         {
-            if (rea.Result == CheckState.Checked)
+            if (rea.NewValue == CheckState.Checked)
             {
                 ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.AllowXGreaterThanContentWidth;
             }
@@ -137,23 +177,23 @@ public sealed class ViewportSettingsEditor : EditorBase
             }
         }
 
-        _cbAllowYGreaterThanContentHeight = new ()
+        _cbAllowYGreaterThanContentHeight = new CheckBox
         {
             Title = "Allow Y > Content Height",
             X = Pos.Right (_cbAllowXGreaterThanContentWidth) + 1,
-            Y = Pos.Bottom (_cbAllowNegativeX),
+            Y = Pos.Top (_cbAllowXGreaterThanContentWidth),
             CanFocus = true
         };
 
-        _cbAllowNegativeY.CheckedStateChanging += AllowNegativeYToggle;
+        _cbAllowNegativeY.ValueChanging += AllowNegativeYToggle;
 
-        _cbAllowYGreaterThanContentHeight.CheckedStateChanging += AllowYGreaterThanContentHeightToggle;
+        _cbAllowYGreaterThanContentHeight.ValueChanging += AllowYGreaterThanContentHeightToggle;
 
         Add (_cbAllowYGreaterThanContentHeight);
 
-        void AllowNegativeYToggle (object? sender, ResultEventArgs<CheckState> rea)
+        void AllowNegativeYToggle (object? sender, ValueChangingEventArgs<CheckState> rea)
         {
-            if (rea.Result == CheckState.Checked)
+            if (rea.NewValue == CheckState.Checked)
             {
                 ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.AllowNegativeY;
             }
@@ -163,9 +203,9 @@ public sealed class ViewportSettingsEditor : EditorBase
             }
         }
 
-        void AllowYGreaterThanContentHeightToggle (object? sender, ResultEventArgs<CheckState> rea)
+        void AllowYGreaterThanContentHeightToggle (object? sender, ValueChangingEventArgs<CheckState> rea)
         {
-            if (rea.Result == CheckState.Checked)
+            if (rea.NewValue == CheckState.Checked)
             {
                 ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.AllowYGreaterThanContentHeight;
             }
@@ -175,73 +215,55 @@ public sealed class ViewportSettingsEditor : EditorBase
             }
         }
 
-        _cbAllowNegativeY.X = Pos.Left (_cbAllowYGreaterThanContentHeight);
-
-        var labelContentSize = new Label
+        _cbAllowXPlusWidthGreaterThanContentWidth = new CheckBox
         {
-            Title = "ContentSize:",
-            Y = Pos.Bottom (_cbAllowYGreaterThanContentHeight)
+            Title = "Allow X+Width > Content Width", Y = Pos.Bottom (_cbAllowXGreaterThanContentWidth), CanFocus = true
         };
+        _cbAllowXPlusWidthGreaterThanContentWidth.ValueChanging += AllowXPlusWidthGreaterThanContentWidthToggle;
 
-        _contentSizeWidth = new ()
-        {
-            X = Pos.Right (labelContentSize) + 1,
-            Y = Pos.Top (labelContentSize),
-            CanFocus = true
-        };
-        _contentSizeWidth.ValueChanging += ContentSizeWidthValueChanged;
+        Add (_cbAllowXPlusWidthGreaterThanContentWidth);
 
-        void ContentSizeWidthValueChanged (object? sender, CancelEventArgs<int> cea)
+        void AllowXPlusWidthGreaterThanContentWidthToggle (object? sender, ValueChangingEventArgs<CheckState> rea)
         {
-            if (cea.NewValue < 0)
+            if (rea.NewValue == CheckState.Checked)
             {
-                cea.Cancel = true;
-
-                return;
+                ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.AllowXPlusWidthGreaterThanContentWidth;
             }
-
-            ViewToEdit!.SetContentSize (ViewToEdit.GetContentSize () with { Width = cea.NewValue });
+            else
+            {
+                ViewToEdit!.ViewportSettings &= ~ViewportSettingsFlags.AllowXPlusWidthGreaterThanContentWidth;
+            }
         }
 
-        var labelComma = new Label
+        _cbAllowYPlusHeightGreaterThanContentHeight = new CheckBox
         {
-            Title = ",",
-            X = Pos.Right (_contentSizeWidth),
-            Y = Pos.Top (labelContentSize)
-        };
-
-        _contentSizeHeight = new ()
-        {
-            X = Pos.Right (labelComma) + 1,
-            Y = Pos.Top (labelContentSize),
+            Title = "Allow Y+Height > Content Height",
+            X = Pos.Left (_cbAllowYGreaterThanContentHeight),
+            Y = Pos.Bottom (_cbAllowYGreaterThanContentHeight),
             CanFocus = true
         };
-        _contentSizeHeight.ValueChanging += ContentSizeHeightValueChanged;
+        _cbAllowYPlusHeightGreaterThanContentHeight.ValueChanging += AllowYPlusHeightGreaterThanContentHeightToggle;
 
-        void ContentSizeHeightValueChanged (object? sender, CancelEventArgs<int> cea)
+        Add (_cbAllowYPlusHeightGreaterThanContentHeight);
+
+        void AllowYPlusHeightGreaterThanContentHeightToggle (object? sender, ValueChangingEventArgs<CheckState> rea)
         {
-            if (cea.NewValue < 0)
+            if (rea.NewValue == CheckState.Checked)
             {
-                cea.Cancel = true;
-
-                return;
+                ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.AllowYPlusHeightGreaterThanContentHeight;
             }
-
-            ViewToEdit?.SetContentSize (ViewToEdit.GetContentSize () with { Height = cea.NewValue });
+            else
+            {
+                ViewToEdit!.ViewportSettings &= ~ViewportSettingsFlags.AllowYPlusHeightGreaterThanContentHeight;
+            }
         }
 
-        _cbClearContentOnly = new ()
-        {
-            Title = "ClearContentOnly",
-            X = 0,
-            Y = Pos.Bottom (labelContentSize),
-            CanFocus = true
-        };
-        _cbClearContentOnly.CheckedStateChanging += ClearContentOnlyToggle;
+        _cbClearContentOnly = new CheckBox { Title = "ClearContentOnly", Y = Pos.Bottom (_cbAllowYPlusHeightGreaterThanContentHeight), CanFocus = true };
+        _cbClearContentOnly.ValueChanging += ClearContentOnlyToggle;
 
-        void ClearContentOnlyToggle (object? sender, ResultEventArgs<CheckState> rea)
+        void ClearContentOnlyToggle (object? sender, ValueChangingEventArgs<CheckState> rea)
         {
-            if (rea.Result == CheckState.Checked)
+            if (rea.NewValue == CheckState.Checked)
             {
                 ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.ClearContentOnly;
             }
@@ -251,18 +273,15 @@ public sealed class ViewportSettingsEditor : EditorBase
             }
         }
 
-        _cbClipContentOnly = new ()
+        _cbClipContentOnly = new CheckBox
         {
-            Title = "ClipContentOnly",
-            X = Pos.Right (_cbClearContentOnly) + 1,
-            Y = Pos.Bottom (labelContentSize),
-            CanFocus = true
+            Title = "ClipContentOnly", X = Pos.Right (_cbClearContentOnly) + 1, Y = Pos.Top (_cbClearContentOnly), CanFocus = true
         };
-        _cbClipContentOnly.CheckedStateChanging += ClipContentOnlyToggle;
+        _cbClipContentOnly.ValueChanging += ClipContentOnlyToggle;
 
-        void ClipContentOnlyToggle (object? sender, ResultEventArgs<CheckState> rea)
+        void ClipContentOnlyToggle (object? sender, ValueChangingEventArgs<CheckState> rea)
         {
-            if (rea.Result == CheckState.Checked)
+            if (rea.NewValue == CheckState.Checked)
             {
                 ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.ClipContentOnly;
             }
@@ -272,18 +291,12 @@ public sealed class ViewportSettingsEditor : EditorBase
             }
         }
 
-        _cbTransparent = new ()
-        {
-            Title = "Transparent",
-            X = Pos.Right (_cbClipContentOnly) + 1,
-            Y = Pos.Bottom (labelContentSize),
-            CanFocus = true
-        };
-        _cbTransparent.CheckedStateChanging += TransparentToggle;
+        _cbTransparent = new CheckBox { Title = "Transparent", X = Pos.Right (_cbClipContentOnly) + 1, Y = Pos.Top (_cbClipContentOnly), CanFocus = true };
+        _cbTransparent.ValueChanging += TransparentToggle;
 
-        void TransparentToggle (object? sender, ResultEventArgs<CheckState> rea)
+        void TransparentToggle (object? sender, ValueChangingEventArgs<CheckState> rea)
         {
-            if (rea.Result == CheckState.Checked)
+            if (rea.NewValue == CheckState.Checked)
             {
                 ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.Transparent;
             }
@@ -293,18 +306,12 @@ public sealed class ViewportSettingsEditor : EditorBase
             }
         }
 
-        _cbTransparentMouse = new ()
-        {
-            Title = "TransparentMouse",
-            X = Pos.Right (_cbTransparent) + 1,
-            Y = Pos.Bottom (labelContentSize),
-            CanFocus = true
-        };
-        _cbTransparentMouse.CheckedStateChanging += TransparentMouseToggle;
+        _cbTransparentMouse = new CheckBox { Title = "TransparentMouse", X = Pos.Right (_cbTransparent) + 1, Y = Pos.Top (_cbTransparent), CanFocus = true };
+        _cbTransparentMouse.ValueChanging += TransparentMouseToggle;
 
-        void TransparentMouseToggle (object? sender, ResultEventArgs<CheckState> rea)
+        void TransparentMouseToggle (object? sender, ValueChangingEventArgs<CheckState> rea)
         {
-            if (rea.Result == CheckState.Checked)
+            if (rea.NewValue == CheckState.Checked)
             {
                 ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
             }
@@ -314,74 +321,67 @@ public sealed class ViewportSettingsEditor : EditorBase
             }
         }
 
-        _cbVerticalScrollBar = new ()
-        {
-            Title = "VerticalScrollBar",
-            X = 0,
-            Y = Pos.Bottom (_cbClearContentOnly),
-            CanFocus = false
-        };
-        _cbVerticalScrollBar.CheckedStateChanging += VerticalScrollBarToggle;
+        Label lblVerticalScrollBar = new () { Title = "V ScrollBar:", Y = Pos.Bottom (_cbClearContentOnly) };
 
-        void VerticalScrollBarToggle (object? sender, ResultEventArgs<CheckState> rea)
+        _osVerticalScrollBar = new OptionSelector<ScrollBarVisibilityMode>
         {
-            ViewToEdit!.VerticalScrollBar.Visible = rea.Result == CheckState.Checked;
+            X = Pos.Right (lblVerticalScrollBar) + 1,
+            Y = Pos.Top (lblVerticalScrollBar),
+            Value = ScrollBarVisibilityMode.None,
+            Orientation = Orientation.Horizontal,
+            AssignHotKeys = true
+        };
+        _osVerticalScrollBar.ValueChanged += VerticalScrollBarChanged;
+
+        void VerticalScrollBarChanged (object? sender, EventArgs<ScrollBarVisibilityMode?> rea)
+        {
+            if (rea.Value == ScrollBarVisibilityMode.Auto)
+            {
+                ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+            }
+            else
+            {
+                ViewToEdit!.ViewportSettings &= ~ViewportSettingsFlags.HasVerticalScrollBar;
+                ViewToEdit!.VerticalScrollBar.VisibilityMode = rea.Value!.Value;
+            }
         }
 
-        _cbAutoShowVerticalScrollBar = new ()
-        {
-            Title = "AutoShow",
-            X = Pos.Right (_cbVerticalScrollBar) + 1,
-            Y = Pos.Top (_cbVerticalScrollBar),
-            CanFocus = false
-        };
-        _cbAutoShowVerticalScrollBar.CheckedStateChanging += AutoShowVerticalScrollBarToggle;
+        Label lblHorizontalScrollBar = new () { Title = "H ScrollBar:", Y = Pos.Bottom (lblVerticalScrollBar) };
 
-        void AutoShowVerticalScrollBarToggle (object? sender, ResultEventArgs<CheckState> rea)
+        _osHorizontalScrollBar = new OptionSelector<ScrollBarVisibilityMode>
         {
-            ViewToEdit!.VerticalScrollBar.AutoShow = rea.Result == CheckState.Checked;
+            X = Pos.Right (lblHorizontalScrollBar) + 1,
+            Y = Pos.Top (lblHorizontalScrollBar),
+            Value = ScrollBarVisibilityMode.None,
+            Orientation = Orientation.Horizontal,
+            AssignHotKeys = true
+        };
+        _osHorizontalScrollBar.ValueChanged += HorizontalScrollBarChanged;
+
+        void HorizontalScrollBarChanged (object? sender, EventArgs<ScrollBarVisibilityMode?> rea)
+        {
+            if (rea.Value == ScrollBarVisibilityMode.Auto)
+            {
+                ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
+            }
+            else
+            {
+                ViewToEdit!.ViewportSettings &= ~ViewportSettingsFlags.HasHorizontalScrollBar;
+                ViewToEdit!.HorizontalScrollBar.VisibilityMode = rea.Value!.Value;
+            }
         }
 
-        _cbHorizontalScrollBar = new ()
-        {
-            Title = "HorizontalScrollBar",
-            X = 0,
-            Y = Pos.Bottom (_cbVerticalScrollBar),
-            CanFocus = false
-        };
-        _cbHorizontalScrollBar.CheckedStateChanging += HorizontalScrollBarToggle;
-
-        void HorizontalScrollBarToggle (object? sender, ResultEventArgs<CheckState> rea)
-        {
-            ViewToEdit!.HorizontalScrollBar.Visible = rea.Result == CheckState.Checked;
-        }
-
-        _cbAutoShowHorizontalScrollBar = new ()
-        {
-            Title = "AutoShow ",
-            X = Pos.Right (_cbHorizontalScrollBar) + 1,
-            Y = Pos.Top (_cbHorizontalScrollBar),
-            CanFocus = false
-        };
-        _cbAutoShowHorizontalScrollBar.CheckedStateChanging += AutoShowHorizontalScrollBarToggle;
-
-        void AutoShowHorizontalScrollBarToggle (object? sender, ResultEventArgs<CheckState> rea)
-        {
-            ViewToEdit!.HorizontalScrollBar.AutoShow = rea.Result == CheckState.Checked;
-        }
-
-        Add (
+        Add (labelViewport,
+             _viewportEditor,
              labelContentSize,
-             _contentSizeWidth,
-             labelComma,
-             _contentSizeHeight,
+             _contentSizeEditor,
              _cbClearContentOnly,
              _cbClipContentOnly,
              _cbTransparent,
              _cbTransparentMouse,
-             _cbVerticalScrollBar,
-             _cbHorizontalScrollBar,
-             _cbAutoShowVerticalScrollBar,
-             _cbAutoShowHorizontalScrollBar);
+             lblVerticalScrollBar,
+             _osVerticalScrollBar,
+             lblHorizontalScrollBar,
+             _osHorizontalScrollBar);
     }
 }

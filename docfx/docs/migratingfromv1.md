@@ -19,6 +19,7 @@ For detailed breaking change documentation, check out this Discussion: https://g
 - [Scrolling Changes](#scrolling-changes)
 - [Adornments](#adornments)
 - [Event Pattern Changes](#event-pattern-changes)
+- [Cursor Management](#cursor-management)
 - [View-Specific Changes](#view-specific-changes)
 - [Disposal and Resource Management](#disposal-and-resource-management)
 - [API Terminology Changes](#api-terminology-changes)
@@ -29,7 +30,7 @@ For detailed breaking change documentation, check out this Discussion: https://g
 
 Terminal.Gui v2 represents a major architectural evolution with these key improvements:
 
-1. **Instance-Based Application Model** - Move from static `Application` to `IApplication` instances
+1. **Instance-Based Application Model** - Move from static <xref:Terminal.Gui.App.Application> to <xref:Terminal.Gui.App.IApplication> instances
 2. **IRunnable Architecture** - Interface-based runnable pattern with type-safe results
 3. **Simplified Layout** - Removed Absolute/Computed distinction, improved adornments
 4. **24-bit TrueColor** - Full color support by default
@@ -79,39 +80,16 @@ Application.Shutdown(); // Obsolete - use Dispose() instead
 
 ### IRunnable Architecture
 
-v2 introduces `IRunnable<TResult>` for type-safe, runnable views:
+v2 introduces <xref:Terminal.Gui.App.IRunnable> for type-safe, runnable views:
 
 ```csharp
 // Create a dialog that returns a typed result
-public class FileDialog : Runnable<string?>
+public class FileDialog : Runnable<string>
 {
-    private TextField _pathField;
-    
-    public FileDialog()
-    {
-        Title = "Select File";
-        _pathField = new TextField { Width = Dim.Fill() };
-        Add(_pathField);
-        
-        var okButton = new Button { Text = "OK", IsDefault = true };
-        okButton.Accepting += (s, e) => {
-            Result = _pathField.Text;
-            Application.RequestStop();
-        };
-        AddButton(okButton);
-    }
-    
-    protected override bool OnIsRunningChanging(bool oldValue, bool newValue)
-    {
-        if (!newValue)  // Stopping - extract result before disposal
-        {
-            Result = _pathField?.Text;
-        }
-        return base.OnIsRunningChanging(oldValue, newValue);
-    }
+    // Implementation
 }
 
-// Use with fluent API
+// Use it
 using (var app = Application.Create().Init())
 {
     app.Run<FileDialog>();
@@ -152,8 +130,8 @@ using (var app = Application.Create().Init())
 // ✅ v2 - Framework-created runnables disposed automatically
 using (var app = Application.Create().Init())
 {
-    app.Run<MyDialog>(); // Dialog disposed automatically
-    var result = app.GetResult<MyResult>();
+    app.Run<ColorPickerDialog>();
+    var result = app.GetResult<Color>();
 }
 ```
 
@@ -161,7 +139,7 @@ using (var app = Application.Create().Init())
 - "Whoever creates it, owns it"
 - `Run<TRunnable>()`: Framework creates → Framework disposes
 - `Run(IRunnable)`: Caller creates → Caller disposes
-- Always dispose `IApplication` (use `using` statement)
+- Always dispose <xref:Terminal.Gui.App.IApplication> (use `using` statement)
 
 ### View.App Property
 
@@ -598,9 +576,9 @@ view.MouseEvent += (s, e) =>
 
 **Key Changes:**
 - `View.MouseClick` event has been **removed**
-- Use `MouseBindings` to map mouse events to `Command`s
-- Default mouse bindings invoke `Command.Activate` which raises the `Activating` event
-- For custom behavior, override `OnActivating` or subscribe to the `Activating` event
+- Use `MouseBindings` to map mouse events to <xref:Terminal.Gui.Input.Command>s
+- Default mouse bindings invoke <xref:Terminal.Gui.Input.Command.Activate> which raises the <xref:Terminal.Gui.ViewBase.View.Activating> event
+- For custom behavior, override `OnActivating` or subscribe to the <xref:Terminal.Gui.ViewBase.View.Activating> event
 - For low-level mouse handling, use `MouseEvent` directly
 
 **Migration Pattern:**
@@ -619,7 +597,7 @@ protected override bool OnMouseClick(MouseEventArgs mouseEvent)
 // ✅ v2 - OnActivating override
 protected override bool OnActivating(CommandEventArgs args)
 {
-    if (args.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+    if (args.Context is CommandContext { Binding.MouseEventArgs: { } mouseArgs })
     {
         // Access mouse position and flags via context
         if (mouseArgs.Flags.HasFlag(MouseFlags.Button1Clicked))
@@ -644,7 +622,7 @@ view.Activating += (s, e) =>
 view.Activating += (s, e) =>
 {
     // Extract mouse event args from command context
-    if (e.Context is CommandContext<MouseBinding> { Binding.MouseEventArgs: { } mouseArgs })
+    if (e.Context is CommandContext { Binding.MouseEventArgs: { } mouseArgs })
     {
         Point position = mouseArgs.Position;
         MouseFlags flags = mouseArgs.Flags;
@@ -697,7 +675,7 @@ view.CanFocus = true; // Default was true
 view.CanFocus = true; // Default is FALSE - must opt-in
 ```
 
-**Important:** In v2, `CanFocus` defaults to `false`. Views that want focus must explicitly set it.
+**Important:** In v2, <xref:Terminal.Gui.ViewBase.View.CanFocus> defaults to `false`. Views that want focus must explicitly set it.
 
 ### Focus Changes
 
@@ -782,10 +760,9 @@ var scrollView = new ScrollView
 var view = new View();
 view.SetContentSize(new Size(100, 100));
 
-// Built-in scrollbars
-view.VerticalScrollBar.Visible = true;
-view.HorizontalScrollBar.Visible = true;
-view.VerticalScrollBar.AutoShow = true;
+// Built-in scrollbars with automatic visibility
+view.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+view.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 ```
 
 ### Scrolling API
@@ -829,390 +806,295 @@ button.Accepting += (s, e) => { /* do something */ };
 ```csharp
 // Various patterns
 event Action SomeEvent;
-event Action<string> OtherEvent;
-event Action<EventArgs> ThirdEvent;
+event Action<T> OtherEvent;
+event Action<T1, T2> ThirdEvent;
 ```
 
 **v2:**
 ```csharp
 // Consistent pattern
 event EventHandler<EventArgs>? SomeEvent;
-event EventHandler<EventArgs<string>>? OtherEvent;
-event EventHandler<CancelEventArgs<bool>>? ThirdEvent;
+event EventHandler<T>? OtherEvent;
 ```
 
-**Benefits:**
-- Named parameters
-- Cancellable events via `CancelEventArgs`
-- Future-proof (new properties can be added)
+---
+
+## Cursor Management
+
+Terminal.Gui v2 introduces a completely redesigned cursor system that separates the **Terminal Cursor** (visible indicator) from the **Draw Cursor** (internal rendering position).
+
+### Key Changes
+
+**v1 Pattern (PositionCursor Override):**
+```csharp
+// v1 - Override PositionCursor method
+public override void PositionCursor ()
+{
+    if (!HasFocus) return;
+    
+    var col = _cursorPosition - _scrollOffset;
+    if (col < 0 || col >= Frame.Width) return;
+    
+    Move (col, 0);  // This was confusing - affected both cursors
+}
+```
+
+**v2 Pattern (Cursor Property):**
+```csharp
+// v2 - Set Cursor property in OnDrawContent
+protected override void OnDrawContent (Rectangle viewport)
+{
+    // ... drawing code ...
+    
+    if (HasFocus)
+    {
+        int col = _cursorPosition - _scrollOffset;
+        
+        if (col >= 0 && col < viewport.Width)
+        {
+            // Convert to screen coordinates and set cursor
+            Point screenPos = ViewportToScreen (new Point (col, 0));
+            Cursor = new Cursor 
+            { 
+                Position = screenPos,
+                Style = CursorStyle.BlinkingBar 
+            };
+        }
+        else
+        {
+            // Hide cursor when outside viewport
+            Cursor = new Cursor { Position = null };
+        }
+    }
+}
+```
+
+### Cursor Class
+
+v2 uses an immutable `Cursor` record class:
+
+```csharp
+// Immutable cursor with screen coordinates
+Cursor = new Cursor
+{
+    Position = screenPos,        // Point? - null = hidden
+    Style = CursorStyle.BlinkingBar  // ANSI-based styles
+};
+
+// Update position keeping same style
+Cursor = Cursor with { Position = newScreenPos };
+
+// Hide cursor
+Cursor = new Cursor { Position = null };
+```
+
+### CursorStyle Enum
+
+v2 uses ANSI/VT terminal standards instead of Windows-based styles:
+
+```csharp
+// v2 - ANSI DECSCUSR-based styles
+public enum CursorStyle
+{
+    Default = 0,           // Usually BlinkingBlock
+    BlinkingBlock = 1,     // █ (blinking)
+    SteadyBlock = 2,       // █ (steady)
+    BlinkingUnderline = 3, // _ (blinking)
+    SteadyUnderline = 4,   // _ (steady)
+    BlinkingBar = 5,       // | (blinking) - common for text editors
+    SteadyBar = 6,         // | (steady)
+    Hidden = -1            // No visible cursor
+}
+```
+
+### Coordinate Systems
+
+**CRITICAL**: `Cursor.Position` must ALWAYS be in screen-absolute coordinates.
+
+```csharp
+// v2 - Always convert to screen coordinates
+Point contentPos = new Point (col, row);        // Your internal coordinates
+Point screenPos = ContentToScreen (contentPos); // Convert to screen
+Cursor = new Cursor { Position = screenPos, Style = CursorStyle.BlinkingBar };
+
+// Or from viewport coordinates
+Point viewportPos = new Point (col, row);
+Point screenPos = ViewportToScreen (viewportPos);
+Cursor = new Cursor { Position = screenPos, Style = CursorStyle.BlinkingBar };
+```
+
+### Efficient Cursor Updates
+
+When cursor moves without content changes, use `SetCursorNeedsUpdate()`:
+
+```csharp
+// v2 - Signal cursor update without full redraw
+private void MoveCursorRight ()
+{
+    _cursorPosition++;
+    
+    int viewportCol = _cursorPosition - _scrollOffset;
+    if (viewportCol >= 0 && viewportCol < Viewport.Width)
+    {
+        Point screenPos = ViewportToScreen (new Point (viewportCol, 0));
+        Cursor = Cursor with { Position = screenPos };
+        SetCursorNeedsUpdate (); // Efficient - no redraw
+    }
+}
+```
+
+### Critical: Move() vs Cursor
+
+**v1 Confusion:**
+- `Move()` affected both Draw Cursor and positioning for Terminal Cursor
+
+**v2 Clarity:**
+- `Move()` ONLY affects **Draw Cursor** (where next character renders)
+- `Cursor` property ONLY affects **Terminal Cursor** (visible indicator)
+
+```csharp
+// ❌ WRONG in v2 - Don't use Move() for cursor positioning
+Move (cursorCol, cursorRow);  // This is for drawing, not Terminal Cursor
+
+// ✅ CORRECT in v2 - Use Cursor property
+Point screenPos = ViewportToScreen (new Point (cursorCol, cursorRow));
+Cursor = new Cursor { Position = screenPos, Style = CursorStyle.BlinkingBar };
+```
+
+### Migration Checklist
+
+When migrating cursor code from v1 to v2:
+
+1. ✅ Remove `PositionCursor()` override
+2. ✅ Move cursor logic to `OnDrawContent()` or event handlers
+3. ✅ Convert coordinates to screen space using `ViewportToScreen()` or `ContentToScreen()`
+4. ✅ Set `Cursor` property instead of calling `Move()`
+5. ✅ Use `CursorStyle` enum for cursor appearance
+6. ✅ Use `SetCursorNeedsUpdate()` for position-only changes
+7. ✅ Set `Cursor.Position = null` to hide cursor
+
+See [Cursor Management](cursor.md) for comprehensive documentation and examples.
 
 ---
 
 ## View-Specific Changes
 
-### CheckBox
+### ListView
 
 **v1:**
 ```csharp
-var cb = new CheckBox("_Checkbox", true);
-cb.Toggled += (e) => { };
-cb.Toggle();
+var listView = new ListView(items);
+listView.SelectedChanged += () => { };
 ```
 
 **v2:**
 ```csharp
-var cb = new CheckBox 
-{ 
-    Title = "_Checkbox",
-    CheckState = CheckState.Checked
-};
-cb.CheckStateChanging += (s, e) => 
+var listView = new ListView();
+listView.SetSource(items);
+listView.SelectedItemChanged += (s, e) => { };
+```
+
+### TextView
+
+**v1:**
+```csharp
+var textView = new TextView
 {
-    e.Cancel = preventChange;
+    Text = "Initial text"
 };
-cb.AdvanceCheckState();
-```
-
-### StatusBar
-
-**v1:**
-```csharp
-var statusBar = new StatusBar(
-    new StatusItem[]
-    {
-        new StatusItem(Application.QuitKey, "Quit", () => Quit())
-    }
-);
 ```
 
 **v2:**
 ```csharp
-var statusBar = new StatusBar(
-    new Shortcut[] 
-    { 
-        new Shortcut(Application.QuitKey, "Quit", Quit) 
-    }
-);
+var textView = new TextView
+{
+    Text = "Initial text"
+};
+// Same API, but better performance
 ```
 
-### PopoverMenu
-
-v2 replaces `ContextMenu` with `PopoverMenu`:
+### Button
 
 **v1:**
 ```csharp
-var contextMenu = new ContextMenu();
+var button = new Button("Click Me");
+button.Clicked += () => { };
 ```
 
 **v2:**
 ```csharp
-var popoverMenu = new PopoverMenu();
-```
-
-### MenuItem
-
-**v1:**
-```csharp
-new MenuItem(
-    "Copy",
-    "",
-    CopyGlyph,
-    null,
-    null,
-    (KeyCode)Key.G.WithCtrl
-)
-```
-
-**v2:**
-```csharp
-new MenuItem(
-    "Copy",
-    "",
-    CopyGlyph,
-    Key.G.WithCtrl
-)
+var button = new Button { Text = "Click Me" };
+button.Accepting += (s, e) => { };
 ```
 
 ---
 
 ## Disposal and Resource Management
 
-v2 implements proper `IDisposable` throughout.
+v2 implements `IDisposable` throughout the API.
 
-### View Disposal
+### Disposal Rules
 
-```csharp
-// v1 - No explicit disposal needed
-var view = new View();
-Application.Run(view);
-Application.Shutdown();
-
-// v2 - Explicit disposal required
-var view = new View();
-app.Run(view);
-view.Dispose();
-app.Dispose();
-```
-
-### Disposal Patterns
+1. **Whoever creates it, owns it** - If you create a View, you must dispose it
+2. **Framework-created instances** - The framework disposes what it creates
+3. **Always use `using` statements** - For <xref:Terminal.Gui.App.IApplication> instances
 
 ```csharp
-// ✅ Best practice - using statement
+// ✅ Correct disposal pattern
 using (var app = Application.Create().Init())
 {
-    using (var view = new View())
-    {
-        app.Run(view);
-    }
-}
-
-// ✅ Alternative - explicit try/finally
-var app = Application.Create();
-try
-{
-    app.Init();
-    var view = new View();
+    var window = new Window();
     try
     {
-        app.Run(view);
+        app.Run(window);
     }
     finally
     {
-        view.Dispose();
+        window.Dispose();
     }
 }
-finally
+
+// ✅ Framework disposes what it creates
+using (var app = Application.Create().Init())
 {
-    app.Dispose();
+    app.Run<MyDialog>(); // Framework creates and disposes MyDialog
 }
 ```
-
-### SubView Disposal
-
-When a View is disposed, it automatically disposes all SubViews:
-
-```csharp
-var container = new View();
-var child1 = new View();
-var child2 = new View();
-
-container.Add(child1, child2);
-
-// Disposes container, child1, and child2
-container.Dispose();
-```
-
-See [Resource Management](#disposal-and-resource-management) for complete details.
 
 ---
 
 ## API Terminology Changes
 
-v2 modernizes terminology for clarity:
-
-### Application.Top → Application.TopRunnable
-
-**v1:**
-```csharp
-Application.Top.SetNeedsDraw();
-```
-
-**v2:**
-```csharp
-// Use TopRunnable (or TopRunnableView for View reference)
-app.TopRunnable?.SetNeedsDraw();
-app.TopRunnableView?.SetNeedsDraw();
-
-// From within a view
-App?.TopRunnableView?.SetNeedsDraw();
-```
-
-**Why "TopRunnable"?**
-- Clearly indicates it's the top of the runnable session stack
-- Aligns with `IRunnable` architecture
-- Works with any `IRunnable`, not just `Toplevel`
-
-### Application.TopLevels → Application.SessionStack
-
-**v1:**
-```csharp
-foreach (var tl in Application.TopLevels)
-{
-    // Process
-}
-```
-
-**v2:**
-```csharp
-foreach (var token in app.SessionStack)
-{
-    var runnable = token.Runnable;
-    // Process
-}
-
-// Count of sessions
-int sessionCount = app.SessionStack.Count;
-```
-
-**Why "SessionStack"?**
-- Describes both content (sessions) and structure (stack)
-- Aligns with `SessionToken` terminology
-- Follows .NET naming patterns
-
-### View Arrangement
-
-**v1:**
-```csharp
-view.SendSubViewToBack();
-view.SendSubViewBackward();
-view.SendSubViewToFront();
-view.SendSubViewForward();
-```
-
-**v2:**
-```csharp
-// Fixed naming (methods worked opposite to their names in v1)
-view.MoveSubViewToStart();
-view.MoveSubViewTowardsStart();
-view.MoveSubViewToEnd();
-view.MoveSubViewTowardsEnd();
-```
-
-### Mdi → ViewArrangement.Overlapped
-
-**v1:**
-```csharp
-Application.MdiTop = true;
-toplevel.IsMdiContainer = true;
-```
-
-**v2:**
-```csharp
-view.Arrangement = ViewArrangement.Overlapped;
-
-// Additional flags
-view.Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable;
-```
-
-See [Arrangement Deep Dive](arrangement.md) for complete details.
+| v1 | v2 | Notes |
+|----|-----|-------|
+| `Application.Top` | `app.TopRunnable` | Property on IApplication instance |
+| `Application.MainLoop` | `app.MainLoop` | Property on IApplication instance |
+| `Application.Driver` | `app.Driver` | Property on IApplication instance |
+| `Bounds` | `Viewport` | Viewport can have non-zero location for scrolling |
+| `Rect` | `Rectangle` | Standard .NET type |
+| `MouseClick` event | <xref:Terminal.Gui.ViewBase.View.Activating> event | Via Command.Activate |
+| `Enter`/`Leave` events | `HasFocusChanged` event | Unified focus event |
+| `Button.Clicked` | `Button.Accepting` | Consistent with Command pattern |
+| `AutoSize` | `Dim.Auto()` | Part of layout system |
+| `LayoutStyle` | Removed | All layout is now declarative |
 
 ---
 
-## Complete Migration Example
+## Summary
 
-Here's a complete v1 to v2 migration:
+v2 represents a significant evolution of Terminal.Gui with:
 
-**v1:**
-```csharp
-using NStack;
-using Terminal.Gui;
+- **Better Architecture** - Instance-based, testable, maintainable
+- **Modern APIs** - Standard .NET patterns throughout
+- **Enhanced Capabilities** - TrueColor, built-in scrolling, better input
+- **Improved Developer Experience** - Fluent API, better documentation
 
-Application.Init();
+While migration requires some effort, the result is a more robust, performant, and maintainable codebase. Start by updating your application lifecycle to use `Application.Create()`, then address layout and input changes incrementally.
 
-var win = new Window(new Rect(0, 0, 50, 20), "Hello");
-
-var label = new Label(1, 1, "Name:");
-
-var textField = new TextField(10, 1, 30, "");
-
-var button = new Button(10, 3, "OK");
-button.Clicked += () =>
-{
-    MessageBox.Query(50, 7, "Info", $"Hello, {textField.Text}", "Ok");
-};
-
-win.Add(label, textField, button);
-
-Application.Top.Add(win);
-Application.Run();
-Application.Shutdown();
-```
-
-**v2:**
-```csharp
-using System;
-using Terminal.Gui;
-
-using (var app = Application.Create().Init())
-{
-    var win = new Window
-    {
-        Title = "Hello",
-        Width = 50,
-        Height = 20
-    };
-
-    var label = new Label
-    {
-        Text = "Name:",
-        X = 1,
-        Y = 1
-    };
-
-    var textField = new TextField
-    {
-        X = 10,
-        Y = 1,
-        Width = 30
-    };
-
-    var button = new Button
-    {
-        Text = "OK",
-        X = 10,
-        Y = 3
-    };
-    button.Accepting += (s, e) =>
-    {
-        MessageBox.Query(app, "Info", $"Hello, {textField.Text}", "Ok");
-    };
-
-    win.Add(label, textField, button);
-
-    app.Run(win);
-    win.Dispose();
-}
-```
-
----
-
-## Summary of Major Breaking Changes
-
-| Category | v1 | v2 |
-|----------|----|----|
-| **Application** | Static `Application` | `IApplication` instances via `Application.Create()` |
-| **Disposal** | Automatic | Explicit (`IDisposable` pattern) |
-| **View Construction** | Constructors with Rect | Initializers with X, Y, Width, Height |
-| **Layout** | Absolute/Computed distinction | Unified Pos/Dim system |
-| **Colors** | Limited palette | 24-bit TrueColor default |
-| **Types** | `Rect`, `NStack.ustring` | `Rectangle`, `System.String` |
-| **Keyboard** | `KeyEvent`, hard-coded keys | `Key`, configurable bindings |
-| **Mouse** | Screen-relative | Viewport-relative |
-| **Scrolling** | `ScrollView` | Built-in on all Views |
-| **Focus** | `CanFocus` default true | `CanFocus` default false |
-| **Navigation** | `Enter`/`Leave` events | `HasFocusChanging`/`HasFocusChanged` |
-| **Events** | Mixed patterns | Standard `EventHandler<EventArgs>` |
-| **Terminology** | `Application.Top`, `TopLevels` | `TopRunnable`, `SessionStack` |
-
----
-
-## Additional Resources
-
-- [Application Deep Dive](application.md) - Complete application architecture
-- [View Deep Dive](View.md) - View system details
-- [Layout Deep Dive](layout.md) - Comprehensive layout guide
-- [Keyboard Deep Dive](keyboard.md) - Keyboard input handling
-- [Mouse Deep Dive](mouse.md) - Mouse input handling
-- [Navigation Deep Dive](navigation.md) - Focus and navigation
-- [Scrolling Deep Dive](scrolling.md) - Built-in scrolling system
-- [Arrangement Deep Dive](arrangement.md) - Movable/resizable views
-- [Configuration Deep Dive](config.md) - Configuration system
-- [What's New in v2](newinv2.md) - New features overview
-
----
-
-## Getting Help
-
-- [GitHub Discussions](https://github.com/gui-cs/Terminal.Gui/discussions)
-- [GitHub Issues](https://github.com/gui-cs/Terminal.Gui/issues)
-- [API Documentation](~/api/index.md)
+For more details, see:
+- [Application Deep Dive](application.md)
+- [Keyboard Deep Dive](keyboard.md)
+- [Mouse Deep Dive](mouse.md)
+- [Layout Deep Dive](layout.md)
+- [Navigation Deep Dive](navigation.md)
+- [What's New in v2](newinv2.md)

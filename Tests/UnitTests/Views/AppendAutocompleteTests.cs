@@ -1,6 +1,3 @@
-using UnitTests;
-using Xunit.Abstractions;
-
 namespace UnitTests.TextTests;
 
 public class AppendAutocompleteTests (ITestOutputHelper output)
@@ -16,7 +13,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.SetClipToScreen ();
         tf.Draw ();
         tf.SetClipToScreen ();
-        tf.PositionCursor ();
+
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
 
@@ -49,7 +46,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.SetClipToScreen ();
         tf.Draw ();
         tf.SetClipToScreen ();
-        tf.PositionCursor ();
+
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
 
@@ -66,7 +63,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.SetClipToScreen ();
         tf.Draw ();
         tf.SetClipToScreen ();
-        tf.PositionCursor ();
+
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("fi", tf.Text);
         Application.TopRunnableView.Dispose ();
@@ -85,7 +82,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.SetClipToScreen ();
         tf.Draw ();
         tf.SetClipToScreen ();
-        tf.PositionCursor ();
+
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
 
@@ -95,7 +92,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.SetClipToScreen ();
         tf.Draw ();
         tf.SetClipToScreen ();
-        tf.PositionCursor ();
+
         DriverAssert.AssertDriverContentsAre ("friend", output);
         Assert.Equal ("f", tf.Text);
 
@@ -104,7 +101,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.SetClipToScreen ();
         tf.Draw ();
         tf.SetClipToScreen ();
-        tf.PositionCursor ();
+
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
         Application.TopRunnableView.Dispose ();
@@ -121,7 +118,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.SetClipToScreen ();
         tf.Draw ();
         tf.SetClipToScreen ();
-        tf.PositionCursor ();
+
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
 
@@ -147,7 +144,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.SetClipToScreen ();
         tf.Draw ();
         tf.SetClipToScreen ();
-        tf.PositionCursor ();
+
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
 
@@ -168,12 +165,12 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
 
         tf.Autocomplete = new AppendAutocomplete (tf);
         var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
-        generator.AllSuggestions = new() { "FISH" };
+        generator.AllSuggestions = new () { "FISH" };
 
         tf.SetClipToScreen ();
         tf.Draw ();
         tf.SetClipToScreen ();
-        tf.PositionCursor ();
+
         DriverAssert.AssertDriverContentsAre ("", output);
         tf.NewKeyDownEvent (Key.M);
         tf.NewKeyDownEvent (Key.Y);
@@ -185,7 +182,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.SetClipToScreen ();
         tf.Draw ();
         tf.SetClipToScreen ();
-        tf.PositionCursor ();
+
         DriverAssert.AssertDriverContentsAre ("my fISH", output);
         Assert.Equal ("my f", tf.Text);
 
@@ -206,12 +203,12 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
 
         tf.Autocomplete = new AppendAutocomplete (tf);
         var generator = (SingleWordSuggestionGenerator)tf.Autocomplete.SuggestionGenerator;
-        generator.AllSuggestions = new() { "fish" };
+        generator.AllSuggestions = new () { "fish" };
 
         tf.SetClipToScreen ();
         tf.Draw ();
         tf.SetClipToScreen ();
-        tf.PositionCursor ();
+
         DriverAssert.AssertDriverContentsAre ("", output);
 
         tf.NewKeyDownEvent (new ('f'));
@@ -219,7 +216,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.SetClipToScreen ();
         tf.Draw ();
         tf.SetClipToScreen ();
-        tf.PositionCursor ();
+
         DriverAssert.AssertDriverContentsAre ("fish", output);
         Assert.Equal ("f", tf.Text);
 
@@ -253,7 +250,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         tf.SetClipToScreen ();
         tf.Draw ();
         tf.SetClipToScreen ();
-        tf.PositionCursor ();
+
         DriverAssert.AssertDriverContentsAre (expectRender, output);
         Assert.Equal ("f", tf.Text);
         Application.TopRunnableView.Dispose ();
@@ -284,7 +281,7 @@ public class AppendAutocompleteTests (ITestOutputHelper output)
         generator.AllSuggestions = suggestions.ToList ();
 
         tf.Draw ();
-        tf.PositionCursor ();
+
         DriverAssert.AssertDriverContentsAre ("", output);
 
         return tf;

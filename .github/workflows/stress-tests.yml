@@ -7,7 +7,7 @@ on:
     branches: [ v2_release, v2_develop ]
     paths-ignore:
       - '**.md'
-      
+
 jobs:
   run_stress_tests:
     runs-on: ${{ matrix.os }}
@@ -17,6 +17,8 @@ jobs:
         os: [ ubuntu-latest ]
 
     timeout-minutes: 70 # Allow some buffer time beyond the 1-hour test duration
+    env:
+      DisableRealDriverIO: "1"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -24,7 +26,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.x
+          dotnet-version: 10.x
           dotnet-quality: 'ga'
 
       - name: Install dependencies
@@ -37,7 +39,7 @@ jobs:
         run: |
           end=$((SECONDS+900))
           while [ $SECONDS -lt $end ]; do
-            dotnet test Tests/StressTests --no-build --verbosity normal --diag:logs/${{ runner.os }}/logs.txt --blame --blame-crash --blame-hang --blame-hang-timeout 60s --blame-crash-collect-always -- xunit.stopOnFail=true
+            dotnet test --project Tests/StressTests --no-build --verbosity normal --diagnostic --diagnostic-output-directory logs/${{ runner.os }}
           done
 
       - name: Upload Test Logs
@@ -58,6 +60,8 @@ jobs:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
     timeout-minutes: 90
+    env:
+      DisableRealDriverIO: "1"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -65,7 +69,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.x
+          dotnet-version: 10.x
           dotnet-quality: 'ga'
 
       - name: Install dependencies
@@ -80,62 +84,31 @@ jobs:
         run: |
           Add-MpPreference -ExclusionPath "${{ github.workspace }}"
           Add-MpPreference -ExclusionProcess "dotnet.exe"
-          Add-MpPreference -ExclusionProcess "testhost.exe"
-          Add-MpPreference -ExclusionProcess "VSTest.Console.exe"
 
-      - name: Set VSTEST_DUMP_PATH
-        shell: bash
-        run: echo "VSTEST_DUMP_PATH=logs/UnitTestsParallelizable/${{ runner.os }}/" >> $GITHUB_ENV
-
-      - name: Run UnitTestsParallelizable (3 iterations with varying parallelization)
+      - name: Run UnitTestsParallelizable (3 iterations)
         shell: bash
         run: |
-          # Run tests 3 times with different parallelization settings to expose concurrency issues
-          # Run 1: Default parallelization (2x) - standard test execution
-          # Run 2: Maximum parallelization (unlimited) - stress test with high concurrency
-          # Run 3: Single-threaded execution (1) - deterministic execution to expose ordering issues
+          # Run tests 3 times to expose concurrency issues
           for RUN in {1..3}; do
             echo "============================================"
             echo "Starting test run $RUN of 3"
             echo "============================================"
-            
-            # Use a combination of run number and timestamp to create different execution patterns
-            SEED=$((1000 + $RUN + $(date +%s) % 1000))
-            echo "Using randomization seed: $SEED"
-            
-            # Vary the xUnit parallelization based on run number to expose race conditions
-            if [ $RUN -eq 1 ]; then
-              XUNIT_MAX_PARALLEL_THREADS="2x"
-              echo "Run $RUN: Using default parallelization (2x)"
-            elif [ $RUN -eq 2 ]; then
-              XUNIT_MAX_PARALLEL_THREADS="unlimited"
-              echo "Run $RUN: Using maximum parallelization (unlimited)"
-            else
-              XUNIT_MAX_PARALLEL_THREADS="1"
-              echo "Run $RUN: Using single-threaded execution"
-            fi
-            
-            dotnet test Tests/UnitTestsParallelizable \
+
+            dotnet test \
+              --project Tests/UnitTestsParallelizable \
               --no-build \
               --verbosity normal \
-              --settings Tests/UnitTestsParallelizable/runsettings.xml \
-              --diag:logs/UnitTestsParallelizable/${{ runner.os }}/run${RUN}-logs.txt \
-              --blame \
-              --blame-crash \
-              --blame-hang \
-              --blame-hang-timeout 60s \
-              --blame-crash-collect-always \
-              -- xUnit.MaxParallelThreads=${XUNIT_MAX_PARALLEL_THREADS}
-            
+              --diagnostic --diagnostic-output-directory logs/UnitTestsParallelizable/${{ runner.os }}/run${RUN}
+
             if [ $? -ne 0 ]; then
               echo "ERROR: Test run $RUN failed!"
               exit 1
             fi
-            
+
             echo "Test run $RUN completed successfully"
             echo ""
           done
-          
+
           echo "============================================"
           echo "All 3 test runs completed successfully!"
           echo "============================================"
@@ -148,4 +121,3 @@ jobs:
           path: |
             logs/UnitTestsParallelizable/
             TestResults/
-

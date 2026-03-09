@@ -24,38 +24,27 @@ public class CsvEditor : Scenario
     private CheckBox? _miRightCheckBox;
     private TextField? _selectedCellTextField;
     private TableView? _tableView;
+    private IApplication? _app;
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
+        _app = app;
 
-        Window appWindow = new ()
-        {
-            Title = GetName ()
-        };
+        using Window appWindow = new () { Title = GetName () };
 
         // MenuBar
         MenuBar menu = new ();
 
-        _tableView = new ()
-        {
-            X = 0,
-            Y = Pos.Bottom (menu),
-            Width = Dim.Fill (),
-            Height = Dim.Fill (1)
-        };
+        _tableView = new () { X = 0, Y = Pos.Bottom (menu), Width = Dim.Fill (), Height = Dim.Fill (1) };
 
-        _selectedCellTextField = new ()
-        {
-            Text = "0,0",
-            Width = 10,
-            Height = 1
-        };
+        _selectedCellTextField = new () { Text = "0,0", Width = 10, Height = 1 };
         _selectedCellTextField.TextChanged += SelectedCellLabel_TextChanged;
 
         // StatusBar
-        StatusBar statusBar = new (
-                                   [
+        StatusBar statusBar = new ([
                                        new (Application.QuitKey, "Quit", Quit, "Quit!"),
                                        new (Key.O.WithCtrl, "Open", Open, "Open a file."),
                                        new (Key.S.WithCtrl, "Save", Save, "Save current."),
@@ -66,127 +55,46 @@ public class CsvEditor : Scenario
                                            AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast,
                                            Enabled = false
                                        }
-                                   ]
-                                  )
-        {
-            AlignmentModes = AlignmentModes.IgnoreFirstOrLast
-        };
+                                   ]) { AlignmentModes = AlignmentModes.IgnoreFirstOrLast };
 
         // Setup menu checkboxes for alignment
-        _miLeftCheckBox = new ()
-        {
-            Title = "_Align Left"
-        };
-        _miLeftCheckBox.CheckedStateChanged += (s, e) => Align (Alignment.Start);
+        _miLeftCheckBox = new () { Title = "_Align Left" };
+        _miLeftCheckBox.ValueChanged += (_, _) => Align (Alignment.Start);
 
-        _miRightCheckBox = new ()
-        {
-            Title = "_Align Right"
-        };
-        _miRightCheckBox.CheckedStateChanged += (s, e) => Align (Alignment.End);
+        _miRightCheckBox = new () { Title = "_Align Right" };
+        _miRightCheckBox.ValueChanged += (_, _) => Align (Alignment.End);
 
-        _miCenteredCheckBox = new ()
-        {
-            Title = "_Align Centered"
-        };
-        _miCenteredCheckBox.CheckedStateChanged += (s, e) => Align (Alignment.Center);
+        _miCenteredCheckBox = new () { Title = "_Align Centered" };
+        _miCenteredCheckBox.ValueChanged += (_, _) => Align (Alignment.Center);
 
-        MenuBarItem fileMenu = new (
-                                    "_File",
+        MenuBarItem fileMenu = new (Strings.menuFile,
                                     [
-                                        new MenuItem
-                                        {
-                                            Title = "_Open CSV",
-                                            Action = Open
-                                        },
-                                        new MenuItem
-                                        {
-                                            Title = "_Save",
-                                            Action = Save
-                                        },
-                                        new MenuItem
-                                        {
-                                            Title = "_Quit",
-                                            HelpText = "Quits The App",
-                                            Action = Quit
-                                        }
-                                    ]
-                                   );
+                                        new MenuItem { Title = "_Open CSV", Action = Open },
+                                        new MenuItem { Title = Strings.cmdSave, Action = Save },
+                                        new MenuItem { Title = Strings.cmdQuit, HelpText = "Quits The App", Action = Quit }
+                                    ]);
 
         menu.Add (fileMenu);
 
-        menu.Add (
-                  new MenuBarItem (
-                                   "_Edit",
+        menu.Add (new MenuBarItem ("_Edit",
                                    [
-                                       new MenuItem
-                                       {
-                                           Title = "_New Column",
-                                           Action = AddColumn
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = "_New Row",
-                                           Action = AddRow
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = "_Rename Column",
-                                           Action = RenameColumn
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = "_Delete Column",
-                                           Action = DeleteColum
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = "_Move Column",
-                                           Action = MoveColumn
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = "_Move Row",
-                                           Action = MoveRow
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = "_Sort Asc",
-                                           Action = () => Sort (true)
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = "_Sort Desc",
-                                           Action = () => Sort (false)
-                                       }
-                                   ]
-                                  )
-                 );
+                                       new MenuItem { Title = "_New Column", Action = AddColumn },
+                                       new MenuItem { Title = "_New Row", Action = AddRow },
+                                       new MenuItem { Title = "_Rename Column", Action = RenameColumn },
+                                       new MenuItem { Title = "_Delete Column", Action = DeleteColum },
+                                       new MenuItem { Title = "_Move Column", Action = MoveColumn },
+                                       new MenuItem { Title = "_Move Row", Action = MoveRow },
+                                       new MenuItem { Title = "_Sort Asc", Action = () => Sort (true) },
+                                       new MenuItem { Title = "_Sort Desc", Action = () => Sort (false) }
+                                   ]));
 
-        menu.Add (
-                  new MenuBarItem (
-                                   "_View",
+        menu.Add (new MenuBarItem ("_View",
                                    [
-                                       new MenuItem
-                                       {
-                                           CommandView = _miLeftCheckBox
-                                       },
-                                       new MenuItem
-                                       {
-                                           CommandView = _miRightCheckBox
-                                       },
-                                       new MenuItem
-                                       {
-                                           CommandView = _miCenteredCheckBox
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = "_Set Format Pattern",
-                                           Action = SetFormat
-                                       }
-                                   ]
-                                  )
-                 );
+                                       new MenuItem { CommandView = _miLeftCheckBox },
+                                       new MenuItem { CommandView = _miRightCheckBox },
+                                       new MenuItem { CommandView = _miCenteredCheckBox },
+                                       new MenuItem { Title = "_Set Format Pattern", Action = SetFormat }
+                                   ]));
 
         appWindow.Add (menu, _tableView, statusBar);
 
@@ -194,9 +102,7 @@ public class CsvEditor : Scenario
         _tableView.CellActivated += EditCurrentCell;
         _tableView.KeyDown += TableViewKeyPress;
 
-        Application.Run (appWindow);
-        appWindow.Dispose ();
-        Application.Shutdown ();
+        app.Run (appWindow);
     }
 
     private void AddColumn ()
@@ -210,20 +116,9 @@ public class CsvEditor : Scenario
         {
             DataColumn col = new (colName);
 
-            int newColIdx = Math.Min (
-                                      Math.Max (0, _tableView.SelectedColumn + 1),
-                                      _tableView.Table.Columns
-                                     );
+            int newColIdx = Math.Min (Math.Max (0, _tableView.SelectedColumn + 1), _tableView.Table!.Columns);
 
-            int? result = MessageBox.Query (Application.Instance,
-                                           "Column Type",
-                                           "Pick a data type for the column",
-                                           "Date",
-                                           "Integer",
-                                           "Double",
-                                           "Text",
-                                           "Cancel"
-                                          );
+            int? result = MessageBox.Query (_tableView.App!, "Column Type", "Pick a data type for the column", "Date", "Integer", "Double", "Text", "Cancel");
 
             if (result is null || result >= 4)
             {
@@ -236,14 +131,17 @@ public class CsvEditor : Scenario
                     col.DataType = typeof (DateTime);
 
                     break;
+
                 case 1:
                     col.DataType = typeof (int);
 
                     break;
+
                 case 2:
                     col.DataType = typeof (double);
 
                     break;
+
                 case 3:
                     col.DataType = typeof (string);
 
@@ -265,7 +163,7 @@ public class CsvEditor : Scenario
 
         DataRow newRow = _currentTable.NewRow ();
 
-        int newRowIdx = Math.Min (Math.Max (0, _tableView.SelectedRow + 1), _tableView.Table.Rows);
+        int newRowIdx = Math.Min (Math.Max (0, _tableView.SelectedRow + 1), _tableView.Table!.Rows);
 
         _currentTable.Rows.InsertAt (newRow, newRowIdx);
         _tableView.Update ();
@@ -283,17 +181,17 @@ public class CsvEditor : Scenario
 
         if (_miLeftCheckBox is { })
         {
-            _miLeftCheckBox.CheckedState = style.Alignment == Alignment.Start ? CheckState.Checked : CheckState.UnChecked;
+            _miLeftCheckBox.Value = style.Alignment == Alignment.Start ? CheckState.Checked : CheckState.UnChecked;
         }
 
         if (_miRightCheckBox is { })
         {
-            _miRightCheckBox.CheckedState = style.Alignment == Alignment.End ? CheckState.Checked : CheckState.UnChecked;
+            _miRightCheckBox.Value = style.Alignment == Alignment.End ? CheckState.Checked : CheckState.UnChecked;
         }
 
         if (_miCenteredCheckBox is { })
         {
-            _miCenteredCheckBox.CheckedState = style.Alignment == Alignment.Center ? CheckState.Checked : CheckState.UnChecked;
+            _miCenteredCheckBox.Value = style.Alignment == Alignment.Center ? CheckState.Checked : CheckState.UnChecked;
         }
 
         _tableView.Update ();
@@ -308,7 +206,7 @@ public class CsvEditor : Scenario
 
         if (_tableView.SelectedColumn == -1)
         {
-            MessageBox.ErrorQuery (Application.Instance, "No Column", "No column selected", "Ok");
+            MessageBox.ErrorQuery (_tableView!.App!, "No Column", "No column selected", "Ok");
 
             return;
         }
@@ -320,7 +218,7 @@ public class CsvEditor : Scenario
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery (Application.Instance, "Could not remove column", ex.Message, "Ok");
+            MessageBox.ErrorQuery (_tableView!.App!, "Could not remove column", ex.Message, "Ok");
         }
     }
 
@@ -337,12 +235,11 @@ public class CsvEditor : Scenario
         {
             try
             {
-                _currentTable.Rows [e.Row] [e.Col] =
-                    string.IsNullOrWhiteSpace (newText) ? DBNull.Value : newText;
+                _currentTable.Rows [e.Row] [e.Col] = string.IsNullOrWhiteSpace (newText) ? DBNull.Value : newText;
             }
             catch (Exception ex)
             {
-                MessageBox.ErrorQuery (Application.Instance, 60, 20, "Failed to set text", ex.Message, "Ok");
+                MessageBox.ErrorQuery (_tableView!.App!, "Failed to set text", ex.Message, "Ok");
             }
 
             _tableView.Update ();
@@ -355,23 +252,25 @@ public class CsvEditor : Scenario
 
         Button ok = new () { Text = "Ok", IsDefault = true };
 
-        ok.Accepting += (s, e) =>
+        Dialog d = new () { Title = title };
+
+        ok.Accepting += (_, _) =>
                         {
                             okPressed = true;
-                            Application.RequestStop ();
+                            d.App?.RequestStop ();
                         };
         Button cancel = new () { Text = "Cancel" };
-        cancel.Accepting += (s, e) => { Application.RequestStop (); };
-        Dialog d = new () { Title = title, Buttons = [ok, cancel] };
+        cancel.Accepting += (_, _) => { d.App?.RequestStop (); };
+        d.Buttons = [ok, cancel];
 
         Label lbl = new () { X = 0, Y = 1, Text = label };
 
-        TextField tf = new () { Text = initialText, X = 0, Y = 2, Width = Dim.Fill () };
+        TextField tf = new () { Text = initialText, X = 0, Y = 2, Width = Dim.Fill (0, 50) };
 
         d.Add (lbl, tf);
         tf.SetFocus ();
 
-        Application.Run (d);
+        _app?.Run (d);
         d.Dispose ();
 
         enteredText = okPressed ? tf.Text : string.Empty;
@@ -388,7 +287,7 @@ public class CsvEditor : Scenario
 
         if (_tableView.SelectedColumn == -1)
         {
-            MessageBox.ErrorQuery (Application.Instance, "No Column", "No column selected", "Ok");
+            MessageBox.ErrorQuery (_tableView!.App!, "No Column", "No column selected", "Ok");
 
             return;
         }
@@ -399,10 +298,7 @@ public class CsvEditor : Scenario
 
             if (GetText ("Move Column", "New Index:", currentCol.Ordinal.ToString (), out string newOrdinal))
             {
-                int newIdx = Math.Min (
-                                       Math.Max (0, int.Parse (newOrdinal)),
-                                       _tableView.Table.Columns - 1
-                                      );
+                int newIdx = Math.Min (Math.Max (0, int.Parse (newOrdinal)), _tableView.Table!.Columns - 1);
 
                 currentCol.SetOrdinal (newIdx);
 
@@ -413,7 +309,7 @@ public class CsvEditor : Scenario
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery (Application.Instance, "Error moving column", ex.Message, "Ok");
+            MessageBox.ErrorQuery (_tableView!.App!, "Error moving column", ex.Message, "Ok");
         }
     }
 
@@ -426,7 +322,7 @@ public class CsvEditor : Scenario
 
         if (_tableView.SelectedRow == -1)
         {
-            MessageBox.ErrorQuery (Application.Instance, "No Rows", "No row selected", "Ok");
+            MessageBox.ErrorQuery (_tableView!.App!, "No Rows", "No row selected", "Ok");
 
             return;
         }
@@ -439,7 +335,7 @@ public class CsvEditor : Scenario
 
             if (GetText ("Move Row", "New Row:", oldIdx.ToString (), out string newOrdinal))
             {
-                int newIdx = Math.Min (Math.Max (0, int.Parse (newOrdinal)), _tableView.Table.Rows - 1);
+                int newIdx = Math.Min (Math.Max (0, int.Parse (newOrdinal)), _tableView.Table!.Rows - 1);
 
                 if (newIdx == oldIdx)
                 {
@@ -462,7 +358,7 @@ public class CsvEditor : Scenario
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery (Application.Instance, "Error moving column", ex.Message, "Ok");
+            MessageBox.ErrorQuery (_tableView!.App!, "Error moving column", ex.Message, "Ok");
         }
     }
 
@@ -470,7 +366,7 @@ public class CsvEditor : Scenario
     {
         if (_tableView?.Table is null)
         {
-            MessageBox.ErrorQuery (Application.Instance, "No Table Loaded", "No table has currently be opened", "Ok");
+            MessageBox.ErrorQuery (_tableView!.App!, "No Table Loaded", "No table has currently be opened", "Ok");
 
             return true;
         }
@@ -500,29 +396,26 @@ public class CsvEditor : Scenario
 
         if (_miLeftCheckBox is { })
         {
-            _miLeftCheckBox.CheckedState = style?.Alignment == Alignment.Start ? CheckState.Checked : CheckState.UnChecked;
+            _miLeftCheckBox.Value = style?.Alignment == Alignment.Start ? CheckState.Checked : CheckState.UnChecked;
         }
 
         if (_miRightCheckBox is { })
         {
-            _miRightCheckBox.CheckedState = style?.Alignment == Alignment.End ? CheckState.Checked : CheckState.UnChecked;
+            _miRightCheckBox.Value = style?.Alignment == Alignment.End ? CheckState.Checked : CheckState.UnChecked;
         }
 
         if (_miCenteredCheckBox is { })
         {
-            _miCenteredCheckBox.CheckedState = style?.Alignment == Alignment.Center ? CheckState.Checked : CheckState.UnChecked;
+            _miCenteredCheckBox.Value = style?.Alignment == Alignment.Center ? CheckState.Checked : CheckState.UnChecked;
         }
     }
 
     private void Open ()
     {
-        FileDialog ofd = new ()
-        {
-            AllowedTypes = [new AllowedType ("Comma Separated Values", ".csv")]
-        };
+        FileDialog ofd = new () { AllowedTypes = [new AllowedType ("Comma Separated Values", ".csv")] };
         ofd.Style.OkButtonText = "Open";
 
-        Application.Run (ofd);
+        _app?.Run (ofd);
 
         if (!ofd.Canceled && !string.IsNullOrWhiteSpace (ofd.Path))
         {
@@ -575,22 +468,18 @@ public class CsvEditor : Scenario
                 _selectedCellTextField.SuperView.Enabled = true;
             }
 
-            if (Application.TopRunnableView is { })
+            if (_app?.TopRunnableView is { })
             {
-                Application.TopRunnableView.Title = $"{GetName ()} - {Path.GetFileName (_currentFile)}";
+                _app.TopRunnableView.Title = $"{GetName ()} - {Path.GetFileName (_currentFile)}";
             }
         }
         catch (Exception ex)
         {
-            MessageBox.ErrorQuery (Application.Instance,
-                                   "Open Failed",
-                                   $"Error on line {lineNumber}{Environment.NewLine}{ex.Message}",
-                                   "Ok"
-                                  );
+            MessageBox.ErrorQuery (_tableView!.App!, "Open Failed", $"Error on line {lineNumber}{Environment.NewLine}{ex.Message}", "Ok");
         }
     }
 
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () => _tableView?.App?.RequestStop ();
 
     private void RenameColumn ()
     {
@@ -612,15 +501,12 @@ public class CsvEditor : Scenario
     {
         if (_tableView?.Table is null || string.IsNullOrWhiteSpace (_currentFile) || _currentTable is null)
         {
-            MessageBox.ErrorQuery (Application.Instance, "No file loaded", "No file is currently loaded", "Ok");
+            MessageBox.ErrorQuery (_tableView!.App!, "No file loaded", "No file is currently loaded", "Ok");
 
             return;
         }
 
-        using CsvWriter writer = new (
-                                      new StreamWriter (File.OpenWrite (_currentFile)),
-                                      CultureInfo.InvariantCulture
-                                     );
+        using CsvWriter writer = new (new StreamWriter (File.OpenWrite (_currentFile)), CultureInfo.InvariantCulture);
 
         foreach (string col in _currentTable.Columns.Cast<DataColumn> ().Select (c => c.ColumnName))
         {
@@ -674,11 +560,10 @@ public class CsvEditor : Scenario
 
         if (col.DataType == typeof (string))
         {
-            MessageBox.ErrorQuery (Application.Instance,
+            MessageBox.ErrorQuery (_tableView!.App!,
                                    "Cannot Format Column",
                                    "String columns cannot be Formatted, try adding a new column to the table with a date/numerical Type",
-                                   "Ok"
-                                  );
+                                   "Ok");
 
             return;
         }
@@ -711,12 +596,12 @@ public class CsvEditor : Scenario
 
         if (_tableView.SelectedColumn == -1)
         {
-            MessageBox.ErrorQuery (Application.Instance, "No Column", "No column selected", "Ok");
+            MessageBox.ErrorQuery (_tableView!.App!, "No Column", "No column selected", "Ok");
 
             return;
         }
 
-        string colName = _tableView.Table.ColumnNames [_tableView.SelectedColumn];
+        string colName = _tableView.Table!.ColumnNames [_tableView.SelectedColumn];
 
         _currentTable.DefaultView.Sort = colName + (asc ? " asc" : " desc");
         SetTable (_currentTable.DefaultView.ToTable ());
@@ -734,10 +619,7 @@ public class CsvEditor : Scenario
             if (_tableView.FullRowSelect)
             {
                 // Delete button deletes all rows when in full row mode
-                foreach (int toRemove in _tableView.GetAllSelectedCells ()
-                                                   .Select (p => p.Y)
-                                                   .Distinct ()
-                                                   .OrderByDescending (i => i))
+                foreach (int toRemove in _tableView.GetAllSelectedCells ().Select (p => p.Y).Distinct ().OrderByDescending (i => i))
                 {
                     _currentTable.Rows.RemoveAt (toRemove);
                 }

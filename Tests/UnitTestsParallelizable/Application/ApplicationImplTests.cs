@@ -3,24 +3,23 @@ using Moq;
 
 namespace ApplicationTests;
 
+[Collection ("Application Tests")]
 public class ApplicationImplTests
 {
-
     [Fact]
     public void Internal_Properties_Correct ()
     {
         IApplication app = Application.Create ();
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         Assert.True (app.Initialized);
         Assert.Null (app.TopRunnableView);
         SessionToken? rs = app.Begin (new Runnable<bool> ());
         Assert.Equal (app.TopRunnable, rs!.Runnable);
-        Assert.Null (app.Mouse.MouseGrabView); // public
+        Assert.False (app.Mouse.IsGrabbed (rs!.Runnable as View)); // public
 
         app.Dispose ();
     }
-
 
     #region DisposeTests
 
@@ -61,9 +60,7 @@ public class ApplicationImplTests
         app.Dispose ();
     }
 
-
     #endregion
-
 
     /// <summary>
     ///     Crates a new ApplicationImpl instance for testing. The input, output, and size monitor components are mocked.
@@ -75,22 +72,23 @@ public class ApplicationImplTests
 
         Mock<IComponentFactory<ConsoleKeyInfo>> m = new ();
         m.Setup (f => f.CreateInput ()).Returns (netInput.Object);
-        m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<ConsoleKeyInfo>> ())).Returns (Mock.Of<IInputProcessor> ());
+        Mock<IInputProcessor> inputProcessor = new ();
+        inputProcessor.Setup (p => p.GetParser ()).Returns (Mock.Of<IAnsiResponseParser> ());
+        m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<ConsoleKeyInfo>> (), It.IsAny<ITimeProvider?> ())).Returns (inputProcessor.Object);
 
         Mock<IOutput> consoleOutput = new ();
         var size = new Size (80, 25);
 
-        consoleOutput.Setup (o => o.SetSize (It.IsAny<int> (), It.IsAny<int> ()))
-                     .Callback<int, int> ((w, h) => size = new (w, h));
+        consoleOutput.Setup (o => o.SetSize (It.IsAny<int> (), It.IsAny<int> ())).Callback<int, int> ((w, h) => size = new Size (w, h));
         consoleOutput.Setup (o => o.GetSize ()).Returns (() => size);
+        consoleOutput.Setup (o => o.GetCursor ()).Returns (() => new Cursor ());
         m.Setup (f => f.CreateOutput ()).Returns (consoleOutput.Object);
         m.Setup (f => f.CreateSizeMonitor (It.IsAny<IOutput> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<ISizeMonitor> ());
 
         return new ApplicationImpl (m.Object);
     }
 
-    private void SetupRunInputMockMethodToBlock (Mock<INetInput> netInput)
-    {
+    private void SetupRunInputMockMethodToBlock (Mock<INetInput> netInput) =>
         netInput.Setup (r => r.Run (It.IsAny<CancellationToken> ()))
                 .Callback<CancellationToken> (token =>
                                               {
@@ -102,8 +100,6 @@ public class ApplicationImplTests
                                                   }
                                               })
                 .Verifiable (Times.Once);
-    }
-
 
     [Fact]
     public void NoInitThrowOnRun ()
@@ -118,10 +114,9 @@ public class ApplicationImplTests
     {
         IApplication app = NewMockedApplicationImpl ();
 
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
-        object? timeoutToken = app.AddTimeout (
-                                               TimeSpan.FromMilliseconds (150),
+        object? timeoutToken = app.AddTimeout (TimeSpan.FromMilliseconds (150),
                                                () =>
                                                {
                                                    if (app.TopRunnableView is { })
@@ -132,8 +127,7 @@ public class ApplicationImplTests
                                                    }
 
                                                    return false;
-                                               }
-                                              );
+                                               });
         Assert.Null (app.TopRunnableView);
 
         // Blocks until the timeout call is hit
@@ -153,15 +147,11 @@ public class ApplicationImplTests
     {
         IApplication app = NewMockedApplicationImpl ()!;
 
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
-        IRunnable top = new Window
-        {
-            Title = "InitRunShutdown_Running_Set_To_False"
-        };
+        IRunnable top = new Window { Title = "InitRunShutdown_Running_Set_To_False" };
 
-        object? timeoutToken = app.AddTimeout (
-                                               TimeSpan.FromMilliseconds (150),
+        object? timeoutToken = app.AddTimeout (TimeSpan.FromMilliseconds (150),
                                                () =>
                                                {
                                                    Assert.True (top!.IsRunning);
@@ -174,8 +164,7 @@ public class ApplicationImplTests
                                                    }
 
                                                    return false;
-                                               }
-                                              );
+                                               });
 
         Assert.False (top.IsRunning);
 
@@ -201,28 +190,24 @@ public class ApplicationImplTests
         Assert.Null (app.TopRunnableView);
         Assert.Null (app.Driver);
 
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         IRunnable top = new Window ();
         var isIsModalChanged = 0;
 
-        top.IsModalChanged
-            += (_, a) => { isIsModalChanged++; };
+        top.IsModalChanged += (_, a) => { isIsModalChanged++; };
 
         var isRunningChangedCount = 0;
 
-        top.IsRunningChanged
-            += (_, a) => { isRunningChangedCount++; };
+        top.IsRunningChanged += (_, a) => { isRunningChangedCount++; };
 
-        object? timeoutToken = app.AddTimeout (
-                                               TimeSpan.FromMilliseconds (150),
+        object? timeoutToken = app.AddTimeout (TimeSpan.FromMilliseconds (150),
                                                () =>
                                                {
                                                    //Assert.Fail (@"Didn't stop after first iteration.");
 
                                                    return false;
-                                               }
-                                              );
+                                               });
 
         Assert.Equal (0, isIsModalChanged);
         Assert.Equal (0, isRunningChangedCount);
@@ -247,22 +232,19 @@ public class ApplicationImplTests
         Assert.Null (app.TopRunnableView);
         Assert.Null (app.Driver);
 
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         IRunnable top = new Window ();
 
         var isIsModalChanged = 0;
 
-        top.IsModalChanged
-            += (_, a) => { isIsModalChanged++; };
+        top.IsModalChanged += (_, a) => { isIsModalChanged++; };
 
         var isRunningChangedCount = 0;
 
-        top.IsRunningChanged
-            += (_, a) => { isRunningChangedCount++; };
+        top.IsRunningChanged += (_, a) => { isRunningChangedCount++; };
 
-        object? timeoutToken = app.AddTimeout (
-                                               TimeSpan.FromMilliseconds (150),
+        object? timeoutToken = app.AddTimeout (TimeSpan.FromMilliseconds (150),
                                                () =>
                                                {
                                                    Assert.True (top!.IsRunning);
@@ -275,8 +257,7 @@ public class ApplicationImplTests
                                                    }
 
                                                    return false;
-                                               }
-                                              );
+                                               });
 
         Assert.Equal (0, isIsModalChanged);
         Assert.Equal (0, isRunningChangedCount);
@@ -301,15 +282,11 @@ public class ApplicationImplTests
     {
         IApplication app = NewMockedApplicationImpl ()!;
 
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
-        IRunnable top = new Window
-        {
-            Title = "InitRunShutdown_QuitKey_Quits"
-        };
+        IRunnable top = new Window { Title = "InitRunShutdown_QuitKey_Quits" };
 
-        object? timeoutToken = app.AddTimeout (
-                                               TimeSpan.FromMilliseconds (150),
+        object? timeoutToken = app.AddTimeout (TimeSpan.FromMilliseconds (150),
                                                () =>
                                                {
                                                    Assert.True (top!.IsRunning);
@@ -320,8 +297,7 @@ public class ApplicationImplTests
                                                    }
 
                                                    return false;
-                                               }
-                                              );
+                                               });
 
         Assert.False (top!.IsRunning);
 
@@ -334,7 +310,7 @@ public class ApplicationImplTests
         Assert.False (top!.IsRunning);
 
         Assert.Null (app.TopRunnableView);
-        ((top as Window)!).Dispose ();
+        (top as Window)!.Dispose ();
         app.Dispose ();
         Assert.Null (app.TopRunnableView);
     }
@@ -344,7 +320,7 @@ public class ApplicationImplTests
     {
         IApplication app = NewMockedApplicationImpl ()!;
 
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         app.AddTimeout (TimeSpan.Zero, () => IdleExit (app));
         Assert.Null (app.TopRunnableView);
@@ -363,17 +339,15 @@ public class ApplicationImplTests
     {
         IApplication app = NewMockedApplicationImpl ()!;
 
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var isRunningChanging = 0;
         var isRunningChanged = 0;
         Runnable<bool> t = new ();
 
-        t.IsRunningChanging
-            += (_, a) => { isRunningChanging++; };
+        t.IsRunningChanging += (_, a) => { isRunningChanging++; };
 
-        t.IsRunningChanged
-            += (_, a) => { isRunningChanged++; };
+        t.IsRunningChanged += (_, a) => { isRunningChanged++; };
 
         app.AddTimeout (TimeSpan.Zero, () => IdleExit (app));
 
@@ -389,26 +363,24 @@ public class ApplicationImplTests
     {
         IApplication app = NewMockedApplicationImpl ()!;
 
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
 
         var isRunningChanging = 0;
         var isRunningChanged = 0;
         Runnable<bool> t = new ();
 
-        t.IsRunningChanging
-            += (_, a) =>
-               {
-                   // Cancel the first time
-                   if (isRunningChanging == 0)
-                   {
-                       a.Cancel = true;
-                   }
+        t.IsRunningChanging += (_, a) =>
+                               {
+                                   // Cancel the first time
+                                   if (isRunningChanging == 0)
+                                   {
+                                       a.Cancel = true;
+                                   }
 
-                   isRunningChanging++;
-               };
+                                   isRunningChanging++;
+                               };
 
-        t.IsRunningChanged
-            += (_, a) => { isRunningChanged++; };
+        t.IsRunningChanged += (_, a) => { isRunningChanged++; };
 
         app.AddTimeout (TimeSpan.Zero, () => IdleExit (app));
 
@@ -436,37 +408,33 @@ public class ApplicationImplTests
     {
         IApplication app = NewMockedApplicationImpl ()!;
 
-        app.Init ("fake");
+        app.Init (DriverRegistry.Names.ANSI);
         var b = new Button ();
 
         var result = false;
 
-        b.Accepting +=
-            (_, _) =>
-            {
-                Task.Run (() => { Task.Delay (300).Wait (); })
-                    .ContinueWith (
-                                   (t, _) =>
-                                   {
-                                       // no longer loading
-                                       app.Invoke (() =>
-                                                   {
-                                                       result = true;
-                                                       app.RequestStop ();
-                                                   });
-                                   },
-                                   TaskScheduler.FromCurrentSynchronizationContext ());
-            };
+        b.Accepting += (_, _) =>
+                       {
+                           Task.Run (() => { Task.Delay (300).Wait (); })
+                               .ContinueWith ((t, _) =>
+                                              {
+                                                  // no longer loading
+                                                  app.Invoke (() =>
+                                                              {
+                                                                  result = true;
+                                                                  app.RequestStop ();
+                                                              });
+                                              },
+                                              TaskScheduler.FromCurrentSynchronizationContext ());
+                       };
 
-        app.AddTimeout (
-                        TimeSpan.FromMilliseconds (150),
+        app.AddTimeout (TimeSpan.FromMilliseconds (150),
                         () =>
                         {
                             // Run asynchronous logic inside Task.Run
                             if (app.TopRunnableView != null)
                             {
                                 b.NewKeyDownEvent (Key.Enter);
-                                b.NewKeyUpEvent (Key.Enter);
                             }
 
                             return false;
@@ -474,10 +442,7 @@ public class ApplicationImplTests
 
         Assert.Null (app.TopRunnableView);
 
-        var w = new Window
-        {
-            Title = "Open_CallsContinueWithOnUIThread"
-        };
+        var w = new Window { Title = "Open_CallsContinueWithOnUIThread" };
         w.Add (b);
 
         // Blocks until the timeout call is hit
@@ -505,12 +470,12 @@ public class ApplicationImplTests
         Assert.Empty (v2.SessionStack!);
 
         // Init should populate instance fields
-        v2.Init ("fake");
+        v2.Init (DriverRegistry.Names.ANSI);
 
         // After Init, Driver, Navigation, and Popover should be populated
         Assert.NotNull (v2.Driver);
         Assert.True (v2.Initialized);
-        Assert.NotNull (v2.Popover);
+        Assert.NotNull (v2.Popovers);
         Assert.NotNull (v2.Navigation);
         Assert.Null (v2.TopRunnableView); // Top is still null until Run
 

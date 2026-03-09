@@ -2,7 +2,7 @@
 
 namespace ViewBaseTests.Navigation;
 
-[Collection ("Global Test Setup")]
+
 public class SetFocusTests () : TestsAllViews
 {
     [Fact]
@@ -16,7 +16,7 @@ public class SetFocusTests () : TestsAllViews
         Assert.True (view.CanFocus);
         Assert.False (view.HasFocus);
 
-        Exception exception = Record.Exception (() => view.SetFocus ());
+        Exception? exception = Record.Exception (() => view.SetFocus ());
         Assert.Null (exception);
 
         Assert.True (view.CanFocus);

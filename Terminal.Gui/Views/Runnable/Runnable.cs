@@ -1,7 +1,8 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Base implementation of <see cref="IRunnable"/> for views that can be run as blocking sessions without returning a result.
+///     Base implementation of <see cref="IRunnable"/> for views that can be run as blocking sessions without returning a
+///     result.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -18,8 +19,6 @@ namespace Terminal.Gui.Views;
 public class Runnable : View, IRunnable
 {
     // Cached state - eliminates race conditions from stack queries
-    private bool _isRunning;
-    private bool _isModal;
 
     /// <summary>
     ///     Constructs a new instance of the <see cref="Runnable"/> class.
@@ -39,24 +38,20 @@ public class Runnable : View, IRunnable
 
     #region IRunnable Implementation - IsRunning (from base interface)
 
-    /// <inheritdoc />
-    public void SetApp (IApplication app)
-    {
-        App = app;
-    }
+    /// <inheritdoc/>
+    public void SetApp (IApplication app) => App = app;
 
     /// <inheritdoc/>
-    public bool IsRunning => _isRunning;
+    public bool IsRunning { get; private set; }
 
     /// <inheritdoc/>
-    public void SetIsRunning (bool value) { _isRunning = value; }
+    public void SetIsRunning (bool value) => IsRunning = value;
 
-    /// <inheritdoc />
-    public virtual void RequestStop ()
-    {
+    /// <inheritdoc/>
+    public virtual void RequestStop () =>
+
         // Use the IRunnable-specific RequestStop if the App supports it
         App?.RequestStop (this);
-    }
 
     /// <inheritdoc/>
     public bool RaiseIsRunningChanging (bool oldIsRunning, bool newIsRunning)
@@ -93,6 +88,7 @@ public class Runnable : View, IRunnable
         {
             BeginInit ();
             EndInit ();
+
             // Initialized event is raised by View.EndInit()
         }
 
@@ -129,9 +125,9 @@ public class Runnable : View, IRunnable
     ///         // Check if user wants to save first
     ///         if (HasUnsavedChanges ())
     ///         {
-    ///             int result = MessageBox.Query (App, "Save?", "Save changes?", "Yes", "No", "Cancel");
-    ///             if (result == 2) return true;  // Cancel stopping
-    ///             if (result == 0) Save ();
+    ///             int result = MessageBox.Query (App, "Save?", "Save changes?", Strings.btnNo, Strings.btnYes);
+    ///             if (result == 0) return true;  // Cancel stopping
+    ///             if (result == 1) Save ();
     ///         }
     ///     }
     /// 
@@ -159,12 +155,12 @@ public class Runnable : View, IRunnable
     #region IRunnable Implementation - IsModal (from base interface)
 
     /// <inheritdoc/>
-    public bool IsModal => _isModal;
+    public bool IsModal { get; private set; }
 
     /// <inheritdoc/>
-    public void SetIsModal (bool value) { _isModal = value; }
+    public void SetIsModal (bool value) => IsModal = value;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool StopRequested { get; set; }
 
     /// <inheritdoc/>
@@ -173,16 +169,12 @@ public class Runnable : View, IRunnable
         if (newIsModal)
         {
             // Set focus to self if becoming modal
-            if (HasFocus is false)
-            {
-                SetFocus ();
-            }
-
-            // Position cursor and update driver
-            if (App?.PositionCursor () == true)
-            {
-                App?.Driver?.UpdateCursor ();
-            }
+            SetFocus ();
+            App?.Navigation?.SetFocused (Focused);
+        }
+        else
+        {
+            App?.Popovers?.Hide ();
         }
 
         // CWP Phase 3: Post-notification (work already done by Application)

@@ -106,16 +106,17 @@ public partial class View
         Rune hotkeySpec = HotKeySpecifier == (Rune)0xffff ? (Rune)'_' : HotKeySpecifier;
         SetAttribute (normalColor);
 
-        foreach (Rune rune in text.EnumerateRunes ())
+        foreach (string grapheme in GraphemeHelper.GetGraphemes (text))
         {
-            if (rune == new Rune (hotkeySpec.Value))
+            // The hotkey specifier is always a single simple character (e.g., '_')
+            if (grapheme.Length == 1 && new Rune (grapheme [0]) == new Rune (hotkeySpec.Value))
             {
                 SetAttribute (hotColor);
 
                 continue;
             }
 
-            AddRune (rune);
+            AddStr (grapheme);
             SetAttribute (normalColor);
         }
     }

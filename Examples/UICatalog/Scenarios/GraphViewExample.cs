@@ -17,15 +17,17 @@ public class GraphViewExample : Scenario
     private CheckBox? _diagCheckBox;
     private CheckBox? _showBorderCheckBox;
     private ViewDiagnosticFlags _viewDiagnostics;
+    private IApplication? _app;
 
     public override void Main ()
     {
-        Application.Init ();
+        ConfigurationManager.Enable (ConfigLocations.All);
+        using IApplication app = Application.Create ();
+        app.Init ();
+        _app = app;
 
-        Window app = new ()
-        {
-            BorderStyle = LineStyle.None
-        };
+        using Window window = new ();
+        window.BorderStyle = LineStyle.None;
 
         _graphs =
         [
@@ -82,7 +84,7 @@ public class GraphViewExample : Scenario
                                    ]
                                   );
 
-        Shortcut? diagShortcut = new ()
+        Shortcut diagShortcut = new ()
         {
             Key = Key.F10,
             CommandView = new CheckBox
@@ -91,7 +93,7 @@ public class GraphViewExample : Scenario
                 CanFocus = false
             }
         };
-        
+
         statusBar.Add (diagShortcut);
         diagShortcut.Accepting += DiagShortcut_Accept;
 
@@ -99,22 +101,22 @@ public class GraphViewExample : Scenario
         _showBorderCheckBox = new ()
         {
             Title = "_Enable Margin, Border, and Padding",
-            CheckedState = CheckState.Checked
+            Value = CheckState.Checked
         };
-        _showBorderCheckBox.CheckedStateChanged += (s, e) => ShowBorder ();
+        _showBorderCheckBox.ValueChanged += (_, _) => ShowBorder ();
 
         _diagCheckBox = new ()
         {
             Title = "_Diagnostics",
-            CheckedState = View.Diagnostics == (ViewDiagnosticFlags.Thickness | ViewDiagnosticFlags.Ruler)
+            Value = View.Diagnostics == (ViewDiagnosticFlags.Thickness | ViewDiagnosticFlags.Ruler)
                                ? CheckState.Checked
                                : CheckState.UnChecked
         };
-        _diagCheckBox.CheckedStateChanged += (s, e) => ToggleDiagnostics ();
+        _diagCheckBox.ValueChanged += (_, _) => ToggleDiagnostics ();
 
         menu.Add (
                   new MenuBarItem (
-                                   "_File",
+                                   Strings.menuFile,
                                    [
                                        new MenuItem
                                        {
@@ -158,7 +160,7 @@ public class GraphViewExample : Scenario
                                        },
                                        new MenuItem
                                        {
-                                           Title = "_Quit",
+                                           Title = Strings.cmdQuit,
                                            Action = Quit
                                        }
                                    ]
@@ -212,33 +214,31 @@ public class GraphViewExample : Scenario
                  );
 
         // Add views in order of visual appearance
-        app.Add (menu, _graphView, frameRight, statusBar);
+        window.Add (menu, _graphView, frameRight, statusBar);
 
         _graphs [_currentGraph++ % _graphs.Length] ();
 
         _viewDiagnostics = View.Diagnostics;
-        Application.Run (app);
+        app.Run (window);
         View.Diagnostics = _viewDiagnostics;
-        app.Dispose ();
-        Application.Shutdown ();
     }
 
     private void DiagShortcut_Accept (object? sender, CommandEventArgs e)
     {
         ToggleDiagnostics ();
 
-        if (sender is Shortcut shortcut && shortcut.CommandView is CheckBox checkBox)
+        if (sender is Shortcut { CommandView: CheckBox checkBox })
         {
-            checkBox.CheckedState = _diagCheckBox?.CheckedState ?? CheckState.UnChecked;
+            checkBox.Value = _diagCheckBox?.Value ?? CheckState.UnChecked;
         }
     }
 
     private void ToggleDiagnostics ()
     {
-        View.Diagnostics = _diagCheckBox?.CheckedState == CheckState.Checked
+        View.Diagnostics = _diagCheckBox?.Value == CheckState.Checked
                                ? ViewDiagnosticFlags.Thickness | ViewDiagnosticFlags.Ruler
                                : ViewDiagnosticFlags.Off;
-        Application.LayoutAndDraw ();
+        _app?.LayoutAndDraw ();
     }
 
     private void Margin (bool left, bool increase)
@@ -305,7 +305,7 @@ public class GraphViewExample : Scenario
 
         _graphView.AxisY.LabelGetter = v => '$' + (v.Value / 1000f).ToString ("N0") + 'k';
 
-        // Do not show x axis labels (bars draw their own labels)
+        // Do not show x-axis labels (bars draw their own labels)
         _graphView.AxisX.Increment = 0;
         _graphView.AxisX.ShowLabelsEvery = 0;
         _graphView.AxisX.Minimum = 0;
@@ -331,7 +331,7 @@ public class GraphViewExample : Scenario
         _graphView.Annotations.Add (legend);
     }
 
-    private void Quit () { Application.RequestStop (); }
+    private void Quit () { _graphView?.App?.RequestStop (); }
 
     private void SetupDisco ()
     {
@@ -354,25 +354,7 @@ public class GraphViewExample : Scenario
         DiscoBarSeries series = new ();
         List<BarSeriesBar> bars = [];
 
-        Func<bool> genSample = () =>
-                               {
-                                   bars.Clear ();
-
-                                   // generate an imaginary sample
-                                   for (var i = 0; i < 31; i++)
-                                   {
-                                       bars.Add (
-                                                 new (null, stiple, r.Next (0, 100))
-                                                );
-                                   }
-
-                                   _graphView?.SetNeedsDraw ();
-
-                                   // while the equaliser is showing
-                                   return _graphView is { } && _graphView.Series.Contains (series);
-                               };
-
-        Application.AddTimeout (TimeSpan.FromMilliseconds (250), genSample);
+        _app?.AddTimeout (TimeSpan.FromMilliseconds (250), GenSample);
 
         series.Bars = bars;
 
@@ -387,6 +369,24 @@ public class GraphViewExample : Scenario
         _graphView.AxisY.Visible = false;
 
         _graphView.SetNeedsDraw ();
+
+        return;
+
+        bool GenSample ()
+        {
+            bars.Clear ();
+
+            // generate an imaginary sample
+            for (var i = 0; i < 31; i++)
+            {
+                bars.Add (new (string.Empty, stiple, r.Next (0, 100)));
+            }
+
+            _graphView?.SetNeedsDraw ();
+
+            // while the equaliser is showing
+            return _graphView is { } && _graphView.Series.Contains (series);
+        }
     }
 
     private void SetupLifeExpectancyBarGraph (bool verticalBars)
@@ -438,7 +438,7 @@ public class GraphViewExample : Scenario
             // How much graph space each cell of the console depicts
             _graphView.CellSize = new (0.1f, 0.25f);
 
-            // No axis marks since Bar will add it's own categorical marks
+            // No axis marks since Bar will add its own categorical marks
             _graphView.AxisX.Increment = 0f;
             _graphView.AxisX.Text = "Country";
             _graphView.AxisX.Minimum = 0;
@@ -463,7 +463,7 @@ public class GraphViewExample : Scenario
             // How much graph space each cell of the console depicts
             _graphView.CellSize = new (0.1f, 1f);
 
-            // No axis marks since Bar will add it's own categorical marks
+            // No axis marks since Bar will add its own categorical marks
             _graphView.AxisY.Increment = 0f;
             _graphView.AxisY.ShowLabelsEvery = 1;
             _graphView.AxisY.Text = "Country";
@@ -571,10 +571,7 @@ public class GraphViewExample : Scenario
                                     new TextAnnotation
                                     {
                                         Text = "(Max)",
-                                        GraphPosition = new (
-                                                             max.X + 2 * _graphView.CellSize.X,
-                                                             max.Y
-                                                            )
+                                        GraphPosition = max with { X = max.X + 2 * _graphView.CellSize.X }
                                     }
                                    );
 
@@ -757,7 +754,7 @@ public class GraphViewExample : Scenario
         // How much graph space each cell of the console depicts
         _graphView.CellSize = new (100_000, 1);
 
-        //center the x axis in middle of screen to show both sides
+        //center the x-axis in middle of screen to show both sides
         _graphView.ScrollOffset = new (-3_000_000, 0);
 
         _graphView.AxisX.Text = "Number Of People";
@@ -875,10 +872,11 @@ public class GraphViewExample : Scenario
         _about.Text = "This graph shows a sine wave";
 
         ScatterSeries points = new ();
-        PathAnnotation line = new ();
-
-        // Draw line first so it does not draw over top of points or axis labels
-        line.BeforeSeries = true;
+        PathAnnotation line = new ()
+        {
+            // Draw line first so it does not draw over top of points or axis labels
+            BeforeSeries = true
+        };
 
         // Generate line graph with 2,000 points
         for (float x = -500; x < 500; x += 0.5f)
@@ -920,7 +918,7 @@ public class GraphViewExample : Scenario
             return;
         }
 
-        if (_showBorderCheckBox?.CheckedState == CheckState.Checked)
+        if (_showBorderCheckBox?.Value == CheckState.Checked)
         {
             _graphView.BorderStyle = LineStyle.Single;
             _graphView.Border!.Thickness = _thickness;
@@ -955,20 +953,11 @@ public class GraphViewExample : Scenario
 
     private sealed class DiscoBarSeries : BarSeries
     {
-        private readonly Attribute _brightgreen;
-        private readonly Attribute _brightred;
-        private readonly Attribute _brightyellow;
-        private readonly Attribute _green;
-        private readonly Attribute _red;
-
-        public DiscoBarSeries ()
-        {
-            _green = new (Color.BrightGreen, Color.Black);
-            _brightgreen = new (Color.Green, Color.Black);
-            _brightyellow = new (Color.BrightYellow, Color.Black);
-            _red = new (Color.Red, Color.Black);
-            _brightred = new (Color.BrightRed, Color.Black);
-        }
+        private readonly Attribute _brightGreen = new (Color.Green, Color.Black);
+        private readonly Attribute _brightRed = new (Color.BrightRed, Color.Black);
+        private readonly Attribute _brightYellow = new (Color.BrightYellow, Color.Black);
+        private readonly Attribute _green = new (Color.BrightGreen, Color.Black);
+        private readonly Attribute _red = new (Color.Red, Color.Black);
 
         protected override void DrawBarLine (GraphView graph, Point start, Point end, BarSeriesBar beingDrawn)
         {
@@ -976,14 +965,14 @@ public class GraphViewExample : Scenario
 
             for (int y = end.Y; y <= start.Y; y++)
             {
-                float height = graph.ScreenToGraphSpace (x, y).Y;
+                float height = graph.ViewportToGraphSpace (x, y).Y;
 
                 Attribute attr = height switch
                                  {
                                      >= 85 => _red,
-                                     >= 66 => _brightred,
-                                     >= 45 => _brightyellow,
-                                     >= 25 => _brightgreen,
+                                     >= 66 => _brightRed,
+                                     >= 45 => _brightYellow,
+                                     >= 25 => _brightGreen,
                                      _ => _green
                                  };
 

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
-using Xunit.Sdk;
+using Xunit.v3;
 
 namespace UnitTests;
 
@@ -21,8 +21,8 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     /// </summary>
     /// <param name="autoInit">If true, Application.Init will be called Before the test runs.</param>
     /// <param name="forceDriver">
-    ///     Forces the specified driver ("windows", "dotnet", "unix", or "fake") to
-    ///     be used when Application.Init is called. If not specified FakeDriver will be used. Only valid if
+    ///     Forces the specified driver to be used when Application.Init is called. If not specified ANSI Driver will be used.
+    ///     Only valid if
     ///     <paramref name="autoInit"/> is true.
     /// </param>
     public AutoInitShutdownAttribute (
@@ -38,7 +38,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     private readonly string _forceDriver;
     private IDisposable _v2Cleanup;
 
-    public override void After (MethodInfo methodUnderTest)
+    public override void After (MethodInfo methodUnderTest, IXunitTest test)
     {
         Debug.WriteLine ($"After: {methodUnderTest?.Name ?? "Unknown Test"}");
 
@@ -63,6 +63,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 }
 #endif
             }
+
             //catch (Exception e)
             //{
             //    Debug.WriteLine ($"Application.Shutdown threw an exception after the test exited: {e}");
@@ -83,7 +84,7 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
         CM.Disable (true);
     }
 
-    public override void Before (MethodInfo methodUnderTest)
+    public override void Before (MethodInfo methodUnderTest, IXunitTest test)
     {
         Debug.WriteLine ($"Before: {methodUnderTest?.Name ?? "Unknown Test"}");
 
@@ -109,15 +110,15 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
                 View.Instances.Clear ();
             }
 #endif
-            if (string.IsNullOrEmpty (_forceDriver) || _forceDriver.ToLowerInvariant () == "fake")
+            if (string.IsNullOrEmpty (_forceDriver) || _forceDriver.ToLowerInvariant () == DriverRegistry.Names.ANSI)
             {
                 var fa = new FakeApplicationFactory ();
                 _v2Cleanup = fa.SetupFakeApplication ();
-
             }
             else
             {
                 Assert.Fail ("Specifying driver name not yet supported");
+
                 //Application.Init ((IDriver)Activator.CreateInstance (_forceDriver));
             }
         }
@@ -126,11 +127,11 @@ public class AutoInitShutdownAttribute : BeforeAfterTestAttribute
     private bool _autoInit { get; }
 
     /// <summary>
-    /// Runs a single iteration of the main loop (layout, draw, run timed events etc.)
+    ///     Runs a single iteration of the main loop (layout, draw, run timed events etc.)
     /// </summary>
     public static void RunIteration ()
     {
-        ApplicationImpl a = (ApplicationImpl)ApplicationImpl.Instance;
+        var a = (ApplicationImpl)ApplicationImpl.Instance;
         a.Coordinator?.RunIteration ();
     }
 }

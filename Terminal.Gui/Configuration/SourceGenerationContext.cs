@@ -26,6 +26,7 @@ namespace Terminal.Gui.Configuration;
 [JsonSerializable (typeof (ShadowStyle))]
 [JsonSerializable (typeof (MouseState))]
 [JsonSerializable (typeof (TextStyle))]
+[JsonSerializable (typeof (CursorStyle))]
 [JsonSerializable (typeof (Dictionary<ColorName16, string>))]
 [JsonSerializable (typeof (Dictionary<string, Color>))]
 
@@ -42,6 +43,8 @@ namespace Terminal.Gui.Configuration;
 [JsonSerializable (typeof (Scope<SettingsScope>))]
 [JsonSerializable (typeof (ConcurrentDictionary<string, ThemeScope>))]
 [JsonSerializable (typeof (Dictionary<string, Scheme>))]
+
+[JsonSerializable (typeof (TraceCategory))]
 
 internal partial class SourceGenerationContext : JsonSerializerContext
 { }

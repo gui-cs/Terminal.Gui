@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace ViewsTests;
 
@@ -10,7 +9,7 @@ public class AllViewsDrawTests (ITestOutputHelper output) : TestsAllViews
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Draw_Does_Not_Layout (Type viewType)
     {
-        IDriver driver = CreateFakeDriver ();
+        IDriver driver = CreateTestDriver ();
 
         View? view = CreateInstanceIfNotGeneric (viewType);
 

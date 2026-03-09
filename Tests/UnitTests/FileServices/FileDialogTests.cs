@@ -1,7 +1,5 @@
 using System.IO.Abstractions.TestingHelpers;
 using System.Runtime.InteropServices;
-using UnitTests;
-using Xunit.Abstractions;
 
 namespace UnitTests.FileServicesTests;
 
@@ -35,7 +33,7 @@ public class FileDialogTests ()
         FileDialog dlg = GetInitializedFileDialog ();
         TextField tf = dlg.SubViews.OfType<TextField> ().First (t => t.HasFocus);
         tf.ClearAllSelection ();
-        tf.CursorPosition = tf.Text.Length;
+        tf.InsertionPoint = tf.Text.Length;
         Assert.True (tf.HasFocus);
 
         SendSlash ();
@@ -107,7 +105,7 @@ public class FileDialogTests ()
         Assert.IsType<TextField> (dlg.MostFocused);
         Assert.Same (tf, dlg.MostFocused);
 
-        Assert.Equal ("_Find", tf.Title);
+        Assert.Equal (Strings.cmdFind, tf.Title);
 
         // Dialog has not yet been confirmed with a choice
         Assert.True (dlg.Canceled);
@@ -185,7 +183,6 @@ public class FileDialogTests ()
         IReadOnlyCollection<string> eventMultiSelected = null;
         dlg.FilesSelected += (s, e) => { eventMultiSelected = e.Dialog.MultiSelected; };
 
-
         var tv = GetTableView (dlg);
         tv.SetFocus ();
 
@@ -206,7 +203,7 @@ public class FileDialogTests ()
         }
         else
         {
-            Application.RaiseKeyDownEvent ('O');
+            Application.RaiseKeyDownEvent (Key.O.WithAlt);
         }
 
         Assert.False (dlg.Canceled);
@@ -739,7 +736,7 @@ public class FileDialogTests ()
                 ForceFocus (tb);
 
                 tb.Text = "/bob/fish";
-                tb.CursorPosition = tb.Text.Length;
+                tb.InsertionPoint = tb.Text.Length;
                 tb.GenerateSuggestions (null, "fish", "fishes");
 
                 // should not report success for autocompletion because we already have that exact
@@ -754,7 +751,7 @@ public class FileDialogTests ()
                 ForceFocus (tb);
 
                 tb.Text = @"/bob/fi";
-                tb.CursorPosition = tb.Text.Length;
+                tb.InsertionPoint = tb.Text.Length;
                 tb.GenerateSuggestions (null, "fish", "fishes");
 
                 Assert.True (tb.AcceptSelectionIfAny ());

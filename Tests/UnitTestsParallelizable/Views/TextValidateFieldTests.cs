@@ -3,7 +3,7 @@ using UnitTests;
 
 namespace ViewsTests;
 
-public class TextValidateField_NET_Provider_Tests : FakeDriverBase
+public class TextValidateField_NET_Provider_Tests : TestDriverBase
 {
     [Fact]
     public void Backspace_Key_Deletes_Previous_Character ()
@@ -322,7 +322,7 @@ public class TextValidateField_NET_Provider_Tests : FakeDriverBase
         Assert.False (field.IsValid);
         Assert.Equal ("--(1   )--", field.Provider.Text);
 
-        field.NewMouseEvent (new MouseEventArgs { Position = new (25, 0), Flags = MouseFlags.Button1Pressed });
+        field.NewMouseEvent (new Mouse { Position = new Point (25, 0), Flags = MouseFlags.LeftButtonPressed });
 
         field.NewKeyDownEvent (Key.D1);
 
@@ -336,10 +336,7 @@ public class TextValidateField_NET_Provider_Tests : FakeDriverBase
     {
         var wasTextChanged = false;
 
-        var field = new TextValidateField
-        {
-            TextAlignment = Alignment.Start, Width = 30, Provider = new NetMaskedTextProvider ("--(0000)--")
-        };
+        var field = new TextValidateField { TextAlignment = Alignment.Start, Width = 30, Provider = new NetMaskedTextProvider ("--(0000)--") };
 
         field.Provider.TextChanged += (sender, e) => wasTextChanged = true;
 
@@ -426,16 +423,13 @@ public class TextValidateField_NET_Provider_Tests : FakeDriverBase
     }
 }
 
-public class TextValidateField_Regex_Provider_Tests : FakeDriverBase
+public class TextValidateField_Regex_Provider_Tests : TestDriverBase
 {
     [Fact]
     public void End_Key_End_Of_Input ()
     {
         // Exactly 5 numbers
-        var field = new TextValidateField
-        {
-            Width = 20, Provider = new TextRegexProvider ("^[0-9]{5}$") { ValidateOnInput = false }
-        };
+        var field = new TextValidateField { Width = 20, Provider = new TextRegexProvider ("^[0-9]{5}$") { ValidateOnInput = false } };
 
         for (var i = 0; i < 4; i++)
         {
@@ -513,10 +507,7 @@ public class TextValidateField_Regex_Provider_Tests : FakeDriverBase
     [Fact]
     public void Input_Without_Validate_On_Input ()
     {
-        var field = new TextValidateField
-        {
-            Width = 20, Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }
-        };
+        var field = new TextValidateField { Width = 20, Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false } };
 
         field.NewKeyDownEvent (Key.D1);
         Assert.Equal ("1", field.Text);
@@ -540,9 +531,7 @@ public class TextValidateField_Regex_Provider_Tests : FakeDriverBase
     {
         var field = new TextValidateField
         {
-            TextAlignment = Alignment.Center,
-            Width = 20,
-            Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }
+            TextAlignment = Alignment.Center, Width = 20, Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }
         };
 
         field.Text = "123";
@@ -596,9 +585,7 @@ public class TextValidateField_Regex_Provider_Tests : FakeDriverBase
 
         var field = new TextValidateField
         {
-            TextAlignment = Alignment.Center,
-            Width = 20,
-            Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }
+            TextAlignment = Alignment.Center, Width = 20, Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }
         };
 
         field.Provider.TextChanged += (sender, e) => wasTextChanged = true;
@@ -616,9 +603,7 @@ public class TextValidateField_Regex_Provider_Tests : FakeDriverBase
     {
         var field = new TextValidateField
         {
-            TextAlignment = Alignment.Center,
-            Width = 20,
-            Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }
+            TextAlignment = Alignment.Center, Width = 20, Provider = new TextRegexProvider ("^[0-9][0-9][0-9]$") { ValidateOnInput = false }
         };
 
         field.Text = "123";
@@ -653,5 +638,15 @@ public class TextValidateField_Regex_Provider_Tests : FakeDriverBase
         field.Text = text;
 
         Assert.False (field.IsValid);
+    }
+
+    // Claude - Opus 4.5
+    [Fact]
+    public void Text_Polymorphism_Works ()
+    {
+        // Test that TextValidateField.Text works correctly when accessed via View base class
+        var field = new TextValidateField { Provider = new NetMaskedTextProvider ("0000") { Text = "1234" } };
+        Assert.Equal ("1234", field.Text);
+        Assert.Equal ("1234", field.Text); // Should be same due to polymorphism
     }
 }

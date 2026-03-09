@@ -1,10 +1,9 @@
 #nullable enable
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace ViewBaseTests.Drawing;
 
-public class ViewDrawingFlowTests () : FakeDriverBase
+public class ViewDrawingFlowTests () : TestDriverBase
 {
     
     #region Draw Visibility Tests
@@ -12,7 +11,7 @@ public class ViewDrawingFlowTests () : FakeDriverBase
     [Fact]
     public void Draw_NotVisible_DoesNotDraw ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
 
         var view = new View
         {
@@ -36,7 +35,7 @@ public class ViewDrawingFlowTests () : FakeDriverBase
     [Fact]
     public void Draw_SuperViewNotVisible_DoesNotDraw ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
 
         var parent = new View
         {
@@ -62,7 +61,7 @@ public class ViewDrawingFlowTests () : FakeDriverBase
     [Fact]
     public void Draw_Enabled_False_UsesDisabledAttribute ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         bool drawingTextCalled = false;
@@ -102,7 +101,7 @@ public class ViewDrawingFlowTests () : FakeDriverBase
     [Fact]
     public void Draw_CallsMethodsInCorrectOrder ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var callOrder = new List<string> ();
@@ -138,7 +137,7 @@ public class ViewDrawingFlowTests () : FakeDriverBase
     [Fact]
     public void Draw_WithSubViews_DrawsInReverseOrder ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var drawOrder = new List<string> ();
@@ -181,7 +180,7 @@ public class ViewDrawingFlowTests () : FakeDriverBase
     [Fact]
     public void Draw_WithContext_PassesContext ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         DrawContext? receivedContext = null;
@@ -214,7 +213,7 @@ public class ViewDrawingFlowTests () : FakeDriverBase
     [Fact]
     public void Draw_WithoutContext_CreatesContext ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         DrawContext? receivedContext = null;
@@ -249,7 +248,7 @@ public class ViewDrawingFlowTests () : FakeDriverBase
     [Fact]
     public void ClearingViewport_CanCancel ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -277,7 +276,7 @@ public class ViewDrawingFlowTests () : FakeDriverBase
     [Fact]
     public void DrawingText_CanCancel ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var view = new View
@@ -306,7 +305,7 @@ public class ViewDrawingFlowTests () : FakeDriverBase
     [Fact]
     public void DrawingSubViews_CanCancel ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         var parent = new TestView
@@ -336,7 +335,7 @@ public class ViewDrawingFlowTests () : FakeDriverBase
     [Fact]
     public void DrawComplete_AlwaysCalled ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         bool drawCompleteCalled = false;
@@ -367,7 +366,7 @@ public class ViewDrawingFlowTests () : FakeDriverBase
     [Fact]
     public void Draw_TransparentView_DoesNotClearViewport ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         driver.Clip = new Region (driver.Screen);
 
         bool clearedViewport = false;
@@ -395,7 +394,7 @@ public class ViewDrawingFlowTests () : FakeDriverBase
     [Fact]
     public void Draw_TransparentView_ExcludesDrawnRegionFromClip ()
     {
-        IDriver driver = CreateFakeDriver (80, 25);
+        IDriver driver = CreateTestDriver (80, 25);
         var initialClip = new Region (driver.Screen);
         driver.Clip = initialClip;
 
