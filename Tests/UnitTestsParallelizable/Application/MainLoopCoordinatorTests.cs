@@ -218,36 +218,38 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
     [Fact]
     public async Task StartInputTaskAsync_EnablesAndDisablesKittyKeyboard_WhenTerminalResponds ()
     {
-        TestLogging.Verbose (outputHelper);
+        using (TestLogging.Verbose (outputHelper))
+        {
+            ConcurrentQueue<char> inputQueue = new ();
+            TimedEvents timedEvents = new ();
+            ApplicationMainLoop<char> loop = new ();
+            TestAnsiInput input = new ("\u001B[?31u");
+            AnsiOutput output = new ();
+            TestAnsiComponentFactory factory = new (input, output);
+            MainLoopCoordinator<char> coordinator = new (timedEvents, inputQueue, loop, factory);
+            Mock<IApplication> appMock = new ();
 
-        Terminal.Gui.Tracing.Trace.EnabledCategories = TraceCategory.Lifecycle;
+            appMock.SetupProperty (a => a.Driver);
+            appMock.SetupProperty (a => a.MainThreadId, 123);
 
-        ConcurrentQueue<char> inputQueue = new ();
-        TimedEvents timedEvents = new ();
-        ApplicationMainLoop<char> loop = new ();
-        TestAnsiInput input = new ("\u001B[?31u");
-        AnsiOutput output = new ();
-        TestAnsiComponentFactory factory = new (input, output);
-        MainLoopCoordinator<char> coordinator = new (timedEvents, inputQueue, loop, factory);
-        Mock<IApplication> appMock = new ();
+            await coordinator.StartInputTaskAsync (appMock.Object);
 
-        appMock.SetupProperty (a => a.Driver);
-        appMock.SetupProperty (a => a.MainThreadId, 123);
+            Assert.True (SpinWait.SpinUntil (() => input.ResponseSent, TimeSpan.FromSeconds (1)));
+            loop.InputProcessor.ProcessQueue ();
 
-        await coordinator.StartInputTaskAsync (appMock.Object);
+            var driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
+            Assert.True (driver.KittyKeyboardProtocol.IsSupported);
+            Assert.Equal (31, driver.KittyKeyboardProtocol.SupportedFlags);
+            Assert.Equal (EscSeqUtils.KittyKeyboardPhase1Flags, driver.KittyKeyboardProtocol.EnabledFlags);
 
-        Assert.True (SpinWait.SpinUntil (() => input.ResponseSent, TimeSpan.FromSeconds (1)));
-        loop.InputProcessor.ProcessQueue ();
+            Assert.Contains (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardPhase1Flags),
+                             output.GetLastOutput (),
+                             StringComparison.Ordinal);
 
-        var driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
-        Assert.True (driver.KittyKeyboardProtocol.IsSupported);
-        Assert.Equal (31, driver.KittyKeyboardProtocol.SupportedFlags);
-        Assert.Equal (EscSeqUtils.KittyKeyboardPhase1Flags, driver.KittyKeyboardProtocol.EnabledFlags);
-        Assert.Contains (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardPhase1Flags), output.GetLastOutput (), StringComparison.Ordinal);
+            coordinator.Stop ();
 
-        coordinator.Stop ();
-
-        Assert.Contains (EscSeqUtils.CSI_DisableKittyKeyboardFlags, output.GetLastOutput (), StringComparison.Ordinal);
+            Assert.Contains (EscSeqUtils.CSI_DisableKittyKeyboardFlags, output.GetLastOutput (), StringComparison.Ordinal);
+        }
     }
 
     [Fact]
