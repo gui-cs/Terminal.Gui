@@ -352,6 +352,12 @@ public interface IDriver : IDisposable
     /// <summary>Event fired when a key is pressed down.</summary>
     event EventHandler<Key>? KeyDown;
 
+    /// <summary>
+    ///     Event fired when a key is released. Only raised when the driver provides key release information.
+    ///     Not all drivers support key-up events.
+    /// </summary>
+    event EventHandler<Key>? KeyUp;
+
     /// <summary>Event fired when a mouse event occurs.</summary>
     event EventHandler<Mouse>? MouseEvent;
 

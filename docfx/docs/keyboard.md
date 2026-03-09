@@ -25,9 +25,12 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 *Terminal.Gui* provides the following APIs for handling keyboard input:
 
-* **Key** - <xref:Terminal.Gui.Input.Key> provides a platform-independent abstraction for common keyboard operations. It is used for processing keyboard input and raising keyboard events. This class provides a high-level abstraction with helper methods and properties for common keyboard operations. Use this class instead of the low-level `KeyCode` enum when possible.
+* **Key** - <xref:Terminal.Gui.Input.Key> provides a platform-independent abstraction for common keyboard operations. It is used for processing keyboard input and raising keyboard events. This class provides a high-level abstraction with helper methods and properties for common keyboard operations. Use this class instead of the low-level `KeyCode` enum when possible. `Key` also carries rich metadata:
+  - `EventType` — `KeyEventType.Press` (default), `KeyEventType.Repeat`, or `KeyEventType.Release`. Defaults to `Press` so existing code is unaffected. Does not participate in equality.
+  - `ModifierKey` — identifies standalone modifier key events (e.g. `ModifierKey.LeftShift`, `ModifierKey.RightCtrl`). Defaults to `ModifierKey.None`.
+  - `IsModifierOnly` — `true` when `ModifierKey != ModifierKey.None`, indicating a standalone modifier key press/release with no accompanying character key.
 * **Key Bindings** - Key Bindings provide a declarative method for handling keyboard input in <xref:Terminal.Gui.ViewBase.View> implementations. The View calls `AddCommand()`(Terminal.Gui.Command,System.Func{System.Nullable{System.Boolean}}) to declare it supports a particular command and then uses <xref:Terminal.Gui.Input.KeyBindings> to indicate which key presses will invoke the command.
-* **Key Events** - The Key Bindings API is rich enough to support the vast majority of use-cases. However, in some cases subscribing directly to key events is needed (e.g. when capturing arbitrary typing by a user). Use `KeyDown` and related events in these cases.
+* **Key Events** - The Key Bindings API is rich enough to support the vast majority of use-cases. However, in some cases subscribing directly to key events is needed (e.g. when capturing arbitrary typing by a user). Use `KeyDown` and `KeyUp` events in these cases.
 
 Each of these APIs are described more fully below.
 
@@ -91,12 +94,14 @@ The <xref:Terminal.Gui.Input.Command> can be invoked even if the <xref:Terminal.
 
 ### **Key Events**
 
-Keyboard events are retrieved from [Drivers](drivers.md) each iteration of the [Application](~/api/Terminal.Gui.App.Application.yml) [Main Loop](multitasking.md). The driver raises the `IDriver.KeyDown` event which invokes <xref:Terminal.Gui.App.Application.RaiseKeyDownEvent(Terminal.Gui.Input.Key)> respectively.
-
-> [!NOTE]
-> Most drivers/platforms do not support sensing distinct KeyUp events, therefore Terminal.Gui does not support them.
+Keyboard events are retrieved from [Drivers](drivers.md) each iteration of the [Application](~/api/Terminal.Gui.App.Application.yml) [Main Loop](multitasking.md). The driver raises `IDriver.KeyDown` for press/repeat events and `IDriver.KeyUp` for release events.
 
 <xref:Terminal.Gui.App.Application.RaiseKeyDownEvent(Terminal.Gui.Input.Key)> raises `Application.KeyDown` and then calls `NewKeyDownEvent()` on all runnable <xref:Terminal.Gui.ViewBase.View>s. If no <xref:Terminal.Gui.ViewBase.View> handles the key event, any Application-scoped key bindings will be invoked. Application-scoped key bindings are managed through `Application.Keyboard.KeyBindings`.
+
+`Application.Keyboard.KeyUp` fires for key release events. It routes through the focused view hierarchy via `View.NewKeyUpEvent()` → `View.OnKeyUp()` → `View.KeyUp`. Key bindings are not invoked for key-up events.
+
+> [!NOTE]
+> `KeyUp` events are only raised when the driver provides release information. The ANSI driver reports key releases when the terminal supports the [kitty keyboard protocol](https://sw.kovidgoyal.net/kitty/keyboard-protocol/) with event type reporting (flag 2). Terminals that do not support kitty, or drivers that do not implement key-up (e.g. Windows, DotNet), simply never raise `KeyUp`.
 
 If a view is enabled, the `NewKeyDownEvent()` method will do the following:
 
@@ -112,12 +117,17 @@ To define application key handling logic for an entire application in cases wher
 
 ## **Key Down/Up Events**
 
-*Terminal.Gui* supports key down events only via `OnKeyDown()`.
+*Terminal.Gui* supports both key down and key up events:
+
+- `KeyDown` — raised for press and repeat events. This is the primary keyboard event used by most code.
+- `KeyUp` — raised for release events. Only available when the driver supports it (currently the ANSI driver with kitty keyboard protocol).
+
+Both events carry a <xref:Terminal.Gui.Input.Key> whose `EventType` property indicates `Press`, `Repeat`, or `Release`. The `EventType` defaults to `Press` and does not affect equality, so existing code that compares keys is unaffected.
 
 # General input model
 
-- Key Down and Up events are generated by the driver.
-- <xref:Terminal.Gui.App.IApplication> implementations subscribe to driver KeyDown/Up events and forwards them to the most-focused `Runnable` view using `View.NewKeyDownEvent`.
+- The driver generates `KeyDown` events (for press and repeat) and `KeyUp` events (for release, when supported).
+- <xref:Terminal.Gui.App.IApplication> implementations subscribe to driver `KeyDown`/`KeyUp` events and forward them to the most-focused `Runnable` view using `View.NewKeyDownEvent` or `View.NewKeyUpEvent` respectively.
 - The base (<xref:Terminal.Gui.ViewBase.View>) implementation of `NewKeyDownEvent` follows a pattern of "Before", "During", and "After" processing:
   - **Before**
     - If `Enabled == false` that view should *never* see keyboard (or mouse input).
@@ -226,7 +236,7 @@ The `Keyboard` class implements <xref:Terminal.Gui.App.IKeyboard> and maintains:
 
 - **KeyBindings**: Application-scoped key binding dictionary
 - **Navigation Keys**: QuitKey, ArrangeKey, NextTabKey, PrevTabKey, NextTabGroupKey, PrevTabGroupKey
-- **Events**: KeyDown event for application-level keyboard monitoring
+- **Events**: `KeyDown` and `KeyUp` events for application-level keyboard monitoring
 - **Command Implementations**: Handlers for Application-scoped commands (Quit, Suspend, Navigation, Refresh, Arrange)
 
 The <xref:Terminal.Gui.App.IApplication> implementations create and manage the <xref:Terminal.Gui.App.IKeyboard> instance, setting its `IApplication` property to `this` to provide the necessary <xref:Terminal.Gui.App.IApplication> reference.

@@ -65,7 +65,17 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         // Enable keyboard handling
         Parser.HandleKeyboard = true;
 
-        Parser.Keyboard += (_, keyEvent) => { RaiseKeyDownEvent (keyEvent); };
+        Parser.Keyboard += (_, keyEvent) =>
+                           {
+                               if (keyEvent.EventType == KeyEventType.Release)
+                               {
+                                   RaiseKeyUpEvent (keyEvent);
+                               }
+                               else
+                               {
+                                   RaiseKeyDownEvent (keyEvent);
+                               }
+                           };
 
         // Configure unexpected response handler
         Parser.UnexpectedResponseHandler = str =>
@@ -236,6 +246,12 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
 
     /// <inheritdoc/>
     public void RaiseKeyDownEvent (Key a) => KeyDown?.Invoke (this, a);
+
+    /// <inheritdoc/>
+    public event EventHandler<Key>? KeyUp;
+
+    /// <inheritdoc/>
+    public void RaiseKeyUpEvent (Key a) => KeyUp?.Invoke (this, a);
 
     /// <inheritdoc/>
     public virtual void InjectKeyDownEvent (Key key)

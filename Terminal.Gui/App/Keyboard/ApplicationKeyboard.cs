@@ -146,6 +146,48 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
     public event EventHandler<Key>? KeyDown;
 
     /// <inheritdoc/>
+    public event EventHandler<Key>? KeyUp;
+
+    /// <inheritdoc/>
+    public bool RaiseKeyUpEvent (Key key)
+    {
+        KeyUp?.Invoke (this, key);
+
+        if (key.Handled)
+        {
+            return true;
+        }
+
+        if (App?.TopRunnableView is null)
+        {
+            if (App?.SessionStack is { })
+            {
+                foreach (IRunnable? runnable in App.SessionStack.Select (r => r.Runnable))
+                {
+                    if (runnable is View view && view.NewKeyUpEvent (key))
+                    {
+                        return true;
+                    }
+
+                    if (runnable!.IsModal)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+        else
+        {
+            if (App.TopRunnableView.NewKeyUpEvent (key))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc/>
     public bool RaiseKeyDownEvent (Key key)
     {
         Trace.Keyboard ("app", key, "Entry");

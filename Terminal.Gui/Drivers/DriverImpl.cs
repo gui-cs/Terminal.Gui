@@ -48,6 +48,7 @@ internal class DriverImpl : IDriver
         _componentFactory = componentFactory;
         _inputProcessor = inputProcessor;
         _inputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
+        _inputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
         _inputProcessor.SyntheticMouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
         _outputBuffer = outputBuffer;
         _output = output;
@@ -375,6 +376,9 @@ internal class DriverImpl : IDriver
 
     /// <summary>Event fired when a key is pressed down.</summary>
     public event EventHandler<Key>? KeyDown;
+
+    /// <summary>Event fired when a key is released.</summary>
+    public event EventHandler<Key>? KeyUp;
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     public event EventHandler<Mouse>? MouseEvent;

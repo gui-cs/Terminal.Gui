@@ -901,14 +901,22 @@ public static class EscSeqUtils
     public static readonly AnsiEscapeSequence CSI_QueryKittyKeyboardFlags = new () { Request = CSI + "?u", Terminator = "u", Value = "?" };
 
     /// <summary>
-    ///     Phase 1 enables only kitty's disambiguate escape codes flag.
+    ///     Kitty keyboard flag: disambiguate escape codes (flag 0b1).
+    ///     Encodes keys unambiguously as CSI u sequences instead of legacy escape sequences.
     /// </summary>
     public const int KittyKeyboardDisambiguateEscapeCodes = 1;
 
     /// <summary>
-    ///     The kitty keyboard flags enabled during phase 1.
+    ///     Kitty keyboard flag: report event types — press, repeat, release (flag 0b10).
+    ///     Enables the terminal to report key release and repeat events in addition to key press.
     /// </summary>
-    public const int KittyKeyboardPhase1Flags = KittyKeyboardDisambiguateEscapeCodes;
+    public const int KittyKeyboardReportEventTypes = 2;
+
+    /// <summary>
+    ///     The kitty keyboard flags that Terminal.Gui requests when kitty keyboard protocol is supported.
+    ///     Currently: disambiguate escape codes + report event types.
+    /// </summary>
+    public const int KittyKeyboardRequestedFlags = KittyKeyboardDisambiguateEscapeCodes | KittyKeyboardReportEventTypes;
 
     /// <summary>
     ///     ESC [ &gt; flags u - Push current kitty keyboard flags and enable the specified flags.

@@ -62,7 +62,7 @@ public class KittyKeyboardProtocolDetector
                       response =>
                       {
                           KittyKeyboardProtocolResult result = ParseResponse (response);
-                          result.EnabledFlags = result.IsSupported ? EscSeqUtils.KittyKeyboardPhase1Flags : 0;
+                          result.EnabledFlags = result.IsSupported ? EscSeqUtils.KittyKeyboardRequestedFlags : 0;
                           Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector),
                                            "Detect",
                                            $"Kitty keyboard response '{response}' => Supported={result.IsSupported}, SupportedFlags={result.SupportedFlags}, EnabledFlags={result.EnabledFlags}");

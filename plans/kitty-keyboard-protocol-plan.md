@@ -117,7 +117,11 @@ This likely implies coordinated changes across:
 
 ### Phase 3: Full end-to-end adoption
 
-Once the richer model exists, update the kitty parser and driver plumbing to populate it fully, then bring other drivers into parity where feasible.
+Once the richer model exists, update the kitty parser and driver plumbing to populate it fully.
+
+### Phase 4: Other driver parity (optional)
+
+Bring other drivers (Windows, etc.) into parity where feasible. This is independent of the kitty work and can be done at any time after Phase 2.
 
 This sequencing keeps phase 1 shippable while avoiding the false assumption that lossy mapping is the intended end state.
 
@@ -364,7 +368,7 @@ Diagnostic guidance while building these tests:
 
 ## Phase 2: Rich Keyboard Event Model
 
-Status: In Progress (branch: `feature/kitty-phase2`)
+Status: Completed (branch: `feature/kitty-phase2`)
 
 ### Goal
 
@@ -380,39 +384,42 @@ Revise `Key` and the keyboard event pipeline so Terminal.Gui can preserve richer
 - Existing `KeyDown`-based application code must continue to work without modification
 - The richer model should be additive — new properties/events, not breaking changes to existing ones
 - Phase 2 should not require kitty support to be useful — the model should be driver-agnostic
-- Windows driver already has key-up and repeat info available; the model should accommodate all drivers
+- The model should be designed to accommodate all drivers, but Phase 2 only wires the ANSI/kitty driver; Windows and other drivers are deferred to Phase 4 (optional)
 
 ### Phase 2 Implementation Steps
 
 #### 1. Extend `Key` with event type metadata
 
-Status: Not Started
+Status: Completed
 
-Add an `EventType` property to `Terminal.Gui.Input.Key`:
+Added `KeyEventType` enum (Press=1, Repeat=2, Release=3 — values match kitty protocol) and `ModifierKey` enum for standalone modifier identity.
 
-- `KeyEventType.Press` (default, preserves current behavior)
-- `KeyEventType.Release`
-- `KeyEventType.Repeat`
-
-The property should default to `Press` so all existing code continues to work. The `Key` constructor and equality semantics need review to determine whether event type participates in equality or is metadata-only.
+Extended `Key` with:
+- `EventType` property (init-only, defaults to `KeyEventType.Press`, does NOT participate in equality)
+- `ModifierKey` property (init-only, defaults to `ModifierKey.None`)
+- `IsModifierOnly` computed property (`=> ModifierKey != ModifierKey.None`)
+- Copy constructor preserves both new properties
+- `WithShift`, `WithCtrl`, `WithAlt`, `NoShift` preserve `EventType`
 
 Files:
+- `Terminal.Gui/Input/Keyboard/KeyEventType.cs` (new)
+- `Terminal.Gui/Input/Keyboard/ModifierKey.cs` (new)
 - `Terminal.Gui/Input/Keyboard/Key.cs`
 
 #### 2. Add `KeyUp` event to driver and keyboard pipeline
 
-Status: Not Started
+Status: Completed
 
-Extend `IDriver` with a `KeyUp` event alongside the existing `KeyDown`. Wire through:
-
-- `IKeyboard.KeyUp`
-- `IApplication.KeyUp`
-- `ApplicationImpl` routing
-- Legacy `Application.KeyUp` shim
-
-The `KeyUp` event should fire only when the driver provides release information. Drivers that do not support key-up should simply never raise it.
+Added `KeyUp` event and `RaiseKeyUpEvent` through the full pipeline:
+- `IInputProcessor` → `InputProcessorImpl`: Routes `KeyEventType.Release` to `RaiseKeyUpEvent`, press/repeat to `RaiseKeyDownEvent`
+- `IDriver` → `DriverImpl`: Wires `_inputProcessor.KeyUp` → `KeyUp` event
+- `IKeyboard` → `ApplicationKeyboard`: `RaiseKeyUpEvent` routes through focused view hierarchy (simpler than `KeyDown` — no key binding invocation)
+- `ApplicationImpl.Driver.cs`: Subscribes/unsubscribes `Driver_KeyUp` handler
+- Legacy `Application.KeyUp` static event shim
 
 Files:
+- `Terminal.Gui/Drivers/Input/IInputProcessor.cs`
+- `Terminal.Gui/Drivers/Input/InputProcessorImpl.cs`
 - `Terminal.Gui/Drivers/IDriver.cs`
 - `Terminal.Gui/Drivers/DriverImpl.cs`
 - `Terminal.Gui/App/Keyboard/IKeyboard.cs`
@@ -421,82 +428,106 @@ Files:
 - `Terminal.Gui/App/ApplicationImpl.Driver.cs`
 - `Terminal.Gui/App/Legacy/Application.Keyboard.cs`
 
-#### 3. Surface key-up and repeat from existing drivers
+#### 3. Surface key-up and repeat from the kitty parser
 
-Status: Not Started
+Status: Completed
 
-The Windows driver (`WindowsInput`) already receives `KEY_EVENT_RECORD` with `bKeyDown` and repeat count. Plumb this through the new model so Windows users get key-up events immediately.
+Updated all three ANSI parser patterns to extract event type from the kitty `modifiers:event_type` format:
+- Extracted shared `ApplyModifiersAndEventType(string modifierField, Key key)` helper into `AnsiKeyboardParserPattern` base class — handles modifier decoding and event type parsing for all CSI pattern types
+- `KittyKeyboardPattern`: Refactored to use shared helper, added `_modifierKeyMap` dictionary for standalone modifier key codepoints (57358–57451)
+- `CsiKeyPattern`: Updated regex from `(\d+)` to `(\d+(?::\d+)*)` to accept `1:3` format, replaced inline modifier switch with shared helper
+- `CsiCursorPattern`: Same regex and helper changes as CsiKeyPattern
 
-For the ANSI/kitty driver, the kitty parser already receives event type in the CSI `u` sequence but drops it in phase 1. Update `KittyKeyboardPattern` to populate `Key.EventType` instead of discarding it.
+Also enabled kitty flag 2 (report event types) by adding `KittyKeyboardReportEventTypes = 2` and setting `KittyKeyboardRequestedFlags = KittyKeyboardDisambiguateEscapeCodes | KittyKeyboardReportEventTypes` (value 3).
 
 Files:
-- `Terminal.Gui/Drivers/WindowsDriver/WindowsInput.cs`
+- `Terminal.Gui/Drivers/AnsiHandling/AnsiKeyboardParserPattern.cs`
 - `Terminal.Gui/Drivers/AnsiHandling/KittyKeyboardPattern.cs`
-- `Terminal.Gui/Drivers/AnsiHandling/AnsiKeyboardParser.cs`
+- `Terminal.Gui/Drivers/AnsiHandling/CsiKeyPattern.cs`
+- `Terminal.Gui/Drivers/AnsiHandling/CsiCursorPattern.cs`
+- `Terminal.Gui/Drivers/AnsiHandling/EscSeqUtils/EscSeqUtils.cs`
 
 #### 4. Add standalone modifier key events
 
-Status: Not Started
+Status: Completed
 
-Currently, pressing Shift/Ctrl/Alt alone produces no event. With kitty protocol (and Windows), standalone modifier presses can be reported. Add support for:
+`KittyKeyboardPattern` now recognizes kitty modifier key codepoints (57358–57451) and maps them to `ModifierKey` enum values. The parser returns `new Key { ModifierKey = modifierKey }` for these, with `IsModifierOnly == true`.
 
-- `Key.IsModifierOnly` property or similar to indicate a standalone modifier event
-- Modifier key identity (which modifier was pressed/released)
+Supported: LeftShift, RightShift, LeftCtrl, RightCtrl, LeftAlt, RightAlt, LeftSuper, RightSuper, LeftHyper, RightHyper, CapsLock, NumLock, ScrollLock, and generic Shift/Ctrl/Alt/Super/Hyper.
 
 Files:
-- `Terminal.Gui/Input/Keyboard/Key.cs`
-- `Terminal.Gui/Drivers/AnsiHandling/KittyKeyboardPattern.cs`
+- `Terminal.Gui/Input/Keyboard/ModifierKey.cs` (new — enum definition)
+- `Terminal.Gui/Input/Keyboard/Key.cs` (ModifierKey property, IsModifierOnly)
+- `Terminal.Gui/Drivers/AnsiHandling/KittyKeyboardPattern.cs` (_modifierKeyMap + MapKey)
 
 #### 5. View-level keyboard event updates
 
-Status: Not Started
+Status: Completed
 
-Extend `View` keyboard event surfaces to support `KeyUp`:
-
-- `View.OnKeyUp` virtual method
-- `View.KeyUp` event
-- Routing through the view hierarchy matching `KeyDown` patterns
+Added `NewKeyUpEvent` (internal entry point), virtual `OnKeyUp`, and `KeyUp` event to `View`. Routing mirrors `KeyDown` through the view hierarchy.
 
 Files:
-- `Terminal.Gui/Views/View.Keyboard.cs`
-- `Terminal.Gui/Views/View.cs`
+- `Terminal.Gui/ViewBase/View.Keyboard.cs`
 
 #### 6. Add tests for phase 2 features
 
-Status: Not Started
+Status: Completed
 
-- Unit tests for `Key.EventType` behavior and equality semantics
-- Unit tests for `KeyUp` event routing through driver → keyboard → application → view
-- Integration tests for Windows driver key-up events
-- Integration tests for kitty key-up/repeat parsing
-- Tests for standalone modifier key events
-- Backward compatibility tests ensuring existing `KeyDown`-only code still works
+New test files:
+- `Tests/UnitTestsParallelizable/Input/Keyboard/KeyEventTypeTests.cs` — 16 tests for `EventType`, `ModifierKey`, `IsModifierOnly`, copy constructor preservation, equality semantics
+- `Tests/UnitTestsParallelizable/Drivers/AnsiHandling/KittyKeyboardPhase2Tests.cs` — 28 tests covering event type parsing (CSI u, CSI ~, CSI cursor), standalone modifier key events, edge cases
+
+Updated test files (renamed constants `KittyKeyboardPhase1Flags` → `KittyKeyboardRequestedFlags`):
+- `Tests/UnitTestsParallelizable/Drivers/AnsiHandling/KittyKeyboardProtocolDetectorTests.cs`
+- `Tests/UnitTestsParallelizable/Application/MainLoopCoordinatorTests.cs`
+- `Tests/UnitTestsParallelizable/Drivers/Ansi/AnsiInputOutputTests.cs`
+
+#### 7. Update Keys scenario
+
+Status: Completed
+
+Updated the UICatalog Keys scenario to display Phase 2 capabilities:
+- Added "Last app.Keyboard.KeyUp" label row
+- Added `FormatKeyEvent` helper showing `(press)`, `(repeat)`, `(release)` and `[ModifierKey]` annotations
+- Wired `app.Keyboard.KeyUp` for both label display and event log
 
 Files:
-- `Tests/UnitTestsParallelizable/Input/KeyTests.cs`
-- `Tests/UnitTestsParallelizable/Drivers/AnsiHandling/AnsiKeyboardParserTests.cs`
-- `Tests/UnitTestsParallelizable/Application/MainLoopCoordinatorTests.cs`
+- `Examples/UICatalog/Scenarios/Keys.cs`
 
 ### Phase 2 Success Criteria
 
 - `Key` can represent press, release, and repeat event types
 - `KeyUp` events flow through the full pipeline (driver → keyboard → application → view)
-- Windows driver surfaces key-up and repeat events
 - Kitty parser populates event type instead of discarding it
 - All existing `KeyDown`-based code continues to work without modification
 - Test coverage does not decrease
 
 ## Phase 3: Full Kitty Fidelity
 
+Status: Largely completed in Phase 2
+
+Phase 2 already implemented most of the originally planned Phase 3 work:
+- ✓ Event type (press/repeat/release) flows end-to-end through all three CSI pattern types
+- ✓ Standalone modifier key events are preserved and exposed
+- ✓ Distinct left/right modifier keys are mapped from kitty codepoints
+
+Remaining:
+- Evaluate whether injection APIs need kitty-aware encoding for richer event simulation in tests
+- Consider additional kitty fields (alternate key, associated text) if needed
+
+## Phase 4: Other Driver Parity (Optional)
+
 Status: Not Started
 
-After the richer model exists:
+Extend non-ANSI drivers to surface the rich keyboard event model where the platform already provides the data. This phase is optional and independent of Phases 1–3.
 
-- update `KittyKeyboardPattern` to populate key-down, key-up, and repeat semantics end-to-end
-- preserve standalone modifier-key events
-- preserve distinct modifier keys where kitty exposes them
-- evaluate whether injection APIs need kitty-aware encoding for tests
-- decide whether non-ANSI drivers should expose the same richer model when the platform supports it
+- **Windows driver**: `WindowsInput` already receives `KEY_EVENT_RECORD` with `bKeyDown` and repeat count — plumb these through `Key.EventType` and `KeyUp` events
+- **Other drivers**: evaluate whether any other driver backends have key-up or repeat data available and wire them through the model
+- Ensure cross-driver behavioral consistency for applications that consume `KeyUp`/repeat events
+
+Files:
+- `Terminal.Gui/Drivers/WindowsDriver/WindowsInput.cs`
+- Other driver files as needed
 
 ## Proposed File Changes
 
@@ -516,16 +547,40 @@ After the richer model exists:
 - `Tests/UnitTestsParallelizable/Drivers/AnsiHandling/AnsiKeyboardParserTests.cs`
 - `Tests/UnitTestsParallelizable/Drivers/AnsiDriver/AnsiInputTestableTests.cs`
 
-### Later phases likely modified files
+### Phase 2 new files
+
+- `Terminal.Gui/Input/Keyboard/KeyEventType.cs`
+- `Terminal.Gui/Input/Keyboard/ModifierKey.cs`
+- `Tests/UnitTestsParallelizable/Input/Keyboard/KeyEventTypeTests.cs`
+- `Tests/UnitTestsParallelizable/Drivers/AnsiHandling/KittyKeyboardPhase2Tests.cs`
+
+### Phase 2 modified files
 
 - `Terminal.Gui/Input/Keyboard/Key.cs`
+- `Terminal.Gui/Drivers/Input/IInputProcessor.cs`
+- `Terminal.Gui/Drivers/Input/InputProcessorImpl.cs`
 - `Terminal.Gui/Drivers/IDriver.cs`
+- `Terminal.Gui/Drivers/DriverImpl.cs`
 - `Terminal.Gui/App/Keyboard/IKeyboard.cs`
 - `Terminal.Gui/App/Keyboard/ApplicationKeyboard.cs`
-- `Terminal.Gui/App/IApplication.cs`
 - `Terminal.Gui/App/ApplicationImpl.Driver.cs`
 - `Terminal.Gui/App/Legacy/Application.Keyboard.cs`
-- view keyboard event surfaces and related test helpers
+- `Terminal.Gui/Drivers/AnsiHandling/AnsiKeyboardParserPattern.cs`
+- `Terminal.Gui/Drivers/AnsiHandling/KittyKeyboardPattern.cs`
+- `Terminal.Gui/Drivers/AnsiHandling/CsiKeyPattern.cs`
+- `Terminal.Gui/Drivers/AnsiHandling/CsiCursorPattern.cs`
+- `Terminal.Gui/Drivers/AnsiHandling/EscSeqUtils/EscSeqUtils.cs`
+- `Terminal.Gui/Drivers/AnsiHandling/KittyKeyboardProtocolDetector.cs`
+- `Terminal.Gui/ViewBase/View.Keyboard.cs`
+- `Examples/UICatalog/Scenarios/Keys.cs`
+- `Tests/UnitTestsParallelizable/Drivers/AnsiHandling/KittyKeyboardProtocolDetectorTests.cs`
+- `Tests/UnitTestsParallelizable/Application/MainLoopCoordinatorTests.cs`
+- `Tests/UnitTestsParallelizable/Drivers/Ansi/AnsiInputOutputTests.cs`
+
+### Phase 4 likely modified files (optional)
+
+- `Terminal.Gui/Drivers/WindowsDriver/WindowsInput.cs`
+- other driver files as needed
 
 ## Open Design Choices
 
@@ -608,7 +663,6 @@ Across all phases:
 ## Recommended Delivery Order
 
 1. Land phase 1 capability detection, parser support, startup/shutdown wiring, and compatibility tests.
-2. Introduce a richer internal keyboard event shape if needed to decouple parser fidelity from the current `Key` API.
-3. Revise `Key`, `IKeyboard`, `IApplication`, and related routing to support key-up/repeat/distinct modifiers.
-4. Re-plumb the kitty parser and ANSI driver to populate the richer model end to end.
-5. Expand tests to cover full-fidelity behavior and cross-driver compatibility.
+2. Revise `Key`, `IKeyboard`, `IApplication`, and related routing to support key-up/repeat/distinct modifiers. Wire kitty parser to populate the richer model.
+3. Re-plumb the kitty parser and ANSI driver to populate full kitty fidelity end to end.
+4. (Optional) Extend Windows and other drivers to surface key-up/repeat through the rich model.

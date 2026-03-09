@@ -3,7 +3,6 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Terminal.Gui.Tests;
-using Terminal.Gui.Tracing;
 
 // ReSharper disable AccessToDisposedClosure
 #pragma warning disable xUnit1031
@@ -269,7 +268,7 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
         var driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
         Assert.False (driver.KittyKeyboardProtocol.IsSupported);
 
-        Assert.DoesNotContain (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardPhase1Flags),
+        Assert.DoesNotContain (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardRequestedFlags),
                                output.GetLastOutput (),
                                StringComparison.Ordinal);
 
@@ -287,7 +286,7 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
 
         MainLoopCoordinator<char> c = new (new TimedEvents (), new ConcurrentQueue<char> (), Mock.Of<IApplicationMainLoop<char>> (), m.Object);
 
-        AggregateException ex = await Assert.ThrowsAsync<AggregateException> (() => c.StartInputTaskAsync (null));
+        var ex = await Assert.ThrowsAsync<AggregateException> (() => c.StartInputTaskAsync (null));
         Assert.Equal ("Crash on boot", ex.InnerExceptions [0].Message);
     }
 
