@@ -21,6 +21,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// </summary>
     internal AnsiResponseParser<TInputRecord> Parser { get; }
 
+    private readonly ITimeProvider _timeProvider;
     private readonly MouseInterpreter _mouseInterpreter;
 
     /// <summary>
@@ -52,6 +53,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     protected InputProcessorImpl (ConcurrentQueue<TInputRecord> inputBuffer, IKeyConverter<TInputRecord> keyConverter, ITimeProvider? timeProvider = null)
     {
         ITimeProvider tp = timeProvider ?? new SystemTimeProvider ();
+        _timeProvider = tp;
         Parser = new AnsiResponseParser<TInputRecord> (tp);
         _mouseInterpreter = new MouseInterpreter (tp);
 
@@ -146,7 +148,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     private IEnumerable<TInputRecord> ReleaseParserHeldKeysIfStale ()
     {
         if (Parser.State is AnsiResponseParserState.ExpectingEscapeSequence or AnsiResponseParserState.InResponse
-            && DateTime.Now - Parser.StateChangedAt > _escTimeout)
+            && _timeProvider.Now - Parser.StateChangedAt > _escTimeout)
         {
             return Parser.Release ().Select (o => o.Item2);
         }
