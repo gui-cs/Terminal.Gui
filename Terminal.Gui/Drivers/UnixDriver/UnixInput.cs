@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Terminal.Gui.Tracing;
 
 // ReSharper disable IdentifierTypo
 // ReSharper disable StringLiteralTypo
@@ -20,7 +21,13 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
 
     public UnixInput ()
     {
-        //Logging.Information ($"Creating {nameof (UnixInput)}");
+        // Check if we have a real console first
+        if (!IsAttachedToTerminal)
+        {
+            Trace.Lifecycle (nameof (UnixInput), "Init", "Console is not attached to a terminal. Running in degraded mode.");
+
+            return;
+        }
 
         try
         {
@@ -30,17 +37,18 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
             // Enable raw mode using the helper
             _terminalInitialized = _rawModeHelper.TryEnable ();
 
-            if (_terminalInitialized)
+            if (!_terminalInitialized)
             {
-                WriteRaw (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
-                WriteRaw (EscSeqUtils.CSI_HideCursor);
-
-                // CSI_EnableMouseEvents enables
-                // Mode 1003 (any-event) - Reports all mouse events including motion with/without buttons
-                // Mode 1015 (URXVT) - UTF-8 coordinate encoding (fallback for older terminals)
-                // Mode 1006 (SGR) - Modern decimal format with unlimited coordinates (preferred)
-                WriteRaw (EscSeqUtils.CSI_EnableMouseEvents);
+                return;
             }
+            WriteRaw (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+            WriteRaw (EscSeqUtils.CSI_HideCursor);
+
+            // CSI_EnableMouseEvents enables
+            // Mode 1003 (any-event) - Reports all mouse events including motion with/without buttons
+            // Mode 1015 (URXVT) - UTF-8 coordinate encoding (fallback for older terminals)
+            // Mode 1006 (SGR) - Modern decimal format with unlimited coordinates (preferred)
+            WriteRaw (EscSeqUtils.CSI_EnableMouseEvents);
         }
         catch (DllNotFoundException ex)
         {
@@ -102,7 +110,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
                 continue;
             }
 
-            byte [] buf = new byte [256];
+            var buf = new byte [256];
 
             if (!UnixIOHelper.TryReadStdin (buf, out int bytesRead) || bytesRead <= 0)
             {
@@ -146,7 +154,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
     }
 
     /// <inheritdoc/>
-    public void InjectInput (char input) { _testInput.Enqueue (input); }
+    public void InjectInput (char input) => _testInput.Enqueue (input);
 
     /// <inheritdoc/>
     public override void Dispose ()

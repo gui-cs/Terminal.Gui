@@ -20,6 +20,7 @@
 		<DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL</DefineConstants>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<NoLogo>true</NoLogo>
+		<NoWarn>$(NoWarn);AD0001</NoWarn>
 		<SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
