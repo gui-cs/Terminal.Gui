@@ -229,11 +229,15 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public Region? Clip { get => _outputBuffer.Clip; set => _outputBuffer.Clip = value; }
 
+    /// <inheritdoc/>
+    public string? CurrentUrl { get => _outputBuffer.CurrentUrl; set => _outputBuffer.CurrentUrl = value; }
+
     /// <summary>Clears the <see cref="IDriver.Contents"/> of the driver.</summary>
     public void ClearContents ()
     {
         _outputBuffer.ClearContents ();
         ClearedContents?.Invoke (this, EventArgs.Empty);
+        CurrentUrl = null;
     }
 
     /// <inheritdoc/>
