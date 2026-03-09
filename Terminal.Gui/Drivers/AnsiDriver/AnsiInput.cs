@@ -88,9 +88,9 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
         try
         {
             // Check if we have a real console first
-            if (!AnsiTerminalHelper.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached))
+            if (!IsAttachedToTerminal)
             {
-                Trace.Lifecycle (nameof (AnsiInput), "Init", $"Console redirected (Output: {outputAttached}, Input: {inputAttached}). Running in degraded mode.");
+                Trace.Lifecycle (nameof (AnsiInput), "Init", "Console is not attached to a terminal. Running in degraded mode.");
 
                 return;
             }
@@ -105,7 +105,9 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                     _windowsVTInput.Dispose ();
                     _windowsVTInput = null;
 
-                    Trace.Lifecycle (nameof (AnsiInput), "Init", "Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
+                    Trace.Lifecycle (nameof (AnsiInput),
+                                     "Init",
+                                     "Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
 
                     return;
                 }
@@ -121,7 +123,9 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
 
                     if (!_unixRawMode.TryEnable ())
                     {
-                        Trace.Lifecycle (nameof (AnsiInput), "Init", "Failed to enable Unix raw input mode. Terminal input will not work. Running in degraded mode.");
+                        Trace.Lifecycle (nameof (AnsiInput),
+                                         "Init",
+                                         "Failed to enable Unix raw input mode. Terminal input will not work. Running in degraded mode.");
                         _pollMap = null;
                         _unixRawMode?.Dispose ();
                         _unixRawMode = null;
@@ -132,7 +136,9 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                 }
                 catch (DllNotFoundException ex)
                 {
-                    Trace.Lifecycle (nameof (AnsiInput), "Init", $"Failed to enable Unix raw input mode. libc not available: {ex.Message}. Running in degraded mode.");
+                    Trace.Lifecycle (nameof (AnsiInput),
+                                     "Init",
+                                     $"Failed to enable Unix raw input mode. libc not available: {ex.Message}. Running in degraded mode.");
                 }
             }
             else
@@ -147,7 +153,9 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
         }
         catch (Exception ex)
         {
-            Trace.Lifecycle (nameof (AnsiInput), "Init", $"Failed to initialize terminal: {ex.GetType ().Name}: {ex.Message}. Running in degraded mode. Stack trace: {ex.StackTrace}");
+            Trace.Lifecycle (nameof (AnsiInput),
+                             "Init",
+                             $"Failed to initialize terminal: {ex.GetType ().Name}: {ex.Message}. Running in degraded mode. Stack trace: {ex.StackTrace}");
             _platform = AnsiPlatform.Degraded;
         }
     }
