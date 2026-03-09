@@ -7,7 +7,7 @@ public class TextRegexProvider : ITextValidateProvider
 {
     private List<Rune> _pattern = null!;
     private Regex _regex = null!;
-    private List<Rune> _text = null!;
+    private List<Rune> _text = [];
 
     /// <summary>Empty Constructor.</summary>
     public TextRegexProvider (string pattern) => Pattern = pattern;
@@ -36,7 +36,7 @@ public class TextRegexProvider : ITextValidateProvider
         get => StringExtensions.ToString (_text);
         set
         {
-            _text = (value != string.Empty ? value.ToRuneList () : null)!;
+            _text = value != string.Empty ? value.ToRuneList () : [];
             SetupText ();
         }
     }
@@ -103,7 +103,7 @@ public class TextRegexProvider : ITextValidateProvider
         }
         string oldValue = Text;
         _text.RemoveAt (pos);
-        OnTextChanged (new EventArgs<string> (in oldValue));
+        RaiseTextChanged (new EventArgs<string> (in oldValue));
 
         return true;
     }
@@ -120,16 +120,26 @@ public class TextRegexProvider : ITextValidateProvider
         }
         string oldValue = Text;
         _text.Insert (pos, (Rune)ch);
-        OnTextChanged (new EventArgs<string> (in oldValue));
+        RaiseTextChanged (new EventArgs<string> (in oldValue));
 
         return true;
     }
 
     /// <summary>
-    ///     Raises the TextChanged event to notify subscribers that the text has changed.
+    ///     Called when the text has changed. Subclasses can override this to perform custom actions.
     /// </summary>
     /// <param name="args">Contains the event data representing the new text value.</param>
-    public void OnTextChanged (EventArgs<string> args) => TextChanged?.Invoke (this, args);
+    public virtual void OnTextChanged (EventArgs<string> args) { }
+
+    /// <summary>
+    ///     Raises the <see cref="TextChanged"/> event.
+    /// </summary>
+    /// <param name="args">Contains the event data representing the new text value.</param>
+    private void RaiseTextChanged (EventArgs<string> args)
+    {
+        OnTextChanged (args);
+        TextChanged?.Invoke (this, args);
+    }
 
     /// <summary>Compiles the regex pattern for validation./></summary>
     private void CompileMask () => _regex = new Regex (StringExtensions.ToString (_pattern), RegexOptions.Compiled);

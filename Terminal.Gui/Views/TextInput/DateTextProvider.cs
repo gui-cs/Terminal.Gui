@@ -60,7 +60,7 @@ public class DateTextProvider : ITextValidateProvider
             _format = value;
             _separator = CleanSeparator (value.DateSeparator);
             AnalyzePattern ();
-            OnTextChanged (new EventArgs<string> (in string.Empty));
+            RaiseTextChanged (new EventArgs<string> (in string.Empty));
         }
     }
 
@@ -91,7 +91,7 @@ public class DateTextProvider : ITextValidateProvider
 
             if (oldValue != Text)
             {
-                OnTextChanged (new EventArgs<string> (in oldValue));
+                RaiseTextChanged (new EventArgs<string> (in oldValue));
             }
         }
     }
@@ -193,7 +193,7 @@ public class DateTextProvider : ITextValidateProvider
             return false;
         }
         _dateValue = newValue;
-        OnTextChanged (new EventArgs<string> (in oldValue));
+        RaiseTextChanged (new EventArgs<string> (in oldValue));
 
         return true;
     }
@@ -223,16 +223,26 @@ public class DateTextProvider : ITextValidateProvider
             return false;
         }
         _dateValue = newValue;
-        OnTextChanged (new EventArgs<string> (in oldValue));
+        RaiseTextChanged (new EventArgs<string> (in oldValue));
 
         return true;
     }
 
     /// <summary>
-    ///     Raises the <see cref="TextChanged"/> event to notify subscribers that the text has changed.
+    ///     Called when the text has changed. Subclasses can override this to perform custom actions.
     /// </summary>
     /// <param name="args">An <see cref="EventArgs{T}"/> object that contains the event data for the text change.</param>
-    public void OnTextChanged (EventArgs<string> args) => TextChanged?.Invoke (this, args);
+    public virtual void OnTextChanged (EventArgs<string> args) { }
+
+    /// <summary>
+    ///     Raises the <see cref="TextChanged"/> event.
+    /// </summary>
+    /// <param name="args">An <see cref="EventArgs{T}"/> object that contains the event data for the text change.</param>
+    private void RaiseTextChanged (EventArgs<string> args)
+    {
+        OnTextChanged (args);
+        TextChanged?.Invoke (this, args);
+    }
 
     /// <summary>
     ///     Analyzes the ShortDatePattern to detect format characteristics.
@@ -322,15 +332,17 @@ public class DateTextProvider : ITextValidateProvider
     {
         string cleaned = separator.Trim ().Replace ("\u200f", "");
 
-        if (cleaned.Length > 1)
+        if (cleaned.Length <= 1)
         {
-            // Take only the first non-whitespace character
-            foreach (char c in cleaned)
+            return cleaned;
+        }
+
+        // Take only the first non-whitespace character
+        foreach (char c in cleaned)
+        {
+            if (!char.IsWhiteSpace (c))
             {
-                if (!char.IsWhiteSpace (c))
-                {
-                    return c.ToString ();
-                }
+                return c.ToString ();
             }
         }
 
@@ -357,15 +369,15 @@ public class DateTextProvider : ITextValidateProvider
         text = text.Trim ();
 
         // Try to parse using the current pattern
-        if (DateTime.TryParseExact (text, _normalizedPattern, _format, DateTimeStyles.None, out DateTime dt))
+        if (!DateTime.TryParseExact (text, _normalizedPattern, _format, DateTimeStyles.None, out DateTime dt))
         {
-            result = dt;
-
-            return true;
+            return TryManualParse (text, out result);
         }
+        result = dt;
+
+        return true;
 
         // Fallback: try manual parsing for partial/invalid input
-        return TryManualParse (text, out result);
     }
 
     /// <summary>
