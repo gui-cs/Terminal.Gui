@@ -28,7 +28,7 @@ public class TextRegexProvider : ITextValidateProvider
     public bool ValidateOnInput { get; set; } = true;
 
     /// <inheritdoc/>
-    public event EventHandler<EventArgs<string>> TextChanged = null!;
+    public event EventHandler<EventArgs<string>>? TextChanged;
 
     /// <inheritdoc/>
     public string Text
@@ -136,7 +136,7 @@ public class TextRegexProvider : ITextValidateProvider
 
     private void SetupText ()
     {
-        if (_text is not null && IsValid)
+        if (IsValid)
         {
             return;
         }

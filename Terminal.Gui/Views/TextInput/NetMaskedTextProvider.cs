@@ -131,10 +131,12 @@ public class NetMaskedTextProvider : ITextValidateProvider
     }
 
     /// <summary>
-    /// Raises the TextChanged event to notify subscribers that the text has changed.
+    ///     Raises the TextChanged event to notify subscribers that the text has changed.
     /// </summary>
-    /// <remarks>Call this method to trigger the TextChanged event when the text value is updated. Subscribers
-    /// can use this event to respond to changes in the text.</remarks>
+    /// <remarks>
+    ///     Call this method to trigger the TextChanged event when the text value is updated. Subscribers
+    ///     can use this event to respond to changes in the text.
+    /// </remarks>
     /// <param name="args">Contains the event data for the text change.</param>
     public void OnTextChanged (EventArgs<string> args) => TextChanged?.Invoke (this, args);
 }
