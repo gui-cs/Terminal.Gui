@@ -101,9 +101,11 @@ internal static class UnixTerminalHelper
             output.Write (EscSeqUtils.CSI_DisableMouseEvents);
 
             // Check if we have a real console first
-            if (!AnsiTerminalHelper.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached))
+            if (!Driver.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached))
             {
-                Trace.Lifecycle (nameof (UnixTerminalHelper), "Suspend", $"Console redirected (Output: {outputAttached}, Input: {inputAttached}). Running in degraded mode.");
+                Trace.Lifecycle (nameof (UnixTerminalHelper),
+                                 "Suspend",
+                                 $"Console redirected (Output: {outputAttached}, Input: {inputAttached}). Running in degraded mode.");
 
                 return;
             }
