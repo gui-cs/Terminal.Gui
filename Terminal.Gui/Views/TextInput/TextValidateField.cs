@@ -50,8 +50,13 @@ public class TextValidateField : View, IDesignable, IValue<string>
             return;
         }
 
+        if (_provider is null)
+        {
+            return;
+        }
+
         // When we gain focus, put the insertion point at the start if it's before the start.
-        InsertionPoint = Math.Max (InsertionPoint, _provider!.CursorStart ());
+        InsertionPoint = Math.Max (InsertionPoint, _provider.CursorStart ());
 
         // Match the cursor position to the insertion point.
         // Don't call UpdateCursor so we can set the style too.
