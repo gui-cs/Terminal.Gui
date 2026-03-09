@@ -42,7 +42,7 @@ public class AnsiMouseParserTests
 
     /// <summary>
     /// Tests that ProcessMouseInput sets ScreenPosition and NOT Position.
-    /// Position is View-relative and should only be set by MouseImpl or View.Mouse code.
+    /// Position is View-relative and should only be set by ApplicationMouse or View.Mouse code.
     /// </summary>
     [Theory]
     [InlineData ("\u001b[<0;10;20M", 9, 19)] // Button 1 Pressed at screen (9, 19) 
@@ -60,7 +60,7 @@ public class AnsiMouseParserTests
         Assert.Equal (new Point (expectedX, expectedY), result!.ScreenPosition);
         Assert.NotNull (result.Timestamp);
 
-        // Position should NEVER be set by parsers; it's View-relative and set by MouseImpl/View.Mouse
+        // Position should NEVER be set by parsers; it's View-relative and set by ApplicationMouse/View.Mouse
         Assert.Null (result.Position);
     }
 }

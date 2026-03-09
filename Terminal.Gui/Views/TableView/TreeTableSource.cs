@@ -1,4 +1,3 @@
-#nullable disable
 namespace Terminal.Gui.Views;
 
 /// <summary>An <see cref="ITableSource"/> with expandable rows.</summary>
@@ -16,7 +15,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     /// <param name="table">The table this source will provide data for.</param>
     /// <param name="firstColumnName">
     ///     Column name to use for the first column of the table (where the tree branches/leaves will
-    ///     be rendered.
+    ///     be rendered).
     /// </param>
     /// <param name="tree">
     ///     The tree data to render. This should be a new view and not used elsewhere (e.g. via
@@ -101,7 +100,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
     private bool IsInTreeColumn (int column, bool isKeyboard)
     {
-        string [] colNames = _tableView.Table.ColumnNames;
+        string [] colNames = _tableView.Table!.ColumnNames;
 
         if (column < 0 || column >= colNames.Length)
         {
@@ -122,7 +121,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
     private Branch<T> RowToBranch (int row) => _tree.BuildLineMap ().ElementAt (row);
 
-    private void Table_KeyPress (object sender, Key e)
+    private void Table_KeyPress (object? sender, Key e)
     {
         if (!IsInTreeColumn (_tableView.SelectedColumn, true))
         {
@@ -154,14 +153,15 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
             }
         }
 
-        if (e.Handled)
+        if (!e.Handled)
         {
-            _tree.InvalidateLineMap ();
-            _tableView.SetNeedsDraw ();
+            return;
         }
+        _tree.InvalidateLineMap ();
+        _tableView.RefreshContentSize ();
+        _tableView.SetNeedsDraw ();
     }
 
-#nullable enable
     private void Table_Activating (object? sender, CommandEventArgs e)
     {
         // Only handle mouse clicks, not keyboard selections
@@ -196,10 +196,12 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
             }
         }
 
-        if (e.Handled)
+        if (!e.Handled)
         {
-            _tree.InvalidateLineMap ();
-            _tableView.SetNeedsDraw ();
+            return;
         }
+        _tree.InvalidateLineMap ();
+        _tableView.RefreshContentSize ();
+        _tableView.SetNeedsDraw ();
     }
 }

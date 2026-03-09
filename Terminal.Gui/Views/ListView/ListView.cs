@@ -194,52 +194,6 @@ public partial class ListView : View, IDesignable, IValue<int?>
     /// <summary>INTERNAL: Gets the effective content width including mark columns when <see cref="ShowMarks"/> is true.</summary>
     private int EffectiveMaxItemLength => MaxItemLength + MarkWidth;
 
-    /// <summary>Gets or sets the index of the item that will appear at the top of the <see cref="View.Viewport"/>.</summary>
-    /// <remarks>
-    ///     This a helper property for accessing <c>listView.Viewport.Y</c>.
-    /// </remarks>
-    /// <value>The top item.</value>
-    /// <remarks>
-    ///     Values are clamped to the valid range [0, Count - Viewport.Height].
-    /// </remarks>
-    [Obsolete ("Used only internally by ComboBox which will be replaced soon. Do not use.")]
-    public int TopItem
-    {
-        get => Viewport.Y;
-        set
-        {
-            if (Source is null)
-            {
-                return;
-            }
-
-            // Clamp to valid range: [0, Count - Viewport.Height]
-            int maxTopItem = Math.Max (0, Source.Count - Viewport.Height);
-            value = Math.Clamp (value, 0, maxTopItem);
-            Viewport = Viewport with { Y = value };
-        }
-    }
-
-    /// <summary>Gets or sets the leftmost column that is currently visible (when scrolling horizontally).</summary>
-    [Obsolete ("Used only internally by ComboBox which will be replaced soon. Do not use.")]
-    internal int LeftItem
-    {
-        get => Viewport.X;
-        set
-        {
-            if (Source is null)
-            {
-                return;
-            }
-
-            // Clamp to valid range: [0, EffectiveMaxItemLength - Viewport.Width]
-            int maxLeftItem = Math.Max (0, EffectiveMaxItemLength - Viewport.Width);
-            value = Math.Clamp (value, 0, maxLeftItem);
-            Viewport = Viewport with { X = value };
-            SetNeedsDraw ();
-        }
-    }
-
     #endregion Viewport/ContentSize Management
 
     #region Keystroke Navigation

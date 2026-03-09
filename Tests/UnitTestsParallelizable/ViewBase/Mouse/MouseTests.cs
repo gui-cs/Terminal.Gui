@@ -1,5 +1,4 @@
 ﻿using UnitTests;
-using Xunit.Abstractions;
 
 namespace ViewBaseTests.MouseTests;
 

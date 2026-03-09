@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace ViewsTests;
 
@@ -230,7 +229,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         var tf = new TextField { Width = 10 };
         top.Add (tf);
 
-        Exception exception = Record.Exception (() => tf.SetFocus ());
+        Exception? exception = Record.Exception (() => tf.SetFocus ());
         Assert.Null (exception);
     }
 

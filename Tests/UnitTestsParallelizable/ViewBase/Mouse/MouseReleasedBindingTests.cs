@@ -1,5 +1,3 @@
-using Xunit.Abstractions;
-
 namespace ViewBaseTests.MouseTests;
 
 // Claude - Opus 4.5

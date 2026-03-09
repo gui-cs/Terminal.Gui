@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using Xunit.Abstractions;
 
 namespace UnitTests.ViewsTests;
 
@@ -1073,7 +1072,7 @@ t
 
         Assert.Equal (new (0, 0, 5, 1), label.Frame);
         Assert.Equal (new (5, 1), label.TextFormatter.ConstrainToSize);
-        Exception exception = Record.Exception (() => Assert.Single (label.TextFormatter.GetLines ()));
+        Exception? exception = Record.Exception (() => Assert.Single (label.TextFormatter.GetLines ()));
         Assert.Null (exception);
 
         expected = @"

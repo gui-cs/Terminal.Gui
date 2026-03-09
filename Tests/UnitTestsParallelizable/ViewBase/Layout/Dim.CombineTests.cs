@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using Xunit.Abstractions;
 
 namespace ViewBaseTests.Layout;
 

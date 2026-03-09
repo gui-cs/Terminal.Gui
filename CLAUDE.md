@@ -81,8 +81,8 @@ When in planning mode:
 ```bash
 dotnet restore
 dotnet build --no-restore
-dotnet test Tests/UnitTestsParallelizable --no-build
-dotnet test Tests/UnitTests --no-build
+dotnet test --project Tests/UnitTestsParallelizable --no-build
+dotnet test --project Tests/UnitTests --no-build
 ```
 
 ## Key Concepts

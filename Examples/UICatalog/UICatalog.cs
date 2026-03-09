@@ -10,9 +10,8 @@ global using Terminal.Gui.Drawing;
 global using Terminal.Gui.Text;
 global using Terminal.Gui.FileServices;
 global using Terminal.Gui.Resources;
-global using Terminal.Gui.Tracing;
 using System.CommandLine;
-using System.CommandLine.Builder;
+using System.CommandLine.Help;
 using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.Globalization;
@@ -81,60 +80,77 @@ public class UICatalog
         // Get allowed driver names
         string? [] allowedDrivers = DriverRegistry.GetDriverNames ().ToArray ();
 
-        Option<string> driverOption = new Option<string> ("--driver", "The IDriver to use.").FromAmong (allowedDrivers!);
-        driverOption.SetDefaultValue (string.Empty);
-        driverOption.AddAlias ("-d");
-        driverOption.AddAlias ("--d");
+        Option<string> driverOption = new ("--driver")
+        {
+            Description = "The IDriver to use."
+        };
+        driverOption.AcceptOnlyFromAmong (allowedDrivers!);
+        driverOption.DefaultValueFactory = _ => string.Empty;
+        driverOption.Aliases.Add ("-d");
+        driverOption.Aliases.Add ("--d");
 
         // Add validator separately (not chained)
-        driverOption.AddValidator (result =>
+        driverOption.Validators.Add (result =>
                                    {
                                        var value = result.GetValueOrDefault<string> ();
 
                                        if (result.Tokens.Count > 0 && !allowedDrivers.Contains (value))
                                        {
-                                           result.ErrorMessage = $"Invalid driver name '{value}'. Allowed values: {string.Join (", ", allowedDrivers)}";
+                                           result.AddError ($"Invalid driver name '{value}'. Allowed values: {string.Join (", ", allowedDrivers)}");
                                        }
                                    });
 
         // Configuration Management
-        Option<bool> disableConfigManagement = new ("--disable-cm",
-                                                    "Indicates Configuration Management should not be enabled. Only `ConfigLocations.HardCoded` settings will be loaded.");
-        disableConfigManagement.AddAlias ("-dcm");
-        disableConfigManagement.AddAlias ("--dcm");
+        Option<bool> disableConfigManagement = new ("--disable-cm")
+        {
+            Description = "Indicates Configuration Management should not be enabled. Only `ConfigLocations.HardCoded` settings will be loaded."
+        };
+        disableConfigManagement.Aliases.Add ("-dcm");
+        disableConfigManagement.Aliases.Add ("--dcm");
 
-        Option<bool> benchmarkFlag = new ("--benchmark", "Enables benchmarking. If a Scenario is specified, just that Scenario will be benchmarked.");
-        benchmarkFlag.AddAlias ("-b");
-        benchmarkFlag.AddAlias ("--b");
+        Option<bool> benchmarkFlag = new ("--benchmark")
+        {
+            Description = "Enables benchmarking. If a Scenario is specified, just that Scenario will be benchmarked."
+        };
+        benchmarkFlag.Aliases.Add ("-b");
+        benchmarkFlag.Aliases.Add ("--b");
 
-        Option<bool> force16ColorsOption = new ("--force-16-colors", "Forces the driver to use 16-color mode instead of TrueColor.");
-        force16ColorsOption.AddAlias ("-16");
+        Option<bool> force16ColorsOption = new ("--force-16-colors") { Description = "Forces the driver to use 16-color mode instead of TrueColor." };
+        force16ColorsOption.Aliases.Add ("-16");
 
-        Option<uint> benchmarkTimeout = new ("--timeout",
-                                             () => Scenario.BenchmarkTimeout,
-                                             $"The maximum time in milliseconds to run a benchmark for. Default is {Scenario.BenchmarkTimeout}ms.");
-        benchmarkTimeout.AddAlias ("-t");
-        benchmarkTimeout.AddAlias ("--t");
+        Option<uint> benchmarkTimeout = new ("--timeout")
+        {
+            Description = $"The maximum time in milliseconds to run a benchmark for. Default is {Scenario.BenchmarkTimeout}ms.",
+            DefaultValueFactory = _ => Scenario.BenchmarkTimeout
+        };
+        benchmarkTimeout.Aliases.Add ("-t");
+        benchmarkTimeout.Aliases.Add ("--t");
 
-        Option<string> resultsFile = new ("--file", "The file to save benchmark results to. If not specified, the results will be displayed in a TableView.");
-        resultsFile.AddAlias ("-f");
-        resultsFile.AddAlias ("--f");
+        Option<string> resultsFile = new ("--file")
+        {
+            Description = "The file to save benchmark results to. If not specified, the results will be displayed in a TableView.",
+            DefaultValueFactory = _ => string.Empty
+        };
+        resultsFile.Aliases.Add ("-f");
+        resultsFile.Aliases.Add ("--f");
 
         // what's the app name?
         LogFilePath = $"{LOGFILE_LOCATION}/{Assembly.GetExecutingAssembly ().GetName ().Name}.log";
 
-        Option<string> debugLogLevel =
-            new Option<string> ("--debug-log-level", $"The level to use for logging (debug console and {LogFilePath})").FromAmong (Enum.GetNames<LogLevel> ());
-        debugLogLevel.SetDefaultValue ("Warning");
-        debugLogLevel.AddAlias ("-dl");
-        debugLogLevel.AddAlias ("--dl");
+        Option<string> debugLogLevel = new ("--debug-log-level")
+        {
+            Description = $"The level to use for logging (debug console and {LogFilePath})"
+        };
+        debugLogLevel.AcceptOnlyFromAmong (Enum.GetNames<LogLevel> ());
+        debugLogLevel.DefaultValueFactory = _ => "Warning";
+        debugLogLevel.Aliases.Add ("-dl");
+        debugLogLevel.Aliases.Add ("--dl");
 
-        Argument<string> scenarioArgument =
-            new Argument<string> ("scenario",
-                                  description: "The name of the Scenario to run. If not provided, the UI Catalog UI will be shown.",
-                                  getDefaultValue: () => "none").FromAmong (UICatalogRunnable.CachedScenarios.Select (s => s.GetName ())
-                                                                                             .Append ("none")
-                                                                                             .ToArray ());
+        Argument<string> scenarioArgument = new ("scenario")
+        {
+            Description = "The name of the Scenario to run. If not provided, the UI Catalog UI will be shown.", DefaultValueFactory = _ => "none"
+        };
+        scenarioArgument.AcceptOnlyFromAmong (UICatalogRunnable.CachedScenarios.Select (s => s.GetName ()).Append ("none").ToArray ());
 
         var rootCommand = new RootCommand ("A comprehensive sample library and test app for Terminal.Gui")
         {
@@ -148,19 +164,19 @@ public class UICatalog
             force16ColorsOption
         };
 
-        rootCommand.SetHandler (context =>
+        rootCommand.SetAction (context =>
                                 {
-                                    bool force16 = context.ParseResult.GetValueForOption (force16ColorsOption);
+                                    bool force16 = context.GetRequiredValue (force16ColorsOption);
 
                                     UICatalogCommandLineOptions options = new ()
                                     {
-                                        Scenario = context.ParseResult.GetValueForArgument (scenarioArgument),
-                                        Driver = context.ParseResult.GetValueForOption (driverOption) ?? string.Empty,
-                                        DontEnableConfigurationManagement = context.ParseResult.GetValueForOption (disableConfigManagement),
-                                        Benchmark = context.ParseResult.GetValueForOption (benchmarkFlag),
-                                        BenchmarkTimeout = context.ParseResult.GetValueForOption (benchmarkTimeout),
-                                        ResultsFile = context.ParseResult.GetValueForOption (resultsFile) ?? string.Empty,
-                                        DebugLogLevel = context.ParseResult.GetValueForOption (debugLogLevel) ?? "Warning",
+                                        Scenario = context.GetRequiredValue (scenarioArgument),
+                                        Driver = context.GetRequiredValue (driverOption) ?? string.Empty,
+                                        DontEnableConfigurationManagement = context.GetRequiredValue (disableConfigManagement),
+                                        Benchmark = context.GetRequiredValue (benchmarkFlag),
+                                        BenchmarkTimeout = context.GetRequiredValue (benchmarkTimeout),
+                                        ResultsFile = context.GetRequiredValue (resultsFile) ?? string.Empty,
+                                        DebugLogLevel = context.GetRequiredValue (debugLogLevel) ?? "Warning",
 
                                         // Only set Force16Colors if explicitly specified on command line
                                         Force16Colors = force16 ? true : null
@@ -172,16 +188,20 @@ public class UICatalog
 
         var helpShown = false;
 
-        Parser parser = new CommandLineBuilder (rootCommand).UseHelp (_ => helpShown = true).Build ();
+        ParseResult parseResult = rootCommand.Parse (args);
 
-        parser.Invoke (args);
+        // Check if the analysis results indicate that help should be displayed
+        if (parseResult.Errors.Count == 0 && parseResult.Action is HelpAction)
+        {
+            helpShown = true;
+        }
+
+        parseResult.Invoke ();
 
         if (helpShown)
         {
             return 0;
         }
-
-        ParseResult parseResult = parser.Parse (args);
 
         if (parseResult.Errors.Count > 0)
         {

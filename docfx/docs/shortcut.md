@@ -9,7 +9,7 @@
 
 ## From the User's Perspective
 
-A `Shortcut` is a single, clickable row in a menu, toolbar, or status bar. It shows three things:
+A <xref:Terminal.Gui.Views.Shortcut> is a single, clickable row in a menu, toolbar, or status bar. It shows three things:
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -29,49 +29,49 @@ A `Shortcut` is a single, clickable row in a menu, toolbar, or status bar. It sh
 
 ### CommandView Variants
 
-The CommandView can be any View. Common configurations:
+The CommandView can be any <xref:Terminal.Gui.ViewBase.View>. Common configurations:
 
 | CommandView Type | Activate Behavior | Accept Behavior |
 |-----------------|-------------------|-----------------|
-| **View** (default) | Invokes `Action` | Invokes `Action` |
-| **CheckBox** | Toggles check state, invokes `Action` | Invokes `Action` (no toggle) |
-| **Button** | Invokes `Action` | Invokes Button's Accept |
+| **<xref:Terminal.Gui.ViewBase.View>** (default) | Invokes `Action` | Invokes `Action` |
+| **<xref:Terminal.Gui.Views.CheckBox>** | Toggles check state, invokes `Action` | Invokes `Action` (no toggle) |
+| **<xref:Terminal.Gui.Views.Button>** | Invokes `Action` | Invokes Button's Accept |
 | **ColorPicker16** | Opens color dialog or cycles | Invokes `Action` |
 
 ### Key Principle: Single Responsibility
 
-From the user's perspective, a Shortcut is **one control**. The fact that it contains three SubViews (CommandView, HelpView, KeyView) is an implementation detail. Whether the user clicks on the command text, the help text, the key text, or the gap between them, the result is the same.
+From the user's perspective, a <xref:Terminal.Gui.Views.Shortcut> is **one control**. The fact that it contains three SubViews (CommandView, HelpView, KeyView) is an implementation detail. Whether the user clicks on the command text, the help text, the key text, or the gap between them, the result is the same.
 
 ## Design
 
 ### Commands and Their Semantics
 
-Shortcut participates in the standard Command system with three commands:
+<xref:Terminal.Gui.Views.Shortcut> participates in the standard Command system with three commands:
 
 | Command | Trigger | What It Does |
 |---------|---------|-------------|
-| **`Command.Activate`** | Space, click, `Shortcut.Key` press | Changes state (e.g., toggles CheckBox) and invokes `Action` |
-| **`Command.Accept`** | Enter, double-click | Confirms/executes without state change; invokes `Action` |
-| **`Command.HotKey`** | HotKey letter, `Shortcut.Key` | Sets focus, then invokes `Command.Activate` |
+| **<xref:Terminal.Gui.Input.Command.Activate>** | Space, click, `Shortcut.Key` press | Changes state (e.g., toggles <xref:Terminal.Gui.Views.CheckBox>) and invokes `Action` |
+| **<xref:Terminal.Gui.Input.Command.Accept>** | Enter, double-click | Confirms/executes without state change; invokes `Action` |
+| **<xref:Terminal.Gui.Input.Command.HotKey>** | HotKey letter, `Shortcut.Key` | Sets focus, then invokes <xref:Terminal.Gui.Input.Command.Activate> |
 
 ### CommandsToBubbleUp
 
-`Shortcut` sets `CommandsToBubbleUp = [Command.Activate, Command.Accept]` in its constructor. This enables commands from SubViews (like CommandView) to bubble up to the Shortcut for centralized handling.
+<xref:Terminal.Gui.Views.Shortcut> sets <xref:Terminal.Gui.ViewBase.View.CommandsToBubbleUp> = [<xref:Terminal.Gui.Input.Command.Activate>, <xref:Terminal.Gui.Input.Command.Accept>] in its constructor. This enables commands from SubViews (like CommandView) to bubble up to the <xref:Terminal.Gui.Views.Shortcut> for centralized handling.
 
 ### The BubbleDown Pattern
 
-Because Shortcut is a composite view, it must coordinate command flow between itself and its CommandView. The core pattern is:
+Because <xref:Terminal.Gui.Views.Shortcut> is a composite view, it must coordinate command flow between itself and its CommandView. The core pattern is:
 
-1. **User interacts** with the Shortcut (clicks, presses key, etc.)
+1. **User interacts** with the <xref:Terminal.Gui.Views.Shortcut> (clicks, presses key, etc.)
 2. The command reaches `Shortcut.OnActivating` or `Shortcut.OnAccepting`
-3. Shortcut **forwards the command down** to CommandView via `BubbleDown`
-4. CommandView processes the command (e.g., CheckBox toggles)
+3. <xref:Terminal.Gui.Views.Shortcut> **forwards the command down** to CommandView via `BubbleDown`
+4. CommandView processes the command (e.g., <xref:Terminal.Gui.Views.CheckBox> toggles)
 5. `BubbleDown` suppresses re-bubbling (via `IsBubblingDown = true`), preventing infinite loops
-6. Shortcut raises its own events and invokes `Action`
+6. <xref:Terminal.Gui.Views.Shortcut> raises its own events and invokes `Action`
 
 ### When to BubbleDown (and When Not To)
 
-The critical design decision is **when** Shortcut should forward a command to CommandView. The rule is:
+The critical design decision is **when** <xref:Terminal.Gui.Views.Shortcut> should forward a command to CommandView. The rule is:
 
 ```
 BubbleDown to CommandView ONLY when:
@@ -83,9 +83,9 @@ This produces three paths:
 
 | Origin | Has Binding? | Binding.Source | BubbleDown? | Reason |
 |--------|-------------|---------------|-------------|--------|
-| CommandView click/key | Yes | CommandView | **No** | CommandView already processed it; it bubbled up via `CommandsToBubbleUp` |
+| CommandView click/key | Yes | CommandView | **No** | CommandView already processed it; it bubbled up via <xref:Terminal.Gui.ViewBase.View.CommandsToBubbleUp> |
 | Shortcut/HelpView/KeyView click, or Shortcut.Key press | Yes | Shortcut (or HelpView/KeyView) | **Yes** | CommandView hasn't seen this command yet |
-| Programmatic `InvokeCommand` | No (null) | N/A | **No** | No user interaction to forward |
+| Programmatic [InvokeCommand()](xref:Terminal.Gui.ViewBase.View.InvokeCommand*) | No (null) | N/A | **No** | No user interaction to forward |
 
 ### Implementation
 
@@ -109,7 +109,7 @@ protected override bool OnActivating (CommandEventArgs args)
 
 ### OnAccepting Behavior
 
-When `Command.Accept` is invoked on a Shortcut:
+When <xref:Terminal.Gui.Input.Command.Accept> is invoked on a <xref:Terminal.Gui.Views.Shortcut>:
 
 1. `OnAccepting` is called
 2. If the command came from a user binding (not from CommandView), it forwards `Accept` to CommandView via `BubbleDown`
@@ -149,13 +149,12 @@ protected override void OnActivated (ICommandContext? ctx)
 }
 ```
 
-### CommandView_Activated — Deferred Activation
+### BubbleActivatedUp — Post-Completion Notification
 
-Shortcut subscribes to `CommandView.Activated`. When a command bubbles up from within CommandView and reaches Shortcut's `HandleActivate` with `IsBubblingUp = true`, Shortcut defers its own `RaiseActivated` until `CommandView.Activated` fires. This ensures the CommandView completes its state change (e.g., CheckBox toggles) before Shortcut raises its own Activated event.
+When a command completes activation (either via the normal path or after ConsumeDispatch), the framework walks up the SuperView chain and fires `RaiseActivated` on ancestors that subscribe via `CommandsToBubbleUp`. This ensures:
 
-`CommandView_Activated` handles two cases:
-1. **Deferred path**: `HandleActivate` set `_activationBubbledUp = true` — fires deferred `RaiseActivated` with the saved context.
-2. **Consumed-by-CommandView path**: The CommandView (e.g., `OptionSelector`, `FlagSelector`) consumed the bubble in its `OnActivating` (before it reached Shortcut's `HandleActivate`), then called `RaiseActivated` directly. In this case, the event context has `IsBubblingUp = true` — Shortcut's `CommandView_Activated` detects this and fires `RaiseActivated`.
+1. **Relay-dispatch path** (e.g., Shortcut with CheckBox): After the CheckBox completes its state change (e.g., toggles), `BubbleActivatedUp` fires `RaiseActivated` on composite ancestors (Shortcut). This guarantees `Action` sees the updated state.
+2. **Consume-dispatch path** (e.g., MenuItem with OptionSelector/FlagSelector): After the OptionSelector consumes the command and updates its value, `BubbleActivatedUp` fires `RaiseActivated` on all ancestors in the chain (MenuItem → Menu → SuperView), enabling full-chain notification.
 
 ## Detailed Command Flows
 
@@ -227,7 +226,7 @@ User presses Shortcut.Key
         → Action?.Invoke()
 ```
 
-**Key detail:** `DefaultHotKeyHandler` passes `ctx.Binding` when invoking `Command.Activate`, preserving the binding source so `OnActivating` can detect it was user-initiated and BubbleDown to CommandView.
+**Key detail:** `DefaultHotKeyHandler` passes `ctx.Binding` when invoking <xref:Terminal.Gui.Input.Command.Activate>, preserving the binding source so `OnActivating` can detect it was user-initiated and BubbleDown to CommandView.
 
 ### Flow 4: CommandView HotKey Press (e.g., Alt+O for "_Open")
 
@@ -281,11 +280,11 @@ Code calls shortcut.InvokeCommand(Command.Activate)
     → Action?.Invoke()
 ```
 
-**Result:** Action invokes, but CommandView does NOT change state. This is by design: programmatic invocations should use `commandView.InvokeCommand(Command.Activate)` directly if they want to change CommandView state.
+**Result:** Action invokes, but CommandView does NOT change state. This is by design: programmatic invocations should use `commandView.InvokeCommand(Command.Activate)` directly if they want to change CommandView state (see <xref:Terminal.Gui.Input.Command.Activate>).
 
 ## MouseHighlightStates and Event Routing
 
-`Shortcut` defaults to `MouseHighlightStates = MouseState.In`, which causes it to highlight on mouse hover and intercept mouse events for its entire area.
+<xref:Terminal.Gui.Views.Shortcut> defaults to `MouseHighlightStates = MouseState.In`, which causes it to highlight on mouse hover and intercept mouse events for its entire area.
 
 ### With MouseHighlightStates = MouseState.In (Default)
 
@@ -308,18 +307,18 @@ Code calls shortcut.InvokeCommand(Command.Activate)
 
 | Event | When Fired | Can Cancel? |
 |-------|-----------|-------------|
-| `HandlingHotKey` | When `Shortcut.Key` is pressed | Yes |
-| `Activating` | During activation flow | Yes |
-| `Activated` | After successful activation; `Action` invoked | No |
-| `Accepting` | When `Command.Accept` invoked | Yes |
-| `Accepted` | After successful accept; `Action` invoked | No |
+| <xref:Terminal.Gui.ViewBase.View.HandlingHotKey> | When `Shortcut.Key` is pressed | Yes |
+| <xref:Terminal.Gui.ViewBase.View.Activating> | During activation flow | Yes |
+| <xref:Terminal.Gui.ViewBase.View.Activated> | After successful activation; `Action` invoked | No |
+| <xref:Terminal.Gui.ViewBase.View.Accepting> | When <xref:Terminal.Gui.Input.Command.Accept> invoked | Yes |
+| <xref:Terminal.Gui.ViewBase.View.Accepted> | After successful accept; `Action` invoked | No |
 
 ### Events on CommandView (if subscribed directly)
 
 | Event | When Fired | Notes |
 |-------|-----------|-------|
-| `Activating` | When CommandView activates | Fires once per interaction |
-| `Activated` | After CommandView activates | State changes here for CheckBox |
+| <xref:Terminal.Gui.ViewBase.View.Activating> | When CommandView activates | Fires once per interaction |
+| <xref:Terminal.Gui.ViewBase.View.Activated> | After CommandView activates | State changes here for <xref:Terminal.Gui.Views.CheckBox> |
 
 ### CheckBox-Specific Events
 
@@ -332,16 +331,16 @@ Code calls shortcut.InvokeCommand(Command.Activate)
 
 The `Action` property is invoked in two places:
 
-1. **`OnActivated`**: After `Command.Activate` completes successfully
-2. **`OnAccepted`**: After `Command.Accept` completes successfully
+1. **`OnActivated`**: After <xref:Terminal.Gui.Input.Command.Activate> completes successfully
+2. **`OnAccepted`**: After <xref:Terminal.Gui.Input.Command.Accept> completes successfully
 
-This means `Action` fires regardless of whether the Shortcut was activated (Space/click) or accepted (Enter).
+This means `Action` fires regardless of whether the <xref:Terminal.Gui.Views.Shortcut> was activated (Space/click) or accepted (Enter).
 
 ## How To
 
 ### Handle Activation Differently Based on Source
 
-Use `args.Context.TryGetSource()` in the `Activating` event handler to determine whether the user interacted with the CommandView directly or with the Shortcut:
+Use `args.Context.TryGetSource()` in the <xref:Terminal.Gui.ViewBase.View.Activating> event handler to determine whether the user interacted with the CommandView directly or with the <xref:Terminal.Gui.Views.Shortcut>:
 
 ```csharp
 Shortcut shortcut = new ()
@@ -390,35 +389,35 @@ shortcut.Action = () => DoSomething ();
 
 ### Why BubbleDown?
 
-Without BubbleDown, clicking on the HelpView or KeyView area would not toggle a CheckBox CommandView. BubbleDown ensures that **all** user interactions with the Shortcut reach the CommandView, maintaining the "single control" illusion.
+Without BubbleDown, clicking on the HelpView or KeyView area would not toggle a <xref:Terminal.Gui.Views.CheckBox> CommandView. BubbleDown ensures that **all** user interactions with the <xref:Terminal.Gui.Views.Shortcut> reach the CommandView, maintaining the "single control" illusion.
 
 ### Why Check Binding.Source?
 
 The three-way check (has binding? source is CommandView? programmatic?) prevents:
 
-1. **Double-processing**: When CommandView raises Activate and it bubbles up to Shortcut, Shortcut should not BubbleDown back to CommandView (infinite loop / double toggle).
-2. **Unwanted side effects**: Programmatic `InvokeCommand` on the Shortcut should not automatically change CommandView state - the caller should be explicit.
+1. **Double-processing**: When CommandView raises Activate and it bubbles up to <xref:Terminal.Gui.Views.Shortcut>, <xref:Terminal.Gui.Views.Shortcut> should not BubbleDown back to CommandView (infinite loop / double toggle).
+2. **Unwanted side effects**: Programmatic [InvokeCommand()](xref:Terminal.Gui.ViewBase.View.InvokeCommand*) on the <xref:Terminal.Gui.Views.Shortcut> should not automatically change CommandView state - the caller should be explicit.
 
 ### Why Accept Does Not Invoke Activate?
 
-Accept and Activate are distinct semantic actions:
+<xref:Terminal.Gui.Input.Command.Accept> and <xref:Terminal.Gui.Input.Command.Activate> are distinct semantic actions:
 
-- **Activate** = "interact with this control" (toggle, select, change state)
-- **Accept** = "confirm/execute" (submit, close menu, run command)
+- **<xref:Terminal.Gui.Input.Command.Activate>** = "interact with this control" (toggle, select, change state)
+- **<xref:Terminal.Gui.Input.Command.Accept>** = "confirm/execute" (submit, close menu, run command)
 
-Conflating them causes confusion in composite views like Menu, where Accept on a MenuItem should execute the command and close the menu, but Activate should just highlight/focus the item.
+Conflating them causes confusion in composite views like Menu, where Accept on a <xref:Terminal.Gui.Views.MenuItem> should execute the command and close the menu, but Activate should just highlight/focus the item.
 
 ### Comparison with SelectorBase/FlagSelector
 
 `FlagSelector` is another composite view that uses `BubbleDown`, but with intentionally different semantics:
 
-| | Shortcut | FlagSelector |
+| | <xref:Terminal.Gui.Views.Shortcut> | FlagSelector |
 |--|---------|-------------|
 | **Check** | `Binding.Source` | `Context.Source` (via `TryGetSource`) |
 | **Programmatic invoke** | Skip BubbleDown | BubbleDown to focused checkbox |
 | **From SubView** | Skip (already processed) | Skip (already processed) |
 | **From self** | BubbleDown to CommandView | BubbleDown to focused checkbox |
 
-**Why the difference?** FlagSelector is a container for N equivalent checkboxes; programmatic `InvokeCommand(Activate)` naturally means "toggle the focused item." Shortcut is a composite with one CommandView; programmatic invoke should raise Shortcut's own events/Action without implicitly changing CommandView state. Callers who want to change CommandView state should call `commandView.InvokeCommand(Activate)` directly.
+**Why the difference?** FlagSelector is a container for N equivalent checkboxes; programmatic `InvokeCommand(Activate)` (see <xref:Terminal.Gui.Input.Command.Activate>) naturally means "toggle the focused item." <xref:Terminal.Gui.Views.Shortcut> is a composite with one CommandView; programmatic invoke should raise <xref:Terminal.Gui.Views.Shortcut>'s own events/Action without implicitly changing CommandView state. Callers who want to change CommandView state should call `commandView.InvokeCommand(Activate)` directly.
 
-`OptionSelector` takes a different approach entirely: it subscribes to checkbox `Activating` events and manually calls `InvokeCommand(Command.Activate, args.Context)` on itself, bypassing the BubbleDown pattern. This works but has a TODO noting it shouldn't be needed.
+`OptionSelector` takes a different approach entirely: it subscribes to checkbox <xref:Terminal.Gui.ViewBase.View.Activating> events and manually calls `InvokeCommand(Command.Activate, args.Context)` on itself, bypassing the BubbleDown pattern. This works but has a TODO noting it shouldn't be needed.

@@ -1,5 +1,4 @@
-#nullable disable
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Implementation of <see cref="CheckBoxTableSourceWrapperBase"/> which records toggled rows by a property on row
@@ -16,12 +15,8 @@ public class CheckBoxTableSourceWrapperByObject<T> : CheckBoxTableSourceWrapperB
     /// <param name="toWrap">The collection of objects you will record checked state for</param>
     /// <param name="getter">Delegate method for retrieving checked state from your objects of type <typeparamref name="T"/>.</param>
     /// <param name="setter">Delegate method for setting new checked states on your objects of type <typeparamref name="T"/>.</param>
-    public CheckBoxTableSourceWrapperByObject (
-        TableView tableView,
-        IEnumerableTableSource<T> toWrap,
-        Func<T, bool> getter,
-        Action<T, bool> setter
-    ) : base (tableView, toWrap)
+    public CheckBoxTableSourceWrapperByObject (TableView tableView, IEnumerableTableSource<T> toWrap, Func<T, bool> getter, Action<T, bool> setter) :
+        base (tableView, toWrap)
     {
         _toWrap = toWrap;
         _getter = getter;
@@ -38,10 +33,10 @@ public class CheckBoxTableSourceWrapperByObject<T> : CheckBoxTableSourceWrapperB
     }
 
     /// <inheritdoc/>
-    protected override bool IsChecked (int row) { return _getter (_toWrap.GetObjectOnRow (row)); }
+    protected override bool IsChecked (int row) => _getter (_toWrap.GetObjectOnRow (row));
 
     /// <inheritdoc/>
-    protected override void ToggleAllRows () { ToggleRows (Enumerable.Range (0, _toWrap.Rows).ToArray ()); }
+    protected override void ToggleAllRows () => ToggleRows (Enumerable.Range (0, _toWrap.Rows).ToArray ());
 
     /// <inheritdoc/>
     protected override void ToggleRow (int row)

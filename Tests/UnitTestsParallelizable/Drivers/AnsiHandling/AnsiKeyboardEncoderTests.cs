@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-namespace DriverTests.AnsiHandling;
+﻿namespace DriverTests.AnsiHandling;
 
 /// <summary>
 ///     Tests for <see cref="AnsiKeyboardEncoder"/> - verifies Key → ANSI sequence conversion.

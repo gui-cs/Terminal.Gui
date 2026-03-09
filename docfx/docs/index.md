@@ -1,7 +1,7 @@
 # Terminal.Gui Deep Dives 
 
 > [!IMPORTANT]
-> Terminal.Gui v2 "Alpha" has been released.
+> Terminal.Gui v2 "Beta" has been released.
 
 Welcome to the Terminal.Gui documentation! This comprehensive guide covers everything you need to know about building modern terminal user interfaces with Terminal.Gui.
 
@@ -23,7 +23,6 @@ Welcome to the Terminal.Gui documentation! This comprehensive guide covers every
 - [Application](~/docs/application.md) - Application lifecycle, initialization, and main loop
 - [Arrangement](~/docs/arrangement.md) - View arrangement and positioning strategies
 - [Cancellable Work Pattern](~/docs/cancellable-work-pattern.md) - Core design pattern for extensible workflows
-- [Character Map Scenario](~/docs/CharacterMap.md) - Complex drawing, scrolling, and Unicode rendering example
 - [Command](~/docs/command.md) - Command execution, key bindings, and the Activating/Accepting concepts
 - [Command Diagrams](~/docs/command-diagrams.md) - Visual diagrams of command flow and processing
 - [Configuration](~/docs/config.md) - Persistent settings, themes, and configuration scopes
