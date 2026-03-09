@@ -20,7 +20,7 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
         // Check if we have a real console first
         if (!IsAttachedToTerminal)
         {
-            Tracing.Trace.Lifecycle (nameof (NetInput), "Init", $"Console is not attached to a terminal. Running in degraded mode.");
+            Trace.Lifecycle (nameof (NetInput), "Init", "Console is not attached to a terminal. Running in degraded mode.");
 
             return;
         }

@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Terminal.Gui.Tracing;
 using static Terminal.Gui.Drivers.WindowsConsole;
 
 namespace Terminal.Gui.Drivers;
@@ -32,7 +33,7 @@ internal class WindowsInput : InputImpl<InputRecord>, IWindowsInput
         // Check if we have a real console first
         if (!IsAttachedToTerminal)
         {
-            Tracing.Trace.Lifecycle (nameof (WindowsInput), "Init", $"Console is not attached to a terminal. Running in degraded mode.");
+            Trace.Lifecycle (nameof (WindowsInput), "Init", "Console is not attached to a terminal. Running in degraded mode.");
 
             return;
         }

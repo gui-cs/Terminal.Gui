@@ -24,7 +24,7 @@ internal class UnixInput : InputImpl<char>, IUnixInput, ITestableInput<char>
         // Check if we have a real console first
         if (!IsAttachedToTerminal)
         {
-            Tracing.Trace.Lifecycle (nameof (UnixInput), "Init", $"Console is not attached to a terminal. Running in degraded mode.");
+            Trace.Lifecycle (nameof (UnixInput), "Init", "Console is not attached to a terminal. Running in degraded mode.");
 
             return;
         }

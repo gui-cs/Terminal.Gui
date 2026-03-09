@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Terminal.Gui.Tests;
+using Terminal.Gui.Tracing;
 
 // ReSharper disable AccessToDisposedClosure
 #pragma warning disable xUnit1031

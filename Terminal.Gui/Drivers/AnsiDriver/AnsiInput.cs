@@ -90,7 +90,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
             // Check if we have a real console first
             if (!IsAttachedToTerminal)
             {
-                Trace.Lifecycle (nameof (AnsiInput), "Init", $"Console is not attached to a terminal. Running in degraded mode.");
+                Trace.Lifecycle (nameof (AnsiInput), "Init", "Console is not attached to a terminal. Running in degraded mode.");
 
                 return;
             }

@@ -355,6 +355,7 @@ public class AnsiOutput : OutputBase, IOutput
         {
             DisableKittyKeyboard ();
 
+
             if (_platform == AnsiPlatform.Degraded)
             {
                 return;
