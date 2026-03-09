@@ -1,10 +1,10 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Globalization;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Time And Date", "Illustrates TimeEditor, DateEditor, and time & date handling")]
+[ScenarioMetadata ("Time And Date", "Illustrates TimeEditor, DateEditor, DatePicker, and Prompt<DatePicker>")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("DateTime")]
 public class TimeAndDate : Scenario
@@ -24,8 +24,8 @@ public class TimeAndDate : Scenario
         // ── TimeEditor examples ──────────────────────────────────────
         Label teLabel = new ()
         {
-            X = Pos.Center (),
-            Y = 1,
+            X = 0,
+            Y = 0,
             Text = "TimeEditor (based on TextValidateField):"
         };
         win.Add (teLabel);
@@ -33,7 +33,7 @@ public class TimeAndDate : Scenario
         // Default culture time editor
         TimeEditor defaultTimeEditor = new ()
         {
-            X = Pos.Center (),
+            X = 0,
             Y = Pos.Bottom (teLabel),
             Value = DateTime.Now.TimeOfDay
         };
@@ -53,7 +53,7 @@ public class TimeAndDate : Scenario
 
         TimeEditor time24Editor = new ()
         {
-            X = Pos.Center (),
+            X = 0,
             Y = Pos.Bottom (defaultTimeEditor) + 1,
             Value = DateTime.Now.TimeOfDay,
             Format = format24h
@@ -75,7 +75,7 @@ public class TimeAndDate : Scenario
 
         TimeEditor shortTimeEditor = new ()
         {
-            X = Pos.Center (),
+            X = 0,
             Y = Pos.Bottom (time24Editor) + 1,
             Value = DateTime.Now.TimeOfDay,
             Format = shortFormat
@@ -93,10 +93,8 @@ public class TimeAndDate : Scenario
 
         _lblTimeEditorValue = new ()
         {
-            X = Pos.Center (),
+            X = 0,
             Y = Pos.Bottom (shortTimeEditor) + 1,
-            TextAlignment = Alignment.Center,
-            Width = Dim.Fill (),
             Text = "TimeEditor Value: "
         };
         win.Add (_lblTimeEditorValue);
@@ -104,8 +102,8 @@ public class TimeAndDate : Scenario
         // ── DateEditor examples ──────────────────────────────────────
         Label deLabel = new ()
         {
-            X = Pos.Center (),
-            Y = Pos.Bottom (_lblTimeEditorValue) + 2,
+            X = 0,
+            Y = Pos.Bottom (_lblTimeEditorValue) + 1,
             Text = "DateEditor (based on TextValidateField):"
         };
         win.Add (deLabel);
@@ -113,7 +111,7 @@ public class TimeAndDate : Scenario
         // Default culture date editor
         DateEditor defaultDateEditor = new ()
         {
-            X = Pos.Center (),
+            X = 0,
             Y = Pos.Bottom (deLabel),
             Value = DateTime.Today
         };
@@ -133,7 +131,7 @@ public class TimeAndDate : Scenario
 
         DateEditor usDateEditor = new ()
         {
-            X = Pos.Center (),
+            X = 0,
             Y = Pos.Bottom (defaultDateEditor) + 1,
             Value = DateTime.Today,
             Format = usFormat
@@ -154,7 +152,7 @@ public class TimeAndDate : Scenario
 
         DateEditor germanDateEditor = new ()
         {
-            X = Pos.Center (),
+            X = 0,
             Y = Pos.Bottom (usDateEditor) + 1,
             Value = DateTime.Today,
             Format = deFormat
@@ -172,13 +170,77 @@ public class TimeAndDate : Scenario
 
         _lblDateEditorValue = new ()
         {
-            X = Pos.Center (),
+            X = 0,
             Y = Pos.Bottom (germanDateEditor) + 1,
-            TextAlignment = Alignment.Center,
-            Width = Dim.Fill (),
             Text = "DateEditor Value: "
         };
         win.Add (_lblDateEditorValue);
+
+        // ── Inline DatePicker synced to default DateEditor ───────────
+        Label dpLabel = new ()
+        {
+            X = Pos.Percent (50),
+            Y = Pos.Top (deLabel),
+            Text = "DatePicker (synced with default DateEditor):"
+        };
+        win.Add (dpLabel);
+
+        DatePicker inlineDatePicker = new (defaultDateEditor.Value ?? DateTime.Today)
+        {
+            X = Pos.Percent (50),
+            Y = Pos.Bottom (dpLabel)
+        };
+        win.Add (inlineDatePicker);
+
+        // Sync DateEditor → DatePicker
+        defaultDateEditor.ValueChanged += (_, e) =>
+                                          {
+                                              if (e.NewValue.HasValue)
+                                              {
+                                                  inlineDatePicker.Value = e.NewValue.Value;
+                                              }
+                                          };
+
+        // Sync DatePicker → DateEditor
+        inlineDatePicker.ValueChanged += (_, e) => defaultDateEditor.Value = e.NewValue;
+
+        // ── Prompt<DatePicker> button ────────────────────────────────
+        Button promptDatePickerButton = new ()
+        {
+            X = Pos.Percent (50),
+            Y = Pos.Bottom (inlineDatePicker) + 1,
+            Text = "Prompt<DatePicker>..."
+        };
+        win.Add (promptDatePickerButton);
+
+        Label promptResultLabel = new ()
+        {
+            X = Pos.Percent (50),
+            Y = Pos.Bottom (promptDatePickerButton),
+            Text = "Prompt result: (none)"
+        };
+        win.Add (promptResultLabel);
+
+        promptDatePickerButton.Accepting += (_, _) =>
+                                            {
+                                                DateTime? result = win.Prompt<DatePicker, DateTime?> (
+                                                                                                      view: new DatePicker (defaultDateEditor.Value ?? DateTime.Today),
+                                                                                                      resultExtractor: dp => dp.Value,
+                                                                                                      beginInitHandler: prompt =>
+                                                                                                                        {
+                                                                                                                            prompt.Title = "Pick a Date";
+                                                                                                                        });
+
+                                                if (result is { } selectedDate)
+                                                {
+                                                    promptResultLabel.Text = $"Prompt result: {selectedDate:d}";
+                                                    defaultDateEditor.Value = selectedDate;
+                                                }
+                                                else
+                                                {
+                                                    promptResultLabel.Text = "Prompt result: (cancelled)";
+                                                }
+                                            };
 
         app.Run (win);
     }
