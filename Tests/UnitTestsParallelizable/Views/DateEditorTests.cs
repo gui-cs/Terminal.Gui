@@ -86,8 +86,8 @@ public class DateEditorTests (ITestOutputHelper output) : TestDriverBase
     {
         DateEditor de = new () { Value = new DateTime (2024, 1, 1) };
         var eventFired = false;
-        DateTime? oldValue = null;
-        DateTime? newValue = null;
+        DateTime oldValue = DateTime.MinValue;
+        DateTime newValue = DateTime.MinValue;
 
         de.ValueChanged += (_, e) =>
                            {
@@ -396,9 +396,9 @@ public class DateEditorTests (ITestOutputHelper output) : TestDriverBase
         de.Text = "03/15/2024";
 
         // Value should be updated
-        Assert.Equal (2024, de.Value!.Value.Year);
-        Assert.Equal (3, de.Value.Value.Month);
-        Assert.Equal (15, de.Value.Value.Day);
+        Assert.Equal (2024, de.Value.Year);
+        Assert.Equal (3, de.Value.Month);
+        Assert.Equal (15, de.Value.Day);
     }
 
     [Fact]
@@ -429,9 +429,9 @@ public class DateEditorTests (ITestOutputHelper output) : TestDriverBase
             de.Layout ();
 
             // Value should remain the same
-            Assert.Equal (2024, de.Value!.Value.Year);
-            Assert.Equal (3, de.Value.Value.Month);
-            Assert.Equal (15, de.Value.Value.Day);
+            Assert.Equal (2024, de.Value.Year);
+            Assert.Equal (3, de.Value.Month);
+            Assert.Equal (15, de.Value.Day);
         }
     }
 
@@ -733,7 +733,7 @@ public class DateEditorTests (ITestOutputHelper output) : TestDriverBase
             output.WriteLine ($"After '2': \"{de.Provider.DisplayText}\"");
 
             // Month should now be 12
-            Assert.Equal (12, de.Value!.Value.Month);
+            Assert.Equal (12, de.Value.Month);
 
             DriverAssert.AssertDriverContentsWithFrameAre (@"12/01/2024", output, app.Driver);
         }

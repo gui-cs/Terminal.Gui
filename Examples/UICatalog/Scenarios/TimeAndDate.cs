@@ -185,7 +185,7 @@ public class TimeAndDate : Scenario
         };
         win.Add (dpLabel);
 
-        DatePicker inlineDatePicker = new (defaultDateEditor.Value ?? DateTime.Today)
+        DatePicker inlineDatePicker = new (defaultDateEditor.Value)
         {
             X = Pos.Percent (50),
             Y = Pos.Bottom (dpLabel)
@@ -195,10 +195,7 @@ public class TimeAndDate : Scenario
         // Sync DateEditor → DatePicker
         defaultDateEditor.ValueChanged += (_, e) =>
                                           {
-                                              if (e.NewValue.HasValue)
-                                              {
-                                                  inlineDatePicker.Value = e.NewValue.Value;
-                                              }
+                                              inlineDatePicker.Value = e.NewValue;
                                           };
 
         // Sync DatePicker → DateEditor
@@ -224,7 +221,7 @@ public class TimeAndDate : Scenario
         promptDatePickerButton.Accepting += (_, _) =>
                                             {
                                                 DateTime? result = win.Prompt<DatePicker, DateTime?> (
-                                                                                                      view: new DatePicker (defaultDateEditor.Value ?? DateTime.Today),
+                                                                                                      view: new DatePicker (defaultDateEditor.Value),
                                                                                                       resultExtractor: dp => dp.Value,
                                                                                                       beginInitHandler: prompt =>
                                                                                                                         {
@@ -245,7 +242,7 @@ public class TimeAndDate : Scenario
         app.Run (win);
     }
 
-    private void DateEditorChanged (object? sender, ValueChangedEventArgs<DateTime?> e)
+    private void DateEditorChanged (object? sender, ValueChangedEventArgs<DateTime> e)
     {
         _lblDateEditorValue!.Text = $"DateEditor Value: {e.NewValue:d}";
     }

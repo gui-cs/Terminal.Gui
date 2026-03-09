@@ -173,18 +173,13 @@ public class DatePicker : View, IValue<DateTime>
         return _table;
     }
 
-    private void DateEditor_ValueChanged (object? sender, ValueChangedEventArgs<DateTime?> e)
+    private void DateEditor_ValueChanged (object? sender, ValueChangedEventArgs<DateTime> e)
     {
-        if (!e.NewValue.HasValue)
-        {
-            return;
-        }
+        Value = e.NewValue;
 
-        Value = e.NewValue.Value;
-
-        if (e.NewValue.Value.Day != Value.Day)
+        if (e.NewValue.Day != Value.Day)
         {
-            SelectDayOnCalendar (e.NewValue.Value.Day);
+            SelectDayOnCalendar (e.NewValue.Day);
         }
 
         if (Value.Month == DateTime.MinValue.Month && Value.Year == DateTime.MinValue.Year)
