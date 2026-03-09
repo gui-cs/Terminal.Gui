@@ -1,5 +1,3 @@
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>TextValidateField Providers Interface. All TextValidateField are created with a ITextValidateProvider.</summary>
@@ -50,11 +48,6 @@ public interface ITextValidateProvider
     /// <param name="pos"></param>
     /// <returns>true if the character was successfully inserted, otherwise false.</returns>
     bool InsertAt (char ch, int pos);
-
-    /// <summary>Method that invoke the <see cref="TextChanged"/> event if it's defined.</summary>
-    /// <param name="oldValue">The previous text before replaced.</param>
-    /// <returns>Returns the <see cref="EventArgs{T}"/></returns>
-    void OnTextChanged (EventArgs<string> oldValue);
 
     /// <summary>
     ///     Changed event, raised when the text has changed.
