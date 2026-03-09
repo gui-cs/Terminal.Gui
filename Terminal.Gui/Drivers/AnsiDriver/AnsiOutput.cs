@@ -61,9 +61,9 @@ public class AnsiOutput : OutputBase, IOutput
         try
         {
             // Check if we have a real console first
-            if (!AnsiTerminalHelper.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached))
+            if (!IsAttachedToTerminal)
             {
-                Trace.Lifecycle (nameof (AnsiOutput), "Init", $"Console redirected (Output: {outputAttached}, Input: {inputAttached}). Running in degraded mode.");
+                Trace.Lifecycle (nameof (AnsiOutput), "Init", "No real terminal attached. Running in degraded mode.");
 
                 return;
             }
@@ -78,7 +78,9 @@ public class AnsiOutput : OutputBase, IOutput
                     _windowsVTOutput.Dispose ();
                     _windowsVTOutput = null;
 
-                    Trace.Lifecycle (nameof (AnsiOutput), "Init", "Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
+                    Trace.Lifecycle (nameof (AnsiOutput),
+                                     "Init",
+                                     "Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
 
                     return;
                 }
@@ -178,14 +180,16 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
+        StringBuilder capturedOutput = new ();
+        capturedOutput.Append (text);
+        base.Write (capturedOutput);
+
         try
         {
             switch (_platform)
             {
                 case AnsiPlatform.WindowsVT:
-                    StringBuilder sb = new ();
-                    sb.Append (text);
-                    _windowsVTOutput!.Write (sb);
+                    _windowsVTOutput!.Write (capturedOutput);
 
                     break;
 
@@ -310,13 +314,13 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Dispose ()
     {
-        if (_platform == AnsiPlatform.Degraded)
-        {
-            return;
-        }
-
         try
         {
+            if (_platform == AnsiPlatform.Degraded)
+            {
+                return;
+            }
+
             // Restore terminal state: disable mouse, restore buffer, show cursor
             // TODO: Move Input related CSI sequences to AnsiInput
             Write (EscSeqUtils.CSI_DisableMouseEvents);
