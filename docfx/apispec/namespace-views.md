@@ -23,7 +23,7 @@ The `Views` namespace contains the complete collection of built-in UI controls d
 - OptionSeletor, FlagSelector, ColorPicker, DatePicker, Slider, NumericUpDown
 
 **Menus & Navigation**
-- MenuBar, ContextMenu, StatusBar, Shortcut
+- MenuBar, ContextMenu, StatusBar, Shortcut, Link
 
 **Dialogs**
 - Prompt, MessageBox, FileDialog, OpenDialog, SaveDialog, Wizard
