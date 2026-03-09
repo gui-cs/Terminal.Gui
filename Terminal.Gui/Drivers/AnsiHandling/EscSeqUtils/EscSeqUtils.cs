@@ -895,6 +895,34 @@ public static class EscSeqUtils
     public static readonly AnsiEscapeSequence CSI_RequestCursorPositionReport = new () { Request = CSI + "?6n", Terminator = "R" };
 
     /// <summary>
+    ///     ESC [ ? u - Query kitty keyboard progressive enhancement flags.
+    ///     The terminal reply to <see cref="CSI_QueryKittyKeyboardFlags"/> is ESC [ ? flags u.
+    /// </summary>
+    public static readonly AnsiEscapeSequence CSI_QueryKittyKeyboardFlags = new () { Request = CSI + "?u", Terminator = "u", Value = "?" };
+
+    /// <summary>
+    ///     Phase 1 enables only kitty's disambiguate escape codes flag.
+    /// </summary>
+    public const int KittyKeyboardDisambiguateEscapeCodes = 1;
+
+    /// <summary>
+    ///     The kitty keyboard flags enabled during phase 1.
+    /// </summary>
+    public const int KittyKeyboardPhase1Flags = KittyKeyboardDisambiguateEscapeCodes;
+
+    /// <summary>
+    ///     ESC [ &gt; flags u - Push current kitty keyboard flags and enable the specified flags.
+    /// </summary>
+    /// <param name="flags">The kitty keyboard progressive enhancement flags to enable.</param>
+    /// <returns>The ANSI request string.</returns>
+    public static string CSI_EnableKittyKeyboardFlags (int flags) => $"{CSI}>{flags}u";
+
+    /// <summary>
+    ///     ESC [ &lt; u - Restore the previously pushed kitty keyboard flag state.
+    /// </summary>
+    public static readonly string CSI_DisableKittyKeyboardFlags = CSI + "<u";
+
+    /// <summary>
     ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) R
     /// </summary>
     public const string CSI_RequestCursorPositionReport_Terminator = "R";

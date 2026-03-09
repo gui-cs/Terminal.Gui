@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Terminal.Gui.Tests;
+using Terminal.Gui.Tracing;
 
 // ReSharper disable AccessToDisposedClosure
 #pragma warning disable xUnit1031
@@ -212,6 +213,67 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
         // Before the throttle fix, this would take many seconds due to CPU saturation
         // With the throttle, each thread does Task.Delay(20ms) and exits within ~20-40ms
         Assert.True (sw.ElapsedMilliseconds < 2000, $"Disposing {COUNT} apps took {sw.ElapsedMilliseconds}ms - CPU may be saturated");
+    }
+
+    [Fact]
+    public async Task StartInputTaskAsync_DetectsKittyKeyboard_WhenTerminalResponds ()
+    {
+        using (TestLogging.Verbose (outputHelper))
+        {
+            ConcurrentQueue<char> inputQueue = new ();
+            TimedEvents timedEvents = new ();
+            ApplicationMainLoop<char> loop = new ();
+            TestAnsiInput input = new ("\u001B[?31u");
+            AnsiOutput output = new ();
+            TestAnsiComponentFactory factory = new (input, output);
+            MainLoopCoordinator<char> coordinator = new (timedEvents, inputQueue, loop, factory);
+            Mock<IApplication> appMock = new ();
+
+            appMock.SetupProperty (a => a.Driver);
+            appMock.SetupProperty (a => a.MainThreadId, 123);
+
+            await coordinator.StartInputTaskAsync (appMock.Object);
+
+            Assert.True (SpinWait.SpinUntil (() => input.ResponseSent, TimeSpan.FromSeconds (1)));
+            loop.InputProcessor.ProcessQueue ();
+
+            var driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
+            Assert.True (driver.KittyKeyboardProtocol.IsSupported);
+            Assert.Equal (31, driver.KittyKeyboardProtocol.SupportedFlags);
+
+            // In degraded mode (no real terminal), enable/disable are no-ops,
+            // but detection still succeeds via injected response.
+            Assert.Equal (0, driver.KittyKeyboardProtocol.EnabledFlags);
+
+            coordinator.Stop ();
+        }
+    }
+
+    [Fact]
+    public async Task StartInputTaskAsync_DoesNotEnableKittyKeyboard_ForLegacyConsole ()
+    {
+        ConcurrentQueue<char> inputQueue = new ();
+        TimedEvents timedEvents = new ();
+        ApplicationMainLoop<char> loop = new ();
+        TestAnsiInput input = new (null);
+        AnsiOutput output = new () { IsLegacyConsole = true };
+        TestAnsiComponentFactory factory = new (input, output);
+        MainLoopCoordinator<char> coordinator = new (timedEvents, inputQueue, loop, factory);
+        Mock<IApplication> appMock = new ();
+
+        appMock.SetupProperty (a => a.Driver);
+        appMock.SetupProperty (a => a.MainThreadId, 456);
+
+        await coordinator.StartInputTaskAsync (appMock.Object);
+
+        var driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
+        Assert.False (driver.KittyKeyboardProtocol.IsSupported);
+
+        Assert.DoesNotContain (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardPhase1Flags),
+                               output.GetLastOutput (),
+                               StringComparison.Ordinal);
+
+        coordinator.Stop ();
     }
 
     [Fact]

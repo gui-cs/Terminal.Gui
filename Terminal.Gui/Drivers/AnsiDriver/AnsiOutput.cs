@@ -50,8 +50,6 @@ public class AnsiOutput : OutputBase, IOutput
     /// </summary>
     public AnsiOutput ()
     {
-        // Logging.Information ($"Creating {nameof (AnsiOutput)}");
-
         _platform = AnsiPlatform.Degraded;
 
         _lastBuffer = new OutputBufferImpl ();
@@ -171,8 +169,6 @@ public class AnsiOutput : OutputBase, IOutput
         }
         catch (Exception)
         {
-            //Logging.Warning (e.Message);
-
             // ignore for unit tests
         }
     }
@@ -206,10 +202,44 @@ public class AnsiOutput : OutputBase, IOutput
         }
         catch (Exception)
         {
-            //Logging.Warning (e.Message);
-
             // ignore for unit tests
         }
+    }
+
+    /// <summary>
+    ///     Gets the kitty keyboard flags currently enabled on the terminal.
+    /// </summary>
+    internal int KittyKeyboardEnabledFlags { get; private set; }
+
+    /// <summary>
+    ///     Enables kitty keyboard progressive enhancement flags for the active terminal.
+    /// </summary>
+    /// <param name="flags">The kitty keyboard flags to enable.</param>
+    internal void EnableKittyKeyboard (int flags)
+    {
+        if (flags <= 0 || _platform == AnsiPlatform.Degraded)
+        {
+            return;
+        }
+
+        Trace.Lifecycle (nameof (AnsiOutput), "KittyKeyboard", $"Writing enable sequence for flags {flags}");
+        Write (EscSeqUtils.CSI_EnableKittyKeyboardFlags (flags));
+        KittyKeyboardEnabledFlags = flags;
+    }
+
+    /// <summary>
+    ///     Restores the previous kitty keyboard flag state if kitty mode was enabled.
+    /// </summary>
+    internal void DisableKittyKeyboard ()
+    {
+        if (KittyKeyboardEnabledFlags <= 0)
+        {
+            return;
+        }
+
+        Trace.Lifecycle (nameof (AnsiOutput), "KittyKeyboard", $"Writing disable sequence for flags {KittyKeyboardEnabledFlags}");
+        Write (EscSeqUtils.CSI_DisableKittyKeyboardFlags);
+        KittyKeyboardEnabledFlags = 0;
     }
 
     /// <inheritdoc cref="IOutput.Write(IOutputBuffer)"/>
@@ -316,6 +346,8 @@ public class AnsiOutput : OutputBase, IOutput
     {
         try
         {
+            DisableKittyKeyboard ();
+
             if (_platform == AnsiPlatform.Degraded)
             {
                 return;
@@ -333,7 +365,7 @@ public class AnsiOutput : OutputBase, IOutput
         }
         finally
         {
-            //Logging.Trace ("Flushing and closing.");
+            Trace.Lifecycle (nameof (AnsiOutput), "Dispose", "Flushing output and releasing resources.");
 
             _windowsVTOutput?.Dispose ();
         }

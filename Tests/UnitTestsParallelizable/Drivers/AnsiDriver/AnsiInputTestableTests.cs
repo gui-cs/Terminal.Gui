@@ -527,6 +527,56 @@ public class AnsiInputTestableTests
         Assert.Equal (1, keyDownCount);
     }
 
+    [Fact]
+    public void AnsiInput_ProcessQueue_ParsesKittySequence_FromInjectedCharacters ()
+    {
+        AnsiInput ansiInput = new ();
+        ConcurrentQueue<char> queue = new ();
+        ansiInput.Initialize (queue);
+
+        AnsiInputProcessor processor = new (queue);
+        processor.InputImpl = ansiInput;
+
+        Key? receivedKey = null;
+        processor.KeyDown += (_, k) => receivedKey = k;
+
+        foreach (char ch in "\u001b[65;2u")
+        {
+            ((ITestableInput<char>)ansiInput).InjectInput (ch);
+        }
+
+        SimulateInputThread (ansiInput, queue);
+        processor.ProcessQueue ();
+
+        Assert.NotNull (receivedKey);
+        Assert.Equal (Key.A.WithShift, receivedKey);
+    }
+
+    [Fact]
+    public void AnsiInput_ProcessQueue_ParsesKittyNavigationSequence_FromInjectedCharacters ()
+    {
+        AnsiInput ansiInput = new ();
+        ConcurrentQueue<char> queue = new ();
+        ansiInput.Initialize (queue);
+
+        AnsiInputProcessor processor = new (queue);
+        processor.InputImpl = ansiInput;
+
+        Key? receivedKey = null;
+        processor.KeyDown += (_, k) => receivedKey = k;
+
+        foreach (char ch in "\u001b[57349;6u")
+        {
+            ((ITestableInput<char>)ansiInput).InjectInput (ch);
+        }
+
+        SimulateInputThread (ansiInput, queue);
+        processor.ProcessQueue ();
+
+        Assert.NotNull (receivedKey);
+        Assert.Equal (Key.PageDown.WithCtrl.WithShift, receivedKey);
+    }
+
     #endregion
 
     #region Mouse Event Sequencing Tests
