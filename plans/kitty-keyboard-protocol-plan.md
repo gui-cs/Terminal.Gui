@@ -364,7 +364,7 @@ Diagnostic guidance while building these tests:
 
 ## Phase 2: Rich Keyboard Event Model
 
-Status: In Progress
+Status: In Progress (branch: `feature/kitty-phase2`)
 
 ### Goal
 
