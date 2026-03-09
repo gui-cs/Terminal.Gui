@@ -217,7 +217,7 @@ public class AnsiOutput : OutputBase, IOutput
     /// <param name="flags">The kitty keyboard flags to enable.</param>
     internal void EnableKittyKeyboard (int flags)
     {
-        if (flags <= 0)
+        if (flags <= 0 || _platform == AnsiPlatform.Degraded)
         {
             return;
         }

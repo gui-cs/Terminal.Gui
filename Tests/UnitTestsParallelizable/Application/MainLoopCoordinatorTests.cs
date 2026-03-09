@@ -216,7 +216,7 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
     }
 
     [Fact]
-    public async Task StartInputTaskAsync_EnablesAndDisablesKittyKeyboard_WhenTerminalResponds ()
+    public async Task StartInputTaskAsync_DetectsKittyKeyboard_WhenTerminalResponds ()
     {
         using (TestLogging.Verbose (outputHelper))
         {
@@ -240,15 +240,12 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
             var driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
             Assert.True (driver.KittyKeyboardProtocol.IsSupported);
             Assert.Equal (31, driver.KittyKeyboardProtocol.SupportedFlags);
-            Assert.Equal (EscSeqUtils.KittyKeyboardPhase1Flags, driver.KittyKeyboardProtocol.EnabledFlags);
 
-            Assert.Contains (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardPhase1Flags),
-                             output.GetLastOutput (),
-                             StringComparison.Ordinal);
+            // In degraded mode (no real terminal), enable/disable are no-ops,
+            // but detection still succeeds via injected response.
+            Assert.Equal (0, driver.KittyKeyboardProtocol.EnabledFlags);
 
             coordinator.Stop ();
-
-            Assert.Contains (EscSeqUtils.CSI_DisableKittyKeyboardFlags, output.GetLastOutput (), StringComparison.Ordinal);
         }
     }
 
