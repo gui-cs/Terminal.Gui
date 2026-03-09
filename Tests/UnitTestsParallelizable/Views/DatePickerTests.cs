@@ -97,4 +97,67 @@ public class DatePickerTests : TestDriverBase
         Assert.Equal (DateTime.Now.Date.Month, datePicker.Value.Month);
         Assert.Equal (DateTime.Now.Date.Year, datePicker.Value.Year);
     }
+
+    [Fact]
+    public void DatePicker_Constructor_InitializesEmbeddedEditor_WithCorrectValue ()
+    {
+        // Test that embedded DateEditor is initialized with the DatePicker's value, not DateTime.Now
+        DateTime testDate = new DateTime (2020, 5, 15);
+        DatePicker datePicker = new DatePicker (testDate);
+        datePicker.BeginInit ();
+        datePicker.EndInit ();
+
+        // Get the embedded editor
+        DateEditor? editor = datePicker.SubViews.FirstOrDefault (v => v.Id == "_dateEditor") as DateEditor;
+        Assert.NotNull (editor);
+        Assert.Equal (testDate, editor.Value);
+
+        datePicker.Dispose ();
+    }
+
+    [Fact]
+    public void DatePicker_Culture_PropagatesTo_EmbeddedEditor ()
+    {
+        // Test that changing Culture propagates Format to the embedded DateEditor
+        DateTime testDate = new DateTime (2024, 3, 15);
+        DatePicker datePicker = new DatePicker (testDate);
+        datePicker.BeginInit ();
+        datePicker.EndInit ();
+
+        DateEditor? editor = datePicker.SubViews.FirstOrDefault (v => v.Id == "_dateEditor") as DateEditor;
+        Assert.NotNull (editor);
+
+        // Change culture
+        CultureInfo germanCulture = CultureInfo.GetCultureInfo ("de-DE");
+        datePicker.Culture = germanCulture;
+
+        // Verify the editor's Format was updated
+        Assert.Equal (germanCulture.DateTimeFormat, editor.Format);
+
+        datePicker.Dispose ();
+    }
+
+    [Fact]
+    public void DatePicker_Value_PropagatesTo_EmbeddedEditor ()
+    {
+        // Test that changing DatePicker.Value updates the embedded DateEditor.Value
+        DateTime initialDate = new DateTime (2020, 1, 1);
+        DateTime newDate = new DateTime (2024, 12, 25);
+
+        DatePicker datePicker = new DatePicker (initialDate);
+        datePicker.BeginInit ();
+        datePicker.EndInit ();
+
+        DateEditor? editor = datePicker.SubViews.FirstOrDefault (v => v.Id == "_dateEditor") as DateEditor;
+        Assert.NotNull (editor);
+        Assert.Equal (initialDate, editor.Value);
+
+        // Change the DatePicker's value
+        datePicker.Value = newDate;
+
+        // Verify the editor's value was updated
+        Assert.Equal (newDate, editor.Value);
+
+        datePicker.Dispose ();
+    }
 }

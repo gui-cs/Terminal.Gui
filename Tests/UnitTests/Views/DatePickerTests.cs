@@ -16,7 +16,7 @@ public class DatePickerTests
         top.Add (datePicker);
         Application.Begin (top);
 
-        Assert.Equal (datePicker.SubViews.First (v => v.Id == "_dateField"), datePicker.Focused);
+        Assert.Equal (datePicker.SubViews.First (v => v.Id == "_dateEditor"), datePicker.Focused);
 
         // Set focus to next month button
         datePicker.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
@@ -48,7 +48,7 @@ public class DatePickerTests
         top.Add (datePicker);
         Application.Begin (top);
 
-        Assert.Equal (datePicker.SubViews.First (v => v.Id == "_dateField"), datePicker.Focused);
+        Assert.Equal (datePicker.SubViews.First (v => v.Id == "_dateEditor"), datePicker.Focused);
 
         datePicker.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop);
         Assert.Equal (datePicker.SubViews.First (v => v.Id == "_calendar"), datePicker.Focused);
