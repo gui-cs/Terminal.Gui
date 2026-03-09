@@ -128,7 +128,7 @@ public class TextRegexProvider : ITextValidateProvider
     /// <summary>
     ///     Raises the TextChanged event to notify subscribers that the text has changed.
     /// </summary>
-    /// <param name="args">An EventArgs<string> object that contains the event data representing the new text value.</param>
+    /// <param name="args">Contains the event data representing the new text value.</param>
     public void OnTextChanged (EventArgs<string> args) => TextChanged?.Invoke (this, args);
 
     /// <summary>Compiles the regex pattern for validation./></summary>
