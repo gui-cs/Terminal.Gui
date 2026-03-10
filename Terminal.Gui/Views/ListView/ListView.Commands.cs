@@ -2,6 +2,33 @@ namespace Terminal.Gui.Views;
 
 public partial class ListView
 {
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="ListView"/>. Override via <c>config.json</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, string []>? DefaultKeyBindings { get; set; } = new ()
+    {
+        { "Up", ["CursorUp", "Ctrl+P"] },
+        { "Down", ["CursorDown", "Ctrl+N"] },
+        { "PageUp", ["PageUp"] },
+        { "PageDown", ["PageDown", "Ctrl+V"] },
+        { "Start", ["Home"] },
+        { "End", ["End"] },
+        { "UpExtend", ["Shift+CursorUp", "Ctrl+Shift+P"] },
+        { "DownExtend", ["Shift+CursorDown", "Ctrl+Shift+N"] },
+        { "PageUpExtend", ["Shift+PageUp"] },
+        { "PageDownExtend", ["Shift+PageDown"] },
+        { "StartExtend", ["Shift+Home"] },
+        { "EndExtend", ["Shift+End"] }
+    };
+
+    /// <summary>
+    ///     Gets or sets the platform-override key bindings for <see cref="ListView"/> on Unix. Override via
+    ///     <c>config.json</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
+
     private void SetupBindingsAndCommands ()
     {
         // Things this view knows how to do
@@ -29,26 +56,7 @@ public partial class ListView
         AddCommand (Command.SelectAll, HandleSelectAll);
 
         // Default keybindings for all ListViews
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.P.WithCtrl, Command.Up);
-        KeyBindings.Add (Key.CursorDown, Command.Down);
-        KeyBindings.Add (Key.N.WithCtrl, Command.Down);
-        KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.V.WithCtrl, Command.PageDown);
-        KeyBindings.Add (Key.Home, Command.Start);
-        KeyBindings.Add (Key.End, Command.End);
-
-        // Shift+Arrow for extending selection
-        KeyBindings.Add (Key.CursorUp.WithShift, Command.UpExtend);
-        KeyBindings.Add (Key.P.WithCtrl.WithShift, Command.UpExtend);
-        KeyBindings.Add (Key.CursorDown.WithShift, Command.DownExtend);
-        KeyBindings.Add (Key.N.WithCtrl.WithShift, Command.DownExtend);
-
-        KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
-        KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
-        KeyBindings.Add (Key.Home.WithShift, Command.StartExtend);
-        KeyBindings.Add (Key.End.WithShift, Command.EndExtend);
+        KeyBindingConfigHelper.Apply (this, DefaultKeyBindings, DefaultKeyBindingsUnix);
 
         // Key.Space is already bound to Command.Activate; this gives us activate then move down
         KeyBindings.Add (Key.Space.WithShift, Command.Activate, Command.Down);

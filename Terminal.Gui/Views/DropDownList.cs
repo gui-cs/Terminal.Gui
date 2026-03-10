@@ -62,6 +62,22 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class DropDownList : TextField
 {
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="DropDownList"/>. Override via <c>config.json</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public new static Dictionary<string, string []>? DefaultKeyBindings { get; set; } = new ()
+    {
+        { "Toggle", ["F4", "Alt+CursorDown"] }
+    };
+
+    /// <summary>
+    ///     Gets or sets the platform-override key bindings for <see cref="DropDownList"/> on Unix. Override via
+    ///     <c>config.json</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public new static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
+
     private readonly Button? _toggleButton;
     private Popover<ListView, string?>? _listPopover;
 
@@ -139,8 +155,7 @@ public class DropDownList : TextField
         Width = Dim.Auto (minimumContentDim: Dim.Func (_ => _listPopover.ContentView?.MaxItemLength ?? 0));
 
         // Add keyboard bindings
-        KeyBindings.Add (Key.F4, Command.Toggle);
-        KeyBindings.Add (Key.CursorDown.WithAlt, Command.Toggle);
+        KeyBindingConfigHelper.Apply (this, DefaultKeyBindings, DefaultKeyBindingsUnix);
 
         // Add command handler for toggle
         AddCommand (Command.Toggle, ToggleDropDown);

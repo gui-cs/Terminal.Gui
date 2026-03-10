@@ -74,6 +74,41 @@ public class TreeView<T> : View, ITreeView where T : class
     public static string NoBuilderError = "ERROR: TreeBuilder Not Set";
 
     /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="TreeView{T}"/> on all platforms.
+    ///     Maps <see cref="Command"/> names to arrays of key strings (parseable by <see cref="Key.TryParse"/>).
+    ///     Configure in <em>config.json</em> under the key <c>TreeView.DefaultKeyBindings</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, string []> DefaultKeyBindings { get; set; } = new ()
+    {
+        ["PageUp"] = ["PageUp"],
+        ["PageDown"] = ["PageDown"],
+        ["PageUpExtend"] = ["Shift+PageUp"],
+        ["PageDownExtend"] = ["Shift+PageDown"],
+        ["Expand"] = ["CursorRight"],
+        ["ExpandAll"] = ["Ctrl+CursorRight"],
+        ["Collapse"] = ["CursorLeft"],
+        ["CollapseAll"] = ["Ctrl+CursorLeft"],
+        ["Up"] = ["CursorUp"],
+        ["UpExtend"] = ["Shift+CursorUp"],
+        ["LineUpToFirstBranch"] = ["Ctrl+CursorUp"],
+        ["Down"] = ["CursorDown"],
+        ["DownExtend"] = ["Shift+CursorDown"],
+        ["LineDownToLastBranch"] = ["Ctrl+CursorDown"],
+        ["Start"] = ["Home"],
+        ["End"] = ["End"],
+        ["SelectAll"] = ["Ctrl+A"],
+    };
+
+    /// <summary>
+    ///     Gets or sets additional key bindings for <see cref="TreeView{T}"/> applied only on non-Windows platforms.
+    ///     These are appended to <see cref="DefaultKeyBindings"/>. Configure in <em>config.json</em> under the key
+    ///     <c>TreeView.DefaultKeyBindingsUnix</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
+
+    /// <summary>
     ///     Interface for filtering which lines of the tree are displayed e.g. to provide text searching.  Defaults to
     ///     <see langword="null"/> (no filtering).
     /// </summary>
@@ -254,27 +289,9 @@ public class TreeView<T> : View, ITreeView where T : class
                     });
 
         // Default keybindings for this view
-        KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
-        KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
-        KeyBindings.Add (Key.CursorRight, Command.Expand);
-        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.ExpandAll);
-        KeyBindings.Add (Key.CursorLeft, Command.Collapse);
-        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.CollapseAll);
+        KeyBindingConfigHelper.Apply (this, DefaultKeyBindings, DefaultKeyBindingsUnix);
 
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.CursorUp.WithShift, Command.UpExtend);
-        KeyBindings.Add (Key.CursorUp.WithCtrl, Command.LineUpToFirstBranch);
-
-        KeyBindings.Add (Key.CursorDown, Command.Down);
-        KeyBindings.Add (Key.CursorDown.WithShift, Command.DownExtend);
-        KeyBindings.Add (Key.CursorDown.WithCtrl, Command.LineDownToLastBranch);
-
-        KeyBindings.Add (Key.Home, Command.Start);
-        KeyBindings.Add (Key.End, Command.End);
-        KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
-
+        // ObjectActivationKey depends on instance state: cannot be in the static dict
         KeyBindings.Remove (ObjectActivationKey);
         KeyBindings.Add (ObjectActivationKey, Command.Activate);
 

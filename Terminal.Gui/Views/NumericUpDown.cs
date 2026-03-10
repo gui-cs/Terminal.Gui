@@ -11,6 +11,26 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class NumericUpDown<T> : View, IValue<T> where T : notnull
 {
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="NumericUpDown{T}"/> on all platforms.
+    ///     Maps <see cref="Command"/> names to arrays of key strings (parseable by <see cref="Key.TryParse"/>).
+    ///     Configure in <em>config.json</em> under the key <c>NumericUpDown.DefaultKeyBindings</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, string []> DefaultKeyBindings { get; set; } = new ()
+    {
+        ["Up"] = ["CursorUp"],
+        ["Down"] = ["CursorDown"],
+    };
+
+    /// <summary>
+    ///     Gets or sets additional key bindings for <see cref="NumericUpDown{T}"/> applied only on non-Windows platforms.
+    ///     These are appended to <see cref="DefaultKeyBindings"/>. Configure in <em>config.json</em> under the key
+    ///     <c>NumericUpDown.DefaultKeyBindingsUnix</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
+
     private readonly Button _down;
 
     // TODO: Use a TextField instead of a Label
@@ -123,8 +143,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
                         return true;
                     });
 
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.CursorDown, Command.Down);
+        KeyBindingConfigHelper.Apply (this, DefaultKeyBindings, DefaultKeyBindingsUnix);
 
         SetText ();
 

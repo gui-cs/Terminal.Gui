@@ -230,10 +230,659 @@ Many modern TUIs use **Ctrl+Z** for undo on Windows but **Ctrl+/** or similar on
 
 ---
 
-## TODO
+## Deep Dive: ConfigurationManager Constraints
 
-- [ ] Create new PR from `feature/cm-keybindings` → `v2_develop`
-- [ ] Design: finalize config JSON schema
-- [ ] Design: resolve static vs instance property challenge
-- [ ] Design: platform-specific binding strategy
-- [ ] Implementation planning
+From analysis of the existing CM infrastructure:
+
+### Hard Requirements
+- **Property MUST be `public static`** — CM reflection throws `InvalidOperationException` otherwise
+- **JSON key format**: `ClassName.PropertyName` (or just `PropertyName` if `OmitClassName = true`)
+- **Scope**: `[ConfigurationProperty(Scope = typeof(SettingsScope))]` for top-level config.json entries
+- **Unknown JSON keys throw** `JsonException` — no forward compatibility; every new property must be registered
+
+### Type Support
+- `Key` already serializes as a **plain string** (`"Ctrl+Z"`, `"Shift+F10"`) via the globally-registered `KeyJsonConverter`
+- New collection types (e.g. `Dictionary<string, string[]>`) must be added to `SourceGenerationContext`
+- `KeyBinding`/`KeyBindings` are **NOT serializable as-is** — they contain `WeakReference<View>` and `View` fields
+
+### Practical Serializable Type for a Bindings Map
+The simplest type that works:
+```csharp
+// Command name (string) → one or more key strings
+public static Dictionary<string, string[]> DefaultKeyBindings { get; set; }
+```
+- `string[]` needs `[JsonSerializable(typeof(string[]))]` (likely already registered)
+- `Dictionary<string, string[]>` needs `[JsonSerializable(typeof(Dictionary<string, string[]>))]`
+- No new converters required — `Key` round-trips via `Key.TryParse()`/`Key.ToString()`
+
+---
+
+## Existing Application-Level Key Properties (Already in config.json)
+
+These already work and will NOT change format:
+
+```json
+"Application.QuitKey": "Esc",
+"Application.ArrangeKey": "Ctrl+F5",
+"Application.NextTabKey": "Tab",
+"Application.PrevTabKey": "Shift+Tab",
+"Application.NextTabGroupKey": "F6",
+"Application.PrevTabGroupKey": "Shift+F6",
+"PopoverMenu.DefaultKey": "Shift+F10"
+```
+
+---
+
+## Platform Binding Strategy
+
+### The Problem
+Several key conventions differ fundamentally by platform:
+- **`Ctrl+Z`** = Undo on Windows/macOS GUI; = SIGTSTP (suspend) on Unix TUI
+- **`Ctrl+Y`** = Redo on Windows; = Paste/Yank in emacs/Unix TUI
+- **`Ctrl+R`** = DeleteAll in TextField; = Redo in TextView (inconsistency!)
+- **`Ctrl+C`** = Copy GUI; = SIGINT on some Unix terminals (handled by raw mode)
+- **`Ctrl+W`** = not bound in TextField; = Cut in TextView (emacs kill-region)
+
+### Guiding Principle
+> **Prefer popular TUI conventions (vim, emacs, less, tig, ranger) over GUI conventions (Word, Notepad) on Unix.**
+> On Windows, GUI conventions are fine since `Ctrl+Z` suspend doesn't apply.
+
+### Design: Two Static Properties Per Class
+Use **two** `public static` properties per view — a base set and a Unix-specific override. CM merges them at runtime:
+
+```json
+"TextField.DefaultKeyBindings": {
+  "Undo":  ["Ctrl+Z"],
+  "Redo":  ["Ctrl+Y", "Ctrl+Shift+Z"]
+},
+"TextField.DefaultKeyBindingsUnix": {
+  "Undo":  ["Ctrl+Slash"],
+  "Redo":  ["Ctrl+Shift+Z"]
+}
+```
+
+The view's `CreateCommandsAndBindings()` applies `DefaultKeyBindings` first, then overlays `DefaultKeyBindingsUnix` (or `DefaultKeyBindingsWindows` if needed) at runtime using `RuntimeInformation.IsOSPlatform()`.
+
+---
+
+## Complete Existing Key Bindings (Ground Truth)
+
+### `View` (base class) — `View.Keyboard.cs`
+
+| Key | Command | Notes |
+|-----|---------|-------|
+| `Space` | `Activate` | All views |
+| `Enter` | `Accept` | All views |
+
+### `Application` — `ApplicationKeyboard.cs`
+
+These are already single-Key properties in config.json; no change to format needed.
+
+| Property | Default | Command |
+|----------|---------|---------|
+| `Application.QuitKey` | `Esc` | `Quit` |
+| `Application.NextTabKey` | `Tab` | `NextTabStop` |
+| `Application.PrevTabKey` | `Shift+Tab` | `PreviousTabStop` |
+| `Application.NextTabGroupKey` | `F6` | `NextTabGroup` |
+| `Application.PrevTabGroupKey` | `Shift+F6` | `PreviousTabGroup` |
+| `Application.ArrangeKey` | `Ctrl+F5` | `Arrange` |
+
+Additionally hardcoded (not configurable today):
+- `CursorRight` / `CursorDown` → `NextTabStop` (dialog navigation)
+
+### `TextField` — `TextField.Commands.cs`
+
+| Key(s) | Command | TUI Notes |
+|--------|---------|-----------|
+| `Delete` | `DeleteCharRight` | Universal |
+| `Ctrl+D` | `DeleteCharRight` | Emacs |
+| `Backspace` | `DeleteCharLeft` | Universal |
+| `Home`, `Ctrl+Home` | `LeftStart` | Universal |
+| `End`, `Ctrl+End`, `Ctrl+E` | `RightEnd` | Universal / Emacs |
+| `CursorLeft`, `Ctrl+B` | `Left` | Universal / Emacs |
+| `CursorRight`, `Ctrl+F` | `Right` | Universal / Emacs |
+| `Ctrl+CursorLeft`, `Ctrl+CursorUp` | `WordLeft` | Universal |
+| `Ctrl+CursorRight`, `Ctrl+CursorDown` | `WordRight` | Universal |
+| `Shift+CursorLeft`, `Shift+CursorUp` | `LeftExtend` | Universal |
+| `Shift+CursorRight`, `Shift+CursorDown` | `RightExtend` | Universal |
+| `Ctrl+Shift+CursorLeft`, `Ctrl+Shift+CursorUp` | `WordLeftExtend` | |
+| `Ctrl+Shift+CursorRight`, `Ctrl+Shift+CursorDown` | `WordRightExtend` | |
+| `Shift+Home`, `Ctrl+Shift+Home`, `Ctrl+Shift+A` | `LeftStartExtend` | |
+| `Shift+End`, `Ctrl+Shift+End`, `Ctrl+Shift+E` | `RightEndExtend` | |
+| `Ctrl+K` | `CutToEndOfLine` | Emacs kill-line |
+| `Ctrl+Shift+K` | `CutToStartOfLine` | |
+| **`Ctrl+Z`** | `Undo` | ⚠️ Unix: conflicts with SIGTSTP |
+| **`Ctrl+Y`** | `Redo` | ⚠️ Emacs: Ctrl+Y = paste (yank) |
+| `Ctrl+Delete` | `KillWordRight` | kill-word-forward |
+| `Ctrl+Backspace` | `KillWordLeft` | kill-word-backward |
+| `Insert` | `ToggleOverwrite` | Universal |
+| `Ctrl+C` | `Copy` | Universal (raw mode safe) |
+| `Ctrl+X` | `Cut` | Universal |
+| `Ctrl+V` | `Paste` | Universal |
+| `Ctrl+A` | `SelectAll` | ⚠️ Emacs: Ctrl+A = line start |
+| `Ctrl+R`, `Ctrl+Shift+D` | `DeleteAll` | ⚠️ Ctrl+R = Redo in TextView! |
+
+### `TextView` — `TextView.Commands.cs`
+
+Inherits TextField commands. Key **differences and additions**:
+
+| Key(s) | Command | Notes |
+|--------|---------|-------|
+| `Enter` | `NewLine` (if multiline) / `Accept` | |
+| `PageDown`, `Ctrl+V` | `PageDown` | Ctrl+V = pgdn in emacs |
+| `Shift+PageDown` | `PageDownExtend` | |
+| `PageUp` | `PageUp` | |
+| `Shift+PageUp` | `PageUpExtend` | |
+| `CursorDown`, `Ctrl+N` | `Down` | Ctrl+N = next in emacs |
+| `Shift+CursorDown` | `DownExtend` | |
+| `CursorUp`, `Ctrl+P` | `Up` | Ctrl+P = prev in emacs |
+| `Shift+CursorUp` | `UpExtend` | |
+| `Ctrl+End` | `End` (doc end) | |
+| `Ctrl+Shift+End` | `EndExtend` | |
+| `Ctrl+Home` | `Start` (doc start) | |
+| `Ctrl+Shift+Home` | `StartExtend` | |
+| `Ctrl+Space` | `ToggleExtend` | Emacs mark |
+| **`Ctrl+Y`** | `Paste` | ⚠️ Emacs yank (≠ TextField's Redo!) |
+| `Ctrl+W`, `Ctrl+X` | `Cut` | Emacs kill-region + GUI |
+| `Ctrl+Shift+Delete` | `CutToEndOfLine` | |
+| `Ctrl+Shift+Backspace` | `CutToStartOfLine` | |
+| `Ctrl+Shift+Right` | `WordRightExtend` | |
+| `Ctrl+Shift+Left` | `WordLeftExtend` | |
+| `Tab` | `NextTabStop` | |
+| `Shift+Tab` | `PreviousTabStop` | |
+| `Ctrl+Z` | `Undo` | ⚠️ Same Unix issue |
+| **`Ctrl+R`** | `Redo` | ⚠️ Conflicts with TextField's DeleteAll! |
+| `Ctrl+G` , `Ctrl+Shift+D` | `DeleteAll` | |
+| `Ctrl+L` | `Open` (color picker) | |
+
+### `ListView` — `ListView.Commands.cs`
+
+| Key(s) | Command |
+|--------|---------|
+| `CursorUp`, `Ctrl+P` | `Up` |
+| `CursorDown`, `Ctrl+N` | `Down` |
+| `PageUp` | `PageUp` |
+| `PageDown`, `Ctrl+V` | `PageDown` |
+| `Home` | `Start` |
+| `End` | `End` |
+| `Shift+CursorUp`, `Ctrl+Shift+P` | `UpExtend` |
+| `Shift+CursorDown`, `Ctrl+Shift+N` | `DownExtend` |
+| `Shift+PageUp` | `PageUpExtend` |
+| `Shift+PageDown` | `PageDownExtend` |
+| `Shift+Home` | `StartExtend` |
+| `Shift+End` | `EndExtend` |
+| `Shift+Space` | `Activate` + `Down` |
+| `Ctrl+A` | `SelectAll` (mark all) |
+| `Ctrl+U` | `SelectAll` (unmark all) |
+
+### `TableView` — `TableView.cs`
+
+| Key(s) | Command |
+|--------|---------|
+| `CursorLeft` | `Left` |
+| `CursorRight` | `Right` |
+| `CursorUp` | `Up` |
+| `CursorDown` | `Down` |
+| `PageUp` | `PageUp` |
+| `PageDown` | `PageDown` |
+| `Home` | `LeftStart` (row start) |
+| `End` | `RightEnd` (row end) |
+| `Ctrl+Home` | `Start` (table start) |
+| `Ctrl+End` | `End` (table end) |
+| `Shift+CursorLeft` | `LeftExtend` |
+| `Shift+CursorRight` | `RightExtend` |
+| `Shift+CursorUp` | `UpExtend` |
+| `Shift+CursorDown` | `DownExtend` |
+| `Shift+PageUp` | `PageUpExtend` |
+| `Shift+PageDown` | `PageDownExtend` |
+| `Shift+Home` | `LeftStartExtend` |
+| `Shift+End` | `RightEndExtend` |
+| `Ctrl+Shift+Home` | `StartExtend` |
+| `Ctrl+Shift+End` | `EndExtend` |
+| `Ctrl+A` | `SelectAll` |
+| `Enter` | `Accept` (`CellActivationKey`) |
+
+### `TreeView` — `TreeView.cs`
+
+| Key(s) | Command |
+|--------|---------|
+| `CursorUp` | `Up` |
+| `Shift+CursorUp` | `UpExtend` |
+| `Ctrl+CursorUp` | `LineUpToFirstBranch` |
+| `CursorDown` | `Down` |
+| `Shift+CursorDown` | `DownExtend` |
+| `Ctrl+CursorDown` | `LineDownToLastBranch` |
+| `CursorRight` | `Expand` |
+| `Ctrl+CursorRight` | `ExpandAll` |
+| `CursorLeft` | `Collapse` |
+| `Ctrl+CursorLeft` | `CollapseAll` |
+| `PageUp` | `PageUp` |
+| `PageDown` | `PageDown` |
+| `Shift+PageUp` | `PageUpExtend` |
+| `Shift+PageDown` | `PageDownExtend` |
+| `Home` | `Start` |
+| `End` | `End` |
+| `Ctrl+A` | `SelectAll` |
+| `Enter` | `Activate` (`ObjectActivationKey`) |
+
+### `TabView` — `TabView.cs`
+
+| Key(s) | Command |
+|--------|---------|
+| `CursorLeft` | `Left` (prev tab) |
+| `CursorRight` | `Right` (next tab) |
+| `CursorUp` | `Up` |
+| `CursorDown` | `Down` |
+| `Home` | `LeftStart` (first tab) |
+| `End` | `RightEnd` (last tab) |
+| `PageUp` | `PageUp` |
+| `PageDown` | `PageDown` |
+
+### Other Views (minor bindings)
+
+**`DropDownList`**: `F4` → `Toggle`, `CursorDown` → open
+
+**`HexView`**: Arrow keys, PageUp/Down, Home, End, Backspace→`DeleteCharLeft`, Delete→`DeleteCharRight`, Insert→`ToggleOverwrite`
+
+**`NumericUpDown`**: `CursorUp`→`Up`, `CursorDown`→`Down`
+
+**`ColorBar`**: `CursorLeft`/`Right` + Shift extend variants + `Home`/`End`
+
+**`ColorPicker.16`**: Arrow keys for 16-color grid
+
+**`CharMap`**: Arrow keys, PageUp/Down, Home, End, `Shift+F10`→`Context`
+
+**`LinearRange`**: Arrow keys, PageUp/Down, Home, End, extend variants
+
+**`PopoverImpl`**: `Application.QuitKey` → `Quit`
+
+---
+
+## Inconsistencies Found (Fix as Part of This PR)
+
+| Issue | TextField | TextView | Recommendation |
+|-------|-----------|----------|----------------|
+| **Redo key** | `Ctrl+Y` | `Ctrl+R` | Standardize: use `Ctrl+Shift+Z` everywhere; `Ctrl+R` on Unix |
+| **Paste key** | `Ctrl+V` | `Ctrl+V` + `Ctrl+Y` | TextField should also have `Ctrl+Y`→Paste on Unix |
+| **DeleteAll** | `Ctrl+R`, `Ctrl+Shift+D` | `Ctrl+G`, `Ctrl+Shift+D` | Remove `Ctrl+R` from TextField (conflicts with Redo); keep `Ctrl+Shift+D` for all |
+| **CutToStart** | `Ctrl+Shift+K` | `Ctrl+Shift+Backspace` | Different keys — pick one or bind both everywhere |
+| **`Ctrl+W`** (Cut) | Not bound | Bound | Add to TextField on Unix |
+| **`Ctrl+V`** (PageDown in emacs) | Not a pager | `Ctrl+V`→PageDown | Fine; no conflict |
+
+---
+
+## Proposed `config.json` Additions
+
+### Design Rules Applied
+1. All keys that are **universal** (same on all platforms) go in the base `DefaultKeyBindings`
+2. Keys that **conflict with Unix signals or conventions** go in `DefaultKeyBindingsUnix` (override)
+3. On Unix, omitting a key from the override means the base binding is **cleared** for that command if it conflicts — the override **replaces**, not appends, for that command
+4. Emacs shortcuts are included in both base and Unix sections as they're safe on both
+
+```json
+{
+  "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
+
+  // ─── Existing application-level key properties (unchanged) ────────────────
+  "Application.QuitKey": "Esc",
+  "Application.ArrangeKey": "Ctrl+F5",
+  "Application.NextTabKey": "Tab",
+  "Application.PrevTabKey": "Shift+Tab",
+  "Application.NextTabGroupKey": "F6",
+  "Application.PrevTabGroupKey": "Shift+F6",
+  "PopoverMenu.DefaultKey": "Shift+F10",
+
+  // ─── View (base class) ────────────────────────────────────────────────────
+  "View.DefaultKeyBindings": {
+    "Activate": [ "Space" ],
+    "Accept":   [ "Enter" ]
+  },
+
+  // ─── TextField ────────────────────────────────────────────────────────────
+  "TextField.DefaultKeyBindings": {
+    "DeleteCharRight":   [ "Delete", "Ctrl+D" ],
+    "DeleteCharLeft":    [ "Backspace" ],
+    "LeftStart":         [ "Home", "Ctrl+Home" ],
+    "RightEnd":          [ "End", "Ctrl+End", "Ctrl+E" ],
+    "Left":              [ "CursorLeft", "Ctrl+B" ],
+    "Right":             [ "CursorRight", "Ctrl+F" ],
+    "WordLeft":          [ "Ctrl+CursorLeft" ],
+    "WordRight":         [ "Ctrl+CursorRight" ],
+    "LeftExtend":        [ "Shift+CursorLeft" ],
+    "RightExtend":       [ "Shift+CursorRight" ],
+    "WordLeftExtend":    [ "Ctrl+Shift+CursorLeft" ],
+    "WordRightExtend":   [ "Ctrl+Shift+CursorRight" ],
+    "LeftStartExtend":   [ "Shift+Home", "Ctrl+Shift+Home" ],
+    "RightEndExtend":    [ "Shift+End", "Ctrl+Shift+End" ],
+    "CutToEndOfLine":    [ "Ctrl+K" ],
+    "CutToStartOfLine":  [ "Ctrl+Shift+K" ],
+    "Undo":              [ "Ctrl+Z" ],
+    "Redo":              [ "Ctrl+Shift+Z" ],
+    "KillWordRight":     [ "Ctrl+Delete" ],
+    "KillWordLeft":      [ "Ctrl+Backspace" ],
+    "ToggleOverwrite":   [ "InsertChar" ],
+    "Copy":              [ "Ctrl+C" ],
+    "Cut":               [ "Ctrl+X" ],
+    "Paste":             [ "Ctrl+V" ],
+    "SelectAll":         [ "Ctrl+A" ],
+    "DeleteAll":         [ "Ctrl+Shift+D" ],
+    "Context":           [ "Shift+F10" ]
+  },
+  "TextField.DefaultKeyBindingsUnix": {
+    // On Unix: Ctrl+Z = SIGTSTP. Use Ctrl+/ for Undo (readline default).
+    // Ctrl+Shift+Z works in most modern terminals (xterm, kitty, wezterm) for Redo.
+    "Undo":     [ "Ctrl+Slash" ],
+    "Redo":     [ "Ctrl+Shift+Z", "Ctrl+R" ],
+    "Paste":    [ "Ctrl+V", "Ctrl+Y" ],
+    "Cut":      [ "Ctrl+X", "Ctrl+W" ],
+    "SelectAll": [ "Ctrl+A" ]
+    // Note: Ctrl+A conflicts with emacs 'line start' but SelectAll is more useful in a single-line field
+  },
+
+  // ─── TextView ─────────────────────────────────────────────────────────────
+  "TextView.DefaultKeyBindings": {
+    // Movement (inherits single-line; adds multi-line)
+    "Up":              [ "CursorUp", "Ctrl+P" ],
+    "Down":            [ "CursorDown", "Ctrl+N" ],
+    "PageUp":          [ "PageUp" ],
+    "PageDown":        [ "PageDown" ],
+    "PageUpExtend":    [ "Shift+PageUp" ],
+    "PageDownExtend":  [ "Shift+PageDown" ],
+    "Start":           [ "Ctrl+Home" ],
+    "End":             [ "Ctrl+End" ],
+    "StartExtend":     [ "Ctrl+Shift+Home" ],
+    "EndExtend":       [ "Ctrl+Shift+End" ],
+    "UpExtend":        [ "Shift+CursorUp" ],
+    "DownExtend":      [ "Shift+CursorDown" ],
+    "LeftStart":       [ "Home" ],
+    "RightEnd":        [ "End", "Ctrl+E" ],
+    "LeftStartExtend": [ "Shift+Home" ],
+    "RightEndExtend":  [ "Shift+End" ],
+    "Left":            [ "CursorLeft", "Ctrl+B" ],
+    "Right":           [ "CursorRight", "Ctrl+F" ],
+    "LeftExtend":      [ "Shift+CursorLeft" ],
+    "RightExtend":     [ "Shift+CursorRight" ],
+    "WordLeft":        [ "Ctrl+CursorLeft" ],
+    "WordRight":       [ "Ctrl+CursorRight" ],
+    "WordLeftExtend":  [ "Ctrl+Shift+CursorLeft" ],
+    "WordRightExtend": [ "Ctrl+Shift+CursorRight" ],
+    "ToggleExtend":    [ "Ctrl+Space" ],
+    // Editing
+    "DeleteCharLeft":   [ "Backspace" ],
+    "DeleteCharRight":  [ "Delete", "Ctrl+D" ],
+    "KillWordRight":    [ "Ctrl+Delete" ],
+    "KillWordLeft":     [ "Ctrl+Backspace" ],
+    "CutToEndOfLine":   [ "Ctrl+K", "Ctrl+Shift+Delete" ],
+    "CutToStartOfLine": [ "Ctrl+Shift+Backspace" ],
+    "Undo":             [ "Ctrl+Z" ],
+    "Redo":             [ "Ctrl+Shift+Z" ],
+    "Copy":             [ "Ctrl+C" ],
+    "Cut":              [ "Ctrl+X" ],
+    "Paste":            [ "Ctrl+V" ],
+    "SelectAll":        [ "Ctrl+A" ],
+    "DeleteAll":        [ "Ctrl+Shift+D" ],
+    "ToggleOverwrite":  [ "InsertChar" ],
+    "NextTabStop":      [ "Tab" ],
+    "PreviousTabStop":  [ "Shift+Tab" ],
+    "NewLine":          [ "Enter" ],
+    "Open":             [ "Ctrl+L" ]
+  },
+  "TextView.DefaultKeyBindingsUnix": {
+    "Undo":   [ "Ctrl+Slash" ],
+    "Redo":   [ "Ctrl+Shift+Z", "Ctrl+R" ],
+    "Paste":  [ "Ctrl+V", "Ctrl+Y" ],
+    "Cut":    [ "Ctrl+X", "Ctrl+W" ],
+    // On Unix, Ctrl+V = PageDown in emacs. Override PageDown:
+    "PageDown": [ "PageDown", "Ctrl+V" ]
+  },
+
+  // ─── ListView ─────────────────────────────────────────────────────────────
+  "ListView.DefaultKeyBindings": {
+    "Up":             [ "CursorUp", "Ctrl+P" ],
+    "Down":           [ "CursorDown", "Ctrl+N" ],
+    "PageUp":         [ "PageUp" ],
+    "PageDown":       [ "PageDown", "Ctrl+V" ],
+    "Start":          [ "Home" ],
+    "End":            [ "End" ],
+    "UpExtend":       [ "Shift+CursorUp" ],
+    "DownExtend":     [ "Shift+CursorDown" ],
+    "PageUpExtend":   [ "Shift+PageUp" ],
+    "PageDownExtend": [ "Shift+PageDown" ],
+    "StartExtend":    [ "Shift+Home" ],
+    "EndExtend":      [ "Shift+End" ],
+    "SelectAll":      [ "Ctrl+A" ]
+  },
+  "ListView.DefaultKeyBindingsUnix": {
+    // On Unix, Ctrl+V commonly = paste. Keep for pgdn since TUIs (less, htop) use it.
+    // No overrides needed — Ctrl+V PageDown is a TUI convention, not a conflict.
+  },
+
+  // ─── TableView ────────────────────────────────────────────────────────────
+  "TableView.DefaultKeyBindings": {
+    "Left":           [ "CursorLeft" ],
+    "Right":          [ "CursorRight" ],
+    "Up":             [ "CursorUp" ],
+    "Down":           [ "CursorDown" ],
+    "PageUp":         [ "PageUp" ],
+    "PageDown":       [ "PageDown" ],
+    "LeftStart":      [ "Home" ],
+    "RightEnd":       [ "End" ],
+    "Start":          [ "Ctrl+Home" ],
+    "End":            [ "Ctrl+End" ],
+    "LeftExtend":     [ "Shift+CursorLeft" ],
+    "RightExtend":    [ "Shift+CursorRight" ],
+    "UpExtend":       [ "Shift+CursorUp" ],
+    "DownExtend":     [ "Shift+CursorDown" ],
+    "PageUpExtend":   [ "Shift+PageUp" ],
+    "PageDownExtend": [ "Shift+PageDown" ],
+    "LeftStartExtend": [ "Shift+Home" ],
+    "RightEndExtend":  [ "Shift+End" ],
+    "StartExtend":    [ "Ctrl+Shift+Home" ],
+    "EndExtend":      [ "Ctrl+Shift+End" ],
+    "SelectAll":      [ "Ctrl+A" ],
+    "Accept":         [ "Enter" ]
+  },
+
+  // ─── TreeView ─────────────────────────────────────────────────────────────
+  "TreeView.DefaultKeyBindings": {
+    "Up":                  [ "CursorUp" ],
+    "UpExtend":            [ "Shift+CursorUp" ],
+    "LineUpToFirstBranch": [ "Ctrl+CursorUp" ],
+    "Down":                [ "CursorDown" ],
+    "DownExtend":          [ "Shift+CursorDown" ],
+    "LineDownToLastBranch":[ "Ctrl+CursorDown" ],
+    "Expand":              [ "CursorRight" ],
+    "ExpandAll":           [ "Ctrl+CursorRight" ],
+    "Collapse":            [ "CursorLeft" ],
+    "CollapseAll":         [ "Ctrl+CursorLeft" ],
+    "PageUp":              [ "PageUp" ],
+    "PageDown":            [ "PageDown" ],
+    "PageUpExtend":        [ "Shift+PageUp" ],
+    "PageDownExtend":      [ "Shift+PageDown" ],
+    "Start":               [ "Home" ],
+    "End":                 [ "End" ],
+    "SelectAll":           [ "Ctrl+A" ],
+    "Activate":            [ "Enter" ]
+  },
+
+  // ─── TabView ──────────────────────────────────────────────────────────────
+  "TabView.DefaultKeyBindings": {
+    "Left":      [ "CursorLeft" ],
+    "Right":     [ "CursorRight" ],
+    "Up":        [ "CursorUp" ],
+    "Down":      [ "CursorDown" ],
+    "LeftStart": [ "Home" ],
+    "RightEnd":  [ "End" ],
+    "PageUp":    [ "PageUp" ],
+    "PageDown":  [ "PageDown" ]
+  },
+
+  // ─── HexView ──────────────────────────────────────────────────────────────
+  "HexView.DefaultKeyBindings": {
+    "Left":            [ "CursorLeft" ],
+    "Right":           [ "CursorRight" ],
+    "Up":              [ "CursorUp" ],
+    "Down":            [ "CursorDown" ],
+    "PageUp":          [ "PageUp" ],
+    "PageDown":        [ "PageDown" ],
+    "Start":           [ "Home" ],
+    "End":             [ "End" ],
+    "LeftExtend":      [ "Shift+CursorLeft" ],
+    "RightExtend":     [ "Shift+CursorRight" ],
+    "UpExtend":        [ "Shift+CursorUp" ],
+    "DownExtend":      [ "Shift+CursorDown" ],
+    "DeleteCharLeft":  [ "Backspace" ],
+    "DeleteCharRight": [ "Delete" ],
+    "ToggleOverwrite": [ "InsertChar" ]
+  },
+
+  // ─── NumericUpDown ────────────────────────────────────────────────────────
+  "NumericUpDown.DefaultKeyBindings": {
+    "Up":   [ "CursorUp" ],
+    "Down": [ "CursorDown" ]
+  },
+
+  // ─── DropDownList ─────────────────────────────────────────────────────────
+  "DropDownList.DefaultKeyBindings": {
+    "Toggle": [ "F4" ],
+    "Down":   [ "CursorDown" ]
+  },
+
+  // ─── ColorBar ─────────────────────────────────────────────────────────────
+  "ColorBar.DefaultKeyBindings": {
+    "Left":       [ "CursorLeft" ],
+    "Right":      [ "CursorRight" ],
+    "LeftExtend": [ "Shift+CursorLeft" ],
+    "RightExtend":[ "Shift+CursorRight" ],
+    "LeftStart":  [ "Home" ],
+    "RightEnd":   [ "End" ]
+  },
+
+  // ─── LinearRange ──────────────────────────────────────────────────────────
+  // Orientation-aware: horizontal uses Left/Right, vertical uses Up/Down
+  "LinearRange.DefaultKeyBindings": {
+    "Left":       [ "CursorLeft" ],
+    "Right":      [ "CursorRight" ],
+    "Up":         [ "CursorUp" ],
+    "Down":       [ "CursorDown" ],
+    "LeftExtend": [ "Ctrl+CursorLeft", "Ctrl+CursorUp" ],
+    "RightExtend":[ "Ctrl+CursorRight", "Ctrl+CursorDown" ],
+    "LeftStart":  [ "Home" ],
+    "RightEnd":   [ "End" ],
+    "Accept":     [ "Enter" ],
+    "Activate":   [ "Space" ]
+  },
+
+  // ─── Views with no configurable bindings (rely on View base or are internal) ─
+  // Button    — overrides Space/Enter → Accept via ReplaceCommands (inherits from View)
+  // CheckBox  — MouseBindings only; inherits Space/Enter from View
+  // ScrollBar — no keyboard bindings (mouse/programmatic only)
+  // StatusBar — no keyboard bindings
+  // MenuBar   — uses HotKeyBindings (single Key property: Application.QuitKey)
+  // Shortcut  — dynamic: bound via App.Keyboard.KeyBindings.AddApp at runtime
+  // FileDialog— binds internally on its _tableView (inherits TableView bindings)
+}
+```
+
+---
+
+## Implementation Plan
+
+### Phase 1: Infrastructure
+
+**New type:** `DefaultKeyBindingCollection` (or just use `Dictionary<string, string[]>`)
+
+1. **Add to `SourceGenerationContext`**:
+   ```csharp
+   [JsonSerializable(typeof(Dictionary<string, string[]>))]
+   ```
+
+2. **Add a static helper** `KeyBindingConfigHelper` with one method:
+   ```csharp
+   internal static class KeyBindingConfigHelper
+   {
+       // Applies a DefaultKeyBindings dict to a view's KeyBindings,
+       // replacing existing bindings for each command.
+       // Then overlays the platform-specific overrides.
+       internal static void Apply (
+           View view,
+           Dictionary<string, string[]>? baseBindings,
+           Dictionary<string, string[]>? unixOverrides = null)
+   ```
+   - Iterates `baseBindings`, parses each key string with `Key.TryParse`
+   - Calls `view.KeyBindings.Add(key, command)` (or `ReplaceCommands`)
+   - If `RuntimeInformation.IsOSPlatform(OSPlatform.Linux) || IsOSPlatform(OSPlatform.OSX)`, overlays `unixOverrides`
+   - Commands validated against `Enum.TryParse<Command>()`; invalid names logged and skipped
+
+3. **Add to `SettingsScope`** (to accept the new JSON keys without throwing):
+   Each new `ClassName.DefaultKeyBindings` property needs to be registered as a `[ConfigurationProperty]` on a new static property somewhere, OR we add a bulk registration mechanism.
+
+   **Recommended approach**: a single static class `ViewDefaultKeyBindings` with one property per view:
+   ```csharp
+   public static class ViewDefaultKeyBindings
+   {
+       [ConfigurationProperty(Scope = typeof(SettingsScope))]
+       public static Dictionary<string, string[]>? TextField { get; set; }
+
+       [ConfigurationProperty(Scope = typeof(SettingsScope))]
+       public static Dictionary<string, string[]>? TextFieldUnix { get; set; }
+
+       [ConfigurationProperty(Scope = typeof(SettingsScope))]
+       public static Dictionary<string, string[]>? TextView { get; set; }
+       // ... etc.
+   }
+   ```
+   JSON key would then be `ViewDefaultKeyBindings.TextField` — or use `[JsonPropertyName("TextField.DefaultKeyBindings")]` override.
+
+   **Alternative**: Add static properties directly on each View class (one per view), which gives JSON keys of `TextField.DefaultKeyBindings` naturally. This is cleaner but requires each view to have a static dependency on CM.
+
+4. **Register and apply** in each view's `CreateCommandsAndBindings()`:
+   ```csharp
+   KeyBindingConfigHelper.Apply (
+       this,
+       ViewDefaultKeyBindings.TextField,
+       ViewDefaultKeyBindings.TextFieldUnix);
+   ```
+
+### Phase 2: Migrate TextField (Proof of Concept)
+
+- Move all `KeyBindings.Add` calls in `TextField.Commands.cs` to `config.json`
+- Implement the Unix override for Undo/Redo/Paste/Cut
+- Tests: verify bindings load from config, verify platform-specific overrides apply
+
+### Phase 3: Migrate Remaining Views
+
+Order: `TextView` → `ListView` → `TableView` → `TreeView` → `TabView` → others
+
+### Phase 4: Fix Inconsistencies
+
+- Standardize Undo (`Ctrl+Z` / `Ctrl+/` on Unix)
+- Standardize Redo (`Ctrl+Shift+Z` everywhere; `Ctrl+R` on Unix as secondary)
+- Remove `Ctrl+R` from TextField's `DeleteAll` (use only `Ctrl+Shift+D`)
+- Remove `Ctrl+Y` as Redo from TextField (it's Paste/Yank in emacs; use `Ctrl+Shift+Z`)
+- Add `Ctrl+W` as Cut alternative in TextField (emacs kill-region)
+
+### Phase 5: Documentation
+
+- Update `docfx/docs/keyboard.md`
+- Add config.json JSON schema entries for new properties
+- Update UICatalog keyboard scenario to show configurable bindings
+
+---
+
+## Open Questions
+
+1. **Static property location**: One class (`ViewDefaultKeyBindings`) with all views, or one static property per view class? The former keeps CM deps isolated; the latter is more discoverable.
+
+2. **Override semantics**: Does `DefaultKeyBindingsUnix` **replace** the command's binding(s) entirely, or **append** to them? Replace is simpler; append allows stacking (base keeps `Ctrl+Z`, Unix adds `Ctrl+/`). **Recommendation: append** so users can always still use the base key.
+
+3. **Config schema `$schema`**: New properties need to be added to the JSON schema file at `https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json`.
+
+4. **`Ctrl+Slash` key name**: Verify `Key.TryParse("Ctrl+Slash")` works (or is it `Ctrl+/`?). Need to check `Key.ToString()` output for this key.
+
+5. **`Ctrl+A` in TextView**: Current code binds `Ctrl+A` to `SelectAll`. Emacs users expect `Ctrl+A` = line start. For now: keep `SelectAll`; document the conflict.
+
+6. **User override merging**: If a user's `~/.tui-config.json` has `"TextField.DefaultKeyBindings": { "Undo": ["F9"] }`, does it replace or merge with the built-in defaults? CM's current merge strategy: later scopes win. This means user config completely replaces the built-in dict for that command — which is the right behavior.
+
+7. **New PR**: Original PR #4266 branch was renamed. Need to open new PR from `feature/cm-keybindings` → `v2_develop`.
+

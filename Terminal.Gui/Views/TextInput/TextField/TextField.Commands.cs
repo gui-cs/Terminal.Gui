@@ -2,6 +2,51 @@
 
 public partial class TextField
 {
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="TextField"/> on all platforms.
+    ///     Maps <see cref="Command"/> names to arrays of key strings (parseable by <see cref="Key.TryParse"/>).
+    ///     Configure in <em>config.json</em> under the key <c>TextField.DefaultKeyBindings</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, string []> DefaultKeyBindings { get; set; } = new ()
+    {
+        // https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
+        ["DeleteCharRight"] = ["Delete", "Ctrl+D"],
+        ["DeleteCharLeft"] = ["Backspace"],
+        ["LeftStartExtend"] = ["Shift+Home", "Ctrl+Shift+Home", "Ctrl+Shift+A"],
+        ["RightEndExtend"] = ["Shift+End", "Ctrl+Shift+End", "Ctrl+Shift+E"],
+        ["LeftStart"] = ["Home", "Ctrl+Home"],
+        ["LeftExtend"] = ["Shift+CursorLeft", "Shift+CursorUp"],
+        ["RightExtend"] = ["Shift+CursorRight", "Shift+CursorDown"],
+        ["WordLeftExtend"] = ["Ctrl+Shift+CursorLeft", "Ctrl+Shift+CursorUp"],
+        ["WordRightExtend"] = ["Ctrl+Shift+CursorRight", "Ctrl+Shift+CursorDown"],
+        ["Left"] = ["CursorLeft", "Ctrl+B"],
+        ["RightEnd"] = ["End", "Ctrl+End", "Ctrl+E"],
+        ["Right"] = ["CursorRight", "Ctrl+F"],
+        ["CutToEndOfLine"] = ["Ctrl+K"],
+        ["CutToStartOfLine"] = ["Ctrl+Shift+K"],
+        ["Undo"] = ["Ctrl+Z"],
+        ["Redo"] = ["Ctrl+Y"],
+        ["WordLeft"] = ["Ctrl+CursorLeft", "Ctrl+CursorUp"],
+        ["WordRight"] = ["Ctrl+CursorRight", "Ctrl+CursorDown"],
+        ["KillWordRight"] = ["Ctrl+Delete"],
+        ["KillWordLeft"] = ["Ctrl+Backspace"],
+        ["ToggleOverwrite"] = ["Insert"],
+        ["Copy"] = ["Ctrl+C"],
+        ["Cut"] = ["Ctrl+X"],
+        ["Paste"] = ["Ctrl+V"],
+        ["SelectAll"] = ["Ctrl+A"],
+        ["DeleteAll"] = ["Ctrl+R", "Ctrl+Shift+D"],
+    };
+
+    /// <summary>
+    ///     Gets or sets additional key bindings for <see cref="TextField"/> applied only on non-Windows platforms.
+    ///     These are appended to <see cref="DefaultKeyBindings"/>. Configure in <em>config.json</em> under the key
+    ///     <c>TextField.DefaultKeyBindingsUnix</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
+
     private void CreateCommandsAndBindings ()
     {
         // Things this view knows how to do
@@ -35,70 +80,10 @@ public partial class TextField
         AddCommand (Command.DeleteAll, () => DeleteAll ());
         AddCommand (Command.Context, () => ShowContextMenu (true));
 
-        // Default keybindings for this view
-        // We follow this as closely as possible: https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
-        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
-        KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
+        // Apply configurable key bindings (defaults from DefaultKeyBindings, plus platform-specific overrides)
+        KeyBindingConfigHelper.Apply (this, DefaultKeyBindings, DefaultKeyBindingsUnix);
 
-        KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
-
-        KeyBindings.Add (Key.Home.WithShift, Command.LeftStartExtend);
-        KeyBindings.Add (Key.Home.WithShift.WithCtrl, Command.LeftStartExtend);
-        KeyBindings.Add (Key.A.WithShift.WithCtrl, Command.LeftStartExtend);
-
-        KeyBindings.Add (Key.End.WithShift, Command.RightEndExtend);
-        KeyBindings.Add (Key.End.WithShift.WithCtrl, Command.RightEndExtend);
-        KeyBindings.Add (Key.E.WithShift.WithCtrl, Command.RightEndExtend);
-
-        KeyBindings.Add (Key.Home, Command.LeftStart);
-        KeyBindings.Add (Key.Home.WithCtrl, Command.LeftStart);
-
-        KeyBindings.Add (Key.CursorLeft.WithShift, Command.LeftExtend);
-        KeyBindings.Add (Key.CursorUp.WithShift, Command.LeftExtend);
-
-        KeyBindings.Add (Key.CursorRight.WithShift, Command.RightExtend);
-        KeyBindings.Add (Key.CursorDown.WithShift, Command.RightExtend);
-
-        KeyBindings.Add (Key.CursorLeft.WithShift.WithCtrl, Command.WordLeftExtend);
-        KeyBindings.Add (Key.CursorUp.WithShift.WithCtrl, Command.WordLeftExtend);
-
-        KeyBindings.Add (Key.CursorRight.WithShift.WithCtrl, Command.WordRightExtend);
-        KeyBindings.Add (Key.CursorDown.WithShift.WithCtrl, Command.WordRightExtend);
-
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
-        KeyBindings.Add (Key.B.WithCtrl, Command.Left);
-
-        KeyBindings.Add (Key.End, Command.RightEnd);
-        KeyBindings.Add (Key.End.WithCtrl, Command.RightEnd);
-        KeyBindings.Add (Key.E.WithCtrl, Command.RightEnd);
-
-        KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.F.WithCtrl, Command.Right);
-
-        KeyBindings.Add (Key.K.WithCtrl, Command.CutToEndOfLine);
-        KeyBindings.Add (Key.K.WithCtrl.WithShift, Command.CutToStartOfLine);
-
-        KeyBindings.Add (Key.Z.WithCtrl, Command.Undo);
-
-        KeyBindings.Add (Key.Y.WithCtrl, Command.Redo);
-
-        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.WordLeft);
-        KeyBindings.Add (Key.CursorUp.WithCtrl, Command.WordLeft);
-
-        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.WordRight);
-        KeyBindings.Add (Key.CursorDown.WithCtrl, Command.WordRight);
-
-        KeyBindings.Add (Key.Delete.WithCtrl, Command.KillWordRight);
-        KeyBindings.Add (Key.Backspace.WithCtrl, Command.KillWordLeft);
-        KeyBindings.Add (Key.InsertChar, Command.ToggleOverwrite);
-        KeyBindings.Add (Key.C.WithCtrl, Command.Copy);
-        KeyBindings.Add (Key.X.WithCtrl, Command.Cut);
-        KeyBindings.Add (Key.V.WithCtrl, Command.Paste);
-        KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
-
-        KeyBindings.Add (Key.R.WithCtrl, Command.DeleteAll);
-        KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);
-
+        // TextField does not use Space as a trigger (that binding is added by the base View class)
         KeyBindings.Remove (Key.Space);
     }
 

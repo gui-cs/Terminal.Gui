@@ -7,6 +7,29 @@ public class TabView : View
     public const uint DefaultMaxTabTextWidth = 30;
 
     /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="TabView"/>. Override via <c>config.json</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, string []>? DefaultKeyBindings { get; set; } = new ()
+    {
+        { "Left", ["CursorLeft"] },
+        { "Right", ["CursorRight"] },
+        { "LeftStart", ["Home"] },
+        { "RightEnd", ["End"] },
+        { "PageDown", ["PageDown"] },
+        { "PageUp", ["PageUp"] },
+        { "Up", ["CursorUp"] },
+        { "Down", ["CursorDown"] }
+    };
+
+    /// <summary>
+    ///     Gets or sets the platform-override key bindings for <see cref="TabView"/> on Unix. Override via
+    ///     <c>config.json</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
+
+    /// <summary>
     ///     This sub view is the main client area of the current tab.  It hosts the <see cref="Tab.View"/> of the tab, the
     ///     <see cref="SelectedTab"/>.
     /// </summary>
@@ -158,14 +181,7 @@ public class TabView : View
                     });
 
         // Default keybindings for this view
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
-        KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.Home, Command.LeftStart);
-        KeyBindings.Add (Key.End, Command.RightEnd);
-        KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.CursorDown, Command.Down);
+        KeyBindingConfigHelper.Apply (this, DefaultKeyBindings, DefaultKeyBindingsUnix);
     }
 
     /// <summary>

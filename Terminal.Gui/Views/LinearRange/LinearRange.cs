@@ -29,6 +29,30 @@ public class LinearRange : LinearRange<object>
 /// <typeparam name="T"></typeparam>
 public class LinearRange<T> : View, IOrientation
 {
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="LinearRange{T}"/> on all platforms.
+    ///     Maps <see cref="Command"/> names to arrays of key strings (parseable by <see cref="Key.TryParse"/>).
+    ///     Configure in <em>config.json</em> under the key <c>LinearRange.DefaultKeyBindings</c>.
+    /// </summary>
+    /// <remarks>
+    ///     Orientation-dependent bindings (CursorRight/Left for Horizontal, CursorDown/Up for Vertical) and
+    ///     override bindings (Enter, Space) are managed at runtime by <c>SetKeyBindings()</c>.
+    /// </remarks>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, string []> DefaultKeyBindings { get; set; } = new ()
+    {
+        ["LeftStart"] = ["Home"],
+        ["RightEnd"] = ["End"],
+    };
+
+    /// <summary>
+    ///     Gets or sets additional key bindings for <see cref="LinearRange{T}"/> applied only on non-Windows platforms.
+    ///     These are appended to <see cref="DefaultKeyBindings"/>. Configure in <em>config.json</em> under the key
+    ///     <c>LinearRange.DefaultKeyBindingsUnix</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
+
     private readonly LinearRangeConfiguration _config = new ();
 
     // List of the current set options.
