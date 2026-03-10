@@ -51,16 +51,19 @@ internal static class SuspendHelper
                     _suspendSignal = 18;
 
                     break;
+
                 case "Linux":
                     // TODO: should fetch the machine name and
                     // if it is MIPS return 24
                     _suspendSignal = 20;
 
                     break;
+
                 case "Solaris":
                     _suspendSignal = 24;
 
                     break;
+
                 default:
                     _suspendSignal = -1;
 

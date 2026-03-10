@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.Drivers;
 
-/// <inheritdoc />
+/// <inheritdoc/>
 internal class SizeMonitorImpl : ISizeMonitor
 {
     private readonly IOutput _consoleOut;
@@ -29,14 +29,16 @@ internal class SizeMonitorImpl : ISizeMonitor
     {
         Size size = _consoleOut.GetSize ();
 
-        if (size != _lastSize)
+        if (size == _lastSize)
         {
-            _lastSize = size;
-            SizeChanged?.Invoke (this, new (size));
-
-            return true;
+            return false;
         }
 
-        return false;
+        Trace.Lifecycle (nameof (SizeMonitorImpl), "Poll", $"{_lastSize} → {size}");
+        _lastSize = size;
+        SizeChanged?.Invoke (this, new SizeChangedEventArgs (size));
+
+        return true;
+
     }
 }

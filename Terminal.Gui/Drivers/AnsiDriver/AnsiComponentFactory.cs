@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.Drivers;
 
@@ -32,14 +33,16 @@ public class AnsiComponentFactory : ComponentFactoryImpl<char>
     /// </summary>
     /// <param name="input"></param>
     /// <param name="output">Optional fake output to capture what would be written to console.</param>
-    /// <param name="sizeMonitor">Optional size monitor override (used in tests; if <see langword="null"/>, the monitor is chosen based on <see cref="Driver.SizeDetection"/>).</param>
+    /// <param name="sizeMonitor">
+    ///     Optional size monitor override (used in tests; if <see langword="null"/>, the monitor is chosen based on
+    ///     <see cref="Driver.SizeDetection"/>).
+    /// </param>
     public AnsiComponentFactory (AnsiInput? input = null, IOutput? output = null, ISizeMonitor? sizeMonitor = null)
     {
         _input = input;
         _output = output;
         _injectedSizeMonitor = sizeMonitor;
     }
-
 
     /// <inheritdoc/>
     public override ISizeMonitor CreateSizeMonitor (IOutput consoleOutput, IOutputBuffer outputBuffer)
@@ -50,25 +53,22 @@ public class AnsiComponentFactory : ComponentFactoryImpl<char>
             return _injectedSizeMonitor;
         }
 
-        if (consoleOutput is AnsiOutput ansiOutput)
+        if (consoleOutput is not AnsiOutput ansiOutput)
         {
-            if (Driver.SizeDetection == SizeDetectionMode.Polling)
-            {
-                // Polling mode: wire up a platform-native size query so that
-                // AnsiOutput.GetSize() returns the real terminal size via
-                // ioctl(TIOCGWINSZ) on Unix or the Console API on Windows.
-                ansiOutput.NativeSizeQuery = CreateNativeSizeQuery ();
-
-                return new SizeMonitorImpl (ansiOutput);
-            }
-
-            // Default (AnsiQuery): use ANSI escape-sequence queries.
-            // The ANSI request callback will be set up by MainLoopCoordinator
-            // after the driver is fully constructed.
-            return new AnsiSizeMonitor (ansiOutput, queueAnsiRequest: null);
+            return new SizeMonitorImpl (consoleOutput);
         }
 
-        return new SizeMonitorImpl (consoleOutput);
+        if (Driver.SizeDetection != SizeDetectionMode.Polling)
+        {
+            return new AnsiSizeMonitor (ansiOutput);
+        }
+
+        // Polling mode: wire up a platform-native size query so that
+        // AnsiOutput.GetSize() returns the real terminal size via
+        // ioctl(TIOCGWINSZ) on Unix or the Console API on Windows.
+        ansiOutput.NativeSizeQuery = CreateNativeSizeQuery ();
+
+        return new SizeMonitorImpl (ansiOutput);
     }
 
     /// <summary>
@@ -89,9 +89,9 @@ public class AnsiComponentFactory : ComponentFactoryImpl<char>
 
                            return w > 0 && h > 0 ? new Size (w, h) : null;
                        }
-                       catch (IOException ex)
+                       catch (Exception ex)
                        {
-                           Logging.Trace (nameof (AnsiComponentFactory), "NativeSizeQuery", $"Console size query failed: {ex.Message}");
+                           Trace.Lifecycle (nameof (AnsiComponentFactory), "NativeSizeQuery", $"Console size query failed: {ex.GetType ().Name}: {ex.Message}");
 
                            return null;
                        }
@@ -102,19 +102,12 @@ public class AnsiComponentFactory : ComponentFactoryImpl<char>
     }
 
     /// <inheritdoc/>
-    public override IInput<char> CreateInput ()
-    {
-        return _input ?? new AnsiInput ();
-    }
+    public override IInput<char> CreateInput () => _input ?? new AnsiInput ();
 
     /// <inheritdoc/>
-    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<char> inputBuffer, ITimeProvider? timeProvider = null) { return new AnsiInputProcessor (inputBuffer, timeProvider); }
+    public override IInputProcessor CreateInputProcessor (ConcurrentQueue<char> inputBuffer, ITimeProvider? timeProvider = null) =>
+        new AnsiInputProcessor (inputBuffer, timeProvider);
 
     /// <inheritdoc/>
-    public override IOutput CreateOutput ()
-    {
-        return _output ?? new AnsiOutput ();
-    }
+    public override IOutput CreateOutput () => _output ?? new AnsiOutput ();
 }
-
-

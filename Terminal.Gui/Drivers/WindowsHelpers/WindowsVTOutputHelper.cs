@@ -116,6 +116,7 @@ internal sealed class WindowsVTOutputHelper : IDisposable
             }
 
             IsEnabled = true;
+
             //Logging.Information ($"Windows VTS output mode enabled successfully. Mode: 0x{newMode:X} (was 0x{_originalConsoleMode:X})");
 
             return true;
@@ -142,6 +143,7 @@ internal sealed class WindowsVTOutputHelper : IDisposable
         {
             SetConsoleMode (OutputHandle, _originalConsoleMode);
             IsEnabled = false;
+
             //Logging.Information ("Windows console mode restored.");
         }
         catch (Exception ex)

@@ -14,14 +14,12 @@ public class SizeMonitorTests
         // Poll returns the same size → no event should fire.
         Mock<IOutput> consoleOutput = new ();
 
-        Queue<Size> queue = new (
-                                 [
-                                     new (30, 20), // constructor call
-                                     new (30, 20)  // Poll 1 – unchanged
+        Queue<Size> queue = new ([
+                                     new Size (30, 20), // constructor call
+                                     new Size (30, 20) // Poll 1 – unchanged
                                  ]);
 
-        consoleOutput.Setup (m => m.GetSize ())
-                     .Returns (queue.Dequeue);
+        consoleOutput.Setup (m => m.GetSize ()).Returns (queue.Dequeue);
 
         SizeMonitorImpl monitor = new (consoleOutput.Object);
 
@@ -39,15 +37,13 @@ public class SizeMonitorTests
         // Arrange: initial size 30x20, then size changes to 40x25.
         Mock<IOutput> consoleOutput = new ();
 
-        Queue<Size> queue = new (
-                                 [
-                                     new (30, 20), // constructor call
-                                     new (40, 25), // Poll 1 – changed
-                                     new (40, 25)  // Poll 2 – unchanged
+        Queue<Size> queue = new ([
+                                     new Size (30, 20), // constructor call
+                                     new Size (40, 25), // Poll 1 – changed
+                                     new Size (40, 25) // Poll 2 – unchanged
                                  ]);
 
-        consoleOutput.Setup (m => m.GetSize ())
-                     .Returns (queue.Dequeue);
+        consoleOutput.Setup (m => m.GetSize ()).Returns (queue.Dequeue);
 
         SizeMonitorImpl monitor = new (consoleOutput.Object);
 
@@ -69,15 +65,13 @@ public class SizeMonitorTests
     {
         Mock<IOutput> consoleOutput = new ();
 
-        Queue<Size> queue = new (
-                                 [
-                                     new (30, 20), // constructor call
-                                     new (40, 25), // Poll 1 – changed
-                                     new (50, 30)  // Poll 2 – changed again
+        Queue<Size> queue = new ([
+                                     new Size (30, 20), // constructor call
+                                     new Size (40, 25), // Poll 1 – changed
+                                     new Size (50, 30) // Poll 2 – changed again
                                  ]);
 
-        consoleOutput.Setup (m => m.GetSize ())
-                     .Returns (queue.Dequeue);
+        consoleOutput.Setup (m => m.GetSize ()).Returns (queue.Dequeue);
 
         SizeMonitorImpl monitor = new (consoleOutput.Object);
 

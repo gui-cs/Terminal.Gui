@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using Moq;
 
 namespace DriverTests.Ansi;

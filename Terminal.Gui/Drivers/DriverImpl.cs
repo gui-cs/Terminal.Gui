@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.Drivers;
 
@@ -170,6 +171,7 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public virtual void SetScreenSize (int width, int height)
     {
+        Trace.Lifecycle (nameof (DriverImpl), "SetScreenSize", $"{width}×{height}");
         _outputBuffer.SetSize (width, height);
         _output.SetSize (width, height);
         SizeChanged?.Invoke (this, new SizeChangedEventArgs (new Size (width, height)));
@@ -178,7 +180,11 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
-    private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e) => SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
+    private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e)
+    {
+        Trace.Lifecycle (nameof (DriverImpl), "OnSizeMonitorOnSizeChanged", $"{e.Size?.Width}×{e.Size?.Height}");
+        SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
+    }
 
     /// <inheritdoc/>
     public int Cols { get => _outputBuffer.Cols; set => _outputBuffer.Cols = value; }

@@ -150,14 +150,15 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public Size GetSize ()
     {
-        if (NativeSizeQuery is { })
+        if (NativeSizeQuery is null)
         {
-            Size? native = NativeSizeQuery ();
+            return _consoleSize;
+        }
+        Size? native = NativeSizeQuery ();
 
-            if (native is { })
-            {
-                _consoleSize = native.Value;
-            }
+        if (native is { })
+        {
+            _consoleSize = native.Value;
         }
 
         return _consoleSize;
