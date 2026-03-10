@@ -238,11 +238,11 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
 
             var driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
             Assert.True (driver.KittyKeyboardProtocol.IsSupported);
-            Assert.Equal (31, driver.KittyKeyboardProtocol.SupportedFlags);
+            Assert.Equal ((KittyKeyboardFlags)31, driver.KittyKeyboardProtocol.SupportedFlags);
 
             // In degraded mode (no real terminal), enable/disable are no-ops,
             // but detection still succeeds via injected response.
-            Assert.Equal (0, driver.KittyKeyboardProtocol.EnabledFlags);
+            Assert.Equal (KittyKeyboardFlags.None, driver.KittyKeyboardProtocol.EnabledFlags);
 
             coordinator.Stop ();
         }

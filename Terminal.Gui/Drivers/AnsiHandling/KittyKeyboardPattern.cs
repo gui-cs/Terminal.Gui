@@ -9,7 +9,7 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class KittyKeyboardPattern : AnsiKeyboardParserPattern
 {
-    private readonly Regex _pattern = new (@"^\u001b\[(\d+)(?:(?::\d+)*)?(?:;([^;u]+)(?:;[^u]*)?)?u$");
+    private readonly Regex _pattern = new (@"^\u001b\[(\d+)(?::(\d+))?(?::(\d+))?(?:;([^;u]+)(?:;[^u]*)?)?u$");
 
     private readonly Dictionary<int, Key> _functionalKeyMap = new ()
     {
@@ -80,14 +80,32 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
             return null;
         }
 
-        string modifierField = match.Groups [2].Value;
+        // Extract alternate key codes (kitty flag 4: report alternate keys)
+        KeyCode shiftedKeyCode = KeyCode.Null;
+        KeyCode baseLayoutKeyCode = KeyCode.Null;
 
-        if (string.IsNullOrEmpty (modifierField))
+        if (match.Groups [2].Success
+            && int.TryParse (match.Groups [2].Value, CultureInfo.InvariantCulture, out int shiftedCode)
+            && shiftedCode > 0)
         {
-            return key;
+            shiftedKeyCode = (KeyCode)shiftedCode;
         }
 
-        return ApplyModifiersAndEventType (modifierField, key);
+        if (match.Groups [3].Success
+            && int.TryParse (match.Groups [3].Value, CultureInfo.InvariantCulture, out int baseCode)
+            && baseCode > 0)
+        {
+            baseLayoutKeyCode = (KeyCode)baseCode;
+        }
+
+        if (shiftedKeyCode != KeyCode.Null || baseLayoutKeyCode != KeyCode.Null)
+        {
+            key = new Key (key) { ShiftedKeyCode = shiftedKeyCode, BaseLayoutKeyCode = baseLayoutKeyCode };
+        }
+
+        string modifierField = match.Groups [4].Value;
+
+        return string.IsNullOrEmpty (modifierField) ? key : ApplyModifiersAndEventType (modifierField, key);
     }
 
     /// <summary>

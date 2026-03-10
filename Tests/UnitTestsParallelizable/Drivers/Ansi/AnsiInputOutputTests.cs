@@ -77,7 +77,7 @@ public class AnsiInputOutputTests (ITestOutputHelper output)
 
         output.EnableKittyKeyboard (EscSeqUtils.KittyKeyboardRequestedFlags);
 
-        Assert.Equal (0, output.KittyKeyboardEnabledFlags);
+        Assert.Equal (KittyKeyboardFlags.None, output.KittyKeyboardEnabledFlags);
 
         Assert.DoesNotContain (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardRequestedFlags),
                                output.GetLastOutput (),
@@ -93,7 +93,7 @@ public class AnsiInputOutputTests (ITestOutputHelper output)
 
         output.Dispose ();
 
-        Assert.Equal (0, output.KittyKeyboardEnabledFlags);
+        Assert.Equal (KittyKeyboardFlags.None, output.KittyKeyboardEnabledFlags);
         Assert.DoesNotContain (EscSeqUtils.CSI_DisableKittyKeyboardFlags, output.GetLastOutput (), StringComparison.Ordinal);
     }
 

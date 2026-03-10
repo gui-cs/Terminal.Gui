@@ -40,7 +40,7 @@ namespace Terminal.Gui.Input;
 ///                     The <c>With</c> properties (<see cref="WithShift"/>,<see cref="WithCtrl"/>,
 ///                     <see cref="WithAlt"/>) return a copy of the Key with the shift modifier applied. This is useful for
 ///                     specifying a key that requires a shift modifier (e.g.
-///                     <c>var ControlAltDelete = new Key(Key.Delete).WithAlt.WithDel;</c>.
+///                     <c>var ControlAltDelete = new Key(Key.Delete).WithAlt.WithDel;</c>).
 ///                 </description>
 ///             </item>
 ///             <item>
@@ -48,7 +48,7 @@ namespace Terminal.Gui.Input;
 ///                 <description>
 ///                     The <c>No</c> properties (<see cref="NoShift"/>,<see cref="NoCtrl"/>, <see cref="NoAlt"/>)
 ///                     return a copy of the Key with the shift modifier removed. This is useful for specifying a key that
-///                     does not require a shift modifier (e.g. <c>var ControlDelete = ControlAltDelete.NoCtrl;</c>.
+///                     does not require a shift modifier (e.g. <c>var ControlDelete = ControlAltDelete.NoCtrl;</c>).
 ///                 </description>
 ///             </item>
 ///             <item>
@@ -92,6 +92,8 @@ public class Key : EventArgs, IEquatable<Key>
         Handled = key.Handled;
         EventType = key.EventType;
         ModifierKey = key.ModifierKey;
+        ShiftedKeyCode = key.ShiftedKeyCode;
+        BaseLayoutKeyCode = key.BaseLayoutKeyCode;
     }
 
     /// <summary>Constructs a new <see cref="Key"/> from a char.</summary>
@@ -194,7 +196,7 @@ public class Key : EventArgs, IEquatable<Key>
     ///         <see cref="KeyCode.ShiftMask"/> is set.
     ///     </para>
     ///     <para>
-    ///         If the key is outside of the <see cref="KeyCode.CharMask"/> range, the returned Rune will be
+    ///         If the key is outside the <see cref="KeyCode.CharMask"/> range, the returned Rune will be
     ///         <see langword="default"/>.
     ///     </para>
     /// </remarks>
@@ -244,6 +246,42 @@ public class Key : EventArgs, IEquatable<Key>
     ///     </para>
     /// </remarks>
     public ModifierKey ModifierKey { get; init; } = ModifierKey.None;
+
+    /// <summary>
+    ///     Gets the shifted key code reported by the kitty keyboard protocol (flag 4).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When the terminal reports alternate keys, this contains the key code that would be
+    ///         produced with the current modifier state. For example, Shift+2 on a US layout
+    ///         would report <c>ShiftedKeyCode = (KeyCode)'@'</c>.
+    ///     </para>
+    ///     <para>
+    ///         Defaults to <see cref="KeyCode.Null"/> when the terminal does not report alternate keys.
+    ///     </para>
+    ///     <para>
+    ///         This property does not participate in equality comparisons.
+    ///     </para>
+    /// </remarks>
+    public KeyCode ShiftedKeyCode { get; init; } = KeyCode.Null;
+
+    /// <summary>
+    ///     Gets the base layout key code reported by the kitty keyboard protocol (flag 4).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When the terminal reports alternate keys, this contains the key code corresponding
+    ///         to the physical key in the standard (US) keyboard layout, regardless of the active
+    ///         input language or modifier state.
+    ///     </para>
+    ///     <para>
+    ///         Defaults to <see cref="KeyCode.Null"/> when the terminal does not report alternate keys.
+    ///     </para>
+    ///     <para>
+    ///         This property does not participate in equality comparisons.
+    ///     </para>
+    /// </remarks>
+    public KeyCode BaseLayoutKeyCode { get; init; } = KeyCode.Null;
 
     /// <summary>
     ///     Gets a value indicating whether this <see cref="Key"/> represents a standalone modifier key event.
@@ -395,7 +433,7 @@ public class Key : EventArgs, IEquatable<Key>
     ///         <see cref="KeyCode.ShiftMask"/> is set.
     ///     </para>
     ///     <para>
-    ///         If the key is outside of the <see cref="KeyCode.CharMask"/> range, the returned Rune will be
+    ///         If the key is outside the <see cref="KeyCode.CharMask"/> range, the returned Rune will be
     ///         <see langword="default"/>.
     ///     </para>
     /// </remarks>
@@ -446,7 +484,6 @@ public class Key : EventArgs, IEquatable<Key>
     /// <param name="kea"></param>
     public static explicit operator Rune (Key kea) => kea.AsRune;
 
-    // BUGBUG: (Tig) I do not think this cast operator is really needed. 
     /// <summary>
     ///     Explicitly cast <see cref="Key"/> to a <see langword="uint"/>. The conversion is lossy because properties such
     ///     as <see cref="Handled"/> are not encoded in <see cref="KeyCode"/>.
@@ -466,22 +503,18 @@ public class Key : EventArgs, IEquatable<Key>
     public static implicit operator Key (KeyCode keyCode) => new (keyCode);
 
     /// <summary>Cast <see langword="char"/> to a <see cref="Key"/>.</summary>
-    /// <remarks>See <see cref="Key(char)"/> for more information.</remarks>
     /// <param name="ch"></param>
     public static implicit operator Key (char ch) => new (ch);
 
     /// <summary>Cast <see langword="string"/> to a <see cref="Key"/>.</summary>
-    /// <remarks>See <see cref="Key(string)"/> for more information.</remarks>
     /// <param name="str"></param>
     public static implicit operator Key (string str) => new (str);
 
     /// <summary>Cast <see langword="int"/> to a <see cref="Key"/>.</summary>
-    /// <remarks>See <see cref="Key(int)"/> for more information.</remarks>
     /// <param name="value"></param>
     public static implicit operator Key (int value) => new (value);
 
     /// <summary>Cast a <see cref="Key"/> to a <see langword="string"/>.</summary>
-    /// <remarks>See <see cref="Key(string)"/> for more information.</remarks>
     /// <param name="key"></param>
     public static implicit operator string (Key key) => key.ToString ();
 
@@ -517,25 +550,25 @@ public class Key : EventArgs, IEquatable<Key>
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-    public static bool operator < (Key a, Key b) => a?.KeyCode < b?.KeyCode;
+    public static bool operator < (Key a, Key b) => a.KeyCode < b.KeyCode;
 
     /// <summary>Compares two <see cref="Key"/>s for greater-than.</summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-    public static bool operator > (Key a, Key b) => a?.KeyCode > b?.KeyCode;
+    public static bool operator > (Key a, Key b) => a.KeyCode > b.KeyCode;
 
     /// <summary>Compares two <see cref="Key"/>s for greater-than-or-equal-to.</summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-    public static bool operator <= (Key a, Key b) => a?.KeyCode <= b?.KeyCode;
+    public static bool operator <= (Key a, Key b) => a.KeyCode <= b.KeyCode;
 
     /// <summary>Compares two <see cref="Key"/>s for greater-than-or-equal-to.</summary>
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-    public static bool operator >= (Key a, Key b) => a?.KeyCode >= b?.KeyCode;
+    public static bool operator >= (Key a, Key b) => a.KeyCode >= b.KeyCode;
 
     #endregion Operators
 
@@ -620,17 +653,19 @@ public class Key : EventArgs, IEquatable<Key>
         }
 
         // Handle special cases and modifiers on their own
-        if (key != KeyCode.SpecialMask && (baseKey != KeyCode.Null || hasModifiers))
+        if (key == KeyCode.SpecialMask || (baseKey == KeyCode.Null && !hasModifiers))
         {
-            if ((key & KeyCode.SpecialMask) != 0 && (baseKey & ~KeyCode.Space) is >= KeyCode.A and <= KeyCode.Z)
-            {
-                sb.Append (baseKey & ~KeyCode.Space);
-            }
-            else
-            {
-                // Append the actual key name
-                sb.Append (GetKeyString (baseKey));
-            }
+            return TrimEndSeparator (sb.ToString (), separator);
+        }
+
+        if ((key & KeyCode.SpecialMask) != 0 && (baseKey & ~KeyCode.Space) is >= KeyCode.A and <= KeyCode.Z)
+        {
+            sb.Append (baseKey & ~KeyCode.Space);
+        }
+        else
+        {
+            // Append the actual key name
+            sb.Append (GetKeyString (baseKey));
         }
 
         return TrimEndSeparator (sb.ToString (), separator);
@@ -726,7 +761,7 @@ public class Key : EventArgs, IEquatable<Key>
         // Split the string into parts using the set Separator
         string [] parts = text.Split ((char)separator.Value);
 
-        if (parts.Length is > 4)
+        if (parts.Length > 4)
         {
             // Invalid
             return false;
@@ -753,7 +788,7 @@ public class Key : EventArgs, IEquatable<Key>
             key = (char)separator.Value;
         }
 
-        if (separator != Separator && (parts.Length is 1 || (key is { } && parts.Length is 2)))
+        if (separator != Separator && parts.Length is 1 or 2)
         {
             parts = text.Split ((char)separator.Value);
 
@@ -768,18 +803,19 @@ public class Key : EventArgs, IEquatable<Key>
 
         for (var index = 0; index < parts.Length; index++)
         {
-            if (_modifierDict.TryGetValue (parts [index].ToLowerInvariant (), out KeyCode modifier))
+            if (!_modifierDict.TryGetValue (parts [index].ToLowerInvariant (), out KeyCode modifier))
             {
-                modifiers |= modifier;
-                parts [index] = string.Empty; // eat it
+                continue;
             }
+            modifiers |= modifier;
+            parts [index] = string.Empty; // eat it
         }
 
         // we now have the modifiers
 
         string partNotFound = parts.FirstOrDefault (p => !string.IsNullOrEmpty (p), string.Empty);
-        var parsedKeyCode = KeyCode.Null;
-        var parsedInt = 0;
+        KeyCode parsedKeyCode;
+        int parsedInt;
 
         if (partNotFound.Length == 1)
         {
@@ -839,7 +875,7 @@ public class Key : EventArgs, IEquatable<Key>
             }
         }
 
-        // if it's a number int, treat it as a unicode value
+        // if it's a number int, treat it as a Unicode value
         if (int.TryParse (partNotFound, NumberStyles.Number, CultureInfo.InvariantCulture, out parsedInt))
         {
             if (!Rune.IsValid (parsedInt))
@@ -864,14 +900,14 @@ public class Key : EventArgs, IEquatable<Key>
             return false;
         }
 
-        if (GetIsKeyCodeAtoZ (parsedKeyCode))
+        if (!GetIsKeyCodeAtoZ (parsedKeyCode))
         {
-            key = new Key (parsedKeyCode | (modifiers & ~KeyCode.Space));
-
-            return true;
+            return false;
         }
+        key = new Key (parsedKeyCode | (modifiers & ~KeyCode.Space));
 
-        return false;
+        return true;
+
     }
 
     #endregion
@@ -1117,19 +1153,17 @@ public class Key : EventArgs, IEquatable<Key>
 
     #endregion
 
-    private static Rune _separator = new ('+');
-
     /// <summary>Gets or sets the separator character used when parsing and printing Keys. E.g. Ctrl+A. The default is '+'.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Rune Separator
     {
-        get => _separator;
+        get;
         set
         {
-            if (_separator != value)
+            if (field != value)
             {
-                _separator = value == default (Rune) ? new Rune ('+') : value;
+                field = value == default (Rune) ? new Rune ('+') : value;
             }
         }
-    }
+    } = new ('+');
 }
