@@ -110,24 +110,32 @@ internal static class UnixTerminalHelper
                 return;
             }
 
-            // Save terminal state before suspending
+            // Save the current terminal state (raw mode) so we can restore it after resume.
             SaveTerminalState ();
 
-            // Disable alternative screen buffer and show cursor
+            // Leave the alternate screen buffer and show cursor.
             output.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
-
-            //Set cursor key to cursor.
             output.Write (EscSeqUtils.CSI_ShowCursor);
+
+            // Restore terminal to cooked mode so the shell can function while we're stopped.
+            // The raw mode state was saved above and will be restored after resume.
+            RunSttySane ();
+
+            Logging.Information ("UnixTerminalHelper.Suspend: Terminal restored to cooked mode, calling SuspendHelper.Suspend...");
 
             if (!SuspendHelper.Suspend ())
             {
+                Logging.Warning ("UnixTerminalHelper.Suspend: SuspendHelper.Suspend() returned false");
+
                 return;
             }
 
-            // Restore terminal state after resuming
+            Logging.Information ("UnixTerminalHelper.Suspend: Resumed from suspend! Restoring raw mode...");
+
+            // Restore the saved raw mode terminal state.
             RestoreTerminalState ();
 
-            //Enable alternative screen buffer.
+            // Re-enter the alternate screen buffer.
             output.Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
         }
         catch (Exception ex)
