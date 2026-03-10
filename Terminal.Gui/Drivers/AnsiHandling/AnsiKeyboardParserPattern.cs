@@ -51,4 +51,57 @@ public abstract class AnsiKeyboardParserPattern
     /// <param name="input"></param>
     /// <returns></returns>
     protected abstract Key? GetKeyImpl (string? input);
+
+    /// <summary>
+    ///     Parses a kitty-extended modifier field that may contain an event type suffix.
+    ///     The field format is <c>modifiers</c> or <c>modifiers:event_type</c>.
+    /// </summary>
+    /// <param name="modifierField">The raw modifier field string (e.g. "5" or "1:3").</param>
+    /// <param name="key">The base key to apply modifiers to.</param>
+    /// <returns>The key with modifiers and event type applied, or <see langword="null"/> if parsing fails.</returns>
+    protected static Key ApplyModifiersAndEventType (string modifierField, Key key)
+    {
+        string [] parts = modifierField.Split (':');
+        string modifierToken = parts [0];
+
+        if (!int.TryParse (modifierToken, System.Globalization.CultureInfo.InvariantCulture, out int encodedModifiers))
+        {
+            return key;
+        }
+
+        int modifiers = System.Math.Max (0, encodedModifiers - 1);
+
+        if ((modifiers & 0b1) != 0)
+        {
+            key = key.WithShift;
+        }
+
+        if ((modifiers & 0b10) != 0)
+        {
+            key = key.WithAlt;
+        }
+
+        if ((modifiers & 0b100) != 0)
+        {
+            key = key.WithCtrl;
+        }
+
+        // Extract event type from the modifier field: modifiers:event_type
+        // Kitty values: 1=press, 2=repeat, 3=release (matching KeyEventType enum values)
+        KeyEventType eventType = KeyEventType.Press;
+
+        if (parts.Length > 1
+            && int.TryParse (parts [1], System.Globalization.CultureInfo.InvariantCulture, out int kittyEventType)
+            && kittyEventType is >= 1 and <= 3)
+        {
+            eventType = (KeyEventType)kittyEventType;
+        }
+
+        if (eventType != KeyEventType.Press)
+        {
+            key = new Key (key) { EventType = eventType };
+        }
+
+        return key;
+    }
 }

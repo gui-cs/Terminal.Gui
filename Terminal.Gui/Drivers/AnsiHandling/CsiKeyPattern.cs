@@ -9,7 +9,7 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class CsiKeyPattern : AnsiKeyboardParserPattern
 {
-    private readonly Regex _pattern = new (@"^\u001b\[(\d+)(?:;(\d+))?~$");
+    private readonly Regex _pattern = new (@"^\u001b\[(\d+)(?:;(\d+(?::\d+)*))?~$");
 
     private readonly Dictionary<int, Key> _keyCodeMap = new ()
     {
@@ -60,23 +60,13 @@ public class CsiKeyPattern : AnsiKeyboardParserPattern
         }
 
         // If there's no modifier, just return the key.
-        if (!int.TryParse (match.Groups [2].Value, out int modifier))
+        string modifierField = match.Groups [2].Value;
+
+        if (string.IsNullOrEmpty (modifierField))
         {
             return key;
         }
 
-        key = modifier switch
-              {
-                  2 => key.WithShift,
-                  3 => key.WithAlt,
-                  4 => key.WithAlt.WithShift,
-                  5 => key.WithCtrl,
-                  6 => key.WithCtrl.WithShift,
-                  7 => key.WithCtrl.WithAlt,
-                  8 => key.WithCtrl.WithAlt.WithShift,
-                  _ => key
-              };
-
-        return key;
+        return ApplyModifiersAndEventType (modifierField, key);
     }
 }
