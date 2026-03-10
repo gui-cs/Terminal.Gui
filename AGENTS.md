@@ -70,6 +70,8 @@ dotnet run
 5. **Unused lambda params** - Use `_` discard: `(_, _) => { }`
 6. **Local functions** - Use camelCase: `void myLocalFunc ()`
 7. **Backing fields** - Place immediately before their property
+8. **Early return** - Prefer guard clauses over nested `if`/`else`
+9. **One type per file** - Public and internal types each get their own file
 
 ## Detailed Coding Rules
 
