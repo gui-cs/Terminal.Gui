@@ -373,7 +373,7 @@ internal class DriverImpl : IDriver
     ///     Stores the kitty keyboard flags currently enabled on the terminal.
     /// </summary>
     /// <param name="enabledFlags">The kitty keyboard flags currently enabled.</param>
-    internal void SetKittyKeyboardEnabledFlags (int enabledFlags)
+    internal void SetKittyKeyboardEnabledFlags (KittyKeyboardFlags enabledFlags)
     {
         KittyKeyboardProtocol.EnabledFlags = enabledFlags;
     }
@@ -386,9 +386,6 @@ internal class DriverImpl : IDriver
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     public event EventHandler<Mouse>? MouseEvent;
-
-    /// <inheritdoc/>
-    public void InjectMouseEvent (Mouse mouse) => GetInputProcessor ().InjectMouseEvent (null, mouse);
 
     #endregion Input Events
 

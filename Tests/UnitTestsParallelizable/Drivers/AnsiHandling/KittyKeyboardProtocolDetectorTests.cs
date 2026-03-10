@@ -27,7 +27,7 @@ public class KittyKeyboardProtocolDetectorTests
 
         Assert.NotNull (result);
         Assert.True (result.IsSupported);
-        Assert.Equal (31, result.SupportedFlags);
+        Assert.Equal (31, (int)result.SupportedFlags);
         Assert.Equal (EscSeqUtils.KittyKeyboardRequestedFlags, result.EnabledFlags);
         driverMock.Verify (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()), Times.Once);
     }
@@ -49,8 +49,8 @@ public class KittyKeyboardProtocolDetectorTests
 
         Assert.NotNull (result);
         Assert.False (result.IsSupported);
-        Assert.Equal (0, result.SupportedFlags);
-        Assert.Equal (0, result.EnabledFlags);
+        Assert.Equal (0, (int)result.SupportedFlags);
+        Assert.Equal (0, (int)result.EnabledFlags);
     }
 
     [Fact]
@@ -81,6 +81,6 @@ public class KittyKeyboardProtocolDetectorTests
         KittyKeyboardProtocolResult result = KittyKeyboardProtocolDetector.ParseResponse (response);
 
         Assert.Equal (isSupported, result.IsSupported);
-        Assert.Equal (supportedFlags, result.SupportedFlags);
+        Assert.Equal ((KittyKeyboardFlags)supportedFlags, result.SupportedFlags);
     }
 }

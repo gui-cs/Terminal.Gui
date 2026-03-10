@@ -648,12 +648,11 @@ public class KittyKeyboardPhase2Tests
     public void Pipeline_FullCycle_PressRepeatRelease ()
     {
         // Simulates holding 'a': press → repeat → repeat → release
-        (List<Key> down, List<Key> up) = InjectRawSequence (
-                                                             "\x1b[97;1:1u", // press
-                                                             "\x1b[97;1:2u", // repeat
-                                                             "\x1b[97;1:2u", // repeat
-                                                             "\x1b[97;1:3u" // release
-                                                            );
+        (List<Key> down, List<Key> up) = InjectRawSequence ("\x1b[97;1:1u", // press
+                                                            "\x1b[97;1:2u", // repeat
+                                                            "\x1b[97;1:2u", // repeat
+                                                            "\x1b[97;1:3u" // release
+                                                           );
 
         Assert.Equal (3, down.Count);
         Assert.Equal (KeyEventType.Press, down [0].EventType);
@@ -729,18 +728,14 @@ public class KittyKeyboardPhase2Tests
 
     // Claude - Opus 4.6
     [Fact]
-    public void KittyRequestedFlags_IncludesReportAllKeys ()
-    {
+    public void KittyRequestedFlags_IncludesReportAllKeys () =>
+
         // The kitty spec requires flag 8 (report all keys as escape codes) for the terminal
         // to send standalone modifier key events (e.g., pressing Shift alone).
         // Without this flag, terminals like Windows Terminal won't report modifier-only presses.
-        int reportAllKeysFlag = 8;
-
-        Assert.True (
-                     (EscSeqUtils.KittyKeyboardRequestedFlags & reportAllKeysFlag) != 0,
-                     $"KittyKeyboardRequestedFlags ({EscSeqUtils.KittyKeyboardRequestedFlags}) must include flag 8 (report all keys as escape codes) " +
-                     "to receive standalone modifier key events from the terminal.");
-    }
+        Assert.True (EscSeqUtils.KittyKeyboardRequestedFlags.HasFlag (KittyKeyboardFlags.ReportAllKeysAsEscapeCodes),
+                     $"KittyKeyboardRequestedFlags ({EscSeqUtils.KittyKeyboardRequestedFlags}) must include ReportAllKeysAsEscapeCodes "
+                     + "to receive standalone modifier key events from the terminal.");
 
     #endregion
 
