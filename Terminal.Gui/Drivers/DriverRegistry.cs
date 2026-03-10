@@ -17,9 +17,6 @@ public static class DriverRegistry
         /// <summary>.NET System.Console cross-platform driver name.</summary>
         public const string DOTNET = "dotnet";
 
-        /// <summary>Unix/Linux/macOS terminal driver name.</summary>
-        public const string UNIX = "unix";
-
         /// <summary>Pure ANSI escape sequence cross-platform driver name.</summary>
         public const string ANSI = "ansi";
     }
@@ -61,15 +58,6 @@ public static class DriverRegistry
                        "Cross-platform driver using System.Console API",
                        [PlatformID.Win32NT, PlatformID.Unix, PlatformID.MacOSX],
                        () => new NetComponentFactory ()
-                      ));
-
-        Register (
-                  new (
-                       Names.UNIX,
-                       "Unix/Linux Terminal Driver",
-                       "Optimized Unix/Linux/macOS driver with raw terminal mode",
-                       [PlatformID.Unix, PlatformID.MacOSX],
-                       () => new UnixComponentFactory ()
                       ));
 
         Register (
@@ -145,7 +133,7 @@ public static class DriverRegistry
 
         if (p == PlatformID.Unix)
         {
-            return _registry [Names.UNIX];
+            return _registry [Names.ANSI];
         }
 
         // Fallback to dotnet

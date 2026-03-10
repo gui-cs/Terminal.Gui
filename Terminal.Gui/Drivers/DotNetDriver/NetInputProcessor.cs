@@ -10,10 +10,10 @@ public class NetInputProcessor : InputProcessorImpl<ConsoleKeyInfo>
     /// <inheritdoc/>
     /// <param name="inputBuffer">The input buffer to process.</param>
     /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
-    public NetInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer, ITimeProvider? timeProvider = null)
-        : base (inputBuffer, new NetKeyConverter (), timeProvider)
-    {
-    }
+    public NetInputProcessor (ConcurrentQueue<ConsoleKeyInfo> inputBuffer, ITimeProvider? timeProvider = null) : base (inputBuffer,
+                                                                                                                       new NetKeyConverter (),
+                                                                                                                       timeProvider)
+    { }
 
     /// <inheritdoc/>
     protected override void Process (ConsoleKeyInfo input)

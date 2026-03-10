@@ -10,8 +10,8 @@ namespace Terminal.Gui.Drivers;
 ///         for escape sequence parsing.
 ///     </para>
 ///     <list type="bullet">
-///         <item><see cref="UnixInputProcessor"/> - Raw terminal input on Unix/Linux/macOS</item>
-///         <item><see cref="AnsiInputProcessor"/> - ANSI-based test driver</item>
+///         
+///         <item><see cref="AnsiInputProcessor"/> - ANSI-based driver for Unix/Linux/macOS and testing</item>
 ///     </list>
 ///     <para>
 ///         The conversion uses <see cref="ConsoleKeyInfo"/> as an intermediary format,
