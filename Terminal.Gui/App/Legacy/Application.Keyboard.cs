@@ -28,6 +28,24 @@ public static partial class Application // Keyboard handling
         remove => ApplicationImpl.Instance.Keyboard.KeyDown -= value;
     }
 
+    /// <summary>
+    ///     Raised when the user releases a key.
+    ///     <para>
+    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
+    ///         additional processing.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     This event is only raised when the driver provides key release information.
+    ///     Not all drivers support key-up events.
+    /// </remarks>
+    [Obsolete ("The legacy static Application object is going away.")]
+    public static event EventHandler<Key>? KeyUp
+    {
+        add => ApplicationImpl.Instance.Keyboard.KeyUp += value;
+        remove => ApplicationImpl.Instance.Keyboard.KeyUp -= value;
+    }
+
     /// <inheritdoc cref="IKeyboard.KeyBindings"/>
     [Obsolete ("The legacy static Application object is going away.")]
     public static KeyBindings KeyBindings => ApplicationImpl.Instance.Keyboard.KeyBindings;

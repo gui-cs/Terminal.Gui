@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace DriverTests.AnsiDriver;
 
 /// <summary>
@@ -77,10 +75,13 @@ public class AnsiInputOutputTests (ITestOutputHelper output)
     {
         using AnsiOutput output = new ();
 
-        output.EnableKittyKeyboard (EscSeqUtils.KittyKeyboardPhase1Flags);
+        output.EnableKittyKeyboard (EscSeqUtils.KittyKeyboardRequestedFlags);
 
-        Assert.Equal (0, output.KittyKeyboardEnabledFlags);
-        Assert.DoesNotContain (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardPhase1Flags), output.GetLastOutput (), StringComparison.Ordinal);
+        Assert.Equal (KittyKeyboardFlags.None, output.KittyKeyboardEnabledFlags);
+
+        Assert.DoesNotContain (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardRequestedFlags),
+                               output.GetLastOutput (),
+                               StringComparison.Ordinal);
     }
 
     [Fact]
@@ -88,11 +89,11 @@ public class AnsiInputOutputTests (ITestOutputHelper output)
     public void AnsiOutput_Dispose_DoesNotWriteDisableSequence_WhenNoTerminalAvailable ()
     {
         AnsiOutput output = new ();
-        output.EnableKittyKeyboard (EscSeqUtils.KittyKeyboardPhase1Flags);
+        output.EnableKittyKeyboard (EscSeqUtils.KittyKeyboardRequestedFlags);
 
         output.Dispose ();
 
-        Assert.Equal (0, output.KittyKeyboardEnabledFlags);
+        Assert.Equal (KittyKeyboardFlags.None, output.KittyKeyboardEnabledFlags);
         Assert.DoesNotContain (EscSeqUtils.CSI_DisableKittyKeyboardFlags, output.GetLastOutput (), StringComparison.Ordinal);
     }
 

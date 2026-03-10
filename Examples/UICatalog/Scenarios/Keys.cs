@@ -41,14 +41,34 @@ public class Keys : Scenario
             Text = "Last _app.Keyboard.KeyDown:"
         };
         win.Add (label);
+
         Label labelAppKeypress = new ()
         {
             X = Pos.Right (label) + 1,
-            Y = Pos.Top (label)
+            Y = Pos.Top (label),
+            Width = Dim.Fill (2)
         };
         win.Add (labelAppKeypress);
 
-        app.Keyboard.KeyDown += (_, e) => labelAppKeypress.Text = e.ToString ();
+        app.Keyboard.KeyDown += (_, e) => labelAppKeypress.Text = FormatKeyEvent (e);
+
+        label = new ()
+        {
+            X = 0,
+            Y = Pos.Bottom (label),
+            Text = "Last app.Keyboard._KeyUp:"
+        };
+        win.Add (label);
+
+        Label labelAppKeyUp = new ()
+        {
+            X = Pos.Right (label) + 1,
+            Y = Pos.Top (label),
+            Width = Dim.Fill (2)
+        };
+        win.Add (labelAppKeyUp);
+
+        app.Keyboard.KeyUp += (_, e) => labelAppKeyUp.Text = FormatKeyEvent (e);
 
         label = new ()
         {
@@ -63,10 +83,11 @@ public class Keys : Scenario
             X = Pos.Right (label) + 1,
             Y = Pos.Top (label),
             Height = 1,
+            Width = Dim.Fill (2)
         };
         win.Add (lastTextFieldKeyDownLabel);
 
-        edit.KeyDown += (_, e) => lastTextFieldKeyDownLabel.Text = e.ToString ();
+        edit.KeyDown += (_, e) => lastTextFieldKeyDownLabel.Text = FormatKeyEvent (e);
 
         // Application key event log:
         label = new ()
@@ -77,6 +98,7 @@ public class Keys : Scenario
         };
         win.Add (label);
         int maxKeyString = Key.CursorRight.WithAlt.WithCtrl.WithShift.ToString ().Length;
+        int colWidth = maxKeyString + 12; // room for event type + modifier info
 
         ObservableCollection<string> keyList = [];
 
@@ -84,7 +106,7 @@ public class Keys : Scenario
         {
             X = 0,
             Y = Pos.Bottom (label),
-            Width = "KeyDown:".Length + maxKeyString,
+            Width = colWidth,
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (keyList)
         };
@@ -163,15 +185,39 @@ public class Keys : Scenario
         app.Driver!.GetInputProcessor ().AnsiSequenceSwallowed += (_, e) => { swallowedList.Add (e.Replace ("\x1b", "Esc")); };
 
         app.Keyboard.KeyDown += (_, a) => KeyDownPressUp (a, "Down");
+        app.Keyboard.KeyUp += (_, a) => KeyDownPressUp (a, "Up");
 
         void KeyDownPressUp (Key args, string upDown)
         {
-            string msg = $"Key{upDown,-7}: {args}";
+            string msg = $"Key{upDown,-7}: {FormatKeyEvent (args)}";
             keyList.Add (msg);
             appKeyListView.MoveDown ();
             onKeyDownNotHandledListView.MoveDown ();
         }
 
         app.Run (win);
+    }
+
+    /// <summary>
+    ///     Formats a <see cref="Key"/> event with Phase 2 metadata: event type and modifier key identity.
+    /// </summary>
+    private static string FormatKeyEvent (Key key)
+    {
+        string eventType = key.EventType switch
+        {
+            KeyEventType.Press => "press",
+            KeyEventType.Repeat => "repeat",
+            KeyEventType.Release => "release",
+            _ => "?"
+        };
+
+        string text = $"{key} ({eventType})";
+
+        if (key.IsModifierOnly)
+        {
+            text += $" [{key.ModifierKey}]";
+        }
+
+        return text;
     }
 }

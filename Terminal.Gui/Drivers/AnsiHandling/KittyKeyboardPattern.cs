@@ -4,12 +4,12 @@ using System.Text.RegularExpressions;
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Parses kitty keyboard protocol CSI <c>u</c> sequences into the current <see cref="Key"/> model.
-///     Phase 1 intentionally drops kitty-only event metadata such as press/release/repeat and distinct modifier keys.
+///     Parses kitty keyboard protocol CSI <c>u</c> sequences into the <see cref="Key"/> model.
+///     Extracts event type (press/repeat/release) and maps it to <see cref="KeyEventType"/>.
 /// </summary>
 public class KittyKeyboardPattern : AnsiKeyboardParserPattern
 {
-    private readonly Regex _pattern = new (@"^\u001b\[(\d+)(?:(?::\d+)*)?(?:;([^;u]+)(?:;[^u]*)?)?u$");
+    private readonly Regex _pattern = new (@"^\u001b\[(\d+)(?::(\d+))?(?::(\d+))?(?:;([^;u]+)(?:;[^u]*)?)?u$");
 
     private readonly Dictionary<int, Key> _functionalKeyMap = new ()
     {
@@ -55,10 +55,10 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
         { 57387, Key.F24 }
     };
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override bool IsMatch (string? input) => !string.IsNullOrEmpty (input) && _pattern.IsMatch (input);
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override Key? GetKeyImpl (string? input)
     {
         Match match = _pattern.Match (input!);
@@ -80,45 +80,68 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
             return null;
         }
 
-        string modifierField = match.Groups [2].Value;
+        // Extract alternate key codes (kitty flag 4: report alternate keys)
+        KeyCode shiftedKeyCode = KeyCode.Null;
+        KeyCode baseLayoutKeyCode = KeyCode.Null;
 
-        if (string.IsNullOrEmpty (modifierField))
+        if (match.Groups [2].Success
+            && int.TryParse (match.Groups [2].Value, CultureInfo.InvariantCulture, out int shiftedCode)
+            && shiftedCode > 0)
         {
-            return key;
+            shiftedKeyCode = (KeyCode)shiftedCode;
         }
 
-        string modifierToken = modifierField.Split (':') [0];
-
-        if (!int.TryParse (modifierToken, CultureInfo.InvariantCulture, out int encodedModifiers))
+        if (match.Groups [3].Success
+            && int.TryParse (match.Groups [3].Value, CultureInfo.InvariantCulture, out int baseCode)
+            && baseCode > 0)
         {
-            return key;
+            baseLayoutKeyCode = (KeyCode)baseCode;
         }
 
-        int modifiers = Math.Max (0, encodedModifiers - 1);
-
-        if ((modifiers & 0b1) != 0)
+        if (shiftedKeyCode != KeyCode.Null || baseLayoutKeyCode != KeyCode.Null)
         {
-            key = key.WithShift;
+            key = new Key (key) { ShiftedKeyCode = shiftedKeyCode, BaseLayoutKeyCode = baseLayoutKeyCode };
         }
 
-        if ((modifiers & 0b10) != 0)
-        {
-            key = key.WithAlt;
-        }
+        string modifierField = match.Groups [4].Value;
 
-        if ((modifiers & 0b100) != 0)
-        {
-            key = key.WithCtrl;
-        }
-
-        return key;
+        return string.IsNullOrEmpty (modifierField) ? key : ApplyModifiersAndEventType (modifierField, key);
     }
+
+    /// <summary>
+    ///     Maps kitty modifier key codepoints to <see cref="ModifierKey"/> values.
+    /// </summary>
+    private static readonly Dictionary<int, ModifierKey> _modifierKeyMap = new ()
+    {
+        { 57358, ModifierKey.CapsLock },
+        { 57359, ModifierKey.ScrollLock },
+        { 57360, ModifierKey.NumLock },
+        { 57441, ModifierKey.LeftShift },
+        { 57442, ModifierKey.LeftCtrl },
+        { 57443, ModifierKey.LeftAlt },
+        { 57444, ModifierKey.LeftSuper },
+        { 57445, ModifierKey.LeftHyper },
+
+        // 57446 = Left Meta (mapped to Alt for Terminal.Gui)
+        { 57447, ModifierKey.RightShift },
+        { 57448, ModifierKey.RightCtrl },
+        { 57449, ModifierKey.RightAlt },
+        { 57450, ModifierKey.RightSuper },
+        { 57451, ModifierKey.RightHyper }
+
+        // 57452 = Right Meta (mapped to Alt for Terminal.Gui)
+    };
 
     private Key? MapKey (int kittyCode)
     {
         if (_functionalKeyMap.TryGetValue (kittyCode, out Key? functionalKey))
         {
             return functionalKey;
+        }
+
+        if (_modifierKeyMap.TryGetValue (kittyCode, out ModifierKey modifierKey))
+        {
+            return new Key { ModifierKey = modifierKey };
         }
 
         if (!Rune.IsValid (kittyCode))
