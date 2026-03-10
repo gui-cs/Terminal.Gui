@@ -683,6 +683,65 @@ public class KittyKeyboardPhase2Tests
         Assert.Empty (up);
     }
 
+    // --- Modifier-only key down/up events at app.Keyboard level ---
+
+    // Claude - Opus 4.6
+    [Theory]
+    [InlineData ("\x1b[57441u", ModifierKey.LeftShift)]
+    [InlineData ("\x1b[57442u", ModifierKey.LeftCtrl)]
+    [InlineData ("\x1b[57443u", ModifierKey.LeftAlt)]
+    [InlineData ("\x1b[57447u", ModifierKey.RightShift)]
+    [InlineData ("\x1b[57448u", ModifierKey.RightCtrl)]
+    [InlineData ("\x1b[57449u", ModifierKey.RightAlt)]
+    public void Pipeline_ModifierPress_RaisesKeyDown (string sequence, ModifierKey expectedModifier)
+    {
+        // Standalone modifier press should raise app.Keyboard.KeyDown
+        (List<Key> down, List<Key> up) = InjectRawSequence (sequence);
+
+        Assert.Single (down);
+        Assert.True (down [0].IsModifierOnly);
+        Assert.Equal (expectedModifier, down [0].ModifierKey);
+        Assert.Equal (KeyEventType.Press, down [0].EventType);
+        Assert.Empty (up);
+    }
+
+    // Claude - Opus 4.6
+    [Theory]
+    [InlineData ("\x1b[57441;1:3u", ModifierKey.LeftShift)]
+    [InlineData ("\x1b[57442;1:3u", ModifierKey.LeftCtrl)]
+    [InlineData ("\x1b[57443;1:3u", ModifierKey.LeftAlt)]
+    [InlineData ("\x1b[57447;1:3u", ModifierKey.RightShift)]
+    [InlineData ("\x1b[57448;1:3u", ModifierKey.RightCtrl)]
+    [InlineData ("\x1b[57449;1:3u", ModifierKey.RightAlt)]
+    public void Pipeline_ModifierRelease_RaisesKeyUp (string sequence, ModifierKey expectedModifier)
+    {
+        // Standalone modifier release should raise app.Keyboard.KeyUp
+        (List<Key> down, List<Key> up) = InjectRawSequence (sequence);
+
+        Assert.Empty (down);
+        Assert.Single (up);
+        Assert.True (up [0].IsModifierOnly);
+        Assert.Equal (expectedModifier, up [0].ModifierKey);
+        Assert.Equal (KeyEventType.Release, up [0].EventType);
+    }
+
+    // --- Kitty flags must include "report all keys" for standalone modifier events ---
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void KittyRequestedFlags_IncludesReportAllKeys ()
+    {
+        // The kitty spec requires flag 8 (report all keys as escape codes) for the terminal
+        // to send standalone modifier key events (e.g., pressing Shift alone).
+        // Without this flag, terminals like Windows Terminal won't report modifier-only presses.
+        int reportAllKeysFlag = 8;
+
+        Assert.True (
+                     (EscSeqUtils.KittyKeyboardRequestedFlags & reportAllKeysFlag) != 0,
+                     $"KittyKeyboardRequestedFlags ({EscSeqUtils.KittyKeyboardRequestedFlags}) must include flag 8 (report all keys as escape codes) " +
+                     "to receive standalone modifier key events from the terminal.");
+    }
+
     #endregion
 
     #region Full Pipeline Tests (Negative)

@@ -913,10 +913,16 @@ public static class EscSeqUtils
     public const int KittyKeyboardReportEventTypes = 2;
 
     /// <summary>
-    ///     The kitty keyboard flags that Terminal.Gui requests when kitty keyboard protocol is supported.
-    ///     Currently: disambiguate escape codes + report event types.
+    ///     Kitty keyboard flag: report all keys as escape codes (flag 0b1000).
+    ///     Enables the terminal to report standalone modifier key events (e.g., pressing Shift alone).
     /// </summary>
-    public const int KittyKeyboardRequestedFlags = KittyKeyboardDisambiguateEscapeCodes | KittyKeyboardReportEventTypes;
+    public const int KittyKeyboardReportAllKeysAsEscapeCodes = 8;
+
+    /// <summary>
+    ///     The kitty keyboard flags that Terminal.Gui requests when kitty keyboard protocol is supported.
+    ///     Currently: disambiguate escape codes + report event types + report all keys as escape codes.
+    /// </summary>
+    public const int KittyKeyboardRequestedFlags = KittyKeyboardDisambiguateEscapeCodes | KittyKeyboardReportEventTypes | KittyKeyboardReportAllKeysAsEscapeCodes;
 
     /// <summary>
     ///     ESC [ &gt; flags u - Push current kitty keyboard flags and enable the specified flags.
