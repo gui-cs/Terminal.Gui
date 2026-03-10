@@ -71,33 +71,12 @@ public sealed class Driver
 
         if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
         {
-            const int STD_INPUT_HANDLE = -10;
-            const int STD_OUTPUT_HANDLE = -11;
-            nint inH = GetStdHandle (STD_INPUT_HANDLE);
-            nint outH = GetStdHandle (STD_OUTPUT_HANDLE);
-
-            inputAttached = inH != nint.Zero && GetConsoleMode (inH, out _);
-            outputAttached = outH != nint.Zero && GetConsoleMode (outH, out _);
-
-            return inputAttached && outputAttached;
+            return WindowsConsoleHelper.IsAttachedToTerminal (out inputAttached, out outputAttached);
         }
 
-        const int STDIN_FILENO = 0;
-        const int STDOUT_FILENO = 1;
-        inputAttached = isatty (STDIN_FILENO) == 1;
-        outputAttached = isatty (STDOUT_FILENO) == 1;
+        inputAttached = UnixIOHelper.IsTerminal (UnixIOHelper.STDIN_FILENO);
+        outputAttached = UnixIOHelper.IsTerminal (UnixIOHelper.STDOUT_FILENO);
 
         return inputAttached && outputAttached;
     }
-
-    // Unix
-    [DllImport ("libc", SetLastError = true)]
-    private static extern int isatty (int fd);
-
-    // Windows
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern nint GetStdHandle (int nStdHandle);
-
-    [DllImport ("kernel32.dll")]
-    private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
 }
