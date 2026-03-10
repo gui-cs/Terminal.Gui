@@ -6,8 +6,12 @@ namespace Terminal.Gui.Drivers;
 
 internal static class UnixTerminalHelper
 {
+    // Use a raw buffer for termios save/restore since the struct layout differs between
+    // macOS (72 bytes: ulong flags, NCCS=20, ulong speeds) and Linux (56 bytes: uint flags, NCCS=32, uint speeds).
+    // We never interpret individual fields; we just save and restore the entire blob.
+    private const int TermiosBufferSize = 128;
+    private static nint _origTermios;
     private static bool _savedTermios;
-    private static Termios _origTermios;
     private static int _ttyFd = -1;
 
     public static void SaveTerminalState ()
@@ -17,7 +21,12 @@ internal static class UnixTerminalHelper
             _ttyFd = open ("/dev/tty", O_RDWR);
         }
 
-        if (_ttyFd != -1 && tcgetattr (_ttyFd, out _origTermios) == 0)
+        if (_origTermios == nint.Zero)
+        {
+            _origTermios = Marshal.AllocHGlobal (TermiosBufferSize);
+        }
+
+        if (_ttyFd != -1 && tcgetattr (_ttyFd, _origTermios) == 0)
         {
             _savedTermios = true;
         }
@@ -31,6 +40,7 @@ internal static class UnixTerminalHelper
             {
                 // Ignore any exceptions during close, as we're already in a cleanup phase
             }
+
             _ttyFd = -1;
         }
     }
@@ -39,9 +49,9 @@ internal static class UnixTerminalHelper
     {
         if (_ttyFd != -1)
         {
-            if (_savedTermios)
+            if (_savedTermios && _origTermios != nint.Zero)
             {
-                if (tcsetattr (_ttyFd, TCSANOW, ref _origTermios) != 0)
+                if (tcsetattr (_ttyFd, TCSANOW, _origTermios) != 0)
                 {
                     // fallback to stty sane
                     RunSttySane ();
@@ -154,23 +164,6 @@ internal static class UnixTerminalHelper
     private const int O_RDWR = 2;
     private const int TCSANOW = 0;
 
-    [StructLayout (LayoutKind.Sequential)]
-    private struct Termios
-    {
-#pragma warning disable IDE1006 // Naming Styles
-        public uint c_iflag;
-        public uint c_oflag;
-        public uint c_cflag;
-        public uint c_lflag;
-
-        [MarshalAs (UnmanagedType.ByValArray, SizeConst = 32)]
-        public byte [] c_cc;
-
-        public uint c_ispeed;
-        public uint c_ospeed;
-#pragma warning restore IDE1006 // Naming Styles
-    }
-
     [DllImport ("libc", SetLastError = true)]
     private static extern int open (string path, int oflag);
 
@@ -178,8 +171,8 @@ internal static class UnixTerminalHelper
     private static extern int close (int fd);
 
     [DllImport ("libc", SetLastError = true)]
-    private static extern int tcgetattr (int fd, out Termios termios_p);
+    private static extern int tcgetattr (int fd, nint termios_p);
 
     [DllImport ("libc", SetLastError = true)]
-    private static extern int tcsetattr (int fd, int optional_actions, ref Termios termios_p);
+    private static extern int tcsetattr (int fd, int optional_actions, nint termios_p);
 }
