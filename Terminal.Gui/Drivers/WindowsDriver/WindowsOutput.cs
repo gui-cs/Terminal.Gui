@@ -269,7 +269,6 @@ internal partial class WindowsOutput : OutputBase, IOutput
         if (!WriteConsole (!IsLegacyConsole ? _outputHandle : _screenBuffer, str, (uint)str.Length, out uint _, nint.Zero))
         {
             // Don't throw in unit tests
-            // throw new Win32Exception (Marshal.GetLastWin32Error (), "Failed to write to console screen buffer.");
         }
     }
 
@@ -320,7 +319,7 @@ internal partial class WindowsOutput : OutputBase, IOutput
 
         if (!SetConsoleWindowInfo (_outputHandle, true, ref winRect))
         {
-            //throw new System.ComponentModel.Win32Exception (Marshal.GetLastWin32Error ());
+            Trace.Lifecycle (nameof (WindowsOutput), "SetConsoleWindow", $"Failed to set console window size, error code: {Marshal.GetLastWin32Error ()}. Returning requested size without resizing.");
             return new Size (cols, rows);
         }
 

@@ -229,11 +229,15 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public Region? Clip { get => _outputBuffer.Clip; set => _outputBuffer.Clip = value; }
 
+    /// <inheritdoc/>
+    public string? CurrentUrl { get => _outputBuffer.CurrentUrl; set => _outputBuffer.CurrentUrl = value; }
+
     /// <summary>Clears the <see cref="IDriver.Contents"/> of the driver.</summary>
     public void ClearContents ()
     {
         _outputBuffer.ClearContents ();
         ClearedContents?.Invoke (this, EventArgs.Empty);
+        CurrentUrl = null;
     }
 
     /// <inheritdoc/>
@@ -352,6 +356,26 @@ internal class DriverImpl : IDriver
     #endregion Cursor
 
     #region Input Events
+
+    /// <summary>
+    ///     Gets the detected kitty keyboard protocol state for the current driver instance.
+    /// </summary>
+    internal KittyKeyboardProtocolResult KittyKeyboardProtocol { get; private set; } = new ();
+
+    /// <summary>
+    ///     Stores the latest kitty keyboard protocol detection result.
+    /// </summary>
+    /// <param name="result">The detected kitty keyboard protocol result.</param>
+    internal void SetKittyKeyboardProtocol (KittyKeyboardProtocolResult result) => KittyKeyboardProtocol = result;
+
+    /// <summary>
+    ///     Stores the kitty keyboard flags currently enabled on the terminal.
+    /// </summary>
+    /// <param name="enabledFlags">The kitty keyboard flags currently enabled.</param>
+    internal void SetKittyKeyboardEnabledFlags (int enabledFlags)
+    {
+        KittyKeyboardProtocol.EnabledFlags = enabledFlags;
+    }
 
     /// <summary>Event fired when a key is pressed down.</summary>
     public event EventHandler<Key>? KeyDown;
