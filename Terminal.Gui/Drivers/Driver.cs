@@ -33,15 +33,16 @@ public sealed class Driver
     // It controls which strategy the ANSI driver uses to determine the terminal's size.
     /// <summary>
     ///     Controls how the ANSI driver detects the terminal's window size.
-    ///     Defaults to <see cref="SizeDetectionMode.Polling"/>, which uses a synchronous
-    ///     native syscall (<c>ioctl</c> on Unix, Console API on Windows) for immediate,
-    ///     reliable size information.  Set to <see cref="SizeDetectionMode.AnsiQuery"/>
-    ///     to use pure-ANSI escape-sequence queries instead (useful when the native API
-    ///     does not reflect the remote terminal size, e.g. over an SSH tunnel).
+    ///     Defaults to <see cref="SizeDetectionMode.AnsiQuery"/>, which sends a
+    ///     <c>CSI 18t</c> ANSI escape-sequence query to obtain the terminal size.
+    ///     Set to <see cref="SizeDetectionMode.Polling"/> to use a synchronous
+    ///     native syscall (<c>ioctl</c> on Unix, Console API on Windows) instead —
+    ///     useful when the ANSI query response does not reflect the remote terminal
+    ///     size (e.g., over an SSH tunnel).
     /// </summary>
     /// <seealso cref="SizeDetectionMode"/>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static SizeDetectionMode SizeDetection { get; set; } = SizeDetectionMode.Polling;
+    public static SizeDetectionMode SizeDetection { get; set; } = SizeDetectionMode.AnsiQuery;
 
     /// <summary>
     ///     Determines whether the process is attached to a real terminal (i.e. stdin/stdout

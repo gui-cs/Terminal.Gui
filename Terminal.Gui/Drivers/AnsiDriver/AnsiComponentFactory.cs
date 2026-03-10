@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.Drivers;
 
@@ -49,17 +50,55 @@ public class AnsiComponentFactory : ComponentFactoryImpl<char>
             return _injectedSizeMonitor;
         }
 
-        // When AnsiQuery mode is requested, use the ANSI escape-sequence monitor.
-        if (Driver.SizeDetection == SizeDetectionMode.AnsiQuery
-            && consoleOutput is AnsiOutput ansiOutput)
+        if (consoleOutput is AnsiOutput ansiOutput)
         {
+            if (Driver.SizeDetection == SizeDetectionMode.Polling)
+            {
+                // Polling mode: wire up a platform-native size query so that
+                // AnsiOutput.GetSize() returns the real terminal size via
+                // ioctl(TIOCGWINSZ) on Unix or the Console API on Windows.
+                ansiOutput.NativeSizeQuery = CreateNativeSizeQuery ();
+
+                return new SizeMonitorImpl (ansiOutput);
+            }
+
+            // Default (AnsiQuery): use ANSI escape-sequence queries.
             // The ANSI request callback will be set up by MainLoopCoordinator
             // after the driver is fully constructed.
             return new AnsiSizeMonitor (ansiOutput, queueAnsiRequest: null);
         }
 
-        // Default: synchronous polling via ioctl / Console API.
         return new SizeMonitorImpl (consoleOutput);
+    }
+
+    /// <summary>
+    ///     Returns a delegate that queries the real terminal size from the OS.
+    ///     On Windows this uses <see cref="Console.WindowWidth"/> / <see cref="Console.WindowHeight"/>;
+    ///     on Unix/macOS it uses <c>ioctl(TIOCGWINSZ)</c> via <see cref="UnixIOHelper.TryGetTerminalSize"/>.
+    /// </summary>
+    internal static Func<Size?> CreateNativeSizeQuery ()
+    {
+        if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
+        {
+            return () =>
+                   {
+                       try
+                       {
+                           int w = Console.WindowWidth;
+                           int h = Console.WindowHeight;
+
+                           return w > 0 && h > 0 ? new Size (w, h) : null;
+                       }
+                       catch (IOException ex)
+                       {
+                           Logging.Trace (nameof (AnsiComponentFactory), "NativeSizeQuery", $"Console size query failed: {ex.Message}");
+
+                           return null;
+                       }
+                   };
+        }
+
+        return () => UnixIOHelper.TryGetTerminalSize (out Size s) ? s : null;
     }
 
     /// <inheritdoc/>
@@ -77,6 +116,5 @@ public class AnsiComponentFactory : ComponentFactoryImpl<char>
         return _output ?? new AnsiOutput ();
     }
 }
-
 
 
