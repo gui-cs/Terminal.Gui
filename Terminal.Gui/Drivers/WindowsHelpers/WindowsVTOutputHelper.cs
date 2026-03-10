@@ -37,6 +37,10 @@ internal sealed class WindowsVTOutputHelper : IDisposable
     [DllImport ("kernel32.dll")]
     public static extern bool WriteFile (nint hConsoleHandle, byte [] lpBuffer, uint nNumberOfBytesToWrite, out uint lpNumberOfBytesWritten, nint lpOverlapped);
 
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs (UnmanagedType.Bool)]
+    private static extern bool FlushFileBuffers (nint hFile);
+
     #endregion
 
     private uint _originalConsoleMode;
@@ -116,6 +120,7 @@ internal sealed class WindowsVTOutputHelper : IDisposable
             }
 
             IsEnabled = true;
+
             //Logging.Information ($"Windows VTS output mode enabled successfully. Mode: 0x{newMode:X} (was 0x{_originalConsoleMode:X})");
 
             return true;
@@ -142,6 +147,7 @@ internal sealed class WindowsVTOutputHelper : IDisposable
         {
             SetConsoleMode (OutputHandle, _originalConsoleMode);
             IsEnabled = false;
+
             //Logging.Information ("Windows console mode restored.");
         }
         catch (Exception ex)
@@ -168,5 +174,18 @@ internal sealed class WindowsVTOutputHelper : IDisposable
         byte [] byteArray = Encoding.UTF8.GetBytes (output.ToString ());
 
         WriteFile (OutputHandle, byteArray, (uint)byteArray.Length, out _, nint.Zero);
+    }
+
+    /// <summary>
+    ///     Flushes the stdout handle via <c>FlushFileBuffers</c>.
+    /// </summary>
+    public static void FlushStdout ()
+    {
+        nint h = GetStdHandle (STD_OUTPUT_HANDLE);
+
+        if (h != nint.Zero && h != new nint (-1))
+        {
+            FlushFileBuffers (h);
+        }
     }
 }

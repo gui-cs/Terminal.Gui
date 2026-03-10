@@ -280,7 +280,6 @@ public class FileDialogTests : TestsAllDrivers
         {
             yield return [DriverRegistry.Names.WINDOWS, false];
             yield return [DriverRegistry.Names.DOTNET, false];
-            yield return [DriverRegistry.Names.UNIX, true];
             yield return [DriverRegistry.Names.ANSI, true];
         }
 

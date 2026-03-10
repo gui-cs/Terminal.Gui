@@ -139,8 +139,30 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void SetSize (int width, int height) => _consoleSize = new Size (width, height);
 
+    /// <summary>
+    ///     When non-<see langword="null"/>, <see cref="GetSize"/> calls this delegate to obtain the
+    ///     real terminal size directly from the OS (e.g. <c>ioctl(TIOCGWINSZ)</c> on Unix or the
+    ///     Console API on Windows). Set by <see cref="AnsiComponentFactory"/> when
+    ///     <see cref="Driver.SizeDetection"/> is <see cref="SizeDetectionMode.Polling"/>.
+    /// </summary>
+    internal Func<Size?>? NativeSizeQuery { get; set; }
+
     /// <inheritdoc/>
-    public Size GetSize () => _consoleSize;
+    public Size GetSize ()
+    {
+        if (NativeSizeQuery is null)
+        {
+            return _consoleSize;
+        }
+        Size? native = NativeSizeQuery ();
+
+        if (native is { })
+        {
+            _consoleSize = native.Value;
+        }
+
+        return _consoleSize;
+    }
 
     /// <inheritdoc/>
     protected override void Write (StringBuilder output)

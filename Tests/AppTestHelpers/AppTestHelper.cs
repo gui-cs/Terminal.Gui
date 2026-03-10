@@ -254,12 +254,6 @@ public partial class AppTestHelper : IDisposable
 
                 break;
 
-            case DriverRegistry.Names.UNIX:
-                _sizeMonitor = new SizeMonitorImpl (_output);
-                cf = new AnsiComponentFactory (_ansiInput, _output, _sizeMonitor);
-
-                break;
-
             case DriverRegistry.Names.ANSI:
                 _sizeMonitor = new SizeMonitorImpl (_output);
                 cf = new AnsiComponentFactory (_ansiInput, _output, _sizeMonitor);
