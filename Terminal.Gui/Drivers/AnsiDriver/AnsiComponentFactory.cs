@@ -89,8 +89,10 @@ public class AnsiComponentFactory : ComponentFactoryImpl<char>
 
                            return w > 0 && h > 0 ? new Size (w, h) : null;
                        }
-                       catch
+                       catch (IOException ex)
                        {
+                           Logging.Trace (nameof (AnsiComponentFactory), "NativeSizeQuery", $"Console size query failed: {ex.Message}");
+
                            return null;
                        }
                    };
