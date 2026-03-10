@@ -48,6 +48,21 @@ public interface IInputProcessor
     /// <param name="key">The key to enqueue.</param>
     void InjectKeyDownEvent (Key key);
 
+    /// <summary>
+    ///     Raises the <see cref="KeyUp"/> event after a key release event is dequeued.
+    /// </summary>
+    /// <param name="key">The key event data.</param>
+    void RaiseKeyUpEvent (Key key);
+
+    /// <summary>
+    ///     Event raised when a key is released.
+    /// </summary>
+    /// <remarks>
+    ///     This event is only raised when the driver provides key release information.
+    ///     Not all drivers support key-up events.
+    /// </remarks>
+    event EventHandler<Key>? KeyUp;
+
     #endregion
 
     #region Mouse Events

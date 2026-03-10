@@ -59,6 +59,31 @@ public interface IKeyboard
     /// </summary>
     event EventHandler<Key>? KeyDown;
 
+    /// <summary>
+    ///     Called when a key is released (by the <see cref="IDriver"/>). Raises the cancelable
+    ///     <see cref="KeyUp"/> event, then calls <see cref="View.NewKeyUpEvent"/> on all top level views.
+    /// </summary>
+    /// <remarks>
+    ///     This event is only raised when the driver provides key release information.
+    ///     Not all drivers support key-up events.
+    /// </remarks>
+    /// <param name="key"></param>
+    /// <returns><see langword="true"/> if the key was handled.</returns>
+    bool RaiseKeyUpEvent (Key key);
+
+    /// <summary>
+    ///     Raised when the user releases a key.
+    ///     <para>
+    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
+    ///         additional processing.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     This event is only raised when the driver provides key release information.
+    ///     Not all drivers support key-up events.
+    /// </remarks>
+    event EventHandler<Key>? KeyUp;
+
     /// <summary>Gets the Application-scoped key bindings.</summary>
     KeyBindings KeyBindings { get; }
 

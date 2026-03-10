@@ -39,8 +39,8 @@ Instead of embedding descriptions, it points to actual source files that agents 
 |Drawing/Quant:{EuclideanColorDistance.cs,IPaletteBuilder.cs,PopularityPaletteWithThreshold.cs}
 |Drawing/Sixel:{SixelEncoder.cs,SixelSupportDetector.cs,SixelSupportResult.cs,SixelToRender.cs}
 |Drivers:{ComponentFactoryImpl.cs,Cursor.cs,CursorStyle.cs,Driver.cs,DriverImpl.cs,DriverRegistry.cs,IComponentFactory.cs,IDriver.cs,ISizeMonitor.cs,PlatformDetection.cs,SizeMonitorImpl.cs}
-|Drivers/AnsiDriver:{AnsiComponentFactory.cs,AnsiInput.cs,AnsiInputProcessor.cs,AnsiOutput.cs,AnsiPlatform.cs,AnsiSizeMonitor.cs,FakeClipboard.cs}
-|Drivers/AnsiHandling:{AnsiEscapeSequence.cs,AnsiEscapeSequenceRequest.cs,AnsiKeyboardEncoder.cs,AnsiKeyboardParser.cs,AnsiKeyboardParserPattern.cs,AnsiKeyConverter.cs,AnsiMouseEncoder.cs,AnsiMouseParser.cs,AnsiRequestScheduler.cs,AnsiResponseExpectation.cs,AnsiResponseParser.cs,AnsiResponseParserBase.cs,AnsiResponseParserState.cs,AnsiResponseParserTInputRecord.cs,CsiCursorPattern.cs,CsiKeyPattern.cs,EscAsAltPattern.cs,GenericHeld.cs,IAnsiResponseParser.cs,IHeld.cs,Osc8UrlLinker.cs,ReasonCannotSend.cs,Ss3Pattern.cs,StringHeld.cs,TerminalColorDetector.cs}
+|Drivers/AnsiDriver:{AnsiComponentFactory.cs,AnsiInput.cs,AnsiInputProcessor.cs,AnsiOutput.cs,AnsiPlatform.cs,AnsiSizeMonitor.cs,AnsiTerminalHelper.cs,FakeClipboard.cs,WindowsVTInputHelper.cs,WindowsVTOutputHelper.cs}
+|Drivers/AnsiHandling:{AnsiEscapeSequence.cs,AnsiEscapeSequenceRequest.cs,AnsiKeyboardEncoder.cs,AnsiKeyboardParser.cs,AnsiKeyboardParserPattern.cs,AnsiKeyConverter.cs,AnsiMouseEncoder.cs,AnsiMouseParser.cs,AnsiRequestScheduler.cs,AnsiResponseExpectation.cs,AnsiResponseParser.cs,AnsiResponseParserBase.cs,AnsiResponseParserState.cs,AnsiResponseParserTInputRecord.cs,CsiCursorPattern.cs,CsiKeyPattern.cs,EscAsAltPattern.cs,GenericHeld.cs,IAnsiResponseParser.cs,IHeld.cs,KittyKeyboardFlags.cs,KittyKeyboardPattern.cs,KittyKeyboardProtocolDetector.cs,KittyKeyboardProtocolResult.cs,Osc8UrlLinker.cs,ReasonCannotSend.cs,Ss3Pattern.cs,StringHeld.cs,TerminalColorDetector.cs}
 |Drivers/AnsiHandling/EscSeqUtils:{EscSeqReqStatus.cs,EscSeqRequests.cs,EscSeqUtils.cs}
 |Drivers/DotNetDriver:{INetInput.cs,NetComponentFactory.cs,NetInput.cs,NetInputProcessor.cs,NetKeyConverter.cs,NetOutput.cs,NetWinVTConsole.cs}
 |Drivers/Input:{ConsoleInputSource.cs,IInput.cs,IInputProcessor.cs,IInputSource.cs,InputImpl.cs,InputProcessorImpl.cs,InputRecord.cs,ITestableInput.cs,TestInputSource.cs}
@@ -48,11 +48,11 @@ Instead of embedding descriptions, it points to actual source files that agents 
 |Drivers/Mouse:{MouseButtonClickTracker.cs,MouseInterpreter.cs}
 |Drivers/Output:{IOutput.cs,IOutputBuffer.cs,OutputBase.cs,OutputBufferImpl.cs}
 |Drivers/TerminalEnvironment:{ColorCapabilityLevel.cs,TerminalColorCapabilities.cs,TerminalEnvironmentDetector.cs}
-|Drivers/UnixDriver:{IUnixInput.cs,SuspendHelper.cs,UnixClipboard.cs,UnixComponentFactory.cs,UnixInput.cs,UnixInputProcessor.cs,UnixIOHelper.cs,UnixOutput.cs,UnixRawModeHelper.cs}
-|Drivers/WindowsDriver:{ClipboardImpl.cs,CursorVisibility.cs,IWindowsInput.cs,WindowsComponentFactory.cs,WindowsConsole.cs,WindowsInput.cs,WindowsInputProcessor.cs,WindowsKeyboardLayout.cs,WindowsKeyConverter.cs,WindowsKeyHelper.cs,WindowsOutput.cs,WindowsVTInputHelper.cs,WindowsVTOutputHelper.cs}
+|Drivers/UnixDriver:{IUnixInput.cs,SuspendHelper.cs,UnixClipboard.cs,UnixComponentFactory.cs,UnixInput.cs,UnixInputProcessor.cs,UnixIOHelper.cs,UnixOutput.cs,UnixRawModeHelper.cs,UnixTerminalHelper.cs}
+|Drivers/WindowsDriver:{ClipboardImpl.cs,CursorVisibility.cs,IWindowsInput.cs,WindowsComponentFactory.cs,WindowsConsole.cs,WindowsInput.cs,WindowsInputProcessor.cs,WindowsKeyboardLayout.cs,WindowsKeyConverter.cs,WindowsKeyHelper.cs,WindowsOutput.cs}
 |FileServices:{DefaultSearchMatcher.cs,FileSystemColorProvider.cs,FileSystemIconProvider.cs,FileSystemInfoStats.cs,FileSystemTreeBuilder.cs,IFileOperations.cs,ISearchMatcher.cs}
 |Input:{Command.cs,CommandBinding.cs,CommandBindingsBase.cs,CommandBridge.cs,CommandContext.cs,CommandContextExtensions.cs,CommandEventArgs.cs,CommandOutcome.cs,CommandRouting.cs,IAcceptTarget.cs,ICommandBinding.cs,ICommandContext.cs}
-|Input/Keyboard:{Key.cs,KeyBinding.cs,KeyBindings.cs,KeyChangedEventArgs.cs,KeyEqualityComparer.cs,KeystrokeNavigatorEventArgs.cs}
+|Input/Keyboard:{Key.cs,KeyBinding.cs,KeyBindings.cs,KeyChangedEventArgs.cs,KeyEqualityComparer.cs,KeyEventType.cs,KeystrokeNavigatorEventArgs.cs,ModifierKey.cs}
 |Input/Mouse:{GrabMouseEventArgs.cs,Mouse.cs,MouseBinding.cs,MouseBindings.cs,MouseFlags.cs,MouseFlagsChangedEventArgs.cs}
 |Resources:{GlobalResources.cs,ResourceManagerWrapper.cs,Strings.Designer.cs}
 |Testing:{IInputInjector.cs,InputInjectionEvent.cs,InputInjectionExtensions.cs,InputInjectionMode.cs,InputInjectionOptions.cs,InputInjector.cs}
@@ -66,7 +66,7 @@ Instead of embedding descriptions, it points to actual source files that agents 
 |ViewBase/Mouse:{IMouseHoldRepeater.cs,MouseHoldRepeaterImpl.cs,MouseState.cs,View.Mouse.cs}
 |ViewBase/Navigation:{AdvanceFocusEventArgs.cs,FocusEventArgs.cs,NavigationDirection.cs,TabBehavior.cs}
 |ViewBase/Orientation:{IOrientation.cs,Orientation.cs,OrientationHelper.cs}
-|Views:{Bar.cs,Button.cs,CheckBox.cs,CheckState.cs,DatePicker.cs,Dialog.cs,DialogTResult.cs,DropDownList.cs,FrameView.cs,HexView.cs,HexViewEventArgs.cs,Label.cs,Line.cs,MessageBox.cs,NumericUpDown.cs,ProgressBar.cs,Prompt.cs,PromptExtensions.cs,ReadOnlyCollectionExtensions.cs,Shortcut.cs,StatusBar.cs,Window.cs}
+|Views:{Bar.cs,Button.cs,CheckBox.cs,CheckState.cs,DatePicker.cs,Dialog.cs,DialogTResult.cs,DropDownList.cs,FrameView.cs,HexView.cs,HexViewEventArgs.cs,Label.cs,Line.cs,Link.cs,MessageBox.cs,NumericUpDown.cs,ProgressBar.cs,Prompt.cs,PromptExtensions.cs,ReadOnlyCollectionExtensions.cs,Shortcut.cs,StatusBar.cs,Window.cs}
 |Views/Autocomplete:{AppendAutocomplete.cs,AutocompleteBase.cs,AutocompleteContext.cs,AutocompleteFilepathContext.cs,IAutocomplete.cs,ISuggestionGenerator.cs,PopupAutocomplete.cs,PopupAutocomplete.PopUp.cs,SingleWordSuggestionGenerator.cs,Suggestion.cs}
 |Views/CharMap:{CharMap.cs,UcdApiClient.cs,UnicodeRange.cs}
 |Views/CollectionNavigation:{CollectionNavigator.cs,CollectionNavigatorBase.cs,DefaultCollectionNavigatorMatcher.cs,ICollectionNavigator.cs,ICollectionNavigatorMatcher.cs,IListCollectionNavigator.cs,TableCollectionNavigator.cs}

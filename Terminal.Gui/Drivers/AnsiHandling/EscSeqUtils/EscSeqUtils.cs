@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+
 // ReSharper disable UnusedMember.Global
 
 // ReSharper disable CommentTypo
@@ -893,6 +894,31 @@ public static class EscSeqUtils
     ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) ; 1 R
     /// </summary>
     public static readonly AnsiEscapeSequence CSI_RequestCursorPositionReport = new () { Request = CSI + "?6n", Terminator = "R" };
+
+    /// <summary>
+    ///     ESC [ ? u - Query kitty keyboard progressive enhancement flags.
+    ///     The terminal reply to <see cref="CSI_QueryKittyKeyboardFlags"/> is ESC [ ? flags u.
+    /// </summary>
+    public static readonly AnsiEscapeSequence CSI_QueryKittyKeyboardFlags = new () { Request = CSI + "?u", Terminator = "u", Value = "?" };
+
+    /// <summary>
+    ///     The kitty keyboard flags that Terminal.Gui requests when kitty keyboard protocol is supported.
+    ///     Currently: disambiguate escape codes + report event types + report alternate keys + report all keys as escape codes.
+    /// </summary>
+    public const KittyKeyboardFlags KittyKeyboardRequestedFlags =
+        KittyKeyboardFlags.DisambiguateEscapeCodes | KittyKeyboardFlags.ReportEventTypes | KittyKeyboardFlags.ReportAlternateKeys | KittyKeyboardFlags.ReportAllKeysAsEscapeCodes;
+
+    /// <summary>
+    ///     ESC [ &gt; flags u - Push current kitty keyboard flags and enable the specified flags.
+    /// </summary>
+    /// <param name="flags">The kitty keyboard progressive enhancement flags to enable.</param>
+    /// <returns>The ANSI request string.</returns>
+    public static string CSI_EnableKittyKeyboardFlags (KittyKeyboardFlags flags) => $"{CSI}>{(int)flags}u";
+
+    /// <summary>
+    ///     ESC [ &lt; u - Restore the previously pushed kitty keyboard flag state.
+    /// </summary>
+    public static readonly string CSI_DisableKittyKeyboardFlags = CSI + "<u";
 
     /// <summary>
     ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) R
