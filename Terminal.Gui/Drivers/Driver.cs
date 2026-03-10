@@ -29,6 +29,20 @@ public sealed class Driver
     /// <summary>Raised when <see cref="Force16Colors"/> changes.</summary>
     public static event EventHandler<ValueChangedEventArgs<bool>>? Force16ColorsChanged;
 
+    // NOTE: SizeDetection is a configuration property (Driver.SizeDetection).
+    // It controls which strategy the ANSI driver uses to determine the terminal's size.
+    /// <summary>
+    ///     Controls how the ANSI driver detects the terminal's window size.
+    ///     Defaults to <see cref="SizeDetectionMode.Polling"/>, which uses a synchronous
+    ///     native syscall (<c>ioctl</c> on Unix, Console API on Windows) for immediate,
+    ///     reliable size information.  Set to <see cref="SizeDetectionMode.AnsiQuery"/>
+    ///     to use pure-ANSI escape-sequence queries instead (useful when the native API
+    ///     does not reflect the remote terminal size, e.g. over an SSH tunnel).
+    /// </summary>
+    /// <seealso cref="SizeDetectionMode"/>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static SizeDetectionMode SizeDetection { get; set; } = SizeDetectionMode.Polling;
+
     /// <summary>
     ///     Determines whether the process is attached to a real terminal (i.e. stdin/stdout
     ///     are connected to a console device rather than redirected or running inside a test harness). Set the environment

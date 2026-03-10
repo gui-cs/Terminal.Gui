@@ -24,34 +24,41 @@ public class AnsiComponentFactory : ComponentFactoryImpl<char>
 
     private readonly AnsiInput? _input;
     private readonly IOutput? _output;
-    private AnsiSizeMonitor? _createdSizeMonitor;
+    private readonly ISizeMonitor? _injectedSizeMonitor;
 
     /// <summary>
     ///     Creates a new ANSIComponentFactory with optional output capture.
     /// </summary>
     /// <param name="input"></param>
     /// <param name="output">Optional fake output to capture what would be written to console.</param>
-    /// <param name="sizeMonitor">Optional size monitor (if null, will create ANSISizeMonitor)</param>
+    /// <param name="sizeMonitor">Optional size monitor override (used in tests; if <see langword="null"/>, the monitor is chosen based on <see cref="Driver.SizeDetection"/>).</param>
     public AnsiComponentFactory (AnsiInput? input = null, IOutput? output = null, ISizeMonitor? sizeMonitor = null)
     {
         _input = input;
         _output = output;
-        _createdSizeMonitor = sizeMonitor as AnsiSizeMonitor;
+        _injectedSizeMonitor = sizeMonitor;
     }
 
 
     /// <inheritdoc/>
     public override ISizeMonitor CreateSizeMonitor (IOutput consoleOutput, IOutputBuffer outputBuffer)
     {
-        if (consoleOutput is AnsiOutput output)
+        // Return injected monitor (e.g. from test harness) if one was provided.
+        if (_injectedSizeMonitor is { })
         {
-            // Create ANSISizeMonitor - the ANSI request callback will be set up
-            // by MainLoopCoordinator after the driver is fully constructed
-            _createdSizeMonitor = new (output, queueAnsiRequest: null);
-            return _createdSizeMonitor;
+            return _injectedSizeMonitor;
         }
 
-        // Fallback for other output types
+        // When AnsiQuery mode is requested, use the ANSI escape-sequence monitor.
+        if (Driver.SizeDetection == SizeDetectionMode.AnsiQuery
+            && consoleOutput is AnsiOutput ansiOutput)
+        {
+            // The ANSI request callback will be set up by MainLoopCoordinator
+            // after the driver is fully constructed.
+            return new AnsiSizeMonitor (ansiOutput, queueAnsiRequest: null);
+        }
+
+        // Default: synchronous polling via ioctl / Console API.
         return new SizeMonitorImpl (consoleOutput);
     }
 
