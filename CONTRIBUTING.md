@@ -169,6 +169,24 @@ Welcome! This guide provides everything you need to know to contribute effective
 
 **⚠️ CRITICAL - These conventions apply to ALL code - production code, test code, examples, documentation, and samples.**
 
+- **Prefer early return** - Use guard clauses to reduce nesting:
+  ```csharp
+  // ✅ CORRECT - Early return
+  if (view is null)
+  {
+      return;
+  }
+
+  DoWork (view);
+
+  // ❌ WRONG - Unnecessary nesting
+  if (view is not null)
+  {
+      DoWork (view);
+  }
+  ```
+- **One type per file** - Each public or internal type gets its own file, named to match the type (e.g., `Button.cs` for `class Button`). Private nested types belong in their containing type's file.
+
 ### Unicode and Grapheme Handling
 
 **Think in graphemes, not runes.** A grapheme cluster is what the user perceives as a single character, but it may consist of multiple `Rune` values (e.g., base character + combining marks, or ZWJ emoji sequences).

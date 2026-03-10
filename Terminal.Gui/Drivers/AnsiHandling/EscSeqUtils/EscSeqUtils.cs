@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+
 // ReSharper disable UnusedMember.Global
 
 // ReSharper disable CommentTypo
@@ -901,21 +902,18 @@ public static class EscSeqUtils
     public static readonly AnsiEscapeSequence CSI_QueryKittyKeyboardFlags = new () { Request = CSI + "?u", Terminator = "u", Value = "?" };
 
     /// <summary>
-    ///     Phase 1 enables only kitty's disambiguate escape codes flag.
+    ///     The kitty keyboard flags that Terminal.Gui requests when kitty keyboard protocol is supported.
+    ///     Currently: disambiguate escape codes + report event types + report alternate keys + report all keys as escape codes.
     /// </summary>
-    public const int KittyKeyboardDisambiguateEscapeCodes = 1;
-
-    /// <summary>
-    ///     The kitty keyboard flags enabled during phase 1.
-    /// </summary>
-    public const int KittyKeyboardPhase1Flags = KittyKeyboardDisambiguateEscapeCodes;
+    public const KittyKeyboardFlags KittyKeyboardRequestedFlags =
+        KittyKeyboardFlags.DisambiguateEscapeCodes | KittyKeyboardFlags.ReportEventTypes | KittyKeyboardFlags.ReportAlternateKeys | KittyKeyboardFlags.ReportAllKeysAsEscapeCodes;
 
     /// <summary>
     ///     ESC [ &gt; flags u - Push current kitty keyboard flags and enable the specified flags.
     /// </summary>
     /// <param name="flags">The kitty keyboard progressive enhancement flags to enable.</param>
     /// <returns>The ANSI request string.</returns>
-    public static string CSI_EnableKittyKeyboardFlags (int flags) => $"{CSI}>{flags}u";
+    public static string CSI_EnableKittyKeyboardFlags (KittyKeyboardFlags flags) => $"{CSI}>{(int)flags}u";
 
     /// <summary>
     ///     ESC [ &lt; u - Restore the previously pushed kitty keyboard flag state.

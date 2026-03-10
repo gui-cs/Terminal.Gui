@@ -48,6 +48,7 @@ internal class DriverImpl : IDriver
         _componentFactory = componentFactory;
         _inputProcessor = inputProcessor;
         _inputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
+        _inputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
         _inputProcessor.SyntheticMouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
         _outputBuffer = outputBuffer;
         _output = output;
@@ -372,7 +373,7 @@ internal class DriverImpl : IDriver
     ///     Stores the kitty keyboard flags currently enabled on the terminal.
     /// </summary>
     /// <param name="enabledFlags">The kitty keyboard flags currently enabled.</param>
-    internal void SetKittyKeyboardEnabledFlags (int enabledFlags)
+    internal void SetKittyKeyboardEnabledFlags (KittyKeyboardFlags enabledFlags)
     {
         KittyKeyboardProtocol.EnabledFlags = enabledFlags;
     }
@@ -380,11 +381,11 @@ internal class DriverImpl : IDriver
     /// <summary>Event fired when a key is pressed down.</summary>
     public event EventHandler<Key>? KeyDown;
 
+    /// <summary>Event fired when a key is released.</summary>
+    public event EventHandler<Key>? KeyUp;
+
     /// <summary>Event fired when a mouse event occurs.</summary>
     public event EventHandler<Mouse>? MouseEvent;
-
-    /// <inheritdoc/>
-    public void InjectMouseEvent (Mouse mouse) => GetInputProcessor ().InjectMouseEvent (null, mouse);
 
     #endregion Input Events
 

@@ -268,11 +268,20 @@ internal partial class ApplicationImpl
 #endif
 
         // === 4. Clean up driver ===
-        if (Driver is { })
+        // Capture-and-null to avoid race when Dispose is called concurrently from
+        // multiple threads (e.g. AppTestHelper background thread + test thread).
+        // Null Driver first so concurrent callers see null and skip cleanup.
+        IDriver? driver = Driver;
+        Driver = null;
+
+        if (driver is { })
         {
-            UnsubscribeDriverEvents ();
-            Driver.Dispose ();
-            Driver = null;
+            // Unsubscribe using the captured local since Driver property is now null
+            driver.SizeChanged -= Driver_SizeChanged;
+            driver.KeyDown -= Driver_KeyDown;
+            driver.KeyUp -= Driver_KeyUp;
+            driver.MouseEvent -= Driver_MouseEvent;
+            driver.Dispose ();
         }
 
         // === 5. Clear run state ===
