@@ -1,12 +1,13 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using UnitTests;
 
 namespace ViewsTests;
 
 /// <summary>
 ///     Tests for <see cref="CharMap"/> command handling and IValue implementation.
 /// </summary>
-public class CharMapTests
+public class CharMapTests : TestDriverBase
 {
     /// <summary>
     ///     Verifies that <see cref="CharMap.ValueChangedUntyped"/> is raised when <see cref="CharMap.SelectedCodePoint"/> changes.
@@ -126,6 +127,45 @@ public class CharMapTests
         charMap.Value = new Rune (0x42); // 'B'
 
         Assert.Equal (1, valueChangedUntypedCount);
+
+        charMap.Dispose ();
+    }
+
+    /// <summary>
+    ///     Verifies that drawing a <see cref="CharMap"/> with a ModifierSymbol code point (e.g. U+1F3FB, emoji skin tone
+    ///     modifier) does not throw <see cref="InvalidOperationException"/>.
+    /// </summary>
+    [Fact]
+    [RequiresUnreferencedCode ("AOT")]
+    [RequiresDynamicCode ("AOT")]
+    public void Draw_ModifierSymbol_CodePoint_Does_Not_Throw ()
+    {
+        // U+1F3FB is EMOJI MODIFIER FITZPATRICK TYPE-1-2, classified as UnicodeCategory.ModifierSymbol
+        // with a column width of 0 (designed to combine with a preceding base emoji).
+        const int modifierSymbolCodePoint = 0x1F3FB;
+
+        IDriver driver = CreateTestDriver (80, 25);
+        driver.Clip = new Region (driver.Screen);
+
+        CharMap charMap = new ()
+        {
+            Driver = driver,
+            X = 0,
+            Y = 0,
+            Width = 80,
+            Height = 25,
+            StartCodePoint = modifierSymbolCodePoint & ~0xF // row containing U+1F3FB
+        };
+
+        charMap.SelectedCodePoint = modifierSymbolCodePoint;
+
+        charMap.BeginInit ();
+        charMap.EndInit ();
+        charMap.LayoutSubViews ();
+
+        // This must not throw InvalidOperationException
+        Exception? exception = Record.Exception (() => charMap.Draw ());
+        Assert.Null (exception);
 
         charMap.Dispose ();
     }
