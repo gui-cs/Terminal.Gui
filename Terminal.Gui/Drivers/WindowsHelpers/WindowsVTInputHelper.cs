@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using System.Text;
 using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.Drivers;

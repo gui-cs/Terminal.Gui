@@ -18,8 +18,7 @@ internal class UnixClipboard : ClipboardBase
 
         try
         {
-            (int exitCode, string result) =
-                ClipboardProcessRunner.Bash ($"{_xclipPath} {xclipargs} > {tempFileName}", waitForOutput: false);
+            (int exitCode, string result) = ClipboardProcessRunner.Bash ($"{_xclipPath} {xclipargs} > {tempFileName}", waitForOutput: false);
 
             if (exitCode == 0)
             {
@@ -96,17 +95,9 @@ internal class MacOSXClipboard : ClipboardBase
 
     public MacOSXClipboard ()
     {
-        _utfTextType = objc_msgSend (
-                                     objc_msgSend (_nsString, _allocRegister),
-                                     _initWithUtf8Register,
-                                     "public.utf8-plain-text"
-                                    );
+        _utfTextType = objc_msgSend (objc_msgSend (_nsString, _allocRegister), _initWithUtf8Register, "public.utf8-plain-text");
 
-        _nsStringPboardType = objc_msgSend (
-                                            objc_msgSend (_nsString, _allocRegister),
-                                            _initWithUtf8Register,
-                                            "NSStringPboardType"
-                                           );
+        _nsStringPboardType = objc_msgSend (objc_msgSend (_nsString, _allocRegister), _initWithUtf8Register, "NSStringPboardType");
         _generalPasteboard = objc_msgSend (_nsPasteboard, _generalPasteboardRegister);
         IsSupported = CheckSupport ();
     }
@@ -213,10 +204,7 @@ internal class WSLClipboard : ClipboardBase
             return;
         }
 
-        (int exitCode, string output) = ClipboardProcessRunner.Process (
-                                                                        _powershellPath,
-                                                                        $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\""
-                                                                       );
+        (int exitCode, string output) = ClipboardProcessRunner.Process (_powershellPath, $"-noprofile -command \"Set-Clipboard -Value \\\"{text}\\\"\"");
     }
 
     private bool CheckSupport ()

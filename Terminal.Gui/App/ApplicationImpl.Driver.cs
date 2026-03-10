@@ -83,11 +83,6 @@ internal partial class ApplicationImpl
 
                     break;
 
-                case DriverRegistry.Names.UNIX:
-                    Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
-
-                    break;
-
                 case DriverRegistry.Names.ANSI:
                     Coordinator = CreateSubcomponents (() => new AnsiComponentFactory ());
 

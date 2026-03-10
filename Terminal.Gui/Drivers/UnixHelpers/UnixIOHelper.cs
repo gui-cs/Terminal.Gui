@@ -117,6 +117,30 @@ internal static class UnixIOHelper
     [DllImport ("libc", SetLastError = true)]
     public static extern int dup (int fd);
 
+    /// <summary>
+    ///     Wait until all output written to the file descriptor has been transmitted.
+    /// </summary>
+    /// <param name="fd">File descriptor (typically <see cref="STDOUT_FILENO"/>).</param>
+    /// <returns>0 on success, -1 on error.</returns>
+    [DllImport ("libc", SetLastError = true)]
+    public static extern int tcdrain (int fd);
+
+    /// <summary>
+    ///     Synchronise a file descriptor's state with the underlying storage device.
+    /// </summary>
+    /// <param name="fd">File descriptor.</param>
+    /// <returns>0 on success, -1 on error.</returns>
+    [DllImport ("libc", SetLastError = true)]
+    public static extern int fsync (int fd);
+
+    /// <summary>
+    ///     Test whether a file descriptor refers to a terminal.
+    /// </summary>
+    /// <param name="fd">File descriptor to test.</param>
+    /// <returns>1 if <paramref name="fd"/> is a terminal; 0 otherwise.</returns>
+    [DllImport ("libc", SetLastError = true)]
+    public static extern int isatty (int fd);
+
     #endregion
 
     #region Terminal Queue Selectors
@@ -295,6 +319,35 @@ internal static class UnixIOHelper
             return false;
         }
     }
+
+    /// <summary>
+    ///     Waits until all output written to stdout has been transmitted to the terminal.
+    ///     Prefers <c>tcdrain</c>; falls back to <c>fsync</c>.
+    /// </summary>
+    public static void FlushStdout ()
+    {
+        if (tcdrain (STDOUT_FILENO) == 0)
+        {
+            return;
+        }
+
+        // fallback
+        try
+        {
+            fsync (STDOUT_FILENO);
+        }
+        catch
+        {
+            // ignore
+        }
+    }
+
+    /// <summary>
+    ///     Tests whether the given file descriptor is connected to a terminal device.
+    /// </summary>
+    /// <param name="fd">File descriptor to test (e.g. <see cref="STDIN_FILENO"/>).</param>
+    /// <returns><see langword="true"/> if <paramref name="fd"/> is a terminal.</returns>
+    public static bool IsTerminal (int fd) => isatty (fd) == 1;
 
     /// <summary>
     ///     Gets the terminal size using ioctl.
