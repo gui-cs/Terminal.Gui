@@ -203,7 +203,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                     yield break;
                 }
 
-                string text = Encoding.UTF8.GetString (buffer, 0, bytesRead);
+                string text = _windowsVTInput!.ConsoleInputEncoding.GetString (buffer, 0, bytesRead);
 
                 //Trace.Lifecycle (nameof (AnsiInput), "Read", $"Read {bytesRead} bytes from Windows VT Input: {text}");
 

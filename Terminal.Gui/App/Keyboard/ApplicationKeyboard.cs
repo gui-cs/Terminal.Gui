@@ -146,6 +146,50 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
     public event EventHandler<Key>? KeyDown;
 
     /// <inheritdoc/>
+    public event EventHandler<Key>? KeyUp;
+
+    /// <inheritdoc/>
+    public bool RaiseKeyUpEvent (Key key)
+    {
+        KeyUp?.Invoke (this, key);
+
+        if (key.Handled)
+        {
+            return true;
+        }
+
+        if (App?.TopRunnableView is null)
+        {
+            if (App?.SessionStack is null)
+            {
+                return false;
+            }
+
+            foreach (IRunnable? runnable in App.SessionStack.Select (r => r.Runnable))
+            {
+                if (runnable is View view && view.NewKeyUpEvent (key))
+                {
+                    return true;
+                }
+
+                if (runnable!.IsModal)
+                {
+                    break;
+                }
+            }
+        }
+        else
+        {
+            if (App.TopRunnableView.NewKeyUpEvent (key))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc/>
     public bool RaiseKeyDownEvent (Key key)
     {
         Trace.Keyboard ("app", key, "Entry");
@@ -214,31 +258,32 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
         // Invoke any Application-scoped KeyBindings.
         // The first view that handles the key will stop the loop.
         // foreach (KeyValuePair<Key, KeyBinding> binding in KeyBindings.GetBindings (key))
-        if (KeyBindings.TryGet (key, out KeyBinding binding))
+        if (!KeyBindings.TryGet (key, out KeyBinding binding))
         {
-            Trace.Keyboard ("app", key, "Entry");
+            return handled;
+        }
+        Trace.Keyboard ("app", key, "Entry");
 
-            if (binding.Target is { })
+        if (binding.Target is { })
+        {
+            if (!binding.Target.Enabled)
             {
-                if (!binding.Target.Enabled)
-                {
-                    return null;
-                }
-
-                handled = binding.Target?.InvokeCommands (binding.Commands,
-                                                          binding with { Source = binding.Target is { } t ? new WeakReference<View> (t) : null });
+                return null;
             }
-            else
+
+            handled = binding.Target?.InvokeCommands (binding.Commands,
+                                                      binding with { Source = binding.Target is { } t ? new WeakReference<View> (t) : null });
+        }
+        else
+        {
+            bool? toReturn = null;
+
+            foreach (Command command in binding.Commands)
             {
-                bool? toReturn = null;
-
-                foreach (Command command in binding.Commands)
-                {
-                    toReturn = InvokeCommand (command, key, binding);
-                }
-
-                handled = toReturn ?? true;
+                toReturn = InvokeCommand (command, key, binding);
             }
+
+            handled = toReturn ?? true;
         }
 
         return handled;
@@ -252,14 +297,14 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
             throw new NotSupportedException (@$"A KeyBinding exists for {command} ({key}) but that command is not supported by Application.");
         }
 
-        if (_commandImplementations.TryGetValue (command, out View.CommandImplementation? implementation))
+        if (!_commandImplementations.TryGetValue (command, out View.CommandImplementation? implementation))
         {
-            CommandContext context = new (command, null, binding); // Create the context here
-
-            return implementation (context);
+            return null;
         }
+        CommandContext context = new (command, null, binding); // Create the context here
 
-        return null;
+        return implementation (context);
+
     }
 
     internal void AddKeyBindings ()
@@ -368,7 +413,7 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
     /// </remarks>
     /// <param name="command">The command.</param>
     /// <param name="f">The function.</param>
-    private void AddCommand (Command command, Func<bool?> f) => _commandImplementations [command] = ctx => f ();
+    private void AddCommand (Command command, Func<bool?> f) => _commandImplementations [command] = _ => f ();
 
     private void OnArrangeKeyChanged (object? sender, ValueChangedEventArgs<Key> e) => ArrangeKey = e.NewValue;
 

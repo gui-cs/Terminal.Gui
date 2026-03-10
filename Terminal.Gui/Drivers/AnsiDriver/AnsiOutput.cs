@@ -209,15 +209,15 @@ public class AnsiOutput : OutputBase, IOutput
     /// <summary>
     ///     Gets the kitty keyboard flags currently enabled on the terminal.
     /// </summary>
-    internal int KittyKeyboardEnabledFlags { get; private set; }
+    internal KittyKeyboardFlags KittyKeyboardEnabledFlags { get; private set; }
 
     /// <summary>
     ///     Enables kitty keyboard progressive enhancement flags for the active terminal.
     /// </summary>
     /// <param name="flags">The kitty keyboard flags to enable.</param>
-    internal void EnableKittyKeyboard (int flags)
+    internal void EnableKittyKeyboard (KittyKeyboardFlags flags)
     {
-        if (flags <= 0 || _platform == AnsiPlatform.Degraded)
+        if (flags == KittyKeyboardFlags.None || _platform == AnsiPlatform.Degraded)
         {
             return;
         }
@@ -232,14 +232,14 @@ public class AnsiOutput : OutputBase, IOutput
     /// </summary>
     internal void DisableKittyKeyboard ()
     {
-        if (KittyKeyboardEnabledFlags <= 0)
+        if (KittyKeyboardEnabledFlags == KittyKeyboardFlags.None)
         {
             return;
         }
 
         Trace.Lifecycle (nameof (AnsiOutput), "KittyKeyboard", $"Writing disable sequence for flags {KittyKeyboardEnabledFlags}");
         Write (EscSeqUtils.CSI_DisableKittyKeyboardFlags);
-        KittyKeyboardEnabledFlags = 0;
+        KittyKeyboardEnabledFlags = KittyKeyboardFlags.None;
     }
 
     /// <inheritdoc cref="IOutput.Write(IOutputBuffer)"/>
@@ -354,7 +354,6 @@ public class AnsiOutput : OutputBase, IOutput
             }
 
             // Restore terminal state: disable mouse, restore buffer, show cursor
-            // TODO: Move Input related CSI sequences to AnsiInput
             Write (EscSeqUtils.CSI_DisableMouseEvents);
             Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
             Write (EscSeqUtils.CSI_ShowCursor);

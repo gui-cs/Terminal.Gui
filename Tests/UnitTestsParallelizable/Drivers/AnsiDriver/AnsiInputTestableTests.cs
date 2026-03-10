@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Text;
 
 namespace DriverTests.AnsiHandling;
 
@@ -319,7 +320,7 @@ public class AnsiInputTestableTests
     public void Read_ReturnsInjectedTestInput ()
     {
         var input = new AnsiInput ();
-        var queue = new ConcurrentQueue<char> ();
+        ConcurrentQueue<char> queue = new ();
         input.Initialize (queue);
 
         ITestableInput<char> testable = input;
@@ -332,7 +333,7 @@ public class AnsiInputTestableTests
         Assert.True (input.Peek ());
 
         // Read should return injected characters in FIFO order
-        var read = input.Read ().ToList ();
+        List<char> read = input.Read ().ToList ();
         Assert.Equal (2, read.Count);
         Assert.Equal ('a', read [0]);
         Assert.Equal ('\x1A', read [1]);
@@ -647,6 +648,61 @@ public class AnsiInputTestableTests
 
             Assert.True (wheelEventReceived.Flags.HasFlag (MouseFlags.Shift),
                          $"Horizontal wheel events should include Shift flag, got: {wheelEventReceived.Flags}");
+        }
+    }
+
+    #endregion
+
+    #region Encoding Tests (Issue #4582)
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void AnsiInput_ReadBytes_AccentedChars_DecodesCorrectly ()
+    {
+        // Issue #4582: On Windows, ReadFile returns bytes in the console's input code page
+        // (e.g. Windows-1252), NOT UTF-8. The Read() method must use the correct encoding.
+        //
+        // In Windows-1252: 'á' = 0xE1 (single byte)
+        // In UTF-8:        'á' = 0xC3 0xA1 (two bytes)
+        //
+        // When ReadFile returns 0xE1 and we decode with UTF-8, it sees an incomplete
+        // 3-byte sequence start (0xE1 expects two continuation bytes) → replacement char '�'
+
+        Encoding.RegisterProvider (CodePagesEncodingProvider.Instance);
+        var windows1252 = Encoding.GetEncoding (1252);
+
+        // Simulate what ReadFile returns on a Windows-1252 console for accented chars
+        char [] accentedChars =
+        [
+            'á',
+            'é',
+            'í',
+            'ó',
+            'ú',
+            'ñ',
+            'ü',
+            'à',
+            'è',
+            'ì',
+            'ò',
+            'ù',
+            'â',
+            'ê',
+            'î',
+            'ô',
+            'û'
+        ];
+
+        foreach (char expected in accentedChars)
+        {
+            // Get the bytes as ReadFile would return them (in Windows-1252)
+            byte [] codePageBytes = windows1252.GetBytes (expected.ToString ());
+
+            // OLD (bug): Encoding.UTF8.GetString (codePageBytes) produces '�' for accented chars
+            // FIX: Use the console's input code page encoding to decode ReadFile bytes
+            string decoded = windows1252.GetString (codePageBytes);
+
+            Assert.Equal (expected.ToString (), decoded);
         }
     }
 
