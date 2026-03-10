@@ -135,7 +135,6 @@ Use `TestLogging` helper to capture Terminal.Gui logs in xUnit test output:
 using Terminal.Gui;
 using Terminal.Gui.Tests;
 using Xunit;
-using Xunit.Abstractions;
 
 public class MyTests
 {

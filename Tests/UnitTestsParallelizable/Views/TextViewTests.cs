@@ -1,7 +1,6 @@
 ﻿#nullable disable
 using System.Text;
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace ViewsTests.TextViewTests;
 
