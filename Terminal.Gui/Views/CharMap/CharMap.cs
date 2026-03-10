@@ -822,6 +822,22 @@ public class CharMap : View, IDesignable, IValue<Rune>
 
                     break;
 
+                // Modifier symbol (e.g. emoji skin tone modifiers U+1F3FB-U+1F3FF) that reports
+                // width of 0 because it is designed to combine with a preceding base character.
+                case UnicodeCategory.ModifierSymbol:
+                    if (width > 0)
+                    {
+                        AddStr (grapheme);
+                    }
+                    else
+                    {
+                        SetAttributeForRole (VisualRole.Highlight);
+                        AddStr ("M");
+                        SetAttributeForRole (VisualRole.Normal);
+                    }
+
+                    break;
+
                 case UnicodeCategory.OtherLetter:
                     AddStr (grapheme);
 
@@ -841,7 +857,11 @@ public class CharMap : View, IDesignable, IValue<Rune>
                     }
                     else
                     {
-                        throw new InvalidOperationException ($"The Rune \"{grapheme}\" (U+{Rune.GetRuneAt (grapheme, 0).Value:x6}) has zero width and no special-case UnicodeCategory logic applies.");
+                        // Fallback for any zero-width rune whose UnicodeCategory is not explicitly handled above.
+                        // Display a highlighted placeholder to avoid crashes for future Unicode categories.
+                        SetAttributeForRole (VisualRole.Highlight);
+                        AddStr ("?");
+                        SetAttributeForRole (VisualRole.Normal);
                     }
 
                     break;
