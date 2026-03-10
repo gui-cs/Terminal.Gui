@@ -1,9 +1,16 @@
-﻿using System.Runtime.InteropServices;
+﻿namespace Terminal.Gui.Drivers;
 
-namespace Terminal.Gui.Drivers;
-
+/// <summary>
+///     Dispatches platform-specific terminal operations to the appropriate helper.
+///     Contains zero P/Invoke — all native calls live in <see cref="UnixIOHelper"/> and
+///     <see cref="WindowsVTOutputHelper"/>.
+/// </summary>
 internal static class AnsiTerminalHelper
 {
+    /// <summary>
+    ///     Flushes stdout using the platform-appropriate native mechanism.
+    /// </summary>
+    /// <param name="platform">The detected platform.</param>
     public static void FlushNative (AnsiPlatform platform)
     {
         try
@@ -11,67 +18,19 @@ internal static class AnsiTerminalHelper
             switch (platform)
             {
                 case AnsiPlatform.UnixRaw:
-                    FlushUnix ();
+                    UnixIOHelper.FlushStdout ();
 
                     break;
 
                 case AnsiPlatform.WindowsVT:
-                    FlushWindows ();
+                    WindowsVTOutputHelper.FlushStdout ();
 
                     break;
             }
         }
         catch
         {
-            // ignore any exceptions during flush, as we don't want to crash the app if the flush fails in unit tests.
+            // Ignore exceptions during flush — don't crash the app if flush fails in unit tests.
         }
     }
-
-    /* Unix: wait until output has been transmitted to the terminal.
-       Prefer tcdrain(STDOUT_FILENO). If it fails, fall back to fsync. */
-    private static void FlushUnix ()
-    {
-        const int STDOUT_FILENO = 1;
-
-        if (tcdrain (STDOUT_FILENO) == 0)
-        {
-            return;
-        }
-
-        // fallback
-        try
-        {
-            fsync (STDOUT_FILENO);
-        }
-        catch
-        { /* ignore */
-        }
-    }
-
-    /* Windows: flush the stdout handle. */
-    private static void FlushWindows ()
-    {
-        const int STD_OUTPUT_HANDLE = -11;
-        nint h = GetStdHandle (STD_OUTPUT_HANDLE);
-
-        if (h != nint.Zero && h != new nint (-1))
-        {
-            FlushFileBuffers (h); // returns false on failure
-        }
-    }
-
-    // Unix
-    [DllImport ("libc", SetLastError = true)]
-    private static extern int tcdrain (int fd);
-
-    [DllImport ("libc", SetLastError = true)]
-    private static extern int fsync (int fd);
-
-    // Windows
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern nint GetStdHandle (int nStdHandle);
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    [return: MarshalAs (UnmanagedType.Bool)]
-    private static extern bool FlushFileBuffers (nint hFile);
 }
