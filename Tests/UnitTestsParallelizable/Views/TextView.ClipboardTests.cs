@@ -34,9 +34,9 @@ public class TextViewClipboardTests
 
     // CoPilot - decomposed from KeyBindings_Command test
     [Fact]
-    public void CtrlY_Yank_From_Clipboard ()
+    public void CtrlV_Paste_From_Clipboard ()
     {
-        // Test that Ctrl+Y pastes (yanks) from clipboard
+        // Test that Ctrl+V pastes from clipboard
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
         app.Clipboard = new FakeClipboard ();
@@ -55,7 +55,7 @@ public class TextViewClipboardTests
         app.Clipboard!.SetClipboardData ("is is the first lin");
         Assert.Equal (Point.Empty, tv.InsertionPoint);
 
-        // Ctrl+Y should paste from clipboard
+        // Ctrl+V should paste from clipboard
         Assert.True (tv.NewKeyDownEvent (Key.V.WithCtrl));
         Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
         Assert.Equal (new (19, 0), tv.InsertionPoint);
@@ -64,9 +64,9 @@ public class TextViewClipboardTests
 
     // CoPilot - decomposed from KeyBindings_Command test
     [Fact]
-    public void CtrlY_Respects_ReadOnly ()
+    public void CtrlV_Respects_ReadOnly ()
     {
-        // Test that Ctrl+Y does not paste when ReadOnly is true
+        // Test that Ctrl+V does not paste when ReadOnly is true
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
         app.Clipboard = new FakeClipboard ();
@@ -86,7 +86,7 @@ public class TextViewClipboardTests
         app.Clipboard!.SetClipboardData ("is is the first lin");
         Assert.Equal (Point.Empty, tv.InsertionPoint);
 
-        // Ctrl+Y should not paste when ReadOnly
+        // Ctrl+V should not paste when ReadOnly
         Assert.True (tv.NewKeyDownEvent (Key.V.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
         Assert.Equal (Point.Empty, tv.InsertionPoint);

@@ -156,9 +156,9 @@ public class TextViewInputTests
 
     // CoPilot - decomposed from KeyBindings_Command test
     [Fact]
-    public void CtrlR_Redo_Reapplies_Undone_Change ()
+    public void CtrlY_Redo_Reapplies_Undone_Change ()
     {
-        // Test that Ctrl+R redoes the last undone change
+        // Test that Ctrl+Y redoes the last undone change
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 

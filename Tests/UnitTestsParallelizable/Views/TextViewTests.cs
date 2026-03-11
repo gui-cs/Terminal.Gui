@@ -2437,7 +2437,7 @@ public class TextViewTests
         // Ctrl+R → No longer Redo
         // Ctrl+G → No longer DeleteAll
         // Ctrl+Shift+D → DeleteAll
-        var tv = new TextView { Width = 40, Height = 10, Text = "hello" };
+        TextView tv = new () { Width = 40, Height = 10, Text = "hello" };
         tv.InsertionPoint = new Point (tv.Text.Length, 0);
 
         // Ctrl+Z → Undo
@@ -2468,9 +2468,10 @@ public class TextViewTests
     public void UnifiedKeyBindings_CtrlV_Is_Paste_Not_PageDown ()
     {
         // Ctrl+V should map to Paste, not PageDown
-        var tv = new TextView { Width = 40, Height = 10 };
+        TextView tv = new () { Width = 40, Height = 10 };
         Assert.True (tv.KeyBindings.TryGet (Key.V.WithCtrl, out KeyBinding binding));
         Assert.Contains (Command.Paste, binding.Commands);
+        Assert.DoesNotContain (Command.PageDown, binding.Commands);
     }
 
     // Copilot
@@ -2482,7 +2483,7 @@ public class TextViewTests
             return; // non-Windows-only bindings are not added on Windows
         }
 
-        var tv = new TextView { Width = 40, Height = 10, Text = "hello" };
+        TextView tv = new () { Width = 40, Height = 10, Text = "hello" };
         tv.InsertionPoint = new Point (tv.Text.Length, 0);
 
         // Ctrl+/ → Undo

@@ -981,7 +981,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     public void UnifiedKeyBindings_Undo_Redo_Paste_DeleteAll ()
     {
         // Arrange
-        var tf = new TextField { Width = 40, Text = "hello" };
+        TextField tf = new () { Width = 40, Text = "hello" };
         tf.BeginInit ();
         tf.EndInit ();
         tf.InsertionPoint = tf.Text.Length;
@@ -1015,7 +1015,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
             return; // non-Windows-only bindings are not added on Windows
         }
 
-        var tf = new TextField { Width = 40, Text = "hello" };
+        TextField tf = new () { Width = 40, Text = "hello" };
         tf.BeginInit ();
         tf.EndInit ();
         tf.InsertionPoint = tf.Text.Length;
