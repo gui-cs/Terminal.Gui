@@ -1001,8 +1001,8 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         // Ctrl+V → Paste (Ctrl+R must no longer be DeleteAll)
         Assert.False (tf.KeyBindings.TryGet (Key.R.WithCtrl, out _));
 
-        // Ctrl+Shift+D → DeleteAll (and NOT Ctrl+R)
-        Assert.True (tf.NewKeyDownEvent (Key.D.WithCtrl.WithShift));
+        // Ctrl+Shift+Delete → DeleteAll (and NOT Ctrl+R)
+        Assert.True (tf.NewKeyDownEvent (Key.Delete.WithCtrl.WithShift));
         Assert.Equal ("", tf.Text);
     }
 

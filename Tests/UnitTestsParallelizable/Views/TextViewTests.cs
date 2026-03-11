@@ -2436,7 +2436,7 @@ public class TextViewTests
         // Ctrl+V → Paste (was PageDown via Emacs)
         // Ctrl+R → No longer Redo
         // Ctrl+G → No longer DeleteAll
-        // Ctrl+Shift+D → DeleteAll
+        // Ctrl+Shift+Delete → DeleteAll
         TextView tv = new () { Width = 40, Height = 10, Text = "hello" };
         tv.InsertionPoint = new Point (tv.Text.Length, 0);
 
@@ -2458,8 +2458,11 @@ public class TextViewTests
         // Ctrl+G no longer mapped to DeleteAll
         Assert.False (tv.KeyBindings.TryGet (Key.G.WithCtrl, out _));
 
-        // Ctrl+Shift+D → DeleteAll (verify binding exists)
-        Assert.True (tv.KeyBindings.TryGet (Key.D.WithCtrl.WithShift, out KeyBinding deleteAllBinding));
+        // Ctrl+Shift+D no longer mapped to DeleteAll
+        Assert.False (tv.KeyBindings.TryGet (Key.D.WithCtrl.WithShift, out _));
+
+        // Ctrl+Shift+Delete → DeleteAll (verify binding exists)
+        Assert.True (tv.KeyBindings.TryGet (Key.Delete.WithCtrl.WithShift, out KeyBinding deleteAllBinding));
         Assert.Contains (Command.DeleteAll, deleteAllBinding.Commands);
     }
 

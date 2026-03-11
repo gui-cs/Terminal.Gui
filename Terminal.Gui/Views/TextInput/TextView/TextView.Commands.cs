@@ -111,7 +111,7 @@ public partial class TextView
 
         KeyBindings.Add (Key.K.WithCtrl, Command.CutToEndOfLine); // kill-to-end
 
-        KeyBindings.Add (Key.Delete.WithCtrl.WithShift, Command.CutToEndOfLine); // kill-to-end
+        KeyBindings.Add (Key.Delete.WithCtrl.WithShift, Command.DeleteAll);
 
         KeyBindings.Add (Key.Backspace.WithCtrl.WithShift, Command.CutToStartOfLine); // kill-to-start
 
@@ -150,8 +150,6 @@ public partial class TextView
             KeyBindings.Add (new Key ('/').WithCtrl, Command.Undo);
             KeyBindings.Add (Key.Z.WithCtrl.WithShift, Command.Redo);
         }
-
-        KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);
 
         KeyBindings.Add (Key.L.WithCtrl, Command.Open);
     }

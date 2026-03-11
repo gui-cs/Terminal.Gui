@@ -64,7 +64,7 @@ public class TextViewCommandTests
         runnable.Add (tv);
         app.Begin (runnable);
 
-        Assert.True (tv.NewKeyDownEvent (Key.D.WithCtrl.WithShift));
+        Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl.WithShift));
 
         Assert.Equal ("", tv.Text);
     }
@@ -79,7 +79,7 @@ public class TextViewCommandTests
         runnable.Add (tv);
         app.Begin (runnable);
 
-        Assert.True (tv.NewKeyDownEvent (Key.D.WithCtrl.WithShift));
+        Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl.WithShift));
 
         Assert.Equal ("Hello World", tv.Text);
     }

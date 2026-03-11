@@ -102,7 +102,7 @@ public partial class TextField
         KeyBindings.Add (Key.V.WithCtrl, Command.Paste);
         KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
 
-        KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);
+        KeyBindings.Add (Key.Delete.WithCtrl.WithShift, Command.DeleteAll);
 
         KeyBindings.Remove (Key.Space);
     }

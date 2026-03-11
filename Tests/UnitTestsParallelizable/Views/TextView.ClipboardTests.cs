@@ -237,9 +237,9 @@ public class TextViewClipboardTests
 
     // CoPilot - decomposed from KeyBindings_Command test
     [Fact]
-    public void CtrlShiftDelete_Kill_Line_To_Clipboard ()
+    public void CtrlShiftDelete_Deletes_All_Text ()
     {
-        // Test that Ctrl+Shift+Delete kills line to clipboard (same as Ctrl+K)
+        // Test that Ctrl+Shift+Delete deletes all text (DeleteAll command)
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
         app.Clipboard = new FakeClipboard ();
@@ -257,11 +257,9 @@ public class TextViewClipboardTests
 
         Assert.Equal (Point.Empty, tv.InsertionPoint);
 
-        // Ctrl+Shift+Delete should kill the rest of the line
+        // Ctrl+Shift+Delete should delete all text
         Assert.True (tv.NewKeyDownEvent (Key.Delete.WithCtrl.WithShift));
-        Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
-        Assert.Equal (Point.Empty, tv.InsertionPoint);
-        Assert.Equal ("is is the first lin", app.Clipboard!.GetClipboardData ());
+        Assert.Equal ("", tv.Text);
     }
 
     // CoPilot - decomposed from KeyBindings_Command test
