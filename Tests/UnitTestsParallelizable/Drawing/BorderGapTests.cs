@@ -51,10 +51,10 @@ public class BorderGapTests (ITestOutputHelper output) : TestDriverBase
     {
         Border border = new ();
 
-        border.TopGaps.Add (new (2, 5));
-        border.BottomGaps.Add (new (3, 4));
-        border.LeftGaps.Add (new (1, 3));
-        border.RightGaps.Add (new (0, 2));
+        border.TopGaps.Add (new BorderGap (2, 5));
+        border.BottomGaps.Add (new BorderGap (3, 4));
+        border.LeftGaps.Add (new BorderGap (1, 3));
+        border.RightGaps.Add (new BorderGap (0, 2));
 
         Assert.Single (border.TopGaps);
         Assert.Equal (new BorderGap (2, 5), border.TopGaps [0]);
@@ -74,9 +74,9 @@ public class BorderGapTests (ITestOutputHelper output) : TestDriverBase
     {
         Border border = new ();
 
-        border.TopGaps.Add (new (1, 2));
-        border.TopGaps.Add (new (5, 3));
-        border.TopGaps.Add (new (10, 1));
+        border.TopGaps.Add (new BorderGap (1, 2));
+        border.TopGaps.Add (new BorderGap (5, 3));
+        border.TopGaps.Add (new BorderGap (10, 1));
 
         Assert.Equal (3, border.TopGaps.Count);
         Assert.Equal (new BorderGap (1, 2), border.TopGaps [0]);
@@ -88,10 +88,10 @@ public class BorderGapTests (ITestOutputHelper output) : TestDriverBase
     public void Border_ClearAllGaps_ClearsAllLists ()
     {
         Border border = new ();
-        border.TopGaps.Add (new (0, 5));
-        border.BottomGaps.Add (new (1, 3));
-        border.LeftGaps.Add (new (2, 4));
-        border.RightGaps.Add (new (3, 2));
+        border.TopGaps.Add (new BorderGap (0, 5));
+        border.BottomGaps.Add (new BorderGap (1, 3));
+        border.LeftGaps.Add (new BorderGap (2, 4));
+        border.RightGaps.Add (new BorderGap (3, 2));
 
         border.ClearAllGaps ();
 
@@ -116,16 +116,11 @@ public class BorderGapTests (ITestOutputHelper output) : TestDriverBase
     {
         IDriver driver = CreateTestDriver ();
 
-        View view = new ()
-        {
-            Width = 12,
-            Height = 5,
-            BorderStyle = LineStyle.Single
-        };
+        View view = new () { Width = 12, Height = 5, BorderStyle = LineStyle.Single };
         view.Driver = driver;
 
         // Gap at position 3, length 4 — punches out columns 3..6 on the top border
-        view.Border!.TopGaps.Add (new (3, 4));
+        view.Border!.TopGaps.Add (new BorderGap (3, 4));
 
         Runnable top = new () { Width = driver.Cols, Height = driver.Rows };
         top.Driver = driver;
@@ -133,13 +128,14 @@ public class BorderGapTests (ITestOutputHelper output) : TestDriverBase
         top.Layout ();
         top.Draw ();
 
-        DriverAssert.AssertDriverContentsAre (
-                                              @"
-┌──    ────┐
-│          │
-│          │
-│          │
-└──────────┘",
+        DriverAssert.AssertDriverContentsAre ("""
+
+                                              ┌──    ────┐
+                                              │          │
+                                              │          │
+                                              │          │
+                                              └──────────┘
+                                              """,
                                               output,
                                               driver);
     }
@@ -149,16 +145,11 @@ public class BorderGapTests (ITestOutputHelper output) : TestDriverBase
     {
         IDriver driver = CreateTestDriver ();
 
-        View view = new ()
-        {
-            Width = 12,
-            Height = 5,
-            BorderStyle = LineStyle.Single
-        };
+        View view = new () { Width = 12, Height = 5, BorderStyle = LineStyle.Single };
         view.Driver = driver;
 
         // Gap at position 3, length 4 — punches out columns 3..6 on the bottom border
-        view.Border!.BottomGaps.Add (new (3, 4));
+        view.Border!.BottomGaps.Add (new BorderGap (3, 4));
 
         Runnable top = new () { Width = driver.Cols, Height = driver.Rows };
         top.Driver = driver;
@@ -166,13 +157,14 @@ public class BorderGapTests (ITestOutputHelper output) : TestDriverBase
         top.Layout ();
         top.Draw ();
 
-        DriverAssert.AssertDriverContentsAre (
-                                              @"
-┌──────────┐
-│          │
-│          │
-│          │
-└──    ────┘",
+        DriverAssert.AssertDriverContentsAre ("""
+
+                                              ┌──────────┐
+                                              │          │
+                                              │          │
+                                              │          │
+                                              └──    ────┘
+                                              """,
                                               output,
                                               driver);
     }
