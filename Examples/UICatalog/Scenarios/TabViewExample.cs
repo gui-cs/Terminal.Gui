@@ -100,6 +100,14 @@ public class TabViewExample : Scenario
             Value = (int)tabView.MaxTabTextWidth,
         };
 
+        maxWidthUpDown.ValueChanging += (_, args) =>
+                                        {
+                                            if (args.NewValue < 1 || args.NewValue > 100)
+                                            {
+                                                args.Handled = true;
+                                            }
+                                        };
+
         maxWidthUpDown.ValueChanged += (_, args) =>
                                        {
                                            tabView.MaxTabTextWidth = (uint)args.NewValue;
