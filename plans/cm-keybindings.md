@@ -6,9 +6,130 @@
 
 ---
 
-## PR Description (Original)
+## Implementation Status
 
-### Overview
+### ✅ Completed
+
+| Phase | Description | Status |
+|-------|-------------|--------|
+| Infrastructure | `KeyBindingConfigHelper.cs` — `Apply(view, baseBindings, platformBindings)` | ✅ Done |
+| Infrastructure | Registered `Dictionary<string, string[]>` and `string[]` in `SourceGenerationContext.cs` | ✅ Done |
+| TextField | Migrated to `DefaultKeyBindings` + `DefaultKeyBindingsUnix` static properties | ✅ Done |
+| TextView | Migrated; preserves dynamic Enter binding (Multiline) and Space removal after Apply | ✅ Done |
+| ListView | Migrated; multi-command bindings (Shift+Space) stay as direct `KeyBindings.Add` | ✅ Done |
+| TableView | Migrated; dynamic `CellActivationKey` stays as direct `KeyBindings.Add` | ✅ Done |
+| TabView | Migrated | ✅ Done |
+| HexView | Migrated | ✅ Done |
+| DropDownList | Migrated; uses `new` keyword to hide inherited TextField members | ✅ Done |
+| NumericUpDown | `[ConfigurationProperty]` on non-generic `NumericUpDown` class; generic `NumericUpDown<T>` references it | ✅ Done |
+| TreeView | `[ConfigurationProperty]` on non-generic `TreeView` class; generic `TreeView<T>` references it | ✅ Done |
+| LinearRange | `[ConfigurationProperty]` on non-generic `LinearRange` class; generic `LinearRange<T>` references it | ✅ Done |
+| config.json | All 10 views have `DefaultKeyBindings` entries in config.json | ✅ Done |
+| Tests — Apply | 14 low-level tests in `Configuration/KeyBindingConfigHelperTests.cs` (View + CommandNotBound only, no Views dependency) | ✅ Done |
+| Tests — Views | 26 tests in `Views/DefaultKeyBindingsTests.cs` (static props, key string validation, CM discovery, binding consistency, behavior) | ✅ Done |
+| Generic type fix | Moved `[ConfigurationProperty]` from generic base classes to non-generic derived classes (TreeView, NumericUpDown, LinearRange) | ✅ Done |
+| InsertChar fix | HexView: `"InsertChar"` → `"Insert"` (Key.TryParse resolves via KeyCode enum) | ✅ Done |
+
+### 🔲 Remaining
+
+| Task | Description | Priority |
+|------|-------------|----------|
+| Documentation | Update `docfx/docs/keyboard.md` and `docfx/docs/config.md` with configurable key bindings sections | High |
+| New PR | Create PR from `feature/cm-keybindings` → `v2_develop` | High |
+| Undo/Redo inconsistency | TextField uses `Ctrl+Y` for Redo; TextView uses `Ctrl+R` for Redo and `Ctrl+Y` for Paste. Consider unifying or documenting. | Low / Out of scope |
+
+### All tests pass: 15,836 total (14,819 parallelizable + 1,017 non-parallelizable)
+
+---
+
+## Architecture
+
+### Pattern: Two Static Properties Per View
+
+Each view that has configurable key bindings exposes:
+
+```csharp
+[ConfigurationProperty (Scope = typeof (SettingsScope))]
+public static Dictionary<string, string[]>? DefaultKeyBindings { get; set; } = new ()
+{
+    { "CommandName", ["KeyString1", "KeyString2"] },
+    // ...
+};
+
+[ConfigurationProperty (Scope = typeof (SettingsScope))]
+public static Dictionary<string, string[]>? DefaultKeyBindingsUnix { get; set; }
+```
+
+- **`DefaultKeyBindings`** — applied on all platforms (initialized with C# defaults)
+- **`DefaultKeyBindingsUnix`** — overlaid on non-Windows at runtime (null by default = no overrides)
+
+### KeyBindingConfigHelper.Apply()
+
+```csharp
+internal static void Apply (
+    View view,
+    Dictionary<string, string[]>? baseBindings,
+    Dictionary<string, string[]>? platformBindings = null)
+```
+
+1. Iterates `baseBindings` entries
+2. Parses command name via `Enum.TryParse<Command>()`
+3. Parses each key string via `Key.TryParse()`
+4. Skips already-bound keys (`view.KeyBindings.TryGet(key, out _)`)
+5. If non-Windows, also applies `platformBindings`
+6. Silently skips invalid command names and unparseable key strings
+
+### config.json Format
+
+```jsonc
+// In "View Specific Settings" section:
+"TextField.DefaultKeyBindings": {
+    "Left": [ "CursorLeft", "Ctrl+B" ],
+    "Right": [ "CursorRight", "Ctrl+F" ],
+    "Undo": [ "Ctrl+Z" ],
+    // ...
+},
+"TextField.DefaultKeyBindingsUnix": null
+```
+
+### Generic Type Constraint
+
+**CRITICAL**: `[ConfigurationProperty]` CANNOT be placed on open generic types (`TreeView<T>`, `NumericUpDown<T>`, `LinearRange<T>`). CM reflection calls `PropertyInfo.GetValue(null)` which throws `InvalidOperationException` on open generics.
+
+**Solution**: Place the static properties on a non-generic class (e.g., `TreeView`) and have the generic constructor reference them explicitly:
+
+```csharp
+// Non-generic class holds the config properties
+public class TreeView : TreeView<TreeNode> { /* ... */ }
+
+// In TreeView<T> constructor:
+KeyBindingConfigHelper.Apply (this, TreeView.DefaultKeyBindings, TreeView.DefaultKeyBindingsUnix);
+```
+
+### Bindings That Stay as Direct KeyBindings.Add()
+
+Some bindings cannot be expressed in the `Dictionary<string, string[]>` format:
+
+- **Multi-command**: `KeyBindings.Add(Key.Space.WithShift, Command.Activate, Command.Down)` (ListView)
+- **Data-bearing**: `KeyBindings.Add(Key.A.WithCtrl, new KeyBinding([Command.SelectAll], true))` (ListView mark-all)
+- **Dynamic/instance**: `KeyBindings.Add(CellActivationKey, Command.Accept)` (TableView), `KeyBindings.Add(ObjectActivationKey, Command.Activate)` (TreeView)
+- **Conditional**: Enter binding depends on `Multiline` property (TextView)
+- **Orientation-dependent**: `SetKeyBindings()` (LinearRange)
+
+### Test Structure
+
+- **`Tests/UnitTestsParallelizable/Configuration/KeyBindingConfigHelperTests.cs`** (14 tests)
+  - Low-level `Apply` tests using only `View` + `CommandNotBound` event
+  - Zero dependencies on `Terminal.Gui.Views`
+  
+- **`Tests/UnitTestsParallelizable/Views/DefaultKeyBindingsTests.cs`** (26 tests)
+  - Static property validation for all 10 views
+  - Key string parseability (catches typos)
+  - CM discovery verification (catches generic type issues)
+  - Binding consistency (every declared key exists on fresh instance)
+  - Behavioral tests (keys actually trigger expected actions)
+
+---
 
 This PR provides a comprehensive design document for addressing issue #3089, which requests the ability to configure default key bindings through ConfigurationManager. Currently, all default key bindings in Terminal.Gui are hard-coded in View constructors, making them non-configurable by users.
 
