@@ -82,6 +82,12 @@ public partial class TextField
 
         KeyBindings.Add (Key.Y.WithCtrl, Command.Redo);
 
+        if (!PlatformDetection.IsWindows ())
+        {
+            KeyBindings.Add (new Key ('/').WithCtrl, Command.Undo);
+            KeyBindings.Add (Key.Z.WithCtrl.WithShift, Command.Redo);
+        }
+
         KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.WordLeft);
         KeyBindings.Add (Key.CursorUp.WithCtrl, Command.WordLeft);
 
@@ -96,7 +102,6 @@ public partial class TextField
         KeyBindings.Add (Key.V.WithCtrl, Command.Paste);
         KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
 
-        KeyBindings.Add (Key.R.WithCtrl, Command.DeleteAll);
         KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);
 
         KeyBindings.Remove (Key.Space);

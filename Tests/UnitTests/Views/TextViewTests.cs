@@ -128,7 +128,7 @@ public partial class TextViewTests
 
         // Redo
         expectedEventCount++;
-        Assert.True (_textView.NewKeyDownEvent (Key.R.WithCtrl));
+        Assert.True (_textView.NewKeyDownEvent (Key.Y.WithCtrl));
         Assert.Equal (expectedEventCount, eventcount);
 
         // Undo
@@ -138,7 +138,7 @@ public partial class TextViewTests
 
         // Redo
         expectedEventCount++;
-        Assert.True (_textView.NewKeyDownEvent (Key.R.WithCtrl));
+        Assert.True (_textView.NewKeyDownEvent (Key.Y.WithCtrl));
         Assert.Equal (expectedEventCount, eventcount);
     }
 
@@ -262,7 +262,7 @@ public partial class TextViewTests
         Assert.Equal (new Point (24, 0), _textView.InsertionPoint);
         Assert.True (_textView.IsSelecting);
         _textView.IsSelecting = false;
-        _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
+        _textView.NewKeyDownEvent (Key.V.WithCtrl); // Paste
         Assert.Equal (new Point (28, 0), _textView.InsertionPoint);
         Assert.False (_textView.IsSelecting);
         Assert.Equal ("TAB to jump between texttext fields.", _textView.Text);
@@ -276,7 +276,7 @@ public partial class TextViewTests
         _textView.SelectionStartColumn = 0;
         _textView.SelectionStartRow = 0;
         _textView.IsSelecting = false;
-        _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
+        _textView.NewKeyDownEvent (Key.V.WithCtrl); // Paste
         Assert.Equal (new Point (28, 0), _textView.InsertionPoint);
         Assert.False (_textView.IsSelecting);
         Assert.Equal ("TAB to jump between texttext fields.", _textView.Text);
@@ -292,12 +292,12 @@ public partial class TextViewTests
         _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
         Assert.Equal ("text", _textView.SelectedText);
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
-        _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
+        _textView.NewKeyDownEvent (Key.V.WithCtrl); // Paste
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
         _textView.SelectionStartColumn = 20;
         _textView.SelectionStartRow = 0;
         _textView.NewKeyDownEvent (Key.W.WithCtrl); // Cut
-        _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
+        _textView.NewKeyDownEvent (Key.V.WithCtrl); // Paste
         Assert.Equal ("TAB to jump between text fields.", _textView.Text);
     }
 
@@ -347,12 +347,12 @@ public partial class TextViewTests
         _textView.Text = "This is the first line.\nThis is the second line.\n";
         _textView.InsertionPoint = new Point (0, _textView.Lines - 1);
         _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
-        _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
+        _textView.NewKeyDownEvent (Key.V.WithCtrl); // Paste
 
         Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}{Environment.NewLine}", _textView.Text);
         _textView.InsertionPoint = new Point (3, 1);
         _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
-        _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
+        _textView.NewKeyDownEvent (Key.V.WithCtrl); // Paste
 
         Assert.Equal ($"This is the first line.{
             Environment.NewLine
@@ -365,7 +365,7 @@ public partial class TextViewTests
         }",
                       _textView.Text);
         Assert.Equal (new Point (3, 2), _textView.InsertionPoint);
-        _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
+        _textView.NewKeyDownEvent (Key.V.WithCtrl); // Paste
 
         Assert.Equal ($"This is the first line.{
             Environment.NewLine
@@ -1273,7 +1273,7 @@ This is the second line.
                     Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", Clipboard.Contents);
 
                     // Paste
-                    _textView.NewKeyDownEvent (Key.Y.WithCtrl);
+                    _textView.NewKeyDownEvent (Key.V.WithCtrl);
 
                     Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.", _textView.Text);
 
@@ -1329,7 +1329,7 @@ This is the second line.
                     Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", Clipboard.Contents);
 
                     // Paste inverted
-                    _textView.NewKeyDownEvent (Key.Y.WithCtrl);
+                    _textView.NewKeyDownEvent (Key.V.WithCtrl);
 
                     Assert.Equal ($"This is the second line.{Environment.NewLine}This is the first line.", _textView.Text);
 
@@ -1459,7 +1459,7 @@ This is the second line.
         _textView.InsertionPoint = new Point (24, 0);
         _textView.NewKeyDownEvent (Key.C.WithCtrl); // Copy
         Assert.Equal ("text", _textView.SelectedText);
-        _textView.NewKeyDownEvent (Key.Y.WithCtrl); // Paste
+        _textView.NewKeyDownEvent (Key.V.WithCtrl); // Paste
         Assert.Equal ("", _textView.SelectedText);
     }
 

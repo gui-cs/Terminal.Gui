@@ -56,7 +56,7 @@ public class TextViewClipboardTests
         Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         // Ctrl+Y should paste from clipboard
-        Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
+        Assert.True (tv.NewKeyDownEvent (Key.V.WithCtrl));
         Assert.Equal ($"is is the first lin{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
         Assert.Equal (new (19, 0), tv.InsertionPoint);
         Assert.False (tv.IsSelecting);
@@ -87,7 +87,7 @@ public class TextViewClipboardTests
         Assert.Equal (Point.Empty, tv.InsertionPoint);
 
         // Ctrl+Y should not paste when ReadOnly
-        Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
+        Assert.True (tv.NewKeyDownEvent (Key.V.WithCtrl));
         Assert.Equal ($"{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.first", tv.Text);
         Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.False (tv.IsSelecting);

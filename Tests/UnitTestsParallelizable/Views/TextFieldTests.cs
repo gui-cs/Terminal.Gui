@@ -975,4 +975,59 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
 
         textField.Dispose ();
     }
+
+    // Copilot
+    [Fact]
+    public void UnifiedKeyBindings_Undo_Redo_Paste_DeleteAll ()
+    {
+        // Arrange
+        var tf = new TextField { Width = 40, Text = "hello" };
+        tf.BeginInit ();
+        tf.EndInit ();
+        tf.InsertionPoint = tf.Text.Length;
+
+        // Ctrl+Z → Undo
+        tf.NewKeyDownEvent (Key.Backspace); // delete a char so undo has something to do
+        Assert.Equal ("hell", tf.Text);
+        Assert.True (tf.NewKeyDownEvent (Key.Z.WithCtrl));
+        Assert.Equal ("hello", tf.Text);
+
+        // Ctrl+Y → Redo
+        Assert.True (tf.NewKeyDownEvent (Key.Y.WithCtrl));
+        Assert.Equal ("hell", tf.Text);
+        Assert.True (tf.NewKeyDownEvent (Key.Z.WithCtrl)); // undo again to restore
+        Assert.Equal ("hello", tf.Text);
+
+        // Ctrl+V → Paste (Ctrl+R must no longer be DeleteAll)
+        Assert.False (tf.KeyBindings.TryGet (Key.R.WithCtrl, out _));
+
+        // Ctrl+Shift+D → DeleteAll (and NOT Ctrl+R)
+        Assert.True (tf.NewKeyDownEvent (Key.D.WithCtrl.WithShift));
+        Assert.Equal ("", tf.Text);
+    }
+
+    // Copilot
+    [Fact]
+    public void UnifiedKeyBindings_NonWindows_Undo_Redo ()
+    {
+        if (PlatformDetection.IsWindows ())
+        {
+            return; // non-Windows-only bindings are not added on Windows
+        }
+
+        var tf = new TextField { Width = 40, Text = "hello" };
+        tf.BeginInit ();
+        tf.EndInit ();
+        tf.InsertionPoint = tf.Text.Length;
+
+        // Ctrl+/ → Undo
+        tf.NewKeyDownEvent (Key.Backspace); // delete so undo has something
+        Assert.Equal ("hell", tf.Text);
+        Assert.True (tf.NewKeyDownEvent (new Key ('/').WithCtrl));
+        Assert.Equal ("hello", tf.Text);
+
+        // Ctrl+Shift+Z → Redo
+        Assert.True (tf.NewKeyDownEvent (Key.Z.WithCtrl.WithShift));
+        Assert.Equal ("hell", tf.Text);
+    }
 }
