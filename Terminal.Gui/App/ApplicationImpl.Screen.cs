@@ -1,5 +1,7 @@
 namespace Terminal.Gui.App;
 
+using Trace = Terminal.Gui.Tracing.Trace;
+
 internal partial class ApplicationImpl
 {
     /// <inheritdoc/>
@@ -48,6 +50,8 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public void LayoutAndDraw (bool forceRedraw = false)
     {
+        Trace.Draw ("ApplicationImpl", "Start", $"forceRedraw={forceRedraw}");
+
         if (ClearScreenNextIteration)
         {
             forceRedraw = true;
@@ -94,5 +98,7 @@ internal partial class ApplicationImpl
             // Cause the driver to flush any pending updates to the terminal
             Driver?.Refresh ();
         }
+
+        Trace.Draw ("ApplicationImpl", "End", $"neededLayout={neededLayout}, needsDraw={needsDraw}");
     }
 }
