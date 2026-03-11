@@ -23,42 +23,6 @@ public partial class TableView : View, IDesignable
     /// </summary>
     public const int DEFAULT_MAX_CELL_WIDTH = 100;
 
-    /// <summary>
-    ///     Gets or sets the default key bindings for <see cref="TableView"/>. Override via <c>config.json</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindings { get; set; } = new ()
-    {
-        { "Left", ["CursorLeft"] },
-        { "Right", ["CursorRight"] },
-        { "Up", ["CursorUp"] },
-        { "Down", ["CursorDown"] },
-        { "PageUp", ["PageUp"] },
-        { "PageDown", ["PageDown"] },
-        { "LeftStart", ["Home"] },
-        { "RightEnd", ["End"] },
-        { "Start", ["Ctrl+Home"] },
-        { "End", ["Ctrl+End"] },
-        { "LeftExtend", ["Shift+CursorLeft"] },
-        { "RightExtend", ["Shift+CursorRight"] },
-        { "UpExtend", ["Shift+CursorUp"] },
-        { "DownExtend", ["Shift+CursorDown"] },
-        { "PageUpExtend", ["Shift+PageUp"] },
-        { "PageDownExtend", ["Shift+PageDown"] },
-        { "LeftStartExtend", ["Shift+Home"] },
-        { "RightEndExtend", ["Shift+End"] },
-        { "StartExtend", ["Ctrl+Shift+Home"] },
-        { "EndExtend", ["Ctrl+Shift+End"] },
-        { "SelectAll", ["Ctrl+A"] }
-    };
-
-    /// <summary>
-    ///     Gets or sets the platform-override key bindings for <see cref="TableView"/> on Unix. Override via
-    ///     <c>config.json</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
-
     /// <summary>Initializes a <see cref="TableView"/> class.</summary>
     /// <param name="table">The table to display in the control</param>
     public TableView (ITableSource table) : this () => Table = table;
@@ -223,7 +187,27 @@ public partial class TableView : View, IDesignable
         AddCommand (Command.Activate, ctx => { return RaiseActivating (ctx) is true; });
 
         // Default keybindings for this view
-        KeyBindingConfigHelper.Apply (this, DefaultKeyBindings, DefaultKeyBindingsUnix);
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
+        KeyBindings.Add (Key.CursorRight, Command.Right);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
+        KeyBindings.Add (Key.PageUp, Command.PageUp);
+        KeyBindings.Add (Key.PageDown, Command.PageDown);
+        KeyBindings.Add (Key.Home, Command.LeftStart);
+        KeyBindings.Add (Key.End, Command.RightEnd);
+        KeyBindings.Add (Key.Home.WithCtrl, Command.Start);
+        KeyBindings.Add (Key.End.WithCtrl, Command.End);
+        KeyBindings.Add (Key.CursorLeft.WithShift, Command.LeftExtend);
+        KeyBindings.Add (Key.CursorRight.WithShift, Command.RightExtend);
+        KeyBindings.Add (Key.CursorUp.WithShift, Command.UpExtend);
+        KeyBindings.Add (Key.CursorDown.WithShift, Command.DownExtend);
+        KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
+        KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
+        KeyBindings.Add (Key.Home.WithShift, Command.LeftStartExtend);
+        KeyBindings.Add (Key.End.WithShift, Command.RightEndExtend);
+        KeyBindings.Add (Key.Home.WithCtrl.WithShift, Command.StartExtend);
+        KeyBindings.Add (Key.End.WithCtrl.WithShift, Command.EndExtend);
+        KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
         KeyBindings.Remove (CellActivationKey);
         KeyBindings.Add (CellActivationKey, Command.Accept);
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);

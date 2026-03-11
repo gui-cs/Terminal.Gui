@@ -123,7 +123,8 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
                         return true;
                     });
 
-        KeyBindingConfigHelper.Apply (this, NumericUpDown.DefaultKeyBindings, NumericUpDown.DefaultKeyBindingsUnix);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
 
         SetText ();
 
@@ -300,24 +301,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
 ///     Enables the user to increase or decrease an <see langword="int"/> by clicking on the up or down buttons.
 /// </summary>
 public class NumericUpDown : NumericUpDown<int>
-{
-    /// <summary>
-    ///     Gets or sets the default key bindings for <see cref="NumericUpDown"/>. Override via <c>config.json</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindings { get; set; } = new ()
-    {
-        { "Up", ["CursorUp"] },
-        { "Down", ["CursorDown"] }
-    };
-
-    /// <summary>
-    ///     Gets or sets the platform-override key bindings for <see cref="NumericUpDown"/> on Unix. Override via
-    ///     <c>config.json</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
-}
+{ }
 
 internal interface INumericHelper
 {

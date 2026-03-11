@@ -30,36 +30,6 @@ public interface ITreeView
 public class TreeView : TreeView<ITreeNode>, IDesignable
 {
     /// <summary>
-    ///     Gets or sets the default key bindings for <see cref="TreeView"/> on all platforms. Override via <c>config.json</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []> DefaultKeyBindings { get; set; } = new ()
-    {
-        ["PageUp"] = ["PageUp"],
-        ["PageDown"] = ["PageDown"],
-        ["PageUpExtend"] = ["Shift+PageUp"],
-        ["PageDownExtend"] = ["Shift+PageDown"],
-        ["Expand"] = ["CursorRight"],
-        ["ExpandAll"] = ["Ctrl+CursorRight"],
-        ["Collapse"] = ["CursorLeft"],
-        ["CollapseAll"] = ["Ctrl+CursorLeft"],
-        ["Up"] = ["CursorUp"],
-        ["UpExtend"] = ["Shift+CursorUp"],
-        ["LineUpToFirstBranch"] = ["Ctrl+CursorUp"],
-        ["Down"] = ["CursorDown"],
-        ["DownExtend"] = ["Shift+CursorDown"],
-        ["LineDownToLastBranch"] = ["Ctrl+CursorDown"],
-        ["Start"] = ["Home"],
-        ["End"] = ["End"],
-        ["SelectAll"] = ["Ctrl+A"],
-    };
-
-    /// <summary>
-    ///     Gets or sets the platform-override key bindings for <see cref="TreeView"/> on Unix. Override via <c>config.json</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []> DefaultKeyBindingsUnix { get; set; }
-    /// <summary>
     ///     Creates a new instance of the tree control with absolute positioning and initialises
     ///     <see cref="TreeBuilder{T}"/> with default <see cref="ITreeNode"/> based builder.
     /// </summary>
@@ -284,9 +254,27 @@ public class TreeView<T> : View, ITreeView where T : class
                     });
 
         // Default keybindings for this view
-        KeyBindingConfigHelper.Apply (this, TreeView.DefaultKeyBindings, TreeView.DefaultKeyBindingsUnix);
+        KeyBindings.Add (Key.PageUp, Command.PageUp);
+        KeyBindings.Add (Key.PageDown, Command.PageDown);
+        KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
+        KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
+        KeyBindings.Add (Key.CursorRight, Command.Expand);
+        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.ExpandAll);
+        KeyBindings.Add (Key.CursorLeft, Command.Collapse);
+        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.CollapseAll);
 
-        // ObjectActivationKey depends on instance state: cannot be in the static dict
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.CursorUp.WithShift, Command.UpExtend);
+        KeyBindings.Add (Key.CursorUp.WithCtrl, Command.LineUpToFirstBranch);
+
+        KeyBindings.Add (Key.CursorDown, Command.Down);
+        KeyBindings.Add (Key.CursorDown.WithShift, Command.DownExtend);
+        KeyBindings.Add (Key.CursorDown.WithCtrl, Command.LineDownToLastBranch);
+
+        KeyBindings.Add (Key.Home, Command.Start);
+        KeyBindings.Add (Key.End, Command.End);
+        KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
+
         KeyBindings.Remove (ObjectActivationKey);
         KeyBindings.Add (ObjectActivationKey, Command.Activate);
 

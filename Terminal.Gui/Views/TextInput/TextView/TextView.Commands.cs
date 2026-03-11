@@ -2,69 +2,6 @@ namespace Terminal.Gui.Views;
 
 public partial class TextView
 {
-    /// <summary>
-    ///     Gets or sets the default key bindings for <see cref="TextView"/> on all platforms.
-    ///     Maps <see cref="Command"/> names to arrays of key strings (parseable by <see cref="Key.TryParse"/>).
-    ///     Configure in <em>config.json</em> under the key <c>TextView.DefaultKeyBindings</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []> DefaultKeyBindings { get; set; } = new ()
-    {
-        // https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
-        // Movement
-        ["PageDown"] = ["PageDown", "Ctrl+V"],
-        ["PageDownExtend"] = ["Shift+PageDown"],
-        ["PageUp"] = ["PageUp"],
-        ["PageUpExtend"] = ["Shift+PageUp"],
-        ["Down"] = ["Ctrl+N", "CursorDown"],
-        ["DownExtend"] = ["Shift+CursorDown"],
-        ["Up"] = ["Ctrl+P", "CursorUp"],
-        ["UpExtend"] = ["Shift+CursorUp"],
-        ["Right"] = ["Ctrl+F", "CursorRight"],
-        ["RightExtend"] = ["Shift+CursorRight"],
-        ["Left"] = ["Ctrl+B", "CursorLeft"],
-        ["LeftExtend"] = ["Shift+CursorLeft"],
-        ["LeftStart"] = ["Home"],
-        ["LeftStartExtend"] = ["Shift+Home"],
-        ["RightEnd"] = ["End", "Ctrl+E"],
-        ["RightEndExtend"] = ["Shift+End"],
-        ["End"] = ["Ctrl+End"],
-        ["EndExtend"] = ["Ctrl+Shift+End"],
-        ["Start"] = ["Ctrl+Home"],
-        ["StartExtend"] = ["Ctrl+Shift+Home"],
-        // Editing
-        ["DeleteCharLeft"] = ["Backspace"],
-        ["DeleteCharRight"] = ["Delete", "Ctrl+D"],
-        ["CutToEndOfLine"] = ["Ctrl+K", "Ctrl+Shift+Delete"],
-        ["CutToStartOfLine"] = ["Ctrl+Shift+Backspace"],
-        ["Paste"] = ["Ctrl+Y"],
-        ["ToggleExtend"] = ["Ctrl+Space"],
-        ["Copy"] = ["Ctrl+C"],
-        ["Cut"] = ["Ctrl+W", "Ctrl+X"],
-        ["WordLeft"] = ["Ctrl+CursorLeft"],
-        ["WordLeftExtend"] = ["Ctrl+Shift+CursorLeft"],
-        ["WordRight"] = ["Ctrl+CursorRight"],
-        ["WordRightExtend"] = ["Ctrl+Shift+CursorRight"],
-        ["KillWordRight"] = ["Ctrl+Delete"],
-        ["KillWordLeft"] = ["Ctrl+Backspace"],
-        ["SelectAll"] = ["Ctrl+A"],
-        ["ToggleOverwrite"] = ["Insert"],
-        ["NextTabStop"] = ["Tab"],
-        ["PreviousTabStop"] = ["Shift+Tab"],
-        ["Undo"] = ["Ctrl+Z"],
-        ["Redo"] = ["Ctrl+R"],
-        ["DeleteAll"] = ["Ctrl+G", "Ctrl+Shift+D"],
-        ["Open"] = ["Ctrl+L"],
-    };
-
-    /// <summary>
-    ///     Gets or sets additional key bindings for <see cref="TextView"/> applied only on non-Windows platforms.
-    ///     These are appended to <see cref="DefaultKeyBindings"/>. Configure in <em>config.json</em> under the key
-    ///     <c>TextView.DefaultKeyBindingsUnix</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
-
     private void CreateCommandsAndBindings ()
     {
         // Things this view knows how to do
@@ -124,15 +61,95 @@ public partial class TextView
         AddCommand (Command.Context, () => ShowContextMenu (null));
         AddCommand (Command.Open, () => PromptForColors ());
 
-        // Apply configurable key bindings (defaults from DefaultKeyBindings, plus platform-specific overrides)
-        KeyBindingConfigHelper.Apply (this, DefaultKeyBindings, DefaultKeyBindingsUnix);
-
-        // TextView does not use Space (inherited from base View)
+        // Default keybindings for this view
         KeyBindings.Remove (Key.Space);
 
-        // Enter binding depends on Multiline instance state: cannot be in the static dict
         KeyBindings.Remove (Key.Enter);
         KeyBindings.Add (Key.Enter, Multiline ? Command.NewLine : Command.Accept);
+
+        KeyBindings.Add (Key.PageDown, Command.PageDown);
+        KeyBindings.Add (Key.V.WithCtrl, Command.PageDown);
+
+        KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
+
+        KeyBindings.Add (Key.PageUp, Command.PageUp);
+
+        KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
+
+        KeyBindings.Add (Key.N.WithCtrl, Command.Down);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
+
+        KeyBindings.Add (Key.CursorDown.WithShift, Command.DownExtend);
+
+        KeyBindings.Add (Key.P.WithCtrl, Command.Up);
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+
+        KeyBindings.Add (Key.CursorUp.WithShift, Command.UpExtend);
+
+        KeyBindings.Add (Key.F.WithCtrl, Command.Right);
+        KeyBindings.Add (Key.CursorRight, Command.Right);
+
+        KeyBindings.Add (Key.CursorRight.WithShift, Command.RightExtend);
+
+        KeyBindings.Add (Key.B.WithCtrl, Command.Left);
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
+
+        KeyBindings.Add (Key.CursorLeft.WithShift, Command.LeftExtend);
+
+        KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
+
+        KeyBindings.Add (Key.Home, Command.LeftStart);
+
+        KeyBindings.Add (Key.Home.WithShift, Command.LeftStartExtend);
+
+        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
+        KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
+
+        KeyBindings.Add (Key.End, Command.RightEnd);
+        KeyBindings.Add (Key.E.WithCtrl, Command.RightEnd);
+
+        KeyBindings.Add (Key.End.WithShift, Command.RightEndExtend);
+
+        KeyBindings.Add (Key.K.WithCtrl, Command.CutToEndOfLine); // kill-to-end
+
+        KeyBindings.Add (Key.Delete.WithCtrl.WithShift, Command.CutToEndOfLine); // kill-to-end
+
+        KeyBindings.Add (Key.Backspace.WithCtrl.WithShift, Command.CutToStartOfLine); // kill-to-start
+
+        KeyBindings.Add (Key.Y.WithCtrl, Command.Paste); // Control-y, yank
+        KeyBindings.Add (Key.Space.WithCtrl, Command.ToggleExtend);
+
+        KeyBindings.Add (Key.C.WithCtrl, Command.Copy);
+
+        KeyBindings.Add (Key.W.WithCtrl, Command.Cut); // Move to Unix?
+        KeyBindings.Add (Key.X.WithCtrl, Command.Cut);
+
+        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.WordLeft);
+
+        KeyBindings.Add (Key.CursorLeft.WithCtrl.WithShift, Command.WordLeftExtend);
+
+        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.WordRight);
+
+        KeyBindings.Add (Key.CursorRight.WithCtrl.WithShift, Command.WordRightExtend);
+        KeyBindings.Add (Key.Delete.WithCtrl, Command.KillWordRight); // kill-word-forwards
+        KeyBindings.Add (Key.Backspace.WithCtrl, Command.KillWordLeft); // kill-word-backwards
+
+        KeyBindings.Add (Key.End.WithCtrl, Command.End);
+        KeyBindings.Add (Key.End.WithCtrl.WithShift, Command.EndExtend);
+        KeyBindings.Add (Key.Home.WithCtrl, Command.Start);
+        KeyBindings.Add (Key.Home.WithCtrl.WithShift, Command.StartExtend);
+        KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
+        KeyBindings.Add (Key.InsertChar, Command.ToggleOverwrite);
+        KeyBindings.Add (Key.Tab, Command.NextTabStop);
+        KeyBindings.Add (Key.Tab.WithShift, Command.PreviousTabStop);
+
+        KeyBindings.Add (Key.Z.WithCtrl, Command.Undo);
+        KeyBindings.Add (Key.R.WithCtrl, Command.Redo);
+
+        KeyBindings.Add (Key.G.WithCtrl, Command.DeleteAll);
+        KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);
+
+        KeyBindings.Add (Key.L.WithCtrl, Command.Open);
     }
 
     private void DoNeededAction ()
