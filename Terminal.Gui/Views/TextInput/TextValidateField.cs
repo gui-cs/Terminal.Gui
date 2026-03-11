@@ -1,6 +1,32 @@
 namespace Terminal.Gui.Views;
 
-/// <summary>Masked text editor that validates input through a <see cref="ITextValidateProvider"/></summary>
+/// <summary>Masked text editor that validates input through a <see cref="ITextValidateProvider"/>.</summary>
+/// <remarks>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left</term> <description>Moves the cursor left.</description>
+///         </item>
+///         <item>
+///             <term>Right</term> <description>Moves the cursor right.</description>
+///         </item>
+///         <item>
+///             <term>Home</term> <description>Moves the cursor to the start.</description>
+///         </item>
+///         <item>
+///             <term>End</term> <description>Moves the cursor to the end.</description>
+///         </item>
+///         <item>
+///             <term>Delete</term> <description>Deletes the character at the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Backspace</term> <description>Deletes the character before the cursor.</description>
+///         </item>
+///     </list>
+/// </remarks>
 public class TextValidateField : View, IDesignable, IValue<string>
 {
     private const int DEFAULT_LENGTH = 10;

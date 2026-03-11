@@ -17,6 +17,28 @@
 ///     <para>
 ///         Button does not raise <see cref="View.Activating"/> events.
 ///     </para>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Space</term> <description>Accepts the button (<see cref="Command.Accept"/>).</description>
+///         </item>
+///         <item>
+///             <term>Enter</term> <description>Accepts the button (<see cref="Command.Accept"/>).</description>
+///         </item>
+///     </list>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Click / Double-Click / Triple-Click</term>
+///             <description>Accepts the button (<see cref="Command.Accept"/>).</description>
+///         </item>
+///     </list>
 /// </remarks>
 public class Button : View, IDesignable, IAcceptTarget
 {

@@ -6,6 +6,20 @@ namespace Terminal.Gui.Views;
 /// <summary>
 ///     The abstract base class for <see cref="OptionSelector{TEnum}"/> and <see cref="FlagSelector{TFlagsEnum}"/>.
 /// </summary>
+/// <remarks>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Up / Left</term> <description>Moves to the previous option.</description>
+///         </item>
+///         <item>
+///             <term>Down / Right</term> <description>Moves to the next option.</description>
+///         </item>
+///     </list>
+/// </remarks>
 public abstract class SelectorBase : View, IOrientation, IValue<int?>
 {
     /// <summary>

@@ -6,8 +6,22 @@ namespace Terminal.Gui.Views;
 ///     Enables the user to increase or decrease a value with the mouse or keyboard in type-safe way.
 /// </summary>
 /// <remarks>
-///     Supports the following types: <see cref="int"/>, <see cref="long"/>, <see cref="double"/>, <see cref="double"/>,
-///     <see cref="decimal"/>. Attempting to use any other type will result in an <see cref="InvalidOperationException"/>.
+///     <para>
+///         Supports the following types: <see cref="int"/>, <see cref="long"/>, <see cref="double"/>, <see cref="double"/>,
+///         <see cref="decimal"/>. Attempting to use any other type will result in an <see cref="InvalidOperationException"/>.
+///     </para>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Up</term> <description>Increases the value.</description>
+///         </item>
+///         <item>
+///             <term>Down</term> <description>Decreases the value.</description>
+///         </item>
+///     </list>
 /// </remarks>
 public class NumericUpDown<T> : View, IValue<T> where T : notnull
 {
