@@ -67,15 +67,11 @@ public class TextFieldDefaultKeyBindingsTests
         Assert.True (bindings.ContainsKey ("ToggleOverwrite"), "Should contain ToggleOverwrite");
         Assert.True (bindings.ContainsKey ("DeleteAll"), "Should contain DeleteAll");
 
-        // Verify Emacs non-Windows bindings
+        // Verify Emacs bindings (all platforms)
         Assert.True (bindings.ContainsKey ("Left"), "Should contain Left (Emacs Ctrl+B)");
-        Assert.NotNull (bindings ["Left"].Linux);
-        Assert.NotNull (bindings ["Left"].Macos);
-        Assert.Null (bindings ["Left"].All);
+        Assert.NotNull (bindings ["Left"].All);
 
         Assert.True (bindings.ContainsKey ("Right"), "Should contain Right (Emacs Ctrl+F)");
-        Assert.NotNull (bindings ["Right"].Linux);
-        Assert.NotNull (bindings ["Right"].Macos);
-        Assert.Null (bindings ["Right"].All);
+        Assert.NotNull (bindings ["Right"].All);
     }
 }

@@ -14,9 +14,9 @@ public partial class TextField
     /// </remarks>
     public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
-        // Emacs navigation (non-Windows only)
-        ["Left"] = Bind.NonWindows ("Ctrl+B"),
-        ["Right"] = Bind.NonWindows ("Ctrl+F"),
+        // Emacs navigation
+        ["Left"] = Bind.All ("Ctrl+B"),
+        ["Right"] = Bind.All ("Ctrl+F"),
 
         // Additional LeftStart key (Ctrl+Home; base already has Home)
         ["LeftStart"] = Bind.All ("Ctrl+Home"),
