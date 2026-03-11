@@ -69,6 +69,13 @@ public class PopoverMenu : Popover<Menu, MenuItem>
     public PopoverMenu (IEnumerable<MenuItem>? menuItems) : this (new Menu (menuItems)) { }
 
     /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="PopoverMenu"/>. All standard navigation bindings are
+    ///     inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary is empty by default.
+    ///     Dynamic bindings (activation key) are bound directly in the constructor.
+    /// </summary>
+    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class with the specified root <see cref="Menu"/>.
     /// </summary>
     /// <param name="root">The root menu that contains the top-level menu items.</param>
@@ -81,14 +88,15 @@ public class PopoverMenu : Popover<Menu, MenuItem>
         Key = DefaultKey;
 
         AddCommand (Command.Right, MoveRight);
-        KeyBindings.Add (Key.CursorRight, Command.Right);
 
         //KeyBindings.Add (Key.CursorDown, Command.Down);
 
         AddCommand (Command.Left, MoveLeft);
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
 
         //KeyBindings.Add (Key.CursorUp, Command.Up);
+
+        // Apply layered key bindings (base View layer + PopoverMenu-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
 
         KeyBindings.Remove (Key.Space);
         KeyBindings.Remove (Key.Enter);

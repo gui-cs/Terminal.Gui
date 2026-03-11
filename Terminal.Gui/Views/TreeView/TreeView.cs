@@ -66,6 +66,11 @@ public class TreeView : TreeView<ITreeNode>, IDesignable
 ///     <a href="../docs/treeview.md">See TreeView Deep Dive for more information</a>.
 /// </summary>
 /// <remarks>
+///     <para>
+///         Key bindings are configurable via <see cref="DefaultKeyBindings"/> (TreeView-specific commands)
+///         and <see cref="View.DefaultKeyBindings"/> (shared navigation commands). The instance-dependent
+///         <see cref="ObjectActivationKey"/> binding is added directly in the constructor.
+///     </para>
 ///     <para>Default key bindings:</para>
 ///     <list type="table">
 ///         <listheader>
@@ -119,6 +124,38 @@ public class TreeView<T> : View, ITreeView where T : class
     ///     builder set).
     /// </summary>
     public static string NoBuilderError = "ERROR: TreeBuilder Not Set";
+
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="TreeView{T}"/>. These are layered on top of
+    ///     <see cref="View.DefaultKeyBindings"/> when the view is created.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Only single-command bindings are included here. The instance-dependent
+    ///         <see cref="ObjectActivationKey"/> binding is added directly in the constructor.
+    ///     </para>
+    ///     <para>
+    ///         This property is not decorated with <see cref="ConfigurationPropertyAttribute"/> because
+    ///         <see cref="TreeView{T}"/> is a generic type. Use <see cref="View.ViewKeyBindings"/> to
+    ///         override key bindings for TreeView via configuration.
+    ///     </para>
+    /// </remarks>
+    public new static Dictionary<string, PlatformKeyBinding> DefaultKeyBindings { get; set; } = new ()
+    {
+        // Tree-specific expand/collapse
+        ["Expand"] = Bind.All ("CursorRight"),
+        ["ExpandAll"] = Bind.All ("Ctrl+CursorRight"),
+        ["Collapse"] = Bind.All ("CursorLeft"),
+        ["CollapseAll"] = Bind.All ("Ctrl+CursorLeft"),
+
+        // Branch navigation
+        ["LineUpToFirstBranch"] = Bind.All ("Ctrl+CursorUp"),
+        ["LineDownToLastBranch"] = Bind.All ("Ctrl+CursorDown"),
+
+        // TreeView uses Home/End (not Ctrl+Home/Ctrl+End like the base layer)
+        ["Start"] = Bind.All ("Home"),
+        ["End"] = Bind.All ("End")
+    };
 
     /// <summary>
     ///     Interface for filtering which lines of the tree are displayed e.g. to provide text searching.  Defaults to
@@ -300,28 +337,10 @@ public class TreeView<T> : View, ITreeView where T : class
                         return true;
                     });
 
-        // Default keybindings for this view
-        KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
-        KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
-        KeyBindings.Add (Key.CursorRight, Command.Expand);
-        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.ExpandAll);
-        KeyBindings.Add (Key.CursorLeft, Command.Collapse);
-        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.CollapseAll);
+        // Apply configurable key bindings (TreeView-specific layer + base layer)
+        ApplyKeyBindings (DefaultKeyBindings, View.DefaultKeyBindings);
 
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.CursorUp.WithShift, Command.UpExtend);
-        KeyBindings.Add (Key.CursorUp.WithCtrl, Command.LineUpToFirstBranch);
-
-        KeyBindings.Add (Key.CursorDown, Command.Down);
-        KeyBindings.Add (Key.CursorDown.WithShift, Command.DownExtend);
-        KeyBindings.Add (Key.CursorDown.WithCtrl, Command.LineDownToLastBranch);
-
-        KeyBindings.Add (Key.Home, Command.Start);
-        KeyBindings.Add (Key.End, Command.End);
-        KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
-
+        // Instance-dependent activation key binding (not part of DefaultKeyBindings)
         KeyBindings.Remove (ObjectActivationKey);
         KeyBindings.Add (ObjectActivationKey, Command.Activate);
 
@@ -1273,7 +1292,7 @@ public class TreeView<T> : View, ITreeView where T : class
             int current = map.IndexOf (b => b.Model == SelectedObject);
 
             // The currently selected object is no longer in line map somehow
-            if(current < 0)
+            if (current < 0)
             {
                 return false;
             }

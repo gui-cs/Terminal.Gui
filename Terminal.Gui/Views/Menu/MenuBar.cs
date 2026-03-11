@@ -67,6 +67,13 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class MenuBar : Menu, IDesignable
 {
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="MenuBar"/>. All standard navigation bindings are
+    ///     inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary is empty by default.
+    ///     Dynamic bindings (activation key, quit key) are bound directly in the constructor.
+    /// </summary>
+    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
+
     /// <inheritdoc/>
     public MenuBar () : this ([]) { }
 
@@ -85,16 +92,18 @@ public class MenuBar : Menu, IDesignable
         // If we're not focused, Key activates/deactivates
         HotKeyBindings.Add (Key, Command.HotKey);
 
-        KeyBindings.Add (Key, Command.Quit);
-        KeyBindings.ReplaceCommands (Application.QuitKey, Command.Quit);
-
         AddCommand (Command.Quit, Quit);
 
         AddCommand (Command.Right, MoveRight);
-        KeyBindings.Add (Key.CursorRight, Command.Right);
 
         AddCommand (Command.Left, MoveLeft);
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
+
+        // Apply layered key bindings (base View layer + MenuBar-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
+
+        // Dynamic bindings that depend on instance properties
+        KeyBindings.Add (Key, Command.Quit);
+        KeyBindings.ReplaceCommands (Application.QuitKey, Command.Quit);
 
         // Override the default HotKey handler to correctly route bubbled-up HotKeys
         // from MenuBarItems. Without this, DefaultHotKeyHandler invokes Activate on the

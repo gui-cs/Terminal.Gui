@@ -35,6 +35,12 @@ public class TextValidateField : View, IDesignable, IValue<string>
     private string _lastKnownText = string.Empty;
 
     /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="TextValidateField"/>. All standard bindings are
+    ///     inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary is empty by default.
+    /// </summary>
+    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
+
+    /// <summary>
     ///     Gets or sets whether value change events are suppressed.
     ///     Subclasses set this to <see langword="true"/> when programmatically updating the provider
     ///     to prevent re-entrant event firing.
@@ -57,13 +63,8 @@ public class TextValidateField : View, IDesignable, IValue<string>
         AddCommand (Command.Left, () => CursorLeft ());
         AddCommand (Command.Right, () => CursorRight ());
 
-        // Default keybindings for this view
-        KeyBindings.Add (Key.Home, Command.LeftStart);
-        KeyBindings.Add (Key.End, Command.RightEnd);
-        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
-        KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
-        KeyBindings.Add (Key.CursorRight, Command.Right);
+        // Apply layered key bindings (base View layer + TextValidateField-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
     }
 
     /// <inheritdoc/>

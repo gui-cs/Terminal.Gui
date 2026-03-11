@@ -44,6 +44,22 @@ public static class PlatformDetection
         || RuntimeInformation.IsOSPlatform (OSPlatform.OSX)
         || RuntimeInformation.IsOSPlatform (OSPlatform.FreeBSD);
 
+    /// <summary>Returns the platform name used for key binding resolution: "windows", "linux", or "macos".</summary>
+    public static string GetCurrentPlatformName ()
+    {
+        if (IsWindows ())
+        {
+            return "windows";
+        }
+
+        if (IsMac ())
+        {
+            return "macos";
+        }
+
+        return "linux";
+    }
+
     /// <summary>
     ///     Determines if the current platform is Windows.
     /// </summary>

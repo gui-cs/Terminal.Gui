@@ -56,6 +56,13 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
 {
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="TimeEditor"/>. All standard bindings are
+    ///     inherited from <see cref="TextValidateField.DefaultKeyBindings"/> and <see cref="View.DefaultKeyBindings"/>,
+    ///     so this dictionary is empty by default.
+    /// </summary>
+    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
+
     private TimeTextProvider TimeProvider => (TimeTextProvider)Provider!;
 
     private TimeSpan _value;
@@ -141,7 +148,6 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
     /// <inheritdoc/>
     public new event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
-    /// <inheritdoc/>
     object? IValue.GetValue () => Value;
 
     /// <summary>

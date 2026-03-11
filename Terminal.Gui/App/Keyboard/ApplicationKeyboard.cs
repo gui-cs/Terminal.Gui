@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Terminal.Gui.Configuration;
 using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.App;
@@ -75,6 +76,24 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
 
     /// <inheritdoc/>
     public KeyBindings KeyBindings { get; internal set; } = new ();
+
+    /// <summary>
+    ///     Gets or sets the default key bindings for Application-level commands, optionally varying by platform.
+    ///     Each entry maps a command name (e.g. "Quit", "Suspend") to a <see cref="PlatformKeyBinding"/>
+    ///     that specifies the key strings for all platforms or specific ones.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    {
+        ["Quit"] = Bind.All ("Esc"),
+        ["Suspend"] = Bind.NonWindows ("Ctrl+Z"),
+        ["Arrange"] = Bind.All ("Ctrl+F5"),
+        ["NextTabStop"] = Bind.All ("Tab"),
+        ["PreviousTabStop"] = Bind.All ("Shift+Tab"),
+        ["NextTabGroup"] = Bind.All ("F6"),
+        ["PreviousTabGroup"] = Bind.All ("Shift+F6"),
+        ["Refresh"] = Bind.All ("F5"),
+    };
 
     /// <inheritdoc/>
     public Key QuitKey

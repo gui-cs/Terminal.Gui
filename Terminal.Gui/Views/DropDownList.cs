@@ -59,7 +59,10 @@ namespace Terminal.Gui.Views;
 ///         };
 ///         dropdown.ValueChanged += (s, e) => MessageBox.Query ("Selected", dropdown.Text, "Ok");
 ///     </code>
-///     <para>Default key bindings (in addition to <see cref="TextField"/> bindings):</para>
+///     <para>
+///         Default key bindings are defined in <see cref="DefaultKeyBindings"/> (in addition to
+///         <see cref="TextField"/> bindings):
+///     </para>
 ///     <list type="table">
 ///         <listheader>
 ///             <term>Key</term> <description>Action</description>
@@ -83,6 +86,15 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class DropDownList : TextField
 {
+    /// <summary>
+    ///     Gets or sets the view-specific default key bindings for <see cref="DropDownList"/>. Contains only bindings
+    ///     unique to this view; shared bindings come from <see cref="View.DefaultKeyBindings"/>.
+    /// </summary>
+    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    {
+        ["Toggle"] = Bind.All ("F4", "Alt+CursorDown"),
+    };
+
     private readonly Button? _toggleButton;
     private Popover<ListView, string?>? _listPopover;
 
@@ -159,12 +171,11 @@ public class DropDownList : TextField
         // Adjust TextField width to account for toggle button
         Width = Dim.Auto (minimumContentDim: Dim.Func (_ => _listPopover.ContentView?.MaxItemLength ?? 0));
 
-        // Add keyboard bindings
-        KeyBindings.Add (Key.F4, Command.Toggle);
-        KeyBindings.Add (Key.CursorDown.WithAlt, Command.Toggle);
-
         // Add command handler for toggle
         AddCommand (Command.Toggle, ToggleDropDown);
+
+        // Apply layered key bindings (base View layer + DropDownList-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
 
         MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
     }

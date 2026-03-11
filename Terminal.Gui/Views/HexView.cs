@@ -82,6 +82,17 @@ public class HexView : View, IDesignable
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBlock;
 
+    /// <summary>
+    ///     Gets or sets the view-specific default key bindings for <see cref="HexView"/>. Contains only bindings
+    ///     unique to this view; shared bindings come from <see cref="View.DefaultKeyBindings"/>.
+    /// </summary>
+    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    {
+        ["StartOfPage"] = Bind.All ("Ctrl+CursorUp"),
+        ["EndOfPage"] = Bind.All ("Ctrl+CursorDown"),
+        ["Insert"] = Bind.All ("Insert"),
+    };
+
     private const int DEFAULT_ADDRESS_WIDTH = 8; // The default value for AddressWidth
     private const int NUM_BYTES_PER_HEX_COLUMN = 4;
     private const int HEX_COLUMN_WIDTH = NUM_BYTES_PER_HEX_COLUMN * 3 + 2; // 3 cols per byte + 1 for vert separator + right space
@@ -124,22 +135,7 @@ public class HexView : View, IDesignable
         AddCommand (Command.DeleteCharRight, () => true);
         AddCommand (Command.Insert, () => true);
 
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
-        KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.CursorDown, Command.Down);
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.Home, Command.Start);
-        KeyBindings.Add (Key.End, Command.End);
-        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.LeftStart);
-        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.RightEnd);
-        KeyBindings.Add (Key.CursorUp.WithCtrl, Command.StartOfPage);
-        KeyBindings.Add (Key.CursorDown.WithCtrl, Command.EndOfPage);
-
-        KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
-        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
-        KeyBindings.Add (Key.InsertChar, Command.Insert);
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
 
         KeyBindings.Remove (Key.Space);
         KeyBindings.Remove (Key.Enter);
