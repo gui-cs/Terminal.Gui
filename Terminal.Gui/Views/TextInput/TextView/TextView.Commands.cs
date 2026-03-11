@@ -375,9 +375,7 @@ public partial class TextView
             return true;
         }
 
-        _selectionStartColumn = 0;
-        _selectionStartRow = 0;
-        MoveBottomEndExtend ();
+        SelectAll ();
 
         return DeleteCharLeft ();
     }
