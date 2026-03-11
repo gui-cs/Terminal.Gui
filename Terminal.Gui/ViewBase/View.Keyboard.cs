@@ -686,7 +686,7 @@ public partial class View // Keyboard APIs
         ["Redo"] = Bind.Platform (["Ctrl+Y"], ["Ctrl+Shift+Z"], ["Ctrl+Shift+Z"]),
         ["SelectAll"] = Bind.All ("Ctrl+A"),
         ["DeleteCharLeft"] = Bind.All ("Backspace"),
-        ["DeleteCharRight"] = Bind.AllPlus ("Delete", ["Ctrl+D"])
+        ["DeleteCharRight"] = Bind.All ("Delete", "Ctrl+D")
     };
 
     /// <summary>

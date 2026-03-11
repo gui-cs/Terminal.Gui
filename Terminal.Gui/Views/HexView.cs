@@ -88,6 +88,14 @@ public class HexView : View, IDesignable
     /// </summary>
     public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
+        // HexView maps Home/End to stream start/end (overrides base layer's LeftStart/RightEnd)
+        ["Start"] = Bind.All ("Home"),
+        ["End"] = Bind.All ("End"),
+
+        // Row start/end via Ctrl+Left/Right
+        ["LeftStart"] = Bind.All ("Ctrl+CursorLeft"),
+        ["RightEnd"] = Bind.All ("Ctrl+CursorRight"),
+
         ["StartOfPage"] = Bind.All ("Ctrl+CursorUp"),
         ["EndOfPage"] = Bind.All ("Ctrl+CursorDown"),
         ["Insert"] = Bind.All ("Insert"),
@@ -135,7 +143,7 @@ public class HexView : View, IDesignable
         AddCommand (Command.DeleteCharRight, () => true);
         AddCommand (Command.Insert, () => true);
 
-        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
+        ApplyKeyBindings (DefaultKeyBindings, View.DefaultKeyBindings);
 
         KeyBindings.Remove (Key.Space);
         KeyBindings.Remove (Key.Enter);

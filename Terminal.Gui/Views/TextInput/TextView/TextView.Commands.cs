@@ -15,11 +15,11 @@ public partial class TextView
     /// </remarks>
     public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
-        // Emacs navigation (non-Windows)
-        ["Down"] = Bind.NonWindows ("Ctrl+N"),
-        ["Up"] = Bind.NonWindows ("Ctrl+P"),
-        ["Right"] = Bind.NonWindows ("Ctrl+F"),
-        ["Left"] = Bind.NonWindows ("Ctrl+B"),
+        // Emacs navigation
+        ["Down"] = Bind.All ("Ctrl+N"),
+        ["Up"] = Bind.All ("Ctrl+P"),
+        ["Right"] = Bind.All ("Ctrl+F"),
+        ["Left"] = Bind.All ("Ctrl+B"),
 
         // Additional RightEnd binding
         ["RightEnd"] = Bind.All ("Ctrl+E"),
@@ -33,7 +33,7 @@ public partial class TextView
         ["DeleteAll"] = Bind.All ("Ctrl+Shift+Delete"),
 
         // Additional Cut binding (Emacs)
-        ["Cut"] = Bind.NonWindows ("Ctrl+W"),
+        ["Cut"] = Bind.All ("Ctrl+W"),
 
         // Word navigation
         ["WordLeft"] = Bind.All ("Ctrl+CursorLeft"),
