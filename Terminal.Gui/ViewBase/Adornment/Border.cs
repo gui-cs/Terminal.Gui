@@ -36,6 +36,27 @@ public partial class Border : Adornment
 {
     private LineStyle? _lineStyle;
 
+    /// <summary>Gets the list of gaps on the top border line.</summary>
+    public List<BorderGap> TopGaps { get; } = [];
+
+    /// <summary>Gets the list of gaps on the bottom border line.</summary>
+    public List<BorderGap> BottomGaps { get; } = [];
+
+    /// <summary>Gets the list of gaps on the left border line.</summary>
+    public List<BorderGap> LeftGaps { get; } = [];
+
+    /// <summary>Gets the list of gaps on the right border line.</summary>
+    public List<BorderGap> RightGaps { get; } = [];
+
+    /// <summary>Clears all gap lists.</summary>
+    public void ClearAllGaps ()
+    {
+        TopGaps.Clear ();
+        BottomGaps.Clear ();
+        LeftGaps.Clear ();
+        RightGaps.Clear ();
+    }
+
     /// <inheritdoc/>
     public Border ()
     { /* Do nothing; A parameter-less constructor is required to support all views unit tests. */
@@ -69,7 +90,7 @@ public partial class Border : Adornment
                 return;
             }
 
-            DrawIndicator = new ()
+            DrawIndicator = new SpinnerView
             {
 #if DEBUG
                 Id = "DrawIndicator",
@@ -170,10 +191,10 @@ public partial class Border : Adornment
     {
         Rectangle screenRect = ViewportToScreen (Viewport);
 
-        return new (screenRect.X + Math.Max (0, Thickness.Left - 1),
-                    screenRect.Y + Math.Max (0, Thickness.Top - 1),
-                    Math.Max (0, screenRect.Width - Math.Max (0, Math.Max (0, Thickness.Left - 1) + Math.Max (0, Thickness.Right - 1))),
-                    Math.Max (0, screenRect.Height - Math.Max (0, Math.Max (0, Thickness.Top - 1) + Math.Max (0, Thickness.Bottom - 1))));
+        return new Rectangle (screenRect.X + Math.Max (0, Thickness.Left - 1),
+                              screenRect.Y + Math.Max (0, Thickness.Top - 1),
+                              Math.Max (0, screenRect.Width - Math.Max (0, Math.Max (0, Thickness.Left - 1) + Math.Max (0, Thickness.Right - 1))),
+                              Math.Max (0, screenRect.Height - Math.Max (0, Math.Max (0, Thickness.Top - 1) + Math.Max (0, Thickness.Bottom - 1))));
     }
 
     // TODO: Make LineStyle nullable https://github.com/gui-cs/Terminal.Gui/issues/4021
@@ -246,7 +267,7 @@ public partial class Border : Adornment
                                       Math.Min (Parent?.TitleTextFormatter.FormatAndGetSize ().Width ?? 0,
                                                 Math.Min (screenBounds.Width - 4, borderBounds.Width - 4)));
 
-        Parent?.TitleTextFormatter.ConstrainToSize = new (maxTitleWidth, 1);
+        Parent?.TitleTextFormatter.ConstrainToSize = new Size (maxTitleWidth, 1);
 
         int sideLineLength = borderBounds.Height;
         bool canDrawBorder = borderBounds is { Width: > 0, Height: > 0 };
@@ -299,7 +320,7 @@ public partial class Border : Adornment
                                             titleRect,
                                             GetAttributeForRole (Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
                                             GetAttributeForRole (Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
-            Parent?.LineCanvas.Exclude (new (titleRect));
+            Parent?.LineCanvas.Exclude (new Region (titleRect));
         }
 
         if (!canDrawBorder || LineStyle == LineStyle.None)
@@ -331,7 +352,7 @@ public partial class Border : Adornment
             if (borderBounds.Width < 4 || !Settings.FastHasFlags (BorderSettings.Title) || string.IsNullOrEmpty (Parent?.Title))
             {
                 // ╔╡╞╗ should be ╔══╗
-                lc?.AddLine (new (borderBounds.Location.X, titleY), borderBounds.Width, Orientation.Horizontal, lineStyle, normalAttribute);
+                lc?.AddLine (new Point (borderBounds.Location.X, titleY), borderBounds.Width, Orientation.Horizontal, lineStyle, normalAttribute);
             }
             else
             {
@@ -340,7 +361,7 @@ public partial class Border : Adornment
                 //│
                 if (Thickness.Top == 2)
                 {
-                    lc?.AddLine (new (borderBounds.X + 1, topTitleLineY),
+                    lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY),
                                  Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
                                  lineStyle,
@@ -352,13 +373,13 @@ public partial class Border : Adornment
                 //│
                 if (borderBounds.Width >= 4 && Thickness.Top > 2)
                 {
-                    lc?.AddLine (new (borderBounds.X + 1, topTitleLineY),
+                    lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY),
                                  Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
                                  lineStyle,
                                  normalAttribute);
 
-                    lc?.AddLine (new (borderBounds.X + 1, topTitleLineY + 2),
+                    lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY + 2),
                                  Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
                                  lineStyle,
@@ -370,17 +391,17 @@ public partial class Border : Adornment
                 lc?.AddLine (borderBounds.Location with { Y = titleY }, 2, Orientation.Horizontal, lineStyle, normalAttribute);
 
                 // Add a vert line for ╔╡
-                lc?.AddLine (new (borderBounds.X + 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, normalAttribute);
+                lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, normalAttribute);
 
                 // Add a vert line for ╞
-                lc?.AddLine (new (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, topTitleLineY),
+                lc?.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, topTitleLineY),
                              titleBarsLength,
                              Orientation.Vertical,
                              LineStyle.Single,
                              normalAttribute);
 
                 // Add the right hand line for ╞═════╗
-                lc?.AddLine (new (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, titleY),
+                lc?.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, titleY),
                              borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                              Orientation.Horizontal,
                              lineStyle,
@@ -398,7 +419,7 @@ public partial class Border : Adornment
 
         if (drawBottom)
         {
-            lc?.AddLine (new (borderBounds.X, borderBounds.Y + borderBounds.Height - 1),
+            lc?.AddLine (new Point (borderBounds.X, borderBounds.Y + borderBounds.Height - 1),
                          borderBounds.Width,
                          Orientation.Horizontal,
                          lineStyle,
@@ -407,10 +428,13 @@ public partial class Border : Adornment
 
         if (drawRight)
         {
-            lc?.AddLine (new (borderBounds.X + borderBounds.Width - 1, titleY), sideLineLength, Orientation.Vertical, lineStyle, normalAttribute);
+            lc?.AddLine (new Point (borderBounds.X + borderBounds.Width - 1, titleY), sideLineLength, Orientation.Vertical, lineStyle, normalAttribute);
         }
 
         // SetAttribute (prevAttr);
+
+        // Apply border gaps — exclude regions where border lines should not be drawn
+        ApplyGaps (lc!, borderBounds);
 
         // TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
         if (Diagnostics.HasFlag (ViewDiagnosticFlags.Ruler))
@@ -420,14 +444,14 @@ public partial class Border : Adornment
 
             if (drawTop)
             {
-                hRuler.Draw (Driver, new (screenBounds.X, screenBounds.Y));
+                hRuler.Draw (Driver, new Point (screenBounds.X, screenBounds.Y));
             }
 
             // Redraw title
             if (drawTop && maxTitleWidth > 0 && Settings.FastHasFlags (BorderSettings.Title))
             {
                 Parent!.TitleTextFormatter.Draw (Driver,
-                                                 new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
+                                                 new Rectangle (borderBounds.X + 2, titleY, maxTitleWidth, 1),
                                                  Parent.HasFocus
                                                      ? Parent.GetAttributeForRole (VisualRole.Focus)
                                                      : Parent.GetAttributeForRole (VisualRole.Normal),
@@ -441,19 +465,19 @@ public partial class Border : Adornment
 
             if (drawLeft)
             {
-                vRuler.Draw (Driver, new (screenBounds.X, screenBounds.Y + 1), 1);
+                vRuler.Draw (Driver, new Point (screenBounds.X, screenBounds.Y + 1), 1);
             }
 
             // Bottom
             if (drawBottom)
             {
-                hRuler.Draw (Driver, new (screenBounds.X, screenBounds.Y + screenBounds.Height - 1));
+                hRuler.Draw (Driver, new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1));
             }
 
             // Right
             if (drawRight)
             {
-                vRuler.Draw (Driver, new (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), 1);
+                vRuler.Draw (Driver, new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), 1);
             }
         }
 
@@ -484,7 +508,7 @@ public partial class Border : Adornment
         var fore = new GradientFill (rect, g, GradientDirection.Diagonal);
         var back = new SolidFill (GetAttributeForRole (VisualRole.Normal).Background);
 
-        lc.Fill = new (fore, back);
+        lc.Fill = new FillPair (fore, back);
     }
 
     private static void GetAppealingGradientColors (out List<Color> stops, out List<int> steps)
@@ -492,15 +516,38 @@ public partial class Border : Adornment
         // Define the colors of the gradient stops with more appealing colors
         stops =
         [
-            new (0, 128, 255), // Bright Blue
-            new (0, 255, 128), // Bright Green
-            new (255, 255), // Bright Yellow
-            new (255, 128), // Bright Orange
-            new (255, 0, 128)
+            new Color (0, 128, 255), // Bright Blue
+            new Color (0, 255, 128), // Bright Green
+            new Color (255, 255), // Bright Yellow
+            new Color (255, 128), // Bright Orange
+            new Color (255, 0, 128)
         ];
 
         // Define the number of steps between each color for smoother transitions
         // If we pass only a single value then it will assume equal steps between all pairs
         steps = [15];
+    }
+
+    private void ApplyGaps (LineCanvas lc, Rectangle borderBounds)
+    {
+        foreach (BorderGap gap in TopGaps)
+        {
+            lc.Exclude (new Region (new Rectangle (borderBounds.X + gap.Position, borderBounds.Y, gap.Length, 1)));
+        }
+
+        foreach (BorderGap gap in BottomGaps)
+        {
+            lc.Exclude (new Region (new Rectangle (borderBounds.X + gap.Position, borderBounds.Y + borderBounds.Height - 1, gap.Length, 1)));
+        }
+
+        foreach (BorderGap gap in LeftGaps)
+        {
+            lc.Exclude (new Region (new Rectangle (borderBounds.X, borderBounds.Y + gap.Position, 1, gap.Length)));
+        }
+
+        foreach (BorderGap gap in RightGaps)
+        {
+            lc.Exclude (new Region (new Rectangle (borderBounds.X + borderBounds.Width - 1, borderBounds.Y + gap.Position, 1, gap.Length)));
+        }
     }
 }
