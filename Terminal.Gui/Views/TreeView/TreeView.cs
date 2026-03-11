@@ -30,6 +30,36 @@ public interface ITreeView
 public class TreeView : TreeView<ITreeNode>, IDesignable
 {
     /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="TreeView"/> on all platforms. Override via <c>config.json</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, string []> DefaultKeyBindings { get; set; } = new ()
+    {
+        ["PageUp"] = ["PageUp"],
+        ["PageDown"] = ["PageDown"],
+        ["PageUpExtend"] = ["Shift+PageUp"],
+        ["PageDownExtend"] = ["Shift+PageDown"],
+        ["Expand"] = ["CursorRight"],
+        ["ExpandAll"] = ["Ctrl+CursorRight"],
+        ["Collapse"] = ["CursorLeft"],
+        ["CollapseAll"] = ["Ctrl+CursorLeft"],
+        ["Up"] = ["CursorUp"],
+        ["UpExtend"] = ["Shift+CursorUp"],
+        ["LineUpToFirstBranch"] = ["Ctrl+CursorUp"],
+        ["Down"] = ["CursorDown"],
+        ["DownExtend"] = ["Shift+CursorDown"],
+        ["LineDownToLastBranch"] = ["Ctrl+CursorDown"],
+        ["Start"] = ["Home"],
+        ["End"] = ["End"],
+        ["SelectAll"] = ["Ctrl+A"],
+    };
+
+    /// <summary>
+    ///     Gets or sets the platform-override key bindings for <see cref="TreeView"/> on Unix. Override via <c>config.json</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, string []> DefaultKeyBindingsUnix { get; set; }
+    /// <summary>
     ///     Creates a new instance of the tree control with absolute positioning and initialises
     ///     <see cref="TreeBuilder{T}"/> with default <see cref="ITreeNode"/> based builder.
     /// </summary>
@@ -72,41 +102,6 @@ public class TreeView<T> : View, ITreeView where T : class
     ///     builder set).
     /// </summary>
     public static string NoBuilderError = "ERROR: TreeBuilder Not Set";
-
-    /// <summary>
-    ///     Gets or sets the default key bindings for <see cref="TreeView{T}"/> on all platforms.
-    ///     Maps <see cref="Command"/> names to arrays of key strings (parseable by <see cref="Key.TryParse"/>).
-    ///     Configure in <em>config.json</em> under the key <c>TreeView.DefaultKeyBindings</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []> DefaultKeyBindings { get; set; } = new ()
-    {
-        ["PageUp"] = ["PageUp"],
-        ["PageDown"] = ["PageDown"],
-        ["PageUpExtend"] = ["Shift+PageUp"],
-        ["PageDownExtend"] = ["Shift+PageDown"],
-        ["Expand"] = ["CursorRight"],
-        ["ExpandAll"] = ["Ctrl+CursorRight"],
-        ["Collapse"] = ["CursorLeft"],
-        ["CollapseAll"] = ["Ctrl+CursorLeft"],
-        ["Up"] = ["CursorUp"],
-        ["UpExtend"] = ["Shift+CursorUp"],
-        ["LineUpToFirstBranch"] = ["Ctrl+CursorUp"],
-        ["Down"] = ["CursorDown"],
-        ["DownExtend"] = ["Shift+CursorDown"],
-        ["LineDownToLastBranch"] = ["Ctrl+CursorDown"],
-        ["Start"] = ["Home"],
-        ["End"] = ["End"],
-        ["SelectAll"] = ["Ctrl+A"],
-    };
-
-    /// <summary>
-    ///     Gets or sets additional key bindings for <see cref="TreeView{T}"/> applied only on non-Windows platforms.
-    ///     These are appended to <see cref="DefaultKeyBindings"/>. Configure in <em>config.json</em> under the key
-    ///     <c>TreeView.DefaultKeyBindingsUnix</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
 
     /// <summary>
     ///     Interface for filtering which lines of the tree are displayed e.g. to provide text searching.  Defaults to
@@ -289,7 +284,7 @@ public class TreeView<T> : View, ITreeView where T : class
                     });
 
         // Default keybindings for this view
-        KeyBindingConfigHelper.Apply (this, DefaultKeyBindings, DefaultKeyBindingsUnix);
+        KeyBindingConfigHelper.Apply (this, TreeView.DefaultKeyBindings, TreeView.DefaultKeyBindingsUnix);
 
         // ObjectActivationKey depends on instance state: cannot be in the static dict
         KeyBindings.Remove (ObjectActivationKey);

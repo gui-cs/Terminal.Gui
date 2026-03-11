@@ -11,26 +11,6 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class NumericUpDown<T> : View, IValue<T> where T : notnull
 {
-    /// <summary>
-    ///     Gets or sets the default key bindings for <see cref="NumericUpDown{T}"/> on all platforms.
-    ///     Maps <see cref="Command"/> names to arrays of key strings (parseable by <see cref="Key.TryParse"/>).
-    ///     Configure in <em>config.json</em> under the key <c>NumericUpDown.DefaultKeyBindings</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []> DefaultKeyBindings { get; set; } = new ()
-    {
-        ["Up"] = ["CursorUp"],
-        ["Down"] = ["CursorDown"],
-    };
-
-    /// <summary>
-    ///     Gets or sets additional key bindings for <see cref="NumericUpDown{T}"/> applied only on non-Windows platforms.
-    ///     These are appended to <see cref="DefaultKeyBindings"/>. Configure in <em>config.json</em> under the key
-    ///     <c>NumericUpDown.DefaultKeyBindingsUnix</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
-
     private readonly Button _down;
 
     // TODO: Use a TextField instead of a Label
@@ -143,7 +123,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
                         return true;
                     });
 
-        KeyBindingConfigHelper.Apply (this, DefaultKeyBindings, DefaultKeyBindingsUnix);
+        KeyBindingConfigHelper.Apply (this, NumericUpDown.DefaultKeyBindings, NumericUpDown.DefaultKeyBindingsUnix);
 
         SetText ();
 
@@ -320,7 +300,24 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
 ///     Enables the user to increase or decrease an <see langword="int"/> by clicking on the up or down buttons.
 /// </summary>
 public class NumericUpDown : NumericUpDown<int>
-{ }
+{
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="NumericUpDown"/>. Override via <c>config.json</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, string []>? DefaultKeyBindings { get; set; } = new ()
+    {
+        { "Up", ["CursorUp"] },
+        { "Down", ["CursorDown"] }
+    };
+
+    /// <summary>
+    ///     Gets or sets the platform-override key bindings for <see cref="NumericUpDown"/> on Unix. Override via
+    ///     <c>config.json</c>.
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
+}
 
 internal interface INumericHelper
 {

@@ -176,10 +176,37 @@
     "EndOfPage": [ "Ctrl+CursorDown" ],
     "DeleteCharLeft": [ "Backspace" ],
     "DeleteCharRight": [ "Delete" ],
-    "Insert": [ "InsertChar" ]
+    "Insert": [ "Insert" ]
   },
   "DropDownList.DefaultKeyBindings": {
     "Toggle": [ "F4", "Alt+CursorDown" ]
+  },
+  "TreeView.DefaultKeyBindings": {
+    "PageUp": [ "PageUp" ],
+    "PageDown": [ "PageDown" ],
+    "PageUpExtend": [ "Shift+PageUp" ],
+    "PageDownExtend": [ "Shift+PageDown" ],
+    "Expand": [ "CursorRight" ],
+    "ExpandAll": [ "Ctrl+CursorRight" ],
+    "Collapse": [ "CursorLeft" ],
+    "CollapseAll": [ "Ctrl+CursorLeft" ],
+    "Up": [ "CursorUp" ],
+    "UpExtend": [ "Shift+CursorUp" ],
+    "LineUpToFirstBranch": [ "Ctrl+CursorUp" ],
+    "Down": [ "CursorDown" ],
+    "DownExtend": [ "Shift+CursorDown" ],
+    "LineDownToLastBranch": [ "Ctrl+CursorDown" ],
+    "Start": [ "Home" ],
+    "End": [ "End" ],
+    "SelectAll": [ "Ctrl+A" ]
+  },
+  "NumericUpDown.DefaultKeyBindings": {
+    "Up": [ "CursorUp" ],
+    "Down": [ "CursorDown" ]
+  },
+  "LinearRange.DefaultKeyBindings": {
+    "LeftStart": [ "Home" ],
+    "RightEnd": [ "End" ]
   },
   "PopoverMenu.DefaultKey": "Shift+F10",
   "FileDialog.MaxSearchResults": 10000,

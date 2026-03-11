@@ -57,7 +57,7 @@ public class HexView : View, IDesignable
         { "EndOfPage", ["Ctrl+CursorDown"] },
         { "DeleteCharLeft", ["Backspace"] },
         { "DeleteCharRight", ["Delete"] },
-        { "Insert", ["InsertChar"] }
+        { "Insert", ["Insert"] }
     };
 
     /// <summary>

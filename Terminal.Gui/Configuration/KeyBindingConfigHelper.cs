@@ -31,14 +31,16 @@ internal static class KeyBindingConfigHelper
     /// </param>
     internal static void Apply (View view, Dictionary<string, string []>? baseBindings, Dictionary<string, string []>? platformBindings = null)
     {
-        applyDict (baseBindings);
+        ApplyDict (baseBindings);
 
         if (!OperatingSystem.IsWindows ())
         {
-            applyDict (platformBindings);
+            ApplyDict (platformBindings);
         }
 
-        void applyDict (Dictionary<string, string []>? dict)
+        return;
+
+        void ApplyDict (Dictionary<string, string []>? dict)
         {
             if (dict is null)
             {
