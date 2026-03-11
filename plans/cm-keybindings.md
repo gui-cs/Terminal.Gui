@@ -33,30 +33,39 @@
 3. Eliminate duplication — shared bindings defined once, applied to many views
 4. Zero startup cost — C# code is source of truth; built-in config.json has no key binding entries
 5. Backward compatible — existing `QuitKey`, `ArrangeKey`, etc. properties continue to work
+6. **MEC-ready** — Minimize coupling to CM internals so the future migration to `Microsoft.Extensions.Configuration` is tractable. Specifically: use strongly-typed POCOs instead of raw nested dictionaries, and limit `[ConfigurationProperty]` decorations to only 3 properties (Application, View base, View per-type overrides)
 
 ## Architecture Overview
 
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │  User config.json (overrides)                                │
-│  "TextField.DefaultKeyBindings": { "Undo": { "all": [...] }}│
+│  "View.ViewKeyBindings": {                                   │
+│    "TextField": { "Undo": { "All": ["Ctrl+Z"] } }           │
+│  }                                                           │
 └──────────────┬───────────────────────────────────────────────┘
                │ CM loads & replaces static property
                ▼
 ┌──────────────────────────────────────────────────────────────┐
 │  C# Static Properties (source of truth)                      │
+│  [ConfigurationProperty] — only 3 properties:                │
 │                                                              │
 │  Application.DefaultKeyBindings  ← Layer 1 (app-level)      │
 │  View.DefaultKeyBindings         ← Layer 2 (shared base)    │
+│  View.ViewKeyBindings            ← User overrides (merged)  │
+│                                                              │
+│  Plain statics (no [ConfigurationProperty]):                 │
 │  TextField.DefaultKeyBindings    ← Layer 3 (view-specific)  │
+│  ListView.DefaultKeyBindings     ← Layer 3 (view-specific)  │
+│  ...                                                         │
 └──────────────┬───────────────────────────────────────────────┘
                │ view.ApplyKeyBindings(layers...)
                ▼
 ┌──────────────────────────────────────────────────────────────┐
-│  Platform Resolution                                         │
-│  Windows: "all" + "windows"                                  │
-│  Linux:   "all" + "linux"                                    │
-│  macOS:   "all" + "macos"                                    │
+│  Platform Resolution (PlatformKeyBinding POCO)               │
+│  Windows: All + Windows                                      │
+│  Linux:   All + Linux                                        │
+│  macOS:   All + Macos                                        │
 └──────────────┬───────────────────────────────────────────────┘
                │ GetSupportedCommands() filter
                ▼
@@ -70,29 +79,31 @@
 
 1. **C# code is the source of truth** — All defaults live in static initializers. Works without CM enabled.
 2. **config.json is for user overrides only** — Built-in config.json has ZERO key binding entries. This avoids startup cost and keeps things clean when CM is disabled (which is the default).
-3. **Per-command platform attribution** — Each command specifies which platforms its keys apply to via `"all"`, `"windows"`, `"linux"`, `"macos"`.
+3. **Per-command platform attribution** — Each command specifies which platforms its keys apply to via `All`, `Windows`, `Linux`, `Macos` properties on a strongly-typed `PlatformKeyBinding` record.
 4. **Shared base layer** — Common bindings (navigation, clipboard, editing) defined once on `View`, applied only to views that register handlers for those commands.
 5. **Skip unhandled commands** — `ApplyKeyBindings()` checks `view.GetSupportedCommands()` and only binds commands the view actually handles. This is the key mechanism that makes the shared base layer work without views getting bindings they don't support.
+6. **MEC-ready: Strongly-typed POCOs** — Platform key bindings use a `PlatformKeyBinding` record instead of raw `Dictionary<string, string[]>`. This maps cleanly to MEC's `IOptions<T>` binding model.
+7. **MEC-ready: Minimal `[ConfigurationProperty]` surface** — Only 3 properties are decorated with `[ConfigurationProperty]`: `Application.DefaultKeyBindings`, `View.DefaultKeyBindings`, and `View.ViewKeyBindings` (a merged dictionary for all view-specific overrides). Individual view `DefaultKeyBindings` properties are plain statics — not CM-discoverable. This keeps the migration surface small (3 properties vs ~15+) while still allowing user customization of any view's bindings via the merged `View.ViewKeyBindings` property.
 
 ---
 
 ## Platform Model
 
-Four platform keys, **additive** within a command:
+Four platform properties on `PlatformKeyBinding`, **additive** within a command:
 
-| Key | Matches |
-|-----|---------|
-| `"all"` | Every platform |
-| `"windows"` | Windows only |
-| `"linux"` | Linux only |
-| `"macos"` | macOS only |
+| Property | Matches |
+|----------|---------|
+| `All` | Every platform |
+| `Windows` | Windows only |
+| `Linux` | Linux only |
+| `Macos` | macOS only |
 
 Resolution for current OS:
-- **Windows**: collect keys from `"all"` + `"windows"`
-- **Linux**: collect keys from `"all"` + `"linux"`
-- **macOS**: collect keys from `"all"` + `"macos"`
+- **Windows**: collect keys from `All` + `Windows`
+- **Linux**: collect keys from `All` + `Linux`
+- **macOS**: collect keys from `All` + `Macos`
 
-Keys are **additive** within a command. For non-Windows bindings, specify both `linux` and `macos`:
+Keys are **additive** within a command. For non-Windows bindings, specify both `Linux` and `Macos` (or use `Bind.NonWindows`):
 ```csharp
 ["DeleteCharRight"] = Bind.AllPlus ("Delete", nonWindows: ["Ctrl+D"])
 // Windows gets: Delete
@@ -107,63 +118,81 @@ Keys are **additive** within a command. For non-Windows bindings, specify both `
 
 ---
 
-## C# Type
+## C# Types
+
+### `PlatformKeyBinding` — Strongly-Typed Platform Key Mapping
+
+New file: `Terminal.Gui/Configuration/PlatformKeyBinding.cs`
+
+**MEC-readiness:** This is a POCO record, not a raw dictionary. MEC's `IOptions<T>` / `ConfigurationBinder` can bind to it directly. It also serializes cleanly with `System.Text.Json`.
 
 ```csharp
-// Outer key = Command name (string), Inner key = platform, Inner value = key strings
-Dictionary<string, Dictionary<string, string[]>>
+/// <summary>
+/// Defines the key strings for a single command, optionally varying by platform.
+/// </summary>
+public record PlatformKeyBinding
+{
+    /// <summary>Keys that apply on all platforms.</summary>
+    public string[]? All { get; init; }
+
+    /// <summary>Additional keys for Windows only.</summary>
+    public string[]? Windows { get; init; }
+
+    /// <summary>Additional keys for Linux only.</summary>
+    public string[]? Linux { get; init; }
+
+    /// <summary>Additional keys for macOS only.</summary>
+    public string[]? Macos { get; init; }
+}
+```
+
+The outer container type for a set of key bindings is:
+
+```csharp
+// Outer key = Command name (string), value = platform-attributed keys
+Dictionary<string, PlatformKeyBinding>
 ```
 
 ### Ergonomic Helper: `Bind` static class
 
 New file: `Terminal.Gui/Configuration/Bind.cs`
 
+The `Bind` helper returns `PlatformKeyBinding` instances (not raw dictionaries):
+
 ```csharp
 internal static class Bind
 {
     /// <summary>All platforms get these keys.</summary>
-    public static Dictionary<string, string[]> All (params string[] keys)
-        => new () { { "all", keys } };
+    public static PlatformKeyBinding All (params string[] keys)
+        => new () { All = keys };
 
     /// <summary>All platforms get the base key; specific platforms get additional keys.</summary>
-    public static Dictionary<string, string[]> AllPlus (
+    public static PlatformKeyBinding AllPlus (
         string key,
         string[]? nonWindows = null,
         string[]? windows = null,
         string[]? linux = null,
         string[]? macos = null)
     {
-        Dictionary<string, string[]> result = new () { { "all", [key] } };
-        if (nonWindows is not null)
+        return new ()
         {
-            result ["linux"] = nonWindows;
-            result ["macos"] = nonWindows;
-        }
-
-        if (windows is not null) result ["windows"] = windows;
-        if (linux is not null) result ["linux"] = linux;
-        if (macos is not null) result ["macos"] = macos;
-
-        return result;
+            All = [key],
+            Windows = windows,
+            Linux = nonWindows is not null && linux is null ? nonWindows : linux,
+            Macos = nonWindows is not null && macos is null ? nonWindows : macos,
+        };
     }
 
     /// <summary>Linux + macOS get these keys. Convenience for specifying both.</summary>
-    public static Dictionary<string, string[]> NonWindows (params string[] keys)
-        => new () { { "linux", keys }, { "macos", keys } };
+    public static PlatformKeyBinding NonWindows (params string[] keys)
+        => new () { Linux = keys, Macos = keys };
 
     /// <summary>Platform-specific keys only (no "all" entry).</summary>
-    public static Dictionary<string, string[]> Platform (
+    public static PlatformKeyBinding Platform (
         string[]? windows = null,
         string[]? linux = null,
         string[]? macos = null)
-    {
-        Dictionary<string, string[]> result = new ();
-        if (windows is not null) result ["windows"] = windows;
-        if (linux is not null) result ["linux"] = linux;
-        if (macos is not null) result ["macos"] = macos;
-
-        return result;
-    }
+        => new () { Windows = windows, Linux = linux, Macos = macos };
 }
 ```
 
@@ -171,7 +200,18 @@ internal static class Bind
 
 ## Layered Architecture
 
-Key bindings are applied in three layers. Each layer is a `Dictionary<string, Dictionary<string, string[]>>` static property decorated with `[ConfigurationProperty]`.
+Key bindings are applied in three layers. Each layer is a `Dictionary<string, PlatformKeyBinding>` static property. **Only 3 properties** are decorated with `[ConfigurationProperty]` — this is an intentional design choice to minimize the migration surface when moving to MEC post-v2.
+
+| Layer | Property | `[ConfigurationProperty]`? | Purpose |
+|-------|----------|---------------------------|---------|
+| 1 | `Application.DefaultKeyBindings` | ✅ Yes | Global app-level bindings |
+| 2 | `View.DefaultKeyBindings` | ✅ Yes | Shared base layer for all views |
+| 3 | `View.ViewKeyBindings` | ✅ Yes | Merged dict of per-view overrides (keyed by type name) |
+| — | `TextField.DefaultKeyBindings` etc. | ❌ No — plain static | View-specific defaults (code only) |
+
+**Why only 3 `[ConfigurationProperty]` decorations?** Today's CM discovers properties via assembly-scanning reflection and sets them via `PropertyInfo.SetValue(null, ...)`. MEC uses `IOptions<T>` on instances. Every `[ConfigurationProperty]` is a migration point. By keeping the count at 3 instead of ~15+, we reduce the MEC migration surface by ~80%.
+
+**How users customize per-view bindings:** Via the merged `View.ViewKeyBindings` property, which is a `Dictionary<string, Dictionary<string, PlatformKeyBinding>>` — outer key is the type name (e.g., `"TextField"`), inner dict is command→keys. CM can discover and override this single property; at apply time, each view checks whether `ViewKeyBindings` has an entry for its type name and merges those bindings.
 
 ### Layer 1: Application Key Bindings (`ApplicationKeyboard.DefaultKeyBindings`)
 
@@ -179,7 +219,7 @@ Global application-level bindings. Applied by `ApplicationKeyboard.AddKeyBinding
 
 ```csharp
 [ConfigurationProperty (Scope = typeof (SettingsScope))]
-public static Dictionary<string, Dictionary<string, string[]>>? DefaultKeyBindings { get; set; } = new ()
+public static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
 {
     ["Quit"]             = Bind.All ("Esc"),
     ["Suspend"]          = Bind.NonWindows ("Ctrl+Z"),
@@ -201,7 +241,7 @@ Common bindings shared across many views. Only applied to views that have regist
 ```csharp
 // View.Keyboard.cs
 [ConfigurationProperty (Scope = typeof (SettingsScope))]
-public static Dictionary<string, Dictionary<string, string[]>>? DefaultKeyBindings { get; set; } = new ()
+public static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
 {
     // Navigation
     ["Left"]       = Bind.All ("CursorLeft"),
@@ -247,10 +287,12 @@ public static Dictionary<string, Dictionary<string, string[]>>? DefaultKeyBindin
 
 Each view defines ONLY its unique/additional bindings. These **extend** the base layer (never replace it).
 
+**No `[ConfigurationProperty]` on view-specific properties.** These are plain statics — code-only defaults. User customization goes through the merged `View.ViewKeyBindings` property (see below).
+
 Example — TextField (text-editing specific only):
 ```csharp
-[ConfigurationProperty (Scope = typeof (SettingsScope))]
-public static Dictionary<string, Dictionary<string, string[]>>? DefaultKeyBindings { get; set; } = new ()
+// NO [ConfigurationProperty] — plain static, not CM-discoverable
+public static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
 {
     // Emacs shortcuts (extend base CursorLeft/Right)
     ["Left"]             = Bind.NonWindows ("Ctrl+B"),
@@ -271,8 +313,8 @@ public static Dictionary<string, Dictionary<string, string[]>>? DefaultKeyBindin
 
 Example — ListView (list-specific only):
 ```csharp
-[ConfigurationProperty (Scope = typeof (SettingsScope))]
-public static Dictionary<string, Dictionary<string, string[]>>? DefaultKeyBindings { get; set; } = new ()
+// NO [ConfigurationProperty] — plain static
+public static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
 {
     // Emacs nav shortcuts (extend base CursorUp/Down)
     ["Up"]   = Bind.NonWindows ("Ctrl+P"),
@@ -280,6 +322,24 @@ public static Dictionary<string, Dictionary<string, string[]>>? DefaultKeyBindin
 };
 // NOTE: Multi-command bindings (Shift+Space → Activate+Down) stay as direct KeyBindings.Add()
 ```
+
+### Layer 3b: Merged View Overrides (`View.ViewKeyBindings`) — CM/MEC bridge
+
+This is the **single `[ConfigurationProperty]`-decorated entry point** for per-view key binding customization. It's a `Dictionary<string, Dictionary<string, PlatformKeyBinding>>` where the outer key is the view type name (e.g., `"TextField"`, `"ListView"`).
+
+```csharp
+// View.Keyboard.cs
+[ConfigurationProperty (Scope = typeof (SettingsScope))]
+public static Dictionary<string, Dictionary<string, PlatformKeyBinding>>? ViewKeyBindings { get; set; }
+```
+
+**Default value is `null`** (no overrides). When a user provides overrides in config.json, CM populates this. At apply time, `ApplyKeyBindings()` checks `View.ViewKeyBindings?[GetType().Name]` and merges any entries found.
+
+**Why this design?**
+- Only 1 `[ConfigurationProperty]` for ALL view-specific overrides (instead of ~13 separate ones)
+- Users can still customize any view's bindings via config.json
+- MEC migration: 1 `IOptions<ViewKeyBindingsOptions>` replaces 1 `[ConfigurationProperty]`
+- Code defaults remain in each view's plain static `DefaultKeyBindings` (no CM overhead)
 
 ### Layer Application Order
 
@@ -307,40 +367,66 @@ Platform detection uses the existing `PlatformDetection` class (in `Terminal.Gui
 
 ```csharp
 // In View.Keyboard.cs — instance method
-protected void ApplyKeyBindings (params Dictionary<string, Dictionary<string, string[]>>?[] layers)
+protected void ApplyKeyBindings (params Dictionary<string, PlatformKeyBinding>?[] layers)
 {
     HashSet<Command> supported = new (GetSupportedCommands ());
 
-    foreach (Dictionary<string, Dictionary<string, string[]>>? layer in layers)
+    // Apply code-defined layers (base + view-specific)
+    foreach (Dictionary<string, PlatformKeyBinding>? layer in layers)
     {
         if (layer is null) continue;
 
-        foreach ((string commandName, Dictionary<string, string[]> platformKeys) in layer)
+        ApplyLayer (layer, supported);
+    }
+
+    // Apply user overrides from View.ViewKeyBindings (CM/MEC bridge)
+    string typeName = GetType ().Name;
+
+    if (ViewKeyBindings?.TryGetValue (typeName, out Dictionary<string, PlatformKeyBinding>? overrides) == true
+        && overrides is not null)
+    {
+        ApplyLayer (overrides, supported);
+    }
+}
+
+private void ApplyLayer (Dictionary<string, PlatformKeyBinding> layer, HashSet<Command> supported)
+{
+    foreach ((string commandName, PlatformKeyBinding platformKeys) in layer)
+    {
+        if (!Enum.TryParse<Command> (commandName, out Command command)) continue;
+        if (!supported.Contains (command)) continue;
+
+        foreach (string keyString in ResolveKeysForCurrentPlatform (platformKeys))
         {
-            if (!Enum.TryParse<Command> (commandName, out Command command)) continue;
-            if (!supported.Contains (command)) continue;
+            if (!Key.TryParse (keyString, out Key? key)) continue;
+            if (KeyBindings.TryGet (key, out _)) continue; // skip already-bound
 
-            foreach (string keyString in ResolveKeysForCurrentPlatform (platformKeys))
-            {
-                if (!Key.TryParse (keyString, out Key? key)) continue;
-                if (KeyBindings.TryGet (key, out _)) continue; // skip already-bound
-
-                KeyBindings.Add (key, command);
-            }
+            KeyBindings.Add (key, command);
         }
     }
 }
 
 /// <summary>Resolves platform-specific key strings for the current OS.</summary>
-private static IEnumerable<string> ResolveKeysForCurrentPlatform (Dictionary<string, string[]> platformKeys)
+private static IEnumerable<string> ResolveKeysForCurrentPlatform (PlatformKeyBinding platformKeys)
 {
-    if (platformKeys.TryGetValue ("all", out string[]? allKeys))
-        foreach (string k in allKeys) yield return k;
+    if (platformKeys.All is not null)
+    {
+        foreach (string k in platformKeys.All) yield return k;
+    }
 
     string platform = PlatformDetection.GetCurrentPlatformName ();
+    string[]? platKeys = platform switch
+    {
+        "windows" => platformKeys.Windows,
+        "linux" => platformKeys.Linux,
+        "macos" => platformKeys.Macos,
+        _ => null
+    };
 
-    if (platformKeys.TryGetValue (platform, out string[]? platKeys))
+    if (platKeys is not null)
+    {
         foreach (string k in platKeys) yield return k;
+    }
 }
 ```
 
@@ -384,35 +470,40 @@ All defaults are in C# static initializers. This means:
 
 ```jsonc
 {
-    // Override TextField undo to use Ctrl+Z everywhere
-    "TextField.DefaultKeyBindings": {
-        "Undo": { "all": ["Ctrl+Z"] }
+    // Override Application quit key — adds Ctrl+Q on Linux/macOS
+    "Application.DefaultKeyBindings": {
+        "Quit": { "All": ["Esc"], "Linux": ["Ctrl+Q"], "Macos": ["Ctrl+Q"] }
     },
 
-    // Add a custom Application quit key on Linux and macOS
-    "Application.DefaultKeyBindings": {
-        "Quit": { "all": ["Esc"], "linux": ["Ctrl+Q"], "macos": ["Ctrl+Q"] }
+    // Override TextField-specific bindings via the merged ViewKeyBindings property
+    "View.ViewKeyBindings": {
+        "TextField": {
+            "Undo": { "All": ["Ctrl+Z"] }
+        },
+        "ListView": {
+            "Up": { "Linux": ["Ctrl+P"], "Macos": ["Ctrl+P"] }
+        }
     }
 }
 ```
 
-**Override semantics**: CM replaces the entire static property value. A user override for `TextField.DefaultKeyBindings` replaces ALL of TextField's view-specific bindings. `View.DefaultKeyBindings` is unaffected (separate property).
+**Override semantics**: CM replaces the entire static property value. A user override for `View.ViewKeyBindings` replaces ALL per-view overrides. `View.DefaultKeyBindings` and `Application.DefaultKeyBindings` are separate properties and unaffected.
 
 ---
 
 ## SourceGenerationContext Registration
 
 ```csharp
-[JsonSerializable (typeof (Dictionary<string, Dictionary<string, string[]>>))]
-[JsonSerializable (typeof (Dictionary<string, string[]>))]
-[JsonSerializable (typeof (string[]))]
+[JsonSerializable (typeof (PlatformKeyBinding))]
+[JsonSerializable (typeof (Dictionary<string, PlatformKeyBinding>))]
+[JsonSerializable (typeof (Dictionary<string, Dictionary<string, PlatformKeyBinding>>))]
 ```
 
 ---
 
 ## Known Constraint: Open Generic Types
 
-`[ConfigurationProperty]` CANNOT be placed on open generic types (`TreeView<T>`, `NumericUpDown<T>`, `LinearRange<T>`). CM's `ConfigProperty.Initialize()` calls `PropertyInfo.GetValue(null)` which throws on open generics. Solution: place the `[ConfigurationProperty]` static properties on the non-generic base class (e.g., `TreeView`, `NumericUpDown`, `LinearRange`) and reference them from the generic class's setup code.
+`[ConfigurationProperty]` CANNOT be placed on open generic types (`TreeView<T>`, `NumericUpDown<T>`, `LinearRange<T>`). CM's `ConfigProperty.Initialize()` calls `PropertyInfo.GetValue(null)` which throws on open generics. **With the new design, this is largely moot** — view-specific `DefaultKeyBindings` are plain statics without `[ConfigurationProperty]`, so they can live on non-generic base classes without the CM constraint being relevant. User customization of generic views goes through the merged `View.ViewKeyBindings` property (keyed by type name, e.g., `"TreeView"`).
 
 ---
 
@@ -496,26 +587,29 @@ Commit: "Add Configuration trace category and instrument ConfigurationManager"
 ### Phase 3: CM Infrastructure (JSON Schema Support)
 
 **Modified:** `Terminal.Gui/Configuration/SourceGenerationContext.cs`
+**New file:** `Terminal.Gui/Configuration/PlatformKeyBinding.cs`
 
-Register the new dict-of-dict type for JSON serialization:
+Register the new POCO type and its containers for JSON serialization:
 ```csharp
-[JsonSerializable (typeof (Dictionary<string, Dictionary<string, string[]>>))]
-[JsonSerializable (typeof (Dictionary<string, string[]>))]
-[JsonSerializable (typeof (string[]))]
+[JsonSerializable (typeof (PlatformKeyBinding))]
+[JsonSerializable (typeof (Dictionary<string, PlatformKeyBinding>))]
+[JsonSerializable (typeof (Dictionary<string, Dictionary<string, PlatformKeyBinding>>))]
 ```
 
 Tests first (`Tests/UnitTestsParallelizable/Configuration/KeyBindingSchemaTests.cs`):
 
 | # | Test | Validates |
 |---|------|-----------|
-| 1 | `KeyBindingDict_RoundTrips_ThroughJson` | Serialize → deserialize a `Dictionary<string, Dictionary<string, string[]>>` preserves all data |
-| 2 | `KeyBindingDict_Deserializes_FromUserConfigFormat` | Parse `{ "Left": { "all": ["CursorLeft"], "linux": ["Ctrl+B"] } }` correctly |
-| 3 | `KeyBindingDict_EmptyDict_RoundTrips` | Empty dict serializes/deserializes without error |
-| 4 | `KeyBindingDict_CM_CanDiscover_DictProperty` | A `[ConfigurationProperty]` of this type is found by CM's property discovery |
+| 1 | `PlatformKeyBinding_RoundTrips_ThroughJson` | Serialize → deserialize a `PlatformKeyBinding` preserves All/Windows/Linux/Macos |
+| 2 | `KeyBindingDict_RoundTrips_ThroughJson` | Serialize → deserialize a `Dictionary<string, PlatformKeyBinding>` preserves all data |
+| 3 | `KeyBindingDict_Deserializes_FromUserConfigFormat` | Parse `{ "Left": { "All": ["CursorLeft"], "Linux": ["Ctrl+B"] } }` correctly |
+| 4 | `KeyBindingDict_EmptyDict_RoundTrips` | Empty dict serializes/deserializes without error |
+| 5 | `KeyBindingDict_CM_CanDiscover_DictProperty` | A `[ConfigurationProperty]` of this type is found by CM's property discovery |
+| 6 | `ViewKeyBindings_RoundTrips_ThroughJson` | `Dictionary<string, Dictionary<string, PlatformKeyBinding>>` round-trips (the merged override dict) |
 
-Commit: "Add JSON schema support for key binding dictionaries"
+Commit: "Add PlatformKeyBinding POCO and JSON schema support"
 
-### Phase 3: `Bind` Helper + `PlatformDetection` Extension
+### Phase 3b: `Bind` Helper + `PlatformDetection` Extension
 
 **New file:** `Terminal.Gui/Configuration/Bind.cs`
 **Modified:** `Terminal.Gui/Drivers/PlatformDetection.cs` — add `GetCurrentPlatformName()`
@@ -524,15 +618,15 @@ Tests first (`Tests/UnitTestsParallelizable/Configuration/BindTests.cs`):
 
 | # | Test | Validates |
 |---|------|-----------|
-| 1 | `Bind_All_SingleKey_ReturnsAllEntry` | `Bind.All("CursorLeft")` → `{ "all": ["CursorLeft"] }` |
-| 2 | `Bind_All_MultipleKeys_ReturnsAllEntry` | `Bind.All("Home", "Ctrl+Home")` → `{ "all": ["Home", "Ctrl+Home"] }` |
-| 3 | `Bind_AllPlus_NonWindowsKeys_ReturnsBothLinuxAndMacos` | `Bind.AllPlus("Delete", nonWindows: ["Ctrl+D"])` → `{ "all": ["Delete"], "linux": ["Ctrl+D"], "macos": ["Ctrl+D"] }` |
-| 4 | `Bind_AllPlus_WindowsKeys_ReturnsAllAndWindows` | `Bind.AllPlus("X", windows: ["Ctrl+X"])` → `{ "all": ["X"], "windows": ["Ctrl+X"] }` |
-| 5 | `Bind_AllPlus_NullPlatforms_OmitsNullEntries` | Null platforms don't create entries |
-| 6 | `Bind_NonWindows_ReturnsBothLinuxAndMacos` | `Bind.NonWindows("Ctrl+Z")` → `{ "linux": ["Ctrl+Z"], "macos": ["Ctrl+Z"] }` — no "all" |
-| 7 | `Bind_Platform_LinuxOnly` | `Bind.Platform(linux: ["Ctrl+Z"])` → `{ "linux": ["Ctrl+Z"] }` — no "all", no "macos" |
-| 8 | `Bind_Platform_WindowsAndMacos` | Both present, no "all" |
-| 9 | `Bind_Platform_AllNulls_ReturnsEmpty` | Empty dict when all null |
+| 1 | `Bind_All_SingleKey_ReturnsPlatformKeyBinding` | `Bind.All("CursorLeft")` → `PlatformKeyBinding { All = ["CursorLeft"] }` |
+| 2 | `Bind_All_MultipleKeys` | `Bind.All("Home", "Ctrl+Home")` → `{ All = ["Home", "Ctrl+Home"] }` |
+| 3 | `Bind_AllPlus_NonWindowsKeys` | `Bind.AllPlus("Delete", nonWindows: ["Ctrl+D"])` → `{ All = ["Delete"], Linux = ["Ctrl+D"], Macos = ["Ctrl+D"] }` |
+| 4 | `Bind_AllPlus_WindowsKeys` | `Bind.AllPlus("X", windows: ["Ctrl+X"])` → `{ All = ["X"], Windows = ["Ctrl+X"] }` |
+| 5 | `Bind_AllPlus_NullPlatforms_LeavesNull` | Null platforms stay null on the record |
+| 6 | `Bind_NonWindows_SetsLinuxAndMacos` | `Bind.NonWindows("Ctrl+Z")` → `{ Linux = ["Ctrl+Z"], Macos = ["Ctrl+Z"] }` — All is null |
+| 7 | `Bind_Platform_LinuxOnly` | `Bind.Platform(linux: ["Ctrl+Z"])` → only Linux set |
+| 8 | `Bind_Platform_WindowsAndMacos` | Both present, All is null |
+| 9 | `Bind_Platform_AllNulls_ReturnsEmpty` | All properties null |
 
 Tests for `PlatformDetection.GetCurrentPlatformName()`:
 
@@ -569,10 +663,10 @@ Tests first (`Tests/UnitTestsParallelizable/ViewBase/ApplyKeyBindingsTests.cs`):
 
 | # | Test | Validates |
 |---|------|-----------|
-| 1 | `ApplyKeyBindings_AllPlatform_BindsKey` | `{ "Left": { "all": ["CursorLeft"] } }` binds CursorLeft→Left |
-| 2 | `ApplyKeyBindings_CurrentPlatformOnly_BindsOnThisPlatform` | Platform-specific entry binds on matching OS |
+| 1 | `ApplyKeyBindings_AllPlatform_BindsKey` | `PlatformKeyBinding { All = ["CursorLeft"] }` binds CursorLeft→Left |
+| 2 | `ApplyKeyBindings_CurrentPlatformOnly_BindsOnThisPlatform` | Platform-specific property binds on matching OS |
 | 3 | `ApplyKeyBindings_OtherPlatformOnly_DoesNotBind` | Entry for different platform doesn't bind |
-| 4 | `ApplyKeyBindings_AllPlusPlatform_Additive` | Both `"all"` and platform-specific keys bind |
+| 4 | `ApplyKeyBindings_AllPlusPlatform_Additive` | Both `All` and platform-specific keys bind |
 | 5 | `ApplyKeyBindings_BindsSupportedCommand` | View with command handler gets binding |
 | 6 | `ApplyKeyBindings_SkipsUnsupportedCommand` | View without handler does NOT get binding |
 | 7 | `ApplyKeyBindings_MultipleLayers_Additive` | Base layer + view layer both contribute bindings |
@@ -583,6 +677,9 @@ Tests first (`Tests/UnitTestsParallelizable/ViewBase/ApplyKeyBindingsTests.cs`):
 | 12 | `ApplyKeyBindings_MultipleKeysPerCommand` | `{ "Left": Bind.All("CursorLeft", "Ctrl+B") }` binds both keys |
 | 13 | `ApplyKeyBindings_EmptyDict_NoOp` | Empty dictionary doesn't throw or change bindings |
 | 14 | `ApplyKeyBindings_ViewSpecificExtendsBase_SameCommand` | Base has `Left→CursorLeft`, view has `Left→Ctrl+B` — both keys get bound |
+| 15 | `ApplyKeyBindings_ViewKeyBindings_MergesOverrides` | `View.ViewKeyBindings["TestView"]` entries merge into bindings |
+| 16 | `ApplyKeyBindings_ViewKeyBindings_Null_NoOp` | `View.ViewKeyBindings = null` doesn't throw |
+| 17 | `ApplyKeyBindings_ViewKeyBindings_NoEntryForType_NoOp` | ViewKeyBindings exists but no entry for this view's type name — no change |
 
 Note: Tests use `View` + `CommandNotBound` event — no dependency on `./Views`.
 
@@ -604,6 +701,8 @@ Tests (`Tests/UnitTestsParallelizable/ViewBase/ViewDefaultKeyBindingsTests.cs`):
 | 6 | `View_DefaultKeyBindings_AllCommandNamesParseable` | Every command name in the dict parses to a `Command` enum |
 | 7 | `View_DefaultKeyBindings_HasConfigurationPropertyAttribute` | `[ConfigurationProperty]` is applied |
 | 8 | `View_DefaultKeyBindings_NoBindingsApplied_WhenNoCommandHandlers` | Plain `View` with no AddCommand beyond base — ApplyKeyBindings doesn't crash |
+| 9 | `View_ViewKeyBindings_IsNull_ByDefault` | `View.ViewKeyBindings` is null when no overrides are configured |
+| 10 | `View_ViewKeyBindings_HasConfigurationPropertyAttribute` | `[ConfigurationProperty]` is applied to `View.ViewKeyBindings` |
 
 At this point, `View.DefaultKeyBindings` is defined but NOT yet wired into any view's setup. Wiring happens in Phase 7.
 
@@ -613,9 +712,11 @@ Commit: "Add View.DefaultKeyBindings shared base layer"
 
 For each view, follow this sub-pattern:
 1. Write tests that verify the view's CURRENT key bindings (snapshot the expected state)
-2. Switch the view from direct `KeyBindings.Add` to `ApplyKeyBindings(View.DefaultKeyBindings, ViewType.DefaultKeyBindings)`
-3. Verify the snapshot tests still pass (no behavior change)
-4. Add tests for the static `DefaultKeyBindings` property (not null, parseable, CM discoverable)
+2. Add a `public static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings` property (**no `[ConfigurationProperty]`** — plain static)
+3. Switch the view from direct `KeyBindings.Add` to `ApplyKeyBindings(View.DefaultKeyBindings, ViewType.DefaultKeyBindings)`
+4. Verify the snapshot tests still pass (no behavior change)
+5. Add tests for the static `DefaultKeyBindings` property (not null, parseable keys, parseable command names)
+6. **Do NOT add `[ConfigurationProperty]`** to any view-specific property — user customization goes through `View.ViewKeyBindings`
 
 **View migration order** (simplest → most complex):
 
@@ -636,17 +737,17 @@ For each view, follow this sub-pattern:
 
 #### 7d: NumericUpDown
 - 2 bindings: CursorUp→Up, CursorDown→Down (already in base)
-- Generic type constraint: `[ConfigurationProperty]` on non-generic `NumericUpDown`
+- Generic type: plain static on non-generic base class (no CM constraint since no `[ConfigurationProperty]`)
 - Tests: verify generic class references non-generic property
 
 #### 7e: LinearRange
 - 2 unique + orientation-dependent bindings (stay as direct `KeyBindings.Add`)
-- Generic type constraint: same pattern as NumericUpDown
+- Generic type: same pattern as NumericUpDown
 - Tests: verify Home→LeftStart, End→RightEnd + orientation bindings
 
 #### 7f: TreeView
 - 17 bindings, unique commands: `Expand`, `ExpandAll`, `Collapse`, `CollapseAll`, `LineUpToFirstBranch`, `LineDownToLastBranch`
-- Generic type constraint: same pattern
+- Generic type: same pattern — plain static on non-generic base
 - Instance-dependent `ObjectActivationKey` stays as direct KeyBindings.Add
 - Tests: verify unique tree commands + shared nav commands from base
 
@@ -709,19 +810,17 @@ Currently inconsistent:
 - **PopoverMenu.DefaultKey**: Keep `Shift+F10` on all (already correct)
 - **DropDownList**: Keep `F4` + `Alt+CursorDown` (already correct)
 
-These keys should move into the `DefaultKeyBindings` dict pattern so they're configurable:
+These keys should move into the `DefaultKeyBindings` dict pattern so they're configurable (via `View.ViewKeyBindings`):
 
 ```csharp
-// MenuBar
-[ConfigurationProperty (Scope = typeof (SettingsScope))]
-public static Dictionary<string, Dictionary<string, string[]>>? DefaultKeyBindings { get; set; } = new ()
+// MenuBar — plain static (no [ConfigurationProperty])
+public static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
 {
     ["HotKey"] = Bind.All ("F10"),
 };
 
-// PopoverMenu
-[ConfigurationProperty (Scope = typeof (SettingsScope))]
-public static Dictionary<string, Dictionary<string, string[]>>? DefaultKeyBindings { get; set; } = new ()
+// PopoverMenu — plain static (no [ConfigurationProperty])
+public static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
 {
     ["Context"] = Bind.All ("Shift+F10"),
 };
@@ -734,16 +833,16 @@ Tests:
 | 1 | `MenuBar_DefaultKey_IsF10` | MenuBar activation key is F10 (changed from F9) |
 | 2 | `PopoverMenu_DefaultKey_IsShiftF10` | Context menu key is Shift+F10 |
 | 3 | `DropDownList_Toggle_F4_And_AltDown` | Dropdown opens with F4 and Alt+Down |
-| 4 | `MenuBar_DefaultKeyBindings_HasConfigurationProperty` | CM can discover/override |
-| 5 | `PopoverMenu_DefaultKeyBindings_HasConfigurationProperty` | CM can discover/override |
+| 4 | `MenuBar_Configurable_ViaViewKeyBindings` | Override via `View.ViewKeyBindings["MenuBar"]` works |
+| 5 | `PopoverMenu_Configurable_ViaViewKeyBindings` | Override via `View.ViewKeyBindings["PopoverMenu"]` works |
 
 Commit: "Standardize popover activation keys (MenuBar F9→F10)"
 
 ### Phase 9: config.json Cleanup
 
 - Remove ALL `DefaultKeyBindings` / `DefaultKeyBindingsUnix` entries from built-in `config.json`
-- Verify CM still discovers the properties (they're `[ConfigurationProperty]` decorated)
-- Verify user override format works by writing a test that sets a dict value and confirms ApplyKeyBindings uses it
+- Verify CM discovers the 3 `[ConfigurationProperty]`-decorated properties: `Application.DefaultKeyBindings`, `View.DefaultKeyBindings`, `View.ViewKeyBindings`
+- Verify user override format works by writing a test that sets `View.ViewKeyBindings` and confirms ApplyKeyBindings uses it
 
 Commit: "Remove key binding entries from built-in config.json"
 
