@@ -26,6 +26,9 @@ public enum TraceCategory
     /// <summary>Navigation traces (Focus, TabBehavior, etc...).</summary>
     Navigation = 16,
 
+    /// <summary>Configuration management traces (property discovery, source loading, property assignment).</summary>
+    Configuration = 32,
+
     /// <summary>All trace categories enabled.</summary>
-    All = Lifecycle | Command | Mouse | Keyboard | Navigation
+    All = Lifecycle | Command | Mouse | Keyboard | Navigation | Configuration
 }

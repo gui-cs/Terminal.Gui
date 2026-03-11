@@ -389,6 +389,43 @@ public class TraceTests
         }
     }
 
+    #region Configuration Category Tests
+
+    // Copilot
+    [Fact]
+    public void TraceCategory_Configuration_HasExpectedValue ()
+    {
+        Assert.Equal (32, (int)TraceCategory.Configuration);
+    }
+
+    // Copilot
+    [Fact]
+    public void TraceCategory_All_IncludesConfiguration ()
+    {
+        Assert.True (TraceCategory.All.HasFlag (TraceCategory.Configuration));
+    }
+
+    // Copilot
+    [Fact]
+    public void Configuration_Category_CanBeEnabled ()
+    {
+        Trace.EnabledCategories = TraceCategory.None;
+
+        try
+        {
+            Trace.EnabledCategories = TraceCategory.Configuration;
+
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Configuration));
+        }
+        finally
+        {
+            Trace.EnabledCategories = TraceCategory.None;
+            Trace.Backend = new NullBackend ();
+        }
+    }
+
+    #endregion
+
     #region Scenario Tests (merged from IssueScenarioTraceTests)
 
     /// <summary>

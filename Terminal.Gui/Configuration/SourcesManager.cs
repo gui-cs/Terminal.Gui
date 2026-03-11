@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
+using Trace = Terminal.Gui.Tracing.Trace;
 
 namespace Terminal.Gui.Configuration;
 
@@ -165,6 +166,8 @@ public class SourcesManager
 
             Logging.Trace ($"Read configuration from \"{source}\" - ConfigLocation: {location}");
 
+            Trace.Configuration (source, "Load", $"location={location}");
+
             return true;
         }
         catch (JsonException e)
@@ -174,6 +177,7 @@ public class SourcesManager
                 throw;
             }
 
+            Trace.Configuration (source, "LoadError", e.Message);
             ConfigurationManager.AddJsonError ($"Error reading {source}: {e.Message}");
         }
 
