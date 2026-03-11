@@ -228,6 +228,7 @@ Terminal.Gui includes a unified tracing system (in the `Terminal.Gui.Tracing` na
 | Keyboard | `TraceCategory.Keyboard` | Keyboard events (key down, key up) |
 | Navigation | `TraceCategory.Navigation` | Focus and TabBehavior navigation |
 | Lifecycle | `TraceCategory.Lifecycle` | Application and Driver lifecycle events |
+| Configuration | `TraceCategory.Configuration` | Configuration load/apply operations (source loading, property assignment, JSON errors) |
 | All | `TraceCategory.All` | All categories combined |
 
 > [!IMPORTANT]
@@ -243,6 +244,9 @@ using Terminal.Gui.Tracing;
 
 // Enable multiple categories at once
 Trace.EnabledCategories = TraceCategory.Command | TraceCategory.Mouse;
+
+// Enable configuration tracing to diagnose CM load/apply issues
+Trace.EnabledCategories = TraceCategory.Configuration;
 
 // Check enabled categories
 if (Trace.EnabledCategories.HasFlag (TraceCategory.Command)) { ... }
@@ -270,6 +274,14 @@ When tracing is enabled, output automatically goes to `Logging.Trace` via the `L
 ```json
 {
   "Trace.EnabledCategories": ["Command", "Mouse"]
+}
+```
+
+To enable configuration tracing (useful when diagnosing why a property isn't applied or a JSON file isn't loaded):
+
+```json
+{
+  "Trace.EnabledCategories": ["Configuration"]
 }
 ```
 

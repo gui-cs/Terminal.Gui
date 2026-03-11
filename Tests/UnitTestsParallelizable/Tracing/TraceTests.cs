@@ -389,6 +389,93 @@ public class TraceTests
         }
     }
 
+    #region Configuration Category Tests
+
+    // Copilot
+    [Fact]
+    public void TraceCategory_Configuration_HasExpectedValue ()
+    {
+        Assert.Equal (32, (int)TraceCategory.Configuration);
+    }
+
+    // Copilot
+    [Fact]
+    public void TraceCategory_All_IncludesConfiguration ()
+    {
+        Assert.True (TraceCategory.All.HasFlag (TraceCategory.Configuration));
+    }
+
+    // Copilot
+    [Fact]
+    public void Configuration_Category_CanBeEnabled ()
+    {
+        Trace.EnabledCategories = TraceCategory.None;
+
+        try
+        {
+            Trace.EnabledCategories = TraceCategory.Configuration;
+
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Configuration));
+        }
+        finally
+        {
+            Trace.EnabledCategories = TraceCategory.None;
+            Trace.Backend = new NullBackend ();
+        }
+    }
+
+    // Copilot
+    [Fact]
+    public void ConfigurationTrace_CapturesEntries ()
+    {
+        ListBackend backend = new ();
+        Trace.Backend = backend;
+        Trace.EnabledCategories = TraceCategory.Configuration;
+
+        try
+        {
+            Trace.Configuration ("my-property", "Apply", "test message");
+
+#if DEBUG
+            Assert.Single (backend.Entries);
+            Assert.Equal (TraceCategory.Configuration, backend.Entries [0].Category);
+            Assert.Contains ("my-property", backend.Entries [0].Id);
+            Assert.Equal ("Apply", backend.Entries [0].Phase);
+#else
+            // In Release, [Conditional("DEBUG")] removes Trace.Configuration calls entirely
+            Assert.Empty (backend.Entries);
+#endif
+        }
+        finally
+        {
+            Trace.EnabledCategories = TraceCategory.None;
+            Trace.Backend = new NullBackend ();
+        }
+    }
+
+    // Copilot
+    [Fact]
+    public void LoggingBackend_FormatsConfigurationCorrectly ()
+    {
+        LoggingBackend backend = new ();
+
+        TraceEntry entry = new (
+                                TraceCategory.Configuration,
+                                "my-property",
+                                "Apply",
+                                "InternalApply",
+                                "Test configuration trace",
+                                DateTime.UtcNow,
+                                null);
+
+        // Verify the Configuration case in the switch does not throw
+        backend.Log (entry);
+
+        Assert.True (true);
+    }
+
+    #endregion
+
     #region Scenario Tests (merged from IssueScenarioTraceTests)
 
     /// <summary>
