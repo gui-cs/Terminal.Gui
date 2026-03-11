@@ -12,17 +12,17 @@
 |-------|-------------|--------|
 | 0 | Prerequisite: Unify TextField/TextView keybindings (#4828) | ✅ Merged |
 | 1 | Revert POC to clean baseline | ✅ Done |
-| 1b | Change DeleteAll from Ctrl+Shift+D → Ctrl+Shift+Delete | ⬜ Pending |
+| 1b | Change DeleteAll from Ctrl+Shift+D → Ctrl+Shift+Delete | ✅ Done |
 | 2 | Add `Configuration` trace category + instrument CM | ✅ Done (PR #4827) |
-| 3 | CM infrastructure (JSON schema) | ⬜ Pending |
-| 4 | `Bind` helper + `PlatformDetection` extension | ⬜ Pending |
-| 5 | Application key bindings | ⬜ Pending |
-| 6 | `View.ApplyKeyBindings()` instance method | ⬜ Pending |
-| 7 | View base layer (`View.DefaultKeyBindings`) | ⬜ Pending |
-| 8 | Migrate views (13 views, simplest→complex) | ⬜ Pending |
-| 9 | Standardize popover activation keys | ⬜ Pending |
-| 10 | config.json cleanup | ⬜ Pending |
-| 11 | Documentation | ⬜ Pending |
+| 3 | CM infrastructure (JSON schema) | ✅ Done |
+| 4 | `Bind` helper + `PlatformDetection` extension | ✅ Done |
+| 5 | Application key bindings | ✅ Done |
+| 6 | `View.ApplyKeyBindings()` instance method | ✅ Done |
+| 7 | View base layer (`View.DefaultKeyBindings`) | ✅ Done |
+| 8 | Migrate views (13 views, simplest→complex) | ✅ Done |
+| 9 | Standardize popover activation keys (MenuBar F9→F10) | ✅ Done |
+| 10 | config.json cleanup | ✅ Done (already clean) |
+| 11 | Documentation | ✅ Done |
 
 ---
 

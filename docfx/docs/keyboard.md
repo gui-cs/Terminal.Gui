@@ -385,6 +385,92 @@ injector.InjectKey(Key.F1, options);
 - Advanced scenarios (modifier keys, function keys, special keys)
 - Troubleshooting guide
 
+## Configurable Key Bindings
+
+Terminal.Gui uses a layered, platform-aware key binding architecture. All default key bindings are defined declaratively using `PlatformKeyBinding` records and can be overridden via [ConfigurationManager](config.md).
+
+### Three Layers
+
+Key bindings are organized in three layers, applied from lowest to highest priority:
+
+1. **`Application.DefaultKeyBindings`** - Application-wide bindings for commands like Quit, Suspend, Arrange, and tab navigation. This is a `[ConfigurationProperty]` and can be overridden via configuration.
+
+2. **`View.DefaultKeyBindings`** - Shared base bindings for all views, covering navigation (cursor keys, Home, End), clipboard (Copy, Cut, Paste), and editing (Undo, Redo, Delete). This is also a `[ConfigurationProperty]`.
+
+3. **Per-view `DefaultKeyBindings`** - View-specific bindings that layer on top of the base. For example, `TextField.DefaultKeyBindings` adds Emacs-style navigation (`Ctrl+B`, `Ctrl+F`), word movement (`Ctrl+CursorLeft`), and kill commands (`Ctrl+K`). These are plain static properties, not configurable via ConfigurationManager.
+
+Each view's constructor calls `ApplyKeyBindings (View.DefaultKeyBindings, <ViewType>.DefaultKeyBindings)` to combine the layers. Only commands that the view actually supports (via `GetSupportedCommands ()`) are bound. Keys already bound by a lower layer are not overwritten by a higher layer.
+
+### Platform-Aware Bindings
+
+Key bindings can vary by operating system using the `PlatformKeyBinding` record:
+
+```csharp
+public record PlatformKeyBinding
+{
+    public string []? All { get; init; }      // All platforms
+    public string []? Windows { get; init; }  // Windows only
+    public string []? Linux { get; init; }    // Linux only
+    public string []? Macos { get; init; }    // macOS only
+}
+```
+
+`All` keys apply on every platform. Platform-specific arrays add additional bindings on that platform. For example, `Undo` is bound to `Ctrl+Z` everywhere, but also to `Ctrl+/` on Linux and macOS:
+
+```csharp
+["Undo"] = Bind.AllPlus ("Ctrl+Z", nonWindows: ["Ctrl+/"]),
+```
+
+The `Bind` helper class provides factory methods:
+
+| Method | Description |
+|--------|-------------|
+| `Bind.All (...)` | Same keys on all platforms |
+| `Bind.AllPlus (key, nonWindows, windows, linux, macos)` | A base key on all platforms, plus platform-specific extras |
+| `Bind.NonWindows (...)` | Keys that apply only on Linux and macOS |
+| `Bind.Platform (windows, linux, macos)` | Fully platform-specific, no shared keys |
+
+### User Overrides via Configuration
+
+Users can override key bindings for any view type using `View.ViewKeyBindings` in a configuration file. The outer key is the view type name; the inner dictionary maps command names to `PlatformKeyBinding` objects:
+
+```json
+{
+  "View.ViewKeyBindings": {
+    "TextField": {
+      "Undo": { "All": ["Ctrl+Z"] },
+      "CutToEndOfLine": { "All": ["Ctrl+K"] }
+    },
+    "TextView": {
+      "Redo": { "All": ["Ctrl+Shift+Z"], "Windows": ["Ctrl+Y"] }
+    }
+  }
+}
+```
+
+`ViewKeyBindings` overrides are applied last (highest priority), after both `View.DefaultKeyBindings` and per-view `DefaultKeyBindings`.
+
+Application-level defaults can also be overridden:
+
+```json
+{
+  "Application.DefaultKeyBindings": {
+    "Quit": { "All": ["Ctrl+Q"] },
+    "Suspend": { "Linux": ["Ctrl+Z"], "Macos": ["Ctrl+Z"] }
+  }
+}
+```
+
+### Resolution Order
+
+When a view is created, key bindings are resolved in this order:
+
+1. `View.DefaultKeyBindings` (base layer - navigation, clipboard, editing)
+2. Per-view `DefaultKeyBindings` (e.g., `TextField.DefaultKeyBindings`)
+3. `View.ViewKeyBindings` user overrides (from configuration)
+
+At each layer, only commands supported by the view are bound, and keys already bound by a previous layer are skipped. This means user overrides take effect because they are applied last, after the default layers have established their bindings.
+
 ## Keyboard Tracing
 
 For debugging keyboard event flow, use the `Trace` class from the `Terminal.Gui.Tracing` namespace:
