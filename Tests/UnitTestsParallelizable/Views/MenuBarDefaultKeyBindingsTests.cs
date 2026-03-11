@@ -49,4 +49,29 @@ public class MenuBarDefaultKeyBindingsTests
 
         Assert.Null (attr);
     }
+
+    [Fact]
+    public void MenuBar_DefaultKey_IsF10 ()
+    {
+        Assert.Equal (Key.F10, MenuBar.DefaultKey);
+    }
+
+    [Fact]
+    public void PopoverMenu_DefaultKey_IsShiftF10 ()
+    {
+        Assert.Equal (Key.F10.WithShift, PopoverMenu.DefaultKey);
+    }
+
+    [Fact]
+    public void DropDownList_Toggle_F4_And_AltDown ()
+    {
+        Dictionary<string, PlatformKeyBinding>? bindings = DropDownList.DefaultKeyBindings;
+        Assert.NotNull (bindings);
+        Assert.True (bindings!.ContainsKey ("Toggle"), "Should contain Toggle command");
+
+        PlatformKeyBinding toggle = bindings ["Toggle"];
+        Assert.NotNull (toggle.All);
+        Assert.Contains ("F4", toggle.All!);
+        Assert.Contains ("Alt+CursorDown", toggle.All!);
+    }
 }

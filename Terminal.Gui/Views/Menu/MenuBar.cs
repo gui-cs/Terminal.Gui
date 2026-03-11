@@ -16,7 +16,7 @@ namespace Terminal.Gui.Views;
 ///         <see cref="View.SuperView"/>.
 ///     </para>
 ///     <para>
-///         <b>Activation:</b> The <see cref="Key"/> property (default: <see cref="Key.F9"/>, configurable via
+///         <b>Activation:</b> The <see cref="Key"/> property (default: <see cref="Key.F10"/>, configurable via
 ///         <see cref="DefaultKey"/>) activates the <see cref="MenuBar"/>. When activated, the first
 ///         <see cref="MenuBarItem"/> with a <see cref="PopoverMenu"/> is opened. Use <see cref="Active"/> to
 ///         get or set whether the <see cref="MenuBar"/> is in its active state. When <see cref="Active"/> changes,
@@ -53,7 +53,7 @@ namespace Terminal.Gui.Views;
 ///             <term>Key</term> <description>Action</description>
 ///         </listheader>
 ///         <item>
-///             <term>F9 (configurable via <see cref="DefaultKey"/>)</term>
+///             <term>F10 (configurable via <see cref="DefaultKey"/>)</term>
 ///             <description>Activates/deactivates the menu bar.</description>
 ///         </item>
 ///         <item>
@@ -136,7 +136,7 @@ public class MenuBar : Menu, IDesignable
 
             return true;
 
-            // Non-bubbled HotKey (e.g. F9 pressed on MenuBar directly) — use default behavior.
+            // Non-bubbled HotKey (e.g. F10 pressed on MenuBar directly) — use default behavior.
         }
 
         bool? Quit (ICommandContext? ctx)
@@ -437,7 +437,7 @@ public class MenuBar : Menu, IDesignable
 
     /// <summary>The default key for activating menu bars.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key DefaultKey { get; set; } = Key.F9;
+    public static Key DefaultKey { get; set; } = Key.F10;
 
     /// <inheritdoc/>
     public override void EndInit ()
@@ -527,7 +527,7 @@ public class MenuBar : Menu, IDesignable
     public bool IsOpen () => SubViews.OfType<IMenuBarEntry> ().Any (e => e.IsMenuOpen);
 
     /// <summary>
-    ///     Specifies the key that will activate the MenuBar. The default is <see cref="Key.F9"/> and
+    ///     Specifies the key that will activate the MenuBar. The default is <see cref="Key.F10"/> and
     ///     can be configured using the <see cref="DefaultKey"/> configuraiton property.
     /// </summary>
     public Key Key
