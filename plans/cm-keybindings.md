@@ -2,7 +2,7 @@
 
 > Branch: `feature/cm-keybindings` → `v2_develop` on gui-cs/Terminal.Gui
 > Fixes: #3023, #3089
-> Prerequisite: #4825 (Unify TextField/TextView Undo/Redo/Paste) — merge first
+> Prerequisite: #4825 (Unify TextField/TextView Undo/Redo/Paste) — ✅ merged as PR #4828
 
 ---
 
@@ -10,8 +10,10 @@
 
 | Phase | Description | Status |
 |-------|-------------|--------|
-| 1 | Revert POC to clean baseline | ⬜ Pending |
-| 2 | Add `Configuration` trace category + instrument CM | ⬜ Pending |
+| 0 | Prerequisite: Unify TextField/TextView keybindings (#4828) | ✅ Merged |
+| 1 | Revert POC to clean baseline | ✅ Done |
+| 1b | Change DeleteAll from Ctrl+Shift+D → Ctrl+Shift+Delete | ⬜ Pending |
+| 2 | Add `Configuration` trace category + instrument CM | ✅ Done (PR #4827) |
 | 3 | CM infrastructure (JSON schema) | ⬜ Pending |
 | 4 | `Bind` helper + `PlatformDetection` extension | ⬜ Pending |
 | 5 | Application key bindings | ⬜ Pending |
@@ -307,7 +309,7 @@ public static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; 
     ["KillWordRight"]    = Bind.All ("Ctrl+Delete"),
     ["KillWordLeft"]     = Bind.All ("Ctrl+Backspace"),
     ["ToggleOverwrite"]  = Bind.All ("Insert"),
-    ["DeleteAll"]        = Bind.All ("Ctrl+R", "Ctrl+Shift+D"),
+    ["DeleteAll"]        = Bind.All ("Ctrl+Shift+Delete"),
 };
 ```
 
@@ -507,16 +509,16 @@ All defaults are in C# static initializers. This means:
 
 ---
 
-## Prerequisite: Undo/Redo/Paste Unification (#4825)
+## Prerequisite: Undo/Redo/Paste Unification (#4825) — ✅ MERGED
 
-TextField and TextView currently have incompatible key bindings for Undo/Redo/Paste/DeleteAll. This is tracked as a separate issue (#4825) and must be merged before this PR's implementation begins. After #4825, both views will use:
+TextField and TextView had incompatible key bindings for Undo/Redo/Paste/DeleteAll. This was resolved by PR #4828 (merged). After that merge, both views use:
 
 | Command | All Platforms | Non-Windows (additional) |
 |---------|--------------|--------------------------|
 | Paste | Ctrl+V | — |
 | Undo | Ctrl+Z | Ctrl+/ |
 | Redo | Ctrl+Y | Ctrl+Shift+Z |
-| DeleteAll | Ctrl+Shift+D | — |
+| DeleteAll | Ctrl+Shift+Delete | — |
 
 ---
 
