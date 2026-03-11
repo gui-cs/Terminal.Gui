@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Trace = Terminal.Gui.Tracing.Trace;
 
 namespace Terminal.Gui.Configuration;
 
@@ -473,6 +474,8 @@ public static class ConfigurationManager
     [RequiresDynamicCode ("Calls Terminal.Gui.Scope<T>.Apply()")]
     private static void InternalApply ()
     {
+        Trace.Configuration ("ConfigurationManager", "Apply", "Start");
+
         var settings = false;
         var themes = false;
         var appSettings = false;
@@ -496,6 +499,8 @@ public static class ConfigurationManager
         }
         finally
         {
+            Trace.Configuration ("ConfigurationManager", "Apply", $"End - settings={settings}, themes={themes}, appSettings={appSettings}");
+
             if (settings || themes || appSettings)
             {
                 OnApplied ();
