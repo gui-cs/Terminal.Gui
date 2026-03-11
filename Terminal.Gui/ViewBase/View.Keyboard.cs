@@ -682,8 +682,8 @@ public partial class View // Keyboard APIs
         ["Paste"] = Bind.All ("Ctrl+V"),
 
         // Editing
-        ["Undo"] = Bind.Platform (["Ctrl+Z"], ["Ctrl+/"], ["Ctrl+/"]),
-        ["Redo"] = Bind.Platform (["Ctrl+Y"], ["Ctrl+Shift+Z"], ["Ctrl+Shift+Z"]),
+        ["Undo"] = Bind.AllPlus ("Ctrl+Z", nonWindows: ["Ctrl+/"]),
+        ["Redo"] = Bind.AllPlus ("Ctrl+Y", nonWindows: ["Ctrl+Shift+Z"]),
         ["SelectAll"] = Bind.All ("Ctrl+A"),
         ["DeleteCharLeft"] = Bind.All ("Backspace"),
         ["DeleteCharRight"] = Bind.All ("Delete", "Ctrl+D")
