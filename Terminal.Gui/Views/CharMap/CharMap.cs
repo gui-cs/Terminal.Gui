@@ -8,6 +8,44 @@ namespace Terminal.Gui.Views;
 /// <summary>
 ///     A scrollable map of the Unicode codepoints.
 /// </summary>
+/// <remarks>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Moves one codepoint left or right.</description>
+///         </item>
+///         <item>
+///             <term>Up / Down</term> <description>Moves one row up or down.</description>
+///         </item>
+///         <item>
+///             <term>PageUp / PageDown</term> <description>Moves one page up or down.</description>
+///         </item>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last codepoint.</description>
+///         </item>
+///     </list>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Click</term> <description>Selects the clicked codepoint (<see cref="Command.Activate"/>).</description>
+///         </item>
+///         <item>
+///             <term>Double-Click</term> <description>Accepts the clicked codepoint (<see cref="Command.Accept"/>).</description>
+///         </item>
+///         <item>
+///             <term>Right-Click / Ctrl+Click</term> <description>Opens the context menu.</description>
+///         </item>
+///         <item>
+///             <term>Wheel Up / Down / Left / Right</term> <description>Scrolls the map.</description>
+///         </item>
+///     </list>
+/// </remarks>
 public class CharMap : View, IDesignable, IValue<Rune>
 {
     /// <summary>

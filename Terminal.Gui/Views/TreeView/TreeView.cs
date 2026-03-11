@@ -65,6 +65,53 @@ public class TreeView : TreeView<ITreeNode>, IDesignable
 ///     a user defined <see cref="ITreeBuilder{T}"/>.
 ///     <a href="../docs/treeview.md">See TreeView Deep Dive for more information</a>.
 /// </summary>
+/// <remarks>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Up</term> <description>Moves up one node.</description>
+///         </item>
+///         <item>
+///             <term>Down</term> <description>Moves down one node.</description>
+///         </item>
+///         <item>
+///             <term>Right</term> <description>Expands the current branch.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Right</term> <description>Expands the current branch and all sub-branches.</description>
+///         </item>
+///         <item>
+///             <term>Left</term> <description>Collapses the current branch.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Left</term> <description>Collapses the current branch and all sub-branches.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Up</term> <description>Moves up to the first branch at the same level.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Down</term> <description>Moves down to the last branch at the same level.</description>
+///         </item>
+///         <item>
+///             <term>PageUp / PageDown</term> <description>Moves one page up or down.</description>
+///         </item>
+///         <item>
+///             <term>Shift+Up / Shift+Down</term> <description>Extends the selection up or down.</description>
+///         </item>
+///         <item>
+///             <term>Shift+PageUp / Shift+PageDown</term> <description>Extends the selection by one page.</description>
+///         </item>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last node.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+A</term> <description>Selects all nodes.</description>
+///         </item>
+///     </list>
+/// </remarks>
 public class TreeView<T> : View, ITreeView where T : class
 {
     /// <summary>
