@@ -4,10 +4,9 @@ using System.Diagnostics;
 
 namespace Terminal.Gui.ViewBase;
 
-#region API Docs
 
 /// <summary>
-///     View is the base class all visible elements. View can render itself and
+///     View is the base class for all visible elements. View can render itself and
 ///     contains zero or more nested views, called SubViews. View provides basic functionality for layout, arrangement, and
 ///     drawing. In addition, View provides keyboard and mouse event handling.
 ///     <para>
@@ -19,9 +18,32 @@ namespace Terminal.Gui.ViewBase;
 ///         for more.
 ///     </para>
 /// </summary>
-
-#endregion API Docs
-
+/// <remarks>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Space</term> <description>Activates the view (<see cref="Command.Activate"/>).</description>
+///         </item>
+///         <item>
+///             <term>Enter</term> <description>Accepts the view (<see cref="Command.Accept"/>).</description>
+///         </item>
+///     </list>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left Button Released</term> <description>Activates the view (<see cref="Command.Activate"/>).</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Left Button Released</term> <description>Opens the context menu (<see cref="Command.Context"/>).</description>
+///         </item>
+///     </list>
+/// </remarks>
 public partial class View : IDisposable, ISupportInitializeNotification
 {
     private bool _disposedValue;

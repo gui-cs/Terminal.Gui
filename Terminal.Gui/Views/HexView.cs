@@ -28,6 +28,51 @@ namespace Terminal.Gui.Views;
 ///         Control the byte at the caret for editing by setting the <see cref="Address"/> property to an offset in the
 ///         stream.
 ///     </para>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Moves the cursor one nibble/byte.</description>
+///         </item>
+///         <item>
+///             <term>Up / Down</term> <description>Moves the cursor one row up or down.</description>
+///         </item>
+///         <item>
+///             <term>PageUp / PageDown</term> <description>Moves one page up or down.</description>
+///         </item>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last byte in the stream.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Left / Ctrl+Right</term> <description>Moves to the start or end of the current row.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Up / Ctrl+Down</term> <description>Moves to the start or end of the current page.</description>
+///         </item>
+///         <item>
+///             <term>Backspace</term> <description>Deletes the byte before the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Delete</term> <description>Deletes the byte at the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Insert</term> <description>Toggles insert mode.</description>
+///         </item>
+///     </list>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Click / Double-Click</term> <description>Positions the cursor at the clicked byte.</description>
+///         </item>
+///         <item>
+///             <term>Wheel Up / Down</term> <description>Scrolls the view.</description>
+///         </item>
+///     </list>
 /// </remarks>
 public class HexView : View, IDesignable
 {

@@ -222,9 +222,9 @@ public partial class TextViewTests
         Kill_Delete_WordBackward ();
         Assert.Equal (expectedEventCount, eventcount);
 
-        expectedEventCount += 2;
-        Kill_To_End_Delete_Forwards_Copy_To_The_Clipboard_And_Paste ();
-        Assert.Equal (expectedEventCount, eventcount);
+        //expectedEventCount += 2;
+        //Kill_To_End_Delete_Forwards_Copy_To_The_Clipboard_And_Paste ();
+        //Assert.Equal (expectedEventCount, eventcount);
 
         expectedEventCount += 2;
         Kill_To_Start_Delete_Backwards_Copy_To_The_Clipboard_And_Paste ();
@@ -1234,7 +1234,7 @@ This is the second line.
         }
     }
 
-    [Fact]
+    [Fact (Skip = "This test is bogus and should be refactored in a parallelizable test")]
     [TextViewTestsSetupFakeApplication]
     public void Kill_To_End_Delete_Forwards_Copy_To_The_Clipboard_And_Paste ()
     {

@@ -1,6 +1,29 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>Control that hosts multiple sub views, presenting a single one at once.</summary>
+/// <remarks>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Moves to the previous or next tab.</description>
+///         </item>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last tab.</description>
+///         </item>
+///         <item>
+///             <term>PageUp / PageDown</term> <description>Scrolls the tab strip one page.</description>
+///         </item>
+///         <item>
+///             <term>Up</term> <description>Moves focus into the tab content area.</description>
+///         </item>
+///         <item>
+///             <term>Down</term> <description>Moves focus back to the tab strip.</description>
+///         </item>
+///     </list>
+/// </remarks>
 public class TabView : View
 {
     /// <summary>The default <see cref="MaxTabTextWidth"/> to set on new <see cref="TabView"/> controls.</summary>

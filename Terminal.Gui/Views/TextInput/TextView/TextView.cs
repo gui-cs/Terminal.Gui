@@ -7,7 +7,7 @@ namespace Terminal.Gui.Views;
 ///     <para>Default key bindings:</para>
 ///     <list type="table">
 ///         <listheader>
-///             <term>Shortcut</term> <description>Action</description>
+///             <term>Key</term> <description>Action</description>
 ///         </listheader>
 ///         <item>
 ///             <term>Left, Ctrl+B</term> <description>Moves the editing point left.</description>

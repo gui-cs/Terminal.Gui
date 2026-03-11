@@ -51,6 +51,15 @@ namespace Terminal.Gui.Views;
 ///         Both <see cref="View.Width"/> and <see cref="View.Height"/> default to <see cref="DimAutoStyle.Text"/>,
 ///         so the link auto-sizes to fit whichever text is displayed (<see cref="View.Text"/> or <see cref="Url"/>).
 ///     </para>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Click</term> <description>Accepts the link, opening the URL (<see cref="Command.Accept"/>).</description>
+///         </item>
+///     </list>
 /// </remarks>
 public class Link : View, IDesignable
 {

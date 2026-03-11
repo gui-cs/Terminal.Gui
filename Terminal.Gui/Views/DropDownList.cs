@@ -59,6 +59,27 @@ namespace Terminal.Gui.Views;
 ///         };
 ///         dropdown.ValueChanged += (s, e) => MessageBox.Query ("Selected", dropdown.Text, "Ok");
 ///     </code>
+///     <para>Default key bindings (in addition to <see cref="TextField"/> bindings):</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>F4</term> <description>Toggles the dropdown list open or closed.</description>
+///         </item>
+///         <item>
+///             <term>Alt+Down</term> <description>Toggles the dropdown list open or closed.</description>
+///         </item>
+///     </list>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Click</term> <description>Activates the dropdown (<see cref="Command.Activate"/>).</description>
+///         </item>
+///     </list>
 /// </remarks>
 public class DropDownList : TextField
 {
