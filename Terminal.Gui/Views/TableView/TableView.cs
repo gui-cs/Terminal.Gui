@@ -16,6 +16,44 @@ public delegate Scheme? RowColorGetterDelegate (RowColorGetterArgs args);
 ///     Displays and enables infinite scrolling through tabular data based on a <see cref="ITableSource"/>.
 ///     <a href="../docs/tableview.md">See the TableView Deep Dive for more</a>.
 /// </summary>
+/// <remarks>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Moves one column left or right.</description>
+///         </item>
+///         <item>
+///             <term>Up / Down</term> <description>Moves one row up or down.</description>
+///         </item>
+///         <item>
+///             <term>PageUp / PageDown</term> <description>Moves one page up or down.</description>
+///         </item>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last column.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Home / Ctrl+End</term> <description>Moves to the first or last row.</description>
+///         </item>
+///         <item>
+///             <term>Shift+&lt;movement&gt;</term> <description>Extends the selection in the given direction.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+A</term> <description>Selects all cells.</description>
+///         </item>
+///     </list>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Click</term> <description>Activates the clicked cell (<see cref="Command.Activate"/>).</description>
+///         </item>
+///     </list>
+/// </remarks>
 public partial class TableView : View, IDesignable
 {
     /// <summary>

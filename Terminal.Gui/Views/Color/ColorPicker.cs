@@ -4,6 +4,17 @@ namespace Terminal.Gui.Views;
 ///     Color Picker supporting RGB, HSL, and HSV color models. Supports choosing colors with
 ///     sliders and color names from the <see cref="IColorNameResolver"/>.
 /// </summary>
+/// <remarks>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Double-Click</term> <description>Accepts the selected color (<see cref="Command.Accept"/>).</description>
+///         </item>
+///     </list>
+/// </remarks>
 public class ColorPicker : View, IValue<Color?>, IDesignable
 {
     /// <summary>

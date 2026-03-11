@@ -68,7 +68,6 @@ public partial class TextView
         KeyBindings.Add (Key.Enter, Multiline ? Command.NewLine : Command.Accept);
 
         KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.V.WithCtrl, Command.PageDown);
 
         KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
 
@@ -112,11 +111,11 @@ public partial class TextView
 
         KeyBindings.Add (Key.K.WithCtrl, Command.CutToEndOfLine); // kill-to-end
 
-        KeyBindings.Add (Key.Delete.WithCtrl.WithShift, Command.CutToEndOfLine); // kill-to-end
+        KeyBindings.Add (Key.Delete.WithCtrl.WithShift, Command.DeleteAll);
 
         KeyBindings.Add (Key.Backspace.WithCtrl.WithShift, Command.CutToStartOfLine); // kill-to-start
 
-        KeyBindings.Add (Key.Y.WithCtrl, Command.Paste); // Control-y, yank
+        KeyBindings.Add (Key.V.WithCtrl, Command.Paste);
         KeyBindings.Add (Key.Space.WithCtrl, Command.ToggleExtend);
 
         KeyBindings.Add (Key.C.WithCtrl, Command.Copy);
@@ -144,10 +143,13 @@ public partial class TextView
         KeyBindings.Add (Key.Tab.WithShift, Command.PreviousTabStop);
 
         KeyBindings.Add (Key.Z.WithCtrl, Command.Undo);
-        KeyBindings.Add (Key.R.WithCtrl, Command.Redo);
+        KeyBindings.Add (Key.Y.WithCtrl, Command.Redo);
 
-        KeyBindings.Add (Key.G.WithCtrl, Command.DeleteAll);
-        KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);
+        if (!PlatformDetection.IsWindows ())
+        {
+            KeyBindings.Add (new Key ('/').WithCtrl, Command.Undo);
+            KeyBindings.Add (Key.Z.WithCtrl.WithShift, Command.Redo);
+        }
 
         KeyBindings.Add (Key.L.WithCtrl, Command.Open);
     }
@@ -371,9 +373,7 @@ public partial class TextView
             return true;
         }
 
-        _selectionStartColumn = 0;
-        _selectionStartRow = 0;
-        MoveBottomEndExtend ();
+        SelectAll ();
 
         return DeleteCharLeft ();
     }

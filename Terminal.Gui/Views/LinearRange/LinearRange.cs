@@ -4,6 +4,47 @@ namespace Terminal.Gui.Views;
 ///     Provides a linear range control letting the user navigate from a set of typed options in a linear manner using the
 ///     keyboard or mouse.
 /// </summary>
+/// <remarks>
+///     <para>Default key bindings (when <see cref="Orientation"/> is <see cref="Orientation.Horizontal"/>):</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Moves to the previous or next option.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Left / Ctrl+Right</term> <description>Moves by a larger step.</description>
+///         </item>
+///     </list>
+///     <para>Default key bindings (when <see cref="Orientation"/> is <see cref="Orientation.Vertical"/>):</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Up / Down</term> <description>Moves to the previous or next option.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Up / Ctrl+Down</term> <description>Moves by a larger step.</description>
+///         </item>
+///     </list>
+///     <para>Common key bindings (both orientations):</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last option.</description>
+///         </item>
+///         <item>
+///             <term>Enter</term> <description>Accepts the current selection (<see cref="Command.Accept"/>).</description>
+///         </item>
+///         <item>
+///             <term>Space</term> <description>Activates the current selection (<see cref="Command.Activate"/>).</description>
+///         </item>
+///     </list>
+/// </remarks>
 public class LinearRange : LinearRange<object>
 {
     /// <summary>
@@ -23,10 +64,50 @@ public class LinearRange : LinearRange<object>
 
 /// <summary>
 ///     Provides a type-safe linear range control letting the user navigate from a set of typed options in a linear manner
-///     using the
-///     keyboard or mouse.
+///     using the keyboard or mouse.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">The type of the options.</typeparam>
+/// <remarks>
+///     <para>Default key bindings (when <see cref="Orientation"/> is <see cref="Orientation.Horizontal"/>):</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Moves to the previous or next option.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Left / Ctrl+Right</term> <description>Moves by a larger step.</description>
+///         </item>
+///     </list>
+///     <para>Default key bindings (when <see cref="Orientation"/> is <see cref="Orientation.Vertical"/>):</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Up / Down</term> <description>Moves to the previous or next option.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Up / Ctrl+Down</term> <description>Moves by a larger step.</description>
+///         </item>
+///     </list>
+///     <para>Common key bindings (both orientations):</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last option.</description>
+///         </item>
+///         <item>
+///             <term>Enter</term> <description>Accepts the current selection (<see cref="Command.Accept"/>).</description>
+///         </item>
+///         <item>
+///             <term>Space</term> <description>Activates the current selection (<see cref="Command.Activate"/>).</description>
+///         </item>
+///     </list>
+/// </remarks>
 public class LinearRange<T> : View, IOrientation
 {
     private readonly LinearRangeConfiguration _config = new ();
