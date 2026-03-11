@@ -31,29 +31,22 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         app.Init ();
         _app = app;
 
-        TabView tv = new () { Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
-
-        Tab single = new ();
-        single.DisplayText = "Single";
-        single.View = BuildSingleTab ();
-
-        Tab bulk = new ();
-        bulk.DisplayText = "Multi";
-        bulk.View = BuildBulkTab ();
-
-        tv.AddTab (single, true);
-        tv.AddTab (bulk, false);
+        // TODO: Restore TabView usage after TabView rewrite (#4183)
+        View singleView = BuildSingleTab ();
+        View bulkView = BuildBulkTab ();
 
         // Setup - Create a top-level application window and configure it.
         using Window appWindow = new ();
         appWindow.Title = GetQuitKeyAndName ();
 
-        appWindow.Add (tv);
+        singleView.Width = Dim.Fill ();
+        singleView.Height = Dim.Fill ();
+        appWindow.Add (singleView);
 
         // Run - Start the application.
         app.Run (appWindow);
-        bulk.View.Dispose ();
-        single.View.Dispose ();
+        bulkView.Dispose ();
+        singleView.Dispose ();
 
         _app.RemoveTimeout (_updateTimeoutToken!);
         _app.RemoveTimeout (_sendDarTimeoutToken!);

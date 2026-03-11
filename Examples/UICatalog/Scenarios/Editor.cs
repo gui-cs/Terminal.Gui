@@ -27,7 +27,6 @@ public class Editor : Scenario
     private CheckBox? _miForceMinimumPosToZeroCheckBox;
     private byte []? _originalText;
     private bool _saved = true;
-    private TabView? _tabView;
     private string _textToFind = string.Empty;
     private string _textToReplace = string.Empty;
     private TextView? _textView;
@@ -935,16 +934,14 @@ public class Editor : Scenario
 
     private void ShowFindReplace (bool isFind = true)
     {
-        if (_findReplaceWindow is null || _tabView is null)
+        if (_findReplaceWindow is null)
         {
             return;
         }
 
         _findReplaceWindow.Visible = true;
         _findReplaceWindow.SuperView?.MoveSubViewToStart (_findReplaceWindow);
-        _tabView.SetFocus ();
-        _tabView.SelectedTab = isFind ? _tabView.Tabs.ToArray () [0] : _tabView.Tabs.ToArray () [1];
-        _tabView.SelectedTab?.View?.FocusDeepest (NavigationDirection.Forward, null);
+        _findReplaceWindow.FocusDeepest (NavigationDirection.Forward, null);
     }
 
     private void CreateFindReplace ()
@@ -956,14 +953,14 @@ public class Editor : Scenario
 
         _findReplaceWindow = new FindReplaceWindow (_textView);
 
-        _tabView = new TabView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (0) };
+        // TODO: Restore TabView usage after TabView rewrite (#4183)
+        View findView = CreateFindTab ();
+        findView.X = 0;
+        findView.Y = 0;
+        findView.Width = Dim.Fill ();
+        findView.Height = Dim.Fill ();
 
-        _tabView.AddTab (new Tab { DisplayText = "Find", View = CreateFindTab () }, true);
-        _tabView.AddTab (new Tab { DisplayText = "Replace", View = CreateReplaceTab () }, false);
-
-        _tabView.SelectedTabChanged += (s, e) => { _tabView.SelectedTab?.View?.FocusDeepest (NavigationDirection.Forward, null); };
-
-        _findReplaceWindow.Add (_tabView);
+        _findReplaceWindow.Add (findView);
         _findReplaceWindow.Visible = false;
         _appWindow.Add (_findReplaceWindow);
     }
