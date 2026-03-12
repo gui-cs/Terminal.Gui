@@ -12,8 +12,11 @@ internal class TabRow : View
         Id = "TabRow";
 #endif
         CanFocus = false;
-        Width = Dim.Fill ();
-        Height = 2;
+
+        // Extend past the Padding bounds to overlap with the Border's left/right columns
+        X = -1;
+        Width = Dim.Fill (-1);
+        Height = 3;
         SuperViewRendersLineCanvas = true;
     }
 
@@ -23,7 +26,14 @@ internal class TabRow : View
     /// <summary>Rebuilds tab header views from the current set of Tabs.</summary>
     internal void RebuildHeaders ()
     {
-        RemoveAll ();
+        // Dispose old headers before removing them — they are owned by TabRow
+        View [] oldHeaders = [.. SubViews];
+
+        for (int i = oldHeaders.Length - 1; i >= 0; i--)
+        {
+            Remove (oldHeaders [i]);
+            oldHeaders [i].Dispose ();
+        }
 
         TabView? tabView = TabView;
 
@@ -35,7 +45,7 @@ internal class TabRow : View
         IReadOnlyList<Tab> tabs = tabView.Tabs;
         View? previous = null;
 
-        for (int i = 0; i < tabs.Count; i++)
+        for (var i = 0; i < tabs.Count; i++)
         {
             int tabIndex = i;
             Tab tab = tabs [i];
@@ -45,13 +55,16 @@ internal class TabRow : View
 #if DEBUG
                 Id = $"TabHeader_{tab.Title}",
 #endif
-                Title = tab.Title,
+                Text = tab.Title,
                 BorderStyle = LineStyle.Rounded,
                 SuperViewRendersLineCanvas = true,
                 Width = Dim.Auto (DimAutoStyle.Text),
-                Height = 2,
-                CanFocus = false,
+                Height = 3,
+                CanFocus = false
             };
+
+            // Disable title rendering in the border — we use Text, not Title
+            header.Border!.Settings &= ~BorderSettings.Title;
 
             // Position: first header at X=0, others adjacent (overlapping by 1 for shared edges)
             if (previous is null)
@@ -65,10 +78,7 @@ internal class TabRow : View
 
             header.MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
 
-            header.Accepting += (_, _) =>
-                                {
-                                    tabView.SelectedTabIndex = tabIndex;
-                                };
+            header.Activating += (_, _) => { tabView.SelectedTabIndex = tabIndex; };
 
             Add (header);
             previous = header;
@@ -92,16 +102,14 @@ internal class TabRow : View
         bool tabsOnBottom = tabView.TabsOnBottom;
         View [] headers = [.. SubViews];
 
-        for (int i = 0; i < headers.Length && i < tabs.Count; i++)
+        for (var i = 0; i < headers.Length && i < tabs.Count; i++)
         {
             View header = headers [i];
 
             if (i == selectedIndex)
             {
                 // Selected tab: open bottom (tabs on top) or open top (tabs on bottom)
-                header.Border!.Thickness = tabsOnBottom
-                                               ? new Thickness (1, 0, 1, 1)
-                                               : new Thickness (1, 1, 1, 0);
+                header.Border!.Thickness = tabsOnBottom ? new Thickness (1, 0, 1, 1) : new Thickness (1, 1, 1, 0);
             }
             else
             {
@@ -110,16 +118,17 @@ internal class TabRow : View
             }
         }
 
-        // Update the TabView's border gaps to create the opening under/over the selected tab
+        // Update the TabView's border gaps
         UpdateBorderGaps ();
 
         SetNeedsLayout ();
     }
 
     /// <summary>
-    ///     Updates the TabView's Border gaps so the selected tab visually connects to the content area.
+    ///     Updates the TabView's Border gaps so the right (or left) border is suppressed in the tab header area,
+    ///     and draws the continuation line from the last tab to the edge of the view.
     /// </summary>
-    private void UpdateBorderGaps ()
+    internal void UpdateBorderGaps ()
     {
         TabView? tabView = TabView;
 
@@ -130,42 +139,72 @@ internal class TabRow : View
 
         tabView.Border!.ClearAllGaps ();
 
-        int? selectedIndex = tabView.SelectedTabIndex;
+        View [] headers = [.. SubViews];
 
-        if (!selectedIndex.HasValue)
+        if (headers.Length == 0)
         {
             return;
+        }
+
+        bool tabsOnBottom = tabView.TabsOnBottom;
+
+        // Suppress the right border above (or below) the continuation line.
+        // The Border draws segmented lines around gaps, so at the continuation row
+        // the right line segment starts fresh (only "down"), and auto-join with the
+        // horizontal continuation line produces ╮ (not ┤).
+        if (tabsOnBottom)
+        {
+            tabView.Border.RightGaps.Add (new BorderGap (tabView.Border.Frame.Height - 2, 2));
+        }
+        else
+        {
+            tabView.Border.RightGaps.Add (new BorderGap (0, 2));
+        }
+    }
+
+    /// <inheritdoc />
+    protected override bool OnDrawingContent (DrawContext? context)
+    {
+        TabView? tabView = TabView;
+
+        if (tabView is null)
+        {
+            return base.OnDrawingContent (context);
         }
 
         View [] headers = [.. SubViews];
 
-        if (selectedIndex.Value >= headers.Length)
+        if (headers.Length == 0)
         {
-            return;
+            return base.OnDrawingContent (context);
         }
 
-        View selectedHeader = headers [selectedIndex.Value];
+        bool tabsOnBottom = tabView.TabsOnBottom;
 
-        // The gap position is relative to the TabView border rectangle
-        // The header's Frame.X is relative to TabRow, and TabRow is in Padding
-        // We need the position relative to the border
-        int gapPosition = selectedHeader.Frame.X + 1; // +1 to skip the header's left border
-        int gapLength = Math.Max (0, selectedHeader.Frame.Width - 2); // Exclude the header's left/right borders
+        // Draw the continuation line from the last tab header to the right edge of the view.
+        // This line forms the top (or bottom) boundary of the content area where there are no tabs.
+        View lastHeader = headers [^1];
+        int lineY = tabsOnBottom ? 0 : Frame.Height - 1;
 
-        if (gapLength <= 0)
+        // Use the TabView's border rectangle for precise screen coordinates
+        Rectangle borderBounds = tabView.Border!.GetBorderRectangle ();
+        int screenRightX = borderBounds.X + borderBounds.Width - 1;
+
+        // The start position overlaps with the last header's right border
+        Point screenStart = ViewportToScreen (new Point (lastHeader.Frame.Right - 1, lineY));
+        int lineLength = screenRightX - screenStart.X + 1;
+
+        if (lineLength > 0)
         {
-            return;
+            // The horizontal continuation line auto-joins with the Border's segmented right line
+            // at the endpoint to produce the corner junction (e.g., ╮ for tabs on top).
+            LineCanvas.AddLine (
+                                screenStart,
+                                lineLength,
+                                Orientation.Horizontal,
+                                tabView.BorderStyle);
         }
 
-        BorderGap gap = new (gapPosition, gapLength);
-
-        if (tabView.TabsOnBottom)
-        {
-            tabView.Border.BottomGaps.Add (gap);
-        }
-        else
-        {
-            tabView.Border.TopGaps.Add (gap);
-        }
+        return base.OnDrawingContent (context);
     }
 }

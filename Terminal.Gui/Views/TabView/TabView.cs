@@ -19,8 +19,6 @@ public class TabView : View, IDesignable
     private readonly TabRow _tabRow;
 
     private int? _selectedTabIndex;
-    private bool _tabsOnBottom;
-    private uint _maxTabTextWidth = 30;
 
     /// <summary>Creates a new <see cref="TabView"/>.</summary>
     public TabView ()
@@ -29,12 +27,18 @@ public class TabView : View, IDesignable
         SuperViewRendersLineCanvas = true;
         BorderStyle = LineStyle.Rounded;
 
-        _tabRow = new ();
+        // No top border — the tab headers form the top of the view
+        Border!.Thickness = new Thickness (1, 0, 1, 1);
+
+        _tabRow = new TabRow ();
         Padding!.Add (_tabRow);
 
-        // Default: tabs on top — reserve 2 rows in Padding.Top for TabRow
-        Padding.Thickness = Padding.Thickness with { Top = 2 };
+        // Default: tabs on top — reserve 3 rows in Padding.Top for TabRow
+        Padding.Thickness = Padding.Thickness with { Top = 3 };
         _tabRow.Y = 0;
+
+        // Recompute border gaps after all subviews (including Padding's TabRow) are laid out
+        SubViewsLaidOut += (_, _) => _tabRow.UpdateBorderGaps ();
 
         // Register commands
         AddCommand (Command.Left, () => SelectPreviousTab ());
@@ -93,31 +97,31 @@ public class TabView : View, IDesignable
     }
 
     /// <summary>Gets the currently selected <see cref="Tab"/>, or <see langword="null"/> if no tab is selected.</summary>
-    public Tab? SelectedTab => _selectedTabIndex.HasValue
-                                   ? Tabs.ElementAtOrDefault (_selectedTabIndex.Value)
-                                   : null;
+    public Tab? SelectedTab => _selectedTabIndex.HasValue ? Tabs.ElementAtOrDefault (_selectedTabIndex.Value) : null;
 
     /// <summary>Gets or sets whether tabs are displayed at the bottom of the view instead of the top.</summary>
     public bool TabsOnBottom
     {
-        get => _tabsOnBottom;
+        get;
         set
         {
-            if (_tabsOnBottom == value)
+            if (field == value)
             {
                 return;
             }
 
-            _tabsOnBottom = value;
+            field = value;
 
             if (value)
             {
-                Padding!.Thickness = Padding.Thickness with { Top = 0, Bottom = 2 };
+                Border!.Thickness = new Thickness (1, 1, 1, 0);
+                Padding!.Thickness = Padding.Thickness with { Top = 0, Bottom = 3 };
                 _tabRow.Y = Pos.AnchorEnd ();
             }
             else
             {
-                Padding!.Thickness = Padding.Thickness with { Top = 2, Bottom = 0 };
+                Border!.Thickness = new Thickness (1, 0, 1, 1);
+                Padding!.Thickness = Padding.Thickness with { Top = 3, Bottom = 0 };
                 _tabRow.Y = 0;
             }
 
@@ -129,21 +133,32 @@ public class TabView : View, IDesignable
     /// <summary>Gets or sets the maximum display width for tab header text. Default is 30.</summary>
     public uint MaxTabTextWidth
     {
-        get => _maxTabTextWidth;
+        get;
         set
         {
-            _maxTabTextWidth = value;
+            field = value;
             _tabRow.RebuildHeaders ();
         }
-    }
+    } = 30;
 
     /// <summary>Raised after <see cref="SelectedTabIndex"/> changes.</summary>
     public event EventHandler<ValueChangedEventArgs<Tab?>>? SelectedTabChanged;
 
     /// <summary>Raises the <see cref="SelectedTabChanged"/> event.</summary>
-    protected virtual void OnSelectedTabChanged (ValueChangedEventArgs<Tab?> args)
+    protected virtual void OnSelectedTabChanged (ValueChangedEventArgs<Tab?> args) => SelectedTabChanged?.Invoke (this, args);
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
     {
-        SelectedTabChanged?.Invoke (this, args);
+        if (disposing)
+        {
+            // Clear event handlers before base.Dispose removes SubViews.
+            // SubView removal triggers OnSubViewRemoved → SelectedTabIndex setter → SelectedTabChanged.
+            // Event handlers may reference views that are already disposed by the parent's disposal chain.
+            SelectedTabChanged = null;
+        }
+
+        base.Dispose (disposing);
     }
 
     /// <inheritdoc/>
@@ -151,15 +166,16 @@ public class TabView : View, IDesignable
     {
         base.OnSubViewAdded (view);
 
-        if (view is Tab)
+        if (view is not Tab)
         {
-            _tabRow.RebuildHeaders ();
+            return;
+        }
+        _tabRow.RebuildHeaders ();
 
-            // If no tab is selected, select this one
-            if (!_selectedTabIndex.HasValue)
-            {
-                SelectedTabIndex = Tabs.Count - 1;
-            }
+        // If no tab is selected, select this one
+        if (!_selectedTabIndex.HasValue)
+        {
+            SelectedTabIndex = Tabs.Count - 1;
         }
     }
 
@@ -168,26 +184,35 @@ public class TabView : View, IDesignable
     {
         base.OnSubViewRemoved (view);
 
-        if (view is Tab)
+        if (view is not Tab)
         {
-            _tabRow.RebuildHeaders ();
+            return;
+        }
 
-            IReadOnlyList<Tab> tabs = Tabs;
+        // During disposal, adornments are disposed before SubViews are removed.
+        // Skip rebuilding headers and adjusting selection to avoid creating orphaned views.
+        if (Border is null)
+        {
+            return;
+        }
 
-            // Adjust selection if the removed tab was selected or if selection is out of range
-            if (tabs.Count == 0)
-            {
-                _selectedTabIndex = null;
-            }
-            else if (_selectedTabIndex.HasValue && _selectedTabIndex.Value >= tabs.Count)
-            {
-                SelectedTabIndex = tabs.Count - 1;
-            }
-            else
-            {
-                // Re-apply to refresh visibility
-                SelectedTabIndex = _selectedTabIndex;
-            }
+        _tabRow.RebuildHeaders ();
+
+        IReadOnlyList<Tab> tabs = Tabs;
+
+        // Adjust selection if the removed tab was selected or if selection is out of range
+        if (tabs.Count == 0)
+        {
+            _selectedTabIndex = null;
+        }
+        else if (_selectedTabIndex.HasValue && _selectedTabIndex.Value >= tabs.Count)
+        {
+            SelectedTabIndex = tabs.Count - 1;
+        }
+        else
+        {
+            // Re-apply to refresh visibility
+            SelectedTabIndex = _selectedTabIndex;
         }
     }
 
@@ -218,7 +243,7 @@ public class TabView : View, IDesignable
             return false;
         }
 
-        if (!_selectedTabIndex.HasValue || _selectedTabIndex.Value <= 0)
+        if (_selectedTabIndex is not > 0)
         {
             SelectedTabIndex = tabs.Count - 1;
         }

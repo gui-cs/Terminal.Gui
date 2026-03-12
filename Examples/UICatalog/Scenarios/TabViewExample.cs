@@ -149,6 +149,7 @@ public class TabViewExample : Scenario
                                       if (selected is not null)
                                       {
                                           tabView.Remove (selected);
+                                          selected.Dispose ();
                                       }
                                   };
 
@@ -240,6 +241,6 @@ public class TabViewExample : Scenario
 
         mainWindow.Add (eventLog);
 
-        Application.Run (mainWindow);
+        app.Run (mainWindow);
     }
 }

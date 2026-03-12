@@ -13,6 +13,6 @@ public class Tab : View
         CanFocus = true;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
-        Visible = false;
+        base.Visible = false;
     }
 }

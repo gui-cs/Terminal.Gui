@@ -413,7 +413,15 @@ public partial class Border : Adornment
 
         if (drawLeft)
         {
-            lc?.AddLine (borderBounds.Location with { Y = titleY }, sideLineLength, Orientation.Vertical, lineStyle, normalAttribute);
+            if (LeftGaps.Count > 0)
+            {
+                // Draw segmented left line, skipping gap regions.
+                DrawSegmentedVerticalLine (lc, borderBounds.X, titleY, sideLineLength, LeftGaps, lineStyle, normalAttribute);
+            }
+            else
+            {
+                lc?.AddLine (borderBounds.Location with { Y = titleY }, sideLineLength, Orientation.Vertical, lineStyle, normalAttribute);
+            }
         }
 #endif
 
@@ -428,7 +436,18 @@ public partial class Border : Adornment
 
         if (drawRight)
         {
-            lc?.AddLine (new Point (borderBounds.X + borderBounds.Width - 1, titleY), sideLineLength, Orientation.Vertical, lineStyle, normalAttribute);
+            int rightX = borderBounds.X + borderBounds.Width - 1;
+
+            if (RightGaps.Count > 0)
+            {
+                // Draw segmented right line, skipping gap regions.
+                // This produces correct auto-join at segment boundaries (e.g., ╮ instead of ┤).
+                DrawSegmentedVerticalLine (lc, rightX, titleY, sideLineLength, RightGaps, lineStyle, normalAttribute);
+            }
+            else
+            {
+                lc?.AddLine (new Point (rightX, titleY), sideLineLength, Orientation.Vertical, lineStyle, normalAttribute);
+            }
         }
 
         // SetAttribute (prevAttr);
@@ -528,6 +547,50 @@ public partial class Border : Adornment
         steps = [15];
     }
 
+    /// <summary>
+    ///     Draws a vertical line at the specified X coordinate, splitting it into segments that skip over gaps.
+    ///     Each segment is an independent <see cref="LineCanvas.AddLine(StraightLine)"/> call, so auto-join at segment
+    ///     boundaries produces correct corner glyphs (e.g., ╮) instead of T-junctions (e.g., ┤).
+    /// </summary>
+    private static void DrawSegmentedVerticalLine (
+        LineCanvas? lc,
+        int x,
+        int startY,
+        int totalLength,
+        List<BorderGap> gaps,
+        LineStyle lineStyle,
+        Attribute attribute)
+    {
+        if (lc is null || totalLength <= 0)
+        {
+            return;
+        }
+
+        // Build sorted list of gap intervals (relative to startY)
+        List<BorderGap> sortedGaps = [.. gaps.OrderBy (g => g.Position)];
+        var currentY = 0;
+
+        foreach (BorderGap gap in sortedGaps)
+        {
+            int segmentLength = gap.Position - currentY;
+
+            if (segmentLength > 0)
+            {
+                lc.AddLine (new Point (x, startY + currentY), segmentLength, Orientation.Vertical, lineStyle, attribute);
+            }
+
+            currentY = gap.Position + gap.Length;
+        }
+
+        // Draw remaining segment after the last gap
+        int remainingLength = totalLength - currentY;
+
+        if (remainingLength > 0)
+        {
+            lc.AddLine (new Point (x, startY + currentY), remainingLength, Orientation.Vertical, lineStyle, attribute);
+        }
+    }
+
     private void ApplyGaps (LineCanvas lc, Rectangle borderBounds)
     {
         foreach (BorderGap gap in TopGaps)
@@ -540,14 +603,8 @@ public partial class Border : Adornment
             lc.Exclude (new Region (new Rectangle (borderBounds.X + gap.Position, borderBounds.Y + borderBounds.Height - 1, gap.Length, 1)));
         }
 
-        foreach (BorderGap gap in LeftGaps)
-        {
-            lc.Exclude (new Region (new Rectangle (borderBounds.X, borderBounds.Y + gap.Position, 1, gap.Length)));
-        }
-
-        foreach (BorderGap gap in RightGaps)
-        {
-            lc.Exclude (new Region (new Rectangle (borderBounds.X + borderBounds.Width - 1, borderBounds.Y + gap.Position, 1, gap.Length)));
-        }
+        // LeftGaps and RightGaps are handled via segmented line drawing in OnDrawingContent,
+        // not via Exclude. This allows other views (e.g., TabRow) to draw lines at gap positions
+        // without being suppressed by the exclusion region.
     }
 }
