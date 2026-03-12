@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Terminal.Gui.Configuration;
 using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.App;
@@ -272,8 +271,7 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
                 return null;
             }
 
-            handled = binding.Target?.InvokeCommands (binding.Commands,
-                                                      binding with { Source = binding.Target is { } t ? new WeakReference<View> (t) : null });
+            handled = binding.Target?.InvokeCommands (binding.Commands, binding with { Source = binding.Target is { } t ? new WeakReference<View> (t) : null });
         }
         else
         {
@@ -305,7 +303,6 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
         CommandContext context = new (command, null, binding); // Create the context here
 
         return implementation (context);
-
     }
 
     internal void AddKeyBindings ()

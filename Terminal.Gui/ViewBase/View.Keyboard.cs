@@ -654,7 +654,15 @@ public partial class View // Keyboard APIs
     ///     </para>
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    public static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings
+    {
+        get => field;
+        set
+        {
+            field = value;
+            Trace.Configuration ("DefaultKeyBindings", "View Set", $"{string.Join (", ", value?.Select (kvp => $"{kvp.Key}=[{kvp.Value}]") ?? [])}");
+        }
+    } = new ()
     {
         // Navigation
         [Command.Left] = Bind.All ("CursorLeft"),

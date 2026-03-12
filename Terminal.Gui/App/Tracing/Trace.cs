@@ -348,5 +348,23 @@ public static class Trace
         Backend.Log (new TraceEntry (TraceCategory.Keyboard, view.ToIdentifyingString (), phase, method, message, DateTime.UtcNow, key));
     }
 
+    /// <summary>
+    ///     Traces a keyboard binding event.
+    /// </summary>
+    /// <param name="binding">The keyboard binding being processed.</param>
+    /// <param name="phase">The phase of processing.</param>
+    /// <param name="message">Optional additional context.</param>
+    /// <param name="method">Automatically captured caller method name.</param>
+    [Conditional ("DEBUG")]
+    public static void Keyboard (PlatformKeyBinding binding, string phase, string? message = null, [CallerMemberName] string method = "")
+    {
+        if (!EnabledCategories.HasFlag (TraceCategory.Keyboard))
+        {
+            return;
+        }
+
+        Backend.Log (new TraceEntry (TraceCategory.Keyboard, binding.GetCurrentPlatformKeys ().ToString(), phase, method, message, DateTime.UtcNow, binding));
+    }
+
     #endregion
 }

@@ -18,6 +18,34 @@ public record PlatformKeyBinding
     /// <summary>Gets or sets additional keys for macOS only.</summary>
     public string []? Macos { get; init; }
 
+    /// <inheritdoc/>
+    public override string ToString ()
+    {
+        List<string> parts = [];
+
+        if (All is { Length: > 0 })
+        {
+            parts.Add ($"All=[{string.Join (", ", All)}]");
+        }
+
+        if (Windows is { Length: > 0 })
+        {
+            parts.Add ($"Win=[{string.Join (", ", Windows)}]");
+        }
+
+        if (Linux is { Length: > 0 })
+        {
+            parts.Add ($"Linux=[{string.Join (", ", Linux)}]");
+        }
+
+        if (Macos is { Length: > 0 })
+        {
+            parts.Add ($"Mac=[{string.Join (", ", Macos)}]");
+        }
+
+        return parts.Count > 0 ? string.Join ("; ", parts) : "(none)";
+    }
+
     /// <summary>
     ///     Returns the key strings applicable to the current operating system.
     ///     Yields all <see cref="All"/> keys followed by the platform-specific keys.

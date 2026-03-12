@@ -20,6 +20,7 @@ global using Terminal.Gui.FileServices;
 using System.Globalization;
 using System.Reflection;
 using System.Resources;
+using System.Runtime.CompilerServices;
 
 namespace Terminal.Gui.App;
 
@@ -246,7 +247,15 @@ public static partial class Application
     ///     </para>
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    public static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings
+    {
+        get => field;
+        set
+        {
+            field = value;
+            Tracing.Trace.Configuration ($"DefaultKeyBindings", "App Set", $"{string.Join (", ", value?.Select (kvp => $"{kvp.Key}=[{kvp.Value}]") ?? [])}");
+        }
+    } = new ()
     {
         [Command.Quit] = Bind.All ("Esc"),
         [Command.Suspend] = Bind.NonWindows ("Ctrl+Z"),
@@ -268,6 +277,7 @@ public static partial class Application
             Key oldValue = field;
             field = value;
             QuitKeyChanged?.Invoke (null, new ValueChangedEventArgs<Key> (oldValue, field));
+            Tracing.Trace.Configuration ($"QuitKey", "App Set", $"{field}");
         }
     } = Key.Esc;
 
@@ -284,6 +294,7 @@ public static partial class Application
             Key oldValue = field;
             field = value;
             ArrangeKeyChanged?.Invoke (null, new ValueChangedEventArgs<Key> (oldValue, field));
+            Tracing.Trace.Configuration ($"ArrangeKey", "App Set", $"{field}");
         }
     } = Key.F5.WithCtrl;
 
@@ -300,6 +311,7 @@ public static partial class Application
             Key oldValue = field;
             field = value;
             NextTabGroupKeyChanged?.Invoke (null, new (oldValue, field));
+            Tracing.Trace.Configuration ($"NextTabGroupKey", "App Set", $"{field}");
         }
     } = Key.F6;
 
@@ -316,6 +328,7 @@ public static partial class Application
             Key oldValue = field;
             field = value;
             NextTabKeyChanged?.Invoke (null, new (oldValue, field));
+            Tracing.Trace.Configuration ($"NextTabKey", "App Set", $"{field}");
         }
     } = Key.Tab;
 
@@ -332,6 +345,7 @@ public static partial class Application
             Key oldValue = field;
             field = value;
             PrevTabGroupKeyChanged?.Invoke (null, new (oldValue, field));
+            Tracing.Trace.Configuration ($"PrevTabGroupKey", "App Set", $"{field}");
         }
     } = Key.F6.WithShift;
 
@@ -348,6 +362,7 @@ public static partial class Application
             Key oldValue = field;
             field = value;
             PrevTabKeyChanged?.Invoke (null, new (oldValue, field));
+            Tracing.Trace.Configuration ($"PrevTabKey", "App Set", $"{field}");
         }
     } = Key.Tab.WithShift;
 
