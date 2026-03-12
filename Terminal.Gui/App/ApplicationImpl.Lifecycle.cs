@@ -68,24 +68,9 @@ internal partial class ApplicationImpl
         // BUGBUG: These should not be needed; ApplicationKeyboard subscribes to Application static property changes
         // BUGBUG: and should set these automatically.
         bool hasExistingKeyboard = _keyboard is { };
-        Key existingQuitKey = _keyboard?.QuitKey ?? Application.QuitKey;
-        Key existingArrangeKey = _keyboard?.ArrangeKey ?? Application.ArrangeKey;
-        Key existingNextTabKey = _keyboard?.NextTabKey ?? Application.NextTabKey;
-        Key existingPrevTabKey = _keyboard?.PrevTabKey ?? Application.PrevTabKey;
-        Key existingNextTabGroupKey = _keyboard?.NextTabGroupKey ?? Application.NextTabGroupKey;
-        Key existingPrevTabGroupKey = _keyboard?.PrevTabGroupKey ?? Application.PrevTabGroupKey;
 
         // Reset keyboard to ensure fresh state with default bindings
         _keyboard = new ApplicationKeyboard { App = this };
-
-        // Sync keys from Application static properties (or existing keyboard if it had custom values)
-        // This ensures we respect any Application.QuitKey etc changes made before Init()
-        _keyboard.QuitKey = existingQuitKey;
-        _keyboard.ArrangeKey = existingArrangeKey;
-        _keyboard.NextTabKey = existingNextTabKey;
-        _keyboard.PrevTabKey = existingPrevTabKey;
-        _keyboard.NextTabGroupKey = existingNextTabGroupKey;
-        _keyboard.PrevTabGroupKey = existingPrevTabGroupKey;
 
         CreateDriver (_driverName);
 

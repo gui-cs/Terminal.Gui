@@ -46,7 +46,7 @@ public class SingleBackgroundWorker : Scenario
                                            new MenuItem
                                            {
                                                Title = Strings.cmdQuit,
-                                               Key = Application.QuitKey,
+                                               Key = Application.GetDefaultKey (Command.Quit),
                                                Action = () => App?.RequestStop ()
                                            }
                                        ]
@@ -56,7 +56,7 @@ public class SingleBackgroundWorker : Scenario
             // StatusBar
             StatusBar statusBar = new (
                                        [
-                                           new (Application.QuitKey, "Quit", () => App?.RequestStop ()),
+                                           new (Application.GetDefaultKey (Command.Quit), "Quit", () => App?.RequestStop ()),
                                            new (Key.R.WithCtrl, "Run Worker", RunWorker)
                                        ]
                                       );
@@ -218,7 +218,7 @@ public class SingleBackgroundWorker : Scenario
                             {
                                 // Prevents App.QuitKey from closing this.
                                 // Only Ctrl+C is allowed.
-                                if (e == Application.QuitKey)
+                                if (e == Application.GetDefaultKey (Command.Quit))
                                 {
                                     e.Handled = true;
                                 }

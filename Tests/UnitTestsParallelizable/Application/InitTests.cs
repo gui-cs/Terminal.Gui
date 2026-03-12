@@ -96,13 +96,13 @@ public class InitTests (ITestOutputHelper output)
         {
             IApplication app = Application.Create ();
 
-            // Set via Keyboard property (modern API)
-            app.Keyboard.QuitKey = Key.Q;
-            Assert.Equal (Key.Q, app.Keyboard.QuitKey);
+            // Set via static DefaultKeyBindings (modern API)
+            Application.DefaultKeyBindings! [Command.Quit] = Bind.All (Key.Q);
+            Assert.Equal (Key.Q, Application.GetDefaultKey (Command.Quit));
 
             app.Init (DriverRegistry.Names.ANSI);
 
-            Assert.Equal (Key.Q, app.Keyboard.QuitKey);
+            Assert.Equal (Key.Q, Application.GetDefaultKey (Command.Quit));
 
             app.Dispose ();
         }
@@ -160,9 +160,9 @@ public class InitTests (ITestOutputHelper output)
             app.Init (DriverRegistry.Names.ANSI);
 
             app.StopAfterFirstIteration = true;
-            app.Keyboard.PrevTabGroupKey = Key.A;
-            app.Keyboard.NextTabGroupKey = Key.B;
-            app.Keyboard.QuitKey = Key.C;
+            Application.DefaultKeyBindings! [Command.PreviousTabGroup] = Bind.All (Key.A);
+            Application.DefaultKeyBindings! [Command.NextTabGroup] = Bind.All (Key.B);
+            Application.DefaultKeyBindings! [Command.Quit] = Bind.All (Key.C);
             app.Keyboard.KeyBindings.Add (Key.D, Command.Cancel);
 
             app.Mouse.CachedViewsUnderMouse.Clear ();

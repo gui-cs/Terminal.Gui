@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using Terminal.Gui.App;
 using Terminal.Gui.ViewBase;
+using Terminal.Gui.Input;
 
 namespace CommunityToolkitExample;
 
@@ -9,7 +10,7 @@ internal partial class LoginView : IRecipient<Message<LoginActions>>
     public LoginView (LoginViewModel viewModel)
     {
         WeakReferenceMessenger.Default.Register (this);
-        Title = $"Community Toolkit MVVM Example - {Application.QuitKey} to Exit";
+        Title = $"Community Toolkit MVVM Example - {Application.GetDefaultKey (Command.Quit)} to Exit";
         ViewModel = viewModel;
         InitializeComponent ();
         usernameInput.TextChanged += (_, _) =>

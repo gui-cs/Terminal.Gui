@@ -66,7 +66,7 @@ Key Bindings can be added at the <xref:Terminal.Gui.App.Application> or <xref:Te
 
 For **Application-scoped Key Bindings** there are two categories of Application-scoped Key Bindings:
 
-1) **Application Command Key Bindings** - Bindings for <xref:Terminal.Gui.Input.Command>s supported by <xref:Terminal.Gui.App.Application>. For example, `Application.QuitKey`, which is bound to `Command.Quit` and results in <xref:Terminal.Gui.App.Application.RequestStop(Terminal.Gui.App.IRunnable)> being called.
+1) **Application Command Key Bindings** - Bindings for <xref:Terminal.Gui.Input.Command>s supported by <xref:Terminal.Gui.App.Application>. For example, `Application.GetDefaultKey (Command.Quit)`, which is bound to `Command.Quit` in `Application.DefaultKeyBindings` and results in <xref:Terminal.Gui.App.Application.RequestStop(Terminal.Gui.App.IRunnable)> being called.
 2) **Application Key Bindings** - Bindings for <xref:Terminal.Gui.Input.Command>s supported on arbitrary <xref:Terminal.Gui.ViewBase.View>s that are meant to be invoked regardless of which part of the application is visible/active.
 
 Use `Application.Keyboard.KeyBindings` to add or modify Application-scoped Key Bindings. For backward compatibility, `Application.KeyBindings` also provides access to the same key bindings.
@@ -223,8 +223,8 @@ view.KeyDown += (s, key) =>
 
 * Implements support for `KeyBindingScope.Application`.
 * Keyboard functionality is now encapsulated in the <xref:Terminal.Gui.App.IKeyboard> interface, accessed via `Application.Keyboard`.
-* `Application.Keyboard` provides access to <xref:Terminal.Gui.Input.KeyBindings>, key binding configuration (QuitKey, ArrangeKey, navigation keys), and keyboard event handling.
-* For backward compatibility, <xref:Terminal.Gui.App.Application> still exposes static properties/methods that delegate to `Application.Keyboard` (e.g., `IApplication.KeyBindings`, `IApplication.RaiseKeyDownEvent`, `IApplication.QuitKey`).
+* `Application.Keyboard` provides access to <xref:Terminal.Gui.Input.KeyBindings>, key binding configuration (via `Application.DefaultKeyBindings` for commands like `Command.Quit`, `Command.Arrange`, and navigation commands), and keyboard event handling.
+* For backward compatibility, <xref:Terminal.Gui.App.Application> still exposes static properties/methods that delegate to `Application.Keyboard` (e.g., `IApplication.KeyBindings`, `IApplication.RaiseKeyDownEvent`).
 * Exposes cancelable `KeyDown` events (via `Handled = true`). The `RaiseKeyDownEvent` method is public and can be used to simulate keyboard input, although it is preferred to use `InputInjector` for testing.
 * The <xref:Terminal.Gui.App.IKeyboard> interface enables testability with isolated keyboard instances that don't depend on static Application state.
 
@@ -246,7 +246,7 @@ The <xref:Terminal.Gui.App.IKeyboard> interface provides a decoupled, testable a
 
 3. **Testability** - Unit tests can create isolated <xref:Terminal.Gui.App.IKeyboard> instances with mock <xref:Terminal.Gui.App.IApplication> references, enabling parallel test execution without interference.
 
-4. **Backward Compatibility** - All existing <xref:Terminal.Gui.App.Application> keyboard APIs (e.g., `Application.KeyBindings`, `Application.RaiseKeyDownEvent`, `Application.QuitKey`) remain available and delegate to `Application.Keyboard`.
+4. **Backward Compatibility** - All existing <xref:Terminal.Gui.App.Application> keyboard APIs (e.g., `Application.KeyBindings`, `Application.RaiseKeyDownEvent`) remain available and delegate to `Application.Keyboard`. Application-level command keys are configured via `Application.DefaultKeyBindings`.
 
 ### Usage Examples
 
@@ -256,7 +256,7 @@ The <xref:Terminal.Gui.App.IKeyboard> interface provides a decoupled, testable a
 // Modern approach - using IKeyboard
 App.Keyboard.KeyBindings.Add(Key.F1, Command.HotKey);
 App.Keyboard.RaiseKeyDownEvent(Key.Enter);
-App.Keyboard.QuitKey = Key.Q.WithCtrl;
+Application.DefaultKeyBindings.ReplaceKey (Application.GetDefaultKey (Command.Quit), Key.Q.WithCtrl);
 ```
 
 **Testing with isolated keyboard instances:**

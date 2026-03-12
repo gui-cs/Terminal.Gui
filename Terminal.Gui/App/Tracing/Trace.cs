@@ -291,7 +291,7 @@ public static class Trace
     /// <summary>
     ///     Traces a draw operation.
     /// </summary>
-    /// <param name="id">An identifying string for the trace (e.g., <see cref="View.ToIdentifyingString"/>).</param>
+    /// <param name="id">An identifying string for the trace.</param>
     /// <param name="phase">The phase of the draw operation (e.g., "Start", "End", "Adornments", "SubViews", "Text", "Content").</param>
     /// <param name="message">Optional additional context.</param>
     /// <param name="method">Automatically captured caller method name.</param>

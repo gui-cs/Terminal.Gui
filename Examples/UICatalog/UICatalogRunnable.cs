@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
@@ -135,7 +135,7 @@ public sealed class UICatalogRunnable : Runnable
                                                         {
                                                             Title = Strings.cmdQuit,
                                                             HelpText = "Quit UI Catalog",
-                                                            Key = Application.QuitKey,
+                                                            Key = Application.GetDefaultKey (Command.Quit),
 
                                                             // By not specifying TargetView the Key Binding will be Application-level
                                                             Command = Command.Quit
@@ -685,7 +685,7 @@ public sealed class UICatalogRunnable : Runnable
         StatusBar statusBar = new () { AlignmentModes = AlignmentModes.IgnoreFirstOrLast, CanFocus = false };
 
         // This demonstrates a shortcut that invokes RequestStop to quit the app
-        _shQuit = new Shortcut { CanFocus = false, Title = "Quit", Key = Application.QuitKey, Action = RequestStop };
+        _shQuit = new Shortcut { CanFocus = false, Title = "Quit", Key = Application.GetDefaultKey (Command.Quit), Action = RequestStop };
 
         _shVersion = new Shortcut { Title = "Version Info", CanFocus = false };
 
@@ -749,7 +749,7 @@ public sealed class UICatalogRunnable : Runnable
 
         SchemeName = CachedRunnableScheme;
 
-        _shQuit?.Key = Application.QuitKey;
+        _shQuit?.Key = Application.GetDefaultKey (Command.Quit);
 
         _disableMouseCb!.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
         _force16ColorsShortcutCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;

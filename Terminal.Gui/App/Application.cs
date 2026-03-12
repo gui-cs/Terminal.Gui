@@ -254,6 +254,7 @@ public static partial class Application
         {
             field = value;
             Tracing.Trace.Configuration ($"DefaultKeyBindings", "App Set", $"{string.Join (", ", value?.Select (kvp => $"{kvp.Key}=[{kvp.Value}]") ?? [])}");
+            DefaultKeyBindingsChanged?.Invoke (null, EventArgs.Empty);
         }
     } = new ()
     {
@@ -267,105 +268,34 @@ public static partial class Application
         [Command.Refresh] = Bind.All ("F5"),
     };
 
-    /// <summary>Gets or sets the key to quit the application.</summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key QuitKey
+    /// <summary>Raised when <see cref="DefaultKeyBindings"/> is replaced.</summary>
+    public static event EventHandler? DefaultKeyBindingsChanged;
+
+    /// <summary>
+    ///     Returns the first platform-resolved key for the specified <paramref name="command"/>
+    ///     from <see cref="DefaultKeyBindings"/>, or <see cref="Key.Empty"/> if none is configured.
+    /// </summary>
+    public static Key GetDefaultKey (Command command)
     {
-        get;
-        set
+        if (DefaultKeyBindings is null || !DefaultKeyBindings.TryGetValue (command, out PlatformKeyBinding? binding))
         {
-            Key oldValue = field;
-            field = value;
-            QuitKeyChanged?.Invoke (null, new ValueChangedEventArgs<Key> (oldValue, field));
-            Tracing.Trace.Configuration ($"QuitKey", "App Set", $"{field}");
+            return Key.Empty;
         }
-    } = Key.Esc;
 
-    /// <summary>Raised when <see cref="QuitKey"/> changes.</summary>
-    public static event EventHandler<ValueChangedEventArgs<Key>>? QuitKeyChanged;
+        return binding.GetCurrentPlatformKeys ().FirstOrDefault () ?? Key.Empty;
+    }
 
-    /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key ArrangeKey
+    /// <summary>
+    ///     Returns all platform-resolved keys for the specified <paramref name="command"/>
+    ///     from <see cref="DefaultKeyBindings"/>.
+    /// </summary>
+    public static IEnumerable<Key> GetDefaultKeys (Command command)
     {
-        get;
-        set
+        if (DefaultKeyBindings is null || !DefaultKeyBindings.TryGetValue (command, out PlatformKeyBinding? binding))
         {
-            Key oldValue = field;
-            field = value;
-            ArrangeKeyChanged?.Invoke (null, new ValueChangedEventArgs<Key> (oldValue, field));
-            Tracing.Trace.Configuration ($"ArrangeKey", "App Set", $"{field}");
+            return [];
         }
-    } = Key.F5.WithCtrl;
 
-    /// <summary>Raised when <see cref="ArrangeKey"/> changes.</summary>
-    public static event EventHandler<ValueChangedEventArgs<Key>>? ArrangeKeyChanged;
-
-    /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key NextTabGroupKey
-    {
-        get;
-        set
-        {
-            Key oldValue = field;
-            field = value;
-            NextTabGroupKeyChanged?.Invoke (null, new (oldValue, field));
-            Tracing.Trace.Configuration ($"NextTabGroupKey", "App Set", $"{field}");
-        }
-    } = Key.F6;
-
-    /// <summary>Raised when <see cref="NextTabGroupKey"/> changes.</summary>
-    public static event EventHandler<ValueChangedEventArgs<Key>>? NextTabGroupKeyChanged;
-
-    /// <summary>Alternative key to navigate forwards through views. Tab is the primary key.</summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key NextTabKey
-    {
-        get;
-        set
-        {
-            Key oldValue = field;
-            field = value;
-            NextTabKeyChanged?.Invoke (null, new (oldValue, field));
-            Tracing.Trace.Configuration ($"NextTabKey", "App Set", $"{field}");
-        }
-    } = Key.Tab;
-
-    /// <summary>Raised when <see cref="NextTabKey"/> changes.</summary>
-    public static event EventHandler<ValueChangedEventArgs<Key>>? NextTabKeyChanged;
-
-    /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key PrevTabGroupKey
-    {
-        get;
-        set
-        {
-            Key oldValue = field;
-            field = value;
-            PrevTabGroupKeyChanged?.Invoke (null, new (oldValue, field));
-            Tracing.Trace.Configuration ($"PrevTabGroupKey", "App Set", $"{field}");
-        }
-    } = Key.F6.WithShift;
-
-    /// <summary>Raised when <see cref="PrevTabGroupKey"/> changes.</summary>
-    public static event EventHandler<ValueChangedEventArgs<Key>>? PrevTabGroupKeyChanged;
-
-    /// <summary>Alternative key to navigate backwards through views. Shift+Tab is the primary key.</summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key PrevTabKey
-    {
-        get;
-        set
-        {
-            Key oldValue = field;
-            field = value;
-            PrevTabKeyChanged?.Invoke (null, new (oldValue, field));
-            Tracing.Trace.Configuration ($"PrevTabKey", "App Set", $"{field}");
-        }
-    } = Key.Tab.WithShift;
-
-    /// <summary>Raised when <see cref="PrevTabKey"/> changes.</summary>
-    public static event EventHandler<ValueChangedEventArgs<Key>>? PrevTabKeyChanged;
+        return binding.GetCurrentPlatformKeys ();
+    }
 }

@@ -96,7 +96,7 @@ public static bool Force16Colors { get; set; } = false;
 ```
 
 **Examples:**
-- `Application.QuitKey` - Default key to quit applications
+- `Application.DefaultKeyBindings` (e.g. `Command.Quit`) - Default keys for application-level commands
 - `Application.Force16Colors` - Force 16-color mode
 - `Key.Separator` - Character separating keys in key combinations
 
@@ -199,10 +199,10 @@ graph TD
 **Environment Variable** (`TUI_CONFIG`):
 ```bash
 # Linux/macOS
-export TUI_CONFIG='{"Application.QuitKey": "Ctrl+Q"}'
+export TUI_CONFIG='{"Application.DefaultKeyBindings.Quit": "Ctrl+Q"}'
 
 # Windows PowerShell
-$env:TUI_CONFIG='{"Application.QuitKey": "Ctrl+Q"}'
+$env:TUI_CONFIG='{"Application.DefaultKeyBindings.Quit": "Ctrl+Q"}'
 ```
 
 ---
@@ -432,7 +432,7 @@ Set configuration directly in code without files:
 ```csharp
 ConfigurationManager.RuntimeConfig = @"
 {
-  ""Application.QuitKey"": ""Ctrl+Q"",
+  ""Application.DefaultKeyBindings.Quit"": ""Ctrl+Q"",
   ""Application.Force16Colors"": true
 }";
 
@@ -500,14 +500,14 @@ System-wide settings from [SettingsScope](~/api/Terminal.Gui.Configuration.Setti
 
 ```json
 {
-  "Application.QuitKey": "Esc",
+  "Application.DefaultKeyBindings.Quit": "Esc",
   "Application.Force16Colors": false,
   "Application.IsMouseDisabled": false,
-  "Application.ArrangeKey": "Ctrl+F5",
-  "IKeyboard.NextTabKey": "Tab",
-  "IKeyboard.PrevTabKey": "Shift+Tab",
-  "IKeyboard.NextTabGroupKey": "F6",
-  "IKeyboard.PrevTabGroupKey": "Shift+F6",
+  "Application.DefaultKeyBindings.Arrange": "Ctrl+F5",
+  "Application.DefaultKeyBindings.NextTabStop": "Tab",
+  "Application.DefaultKeyBindings.PreviousTabStop": "Shift+Tab",
+  "Application.DefaultKeyBindings.NextTabGroup": "F6",
+  "Application.DefaultKeyBindings.PreviousTabGroup": "Shift+F6",
   "Key.Separator": "+"
 }
 ```
@@ -764,7 +764,7 @@ All configuration files must conform to the JSON schema:
   "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
   
   // SettingsScope properties
-  "Application.QuitKey": "Esc",
+  "Application.DefaultKeyBindings.Quit": "Esc",
   "Application.Force16Colors": false,
   
   // Current theme name
@@ -898,7 +898,7 @@ Update ConfigurationManager to reflect current static property values:
 
 ```csharp
 // Change a setting programmatically
-Application.QuitKey = Key.Q.WithCtrl;
+Application.DefaultKeyBindings.ReplaceKey (Application.GetDefaultKey (Command.Quit), Key.Q.WithCtrl);
 
 // Update ConfigurationManager to reflect the change
 ConfigurationManager.UpdateToCurrentValues();
@@ -1003,7 +1003,7 @@ ConfigurationManager.UpdateToCurrentValues();
 ```csharp
 ConfigurationManager.RuntimeConfig = @"
 {
-  ""Application.QuitKey"": ""Ctrl+Q"",
+  ""Application.DefaultKeyBindings.Quit"": ""Ctrl+Q"",
   ""Application.Force16Colors"": true,
   ""Theme"": ""Dark""
 }";

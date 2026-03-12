@@ -5,7 +5,7 @@ namespace Terminal.Gui.Configuration;
 
 /// <summary>
 ///     Serializes and deserializes <see cref="Key"/> arrays as JSON string arrays (e.g. <c>["Ctrl+A", "Home"]</c>).
-///     Each element uses <see cref="Key.ToString"/> for writing and <see cref="Key.TryParse"/> for reading.
+///     Each element uses <see cref="Key.ToString()"/> for writing and <see cref="Key.TryParse"/> for reading.
 /// </summary>
 public class KeyArrayJsonConverter : JsonConverter<Key []?>
 {

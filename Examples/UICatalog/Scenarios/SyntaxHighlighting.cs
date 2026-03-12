@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using System.ComponentModel;
 using System.Reflection;
 using System.Text;
@@ -158,7 +158,7 @@ public class SyntaxHighlighting : Scenario
 
         _appWindow.Add (_textView);
 
-        StatusBar statusBar = new ([new (Application.QuitKey, "Quit", Quit)]);
+        StatusBar statusBar = new ([new (Application.GetDefaultKey (Command.Quit), "Quit", Quit)]);
 
         _appWindow.Add (statusBar);
 

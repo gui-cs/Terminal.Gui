@@ -502,7 +502,7 @@ See the [Arrangement Deep Dive](arrangement.md) for complete details.
 - **[ViewArrangement.Resizable](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Resize edges with mouse or keyboard
 - **[ViewArrangement.Overlapped](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Z-order management for overlapping views
 
-**Arrangement Key**: Press `Ctrl+F5` (configurable via `Application.ArrangeKey`) to enter arrange mode
+**Arrangement Key**: Press `Ctrl+F5` (configurable via `Application.DefaultKeyBindings` for `Command.Arrange`) to enter arrange mode
 
 ```csharp
 // Movable and resizable window
@@ -611,10 +611,10 @@ private bool HandleAccept ()
 }
 ```
 
-**Configurable Keys:**
-- `Application.QuitKey` - Close app (default: Esc)
-- `Application.ArrangeKey` - Arrange mode (default: Ctrl+F5)
-- Navigation keys (Tab, F6, arrows)
+**Configurable Keys** (via `Application.DefaultKeyBindings`):
+- `Command.Quit` - Close app (default: Esc)
+- `Command.Arrange` - Arrange mode (default: Ctrl+F5)
+- Navigation commands (`Command.NextTabStop`, `Command.NextTabGroup`, etc.)
 
 ### Mouse API
 

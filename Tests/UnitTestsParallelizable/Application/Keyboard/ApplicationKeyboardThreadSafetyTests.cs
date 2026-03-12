@@ -299,6 +299,10 @@ public class ApplicationKeyboardThreadSafetyTests
     public void KeyProperty_Setters_ConcurrentAccess_NoExceptions ()
     {
         // Arrange
+        // Save original bindings so parallel mutation doesn't pollute other tests
+        Dictionary<Command, PlatformKeyBinding>? savedBindings = Application.DefaultKeyBindings is { }
+                                                                     ? new (Application.DefaultKeyBindings)
+                                                                     : null;
         var keyboard = new ApplicationKeyboard ();
 
         // Initialize once before concurrent access
@@ -324,32 +328,32 @@ public class ApplicationKeyboardThreadSafetyTests
                                              switch (j % 6)
                                              {
                                                  case 0:
-                                                     keyboard.QuitKey = Key.Q.WithCtrl;
+                                                     Application.DefaultKeyBindings! [Command.Quit] = Bind.All (Key.Q.WithCtrl);
 
                                                      break;
 
                                                  case 1:
-                                                     keyboard.ArrangeKey = Key.F6.WithCtrl;
+                                                     Application.DefaultKeyBindings! [Command.Arrange] = Bind.All (Key.F6.WithCtrl);
 
                                                      break;
 
                                                  case 2:
-                                                     keyboard.NextTabKey = Key.Tab;
+                                                     Application.DefaultKeyBindings! [Command.NextTabStop] = Bind.All (Key.Tab);
 
                                                      break;
 
                                                  case 3:
-                                                     keyboard.PrevTabKey = Key.Tab.WithShift;
+                                                     Application.DefaultKeyBindings! [Command.PreviousTabStop] = Bind.All (Key.Tab.WithShift);
 
                                                      break;
 
                                                  case 4:
-                                                     keyboard.NextTabGroupKey = Key.F6;
+                                                     Application.DefaultKeyBindings! [Command.NextTabGroup] = Bind.All (Key.F6);
 
                                                      break;
 
                                                  case 5:
-                                                     keyboard.PrevTabGroupKey = Key.F6.WithShift;
+                                                     Application.DefaultKeyBindings! [Command.PreviousTabGroup] = Bind.All (Key.F6.WithShift);
 
                                                      break;
                                              }
@@ -370,6 +374,9 @@ public class ApplicationKeyboardThreadSafetyTests
         // Assert
         Assert.Empty (exceptions);
         keyboard.Dispose ();
+
+        // Restore original bindings
+        Application.DefaultKeyBindings = savedBindings;
     }
 
     [Fact]
@@ -456,7 +463,7 @@ public class ApplicationKeyboardThreadSafetyTests
                                  {
                                      try
                                      {
-                                         keyboard.QuitKey = j % 2 == 0 ? Key.Q.WithCtrl : Key.Esc;
+                                         Application.DefaultKeyBindings! [Command.Quit] = Bind.All (j % 2 == 0 ? Key.Q.WithCtrl : Key.Esc);
                                      }
                                      catch (Exception ex)
                                      {

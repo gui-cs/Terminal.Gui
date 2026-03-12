@@ -1,4 +1,4 @@
-using System.Drawing;
+﻿using System.Drawing;
 using System.Globalization;
 using AppTestHelpers;
 using AppTestHelpers.XunitHelpers;
@@ -214,7 +214,7 @@ public class MenuBarTests : TestsAllDrivers
                                         .AssertTrue (menuBar?.IsOpen ())
                                         .AssertEqual ("_New", app?.Navigation?.GetFocused ()!.Title)
                                         .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                        .KeyDown (Application.QuitKey)
+                                        .KeyDown (Application.GetDefaultKey (Command.Quit))
                                         .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
                                         .AssertIsNotType<MenuItem> (app!.Navigation!.GetFocused ());
     }
@@ -246,7 +246,7 @@ public class MenuBarTests : TestsAllDrivers
                                         .AssertTrue (menuBar?.IsOpen ())
                                         .AssertEqual ("Cu_t", app?.Navigation?.GetFocused ()!.Title)
                                         .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                        .KeyDown (Application.QuitKey)
+                                        .KeyDown (Application.GetDefaultKey (Command.Quit))
                                         .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
                                         .AssertIsNotType<MenuItem> (app?.Navigation?.GetFocused ());
     }
@@ -276,7 +276,7 @@ public class MenuBarTests : TestsAllDrivers
                                         .AssertEqual ("_New", app.Navigation!.GetFocused ()!.Title)
                                         .AssertTrue (app?.TopRunnable!.IsRunning)
                                         .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                        .KeyDown (Application.QuitKey)
+                                        .KeyDown (Application.GetDefaultKey (Command.Quit))
                                         .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
                                         .AssertTrue (app!.TopRunnable!.IsRunning);
     }
@@ -312,7 +312,7 @@ public class MenuBarTests : TestsAllDrivers
                                         .KeyDown (MenuBar.DefaultKey)
                                         .AssertEqual ("_New", app?.Navigation!.GetFocused ()!.Title)
                                         .ScreenShot ($"After {MenuBar.DefaultKey}", _out)
-                                        .KeyDown (Application.QuitKey)
+                                        .KeyDown (Application.GetDefaultKey (Command.Quit))
                                         .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
                                         .AssertTrue (app?.TopRunnable!.IsRunning);
     }
@@ -906,7 +906,7 @@ public class MenuBarTests : TestsAllDrivers
              .AssertFalse (((IMenuBarEntry)inlineItem).IsMenuOpen);
 
         // Close with Escape
-        c = c.KeyDown (Application.QuitKey)
+        c = c.KeyDown (Application.GetDefaultKey (Command.Quit))
              .ScreenShot ("After Escape — all menus closed", _out)
              .AssertFalse (menuBar.IsOpen ());
 

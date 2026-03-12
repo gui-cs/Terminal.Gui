@@ -512,7 +512,7 @@ public class MenuBarTests (ITestOutputHelper output)
         Assert.True (menuBar.IsOpen ());
 
         // Act — Quit command should close everything.
-        // Note: Application.QuitKey is a local KeyBinding, so we invoke the command directly
+        // Note: Application.GetDefaultKey (Command.Quit) is a local KeyBinding, so we invoke the command directly
         // because the PopoverMenu has focus (separate view hierarchy from MenuBar).
         menuBar.InvokeCommand (Command.Quit);
         Assert.False (menuBar.Active);
@@ -1230,7 +1230,7 @@ public class MenuBarTests (ITestOutputHelper output)
         Assert.True (menuBarItem.PopoverMenu!.Visible);
 
         // Act — single Escape (QuitKey) should fully deactivate everything
-        app.InjectKey (Application.QuitKey);
+        app.InjectKey (Application.GetDefaultKey (Command.Quit));
 
         // Assert — MenuBar should be completely inactive after ONE press
         Assert.False (menuBarItem.PopoverMenu!.Visible);
@@ -1699,7 +1699,7 @@ public class MenuBarTests (ITestOutputHelper output)
         app.InjectKey (Key.CursorRight); // Open submenu
 
         // Close the menu entirely
-        app.InjectKey (Application.QuitKey);
+        app.InjectKey (Application.GetDefaultKey (Command.Quit));
 
         Assert.False (menuBar.Active, "MenuBar should be deactivated");
         Assert.False (menuBar.IsOpen (), "No popover should be open");

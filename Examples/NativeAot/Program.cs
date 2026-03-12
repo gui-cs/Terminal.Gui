@@ -7,6 +7,7 @@ using Terminal.Gui.Configuration;
 using Terminal.Gui.Views;
 using Terminal.Gui.App;
 using Terminal.Gui.ViewBase;
+using Terminal.Gui.Input;
 
 namespace NativeAot;
 
@@ -63,7 +64,7 @@ public class ExampleWindow : Window
 
     public ExampleWindow ()
     {
-        Title = $"Example App ({Application.QuitKey} to quit)";
+        Title = $"Example App ({Application.GetDefaultKey (Command.Quit)} to quit)";
 
         // Create input components and labels
         var usernameLabel = new Label { Text = "Username:" };

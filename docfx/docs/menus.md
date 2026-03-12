@@ -181,7 +181,7 @@ MenuBarItem fileMenuBarItem = new ("_File", [
     new MenuItem ("_New", Key.N.WithCtrl, () => NewFile ()),
     new MenuItem ("_Open...", Key.O.WithCtrl, () => OpenFile ()),
     new Line (),
-    new MenuItem ("_Quit", Application.QuitKey, () => Application.RequestStop ())
+    new MenuItem ("_Quit", Application.GetDefaultKey (Command.Quit), () => Application.RequestStop ())
 ]);
 ```
 
@@ -204,7 +204,7 @@ MenuBar menuBar = new ([
         new MenuItem ("_New", Key.N.WithCtrl, () => NewFile ()),
         new MenuItem ("_Open...", Key.O.WithCtrl, () => OpenFile ()),
         new Line (),
-        new MenuItem ("E_xit", Application.QuitKey, () => Application.RequestStop ())
+        new MenuItem ("E_xit", Application.GetDefaultKey (Command.Quit), () => Application.RequestStop ())
     ]),
     new MenuBarItem ("_Edit", [
         new MenuItem ("_Cut", Key.X.WithCtrl, () => Cut ()),
@@ -476,7 +476,7 @@ MenuBar menuBar = new ([
         new MenuItem ("_New", "", () => MessageBox.Query ("New", "Create new file?", "OK", "Cancel")),
         new MenuItem ("_Open...", "", () => MessageBox.Query ("Open", "Open file dialog", "OK")),
         new Line (),
-        new MenuItem ("E_xit", Application.QuitKey, () => Application.RequestStop ())
+        new MenuItem ("E_xit", Application.GetDefaultKey (Command.Quit), () => Application.RequestStop ())
     ]),
     new MenuBarItem ("_Edit", [
         new MenuItem ("_Undo", Key.Z.WithCtrl, () => { }),
@@ -665,10 +665,10 @@ NewKeyDownEvent (key)
 
 For menus specifically:
 - <xref:Terminal.Gui.Views.MenuBar> binds `F10` to <xref:Terminal.Gui.Input.Command.HotKey> (via `HotKeyBindings`)
-- <xref:Terminal.Gui.Views.MenuBar> binds `F10` and `Application.QuitKey` to `Command.Quit` (via `KeyBindings`)
+- <xref:Terminal.Gui.Views.MenuBar> binds `F10` and `Application.GetDefaultKey (Command.Quit)` to `Command.Quit` (via `KeyBindings`)
 - <xref:Terminal.Gui.Views.MenuBar> binds arrow keys to `Command.Right`/`Command.Left`
 - <xref:Terminal.Gui.Views.PopoverMenu> binds arrow keys to `Command.Right`/`Command.Left` for submenu navigation
-- <xref:Terminal.Gui.Views.PopoverMenu> binds `Escape`/`QuitKey` to `Command.Quit`
+- <xref:Terminal.Gui.Views.PopoverMenu> binds `Escape`/quit key to `Command.Quit`
 
 ---
 

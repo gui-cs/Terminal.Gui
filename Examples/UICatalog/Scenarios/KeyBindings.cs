@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Text;
 
 namespace UICatalog.Scenarios;
@@ -44,7 +44,7 @@ public sealed class KeyBindings : Scenario
                     - Focused: F3
                     - Application: F4
                     Pressing Esc or {
-                        Application.QuitKey
+                        Application.GetDefaultKey (Command.Quit)
                     } will cause it to quit the app.
                     """,
             BorderStyle = LineStyle.Dashed

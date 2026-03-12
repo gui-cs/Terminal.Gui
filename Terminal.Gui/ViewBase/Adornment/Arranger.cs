@@ -58,9 +58,11 @@ internal sealed class Arranger : IDisposable
 
         _border.HotKeyBindings.Add (Key.Esc, Command.Quit);
 
-        if (_border.App?.Keyboard.ArrangeKey is { })
+        Key arrangeKey = Application.GetDefaultKey (Command.Arrange);
+
+        if (arrangeKey != Key.Empty)
         {
-            _border.HotKeyBindings.Add (_border.App.Keyboard.ArrangeKey, Command.Quit);
+            _border.HotKeyBindings.Add (arrangeKey, Command.Quit);
         }
         _border.HotKeyBindings.Add (Key.CursorUp, Command.Up);
         _border.HotKeyBindings.Add (Key.CursorDown, Command.Down);

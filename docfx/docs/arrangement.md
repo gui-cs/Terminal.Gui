@@ -123,7 +123,7 @@ var view2 = new View
 
 ## Arrange Mode (Interactive)
 
-**Arrange Mode** is an interactive mode for arranging views using the keyboard. It is activated by pressing the **Arrange Key** (default: `Ctrl+F5`, configurable via `Application.ArrangeKey`).
+**Arrange Mode** is an interactive mode for arranging views using the keyboard. It is activated by pressing the **Arrange Key** (default: `Ctrl+F5`, configurable via `Application.DefaultKeyBindings` for `Command.Arrange`).
 
 ### Entering Arrange Mode
 
@@ -724,14 +724,14 @@ view.LayoutComplete += (s, e) =>
 - **[View Deep Dive](View.md)** - View base class
 - **[Multitasking Deep Dive](multitasking.md)** - Modal and runnable views
 - **[Drawing Deep Dive](drawing.md)** - LineCanvas and borders
-- **[Configuration Deep Dive](config.md)** - Configuring IKeyboard.ArrangeKey
+- **[Configuration Deep Dive](config.md)** - Configuring the Arrange key via `Application.DefaultKeyBindings`
 
 ### API Reference
 
 - `Arrangement`
 - <xref:Terminal.Gui.ViewBase.ViewArrangement>
 - <xref:Terminal.Gui.ViewBase.Border>
-- `Application.ArrangeKey`
+- `Application.GetDefaultKey (Command.Arrange)`
 - Runnable.Modal
 
 ### UICatalog Examples

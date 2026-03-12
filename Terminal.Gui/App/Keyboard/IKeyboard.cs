@@ -86,22 +86,4 @@ public interface IKeyboard
 
     /// <summary>Gets the Application-scoped key bindings.</summary>
     KeyBindings KeyBindings { get; }
-
-    /// <summary>Gets or sets the key to quit the application.</summary>
-    Key QuitKey { get; set; }
-
-    /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
-    Key ArrangeKey { get; set; }
-
-    /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
-    Key NextTabGroupKey { get; set; }
-
-    /// <summary>Alternative key to navigate forwards through views. Tab is the primary key.</summary>
-    Key NextTabKey { get; set; }
-
-    /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
-    Key PrevTabGroupKey { get; set; }
-
-    /// <summary>Alternative key to navigate backwards through views. Shift+Tab is the primary key.</summary>
-    Key PrevTabKey { get; set; }
 }

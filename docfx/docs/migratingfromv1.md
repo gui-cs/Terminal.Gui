@@ -477,13 +477,13 @@ if (keyEvent.Key == Key.CtrlMask | Key.Q)
 **v2:**
 ```csharp
 // Configurable quit key
-if (key == Application.QuitKey)
+if (key == Application.GetDefaultKey (Command.Quit))
 {
-    Application.RequestStop();
+    Application.RequestStop ();
 }
 
-// Change the quit key
-Application.QuitKey = Key.Esc;
+// Change the quit key via DefaultKeyBindings
+Application.DefaultKeyBindings.ReplaceKey (Application.GetDefaultKey (Command.Quit), Key.Esc);
 ```
 
 ### Navigation Keys
@@ -498,11 +498,11 @@ v2 has consistent, configurable navigation keys:
 | `Shift+F6` | Previous TabGroup |
 
 ```csharp
-// Configurable
-Application.NextTabStopKey = Key.Tab;
-Application.PrevTabStopKey = Key.Tab.WithShift;
-Application.NextTabGroupKey = Key.F6;
-Application.PrevTabGroupKey = Key.F6.WithShift;
+// Configurable via Application.DefaultKeyBindings
+Application.GetDefaultKey (Command.NextTabStop);    // Key.Tab
+Application.GetDefaultKey (Command.PreviousTabStop); // Key.Tab.WithShift
+Application.GetDefaultKey (Command.NextTabGroup);    // Key.F6
+Application.GetDefaultKey (Command.PreviousTabGroup); // Key.F6.WithShift
 ```
 
 See [Keyboard Deep Dive](keyboard.md) for complete details.

@@ -419,7 +419,7 @@ public class TextValidateField : View, IDesignable, IValue<string>
             return false;
         }
 
-        if (key.AsRune == default (Rune) || key == Application.QuitKey)
+        if (key.AsRune == default (Rune) || key == Application.GetDefaultKey (Command.Quit))
         {
             return false;
         }

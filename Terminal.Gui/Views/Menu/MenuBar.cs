@@ -36,7 +36,7 @@ namespace Terminal.Gui.Views;
 ///     </para>
 ///     <para>
 ///         <b>Navigation:</b> The <c>Left</c> and <c>Right</c> arrow keys move focus between
-///         <see cref="MenuBarItem"/>s. <see cref="Application.QuitKey"/> and <see cref="Key"/> close any open
+///         <see cref="MenuBarItem"/>s. <see cref="Application.GetDefaultKey"/> and <see cref="Key"/> close any open
 ///         popover and deactivate the <see cref="MenuBar"/>.
 ///     </para>
 ///     <para>
@@ -60,7 +60,7 @@ namespace Terminal.Gui.Views;
 ///             <term>Left / Right</term> <description>Moves between menu bar items.</description>
 ///         </item>
 ///         <item>
-///             <term>Escape, <see cref="Application.QuitKey"/></term>
+///             <term>Escape, <see cref="Application.GetDefaultKey"/></term>
 ///             <description>Closes any open popover and deactivates the menu bar.</description>
 ///         </item>
 ///     </list>
@@ -107,7 +107,7 @@ public class MenuBar : Menu, IDesignable
 
         // Dynamic bindings that depend on instance properties
         KeyBindings.Add (Key, Command.Quit);
-        KeyBindings.ReplaceCommands (Application.QuitKey, Command.Quit);
+        KeyBindings.ReplaceCommands (Application.GetDefaultKey (Command.Quit), Command.Quit);
 
         // Override the default HotKey handler to correctly route bubbled-up HotKeys
         // from MenuBarItems. Without this, DefaultHotKeyHandler invokes Activate on the
@@ -309,7 +309,7 @@ public class MenuBar : Menu, IDesignable
                                                           ]) { Id = "Preferences" }
                                   },
                                   new Line (),
-                                  new MenuItem { TargetView = targetView as View, Key = Application.QuitKey, Command = Command.Quit }
+                                  new MenuItem { TargetView = targetView as View, Key = Application.GetDefaultKey (Command.Quit), Command = Command.Quit }
                               ]));
 
         Add (new MenuBarItem ("_Edit",
