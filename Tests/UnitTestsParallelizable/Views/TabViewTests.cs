@@ -19,7 +19,7 @@ public class TabViewTests (ITestOutputHelper output) : TestDriverBase
         Assert.Null (tabView.SelectedTabIndex);
         Assert.Null (tabView.SelectedTab);
         Assert.Empty (tabView.Tabs);
-        Assert.False (tabView.TabsOnBottom);
+        Assert.Equal (Side.Top, tabView.TabSide);
         Assert.Equal (30u, tabView.MaxTabTextWidth);
     }
 
@@ -316,37 +316,53 @@ public class TabViewTests (ITestOutputHelper output) : TestDriverBase
 
     #endregion
 
-    #region TabsOnBottom
+    #region TabSide
 
     [Fact]
-    public void TabsOnBottom_SwitchesPaddingThickness ()
+    public void TabSide_SwitchesPaddingThickness ()
     {
         TabView tabView = new ();
 
-        Assert.False (tabView.TabsOnBottom);
+        Assert.Equal (Side.Top, tabView.TabSide);
         Assert.Equal (3, tabView.Padding!.Thickness.Top);
         Assert.Equal (0, tabView.Padding.Thickness.Bottom);
 
-        tabView.TabsOnBottom = true;
+        tabView.TabSide = Side.Bottom;
 
         Assert.Equal (0, tabView.Padding.Thickness.Top);
         Assert.Equal (3, tabView.Padding.Thickness.Bottom);
 
-        tabView.TabsOnBottom = false;
+        tabView.TabSide = Side.Top;
 
         Assert.Equal (3, tabView.Padding.Thickness.Top);
         Assert.Equal (0, tabView.Padding.Thickness.Bottom);
     }
 
     [Fact]
-    public void TabsOnBottom_SameValue_NoChange ()
+    public void TabSide_SameValue_NoChange ()
     {
         TabView tabView = new ();
         Thickness originalThickness = tabView.Padding!.Thickness;
 
-        tabView.TabsOnBottom = false;
+        tabView.TabSide = Side.Top;
 
         Assert.Equal (originalThickness, tabView.Padding.Thickness);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void TabSide_InvalidValue_Ignored ()
+    {
+        TabView tabView = new ();
+
+        tabView.TabSide = Side.Left;
+
+        Assert.Equal (Side.Top, tabView.TabSide);
+        Assert.Equal (3, tabView.Padding!.Thickness.Top);
+
+        tabView.TabSide = Side.Right;
+
+        Assert.Equal (Side.Top, tabView.TabSide);
     }
 
     #endregion

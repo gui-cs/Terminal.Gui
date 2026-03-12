@@ -25,13 +25,13 @@ public class Tab : View
             return true;
         }
 
-        if (SuperView is TabView tabView)
+        if (SuperView is not TabView tabView)
         {
-            tabView.SelectedTabIndex = tabView.Tabs.IndexOf (this);
-
-            return true;
+            return false;
         }
+        tabView.SelectedTabIndex = tabView.Tabs.IndexOf (this);
 
-        return false;
+        return true;
+
     }
 }

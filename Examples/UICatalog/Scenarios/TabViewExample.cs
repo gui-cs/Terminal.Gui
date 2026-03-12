@@ -24,11 +24,7 @@ public class TabViewExample : Scenario
             SchemeName = "Dialog"
         };
 
-        EventLog eventLog = new ()
-        {
-            X = Pos.AnchorEnd (),
-            Height = Dim.Fill ()
-        };
+        EventLog eventLog = new () { X = Pos.AnchorEnd (), Height = Dim.Fill () };
 
         FrameView demoFrame = new ()
         {
@@ -41,7 +37,10 @@ public class TabViewExample : Scenario
 
         TabView tabView = new ()
         {
-            X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (),
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
             AssignHotKeys = true,
             Arrangement = ViewArrangement.Resizable // Enables resizing the TabView by dragging its edges for testing
         };
@@ -65,8 +64,17 @@ public class TabViewExample : Scenario
             Title = "_Side",
             BorderStyle = LineStyle.Dashed,
             AssignHotKeys = true,
-            Y = Pos.Bottom (label) + 1
+            Y = Pos.Bottom (label) + 1,
+            Value = tabView.TabSide
         };
+
+        sideSelector.ValueChanged += (_, args) =>
+                                     {
+                                         if (args.Value is Side.Top or Side.Bottom)
+                                         {
+                                             tabView.TabSide = args.Value.Value;
+                                         }
+                                     };
         tab3.Add (sideSelector);
 
         tabView.Add (tab1, tab2, tab3);
@@ -79,14 +87,36 @@ public class TabViewExample : Scenario
 
         var configY = 0;
 
-        // TabsOnBottom checkbox
-        CheckBox tabsOnBottomCb = new () { Text = "Tabs On _Bottom", X = 0, Y = configY++ };
+        // TabSide selector
+        OptionSelector<Side> tabSideSelector = new ()
+        {
+            Title = "Tab _Side",
+            X = 0,
+            Y = configY,
+            BorderStyle = LineStyle.Dashed,
+            Orientation = Orientation.Horizontal,
+            Value = Side.Top
+        };
 
-        tabsOnBottomCb.ValueChanged += (_, args) => { tabView.TabsOnBottom = args.NewValue == CheckState.Checked; };
+        // Disable Left and Right — only Top and Bottom are supported
+        foreach (CheckBox cb in tabSideSelector.SubViews.OfType<CheckBox> ())
+        {
+            if (cb.Title == "Left" || cb.Title == "Right")
+            {
+                cb.Enabled = false;
+            }
+        }
 
-        configFrame.Add (tabsOnBottomCb);
+        tabSideSelector.ValueChanged += (_, args) =>
+                                        {
+                                            if (args.Value is Side.Top or Side.Bottom)
+                                            {
+                                                tabView.TabSide = args.Value.Value;
+                                            }
+                                        };
 
-        configY++;
+        configFrame.Add (tabSideSelector);
+        configY += 3;
 
         // MaxTabTextWidth
         Label maxWidthLabel = new () { Text = "MaxTabTextWidth:", X = 0, Y = configY };
@@ -182,7 +212,6 @@ public class TabViewExample : Scenario
 
         adornmentsEditor.ViewToEdit = tabView;
         configFrame.Add (adornmentsEditor);
-
 
         eventLog.ViewToLog = tabView;
 

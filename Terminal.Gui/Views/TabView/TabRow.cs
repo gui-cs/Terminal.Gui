@@ -65,7 +65,16 @@ internal class TabRow : View
                 SuperViewRendersLineCanvas = true,
                 Width = Dim.Auto (DimAutoStyle.Text),
                 Height = 3,
-                CanFocus = false
+                CanFocus = true
+            };
+
+            header.GettingAttributeForRole += (sender, args) =>
+            {
+                if (args.Role == VisualRole.HotNormal && tabView.SubViews.ElementAt (tabIndex).HasFocus)
+                {
+                    args.Handled = true;
+                    args.Result = header.GetAttributeForRole (VisualRole.HotFocus);
+                }
             };
 
             // Disable title rendering in the border — we use Text, not Title
@@ -104,7 +113,7 @@ internal class TabRow : View
 
         IReadOnlyList<Tab> tabs = tabView.Tabs;
         int? selectedIndex = tabView.SelectedTabIndex;
-        bool tabsOnBottom = tabView.TabsOnBottom;
+        bool tabsOnBottom = tabView.TabSide == Side.Bottom;
         View [] headers = [.. SubViews];
 
         for (var i = 0; i < headers.Length && i < tabs.Count; i++)
@@ -156,7 +165,7 @@ internal class TabRow : View
             return;
         }
 
-        bool tabsOnBottom = tabView.TabsOnBottom;
+        bool tabsOnBottom = tabView.TabSide == Side.Bottom;
 
         // Suppress the right border above (or below) the continuation line.
         // The Border draws segmented lines around gaps, so at the continuation row
@@ -189,7 +198,7 @@ internal class TabRow : View
             return base.OnDrawingContent (context);
         }
 
-        bool tabsOnBottom = tabView.TabsOnBottom;
+        bool tabsOnBottom = tabView.TabSide == Side.Bottom;
 
         // Draw the continuation line from the last tab header to the right edge of the view.
         // This line forms the top (or bottom) boundary of the content area where there are no tabs.

@@ -104,20 +104,24 @@ public class TabView : View, IDesignable
     /// <summary>Gets the currently selected <see cref="Tab"/>, or <see langword="null"/> if no tab is selected.</summary>
     public Tab? SelectedTab => _selectedTabIndex.HasValue ? Tabs.ElementAtOrDefault (_selectedTabIndex.Value) : null;
 
-    /// <summary>Gets or sets whether tabs are displayed at the bottom of the view instead of the top.</summary>
-    public bool TabsOnBottom
+    /// <summary>Gets or sets which side of the view the tab headers are displayed on.</summary>
+    /// <remarks>
+    ///     Only <see cref="Side.Top"/> and <see cref="Side.Bottom"/> are supported.
+    ///     Setting to <see cref="Side.Left"/> or <see cref="Side.Right"/> is ignored.
+    /// </remarks>
+    public Side TabSide
     {
         get;
         set
         {
-            if (field == value)
+            if (field == value || (value != Side.Top && value != Side.Bottom))
             {
                 return;
             }
 
             field = value;
 
-            if (value)
+            if (value == Side.Bottom)
             {
                 Border!.Thickness = new Thickness (1, 1, 1, 0);
                 Padding!.Thickness = Padding.Thickness with { Top = 0, Bottom = 3 };
@@ -133,7 +137,7 @@ public class TabView : View, IDesignable
             _tabRow.UpdateHeaderAppearance ();
             SetNeedsLayout ();
         }
-    }
+    } = Side.Top;
 
     /// <summary>Gets or sets the maximum display width for tab header text. Default is 30.</summary>
     public uint MaxTabTextWidth

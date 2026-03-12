@@ -712,9 +712,11 @@ All in `Tests/UnitTestsParallelizable/Views/TabViewTests.cs`:
 
 When there are too many tabs to fit in the available width, there is no scroll mechanism. The tabs just overflow. Need to implement scroll offset logic in TabRow with left/right scroll indicators (using `Glyphs.LeftArrow` / `Glyphs.RightArrow`).
 
-### Issue 3: TabsOnBottom property type
+### Issue 3: TabsOnBottom property type - ✅ FIXED
 
 `TabsOnBottom` property should be of type `Side` enum (Top/Bottom) instead of bool for better extensibility and clarity. We may add Left & Right later.
+
+The TabViews Scenario should be updated to so that the Configuration pane usesa an OptionSelector<Side> instead of a CheckBox for this setting. Also update the 3rd example tab such that the OptionSelector<Side> that is there now also controls the tabview.
 
 ### Issue 4: Tab Hotkeys do not work - ✅ FIXED
 

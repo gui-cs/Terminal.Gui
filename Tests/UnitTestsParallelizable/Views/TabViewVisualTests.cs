@@ -280,7 +280,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (20, 7);
 
-        TabView tabView = new () { Width = 20, Height = 7, TabsOnBottom = true };
+        TabView tabView = new () { Width = 20, Height = 7, TabSide = Side.Bottom };
 
         Tab tab1 = new () { Title = "T1" };
         tab1.Add (new Label { Text = "Bottom" });
@@ -321,7 +321,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (20, 7);
 
-        TabView tabView = new () { Width = 20, Height = 7, TabsOnBottom = true };
+        TabView tabView = new () { Width = 20, Height = 7, TabSide = Side.Bottom };
 
         Tab tab1 = new () { Title = "T1" };
 
@@ -359,7 +359,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (25, 8);
 
-        TabView tabView = new () { Width = 25, Height = 8, TabsOnBottom = true };
+        TabView tabView = new () { Width = 25, Height = 8, TabSide = Side.Bottom };
 
         Tab tab1 = new () { Title = "AA" };
         tab1.Add (new Label { Text = "First" });
@@ -399,7 +399,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (25, 8);
 
-        TabView tabView = new () { Width = 25, Height = 8, TabsOnBottom = true };
+        TabView tabView = new () { Width = 25, Height = 8, TabSide = Side.Bottom };
 
         Tab tab1 = new () { Title = "AA" };
 
@@ -440,7 +440,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (25, 8);
 
-        TabView tabView = new () { Width = 25, Height = 8, TabsOnBottom = true };
+        TabView tabView = new () { Width = 25, Height = 8, TabSide = Side.Bottom };
 
         Tab tab1 = new () { Title = "AA" };
         Tab tab2 = new () { Title = "BB" };
@@ -480,7 +480,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (15, 8);
 
-        TabView tabView = new () { Width = 15, Height = 8, TabsOnBottom = true };
+        TabView tabView = new () { Width = 15, Height = 8, TabSide = Side.Bottom };
 
         Tab tab1 = new () { Title = "One" };
         tab1.Add (new Label { Text = "Solo" });
@@ -578,7 +578,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (20, 7);
 
-        TabView tabView = new () { Width = 20, Height = 7, TabsOnBottom = true };
+        TabView tabView = new () { Width = 20, Height = 7, TabSide = Side.Bottom };
 
         Tab tab1 = new () { Title = "T1" };
         tab1.Add (new Label { Text = "First" });
@@ -663,7 +663,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
                                               app.Driver);
 
         // Toggle to tabs on bottom
-        tabView.TabsOnBottom = true;
+        tabView.TabSide = Side.Bottom;
         top.Layout ();
         top.Draw ();
 
@@ -722,7 +722,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Render_SelectedTab_TabsOnBottom_HasOpenTopBorder ()
     {
-        TabView tabView = new () { Width = 30, Height = 10, TabsOnBottom = true };
+        TabView tabView = new () { Width = 30, Height = 10, TabSide = Side.Bottom };
 
         Tab tab1 = new () { Title = "T1" };
         Tab tab2 = new () { Title = "T2" };
@@ -779,7 +779,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Render_SelectedTab_TabsOnBottom_HasPaddingOffset ()
     {
-        TabView tabView = new () { Width = 30, Height = 10, TabsOnBottom = true };
+        TabView tabView = new () { Width = 30, Height = 10, TabSide = Side.Bottom };
 
         Tab tab1 = new () { Title = "T1" };
         Tab tab2 = new () { Title = "T2" };
@@ -804,7 +804,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Render_SwitchingSelection_TabsOnBottom_UpdatesPadding ()
     {
-        TabView tabView = new () { Width = 30, Height = 10, TabsOnBottom = true };
+        TabView tabView = new () { Width = 30, Height = 10, TabSide = Side.Bottom };
 
         Tab tab1 = new () { Title = "T1" };
         Tab tab2 = new () { Title = "T2" };
@@ -894,7 +894,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
     {
         IDriver driver = CreateTestDriver ();
 
-        TabView tabView = new () { Driver = driver, Width = 30, Height = 10, TabsOnBottom = true };
+        TabView tabView = new () { Driver = driver, Width = 30, Height = 10, TabSide = Side.Bottom };
 
         Tab tab1 = new () { Title = "T1" };
 
