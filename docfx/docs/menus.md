@@ -454,7 +454,7 @@ When a user presses Enter or clicks a <xref:Terminal.Gui.Views.MenuItem>:
 | `←` / `→` | Navigate MenuBar items / Expand-collapse submenus |
 | `Enter` | Accept selected MenuItem |
 | `Space` | Activate selected MenuItem (e.g., toggle a CheckBox CommandView) |
-| `Escape` / `QuitKey` | Close menu / Deactivate MenuBar |
+| `Escape` / `Application.GetDefaultKey (Command.Quit)` | Close menu / Deactivate MenuBar |
 | Hotkey (e.g., `Alt+F`) | Activate/toggle specific MenuBarItem |
 | Hotkey in Menu | Jump to MenuItem with matching hotkey |
 

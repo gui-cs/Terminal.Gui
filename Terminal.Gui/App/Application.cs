@@ -258,14 +258,14 @@ public static partial class Application
         }
     } = new ()
     {
-        [Command.Quit] = Bind.All ("Esc"),
-        [Command.Suspend] = Bind.NonWindows ("Ctrl+Z"),
-        [Command.Arrange] = Bind.All ("Ctrl+F5"),
-        [Command.NextTabStop] = Bind.All ("Tab"),
-        [Command.PreviousTabStop] = Bind.All ("Shift+Tab"),
-        [Command.NextTabGroup] = Bind.All ("F6"),
-        [Command.PreviousTabGroup] = Bind.All ("Shift+F6"),
-        [Command.Refresh] = Bind.All ("F5"),
+        [Command.Quit] = Bind.All (Key.Esc),
+        [Command.Suspend] = Bind.NonWindows (Key.Z.WithCtrl),
+        [Command.Arrange] = Bind.All (Key.F5.WithCtrl),
+        [Command.NextTabStop] = Bind.All (Key.Tab),
+        [Command.PreviousTabStop] = Bind.All (Key.Tab.WithShift),
+        [Command.NextTabGroup] = Bind.All (Key.F6),
+        [Command.PreviousTabGroup] = Bind.All (Key.F6.WithShift),
+        [Command.Refresh] = Bind.All (Key.F5),
     };
 
     /// <summary>Raised when <see cref="DefaultKeyBindings"/> is replaced.</summary>

@@ -1,8 +1,9 @@
 {
-    "$schema": "https://gui-cs.github.io/Terminal.GuiV2Docs/schemas/tui-config-schema.json",
+    "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
     "ConfigurationManager.ThrowOnJsonErrors": false,
     "Application.DefaultKeyBindings": {
         "Quit": { "All": ["Esc"] },
+        "Suspend": { "Linux": ["Ctrl+Z"], "Macos": ["Ctrl+Z"] },
         "Arrange": { "All": ["Ctrl+F5"] },
         "NextTabStop": { "All": ["Tab"] },
         "PreviousTabStop": { "All": ["Shift+Tab"] },
@@ -10,21 +11,23 @@
         "PreviousTabGroup": { "All": ["Shift+F6"] },
         "Refresh": { "All": ["F5"] }
     },
-    "Application.Force16Colors": false,  
+    "Driver.Force16Colors": false,  
     "Application.ForceDriver": "",
     "Application.IsMouseDisabled": false,
-    "ContextMenu.DefaultKey": "Shift+F10",
+    "Key.Separator": "+",
+    "MenuBar.DefaultKey": "F10",
+    "PopoverMenu.DefaultKey": "Shift+F10",
     "FileDialog.MaxSearchResults": 10000,
     "FileDialogStyle.DefaultUseColors": false,
     "FileDialogStyle.DefaultUseUnicodeCharacters": false,
-    "Glyphs": {
-        "CheckStateChecked": "✓"
-    },
     "Theme": "Gruntled",
     "Themes": [
         {
             "Gruntled": {
-                "ColorSchemes": [
+                "Glyphs": {
+                    "CheckStateChecked": "✓"
+                },
+                "Schemes": [
                     {
                         "TopLevel": {
                             "Normal": {

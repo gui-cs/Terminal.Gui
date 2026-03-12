@@ -253,27 +253,24 @@ The <xref:Terminal.Gui.App.IKeyboard> interface provides a decoupled, testable a
 **Accessing keyboard functionality:**
 
 ```csharp
-// Modern approach - using IKeyboard
 App.Keyboard.KeyBindings.Add(Key.F1, Command.HotKey);
 App.Keyboard.RaiseKeyDownEvent(Key.Enter);
-Application.DefaultKeyBindings.ReplaceKey (Application.GetDefaultKey (Command.Quit), Key.Q.WithCtrl);
+Application.DefaultKeyBindings[Command.Quit] = Bind.All (Key.Q.WithCtrl);
 ```
 
 **Testing with isolated keyboard instances:**
 
 ```csharp
 // Create independent keyboard instances for parallel tests
-var keyboard1 = new Keyboard();
-keyboard1.QuitKey = Key.Q.WithCtrl;
-keyboard1.KeyBindings.Add(Key.F1, Command.HotKey);
+var keyboard1 = new ApplicationKeyboard ();
+keyboard1.KeyBindings.Add (Key.Q.WithCtrl, Command.Quit);
 
-var keyboard2 = new Keyboard();
-keyboard2.QuitKey = Key.X.WithCtrl;
-keyboard2.KeyBindings.Add(Key.F2, Command.Accept);
+var keyboard2 = new ApplicationKeyboard ();
+keyboard2.KeyBindings.Add (Key.X.WithCtrl, Command.Quit);
 
-// keyboard1 and keyboard2 maintain completely separate state
-Assert.Equal(Key.Q.WithCtrl, keyboard1.QuitKey);
-Assert.Equal(Key.X.WithCtrl, keyboard2.QuitKey);
+// keyboard1 and keyboard2 maintain completely separate KeyBindings
+Assert.True (keyboard1.KeyBindings.TryGet (Key.Q.WithCtrl, out _));
+Assert.True (keyboard2.KeyBindings.TryGet (Key.X.WithCtrl, out _));
 ```
 
 **Accessing application context from views:**
@@ -306,7 +303,7 @@ public class MyView : View
 The `Keyboard` class implements <xref:Terminal.Gui.App.IKeyboard> and maintains:
 
 - **KeyBindings**: Application-scoped key binding dictionary
-- **Navigation Keys**: QuitKey, ArrangeKey, NextTabKey, PrevTabKey, NextTabGroupKey, PrevTabGroupKey
+- **Navigation Keys**: Configured via Application.DefaultKeyBindings dictionary (Quit, Arrange, NextTabStop, PreviousTabStop, NextTabGroup, PreviousTabGroup, Refresh, Suspend)
 - **Events**: `KeyDown` and `KeyUp` events for application-level keyboard monitoring
 - **Command Implementations**: Handlers for Application-scoped commands (Quit, Suspend, Navigation, Refresh, Arrange)
 

@@ -147,18 +147,18 @@ public class TreeView<T> : View, ITreeView where T : class
     public new static Dictionary<Command, PlatformKeyBinding> DefaultKeyBindings { get; set; } = new ()
     {
         // Tree-specific expand/collapse
-        [Command.Expand] = Bind.All ("CursorRight"),
-        [Command.ExpandAll] = Bind.All ("Ctrl+CursorRight"),
-        [Command.Collapse] = Bind.All ("CursorLeft"),
-        [Command.CollapseAll] = Bind.All ("Ctrl+CursorLeft"),
+        [Command.Expand] = Bind.All (Key.CursorRight),
+        [Command.ExpandAll] = Bind.All (Key.CursorRight.WithCtrl),
+        [Command.Collapse] = Bind.All (Key.CursorLeft),
+        [Command.CollapseAll] = Bind.All (Key.CursorLeft.WithCtrl),
 
         // Branch navigation
-        [Command.LineUpToFirstBranch] = Bind.All ("Ctrl+CursorUp"),
-        [Command.LineDownToLastBranch] = Bind.All ("Ctrl+CursorDown"),
+        [Command.LineUpToFirstBranch] = Bind.All (Key.CursorUp.WithCtrl),
+        [Command.LineDownToLastBranch] = Bind.All (Key.CursorDown.WithCtrl),
 
         // TreeView uses Home/End (not Ctrl+Home/Ctrl+End like the base layer)
-        [Command.Start] = Bind.All ("Home"),
-        [Command.End] = Bind.All ("End")
+        [Command.Start] = Bind.All (Key.Home),
+        [Command.End] = Bind.All (Key.End)
     };
 
     /// <summary>

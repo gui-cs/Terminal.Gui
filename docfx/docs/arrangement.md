@@ -649,7 +649,7 @@ using Terminal.Gui.Configuration;
 using IApplication app = Application.Create();
 
 // Change the arrange key
-app.Keyboard.ArrangeKey = Key.F2;
+Application.DefaultKeyBindings[Command.Arrange] = Bind.All (Key.F2);
 
 app.Init();
 

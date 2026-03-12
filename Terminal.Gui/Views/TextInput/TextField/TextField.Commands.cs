@@ -19,42 +19,42 @@ public partial class TextField
     public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
         // Emacs navigation
-        [Command.Left] = Bind.All ("Ctrl+B"),
-        [Command.Right] = Bind.All ("Ctrl+F"),
+        [Command.Left] = Bind.All (Key.B.WithCtrl),
+        [Command.Right] = Bind.All (Key.F.WithCtrl),
 
         // Additional LeftStart key (Ctrl+Home; base already has Home)
-        [Command.LeftStart] = Bind.All ("Ctrl+Home"),
+        [Command.LeftStart] = Bind.All (Key.Home.WithCtrl),
 
         // Additional RightEnd keys (Ctrl+End, Ctrl+E; base already has End)
-        [Command.RightEnd] = Bind.All ("Ctrl+End", "Ctrl+E"),
+        [Command.RightEnd] = Bind.All (Key.End.WithCtrl, Key.E.WithCtrl),
 
         // Additional extend keys (CursorUp/CursorDown with Shift; base has CursorLeft/CursorRight with Shift)
-        [Command.LeftExtend] = Bind.All ("Shift+CursorUp"),
-        [Command.RightExtend] = Bind.All ("Shift+CursorDown"),
+        [Command.LeftExtend] = Bind.All (Key.CursorUp.WithShift),
+        [Command.RightExtend] = Bind.All (Key.CursorDown.WithShift),
 
         // Additional LeftStartExtend keys (base already has Shift+Home)
-        [Command.LeftStartExtend] = Bind.All ("Ctrl+Shift+Home", "Ctrl+Shift+A"),
+        [Command.LeftStartExtend] = Bind.All (Key.Home.WithCtrl.WithShift, Key.A.WithCtrl.WithShift),
 
         // Additional RightEndExtend keys (base already has Shift+End)
-        [Command.RightEndExtend] = Bind.All ("Ctrl+Shift+End", "Ctrl+Shift+E"),
+        [Command.RightEndExtend] = Bind.All (Key.End.WithCtrl.WithShift, Key.E.WithCtrl.WithShift),
 
         // Word navigation
-        [Command.WordLeft] = Bind.All ("Ctrl+CursorLeft", "Ctrl+CursorUp"),
-        [Command.WordRight] = Bind.All ("Ctrl+CursorRight", "Ctrl+CursorDown"),
-        [Command.WordLeftExtend] = Bind.All ("Ctrl+Shift+CursorLeft", "Ctrl+Shift+CursorUp"),
-        [Command.WordRightExtend] = Bind.All ("Ctrl+Shift+CursorRight", "Ctrl+Shift+CursorDown"),
+        [Command.WordLeft] = Bind.All (Key.CursorLeft.WithCtrl, Key.CursorUp.WithCtrl),
+        [Command.WordRight] = Bind.All (Key.CursorRight.WithCtrl, Key.CursorDown.WithCtrl),
+        [Command.WordLeftExtend] = Bind.All (Key.CursorLeft.WithCtrl.WithShift, Key.CursorUp.WithCtrl.WithShift),
+        [Command.WordRightExtend] = Bind.All (Key.CursorRight.WithCtrl.WithShift, Key.CursorDown.WithCtrl.WithShift),
 
         // Kill commands
-        [Command.CutToEndOfLine] = Bind.All ("Ctrl+K"),
-        [Command.CutToStartOfLine] = Bind.All ("Ctrl+Shift+K"),
-        [Command.KillWordRight] = Bind.All ("Ctrl+Delete"),
-        [Command.KillWordLeft] = Bind.All ("Ctrl+Backspace"),
+        [Command.CutToEndOfLine] = Bind.All (Key.K.WithCtrl),
+        [Command.CutToStartOfLine] = Bind.All (Key.K.WithCtrl.WithShift),
+        [Command.KillWordRight] = Bind.All (Key.Delete.WithCtrl),
+        [Command.KillWordLeft] = Bind.All (Key.Backspace.WithCtrl),
 
         // Overwrite mode
-        [Command.ToggleOverwrite] = Bind.All ("Insert"),
+        [Command.ToggleOverwrite] = Bind.All (Key.InsertChar),
 
         // Delete all text
-        [Command.DeleteAll] = Bind.All ("Ctrl+Shift+Delete")
+        [Command.DeleteAll] = Bind.All (Key.Delete.WithCtrl.WithShift)
     };
 
     private void CreateCommandsAndBindings ()

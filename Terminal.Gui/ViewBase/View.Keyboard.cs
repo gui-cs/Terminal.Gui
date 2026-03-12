@@ -665,40 +665,40 @@ public partial class View // Keyboard APIs
     } = new ()
     {
         // Navigation
-        [Command.Left] = Bind.All ("CursorLeft"),
-        [Command.Right] = Bind.All ("CursorRight"),
-        [Command.Up] = Bind.All ("CursorUp"),
-        [Command.Down] = Bind.All ("CursorDown"),
-        [Command.PageUp] = Bind.All ("PageUp"),
-        [Command.PageDown] = Bind.All ("PageDown"),
-        [Command.LeftStart] = Bind.All ("Home"),
-        [Command.RightEnd] = Bind.All ("End"),
-        [Command.Start] = Bind.All ("Ctrl+Home"),
-        [Command.End] = Bind.All ("Ctrl+End"),
+        [Command.Left] = Bind.All (Key.CursorLeft),
+        [Command.Right] = Bind.All (Key.CursorRight),
+        [Command.Up] = Bind.All (Key.CursorUp),
+        [Command.Down] = Bind.All (Key.CursorDown),
+        [Command.PageUp] = Bind.All (Key.PageUp),
+        [Command.PageDown] = Bind.All (Key.PageDown),
+        [Command.LeftStart] = Bind.All (Key.Home),
+        [Command.RightEnd] = Bind.All (Key.End),
+        [Command.Start] = Bind.All (Key.Home.WithCtrl),
+        [Command.End] = Bind.All (Key.End.WithCtrl),
 
         // Selection-extend
-        [Command.LeftExtend] = Bind.All ("Shift+CursorLeft"),
-        [Command.RightExtend] = Bind.All ("Shift+CursorRight"),
-        [Command.UpExtend] = Bind.All ("Shift+CursorUp"),
-        [Command.DownExtend] = Bind.All ("Shift+CursorDown"),
-        [Command.PageUpExtend] = Bind.All ("Shift+PageUp"),
-        [Command.PageDownExtend] = Bind.All ("Shift+PageDown"),
-        [Command.LeftStartExtend] = Bind.All ("Shift+Home"),
-        [Command.RightEndExtend] = Bind.All ("Shift+End"),
-        [Command.StartExtend] = Bind.All ("Ctrl+Shift+Home"),
-        [Command.EndExtend] = Bind.All ("Ctrl+Shift+End"),
+        [Command.LeftExtend] = Bind.All (Key.CursorLeft.WithShift),
+        [Command.RightExtend] = Bind.All (Key.CursorRight.WithShift),
+        [Command.UpExtend] = Bind.All (Key.CursorUp.WithShift),
+        [Command.DownExtend] = Bind.All (Key.CursorDown.WithShift),
+        [Command.PageUpExtend] = Bind.All (Key.PageUp.WithShift),
+        [Command.PageDownExtend] = Bind.All (Key.PageDown.WithShift),
+        [Command.LeftStartExtend] = Bind.All (Key.Home.WithShift),
+        [Command.RightEndExtend] = Bind.All (Key.End.WithShift),
+        [Command.StartExtend] = Bind.All (Key.Home.WithCtrl.WithShift),
+        [Command.EndExtend] = Bind.All (Key.End.WithCtrl.WithShift),
 
         // Clipboard
-        [Command.Copy] = Bind.All ("Ctrl+C"),
-        [Command.Cut] = Bind.All ("Ctrl+X"),
-        [Command.Paste] = Bind.All ("Ctrl+V"),
+        [Command.Copy] = Bind.All (Key.C.WithCtrl),
+        [Command.Cut] = Bind.All (Key.X.WithCtrl),
+        [Command.Paste] = Bind.All (Key.V.WithCtrl),
 
         // Editing
-        [Command.Undo] = Bind.AllPlus ("Ctrl+Z", ["Ctrl+/"]),
-        [Command.Redo] = Bind.AllPlus ("Ctrl+Y", ["Ctrl+Shift+Z"]),
-        [Command.SelectAll] = Bind.All ("Ctrl+A"),
-        [Command.DeleteCharLeft] = Bind.All ("Backspace"),
-        [Command.DeleteCharRight] = Bind.All ("Delete", "Ctrl+D")
+        [Command.Undo] = Bind.AllPlus (Key.Z.WithCtrl, [new Key ('/').WithCtrl]),
+        [Command.Redo] = Bind.AllPlus (Key.Y.WithCtrl, [Key.Z.WithCtrl.WithShift]),
+        [Command.SelectAll] = Bind.All (Key.A.WithCtrl),
+        [Command.DeleteCharLeft] = Bind.All (Key.Backspace),
+        [Command.DeleteCharRight] = Bind.All (Key.Delete, Key.D.WithCtrl)
     };
 
     /// <summary>

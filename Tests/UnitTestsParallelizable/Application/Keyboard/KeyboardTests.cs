@@ -288,8 +288,13 @@ public class KeyboardTests
     [Fact]
     public void KeyBindings_Remove_Removes ()
     {
-        // Arrange
+        // Arrange — dispose immediately to detach from DefaultKeyBindingsChanged,
+        // preventing interference from parallel tests modifying Application.DefaultKeyBindings.
         var keyboard = new ApplicationKeyboard ();
+        keyboard.Dispose ();
+
+        // Re-init bindings manually without event subscription
+        keyboard.KeyBindings.Clear ();
         keyboard.KeyBindings.Add (Key.A, Command.Accept);
         Assert.True (keyboard.KeyBindings.TryGet (Key.A, out _));
 

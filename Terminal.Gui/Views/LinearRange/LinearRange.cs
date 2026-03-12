@@ -134,8 +134,8 @@ public class LinearRange<T> : View, IOrientation
     /// </remarks>
     public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
-        [Command.Accept] = Bind.All ("Enter"),
-        [Command.Activate] = Bind.All ("Space"),
+        [Command.Accept] = Bind.All (Key.Enter),
+        [Command.Activate] = Bind.All (Key.Space),
     };
 
     private readonly LinearRangeConfiguration _config = new ();

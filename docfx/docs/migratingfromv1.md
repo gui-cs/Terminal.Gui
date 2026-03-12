@@ -483,7 +483,7 @@ if (key == Application.GetDefaultKey (Command.Quit))
 }
 
 // Change the quit key via DefaultKeyBindings
-Application.DefaultKeyBindings.ReplaceKey (Application.GetDefaultKey (Command.Quit), Key.Esc);
+Application.DefaultKeyBindings[Command.Quit] = Bind.All (Key.Esc);
 ```
 
 ### Navigation Keys

@@ -96,7 +96,7 @@ public class DropDownList : TextField
     /// </summary>
     public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
-        [Command.Toggle] = Bind.All ("F4", "Alt+CursorDown"),
+        [Command.Toggle] = Bind.All (Key.F4, Key.CursorDown.WithAlt),
     };
 
     private readonly Button? _toggleButton;

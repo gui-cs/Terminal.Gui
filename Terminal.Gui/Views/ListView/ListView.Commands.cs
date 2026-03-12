@@ -19,21 +19,21 @@ public partial class ListView
     public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
         // Emacs navigation
-        [Command.Up] = Bind.All ("Ctrl+P"),
-        [Command.Down] = Bind.All ("Ctrl+N"),
-        [Command.PageDown] = Bind.All ("Ctrl+V"),
+        [Command.Up] = Bind.All (Key.P.WithCtrl),
+        [Command.Down] = Bind.All (Key.N.WithCtrl),
+        [Command.PageDown] = Bind.All (Key.V.WithCtrl),
 
         // ListView uses Home/End (not Ctrl+Home/Ctrl+End like the base layer)
-        [Command.Start] = Bind.All ("Home"),
-        [Command.End] = Bind.All ("End"),
+        [Command.Start] = Bind.All (Key.Home),
+        [Command.End] = Bind.All (Key.End),
 
         // Emacs extend
-        [Command.UpExtend] = Bind.All ("Ctrl+Shift+P"),
-        [Command.DownExtend] = Bind.All ("Ctrl+Shift+N"),
+        [Command.UpExtend] = Bind.All (Key.P.WithCtrl.WithShift),
+        [Command.DownExtend] = Bind.All (Key.N.WithCtrl.WithShift),
 
         // ListView uses Shift+Home/End (not Ctrl+Shift+Home/End like the base layer)
-        [Command.StartExtend] = Bind.All ("Shift+Home"),
-        [Command.EndExtend] = Bind.All ("Shift+End"),
+        [Command.StartExtend] = Bind.All (Key.Home.WithShift),
+        [Command.EndExtend] = Bind.All (Key.End.WithShift),
     };
 
     private void SetupBindingsAndCommands ()

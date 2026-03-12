@@ -27,7 +27,7 @@ public class ApplyKeyBindingsTests
     public void ApplyKeyBindings_AllPlatform_BindsKey ()
     {
         TestView view = new (Command.Left);
-        Dictionary<Command, PlatformKeyBinding> layer = new () { [Command.Left] = Bind.All ("CursorLeft") };
+        Dictionary<Command, PlatformKeyBinding> layer = new () { [Command.Left] = Bind.All (Key.CursorLeft) };
 
         view.CallApplyKeyBindings (layer);
 
@@ -39,7 +39,7 @@ public class ApplyKeyBindingsTests
     public void ApplyKeyBindings_BindsSupportedCommand ()
     {
         TestView view = new (Command.Right);
-        Dictionary<Command, PlatformKeyBinding> layer = new () { [Command.Right] = Bind.All ("CursorRight") };
+        Dictionary<Command, PlatformKeyBinding> layer = new () { [Command.Right] = Bind.All (Key.CursorRight) };
 
         view.CallApplyKeyBindings (layer);
 
@@ -51,7 +51,7 @@ public class ApplyKeyBindingsTests
     {
         // View does NOT support Command.Left
         TestView view = new (Command.Right);
-        Dictionary<Command, PlatformKeyBinding> layer = new () { [Command.Left] = Bind.All ("CursorLeft") };
+        Dictionary<Command, PlatformKeyBinding> layer = new () { [Command.Left] = Bind.All (Key.CursorLeft) };
 
         view.CallApplyKeyBindings (layer);
 
@@ -62,8 +62,8 @@ public class ApplyKeyBindingsTests
     public void ApplyKeyBindings_MultipleLayers_Additive ()
     {
         TestView view = new (Command.Left, Command.Right);
-        Dictionary<Command, PlatformKeyBinding> layer1 = new () { [Command.Left] = Bind.All ("CursorLeft") };
-        Dictionary<Command, PlatformKeyBinding> layer2 = new () { [Command.Right] = Bind.All ("CursorRight") };
+        Dictionary<Command, PlatformKeyBinding> layer1 = new () { [Command.Left] = Bind.All (Key.CursorLeft) };
+        Dictionary<Command, PlatformKeyBinding> layer2 = new () { [Command.Right] = Bind.All (Key.CursorRight) };
 
         view.CallApplyKeyBindings (layer1, layer2);
 
@@ -75,7 +75,7 @@ public class ApplyKeyBindingsTests
     public void ApplyKeyBindings_NullLayer_Skipped ()
     {
         TestView view = new (Command.Left);
-        Dictionary<Command, PlatformKeyBinding> validLayer = new () { [Command.Left] = Bind.All ("CursorLeft") };
+        Dictionary<Command, PlatformKeyBinding> validLayer = new () { [Command.Left] = Bind.All (Key.CursorLeft) };
 
         // Should not throw
         view.CallApplyKeyBindings (null, validLayer);
@@ -87,7 +87,7 @@ public class ApplyKeyBindingsTests
     public void ApplyKeyBindings_InvalidCommandName_Skipped ()
     {
         TestView view = new (Command.Left);
-        Dictionary<Command, PlatformKeyBinding> layer = new () { [(Command)9999] = Bind.All ("X") };
+        Dictionary<Command, PlatformKeyBinding> layer = new () { [(Command)9999] = Bind.All (Key.X) };
 
         // Should not throw
         view.CallApplyKeyBindings (layer);
@@ -113,7 +113,7 @@ public class ApplyKeyBindingsTests
         // Manually bind CursorLeft to Command.Right first
         view.KeyBindings.Add (Key.CursorLeft, Command.Right);
 
-        Dictionary<Command, PlatformKeyBinding> layer = new () { [Command.Left] = Bind.All ("CursorLeft") };
+        Dictionary<Command, PlatformKeyBinding> layer = new () { [Command.Left] = Bind.All (Key.CursorLeft) };
 
         view.CallApplyKeyBindings (layer);
 
@@ -127,7 +127,7 @@ public class ApplyKeyBindingsTests
     public void ApplyKeyBindings_MultipleKeysPerCommand ()
     {
         TestView view = new (Command.Left);
-        Dictionary<Command, PlatformKeyBinding> layer = new () { [Command.Left] = Bind.All ("CursorLeft", "Ctrl+B") };
+        Dictionary<Command, PlatformKeyBinding> layer = new () { [Command.Left] = Bind.All (Key.CursorLeft, Key.B.WithCtrl) };
 
         view.CallApplyKeyBindings (layer);
 
@@ -173,7 +173,7 @@ public class ApplyKeyBindingsTests
         {
             View.ViewKeyBindings = new Dictionary<string, Dictionary<Command, PlatformKeyBinding>>
             {
-                ["SomeOtherView"] = new () { [Command.Left] = Bind.All ("CursorLeft") }
+                ["SomeOtherView"] = new () { [Command.Left] = Bind.All (Key.CursorLeft) }
             };
 
             TestView view = new (Command.Left);

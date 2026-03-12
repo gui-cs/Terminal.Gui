@@ -528,11 +528,11 @@ v2 decouples navigation concepts:
 - Arrow keys - Same as Tab navigation
 
 ```csharp
-// Configure navigation keys
-App.Keyboard.NextTabStopKey = Key.Tab;
-App.Keyboard.PrevTabStopKey = Key.Tab.WithShift;
-App.Keyboard.NextTabGroupKey = Key.F6;
-App.Keyboard.PrevTabGroupKey = Key.F6.WithShift;
+// Configure navigation keys via Application.DefaultKeyBindings
+Application.DefaultKeyBindings[Command.NextTabStop] = Bind.All (Key.Tab);
+Application.DefaultKeyBindings[Command.PreviousTabStop] = Bind.All (Key.Tab.WithShift);
+Application.DefaultKeyBindings[Command.NextTabGroup] = Bind.All (Key.F6);
+Application.DefaultKeyBindings[Command.PreviousTabGroup] = Bind.All (Key.F6.WithShift);
 
 // Set tab behavior
 view.CanFocus = true;

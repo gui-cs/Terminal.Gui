@@ -898,7 +898,7 @@ Update ConfigurationManager to reflect current static property values:
 
 ```csharp
 // Change a setting programmatically
-Application.DefaultKeyBindings.ReplaceKey (Application.GetDefaultKey (Command.Quit), Key.Q.WithCtrl);
+Application.DefaultKeyBindings[Command.Quit] = Bind.All (Key.Q.WithCtrl);
 
 // Update ConfigurationManager to reflect the change
 ConfigurationManager.UpdateToCurrentValues();
@@ -1003,15 +1003,17 @@ ConfigurationManager.UpdateToCurrentValues();
 ```csharp
 ConfigurationManager.RuntimeConfig = @"
 {
-  ""Application.DefaultKeyBindings.Quit"": ""Ctrl+Q"",
-  ""Application.Force16Colors"": true,
+  ""Application.DefaultKeyBindings"": {
+    ""Quit"": { ""All"": [""Ctrl+Q""] }
+  },
+  ""Driver.Force16Colors"": true,
   ""Theme"": ""Dark""
 }";
 
 ConfigurationManager.Enable(ConfigLocations.Runtime);
 
 // Settings are now applied
-// QuitKey is Ctrl+Q
+// Quit key is Ctrl+Q
 // 16-color mode is forced
 // Dark theme is active
 ```

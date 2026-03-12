@@ -93,16 +93,16 @@ public class HexView : View, IDesignable
     public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
         // HexView maps Home/End to stream start/end (overrides base layer's LeftStart/RightEnd)
-        [Command.Start] = Bind.All ("Home"),
-        [Command.End] = Bind.All ("End"),
+        [Command.Start] = Bind.All (Key.Home),
+        [Command.End] = Bind.All (Key.End),
 
         // Row start/end via Ctrl+Left/Right
-        [Command.LeftStart] = Bind.All ("Ctrl+CursorLeft"),
-        [Command.RightEnd] = Bind.All ("Ctrl+CursorRight"),
+        [Command.LeftStart] = Bind.All (Key.CursorLeft.WithCtrl),
+        [Command.RightEnd] = Bind.All (Key.CursorRight.WithCtrl),
 
-        [Command.StartOfPage] = Bind.All ("Ctrl+CursorUp"),
-        [Command.EndOfPage] = Bind.All ("Ctrl+CursorDown"),
-        [Command.Insert] = Bind.All ("Insert"),
+        [Command.StartOfPage] = Bind.All (Key.CursorUp.WithCtrl),
+        [Command.EndOfPage] = Bind.All (Key.CursorDown.WithCtrl),
+        [Command.Insert] = Bind.All (Key.InsertChar),
     };
 
     private const int DEFAULT_ADDRESS_WIDTH = 8; // The default value for AddressWidth

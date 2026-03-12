@@ -20,40 +20,40 @@ public partial class TextView
     public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
         // Emacs navigation
-        [Command.Down] = Bind.All ("Ctrl+N"),
-        [Command.Up] = Bind.All ("Ctrl+P"),
-        [Command.Right] = Bind.All ("Ctrl+F"),
-        [Command.Left] = Bind.All ("Ctrl+B"),
+        [Command.Down] = Bind.All (Key.N.WithCtrl),
+        [Command.Up] = Bind.All (Key.P.WithCtrl),
+        [Command.Right] = Bind.All (Key.F.WithCtrl),
+        [Command.Left] = Bind.All (Key.B.WithCtrl),
 
         // Additional RightEnd binding
-        [Command.RightEnd] = Bind.All ("Ctrl+E"),
+        [Command.RightEnd] = Bind.All (Key.E.WithCtrl),
 
         // Toggle selection mode
-        [Command.ToggleExtend] = Bind.All ("Ctrl+Space"),
+        [Command.ToggleExtend] = Bind.All (Key.Space.WithCtrl),
 
         // Kill / cut line commands
-        [Command.CutToEndOfLine] = Bind.All ("Ctrl+K"),
-        [Command.CutToStartOfLine] = Bind.All ("Ctrl+Shift+Backspace"),
-        [Command.DeleteAll] = Bind.All ("Ctrl+Shift+Delete"),
+        [Command.CutToEndOfLine] = Bind.All (Key.K.WithCtrl),
+        [Command.CutToStartOfLine] = Bind.All (Key.Backspace.WithCtrl.WithShift),
+        [Command.DeleteAll] = Bind.All (Key.Delete.WithCtrl.WithShift),
 
         // Additional Cut binding (Emacs)
-        [Command.Cut] = Bind.All ("Ctrl+W"),
+        [Command.Cut] = Bind.All (Key.W.WithCtrl),
 
         // Word navigation
-        [Command.WordLeft] = Bind.All ("Ctrl+CursorLeft"),
-        [Command.WordRight] = Bind.All ("Ctrl+CursorRight"),
-        [Command.WordLeftExtend] = Bind.All ("Ctrl+Shift+CursorLeft"),
-        [Command.WordRightExtend] = Bind.All ("Ctrl+Shift+CursorRight"),
+        [Command.WordLeft] = Bind.All (Key.CursorLeft.WithCtrl),
+        [Command.WordRight] = Bind.All (Key.CursorRight.WithCtrl),
+        [Command.WordLeftExtend] = Bind.All (Key.CursorLeft.WithCtrl.WithShift),
+        [Command.WordRightExtend] = Bind.All (Key.CursorRight.WithCtrl.WithShift),
 
         // Kill word
-        [Command.KillWordRight] = Bind.All ("Ctrl+Delete"),
-        [Command.KillWordLeft] = Bind.All ("Ctrl+Backspace"),
+        [Command.KillWordRight] = Bind.All (Key.Delete.WithCtrl),
+        [Command.KillWordLeft] = Bind.All (Key.Backspace.WithCtrl),
 
         // Overwrite mode
-        [Command.ToggleOverwrite] = Bind.All ("Insert"),
+        [Command.ToggleOverwrite] = Bind.All (Key.InsertChar),
 
         // Open color picker
-        [Command.Open] = Bind.All ("Ctrl+L")
+        [Command.Open] = Bind.All (Key.L.WithCtrl)
     };
 
     private void CreateCommandsAndBindings ()
