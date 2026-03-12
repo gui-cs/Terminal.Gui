@@ -110,11 +110,16 @@ internal class TabRow : View
             {
                 // Selected tab: open bottom (tabs on top) or open top (tabs on bottom)
                 header.Border!.Thickness = tabsOnBottom ? new Thickness (1, 0, 1, 1) : new Thickness (1, 1, 1, 0);
+
+                // When TabsOnBottom, Border.Top=0 shifts content to row 0, colliding with
+                // the continuation line. Compensate with Padding.Top=1 to push text to row 1.
+                header.Padding!.Thickness = tabsOnBottom ? new Thickness (0, 1, 0, 0) : new Thickness (0);
             }
             else
             {
                 // Unselected tab: full border
                 header.Border!.Thickness = new Thickness (1);
+                header.Padding!.Thickness = new Thickness (0);
             }
         }
 

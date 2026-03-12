@@ -694,58 +694,19 @@ All in `Tests/UnitTestsParallelizable/Views/TabViewTests.cs`:
 | Phase 2: Core TabView + Tab + TabRow | ✅ Done |
 | Phase 3: TabViews Scenario | ✅ Done |
 | Phase 4: Navigation and Commands | ⚠️ Partial — basic Ctrl+Left/Right/Home/End works. Tab hotkeys and Tab-key focus navigation do NOT work. |
-| Phase 5: Visual Polish | ⚠️ Partial — tabs-on-top rendering works. **TabsOnBottom is broken** (see fix plan below). Tab scrolling not implemented. |
+| Phase 5: Visual Polish | ⚠️ Partial — tabs-on-top rendering works. TabsOnBottom rendering **FIXED** (Padding.Top=1 compensation). Tab scrolling not implemented. |
 | Phase 6: Events and API Completeness | ✅ Done |
-| Phase 7: Tests | ⚠️ Partial — 59 tests pass, but visual test coverage is thin. No visual tests for TabsOnBottom (existing one has wrong expected output), no scroll tests, no bottom+selection-switch tests. |
+| Phase 7: Tests | ⚠️ Partial — 71 tests pass (43 in TabViewTests + 28 in TabViewVisualTests). Comprehensive visual tests for tabs-on-top and tabs-on-bottom. No scroll tests. |
 
 ## Known Issues (To Fix)
 
-### Issue 1: TabsOnBottom rendering broken — FIX PLAN
+### Issue 1: TabsOnBottom rendering — ✅ FIXED
 
-**Root cause:** In `TabRow.UpdateHeaderAppearance()`, the selected header when TabsOnBottom gets `Border.Thickness = new Thickness(1, 0, 1, 1)` (no top border). With `Thickness.Top=0`, the View content area starts at Y=0 of the header, but Y=0 is also where the continuation line draws. Text and continuation line collide on the same row.
+**Root cause:** In `TabRow.UpdateHeaderAppearance()`, selected header with `Border.Thickness.Top=0` caused text to render at Y=0, colliding with the continuation line.
 
-**Fix:** Add `Padding.Top=1` on the selected header when TabsOnBottom to push text from Y=0 to Y=1:
+**Fix applied:** Added `Padding.Top=1` compensation on selected header when TabsOnBottom in `TabRow.UpdateHeaderAppearance()`. Also resets `Padding.Thickness = new Thickness(0)` for unselected tabs.
 
-```csharp
-// In TabRow.UpdateHeaderAppearance(), replace selected/unselected block:
-if (i == selectedIndex)
-{
-    header.Border!.Thickness = tabsOnBottom ? new Thickness (1, 0, 1, 1) : new Thickness (1, 1, 1, 0);
-    header.Padding!.Thickness = tabsOnBottom ? new Thickness (0, 1, 0, 0) : new Thickness (0);
-}
-else
-{
-    header.Border!.Thickness = new Thickness (1);
-    header.Padding!.Thickness = new Thickness (0);
-}
-```
-
-**Why it works:** Header Height=3 is fixed. With `Border.Top=0` + `Padding.Top=1`, text renders at Y=1 (same row as full-bordered headers). Border still draws correctly — no top line, verticals extend through. No changes needed to `UpdateBorderGaps()` or `OnDrawingContent()`.
-
-**Visual tests to add/fix (~13 new tests):**
-
-Tabs on Top (new):
-- `Renders_ThreeTabs_FirstSelected` — 25x6, AA/BB/CC, index 0
-- `Renders_ThreeTabs_LastSelected` — 25x6, AA/BB/CC, index 2
-
-Tabs on Bottom (fix + new):
-- `Renders_TabsOnBottom` — FIX existing test's expected output
-- `Renders_TabsOnBottom_SecondSelected` — 20x7, T1/T2, index 1
-- `Renders_TabsOnBottom_ThreeTabs_FirstSelected` — 25x8, index 0
-- `Renders_TabsOnBottom_ThreeTabs_MiddleSelected` — 25x8, index 1
-- `Renders_TabsOnBottom_ThreeTabs_LastSelected` — 25x8, index 2
-- `Renders_TabsOnBottom_SingleTab` — 15x8, index 0
-
-State transitions:
-- `Renders_SwitchTab_TabsOnBottom_UpdatesVisual` — switch 0→1
-- `Renders_ToggleTabsOnBottom_ChangesRendering` — flip at runtime
-
-Padding assertions:
-- `Render_SelectedTab_TabsOnBottom_HasPaddingOffset` — Padding.Top=1 for selected
-- `Render_SwitchingSelection_TabsOnBottom_UpdatesPadding` — padding resets on switch
-
-Edge cases:
-- `Renders_NoTabs` — empty TabView
+**Tests:** 13 new visual tests added in `TabViewVisualTests.cs` (refactored from `TabViewTests.cs`), covering tabs-on-top, tabs-on-bottom, state transitions, padding assertions, and edge cases. All pass.
 
 ### Issue 2: Tab scrolling not implemented
 
