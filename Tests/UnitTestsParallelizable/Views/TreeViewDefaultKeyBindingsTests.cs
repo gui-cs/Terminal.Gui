@@ -17,13 +17,13 @@ public class TreeViewDefaultKeyBindingsTests
     {
         foreach ((Command command, PlatformKeyBinding platformBinding) in TreeView<ITreeNode>.DefaultKeyBindings!)
         {
-            string [] [] allKeyArrays = [platformBinding.All ?? [], platformBinding.Windows ?? [], platformBinding.Linux ?? [], platformBinding.Macos ?? []];
+            Key [] [] allKeyArrays = [platformBinding.All ?? [], platformBinding.Windows ?? [], platformBinding.Linux ?? [], platformBinding.Macos ?? []];
 
-            foreach (string [] keyArray in allKeyArrays)
+            foreach (Key [] keyArray in allKeyArrays)
             {
-                foreach (string keyString in keyArray)
+                foreach (Key key in keyArray)
                 {
-                    Assert.True (Key.TryParse (keyString, out _), $"Key string '{keyString}' for command '{command}' should be parseable.");
+                    Assert.NotEqual (Key.Empty, key);
                 }
             }
         }

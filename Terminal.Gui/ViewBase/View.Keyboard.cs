@@ -748,9 +748,9 @@ public partial class View // Keyboard APIs
                 continue;
             }
 
-            foreach (string keyString in platformKeys.GetCurrentPlatformKeys ())
+            foreach (Key key in platformKeys.GetCurrentPlatformKeys ())
             {
-                if (!Key.TryParse (keyString, out Key key))
+                if (key == Key.Empty)
                 {
                     continue;
                 }

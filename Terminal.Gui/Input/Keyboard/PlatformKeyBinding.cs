@@ -1,22 +1,28 @@
+using System.Text.Json.Serialization;
+
 namespace Terminal.Gui;
 
 /// <summary>
-///     Defines the key strings for a single command, optionally varying by platform.
+///     Defines the keys for a single command, optionally varying by platform.
 ///     Keys are additive — for example, on Linux both <see cref="All"/> and <see cref="Linux"/> keys apply.
 /// </summary>
 public record PlatformKeyBinding
 {
     /// <summary>Gets or sets keys that apply on all platforms.</summary>
-    public string []? All { get; init; }
+    [JsonConverter (typeof (KeyArrayJsonConverter))]
+    public Key []? All { get; init; }
 
     /// <summary>Gets or sets additional keys for Windows only.</summary>
-    public string []? Windows { get; init; }
+    [JsonConverter (typeof (KeyArrayJsonConverter))]
+    public Key []? Windows { get; init; }
 
     /// <summary>Gets or sets additional keys for Linux only.</summary>
-    public string []? Linux { get; init; }
+    [JsonConverter (typeof (KeyArrayJsonConverter))]
+    public Key []? Linux { get; init; }
 
     /// <summary>Gets or sets additional keys for macOS only.</summary>
-    public string []? Macos { get; init; }
+    [JsonConverter (typeof (KeyArrayJsonConverter))]
+    public Key []? Macos { get; init; }
 
     /// <inheritdoc/>
     public override string ToString ()
@@ -25,55 +31,55 @@ public record PlatformKeyBinding
 
         if (All is { Length: > 0 })
         {
-            parts.Add ($"All=[{string.Join (", ", All)}]");
+            parts.Add ($"All=[{string.Join (", ", All.Select (k => k.ToString ()))}]");
         }
 
         if (Windows is { Length: > 0 })
         {
-            parts.Add ($"Win=[{string.Join (", ", Windows)}]");
+            parts.Add ($"Win=[{string.Join (", ", Windows.Select (k => k.ToString ()))}]");
         }
 
         if (Linux is { Length: > 0 })
         {
-            parts.Add ($"Linux=[{string.Join (", ", Linux)}]");
+            parts.Add ($"Linux=[{string.Join (", ", Linux.Select (k => k.ToString ()))}]");
         }
 
         if (Macos is { Length: > 0 })
         {
-            parts.Add ($"Mac=[{string.Join (", ", Macos)}]");
+            parts.Add ($"Mac=[{string.Join (", ", Macos.Select (k => k.ToString ()))}]");
         }
 
         return parts.Count > 0 ? string.Join ("; ", parts) : "(none)";
     }
 
     /// <summary>
-    ///     Returns the key strings applicable to the current operating system.
+    ///     Returns the keys applicable to the current operating system.
     ///     Yields all <see cref="All"/> keys followed by the platform-specific keys.
     /// </summary>
-    public IEnumerable<string> GetCurrentPlatformKeys ()
+    public IEnumerable<Key> GetCurrentPlatformKeys ()
     {
         if (All is { })
         {
-            foreach (string k in All)
+            foreach (Key k in All)
             {
                 yield return k;
             }
         }
 
-        string []? platKeys = PlatformDetection.GetCurrentPlatform () switch
-                              {
-                                  TuiPlatform.Windows => Windows,
-                                  TuiPlatform.Linux => Linux,
-                                  TuiPlatform.Macos => Macos,
-                                  _ => null
-                              };
+        Key []? platKeys = PlatformDetection.GetCurrentPlatform () switch
+                           {
+                               TuiPlatform.Windows => Windows,
+                               TuiPlatform.Linux => Linux,
+                               TuiPlatform.Macos => Macos,
+                               _ => null
+                           };
 
         if (platKeys is null)
         {
             yield break;
         }
 
-        foreach (string k in platKeys)
+        foreach (Key k in platKeys)
         {
             yield return k;
         }

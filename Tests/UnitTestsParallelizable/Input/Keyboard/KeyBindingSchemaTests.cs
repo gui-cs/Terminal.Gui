@@ -1,40 +1,29 @@
 // Claude - Opus 4.6
 
 using System.Text.Json;
-using Terminal.Gui;
-using Terminal.Gui.Configuration;
 
 namespace InputTests;
 
 public class KeyBindingSchemaTests
 {
-    private static readonly JsonSerializerOptions _jsonOptions = new ()
-    {
-        TypeInfoResolver = SourceGenerationContext.Default
-    };
+    private static readonly JsonSerializerOptions _jsonOptions = new () { TypeInfoResolver = SourceGenerationContext.Default };
 
     [Fact]
     public void PlatformKeyBinding_RoundTrips_ThroughJson ()
     {
         // Arrange
-        PlatformKeyBinding original = new ()
-        {
-            All = ["CursorLeft", "Home"],
-            Windows = ["Alt+Left"],
-            Linux = ["Ctrl+B"],
-            Macos = ["Cmd+Left"]
-        };
+        PlatformKeyBinding original = new () { All = ["CursorLeft", "Home"], Windows = ["Alt+CursorLeft"], Linux = ["Ctrl+B"], Macos = ["Alt+CursorLeft"] };
 
         // Act
         string json = JsonSerializer.Serialize (original, _jsonOptions);
-        PlatformKeyBinding? deserialized = JsonSerializer.Deserialize<PlatformKeyBinding> (json, _jsonOptions);
+        var deserialized = JsonSerializer.Deserialize<PlatformKeyBinding> (json, _jsonOptions);
 
         // Assert
         Assert.NotNull (deserialized);
-        Assert.Equal (original.All, deserialized.All);
-        Assert.Equal (original.Windows, deserialized.Windows);
-        Assert.Equal (original.Linux, deserialized.Linux);
-        Assert.Equal (original.Macos, deserialized.Macos);
+        Assert.Equal (original.All!.AsEnumerable (), deserialized.All!.AsEnumerable ());
+        Assert.Equal (original.Windows!.AsEnumerable (), deserialized.Windows!.AsEnumerable ());
+        Assert.Equal (original.Linux!.AsEnumerable (), deserialized.Linux!.AsEnumerable ());
+        Assert.Equal (original.Macos!.AsEnumerable (), deserialized.Macos!.AsEnumerable ());
     }
 
     [Fact]
@@ -43,8 +32,8 @@ public class KeyBindingSchemaTests
         // Arrange
         Dictionary<Command, PlatformKeyBinding> original = new ()
         {
-            [Command.Left] = new () { All = ["CursorLeft"] },
-            [Command.Right] = new () { All = ["CursorRight"], Linux = ["Ctrl+F"] }
+            [Command.Left] = new PlatformKeyBinding { All = ["CursorLeft"] },
+            [Command.Right] = new PlatformKeyBinding { All = ["CursorRight"], Linux = ["Ctrl+F"] }
         };
 
         // Act
@@ -54,15 +43,15 @@ public class KeyBindingSchemaTests
         // Assert
         Assert.NotNull (deserialized);
         Assert.Equal (2, deserialized.Count);
-        Assert.Equal (["CursorLeft"], deserialized [Command.Left].All!);
-        Assert.Equal (["Ctrl+F"], deserialized [Command.Right].Linux!);
+        Assert.Equal ((Key [])["CursorLeft"], deserialized [Command.Left].All!.AsEnumerable ());
+        Assert.Equal ((Key [])["Ctrl+F"], deserialized [Command.Right].Linux!.AsEnumerable ());
     }
 
     [Fact]
     public void KeyBindingDict_Deserializes_FromUserConfigFormat ()
     {
         // Arrange
-        string json = """{ "Left": { "All": ["CursorLeft"], "Linux": ["Ctrl+B"] } }""";
+        var json = """{ "Left": { "All": ["CursorLeft"], "Linux": ["Ctrl+B"] } }""";
 
         // Act
         Dictionary<Command, PlatformKeyBinding>? result = JsonSerializer.Deserialize<Dictionary<Command, PlatformKeyBinding>> (json, _jsonOptions);
@@ -71,8 +60,8 @@ public class KeyBindingSchemaTests
         Assert.NotNull (result);
         Assert.Single (result);
         Assert.True (result.ContainsKey (Command.Left));
-        Assert.Equal (["CursorLeft"], result [Command.Left].All!);
-        Assert.Equal (["Ctrl+B"], result [Command.Left].Linux!);
+        Assert.Equal ((Key [])["CursorLeft"], result [Command.Left].All!.AsEnumerable ());
+        Assert.Equal ((Key [])["Ctrl+B"], result [Command.Left].Linux!.AsEnumerable ());
         Assert.Null (result [Command.Left].Windows);
         Assert.Null (result [Command.Left].Macos);
     }
@@ -98,28 +87,25 @@ public class KeyBindingSchemaTests
         // Arrange
         Dictionary<string, Dictionary<Command, PlatformKeyBinding>> original = new ()
         {
-            ["TextView"] = new ()
+            ["TextView"] = new Dictionary<Command, PlatformKeyBinding>
             {
-                [Command.Left] = new () { All = ["CursorLeft"], Macos = ["Cmd+Left"] },
-                [Command.SelectAll] = new () { All = ["Ctrl+A"] }
+                [Command.Left] = new () { All = ["CursorLeft"], Macos = ["Alt+CursorLeft"] }, [Command.SelectAll] = new () { All = ["Ctrl+A"] }
             },
-            ["TextField"] = new ()
-            {
-                [Command.DeleteAll] = new () { All = ["Ctrl+Shift+Delete"] }
-            }
+            ["TextField"] = new Dictionary<Command, PlatformKeyBinding> { [Command.DeleteAll] = new () { All = ["Ctrl+Shift+Delete"] } }
         };
 
         // Act
         string json = JsonSerializer.Serialize (original, _jsonOptions);
+
         Dictionary<string, Dictionary<Command, PlatformKeyBinding>>? deserialized =
             JsonSerializer.Deserialize<Dictionary<string, Dictionary<Command, PlatformKeyBinding>>> (json, _jsonOptions);
 
         // Assert
         Assert.NotNull (deserialized);
         Assert.Equal (2, deserialized.Count);
-        Assert.Equal (["CursorLeft"], deserialized ["TextView"] [Command.Left].All!);
-        Assert.Equal (["Cmd+Left"], deserialized ["TextView"] [Command.Left].Macos!);
-        Assert.Equal (["Ctrl+A"], deserialized ["TextView"] [Command.SelectAll].All!);
-        Assert.Equal (["Ctrl+Shift+Delete"], deserialized ["TextField"] [Command.DeleteAll].All!);
+        Assert.Equal ((Key [])["CursorLeft"], deserialized ["TextView"] [Command.Left].All!.AsEnumerable ());
+        Assert.Equal ((Key [])["Alt+CursorLeft"], deserialized ["TextView"] [Command.Left].Macos!.AsEnumerable ());
+        Assert.Equal ((Key [])["Ctrl+A"], deserialized ["TextView"] [Command.SelectAll].All!.AsEnumerable ());
+        Assert.Equal ((Key [])["Ctrl+Shift+Delete"], deserialized ["TextField"] [Command.DeleteAll].All!.AsEnumerable ());
     }
 }

@@ -8,7 +8,7 @@ public class BindTests
     {
         PlatformKeyBinding result = Bind.All ("CursorLeft");
 
-        Assert.Equal (["CursorLeft"], result.All!);
+        Assert.Equal ((Key [])["CursorLeft"], result.All!.AsEnumerable ());
         Assert.Null (result.Windows);
         Assert.Null (result.Linux);
         Assert.Null (result.Macos);
@@ -19,7 +19,7 @@ public class BindTests
     {
         PlatformKeyBinding result = Bind.All ("Home", "Ctrl+Home");
 
-        Assert.Equal (["Home", "Ctrl+Home"], result.All!);
+        Assert.Equal ((Key [])["Home", "Ctrl+Home"], result.All!.AsEnumerable ());
     }
 
     [Fact]
@@ -27,10 +27,10 @@ public class BindTests
     {
         PlatformKeyBinding result = Bind.AllPlus ("Delete", ["Ctrl+D"]);
 
-        Assert.Equal (["Delete"], result.All!);
+        Assert.Equal ((Key [])["Delete"], result.All!.AsEnumerable ());
         Assert.Null (result.Windows);
-        Assert.Equal (["Ctrl+D"], result.Linux!);
-        Assert.Equal (["Ctrl+D"], result.Macos!);
+        Assert.Equal ((Key [])["Ctrl+D"], result.Linux!.AsEnumerable ());
+        Assert.Equal ((Key [])["Ctrl+D"], result.Macos!.AsEnumerable ());
     }
 
     [Fact]
@@ -38,8 +38,8 @@ public class BindTests
     {
         PlatformKeyBinding result = Bind.AllPlus ("X", windows: ["Ctrl+X"]);
 
-        Assert.Equal (["X"], result.All!);
-        Assert.Equal (["Ctrl+X"], result.Windows!);
+        Assert.Equal ((Key [])["X"], result.All!.AsEnumerable ());
+        Assert.Equal ((Key [])["Ctrl+X"], result.Windows!.AsEnumerable ());
         Assert.Null (result.Linux);
         Assert.Null (result.Macos);
     }
@@ -49,7 +49,7 @@ public class BindTests
     {
         PlatformKeyBinding result = Bind.AllPlus ("Delete");
 
-        Assert.Equal (["Delete"], result.All!);
+        Assert.Equal ((Key [])["Delete"], result.All!.AsEnumerable ());
         Assert.Null (result.Windows);
         Assert.Null (result.Linux);
         Assert.Null (result.Macos);
@@ -62,8 +62,8 @@ public class BindTests
 
         Assert.Null (result.All);
         Assert.Null (result.Windows);
-        Assert.Equal (["Ctrl+Z"], result.Linux!);
-        Assert.Equal (["Ctrl+Z"], result.Macos!);
+        Assert.Equal ((Key [])["Ctrl+Z"], result.Linux!.AsEnumerable ());
+        Assert.Equal ((Key [])["Ctrl+Z"], result.Macos!.AsEnumerable ());
     }
 
     [Fact]
@@ -73,19 +73,19 @@ public class BindTests
 
         Assert.Null (result.All);
         Assert.Null (result.Windows);
-        Assert.Equal (["Ctrl+Z"], result.Linux!);
+        Assert.Equal ((Key [])["Ctrl+Z"], result.Linux!.AsEnumerable ());
         Assert.Null (result.Macos);
     }
 
     [Fact]
     public void Bind_Platform_WindowsAndMacos ()
     {
-        PlatformKeyBinding result = Bind.Platform (["Ctrl+Z"], macos: ["Cmd+Z"]);
+        PlatformKeyBinding result = Bind.Platform (["Ctrl+Z"], macos: ["Alt+Z"]);
 
         Assert.Null (result.All);
-        Assert.Equal (["Ctrl+Z"], result.Windows!);
+        Assert.Equal ((Key [])["Ctrl+Z"], result.Windows!.AsEnumerable ());
         Assert.Null (result.Linux);
-        Assert.Equal (["Cmd+Z"], result.Macos!);
+        Assert.Equal ((Key [])["Alt+Z"], result.Macos!.AsEnumerable ());
     }
 
     [Fact]

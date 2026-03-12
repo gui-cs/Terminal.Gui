@@ -6,17 +6,12 @@ namespace Terminal.Gui;
 internal static class Bind
 {
     /// <summary>Creates a binding where all platforms get these keys.</summary>
-    public static PlatformKeyBinding All (params string [] keys) => new () { All = keys };
+    public static PlatformKeyBinding All (params Key [] keys) => new () { All = keys };
 
     /// <summary>
     ///     Creates a binding where all platforms get the base key, with additional keys for specific platforms.
     /// </summary>
-    public static PlatformKeyBinding AllPlus (
-        string key,
-        string []? nonWindows = null,
-        string []? windows = null,
-        string []? linux = null,
-        string []? macos = null) =>
+    public static PlatformKeyBinding AllPlus (Key key, Key []? nonWindows = null, Key []? windows = null, Key []? linux = null, Key []? macos = null) =>
         new ()
         {
             All = [key],
@@ -26,9 +21,9 @@ internal static class Bind
         };
 
     /// <summary>Creates a binding where only Linux and macOS get these keys.</summary>
-    public static PlatformKeyBinding NonWindows (params string [] keys) => new () { Linux = keys, Macos = keys };
+    public static PlatformKeyBinding NonWindows (params Key [] keys) => new () { Linux = keys, Macos = keys };
 
     /// <summary>Creates a binding with platform-specific keys only (no "all" entry).</summary>
-    public static PlatformKeyBinding Platform (string []? windows = null, string []? linux = null, string []? macos = null) =>
+    public static PlatformKeyBinding Platform (Key []? windows = null, Key []? linux = null, Key []? macos = null) =>
         new () { Windows = windows, Linux = linux, Macos = macos };
 }

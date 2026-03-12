@@ -36,8 +36,7 @@ public class ViewDefaultKeyBindingsTests
     [InlineData (Command.RightEndExtend)]
     [InlineData (Command.StartExtend)]
     [InlineData (Command.EndExtend)]
-    public void View_DefaultKeyBindings_ContainsSelectionExtendCommands (Command command) =>
-        Assert.True (View.DefaultKeyBindings!.ContainsKey (command));
+    public void View_DefaultKeyBindings_ContainsSelectionExtendCommands (Command command) => Assert.True (View.DefaultKeyBindings!.ContainsKey (command));
 
     [Theory]
     [InlineData (Command.Copy)]
@@ -56,15 +55,15 @@ public class ViewDefaultKeyBindingsTests
     [Fact]
     public void View_DefaultKeyBindings_AllKeyStringsParseable ()
     {
-        foreach ((Command command, PlatformKeyBinding platformBinding) in View.DefaultKeyBindings!)
+        foreach ((Command _, PlatformKeyBinding platformBinding) in View.DefaultKeyBindings!)
         {
-            string [] [] allKeyArrays = [platformBinding.All ?? [], platformBinding.Windows ?? [], platformBinding.Linux ?? [], platformBinding.Macos ?? []];
+            Key [] [] allKeyArrays = [platformBinding.All ?? [], platformBinding.Windows ?? [], platformBinding.Linux ?? [], platformBinding.Macos ?? []];
 
-            foreach (string [] keyArray in allKeyArrays)
+            foreach (Key [] keyArray in allKeyArrays)
             {
-                foreach (string keyString in keyArray)
+                foreach (Key key in keyArray)
                 {
-                    Assert.True (Key.TryParse (keyString, out _), $"Key string '{keyString}' for command '{command}' should be parseable.");
+                    Assert.NotEqual (Key.Empty, key);
                 }
             }
         }

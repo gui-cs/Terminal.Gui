@@ -21,7 +21,7 @@ public class ApplicationDefaultKeyBindingsTests
 
         PlatformKeyBinding quit = bindings [Command.Quit];
         Assert.NotNull (quit.All);
-        Assert.Contains ("Esc", quit.All!);
+        Assert.Contains (Key.Esc, quit.All!);
     }
 
     [Fact]
@@ -34,9 +34,9 @@ public class ApplicationDefaultKeyBindingsTests
         PlatformKeyBinding suspend = bindings [Command.Suspend];
         Assert.Null (suspend.All);
         Assert.NotNull (suspend.Linux);
-        Assert.Contains ("Ctrl+Z", suspend.Linux!);
+        Assert.Contains (Key.Z.WithCtrl, suspend.Linux!);
         Assert.NotNull (suspend.Macos);
-        Assert.Contains ("Ctrl+Z", suspend.Macos!);
+        Assert.Contains (Key.Z.WithCtrl, suspend.Macos!);
     }
 
     [Fact]
@@ -50,10 +50,10 @@ public class ApplicationDefaultKeyBindingsTests
             Command command = entry.Key;
             PlatformKeyBinding binding = entry.Value;
 
-            AssertKeysParseable (binding.All, command, "All");
-            AssertKeysParseable (binding.Windows, command, "Windows");
-            AssertKeysParseable (binding.Linux, command, "Linux");
-            AssertKeysParseable (binding.Macos, command, "Macos");
+            AssertKeysValid (binding.All, command, "All");
+            AssertKeysValid (binding.Windows, command, "Windows");
+            AssertKeysValid (binding.Linux, command, "Linux");
+            AssertKeysValid (binding.Macos, command, "Macos");
         }
     }
 
@@ -84,17 +84,16 @@ public class ApplicationDefaultKeyBindingsTests
         Assert.Equal (expectedCommands.Length, bindings.Count);
     }
 
-    private static void AssertKeysParseable (string []? keys, Command command, string platformName)
+    private static void AssertKeysValid (Key []? keys, Command command, string platformName)
     {
         if (keys is null)
         {
             return;
         }
 
-        foreach (string keyString in keys)
+        foreach (Key key in keys)
         {
-            bool parsed = Key.TryParse (keyString, out Key _);
-            Assert.True (parsed, $"Key string '{keyString}' for command '{command}' ({platformName}) could not be parsed.");
+            Assert.NotEqual (Key.Empty, key);
         }
     }
 }

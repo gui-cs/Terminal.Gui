@@ -94,10 +94,10 @@ public class ApplyKeyBindingsTests
     }
 
     [Fact]
-    public void ApplyKeyBindings_InvalidKeyString_Skipped ()
+    public void ApplyKeyBindings_EmptyKey_Skipped ()
     {
         TestView view = new (Command.Left);
-        Dictionary<Command, PlatformKeyBinding> layer = new () { [Command.Left] = new PlatformKeyBinding { All = ["???invalid???"] } };
+        Dictionary<Command, PlatformKeyBinding> layer = new () { [Command.Left] = new PlatformKeyBinding { All = [Key.Empty] } };
 
         // Should not throw
         view.CallApplyKeyBindings (layer);
