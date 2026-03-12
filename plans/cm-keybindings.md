@@ -23,6 +23,12 @@
 | 9 | Standardize popover activation keys (MenuBar F9→F10) | ✅ Done |
 | 10 | config.json cleanup | ✅ Done (already clean) |
 | 11 | Documentation | ✅ Done |
+| 11b | Move `DefaultKeyBindings` from `ApplicationKeyboard` → `Application`; create `Examples/Config/` | ✅ Done |
+| 12a | **Add `TuiPlatform` enum; type-safe platform resolution** (Breaking) | 🔲 TODO |
+| 12b | **Register `Dictionary<Command,PlatformKeyBinding>` with STJ source gen** | 🔲 TODO |
+| 12c | **Change all `DefaultKeyBindings` to `Dictionary<Command, PlatformKeyBinding>`** (Breaking) | 🔲 TODO |
+| 12d | **Remove single-key properties; wire `AddKeyBindings()` to `DefaultKeyBindings`** (Breaking) | 🔲 TODO |
+| 12e | **Update tests** | 🔲 TODO |
 
 ---
 
@@ -34,7 +40,7 @@
 2. Support platform-specific key bindings (Windows / Linux / macOS)
 3. Eliminate duplication — shared bindings defined once, applied to many views
 4. Zero startup cost — C# code is source of truth; built-in config.json has no key binding entries
-5. Backward compatible — existing `QuitKey`, `ArrangeKey`, etc. properties continue to work
+5. ~~Backward compatible~~ **Breaking changes are acceptable and will be documented in the PR**
 6. **MEC-ready** — Minimize coupling to CM internals so the future migration to `Microsoft.Extensions.Configuration` is tractable. Specifically: use strongly-typed POCOs instead of raw nested dictionaries, and limit `[ConfigurationProperty]` decorations to only 3 properties (Application, View base, View per-type overrides)
 
 ## Architecture Overview
@@ -215,9 +221,14 @@ Key bindings are applied in three layers. Each layer is a `Dictionary<string, Pl
 
 **How users customize per-view bindings:** Via the merged `View.ViewKeyBindings` property, which is a `Dictionary<string, Dictionary<string, PlatformKeyBinding>>` — outer key is the type name (e.g., `"TextField"`), inner dict is command→keys. CM can discover and override this single property; at apply time, each view checks whether `ViewKeyBindings` has an entry for its type name and merges those bindings.
 
-### Layer 1: Application Key Bindings (`ApplicationKeyboard.DefaultKeyBindings`)
+### Layer 1: Application Key Bindings (`Application.DefaultKeyBindings`)
 
 Global application-level bindings. Applied by `ApplicationKeyboard.AddKeyBindings()`.
+
+> **Phase 12 breaking change:** The separate `Application.QuitKey`, `ArrangeKey`, `NextTabKey`,
+> `PrevTabKey`, `NextTabGroupKey`, `PrevTabGroupKey` properties (and matching `IKeyboard` members)
+> are **removed**. Use `Application.GetDefaultKey("Quit")` / `Application.GetDefaultKeys("Quit")`
+> instead. See Phase 12 below.
 
 ```csharp
 [ConfigurationProperty (Scope = typeof (SettingsScope))]
@@ -233,8 +244,6 @@ public static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; 
     ["Refresh"]          = Bind.All ("F5"),
 };
 ```
-
-Existing scalar properties (`QuitKey`, `ArrangeKey`, etc.) become convenience accessors that read from the dict for backward compatibility.
 
 ### Layer 2: View Base Key Bindings (`View.DefaultKeyBindings`)
 
@@ -933,3 +942,434 @@ These can be migrated in follow-up PRs if needed.
 **HexView only:** StartOfPage, EndOfPage, Insert
 
 **DropDownList only:** Toggle (F4, Alt+CursorDown)
+
+---
+
+## Phase 11b: Move DefaultKeyBindings + Create Config Examples (✅ Done)
+
+- Moved `DefaultKeyBindings` `[ConfigurationProperty]` from internal `ApplicationKeyboard` to
+  the public `static partial class Application` in `Application.Keyboard.cs` so the CM JSON key
+  is `Application.DefaultKeyBindings` (not `ApplicationKeyboard.DefaultKeyBindings`).
+- Created `Examples/Config/` folder with:
+  - `macos.json` — overrides `Quit` to `["Esc","Ctrl+Q"]` etc. for Windows users who want macOS bindings
+  - `windows.json` — overrides `Quit` to `["Ctrl+Q"]` etc. for macOS users who want Windows bindings
+  - `README.md` — usage guide and comparison tables
+
+---
+
+## Phase 12: `Dictionary<Command, PlatformKeyBinding>` Throughout + Remove Single-Key Properties (🔲 TODO)
+
+> **BREAKING CHANGE — will be documented in PR.**
+>
+> JSON format for key binding dicts also changes (see Step 12a).
+
+### Overview
+
+Two tightly-coupled goals addressed together:
+
+1. **Type-safe key dict:** Change all `DefaultKeyBindings` dictionaries from `Dictionary<string, PlatformKeyBinding>` to `Dictionary<Command, PlatformKeyBinding>`. This eliminates string parsing in the hot path and catches command-name typos at compile time.
+
+2. **Remove single-key properties:** Remove `Application.QuitKey`, `ArrangeKey`, `NextTabKey`, `PrevTabKey`, `NextTabGroupKey`, `PrevTabGroupKey` (and matching `IKeyboard` members) and wire `ApplicationKeyboard.AddKeyBindings()` to read `Application.DefaultKeyBindings` instead.
+
+### New C# API
+
+```csharp
+// All DefaultKeyBindings dictionaries change type:
+//   Before: Dictionary<string, PlatformKeyBinding>
+//   After:  Dictionary<Command, PlatformKeyBinding>
+
+// Application-level helpers
+public static Key GetDefaultKey (Command command);               // first platform-resolved key
+public static IEnumerable<Key> GetDefaultKeys (Command command); // all platform-resolved keys
+
+// Fires when Application.DefaultKeyBindings is replaced (e.g. by CM)
+public static event EventHandler? DefaultKeyBindingsChanged;
+```
+
+### JSON Format
+
+The JSON format uses standard flat objects throughout — this is unchanged from the current files.
+Command enum names (`"Quit"`, `"Arrange"`, etc.) are the JSON property keys; STJ source generation
+maps them to `Command.Quit`, `Command.Arrange`, etc. automatically. The full set of properties:
+
+```json
+{
+  "Application.DefaultKeyBindings": {
+    "Quit":   { "All": ["Esc", "Ctrl+Q"] },
+    "Arrange": { "All": ["Ctrl+F5"] }
+  },
+  "View.DefaultKeyBindings": {
+    "Copy": { "All": ["Ctrl+C"] },
+    "Undo": { "All": ["Ctrl+Z"], "Macos": ["Ctrl+/"] }
+  },
+  "View.ViewKeyBindings": {
+    "TextField": {
+      "CutToEndOfLine": { "All": ["Ctrl+K"] },
+      "WordLeft":       { "All": ["Ctrl+CursorLeft"] }
+    }
+  }
+}
+```
+
+`View.ViewKeyBindings` outer key is the view type name (string); inner keys are command names.
+See `Examples/Config/macos.json` and `windows.json` for complete examples.
+
+---
+
+### Step 12a: Add `TuiPlatform` Enum + Type-Safe Platform Resolution
+
+**Problem:** `PlatformDetection.GetCurrentPlatformName()` returns a raw string (`"windows"`, `"linux"`, `"macos"`). The `switch` in `ResolveKeysForCurrentPlatform` matches on those strings — silently broken if the string ever changes. Making it type-safe also enables a clean `PlatformKeyBinding.GetCurrentPlatformKeys()` instance method.
+
+**New type** (new file `Terminal.Gui/Drivers/TuiPlatform.cs`):
+
+```csharp
+/// <summary>Identifies the operating system for platform-specific key binding resolution.</summary>
+public enum TuiPlatform
+{
+    /// <summary>Microsoft Windows.</summary>
+    Windows,
+
+    /// <summary>Linux.</summary>
+    Linux,
+
+    /// <summary>macOS (Darwin).</summary>
+    Macos,
+}
+```
+
+**`PlatformDetection.cs`** — replace `GetCurrentPlatformName()` with `GetCurrentPlatform()`:
+
+```csharp
+// BEFORE
+public static string GetCurrentPlatformName ()
+{
+    if (IsWindows ()) return "windows";
+    if (IsMac ()) return "macos";
+    return "linux";
+}
+
+// AFTER
+public static TuiPlatform GetCurrentPlatform ()
+{
+    if (IsWindows ()) return TuiPlatform.Windows;
+    if (IsMac ()) return TuiPlatform.Macos;
+    return TuiPlatform.Linux;
+}
+```
+
+**`PlatformKeyBinding.cs`** — add `GetCurrentPlatformKeys()` (moves logic out of `View.Keyboard.cs`):
+
+```csharp
+// BEFORE: private static in View.Keyboard.cs, switched on string
+string []? platKeys = platform switch
+{
+    "windows" => platformKeys.Windows,
+    "linux"   => platformKeys.Linux,
+    "macos"   => platformKeys.Macos,
+    _         => null
+};
+
+// AFTER: public instance method on PlatformKeyBinding, switches on TuiPlatform
+public IEnumerable<string> GetCurrentPlatformKeys ()
+{
+    if (All is { })
+    {
+        foreach (string k in All) yield return k;
+    }
+
+    string []? platKeys = PlatformDetection.GetCurrentPlatform () switch
+    {
+        TuiPlatform.Windows => Windows,
+        TuiPlatform.Linux   => Linux,
+        TuiPlatform.Macos   => Macos,
+        _                   => null
+    };
+
+    if (platKeys is null) yield break;
+
+    foreach (string k in platKeys) yield return k;
+}
+```
+
+**`View.Keyboard.cs`** — replace `ResolveKeysForCurrentPlatform(entry.Value)` calls with `entry.Value.GetCurrentPlatformKeys()`.
+
+**`BindTests.cs`** — update tests that assert on `GetCurrentPlatformName()` string results.
+
+Files: `TuiPlatform.cs` (new), `PlatformDetection.cs`, `PlatformKeyBinding.cs`, `View.Keyboard.cs`, `BindTests.cs`
+
+Commit: "Add TuiPlatform enum; replace string platform IDs with typed enum"
+
+---
+
+### Step 12b: Register `Dictionary<Command, PlatformKeyBinding>` with STJ Source Gen
+
+Standard STJ source generation supports enum-keyed dicts — enum names become JSON string keys automatically. No custom converter needed.
+
+**`SourceGenerationContext.cs`** — update registrations:
+
+```csharp
+// Remove:
+[JsonSerializable (typeof (Dictionary<string, PlatformKeyBinding>))]
+[JsonSerializable (typeof (Dictionary<string, Dictionary<string, PlatformKeyBinding>>))]
+
+// Add:
+[JsonSerializable (typeof (Dictionary<Command, PlatformKeyBinding>))]
+[JsonSerializable (typeof (Dictionary<string, Dictionary<Command, PlatformKeyBinding>>))]
+```
+
+`DictionaryJsonConverter<T>` is not used for key binding dicts (source-gen context takes precedence).
+
+Commit: "Register Command-keyed key binding dict types with STJ source gen"
+
+---
+### Step 12b: Change All `DefaultKeyBindings` to `Dictionary<Command, PlatformKeyBinding>`
+
+#### `Application.cs` — before/after
+
+```csharp
+// BEFORE
+[ConfigurationProperty (Scope = typeof (SettingsScope))]
+public static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+{
+    ["Quit"]             = Bind.All ("Esc"),
+    ["Suspend"]          = Bind.NonWindows ("Ctrl+Z"),
+    ["Arrange"]          = Bind.All ("Ctrl+F5"),
+    ["NextTabStop"]      = Bind.All ("Tab"),
+    ["PreviousTabStop"]  = Bind.All ("Shift+Tab"),
+    ["NextTabGroup"]     = Bind.All ("F6"),
+    ["PreviousTabGroup"] = Bind.All ("Shift+F6"),
+    ["Refresh"]          = Bind.All ("F5"),
+};
+
+// AFTER
+[ConfigurationProperty (Scope = typeof (SettingsScope))]
+public static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+{
+    [Command.Quit]             = Bind.All ("Esc"),
+    [Command.Suspend]          = Bind.NonWindows ("Ctrl+Z"),
+    [Command.Arrange]          = Bind.All ("Ctrl+F5"),
+    [Command.NextTabStop]      = Bind.All ("Tab"),
+    [Command.PreviousTabStop]  = Bind.All ("Shift+Tab"),
+    [Command.NextTabGroup]     = Bind.All ("F6"),
+    [Command.PreviousTabGroup] = Bind.All ("Shift+F6"),
+    [Command.Refresh]          = Bind.All ("F5"),
+};
+```
+
+#### `TextField.Commands.cs` — before/after (representative of all 13 per-view dicts)
+
+```csharp
+// BEFORE
+public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+{
+    ["Left"]            = Bind.All ("Ctrl+B"),
+    ["Right"]           = Bind.All ("Ctrl+F"),
+    ["WordLeft"]        = Bind.All ("Ctrl+CursorLeft", "Ctrl+CursorUp"),
+    ["WordRight"]       = Bind.All ("Ctrl+CursorRight", "Ctrl+CursorDown"),
+    ["WordLeftExtend"]  = Bind.All ("Ctrl+Shift+CursorLeft", "Ctrl+Shift+CursorUp"),
+    ["WordRightExtend"] = Bind.All ("Ctrl+Shift+CursorRight", "Ctrl+Shift+CursorDown"),
+    ["CutToEndOfLine"]  = Bind.All ("Ctrl+K"),
+    // ... (13 entries total)
+};
+
+// AFTER
+public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+{
+    [Command.Left]            = Bind.All ("Ctrl+B"),
+    [Command.Right]           = Bind.All ("Ctrl+F"),
+    [Command.WordLeft]        = Bind.All ("Ctrl+CursorLeft", "Ctrl+CursorUp"),
+    [Command.WordRight]       = Bind.All ("Ctrl+CursorRight", "Ctrl+CursorDown"),
+    [Command.WordLeftExtend]  = Bind.All ("Ctrl+Shift+CursorLeft", "Ctrl+Shift+CursorUp"),
+    [Command.WordRightExtend] = Bind.All ("Ctrl+Shift+CursorRight", "Ctrl+Shift+CursorDown"),
+    [Command.CutToEndOfLine]  = Bind.All ("Ctrl+K"),
+    // ... (13 entries total)
+};
+```
+
+#### `View.Keyboard.cs` — `ApplyKeyBindings` loop — before/after
+
+```csharp
+// BEFORE — requires string→Command parsing
+foreach (KeyValuePair<string, PlatformKeyBinding> entry in defaults)
+{
+    if (!Enum.TryParse (entry.Key, out Command command))
+        continue; // silently ignore unknown command names
+
+    foreach (string keyStr in ResolveKeysForCurrentPlatform (entry.Value))
+    {
+        if (!Key.TryParse (keyStr, out Key key))
+            continue;
+
+        if (KeyBindings.TryGet (key, out _))
+            continue;
+
+        KeyBindings.Add (key, command);
+    }
+}
+
+// AFTER — Command key is already typed; no parsing needed
+foreach (KeyValuePair<Command, PlatformKeyBinding> entry in defaults)
+{
+    foreach (string keyStr in entry.Value.GetCurrentPlatformKeys ())
+    {
+        if (!Key.TryParse (keyStr, out Key key))
+            continue;
+
+        if (KeyBindings.TryGet (key, out _))
+            continue;
+
+        KeyBindings.Add (key, entry.Key);
+    }
+}
+```
+
+#### JSON — unchanged (enum names serialize as strings automatically)
+
+```json
+{
+    "Application.DefaultKeyBindings": {
+        "Quit":   { "All": ["Esc", "Ctrl+Q"] },
+        "Arrange": { "All": ["Ctrl+F5"] }
+    },
+    "View.DefaultKeyBindings": {
+        "Copy": { "All": ["Ctrl+C"] },
+        "Undo": { "All": ["Ctrl+Z"], "Macos": ["Ctrl+/"] }
+    },
+    "View.ViewKeyBindings": {
+        "TextField": {
+            "CutToEndOfLine": { "All": ["Ctrl+K"] },
+            "WordLeft":       { "All": ["Ctrl+CursorLeft"] }
+        }
+    }
+}
+```
+
+#### Files changed
+
+| Location | Change |
+|----------|--------|
+| `App/Application.cs` — `DefaultKeyBindings` | `Dictionary<string, …>` → `Dictionary<Command, …>` |
+| `ViewBase/View.Keyboard.cs` — `DefaultKeyBindings` (base layer) | same |
+| `ViewBase/View.Keyboard.cs` — `ViewKeyBindings` | inner dict: `Dictionary<string, …>` → `Dictionary<Command, …>` |
+| `ViewBase/View.Keyboard.cs` — `ApplyKeyBindings()` | iterate `Command` keys directly — drop `Enum.TryParse` |
+| All 13 per-view `DefaultKeyBindings` (TextField, TextView, ListView, etc.) | same type change |
+| `Tests/…ApplicationDefaultKeyBindingsTests.cs` | Update dict literals to use `Command.Quit` etc. |
+| `Tests/…ViewDefaultKeyBindingsTests.cs` and per-view tests | same |
+| `Examples/UICatalog/Scenarios/KeyBindings.cs` | `FormatDefaultKeyBindings()` — iterate `Command` keys, call `.ToString()` for display |
+
+Commit: "Change all DefaultKeyBindings from string-keyed to Command-keyed"
+
+---
+
+### Step 12c: Remove Single-Key Properties; Wire `AddKeyBindings()` to `DefaultKeyBindings`
+
+**Files in `Terminal.Gui/`:**
+
+| File | Change |
+|------|--------|
+| `App/Application.cs` | Remove `QuitKey`, `ArrangeKey`, `NextTabKey`, `PrevTabKey`, `NextTabGroupKey`, `PrevTabGroupKey` props + `*Changed` events. Add `DefaultKeyBindingsChanged` event (fired from `DefaultKeyBindings` setter). Add `GetDefaultKey(Command)` + `GetDefaultKeys(Command)` helpers. |
+| `App/Keyboard/IKeyboard.cs` | Remove the 6 single-key members from the interface. |
+| `App/Keyboard/ApplicationKeyboard.cs` | Remove 6 backing fields + properties + event handlers. Subscribe to `Application.DefaultKeyBindingsChanged`. Rewrite `AddKeyBindings()` (see below). |
+| `App/ApplicationImpl.Lifecycle.cs` | Delete key-preservation block (lines 67–88, marked BUGBUG). |
+| `Configuration/PlatformKeyBinding.cs` | Add `GetCurrentPlatformKeys()` instance method (refactored out of `View.ResolveKeysForCurrentPlatform` private static). |
+| `App/Popovers/PopoverImpl.cs` | Loop `Application.GetDefaultKeys(Command.Quit)` to bind all quit keys. |
+| `Views/Menu/MenuBar.cs` | Remove redundant `KeyBindings.ReplaceCommands(Application.QuitKey, …)`. |
+| `Views/Menu/MenuBarItem.cs` | `e == Application.QuitKey` → `Application.GetDefaultKeys(Command.Quit).Any(k => k == e)`. |
+| `Views/Menu/PopoverMenu.cs` | Same pattern for two `Application.QuitKey` comparisons. |
+| `Views/TextInput/TextValidateField.cs` | Same pattern for `key == Application.QuitKey`. |
+| `ViewBase/Adornment/Arranger.cs` | Loop `Application.GetDefaultKeys(Command.Arrange)` to bind all arrange keys. |
+
+**Files in `Examples/`:**
+
+| File | Change |
+|------|--------|
+| `UICatalog/Scenario.cs` | `GetQuitKeyAndName()` uses `Application.GetDefaultKey(Command.Quit)`. |
+| `UICatalog/UICatalogRunnable.cs` | Replace 3 `Application.QuitKey` refs. |
+| ~40 scenario files | Most use `GetQuitKeyAndName()` (auto-fixed). Fix remaining direct refs. |
+
+**`AddKeyBindings()` after rewrite:**
+
+```csharp
+internal void AddKeyBindings ()
+{
+    _commandImplementations.Clear ();
+
+    AddCommand (Command.Quit, () => { App?.RequestStop (); return true; });
+    AddCommand (Command.Suspend, () => { /* ... */ return true; });
+    AddCommand (Command.NextTabStop, () => App?.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabStop));
+    AddCommand (Command.PreviousTabStop, () => App?.Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabStop));
+    AddCommand (Command.NextTabGroup, () => App?.Navigation?.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup));
+    AddCommand (Command.PreviousTabGroup, () => App?.Navigation?.AdvanceFocus (NavigationDirection.Backward, TabBehavior.TabGroup));
+    AddCommand (Command.Refresh, () => { App?.LayoutAndDraw (true); return true; });
+    AddCommand (Command.Arrange, () => { /* ... */ return false; });
+
+    KeyBindings.Clear ();
+
+    if (Application.DefaultKeyBindings is { } defaults)
+    {
+        foreach (KeyValuePair<Command, PlatformKeyBinding> entry in defaults)
+        {
+            foreach (string keyStr in entry.Value.GetCurrentPlatformKeys ())
+            {
+                if (Key.TryParse (keyStr, out Key key))
+                {
+                    KeyBindings.Add (key, entry.Key);
+                }
+            }
+        }
+    }
+
+    // Non-configurable navigation aliases
+    KeyBindings.ReplaceCommands (Key.CursorRight, Command.NextTabStop);
+    KeyBindings.ReplaceCommands (Key.CursorDown, Command.NextTabStop);
+    KeyBindings.ReplaceCommands (Key.CursorLeft, Command.PreviousTabStop);
+    KeyBindings.ReplaceCommands (Key.CursorUp, Command.PreviousTabStop);
+}
+```
+
+Commit: "Remove single-key properties; wire ApplicationKeyboard to DefaultKeyBindings"
+
+---
+
+### Step 12d: Tests
+
+| File | Change |
+|------|--------|
+| `Application/Keyboard/KeyboardTests.cs` | Remove tests for 6 single-key props. Add: adding `Ctrl+Q` to `DefaultKeyBindings[Command.Quit]` causes it to be live-bound. |
+| `Application/Keyboard/ApplicationKeyboardThreadSafetyTests.cs` | Remove single-key prop refs. |
+| `Application/Keyboard/ApplicationDefaultKeyBindingsTests.cs` | Add: `DefaultKeyBindingsChanged` fires on set. Add: multi-key Quit resolves on current platform. |
+
+Commit: "Update tests for Command-keyed DefaultKeyBindings and removed single-key properties"
+
+---
+
+### Breaking Change Documentation (for PR)
+
+```
+BREAKING CHANGES in this PR:
+
+Key binding dictionary type change:
+  Before: Dictionary<string, PlatformKeyBinding>
+  After:  Dictionary<Command, PlatformKeyBinding>
+  Affects: Application.DefaultKeyBindings, View.DefaultKeyBindings,
+           View.ViewKeyBindings (inner dict), all per-view DefaultKeyBindings.
+
+Removed single-key properties from Application and IKeyboard:
+  Application.QuitKey / QuitKeyChanged
+  Application.ArrangeKey / ArrangeKeyChanged
+  Application.NextTabKey / NextTabKeyChanged
+  Application.PrevTabKey / PrevTabKeyChanged
+  Application.NextTabGroupKey / NextTabGroupKeyChanged
+  Application.PrevTabGroupKey / PrevTabGroupKeyChanged
+
+Key binding JSON format change:
+  New:  standard flat object              {"Quit": {...}, ...}
+  Update any custom ~/.tui/config.json key binding sections to use object format.
+
+
+Migration:
+  Application.QuitKey                        → Application.GetDefaultKey (Command.Quit)
+  key == Application.QuitKey                 → Application.GetDefaultKeys (Command.Quit).Any (k => k == key)
+  Application.DefaultKeyBindings["Quit"]     → Application.DefaultKeyBindings[Command.Quit]
+  keyboard.QuitKey = Key.Q.WithCtrl          → Application.DefaultKeyBindings[Command.Quit] = Bind.All ("Ctrl+Q")
+```

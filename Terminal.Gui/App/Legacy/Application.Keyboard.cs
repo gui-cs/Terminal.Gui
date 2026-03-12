@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.App;
+﻿using Terminal.Gui.Configuration;
+
+namespace Terminal.Gui.App;
 
 public static partial class Application // Keyboard handling
 {

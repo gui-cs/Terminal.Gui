@@ -65,6 +65,10 @@ public partial class TableView : View, IDesignable
     ///     Gets or sets the default key bindings for <see cref="TableView"/>. All standard navigation and
     ///     selection-extend bindings are inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary
     ///     is empty by default.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -72,7 +76,7 @@ public partial class TableView : View, IDesignable
     ///         and is added directly in the constructor.
     ///     </para>
     /// </remarks>
-    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
 
     /// <summary>Initializes a <see cref="TableView"/> class.</summary>
     /// <param name="table">The table to display in the control</param>

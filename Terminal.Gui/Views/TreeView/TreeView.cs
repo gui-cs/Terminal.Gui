@@ -128,6 +128,10 @@ public class TreeView<T> : View, ITreeView where T : class
     /// <summary>
     ///     Gets or sets the default key bindings for <see cref="TreeView{T}"/>. These are layered on top of
     ///     <see cref="View.DefaultKeyBindings"/> when the view is created.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -140,21 +144,21 @@ public class TreeView<T> : View, ITreeView where T : class
     ///         override key bindings for TreeView via configuration.
     ///     </para>
     /// </remarks>
-    public new static Dictionary<string, PlatformKeyBinding> DefaultKeyBindings { get; set; } = new ()
+    public new static Dictionary<Command, PlatformKeyBinding> DefaultKeyBindings { get; set; } = new ()
     {
         // Tree-specific expand/collapse
-        ["Expand"] = Bind.All ("CursorRight"),
-        ["ExpandAll"] = Bind.All ("Ctrl+CursorRight"),
-        ["Collapse"] = Bind.All ("CursorLeft"),
-        ["CollapseAll"] = Bind.All ("Ctrl+CursorLeft"),
+        [Command.Expand] = Bind.All ("CursorRight"),
+        [Command.ExpandAll] = Bind.All ("Ctrl+CursorRight"),
+        [Command.Collapse] = Bind.All ("CursorLeft"),
+        [Command.CollapseAll] = Bind.All ("Ctrl+CursorLeft"),
 
         // Branch navigation
-        ["LineUpToFirstBranch"] = Bind.All ("Ctrl+CursorUp"),
-        ["LineDownToLastBranch"] = Bind.All ("Ctrl+CursorDown"),
+        [Command.LineUpToFirstBranch] = Bind.All ("Ctrl+CursorUp"),
+        [Command.LineDownToLastBranch] = Bind.All ("Ctrl+CursorDown"),
 
         // TreeView uses Home/End (not Ctrl+Home/Ctrl+End like the base layer)
-        ["Start"] = Bind.All ("Home"),
-        ["End"] = Bind.All ("End")
+        [Command.Start] = Bind.All ("Home"),
+        [Command.End] = Bind.All ("End")
     };
 
     /// <summary>

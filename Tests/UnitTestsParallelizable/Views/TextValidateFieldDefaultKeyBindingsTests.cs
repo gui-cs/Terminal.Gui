@@ -15,7 +15,7 @@ public class TextValidateFieldDefaultKeyBindingsTests
     [Fact]
     public void TextValidateField_DefaultKeyBindings_AllKeyStringsParseable ()
     {
-        foreach ((string commandName, PlatformKeyBinding platformBinding) in TextValidateField.DefaultKeyBindings!)
+        foreach ((Command command, PlatformKeyBinding platformBinding) in TextValidateField.DefaultKeyBindings!)
         {
             string [] [] allKeyArrays = [platformBinding.All ?? [], platformBinding.Windows ?? [], platformBinding.Linux ?? [], platformBinding.Macos ?? []];
 
@@ -23,7 +23,7 @@ public class TextValidateFieldDefaultKeyBindingsTests
             {
                 foreach (string keyString in keyArray)
                 {
-                    Assert.True (Key.TryParse (keyString, out _), $"Key string '{keyString}' for command '{commandName}' should be parseable.");
+                    Assert.True (Key.TryParse (keyString, out _), $"Key string '{keyString}' for command '{command}' should be parseable.");
                 }
             }
         }
@@ -32,9 +32,9 @@ public class TextValidateFieldDefaultKeyBindingsTests
     [Fact]
     public void TextValidateField_DefaultKeyBindings_AllCommandNamesParseable ()
     {
-        foreach (string commandName in TextValidateField.DefaultKeyBindings!.Keys)
+        foreach (Command command in TextValidateField.DefaultKeyBindings!.Keys)
         {
-            Assert.True (Enum.TryParse<Command> (commandName, out _), $"Command name '{commandName}' should parse to a Command enum value.");
+            Assert.True (Enum.IsDefined (command), $"Command name '{command}' should parse to a Command enum value.");
         }
     }
 

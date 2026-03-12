@@ -15,7 +15,7 @@ public class LinearRangeDefaultKeyBindingsTests
     [Fact]
     public void LinearRange_DefaultKeyBindings_AllKeyStringsParseable ()
     {
-        foreach ((string commandName, PlatformKeyBinding platformBinding) in LinearRange<object>.DefaultKeyBindings!)
+        foreach ((Command command, PlatformKeyBinding platformBinding) in LinearRange<object>.DefaultKeyBindings!)
         {
             string [] [] allKeyArrays = [platformBinding.All ?? [], platformBinding.Windows ?? [], platformBinding.Linux ?? [], platformBinding.Macos ?? []];
 
@@ -23,7 +23,7 @@ public class LinearRangeDefaultKeyBindingsTests
             {
                 foreach (string keyString in keyArray)
                 {
-                    Assert.True (Key.TryParse (keyString, out _), $"Key string '{keyString}' for command '{commandName}' should be parseable.");
+                    Assert.True (Key.TryParse (keyString, out _), $"Key string '{keyString}' for command '{command}' should be parseable.");
                 }
             }
         }
@@ -32,9 +32,9 @@ public class LinearRangeDefaultKeyBindingsTests
     [Fact]
     public void LinearRange_DefaultKeyBindings_AllCommandNamesParseable ()
     {
-        foreach (string commandName in LinearRange<object>.DefaultKeyBindings!.Keys)
+        foreach (Command command in LinearRange<object>.DefaultKeyBindings!.Keys)
         {
-            Assert.True (Enum.TryParse<Command> (commandName, out _), $"Command name '{commandName}' should parse to a Command enum value.");
+            Assert.True (Enum.IsDefined (command), $"Command name '{command}' should parse to a Command enum value.");
         }
     }
 
@@ -52,8 +52,8 @@ public class LinearRangeDefaultKeyBindingsTests
     }
 
     [Theory]
-    [InlineData ("Accept")]
-    [InlineData ("Activate")]
-    public void LinearRange_DefaultKeyBindings_ContainsUniqueCommands (string commandName) =>
-        Assert.True (LinearRange<object>.DefaultKeyBindings!.ContainsKey (commandName));
+    [InlineData (Command.Accept)]
+    [InlineData (Command.Activate)]
+    public void LinearRange_DefaultKeyBindings_ContainsUniqueCommands (Command command) =>
+        Assert.True (LinearRange<object>.DefaultKeyBindings!.ContainsKey (command));
 }

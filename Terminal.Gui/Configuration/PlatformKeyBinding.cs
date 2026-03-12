@@ -17,4 +17,37 @@ public record PlatformKeyBinding
 
     /// <summary>Gets or sets additional keys for macOS only.</summary>
     public string []? Macos { get; init; }
+
+    /// <summary>
+    ///     Returns the key strings applicable to the current operating system.
+    ///     Yields all <see cref="All"/> keys followed by the platform-specific keys.
+    /// </summary>
+    public IEnumerable<string> GetCurrentPlatformKeys ()
+    {
+        if (All is { })
+        {
+            foreach (string k in All)
+            {
+                yield return k;
+            }
+        }
+
+        string []? platKeys = PlatformDetection.GetCurrentPlatform () switch
+                              {
+                                  TuiPlatform.Windows => Windows,
+                                  TuiPlatform.Linux => Linux,
+                                  TuiPlatform.Macos => Macos,
+                                  _ => null
+                              };
+
+        if (platKeys is null)
+        {
+            yield break;
+        }
+
+        foreach (string k in platKeys)
+        {
+            yield return k;
+        }
+    }
 }

@@ -5,6 +5,10 @@ public partial class ListView
     /// <summary>
     ///     Gets or sets the default key bindings for <see cref="ListView"/>. These are layered on top of
     ///     <see cref="View.DefaultKeyBindings"/> when the view is created.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -12,24 +16,24 @@ public partial class ListView
     ///         Activate+Down) and bindings with data payloads are added directly in the constructor.
     ///     </para>
     /// </remarks>
-    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
         // Emacs navigation
-        ["Up"] = Bind.All ("Ctrl+P"),
-        ["Down"] = Bind.All ("Ctrl+N"),
-        ["PageDown"] = Bind.All ("Ctrl+V"),
+        [Command.Up] = Bind.All ("Ctrl+P"),
+        [Command.Down] = Bind.All ("Ctrl+N"),
+        [Command.PageDown] = Bind.All ("Ctrl+V"),
 
         // ListView uses Home/End (not Ctrl+Home/Ctrl+End like the base layer)
-        ["Start"] = Bind.All ("Home"),
-        ["End"] = Bind.All ("End"),
+        [Command.Start] = Bind.All ("Home"),
+        [Command.End] = Bind.All ("End"),
 
         // Emacs extend
-        ["UpExtend"] = Bind.All ("Ctrl+Shift+P"),
-        ["DownExtend"] = Bind.All ("Ctrl+Shift+N"),
+        [Command.UpExtend] = Bind.All ("Ctrl+Shift+P"),
+        [Command.DownExtend] = Bind.All ("Ctrl+Shift+N"),
 
         // ListView uses Shift+Home/End (not Ctrl+Shift+Home/End like the base layer)
-        ["StartExtend"] = Bind.All ("Shift+Home"),
-        ["EndExtend"] = Bind.All ("Shift+End"),
+        [Command.StartExtend] = Bind.All ("Shift+Home"),
+        [Command.EndExtend] = Bind.All ("Shift+End"),
     };
 
     private void SetupBindingsAndCommands ()

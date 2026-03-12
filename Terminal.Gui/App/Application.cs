@@ -236,6 +236,28 @@ public static partial class Application
         }
     } = string.Empty;
 
+    /// <summary>
+    ///     Gets or sets the default key bindings for Application-level commands, optionally varying by platform.
+    ///     Each entry maps a <see cref="Command"/> to a <see cref="PlatformKeyBinding"/>
+    ///     that specifies the key strings for all platforms or specific ones.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    {
+        [Command.Quit] = Bind.All ("Esc"),
+        [Command.Suspend] = Bind.NonWindows ("Ctrl+Z"),
+        [Command.Arrange] = Bind.All ("Ctrl+F5"),
+        [Command.NextTabStop] = Bind.All ("Tab"),
+        [Command.PreviousTabStop] = Bind.All ("Shift+Tab"),
+        [Command.NextTabGroup] = Bind.All ("F6"),
+        [Command.PreviousTabGroup] = Bind.All ("Shift+F6"),
+        [Command.Refresh] = Bind.All ("F5"),
+    };
+
     /// <summary>Gets or sets the key to quit the application.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Key QuitKey
