@@ -49,8 +49,7 @@ namespace Terminal.Gui.Configuration;
 [JsonSerializable (typeof (SizeDetectionMode))]
 
 [JsonSerializable (typeof (PlatformKeyBinding))]
-[JsonSerializable (typeof (Dictionary<string, PlatformKeyBinding>))]
-[JsonSerializable (typeof (Dictionary<string, Dictionary<string, PlatformKeyBinding>>))]
+
 [JsonSerializable (typeof (Dictionary<Command, PlatformKeyBinding>))]
 [JsonSerializable (typeof (Dictionary<string, Dictionary<Command, PlatformKeyBinding>>))]
 

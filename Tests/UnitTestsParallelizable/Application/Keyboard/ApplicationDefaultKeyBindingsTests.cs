@@ -15,11 +15,11 @@ public class ApplicationDefaultKeyBindingsTests
     [Fact]
     public void Application_DefaultKeyBindings_ContainsQuit ()
     {
-        Dictionary<string, PlatformKeyBinding>? bindings = Application.DefaultKeyBindings;
+        Dictionary<Command, PlatformKeyBinding>? bindings = Application.DefaultKeyBindings;
         Assert.NotNull (bindings);
-        Assert.True (bindings.ContainsKey ("Quit"));
+        Assert.True (bindings.ContainsKey (Command.Quit));
 
-        PlatformKeyBinding quit = bindings ["Quit"];
+        PlatformKeyBinding quit = bindings [Command.Quit];
         Assert.NotNull (quit.All);
         Assert.Contains ("Esc", quit.All!);
     }
@@ -27,11 +27,11 @@ public class ApplicationDefaultKeyBindingsTests
     [Fact]
     public void Application_DefaultKeyBindings_SuspendIsNonWindows ()
     {
-        Dictionary<string, PlatformKeyBinding>? bindings = Application.DefaultKeyBindings;
+        Dictionary<Command, PlatformKeyBinding>? bindings = Application.DefaultKeyBindings;
         Assert.NotNull (bindings);
-        Assert.True (bindings.ContainsKey ("Suspend"));
+        Assert.True (bindings.ContainsKey (Command.Suspend));
 
-        PlatformKeyBinding suspend = bindings ["Suspend"];
+        PlatformKeyBinding suspend = bindings [Command.Suspend];
         Assert.Null (suspend.All);
         Assert.NotNull (suspend.Linux);
         Assert.Contains ("Ctrl+Z", suspend.Linux!);
@@ -42,18 +42,18 @@ public class ApplicationDefaultKeyBindingsTests
     [Fact]
     public void Application_DefaultKeyBindings_AllKeyStringsParseable ()
     {
-        Dictionary<string, PlatformKeyBinding>? bindings = Application.DefaultKeyBindings;
+        Dictionary<Command, PlatformKeyBinding>? bindings = Application.DefaultKeyBindings;
         Assert.NotNull (bindings);
 
-        foreach (KeyValuePair<string, PlatformKeyBinding> entry in bindings)
+        foreach (KeyValuePair<Command, PlatformKeyBinding> entry in bindings)
         {
-            string commandName = entry.Key;
+            Command command = entry.Key;
             PlatformKeyBinding binding = entry.Value;
 
-            AssertKeysParseable (binding.All, commandName, "All");
-            AssertKeysParseable (binding.Windows, commandName, "Windows");
-            AssertKeysParseable (binding.Linux, commandName, "Linux");
-            AssertKeysParseable (binding.Macos, commandName, "Macos");
+            AssertKeysParseable (binding.All, command, "All");
+            AssertKeysParseable (binding.Windows, command, "Windows");
+            AssertKeysParseable (binding.Linux, command, "Linux");
+            AssertKeysParseable (binding.Macos, command, "Macos");
         }
     }
 
@@ -71,12 +71,12 @@ public class ApplicationDefaultKeyBindingsTests
     [Fact]
     public void Application_DefaultKeyBindings_ContainsExpectedCommands ()
     {
-        Dictionary<string, PlatformKeyBinding>? bindings = Application.DefaultKeyBindings;
+        Dictionary<Command, PlatformKeyBinding>? bindings = Application.DefaultKeyBindings;
         Assert.NotNull (bindings);
 
-        string [] expectedCommands = ["Quit", "Suspend", "Arrange", "NextTabStop", "PreviousTabStop", "NextTabGroup", "PreviousTabGroup", "Refresh"];
+        Command [] expectedCommands = [Command.Quit, Command.Suspend, Command.Arrange, Command.NextTabStop, Command.PreviousTabStop, Command.NextTabGroup, Command.PreviousTabGroup, Command.Refresh];
 
-        foreach (string command in expectedCommands)
+        foreach (Command command in expectedCommands)
         {
             Assert.True (bindings.ContainsKey (command), $"Expected command '{command}' not found in DefaultKeyBindings.");
         }
@@ -84,7 +84,7 @@ public class ApplicationDefaultKeyBindingsTests
         Assert.Equal (expectedCommands.Length, bindings.Count);
     }
 
-    private static void AssertKeysParseable (string []? keys, string commandName, string platformName)
+    private static void AssertKeysParseable (string []? keys, Command command, string platformName)
     {
         if (keys is null)
         {
@@ -94,7 +94,7 @@ public class ApplicationDefaultKeyBindingsTests
         foreach (string keyString in keys)
         {
             bool parsed = Key.TryParse (keyString, out Key _);
-            Assert.True (parsed, $"Key string '{keyString}' for command '{commandName}' ({platformName}) could not be parsed.");
+            Assert.True (parsed, $"Key string '{keyString}' for command '{command}' ({platformName}) could not be parsed.");
         }
     }
 }

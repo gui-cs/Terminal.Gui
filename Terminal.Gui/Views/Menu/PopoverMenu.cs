@@ -72,8 +72,12 @@ public class PopoverMenu : Popover<Menu, MenuItem>
     ///     Gets or sets the default key bindings for <see cref="PopoverMenu"/>. All standard navigation bindings are
     ///     inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary is empty by default.
     ///     Dynamic bindings (activation key) are bound directly in the constructor.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
     /// </summary>
-    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class with the specified root <see cref="Menu"/>.

@@ -89,10 +89,14 @@ public class DropDownList : TextField
     /// <summary>
     ///     Gets or sets the view-specific default key bindings for <see cref="DropDownList"/>. Contains only bindings
     ///     unique to this view; shared bindings come from <see cref="View.DefaultKeyBindings"/>.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
     /// </summary>
-    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
-        ["Toggle"] = Bind.All ("F4", "Alt+CursorDown"),
+        [Command.Toggle] = Bind.All ("F4", "Alt+CursorDown"),
     };
 
     private readonly Button? _toggleButton;

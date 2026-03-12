@@ -144,16 +144,16 @@ public sealed class KeyBindings : Scenario
     ///     Formats a <see cref="PlatformKeyBinding"/> dictionary for display, one line per key.
     ///     Each line: "CommandName   KeyString (Platform)"
     /// </summary>
-    private static IEnumerable<string> FormatDefaultKeyBindings (Dictionary<string, Terminal.Gui.PlatformKeyBinding> dict)
+    private static IEnumerable<string> FormatDefaultKeyBindings (Dictionary<Command, Terminal.Gui.PlatformKeyBinding> dict)
     {
         if (dict is null)
         {
             yield break;
         }
 
-        foreach (KeyValuePair<string, Terminal.Gui.PlatformKeyBinding> entry in dict)
+        foreach (KeyValuePair<Command, Terminal.Gui.PlatformKeyBinding> entry in dict)
         {
-            string cmd = entry.Key;
+            string cmd = entry.Key.ToString ();
             Terminal.Gui.PlatformKeyBinding pkb = entry.Value;
 
             foreach (string key in pkb.All ?? [])

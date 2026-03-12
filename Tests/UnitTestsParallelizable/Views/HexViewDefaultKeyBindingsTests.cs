@@ -15,7 +15,7 @@ public class HexViewDefaultKeyBindingsTests
     [Fact]
     public void HexView_DefaultKeyBindings_AllKeyStringsParseable ()
     {
-        foreach ((string commandName, PlatformKeyBinding platformBinding) in HexView.DefaultKeyBindings!)
+        foreach ((Command command, PlatformKeyBinding platformBinding) in HexView.DefaultKeyBindings!)
         {
             string [] [] allKeyArrays = [platformBinding.All ?? [], platformBinding.Windows ?? [], platformBinding.Linux ?? [], platformBinding.Macos ?? []];
 
@@ -23,7 +23,7 @@ public class HexViewDefaultKeyBindingsTests
             {
                 foreach (string keyString in keyArray)
                 {
-                    Assert.True (Key.TryParse (keyString, out _), $"Key string '{keyString}' for command '{commandName}' should be parseable.");
+                    Assert.True (Key.TryParse (keyString, out _), $"Key string '{keyString}' for command '{command}' should be parseable.");
                 }
             }
         }
@@ -32,9 +32,9 @@ public class HexViewDefaultKeyBindingsTests
     [Fact]
     public void HexView_DefaultKeyBindings_AllCommandNamesParseable ()
     {
-        foreach (string commandName in HexView.DefaultKeyBindings!.Keys)
+        foreach (Command command in HexView.DefaultKeyBindings!.Keys)
         {
-            Assert.True (Enum.TryParse<Command> (commandName, out _), $"Command name '{commandName}' should parse to a Command enum value.");
+            Assert.True (Enum.IsDefined (command), $"Command name '{command}' should parse to a Command enum value.");
         }
     }
 
@@ -51,8 +51,8 @@ public class HexViewDefaultKeyBindingsTests
     }
 
     [Theory]
-    [InlineData ("StartOfPage")]
-    [InlineData ("EndOfPage")]
-    [InlineData ("Insert")]
-    public void HexView_DefaultKeyBindings_ContainsUniqueCommands (string commandName) => Assert.True (HexView.DefaultKeyBindings!.ContainsKey (commandName));
+    [InlineData (Command.StartOfPage)]
+    [InlineData (Command.EndOfPage)]
+    [InlineData (Command.Insert)]
+    public void HexView_DefaultKeyBindings_ContainsUniqueCommands (Command command) => Assert.True (HexView.DefaultKeyBindings!.ContainsKey (command));
 }

@@ -5,6 +5,10 @@ public partial class TextView
     /// <summary>
     ///     Gets or sets the view-specific default key bindings for <see cref="TextView"/>. Contains only bindings
     ///     unique to this view; shared bindings come from <see cref="View.DefaultKeyBindings"/>.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -13,43 +17,43 @@ public partial class TextView
     ///         are added directly in the constructor.
     ///     </para>
     /// </remarks>
-    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
         // Emacs navigation
-        ["Down"] = Bind.All ("Ctrl+N"),
-        ["Up"] = Bind.All ("Ctrl+P"),
-        ["Right"] = Bind.All ("Ctrl+F"),
-        ["Left"] = Bind.All ("Ctrl+B"),
+        [Command.Down] = Bind.All ("Ctrl+N"),
+        [Command.Up] = Bind.All ("Ctrl+P"),
+        [Command.Right] = Bind.All ("Ctrl+F"),
+        [Command.Left] = Bind.All ("Ctrl+B"),
 
         // Additional RightEnd binding
-        ["RightEnd"] = Bind.All ("Ctrl+E"),
+        [Command.RightEnd] = Bind.All ("Ctrl+E"),
 
         // Toggle selection mode
-        ["ToggleExtend"] = Bind.All ("Ctrl+Space"),
+        [Command.ToggleExtend] = Bind.All ("Ctrl+Space"),
 
         // Kill / cut line commands
-        ["CutToEndOfLine"] = Bind.All ("Ctrl+K"),
-        ["CutToStartOfLine"] = Bind.All ("Ctrl+Shift+Backspace"),
-        ["DeleteAll"] = Bind.All ("Ctrl+Shift+Delete"),
+        [Command.CutToEndOfLine] = Bind.All ("Ctrl+K"),
+        [Command.CutToStartOfLine] = Bind.All ("Ctrl+Shift+Backspace"),
+        [Command.DeleteAll] = Bind.All ("Ctrl+Shift+Delete"),
 
         // Additional Cut binding (Emacs)
-        ["Cut"] = Bind.All ("Ctrl+W"),
+        [Command.Cut] = Bind.All ("Ctrl+W"),
 
         // Word navigation
-        ["WordLeft"] = Bind.All ("Ctrl+CursorLeft"),
-        ["WordRight"] = Bind.All ("Ctrl+CursorRight"),
-        ["WordLeftExtend"] = Bind.All ("Ctrl+Shift+CursorLeft"),
-        ["WordRightExtend"] = Bind.All ("Ctrl+Shift+CursorRight"),
+        [Command.WordLeft] = Bind.All ("Ctrl+CursorLeft"),
+        [Command.WordRight] = Bind.All ("Ctrl+CursorRight"),
+        [Command.WordLeftExtend] = Bind.All ("Ctrl+Shift+CursorLeft"),
+        [Command.WordRightExtend] = Bind.All ("Ctrl+Shift+CursorRight"),
 
         // Kill word
-        ["KillWordRight"] = Bind.All ("Ctrl+Delete"),
-        ["KillWordLeft"] = Bind.All ("Ctrl+Backspace"),
+        [Command.KillWordRight] = Bind.All ("Ctrl+Delete"),
+        [Command.KillWordLeft] = Bind.All ("Ctrl+Backspace"),
 
         // Overwrite mode
-        ["ToggleOverwrite"] = Bind.All ("Insert"),
+        [Command.ToggleOverwrite] = Bind.All ("Insert"),
 
         // Open color picker
-        ["Open"] = Bind.All ("Ctrl+L")
+        [Command.Open] = Bind.All ("Ctrl+L")
     };
 
     private void CreateCommandsAndBindings ()

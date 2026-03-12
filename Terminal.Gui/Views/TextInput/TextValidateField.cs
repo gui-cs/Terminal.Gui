@@ -37,8 +37,12 @@ public class TextValidateField : View, IDesignable, IValue<string>
     /// <summary>
     ///     Gets or sets the default key bindings for <see cref="TextValidateField"/>. All standard bindings are
     ///     inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary is empty by default.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
     /// </summary>
-    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
 
     /// <summary>
     ///     Gets or sets whether value change events are suppressed.

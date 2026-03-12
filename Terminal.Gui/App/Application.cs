@@ -238,20 +238,24 @@ public static partial class Application
 
     /// <summary>
     ///     Gets or sets the default key bindings for Application-level commands, optionally varying by platform.
-    ///     Each entry maps a command name (e.g. "Quit", "Suspend") to a <see cref="PlatformKeyBinding"/>
+    ///     Each entry maps a <see cref="Command"/> to a <see cref="PlatformKeyBinding"/>
     ///     that specifies the key strings for all platforms or specific ones.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    public static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
-        ["Quit"] = Bind.All ("Esc"),
-        ["Suspend"] = Bind.NonWindows ("Ctrl+Z"),
-        ["Arrange"] = Bind.All ("Ctrl+F5"),
-        ["NextTabStop"] = Bind.All ("Tab"),
-        ["PreviousTabStop"] = Bind.All ("Shift+Tab"),
-        ["NextTabGroup"] = Bind.All ("F6"),
-        ["PreviousTabGroup"] = Bind.All ("Shift+F6"),
-        ["Refresh"] = Bind.All ("F5"),
+        [Command.Quit] = Bind.All ("Esc"),
+        [Command.Suspend] = Bind.NonWindows ("Ctrl+Z"),
+        [Command.Arrange] = Bind.All ("Ctrl+F5"),
+        [Command.NextTabStop] = Bind.All ("Tab"),
+        [Command.PreviousTabStop] = Bind.All ("Shift+Tab"),
+        [Command.NextTabGroup] = Bind.All ("F6"),
+        [Command.PreviousTabGroup] = Bind.All ("Shift+F6"),
+        [Command.Refresh] = Bind.All ("F5"),
     };
 
     /// <summary>Gets or sets the key to quit the application.</summary>

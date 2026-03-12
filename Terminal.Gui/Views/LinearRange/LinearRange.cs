@@ -120,6 +120,10 @@ public class LinearRange<T> : View, IOrientation
     /// <summary>
     ///     Gets or sets the view-specific default key bindings for <see cref="LinearRange{T}"/>. Contains only bindings
     ///     unique to this view; shared bindings come from <see cref="View.DefaultKeyBindings"/>.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -128,10 +132,10 @@ public class LinearRange<T> : View, IOrientation
     ///         configuration.
     ///     </para>
     /// </remarks>
-    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
-        ["Accept"] = Bind.All ("Enter"),
-        ["Activate"] = Bind.All ("Space"),
+        [Command.Accept] = Bind.All ("Enter"),
+        [Command.Activate] = Bind.All ("Space"),
     };
 
     private readonly LinearRangeConfiguration _config = new ();

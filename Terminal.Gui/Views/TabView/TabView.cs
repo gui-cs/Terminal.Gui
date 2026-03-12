@@ -32,8 +32,12 @@ public class TabView : View
     /// <summary>
     ///     Gets or sets the default key bindings for <see cref="TabView"/>. All standard navigation bindings are
     ///     inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary is empty by default.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
     /// </summary>
-    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
 
     /// <summary>
     ///     This sub view is the main client area of the current tab.  It hosts the <see cref="Tab.View"/> of the tab, the

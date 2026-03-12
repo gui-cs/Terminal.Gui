@@ -15,7 +15,7 @@ public class MenuBarDefaultKeyBindingsTests
     [Fact]
     public void MenuBar_DefaultKeyBindings_AllKeyStringsParseable ()
     {
-        foreach ((string commandName, PlatformKeyBinding platformBinding) in MenuBar.DefaultKeyBindings!)
+        foreach ((Command command, PlatformKeyBinding platformBinding) in MenuBar.DefaultKeyBindings!)
         {
             string [] [] allKeyArrays = [platformBinding.All ?? [], platformBinding.Windows ?? [], platformBinding.Linux ?? [], platformBinding.Macos ?? []];
 
@@ -23,7 +23,7 @@ public class MenuBarDefaultKeyBindingsTests
             {
                 foreach (string keyString in keyArray)
                 {
-                    Assert.True (Key.TryParse (keyString, out _), $"Key string '{keyString}' for command '{commandName}' should be parseable.");
+                    Assert.True (Key.TryParse (keyString, out _), $"Key string '{keyString}' for command '{command}' should be parseable.");
                 }
             }
         }
@@ -32,9 +32,9 @@ public class MenuBarDefaultKeyBindingsTests
     [Fact]
     public void MenuBar_DefaultKeyBindings_AllCommandNamesParseable ()
     {
-        foreach (string commandName in MenuBar.DefaultKeyBindings!.Keys)
+        foreach (Command command in MenuBar.DefaultKeyBindings!.Keys)
         {
-            Assert.True (Enum.TryParse<Command> (commandName, out _), $"Command name '{commandName}' should parse to a Command enum value.");
+            Assert.True (Enum.IsDefined (command), $"Command name '{command}' should parse to a Command enum value.");
         }
     }
 
@@ -65,11 +65,11 @@ public class MenuBarDefaultKeyBindingsTests
     [Fact]
     public void DropDownList_Toggle_F4_And_AltDown ()
     {
-        Dictionary<string, PlatformKeyBinding>? bindings = DropDownList.DefaultKeyBindings;
+        Dictionary<Command, PlatformKeyBinding>? bindings = DropDownList.DefaultKeyBindings;
         Assert.NotNull (bindings);
-        Assert.True (bindings!.ContainsKey ("Toggle"), "Should contain Toggle command");
+        Assert.True (bindings!.ContainsKey (Command.Toggle), "Should contain Toggle command");
 
-        PlatformKeyBinding toggle = bindings ["Toggle"];
+        PlatformKeyBinding toggle = bindings [Command.Toggle];
         Assert.NotNull (toggle.All);
         Assert.Contains ("F4", toggle.All!);
         Assert.Contains ("Alt+CursorDown", toggle.All!);

@@ -13,50 +13,50 @@ public class ViewDefaultKeyBindingsTests
     public void View_DefaultKeyBindings_IsNotNull () => Assert.NotNull (View.DefaultKeyBindings);
 
     [Theory]
-    [InlineData ("Left")]
-    [InlineData ("Right")]
-    [InlineData ("Up")]
-    [InlineData ("Down")]
-    [InlineData ("PageUp")]
-    [InlineData ("PageDown")]
-    [InlineData ("LeftStart")]
-    [InlineData ("RightEnd")]
-    [InlineData ("Start")]
-    [InlineData ("End")]
-    public void View_DefaultKeyBindings_ContainsNavigationCommands (string commandName) => Assert.True (View.DefaultKeyBindings!.ContainsKey (commandName));
+    [InlineData (Command.Left)]
+    [InlineData (Command.Right)]
+    [InlineData (Command.Up)]
+    [InlineData (Command.Down)]
+    [InlineData (Command.PageUp)]
+    [InlineData (Command.PageDown)]
+    [InlineData (Command.LeftStart)]
+    [InlineData (Command.RightEnd)]
+    [InlineData (Command.Start)]
+    [InlineData (Command.End)]
+    public void View_DefaultKeyBindings_ContainsNavigationCommands (Command command) => Assert.True (View.DefaultKeyBindings!.ContainsKey (command));
 
     [Theory]
-    [InlineData ("LeftExtend")]
-    [InlineData ("RightExtend")]
-    [InlineData ("UpExtend")]
-    [InlineData ("DownExtend")]
-    [InlineData ("PageUpExtend")]
-    [InlineData ("PageDownExtend")]
-    [InlineData ("LeftStartExtend")]
-    [InlineData ("RightEndExtend")]
-    [InlineData ("StartExtend")]
-    [InlineData ("EndExtend")]
-    public void View_DefaultKeyBindings_ContainsSelectionExtendCommands (string commandName) =>
-        Assert.True (View.DefaultKeyBindings!.ContainsKey (commandName));
+    [InlineData (Command.LeftExtend)]
+    [InlineData (Command.RightExtend)]
+    [InlineData (Command.UpExtend)]
+    [InlineData (Command.DownExtend)]
+    [InlineData (Command.PageUpExtend)]
+    [InlineData (Command.PageDownExtend)]
+    [InlineData (Command.LeftStartExtend)]
+    [InlineData (Command.RightEndExtend)]
+    [InlineData (Command.StartExtend)]
+    [InlineData (Command.EndExtend)]
+    public void View_DefaultKeyBindings_ContainsSelectionExtendCommands (Command command) =>
+        Assert.True (View.DefaultKeyBindings!.ContainsKey (command));
 
     [Theory]
-    [InlineData ("Copy")]
-    [InlineData ("Cut")]
-    [InlineData ("Paste")]
-    public void View_DefaultKeyBindings_ContainsClipboardCommands (string commandName) => Assert.True (View.DefaultKeyBindings!.ContainsKey (commandName));
+    [InlineData (Command.Copy)]
+    [InlineData (Command.Cut)]
+    [InlineData (Command.Paste)]
+    public void View_DefaultKeyBindings_ContainsClipboardCommands (Command command) => Assert.True (View.DefaultKeyBindings!.ContainsKey (command));
 
     [Theory]
-    [InlineData ("Undo")]
-    [InlineData ("Redo")]
-    [InlineData ("SelectAll")]
-    [InlineData ("DeleteCharLeft")]
-    [InlineData ("DeleteCharRight")]
-    public void View_DefaultKeyBindings_ContainsEditingCommands (string commandName) => Assert.True (View.DefaultKeyBindings!.ContainsKey (commandName));
+    [InlineData (Command.Undo)]
+    [InlineData (Command.Redo)]
+    [InlineData (Command.SelectAll)]
+    [InlineData (Command.DeleteCharLeft)]
+    [InlineData (Command.DeleteCharRight)]
+    public void View_DefaultKeyBindings_ContainsEditingCommands (Command command) => Assert.True (View.DefaultKeyBindings!.ContainsKey (command));
 
     [Fact]
     public void View_DefaultKeyBindings_AllKeyStringsParseable ()
     {
-        foreach ((string commandName, PlatformKeyBinding platformBinding) in View.DefaultKeyBindings!)
+        foreach ((Command command, PlatformKeyBinding platformBinding) in View.DefaultKeyBindings!)
         {
             string [] [] allKeyArrays = [platformBinding.All ?? [], platformBinding.Windows ?? [], platformBinding.Linux ?? [], platformBinding.Macos ?? []];
 
@@ -64,7 +64,7 @@ public class ViewDefaultKeyBindingsTests
             {
                 foreach (string keyString in keyArray)
                 {
-                    Assert.True (Key.TryParse (keyString, out _), $"Key string '{keyString}' for command '{commandName}' should be parseable.");
+                    Assert.True (Key.TryParse (keyString, out _), $"Key string '{keyString}' for command '{command}' should be parseable.");
                 }
             }
         }
@@ -73,9 +73,9 @@ public class ViewDefaultKeyBindingsTests
     [Fact]
     public void View_DefaultKeyBindings_AllCommandNamesParseable ()
     {
-        foreach (string commandName in View.DefaultKeyBindings!.Keys)
+        foreach (Command command in View.DefaultKeyBindings!.Keys)
         {
-            Assert.True (Enum.TryParse<Command> (commandName, out _), $"Command name '{commandName}' should parse to a Command enum value.");
+            Assert.True (Enum.IsDefined (command), $"Command name '{command}' should parse to a Command enum value.");
         }
     }
 

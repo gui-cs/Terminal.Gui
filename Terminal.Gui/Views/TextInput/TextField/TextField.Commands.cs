@@ -5,6 +5,10 @@ public partial class TextField
     /// <summary>
     ///     Gets or sets the default key bindings for <see cref="TextField"/>. These are layered on top of
     ///     <see cref="View.DefaultKeyBindings"/> when the view is created.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -12,45 +16,45 @@ public partial class TextField
     ///         in the constructor.
     ///     </para>
     /// </remarks>
-    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
         // Emacs navigation
-        ["Left"] = Bind.All ("Ctrl+B"),
-        ["Right"] = Bind.All ("Ctrl+F"),
+        [Command.Left] = Bind.All ("Ctrl+B"),
+        [Command.Right] = Bind.All ("Ctrl+F"),
 
         // Additional LeftStart key (Ctrl+Home; base already has Home)
-        ["LeftStart"] = Bind.All ("Ctrl+Home"),
+        [Command.LeftStart] = Bind.All ("Ctrl+Home"),
 
         // Additional RightEnd keys (Ctrl+End, Ctrl+E; base already has End)
-        ["RightEnd"] = Bind.All ("Ctrl+End", "Ctrl+E"),
+        [Command.RightEnd] = Bind.All ("Ctrl+End", "Ctrl+E"),
 
         // Additional extend keys (CursorUp/CursorDown with Shift; base has CursorLeft/CursorRight with Shift)
-        ["LeftExtend"] = Bind.All ("Shift+CursorUp"),
-        ["RightExtend"] = Bind.All ("Shift+CursorDown"),
+        [Command.LeftExtend] = Bind.All ("Shift+CursorUp"),
+        [Command.RightExtend] = Bind.All ("Shift+CursorDown"),
 
         // Additional LeftStartExtend keys (base already has Shift+Home)
-        ["LeftStartExtend"] = Bind.All ("Ctrl+Shift+Home", "Ctrl+Shift+A"),
+        [Command.LeftStartExtend] = Bind.All ("Ctrl+Shift+Home", "Ctrl+Shift+A"),
 
         // Additional RightEndExtend keys (base already has Shift+End)
-        ["RightEndExtend"] = Bind.All ("Ctrl+Shift+End", "Ctrl+Shift+E"),
+        [Command.RightEndExtend] = Bind.All ("Ctrl+Shift+End", "Ctrl+Shift+E"),
 
         // Word navigation
-        ["WordLeft"] = Bind.All ("Ctrl+CursorLeft", "Ctrl+CursorUp"),
-        ["WordRight"] = Bind.All ("Ctrl+CursorRight", "Ctrl+CursorDown"),
-        ["WordLeftExtend"] = Bind.All ("Ctrl+Shift+CursorLeft", "Ctrl+Shift+CursorUp"),
-        ["WordRightExtend"] = Bind.All ("Ctrl+Shift+CursorRight", "Ctrl+Shift+CursorDown"),
+        [Command.WordLeft] = Bind.All ("Ctrl+CursorLeft", "Ctrl+CursorUp"),
+        [Command.WordRight] = Bind.All ("Ctrl+CursorRight", "Ctrl+CursorDown"),
+        [Command.WordLeftExtend] = Bind.All ("Ctrl+Shift+CursorLeft", "Ctrl+Shift+CursorUp"),
+        [Command.WordRightExtend] = Bind.All ("Ctrl+Shift+CursorRight", "Ctrl+Shift+CursorDown"),
 
         // Kill commands
-        ["CutToEndOfLine"] = Bind.All ("Ctrl+K"),
-        ["CutToStartOfLine"] = Bind.All ("Ctrl+Shift+K"),
-        ["KillWordRight"] = Bind.All ("Ctrl+Delete"),
-        ["KillWordLeft"] = Bind.All ("Ctrl+Backspace"),
+        [Command.CutToEndOfLine] = Bind.All ("Ctrl+K"),
+        [Command.CutToStartOfLine] = Bind.All ("Ctrl+Shift+K"),
+        [Command.KillWordRight] = Bind.All ("Ctrl+Delete"),
+        [Command.KillWordLeft] = Bind.All ("Ctrl+Backspace"),
 
         // Overwrite mode
-        ["ToggleOverwrite"] = Bind.All ("Insert"),
+        [Command.ToggleOverwrite] = Bind.All ("Insert"),
 
         // Delete all text
-        ["DeleteAll"] = Bind.All ("Ctrl+Shift+Delete")
+        [Command.DeleteAll] = Bind.All ("Ctrl+Shift+Delete")
     };
 
     private void CreateCommandsAndBindings ()

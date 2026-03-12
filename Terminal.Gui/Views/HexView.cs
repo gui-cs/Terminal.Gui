@@ -85,20 +85,24 @@ public class HexView : View, IDesignable
     /// <summary>
     ///     Gets or sets the view-specific default key bindings for <see cref="HexView"/>. Contains only bindings
     ///     unique to this view; shared bindings come from <see cref="View.DefaultKeyBindings"/>.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
     /// </summary>
-    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
         // HexView maps Home/End to stream start/end (overrides base layer's LeftStart/RightEnd)
-        ["Start"] = Bind.All ("Home"),
-        ["End"] = Bind.All ("End"),
+        [Command.Start] = Bind.All ("Home"),
+        [Command.End] = Bind.All ("End"),
 
         // Row start/end via Ctrl+Left/Right
-        ["LeftStart"] = Bind.All ("Ctrl+CursorLeft"),
-        ["RightEnd"] = Bind.All ("Ctrl+CursorRight"),
+        [Command.LeftStart] = Bind.All ("Ctrl+CursorLeft"),
+        [Command.RightEnd] = Bind.All ("Ctrl+CursorRight"),
 
-        ["StartOfPage"] = Bind.All ("Ctrl+CursorUp"),
-        ["EndOfPage"] = Bind.All ("Ctrl+CursorDown"),
-        ["Insert"] = Bind.All ("Insert"),
+        [Command.StartOfPage] = Bind.All ("Ctrl+CursorUp"),
+        [Command.EndOfPage] = Bind.All ("Ctrl+CursorDown"),
+        [Command.Insert] = Bind.All ("Insert"),
     };
 
     private const int DEFAULT_ADDRESS_WIDTH = 8; // The default value for AddressWidth

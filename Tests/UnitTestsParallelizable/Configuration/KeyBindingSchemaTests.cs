@@ -41,21 +41,21 @@ public class KeyBindingSchemaTests
     public void KeyBindingDict_RoundTrips_ThroughJson ()
     {
         // Arrange
-        Dictionary<string, PlatformKeyBinding> original = new ()
+        Dictionary<Command, PlatformKeyBinding> original = new ()
         {
-            ["Left"] = new () { All = ["CursorLeft"] },
-            ["Right"] = new () { All = ["CursorRight"], Linux = ["Ctrl+F"] }
+            [Command.Left] = new () { All = ["CursorLeft"] },
+            [Command.Right] = new () { All = ["CursorRight"], Linux = ["Ctrl+F"] }
         };
 
         // Act
         string json = JsonSerializer.Serialize (original, _jsonOptions);
-        Dictionary<string, PlatformKeyBinding>? deserialized = JsonSerializer.Deserialize<Dictionary<string, PlatformKeyBinding>> (json, _jsonOptions);
+        Dictionary<Command, PlatformKeyBinding>? deserialized = JsonSerializer.Deserialize<Dictionary<Command, PlatformKeyBinding>> (json, _jsonOptions);
 
         // Assert
         Assert.NotNull (deserialized);
         Assert.Equal (2, deserialized.Count);
-        Assert.Equal (["CursorLeft"], deserialized ["Left"].All!);
-        Assert.Equal (["Ctrl+F"], deserialized ["Right"].Linux!);
+        Assert.Equal (["CursorLeft"], deserialized [Command.Left].All!);
+        Assert.Equal (["Ctrl+F"], deserialized [Command.Right].Linux!);
     }
 
     [Fact]
@@ -65,27 +65,27 @@ public class KeyBindingSchemaTests
         string json = """{ "Left": { "All": ["CursorLeft"], "Linux": ["Ctrl+B"] } }""";
 
         // Act
-        Dictionary<string, PlatformKeyBinding>? result = JsonSerializer.Deserialize<Dictionary<string, PlatformKeyBinding>> (json, _jsonOptions);
+        Dictionary<Command, PlatformKeyBinding>? result = JsonSerializer.Deserialize<Dictionary<Command, PlatformKeyBinding>> (json, _jsonOptions);
 
         // Assert
         Assert.NotNull (result);
         Assert.Single (result);
-        Assert.True (result.ContainsKey ("Left"));
-        Assert.Equal (["CursorLeft"], result ["Left"].All!);
-        Assert.Equal (["Ctrl+B"], result ["Left"].Linux!);
-        Assert.Null (result ["Left"].Windows);
-        Assert.Null (result ["Left"].Macos);
+        Assert.True (result.ContainsKey (Command.Left));
+        Assert.Equal (["CursorLeft"], result [Command.Left].All!);
+        Assert.Equal (["Ctrl+B"], result [Command.Left].Linux!);
+        Assert.Null (result [Command.Left].Windows);
+        Assert.Null (result [Command.Left].Macos);
     }
 
     [Fact]
     public void KeyBindingDict_EmptyDict_RoundTrips ()
     {
         // Arrange
-        Dictionary<string, PlatformKeyBinding> original = [];
+        Dictionary<Command, PlatformKeyBinding> original = [];
 
         // Act
         string json = JsonSerializer.Serialize (original, _jsonOptions);
-        Dictionary<string, PlatformKeyBinding>? deserialized = JsonSerializer.Deserialize<Dictionary<string, PlatformKeyBinding>> (json, _jsonOptions);
+        Dictionary<Command, PlatformKeyBinding>? deserialized = JsonSerializer.Deserialize<Dictionary<Command, PlatformKeyBinding>> (json, _jsonOptions);
 
         // Assert
         Assert.NotNull (deserialized);
@@ -96,30 +96,30 @@ public class KeyBindingSchemaTests
     public void ViewKeyBindings_RoundTrips_ThroughJson ()
     {
         // Arrange
-        Dictionary<string, Dictionary<string, PlatformKeyBinding>> original = new ()
+        Dictionary<string, Dictionary<Command, PlatformKeyBinding>> original = new ()
         {
             ["TextView"] = new ()
             {
-                ["Left"] = new () { All = ["CursorLeft"], Macos = ["Cmd+Left"] },
-                ["SelectAll"] = new () { All = ["Ctrl+A"] }
+                [Command.Left] = new () { All = ["CursorLeft"], Macos = ["Cmd+Left"] },
+                [Command.SelectAll] = new () { All = ["Ctrl+A"] }
             },
             ["TextField"] = new ()
             {
-                ["DeleteAll"] = new () { All = ["Ctrl+Shift+Delete"] }
+                [Command.DeleteAll] = new () { All = ["Ctrl+Shift+Delete"] }
             }
         };
 
         // Act
         string json = JsonSerializer.Serialize (original, _jsonOptions);
-        Dictionary<string, Dictionary<string, PlatformKeyBinding>>? deserialized =
-            JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, PlatformKeyBinding>>> (json, _jsonOptions);
+        Dictionary<string, Dictionary<Command, PlatformKeyBinding>>? deserialized =
+            JsonSerializer.Deserialize<Dictionary<string, Dictionary<Command, PlatformKeyBinding>>> (json, _jsonOptions);
 
         // Assert
         Assert.NotNull (deserialized);
         Assert.Equal (2, deserialized.Count);
-        Assert.Equal (["CursorLeft"], deserialized ["TextView"] ["Left"].All!);
-        Assert.Equal (["Cmd+Left"], deserialized ["TextView"] ["Left"].Macos!);
-        Assert.Equal (["Ctrl+A"], deserialized ["TextView"] ["SelectAll"].All!);
-        Assert.Equal (["Ctrl+Shift+Delete"], deserialized ["TextField"] ["DeleteAll"].All!);
+        Assert.Equal (["CursorLeft"], deserialized ["TextView"] [Command.Left].All!);
+        Assert.Equal (["Cmd+Left"], deserialized ["TextView"] [Command.Left].Macos!);
+        Assert.Equal (["Ctrl+A"], deserialized ["TextView"] [Command.SelectAll].All!);
+        Assert.Equal (["Ctrl+Shift+Delete"], deserialized ["TextField"] [Command.DeleteAll].All!);
     }
 }

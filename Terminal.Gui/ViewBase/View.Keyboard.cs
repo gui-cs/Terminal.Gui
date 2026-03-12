@@ -648,63 +648,71 @@ public partial class View // Keyboard APIs
     /// <summary>
     ///     Gets or sets the default key bindings shared across all views. Only commands that a view supports
     ///     (via <see cref="GetSupportedCommands"/>) are actually bound when <see cref="ApplyKeyBindings"/> is called.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    public static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
         // Navigation
-        ["Left"] = Bind.All ("CursorLeft"),
-        ["Right"] = Bind.All ("CursorRight"),
-        ["Up"] = Bind.All ("CursorUp"),
-        ["Down"] = Bind.All ("CursorDown"),
-        ["PageUp"] = Bind.All ("PageUp"),
-        ["PageDown"] = Bind.All ("PageDown"),
-        ["LeftStart"] = Bind.All ("Home"),
-        ["RightEnd"] = Bind.All ("End"),
-        ["Start"] = Bind.All ("Ctrl+Home"),
-        ["End"] = Bind.All ("Ctrl+End"),
+        [Command.Left] = Bind.All ("CursorLeft"),
+        [Command.Right] = Bind.All ("CursorRight"),
+        [Command.Up] = Bind.All ("CursorUp"),
+        [Command.Down] = Bind.All ("CursorDown"),
+        [Command.PageUp] = Bind.All ("PageUp"),
+        [Command.PageDown] = Bind.All ("PageDown"),
+        [Command.LeftStart] = Bind.All ("Home"),
+        [Command.RightEnd] = Bind.All ("End"),
+        [Command.Start] = Bind.All ("Ctrl+Home"),
+        [Command.End] = Bind.All ("Ctrl+End"),
 
         // Selection-extend
-        ["LeftExtend"] = Bind.All ("Shift+CursorLeft"),
-        ["RightExtend"] = Bind.All ("Shift+CursorRight"),
-        ["UpExtend"] = Bind.All ("Shift+CursorUp"),
-        ["DownExtend"] = Bind.All ("Shift+CursorDown"),
-        ["PageUpExtend"] = Bind.All ("Shift+PageUp"),
-        ["PageDownExtend"] = Bind.All ("Shift+PageDown"),
-        ["LeftStartExtend"] = Bind.All ("Shift+Home"),
-        ["RightEndExtend"] = Bind.All ("Shift+End"),
-        ["StartExtend"] = Bind.All ("Ctrl+Shift+Home"),
-        ["EndExtend"] = Bind.All ("Ctrl+Shift+End"),
+        [Command.LeftExtend] = Bind.All ("Shift+CursorLeft"),
+        [Command.RightExtend] = Bind.All ("Shift+CursorRight"),
+        [Command.UpExtend] = Bind.All ("Shift+CursorUp"),
+        [Command.DownExtend] = Bind.All ("Shift+CursorDown"),
+        [Command.PageUpExtend] = Bind.All ("Shift+PageUp"),
+        [Command.PageDownExtend] = Bind.All ("Shift+PageDown"),
+        [Command.LeftStartExtend] = Bind.All ("Shift+Home"),
+        [Command.RightEndExtend] = Bind.All ("Shift+End"),
+        [Command.StartExtend] = Bind.All ("Ctrl+Shift+Home"),
+        [Command.EndExtend] = Bind.All ("Ctrl+Shift+End"),
 
         // Clipboard
-        ["Copy"] = Bind.All ("Ctrl+C"),
-        ["Cut"] = Bind.All ("Ctrl+X"),
-        ["Paste"] = Bind.All ("Ctrl+V"),
+        [Command.Copy] = Bind.All ("Ctrl+C"),
+        [Command.Cut] = Bind.All ("Ctrl+X"),
+        [Command.Paste] = Bind.All ("Ctrl+V"),
 
         // Editing
-        ["Undo"] = Bind.AllPlus ("Ctrl+Z", ["Ctrl+/"]),
-        ["Redo"] = Bind.AllPlus ("Ctrl+Y", ["Ctrl+Shift+Z"]),
-        ["SelectAll"] = Bind.All ("Ctrl+A"),
-        ["DeleteCharLeft"] = Bind.All ("Backspace"),
-        ["DeleteCharRight"] = Bind.All ("Delete", "Ctrl+D")
+        [Command.Undo] = Bind.AllPlus ("Ctrl+Z", ["Ctrl+/"]),
+        [Command.Redo] = Bind.AllPlus ("Ctrl+Y", ["Ctrl+Shift+Z"]),
+        [Command.SelectAll] = Bind.All ("Ctrl+A"),
+        [Command.DeleteCharLeft] = Bind.All ("Backspace"),
+        [Command.DeleteCharRight] = Bind.All ("Delete", "Ctrl+D")
     };
 
     /// <summary>
     ///     Gets or sets per-view key binding overrides from configuration. The outer key is the view type name
-    ///     (e.g., "TextField"), the inner dictionary maps command names to platform key bindings.
+    ///     (e.g., "TextField"), the inner dictionary maps commands to platform key bindings.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, Dictionary<string, PlatformKeyBinding>>? ViewKeyBindings { get; set; }
+    public static Dictionary<string, Dictionary<Command, PlatformKeyBinding>>? ViewKeyBindings { get; set; }
 
     /// <summary>
     ///     Applies layered key bindings from the provided dictionaries. Only commands that the view supports
     ///     (via <see cref="GetSupportedCommands"/>) are bound. Keys already bound are not overwritten.
     /// </summary>
-    protected void ApplyKeyBindings (params Dictionary<string, PlatformKeyBinding>? [] layers)
+    protected void ApplyKeyBindings (params Dictionary<Command, PlatformKeyBinding>? [] layers)
     {
         HashSet<Command> supported = new (GetSupportedCommands ());
 
-        foreach (Dictionary<string, PlatformKeyBinding>? layer in layers)
+        foreach (Dictionary<Command, PlatformKeyBinding>? layer in layers)
         {
             if (layer is null)
             {
@@ -717,21 +725,16 @@ public partial class View // Keyboard APIs
         // Apply user overrides from View.ViewKeyBindings (CM/MEC bridge)
         string typeName = GetType ().Name;
 
-        if (ViewKeyBindings?.TryGetValue (typeName, out Dictionary<string, PlatformKeyBinding>? overrides) == true)
+        if (ViewKeyBindings?.TryGetValue (typeName, out Dictionary<Command, PlatformKeyBinding>? overrides) == true)
         {
             ApplyLayer (overrides, supported);
         }
     }
 
-    private void ApplyLayer (Dictionary<string, PlatformKeyBinding> layer, HashSet<Command> supported)
+    private void ApplyLayer (Dictionary<Command, PlatformKeyBinding> layer, HashSet<Command> supported)
     {
-        foreach ((string commandName, PlatformKeyBinding platformKeys) in layer)
+        foreach ((Command command, PlatformKeyBinding platformKeys) in layer)
         {
-            if (!Enum.TryParse (commandName, out Command command))
-            {
-                continue;
-            }
-
             if (!supported.Contains (command))
             {
                 continue;
@@ -746,7 +749,7 @@ public partial class View // Keyboard APIs
 
                 if (KeyBindings.TryGet (key, out _))
                 {
-                    continue; // skip already-bound
+                    continue;
                 }
 
                 KeyBindings.Add (key, command);

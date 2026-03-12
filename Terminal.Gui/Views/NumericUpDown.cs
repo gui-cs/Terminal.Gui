@@ -35,8 +35,12 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
     /// <summary>
     ///     Gets or sets the view-specific default key bindings for <see cref="NumericUpDown{T}"/>. All standard navigation
     ///     bindings are inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary is empty by default.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
     /// </summary>
-    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
 
     private readonly Button _down;
 

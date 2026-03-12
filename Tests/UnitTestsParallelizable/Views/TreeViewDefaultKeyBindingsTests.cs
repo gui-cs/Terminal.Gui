@@ -15,7 +15,7 @@ public class TreeViewDefaultKeyBindingsTests
     [Fact]
     public void TreeView_DefaultKeyBindings_AllKeyStringsParseable ()
     {
-        foreach ((string commandName, PlatformKeyBinding platformBinding) in TreeView<ITreeNode>.DefaultKeyBindings!)
+        foreach ((Command command, PlatformKeyBinding platformBinding) in TreeView<ITreeNode>.DefaultKeyBindings!)
         {
             string [] [] allKeyArrays = [platformBinding.All ?? [], platformBinding.Windows ?? [], platformBinding.Linux ?? [], platformBinding.Macos ?? []];
 
@@ -23,7 +23,7 @@ public class TreeViewDefaultKeyBindingsTests
             {
                 foreach (string keyString in keyArray)
                 {
-                    Assert.True (Key.TryParse (keyString, out _), $"Key string '{keyString}' for command '{commandName}' should be parseable.");
+                    Assert.True (Key.TryParse (keyString, out _), $"Key string '{keyString}' for command '{command}' should be parseable.");
                 }
             }
         }
@@ -32,9 +32,9 @@ public class TreeViewDefaultKeyBindingsTests
     [Fact]
     public void TreeView_DefaultKeyBindings_AllCommandNamesParseable ()
     {
-        foreach (string commandName in TreeView<ITreeNode>.DefaultKeyBindings!.Keys)
+        foreach (Command command in TreeView<ITreeNode>.DefaultKeyBindings!.Keys)
         {
-            Assert.True (Enum.TryParse<Command> (commandName, out _), $"Command name '{commandName}' should parse to a Command enum value.");
+            Assert.True (Enum.IsDefined (command), $"Command name '{command}' should parse to a Command enum value.");
         }
     }
 
@@ -54,18 +54,18 @@ public class TreeViewDefaultKeyBindingsTests
     [Fact]
     public void TreeView_DefaultKeyBindings_ContainsUniqueCommands ()
     {
-        Dictionary<string, PlatformKeyBinding> bindings = TreeView<ITreeNode>.DefaultKeyBindings!;
+        Dictionary<Command, PlatformKeyBinding> bindings = TreeView<ITreeNode>.DefaultKeyBindings!;
 
         // Tree-specific commands
-        Assert.True (bindings.ContainsKey ("Expand"), "DefaultKeyBindings should contain Expand.");
-        Assert.True (bindings.ContainsKey ("ExpandAll"), "DefaultKeyBindings should contain ExpandAll.");
-        Assert.True (bindings.ContainsKey ("Collapse"), "DefaultKeyBindings should contain Collapse.");
-        Assert.True (bindings.ContainsKey ("CollapseAll"), "DefaultKeyBindings should contain CollapseAll.");
-        Assert.True (bindings.ContainsKey ("LineUpToFirstBranch"), "DefaultKeyBindings should contain LineUpToFirstBranch.");
-        Assert.True (bindings.ContainsKey ("LineDownToLastBranch"), "DefaultKeyBindings should contain LineDownToLastBranch.");
+        Assert.True (bindings.ContainsKey (Command.Expand), "DefaultKeyBindings should contain Expand.");
+        Assert.True (bindings.ContainsKey (Command.ExpandAll), "DefaultKeyBindings should contain ExpandAll.");
+        Assert.True (bindings.ContainsKey (Command.Collapse), "DefaultKeyBindings should contain Collapse.");
+        Assert.True (bindings.ContainsKey (Command.CollapseAll), "DefaultKeyBindings should contain CollapseAll.");
+        Assert.True (bindings.ContainsKey (Command.LineUpToFirstBranch), "DefaultKeyBindings should contain LineUpToFirstBranch.");
+        Assert.True (bindings.ContainsKey (Command.LineDownToLastBranch), "DefaultKeyBindings should contain LineDownToLastBranch.");
 
         // TreeView overrides Start/End to use Home/End instead of Ctrl+Home/Ctrl+End
-        Assert.True (bindings.ContainsKey ("Start"), "DefaultKeyBindings should contain Start.");
-        Assert.True (bindings.ContainsKey ("End"), "DefaultKeyBindings should contain End.");
+        Assert.True (bindings.ContainsKey (Command.Start), "DefaultKeyBindings should contain Start.");
+        Assert.True (bindings.ContainsKey (Command.End), "DefaultKeyBindings should contain End.");
     }
 }
