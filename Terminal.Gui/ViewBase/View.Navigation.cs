@@ -621,12 +621,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             return (false, false);
         }
 
-        if (!CanBeVisible (this) || !Enabled)
-        {
-            return (false, false);
-        }
-
-        if (!CanFocus)
+        if (!CanBeVisible (this) || !Enabled || !CanFocus)
         {
             return (false, false);
         }

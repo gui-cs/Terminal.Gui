@@ -38,6 +38,8 @@ public class TabView : View, IDesignable
         Padding.Thickness = Padding.Thickness with { Top = 3 };
         _tabRow.Y = 0;
 
+        Padding.TabStop = TabBehavior.TabStop;
+
         // Recompute border gaps after all subviews (including Padding's TabRow) are laid out
         SubViewsLaidOut += (_, _) => _tabRow.UpdateBorderGaps ();
 
@@ -155,7 +157,7 @@ public class TabView : View, IDesignable
 
     /// <summary>Raises the <see cref="SelectedTabChanged"/> event.</summary>
     protected virtual void OnSelectedTabChanged (ValueChangedEventArgs<Tab?> args) => SelectedTabChanged?.Invoke (this, args);
-    
+
     /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
@@ -222,6 +224,18 @@ public class TabView : View, IDesignable
         }
 
         base.OnHasFocusChanged (newHasFocus, previousFocusedView, focusedView);
+    }
+
+    /// <inheritdoc />
+    protected override bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
+    {
+        return base.OnAdvancingFocus (direction, behavior);
+    }
+
+    /// <inheritdoc />
+    protected override void OnFocusedChanged (View? previousFocused, View? focused)
+    {
+        base.OnFocusedChanged (previousFocused, focused);
     }
 
     private bool? SelectPreviousTab ()

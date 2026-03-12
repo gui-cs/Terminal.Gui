@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices.JavaScript;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -13,7 +11,7 @@ internal class TabRow : View
 #if DEBUG
         Id = "TabRow";
 #endif
-        CanFocus = false;
+        CanFocus = true;
         TabStop = TabBehavior.TabStop;
 
         // Extend past the Padding bounds to overlap with the Border's left/right columns
@@ -69,13 +67,13 @@ internal class TabRow : View
             };
 
             header.GettingAttributeForRole += (sender, args) =>
-            {
-                if (args.Role == VisualRole.HotNormal && tabView.SubViews.ElementAt (tabIndex).HasFocus)
-                {
-                    args.Handled = true;
-                    args.Result = header.GetAttributeForRole (VisualRole.HotFocus);
-                }
-            };
+                                              {
+                                                  if (args.Role == VisualRole.HotNormal && tabView.SubViews.ElementAt (tabIndex).HasFocus)
+                                                  {
+                                                      args.Handled = true;
+                                                      args.Result = header.GetAttributeForRole (VisualRole.HotFocus);
+                                                  }
+                                              };
 
             // Disable title rendering in the border — we use Text, not Title
             header.Border!.Settings &= ~BorderSettings.Title;
@@ -94,11 +92,31 @@ internal class TabRow : View
 
             header.Activating += (_, _) => { tabView.SelectedTabIndex = tabIndex; };
 
+            header.HasFocusChanged += (_, args) =>
+                                     {
+                                         if (args.NewValue && tabView.SelectedTabIndex != tabIndex)
+                                         {
+                                             //tabView.SelectedTabIndex = tabIndex;
+                                         }
+                                     };
+
             Add (header);
             previous = header;
         }
 
         UpdateHeaderAppearance ();
+    }
+
+    /// <inheritdoc />
+    protected override bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
+    {
+        return base.OnAdvancingFocus (direction, behavior);
+    }
+
+    /// <inheritdoc />
+    protected override void OnFocusedChanged (View? previousFocused, View? focused)
+    {
+        base.OnFocusedChanged (previousFocused, focused);
     }
 
     /// <summary>Updates tab header borders based on which tab is selected.</summary>

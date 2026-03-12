@@ -43,6 +43,7 @@ public class Padding : Adornment
             {
                 Parent.SetFocus ();
                 Parent.SetNeedsDraw ();
+
                 return mouse.Handled = true;
             }
         }
@@ -90,7 +91,7 @@ public class Padding : Adornment
         {
             // Include SubViews from Parent. Since we are a Padding of Parent do not
             // request Adornments again to avoid infinite recursion.
-            subViewsOfThisAdornment.AddRange (Parent.GetSubViews (false, false, false));
+            subViewsOfThisAdornment.AddRange (Parent.GetSubViews ());
         }
 
         return subViewsOfThisAdornment;
