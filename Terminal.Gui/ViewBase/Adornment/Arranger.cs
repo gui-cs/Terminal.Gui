@@ -37,7 +37,7 @@ internal sealed class Arranger : IDisposable
     ///     or keyboard.
     /// </summary>
     /// <remarks>
-    ///     Arrange Mode is exited by the user pressing <see cref="IKeyboard.ArrangeKey"/>, <see cref="Key.Esc"/>, or by
+    ///     Arrange Mode is exited by the user pressing the Arrange key, <see cref="Key.Esc"/>, or by
     ///     clicking the mouse out of the <see cref="Adornment.Parent"/>'s Frame.
     /// </remarks>
     /// <returns></returns>

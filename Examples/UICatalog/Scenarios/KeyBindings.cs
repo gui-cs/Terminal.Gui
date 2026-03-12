@@ -156,22 +156,22 @@ public sealed class KeyBindings : Scenario
             string cmd = entry.Key.ToString ();
             Terminal.Gui.PlatformKeyBinding pkb = entry.Value;
 
-            foreach (string key in pkb.All ?? [])
+            foreach (Key key in pkb.All ?? [])
             {
                 yield return $"{cmd,-22} {key} (All)";
             }
 
-            foreach (string key in pkb.Windows ?? [])
+            foreach (Key key in pkb.Windows ?? [])
             {
                 yield return $"{cmd,-22} {key} (Win)";
             }
 
-            foreach (string key in pkb.Linux ?? [])
+            foreach (Key key in pkb.Linux ?? [])
             {
                 yield return $"{cmd,-22} {key} (Linux)";
             }
 
-            foreach (string key in pkb.Macos ?? [])
+            foreach (Key key in pkb.Macos ?? [])
             {
                 yield return $"{cmd,-22} {key} (macOS)";
             }
@@ -193,7 +193,9 @@ public sealed class KeyBindings : Scenario
 
         foreach (KeyValuePair<Key, KeyBinding> binding in focused.KeyBindings.GetBindings ())
         {
-            _focusedBindings.Add ($"{binding.Key} -> {binding.Value.Commands [0]}");
+            string commands = string.Join (",", binding.Value.Commands);
+
+            _focusedBindings.Add ($"{commands,-22} {binding.Key}");
         }
     }
 }
