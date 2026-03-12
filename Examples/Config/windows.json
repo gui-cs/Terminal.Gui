@@ -43,5 +43,14 @@
         "SelectAll":        { "All": ["Ctrl+A"] },
         "DeleteCharLeft":   { "All": ["Backspace"] },
         "DeleteCharRight":  { "All": ["Delete"] }
+    },
+
+    "View.ViewKeyBindings": {
+        "TextField": {
+            "WordLeft":       { "All": ["Ctrl+CursorLeft"] },
+            "WordRight":      { "All": ["Ctrl+CursorRight"] },
+            "WordLeftExtend": { "All": ["Ctrl+Shift+CursorLeft"] },
+            "WordRightExtend":{ "All": ["Ctrl+Shift+CursorRight"] }
+        }
     }
 }

@@ -44,5 +44,12 @@
         "SelectAll":        { "All": ["Ctrl+A"] },
         "DeleteCharLeft":   { "All": ["Backspace"] },
         "DeleteCharRight":  { "All": ["Delete", "Ctrl+D"] }
+    },
+
+    "View.ViewKeyBindings": {
+        "TextField": {
+            "CutToEndOfLine":   { "All": ["Ctrl+K"] },
+            "KillWordRight":    { "All": ["Ctrl+W"] }
+        }
     }
 }
