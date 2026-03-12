@@ -476,6 +476,43 @@ public class TraceTests
 
     #endregion
 
+    #region Draw Category Tests
+
+    // Copilot
+    [Fact]
+    public void TraceCategory_Draw_HasExpectedValue ()
+    {
+        Assert.Equal (64, (int)TraceCategory.Draw);
+    }
+
+    // Copilot
+    [Fact]
+    public void TraceCategory_All_IncludesDraw ()
+    {
+        Assert.True (TraceCategory.All.HasFlag (TraceCategory.Draw));
+    }
+
+    // Copilot
+    [Fact]
+    public void Draw_Category_CanBeEnabled ()
+    {
+        Trace.EnabledCategories = TraceCategory.None;
+
+        try
+        {
+            Trace.EnabledCategories = TraceCategory.Draw;
+
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Draw));
+        }
+        finally
+        {
+            Trace.EnabledCategories = TraceCategory.None;
+            Trace.Backend = new NullBackend ();
+        }
+    }
+
+    #endregion
+
     #region Scenario Tests (merged from IssueScenarioTraceTests)
 
     /// <summary>

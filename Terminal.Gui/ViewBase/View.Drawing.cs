@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.ViewBase;
 
@@ -27,6 +28,7 @@ public partial class View // Drawing APIs
                 view.SetNeedsDraw ();
             }
 
+            Trace.Draw (view.ToIdentifyingString (), "Draw", $"force={force}");
             view.Draw (context);
         }
 
@@ -83,6 +85,8 @@ public partial class View // Drawing APIs
             return;
         }
 
+        Trace.Draw (this.ToIdentifyingString (), "Start", $"NeedsDraw={NeedsDraw}, SubViewNeedsDraw={SubViewNeedsDraw}");
+
         Region? originalClip = GetClip ();
 
         // TODO: This can be further optimized by checking NeedsDraw below and only
@@ -93,6 +97,7 @@ public partial class View // Drawing APIs
             // Draw the Border and Padding Adornments.
             // Note: Margin with a Shadow is special-cased and drawn in a separate pass to support
             // transparent shadows.
+            Trace.Draw (this.ToIdentifyingString (), "Adornments");
             DoDrawAdornments (originalClip);
             SetClip (originalClip);
 
@@ -114,16 +119,19 @@ public partial class View // Drawing APIs
             // Draw the SubViews first (order matters: SubViews, Text, Content)
             if (SubViewNeedsDraw)
             {
+                Trace.Draw (this.ToIdentifyingString (), "SubViews");
                 DoDrawSubViews (context);
             }
 
             // ------------------------------------
             // Draw the text
+            Trace.Draw (this.ToIdentifyingString (), "Text");
             SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
             DoDrawText (context);
 
             // ------------------------------------
             // Draw the content
+            Trace.Draw (this.ToIdentifyingString (), "Content");
             DoDrawContent (context);
 
             // ------------------------------------
@@ -132,6 +140,7 @@ public partial class View // Drawing APIs
             // because they may draw outside the viewport.
             SetClip (originalClip);
             originalClip = AddFrameToClip ();
+            Trace.Draw (this.ToIdentifyingString (), "LineCanvas");
             DoRenderLineCanvas (context);
 
             // ------------------------------------
@@ -178,6 +187,8 @@ public partial class View // Drawing APIs
         // We're done drawing - The Clip is reset to what it was before we started
         // But the context contains the region that was drawn by this view
         DoDrawComplete (context);
+
+        Trace.Draw (this.ToIdentifyingString (), "End");
 
         // When DoDrawComplete returns, Driver.Clip has been updated to exclude this view's area.
         // The next view drawn (earlier in Z-order, typically a peer view or the SuperView) will see
