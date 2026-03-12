@@ -685,6 +685,25 @@ All in `Tests/UnitTestsParallelizable/Views/TabViewTests.cs`:
 
 ---
 
+## Status
+
+| Phase | Status |
+|-------|--------|
+| Phase 0: Delete Old TabView | ✅ Done |
+| Phase 1: Border.Gaps Enhancement | ✅ Done |
+| Phase 2: Core TabView + Tab + TabRow | ✅ Done |
+| Phase 3: TabViews Scenario | ✅ Done |
+| Phase 4: Navigation and Commands | ✅ Done (basic Ctrl+Left/Right/Home/End) |
+| Phase 5: Visual Polish | ✅ Done (tabs on top rendering, segmented border lines, continuation line) |
+| Phase 6: Events and API Completeness | ✅ Done |
+| Phase 7: Tests | ✅ Done (59 tests passing) |
+
+## Known Issues (To Fix Later)
+
+1. **Tab scrolling does not work** — When there are too many tabs to fit in the available width, there is no scroll mechanism. The tabs just overflow. Need to implement scroll offset logic in TabRow with left/right scroll indicators (using `Glyphs.LeftArrow` / `Glyphs.RightArrow`).
+
+2. **TabsOnBottom rendering is broken** — When `TabsOnBottom = true`, the selected tab's title text renders too high (mispositioned vertically). The border/gap logic for bottom tabs needs debugging.
+
 ## Open Questions
 
 1. **Should `AddTab` / `RemoveTab` convenience methods exist?** Or just use `Add ()` / `Remove ()`? Leaning toward just `Add/Remove` for consistency, but `AddTab` could do validation (ensure only Tab types are added).
