@@ -1,5 +1,5 @@
 ﻿using System.Collections.ObjectModel;
-using System.Text;
+using System.Reflection;
 
 namespace UICatalog.Scenarios;
 
@@ -7,8 +7,9 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Mouse and Keyboard")]
 public sealed class KeyBindings : Scenario
 {
-    private IApplication _app;
+    private readonly ObservableCollection<string> _hotkeyBindings = [];
     private readonly ObservableCollection<string> _focusedBindings = [];
+    private ListView _hotkeyBindingsListView;
     private ListView _focusedBindingsListView;
 
     public override void Main ()
@@ -16,139 +17,211 @@ public sealed class KeyBindings : Scenario
         ConfigurationManager.Enable (ConfigLocations.All);
         using IApplication app = Application.Create ();
         app.Init ();
-        _app = app;
 
-        // Setup - Create a top-level application window and configure it.
         using Window appWindow = new ();
         appWindow.Title = GetQuitKeyAndName ();
-        appWindow.SuperViewRendersLineCanvas = true;
 
-        Label label = new () { Title = "_Label:" };
-        TextField textField = new () { X = Pos.Right (label), Y = Pos.Top (label), Width = 20 };
-
-        appWindow.Add (label, textField);
-
-        Button button = new () { X = Pos.Right (textField) + 1, Y = Pos.Top (label), Text = "_Button" };
-        appWindow.Add (button);
-
-        KeyBindingsDemo keyBindingsDemo = new ()
-        {
-            X = Pos.Right (button) + 1,
-            Width = Dim.Auto (DimAutoStyle.Text),
-            Height = Dim.Auto (DimAutoStyle.Text),
-            HotKeySpecifier = (Rune)'_',
-            Title = "_KeyBindingsDemo",
-            Text = $"""
-                    These keys will cause this view to show a message box:
-                    - Hotkey: k, K, Alt-K, Alt-Shift-K
-                    - Focused: F3
-                    - Application: F4
-                    Pressing Esc or {
-                        Application.GetDefaultKey (Command.Quit)
-                    } will cause it to quit the app.
-                    """,
-            BorderStyle = LineStyle.Dashed
-        };
-        appWindow.Add (keyBindingsDemo);
-
-        // App DefaultKeyBindings — shows all commands + all platform keys from Application.DefaultKeyBindings
-        ObservableCollection<string> appBindings = [];
+        // ── Left column: App Bindings (top 50%) and View Bindings (bottom 50%) ──
 
         ListView appBindingsListView = new ()
         {
-            Title = "_Application Bindings",
+            Title = "_App Default Bindings",
             BorderStyle = LineStyle.Single,
-            X = -1,
-            Y = Pos.Bottom (keyBindingsDemo) + 1,
             Width = Dim.Auto (),
-            Height = Dim.Fill () + 1,
+            Height = Dim.Auto (),
             CanFocus = true,
-            Source = new ListWrapper<string> (appBindings),
-            SuperViewRendersLineCanvas = true
+            Source = new ListWrapper<string> (FormatDefaultKeyBindings (Application.DefaultKeyBindings)),
+            ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar
         };
-        appWindow.Add (appBindingsListView);
 
-        foreach (string item in FormatDefaultKeyBindings (Application.DefaultKeyBindings))
+        ListView viewBindingsListView = new ()
         {
-            appBindings.Add (item);
-        }
-
-        // View DefaultKeyBindings — shows all commands + all platform keys from View.DefaultKeyBindings
-        ObservableCollection<string> viewBindings = [];
-
-        ListView viewDefaultBindingsListView = new ()
-        {
-            Title = "_View Bindings",
+            Title = "_View Default Bindings",
             BorderStyle = LineStyle.Single,
-            X = Pos.Right (appBindingsListView) - 1,
-            Y = Pos.Bottom (keyBindingsDemo) + 1,
+            Y = Pos.Bottom (appBindingsListView),
             Width = Dim.Auto (),
-            Height = Dim.Fill () + 1,
-            CanFocus = true,
-            Source = new ListWrapper<string> (viewBindings),
-            SuperViewRendersLineCanvas = true
+            Height = Dim.Fill (),
+            Source = new ListWrapper<string> (FormatDefaultKeyBindings (View.DefaultKeyBindings)),
+            ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar
         };
-        appWindow.Add (viewDefaultBindingsListView);
 
-        foreach (string item in FormatDefaultKeyBindings (View.DefaultKeyBindings))
+        appWindow.Add (appBindingsListView, viewBindingsListView);
+
+        // ── Middle column: All View types ──
+
+        Dictionary<string, Type> viewClasses = GetAllViewClasses ();
+        ObservableCollection<string> viewClassNames = new (viewClasses.Keys.OrderBy (k => k));
+
+        ListView viewClassListView = new ()
         {
-            viewBindings.Add (item);
-        }
+            Title = "All _View Types",
+            BorderStyle = LineStyle.Double,
+            X = Pos.Func (_ => Math.Max (appBindingsListView.Frame.Width, viewBindingsListView.Frame.Width)),
+            Width = Dim.Auto (),
+            Height = Dim.Fill (),
+            CanFocus = true,
+            Source = new ListWrapper<string> (viewClassNames),
+            ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar
+        };
 
-        ObservableCollection<string> hotkeyBindings = [];
+        appWindow.Add (viewClassListView);
 
-        ListView hotkeyBindingsListView = new ()
+        _focusedBindingsListView = new ()
         {
-            Title = "_Hotkey Bindings",
+            Title = "View Bindings",
             BorderStyle = LineStyle.Single,
-            X = Pos.Right (viewDefaultBindingsListView) - 1,
-            Y = Pos.Bottom (keyBindingsDemo) + 1,
+            Y = 0,
+            X = Pos.Right (viewClassListView),
             Width = Dim.Auto (),
-            Height = Dim.Fill () + 1,
+            Height = Dim.Percent (50),
             CanFocus = true,
-            Source = new ListWrapper<string> (hotkeyBindings),
-            SuperViewRendersLineCanvas = true
+            Source = new ListWrapper<string> (_focusedBindings),
+            ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar
         };
-        appWindow.Add (hotkeyBindingsListView);
 
-        foreach (View subview in appWindow.SubViews)
+        _hotkeyBindingsListView = new ()
         {
-            foreach (KeyValuePair<Key, KeyBinding> binding in subview.HotKeyBindings.GetBindings ())
+            Title = "_HotKey Bindings",
+            BorderStyle = LineStyle.Single,
+            X = Pos.Right (viewClassListView),
+            Y = Pos.Bottom (_focusedBindingsListView),
+            Width = Dim.Auto (),
+            Height = Dim.Fill (),
+            CanFocus = true,
+            Source = new ListWrapper<string> (_hotkeyBindings),
+            ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar
+        };
+
+        appWindow.Add (_focusedBindingsListView, _hotkeyBindingsListView);
+
+        // ── Wire up selection changes ──
+
+        viewClassListView.ValueChanged += (_, args) =>
+                                        {
+                                            if (args.NewValue is null || args.NewValue < 0 || args.NewValue >= viewClassNames.Count)
+                                            {
+                                                return;
+                                            }
+
+                                            string selectedName = viewClassNames [args.NewValue.Value];
+
+                                            if (viewClasses.TryGetValue (selectedName, out Type selectedType))
+                                            {
+                                                _focusedBindingsListView.Title = $"{selectedName} Bindings";
+                                                _hotkeyBindingsListView.Title = $"{selectedName} HotKey Bindings";
+                                                PopulateBindingsForType (selectedType, selectedName);
+                                            }
+                                        };
+
+        // Select the first view type to populate bindings
+        if (viewClassNames.Count > 0)
+        {
+            viewClassListView.SelectedItem = 0;
+            string firstName = viewClassNames [0];
+
+            if (viewClasses.TryGetValue (firstName, out Type firstType))
             {
-                hotkeyBindings.Add ($"{binding.Key} -> {subview.GetType ().Name} - {binding.Value.Commands [0]}");
+                PopulateBindingsForType (firstType, firstName);
             }
         }
 
-        _focusedBindingsListView = new ListView
-        {
-            Title = "_Focused Bindings",
-            BorderStyle = LineStyle.Single,
-            X = Pos.Right (hotkeyBindingsListView) - 1,
-            Y = Pos.Bottom (keyBindingsDemo) + 1,
-            Width = Dim.Auto (),
-            Height = Dim.Fill () + 1,
-            CanFocus = true,
-            Source = new ListWrapper<string> (_focusedBindings),
-            SuperViewRendersLineCanvas = true
-        };
-        appWindow.Add (_focusedBindingsListView);
-
-        app.Navigation!.FocusedChanged += Application_HasFocusChanged;
-
-        // Run - Start the application.
         app.Run (appWindow);
-        app.Navigation!.FocusedChanged -= Application_HasFocusChanged;
+    }
+
+    /// <summary>
+    ///     Creates an instance of the given <see cref="View"/> type and populates the HotKey
+    ///     and Focused binding lists from it.
+    /// </summary>
+    private void PopulateBindingsForType (Type viewType, string displayName)
+    {
+        _hotkeyBindings.Clear ();
+        _focusedBindings.Clear ();
+
+        View view = null;
+
+        try
+        {
+            Type typeToCreate = viewType;
+
+            if (viewType.IsGenericType)
+            {
+                Type [] genericArgs = viewType.GetGenericArguments ();
+                Type [] typeArguments = new Type [genericArgs.Length];
+
+                for (var i = 0; i < genericArgs.Length; i++)
+                {
+                    typeArguments [i] = typeof (object);
+                }
+
+                typeToCreate = viewType.MakeGenericType (typeArguments);
+            }
+
+            view = (View)Activator.CreateInstance (typeToCreate)!;
+
+            if (view is IDesignable designable)
+            {
+                string demoText = "Sample text";
+                designable.EnableForDesign (ref demoText);
+            }
+        }
+        catch (Exception)
+        {
+            _hotkeyBindings.Add ("(could not instantiate)");
+            _focusedBindings.Add ("(could not instantiate)");
+            _hotkeyBindingsListView.Title = $"_HotKey Bindings - {displayName}";
+            _focusedBindingsListView.Title = $"_Focused Bindings - {displayName}";
+
+            return;
+        }
+
+        // HotKey bindings
+        _hotkeyBindingsListView.Title = $"_HotKey Bindings - {displayName}";
+        List<KeyValuePair<Key, KeyBinding>> hotKeyBindings = view.HotKeyBindings.GetBindings ().ToList ();
+
+        if (hotKeyBindings.Count == 0)
+        {
+            _hotkeyBindings.Add ("(none)");
+        }
+        else
+        {
+            foreach (KeyValuePair<Key, KeyBinding> binding in hotKeyBindings)
+            {
+                string commands = string.Join (",", binding.Value.Commands);
+                _hotkeyBindings.Add ($"{commands,-22} {binding.Key}");
+            }
+        }
+
+        // Focused (KeyBindings) bindings
+        _focusedBindingsListView.Title = $"_Focused Bindings - {displayName}";
+        List<KeyValuePair<Key, KeyBinding>> focusedBindings = view.KeyBindings.GetBindings ().ToList ();
+
+        if (focusedBindings.Count == 0)
+        {
+            _focusedBindings.Add ("(none)");
+        }
+        else
+        {
+            foreach (KeyValuePair<Key, KeyBinding> binding in focusedBindings)
+            {
+                string commands = string.Join (",", binding.Value.Commands);
+                _focusedBindings.Add ($"{commands,-22} {binding.Key}");
+            }
+        }
+
+        view.Dispose ();
     }
 
     /// <summary>
     ///     Formats a <see cref="PlatformKeyBinding"/> dictionary for display, one line per key.
     ///     Each line: "CommandName   KeyString (Platform)"
     /// </summary>
-    private static IEnumerable<string> FormatDefaultKeyBindings (Dictionary<Command, Terminal.Gui.PlatformKeyBinding> dict)
+    private static ObservableCollection<string> FormatDefaultKeyBindings (Dictionary<Command, Terminal.Gui.PlatformKeyBinding> dict)
     {
+        ObservableCollection<string> items = [];
+
         if (dict is null)
         {
-            yield break;
+            return items;
         }
 
         foreach (KeyValuePair<Command, Terminal.Gui.PlatformKeyBinding> entry in dict)
@@ -158,99 +231,71 @@ public sealed class KeyBindings : Scenario
 
             foreach (Key key in pkb.All ?? [])
             {
-                yield return $"{cmd,-22} {key} (All)";
+                items.Add ($"{cmd,-22} {key} (All)");
             }
 
             foreach (Key key in pkb.Windows ?? [])
             {
-                yield return $"{cmd,-22} {key} (Win)";
+                items.Add ($"{cmd,-22} {key} (Win)");
             }
 
             foreach (Key key in pkb.Linux ?? [])
             {
-                yield return $"{cmd,-22} {key} (Linux)";
+                items.Add ($"{cmd,-22} {key} (Linux)");
             }
 
             foreach (Key key in pkb.Macos ?? [])
             {
-                yield return $"{cmd,-22} {key} (macOS)";
+                items.Add ($"{cmd,-22} {key} (macOS)");
             }
         }
+
+        return items;
     }
 
-    private void Application_HasFocusChanged (object sender, EventArgs e)
+    /// <summary>
+    ///     Gets all concrete, public <see cref="View"/> subclasses (plus <see cref="View"/> itself),
+    ///     keyed by formatted display name.
+    /// </summary>
+    private static Dictionary<string, Type> GetAllViewClasses ()
     {
-        View focused = _app.Navigation?.GetFocused ();
+        List<Type> types = typeof (View).Assembly.GetTypes ()
+                                        .Where (t => t is { IsClass: true, IsAbstract: false, IsPublic: true }
+                                                     && t.IsSubclassOf (typeof (View)))
+                                        .ToList ();
 
-        if (focused == null)
+        types.Add (typeof (View));
+
+        return types
+               .Where (canSatisfyGenericConstraints)
+               .OrderBy (t => getFormattedTypeName (t))
+               .ToDictionary (t => getFormattedTypeName (t), t => t);
+
+        static string getFormattedTypeName (Type type)
         {
-            return;
+            if (!type.IsGenericType)
+            {
+                return type.Name;
+            }
+
+            string baseName = type.Name [..type.Name.IndexOf ('`')];
+            string [] typeParams = type.GetGenericArguments ().Select (t => t.Name).ToArray ();
+
+            return $"{baseName}<{string.Join (", ", typeParams)}>";
         }
 
-        _focusedBindingsListView.Title = $"_Focused ({focused.GetType ().Name}) Bindings";
-
-        _focusedBindings.Clear ();
-
-        foreach (KeyValuePair<Key, KeyBinding> binding in focused.KeyBindings.GetBindings ())
+        static bool canSatisfyGenericConstraints (Type type)
         {
-            string commands = string.Join (",", binding.Value.Commands);
+            if (!type.IsGenericType)
+            {
+                return true;
+            }
 
-            _focusedBindings.Add ($"{commands,-22} {binding.Key}");
+            Type genericTypeDef = type.GetGenericTypeDefinition ();
+            Type [] genericArgs = genericTypeDef.GetGenericArguments ();
+
+            return genericArgs.SelectMany (arg => arg.GetGenericParameterConstraints ())
+                              .All (constraint => !constraint.IsClass || constraint == typeof (object));
         }
-    }
-}
-
-public class KeyBindingsDemo : View
-{
-    public KeyBindingsDemo ()
-    {
-        CanFocus = true;
-
-        AddCommand (Command.Save,
-                    ctx =>
-                    {
-                        MessageBox.Query (App!, $"{ctx?.Command}", $"Ctx: {ctx}", "Ok");
-
-                        return true;
-                    });
-
-        AddCommand (Command.New,
-                    ctx =>
-                    {
-                        MessageBox.Query (App!, $"{ctx?.Command}", $"Ctx: {ctx}", "Ok");
-
-                        return true;
-                    });
-
-        AddCommand (Command.HotKey,
-                    ctx =>
-                    {
-                        MessageBox.Query (App!, $"{ctx?.Command}", $"Ctx: {ctx}\nCommand: {ctx?.Command}", "Ok");
-                        SetFocus ();
-
-                        return true;
-                    });
-
-        KeyBindings.Add (Key.F2, Command.Save);
-        KeyBindings.Add (Key.F3, Command.New); // same as specifying KeyBindingScope.Focused
-
-        Initialized += (_, _) =>
-                       {
-                           App?.Keyboard.KeyBindings.AddApp (Key.F4, this, Command.New);
-                           App?.Keyboard.KeyBindings.AddApp (Key.Q.WithAlt, this, Command.Quit);
-                       };
-
-        AddCommand (Command.Quit,
-                    ctx =>
-                    {
-                        if (ctx?.Binding is not KeyBinding keyBinding)
-                        {
-                            return false;
-                        }
-                        MessageBox.Query (App, $"{keyBinding}", $"Key: {keyBinding.Key}\nCommand: {ctx.Command}", "Ok");
-                        App?.RequestStop ();
-
-                        return true;
-                    });
     }
 }
