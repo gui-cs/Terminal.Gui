@@ -1,21 +1,21 @@
-// Claude - Opus 4.6
+// Copilot
 
 using System.Reflection;
 
 namespace ApplicationTests.Keyboard;
 
 /// <summary>
-///     Tests for <see cref="ApplicationKeyboard.DefaultKeyBindings"/> static property.
+///     Tests for <see cref="Application.DefaultKeyBindings"/> static property.
 /// </summary>
 public class ApplicationDefaultKeyBindingsTests
 {
     [Fact]
-    public void Application_DefaultKeyBindings_IsNotNull () => Assert.NotNull (ApplicationKeyboard.DefaultKeyBindings);
+    public void Application_DefaultKeyBindings_IsNotNull () => Assert.NotNull (Application.DefaultKeyBindings);
 
     [Fact]
     public void Application_DefaultKeyBindings_ContainsQuit ()
     {
-        Dictionary<string, PlatformKeyBinding>? bindings = ApplicationKeyboard.DefaultKeyBindings;
+        Dictionary<string, PlatformKeyBinding>? bindings = Application.DefaultKeyBindings;
         Assert.NotNull (bindings);
         Assert.True (bindings.ContainsKey ("Quit"));
 
@@ -27,7 +27,7 @@ public class ApplicationDefaultKeyBindingsTests
     [Fact]
     public void Application_DefaultKeyBindings_SuspendIsNonWindows ()
     {
-        Dictionary<string, PlatformKeyBinding>? bindings = ApplicationKeyboard.DefaultKeyBindings;
+        Dictionary<string, PlatformKeyBinding>? bindings = Application.DefaultKeyBindings;
         Assert.NotNull (bindings);
         Assert.True (bindings.ContainsKey ("Suspend"));
 
@@ -42,7 +42,7 @@ public class ApplicationDefaultKeyBindingsTests
     [Fact]
     public void Application_DefaultKeyBindings_AllKeyStringsParseable ()
     {
-        Dictionary<string, PlatformKeyBinding>? bindings = ApplicationKeyboard.DefaultKeyBindings;
+        Dictionary<string, PlatformKeyBinding>? bindings = Application.DefaultKeyBindings;
         Assert.NotNull (bindings);
 
         foreach (KeyValuePair<string, PlatformKeyBinding> entry in bindings)
@@ -60,7 +60,7 @@ public class ApplicationDefaultKeyBindingsTests
     [Fact]
     public void Application_DefaultKeyBindings_HasConfigurationPropertyAttribute ()
     {
-        PropertyInfo? propertyInfo = typeof (ApplicationKeyboard).GetProperty ("DefaultKeyBindings", BindingFlags.Public | BindingFlags.Static);
+        PropertyInfo? propertyInfo = typeof (Application).GetProperty ("DefaultKeyBindings", BindingFlags.Public | BindingFlags.Static);
 
         Assert.NotNull (propertyInfo);
 
@@ -71,7 +71,7 @@ public class ApplicationDefaultKeyBindingsTests
     [Fact]
     public void Application_DefaultKeyBindings_ContainsExpectedCommands ()
     {
-        Dictionary<string, PlatformKeyBinding>? bindings = ApplicationKeyboard.DefaultKeyBindings;
+        Dictionary<string, PlatformKeyBinding>? bindings = Application.DefaultKeyBindings;
         Assert.NotNull (bindings);
 
         string [] expectedCommands = ["Quit", "Suspend", "Arrange", "NextTabStop", "PreviousTabStop", "NextTabGroup", "PreviousTabGroup", "Refresh"];

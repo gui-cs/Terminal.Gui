@@ -1,0 +1,47 @@
+{
+    "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
+
+    "Application.DefaultKeyBindings": {
+        "Quit":            { "All": ["Esc"] },
+        "Arrange":         { "All": ["Ctrl+F5"] },
+        "NextTabStop":     { "All": ["Tab"] },
+        "PreviousTabStop": { "All": ["Shift+Tab"] },
+        "NextTabGroup":    { "All": ["F6"] },
+        "PreviousTabGroup":{ "All": ["Shift+F6"] },
+        "Refresh":         { "All": ["F5"] }
+    },
+
+    "View.DefaultKeyBindings": {
+        "Left":             { "All": ["CursorLeft"] },
+        "Right":            { "All": ["CursorRight"] },
+        "Up":               { "All": ["CursorUp"] },
+        "Down":             { "All": ["CursorDown"] },
+        "PageUp":           { "All": ["PageUp"] },
+        "PageDown":         { "All": ["PageDown"] },
+        "LeftStart":        { "All": ["Home"] },
+        "RightEnd":         { "All": ["End"] },
+        "Start":            { "All": ["Ctrl+Home"] },
+        "End":              { "All": ["Ctrl+End"] },
+
+        "LeftExtend":       { "All": ["Shift+CursorLeft"] },
+        "RightExtend":      { "All": ["Shift+CursorRight"] },
+        "UpExtend":         { "All": ["Shift+CursorUp"] },
+        "DownExtend":       { "All": ["Shift+CursorDown"] },
+        "PageUpExtend":     { "All": ["Shift+PageUp"] },
+        "PageDownExtend":   { "All": ["Shift+PageDown"] },
+        "LeftStartExtend":  { "All": ["Shift+Home"] },
+        "RightEndExtend":   { "All": ["Shift+End"] },
+        "StartExtend":      { "All": ["Ctrl+Shift+Home"] },
+        "EndExtend":        { "All": ["Ctrl+Shift+End"] },
+
+        "Copy":             { "All": ["Ctrl+C"] },
+        "Cut":              { "All": ["Ctrl+X"] },
+        "Paste":            { "All": ["Ctrl+V"] },
+
+        "Undo":             { "All": ["Ctrl+Z"] },
+        "Redo":             { "All": ["Ctrl+Y"] },
+        "SelectAll":        { "All": ["Ctrl+A"] },
+        "DeleteCharLeft":   { "All": ["Backspace"] },
+        "DeleteCharRight":  { "All": ["Delete"] }
+    }
+}

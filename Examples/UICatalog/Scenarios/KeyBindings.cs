@@ -19,7 +19,9 @@ public sealed class KeyBindings : Scenario
         _app = app;
 
         // Setup - Create a top-level application window and configure it.
-        using Window appWindow = new () { Title = GetQuitKeyAndName (), SuperViewRendersLineCanvas = true };
+        using Window appWindow = new ();
+        appWindow.Title = GetQuitKeyAndName ();
+        appWindow.SuperViewRendersLineCanvas = true;
 
         Label label = new () { Title = "_Label:" };
         TextField textField = new () { X = Pos.Right (label), Y = Pos.Top (label), Width = 20 };
@@ -49,7 +51,8 @@ public sealed class KeyBindings : Scenario
         };
         appWindow.Add (keyBindingsDemo);
 
-        ObservableCollection<string> appBindings = new ();
+        // App DefaultKeyBindings — shows all commands + all platform keys from Application.DefaultKeyBindings
+        ObservableCollection<string> appBindings = [];
 
         ListView appBindingsListView = new ()
         {
@@ -65,19 +68,40 @@ public sealed class KeyBindings : Scenario
         };
         appWindow.Add (appBindingsListView);
 
-        foreach (Key key in app.Keyboard.KeyBindings.GetBindings ().ToDictionary ().Keys)
+        foreach (string item in FormatDefaultKeyBindings (Application.DefaultKeyBindings))
         {
-            KeyBinding binding = app.Keyboard.KeyBindings.Get (key);
-            appBindings.Add ($"{key} -> {binding.Target?.GetType ().Name} - {binding.Commands [0]}");
+            appBindings.Add (item);
         }
 
-        ObservableCollection<string> hotkeyBindings = new ();
+        // View DefaultKeyBindings — shows all commands + all platform keys from View.DefaultKeyBindings
+        ObservableCollection<string> viewBindings = [];
+
+        ListView viewDefaultBindingsListView = new ()
+        {
+            Title = "_View Bindings",
+            BorderStyle = LineStyle.Single,
+            X = Pos.Right (appBindingsListView) - 1,
+            Y = Pos.Bottom (keyBindingsDemo) + 1,
+            Width = Dim.Auto (),
+            Height = Dim.Fill () + 1,
+            CanFocus = true,
+            Source = new ListWrapper<string> (viewBindings),
+            SuperViewRendersLineCanvas = true
+        };
+        appWindow.Add (viewDefaultBindingsListView);
+
+        foreach (string item in FormatDefaultKeyBindings (View.DefaultKeyBindings))
+        {
+            viewBindings.Add (item);
+        }
+
+        ObservableCollection<string> hotkeyBindings = [];
 
         ListView hotkeyBindingsListView = new ()
         {
             Title = "_Hotkey Bindings",
             BorderStyle = LineStyle.Single,
-            X = Pos.Right (appBindingsListView) - 1,
+            X = Pos.Right (viewDefaultBindingsListView) - 1,
             Y = Pos.Bottom (keyBindingsDemo) + 1,
             Width = Dim.Auto (),
             Height = Dim.Fill () + 1,
@@ -114,6 +138,44 @@ public sealed class KeyBindings : Scenario
         // Run - Start the application.
         app.Run (appWindow);
         app.Navigation!.FocusedChanged -= Application_HasFocusChanged;
+    }
+
+    /// <summary>
+    ///     Formats a <see cref="PlatformKeyBinding"/> dictionary for display, one line per key.
+    ///     Each line: "CommandName   KeyString (Platform)"
+    /// </summary>
+    private static IEnumerable<string> FormatDefaultKeyBindings (Dictionary<string, Terminal.Gui.PlatformKeyBinding> dict)
+    {
+        if (dict is null)
+        {
+            yield break;
+        }
+
+        foreach (KeyValuePair<string, Terminal.Gui.PlatformKeyBinding> entry in dict)
+        {
+            string cmd = entry.Key;
+            Terminal.Gui.PlatformKeyBinding pkb = entry.Value;
+
+            foreach (string key in pkb.All ?? [])
+            {
+                yield return $"{cmd,-22} {key} (All)";
+            }
+
+            foreach (string key in pkb.Windows ?? [])
+            {
+                yield return $"{cmd,-22} {key} (Win)";
+            }
+
+            foreach (string key in pkb.Linux ?? [])
+            {
+                yield return $"{cmd,-22} {key} (Linux)";
+            }
+
+            foreach (string key in pkb.Macos ?? [])
+            {
+                yield return $"{cmd,-22} {key} (macOS)";
+            }
+        }
     }
 
     private void Application_HasFocusChanged (object sender, EventArgs e)
