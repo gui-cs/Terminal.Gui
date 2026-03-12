@@ -682,8 +682,8 @@ public partial class View // Keyboard APIs
         ["Paste"] = Bind.All ("Ctrl+V"),
 
         // Editing
-        ["Undo"] = Bind.AllPlus ("Ctrl+Z", nonWindows: ["Ctrl+/"]),
-        ["Redo"] = Bind.AllPlus ("Ctrl+Y", nonWindows: ["Ctrl+Shift+Z"]),
+        ["Undo"] = Bind.AllPlus ("Ctrl+Z", ["Ctrl+/"]),
+        ["Redo"] = Bind.AllPlus ("Ctrl+Y", ["Ctrl+Shift+Z"]),
         ["SelectAll"] = Bind.All ("Ctrl+A"),
         ["DeleteCharLeft"] = Bind.All ("Backspace"),
         ["DeleteCharRight"] = Bind.All ("Delete", "Ctrl+D")
@@ -737,7 +737,7 @@ public partial class View // Keyboard APIs
                 continue;
             }
 
-            foreach (string keyString in ResolveKeysForCurrentPlatform (platformKeys))
+            foreach (string keyString in platformKeys.GetCurrentPlatformKeys ())
             {
                 if (!Key.TryParse (keyString, out Key key))
                 {
@@ -751,38 +751,6 @@ public partial class View // Keyboard APIs
 
                 KeyBindings.Add (key, command);
             }
-        }
-    }
-
-    /// <summary>Resolves platform-specific key strings for the current OS.</summary>
-    private static IEnumerable<string> ResolveKeysForCurrentPlatform (PlatformKeyBinding platformKeys)
-    {
-        if (platformKeys.All is { })
-        {
-            foreach (string k in platformKeys.All)
-            {
-                yield return k;
-            }
-        }
-
-        string platform = PlatformDetection.GetCurrentPlatformName ();
-
-        string []? platKeys = platform switch
-                              {
-                                  "windows" => platformKeys.Windows,
-                                  "linux" => platformKeys.Linux,
-                                  "macos" => platformKeys.Macos,
-                                  _ => null
-                              };
-
-        if (platKeys is null)
-        {
-            yield break;
-        }
-
-        foreach (string k in platKeys)
-        {
-            yield return k;
         }
     }
 
