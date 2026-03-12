@@ -4,7 +4,7 @@ using System.Text.Json;
 using Terminal.Gui;
 using Terminal.Gui.Configuration;
 
-namespace ConfigurationTests;
+namespace InputTests;
 
 public class KeyBindingSchemaTests
 {

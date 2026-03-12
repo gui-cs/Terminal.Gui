@@ -24,11 +24,15 @@
 | 10 | config.json cleanup | ✅ Done (already clean) |
 | 11 | Documentation | ✅ Done |
 | 11b | Move `DefaultKeyBindings` from `ApplicationKeyboard` → `Application`; create `Examples/Config/` | ✅ Done |
-| 12a | **Add `TuiPlatform` enum; type-safe platform resolution** (Breaking) | 🔲 TODO |
-| 12b | **Register `Dictionary<Command,PlatformKeyBinding>` with STJ source gen** | 🔲 TODO |
-| 12c | **Change all `DefaultKeyBindings` to `Dictionary<Command, PlatformKeyBinding>`** (Breaking) | 🔲 TODO |
+| 12a | **Add `TuiPlatform` enum; type-safe platform resolution** (Breaking) | ✅ Done |
+| 12b | **Register `Dictionary<Command,PlatformKeyBinding>` with STJ source gen** | ✅ Done |
+| 12c | **Change all `DefaultKeyBindings` to `Dictionary<Command, PlatformKeyBinding>`** (Breaking) | ✅ Done |
 | 12d | **Remove single-key properties; wire `AddKeyBindings()` to `DefaultKeyBindings`** (Breaking) | 🔲 TODO |
 | 12e | **Update tests** | 🔲 TODO |
+| 13a | **Move `Bind` + `PlatformKeyBinding` from `Configuration/` to `Input/Keyboard/`** | 🔲 TODO |
+| 13b | **Move related tests from `Configuration/` to `Input/Keyboard/` in test project** | 🔲 TODO |
+| 13c | **Make `Bind` type-safe: `string[]` → `Key[]` in `PlatformKeyBinding` and `Bind`** | 🔲 TODO |
+| 13d | **Add dedicated `PlatformKeyBinding` tests** | 🔲 TODO |
 
 ---
 
@@ -1373,3 +1377,145 @@ Migration:
   Application.DefaultKeyBindings["Quit"]     → Application.DefaultKeyBindings[Command.Quit]
   keyboard.QuitKey = Key.Q.WithCtrl          → Application.DefaultKeyBindings[Command.Quit] = Bind.All ("Ctrl+Q")
 ```
+
+---
+
+## Phase 13: Move Files, Make `Bind` Type-Safe, Add `PlatformKeyBinding` Tests
+
+### Step 13a: Move `Bind` + `PlatformKeyBinding` to `Input/Keyboard/`
+
+**Rationale:** These types define key bindings — they belong with the other keyboard/input types, not in `Configuration/`. The `Configuration/` folder is for CM infrastructure (JSON converters, property discovery, themes). `Bind` and `PlatformKeyBinding` are used by `View.Keyboard.cs`, `ApplicationKeyboard.cs`, and all view command setup files — all input-layer consumers.
+
+**Files:**
+- Move `Terminal.Gui/Configuration/Bind.cs` → `Terminal.Gui/Input/Keyboard/Bind.cs`
+- Move `Terminal.Gui/Configuration/PlatformKeyBinding.cs` → `Terminal.Gui/Input/Keyboard/PlatformKeyBinding.cs`
+
+**No namespace change** — both are already `namespace Terminal.Gui;` (file-scoped).
+
+**No code changes needed** — just file moves. All `using` statements and references remain valid.
+
+Commit: "Move Bind and PlatformKeyBinding from Configuration/ to Input/Keyboard/"
+
+---
+
+### Step 13b: Move Related Tests to `Input/Keyboard/`
+
+**Files:**
+- Move `Tests/UnitTestsParallelizable/Configuration/BindTests.cs` → `Tests/UnitTestsParallelizable/Input/Keyboard/BindTests.cs`
+- Move `Tests/UnitTestsParallelizable/Configuration/KeyBindingSchemaTests.cs` → `Tests/UnitTestsParallelizable/Input/Keyboard/KeyBindingSchemaTests.cs`
+
+**Create `Tests/UnitTestsParallelizable/Input/Keyboard/` directory** if it doesn't exist.
+
+Commit: "Move Bind and KeyBindingSchema tests to Input/Keyboard/"
+
+---
+
+### Step 13c: Make `Bind` Type-Safe — `string[]` → `Key[]`
+
+**Problem:** `Bind.All("CursorLeft")` and `PlatformKeyBinding.All` use raw `string[]`. Typos like `"CusorLeft"` compile fine but fail silently at runtime when `Key.TryParse` returns `false`. Since `Key` has implicit conversion from `string`, making the types `Key[]` catches mistakes earlier and provides IDE auto-complete.
+
+**Changes to `PlatformKeyBinding`:**
+
+```csharp
+// BEFORE
+public record PlatformKeyBinding
+{
+    public string[]? All { get; init; }
+    public string[]? Windows { get; init; }
+    public string[]? Linux { get; init; }
+    public string[]? Macos { get; init; }
+}
+
+// AFTER
+public record PlatformKeyBinding
+{
+    public Key[]? All { get; init; }
+    public Key[]? Windows { get; init; }
+    public Key[]? Linux { get; init; }
+    public Key[]? Macos { get; init; }
+}
+```
+
+**Changes to `Bind`:**
+
+```csharp
+// BEFORE
+public static PlatformKeyBinding All (params string[] keys)
+    => new () { All = keys };
+
+// AFTER
+public static PlatformKeyBinding All (params Key[] keys)
+    => new () { All = keys };
+```
+
+Same pattern for `AllPlus`, `NonWindows`, `Platform`.
+
+**Changes to `GetCurrentPlatformKeys()`:**
+
+```csharp
+// BEFORE
+public IEnumerable<string> GetCurrentPlatformKeys () { ... yield return k; }
+
+// AFTER
+public IEnumerable<Key> GetCurrentPlatformKeys () { ... yield return k; }
+```
+
+**Changes to `View.Keyboard.cs` `ApplyLayer()`:**
+
+```csharp
+// BEFORE
+foreach (string keyStr in entry.Value.GetCurrentPlatformKeys ())
+{
+    if (!Key.TryParse (keyStr, out Key? key)) continue;
+    ...
+}
+
+// AFTER
+foreach (Key key in entry.Value.GetCurrentPlatformKeys ())
+{
+    // No TryParse needed — already a Key
+    if (KeyBindings.TryGet (key, out _)) continue;
+    KeyBindings.Add (key, entry.Key);
+}
+```
+
+**Call sites** — `Bind.All ("CursorLeft")` still works because `Key` has `implicit operator Key (string)`. No changes needed at 90%+ of call sites.
+
+**JSON serialization** — `Key` already has `KeyJsonConverter` registered in `SourceGenerationContext`. Need to register `Key[]` if not already, and verify `PlatformKeyBinding` round-trips through JSON with `Key[]` properties. The JSON format for keys remains strings (`"CursorLeft"`, `"Ctrl+A"`) — the converter handles the `Key` ↔ `string` mapping.
+
+**`ToString()` on PlatformKeyBinding** — update to call `Key.ToString()` instead of using raw strings (likely no change needed since `Key` has `ToString()`).
+
+Files changed:
+- `Terminal.Gui/Input/Keyboard/PlatformKeyBinding.cs` (after 13a move)
+- `Terminal.Gui/Input/Keyboard/Bind.cs` (after 13a move)
+- `Terminal.Gui/ViewBase/View.Keyboard.cs` — `ApplyLayer()`, `ApplyKeyBindings()`
+- `Terminal.Gui/App/Keyboard/ApplicationKeyboard.cs` — `AddKeyBindings()` if it uses string keys
+- `Terminal.Gui/Configuration/SourceGenerationContext.cs` — register `Key[]` if needed
+- All test files referencing `PlatformKeyBinding` string properties
+
+Commit: "Make Bind and PlatformKeyBinding type-safe with Key[] instead of string[]"
+
+---
+
+### Step 13d: Add Dedicated `PlatformKeyBinding` Tests
+
+**New file:** `Tests/UnitTestsParallelizable/Input/Keyboard/PlatformKeyBindingTests.cs`
+
+| # | Test | Validates |
+|---|------|-----------|
+| 1 | `PlatformKeyBinding_Default_AllPropertiesNull` | `new PlatformKeyBinding ()` has all null properties |
+| 2 | `PlatformKeyBinding_All_SetsCorrectly` | `new PlatformKeyBinding { All = [Key.CursorLeft] }` |
+| 3 | `PlatformKeyBinding_Windows_SetsCorrectly` | Windows-only property set |
+| 4 | `PlatformKeyBinding_Linux_SetsCorrectly` | Linux-only property set |
+| 5 | `PlatformKeyBinding_Macos_SetsCorrectly` | macOS-only property set |
+| 6 | `GetCurrentPlatformKeys_AllOnly_ReturnsAllKeys` | Only `All` set → returns those keys on any platform |
+| 7 | `GetCurrentPlatformKeys_PlatformOnly_ReturnsCurrentPlatformKeys` | Only current platform set → returns those keys |
+| 8 | `GetCurrentPlatformKeys_AllPlusPlatform_Additive` | Both `All` and current platform set → both returned |
+| 9 | `GetCurrentPlatformKeys_OtherPlatformOnly_ReturnsEmpty` | Only non-current platform set → returns nothing |
+| 10 | `GetCurrentPlatformKeys_AllNull_ReturnsEmpty` | All properties null → empty enumerable |
+| 11 | `ToString_ShowsAllPlatforms` | Human-readable output includes all non-null platforms |
+| 12 | `ToString_NullProperties_Omitted` | Null platforms not shown in ToString |
+| 13 | `PlatformKeyBinding_RoundTrips_ThroughJson` | Serialize → deserialize preserves all Key[] properties |
+| 14 | `PlatformKeyBinding_Equality_RecordSemantics` | Two records with same keys are equal |
+
+Commit: "Add dedicated PlatformKeyBinding tests"

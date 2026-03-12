@@ -656,7 +656,7 @@ public partial class View // Keyboard APIs
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings
     {
-        get => field;
+        get;
         set
         {
             field = value;

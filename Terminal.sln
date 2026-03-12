@@ -134,7 +134,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutputView", "docfx\scripts
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{3DD033C0-E023-47BF-A808-9CCE30873C3E}"
 	ProjectSection(SolutionItems) = preProject
+		Examples\Config\example_config.json = Examples\Config\example_config.json
+		Examples\Config\macos.json = Examples\Config\macos.json
 		Examples\PowershellExample.ps1 = Examples\PowershellExample.ps1
+		Examples\Config\README.md = Examples\Config\README.md
+		Examples\Config\windows.json = Examples\Config\windows.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ScenarioRunner", "Examples\ScenarioRunner\ScenarioRunner.csproj", "{DB0337E6-BBC0-4ECB-9F18-F7310705BDAF}"

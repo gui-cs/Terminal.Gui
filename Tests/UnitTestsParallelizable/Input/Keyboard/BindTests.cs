@@ -1,4 +1,4 @@
-namespace ConfigurationTests;
+namespace InputTests;
 
 // Claude - Opus 4.6
 public class BindTests

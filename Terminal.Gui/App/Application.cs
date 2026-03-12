@@ -249,7 +249,7 @@ public static partial class Application
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings
     {
-        get => field;
+        get;
         set
         {
             field = value;
