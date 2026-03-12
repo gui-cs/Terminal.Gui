@@ -398,6 +398,48 @@ public sealed class UICatalogRunnable : Runnable
                 Enabled = false, CommandView = navTraceCheckBox, HelpText = "Toggle Focus & TabBehavior tracing", Key = Key.K.WithCtrl
             });
 
+            CheckBox configTraceCheckBox = new ()
+            {
+                Text = "Con_figuration",
+                Value = Trace.EnabledCategories.HasFlag (TraceCategory.Configuration) ? CheckState.Checked : CheckState.UnChecked,
+                CanFocus = false
+            };
+
+            configTraceCheckBox.ValueChanging += (_, e) =>
+                                                 {
+                                                     if (e.NewValue == CheckState.Checked)
+                                                     {
+                                                         Trace.EnabledCategories |= TraceCategory.Configuration;
+                                                     }
+                                                     else
+                                                     {
+                                                         Trace.EnabledCategories &= ~TraceCategory.Configuration;
+                                                     }
+                                                 };
+
+            menuItems.Add (new MenuItem { CommandView = configTraceCheckBox, HelpText = "Toggle Configuration management tracing" });
+
+            CheckBox drawTraceCheckBox = new ()
+            {
+                Text = "_Draw",
+                Value = Trace.EnabledCategories.HasFlag (TraceCategory.Draw) ? CheckState.Checked : CheckState.UnChecked,
+                CanFocus = false
+            };
+
+            drawTraceCheckBox.ValueChanging += (_, e) =>
+                                               {
+                                                   if (e.NewValue == CheckState.Checked)
+                                                   {
+                                                       Trace.EnabledCategories |= TraceCategory.Draw;
+                                                   }
+                                                   else
+                                                   {
+                                                       Trace.EnabledCategories &= ~TraceCategory.Draw;
+                                                   }
+                                               };
+
+            menuItems.Add (new MenuItem { CommandView = drawTraceCheckBox, HelpText = "Toggle Draw operation tracing" });
+
             // add a separator
             menuItems.Add (new Line ());
 
