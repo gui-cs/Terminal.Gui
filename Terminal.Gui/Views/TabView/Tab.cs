@@ -11,8 +11,27 @@ public class Tab : View
     public Tab ()
     {
         CanFocus = true;
+        TabStop = TabBehavior.TabStop;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
         base.Visible = false;
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    {
+        if (base.OnHandlingHotKey (args))
+        {
+            return true;
+        }
+
+        if (SuperView is TabView tabView)
+        {
+            tabView.SelectedTabIndex = tabView.Tabs.IndexOf (this);
+
+            return true;
+        }
+
+        return false;
     }
 }

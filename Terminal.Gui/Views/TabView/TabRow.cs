@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices.JavaScript;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -12,6 +14,7 @@ internal class TabRow : View
         Id = "TabRow";
 #endif
         CanFocus = false;
+        TabStop = TabBehavior.TabStop;
 
         // Extend past the Padding bounds to overlap with the Border's left/right columns
         X = -1;
@@ -55,6 +58,8 @@ internal class TabRow : View
 #if DEBUG
                 Id = $"TabHeader_{tab.Title}",
 #endif
+                TabStop = TabBehavior.TabStop,
+                Title = tab.Title,
                 Text = tab.Title,
                 BorderStyle = LineStyle.Rounded,
                 SuperViewRendersLineCanvas = true,

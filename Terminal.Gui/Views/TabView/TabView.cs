@@ -79,17 +79,21 @@ public class TabView : View, IDesignable
             foreach (Tab tab in tabs)
             {
                 tab.Visible = false;
+                tab.Enabled = false;
             }
 
             if (value.HasValue)
             {
                 tabs [value.Value].Visible = true;
+                tabs [value.Value].Enabled = true;
             }
 
             // Update tab header appearance
             _tabRow.UpdateHeaderAppearance ();
 
             Tab? newTab = SelectedTab;
+
+            SelectedTab?.SetFocus ();
 
             OnSelectedTabChanged (new ValueChangedEventArgs<Tab?> (oldTab, newTab));
 
@@ -147,21 +151,7 @@ public class TabView : View, IDesignable
 
     /// <summary>Raises the <see cref="SelectedTabChanged"/> event.</summary>
     protected virtual void OnSelectedTabChanged (ValueChangedEventArgs<Tab?> args) => SelectedTabChanged?.Invoke (this, args);
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        if (disposing)
-        {
-            // Clear event handlers before base.Dispose removes SubViews.
-            // SubView removal triggers OnSubViewRemoved → SelectedTabIndex setter → SelectedTabChanged.
-            // Event handlers may reference views that are already disposed by the parent's disposal chain.
-            SelectedTabChanged = null;
-        }
-
-        base.Dispose (disposing);
-    }
-
+    
     /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
@@ -218,21 +208,16 @@ public class TabView : View, IDesignable
     }
 
     /// <inheritdoc/>
-    public bool EnableForDesign ()
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
-        Tab tab1 = new () { Title = "Tab_1" };
-        tab1.Add (new Label { Text = "Label in Tab1" });
+        if (newHasFocus && SelectedTab is { HasFocus: false })
+        {
+            SelectedTab?.SetFocus ();
 
-        Tab tab2 = new () { Title = "Tab _2" };
-        tab2.Add (new TextField { Text = "TextField in Tab2", Width = 15 });
+            return;
+        }
 
-        Tab tab3 = new () { Title = "Tab T_hree" };
-        tab3.Add (new Label { Text = "Label in Tab3" });
-
-        Add (tab1, tab2, tab3);
-        SelectedTabIndex = 0;
-
-        return true;
+        base.OnHasFocusChanged (newHasFocus, previousFocusedView, focusedView);
     }
 
     private bool? SelectPreviousTab ()
@@ -301,5 +286,37 @@ public class TabView : View, IDesignable
         SelectedTabIndex = tabs.Count - 1;
 
         return true;
+    }
+
+    /// <inheritdoc/>
+    public bool EnableForDesign ()
+    {
+        Tab tab1 = new () { Title = "Tab_1" };
+        tab1.Add (new Label { Text = "Label in Tab1" });
+
+        Tab tab2 = new () { Title = "Tab _2" };
+        tab2.Add (new TextField { Text = "TextField in Tab2", Width = 15 });
+
+        Tab tab3 = new () { Title = "Tab T_hree" };
+        tab3.Add (new Label { Text = "Label in Tab3" });
+
+        Add (tab1, tab2, tab3);
+        SelectedTabIndex = 0;
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            // Clear event handlers before base.Dispose removes SubViews.
+            // SubView removal triggers OnSubViewRemoved → SelectedTabIndex setter → SelectedTabChanged.
+            // Event handlers may reference views that are already disposed by the parent's disposal chain.
+            SelectedTabChanged = null;
+        }
+
+        base.Dispose (disposing);
     }
 }

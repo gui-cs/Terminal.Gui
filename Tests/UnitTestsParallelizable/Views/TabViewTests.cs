@@ -491,6 +491,163 @@ public class TabViewTests (ITestOutputHelper output) : TestDriverBase
 
     #endregion
 
+    #region Hotkey Navigation
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void HotKey_SelectsTab ()
+    {
+        TabView tabView = new ();
+
+        Tab tab1 = new () { Title = "_First" };
+        Tab tab2 = new () { Title = "_Second" };
+        Tab tab3 = new () { Title = "_Third" };
+
+        tabView.Add (tab1, tab2, tab3);
+        tabView.SelectedTabIndex = 0;
+
+        // Invoke hotkey on tab3 — should select it
+        tab3.InvokeCommand (Command.HotKey);
+
+        Assert.Equal (2, tabView.SelectedTabIndex);
+        Assert.True (tab3.Visible);
+        Assert.False (tab1.Visible);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void HotKey_SelectsTab_FromAnySelection ()
+    {
+        TabView tabView = new ();
+
+        Tab tab1 = new () { Title = "_Alpha" };
+        Tab tab2 = new () { Title = "_Beta" };
+        Tab tab3 = new () { Title = "_Gamma" };
+
+        tabView.Add (tab1, tab2, tab3);
+        tabView.SelectedTabIndex = 2;
+
+        // Invoke hotkey on tab1 — should switch from tab3 to tab1
+        tab1.InvokeCommand (Command.HotKey);
+
+        Assert.Equal (0, tabView.SelectedTabIndex);
+        Assert.True (tab1.Visible);
+        Assert.False (tab3.Visible);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void HotKey_OnAlreadySelectedTab_StaysSelected ()
+    {
+        TabView tabView = new ();
+
+        Tab tab1 = new () { Title = "_One" };
+        Tab tab2 = new () { Title = "_Two" };
+
+        tabView.Add (tab1, tab2);
+        tabView.SelectedTabIndex = 0;
+
+        // Invoke hotkey on already-selected tab1
+        tab1.InvokeCommand (Command.HotKey);
+
+        Assert.Equal (0, tabView.SelectedTabIndex);
+        Assert.True (tab1.Visible);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void HotKey_SwitchesSelection ()
+    {
+        TabView tabView = new ();
+
+        Tab tab1 = new () { Title = "_One" };
+        Tab tab2 = new () { Title = "_Two" };
+
+        tabView.Add (tab1, tab2);
+        tabView.SelectedTabIndex = 0;
+
+        tab2.InvokeCommand (Command.HotKey);
+
+        Assert.Equal (1, tabView.SelectedTabIndex);
+        Assert.True (tab2.Visible);
+        Assert.False (tab1.Visible);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void HotKey_WithKeyPress_SelectsTab ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (30, 10);
+
+        TabView tabView = new () { Width = 30, Height = 10 };
+
+        Tab tab1 = new () { Title = "_First" };
+        tab1.Add (new Label { Text = "Content1" });
+
+        Tab tab2 = new () { Title = "_Second" };
+        tab2.Add (new Label { Text = "Content2" });
+
+        Tab tab3 = new () { Title = "_Third" };
+        tab3.Add (new Label { Text = "Content3" });
+
+        tabView.Add (tab1, tab2, tab3);
+        tabView.SelectedTabIndex = 0;
+
+        Runnable top = new ();
+        top.Add (tabView);
+        app.Begin (top);
+
+        Assert.Equal (0, tabView.SelectedTabIndex);
+
+        // Press Alt+T to activate "Third" tab
+        top.NewKeyDownEvent (Key.T.WithAlt);
+
+        Assert.Equal (2, tabView.SelectedTabIndex);
+        Assert.True (tab3.Visible);
+        Assert.False (tab1.Visible);
+
+        // Press Alt+F to switch back to "First"
+        top.NewKeyDownEvent (Key.F.WithAlt);
+
+        Assert.Equal (0, tabView.SelectedTabIndex);
+        Assert.True (tab1.Visible);
+        Assert.False (tab3.Visible);
+
+        top.Dispose ();
+        app.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void HotKey_RaisesSelectedTabChanged ()
+    {
+        TabView tabView = new ();
+
+        Tab tab1 = new () { Title = "_One" };
+        Tab tab2 = new () { Title = "_Two" };
+
+        tabView.Add (tab1, tab2);
+        tabView.SelectedTabIndex = 0;
+
+        Tab? oldTab = null;
+        Tab? newTab = null;
+
+        tabView.SelectedTabChanged += (_, args) =>
+                                      {
+                                          oldTab = args.OldValue;
+                                          newTab = args.NewValue;
+                                      };
+
+        tab2.InvokeCommand (Command.HotKey);
+
+        Assert.Same (tab1, oldTab);
+        Assert.Same (tab2, newTab);
+    }
+
+    #endregion
+
     #region Mouse Interaction
 
     [Fact]

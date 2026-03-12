@@ -716,7 +716,7 @@ When there are too many tabs to fit in the available width, there is no scroll m
 
 `TabsOnBottom` property should be of type `Side` enum (Top/Bottom) instead of bool for better extensibility and clarity. We may add Left & Right later.
 
-### Issue 4: Tab Hotkeys do not work
+### Issue 4: Tab Hotkeys do not work -  FIXED - NEEDS UNIT TESTS
 
 E.g. in the TabViewsExample scenario hitting Alt-h should activate the tab Titled "Tab T_hree", but it does not. Tests need to be written for this that fail, then the issue fixed.
 

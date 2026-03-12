@@ -42,21 +42,32 @@ public class TabViewExample : Scenario
         TabView tabView = new ()
         {
             X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (),
+            AssignHotKeys = true,
             Arrangement = ViewArrangement.Resizable // Enables resizing the TabView by dragging its edges for testing
         };
 
         // Add some default tabs
-        Tab tab1 = new () { Title = "Tab _1" };
+        Tab tab1 = new () { Title = "Tab 1" };
         tab1.Add (new Label { Text = "This is the content of Tab 1.\nIt has a label." });
 
-        Tab tab2 = new () { Title = "Tab _2" };
+        Tab tab2 = new () { Title = "Tab 2" };
         TextField tf = new () { Text = "Edit me", Width = 20, Y = 0 };
-        Button btn = new () { Text = "Click Me", Y = 2 };
-        btn.Accepting += (_, _) => { btn.Text = "Clicked!"; };
+        Button btn = new () { Text = "Clic_k Me", Y = 2 };
+        btn.Accepting += (_, _) => { btn.Text = "Clic_ked!"; };
         tab2.Add (tf, btn);
 
-        Tab tab3 = new () { Title = "Tab T_hree" };
-        tab3.Add (new Label { Text = "Third tab content.\nWith multiple lines.\nLine 3." });
+        Tab tab3 = new () { Title = "Tab Three" };
+        Label label = new () { Text = "Third tab content.\nWith multiple lines.\nLine 3." };
+        tab3.Add (label);
+
+        OptionSelector<Side> sideSelector = new ()
+        {
+            Title = "_Side",
+            BorderStyle = LineStyle.Dashed,
+            AssignHotKeys = true,
+            Y = Pos.Bottom (label) + 1
+        };
+        tab3.Add (sideSelector);
 
         tabView.Add (tab1, tab2, tab3);
         tabView.SelectedTabIndex = 0;
