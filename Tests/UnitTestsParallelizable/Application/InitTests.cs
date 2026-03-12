@@ -159,6 +159,11 @@ public class InitTests (ITestOutputHelper output)
             app = Application.Create ();
             app.Init (DriverRegistry.Names.ANSI);
 
+            // Save static DefaultKeyBindings entries before mutation
+            PlatformKeyBinding origPrevTabGroup = Application.DefaultKeyBindings! [Command.PreviousTabGroup];
+            PlatformKeyBinding origNextTabGroup = Application.DefaultKeyBindings! [Command.NextTabGroup];
+            PlatformKeyBinding origQuit = Application.DefaultKeyBindings! [Command.Quit];
+
             app.StopAfterFirstIteration = true;
             Application.DefaultKeyBindings! [Command.PreviousTabGroup] = Bind.All (Key.A);
             Application.DefaultKeyBindings! [Command.NextTabGroup] = Bind.All (Key.B);
@@ -171,6 +176,11 @@ public class InitTests (ITestOutputHelper output)
             // Dispose and check reset
             app.Dispose ();
             CheckReset (app);
+
+            // Restore static DefaultKeyBindings to avoid polluting other parallel tests
+            Application.DefaultKeyBindings! [Command.PreviousTabGroup] = origPrevTabGroup;
+            Application.DefaultKeyBindings! [Command.NextTabGroup] = origNextTabGroup;
+            Application.DefaultKeyBindings! [Command.Quit] = origQuit;
         }
 
         return;
