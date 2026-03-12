@@ -27,12 +27,12 @@
 | 12a | **Add `TuiPlatform` enum; type-safe platform resolution** (Breaking) | ✅ Done |
 | 12b | **Register `Dictionary<Command,PlatformKeyBinding>` with STJ source gen** | ✅ Done |
 | 12c | **Change all `DefaultKeyBindings` to `Dictionary<Command, PlatformKeyBinding>`** (Breaking) | ✅ Done |
-| 12d | **Remove single-key properties; wire `AddKeyBindings()` to `DefaultKeyBindings`** (Breaking) | 🔲 TODO |
-| 12e | **Update tests** | 🔲 TODO |
-| 13a | **Move `Bind` + `PlatformKeyBinding` from `Configuration/` to `Input/Keyboard/`** | 🔲 TODO |
-| 13b | **Move related tests from `Configuration/` to `Input/Keyboard/` in test project** | 🔲 TODO |
-| 13c | **Make `Bind` type-safe: `string[]` → `Key[]` in `PlatformKeyBinding` and `Bind`** | 🔲 TODO |
-| 13d | **Add dedicated `PlatformKeyBinding` tests** | 🔲 TODO |
+| 12d | **Remove single-key properties; wire `AddKeyBindings()` to `DefaultKeyBindings`** (Breaking) | ✅ Done |
+| 12e | **Update tests** | ✅ Done |
+| 13a | **Move `Bind` + `PlatformKeyBinding` from `Configuration/` to `Input/Keyboard/`** | ✅ Done |
+| 13b | **Move related tests from `Configuration/` to `Input/Keyboard/` in test project** | ✅ Done |
+| 13c | **Make `Bind` type-safe: `string[]` → `Key[]` in `PlatformKeyBinding` and `Bind`** | ✅ Done |
+| 13d | **Add dedicated `PlatformKeyBinding` tests** | ✅ Done |
 
 ---
 
