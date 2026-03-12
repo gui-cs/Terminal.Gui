@@ -1607,11 +1607,11 @@ public class MenuBarTests (ITestOutputHelper output)
         MenuBarItem editItem = menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (1);
         MenuBarItem helpItem = menuBar.SubViews.OfType<MenuBarItem> ().ElementAt (2);
 
-        // Act — press F9 to open MenuBar (File menu opens)
+        // Act — press F10 to open MenuBar (File menu opens)
         app.InjectKey (MenuBar.DefaultKey);
 
-        Assert.True (menuBar.Active, "MenuBar should be active after F9");
-        Assert.True (menuBar.IsOpen (), "MenuBar should be open after F9");
+        Assert.True (menuBar.Active, "MenuBar should be active after F10");
+        Assert.True (menuBar.IsOpen (), "MenuBar should be open after F10");
         Assert.True (fileItem.PopoverMenu is { Visible: true }, "File's popover should be visible");
 
         // Act — press CursorRight to switch to Edit menu

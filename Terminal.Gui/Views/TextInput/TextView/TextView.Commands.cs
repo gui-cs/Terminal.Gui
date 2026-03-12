@@ -3,67 +3,54 @@ namespace Terminal.Gui.Views;
 public partial class TextView
 {
     /// <summary>
-    ///     Gets or sets the default key bindings for <see cref="TextView"/> on all platforms.
-    ///     Maps <see cref="Command"/> names to arrays of key strings (parseable by <see cref="Key.TryParse"/>).
-    ///     Configure in <em>config.json</em> under the key <c>TextView.DefaultKeyBindings</c>.
+    ///     Gets or sets the view-specific default key bindings for <see cref="TextView"/>. Contains only bindings
+    ///     unique to this view; shared bindings come from <see cref="View.DefaultKeyBindings"/>.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []> DefaultKeyBindings { get; set; } = new ()
+    /// <remarks>
+    ///     <para>
+    ///         Only single-command bindings are included here. Dynamic bindings (e.g., Enter for NewLine/Accept
+    ///         depending on <see cref="Multiline"/>, Tab depending on <see cref="TabKeyAddsTab"/>)
+    ///         are added directly in the constructor.
+    ///     </para>
+    /// </remarks>
+    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
-        // https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
-        // Movement
-        ["PageDown"] = ["PageDown", "Ctrl+V"],
-        ["PageDownExtend"] = ["Shift+PageDown"],
-        ["PageUp"] = ["PageUp"],
-        ["PageUpExtend"] = ["Shift+PageUp"],
-        ["Down"] = ["Ctrl+N", "CursorDown"],
-        ["DownExtend"] = ["Shift+CursorDown"],
-        ["Up"] = ["Ctrl+P", "CursorUp"],
-        ["UpExtend"] = ["Shift+CursorUp"],
-        ["Right"] = ["Ctrl+F", "CursorRight"],
-        ["RightExtend"] = ["Shift+CursorRight"],
-        ["Left"] = ["Ctrl+B", "CursorLeft"],
-        ["LeftExtend"] = ["Shift+CursorLeft"],
-        ["LeftStart"] = ["Home"],
-        ["LeftStartExtend"] = ["Shift+Home"],
-        ["RightEnd"] = ["End", "Ctrl+E"],
-        ["RightEndExtend"] = ["Shift+End"],
-        ["End"] = ["Ctrl+End"],
-        ["EndExtend"] = ["Ctrl+Shift+End"],
-        ["Start"] = ["Ctrl+Home"],
-        ["StartExtend"] = ["Ctrl+Shift+Home"],
-        // Editing
-        ["DeleteCharLeft"] = ["Backspace"],
-        ["DeleteCharRight"] = ["Delete", "Ctrl+D"],
-        ["CutToEndOfLine"] = ["Ctrl+K", "Ctrl+Shift+Delete"],
-        ["CutToStartOfLine"] = ["Ctrl+Shift+Backspace"],
-        ["Paste"] = ["Ctrl+Y"],
-        ["ToggleExtend"] = ["Ctrl+Space"],
-        ["Copy"] = ["Ctrl+C"],
-        ["Cut"] = ["Ctrl+W", "Ctrl+X"],
-        ["WordLeft"] = ["Ctrl+CursorLeft"],
-        ["WordLeftExtend"] = ["Ctrl+Shift+CursorLeft"],
-        ["WordRight"] = ["Ctrl+CursorRight"],
-        ["WordRightExtend"] = ["Ctrl+Shift+CursorRight"],
-        ["KillWordRight"] = ["Ctrl+Delete"],
-        ["KillWordLeft"] = ["Ctrl+Backspace"],
-        ["SelectAll"] = ["Ctrl+A"],
-        ["ToggleOverwrite"] = ["Insert"],
-        ["NextTabStop"] = ["Tab"],
-        ["PreviousTabStop"] = ["Shift+Tab"],
-        ["Undo"] = ["Ctrl+Z"],
-        ["Redo"] = ["Ctrl+R"],
-        ["DeleteAll"] = ["Ctrl+G", "Ctrl+Shift+D"],
-        ["Open"] = ["Ctrl+L"],
-    };
+        // Emacs navigation
+        ["Down"] = Bind.All ("Ctrl+N"),
+        ["Up"] = Bind.All ("Ctrl+P"),
+        ["Right"] = Bind.All ("Ctrl+F"),
+        ["Left"] = Bind.All ("Ctrl+B"),
 
-    /// <summary>
-    ///     Gets or sets additional key bindings for <see cref="TextView"/> applied only on non-Windows platforms.
-    ///     These are appended to <see cref="DefaultKeyBindings"/>. Configure in <em>config.json</em> under the key
-    ///     <c>TextView.DefaultKeyBindingsUnix</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
+        // Additional RightEnd binding
+        ["RightEnd"] = Bind.All ("Ctrl+E"),
+
+        // Toggle selection mode
+        ["ToggleExtend"] = Bind.All ("Ctrl+Space"),
+
+        // Kill / cut line commands
+        ["CutToEndOfLine"] = Bind.All ("Ctrl+K"),
+        ["CutToStartOfLine"] = Bind.All ("Ctrl+Shift+Backspace"),
+        ["DeleteAll"] = Bind.All ("Ctrl+Shift+Delete"),
+
+        // Additional Cut binding (Emacs)
+        ["Cut"] = Bind.All ("Ctrl+W"),
+
+        // Word navigation
+        ["WordLeft"] = Bind.All ("Ctrl+CursorLeft"),
+        ["WordRight"] = Bind.All ("Ctrl+CursorRight"),
+        ["WordLeftExtend"] = Bind.All ("Ctrl+Shift+CursorLeft"),
+        ["WordRightExtend"] = Bind.All ("Ctrl+Shift+CursorRight"),
+
+        // Kill word
+        ["KillWordRight"] = Bind.All ("Ctrl+Delete"),
+        ["KillWordLeft"] = Bind.All ("Ctrl+Backspace"),
+
+        // Overwrite mode
+        ["ToggleOverwrite"] = Bind.All ("Insert"),
+
+        // Open color picker
+        ["Open"] = Bind.All ("Ctrl+L")
+    };
 
     private void CreateCommandsAndBindings ()
     {
@@ -124,15 +111,18 @@ public partial class TextView
         AddCommand (Command.Context, () => ShowContextMenu (null));
         AddCommand (Command.Open, () => PromptForColors ());
 
-        // Apply configurable key bindings (defaults from DefaultKeyBindings, plus platform-specific overrides)
-        KeyBindingConfigHelper.Apply (this, DefaultKeyBindings, DefaultKeyBindingsUnix);
+        // Apply configurable key bindings (base layer + TextView-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
 
-        // TextView does not use Space (inherited from base View)
         KeyBindings.Remove (Key.Space);
 
-        // Enter binding depends on Multiline instance state: cannot be in the static dict
+        // Dynamic binding: Enter maps to NewLine or Accept depending on Multiline
         KeyBindings.Remove (Key.Enter);
         KeyBindings.Add (Key.Enter, Multiline ? Command.NewLine : Command.Accept);
+
+        // Dynamic bindings: Tab/Shift+Tab (depend on TabKeyAddsTab property)
+        KeyBindings.Add (Key.Tab, Command.NextTabStop);
+        KeyBindings.Add (Key.Tab.WithShift, Command.PreviousTabStop);
     }
 
     private void DoNeededAction ()
@@ -218,7 +208,7 @@ public partial class TextView
         {
             ClearRegion ();
 
-            _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
         }
 
         UpdateWrapModel ();
@@ -244,13 +234,13 @@ public partial class TextView
         {
             List<Cell> runeList = contents is null ? [] : Cell.ToCellList (contents);
             List<Cell> currentLine = GetCurrentLine ();
-            _historyText.Add ([ [.. currentLine]], InsertionPoint);
-            List<List<Cell>> addedLine = [ [.. currentLine], runeList];
+            _historyText.Add ([[.. currentLine]], InsertionPoint);
+            List<List<Cell>> addedLine = [[.. currentLine], runeList];
             _historyText.Add ([.. addedLine], InsertionPoint, TextEditingLineStatus.Added);
             _model.AddLine (CurrentRow, runeList);
             SetNeedsDraw ();
             CurrentRow++;
-            _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
             OnContentsChanged ();
         }
@@ -266,7 +256,7 @@ public partial class TextView
 
             if (IsSelecting)
             {
-                _historyText.ReplaceLast ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Original);
+                _historyText.ReplaceLast ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Original);
             }
         }
 
@@ -354,9 +344,7 @@ public partial class TextView
             return true;
         }
 
-        _selectionStartColumn = 0;
-        _selectionStartRow = 0;
-        MoveBottomEndExtend ();
+        SelectAll ();
 
         return DeleteCharLeft ();
     }
@@ -372,13 +360,13 @@ public partial class TextView
         if (IsSelecting)
         {
             SetWrapModel ();
-            _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint);
+            _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint);
 
             ClearSelectedRegion ();
 
             List<Cell> currentLine = GetCurrentLine ();
 
-            _historyText.Add ([ [.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.Add ([[.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
 
             UpdateWrapModel ();
             OnContentsChanged ();
@@ -405,13 +393,13 @@ public partial class TextView
         if (IsSelecting)
         {
             SetWrapModel ();
-            _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint);
+            _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint);
 
             ClearSelectedRegion ();
 
             List<Cell> currentLine = GetCurrentLine ();
 
-            _historyText.Add ([ [.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.Add ([[.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
 
             UpdateWrapModel ();
             OnContentsChanged ();
@@ -436,7 +424,7 @@ public partial class TextView
             // Delete backwards
             List<Cell> currentLine = GetCurrentLine ();
 
-            _historyText.Add ([ [.. currentLine]], InsertionPoint);
+            _historyText.Add ([[.. currentLine]], InsertionPoint);
 
             currentLine.RemoveAt (CurrentColumn - 1);
             SetNeedsDraw ();
@@ -448,7 +436,7 @@ public partial class TextView
 
             CurrentColumn--;
 
-            _historyText.Add ([ [.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.Add ([[.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
 
             if (CurrentColumn < Viewport.X)
             {
@@ -468,9 +456,9 @@ public partial class TextView
             int prowIdx = CurrentRow - 1;
             List<Cell> prevRow = _model.GetLine (prowIdx);
 
-            _historyText.Add ([ [.. prevRow]], InsertionPoint);
+            _historyText.Add ([[.. prevRow]], InsertionPoint);
 
-            List<List<Cell>> removedLines = [ [.. prevRow], [.. GetCurrentLine ()]];
+            List<List<Cell>> removedLines = [[.. prevRow], [.. GetCurrentLine ()]];
 
             _historyText.Add (removedLines, new Point (CurrentColumn, prowIdx), TextEditingLineStatus.Removed);
 
@@ -512,9 +500,9 @@ public partial class TextView
         if (CurrentColumn == currentLine.Count)
         {
             // We're at the end of the line; need to merge with the next line
-            _historyText.Add ([ [.. currentLine]], InsertionPoint);
+            _historyText.Add ([[.. currentLine]], InsertionPoint);
 
-            List<List<Cell>> removedLines = [ [.. currentLine]];
+            List<List<Cell>> removedLines = [[.. currentLine]];
             List<Cell> nextLine = _model.GetLine (CurrentRow + 1);
             removedLines.Add ([.. nextLine]);
             _historyText.Add (removedLines, InsertionPoint, TextEditingLineStatus.Removed);
@@ -522,7 +510,7 @@ public partial class TextView
             _model.RemoveLine (CurrentRow + 1);
             SetNeedsDraw ();
 
-            _historyText.Add ([ [.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.Add ([[.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
 
             if (_wordWrap)
             {
@@ -535,12 +523,12 @@ public partial class TextView
         }
 
         // We're not at the end of the line; delete to end of line
-        _historyText.Add ([ [.. currentLine]], InsertionPoint);
+        _historyText.Add ([[.. currentLine]], InsertionPoint);
 
         currentLine.RemoveAt (CurrentColumn);
         SetNeedsDraw ();
 
-        _historyText.Add ([ [.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
+        _historyText.Add ([[.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         if (_wordWrap)
         {
@@ -578,13 +566,13 @@ public partial class TextView
             return true;
         }
 
-        _historyText.Add ([ [.. currentLine]], InsertionPoint);
+        _historyText.Add ([[.. currentLine]], InsertionPoint);
 
         if (currentLine.Count == 0)
         {
             if (CurrentRow < _model.Count - 1)
             {
-                List<List<Cell>> removedLines = [ [.. currentLine]];
+                List<List<Cell>> removedLines = [[.. currentLine]];
 
                 _model.RemoveLine (CurrentRow);
                 SetNeedsDraw ();
@@ -634,7 +622,7 @@ public partial class TextView
             SetNeedsDraw ();
         }
 
-        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         UpdateWrapModel ();
 
@@ -671,7 +659,7 @@ public partial class TextView
             return true;
         }
 
-        _historyText.Add ([ [.. currentLine]], InsertionPoint);
+        _historyText.Add ([[.. currentLine]], InsertionPoint);
 
         if (currentLine.Count == 0)
         {
@@ -702,7 +690,7 @@ public partial class TextView
                 CurrentRow--;
                 currentLine = _model.GetLine (CurrentRow);
 
-                List<List<Cell>> removedLine = [ [.. currentLine], []];
+                List<List<Cell>> removedLine = [[.. currentLine], []];
 
                 _historyText.Add ([.. removedLine], InsertionPoint, TextEditingLineStatus.Removed);
 
@@ -729,7 +717,7 @@ public partial class TextView
             CurrentColumn = 0;
         }
 
-        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         UpdateWrapModel ();
 
@@ -752,13 +740,13 @@ public partial class TextView
 
         List<Cell> currentLine = GetCurrentLine ();
 
-        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint);
+        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint);
 
         if (CurrentColumn == 0)
         {
             DeleteTextLeft ();
 
-            _historyText.ReplaceLast ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.ReplaceLast ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
             UpdateWrapModel ();
 
@@ -812,7 +800,7 @@ public partial class TextView
             CurrentRow = newPos.Value.row;
         }
 
-        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         UpdateWrapModel ();
 
@@ -832,13 +820,13 @@ public partial class TextView
 
         List<Cell> currentLine = GetCurrentLine ();
 
-        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint);
+        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint);
 
         if (currentLine.Count == 0 || CurrentColumn == currentLine.Count)
         {
             DeleteTextRight ();
 
-            _historyText.ReplaceLast ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+            _historyText.ReplaceLast ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
             UpdateWrapModel ();
 
@@ -866,7 +854,7 @@ public partial class TextView
             _wrapNeeded = true;
         }
 
-        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         UpdateWrapModel ();
 
@@ -935,7 +923,7 @@ public partial class TextView
         SetWrapModel ();
 
         List<Cell> currentLine = GetCurrentLine ();
-        _historyText.Add ([ [.. currentLine]], InsertionPoint);
+        _historyText.Add ([[.. currentLine]], InsertionPoint);
 
         if (IsSelecting)
         {
@@ -945,7 +933,7 @@ public partial class TextView
         int restCount = currentLine.Count - CurrentColumn;
         List<Cell> rest = currentLine.GetRange (CurrentColumn, restCount);
         currentLine.RemoveRange (CurrentColumn, restCount);
-        List<List<Cell>> addedLines = [ [.. currentLine]];
+        List<List<Cell>> addedLines = [[.. currentLine]];
         _model.AddLine (CurrentRow + 1, rest);
         addedLines.Add ([.. _model.GetLine (CurrentRow + 1)]);
         _historyText.Add (addedLines, InsertionPoint, TextEditingLineStatus.Added);
@@ -958,7 +946,7 @@ public partial class TextView
 
         CurrentColumn = 0;
 
-        _historyText.Add ([ [.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
+        _historyText.Add ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
         if (!_wordWrap && CurrentColumn < Viewport.X)
         {

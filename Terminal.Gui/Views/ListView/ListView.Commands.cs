@@ -3,36 +3,39 @@ namespace Terminal.Gui.Views;
 public partial class ListView
 {
     /// <summary>
-    ///     Gets or sets the default key bindings for <see cref="ListView"/>. Override via <c>config.json</c>.
+    ///     Gets or sets the default key bindings for <see cref="ListView"/>. These are layered on top of
+    ///     <see cref="View.DefaultKeyBindings"/> when the view is created.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindings { get; set; } = new ()
+    /// <remarks>
+    ///     <para>
+    ///         Only single-command bindings are included here. Multi-command bindings (e.g., Shift+Space for
+    ///         Activate+Down) and bindings with data payloads are added directly in the constructor.
+    ///     </para>
+    /// </remarks>
+    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
-        { "Up", ["CursorUp", "Ctrl+P"] },
-        { "Down", ["CursorDown", "Ctrl+N"] },
-        { "PageUp", ["PageUp"] },
-        { "PageDown", ["PageDown", "Ctrl+V"] },
-        { "Start", ["Home"] },
-        { "End", ["End"] },
-        { "UpExtend", ["Shift+CursorUp", "Ctrl+Shift+P"] },
-        { "DownExtend", ["Shift+CursorDown", "Ctrl+Shift+N"] },
-        { "PageUpExtend", ["Shift+PageUp"] },
-        { "PageDownExtend", ["Shift+PageDown"] },
-        { "StartExtend", ["Shift+Home"] },
-        { "EndExtend", ["Shift+End"] }
-    };
+        // Emacs navigation
+        ["Up"] = Bind.All ("Ctrl+P"),
+        ["Down"] = Bind.All ("Ctrl+N"),
+        ["PageDown"] = Bind.All ("Ctrl+V"),
 
-    /// <summary>
-    ///     Gets or sets the platform-override key bindings for <see cref="ListView"/> on Unix. Override via
-    ///     <c>config.json</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
+        // ListView uses Home/End (not Ctrl+Home/Ctrl+End like the base layer)
+        ["Start"] = Bind.All ("Home"),
+        ["End"] = Bind.All ("End"),
+
+        // Emacs extend
+        ["UpExtend"] = Bind.All ("Ctrl+Shift+P"),
+        ["DownExtend"] = Bind.All ("Ctrl+Shift+N"),
+
+        // ListView uses Shift+Home/End (not Ctrl+Shift+Home/End like the base layer)
+        ["StartExtend"] = Bind.All ("Shift+Home"),
+        ["EndExtend"] = Bind.All ("Shift+End"),
+    };
 
     private void SetupBindingsAndCommands ()
     {
         // Things this view knows how to do
-        // 
+        //
         AddCommand (Command.Up, ctx => RaiseActivating (ctx) == true || MoveUp ());
         AddCommand (Command.Down, ctx => RaiseActivating (ctx) == true || MoveDown ());
 
@@ -55,13 +58,15 @@ public partial class ListView
 
         AddCommand (Command.SelectAll, HandleSelectAll);
 
-        // Default keybindings for all ListViews
-        KeyBindingConfigHelper.Apply (this, DefaultKeyBindings, DefaultKeyBindingsUnix);
+        // Apply configurable key bindings (base layer + ListView-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
 
-        // Key.Space is already bound to Command.Activate; this gives us activate then move down
+        // Multi-command binding: activate then move down (can't be expressed in single-command dict)
         KeyBindings.Add (Key.Space.WithShift, Command.Activate, Command.Down);
 
-        // Use the form of Add that lets us pass data with the binding
+        // Use the form of Add that lets us pass data with the binding.
+        // Remove Ctrl+A first since ApplyKeyBindings may have already bound it (without data).
+        KeyBindings.Remove (Key.A.WithCtrl);
         KeyBindings.Add (Key.A.WithCtrl, new KeyBinding ([Command.SelectAll], true));
         KeyBindings.Add (Key.U.WithCtrl, new KeyBinding ([Command.SelectAll], false));
 

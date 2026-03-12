@@ -1,33 +1,39 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>Control that hosts multiple sub views, presenting a single one at once.</summary>
+/// <remarks>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Moves to the previous or next tab.</description>
+///         </item>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last tab.</description>
+///         </item>
+///         <item>
+///             <term>PageUp / PageDown</term> <description>Scrolls the tab strip one page.</description>
+///         </item>
+///         <item>
+///             <term>Up</term> <description>Moves focus into the tab content area.</description>
+///         </item>
+///         <item>
+///             <term>Down</term> <description>Moves focus back to the tab strip.</description>
+///         </item>
+///     </list>
+/// </remarks>
 public class TabView : View
 {
     /// <summary>The default <see cref="MaxTabTextWidth"/> to set on new <see cref="TabView"/> controls.</summary>
     public const uint DefaultMaxTabTextWidth = 30;
 
     /// <summary>
-    ///     Gets or sets the default key bindings for <see cref="TabView"/>. Override via <c>config.json</c>.
+    ///     Gets or sets the default key bindings for <see cref="TabView"/>. All standard navigation bindings are
+    ///     inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary is empty by default.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindings { get; set; } = new ()
-    {
-        { "Left", ["CursorLeft"] },
-        { "Right", ["CursorRight"] },
-        { "LeftStart", ["Home"] },
-        { "RightEnd", ["End"] },
-        { "PageDown", ["PageDown"] },
-        { "PageUp", ["PageUp"] },
-        { "Up", ["CursorUp"] },
-        { "Down", ["CursorDown"] }
-    };
-
-    /// <summary>
-    ///     Gets or sets the platform-override key bindings for <see cref="TabView"/> on Unix. Override via
-    ///     <c>config.json</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
+    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
 
     /// <summary>
     ///     This sub view is the main client area of the current tab.  It hosts the <see cref="Tab.View"/> of the tab, the
@@ -180,8 +186,8 @@ public class TabView : View
                         return false;
                     });
 
-        // Default keybindings for this view
-        KeyBindingConfigHelper.Apply (this, DefaultKeyBindings, DefaultKeyBindingsUnix);
+        // Apply layered key bindings (base View layer + TabView-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
     }
 
     /// <summary>

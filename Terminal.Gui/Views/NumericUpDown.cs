@@ -6,11 +6,38 @@ namespace Terminal.Gui.Views;
 ///     Enables the user to increase or decrease a value with the mouse or keyboard in type-safe way.
 /// </summary>
 /// <remarks>
-///     Supports the following types: <see cref="int"/>, <see cref="long"/>, <see cref="double"/>, <see cref="double"/>,
-///     <see cref="decimal"/>. Attempting to use any other type will result in an <see cref="InvalidOperationException"/>.
+///     <para>
+///         Supports the following types: <see cref="int"/>, <see cref="long"/>, <see cref="double"/>, <see cref="double"/>
+///         ,
+///         <see cref="decimal"/>. Attempting to use any other type will result in an
+///         <see cref="InvalidOperationException"/>.
+///     </para>
+///     <para>
+///         Default key bindings are inherited from <see cref="View.DefaultKeyBindings"/>:
+///     </para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>CursorUp</term> <description>Increases the value (<see cref="Command.Up"/>).</description>
+///         </item>
+///         <item>
+///             <term>CursorDown</term> <description>Decreases the value (<see cref="Command.Down"/>).</description>
+///         </item>
+///     </list>
+///     <para>
+///         View-specific bindings can be added via <see cref="DefaultKeyBindings"/>.
+///     </para>
 /// </remarks>
 public class NumericUpDown<T> : View, IValue<T> where T : notnull
 {
+    /// <summary>
+    ///     Gets or sets the view-specific default key bindings for <see cref="NumericUpDown{T}"/>. All standard navigation
+    ///     bindings are inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary is empty by default.
+    /// </summary>
+    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
+
     private readonly Button _down;
 
     // TODO: Use a TextField instead of a Label
@@ -88,7 +115,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
         Add (_down, _number, _up);
 
         AddCommand (Command.Up,
-                    ctx =>
+                    _ =>
                     {
                         if (type == typeof (object))
                         {
@@ -106,7 +133,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
                     });
 
         AddCommand (Command.Down,
-                    ctx =>
+                    _ =>
                     {
                         if (type == typeof (object))
                         {
@@ -123,7 +150,8 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
                         return true;
                     });
 
-        KeyBindingConfigHelper.Apply (this, NumericUpDown.DefaultKeyBindings, NumericUpDown.DefaultKeyBindingsUnix);
+        // Apply layered key bindings (base View layer + NumericUpDown-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
 
         SetText ();
 
@@ -142,7 +170,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
         }
     }
 
-    private T? _value = default;
+    private T? _value;
 
     /// <summary>
     ///     Gets or sets the value that will be incremented or decremented.
@@ -238,21 +266,19 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
         Text = _number.Text;
     }
 
-    private T? _increment;
-
     /// <summary>
     /// </summary>
     public T? Increment
     {
-        get => _increment;
+        get;
         set
         {
-            if (_increment is { } oldVal && value is { } newVal && oldVal.Equals (newVal))
+            if (field is { } oldVal && value is { } && oldVal.Equals (value))
             {
                 return;
             }
 
-            _increment = value;
+            field = value;
 
             IncrementChanged?.Invoke (this, new EventArgs<T> (value!));
         }
@@ -299,25 +325,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
 /// <summary>
 ///     Enables the user to increase or decrease an <see langword="int"/> by clicking on the up or down buttons.
 /// </summary>
-public class NumericUpDown : NumericUpDown<int>
-{
-    /// <summary>
-    ///     Gets or sets the default key bindings for <see cref="NumericUpDown"/>. Override via <c>config.json</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindings { get; set; } = new ()
-    {
-        { "Up", ["CursorUp"] },
-        { "Down", ["CursorDown"] }
-    };
-
-    /// <summary>
-    ///     Gets or sets the platform-override key bindings for <see cref="NumericUpDown"/> on Unix. Override via
-    ///     <c>config.json</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
-}
+public class NumericUpDown : NumericUpDown<int>;
 
 internal interface INumericHelper
 {

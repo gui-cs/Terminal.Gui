@@ -320,16 +320,16 @@ public class MenuBarItemWithoutPopoverTests
         IMenuBarEntry entry = inlineItem;
 
         // --- First activation: open the menu ---
-        app.InjectKey (Key.F9);
+        app.InjectKey (Key.F10);
 
-        Assert.True (menuBar.Active, "MenuBar should be active after F9.");
-        Assert.True (entry.IsMenuOpen, "InlineItem should be open after F9.");
+        Assert.True (menuBar.Active, "MenuBar should be active after F10.");
+        Assert.True (entry.IsMenuOpen, "InlineItem should be open after F10.");
 
         // --- Second activation: close the menu ---
-        app.InjectKey (Key.F9);
+        app.InjectKey (Key.F10);
 
-        Assert.False (entry.IsMenuOpen, "InlineItem should be closed after second F9.");
-        Assert.False (menuBar.Active, "MenuBar should be inactive after second F9.");
+        Assert.False (entry.IsMenuOpen, "InlineItem should be closed after second F10.");
+        Assert.False (menuBar.Active, "MenuBar should be inactive after second F10.");
     }
 
     // Claude - Opus 4.6
@@ -380,11 +380,11 @@ public class MenuBarItemWithoutPopoverTests
         IMenuBarEntry popoverEntry = popoverItem;
         IMenuBarEntry inlineEntry = inlineItem;
 
-        // --- Open popover via F9 ---
-        app.InjectKey (Key.F9);
+        // --- Open popover via F10 ---
+        app.InjectKey (Key.F10);
 
-        Assert.True (menuBar.Active, "MenuBar should be active after F9.");
-        Assert.True (popoverEntry.IsMenuOpen, "Popover should be open after F9.");
+        Assert.True (menuBar.Active, "MenuBar should be active after F10.");
+        Assert.True (popoverEntry.IsMenuOpen, "Popover should be open after F10.");
 
         // --- Arrow right to switch to inline entry ---
         app.InjectKey (Key.CursorRight);
@@ -412,10 +412,10 @@ public class MenuBarItemWithoutPopoverTests
 
         IMenuBarEntry entry = inlineItem;
 
-        // --- Open via F9 ---
-        app.InjectKey (Key.F9);
+        // --- Open via F10 ---
+        app.InjectKey (Key.F10);
 
-        Assert.True (entry.IsMenuOpen, "InlineItem should be open after F9.");
+        Assert.True (entry.IsMenuOpen, "InlineItem should be open after F10.");
 
         // --- Press Enter on the focused MenuItem ---
         app.InjectKey (Key.Enter);
@@ -590,8 +590,8 @@ public class MenuBarItemWithoutPopoverTests
         IMenuBarEntry entry = inlineItem;
 
         // Open the inline menu
-        app.InjectKey (Key.F9);
-        Assert.True (entry.IsMenuOpen, "InlineItem should be open after F9.");
+        app.InjectKey (Key.F10);
+        Assert.True (entry.IsMenuOpen, "InlineItem should be open after F10.");
 
         // Navigate down to "Options" (second item)
         app.InjectKey (Key.CursorDown);
@@ -630,7 +630,7 @@ public class MenuBarItemWithoutPopoverTests
         IMenuBarEntry entry = inlineItem;
 
         // Open inline menu
-        app.InjectKey (Key.F9);
+        app.InjectKey (Key.F10);
         Assert.True (entry.IsMenuOpen);
 
         // Open cascading SubMenu via Right arrow

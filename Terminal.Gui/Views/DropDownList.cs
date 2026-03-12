@@ -59,24 +59,41 @@ namespace Terminal.Gui.Views;
 ///         };
 ///         dropdown.ValueChanged += (s, e) => MessageBox.Query ("Selected", dropdown.Text, "Ok");
 ///     </code>
+///     <para>
+///         Default key bindings are defined in <see cref="DefaultKeyBindings"/> (in addition to
+///         <see cref="TextField"/> bindings):
+///     </para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>F4</term> <description>Toggles the dropdown list open or closed.</description>
+///         </item>
+///         <item>
+///             <term>Alt+Down</term> <description>Toggles the dropdown list open or closed.</description>
+///         </item>
+///     </list>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Click</term> <description>Activates the dropdown (<see cref="Command.Activate"/>).</description>
+///         </item>
+///     </list>
 /// </remarks>
 public class DropDownList : TextField
 {
     /// <summary>
-    ///     Gets or sets the default key bindings for <see cref="DropDownList"/>. Override via <c>config.json</c>.
+    ///     Gets or sets the view-specific default key bindings for <see cref="DropDownList"/>. Contains only bindings
+    ///     unique to this view; shared bindings come from <see cref="View.DefaultKeyBindings"/>.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public new static Dictionary<string, string []>? DefaultKeyBindings { get; set; } = new ()
+    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
-        { "Toggle", ["F4", "Alt+CursorDown"] }
+        ["Toggle"] = Bind.All ("F4", "Alt+CursorDown"),
     };
-
-    /// <summary>
-    ///     Gets or sets the platform-override key bindings for <see cref="DropDownList"/> on Unix. Override via
-    ///     <c>config.json</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public new static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
 
     private readonly Button? _toggleButton;
     private Popover<ListView, string?>? _listPopover;
@@ -154,11 +171,11 @@ public class DropDownList : TextField
         // Adjust TextField width to account for toggle button
         Width = Dim.Auto (minimumContentDim: Dim.Func (_ => _listPopover.ContentView?.MaxItemLength ?? 0));
 
-        // Add keyboard bindings
-        KeyBindingConfigHelper.Apply (this, DefaultKeyBindings, DefaultKeyBindingsUnix);
-
         // Add command handler for toggle
         AddCommand (Command.Toggle, ToggleDropDown);
+
+        // Apply layered key bindings (base View layer + DropDownList-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
 
         MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
     }

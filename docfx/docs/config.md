@@ -512,6 +512,29 @@ System-wide settings from [SettingsScope](~/api/Terminal.Gui.Configuration.Setti
 }
 ```
 
+### Key Binding Settings
+
+Configurable key bindings use the `PlatformKeyBinding` format to support platform-aware defaults. See [Key Binding Overrides](#key-binding-overrides) for the full JSON format.
+
+```json
+{
+  "Application.DefaultKeyBindings": {
+    "Quit": { "All": ["Esc"] },
+    "Suspend": { "Linux": ["Ctrl+Z"], "Macos": ["Ctrl+Z"] },
+    "Arrange": { "All": ["Ctrl+F5"] }
+  },
+  "View.DefaultKeyBindings": {
+    "Copy": { "All": ["Ctrl+C"] },
+    "Undo": { "All": ["Ctrl+Z"], "Linux": ["Ctrl+/"], "Macos": ["Ctrl+/"] }
+  },
+  "View.ViewKeyBindings": {
+    "TextField": {
+      "CutToEndOfLine": { "All": ["Ctrl+K"] }
+    }
+  }
+}
+```
+
 ### View-Specific Settings
 
 Settings for individual View types from [ThemeScope](~/api/Terminal.Gui.Configuration.ThemeScope.yml):
@@ -554,6 +577,51 @@ Glyphs can be specified as:
 - U+ format: `"U+25C4"`
 - UTF-16 format: `"\\u25BC"`
 - Decimal codepoint: `965010`
+
+### Key Binding Overrides
+
+Key bindings for Application-level commands, base View commands, and per-view commands can all be overridden in configuration. See [Keyboard Deep Dive - Configurable Key Bindings](keyboard.md#configurable-key-bindings) for the full architecture.
+
+**Override Application-level key bindings** (e.g., change the Quit key):
+
+```json
+{
+  "Application.DefaultKeyBindings": {
+    "Quit": { "All": ["Ctrl+Q"] },
+    "Suspend": { "Linux": ["Ctrl+Z"], "Macos": ["Ctrl+Z"] }
+  }
+}
+```
+
+**Override base View key bindings** (affects all views that support those commands):
+
+```json
+{
+  "View.DefaultKeyBindings": {
+    "Copy": { "All": ["Ctrl+C", "Ctrl+Insert"] },
+    "Paste": { "All": ["Ctrl+V", "Shift+Insert"] },
+    "Undo": { "All": ["Ctrl+Z"], "Linux": ["Ctrl+/"], "Macos": ["Ctrl+/"] }
+  }
+}
+```
+
+**Override per-view key bindings** using `View.ViewKeyBindings` (maps view type name to command overrides):
+
+```json
+{
+  "View.ViewKeyBindings": {
+    "TextField": {
+      "Undo": { "All": ["Ctrl+Z"] },
+      "CutToEndOfLine": { "All": ["Ctrl+K"] }
+    },
+    "TextView": {
+      "Redo": { "All": ["Ctrl+Shift+Z"], "Windows": ["Ctrl+Y"] }
+    }
+  }
+}
+```
+
+Each entry uses the `PlatformKeyBinding` format with optional `All`, `Windows`, `Linux`, and `Macos` string arrays. `All` keys apply on every platform; platform-specific arrays add additional bindings for that OS.
 
 ### Discovering Configuration Properties
 

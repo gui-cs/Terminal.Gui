@@ -30,7 +30,7 @@ public class MenuBarTests : TestsAllDrivers
                                                    Assert.Empty (menuBar.SubViews);
                                                    Assert.False (menuBar.CanFocus);
                                                    Assert.Equal (Orientation.Horizontal, menuBar.Orientation);
-                                                   Assert.Equal (Key.F9, MenuBar.DefaultKey);
+                                                   Assert.Equal (Key.F10, MenuBar.DefaultKey);
                                                });
     }
 
@@ -101,15 +101,15 @@ public class MenuBarTests : TestsAllDrivers
                                                                              newKeyValue = args.NewKey;
                                                                          };
 
-                                                   // Default key should be F9
-                                                   Assert.Equal (Key.F9, menuBar.Key);
+                                                   // Default key should be F10
+                                                   Assert.Equal (Key.F10, menuBar.Key);
 
                                                    // Change key to F1
                                                    menuBar.Key = Key.F1;
 
                                                    // Verify event was raised
                                                    Assert.True (eventRaised);
-                                                   Assert.Equal (Key.F9, oldKeyValue);
+                                                   Assert.Equal (Key.F10, oldKeyValue);
                                                    Assert.Equal (Key.F1, newKeyValue);
 
                                                    // Verify key was changed
@@ -368,7 +368,7 @@ public class MenuBarTests : TestsAllDrivers
 
         // Open the menu
         c = c.KeyDown (MenuBar.DefaultKey);
-        Assert.True (menuBar!.IsOpen (), "Menu should be open after F9");
+        Assert.True (menuBar!.IsOpen (), "Menu should be open after F10");
 
         c = c.ScreenShot ("Menu open with Bar CommandView", _out);
 
@@ -446,7 +446,7 @@ public class MenuBarTests : TestsAllDrivers
 
         // Step 2: Open the Test menu
         c = c.KeyDown (MenuBar.DefaultKey);
-        Assert.True (menuBar!.IsOpen (), "Menu should be open after F9");
+        Assert.True (menuBar!.IsOpen (), "Menu should be open after F10");
 
         // Step 3: Navigate within the OptionSelector to Error
         // Items: Base(0), Menu(1), Dialog(2), Runnable(3), Error(4)
@@ -588,7 +588,7 @@ public class MenuBarTests : TestsAllDrivers
 
         // Step 2: Open the Test menu
         c = c.KeyDown (MenuBar.DefaultKey);
-        Assert.True (menuBar!.IsOpen (), "Menu should be open after F9");
+        Assert.True (menuBar!.IsOpen (), "Menu should be open after F10");
 
         // Step 6: Click directly on the Error checkbox WITHOUT keyboard navigation first.
         // This simulates the real user scenario where the user opens the menu and clicks
@@ -657,7 +657,7 @@ public class MenuBarTests : TestsAllDrivers
 
         // Step 2: Open the Test menu
         c = c.KeyDown (MenuBar.DefaultKey);
-        Assert.True (menuBar!.IsOpen (), "Menu should be open after F9");
+        Assert.True (menuBar!.IsOpen (), "Menu should be open after F10");
 
         // Step 6: Click directly on the Error checkbox WITHOUT keyboard navigation first.
         // This simulates the real user scenario where the user opens the menu and clicks
@@ -724,7 +724,7 @@ public class MenuBarTests : TestsAllDrivers
 
         // Step 2: Open the Test menu
         c = c.KeyDown (MenuBar.DefaultKey);
-        Assert.True (menuBar!.IsOpen (), "Menu should be open after F9");
+        Assert.True (menuBar!.IsOpen (), "Menu should be open after F10");
 
         // Step 6: Click directly on the Error checkbox WITHOUT keyboard navigation first.
         // This simulates the real user scenario where the user opens the menu and clicks
@@ -865,9 +865,9 @@ public class MenuBarTests : TestsAllDrivers
              .ScreenShot ("Initial state — MenuBar with File (popover) and Inline entries", _out)
              .AssertFalse (menuBar!.IsOpen ());
 
-        // Activate MenuBar with F9 — should open the first entry (File, a popover)
+        // Activate MenuBar with F10 — should open the first entry (File, a popover)
         c = c.KeyDown (MenuBar.DefaultKey)
-             .ScreenShot ("After F9 — File popover should be open", _out)
+             .ScreenShot ("After F10 — File popover should be open", _out)
              .AssertTrue (menuBar.IsOpen ())
              .AssertTrue (((IMenuBarEntry)popoverItem!).IsMenuOpen);
 
@@ -1004,9 +1004,9 @@ public class MenuBarTests : TestsAllDrivers
 
         c = c.WaitIteration ();
 
-        // Open via F9 (activates first entry)
+        // Open via F10 (activates first entry)
         c = c.KeyDown (MenuBar.DefaultKey)
-             .ScreenShot ("After F9 — inline SubMenu open with 'Do Something'", _out)
+             .ScreenShot ("After F10 — inline SubMenu open with 'Do Something'", _out)
              .AssertTrue (((IMenuBarEntry)inlineItem!).IsMenuOpen);
 
         // Press Enter to activate the focused MenuItem

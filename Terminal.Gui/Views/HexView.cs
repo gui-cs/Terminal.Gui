@@ -28,6 +28,51 @@ namespace Terminal.Gui.Views;
 ///         Control the byte at the caret for editing by setting the <see cref="Address"/> property to an offset in the
 ///         stream.
 ///     </para>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Moves the cursor one nibble/byte.</description>
+///         </item>
+///         <item>
+///             <term>Up / Down</term> <description>Moves the cursor one row up or down.</description>
+///         </item>
+///         <item>
+///             <term>PageUp / PageDown</term> <description>Moves one page up or down.</description>
+///         </item>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last byte in the stream.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Left / Ctrl+Right</term> <description>Moves to the start or end of the current row.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Up / Ctrl+Down</term> <description>Moves to the start or end of the current page.</description>
+///         </item>
+///         <item>
+///             <term>Backspace</term> <description>Deletes the byte before the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Delete</term> <description>Deletes the byte at the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Insert</term> <description>Toggles insert mode.</description>
+///         </item>
+///     </list>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Click / Double-Click</term> <description>Positions the cursor at the clicked byte.</description>
+///         </item>
+///         <item>
+///             <term>Wheel Up / Down</term> <description>Scrolls the view.</description>
+///         </item>
+///     </list>
 /// </remarks>
 public class HexView : View, IDesignable
 {
@@ -38,34 +83,23 @@ public class HexView : View, IDesignable
     public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBlock;
 
     /// <summary>
-    ///     Gets or sets the default key bindings for <see cref="HexView"/>. Override via <c>config.json</c>.
+    ///     Gets or sets the view-specific default key bindings for <see cref="HexView"/>. Contains only bindings
+    ///     unique to this view; shared bindings come from <see cref="View.DefaultKeyBindings"/>.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindings { get; set; } = new ()
+    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
-        { "Left", ["CursorLeft"] },
-        { "Right", ["CursorRight"] },
-        { "Down", ["CursorDown"] },
-        { "Up", ["CursorUp"] },
-        { "PageUp", ["PageUp"] },
-        { "PageDown", ["PageDown"] },
-        { "Start", ["Home"] },
-        { "End", ["End"] },
-        { "LeftStart", ["Ctrl+CursorLeft"] },
-        { "RightEnd", ["Ctrl+CursorRight"] },
-        { "StartOfPage", ["Ctrl+CursorUp"] },
-        { "EndOfPage", ["Ctrl+CursorDown"] },
-        { "DeleteCharLeft", ["Backspace"] },
-        { "DeleteCharRight", ["Delete"] },
-        { "Insert", ["Insert"] }
-    };
+        // HexView maps Home/End to stream start/end (overrides base layer's LeftStart/RightEnd)
+        ["Start"] = Bind.All ("Home"),
+        ["End"] = Bind.All ("End"),
 
-    /// <summary>
-    ///     Gets or sets the platform-override key bindings for <see cref="HexView"/> on Unix. Override via
-    ///     <c>config.json</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
+        // Row start/end via Ctrl+Left/Right
+        ["LeftStart"] = Bind.All ("Ctrl+CursorLeft"),
+        ["RightEnd"] = Bind.All ("Ctrl+CursorRight"),
+
+        ["StartOfPage"] = Bind.All ("Ctrl+CursorUp"),
+        ["EndOfPage"] = Bind.All ("Ctrl+CursorDown"),
+        ["Insert"] = Bind.All ("Insert"),
+    };
 
     private const int DEFAULT_ADDRESS_WIDTH = 8; // The default value for AddressWidth
     private const int NUM_BYTES_PER_HEX_COLUMN = 4;
@@ -109,7 +143,7 @@ public class HexView : View, IDesignable
         AddCommand (Command.DeleteCharRight, () => true);
         AddCommand (Command.Insert, () => true);
 
-        KeyBindingConfigHelper.Apply (this, DefaultKeyBindings, DefaultKeyBindingsUnix);
+        ApplyKeyBindings (DefaultKeyBindings, View.DefaultKeyBindings);
 
         KeyBindings.Remove (Key.Space);
         KeyBindings.Remove (Key.Enter);

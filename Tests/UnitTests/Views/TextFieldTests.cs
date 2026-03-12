@@ -727,7 +727,7 @@ public class TextFieldTests (ITestOutputHelper output)
         Assert.Equal ("to jump between text fields", tf.Text);
         Assert.True (tf.NewKeyDownEvent (Key.A.WithCtrl));
         Assert.Equal ("to jump between text fields", tf.SelectedText);
-        Assert.True (tf.NewKeyDownEvent (Key.D.WithCtrl.WithShift));
+        Assert.True (tf.NewKeyDownEvent (Key.Delete.WithCtrl.WithShift));
         Assert.Equal ("", tf.Text);
     }
 

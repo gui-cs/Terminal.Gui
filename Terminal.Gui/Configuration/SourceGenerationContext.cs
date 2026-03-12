@@ -29,8 +29,6 @@ namespace Terminal.Gui.Configuration;
 [JsonSerializable (typeof (CursorStyle))]
 [JsonSerializable (typeof (Dictionary<ColorName16, string>))]
 [JsonSerializable (typeof (Dictionary<string, Color>))]
-[JsonSerializable (typeof (Dictionary<string, string []>))]
-[JsonSerializable (typeof (string []))]
 
 [JsonSerializable (typeof (Dictionary<string, ConfigProperty>))]
 [JsonSerializable (typeof (ConcurrentDictionary<string, ConfigProperty>))]
@@ -48,6 +46,10 @@ namespace Terminal.Gui.Configuration;
 
 [JsonSerializable (typeof (TraceCategory))]
 [JsonSerializable (typeof (SizeDetectionMode))]
+
+[JsonSerializable (typeof (PlatformKeyBinding))]
+[JsonSerializable (typeof (Dictionary<string, PlatformKeyBinding>))]
+[JsonSerializable (typeof (Dictionary<string, Dictionary<string, PlatformKeyBinding>>))]
 
 internal partial class SourceGenerationContext : JsonSerializerContext
 { }

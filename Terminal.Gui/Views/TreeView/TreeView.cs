@@ -30,36 +30,6 @@ public interface ITreeView
 public class TreeView : TreeView<ITreeNode>, IDesignable
 {
     /// <summary>
-    ///     Gets or sets the default key bindings for <see cref="TreeView"/> on all platforms. Override via <c>config.json</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []> DefaultKeyBindings { get; set; } = new ()
-    {
-        ["PageUp"] = ["PageUp"],
-        ["PageDown"] = ["PageDown"],
-        ["PageUpExtend"] = ["Shift+PageUp"],
-        ["PageDownExtend"] = ["Shift+PageDown"],
-        ["Expand"] = ["CursorRight"],
-        ["ExpandAll"] = ["Ctrl+CursorRight"],
-        ["Collapse"] = ["CursorLeft"],
-        ["CollapseAll"] = ["Ctrl+CursorLeft"],
-        ["Up"] = ["CursorUp"],
-        ["UpExtend"] = ["Shift+CursorUp"],
-        ["LineUpToFirstBranch"] = ["Ctrl+CursorUp"],
-        ["Down"] = ["CursorDown"],
-        ["DownExtend"] = ["Shift+CursorDown"],
-        ["LineDownToLastBranch"] = ["Ctrl+CursorDown"],
-        ["Start"] = ["Home"],
-        ["End"] = ["End"],
-        ["SelectAll"] = ["Ctrl+A"],
-    };
-
-    /// <summary>
-    ///     Gets or sets the platform-override key bindings for <see cref="TreeView"/> on Unix. Override via <c>config.json</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []> DefaultKeyBindingsUnix { get; set; }
-    /// <summary>
     ///     Creates a new instance of the tree control with absolute positioning and initialises
     ///     <see cref="TreeBuilder{T}"/> with default <see cref="ITreeNode"/> based builder.
     /// </summary>
@@ -95,6 +65,58 @@ public class TreeView : TreeView<ITreeNode>, IDesignable
 ///     a user defined <see cref="ITreeBuilder{T}"/>.
 ///     <a href="../docs/treeview.md">See TreeView Deep Dive for more information</a>.
 /// </summary>
+/// <remarks>
+///     <para>
+///         Key bindings are configurable via <see cref="DefaultKeyBindings"/> (TreeView-specific commands)
+///         and <see cref="View.DefaultKeyBindings"/> (shared navigation commands). The instance-dependent
+///         <see cref="ObjectActivationKey"/> binding is added directly in the constructor.
+///     </para>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Up</term> <description>Moves up one node.</description>
+///         </item>
+///         <item>
+///             <term>Down</term> <description>Moves down one node.</description>
+///         </item>
+///         <item>
+///             <term>Right</term> <description>Expands the current branch.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Right</term> <description>Expands the current branch and all sub-branches.</description>
+///         </item>
+///         <item>
+///             <term>Left</term> <description>Collapses the current branch.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Left</term> <description>Collapses the current branch and all sub-branches.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Up</term> <description>Moves up to the first branch at the same level.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Down</term> <description>Moves down to the last branch at the same level.</description>
+///         </item>
+///         <item>
+///             <term>PageUp / PageDown</term> <description>Moves one page up or down.</description>
+///         </item>
+///         <item>
+///             <term>Shift+Up / Shift+Down</term> <description>Extends the selection up or down.</description>
+///         </item>
+///         <item>
+///             <term>Shift+PageUp / Shift+PageDown</term> <description>Extends the selection by one page.</description>
+///         </item>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last node.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+A</term> <description>Selects all nodes.</description>
+///         </item>
+///     </list>
+/// </remarks>
 public class TreeView<T> : View, ITreeView where T : class
 {
     /// <summary>
@@ -102,6 +124,38 @@ public class TreeView<T> : View, ITreeView where T : class
     ///     builder set).
     /// </summary>
     public static string NoBuilderError = "ERROR: TreeBuilder Not Set";
+
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="TreeView{T}"/>. These are layered on top of
+    ///     <see cref="View.DefaultKeyBindings"/> when the view is created.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Only single-command bindings are included here. The instance-dependent
+    ///         <see cref="ObjectActivationKey"/> binding is added directly in the constructor.
+    ///     </para>
+    ///     <para>
+    ///         This property is not decorated with <see cref="ConfigurationPropertyAttribute"/> because
+    ///         <see cref="TreeView{T}"/> is a generic type. Use <see cref="View.ViewKeyBindings"/> to
+    ///         override key bindings for TreeView via configuration.
+    ///     </para>
+    /// </remarks>
+    public new static Dictionary<string, PlatformKeyBinding> DefaultKeyBindings { get; set; } = new ()
+    {
+        // Tree-specific expand/collapse
+        ["Expand"] = Bind.All ("CursorRight"),
+        ["ExpandAll"] = Bind.All ("Ctrl+CursorRight"),
+        ["Collapse"] = Bind.All ("CursorLeft"),
+        ["CollapseAll"] = Bind.All ("Ctrl+CursorLeft"),
+
+        // Branch navigation
+        ["LineUpToFirstBranch"] = Bind.All ("Ctrl+CursorUp"),
+        ["LineDownToLastBranch"] = Bind.All ("Ctrl+CursorDown"),
+
+        // TreeView uses Home/End (not Ctrl+Home/Ctrl+End like the base layer)
+        ["Start"] = Bind.All ("Home"),
+        ["End"] = Bind.All ("End")
+    };
 
     /// <summary>
     ///     Interface for filtering which lines of the tree are displayed e.g. to provide text searching.  Defaults to
@@ -283,10 +337,10 @@ public class TreeView<T> : View, ITreeView where T : class
                         return true;
                     });
 
-        // Default keybindings for this view
-        KeyBindingConfigHelper.Apply (this, TreeView.DefaultKeyBindings, TreeView.DefaultKeyBindingsUnix);
+        // Apply configurable key bindings (TreeView-specific layer + base layer)
+        ApplyKeyBindings (DefaultKeyBindings, View.DefaultKeyBindings);
 
-        // ObjectActivationKey depends on instance state: cannot be in the static dict
+        // Instance-dependent activation key binding (not part of DefaultKeyBindings)
         KeyBindings.Remove (ObjectActivationKey);
         KeyBindings.Add (ObjectActivationKey, Command.Activate);
 
@@ -1238,7 +1292,7 @@ public class TreeView<T> : View, ITreeView where T : class
             int current = map.IndexOf (b => b.Model == SelectedObject);
 
             // The currently selected object is no longer in line map somehow
-            if(current < 0)
+            if (current < 0)
             {
                 return false;
             }

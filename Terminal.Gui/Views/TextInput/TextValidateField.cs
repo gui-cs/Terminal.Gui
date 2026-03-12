@@ -1,12 +1,44 @@
 namespace Terminal.Gui.Views;
 
-/// <summary>Masked text editor that validates input through a <see cref="ITextValidateProvider"/></summary>
+/// <summary>Masked text editor that validates input through a <see cref="ITextValidateProvider"/>.</summary>
+/// <remarks>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left</term> <description>Moves the cursor left.</description>
+///         </item>
+///         <item>
+///             <term>Right</term> <description>Moves the cursor right.</description>
+///         </item>
+///         <item>
+///             <term>Home</term> <description>Moves the cursor to the start.</description>
+///         </item>
+///         <item>
+///             <term>End</term> <description>Moves the cursor to the end.</description>
+///         </item>
+///         <item>
+///             <term>Delete</term> <description>Deletes the character at the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Backspace</term> <description>Deletes the character before the cursor.</description>
+///         </item>
+///     </list>
+/// </remarks>
 public class TextValidateField : View, IDesignable, IValue<string>
 {
     private const int DEFAULT_LENGTH = 10;
 
     private ITextValidateProvider? _provider;
     private string _lastKnownText = string.Empty;
+
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="TextValidateField"/>. All standard bindings are
+    ///     inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary is empty by default.
+    /// </summary>
+    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
 
     /// <summary>
     ///     Gets or sets whether value change events are suppressed.
@@ -31,13 +63,8 @@ public class TextValidateField : View, IDesignable, IValue<string>
         AddCommand (Command.Left, () => CursorLeft ());
         AddCommand (Command.Right, () => CursorRight ());
 
-        // Default keybindings for this view
-        KeyBindings.Add (Key.Home, Command.LeftStart);
-        KeyBindings.Add (Key.End, Command.RightEnd);
-        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
-        KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
-        KeyBindings.Add (Key.CursorRight, Command.Right);
+        // Apply layered key bindings (base View layer + TextValidateField-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
     }
 
     /// <inheritdoc/>

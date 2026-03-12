@@ -16,6 +16,44 @@ public delegate Scheme? RowColorGetterDelegate (RowColorGetterArgs args);
 ///     Displays and enables infinite scrolling through tabular data based on a <see cref="ITableSource"/>.
 ///     <a href="../docs/tableview.md">See the TableView Deep Dive for more</a>.
 /// </summary>
+/// <remarks>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Moves one column left or right.</description>
+///         </item>
+///         <item>
+///             <term>Up / Down</term> <description>Moves one row up or down.</description>
+///         </item>
+///         <item>
+///             <term>PageUp / PageDown</term> <description>Moves one page up or down.</description>
+///         </item>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last column.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Home / Ctrl+End</term> <description>Moves to the first or last row.</description>
+///         </item>
+///         <item>
+///             <term>Shift+&lt;movement&gt;</term> <description>Extends the selection in the given direction.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+A</term> <description>Selects all cells.</description>
+///         </item>
+///     </list>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Click</term> <description>Activates the clicked cell (<see cref="Command.Activate"/>).</description>
+///         </item>
+///     </list>
+/// </remarks>
 public partial class TableView : View, IDesignable
 {
     /// <summary>
@@ -24,40 +62,17 @@ public partial class TableView : View, IDesignable
     public const int DEFAULT_MAX_CELL_WIDTH = 100;
 
     /// <summary>
-    ///     Gets or sets the default key bindings for <see cref="TableView"/>. Override via <c>config.json</c>.
+    ///     Gets or sets the default key bindings for <see cref="TableView"/>. All standard navigation and
+    ///     selection-extend bindings are inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary
+    ///     is empty by default.
     /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindings { get; set; } = new ()
-    {
-        { "Left", ["CursorLeft"] },
-        { "Right", ["CursorRight"] },
-        { "Up", ["CursorUp"] },
-        { "Down", ["CursorDown"] },
-        { "PageUp", ["PageUp"] },
-        { "PageDown", ["PageDown"] },
-        { "LeftStart", ["Home"] },
-        { "RightEnd", ["End"] },
-        { "Start", ["Ctrl+Home"] },
-        { "End", ["Ctrl+End"] },
-        { "LeftExtend", ["Shift+CursorLeft"] },
-        { "RightExtend", ["Shift+CursorRight"] },
-        { "UpExtend", ["Shift+CursorUp"] },
-        { "DownExtend", ["Shift+CursorDown"] },
-        { "PageUpExtend", ["Shift+PageUp"] },
-        { "PageDownExtend", ["Shift+PageDown"] },
-        { "LeftStartExtend", ["Shift+Home"] },
-        { "RightEndExtend", ["Shift+End"] },
-        { "StartExtend", ["Ctrl+Shift+Home"] },
-        { "EndExtend", ["Ctrl+Shift+End"] },
-        { "SelectAll", ["Ctrl+A"] }
-    };
-
-    /// <summary>
-    ///     Gets or sets the platform-override key bindings for <see cref="TableView"/> on Unix. Override via
-    ///     <c>config.json</c>.
-    /// </summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Dictionary<string, string []>? DefaultKeyBindingsUnix { get; set; }
+    /// <remarks>
+    ///     <para>
+    ///         The <see cref="CellActivationKey"/> binding (<see cref="Command.Accept"/>) is instance-dependent
+    ///         and is added directly in the constructor.
+    ///     </para>
+    /// </remarks>
+    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
 
     /// <summary>Initializes a <see cref="TableView"/> class.</summary>
     /// <param name="table">The table to display in the control</param>
@@ -73,13 +88,13 @@ public partial class TableView : View, IDesignable
         CollectionNavigator = new TableCollectionNavigator (this);
 
         // Things this view knows how to do
-        AddCommand (Command.Right, ctx => HandleRight (ctx));
+        AddCommand (Command.Right, HandleRight);
 
-        AddCommand (Command.Left, () => { return ChangeSelectionByOffsetWithReturn (-1, 0); });
+        AddCommand (Command.Left, () => ChangeSelectionByOffsetWithReturn (-1, 0));
 
-        AddCommand (Command.Up, ctx => HandleUp (ctx));
+        AddCommand (Command.Up, HandleUp);
 
-        AddCommand (Command.Down, ctx => HandleDown (ctx));
+        AddCommand (Command.Down, HandleDown);
 
         AddCommand (Command.PageUp,
                     () =>
@@ -218,12 +233,14 @@ public partial class TableView : View, IDesignable
                     });
         AddCommand (Command.Accept, () => OnCellActivated (new CellActivatedEventArgs (Table!, SelectedColumn, SelectedRow)));
 
-        AddCommand (Command.Toggle, _ => { return ToggleCurrentCellSelection () is true; });
+        AddCommand (Command.Toggle, _ => ToggleCurrentCellSelection () is true);
 
-        AddCommand (Command.Activate, ctx => { return RaiseActivating (ctx) is true; });
+        AddCommand (Command.Activate, ctx => RaiseActivating (ctx) is true);
 
-        // Default keybindings for this view
-        KeyBindingConfigHelper.Apply (this, DefaultKeyBindings, DefaultKeyBindingsUnix);
+        // Apply configurable key bindings (base View layer + TableView-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
+
+        // CellActivationKey is instance-dependent, so it stays as a direct binding
         KeyBindings.Remove (CellActivationKey);
         KeyBindings.Add (CellActivationKey, Command.Accept);
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
@@ -807,32 +824,29 @@ public partial class TableView : View, IDesignable
     }
 
     // TODO: Update to use Key instead of KeyCode
-    private KeyCode _cellActivationKey = KeyCode.Enter;
-
-    // TODO: Update to use Key instead of KeyCode
     /// <summary>The key which when pressed should trigger <see cref="CellActivated"/> event.  Defaults to Enter.</summary>
     public KeyCode CellActivationKey
     {
-        get => _cellActivationKey;
+        get;
         set
         {
-            if (_cellActivationKey == value)
+            if (field == value)
             {
                 return;
             }
 
-            if (KeyBindings.TryGet (_cellActivationKey, out _))
+            if (KeyBindings.TryGet (field, out _))
             {
-                KeyBindings.Replace (_cellActivationKey, value);
+                KeyBindings.Replace (field, value);
             }
             else
             {
                 KeyBindings.Add (value, Command.Accept);
             }
 
-            _cellActivationKey = value;
+            field = value;
         }
-    }
+    } = KeyCode.Enter;
 
     /// <inheritdoc/>
     protected override bool OnKeyDown (Key key)

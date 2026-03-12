@@ -41,6 +41,13 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class DateEditor : TextValidateField, IValue<DateTime>, IDesignable
 {
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="DateEditor"/>. All standard bindings are
+    ///     inherited from <see cref="TextValidateField.DefaultKeyBindings"/> and <see cref="View.DefaultKeyBindings"/>,
+    ///     so this dictionary is empty by default.
+    /// </summary>
+    public new static Dictionary<string, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
+
     private DateTextProvider DateProvider => (DateTextProvider)Provider!;
 
     private DateTime _value;
@@ -125,7 +132,6 @@ public class DateEditor : TextValidateField, IValue<DateTime>, IDesignable
     /// <inheritdoc/>
     public new event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
-    /// <inheritdoc/>
     object? IValue.GetValue () => Value;
 
     /// <summary>
