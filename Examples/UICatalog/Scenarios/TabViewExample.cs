@@ -1,6 +1,4 @@
 #nullable enable
-using Terminal.Gui.Views;
-
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("TabViews", "Demonstrates the TabView control.")]
@@ -17,22 +15,34 @@ public class TabViewExample : Scenario
         using Window mainWindow = new ();
         mainWindow.Title = GetQuitKeyAndName ();
 
-        // === Left side: Demo TabView ===
+        FrameView configFrame = new ()
+        {
+            Title = "Confi_guration",
+            Y = Pos.AnchorEnd (),
+            Height = Dim.Auto (),
+            Width = Dim.Auto (),
+            SchemeName = "Dialog"
+        };
+
+        EventLog eventLog = new ()
+        {
+            X = Pos.AnchorEnd (),
+            Height = Dim.Fill ()
+        };
+
         FrameView demoFrame = new ()
         {
             Title = "TabView _Demo",
             X = 0,
             Y = 0,
-            Width = Dim.Percent (60),
-            Height = Dim.Fill (10),
+            Width = Dim.Fill (eventLog),
+            Height = Dim.Fill (configFrame)
         };
 
         TabView tabView = new ()
         {
-            X = 0,
-            Y = 0,
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
+            X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (),
+            Arrangement = ViewArrangement.Resizable // Enables resizing the TabView by dragging its edges for testing
         };
 
         // Add some default tabs
@@ -52,53 +62,25 @@ public class TabViewExample : Scenario
         tabView.SelectedTabIndex = 0;
         _tabCounter = 3;
 
+        configFrame.Width = Dim.Width (demoFrame);
+
         demoFrame.Add (tabView);
-        mainWindow.Add (demoFrame);
 
-        // === Right side: Configuration pane ===
-        FrameView configFrame = new ()
-        {
-            Title = "Confi_guration",
-            X = Pos.Right (demoFrame),
-            Y = 0,
-            Width = Dim.Fill (),
-            Height = Dim.Fill (10),
-            SchemeName = "Dialog",
-        };
-
-        int configY = 0;
+        var configY = 0;
 
         // TabsOnBottom checkbox
-        CheckBox tabsOnBottomCb = new ()
-        {
-            Text = "Tabs On _Bottom",
-            X = 0,
-            Y = configY++,
-        };
+        CheckBox tabsOnBottomCb = new () { Text = "Tabs On _Bottom", X = 0, Y = configY++ };
 
-        tabsOnBottomCb.ValueChanged += (_, args) =>
-                                       {
-                                           tabView.TabsOnBottom = args.NewValue == CheckState.Checked;
-                                       };
+        tabsOnBottomCb.ValueChanged += (_, args) => { tabView.TabsOnBottom = args.NewValue == CheckState.Checked; };
 
         configFrame.Add (tabsOnBottomCb);
 
         configY++;
 
         // MaxTabTextWidth
-        Label maxWidthLabel = new ()
-        {
-            Text = "MaxTabTextWidth:",
-            X = 0,
-            Y = configY,
-        };
+        Label maxWidthLabel = new () { Text = "MaxTabTextWidth:", X = 0, Y = configY };
 
-        NumericUpDown maxWidthUpDown = new ()
-        {
-            X = Pos.Right (maxWidthLabel) + 1,
-            Y = configY,
-            Value = (int)tabView.MaxTabTextWidth,
-        };
+        NumericUpDown maxWidthUpDown = new () { X = Pos.Right (maxWidthLabel) + 1, Y = configY, Value = (int)tabView.MaxTabTextWidth };
 
         maxWidthUpDown.ValueChanging += (_, args) =>
                                         {
@@ -108,21 +90,13 @@ public class TabViewExample : Scenario
                                             }
                                         };
 
-        maxWidthUpDown.ValueChanged += (_, args) =>
-                                       {
-                                           tabView.MaxTabTextWidth = (uint)args.NewValue;
-                                       };
+        maxWidthUpDown.ValueChanged += (_, args) => { tabView.MaxTabTextWidth = (uint)args.NewValue; };
 
         configFrame.Add (maxWidthLabel, maxWidthUpDown);
         configY += 2;
 
         // Add Tab button
-        Button addTabBtn = new ()
-        {
-            Text = "_Add Tab",
-            X = 0,
-            Y = configY,
-        };
+        Button addTabBtn = new () { Text = "_Add Tab", X = 0, Y = configY };
 
         addTabBtn.Accepting += (_, _) =>
                                {
@@ -135,18 +109,13 @@ public class TabViewExample : Scenario
         configFrame.Add (addTabBtn);
 
         // Remove Tab button
-        Button removeTabBtn = new ()
-        {
-            Text = "_Remove Tab",
-            X = Pos.Right (addTabBtn) + 1,
-            Y = configY,
-        };
+        Button removeTabBtn = new () { Text = "_Remove Tab", X = Pos.Right (addTabBtn) + 1, Y = configY };
 
         removeTabBtn.Accepting += (_, _) =>
                                   {
                                       Tab? selected = tabView.SelectedTab;
 
-                                      if (selected is not null)
+                                      if (selected is { })
                                       {
                                           tabView.Remove (selected);
                                           selected.Dispose ();
@@ -157,36 +126,17 @@ public class TabViewExample : Scenario
         configY += 2;
 
         // SelectedTabIndex
-        Label selectedLabel = new ()
-        {
-            Text = "SelectedTabIndex:",
-            X = 0,
-            Y = configY,
-        };
+        Label selectedLabel = new () { Text = "SelectedTabIndex:", X = 0, Y = configY };
 
-        Label selectedValueLabel = new ()
-        {
-            Text = tabView.SelectedTabIndex?.ToString () ?? "null",
-            X = Pos.Right (selectedLabel) + 1,
-            Y = configY,
-            Width = 6,
-        };
+        Label selectedValueLabel = new () { Text = tabView.SelectedTabIndex?.ToString () ?? "null", X = Pos.Right (selectedLabel) + 1, Y = configY, Width = 6 };
 
-        tabView.SelectedTabChanged += (_, args) =>
-                                      {
-                                          selectedValueLabel.Text = tabView.SelectedTabIndex?.ToString () ?? "null";
-                                      };
+        tabView.SelectedTabChanged += (_, args) => { selectedValueLabel.Text = tabView.SelectedTabIndex?.ToString () ?? "null"; };
 
         configFrame.Add (selectedLabel, selectedValueLabel);
         configY += 2;
 
         // Select Previous / Next buttons
-        Button prevBtn = new ()
-        {
-            Text = "_Prev",
-            X = 0,
-            Y = configY,
-        };
+        Button prevBtn = new () { Text = "_Prev", X = 0, Y = configY };
 
         prevBtn.Accepting += (_, _) =>
                              {
@@ -196,12 +146,7 @@ public class TabViewExample : Scenario
                                  }
                              };
 
-        Button nextBtn = new ()
-        {
-            Text = "_Next",
-            X = Pos.Right (prevBtn) + 1,
-            Y = configY,
-        };
+        Button nextBtn = new () { Text = "_Next", X = Pos.Right (prevBtn) + 1, Y = configY };
 
         nextBtn.Accepting += (_, _) =>
                              {
@@ -221,25 +166,16 @@ public class TabViewExample : Scenario
             Y = configY,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            AutoSelectViewToEdit = false,
+            AutoSelectViewToEdit = false
         };
 
         adornmentsEditor.ViewToEdit = tabView;
         configFrame.Add (adornmentsEditor);
 
-        mainWindow.Add (configFrame);
 
-        // === Bottom: Event Log ===
-        EventLog eventLog = new ()
-        {
-            X = 0,
-            Y = Pos.AnchorEnd (),
-            Width = Dim.Fill (),
-            Height = 10,
-            ViewToLog = tabView,
-        };
+        eventLog.ViewToLog = tabView;
 
-        mainWindow.Add (eventLog);
+        mainWindow.Add (demoFrame, configFrame, eventLog);
 
         app.Run (mainWindow);
     }

@@ -17,7 +17,7 @@ internal class TabRow : View
         X = -1;
         Width = Dim.Fill (-1);
         Height = 3;
-        SuperViewRendersLineCanvas = true;
+        base.SuperViewRendersLineCanvas = true;
     }
 
     /// <summary>Gets the owning TabView by navigating: TabRow -> Padding (SuperView) -> TabView (Parent).</summary>
@@ -162,7 +162,7 @@ internal class TabRow : View
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
         TabView? tabView = TabView;
@@ -198,11 +198,7 @@ internal class TabRow : View
         {
             // The horizontal continuation line auto-joins with the Border's segmented right line
             // at the endpoint to produce the corner junction (e.g., ╮ for tabs on top).
-            LineCanvas.AddLine (
-                                screenStart,
-                                lineLength,
-                                Orientation.Horizontal,
-                                tabView.BorderStyle);
+            LineCanvas.AddLine (screenStart, lineLength, Orientation.Horizontal, tabView.BorderStyle);
         }
 
         return base.OnDrawingContent (context);

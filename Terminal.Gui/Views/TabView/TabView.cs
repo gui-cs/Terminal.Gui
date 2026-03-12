@@ -24,8 +24,9 @@ public class TabView : View, IDesignable
     public TabView ()
     {
         TabStop = TabBehavior.TabGroup;
-        SuperViewRendersLineCanvas = true;
+        base.SuperViewRendersLineCanvas = true;
         BorderStyle = LineStyle.Rounded;
+        CanFocus = true;
 
         // No top border — the tab headers form the top of the view
         Border!.Thickness = new Thickness (1, 0, 1, 1);
@@ -41,10 +42,10 @@ public class TabView : View, IDesignable
         SubViewsLaidOut += (_, _) => _tabRow.UpdateBorderGaps ();
 
         // Register commands
-        AddCommand (Command.Left, () => SelectPreviousTab ());
-        AddCommand (Command.Right, () => SelectNextTab ());
-        AddCommand (Command.LeftStart, () => SelectFirstTab ());
-        AddCommand (Command.RightEnd, () => SelectLastTab ());
+        AddCommand (Command.Left, SelectPreviousTab);
+        AddCommand (Command.Right, SelectNextTab);
+        AddCommand (Command.LeftStart, SelectFirstTab);
+        AddCommand (Command.RightEnd, SelectLastTab);
 
         // Bind keys
         KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.Left);

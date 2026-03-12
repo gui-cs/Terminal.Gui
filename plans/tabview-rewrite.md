@@ -693,16 +693,79 @@ All in `Tests/UnitTestsParallelizable/Views/TabViewTests.cs`:
 | Phase 1: Border.Gaps Enhancement | ✅ Done |
 | Phase 2: Core TabView + Tab + TabRow | ✅ Done |
 | Phase 3: TabViews Scenario | ✅ Done |
-| Phase 4: Navigation and Commands | ✅ Done (basic Ctrl+Left/Right/Home/End) |
-| Phase 5: Visual Polish | ✅ Done (tabs on top rendering, segmented border lines, continuation line) |
+| Phase 4: Navigation and Commands | ⚠️ Partial — basic Ctrl+Left/Right/Home/End works. Tab hotkeys and Tab-key focus navigation do NOT work. |
+| Phase 5: Visual Polish | ⚠️ Partial — tabs-on-top rendering works. **TabsOnBottom is broken** (see fix plan below). Tab scrolling not implemented. |
 | Phase 6: Events and API Completeness | ✅ Done |
-| Phase 7: Tests | ✅ Done (59 tests passing) |
+| Phase 7: Tests | ⚠️ Partial — 59 tests pass, but visual test coverage is thin. No visual tests for TabsOnBottom (existing one has wrong expected output), no scroll tests, no bottom+selection-switch tests. |
 
-## Known Issues (To Fix Later)
+## Known Issues (To Fix)
 
-1. **Tab scrolling does not work** — When there are too many tabs to fit in the available width, there is no scroll mechanism. The tabs just overflow. Need to implement scroll offset logic in TabRow with left/right scroll indicators (using `Glyphs.LeftArrow` / `Glyphs.RightArrow`).
+### Issue 1: TabsOnBottom rendering broken — FIX PLAN
 
-2. **TabsOnBottom rendering is broken** — When `TabsOnBottom = true`, the selected tab's title text renders too high (mispositioned vertically). The border/gap logic for bottom tabs needs debugging.
+**Root cause:** In `TabRow.UpdateHeaderAppearance()`, the selected header when TabsOnBottom gets `Border.Thickness = new Thickness(1, 0, 1, 1)` (no top border). With `Thickness.Top=0`, the View content area starts at Y=0 of the header, but Y=0 is also where the continuation line draws. Text and continuation line collide on the same row.
+
+**Fix:** Add `Padding.Top=1` on the selected header when TabsOnBottom to push text from Y=0 to Y=1:
+
+```csharp
+// In TabRow.UpdateHeaderAppearance(), replace selected/unselected block:
+if (i == selectedIndex)
+{
+    header.Border!.Thickness = tabsOnBottom ? new Thickness (1, 0, 1, 1) : new Thickness (1, 1, 1, 0);
+    header.Padding!.Thickness = tabsOnBottom ? new Thickness (0, 1, 0, 0) : new Thickness (0);
+}
+else
+{
+    header.Border!.Thickness = new Thickness (1);
+    header.Padding!.Thickness = new Thickness (0);
+}
+```
+
+**Why it works:** Header Height=3 is fixed. With `Border.Top=0` + `Padding.Top=1`, text renders at Y=1 (same row as full-bordered headers). Border still draws correctly — no top line, verticals extend through. No changes needed to `UpdateBorderGaps()` or `OnDrawingContent()`.
+
+**Visual tests to add/fix (~13 new tests):**
+
+Tabs on Top (new):
+- `Renders_ThreeTabs_FirstSelected` — 25x6, AA/BB/CC, index 0
+- `Renders_ThreeTabs_LastSelected` — 25x6, AA/BB/CC, index 2
+
+Tabs on Bottom (fix + new):
+- `Renders_TabsOnBottom` — FIX existing test's expected output
+- `Renders_TabsOnBottom_SecondSelected` — 20x7, T1/T2, index 1
+- `Renders_TabsOnBottom_ThreeTabs_FirstSelected` — 25x8, index 0
+- `Renders_TabsOnBottom_ThreeTabs_MiddleSelected` — 25x8, index 1
+- `Renders_TabsOnBottom_ThreeTabs_LastSelected` — 25x8, index 2
+- `Renders_TabsOnBottom_SingleTab` — 15x8, index 0
+
+State transitions:
+- `Renders_SwitchTab_TabsOnBottom_UpdatesVisual` — switch 0→1
+- `Renders_ToggleTabsOnBottom_ChangesRendering` — flip at runtime
+
+Padding assertions:
+- `Render_SelectedTab_TabsOnBottom_HasPaddingOffset` — Padding.Top=1 for selected
+- `Render_SwitchingSelection_TabsOnBottom_UpdatesPadding` — padding resets on switch
+
+Edge cases:
+- `Renders_NoTabs` — empty TabView
+
+### Issue 2: Tab scrolling not implemented
+
+When there are too many tabs to fit in the available width, there is no scroll mechanism. The tabs just overflow. Need to implement scroll offset logic in TabRow with left/right scroll indicators (using `Glyphs.LeftArrow` / `Glyphs.RightArrow`).
+
+### Issue 3: TabsOnBottom property type
+
+`TabsOnBottom` property should be of type `Side` enum (Top/Bottom) instead of bool for better extensibility and clarity. We may add Left & Right later.
+
+### Issue 4: Tab Hotkeys do not work
+
+E.g. in the TabViewsExample scenario hitting Alt-h should activate the tab Titled "Tab T_hree", but it does not. Tests need to be written for this that fail, then the issue fixed.
+
+### Issue 5: Tab-key focus navigation broken
+
+When the Tab key is pressed, the focus should move to the next focusable element within the selected tab's content; if there's no next, it should nav to the tabrow. The TabView should be a TabGroup. This is not working currently. Tests need to be written for this that fail, then the issue fixed.
+
+### Issue 6: Resizable arrangement broken for top
+
+If `Arrangement = ViewArrangement.Resizable` is set on TabView, everything renders right, but Arranger is not enabling resizing the top. This is probably because we make the thickness of the TabView border top 0. Tests need to be written for this that fail, then the issue fixed.
 
 ## Open Questions
 
