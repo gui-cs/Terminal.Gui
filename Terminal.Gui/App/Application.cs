@@ -20,7 +20,7 @@ global using Terminal.Gui.FileServices;
 using System.Globalization;
 using System.Reflection;
 using System.Resources;
-using System.Runtime.CompilerServices;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.App;
 
@@ -152,17 +152,17 @@ public static partial class Application
     /// <summary>
     ///     Raises the <see cref="InstanceCreated"/> event on the current thread.
     /// </summary>
-    internal static void RaiseInstanceCreated (IApplication app) => _instanceCreated.Value?.Invoke (null, new (app));
+    internal static void RaiseInstanceCreated (IApplication app) => _instanceCreated.Value?.Invoke (null, new EventArgs<IApplication> (app));
 
     /// <summary>
     ///     Raises the <see cref="InstanceInitialized"/> event on the current thread.
     /// </summary>
-    internal static void RaiseInstanceInitialized (IApplication app) => _instanceInitialized.Value?.Invoke (null, new (app));
+    internal static void RaiseInstanceInitialized (IApplication app) => _instanceInitialized.Value?.Invoke (null, new EventArgs<IApplication> (app));
 
     /// <summary>
     ///     Raises the <see cref="InstanceDisposed"/> event on the current thread.
     /// </summary>
-    internal static void RaiseInstanceDisposed (IApplication app) => _instanceDisposed.Value?.Invoke (null, new (app));
+    internal static void RaiseInstanceDisposed (IApplication app) => _instanceDisposed.Value?.Invoke (null, new EventArgs<IApplication> (app));
 
     #endregion Modern Instance-Based Model Events (Thread-Local)
 
@@ -233,7 +233,7 @@ public static partial class Application
         {
             string oldValue = field;
             field = value;
-            ForceDriverChanged?.Invoke (null, new (oldValue, field));
+            ForceDriverChanged?.Invoke (null, new ValueChangedEventArgs<string> (oldValue, field));
         }
     } = string.Empty;
 
@@ -253,7 +253,7 @@ public static partial class Application
         set
         {
             field = value;
-            Tracing.Trace.Configuration ($"DefaultKeyBindings", "App Set", $"{string.Join (", ", value?.Select (kvp => $"{kvp.Key}=[{kvp.Value}]") ?? [])}");
+            Trace.Configuration ("DefaultKeyBindings", "App Set", $"{string.Join (", ", value?.Select (kvp => $"{kvp.Key}=[{kvp.Value}]") ?? [])}");
             DefaultKeyBindingsChanged?.Invoke (null, EventArgs.Empty);
         }
     } = new ()
@@ -265,7 +265,7 @@ public static partial class Application
         [Command.PreviousTabStop] = Bind.All (Key.Tab.WithShift),
         [Command.NextTabGroup] = Bind.All (Key.F6),
         [Command.PreviousTabGroup] = Bind.All (Key.F6.WithShift),
-        [Command.Refresh] = Bind.All (Key.F5),
+        [Command.Refresh] = Bind.All (Key.F5)
     };
 
     /// <summary>

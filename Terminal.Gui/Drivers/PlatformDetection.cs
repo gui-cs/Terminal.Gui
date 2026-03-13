@@ -44,15 +44,6 @@ public static class PlatformDetection
         || RuntimeInformation.IsOSPlatform (OSPlatform.OSX)
         || RuntimeInformation.IsOSPlatform (OSPlatform.FreeBSD);
 
-    /// <summary>Returns the platform name used for key binding resolution: "windows", "linux", or "macos".</summary>
-    [Obsolete ("Use GetCurrentPlatform() instead.")]
-    public static string GetCurrentPlatformName () =>
-        GetCurrentPlatform () switch
-        {
-            TuiPlatform.Windows => "windows",
-            TuiPlatform.Macos => "macos",
-            _ => "linux"
-        };
 
     /// <summary>Returns the <see cref="TuiPlatform"/> for the current operating system.</summary>
     public static TuiPlatform GetCurrentPlatform ()

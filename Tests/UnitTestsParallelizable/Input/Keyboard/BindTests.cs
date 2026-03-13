@@ -100,17 +100,6 @@ public class BindTests
     }
 
     [Fact]
-    public void GetCurrentPlatformName_ReturnsValidName ()
-    {
-#pragma warning disable CS0618 // Obsolete
-        string name = PlatformDetection.GetCurrentPlatformName ();
-#pragma warning restore CS0618
-        string [] validNames = ["windows", "linux", "macos"];
-
-        Assert.Contains (name, validNames);
-    }
-
-    [Fact]
     public void GetCurrentPlatform_ReturnsValidPlatform ()
     {
         TuiPlatform platform = PlatformDetection.GetCurrentPlatform ();

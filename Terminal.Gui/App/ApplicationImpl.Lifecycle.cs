@@ -64,11 +64,6 @@ internal partial class ApplicationImpl
             _driverName = ForceDriver;
         }
 
-        // Preserve existing keyboard settings if they exist
-        // BUGBUG: These should not be needed; ApplicationKeyboard subscribes to Application static property changes
-        // BUGBUG: and should set these automatically.
-        bool hasExistingKeyboard = _keyboard is { };
-
         // Reset keyboard to ensure fresh state with default bindings
         _keyboard = new ApplicationKeyboard { App = this };
 
