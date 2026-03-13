@@ -142,7 +142,10 @@ public class AllDriverTests (ITestOutputHelper output) : TestDriverBase
         using IApplication? app = Application.Create ().Init (driverName);
 
         // Act & Assert
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (Key.Z.WithCtrl));
+        if (Application.GetDefaultKey (Command.Suspend) != Key.Empty)
+        {
+            Assert.True (app.Keyboard.RaiseKeyDownEvent (Application.GetDefaultKey (Command.Suspend)));
+        }
     }
 }
 

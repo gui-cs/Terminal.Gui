@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Terminal.Gui.Tests;
+using UnitTests.Parallelizable;
 
 namespace ApplicationTests;
 

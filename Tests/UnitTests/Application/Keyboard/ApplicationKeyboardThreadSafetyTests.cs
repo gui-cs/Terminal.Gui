@@ -1,6 +1,6 @@
 // ReSharper disable AccessToDisposedClosure
 
-namespace ApplicationTests.Keyboard;
+namespace UnitTests.ApplicationTests.Keyboard;
 
 /// <summary>
 ///     Tests to verify that ApplicationKeyboard is thread-safe for concurrent access scenarios.

@@ -1,25 +1,20 @@
 // Claude - Opus 4.5
 
-using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
+using UnitTests.Parallelizable;
+
 #pragma warning disable xUnit1031
 
-namespace ApplicationTests;
+namespace UnitTests.TracingTests;
 
 /// <summary>
 ///     Tests for thread-safe tracing behavior.
 ///     These tests verify that tracing is properly isolated per-thread and per-async-context.
 ///     All tests work correctly in both Debug and Release builds.
+///     IMPORTANT: These tests set static state on the Trace class, so they must be run in isolation (not parallelized) to avoid interference between tests.
 /// </summary>
-public class ThreadSafeTraceTests
+public class ThreadSafeTraceTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public ThreadSafeTraceTests (ITestOutputHelper output)
-    {
-        _output = output;
-    }
-
     [Fact]
     public void EnabledCategories_Default_IsNone ()
     {
@@ -176,7 +171,7 @@ public class ThreadSafeTraceTests
     {
         try
         {
-            using (TestLogging.Verbose (_output, TraceCategory.Command))
+            using (TestLogging.Verbose (output, TraceCategory.Command))
             {
                 Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Command));
                 Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
