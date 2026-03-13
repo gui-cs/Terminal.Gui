@@ -3,7 +3,7 @@ namespace Terminal.Gui;
 /// <summary>
 ///     Provides ergonomic factory methods for creating <see cref="PlatformKeyBinding"/> instances.
 /// </summary>
-internal static class Bind
+public static class Bind
 {
     /// <summary>Creates a binding where all platforms get these keys.</summary>
     public static PlatformKeyBinding All (params Key [] keys) => new () { All = keys };

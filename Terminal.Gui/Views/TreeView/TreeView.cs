@@ -156,7 +156,7 @@ public class TreeView<T> : View, ITreeView where T : class
         [Command.LineUpToFirstBranch] = Bind.All (Key.CursorUp.WithCtrl),
         [Command.LineDownToLastBranch] = Bind.All (Key.CursorDown.WithCtrl),
 
-        // TreeView uses Home/End (not Ctrl+Home/Ctrl+End like the base layer)
+        // TreeView adds Home/End as additional Start/End bindings (the base layer also provides Ctrl+Home/Ctrl+End)
         [Command.Start] = Bind.All (Key.Home),
         [Command.End] = Bind.All (Key.End)
     };

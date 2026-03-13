@@ -363,7 +363,7 @@ public static class Trace
             return;
         }
 
-        Backend.Log (new TraceEntry (TraceCategory.Keyboard, binding.GetCurrentPlatformKeys ().ToString(), phase, method, message, DateTime.UtcNow, binding));
+        Backend.Log (new TraceEntry (TraceCategory.Keyboard, string.Join (", ", binding.GetCurrentPlatformKeys ()), phase, method, message, DateTime.UtcNow, binding));
     }
 
     #endregion

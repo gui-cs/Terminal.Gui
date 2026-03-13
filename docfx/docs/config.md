@@ -199,10 +199,10 @@ graph TD
 **Environment Variable** (`TUI_CONFIG`):
 ```bash
 # Linux/macOS
-export TUI_CONFIG='{"Application.DefaultKeyBindings.Quit": "Ctrl+Q"}'
+export TUI_CONFIG='{"Application.DefaultKeyBindings": {"Quit": {"All": ["Ctrl+Q"]}}}'
 
 # Windows PowerShell
-$env:TUI_CONFIG='{"Application.DefaultKeyBindings.Quit": "Ctrl+Q"}'
+$env:TUI_CONFIG='{"Application.DefaultKeyBindings": {"Quit": {"All": ["Ctrl+Q"]}}}'
 ```
 
 ---

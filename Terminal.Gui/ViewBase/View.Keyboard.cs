@@ -731,7 +731,14 @@ public partial class View // Keyboard APIs
         }
 
         // Apply user overrides from View.ViewKeyBindings (CM/MEC bridge)
+        // Strip generic arity suffix (e.g., "TreeView`1" → "TreeView") so config keys match
         string typeName = GetType ().Name;
+        int backtick = typeName.IndexOf ('`');
+
+        if (backtick >= 0)
+        {
+            typeName = typeName [..backtick];
+        }
 
         if (ViewKeyBindings?.TryGetValue (typeName, out Dictionary<Command, PlatformKeyBinding>? overrides) == true)
         {

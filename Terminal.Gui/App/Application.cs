@@ -268,7 +268,14 @@ public static partial class Application
         [Command.Refresh] = Bind.All (Key.F5),
     };
 
-    /// <summary>Raised when <see cref="DefaultKeyBindings"/> is replaced.</summary>
+    /// <summary>
+    ///     Raised when the <see cref="DefaultKeyBindings"/> property is replaced (i.e., a new dictionary is assigned).
+    ///     <para>
+    ///         <b>Note:</b> This event does <b>not</b> fire when individual entries are mutated
+    ///         (e.g., <c>DefaultKeyBindings [Command.Quit] = ...</c>). To ensure the event fires, assign a
+    ///         new dictionary or call the property setter.
+    ///     </para>
+    /// </summary>
     public static event EventHandler? DefaultKeyBindingsChanged;
 
     /// <summary>

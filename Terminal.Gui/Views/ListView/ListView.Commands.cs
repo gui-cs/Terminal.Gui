@@ -23,7 +23,7 @@ public partial class ListView
         [Command.Down] = Bind.All (Key.N.WithCtrl),
         [Command.PageDown] = Bind.All (Key.V.WithCtrl),
 
-        // ListView uses Home/End (not Ctrl+Home/Ctrl+End like the base layer)
+        // ListView adds Home/End as additional Start/End bindings (the base layer also provides Ctrl+Home/Ctrl+End)
         [Command.Start] = Bind.All (Key.Home),
         [Command.End] = Bind.All (Key.End),
 
@@ -63,7 +63,7 @@ public partial class ListView
         AddCommand (Command.SelectAll, HandleSelectAll);
 
         // Apply configurable key bindings (base layer + ListView-specific layer)
-        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
+        ApplyKeyBindings (DefaultKeyBindings, View.DefaultKeyBindings);
 
         // Multi-command binding: activate then move down (can't be expressed in single-command dict)
         KeyBindings.Add (Key.Space.WithShift, Command.Activate, Command.Down);

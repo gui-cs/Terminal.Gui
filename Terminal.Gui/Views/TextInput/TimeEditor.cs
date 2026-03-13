@@ -81,6 +81,9 @@ public class TimeEditor : TextValidateField, IValue<TimeSpan>, IDesignable
         // Add one so there is always a blank cell after the last editable character for the cursor.
         Width = Dim.Auto (minimumContentDim: Provider!.DisplayText.Length + 1);
         _value = TimeProvider.TimeValue;
+
+        // Apply TimeEditor-specific bindings (empty by default; enables user overrides via DefaultKeyBindings)
+        ApplyKeyBindings (DefaultKeyBindings);
     }
 
     /// <summary>
