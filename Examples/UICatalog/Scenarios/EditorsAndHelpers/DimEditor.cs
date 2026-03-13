@@ -25,6 +25,8 @@ public class DimEditor : EditorBase
         {
             ViewToEdit.SubViewsLaidOut += (_, _) => { OnUpdateLayoutSettings (); };
         }
+
+        base.OnViewToEditChanged ();
     }
 
     protected override void OnUpdateLayoutSettings ()

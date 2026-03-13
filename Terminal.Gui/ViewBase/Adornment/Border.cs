@@ -70,6 +70,7 @@ public partial class Border : Adornment
         TabStop = TabBehavior.TabGroup;
         ThicknessChanged += OnThicknessChanged;
         Settings = BorderSettings.Title;
+        base.SuperViewRendersLineCanvas = true;
     }
 
     // TODO: Move DrawIndicator out of Border and into View
@@ -78,6 +79,70 @@ public partial class Border : Adornment
         if (IsInitialized)
         {
             ShowHideDrawIndicator ();
+        }
+    }
+    
+    /// <summary>
+    ///     INTERNAL API - Draws the transparent margins for the specified views. This is called from
+    ///     <see cref="View.Draw(DrawContext)"/> on each
+    ///     iteration of the main loop after all Views have been drawn.
+    /// </summary>
+    /// <remarks>
+    ///     Non-transparent margins are drawn as-normal in <see cref="View.DrawAdornments"/>.
+    /// </remarks>
+    /// <param name="views"></param>
+    /// <returns>
+    ///     <see langword="true"/>
+    /// </returns>
+    internal static bool DrawBorders (IEnumerable<View> views)
+    {
+        Stack<View> stack = new (views);
+
+        while (stack.Count > 0)
+        {
+            View view = stack.Pop ();
+
+            if (view.Border is { } border
+                && border.Thickness != Thickness.Empty
+                && border.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)
+                && border.GetCachedClip () != null)
+            {
+                border.SetNeedsDraw ();
+                Region? saved = view.GetClip ();
+                view.SetClip (border.GetCachedClip ());
+                border.Draw ();
+                view.SetClip (saved);
+                border.ClearCachedClip ();
+            }
+
+            // Do not include Margin views of subviews; not supported
+            foreach (View subview in view.GetSubViews (false, includePadding: true, includeBorder: true)
+                                         .OrderBy (v => v.ShadowStyle != ShadowStyle.None)
+                                         .Reverse ())
+            {
+                stack.Push (subview);
+            }
+        }
+
+        return true;
+    }
+
+    protected override bool OnRenderingLineCanvas () => false;
+
+
+    // When the Parent is drawn, we cache the clip region so we can draw the Margin after all other Views
+    private Region? _cachedClip;
+
+    internal Region? GetCachedClip () => _cachedClip;
+
+    internal void ClearCachedClip () { _cachedClip = null; }
+
+    internal void CacheClip ()
+    {
+        if (Thickness != Thickness.Empty)
+        {
+            // PERFORMANCE: How expensive are these clones?
+            _cachedClip = GetClip ()?.Clone ();
         }
     }
 
@@ -327,7 +392,7 @@ public partial class Border : Adornment
         {
             return true;
         }
-        LineCanvas? lc = Parent?.LineCanvas;
+        LineCanvas? lc = LineCanvas;
 
         bool drawTop = Thickness.Top > 0 && Frame is { Width: > 1, Height: >= 1 };
         bool drawLeft = Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0);

@@ -74,7 +74,11 @@ public class AdornmentEditor : EditorBase
     public void OnAdornmentChanged () { AdornmentChanged?.Invoke (this, EventArgs.Empty); }
 
     /// <inheritdoc/>
-    protected override void OnViewToEditChanged () { AdornmentToEdit = ViewToEdit as Adornment; }
+    protected override void OnViewToEditChanged ()
+    {
+        base.OnViewToEditChanged ();
+        AdornmentToEdit = ViewToEdit as Adornment;
+    }
 
     private NumericUpDown<int>? _topEdit;
     private NumericUpDown<int>? _leftEdit;

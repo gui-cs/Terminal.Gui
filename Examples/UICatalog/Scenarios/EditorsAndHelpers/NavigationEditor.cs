@@ -28,6 +28,8 @@ public sealed class NavigationEditor : EditorBase
         }
 
         _tabBehaviorSelector.ValueChanged += TabStopOnValueChanged;
+
+        base.OnViewToEditChanged ();
     }
 
     private void TabStopOnValueChanged (object? sender, EventArgs<TabBehavior?> e)

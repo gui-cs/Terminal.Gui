@@ -18,14 +18,16 @@ public sealed class ViewportSettingsEditor : EditorBase
 
     protected override void OnViewToEditChanged ()
     {
+        base.OnViewToEditChanged ();
+
         foreach (View subview in SubViews)
         {
-            subview.Enabled = ViewToEdit is { } and not Adornment;
+            subview.Enabled = ViewToEdit is { };// and not Adornment;
         }
 
         if (ViewToEdit is null or Adornment)
         {
-            return;
+           // return;
         }
 
         _cbAllowNegativeX?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeX) ? CheckState.Checked : CheckState.UnChecked;
@@ -69,7 +71,7 @@ public sealed class ViewportSettingsEditor : EditorBase
     {
         base.OnUpdateLayoutSettings ();
 
-        Enabled = ViewToEdit is not Adornment;
+        //Enabled = ViewToEdit is not Adornment;
 
         if (ViewToEdit is null)
         {
@@ -335,6 +337,10 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         void VerticalScrollBarChanged (object? sender, EventArgs<ScrollBarVisibilityMode?> rea)
         {
+            if (ViewToEdit is null or Adornment)
+            {
+                return;
+            }
             if (rea.Value == ScrollBarVisibilityMode.Auto)
             {
                 ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
@@ -360,6 +366,10 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         void HorizontalScrollBarChanged (object? sender, EventArgs<ScrollBarVisibilityMode?> rea)
         {
+            if (ViewToEdit is null or Adornment)
+            {
+                 return;
+            }
             if (rea.Value == ScrollBarVisibilityMode.Auto)
             {
                 ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
