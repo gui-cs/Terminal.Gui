@@ -1,4 +1,3 @@
-
 /// <summary>
 ///     Represents the status of a line during text editing operations in a <see cref="TextView"/>.
 /// </summary>
@@ -8,8 +7,8 @@
 ///     and maintaining the state of text modifications. Each value describes a specific type of change or state for a
 ///     line.
 /// </remarks>
+
 // ReSharper disable once CheckNamespace
-#nullable disable
 public enum TextEditingLineStatus
 {
     /// <summary>

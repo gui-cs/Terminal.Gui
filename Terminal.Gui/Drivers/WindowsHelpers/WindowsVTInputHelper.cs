@@ -48,6 +48,9 @@ internal sealed class WindowsVTInputHelper : IDisposable
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern bool ReadFile (nint hFile, byte [] lpBuffer, uint nNumberOfBytesToRead, out uint lpNumberOfBytesRead, nint lpOverlapped);
 
+    [DllImport ("kernel32.dll")]
+    private static extern uint GetConsoleCP ();
+
     #endregion
 
     // Console mode flags
@@ -72,6 +75,21 @@ internal sealed class WindowsVTInputHelper : IDisposable
     ///     Gets the Windows console input handle.
     /// </summary>
     public nint InputHandle { get; private set; }
+
+    /// <summary>
+    ///     Gets the encoding for the console's input code page.
+    ///     On Windows, <c>ReadFile</c> returns bytes in the console's input code page (e.g., Windows-1252),
+    ///     not UTF-8. This encoding must be used to correctly decode those bytes.
+    /// </summary>
+    public Encoding ConsoleInputEncoding
+    {
+        get
+        {
+            uint codePage = GetConsoleCP ();
+
+            return Encoding.GetEncoding ((int)codePage);
+        }
+    }
 
     /// <summary>
     ///     Attempts to enable Windows Virtual Terminal Input mode.

@@ -264,6 +264,28 @@ public static class Trace
 
     #endregion
 
+    #region Configuration Tracing
+
+    /// <summary>
+    ///     Traces a configuration management operation.
+    /// </summary>
+    /// <param name="id">An identifying string for the trace (e.g., property name, source path).</param>
+    /// <param name="phase">The phase of the operation (e.g., "Load", "Apply", "Discover").</param>
+    /// <param name="message">Optional additional context.</param>
+    /// <param name="method">Automatically captured caller method name.</param>
+    [Conditional ("DEBUG")]
+    public static void Configuration (string? id, string phase, string? message = null, [CallerMemberName] string method = "")
+    {
+        if (!EnabledCategories.HasFlag (TraceCategory.Configuration))
+        {
+            return;
+        }
+
+        Backend.Log (new TraceEntry (TraceCategory.Configuration, id ?? string.Empty, phase, method, message, DateTime.UtcNow, null));
+    }
+
+    #endregion
+
     #region Keyboard Tracing
 
     /// <summary>

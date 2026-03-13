@@ -47,6 +47,23 @@ namespace Terminal.Gui.Views;
 ///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/menus.html">Menus Deep Dive</see> for the
 ///         full menu system architecture, class hierarchy, command routing, and usage examples.
 ///     </para>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>F9 (configurable via <see cref="DefaultKey"/>)</term>
+///             <description>Activates/deactivates the menu bar.</description>
+///         </item>
+///         <item>
+///             <term>Left / Right</term> <description>Moves between menu bar items.</description>
+///         </item>
+///         <item>
+///             <term>Escape, <see cref="Application.QuitKey"/></term>
+///             <description>Closes any open popover and deactivates the menu bar.</description>
+///         </item>
+///     </list>
 /// </remarks>
 public class MenuBar : Menu, IDesignable
 {

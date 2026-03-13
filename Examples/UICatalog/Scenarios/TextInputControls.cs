@@ -13,8 +13,8 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("DateTime")]
 public class TextInputControls : Scenario
 {
-    private Label? _labelMirroringTimeField;
-    private TimeField? _timeField;
+    private Label? _labelMirroringTimeEditor;
+    private TimeEditor? _timeEditor;
 
     public override void Main ()
     {
@@ -115,10 +115,7 @@ public class TextInputControls : Scenario
 
         CheckBox chxReadOnly = new ()
         {
-            X = Pos.Left (textView),
-            Y = Pos.Bottom (textView),
-            Value = textView.ReadOnly ? CheckState.Checked : CheckState.UnChecked,
-            Text = "Read_Only"
+            X = Pos.Left (textView), Y = Pos.Bottom (textView), Value = textView.ReadOnly ? CheckState.Checked : CheckState.UnChecked, Text = "Read_Only"
         };
         chxReadOnly.ValueChanging += (_, args) => textView.ReadOnly = args.NewValue == CheckState.Checked;
         win.Add (chxReadOnly);
@@ -155,39 +152,39 @@ public class TextInputControls : Scenario
         };
 
         chxMultiline.ValueChanging += (_, e) =>
-                                             {
-                                                 textView.Multiline = e.NewValue == CheckState.Checked;
+                                      {
+                                          textView.Multiline = e.NewValue == CheckState.Checked;
 
-                                                 if (!textView.Multiline && chxWordWrap.Value == CheckState.Checked)
-                                                 {
-                                                     chxWordWrap.Value = CheckState.UnChecked;
-                                                 }
+                                          if (!textView.Multiline && chxWordWrap.Value == CheckState.Checked)
+                                          {
+                                              chxWordWrap.Value = CheckState.UnChecked;
+                                          }
 
-                                                 if (!textView.Multiline && chxCaptureTabs.Value == CheckState.Checked)
-                                                 {
-                                                     chxCaptureTabs.Value = CheckState.UnChecked;
-                                                 }
-                                             };
+                                          if (!textView.Multiline && chxCaptureTabs.Value == CheckState.Checked)
+                                          {
+                                              chxCaptureTabs.Value = CheckState.UnChecked;
+                                          }
+                                      };
 
         Key? keyTab = textView.KeyBindings.GetFirstFromCommands (Command.NextTabStop);
         Key? keyBackTab = textView.KeyBindings.GetFirstFromCommands (Command.PreviousTabStop);
 
         chxCaptureTabs.ValueChanging += (_, e) =>
-                                               {
-                                                   textView.TabKeyAddsTab = e.NewValue == CheckState.Checked;
+                                        {
+                                            textView.TabKeyAddsTab = e.NewValue == CheckState.Checked;
 
-                                                   // TODO: This should be in TextView.TabKeyAddsTab_set
-                                                   if (e.NewValue == CheckState.Checked)
-                                                   {
-                                                       textView.KeyBindings.Add (keyTab!, Command.NextTabStop);
-                                                       textView.KeyBindings.Add (keyBackTab!, Command.PreviousTabStop);
-                                                   }
-                                                   else
-                                                   {
-                                                       textView.KeyBindings.Remove (keyTab!);
-                                                       textView.KeyBindings.Remove (keyBackTab!);
-                                                   }
-                                               };
+                                            // TODO: This should be in TextView.TabKeyAddsTab_set
+                                            if (e.NewValue == CheckState.Checked)
+                                            {
+                                                textView.KeyBindings.Add (keyTab!, Command.NextTabStop);
+                                                textView.KeyBindings.Add (keyBackTab!, Command.PreviousTabStop);
+                                            }
+                                            else
+                                            {
+                                                textView.KeyBindings.Remove (keyTab!);
+                                                textView.KeyBindings.Remove (keyBackTab!);
+                                            }
+                                        };
         win.Add (chxCaptureTabs);
 
         CheckBox scrollBars = new ()
@@ -227,56 +224,48 @@ public class TextInputControls : Scenario
                             };
         win.Add (labelMirroringHexEditor);
 
-        // DateField
-        label = new Label { Text = " _DateField:", Y = Pos.Bottom (hexEditor) + 1 };
+        // DateEditor
+        label = new Label { Text = "_DateEditor:", Y = Pos.Bottom (hexEditor) + 1 };
         win.Add (label);
 
-        DateField dateField = new (DateTime.Now) { X = Pos.Right (label) + 1, Y = Pos.Bottom (hexEditor) + 1, Width = 20 };
-        win.Add (dateField);
+        DateEditor dateEditor = new () { X = Pos.Right (label) + 1, Y = Pos.Bottom (hexEditor) + 1, Value = DateTime.Today };
+        win.Add (dateEditor);
 
-        Label labelMirroringDateField = new ()
+        Label labelMirroringDateEditor = new ()
         {
-            X = Pos.Right (dateField) + 1,
-            Y = Pos.Top (dateField),
-            Width = Dim.Width (dateField),
-            Height = Dim.Height (dateField),
-            Text = dateField.Text
+            X = Pos.Right (dateEditor) + 1,
+            Y = Pos.Top (dateEditor),
+            Width = Dim.Width (dateEditor),
+            Height = Dim.Height (dateEditor),
+            Text = dateEditor.Text
         };
-        win.Add (labelMirroringDateField);
+        win.Add (labelMirroringDateEditor);
 
-        dateField.TextChanged += (_, _) => { labelMirroringDateField.Text = dateField.Text; };
+        dateEditor.ValueChanged += (_, _) => { labelMirroringDateEditor.Text = dateEditor.Text; };
 
-        // TimeField
-        label = new Label { Text = "T_imeField:", Y = Pos.Top (dateField), X = Pos.Right (labelMirroringDateField) + 5 };
+        // TimeEditor
+        label = new Label { Text = "T_imeEditor:", Y = Pos.Top (dateEditor), X = Pos.Right (labelMirroringDateEditor) + 5 };
         win.Add (label);
 
-        _timeField = new TimeField
-        {
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (dateField),
-            Width = 20,
-            IsShortFormat = false,
-            Value = DateTime.Now.TimeOfDay
-        };
-        win.Add (_timeField);
+        _timeEditor = new TimeEditor { X = Pos.Right (label) + 1, Y = Pos.Top (dateEditor), Value = DateTime.Now.TimeOfDay };
+        win.Add (_timeEditor);
 
-        _labelMirroringTimeField = new Label
+        _labelMirroringTimeEditor = new Label
         {
-            X = Pos.Right (_timeField) + 1,
-            Y = Pos.Top (_timeField),
-            Width = Dim.Width (_timeField),
-            Height = Dim.Height (_timeField),
-            Text = _timeField.Text
+            X = Pos.Right (_timeEditor) + 1,
+            Y = Pos.Top (_timeEditor),
+            Width = Dim.Width (_timeEditor),
+            Height = Dim.Height (_timeEditor),
+            Text = _timeEditor.Text
         };
-        win.Add (_labelMirroringTimeField);
+        win.Add (_labelMirroringTimeEditor);
 
-        _timeField.ValueChanged += TimeChanged;
+        _timeEditor.ValueChanged += TimeChanged;
 
         // MaskedTextProvider - uses .NET MaskedTextProvider
-        Label netProviderLabel = new () { X = Pos.Left (dateField), Y = Pos.Bottom (dateField) + 1, Text = "_NetMaskedTextProvider [ +99 (000) 000-0000 ]:" };
-        win.Add (netProviderLabel);
-
         NetMaskedTextProvider netProvider = new ("+99 (000) 000-0000");
+        Label netProviderLabel = new () { X = Pos.Left (dateEditor), Y = Pos.Bottom (dateEditor) + 1, Text = $"_NetMaskedTextProvider ({netProvider.Mask}):" };
+        win.Add (netProviderLabel);
 
         TextValidateField netProviderField = new () { X = Pos.Right (netProviderLabel) + 1, Y = Pos.Y (netProviderLabel), Provider = netProvider };
         win.Add (netProviderField);
@@ -294,13 +283,13 @@ public class TextInputControls : Scenario
         netProviderField.Provider.TextChanged += (_, _) => { labelMirroringNetProviderField.Text = netProviderField.Text; };
 
         // TextRegexProvider - Regex provider implemented by Terminal.Gui
+        TextRegexProvider provider2 = new ("^([0-9]?[0-9]?[0-9]|1000)$") { ValidateOnInput = false };
+
         Label regexProviderLabel = new ()
         {
-            X = Pos.Left (netProviderLabel), Y = Pos.Bottom (netProviderLabel) + 1, Text = "Text_RegexProvider [ ^([0-9]?[0-9]?[0-9]|1000)$ ]:"
+            X = Pos.Left (netProviderLabel), Y = Pos.Bottom (netProviderLabel) + 1, Text = $"Text_RegexProvider ({provider2.Pattern}):"
         };
         win.Add (regexProviderLabel);
-
-        TextRegexProvider provider2 = new ("^([0-9]?[0-9]?[0-9]|1000)$") { ValidateOnInput = false };
 
         TextValidateField regexProviderField = new ()
         {
@@ -475,9 +464,9 @@ public class TextInputControls : Scenario
 
     private void TimeChanged (object? sender, ValueChangedEventArgs<TimeSpan> e)
     {
-        if (_labelMirroringTimeField is { } && _timeField is { })
+        if (_labelMirroringTimeEditor is { } && _timeEditor is { })
         {
-            _labelMirroringTimeField.Text = _timeField.Text;
+            _labelMirroringTimeEditor.Text = _timeEditor.Text;
         }
     }
 }

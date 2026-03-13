@@ -62,15 +62,11 @@ public class AnsiInputProcessor : InputProcessorImpl<char>
         // Convert Key → ANSI sequence (if needed) or char
         string sequence = AnsiKeyboardEncoder.Encode (key);
 
-        // If input supports testing, use it
-        if (InputImpl is not ITestableInput<char> testableInput)
-        {
-            return;
-        }
-
+        // Enqueue directly to InputQueue for synchronous processing.
+        // This bypasses the background input thread, which is correct for test injection.
         foreach (char ch in sequence)
         {
-            testableInput.InjectInput (ch);
+            InputQueue.Enqueue (ch);
         }
     }
 
@@ -82,15 +78,11 @@ public class AnsiInputProcessor : InputProcessorImpl<char>
         // Convert Mouse to ANSI SGR format escape sequence
         string ansiSequence = AnsiMouseEncoder.Encode (mouse);
 
-        // Enqueue each character of the ANSI sequence
-        if (InputImpl is not ITestableInput<char> testableInput)
-        {
-            return;
-        }
-
+        // Enqueue directly to InputQueue for synchronous processing.
+        // This bypasses the background input thread, which is correct for test injection.
         foreach (char ch in ansiSequence)
         {
-            testableInput.InjectInput (ch);
+            InputQueue.Enqueue (ch);
         }
     }
 }

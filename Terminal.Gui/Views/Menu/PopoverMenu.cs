@@ -27,6 +27,18 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/popovers.html"/> for more information.
 ///     </para>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Right</term> <description>Opens a sub-menu or moves to the next menu bar item.</description>
+///         </item>
+///         <item>
+///             <term>Left</term> <description>Closes a sub-menu or moves to the previous menu bar item.</description>
+///         </item>
+///     </list>
 /// </remarks>
 public class PopoverMenu : Popover<Menu, MenuItem>
 {

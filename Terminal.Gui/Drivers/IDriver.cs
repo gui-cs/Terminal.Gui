@@ -188,6 +188,13 @@ public interface IDriver : IDisposable
     Attribute CurrentAttribute { get; set; }
 
     /// <summary>
+    ///     Gets or sets the URL that will be associated with cells added via <see cref="AddRune(Rune)"/> or <see cref="AddStr(string)"/>.
+    ///     When set, subsequent cells will include this URL for OSC 8 hyperlink rendering.
+    ///     Set to <see langword="null"/> to stop associating URLs with cells.
+    /// </summary>
+    string? CurrentUrl { get; set; }
+
+    /// <summary>
     ///     Updates <see cref="IDriver.Col"/> and <see cref="IDriver.Row"/> to the specified column and row in
     ///     <see cref="IDriver.Contents"/>.
     ///     Used by <see cref="IDriver.AddRune(System.Text.Rune)"/> and <see cref="IDriver.AddStr"/> to determine
@@ -351,6 +358,12 @@ public interface IDriver : IDisposable
 
     /// <summary>Event fired when a key is pressed down.</summary>
     event EventHandler<Key>? KeyDown;
+
+    /// <summary>
+    ///     Event fired when a key is released. Only raised when the driver provides key release information.
+    ///     Not all drivers support key-up events.
+    /// </summary>
+    event EventHandler<Key>? KeyUp;
 
     /// <summary>Event fired when a mouse event occurs.</summary>
     event EventHandler<Mouse>? MouseEvent;

@@ -21,6 +21,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// </summary>
     internal AnsiResponseParser<TInputRecord> Parser { get; }
 
+    private readonly ITimeProvider _timeProvider;
     private readonly MouseInterpreter _mouseInterpreter;
 
     /// <summary>
@@ -52,6 +53,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     protected InputProcessorImpl (ConcurrentQueue<TInputRecord> inputBuffer, IKeyConverter<TInputRecord> keyConverter, ITimeProvider? timeProvider = null)
     {
         ITimeProvider tp = timeProvider ?? new SystemTimeProvider ();
+        _timeProvider = tp;
         Parser = new AnsiResponseParser<TInputRecord> (tp);
         _mouseInterpreter = new MouseInterpreter (tp);
 
@@ -65,7 +67,17 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
         // Enable keyboard handling
         Parser.HandleKeyboard = true;
 
-        Parser.Keyboard += (_, keyEvent) => { RaiseKeyDownEvent (keyEvent); };
+        Parser.Keyboard += (_, keyEvent) =>
+                           {
+                               if (keyEvent.EventType == KeyEventType.Release)
+                               {
+                                   RaiseKeyUpEvent (keyEvent);
+                               }
+                               else
+                               {
+                                   RaiseKeyDownEvent (keyEvent);
+                               }
+                           };
 
         // Configure unexpected response handler
         Parser.UnexpectedResponseHandler = str =>
@@ -136,7 +148,7 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     private IEnumerable<TInputRecord> ReleaseParserHeldKeysIfStale ()
     {
         if (Parser.State is AnsiResponseParserState.ExpectingEscapeSequence or AnsiResponseParserState.InResponse
-            && DateTime.Now - Parser.StateChangedAt > _escTimeout)
+            && _timeProvider.Now - Parser.StateChangedAt > _escTimeout)
         {
             return Parser.Release ().Select (o => o.Item2);
         }
@@ -236,6 +248,12 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
 
     /// <inheritdoc/>
     public void RaiseKeyDownEvent (Key a) => KeyDown?.Invoke (this, a);
+
+    /// <inheritdoc/>
+    public event EventHandler<Key>? KeyUp;
+
+    /// <inheritdoc/>
+    public void RaiseKeyUpEvent (Key a) => KeyUp?.Invoke (this, a);
 
     /// <inheritdoc/>
     public virtual void InjectKeyDownEvent (Key key)
