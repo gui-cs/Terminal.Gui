@@ -180,15 +180,16 @@ public class Link : View, IDesignable
     public const string DEFAULT_URL = "";
 
     private string _url = DEFAULT_URL;
+    private bool _isUrlValid = false;
 
     /// <summary>
     ///     Gets or sets the URL (hyperlink target) associated with this <see cref="Link"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         Any string value is accepted. URL validation occurs at draw time: if the value is not a well-formed
-    ///         absolute URI (per <see cref="Uri.IsWellFormedUriString"/>), the link renders with the
-    ///         <see cref="VisualRole.Disabled"/> style and no OSC 8 hyperlink sequence is emitted.
+    ///         Any string value is accepted. URL validation is performed once when this property is set and the result is
+    ///         cached: if the value is not a well-formed absolute URI (per <see cref="Uri.IsWellFormedUriString"/>), the
+    ///         link renders with the <see cref="VisualRole.Disabled"/> style and no OSC 8 hyperlink sequence is emitted.
     ///     </para>
     ///     <para>
     ///         When <see cref="View.Text"/> is empty, <see cref="Url"/> is used as the display text.
@@ -319,7 +320,7 @@ public class Link : View, IDesignable
         string? url = Url;
 
         // If the URL is not valid, don't set CurrentUrl, and adjust the attributes to indicate it's not well-formed
-        if (!Uri.IsWellFormedUriString (Url, UriKind.Absolute))
+        if (!_isUrlValid)
         {
             normalAttr = GetAttributeForRole (VisualRole.Disabled);
             normalAttr = normalAttr with { Background = HasFocus ? GetAttributeForRole (VisualRole.Focus).Background : normalAttr.Background };
@@ -372,6 +373,7 @@ public class Link : View, IDesignable
 
         // Do the work
         _url = value;
+        _isUrlValid = Uri.IsWellFormedUriString (value, UriKind.Absolute);
 
         // CWP: Fire ValueChanged
         ValueChangedEventArgs<string> changedArgs = new (oldValue, value);
