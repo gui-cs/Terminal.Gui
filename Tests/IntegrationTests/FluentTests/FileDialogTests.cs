@@ -59,7 +59,7 @@ public class FileDialogTests : TestsAllDrivers
 
         using AppTestHelper c = With.A (() => NewSaveDialog (out sd), 100, 20, d, _out)
                                   .ScreenShot ("Save dialog", _out)
-                                  .KeyDown (Application.QuitKey)
+                                  .KeyDown (Application.GetDefaultKey (Command.Quit))
                                   .AssertTrue (sd!.Canceled);
     }
 

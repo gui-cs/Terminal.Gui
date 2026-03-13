@@ -1,4 +1,4 @@
-using AppTestHelpers;
+﻿using AppTestHelpers;
 using AppTestHelpers.XunitHelpers;
 
 namespace IntegrationTests;
@@ -17,7 +17,7 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
         using AppTestHelper helper = With.A<Window> (40, 10, d)
                                               .Then ((app) =>
                                                      {
-                                                         app?.Keyboard.RaiseKeyDownEvent (Application.QuitKey);
+                                                         app?.Keyboard.RaiseKeyDownEvent (Application.GetDefaultKey (Command.Quit));
                                                          Assert.False (app!.TopRunnable!.IsRunning);
                                                      });
     }
@@ -30,7 +30,7 @@ public class TestContextKeyEventTests (ITestOutputHelper outputHelper) : TestsAl
         Assert.True (helper.App?.TopRunnable!.IsRunning);
 
         IRunnable? top = helper.App?.TopRunnable;
-        helper.KeyDown (Application.QuitKey);
+        helper.KeyDown (Application.GetDefaultKey (Command.Quit));
         helper.App?.Dispose ();
 
         Assert.False (top!.IsRunning);

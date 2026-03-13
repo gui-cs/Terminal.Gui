@@ -455,7 +455,7 @@ public class MenuBarItem : MenuItem, IMenuBarEntry, IDesignable
             e.Handled = true;
             menuBar.InvokeCommand (Command.Left);
         }
-        else if (e == Application.QuitKey)
+        else if (e == Application.GetDefaultKey (Command.Quit))
         {
             e.Handled = true;
             menuBar.HideActiveItem ();

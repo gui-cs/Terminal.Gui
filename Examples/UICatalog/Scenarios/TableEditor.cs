@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using System.Data;
 using System.Globalization;
 using System.Text;
@@ -243,7 +243,7 @@ public class TableEditor : Scenario
         var selectedCellLabel = new Label { Text = "0,0" };
 
         var statusBar = new StatusBar ([
-                                           new Shortcut (Application.QuitKey, "Quit", Quit),
+                                           new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", Quit),
                                            new Shortcut (Key.F2, "OpenExample", () => OpenExample (true)),
                                            new Shortcut (Key.F3, "CloseExample", CloseExample),
                                            new Shortcut (Key.F4, "OpenSimple", () => OpenSimple (true)),

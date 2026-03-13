@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 using System.Collections.Generic;
 using System.Linq;
@@ -70,7 +70,7 @@ public class TreeUseCases : Scenario
         // StatusBar
         StatusBar statusBar = new (
             [
-                new (Application.QuitKey, "Quit", Quit)
+                new (Application.GetDefaultKey (Command.Quit), "Quit", Quit)
             ]
         );
 

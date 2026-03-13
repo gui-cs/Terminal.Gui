@@ -96,7 +96,7 @@ public static bool Force16Colors { get; set; } = false;
 ```
 
 **Examples:**
-- `Application.QuitKey` - Default key to quit applications
+- `Application.DefaultKeyBindings` (e.g. `Command.Quit`) - Default keys for application-level commands
 - `Application.Force16Colors` - Force 16-color mode
 - `Key.Separator` - Character separating keys in key combinations
 
@@ -199,10 +199,10 @@ graph TD
 **Environment Variable** (`TUI_CONFIG`):
 ```bash
 # Linux/macOS
-export TUI_CONFIG='{"Application.QuitKey": "Ctrl+Q"}'
+export TUI_CONFIG='{"Application.DefaultKeyBindings": {"Quit": {"All": ["Ctrl+Q"]}}}'
 
 # Windows PowerShell
-$env:TUI_CONFIG='{"Application.QuitKey": "Ctrl+Q"}'
+$env:TUI_CONFIG='{"Application.DefaultKeyBindings": {"Quit": {"All": ["Ctrl+Q"]}}}'
 ```
 
 ---
@@ -432,7 +432,7 @@ Set configuration directly in code without files:
 ```csharp
 ConfigurationManager.RuntimeConfig = @"
 {
-  ""Application.QuitKey"": ""Ctrl+Q"",
+  ""Application.DefaultKeyBindings.Quit"": ""Ctrl+Q"",
   ""Application.Force16Colors"": true
 }";
 
@@ -500,15 +500,38 @@ System-wide settings from [SettingsScope](~/api/Terminal.Gui.Configuration.Setti
 
 ```json
 {
-  "Application.QuitKey": "Esc",
+  "Application.DefaultKeyBindings.Quit": "Esc",
   "Application.Force16Colors": false,
   "Application.IsMouseDisabled": false,
-  "Application.ArrangeKey": "Ctrl+F5",
-  "IKeyboard.NextTabKey": "Tab",
-  "IKeyboard.PrevTabKey": "Shift+Tab",
-  "IKeyboard.NextTabGroupKey": "F6",
-  "IKeyboard.PrevTabGroupKey": "Shift+F6",
+  "Application.DefaultKeyBindings.Arrange": "Ctrl+F5",
+  "Application.DefaultKeyBindings.NextTabStop": "Tab",
+  "Application.DefaultKeyBindings.PreviousTabStop": "Shift+Tab",
+  "Application.DefaultKeyBindings.NextTabGroup": "F6",
+  "Application.DefaultKeyBindings.PreviousTabGroup": "Shift+F6",
   "Key.Separator": "+"
+}
+```
+
+### Key Binding Settings
+
+Configurable key bindings use the `PlatformKeyBinding` format to support platform-aware defaults. See [Key Binding Overrides](#key-binding-overrides) for the full JSON format.
+
+```json
+{
+  "Application.DefaultKeyBindings": {
+    "Quit": { "All": ["Esc"] },
+    "Suspend": { "Linux": ["Ctrl+Z"], "Macos": ["Ctrl+Z"] },
+    "Arrange": { "All": ["Ctrl+F5"] }
+  },
+  "View.DefaultKeyBindings": {
+    "Copy": { "All": ["Ctrl+C"] },
+    "Undo": { "All": ["Ctrl+Z"], "Linux": ["Ctrl+/"], "Macos": ["Ctrl+/"] }
+  },
+  "View.ViewKeyBindings": {
+    "TextField": {
+      "CutToEndOfLine": { "All": ["Ctrl+K"] }
+    }
+  }
 }
 ```
 
@@ -554,6 +577,51 @@ Glyphs can be specified as:
 - U+ format: `"U+25C4"`
 - UTF-16 format: `"\\u25BC"`
 - Decimal codepoint: `965010`
+
+### Key Binding Overrides
+
+Key bindings for Application-level commands, base View commands, and per-view commands can all be overridden in configuration. See [Keyboard Deep Dive - Configurable Key Bindings](keyboard.md#configurable-key-bindings) for the full architecture.
+
+**Override Application-level key bindings** (e.g., change the Quit key):
+
+```json
+{
+  "Application.DefaultKeyBindings": {
+    "Quit": { "All": ["Ctrl+Q"] },
+    "Suspend": { "Linux": ["Ctrl+Z"], "Macos": ["Ctrl+Z"] }
+  }
+}
+```
+
+**Override base View key bindings** (affects all views that support those commands):
+
+```json
+{
+  "View.DefaultKeyBindings": {
+    "Copy": { "All": ["Ctrl+C", "Ctrl+Insert"] },
+    "Paste": { "All": ["Ctrl+V", "Shift+Insert"] },
+    "Undo": { "All": ["Ctrl+Z"], "Linux": ["Ctrl+/"], "Macos": ["Ctrl+/"] }
+  }
+}
+```
+
+**Override per-view key bindings** using `View.ViewKeyBindings` (maps view type name to command overrides):
+
+```json
+{
+  "View.ViewKeyBindings": {
+    "TextField": {
+      "Undo": { "All": ["Ctrl+Z"] },
+      "CutToEndOfLine": { "All": ["Ctrl+K"] }
+    },
+    "TextView": {
+      "Redo": { "All": ["Ctrl+Shift+Z"], "Windows": ["Ctrl+Y"] }
+    }
+  }
+}
+```
+
+Each entry uses the `PlatformKeyBinding` format with optional `All`, `Windows`, `Linux`, and `Macos` string arrays. `All` keys apply on every platform; platform-specific arrays add additional bindings for that OS.
 
 ### Discovering Configuration Properties
 
@@ -696,7 +764,7 @@ All configuration files must conform to the JSON schema:
   "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
   
   // SettingsScope properties
-  "Application.QuitKey": "Esc",
+  "Application.DefaultKeyBindings.Quit": "Esc",
   "Application.Force16Colors": false,
   
   // Current theme name
@@ -830,7 +898,7 @@ Update ConfigurationManager to reflect current static property values:
 
 ```csharp
 // Change a setting programmatically
-Application.QuitKey = Key.Q.WithCtrl;
+Application.DefaultKeyBindings[Command.Quit] = Bind.All (Key.Q.WithCtrl);
 
 // Update ConfigurationManager to reflect the change
 ConfigurationManager.UpdateToCurrentValues();
@@ -935,15 +1003,17 @@ ConfigurationManager.UpdateToCurrentValues();
 ```csharp
 ConfigurationManager.RuntimeConfig = @"
 {
-  ""Application.QuitKey"": ""Ctrl+Q"",
-  ""Application.Force16Colors"": true,
+  ""Application.DefaultKeyBindings"": {
+    ""Quit"": { ""All"": [""Ctrl+Q""] }
+  },
+  ""Driver.Force16Colors"": true,
   ""Theme"": ""Dark""
 }";
 
 ConfigurationManager.Enable(ConfigLocations.Runtime);
 
 // Settings are now applied
-// QuitKey is Ctrl+Q
+// Quit key is Ctrl+Q
 // 16-color mode is forced
 // Dark theme is active
 ```

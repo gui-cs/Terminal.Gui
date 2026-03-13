@@ -69,6 +69,17 @@ public class PopoverMenu : Popover<Menu, MenuItem>
     public PopoverMenu (IEnumerable<MenuItem>? menuItems) : this (new Menu (menuItems)) { }
 
     /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="PopoverMenu"/>. All standard navigation bindings are
+    ///     inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary is empty by default.
+    ///     Dynamic bindings (activation key) are bound directly in the constructor.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="PopoverMenu"/> class with the specified root <see cref="Menu"/>.
     /// </summary>
     /// <param name="root">The root menu that contains the top-level menu items.</param>
@@ -81,14 +92,15 @@ public class PopoverMenu : Popover<Menu, MenuItem>
         Key = DefaultKey;
 
         AddCommand (Command.Right, MoveRight);
-        KeyBindings.Add (Key.CursorRight, Command.Right);
 
         //KeyBindings.Add (Key.CursorDown, Command.Down);
 
         AddCommand (Command.Left, MoveLeft);
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
 
         //KeyBindings.Add (Key.CursorUp, Command.Up);
+
+        // Apply layered key bindings (base View layer + PopoverMenu-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
 
         KeyBindings.Remove (Key.Space);
         KeyBindings.Remove (Key.Enter);
@@ -166,7 +178,7 @@ public class PopoverMenu : Popover<Menu, MenuItem>
         }
 
         // QuitKey handling
-        if (args.Context?.Binding is KeyBinding { Key: { } key } && key == Application.QuitKey && SuperView is { Visible: true })
+        if (args.Context?.Binding is KeyBinding { Key: { } key } && key == Application.GetDefaultKey (Command.Quit) && SuperView is { Visible: true })
         {
             args.Handled = true;
         }
@@ -489,7 +501,7 @@ public class PopoverMenu : Popover<Menu, MenuItem>
     protected override bool OnKeyDownNotHandled (Key key)
     {
         // See if any of our MenuItems have this key as Key
-        IEnumerable<MenuItem> all = Root?.GetMenuItemsOfAllSubMenus (mi => key != Application.QuitKey && mi.Key == key) ?? [];
+        IEnumerable<MenuItem> all = Root?.GetMenuItemsOfAllSubMenus (mi => key != Application.GetDefaultKey (Command.Quit) && mi.Key == key) ?? [];
 
         foreach (MenuItem menuItem in all)
         {

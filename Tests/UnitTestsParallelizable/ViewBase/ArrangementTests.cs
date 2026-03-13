@@ -732,7 +732,7 @@ public class ArrangementTests (ITestOutputHelper output)
     // parallelizable tests when using NewMouseEvent directly on views.
     //
     // Remaining functionality that still requires Application.Init:
-    // 1. Border.EnterArrangeMode() with keyboard mode - depends on Application.ArrangeKey
+    // 1. Border.EnterArrangeMode() with keyboard mode - depends on Application.GetDefaultKey (Command.Arrange)
     // 2. Border.HandleDragOperation() - depends on Application.Top for screen refresh
     // 3. Application-level mouse event routing through Application.RaiseMouseEvent
     //

@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 using System.Diagnostics;
 
@@ -107,7 +107,7 @@ public class MenuBars : Scenario
 
                             return true;
                         });
-            HotKeyBindings.Add (Application.QuitKey, Command.Quit);
+            HotKeyBindings.Add (Application.GetDefaultKey (Command.Quit), Command.Quit);
 
             // BUGBUG: This must come before we create the MenuBar or it will not work.
             // BUGBUG: This is due to TODO's in PopoverMenu where key bindings are not

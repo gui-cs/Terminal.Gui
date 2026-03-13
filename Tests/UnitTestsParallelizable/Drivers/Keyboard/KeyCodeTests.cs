@@ -18,7 +18,7 @@ public class KeyCodeTests
         Assert.Equal ("Y, CtrlMask", key.ToString ());
 
         // This will be well compared, because the Key.CtrlMask have a high value.
-        Assert.False (key == Application.QuitKey);
+        Assert.False (key == Application.GetDefaultKey (Command.Quit));
 
         switch (key)
         {
