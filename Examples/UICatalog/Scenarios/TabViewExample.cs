@@ -32,7 +32,8 @@ public class TabViewExample : Scenario
             X = 0,
             Y = 0,
             Width = Dim.Fill (eventLog),
-            Height = Dim.Fill (configFrame)
+            Height = Dim.Fill (configFrame),
+            Arrangement = ViewArrangement.Resizable // Enables resizing the TabView by dragging its edges for testing
         };
 
         TabView tabView = new ()

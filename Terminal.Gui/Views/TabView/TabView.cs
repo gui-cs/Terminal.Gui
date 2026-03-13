@@ -90,8 +90,13 @@ public class TabView : View, IDesignable
                 tabs [value.Value].Enabled = true;
             }
 
-            // Update tab header appearance
+            // Update tab header appearance and scroll to make the selected tab visible
             _tabRow.UpdateHeaderAppearance ();
+
+            if (value.HasValue)
+            {
+                _tabRow.EnsureHeaderVisible (value.Value);
+            }
 
             Tab? newTab = SelectedTab;
 

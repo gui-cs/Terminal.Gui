@@ -694,9 +694,9 @@ All in `Tests/UnitTestsParallelizable/Views/TabViewTests.cs`:
 | Phase 2: Core TabView + Tab + TabRow | ✅ Done |
 | Phase 3: TabViews Scenario | ✅ Done |
 | Phase 4: Navigation and Commands | ⚠️ Partial — basic Ctrl+Left/Right/Home/End works. Tab hotkeys and Tab-key focus navigation do NOT work. |
-| Phase 5: Visual Polish | ⚠️ Partial — tabs-on-top rendering works. TabsOnBottom rendering **FIXED** (Padding.Top=1 compensation). Tab scrolling not implemented. |
+| Phase 5: Visual Polish | ⚠️ Partial — tabs-on-top rendering works. TabsOnBottom rendering **FIXED** (Padding.Top=1 compensation). Tab scrolling in progress (see Issue 2). |
 | Phase 6: Events and API Completeness | ✅ Done |
-| Phase 7: Tests | ⚠️ Partial — 71 tests pass (43 in TabViewTests + 28 in TabViewVisualTests). Comprehensive visual tests for tabs-on-top and tabs-on-bottom. No scroll tests. |
+| Phase 7: Tests | ⚠️ Partial — 80 tests pass (43 in TabViewTests + 28 visual + 9 scroll/content-size). 1 scroll test skipped pending investigation. |
 
 ## Known Issues (To Fix)
 
@@ -708,9 +708,14 @@ All in `Tests/UnitTestsParallelizable/Views/TabViewTests.cs`:
 
 **Tests:** 13 new visual tests added in `TabViewVisualTests.cs` (refactored from `TabViewTests.cs`), covering tabs-on-top, tabs-on-bottom, state transitions, padding assertions, and edge cases. All pass.
 
-### Issue 2: Tab scrolling not implemented
+### Issue 2: Tab scrolling — in progress
 
-When there are too many tabs to fit in the available width, there is no scroll mechanism. The tabs just overflow. Need to implement scroll offset logic in TabRow with left/right scroll indicators (using `Glyphs.LeftArrow` / `Glyphs.RightArrow`).
+**Progress:** ContentSize is now set correctly on TabRow (total width of all tab headers accounting for 1-column border overlaps). `EnsureHeaderVisible(tabIndex)` scrolls the Viewport to reveal the selected tab header. Forward scrolling (selecting later tabs) works and is tested.
+
+**Remaining:**
+- Scroll-back (selecting an earlier tab after scrolling forward) sets Viewport.X=0 correctly but the rendering doesn't reflect the change — needs investigation.
+- Scroll indicator buttons (◄/►) or built-in scrollbar UX not yet decided/implemented. The built-in `ViewportSettings.HasHorizontalScrollBar` approach was tried but removed — it adds a scrollbar row that conflicts with the TabRow layout. A simpler approach using left/right scroll buttons placed at the edges of the TabRow may work better.
+- Need to decide where to place scroll buttons when tabs overflow.
 
 ### Issue 3: TabsOnBottom property type - ✅ FIXED
 

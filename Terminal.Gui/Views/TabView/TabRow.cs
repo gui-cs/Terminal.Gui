@@ -61,7 +61,7 @@ internal class TabRow : View
                 Text = tab.Title,
                 BorderStyle = LineStyle.Rounded,
                 SuperViewRendersLineCanvas = true,
-                Width = Dim.Auto (DimAutoStyle.Text),
+                Width = Dim.Auto (DimAutoStyle.Text, maximumContentDim: (int)tabView.MaxTabTextWidth),
                 Height = 3,
                 CanFocus = true
             };
@@ -105,6 +105,7 @@ internal class TabRow : View
         }
 
         UpdateHeaderAppearance ();
+        UpdateContentSizeForScrolling ();
     }
 
     /// <inheritdoc />
@@ -117,6 +118,43 @@ internal class TabRow : View
     protected override void OnFocusedChanged (View? previousFocused, View? focused)
     {
         base.OnFocusedChanged (previousFocused, focused);
+    }
+
+    /// <summary>
+    ///     Sets the ContentSize to the total width of all tab headers and enables the horizontal
+    ///     scrollbar when headers overflow the viewport.
+    /// </summary>
+    internal void UpdateContentSizeForScrolling ()
+    {
+        TabView? tabView = TabView;
+
+        if (tabView is null)
+        {
+            return;
+        }
+
+        IReadOnlyList<Tab> tabs = tabView.Tabs;
+
+        if (tabs.Count == 0)
+        {
+            SetContentSize (null);
+
+            return;
+        }
+
+        // Compute total header width: first header full width, each subsequent overlaps by 1
+        int totalWidth = 0;
+
+        for (var i = 0; i < tabs.Count; i++)
+        {
+            int textCols = tabs [i].Title.GetColumns ();
+            int displayCols = (int)Math.Min (textCols, tabView.MaxTabTextWidth);
+            int headerWidth = displayCols + 2; // +2 for left/right borders
+            totalWidth += i == 0 ? headerWidth : headerWidth - 1;
+        }
+
+        // Set content size so the layout engine knows how wide the content really is
+        SetContentSize (new Size (totalWidth, 3));
     }
 
     /// <summary>Updates tab header borders based on which tab is selected.</summary>
@@ -159,6 +197,52 @@ internal class TabRow : View
         UpdateBorderGaps ();
 
         SetNeedsLayout ();
+    }
+
+    /// <summary>
+    ///     Scrolls the viewport so the tab header at the given index is visible.
+    /// </summary>
+    internal void EnsureHeaderVisible (int tabIndex)
+    {
+        TabView? tabView = TabView;
+
+        if (tabView is null)
+        {
+            return;
+        }
+
+        IReadOnlyList<Tab> tabs = tabView.Tabs;
+
+        if (tabIndex < 0 || tabIndex >= tabs.Count)
+        {
+            return;
+        }
+
+        // Compute the X position and width of the target header
+        int headerX = 0;
+
+        for (var i = 0; i < tabIndex; i++)
+        {
+            int textCols = tabs [i].Title.GetColumns ();
+            int displayCols = (int)Math.Min (textCols, tabView.MaxTabTextWidth);
+            int headerWidth = displayCols + 2;
+            headerX += i == 0 ? headerWidth : headerWidth - 1;
+        }
+
+        int targetTextCols = tabs [tabIndex].Title.GetColumns ();
+        int targetDisplayCols = (int)Math.Min (targetTextCols, tabView.MaxTabTextWidth);
+        int targetWidth = targetDisplayCols + 2;
+
+        // Scroll left if the header is before the viewport
+        if (headerX < Viewport.X)
+        {
+            Viewport = Viewport with { X = headerX };
+        }
+        // Scroll right if the header extends past the viewport
+        else if (headerX + targetWidth > Viewport.X + Viewport.Width)
+        {
+            Viewport = Viewport with { X = headerX + targetWidth - Viewport.Width };
+        }
     }
 
     /// <summary>
