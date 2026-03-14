@@ -42,7 +42,7 @@ The breaking-changes catalog (§7) exists specifically for library consumers and
 Phase 3 (no-View border drawing) is marked **recommended, not optional** for windowed apps — it eliminates `BorderView` creation for the most common Terminal.Gui use case (a `Window` with a title). The complexity cost is real but the payoff for the majority of applications is worth calling out clearly rather than deferring. Phases are sized for independent delivery; no phase requires another to be complete before it ships value.
 
 ### Illuminate and Clarify
-Four lifecycle hazards identified during design — `EnsureView()` mid-lifecycle ordering, thread safety, `IDesignable` impact, and focus/tab ordering — are each addressed in §4.9 (Lifecycle Hazards) rather than buried in footnotes or ignored.
+Four lifecycle hazards identified during design — `EnsureView()` mid-lifecycle ordering, thread safety, `IDesignable` impact, and focus/tab ordering — are each addressed in §4.11 (Lifecycle Hazards) rather than buried in footnotes or ignored.
 
 ### Flexible in Approach
 The interface `IAdornment` allows the design to evolve: a future v3 could swap in a struct-based `IAdornment` implementation with no changes to `View`. Consumers who need `View`-level access call `.EnsureView()` explicitly, which is also how custom adornment implementations can hook into the system.
@@ -135,30 +135,35 @@ The following patterns appear in `View.*` partial files and must be updated when
 
 ## 4. Proposed Design
 
-### 4.1 Interface
+### 4.1 Interfaces
+
+Two interfaces capture distinct responsibilities. A single `IAdornment` without `IAdornmentView` would conflate the lightweight "settings" concern with the View-connected "rendering layer" concern.
+
+#### 4.1.1 IAdornment — Settings Contract (lightweight objects)
 
 ```csharp
 /// <summary>
 ///     Defines the contract for an adornment layer around a View.
-///     Implemented by <see cref="Border"/>, <see cref="Margin"/>, and <see cref="Padding"/>.
+///     Implemented by the lightweight <see cref="Border"/>, <see cref="Margin"/>, and <see cref="Padding"/> classes.
+///     Does not expose <c>Parent</c> — that belongs to <see cref="IAdornmentView"/>,
+///     which is the View-level contract for the heavy layer.
 /// </summary>
 public interface IAdornment
 {
-    /// <summary>The parent View this adornment surrounds.</summary>
-    View? Parent { get; set; }
-
     /// <summary>
     ///     The thickness (space consumed by this adornment layer).
-    ///     Changing this triggers layout recalculation.
+    ///     Changing this triggers layout recalculation on the parent View.
     /// </summary>
     Thickness Thickness { get; set; }
 
     /// <summary>
-    ///     The <see cref="AdornmentView"/> backing this adornment.
+    ///     The <see cref="IAdornmentView"/> backing this adornment.
     ///     Null until the adornment actually needs View-level functionality
     ///     (rendering, SubViews, mouse, arrangement, shadow).
+    ///     Typed as <see cref="IAdornmentView"/> to allow custom implementations
+    ///     without requiring subclassing of <see cref="AdornmentView"/>.
     /// </summary>
-    AdornmentView? View { get; }
+    IAdornmentView? View { get; }
 
     /// <summary>Fired when <see cref="Thickness"/> changes.</summary>
     event EventHandler? ThicknessChanged;
@@ -176,23 +181,65 @@ public interface IAdornment
 }
 ```
 
+**Rationale for `Parent` not being on `IAdornment`:** `IAdornment` represents a pure settings object: it holds `Thickness` and exposes the lazy `View`. The relationship with the parent `View` is an implementation detail of `AdornmentImpl` — stored as a non-interface field needed for geometry math and `EnsureView()`. Callers that need the parent already have the `View` reference they used to access the adornment.
+
+#### 4.1.2 IAdornmentView — Connected-View Contract (heavy objects)
+
+```csharp
+/// <summary>
+///     Defines the contract for the View-level backing object of an adornment layer.
+///     Implemented by <see cref="AdornmentView"/> (and its subclasses <see cref="BorderView"/>,
+///     <see cref="MarginView"/>, <see cref="PaddingView"/>).
+/// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="IAdornment.View"/> is typed as <see cref="IAdornmentView?"/> rather than
+///         the concrete <see cref="AdornmentView?"/> to allow alternative implementations (e.g., test
+///         doubles or custom renderers) without requiring inheritance from <see cref="AdornmentView"/>.
+///     </para>
+///     <para>
+///         The default implementation is <see cref="AdornmentView"/>. In practice, all three standard
+///         adornments use <see cref="AdornmentView"/> subclasses. External custom implementations are
+///         an advanced use case but are supported by this interface boundary.
+///     </para>
+/// </remarks>
+public interface IAdornmentView
+{
+    /// <summary>
+    ///     The <see cref="View"/> this adornment layer surrounds.
+    ///     Set by <see cref="AdornmentImpl.EnsureView"/> when the backing View is created,
+    ///     using the <c>Parent</c> stored on <see cref="AdornmentImpl"/>.
+    /// </summary>
+    View? Parent { get; set; }
+}
+```
+
 ### 4.2 Class Hierarchy (New)
 
 ```
-IAdornment
-└── AdornmentImpl (abstract, : object)  — lightweight base
-    ├── Border     — adds LineStyle, Settings, GetBorderRectangle()
-    ├── Margin     — adds ShadowStyle, ShadowSize, CacheClip() family
+IAdornment           — "settings" contract (Thickness, IAdornmentView? View, ThicknessChanged, coord methods)
+└── AdornmentImpl (abstract, : object)  — lightweight base; holds Parent as non-interface field
+    ├── Border     — adds LineStyle, Settings, GetBorderRectangle(), Arranger
+    ├── Margin     — adds ShadowStyle, ShadowSize, CacheClip() family, ViewportSettings
     └── Padding    — triggers EnsureView() on Add()
 
-View
-└── AdornmentView (: View) — renamed from Adornment
-    ├── BorderView  (: AdornmentView) — renamed from Border
-    ├── MarginView  (: AdornmentView) — renamed from Margin
-    └── PaddingView (: AdornmentView) — renamed from Padding
+IAdornmentView       — "connected-view" contract (Parent only)
+└── AdornmentView (: View, IAdornmentView) — default impl; renamed from Adornment
+    ├── BorderView  (: AdornmentView) — renamed from Border (View subclass)
+    ├── MarginView  (: AdornmentView) — renamed from Margin (View subclass)
+    └── PaddingView (: AdornmentView) — renamed from Padding (View subclass)
 ```
 
+**Key relationships:**
+- `IAdornment.View` returns `IAdornmentView?` (the interface type, not the concrete class)
+- `AdornmentImpl` stores `_view` as `AdornmentView?` internally; `IAdornment.View` is implemented via explicit interface to return `IAdornmentView?`
+- `AdornmentImpl` exposes `Parent : View?` as a public property (not on `IAdornment`); it is set by `View.SetupAdornments()` and used in `EnsureView()`, geometry math, and `OnThicknessChanged()`
+- `AdornmentView` carries `Parent : View?` from `IAdornmentView`; its View overrides (`FrameToScreen`, `GetApp`, etc.) all delegate to `Parent`
+- `BorderView`, `MarginView`, `PaddingView` inherit `Parent` from `AdornmentView` and use it heavily in their rendering, event subscription, and mouse handling
+
 ### 4.3 AdornmentImpl — Lightweight Base
+
+`Parent` is on `AdornmentImpl` (not on `IAdornment`) because it is an implementation detail needed for geometry math, `EnsureView()`, and layout triggers. The `IAdornment.View` property is implemented explicitly to expose `IAdornmentView?`; internally the field is typed `AdornmentView?` so `EnsureView()` and `CreateView()` can return the concrete type without casting.
 
 ```csharp
 /// <summary>
@@ -204,7 +251,12 @@ public abstract class AdornmentImpl : IAdornment
 {
     private AdornmentView? _view;
 
-    /// <inheritdoc/>
+    /// <summary>
+    ///     The View this adornment surrounds. Not on <see cref="IAdornment"/> — callers that need
+    ///     the parent already have the View reference they used to access this adornment.
+    ///     Set by <see cref="View.SetupAdornments"/> and used for geometry math and
+    ///     <see cref="EnsureView"/> creation.
+    /// </summary>
     public View? Parent { get; set; }
 
     private Thickness _thickness = Thickness.Empty;
@@ -238,13 +290,20 @@ public abstract class AdornmentImpl : IAdornment
 
     /// <summary>
     ///     The backing <see cref="AdornmentView"/> — null until demanded.
+    ///     Returns the concrete <see cref="AdornmentView"/> for callers within this assembly.
     /// </summary>
     public AdornmentView? View => _view;
 
     /// <summary>
+    ///     Explicit <see cref="IAdornment"/> implementation — exposes <see cref="View"/> as
+    ///     <see cref="IAdornmentView?"/> so the interface contract does not reference the concrete class.
+    /// </summary>
+    IAdornmentView? IAdornment.View => _view;
+
+    /// <summary>
     ///     Returns the existing <see cref="AdornmentView"/>, creating it if not yet allocated.
     ///     Calls <see cref="View.BeginInit"/> and/or <see cref="View.EndInit"/> on the new view
-    ///     to match the parent's current initialization state. See §4.9 for lifecycle details.
+    ///     to match the parent's current initialization state. See §4.11 for lifecycle details.
     /// </summary>
     /// <remarks>Must be called on the UI thread.</remarks>
     public AdornmentView EnsureView ()
@@ -255,7 +314,7 @@ public abstract class AdornmentImpl : IAdornment
             _view.Thickness = _thickness;
             _view.Parent = Parent;
 
-            // Synchronize init state with the parent. See §4.9 Hazard 1 for full explanation.
+            // Synchronize init state with the parent. See §4.11 Hazard 1 for full explanation.
             if (Parent?.IsInitialized == true)
             {
                 _view.BeginInit ();
@@ -572,7 +631,200 @@ public class Padding : AdornmentImpl
 }
 ```
 
-### 4.7 View.SetupAdornments (New Behavior)
+### 4.7 AdornmentView — Default IAdornmentView Implementation
+
+`AdornmentView` is the renamed `Adornment` class. It is the default (and only built-in) implementation of `IAdornmentView`. `BorderView`, `MarginView`, and `PaddingView` each subclass it.
+
+The `*View` classes are **simple `View` subclasses** with one additional property: `Parent`. All their rendering, layout, focus, and mouse behavior is rooted in that single field. Architecturally, they mirror the current `Adornment`/`Border`/`Margin`/`Padding` hierarchy with minimal change.
+
+```csharp
+/// <summary>
+///     The View-backed rendering layer for an adornment (Margin, Border, or Padding).
+///     Implements <see cref="IAdornmentView"/> — i.e., it knows its <see cref="Parent"/> View.
+///     Created lazily by <see cref="AdornmentImpl.EnsureView"/> when View-level functionality is needed.
+/// </summary>
+/// <remarks>
+///     This is a direct rename of the current <c>Adornment</c> class. It retains
+///     all existing behavior. The only structural change is implementing <see cref="IAdornmentView"/>
+///     and having <see cref="IAdornment.View"/> return this type via that interface.
+/// </remarks>
+public class AdornmentView : View, IAdornmentView, IDesignable
+{
+    /// <summary>Parameter-less constructor required by AllViewsTester.</summary>
+    public AdornmentView ()
+    {
+        /* Do nothing. */
+    }
+
+    /// <summary>Constructs a rendering layer for the specified <paramref name="parent"/>.</summary>
+    public AdornmentView (View parent)
+    {
+        CanFocus = false;
+        TabStop = TabBehavior.NoStop;
+        Parent = parent;
+        KeyBindings.Clear ();
+    }
+
+    /// <inheritdoc cref="IAdornmentView.Parent"/>
+    public View? Parent { get; set; }
+
+    // ---- All overrides below delegate to Parent in the same way the current Adornment does. ----
+    // They are NOT on IAdornmentView because they are View-override concerns, not interface contracts.
+
+    /// <inheritdoc/>
+    public override string ToDebugString ()
+        => $"{GetType ().Name}({Id}) Parent={(Parent is { } ? Parent.ToDebugString () : "null")}";
+
+    /// <inheritdoc/>
+    protected override IApplication? GetApp () => Parent?.App;
+
+    /// <inheritdoc/>
+    protected override IDriver? GetDriver () => Parent?.Driver ?? base.GetDriver ();
+
+    // Scheme: explicit set stores it; get falls through to parent's scheme.
+    private Scheme? _scheme;
+
+    /// <inheritdoc/>
+    protected override bool OnGettingScheme (out Scheme? scheme)
+    {
+        scheme = _scheme ?? Parent?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args)
+    {
+        Parent?.SetNeedsDraw ();
+        _scheme = args.NewValue;
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    public override Rectangle FrameToScreen ()
+    {
+        if (Parent is null)
+        {
+            // While there are no real use cases for an AdornmentView being a subview, support it
+            // for AllViewsTester.
+            if (SuperView is null)
+            {
+                return Frame;
+            }
+            Point super = SuperView.ViewportToScreen (Frame.Location);
+
+            return new (super, Frame.Size);
+        }
+
+        // AdornmentViews are *children* of a View, not SubViews. Use Parent.FrameToScreen()
+        // to get the parent's screen origin, then offset by our Frame.
+        Rectangle parentScreen = Parent.FrameToScreen ();
+
+        return new (new (parentScreen.X + Frame.X, parentScreen.Y + Frame.Y), Frame.Size);
+    }
+
+    /// <inheritdoc/>
+    public override Point ScreenToFrame (in Point location)
+    {
+        View? parentOrSuperView = Parent ?? SuperView;
+
+        if (parentOrSuperView is null)
+        {
+            return Point.Empty;
+        }
+
+        return parentOrSuperView.ScreenToFrame (new (location.X - Frame.X, location.Y - Frame.Y));
+    }
+
+    /// <inheritdoc/>
+    public override bool Contains (in Point location)
+    {
+        View? parentOrSuperView = Parent ?? SuperView;
+
+        if (parentOrSuperView is null)
+        {
+            return false;
+        }
+
+        Rectangle outside = Frame;
+        outside.Offset (parentOrSuperView.Frame.Location);
+
+        return Thickness.Contains (outside, location);
+    }
+
+    /// <inheritdoc/>
+    public override Rectangle Viewport
+    {
+        get => base.Viewport;
+        set => throw new InvalidOperationException (@"The Viewport of an AdornmentView cannot be modified.");
+    }
+
+    /// <inheritdoc/>
+    public override bool SuperViewRendersLineCanvas
+    {
+        get => false;
+        set => throw new InvalidOperationException (@"AdornmentView can only render to their Parent or Parent's Superview.");
+    }
+
+    bool IDesignable.EnableForDesign ()
+    {
+        Thickness = new (3);
+        Frame = new (0, 0, 10, 10);
+        Diagnostics = ViewDiagnosticFlags.Thickness;
+
+        return true;
+    }
+}
+```
+
+### 4.8 BorderView, MarginView, PaddingView — Heavy Adornment Views
+
+Each `*View` class is a **direct rename** of the current `Border`/`Margin`/`Padding` class plus inheritance change (from `Adornment` to `AdornmentView`). Their bodies are unchanged — they use `Parent` exactly as they do today.
+
+The table below documents the key `Parent` accesses in each class to make clear why `Parent` must be on `IAdornmentView` (it is used for drawing, event subscription, focus, scheme, and arrangement):
+
+| Class | Representative `Parent` usages |
+|-------|-------------------------------|
+| `BorderView` | `Parent.TitleTextFormatter.Draw(...)`, `Parent.HasFocus`, `Parent.Arrangement`, `Parent.LineCanvas`, `Parent.InvokeCommand(Command.Quit)`, `Parent.SuperView?.BorderStyle` |
+| `MarginView` | `Parent.MouseStateChanged += ...`, `Parent.Border!.GetBorderRectangle()`, `Parent.Border!.Thickness` |
+| `PaddingView` | `Parent.CanFocus`, `Parent.HasFocus`, `Parent.SetFocus()`, `Parent.SetNeedsDraw()`, `Parent.GetSubViews(...)` |
+
+```csharp
+// BorderView is Border (: Adornment : View) renamed to BorderView (: AdornmentView : View).
+// It retains all existing implementation. Parent is accessed via inheritance from AdornmentView.
+public class BorderView : AdornmentView
+{
+    public BorderView () { }
+    public BorderView (View? parent) : base (parent!) { }
+
+    // ... all existing Border rendering code unchanged ...
+    // Parent.TitleTextFormatter, Parent.HasFocus, Parent.LineCanvas, etc. all compile
+    // because Parent : View? is inherited from AdornmentView.
+}
+
+// MarginView is Margin (: Adornment : View) renamed to MarginView (: AdornmentView : View).
+public class MarginView : AdornmentView
+{
+    public MarginView () { }
+    public MarginView (View? parent) : base (parent!) { }
+
+    // ... all existing Margin shadow + clip code unchanged ...
+}
+
+// PaddingView is Padding (: Adornment : View) renamed to PaddingView (: AdornmentView : View).
+public class PaddingView : AdornmentView
+{
+    public PaddingView () { }
+    public PaddingView (View? parent) : base (parent!) { }
+
+    // ... all existing Padding focus + GetSubViews code unchanged ...
+}
+```
+
+**No new API is needed on `IAdornmentView` for the `*View` classes.** All of the `Parent` accesses in `BorderView`/`MarginView`/`PaddingView` are through concrete `View` method calls that are already available via inheritance from `AdornmentView`. `IAdornmentView.Parent` is the only interface surface needed — everything else flows from `View`.
+
+### 4.9 View.SetupAdornments (New Behavior)
 
 ```csharp
 private void SetupAdornments ()
@@ -601,7 +853,7 @@ private void DisposeAdornments ()
 }
 ```
 
-### 4.8 Lazy View Creation Triggers
+### 4.10 Lazy View Creation Triggers
 
 An `AdornmentView` is created **only** when:
 
@@ -619,7 +871,7 @@ For the **majority of simple views** (no arrangement, no shadow, no adornment su
 
 ---
 
-### 4.9 Lifecycle Hazards
+### 4.11 Lifecycle Hazards
 
 Four hazards arise from lazy creation that must be addressed in implementation:
 
@@ -736,8 +988,9 @@ This avoids View creation for the rendering of simple borders. The complexity tr
 5. Update `Border.Arrangment.cs` → reference `BorderView` (note: filename has pre-existing typo; rename opportunity)
 6. Update all `is Adornment` / `as Adornment` / `typeof(Adornment)` → use `AdornmentView`
 7. Update `View.Adornments.cs` property types: `Adornment` → `AdornmentView`
-8. Create `IAdornment.cs` with interface definition
-9. Create `AdornmentImpl.cs` with lightweight base (delegates all to concrete subclass)
+8. Create `IAdornment.cs` and `IAdornmentView.cs` with interface definitions
+9. Add `: IAdornmentView` to `AdornmentView`; update `AdornmentImpl.View` to explicit-implement `IAdornment.View` as `IAdornmentView?`
+10. Create `AdornmentImpl.cs` with lightweight base (delegates all to concrete subclass)
 10. Create lightweight `Border.cs`, `Margin.cs`, `Padding.cs` (thin wrappers over `BorderView`/`MarginView`/`PaddingView`) — **identical behavior** to current code, just split into two classes
 11. Change `View.Border`, `View.Margin`, `View.Padding` property types from `BorderView?` to `Border?`, `Margin?`, `Padding?`
 12. Update `View.SetupAdornments()` to create lightweight objects (still eagerly create Views initially)
@@ -757,8 +1010,8 @@ This avoids View creation for the rendering of simple borders. The complexity tr
 
 **Changes:**
 1. Update `View.SetupAdornments()` to NOT create Views — only create lightweight `Border`/`Margin`/`Padding` objects
-2. Remove `BeginInitAdornments()` and `EndInitAdornments()` from `View`; replace with null-safe inline calls inside `View.BeginInit()` and `View.EndInit()` overrides (see §4.9 Hazard 1)
-3. Implement `EnsureView()` in `AdornmentImpl` with proper initialization sequencing (see §4.9)
+2. Remove `BeginInitAdornments()` and `EndInitAdornments()` from `View`; replace with null-safe inline calls inside `View.BeginInit()` and `View.EndInit()` overrides (see §4.11 Hazard 1)
+3. Implement `EnsureView()` in `AdornmentImpl` with proper initialization sequencing (see §4.11)
 4. Update `SetAdornmentFrames()` to work purely from Thickness (no View needed)
 5. Update `GetAdornmentsThickness()` — already Thickness-only, no change needed
 6. Migrate triggering callsites to use `border.EnsureView()` / `border.View`:
@@ -865,8 +1118,9 @@ Code that does `v.Border?.XYZ` with nullable check is not needed for the lightwe
 | File | Contents |
 |------|----------|
 | `Terminal.Gui/ViewBase/Adornment/IAdornment.cs` | `IAdornment` interface |
+| `Terminal.Gui/ViewBase/Adornment/IAdornmentView.cs` | `IAdornmentView` interface (`Parent` only) |
 | `Terminal.Gui/ViewBase/Adornment/AdornmentImpl.cs` | `AdornmentImpl` abstract base |
-| `Terminal.Gui/ViewBase/Adornment/AdornmentView.cs` | Renamed from `Adornment.cs` |
+| `Terminal.Gui/ViewBase/Adornment/AdornmentView.cs` | Renamed from `Adornment.cs`; adds `: IAdornmentView` |
 | `Terminal.Gui/ViewBase/Adornment/BorderView.cs` | Renamed from `Border.cs` |
 | `Terminal.Gui/ViewBase/Adornment/BorderView.Arrangement.cs` | Renamed from `Border.Arrangment.cs` (fixing pre-existing typo) |
 | `Terminal.Gui/ViewBase/Adornment/MarginView.cs` | Renamed from `Margin.cs` |
