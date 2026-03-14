@@ -7,20 +7,14 @@ public class TransparentTests (ITestOutputHelper output)
 {
     [Fact]
     [SetupFakeApplication]
-
     public void Transparent_Text_Occludes ()
     {
-        var super = new View
-        {
-            App = ApplicationImpl.Instance,
-            Id = "super",
-            Width = 20,
-            Height = 5,
-        };
+        var super = new View { App = ApplicationImpl.Instance, Id = "super", Width = 20, Height = 5 };
+
         super.DrawingContent += (sender, args) =>
                                 {
                                     var s = sender as View;
-                                    s!.FillRect(s!.Viewport, Glyphs.Stipple);
+                                    s!.FillRect (s.Viewport, Glyphs.Stipple);
                                     args.Cancel = true;
                                 };
 
@@ -41,31 +35,27 @@ public class TransparentTests (ITestOutputHelper output)
         super.Layout ();
         super.Draw ();
 
-        _ = DriverAssert.AssertDriverContentsWithFrameAre (
-                                                        @"
-░░░░░░░░░░░░░░░░░░░░
-░┌─────────────┐░░░░
-░│Sub░░░░░░░░░░│░░░░
-░└─────────────┘░░░░
-░░░░░░░░░░░░░░░░░░░░", output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre ("""
+
+                                                           ░░░░░░░░░░░░░░░░░░░░
+                                                           ░┌─────────────┐░░░░
+                                                           ░│Sub░░░░░░░░░░│░░░░
+                                                           ░└─────────────┘░░░░
+                                                           ░░░░░░░░░░░░░░░░░░░░
+                                                           """,
+                                                           output);
     }
 
     [Fact]
     [SetupFakeApplication]
-
     public void Transparent_SubView_Occludes ()
     {
-        var super = new View
-        {
-            App = ApplicationImpl.Instance,
-            Id = "super",
-            Width = 20,
-            Height = 5,
-        };
+        var super = new View { App = ApplicationImpl.Instance, Id = "super", Width = 20, Height = 5 };
+
         super.DrawingContent += (sender, args) =>
                                 {
                                     var s = sender as View;
-                                    s!.FillRect (s!.Viewport, Glyphs.Stipple);
+                                    s!.FillRect (s.Viewport, Glyphs.Stipple);
                                     args.Cancel = true;
                                 };
 
@@ -82,12 +72,12 @@ public class TransparentTests (ITestOutputHelper output)
 
         var subSub = new View
         {
-            X = Pos.Center(),
-            Y = Pos.Center(),
-            Width = Dim.Auto(),
-            Height = Dim.Auto(),
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
             Id = "subSub",
-            Text = "subSub",
+            Text = "subSub"
         };
         sub.Add (subSub);
 
@@ -96,12 +86,14 @@ public class TransparentTests (ITestOutputHelper output)
         super.Layout ();
         super.Draw ();
 
-        _ = DriverAssert.AssertDriverContentsWithFrameAre (
-                                                          @"
-░░░░░░░░░░░░░░░░░░░░
-░┌─────────────┐░░░░
-░│░░░subSub░░░░│░░░░
-░└─────────────┘░░░░
-░░░░░░░░░░░░░░░░░░░░", output);
+        _ = DriverAssert.AssertDriverContentsWithFrameAre ("""
+
+                                                           ░░░░░░░░░░░░░░░░░░░░
+                                                           ░┌─────────────┐░░░░
+                                                           ░│░░░subSub░░░░│░░░░
+                                                           ░└─────────────┘░░░░
+                                                           ░░░░░░░░░░░░░░░░░░░░
+                                                           """,
+                                                           output);
     }
 }

@@ -1,5 +1,15 @@
 # Plan: Border Transparent & TransparentMouse Support (Issue #4834)
 
+## Status
+
+| Item | Status |
+|------|--------|
+| Border transparency failing tests | Done — 2 skipped, 1 passes (wrong reason) |
+| DoDrawComplete comment rewrite | Done |
+| DoDrawComplete baseline tests | Done — 8 tests, all passing |
+| Phase 1: Visual transparency for Border | Not started |
+| Phase 2: Drawn-region-aware TransparentMouse | Not started |
+
 ## Context
 
 Issue #4834: `Border` should support `ViewportSettingsFlags.Transparent` and `ViewportSettingsFlags.TransparentMouse`. Prerequisite for TabView redesign (#4183), where each Tab's Border renders a small header rectangle and the rest must be transparent.
@@ -15,9 +25,24 @@ Three tests in `Tests/UnitTestsParallelizable/ViewBase/Adornment/BorderTranspare
 
 | Test | Status | Why |
 |------|--------|-----|
-| `Border_Transparent_Shows_Underlying_Content_In_Interior` | **FAILS** | Border doesn't honor `Transparent` — interior shows spaces, not underlying content |
+| `Border_Transparent_Shows_Underlying_Content_In_Interior` | **Skip** (not yet implemented) | Border doesn't honor `Transparent` — interior shows spaces, not underlying content |
 | `Border_TransparentMouse_Interior_Clicks_Pass_Through` | passes (wrong reason) | Blanket `TransparentMouse` removes Border entirely |
-| `Border_TransparentMouse_BorderLine_Clicks_Are_Captured` | **FAILS** | Blanket `TransparentMouse` removes Border from ALL hits, including border line cells |
+| `Border_TransparentMouse_BorderLine_Clicks_Are_Captured` | **Skip** (not yet implemented) | Blanket `TransparentMouse` removes Border from ALL hits, including border line cells |
+
+## Baseline Tests for DoDrawComplete
+
+Eight tests in `Tests/UnitTestsParallelizable/ViewBase/Draw/DoDrawCompleteTests.cs` — all passing:
+
+| Test | What it verifies |
+|------|-----------------|
+| `OpaqueView_ExcludesEntireFrameFromClip` | Opaque view punches out its entire borderFrame from Driver.Clip |
+| `OpaqueView_UsesBorderFrameNotViewFrame` | When Border exists, uses Border.FrameToScreen() not View.FrameToScreen() |
+| `OpaqueView_UpdatesDrawContext` | Opaque view calls `context.AddDrawnRectangle(borderFrame)` so SuperView knows |
+| `TransparentView_ExcludesOnlyDrawnRegion` | Transparent view excludes only the actually-drawn cells, not the full frame |
+| `TransparentView_ClampsDrawnRegionToViewport` | DrawnRegion is clipped to Viewport bounds before exclusion |
+| `TransparentView_ExcludesBorderAndPadding` | Border and Padding thickness areas are always excluded, even for transparent views |
+| `Adornment_SkipsClipExclusion` | Adornments (Margin/Border/Padding) do NOT modify Driver.Clip in DoDrawComplete |
+| `TransparentParent_OpaqueChild_ContextFlows` | Opaque child's frame is added to parent's DrawContext via AddDrawnRectangle |
 
 ## Root Cause Analysis
 
@@ -171,23 +196,6 @@ viewsUnderLocation.RemoveAll (v =>
 | Layout changes | Trigger `SetNeedsDraw`, which clears cache |
 | Border with no lines (Thickness=0) | No drawn region, fully transparent to mouse |
 | Existing code that reads `Parent.LineCanvas` from Border | Must be updated to use `this.LineCanvas` or verified to still work after merge |
-
-## Missing Baseline Tests for DoDrawComplete
-
-Audit of `Tests/UnitTestsParallelizable/ViewBase/Draw/` revealed that `DoDrawComplete` has significant test gaps.
-These tests establish baseline behavior before we modify the logic. They go in
-`Tests/UnitTestsParallelizable/ViewBase/Draw/DoDrawCompleteTests.cs`.
-
-| Test | What it verifies |
-|------|-----------------|
-| `DoDrawComplete_OpaqueView_ExcludesEntireFrameFromClip` | Opaque view punches out its entire borderFrame from Driver.Clip |
-| `DoDrawComplete_OpaqueView_UsesBorderFrameNotViewFrame` | When Border exists, uses Border.FrameToScreen() not View.FrameToScreen() |
-| `DoDrawComplete_OpaqueView_UpdatesDrawContext` | Opaque view calls `context.AddDrawnRectangle(borderFrame)` so SuperView knows |
-| `DoDrawComplete_TransparentView_ExcludesOnlyDrawnRegion` | Transparent view excludes only the actually-drawn cells, not the full frame |
-| `DoDrawComplete_TransparentView_ClampsDrawnRegionToViewport` | DrawnRegion is clipped to Viewport bounds before exclusion |
-| `DoDrawComplete_TransparentView_ExcludesBorderAndPadding` | Border and Padding thickness areas are always excluded, even for transparent views |
-| `DoDrawComplete_Adornment_SkipsClipExclusion` | Adornments (Margin/Border/Padding) do NOT modify Driver.Clip in DoDrawComplete |
-| `DoDrawComplete_TransparentParent_OpaqueChild_ContextFlows` | Opaque child's frame is added to parent's DrawContext via AddDrawnRectangle |
 
 ## Verification
 
