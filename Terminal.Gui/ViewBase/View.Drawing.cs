@@ -30,6 +30,8 @@ public partial class View // Drawing APIs
             view.Draw (context);
         }
 
+        Border.DrawBorders(viewsArray);
+
         // Draw Transparent margins last to ensure they are drawn on top of the content.
         Margin.DrawMargins (viewsArray);
 
@@ -170,6 +172,7 @@ public partial class View // Drawing APIs
 
         // ------------------------------------
         // This causes the Margin to be drawn in a second pass if it has a ShadowStyle
+        Border?.CacheClip ();
         Margin?.CacheClip ();
 
         // ------------------------------------
@@ -315,7 +318,7 @@ public partial class View // Drawing APIs
 
         // Each of these renders lines to this View's LineCanvas
         // Those lines will be finally rendered in OnRenderLineCanvas
-        if (Border is { } && Border.Thickness != Thickness.Empty)
+        if (Border is { } && !Border.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) && Border.Thickness != Thickness.Empty)
         {
             Border?.Draw ();
         }
@@ -853,7 +856,7 @@ public partial class View // Drawing APIs
             ExcludeFromClip (context.GetDrawnRegion ());
 
             // Border and Padding are always opaque (they draw lines/fills), so exclude them too
-            ExcludeFromClip (Border?.Thickness.AsRegion (Border.FrameToScreen ()));
+            //ExcludeFromClip (Border?.Thickness.AsRegion (Border.FrameToScreen ()));
             ExcludeFromClip (Padding?.Thickness.AsRegion (Padding.FrameToScreen ()));
         }
         else
@@ -868,7 +871,19 @@ public partial class View // Drawing APIs
             // If there's a Border, use its frame instead (includes the border thickness)
             if (Border is { })
             {
-                borderFrame = Border.FrameToScreen ();
+                if (Border.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
+                {
+                    context!.ClipDrawnRegion (ViewportToScreen (Viewport));
+
+                    borderFrame = Border.Thickness.AsRegion (Border.FrameToScreen ()).GetBounds ();
+                    //context?.AddDrawnRectangle (borderFrame);
+                    //Driver?.Clip?.Union (borderFrame);
+                    borderFrame = Padding!.FrameToScreen ();
+                }
+                else
+                {
+                    borderFrame = Border.FrameToScreen ();
+                }
             }
 
             // Exclude this view's entire area (Border inward, but not Margin) from the clip.

@@ -50,7 +50,6 @@ public class Margin : Adornment
     }
 
     // When the Parent is drawn, we cache the clip region so we can draw the Margin after all other Views
-    // QUESTION: Why can't this just be the NeedsDisplay region?
     private Region? _cachedClip;
 
     internal Region? GetCachedClip () => _cachedClip;

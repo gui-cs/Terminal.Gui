@@ -208,15 +208,15 @@ public class Adornment : View, IDesignable
     /// <returns></returns>
     protected override bool OnRenderingLineCanvas () => true;
 
-    /// <summary>
-    ///     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this
-    ///     property throws an <see cref="InvalidOperationException"/>.
-    /// </summary>
-    public override bool SuperViewRendersLineCanvas
-    {
-        get => false;
-        set => throw new InvalidOperationException (@"Adornment can only render to their Parent or Parent's Superview.");
-    }
+    ///// <summary>
+    /////     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this
+    /////     property throws an <see cref="InvalidOperationException"/>.
+    ///// </summary>
+    //public override bool SuperViewRendersLineCanvas
+    //{
+    //    get => false;
+    //    set => throw new InvalidOperationException (@"Adornment can only render to their Parent or Parent's Superview.");
+    //}
 
     /// <summary>
     ///     Indicates whether the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness.
