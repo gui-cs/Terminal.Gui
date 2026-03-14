@@ -1,0 +1,149 @@
+// Claude - Opus 4.6
+
+using System.Text;
+using UnitTests;
+// ReSharper disable StringLiteralTypo
+
+namespace ViewBaseTests.Adornments;
+
+/// <summary>
+///     Tests for Border transparency support (Issue #4834).
+///     Border should support ViewportSettingsFlags.Transparent and ViewportSettingsFlags.TransparentMouse.
+/// </summary>
+public class BorderTransparentTests (ITestOutputHelper output)
+{
+    /// <summary>
+    ///     Verifies that a Border with Transparent set only draws border lines,
+    ///     allowing underlying content to show through the interior.
+    ///     Currently fails because Border doesn't honor Transparent — the interior
+    ///     shows spaces instead of the underlying 'X' background.
+    /// </summary>
+    [Fact (Skip = "Not yet implemented — Issue #4834")]
+    public void Border_Transparent_Shows_Underlying_Content_In_Interior ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (7, 5);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        // Fill window background with 'X' to detect transparency
+        window.ClearingViewport += (_, args) =>
+                                   {
+                                       window.FillRect (args.NewViewport, new Rune ('X'));
+                                       args.Cancel = true;
+                                   };
+
+        View borderedView = new ()
+        {
+            X = 1,
+            Y = 1,
+            Width = 5,
+            Height = 3,
+            BorderStyle = LineStyle.Single
+        };
+        borderedView.Border!.ViewportSettings |= ViewportSettingsFlags.Transparent;
+
+        window.Add (borderedView);
+        app.Begin (window);
+
+        // The interior (row 2, cols 2-4) should show 'X' from the underlying window,
+        // not spaces from the bordered view's cleared viewport.
+        // Border lines should still be drawn normally.
+        DriverAssert.AssertDriverContentsAre ("""
+
+                                              XXXXXXX
+                                              X┌───┐X
+                                              X│XXX│X
+                                              X└───┘X
+                                              XXXXXXX
+                                              """,
+                                              output,
+                                              app.Driver);
+    }
+
+    /// <summary>
+    ///     Verifies that mouse events in the transparent interior of a Border with TransparentMouse
+    ///     pass through to views underneath.
+    ///     Currently passes — but only because the blanket TransparentMouse flag removes the Border
+    ///     entirely from hit-testing. After per-cell TransparentMouse is implemented, this should
+    ///     still pass because the interior cells were not drawn by the Border.
+    /// </summary>
+    [Fact]
+    public void Border_TransparentMouse_Interior_Clicks_Pass_Through ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (10, 6);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        View borderedView = new ()
+        {
+            X = 2,
+            Y = 1,
+            Width = 5,
+            Height = 3,
+            BorderStyle = LineStyle.Single,
+            Id = "Bordered"
+        };
+        borderedView.Border!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
+
+        window.Add (borderedView);
+        app.Begin (window);
+
+        // Screen position (4, 2) is in the interior of the bordered view —
+        // inside the border outline but NOT on a border line.
+        // With TransparentMouse, this should pass through to views underneath.
+        List<View?> viewsUnderInterior = window.GetViewsUnderLocation (new Point (4, 2), ViewportSettingsFlags.TransparentMouse);
+
+        // The bordered view's Border should NOT be in the hit list for interior points
+        bool borderInList = viewsUnderInterior.Any (v => v is Border);
+
+        Assert.False (borderInList, "Border with TransparentMouse should not capture mouse events in its transparent interior");
+    }
+
+    /// <summary>
+    ///     Verifies that mouse events ON the border lines of a Border with TransparentMouse
+    ///     are still captured by the Border (only the transparent interior passes through).
+    ///     Currently fails because the blanket TransparentMouse flag removes the Border
+    ///     from ALL hit-testing, including border line cells.
+    /// </summary>
+    [Fact (Skip = "Not yet implemented — Issue #4834")]
+    public void Border_TransparentMouse_BorderLine_Clicks_Are_Captured ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (10, 6);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        View borderedView = new ()
+        {
+            X = 2,
+            Y = 1,
+            Width = 5,
+            Height = 3,
+            BorderStyle = LineStyle.Single,
+            Id = "Bordered"
+        };
+        borderedView.Border!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
+
+        window.Add (borderedView);
+        app.Begin (window);
+
+        // Click on the top-left corner of the border (screen position 2, 1)
+        // This IS on a border line, so it should be captured by the Border.
+        List<View?> viewsOnBorderLine = window.GetViewsUnderLocation (new Point (2, 1), ViewportSettingsFlags.TransparentMouse);
+
+        bool borderInList = viewsOnBorderLine.Any (v => v is Border);
+
+        Assert.True (borderInList, "Border with TransparentMouse should still capture mouse events on its drawn border lines");
+    }
+}
