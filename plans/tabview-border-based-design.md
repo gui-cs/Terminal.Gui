@@ -650,7 +650,7 @@ Fucking magic.
 
 ## Issues Found in This Plan (To Fix)
 
-The following errors/inconsistencies should be corrected:
+The following errors/inconsistencies should be corrected:Borde
 
 1. **Line ~292**: `Border.BorderStyle == BorderStyle.Tab` — `BorderStyle` is actually `LineStyle` (Rounded, Single, etc.). The Tab flag is on `BorderSettings`, not `BorderStyle`. Should be `Border.Settings.HasFlag (BorderSettings.Tab)`.
 

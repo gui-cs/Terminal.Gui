@@ -25,9 +25,9 @@ public sealed class ViewportSettingsEditor : EditorBase
             subview.Enabled = ViewToEdit is { };// and not Adornment;
         }
 
-        if (ViewToEdit is null or Adornment)
+        if (ViewToEdit is null)
         {
-           // return;
+           return;
         }
 
         _cbAllowNegativeX?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeX) ? CheckState.Checked : CheckState.UnChecked;
