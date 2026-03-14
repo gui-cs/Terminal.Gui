@@ -137,7 +137,7 @@ public class TextViewAutocompletePopup : Scenario
         StatusBar statusBar = new (
                                    [
                                        new (
-                                            Application.QuitKey,
+                                            Application.GetDefaultKey (Command.Quit),
                                             "Quit",
                                             () => Quit ()
                                            ),

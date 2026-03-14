@@ -15,7 +15,7 @@ public class SourcesManagerTests
         // Add one successful source
         var validSource = "valid.json";
         var validLocation = ConfigLocations.Runtime;
-        sourcesManager.Load (settingsScope, """{"Application.QuitKey": "Ctrl+Z"}""", validSource, validLocation);
+        sourcesManager.Load (settingsScope, """{"Driver.Force16Colors": true}""", validSource, validLocation);
 
         try
         {

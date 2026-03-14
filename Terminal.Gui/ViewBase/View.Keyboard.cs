@@ -194,13 +194,14 @@ public partial class View // Keyboard APIs
         HotKeyBindings.Add (newKey.WithAlt, keyBinding);
 
         // If the Key is A-Z, add ShiftMask and AltMask | ShiftMask
-        if (newKey.IsKeyCodeAtoZ)
+        if (!newKey.IsKeyCodeAtoZ)
         {
-            HotKeyBindings.Remove (newKey.WithShift);
-            HotKeyBindings.Add (newKey.WithShift, keyBinding);
-            HotKeyBindings.Remove (newKey.WithShift.WithAlt);
-            HotKeyBindings.Add (newKey.WithShift.WithAlt, keyBinding);
+            return true;
         }
+        HotKeyBindings.Remove (newKey.WithShift);
+        HotKeyBindings.Add (newKey.WithShift, keyBinding);
+        HotKeyBindings.Remove (newKey.WithShift.WithAlt);
+        HotKeyBindings.Add (newKey.WithShift.WithAlt, keyBinding);
 
         return true;
     }
@@ -643,6 +644,133 @@ public partial class View // Keyboard APIs
 
     /// <summary>Gets the bindings for this view that will be invoked regardless of whether this view has focus or not.</summary>
     public KeyBindings HotKeyBindings { get; internal set; } = null!;
+
+    /// <summary>
+    ///     Gets or sets the default key bindings shared across all views. Only commands that a view supports
+    ///     (via <see cref="GetSupportedCommands"/>) are actually bound when <see cref="ApplyKeyBindings"/> is called.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings
+    {
+        get;
+        set
+        {
+            field = value;
+            Trace.Configuration ("DefaultKeyBindings", "View Set", $"{string.Join (", ", value?.Select (kvp => $"{kvp.Key}=[{kvp.Value}]") ?? [])}");
+        }
+    } = new ()
+    {
+        // Navigation
+        [Command.Left] = Bind.All (Key.CursorLeft),
+        [Command.Right] = Bind.All (Key.CursorRight),
+        [Command.Up] = Bind.All (Key.CursorUp),
+        [Command.Down] = Bind.All (Key.CursorDown),
+        [Command.PageUp] = Bind.All (Key.PageUp),
+        [Command.PageDown] = Bind.All (Key.PageDown),
+        [Command.LeftStart] = Bind.All (Key.Home),
+        [Command.RightEnd] = Bind.All (Key.End),
+        [Command.Start] = Bind.All (Key.Home.WithCtrl),
+        [Command.End] = Bind.All (Key.End.WithCtrl),
+
+        // Selection-extend
+        [Command.LeftExtend] = Bind.All (Key.CursorLeft.WithShift),
+        [Command.RightExtend] = Bind.All (Key.CursorRight.WithShift),
+        [Command.UpExtend] = Bind.All (Key.CursorUp.WithShift),
+        [Command.DownExtend] = Bind.All (Key.CursorDown.WithShift),
+        [Command.PageUpExtend] = Bind.All (Key.PageUp.WithShift),
+        [Command.PageDownExtend] = Bind.All (Key.PageDown.WithShift),
+        [Command.LeftStartExtend] = Bind.All (Key.Home.WithShift),
+        [Command.RightEndExtend] = Bind.All (Key.End.WithShift),
+        [Command.StartExtend] = Bind.All (Key.Home.WithCtrl.WithShift),
+        [Command.EndExtend] = Bind.All (Key.End.WithCtrl.WithShift),
+
+        // Clipboard
+        [Command.Copy] = Bind.All (Key.C.WithCtrl),
+        [Command.Cut] = Bind.All (Key.X.WithCtrl),
+        [Command.Paste] = Bind.All (Key.V.WithCtrl),
+
+        // Editing
+        [Command.Undo] = Bind.AllPlus (Key.Z.WithCtrl, [new Key ('/').WithCtrl]),
+        [Command.Redo] = Bind.AllPlus (Key.Y.WithCtrl, [Key.Z.WithCtrl.WithShift]),
+        [Command.SelectAll] = Bind.All (Key.A.WithCtrl),
+        [Command.DeleteCharLeft] = Bind.All (Key.Backspace),
+        [Command.DeleteCharRight] = Bind.All (Key.Delete, Key.D.WithCtrl)
+    };
+
+    /// <summary>
+    ///     Gets or sets per-view key binding overrides from configuration. The outer key is the view type name
+    ///     (e.g., "TextField"), the inner dictionary maps commands to platform key bindings.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, Dictionary<Command, PlatformKeyBinding>>? ViewKeyBindings { get; set; }
+
+    /// <summary>
+    ///     Applies layered key bindings from the provided dictionaries. Only commands that the view supports
+    ///     (via <see cref="GetSupportedCommands"/>) are bound. Keys already bound are not overwritten.
+    /// </summary>
+    protected void ApplyKeyBindings (params Dictionary<Command, PlatformKeyBinding>? [] layers)
+    {
+        HashSet<Command> supported = new (GetSupportedCommands ());
+
+        foreach (Dictionary<Command, PlatformKeyBinding>? layer in layers)
+        {
+            if (layer is null)
+            {
+                continue;
+            }
+
+            ApplyLayer (layer, supported);
+        }
+
+        // Apply user overrides from View.ViewKeyBindings (CM/MEC bridge)
+        // Strip generic arity suffix (e.g., "TreeView`1" → "TreeView") so config keys match
+        string typeName = GetType ().Name;
+        int backtick = typeName.IndexOf ('`');
+
+        if (backtick >= 0)
+        {
+            typeName = typeName [..backtick];
+        }
+
+        if (ViewKeyBindings?.TryGetValue (typeName, out Dictionary<Command, PlatformKeyBinding>? overrides) == true)
+        {
+            ApplyLayer (overrides, supported);
+        }
+    }
+
+    private void ApplyLayer (Dictionary<Command, PlatformKeyBinding> layer, HashSet<Command> supported)
+    {
+        foreach ((Command command, PlatformKeyBinding platformKeys) in layer)
+        {
+            if (!supported.Contains (command))
+            {
+                continue;
+            }
+
+            foreach (Key key in platformKeys.GetCurrentPlatformKeys ())
+            {
+                if (key == Key.Empty)
+                {
+                    continue;
+                }
+
+                if (KeyBindings.TryGet (key, out _))
+                {
+                    continue;
+                }
+
+                KeyBindings.Add (key, command);
+            }
+        }
+    }
 
     /// <summary>
     ///     INTERNAL: Invokes the Commands bound to <paramref name="key"/>.

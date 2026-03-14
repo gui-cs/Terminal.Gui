@@ -35,14 +35,14 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         Assert.False (IsEnabled);
         Enable (ConfigLocations.HardCoded);
 
-        Assert.Equal (Key.Esc, Application.QuitKey);
+        Assert.Equal (Key.Esc, Application.GetDefaultKey (Command.Quit));
 
-        ConfigProperty fromSettings = Settings! ["Application.QuitKey"];
+        ConfigProperty fromSettings = Settings! ["Application.DefaultKeyBindings"];
 
         FrozenDictionary<string, ConfigProperty> initialCache = GetHardCodedConfigPropertyCache ();
         Assert.NotNull (initialCache);
 
-        ConfigProperty fromCache = initialCache ["Application.QuitKey"];
+        ConfigProperty fromCache = initialCache ["Application.DefaultKeyBindings"];
 
         // Assert
         Assert.NotEqual (fromCache, fromSettings);
@@ -76,25 +76,25 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         try
         {
             Enable (ConfigLocations.HardCoded);
-            Assert.Equal (Key.Esc, Application.QuitKey);
+            Assert.Equal (10000, FileDialog.MaxSearchResults);
 
             FrozenDictionary<string, ConfigProperty> initialCache = GetHardCodedConfigPropertyCache ();
             Assert.NotNull (initialCache);
-            Assert.Equal (Key.Esc, (Key)initialCache ["Application.QuitKey"].PropertyValue);
+            Assert.Equal (10000, (int)initialCache ["FileDialog.MaxSearchResults"].PropertyValue!);
 
             // Act
-            Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
-            Assert.Equal (Key.Q, (Key)Settings ["Application.QuitKey"].PropertyValue);
+            Settings! ["FileDialog.MaxSearchResults"].PropertyValue = 42;
+            Assert.Equal (42, (int)Settings ["FileDialog.MaxSearchResults"].PropertyValue!);
 
-            Settings ["Application.QuitKey"].Apply ();
-            Assert.Equal (Key.Q, Application.QuitKey);
+            Settings ["FileDialog.MaxSearchResults"].Apply ();
+            Assert.Equal (42, FileDialog.MaxSearchResults);
 
-            Application.QuitKey = Key.K;
+            FileDialog.MaxSearchResults = 99;
 
             // Assert
             FrozenDictionary<string, ConfigProperty> cache = GetHardCodedConfigPropertyCache ();
-            Assert.True (initialCache ["Application.QuitKey"].Immutable);
-            Assert.Equal (Key.Esc, (Key)initialCache ["Application.QuitKey"].PropertyValue);
+            Assert.True (initialCache ["FileDialog.MaxSearchResults"].Immutable);
+            Assert.Equal (10000, (int)initialCache ["FileDialog.MaxSearchResults"].PropertyValue!);
         }
         finally
         {
@@ -306,15 +306,17 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             fired = true;
 
             // assert
-            Assert.Equal (KeyCode.Q, Application.QuitKey.KeyCode);
-            Assert.Equal (KeyCode.F, Application.NextTabGroupKey.KeyCode);
-            Assert.Equal (KeyCode.B, Application.PrevTabGroupKey.KeyCode);
+            Assert.Equal (KeyCode.Q, Application.GetDefaultKey (Command.Quit).KeyCode);
+            Assert.Equal (KeyCode.F, Application.GetDefaultKey (Command.NextTabGroup).KeyCode);
+            Assert.Equal (KeyCode.B, Application.GetDefaultKey (Command.PreviousTabGroup).KeyCode);
         }
 
         // act
-        Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
-        Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
-        Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
+        Dictionary<Command, PlatformKeyBinding> bindings = new ((Dictionary<Command, PlatformKeyBinding>)Settings! ["Application.DefaultKeyBindings"].PropertyValue!);
+        bindings [Command.Quit] = Bind.All (Key.Q);
+        bindings [Command.NextTabGroup] = Bind.All (Key.F);
+        bindings [Command.PreviousTabGroup] = Bind.All (Key.B);
+        Settings! ["Application.DefaultKeyBindings"].PropertyValue = bindings;
 
         Apply ();
 
@@ -336,7 +338,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         Enable (ConfigLocations.HardCoded);
 
         ThrowOnJsonErrors = true;
-        Assert.Equal (Key.Esc, ((Key)Settings! ["Application.QuitKey"].PropertyValue)!.KeyCode);
+        Dictionary<Command, PlatformKeyBinding> loadBindings = (Dictionary<Command, PlatformKeyBinding>)Settings! ["Application.DefaultKeyBindings"].PropertyValue!;
+        Assert.Equal (Key.Esc, loadBindings [Command.Quit].GetCurrentPlatformKeys ().First ());
 
         Updated += ConfigurationManagerUpdated;
 
@@ -402,19 +405,20 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Enable (ConfigLocations.HardCoded);
             ThrowOnJsonErrors = true;
 
-            Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Assert.Equal (Key.Esc, Application.GetDefaultKey (Command.Quit));
 
             // act
             RuntimeConfig = """
 
                                     {
-                                          "Application.QuitKey": "Ctrl-Q"
+                                          "Application.DefaultKeyBindings": { "Quit": { "All": ["Ctrl-Q"] } }
                                     }
                             """;
             Load (ConfigLocations.Runtime);
 
             // assert
-            Assert.Equal (Key.Q.WithCtrl, (Key)Settings ["Application.QuitKey"].PropertyValue);
+            Dictionary<Command, PlatformKeyBinding> loadedBindings = (Dictionary<Command, PlatformKeyBinding>)Settings ["Application.DefaultKeyBindings"].PropertyValue!;
+            Assert.Equal (Key.Q.WithCtrl, loadedBindings [Command.Quit].GetCurrentPlatformKeys ().First ());
         }
         finally
         {
@@ -435,7 +439,9 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         {
             Enable (ConfigLocations.HardCoded);
 
-            Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
+            Dictionary<Command, PlatformKeyBinding> bindings6 = new ((Dictionary<Command, PlatformKeyBinding>)Settings! ["Application.DefaultKeyBindings"].PropertyValue!);
+            bindings6 [Command.Quit] = Bind.All (Key.Q);
+            Settings! ["Application.DefaultKeyBindings"].PropertyValue = bindings6;
 
             Updated += ConfigurationManagerUpdated;
 
@@ -468,15 +474,17 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             // arrange
             Enable (ConfigLocations.HardCoded);
 
-            Settings! ["Application.QuitKey"].PropertyValue = Key.Q;
-            Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
-            Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
+            Dictionary<Command, PlatformKeyBinding> bindings7 = new ((Dictionary<Command, PlatformKeyBinding>)Settings! ["Application.DefaultKeyBindings"].PropertyValue!);
+            bindings7 [Command.Quit] = Bind.All (Key.Q);
+            bindings7 [Command.NextTabGroup] = Bind.All (Key.F);
+            bindings7 [Command.PreviousTabGroup] = Bind.All (Key.B);
+            Settings! ["Application.DefaultKeyBindings"].PropertyValue = bindings7;
             Settings.Apply ();
 
             // assert apply worked
-            Assert.Equal (KeyCode.Q, Application.QuitKey.KeyCode);
-            Assert.Equal (KeyCode.F, Application.NextTabGroupKey.KeyCode);
-            Assert.Equal (KeyCode.B, Application.PrevTabGroupKey.KeyCode);
+            Assert.Equal (KeyCode.Q, Application.GetDefaultKey (Command.Quit).KeyCode);
+            Assert.Equal (KeyCode.F, Application.GetDefaultKey (Command.NextTabGroup).KeyCode);
+            Assert.Equal (KeyCode.B, Application.GetDefaultKey (Command.PreviousTabGroup).KeyCode);
 
             //act
             ResetToHardCodedDefaults ();
@@ -484,26 +492,29 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             // assert
             Assert.NotEmpty (ThemeManager.Themes!);
             Assert.Equal ("Default", ThemeManager.Theme);
-            Assert.Equal (Key.Esc, Application.QuitKey);
-            Assert.Equal (Key.F6, Application.NextTabGroupKey);
-            Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
+            Assert.Equal (Key.Esc, Application.GetDefaultKey (Command.Quit));
+            Assert.Equal (Key.F6, Application.GetDefaultKey (Command.NextTabGroup));
+            Assert.Equal (Key.F6.WithShift, Application.GetDefaultKey (Command.PreviousTabGroup));
 
             // arrange
-            Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-            Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
-            Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
+            Dictionary<Command, PlatformKeyBinding> bindings7b = new ((Dictionary<Command, PlatformKeyBinding>)Settings ["Application.DefaultKeyBindings"].PropertyValue!);
+            bindings7b [Command.Quit] = Bind.All (Key.Q);
+            bindings7b [Command.NextTabGroup] = Bind.All (Key.F);
+            bindings7b [Command.PreviousTabGroup] = Bind.All (Key.B);
+            Settings ["Application.DefaultKeyBindings"].PropertyValue = bindings7b;
             Settings.Apply ();
 
-            // act
+            // act - ResetToHardCodedDefaults first, then load library resources on top
+            ResetToHardCodedDefaults ();
             Load (ConfigLocations.LibraryResources);
             Apply ();
 
             // assert
             Assert.NotEmpty (ThemeManager.Themes);
             Assert.Equal ("Default", ThemeManager.Theme);
-            Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
-            Assert.Equal (Key.F6, Application.NextTabGroupKey);
-            Assert.Equal (Key.F6.WithShift, Application.PrevTabGroupKey);
+            Assert.Equal (KeyCode.Esc, Application.GetDefaultKey (Command.Quit).KeyCode);
+            Assert.Equal (Key.F6, Application.GetDefaultKey (Command.NextTabGroup));
+            Assert.Equal (Key.F6.WithShift, Application.GetDefaultKey (Command.PreviousTabGroup));
         }
         finally
         {
@@ -542,7 +553,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             var json = @"
 {
   ""$schema"": ""https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json"",
-  ""Application.QuitKey"": ""Alt-Z"",
+  ""Application.DefaultKeyBindings"": { ""Quit"": { ""All"": [""Alt-Z""] } },
   ""Theme"": ""Default"",
   ""Themes"": [
     {
@@ -682,8 +693,9 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             ConfigurationManager.SourcesManager?.Load (Settings, json, "UpdateFromJson", ConfigLocations.Runtime);
 
             Assert.Equal ("Default", ThemeManager.Theme);
-            Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
-            Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings! ["Application.QuitKey"].PropertyValue)!.KeyCode);
+            Assert.Equal (KeyCode.Esc, Application.GetDefaultKey (Command.Quit).KeyCode);
+            Dictionary<Command, PlatformKeyBinding> settingsBindings8 = (Dictionary<Command, PlatformKeyBinding>)Settings! ["Application.DefaultKeyBindings"].PropertyValue!;
+            Assert.Equal (KeyCode.Z | KeyCode.AltMask, settingsBindings8 [Command.Quit].GetCurrentPlatformKeys ().First ().KeyCode);
             Assert.Equal (Alignment.Center, MessageBox.DefaultButtonAlignment);
 
             // Get current scheme colors again
@@ -697,7 +709,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Apply ();
 
             Assert.Equal ("Default", ThemeManager.Theme);
-            Assert.Equal (KeyCode.Z | KeyCode.AltMask, Application.QuitKey.KeyCode);
+            Assert.Equal (KeyCode.Z | KeyCode.AltMask, Application.GetDefaultKey (Command.Quit).KeyCode);
             Assert.Equal (Alignment.End, MessageBox.DefaultButtonAlignment);
 
             Assert.Equal (Color.White.ToString (), currentBaseNormalFg.ToString ());
@@ -713,7 +725,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             FrozenDictionary<string, ConfigProperty> hardCodedCache = GetHardCodedConfigPropertyCache ()!;
 
             Assert.Equal (hardCodedCache ["Theme"].PropertyValue, ThemeManager.Theme);
-            Assert.Equal (hardCodedCache ["Application.QuitKey"].PropertyValue, Application.QuitKey);
+            Dictionary<Command, PlatformKeyBinding> hardCodedBindings = (Dictionary<Command, PlatformKeyBinding>)hardCodedCache ["Application.DefaultKeyBindings"].PropertyValue!;
+            Assert.Equal (hardCodedBindings [Command.Quit].GetCurrentPlatformKeys ().First (), Application.GetDefaultKey (Command.Quit));
 
             // Themes
             Assert.Equal (hardCodedCache ["MessageBox.DefaultButtonAlignment"].PropertyValue, MessageBox.DefaultButtonAlignment);
@@ -750,11 +763,12 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             // Act
             Enable (ConfigLocations.HardCoded);
 
-            Application.QuitKey = Key.A;
+            Application.DefaultKeyBindings! [Command.Quit] = Bind.All (Key.A);
 
             UpdateToCurrentValues ();
 
-            Assert.Equal (Key.A, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Dictionary<Command, PlatformKeyBinding> bindings9 = (Dictionary<Command, PlatformKeyBinding>)Settings! ["Application.DefaultKeyBindings"].PropertyValue!;
+            Assert.Equal (Key.A, bindings9 [Command.Quit].GetCurrentPlatformKeys ().First ());
             Assert.NotNull (Settings);
             Assert.NotNull (AppSettings);
             Assert.NotNull (ThemeManager.Themes);
@@ -785,13 +799,13 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             // with different precedence levels
             RuntimeConfig = """
                             {
-                                 "Application.QuitKey": "Alt+Q"  
+                                 "Application.DefaultKeyBindings": { "Quit": { "All": ["Alt+Q"] } }
                             }
                             """;
 
             var defaultConfig = """
                                 {
-                                     "Application.QuitKey": "Ctrl+X"
+                                     "Application.DefaultKeyBindings": { "Quit": { "All": ["Ctrl+X"] } }
                                 }
                                 """;
 
@@ -802,7 +816,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Load (ConfigLocations.Runtime);
 
             // Assert - the runtime config should win due to precedence
-            Assert.Equal (Key.Q.WithAlt, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Dictionary<Command, PlatformKeyBinding> precedenceBindings = (Dictionary<Command, PlatformKeyBinding>)Settings! ["Application.DefaultKeyBindings"].PropertyValue!;
+            Assert.Equal (Key.Q.WithAlt, precedenceBindings [Command.Quit].GetCurrentPlatformKeys ().First ());
         }
         finally
         {
@@ -902,8 +917,8 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 #pragma warning restore xUnit2030
 
             // Application is a static class
-            PropertyInfo pi = typeof (Application).GetProperty ("QuitKey");
-            Assert.Equal (pi, Settings ["Application.QuitKey"].PropertyInfo);
+            PropertyInfo pi = typeof (Application).GetProperty ("DefaultKeyBindings");
+            Assert.Equal (pi, Settings ["Application.DefaultKeyBindings"].PropertyInfo);
 
             // FrameView is not a static class and DefaultBorderStyle is Scope.Scheme
             pi = typeof (FrameView).GetProperty ("DefaultBorderStyle");
@@ -925,14 +940,15 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         try
         {
             // Spot check by setting some of the config properties
-            Application.QuitKey = Key.X.WithCtrl;
+            Application.DefaultKeyBindings! [Command.Quit] = Bind.All (Key.X.WithCtrl);
             FileDialog.MaxSearchResults = 1;
 
             Enable (ConfigLocations.HardCoded);
             Load (ConfigLocations.HardCoded);
 
             // Spot check
-            Assert.Equal (Key.Esc, Settings ["Application.QuitKey"].PropertyValue as Key);
+            Dictionary<Command, PlatformKeyBinding> hcBindings = (Dictionary<Command, PlatformKeyBinding>)Settings ["Application.DefaultKeyBindings"].PropertyValue!;
+            Assert.Equal (Key.Esc, hcBindings [Command.Quit].GetCurrentPlatformKeys ().First ());
             Assert.Equal (10000, (int)Settings ["FileDialog.MaxSearchResults"].PropertyValue!);
 
             Assert.Single (ThemeManager.Themes!);
@@ -948,7 +964,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             //Assert.Equal (Color.Blue, SchemeManager.GetSchemes () ["Base"].Normal.Background);
 
             Apply ();
-            Assert.Equal (Key.Esc, Application.QuitKey);
+            Assert.Equal (Key.Esc, Application.GetDefaultKey (Command.Quit));
             Assert.Equal (10000, FileDialog.MaxSearchResults);
         }
         finally
@@ -965,14 +981,15 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         try
         {
             // Spot check by setting some of the config properties
-            Application.QuitKey = Key.X.WithCtrl;
+            Application.DefaultKeyBindings! [Command.Quit] = Bind.All (Key.X.WithCtrl);
             FileDialog.MaxSearchResults = 1;
 
             Enable (ConfigLocations.HardCoded);
             Load (ConfigLocations.LibraryResources);
 
             // Spot check
-            Assert.Equal (Key.Esc, Settings! ["Application.QuitKey"].PropertyValue as Key);
+            Dictionary<Command, PlatformKeyBinding> lrBindings = (Dictionary<Command, PlatformKeyBinding>)Settings! ["Application.DefaultKeyBindings"].PropertyValue!;
+            Assert.Equal (Key.Esc, lrBindings [Command.Quit].GetCurrentPlatformKeys ().First ());
             Assert.Equal (10000, (int)Settings ["FileDialog.MaxSearchResults"].PropertyValue!);
 
             Assert.NotEmpty (ThemeManager.Themes!);
@@ -989,7 +1006,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             //Assert.Equal (Color.Blue, SchemeManager.Schemes ["Base"].Normal.Background);
 
             Apply ();
-            Assert.Equal (Key.Esc, Application.QuitKey);
+            Assert.Equal (Key.Esc, Application.GetDefaultKey (Command.Quit));
             Assert.Equal (10000, FileDialog.MaxSearchResults);
         }
         finally
@@ -1006,7 +1023,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         try
         {
             // Spot check by setting some of the config properties
-            Application.QuitKey = Key.X.WithCtrl;
+            Application.DefaultKeyBindings! [Command.Quit] = Bind.All (Key.X.WithCtrl);
             FileDialog.MaxSearchResults = 1;
             Glyphs.Apple = new ('z');
 
@@ -1015,7 +1032,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             RuntimeConfig = """
                             {
-                                "Application.QuitKey": "Alt-Q",
+                                "Application.DefaultKeyBindings": { "Quit": { "All": ["Alt-Q"] } },
                                 "FileDialog.MaxSearchResults":9,
                                 "Themes" : [
                                     {
@@ -1028,12 +1045,13 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
                             """;
             Load (ConfigLocations.Runtime);
 
-            Assert.Equal (Key.Q.WithAlt, Settings! ["Application.QuitKey"].PropertyValue as Key);
+            Dictionary<Command, PlatformKeyBinding> rtBindings = (Dictionary<Command, PlatformKeyBinding>)Settings! ["Application.DefaultKeyBindings"].PropertyValue!;
+            Assert.Equal (Key.Q.WithAlt, rtBindings [Command.Quit].GetCurrentPlatformKeys ().First ());
             Assert.Equal (9, (int)Settings ["FileDialog.MaxSearchResults"].PropertyValue!);
             Assert.Equal (new Rune ('a'), ThemeManager.GetCurrentTheme () ["Glyphs.Apple"].PropertyValue);
 
             Apply ();
-            Assert.Equal (Key.Q.WithAlt, Application.QuitKey);
+            Assert.Equal (Key.Q.WithAlt, Application.GetDefaultKey (Command.Quit));
             Assert.Equal (9, FileDialog.MaxSearchResults);
             Assert.Equal (new ('a'), Glyphs.Apple);
         }
@@ -1237,7 +1255,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             var json = @"
 {
   ""$schema"": ""https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json"",
-  ""Application.QuitKey"": ""Alt-Z"",
+  ""Application.DefaultKeyBindings"": { ""Quit"": { ""All"": [""Alt-Z""] } },
   ""Theme"": ""Default"",
   ""Themes"": [
     {
@@ -1378,15 +1396,16 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
 
             Assert.Equal ("Default", ThemeManager.Theme);
 
-            Assert.Equal (KeyCode.Esc, Application.QuitKey.KeyCode);
-            Assert.Equal (KeyCode.Z | KeyCode.AltMask, ((Key)Settings! ["Application.QuitKey"].PropertyValue)!.KeyCode);
+            Assert.Equal (KeyCode.Esc, Application.GetDefaultKey (Command.Quit).KeyCode);
+            Dictionary<Command, PlatformKeyBinding> smBindings = (Dictionary<Command, PlatformKeyBinding>)Settings! ["Application.DefaultKeyBindings"].PropertyValue!;
+            Assert.Equal (KeyCode.Z | KeyCode.AltMask, smBindings [Command.Quit].GetCurrentPlatformKeys ().First ().KeyCode);
             Assert.Equal (Alignment.Center, MessageBox.DefaultButtonAlignment);
 
             // Now Apply
             Apply ();
 
             Assert.Equal ("Default", ThemeManager.Theme);
-            Assert.Equal (KeyCode.Z | KeyCode.AltMask, Application.QuitKey.KeyCode);
+            Assert.Equal (KeyCode.Z | KeyCode.AltMask, Application.GetDefaultKey (Command.Quit).KeyCode);
             Assert.Equal (Alignment.End, MessageBox.DefaultButtonAlignment);
 
             Assert.Equal (Color.White, SchemeManager.GetSchemes ()! ["Base"].Normal.Foreground);
@@ -1430,79 +1449,79 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             // Priority order (lowest to highest): HardCoded → LibraryResources → AppResources → GlobalHome → GlobalCurrent → AppHome → AppCurrent → Env → Runtime
 
             // Start with HardCoded
-            Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Assert.Equal (10000, (int)Settings! ["FileDialog.MaxSearchResults"].PropertyValue!);
 
             // Load LibraryResources (should override HardCoded)
             var libraryConfig = """
                                 {
-                                     "Application.QuitKey": "Ctrl+L"
+                                     "FileDialog.MaxSearchResults": 1
                                 }
                                 """;
             ConfigurationManager.SourcesManager?.Load (Settings, libraryConfig, "library-test", ConfigLocations.LibraryResources);
-            Assert.Equal (Key.L.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Assert.Equal (1, (int)Settings! ["FileDialog.MaxSearchResults"].PropertyValue!);
 
             // Load AppResources (should override LibraryResources)
             var appResourcesConfig = """
                                      {
-                                          "Application.QuitKey": "Ctrl+A"
+                                          "FileDialog.MaxSearchResults": 2
                                      }
                                      """;
             ConfigurationManager.SourcesManager?.Load (Settings, appResourcesConfig, "appresources-test", ConfigLocations.AppResources);
-            Assert.Equal (Key.A.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Assert.Equal (2, (int)Settings! ["FileDialog.MaxSearchResults"].PropertyValue!);
 
             // Load GlobalHome (should override AppResources)
             var globalHomeConfig = """
                                    {
-                                        "Application.QuitKey": "Ctrl+G"
+                                        "FileDialog.MaxSearchResults": 3
                                    }
                                    """;
             ConfigurationManager.SourcesManager?.Load (Settings, globalHomeConfig, "globalhome-test", ConfigLocations.GlobalHome);
-            Assert.Equal (Key.G.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Assert.Equal (3, (int)Settings! ["FileDialog.MaxSearchResults"].PropertyValue!);
 
             // Load GlobalCurrent (should override GlobalHome)
             var globalCurrentConfig = """
                                       {
-                                           "Application.QuitKey": "Ctrl+C"
+                                           "FileDialog.MaxSearchResults": 4
                                       }
                                       """;
             ConfigurationManager.SourcesManager?.Load (Settings, globalCurrentConfig, "globalcurrent-test", ConfigLocations.GlobalCurrent);
-            Assert.Equal (Key.C.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Assert.Equal (4, (int)Settings! ["FileDialog.MaxSearchResults"].PropertyValue!);
 
             // Load AppHome (should override GlobalCurrent)
             var appHomeConfig = """
                                 {
-                                     "Application.QuitKey": "Ctrl+H"
+                                     "FileDialog.MaxSearchResults": 5
                                 }
                                 """;
             ConfigurationManager.SourcesManager?.Load (Settings, appHomeConfig, "apphome-test", ConfigLocations.AppHome);
-            Assert.Equal (Key.H.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Assert.Equal (5, (int)Settings! ["FileDialog.MaxSearchResults"].PropertyValue!);
 
             // Load AppCurrent (should override AppHome)
             var appCurrentConfig = """
                                    {
-                                        "Application.QuitKey": "Ctrl+U"
+                                        "FileDialog.MaxSearchResults": 6
                                    }
                                    """;
             ConfigurationManager.SourcesManager?.Load (Settings, appCurrentConfig, "appcurrent-test", ConfigLocations.AppCurrent);
-            Assert.Equal (Key.U.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Assert.Equal (6, (int)Settings! ["FileDialog.MaxSearchResults"].PropertyValue!);
 
             // Load Env (should override AppCurrent)
             var envConfig = """
                             {
-                                 "Application.QuitKey": "Ctrl+E"
+                                 "FileDialog.MaxSearchResults": 7
                             }
                             """;
             ConfigurationManager.SourcesManager?.Load (Settings, envConfig, "env-test", ConfigLocations.Env);
-            Assert.Equal (Key.E.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Assert.Equal (7, (int)Settings! ["FileDialog.MaxSearchResults"].PropertyValue!);
 
             // Load Runtime (should override Env - highest priority)
             RuntimeConfig = """
                             {
-                                 "Application.QuitKey": "Ctrl+R"
+                                 "FileDialog.MaxSearchResults": 8
                             }
                             """;
             Load (ConfigLocations.Runtime);
-            Assert.Equal (Key.R.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Assert.Equal (8, (int)Settings! ["FileDialog.MaxSearchResults"].PropertyValue!);
         }
         finally
         {
@@ -1526,7 +1545,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
                                                 SourcesManager.TUI_CONFIG_ENV_S,
                                                 """
                                                 {
-                                                     "Application.QuitKey": "Ctrl+Z"
+                                                     "FileDialog.MaxSearchResults": 42
                                                 }
                                                 """);
 
@@ -1534,7 +1553,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Load (ConfigLocations.Env);
 
             // Assert
-            Assert.Equal (Key.Z.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Assert.Equal (42, (int)Settings! ["FileDialog.MaxSearchResults"].PropertyValue!);
         }
         finally
         {
@@ -1559,14 +1578,14 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
                                                 SourcesManager.TUI_CONFIG_ENV_S,
                                                 """
                                                 {
-                                                     "Application.QuitKey": "Ctrl+E"
+                                                     "FileDialog.MaxSearchResults": 7
                                                 }
                                                 """);
 
             // Set Runtime config
             RuntimeConfig = """
                             {
-                                 "Application.QuitKey": "Ctrl+R"
+                                 "FileDialog.MaxSearchResults": 8
                             }
                             """;
 
@@ -1574,7 +1593,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Load (ConfigLocations.Env | ConfigLocations.Runtime);
 
             // Assert - Runtime should win (highest priority)
-            Assert.Equal (Key.R.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Assert.Equal (8, (int)Settings! ["FileDialog.MaxSearchResults"].PropertyValue!);
         }
         finally
         {
@@ -1599,14 +1618,14 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
                                                 SourcesManager.TUI_CONFIG_ENV_S,
                                                 """
                                                 {
-                                                     "Application.QuitKey": "Ctrl+E"
+                                                     "FileDialog.MaxSearchResults": 7
                                                 }
                                                 """);
 
             // Set runtime config (highest priority)
             RuntimeConfig = """
                             {
-                                 "Application.QuitKey": "Ctrl+R"
+                                 "FileDialog.MaxSearchResults": 8
                             }
                             """;
 
@@ -1614,7 +1633,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
             Load (ConfigLocations.All);
 
             // Assert - Runtime should win (highest priority)
-            Assert.Equal (Key.R.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Assert.Equal (8, (int)Settings! ["FileDialog.MaxSearchResults"].PropertyValue!);
 
             // Now test without Runtime
             RuntimeConfig = null;
@@ -1624,13 +1643,13 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
                                                 SourcesManager.TUI_CONFIG_ENV_S,
                                                 """
                                                 {
-                                                     "Application.QuitKey": "Ctrl+E"
+                                                     "FileDialog.MaxSearchResults": 7
                                                 }
                                                 """);
             Load (ConfigLocations.Env);
 
             // Assert - Env should be used when Runtime is not set
-            Assert.Equal (Key.E.WithCtrl, (Key)Settings! ["Application.QuitKey"].PropertyValue);
+            Assert.Equal (7, (int)Settings! ["FileDialog.MaxSearchResults"].PropertyValue!);
         }
         finally
         {

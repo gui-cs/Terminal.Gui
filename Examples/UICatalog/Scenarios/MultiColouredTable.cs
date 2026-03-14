@@ -49,7 +49,7 @@ public class MultiColouredTable : Scenario
         // StatusBar
         StatusBar statusBar = new (
                                        [
-                                           new (Application.QuitKey, "Quit", Quit)
+                                           new (Application.GetDefaultKey (Command.Quit), "Quit", Quit)
                                        ]
                                       );
 

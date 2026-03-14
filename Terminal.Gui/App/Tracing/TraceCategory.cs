@@ -29,6 +29,9 @@ public enum TraceCategory
     /// <summary>Configuration management traces (property discovery, source loading, property assignment).</summary>
     Configuration = 32,
 
+    /// <summary>Draw operation traces (layout-and-draw, view draw phases, adornments, subviews).</summary>
+    Draw = 64,
+
     /// <summary>All trace categories enabled.</summary>
-    All = Lifecycle | Command | Mouse | Keyboard | Navigation | Configuration
+    All = Lifecycle | Command | Mouse | Keyboard | Navigation | Configuration | Draw
 }

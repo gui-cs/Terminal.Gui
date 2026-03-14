@@ -44,6 +44,23 @@ public static class PlatformDetection
         || RuntimeInformation.IsOSPlatform (OSPlatform.OSX)
         || RuntimeInformation.IsOSPlatform (OSPlatform.FreeBSD);
 
+
+    /// <summary>Returns the <see cref="TuiPlatform"/> for the current operating system.</summary>
+    public static TuiPlatform GetCurrentPlatform ()
+    {
+        if (IsWindows ())
+        {
+            return TuiPlatform.Windows;
+        }
+
+        if (IsMac ())
+        {
+            return TuiPlatform.Macos;
+        }
+
+        return TuiPlatform.Linux;
+    }
+
     /// <summary>
     ///     Determines if the current platform is Windows.
     /// </summary>

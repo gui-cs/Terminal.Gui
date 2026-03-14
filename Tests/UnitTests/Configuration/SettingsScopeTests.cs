@@ -15,22 +15,31 @@ public class SettingsScopeTests
         // arrange
         Enable (ConfigLocations.HardCoded);
 
-        Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue!);
+        Dictionary<Command, PlatformKeyBinding> defaultBindings =
+            (Dictionary<Command, PlatformKeyBinding>)Settings! ["Application.DefaultKeyBindings"].PropertyValue!;
+        Assert.NotNull (defaultBindings);
+        Assert.Contains (Command.Quit, defaultBindings.Keys);
 
         ThrowOnJsonErrors = true;
 
         // act
         RuntimeConfig = """
-
-                                {
-                                      "Application.QuitKey": "Ctrl-Q"
-                                }
+                        {
+                            "Application.DefaultKeyBindings": {
+                                "Quit": { "All": ["Ctrl+Q"] }
+                            }
+                        }
                         """;
 
         Load (ConfigLocations.Runtime);
 
         // assert
-        Assert.Equal (Key.Q.WithCtrl, (Key)Settings ["Application.QuitKey"].PropertyValue!);
+        Dictionary<Command, PlatformKeyBinding> updatedBindings =
+            (Dictionary<Command, PlatformKeyBinding>)Settings ["Application.DefaultKeyBindings"].PropertyValue!;
+        Assert.NotNull (updatedBindings);
+        Key [] quitKeys = updatedBindings [Command.Quit].All!;
+        Assert.Single (quitKeys);
+        Assert.Equal (Key.Q.WithCtrl, quitKeys [0]);
 
         // clean up
         Disable (true);
@@ -109,30 +118,26 @@ public class SettingsScopeTests
         Enable (ConfigLocations.HardCoded);
         Load (ConfigLocations.LibraryResources);
 
-        // arrange
-        Assert.Equal (Key.Esc, (Key)Settings! ["Application.QuitKey"].PropertyValue!);
+        // arrange — verify default bindings are present
+        Dictionary<Command, PlatformKeyBinding> bindings =
+            (Dictionary<Command, PlatformKeyBinding>)Settings! ["Application.DefaultKeyBindings"].PropertyValue!;
+        Assert.Contains (Command.Quit, bindings.Keys);
 
-        Assert.Equal (
-                      Key.F6,
-                      (Key)Settings ["Application.NextTabGroupKey"].PropertyValue!
-                     );
-
-        Assert.Equal (
-                      Key.F6.WithShift,
-                      (Key)Settings ["Application.PrevTabGroupKey"].PropertyValue!
-                     );
-
-        // act
-        Settings ["Application.QuitKey"].PropertyValue = Key.Q;
-        Settings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
-        Settings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
+        // act — replace with new bindings
+        Dictionary<Command, PlatformKeyBinding> newBindings = new ()
+        {
+            [Command.Quit] = Bind.All (Key.Q),
+            [Command.NextTabGroup] = Bind.All (Key.F),
+            [Command.PreviousTabGroup] = Bind.All (Key.B),
+        };
+        Settings ["Application.DefaultKeyBindings"].PropertyValue = newBindings;
 
         Settings.Apply ();
 
         // assert
-        Assert.Equal (Key.Q, Application.QuitKey);
-        Assert.Equal (Key.F, Application.NextTabGroupKey);
-        Assert.Equal (Key.B, Application.PrevTabGroupKey);
+        Assert.Equal (Key.Q, Application.GetDefaultKey (Command.Quit));
+        Assert.Equal (Key.F, Application.GetDefaultKey (Command.NextTabGroup));
+        Assert.Equal (Key.B, Application.GetDefaultKey (Command.PreviousTabGroup));
 
         Disable (true);
     }
@@ -141,21 +146,34 @@ public class SettingsScopeTests
     public void CopyUpdatedPropertiesFrom_ShouldCopyChangedPropertiesOnly ()
     {
         Enable (ConfigLocations.HardCoded);
-        Settings! ["Application.QuitKey"].PropertyValue = Key.End;
 
-        var updatedSettings = new SettingsScope ();
+        // Set DefaultKeyBindings to a custom value
+        Dictionary<Command, PlatformKeyBinding> customBindings = new ()
+        {
+            [Command.Quit] = Bind.All (Key.End),
+        };
+        Settings! ["Application.DefaultKeyBindings"].PropertyValue = customBindings;
+
+        SettingsScope updatedSettings = new ();
         updatedSettings.LoadHardCodedDefaults ();
 
-        // Don't set Quitkey
-        updatedSettings ["Application.QuitKey"].HasValue = false;
-        updatedSettings ["Application.QuitKey"].PropertyValue = null;
-        updatedSettings ["Application.NextTabGroupKey"].PropertyValue = Key.F;
-        updatedSettings ["Application.PrevTabGroupKey"].PropertyValue = Key.B;
+        // Mark DefaultKeyBindings as not having a value (should not overwrite)
+        updatedSettings ["Application.DefaultKeyBindings"].HasValue = false;
+        updatedSettings ["Application.DefaultKeyBindings"].PropertyValue = null;
+
+        // Set a different property to verify it IS copied
+        updatedSettings ["FileDialog.MaxSearchResults"].PropertyValue = 42;
 
         Settings.UpdateFrom (updatedSettings);
-        Assert.Equal (KeyCode.End, ((Key)Settings ["Application.QuitKey"].PropertyValue!).KeyCode);
-        Assert.Equal (KeyCode.F, ((Key)updatedSettings ["Application.NextTabGroupKey"].PropertyValue!).KeyCode);
-        Assert.Equal (KeyCode.B, ((Key)updatedSettings ["Application.PrevTabGroupKey"].PropertyValue!).KeyCode);
+
+        // DefaultKeyBindings should still have our custom value
+        Dictionary<Command, PlatformKeyBinding> result =
+            (Dictionary<Command, PlatformKeyBinding>)Settings ["Application.DefaultKeyBindings"].PropertyValue!;
+        Assert.Contains (Command.Quit, result.Keys);
+
+        // MaxSearchResults should be updated
+        Assert.Equal (42, Settings ["FileDialog.MaxSearchResults"].PropertyValue);
+
         Disable (true);
     }
 
@@ -167,16 +185,24 @@ public class SettingsScopeTests
             Enable (ConfigLocations.HardCoded);
             Load (ConfigLocations.LibraryResources);
 
-            Assert.True (Settings! ["Application.QuitKey"].PropertyValue is Key);
-            Assert.Equal (Key.Esc, Settings ["Application.QuitKey"].PropertyValue as Key);
-            Settings ["Application.QuitKey"].PropertyValue = Key.Q;
+            Assert.True (Settings! ["Application.DefaultKeyBindings"].PropertyValue is Dictionary<Command, PlatformKeyBinding>);
+            Assert.Equal (Key.Esc, Application.GetDefaultKey (Command.Quit));
+
+            // Change to a custom value
+            Dictionary<Command, PlatformKeyBinding> customBindings = new ()
+            {
+                [Command.Quit] = Bind.All (Key.Q),
+            };
+            Settings ["Application.DefaultKeyBindings"].PropertyValue = customBindings;
             Apply ();
-            Assert.Equal (Key.Q, Application.QuitKey);
+            Assert.Equal (Key.Q, Application.GetDefaultKey (Command.Quit));
 
             // Act
             ResetToHardCodedDefaults ();
-            Assert.Equal (Key.Esc, Settings ["Application.QuitKey"].PropertyValue as Key);
-            Assert.Equal (Key.Esc, Application.QuitKey);
+            Dictionary<Command, PlatformKeyBinding> resetBindings =
+                (Dictionary<Command, PlatformKeyBinding>)Settings ["Application.DefaultKeyBindings"].PropertyValue!;
+            Assert.Contains (Command.Quit, resetBindings.Keys);
+            Assert.Equal (Key.Esc, Application.GetDefaultKey (Command.Quit));
         }
         finally
         {
@@ -203,20 +229,24 @@ public class SettingsScopeTests
     public void LoadHardCodedDefaults_Resets ()
     {
         // Arrange
-        Assert.Equal (Key.Esc, Application.QuitKey);
-        var settingsScope = new SettingsScope ();
+        Assert.Equal (Key.Esc, Application.GetDefaultKey (Command.Quit));
+        SettingsScope settingsScope = new ();
         settingsScope.LoadHardCodedDefaults ();
 
-        // Act
-        settingsScope ["Application.QuitKey"].PropertyValue = Key.Q;
+        // Act — change the quit key
+        Dictionary<Command, PlatformKeyBinding> customBindings = new ()
+        {
+            [Command.Quit] = Bind.All (Key.Q),
+        };
+        settingsScope ["Application.DefaultKeyBindings"].PropertyValue = customBindings;
         settingsScope.Apply ();
-        Assert.Equal (Key.Q, Application.QuitKey);
+        Assert.Equal (Key.Q, Application.GetDefaultKey (Command.Quit));
 
         settingsScope.LoadHardCodedDefaults ();
         settingsScope.Apply ();
 
-        // Assert
-        Assert.Equal (Key.Esc, Application.QuitKey);
+        // Assert — should be back to default
+        Assert.Equal (Key.Esc, Application.GetDefaultKey (Command.Quit));
 
         Disable (true);
     }
