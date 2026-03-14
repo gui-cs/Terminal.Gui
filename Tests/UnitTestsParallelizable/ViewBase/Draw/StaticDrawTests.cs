@@ -1,34 +1,33 @@
-#nullable enable
 using UnitTests;
 
 namespace ViewBaseTests.Drawing;
 
 /// <summary>
-/// Tests for the static View.Draw(IEnumerable&lt;View&gt;, bool) method
+///     Tests for the static View.Draw(IEnumerable&lt;View&gt;, bool) method
 /// </summary>
 [Trait ("Category", "Output")]
 public class StaticDrawTests : TestDriverBase
 {
     [Fact]
-    public void StaticDraw_ClearsSubViewNeedsDraw_AfterMarginDrawMargins ()
+    public void StaticDraw_ClearsSubViewNeedsDraw_AfterMarginDrawShadows ()
     {
         // This test validates the fix where the static Draw method calls ClearNeedsDraw()
-        // on all peer views after drawing them AND after calling Margin.DrawMargins().
+        // on all peer views after drawing them AND after calling Margin.DrawShadows().
         //
         // THE BUG (before the fix):
-        // Margin.DrawMargins() can cause SubViewNeedsDraw to be set on views in the hierarchy.
+        // Margin.DrawShadows() can cause SubViewNeedsDraw to be set on views in the hierarchy.
         // This would leave SubViewNeedsDraw = true even after drawing completed.
         //
         // THE FIX (current code):
         // The static Draw() method explicitly calls ClearNeedsDraw() on all peer views
-        // at the very end, AFTER Margin.DrawMargins(), clearing any SubViewNeedsDraw flags
+        // at the very end, AFTER Margin.DrawShadows(), clearing any SubViewNeedsDraw flags
         // that were set during margin drawing.
 
         IDriver driver = CreateTestDriver ();
-        driver.Clip = new (driver.Screen);
+        driver.Clip = new Region (driver.Screen);
 
         // Create a view hierarchy where a subview's subview has a margin
-        // This reproduces the scenario where Margin.DrawMargins sets SubViewNeedsDraw
+        // This reproduces the scenario where Margin.DrawShadows sets SubViewNeedsDraw
         View superview = new ()
         {
             X = 0,
@@ -39,8 +38,23 @@ public class StaticDrawTests : TestDriverBase
             Id = "SuperView"
         };
 
-        View subview1 = new () { X = 0, Y = 0, Width = 40, Height = 40, Id = "SubView1" };
-        View subview2 = new () { X = 0, Y = 20, Width = 20, Height = 20, Id = "SubView2" };
+        View subview1 = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 40,
+            Height = 40,
+            Id = "SubView1"
+        };
+
+        View subview2 = new ()
+        {
+            X = 0,
+            Y = 20,
+            Width = 20,
+            Height = 20,
+            Id = "SubView2"
+        };
 
         // Add a subview to subview1 that has a margin with shadow
         // This is key to reproducing the bug
@@ -52,7 +66,7 @@ public class StaticDrawTests : TestDriverBase
             Height = 20,
             Id = "SubSubView"
         };
-        subSubView.Margin!.Thickness = new (1);
+        subSubView.Margin!.Thickness = new Thickness (1);
         subSubView.Margin.ShadowStyle = ShadowStyle.Transparent;
 
         subview1.Add (subSubView);
@@ -74,9 +88,9 @@ public class StaticDrawTests : TestDriverBase
         // Call the static Draw method on the subviews
         // This will:
         // 1. Call view.Draw() on each subview
-        // 2. Call Margin.DrawMargins() which may set SubViewNeedsDraw in the hierarchy
+        // 2. Call Margin.DrawShadows() which may set SubViewNeedsDraw in the hierarchy
         // 3. Call ClearNeedsDraw() on each subview to clean up
-        View.Draw (superview.InternalSubViews, force: false);
+        View.Draw (superview.InternalSubViews, false);
 
         // After the static Draw completes:
         // All subviews should have NeedsDraw = false
@@ -86,18 +100,17 @@ public class StaticDrawTests : TestDriverBase
         Assert.False (subSubView.Margin.NeedsDraw, "SubSubView's Margin should not need drawing after Draw()");
 
         // SuperView's SubViewNeedsDraw should be false because the static Draw() method
-        // calls ClearNeedsDraw() on all the subviews at the end, AFTER Margin.DrawMargins()
+        // calls ClearNeedsDraw() on all the subviews at the end, AFTER Margin.DrawShadows()
         // 
-        // BEFORE THE FIX: This would be TRUE because Margin.DrawMargins() would
+        // BEFORE THE FIX: This would be TRUE because Margin.DrawShadows() would
         //                 set SubViewNeedsDraw somewhere in the hierarchy and it
         //                 wouldn't be cleared
         // AFTER THE FIX: This is FALSE because the static Draw() calls ClearNeedsDraw()
         //                at the very end, cleaning up any SubViewNeedsDraw flags set
-        //                by Margin.DrawMargins()
+        //                by Margin.DrawShadows()
         Assert.False (superview.SubViewNeedsDraw,
                       "superview's SubViewNeedsDraw should be false after static Draw(). All subviews were drawn in the call to View.Draw");
-        Assert.False (subview1.SubViewNeedsDraw,
-                      "SubView1's SubViewNeedsDraw should be false after its subviews are drawn and cleared");
+        Assert.False (subview1.SubViewNeedsDraw, "SubView1's SubViewNeedsDraw should be false after its subviews are drawn and cleared");
     }
 
     [Fact]
@@ -105,10 +118,27 @@ public class StaticDrawTests : TestDriverBase
     {
         // Verify that when force=true, all views get SetNeedsDraw() called before drawing
         IDriver driver = CreateTestDriver ();
-        driver.Clip = new (driver.Screen);
+        driver.Clip = new Region (driver.Screen);
 
-        View view1 = new () { X = 0, Y = 0, Width = 10, Height = 10, Driver = driver, Id = "View1" };
-        View view2 = new () { X = 10, Y = 0, Width = 10, Height = 10, Driver = driver, Id = "View2" };
+        View view1 = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 10,
+            Driver = driver,
+            Id = "View1"
+        };
+
+        View view2 = new ()
+        {
+            X = 10,
+            Y = 0,
+            Width = 10,
+            Height = 10,
+            Driver = driver,
+            Id = "View2"
+        };
 
         view1.BeginInit ();
         view1.EndInit ();
@@ -122,7 +152,7 @@ public class StaticDrawTests : TestDriverBase
         Assert.False (view2.NeedsDraw);
 
         // Now call static Draw with force=true
-        View.Draw ([view1, view2], force: true);
+        View.Draw ([view1, view2], true);
 
         // After drawing with force=true, they should be cleared again
         Assert.False (view1.NeedsDraw);
@@ -133,18 +163,17 @@ public class StaticDrawTests : TestDriverBase
     public void StaticDraw_HandlesEmptyCollection ()
     {
         // Verify that calling Draw with an empty collection doesn't crash
-        View.Draw ([], force: false);
-        View.Draw ([], force: true);
+        View.Draw ([], false);
+        View.Draw ([], true);
     }
-
 
     [Fact]
     public void StaticDraw_ClearsNestedSubViewNeedsDraw ()
     {
         // This test verifies that the static Draw method properly clears SubViewNeedsDraw
-        // flags throughout a nested view hierarchy after Margin.DrawMargins
+        // flags throughout a nested view hierarchy after Margin.DrawShadows
         IDriver driver = CreateTestDriver ();
-        driver.Clip = new (driver.Screen);
+        driver.Clip = new Region (driver.Screen);
 
         View topView = new ()
         {
@@ -156,8 +185,23 @@ public class StaticDrawTests : TestDriverBase
             Id = "TopView"
         };
 
-        View middleView1 = new () { X = 0, Y = 0, Width = 30, Height = 30, Id = "MiddleView1" };
-        View middleView2 = new () { X = 30, Y = 0, Width = 30, Height = 30, Id = "MiddleView2" };
+        View middleView1 = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 30,
+            Height = 30,
+            Id = "MiddleView1"
+        };
+
+        View middleView2 = new ()
+        {
+            X = 30,
+            Y = 0,
+            Width = 30,
+            Height = 30,
+            Id = "MiddleView2"
+        };
 
         View bottomView = new ()
         {
@@ -168,8 +212,8 @@ public class StaticDrawTests : TestDriverBase
             Id = "BottomView"
         };
 
-        // Give the bottom view a margin to trigger the Margin.DrawMargins behavior
-        bottomView.Margin!.Thickness = new (1);
+        // Give the bottom view a shadow to trigger the Margin.DrawShadows behavior
+        bottomView.Margin!.Thickness = new Thickness (1);
         bottomView.Margin.ShadowStyle = ShadowStyle.Transparent;
 
         middleView1.Add (bottomView);
@@ -184,18 +228,14 @@ public class StaticDrawTests : TestDriverBase
         Assert.True (bottomView.NeedsDraw);
 
         // Draw the middle views using static Draw
-        View.Draw (topView.InternalSubViews, force: false);
+        View.Draw (topView.InternalSubViews, false);
 
         // All SubViewNeedsDraw flags should be cleared after the static Draw
         Assert.False (topView.SubViewNeedsDraw,
-            "TopView's SubViewNeedsDraw should be false after static Draw(). All subviews were drawn in the call to View.Draw");
-        Assert.False (middleView1.SubViewNeedsDraw,
-            "MiddleView1's SubViewNeedsDraw should be false after its subviews are drawn");
-        Assert.False (middleView2.SubViewNeedsDraw,
-            "MiddleView2's SubViewNeedsDraw should be false");
-        Assert.False (bottomView.NeedsDraw,
-            "BottomView should not need drawing after Draw()");
-        Assert.False (bottomView.Margin.NeedsDraw,
-            "BottomView's Margin should not need drawing after Draw()");
+                      "TopView's SubViewNeedsDraw should be false after static Draw(). All subviews were drawn in the call to View.Draw");
+        Assert.False (middleView1.SubViewNeedsDraw, "MiddleView1's SubViewNeedsDraw should be false after its subviews are drawn");
+        Assert.False (middleView2.SubViewNeedsDraw, "MiddleView2's SubViewNeedsDraw should be false");
+        Assert.False (bottomView.NeedsDraw, "BottomView should not need drawing after Draw()");
+        Assert.False (bottomView.Margin.NeedsDraw, "BottomView's Margin should not need drawing after Draw()");
     }
 }

@@ -32,10 +32,10 @@ public partial class View // Drawing APIs
             view.Draw (context);
         }
 
-        // Draw Transparent margins last to ensure they are drawn on top of the content.
-        Margin.DrawMargins (viewsArray);
+        // Draw shadows last to ensure they are drawn on top of the content.
+        Margin.DrawShadows (viewsArray);
 
-        // DrawMargins may have caused some views have NeedsDraw/NeedsSubViewDraw set; clear them all.
+        // DrawShadows may have caused some views have NeedsDraw/NeedsSubViewDraw set; clear them all.
         foreach (View view in viewsArray)
         {
             view.ClearNeedsDraw ();
@@ -199,8 +199,8 @@ public partial class View // Drawing APIs
 
     private void DoDrawAdornmentsSubViews ()
     {
-        // Only SetNeedsDraw on Margin here if it is not Transparent. Transparent Margins are drawn in a separate pass in the static View.Draw
-        // via Margin.DrawTransparentMargins.
+        // Only SetNeedsDraw on Margin here if it is not Transparent. Margins with shadows are drawn in a separate pass in the static View.Draw
+        // via Margin.DrawShadows.
         if (Margin is { NeedsDraw: true } && !Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
         {
             foreach (View subview in Margin.SubViews)
@@ -295,8 +295,8 @@ public partial class View // Drawing APIs
     /// </remarks>
     public void DrawAdornments ()
     {
-        // Only draw Margin here if it is not Transparent. Transparent Margins are drawn in a separate pass in the static View.Draw
-        // via Margin.DrawTransparentMargins.
+        // Only draw Margin here if it is not Transparent. Margins with shadows are drawn in a separate pass in the static View.Draw
+        // via Margin.DrawShadows.
         if (Margin is { } && !Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
         {
             Margin?.Draw ();

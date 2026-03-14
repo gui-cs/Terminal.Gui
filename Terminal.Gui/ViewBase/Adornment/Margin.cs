@@ -49,8 +49,7 @@ public class Margin : Adornment
         }
     }
 
-    // When the Parent is drawn, we cache the clip region so we can draw the Margin after all other Views
-    // QUESTION: Why can't this just be the NeedsDisplay region?
+    // When the Parent is drawn, we cache the clip region so we can draw the Shadows after all other Views
     private Region? _cachedClip;
 
     internal Region? GetCachedClip () => _cachedClip;
@@ -67,18 +66,18 @@ public class Margin : Adornment
     }
 
     /// <summary>
-    ///     INTERNAL API - Draws the transparent margins for the specified views. This is called from
+    ///     INTERNAL API - Draws the shadows for the specified views. This is called from
     ///     <see cref="View.Draw(DrawContext)"/> on each
     ///     iteration of the main loop after all Views have been drawn.
     /// </summary>
     /// <remarks>
-    ///     Non-transparent margins are drawn as-normal in <see cref="View.DrawAdornments"/>.
+    ///    Margins with no <see cref="ShadowStyle"/> are drawn as-normal in <see cref="View.DrawAdornments"/>.
     /// </remarks>
     /// <param name="views"></param>
     /// <returns>
     ///     <see langword="true"/>
     /// </returns>
-    internal static bool DrawMargins (IEnumerable<View> views)
+    internal static bool DrawShadows (IEnumerable<View> views)
     {
         Stack<View> stack = new (views);
 

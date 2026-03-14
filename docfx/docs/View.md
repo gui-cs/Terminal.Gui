@@ -768,11 +768,21 @@ Application.Run (wizard);
 
 ### Shadow Effects
 
-`ShadowStyle` - [ShadowStyle](~/api/Terminal.Gui.ViewBase.ShadowStyle.yml) for drop shadows:
+Shadows are drop-shadow effects rendered by the <xref:Terminal.Gui.ViewBase.Margin>. They are configured via <xref:Terminal.Gui.ViewBase.View.ShadowStyle>:
+
+- **`ShadowStyle.None`** — No shadow (default).
+- **`ShadowStyle.Opaque`** — Draws solid block glyphs (e.g., `▌`, `▀`) along the right and bottom edges. The foreground is black and the background matches whatever is underneath. Best for small views like buttons.
+- **`ShadowStyle.Transparent`** — Preserves the underlying text but darkens the foreground and background colors. Best for larger views like windows and dialogs where obscuring content would be undesirable.
 
 ```csharp
 view.ShadowStyle = ShadowStyle.Transparent;
 ```
+
+When a shadow is enabled, the Margin's <xref:Terminal.Gui.Drawing.Thickness> is automatically increased on the right and bottom to make room for the shadow area. Two internal `ShadowView` instances (one vertical, one horizontal) are added as SubViews of the Margin.
+
+Shadows are drawn in a **second pass** after all views have been drawn (via `Margin.DrawShadows`). This ensures shadows render on top of all other content. Margins without shadows are drawn normally in the first pass. See [Drawing Deep Dive](drawing.md) for details on the two-pass rendering process.
+
+For interactive views, shadows also provide visual feedback on mouse press — the shadow shifts to create a "sunken" 3D button effect.
 
 ---
 
