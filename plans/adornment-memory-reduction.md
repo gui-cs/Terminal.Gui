@@ -272,9 +272,13 @@ public abstract class AdornmentImpl : IAdornment
 
             if (current != _thickness)
             {
-                // Only hit View if one exists
-                _view?.SetNeedsLayout ();
-                _view?.SetNeedsDraw ();
+                // Only hit View if one exists — keep its Thickness in sync
+                if (_view is { })
+                {
+                    _view.Thickness = value;
+                    _view.SetNeedsLayout ();
+                    _view.SetNeedsDraw ();
+                }
 
                 Parent?.SetAdornmentFrames ();
                 OnThicknessChanged ();
@@ -555,8 +559,13 @@ public class Margin : AdornmentImpl
     internal Region? GetCachedClip () => (View as MarginView)?.GetCachedClip ();
     internal void ClearCachedClip () => (View as MarginView)?.ClearCachedClip ();
 
-    /// <inheritdoc/>
-    public new ViewportSettingsFlags ViewportSettings
+    /// <summary>Gets or sets the viewport settings for the Margin layer.</summary>
+    /// <remarks>
+    ///     Defaults to <see cref="ViewportSettingsFlags.Transparent"/> | <see cref="ViewportSettingsFlags.TransparentMouse"/>
+    ///     — matching the current <see cref="Margin"/> behavior. The value is stored and applied to
+    ///     <see cref="MarginView"/> when one is created.
+    /// </remarks>
+    public ViewportSettingsFlags ViewportSettings
     {
         get => (View as MarginView)?.ViewportSettings ?? (ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse);
         set
@@ -579,6 +588,10 @@ public class Margin : AdornmentImpl
         if (_shadowStyle != ShadowStyle.None)
         {
             mv.ShadowStyle = _shadowStyle;
+        }
+        if (_shadowSize != Size.Empty)
+        {
+            mv.ShadowSize = _shadowSize;
         }
         if (_deferredViewportSettings.HasValue)
         {
@@ -636,6 +649,8 @@ public class Padding : AdornmentImpl
 `AdornmentView` is the renamed `Adornment` class. It is the default (and only built-in) implementation of `IAdornmentView`. `BorderView`, `MarginView`, and `PaddingView` each subclass it.
 
 The `*View` classes are **simple `View` subclasses** with one additional property: `Parent`. All their rendering, layout, focus, and mouse behavior is rooted in that single field. Architecturally, they mirror the current `Adornment`/`Border`/`Margin`/`Padding` hierarchy with minimal change.
+
+**`Thickness` ownership:** `AdornmentView` retains its own `Thickness` property (inherited from the current `Adornment` class — it is used in `OnClearingViewport`, `Contains`, etc.). The lightweight `AdornmentImpl` is the authoritative source for `Thickness`; when `AdornmentImpl.Thickness` is set and a backing `AdornmentView` already exists, the setter also updates `_view.Thickness` to keep the two in sync. When `EnsureView()` creates a new view, it copies `_thickness` to the new view immediately.
 
 ```csharp
 /// <summary>
@@ -991,10 +1006,10 @@ This avoids View creation for the rendering of simple borders. The complexity tr
 8. Create `IAdornment.cs` and `IAdornmentView.cs` with interface definitions
 9. Add `: IAdornmentView` to `AdornmentView`; update `AdornmentImpl.View` to explicit-implement `IAdornment.View` as `IAdornmentView?`
 10. Create `AdornmentImpl.cs` with lightweight base (delegates all to concrete subclass)
-10. Create lightweight `Border.cs`, `Margin.cs`, `Padding.cs` (thin wrappers over `BorderView`/`MarginView`/`PaddingView`) — **identical behavior** to current code, just split into two classes
-11. Change `View.Border`, `View.Margin`, `View.Padding` property types from `BorderView?` to `Border?`, `Margin?`, `Padding?`
-12. Update `View.SetupAdornments()` to create lightweight objects (still eagerly create Views initially)
-13. All tests pass unchanged (no behavior change)
+11. Create lightweight `Border.cs`, `Margin.cs`, `Padding.cs` (thin wrappers over `BorderView`/`MarginView`/`PaddingView`) — **identical behavior** to current code, just split into two classes
+12. Change `View.Border`, `View.Margin`, `View.Padding` property types from `BorderView?` to `Border?`, `Margin?`, `Padding?`
+13. Update `View.SetupAdornments()` to create lightweight objects (still eagerly create Views initially)
+14. All tests pass unchanged (no behavior change)
 
 **Memory impact:** Zero (Views still eagerly created in Phase 1)
 
@@ -1021,8 +1036,8 @@ This avoids View creation for the rendering of simple borders. The complexity tr
    - `current.Padding.GetSubViews(...)` → `current.Padding.View?.GetSubViews(...)` (callers updated directly)
    - `current.Padding.SetNeedsLayout()` → `current.Padding?.View?.SetNeedsLayout()`
    - `HelpView.Margin!.ViewportSettings |= ...` → `HelpView.Margin!.ViewportSettings |= ...` (promoted to lightweight Margin)
-7. Update `Margin.DrawMargins()` to skip when `margin.View is null` (transparent margins without shadow don't need drawing)
-8. Update `View.Drawing.cs` `Margin?.CacheClip()` → `Margin?.CacheClip()` (already delegated in lightweight Margin)
+7. Update adornment drawing loop in `View.Drawing.cs` to call `margin.View?.Draw()` / `border.View?.Draw()` / `padding.View?.Draw()` — skip drawing entirely when `.View is null` and Thickness is empty (transparent margins without shadow draw nothing)
+8. Update `View.Drawing.cs` `Margin?.CacheClip()` — already delegated via the lightweight `Margin.CacheClip()` helper method (no change needed)
 
 **Memory impact for typical views:** ~1,600–5,000 bytes saved (2–3 `AdornmentView` instances eliminated)
 
