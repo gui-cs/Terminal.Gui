@@ -183,7 +183,7 @@ IAdornment
 └── AdornmentImpl (abstract, : object)  — lightweight base
     ├── Border     — adds LineStyle, Settings, GetBorderRectangle()
     ├── Margin     — adds ShadowStyle, ShadowSize, CacheClip() family
-    └── Padding    — GetSubViews() override logic
+    └── Padding    — triggers EnsureView() on Add()
 
 View
 └── AdornmentView (: View) — renamed from Adornment
@@ -243,8 +243,10 @@ public abstract class AdornmentImpl : IAdornment
 
     /// <summary>
     ///     Returns the existing <see cref="AdornmentView"/>, creating it if not yet allocated.
-    ///     Triggers initialization and layout integration.
+    ///     Calls <see cref="View.BeginInit"/> and/or <see cref="View.EndInit"/> on the new view
+    ///     to match the parent's current initialization state. See §4.9 for lifecycle details.
     /// </summary>
+    /// <remarks>Must be called on the UI thread.</remarks>
     public AdornmentView EnsureView ()
     {
         if (_view is null)
@@ -252,6 +254,19 @@ public abstract class AdornmentImpl : IAdornment
             _view = CreateView ();
             _view.Thickness = _thickness;
             _view.Parent = Parent;
+
+            // Synchronize init state with the parent. See §4.9 Hazard 1 for full explanation.
+            if (Parent?.IsInitialized == true)
+            {
+                _view.BeginInit ();
+                _view.EndInit ();
+            }
+            else if (Parent?.IsBeginInit == true)
+            {
+                _view.BeginInit ();
+                // EndInit propagates from View.EndInit() override on the parent.
+            }
+
             Parent?.SetAdornmentFrames ();
         }
 
@@ -340,12 +355,6 @@ public abstract class AdornmentImpl : IAdornment
     ///     When View is null but Thickness is non-empty, draws directly via Parent.
     /// </summary>
     internal virtual void Draw () => View?.Draw ();
-
-    /// <summary>Propagates init to the View if it exists.</summary>
-    internal void BeginInit () => View?.BeginInit ();
-
-    /// <summary>Propagates init to the View if it exists.</summary>
-    internal void EndInit () => View?.EndInit ();
 
     /// <summary>Propagates disposal to the View if it exists.</summary>
     internal void Dispose ()
@@ -542,25 +551,6 @@ public class Padding : AdornmentImpl
     /// </summary>
     public void Add (View view) => ((PaddingView)EnsureView ()).Add (view);
 
-    /// <summary>
-    ///     Gets SubViews. If no <see cref="PaddingView"/> exists and
-    ///     <paramref name="includePadding"/> is true, returns SubViews from Parent directly.
-    /// </summary>
-    public IReadOnlyCollection<View> GetSubViews (bool includeMargin = false, bool includeBorder = false, bool includePadding = false)
-    {
-        if (View is PaddingView pv)
-        {
-            return pv.GetSubViews (includeMargin, includeBorder, includePadding);
-        }
-
-        if (includePadding && Parent is { })
-        {
-            return Parent.GetSubViews (false, false, false);
-        }
-
-        return Array.Empty<View> ();
-    }
-
     /// <inheritdoc/>
     protected override AdornmentView CreateView () => new PaddingView (Parent);
 
@@ -596,19 +586,9 @@ private void SetupAdornments ()
     }
 }
 
-private void BeginInitAdornments ()
-{
-    Margin?.View?.BeginInit ();
-    Border?.View?.BeginInit ();
-    Padding?.View?.BeginInit ();
-}
-
-private void EndInitAdornments ()
-{
-    Margin?.View?.EndInit ();
-    Border?.View?.EndInit ();
-    Padding?.View?.EndInit ();
-}
+// BeginInitAdornments() and EndInitAdornments() are removed.
+// BeginInit/EndInit is called by EnsureView() when each IAdornment.View is first created,
+// based on Parent.IsInitialized / Parent.IsBeginInit at that point.
 
 private void DisposeAdornments ()
 {
@@ -645,26 +625,36 @@ Four hazards arise from lazy creation that must be addressed in implementation:
 
 #### Hazard 1: `EnsureView()` called after `BeginInit()` but before `EndInit()`
 
-`View.BeginInit()` and `View.EndInit()` wrap initialization of all adornments. If a trigger fires between `BeginInit()` and `EndInit()` on the parent — for example, if `ShadowStyle` is set inside a `BeginInit` block — the newly created `MarginView` must itself go through `BeginInit` + `EndInit` before use.
+`View.BeginInit()` and `View.EndInit()` wrap initialization. Because `BeginInitAdornments()`/`EndInitAdornments()` are removed, `EnsureView()` is now the sole place that decides how to initialize a newly created `AdornmentView`. It must handle three parent states: pre-init, mid-init (between `BeginInit` and `EndInit`), and post-init.
 
-**Resolution:** `EnsureView()` must handle three parent states: pre-init, mid-init (between `BeginInit` and `EndInit`), and post-init. `View` exposes `IsInitialized` (true after `EndInit` completes). To detect mid-init, we need a flag — either `View._initialized` (private) or a new `IsBeginning` property. The simplest correct approach is to track init state inside `AdornmentImpl` itself: the parent calls `BeginInit()` / `EndInit()` on adornments during its own init; if a trigger fires before `EndInit()`, we call only `BeginInit()` on the new view and let the parent's pending `EndInit()` call complete it.
+**Resolution:** `View` exposes `IsInitialized` (true after `EndInit` completes) and requires a new `IsBeginInit` property (true when `BeginInit` has been called but `EndInit` has not). `EnsureView()` uses these to synchronize the new view's init state with the parent:
+
+- `Parent.IsInitialized == true` → call `BeginInit()` + `EndInit()` immediately on the new view
+- `Parent.IsBeginInit == true` → call only `BeginInit()`. The parent's own `View.EndInit()` override calls `EndInit()` on any adornment view that exists at that point (including the newly created one).
+- Neither → no init calls yet. They happen naturally when the parent later calls `BeginInit()`/`EndInit()`. Since `BeginInitAdornments`/`EndInitAdornments` are removed, `View.BeginInit()` and `View.EndInit()` include null-safe calls on any adornment `View` that exists at that point.
+
+The simplest implementation: `View.BeginInit()` and `View.EndInit()` include null-safe calls to `Margin.View?.BeginInit()`, `Border.View?.BeginInit()`, etc. — these are cheap no-ops when no `AdornmentView` has been created yet, and correctly propagate to any `AdornmentView` that was created before or during init.
 
 ```csharp
-private bool _beginInitCalled;
-private bool _endInitCalled;
-
-internal void BeginInit ()
+// In View.BeginInit() (replaces BeginInitAdornments):
+protected override void BeginInit ()
 {
-    _beginInitCalled = true;
-    _view?.BeginInit ();
+    base.BeginInit ();
+    Margin?.View?.BeginInit ();
+    Border?.View?.BeginInit ();
+    Padding?.View?.BeginInit ();
 }
 
-internal void EndInit ()
+// In View.EndInit() (replaces EndInitAdornments):
+protected override void EndInit ()
 {
-    _endInitCalled = true;
-    _view?.EndInit ();
+    Margin?.View?.EndInit ();
+    Border?.View?.EndInit ();
+    Padding?.View?.EndInit ();
+    base.EndInit ();
 }
 
+// EnsureView() on demand:
 public AdornmentView EnsureView ()
 {
     if (_view is null)
@@ -673,18 +663,15 @@ public AdornmentView EnsureView ()
         _view.Thickness = _thickness;
         _view.Parent = Parent;
 
-        // Replay whichever init calls have already happened on the parent's behalf.
-        if (_beginInitCalled)
+        if (Parent?.IsInitialized == true)
         {
             _view.BeginInit ();
-        }
-
-        // Only call EndInit if the parent's EndInit has already fired (view fully initialized).
-        // If we are mid-init (BeginInit fired, EndInit not yet), the parent's pending
-        // EndInit call will flow through to _view via the updated EndInit() above.
-        if (_endInitCalled)
-        {
             _view.EndInit ();
+        }
+        else if (Parent?.IsBeginInit == true)
+        {
+            _view.BeginInit ();
+            // EndInit will propagate from View.EndInit() above
         }
 
         Parent?.SetAdornmentFrames ();
@@ -693,6 +680,8 @@ public AdornmentView EnsureView ()
     return _view;
 }
 ```
+
+This approach eliminates the `_beginInitCalled`/`_endInitCalled` tracking fields from `AdornmentImpl`, removes the `internal BeginInit()`/`EndInit()` helper wrappers, and replaces `BeginInitAdornments()`/`EndInitAdornments()` with inline null-safe calls added to the `View.BeginInit()`/`View.EndInit()` overrides — which are already virtual and already called during the parent's init sequence.
 
 #### Hazard 2: Thread Safety
 
@@ -768,14 +757,15 @@ This avoids View creation for the rendering of simple borders. The complexity tr
 
 **Changes:**
 1. Update `View.SetupAdornments()` to NOT create Views — only create lightweight `Border`/`Margin`/`Padding` objects
-2. Update `BeginInitAdornments()` / `EndInitAdornments()` to be no-ops when View is null
-3. Implement `EnsureView()` in `AdornmentImpl` with proper initialization sequencing
+2. Remove `BeginInitAdornments()` and `EndInitAdornments()` from `View`; replace with null-safe inline calls inside `View.BeginInit()` and `View.EndInit()` overrides (see §4.9 Hazard 1)
+3. Implement `EnsureView()` in `AdornmentImpl` with proper initialization sequencing (see §4.9)
 4. Update `SetAdornmentFrames()` to work purely from Thickness (no View needed)
 5. Update `GetAdornmentsThickness()` — already Thickness-only, no change needed
 6. Migrate triggering callsites to use `border.EnsureView()` / `border.View`:
    - `tab.Border!.Activating += Tab_Selecting!` → `tab.Border!.EnsureView().Activating += Tab_Selecting!`
    - `viewToArrange.Border?.Arranger` → `viewToArrange.Border?.EnsureView().Arranger` (or `Border?.Arranger` if Arranger is promoted to Border)
    - `current.Margin!.SubViews.Count` → `current.Margin?.View?.SubViews.Count ?? 0`
+   - `current.Padding.GetSubViews(...)` → `current.Padding.View?.GetSubViews(...)` (callers updated directly)
    - `current.Padding.SetNeedsLayout()` → `current.Padding?.View?.SetNeedsLayout()`
    - `HelpView.Margin!.ViewportSettings |= ...` → `HelpView.Margin!.ViewportSettings |= ...` (promoted to lightweight Margin)
 7. Update `Margin.DrawMargins()` to skip when `margin.View is null` (transparent margins without shadow don't need drawing)
@@ -856,9 +846,9 @@ These are **breaking for contributors** but not for library users.
 | `View.Padding` type | Same pattern | Same |
 | `Adornment` class | Renamed to `AdornmentView` | Provide `[Obsolete]` alias for one release cycle |
 | `new Adornment(parent)` | Constructor on `AdornmentView` | Tests use `new Adornment()` parameter-less constructor — keep on `AdornmentView` |
-| `view.Border?.BeginInit()` | Must use `view.Border?.View?.BeginInit()` | Breaking, but rare in user code |
 | `view.Border?.SetNeedsDraw()` | Must use `view.Border?.View?.SetNeedsDraw()` | Breaking |
 | `view.Border.Add(subView)` | Use `view.Border.EnsureView().Add(subView)` or `view.Padding.Add(subView)` helper | Provide convenience methods |
+| `view.Padding.GetSubViews(...)` | Must use `view.Padding.View?.GetSubViews(...)` — callers updated, no wrapper on Padding | Callers updated to call through `.View` |
 
 ### 7.3 Nullability Clarification
 
@@ -971,11 +961,11 @@ view.Border.EnsureView().Add(mySubView);
 // Or (Padding preferred, convenience method):
 view.Padding.Add(mySubView);
 
-// ⚠️ CHANGED — Calling View.BeginInit on an adornment
+// ⚠️ CHANGED — Getting SubViews from Padding (no wrapper on lightweight Padding)
 // Old:
-view.Border.BeginInit();
+view.Padding.GetSubViews(includePadding: true);
 // New:
-view.Border.View?.BeginInit();
+view.Padding.View?.GetSubViews(includePadding: true);
 
 // ⚠️ CHANGED — Type checks for Adornment
 // Old:
