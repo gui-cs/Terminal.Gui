@@ -28,6 +28,51 @@ namespace Terminal.Gui.Views;
 ///         Control the byte at the caret for editing by setting the <see cref="Address"/> property to an offset in the
 ///         stream.
 ///     </para>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Moves the cursor one nibble/byte.</description>
+///         </item>
+///         <item>
+///             <term>Up / Down</term> <description>Moves the cursor one row up or down.</description>
+///         </item>
+///         <item>
+///             <term>PageUp / PageDown</term> <description>Moves one page up or down.</description>
+///         </item>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last byte in the stream.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Left / Ctrl+Right</term> <description>Moves to the start or end of the current row.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Up / Ctrl+Down</term> <description>Moves to the start or end of the current page.</description>
+///         </item>
+///         <item>
+///             <term>Backspace</term> <description>Deletes the byte before the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Delete</term> <description>Deletes the byte at the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Insert</term> <description>Toggles insert mode.</description>
+///         </item>
+///     </list>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Click / Double-Click</term> <description>Positions the cursor at the clicked byte.</description>
+///         </item>
+///         <item>
+///             <term>Wheel Up / Down</term> <description>Scrolls the view.</description>
+///         </item>
+///     </list>
 /// </remarks>
 public class HexView : View, IDesignable
 {
@@ -36,6 +81,29 @@ public class HexView : View, IDesignable
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBlock;
+
+    /// <summary>
+    ///     Gets or sets the view-specific default key bindings for <see cref="HexView"/>. Contains only bindings
+    ///     unique to this view; shared bindings come from <see cref="View.DefaultKeyBindings"/>.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    {
+        // HexView maps Home/End to stream start/end (overrides base layer's LeftStart/RightEnd)
+        [Command.Start] = Bind.All (Key.Home),
+        [Command.End] = Bind.All (Key.End),
+
+        // Row start/end via Ctrl+Left/Right
+        [Command.LeftStart] = Bind.All (Key.CursorLeft.WithCtrl),
+        [Command.RightEnd] = Bind.All (Key.CursorRight.WithCtrl),
+
+        [Command.StartOfPage] = Bind.All (Key.CursorUp.WithCtrl),
+        [Command.EndOfPage] = Bind.All (Key.CursorDown.WithCtrl),
+        [Command.Insert] = Bind.All (Key.InsertChar),
+    };
 
     private const int DEFAULT_ADDRESS_WIDTH = 8; // The default value for AddressWidth
     private const int NUM_BYTES_PER_HEX_COLUMN = 4;
@@ -79,22 +147,7 @@ public class HexView : View, IDesignable
         AddCommand (Command.DeleteCharRight, () => true);
         AddCommand (Command.Insert, () => true);
 
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
-        KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.CursorDown, Command.Down);
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.Home, Command.Start);
-        KeyBindings.Add (Key.End, Command.End);
-        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.LeftStart);
-        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.RightEnd);
-        KeyBindings.Add (Key.CursorUp.WithCtrl, Command.StartOfPage);
-        KeyBindings.Add (Key.CursorDown.WithCtrl, Command.EndOfPage);
-
-        KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
-        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
-        KeyBindings.Add (Key.InsertChar, Command.Insert);
+        ApplyKeyBindings (DefaultKeyBindings, View.DefaultKeyBindings);
 
         KeyBindings.Remove (Key.Space);
         KeyBindings.Remove (Key.Enter);

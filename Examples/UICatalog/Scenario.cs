@@ -74,11 +74,11 @@ public class Scenario : IDisposable
     public string GetName () => ScenarioMetadata.GetName (GetType ());
 
     /// <summary>
-    ///     Helper to get the <see cref="Application.QuitKey"/> and the <see cref="Scenario"/> Name (defined in
+    ///     Helper to get the <see cref="Application.GetDefaultKey (Command.Quit)"/> and the <see cref="Scenario"/> Name (defined in
     ///     <see cref="ScenarioMetadata"/>)
     /// </summary>
     /// <returns></returns>
-    public string GetQuitKeyAndName () => $"{Application.QuitKey} to Quit - Scenario: {GetName ()}";
+    public string GetQuitKeyAndName () => $"{Application.GetDefaultKey (Command.Quit)} to Quit - Scenario: {GetName ()}";
 
     /// <summary>
     ///     Returns a list of all <see cref="Scenario"/> instanaces defined in the project, sorted by
@@ -269,7 +269,7 @@ public class Scenario : IDisposable
         }
 
         Logging.Warning ($@"  Failed to Quit with {
-            Application.QuitKey
+            Application.GetDefaultKey (Command.Quit)
         } after {
             BenchmarkTimeout
         }ms and {

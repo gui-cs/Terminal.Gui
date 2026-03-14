@@ -91,7 +91,7 @@ public class StatusBarTests
                                 new Shortcut []
                                 {
                                     new (
-                                         Application.QuitKey,
+                                         Application.GetDefaultKey (Command.Quit),
                                          $"Quit",
                                          () => msg = "Quiting..."
                                         )
@@ -110,7 +110,7 @@ public class StatusBarTests
             if (iteration == 0)
             {
                 Assert.Equal ("", msg);
-                Application.RaiseKeyDownEvent (Application.QuitKey);
+                Application.RaiseKeyDownEvent (Application.GetDefaultKey (Command.Quit));
             }
             else if (iteration == 1)
             {

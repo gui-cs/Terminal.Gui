@@ -19,10 +19,34 @@
       "default": "+",
       "description": "The character used to separate modifiers and keys in key string representations (e.g., 'Ctrl+Q')."
     },
-    "Application.ArrangeKey": {
-      "type": "string",
-      "default": "Ctrl+F5",
-      "description": "The key combination used to trigger an arrange or layout command, often for tiling or re-organizing windows."
+    "Application.DefaultKeyBindings": {
+      "type": "object",
+      "description": "A dictionary mapping Command names to PlatformKeyBinding objects. Each PlatformKeyBinding can specify keys for All platforms or per-platform (Windows, Linux, Macos). Commands include Quit, Arrange, NextTabStop, PreviousTabStop, NextTabGroup, PreviousTabGroup.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "All": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Key combinations applied on all platforms."
+          },
+          "Windows": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Key combinations applied only on Windows."
+          },
+          "Linux": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Key combinations applied only on Linux."
+          },
+          "Macos": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Key combinations applied only on macOS."
+          }
+        }
+      }
     },
     "Application.Force16Colors": {
       "type": "boolean",
@@ -49,31 +73,6 @@
       "type": "boolean",
       "default": false,
       "description": "Disables or enables mouse support for the application. If true, mouse events will be ignored."
-    },
-    "IKeyboard.NextTabGroupKey": {
-      "type": "string",
-      "default": "F6",
-      "description": "The key combination to navigate to the next logical group of controls or container (e.g., 'F6', 'Ctrl+PageDown')."
-    },
-    "IKeyboard.NextTabKey": {
-      "type": "string",
-      "default": "Tab",
-      "description": "The key combination to navigate to the next focusable view or tab stop (e.g., 'Tab')."
-    },
-    "IKeyboard.PrevTabGroupKey": {
-      "type": "string",
-      "default": "Shift+F6",
-      "description": "The key combination to navigate to the previous logical group of controls or container (e.g., 'Shift+F6', 'Ctrl+PageUp')."
-    },
-    "IKeyboard.PrevTabKey": {
-      "type": "string",
-      "default": "Shift+Tab",
-      "description": "The key combination to navigate to the previous focusable view or tab stop (e.g., 'Shift+Tab')."
-    },
-    "Application.QuitKey": {
-      "type": "string",
-      "default": "Esc",
-      "description": "The primary key combination used to request the application to quit (e.g., 'Esc', 'Ctrl+Q')."
     },
     "PopoverMenu.DefaultKey": {
       "type": "string",

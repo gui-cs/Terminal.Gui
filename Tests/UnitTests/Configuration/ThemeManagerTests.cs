@@ -254,7 +254,7 @@ public class ThemeManagerTests (ITestOutputHelper output)
 
         output.WriteLine ($"Start: Base Scheme size: {(MemorySizeEstimator.EstimateSize (Scheme.GetHardCodedSchemes ()))} b");
 
-        output.WriteLine ($"Start: PropertyInfo size: {(MemorySizeEstimator.EstimateSize (ConfigurationManager.Settings! ["Application.QuitKey"]))} b");
+        output.WriteLine ($"Start: PropertyInfo size: {(MemorySizeEstimator.EstimateSize (ConfigurationManager.Settings! ["Application.DefaultKeyBindings"]))} b");
 
         ThemeScope themeScope = new ThemeScope ();
         output.WriteLine ($"Start: ThemeScope ({themeScope.Count}) size: {(MemorySizeEstimator.EstimateSize (themeScope))} b");

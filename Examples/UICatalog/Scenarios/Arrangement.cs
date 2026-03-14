@@ -284,7 +284,7 @@ public class Arrangement : Scenario
         List<Key> keys =
         [
             '&',
-            app!.Keyboard.ArrangeKey
+            Application.GetDefaultKey (Command.Arrange)
         ];
 
         // Select view with progress bar
@@ -299,11 +299,11 @@ public class Arrangement : Scenario
             keys.Add (Key.CursorRight);
         }
 
-        keys.Add (app.Keyboard.ArrangeKey);
+        keys.Add (Application.GetDefaultKey (Command.Arrange));
 
         keys.Add (Key.S);
 
-        keys.Add (app.Keyboard.ArrangeKey);
+        keys.Add (Application.GetDefaultKey (Command.Arrange));
 
         for (var i = 0; i < 10; i++)
         {
@@ -315,12 +315,12 @@ public class Arrangement : Scenario
             keys.Add (Key.CursorLeft);
         }
 
-        keys.Add (app.Keyboard.ArrangeKey);
+        keys.Add (Application.GetDefaultKey (Command.Arrange));
 
         // Select view with progress bar
         keys.Add ('&');
 
-        keys.Add (app.Keyboard.ArrangeKey);
+        keys.Add (Application.GetDefaultKey (Command.Arrange));
 
         keys.Add (Key.Tab);
 

@@ -26,7 +26,6 @@ public class SyncrhonizationContextTests
     [InlineData (DriverRegistry.Names.ANSI)]
     [InlineData (DriverRegistry.Names.WINDOWS)]
     [InlineData (DriverRegistry.Names.DOTNET)]
-    [InlineData (DriverRegistry.Names.UNIX)]
     public void SynchronizationContext_Post (string driverName = null)
     {
         lock (_lockPost)

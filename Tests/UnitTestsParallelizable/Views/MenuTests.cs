@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
-using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
+using UnitTests.Parallelizable;
 
 namespace ViewsTests;
 

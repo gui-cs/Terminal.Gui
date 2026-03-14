@@ -1,7 +1,78 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>Single-line text editor.</summary>
-/// <remarks>The <see cref="TextField"/> <see cref="View"/> provides editing functionality and mouse support.</remarks>
+/// <remarks>
+///     <para>The <see cref="TextField"/> <see cref="View"/> provides editing functionality and mouse support.</para>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left, Ctrl+B</term> <description>Moves the cursor left.</description>
+///         </item>
+///         <item>
+///             <term>Right, Ctrl+F</term> <description>Moves the cursor right.</description>
+///         </item>
+///         <item>
+///             <term>Home, Ctrl+Home</term> <description>Moves the cursor to the start of the text.</description>
+///         </item>
+///         <item>
+///             <term>End, Ctrl+End, Ctrl+E</term> <description>Moves the cursor to the end of the text.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Left, Ctrl+Up</term> <description>Moves one word left.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Right, Ctrl+Down</term> <description>Moves one word right.</description>
+///         </item>
+///         <item>
+///             <term>Shift+&lt;movement&gt;</term> <description>Extends the selection in the given direction.</description>
+///         </item>
+///         <item>
+///             <term>Delete, Ctrl+D</term> <description>Deletes the character in front of the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Backspace</term> <description>Deletes the character behind the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+K</term> <description>Cuts text from the cursor to the end of the line.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Shift+K</term> <description>Cuts text from the cursor to the start of the line.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Delete</term> <description>Deletes the word to the right of the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Backspace</term> <description>Deletes the word to the left of the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+C</term> <description>Copies the selected text to the clipboard.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+X</term> <description>Cuts the selected text to the clipboard.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+V</term> <description>Pastes text from the clipboard.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+A</term> <description>Selects all text.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Shift+Delete</term> <description>Deletes all text.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Z</term> <description>Undoes the last change.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Y</term> <description>Redoes the last undone change.</description>
+///         </item>
+///         <item>
+///             <term>Insert</term> <description>Toggles overwrite mode.</description>
+///         </item>
+///     </list>
+/// </remarks>
 public partial class TextField : View, IDesignable, IValue<string>
 {
     /// <summary>
