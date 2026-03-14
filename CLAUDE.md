@@ -81,8 +81,8 @@ When in planning mode:
 ```bash
 dotnet restore
 dotnet build --no-restore
-dotnet test Tests/UnitTestsParallelizable --no-build
-dotnet test Tests/UnitTests --no-build
+dotnet test --project Tests/UnitTestsParallelizable --no-build
+dotnet test --project Tests/UnitTests --no-build
 ```
 
 ## Key Concepts
@@ -105,6 +105,8 @@ dotnet test Tests/UnitTests --no-build
 6. **Use `[...]`** not `new () { ... }` for collections
 7. **SubView/SuperView** for containment (Parent/Child only for non-containment refs)
 8. **Unused lambda params** - use `_`: `(_, _) => { }`
+9. **Early return** - Prefer guard clauses over nested `if`/`else`
+10. **One type per file** - Public and internal types each get their own file
 
 ## Testing
 

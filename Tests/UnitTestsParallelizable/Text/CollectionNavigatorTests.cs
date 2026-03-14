@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
 using Moq;
-using Xunit.Abstractions;
 
 namespace TextTests;
 
@@ -470,8 +469,7 @@ public class CollectionNavigatorTests
         // Reader tasks
         for (var i = 0; i < numReaders; i++)
         {
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      try
                                      {
@@ -485,7 +483,8 @@ public class CollectionNavigatorTests
                                      {
                                          exceptions.Add (ex);
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
         // Writer tasks (change Collection reference)
@@ -493,8 +492,7 @@ public class CollectionNavigatorTests
         {
             int writerIndex = i;
 
-            tasks.Add (
-                       Task.Run (() =>
+            tasks.Add (Task.Run (() =>
                                  {
                                      try
                                      {
@@ -509,11 +507,12 @@ public class CollectionNavigatorTests
                                      {
                                          exceptions.Add (ex);
                                      }
-                                 }));
+                                 },
+                                 TestContext.Current.CancellationToken));
         }
 
 #pragma warning disable xUnit1031
-        Task.WaitAll (tasks.ToArray ());
+        Task.WaitAll (tasks.ToArray (), TestContext.Current.CancellationToken);
 #pragma warning restore xUnit1031
 
         // Allow some exceptions due to collection being swapped during access

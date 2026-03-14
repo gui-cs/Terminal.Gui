@@ -570,6 +570,70 @@ public partial class View // Keyboard APIs
 
     #endregion KeyDown Event
 
+    #region KeyUp Event
+
+    /// <summary>
+    ///     Called when a key is released. This is the view-level entry point for key-up events,
+    ///     following the same pattern as <see cref="NewKeyDownEvent"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Key-up events are only raised when the driver provides key release information.
+    ///         Not all drivers support key-up events.
+    ///     </para>
+    /// </remarks>
+    /// <param name="key">The key that was released.</param>
+    /// <returns><see langword="true"/> if the event was handled.</returns>
+    public bool NewKeyUpEvent (Key key)
+    {
+        if (!Enabled)
+        {
+            return false;
+        }
+
+        if (Focused?.NewKeyUpEvent (key) == true)
+        {
+            return true;
+        }
+
+        if (OnKeyUp (key) || key.Handled)
+        {
+            return true;
+        }
+
+        KeyUp?.Invoke (this, key);
+
+        return key.Handled;
+    }
+
+    /// <summary>
+    ///     Called when the user releases a key, allowing subclasses to pre-process the key up event.
+    ///     Set <see cref="Key.Handled"/> to <see langword="true"/> to stop the key from being processed further.
+    /// </summary>
+    /// <param name="key">The key that produced the event.</param>
+    /// <returns>
+    ///     <see langword="false"/> if the key up event was not handled. <see langword="true"/> if the event was handled
+    ///     and processing should stop.
+    /// </returns>
+    protected virtual bool OnKeyUp (Key key) => false;
+
+    /// <summary>
+    ///     Raised when the user releases a key.
+    ///     <para>
+    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
+    ///         additional processing.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Key-up events are only raised when the driver provides key release information.
+    ///         Not all drivers support key-up events.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<Key>? KeyUp;
+
+    #endregion KeyUp Event
+
     #endregion Low-level Key handling
 
     #region Key Bindings

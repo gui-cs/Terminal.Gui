@@ -1,7 +1,5 @@
 using System.Globalization;
 using System.Text;
-using UnitTests;
-using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Dim;
 
 namespace UnitTests.LayoutTests;

@@ -90,8 +90,7 @@ internal abstract class ColorBar : View, IColorBar
 
         if (!string.IsNullOrWhiteSpace (Text))
         {
-            // TODO: is there a better method than this? this is what it is in TableView
-            xOffset = Text.EnumerateRunes ().Sum (c => c.GetColumns ());
+            xOffset = Text.GetColumns ();
         }
 
         _barWidth = Viewport.Width - xOffset;

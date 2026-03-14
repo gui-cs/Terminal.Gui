@@ -1,5 +1,4 @@
 using Terminal.Gui.Tests;
-using Xunit.Abstractions;
 
 namespace ApplicationTests.Init;
 

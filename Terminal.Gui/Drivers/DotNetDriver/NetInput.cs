@@ -1,29 +1,38 @@
 #nullable disable
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     <see cref="IInput{TInputRecord}"/> implementation that uses native dotnet methods e.g. <see cref="System.Console"/>.
+///     <see cref="IInput{TInputRecord}"/> implementation that uses native dotnet methods e.g. <see cref="System.Console"/>
+///     .
 ///     The <see cref="Peek"/> and <see cref="Read"/> methods are executed
 ///     on the input thread created by <see cref="MainLoopCoordinator{TInputRecord}.StartInputTaskAsync"/>.
 /// </summary>
-public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo>, IDisposable
+public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo>
 {
     /// <summary>
     ///     Creates a new instance of the class. Implicitly sends
     ///     console mode settings that enable virtual input (mouse
-    ///     reporting etc).
+    ///     reporting etc.).
     /// </summary>
     public NetInput ()
     {
-        //Logging.Information ($"Creating {nameof (NetInput)}");
+        // Check if we have a real console first
+        if (!IsAttachedToTerminal)
+        {
+            Trace.Lifecycle (nameof (NetInput), "Init", "Console is not attached to a terminal. Running in degraded mode.");
+
+            return;
+        }
 
         PlatformID p = Environment.OSVersion.Platform;
 
-        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+        if (p is PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows)
         {
             try
             {
-                _adjustConsole = new ();
+                _adjustConsole = new NetWinVTConsole ();
             }
             catch (ApplicationException ex)
             {
@@ -84,8 +93,8 @@ public class NetInput : InputImpl<ConsoleKeyInfo>, ITestableInput<ConsoleKeyInfo
         }
     }
 
-    /// <inheritdoc />
-    public void InjectInput (ConsoleKeyInfo input) { throw new NotImplementedException (); }
+    /// <inheritdoc/>
+    public void InjectInput (ConsoleKeyInfo input) => throw new NotImplementedException ();
 
     /// <inheritdoc/>
     public override bool Peek ()

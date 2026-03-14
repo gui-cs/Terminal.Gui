@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System.Text;
-using Xunit.Abstractions;
 
 namespace DriverTests.AnsiHandling;
 

@@ -8,7 +8,7 @@ namespace Terminal.Gui.Drivers;
 internal class UnixClipboard : ClipboardBase
 {
     private string _xclipPath = string.Empty;
-    public UnixClipboard () { IsSupported = CheckSupport (); }
+    public UnixClipboard () => IsSupported = CheckSupport ();
     public override bool IsSupported { get; }
 
     protected override string GetClipboardDataImpl ()

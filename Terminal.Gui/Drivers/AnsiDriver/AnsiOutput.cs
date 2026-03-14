@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.Drivers;
 
@@ -49,8 +50,6 @@ public class AnsiOutput : OutputBase, IOutput
     /// </summary>
     public AnsiOutput ()
     {
-        // Logging.Information ($"Creating {nameof (AnsiOutput)}");
-
         _platform = AnsiPlatform.Degraded;
 
         _lastBuffer = new OutputBufferImpl ();
@@ -59,10 +58,10 @@ public class AnsiOutput : OutputBase, IOutput
 
         try
         {
-            // Check if console is available (not redirected)
-            if (Console.IsOutputRedirected || Console.IsInputRedirected)
+            // Check if we have a real console first
+            if (!IsAttachedToTerminal)
             {
-                Logging.Information ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
+                Trace.Lifecycle (nameof (AnsiOutput), "Init", "No real terminal attached. Running in degraded mode.");
 
                 return;
             }
@@ -77,7 +76,9 @@ public class AnsiOutput : OutputBase, IOutput
                     _windowsVTOutput.Dispose ();
                     _windowsVTOutput = null;
 
-                    Logging.Information ("Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
+                    Trace.Lifecycle (nameof (AnsiOutput),
+                                     "Init",
+                                     "Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
 
                     return;
                 }
@@ -90,7 +91,7 @@ public class AnsiOutput : OutputBase, IOutput
 
                 if (fdCopy == -1)
                 {
-                    Logging.Information ("Console output stream is not writable. Running in degraded mode.");
+                    Trace.Lifecycle (nameof (AnsiOutput), "Init", "Console output stream is not writable. Running in degraded mode.");
 
                     return;
                 }
@@ -104,12 +105,12 @@ public class AnsiOutput : OutputBase, IOutput
             Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.EntireScreen));
             Write (EscSeqUtils.CSI_SetCursorPosition (1, 1)); // Move to top-left
             Write (EscSeqUtils.CSI_HideCursor);
+
             // TODO: Move Input related CSI sequences to AnsiInput
             Write (EscSeqUtils.CSI_EnableMouseEvents);
 
             // Flush to ensure all sequences are sent
-            // NOTE: Default implementation of Flush does nothing.
-            Console.Out.Flush ();
+            AnsiTerminalHelper.FlushNative (_platform);
 
             //Logging.Information ("ANSIOutput initialized successfully");
 
@@ -121,11 +122,13 @@ public class AnsiOutput : OutputBase, IOutput
         }
         catch (Exception ex)
         {
-            Logging.Warning ($"Failed to initialize ANSIOutput: {ex.GetType ().Name}: {ex.Message}");
-            Logging.Warning ($"Stack trace: {ex.StackTrace}");
+            Trace.Lifecycle (nameof (AnsiOutput), "Init", $"Failed to initialize ANSIOutput: {ex.GetType ().Name}: {ex.Message}. Stack trace: {ex.StackTrace}");
             _platform = AnsiPlatform.Degraded;
         }
     }
+
+    /// <inheritdoc/>
+    public void Suspend () => UnixTerminalHelper.Suspend (this);
 
     /// <summary>
     ///     Gets or sets the last output buffer written. The <see cref="IOutputBuffer.Contents"/> contains
@@ -166,8 +169,6 @@ public class AnsiOutput : OutputBase, IOutput
         }
         catch (Exception)
         {
-            //Logging.Warning (e.Message);
-
             // ignore for unit tests
         }
     }
@@ -175,14 +176,16 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
+        StringBuilder capturedOutput = new ();
+        capturedOutput.Append (text);
+        base.Write (capturedOutput);
+
         try
         {
             switch (_platform)
             {
                 case AnsiPlatform.WindowsVT:
-                    StringBuilder sb = new ();
-                    sb.Append (text);
-                    _windowsVTOutput!.Write (sb);
+                    _windowsVTOutput!.Write (capturedOutput);
 
                     break;
 
@@ -199,10 +202,44 @@ public class AnsiOutput : OutputBase, IOutput
         }
         catch (Exception)
         {
-            //Logging.Warning (e.Message);
-
             // ignore for unit tests
         }
+    }
+
+    /// <summary>
+    ///     Gets the kitty keyboard flags currently enabled on the terminal.
+    /// </summary>
+    internal KittyKeyboardFlags KittyKeyboardEnabledFlags { get; private set; }
+
+    /// <summary>
+    ///     Enables kitty keyboard progressive enhancement flags for the active terminal.
+    /// </summary>
+    /// <param name="flags">The kitty keyboard flags to enable.</param>
+    internal void EnableKittyKeyboard (KittyKeyboardFlags flags)
+    {
+        if (flags == KittyKeyboardFlags.None || _platform == AnsiPlatform.Degraded)
+        {
+            return;
+        }
+
+        Trace.Lifecycle (nameof (AnsiOutput), "KittyKeyboard", $"Writing enable sequence for flags {flags}");
+        Write (EscSeqUtils.CSI_EnableKittyKeyboardFlags (flags));
+        KittyKeyboardEnabledFlags = flags;
+    }
+
+    /// <summary>
+    ///     Restores the previous kitty keyboard flag state if kitty mode was enabled.
+    /// </summary>
+    internal void DisableKittyKeyboard ()
+    {
+        if (KittyKeyboardEnabledFlags == KittyKeyboardFlags.None)
+        {
+            return;
+        }
+
+        Trace.Lifecycle (nameof (AnsiOutput), "KittyKeyboard", $"Writing disable sequence for flags {KittyKeyboardEnabledFlags}");
+        Write (EscSeqUtils.CSI_DisableKittyKeyboardFlags);
+        KittyKeyboardEnabledFlags = KittyKeyboardFlags.None;
     }
 
     /// <inheritdoc cref="IOutput.Write(IOutputBuffer)"/>
@@ -228,7 +265,7 @@ public class AnsiOutput : OutputBase, IOutput
             }
             else
             {
-                if (_currentCursor!.Style != cursor.Style)
+                if (_currentCursor.Style != cursor.Style)
                 {
                     Write (EscSeqUtils.CSI_SetCursorStyle (cursor.Style));
                 }
@@ -251,7 +288,7 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int col, int row)
     {
-        if (_currentCursor!.Position is { } && _currentCursor.Position.Value.X == col && _currentCursor.Position.Value.Y == row)
+        if (_currentCursor.Position is { } && _currentCursor.Position.Value.X == col && _currentCursor.Position.Value.Y == row)
         {
             return false;
         }
@@ -286,34 +323,37 @@ public class AnsiOutput : OutputBase, IOutput
             // Example: "[8;25;80t"
             Match match = Regex.Match (response, @"\[(\d+);(\d+);(\d+)t$");
 
-            if (match is { Success: true, Groups.Count: 4 })
+            if (match is not { Success: true, Groups.Count: 4 })
             {
-                // Group 1 should be "8" (the response value)
-                // Group 2 is height, Group 3 is width
-                if (int.TryParse (match.Groups [2].Value, out int height) && int.TryParse (match.Groups [3].Value, out int width))
-                {
-                    _consoleSize = new Size (width, height);
-                }
+                return;
+            }
+
+            // Group 1 should be "8" (the response value)
+            // Group 2 is height, Group 3 is width
+            if (int.TryParse (match.Groups [2].Value, out int height) && int.TryParse (match.Groups [3].Value, out int width))
+            {
+                _consoleSize = new Size (width, height);
             }
         }
         catch (Exception ex)
         {
-            Logging.Warning ($"Failed to parse size query response '{response}': {ex.Message}");
+            Trace.Lifecycle (nameof (AnsiOutput), "SizeQuery", $"Failed to parse size query response '{response}': {ex.Message}");
         }
     }
 
     /// <inheritdoc/>
     public void Dispose ()
     {
-        if (_platform == AnsiPlatform.Degraded)
-        {
-            return;
-        }
-
         try
         {
+            DisableKittyKeyboard ();
+
+            if (_platform == AnsiPlatform.Degraded)
+            {
+                return;
+            }
+
             // Restore terminal state: disable mouse, restore buffer, show cursor
-            // TODO: Move Input related CSI sequences to AnsiInput
             Write (EscSeqUtils.CSI_DisableMouseEvents);
             Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
             Write (EscSeqUtils.CSI_ShowCursor);
@@ -324,7 +364,7 @@ public class AnsiOutput : OutputBase, IOutput
         }
         finally
         {
-            //Logging.Trace ("Flushing and closing.");
+            Trace.Lifecycle (nameof (AnsiOutput), "Dispose", "Flushing output and releasing resources.");
 
             _windowsVTOutput?.Dispose ();
         }

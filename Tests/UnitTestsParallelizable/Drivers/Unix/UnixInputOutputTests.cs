@@ -1,5 +1,4 @@
 #nullable enable
-using Xunit.Abstractions;
 
 namespace DriverTests.UnixDriver;
 
@@ -105,5 +104,33 @@ public class UnixInputOutputTests (ITestOutputHelper output)
         Assert.Null (exception);
         Assert.Equal (80, size.Width);
         Assert.Equal (25, size.Height);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void UnixOutput_Suspend_DoesNotThrow_WhenNoTerminalAvailable ()
+    {
+        // Arrange
+        using var output = new UnixOutput ();
+
+        // Act
+        Exception? exception = Record.Exception (() => output.Suspend ());
+
+        // Assert
+        Assert.Null (exception);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void UnixDriver_IsAttachedToTerminal_ReturnsFalse_InTestHarness ()
+    {
+        // Copilot - generated.
+        // Act — Driver.IsAttachedToTerminal is the shared entry point all drivers use.
+        bool result = Driver.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached);
+
+        // Assert
+        Assert.False (result, "UnixDriver: IsAttachedToTerminal should return false in test harness");
+        Assert.False (inputAttached);
+        Assert.False (outputAttached);
     }
 }

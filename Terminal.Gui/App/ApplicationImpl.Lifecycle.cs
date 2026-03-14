@@ -65,7 +65,7 @@ internal partial class ApplicationImpl
         }
 
         // Preserve existing keyboard settings if they exist
-        // BUGBUG: These should not be needed; KeyboardImpl subscribes to Application static property changes
+        // BUGBUG: These should not be needed; ApplicationKeyboard subscribes to Application static property changes
         // BUGBUG: and should set these automatically.
         bool hasExistingKeyboard = _keyboard is { };
         Key existingQuitKey = _keyboard?.QuitKey ?? Application.QuitKey;
@@ -76,7 +76,7 @@ internal partial class ApplicationImpl
         Key existingPrevTabGroupKey = _keyboard?.PrevTabGroupKey ?? Application.PrevTabGroupKey;
 
         // Reset keyboard to ensure fresh state with default bindings
-        _keyboard = new KeyboardImpl { App = this };
+        _keyboard = new ApplicationKeyboard { App = this };
 
         // Sync keys from Application static properties (or existing keyboard if it had custom values)
         // This ensures we respect any Application.QuitKey etc changes made before Init()
@@ -268,11 +268,20 @@ internal partial class ApplicationImpl
 #endif
 
         // === 4. Clean up driver ===
-        if (Driver is { })
+        // Capture-and-null to avoid race when Dispose is called concurrently from
+        // multiple threads (e.g. AppTestHelper background thread + test thread).
+        // Null Driver first so concurrent callers see null and skip cleanup.
+        IDriver? driver = Driver;
+        Driver = null;
+
+        if (driver is { })
         {
-            UnsubscribeDriverEvents ();
-            Driver.Dispose ();
-            Driver = null;
+            // Unsubscribe using the captured local since Driver property is now null
+            driver.SizeChanged -= Driver_SizeChanged;
+            driver.KeyDown -= Driver_KeyDown;
+            driver.KeyUp -= Driver_KeyUp;
+            driver.MouseEvent -= Driver_MouseEvent;
+            driver.Dispose ();
         }
 
         // === 5. Clear run state ===

@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
-using Xunit.Sdk;
+using Xunit.v3;
 
 namespace UnitTests;
 
@@ -15,15 +15,15 @@ namespace UnitTests;
 [AttributeUsage (AttributeTargets.Class | AttributeTargets.Method)]
 public class TestRespondersDisposedAttribute : BeforeAfterTestAttribute
 {
-    public TestRespondersDisposedAttribute () { CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US"); }
+    public TestRespondersDisposedAttribute () => CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.GetCultureInfo ("en-US");
 
-    public override void After (MethodInfo methodUnderTest)
+    public override void After (MethodInfo methodUnderTest, IXunitTest test)
     {
         Debug.WriteLine ($"After: {methodUnderTest.Name}");
 
         Debug.Assert (!CM.IsEnabled, "This test left ConfigurationManager enabled!");
 
-        base.After (methodUnderTest);
+        base.After (methodUnderTest, test);
 
 #if DEBUG_IDISPOSABLE
         Assert.True (View.EnableDebugIDisposableAsserts);
@@ -31,11 +31,11 @@ public class TestRespondersDisposedAttribute : BeforeAfterTestAttribute
 #endif
     }
 
-    public override void Before (MethodInfo methodUnderTest)
+    public override void Before (MethodInfo methodUnderTest, IXunitTest test)
     {
         Debug.WriteLine ($"Before: {methodUnderTest.Name}");
 
-        base.Before (methodUnderTest);
+        base.Before (methodUnderTest, test);
 #if DEBUG_IDISPOSABLE
         View.EnableDebugIDisposableAsserts = true;
         // Clear out any lingering Responder instances from previous tests

@@ -2,7 +2,6 @@
 using System.Text;
 using UICatalog;
 using UnitTests;
-using Xunit.Abstractions;
 
 // Alias Console to MockConsole so we don't accidentally use Console
 
@@ -452,7 +451,7 @@ Nice       Work")]
                               | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |*
                               |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|*
                            ***********************************************************
-                           **********************v2 - Pre-Alpha***********************
+                           *************************v2 - Beta*************************
                            ***********************************************************
                            **********https://github.com/gui-cs/Terminal.Gui***********
                            """;

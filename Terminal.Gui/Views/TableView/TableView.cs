@@ -397,7 +397,7 @@ public partial class TableView : View, IDesignable
     /// <returns></returns>
     private int CalculateMaxCellWidth (int col, ColumnStyle? colStyle, int startRow, int rowsToRender)
     {
-        int spaceRequired = _table!.ColumnNames [col].EnumerateRunes ().Sum (c => c.GetColumns ());
+        int spaceRequired = _table!.ColumnNames [col].GetColumns ();
 
         // if table has no rows
         if (Table is not { Rows: > 0 })
@@ -408,7 +408,7 @@ public partial class TableView : View, IDesignable
         for (int i = startRow; i < startRow + rowsToRender; i++)
         {
             // expand required space if cell is bigger than the last biggest cell or header
-            spaceRequired = Math.Max (spaceRequired, GetRepresentation (Table [i, col], colStyle).EnumerateRunes ().Sum (c => c.GetColumns ()));
+            spaceRequired = Math.Max (spaceRequired, GetRepresentation (Table [i, col], colStyle).GetColumns ());
         }
 
         // Don't require more space than the style allows
@@ -666,13 +666,13 @@ public partial class TableView : View, IDesignable
         }
 
         // if value is too wide
-        if (representation.EnumerateRunes ().Sum (c => c.GetColumns ()) >= availableHorizontalSpace)
+        if (representation.GetColumns () >= availableHorizontalSpace)
         {
             return new string (representation.TakeWhile (c => (availableHorizontalSpace -= ((Rune)c).GetColumns ()) > 0).ToArray ());
         }
 
         // pad it out with spaces to the given alignment
-        int toPad = availableHorizontalSpace - (representation.EnumerateRunes ().Sum (c => c.GetColumns ()) + 1 /*leave 1 space for cell boundary*/);
+        int toPad = availableHorizontalSpace - (representation.GetColumns () + 1 /*leave 1 space for cell boundary*/);
 
         return (colStyle?.GetAlignment (originalCellValue) ?? Alignment.Start) switch
                {

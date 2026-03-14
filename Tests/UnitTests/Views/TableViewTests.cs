@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Data;
 using System.Globalization;
-using Xunit.Abstractions;
 
 namespace UnitTests.ViewsTests;
 
@@ -1800,6 +1799,9 @@ public class TableViewTests (ITestOutputHelper output)
         // The unicode width of this string is shorter than the string length! 
         Assert.Equal (14, surrogate.EnumerateRunes ().Sum (c => c.GetColumns ()));
         Assert.Equal (15, surrogate.Length);
+
+        // For combining marks, EnumerateRunes().Sum() and GetColumns() agree
+        Assert.Equal (14, surrogate.GetColumns ());
     }
 
     [Fact]

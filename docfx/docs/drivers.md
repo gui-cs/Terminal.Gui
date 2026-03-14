@@ -373,10 +373,24 @@ Drivers implement cursor control through `IDriver` which delegates to `IOutput`:
 > See [Cursor Management](cursor.md) for complete details.
 
 #### Input Events
-- `KeyDown`, `MouseEvent` - Input events raised by the driver when input is processed
+- `KeyDown` - Raised for key press and repeat events
+- `KeyUp` - Raised for key release events (only when the driver supports it — currently the ANSI driver with kitty keyboard protocol)
+- `MouseEvent` - Raised for mouse input events
 
 > [!NOTE]
 > For testing, use the input injection API. See [Input Injection](input-injection.md) for details.
+
+#### Kitty Keyboard Protocol
+
+The ANSI driver detects and enables the [kitty keyboard protocol](https://sw.kovidgoyal.net/kitty/keyboard-protocol/) at startup when the terminal supports it. This provides:
+
+- **Disambiguated escape codes** (flag 1) — eliminates ambiguity in legacy ANSI key sequences
+- **Event type reporting** (flag 2) — press, repeat, and release events via `Key.EventType`
+- **Standalone modifier key events** — pressing Shift, Ctrl, Alt alone generates events with `Key.IsModifierOnly == true` and `Key.ModifierKey` identifying the specific modifier (e.g. `ModifierKey.LeftShift`)
+
+Detection uses the `KittyKeyboardProtocolDetector` which queries the terminal via CSI `?u`. If supported, the protocol is enabled with flags 1+2. On shutdown, the protocol is disabled to restore normal terminal behavior.
+
+Three ANSI parser patterns handle kitty event types: `KittyKeyboardPattern` (CSI `u`), `CsiKeyPattern` (CSI `~`), and `CsiCursorPattern` (CSI cursor letters). Release events route to `KeyUp`; press and repeat route to `KeyDown`.
 
 #### ANSI Escape Sequences
 - `QueueAnsiRequest()` - ANSI request handling

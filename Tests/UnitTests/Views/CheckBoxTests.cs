@@ -1,7 +1,3 @@
-using System.ComponentModel;
-using UnitTests;
-using Xunit.Abstractions;
-
 // ReSharper disable AccessToModifiedClosure
 
 namespace UnitTests.ViewsTests;

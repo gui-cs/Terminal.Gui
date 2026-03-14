@@ -1,6 +1,4 @@
 using System.Reflection;
-using UnitTests;
-using Xunit.Abstractions;
 
 namespace UnitTests.ViewsTests;
 

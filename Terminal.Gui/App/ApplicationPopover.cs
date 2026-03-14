@@ -184,6 +184,15 @@ public sealed class ApplicationPopover : IDisposable
             throw new InvalidOperationException (@"Popovers must be registered before being shown.");
         }
 
+        // Prevent re-show of a popover that was just dismissed by a mouse-press-outside event.
+        // The dismiss logic in ApplicationMouse.RaiseMouseEvent sets DismissedByMousePress before recursing,
+        // and the guard spans the entire press → release → click cycle. This prevents views beneath
+        // the popover from re-opening the same popover during the click that dismissed it.
+        if (popover is { } && App?.Mouse is ApplicationMouse { DismissedByMousePress: { } dismissed } && dismissed == popover)
+        {
+            return;
+        }
+
         // If there's an existing popover, hide it.
         if (_activePopover is { })
         {

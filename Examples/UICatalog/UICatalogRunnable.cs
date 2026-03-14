@@ -148,11 +148,11 @@ public sealed class UICatalogRunnable : Runnable
                                                     [
                                                         new MenuItem ("_Documentation",
                                                                       "API docs",
-                                                                      () => OpenUrl ("https://gui-cs.github.io/Terminal.Gui"),
+                                                                      () => Link.OpenUrl ("https://gui-cs.github.io/Terminal.Gui"),
                                                                       Key.F1),
                                                         new MenuItem ("_README",
                                                                       "Project readme",
-                                                                      () => OpenUrl ("https://github.com/gui-cs/Terminal.Gui"),
+                                                                      () => Link.OpenUrl ("https://github.com/gui-cs/Terminal.Gui"),
                                                                       Key.F2),
                                                         new MenuItem ("_About...",
                                                                       "About UI Catalog",
@@ -401,7 +401,7 @@ public sealed class UICatalogRunnable : Runnable
             // add a separator
             menuItems.Add (new Line ());
 
-            menuItems.Add (new MenuItem ("_Open Log Folder", string.Empty, () => OpenUrl (UICatalog.LOGFILE_LOCATION)));
+            menuItems.Add (new MenuItem ("_Open Log Folder", string.Empty, () => Link.OpenUrl (UICatalog.LOGFILE_LOCATION)));
 
             return menuItems.ToArray ()!;
 
@@ -740,39 +740,11 @@ public sealed class UICatalogRunnable : Runnable
                            |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|
                         """);
         msg.AppendLine ();
-        msg.AppendLine ("v2 - Pre-Alpha");
+        msg.AppendLine ("v2 - Beta");
         msg.AppendLine ();
         msg.Append ("https://github.com/gui-cs/Terminal.Gui");
 
         return msg.ToString ();
-    }
-
-    public static void OpenUrl (string url)
-    {
-        if (PlatformDetection.IsWindows ())
-        {
-            url = url.Replace ("&", "^&");
-            Process.Start (new ProcessStartInfo ("cmd", $"/c start {url}") { CreateNoWindow = true });
-        }
-        else if (PlatformDetection.IsMac ())
-        {
-            Process.Start ("open", url);
-        }
-        else if (PlatformDetection.IsLinux ())
-        {
-            using Process process = new ();
-
-            process.StartInfo = new ProcessStartInfo
-            {
-                FileName = "xdg-open",
-                Arguments = url,
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                CreateNoWindow = true,
-                UseShellExecute = false
-            };
-            process.Start ();
-        }
     }
 
     /// <summary>

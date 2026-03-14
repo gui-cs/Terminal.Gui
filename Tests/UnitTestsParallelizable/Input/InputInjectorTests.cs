@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using DriverTests.Input;
-using Xunit.Abstractions;
 
 namespace InputTests;
 
@@ -123,12 +122,8 @@ public class InputInjectorTests (ITestOutputHelper output)
 
     #region InjectKey Tests - Pipeline Mode
 
-    // BUGBUG: This test is bogus as it doesn't actually test what happens
-    // BUGBUG: when an accented char comes into the actual stdIn stream, only.
-    // BUGBUG: see https://github.com/gui-cs/Terminal.Gui/pull/4583#issuecomment-3769142085
-
-    [Fact (Skip = "Using Task.Delay (50) will cause failures in slow CI/CD runners")]
-    public async Task InjectKey_Pipeline_AccentedKeys_RaisesAllEvents ()
+    [Fact]
+    public void InjectKey_Pipeline_AutoProcess_False_AccentedKeys_RaisesAllEvents ()
     {
         // Arrange
         VirtualTimeProvider timeProvider = new ();
@@ -182,8 +177,6 @@ public class InputInjectorTests (ITestOutputHelper output)
         injector.InjectKey (new Key ('Ã'), options);
         injector.InjectKey (new Key ('Õ'), options);
 
-        // BUGBUG: This is a hack; we need to figure out how to enable this without delay
-        await Task.Delay (50); // Allow some time for processing
         injector.ProcessQueue ();
 
         // Assert - Should raise exactly 3 KeyDown events
@@ -224,11 +217,8 @@ public class InputInjectorTests (ITestOutputHelper output)
         Assert.Equal (new Key ('Õ'), receivedKeys [33]);
     }
 
-    // BUGBUG: This test is bogus as it doesn't actually test what happens
-    // BUGBUG: when an accented char comes into the actual stdIn stream, only.
-    // BUGBUG: see https://github.com/gui-cs/Terminal.Gui/pull/4583#issuecomment-3769142085
-    [Fact (Skip = "Using Task.Delay (50) will cause failures in slow CI/CD runners")]
-    public async Task InjectKey_PipelineMode_MultipleKeys_RaisesAllEvents ()
+    [Fact]
+    public void InjectKey_PipelineMode_AutoProcess_True_MultipleKeys_RaisesAllEvents ()
     {
         // Arrange
         VirtualTimeProvider timeProvider = new ();
@@ -250,10 +240,6 @@ public class InputInjectorTests (ITestOutputHelper output)
         injector.InjectKey (Key.A, options);
         injector.InjectKey (Key.B, options);
         injector.InjectKey (Key.C, options);
-
-        // BUGBUG: This is a hack; we need to figure out how to enable this without delay
-        await Task.Delay (50); // Allow some time for processing
-        injector.ProcessQueue ();
 
         // Assert - Should raise exactly 3 KeyDown events
         Assert.Equal (3, receivedKeys.Count);
@@ -677,6 +663,50 @@ public class InputInjectorTests (ITestOutputHelper output)
 
         // Assert - Should use default options
         Assert.Single (receivedKeys);
+    }
+
+    #endregion
+
+    #region Pipeline Mode - Escape Sequence Tests
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void InjectKey_PipelineMode_EscapeSequences_RoundTrip ()
+    {
+        // Arrange - Tests that multi-char escape sequences (F1, cursor keys) round-trip
+        // through Pipeline mode with VirtualTimeProvider. This proves the stale-escape fix works.
+        VirtualTimeProvider timeProvider = new ();
+        timeProvider.SetTime (new DateTime (2025, 1, 1, 12, 0, 0));
+
+        using IApplication app = Application.Create (timeProvider);
+        app.Init (DriverRegistry.Names.ANSI);
+
+        List<Key> receivedKeys = [];
+        app.Keyboard.KeyDown += (_, key) => receivedKeys.Add (key);
+
+        TestInputSource testSource = new (timeProvider);
+        InputInjector injector = new (app.Driver?.GetInputProcessor ()!, timeProvider, testSource);
+
+        InputInjectionOptions options = new () { Mode = InputInjectionMode.Pipeline, AutoProcess = true, TimeProvider = timeProvider };
+
+        // Act - Inject keys that encode as multi-char ANSI escape sequences
+        injector.InjectKey (Key.F1, options);
+        injector.InjectKey (Key.CursorUp, options);
+        injector.InjectKey (Key.CursorDown, options);
+        injector.InjectKey (Key.Home, options);
+        injector.InjectKey (Key.End, options);
+        injector.InjectKey (Key.Delete, options);
+        injector.InjectKey (Key.PageUp, options);
+
+        // Assert - All keys should round-trip through encode → parse pipeline
+        Assert.Equal (7, receivedKeys.Count);
+        Assert.Equal (Key.F1, receivedKeys [0]);
+        Assert.Equal (Key.CursorUp, receivedKeys [1]);
+        Assert.Equal (Key.CursorDown, receivedKeys [2]);
+        Assert.Equal (Key.Home, receivedKeys [3]);
+        Assert.Equal (Key.End, receivedKeys [4]);
+        Assert.Equal (Key.Delete, receivedKeys [5]);
+        Assert.Equal (Key.PageUp, receivedKeys [6]);
     }
 
     #endregion

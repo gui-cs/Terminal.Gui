@@ -1,3 +1,5 @@
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
@@ -15,6 +17,13 @@ public class NetOutput : OutputBase, IOutput
     {
         // Logging.Information ($"Creating {nameof (NetOutput)}");
 
+        if (!IsAttachedToTerminal)
+        {
+            Trace.Lifecycle (nameof (NetOutput), "Init", "No real terminal attached. Output operations will be no-op.");
+
+            return;
+        }
+
         try
         {
             Console.OutputEncoding = Encoding.UTF8;
@@ -26,7 +35,7 @@ public class NetOutput : OutputBase, IOutput
 
         PlatformID p = Environment.OSVersion.Platform;
 
-        if (p == PlatformID.Win32NT || p == PlatformID.Win32S || p == PlatformID.Win32Windows)
+        if (p is PlatformID.Win32NT or PlatformID.Win32S or PlatformID.Win32Windows)
         {
             _isWinPlatform = true;
         }
@@ -35,6 +44,11 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public Size GetSize ()
     {
+        if (!IsAttachedToTerminal)
+        {
+            return new Size (80, 25);
+        }
+
         try
         {
             if (Console.IsInputRedirected || Console.IsOutputRedirected)
@@ -58,10 +72,14 @@ public class NetOutput : OutputBase, IOutput
         // Do Nothing.
     }
 
-
     /// <inheritdoc/>
     public void Write (ReadOnlySpan<char> text)
     {
+        if (!IsAttachedToTerminal)
+        {
+            return;
+        }
+
         try
         {
             Console.Out.Write (text);
@@ -77,6 +95,11 @@ public class NetOutput : OutputBase, IOutput
     {
         base.Write (output);
 
+        if (!IsAttachedToTerminal)
+        {
+            return;
+        }
+
         try
         {
             Console.Out.Write (output);
@@ -89,14 +112,10 @@ public class NetOutput : OutputBase, IOutput
 
     private Cursor _currentCursor = new ();
 
-    /// <inheritdoc />
-    public Cursor GetCursor ()
-    {
-        return _currentCursor;
-    }
+    /// <inheritdoc/>
+    public Cursor GetCursor () => _currentCursor;
 
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void SetCursor (Cursor cursor)
     {
         try
@@ -107,7 +126,7 @@ public class NetOutput : OutputBase, IOutput
             }
             else
             {
-                if (_currentCursor!.Style != cursor.Style)
+                if (_currentCursor.Style != cursor.Style)
                 {
                     Write (EscSeqUtils.CSI_SetCursorStyle (cursor.Style));
                 }
@@ -121,10 +140,7 @@ public class NetOutput : OutputBase, IOutput
         }
         finally
         {
-            SetCursorPositionImpl (
-                                   cursor.Position?.X ?? 0,
-                                   cursor.Position?.Y ?? 0
-                                  );
+            SetCursorPositionImpl (cursor.Position?.X ?? 0, cursor.Position?.Y ?? 0);
 
             _currentCursor = cursor;
         }
@@ -133,7 +149,7 @@ public class NetOutput : OutputBase, IOutput
     /// <inheritdoc/>
     protected override bool SetCursorPositionImpl (int col, int row)
     {
-        if (_currentCursor!.Position is { } && _currentCursor.Position.Value.X == col && _currentCursor.Position.Value.Y == row)
+        if (_currentCursor.Position is { } && _currentCursor.Position.Value.X == col && _currentCursor.Position.Value.Y == row)
         {
             return false;
         }
@@ -148,6 +164,7 @@ public class NetOutput : OutputBase, IOutput
             {
                 // Could happen that the windows is still resizing and the col is bigger than Console.WindowWidth.
             }
+
             return true;
         }
 
@@ -160,4 +177,58 @@ public class NetOutput : OutputBase, IOutput
 
     /// <inheritdoc/>
     public void Dispose () { }
+
+    /// <inheritdoc/>
+    public void Suspend ()
+    {
+        if (PlatformDetection.IsWindows () && !IsAttachedToTerminal)
+        {
+            return;
+        }
+
+        // Best-effort: mirror behavior of ANSI/Unix outputs for consoles that accept CSI sequences.
+        try
+        {
+            // Disable mouse events to prevent mouse events from being sent to the application while it is suspended.
+            Write (EscSeqUtils.CSI_DisableMouseEvents);
+
+            // Check if we have a real console first
+            if (Console.IsInputRedirected || Console.IsOutputRedirected)
+            {
+                Logging.Information ($"Console redirected (Output: {
+                    Console.IsOutputRedirected
+                }, Input: {
+                    Console.IsInputRedirected
+                }). Running in degraded mode.");
+
+                return;
+            }
+
+            Console.ResetColor ();
+            Console.Clear ();
+
+            //Disable alternative screen buffer.
+            Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+            //Set cursor key to cursor.
+            Write (EscSeqUtils.CSI_ShowCursor);
+
+            if (!SuspendHelper.Suspend ())
+            {
+                return;
+            }
+
+            //Enable alternative screen buffer.
+            Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+        }
+        catch (Exception ex)
+        {
+            Logging.Error ($"Error suspending terminal: {ex.Message}");
+        }
+        finally
+        {
+            // Enable mouse events to allow mouse events to be sent to the application when it is resumed.
+            Write (EscSeqUtils.CSI_EnableMouseEvents);
+        }
+    }
 }

@@ -1,5 +1,4 @@
 ﻿using UnitTests;
-using Xunit.Abstractions;
 using static Terminal.Gui.ViewBase.Pos;
 
 namespace ViewBaseTests.Layout;
