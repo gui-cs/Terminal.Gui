@@ -1354,22 +1354,82 @@ Locations (verified from codebase grep):
 
 The following issues were identified during plan review and should be addressed before or during implementation. Issues 1 (dual Thickness ownership) and 2 (CWP/EnsureView visibility) have already been resolved in the plan above.
 
+### 14.6 ~~Convenience Pass-Through Methods to Reduce `.View?.` Noise~~ — RESOLVED
 
-### 14.6 Convenience Pass-Through Methods to Reduce `.View?.` Noise
+Resolved by adding pass-through convenience methods on `AdornmentImpl` for the most frequently accessed View operations. Based on a codebase audit (~141 callsites across 13 distinct View methods/properties):
 
-The current codebase uses `view.Border!.SetNeedsDraw()`, `view.Padding.SetNeedsLayout()`, etc. extensively (~541 test callsites). After the change, these become `view.Border?.View?.SetNeedsDraw()`, which is verbose and error-prone.
+| Method/Property | Callsites | Location | Pass-Through on `AdornmentImpl` |
+|----------------|-----------|----------|--------------------------------|
+| `.Add()` | 44 | Examples, Tests | Yes — `Padding.Add()` already exists; add to `AdornmentImpl` base |
+| `.SubViews` | 30 | Tests, Examples | Yes — returns `View?.SubViews ?? []` |
+| `.ViewportSettings` | 27 | Framework, Tests | Yes — already promoted on `Margin`; add to `AdornmentImpl` base |
+| `.CanFocus` | 10 | Tests, Examples | Yes — delegates to `View?.CanFocus` |
+| `.Diagnostics` | 8 | Examples, Tests | Yes — delegates to `View?.Diagnostics` |
+| `.Data` | 6 | Examples | Yes — stored on lightweight, forwarded to View |
+| `.SetScheme()` | 4 | Examples | Yes — delegates to `View?.SetScheme()` |
+| `.Activating` | 4 | TabView only | Yes — on `Border` only; internally calls `EnsureView()` |
+| `.Text` | 4 | Examples | Yes — stored on lightweight, forwarded to View |
+| `.SetNeedsLayout()` | 3 | Framework | Yes — `View?.SetNeedsLayout()` |
+| `.SetNeedsDraw()` | 1 | Tests | Yes — `View?.SetNeedsDraw()` |
 
-Consider adding pass-through convenience methods on `AdornmentImpl` for the most common View operations:
+**Design:** Methods that only read/write when a View exists are simple delegates (no-ops when View is null). Properties that make sense on the lightweight object too (`Data`, `Text`, `ViewportSettings`) are stored on `AdornmentImpl` and forwarded to the View when one exists — same pattern as `Thickness`. Properties that trigger View creation (`Add()`, `Activating`) call `EnsureView()` internally.
+
+Added to `AdornmentImpl` (§4.3):
 
 ```csharp
-// On AdornmentImpl:
+// --- Convenience pass-throughs to reduce .View?. noise ---
+// These cover the ~141 callsites that access View methods through adornments.
+
+// Stored on lightweight, forwarded to View when it exists:
+public string Text
+{
+    get => View?.Text ?? _text;
+    set
+    {
+        _text = value;
+        if (View is { } v) { v.Text = value; }
+    }
+}
+private string _text = string.Empty;
+
+public object? Data
+{
+    get => View?.Data ?? _data;
+    set
+    {
+        _data = value;
+        if (View is { } v) { v.Data = value; }
+    }
+}
+private object? _data;
+
+// Simple delegates — no-ops when View is null:
 public void SetNeedsDraw () => View?.SetNeedsDraw ();
 public void SetNeedsLayout () => View?.SetNeedsLayout ();
+public void SetScheme (Scheme scheme) => View?.SetScheme (scheme);
+public Scheme? GetScheme () => View?.GetScheme ();
+
+public bool CanFocus
+{
+    get => View?.CanFocus ?? false;
+    set { if (View is { } v) { v.CanFocus = value; } }
+}
+
+public ViewDiagnosticFlags Diagnostics
+{
+    get => View?.Diagnostics ?? ViewDiagnosticFlags.Off;
+    set { if (View is { } v) { v.Diagnostics = value; } }
+}
+
+public IEnumerable<View> SubViews => View?.SubViews ?? [];
+
+// Triggers EnsureView — Add() forces View creation:
+public virtual void Add (View subView) => EnsureView ().Add (subView);
 ```
 
-This keeps the migration footprint small and maintains readability. The methods are no-ops when no `AdornmentView` exists (which is correct — if no View exists, there's nothing to draw/layout).
+**Note:** `Padding.Add()` already exists in §4.6 and overrides the base. `Border.Activating` is a Border-specific convenience (not on `AdornmentImpl`). `Margin.ViewportSettings` is already promoted in §4.5.
 
-**Status:** Recommended for implementation during Phase 2 to minimize migration pain.
+This ensures ~95% of existing callsites require no change beyond the type rename.
 
 ### 14.7 `AdornmentImpl.Dispose()` Pattern
 
@@ -1380,8 +1440,3 @@ This keeps the migration footprint small and maintains readability. The methods 
 
 **Status:** Low priority — cosmetic, no functional impact.
 
-### 14.8 Amazon PE Tenets Section (§2)
-
-The PE Tenets section maps Amazon tenets to plan decisions but adds no technical value. It reads as justification rather than guidance. Consider cutting it or reducing to a brief paragraph. The plan is strong enough on its technical merits.
-
-**Status:** Editorial — no functional impact.
