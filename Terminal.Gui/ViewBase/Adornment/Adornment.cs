@@ -12,7 +12,7 @@ namespace Terminal.Gui.ViewBase;
 ///         mouse input. Each can be customized by manipulating their SubViews.
 ///     </para>
 /// </remarsk>
-public class Adornment : View, IDesignable
+public class Adornment : View, IAdornmentView, IDesignable
 {
     /// <inheritdoc/>
     public Adornment ()
@@ -39,6 +39,9 @@ public class Adornment : View, IDesignable
     ///     relationship with their containing View.
     /// </remarks>
     public View? Parent { get; set; }
+
+    /// <inheritdoc cref="IAdornmentView.Adornment"/>
+    IAdornment? IAdornmentView.Adornment { get; set; }
 
     #region Thickness
 

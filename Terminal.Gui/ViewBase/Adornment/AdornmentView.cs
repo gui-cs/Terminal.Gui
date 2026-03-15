@@ -1,0 +1,240 @@
+namespace Terminal.Gui.ViewBase;
+
+/// <summary>
+///     The <see cref="View"/>-backed rendering layer for an adornment (<see cref="Margin"/>, <see cref="Border"/>,
+///     or <see cref="Padding"/>).
+///     Implements <see cref="IAdornmentView"/> — i.e., it knows its <see cref="Parent"/> <see cref="View"/>
+///     and its <see cref="Adornment"/> settings owner.
+///     Created lazily by <see cref="AdornmentImpl.EnsureView"/> when <see cref="View"/>-level functionality is needed.
+/// </summary>
+/// <remarks>
+///     <para>
+///         This class is structurally a copy of <see cref="Adornment"/>. It extends <see cref="View"/> directly
+///         (not <see cref="Adornment"/>) and delegates <see cref="Thickness"/> to the <see cref="IAdornment"/>
+///         back-reference, making <see cref="AdornmentImpl"/> the single authoritative owner of Thickness.
+///     </para>
+///     <para>
+///         During the incremental migration, existing <see cref="Border"/> and <see cref="Padding"/> continue
+///         to extend <see cref="Adornment"/>. Only newly migrated adornments (starting with <c>MarginView</c>)
+///         extend <see cref="AdornmentView"/>.
+///     </para>
+/// </remarks>
+public class AdornmentView : View, IAdornmentView, IDesignable
+{
+    /// <summary>Parameter-less constructor required to support all views unit tests (e.g., AllViewsTester).</summary>
+    public AdornmentView ()
+    {
+        /* Do nothing. */
+    }
+
+    /// <summary>Constructs a rendering layer for the specified <paramref name="parent"/>.</summary>
+    public AdornmentView (View parent)
+    {
+        // By default, Adornments can't get focus; has to be enabled specifically.
+        CanFocus = false;
+        TabStop = TabBehavior.NoStop;
+        Parent = parent;
+
+        // By default, Adornments have no key bindings.
+        KeyBindings.Clear ();
+    }
+
+    /// <inheritdoc cref="IAdornmentView.Parent"/>
+    public View? Parent { get; set; }
+
+    /// <inheritdoc cref="IAdornmentView.Adornment"/>
+    public IAdornment? Adornment { get; set; }
+
+    #region Thickness — delegated to IAdornment
+
+    // Fallback for standalone AdornmentView instances without a back-reference (AllViewsTester).
+    private Thickness _standaloneFallbackThickness = Thickness.Empty;
+
+    /// <summary>
+    ///     The thickness of this adornment layer. Delegates to <see cref="Adornment"/>
+    ///     when a back-reference exists; falls back to a local field for standalone instances.
+    /// </summary>
+    public Thickness Thickness
+    {
+        get => Adornment?.Thickness ?? _standaloneFallbackThickness;
+        set
+        {
+            if (Adornment is { })
+            {
+                Adornment.Thickness = value;
+            }
+            else
+            {
+                _standaloneFallbackThickness = value;
+            }
+        }
+    }
+
+    // ThicknessChanged event and OnThicknessChanged() live on AdornmentImpl (the single
+    // authoritative owner). AdornmentView does not duplicate them — consumers subscribe to
+    // IAdornment.ThicknessChanged via the Adornment back-reference.
+
+    #endregion Thickness
+
+    #region View Overrides
+
+    /// <summary>
+    ///     Gets or sets whether the Adornment will draw diagnostic information.
+    /// </summary>
+    public new ViewDiagnosticFlags Diagnostics { get; set; } = View.Diagnostics;
+
+    /// <inheritdoc/>
+    public override string ToDebugString ()
+        => $"{GetType ().Name}({Id}) Parent={(Parent is { } ? Parent.ToDebugString () : "null")}";
+
+    /// <inheritdoc/>
+    protected override IApplication? GetApp () => Parent?.App;
+
+    /// <inheritdoc/>
+    protected override IDriver? GetDriver () => Parent?.Driver ?? base.GetDriver ();
+
+    private Scheme? _scheme;
+
+    /// <inheritdoc/>
+    protected override bool OnGettingScheme (out Scheme? scheme)
+    {
+        scheme = _scheme ?? Parent?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args)
+    {
+        Parent?.SetNeedsDraw ();
+        _scheme = args.NewValue;
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    public override Rectangle Viewport
+    {
+        get => base.Viewport;
+        set => throw new InvalidOperationException (@"The Viewport of an AdornmentView cannot be modified.");
+    }
+
+    /// <inheritdoc/>
+    public override Rectangle FrameToScreen ()
+    {
+        if (Parent is null)
+        {
+            // Support AllViewsTester where AdornmentView may be a SubView.
+            if (SuperView is null)
+            {
+                return Frame;
+            }
+
+            Point super = SuperView.ViewportToScreen (Frame.Location);
+
+            return new (super, Frame.Size);
+        }
+
+        // AdornmentViews are *Children* of a View, not SubViews. Use Parent.FrameToScreen()
+        // to get the parent's screen origin, then offset by our Frame.
+        Rectangle parentScreen = Parent.FrameToScreen ();
+
+        return new (new (parentScreen.X + Frame.X, parentScreen.Y + Frame.Y), Frame.Size);
+    }
+
+    /// <inheritdoc/>
+    public override Point ScreenToFrame (in Point location)
+    {
+        View? parentOrSuperView = Parent;
+
+        if (parentOrSuperView is { })
+        {
+            return parentOrSuperView.ScreenToFrame (new (location.X - Frame.X, location.Y - Frame.Y));
+        }
+
+        // Support AllViewsTester where AdornmentView may be a SubView.
+        parentOrSuperView = SuperView;
+
+        if (parentOrSuperView is null)
+        {
+            return Point.Empty;
+        }
+
+        return parentOrSuperView.ScreenToFrame (new (location.X - Frame.X, location.Y - Frame.Y));
+    }
+
+    /// <summary>
+    ///     Called when the <see cref="Thickness"/> of the Adornment is to be cleared.
+    /// </summary>
+    /// <returns><see langword="true"/> to stop further clearing.</returns>
+    protected override bool OnClearingViewport ()
+    {
+        if (Thickness == Thickness.Empty)
+        {
+            return true;
+        }
+
+        if (Driver is { })
+        {
+            Thickness.Draw (Driver, ViewportToScreen (Viewport), Diagnostics, ToString ());
+        }
+
+        SetNeedsDraw ();
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnDrawingText () => Thickness == Thickness.Empty;
+
+    /// <inheritdoc/>
+    protected override bool OnDrawingSubViews () => Thickness == Thickness.Empty;
+
+    /// <summary>Does nothing for AdornmentView.</summary>
+    protected override bool OnRenderingLineCanvas () => true;
+
+    /// <summary>
+    ///     AdornmentViews only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas.
+    /// </summary>
+    public override bool SuperViewRendersLineCanvas
+    {
+        get => false;
+        set => throw new InvalidOperationException (@"AdornmentView can only render to their Parent or Parent's Superview.");
+    }
+
+    /// <summary>
+    ///     Indicates whether the specified Parent's SuperView-relative coordinates are within the Adornment's
+    ///     <see cref="Thickness"/>.
+    /// </summary>
+    public override bool Contains (in Point location)
+    {
+        View? parentOrSuperView = Parent;
+
+        if (parentOrSuperView is null)
+        {
+            parentOrSuperView = SuperView;
+
+            if (parentOrSuperView is null)
+            {
+                return false;
+            }
+        }
+
+        Rectangle outside = Frame;
+        outside.Offset (parentOrSuperView.Frame.Location);
+
+        return Thickness.Contains (outside, location);
+    }
+
+    #endregion View Overrides
+
+    /// <inheritdoc/>
+    bool IDesignable.EnableForDesign ()
+    {
+        Thickness = new (3);
+        Frame = new (0, 0, 10, 10);
+        Diagnostics = ViewDiagnosticFlags.Thickness;
+
+        return true;
+    }
+}
