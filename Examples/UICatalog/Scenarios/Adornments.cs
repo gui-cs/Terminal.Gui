@@ -52,9 +52,21 @@ public class Adornments : Scenario
         {
             Title = "The _Window",
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable,
+            X = 5,
+            Y = 5,
             Width = Dim.Fill (adornmentsEditor),
             Height = Dim.Fill (viewportSettingsEditor)
         };
+
+        appWindow.ClearingViewport += (s, e) =>
+                                      {
+                                          if (s is View sender)
+                                          {
+                                              sender.FillRect (sender.Viewport, Glyphs.Stipple);
+                                          }
+
+                                          e.Cancel = true;
+                                      };
         appWindow.Add (window);
 
         TextField tf1 = new () { Width = 10, Text = "TextField" };
