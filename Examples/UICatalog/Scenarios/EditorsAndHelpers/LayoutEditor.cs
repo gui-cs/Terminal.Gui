@@ -31,6 +31,8 @@ public class LayoutEditor : EditorBase
         _widthEditor?.ViewToEdit = ViewToEdit;
 
         _heightEditor?.ViewToEdit = ViewToEdit;
+
+        base.OnViewToEditChanged ();
     }
 
     private void LayoutEditor_Initialized (object? sender, EventArgs e)

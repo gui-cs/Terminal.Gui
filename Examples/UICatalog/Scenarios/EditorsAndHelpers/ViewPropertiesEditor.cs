@@ -96,5 +96,6 @@ public class ViewPropertiesEditor : EditorBase
         {
             _orientationOptionSelector!.Enabled = false;
         }
+        base.OnViewToEditChanged ();
     }
 }
