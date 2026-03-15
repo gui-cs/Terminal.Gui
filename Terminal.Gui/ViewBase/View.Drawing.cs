@@ -367,10 +367,14 @@ public partial class View // Drawing APIs
             return;
         }
 
-        if (ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
+        // Skip clearing if the view or its Border is transparent. A transparent Border means
+        // the border interior should show underlying content, so the parent must not clear it.
+        if (ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)
+            || (Border is { } && Border.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)))
         {
             return;
         }
+
         ClearViewport (context);
         OnClearedViewport ();
         ClearedViewport?.Invoke (this, new DrawEventArgs (Viewport, Viewport, null));
@@ -830,30 +834,39 @@ public partial class View // Drawing APIs
         // This prevents peer views drawn later (lower Z-order) from overwriting this view's pixels.
         // The clip is a shared, mutable region — each view subtracts its area as it completes.
         //
-        // ADORNMENT GUARD: Adornments (Margin, Border, Padding) skip this phase entirely.
-        // Their area is excluded as part of their Parent view's clip exclusion — not their own.
-        // This is because adornments are drawn inside DoDrawAdornments() as part of the parent's
-        // draw cycle, and the parent's opaque path (below) excludes the entire frame including
-        // adornment areas.
+        // ADORNMENT GUARD: Opaque adornments (Margin, Border, Padding) skip this phase — their
+        // parent handles clip exclusion for them. Transparent adornments (e.g., a Border with
+        // ViewportSettingsFlags.Transparent) DO participate, using the transparent path so only
+        // their actually-drawn cells (border lines, title text) are excluded.
         //
         // TRANSPARENT vs OPAQUE: Two strategies for what to exclude:
         //   - Transparent: Exclude ONLY the cells that were actually drawn (from DrawContext).
         //     Undrawn areas remain in the clip, so views behind can show through.
         //   - Opaque (default): Exclude the ENTIRE view frame. Nothing behind is visible.
         //
+        // EFFECTIVELY TRANSPARENT: A view is treated as transparent if:
+        //   - It has ViewportSettingsFlags.Transparent set directly, OR
+        //   - Its Border has Transparent set (the border interior should show through).
+        //   In both cases, only drawn cells are excluded and the viewport is not cleared.
+        //
         // NOTE: The `context` parameter contains the cumulative drawn region from this view's
         // entire draw cycle: ClearViewport + SubViews + Text + Content + LineCanvas. Each of
         // those phases calls context.AddDrawnRectangle/AddDrawnRegion as they render. For
-        // opaque views, the context is also updated here (line below) so that the SuperView's
-        // context accumulates what this subview occupied — important when the SuperView itself
-        // is transparent and needs to know which areas its subviews drew.
+        // opaque views, the context is also updated here so that the SuperView's context
+        // accumulates what this subview occupied — important when the SuperView itself is
+        // transparent and needs to know which areas its subviews drew.
         // -----------------------------------------------------------------------
-        if (this is Adornment)
+        if (this is Adornment && !ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
         {
             return;
         }
 
-        if (ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
+        // A view is effectively transparent if it has the Transparent flag set directly,
+        // OR if its Border has Transparent set (the border interior should show through).
+        bool isEffectivelyTransparent = ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)
+                                        || (Border is { } && Border.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent));
+
+        if (isEffectivelyTransparent)
         {
             // TRANSPARENT PATH:
             // Only exclude regions that were actually drawn. Undrawn areas stay in the clip
@@ -867,11 +880,17 @@ public partial class View // Drawing APIs
             // Punch out just the drawn cells from Driver.Clip.
             ExcludeFromClip (context.GetDrawnRegion ());
 
-            // Border and Padding are always opaque — they draw lines/fills that fully occupy
-            // their thickness area. Exclude them unconditionally even for transparent views.
+            // Padding is always opaque — it draws fills that fully occupy its thickness area.
+            // Exclude it unconditionally even for transparent views.
             // (Margin is NOT excluded here; it has its own separate draw pass for shadows.)
-            ExcludeFromClip (Border?.Thickness.AsRegion (Border.FrameToScreen ()));
-            ExcludeFromClip (Padding?.Thickness.AsRegion (Padding.FrameToScreen ()));
+            // Border is NOT excluded here if it's transparent — its drawn cells are already
+            // in the context's drawn region (via LineCanvas rendering).
+            if (Border is null || !Border.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
+            {
+                ExcludeFromClip (Border?.Thickness.AsRegion (Border!.FrameToScreen ()));
+            }
+
+            ExcludeFromClip (Padding?.Thickness.AsRegion (Padding!.FrameToScreen ()));
         }
         else
         {
@@ -894,7 +913,7 @@ public partial class View // Drawing APIs
 
             // Also record this rectangle in the DrawContext. This is how the SuperView learns
             // what area this subview occupied — critical when the SuperView is transparent and
-            // needs to compute its own drawn region (which includes its subviews' areas).
+            // needs to compute its own drawn region (which includes its subviews areas).
             context?.AddDrawnRectangle (borderFrame);
         }
 

@@ -15,10 +15,10 @@ public class BorderTransparentTests (ITestOutputHelper output)
     /// <summary>
     ///     Verifies that a Border with Transparent set only draws border lines,
     ///     allowing underlying content to show through the interior.
-    ///     Currently fails because Border doesn't honor Transparent — the interior
+    ///     Currently, fails because Border doesn't honor Transparent — the interior
     ///     shows spaces instead of the underlying 'X' background.
     /// </summary>
-    [Fact (Skip = "Not yet implemented — Issue #4834")]
+    [Fact]
     public void Border_Transparent_Shows_Underlying_Content_In_Interior ()
     {
         using IApplication app = Application.Create ();
