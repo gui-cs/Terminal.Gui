@@ -4,12 +4,13 @@
 
 | Item | Status |
 |------|--------|
-| Border transparency failing tests | Done — 2 skipped, 1 passes (wrong reason) |
+| Border transparency failing tests | Done |
 | DoDrawComplete comment rewrite | Done |
 | DoDrawComplete baseline tests | Done — 8 tests, all passing |
-| Phase 1: Visual transparency for Border | In Progress |
-| Phase 1a: DONE |
-| Phase 1b: DONE |
+| Phase 1: Visual transparency for Border | **DONE** |
+| Phase 1a: Fix Border LineCanvas ownership | Done |
+| Phase 1b: Make Border participate in clip exclusion when Transparent | Done |
+| Phase 1 extras: title occlusion, clip clamping, AnchorEnd tests | Done |
 | Phase 2: Drawn-region-aware TransparentMouse | Not started |
 
 ## Context
