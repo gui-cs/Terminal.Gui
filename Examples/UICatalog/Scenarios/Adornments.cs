@@ -24,7 +24,6 @@ public class Adornments : Scenario
         AdornmentsEditor adornmentsEditor = new ()
         {
             BorderStyle = LineStyle.Single,
-            AutoSelectViewToEdit = true,
 
             // This is for giggles, to show that the editor can be moved around.
             Arrangement = ViewArrangement.Movable,
@@ -36,7 +35,6 @@ public class Adornments : Scenario
         ViewportSettingsEditor viewportSettingsEditor = new ()
         {
             BorderStyle = LineStyle.Single,
-            AutoSelectViewToEdit = true,
 
             // This is for giggles, to show that the editor can be moved around.
             Arrangement = ViewArrangement.Movable,
@@ -54,8 +52,8 @@ public class Adornments : Scenario
             Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
             X = 5,
             Y = 5,
-            Width = Dim.Fill (adornmentsEditor),
-            Height = Dim.Fill (viewportSettingsEditor)
+            Width = Dim.Fill (adornmentsEditor) - 1,
+            Height = Dim.Fill (viewportSettingsEditor) - 1
         };
 
         appWindow.ClearingViewport += (s, e) =>
@@ -67,8 +65,6 @@ public class Adornments : Scenario
 
             e.Cancel = true;
         };
-
-        appWindow.Add (window);
 
         TextField tf1 = new () { Width = 10, Text = "TextField" };
         ColorPicker16 color = new () { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd () };
@@ -116,7 +112,7 @@ public class Adornments : Scenario
         window.Margin!.Thickness = new Thickness (0);
 
         window.Border!.Data = "Border";
-        //window.Border!.Text = "Border Text";
+        window.Border!.Text = "Border Text";
         window.Border!.Thickness = new Thickness (3);
         window.Border!.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
 
@@ -130,15 +126,9 @@ public class Adornments : Scenario
         longLabel.TextFormatter.WordWrap = true;
         window.Add (tf1, color, button, label, btnButtonInWindow, labelAnchorEnd, longLabel);
 
-        window.Initialized += (_, _) =>
-                              {
-                                  adornmentsEditor.ViewToEdit = window;
+        // NOTE: Adding SubViews to Margin is not supported
 
-                                  adornmentsEditor.ShowViewIdentifier = true;
-
-                                  // NOTE: Adding SubViews to Margin is not supported
-
-                                  Button btnButtonInBorder = new () { X = Pos.Center (), Y = Pos.AnchorEnd (), Text = "Button in Border Y = AnchorEnd" };
+        Button btnButtonInBorder = new () { X = 0, Y = Pos.AnchorEnd (), Text = "Button in Border Y = AnchorEnd", ShadowStyle = ShadowStyle.None };
 
                                   btnButtonInBorder.Accepting += (_, args) =>
                                                                  {
@@ -148,6 +138,7 @@ public class Adornments : Scenario
                                   window.Border.Add (btnButtonInBorder);
 
                                   Label labelInPadding = new () { X = 0, Y = 1, Title = "_Text:" };
+
                                   window.Padding.Add (labelInPadding);
 
                                   TextField textFieldInPadding = new ()
@@ -159,7 +150,11 @@ public class Adornments : Scenario
                                       (_, _) => MessageBox.Query (appWindow.App!, 20, 7, "TextField", textFieldInPadding.Text, "Ok");
                                   window.Padding.Add (textFieldInPadding);
 
-                                  Button btnButtonInPadding = new () { X = Pos.Center (), Y = 1, Text = "_Button in Padding Y = 1", CanFocus = true };
+                                  Button btnButtonInPadding = new ()
+                                  {
+                                      X = Pos.Center (), Y = Pos.AnchorEnd (), Text = "_Button in Padding Y = AE",
+                                      ShadowStyle = ShadowStyle.None
+                                  };
 
                                   btnButtonInPadding.Accepting += (_, args) =>
                                                                   {
@@ -180,18 +175,19 @@ public class Adornments : Scenario
 
                                 view.Accept += (_, _) => MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
 #endif
-                              };
 
-        adornmentsEditor.AutoSelectViewToEdit = true;
-        adornmentsEditor.AutoSelectSuperView = window;
-        adornmentsEditor.AutoSelectAdornments = true;
+                                  adornmentsEditor.AutoSelectViewToEdit = true;
+                                  adornmentsEditor.AutoSelectSuperView = window;
+                                  adornmentsEditor.AutoSelectAdornments = true;
+                                  adornmentsEditor.ShowViewIdentifier = true;
 
-        viewportSettingsEditor.AutoSelectViewToEdit = true;
-        viewportSettingsEditor.AutoSelectSuperView = window;
-        viewportSettingsEditor.AutoSelectAdornments = true;
-        viewportSettingsEditor.ShowViewIdentifier = true;
+                                  viewportSettingsEditor.AutoSelectViewToEdit = true;
+                                  viewportSettingsEditor.AutoSelectSuperView = window;
+                                  viewportSettingsEditor.AutoSelectAdornments = true;
+                                  viewportSettingsEditor.ShowViewIdentifier = true;
 
-        appWindow.Add (adornmentsEditor, viewportSettingsEditor);
+        appWindow.Add (window, adornmentsEditor, viewportSettingsEditor);
+        window.SetFocus ();
 
         app.Run (appWindow);
     }

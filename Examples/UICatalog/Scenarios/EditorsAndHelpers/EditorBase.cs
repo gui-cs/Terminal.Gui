@@ -54,7 +54,7 @@ public abstract class EditorBase : View
         set => Padding?.Thickness = value ? new Thickness (0, 2, 0, 0) : Thickness.Empty;
     }
 
-    public bool UpdatingLayoutSettings { get; private set; }
+    public bool UpdatingLayoutSettings { get; internal set; }
 
     private void View_LayoutComplete (object? sender, LayoutEventArgs e)
     {
@@ -77,17 +77,11 @@ public abstract class EditorBase : View
                 return;
             }
 
-            if (value is null && _viewToEdit is not null)
-            {
-                _viewToEdit.SubViewsLaidOut -= View_LayoutComplete;
-            }
+            _viewToEdit?.SubViewsLaidOut -= View_LayoutComplete;
 
             _viewToEdit = value;
 
-            if (_viewToEdit is not null)
-            {
-                _viewToEdit.SubViewsLaidOut += View_LayoutComplete;
-            }
+            _viewToEdit?.SubViewsLaidOut += View_LayoutComplete;
 
             OnViewToEditChanged ();
         }
@@ -174,7 +168,7 @@ public abstract class EditorBase : View
     {
         // Clean up event handlers before SuperView is set to null
         // This ensures App is still accessible for proper cleanup
-        if (App is {})
+        if (App is { })
         {
             App.Navigation!.FocusedChanged -= NavigationOnFocusedChanged;
             App.Mouse.MouseEvent -= ApplicationOnMouseEvent;

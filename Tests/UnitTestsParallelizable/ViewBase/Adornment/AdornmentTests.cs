@@ -86,6 +86,60 @@ public class AdornmentTests
         Assert.Equal (new Rectangle (0, 0, view.Padding.Frame.Width, view.Padding.Frame.Height), view.Padding.Viewport);
     }
 
+    [Fact]
+    public void ContentSize_Tracks_Viewport_When_Parent_Resized ()
+    {
+        View view = new () { Width = 20, Height = 20, BorderStyle = LineStyle.Single };
+        view.BeginInit ();
+        view.EndInit ();
+
+        // Border.Thickness is (1,1,1,1) from BorderStyle.Single.
+        Size initialContentSize = view.Border!.GetContentSize ();
+        Assert.Equal (view.Border.Viewport.Size, initialContentSize);
+
+        // Resize the parent view.
+        view.Width = 30;
+        view.Height = 15;
+        view.Layout ();
+
+        // Border's ContentSize should track the new size.
+        Size newContentSize = view.Border.GetContentSize ();
+        Assert.Equal (view.Border.Viewport.Size, newContentSize);
+        Assert.NotEqual (initialContentSize, newContentSize);
+    }
+
+    [Fact]
+    public void Border_SubView_AnchorEnd_Repositions_When_Parent_Resized ()
+    {
+        View view = new () { Width = 20, Height = 20, BorderStyle = LineStyle.Single };
+        View borderSubView = new () { X = 0, Y = Pos.AnchorEnd (), Width = 3, Height = 1, Text = "Z" };
+        view.Border!.Add (borderSubView);
+        view.BeginInit ();
+        view.EndInit ();
+        view.Layout ();
+
+        // Border.Frame = (0,0,20,20). SubView should be at the bottom.
+        Rectangle initialViewport = view.Border.Viewport;
+        int initialY = borderSubView.Frame.Y;
+        Assert.Equal (new Size (20, 20), initialViewport.Size);
+        Assert.Equal (initialViewport.Height - 1, initialY);
+
+        // Resize the parent view.
+        view.Width = 20;
+        view.Height = 10;
+        view.Layout ();
+
+        // Border's Viewport should have changed.
+        Rectangle newViewport = view.Border.Viewport;
+        Assert.Equal (new Size (20, 10), newViewport.Size);
+        Assert.NotEqual (initialViewport, newViewport);
+
+        // SubView should reposition to the new bottom.
+        int newY = borderSubView.Frame.Y;
+        Assert.Equal (newViewport.Height - 1, newY);
+        Assert.NotEqual (initialY, newY);
+    }
+
     // Test that Adornment.Viewport_get override returns Frame.Size minus Thickness
     [Theory]
     [InlineData (0, 0, 0, 0, 0)]

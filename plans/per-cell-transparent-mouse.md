@@ -9,6 +9,7 @@
 | DoDrawComplete baseline tests | Done — 8 tests, all passing |
 | Phase 1: Visual transparency for Border | In Progress |
 | Phase 1a: DONE |
+| Phase 1b: DONE |
 | Phase 2: Drawn-region-aware TransparentMouse | Not started |
 
 ## Context
@@ -82,7 +83,7 @@ This change means:
 - Parent's `RenderLineCanvas` renders all lines and reports the drawn region to the parent's context
 - Border's own DrawContext tracks what IT drew (title text, etc.)
 
-#### 1b. Make Border participate in clip exclusion when Transparent
+#### 1b. Make Border participate in clip exclusion when Transparent - DONE
 
 **Fix in `View.Drawing.cs` (`DoDrawComplete`, ~line 821)**: Relax the Adornment guard. When an Adornment has `Transparent` set, it should participate in the drawn-region clip exclusion path:
 

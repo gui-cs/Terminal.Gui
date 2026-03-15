@@ -310,4 +310,71 @@ public class BorderTransparentTests (ITestOutputHelper output)
 
         Assert.True (borderInList, "Border with TransparentMouse should still capture mouse events on its drawn border lines");
     }
+
+    /// <summary>
+    ///     Verifies that a Border SubView positioned with Pos.AnchorEnd renders at the bottom
+    ///     of the border, and repositions correctly when the parent view is resized.
+    /// </summary>
+    [Fact]
+    public void Border_SubView_AnchorEnd_Renders_At_Bottom_Before_And_After_Resize ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (7, 8);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        View borderedView = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 7,
+            Height = 6,
+            BorderStyle = LineStyle.Single
+        };
+        borderedView.Border!.Thickness = new Thickness (1, 1, 1, 2);
+
+        View borderSubView = new ()
+        {
+            X = 0,
+            Y = Pos.AnchorEnd (),
+            Width = Dim.Fill (),
+            Height = 1,
+            Text = "ZZZ"
+        };
+        borderedView.Border.Add (borderSubView);
+
+        window.Add (borderedView);
+        app.Begin (window);
+
+        // Height=6, border top=1, bottom=2: 3 content rows.
+        // Bottom thickness 2 = border line + subview row below it.
+        // "ZZZ" should render at the last row of the border (below └─────┘).
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌─────┐
+                                              │     │
+                                              │     │
+                                              │     │
+                                              └─────┘
+                                              ZZZ
+                                              """,
+                                              output,
+                                              app.Driver);
+
+        // Resize: shrink height from 6 to 4. Now 1 content row.
+        borderedView.Height = 4;
+        app.LayoutAndDraw ();
+
+        // "ZZZ" should now be at the new bottom.
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌─────┐
+                                              │     │
+                                              └─────┘
+                                              ZZZ
+                                              """,
+                                              output,
+                                              app.Driver);
+    }
 }

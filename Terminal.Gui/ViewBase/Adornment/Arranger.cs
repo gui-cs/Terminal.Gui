@@ -164,6 +164,9 @@ internal sealed class Arranger : IDisposable
         DisposeSizeButton (ref _topSizeButton);
         DisposeSizeButton (ref _bottomSizeButton);
 
+        _border.SetNeedsLayout ();
+        _border.Layout ();
+
         return true;
     }
 
