@@ -21,6 +21,8 @@ This plan introduces a two-level split:
 For a plain view with no border, shadow, or adornment subviews, **zero `View` objects are created for adornments**.  
 For a view with `BorderStyle = LineStyle.Single`, a `BorderView` is created lazily on first draw, but `MarginView`/`PaddingView` are not.
 
+**Implementation strategy:** One adornment at a time — Margin first (simplest, 1 type check), then Padding, then Border (most complex). `AdornmentView` is a **new class copied from `Adornment`**, not a rename. The existing `Adornment` class stays untouched until all three are migrated, then gets an `[Obsolete]` alias.
+
 **Expected adornment-only savings:** 40–90% depending on feature use (see §12 for realistic breakdown).
 
 ---
@@ -591,7 +593,7 @@ public class Padding : AdornmentImpl
 
 ### 4.7 AdornmentView — Default IAdornmentView Implementation
 
-`AdornmentView` is the renamed `Adornment` class. It is the default (and only built-in) implementation of `IAdornmentView`. `BorderView`, `MarginView`, and `PaddingView` each subclass it.
+`AdornmentView` is a **new class copied from `Adornment`**. The existing `Adornment` class is **not renamed or modified** (beyond adding `IAdornmentView` to its interface list). `AdornmentView` is the default implementation of `IAdornmentView` for the new lightweight adornment system. `BorderView`, `MarginView`, and `PaddingView` each subclass it. The `Adornment` class continues to serve `Border` and `Padding` until they are migrated in later phases.
 
 The `*View` classes are **simple `View` subclasses** with two key properties: `Parent` (the View this adornment surrounds) and `Adornment` (back-reference to the lightweight `IAdornment` settings object). All their rendering, layout, focus, and mouse behavior is rooted in `Parent`. Architecturally, they mirror the current `Adornment`/`Border`/`Margin`/`Padding` hierarchy with minimal change.
 
@@ -776,7 +778,7 @@ public class AdornmentView : View, IAdornmentView, IDesignable
 
 ### 4.8 BorderView, MarginView, PaddingView — Heavy Adornment Views
 
-Each `*View` class is a **direct rename** of the current `Border`/`Margin`/`Padding` class plus inheritance change (from `Adornment` to `AdornmentView`). Their bodies are unchanged — they use `Parent` exactly as they do today.
+Each `*View` class is **copied from** (not renamed from) the current `Border`/`Margin`/`Padding` class, with the inheritance changed from `Adornment` to `AdornmentView`. Their bodies are unchanged — they use `Parent` exactly as they do today. The `*View` classes are created incrementally: `MarginView` first (Phase 1), then `PaddingView` (Phase 2), then `BorderView` (Phase 3). The original `Margin`/`Padding`/`Border` View subclasses (extending `Adornment`) are deleted only after their respective phase is complete.
 
 The table below documents the key `Parent` accesses in each class to make clear why `Parent` must be on `IAdornmentView` (it is used for drawing, event subscription, focus, scheme, and arrangement):
 
@@ -787,8 +789,8 @@ The table below documents the key `Parent` accesses in each class to make clear 
 | `PaddingView` | `Parent.CanFocus`, `Parent.HasFocus`, `Parent.SetFocus()`, `Parent.SetNeedsDraw()`, `Parent.GetSubViews(...)` |
 
 ```csharp
-// BorderView is Border (: Adornment : View) renamed to BorderView (: AdornmentView : View).
-// It retains all existing implementation. Parent is accessed via inheritance from AdornmentView.
+// BorderView is copied from Border (: Adornment : View), changed to BorderView (: AdornmentView : View).
+// Created in Phase 3. It retains all existing implementation.
 public class BorderView : AdornmentView
 {
     public BorderView () { }
@@ -799,7 +801,8 @@ public class BorderView : AdornmentView
     // because Parent : View? is inherited from AdornmentView.
 }
 
-// MarginView is Margin (: Adornment : View) renamed to MarginView (: AdornmentView : View).
+// MarginView is copied from Margin (: Adornment : View), changed to MarginView (: AdornmentView : View).
+// Created in Phase 1 (first adornment migrated).
 public class MarginView : AdornmentView
 {
     public MarginView () { }
@@ -808,7 +811,8 @@ public class MarginView : AdornmentView
     // ... all existing Margin shadow + clip code unchanged ...
 }
 
-// PaddingView is Padding (: Adornment : View) renamed to PaddingView (: AdornmentView : View).
+// PaddingView is copied from Padding (: Adornment : View), changed to PaddingView (: AdornmentView : View).
+// Created in Phase 2.
 public class PaddingView : AdornmentView
 {
     public PaddingView () { }
@@ -1002,63 +1006,112 @@ This avoids View creation for the rendering of simple borders. The complexity tr
 
 ## 6. Implementation Phases
 
-### Phase 1: Rename + Interface (Enabling Change)
+The implementation is structured as **one adornment at a time**, starting with Margin (least customized, only 1 `is Margin` type check in library code), then Padding, then Border (most complex — arrangement, title, line styles). This avoids a big-bang rename and lets each phase be independently tested and shipped.
 
-**Goal:** Rename existing View-based classes, introduce IAdornment. No behavior change yet.
-
-**Duration:** 1–2 weeks
-
-**Changes:**
-1. Rename `Adornment.cs` → `AdornmentView.cs`, class `Adornment` → `AdornmentView`
-2. Rename `Border.cs` → `BorderView.cs`, class `Border` → `BorderView`
-3. Rename `Margin.cs` → `MarginView.cs`, class `Margin` → `MarginView`
-4. Rename `Padding.cs` → `PaddingView.cs`, class `Padding` → `PaddingView`
-5. Update `Border.Arrangment.cs` → reference `BorderView` (note: filename has pre-existing typo; rename opportunity)
-6. Update all `is Adornment` / `as Adornment` / `typeof(Adornment)` → use `AdornmentView`
-7. Update `View.Adornments.cs` property types: `Adornment` → `AdornmentView`
-8. Create `IAdornment.cs` and `IAdornmentView.cs` with interface definitions
-9. Add `: IAdornmentView` to `AdornmentView`; update `AdornmentImpl.View` to explicit-implement `IAdornment.View` as `IAdornmentView?`
-10. Create `AdornmentImpl.cs` with lightweight base (delegates all to concrete subclass)
-11. Create lightweight `Border.cs`, `Margin.cs`, `Padding.cs` (thin wrappers over `BorderView`/`MarginView`/`PaddingView`) — **identical behavior** to current code, just split into two classes
-12. Change `View.Border`, `View.Margin`, `View.Padding` property types from `BorderView?` to `Border?`, `Margin?`, `Padding?`
-13. Update `View.SetupAdornments()` to create lightweight objects (still eagerly create Views initially)
-14. All tests pass unchanged (no behavior change)
-
-**Memory impact:** Zero (Views still eagerly created in Phase 1)
-
-**Risk:** Low — pure rename + refactor, all tests must pass
+**Critical design decision:** `AdornmentView` is a **new class copied from `Adornment`**, not a rename. The existing `Adornment` class stays untouched until all three adornments have been migrated. This means:
+- `Border` and `Padding` continue to extend `Adornment` during Phases 1–2
+- `MarginView` extends `AdornmentView` (the copy) in Phase 1
+- Only after Phase 3 (Border migration) is `Adornment` retired with an `[Obsolete]` alias
 
 ---
 
-### Phase 2: Lazy View Creation
+### Phase 0: Infrastructure (Enabling Change)
 
-**Goal:** Make `AdornmentView` creation lazy. Views only created when a feature triggers them.
-
-**Duration:** 2–3 weeks
+**Goal:** Create `IAdornment`, `IAdornmentView`, `AdornmentImpl`, and `AdornmentView` without changing any existing code. Pure additions.
 
 **Changes:**
-1. Update `View.SetupAdornments()` to NOT create Views — only create lightweight `Border`/`Margin`/`Padding` objects
-2. Remove `BeginInitAdornments()` and `EndInitAdornments()` from `View`; replace with null-safe inline calls inside `View.BeginInit()` and `View.EndInit()` overrides (see §4.11 Hazard 1)
-3. Implement `EnsureView()` as `internal` in `AdornmentImpl` with proper initialization sequencing (see §4.11)
-4. Update `SetAdornmentFrames()` to work purely from Thickness (no View needed)
-5. Update `GetAdornmentsThickness()` — already Thickness-only, no change needed
-6. Migrate triggering callsites — `EnsureView()` is internal, so access is via convenience methods or `.View`:
-   - `tab.Border!.Activating += Tab_Selecting!` → `tab.Border!.Activating += Tab_Selecting!` (Border promotes Activating as a convenience that internally calls `EnsureView()`)
-   - `viewToArrange.Border?.Arranger` → `viewToArrange.Border?.Arranger` (Arranger promoted to lightweight Border)
-   - `current.Margin!.SubViews.Count` → `current.Margin?.View?.SubViews.Count ?? 0`
-   - `current.Padding.GetSubViews(...)` → `current.Padding.View?.GetSubViews(...)` (callers updated directly)
-   - `current.Padding.SetNeedsLayout()` → `current.Padding?.View?.SetNeedsLayout()`
-   - `HelpView.Margin!.ViewportSettings |= ...` → `HelpView.Margin!.ViewportSettings |= ...` (promoted to lightweight Margin)
-7. Update adornment drawing loop in `View.Drawing.cs` to call `margin.View?.Draw()` / `border.View?.Draw()` / `padding.View?.Draw()` — skip drawing entirely when `.View is null` and Thickness is empty (transparent margins without shadow draw nothing)
-8. Update `View.Drawing.cs` `Margin?.CacheClip()` — already delegated via the lightweight `Margin.CacheClip()` helper method (no change needed)
+1. Create `IAdornment.cs` — interface definition (§4.1.1)
+2. Create `IAdornmentView.cs` — interface definition with `Parent` and `Adornment` back-reference (§4.1.2)
+3. Create `AdornmentImpl.cs` — abstract lightweight base with `Thickness`, `Frame`, `EnsureView()`, convenience pass-throughs (§4.3, §14.6)
+4. Create `AdornmentView.cs` — **copied from** `Adornment.cs`, implements `IAdornmentView`, adds `Adornment` back-reference and `Thickness` delegation (§4.7). `Adornment.cs` is **not modified**.
+5. Add `IAdornmentView` to existing `Adornment` class (so existing `Border`/`Padding` which still extend `Adornment` also satisfy the interface)
+6. All tests pass unchanged — no behavior change, only new files added
 
-**Memory impact for typical views:** ~1,600–5,000 bytes saved (2–3 `AdornmentView` instances eliminated)
+**Memory impact:** Zero
 
-**Risk:** Medium — behavioral testing required. All adornment tests must run.
+**Risk:** Very low — pure additions, no existing code modified (except adding interface to `Adornment`)
 
-### Phase 3: Additional Optimizations (Post-Adornment)
+---
 
-Complementary to the adornment work, these are lower-complexity wins in `View` itself:
+### Phase 1: Migrate Margin
+
+**Goal:** Replace `Margin : Adornment : View` with the lightweight `Margin : AdornmentImpl` + lazy `MarginView : AdornmentView`.
+
+**Changes:**
+1. Create `MarginView.cs` — **copied from** current `Margin.cs`, inherits `AdornmentView` instead of `Adornment`. Retains all shadow, clip-cache, transparency, and drawing code.
+2. Create lightweight `Margin.cs` (§4.5) — extends `AdornmentImpl`, holds `ShadowStyle`, `ShadowSize`, `ViewportSettings`, `CacheClip()` family. `CreateView()` returns `MarginView`.
+3. Update `View.Margin` property type: `Adornment?` → `Margin?` (the new lightweight class)
+4. Update `View.SetupAdornments()`: create lightweight `Margin` instead of old `Margin : Adornment`. Border and Padding continue to be created as `Adornment` subclasses.
+5. Update `View.SetAdornmentFrames()`: write `Margin.Frame` on the lightweight object (§4.9). Border/Padding frame logic unchanged (still sets `View.Frame` directly on the `Adornment` subclasses).
+6. Update `View.Hierarchy.cs:210`: `if (this is Margin)` → `if (this is MarginView)` (the only `is Margin` type check)
+7. Update `ShadowView.cs`: `SuperView is not Adornment` already covers `MarginView` since `AdornmentView` is separate — verify and update if needed
+8. Update `View.Drawing.cs`: margin drawing calls go through lightweight `Margin.View?.Draw()` / `Margin.CacheClip()` delegates
+9. Update `View.BeginInit()`/`View.EndInit()`: null-safe `Margin?.View?.BeginInit()` for lazy init (Border/Padding still use existing `BeginInitAdornments` path)
+10. Update all Margin-specific callsites (37 in library, 136 in tests) to use convenience methods or `.View?.`
+11. All tests pass
+
+**Memory impact:** ~1,600–2,500 bytes saved per view (one `Adornment`-subclass `View` eliminated for views without shadows)
+
+**Risk:** Low-Medium — Margin is the simplest adornment. Shadow views and clip caching are the main complexity.
+
+---
+
+### Phase 2: Migrate Padding
+
+**Goal:** Replace `Padding : Adornment : View` with the lightweight `Padding : AdornmentImpl` + lazy `PaddingView : AdornmentView`.
+
+**Pre-condition:** Phase 1 complete and stable.
+
+**Changes:**
+1. Create `PaddingView.cs` — **copied from** current `Padding.cs`, inherits `AdornmentView` instead of `Adornment`. Retains focus and `GetSubViews` behavior.
+2. Create lightweight `Padding.cs` (§4.6) — extends `AdornmentImpl`. `Add()` calls `EnsureView()`. `CreateView()` returns `PaddingView`.
+3. Update `View.Padding` property type: `Adornment?` → `Padding?`
+4. Update `View.SetupAdornments()`: create lightweight `Padding`. Border still created as `Adornment` subclass.
+5. Update `View.SetAdornmentFrames()`: write `Padding.Frame` on lightweight object.
+6. Update `View.BeginInit()`/`View.EndInit()`: add null-safe `Padding?.View?.BeginInit()`.
+7. Update Padding-specific callsites to use convenience methods.
+8. All tests pass
+
+**Memory impact:** Additional ~1,600–2,500 bytes saved per view (for views without Padding subviews or focus)
+
+**Risk:** Low-Medium — `CanFocus` and focus routing are the main concern. PaddingView retains focus behavior; lightweight Padding has no focus.
+
+---
+
+### Phase 3: Migrate Border
+
+**Goal:** Replace `Border : Adornment : View` with the lightweight `Border : AdornmentImpl` + lazy `BorderView : AdornmentView`.
+
+**Pre-condition:** Phase 2 complete and stable.
+
+**Changes:**
+1. Create `BorderView.cs` — **copied from** current `Border.cs`, inherits `AdornmentView` instead of `Adornment`. Retains all rendering, arrangement, title, diagnostic spinner code.
+2. Create `BorderView.Arrangement.cs` — **copied from** `Border.Arrangment.cs` (fixing pre-existing typo), references `BorderView`.
+3. Create lightweight `Border.cs` (§4.4) — extends `AdornmentImpl`. Holds `LineStyle`, `Settings`, promotes `Arranger` and `Activating`. `CreateView()` returns `BorderView`.
+4. Update `View.Border` property type: `Adornment?` → `Border?`
+5. Update `View.SetupAdornments()`: create lightweight `Border`. All three adornments now lightweight.
+6. Update `View.SetAdornmentFrames()`: all three write to lightweight `Frame` (§4.9 final form).
+7. Remove `BeginInitAdornments()`/`EndInitAdornments()` — replaced by null-safe calls in `View.BeginInit()`/`View.EndInit()` for all three.
+8. Update all `is Adornment` / `as Adornment` / `typeof(Adornment)` → `is AdornmentView` / `as AdornmentView` / `typeof(AdornmentView)` (30+ locations from §13 callsite inventory)
+9. Retire `Adornment` class: add `[Obsolete("Use AdornmentView instead.", error: false)]` alias that inherits `AdornmentView`.
+10. Delete old `Border.cs` (the View subclass), old `Margin.cs` (the View subclass), old `Padding.cs` (the View subclass). These have been replaced by `BorderView`, `MarginView`, `PaddingView`.
+11. All tests pass
+
+**Memory impact:** Additional ~1,600–2,500 bytes saved per view (for views without arrangement or border subviews). After this phase, full Phase 2 savings from original plan are realized.
+
+**Risk:** Medium-High — Border is the most complex adornment (arrangement, title rendering, line canvas, diagnostic spinner). All `is Adornment` type checks are updated here.
+
+---
+
+### Phase 4: Cleanup and Additional Optimizations
+
+**Goal:** Remove `Adornment` compat alias (after one release cycle), additional `View` optimizations.
+
+**Changes:**
+1. Remove `[Obsolete] Adornment` alias class
+2. Optional: No-View border drawing (Phase 3 from original plan — see §5, §14.4)
+
+Complementary `View` optimizations:
 
 | Optimization | Est. Savings | Risk | Notes |
 |---|---|---|---|
@@ -1066,7 +1119,7 @@ Complementary to the adornment work, these are lower-complexity wins in `View` i
 | Lazy `KeyBindings` | 160–300 bytes | Low-Medium | Create when first binding is added |
 | Lazy `LineCanvas` | 200–500 bytes | Low | Create in `OnDrawingContent` when first needed |
 | Lazy Command dictionary | 100–200 bytes | Low | Create in `AddCommand` |
-| Event broker pattern (40+ fields → dictionary) | 200–250 bytes | Medium | Significant refactor; saves backing-field allocation for unused events |
+| Event broker pattern (40+ fields → dictionary) | 200–250 bytes | Medium | Significant refactor |
 
 ---
 
@@ -1119,34 +1172,63 @@ Code that does `v.Border?.XYZ` with nullable check is not needed for the lightwe
 
 ### New Files
 
-| File | Contents |
-|------|----------|
-| `Terminal.Gui/ViewBase/Adornment/IAdornment.cs` | `IAdornment` interface |
-| `Terminal.Gui/ViewBase/Adornment/IAdornmentView.cs` | `IAdornmentView` interface (`Parent` only) |
-| `Terminal.Gui/ViewBase/Adornment/AdornmentImpl.cs` | `AdornmentImpl` abstract base |
-| `Terminal.Gui/ViewBase/Adornment/AdornmentView.cs` | Renamed from `Adornment.cs`; adds `: IAdornmentView` |
-| `Terminal.Gui/ViewBase/Adornment/BorderView.cs` | Renamed from `Border.cs` |
-| `Terminal.Gui/ViewBase/Adornment/BorderView.Arrangement.cs` | Renamed from `Border.Arrangment.cs` (fixing pre-existing typo) |
-| `Terminal.Gui/ViewBase/Adornment/MarginView.cs` | Renamed from `Margin.cs` |
-| `Terminal.Gui/ViewBase/Adornment/PaddingView.cs` | Renamed from `Padding.cs` |
-| `Terminal.Gui/ViewBase/Adornment/Border.cs` | New lightweight `Border` class |
-| `Terminal.Gui/ViewBase/Adornment/Margin.cs` | New lightweight `Margin` class |
-| `Terminal.Gui/ViewBase/Adornment/Padding.cs` | New lightweight `Padding` class |
+| File | Phase | Contents |
+|------|-------|----------|
+| `Terminal.Gui/ViewBase/Adornment/IAdornment.cs` | 0 | `IAdornment` interface |
+| `Terminal.Gui/ViewBase/Adornment/IAdornmentView.cs` | 0 | `IAdornmentView` interface (`Parent` + `Adornment` back-reference) |
+| `Terminal.Gui/ViewBase/Adornment/AdornmentImpl.cs` | 0 | `AdornmentImpl` abstract base with convenience pass-throughs |
+| `Terminal.Gui/ViewBase/Adornment/AdornmentView.cs` | 0 | **Copied from** `Adornment.cs`; adds `IAdornmentView`, `Adornment` back-reference, `Thickness` delegation |
+| `Terminal.Gui/ViewBase/Adornment/MarginView.cs` | 1 | **Copied from** `Margin.cs`; inherits `AdornmentView` instead of `Adornment` |
+| `Terminal.Gui/ViewBase/Adornment/Margin.cs` | 1 | New lightweight `Margin` class (replaces old `Margin : Adornment`) |
+| `Terminal.Gui/ViewBase/Adornment/PaddingView.cs` | 2 | **Copied from** `Padding.cs`; inherits `AdornmentView` instead of `Adornment` |
+| `Terminal.Gui/ViewBase/Adornment/Padding.cs` | 2 | New lightweight `Padding` class (replaces old `Padding : Adornment`) |
+| `Terminal.Gui/ViewBase/Adornment/BorderView.cs` | 3 | **Copied from** `Border.cs`; inherits `AdornmentView` instead of `Adornment` |
+| `Terminal.Gui/ViewBase/Adornment/BorderView.Arrangement.cs` | 3 | **Copied from** `Border.Arrangment.cs` (fixing typo); references `BorderView` |
+| `Terminal.Gui/ViewBase/Adornment/Border.cs` | 3 | New lightweight `Border` class (replaces old `Border : Adornment`) |
 
-### Modified Files (Phase 1)
+### Modified Files (Phase 0 — Infrastructure)
 
 | File | Change |
 |------|--------|
-| `Terminal.Gui/ViewBase/View.Adornments.cs` | Update property types, is-checks |
-| `Terminal.Gui/ViewBase/View.cs` | Update SetupAdornments signature if needed |
+| `Terminal.Gui/ViewBase/Adornment/Adornment.cs` | Add `: IAdornmentView` to class declaration |
+
+### Modified Files (Phase 1 — Margin Migration)
+
+| File | Change |
+|------|--------|
+| `Terminal.Gui/ViewBase/View.Adornments.cs` | Change `Margin` property type from `Adornment?` to `Margin?` (lightweight) |
+| `Terminal.Gui/ViewBase/View.Adornments.cs` | Update `SetupAdornments()` to create lightweight `Margin` |
+| `Terminal.Gui/ViewBase/View.Adornments.cs` | Update `SetAdornmentFrames()` for Margin frame caching |
+| `Terminal.Gui/ViewBase/View.cs` | Update `BeginInit()`/`EndInit()` for null-safe Margin init |
+| `Terminal.Gui/ViewBase/View.Drawing.cs` | Margin drawing via `Margin.View?.Draw()` / `Margin.CacheClip()` delegates |
+| `Terminal.Gui/ViewBase/View.Hierarchy.cs` | `if (this is Margin)` → `if (this is MarginView)` |
+| `Terminal.Gui/ViewBase/Adornment/ShadowView.cs` | Verify `SuperView is not Adornment` still covers `MarginView` |
+| `Terminal.Gui/Views/Shortcut.cs` | `Margin.ViewportSettings` via promoted property |
+| `Terminal.Gui/Views/Selectors/SelectorBase.cs` | Margin Thickness (lightweight, no change) |
+| Old `Margin.cs` (the `Adornment` subclass) | **Deleted** — replaced by `MarginView.cs` + lightweight `Margin.cs` |
+
+### Modified Files (Phase 2 — Padding Migration, additional)
+
+| File | Change |
+|------|--------|
+| `Terminal.Gui/ViewBase/View.Adornments.cs` | Change `Padding` property type to `Padding?`, update `SetupAdornments()` |
+| `Terminal.Gui/ViewBase/View.Adornments.cs` | Update `SetAdornmentFrames()` for Padding frame caching |
+| `Terminal.Gui/ViewBase/View.cs` | Add null-safe `Padding?.View?.BeginInit()` |
+| Old `Padding.cs` (the `Adornment` subclass) | **Deleted** |
+
+### Modified Files (Phase 3 — Border Migration, additional)
+
+| File | Change |
+|------|--------|
+| `Terminal.Gui/ViewBase/View.Adornments.cs` | Change `Border` property type to `Border?`, update `SetupAdornments()` |
+| `Terminal.Gui/ViewBase/View.Adornments.cs` | `SetAdornmentFrames()` final form (§4.9) — all three lightweight |
+| `Terminal.Gui/ViewBase/View.Adornments.cs` | Remove `BeginInitAdornments()`/`EndInitAdornments()` |
 | `Terminal.Gui/ViewBase/View.Drawing.cs` | Update `is Adornment` → `is AdornmentView` |
 | `Terminal.Gui/ViewBase/View.Drawing.Clipping.cs` | Same |
 | `Terminal.Gui/ViewBase/View.NeedsDraw.cs` | Same |
-| `Terminal.Gui/ViewBase/View.Layout.cs` | Same (3 locations: lines 135, 193, 915) |
-| `Terminal.Gui/ViewBase/View.Navigation.cs` | Same (2 locations: lines 613, 812) |
-| `Terminal.Gui/ViewBase/View.ScrollBars.cs` | Same (3 locations: lines 51, 184, 224) |
-| `Terminal.Gui/ViewBase/View.Hierarchy.cs` | Same |
-| `Terminal.Gui/ViewBase/Adornment/ShadowView.cs` | `SuperView is not Adornment` → `is not AdornmentView` |
+| `Terminal.Gui/ViewBase/View.Layout.cs` | Same (3 locations) |
+| `Terminal.Gui/ViewBase/View.Navigation.cs` | Same (2 locations) |
+| `Terminal.Gui/ViewBase/View.ScrollBars.cs` | Same (3 locations) |
 | `Terminal.Gui/App/Mouse/ApplicationMouse.cs` | Same (3 locations) |
 | `Terminal.Gui/Views/TabView/TabRow.cs` | Same |
 | `Terminal.Gui/ViewBase/EnumExtensions/BorderSettingsExtensions.cs` | Update references |
@@ -1157,29 +1239,20 @@ Code that does `v.Border?.XYZ` with nullable check is not needed for the lightwe
 | UICatalog `EditorsAndHelpers/ExpanderButton.cs` | `superView is Adornment adornment` → `is AdornmentView adornment` |
 | UICatalog `EditorsAndHelpers/PosEditor.cs` | `ViewToEdit is not Adornment` → `is not AdornmentView` |
 | UICatalog `EditorsAndHelpers/ViewportSettingsEditor.cs` | Same (2 locations) |
-
-### Modified Files (Phase 2, additional)
-
-| File | Change |
-|------|--------|
-| `Terminal.Gui/ViewBase/View.Adornments.cs` | `SetupAdornments` creates lightweight objects only |
-| `Terminal.Gui/ViewBase/View.Drawing.cs` | `Margin?.CacheClip()` delegates through lightweight Margin |
-| `Terminal.Gui/ViewBase/View.Layout.cs` | `SubViews.Count` → `View?.SubViews.Count ?? 0` |
-| `Terminal.Gui/Views/TabView/TabView.cs` | `Border.Activating` — Border promotes Activating as convenience (internally calls `EnsureView()`) |
+| `Terminal.Gui/Views/TabView/TabView.cs` | Border promotes Activating as convenience |
 | `Terminal.Gui/App/Keyboard/ApplicationKeyboard.cs` | `Border.Arranger` via promoted property |
-| `Terminal.Gui/Views/Shortcut.cs` | `Margin.ViewportSettings` via promoted property |
-| `Terminal.Gui/Views/StatusBar.cs` | Border null check (already null-safe, no change) |
-| `Terminal.Gui/Views/FileDialogs/FileDialog.cs` | Border null check (already null-safe) |
-| `Terminal.Gui/Views/Menu/MenuBar.cs` | Border null-conditional (already safe) |
-| `Terminal.Gui/Views/Selectors/SelectorBase.cs` | Margin Thickness (lightweight, no change) |
+| Old `Border.cs` and `Border.Arrangment.cs` (the `Adornment` subclasses) | **Deleted** |
+| `Adornment.cs` | Replaced with `[Obsolete]` alias inheriting `AdornmentView` |
 
 ### Test Files
 
-| File | Change |
-|------|--------|
-| `Tests/*/Adornment/AdornmentTests.cs` | `new Adornment(null!)` → `new AdornmentView(null!)` |
-| `Tests/*/Layout/ToScreenTests.cs` | `new Adornment()` → `new AdornmentView()` |
-| All tests using `.Border.Activating` | No change needed — Border promotes Activating as convenience method |
+| File | Phase | Change |
+|------|-------|--------|
+| `Tests/*/Adornment/MarginTests.cs` | 1 | Update for lightweight Margin + MarginView |
+| `Tests/*/Adornment/ShadowTests.cs` | 1 | Update Margin references |
+| `Tests/*/Adornment/AdornmentTests.cs` | 3 | `new Adornment(null!)` → `new AdornmentView(null!)` |
+| `Tests/*/Layout/ToScreenTests.cs` | 3 | `new Adornment()` → `new AdornmentView()` |
+| All tests using `.Border.Activating` | 3 | No change needed — Border promotes Activating as convenience method |
 
 ---
 
@@ -1248,19 +1321,38 @@ public class Adornment : AdornmentView
 
 ## 10. Test Strategy
 
-### Phase 1 (Rename)
-- All existing tests must pass unchanged (except explicit `new Adornment(...)` calls → `new AdornmentView(...)`)
-- Zero behavior change
+### Phase 0 (Infrastructure)
+- All existing tests must pass unchanged — only new files added
+- New unit tests for `AdornmentImpl`, `AdornmentView`, `IAdornment`, `IAdornmentView` in isolation
 
-### Phase 2 (Lazy)
-- Add a memory-measurement test: create 1000 Views, measure GC memory, assert < 3 MB (vs current ~4.3 MB)
-- All existing adornment tests pass
-- New tests for lazy View creation:
-  - View created without any adornment features → `Border.View is null`, `Margin.View is null`, `Padding.View is null`
-  - `BorderStyle = LineStyle.Single` → `Border.View is not null`, others remain null
+### Phase 1 (Margin)
+- All existing Margin tests pass (updated for lightweight `Margin` + `MarginView`)
+- Shadow tests pass — `MarginView` retains all shadow behavior
+- New tests for lazy Margin View creation:
+  - View created with default Margin → `Margin.View is null`
   - `ShadowStyle = ShadowStyle.Opaque` → `Margin.View is not null`
-  - Adding SubViews to Padding → `Padding.View is not null`
-  - After `EnsureView()`, all layout coordinates match current behavior
+  - Margin `ViewportSettings` works through lightweight path
+  - `CacheClip()` / `GetCachedClip()` delegate correctly
+- Border and Padding tests unaffected (still extend `Adornment`)
+
+### Phase 2 (Padding)
+- All existing Padding tests pass
+- New tests for lazy Padding View creation:
+  - View created with default Padding → `Padding.View is null`
+  - `Padding.Add(subView)` → `Padding.View is not null`
+  - `Padding.CanFocus` works through convenience pass-through
+- Margin tests still pass
+
+### Phase 3 (Border)
+- All existing Border tests pass
+- All `is Adornment` → `is AdornmentView` type check updates verified
+- New tests for lazy Border View creation:
+  - View created with default Border → `Border.View is null`
+  - `BorderStyle = LineStyle.Single` → `Border.View is not null`
+  - `Border.Arranger` works through promoted property
+  - `Border.Activating` works through convenience event
+- Add memory-measurement test: create 1000 Views, measure GC memory, assert < 3 MB (vs current ~4.3 MB)
+- After all three phases, all layout coordinates match current behavior
 
 ---
 
@@ -1268,13 +1360,14 @@ public class Adornment : AdornmentView
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|-----------|--------|-----------|
-| Layout regression from lazy frame calculation | Medium | High | Phase 1 has zero behavior change; Phase 2 adds extensive layout tests |
-| Draw-order regression (border not drawn because View wasn't created) | Medium | High | Ensure BorderView creation is triggered before Draw(); add draw tests |
-| Memory regression (View creation triggered too eagerly) | Low | Medium | Add memory measurement tests; profile in CI |
-| Test breakage from `is Adornment` patterns | Low | Low | Grep-and-replace; compiler catches type errors |
-| UICatalog/AllViewsTester breakage | Medium | Low | Update UICatalog editors to use AdornmentView type |
-| Designer (`IDesignable`) breakage | Medium | Medium | `IDesignable.EnableForDesign()` moved to AdornmentView |
-| Tab order regression (Padding is focusable) | Low | High | PaddingView retains focus behavior; lightweight Padding has no focus |
+| Layout regression from cached frame | Medium | High | Each phase tests only the migrated adornment; others remain unchanged |
+| Draw-order regression (margin/padding/border not drawn) | Medium | High | Ensure `*View` creation is triggered before Draw(); add draw tests per phase |
+| Memory regression (View creation triggered too eagerly) | Low | Medium | Add memory measurement tests after Phase 3; profile per phase |
+| `is Adornment` vs `is AdornmentView` confusion during mixed state | Medium | Medium | Phases 1–2 keep `Adornment` alive; only Phase 3 updates type checks |
+| `AdornmentView` and `Adornment` coexisting causes cast errors | Low | High | `AdornmentView` is a copy, not a subclass; `is Adornment` still matches Border/Padding during Phases 1–2 |
+| Shadow regression in Margin migration | Medium | Medium | Shadow tests are extensive (36 test callsites); run full suite in Phase 1 |
+| Tab order regression from Padding migration | Low | High | PaddingView retains focus behavior; test focus navigation in Phase 2 |
+| UICatalog/AllViewsTester breakage | Medium | Low | Update editors progressively per phase |
 
 ---
 
