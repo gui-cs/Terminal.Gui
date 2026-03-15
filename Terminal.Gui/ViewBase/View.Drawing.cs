@@ -872,10 +872,17 @@ public partial class View // Drawing APIs
             // Only exclude regions that were actually drawn. Undrawn areas stay in the clip
             // so that views behind this one can show through (visual transparency).
 
-            // Clamp the drawn region to the Viewport bounds. The context may include areas
-            // outside the Viewport (e.g., content drawn with AllowContentOutsideViewport).
-            // Those pixels aren't visible, so they shouldn't be excluded from the clip.
-            context!.ClipDrawnRegion (ViewportToScreen (Viewport));
+            // Clamp the drawn region to visible bounds. For views that are effectively transparent
+            // due to a transparent Border, clamp to the Border's frame (which includes the border
+            // lines and title). For directly-transparent views, clamp to the Viewport.
+            if (Border is { } && Border.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
+            {
+                context!.ClipDrawnRegion (Border.FrameToScreen ());
+            }
+            else
+            {
+                context!.ClipDrawnRegion (ViewportToScreen (Viewport));
+            }
 
             // Punch out just the drawn cells from Driver.Clip.
             ExcludeFromClip (context.GetDrawnRegion ());

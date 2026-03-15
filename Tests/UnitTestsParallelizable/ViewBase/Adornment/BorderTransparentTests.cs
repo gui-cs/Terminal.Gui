@@ -19,7 +19,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     shows spaces instead of the underlying 'X' background.
     /// </summary>
     [Fact]
-    public void Border_Transparent_Shows_Underlying_Content_In_Interior ()
+    public void Border_Transparent_Shows_Underlying_Content_In_Viewport ()
     {
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -59,6 +59,170 @@ public class BorderTransparentTests (ITestOutputHelper output)
                                               X│XXX│X
                                               X└───┘X
                                               XXXXXXX
+                                              """,
+                                              output,
+                                              app.Driver);
+    }
+
+    [Fact]
+    public void Border_Transparent_Shows_Underlying_Content_Where_Border_DrawContent_Are_Not ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (11, 9);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        // Fill window background with 'X' to detect transparency
+        window.ClearingViewport += (_, args) =>
+                                   {
+                                       window.FillRect (args.NewViewport, new Rune ('X'));
+                                       args.Cancel = true;
+                                   };
+
+        View borderedView = new ()
+        {
+            Title = "B",
+            X = 2,
+            Y = 2,
+            Width = 7,
+            Height = 5,
+            BorderStyle = LineStyle.Single
+        };
+        borderedView.Border!.ViewportSettings |= ViewportSettingsFlags.Transparent;
+        borderedView.Border.Thickness = new Thickness (2);
+
+        window.Add (borderedView);
+        app.Begin (window);
+
+        // The interior (row 2, cols 2-4) should show 'X' from the underlying window,
+        // not spaces from the bordered view's cleared viewport.
+        // Border lines should still be drawn normally.
+        DriverAssert.AssertDriverContentsAre ("""
+                                              XXXXXXXXXXX
+                                              XXXXXXXXXXX
+                                              XXXX┌─┐XXXX
+                                              XXX┌┘B└┐XXX
+                                              XXX│XXX│XXX
+                                              XXX└───┘XXX
+                                              XXXXXXXXXXX
+                                              XXXXXXXXXXX
+                                              XXXXXXXXXXX
+                                              """,
+                                              output,
+                                              app.Driver);
+    }
+    
+    [Fact]
+    public void Border_Transparent_Shows_Underlying_SubViews_Where_Border_DrawContent_Are_Not ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (11, 9);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        // Fill window background with 'X' to detect transparency
+        window.ClearingViewport += (_, args) =>
+        {
+            window.FillRect (args.NewViewport, new Rune ('X'));
+            args.Cancel = true;
+        };
+
+        View subView = new ()
+        {
+            Text = "sub",
+            X = 1,
+            Y = 2,
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+        };
+        window.Add (subView);
+
+        View borderedView = new ()
+        {
+            Title = "B",
+            X = 2,
+            Y = 2,
+            Width = 7,
+            Height = 5,
+            BorderStyle = LineStyle.Single
+        };
+        borderedView.Border!.ViewportSettings |= ViewportSettingsFlags.Transparent;
+        borderedView.Border.Thickness = new Thickness (2);
+
+        window.Add (borderedView);
+        app.Begin (window);
+
+        // The interior (row 2, cols 2-4) should show 'X' from the underlying window,
+        // not spaces from the bordered view's cleared viewport.
+        // Border lines should still be drawn normally.
+        DriverAssert.AssertDriverContentsAre ("""
+                                              XXXXXXXXXXX
+                                              XXXXXXXXXXX
+                                              Xsub┌─┐XXXX
+                                              XXX┌┘B└┐XXX
+                                              XXX│XXX│XXX
+                                              XXX└───┘XXX
+                                              XXXXXXXXXXX
+                                              XXXXXXXXXXX
+                                              XXXXXXXXXXX
+                                              """,
+                                              output,
+                                              app.Driver);
+    }
+
+    [Fact]
+    public void Border_Transparent_Occludes_Underlying_SubViews_Where_Border_DrawContent_Is ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (11, 3);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        // Fill window background with 'X' to detect transparency
+        window.ClearingViewport += (_, args) =>
+        {
+            window.FillRect (args.NewViewport, new Rune ('X'));
+            args.Cancel = true;
+        };
+
+        View subView = new ()
+        {
+            Text = "subview",
+            X = 0,
+            Y = 1,
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+        };
+        window.Add (subView);
+
+        View borderedView = new ()
+        {
+            Title = "AB",
+            X = 0,
+            Y = 0,
+            Width = 9,
+            Height = 3,
+            BorderStyle = LineStyle.Single
+        };
+        borderedView.Border!.ViewportSettings |= ViewportSettingsFlags.Transparent;
+        borderedView.Border.Thickness = new Thickness (2, 3, 1, 0);
+
+        window.Add (borderedView);
+        app.Begin (window);
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              XX┌──┐XXXXX
+                                              s┌┤AB├──┐XX
+                                              X│└──┘XX│XX
                                               """,
                                               output,
                                               app.Driver);

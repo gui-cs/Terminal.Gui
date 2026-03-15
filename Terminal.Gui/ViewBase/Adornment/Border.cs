@@ -303,6 +303,10 @@ public partial class Border : Adornment
                                             titleRect,
                                             GetAttributeForRole (Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
                                             GetAttributeForRole (Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
+
+            // Report the title rect to the DrawContext so it participates in clip exclusion.
+            // This ensures the title occludes peer subviews when the Border is transparent.
+            context?.AddDrawnRectangle (titleRect);
             LineCanvas.Exclude (new Region (titleRect));
         }
 

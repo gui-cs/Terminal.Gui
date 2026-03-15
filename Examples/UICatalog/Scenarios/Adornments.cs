@@ -33,7 +33,7 @@ public class Adornments : Scenario
 
         adornmentsEditor.Border!.Thickness = new Thickness (1, 2, 1, 1);
 
-        ViewportSettingsEditor viewportSettingsEditor= new ()
+        ViewportSettingsEditor viewportSettingsEditor = new ()
         {
             BorderStyle = LineStyle.Single,
             AutoSelectViewToEdit = true,
@@ -45,16 +45,29 @@ public class Adornments : Scenario
 
         viewportSettingsEditor.Border!.Thickness = new Thickness (1, 2, 1, 1);
 
-        Button appButton = new () { X = Pos.Center (), Y = 1, Text = "_SubView of Window" };
+        Button appButton = new () { X = Pos.Center (), Y = 5, Text = "_SubView of Window" };
         appWindow.Add (appButton);
 
         Window window = new ()
         {
             Title = "The _Window",
-            Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable,
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
+            X = 5,
+            Y = 5,
             Width = Dim.Fill (adornmentsEditor),
             Height = Dim.Fill (viewportSettingsEditor)
         };
+
+        appWindow.ClearingViewport += (s, e) =>
+        {
+            if (s is View sender)
+            {
+                sender.FillRect (sender.Viewport, Glyphs.Diamond);
+            }
+
+            e.Cancel = true;
+        };
+
         appWindow.Add (window);
 
         TextField tf1 = new () { Width = 10, Text = "TextField" };
