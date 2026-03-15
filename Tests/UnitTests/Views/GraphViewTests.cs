@@ -1319,7 +1319,7 @@ public class LegendTests
 
         gv.Annotations.Add (legend);
         gv.Layout ();
-        gv.Draw ();
+        gv.Draw (new DrawContext ());
 
         var expected =
             @"

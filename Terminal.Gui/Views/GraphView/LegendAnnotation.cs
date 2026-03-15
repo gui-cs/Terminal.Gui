@@ -40,7 +40,8 @@ public class LegendAnnotation : View, IAnnotation
 
     /// <summary>Draws the Legend and all entries into the area within <see cref="View.Viewport"/></summary>
     /// <param name="graph"></param>
-    public void Render (GraphView graph)
+    /// <param name="drawContext1"></param>
+    public void Render (GraphView graph, DrawContext? drawContext1)
     {
         if (!IsInitialized)
         {
@@ -53,8 +54,10 @@ public class LegendAnnotation : View, IAnnotation
         {
             // BUGBUG: View code should never call Draw directly. This
             // BUGBUG: needs to be refactored to decouple.
-            DrawAdornments ();
-            RenderLineCanvas (null);
+            DrawAdornments (drawContext1);
+            LineCanvas.Merge (Border!.LineCanvas);
+            Border.LineCanvas.Clear ();
+            RenderLineCanvas (drawContext1);
         }
 
         var linesDrawn = 0;

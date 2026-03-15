@@ -37,17 +37,19 @@ public class Padding : Adornment
             return false;
         }
 
-        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+        if (!mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
-            if (Parent.CanFocus && !Parent.HasFocus)
-            {
-                Parent.SetFocus ();
-                Parent.SetNeedsDraw ();
-                return mouse.Handled = true;
-            }
+            return false;
         }
 
-        return false;
+        if (!Parent.CanFocus || Parent.HasFocus)
+        {
+            return false;
+        }
+        Parent.SetFocus ();
+        Parent.SetNeedsDraw ();
+
+        return mouse.Handled = true;
     }
 
     /// <summary>
@@ -90,7 +92,7 @@ public class Padding : Adornment
         {
             // Include SubViews from Parent. Since we are a Padding of Parent do not
             // request Adornments again to avoid infinite recursion.
-            subViewsOfThisAdornment.AddRange (Parent.GetSubViews (false, false, false));
+            subViewsOfThisAdornment.AddRange (Parent.GetSubViews ());
         }
 
         return subViewsOfThisAdornment;

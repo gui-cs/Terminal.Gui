@@ -350,10 +350,11 @@ public class AdornmentTests
     }
 
     [Fact]
-    public void Setting_SuperViewRendersLineCanvas_Throws ()
+    public void Setting_SuperViewRendersLineCanvas_IsAllowed ()
     {
-        var adornment = new Adornment (null!);
-        Assert.Throws<InvalidOperationException> (() => adornment.SuperViewRendersLineCanvas = true);
+        Adornment adornment = new (null!);
+        adornment.SuperViewRendersLineCanvas = true;
+        Assert.True (adornment.SuperViewRendersLineCanvas);
     }
 
     [Fact]

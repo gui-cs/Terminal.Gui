@@ -209,14 +209,13 @@ public class Adornment : View, IDesignable
     protected override bool OnRenderingLineCanvas () => true;
 
     /// <summary>
-    ///     Adornments only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas, so setting this
-    ///     property throws an <see cref="InvalidOperationException"/>.
+    ///     Gets or sets whether this Adornment's <see cref="View.LineCanvas"/> will be merged into
+    ///     its <see cref="Parent"/> view's LineCanvas for rendering.
+    ///     When <see langword="true"/>, the Adornment adds lines to its own LineCanvas and the parent
+    ///     merges and renders them. When <see langword="false"/> (default), the Adornment does not
+    ///     use its own LineCanvas (the legacy behavior where adornments wrote directly to Parent.LineCanvas).
     /// </summary>
-    public override bool SuperViewRendersLineCanvas
-    {
-        get => false;
-        set => throw new InvalidOperationException (@"Adornment can only render to their Parent or Parent's Superview.");
-    }
+    public override bool SuperViewRendersLineCanvas { get; set; }
 
     /// <summary>
     ///     Indicates whether the specified Parent's SuperView-relative coordinates are within the Adornment's Thickness.

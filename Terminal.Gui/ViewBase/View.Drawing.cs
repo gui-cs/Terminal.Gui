@@ -98,7 +98,7 @@ public partial class View // Drawing APIs
             // Note: Margin with a Shadow is special-cased and drawn in a separate pass to support
             // transparent shadows.
             Trace.Draw (this.ToIdentifyingString (), "Adornments");
-            DoDrawAdornments (originalClip);
+            DoDrawAdornments (originalClip, context);
             SetClip (originalClip);
 
             // ------------------------------------
@@ -140,6 +140,16 @@ public partial class View // Drawing APIs
             // because they may draw outside the viewport.
             SetClip (originalClip);
             originalClip = AddFrameToClip ();
+            // Merge Border's LineCanvas into ours before rendering. Border writes lines to its
+            // own LineCanvas (SuperViewRendersLineCanvas = true) during DrawAdornments(). We merge
+            // here — after ClearNeedsDraw (which clears our LineCanvas) but before rendering — so
+            // border lines participate in line-join resolution with any lines SubViews added.
+            if (Border is { SuperViewRendersLineCanvas: true })
+            {
+                LineCanvas.Merge (Border.LineCanvas);
+                Border.LineCanvas.Clear ();
+            }
+
             Trace.Draw (this.ToIdentifyingString (), "LineCanvas");
             DoRenderLineCanvas (context);
 
@@ -243,7 +253,7 @@ public partial class View // Drawing APIs
         }
     }
 
-    internal void DoDrawAdornments (Region? originalClip)
+    internal void DoDrawAdornments (Region? originalClip, DrawContext? drawContext)
     {
         if (this is Adornment)
         {
@@ -282,41 +292,42 @@ public partial class View // Drawing APIs
 
         // TODO: add event.
 
-        DrawAdornments ();
+        DrawAdornments (drawContext);
     }
 
     /// <summary>
     ///     Causes <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/> to be drawn.
     /// </summary>
+    /// <param name="drawContext"></param>
     /// <remarks>
     ///     <para>
     ///         <see cref="Margin"/> is drawn in a separate pass if <see cref="ShadowStyle"/> is set.
     ///     </para>
     /// </remarks>
-    public void DrawAdornments ()
+    public void DrawAdornments (DrawContext? drawContext)
     {
         // Only draw Margin here if it is not Transparent. Margins with shadows are drawn in a separate pass in the static View.Draw
         // via Margin.DrawShadows.
         if (Margin is { } && !Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
         {
-            Margin?.Draw ();
+            Margin?.Draw (drawContext);
         }
 
         // Each of these renders lines to this View's LineCanvas
-        // Those lines will be finally rendered in OnRenderLineCanvas
+        // Those lines will be finally rendered in DoRenderLineCanvas
         if (Border is { } && Border.Thickness != Thickness.Empty)
         {
-            Border?.Draw ();
+            Border?.Draw (drawContext);
         }
 
         if (Padding is { } && Padding.Thickness != Thickness.Empty)
         {
-            Padding?.Draw ();
+            Padding?.Draw (drawContext);
         }
 
         if (Margin is { } && Margin.Thickness != Thickness.Empty /* && Margin.ShadowStyle == ShadowStyle.None*/)
         {
-            //Margin?.Draw ();
+            //Margin?.Draw (drawContext);
         }
     }
 

@@ -223,6 +223,10 @@ public partial class Border : Adornment
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
+        // Border writes lines to its own LineCanvas. The parent merges and renders them.
+        // This enables Border to participate in DrawContext region tracking for transparency support.
+        SuperViewRendersLineCanvas = true;
+
         if (Thickness == Thickness.Empty)
         {
             return true;
@@ -299,14 +303,14 @@ public partial class Border : Adornment
                                             titleRect,
                                             GetAttributeForRole (Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
                                             GetAttributeForRole (Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
-            Parent?.LineCanvas.Exclude (new (titleRect));
+            LineCanvas.Exclude (new (titleRect));
         }
 
         if (!canDrawBorder || LineStyle == LineStyle.None)
         {
             return true;
         }
-        LineCanvas? lc = Parent?.LineCanvas;
+        LineCanvas lc = LineCanvas;
 
         bool drawTop = Thickness.Top > 0 && Frame is { Width: > 1, Height: >= 1 };
         bool drawLeft = Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0);
