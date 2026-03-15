@@ -7,7 +7,8 @@
 | Border transparency failing tests | Done — 2 skipped, 1 passes (wrong reason) |
 | DoDrawComplete comment rewrite | Done |
 | DoDrawComplete baseline tests | Done — 8 tests, all passing |
-| Phase 1: Visual transparency for Border | Not started |
+| Phase 1: Visual transparency for Border | In Progress |
+| Phase 1a: DONE |
 | Phase 2: Drawn-region-aware TransparentMouse | Not started |
 
 ## Context
@@ -64,8 +65,8 @@ This was the user's observation: "I suspect [writing to Parent.LineCanvas] was a
 
 ### Phase 1: Visual Transparency for Border
 
-#### 1a. Fix Border LineCanvas ownership
-
+#### 1a. Fix Border LineCanvas ownership - DONE
+ 
 **Problem**: Border writes to `Parent.LineCanvas`. This means the drawn region is tracked on the parent, not the Border.
 
 **Fix in `Adornment.cs` (~line 215)**: Change `SuperViewRendersLineCanvas` override to allow setting it (remove the throw). Or better: have Adornment return `Parent?.SuperViewRendersLineCanvas ?? false` — meaning adornments' line canvases get merged into their Parent view's LineCanvas (which is where Border already writes today, but through the proper merge mechanism).
