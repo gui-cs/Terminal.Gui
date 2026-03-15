@@ -8,7 +8,7 @@ public class MarginTests (ITestOutputHelper output)
     [Fact]
     public void Margin_Is_Transparent ()
     {
-        IApplication? app = Application.Create ();
+        IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (5, 5);
 
@@ -34,7 +34,7 @@ public class MarginTests (ITestOutputHelper output)
     [Fact]
     public void Margin_ViewPortSettings_Not_Transparent_Is_NotTransparent ()
     {
-        IApplication? app = Application.Create ();
+        IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (5, 5);
 
@@ -54,10 +54,12 @@ public class MarginTests (ITestOutputHelper output)
 
         app.LayoutAndDraw ();
 
-        DriverAssert.AssertDriverContentsAre (@"
-MMM
-M M
-MMM",
+        DriverAssert.AssertDriverContentsAre ("""
+
+                                              MMM
+                                              M M
+                                              MMM
+                                              """,
                                               output,
                                               app.Driver);
         DriverAssert.AssertDriverAttributesAre ("0", output, app.Driver, runnable.GetAttributeForRole (VisualRole.Normal));
@@ -162,7 +164,7 @@ MMM",
         window.Width = Dim.Fill ();
         window.Height = Dim.Fill ();
 
-        window.ClearingViewport += (sender, args) =>
+        window.ClearingViewport += (_, args) =>
                                    {
                                        window.FillRect (args.NewViewport, new Rune ('X'));
                                        args.Cancel = true;
@@ -195,7 +197,7 @@ MMM",
         window.Width = Dim.Fill ();
         window.Height = Dim.Fill ();
 
-        window.ClearingViewport += (sender, args) =>
+        window.ClearingViewport += (_, args) =>
                                    {
                                        window.FillRect (args.NewViewport, new Rune ('X'));
                                        args.Cancel = true;
@@ -203,10 +205,7 @@ MMM",
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
         // Add a button with a transparent shadow to the Padding adornment
-        ShadowDemoView demoView = new ()
-        {
-            ShadowStyle = ShadowStyle.Transparent
-        };
+        ShadowDemoView demoView = new () { ShadowStyle = ShadowStyle.Transparent };
 
         window.Add (demoView);
         app.Begin (window);

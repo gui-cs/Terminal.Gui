@@ -42,11 +42,12 @@ public class Margin : Adornment
 
     private void OnThicknessChanged (object? sender, EventArgs e)
     {
-        if (!_isThicknessChanging)
+        if (_isThicknessChanging)
         {
-            _originalThickness = new (Thickness.Left, Thickness.Top, Thickness.Right, Thickness.Bottom);
-            SetShadow (ShadowStyle);
+            return;
         }
+        _originalThickness = new Thickness (Thickness.Left, Thickness.Top, Thickness.Right, Thickness.Bottom);
+        SetShadow (ShadowStyle);
     }
 
     // When the Parent is drawn, we cache the clip region so we can draw the Shadows after all other Views
@@ -54,7 +55,7 @@ public class Margin : Adornment
 
     internal Region? GetCachedClip () => _cachedClip;
 
-    internal void ClearCachedClip () { _cachedClip = null; }
+    internal void ClearCachedClip () => _cachedClip = null;
 
     internal void CacheClip ()
     {
@@ -71,7 +72,7 @@ public class Margin : Adornment
     ///     iteration of the main loop after all Views have been drawn.
     /// </summary>
     /// <remarks>
-    ///    Margins with no <see cref="ShadowStyle"/> are drawn as-normal in <see cref="View.DrawAdornments"/>.
+    ///     Margins with no <see cref="ShadowStyle"/> are drawn as-normal in <see cref="View.DrawAdornments"/>.
     /// </remarks>
     /// <param name="views"></param>
     /// <returns>
@@ -99,9 +100,7 @@ public class Margin : Adornment
             }
 
             // Do not include Margin views of subviews; not supported
-            foreach (View subview in view.GetSubViews (false, includePadding: true, includeBorder: true)
-                                         .OrderBy (v => v.ShadowStyle != ShadowStyle.None)
-                                         .Reverse ())
+            foreach (View subview in view.GetSubViews (includePadding: true, includeBorder: true).OrderBy (v => v.ShadowStyle != ShadowStyle.None).Reverse ())
             {
                 stack.Push (subview);
             }
@@ -187,11 +186,10 @@ public class Margin : Adornment
         if (ShadowStyle != ShadowStyle.None)
         {
             // Turn off shadow
-            _originalThickness = new (
-                                      Thickness.Left,
-                                      Thickness.Top,
-                                      Math.Max (Thickness.Right - ShadowSize.Width, 0),
-                                      Math.Max (Thickness.Bottom - ShadowSize.Height, 0));
+            _originalThickness = new Thickness (Thickness.Left,
+                                                Thickness.Top,
+                                                Math.Max (Thickness.Right - ShadowSize.Width, 0),
+                                                Math.Max (Thickness.Bottom - ShadowSize.Height, 0));
         }
 
         if (style != ShadowStyle.None)
@@ -199,17 +197,16 @@ public class Margin : Adornment
             // Turn on shadow
             _isThicknessChanging = true;
 
-            Thickness = new (
-                             _originalThickness.Value.Left,
-                             _originalThickness.Value.Top,
-                             _originalThickness.Value.Right + ShadowSize.Width,
-                             _originalThickness.Value.Bottom + ShadowSize.Height);
+            Thickness = new Thickness (_originalThickness.Value.Left,
+                                       _originalThickness.Value.Top,
+                                       _originalThickness.Value.Right + ShadowSize.Width,
+                                       _originalThickness.Value.Bottom + ShadowSize.Height);
             _isThicknessChanging = false;
         }
 
         if (style != ShadowStyle.None)
         {
-            _rightShadow = new ()
+            _rightShadow = new ShadowView
             {
                 X = Pos.AnchorEnd (ShadowSize.Width),
                 Y = 0,
@@ -219,7 +216,7 @@ public class Margin : Adornment
                 Orientation = Orientation.Vertical
             };
 
-            _bottomShadow = new ()
+            _bottomShadow = new ShadowView
             {
                 X = 0,
                 Y = Pos.AnchorEnd (ShadowSize.Height),
@@ -233,7 +230,11 @@ public class Margin : Adornment
         else if (Thickness != _originalThickness)
         {
             _isThicknessChanging = true;
-            Thickness = new (_originalThickness.Value.Left, _originalThickness.Value.Top, _originalThickness.Value.Right, _originalThickness.Value.Bottom);
+
+            Thickness = new Thickness (_originalThickness.Value.Left,
+                                       _originalThickness.Value.Top,
+                                       _originalThickness.Value.Right,
+                                       _originalThickness.Value.Bottom);
             _isThicknessChanging = false;
         }
 
@@ -263,24 +264,22 @@ public class Margin : Adornment
         }
     }
 
-    private Size _shadowSize;
-
     /// <summary>
     ///     Gets or sets the size of the shadow effect.
     /// </summary>
     public Size ShadowSize
     {
-        get => _shadowSize;
+        get;
         set
         {
-            if (TryValidateShadowSize (_shadowSize, value, out Size result))
+            if (TryValidateShadowSize (field, value, out Size result))
             {
-                _shadowSize = value;
+                field = value;
                 SetShadow (ShadowStyle);
             }
             else
             {
-                _shadowSize = result;
+                field = result;
             }
         }
     }
@@ -351,83 +350,73 @@ public class Margin : Adornment
             // TODO: Add a setting or flag that lets the view move vertically as well.
             _isThicknessChanging = true;
 
-            Thickness = new (
-                             Thickness.Left - PRESS_MOVE_HORIZONTAL,
-                             Thickness.Top - PRESS_MOVE_VERTICAL,
-                             Thickness.Right + PRESS_MOVE_HORIZONTAL,
-                             Thickness.Bottom + PRESS_MOVE_VERTICAL);
+            Thickness = new Thickness (Thickness.Left - PRESS_MOVE_HORIZONTAL,
+                                       Thickness.Top - PRESS_MOVE_VERTICAL,
+                                       Thickness.Right + PRESS_MOVE_HORIZONTAL,
+                                       Thickness.Bottom + PRESS_MOVE_VERTICAL);
             _isThicknessChanging = false;
 
-            if (_rightShadow is { })
-            {
-                _rightShadow.Visible = true;
-            }
+            _rightShadow?.Visible = true;
 
-            if (_bottomShadow is { })
-            {
-                _bottomShadow.Visible = true;
-            }
+            _bottomShadow?.Visible = true;
 
             MouseState &= ~MouseState.Pressed;
 
             return;
         }
 
-        if (!MouseState.HasFlag (MouseState.Pressed) && pressed)
+        if (MouseState.HasFlag (MouseState.Pressed) || !pressed)
         {
-            // If the view is not pressed, and we want highlight move the shadow
-            // Note, for visual effects reasons, we only move horizontally.
-            // TODO: Add a setting or flag that lets the view move vertically as well.
-            _isThicknessChanging = true;
-
-            Thickness = new (
-                             Thickness.Left + PRESS_MOVE_HORIZONTAL,
-                             Thickness.Top + PRESS_MOVE_VERTICAL,
-                             Thickness.Right - PRESS_MOVE_HORIZONTAL,
-                             Thickness.Bottom - PRESS_MOVE_VERTICAL);
-            _isThicknessChanging = false;
-
-            MouseState |= MouseState.Pressed;
-
-            if (_rightShadow is { })
-            {
-                _rightShadow.Visible = false;
-            }
-
-            if (_bottomShadow is { })
-            {
-                _bottomShadow.Visible = false;
-            }
+            return;
         }
+
+        // If the view is not pressed, and we want highlight move the shadow
+        // Note, for visual effects reasons, we only move horizontally.
+        // TODO: Add a setting or flag that lets the view move vertically as well.
+        _isThicknessChanging = true;
+
+        Thickness = new Thickness (Thickness.Left + PRESS_MOVE_HORIZONTAL,
+                                   Thickness.Top + PRESS_MOVE_VERTICAL,
+                                   Thickness.Right - PRESS_MOVE_HORIZONTAL,
+                                   Thickness.Bottom - PRESS_MOVE_VERTICAL);
+        _isThicknessChanging = false;
+
+        MouseState |= MouseState.Pressed;
+
+        _rightShadow?.Visible = false;
+
+        _bottomShadow?.Visible = false;
     }
 
     private void Margin_LayoutStarted (object? sender, LayoutEventArgs e)
     {
         // Adjust the shadow such that it is drawn aligned with the Border
-        if (_rightShadow is { } && _bottomShadow is { })
+        if (_rightShadow is null || _bottomShadow is null)
         {
-            switch (ShadowStyle)
-            {
-                case ShadowStyle.Transparent:
-                    // BUGBUG: This doesn't work right for all Border.Top sizes - Need an API on Border that gives top-right location of line corner.
-                    _rightShadow.Y = Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).Y + 1 : 0;
+            return;
+        }
 
-                    break;
+        switch (ShadowStyle)
+        {
+            case ShadowStyle.Transparent:
+                // BUGBUG: This doesn't work right for all Border.Top sizes - Need an API on Border that gives top-right location of line corner.
+                _rightShadow.Y = Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).Y + 1 : 0;
 
-                case ShadowStyle.Opaque:
-                    // BUGBUG: This doesn't work right for all Border.Top sizes - Need an API on Border that gives top-right location of line corner.
-                    _rightShadow.Y = Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).Y + 1 : 0;
-                    _bottomShadow.X = Parent.Border!.Thickness.Left > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).X + 1 : 0;
+                break;
 
-                    break;
+            case ShadowStyle.Opaque:
+                // BUGBUG: This doesn't work right for all Border.Top sizes - Need an API on Border that gives top-right location of line corner.
+                _rightShadow.Y = Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).Y + 1 : 0;
+                _bottomShadow.X = Parent.Border!.Thickness.Left > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).X + 1 : 0;
 
-                case ShadowStyle.None:
-                default:
-                    _rightShadow.Y = 0;
-                    _bottomShadow.X = 0;
+                break;
 
-                    break;
-            }
+            case ShadowStyle.None:
+            default:
+                _rightShadow.Y = 0;
+                _bottomShadow.X = 0;
+
+                break;
         }
     }
 

@@ -63,14 +63,15 @@ public class Adornment : View, IDesignable
 
             _thickness = value;
 
-            if (current != _thickness)
+            if (current == _thickness)
             {
-                Parent?.SetAdornmentFrames ();
-                SetNeedsLayout ();
-                SetNeedsDraw ();
-
-                OnThicknessChanged ();
+                return;
             }
+            Parent?.SetAdornmentFrames ();
+            SetNeedsLayout ();
+            SetNeedsDraw ();
+
+            OnThicknessChanged ();
         }
     }
 
@@ -141,8 +142,7 @@ public class Adornment : View, IDesignable
             }
             Point super = SuperView.ViewportToScreen (Frame.Location);
 
-            return new (super, Frame.Size);
-
+            return new Rectangle (super, Frame.Size);
         }
 
         // Adornments are *Children* of a View, not SubViews. Thus View.FrameToScreen will not work.
@@ -151,7 +151,7 @@ public class Adornment : View, IDesignable
         Rectangle parentScreen = Parent.FrameToScreen ();
 
         // ...and add our Frame location to it.
-        return new (new (parentScreen.X + Frame.X, parentScreen.Y + Frame.Y), Frame.Size);
+        return new Rectangle (new Point (parentScreen.X + Frame.X, parentScreen.Y + Frame.Y), Frame.Size);
     }
 
     /// <inheritdoc/>
@@ -161,7 +161,7 @@ public class Adornment : View, IDesignable
 
         if (parentOrSuperView is { })
         {
-            return parentOrSuperView.ScreenToFrame (new (location.X - Frame.X, location.Y - Frame.Y));
+            return parentOrSuperView.ScreenToFrame (new Point (location.X - Frame.X, location.Y - Frame.Y));
         }
 
         // While there are no real use cases for an Adornment being a subview, we support it for
@@ -173,7 +173,7 @@ public class Adornment : View, IDesignable
             return Point.Empty;
         }
 
-        return parentOrSuperView.ScreenToFrame (new (location.X - Frame.X, location.Y - Frame.Y));
+        return parentOrSuperView.ScreenToFrame (new Point (location.X - Frame.X, location.Y - Frame.Y));
     }
 
     /// <summary>
@@ -256,8 +256,8 @@ public class Adornment : View, IDesignable
     bool IDesignable.EnableForDesign ()
     {
         // This enables AllViewsTester to show something useful.
-        Thickness = new (3);
-        Frame = new (0, 0, 10, 10);
+        Thickness = new Thickness (3);
+        Frame = new Rectangle (0, 0, 10, 10);
         Diagnostics = ViewDiagnosticFlags.Thickness;
 
         return true;

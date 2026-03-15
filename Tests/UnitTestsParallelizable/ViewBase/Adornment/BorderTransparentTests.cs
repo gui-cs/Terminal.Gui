@@ -67,7 +67,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     /// <summary>
     ///     Verifies that mouse events in the transparent interior of a Border with TransparentMouse
     ///     pass through to views underneath.
-    ///     Currently passes — but only because the blanket TransparentMouse flag removes the Border
+    ///     Currently, passes — but only because the blanket TransparentMouse flag removes the Border
     ///     entirely from hit-testing. After per-cell TransparentMouse is implemented, this should
     ///     still pass because the interior cells were not drawn by the Border.
     /// </summary>
@@ -110,7 +110,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     /// <summary>
     ///     Verifies that mouse events ON the border lines of a Border with TransparentMouse
     ///     are still captured by the Border (only the transparent interior passes through).
-    ///     Currently fails because the blanket TransparentMouse flag removes the Border
+    ///     Currently, fails because the blanket TransparentMouse flag removes the Border
     ///     from ALL hit-testing, including border line cells.
     /// </summary>
     [Fact (Skip = "Not yet implemented — Issue #4834")]
@@ -138,7 +138,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
         window.Add (borderedView);
         app.Begin (window);
 
-        // Click on the top-left corner of the border (screen position 2, 1)
+        // Click the top-left corner of the border (screen position 2, 1)
         // This IS on a border line, so it should be captured by the Border.
         List<View?> viewsOnBorderLine = window.GetViewsUnderLocation (new Point (2, 1), ViewportSettingsFlags.TransparentMouse);
 

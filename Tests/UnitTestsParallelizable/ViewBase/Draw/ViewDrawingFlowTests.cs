@@ -78,7 +78,7 @@ public class ViewDrawingFlowTests : TestDriverBase
         view.EndInit ();
         view.LayoutSubViews ();
 
-        view.DrawingText += (s, e) =>
+        view.DrawingText += (_, _) =>
                             {
                                 drawingTextCalled = true;
                                 usedAttribute = driver.CurrentAttribute;
@@ -221,7 +221,7 @@ public class ViewDrawingFlowTests : TestDriverBase
         view.LayoutSubViews ();
 
         view.DrawingContentCallback = () => { };
-        view.DrawingContent += (s, e) => { receivedContext = e.DrawContext; };
+        view.DrawingContent += (_, e) => { receivedContext = e.DrawContext; };
 
         var context = new DrawContext ();
         view.Draw (context);
@@ -251,7 +251,7 @@ public class ViewDrawingFlowTests : TestDriverBase
         view.LayoutSubViews ();
 
         view.DrawingContentCallback = () => { };
-        view.DrawingContent += (s, e) => { receivedContext = e.DrawContext; };
+        view.DrawingContent += (_, e) => { receivedContext = e.DrawContext; };
 
         view.Draw ();
 
@@ -282,8 +282,8 @@ public class ViewDrawingFlowTests : TestDriverBase
 
         var clearedCalled = false;
 
-        view.ClearingViewport += (s, e) => e.Cancel = true;
-        view.ClearedViewport += (s, e) => clearedCalled = true;
+        view.ClearingViewport += (_, e) => e.Cancel = true;
+        view.ClearedViewport += (_, _) => clearedCalled = true;
 
         view.Draw ();
 
@@ -311,8 +311,8 @@ public class ViewDrawingFlowTests : TestDriverBase
 
         var drewTextCalled = false;
 
-        view.DrawingText += (s, e) => e.Cancel = true;
-        view.DrewText += (s, e) => drewTextCalled = true;
+        view.DrawingText += (_, e) => e.Cancel = true;
+        view.DrewText += (_, _) => drewTextCalled = true;
 
         view.Draw ();
 
@@ -342,7 +342,7 @@ public class ViewDrawingFlowTests : TestDriverBase
         var childDrawn = false;
         child.DrawingContentCallback = () => childDrawn = true;
 
-        parent.DrawingSubViews += (s, e) => e.Cancel = true;
+        parent.DrawingSubViews += (_, e) => e.Cancel = true;
 
         parent.Draw ();
 
@@ -369,7 +369,7 @@ public class ViewDrawingFlowTests : TestDriverBase
         view.EndInit ();
         view.LayoutSubViews ();
 
-        view.DrawComplete += (s, e) => drawCompleteCalled = true;
+        view.DrawComplete += (_, _) => drawCompleteCalled = true;
 
         view.Draw ();
 
@@ -401,7 +401,7 @@ public class ViewDrawingFlowTests : TestDriverBase
         view.EndInit ();
         view.LayoutSubViews ();
 
-        view.ClearedViewport += (s, e) => clearedViewport = true;
+        view.ClearedViewport += (_, _) => clearedViewport = true;
 
         view.Draw ();
 
@@ -431,7 +431,7 @@ public class ViewDrawingFlowTests : TestDriverBase
         view.Draw ();
 
         // The drawn area should be excluded from the clip
-        Rectangle viewportScreen = view.ViewportToScreen (view.Viewport);
+        //Rectangle viewportScreen = view.ViewportToScreen (view.Viewport);
 
         // Points inside the view should be excluded
         // Note: This test depends on the DrawContext tracking, which may not exclude if nothing was actually drawn

@@ -11,9 +11,9 @@ public partial class View // Adornments
         if (this is not Adornment)
         {
             // TODO: Make the Adornments Lazy and only create them when needed
-            Margin = new (this);
-            Border = new (this);
-            Padding = new (this);
+            Margin = new Margin (this);
+            Border = new Border (this);
+            Padding = new Padding (this);
         }
     }
 
@@ -64,8 +64,6 @@ public partial class View // Adornments
     /// </remarks>
     public Margin? Margin { get; private set; }
 
-    private ShadowStyle _shadowStyle;
-
     /// <summary>
     ///     Gets or sets whether the View is shown with a shadow effect. The shadow is drawn on the right and bottom sides of
     ///     the
@@ -77,20 +75,17 @@ public partial class View // Adornments
     /// </remarks>
     public virtual ShadowStyle ShadowStyle
     {
-        get => _shadowStyle;
+        get;
         set
         {
-            if (_shadowStyle == value)
+            if (field == value)
             {
                 return;
             }
 
-            _shadowStyle = value;
+            field = value;
 
-            if (Margin is { })
-            {
-                Margin.ShadowStyle = value;
-            }
+            Margin?.ShadowStyle = value;
         }
     }
 
@@ -187,12 +182,12 @@ public partial class View // Adornments
         {
             if (Border!.Thickness == Thickness.Empty)
             {
-                Border.Thickness = new (1);
+                Border.Thickness = new Thickness (1);
             }
         }
         else
         {
-            Border!.Thickness = new (0);
+            Border!.Thickness = new Thickness (0);
         }
 
         Border.LineStyle = style;
