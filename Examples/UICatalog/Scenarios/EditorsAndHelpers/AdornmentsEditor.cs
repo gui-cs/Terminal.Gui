@@ -29,8 +29,7 @@ public class AdornmentsEditor : EditorBase
         BorderEditor?.AdornmentToEdit = ViewToEdit?.Border ?? null;
 
         PaddingEditor?.AdornmentToEdit = ViewToEdit?.Padding ?? null;
-
-        Padding?.Text = GetIdentifyingString (ViewToEdit);
+        base.OnViewToEditChanged ();
     }
 
     private string GetIdentifyingString (View? view)
@@ -56,12 +55,6 @@ public class AdornmentsEditor : EditorBase
         }
 
         return view.GetType ().Name;
-    }
-
-    public bool ShowViewIdentifier
-    {
-        get => Padding is { } && Padding.Thickness != Thickness.Empty;
-        set => Padding?.Thickness = value ? new Thickness (0, 2, 0, 0) : Thickness.Empty;
     }
 
     private void AdornmentsEditor_Initialized (object? sender, EventArgs e)

@@ -34,20 +34,24 @@ public abstract class EditorBase : View
         }
     }
 
-    private readonly ExpanderButton? _expanderButton;
-
     public ExpanderButton? ExpanderButton
     {
-        get => _expanderButton;
+        get;
         init
         {
-            if (ReferenceEquals (_expanderButton, value))
+            if (ReferenceEquals (field, value))
             {
                 return;
             }
 
-            _expanderButton = value;
+            field = value;
         }
+    }
+
+    public bool ShowViewIdentifier
+    {
+        get => Padding is { } && Padding.Thickness != Thickness.Empty;
+        set => Padding?.Thickness = value ? new Thickness (0, 2, 0, 0) : Thickness.Empty;
     }
 
     public bool UpdatingLayoutSettings { get; private set; }
@@ -89,7 +93,13 @@ public abstract class EditorBase : View
         }
     }
 
-    protected virtual void OnViewToEditChanged () { }
+    protected virtual void OnViewToEditChanged ()
+    {
+        if (ShowViewIdentifier)
+        {
+            Padding?.Text = ViewToEdit?.ToIdentifyingString () ?? "<none>";
+        }
+    }
 
     protected virtual void OnUpdateLayoutSettings () { }
 

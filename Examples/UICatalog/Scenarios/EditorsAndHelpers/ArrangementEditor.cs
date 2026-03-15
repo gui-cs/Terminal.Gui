@@ -31,6 +31,8 @@ public sealed class ArrangementEditor : EditorBase
         }
 
         _arrangementSelector.ValueChanged += ArrangementFlagsOnValueChanged;
+
+        base.OnViewToEditChanged ();
     }
 
     private void ArrangementFlagsOnValueChanged (object? sender, EventArgs<ViewArrangement?> e)
