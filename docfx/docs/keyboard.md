@@ -66,7 +66,7 @@ Key Bindings can be added at the <xref:Terminal.Gui.App.Application> or <xref:Te
 
 For **Application-scoped Key Bindings** there are two categories of Application-scoped Key Bindings:
 
-1) **Application Command Key Bindings** - Bindings for <xref:Terminal.Gui.Input.Command>s supported by <xref:Terminal.Gui.App.Application>. For example, `Application.QuitKey`, which is bound to `Command.Quit` and results in <xref:Terminal.Gui.App.Application.RequestStop(Terminal.Gui.App.IRunnable)> being called.
+1) **Application Command Key Bindings** - Bindings for <xref:Terminal.Gui.Input.Command>s supported by <xref:Terminal.Gui.App.Application>. For example, `Application.GetDefaultKey (Command.Quit)`, which is bound to `Command.Quit` in `Application.DefaultKeyBindings` and results in <xref:Terminal.Gui.App.Application.RequestStop(Terminal.Gui.App.IRunnable)> being called.
 2) **Application Key Bindings** - Bindings for <xref:Terminal.Gui.Input.Command>s supported on arbitrary <xref:Terminal.Gui.ViewBase.View>s that are meant to be invoked regardless of which part of the application is visible/active.
 
 Use `Application.Keyboard.KeyBindings` to add or modify Application-scoped Key Bindings. For backward compatibility, `Application.KeyBindings` also provides access to the same key bindings.
@@ -223,8 +223,8 @@ view.KeyDown += (s, key) =>
 
 * Implements support for `KeyBindingScope.Application`.
 * Keyboard functionality is now encapsulated in the <xref:Terminal.Gui.App.IKeyboard> interface, accessed via `Application.Keyboard`.
-* `Application.Keyboard` provides access to <xref:Terminal.Gui.Input.KeyBindings>, key binding configuration (QuitKey, ArrangeKey, navigation keys), and keyboard event handling.
-* For backward compatibility, <xref:Terminal.Gui.App.Application> still exposes static properties/methods that delegate to `Application.Keyboard` (e.g., `IApplication.KeyBindings`, `IApplication.RaiseKeyDownEvent`, `IApplication.QuitKey`).
+* `Application.Keyboard` provides access to <xref:Terminal.Gui.Input.KeyBindings>, key binding configuration (via `Application.DefaultKeyBindings` for commands like `Command.Quit`, `Command.Arrange`, and navigation commands), and keyboard event handling.
+* For backward compatibility, <xref:Terminal.Gui.App.Application> still exposes static properties/methods that delegate to `Application.Keyboard` (e.g., `IApplication.KeyBindings`, `IApplication.RaiseKeyDownEvent`).
 * Exposes cancelable `KeyDown` events (via `Handled = true`). The `RaiseKeyDownEvent` method is public and can be used to simulate keyboard input, although it is preferred to use `InputInjector` for testing.
 * The <xref:Terminal.Gui.App.IKeyboard> interface enables testability with isolated keyboard instances that don't depend on static Application state.
 
@@ -246,34 +246,31 @@ The <xref:Terminal.Gui.App.IKeyboard> interface provides a decoupled, testable a
 
 3. **Testability** - Unit tests can create isolated <xref:Terminal.Gui.App.IKeyboard> instances with mock <xref:Terminal.Gui.App.IApplication> references, enabling parallel test execution without interference.
 
-4. **Backward Compatibility** - All existing <xref:Terminal.Gui.App.Application> keyboard APIs (e.g., `Application.KeyBindings`, `Application.RaiseKeyDownEvent`, `Application.QuitKey`) remain available and delegate to `Application.Keyboard`.
+4. **Backward Compatibility** - All existing <xref:Terminal.Gui.App.Application> keyboard APIs (e.g., `Application.KeyBindings`, `Application.RaiseKeyDownEvent`) remain available and delegate to `Application.Keyboard`. Application-level command keys are configured via `Application.DefaultKeyBindings`.
 
 ### Usage Examples
 
 **Accessing keyboard functionality:**
 
 ```csharp
-// Modern approach - using IKeyboard
 App.Keyboard.KeyBindings.Add(Key.F1, Command.HotKey);
 App.Keyboard.RaiseKeyDownEvent(Key.Enter);
-App.Keyboard.QuitKey = Key.Q.WithCtrl;
+Application.DefaultKeyBindings[Command.Quit] = Bind.All (Key.Q.WithCtrl);
 ```
 
 **Testing with isolated keyboard instances:**
 
 ```csharp
 // Create independent keyboard instances for parallel tests
-var keyboard1 = new Keyboard();
-keyboard1.QuitKey = Key.Q.WithCtrl;
-keyboard1.KeyBindings.Add(Key.F1, Command.HotKey);
+var keyboard1 = new ApplicationKeyboard ();
+keyboard1.KeyBindings.Add (Key.Q.WithCtrl, Command.Quit);
 
-var keyboard2 = new Keyboard();
-keyboard2.QuitKey = Key.X.WithCtrl;
-keyboard2.KeyBindings.Add(Key.F2, Command.Accept);
+var keyboard2 = new ApplicationKeyboard ();
+keyboard2.KeyBindings.Add (Key.X.WithCtrl, Command.Quit);
 
-// keyboard1 and keyboard2 maintain completely separate state
-Assert.Equal(Key.Q.WithCtrl, keyboard1.QuitKey);
-Assert.Equal(Key.X.WithCtrl, keyboard2.QuitKey);
+// keyboard1 and keyboard2 maintain completely separate KeyBindings
+Assert.True (keyboard1.KeyBindings.TryGet (Key.Q.WithCtrl, out _));
+Assert.True (keyboard2.KeyBindings.TryGet (Key.X.WithCtrl, out _));
 ```
 
 **Accessing application context from views:**
@@ -306,7 +303,7 @@ public class MyView : View
 The `Keyboard` class implements <xref:Terminal.Gui.App.IKeyboard> and maintains:
 
 - **KeyBindings**: Application-scoped key binding dictionary
-- **Navigation Keys**: QuitKey, ArrangeKey, NextTabKey, PrevTabKey, NextTabGroupKey, PrevTabGroupKey
+- **Navigation Keys**: Configured via Application.DefaultKeyBindings dictionary (Quit, Arrange, NextTabStop, PreviousTabStop, NextTabGroup, PreviousTabGroup, Refresh, Suspend)
 - **Events**: `KeyDown` and `KeyUp` events for application-level keyboard monitoring
 - **Command Implementations**: Handlers for Application-scoped commands (Quit, Suspend, Navigation, Refresh, Arrange)
 
@@ -384,6 +381,92 @@ injector.InjectKey(Key.F1, options);
 - Testing patterns and best practices
 - Advanced scenarios (modifier keys, function keys, special keys)
 - Troubleshooting guide
+
+## Configurable Key Bindings
+
+Terminal.Gui uses a layered, platform-aware key binding architecture. All default key bindings are defined declaratively using `PlatformKeyBinding` records and can be overridden via [ConfigurationManager](config.md).
+
+### Three Layers
+
+Key bindings are organized in three layers, applied from lowest to highest priority:
+
+1. **`Application.DefaultKeyBindings`** - Application-wide bindings for commands like Quit, Suspend, Arrange, and tab navigation. This is a `[ConfigurationProperty]` and can be overridden via configuration.
+
+2. **`View.DefaultKeyBindings`** - Shared base bindings for all views, covering navigation (cursor keys, Home, End), clipboard (Copy, Cut, Paste), and editing (Undo, Redo, Delete). This is also a `[ConfigurationProperty]`.
+
+3. **Per-view `DefaultKeyBindings`** - View-specific bindings that layer on top of the base. For example, `TextField.DefaultKeyBindings` adds Emacs-style navigation (`Ctrl+B`, `Ctrl+F`), word movement (`Ctrl+CursorLeft`), and kill commands (`Ctrl+K`). These are plain static properties, not configurable via ConfigurationManager.
+
+Each view's constructor calls `ApplyKeyBindings (View.DefaultKeyBindings, <ViewType>.DefaultKeyBindings)` to combine the layers. Only commands that the view actually supports (via `GetSupportedCommands ()`) are bound. Keys already bound by a lower layer are not overwritten by a higher layer.
+
+### Platform-Aware Bindings
+
+Key bindings can vary by operating system using the `PlatformKeyBinding` record:
+
+```csharp
+public record PlatformKeyBinding
+{
+    public string []? All { get; init; }      // All platforms
+    public string []? Windows { get; init; }  // Windows only
+    public string []? Linux { get; init; }    // Linux only
+    public string []? Macos { get; init; }    // macOS only
+}
+```
+
+`All` keys apply on every platform. Platform-specific arrays add additional bindings on that platform. For example, `Undo` is bound to `Ctrl+Z` everywhere, but also to `Ctrl+/` on Linux and macOS:
+
+```csharp
+["Undo"] = Bind.AllPlus ("Ctrl+Z", nonWindows: ["Ctrl+/"]),
+```
+
+The `Bind` helper class provides factory methods:
+
+| Method | Description |
+|--------|-------------|
+| `Bind.All (...)` | Same keys on all platforms |
+| `Bind.AllPlus (key, nonWindows, windows, linux, macos)` | A base key on all platforms, plus platform-specific extras |
+| `Bind.NonWindows (...)` | Keys that apply only on Linux and macOS |
+| `Bind.Platform (windows, linux, macos)` | Fully platform-specific, no shared keys |
+
+### User Overrides via Configuration
+
+Users can override key bindings for any view type using `View.ViewKeyBindings` in a configuration file. The outer key is the view type name; the inner dictionary maps command names to `PlatformKeyBinding` objects:
+
+```json
+{
+  "View.ViewKeyBindings": {
+    "TextField": {
+      "Undo": { "All": ["Ctrl+Z"] },
+      "CutToEndOfLine": { "All": ["Ctrl+K"] }
+    },
+    "TextView": {
+      "Redo": { "All": ["Ctrl+Shift+Z"], "Windows": ["Ctrl+Y"] }
+    }
+  }
+}
+```
+
+`ViewKeyBindings` overrides are applied last (highest priority), after both `View.DefaultKeyBindings` and per-view `DefaultKeyBindings`.
+
+Application-level defaults can also be overridden:
+
+```json
+{
+  "Application.DefaultKeyBindings": {
+    "Quit": { "All": ["Ctrl+Q"] },
+    "Suspend": { "Linux": ["Ctrl+Z"], "Macos": ["Ctrl+Z"] }
+  }
+}
+```
+
+### Resolution Order
+
+When a view is created, key bindings are resolved in this order:
+
+1. `View.DefaultKeyBindings` (base layer - navigation, clipboard, editing)
+2. Per-view `DefaultKeyBindings` (e.g., `TextField.DefaultKeyBindings`)
+3. `View.ViewKeyBindings` user overrides (from configuration)
+
+At each layer, only commands supported by the view are bound, and keys already bound by a previous layer are skipped. This means user overrides take effect because they are applied last, after the default layers have established their bindings.
 
 ## Keyboard Tracing
 

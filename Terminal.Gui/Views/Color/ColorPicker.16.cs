@@ -1,6 +1,29 @@
 namespace Terminal.Gui.Views;
 
-/// <summary>A sinple color picker that supports the legacy 16 ANSI colors</summary>
+/// <summary>A simple color picker that supports the legacy 16 ANSI colors.</summary>
+/// <remarks>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Moves the selection left or right.</description>
+///         </item>
+///         <item>
+///             <term>Up / Down</term> <description>Moves the selection up or down.</description>
+///         </item>
+///     </list>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Double-Click</term> <description>Accepts the selected color (<see cref="Command.Accept"/>).</description>
+///         </item>
+///     </list>
+/// </remarks>
 public class ColorPicker16 : View, IValue<ColorName16>
 {
     /// <summary>Columns of color boxes</summary>

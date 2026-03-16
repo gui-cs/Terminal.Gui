@@ -1,4 +1,4 @@
-namespace UICatalog.Scenarios;
+﻿namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Pos.Align", "Demonstrates Pos.Align")]
 [ScenarioCategory ("Layout")]
@@ -20,7 +20,7 @@ public sealed class PosAlignDemo : Scenario
         // Setup - Create a top-level application window and configure it.
         using Window appWindow = new ()
         {
-            Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()} - {GetDescription ()}"
+            Title = $"{Application.GetDefaultKey (Command.Quit)} to Quit - Scenario: {GetName ()} - {GetDescription ()}"
         };
 
         SetupControls (appWindow, Dimension.Width, Schemes.Runnable);

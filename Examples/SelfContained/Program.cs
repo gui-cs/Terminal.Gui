@@ -6,6 +6,7 @@ using System.Globalization;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
+using Terminal.Gui.Input;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
@@ -62,7 +63,7 @@ public class ExampleWindow : Runnable<string>
     public ExampleWindow ()
     {
         BorderStyle = LineStyle.Single;
-        Title = $"Example App ({Application.QuitKey} to quit)";
+        Title = $"Example App ({Application.GetDefaultKey (Command.Quit)} to quit)";
 
         // Create input components and labels
         var usernameLabel = new Label { Text = "Username:" };

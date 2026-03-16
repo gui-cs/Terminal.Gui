@@ -59,9 +59,46 @@ namespace Terminal.Gui.Views;
 ///         };
 ///         dropdown.ValueChanged += (s, e) => MessageBox.Query ("Selected", dropdown.Text, "Ok");
 ///     </code>
+///     <para>
+///         Default key bindings are defined in <see cref="DefaultKeyBindings"/> (in addition to
+///         <see cref="TextField"/> bindings):
+///     </para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>F4</term> <description>Toggles the dropdown list open or closed.</description>
+///         </item>
+///         <item>
+///             <term>Alt+Down</term> <description>Toggles the dropdown list open or closed.</description>
+///         </item>
+///     </list>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Click</term> <description>Activates the dropdown (<see cref="Command.Activate"/>).</description>
+///         </item>
+///     </list>
 /// </remarks>
 public class DropDownList : TextField
 {
+    /// <summary>
+    ///     Gets or sets the view-specific default key bindings for <see cref="DropDownList"/>. Contains only bindings
+    ///     unique to this view; shared bindings come from <see cref="View.DefaultKeyBindings"/>.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    {
+        [Command.Toggle] = Bind.All (Key.F4, Key.CursorDown.WithAlt),
+    };
+
     private readonly Button? _toggleButton;
     private Popover<ListView, string?>? _listPopover;
 
@@ -138,12 +175,11 @@ public class DropDownList : TextField
         // Adjust TextField width to account for toggle button
         Width = Dim.Auto (minimumContentDim: Dim.Func (_ => _listPopover.ContentView?.MaxItemLength ?? 0));
 
-        // Add keyboard bindings
-        KeyBindings.Add (Key.F4, Command.Toggle);
-        KeyBindings.Add (Key.CursorDown.WithAlt, Command.Toggle);
-
         // Add command handler for toggle
         AddCommand (Command.Toggle, ToggleDropDown);
+
+        // Apply layered key bindings (base View layer + DropDownList-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
 
         MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
     }

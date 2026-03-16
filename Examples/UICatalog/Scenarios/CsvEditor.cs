@@ -45,7 +45,7 @@ public class CsvEditor : Scenario
 
         // StatusBar
         StatusBar statusBar = new ([
-                                       new (Application.QuitKey, "Quit", Quit, "Quit!"),
+                                       new (Application.GetDefaultKey (Command.Quit), "Quit", Quit, "Quit!"),
                                        new (Key.O.WithCtrl, "Open", Open, "Open a file."),
                                        new (Key.S.WithCtrl, "Save", Save, "Save current."),
                                        new ()

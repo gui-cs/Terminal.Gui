@@ -16,7 +16,7 @@ namespace Terminal.Gui.Views;
 ///     </para>
 ///     <para>
 ///         To run modally, pass the dialog to <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>.
-///         The dialog executes until terminated by <see cref="Application.QuitKey"/> (Esc by default),
+///         The dialog executes until terminated by <see cref="Application.GetDefaultKey"/> (Esc by default),
 ///         a press of one of the <see cref="Buttons"/>, or if any subview receives the <see cref="Command.Accept"/>
 ///         command
 ///         and does not handle it.

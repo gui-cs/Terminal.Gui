@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 namespace UICatalog.Scenarios;
 
@@ -155,7 +155,7 @@ public class MenuBarsWithoutPopovers : Scenario
 
                                                     },
                                                     new Line (),
-                                                    new MenuItem { Title = "_Quit", Key = Application.QuitKey }
+                                                    new MenuItem { Title = "_Quit", Key = Application.GetDefaultKey (Command.Quit) }
                                                 ])
             {
                 Id = "FileMenu",

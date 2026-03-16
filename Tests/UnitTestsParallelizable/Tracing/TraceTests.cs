@@ -2,8 +2,8 @@
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
+using UnitTests.Parallelizable;
 
 namespace ApplicationTests;
 
@@ -13,15 +13,8 @@ namespace ApplicationTests;
 ///     In Release, <c>[Conditional("DEBUG")]</c> trace methods are no-ops,
 ///     so capture-based assertions verify entries are empty instead.
 /// </summary>
-public class TraceTests
+public class TraceTests (ITestOutputHelper output)
 {
-    private readonly ITestOutputHelper _output;
-
-    public TraceTests (ITestOutputHelper output)
-    {
-        _output = output;
-    }
-
     [Fact]
     public void CommandEnabled_Default_IsFalse ()
     {
@@ -389,6 +382,130 @@ public class TraceTests
         }
     }
 
+    #region Configuration Category Tests
+
+    // Copilot
+    [Fact]
+    public void TraceCategory_Configuration_HasExpectedValue ()
+    {
+        Assert.Equal (32, (int)TraceCategory.Configuration);
+    }
+
+    // Copilot
+    [Fact]
+    public void TraceCategory_All_IncludesConfiguration ()
+    {
+        Assert.True (TraceCategory.All.HasFlag (TraceCategory.Configuration));
+    }
+
+    // Copilot
+    [Fact]
+    public void Configuration_Category_CanBeEnabled ()
+    {
+        Trace.EnabledCategories = TraceCategory.None;
+
+        try
+        {
+            Trace.EnabledCategories = TraceCategory.Configuration;
+
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Configuration));
+        }
+        finally
+        {
+            Trace.EnabledCategories = TraceCategory.None;
+            Trace.Backend = new NullBackend ();
+        }
+    }
+
+    // Copilot
+    [Fact]
+    public void ConfigurationTrace_CapturesEntries ()
+    {
+        ListBackend backend = new ();
+        Trace.Backend = backend;
+        Trace.EnabledCategories = TraceCategory.Configuration;
+
+        try
+        {
+            Trace.Configuration ("my-property", "Apply", "test message");
+
+#if DEBUG
+            Assert.Single (backend.Entries);
+            Assert.Equal (TraceCategory.Configuration, backend.Entries [0].Category);
+            Assert.Contains ("my-property", backend.Entries [0].Id);
+            Assert.Equal ("Apply", backend.Entries [0].Phase);
+#else
+            // In Release, [Conditional("DEBUG")] removes Trace.Configuration calls entirely
+            Assert.Empty (backend.Entries);
+#endif
+        }
+        finally
+        {
+            Trace.EnabledCategories = TraceCategory.None;
+            Trace.Backend = new NullBackend ();
+        }
+    }
+
+    // Copilot
+    [Fact]
+    public void LoggingBackend_FormatsConfigurationCorrectly ()
+    {
+        LoggingBackend backend = new ();
+
+        TraceEntry entry = new (
+                                TraceCategory.Configuration,
+                                "my-property",
+                                "Apply",
+                                "InternalApply",
+                                "Test configuration trace",
+                                DateTime.UtcNow,
+                                null);
+
+        // Verify the Configuration case in the switch does not throw
+        backend.Log (entry);
+
+        Assert.True (true);
+    }
+
+    #endregion
+
+    #region Draw Category Tests
+
+    // Copilot
+    [Fact]
+    public void TraceCategory_Draw_HasExpectedValue ()
+    {
+        Assert.Equal (64, (int)TraceCategory.Draw);
+    }
+
+    // Copilot
+    [Fact]
+    public void TraceCategory_All_IncludesDraw ()
+    {
+        Assert.True (TraceCategory.All.HasFlag (TraceCategory.Draw));
+    }
+
+    // Copilot
+    [Fact]
+    public void Draw_Category_CanBeEnabled ()
+    {
+        Trace.EnabledCategories = TraceCategory.None;
+
+        try
+        {
+            Trace.EnabledCategories = TraceCategory.Draw;
+
+            Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Draw));
+        }
+        finally
+        {
+            Trace.EnabledCategories = TraceCategory.None;
+            Trace.Backend = new NullBackend ();
+        }
+    }
+
+    #endregion
+
     #region Scenario Tests (merged from IssueScenarioTraceTests)
 
     /// <summary>
@@ -397,13 +514,13 @@ public class TraceTests
     [Fact]
     public void Example_Test_With_Tracing_Enabled ()
     {
-        using (TestLogging.Verbose (traceCategories: TraceCategory.Command, output: _output))
+        using (TestLogging.Verbose (traceCategories: TraceCategory.Command, output: output))
         {
             CheckBox checkbox = new () { Id = "checkbox" };
 
             checkbox.InvokeCommand (Command.Activate);
 
-            _output.WriteLine ("Command tracing enabled successfully without affecting other tests");
+            output.WriteLine ("Command tracing enabled successfully without affecting other tests");
         }
     }
 
@@ -432,7 +549,7 @@ public class TraceTests
     [Fact]
     public void Parallel_Test_With_Mouse_Tracing ()
     {
-        using (TestLogging.Verbose (_output, TraceCategory.Mouse))
+        using (TestLogging.Verbose (output, TraceCategory.Mouse))
         {
             Assert.True (Trace.EnabledCategories.HasFlag (TraceCategory.Mouse));
             Assert.False (Trace.EnabledCategories.HasFlag (TraceCategory.Command));

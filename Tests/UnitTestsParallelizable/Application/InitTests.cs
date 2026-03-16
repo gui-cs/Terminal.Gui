@@ -1,4 +1,4 @@
-using Terminal.Gui.Tests;
+using UnitTests.Parallelizable;
 
 namespace ApplicationTests.Init;
 
@@ -94,17 +94,26 @@ public class InitTests (ITestOutputHelper output)
     {
         using (TestLogging.Verbose (_output))
         {
-            IApplication app = Application.Create ();
+            PlatformKeyBinding original = Application.DefaultKeyBindings! [Command.Quit];
 
-            // Set via Keyboard property (modern API)
-            app.Keyboard.QuitKey = Key.Q;
-            Assert.Equal (Key.Q, app.Keyboard.QuitKey);
+            try
+            {
+                IApplication app = Application.Create ();
 
-            app.Init (DriverRegistry.Names.ANSI);
+                // Set via static DefaultKeyBindings (modern API)
+                Application.DefaultKeyBindings! [Command.Quit] = Bind.All (Key.Q);
+                Assert.Equal (Key.Q, Application.GetDefaultKey (Command.Quit));
 
-            Assert.Equal (Key.Q, app.Keyboard.QuitKey);
+                app.Init (DriverRegistry.Names.ANSI);
 
-            app.Dispose ();
+                Assert.Equal (Key.Q, Application.GetDefaultKey (Command.Quit));
+
+                app.Dispose ();
+            }
+            finally
+            {
+                Application.DefaultKeyBindings! [Command.Quit] = original;
+            }
         }
     }
 
@@ -159,18 +168,33 @@ public class InitTests (ITestOutputHelper output)
             app = Application.Create ();
             app.Init (DriverRegistry.Names.ANSI);
 
-            app.StopAfterFirstIteration = true;
-            app.Keyboard.PrevTabGroupKey = Key.A;
-            app.Keyboard.NextTabGroupKey = Key.B;
-            app.Keyboard.QuitKey = Key.C;
-            app.Keyboard.KeyBindings.Add (Key.D, Command.Cancel);
+            // Save static DefaultKeyBindings entries before mutation
+            PlatformKeyBinding origPrevTabGroup = Application.DefaultKeyBindings! [Command.PreviousTabGroup];
+            PlatformKeyBinding origNextTabGroup = Application.DefaultKeyBindings! [Command.NextTabGroup];
+            PlatformKeyBinding origQuit = Application.DefaultKeyBindings! [Command.Quit];
 
-            app.Mouse.CachedViewsUnderMouse.Clear ();
-            app.Mouse.LastMousePosition = new Point (1, 1);
+            try
+            {
+                app.StopAfterFirstIteration = true;
+                Application.DefaultKeyBindings! [Command.PreviousTabGroup] = Bind.All (Key.A);
+                Application.DefaultKeyBindings! [Command.NextTabGroup] = Bind.All (Key.B);
+                Application.DefaultKeyBindings! [Command.Quit] = Bind.All (Key.C);
+                app.Keyboard.KeyBindings.Add (Key.D, Command.Cancel);
 
-            // Dispose and check reset
-            app.Dispose ();
-            CheckReset (app);
+                app.Mouse.CachedViewsUnderMouse.Clear ();
+                app.Mouse.LastMousePosition = new Point (1, 1);
+
+                // Dispose and check reset
+                app.Dispose ();
+                CheckReset (app);
+            }
+            finally
+            {
+                // Restore static DefaultKeyBindings to avoid polluting other parallel tests
+                Application.DefaultKeyBindings! [Command.PreviousTabGroup] = origPrevTabGroup;
+                Application.DefaultKeyBindings! [Command.NextTabGroup] = origNextTabGroup;
+                Application.DefaultKeyBindings! [Command.Quit] = origQuit;
+            }
         }
 
         return;

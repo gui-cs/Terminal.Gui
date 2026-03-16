@@ -4,13 +4,13 @@ namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Displays a modal message box with a title, message, and buttons. Returns the index of the selected button,
-///     or <see langword="null"/> if the user cancels with <see cref="Application.QuitKey"/>.
+///     or <see langword="null"/> if the user cancels with <see cref="Application.GetDefaultKey"/>.
 /// </summary>
 /// <remarks>
 ///     <para>
 ///         MessageBox provides static methods for displaying modal dialogs with customizable buttons and messages.
 ///         All methods return <see langword="int?"/> where the value is the 0-based index of the button pressed,
-///         or <see langword="null"/> if the user pressed <see cref="Application.QuitKey"/> (typically Esc).
+///         or <see langword="null"/> if the user pressed <see cref="Application.GetDefaultKey"/> (typically Esc).
 ///     </para>
 ///     <para>
 ///         <see cref="Query(IApplication, string, string, string[])"/> uses the default Dialog color scheme.
@@ -84,7 +84,7 @@ public static class MessageBox
     /// <param name="buttons">Array of button labels.</param>
     /// <returns>
     ///     The index of the selected button, or <see langword="null"/> if the user pressed
-    ///     <see cref="Application.QuitKey"/>.
+    ///     <see cref="Application.GetDefaultKey"/>.
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
@@ -115,7 +115,7 @@ public static class MessageBox
     /// <param name="buttons">Array of button labels.</param>
     /// <returns>
     ///     The index of the selected button, or <see langword="null"/> if the user pressed
-    ///     <see cref="Application.QuitKey"/>.
+    ///     <see cref="Application.GetDefaultKey"/>.
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
@@ -150,7 +150,7 @@ public static class MessageBox
     /// <param name="buttons">Array of button labels.</param>
     /// <returns>
     ///     The index of the selected button, or <see langword="null"/> if the user pressed
-    ///     <see cref="Application.QuitKey"/>.
+    ///     <see cref="Application.GetDefaultKey"/>.
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
@@ -177,7 +177,7 @@ public static class MessageBox
     /// <param name="buttons">Array of button labels.</param>
     /// <returns>
     ///     The index of the selected button, or <see langword="null"/> if the user pressed
-    ///     <see cref="Application.QuitKey"/>.
+    ///     <see cref="Application.GetDefaultKey"/>.
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
@@ -204,7 +204,7 @@ public static class MessageBox
     /// <param name="buttons">Array of button labels.</param>
     /// <returns>
     ///     The index of the selected button, or <see langword="null"/> if the user pressed
-    ///     <see cref="Application.QuitKey"/>.
+    ///     <see cref="Application.GetDefaultKey"/>.
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
@@ -235,7 +235,7 @@ public static class MessageBox
     /// <param name="buttons">Array of button labels.</param>
     /// <returns>
     ///     The index of the selected button, or <see langword="null"/> if the user pressed
-    ///     <see cref="Application.QuitKey"/>.
+    ///     <see cref="Application.GetDefaultKey"/>.
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>

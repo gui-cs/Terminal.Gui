@@ -5,6 +5,18 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         <see cref="RadioStyle"/> is used to display radio button style glyphs (●) instead of checkbox style glyphs (☑).
 ///     </para>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Click</term> <description>Toggles the checked state (<see cref="Command.Activate"/>).</description>
+///         </item>
+///         <item>
+///             <term>Double-Click</term> <description>Accepts the checkbox (<see cref="Command.Accept"/>).</description>
+///         </item>
+///     </list>
 /// </remarks>
 public class CheckBox : View, IValue<CheckState>
 {

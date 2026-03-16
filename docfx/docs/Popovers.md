@@ -34,7 +34,7 @@ The `IPopoverView` interface defines the popover contract: visibility, enabled s
 
 - **Full-screen sizing** — `Width = Dim.Fill()`, `Height = Dim.Fill()`
 - **Transparency** — `ViewportSettings.Transparent | ViewportSettings.TransparentMouse`
-- **Dismiss key** — Binds `Application.QuitKey` to `Command.Quit`
+- **Dismiss key** — Binds `Application.GetDefaultKey (Command.Quit)` to `Command.Quit`
 - **Focus management** — Restores focus to the previously-focused view when hidden
 - **Layout on show** — Lays out the popover to fit the screen when becoming visible
 - **Target** — Weak reference to a target view with automatic `CommandBridge` for command routing
@@ -153,7 +153,7 @@ A View qualifies as a popover if it:
 3. **Is Transparent** — `ViewportSettings` includes both:
    - `ViewportSettings.Transparent` — Allows content beneath to show through
    - `ViewportSettings.TransparentMouse` — Mouse clicks outside SubViews pass through
-4. **Handles Quit** — Binds `Application.QuitKey` to `Command.Quit` and sets `Visible = false`
+4. **Handles Quit** — Binds `Application.GetDefaultKey (Command.Quit)` to `Command.Quit` and sets `Visible = false`
 
 `PopoverImpl` provides all these requirements by default.
 
@@ -209,7 +209,7 @@ Application.Popover?.Hide (popover);
 popover.Visible = false;
 
 // Automatic hiding occurs when:
-// - User presses Application.QuitKey (typically Esc)
+// - User presses the quit key (typically Esc; see Application.GetDefaultKey (Command.Quit))
 // - User clicks outside the popover (not on a SubView)
 // - Another popover is shown
 ```

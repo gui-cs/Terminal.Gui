@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Text;
@@ -135,7 +135,7 @@ public sealed class UICatalogRunnable : Runnable
                                                         {
                                                             Title = Strings.cmdQuit,
                                                             HelpText = "Quit UI Catalog",
-                                                            Key = Application.QuitKey,
+                                                            Key = Application.GetDefaultKey (Command.Quit),
 
                                                             // By not specifying TargetView the Key Binding will be Application-level
                                                             Command = Command.Quit
@@ -398,6 +398,48 @@ public sealed class UICatalogRunnable : Runnable
                 Enabled = false, CommandView = navTraceCheckBox, HelpText = "Toggle Focus & TabBehavior tracing", Key = Key.K.WithCtrl
             });
 
+            CheckBox configTraceCheckBox = new ()
+            {
+                Text = "Con_figuration",
+                Value = Trace.EnabledCategories.HasFlag (TraceCategory.Configuration) ? CheckState.Checked : CheckState.UnChecked,
+                CanFocus = false
+            };
+
+            configTraceCheckBox.ValueChanging += (_, e) =>
+                                                 {
+                                                     if (e.NewValue == CheckState.Checked)
+                                                     {
+                                                         Trace.EnabledCategories |= TraceCategory.Configuration;
+                                                     }
+                                                     else
+                                                     {
+                                                         Trace.EnabledCategories &= ~TraceCategory.Configuration;
+                                                     }
+                                                 };
+
+            menuItems.Add (new MenuItem { CommandView = configTraceCheckBox, HelpText = "Toggle Configuration management tracing" });
+
+            CheckBox drawTraceCheckBox = new ()
+            {
+                Text = "_Draw",
+                Value = Trace.EnabledCategories.HasFlag (TraceCategory.Draw) ? CheckState.Checked : CheckState.UnChecked,
+                CanFocus = false
+            };
+
+            drawTraceCheckBox.ValueChanging += (_, e) =>
+                                               {
+                                                   if (e.NewValue == CheckState.Checked)
+                                                   {
+                                                       Trace.EnabledCategories |= TraceCategory.Draw;
+                                                   }
+                                                   else
+                                                   {
+                                                       Trace.EnabledCategories &= ~TraceCategory.Draw;
+                                                   }
+                                               };
+
+            menuItems.Add (new MenuItem { CommandView = drawTraceCheckBox, HelpText = "Toggle Draw operation tracing" });
+
             // add a separator
             menuItems.Add (new Line ());
 
@@ -643,7 +685,7 @@ public sealed class UICatalogRunnable : Runnable
         StatusBar statusBar = new () { AlignmentModes = AlignmentModes.IgnoreFirstOrLast, CanFocus = false };
 
         // This demonstrates a shortcut that invokes RequestStop to quit the app
-        _shQuit = new Shortcut { CanFocus = false, Title = "Quit", Key = Application.QuitKey, Action = RequestStop };
+        _shQuit = new Shortcut { CanFocus = false, Title = "Quit", Key = Application.GetDefaultKey (Command.Quit), Action = RequestStop };
 
         _shVersion = new Shortcut { Title = "Version Info", CanFocus = false };
 
@@ -707,7 +749,7 @@ public sealed class UICatalogRunnable : Runnable
 
         SchemeName = CachedRunnableScheme;
 
-        _shQuit?.Key = Application.QuitKey;
+        _shQuit?.Key = Application.GetDefaultKey (Command.Quit);
 
         _disableMouseCb!.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
         _force16ColorsShortcutCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
