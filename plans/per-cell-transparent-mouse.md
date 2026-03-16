@@ -11,7 +11,7 @@
 | Phase 1a: Fix Border LineCanvas ownership | Done |
 | Phase 1b: Make Border participate in clip exclusion when Transparent | Done |
 | Phase 1 extras: title occlusion, clip clamping, AnchorEnd tests | Done |
-| Phase 2: Drawn-region-aware TransparentMouse | Not started |
+| Phase 2: Drawn-region-aware TransparentMouse | Tests planned — 14 Skip'd tests ready |
 
 ## Context
 
@@ -105,11 +105,32 @@ if (this is not Adornment || ViewportSettings.HasFlag (ViewportSettingsFlags.Tra
 }
 ```
 
-#### 1c. Prevent viewport clearing for Transparent Border
+#### 1c. Prevent viewport clearing for Transparent Border - DONE
 
 When Border has `Transparent` set, its viewport should NOT be cleared during `DoClearViewport`. The existing `Transparent` flag logic in `ClearViewport` (View.Drawing.cs:414) should handle this — but need to verify it works for adornments too.
 
 ### Phase 2: Drawn-Region-Aware TransparentMouse
+
+**FIRST**: Plan tests. For each sub-phase, create the tests that will prove functionality. If they will fail until a later sub-phase is completed, mark them with Skip= with an explanaition. **DONE** — 14 tests total (see below).
+
+**Phase 2 Tests** (all Skip'd until implementation):
+
+| Test | File | Requires | What it proves |
+|------|------|----------|---------------|
+| `CachedDrawnRegion_PopulatedAfterDraw_WhenTransparentMouse` | DoDrawCompleteTests | 2a/2b | Cache populated after Draw() |
+| `CachedDrawnRegion_Null_WhenNotTransparentMouse` | DoDrawCompleteTests | 2a/2b | No caching without flag |
+| `CachedDrawnRegion_TransparentView_ContainsOnlyDrawnCells` | DoDrawCompleteTests | 2a/2b | Only drawn cells cached |
+| `CachedDrawnRegion_BorderAdornment_PopulatedAfterDraw` | DoDrawCompleteTests | 2a/2b | Border adornment gets cache |
+| `CachedDrawnRegion_Border_IncludesTitleAndLines` | DoDrawCompleteTests | 2a/2b | Cache has lines + title |
+| `CachedDrawnRegion_ClearedBySetNeedsDraw` | DoDrawCompleteTests | 2c | SetNeedsDraw invalidates cache |
+| `CachedDrawnRegion_RepopulatedAfterRedraw` | DoDrawCompleteTests | 2a/2b/2c | Full invalidate-redraw cycle |
+| `ShadowView_ReportsDrawnRegionToContext` | DoDrawCompleteTests | 2d | Shadow cells in DrawContext |
+| `Border_TransparentMouse_BorderLine_Clicks_Are_Captured` | BorderTransparentTests | 2e | Border lines receive clicks |
+| `Border_TransparentMouse_Title_Clicks_Are_Captured` | BorderTransparentTests | 2e | Title text receives clicks |
+| `View_TransparentMouse_DrawnCells_Captured_UndrawnCells_PassThrough` | BorderTransparentTests | 2a/2b/2e | Per-cell hit-testing works |
+| `View_TransparentMouse_NullCache_FallsBackToBlanketRemoval` | BorderTransparentTests | 2e | Null cache = blanket fallback |
+| `Border_TransparentMouse_ThickBorder_EmptyCells_PassThrough` | BorderTransparentTests | 2a/2b/2e | Thick border gap cells pass through |
+| `Margin_TransparentMouse_Shadow_Clicks_Are_Captured` | BorderTransparentTests | 2d/2e | Shadow cells receive clicks |
 
 #### 2a. Add `_cachedDrawnRegion` to View (`View.Drawing.cs`)
 

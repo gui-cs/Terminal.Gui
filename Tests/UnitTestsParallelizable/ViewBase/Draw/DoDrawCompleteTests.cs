@@ -320,6 +320,300 @@ public class DoDrawCompleteTests : TestDriverBase
         Assert.False (drawnRegion.Contains (0, 0), "Uncovered area of transparent parent should not be in DrawContext");
     }
 
+    #region Phase 2: CachedDrawnRegion tests
+
+    /// <summary>
+    ///     Verifies that CachedDrawnRegion is populated after Draw() for a view with TransparentMouse set.
+    ///     Requires Phase 2a (add _cachedDrawnRegion field) and 2b (cache in DoDrawComplete).
+    /// </summary>
+    [Fact (Skip = "Phase 2a/2b — CachedDrawnRegion not yet implemented")]
+    public void CachedDrawnRegion_PopulatedAfterDraw_WhenTransparentMouse ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.Clip = new Region (driver.Screen);
+
+        View view = new ()
+        {
+            X = 5,
+            Y = 5,
+            Width = 10,
+            Height = 10,
+            Driver = driver,
+            ViewportSettings = ViewportSettingsFlags.TransparentMouse
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        // Before draw, CachedDrawnRegion should be null.
+        Assert.Null (view.CachedDrawnRegion);
+
+        view.Draw ();
+
+        // After draw, CachedDrawnRegion should be populated (opaque view draws its entire frame).
+        Assert.NotNull (view.CachedDrawnRegion);
+        Assert.False (view.CachedDrawnRegion!.IsEmpty ());
+    }
+
+    /// <summary>
+    ///     Verifies that CachedDrawnRegion is NOT populated for views without TransparentMouse.
+    ///     No point caching for views that won't be filtered during hit-testing.
+    ///     Requires Phase 2a/2b.
+    /// </summary>
+    [Fact (Skip = "Phase 2a/2b — CachedDrawnRegion not yet implemented")]
+    public void CachedDrawnRegion_Null_WhenNotTransparentMouse ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.Clip = new Region (driver.Screen);
+
+        View view = new ()
+        {
+            X = 5,
+            Y = 5,
+            Width = 10,
+            Height = 10,
+            Driver = driver
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        view.Draw ();
+
+        // No TransparentMouse flag = no caching.
+        Assert.Null (view.CachedDrawnRegion);
+    }
+
+    /// <summary>
+    ///     Verifies that CachedDrawnRegion is cleared when SetNeedsDraw is called.
+    ///     Requires Phase 2c (invalidate cache in SetNeedsDraw).
+    /// </summary>
+    [Fact (Skip = "Phase 2c — CachedDrawnRegion invalidation not yet implemented")]
+    public void CachedDrawnRegion_ClearedBySetNeedsDraw ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.Clip = new Region (driver.Screen);
+
+        View view = new ()
+        {
+            X = 5,
+            Y = 5,
+            Width = 10,
+            Height = 10,
+            Driver = driver,
+            ViewportSettings = ViewportSettingsFlags.TransparentMouse
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        view.Draw ();
+        Assert.NotNull (view.CachedDrawnRegion);
+
+        // SetNeedsDraw should invalidate the cache.
+        view.SetNeedsDraw ();
+        Assert.Null (view.CachedDrawnRegion);
+    }
+
+    /// <summary>
+    ///     Verifies that for a transparent view with TransparentMouse, CachedDrawnRegion contains
+    ///     only the actually-drawn cells, not the entire frame.
+    ///     Requires Phase 2a/2b.
+    /// </summary>
+    [Fact (Skip = "Phase 2a/2b — CachedDrawnRegion not yet implemented")]
+    public void CachedDrawnRegion_TransparentView_ContainsOnlyDrawnCells ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.Clip = new Region (driver.Screen);
+
+        TransparentDrawingView view = new ()
+        {
+            X = 5,
+            Y = 5,
+            Width = 20,
+            Height = 20,
+            Driver = driver,
+            ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse,
+            DrawRect = new Rectangle (2, 2, 5, 5)
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        view.Draw ();
+
+        Assert.NotNull (view.CachedDrawnRegion);
+
+        // The drawn rect (viewport 2,2 5x5 → screen 7,7 5x5) should be in the cached region.
+        Rectangle drawnScreen = view.ViewportToScreen (view.DrawRect);
+        Assert.True (view.CachedDrawnRegion!.Contains (drawnScreen.X + 1, drawnScreen.Y + 1),
+                     "Drawn area should be in CachedDrawnRegion");
+
+        // An undrawn area within the viewport should NOT be in the cached region.
+        Assert.False (view.CachedDrawnRegion.Contains (view.ViewportToScreen (view.Viewport).X, view.ViewportToScreen (view.Viewport).Y),
+                      "Undrawn area should not be in CachedDrawnRegion");
+    }
+
+    /// <summary>
+    ///     Verifies that a Border adornment with TransparentMouse gets its CachedDrawnRegion populated
+    ///     after Draw(). The cached region should contain the border line cells.
+    ///     Requires Phase 2a/2b.
+    /// </summary>
+    [Fact (Skip = "Phase 2a/2b — CachedDrawnRegion not yet implemented")]
+    public void CachedDrawnRegion_BorderAdornment_PopulatedAfterDraw ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.Clip = new Region (driver.Screen);
+
+        View view = new ()
+        {
+            X = 5,
+            Y = 5,
+            Width = 10,
+            Height = 10,
+            BorderStyle = LineStyle.Single,
+            Driver = driver
+        };
+        view.Border!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        Assert.Null (view.Border.CachedDrawnRegion);
+
+        view.Draw ();
+
+        // After draw, Border's CachedDrawnRegion should be populated with the border line cells.
+        Assert.NotNull (view.Border.CachedDrawnRegion);
+        Assert.False (view.Border.CachedDrawnRegion!.IsEmpty ());
+
+        // A point on the top border line (screen coords) should be in the cached region.
+        Rectangle borderFrame = view.Border.FrameToScreen ();
+        Assert.True (view.Border.CachedDrawnRegion.Contains (borderFrame.X, borderFrame.Y),
+                     "Top-left border line cell should be in Border's CachedDrawnRegion");
+    }
+
+    /// <summary>
+    ///     Verifies that a Border's CachedDrawnRegion includes both border lines (from LineCanvas)
+    ///     AND title text. Both are "drawn content" and should receive mouse events.
+    ///     Requires Phase 2a/2b.
+    /// </summary>
+    [Fact (Skip = "Phase 2a/2b — CachedDrawnRegion not yet implemented")]
+    public void CachedDrawnRegion_Border_IncludesTitleAndLines ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.Clip = new Region (driver.Screen);
+
+        View view = new ()
+        {
+            Title = "Test",
+            X = 0,
+            Y = 0,
+            Width = 12,
+            Height = 5,
+            BorderStyle = LineStyle.Single,
+            Driver = driver
+        };
+        view.Border!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        view.Draw ();
+
+        Assert.NotNull (view.Border.CachedDrawnRegion);
+
+        // The top-left corner (a border line character) should be in the cached region.
+        Rectangle borderFrame = view.Border.FrameToScreen ();
+        Assert.True (view.Border.CachedDrawnRegion!.Contains (borderFrame.X, borderFrame.Y),
+                     "Border line cell should be in CachedDrawnRegion");
+
+        // The title "Test" starts after "┌┤" — at column 2 on the top border row.
+        // The title text cells should also be in the cached region.
+        Assert.True (view.Border.CachedDrawnRegion.Contains (borderFrame.X + 2, borderFrame.Y),
+                     "Title text cell should be in CachedDrawnRegion");
+
+        // Interior cell (inside the border, not on a line) should NOT be in the cached region.
+        Assert.False (view.Border.CachedDrawnRegion.Contains (borderFrame.X + 2, borderFrame.Y + 2),
+                      "Interior cell should not be in Border's CachedDrawnRegion");
+    }
+
+    /// <summary>
+    ///     Verifies that ShadowView reports its drawn region to the DrawContext.
+    ///     This is needed so that Margin's CachedDrawnRegion includes shadow cells.
+    ///     Requires Phase 2d (ShadowView reports drawn region).
+    /// </summary>
+    [Fact (Skip = "Phase 2d — ShadowView drawn region reporting not yet implemented")]
+    public void ShadowView_ReportsDrawnRegionToContext ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.Clip = new Region (driver.Screen);
+
+        View view = new ()
+        {
+            X = 1,
+            Y = 1,
+            Width = 5,
+            Height = 3,
+            ShadowStyle = ShadowStyle.Opaque,
+            Driver = driver
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        DrawContext context = new ();
+        view.Draw (context);
+
+        // The Margin should have a non-empty drawn region because ShadowView drew shadow cells.
+        // The shadow occupies the right column and bottom row of the Margin.
+        Region drawnRegion = context.GetDrawnRegion ();
+
+        // The shadow is at the right (col 6) and bottom (row 4) relative to screen.
+        // At minimum, some shadow cells should have been reported.
+        Assert.False (drawnRegion.IsEmpty (), "DrawContext should contain shadow drawn region");
+    }
+
+    /// <summary>
+    ///     Verifies that CachedDrawnRegion is repopulated after a redraw following invalidation.
+    ///     Requires Phase 2a/2b/2c.
+    /// </summary>
+    [Fact (Skip = "Phase 2a/2b/2c — CachedDrawnRegion not yet implemented")]
+    public void CachedDrawnRegion_RepopulatedAfterRedraw ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.Clip = new Region (driver.Screen);
+
+        View view = new ()
+        {
+            X = 5,
+            Y = 5,
+            Width = 10,
+            Height = 10,
+            Driver = driver,
+            ViewportSettings = ViewportSettingsFlags.TransparentMouse
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        // First draw — cache populated.
+        view.Draw ();
+        Assert.NotNull (view.CachedDrawnRegion);
+
+        // Invalidate — cache cleared.
+        view.SetNeedsDraw ();
+        Assert.Null (view.CachedDrawnRegion);
+
+        // Second draw — cache repopulated.
+        driver.Clip = new Region (driver.Screen);
+        view.Draw ();
+        Assert.NotNull (view.CachedDrawnRegion);
+        Assert.False (view.CachedDrawnRegion!.IsEmpty ());
+    }
+
+    #endregion
+
     /// <summary>
     ///     Helper view that draws a specific rectangle and reports it to DrawContext.
     ///     Used for testing transparent view clip exclusion.

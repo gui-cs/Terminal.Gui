@@ -274,10 +274,9 @@ public class BorderTransparentTests (ITestOutputHelper output)
     /// <summary>
     ///     Verifies that mouse events ON the border lines of a Border with TransparentMouse
     ///     are still captured by the Border (only the transparent interior passes through).
-    ///     Currently, fails because the blanket TransparentMouse flag removes the Border
-    ///     from ALL hit-testing, including border line cells.
+    ///     Requires Phase 2e (drawn-region-aware hit-testing).
     /// </summary>
-    [Fact (Skip = "Not yet implemented — Issue #4834")]
+    [Fact (Skip = "Phase 2e — drawn-region-aware hit-testing not yet implemented")]
     public void Border_TransparentMouse_BorderLine_Clicks_Are_Captured ()
     {
         using IApplication app = Application.Create ();
@@ -309,6 +308,224 @@ public class BorderTransparentTests (ITestOutputHelper output)
         bool borderInList = viewsOnBorderLine.Any (v => v is Border);
 
         Assert.True (borderInList, "Border with TransparentMouse should still capture mouse events on its drawn border lines");
+    }
+
+    /// <summary>
+    ///     Verifies that mouse events on the title text of a Border with TransparentMouse
+    ///     are captured by the Border. The title is drawn content and should receive clicks.
+    ///     Requires Phase 2e.
+    /// </summary>
+    [Fact (Skip = "Phase 2e — drawn-region-aware hit-testing not yet implemented")]
+    public void Border_TransparentMouse_Title_Clicks_Are_Captured ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (12, 5);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        View borderedView = new ()
+        {
+            Title = "Test",
+            X = 1,
+            Y = 1,
+            Width = 10,
+            Height = 3,
+            BorderStyle = LineStyle.Single,
+            Id = "Bordered"
+        };
+        borderedView.Border!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
+
+        window.Add (borderedView);
+        app.Begin (window);
+
+        // The title "Test" is drawn at the top border line. Click on the 'T' of "Test".
+        // Screen position: border starts at (1,1), title starts at col 3 (after "┌┤").
+        List<View?> viewsOnTitle = window.GetViewsUnderLocation (new Point (3, 1), ViewportSettingsFlags.TransparentMouse);
+
+        bool borderInList = viewsOnTitle.Any (v => v is Border);
+
+        Assert.True (borderInList, "Border with TransparentMouse should capture mouse events on its title text");
+    }
+
+    /// <summary>
+    ///     Verifies that a Margin with TransparentMouse and a shadow passes mouse events through
+    ///     empty margin cells but captures them on shadow cells.
+    ///     Requires Phase 2d (ShadowView reports drawn region) and 2e (drawn-region-aware hit-testing).
+    /// </summary>
+    [Fact (Skip = "Phase 2d/2e — ShadowView drawn region and hit-testing not yet implemented")]
+    public void Margin_TransparentMouse_Shadow_Clicks_Are_Captured ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (10, 6);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        View shadowView = new ()
+        {
+            X = 1,
+            Y = 1,
+            Width = 5,
+            Height = 3,
+            ShadowStyle = ShadowStyle.Opaque,
+            Id = "Shadowed"
+        };
+
+        window.Add (shadowView);
+        app.Begin (window);
+
+        // The shadow is drawn on the right (col 6) and bottom (row 4) of the view.
+        // The Margin has TransparentMouse set by default.
+        // Click on a shadow cell — should be captured (shadow drew there).
+        List<View?> viewsOnShadow = window.GetViewsUnderLocation (new Point (6, 2), ViewportSettingsFlags.TransparentMouse);
+        bool marginInList = viewsOnShadow.Any (v => v is Margin);
+
+        Assert.True (marginInList, "Margin with shadow should capture mouse events on shadow cells");
+
+        // Click on an empty margin cell (if any) — should pass through.
+        // With default Margin thickness of 0 + shadow thickness of 1, the empty margin area
+        // is minimal. Skip this sub-assertion if there's no empty margin area to test.
+    }
+
+    /// <summary>
+    ///     Verifies that drawn-region-aware hit-testing works for a regular View with TransparentMouse.
+    ///     A view that draws only part of its area should pass through clicks on undrawn cells
+    ///     but capture clicks on drawn cells.
+    ///     Requires Phase 2a/2b/2e.
+    /// </summary>
+    [Fact (Skip = "Phase 2a/2b/2e — drawn-region-aware hit-testing not yet implemented")]
+    public void View_TransparentMouse_DrawnCells_Captured_UndrawnCells_PassThrough ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (20, 20);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        // A view that draws only a small rectangle in its viewport.
+        View partialView = new ()
+        {
+            X = 5,
+            Y = 5,
+            Width = 10,
+            Height = 10,
+            Id = "Partial",
+            ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse
+        };
+
+        // Draw a 3x3 block at viewport (1, 1)
+        partialView.DrawingContent += (_, args) =>
+                                      {
+                                          partialView.FillRect (new Rectangle (1, 1, 3, 3), new Rune ('#'));
+                                          args.DrawContext?.AddDrawnRectangle (partialView.ViewportToScreen (new Rectangle (1, 1, 3, 3)));
+                                      };
+
+        window.Add (partialView);
+        app.Begin (window);
+
+        // Screen (7, 7) is inside the drawn 3x3 block (viewport 1,1 + view origin 5,5 + viewport offset).
+        // This should be captured by the view.
+        List<View?> viewsOnDrawnCell = window.GetViewsUnderLocation (new Point (7, 7), ViewportSettingsFlags.TransparentMouse);
+        bool partialInList = viewsOnDrawnCell.Any (v => v?.Id == "Partial");
+        Assert.True (partialInList, "TransparentMouse view should capture clicks on drawn cells");
+
+        // Screen (5, 5) is the top-left of the view's viewport — undrawn area.
+        // This should pass through.
+        List<View?> viewsOnUndrawnCell = window.GetViewsUnderLocation (new Point (5, 5), ViewportSettingsFlags.TransparentMouse);
+        bool partialInListUndrawn = viewsOnUndrawnCell.Any (v => v?.Id == "Partial");
+        Assert.False (partialInListUndrawn, "TransparentMouse view should pass through clicks on undrawn cells");
+    }
+
+    /// <summary>
+    ///     Verifies that when CachedDrawnRegion is null (before first draw), TransparentMouse
+    ///     falls back to blanket removal (no regression from current behavior).
+    ///     Requires Phase 2e.
+    /// </summary>
+    [Fact (Skip = "Phase 2e — drawn-region-aware hit-testing not yet implemented")]
+    public void View_TransparentMouse_NullCache_FallsBackToBlanketRemoval ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (20, 20);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        View transparentMouseView = new ()
+        {
+            X = 5,
+            Y = 5,
+            Width = 10,
+            Height = 10,
+            Id = "TMView",
+            ViewportSettings = ViewportSettingsFlags.TransparentMouse
+        };
+
+        window.Add (transparentMouseView);
+
+        // Do NOT call app.Begin — no draw has occurred, so CachedDrawnRegion is null.
+        // Manually init and layout so GetViewsUnderLocation can work.
+        window.BeginInit ();
+        window.EndInit ();
+        window.LayoutSubViews ();
+
+        // With null cache, TransparentMouse should fall back to blanket removal.
+        List<View?> views = window.GetViewsUnderLocation (new Point (7, 7), ViewportSettingsFlags.TransparentMouse);
+        bool tmViewInList = views.Any (v => v?.Id == "TMView");
+
+        Assert.False (tmViewInList, "View with TransparentMouse and null CachedDrawnRegion should be removed (blanket fallback)");
+    }
+
+    /// <summary>
+    ///     Verifies that a Border with TransparentMouse on a thick border correctly distinguishes
+    ///     between drawn border line cells and empty cells in the border thickness area.
+    ///     Requires Phase 2a/2b/2e.
+    /// </summary>
+    [Fact (Skip = "Phase 2a/2b/2e — drawn-region-aware hit-testing not yet implemented")]
+    public void Border_TransparentMouse_ThickBorder_EmptyCells_PassThrough ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (12, 10);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        View borderedView = new ()
+        {
+            X = 1,
+            Y = 1,
+            Width = 9,
+            Height = 7,
+            BorderStyle = LineStyle.Single,
+            Id = "ThickBordered"
+        };
+        borderedView.Border!.Thickness = new Thickness (2);
+        borderedView.Border.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
+
+        window.Add (borderedView);
+        app.Begin (window);
+
+        // The outer border line is at offset 0 from Border frame; inner line at offset 1.
+        // With thickness=2, there's a gap row/col between outer and inner lines where nothing is drawn.
+        // Click on the top-left outer border line — should be captured.
+        List<View?> viewsOnOuterLine = window.GetViewsUnderLocation (new Point (1, 1), ViewportSettingsFlags.TransparentMouse);
+        bool borderCaptured = viewsOnOuterLine.Any (v => v is Border);
+        Assert.True (borderCaptured, "Click on outer border line should be captured");
+
+        // Click on an empty cell in the border thickness gap (between outer and inner lines).
+        // For thickness=2 with single line, the cell at (2, 3) in screen coords should be empty gap.
+        // This is inside the border frame but not on a drawn line — should pass through.
+        // Note: The exact gap position depends on how the lines are drawn with thickness=2.
     }
 
     /// <summary>

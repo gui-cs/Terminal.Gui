@@ -759,6 +759,17 @@ public partial class View // Drawing APIs
     public virtual bool SuperViewRendersLineCanvas { get; set; } = false;
 
     /// <summary>
+    ///     Gets the cached drawn region from the last draw pass. This is populated during
+    ///     <see cref="DoDrawComplete"/> for views with <see cref="ViewportSettingsFlags.TransparentMouse"/>
+    ///     set, and is used by mouse hit-testing to determine which cells should receive mouse events.
+    /// </summary>
+    /// <remarks>
+    ///     Returns <see langword="null"/> if the view has not been drawn yet, or does not have
+    ///     <see cref="ViewportSettingsFlags.TransparentMouse"/> set. Invalidated by <see cref="SetNeedsDraw()"/>.
+    /// </remarks>
+    internal Region? CachedDrawnRegion { get; set; }
+
+    /// <summary>
     ///     Causes the contents of <see cref="LineCanvas"/> to be drawn.
     ///     If <see cref="SuperViewRendersLineCanvas"/> is true, only the
     ///     <see cref="LineCanvas"/> of this view's SubViews will be rendered. If <see cref="SuperViewRendersLineCanvas"/> is
