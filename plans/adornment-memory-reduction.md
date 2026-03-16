@@ -1122,15 +1122,53 @@ These are places where `Margin`/`Border`/`Padding` was passed to methods expecti
 
 **Risk:** Medium-High — this is a large change, but it's a single coherent refactor with no transitional mixed state. Every `is Adornment` check changes to `is IAdornmentView` in one pass.
 
+#### Phase 1 Implementation Status: ✅ COMPLETE
+
+All 16,022 tests pass. Commits: `0b8defcb4` (initial migration), `96ba0533f` (fix NRE, shadow, layout).
+
+#### Phase 1 Mistakes Made & Lessons Learned
+
+These are mistakes made during implementation and the lessons derived from them. Future phases (and other refactorings) should account for these.
+
+**1. Constructor ordering: `Adornment` back-reference must be set before subclass constructor body runs.**
+
+The original `EnsureView()` design was:
+```csharp
+_view = CreateView();       // Calls MarginView(parent) constructor
+_view.Adornment = this;     // Sets back-reference AFTER construction
+```
+But `MarginView` and `BorderView` constructors accessed `Adornment!.ThicknessChanged` — a `NullReferenceException` because `Adornment` wasn't set yet. **Fix:** Changed constructors to accept the `AdornmentImpl` directly: `MarginView(View parent, Margin margin) : base(parent, margin)`, where the base `AdornmentView` constructor sets `Adornment = adornment` first. **Lesson:** When using a two-object pattern (settings object ↔ view object with mutual back-references), the back-reference must be established during construction, not post-construction. Pass it as a constructor parameter.
+
+**2. Lazy View creation doesn't work yet — the entire codebase assumes adornments are Views.**
+
+The plan called for lazy `EnsureView()` — only creating adornment Views when needed. This caused ~800 `NullReferenceException`s because drawing, layout, hit-testing, navigation, and arrangement all assume `Margin.View`, `Border.View`, `Padding.View` are non-null. **Fix:** `SetupAdornments()` now eagerly calls `EnsureView()` on all three adornments immediately after creation. **Lesson:** A lazy-creation optimization requires ALL consumers to be null-safe. In a large codebase with 22+ callsites, this is a separate phase — not something to combine with the structural split. The split itself (lightweight + View) is correct; the laziness is a future optimization that requires auditing and updating every consumer. **Phase 2 should explicitly scope lazy creation as a standalone item.**
+
+**3. Property setters on lightweight classes must propagate to the View in BOTH directions.**
+
+`Margin.ShadowStyle` setter only propagated to `MarginView` when setting a non-None value. When clearing the shadow (`ShadowStyle.None`), the MarginView retained the old shadow, causing Button tests to fail with sizes off by exactly 1 in each dimension (the shadow's right+bottom thickness). Similarly, `Margin.ShadowSize` getter read from the local `_shadowSize` field instead of from the `MarginView`, returning stale `{0,0}` values. **Fix:** All property setters now check `if (View is T mv) { mv.Property = value; }` first, only falling back to `EnsureView()` when the View doesn't exist and the value demands it. Getters for computed/derived properties (like `ShadowSize`) delegate to the View when it exists. **Lesson:** In a settings-object ↔ rendering-object split, the settings object is the "write" authority but the rendering object may be the "read" authority for derived/computed state. Every getter and setter must be audited for correct delegation direction. A mechanical "store locally, push to view" pattern is insufficient — some properties are computed by the View.
+
+**4. `SubViews.Count > 0` layout guard was a regression from an earlier fix.**
+
+Two layout tests failed because `LayoutSubViews()` was guarded by `if (Margin is { SubViews.Count: > 0 })`, preventing adornment layout when adornments had no sub-views. Investigation via `git log -S` found that commit `e8c851631` ("Ensured adornments layout") had explicitly REMOVED this guard, but it was later re-introduced (likely during a merge or refactor). **Fix:** Removed the guard from `LayoutSubViews()` calls but kept it on `SetNeedsLayout()` propagation (the adornment's own `NeedsLayout` flag is the correct gatekeeper, not sub-view count). **Lesson:** Use `git log -S` to check the provenance of suspicious guards/conditions. A guard that "looks reasonable" may have been deliberately removed and accidentally re-added.
+
+**5. `git stash pop` can resurrect deleted files.**
+
+During investigation, `git stash && git checkout <ref> -- .` followed by `git checkout HEAD -- . && git stash pop` restored `Border.Arrangment.cs` (the old misspelled file that was deleted in Phase 1). This caused 4 compilation errors from the phantom file. **Lesson:** After `git stash pop`, always verify that files deleted in the working tree are still deleted. Or better: avoid `git checkout <ref> -- .` entirely — use `git show <ref>:path` to inspect old file content without modifying the working tree.
+
+**6. Tests must be mechanically updated in bulk, but spot-checked for semantic correctness.**
+
+An agent was used to bulk-update ~146 test compilation errors (changing `Margin` → `Margin!.View!`, `is Border` → `is BorderView`, etc.). This was efficient and correct for most changes, but the agent couldn't detect semantic issues like: subscribing to `Margin.SubViewLayout` (a View event) vs `Margin!.View!.SubViewLayout` (same event, different object). The test compiles either way, but the assertion semantics depend on which object's event fires. **Lesson:** Mechanical test updates are fine for compilation, but each failing test after that needs manual root-cause analysis — the fix is often in the library, not the test.
+
 ---
 
 ### Phase 2: Cleanup and Additional Optimizations
 
-**Goal:** Remove `[Obsolete] Adornment` alias (after one release cycle), additional `View` optimizations.
+**Goal:** Remove `[Obsolete] Adornment` alias (after one release cycle), enable lazy View creation, additional `View` optimizations.
 
 **Changes:**
 1. Remove `[Obsolete] Adornment` alias class
-2. Optional: No-View border drawing (see §5, §14.4)
+2. Enable lazy `EnsureView()` — audit and update all 22+ callsites that assume `Margin.View`/`Border.View`/`Padding.View` are non-null. This is the actual memory-saving step (see Lesson #2 above).
+3. Optional: No-View border drawing (see §5, §14.4)
 
 Complementary `View` optimizations:
 
