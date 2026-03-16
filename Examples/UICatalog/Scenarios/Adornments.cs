@@ -33,7 +33,7 @@ public class Adornments : Scenario
 
         adornmentsEditor.Border!.Thickness = new Thickness (1, 2, 1, 1);
 
-        ViewportSettingsEditor viewportSettingsEditor= new ()
+        ViewportSettingsEditor viewportSettingsEditor = new ()
         {
             BorderStyle = LineStyle.Single,
             AutoSelectViewToEdit = true,
@@ -103,6 +103,7 @@ public class Adornments : Scenario
         window.Margin!.Thickness = new Thickness (0);
 
         window.Border!.Data = "Border";
+
         //window.Border!.Text = "Border Text";
         window.Border!.Thickness = new Thickness (3);
         window.Border!.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));

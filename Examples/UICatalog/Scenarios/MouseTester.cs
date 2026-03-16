@@ -100,19 +100,20 @@ public class MouseTester : Scenario
 
         mouseHighlightStates.ValueChanged += (sender, _) =>
                                              {
-                                                 if (sender is FlagSelector<MouseState> optionSelector)
+                                                 if (sender is not FlagSelector<MouseState> optionSelector)
                                                  {
-                                                     demo.MouseHighlightStates = optionSelector.Value!.Value;
+                                                     return;
+                                                 }
+                                                 demo.MouseHighlightStates = optionSelector.Value!.Value;
 
-                                                     foreach (View subview in demo.SubViews)
-                                                     {
-                                                         subview.MouseHighlightStates = optionSelector.Value!.Value;
-                                                     }
+                                                 foreach (View subview in demo.SubViews)
+                                                 {
+                                                     subview.MouseHighlightStates = optionSelector.Value!.Value;
+                                                 }
 
-                                                     foreach (View subview in demo.Padding.SubViews)
-                                                     {
-                                                         subview.MouseHighlightStates = optionSelector.Value!.Value;
-                                                     }
+                                                 foreach (View subview in demo.Padding.SubViews)
+                                                 {
+                                                     subview.MouseHighlightStates = optionSelector.Value!.Value;
                                                  }
                                              };
 
@@ -159,13 +160,14 @@ public class MouseTester : Scenario
                                           return;
                                       }
 
-                                      if (mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
+                                      if (!mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
                                       {
-                                          lastDriverEvent.Text = $"Last Driver Event: {mouse}";
-                                          Logging.Trace (lastDriverEvent.Text);
-                                          driverLogList.Add ($"{mouse.Position}:{mouse.Flags}");
-                                          driverLog.MoveEnd ();
+                                          return;
                                       }
+                                      lastDriverEvent.Text = $"Last Driver Event: {mouse}";
+                                      Logging.Trace (lastDriverEvent.Text);
+                                      driverLogList.Add ($"{mouse.Position}:{mouse.Flags}");
+                                      driverLog.MoveEnd ();
                                   };
 
         label = new Label { Text = "_App Events:", X = Pos.Right (driverLog) + 1, Y = Pos.Bottom (demo) };
@@ -190,12 +192,13 @@ public class MouseTester : Scenario
                                         return;
                                     }
 
-                                    if (mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
+                                    if (!mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
                                     {
-                                        lastAppEvent.Text = $"   Last App Event: {mouse}";
-                                        appLogList.Add ($"{mouse.Position}:{mouse.Flags}");
-                                        appLog.MoveEnd ();
+                                        return;
                                     }
+                                    lastAppEvent.Text = $"   Last App Event: {mouse}";
+                                    appLogList.Add ($"{mouse.Position}:{mouse.Flags}");
+                                    appLog.MoveEnd ();
                                 };
 
         label = new Label { Text = "_View Events:", X = Pos.Right (appLog) + 1, Y = Pos.Top (label) };
@@ -214,42 +217,46 @@ public class MouseTester : Scenario
 
         demo.MouseEvent += (_, mouse) =>
                            {
-                               if (mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
+                               if (!mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
                                {
-                                   lastViewEvent.Text = $"  Last View Event: {mouse}";
-                                   viewLogList.Add ($"{mouse.Position}:{mouse.View!.Id}:{mouse.Flags}");
-                                   viewLog.MoveEnd ();
+                                   return;
                                }
+                               lastViewEvent.Text = $"  Last View Event: {mouse}";
+                               viewLogList.Add ($"{mouse.Position}:{mouse.View!.Id}:{mouse.Flags}");
+                               viewLog.MoveEnd ();
                            };
 
         demoInPadding.MouseEvent += (_, mouse) =>
                                     {
-                                        if (mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
+                                        if (!mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
                                         {
-                                            lastViewEvent.Text = $"  Last View Event: {mouse}";
-                                            viewLogList.Add ($"{mouse.Position}:{mouse.View!.Id}:{mouse.Flags}");
-                                            viewLog.MoveEnd ();
+                                            return;
                                         }
+                                        lastViewEvent.Text = $"  Last View Event: {mouse}";
+                                        viewLogList.Add ($"{mouse.Position}:{mouse.View!.Id}:{mouse.Flags}");
+                                        viewLog.MoveEnd ();
                                     };
 
         sub1.MouseEvent += (_, mouse) =>
                            {
-                               if (mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
+                               if (!mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
                                {
-                                   lastViewEvent.Text = $"  Last View Event: {mouse}";
-                                   viewLogList.Add ($"{mouse.Position}:{mouse.View!.Id}:{mouse.Flags}");
-                                   viewLog.MoveEnd ();
+                                   return;
                                }
+                               lastViewEvent.Text = $"  Last View Event: {mouse}";
+                               viewLogList.Add ($"{mouse.Position}:{mouse.View!.Id}:{mouse.Flags}");
+                               viewLog.MoveEnd ();
                            };
 
         sub2.MouseEvent += (_, mouse) =>
                            {
-                               if (mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
+                               if (!mouseFlagsFilter.Value.Value.HasFlag ((DemoMouseFlags)mouse.Flags))
                                {
-                                   lastViewEvent.Text = $"  Last View Event: {mouse}";
-                                   viewLogList.Add ($"{mouse.Position}:{mouse.View!.Id}:{mouse.Flags}");
-                                   viewLog.MoveEnd ();
+                                   return;
                                }
+                               lastViewEvent.Text = $"  Last View Event: {mouse}";
+                               viewLogList.Add ($"{mouse.Position}:{mouse.View!.Id}:{mouse.Flags}");
+                               viewLog.MoveEnd ();
                            };
 
         label = new Label { Text = "_Commands:", X = Pos.Right (viewLog) + 1, Y = Pos.Top (label) };
@@ -339,18 +346,19 @@ public class MouseTester : Scenario
 
         runnable.CommandNotBound += (_, args) =>
                                     {
-                                        if (args.Context!.Command == Command.DeleteAll)
+                                        if (args.Context!.Command != Command.DeleteAll)
                                         {
-                                            driverLogList.Clear ();
-                                            driverLog.SetSource (driverLogList);
-                                            appLogList.Clear ();
-                                            appLog.SetSource (appLogList);
-                                            viewLogList.Clear ();
-                                            viewLog.SetSource (viewLogList);
-                                            commandLogList.Clear ();
-                                            commandLog.SetSource (commandLogList);
-                                            args.Handled = true;
+                                            return;
                                         }
+                                        driverLogList.Clear ();
+                                        driverLog.SetSource (driverLogList);
+                                        appLogList.Clear ();
+                                        appLog.SetSource (appLogList);
+                                        viewLogList.Clear ();
+                                        viewLog.SetSource (viewLogList);
+                                        commandLogList.Clear ();
+                                        commandLog.SetSource (commandLogList);
+                                        args.Handled = true;
                                     };
 
         app.Run (runnable);

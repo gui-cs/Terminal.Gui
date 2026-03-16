@@ -263,23 +263,21 @@ public partial class View
 
     #region Viewport
 
-    private ViewportSettingsFlags _viewportSettings;
-
     /// <summary>
     ///     Gets or sets how scrolling the <see cref="View.Viewport"/> on the View's Content Area is handled.
     /// </summary>
     public ViewportSettingsFlags ViewportSettings
     {
-        get => _viewportSettings;
+        get;
         set
         {
-            if (_viewportSettings == value)
+            if (field == value)
             {
                 return;
             }
 
-            ViewportSettingsFlags oldFlags = _viewportSettings;
-            _viewportSettings = value;
+            ViewportSettingsFlags oldFlags = field;
+            field = value;
 
             SyncScrollBarsToSettings (oldFlags, value);
 

@@ -4,7 +4,6 @@ using System.Diagnostics;
 
 namespace Terminal.Gui.ViewBase;
 
-
 /// <summary>
 ///     View is the base class for all visible elements. View can render itself and
 ///     contains zero or more nested views, called SubViews. View provides basic functionality for layout, arrangement, and
@@ -37,10 +36,12 @@ namespace Terminal.Gui.ViewBase;
 ///             <term>Mouse Event</term> <description>Action</description>
 ///         </listheader>
 ///         <item>
-///             <term>Left Button Released</term> <description>Activates the view (<see cref="Command.Activate"/>).</description>
+///             <term>Left Button Released</term>
+///             <description>Activates the view (<see cref="Command.Activate"/>).</description>
 ///         </item>
 ///         <item>
-///             <term>Ctrl+Left Button Released</term> <description>Opens the context menu (<see cref="Command.Context"/>).</description>
+///             <term>Ctrl+Left Button Released</term>
+///             <description>Opens the context menu (<see cref="Command.Context"/>).</description>
 ///         </item>
 ///     </list>
 /// </remarks>

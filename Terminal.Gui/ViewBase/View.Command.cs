@@ -406,7 +406,9 @@ public partial class View // Command APIs
         // Warn if cancellation (not dispatch) occurred on a bridged command.
         if (args.Handled && ctx?.Routing == CommandRouting.Bridged && !_dispatchState.HasFlag (DispatchState.DispatchOccurred))
         {
-            Trace.Command (this, ctx, "BridgedCancellation",
+            Trace.Command (this,
+                           ctx,
+                           "BridgedCancellation",
                            "Cancellation across a CommandBridge has no effect. "
                            + "The remote view's OnAccepted has already fired before the bridge relayed the command.");
         }
@@ -653,9 +655,7 @@ public partial class View // Command APIs
             return;
         }
 
-        for (View? ancestor = GetBubbleAncestor (this);
-             ancestor?.CommandsToBubbleUp.Contains (ctx.Command) == true;
-             ancestor = GetBubbleAncestor (ancestor))
+        for (View? ancestor = GetBubbleAncestor (this); ancestor?.CommandsToBubbleUp.Contains (ctx.Command) == true; ancestor = GetBubbleAncestor (ancestor))
         {
             if (compositeOnly && ancestor.GetDispatchTarget (ctx) is null)
             {
@@ -671,9 +671,7 @@ public partial class View // Command APIs
             // dispatching to MenuBarItem would overwrite the MenuItem value).
             View? dispatchTarget = ancestor.GetDispatchTarget (ctx);
 
-            if (dispatchTarget is IValue refreshedValue
-                && ctx.Source?.TryGetTarget (out View? source) == true
-                && ReferenceEquals (source, dispatchTarget))
+            if (dispatchTarget is IValue refreshedValue && ctx.Source?.TryGetTarget (out View? source) == true && ReferenceEquals (source, dispatchTarget))
             {
                 upCtx = upCtx.WithValue (refreshedValue.GetValue ());
             }
@@ -731,7 +729,9 @@ public partial class View // Command APIs
             // Warn if cancellation occurs on a bridged command — the remote side has already committed.
             if (ctx?.Routing == CommandRouting.Bridged)
             {
-                Trace.Command (this, ctx, "BridgedCancellation",
+                Trace.Command (this,
+                               ctx,
+                               "BridgedCancellation",
                                "Cancellation across a CommandBridge has no effect. "
                                + "The remote view's OnActivated has already fired before the bridge relayed the command.");
             }
@@ -758,7 +758,9 @@ public partial class View // Command APIs
         // Warn if cancellation (not dispatch) occurred on a bridged command.
         if (args.Handled && ctx?.Routing == CommandRouting.Bridged && !_dispatchState.HasFlag (DispatchState.DispatchOccurred))
         {
-            Trace.Command (this, ctx, "BridgedCancellation",
+            Trace.Command (this,
+                           ctx,
+                           "BridgedCancellation",
                            "Cancellation across a CommandBridge has no effect. "
                            + "The remote view's OnActivated has already fired before the bridge relayed the command.");
         }

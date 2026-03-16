@@ -32,31 +32,6 @@ public class AdornmentsEditor : EditorBase
         base.OnViewToEditChanged ();
     }
 
-    private string GetIdentifyingString (View? view)
-    {
-        if (view is null)
-        {
-            return "null";
-        }
-
-        if (!string.IsNullOrEmpty (view.Id))
-        {
-            return view.Id;
-        }
-
-        if (!string.IsNullOrEmpty (view.Title))
-        {
-            return view.Title;
-        }
-
-        if (!string.IsNullOrEmpty (view.Text))
-        {
-            return view.Text;
-        }
-
-        return view.GetType ().Name;
-    }
-
     private void AdornmentsEditor_Initialized (object? sender, EventArgs e)
     {
         ExpanderButton?.Orientation = Orientation.Horizontal;

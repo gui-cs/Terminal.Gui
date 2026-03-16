@@ -3,7 +3,7 @@ namespace Terminal.Gui.ViewBase;
 /// <summary>
 ///     Obsolete compatibility alias for <see cref="AdornmentView"/>. Use <see cref="AdornmentView"/> directly.
 /// </summary>
-[Obsolete ("Use AdornmentView instead.", error: false)]
+[Obsolete ("Use AdornmentView instead.", false)]
 public class Adornment : AdornmentView
 {
     /// <inheritdoc/>

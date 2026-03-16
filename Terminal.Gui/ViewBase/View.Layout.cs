@@ -1,5 +1,7 @@
 using System.Diagnostics;
 
+#pragma warning disable CS0067 // Event is never used
+
 namespace Terminal.Gui.ViewBase;
 
 public partial class View // Layout APIs
@@ -53,22 +55,24 @@ public partial class View // Layout APIs
         set
         {
             // This will set _frame, call SetsNeedsLayout, and raise OnViewportChanged/ViewportChanged
-            if (SetFrame (value with { Width = Math.Max (value.Width, 0), Height = Math.Max (value.Height, 0) }))
+            if (!SetFrame (value with { Width = Math.Max (value.Width, 0), Height = Math.Max (value.Height, 0) }))
             {
-                // BUGBUG: We set the internal fields here to avoid recursion. However, this means that
-                // BUGBUG: other logic in the property setters does not get executed.  Specifically:
-                // BUGBUG: - Reset TextFormatter
-                // BUGBUG: - SetLayoutNeeded (not an issue as we explicitly call Layout below)
-                // BUGBUG: - If we add property change events for X/Y/Width/Height they will not be invoked
-                // If Frame gets set, set all Pos/Dim to Absolute values.
-                _x = _frame!.Value.X;
-                _y = _frame!.Value.Y;
-                _width = _frame!.Value.Width;
-                _height = _frame!.Value.Height;
-
-                // Explicit layout is ok here because we are setting the Frame directly.
-                Layout ();
+                return;
             }
+
+            // BUGBUG: We set the internal fields here to avoid recursion. However, this means that
+            // BUGBUG: other logic in the property setters does not get executed.  Specifically:
+            // BUGBUG: - Reset TextFormatter
+            // BUGBUG: - SetLayoutNeeded (not an issue as we explicitly call Layout below)
+            // BUGBUG: - If we add property change events for X/Y/Width/Height they will not be invoked
+            // If Frame gets set, set all Pos/Dim to Absolute values.
+            _x = _frame!.Value.X;
+            _y = _frame!.Value.Y;
+            _width = _frame!.Value.Width;
+            _height = _frame!.Value.Height;
+
+            // Explicit layout is ok here because we are setting the Frame directly.
+            Layout ();
         }
     }
 
@@ -185,16 +189,18 @@ public partial class View // Layout APIs
     {
         SetNeedsLayout ();
 
-        if (_x is PosAbsolute && _y is PosAbsolute && _width is DimAbsolute && _height is DimAbsolute)
+        if (_x is not PosAbsolute || _y is not PosAbsolute || _width is not DimAbsolute || _height is not DimAbsolute)
         {
-            // Implicit layout is ok here because all Pos/Dim are Absolute values.
-            Layout ();
+            return;
+        }
 
-            if (SuperView is { } || this is AdornmentView { Parent: null })
-            {
-                // Ensure the next Application iteration tries to layout again
-                SetNeedsLayout ();
-            }
+        // Implicit layout is ok here because all Pos/Dim are Absolute values.
+        Layout ();
+
+        if (SuperView is { } || this is AdornmentView { Parent: null })
+        {
+            // Ensure the next Application iteration tries to layout again
+            SetNeedsLayout ();
         }
     }
 
@@ -488,11 +494,12 @@ public partial class View // Layout APIs
 
         foreach (View v in views)
         {
-            if (v.NeedsLayout)
+            if (!v.NeedsLayout)
             {
-                neededLayout = true;
-                v.Layout (contentSize);
+                continue;
             }
+            neededLayout = true;
+            v.Layout (contentSize);
         }
 
         return neededLayout;
@@ -515,18 +522,17 @@ public partial class View // Layout APIs
     /// <returns><see langword="false"/>If the view could not be laid out (typically because a dependencies was not ready). </returns>
     public bool Layout (Size contentSize)
     {
-        if (SetRelativeLayout (contentSize))
+        if (!SetRelativeLayout (contentSize))
         {
-            LayoutSubViews ();
-
-            // A layout was performed so a draw is needed
-            // NeedsLayout may still be true if a dependent View still needs layout after SubViewsLaidOut event
-            SetNeedsDraw ();
-
-            return true;
+            return false;
         }
+        LayoutSubViews ();
 
-        return false;
+        // A layout was performed so a draw is needed
+        // NeedsLayout may still be true if a dependent View still needs layout after SubViewsLaidOut event
+        SetNeedsDraw ();
+
+        return true;
     }
 
     /// <summary>
@@ -868,29 +874,30 @@ public partial class View // Layout APIs
 
             View current = stack.Pop ();
 
-            if (!current.NeedsLayout)
+            if (current.NeedsLayout)
             {
-                current.NeedsLayout = true;
+                continue;
+            }
+            current.NeedsLayout = true;
 
-                if (current.Margin is { SubViews.Count: > 0 })
-                {
-                    current.Margin!.SetNeedsLayout ();
-                }
+            if (current.Margin is { SubViews.Count: > 0 })
+            {
+                current.Margin!.SetNeedsLayout ();
+            }
 
-                if (current.Border is { SubViews.Count: > 0 })
-                {
-                    current.Border!.SetNeedsLayout ();
-                }
+            if (current.Border is { SubViews.Count: > 0 })
+            {
+                current.Border!.SetNeedsLayout ();
+            }
 
-                if (current.Padding is { SubViews.Count: > 0 })
-                {
-                    current.Padding.SetNeedsLayout ();
-                }
+            if (current.Padding is { SubViews.Count: > 0 })
+            {
+                current.Padding.SetNeedsLayout ();
+            }
 
-                foreach (View subview in current.SubViews)
-                {
-                    stack.Push (subview);
-                }
+            foreach (View subview in current.SubViews)
+            {
+                stack.Push (subview);
             }
         }
 
@@ -928,7 +935,7 @@ public partial class View // Layout APIs
     /// </param>
     internal void CollectAll (View from, ref HashSet<View> nNodes, ref HashSet<(View, View)> nEdges)
     {
-        foreach (View? v in from.InternalSubViews)
+        foreach (View v in from.InternalSubViews)
         {
             nNodes.Add (v);
             CollectPos (v.X, v, ref nNodes, ref nEdges);
@@ -1107,7 +1114,7 @@ public partial class View // Layout APIs
 
         IApplication? app = viewToMove.App;
 
-        if (viewToMove?.SuperView is null || viewToMove == app?.TopRunnableView || viewToMove?.SuperView == app?.TopRunnableView)
+        if (viewToMove.SuperView is null || viewToMove == app?.TopRunnableView || viewToMove.SuperView == app?.TopRunnableView)
         {
             maxDimension = app?.Screen.Width ?? 0;
             superView = app?.TopRunnableView;
@@ -1115,11 +1122,11 @@ public partial class View // Layout APIs
         else
         {
             // Use the SuperView's Viewport, not Frame
-            maxDimension = viewToMove!.SuperView.Viewport.Width;
+            maxDimension = viewToMove.SuperView.Viewport.Width;
             superView = viewToMove.SuperView;
         }
 
-        if (superView?.Margin is { } && superView == viewToMove!.SuperView)
+        if (superView?.Margin is { } && superView == viewToMove.SuperView)
         {
             maxDimension -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
         }
@@ -1144,7 +1151,7 @@ public partial class View // Layout APIs
         }
         else
         {
-            maxDimension = viewToMove!.SuperView.Viewport.Height;
+            maxDimension = viewToMove.SuperView.Viewport.Height;
         }
 
         if (superView?.Margin is { } && superView == viewToMove?.SuperView)
@@ -1220,15 +1227,17 @@ public partial class View // Layout APIs
         }
 
         // Fallback: If Runnables is empty or Top is not in Runnables, check Top directly (for test compatibility)
-        if (!checkedTop && App?.TopRunnableView is { Visible: true } top)
+        if (checkedTop || App?.TopRunnableView is not { Visible: true } top)
         {
-            // For root runnables, allow hit-testing even if location is outside bounds (for drag/move)
-            List<View?> result = GetViewsUnderLocation (top, screenLocation, excludeViewportSettingsFlags);
+            return [];
+        }
 
-            if (result.Count > 0)
-            {
-                return result;
-            }
+        // For root runnables, allow hit-testing even if location is outside bounds (for drag/move)
+        List<View?> res = GetViewsUnderLocation (top, screenLocation, excludeViewportSettingsFlags);
+
+        if (res.Count > 0)
+        {
+            return res;
         }
 
         return [];
@@ -1280,7 +1289,8 @@ public partial class View // Layout APIs
                                               ret = true;
                                           }
 
-                                          if (viewsUnderLocation.Contains (v.Padding?.View) && v.Padding!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          if (viewsUnderLocation.Contains (v.Padding?.View)
+                                              && v.Padding!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
                                           {
                                               ret = true;
                                           }
@@ -1372,7 +1382,7 @@ public partial class View // Layout APIs
             {
                 View subview = currentView.InternalSubViews [i];
 
-                if (subview.Visible && subview.Enabled && subview.FrameToScreen ().Contains (location))
+                if (subview is { Visible: true, Enabled: true } && subview.FrameToScreen ().Contains (location))
                 {
                     viewsToProcess.Push (subview);
                 }
@@ -1420,22 +1430,23 @@ public partial class View // Layout APIs
                 ThrowInvalid (view, view.X, nameof (view.X));
             }
 
-            if (heightAuto is { } && heightAuto.Style.FastHasFlags (DimAutoStyle.Content) && ContentSizeTracksViewport)
+            if (heightAuto is null || !heightAuto.Style.FastHasFlags (DimAutoStyle.Content) || !ContentSizeTracksViewport)
             {
-                ThrowInvalid (view, view.Height, nameof (view.Height));
-                ThrowInvalid (view, view.Y, nameof (view.Y));
+                continue;
             }
+            ThrowInvalid (view, view.Height, nameof (view.Height));
+            ThrowInvalid (view, view.Y, nameof (view.Y));
         }
 
         return;
 
-        void ThrowInvalid (View view, object? checkPosDim, string name)
+        static void ThrowInvalid (View view, object? checkPosDim, string name)
         {
             object? bad = null;
 
             switch (checkPosDim)
             {
-                case Pos pos and PosAnchorEnd:
+                case PosAnchorEnd:
                     break;
 
                 case Pos pos and not PosAbsolute and not PosView and not PosCombine:
@@ -1450,10 +1461,10 @@ public partial class View // Layout APIs
 
                     break;
 
-                case Dim dim and DimAuto:
+                case DimAuto:
                     break;
 
-                case Dim dim and DimFill:
+                case DimFill:
                     break;
 
                 case Dim dim and not DimAbsolute and not DimView and not DimCombine:

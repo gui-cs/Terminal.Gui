@@ -414,7 +414,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<int>>? ValueChanged;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>Called when <see cref="Value"/> has changed. Indicates how much to scroll.</summary>

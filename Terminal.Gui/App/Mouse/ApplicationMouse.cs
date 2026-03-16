@@ -237,11 +237,8 @@ internal class ApplicationMouse : IMouse, IDisposable
     ///     Returns <see langword="true"/> when the mouse is currently grabbed by a view
     ///     that belongs to <paramref name="hierarchyRoot"/>'s view hierarchy.
     /// </summary>
-    private bool IsGrabbedByViewInHierarchy (View hierarchyRoot)
-    {
-        return _mouseGrabViewRef?.TryGetTarget (out View? grabbed) is true
-               && View.IsInHierarchy (hierarchyRoot, grabbed, true);
-    }
+    private bool IsGrabbedByViewInHierarchy (View hierarchyRoot) =>
+        _mouseGrabViewRef?.TryGetTarget (out View? grabbed) is true && View.IsInHierarchy (hierarchyRoot, grabbed, true);
 
     /// <inheritdoc/>
     public void RaiseMouseEnterLeaveEvents (Point screenPosition, List<View?> currentViewsUnderMouse)

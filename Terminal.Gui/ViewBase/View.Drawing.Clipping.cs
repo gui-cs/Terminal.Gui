@@ -1,5 +1,4 @@
-﻿
-namespace Terminal.Gui.ViewBase;
+﻿namespace Terminal.Gui.ViewBase;
 
 public partial class View
 {
@@ -11,7 +10,8 @@ public partial class View
     ///         There is a single clip region for the entire application.
     ///     </para>
     ///     <para>
-    ///         This method returns the current clip region, not a clone. If there is a need to modify the clip region, clone it first.
+    ///         This method returns the current clip region, not a clone. If there is a need to modify the clip region, clone
+    ///         it first.
     ///     </para>
     /// </remarks>
     /// <returns>The current Clip.</returns>
@@ -27,15 +27,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <param name="region"></param>
-    public void SetClip (Region? region)
-    {
-        if (Driver is null)
-        {
-            return;
-        }
-
-        Driver.Clip = region;
-    }
+    public void SetClip (Region? region) => Driver?.Clip = region;
 
     /// <summary>
     ///     Sets the Clip to be the rectangle of the screen.
@@ -56,10 +48,7 @@ public partial class View
     {
         Region? previous = GetClip ();
 
-        if (Driver is { })
-        {
-            Driver.Clip = new (Driver!.Screen);
-        }
+        Driver?.Clip = new Region (Driver!.Screen);
 
         return previous;
     }
@@ -73,7 +62,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <param name="rectangle"></param>
-    public void ExcludeFromClip (Rectangle rectangle) { Driver?.Clip?.Exclude (rectangle); }
+    public void ExcludeFromClip (Rectangle rectangle) => Driver?.Clip?.Exclude (rectangle);
 
     /// <summary>
     ///     Removes the specified rectangle from the Clip.
@@ -84,7 +73,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     /// <param name="region"></param>
-    public void ExcludeFromClip (Region? region) { Driver?.Clip?.Exclude (region); }
+    public void ExcludeFromClip (Region? region) => Driver?.Clip?.Exclude (region);
 
     /// <summary>
     ///     Changes the Clip to the intersection of the current Clip and the <see cref="Frame"/> of this View.
@@ -105,7 +94,7 @@ public partial class View
             return null;
         }
 
-        Region previous = GetClip () ?? new (Driver.Screen);
+        Region previous = GetClip () ?? new Region (Driver.Screen);
 
         Region frameRegion = previous.Clone ();
 
@@ -132,7 +121,8 @@ public partial class View
     ///         content to be drawn beyond the viewport.
     ///     </para>
     ///     <para>
-    ///         If <see cref="ViewportSettings"/> has <see cref="ViewBase.ViewportSettingsFlags.ClipContentOnly"/> set, clipping will be
+    ///         If <see cref="ViewportSettings"/> has <see cref="ViewBase.ViewportSettingsFlags.ClipContentOnly"/> set,
+    ///         clipping will be
     ///         applied to just the visible content area.
     ///     </para>
     ///     <remarks>
@@ -152,24 +142,24 @@ public partial class View
             return null;
         }
 
-        Region previous = GetClip () ?? new (App!.Screen);
+        Region previous = GetClip () ?? new Region (App!.Screen);
 
         Region viewportRegion = previous.Clone ();
 
         Rectangle viewport = ViewportToScreen (new Rectangle (Point.Empty, Viewport.Size));
-        viewportRegion?.Intersect (viewport);
+        viewportRegion.Intersect (viewport);
 
         if (ViewportSettings.HasFlag (ViewportSettingsFlags.ClipContentOnly))
         {
             // Clamp the Clip to the just content area that is within the viewport
-            Rectangle visibleContent = ViewportToScreen (new Rectangle (new (-Viewport.X, -Viewport.Y), GetContentSize ()));
-            viewportRegion?.Intersect (visibleContent);
+            Rectangle visibleContent = ViewportToScreen (new Rectangle (new Point (-Viewport.X, -Viewport.Y), GetContentSize ()));
+            viewportRegion.Intersect (visibleContent);
         }
 
         if (this is AdornmentView adornment && adornment.Thickness != Thickness.Empty)
         {
             // Ensure adornments can't draw outside their thickness
-            viewportRegion?.Exclude (adornment.Thickness.GetInside (viewport));
+            viewportRegion.Exclude (adornment.Thickness.GetInside (viewport));
         }
 
         SetClip (viewportRegion);

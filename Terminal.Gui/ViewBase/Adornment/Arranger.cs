@@ -214,9 +214,7 @@ internal sealed class Arranger : IDisposable
 
         if (parentArrangement.HasFlag (ViewArrangement.TopResizable))
         {
-            _topSizeButton = CreateArrangerButton (ArrangeButtons.TopSize,
-                                                   Pos.Center () + _border.Parent!.Margin!.Thickness.Horizontal,
-                                                   0);
+            _topSizeButton = CreateArrangerButton (ArrangeButtons.TopSize, Pos.Center () + _border.Parent!.Margin!.Thickness.Horizontal, 0);
         }
 
         if (parentArrangement.HasFlag (ViewArrangement.RightResizable))
@@ -228,9 +226,7 @@ internal sealed class Arranger : IDisposable
 
         if (parentArrangement.HasFlag (ViewArrangement.LeftResizable))
         {
-            _leftSizeButton = CreateArrangerButton (ArrangeButtons.LeftSize,
-                                                    0,
-                                                    Pos.Center () + _border.Parent!.Margin!.Thickness.Vertical / 2);
+            _leftSizeButton = CreateArrangerButton (ArrangeButtons.LeftSize, 0, Pos.Center () + _border.Parent!.Margin!.Thickness.Vertical / 2);
         }
 
         if (parentArrangement.HasFlag (ViewArrangement.BottomResizable))

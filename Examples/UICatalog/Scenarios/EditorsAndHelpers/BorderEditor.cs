@@ -1,7 +1,4 @@
 ﻿#nullable enable
-using System.Reflection;
-using Terminal.Gui.ViewBase;
-
 namespace UICatalog.Scenarios;
 
 public class BorderEditor : AdornmentEditor
@@ -26,10 +23,9 @@ public class BorderEditor : AdornmentEditor
 
     private void BorderEditor_Initialized (object? sender, EventArgs e)
     {
-        _osBorderStyle = new ()
+        _osBorderStyle = new OptionSelector<LineStyle>
         {
             X = 0,
-
             Y = Pos.Bottom (SubViews.ToArray () [^1]),
             Width = Dim.Fill (),
             Value = (AdornmentToEdit as Border)?.LineStyle ?? LineStyle.None,
@@ -41,11 +37,10 @@ public class BorderEditor : AdornmentEditor
 
         _osBorderStyle.ValueChanged += OnRbBorderStyleOnValueChanged;
 
-        _ckbTitle = new ()
+        _ckbTitle = new CheckBox
         {
             X = 0,
             Y = Pos.Bottom (_osBorderStyle),
-
             Value = CheckState.Checked,
             SuperViewRendersLineCanvas = true,
             Text = "Title"
@@ -54,11 +49,10 @@ public class BorderEditor : AdornmentEditor
         _ckbTitle.ValueChanging += OnCkbTitleOnToggle;
         Add (_ckbTitle);
 
-        _ckbGradient = new ()
+        _ckbGradient = new CheckBox
         {
             X = 0,
             Y = Pos.Bottom (_ckbTitle),
-
             Value = CheckState.Checked,
             SuperViewRendersLineCanvas = true,
             Text = "Gradient"
@@ -76,7 +70,7 @@ public class BorderEditor : AdornmentEditor
                 return;
             }
 
-            if (args.Value is not null)
+            if (args.Value is { })
             {
                 border.LineStyle = (LineStyle)args.Value;
             }

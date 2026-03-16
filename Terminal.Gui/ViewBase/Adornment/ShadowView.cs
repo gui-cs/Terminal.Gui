@@ -93,15 +93,16 @@ internal class ShadowView : View
                 Driver?.Move (c, r);
                 SetAttribute (GetAttributeUnderLocation (new Point (c, r)));
 
-                if (c < ScreenContents?.GetLength (1) && r < ScreenContents?.GetLength (0))
+                if (!(c < ScreenContents?.GetLength (1)) || !(r < ScreenContents?.GetLength (0)))
                 {
-                    string grapheme = ScreenContents [r, c].Grapheme;
-                    AddStr (grapheme);
+                    continue;
+                }
+                string grapheme = ScreenContents [r, c].Grapheme;
+                AddStr (grapheme);
 
-                    if (grapheme.GetColumns () > 1)
-                    {
-                        c++;
-                    }
+                if (grapheme.GetColumns () > 1)
+                {
+                    c++;
                 }
             }
         }
@@ -157,7 +158,11 @@ internal class ShadowView : View
     // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4491
     private Attribute GetAttributeUnderLocation (Point location)
     {
-        if (SuperView is not AdornmentView || location.X < 0 || location.X >= App?.Screen.Width || location.Y < 0 || location.Y >= App?.Screen.Height
+        if (SuperView is not AdornmentView
+            || location.X < 0
+            || location.X >= App?.Screen.Width
+            || location.Y < 0
+            || location.Y >= App?.Screen.Height
             || ScreenContents == null
             || location.Y < 0
             || location.Y >= ScreenContents.GetLength (0)

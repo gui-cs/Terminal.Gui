@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Terminal.Gui.ViewBase;
 
 // BorderView Arrange Mode
@@ -14,10 +12,7 @@ public partial class BorderView
     internal Arranger Arranger => _arranger ??= CreateArranger ();
 
     /// <inheritdoc/>
-    protected override bool OnMouseEvent (Mouse mouseEvent)
-    {
-        return Arranger.HandleMouseEvent (mouseEvent);
-    }
+    protected override bool OnMouseEvent (Mouse mouseEvent) => Arranger.HandleMouseEvent (mouseEvent);
 
     private Arranger CreateArranger ()
     {

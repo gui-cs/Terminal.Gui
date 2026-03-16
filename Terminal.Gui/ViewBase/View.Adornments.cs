@@ -69,8 +69,6 @@ public partial class View // Adornments
     /// </remarks>
     public Margin? Margin { get; private set; }
 
-    private ShadowStyle _shadowStyle;
-
     /// <summary>
     ///     Gets or sets whether the View is shown with a shadow effect. The shadow is drawn on the right and bottom sides of
     ///     the
@@ -82,20 +80,17 @@ public partial class View // Adornments
     /// </remarks>
     public virtual ShadowStyle ShadowStyle
     {
-        get => _shadowStyle;
+        get;
         set
         {
-            if (_shadowStyle == value)
+            if (field == value)
             {
                 return;
             }
 
-            _shadowStyle = value;
+            field = value;
 
-            if (Margin is { })
-            {
-                Margin.ShadowStyle = value;
-            }
+            Margin?.ShadowStyle = value;
         }
     }
 
@@ -192,12 +187,12 @@ public partial class View // Adornments
         {
             if (Border!.Thickness == Thickness.Empty)
             {
-                Border.Thickness = new (1);
+                Border.Thickness = new Thickness (1);
             }
         }
         else
         {
-            Border!.Thickness = new (0);
+            Border!.Thickness = new Thickness (0);
         }
 
         Border.LineStyle = style;
@@ -283,14 +278,15 @@ public partial class View // Adornments
             }
         }
 
-        if (Padding is { } && Border is { })
+        if (Padding is null || Border is null)
         {
-            Padding.Frame = Border.Thickness.GetInside (Border.Frame);
+            return;
+        }
+        Padding.Frame = Border.Thickness.GetInside (Border.Frame);
 
-            if (Padding.View is { } pv)
-            {
-                pv.Frame = Padding.Frame;
-            }
+        if (Padding.View is { } pv)
+        {
+            pv.Frame = Padding.Frame;
         }
     }
 }

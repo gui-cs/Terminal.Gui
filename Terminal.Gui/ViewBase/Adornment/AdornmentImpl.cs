@@ -8,8 +8,6 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 public abstract class AdornmentImpl : IAdornment
 {
-    private AdornmentView? _view;
-
     /// <summary>
     ///     The <see cref="View"/> this adornment surrounds. Not on <see cref="IAdornment"/> — callers that need
     ///     the parent already have the <see cref="View"/> reference they used to access this adornment.
@@ -20,36 +18,36 @@ public abstract class AdornmentImpl : IAdornment
 
     #region Thickness
 
-    private Thickness _thickness = Thickness.Empty;
-
     /// <inheritdoc/>
     public Thickness Thickness
     {
-        get => _thickness;
+        get;
         set
         {
-            Thickness current = _thickness;
-            _thickness = value;
+            Thickness current = field;
+            field = value;
 
-            if (current != _thickness)
+            if (current == field)
             {
-                // AdornmentView.Thickness delegates back here via the IAdornment back-reference,
-                // so no sync is needed — AdornmentImpl is the single authoritative owner.
-                // Just invalidate the View if one exists.
-                if (_view is { })
-                {
-                    _view.SetNeedsLayout ();
-                    _view.SetNeedsDraw ();
-                }
-
-                Parent?.SetAdornmentFrames ();
-
-                // CWP: work (above) → virtual OnThicknessChanged (empty, for subclass override) → raise event
-                OnThicknessChanged ();
-                ThicknessChanged?.Invoke (this, EventArgs.Empty);
+                return;
             }
+
+            // AdornmentView.Thickness delegates back here via the IAdornment back-reference,
+            // so no sync is needed — AdornmentImpl is the single authoritative owner.
+            // Just invalidate the View if one exists.
+            if (View is { })
+            {
+                View.SetNeedsLayout ();
+                View.SetNeedsDraw ();
+            }
+
+            Parent?.SetAdornmentFrames ();
+
+            // CWP: work (above) → virtual OnThicknessChanged (empty, for subclass override) → raise event
+            OnThicknessChanged ();
+            ThicknessChanged?.Invoke (this, EventArgs.Empty);
         }
-    }
+    } = Thickness.Empty;
 
     /// <inheritdoc/>
     public event EventHandler? ThicknessChanged;
@@ -72,13 +70,13 @@ public abstract class AdornmentImpl : IAdornment
     ///     The backing <see cref="AdornmentView"/> — <see langword="null"/> until demanded.
     ///     Returns the concrete <see cref="AdornmentView"/> for callers within this assembly.
     /// </summary>
-    public AdornmentView? View => _view;
+    public AdornmentView? View { get; private set; }
 
     /// <summary>
     ///     Explicit <see cref="IAdornment"/> implementation — exposes <see cref="View"/> as
     ///     <see cref="IAdornmentView"/> so the interface contract does not reference the concrete class.
     /// </summary>
-    IAdornmentView? IAdornment.View => _view;
+    IAdornmentView? IAdornment.View => View;
 
     /// <summary>
     ///     Returns the existing <see cref="AdornmentView"/>, creating it if not yet allocated.
@@ -88,21 +86,22 @@ public abstract class AdornmentImpl : IAdornment
     /// <remarks>Must be called on the UI thread. Internal to prevent eager allocation by consumers.</remarks>
     internal AdornmentView EnsureView ()
     {
-        if (_view is null)
+        if (View is { })
         {
-            _view = CreateView ();
+            return View;
+        }
+        View = CreateView ();
 
-            // Synchronize init state with the parent.
-            if (Parent?.IsInitialized == true)
-            {
-                _view.BeginInit ();
-                _view.EndInit ();
-            }
-
-            Parent?.SetAdornmentFrames ();
+        // Synchronize init state with the parent.
+        if (Parent?.IsInitialized == true)
+        {
+            View.BeginInit ();
+            View.EndInit ();
         }
 
-        return _view;
+        Parent?.SetAdornmentFrames ();
+
+        return View;
     }
 
     /// <summary>Factory method — subclasses return their specific <see cref="AdornmentView"/> subclass.</summary>
@@ -113,38 +112,33 @@ public abstract class AdornmentImpl : IAdornment
     #region Coordinator methods
 
     /// <inheritdoc/>
-    public Point ViewportToScreen (in Point location)
-        => View is { } v ? v.ViewportToScreen (location) : computeViewportToScreen (location);
+    public Point ViewportToScreen (in Point location) => View is { } v ? v.ViewportToScreen (location) : ComputeViewportToScreen (location);
 
     /// <inheritdoc/>
-    public Rectangle FrameToScreen ()
-        => View is { } v ? v.FrameToScreen () : computeFrameToScreen ();
+    public Rectangle FrameToScreen () => View is { } v ? v.FrameToScreen () : ComputeFrameToScreen ();
 
     /// <inheritdoc/>
-    public Point ScreenToFrame (in Point location)
-        => View is { } v ? v.ScreenToFrame (location) : computeScreenToFrame (location);
+    public Point ScreenToFrame (in Point location) => View is { } v ? v.ScreenToFrame (location) : ComputeScreenToFrame (location);
 
-    private Point computeViewportToScreen (in Point location)
+    private Point ComputeViewportToScreen (in Point location)
     {
         Rectangle parentScreen = Parent?.FrameToScreen () ?? Rectangle.Empty;
 
-        return new (parentScreen.X + Frame.X + location.X,
-                    parentScreen.Y + Frame.Y + location.Y);
+        return new Point (parentScreen.X + Frame.X + location.X, parentScreen.Y + Frame.Y + location.Y);
     }
 
-    private Rectangle computeFrameToScreen ()
+    private Rectangle ComputeFrameToScreen ()
     {
         Rectangle parentScreen = Parent?.FrameToScreen () ?? Rectangle.Empty;
 
-        return new (new (parentScreen.X + Frame.X, parentScreen.Y + Frame.Y), Frame.Size);
+        return new Rectangle (new Point (parentScreen.X + Frame.X, parentScreen.Y + Frame.Y), Frame.Size);
     }
 
-    private Point computeScreenToFrame (in Point location)
+    private Point ComputeScreenToFrame (in Point location)
     {
         Rectangle parentScreen = Parent?.FrameToScreen () ?? Rectangle.Empty;
 
-        return new (location.X - parentScreen.X - Frame.X,
-                    location.Y - parentScreen.Y - Frame.Y);
+        return new Point (location.X - parentScreen.X - Frame.X, location.Y - parentScreen.Y - Frame.Y);
     }
 
     #endregion Coordinator methods
@@ -154,26 +148,25 @@ public abstract class AdornmentImpl : IAdornment
     /// <summary>Gets or sets the text displayed in this adornment's <see cref="View"/>.</summary>
     public string Text
     {
-        get => View?.Text ?? _text;
+        get => View?.Text ?? field;
         set
         {
-            _text = value;
+            field = value;
 
             if (View is { } v)
             {
                 v.Text = value;
             }
         }
-    }
-    private string _text = string.Empty;
+    } = string.Empty;
 
     /// <summary>Gets or sets arbitrary data associated with this adornment.</summary>
     public object? Data
     {
-        get => View?.Data ?? _data;
+        get => View?.Data ?? field;
         set
         {
-            _data = value;
+            field = value;
 
             if (View is { } v)
             {
@@ -181,7 +174,6 @@ public abstract class AdornmentImpl : IAdornment
             }
         }
     }
-    private object? _data;
 
     /// <summary>Marks the backing <see cref="View"/> as needing to be redrawn. No-op if no View exists.</summary>
     public void SetNeedsDraw () => View?.SetNeedsDraw ();
@@ -223,6 +215,7 @@ public abstract class AdornmentImpl : IAdornment
 
     /// <summary>Gets the SubViews of the backing <see cref="View"/>. Returns empty if no View exists.</summary>
     public IReadOnlyCollection<View> SubViews => View?.SubViews ?? _emptySubViews;
+
     private static readonly IReadOnlyCollection<View> _emptySubViews = Array.Empty<View> ();
 
     /// <summary>Adds a SubView to the backing <see cref="View"/>. Forces View creation via <see cref="EnsureView"/>.</summary>
@@ -250,10 +243,10 @@ public abstract class AdornmentImpl : IAdornment
     /// <summary>Gets or sets the viewport settings flags on the backing <see cref="View"/>.</summary>
     public ViewportSettingsFlags ViewportSettings
     {
-        get => View?.ViewportSettings ?? _viewportSettings;
+        get => View?.ViewportSettings ?? field;
         set
         {
-            _viewportSettings = value;
+            field = value;
 
             if (View is { } v)
             {
@@ -261,7 +254,6 @@ public abstract class AdornmentImpl : IAdornment
             }
         }
     }
-    private ViewportSettingsFlags _viewportSettings;
 
     /// <summary>Gets or sets visibility of the backing <see cref="View"/>.</summary>
     public bool Visible
@@ -339,32 +331,28 @@ public abstract class AdornmentImpl : IAdornment
     /// <summary>Removes a SubView from the backing <see cref="View"/>. No-op if no View exists.</summary>
     public void Remove (View subView) => View?.Remove (subView);
 
-    /// <summary>Gets whether the backing <see cref="View"/> has a non-default <see cref="Scheme"/>.</summary>
-    public bool HasScheme => View?.HasScheme ?? false;
-
     /// <summary>Gets or sets the Id on the backing <see cref="View"/>.</summary>
     public string Id
     {
-        get => View?.Id ?? _id;
+        get => View?.Id ?? field;
         set
         {
-            _id = value;
+            field = value;
 
             if (View is { } v)
             {
                 v.Id = value;
             }
         }
-    }
-    private string _id = string.Empty;
+    } = string.Empty;
 
     /// <summary>Gets or sets the SchemeName on the backing <see cref="View"/>.</summary>
     public string? SchemeName
     {
-        get => View?.SchemeName ?? _schemeName;
+        get => View?.SchemeName ?? field;
         set
         {
-            _schemeName = value;
+            field = value;
 
             if (View is { } v)
             {
@@ -372,15 +360,15 @@ public abstract class AdornmentImpl : IAdornment
             }
         }
     }
-    private string? _schemeName;
 
     /// <summary>Gets whether the backing <see cref="View"/> is initialized.</summary>
     public bool IsInitialized => View?.IsInitialized ?? false;
 
-    /// <summary>Delegates to <see cref="View.GetAttributeForRole"/> on the backing <see cref="View"/>.
-    /// Falls back to the <see cref="Parent"/>'s attribute when no View exists.</summary>
-    public Attribute GetAttributeForRole (VisualRole role)
-        => View?.GetAttributeForRole (role) ?? Parent?.GetAttributeForRole (role) ?? default;
+    /// <summary>
+    ///     Delegates to <see cref="View.GetAttributeForRole"/> on the backing <see cref="View"/>.
+    ///     Falls back to the <see cref="Parent"/>'s attribute when no View exists.
+    /// </summary>
+    public Attribute GetAttributeForRole (VisualRole role) => View?.GetAttributeForRole (role) ?? Parent?.GetAttributeForRole (role) ?? default (Attribute);
 
     /// <summary>Calls <see cref="View.AddFrameToClip"/> on the backing <see cref="View"/>. Returns null if no View exists.</summary>
     internal Region? AddFrameToClip () => View?.AddFrameToClip ();
@@ -408,7 +396,7 @@ public abstract class AdornmentImpl : IAdornment
     internal void DisposeView ()
     {
         View?.Dispose ();
-        _view = null;
+        View = null;
         Parent = null;
     }
 

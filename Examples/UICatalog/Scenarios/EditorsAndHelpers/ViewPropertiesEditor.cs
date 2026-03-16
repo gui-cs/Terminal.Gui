@@ -20,10 +20,7 @@ public class ViewPropertiesEditor : EditorBase
             Value = ViewToEdit is { } ? ViewToEdit.CanFocus ? CheckState.Checked : CheckState.UnChecked : CheckState.UnChecked
         };
 
-        _canFocusCheckBox.ValueChanged += (_, _) =>
-                                          {
-                                              ViewToEdit?.CanFocus = _canFocusCheckBox.Value == CheckState.Checked;
-                                          };
+        _canFocusCheckBox.ValueChanged += (_, _) => { ViewToEdit?.CanFocus = _canFocusCheckBox.Value == CheckState.Checked; };
         Add (_canFocusCheckBox);
 
         _enabledCheckBox = new CheckBox
@@ -34,10 +31,7 @@ public class ViewPropertiesEditor : EditorBase
             Value = ViewToEdit is { } ? ViewToEdit.Enabled ? CheckState.Checked : CheckState.UnChecked : CheckState.UnChecked
         };
 
-        _enabledCheckBox.ValueChanged += (_, _) =>
-                                         {
-                                             ViewToEdit?.Enabled = _enabledCheckBox.Value == CheckState.Checked;
-                                         };
+        _enabledCheckBox.ValueChanged += (_, _) => { ViewToEdit?.Enabled = _enabledCheckBox.Value == CheckState.Checked; };
         Add (_enabledCheckBox);
 
         Label label = new () { X = Pos.Right (_enabledCheckBox) + 1, Y = Pos.Top (_enabledCheckBox), Text = "Orientation:" };
@@ -64,10 +58,7 @@ public class ViewPropertiesEditor : EditorBase
             Text = "This is demo text"
         };
 
-        _text.ContentsChanged += (_, _) =>
-                                 {
-                                     ViewToEdit?.Text = _text.Text;
-                                 };
+        _text.ContentsChanged += (_, _) => { ViewToEdit?.Text = _text.Text; };
 
         Add (label, _text);
 

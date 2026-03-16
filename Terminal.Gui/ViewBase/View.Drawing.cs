@@ -49,18 +49,20 @@ public partial class View // Drawing APIs
 
         foreach (View view in viewsArray)
         {
-            if (view is not AdornmentView && view.SuperView is { } && view.SuperView != lastSuperView)
+            if (view is AdornmentView || view.SuperView is null || view.SuperView == lastSuperView)
             {
-                // Check if ANY subview of this SuperView still needs drawing
-                bool anySubViewNeedsDrawing = view.SuperView.InternalSubViews.Any (v => v.NeedsDraw || v.SubViewNeedsDraw);
-
-                if (!anySubViewNeedsDrawing)
-                {
-                    view.SuperView.SubViewNeedsDraw = false;
-                }
-
-                lastSuperView = view.SuperView;
+                continue;
             }
+
+            // Check if ANY subview of this SuperView still needs drawing
+            bool anySubViewNeedsDrawing = view.SuperView.InternalSubViews.Any (v => v.NeedsDraw || v.SubViewNeedsDraw);
+
+            if (!anySubViewNeedsDrawing)
+            {
+                view.SuperView.SubViewNeedsDraw = false;
+            }
+
+            lastSuperView = view.SuperView;
         }
     }
 
@@ -110,7 +112,7 @@ public partial class View // Drawing APIs
             originalClip = AddViewportToClip ();
 
             // If no context ...
-            context ??= new ();
+            context ??= new DrawContext ();
 
             SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
             DoClearViewport (context);
@@ -153,26 +155,6 @@ public partial class View // Drawing APIs
             Border?.AdvanceDrawIndicator ();
 
             ClearNeedsDraw ();
-
-            //if (this is not Adornment && SuperView is not Adornment)
-            //{
-            //    // Parent
-            //    Debug.Assert (Margin!.Parent == this);
-            //    Debug.Assert (Border!.Parent == this);
-            //    Debug.Assert (Padding!.Parent == this);
-
-            //    // SubViewNeedsDraw is set to false by ClearNeedsDraw.
-            //    Debug.Assert (SubViewNeedsDraw == false);
-            //    Debug.Assert (Margin!.SubViewNeedsDraw == false);
-            //    Debug.Assert (Border!.SubViewNeedsDraw == false);
-            //    Debug.Assert (Padding!.SubViewNeedsDraw == false);
-
-            //    // NeedsDraw is set to false by ClearNeedsDraw.
-            //    Debug.Assert (NeedsDraw == false);
-            //    Debug.Assert (Margin!.NeedsDraw == false);
-            //    Debug.Assert (Border!.NeedsDraw == false);
-            //    Debug.Assert (Padding!.NeedsDraw == false);
-            //}
         }
 
         // ------------------------------------
@@ -222,7 +204,7 @@ public partial class View // Drawing APIs
                     subview.SetNeedsDraw ();
                 }
 
-                LineCanvas.Exclude (new (subview.FrameToScreen ()));
+                LineCanvas.Exclude (new Region (subview.FrameToScreen ()));
             }
 
             Region? saved = Border?.AddFrameToClip ();
@@ -230,17 +212,19 @@ public partial class View // Drawing APIs
             SetClip (saved);
         }
 
-        if (Padding?.SubViews is { } && Padding.Thickness != Thickness.Empty && Padding.NeedsDraw)
+        if (Padding?.SubViews is null || Padding.Thickness == Thickness.Empty || !Padding.NeedsDraw)
         {
-            foreach (View subview in Padding.SubViews)
-            {
-                subview.SetNeedsDraw ();
-            }
-
-            Region? saved = Padding?.AddFrameToClip ();
-            Padding?.DoDrawSubViews ();
-            SetClip (saved);
+            return;
         }
+
+        foreach (View subview in Padding.SubViews)
+        {
+            subview.SetNeedsDraw ();
+        }
+
+        Region? savedPadding = Padding?.AddFrameToClip ();
+        Padding?.DoDrawSubViews ();
+        SetClip (savedPadding);
     }
 
     internal void DoDrawAdornments (Region? originalClip)
@@ -320,22 +304,6 @@ public partial class View // Drawing APIs
         }
     }
 
-    private void ClearFrame ()
-    {
-        if (Driver is null)
-        {
-            return;
-        }
-
-        // Get screen-relative coords
-        Rectangle toClear = FrameToScreen ();
-
-        Attribute prev = SetAttribute (GetAttributeForRole (VisualRole.Normal));
-        Driver.FillRect (toClear);
-        SetAttribute (prev);
-        SetNeedsDraw ();
-    }
-
     /// <summary>
     ///     Called when the View's Adornments are to be drawn. Prepares <see cref="View.LineCanvas"/>. If
     ///     <see cref="SuperViewRendersLineCanvas"/> is true, only the
@@ -367,12 +335,13 @@ public partial class View // Drawing APIs
             return;
         }
 
-        if (!ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
+        if (ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
         {
-            ClearViewport (context);
-            OnClearedViewport ();
-            ClearedViewport?.Invoke (this, new (Viewport, Viewport, null));
+            return;
         }
+        ClearViewport (context);
+        OnClearedViewport ();
+        ClearedViewport?.Invoke (this, new DrawEventArgs (Viewport, Viewport, null));
     }
 
     /// <summary>
@@ -419,11 +388,11 @@ public partial class View // Drawing APIs
         }
 
         // Get screen-relative coords
-        Rectangle toClear = ViewportToScreen (Viewport with { Location = new (0, 0) });
+        Rectangle toClear = ViewportToScreen (Viewport with { Location = new Point (0, 0) });
 
         if (ViewportSettings.HasFlag (ViewportSettingsFlags.ClearContentOnly))
         {
-            Rectangle visibleContent = ViewportToScreen (new Rectangle (new (-Viewport.X, -Viewport.Y), GetContentSize ()));
+            Rectangle visibleContent = ViewportToScreen (new Rectangle (new Point (-Viewport.X, -Viewport.Y), GetContentSize ()));
             toClear = Rectangle.Intersect (toClear, visibleContent);
         }
 
@@ -501,7 +470,7 @@ public partial class View // Drawing APIs
     /// <param name="context">The draw context to report drawn areas to.</param>
     public void DrawText (DrawContext? context = null)
     {
-        Rectangle drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
+        var drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
 
         // Use GetDrawRegion to get precise drawn areas
         Region textRegion = TextFormatter.GetDrawRegion (drawRect);
@@ -511,8 +480,7 @@ public partial class View // Drawing APIs
 
         if (Driver is { })
         {
-            TextFormatter.Draw (
-                                Driver,
+            TextFormatter.Draw (Driver,
                                 drawRect,
                                 HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
                                 HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
@@ -710,11 +678,12 @@ public partial class View // Drawing APIs
 
             view.Draw (context);
 
-            if (view.SuperViewRendersLineCanvas)
+            if (!view.SuperViewRendersLineCanvas)
             {
-                LineCanvas.Merge (view.LineCanvas);
-                view.LineCanvas.Clear ();
+                continue;
             }
+            LineCanvas.Merge (view.LineCanvas);
+            view.LineCanvas.Clear ();
         }
     }
 
@@ -767,33 +736,36 @@ public partial class View // Drawing APIs
             return;
         }
 
-        if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rectangle.Empty)
+        if (SuperViewRendersLineCanvas || LineCanvas.Bounds == Rectangle.Empty)
         {
-            // Get both cell map and Region in a single pass through the canvas
-            (Dictionary<Point, Cell?> cellMap, Region lineRegion) = LineCanvas.GetCellMapWithRegion ();
-
-            foreach (KeyValuePair<Point, Cell?> p in cellMap)
-            {
-                // Get the entire map
-                if (p.Value is { })
-                {
-                    SetAttribute (p.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
-                    Driver.Move (p.Key.X, p.Key.Y);
-
-                    // TODO: #2616 - Support combining sequences that don't normalize
-                    AddStr (p.Value.Value.Grapheme);
-                }
-            }
-
-            // Report the drawn region for transparency support
-            // Region was built during the GetCellMapWithRegion() call above
-            if (context is { } && cellMap.Count > 0)
-            {
-                context.AddDrawnRegion (lineRegion);
-            }
-
-            LineCanvas.Clear ();
+            return;
         }
+
+        // Get both cell map and Region in a single pass through the canvas
+        (Dictionary<Point, Cell?> cellMap, Region lineRegion) = LineCanvas.GetCellMapWithRegion ();
+
+        foreach (KeyValuePair<Point, Cell?> p in cellMap)
+        {
+            // Get the entire map
+            if (p.Value is null)
+            {
+                continue;
+            }
+            SetAttribute (p.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
+            Driver.Move (p.Key.X, p.Key.Y);
+
+            // TODO: #2616 - Support combining sequences that don't normalize
+            AddStr (p.Value.Value.Grapheme);
+        }
+
+        // Report the drawn region for transparency support
+        // Region was built during the GetCellMapWithRegion() call above
+        if (context is { } && cellMap.Count > 0)
+        {
+            context.AddDrawnRegion (lineRegion);
+        }
+
+        LineCanvas.Clear ();
     }
 
     #endregion DrawLineCanvas
@@ -813,55 +785,57 @@ public partial class View // Drawing APIs
         // Raise virtual method first, then event. This allows subclasses to override behavior
         // before subscribers see the event.
         OnDrawComplete (context);
-        DrawComplete?.Invoke (this, new (Viewport, Viewport, context));
+        DrawComplete?.Invoke (this, new DrawEventArgs (Viewport, Viewport, context));
 
         // Phase 2: Update Driver.Clip to exclude this view's drawn area
         // This prevents views "behind" this one (earlier in draw order/Z-order) from drawing over it.
         // Adornments (Margin, Border, Padding) are handled by their Adornment.Parent view and don't exclude themselves.
-        if (this is not AdornmentView)
+        if (this is AdornmentView)
         {
-            if (ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
+            return;
+        }
+
+        if (ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
+        {
+            // Transparent View Path:
+            // Only exclude the regions that were actually drawn, allowing views beneath
+            // to show through in areas where nothing was drawn.
+
+            // The context.DrawnRegion may include areas outside the Viewport (e.g., if content
+            // was drawn with ViewportSettingsFlags.AllowContentOutsideViewport). We need to clip
+            // it to the Viewport bounds to prevent excluding areas that aren't visible.
+            context!.ClipDrawnRegion (ViewportToScreen (Viewport));
+
+            // Exclude the actually-drawn region from Driver.Clip
+            ExcludeFromClip (context.GetDrawnRegion ());
+
+            // Border and Padding are always opaque (they draw lines/fills), so exclude them too
+            ExcludeFromClip (Border?.Thickness.AsRegion (Border.FrameToScreen ()));
+            ExcludeFromClip (Padding?.Thickness.AsRegion (Padding.FrameToScreen ()));
+        }
+        else
+        {
+            // Opaque View Path (default):
+            // Exclude the entire view area from Driver.Clip. This is the typical case where
+            // the view is considered fully opaque.
+
+            // Start with the Frame in screen coordinates
+            Rectangle borderFrame = FrameToScreen ();
+
+            // If there's a Border, use its frame instead (includes the border thickness)
+            if (Border is { })
             {
-                // Transparent View Path:
-                // Only exclude the regions that were actually drawn, allowing views beneath
-                // to show through in areas where nothing was drawn.
-
-                // The context.DrawnRegion may include areas outside the Viewport (e.g., if content
-                // was drawn with ViewportSettingsFlags.AllowContentOutsideViewport). We need to clip
-                // it to the Viewport bounds to prevent excluding areas that aren't visible.
-                context!.ClipDrawnRegion (ViewportToScreen (Viewport));
-
-                // Exclude the actually-drawn region from Driver.Clip
-                ExcludeFromClip (context.GetDrawnRegion ());
-
-                // Border and Padding are always opaque (they draw lines/fills), so exclude them too
-                ExcludeFromClip (Border?.Thickness.AsRegion (Border.FrameToScreen ()));
-                ExcludeFromClip (Padding?.Thickness.AsRegion (Padding.FrameToScreen ()));
+                borderFrame = Border.FrameToScreen ();
             }
-            else
-            {
-                // Opaque View Path (default):
-                // Exclude the entire view area from Driver.Clip. This is the typical case where
-                // the view is considered fully opaque.
 
-                // Start with the Frame in screen coordinates
-                Rectangle borderFrame = FrameToScreen ();
+            // Exclude this view's entire area (Border inward, but not Margin) from the clip.
+            // This prevents any view drawn after this one from drawing in this area.
+            ExcludeFromClip (borderFrame);
 
-                // If there's a Border, use its frame instead (includes the border thickness)
-                if (Border is { })
-                {
-                    borderFrame = Border.FrameToScreen ();
-                }
-
-                // Exclude this view's entire area (Border inward, but not Margin) from the clip.
-                // This prevents any view drawn after this one from drawing in this area.
-                ExcludeFromClip (borderFrame);
-
-                // Update the DrawContext to track that we drew this entire rectangle.
-                // This allows our SuperView (if any) to know what area we occupied,
-                // which is important for transparency calculations at higher levels.
-                context?.AddDrawnRectangle (borderFrame);
-            }
+            // Update the DrawContext to track that we drew this entire rectangle.
+            // This allows our SuperView (if any) to know what area we occupied,
+            // which is important for transparency calculations at higher levels.
+            context?.AddDrawnRectangle (borderFrame);
         }
 
         // When this method returns, Driver.Clip has been updated to exclude this view's area.

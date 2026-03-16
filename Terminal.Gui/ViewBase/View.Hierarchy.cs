@@ -64,19 +64,19 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         // Add direct SubViews
         result.AddRange (InternalSubViews);
 
-        if (includeMargin && Margin is { SubViews: { Count: > 0 } } && Margin.Thickness != Thickness.Empty)
+        if (includeMargin && Margin is { SubViews.Count: > 0 } && Margin.Thickness != Thickness.Empty)
         {
             // Add Margin SubViews
             result.AddRange (Margin.SubViews);
         }
 
-        if (includeBorder && Border is { SubViews: { Count: > 0 } } && Border.Thickness != Thickness.Empty)
+        if (includeBorder && Border is { SubViews.Count: > 0 } && Border.Thickness != Thickness.Empty)
         {
             // Add Border SubViews
             result.AddRange (Border.SubViews);
         }
 
-        if (includePadding && Padding is { SubViews: { Count: > 0 } } && Padding.Thickness != Thickness.Empty)
+        if (includePadding && Padding is { SubViews.Count: > 0 } && Padding.Thickness != Thickness.Empty)
         {
             // Add Padding SubViews
             result.AddRange (Padding.SubViews);
@@ -153,7 +153,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     #region AddRemove
 
     /// <summary>
-    ///    Adds a SubView (child) to this view at the specified index in the <see cref="SubViews"/> list.
+    ///     Adds a SubView (child) to this view at the specified index in the <see cref="SubViews"/> list.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -384,7 +384,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         if (view.SuperView is null)
         {
-            Logging.Warning ($"{view.ToIdentifyingString()} cannot be Removed. SuperView is null.");
+            Logging.Warning ($"{view.ToIdentifyingString ()} cannot be Removed. SuperView is null.");
         }
         else if (view.SuperView != this)
         {
@@ -574,7 +574,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     {
         View? top = to; // ?? App?.TopRunnableView;
 
-        for (View? v = from?.SuperView ?? this?.SuperView; v != null; v = v.SuperView)
+        for (View? v = from?.SuperView ?? SuperView; v != null; v = v.SuperView)
         {
             top = v;
 
@@ -621,28 +621,30 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             }
         }
 
-        if (includeAdornments)
+        if (!includeAdornments)
         {
-            bool found = IsInHierarchy (start.Padding?.View, view, includeAdornments);
+            return false;
+        }
 
-            if (found)
-            {
-                return found;
-            }
+        bool inHierarchy = IsInHierarchy (start.Padding?.View, view, includeAdornments);
 
-            found = IsInHierarchy (start.Border?.View, view, includeAdornments);
+        if (inHierarchy)
+        {
+            return inHierarchy;
+        }
 
-            if (found)
-            {
-                return found;
-            }
+        inHierarchy = IsInHierarchy (start.Border?.View, view, includeAdornments);
 
-            found = IsInHierarchy (start.Margin?.View, view, includeAdornments);
+        if (inHierarchy)
+        {
+            return inHierarchy;
+        }
 
-            if (found)
-            {
-                return found;
-            }
+        inHierarchy = IsInHierarchy (start.Margin?.View, view, includeAdornments);
+
+        if (inHierarchy)
+        {
+            return inHierarchy;
         }
 
         return false;

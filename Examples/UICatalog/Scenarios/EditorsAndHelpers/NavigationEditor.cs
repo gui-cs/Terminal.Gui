@@ -41,7 +41,7 @@ public sealed class NavigationEditor : EditorBase
         ViewToEdit.TabStop = (TabBehavior)e.Value;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void EndInit ()
     {
         base.EndInit ();

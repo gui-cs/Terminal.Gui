@@ -33,10 +33,12 @@ namespace Terminal.Gui.Views;
 ///             <term>Mouse Event</term> <description>Action</description>
 ///         </listheader>
 ///         <item>
-///             <term>Click</term> <description>Selects the clicked codepoint (<see cref="Command.Activate"/>).</description>
+///             <term>Click</term>
+///             <description>Selects the clicked codepoint (<see cref="Command.Activate"/>).</description>
 ///         </item>
 ///         <item>
-///             <term>Double-Click</term> <description>Accepts the clicked codepoint (<see cref="Command.Accept"/>).</description>
+///             <term>Double-Click</term>
+///             <description>Accepts the clicked codepoint (<see cref="Command.Accept"/>).</description>
 ///         </item>
 ///         <item>
 ///             <term>Right-Click / Ctrl+Click</term> <description>Opens the context menu.</description>
@@ -1018,9 +1020,9 @@ public class CharMap : View, IDesignable, IValue<Rune>
         // ony as long as the popover is visible.
         // Note, for ephemeral Popovers, hotkeys are not supported.
         PopoverMenu contextMenu = new ([
-                                            new MenuItem (Strings.charMapCopyGlyph, string.Empty, CopyGlyph),
-                                            new MenuItem (Strings.charMapCopyCP, string.Empty, CopyCodePoint)
-                                        ]);
+                                           new MenuItem (Strings.charMapCopyGlyph, string.Empty, CopyGlyph),
+                                           new MenuItem (Strings.charMapCopyCP, string.Empty, CopyCodePoint)
+                                       ]);
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.

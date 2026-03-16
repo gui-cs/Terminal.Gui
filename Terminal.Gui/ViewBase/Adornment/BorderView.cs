@@ -73,7 +73,7 @@ public partial class BorderView : AdornmentView
                 return;
             }
 
-            DrawIndicator = new ()
+            DrawIndicator = new SpinnerView
             {
 #if DEBUG
                 Id = "DrawIndicator",
@@ -174,10 +174,10 @@ public partial class BorderView : AdornmentView
     {
         Rectangle screenRect = ViewportToScreen (Viewport);
 
-        return new (screenRect.X + Math.Max (0, Thickness.Left - 1),
-                    screenRect.Y + Math.Max (0, Thickness.Top - 1),
-                    Math.Max (0, screenRect.Width - Math.Max (0, Math.Max (0, Thickness.Left - 1) + Math.Max (0, Thickness.Right - 1))),
-                    Math.Max (0, screenRect.Height - Math.Max (0, Math.Max (0, Thickness.Top - 1) + Math.Max (0, Thickness.Bottom - 1))));
+        return new Rectangle (screenRect.X + Math.Max (0, Thickness.Left - 1),
+                              screenRect.Y + Math.Max (0, Thickness.Top - 1),
+                              Math.Max (0, screenRect.Width - Math.Max (0, Math.Max (0, Thickness.Left - 1) + Math.Max (0, Thickness.Right - 1))),
+                              Math.Max (0, screenRect.Height - Math.Max (0, Math.Max (0, Thickness.Top - 1) + Math.Max (0, Thickness.Bottom - 1))));
     }
 
     // TODO: Make LineStyle nullable https://github.com/gui-cs/Terminal.Gui/issues/4021
@@ -241,7 +241,7 @@ public partial class BorderView : AdornmentView
                                       Math.Min (Parent?.TitleTextFormatter.FormatAndGetSize ().Width ?? 0,
                                                 Math.Min (screenBounds.Width - 4, borderBounds.Width - 4)));
 
-        Parent?.TitleTextFormatter.ConstrainToSize = new (maxTitleWidth, 1);
+        Parent?.TitleTextFormatter.ConstrainToSize = new Size (maxTitleWidth, 1);
 
         int sideLineLength = borderBounds.Height;
         bool canDrawBorder = borderBounds is { Width: > 0, Height: > 0 };
@@ -288,7 +288,7 @@ public partial class BorderView : AdornmentView
                                             titleRect,
                                             GetAttributeForRole (Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
                                             GetAttributeForRole (Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
-            Parent?.LineCanvas.Exclude (new (titleRect));
+            Parent?.LineCanvas.Exclude (new Region (titleRect));
         }
 
         if (!canDrawBorder || LineStyle == LineStyle.None)
@@ -315,13 +315,13 @@ public partial class BorderView : AdornmentView
         {
             if (borderBounds.Width < 4 || !Settings.FastHasFlags (BorderSettings.Title) || string.IsNullOrEmpty (Parent?.Title))
             {
-                lc?.AddLine (new (borderBounds.Location.X, titleY), borderBounds.Width, Orientation.Horizontal, lineStyle, normalAttribute);
+                lc?.AddLine (new Point (borderBounds.Location.X, titleY), borderBounds.Width, Orientation.Horizontal, lineStyle, normalAttribute);
             }
             else
             {
                 if (Thickness.Top == 2)
                 {
-                    lc?.AddLine (new (borderBounds.X + 1, topTitleLineY),
+                    lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY),
                                  Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
                                  lineStyle,
@@ -330,13 +330,13 @@ public partial class BorderView : AdornmentView
 
                 if (borderBounds.Width >= 4 && Thickness.Top > 2)
                 {
-                    lc?.AddLine (new (borderBounds.X + 1, topTitleLineY),
+                    lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY),
                                  Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
                                  lineStyle,
                                  normalAttribute);
 
-                    lc?.AddLine (new (borderBounds.X + 1, topTitleLineY + 2),
+                    lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY + 2),
                                  Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
                                  lineStyle,
@@ -345,15 +345,15 @@ public partial class BorderView : AdornmentView
 
                 lc?.AddLine (borderBounds.Location with { Y = titleY }, 2, Orientation.Horizontal, lineStyle, normalAttribute);
 
-                lc?.AddLine (new (borderBounds.X + 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, normalAttribute);
+                lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, normalAttribute);
 
-                lc?.AddLine (new (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, topTitleLineY),
+                lc?.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, topTitleLineY),
                              titleBarsLength,
                              Orientation.Vertical,
                              LineStyle.Single,
                              normalAttribute);
 
-                lc?.AddLine (new (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, titleY),
+                lc?.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, titleY),
                              borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                              Orientation.Horizontal,
                              lineStyle,
@@ -371,7 +371,7 @@ public partial class BorderView : AdornmentView
 
         if (drawBottom)
         {
-            lc?.AddLine (new (borderBounds.X, borderBounds.Y + borderBounds.Height - 1),
+            lc?.AddLine (new Point (borderBounds.X, borderBounds.Y + borderBounds.Height - 1),
                          borderBounds.Width,
                          Orientation.Horizontal,
                          lineStyle,
@@ -380,7 +380,7 @@ public partial class BorderView : AdornmentView
 
         if (drawRight)
         {
-            lc?.AddLine (new (borderBounds.X + borderBounds.Width - 1, titleY), sideLineLength, Orientation.Vertical, lineStyle, normalAttribute);
+            lc?.AddLine (new Point (borderBounds.X + borderBounds.Width - 1, titleY), sideLineLength, Orientation.Vertical, lineStyle, normalAttribute);
         }
 
         // TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
@@ -390,13 +390,13 @@ public partial class BorderView : AdornmentView
 
             if (drawTop)
             {
-                hRuler.Draw (Driver, new (screenBounds.X, screenBounds.Y));
+                hRuler.Draw (Driver, new Point (screenBounds.X, screenBounds.Y));
             }
 
             if (drawTop && maxTitleWidth > 0 && Settings.FastHasFlags (BorderSettings.Title))
             {
                 Parent!.TitleTextFormatter.Draw (Driver,
-                                                 new (borderBounds.X + 2, titleY, maxTitleWidth, 1),
+                                                 new Rectangle (borderBounds.X + 2, titleY, maxTitleWidth, 1),
                                                  Parent.HasFocus
                                                      ? Parent.GetAttributeForRole (VisualRole.Focus)
                                                      : Parent.GetAttributeForRole (VisualRole.Normal),
@@ -409,17 +409,17 @@ public partial class BorderView : AdornmentView
 
             if (drawLeft)
             {
-                vRuler.Draw (Driver, new (screenBounds.X, screenBounds.Y + 1), 1);
+                vRuler.Draw (Driver, new Point (screenBounds.X, screenBounds.Y + 1), 1);
             }
 
             if (drawBottom)
             {
-                hRuler.Draw (Driver, new (screenBounds.X, screenBounds.Y + screenBounds.Height - 1));
+                hRuler.Draw (Driver, new Point (screenBounds.X, screenBounds.Y + screenBounds.Height - 1));
             }
 
             if (drawRight)
             {
-                vRuler.Draw (Driver, new (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), 1);
+                vRuler.Draw (Driver, new Point (screenBounds.X + screenBounds.Width - 1, screenBounds.Y + 1), 1);
             }
         }
 
@@ -450,18 +450,18 @@ public partial class BorderView : AdornmentView
         var fore = new GradientFill (rect, g, GradientDirection.Diagonal);
         var back = new SolidFill (GetAttributeForRole (VisualRole.Normal).Background);
 
-        lc.Fill = new (fore, back);
+        lc.Fill = new FillPair (fore, back);
     }
 
     private static void GetAppealingGradientColors (out List<Color> stops, out List<int> steps)
     {
         stops =
         [
-            new (0, 128, 255), // Bright Blue
-            new (0, 255, 128), // Bright Green
-            new (255, 255), // Bright Yellow
-            new (255, 128), // Bright Orange
-            new (255, 0, 128)
+            new Color (0, 128, 255), // Bright Blue
+            new Color (0, 255, 128), // Bright Green
+            new Color (255, 255), // Bright Yellow
+            new Color (255, 128), // Bright Orange
+            new Color (255, 0, 128)
         ];
 
         steps = [15];

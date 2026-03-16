@@ -46,24 +46,22 @@ public class Border : AdornmentImpl
         }
     }
 
-    private BorderSettings _settings = BorderSettings.Title;
-
     /// <summary>
     ///     Gets or sets the settings for the border.
     /// </summary>
     public BorderSettings Settings
     {
-        get => _settings;
+        get;
         set
         {
-            _settings = value;
+            field = value;
 
             if (View is BorderView bv)
             {
                 bv.Settings = value;
             }
         }
-    }
+    } = BorderSettings.Title;
 
     /// <summary>
     ///     Computes the border rectangle in screen coordinates.
@@ -79,10 +77,10 @@ public class Border : AdornmentImpl
         // Compute without a View
         Rectangle parentScreen = Parent?.FrameToScreen () ?? Rectangle.Empty;
 
-        return new (parentScreen.X + Math.Max (0, Thickness.Left - 1),
-                    parentScreen.Y + Math.Max (0, Thickness.Top - 1),
-                    Math.Max (0, parentScreen.Width - Math.Max (0, Thickness.Left - 1) - Math.Max (0, Thickness.Right - 1)),
-                    Math.Max (0, parentScreen.Height - Math.Max (0, Thickness.Top - 1) - Math.Max (0, Thickness.Bottom - 1)));
+        return new Rectangle (parentScreen.X + Math.Max (0, Thickness.Left - 1),
+                              parentScreen.Y + Math.Max (0, Thickness.Top - 1),
+                              Math.Max (0, parentScreen.Width - Math.Max (0, Thickness.Left - 1) - Math.Max (0, Thickness.Right - 1)),
+                              Math.Max (0, parentScreen.Height - Math.Max (0, Thickness.Top - 1) - Math.Max (0, Thickness.Bottom - 1)));
     }
 
     /// <summary>

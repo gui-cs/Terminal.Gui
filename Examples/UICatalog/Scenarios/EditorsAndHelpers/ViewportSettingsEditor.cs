@@ -22,12 +22,12 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         foreach (View subview in SubViews)
         {
-            subview.Enabled = ViewToEdit is { };// and not Adornment;
+            subview.Enabled = ViewToEdit is { }; // and not Adornment;
         }
 
         if (ViewToEdit is null)
         {
-           return;
+            return;
         }
 
         _cbAllowNegativeX?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeX) ? CheckState.Checked : CheckState.UnChecked;
@@ -341,6 +341,7 @@ public sealed class ViewportSettingsEditor : EditorBase
             {
                 return;
             }
+
             if (rea.Value == ScrollBarVisibilityMode.Auto)
             {
                 ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
@@ -368,8 +369,9 @@ public sealed class ViewportSettingsEditor : EditorBase
         {
             if (ViewToEdit is null or Adornment)
             {
-                 return;
+                return;
             }
+
             if (rea.Value == ScrollBarVisibilityMode.Auto)
             {
                 ViewToEdit!.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
