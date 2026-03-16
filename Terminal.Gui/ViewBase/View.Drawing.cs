@@ -33,7 +33,7 @@ public partial class View // Drawing APIs
         }
 
         // Draw Transparent margins last to ensure they are drawn on top of the content.
-        Margin.DrawMargins (viewsArray);
+        MarginView.DrawMargins (viewsArray);
 
         // DrawMargins may have caused some views have NeedsDraw/NeedsSubViewDraw set; clear them all.
         foreach (View view in viewsArray)
@@ -49,7 +49,7 @@ public partial class View // Drawing APIs
 
         foreach (View view in viewsArray)
         {
-            if (view is not Adornment && view.SuperView is { } && view.SuperView != lastSuperView)
+            if (view is not AdornmentView && view.SuperView is { } && view.SuperView != lastSuperView)
             {
                 // Check if ANY subview of this SuperView still needs drawing
                 bool anySubViewNeedsDrawing = view.SuperView.InternalSubViews.Any (v => v.NeedsDraw || v.SubViewNeedsDraw);
@@ -245,7 +245,7 @@ public partial class View // Drawing APIs
 
     internal void DoDrawAdornments (Region? originalClip)
     {
-        if (this is Adornment)
+        if (this is AdornmentView)
         {
             AddFrameToClip ();
         }
@@ -636,7 +636,7 @@ public partial class View // Drawing APIs
 
     #region DrawSubViews
 
-    private void DoDrawSubViews (DrawContext? context = null)
+    internal void DoDrawSubViews (DrawContext? context = null)
     {
         if (!NeedsDraw || OnDrawingSubViews (context))
         {
@@ -818,7 +818,7 @@ public partial class View // Drawing APIs
         // Phase 2: Update Driver.Clip to exclude this view's drawn area
         // This prevents views "behind" this one (earlier in draw order/Z-order) from drawing over it.
         // Adornments (Margin, Border, Padding) are handled by their Adornment.Parent view and don't exclude themselves.
-        if (this is not Adornment)
+        if (this is not AdornmentView)
         {
             if (ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
             {

@@ -620,12 +620,12 @@ public partial class View // Command APIs
             return true;
         }
 
-        if (SuperView is Padding padding && padding.Parent?.CommandsToBubbleUp.Contains (command) == true)
+        if (SuperView is PaddingView padding && padding.Parent?.CommandsToBubbleUp.Contains (command) == true)
         {
             return true;
         }
 
-        if (this is Padding selfPadding && selfPadding.Parent?.CommandsToBubbleUp.Contains (command) == true)
+        if (this is PaddingView selfPadding && selfPadding.Parent?.CommandsToBubbleUp.Contains (command) == true)
         {
             return true;
         }
@@ -688,12 +688,12 @@ public partial class View // Command APIs
         {
             View? next = current.SuperView;
 
-            if (next is Padding padding)
+            if (next is PaddingView padding)
             {
                 return padding.Parent;
             }
 
-            if (current is Padding selfPadding)
+            if (current is PaddingView selfPadding)
             {
                 return selfPadding.Parent;
             }
@@ -1260,7 +1260,7 @@ public partial class View // Command APIs
             return SuperView.InvokeCommand (refreshed.Command, upCtx);
         }
 
-        if (SuperView is Padding padding && padding.Parent?.CommandsToBubbleUp.Contains (ctx.Command) == true)
+        if (SuperView is PaddingView padding && padding.Parent?.CommandsToBubbleUp.Contains (ctx.Command) == true)
         {
             // Check if Padding's Parent wants this command bubbled up to it
             Trace.Command (this, ctx, "Routing", $"BubblingUp to Padding.Parent {padding.Parent.ToIdentifyingString ()}");
@@ -1269,7 +1269,7 @@ public partial class View // Command APIs
             return padding.Parent.InvokeCommand (ctx.Command, upCtx);
         }
 
-        if (this is not Padding selfPadding || selfPadding.Parent?.CommandsToBubbleUp.Contains (ctx.Command) != true)
+        if (this is not PaddingView selfPadding || selfPadding.Parent?.CommandsToBubbleUp.Contains (ctx.Command) != true)
         {
             return handled;
         }

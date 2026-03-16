@@ -69,7 +69,7 @@ public class MouseTester : Scenario
         };
         demo.Padding!.Add (demoInPadding);
 
-        demo.Padding!.Initialized += DemoPaddingOnInitialized;
+        demo.Padding!.View!.Initialized += DemoPaddingOnInitialized;
 
         MouseEventDemoView sub1 = new ()
         {

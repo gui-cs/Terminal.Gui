@@ -207,7 +207,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         }
 
         // TODO: Add AddingSubView event
-        if (this is Margin)
+        if (this is MarginView)
         {
             if (view is not ShadowView)
             {
@@ -623,21 +623,21 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
 
         if (includeAdornments)
         {
-            bool found = IsInHierarchy (start.Padding, view, includeAdornments);
+            bool found = IsInHierarchy (start.Padding?.View, view, includeAdornments);
 
             if (found)
             {
                 return found;
             }
 
-            found = IsInHierarchy (start.Border, view, includeAdornments);
+            found = IsInHierarchy (start.Border?.View, view, includeAdornments);
 
             if (found)
             {
                 return found;
             }
 
-            found = IsInHierarchy (start.Margin, view, includeAdornments);
+            found = IsInHierarchy (start.Margin?.View, view, includeAdornments);
 
             if (found)
             {

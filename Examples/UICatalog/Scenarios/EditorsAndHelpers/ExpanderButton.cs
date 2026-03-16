@@ -57,17 +57,17 @@ public class ExpanderButton : Button
             Visible = false;
         }
 
-        if (SuperView is Border { } border)
+        if (SuperView is BorderView { } borderView)
         {
             switch (Orientation)
             {
                 case Orientation.Vertical:
-                    Visible = border.Thickness.Top > 0;
+                    Visible = borderView.Thickness.Top > 0;
 
                     break;
 
                 case Orientation.Horizontal:
-                    Visible = border.Border?.Thickness.Left > 0;
+                    Visible = borderView.Thickness.Left > 0;
 
                     break;
             }
@@ -80,9 +80,9 @@ public class ExpanderButton : Button
 
         ExpandOrCollapse (Collapsed);
 
-        if (SuperView is Border { } border)
+        if (SuperView is BorderView { } borderView)
         {
-            border.ThicknessChanged += (_, _) => ShowHide ();
+            borderView.Adornment!.ThicknessChanged += (_, _) => ShowHide ();
         }
     }
 

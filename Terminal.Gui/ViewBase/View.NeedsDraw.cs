@@ -102,7 +102,7 @@ public partial class View
 
         SuperView?.SetSubViewNeedsDrawDownHierarchy ();
 
-        if (this is Adornment adornment)
+        if (this is AdornmentView adornment)
         {
             adornment.Parent?.SetSubViewNeedsDrawDownHierarchy ();
         }
@@ -173,7 +173,7 @@ public partial class View
 
         SubViewNeedsDraw = true;
 
-        if (this is Adornment adornment)
+        if (this is AdornmentView adornment)
         {
             adornment.Parent?.SetSubViewNeedsDrawDownHierarchy ();
         }

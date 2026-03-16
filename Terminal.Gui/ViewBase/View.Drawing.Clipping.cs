@@ -113,7 +113,7 @@ public partial class View
         Rectangle screenRect = FrameToScreen ();
         frameRegion.Intersect (screenRect);
 
-        if (this is Adornment adornment && adornment.Thickness != Thickness.Empty)
+        if (this is AdornmentView adornment && adornment.Thickness != Thickness.Empty)
         {
             // Ensure adornments can't draw outside their thickness
             frameRegion.Exclude (adornment.Thickness.GetInside (FrameToScreen ()));
@@ -166,7 +166,7 @@ public partial class View
             viewportRegion?.Intersect (visibleContent);
         }
 
-        if (this is Adornment adornment && adornment.Thickness != Thickness.Empty)
+        if (this is AdornmentView adornment && adornment.Thickness != Thickness.Empty)
         {
             // Ensure adornments can't draw outside their thickness
             viewportRegion?.Exclude (adornment.Thickness.GetInside (viewport));

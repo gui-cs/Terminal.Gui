@@ -2,14 +2,14 @@ using System.Diagnostics;
 
 namespace Terminal.Gui.ViewBase;
 
-// Border Arrange Mode
+// BorderView Arrange Mode
 
-public partial class Border
+public partial class BorderView
 {
     private Arranger? _arranger;
 
     /// <summary>
-    ///     INTERNAL: Gets the <see cref="Arranger"/> responsible for handling Arrange Mode for this <see cref="Border"/>.
+    ///     INTERNAL: Gets the <see cref="Arranger"/> responsible for handling Arrange Mode for this <see cref="BorderView"/>.
     /// </summary>
     internal Arranger Arranger => _arranger ??= CreateArranger ();
 

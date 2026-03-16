@@ -7,28 +7,26 @@ public partial class View // Adornments
     /// </summary>
     private void SetupAdornments ()
     {
-        // TODO: Move this to Adornment as a static factory method
-        if (this is not Adornment)
+        if (this is not AdornmentView)
         {
-            // TODO: Make the Adornments Lazy and only create them when needed
-            Margin = new (this);
-            Border = new (this);
-            Padding = new (this);
+            Margin = new Margin { Parent = this };
+            Border = new Border { Parent = this };
+            Padding = new Padding { Parent = this };
         }
     }
 
     private void BeginInitAdornments ()
     {
-        Margin?.BeginInit ();
-        Border?.BeginInit ();
-        Padding?.BeginInit ();
+        Margin?.View?.BeginInit ();
+        Border?.View?.BeginInit ();
+        Padding?.View?.BeginInit ();
     }
 
     private void EndInitAdornments ()
     {
-        Margin?.EndInit ();
-        Border?.EndInit ();
-        Padding?.EndInit ();
+        Margin?.View?.EndInit ();
+        Border?.View?.EndInit ();
+        Padding?.View?.EndInit ();
     }
 
     private void DisposeAdornments ()
@@ -252,25 +250,40 @@ public partial class View // Adornments
     /// <summary>Sets the Frame's of the Margin, Border, and Padding.</summary>
     internal void SetAdornmentFrames ()
     {
-        if (this is Adornment)
+        if (this is AdornmentView)
         {
-            // Adornments do not have Adornments
+            // AdornmentViews do not have Adornments
             return;
         }
 
         if (Margin is { })
         {
-            Margin!.Frame = Rectangle.Empty with { Size = Frame.Size };
+            Margin.Frame = Rectangle.Empty with { Size = Frame.Size };
+
+            if (Margin.View is { } mv)
+            {
+                mv.Frame = Margin.Frame;
+            }
         }
 
         if (Border is { } && Margin is { })
         {
-            Border!.Frame = Margin!.Thickness.GetInside (Margin!.Frame);
+            Border.Frame = Margin.Thickness.GetInside (Margin.Frame);
+
+            if (Border.View is { } bv)
+            {
+                bv.Frame = Border.Frame;
+            }
         }
 
         if (Padding is { } && Border is { })
         {
-            Padding!.Frame = Border!.Thickness.GetInside (Border!.Frame);
+            Padding.Frame = Border.Thickness.GetInside (Border.Frame);
+
+            if (Padding.View is { } pv)
+            {
+                pv.Frame = Padding.Frame;
+            }
         }
     }
 }

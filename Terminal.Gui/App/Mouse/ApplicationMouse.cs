@@ -151,7 +151,7 @@ internal class ApplicationMouse : IMouse, IDisposable
         // Create a view-relative mouse event to send to the view that is under the mouse.
         Mouse viewMouseEvent;
 
-        if (deepestViewUnderMouse is Adornment adornment)
+        if (deepestViewUnderMouse is AdornmentView adornment)
         {
             Point frameLoc = adornment.ScreenToFrame (mouseEvent.ScreenPosition);
 
@@ -195,7 +195,7 @@ internal class ApplicationMouse : IMouse, IDisposable
 
         while (deepestViewUnderMouse.NewMouseEvent (viewMouseEvent) is not true && _mouseGrabViewRef is null)
         {
-            if (deepestViewUnderMouse is Adornment adornmentView)
+            if (deepestViewUnderMouse is AdornmentView adornmentView)
             {
                 deepestViewUnderMouse = adornmentView.Parent?.SuperView;
             }
@@ -286,7 +286,7 @@ internal class ApplicationMouse : IMouse, IDisposable
             CachedViewsUnderMouse.Add (view);
             bool raise;
 
-            if (view is Adornment { Parent: { } } adornmentView)
+            if (view is AdornmentView { Parent: { } } adornmentView)
             {
                 Point superViewLoc = adornmentView.Parent.SuperView?.ScreenToViewport (screenPosition) ?? screenPosition;
                 raise = adornmentView.Contains (superViewLoc);

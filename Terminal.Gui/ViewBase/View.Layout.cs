@@ -132,7 +132,7 @@ public partial class View // Layout APIs
 
         while (current is { })
         {
-            if (current is Adornment adornment)
+            if (current is AdornmentView adornment)
             {
                 // Adornments don't have SuperViews; use Adornment.FrameToScreen override
                 // which will give us the screen coordinates of the parent
@@ -190,7 +190,7 @@ public partial class View // Layout APIs
             // Implicit layout is ok here because all Pos/Dim are Absolute values.
             Layout ();
 
-            if (SuperView is { } || this is Adornment { Parent: null })
+            if (SuperView is { } || this is AdornmentView { Parent: null })
             {
                 // Ensure the next Application iteration tries to layout again
                 SetNeedsLayout ();
@@ -838,7 +838,7 @@ public partial class View // Layout APIs
     /// <value>
     ///     <see langword="true"/> if layout is needed.
     /// </value>
-    public bool NeedsLayout { get; private set; } = true;
+    public bool NeedsLayout { get; internal set; } = true;
 
     /// <summary>
     ///     Sets <see cref="NeedsLayout"/> to return <see langword="true"/>, indicating this View and all of it's subviews
@@ -912,7 +912,7 @@ public partial class View // Layout APIs
             SuperView?.SetNeedsLayout ();
         }
 
-        if (this is not Adornment adornment)
+        if (this is not AdornmentView adornment)
         {
             return;
         }
@@ -1274,24 +1274,24 @@ public partial class View // Layout APIs
         // because the point was in their adornment, and if the adornment is transparent, they should be removed.
         viewsUnderLocation.RemoveAll (v =>
                                       {
-                                          if (v is null or Adornment)
+                                          if (v is null or AdornmentView)
                                           {
                                               return false;
                                           }
 
                                           bool? ret = null;
 
-                                          if (viewsUnderLocation.Contains (v.Margin) && v.Margin!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          if (viewsUnderLocation.Contains (v.Margin?.View) && v.Margin!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
                                           {
                                               ret = true;
                                           }
 
-                                          if (viewsUnderLocation.Contains (v.Border) && v.Border!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          if (viewsUnderLocation.Contains (v.Border?.View) && v.Border!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
                                           {
                                               ret = true;
                                           }
 
-                                          if (viewsUnderLocation.Contains (v.Padding) && v.Padding!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          if (viewsUnderLocation.Contains (v.Padding?.View) && v.Padding!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
                                           {
                                               ret = true;
                                           }
@@ -1348,7 +1348,10 @@ public partial class View // Layout APIs
             {
                 if (padding.Contains (superViewRelativeLocation) && padding.FrameToScreen ().Contains (location))
                 {
-                    viewsToProcess.Push (padding);
+                    if (padding.View is { } pv)
+                    {
+                        viewsToProcess.Push (pv);
+                    }
                 }
             }
 
@@ -1356,7 +1359,10 @@ public partial class View // Layout APIs
             {
                 if (border.Contains (superViewRelativeLocation) && border.FrameToScreen ().Contains (location))
                 {
-                    viewsToProcess.Push (border);
+                    if (border.View is { } bv)
+                    {
+                        viewsToProcess.Push (bv);
+                    }
                 }
             }
 
@@ -1364,7 +1370,10 @@ public partial class View // Layout APIs
             {
                 if (margin.Contains (superViewRelativeLocation) && margin.FrameToScreen ().Contains (location))
                 {
-                    viewsToProcess.Push (margin);
+                    if (margin.View is { } mv)
+                    {
+                        viewsToProcess.Push (mv);
+                    }
                 }
             }
 

@@ -48,7 +48,7 @@ public partial class View
     /// </summary>
     private void SetupScrollBars ()
     {
-        if (this is Adornment)
+        if (this is AdornmentView)
         {
             return;
         }
@@ -181,7 +181,7 @@ public partial class View
     /// </summary>
     private void SyncScrollBarsToSettings (ViewportSettingsFlags oldFlags, ViewportSettingsFlags newFlags)
     {
-        if (this is Adornment)
+        if (this is AdornmentView)
         {
             return;
         }
@@ -221,7 +221,7 @@ public partial class View
     /// </summary>
     private void DisposeScrollBars ()
     {
-        if (this is Adornment)
+        if (this is AdornmentView)
         {
             return;
         }

@@ -6,13 +6,13 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 internal sealed class Arranger : IDisposable
 {
-    private readonly Border _border;
+    private readonly BorderView _border;
 
     /// <summary>
     ///     Creates a new Arranger for the specified border.
     /// </summary>
     /// <param name="border">The border adornment to manage arrangement for.</param>
-    internal Arranger (Border border) => _border = border;
+    internal Arranger (BorderView border) => _border = border;
 
     /// <summary>
     ///     Gets the current arrangement mode.

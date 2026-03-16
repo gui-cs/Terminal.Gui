@@ -157,7 +157,7 @@ internal class ShadowView : View
     // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4491
     private Attribute GetAttributeUnderLocation (Point location)
     {
-        if (SuperView is not Adornment || location.X < 0 || location.X >= App?.Screen.Width || location.Y < 0 || location.Y >= App?.Screen.Height
+        if (SuperView is not AdornmentView || location.X < 0 || location.X >= App?.Screen.Width || location.Y < 0 || location.Y >= App?.Screen.Height
             || ScreenContents == null
             || location.Y < 0
             || location.Y >= ScreenContents.GetLength (0)

@@ -357,17 +357,17 @@ public partial class View // Focus and cross-view navigation management (TabStop
             // How about in Adornments?
             if (Margin is { HasFocus: true })
             {
-                return Margin;
+                return Margin?.View;
             }
 
             if (Border is { HasFocus: true })
             {
-                return Border;
+                return Border?.View;
             }
 
             if (Padding is { HasFocus: true })
             {
-                return Padding;
+                return Padding?.View;
             }
 
             return null;
@@ -610,7 +610,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             throw new ArgumentException ("SetHasFocusTrue: currentFocusedView must HasFocus.");
         }
 
-        var thisAsAdornment = this as Adornment;
+        var thisAsAdornment = this as AdornmentView;
         View? superViewOrParent = thisAsAdornment?.Parent ?? SuperView;
 
         if (CanFocus && superViewOrParent is { CanFocus: false })
@@ -809,7 +809,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             throw new InvalidOperationException ("SetHasFocusFalse new focused view does not have focus.");
         }
 
-        var thisAsAdornment = this as Adornment;
+        var thisAsAdornment = this as AdornmentView;
         View? superViewOrParent = thisAsAdornment?.Parent ?? SuperView;
 
         // If newFocusedVew is null, we need to find the view that should get focus, and SetFocus on it.
@@ -1028,7 +1028,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (Padding is { CanFocus: true, Visible: true, Enabled: true } && Padding.TabStop == behavior && Padding.Thickness != Thickness.Empty)
         {
-            filteredSubViews = filteredSubViews.Append (Padding);
+            filteredSubViews = filteredSubViews.Append (Padding.View!);
         }
 
         // Border and Margin do not participate in focus chain navigation.

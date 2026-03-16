@@ -224,7 +224,8 @@ public abstract class AdornmentImpl : IAdornment
     }
 
     /// <summary>Gets the SubViews of the backing <see cref="View"/>. Returns empty if no View exists.</summary>
-    public IEnumerable<View> SubViews => View?.SubViews ?? [];
+    public IReadOnlyCollection<View> SubViews => View?.SubViews ?? _emptySubViews;
+    private static readonly IReadOnlyCollection<View> _emptySubViews = Array.Empty<View> ();
 
     /// <summary>Adds a SubView to the backing <see cref="View"/>. Forces View creation via <see cref="EnsureView"/>.</summary>
     public virtual void Add (View subView) => EnsureView ().Add (subView);
@@ -232,8 +233,18 @@ public abstract class AdornmentImpl : IAdornment
     /// <summary>Gets whether the backing <see cref="View"/> needs to be redrawn. <see langword="false"/> if no View exists.</summary>
     public bool NeedsDraw => View?.NeedsDraw ?? false;
 
-    /// <summary>Gets whether the backing <see cref="View"/> needs layout. <see langword="false"/> if no View exists.</summary>
-    public bool NeedsLayout => View?.NeedsLayout ?? false;
+    /// <summary>Gets or sets whether the backing <see cref="View"/> needs layout. <see langword="false"/> if no View exists.</summary>
+    public bool NeedsLayout
+    {
+        get => View?.NeedsLayout ?? false;
+        set
+        {
+            if (View is { } v)
+            {
+                v.NeedsLayout = value;
+            }
+        }
+    }
 
     /// <summary>Gets whether the backing <see cref="View"/> has focus. <see langword="false"/> if no View exists.</summary>
     public bool HasFocus => View?.HasFocus ?? false;
@@ -297,6 +308,87 @@ public abstract class AdornmentImpl : IAdornment
 
     /// <summary>Calls <see cref="View.LayoutSubViews"/> on the backing View. No-op if no View exists.</summary>
     public void LayoutSubViews () => View?.LayoutSubViews ();
+
+    /// <summary>Clears the needs-draw state on the backing <see cref="View"/>. No-op if no View exists.</summary>
+    public void ClearNeedsDraw () => View?.ClearNeedsDraw ();
+
+    /// <summary>Gets or sets the Enabled state on the backing <see cref="View"/>.</summary>
+    public bool Enabled
+    {
+        get => View?.Enabled ?? true;
+        set
+        {
+            if (View is { } v)
+            {
+                v.Enabled = value;
+            }
+        }
+    }
+
+    /// <summary>Gets or sets the TabStop behavior on the backing <see cref="View"/>.</summary>
+    public TabBehavior? TabStop
+    {
+        get => View?.TabStop;
+        set
+        {
+            if (View is { } v)
+            {
+                v.TabStop = value;
+            }
+        }
+    }
+
+    /// <summary>Removes a SubView from the backing <see cref="View"/>. No-op if no View exists.</summary>
+    public void Remove (View subView) => View?.Remove (subView);
+
+    /// <summary>Gets whether the backing <see cref="View"/> has a non-default <see cref="Scheme"/>.</summary>
+    public bool HasScheme => View?.HasScheme ?? false;
+
+    /// <summary>Gets or sets the Id on the backing <see cref="View"/>.</summary>
+    public string Id
+    {
+        get => View?.Id ?? _id;
+        set
+        {
+            _id = value;
+
+            if (View is { } v)
+            {
+                v.Id = value;
+            }
+        }
+    }
+    private string _id = string.Empty;
+
+    /// <summary>Gets or sets the SchemeName on the backing <see cref="View"/>.</summary>
+    public string? SchemeName
+    {
+        get => View?.SchemeName ?? _schemeName;
+        set
+        {
+            _schemeName = value;
+
+            if (View is { } v)
+            {
+                v.SchemeName = value;
+            }
+        }
+    }
+    private string? _schemeName;
+
+    /// <summary>Gets whether the backing <see cref="View"/> is initialized.</summary>
+    public bool IsInitialized => View?.IsInitialized ?? false;
+
+    /// <summary>Delegates to <see cref="View.GetAttributeForRole"/> on the backing <see cref="View"/>.
+    /// Falls back to the <see cref="Parent"/>'s attribute when no View exists.</summary>
+    public Attribute GetAttributeForRole (VisualRole role)
+        => View?.GetAttributeForRole (role) ?? Parent?.GetAttributeForRole (role) ?? default;
+
+    /// <summary>Calls <see cref="View.AddFrameToClip"/> on the backing <see cref="View"/>. Returns null if no View exists.</summary>
+    internal Region? AddFrameToClip () => View?.AddFrameToClip ();
+
+    /// <summary>Calls <see cref="View.DoDrawSubViews"/> on the backing <see cref="View"/>. No-op if no View exists.</summary>
+    internal void DoDrawSubViews () => View?.DoDrawSubViews ();
 
     /// <summary>Disposes the backing <see cref="View"/> (if any) and clears references.</summary>
     public void Dispose () => DisposeView ();

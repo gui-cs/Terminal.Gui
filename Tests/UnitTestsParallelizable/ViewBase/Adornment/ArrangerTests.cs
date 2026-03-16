@@ -11,7 +11,7 @@ public class ArrangerTests
 {
     #region Test Helpers
 
-    private static Border CreateBorderWithArrangement (ViewArrangement arrangement)
+    private static BorderView CreateBorderWithArrangement (ViewArrangement arrangement)
     {
         View parent = new ()
         {
@@ -26,7 +26,7 @@ public class ArrangerTests
         parent.BeginInit ();
         parent.EndInit ();
 
-        return parent.Border!;
+        return (BorderView)parent.Border!.View!;
     }
 
     #endregion
@@ -37,7 +37,7 @@ public class ArrangerTests
     public void Constructor_InitializesCorrectly ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
 
         // Act
         Arranger arranger = new (border);
@@ -65,7 +65,7 @@ public class ArrangerTests
     public void HasAnyArrangementOptions_ReturnsCorrectValue (ViewArrangement arrangement, bool expected)
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (arrangement);
+        BorderView border = CreateBorderWithArrangement (arrangement);
         Arranger arranger = new (border);
 
         // Act
@@ -82,9 +82,9 @@ public class ArrangerTests
         View view = new () { BorderStyle = LineStyle.Single };
         view.BeginInit ();
         view.EndInit ();
-        Border? border = view.Border;
-        border!.Parent = null;
-        Arranger arranger = new (border);
+        BorderView borderView = (BorderView)view.Border!.View!;
+        borderView.Parent = null;
+        Arranger arranger = new (borderView);
 
         // Act
         bool result = arranger.HasAnyArrangementOptions ();
@@ -101,7 +101,7 @@ public class ArrangerTests
     public void EnterArrangeMode_ReturnsFalse_WhenNoArrangementOptions ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Fixed);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Fixed);
         Arranger arranger = new (border);
 
         // Act
@@ -116,7 +116,7 @@ public class ArrangerTests
     public void EnterArrangeMode_ReturnsTrue_WhenArrangementOptionsExist ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
 
         // Act
@@ -131,7 +131,7 @@ public class ArrangerTests
     public void EnterArrangeMode_SetsArrangingProperty ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Resizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Resizable);
         Arranger arranger = new (border);
 
         // Act - Enter keyboard mode strips Overlapped
@@ -145,7 +145,7 @@ public class ArrangerTests
     public void EnterArrangeMode_CreatesArrangementButtons ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable | ViewArrangement.Resizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable | ViewArrangement.Resizable);
         Arranger arranger = new (border);
 
         // Act
@@ -165,7 +165,7 @@ public class ArrangerTests
     public void EnterArrangeMode_CreatesCorrectButtons (ViewArrangement arrangement, int expectedCount, ArrangeButtons expectedButtonType)
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (arrangement);
+        BorderView border = CreateBorderWithArrangement (arrangement);
         Arranger arranger = new (border);
 
         // Act
@@ -181,7 +181,7 @@ public class ArrangerTests
     public void EnterArrangeMode_KeyboardMode_ShowsAllApplicableButtons ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable | ViewArrangement.Resizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable | ViewArrangement.Resizable);
         Arranger arranger = new (border);
 
         // Act - Enter keyboard mode (no mouse grab)
@@ -202,7 +202,7 @@ public class ArrangerTests
     public void EnterArrangeMode_KeyboardMode_ShowsAllResizableButtons ()
     {
         // Arrange - Use Resizable flag which includes AllSize
-        Border border = CreateBorderWithArrangement (ViewArrangement.Resizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Resizable);
         Arranger arranger = new (border);
 
         // Act
@@ -226,7 +226,7 @@ public class ArrangerTests
     public void ExitArrangeMode_ResetsArrangingProperty ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
@@ -242,7 +242,7 @@ public class ArrangerTests
     public void ExitArrangeMode_RemovesAllButtons ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable | ViewArrangement.Resizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable | ViewArrangement.Resizable);
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
@@ -257,7 +257,7 @@ public class ArrangerTests
     public void ExitArrangeMode_CanBeCalledMultipleTimes ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
@@ -277,7 +277,7 @@ public class ArrangerTests
     public void DetermineArrangeModeFromClick_ReturnsMovable_WhenClickedInTopThickness ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
         Point clickPoint = new (border.Frame.X + 5, border.Frame.Y); // Top middle
 
@@ -292,7 +292,7 @@ public class ArrangerTests
     public void DetermineArrangeModeFromClick_ReturnsLeftResizable_WhenClickedInLeftEdge ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.LeftResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.LeftResizable);
         Arranger arranger = new (border);
         Point clickPoint = new (border.Frame.X, border.Frame.Y + 5); // Left middle
 
@@ -307,7 +307,7 @@ public class ArrangerTests
     public void DetermineArrangeModeFromClick_ReturnsRightResizable_WhenClickedInRightEdge ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.RightResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.RightResizable);
         Arranger arranger = new (border);
         Point clickPoint = new (border.Frame.Right - 1, border.Frame.Y + 5); // Right middle
 
@@ -322,7 +322,7 @@ public class ArrangerTests
     public void DetermineArrangeModeFromClick_ReturnsBottomResizable_WhenClickedInBottomEdge ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.BottomResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.BottomResizable);
         Arranger arranger = new (border);
         Point clickPoint = new (border.Frame.X + 5, border.Frame.Bottom - 1); // Bottom middle
 
@@ -337,7 +337,7 @@ public class ArrangerTests
     public void DetermineArrangeModeFromClick_ReturnsTopResizable_WhenClickedInTopEdge_AndNotMovable ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.TopResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.TopResizable);
         Arranger arranger = new (border);
         Point clickPoint = new (border.Frame.X + 5, border.Frame.Y); // Top middle
 
@@ -352,7 +352,7 @@ public class ArrangerTests
     public void DetermineArrangeModeFromClick_ReturnsCombined_WhenClickedInBottomRightCorner ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.BottomResizable | ViewArrangement.RightResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.BottomResizable | ViewArrangement.RightResizable);
         Arranger arranger = new (border);
         Point clickPoint = new (border.Frame.Right - 1, border.Frame.Bottom - 1); // Bottom-right corner
 
@@ -367,7 +367,7 @@ public class ArrangerTests
     public void DetermineArrangeModeFromClick_ReturnsCombined_WhenClickedInBottomLeftCorner ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.BottomResizable | ViewArrangement.LeftResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.BottomResizable | ViewArrangement.LeftResizable);
         Arranger arranger = new (border);
         Point clickPoint = new (border.Frame.X, border.Frame.Bottom - 1); // Bottom-left corner
 
@@ -385,9 +385,9 @@ public class ArrangerTests
         View view = new () { BorderStyle = LineStyle.Single };
         view.BeginInit ();
         view.EndInit ();
-        Border? border = view.Border;
-        border!.Parent = null;
-        Arranger arranger = new (border);
+        BorderView borderView = (BorderView)view.Border!.View!;
+        borderView.Parent = null;
+        Arranger arranger = new (borderView);
 
         // Act
         ViewArrangement result = arranger.DetermineArrangeModeFromClick (new (0, 0));
@@ -404,7 +404,7 @@ public class ArrangerTests
     public void HandleDragOperation_MovesView_WhenArrangingIsMovable ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
@@ -427,7 +427,7 @@ public class ArrangerTests
     public void HandleDragOperation_ResizesFromRight_WhenArrangingIsRightResizable ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.RightResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.RightResizable);
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.RightResizable);
 
@@ -452,7 +452,7 @@ public class ArrangerTests
     public void HandleDragOperation_ResizesFromBottom_WhenArrangingIsBottomResizable ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.BottomResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.BottomResizable);
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.BottomResizable);
 
@@ -477,7 +477,7 @@ public class ArrangerTests
     public void HandleDragOperation_ResizesFromLeft_WhenArrangingIsLeftResizable ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.LeftResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.LeftResizable);
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.LeftResizable);
 
@@ -502,7 +502,7 @@ public class ArrangerTests
     public void HandleDragOperation_ResizesFromTop_WhenArrangingIsTopResizable ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.TopResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.TopResizable);
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.TopResizable);
 
@@ -527,7 +527,7 @@ public class ArrangerTests
     public void HandleDragOperation_ResizesFromBottomRight_WhenArrangingIsCombined ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.BottomResizable | ViewArrangement.RightResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.BottomResizable | ViewArrangement.RightResizable);
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.BottomResizable | ViewArrangement.RightResizable);
 
@@ -556,7 +556,7 @@ public class ArrangerTests
         view.BeginInit ();
         view.EndInit ();
         Border? border = view.Border;
-        Arranger arranger = new (border!);
+        Arranger arranger = new (border);
         border!.Parent = null;
 
         // Act & Assert - Should not throw
@@ -571,7 +571,7 @@ public class ArrangerTests
     public void HandleArrangeModeUp_MovesViewUp_WhenArrangingIsMovable ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
@@ -590,7 +590,7 @@ public class ArrangerTests
     public void HandleArrangeModeDown_MovesViewDown_WhenArrangingIsMovable ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
@@ -609,7 +609,7 @@ public class ArrangerTests
     public void HandleArrangeModeLeft_MovesViewLeft_WhenArrangingIsMovable ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
@@ -628,7 +628,7 @@ public class ArrangerTests
     public void HandleArrangeModeRight_MovesViewRight_WhenArrangingIsMovable ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
@@ -650,9 +650,9 @@ public class ArrangerTests
         View view = new () { BorderStyle = LineStyle.Single };
         view.BeginInit ();
         view.EndInit ();
-        Border? border = view.Border;
-        border!.Parent = null;
-        Arranger arranger = new (border);
+        BorderView borderView = (BorderView)view.Border!.View!;
+        borderView.Parent = null;
+        Arranger arranger = new (borderView);
 
         // Act
         bool result = arranger.HandleArrangeModeUp ();
@@ -669,7 +669,7 @@ public class ArrangerTests
     public void IsDragging_ReturnsFalse_Initially ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
 
         // Assert
@@ -680,7 +680,7 @@ public class ArrangerTests
     public void IsDragging_ReturnsTrue_AfterStartDrag ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
 
         // Act
@@ -694,7 +694,7 @@ public class ArrangerTests
     public void IsDragging_ReturnsFalse_AfterEndDrag ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
         arranger.StartDrag (new (5, 5), new (10, 10));
 
@@ -709,7 +709,7 @@ public class ArrangerTests
     public void GrabPoint_IsSetCorrectly_ByStartDrag ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
         Point expectedGrabPoint = new (7, 13);
 
@@ -728,7 +728,7 @@ public class ArrangerTests
     public void Dispose_ExitsArrangeMode ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
@@ -743,7 +743,7 @@ public class ArrangerTests
     public void Dispose_CanBeCalledMultipleTimes ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
 
         // Act & Assert - Should not throw
@@ -760,7 +760,7 @@ public class ArrangerTests
     public void CompleteArrangeWorkflow_MovableMode ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
         View parent = border.Parent!;
         int originalX = parent.Frame.X;
@@ -783,7 +783,7 @@ public class ArrangerTests
     public void CompleteArrangeWorkflow_ResizableMode ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Resizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Resizable);
         Arranger arranger = new (border);
         View parent = border.Parent!;
         int originalWidth = parent.Frame.Width;
@@ -808,7 +808,7 @@ public class ArrangerTests
     public void ButtonVisibility_MovableOnly_ShowsMoveButton ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
 
         // Act
@@ -824,7 +824,7 @@ public class ArrangerTests
     public void ButtonVisibility_LeftResizableOnly_ShowsLeftSizeButton ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.LeftResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.LeftResizable);
         Arranger arranger = new (border);
 
         // Act
@@ -840,7 +840,7 @@ public class ArrangerTests
     public void ButtonVisibility_RightResizableOnly_ShowsRightSizeButton ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.RightResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.RightResizable);
         Arranger arranger = new (border);
 
         // Act
@@ -856,7 +856,7 @@ public class ArrangerTests
     public void ButtonVisibility_TopResizableOnly_ShowsTopSizeButton ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.TopResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.TopResizable);
         Arranger arranger = new (border);
 
         // Act
@@ -872,7 +872,7 @@ public class ArrangerTests
     public void ButtonVisibility_BottomResizableOnly_ShowsBottomSizeButton ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.BottomResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.BottomResizable);
         Arranger arranger = new (border);
 
         // Act
@@ -888,7 +888,7 @@ public class ArrangerTests
     public void ButtonVisibility_ResizableFlag_ShowsAllSizeButton ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Resizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Resizable);
         Arranger arranger = new (border);
 
         // Act
@@ -908,7 +908,7 @@ public class ArrangerTests
     public void ButtonVisibility_MovableAndResizable_ShowsBothButtons ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable | ViewArrangement.Resizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable | ViewArrangement.Resizable);
         Arranger arranger = new (border);
 
         // Act
@@ -929,7 +929,7 @@ public class ArrangerTests
     public void ButtonVisibility_LeftAndRightResizable_ShowsBothButtons ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.LeftResizable | ViewArrangement.RightResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.LeftResizable | ViewArrangement.RightResizable);
         Arranger arranger = new (border);
 
         // Act
@@ -946,7 +946,7 @@ public class ArrangerTests
     public void ButtonVisibility_TopAndBottomResizable_ShowsBothButtons ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.TopResizable | ViewArrangement.BottomResizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.TopResizable | ViewArrangement.BottomResizable);
         Arranger arranger = new (border);
 
         // Act
@@ -963,7 +963,7 @@ public class ArrangerTests
     public void ButtonVisibility_AllDirectionalResizable_ShowsAllFourButtons ()
     {
         // Arrange - Using Resizable flag creates AllSize too
-        Border border = CreateBorderWithArrangement (ViewArrangement.Resizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Resizable);
         Arranger arranger = new (border);
 
         // Act
@@ -983,7 +983,7 @@ public class ArrangerTests
     public void ButtonVisibility_AfterExit_AllButtonsRemoved ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable | ViewArrangement.Resizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable | ViewArrangement.Resizable);
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
@@ -999,7 +999,7 @@ public class ArrangerTests
     public void ButtonVisibility_AfterDispose_AllButtonsRemoved ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable | ViewArrangement.Resizable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable | ViewArrangement.Resizable);
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
@@ -1015,7 +1015,7 @@ public class ArrangerTests
     public void ButtonProperties_AreConfiguredCorrectly ()
     {
         // Arrange
-        Border border = CreateBorderWithArrangement (ViewArrangement.Movable);
+        BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
 
         // Act

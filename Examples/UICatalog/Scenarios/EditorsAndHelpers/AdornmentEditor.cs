@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using Terminal.Gui.ViewBase;
+
 namespace UICatalog.Scenarios;
 
 /// <summary>
@@ -27,9 +29,9 @@ public class AdornmentEditor : EditorBase
     private CheckBox? _diagThicknessCheckBox;
     private CheckBox? _diagRulerCheckBox;
 
-    private Adornment? _adornment;
+    private AdornmentImpl? _adornment;
 
-    public Adornment? AdornmentToEdit
+    public AdornmentImpl? AdornmentToEdit
     {
         get => _adornment;
         set
@@ -55,14 +57,17 @@ public class AdornmentEditor : EditorBase
                 _bottomEdit!.Value = _adornment.Thickness.Bottom;
                 _rightEdit!.Value = _adornment.Thickness.Right;
 
-                _adornment.Initialized += (_, _) =>
-                                          {
-                                              _foregroundColorPicker.SelectedColor =
-                                                  _adornment.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ();
+                if (_adornment.View is { } adornmentView)
+                {
+                    adornmentView.Initialized += (_, _) =>
+                                                 {
+                                                     _foregroundColorPicker.SelectedColor =
+                                                         adornmentView.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ();
 
-                                              _backgroundColorPicker.SelectedColor =
-                                                  _adornment.GetAttributeForRole (VisualRole.Normal).Background.GetClosestNamedColor16 ();
-                                          };
+                                                     _backgroundColorPicker.SelectedColor =
+                                                         adornmentView.GetAttributeForRole (VisualRole.Normal).Background.GetClosestNamedColor16 ();
+                                                 };
+                }
             }
 
             OnAdornmentChanged ();
@@ -77,7 +82,7 @@ public class AdornmentEditor : EditorBase
     protected override void OnViewToEditChanged ()
     {
         base.OnViewToEditChanged ();
-        AdornmentToEdit = ViewToEdit as Adornment;
+        AdornmentToEdit = (ViewToEdit as AdornmentView)?.Adornment as AdornmentImpl;
     }
 
     private NumericUpDown<int>? _topEdit;

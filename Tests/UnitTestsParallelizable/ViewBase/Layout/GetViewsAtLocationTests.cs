@@ -82,7 +82,7 @@ public class GetViewsAtLocationTests
         Assert.Equal (3, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
-        Assert.Equal (sub.Border, result [2]);
+        Assert.Equal (sub.Border!.View!, result [2]);
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public class GetViewsAtLocationTests
         List<View?> result = View.GetViewsAtLocation (root, new (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
-        Assert.Equal (root.Margin, result [1]);
+        Assert.Equal (root.Margin!.View!, result [1]);
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public class GetViewsAtLocationTests
         result = View.GetViewsAtLocation (root, new (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
-        Assert.Equal (root.Margin, result [1]);
+        Assert.Equal (root.Margin!.View!, result [1]);
 
         result = View.GetViewsAtLocation (root, new (1, 1));
         Assert.Single (result);
@@ -129,7 +129,7 @@ public class GetViewsAtLocationTests
         List<View?> result = View.GetViewsAtLocation (root, new (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
-        Assert.Equal (root.Border, result [1]);
+        Assert.Equal (root.Border!.View!, result [1]);
     }
 
     [Fact]
@@ -146,7 +146,7 @@ public class GetViewsAtLocationTests
         result = View.GetViewsAtLocation (root, new (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
-        Assert.Equal (root.Border, result [1]);
+        Assert.Equal (root.Border!.View!, result [1]);
 
         result = View.GetViewsAtLocation (root, new (1, 1));
         Assert.Single (result);
@@ -165,7 +165,7 @@ public class GetViewsAtLocationTests
         List<View?> result = View.GetViewsAtLocation (root, new (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
-        Assert.Equal (root.Border, result [1]);
+        Assert.Equal (root.Border!.View!, result [1]);
     }
 
     [Fact]
@@ -176,7 +176,7 @@ public class GetViewsAtLocationTests
         List<View?> result = View.GetViewsAtLocation (root, new (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
-        Assert.Equal (root.Padding, result [1]);
+        Assert.Equal (root.Padding!.View!, result [1]);
     }
 
     [Fact]
@@ -204,7 +204,7 @@ public class GetViewsAtLocationTests
         Assert.Equal (3, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
-        Assert.Equal (sub.Margin, result [2]);
+        Assert.Equal (sub.Margin!.View!, result [2]);
     }
 
     [Fact]
@@ -219,7 +219,7 @@ public class GetViewsAtLocationTests
         Assert.Equal (3, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
-        Assert.Equal (sub.Border, result [2]);
+        Assert.Equal (sub.Border!.View!, result [2]);
     }
 
     [Fact]
@@ -234,7 +234,7 @@ public class GetViewsAtLocationTests
         Assert.Equal (3, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
-        Assert.Equal (sub.Border, result [2]);
+        Assert.Equal (sub.Border!.View!, result [2]);
     }
 
     [Fact]
@@ -249,7 +249,7 @@ public class GetViewsAtLocationTests
         Assert.Equal (3, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
-        Assert.Equal (sub.Padding, result [2]);
+        Assert.Equal (sub.Padding!.View!, result [2]);
     }
 
     [Fact]
@@ -266,7 +266,7 @@ public class GetViewsAtLocationTests
         Assert.Equal (5, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
-        Assert.Equal (sub.Margin, result [2]);
+        Assert.Equal (sub.Margin!.View!, result [2]);
         Assert.Equal (sub.Margin!.SubViews.ElementAt (0), result [3]);
         Assert.Equal (sub.Margin!.SubViews.ElementAt (1), result [4]);
     }
@@ -298,7 +298,7 @@ public class GetViewsAtLocationTests
         Assert.Equal (4, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
-        Assert.Equal (sub.Border, result [2]);
+        Assert.Equal (sub.Border!.View!, result [2]);
         Assert.Equal (closeButton, result [3]);
     }
 
@@ -1061,13 +1061,13 @@ public class GetViewsAtLocationTests
 
         List<View?> found = runnable.GetViewsUnderLocation (new (5, 5), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (found, v => v == secondaryRunnable);
-        Assert.Contains (found, v => v == secondaryRunnable.Margin);
+        Assert.Contains (found, v => v == secondaryRunnable.Margin!.View!);
         Assert.DoesNotContain (found, v => v?.Id == runnable.Id);
 
         secondaryRunnable.Margin!.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
         found = runnable.GetViewsUnderLocation (new (5, 5), ViewportSettingsFlags.TransparentMouse);
         Assert.DoesNotContain (found, v => v == secondaryRunnable);
-        Assert.DoesNotContain (found, v => v == secondaryRunnable.Margin);
+        Assert.DoesNotContain (found, v => v == secondaryRunnable.Margin!.View!);
         Assert.Contains (found, v => v?.Id == runnable.Id);
 
         runnable.Dispose ();
