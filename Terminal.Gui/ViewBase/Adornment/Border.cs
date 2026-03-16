@@ -20,7 +20,7 @@ public class Border : AdornmentImpl
     /// <inheritdoc/>
     protected override AdornmentView CreateView ()
     {
-        BorderView bv = new (Parent) { LineStyle = _lineStyle ?? LineStyle.None, Settings = Settings };
+        BorderView bv = new (Parent, this) { LineStyle = _lineStyle ?? LineStyle.None, Settings = Settings };
 
         return bv;
     }
@@ -46,10 +46,24 @@ public class Border : AdornmentImpl
         }
     }
 
+    private BorderSettings _settings = BorderSettings.Title;
+
     /// <summary>
     ///     Gets or sets the settings for the border.
     /// </summary>
-    public BorderSettings Settings { get; set; } = BorderSettings.Title;
+    public BorderSettings Settings
+    {
+        get => _settings;
+        set
+        {
+            _settings = value;
+
+            if (View is BorderView bv)
+            {
+                bv.Settings = value;
+            }
+        }
+    }
 
     /// <summary>
     ///     Computes the border rectangle in screen coordinates.

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 namespace ViewBaseTests.Adornments;
 
 
@@ -87,11 +87,11 @@ public class AdornmentTests
         view.Padding!.Thickness = new (paddingThickness);
         Assert.Equal (new (0, 0, 8, 8), view.Viewport);
 
-        Assert.Equal (new (0, 0, view.Margin!.Frame.Width, view.Margin!.Frame.Height), view.Margin!.Viewport);
+        Assert.Equal (new (0, 0, view.Margin!.Frame.Width, view.Margin!.Frame.Height), view.Margin!.View!.Viewport);
 
-        Assert.Equal (new (0, 0, view.Border!.Frame.Width, view.Border!.Frame.Height), view.Border!.Viewport);
+        Assert.Equal (new (0, 0, view.Border!.Frame.Width, view.Border!.Frame.Height), view.Border!.View!.Viewport);
 
-        Assert.Equal (new (0, 0, view.Padding.Frame.Width, view.Padding.Frame.Height), view.Padding.Viewport);
+        Assert.Equal (new (0, 0, view.Padding!.Frame.Width, view.Padding!.Frame.Height), view.Padding!.View!.Viewport);
     }
 
     // Test that Adornment.Viewport_get override returns Frame.Size minus Thickness
@@ -152,10 +152,10 @@ public class AdornmentTests
         Assert.Equal (new (1, 2, 10, 10), parent.Frame);
         Assert.Equal (new (0, 0, 10, 10), parent.Viewport);
         Assert.Equal (new (0, 0, 10, 10), parent.Margin!.Frame);
-        Assert.Equal (new (0, 0, 10, 10), parent.Margin!.Viewport);
+        Assert.Equal (new (0, 0, 10, 10), parent.Margin!.View!.Viewport);
 
-        Assert.Null (parent.Margin!.SuperView);
-        Rectangle boundsAsScreen = parent.Margin!.ViewportToScreen (new Rectangle (1, 2, 5, 5));
+        Assert.Null (parent.Margin!.View!.SuperView);
+        Rectangle boundsAsScreen = parent.Margin!.View!.ViewportToScreen (new Rectangle (1, 2, 5, 5));
         Assert.Equal (new (2, 4, 5, 5), boundsAsScreen);
     }
 
@@ -168,8 +168,7 @@ public class AdornmentTests
         Assert.Equal (new (1, 2, 10, 20), parent.Frame);
         Assert.Equal (new (0, 0, 10, 20), parent.Viewport);
         Assert.Equal (new (0, 0, 10, 20), parent.Margin!.Frame);
-        Assert.Equal (new (0, 0, 10, 20), parent.Margin!.Viewport);
-    }
+        Assert.Equal (new (0, 0, 10, 20), parent.Margin!.View!.Viewport);    }
 
     [Fact]
     public void Frames_are_Parent_SuperView_Relative ()
@@ -310,9 +309,9 @@ public class AdornmentTests
         Assert.Equal (new (1, 2, 10, 10), parent.Frame);
         Assert.Equal (new (0, 0, 10, 10), parent.Viewport);
         Assert.Equal (new (0, 0, 10, 10), parent.Margin!.Frame);
-        Assert.Equal (new (0, 0, 10, 10), parent.Margin!.Viewport);
+        Assert.Equal (new (0, 0, 10, 10), parent.Margin!.View!.Viewport);
 
-        Assert.Null (parent.Margin!.SuperView);
+        Assert.Null (parent.Margin!.View!.SuperView);
         Assert.Equal (new (1, 2, 10, 10), parent.Margin!.FrameToScreen ());
     }
 
@@ -374,16 +373,15 @@ public class AdornmentTests
     [Fact]
     public void Setting_Thickness_Raises_ThicknessChanged ()
     {
-        var adornment = new Adornment (null!);
-        var super = new View ();
+        View view = new ();
         var raised = false;
 
-        adornment.ThicknessChanged += (s, e) =>
-                                      {
-                                          raised = true;
-                                          Assert.Equal (new (1, 2, 3, 4), adornment.Thickness);
-                                      };
-        adornment.Thickness = new (1, 2, 3, 4);
+        view.Margin!.ThicknessChanged += (s, e) =>
+                                          {
+                                              raised = true;
+                                              Assert.Equal (new (1, 2, 3, 4), view.Margin!.Thickness);
+                                          };
+        view.Margin!.Thickness = new (1, 2, 3, 4);
         Assert.True (raised);
     }
 
@@ -415,7 +413,7 @@ public class AdornmentTests
         parent.BeginInit ();
         parent.EndInit ();
 
-        parent.Margin!.SubViewLayout += LayoutStarted;
+        parent.Margin!.View!.SubViewLayout += LayoutStarted;
         parent.Margin!.Thickness = new (1, 2, 3, 4);
         Assert.True (parent.NeedsLayout);
         Assert.True (parent.Margin!.NeedsLayout);
@@ -435,7 +433,7 @@ public class AdornmentTests
         view.BeginInit ();
         view.EndInit ();
         view.Padding!.Thickness = new (2, 2, 2, 2);
-        Assert.Throws<InvalidOperationException> (() => view.Padding.Viewport = view.Padding.Viewport with { Location = new (1, 1) });
+        Assert.Throws<InvalidOperationException> (() => view.Padding!.View!.Viewport = view.Padding!.View!.Viewport with { Location = new (1, 1) });
     }
 
     // Contains tests

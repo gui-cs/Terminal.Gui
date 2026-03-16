@@ -64,7 +64,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
 
         View? foundView = runnable.GetViewsUnderLocation (new (0, 0), ViewportSettingsFlags.None).LastOrDefault ();
 
-        bool found = foundView == subView || foundView == subView.Padding;
+        bool found = foundView == subView || foundView == subView.Padding!.View!;
         Assert.Equal (expectedFound, found);
     }
 
@@ -91,7 +91,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         runnable.Padding.Add (subView);
         runnable.Layout ();
 
-        Assert.Equal (runnable.Padding, runnable.GetViewsUnderLocation (new Point (0, 0), ViewportSettingsFlags.None).LastOrDefault ());
+        Assert.Equal (runnable.Padding!.View!, runnable.GetViewsUnderLocation (new Point (0, 0), ViewportSettingsFlags.None).LastOrDefault ());
 
     }
     

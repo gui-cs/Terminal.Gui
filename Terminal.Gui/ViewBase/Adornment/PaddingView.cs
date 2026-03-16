@@ -17,7 +17,7 @@ public class PaddingView : AdornmentView
     }
 
     /// <inheritdoc/>
-    public PaddingView (View? parent) : base (parent!)
+    public PaddingView (View? parent, Padding padding) : base (parent!, padding)
     {
         CanFocus = true;
         TabStop = TabBehavior.NoStop;

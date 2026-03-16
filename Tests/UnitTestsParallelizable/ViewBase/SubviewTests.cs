@@ -1391,11 +1391,13 @@ public class SubViewTests
 
         // Thickness matters
         superView.Border!.Thickness = new Thickness (1);
-        superView.Border!.Add (borderSubView1, borderSubView2);
+        superView.Border!.Add (borderSubView1);
+        superView.Border!.Add (borderSubView2);
 
         // Thickness matters
         superView.Padding!.Thickness = new Thickness (1);
-        superView.Padding!.Add (paddingSubView1, paddingSubView2);
+        superView.Padding!.Add (paddingSubView1);
+        superView.Padding!.Add (paddingSubView2);
 
         // Act
         IReadOnlyCollection<View> result = superView.GetSubViews (true, true, true);
@@ -1421,7 +1423,7 @@ public class SubViewTests
         view.Padding!.Add (paddingSubView);
 
         // Act - Call GetSubViews on the Margin itself
-        IReadOnlyCollection<View> result = view.Padding.GetSubViews ();
+        IReadOnlyCollection<View> result = view.Padding!.View!.GetSubViews ();
 
         // Assert
         Assert.Single (result);
@@ -1441,7 +1443,7 @@ public class SubViewTests
         view.Border!.Add (borderSubView);
 
         // Act - GetSubViews on Border (an Adornment) with includeAdornments
-        IReadOnlyCollection<View> result = view.Border.GetSubViews (true);
+        IReadOnlyCollection<View> result = view.Border!.View!.GetSubViews (true);
 
         // Assert - Should only return direct subviews, not crash
         Assert.Single (result);

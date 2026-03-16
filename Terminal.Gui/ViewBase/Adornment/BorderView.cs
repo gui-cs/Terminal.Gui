@@ -46,12 +46,12 @@ public partial class BorderView : AdornmentView
     }
 
     /// <inheritdoc/>
-    public BorderView (View? parent) : base (parent!)
+    public BorderView (View? parent, Border border) : base (parent!, border)
     {
         Parent = parent;
         CanFocus = false;
         TabStop = TabBehavior.TabGroup;
-        Adornment!.ThicknessChanged += OnThicknessChanged;
+        Adornment?.ThicknessChanged += OnThicknessChanged;
         Settings = BorderSettings.Title;
     }
 

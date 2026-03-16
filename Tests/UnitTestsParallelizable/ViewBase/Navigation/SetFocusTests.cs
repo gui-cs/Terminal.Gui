@@ -269,7 +269,7 @@ public class SetFocusTests () : TestsAllViews
         Assert.False (subViewSubView2.HasFocus);
         Assert.False (subViewSubView3.HasFocus);
 
-        view.Border!.SetFocus ();
+        view.Border!.View!.SetFocus ();
         Assert.True (view.HasFocus);
         Assert.True (view.Border!.HasFocus);
         Assert.False (subView.HasFocus);

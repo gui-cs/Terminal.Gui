@@ -29,10 +29,10 @@ public class MarginView : AdornmentView
     }
 
     /// <inheritdoc/>
-    public MarginView (View? parent) : base (parent!)
+    public MarginView (View? parent, Margin margin) : base (parent!, margin)
     {
         SubViewLayout += MarginView_LayoutStarted;
-        Adornment!.ThicknessChanged += OnThicknessChanged;
+        Adornment?.ThicknessChanged += OnThicknessChanged;
 
         // Margin should not be focusable
         CanFocus = false;

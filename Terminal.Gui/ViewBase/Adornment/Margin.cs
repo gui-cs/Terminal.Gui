@@ -22,7 +22,7 @@ public class Margin : AdornmentImpl
     /// <inheritdoc/>
     protected override AdornmentView CreateView ()
     {
-        MarginView mv = new (Parent);
+        MarginView mv = new (Parent, this);
 
         if (_shadowStyle != ShadowStyle.None)
         {
@@ -50,7 +50,11 @@ public class Margin : AdornmentImpl
         {
             _shadowStyle = value;
 
-            if (value != ShadowStyle.None)
+            if (View is MarginView mv)
+            {
+                mv.ShadowStyle = value;
+            }
+            else if (value != ShadowStyle.None)
             {
                 ((MarginView)EnsureView ()).ShadowStyle = value;
             }
@@ -62,7 +66,7 @@ public class Margin : AdornmentImpl
     /// <summary>Gets or sets the size of the shadow effect.</summary>
     public Size ShadowSize
     {
-        get => _shadowSize;
+        get => View is MarginView mv ? mv.ShadowSize : _shadowSize;
         set
         {
             _shadowSize = value;

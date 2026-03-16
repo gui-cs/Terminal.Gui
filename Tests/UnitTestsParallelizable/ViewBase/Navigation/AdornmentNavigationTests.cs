@@ -218,7 +218,7 @@ public class AdornmentNavigationTests
 
         // Expected: Padding should be in the focus chain
         // This should pass based on the GetFocusChain code
-        Assert.Contains (view.Padding, focusChain);
+        Assert.Contains (view.Padding!.View!, focusChain);
 
         view.Dispose ();
     }
@@ -321,7 +321,7 @@ public class AdornmentNavigationTests
         View [] focusChain = view.GetFocusChain (NavigationDirection.Forward, TabBehavior.TabGroup);
 
         // Expected: Border should be in the focus chain
-        Assert.DoesNotContain (view.Border, focusChain);
+        Assert.DoesNotContain (view.Border!.View!, focusChain);
 
         view.Dispose ();
     }
@@ -355,7 +355,7 @@ public class AdornmentNavigationTests
         View [] focusChain = view.GetFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
 
         // Expected: Margin should be in the focus chain
-        Assert.DoesNotContain (view.Margin, focusChain);
+        Assert.DoesNotContain (view.Margin!.View!, focusChain);
 
         view.Dispose ();
     }

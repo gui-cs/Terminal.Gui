@@ -15,5 +15,5 @@ public class Padding : AdornmentImpl
     public override void Add (View view) => ((PaddingView)EnsureView ()).Add (view);
 
     /// <inheritdoc/>
-    protected override AdornmentView CreateView () => new PaddingView (Parent);
+    protected override AdornmentView CreateView () => new PaddingView (Parent, this);
 }

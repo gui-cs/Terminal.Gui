@@ -305,8 +305,8 @@ public class LayoutTests
         view.SubViewLayout += (sender, e) => layoutStartedCount++;
         view.SubViewsLaidOut += (sender, e) => layoutCompleteCount++;
 
-        view.Border!.SubViewLayout += (sender, e) => borderLayoutStartedCount++;
-        view.Border!.SubViewsLaidOut += (sender, e) => borderLayoutCompleteCount++;
+        view.Border!.View!.SubViewLayout += (sender, e) => borderLayoutStartedCount++;
+        view.Border!.View!.SubViewsLaidOut += (sender, e) => borderLayoutCompleteCount++;
 
         superView.Add (view);
 
@@ -368,8 +368,8 @@ public class LayoutTests
         view.SubViewLayout += (sender, e) => layoutStartedCount++;
         view.SubViewsLaidOut += (sender, e) => layoutCompleteCount++;
 
-        view.Border!.SubViewLayout += (sender, e) => borderLayoutStartedCount++;
-        view.Border!.SubViewsLaidOut += (sender, e) => borderLayoutCompleteCount++;
+        view.Border!.View!.SubViewLayout += (sender, e) => borderLayoutStartedCount++;
+        view.Border!.View!.SubViewsLaidOut += (sender, e) => borderLayoutCompleteCount++;
 
         superView.Add (view);
         Assert.Equal (0, borderLayoutStartedCount);

@@ -319,7 +319,7 @@ public class SchemeTests : TestDriverBase
         var border = view.Border!;
 
         Assert.NotNull (border);
-        Assert.Null (border.SuperView); // Adornments don't have SuperView
+        Assert.Null (border.View!.SuperView); // Adornments don't have SuperView
         Assert.NotNull (border.Parent);
 
         var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];

@@ -81,7 +81,7 @@ public class GetViewsUnderLocationForRootTests
         top.Margin!.ViewportSettings = ViewportSettingsFlags.None;
         List<View?> result = View.GetViewsUnderLocation (top, new (0, 0), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
-        Assert.Contains (top.Margin, result);
+        Assert.Contains (top.Margin!.View!, result);
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class GetViewsUnderLocationForRootTests
         top.Margin!.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
         List<View?> result = View.GetViewsUnderLocation (top, new (0, 0), ViewportSettingsFlags.TransparentMouse);
         Assert.DoesNotContain (top, result);
-        Assert.DoesNotContain (top.Margin, result);
+        Assert.DoesNotContain (top.Margin!.View!, result);
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public class GetViewsUnderLocationForRootTests
         top.Margin!.ViewportSettings = ViewportSettingsFlags.None;
         List<View?> result = View.GetViewsUnderLocation (top, new (0, 0), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
-        Assert.Contains (top.Margin, result);
+        Assert.Contains (top.Margin!.View!, result);
     }
 
     [Fact]
@@ -122,7 +122,7 @@ public class GetViewsUnderLocationForRootTests
         top.Border!.Thickness = new (1);
         List<View?> result = View.GetViewsUnderLocation (top, new (0, 0), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
-        Assert.Contains (top.Border, result);
+        Assert.Contains (top.Border!.View!, result);
     }
 
     [Fact]
@@ -137,7 +137,7 @@ public class GetViewsUnderLocationForRootTests
         top.Layout ();
         List<View?> result = View.GetViewsUnderLocation (top, new (1, 1), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
-        Assert.Contains (top.Padding, result);
+        Assert.Contains (top.Padding!.View!, result);
     }
 
     [Fact]
@@ -198,14 +198,14 @@ public class GetViewsUnderLocationForRootTests
         Assert.True (subView.Contains (new Point (4, 4)));
         List<View?> result = View.GetViewsUnderLocation (top, new (4, 4), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
-        Assert.Contains (subView.Margin, result);
+        Assert.Contains (subView.Margin!.View!, result);
         Assert.Contains (subView, result);
 
         subView.Margin!.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
 
         result = View.GetViewsUnderLocation (top, new (4, 4), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
-        Assert.DoesNotContain (subView.Margin, result);
+        Assert.DoesNotContain (subView.Margin!.View!, result);
         Assert.DoesNotContain (subView, result);
     }
 
@@ -226,7 +226,7 @@ public class GetViewsUnderLocationForRootTests
         };
         top.Add (subView);
 
-        View? adornment = null;
+        AdornmentImpl? adornment = null;
         switch (adornmentType)
         {
             case "Margin":
@@ -261,7 +261,7 @@ public class GetViewsUnderLocationForRootTests
         // Assert: Should contain top, subView, adornment, and adornmentSubView
         Assert.Contains (top, result);
         Assert.Contains (subView, result);
-        Assert.Contains (adornment, result);
+        Assert.Contains (adornment.View!, result);
         Assert.Contains (adornmentSubView, result);
         Assert.Equal (top, result [0]);
         Assert.Equal (adornmentSubView, result [^1]);
@@ -288,7 +288,7 @@ public class GetViewsUnderLocationForRootTests
         };
         top.Add (subView);
 
-        View? adornment = null;
+        AdornmentImpl? adornment = null;
         switch (adornmentType)
         {
             case "Margin":
@@ -322,7 +322,7 @@ public class GetViewsUnderLocationForRootTests
 
         // Assert: Should contain top, subView, adornment, and adornmentSubView
         Assert.Contains (top, result);
-        Assert.DoesNotContain (adornment, result);
+        Assert.DoesNotContain (adornment.View!, result);
         Assert.Contains (adornmentSubView, result);
         Assert.DoesNotContain (subView, result);
         Assert.Equal (top, result [0]);

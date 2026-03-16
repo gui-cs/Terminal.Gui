@@ -10,5 +10,5 @@ public class Adornment : AdornmentView
     public Adornment () { }
 
     /// <inheritdoc/>
-    public Adornment (View parent) : base (parent) { }
+    public Adornment (View parent) : base (parent, null!) { }
 }

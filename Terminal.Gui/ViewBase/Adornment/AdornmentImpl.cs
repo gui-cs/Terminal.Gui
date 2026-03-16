@@ -91,8 +91,6 @@ public abstract class AdornmentImpl : IAdornment
         if (_view is null)
         {
             _view = CreateView ();
-            _view.Adornment = this;
-            _view.Parent = Parent;
 
             // Synchronize init state with the parent.
             if (Parent?.IsInitialized == true)

@@ -27,13 +27,16 @@ public class AdornmentView : View, IAdornmentView, IDesignable
         /* Do nothing. */
     }
 
-    /// <summary>Constructs a rendering layer for the specified <paramref name="parent"/>.</summary>
-    public AdornmentView (View parent)
+    /// <summary>Constructs a rendering layer for the specified <paramref name="parent"/> and <paramref name="adornment"/>.</summary>
+    public AdornmentView (View parent, AdornmentImpl adornment)
     {
+        // Set Adornment FIRST so subclass constructors can reference it safely.
+        Adornment = adornment;
+        Parent = parent;
+
         // By default, Adornments can't get focus; has to be enabled specifically.
         CanFocus = false;
         TabStop = TabBehavior.NoStop;
-        Parent = parent;
 
         // By default, Adornments have no key bindings.
         KeyBindings.Clear ();

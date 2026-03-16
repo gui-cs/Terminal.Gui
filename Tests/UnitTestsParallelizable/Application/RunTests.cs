@@ -213,7 +213,7 @@ public class RunTests
         Assert.Equal (new (0, 0), w.Frame.Location);
 
         app.Mouse.RaiseMouseEvent (new () { Flags = MouseFlags.LeftButtonPressed });
-        Assert.True (app.Mouse.IsGrabbed (w.Border));
+        Assert.True (app.Mouse.IsGrabbed (w.Border!.View!));
         Assert.Equal (new (0, 0), w.Frame.Location);
 
         // Move down and to the right.

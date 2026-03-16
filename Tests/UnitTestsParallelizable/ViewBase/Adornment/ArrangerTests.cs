@@ -556,7 +556,7 @@ public class ArrangerTests
         view.BeginInit ();
         view.EndInit ();
         Border? border = view.Border;
-        Arranger arranger = new (border);
+        Arranger arranger = new ((BorderView)border!.View!);
         border!.Parent = null;
 
         // Act & Assert - Should not throw
