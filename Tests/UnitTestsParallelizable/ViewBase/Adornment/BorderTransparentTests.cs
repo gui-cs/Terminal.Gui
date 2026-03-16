@@ -2,6 +2,7 @@
 
 using System.Text;
 using UnitTests;
+
 // ReSharper disable StringLiteralTypo
 
 namespace ViewBaseTests.Adornments;
@@ -114,7 +115,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
                                               output,
                                               app.Driver);
     }
-    
+
     [Fact]
     public void Border_Transparent_Shows_Underlying_SubViews_Where_Border_DrawContent_Are_Not ()
     {
@@ -128,10 +129,10 @@ public class BorderTransparentTests (ITestOutputHelper output)
 
         // Fill window background with 'X' to detect transparency
         window.ClearingViewport += (_, args) =>
-        {
-            window.FillRect (args.NewViewport, new Rune ('X'));
-            args.Cancel = true;
-        };
+                                   {
+                                       window.FillRect (args.NewViewport, new Rune ('X'));
+                                       args.Cancel = true;
+                                   };
 
         View subView = new ()
         {
@@ -139,7 +140,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
             X = 1,
             Y = 2,
             Width = Dim.Auto (),
-            Height = Dim.Auto (),
+            Height = Dim.Auto ()
         };
         window.Add (subView);
 
@@ -189,10 +190,10 @@ public class BorderTransparentTests (ITestOutputHelper output)
 
         // Fill window background with 'X' to detect transparency
         window.ClearingViewport += (_, args) =>
-        {
-            window.FillRect (args.NewViewport, new Rune ('X'));
-            args.Cancel = true;
-        };
+                                   {
+                                       window.FillRect (args.NewViewport, new Rune ('X'));
+                                       args.Cancel = true;
+                                   };
 
         View subView = new ()
         {
@@ -200,7 +201,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
             X = 0,
             Y = 1,
             Width = Dim.Auto (),
-            Height = Dim.Auto (),
+            Height = Dim.Auto ()
         };
         window.Add (subView);
 
