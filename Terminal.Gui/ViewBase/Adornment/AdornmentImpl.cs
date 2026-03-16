@@ -229,6 +229,78 @@ public abstract class AdornmentImpl : IAdornment
     /// <summary>Adds a SubView to the backing <see cref="View"/>. Forces View creation via <see cref="EnsureView"/>.</summary>
     public virtual void Add (View subView) => EnsureView ().Add (subView);
 
+    /// <summary>Gets whether the backing <see cref="View"/> needs to be redrawn. <see langword="false"/> if no View exists.</summary>
+    public bool NeedsDraw => View?.NeedsDraw ?? false;
+
+    /// <summary>Gets whether the backing <see cref="View"/> needs layout. <see langword="false"/> if no View exists.</summary>
+    public bool NeedsLayout => View?.NeedsLayout ?? false;
+
+    /// <summary>Gets whether the backing <see cref="View"/> has focus. <see langword="false"/> if no View exists.</summary>
+    public bool HasFocus => View?.HasFocus ?? false;
+
+    /// <summary>Gets or sets the viewport settings flags on the backing <see cref="View"/>.</summary>
+    public ViewportSettingsFlags ViewportSettings
+    {
+        get => View?.ViewportSettings ?? _viewportSettings;
+        set
+        {
+            _viewportSettings = value;
+
+            if (View is { } v)
+            {
+                v.ViewportSettings = value;
+            }
+        }
+    }
+    private ViewportSettingsFlags _viewportSettings;
+
+    /// <summary>Gets or sets visibility of the backing <see cref="View"/>.</summary>
+    public bool Visible
+    {
+        get => View?.Visible ?? true;
+        set
+        {
+            if (View is { } v)
+            {
+                v.Visible = value;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Indicates whether the specified SuperView-relative coordinates are within this adornment's
+    ///     <see cref="Thickness"/>. Works even when no <see cref="View"/> has been created.
+    /// </summary>
+    public bool Contains (in Point location)
+    {
+        if (View is { } v)
+        {
+            return v.Contains (location);
+        }
+
+        if (Parent is null)
+        {
+            return false;
+        }
+
+        Rectangle outside = Frame;
+        outside.Offset (Parent.Frame.Location);
+
+        return Thickness.Contains (outside, location);
+    }
+
+    /// <summary>Calls <see cref="View.BeginInit"/> on the backing View. No-op if no View exists.</summary>
+    public void BeginInit () => View?.BeginInit ();
+
+    /// <summary>Calls <see cref="View.EndInit"/> on the backing View. No-op if no View exists.</summary>
+    public void EndInit () => View?.EndInit ();
+
+    /// <summary>Calls <see cref="View.LayoutSubViews"/> on the backing View. No-op if no View exists.</summary>
+    public void LayoutSubViews () => View?.LayoutSubViews ();
+
+    /// <summary>Disposes the backing <see cref="View"/> (if any) and clears references.</summary>
+    public void Dispose () => DisposeView ();
+
     #endregion Convenience pass-throughs
 
     #region Drawing

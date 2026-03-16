@@ -29,4 +29,10 @@ public interface IAdornmentView
     ///     Set by <see cref="AdornmentImpl.EnsureView"/> when the backing <see cref="View"/> is created.
     /// </summary>
     IAdornment? Adornment { get; set; }
+
+    /// <summary>
+    ///     The thickness of this adornment layer. Every adornment view renders within
+    ///     its <see cref="Thickness"/>.
+    /// </summary>
+    Thickness Thickness { get; set; }
 }
