@@ -592,7 +592,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// </summary>
     /// <param name="start">The View at the start of the hierarchy.</param>
     /// <param name="view">The View to test.</param>
-    /// <param name="includeAdornments">Will include all <see cref="Adornment"/>s in addition to Subviews if true.</param>
+    /// <param name="includeAdornments">Will include all <see cref="IAdornment"/>s in addition to Subviews if true.</param>
     /// <returns></returns>
     public static bool IsInHierarchy (View? start, View? view, bool includeAdornments = false)
     {

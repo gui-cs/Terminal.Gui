@@ -1,3 +1,4 @@
+using UnitTests;
 using UnitTests.Parallelizable;
 
 namespace ApplicationTests.Init;

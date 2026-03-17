@@ -159,7 +159,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     /// <summary>
     ///     Gets the <see cref="IApplication"/> instance this view is running in. Used internally to allow overrides by
-    ///     <see cref="Adornment"/>.
+    ///     <see cref="IAdornment"/>.
     /// </summary>
     /// <returns>
     ///     If this view is at the top of the view hierarchy, and <see cref="App"/> was not explicitly set,
@@ -178,7 +178,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     /// <summary>
     ///     Gets the <see cref="IDriver"/> instance for this view. Used internally to allow overrides by
-    ///     <see cref="Adornment"/>.
+    ///     <see cref="IAdornment"/>.
     /// </summary>
     /// <returns>If this view is at the top of the view hierarchy, returns <see langword="null"/>.</returns>
     protected virtual IDriver? GetDriver () => _driver ?? App?.Driver ?? SuperView?.Driver /*?? ApplicationImpl.Instance.Driver*/;

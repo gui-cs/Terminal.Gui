@@ -47,7 +47,7 @@ public partial class View // Adornments
     }
 
     /// <summary>
-    ///     The <see cref="Adornment"/> that enables separation of a View from other SubViews of the same
+    ///     The <see cref="IAdornment"/> that enables separation of a View from other SubViews of the same
     ///     SuperView. The margin offsets the <see cref="Viewport"/> from the <see cref="Frame"/>.
     /// </summary>
     /// <remarks>
@@ -95,7 +95,7 @@ public partial class View // Adornments
     }
 
     /// <summary>
-    ///     The <see cref="Adornment"/> that offsets the <see cref="Viewport"/> from the <see cref="Margin"/>.
+    ///     The <see cref="IAdornment"/> that offsets the <see cref="Viewport"/> from the <see cref="Margin"/>.
     ///     <para>
     ///         The Border provides the space for a visual border (drawn using
     ///         line-drawing glyphs) and the Title. The Border expands inward; in other words if `Border.Thickness.Top == 2`
@@ -202,7 +202,7 @@ public partial class View // Adornments
     }
 
     /// <summary>
-    ///     The <see cref="Adornment"/> inside of the view that offsets the <see cref="Viewport"/>
+    ///     The <see cref="IAdornment"/> inside of the view that offsets the <see cref="Viewport"/>
     ///     from the <see cref="Border"/>.
     /// </summary>
     /// <remarks>

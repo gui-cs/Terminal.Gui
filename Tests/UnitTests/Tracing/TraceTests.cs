@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Terminal.Gui.Tracing;
-using UnitTests.Parallelizable;
+using UnitTests;
 
 namespace ApplicationTests;
 
