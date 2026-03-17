@@ -16,12 +16,7 @@ public class MouseDragTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        View superView = new ()
-        {
-            Width = 50,
-            Height = 50,
-            App = app
-        };
+        View superView = new () { Width = 50, Height = 50, App = app };
 
         View movableView = new ()
         {
@@ -37,14 +32,14 @@ public class MouseDragTests
         superView.Add (movableView);
 
         // Add to a runnable so the views are part of the application
-        var runnable = new Runnable { App = app, Frame = new (0, 0, 80, 25) };
+        var runnable = new Runnable { App = app, Frame = new Rectangle (0, 0, 80, 25) };
         runnable.Add (superView);
         app.Begin (runnable);
 
         // Simulate mouse press on border to start drag
         Mouse pressEvent = new ()
         {
-            ScreenPosition = new (10, 10), // Screen position
+            ScreenPosition = new Point (10, 10), // Screen position
             Flags = MouseFlags.LeftButtonPressed
         };
 
@@ -54,7 +49,7 @@ public class MouseDragTests
         // Simulate mouse drag
         Mouse dragEvent = new ()
         {
-            ScreenPosition = new (15, 15), // New screen position
+            ScreenPosition = new Point (15, 15), // New screen position
             Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
@@ -78,13 +73,7 @@ public class MouseDragTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        View superView = new ()
-        {
-            X = 5,
-            Y = 5,
-            Width = 50,
-            Height = 50
-        };
+        View superView = new () { X = 5, Y = 5, Width = 50, Height = 50 };
 
         View movableView = new ()
         {
@@ -99,14 +88,14 @@ public class MouseDragTests
         superView.Add (movableView);
 
         // Add to a runnable so the views are part of the application
-        var runnable = new Runnable { App = app, Frame = new (0, 0, 80, 25) };
+        var runnable = new Runnable { App = app, Frame = new Rectangle (0, 0, 80, 25) };
         runnable.Add (superView);
         app.Begin (runnable);
 
         // Simulate mouse press on border
         Mouse pressEvent = new ()
         {
-            ScreenPosition = new (15, 15), // 5+10 offset
+            ScreenPosition = new Point (15, 15), // 5+10 offset
             Flags = MouseFlags.LeftButtonPressed
         };
 
@@ -115,7 +104,7 @@ public class MouseDragTests
         // Simulate mouse drag
         Mouse dragEvent = new ()
         {
-            ScreenPosition = new (18, 18), // Moved 3,3
+            ScreenPosition = new Point (18, 18), // Moved 3,3
             Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
@@ -137,11 +126,7 @@ public class MouseDragTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        View superView = new ()
-        {
-            Width = 50,
-            Height = 50
-        };
+        View superView = new () { Width = 50, Height = 50 };
 
         View movableView = new ()
         {
@@ -156,34 +141,22 @@ public class MouseDragTests
         superView.Add (movableView);
 
         // Add to a runnable so the views are part of the application
-        var runnable = new Runnable { App = app, Frame = new (0, 0, 80, 25) };
+        var runnable = new Runnable { App = app, Frame = new Rectangle (0, 0, 80, 25) };
         runnable.Add (superView);
         app.Begin (runnable);
 
         // Start drag
-        Mouse pressEvent = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse pressEvent = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonPressed };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
 
         // Drag
-        Mouse dragEvent = new ()
-        {
-            ScreenPosition = new (15, 15),
-            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
-        };
+        Mouse dragEvent = new () { ScreenPosition = new Point (15, 15), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
 
         // Release
-        Mouse releaseEvent = new ()
-        {
-            ScreenPosition = new (15, 15),
-            Flags = MouseFlags.LeftButtonReleased
-        };
+        Mouse releaseEvent = new () { ScreenPosition = new Point (15, 15), Flags = MouseFlags.LeftButtonReleased };
 
         app.Mouse.RaiseMouseEvent (releaseEvent);
 
@@ -207,11 +180,7 @@ public class MouseDragTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        View superView = new ()
-        {
-            Width = 50,
-            Height = 50
-        };
+        View superView = new () { Width = 50, Height = 50 };
 
         View resizableView = new ()
         {
@@ -226,25 +195,17 @@ public class MouseDragTests
         superView.Add (resizableView);
 
         // Add to a runnable so the views are part of the application
-        var runnable = new Runnable { App = app, Frame = new (0, 0, 80, 25) };
+        var runnable = new Runnable { App = app, Frame = new Rectangle (0, 0, 80, 25) };
         runnable.Add (superView);
         app.Begin (runnable);
 
         // Simulate mouse press on right border
-        Mouse pressEvent = new ()
-        {
-            ScreenPosition = new (19, 15),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse pressEvent = new () { ScreenPosition = new Point (19, 15), Flags = MouseFlags.LeftButtonPressed };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
 
         // Simulate mouse drag to the right
-        Mouse dragEvent = new ()
-        {
-            ScreenPosition = new (24, 15),
-            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
-        };
+        Mouse dragEvent = new () { ScreenPosition = new Point (24, 15), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
 
@@ -266,11 +227,7 @@ public class MouseDragTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        View superView = new ()
-        {
-            Width = 50,
-            Height = 50
-        };
+        View superView = new () { Width = 50, Height = 50 };
 
         View resizableView = new ()
         {
@@ -285,25 +242,17 @@ public class MouseDragTests
         superView.Add (resizableView);
 
         // Add to a runnable so the views are part of the application
-        var runnable = new Runnable { App = app, Frame = new (0, 0, 80, 25) };
+        var runnable = new Runnable { App = app, Frame = new Rectangle (0, 0, 80, 25) };
         runnable.Add (superView);
         app.Begin (runnable);
 
         // Simulate mouse press on bottom border
-        Mouse pressEvent = new ()
-        {
-            ScreenPosition = new (15, 19),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse pressEvent = new () { ScreenPosition = new Point (15, 19), Flags = MouseFlags.LeftButtonPressed };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
 
         // Simulate mouse drag down
-        Mouse dragEvent = new ()
-        {
-            ScreenPosition = new (15, 24),
-            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
-        };
+        Mouse dragEvent = new () { ScreenPosition = new Point (15, 24), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
 
@@ -325,11 +274,7 @@ public class MouseDragTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        View superView = new ()
-        {
-            Width = 50,
-            Height = 50
-        };
+        View superView = new () { Width = 50, Height = 50 };
 
         View resizableView = new ()
         {
@@ -344,25 +289,17 @@ public class MouseDragTests
         superView.Add (resizableView);
 
         // Add to a runnable so the views are part of the application
-        var runnable = new Runnable { App = app, Frame = new (0, 0, 80, 25) };
+        var runnable = new Runnable { App = app, Frame = new Rectangle (0, 0, 80, 25) };
         runnable.Add (superView);
         app.Begin (runnable);
 
         // Simulate mouse press on left border
-        Mouse pressEvent = new ()
-        {
-            ScreenPosition = new (10, 15),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse pressEvent = new () { ScreenPosition = new Point (10, 15), Flags = MouseFlags.LeftButtonPressed };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
 
         // Simulate mouse drag to the left
-        Mouse dragEvent = new ()
-        {
-            ScreenPosition = new (7, 15),
-            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
-        };
+        Mouse dragEvent = new () { ScreenPosition = new Point (7, 15), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
 
@@ -384,11 +321,7 @@ public class MouseDragTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        View superView = new ()
-        {
-            Width = 50,
-            Height = 50
-        };
+        View superView = new () { Width = 50, Height = 50 };
 
         View resizableView = new ()
         {
@@ -403,25 +336,17 @@ public class MouseDragTests
         superView.Add (resizableView);
 
         // Add to a runnable so the views are part of the application
-        var runnable = new Runnable { App = app, Frame = new (0, 0, 80, 25) };
+        var runnable = new Runnable { App = app, Frame = new Rectangle (0, 0, 80, 25) };
         runnable.Add (superView);
         app.Begin (runnable);
 
         // Simulate mouse press on top border
-        Mouse pressEvent = new ()
-        {
-            ScreenPosition = new (15, 10),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse pressEvent = new () { ScreenPosition = new Point (15, 10), Flags = MouseFlags.LeftButtonPressed };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
 
         // Simulate mouse drag up
-        Mouse dragEvent = new ()
-        {
-            ScreenPosition = new (15, 8),
-            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
-        };
+        Mouse dragEvent = new () { ScreenPosition = new Point (15, 8), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
 
@@ -447,11 +372,7 @@ public class MouseDragTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        View superView = new ()
-        {
-            Width = 50,
-            Height = 50
-        };
+        View superView = new () { Width = 50, Height = 50 };
 
         View resizableView = new ()
         {
@@ -466,25 +387,17 @@ public class MouseDragTests
         superView.Add (resizableView);
 
         // Add to a runnable so the views are part of the application
-        var runnable = new Runnable { App = app, Frame = new (0, 0, 80, 25) };
+        var runnable = new Runnable { App = app, Frame = new Rectangle (0, 0, 80, 25) };
         runnable.Add (superView);
         app.Begin (runnable);
 
         // Simulate mouse press on bottom-right corner
-        Mouse pressEvent = new ()
-        {
-            ScreenPosition = new (19, 19),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse pressEvent = new () { ScreenPosition = new Point (19, 19), Flags = MouseFlags.LeftButtonPressed };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
 
         // Simulate mouse drag diagonally
-        Mouse dragEvent = new ()
-        {
-            ScreenPosition = new (24, 24),
-            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
-        };
+        Mouse dragEvent = new () { ScreenPosition = new Point (24, 24), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
 
@@ -506,11 +419,7 @@ public class MouseDragTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        View superView = new ()
-        {
-            Width = 50,
-            Height = 50
-        };
+        View superView = new () { Width = 50, Height = 50 };
 
         View resizableView = new ()
         {
@@ -525,25 +434,17 @@ public class MouseDragTests
         superView.Add (resizableView);
 
         // Add to a runnable so the views are part of the application
-        var runnable = new Runnable { App = app, Frame = new (0, 0, 80, 25) };
+        var runnable = new Runnable { App = app, Frame = new Rectangle (0, 0, 80, 25) };
         runnable.Add (superView);
         app.Begin (runnable);
 
         // Simulate mouse press on top-left corner
-        Mouse pressEvent = new ()
-        {
-            ScreenPosition = new (10, 10),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        Mouse pressEvent = new () { ScreenPosition = new Point (10, 10), Flags = MouseFlags.LeftButtonPressed };
 
         app.Mouse.RaiseMouseEvent (pressEvent);
 
         // Simulate mouse drag diagonally up and left
-        Mouse dragEvent = new ()
-        {
-            ScreenPosition = new (7, 8),
-            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
-        };
+        Mouse dragEvent = new () { ScreenPosition = new Point (7, 8), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
 
         app.Mouse.RaiseMouseEvent (dragEvent);
 
@@ -569,11 +470,7 @@ public class MouseDragTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        View superView = new ()
-        {
-            Width = 50,
-            Height = 50
-        };
+        View superView = new () { Width = 50, Height = 50 };
 
         View resizableView = new ()
         {
@@ -588,20 +485,20 @@ public class MouseDragTests
         superView.Add (resizableView);
 
         // Add to a runnable so the views are part of the application
-        var runnable = new Runnable { App = app, Frame = new (0, 0, 80, 25) };
+        var runnable = new Runnable { App = app, Frame = new Rectangle (0, 0, 80, 25) };
         runnable.Add (superView);
         app.Begin (runnable);
 
         // Try to drag far to the right (making width very small)
         Mouse dragEvent = new ()
         {
-            Position = new (8, 5), // Drag 8 units right, would make width 2
-            ScreenPosition = new (18, 15),
+            Position = new Point (8, 5), // Drag 8 units right, would make width 2
+            ScreenPosition = new Point (18, 15),
             Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         // Act
-        resizableView.Border!.Arranger.HandleDragOperation (dragEvent);
+        resizableView.Border?.Arranger?.HandleDragOperation (dragEvent);
 
         // Assert - Width should be constrained to minimum
         // width = border thickness + margin right
@@ -620,11 +517,7 @@ public class MouseDragTests
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        View superView = new ()
-        {
-            Width = 50,
-            Height = 50
-        };
+        View superView = new () { Width = 50, Height = 50 };
 
         View resizableView = new ()
         {
@@ -639,20 +532,20 @@ public class MouseDragTests
         superView.Add (resizableView);
 
         // Add to a runnable so the views are part of the application
-        var runnable = new Runnable { App = app, Frame = new (0, 0, 80, 25) };
+        var runnable = new Runnable { App = app, Frame = new Rectangle (0, 0, 80, 25) };
         runnable.Add (superView);
         app.Begin (runnable);
 
         // Try to drag far down (making height very small)
         Mouse dragEvent = new ()
         {
-            Position = new (5, 8), // Drag 8 units down, would make height 2
-            ScreenPosition = new (15, 18),
+            Position = new Point (5, 8), // Drag 8 units down, would make height 2
+            ScreenPosition = new Point (15, 18),
             Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         // Act
-        resizableView.Border!.Arranger.HandleDragOperation (dragEvent);
+        resizableView.Border?.Arranger?.HandleDragOperation (dragEvent);
 
         // Assert - Height should be constrained to minimum
         int expectedMinHeight = resizableView.Border!.Thickness.Vertical + resizableView.Margin!.Thickness.Bottom;

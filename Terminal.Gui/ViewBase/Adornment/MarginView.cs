@@ -7,7 +7,7 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         The Margin is transparent by default. This can be overridden by explicitly setting <see cref="View.Scheme"/>.
+///         The Margin is transparent by default. This can be overridden by explicitly setting <see cref="Scheme"/>.
 ///     </para>
 ///     <para>
 ///         Margins are drawn after all other Views in the application View hierarchy are drawn.

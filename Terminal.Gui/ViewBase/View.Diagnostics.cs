@@ -9,7 +9,7 @@ public partial class View
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         <see cref="Adornment.Diagnostics"/> gets set to this property by default, enabling
+    ///         <see cref="AdornmentView.Diagnostics"/> gets set to this property by default, enabling
     ///         <see cref="ViewDiagnosticFlags.Ruler"/> and <see cref="ViewDiagnosticFlags.Thickness"/>.
     ///     </para>
     /// </remarks>

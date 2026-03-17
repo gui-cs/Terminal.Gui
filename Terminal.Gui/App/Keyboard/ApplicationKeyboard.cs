@@ -256,14 +256,14 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
                         {
                             viewToArrange = viewToArrange switch
                                             {
-                                                Adornment adornmentView => adornmentView.Parent,
+                                                AdornmentView adornmentView => adornmentView.Parent,
                                                 _ => viewToArrange.SuperView
                                             };
                         }
 
                         if (viewToArrange is { })
                         {
-                            return viewToArrange.Border?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
+                            return viewToArrange.Border?.Arranger?.EnterArrangeMode (ViewArrangement.Fixed);
                         }
 
                         return false;

@@ -126,11 +126,11 @@ public partial class View // Adornments
     ///     <para>
     ///         This is a helper for manipulating the view's <see cref="Border"/>. Setting this property to any value other
     ///         than <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s
-    ///         <see cref="Adornment.Thickness"/> to `1` and <see cref="BorderStyle"/> to the value.
+    ///         <see cref="IAdornment.Thickness"/> to `1` and <see cref="BorderStyle"/> to the value.
     ///     </para>
     ///     <para>
     ///         Setting this property to <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s
-    ///         <see cref="Adornment.Thickness"/> to `0` and <see cref="BorderStyle"/> to <see cref="LineStyle.None"/>.
+    ///         <see cref="IAdornment.Thickness"/> to `0` and <see cref="BorderStyle"/> to <see cref="LineStyle.None"/>.
     ///     </para>
     ///     <para>
     ///         Raises <see cref="OnBorderStyleChanged"/> and raises <see cref="BorderStyleChanged"/>, which allows change
@@ -172,11 +172,11 @@ public partial class View // Adornments
     ///         <see cref="BorderStyle"/> is a helper for manipulating the view's <see cref="Border"/>. Setting this property
     ///         to any value other
     ///         than <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s
-    ///         <see cref="Adornment.Thickness"/> to `1` and <see cref="BorderStyle"/> to the value.
+    ///         <see cref="IAdornment.Thickness"/> to `1` and <see cref="BorderStyle"/> to the value.
     ///     </para>
     ///     <para>
     ///         Setting this property to <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s
-    ///         <see cref="Adornment.Thickness"/> to `0` and <see cref="BorderStyle"/> to <see cref="LineStyle.None"/>.
+    ///         <see cref="IAdornment.Thickness"/> to `0` and <see cref="BorderStyle"/> to <see cref="LineStyle.None"/>.
     ///     </para>
     ///     <para>For more advanced customization of the view's border, manipulate see <see cref="Border"/> directly.</para>
     /// </remarks>

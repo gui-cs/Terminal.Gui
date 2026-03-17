@@ -32,13 +32,13 @@ internal sealed class Arranger : IDisposable
     internal bool IsDragging => _dragPosition.HasValue;
 
     /// <summary>
-    ///     Starts "Arrange Mode" where <see cref="Adornment.Parent"/> of a <see cref="Border"/> can be moved and/or resized
+    ///     Starts "Arrange Mode" where <see cref="IAdornmentView.Parent"/> of a <see cref="Border"/> can be moved and/or resized
     ///     using the mouse
     ///     or keyboard.
     /// </summary>
     /// <remarks>
     ///     Arrange Mode is exited by the user pressing the Arrange key, <see cref="Key.Esc"/>, or by
-    ///     clicking the mouse out of the <see cref="Adornment.Parent"/>'s Frame.
+    ///     clicking the mouse out of the <see cref="IAdornmentView.Parent"/>'s Frame.
     /// </remarks>
     /// <returns></returns>
     internal bool EnterArrangeMode (ViewArrangement arrangement)
