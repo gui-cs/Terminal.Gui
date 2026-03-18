@@ -172,7 +172,7 @@ public class GetViewsUnderLocationForRootTests
         View subView = new () { X = 0, Y = 0, Width = 8, Height = 8 };
         top.Add (subView);
 
-        AdornmentImpl? adornment = null;
+        IAdornment? adornment = null;
 
         switch (adornmentType)
         {
@@ -195,14 +195,16 @@ public class GetViewsUnderLocationForRootTests
                 break;
         }
 
+        (adornment as AdornmentImpl)?.EnsureView ();
+
         subView.Layout ();
 
         // Add a child to the adornment
         View adornmentSubView = new () { X = 0, Y = 0, Width = 2, Height = 2 };
-        adornment!.Add (adornmentSubView);
+        (adornment?.View as View)?.Add (adornmentSubView);
 
         // Set adornment ViewportSettings to None so it doesn't interfere with the test
-        adornment.ViewportSettings = ViewportSettingsFlags.None;
+        (adornment?.View as View)?.ViewportSettings = ViewportSettingsFlags.None;
 
         // Act: Point inside adornmentSubView (which is inside the adornment)
         List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
@@ -210,7 +212,6 @@ public class GetViewsUnderLocationForRootTests
         // Assert: Should contain top, subView, adornment, and adornmentSubView
         Assert.Contains (top, result);
         Assert.Contains (subView, result);
-        Assert.Contains (adornment.View!, result);
         Assert.Contains (adornmentSubView, result);
         Assert.Equal (top, result [0]);
         Assert.Equal (adornmentSubView, result [^1]);

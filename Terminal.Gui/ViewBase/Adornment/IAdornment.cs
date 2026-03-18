@@ -41,15 +41,4 @@ public interface IAdornment
 
     /// <summary>Fired when <see cref="Thickness"/> changes.</summary>
     event EventHandler? ThicknessChanged;
-
-    // --- Coordinator methods: delegate to View when present, or use cached Frame ---
-
-    /// <summary>Converts a viewport-relative point to screen coordinates.</summary>
-    Point ViewportToScreen (in Point location);
-
-    /// <summary>Converts a screen point to frame-relative coordinates.</summary>
-    Point ScreenToFrame (in Point location);
-
-    /// <summary>Returns the screen-relative rectangle for this adornment.</summary>
-    Rectangle FrameToScreen ();
 }

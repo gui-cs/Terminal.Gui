@@ -98,21 +98,20 @@ public class Adornments : Scenario
             SchemeName = "Dialog"
         };
 
-        window.Margin!.Data = "Margin";
-        window.Margin!.Text = "Margin Text";
-        window.Margin!.Thickness = new Thickness (0);
+        window.Margin.EnsureView ();
+        window.Margin.View.Text = "Margin Text";
+        window.Margin.Thickness = new Thickness (2);
 
-        window.Border!.Data = "Border";
+        window.Border.EnsureView ();
+        //window.Border.View.Text = "Border Text";
+        window.Border.Thickness = new Thickness (3);
+        window.Border.View.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
 
-        //window.Border!.Text = "Border Text";
-        window.Border!.Thickness = new Thickness (3);
-        window.Border!.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
-
-        window.Padding!.Data = "Padding";
-        window.Padding.Text = "Padding Text line 1\nPadding Text line 3\nPadding Text line 3\nPadding Text line 4\nPadding Text line 5";
+        window.Border.EnsureView ();
+        window.Padding.View.Text = "Padding Text line 1\nPadding Text line 3\nPadding Text line 3\nPadding Text line 4\nPadding Text line 5";
         window.Padding.Thickness = new Thickness (1);
-        window.Padding!.SetScheme (SchemeManager.GetScheme (Schemes.Menu));
-        window.Padding.CanFocus = true;
+        window.Padding.View.SetScheme (SchemeManager.GetScheme (Schemes.Menu));
+        window.Padding.View.CanFocus = true;
 
         Label longLabel = new () { X = 40, Y = 5, Title = "This is long text (in a label) that should clip." };
         longLabel.TextFormatter.WordWrap = true;

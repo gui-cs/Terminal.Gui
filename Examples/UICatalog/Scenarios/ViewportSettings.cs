@@ -72,13 +72,8 @@ public class ViewportSettings : Scenario
         Button buttonAnchored = new () { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Bottom Rig_ht" };
         buttonAnchored.Accepting += (sender, _) => MessageBox.Query ((sender as View)?.App!, "Hi", $"You pressed {((Button)sender!).Text}", Strings.btnOk);
 
-        view.Margin!.Data = "Margin";
-        view.Margin!.Thickness = new Thickness (0);
-
-        view.Border!.Data = "Border";
-        view.Border!.Thickness = new Thickness (3);
-
-        view.Padding!.Data = "Padding";
+        view.Margin.Thickness = new Thickness (0);
+        view.Border.Thickness = new Thickness (3);
 
         view.Add (buttonAnchored, textField, colorPicker, charMap);
 

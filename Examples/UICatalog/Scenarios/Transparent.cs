@@ -121,8 +121,9 @@ public sealed class Transparent : Scenario
             Add (shortcut);
             Add (transparentSubView);
 
-            Padding!.Thickness = new Thickness (1);
-            Padding.Text = "This is the Padding";
+            Padding.Thickness = new Thickness (1);
+            Padding.EnsureView ();
+            Padding.View.Text = "This is the Padding";
         }
 
         private void TransparentView_DrawingContent (object? sender, DrawEventArgs e)

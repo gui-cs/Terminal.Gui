@@ -405,13 +405,13 @@ public class MarginView : AdornmentView
         switch (ShadowStyle)
         {
             case ShadowStyle.Transparent:
-                _rightShadow.Y = Adornment.Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Adornment.Parent.Border!.FrameToScreen ().Location).Y + 1 : 0;
+                _rightShadow.Y = Adornment.Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Adornment.Parent.Border.FrameToScreen ().Location).Y + 1 : 0;
 
                 break;
 
             case ShadowStyle.Opaque:
-                _rightShadow.Y = Adornment.Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Adornment.Parent.Border!.FrameToScreen ().Location).Y + 1 : 0;
-                _bottomShadow.X = Adornment.Parent.Border!.Thickness.Left > 0 ? ScreenToViewport (Adornment.Parent.Border!.FrameToScreen ().Location).X + 1 : 0;
+                _rightShadow.Y = Adornment.Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Adornment.Parent.Border.FrameToScreen ().Location).Y + 1 : 0;
+                _bottomShadow.X = Adornment.Parent.Border!.Thickness.Left > 0 ? ScreenToViewport (Adornment.Parent.Border.FrameToScreen ().Location).X + 1 : 0;
 
                 break;
 

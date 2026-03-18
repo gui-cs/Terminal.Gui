@@ -261,12 +261,7 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
                                             };
                         }
 
-                        if (viewToArrange is { })
-                        {
-                            return viewToArrange.Border?.Arranger?.EnterArrangeMode (ViewArrangement.Fixed);
-                        }
-
-                        return false;
+                        return viewToArrange is { } ? (viewToArrange.Border?.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed) : false;
                     });
 
         // Bind keys from DefaultKeyBindings

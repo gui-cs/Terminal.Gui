@@ -97,19 +97,4 @@ public class Border : AdornmentImpl
             Parent?.SetNeedsLayout ();
         }
     } = BorderSettings.Title;
-
-    /// <summary>
-    ///     The view-arrangement controller. Only exists when a <see cref="BorderView"/> is present.
-    /// </summary>
-    internal Arranger? Arranger => (View as BorderView)?.Arranger;
-
-    /// <summary>
-    ///     Gets the subview used to render <see cref="ViewDiagnosticFlags.DrawIndicator"/>.
-    /// </summary>
-    public SpinnerView? DrawIndicator => (View as BorderView)?.DrawIndicator;
-
-    /// <summary>
-    ///     Advances the draw indicator animation. No-op if no <see cref="BorderView"/> exists.
-    /// </summary>
-    internal void AdvanceDrawIndicator () => (View as BorderView)?.AdvanceDrawIndicator ();
 }

@@ -68,7 +68,7 @@ public abstract class AdornmentImpl : IAdornment
 
     #region View
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public abstract Rectangle GetFrame ();
 
     /// <summary>
@@ -90,7 +90,7 @@ public abstract class AdornmentImpl : IAdornment
     ///     to match the parent's current initialization state.
     /// </summary>
     /// <remarks>Must be called on the UI thread. Internal to prevent eager allocation by consumers.</remarks>
-    internal AdornmentView EnsureView ()
+    public AdornmentView EnsureView ()
     {
         if (View is { })
         {
@@ -99,22 +99,17 @@ public abstract class AdornmentImpl : IAdornment
         View = CreateView ();
 
         // Synchronize init state with the parent.
-        if (Parent?.IsInitialized == true)
+        if (Parent?.IsInitialized != true)
         {
-            View.BeginInit ();
-            View.EndInit ();
+            return View;
         }
-
-        //Parent?.SetAdornmentFrames ();
+        View.BeginInit ();
+        View.EndInit ();
 
         return View;
-
     }
 
-    private void ParentOnFrameChanged (object? sender, EventArgs<Rectangle> e)
-    {
-        View?.OnParentFrameChanged (e.Value);
-    }
+    private void ParentOnFrameChanged (object? sender, EventArgs<Rectangle> e) => View?.OnParentFrameChanged (e.Value);
 
     /// <summary>Factory method — subclasses return their specific <see cref="AdornmentView"/> subclass.</summary>
     protected abstract AdornmentView CreateView ();
@@ -123,21 +118,8 @@ public abstract class AdornmentImpl : IAdornment
 
     #region Coordinator methods
 
-    /// <inheritdoc/>
-    public Point ViewportToScreen (in Point location) => View is { } v ? v.ViewportToScreen (location) : ComputeViewportToScreen (location);
-
-    /// <inheritdoc/>
+    /// <summary>Returns the screen-relative rectangle for this adornment.</summary>
     public Rectangle FrameToScreen () => View is { } v ? v.FrameToScreen () : ComputeFrameToScreen ();
-
-    /// <inheritdoc/>
-    public Point ScreenToFrame (in Point location) => View is { } v ? v.ScreenToFrame (location) : ComputeScreenToFrame (location);
-
-    private Point ComputeViewportToScreen (in Point location)
-    {
-        Rectangle parentScreen = Parent?.FrameToScreen () ?? Rectangle.Empty;
-
-        return new Point (parentScreen.X + GetFrame ().X + location.X, parentScreen.Y + GetFrame ().Y + location.Y);
-    }
 
     private Rectangle ComputeFrameToScreen ()
     {
@@ -146,46 +128,9 @@ public abstract class AdornmentImpl : IAdornment
         return new Rectangle (new Point (parentScreen.X + GetFrame ().X, parentScreen.Y + GetFrame ().Y), GetFrame ().Size);
     }
 
-    private Point ComputeScreenToFrame (in Point location)
-    {
-        Rectangle parentScreen = Parent?.FrameToScreen () ?? Rectangle.Empty;
-
-        return new Point (location.X - parentScreen.X - GetFrame ().X, location.Y - parentScreen.Y - GetFrame ().Y);
-    }
-
     #endregion Coordinator methods
 
     #region Convenience pass-throughs
-
-    /// <summary>Gets or sets the text displayed in this adornment's <see cref="View"/>.</summary>
-    public string Text
-    {
-        get => View?.Text ?? field;
-        set
-        {
-            field = value;
-
-            if (View is { } v)
-            {
-                v.Text = value;
-            }
-        }
-    } = string.Empty;
-
-    /// <summary>Gets or sets arbitrary data associated with this adornment.</summary>
-    public object? Data
-    {
-        get => View?.Data ?? field;
-        set
-        {
-            field = value;
-
-            if (View is { } v)
-            {
-                v.Data = value;
-            }
-        }
-    }
 
     private bool _needsDraw;
 
@@ -372,14 +317,7 @@ public abstract class AdornmentImpl : IAdornment
     public void Remove (View subView) => View?.Remove (subView);
 
     /// <summary>Gets or sets the Id on the backing <see cref="View"/>.</summary>
-    public string Id
-    {
-        get => field;
-        set
-        {
-            field = value;
-        }
-    } = string.Empty;
+    public string Id { get; set; } = string.Empty;
 
     /// <summary>Gets or sets the SchemeName on the backing <see cref="View"/>.</summary>
     public string? SchemeName

@@ -82,10 +82,11 @@ MMM",
         var view = new View { Height = 3, Width = 3 };
 
         // Give the Margin some size
-        view.Margin!.Thickness = new Thickness (1, 1, 1, 1);
+        view.Margin.Thickness = new Thickness (1, 1, 1, 1);
+        view.Margin.EnsureView ();
 
         // Give it Text
-        view.Margin!.Text = "Test";
+        view.Margin.View.Text = "Test";
 
         // Strip off ViewportSettings.Transparent
         view.Margin!.ViewportSettings &= ~ViewportSettingsFlags.Transparent;

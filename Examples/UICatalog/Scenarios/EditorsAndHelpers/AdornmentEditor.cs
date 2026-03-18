@@ -27,35 +27,33 @@ public class AdornmentEditor : EditorBase
     private CheckBox? _diagThicknessCheckBox;
     private CheckBox? _diagRulerCheckBox;
 
-    private AdornmentImpl? _adornment;
-
     public AdornmentImpl? AdornmentToEdit
     {
-        get => _adornment;
+        get;
         set
         {
             Enabled = value is { };
 
-            if (value == _adornment)
+            if (value == field)
             {
                 return;
             }
 
-            _adornment = value;
+            field = value;
 
-            if (_adornment is null)
+            if (field is null)
             {
                 return;
             }
 
             if (IsInitialized)
             {
-                _topEdit!.Value = _adornment.Thickness.Top;
-                _leftEdit!.Value = _adornment.Thickness.Left;
-                _bottomEdit!.Value = _adornment.Thickness.Bottom;
-                _rightEdit!.Value = _adornment.Thickness.Right;
+                _topEdit!.Value = field.Thickness.Top;
+                _leftEdit!.Value = field.Thickness.Left;
+                _bottomEdit!.Value = field.Thickness.Bottom;
+                _rightEdit!.Value = field.Thickness.Right;
 
-                if (_adornment.View is { } adornmentView)
+                if (field.View is { } adornmentView)
                 {
                     adornmentView.Initialized += (_, _) =>
                                                  {

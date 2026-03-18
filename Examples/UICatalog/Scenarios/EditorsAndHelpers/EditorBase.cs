@@ -97,7 +97,7 @@ public abstract class EditorBase : View
     {
         if (ShowViewIdentifier)
         {
-            Padding?.Text = ViewToEdit?.ToIdentifyingString () ?? "<none>";
+            Padding?.View?.Text = ViewToEdit?.ToIdentifyingString () ?? "<none>";
         }
     }
 

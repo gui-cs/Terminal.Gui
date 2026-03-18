@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
@@ -30,6 +28,7 @@ public class PaddingView : AdornmentView
 
         CanFocus = true;
         TabStop = TabBehavior.NoStop;
+
         if (padding.Parent is { })
         {
             Frame = padding.Parent.Border.Thickness.GetInside (padding.Parent.Border.GetFrame ());
@@ -39,8 +38,7 @@ public class PaddingView : AdornmentView
         padding.Parent?.Border.ThicknessChanged += OnThicknessChanged;
     }
 
-
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void OnParentFrameChanged (Rectangle newParentFrame)
     {
         if (Adornment?.Parent is { })
@@ -50,10 +48,7 @@ public class PaddingView : AdornmentView
     }
 
     // TODO: Move DrawIndicator out of Border and into View
-    private void OnThicknessChanged (object? sender, EventArgs e)
-    {
-        OnParentFrameChanged (Adornment.Parent.Frame);
-    }
+    private void OnThicknessChanged (object? sender, EventArgs e) => OnParentFrameChanged (Adornment.Parent.Frame);
 
     /// <summary>Called when a mouse event occurs within the Padding.</summary>
     /// <remarks>
@@ -86,7 +81,6 @@ public class PaddingView : AdornmentView
         Adornment.Parent.SetNeedsDraw ();
 
         return mouse.Handled = true;
-
     }
 
     /// <summary>
