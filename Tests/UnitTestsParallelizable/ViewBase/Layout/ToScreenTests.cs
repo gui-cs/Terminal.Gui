@@ -133,7 +133,7 @@ public class ToScreenTests
         // Arrange
         var adornmentFrame = new Rectangle (topX, 0, 10, 10);
 
-        var adornment = new Adornment ();
+        var adornment = new AdornmentView ();
         adornment.Frame = adornmentFrame;
         adornment.Thickness = new Thickness (1);
 

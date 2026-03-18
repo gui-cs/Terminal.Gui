@@ -654,7 +654,7 @@ public class TabView : View
         // If sender is a Border, get the parent Tab
         if (sender is BorderView border)
         {
-            tab = border.Parent as Tab;
+            tab = border.Adornment.Parent as Tab;
         }
 
         if (tab is { } && tab != SelectedTab)

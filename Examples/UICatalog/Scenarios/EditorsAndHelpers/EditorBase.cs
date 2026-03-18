@@ -159,9 +159,9 @@ public abstract class EditorBase : View
             return;
         }
 
-        if (view is Adornment adornment)
+        if (view is AdornmentView adornment)
         {
-            ViewToEdit = AutoSelectAdornments ? adornment : adornment.Parent;
+            ViewToEdit = AutoSelectAdornments ? adornment : adornment.Adornment.Parent;
         }
         else
         {

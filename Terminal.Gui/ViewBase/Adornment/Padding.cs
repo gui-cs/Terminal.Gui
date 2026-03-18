@@ -9,11 +9,24 @@ namespace Terminal.Gui.ViewBase;
 /// </remarks>
 public class Padding : AdornmentImpl
 {
+    /// <inheritdoc />
+    public override Rectangle GetFrame ()
+    {
+        if (Parent is { })
+        {
+            return Parent.Border.Thickness.GetInside (Parent!.Border.GetFrame ());
+        }
+        else
+        {
+            return Rectangle.Empty;
+        }
+    }
+
     /// <summary>
     ///     Adds a SubView to the Padding. Forces creation of <see cref="PaddingView"/>.
     /// </summary>
     public override void Add (View view) => ((PaddingView)EnsureView ()).Add (view);
 
     /// <inheritdoc/>
-    protected override AdornmentView CreateView () => new PaddingView (Parent, this);
+    protected override AdornmentView CreateView () => new PaddingView (this);
 }

@@ -14,7 +14,26 @@ public abstract class AdornmentImpl : IAdornment
     ///     Set by <see cref="View.SetupAdornments"/> and used for geometry math and
     ///     <see cref="EnsureView"/> creation.
     /// </summary>
-    public View? Parent { get; set; }
+    public View? Parent
+    {
+        get => field;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+
+            field?.FrameChanged -= ParentOnFrameChanged;
+            field = value;
+            field?.FrameChanged += ParentOnFrameChanged;
+
+            if (Parent is { })
+            {
+                View?.OnParentFrameChanged (Parent.Frame);
+            }
+        }
+    }
 
     #region Thickness
 
@@ -32,16 +51,9 @@ public abstract class AdornmentImpl : IAdornment
                 return;
             }
 
-            // AdornmentView.Thickness delegates back here via the IAdornment back-reference,
-            // so no sync is needed — AdornmentImpl is the single authoritative owner.
-            // Just invalidate the View if one exists.
-            if (View is { })
-            {
-                View.SetNeedsLayout ();
-                View.SetNeedsDraw ();
-            }
+            SetNeedsLayout ();
 
-            Parent?.SetAdornmentFrames ();
+            //Parent?.SetAdornmentFrames ();
 
             // CWP: work (above) → virtual OnThicknessChanged (empty, for subclass override) → raise event
             OnThicknessChanged ();
@@ -57,20 +69,17 @@ public abstract class AdornmentImpl : IAdornment
 
     #endregion Thickness
 
-    #region Frame
-
-    /// <inheritdoc/>
-    public Rectangle Frame { get; internal set; }
-
-    #endregion Frame
-
     #region View
 
+    /// <inheritdoc />
+    public abstract Rectangle GetFrame ();
+
     /// <summary>
-    ///     The backing <see cref="AdornmentView"/> — <see langword="null"/> until demanded.
-    ///     Returns the concrete <see cref="AdornmentView"/> for callers within this assembly.
+    ///     The <see cref="IAdornmentView"/> backing this adornment, cast to the adornment type for convenience.
+    ///     <see langword="null"/> until the adornment actually needs <see cref="View"/>-level functionality
+    ///     (rendering, SubViews, mouse, arrangement, shadow).
     /// </summary>
-    public AdornmentView? View { get; private set; }
+    public AdornmentView? View { get; internal set; }
 
     /// <summary>
     ///     Explicit <see cref="IAdornment"/> implementation — exposes <see cref="View"/> as
@@ -99,9 +108,15 @@ public abstract class AdornmentImpl : IAdornment
             View.EndInit ();
         }
 
-        Parent?.SetAdornmentFrames ();
+        //Parent?.SetAdornmentFrames ();
 
         return View;
+
+    }
+
+    private void ParentOnFrameChanged (object? sender, EventArgs<Rectangle> e)
+    {
+        View?.OnParentFrameChanged (e.Value);
     }
 
     /// <summary>Factory method — subclasses return their specific <see cref="AdornmentView"/> subclass.</summary>
@@ -124,21 +139,21 @@ public abstract class AdornmentImpl : IAdornment
     {
         Rectangle parentScreen = Parent?.FrameToScreen () ?? Rectangle.Empty;
 
-        return new Point (parentScreen.X + Frame.X + location.X, parentScreen.Y + Frame.Y + location.Y);
+        return new Point (parentScreen.X + GetFrame ().X + location.X, parentScreen.Y + GetFrame ().Y + location.Y);
     }
 
     private Rectangle ComputeFrameToScreen ()
     {
         Rectangle parentScreen = Parent?.FrameToScreen () ?? Rectangle.Empty;
 
-        return new Rectangle (new Point (parentScreen.X + Frame.X, parentScreen.Y + Frame.Y), Frame.Size);
+        return new Rectangle (new Point (parentScreen.X + GetFrame ().X, parentScreen.Y + GetFrame ().Y), GetFrame ().Size);
     }
 
     private Point ComputeScreenToFrame (in Point location)
     {
         Rectangle parentScreen = Parent?.FrameToScreen () ?? Rectangle.Empty;
 
-        return new Point (location.X - parentScreen.X - Frame.X, location.Y - parentScreen.Y - Frame.Y);
+        return new Point (location.X - parentScreen.X - GetFrame ().X, location.Y - parentScreen.Y - GetFrame ().Y);
     }
 
     #endregion Coordinator methods
@@ -175,11 +190,58 @@ public abstract class AdornmentImpl : IAdornment
         }
     }
 
+    private bool _needsDraw;
+
+    /// <summary>Gets whether the backing <see cref="View"/> needs to be redrawn. <see langword="false"/> if no View exists.</summary>
+    public bool NeedsDraw => View?.NeedsDraw ?? _needsDraw;
+
+    /// <summary>Clears the needs-draw state on the backing <see cref="View"/>. No-op if no View exists.</summary>
+    public void ClearNeedsDraw ()
+    {
+        if (View is { })
+        {
+            View.ClearNeedsDraw ();
+        }
+        else
+        {
+            _needsDraw = false;
+        }
+    }
+
     /// <summary>Marks the backing <see cref="View"/> as needing to be redrawn. No-op if no View exists.</summary>
-    public void SetNeedsDraw () => View?.SetNeedsDraw ();
+    public void SetNeedsDraw ()
+    {
+        if (View is { })
+        {
+            View.SetNeedsDraw ();
+        }
+        else
+        {
+            _needsDraw = true;
+        }
+    }
+
+    /// <summary>Gets or sets whether the backing <see cref="View"/> needs layout. <see langword="false"/> if no View exists.</summary>
+    public bool NeedsLayout
+    {
+        get => View?.NeedsLayout ?? false;
+        set
+        {
+            if (View is { } v)
+            {
+                v.NeedsLayout = value;
+            }
+        }
+    }
 
     /// <summary>Marks the backing <see cref="View"/> as needing layout. No-op if no View exists.</summary>
-    public void SetNeedsLayout () => View?.SetNeedsLayout ();
+    public void SetNeedsLayout ()
+    {
+        if (View is { })
+        {
+            View.SetNeedsLayout ();
+        }
+    }
 
     /// <summary>Sets the <see cref="Scheme"/> on the backing <see cref="View"/>. No-op if no View exists.</summary>
     public void SetScheme (Scheme scheme) => View?.SetScheme (scheme);
@@ -220,22 +282,6 @@ public abstract class AdornmentImpl : IAdornment
 
     /// <summary>Adds a SubView to the backing <see cref="View"/>. Forces View creation via <see cref="EnsureView"/>.</summary>
     public virtual void Add (View subView) => EnsureView ().Add (subView);
-
-    /// <summary>Gets whether the backing <see cref="View"/> needs to be redrawn. <see langword="false"/> if no View exists.</summary>
-    public bool NeedsDraw => View?.NeedsDraw ?? false;
-
-    /// <summary>Gets or sets whether the backing <see cref="View"/> needs layout. <see langword="false"/> if no View exists.</summary>
-    public bool NeedsLayout
-    {
-        get => View?.NeedsLayout ?? false;
-        set
-        {
-            if (View is { } v)
-            {
-                v.NeedsLayout = value;
-            }
-        }
-    }
 
     /// <summary>Gets whether the backing <see cref="View"/> has focus. <see langword="false"/> if no View exists.</summary>
     public bool HasFocus => View?.HasFocus ?? false;
@@ -284,7 +330,7 @@ public abstract class AdornmentImpl : IAdornment
             return false;
         }
 
-        Rectangle outside = Frame;
+        Rectangle outside = GetFrame ();
         outside.Offset (Parent.Frame.Location);
 
         return Thickness.Contains (outside, location);
@@ -298,9 +344,6 @@ public abstract class AdornmentImpl : IAdornment
 
     /// <summary>Calls <see cref="View.LayoutSubViews"/> on the backing View. No-op if no View exists.</summary>
     public void LayoutSubViews () => View?.LayoutSubViews ();
-
-    /// <summary>Clears the needs-draw state on the backing <see cref="View"/>. No-op if no View exists.</summary>
-    public void ClearNeedsDraw () => View?.ClearNeedsDraw ();
 
     /// <summary>Gets or sets the Enabled state on the backing <see cref="View"/>.</summary>
     public bool Enabled
@@ -334,15 +377,10 @@ public abstract class AdornmentImpl : IAdornment
     /// <summary>Gets or sets the Id on the backing <see cref="View"/>.</summary>
     public string Id
     {
-        get => View?.Id ?? field;
+        get => field;
         set
         {
             field = value;
-
-            if (View is { } v)
-            {
-                v.Id = value;
-            }
         }
     } = string.Empty;
 
@@ -386,7 +424,16 @@ public abstract class AdornmentImpl : IAdornment
     /// <summary>
     ///     Draws the adornment content if a <see cref="View"/> exists.
     /// </summary>
-    internal virtual void Draw () => View?.Draw ();
+    internal virtual void Draw ()
+    {
+        if (View is null && Parent is { })
+        {
+            Thickness.Draw (Parent.Driver, Parent.FrameToScreen (), Diagnostics);
+
+            return;
+        }
+        View?.Draw ();
+    }
 
     #endregion Drawing
 

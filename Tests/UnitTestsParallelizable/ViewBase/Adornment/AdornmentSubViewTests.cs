@@ -17,15 +17,13 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         var raised = false;
 
         subView.SubViewLayout += LayoutStarted;
-        view.Padding.Thickness = new (1, 2, 3, 4);
+        view.Padding.Thickness = new Thickness (1, 2, 3, 4);
         view.Layout ();
         Assert.True (raised);
 
         return;
-        void LayoutStarted (object? sender, LayoutEventArgs e)
-        {
-            raised = true;
-        }
+
+        void LayoutStarted (object? sender, LayoutEventArgs e) => raised = true;
     }
 
     [Theory]
@@ -37,32 +35,24 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
     public void Adornment_WithSubView_Finds (int viewPadding, int subViewPadding, bool expectedFound)
     {
         IApplication? app = Application.Create ();
-        Runnable<bool> runnable = new ()
-        {
-            Width = 10,
-            Height = 10
-        };
+        Runnable<bool> runnable = new () { Width = 10, Height = 10 };
         app.Begin (runnable);
 
-        runnable.Padding!.Thickness = new (viewPadding);
+        runnable.Padding!.Thickness = new Thickness (viewPadding);
+
         // Turn of TransparentMouse for the test
         runnable.Padding!.ViewportSettings = ViewportSettingsFlags.None;
 
-        var subView = new View ()
-        {
-            X = 0,
-            Y = 0,
-            Width = 5,
-            Height = 5
-        };
-        subView.Padding!.Thickness = new (subViewPadding);
+        var subView = new View { X = 0, Y = 0, Width = 5, Height = 5 };
+        subView.Padding!.Thickness = new Thickness (subViewPadding);
+
         // Turn of TransparentMouse for the test
         subView.Padding!.ViewportSettings = ViewportSettingsFlags.None;
 
         runnable.Padding!.Add (subView);
         runnable.Layout ();
 
-        View? foundView = runnable.GetViewsUnderLocation (new (0, 0), ViewportSettingsFlags.None).LastOrDefault ();
+        View? foundView = runnable.GetViewsUnderLocation (new Point (0, 0), ViewportSettingsFlags.None).LastOrDefault ();
 
         bool found = foundView == subView || foundView == subView.Padding!.View!;
         Assert.Equal (expectedFound, found);
@@ -72,15 +62,11 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
     public void Adornment_WithNonVisibleSubView_Finds_Adornment ()
     {
         IApplication? app = Application.Create ();
-        Runnable<bool> runnable = new ()
-        {
-            Width = 10,
-            Height = 10
-        };
+        Runnable<bool> runnable = new () { Width = 10, Height = 10 };
         app.Begin (runnable);
         runnable.Padding!.Thickness = new Thickness (1);
 
-        var subView = new View ()
+        var subView = new View
         {
             X = 0,
             Y = 0,
@@ -92,9 +78,8 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         runnable.Layout ();
 
         Assert.Equal (runnable.Padding!.View!, runnable.GetViewsUnderLocation (new Point (0, 0), ViewportSettingsFlags.None).LastOrDefault ());
-
     }
-    
+
     [Fact]
     public void Button_With_Opaque_ShadowStyle_In_Border_Should_Draw_Shadow ()
     {
@@ -108,10 +93,10 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         window.Width = Dim.Fill ();
         window.Height = Dim.Fill ();
         window.Text = @"XXXXXX";
-        window.SetScheme (new (new Attribute (Color.Black, Color.White)));
+        window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
         // Setup padding with some thickness so we have space for the button
-        window.Border!.Thickness = new (0, 3, 0, 0);
+        window.Border!.Thickness = new Thickness (0, 3, 0, 0);
 
         // Add a button with a transparent shadow to the Padding adornment
         Button buttonInBorder = new ()
@@ -121,7 +106,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
             Text = "B",
             NoDecorations = true,
             NoPadding = true,
-            ShadowStyle = ShadowStyle.Opaque,
+            ShadowStyle = ShadowStyle.Opaque
         };
 
         window.Border.Add (buttonInBorder);
@@ -147,10 +132,10 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         window.Width = Dim.Fill ();
         window.Height = Dim.Fill ();
         window.Text = @"XXXXXX";
-        window.SetScheme (new (new Attribute (Color.Black, Color.White)));
+        window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
         // Setup padding with some thickness so we have space for the button
-        window.Padding!.Thickness = new (0, 3, 0, 0);
+        window.Padding!.Thickness = new Thickness (0, 3, 0, 0);
 
         // Add a button with a transparent shadow to the Padding adornment
         Button buttonInPadding = new ()
@@ -160,7 +145,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
             Text = "B",
             NoDecorations = true,
             NoPadding = true,
-            ShadowStyle = ShadowStyle.Opaque,
+            ShadowStyle = ShadowStyle.Opaque
         };
 
         window.Padding.Add (buttonInPadding);
@@ -172,6 +157,4 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
                                            _output,
                                            app.Driver);
     }
-
 }
-

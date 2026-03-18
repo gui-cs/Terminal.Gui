@@ -28,12 +28,11 @@ public class AdornmentView : View, IAdornmentView, IDesignable
     }
 
     /// <summary>Constructs a rendering layer for the specified <paramref name="parent"/> and <paramref name="adornment"/>.</summary>
-    public AdornmentView (View parent, AdornmentImpl adornment)
+    public AdornmentView (IAdornment adornment)
     {
         // Set Adornment FIRST so subclass constructors can reference it safely.
         Adornment = adornment;
-        Parent = parent;
-
+        //Parent = parent;
         // By default, Adornments can't get focus; has to be enabled specifically.
         CanFocus = false;
         TabStop = TabBehavior.NoStop;
@@ -42,8 +41,8 @@ public class AdornmentView : View, IAdornmentView, IDesignable
         KeyBindings.Clear ();
     }
 
-    /// <inheritdoc cref="IAdornmentView.Parent"/>
-    public View? Parent { get; set; }
+    /// <inheritdoc />
+    public virtual void OnParentFrameChanged (Rectangle newParentFrame) => throw new NotImplementedException ();
 
     /// <inheritdoc cref="IAdornmentView.Adornment"/>
     public IAdornment? Adornment { get; set; }
@@ -87,20 +86,20 @@ public class AdornmentView : View, IAdornmentView, IDesignable
     public new ViewDiagnosticFlags Diagnostics { get; set; } = View.Diagnostics;
 
     /// <inheritdoc/>
-    public override string ToDebugString () => $"{GetType ().Name}({Id}) Parent={(Parent is { } ? Parent.ToDebugString () : "null")}";
+    public override string ToDebugString () => $"{GetType ().Name}({Id}) Parent={(Adornment?.Parent is { } ? Adornment.Parent.ToDebugString () : "null")}";
 
     /// <inheritdoc/>
-    protected override IApplication? GetApp () => Parent?.App;
+    protected override IApplication? GetApp () => Adornment?.Parent?.App;
 
     /// <inheritdoc/>
-    protected override IDriver? GetDriver () => Parent?.Driver ?? base.GetDriver ();
+    protected override IDriver? GetDriver () => Adornment?.Parent?.Driver ?? base.GetDriver ();
 
     private Scheme? _scheme;
 
     /// <inheritdoc/>
     protected override bool OnGettingScheme (out Scheme? scheme)
     {
-        scheme = _scheme ?? Parent?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
+        scheme = _scheme ?? Adornment?.Parent?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
 
         return true;
     }
@@ -108,7 +107,7 @@ public class AdornmentView : View, IAdornmentView, IDesignable
     /// <inheritdoc/>
     protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args)
     {
-        Parent?.SetNeedsDraw ();
+        Adornment?.Parent?.SetNeedsDraw ();
         _scheme = args.NewValue;
 
         return false;
@@ -124,7 +123,7 @@ public class AdornmentView : View, IAdornmentView, IDesignable
     /// <inheritdoc/>
     public override Rectangle FrameToScreen ()
     {
-        if (Parent is null)
+        if (Adornment?.Parent is null)
         {
             // Support AllViewsTester where AdornmentView may be a SubView.
             if (SuperView is null)
@@ -139,7 +138,7 @@ public class AdornmentView : View, IAdornmentView, IDesignable
 
         // AdornmentViews are *Children* of a View, not SubViews. Use Parent.FrameToScreen()
         // to get the parent's screen origin, then offset by our Frame.
-        Rectangle parentScreen = Parent.FrameToScreen ();
+        Rectangle parentScreen = Adornment.Parent.FrameToScreen ();
 
         return new Rectangle (new Point (parentScreen.X + Frame.X, parentScreen.Y + Frame.Y), Frame.Size);
     }
@@ -147,7 +146,7 @@ public class AdornmentView : View, IAdornmentView, IDesignable
     /// <inheritdoc/>
     public override Point ScreenToFrame (in Point location)
     {
-        View? parentOrSuperView = Parent;
+        View? parentOrSuperView = Adornment?.Parent;
 
         if (parentOrSuperView is { })
         {
@@ -210,7 +209,7 @@ public class AdornmentView : View, IAdornmentView, IDesignable
     /// </summary>
     public override bool Contains (in Point location)
     {
-        View? parentOrSuperView = Parent;
+        View? parentOrSuperView = Adornment?.Parent;
 
         if (parentOrSuperView is null)
         {

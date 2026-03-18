@@ -194,9 +194,9 @@ public class ExpanderButton : Button
 
         View? superView = SuperView;
 
-        if (superView is Adornment adornment)
+        if (superView is AdornmentView adornment)
         {
-            superView = adornment.Parent;
+            superView = adornment.Adornment.Parent;
         }
 
         if (superView is null)

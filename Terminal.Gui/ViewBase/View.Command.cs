@@ -622,12 +622,12 @@ public partial class View // Command APIs
             return true;
         }
 
-        if (SuperView is PaddingView padding && padding.Parent?.CommandsToBubbleUp.Contains (command) == true)
+        if (SuperView is PaddingView padding && padding.Adornment?.Parent?.CommandsToBubbleUp.Contains (command) == true)
         {
             return true;
         }
 
-        if (this is PaddingView selfPadding && selfPadding.Parent?.CommandsToBubbleUp.Contains (command) == true)
+        if (this is PaddingView selfPadding && selfPadding.Adornment?.Parent?.CommandsToBubbleUp.Contains (command) == true)
         {
             return true;
         }
@@ -688,12 +688,12 @@ public partial class View // Command APIs
 
             if (next is PaddingView padding)
             {
-                return padding.Parent;
+                return padding.Adornment?.Parent;
             }
 
             if (current is PaddingView selfPadding)
             {
-                return selfPadding.Parent;
+                return selfPadding.Adornment?.Parent;
             }
 
             return next;
@@ -1262,25 +1262,25 @@ public partial class View // Command APIs
             return SuperView.InvokeCommand (refreshed.Command, upCtx);
         }
 
-        if (SuperView is PaddingView padding && padding.Parent?.CommandsToBubbleUp.Contains (ctx.Command) == true)
+        if (SuperView is PaddingView padding && padding.Adornment?.Parent?.CommandsToBubbleUp.Contains (ctx.Command) == true)
         {
             // Check if Padding's Parent wants this command bubbled up to it
-            Trace.Command (this, ctx, "Routing", $"BubblingUp to Padding.Parent {padding.Parent.ToIdentifyingString ()}");
+            Trace.Command (this, ctx, "Routing", $"BubblingUp to Padding.Parent {padding.Adornment.Parent.ToIdentifyingString ()}");
             upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Values = ctx.Values };
 
-            return padding.Parent.InvokeCommand (ctx.Command, upCtx);
+            return padding.Adornment.Parent.InvokeCommand (ctx.Command, upCtx);
         }
 
-        if (this is not PaddingView selfPadding || selfPadding.Parent?.CommandsToBubbleUp.Contains (ctx.Command) != true)
+        if (this is not PaddingView selfPadding || selfPadding.Adornment?.Parent?.CommandsToBubbleUp.Contains (ctx.Command) != true)
         {
             return handled;
         }
 
         // Handle when THIS view is a Padding
-        Trace.Command (this, ctx, "Routing", $"BubblingUp from Padding to {selfPadding.Parent.ToIdentifyingString ()}");
+        Trace.Command (this, ctx, "Routing", $"BubblingUp from Padding to {selfPadding.Adornment.Parent.ToIdentifyingString ()}");
         upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Values = ctx.Values };
 
-        return selfPadding.Parent.InvokeCommand (ctx.Command, upCtx);
+        return selfPadding.Adornment.Parent.InvokeCommand (ctx.Command, upCtx);
     }
 
     #endregion Command Bubbling

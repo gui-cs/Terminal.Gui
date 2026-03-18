@@ -29,8 +29,14 @@ public class MarginView : AdornmentView
     }
 
     /// <inheritdoc/>
-    public MarginView (View? parent, Margin margin) : base (parent!, margin)
+    public MarginView (Margin margin) : base (margin)
     {
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (margin == null)
+        {
+            // Supports AllViews_Tests_All_Constructors which uses reflection
+            return;
+        }
         SubViewLayout += MarginView_LayoutStarted;
         Adornment?.ThicknessChanged += OnThicknessChanged;
 
@@ -43,6 +49,9 @@ public class MarginView : AdornmentView
         // Margins are transparent to mouse by default
         ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
     }
+
+    /// <inheritdoc/>
+    public override void OnParentFrameChanged (Rectangle newParentFrame) => Frame = newParentFrame with { Location = Point.Empty };
 
     private void OnThicknessChanged (object? sender, EventArgs e)
     {
@@ -116,14 +125,14 @@ public class MarginView : AdornmentView
     {
         base.BeginInit ();
 
-        if (Parent is null)
+        if (Adornment?.Parent is null)
         {
             return;
         }
 
         ShadowStyle = base.ShadowStyle;
 
-        Parent.MouseStateChanged += OnParentOnMouseStateChanged;
+        Adornment.Parent.MouseStateChanged += OnParentOnMouseStateChanged;
     }
 
     /// <inheritdoc/>
@@ -388,7 +397,7 @@ public class MarginView : AdornmentView
     private void MarginView_LayoutStarted (object? sender, LayoutEventArgs e)
     {
         // Adjust the shadow such that it is drawn aligned with the Border
-        if (_rightShadow is null || _bottomShadow is null)
+        if (_rightShadow is null || _bottomShadow is null || Adornment is null)
         {
             return;
         }
@@ -396,13 +405,13 @@ public class MarginView : AdornmentView
         switch (ShadowStyle)
         {
             case ShadowStyle.Transparent:
-                _rightShadow.Y = Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).Y + 1 : 0;
+                _rightShadow.Y = Adornment.Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Adornment.Parent.Border!.FrameToScreen ().Location).Y + 1 : 0;
 
                 break;
 
             case ShadowStyle.Opaque:
-                _rightShadow.Y = Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).Y + 1 : 0;
-                _bottomShadow.X = Parent.Border!.Thickness.Left > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).X + 1 : 0;
+                _rightShadow.Y = Adornment.Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Adornment.Parent.Border!.FrameToScreen ().Location).Y + 1 : 0;
+                _bottomShadow.X = Adornment.Parent.Border!.Thickness.Left > 0 ? ScreenToViewport (Adornment.Parent.Border!.FrameToScreen ().Location).X + 1 : 0;
 
                 break;
 

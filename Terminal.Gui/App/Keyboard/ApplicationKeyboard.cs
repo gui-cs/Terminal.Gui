@@ -256,7 +256,7 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
                         {
                             viewToArrange = viewToArrange switch
                                             {
-                                                AdornmentView adornmentView => adornmentView.Parent,
+                                                AdornmentView adornmentView => adornmentView.Adornment.Parent,
                                                 _ => viewToArrange.SuperView
                                             };
                         }

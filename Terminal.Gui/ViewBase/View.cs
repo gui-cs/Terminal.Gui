@@ -311,10 +311,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
         }
 
         // Force a layout each time a View is initialized
-        // BUGBUG: This Layout call is a hack to work around some bug in Layout.
-        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
-        // See: https://github.com/gui-cs/Terminal.Gui/issues/3951
-        Layout (); // the EventLog in AllViewsTester fails to layout correctly if this is not here
+        Layout ();
 
         // Complex layout scenarios (e.g. DimAuto and PosAlign) may require multiple layouts to be performed.
         // Thus, we call SetNeedsLayout() to ensure that the layout is performed at least once.

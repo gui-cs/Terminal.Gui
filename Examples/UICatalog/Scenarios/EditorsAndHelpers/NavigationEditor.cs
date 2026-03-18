@@ -18,7 +18,7 @@ public sealed class NavigationEditor : EditorBase
 
     protected override void OnViewToEditChanged ()
     {
-        _tabBehaviorSelector.Enabled = ViewToEdit is { } and not Adornment;
+        _tabBehaviorSelector.Enabled = ViewToEdit is { } and not AdornmentView;
 
         _tabBehaviorSelector.ValueChanged -= TabStopOnValueChanged;
 

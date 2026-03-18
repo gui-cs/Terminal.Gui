@@ -16,11 +16,10 @@ namespace Terminal.Gui.ViewBase;
 public interface IAdornmentView
 {
     /// <summary>
-    ///     The <see cref="View"/> this adornment layer surrounds.
-    ///     Set by <see cref="AdornmentImpl.EnsureView"/> when the backing <see cref="View"/> is created,
-    ///     using the <c>Parent</c> stored on <see cref="AdornmentImpl"/>.
+    /// 
     /// </summary>
-    View? Parent { get; set; }
+    /// <param name="newParentFrame"></param>
+    protected void OnParentFrameChanged (Rectangle newParentFrame);
 
     /// <summary>
     ///     Back-reference to the lightweight <see cref="IAdornment"/> that owns this <see cref="View"/>.

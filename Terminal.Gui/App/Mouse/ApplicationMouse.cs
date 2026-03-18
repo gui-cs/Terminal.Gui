@@ -197,7 +197,7 @@ internal class ApplicationMouse : IMouse, IDisposable
         {
             if (deepestViewUnderMouse is AdornmentView adornmentView)
             {
-                deepestViewUnderMouse = adornmentView.Parent?.SuperView;
+                deepestViewUnderMouse = adornmentView.Adornment?.Parent?.SuperView;
             }
             else
             {
@@ -283,9 +283,9 @@ internal class ApplicationMouse : IMouse, IDisposable
             CachedViewsUnderMouse.Add (view);
             bool raise;
 
-            if (view is AdornmentView { Parent: { } } adornmentView)
+            if (view is AdornmentView { Adornment.Parent: { } } adornmentView)
             {
-                Point superViewLoc = adornmentView.Parent.SuperView?.ScreenToViewport (screenPosition) ?? screenPosition;
+                Point superViewLoc = adornmentView.Adornment.Parent.SuperView?.ScreenToViewport (screenPosition) ?? screenPosition;
                 raise = adornmentView.Contains (superViewLoc);
             }
             else

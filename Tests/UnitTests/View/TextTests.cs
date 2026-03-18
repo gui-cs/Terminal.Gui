@@ -125,9 +125,9 @@ Y
         Application.LayoutAndDraw ();
 
         Assert.Equal (new (0, 0, 15, 15), win.Frame);
-        Assert.Equal (new (0, 0, 15, 15), win.Margin!.Frame);
-        Assert.Equal (new (0, 0, 15, 15), win.Border!.Frame);
-        Assert.Equal (new (1, 1, 13, 13), win.Padding.Frame);
+        Assert.Equal (new (0, 0, 15, 15), win.Margin!.GetFrame ());
+        Assert.Equal (new (0, 0, 15, 15), win.Border!.GetFrame ());
+        Assert.Equal (new (1, 1, 13, 13), win.Padding.GetFrame ());
 
         Assert.Equal (TextDirection.LeftRight_TopBottom, view.TextDirection);
         Assert.Equal (Rectangle.Empty, view.Frame);

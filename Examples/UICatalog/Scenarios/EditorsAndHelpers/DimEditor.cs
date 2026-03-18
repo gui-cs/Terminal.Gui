@@ -31,7 +31,7 @@ public class DimEditor : EditorBase
 
     protected override void OnUpdateLayoutSettings ()
     {
-        Enabled = ViewToEdit is not Adornment;
+        Enabled = ViewToEdit is not AdornmentView;
 
         if (ViewToEdit is null)
         {

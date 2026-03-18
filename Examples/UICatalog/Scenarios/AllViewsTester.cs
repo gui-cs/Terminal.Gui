@@ -35,8 +35,8 @@ public class AllViewsTester : Scenario
         window.Title = GetQuitKeyAndName ();
 
         // Set the BorderStyle we use for all subviews, but disable the app border thickness
-        window.Border!.LineStyle = LineStyle.Heavy;
-        window.Border!.Thickness = new Thickness (0);
+        window.BorderStyle = LineStyle.Heavy;
+        window.Border.Thickness = new Thickness (0);
 
         _viewClasses = GetAllViewClassesCollection ()
                        .OrderBy (t => t.Name)

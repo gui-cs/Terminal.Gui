@@ -1,7 +1,4 @@
-using Terminal.Gui.ViewBase;
-using UnitTests;
-
-namespace ViewBaseTests.AdornmentTests;
+namespace ViewBaseTests.Arrangement;
 
 // Claude - Opus 4.5
 /// <summary>
@@ -34,7 +31,7 @@ public class ArrangementFocusTests
         Attribute highlight = new (ColorName16.Black, ColorName16.Yellow, TextStyle.None);
         Attribute normal = new (ColorName16.Black, ColorName16.White, TextStyle.None);
 
-        button.SetScheme (new () { Focus = focus, Highlight = highlight, Normal = normal });
+        button.SetScheme (new Scheme { Focus = focus, Highlight = highlight, Normal = normal });
 
         runnable.Add (button);
         app.Begin (runnable);
@@ -44,7 +41,7 @@ public class ArrangementFocusTests
         Assert.True (button.HasFocus);
 
         // Simulate mouse over the button
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (6, 5), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (6, 5), Flags = MouseFlags.PositionReport });
         Assert.True (button.MouseState.HasFlag (MouseState.In));
 
         // Act: Get the attribute for Focus role when button has focus AND mouse is over it
@@ -79,7 +76,7 @@ public class ArrangementFocusTests
         Attribute highlight = new (ColorName16.Black, ColorName16.Yellow, TextStyle.None);
         Attribute normal = new (ColorName16.Black, ColorName16.White, TextStyle.None);
 
-        button.SetScheme (new () { Focus = focus, Highlight = highlight, Normal = normal });
+        button.SetScheme (new Scheme { Focus = focus, Highlight = highlight, Normal = normal });
 
         runnable.Add (button);
         app.Begin (runnable);
@@ -118,10 +115,17 @@ public class ArrangementFocusTests
         Attribute highlight = new (ColorName16.Black, ColorName16.Yellow, TextStyle.None);
         Attribute normal = new (ColorName16.Black, ColorName16.White, TextStyle.None);
 
-        button.SetScheme (new () { Focus = focus, Highlight = highlight, Normal = normal });
+        button.SetScheme (new Scheme { Focus = focus, Highlight = highlight, Normal = normal });
 
         // Add another focusable view so button doesn't automatically get focus
-        View otherView = new () { X = 0, Y = 0, Width = 5, Height = 5, CanFocus = true };
+        View otherView = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 5,
+            Height = 5,
+            CanFocus = true
+        };
         runnable.Add (otherView, button);
         app.Begin (runnable);
 
@@ -132,7 +136,7 @@ public class ArrangementFocusTests
         Assert.False (button.HasFocus);
 
         // Simulate mouse over the button
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (6, 5), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (6, 5), Flags = MouseFlags.PositionReport });
         Assert.True (button.MouseState.HasFlag (MouseState.In));
 
         // Act: Get the attribute for Normal role when button does NOT have focus BUT mouse is over it
@@ -166,7 +170,7 @@ public class ArrangementFocusTests
         Attribute highlight = new (ColorName16.Black, ColorName16.Yellow, TextStyle.None);
         Attribute normal = new (ColorName16.Black, ColorName16.White, TextStyle.None);
 
-        view.SetScheme (new () { Focus = focus, Highlight = highlight, Normal = normal });
+        view.SetScheme (new Scheme { Focus = focus, Highlight = highlight, Normal = normal });
 
         runnable.Add (view);
         app.Begin (runnable);
@@ -176,7 +180,7 @@ public class ArrangementFocusTests
         Assert.True (view.HasFocus);
 
         // Simulate mouse over the view
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (10, 8), Flags = MouseFlags.PositionReport });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (10, 8), Flags = MouseFlags.PositionReport });
         Assert.True (view.MouseState.HasFlag (MouseState.In));
 
         // Act: Get the attribute the view would use when rendering with focus
@@ -210,7 +214,7 @@ public class ArrangementFocusTests
         Attribute focus = new (ColorName16.White, ColorName16.Blue, TextStyle.None);
         Attribute highlight = new (ColorName16.Black, ColorName16.Yellow, TextStyle.None);
 
-        button.SetScheme (new () { Focus = focus, Highlight = highlight });
+        button.SetScheme (new Scheme { Focus = focus, Highlight = highlight });
 
         runnable.Add (button);
         app.Begin (runnable);
@@ -220,7 +224,7 @@ public class ArrangementFocusTests
         Assert.True (button.HasFocus);
 
         // Simulate mouse pressed on button
-        app.Mouse.RaiseMouseEvent (new () { ScreenPosition = new (6, 5), Flags = MouseFlags.LeftButtonPressed });
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (6, 5), Flags = MouseFlags.LeftButtonPressed });
         Assert.True (button.MouseState.HasFlag (MouseState.Pressed));
 
         // Act: Even with Pressed state, should return focus colors

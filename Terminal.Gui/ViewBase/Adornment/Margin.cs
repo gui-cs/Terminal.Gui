@@ -23,7 +23,7 @@ public class Margin : AdornmentImpl
     /// <inheritdoc/>
     protected override AdornmentView CreateView ()
     {
-        MarginView mv = new (Parent, this);
+        MarginView mv = new (this);
 
         if (_shadowStyle != ShadowStyle.None)
         {
@@ -36,6 +36,19 @@ public class Margin : AdornmentImpl
         }
 
         return mv;
+    }
+
+    /// <inheritdoc />
+    public override Rectangle GetFrame ()
+    {
+        if (Parent is { })
+        {
+            return Parent.Frame with { Location = Point.Empty };
+        }
+        else
+        {
+            return Rectangle.Empty;
+        }
     }
 
     private ShadowStyle _shadowStyle;
@@ -84,9 +97,4 @@ public class Margin : AdornmentImpl
     internal void CacheClip () => (View as MarginView)?.CacheClip ();
     internal Region? GetCachedClip () => (View as MarginView)?.GetCachedClip ();
     internal void ClearCachedClip () => (View as MarginView)?.ClearCachedClip ();
-
-    /// <summary>
-    ///     Gets the border rectangle from the parent's border, if available.
-    /// </summary>
-    internal Rectangle GetBorderRectangle () => Parent?.Border?.GetBorderRectangle () ?? Rectangle.Empty;
 }

@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using UnitTests;
 
-namespace ViewBaseTests.Adornments;
+namespace ViewBaseTests.Arrangement;
 
 public class BorderArrangementTests (ITestOutputHelper output)
 {

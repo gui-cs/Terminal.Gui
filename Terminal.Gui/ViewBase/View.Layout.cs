@@ -98,7 +98,8 @@ public partial class View // Layout APIs
         // This is the only place where _frame should be set directly. Use Frame = or SetFrame instead.
         _frame = frame;
 
-        SetAdornmentFrames ();
+        // Set the Margin's Frame. All other Adornments use this.
+        Margin?.View?.Frame = Frame with { Location = Point.Empty };
 
         SetNeedsDraw ();
         SetNeedsLayout ();
@@ -197,7 +198,7 @@ public partial class View // Layout APIs
         // Implicit layout is ok here because all Pos/Dim are Absolute values.
         Layout ();
 
-        if (SuperView is { } || this is AdornmentView { Parent: null })
+        if (SuperView is { } || this is AdornmentView { Adornment.Parent: null })
         {
             // Ensure the next Application iteration tries to layout again
             SetNeedsLayout ();
@@ -724,7 +725,7 @@ public partial class View // Layout APIs
 
         // The Adornments already have their Frame's set by SetRelativeLayout so we call LayoutSubViews vs. Layout here.
         Margin?.LayoutSubViews ();
-        Border?.LayoutSubViews ();
+        Border?.View?.LayoutSubViews ();
         Padding?.LayoutSubViews ();
 
         // Sort out the dependencies of the X, Y, Width, Height properties
@@ -854,9 +855,9 @@ public partial class View // Layout APIs
             Margin.SetNeedsLayout ();
         }
 
-        if (Border is { SubViews.Count: > 0 })
+        if (Border.View is { SubViews.Count: > 0 })
         {
-            Border.SetNeedsLayout ();
+            Border.View.SetNeedsLayout ();
         }
 
         if (Padding is { SubViews.Count: > 0 })
@@ -885,9 +886,9 @@ public partial class View // Layout APIs
                 current.Margin!.SetNeedsLayout ();
             }
 
-            if (current.Border is { SubViews.Count: > 0 })
+            if (current.Border.View is { SubViews.Count: > 0 })
             {
-                current.Border!.SetNeedsLayout ();
+                current.Border.View.SetNeedsLayout ();
             }
 
             if (current.Padding is { SubViews.Count: > 0 })
@@ -913,9 +914,9 @@ public partial class View // Layout APIs
             return;
         }
 
-        if (adornment.Parent is { NeedsLayout: false })
+        if (adornment.Adornment?.Parent is { NeedsLayout: false })
         {
-            adornment.Parent?.SetNeedsLayout ();
+            adornment.Adornment.Parent?.SetNeedsLayout ();
         }
     }
 

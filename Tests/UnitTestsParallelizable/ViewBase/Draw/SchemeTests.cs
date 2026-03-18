@@ -312,20 +312,22 @@ public class SchemeTests : TestDriverBase
     }
 
     [Fact]
-    public void GetAttributeForRole_Adornment_UsesParentScheme ()
+    public void GetAttributeForRole_Border_UsesParentScheme ()
     {
         // Border (an Adornment) doesn't have a SuperView but should use its Parent's scheme
-        var view = new View { SchemeName = "Dialog" };
-        var border = view.Border!;
+        View view = new View { SchemeName = "Dialog" };
+        Border? border = view.Border;
+        // Force EnsureView
+        border.LineStyle = LineStyle.Dashed;
 
         Assert.NotNull (border);
-        Assert.Null (border.View!.SuperView); // Adornments don't have SuperView
+        Assert.Null (border.View?.SuperView); // Adornments don't have SuperView
         Assert.NotNull (border.Parent);
 
-        var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        Scheme? dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
 
         // Border should use its Parent's scheme, not Base
-        Assert.Equal (dialogScheme!.Normal, border.GetAttributeForRole (VisualRole.Normal));
+        Assert.Equal (dialogScheme!.Normal, border.View?.GetAttributeForRole (VisualRole.Normal));
 
         view.Dispose ();
     }

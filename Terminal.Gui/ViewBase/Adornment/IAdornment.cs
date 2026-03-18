@@ -20,18 +20,24 @@ public interface IAdornment
     Thickness Thickness { get; set; }
 
     /// <summary>
-    ///     The cached frame rectangle for this adornment layer, set by
+    ///     The calculated frame rectangle for this adornment layer, set by
     ///     <see cref="View.SetAdornmentFrames"/>. This is the single source of truth
     ///     for adornment geometry.
     /// </summary>
-    Rectangle Frame { get; }
+    Rectangle GetFrame ();
 
     /// <summary>
     ///     The <see cref="IAdornmentView"/> backing this adornment.
     ///     <see langword="null"/> until the adornment actually needs <see cref="View"/>-level functionality
-    ///     (rendering, SubViews, mouse, arrangement, shadow).
+    ///     (rendering, SubViews, mouse, arrangement, shadow). Once set, the lifetime is controlled by the
+    ///     <see cref="IAdornmentView"/> implementation.
     /// </summary>
     IAdornmentView? View { get; }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public View? Parent { get; set; }
 
     /// <summary>Fired when <see cref="Thickness"/> changes.</summary>
     event EventHandler? ThicknessChanged;

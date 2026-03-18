@@ -1,5 +1,4 @@
-﻿#nullable enable
-namespace ViewBaseTests.Layout;
+﻿namespace ViewBaseTests.Layout;
 
 public class LayoutTests
 {
@@ -17,16 +16,16 @@ public class LayoutTests
     {
         // Tests defaults
         View v = new ();
-        Assert.Equal (new (0, 0, 0, 0), v.Frame);
-        Assert.Equal (new (0, 0, 0, 0), v.Viewport);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), v.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), v.Viewport);
         Assert.Equal (Pos.Absolute (0), v.X);
         Assert.Equal (Pos.Absolute (0), v.Y);
         Assert.Equal (Dim.Absolute (0), v.Width);
         Assert.Equal (Dim.Absolute (0), v.Height);
 
         v.Layout ();
-        Assert.Equal (new (0, 0, 0, 0), v.Frame);
-        Assert.Equal (new (0, 0, 0, 0), v.Viewport);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), v.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), v.Viewport);
         Assert.Equal (Pos.Absolute (0), v.X);
         Assert.Equal (Pos.Absolute (0), v.Y);
         Assert.Equal (Dim.Absolute (0), v.Width);
@@ -34,7 +33,6 @@ public class LayoutTests
     }
 
     #endregion Constructor Tests
-
 
     [Fact]
     public void Screen_Size_Change_Causes_Layout ()
@@ -56,31 +54,32 @@ public class LayoutTests
 
         app.Driver!.SetScreenSize (80, 25);
 
-        Assert.Equal (new (0, 0, 80, 25), new Rectangle (0, 0, app.Screen.Width, app.Screen.Height));
-        Assert.Equal (new (0, 0, app.Screen.Width, app.Screen.Height), runnable.Frame);
-        Assert.Equal (new (0, 0, 80, 25), runnable.Frame);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), new Rectangle (0, 0, app.Screen.Width, app.Screen.Height));
+        Assert.Equal (new Rectangle (0, 0, app.Screen.Width, app.Screen.Height), runnable.Frame);
+        Assert.Equal (new Rectangle (0, 0, 80, 25), runnable.Frame);
 
         app.Driver!.SetScreenSize (20, 10);
         app.LayoutAndDraw ();
-        Assert.Equal (new (0, 0, app.Screen.Width, app.Screen.Height), runnable.Frame);
+        Assert.Equal (new Rectangle (0, 0, app.Screen.Width, app.Screen.Height), runnable.Frame);
 
-        Assert.Equal (new (0, 0, 20, 10), runnable.Frame);
+        Assert.Equal (new Rectangle (0, 0, 20, 10), runnable.Frame);
     }
+
     [Fact]
     public void Set_All_Absolute_Sets_Correctly ()
     {
         Rectangle frame = new (1, 2, 3, 4);
         View v = new () { X = frame.X, Y = frame.Y, Width = frame.Width, Height = frame.Height };
-        Assert.Equal (new (frame.X, frame.Y, 3, 4), v.Frame);
-        Assert.Equal (new (0, 0, 3, 4), v.Viewport);
+        Assert.Equal (new Rectangle (frame.X, frame.Y, 3, 4), v.Frame);
+        Assert.Equal (new Rectangle (0, 0, 3, 4), v.Viewport);
         Assert.Equal (Pos.Absolute (1), v.X);
         Assert.Equal (Pos.Absolute (2), v.Y);
         Assert.Equal (Dim.Absolute (3), v.Width);
         Assert.Equal (Dim.Absolute (4), v.Height);
 
         v.Layout ();
-        Assert.Equal (new (frame.X, frame.Y, 3, 4), v.Frame);
-        Assert.Equal (new (0, 0, 3, 4), v.Viewport);
+        Assert.Equal (new Rectangle (frame.X, frame.Y, 3, 4), v.Frame);
+        Assert.Equal (new Rectangle (0, 0, 3, 4), v.Viewport);
         Assert.Equal (Pos.Absolute (1), v.X);
         Assert.Equal (Pos.Absolute (2), v.Y);
         Assert.Equal (Dim.Absolute (3), v.Width);
@@ -117,16 +116,16 @@ public class LayoutTests
         Rectangle frame = new (1, 2, 3, 4);
 
         View v = new () { X = frame.X, Y = frame.Y };
-        Assert.Equal (new (frame.X, frame.Y, 0, 0), v.Frame);
-        Assert.Equal (new (0, 0, 0, 0), v.Viewport);
+        Assert.Equal (new Rectangle (frame.X, frame.Y, 0, 0), v.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), v.Viewport);
         Assert.Equal (Pos.Absolute (1), v.X);
         Assert.Equal (Pos.Absolute (2), v.Y);
         Assert.Equal (Dim.Absolute (0), v.Width);
         Assert.Equal (Dim.Absolute (0), v.Height);
 
         v.Layout ();
-        Assert.Equal (new (frame.X, frame.Y, 0, 0), v.Frame);
-        Assert.Equal (new (0, 0, 0, 0), v.Viewport);
+        Assert.Equal (new Rectangle (frame.X, frame.Y, 0, 0), v.Frame);
+        Assert.Equal (new Rectangle (0, 0, 0, 0), v.Viewport);
         Assert.Equal (Pos.Absolute (1), v.X);
         Assert.Equal (Pos.Absolute (2), v.Y);
         Assert.Equal (Dim.Absolute (0), v.Width);
@@ -145,10 +144,7 @@ public class LayoutTests
         v.Layout ();
         Assert.Equal (newFrame, v.Frame);
 
-        Assert.Equal (
-                      new (0, 0, newFrame.Width, newFrame.Height),
-                      v.Viewport
-                     ); // With Absolute Viewport *is* deterministic before Layout
+        Assert.Equal (new Rectangle (0, 0, newFrame.Width, newFrame.Height), v.Viewport); // With Absolute Viewport *is* deterministic before Layout
         Assert.Equal ($"Absolute({newFrame.X})", v.X.ToString ());
         Assert.Equal ($"Absolute({newFrame.Y})", v.Y.ToString ());
         Assert.Equal (Dim.Absolute (3), v.Width);
@@ -166,14 +162,14 @@ public class LayoutTests
         v.Width = 4;
         v.Dispose ();
 
-        v = new () { Frame = Rectangle.Empty };
+        v = new View { Frame = Rectangle.Empty };
         v.X = Pos.Center ();
         v.Y = Pos.Center ();
         v.Width = Dim.Fill ();
         v.Height = Dim.Fill ();
         v.Dispose ();
 
-        v = new () { Frame = Rectangle.Empty };
+        v = new View { Frame = Rectangle.Empty };
         v.X = Pos.Center ();
         v.Y = Pos.Center ();
         v.Width = Dim.Fill ();
@@ -182,7 +178,7 @@ public class LayoutTests
         v.X = 1;
         v.Dispose ();
 
-        v = new () { Frame = Rectangle.Empty };
+        v = new View { Frame = Rectangle.Empty };
         v.X = Pos.Center ();
         v.Y = Pos.Center ();
         v.Width = Dim.Fill ();
@@ -191,7 +187,7 @@ public class LayoutTests
         v.Y = 2;
         v.Dispose ();
 
-        v = new () { Frame = Rectangle.Empty };
+        v = new View { Frame = Rectangle.Empty };
         v.X = Pos.Center ();
         v.Y = Pos.Center ();
         v.Width = Dim.Fill ();
@@ -200,7 +196,7 @@ public class LayoutTests
         v.Width = 3;
         v.Dispose ();
 
-        v = new () { Frame = Rectangle.Empty };
+        v = new View { Frame = Rectangle.Empty };
         v.X = Pos.Center ();
         v.Y = Pos.Center ();
         v.Width = Dim.Fill ();
@@ -209,7 +205,7 @@ public class LayoutTests
         v.Height = 3;
         v.Dispose ();
 
-        v = new () { Frame = Rectangle.Empty };
+        v = new View { Frame = Rectangle.Empty };
         v.X = Pos.Center ();
         v.Y = Pos.Center ();
         v.Width = Dim.Fill ();
@@ -284,8 +280,8 @@ public class LayoutTests
         super.Add (v1, v2);
 
         super.LayoutSubViews ();
-        Assert.Equal (new (0, 0, 10, 10), v1.Frame);
-        Assert.Equal (new (10, 10, 10, 10), v2.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), v1.Frame);
+        Assert.Equal (new Rectangle (10, 10, 10, 10), v2.Frame);
         super.Dispose ();
     }
 
@@ -295,6 +291,7 @@ public class LayoutTests
         // No adornment subviews
         var superView = new View ();
         var view = new View ();
+        view.BorderStyle = LineStyle.None; // Calls EnsureView
 
         var layoutStartedCount = 0;
         var layoutCompleteCount = 0;
@@ -358,6 +355,7 @@ public class LayoutTests
     {
         var superView = new View ();
         var view = new View ();
+        view.BorderStyle = LineStyle.None; // Calls EnsureView
 
         var layoutStartedCount = 0;
         var layoutCompleteCount = 0;
@@ -488,17 +486,10 @@ public class LayoutTests
     [Fact]
     public void LayoutSubViews_Uses_ContentSize ()
     {
-        var superView = new View
-        {
-            Width = 5,
-            Height = 5
-        };
-        superView.SetContentSize (new (10, 10));
+        var superView = new View { Width = 5, Height = 5 };
+        superView.SetContentSize (new Size (10, 10));
 
-        var view = new View
-        {
-            X = Pos.Center ()
-        };
+        var view = new View { X = Pos.Center () };
         superView.Add (view);
 
         superView.LayoutSubViews ();
@@ -608,7 +599,7 @@ public class LayoutTests
         Assert.True (v.NeedsLayout);
         Assert.Equal (0, v.Frame.Height);
 
-        v.Height = Dim.Height (new ());
+        v.Height = Dim.Height (new View ());
         Assert.True (v.NeedsLayout);
         Assert.Equal (0, v.Frame.Height);
     }
@@ -660,7 +651,7 @@ public class LayoutTests
         Assert.True (v.NeedsLayout);
         Assert.Equal (0, v.Frame.Width);
 
-        v.Width = Dim.Width (new ());
+        v.Width = Dim.Width (new View ());
         Assert.True (v.NeedsLayout);
         Assert.Equal (0, v.Frame.Width);
     }
@@ -690,7 +681,7 @@ public class LayoutTests
         Assert.True (v.NeedsLayout);
         Assert.Equal (0, v.Frame.X);
 
-        v.X = Pos.Top (new ());
+        v.X = Pos.Top (new View ());
         Assert.True (v.NeedsLayout);
         Assert.Equal (0, v.Frame.X);
     }
@@ -746,7 +737,7 @@ public class LayoutTests
         Assert.True (v.NeedsLayout);
         Assert.Equal (0, v.Frame.Y);
 
-        v.Y = Pos.Top (new ());
+        v.Y = Pos.Top (new View ());
         Assert.True (v.NeedsLayout);
         Assert.Equal (0, v.Frame.Y);
     }

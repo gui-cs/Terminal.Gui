@@ -10,11 +10,7 @@ public class ArrangementTests (ITestOutputHelper output)
         // This test proves that MouseGrabHandler works correctly with concurrent unit tests
         // using NewMouseEvent directly on views, without requiring Application.Init
 
-        var superView = new View
-        {
-            Width = 80,
-            Height = 25
-        };
+        var superView = new View { Width = 80, Height = 25 };
         superView.App = ApplicationImpl.Instance;
 
         var movableView = new View
@@ -36,7 +32,7 @@ public class ArrangementTests (ITestOutputHelper output)
         // Simulate mouse press on the border to start dragging
         var pressEvent = new Mouse
         {
-            Position = new (1, 0), // Top border area
+            Position = new Point (1, 0), // Top border area
             Flags = MouseFlags.LeftButtonPressed
         };
 
@@ -47,11 +43,7 @@ public class ArrangementTests (ITestOutputHelper output)
         Assert.True (superView.App.Mouse.IsGrabbed (movableView.Border!.View!));
 
         // Simulate mouse drag
-        var dragEvent = new Mouse
-        {
-            Position = new (5, 2),
-            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
-        };
+        var dragEvent = new Mouse { Position = new Point (5, 2), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
 
         result = movableView.Border!.View!.NewMouseEvent (dragEvent);
         Assert.True (result);
@@ -60,11 +52,7 @@ public class ArrangementTests (ITestOutputHelper output)
         Assert.True (superView.App.Mouse.IsGrabbed (movableView.Border!.View!));
 
         // Simulate mouse release to end dragging
-        var releaseEvent = new Mouse
-        {
-            Position = new (5, 2),
-            Flags = MouseFlags.LeftButtonReleased
-        };
+        var releaseEvent = new Mouse { Position = new Point (5, 2), Flags = MouseFlags.LeftButtonReleased };
 
         result = movableView.Border!.View!.NewMouseEvent (releaseEvent);
         Assert.True (result);
@@ -78,12 +66,7 @@ public class ArrangementTests (ITestOutputHelper output)
     {
         // This test proves MouseGrabHandler works for resizing operations
 
-        var superView = new View
-        {
-            App = ApplicationImpl.Instance,
-            Width = 80,
-            Height = 25
-        };
+        var superView = new View { App = ApplicationImpl.Instance, Width = 80, Height = 25 };
 
         var resizableView = new View
         {
@@ -105,7 +88,7 @@ public class ArrangementTests (ITestOutputHelper output)
         // Border.Frame.X is relative to parent, so we use coordinates relative to the border
         var pressEvent = new Mouse
         {
-            Position = new (resizableView.Border.Frame.Width - 1, 5), // Right border area
+            Position = new Point (resizableView.Border.GetFrame ().Width - 1, 5), // Right border area
             Flags = MouseFlags.LeftButtonPressed
         };
 
@@ -118,8 +101,7 @@ public class ArrangementTests (ITestOutputHelper output)
         // Simulate dragging to resize
         var dragEvent = new Mouse
         {
-            Position = new (resizableView.Border.Frame.Width + 3, 5),
-            Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
+            Position = new Point (resizableView.Border.GetFrame ().Width + 3, 5), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport
         };
 
         result = resizableView.Border!.View!.NewMouseEvent (dragEvent);
@@ -127,11 +109,7 @@ public class ArrangementTests (ITestOutputHelper output)
         Assert.True (superView.App.Mouse.IsGrabbed (resizableView.Border!.View!));
 
         // Simulate mouse release
-        var releaseEvent = new Mouse
-        {
-            Position = new (resizableView.Border.Frame.Width + 3, 5),
-            Flags = MouseFlags.LeftButtonReleased
-        };
+        var releaseEvent = new Mouse { Position = new Point (resizableView.Border.GetFrame ().Width + 3, 5), Flags = MouseFlags.LeftButtonReleased };
 
         result = resizableView.Border!.View!.NewMouseEvent (releaseEvent);
         Assert.True (result);
@@ -173,41 +151,25 @@ public class ArrangementTests (ITestOutputHelper output)
         superView.EndInit ();
 
         // Grab mouse on first view
-        var pressEvent1 = new Mouse
-        {
-            Position = new (1, 0),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        var pressEvent1 = new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonPressed };
 
         view1.Border!.View!.NewMouseEvent (pressEvent1);
         Assert.True (superView.App.Mouse.IsGrabbed (view1.Border!.View!));
 
         // Release on first view
-        var releaseEvent1 = new Mouse
-        {
-            Position = new (1, 0),
-            Flags = MouseFlags.LeftButtonReleased
-        };
+        var releaseEvent1 = new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonReleased };
 
         view1.Border!.View!.NewMouseEvent (releaseEvent1);
         Assert.False (Application.Mouse.IsGrabbed (view1.Border!.View!));
 
         // Grab mouse on second view
-        var pressEvent2 = new Mouse
-        {
-            Position = new (1, 0),
-            Flags = MouseFlags.LeftButtonPressed
-        };
+        var pressEvent2 = new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonPressed };
 
         view2.Border!.View!.NewMouseEvent (pressEvent2);
         Assert.True (superView.App.Mouse.IsGrabbed (view2.Border!.View!));
 
         // Release on second view
-        var releaseEvent2 = new Mouse
-        {
-            Position = new (1, 0),
-            Flags = MouseFlags.LeftButtonReleased
-        };
+        var releaseEvent2 = new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonReleased };
 
         view2.Border!.View!.NewMouseEvent (releaseEvent2);
         Assert.False (superView.App.Mouse.IsGrabbed (view2.Border!.View!));

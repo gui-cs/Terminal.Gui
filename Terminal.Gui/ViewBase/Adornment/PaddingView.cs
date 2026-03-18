@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
@@ -17,10 +19,40 @@ public class PaddingView : AdornmentView
     }
 
     /// <inheritdoc/>
-    public PaddingView (View? parent, Padding padding) : base (parent!, padding)
+    public PaddingView (Padding padding) : base (padding)
     {
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (padding == null)
+        {
+            // Supports AllViews_Tests_All_Constructors which uses reflection
+            return;
+        }
+
         CanFocus = true;
         TabStop = TabBehavior.NoStop;
+        if (padding.Parent is { })
+        {
+            Frame = padding.Parent.Border.Thickness.GetInside (padding.Parent.Border.GetFrame ());
+        }
+        padding.ThicknessChanged += OnThicknessChanged;
+        padding.Parent?.Margin.ThicknessChanged += OnThicknessChanged;
+        padding.Parent?.Border.ThicknessChanged += OnThicknessChanged;
+    }
+
+
+    /// <inheritdoc />
+    public override void OnParentFrameChanged (Rectangle newParentFrame)
+    {
+        if (Adornment?.Parent is { })
+        {
+            Frame = Adornment.Parent.Border.Thickness.GetInside (Adornment.Parent.Border.GetFrame ());
+        }
+    }
+
+    // TODO: Move DrawIndicator out of Border and into View
+    private void OnThicknessChanged (object? sender, EventArgs e)
+    {
+        OnParentFrameChanged (Adornment.Parent.Frame);
     }
 
     /// <summary>Called when a mouse event occurs within the Padding.</summary>
@@ -36,7 +68,7 @@ public class PaddingView : AdornmentView
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (Parent is null)
+        if (Adornment.Parent is null)
         {
             return false;
         }
@@ -46,12 +78,12 @@ public class PaddingView : AdornmentView
             return false;
         }
 
-        if (!Parent.CanFocus || Parent.HasFocus)
+        if (!Adornment.Parent.CanFocus || Adornment.Parent.HasFocus)
         {
             return false;
         }
-        Parent.SetFocus ();
-        Parent.SetNeedsDraw ();
+        Adornment.Parent.SetFocus ();
+        Adornment.Parent.SetNeedsDraw ();
 
         return mouse.Handled = true;
 
@@ -93,11 +125,11 @@ public class PaddingView : AdornmentView
     {
         List<View> subViewsOfThisAdornment = new (base.GetSubViews (false, false, includePadding));
 
-        if (includePadding && Parent is { })
+        if (includePadding && Adornment?.Parent is { })
         {
             // Include SubViews from Parent. Since we are a Padding of Parent do not
             // request Adornments again to avoid infinite recursion.
-            subViewsOfThisAdornment.AddRange (Parent.GetSubViews ());
+            subViewsOfThisAdornment.AddRange (Adornment.Parent.GetSubViews ());
         }
 
         return subViewsOfThisAdornment;

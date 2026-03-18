@@ -38,26 +38,44 @@ namespace Terminal.Gui.ViewBase;
 /// </remarks>
 public partial class BorderView : AdornmentView
 {
-    private LineStyle? _lineStyle;
-
     /// <inheritdoc/>
     public BorderView ()
     { /* Do nothing; A parameter-less constructor is required to support all views unit tests. */
     }
 
     /// <inheritdoc/>
-    public BorderView (View? parent, Border border) : base (parent!, border)
+    public BorderView (Border border) : base (border)
     {
-        Parent = parent;
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+        if (border == null)
+        {
+            // Supports AllViews_Tests_All_Constructors which uses reflection
+            return;
+        }
         CanFocus = false;
         TabStop = TabBehavior.TabGroup;
-        Adornment?.ThicknessChanged += OnThicknessChanged;
-        Settings = BorderSettings.Title;
+
+        if (border.Parent is { })
+        {
+            Frame = border.Parent.Margin.Thickness.GetInside (border.Parent.Margin.GetFrame ());
+        }
+        border.ThicknessChanged += OnThicknessChanged;
+        border.Parent?.Margin.ThicknessChanged += OnThicknessChanged;
+    }
+
+    /// <inheritdoc />
+    public override void OnParentFrameChanged (Rectangle newParentFrame)
+    {
+        if (Adornment?.Parent is { })
+        {
+            Frame = Adornment.Parent.Margin.Thickness.GetInside (Adornment.Parent.Margin.GetFrame ());
+        }
     }
 
     // TODO: Move DrawIndicator out of Border and into View
     private void OnThicknessChanged (object? sender, EventArgs e)
     {
+        OnParentFrameChanged (Adornment.Parent.Frame);
         if (IsInitialized)
         {
             ShowHideDrawIndicator ();
@@ -117,17 +135,17 @@ public partial class BorderView : AdornmentView
     {
         base.BeginInit ();
 
-        if (Parent is null)
+        if (Adornment?.Parent is null)
         {
             return;
         }
 
         ShowHideDrawIndicator ();
 
-        MouseHighlightStates |= Parent.Arrangement != ViewArrangement.Fixed ? MouseState.Pressed : MouseState.None;
+        MouseHighlightStates |= Adornment.Parent.Arrangement != ViewArrangement.Fixed ? MouseState.Pressed : MouseState.None;
 
 #if SUBVIEW_BASED_BORDER
-        if (Parent is { })
+        if (Adornment.Parent is { })
         {
             // Left
             _left = new ()
@@ -170,7 +188,7 @@ public partial class BorderView : AdornmentView
 }
 #endif
 
-    internal Rectangle GetBorderRectangle ()
+    private Rectangle GetBorderBounds ()
     {
         Rectangle screenRect = ViewportToScreen (Viewport);
 
@@ -180,75 +198,78 @@ public partial class BorderView : AdornmentView
                               Math.Max (0, screenRect.Height - Math.Max (0, Math.Max (0, Thickness.Top - 1) + Math.Max (0, Thickness.Bottom - 1))));
     }
 
-    // TODO: Make LineStyle nullable https://github.com/gui-cs/Terminal.Gui/issues/4021
-    /// <summary>
-    ///     Sets the style of the border by changing the <see cref="Thickness"/>. This is a helper API for setting the
-    ///     <see cref="Thickness"/> to <c>(1,1,1,1)</c> and setting the line style of the views that comprise the border. If
-    ///     set to <see cref="LineStyle.None"/> no border will be drawn.
-    /// </summary>
-    public LineStyle LineStyle
-    {
-        get
-        {
-            if (_lineStyle.HasValue)
-            {
-                return _lineStyle.Value;
-            }
+    //// TODO: Make LineStyle nullable https://github.com/gui-cs/Terminal.Gui/issues/4021
+    ///// <summary>
+    /////     Sets the style of the border by changing the <see cref="Thickness"/>. This is a helper API for setting the
+    /////     <see cref="Thickness"/> to <c>(1,1,1,1)</c> and setting the line style of the views that comprise the border. If
+    /////     set to <see cref="LineStyle.None"/> no border will be drawn.
+    ///// </summary>
+    //public LineStyle LineStyle
+    //{
+    //    get
+    //    {
+    //        if (_lineStyle.HasValue)
+    //        {
+    //            return _lineStyle.Value;
+    //        }
 
-            // TODO: Make Border.LineStyle inherit from the SuperView hierarchy
-            return Parent?.SuperView?.BorderStyle ?? LineStyle.None;
-        }
+    //        // TODO: Make Border.LineStyle inherit from the SuperView hierarchy
+    //        return Parent?.SuperView?.BorderStyle ?? LineStyle.None;
+    //    }
 
-        // BUGBUG: Setting LineStyle should SetNeedsDraw
-        set => _lineStyle = value;
-    }
+    //    // BUGBUG: Setting LineStyle should SetNeedsDraw
+    //    set => _lineStyle = value;
+    //}
 
-    /// <summary>
-    ///     Gets or sets the settings for the border.
-    /// </summary>
-    public BorderSettings Settings
-    {
-        get;
-        set
-        {
-            if (value == field)
-            {
-                return;
-            }
+    ///// <summary>
+    /////     Gets or sets the settings for the border.
+    ///// </summary>
+    //public BorderSettings Settings
+    //{
+    //    get;
+    //    set
+    //    {
+    //        if (value == field)
+    //        {
+    //            return;
+    //        }
 
-            field = value;
+    //        field = value;
 
-            Parent?.SetNeedsDraw ();
-        }
-    }
+    //        Parent?.SetNeedsDraw ();
+    //    }
+    //}
 
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
-        if (Thickness == Thickness.Empty)
+        if (Thickness == Thickness.Empty || Adornment is null)
         {
             return true;
         }
 
+        if (Adornment is not Border border)
+        {
+            throw new InvalidOperationException ($"Adornment must be of type Border");
+        }
+
         Rectangle screenBounds = ViewportToScreen (Viewport);
 
-        Rectangle borderBounds = GetBorderRectangle ();
+        Rectangle borderBounds = GetBorderBounds ();
         int topTitleLineY = borderBounds.Y;
         int titleY = borderBounds.Y;
         var titleBarsLength = 0;
 
         int maxTitleWidth = Math.Max (0,
-                                      Math.Min (Parent?.TitleTextFormatter.FormatAndGetSize ().Width ?? 0,
+                                      Math.Min (Adornment.Parent?.TitleTextFormatter.FormatAndGetSize ().Width ?? 0,
                                                 Math.Min (screenBounds.Width - 4, borderBounds.Width - 4)));
 
-        Parent?.TitleTextFormatter.ConstrainToSize = new Size (maxTitleWidth, 1);
+        Adornment.Parent?.TitleTextFormatter.ConstrainToSize = new Size (maxTitleWidth, 1);
 
         int sideLineLength = borderBounds.Height;
         bool canDrawBorder = borderBounds is { Width: > 0, Height: > 0 };
 
-        LineStyle lineStyle = LineStyle;
-
-        if (Settings.FastHasFlags (BorderSettings.Title))
+        if (border.Settings.FastHasFlags (BorderSettings.Title))
         {
             if (Thickness.Top == 2)
             {
@@ -275,27 +296,27 @@ public partial class BorderView : AdornmentView
         }
 
         if (Driver is { }
-            && Parent is { }
+            && Adornment.Parent is { }
             && canDrawBorder
             && Thickness.Top > 0
             && maxTitleWidth > 0
-            && Settings.FastHasFlags (BorderSettings.Title)
-            && !string.IsNullOrEmpty (Parent?.Title))
+            && border.Settings.FastHasFlags (BorderSettings.Title)
+            && !string.IsNullOrEmpty (Adornment.Parent?.Title))
         {
             Rectangle titleRect = new (borderBounds.X + 2, titleY, maxTitleWidth, 1);
 
-            Parent.TitleTextFormatter.Draw (Driver,
-                                            titleRect,
-                                            GetAttributeForRole (Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
-                                            GetAttributeForRole (Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
-            Parent?.LineCanvas.Exclude (new Region (titleRect));
+            Adornment.Parent.TitleTextFormatter.Draw (Driver,
+                                                      titleRect,
+                                                      GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
+                                                      GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
+            Adornment.Parent?.LineCanvas.Exclude (new Region (titleRect));
         }
 
-        if (!canDrawBorder || LineStyle == LineStyle.None)
+        if (!canDrawBorder || (Adornment as Border)?.LineStyle == LineStyle.None)
         {
             return true;
         }
-        LineCanvas? lc = Parent?.LineCanvas;
+        LineCanvas? lc = Adornment.Parent?.LineCanvas;
 
         bool drawTop = Thickness.Top > 0 && Frame is { Width: > 1, Height: >= 1 };
         bool drawLeft = Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0);
@@ -313,9 +334,9 @@ public partial class BorderView : AdornmentView
 
         if (drawTop)
         {
-            if (borderBounds.Width < 4 || !Settings.FastHasFlags (BorderSettings.Title) || string.IsNullOrEmpty (Parent?.Title))
+            if (borderBounds.Width < 4 || !border.Settings.FastHasFlags (BorderSettings.Title) || string.IsNullOrEmpty (Adornment.Parent?.Title))
             {
-                lc?.AddLine (new Point (borderBounds.Location.X, titleY), borderBounds.Width, Orientation.Horizontal, lineStyle, normalAttribute);
+                lc?.AddLine (new Point (borderBounds.Location.X, titleY), borderBounds.Width, Orientation.Horizontal, border.LineStyle!.Value, normalAttribute);
             }
             else
             {
@@ -324,7 +345,7 @@ public partial class BorderView : AdornmentView
                     lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY),
                                  Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
-                                 lineStyle,
+                                 border.LineStyle!.Value,
                                  normalAttribute);
                 }
 
@@ -333,17 +354,17 @@ public partial class BorderView : AdornmentView
                     lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY),
                                  Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
-                                 lineStyle,
+                                 border.LineStyle!.Value,
                                  normalAttribute);
 
                     lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY + 2),
                                  Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
-                                 lineStyle,
+                                 border.LineStyle!.Value,
                                  normalAttribute);
                 }
 
-                lc?.AddLine (borderBounds.Location with { Y = titleY }, 2, Orientation.Horizontal, lineStyle, normalAttribute);
+                lc?.AddLine (borderBounds.Location with { Y = titleY }, 2, Orientation.Horizontal, border.LineStyle!.Value, normalAttribute);
 
                 lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, normalAttribute);
 
@@ -356,7 +377,7 @@ public partial class BorderView : AdornmentView
                 lc?.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, titleY),
                              borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                              Orientation.Horizontal,
-                             lineStyle,
+                             border.LineStyle!.Value,
                              normalAttribute);
             }
         }
@@ -365,7 +386,7 @@ public partial class BorderView : AdornmentView
 
         if (drawLeft)
         {
-            lc?.AddLine (borderBounds.Location with { Y = titleY }, sideLineLength, Orientation.Vertical, lineStyle, normalAttribute);
+            lc?.AddLine (borderBounds.Location with { Y = titleY }, sideLineLength, Orientation.Vertical, border.LineStyle!.Value, normalAttribute);
         }
 #endif
 
@@ -374,13 +395,13 @@ public partial class BorderView : AdornmentView
             lc?.AddLine (new Point (borderBounds.X, borderBounds.Y + borderBounds.Height - 1),
                          borderBounds.Width,
                          Orientation.Horizontal,
-                         lineStyle,
+                         border.LineStyle!.Value,
                          normalAttribute);
         }
 
         if (drawRight)
         {
-            lc?.AddLine (new Point (borderBounds.X + borderBounds.Width - 1, titleY), sideLineLength, Orientation.Vertical, lineStyle, normalAttribute);
+            lc?.AddLine (new Point (borderBounds.X + borderBounds.Width - 1, titleY), sideLineLength, Orientation.Vertical, border.LineStyle!.Value, normalAttribute);
         }
 
         // TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler
@@ -393,16 +414,16 @@ public partial class BorderView : AdornmentView
                 hRuler.Draw (Driver, new Point (screenBounds.X, screenBounds.Y));
             }
 
-            if (drawTop && maxTitleWidth > 0 && Settings.FastHasFlags (BorderSettings.Title))
+            if (drawTop && maxTitleWidth > 0 && border.Settings.FastHasFlags (BorderSettings.Title))
             {
-                Parent!.TitleTextFormatter.Draw (Driver,
-                                                 new Rectangle (borderBounds.X + 2, titleY, maxTitleWidth, 1),
-                                                 Parent.HasFocus
-                                                     ? Parent.GetAttributeForRole (VisualRole.Focus)
-                                                     : Parent.GetAttributeForRole (VisualRole.Normal),
-                                                 Parent.HasFocus
-                                                     ? Parent.GetAttributeForRole (VisualRole.Focus)
-                                                     : Parent.GetAttributeForRole (VisualRole.Normal));
+                Adornment.Parent!.TitleTextFormatter.Draw (Driver,
+                                                           new Rectangle (borderBounds.X + 2, titleY, maxTitleWidth, 1),
+                                                           Adornment.Parent.HasFocus
+                                                               ? Adornment.Parent.GetAttributeForRole (VisualRole.Focus)
+                                                               : Adornment.Parent.GetAttributeForRole (VisualRole.Normal),
+                                                           Adornment.Parent.HasFocus
+                                                               ? Adornment.Parent.GetAttributeForRole (VisualRole.Focus)
+                                                               : Adornment.Parent.GetAttributeForRole (VisualRole.Normal));
             }
 
             var vRuler = new Ruler { Length = screenBounds.Height - 2, Orientation = Orientation.Vertical };
@@ -424,13 +445,13 @@ public partial class BorderView : AdornmentView
         }
 
         // TODO: This should not be done on each draw?
-        if (Settings.FastHasFlags (BorderSettings.Gradient))
+        if (border.Settings.FastHasFlags (BorderSettings.Gradient))
         {
             SetupGradientLineCanvas (lc!, screenBounds);
         }
         else
         {
-            lc!.Fill = null;
+            lc?.Fill = null;
         }
 
         return true;

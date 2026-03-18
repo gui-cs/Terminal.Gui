@@ -47,7 +47,7 @@ internal class TabRow : View
 
     protected override bool OnMouseEvent (Mouse me)
     {
-        View? parent = me.View is AdornmentView adornment ? adornment.Parent : me.View;
+        View? parent = me.View is AdornmentView adornment ? adornment.Adornment.Parent : me.View;
         Tab? hit = parent as Tab;
 
         if (me.IsPressed)

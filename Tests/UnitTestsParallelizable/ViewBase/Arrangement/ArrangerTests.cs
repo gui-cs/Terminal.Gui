@@ -1,5 +1,6 @@
 // ReSharper disable PossibleMultipleEnumeration
-namespace ViewBaseTests.AdornmentTests;
+
+namespace ViewBaseTests.Arrangement;
 
 /// <summary>
 ///     Low-level tests for Arranger class.
@@ -82,8 +83,8 @@ public class ArrangerTests
         View view = new () { BorderStyle = LineStyle.Single };
         view.BeginInit ();
         view.EndInit ();
-        BorderView borderView = (BorderView)view.Border!.View!;
-        borderView.Parent = null;
+        var borderView = (BorderView)view.Border!.View!;
+        borderView.Border.Parent = null;
         Arranger arranger = new (borderView);
 
         // Act
@@ -385,12 +386,12 @@ public class ArrangerTests
         View view = new () { BorderStyle = LineStyle.Single };
         view.BeginInit ();
         view.EndInit ();
-        BorderView borderView = (BorderView)view.Border!.View!;
-        borderView.Parent = null;
+        var borderView = (BorderView)view.Border!.View!;
+        borderView.Border.Parent = null;
         Arranger arranger = new (borderView);
 
         // Act
-        ViewArrangement result = arranger.DetermineArrangeModeFromClick (new (0, 0));
+        ViewArrangement result = arranger.DetermineArrangeModeFromClick (new Point (0, 0));
 
         // Assert
         Assert.Equal (ViewArrangement.Fixed, result);
@@ -408,11 +409,11 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
-        View parent = border.Parent!;
+        View parent = border.Adornment.Parent!;
 
         // Simulate starting a drag
         Point grabPoint = new (5, 5);
-        arranger.StartDrag (grabPoint, new (0, 0));
+        arranger.StartDrag (grabPoint, new Point (0, 0));
 
         // Act - Drag to a new position
         Point targetLocation = new (25, 20);
@@ -431,13 +432,13 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.RightResizable);
 
-        View parent = border.Parent!;
+        View parent = border.Adornment.Parent!;
         int originalWidth = parent.Frame.Width;
         int originalX = parent.Frame.X;
 
         // Simulate starting a drag at the right edge
         Point grabPoint = new (parent.Frame.Right, parent.Frame.Y + 5);
-        arranger.StartDrag (grabPoint, new (0, 0));
+        arranger.StartDrag (grabPoint, new Point (0, 0));
 
         // Act - Drag right to expand
         Point targetLocation = new (parent.Frame.X + 60, parent.Frame.Y + 5);
@@ -456,13 +457,13 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.BottomResizable);
 
-        View parent = border.Parent!;
+        View parent = border.Adornment.Parent!;
         int originalHeight = parent.Frame.Height;
         int originalY = parent.Frame.Y;
 
         // Simulate starting a drag at the bottom edge
         Point grabPoint = new (parent.Frame.X + 5, parent.Frame.Bottom);
-        arranger.StartDrag (grabPoint, new (0, 0));
+        arranger.StartDrag (grabPoint, new Point (0, 0));
 
         // Act - Drag down to expand
         Point targetLocation = new (parent.Frame.X + 5, parent.Frame.Y + 40);
@@ -481,13 +482,13 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.LeftResizable);
 
-        View parent = border.Parent!;
+        View parent = border.Adornment.Parent!;
         int originalX = parent.Frame.X;
         int originalWidth = parent.Frame.Width;
 
         // Simulate starting a drag at the left edge
         Point grabPoint = new (parent.Frame.X, parent.Frame.Y + 5);
-        arranger.StartDrag (grabPoint, new (0, 0));
+        arranger.StartDrag (grabPoint, new Point (0, 0));
 
         // Act - Drag left to expand
         Point targetLocation = new (parent.Frame.X - 5, parent.Frame.Y + 5);
@@ -506,13 +507,13 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.TopResizable);
 
-        View parent = border.Parent!;
+        View parent = border.Adornment.Parent!;
         int originalY = parent.Frame.Y;
         int originalHeight = parent.Frame.Height;
 
         // Simulate starting a drag at the top edge
         Point grabPoint = new (parent.Frame.X + 5, parent.Frame.Y);
-        arranger.StartDrag (grabPoint, new (0, 0));
+        arranger.StartDrag (grabPoint, new Point (0, 0));
 
         // Act - Drag up to expand
         Point targetLocation = new (parent.Frame.X + 5, parent.Frame.Y - 5);
@@ -531,13 +532,13 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.BottomResizable | ViewArrangement.RightResizable);
 
-        View parent = border.Parent!;
+        View parent = border.Adornment.Parent!;
         int originalWidth = parent.Frame.Width;
         int originalHeight = parent.Frame.Height;
 
         // Simulate starting a drag at bottom-right corner
         Point grabPoint = new (parent.Frame.Right, parent.Frame.Bottom);
-        arranger.StartDrag (grabPoint, new (0, 0));
+        arranger.StartDrag (grabPoint, new Point (0, 0));
 
         // Act - Drag diagonally to expand
         Point targetLocation = new (parent.Frame.X + 60, parent.Frame.Y + 40);
@@ -575,7 +576,7 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
-        View parent = border.Parent!;
+        View parent = border.Adornment.Parent!;
         int originalY = parent.Frame.Y;
 
         // Act
@@ -594,7 +595,7 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
-        View parent = border.Parent!;
+        View parent = border.Adornment.Parent!;
         int originalY = parent.Frame.Y;
 
         // Act
@@ -613,7 +614,7 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
-        View parent = border.Parent!;
+        View parent = border.Adornment.Parent!;
         int originalX = parent.Frame.X;
 
         // Act
@@ -632,7 +633,7 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
-        View parent = border.Parent!;
+        View parent = border.Adornment.Parent!;
         int originalX = parent.Frame.X;
 
         // Act
@@ -650,8 +651,8 @@ public class ArrangerTests
         View view = new () { BorderStyle = LineStyle.Single };
         view.BeginInit ();
         view.EndInit ();
-        BorderView borderView = (BorderView)view.Border!.View!;
-        borderView.Parent = null;
+        var borderView = (BorderView)view.Border!.View!;
+        borderView.Border.Parent = null;
         Arranger arranger = new (borderView);
 
         // Act
@@ -684,7 +685,7 @@ public class ArrangerTests
         Arranger arranger = new (border);
 
         // Act
-        arranger.StartDrag (new (5, 5), new (10, 10));
+        arranger.StartDrag (new Point (5, 5), new Point (10, 10));
 
         // Assert
         Assert.True (arranger.IsDragging);
@@ -696,7 +697,7 @@ public class ArrangerTests
         // Arrange
         BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
-        arranger.StartDrag (new (5, 5), new (10, 10));
+        arranger.StartDrag (new Point (5, 5), new Point (10, 10));
 
         // Act
         arranger.EndDrag ();
@@ -714,7 +715,7 @@ public class ArrangerTests
         Point expectedGrabPoint = new (7, 13);
 
         // Act
-        arranger.StartDrag (expectedGrabPoint, new (10, 10));
+        arranger.StartDrag (expectedGrabPoint, new Point (10, 10));
 
         // Assert
         Assert.Equal (expectedGrabPoint, arranger.GrabPoint);
@@ -762,7 +763,7 @@ public class ArrangerTests
         // Arrange
         BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
-        View parent = border.Parent!;
+        View parent = border.Adornment.Parent!;
         int originalX = parent.Frame.X;
         int originalY = parent.Frame.Y;
 
@@ -785,12 +786,12 @@ public class ArrangerTests
         // Arrange
         BorderView border = CreateBorderWithArrangement (ViewArrangement.Resizable);
         Arranger arranger = new (border);
-        View parent = border.Parent!;
+        View parent = border.Adornment.Parent!;
         int originalWidth = parent.Frame.Width;
 
         // Act - Use mouse drag mode
         arranger.EnterArrangeMode (ViewArrangement.RightResizable);
-        arranger.StartDrag (new (parent.Frame.Right, parent.Frame.Y + 5), new (0, 0));
+        arranger.StartDrag (new Point (parent.Frame.Right, parent.Frame.Y + 5), new Point (0, 0));
         arranger.HandleDragOperation (new Point (parent.Frame.X + 55, parent.Frame.Y + 5));
         arranger.EndDrag ();
         arranger.ExitArrangeMode ();
@@ -831,7 +832,7 @@ public class ArrangerTests
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
         // Assert
-        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton>().Where(b => b.Visible);
+        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton> ().Where (b => b.Visible);
         Assert.Single (visibleButtons);
         Assert.True (visibleButtons.First ().ButtonType == ArrangeButtons.LeftSize);
     }
@@ -847,7 +848,7 @@ public class ArrangerTests
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
         // Assert
-        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton>().Where(b => b.Visible);
+        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton> ().Where (b => b.Visible);
         Assert.Single (visibleButtons);
         Assert.True (visibleButtons.First ().ButtonType == ArrangeButtons.RightSize);
     }
@@ -863,7 +864,7 @@ public class ArrangerTests
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
         // Assert
-        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton>().Where(b => b.Visible);
+        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton> ().Where (b => b.Visible);
         Assert.Single (visibleButtons);
         Assert.True (visibleButtons.First ().ButtonType == ArrangeButtons.TopSize);
     }
@@ -879,7 +880,7 @@ public class ArrangerTests
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
         // Assert
-        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton>().Where(b => b.Visible);
+        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton> ().Where (b => b.Visible);
         Assert.Single (visibleButtons);
         Assert.True (visibleButtons.First ().ButtonType == ArrangeButtons.BottomSize);
     }
@@ -895,7 +896,7 @@ public class ArrangerTests
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
         // Assert - Resizable flag creates AllSize AND all four directional buttons
-        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton>().Where(b => b.Visible);
+        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton> ().Where (b => b.Visible);
         Assert.Equal (5, visibleButtons.Count ());
         Assert.Contains (visibleButtons, b => b.ButtonType == ArrangeButtons.AllSize);
         Assert.Contains (visibleButtons, b => b.ButtonType == ArrangeButtons.LeftSize);
@@ -915,7 +916,7 @@ public class ArrangerTests
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
         // Assert - Should show Move, AllSize, and all four directional buttons
-        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton>().Where(b => b.Visible);
+        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton> ().Where (b => b.Visible);
         Assert.Equal (6, visibleButtons.Count ());
         Assert.Contains (visibleButtons, b => b.ButtonType == ArrangeButtons.Move);
         Assert.Contains (visibleButtons, b => b.ButtonType == ArrangeButtons.AllSize);
@@ -936,7 +937,7 @@ public class ArrangerTests
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
         // Assert
-        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton>().Where(b => b.Visible);
+        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton> ().Where (b => b.Visible);
         Assert.Equal (2, visibleButtons.Count ());
         Assert.Contains (visibleButtons, b => b.ButtonType == ArrangeButtons.LeftSize);
         Assert.Contains (visibleButtons, b => b.ButtonType == ArrangeButtons.RightSize);
@@ -953,7 +954,7 @@ public class ArrangerTests
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
         // Assert
-        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton>().Where(b => b.Visible);
+        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton> ().Where (b => b.Visible);
         Assert.Equal (2, visibleButtons.Count ());
         Assert.Contains (visibleButtons, b => b.ButtonType == ArrangeButtons.TopSize);
         Assert.Contains (visibleButtons, b => b.ButtonType == ArrangeButtons.BottomSize);
@@ -970,7 +971,7 @@ public class ArrangerTests
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
         // Assert - AllSize plus all four directional buttons visible
-        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton>().Where(b => b.Visible);
+        IEnumerable<ArrangerButton> visibleButtons = border.SubViews.OfType<ArrangerButton> ().Where (b => b.Visible);
         Assert.Equal (5, visibleButtons.Count ());
         Assert.Contains (visibleButtons, b => b.ButtonType == ArrangeButtons.AllSize);
         Assert.Contains (visibleButtons, b => b.ButtonType == ArrangeButtons.LeftSize);

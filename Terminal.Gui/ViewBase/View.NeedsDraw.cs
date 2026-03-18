@@ -21,7 +21,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     public bool NeedsDraw =>
-        Visible && (NeedsDrawRect != Rectangle.Empty || Margin?.NeedsDraw == true || Border?.NeedsDraw == true || Padding?.NeedsDraw == true);
+        Visible && (NeedsDrawRect != Rectangle.Empty || Margin?.NeedsDraw == true || Border.View?.NeedsDraw == true || Padding?.NeedsDraw == true);
 
     /// <summary>
     ///     Sets <see cref="NeedsDraw"/> to <see langword="true"/> indicating the <see cref="Viewport"/> of this View needs to
@@ -104,7 +104,7 @@ public partial class View
 
         if (this is AdornmentView adornment)
         {
-            adornment.Parent?.SetSubViewNeedsDrawDownHierarchy ();
+            adornment.Adornment?.Parent?.SetSubViewNeedsDrawDownHierarchy ();
         }
 
         foreach (View subview in InternalSubViews.Snapshot ())
@@ -130,7 +130,7 @@ public partial class View
         NeedsDrawRect = Rectangle.Empty;
 
         Margin?.ClearNeedsDraw ();
-        Border?.ClearNeedsDraw ();
+        Border.View?.ClearNeedsDraw ();
         Padding?.ClearNeedsDraw ();
 
         foreach (View subview in InternalSubViews.Snapshot ())
@@ -175,7 +175,7 @@ public partial class View
 
         if (this is AdornmentView adornment)
         {
-            adornment.Parent?.SetSubViewNeedsDrawDownHierarchy ();
+            adornment.Adornment?.Parent?.SetSubViewNeedsDrawDownHierarchy ();
         }
 
         if (SuperView is { SubViewNeedsDraw: false })

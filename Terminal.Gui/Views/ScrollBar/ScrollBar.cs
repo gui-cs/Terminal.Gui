@@ -102,7 +102,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             case ScrollBarVisibilityMode.Auto:
                 // If this scrollbar lives in a View's Padding, respect the View's
                 // ViewportSettings as the authority on whether it should be enabled.
-                if (SuperView is PaddingView { Parent: { } ownerView })
+                if (SuperView is PaddingView { Adornment.Parent: { } ownerView })
                 {
                     ViewportSettingsFlags requiredFlag = Orientation == Orientation.Vertical
                                                              ? ViewportSettingsFlags.HasVerticalScrollBar

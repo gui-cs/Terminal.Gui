@@ -73,17 +73,19 @@ public class AdornmentTests
 
         var borderThickness = 2;
         view.Border!.Thickness = new Thickness (borderThickness);
+        view.BorderStyle = LineStyle.Dotted; // Force EnsureView on Border
+
         Assert.Equal (new Rectangle (0, 0, 14, 14), view.Viewport);
 
         var paddingThickness = 3;
         view.Padding!.Thickness = new Thickness (paddingThickness);
         Assert.Equal (new Rectangle (0, 0, 8, 8), view.Viewport);
 
-        Assert.Equal (new Rectangle (0, 0, view.Margin!.Frame.Width, view.Margin!.Frame.Height), view.Margin!.View!.Viewport);
+        Assert.Equal (new Rectangle (0, 0, view.Margin!.GetFrame ().Width, view.Margin!.GetFrame ().Height), view.Margin!.View!.Viewport);
 
-        Assert.Equal (new Rectangle (0, 0, view.Border!.Frame.Width, view.Border!.Frame.Height), view.Border!.View!.Viewport);
+        Assert.Equal (new Rectangle (0, 0, view.Border!.GetFrame ().Width, view.Border!.GetFrame ().Height), view.Border!.View!.Viewport);
 
-        Assert.Equal (new Rectangle (0, 0, view.Padding!.Frame.Width, view.Padding!.Frame.Height), view.Padding!.View!.Viewport);
+        Assert.Equal (new Rectangle (0, 0, view.Padding!.GetFrame ().Width, view.Padding!.GetFrame ().Height), view.Padding!.View!.Viewport);
     }
 
     // Test that Adornment.Viewport_get override returns Frame.Size minus Thickness
@@ -123,7 +125,7 @@ public class AdornmentTests
     [InlineData (1, 1, 1, 0, 4)]
     public void Viewport_Width_Is_Frame_Width (int thickness, int x, int y, int w, int h)
     {
-        var adornment = new Adornment (null!);
+        var adornment = new AdornmentView ();
         adornment.Thickness = new Thickness (thickness);
         adornment.Frame = new Rectangle (x, y, w, h);
         Assert.Equal (new Rectangle (x, y, w, h), adornment.Frame);
@@ -143,24 +145,12 @@ public class AdornmentTests
 
         Assert.Equal (new Rectangle (1, 2, 10, 10), parent.Frame);
         Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin!.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin!.GetFrame ());
         Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin!.View!.Viewport);
 
         Assert.Null (parent.Margin!.View!.SuperView);
         Rectangle boundsAsScreen = parent.Margin!.View!.ViewportToScreen (new Rectangle (1, 2, 5, 5));
         Assert.Equal (new Rectangle (2, 4, 5, 5), boundsAsScreen);
-    }
-
-    [Fact]
-    public void SetAdornmentFrames_Sets_Frames_Correctly ()
-    {
-        var parent = new View { X = 1, Y = 2, Width = 10, Height = 20 };
-        parent.SetAdornmentFrames ();
-
-        Assert.Equal (new Rectangle (1, 2, 10, 20), parent.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 20), parent.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 10, 20), parent.Margin!.Frame);
-        Assert.Equal (new Rectangle (0, 0, 10, 20), parent.Margin!.View!.Viewport);
     }
 
     [Fact]
@@ -183,19 +173,19 @@ public class AdornmentTests
         Assert.Equal (new Rectangle (1, 2, 20, 31), view.Frame);
         Assert.Equal (new Rectangle (0, 0, 8, 19), view.Viewport);
 
-        // Margin.Frame is always the same as the view frame
-        Assert.Equal (new Rectangle (0, 0, 20, 31), view.Margin!.Frame);
+        // Margin.Frame is always at (0,0) and the same as the view frame
+        Assert.Equal (new Rectangle (0, 0, 20, 31), view.Margin!.GetFrame ());
 
         // Border.Frame is View.Frame minus the Margin thickness 
         Assert.Equal (new Rectangle (marginThickness, marginThickness, view.Frame.Width - marginThickness * 2, view.Frame.Height - marginThickness * 2),
-                      view.Border!.Frame);
+                      view.Border!.GetFrame ());
 
         // Padding.Frame is View.Frame minus the Border thickness plus Margin thickness
         Assert.Equal (new Rectangle (marginThickness + borderThickness,
                                      marginThickness + borderThickness,
                                      view.Frame.Width - (marginThickness + borderThickness) * 2,
                                      view.Frame.Height - (marginThickness + borderThickness) * 2),
-                      view.Padding.Frame);
+                      view.Padding.GetFrame ());
     }
 
     // Test that Adornment.FrameToScreen override retains Frame.Size
@@ -215,7 +205,7 @@ public class AdornmentTests
         parent.EndInit ();
 
         Assert.Equal (new Rectangle (1, 2, w, h), parent.Frame);
-        Assert.Equal (new Rectangle (0, 0, w, h), parent.Margin!.Frame);
+        Assert.Equal (new Rectangle (0, 0, w, h), parent.Margin!.GetFrame ());
 
         Assert.Equal (parent.Frame, parent.Margin!.FrameToScreen ());
     }
@@ -224,9 +214,9 @@ public class AdornmentTests
     [Fact]
     public void FrameToScreen_Returns_Frame_If_Parent_Is_Null ()
     {
-        var a = new Adornment { X = 1, Y = 2, Width = 3, Height = 4 };
+        var a = new AdornmentView { X = 1, Y = 2, Width = 3, Height = 4 };
 
-        Assert.Null (a.Parent);
+        Assert.Null (a.Adornment?.Parent);
         Assert.Equal (a.Frame, a.FrameToScreen ());
     }
 
@@ -256,9 +246,9 @@ public class AdornmentTests
         superView.EndInit ();
 
         Assert.Equal (new Rectangle (x, y, 1, 1), view.Frame);
-        Assert.Equal (new Rectangle (0, 0, 20, 20), superView.Margin!.Frame);
+        Assert.Equal (new Rectangle (0, 0, 20, 20), superView.Margin!.GetFrame ());
 
-        Assert.Equal (new Rectangle (marginThickness, marginThickness, 20 - marginThickness * 2, 20 - marginThickness * 2), superView.Border!.Frame);
+        Assert.Equal (new Rectangle (marginThickness, marginThickness, 20 - marginThickness * 2, 20 - marginThickness * 2), superView.Border!.GetFrame ());
 
         Assert.Equal (new Rectangle (superView.Frame.X + marginThickness,
                                      superView.Frame.Y + marginThickness,
@@ -278,7 +268,7 @@ public class AdornmentTests
 
         Assert.Equal (new Rectangle (1, 2, 10, 10), parent.Frame);
         Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Viewport);
-        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin!.Frame);
+        Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin!.GetFrame ());
         Assert.Equal (new Rectangle (0, 0, 10, 10), parent.Margin!.View!.Viewport);
 
         Assert.Null (parent.Margin!.View!.SuperView);
@@ -314,14 +304,14 @@ public class AdornmentTests
     [Fact]
     public void Setting_Viewport_Throws ()
     {
-        var adornment = new Adornment (null!);
+        var adornment = new AdornmentView ();
         Assert.Throws<InvalidOperationException> (() => adornment.Viewport = new Rectangle (1, 2, 3, 4));
     }
 
     [Fact]
     public void Setting_SuperViewRendersLineCanvas_Throws ()
     {
-        var adornment = new Adornment (null!);
+        var adornment = new AdornmentView ();
         Assert.Throws<InvalidOperationException> (() => adornment.SuperViewRendersLineCanvas = true);
     }
 
@@ -424,11 +414,11 @@ public class AdornmentTests
     [InlineData (1, 1, 1, 2, 1, 1, true)]
     public void Contains_Left_Only (int x, int y, int width, int height, int pointX, int pointY, bool expected)
     {
-        Adornment adornment = new () { Id = "adornment" };
-        adornment.Parent = new View { Id = "parent" };
-        adornment.Parent.Frame = new Rectangle (x, y, width, height);
+        AdornmentView adornment = new (new Border ()) { Id = "adornment" };
+        adornment.Adornment.Parent = new View { Id = "parent" };
+        adornment.Adornment.Parent.Frame = new Rectangle (x, y, width, height);
         adornment.Thickness = new Thickness (1, 0, 0, 0);
-        adornment.Frame = adornment.Parent.Frame with { Location = Point.Empty };
+        adornment.Frame = adornment.Adornment.Parent.Frame with { Location = Point.Empty };
 
         bool result = adornment.Contains (new Point (pointX, pointY));
         Assert.Equal (expected, result);
@@ -450,11 +440,11 @@ public class AdornmentTests
     [InlineData (1, 1, 1, 2, 1, 1, true)]
     public void Contains_Right_Only (int x, int y, int width, int height, int pointX, int pointY, bool expected)
     {
-        Adornment adornment = new () { Id = "adornment" };
-        adornment.Parent = new View { Id = "parent" };
-        adornment.Parent.Frame = new Rectangle (x, y, width, height);
+        AdornmentView adornment = new (new Border ()) { Id = "adornment" };
+        adornment.Adornment.Parent = new View { Id = "parent" };
+        adornment.Adornment.Parent.Frame = new Rectangle (x, y, width, height);
         adornment.Thickness = new Thickness (0, 0, 1, 0);
-        adornment.Frame = adornment.Parent.Frame with { Location = Point.Empty };
+        adornment.Frame = adornment.Adornment.Parent.Frame with { Location = Point.Empty };
 
         bool result = adornment.Contains (new Point (pointX, pointY));
         Assert.Equal (expected, result);
@@ -476,11 +466,11 @@ public class AdornmentTests
     [InlineData (1, 1, 1, 2, 1, 1, true)]
     public void Contains_Top_Only (int x, int y, int width, int height, int pointX, int pointY, bool expected)
     {
-        Adornment adornment = new () { Id = "adornment" };
-        adornment.Parent = new View { Id = "parent" };
-        adornment.Parent.Frame = new Rectangle (x, y, width, height);
+        AdornmentView adornment = new (new Border ()) { Id = "adornment" };
+        adornment.Adornment.Parent = new View { Id = "parent" };
+        adornment.Adornment.Parent.Frame = new Rectangle (x, y, width, height);
         adornment.Thickness = new Thickness (0, 1, 0, 0);
-        adornment.Frame = adornment.Parent.Frame with { Location = Point.Empty };
+        adornment.Frame = adornment.Adornment.Parent.Frame with { Location = Point.Empty };
 
         bool result = adornment.Contains (new Point (pointX, pointY));
         Assert.Equal (expected, result);
@@ -502,13 +492,30 @@ public class AdornmentTests
     [InlineData (1, 1, 1, 2, 1, 1, true)]
     public void Contains_TopLeft_Only (int x, int y, int width, int height, int pointX, int pointY, bool expected)
     {
-        Adornment adornment = new () { Id = "adornment" };
-        adornment.Parent = new View { Id = "parent" };
+        TestAdornment adornment = new () { Id = "adornment", Parent = new View { Id = "parent" } };
         adornment.Parent.Frame = new Rectangle (x, y, width, height);
         adornment.Thickness = new Thickness (1, 1, 0, 0);
-        adornment.Frame = adornment.Parent.Frame with { Location = Point.Empty };
 
         bool result = adornment.Contains (new Point (pointX, pointY));
         Assert.Equal (expected, result);
+    }
+
+    public class TestAdornment : AdornmentImpl
+    {
+        /// <inheritdoc />
+        public override Rectangle GetFrame ()
+        {
+            if (Parent is { })
+            {
+                return Parent.Margin.Thickness.GetInside (Parent!.Margin.GetFrame ());
+            }
+            else
+            {
+                return Rectangle.Empty;
+            }
+        }
+
+        /// <inheritdoc />
+        protected override AdornmentView CreateView () => new ();
     }
 }

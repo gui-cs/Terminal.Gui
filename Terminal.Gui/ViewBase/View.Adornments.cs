@@ -10,14 +10,15 @@ public partial class View // Adornments
         if (this is not AdornmentView)
         {
             Margin = new Margin { Parent = this };
-            Border = new Border { Parent = this };
+            //Border = new Border { Parent = this };
+            Border.Parent = this;
             Padding = new Padding { Parent = this };
 
             // Eagerly create the backing Views. The full lazy-creation optimization
             // requires updating all callsites that assume adornments are Views (drawing,
             // layout, hit-testing, etc.) — that is a later phase.
             Margin.EnsureView ();
-            Border.EnsureView ();
+            //Border.EnsureView ();
             Padding.EnsureView ();
         }
     }
@@ -25,14 +26,14 @@ public partial class View // Adornments
     private void BeginInitAdornments ()
     {
         Margin?.View?.BeginInit ();
-        Border?.View?.BeginInit ();
+        Border.View?.BeginInit ();
         Padding?.View?.BeginInit ();
     }
 
     private void EndInitAdornments ()
     {
         Margin?.View?.EndInit ();
-        Border?.View?.EndInit ();
+        Border.View?.EndInit ();
         Padding?.View?.EndInit ();
     }
 
@@ -41,7 +42,6 @@ public partial class View // Adornments
         Margin?.Dispose ();
         Margin = null;
         Border?.Dispose ();
-        Border = null;
         Padding?.Dispose ();
         Padding = null;
     }
@@ -118,7 +118,7 @@ public partial class View // Adornments
     ///         <see cref="SuperView"/> and its <see cref="SubViews"/>.
     ///     </para>
     /// </remarks>
-    public Border? Border { get; private set; }
+    public Border? Border { get; } = new Border ();
 
     // TODO: Make BorderStyle nullable https://github.com/gui-cs/Terminal.Gui/issues/4021
     /// <summary>Gets or sets whether the view has a one row/col thick border.</summary>
@@ -140,14 +140,9 @@ public partial class View // Adornments
     /// </remarks>
     public LineStyle BorderStyle
     {
-        get => Border?.LineStyle ?? LineStyle.Single;
+        get => Border?.LineStyle ?? LineStyle.None;
         set
         {
-            if (Border is null)
-            {
-                return;
-            }
-
             SetBorderStyle (value);
             OnBorderStyleChanged ();
             BorderStyleChanged?.Invoke (this, EventArgs.Empty);
@@ -197,7 +192,7 @@ public partial class View // Adornments
 
         Border.LineStyle = style;
 
-        SetAdornmentFrames ();
+        //SetAdornmentFrames ();
         SetNeedsLayout ();
     }
 
@@ -258,35 +253,27 @@ public partial class View // Adornments
             return;
         }
 
-        if (Margin is { })
-        {
-            Margin.Frame = Rectangle.Empty with { Size = Frame.Size };
+        Margin.View?.Frame = Frame with { Location = Point.Empty };
 
-            if (Margin.View is { } mv)
-            {
-                mv.Frame = Margin.Frame;
-            }
-        }
+        //if (Border is { } && Margin is { })
+        //{
+        //    Border.Frame = Margin.Thickness.GetInside (Margin.Frame);
 
-        if (Border is { } && Margin is { })
-        {
-            Border.Frame = Margin.Thickness.GetInside (Margin.Frame);
+        //    if (Border.View is { } bv)
+        //    {
+        //        bv.Frame = Border.Frame;
+        //    }
+        //}
 
-            if (Border.View is { } bv)
-            {
-                bv.Frame = Border.Frame;
-            }
-        }
+        //if (Padding is null || Border is null)
+        //{
+        //    return;
+        //}
+        //Padding.Frame = Border.Thickness.GetInside (Border.Frame);
 
-        if (Padding is null || Border is null)
-        {
-            return;
-        }
-        Padding.Frame = Border.Thickness.GetInside (Border.Frame);
-
-        if (Padding.View is { } pv)
-        {
-            pv.Frame = Padding.Frame;
-        }
+        //if (Padding.View is { } pv)
+        //{
+        //    pv.Frame = Padding.Frame;
+        //}
     }
 }

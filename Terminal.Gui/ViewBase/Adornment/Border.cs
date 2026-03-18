@@ -20,28 +20,44 @@ public class Border : AdornmentImpl
     /// <inheritdoc/>
     protected override AdornmentView CreateView ()
     {
-        BorderView bv = new (Parent, this) { LineStyle = _lineStyle ?? LineStyle.None, Settings = Settings };
+        BorderView bv = new (this);
 
         return bv;
     }
 
-    private LineStyle? _lineStyle;
+    /// <inheritdoc />
+    public override Rectangle GetFrame ()
+    {
+        if (Parent is { })
+        {
+            return Parent.Margin.Thickness.GetInside (Parent!.Margin.GetFrame ());
+        }
+        else
+        {
+            return Rectangle.Empty;
+        }
+    }
 
     /// <summary>
-    ///     Sets the style of the border by changing the <see cref="Thickness"/>. This is a helper API for setting the
-    ///     <see cref="Thickness"/> to <c>(1,1,1,1)</c> and setting the line style of the views that comprise the border. If
-    ///     set to <see cref="LineStyle.None"/> no border will be drawn.
+    ///     Sets the style of the lines drawn in the <see cref="Border"/>. If not set, will inherit the style from
+    ///     the <see cref="Border.Parent"/>'s <see cref="View.SuperView"/>'s <see cref="View.BorderStyle"/>. If set, will cause <see cref="IAdornment.View"/>
+    ///     to be created.
     /// </summary>
-    public LineStyle LineStyle
+    public LineStyle? LineStyle
     {
-        get => _lineStyle ?? Parent?.SuperView?.BorderStyle ?? LineStyle.None;
+        get => field ?? Parent?.SuperView?.BorderStyle ?? Drawing.LineStyle.None;
         set
         {
-            _lineStyle = value;
-
-            if (View is BorderView bv)
+            if (field == value)
             {
-                bv.LineStyle = value;
+                return;
+            }
+
+            field = value;
+
+            if (field is not null)
+            {
+                EnsureView ();
             }
         }
     }
@@ -54,34 +70,15 @@ public class Border : AdornmentImpl
         get;
         set
         {
+            if (field == value)
+            {
+                return;
+            }
             field = value;
 
-            if (View is BorderView bv)
-            {
-                bv.Settings = value;
-            }
+            Parent?.SetNeedsLayout ();
         }
     } = BorderSettings.Title;
-
-    /// <summary>
-    ///     Computes the border rectangle in screen coordinates.
-    ///     Delegates to <see cref="BorderView.GetBorderRectangle"/> when a View exists.
-    /// </summary>
-    public Rectangle GetBorderRectangle ()
-    {
-        if (View is BorderView bv)
-        {
-            return bv.GetBorderRectangle ();
-        }
-
-        // Compute without a View
-        Rectangle parentScreen = Parent?.FrameToScreen () ?? Rectangle.Empty;
-
-        return new Rectangle (parentScreen.X + Math.Max (0, Thickness.Left - 1),
-                              parentScreen.Y + Math.Max (0, Thickness.Top - 1),
-                              Math.Max (0, parentScreen.Width - Math.Max (0, Thickness.Left - 1) - Math.Max (0, Thickness.Right - 1)),
-                              Math.Max (0, parentScreen.Height - Math.Max (0, Thickness.Top - 1) - Math.Max (0, Thickness.Bottom - 1)));
-    }
 
     /// <summary>
     ///     The view-arrangement controller. Only exists when a <see cref="BorderView"/> is present.

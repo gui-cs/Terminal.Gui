@@ -339,18 +339,19 @@ public class NeedsDrawTests : TestDriverBase
             Height = 20,
             Driver = driver
         };
-        view.Border!.Thickness = new Thickness (1);
+        view.Border.Thickness = new Thickness (1);
+        view.BorderStyle = LineStyle.Single; // Force EnsureView
         view.Padding!.Thickness = new Thickness (1);
         view.BeginInit ();
         view.EndInit ();
         view.LayoutSubViews ();
 
-        Assert.True (view.Border!.NeedsDraw);
+        Assert.True (view.Border.View?.NeedsDraw);
         Assert.True (view.Padding!.NeedsDraw);
 
         view.Draw ();
 
-        Assert.False (view.Border!.NeedsDraw);
+        Assert.False (view.Border.View?.NeedsDraw);
         Assert.False (view.Padding!.NeedsDraw);
     }
 

@@ -18,7 +18,7 @@ public class GetViewsAtLocationTests
     [Fact]
     public void ReturnsEmpty_WhenRootIsNull ()
     {
-        List<View?> result = View.GetViewsAtLocation (null, new (0, 0));
+        List<View?> result = View.GetViewsAtLocation (null, new Point (0, 0));
         Assert.Empty (result);
     }
 
@@ -26,7 +26,7 @@ public class GetViewsAtLocationTests
     public void ReturnsEmpty_WhenRootIsNotVisible ()
     {
         TestView root = new (0, 0, 10, 10, false);
-        List<View?> result = View.GetViewsAtLocation (root, new (5, 5));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (5, 5));
         Assert.Empty (result);
     }
 
@@ -34,7 +34,7 @@ public class GetViewsAtLocationTests
     public void ReturnsEmpty_WhenPointOutsideRoot ()
     {
         TestView root = new (0, 0, 10, 10);
-        List<View?> result = View.GetViewsAtLocation (root, new (20, 20));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (20, 20));
         Assert.Empty (result);
     }
 
@@ -44,7 +44,7 @@ public class GetViewsAtLocationTests
         TestView root = new (0, 0, 10, 10);
         TestView sub = new (5, 5, 2, 2);
         root.Add (sub);
-        List<View?> result = View.GetViewsAtLocation (root, new (20, 20));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (20, 20));
         Assert.Empty (result);
     }
 
@@ -52,7 +52,7 @@ public class GetViewsAtLocationTests
     public void ReturnsRoot_WhenPointInsideRoot_NoSubviews ()
     {
         TestView root = new (0, 0, 10, 10);
-        List<View?> result = View.GetViewsAtLocation (root, new (5, 5));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (5, 5));
         Assert.Single (result);
         Assert.Equal (root, result [0]);
     }
@@ -61,10 +61,10 @@ public class GetViewsAtLocationTests
     public void ReturnsRoot_And_Subview_WhenPointInsideRootMargin ()
     {
         TestView root = new (0, 0, 10, 10);
-        root.Margin!.Thickness = new (1);
+        root.Margin!.Thickness = new Thickness (1);
         TestView sub = new (2, 2, 5, 5);
         root.Add (sub);
-        List<View?> result = View.GetViewsAtLocation (root, new (3, 3));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (3, 3));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
@@ -74,11 +74,11 @@ public class GetViewsAtLocationTests
     public void ReturnsRoot_And_Subview_Border_WhenPointInsideRootMargin ()
     {
         TestView root = new (0, 0, 10, 10);
-        root.Margin!.Thickness = new (1);
+        root.Margin!.Thickness = new Thickness (1);
         TestView sub = new (2, 2, 5, 5);
         sub.BorderStyle = LineStyle.Dotted;
         root.Add (sub);
-        List<View?> result = View.GetViewsAtLocation (root, new (3, 3));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (3, 3));
         Assert.Equal (3, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
@@ -89,8 +89,8 @@ public class GetViewsAtLocationTests
     public void ReturnsRoot_And_Margin_WhenPointInside_With_Margin ()
     {
         TestView root = new (0, 0, 10, 10);
-        root.Margin!.Thickness = new (1);
-        List<View?> result = View.GetViewsAtLocation (root, new (0, 0));
+        root.Margin!.Thickness = new Thickness (1);
+        List<View?> result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (root.Margin!.View!, result [1]);
@@ -100,80 +100,100 @@ public class GetViewsAtLocationTests
     public void ReturnsRoot_WhenPointOutsideSubview_With_Margin ()
     {
         TestView root = new (0, 0, 10, 10);
-        root.Margin!.Thickness = new (1);
+        root.Margin!.Thickness = new Thickness (1);
         TestView sub = new (2, 2, 5, 5);
         root.Add (sub);
-        List<View?> result = View.GetViewsAtLocation (root, new (2, 2));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (2, 2));
         Assert.Single (result);
         Assert.Equal (root, result [0]);
 
-        result = View.GetViewsAtLocation (root, new (0, 0));
+        result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (root.Margin!.View!, result [1]);
 
-        result = View.GetViewsAtLocation (root, new (1, 1));
+        result = View.GetViewsAtLocation (root, new Point (1, 1));
         Assert.Single (result);
         Assert.Equal (root, result [0]);
 
-        result = View.GetViewsAtLocation (root, new (8, 8));
+        result = View.GetViewsAtLocation (root, new Point (8, 8));
         Assert.Single (result);
         Assert.Equal (root, result [0]);
     }
 
     [Fact]
-    public void ReturnsRoot_And_Border_WhenPointInside_With_Border ()
+    public void ReturnsRoot_And_BorderView_WhenPointInside_With_BorderView ()
     {
         TestView root = new (0, 0, 10, 10);
-        root.Border!.Thickness = new (1);
-        List<View?> result = View.GetViewsAtLocation (root, new (0, 0));
+        root.BorderStyle = LineStyle.Dashed; // Sets thickness to 1 and EnsuresView
+        List<View?> result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (root.Border!.View!, result [1]);
     }
 
     [Fact]
-    public void ReturnsRoot_WhenPointOutsideSubview_With_Border ()
+    public void Returns_Root_WhenPointInside_With_Border ()
     {
         TestView root = new (0, 0, 10, 10);
-        root.Border!.Thickness = new (1);
+        root.Border.Thickness = new Thickness (1);
+        List<View?> result = View.GetViewsAtLocation (root, new Point (0, 0));
+        Assert.Single (result);
+        Assert.Equal (root, result [0]);
+    }
+
+    [Fact]
+    public void ReturnsRoot_WhenPointOutsideSubview_With_BorderView ()
+    {
+        TestView root = new (0, 0, 10, 10);
+        root.BorderStyle = LineStyle.Single;
         TestView sub = new (2, 2, 5, 5);
         root.Add (sub);
-        List<View?> result = View.GetViewsAtLocation (root, new (2, 2));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (2, 2));
         Assert.Single (result);
         Assert.Equal (root, result [0]);
 
-        result = View.GetViewsAtLocation (root, new (0, 0));
+        result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (root.Border!.View!, result [1]);
 
-        result = View.GetViewsAtLocation (root, new (1, 1));
+        result = View.GetViewsAtLocation (root, new Point (1, 1));
         Assert.Single (result);
         Assert.Equal (root, result [0]);
 
-        result = View.GetViewsAtLocation (root, new (8, 8));
+        result = View.GetViewsAtLocation (root, new Point (8, 8));
         Assert.Single (result);
         Assert.Equal (root, result [0]);
     }
 
     [Fact]
-    public void ReturnsRoot_And_Border_WhenPointInsideRootBorder ()
+    public void ReturnsRoot_And_BorderView_WhenPointInsideRootBorderView ()
     {
         TestView root = new (0, 0, 10, 10);
-        root.Border!.Thickness = new (1);
-        List<View?> result = View.GetViewsAtLocation (root, new (0, 0));
+        root.BorderStyle = LineStyle.Single;
+        List<View?> result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (root.Border!.View!, result [1]);
+    }
+
+    [Fact]
+    public void ReturnsRoot_WhenPointInsideRootBorder ()
+    {
+        TestView root = new (0, 0, 10, 10);
+        root.Border!.Thickness = new Thickness (1);
+        List<View?> result = View.GetViewsAtLocation (root, new Point (0, 0));
+        Assert.Single (result);
+        Assert.Equal (root, result [0]);
     }
 
     [Fact]
     public void ReturnsRoot_And_Padding_WhenPointInsideRootPadding ()
     {
         TestView root = new (0, 0, 10, 10);
-        root.Padding!.Thickness = new (1);
-        List<View?> result = View.GetViewsAtLocation (root, new (0, 0));
+        root.Padding!.Thickness = new Thickness (1);
+        List<View?> result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (root.Padding!.View!, result [1]);
@@ -186,7 +206,7 @@ public class GetViewsAtLocationTests
         TestView sub = new (2, 2, 5, 5);
         root.Add (sub);
 
-        List<View?> result = View.GetViewsAtLocation (root, new (3, 3));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (3, 3));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
@@ -197,10 +217,10 @@ public class GetViewsAtLocationTests
     {
         TestView root = new (0, 0, 10, 10);
         TestView sub = new (2, 2, 5, 5);
-        sub.Margin!.Thickness = new (1);
+        sub.Margin!.Thickness = new Thickness (1);
         root.Add (sub);
 
-        List<View?> result = View.GetViewsAtLocation (root, new (6, 6));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (6, 6));
         Assert.Equal (3, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
@@ -208,14 +228,14 @@ public class GetViewsAtLocationTests
     }
 
     [Fact]
-    public void ReturnsRootAndSubviewAndBorder_WhenPointInsideSubviewBorder ()
+    public void ReturnsRootAndSubviewAndBorderView_WhenPointInsideSubviewBorderView ()
     {
         TestView root = new (0, 0, 10, 10);
         TestView sub = new (2, 2, 5, 5);
-        sub.Border!.Thickness = new (1);
+        sub.BorderStyle = LineStyle.Single;
         root.Add (sub);
 
-        List<View?> result = View.GetViewsAtLocation (root, new (2, 2));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (2, 2));
         Assert.Equal (3, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
@@ -223,14 +243,14 @@ public class GetViewsAtLocationTests
     }
 
     [Fact]
-    public void ReturnsRootAndSubviewAndSubviewAndBorder_WhenPointInsideSubviewBorder ()
+    public void ReturnsRootAndSubviewAndSubviewAndBorderView_WhenPointInsideSubviewBorderView ()
     {
         TestView root = new (2, 2, 10, 10);
         TestView sub = new (2, 2, 5, 5);
-        sub.Border!.Thickness = new (1);
+        sub.BorderStyle = LineStyle.Dashed;
         root.Add (sub);
 
-        List<View?> result = View.GetViewsAtLocation (root, new (4, 4));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (4, 4));
         Assert.Equal (3, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
@@ -242,10 +262,10 @@ public class GetViewsAtLocationTests
     {
         TestView root = new (0, 0, 10, 10);
         TestView sub = new (2, 2, 5, 5);
-        sub.Padding!.Thickness = new (1);
+        sub.Padding!.Thickness = new Thickness (1);
         root.Add (sub);
 
-        List<View?> result = View.GetViewsAtLocation (root, new (2, 2));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (2, 2));
         Assert.Equal (3, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
@@ -262,7 +282,7 @@ public class GetViewsAtLocationTests
 
         root.Layout ();
 
-        List<View?> result = View.GetViewsAtLocation (root, new (6, 6));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (6, 6));
         Assert.Equal (5, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
@@ -276,7 +296,7 @@ public class GetViewsAtLocationTests
     {
         TestView root = new (0, 0, 10, 10);
         TestView sub = new (2, 2, 5, 5);
-        sub.Border!.Thickness = new (1);
+        sub.Border!.Thickness = new Thickness (1);
 
         var closeButton = new Button
         {
@@ -294,7 +314,7 @@ public class GetViewsAtLocationTests
 
         root.Layout ();
 
-        List<View?> result = View.GetViewsAtLocation (root, new (6, 2));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (6, 2));
         Assert.Equal (4, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
@@ -314,7 +334,7 @@ public class GetViewsAtLocationTests
         sub2.Add (sub3);
 
         // Point inside all
-        List<View?> result = View.GetViewsAtLocation (root, new (7, 7));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (7, 7));
         Assert.Equal (4, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub1, result [1]);
@@ -331,7 +351,7 @@ public class GetViewsAtLocationTests
         root.Add (sub1);
         root.Add (sub2); // sub2 is on top
 
-        List<View?> result = View.GetViewsAtLocation (root, new (5, 5));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (5, 5));
         Assert.Equal (3, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub1, result [1]);
@@ -347,7 +367,7 @@ public class GetViewsAtLocationTests
         root.Add (sub1);
         root.Add (sub2); // sub2 is on top
 
-        List<View?> result = View.GetViewsAtLocation (root, new (5, 5));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (5, 5));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub2, result [1]);
@@ -362,7 +382,7 @@ public class GetViewsAtLocationTests
         root.Add (sub1);
         root.Add (sub2);
 
-        List<View?> result = View.GetViewsAtLocation (root, new (5, 5));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (5, 5));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub2, result [1]);
@@ -372,7 +392,7 @@ public class GetViewsAtLocationTests
     public void ReturnsRoot_WhenPointOnEdge ()
     {
         TestView root = new (0, 0, 10, 10);
-        List<View?> result = View.GetViewsAtLocation (root, new (0, 0));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Single (result);
         Assert.Equal (root, result [0]);
     }
@@ -381,7 +401,7 @@ public class GetViewsAtLocationTests
     public void ReturnsRoot_WhenPointOnBottomRightCorner ()
     {
         TestView root = new (0, 0, 10, 10);
-        List<View?> result = View.GetViewsAtLocation (root, new (9, 9));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (9, 9));
         Assert.Single (result);
         Assert.Equal (root, result [0]);
     }
@@ -393,11 +413,12 @@ public class GetViewsAtLocationTests
         var sub1 = new TestView (2, 2, 6, 6, false);
         root.Add (sub1);
 
-        List<View?> result = View.GetViewsAtLocation (root, new (3, 3));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (3, 3));
         Assert.Single (result);
         Assert.Equal (root, result [0]);
     }
 
+    // TODO: Ensure this test is expanded to test when Border.View is non-null
     [Theory]
     [InlineData (0, 0, 0, 0, 0, -1, -1, new string [] { })]
     [InlineData (0, 0, 0, 0, 0, 0, 0, new [] { "Top" })]
@@ -419,14 +440,14 @@ public class GetViewsAtLocationTests
     [InlineData (0, 0, 1, 0, 0, 10, 10, new string [] { })]
     [InlineData (0, 0, 1, 1, 0, -1, -1, new string [] { })]
     [InlineData (0, 0, 1, 1, 0, 0, 0, new string [] { })] //margin is ViewportSettings.TransparentToMouse
-    [InlineData (0, 0, 1, 1, 0, 1, 1, new [] { "Top", "Border" })]
+    [InlineData (0, 0, 1, 1, 0, 1, 1, new [] { "Top", "BorderView" })]
     [InlineData (0, 0, 1, 1, 0, 4, 4, new [] { "Top" })]
     [InlineData (0, 0, 1, 1, 0, 9, 9, new string [] { })] //margin is ViewportSettings.TransparentToMouse
     [InlineData (0, 0, 1, 1, 0, 10, 10, new string [] { })]
     [InlineData (0, 0, 1, 1, 1, -1, -1, new string [] { })]
     [InlineData (0, 0, 1, 1, 1, 0, 0, new string [] { })] //margin is ViewportSettings.TransparentToMouse
-    [InlineData (0, 0, 1, 1, 1, 1, 1, new [] { "Top", "Border" })]
-    [InlineData (0, 0, 1, 1, 1, 2, 2, new [] { "Top", "Padding" })]
+    [InlineData (0, 0, 1, 1, 1, 1, 1, new [] { "Top", "BorderView" })]
+    [InlineData (0, 0, 1, 1, 1, 2, 2, new [] { "Top", "PaddingView" })]
     [InlineData (0, 0, 1, 1, 1, 4, 4, new [] { "Top" })]
     [InlineData (0, 0, 1, 1, 1, 9, 9, new string [] { })] //margin is ViewportSettings.TransparentToMouse
     [InlineData (0, 0, 1, 1, 1, 10, 10, new string [] { })]
@@ -440,16 +461,16 @@ public class GetViewsAtLocationTests
     [InlineData (1, 1, 1, 1, 0, 0, 0, new string [] { })]
     [InlineData (1, 1, 1, 1, 0, 1, 1, new string [] { })] //margin is ViewportSettings.TransparentToMouse
     [InlineData (1, 1, 1, 1, 0, 4, 4, new [] { "Top" })]
-    [InlineData (1, 1, 1, 1, 0, 9, 9, new [] { "Top", "Border" })]
+    [InlineData (1, 1, 1, 1, 0, 9, 9, new [] { "Top", "BorderView" })]
     [InlineData (1, 1, 1, 1, 0, 10, 10, new string [] { })] //margin is ViewportSettings.TransparentToMouse
     [InlineData (1, 1, 1, 1, 1, -1, -1, new string [] { })]
     [InlineData (1, 1, 1, 1, 1, 0, 0, new string [] { })]
     [InlineData (1, 1, 1, 1, 1, 1, 1, new string [] { })] //margin is ViewportSettings.TransparentToMouse
-    [InlineData (1, 1, 1, 1, 1, 2, 2, new [] { "Top", "Border" })]
-    [InlineData (1, 1, 1, 1, 1, 3, 3, new [] { "Top", "Padding" })]
+    [InlineData (1, 1, 1, 1, 1, 2, 2, new [] { "Top", "BorderView" })]
+    [InlineData (1, 1, 1, 1, 1, 3, 3, new [] { "Top", "PaddingView" })]
     [InlineData (1, 1, 1, 1, 1, 4, 4, new [] { "Top" })]
-    [InlineData (1, 1, 1, 1, 1, 8, 8, new [] { "Top", "Padding" })]
-    [InlineData (1, 1, 1, 1, 1, 9, 9, new [] { "Top", "Border" })]
+    [InlineData (1, 1, 1, 1, 1, 8, 8, new [] { "Top", "PaddingView" })]
+    [InlineData (1, 1, 1, 1, 1, 9, 9, new [] { "Top", "BorderView" })]
     [InlineData (1, 1, 1, 1, 1, 10, 10, new string [] { })] //margin is ViewportSettings.TransparentToMouse
     public void Top_Adornments_Returns_Correct_View (int frameX,
                                                      int frameY,
@@ -461,15 +482,18 @@ public class GetViewsAtLocationTests
                                                      string [] expectedViewsFound)
     {
         // Arrange
-        Runnable<bool>? runnable = new () { Id = "Top", Frame = new (frameX, frameY, 10, 10) };
+        Runnable<bool>? runnable = new () { Id = "Top", Frame = new Rectangle (frameX, frameY, 10, 10) };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
-        runnable.Margin!.Thickness = new (marginThickness);
-        runnable.Margin!.Id = "Margin";
-        runnable.Border!.Thickness = new (borderThickness);
-        runnable.Border!.Id = "Border";
-        runnable.Padding!.Thickness = new (paddingThickness);
-        runnable.Padding.Id = "Padding";
+        runnable.Margin.Thickness = new Thickness (marginThickness);
+        runnable.Margin.EnsureView ();
+        runnable.Margin.View.Id = "MarginView";
+        runnable.Border.Thickness = new Thickness (borderThickness);
+        runnable.Border.EnsureView ();
+        runnable.Border.View.Id = "BorderView";
+        runnable.Padding.Thickness = new Thickness (paddingThickness);
+        runnable.Padding.EnsureView ();
+        runnable.Padding.View.Id = "PaddingView";
 
         var location = new Point (testX, testY);
 
@@ -495,7 +519,7 @@ public class GetViewsAtLocationTests
     public void Returns_Top_If_No_SubViews (int testX, int testY)
     {
         // Arrange
-        Runnable<bool>? runnable = new () { Frame = new (0, 0, 10, 10) };
+        Runnable<bool>? runnable = new () { Frame = new Rectangle (0, 0, 10, 10) };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
 
@@ -520,7 +544,7 @@ public class GetViewsAtLocationTests
         IApplication? app = Application.Create ();
         app.Begin (runnable);
 
-        Assert.Same (runnable, runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ());
+        Assert.Same (runnable, runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ());
         runnable.Dispose ();
     }
 
@@ -542,7 +566,7 @@ public class GetViewsAtLocationTests
         var subview = new View { X = 1, Y = 2, Width = 5, Height = 5 };
         runnable.Add (subview);
 
-        View? found = runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
+        View? found = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         runnable.Dispose ();
@@ -570,7 +594,7 @@ public class GetViewsAtLocationTests
         };
         runnable.Add (subview);
 
-        View? found = runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
+        View? found = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         runnable.Dispose ();
@@ -593,7 +617,7 @@ public class GetViewsAtLocationTests
         subview.Visible = true;
         Assert.True (subview.Visible);
         Assert.False (runnable.Visible);
-        View? found = runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
+        View? found = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         runnable.Dispose ();
@@ -615,12 +639,12 @@ public class GetViewsAtLocationTests
         Runnable<bool>? runnable = new () { Width = 10, Height = 10 };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
-        runnable.Margin!.Thickness = new (1);
+        runnable.Margin!.Thickness = new Thickness (1);
 
         var subview = new View { X = 1, Y = 2, Width = 5, Height = 5 };
         runnable.Add (subview);
 
-        View? found = runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
+        View? found = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         runnable.Dispose ();
@@ -645,12 +669,12 @@ public class GetViewsAtLocationTests
         };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
-        runnable.Viewport = new (offset, offset, 10, 10);
+        runnable.Viewport = new Rectangle (offset, offset, 10, 10);
 
         var subview = new View { X = 1, Y = 1, Width = 2, Height = 2 };
         runnable.Add (subview);
 
-        View? found = runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
+        View? found = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         runnable.Dispose ();
@@ -671,12 +695,12 @@ public class GetViewsAtLocationTests
         Runnable<bool>? runnable = new () { Width = 10, Height = 10 };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
-        runnable.Padding!.Thickness = new (1);
+        runnable.Padding!.Thickness = new Thickness (1);
 
         var subview = new View { X = Pos.AnchorEnd (1), Y = Pos.AnchorEnd (1), Width = 1, Height = 1 };
         runnable.Padding.Add (subview);
 
-        View? found = runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
+        View? found = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == subview);
         runnable.Dispose ();
@@ -685,10 +709,10 @@ public class GetViewsAtLocationTests
     [Theory]
     [InlineData (0, 0, new string [] { })]
     [InlineData (9, 9, new string [] { })]
-    [InlineData (1, 1, new [] { "Top", "Border" })]
-    [InlineData (8, 8, new [] { "Top", "Border" })]
-    [InlineData (2, 2, new [] { "Top", "Padding" })]
-    [InlineData (7, 7, new [] { "Top", "Padding" })]
+    [InlineData (1, 1, new [] { "Top", "BorderView" })]
+    [InlineData (8, 8, new [] { "Top", "BorderView" })]
+    [InlineData (2, 2, new [] { "Top", "PaddingView" })]
+    [InlineData (7, 7, new [] { "Top", "PaddingView" })]
     [InlineData (5, 5, new [] { "Top" })]
     public void Returns_Adornment_If_Start_Has_Adornments (int testX, int testY, string [] expectedViewsFound)
     {
@@ -697,12 +721,18 @@ public class GetViewsAtLocationTests
         Runnable<bool>? runnable = new () { Id = "Top", Width = 10, Height = 10 };
         app.Begin (runnable);
 
-        runnable.Margin!.Thickness = new (1);
+        runnable.Margin!.Thickness = new Thickness (1);
+        runnable.Margin.EnsureView ();
         runnable.Margin!.Id = "Margin";
-        runnable.Border!.Thickness = new (1);
-        runnable.Border!.Id = "Border";
-        runnable.Padding!.Thickness = new (1);
+        runnable.Margin.View.Id = "MarginView";
+        runnable.Border.Thickness = new Thickness (1);
+        runnable.Border.EnsureView ();
+        runnable.Border.Id = "Border";
+        runnable.Border.View.Id = "BorderView";
+        runnable.Padding.Thickness = new Thickness (1);
+        runnable.Padding.EnsureView ();
         runnable.Padding.Id = "Padding";
+        runnable.Padding.View.Id = "PaddingView";
 
         var subview = new View
         {
@@ -714,7 +744,7 @@ public class GetViewsAtLocationTests
         };
         runnable.Add (subview);
 
-        List<View?> viewsUnderMouse = runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse);
+        List<View?> viewsUnderMouse = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse);
         string [] foundIds = viewsUnderMouse.Select (v => v!.Id).ToArray ();
 
         Assert.Equal (expectedViewsFound, foundIds);
@@ -746,11 +776,11 @@ public class GetViewsAtLocationTests
             Width = 5,
             Height = 5
         };
-        subview.Border!.Thickness = new (1);
-        subview.Border!.Id = "border";
+        subview.BorderStyle = LineStyle.Dashed; // Sets thickness to 1 and EnsuresView
+        subview.Border.View.Id = "border";
         runnable.Add (subview);
 
-        List<View?> viewsUnderMouse = runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse);
+        List<View?> viewsUnderMouse = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse);
         string [] foundIds = viewsUnderMouse.Select (v => v!.Id).ToArray ();
 
         Assert.Equal (expectedViewsFound, foundIds);
@@ -782,12 +812,13 @@ public class GetViewsAtLocationTests
             Width = 5,
             Height = 5
         };
-        subview.Border!.Thickness = new (1);
+
+        subview.BorderStyle = LineStyle.Dashed; // Sets thickness to 1 and EnsuresView
         subview.Border!.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
         subview.Border!.Id = "border";
         runnable.Add (subview);
 
-        List<View?> viewsUnderMouse = runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse);
+        List<View?> viewsUnderMouse = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse);
         string [] foundIds = viewsUnderMouse.Select (v => v!.Id).ToArray ();
 
         Assert.Equal (expectedViewsFound, foundIds);
@@ -813,7 +844,7 @@ public class GetViewsAtLocationTests
 
         // A subview with + Padding
         var subview = new View { X = 1, Y = 1, Width = 5, Height = 5 };
-        subview.Padding!.Thickness = new (1);
+        subview.Padding!.Thickness = new Thickness (1);
 
         // This subview will be at the bottom-right-corner of subview
         // So screen-relative location will be X + Width - 1 = 5
@@ -821,7 +852,7 @@ public class GetViewsAtLocationTests
         subview.Padding.Add (paddingSubView);
         runnable.Add (subview);
 
-        View? found = runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
+        View? found = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == paddingSubView);
         runnable.Dispose ();
@@ -846,11 +877,11 @@ public class GetViewsAtLocationTests
 
         // A subview with + Padding
         var subview = new View { X = 1, Y = 1, Width = 5, Height = 5 };
-        subview.Padding!.Thickness = new (1);
+        subview.Padding!.Thickness = new Thickness (1);
 
         // Scroll the subview
-        subview.SetContentSize (new (10, 10));
-        subview.Viewport = subview.Viewport with { Location = new (1, 1) };
+        subview.SetContentSize (new Size (10, 10));
+        subview.Viewport = subview.Viewport with { Location = new Point (1, 1) };
 
         // This subview will be at the bottom-right-corner of subview
         // So screen-relative location will be X + Width - 1 = 5
@@ -858,7 +889,7 @@ public class GetViewsAtLocationTests
         subview.Padding.Add (paddingSubView);
         runnable.Add (subview);
 
-        View? found = runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
+        View? found = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
         Assert.Equal (expectedSubViewFound, found == paddingSubView);
         runnable.Dispose ();
@@ -896,7 +927,7 @@ public class GetViewsAtLocationTests
 
         runnable.Add (subviews [0]);
 
-        View? found = runnable.GetViewsUnderLocation (new (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
+        View? found = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
         Assert.Equal (expectedSubViewFound, subviews.IndexOf (found!));
         runnable.Dispose ();
     }
@@ -914,7 +945,7 @@ public class GetViewsAtLocationTests
     public void Tiled_SubViews (int mouseX, int mouseY, string [] viewIdStrings)
     {
         // Arrange
-        Runnable<bool>? runnable = new () { Frame = new (0, 0, 10, 10), Id = "top" };
+        Runnable<bool>? runnable = new () { Frame = new Rectangle (0, 0, 10, 10), Id = "top" };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
 
@@ -940,7 +971,7 @@ public class GetViewsAtLocationTests
         view.Add (subView);
         runnable.Add (view);
 
-        List<View?> found = runnable.GetViewsUnderLocation (new (mouseX, mouseY), ViewportSettingsFlags.TransparentMouse);
+        List<View?> found = runnable.GetViewsUnderLocation (new Point (mouseX, mouseY), ViewportSettingsFlags.TransparentMouse);
 
         string [] foundIds = found.Select (v => v!.Id).ToArray ();
 
@@ -963,7 +994,7 @@ public class GetViewsAtLocationTests
     public void Popover (int mouseX, int mouseY, string [] viewIdStrings)
     {
         // Arrange
-        Runnable<bool>? runnable = new () { Frame = new (0, 0, 10, 10), Id = "top" };
+        Runnable<bool>? runnable = new () { Frame = new Rectangle (0, 0, 10, 10), Id = "top" };
 
         IApplication? app = Application.Create ();
         app.Begin (runnable);
@@ -991,7 +1022,7 @@ public class GetViewsAtLocationTests
         view.Add (popOver);
         runnable.Add (view);
 
-        List<View?> found = runnable.GetViewsUnderLocation (new (mouseX, mouseY), ViewportSettingsFlags.TransparentMouse);
+        List<View?> found = runnable.GetViewsUnderLocation (new Point (mouseX, mouseY), ViewportSettingsFlags.TransparentMouse);
 
         string [] foundIds = found.Select (v => v!.Id).ToArray ();
 
@@ -1005,16 +1036,16 @@ public class GetViewsAtLocationTests
     {
         IApplication? app = Application.Create ();
 
-        Runnable<bool> runnable = new () { Id = "topRunnable", Frame = new (0, 0, 20, 20) };
+        Runnable<bool> runnable = new () { Id = "topRunnable", Frame = new Rectangle (0, 0, 20, 20) };
 
-        Runnable<bool> secondaryRunnable = new () { Id = "secondaryRunnable", Frame = new (5, 5, 10, 10) };
-        secondaryRunnable.Margin!.Thickness = new (1);
+        Runnable<bool> secondaryRunnable = new () { Id = "secondaryRunnable", Frame = new Rectangle (5, 5, 10, 10) };
+        secondaryRunnable.Margin!.Thickness = new Thickness (1);
         secondaryRunnable.Layout ();
 
         app.Begin (runnable);
         app.Begin (secondaryRunnable);
 
-        List<View?> found = runnable.GetViewsUnderLocation (new (2, 2), ViewportSettingsFlags.TransparentMouse);
+        List<View?> found = runnable.GetViewsUnderLocation (new Point (2, 2), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (found, v => v?.Id == runnable.Id);
         Assert.Contains (found, v => v == runnable);
 
@@ -1027,16 +1058,16 @@ public class GetViewsAtLocationTests
     {
         IApplication? app = Application.Create ();
 
-        Runnable<bool> runnable = new () { Id = "topRunnable", Frame = new (0, 0, 20, 20) };
+        Runnable<bool> runnable = new () { Id = "topRunnable", Frame = new Rectangle (0, 0, 20, 20) };
 
-        Runnable<bool> secondaryRunnable = new () { Id = "secondaryRunnable", Frame = new (5, 5, 10, 10) };
-        secondaryRunnable.Margin!.Thickness = new (1);
+        Runnable<bool> secondaryRunnable = new () { Id = "secondaryRunnable", Frame = new Rectangle (5, 5, 10, 10) };
+        secondaryRunnable.Margin!.Thickness = new Thickness (1);
         secondaryRunnable.Layout ();
 
         app.Begin (runnable);
         app.Begin (secondaryRunnable);
 
-        List<View?> found = runnable.GetViewsUnderLocation (new (7, 7), ViewportSettingsFlags.TransparentMouse);
+        List<View?> found = runnable.GetViewsUnderLocation (new Point (7, 7), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (found, v => v?.Id == secondaryRunnable.Id);
         Assert.DoesNotContain (found, v => v?.Id == runnable.Id);
 
@@ -1049,23 +1080,23 @@ public class GetViewsAtLocationTests
     {
         IApplication? app = Application.Create ();
 
-        Runnable<bool> runnable = new () { Id = "topRunnable", Frame = new (0, 0, 20, 20) };
+        Runnable<bool> runnable = new () { Id = "topRunnable", Frame = new Rectangle (0, 0, 20, 20) };
 
-        Runnable<bool> secondaryRunnable = new () { Id = "secondaryRunnable", Frame = new (5, 5, 10, 10) };
-        secondaryRunnable.Margin!.Thickness = new (1);
+        Runnable<bool> secondaryRunnable = new () { Id = "secondaryRunnable", Frame = new Rectangle (5, 5, 10, 10) };
+        secondaryRunnable.Margin!.Thickness = new Thickness (1);
 
         app.Begin (runnable);
         app.Begin (secondaryRunnable);
 
         secondaryRunnable.Margin!.ViewportSettings = ViewportSettingsFlags.None;
 
-        List<View?> found = runnable.GetViewsUnderLocation (new (5, 5), ViewportSettingsFlags.TransparentMouse);
+        List<View?> found = runnable.GetViewsUnderLocation (new Point (5, 5), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (found, v => v == secondaryRunnable);
         Assert.Contains (found, v => v == secondaryRunnable.Margin!.View!);
         Assert.DoesNotContain (found, v => v?.Id == runnable.Id);
 
         secondaryRunnable.Margin!.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
-        found = runnable.GetViewsUnderLocation (new (5, 5), ViewportSettingsFlags.TransparentMouse);
+        found = runnable.GetViewsUnderLocation (new Point (5, 5), ViewportSettingsFlags.TransparentMouse);
         Assert.DoesNotContain (found, v => v == secondaryRunnable);
         Assert.DoesNotContain (found, v => v == secondaryRunnable.Margin!.View!);
         Assert.Contains (found, v => v?.Id == runnable.Id);
@@ -1079,16 +1110,16 @@ public class GetViewsAtLocationTests
     {
         IApplication? app = Application.Create ();
 
-        Runnable<bool> runnable = new () { Id = "topRunnable", Frame = new (0, 0, 20, 20) };
+        Runnable<bool> runnable = new () { Id = "topRunnable", Frame = new Rectangle (0, 0, 20, 20) };
 
-        Runnable<bool> secondaryRunnable = new () { Id = "secondaryRunnable", Frame = new (5, 5, 10, 10) };
-        secondaryRunnable.Margin!.Thickness = new (1);
+        Runnable<bool> secondaryRunnable = new () { Id = "secondaryRunnable", Frame = new Rectangle (5, 5, 10, 10) };
+        secondaryRunnable.Margin!.Thickness = new Thickness (1);
         secondaryRunnable.Layout ();
 
         app.Begin (runnable);
         app.Begin (secondaryRunnable);
 
-        List<View?> found = runnable.GetViewsUnderLocation (new (20, 20), ViewportSettingsFlags.TransparentMouse);
+        List<View?> found = runnable.GetViewsUnderLocation (new Point (20, 20), ViewportSettingsFlags.TransparentMouse);
         Assert.Empty (found);
 
         runnable.Dispose ();
@@ -1100,7 +1131,7 @@ public class GetViewsAtLocationTests
     public void ReturnsEmpty_WhenRootIsDisabled ()
     {
         TestView root = new (0, 0, 10, 10) { Enabled = false };
-        List<View?> result = View.GetViewsAtLocation (root, new (5, 5));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (5, 5));
         Assert.Empty (result);
     }
 
@@ -1115,12 +1146,12 @@ public class GetViewsAtLocationTests
         root.Add (disabledSub);
 
         // Point inside disabled subview - should only return root
-        List<View?> result = View.GetViewsAtLocation (root, new (7, 7));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (7, 7));
         Assert.Single (result);
         Assert.Equal (root, result [0]);
 
         // Point inside enabled subview - should return root and enabled subview
-        result = View.GetViewsAtLocation (root, new (3, 3));
+        result = View.GetViewsAtLocation (root, new Point (3, 3));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (enabledSub, result [1]);
@@ -1138,7 +1169,7 @@ public class GetViewsAtLocationTests
 
         // Point inside enabled child of disabled parent - should only return root
         // because disabled parent is excluded from hit testing
-        List<View?> result = View.GetViewsAtLocation (root, new (9, 9));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (9, 9));
         Assert.Single (result);
         Assert.Equal (root, result [0]);
     }
@@ -1154,7 +1185,7 @@ public class GetViewsAtLocationTests
         root.Add (enabledSub);
 
         // Point where both subviews overlap - should only return root and enabled subview
-        List<View?> result = View.GetViewsAtLocation (root, new (10, 10));
+        List<View?> result = View.GetViewsAtLocation (root, new Point (10, 10));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (enabledSub, result [1]);

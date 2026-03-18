@@ -6,6 +6,7 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 internal sealed class Arranger : IDisposable
 {
+    // TODO: Simplify this by having _border be of type Border (IAdornment)
     private readonly BorderView _border;
 
     /// <summary>
@@ -87,7 +88,7 @@ internal sealed class Arranger : IDisposable
             _border.SetFocus ();
 
             // Strip off overlapped
-            Arranging = _border.Parent!.Arrangement & ~ViewArrangement.Overlapped;
+            Arranging = _border.Adornment.Parent!.Arrangement & ~ViewArrangement.Overlapped;
         }
 
         return true;
@@ -172,7 +173,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal bool HasAnyArrangementOptions ()
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment.Parent;
 
         if (parent is null)
         {
@@ -200,7 +201,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     private void CreateArrangementButtons ()
     {
-        ViewArrangement parentArrangement = _border.Parent!.Arrangement;
+        ViewArrangement parentArrangement = _border.Adornment.Parent!.Arrangement;
 
         if (parentArrangement.HasFlag (ViewArrangement.Movable))
         {
@@ -214,25 +215,25 @@ internal sealed class Arranger : IDisposable
 
         if (parentArrangement.HasFlag (ViewArrangement.TopResizable))
         {
-            _topSizeButton = CreateArrangerButton (ArrangeButtons.TopSize, Pos.Center () + _border.Parent!.Margin!.Thickness.Horizontal, 0);
+            _topSizeButton = CreateArrangerButton (ArrangeButtons.TopSize, Pos.Center () + _border.Adornment.Parent!.Margin!.Thickness.Horizontal, 0);
         }
 
         if (parentArrangement.HasFlag (ViewArrangement.RightResizable))
         {
             _rightSizeButton = CreateArrangerButton (ArrangeButtons.RightSize,
                                                      Pos.AnchorEnd (),
-                                                     Pos.Center () + _border.Parent!.Margin!.Thickness.Vertical / 2);
+                                                     Pos.Center () + _border.Adornment.Parent!.Margin!.Thickness.Vertical / 2);
         }
 
         if (parentArrangement.HasFlag (ViewArrangement.LeftResizable))
         {
-            _leftSizeButton = CreateArrangerButton (ArrangeButtons.LeftSize, 0, Pos.Center () + _border.Parent!.Margin!.Thickness.Vertical / 2);
+            _leftSizeButton = CreateArrangerButton (ArrangeButtons.LeftSize, 0, Pos.Center () + _border.Adornment.Parent!.Margin!.Thickness.Vertical / 2);
         }
 
         if (parentArrangement.HasFlag (ViewArrangement.BottomResizable))
         {
             _bottomSizeButton = CreateArrangerButton (ArrangeButtons.BottomSize,
-                                                      Pos.Center () + _border.Parent!.Margin!.Thickness.Horizontal / 2,
+                                                      Pos.Center () + _border.Adornment.Parent!.Margin!.Thickness.Horizontal / 2,
                                                       Pos.AnchorEnd ());
         }
     }
@@ -266,7 +267,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     private void SetVisibilityForKeyboardMode ()
     {
-        ViewArrangement parentArrangement = _border.Parent!.Arrangement;
+        ViewArrangement parentArrangement = _border.Adornment.Parent!.Arrangement;
 
         if (parentArrangement.HasFlag (ViewArrangement.Movable))
         {
@@ -439,7 +440,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal bool HandleArrangeModeUp ()
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment.Parent;
 
         if (parent is null)
         {
@@ -475,7 +476,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal bool HandleArrangeModeDown ()
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment.Parent;
 
         if (parent is null)
         {
@@ -511,7 +512,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal bool HandleArrangeModeLeft ()
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment.Parent;
 
         if (parent is null)
         {
@@ -547,7 +548,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal bool HandleArrangeModeRight ()
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment.Parent;
 
         if (parent is null)
         {
@@ -641,7 +642,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     private bool HandleMousePressed (Mouse mouseEvent)
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment.Parent;
 
         if (parent is null)
         {
@@ -689,7 +690,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     private void HandleMouseDrag (Mouse mouseEvent)
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment.Parent;
 
         if (parent is null)
         {
@@ -732,7 +733,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal ViewArrangement DetermineArrangeModeFromClick (Point clickPoint)
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment.Parent;
 
         if (parent is null)
         {
@@ -855,7 +856,7 @@ internal sealed class Arranger : IDisposable
     /// <param name="mouseEvent">The mouse event containing screen position information.</param>
     internal void HandleDragOperation (Mouse mouseEvent)
     {
-        Point targetLocation = _border.Parent!.SuperView?.ScreenToViewport (new Point (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y))
+        Point targetLocation = _border.Adornment.Parent!.SuperView?.ScreenToViewport (new Point (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y))
                                ?? mouseEvent.ScreenPosition;
 
         HandleDragOperation (targetLocation);
@@ -873,7 +874,7 @@ internal sealed class Arranger : IDisposable
     /// </param>
     internal void HandleDragOperation (Point targetLocation)
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment.Parent;
 
         if (parent is null)
         {

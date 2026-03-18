@@ -20,7 +20,7 @@ public sealed class ArrangementEditor : EditorBase
 
     protected override void OnViewToEditChanged ()
     {
-        _arrangementSelector.Enabled = ViewToEdit is { } and not Adornment;
+        _arrangementSelector.Enabled = ViewToEdit is { } and not AdornmentView;
 
         _arrangementSelector.ValueChanged -= ArrangementFlagsOnValueChanged;
 

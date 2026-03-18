@@ -152,7 +152,7 @@ public partial class View // Drawing APIs
 
             // ------------------------------------
             // Advance the diagnostics draw indicator
-            Border?.AdvanceDrawIndicator ();
+            (Border.View as BorderView)?.AdvanceDrawIndicator ();
 
             ClearNeedsDraw ();
         }
@@ -232,31 +232,37 @@ public partial class View // Drawing APIs
         if (this is AdornmentView)
         {
             AddFrameToClip ();
+
+            return;
         }
         else
         {
             // Set the clip to be just the thicknesses of the adornments
             // TODO: Put this union logic in a method on View?
-            Region clipAdornments = Margin!.Thickness.AsRegion (Margin!.FrameToScreen ());
-            clipAdornments.Combine (Border!.Thickness.AsRegion (Border!.FrameToScreen ()), RegionOp.Union);
-            clipAdornments.Combine (Padding!.Thickness.AsRegion (Padding!.FrameToScreen ()), RegionOp.Union);
+            Region clipAdornments = Margin.Thickness.AsRegion (Margin.FrameToScreen ());
+            clipAdornments.Combine (Border.Thickness.AsRegion (Border.FrameToScreen ()), RegionOp.Union);
+            clipAdornments.Combine (Padding.Thickness.AsRegion (Padding.FrameToScreen ()), RegionOp.Union);
             clipAdornments.Combine (originalClip, RegionOp.Intersect);
             SetClip (clipAdornments);
         }
 
-        if (Margin?.NeedsLayout == true)
+        if (Margin.NeedsLayout == true)
         {
             Margin.NeedsLayout = false;
-            Margin?.Thickness.Draw (Driver, FrameToScreen ());
-            Margin?.Parent?.SetSubViewNeedsDrawDownHierarchy ();
+
+            if (Driver is { })
+            {
+                Margin.Thickness.Draw (Driver, FrameToScreen ());
+            }
+            Margin.Parent?.SetSubViewNeedsDrawDownHierarchy ();
         }
 
         if (SubViewNeedsDraw)
         {
             // A SubView may add to the LineCanvas. This ensures any Adornment LineCanvas updates happen.
-            Border?.SetNeedsDraw ();
-            Padding?.SetNeedsDraw ();
-            Margin?.SetNeedsDraw ();
+            Border.SetNeedsDraw ();
+            Padding.SetNeedsDraw ();
+            Margin.SetNeedsDraw ();
         }
 
         if (OnDrawingAdornments ())
@@ -283,19 +289,19 @@ public partial class View // Drawing APIs
         // via Margin.DrawTransparentMargins.
         if (Margin is { } && !Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
         {
-            Margin?.Draw ();
+            Margin.Draw ();
         }
 
         // Each of these renders lines to this View's LineCanvas
         // Those lines will be finally rendered in OnRenderLineCanvas
         if (Border is { } && Border.Thickness != Thickness.Empty)
         {
-            Border?.Draw ();
+            Border.Draw ();
         }
 
         if (Padding is { } && Padding.Thickness != Thickness.Empty)
         {
-            Padding?.Draw ();
+            Padding.Draw ();
         }
 
         if (Margin is { } && Margin.Thickness != Thickness.Empty /* && Margin.ShadowStyle == ShadowStyle.None*/)
