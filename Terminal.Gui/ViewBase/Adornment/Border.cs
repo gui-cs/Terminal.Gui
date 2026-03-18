@@ -38,6 +38,24 @@ public class Border : AdornmentImpl
         }
     }
 
+    /// <inheritdoc />
+    protected override void OnThicknessChanged ()
+    {
+        base.OnThicknessChanged ();
+
+        if (Thickness == Thickness.Empty)
+        {
+            return;
+        }
+
+        if (Parent?.SuperView?.BorderStyle is null)
+        {
+            return;
+        }
+
+        EnsureView ();
+    }
+
     /// <summary>
     ///     Sets the style of the lines drawn in the <see cref="Border"/>. If not set, will inherit the style from
     ///     the <see cref="Border.Parent"/>'s <see cref="View.SuperView"/>'s <see cref="View.BorderStyle"/>. If set, will cause <see cref="IAdornment.View"/>
@@ -45,7 +63,7 @@ public class Border : AdornmentImpl
     /// </summary>
     public LineStyle? LineStyle
     {
-        get => field ?? Parent?.SuperView?.BorderStyle ?? Drawing.LineStyle.None;
+        get => field ?? Parent?.SuperView?.BorderStyle ?? null;
         set
         {
             if (field == value)

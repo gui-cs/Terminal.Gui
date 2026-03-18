@@ -9,7 +9,7 @@ public class BorderTests : TestDriverBase
     {
         Border border = new ();
         Assert.Null (border.View);
-        Assert.Equal (LineStyle.None, border.LineStyle);
+        Assert.Null (border.LineStyle);
         Assert.Equal (BorderSettings.Title, border.Settings);
     }
 

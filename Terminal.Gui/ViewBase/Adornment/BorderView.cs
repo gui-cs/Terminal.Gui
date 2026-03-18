@@ -61,9 +61,8 @@ public partial class BorderView : AdornmentView
         }
         border.ThicknessChanged += OnThicknessChanged;
         border.Parent?.Margin.ThicknessChanged += OnThicknessChanged;
-    }
-
-    /// <inheritdoc />
+   }
+    /// <inheritdoc/>
     public override void OnParentFrameChanged (Rectangle newParentFrame)
     {
         if (Adornment?.Parent is { })
@@ -76,6 +75,7 @@ public partial class BorderView : AdornmentView
     private void OnThicknessChanged (object? sender, EventArgs e)
     {
         OnParentFrameChanged (Adornment.Parent.Frame);
+
         if (IsInitialized)
         {
             ShowHideDrawIndicator ();
@@ -250,7 +250,7 @@ public partial class BorderView : AdornmentView
 
         if (Adornment is not Border border)
         {
-            throw new InvalidOperationException ($"Adornment must be of type Border");
+            throw new InvalidOperationException ("Adornment must be of type Border");
         }
 
         Rectangle screenBounds = ViewportToScreen (Viewport);
@@ -401,7 +401,11 @@ public partial class BorderView : AdornmentView
 
         if (drawRight)
         {
-            lc?.AddLine (new Point (borderBounds.X + borderBounds.Width - 1, titleY), sideLineLength, Orientation.Vertical, border.LineStyle!.Value, normalAttribute);
+            lc?.AddLine (new Point (borderBounds.X + borderBounds.Width - 1, titleY),
+                         sideLineLength,
+                         Orientation.Vertical,
+                         border.LineStyle!.Value,
+                         normalAttribute);
         }
 
         // TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler

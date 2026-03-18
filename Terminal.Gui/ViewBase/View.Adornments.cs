@@ -138,9 +138,9 @@ public partial class View // Adornments
     ///     </para>
     ///     <para>For more advanced customization of the view's border, manipulate see <see cref="Border"/> directly.</para>
     /// </remarks>
-    public LineStyle BorderStyle
+    public LineStyle? BorderStyle
     {
-        get => Border?.LineStyle ?? LineStyle.None;
+        get => Border?.LineStyle ?? null;
         set
         {
             SetBorderStyle (value);
@@ -176,23 +176,22 @@ public partial class View // Adornments
     ///     <para>For more advanced customization of the view's border, manipulate see <see cref="Border"/> directly.</para>
     /// </remarks>
     /// <param name="style"></param>
-    internal void SetBorderStyle (LineStyle style)
+    internal void SetBorderStyle (LineStyle? style)
     {
-        if (style != LineStyle.None)
+        if (style is null or LineStyle.None)
         {
-            if (Border!.Thickness == Thickness.Empty)
+            Border.Thickness = new Thickness (0);
+        }
+        else
+        {
+            if (Border.Thickness == Thickness.Empty)
             {
                 Border.Thickness = new Thickness (1);
             }
         }
-        else
-        {
-            Border!.Thickness = new Thickness (0);
-        }
 
         Border.LineStyle = style;
 
-        //SetAdornmentFrames ();
         SetNeedsLayout ();
     }
 

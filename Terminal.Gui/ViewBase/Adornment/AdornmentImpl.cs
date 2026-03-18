@@ -53,9 +53,6 @@ public abstract class AdornmentImpl : IAdornment
 
             SetNeedsLayout ();
 
-            //Parent?.SetAdornmentFrames ();
-
-            // CWP: work (above) → virtual OnThicknessChanged (empty, for subclass override) → raise event
             OnThicknessChanged ();
             ThicknessChanged?.Invoke (this, EventArgs.Empty);
         }
