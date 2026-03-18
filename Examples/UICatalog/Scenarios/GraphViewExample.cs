@@ -54,7 +54,7 @@ public class GraphViewExample : Scenario
             BorderStyle = LineStyle.Single
         };
         _graphView.Border!.Thickness = _thickness;
-        _graphView.Margin!.Thickness = _thickness;
+        _graphView.Margin.Thickness = _thickness;
         _graphView.Padding!.Thickness = _thickness;
 
         // About TextView
@@ -922,13 +922,13 @@ public class GraphViewExample : Scenario
         {
             _graphView.BorderStyle = LineStyle.Single;
             _graphView.Border!.Thickness = _thickness;
-            _graphView.Margin!.Thickness = _thickness;
+            _graphView.Margin.Thickness = _thickness;
             _graphView.Padding!.Thickness = _thickness;
         }
         else
         {
             _graphView.BorderStyle = LineStyle.None;
-            _graphView.Margin!.Thickness = Thickness.Empty;
+            _graphView.Margin.Thickness = Thickness.Empty;
             _graphView.Padding!.Thickness = Thickness.Empty;
         }
     }

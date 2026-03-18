@@ -118,7 +118,7 @@ public class DropDownList : TextField
             TabStop = TabBehavior.NoStop,
             NoPadding = true,
             NoDecorations = true,
-            ShadowStyle = ShadowStyle.None
+            ShadowStyle = ShadowStyles.None
         };
 
 #if DEBUG

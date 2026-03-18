@@ -60,33 +60,33 @@ public class GetViewsUnderLocationForRootTests
     public void ReturnsAdornment_WhenPointInMargin ()
     {
         Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
-        top.Margin!.Thickness = new Thickness (1);
-        top.Margin!.ViewportSettings = ViewportSettingsFlags.None;
+        top.Margin.Thickness = new Thickness (1);
+        top.Margin.ViewportSettings = ViewportSettingsFlags.None;
         List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
-        Assert.Contains (top.Margin!.View!, result);
+        Assert.Contains (top.Margin.View!, result);
     }
 
     [Fact]
     public void Returns_WhenPointIn_TransparentToMouseMargin_None ()
     {
         Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
-        top.Margin!.Thickness = new Thickness (1);
-        top.Margin!.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
+        top.Margin.Thickness = new Thickness (1);
+        top.Margin.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
         List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
         Assert.DoesNotContain (top, result);
-        Assert.DoesNotContain (top.Margin!.View!, result);
+        Assert.DoesNotContain (top.Margin.View!, result);
     }
 
     [Fact]
     public void Returns_WhenPointIn_NotTransparentToMouseMargin_Top_And_Margin ()
     {
         Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
-        top.Margin!.Thickness = new Thickness (1);
-        top.Margin!.ViewportSettings = ViewportSettingsFlags.None;
+        top.Margin.Thickness = new Thickness (1);
+        top.Margin.ViewportSettings = ViewportSettingsFlags.None;
         List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
-        Assert.Contains (top.Margin!.View!, result);
+        Assert.Contains (top.Margin.View!, result);
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class GetViewsUnderLocationForRootTests
         top.BorderStyle = LineStyle.Single;
         List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
-        Assert.Contains (top.Border!.View!, result);
+        Assert.Contains (top.Border.View!, result);
     }
 
     [Fact]
@@ -143,21 +143,21 @@ public class GetViewsUnderLocationForRootTests
         Runnable top = new () { Frame = new Rectangle (0, 0, 20, 20) };
 
         View subView = new () { Frame = new Rectangle (0, 0, 5, 5) };
-        subView.Margin!.Thickness = new Thickness (1);
-        subView.Margin!.ViewportSettings = ViewportSettingsFlags.None;
+        subView.Margin.Thickness = new Thickness (1);
+        subView.Margin.ViewportSettings = ViewportSettingsFlags.None;
         top.Add (subView);
 
         Assert.True (subView.Contains (new Point (4, 4)));
         List<View?> result = View.GetViewsUnderLocation (top, new Point (4, 4), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
-        Assert.Contains (subView.Margin!.View!, result);
+        Assert.Contains (subView.Margin.View!, result);
         Assert.Contains (subView, result);
 
-        subView.Margin!.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
+        subView.Margin.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
 
         result = View.GetViewsUnderLocation (top, new Point (4, 4), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
-        Assert.DoesNotContain (subView.Margin!.View!, result);
+        Assert.DoesNotContain (subView.Margin.View!, result);
         Assert.DoesNotContain (subView, result);
     }
 
@@ -177,7 +177,7 @@ public class GetViewsUnderLocationForRootTests
         switch (adornmentType)
         {
             case "Margin":
-                subView.Margin!.Thickness = new Thickness (2);
+                subView.Margin.Thickness = new Thickness (2);
                 adornment = subView.Margin;
 
                 break;
@@ -240,7 +240,7 @@ public class GetViewsUnderLocationForRootTests
         switch (adornmentType)
         {
             case "Margin":
-                subView.Margin!.Thickness = new Thickness (2);
+                subView.Margin.Thickness = new Thickness (2);
                 adornment = subView.Margin;
 
                 break;

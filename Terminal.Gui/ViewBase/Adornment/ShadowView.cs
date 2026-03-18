@@ -19,7 +19,7 @@ internal class ShadowView : View
     {
         switch (ShadowStyle)
         {
-            case ShadowStyle.Opaque:
+            case ShadowStyles.Opaque:
                 if (Orientation == Orientation.Vertical)
                 {
                     DrawVerticalShadowOpaque (Viewport);
@@ -31,7 +31,7 @@ internal class ShadowView : View
 
                 break;
 
-            case ShadowStyle.Transparent:
+            case ShadowStyles.Transparent:
                 if (Orientation == Orientation.Vertical)
                 {
                     DrawVerticalShadowTransparent (Viewport);
@@ -52,12 +52,12 @@ internal class ShadowView : View
     /// </summary>
     public Orientation Orientation { get; set; }
 
-    public override ShadowStyle ShadowStyle
+    public override ShadowStyles? ShadowStyle
     {
         get;
         set
         {
-            Visible = value != ShadowStyle.None;
+            Visible = value != ShadowStyles.None;
             field = value;
 
             ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
@@ -174,8 +174,8 @@ internal class ShadowView : View
 
         Attribute attr = ScreenContents [location.Y, location.X].Attribute!.Value;
 
-        var newAttribute = new Attribute (ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDimmerColor (),
-                                          ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDimmerColor (0.05),
+        var newAttribute = new Attribute (ShadowStyle == ShadowStyles.Opaque ? Color.Black : attr.Foreground.GetDimmerColor (),
+                                          ShadowStyle == ShadowStyles.Opaque ? attr.Background : attr.Background.GetDimmerColor (0.05),
                                           attr.Style);
 
         // If the BG is DarkGray, GetDimmerColor gave up. Instead of using the attribute in the Driver under the shadow,
@@ -188,8 +188,8 @@ internal class ShadowView : View
         View? underView = currentViewsUnderMouse.LastOrDefault ();
         attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
 
-        newAttribute = new Attribute (ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Background.GetDimmerColor (),
-                                      ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Foreground.GetDimmerColor (0.25),
+        newAttribute = new Attribute (ShadowStyle == ShadowStyles.Opaque ? Color.Black : attr.Background.GetDimmerColor (),
+                                      ShadowStyle == ShadowStyles.Opaque ? attr.Background : attr.Foreground.GetDimmerColor (0.25),
                                       attr.Style);
 
         return newAttribute;

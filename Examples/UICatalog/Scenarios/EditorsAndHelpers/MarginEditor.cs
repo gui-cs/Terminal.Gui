@@ -10,7 +10,7 @@ public class MarginEditor : AdornmentEditor
         AdornmentChanged += MarginEditor_AdornmentChanged;
     }
 
-    private OptionSelector<ShadowStyle>? _optionsShadow;
+    private OptionSelector<Terminal.Gui.ViewBase.ShadowStyles>? _optionsShadow;
 
     private FlagSelector? _flagSelectorTransparent;
 

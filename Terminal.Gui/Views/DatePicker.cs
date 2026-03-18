@@ -294,7 +294,7 @@ public class DatePicker : View, IValue<DateTime>
             MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             NoPadding = true,
             NoDecorations = true,
-            ShadowStyle = ShadowStyle.None
+            ShadowStyle = ShadowStyles.None
         };
         _previousMonthButton.Accepting += (_, _) => AdjustMonth (-1);
 
@@ -308,7 +308,7 @@ public class DatePicker : View, IValue<DateTime>
             MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             NoPadding = true,
             NoDecorations = true,
-            ShadowStyle = ShadowStyle.None
+            ShadowStyle = ShadowStyles.None
         };
 
         _nextMonthButton.Accepting += (_, _) => AdjustMonth (1);

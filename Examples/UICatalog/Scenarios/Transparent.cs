@@ -88,7 +88,7 @@ public sealed class Transparent : Scenario
                 Height = 8,
                 BorderStyle = LineStyle.Dashed,
                 Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
-                ShadowStyle = ShadowStyle.Transparent
+                ShadowStyle = ShadowStyles.Transparent
             };
             transparentSubView.Border!.Thickness = new Thickness (1, 1, 1, 1);
             transparentSubView.SchemeName = "Dialog";
@@ -123,7 +123,7 @@ public sealed class Transparent : Scenario
 
             Padding.Thickness = new Thickness (1);
             Padding.EnsureView ();
-            Padding.View.Text = "This is the Padding";
+            Padding.View?.Text = "This is the Padding";
         }
 
         private void TransparentView_DrawingContent (object? sender, DrawEventArgs e)

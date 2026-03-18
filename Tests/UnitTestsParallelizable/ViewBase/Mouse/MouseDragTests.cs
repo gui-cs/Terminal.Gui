@@ -502,7 +502,7 @@ public class MouseDragTests
 
         // Assert - Width should be constrained to minimum
         // width = border thickness + margin right
-        int expectedMinWidth = resizableView.Border!.Thickness.Horizontal + resizableView.Margin!.Thickness.Right;
+        int expectedMinWidth = resizableView.Border!.Thickness.Horizontal + resizableView.Margin.Thickness.Right;
         Assert.True (resizableView.Frame.Width >= expectedMinWidth);
 
         app.End (app.SessionStack!.First ());
@@ -548,7 +548,7 @@ public class MouseDragTests
         (resizableView.Border?.View as BorderView)?.Arranger?.HandleDragOperation (dragEvent);
 
         // Assert - Height should be constrained to minimum
-        int expectedMinHeight = resizableView.Border!.Thickness.Vertical + resizableView.Margin!.Thickness.Bottom;
+        int expectedMinHeight = resizableView.Border!.Thickness.Vertical + resizableView.Margin.Thickness.Bottom;
         Assert.True (resizableView.Frame.Height >= expectedMinHeight);
 
         app.End (app.SessionStack!.First ());

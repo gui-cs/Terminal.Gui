@@ -12,7 +12,7 @@ public class MarginTests (ITestOutputHelper output)
         app.Driver!.SetScreenSize (5, 5);
 
         var view = new View { Height = 3, Width = 3 };
-        view.Margin!.Diagnostics = ViewDiagnosticFlags.Thickness;
+        view.Margin.Diagnostics = ViewDiagnosticFlags.Thickness;
         view.Margin.Thickness = new Thickness (1);
 
         Runnable<bool> runnable = new ();
@@ -37,10 +37,11 @@ public class MarginTests (ITestOutputHelper output)
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (5, 5);
 
-        var view = new View { Height = 3, Width = 3 };
-        view.Margin!.Diagnostics = ViewDiagnosticFlags.Thickness;
+        View view = new () { Height = 3, Width = 3 };
+        view.Margin.EnsureView ();
+        view.Margin.View?.Diagnostics = ViewDiagnosticFlags.Thickness;
         view.Margin.Thickness = new Thickness (1);
-        view.Margin.ViewportSettings = ViewportSettingsFlags.None;
+        view.Margin.View?.ViewportSettings = ViewportSettingsFlags.None;
 
         Runnable<bool> runnable = new ();
         app.Begin (runnable);
@@ -53,10 +54,12 @@ public class MarginTests (ITestOutputHelper output)
 
         app.LayoutAndDraw ();
 
-        DriverAssert.AssertDriverContentsAre (@"
-MMM
-M M
-MMM",
+        DriverAssert.AssertDriverContentsAre ("""
+
+                                              MMM
+                                              M M
+                                              MMM
+                                              """,
                                               output,
                                               app.Driver);
         DriverAssert.AssertDriverAttributesAre ("0", output, app.Driver, runnable.GetAttributeForRole (VisualRole.Normal));
@@ -65,15 +68,17 @@ MMM",
     [Fact]
     public void Is_Visually_Transparent ()
     {
-        var view = new View { Height = 3, Width = 3 };
-        Assert.True (view.Margin!.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent), "Margin should be transparent by default.");
+        View view = new () { Height = 3, Width = 3 };
+        view.Margin.EnsureView ();
+        Assert.True (view.Margin.View?.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent), "Margin should be transparent by default.");
     }
 
     [Fact]
     public void Is_Transparent_To_Mouse ()
     {
-        var view = new View { Height = 3, Width = 3 };
-        Assert.True (view.Margin!.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse), "Margin should be transparent to mouse by default.");
+        View view = new () { Height = 3, Width = 3 };
+        view.Margin.EnsureView ();
+        Assert.True (view.Margin.View?.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse), "Margin should be transparent to mouse by default.");
     }
 
     [Fact]
@@ -86,10 +91,10 @@ MMM",
         view.Margin.EnsureView ();
 
         // Give it Text
-        view.Margin.View.Text = "Test";
+        view.Margin.View?.Text = "Test";
 
         // Strip off ViewportSettings.Transparent
-        view.Margin!.ViewportSettings &= ~ViewportSettingsFlags.Transparent;
+        view.Margin.View?.ViewportSettings &= ~ViewportSettingsFlags.Transparent;
 
         // 
     }
@@ -98,32 +103,32 @@ MMM",
     public void Thickness_Is_Empty_By_Default ()
     {
         var view = new View { Height = 3, Width = 3 };
-        Assert.Equal (Thickness.Empty, view.Margin!.Thickness);
+        Assert.Equal (Thickness.Empty, view.Margin.Thickness);
     }
 
     // ShadowStyle
     [Fact]
     public void Margin_Uses_ShadowStyle_Transparent ()
     {
-        var view = new View { Height = 3, Width = 3, ShadowStyle = ShadowStyle.Transparent };
-        Assert.Equal (ShadowStyle.Transparent, view.Margin!.ShadowStyle);
+        var view = new View { Height = 3, Width = 3, ShadowStyle = ShadowStyles.Transparent };
+        Assert.Equal (ShadowStyles.Transparent, view.Margin.ShadowStyle);
 
-        Assert.True (view.Margin!.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse),
+        Assert.True (view.Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse),
                      "Margin should be transparent to mouse when ShadowStyle is Transparent.");
 
-        Assert.True (view.Margin!.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent),
+        Assert.True (view.Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent),
                      "Margin should be transparent when ShadowStyle is Transparent..");
     }
 
     [Fact]
     public void Margin_Uses_ShadowStyle_Opaque ()
     {
-        var view = new View { Height = 3, Width = 3, ShadowStyle = ShadowStyle.Opaque };
-        Assert.Equal (ShadowStyle.Opaque, view.Margin!.ShadowStyle);
+        var view = new View { Height = 3, Width = 3, ShadowStyle = ShadowStyles.Opaque };
+        Assert.Equal (ShadowStyles.Opaque, view.Margin.ShadowStyle);
 
-        Assert.True (view.Margin!.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse),
+        Assert.True (view.Margin.View?.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse),
                      "Margin should be transparent to mouse when ShadowStyle is Opaque.");
-        Assert.True (view.Margin!.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent), "Margin should be transparent when ShadowStyle is Opaque..");
+        Assert.True (view.Margin.View?.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent), "Margin should be transparent when ShadowStyle is Opaque..");
     }
 
     [Fact]
@@ -131,11 +136,11 @@ MMM",
     {
         View superview = new () { Width = 10, Height = 5 };
         View view = new () { Width = 3, Height = 1, BorderStyle = LineStyle.Single };
-        view.Margin!.Thickness = new Thickness (1);
+        view.Margin.Thickness = new Thickness (1);
         View view2 = new () { X = Pos.Right (view), Width = 3, Height = 1, BorderStyle = LineStyle.Single };
-        view2.Margin!.Thickness = new Thickness (1);
+        view2.Margin.Thickness = new Thickness (1);
         View view3 = new () { Y = Pos.Bottom (view), Width = 3, Height = 1, BorderStyle = LineStyle.Single };
-        view3.Margin!.Thickness = new Thickness (1);
+        view3.Margin.Thickness = new Thickness (1);
         superview.Add (view, view2, view3);
 
         superview.LayoutSubViews ();
@@ -226,6 +231,4 @@ MMM",
 
         Assert.Equal (new Rectangle (0, 0, 20, 20), view.Margin.View?.Viewport);
     }
-
-
 }

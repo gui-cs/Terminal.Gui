@@ -35,7 +35,7 @@ public class MouseTests : TestsAllViews
             Arrangement = ViewArrangement.Movable
         };
         testView.Border.LineStyle = LineStyle.None; // Calls EnsureView
-        testView.Margin!.Thickness = new (marginThickness);
+        testView.Margin.Thickness = new (marginThickness);
         testView.Border!.Thickness = new (borderThickness);
         testView.Padding!.Thickness = new (paddingThickness);
 

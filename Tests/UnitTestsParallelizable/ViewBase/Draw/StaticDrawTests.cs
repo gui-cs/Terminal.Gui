@@ -52,8 +52,8 @@ public class StaticDrawTests : TestDriverBase
             Height = 20,
             Id = "SubSubView"
         };
-        subSubView.Margin!.Thickness = new (1);
-        subSubView.Margin.ShadowStyle = ShadowStyle.Transparent;
+        subSubView.Margin.Thickness = new (1);
+        subSubView.Margin.ShadowStyle = ShadowStyles.Transparent;
 
         subview1.Add (subSubView);
         superview.Add (subview1, subview2);
@@ -169,8 +169,8 @@ public class StaticDrawTests : TestDriverBase
         };
 
         // Give the bottom view a margin to trigger the Margin.DrawMargins behavior
-        bottomView.Margin!.Thickness = new (1);
-        bottomView.Margin.ShadowStyle = ShadowStyle.Transparent;
+        bottomView.Margin.Thickness = new (1);
+        bottomView.Margin.ShadowStyle = ShadowStyles.Transparent;
 
         middleView1.Add (bottomView);
         topView.Add (middleView1, middleView2);

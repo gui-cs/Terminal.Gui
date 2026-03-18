@@ -42,21 +42,18 @@ public class PaddingTests
         Assert.Equal (new Rectangle (2, 2, 26, 36), padding.GetFrame ());
     }
 
-
     [Fact]
     public void GetFrame_With_View_Tracks_View_Margin_And_Border ()
     {
-        View view = new View () { Id = "view" };
-        view.Margin.Id = "view.Margin";
-        view.Margin.View.Id = "view.Margin.View";
-        view.Padding.Id = "view.Padding";
-        view.Margin.View.Id = "view.Padding.View";
+        var view = new View { Id = "view" };
+        view.Padding.EnsureView ();
+        view.Margin.View?.Id = "view.Padding.View";
 
         view.Frame = new Rectangle (1, 2, 3, 4);
-        Assert.Equal (new Rectangle (0,0,3,4), view.Padding.View.Frame);
-        Assert.Equal (view.Padding.View.Frame, view.Padding.GetFrame ());
+        Assert.Equal (new Rectangle (0, 0, 3, 4), view.Padding.View?.Frame);
+        Assert.Equal (view.Padding.View?.Frame, view.Padding.GetFrame ());
 
-        view.Padding.Parent.Frame = new Rectangle (10, 20, 30, 40);
+        view.Padding.Parent?.Frame = new Rectangle (10, 20, 30, 40);
         Assert.Equal (new Rectangle (0, 0, 30, 40), view.Padding.GetFrame ());
 
         view.Padding.Thickness = new Thickness (1);
@@ -67,7 +64,6 @@ public class PaddingTests
 
         view.Margin.Thickness = new Thickness (1);
         Assert.Equal (new Rectangle (2, 2, 26, 36), view.Padding.GetFrame ());
-
     }
 
     [Fact]
@@ -79,10 +75,7 @@ public class PaddingTests
 
         padding.View = new PaddingView ();
 
-        View parent = new ()
-        {
-            Frame = new Rectangle (1, 2, 3, 4)
-        };
+        View parent = new () { Frame = new Rectangle (1, 2, 3, 4) };
         padding.Parent = parent;
         Assert.Equal (new Rectangle (0, 0, 3, 4), padding.GetFrame ());
 

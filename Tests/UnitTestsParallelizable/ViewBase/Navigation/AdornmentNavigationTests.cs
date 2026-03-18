@@ -322,7 +322,7 @@ public class AdornmentNavigationTests
         View [] focusChain = view.GetFocusChain (NavigationDirection.Forward, TabBehavior.TabGroup);
 
         // Expected: Border should be in the focus chain
-        Assert.DoesNotContain (view.Border!.View!, focusChain);
+        Assert.DoesNotContain (view.Border.View!, focusChain);
 
         view.Dispose ();
     }
@@ -357,7 +357,7 @@ public class AdornmentNavigationTests
         View [] focusChain = view.GetFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
 
         // Expected: Margin should be in the focus chain
-        Assert.DoesNotContain (view.Margin!.View!, focusChain);
+        Assert.DoesNotContain (view.Margin.View!, focusChain);
 
         view.Dispose ();
     }

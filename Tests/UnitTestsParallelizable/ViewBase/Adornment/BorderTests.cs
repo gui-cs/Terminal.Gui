@@ -55,7 +55,7 @@ public class BorderTests : TestDriverBase
         view.BorderStyle = LineStyle.Dashed;
         Assert.False (view.Border.View?.CanFocus);
         Assert.Equal (TabBehavior.TabGroup, view.Border.View?.TabStop);
-        Assert.Empty (view.Border.View?.KeyBindings.GetBindings ());
+        Assert.Empty (view.Border.View?.KeyBindings.GetBindings ()!);
     }
 
     [Fact]

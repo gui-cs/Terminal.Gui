@@ -1,9 +1,9 @@
 ﻿namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("ShadowStyles Demo", "Demonstrates ShadowStyles Effects.")]
+[ScenarioMetadata ("ShadowStyle Demo", "Demonstrates ShadowStyle Effects.")]
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Adornments")]
-public class ShadowStyles : Scenario
+public class ShadowStyleDemo : Scenario
 {
     public override void Main ()
     {
@@ -38,7 +38,7 @@ public class ShadowStyles : Scenario
             Title = "Shadow Window",
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped,
             BorderStyle = LineStyle.Double,
-            ShadowStyle = ShadowStyle.Transparent
+            ShadowStyle = ShadowStyles.Transparent
         };
 
         window.DrawingContent += (_, e) =>
@@ -52,7 +52,7 @@ public class ShadowStyles : Scenario
             Id = "buttonInWin",
             X = Pos.Center (),
             Y = Pos.Center (), Text = "Button in Window",
-            ShadowStyle = ShadowStyle.Opaque
+            ShadowStyle = ShadowStyles.Opaque
         };
         shadowWindow.Add (buttonInWin);
         window.Add (shadowWindow);
@@ -67,7 +67,7 @@ public class ShadowStyles : Scenario
             Title = "Shadow Window #2",
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped,
             BorderStyle = LineStyle.Double,
-            ShadowStyle = ShadowStyle.Transparent
+            ShadowStyle = ShadowStyles.Transparent
         };
         window.Add (shadowWindow2);
 
@@ -76,7 +76,7 @@ public class ShadowStyles : Scenario
             Id = "button",
             X = Pos.Right (editor) + 10,
             Y = Pos.Center (), Text = "Button",
-            ShadowStyle = ShadowStyle.Opaque
+            ShadowStyle = ShadowStyles.Opaque
         };
         button.Accepting += ButtonOnAccepting;
 

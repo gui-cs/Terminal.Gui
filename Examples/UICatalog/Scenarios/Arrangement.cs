@@ -20,7 +20,7 @@ public class Arrangement : Scenario
         using Window mainWindow = new ();
         mainWindow.Title = GetQuitKeyAndName ();
         mainWindow.TabStop = TabBehavior.TabGroup;
-        mainWindow.ShadowStyle = ShadowStyle.None;
+        mainWindow.ShadowStyle = ShadowStyles.None;
 
         AdornmentsEditor adornmentsEditor = new ()
         {
@@ -176,7 +176,7 @@ public class Arrangement : Scenario
             Y = 15,
             Id = "datePicker",
             Title = "Not _Sizeable",
-            ShadowStyle = ShadowStyle.Transparent,
+            ShadowStyle = ShadowStyles.Transparent,
             BorderStyle = LineStyle.Double,
             TabStop = TabBehavior.TabGroup,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped
@@ -248,7 +248,7 @@ public class Arrangement : Scenario
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
             SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Runnable),
             Id = $"Overlapped{id}",
-            ShadowStyle = ShadowStyle.Transparent,
+            ShadowStyle = ShadowStyles.Transparent,
             BorderStyle = LineStyle.Double,
             CanFocus = true,
             TabStop = TabBehavior.TabGroup,

@@ -39,7 +39,7 @@ public sealed class Themes : Scenario
             Value = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.Theme)
         };
         themeOptionSelector.Border!.Thickness = new Thickness (0, 1, 0, 0);
-        themeOptionSelector.Margin!.Thickness = new Thickness (0, 0, 1, 0);
+        themeOptionSelector.Margin.Thickness = new Thickness (0, 0, 1, 0);
 
         themeOptionSelector.ValueChanged += (sender, args) =>
                                             {
@@ -74,7 +74,7 @@ public sealed class Themes : Scenario
             Source = new ListWrapper<string> (new ObservableCollection<string> (viewClasses.Keys))
         };
         viewListView.Border!.Thickness = new Thickness (0, 1, 0, 0);
-        viewListView.Margin!.Thickness = new Thickness (0, 0, 1, 0);
+        viewListView.Margin.Thickness = new Thickness (0, 0, 1, 0);
 
         viewListView.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
 

@@ -6,8 +6,8 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         <see cref="IAdornment"/> represents a pure settings object: it holds <see cref="Thickness"/>
-///         and <see cref="Frame"/>, and provides coordinate-conversion methods. The full <see cref="View"/>-level
+///         <see cref="IAdornment"/> represents a pure settings object: it holds <see cref="Thickness"/> and provides
+///         coordinate-conversion methods. The full <see cref="View"/>-level
 ///         backing object is created lazily via <see cref="View"/> and accessed through <see cref="IAdornmentView"/>.
 ///     </para>
 /// </remarks>
@@ -35,7 +35,6 @@ public interface IAdornment
     IAdornmentView? View { get; }
 
     /// <summary>
-    /// 
     /// </summary>
     public View? Parent { get; set; }
 

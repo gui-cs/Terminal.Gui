@@ -604,7 +604,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
 
         var thisAsAdornment = this as AdornmentView;
-        View? superViewOrParent = thisAsAdornment?.Adornment.Parent ?? SuperView;
+        View? superViewOrParent = thisAsAdornment?.Adornment?.Parent ?? SuperView;
 
         if ((CanFocus && superViewOrParent is { CanFocus: false }) || !CanBeVisible (this) || !Enabled || !CanFocus)
         {
@@ -786,7 +786,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
         }
 
         var thisAsAdornment = this as AdornmentView;
-        View? superViewOrParent = thisAsAdornment?.Adornment.Parent ?? SuperView;
+        View? superViewOrParent = thisAsAdornment?.Adornment?.Parent ?? SuperView;
 
         // If newFocusedVew is null, we need to find the view that should get focus, and SetFocus on it.
         if (!traversingDown && newFocusedView is null)

@@ -48,7 +48,13 @@ public class PaddingView : AdornmentView
     }
 
     // TODO: Move DrawIndicator out of Border and into View
-    private void OnThicknessChanged (object? sender, EventArgs e) => OnParentFrameChanged (Adornment.Parent.Frame);
+    private void OnThicknessChanged (object? sender, EventArgs e)
+    {
+        if (Adornment is { Parent: { } })
+        {
+            OnParentFrameChanged (Adornment.Parent.Frame);
+        }
+    }
 
     /// <summary>Called when a mouse event occurs within the Padding.</summary>
     /// <remarks>
@@ -63,7 +69,7 @@ public class PaddingView : AdornmentView
     /// <returns><see langword="true"/>, if the event was handled, <see langword="false"/> otherwise.</returns>
     protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (Adornment.Parent is null)
+        if (Adornment?.Parent is null)
         {
             return false;
         }

@@ -17,7 +17,7 @@ public class ClipTests (ITestOutputHelper _output)
             Y = 1,
             Width = 3, Height = 3
         };
-        view.Margin!.Thickness = new (1);
+        view.Margin.Thickness = new (1);
 
         view.Move (0, 0);
         Assert.Equal (new (2, 2), new Point (Application.Driver!.Col, Application.Driver!.Row));

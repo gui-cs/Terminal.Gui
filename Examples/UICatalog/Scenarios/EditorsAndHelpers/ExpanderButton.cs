@@ -72,7 +72,7 @@ public class ExpanderButton : Button
 
     private void ExpanderButton_Initialized (object? sender, EventArgs e)
     {
-        ShadowStyle = ShadowStyle.None;
+        ShadowStyle = ShadowStyles.None;
 
         ExpandOrCollapse (Collapsed);
 
@@ -196,7 +196,7 @@ public class ExpanderButton : Button
 
         if (superView is AdornmentView adornment)
         {
-            superView = adornment.Adornment.Parent;
+            superView = adornment.Adornment?.Parent;
         }
 
         if (superView is null)

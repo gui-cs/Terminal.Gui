@@ -7,7 +7,7 @@ public class ButtonTests (ITestOutputHelper output)
     public void Constructors_Defaults ()
     {
         // Override CM
-        Button.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyles.None;
 
         var btn = new Button ()
         {
@@ -173,7 +173,7 @@ public class ButtonTests (ITestOutputHelper output)
     [AutoInitShutdown]
     public void Update_Parameterless_Only_On_Or_After_Initialize ()
     {
-        Button.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyles.None;
         var btn = new Button { X = Pos.Center (), Y = Pos.Center (), Text = "Say Hello 你" };
         var win = new Window { Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (btn);

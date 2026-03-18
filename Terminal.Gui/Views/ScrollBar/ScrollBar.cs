@@ -43,7 +43,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             CanFocus = false,
             NoDecorations = true,
             NoPadding = true,
-            ShadowStyle = ShadowStyle.None,
+            ShadowStyle = ShadowStyles.None,
             MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         _decreaseButton.Accepting += OnDecreaseButtonOnAccept;
@@ -60,7 +60,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             CanFocus = false,
             NoDecorations = true,
             NoPadding = true,
-            ShadowStyle = ShadowStyle.None,
+            ShadowStyle = ShadowStyles.None,
             MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         _increaseButton.Accepting += OnIncreaseButtonOnAccept;

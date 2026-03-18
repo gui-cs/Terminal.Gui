@@ -117,7 +117,7 @@ public class GetViewsUnderLocationTests
             X = frameX, Y = frameY,
             Width = 10, Height = 10
         };
-        view.Margin!.Thickness = new (marginThickness);
+        view.Margin.Thickness = new (marginThickness);
         view.Border!.Thickness = new (borderThickness);
         view.Padding!.Thickness = new (paddingThickness);
 
@@ -128,9 +128,9 @@ public class GetViewsUnderLocationTests
             containedType = view.GetType ();
         }
 
-        if (view.Margin!.Contains (new (testX, testY)))
+        if (view.Margin.Contains (new (testX, testY)))
         {
-            containedType = view.Margin!.GetType ();
+            containedType = view.Margin.GetType ();
         }
 
         if (view.Border!.Contains (new (testX, testY)))
@@ -183,7 +183,7 @@ public class GetViewsUnderLocationTests
             Width = 1,
             Height = 1,
             Text = ">",
-            ShadowStyle = ShadowStyle.None
+            ShadowStyle = ShadowStyles.None
         };
         parent.Border.Add (expanderButton);
 
@@ -197,7 +197,7 @@ public class GetViewsUnderLocationTests
             Height = 5
         };
         childView.Border!.Thickness = new (1);
-        childView.Border!.ViewportSettings = ViewportSettingsFlags.None;
+        childView.Border.ViewportSettings = ViewportSettingsFlags.None;
         parent.Add (childView);
 
         runnable.Add (parent);

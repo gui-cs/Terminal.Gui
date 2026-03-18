@@ -322,7 +322,7 @@ public sealed class PosAlignDemo : Scenario
                 var posAlign = view.X as PosAlign;
 
                 view.X = Pos.Align (aligner.Alignment, aligner.AlignmentModes, posAlign!.GroupId);
-                view.Margin!.Thickness = new (_leftMargin, view.Margin!.Thickness.Top, view.Margin!.Thickness.Right, view.Margin!.Thickness.Bottom);
+                view.Margin.Thickness = new (_leftMargin, view.Margin.Thickness.Top, view.Margin.Thickness.Right, view.Margin.Thickness.Bottom);
             }
             else
             {
@@ -330,7 +330,7 @@ public sealed class PosAlignDemo : Scenario
 
                 view.Y = Pos.Align (aligner.Alignment, aligner.AlignmentModes, posAlign!.GroupId);
 
-                view.Margin!.Thickness = new (view.Margin!.Thickness.Left, _topMargin, view.Margin!.Thickness.Right, view.Margin!.Thickness.Bottom);
+                view.Margin.Thickness = new (view.Margin.Thickness.Left, _topMargin, view.Margin.Thickness.Right, view.Margin.Thickness.Bottom);
             }
         }
     }

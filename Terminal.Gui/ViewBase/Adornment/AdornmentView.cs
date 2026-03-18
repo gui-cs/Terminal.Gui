@@ -3,7 +3,7 @@ namespace Terminal.Gui.ViewBase;
 /// <summary>
 ///     The <see cref="View"/>-backed rendering layer for an adornment (<see cref="Margin"/>, <see cref="Border"/>,
 ///     or <see cref="Padding"/>).
-///     Implements <see cref="IAdornmentView"/> — i.e., it knows its <see cref="Parent"/> <see cref="View"/>
+///     Implements <see cref="IAdornmentView"/> — i.e., it knows its <see cref="IAdornment.Parent"/> <see cref="View"/>
 ///     and its <see cref="Adornment"/> settings owner.
 ///     Created lazily by <see cref="AdornmentImpl.EnsureView"/> when <see cref="View"/>-level functionality is needed.
 /// </summary>
@@ -27,7 +27,7 @@ public class AdornmentView : View, IAdornmentView, IDesignable
         /* Do nothing. */
     }
 
-    /// <summary>Constructs a rendering layer for the specified <paramref name="parent"/> and <paramref name="adornment"/>.</summary>
+    /// <summary>Constructs a rendering layer for the specified <paramref name="adornment"/>.</summary>
     public AdornmentView (IAdornment adornment)
     {
         // Set Adornment FIRST so subclass constructors can reference it safely.
@@ -195,7 +195,7 @@ public class AdornmentView : View, IAdornmentView, IDesignable
     protected override bool OnRenderingLineCanvas () => true;
 
     /// <summary>
-    ///     AdornmentViews only render to their <see cref="Parent"/>'s or Parent's SuperView's LineCanvas.
+    ///     AdornmentViews only render to their <see cref="IAdornment.Parent"/>'s or Parent's SuperView's LineCanvas.
     /// </summary>
     public override bool SuperViewRendersLineCanvas
     {

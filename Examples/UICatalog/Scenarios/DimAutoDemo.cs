@@ -39,7 +39,7 @@ public class DimAutoDemo : Scenario
             Height = Dim.Auto (DimAutoStyle.Content, 10),
             Arrangement = ViewArrangement.Resizable
         };
-        dimAutoFrameView.Margin!.Thickness = new Thickness (1);
+        dimAutoFrameView.Margin.Thickness = new Thickness (1);
         dimAutoFrameView.ValidatePosDim = true;
 
         TextView textEdit = new ()

@@ -276,7 +276,7 @@ public class ViewportTests (ITestOutputHelper output)
         View view = new () { X = 1, Y = 1, Width = 10, Height = 10 };
         view.BeginInit ();
         view.EndInit ();
-        view.Margin!.Thickness = new (adornmentThickness);
+        view.Margin.Thickness = new (adornmentThickness);
 
         Assert.Equal (expectedOffset, view.GetViewportOffsetFromFrame ().X);
     }

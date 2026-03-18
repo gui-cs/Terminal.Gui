@@ -106,7 +106,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
             Text = "B",
             NoDecorations = true,
             NoPadding = true,
-            ShadowStyle = ShadowStyle.Opaque
+            ShadowStyle = ShadowStyles.Opaque
         };
 
         window.Border.Add (buttonInBorder);
@@ -145,7 +145,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
             Text = "B",
             NoDecorations = true,
             NoPadding = true,
-            ShadowStyle = ShadowStyle.Opaque
+            ShadowStyle = ShadowStyles.Opaque
         };
 
         window.Padding.Add (buttonInPadding);

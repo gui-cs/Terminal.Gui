@@ -104,7 +104,7 @@ public class ViewManipulatorTests
             Width = 50,
             Height = 30
         };
-        view.Margin!.Thickness = new (1);
+        view.Margin.Thickness = new (1);
         ViewManipulator manipulator = new (view, Point.Empty, 20, 10);
         var originalY = view.Frame.Y;
 
@@ -127,7 +127,7 @@ public class ViewManipulatorTests
             Width = 50,
             Height = 30
         };
-        view.Margin!.Thickness = new (1);
+        view.Margin.Thickness = new (1);
         const int MIN_HEIGHT = 35;
         ViewManipulator manipulator = new (view, Point.Empty, 20, MIN_HEIGHT);
 
@@ -181,7 +181,7 @@ public class ViewManipulatorTests
             Width = 50,
             Height = 30
         };
-        view.Margin!.Thickness = new (1);
+        view.Margin.Thickness = new (1);
         ViewManipulator manipulator = new (view, Point.Empty, 20, 10);
         var originalX = view.Frame.X;
 
@@ -204,7 +204,7 @@ public class ViewManipulatorTests
             Width = 50,
             Height = 30
         };
-        view.Margin!.Thickness = new (1);
+        view.Margin.Thickness = new (1);
         const int MIN_WIDTH = 55;
         ViewManipulator manipulator = new (view, Point.Empty, MIN_WIDTH, 10);
 
@@ -482,7 +482,7 @@ public class ViewManipulatorTests
             Width = 50,
             Height = 30
         };
-        view.Margin!.Thickness = new (1);
+        view.Margin.Thickness = new (1);
         view.BeginInit ();
         view.EndInit ();
         ViewManipulator manipulator = new (view, 20, 10);

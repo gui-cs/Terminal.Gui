@@ -1,4 +1,5 @@
 
+#pragma warning disable CS8629 // Nullable value type may be null.
 namespace Terminal.Gui.Views;
 
 internal class TabRow : View
@@ -47,7 +48,7 @@ internal class TabRow : View
 
     protected override bool OnMouseEvent (Mouse me)
     {
-        View? parent = me.View is AdornmentView adornment ? adornment.Adornment.Parent : me.View;
+        View? parent = me.View is AdornmentView adornment ? adornment.Adornment?.Parent : me.View;
         Tab? hit = parent as Tab;
 
         if (me.IsPressed)
@@ -706,12 +707,12 @@ internal class TabRow : View
                 if (_host.Style.TabsOnBottom)
                 {
                     tab.Border!.Thickness = new (1, 0, 1, topLine);
-                    tab.Margin!.Thickness = new (0, 1, 0, 0);
+                    tab.Margin.Thickness = new (0, 1, 0, 0);
                 }
                 else
                 {
                     tab.Border!.Thickness = new (1, topLine, 1, 0);
-                    tab.Margin!.Thickness = new (0, 0, 0, topLine);
+                    tab.Margin.Thickness = new (0, 0, 0, topLine);
                 }
             }
             else if (selected is null)
@@ -719,12 +720,12 @@ internal class TabRow : View
                 if (_host.Style.TabsOnBottom)
                 {
                     tab.Border!.Thickness = new (1, 1, 1, topLine);
-                    tab.Margin!.Thickness = new (0, 0, 0, 0);
+                    tab.Margin.Thickness = new (0, 0, 0, 0);
                 }
                 else
                 {
                     tab.Border!.Thickness = new (1, topLine, 1, 1);
-                    tab.Margin!.Thickness = new (0, 0, 0, 0);
+                    tab.Margin.Thickness = new (0, 0, 0, 0);
                 }
             }
             else
@@ -732,12 +733,12 @@ internal class TabRow : View
                 if (_host.Style.TabsOnBottom)
                 {
                     tab.Border!.Thickness = new (1, 1, 1, topLine);
-                    tab.Margin!.Thickness = new (0, 0, 0, 0);
+                    tab.Margin.Thickness = new (0, 0, 0, 0);
                 }
                 else
                 {
                     tab.Border!.Thickness = new (1, topLine, 1, 1);
-                    tab.Margin!.Thickness = new (0, 0, 0, 0);
+                    tab.Margin.Thickness = new (0, 0, 0, 0);
                 }
             }
 

@@ -27,7 +27,7 @@ public class ArrangerTests
         parent.BeginInit ();
         parent.EndInit ();
 
-        return (BorderView)parent.Border!.View!;
+        return (BorderView)parent.Border.View!;
     }
 
     #endregion
@@ -83,7 +83,7 @@ public class ArrangerTests
         View view = new () { BorderStyle = LineStyle.Single };
         view.BeginInit ();
         view.EndInit ();
-        var borderView = (BorderView)view.Border!.View!;
+        var borderView = (BorderView)view.Border.View!;
         borderView.Border.Parent = null;
         Arranger arranger = new (borderView);
 
@@ -386,7 +386,7 @@ public class ArrangerTests
         View view = new () { BorderStyle = LineStyle.Single };
         view.BeginInit ();
         view.EndInit ();
-        var borderView = (BorderView)view.Border!.View!;
+        var borderView = (BorderView)view.Border.View!;
         borderView.Border.Parent = null;
         Arranger arranger = new (borderView);
 
@@ -409,7 +409,7 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
-        View parent = border.Adornment.Parent!;
+        View parent = border.Adornment?.Parent!;
 
         // Simulate starting a drag
         Point grabPoint = new (5, 5);
@@ -432,7 +432,7 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.RightResizable);
 
-        View parent = border.Adornment.Parent!;
+        View parent = border.Adornment!.Parent!;
         int originalWidth = parent.Frame.Width;
         int originalX = parent.Frame.X;
 
@@ -457,7 +457,7 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.BottomResizable);
 
-        View parent = border.Adornment.Parent!;
+        View parent = border.Adornment!.Parent!;
         int originalHeight = parent.Frame.Height;
         int originalY = parent.Frame.Y;
 
@@ -482,7 +482,7 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.LeftResizable);
 
-        View parent = border.Adornment.Parent!;
+        View parent = border.Adornment!.Parent!;
         int originalX = parent.Frame.X;
         int originalWidth = parent.Frame.Width;
 
@@ -507,7 +507,7 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.TopResizable);
 
-        View parent = border.Adornment.Parent!;
+        View parent = border.Adornment!.Parent!;
         int originalY = parent.Frame.Y;
         int originalHeight = parent.Frame.Height;
 
@@ -532,7 +532,7 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.BottomResizable | ViewArrangement.RightResizable);
 
-        View parent = border.Adornment.Parent!;
+        View parent = border.Adornment!.Parent!;
         int originalWidth = parent.Frame.Width;
         int originalHeight = parent.Frame.Height;
 
@@ -576,7 +576,7 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
-        View parent = border.Adornment.Parent!;
+        View parent = border.Adornment!.Parent!;
         int originalY = parent.Frame.Y;
 
         // Act
@@ -595,7 +595,7 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
-        View parent = border.Adornment.Parent!;
+        View parent = border.Adornment!.Parent!;
         int originalY = parent.Frame.Y;
 
         // Act
@@ -614,7 +614,7 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
-        View parent = border.Adornment.Parent!;
+        View parent = border.Adornment!.Parent!;
         int originalX = parent.Frame.X;
 
         // Act
@@ -633,7 +633,7 @@ public class ArrangerTests
         Arranger arranger = new (border);
         arranger.EnterArrangeMode (ViewArrangement.Movable);
 
-        View parent = border.Adornment.Parent!;
+        View parent = border.Adornment!.Parent!;
         int originalX = parent.Frame.X;
 
         // Act
@@ -651,7 +651,7 @@ public class ArrangerTests
         View view = new () { BorderStyle = LineStyle.Single };
         view.BeginInit ();
         view.EndInit ();
-        var borderView = (BorderView)view.Border!.View!;
+        var borderView = (BorderView)view.Border.View!;
         borderView.Border.Parent = null;
         Arranger arranger = new (borderView);
 
@@ -763,7 +763,7 @@ public class ArrangerTests
         // Arrange
         BorderView border = CreateBorderWithArrangement (ViewArrangement.Movable);
         Arranger arranger = new (border);
-        View parent = border.Adornment.Parent!;
+        View parent = border.Adornment!.Parent!;
         int originalX = parent.Frame.X;
         int originalY = parent.Frame.Y;
 
@@ -786,7 +786,7 @@ public class ArrangerTests
         // Arrange
         BorderView border = CreateBorderWithArrangement (ViewArrangement.Resizable);
         Arranger arranger = new (border);
-        View parent = border.Adornment.Parent!;
+        View parent = border.Adornment!.Parent!;
         int originalWidth = parent.Frame.Width;
 
         // Act - Use mouse drag mode
@@ -1029,7 +1029,7 @@ public class ArrangerTests
         Assert.Equal (1, moveButton.Frame.Height);
         Assert.True (moveButton.NoDecorations);
         Assert.True (moveButton.NoPadding);
-        Assert.Equal (ShadowStyle.None, moveButton.ShadowStyle);
+        Assert.Equal (ShadowStyles.None, moveButton.ShadowStyle);
     }
 
     #endregion

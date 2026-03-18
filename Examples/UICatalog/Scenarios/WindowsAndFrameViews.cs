@@ -37,7 +37,7 @@ public class WindowsAndFrameViews : Scenario
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable
         };
         win.Padding!.Thickness = new (PADDING);
-        win.Margin!.Thickness = new (MARGIN);
+        win.Margin.Thickness = new (MARGIN);
 
         Button paddingButton = new ()
         {

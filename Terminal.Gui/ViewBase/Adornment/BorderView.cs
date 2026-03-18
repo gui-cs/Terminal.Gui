@@ -11,7 +11,7 @@ namespace Terminal.Gui.ViewBase;
 ///         will be drawn on the sides of <see cref="Drawing.Thickness"/> that are greater than zero.
 ///     </para>
 ///     <para>
-///         The <see cref="View.Title"/> of <see cref="AdornmentView.Parent"/> will be drawn based on the value of
+///         The <see cref="View.Title"/> of <see cref="IAdornment.Parent"/> will be drawn based on the value of
 ///         <see cref="Drawing.Thickness.Top"/>:
 ///         <example>
 ///             // If Thickness.Top is 1:
@@ -62,6 +62,7 @@ public partial class BorderView : AdornmentView
         border.ThicknessChanged += OnThicknessChanged;
         border.Parent?.Margin.ThicknessChanged += OnThicknessChanged;
    }
+
     /// <inheritdoc/>
     public override void OnParentFrameChanged (Rectangle newParentFrame)
     {
@@ -74,7 +75,10 @@ public partial class BorderView : AdornmentView
     // TODO: Move DrawIndicator out of Border and into View
     private void OnThicknessChanged (object? sender, EventArgs e)
     {
-        OnParentFrameChanged (Adornment.Parent.Frame);
+        if (Adornment is { Parent: { } })
+        {
+            OnParentFrameChanged (Adornment.Parent.Frame);
+        }
 
         if (IsInitialized)
         {
@@ -198,48 +202,6 @@ public partial class BorderView : AdornmentView
                               Math.Max (0, screenRect.Height - Math.Max (0, Math.Max (0, Thickness.Top - 1) + Math.Max (0, Thickness.Bottom - 1))));
     }
 
-    //// TODO: Make LineStyle nullable https://github.com/gui-cs/Terminal.Gui/issues/4021
-    ///// <summary>
-    /////     Sets the style of the border by changing the <see cref="Thickness"/>. This is a helper API for setting the
-    /////     <see cref="Thickness"/> to <c>(1,1,1,1)</c> and setting the line style of the views that comprise the border. If
-    /////     set to <see cref="LineStyle.None"/> no border will be drawn.
-    ///// </summary>
-    //public LineStyle LineStyle
-    //{
-    //    get
-    //    {
-    //        if (_lineStyle.HasValue)
-    //        {
-    //            return _lineStyle.Value;
-    //        }
-
-    //        // TODO: Make Border.LineStyle inherit from the SuperView hierarchy
-    //        return Parent?.SuperView?.BorderStyle ?? LineStyle.None;
-    //    }
-
-    //    // BUGBUG: Setting LineStyle should SetNeedsDraw
-    //    set => _lineStyle = value;
-    //}
-
-    ///// <summary>
-    /////     Gets or sets the settings for the border.
-    ///// </summary>
-    //public BorderSettings Settings
-    //{
-    //    get;
-    //    set
-    //    {
-    //        if (value == field)
-    //        {
-    //            return;
-    //        }
-
-    //        field = value;
-
-    //        Parent?.SetNeedsDraw ();
-    //    }
-    //}
-
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
@@ -336,7 +298,14 @@ public partial class BorderView : AdornmentView
         {
             if (borderBounds.Width < 4 || !border.Settings.FastHasFlags (BorderSettings.Title) || string.IsNullOrEmpty (Adornment.Parent?.Title))
             {
-                lc?.AddLine (new Point (borderBounds.Location.X, titleY), borderBounds.Width, Orientation.Horizontal, border.LineStyle.Value, normalAttribute);
+                if (border.LineStyle is { })
+                {
+                    lc?.AddLine (new Point (borderBounds.Location.X, titleY),
+                                 borderBounds.Width,
+                                 Orientation.Horizontal,
+                                 border.LineStyle.Value,
+                                 normalAttribute);
+                }
             }
             else
             {

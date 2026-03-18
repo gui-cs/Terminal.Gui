@@ -883,7 +883,7 @@ public partial class View // Layout APIs
 
             if (current.Margin is { SubViews.Count: > 0 })
             {
-                current.Margin!.SetNeedsLayout ();
+                current.Margin.SetNeedsLayout ();
             }
 
             if (current.Border.View is { SubViews.Count: > 0 })
@@ -1280,17 +1280,17 @@ public partial class View // Layout APIs
 
                                           bool? ret = null;
 
-                                          if (viewsUnderLocation.Contains (v.Margin?.View) && v.Margin!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          if (viewsUnderLocation.Contains (v.Margin.View) && v.Margin.View!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
                                           {
                                               ret = true;
                                           }
 
-                                          if (viewsUnderLocation.Contains (v.Border?.View) && v.Border!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          if (viewsUnderLocation.Contains (v.Border.View) && v.Border.View!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
                                           {
                                               ret = true;
                                           }
 
-                                          if (viewsUnderLocation.Contains (v.Padding?.View)
+                                          if (viewsUnderLocation.Contains (v.Padding.View)
                                               && v.Padding!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
                                           {
                                               ret = true;

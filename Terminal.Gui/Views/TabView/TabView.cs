@@ -573,7 +573,7 @@ public class TabView : View
             {
                 tab.Visible = true;
                 tab.Activating += Tab_Selecting!;
-                tab.Border!.View!.Activating += Tab_Selecting!;
+                tab.Border.View!.Activating += Tab_Selecting!;
 
                 yield return tab;
 
@@ -604,7 +604,7 @@ public class TabView : View
             // there is enough space!
             tab.Visible = true;
             tab.Activating += Tab_Selecting!;
-            tab.Border!.View!.Activating += Tab_Selecting!;
+            tab.Border.View!.Activating += Tab_Selecting!;
 
             yield return tab;
 
@@ -654,7 +654,7 @@ public class TabView : View
         // If sender is a Border, get the parent Tab
         if (sender is BorderView border)
         {
-            tab = border.Adornment.Parent as Tab;
+            tab = border.Adornment?.Parent as Tab;
         }
 
         if (tab is { } && tab != SelectedTab)
@@ -686,7 +686,7 @@ public class TabView : View
                 if (tab.Visible)
                 {
                     tab.Activating -= Tab_Selecting!;
-                    tab.Border!.View!.Activating -= Tab_Selecting!;
+                    tab.Border.View!.Activating -= Tab_Selecting!;
                     tab.Visible = false;
                 }
             }
@@ -696,7 +696,7 @@ public class TabView : View
             foreach (Tab tabToRender in _tabLocations)
             {
                 tabToRender.Activating -= Tab_Selecting!;
-                tabToRender.Border!.View!.Activating -= Tab_Selecting!;
+                tabToRender.Border.View!.Activating -= Tab_Selecting!;
                 tabToRender.Visible = false;
             }
 

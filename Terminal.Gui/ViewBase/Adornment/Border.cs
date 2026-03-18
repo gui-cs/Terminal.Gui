@@ -26,17 +26,7 @@ public class Border : AdornmentImpl
     }
 
     /// <inheritdoc />
-    public override Rectangle GetFrame ()
-    {
-        if (Parent is { })
-        {
-            return Parent.Margin.Thickness.GetInside (Parent!.Margin.GetFrame ());
-        }
-        else
-        {
-            return Rectangle.Empty;
-        }
-    }
+    public override Rectangle GetFrame () => Parent is { } ? Parent.Margin.Thickness.GetInside (Parent!.Margin.GetFrame ()) : Rectangle.Empty;
 
     /// <inheritdoc />
     protected override void OnThicknessChanged ()
@@ -48,7 +38,7 @@ public class Border : AdornmentImpl
             return;
         }
 
-        if (Parent?.SuperView?.BorderStyle is null)
+        if (LineStyle is null)
         {
             return;
         }
@@ -58,7 +48,7 @@ public class Border : AdornmentImpl
 
     /// <summary>
     ///     Sets the style of the lines drawn in the <see cref="Border"/>. If not set, will inherit the style from
-    ///     the <see cref="Border.Parent"/>'s <see cref="View.SuperView"/>'s <see cref="View.BorderStyle"/>. If set, will cause <see cref="IAdornment.View"/>
+    ///     the <see cref="IAdornment.Parent"/>'s <see cref="View.SuperView"/>'s <see cref="View.BorderStyle"/>. If set, will cause <see cref="IAdornment.View"/>
     ///     to be created.
     /// </summary>
     public LineStyle? LineStyle

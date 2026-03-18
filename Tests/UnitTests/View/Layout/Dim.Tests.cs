@@ -27,7 +27,7 @@ public class DimTests
     public void Only_DimAbsolute_And_DimFactor_As_A_Different_Procedure_For_Assigning_Value_To_Width_Or_Height ()
     {
         // Override CM
-        Button.DefaultShadow = ShadowStyle.None;
+        Button.DefaultShadow = ShadowStyles.None;
 
         // Testing with the Button because it properly handles the Dim class.
         Runnable t = new ();

@@ -19,7 +19,7 @@ public class AdornmentTests (ITestOutputHelper output)
         view.Border.Thickness = new Thickness (1, 1, 1, 0);
 
         // Add margin bottom thickness
-        view.Margin!.Thickness = new Thickness (0, 0, 0, 1);
+        view.Margin.Thickness = new Thickness (0, 0, 0, 1);
 
         Assert.Equal (6, view.Width);
         Assert.Equal (3, view.Height);
@@ -36,7 +36,7 @@ public class AdornmentTests (ITestOutputHelper output)
         view.Border!.Thickness = new Thickness (1, 1, 1, 1);
 
         // Remove margin bottom thickness
-        view.Margin!.Thickness = new Thickness (0, 0, 0, 0);
+        view.Margin.Thickness = new Thickness (0, 0, 0, 0);
 
         view.Draw ();
 
@@ -54,7 +54,7 @@ public class AdornmentTests (ITestOutputHelper output)
         view.Border!.Thickness = new Thickness (1, 1, 1, 0);
 
         // Add margin bottom thickness
-        view.Margin!.Thickness = new Thickness (0, 0, 0, 1);
+        view.Margin.Thickness = new Thickness (0, 0, 0, 1);
 
         Assert.Equal (6, view.Width);
         Assert.Equal (3, view.Height);

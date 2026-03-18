@@ -90,7 +90,7 @@ public class SubViewTests
     public void Add_Margin_Throws ()
     {
         View view = new ();
-        Assert.Throws<InvalidOperationException> (() => view.Margin!.Add (new View ()));
+        Assert.Throws<InvalidOperationException> (() => view.Margin.Add (new View ()));
     }
 
     [Fact]
@@ -1297,8 +1297,8 @@ public class SubViewTests
         View paddingSubView = new () { Id = "paddingSubView" };
 
         // Thickness matters
-        //superView.Margin!.Thickness = new  (1);
-        //superView.Margin!.Add (marginSubView);
+        //superView.Margin.Thickness = new  (1);
+        //superView.Margin.Add (marginSubView);
         superView.Border!.Thickness = new Thickness (1);
         superView.Border!.Add (borderSubView);
         superView.Padding!.Thickness = new Thickness (1);
@@ -1443,7 +1443,7 @@ public class SubViewTests
         view.Border!.Add (borderSubView);
 
         // Act - GetSubViews on Border (an Adornment) with includeAdornments
-        IReadOnlyCollection<View> result = view.Border!.View!.GetSubViews (true);
+        IReadOnlyCollection<View> result = view.Border.View!.GetSubViews (true);
 
         // Assert - Should only return direct subviews, not crash
         Assert.Single (result);

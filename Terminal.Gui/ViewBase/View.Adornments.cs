@@ -9,41 +9,38 @@ public partial class View // Adornments
     {
         if (this is not AdornmentView)
         {
-            Margin = new Margin { Parent = this };
-            //Border = new Border { Parent = this };
+            Margin.Parent = this;
             Border.Parent = this;
-            Padding = new Padding { Parent = this };
+            Padding.Parent = this;
 
             // Eagerly create the backing Views. The full lazy-creation optimization
             // requires updating all callsites that assume adornments are Views (drawing,
             // layout, hit-testing, etc.) — that is a later phase.
-            Margin.EnsureView ();
+            //Margin.EnsureView ();
             //Border.EnsureView ();
-            Padding.EnsureView ();
+            //Padding.EnsureView ();
         }
     }
 
     private void BeginInitAdornments ()
     {
-        Margin?.View?.BeginInit ();
+        Margin.View?.BeginInit ();
         Border.View?.BeginInit ();
-        Padding?.View?.BeginInit ();
+        Padding.View?.BeginInit ();
     }
 
     private void EndInitAdornments ()
     {
-        Margin?.View?.EndInit ();
+        Margin.View?.EndInit ();
         Border.View?.EndInit ();
-        Padding?.View?.EndInit ();
+        Padding.View?.EndInit ();
     }
 
     private void DisposeAdornments ()
     {
-        Margin?.Dispose ();
-        //Margin = null;
-        Border?.Dispose ();
-        Padding?.Dispose ();
-        //Padding = null;
+        Margin.View?.Dispose ();
+        Border.View?.Dispose ();
+        Padding.View?.Dispose ();
     }
 
     /// <summary>
@@ -67,31 +64,68 @@ public partial class View // Adornments
     ///         <see cref="SuperView"/> and its <see cref="SubViews"/>.
     ///     </para>
     /// </remarks>
-    public Margin? Margin { get; private set; }
+    public Margin Margin { get; } = new ();
 
     /// <summary>
-    ///     Gets or sets whether the View is shown with a shadow effect. The shadow is drawn on the right and bottom sides of
-    ///     the
+    ///     Gets or sets the shadow effect that will be drawn on the right and bottom sides of the
     ///     Margin.
     /// </summary>
     /// <remarks>
-    ///     Setting this property to <see langword="true"/> will add a shadow to the right and bottom sides of the Margin.
+    ///     <see langword="null"/> will disable the shadow. All other values will add a shadow to the right and bottom sides of the Margin.
     ///     The View 's <see cref="Frame"/> will be expanded to include the shadow.
     /// </remarks>
-    public virtual ShadowStyle ShadowStyle
+    public virtual ShadowStyles? ShadowStyle
     {
-        get;
+        get => Margin.ShadowStyle ?? null;
         set
         {
-            if (field == value)
-            {
-                return;
-            }
-
-            field = value;
-
-            Margin?.ShadowStyle = value;
+            SetShadowStyle (value);
+            OnShadowStyleChanged ();
+            ShadowStyleChanged?.Invoke (this, EventArgs.Empty);
         }
+    }
+
+    /// <summary>
+    ///     Called when the <see cref="ShadowStyle"/> has changed.
+    /// </summary>
+    protected virtual bool OnShadowStyleChanged () => false;
+
+    /// <summary>
+    ///     Fired when the <see cref="ShadowStyle"/> has changed.
+    /// </summary>
+    public event EventHandler<EventArgs>? ShadowStyleChanged;
+
+    /// <summary>
+    ///     Sets the <see cref="ShadowStyle"/> of the view to the specified value.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         <see cref="ShadowStyle"/> is a helper for manipulating the view's <see cref="Margin"/>. Setting this property
+    ///         to any value other
+    ///         than <see cref="ShadowStyles.None"/> is equivalent to setting <see cref="Margin"/>'s
+    ///         <see cref="IAdornment.Thickness"/> and <see cref="ShadowStyle"/> to the value.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property to <see cref="ShadowStyles.None"/> is equivalent to setting <see cref="Margin"/>'s
+    ///         <see cref="IAdornment.Thickness"/> to `0` and <see cref="ShadowStyle"/> to <see cref="ShadowStyles.None"/>.
+    ///     </para>
+    ///     <para>For more advanced customization of the view's margin, manipulate see <see cref="Margin"/> directly.</para>
+    /// </remarks>
+    /// <param name="style"></param>
+    internal void SetShadowStyle (ShadowStyles? style)
+    {
+        if (style is null)
+        {
+            Margin.Thickness = new Thickness (0);
+        }
+        else
+        {
+            // Causes EnsureView
+            Margin.ShadowStyle = style;
+        }
+
+
+        SetNeedsLayout ();
     }
 
     /// <summary>
@@ -118,9 +152,8 @@ public partial class View // Adornments
     ///         <see cref="SuperView"/> and its <see cref="SubViews"/>.
     ///     </para>
     /// </remarks>
-    public Border? Border { get; } = new Border ();
+    public Border Border { get; } = new ();
 
-    // TODO: Make BorderStyle nullable https://github.com/gui-cs/Terminal.Gui/issues/4021
     /// <summary>Gets or sets whether the view has a one row/col thick border.</summary>
     /// <remarks>
     ///     <para>
@@ -140,7 +173,7 @@ public partial class View // Adornments
     /// </remarks>
     public LineStyle? BorderStyle
     {
-        get => Border?.LineStyle ?? null;
+        get => Border.LineStyle ?? null;
         set
         {
             SetBorderStyle (value);
@@ -210,7 +243,7 @@ public partial class View // Adornments
     ///         <see cref="SuperView"/> and its <see cref="SubViews"/>.
     ///     </para>
     /// </remarks>
-    public Padding? Padding { get; private set; }
+    public Padding Padding { get; } = new ();
 
     /// <summary>
     ///     <para>Gets the thickness describing the sum of the Adornments' thicknesses.</para>
@@ -225,20 +258,9 @@ public partial class View // Adornments
     {
         var result = Thickness.Empty;
 
-        if (Margin is { })
-        {
-            result += Margin.Thickness;
-        }
-
-        if (Border is { })
-        {
-            result += Border.Thickness;
-        }
-
-        if (Padding is { })
-        {
-            result += Padding.Thickness;
-        }
+        result += Margin.Thickness;
+        result += Border.Thickness;
+        result += Padding.Thickness;
 
         return result;
     }
@@ -252,27 +274,7 @@ public partial class View // Adornments
             return;
         }
 
+        // Border and Padding dynamically update based on Margin's View's Frame changing
         Margin.View?.Frame = Frame with { Location = Point.Empty };
-
-        //if (Border is { } && Margin is { })
-        //{
-        //    Border.Frame = Margin.Thickness.GetInside (Margin.Frame);
-
-        //    if (Border.View is { } bv)
-        //    {
-        //        bv.Frame = Border.Frame;
-        //    }
-        //}
-
-        //if (Padding is null || Border is null)
-        //{
-        //    return;
-        //}
-        //Padding.Frame = Border.Thickness.GetInside (Border.Frame);
-
-        //if (Padding.View is { } pv)
-        //{
-        //    pv.Frame = Padding.Frame;
-        //}
     }
 }

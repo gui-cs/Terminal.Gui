@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
@@ -48,6 +50,12 @@ public class MarginView : AdornmentView
 
         // Margins are transparent to mouse by default
         ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
+
+        if (margin.Parent is { })
+        {
+            Frame = margin.Parent.Frame with { Location = Point.Empty };
+        }
+        margin.ThicknessChanged += OnThicknessChanged;
     }
 
     /// <inheritdoc/>
@@ -55,10 +63,15 @@ public class MarginView : AdornmentView
 
     private void OnThicknessChanged (object? sender, EventArgs e)
     {
-        if (!_isThicknessChanging)
+        if (_isThicknessChanging)
         {
-            _originalThickness = new Thickness (Thickness.Left, Thickness.Top, Thickness.Right, Thickness.Bottom);
-            SetShadow (ShadowStyle);
+            return;
+        }
+        _originalThickness = new Thickness (Thickness.Left, Thickness.Top, Thickness.Right, Thickness.Bottom);
+
+        if (ShadowStyle is { })
+        {
+            SetShadow (ShadowStyle.Value);
         }
     }
 
@@ -71,7 +84,7 @@ public class MarginView : AdornmentView
 
     internal void CacheClip ()
     {
-        if (Thickness != Thickness.Empty && ShadowStyle != ShadowStyle.None)
+        if (Thickness != Thickness.Empty && ShadowStyle != ShadowStyles.None)
         {
             _cachedClip = GetClip ()?.Clone ();
         }
@@ -97,21 +110,23 @@ public class MarginView : AdornmentView
         {
             View view = stack.Pop ();
 
-            if (view.Margin is { } margin
-                && margin.Thickness != Thickness.Empty
-                && margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)
-                && margin.GetCachedClip () != null)
+            if (view.Margin.View is { } marginView
+                && view.Margin.Thickness != Thickness.Empty
+                && marginView.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)
+                && view.Margin.GetCachedClip () != null)
             {
-                margin.SetNeedsDraw ();
+                marginView.SetNeedsDraw ();
                 Region? saved = view.GetClip ();
-                view.SetClip (margin.GetCachedClip ());
-                margin.Draw ();
+                view.SetClip (view.Margin.GetCachedClip ());
+                marginView.Draw ();
                 view.SetClip (saved);
-                margin.ClearCachedClip ();
+                view.Margin.ClearCachedClip ();
             }
 
             // Do not include Margin views of subviews; not supported
-            foreach (View subview in view.GetSubViews (includePadding: true, includeBorder: true).OrderBy (v => v.ShadowStyle != ShadowStyle.None).Reverse ())
+            foreach (View subview in view.GetSubViews (includePadding: true, includeBorder: true)
+                                         .OrderBy (v => v.ShadowStyle != ShadowStyles.None)
+                                         .Reverse ())
             {
                 stack.Push (subview);
             }
@@ -129,8 +144,6 @@ public class MarginView : AdornmentView
         {
             return;
         }
-
-        ShadowStyle = base.ShadowStyle;
 
         Adornment.Parent.MouseStateChanged += OnParentOnMouseStateChanged;
     }
@@ -151,7 +164,7 @@ public class MarginView : AdornmentView
             Thickness.Draw (Driver, screen, Diagnostics, ToString ());
         }
 
-        if (ShadowStyle != ShadowStyle.None)
+        if (ShadowStyle != ShadowStyles.None)
         {
             // Don't clear where the shadow goes
         }
@@ -173,7 +186,7 @@ public class MarginView : AdornmentView
     ///     Sets whether the Margin includes a shadow effect. The shadow is drawn on the right and bottom sides of the
     ///     Margin.
     /// </summary>
-    public ShadowStyle SetShadow (ShadowStyle style)
+    public ShadowStyles? SetShadow (ShadowStyles? style)
     {
         if (_rightShadow is { })
         {
@@ -191,7 +204,7 @@ public class MarginView : AdornmentView
 
         _originalThickness ??= Thickness;
 
-        if (ShadowStyle != ShadowStyle.None)
+        if (ShadowStyle is not null)
         {
             // Turn off shadow
             _originalThickness = new Thickness (Thickness.Left,
@@ -200,7 +213,7 @@ public class MarginView : AdornmentView
                                                 Math.Max (Thickness.Bottom - ShadowSize.Height, 0));
         }
 
-        if (style != ShadowStyle.None)
+        if (style is not null)
         {
             // Turn on shadow
             _isThicknessChanging = true;
@@ -212,7 +225,7 @@ public class MarginView : AdornmentView
             _isThicknessChanging = false;
         }
 
-        if (style != ShadowStyle.None)
+        if (style is not null)
         {
             _rightShadow = new ShadowView
             {
@@ -249,27 +262,11 @@ public class MarginView : AdornmentView
         return style;
     }
 
-    /// <inheritdoc/>
-    public override ShadowStyle ShadowStyle
+    /// <inheritdoc />
+    public override ShadowStyles? ShadowStyle
     {
-        get => base.ShadowStyle;
-        set
-        {
-            if (value == ShadowStyle.Opaque || (value == ShadowStyle.Transparent && (ShadowSize.Width == 0 || ShadowSize.Height == 0)))
-            {
-                if (ShadowSize.Width != 1)
-                {
-                    ShadowSize = ShadowSize with { Width = 1 };
-                }
-
-                if (ShadowSize.Height != 1)
-                {
-                    ShadowSize = ShadowSize with { Height = 1 };
-                }
-            }
-
-            base.ShadowStyle = SetShadow (value);
-        }
+        get => (Adornment as Margin)?.ShadowStyle ?? null;
+        set => throw new InvalidOperationException ($"The ShadowStyle of MarginView cannot be set");
     }
 
     /// <summary>
@@ -280,14 +277,23 @@ public class MarginView : AdornmentView
         get;
         set
         {
+            if (field == value)
+            {
+                return;
+            }
+
             if (TryValidateShadowSize (field, value, out Size result))
             {
                 field = value;
-                SetShadow (ShadowStyle);
             }
             else
             {
                 field = result;
+            }
+
+            if (ShadowStyle is { })
+            {
+                SetShadow (ShadowStyle);
             }
         }
     }
@@ -300,14 +306,14 @@ public class MarginView : AdornmentView
 
         if (newValue.Width < 0)
         {
-            result = ShadowStyle is ShadowStyle.Opaque or ShadowStyle.Transparent ? result with { Width = 1 } : originalValue;
+            result = ShadowStyle is ShadowStyles.Opaque or ShadowStyles.Transparent ? result with { Width = 1 } : originalValue;
 
             wasValid = false;
         }
 
         if (newValue.Height < 0)
         {
-            result = ShadowStyle is ShadowStyle.Opaque or ShadowStyle.Transparent ? result with { Height = 1 } : originalValue;
+            result = ShadowStyle is ShadowStyles.Opaque or ShadowStyles.Transparent ? result with { Height = 1 } : originalValue;
 
             wasValid = false;
         }
@@ -319,14 +325,14 @@ public class MarginView : AdornmentView
 
         var wasUpdated = false;
 
-        if ((ShadowStyle == ShadowStyle.Opaque && newValue.Width != 1) || (ShadowStyle == ShadowStyle.Transparent && newValue.Width < 1))
+        if ((ShadowStyle == ShadowStyles.Opaque && newValue.Width != 1) || (ShadowStyle == ShadowStyles.Transparent && newValue.Width < 1))
         {
             result = result with { Width = 1 };
 
             wasUpdated = true;
         }
 
-        if ((ShadowStyle == ShadowStyle.Opaque && newValue.Height != 1) || (ShadowStyle == ShadowStyle.Transparent && newValue.Height < 1))
+        if ((ShadowStyle == ShadowStyles.Opaque && newValue.Height != 1) || (ShadowStyle == ShadowStyles.Transparent && newValue.Height < 1))
         {
             result = result with { Height = 1 };
 
@@ -338,7 +344,7 @@ public class MarginView : AdornmentView
 
     private void OnParentOnMouseStateChanged (object? sender, EventArgs<MouseState> args)
     {
-        if (sender is not View parent || Thickness == Thickness.Empty || ShadowStyle == ShadowStyle.None)
+        if (sender is not View parent || Thickness == Thickness.Empty || ShadowStyle == ShadowStyles.None)
         {
             return;
         }
@@ -404,18 +410,18 @@ public class MarginView : AdornmentView
 
         switch (ShadowStyle)
         {
-            case ShadowStyle.Transparent:
+            case ShadowStyles.Transparent:
                 _rightShadow.Y = Adornment.Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Adornment.Parent.Border.FrameToScreen ().Location).Y + 1 : 0;
 
                 break;
 
-            case ShadowStyle.Opaque:
+            case ShadowStyles.Opaque:
                 _rightShadow.Y = Adornment.Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Adornment.Parent.Border.FrameToScreen ().Location).Y + 1 : 0;
                 _bottomShadow.X = Adornment.Parent.Border!.Thickness.Left > 0 ? ScreenToViewport (Adornment.Parent.Border.FrameToScreen ().Location).X + 1 : 0;
 
                 break;
 
-            case ShadowStyle.None:
+            case ShadowStyles.None:
             default:
                 _rightShadow.Y = 0;
                 _bottomShadow.X = 0;

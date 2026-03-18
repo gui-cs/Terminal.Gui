@@ -25,69 +25,78 @@ public class Margin : AdornmentImpl
     {
         MarginView mv = new (this);
 
-        if (_shadowStyle != ShadowStyle.None)
-        {
-            mv.ShadowStyle = _shadowStyle;
-        }
+        //if (ShadowStyle != ViewBase.ShadowStyle.None)
+        //{
+        //    mv.ShadowStyle = ShadowStyle;
+        //}
 
-        if (_shadowSize != Size.Empty)
-        {
-            mv.ShadowSize = _shadowSize;
-        }
+        //if (ShadowSize != Size.Empty)
+        //{
+        //    mv.ShadowSize = ShadowSize;
+        //}
 
         return mv;
     }
 
     /// <inheritdoc />
-    public override Rectangle GetFrame ()
-    {
-        if (Parent is { })
-        {
-            return Parent.Frame with { Location = Point.Empty };
-        }
-        else
-        {
-            return Rectangle.Empty;
-        }
-    }
+    public override Rectangle GetFrame () => Parent is { } ? Parent.Frame with { Location = Point.Empty } : Rectangle.Empty;
 
-    private ShadowStyle _shadowStyle;
+    /// <inheritdoc />
+    protected override void OnThicknessChanged ()
+    {
+        base.OnThicknessChanged ();
+
+        if (Thickness == Thickness.Empty)
+        {
+            return;
+        }
+
+        if (ShadowStyle is null)
+        {
+            return;
+        }
+
+        EnsureView ();
+    }
 
     /// <summary>
-    ///     Shadow effect. Setting to anything other than <see cref="ShadowStyle.None"/> forces a <see cref="MarginView"/>
+    ///     Shadow effect. Setting to anything other than <see cref="ShadowStyles.None"/> forces a <see cref="MarginView"/>
     ///     to be created so the shadow sub-views can be hosted.
     /// </summary>
-    public ShadowStyle ShadowStyle
+    public ShadowStyles? ShadowStyle
     {
-        get => _shadowStyle;
+        get => field ?? Parent?.SuperView?.ShadowStyle ?? null;
         set
         {
-            _shadowStyle = value;
-
-            if (View is MarginView mv)
+            if (field == value)
             {
-                mv.ShadowStyle = value;
+                return;
             }
-            else if (value != ShadowStyle.None)
+            field = value;
+
+            if (field is null || EnsureView () is not MarginView marginView)
             {
-                ((MarginView)EnsureView ()).ShadowStyle = value;
+                return;
             }
-        }
-    }
 
-    private Size _shadowSize;
-
-    /// <summary>Gets or sets the size of the shadow effect.</summary>
-    public Size ShadowSize
-    {
-        get => View is MarginView mv ? mv.ShadowSize : _shadowSize;
-        set
-        {
-            _shadowSize = value;
-
-            if (View is MarginView mv)
+            switch (field)
             {
-                mv.ShadowSize = value;
+                case ShadowStyles.None:
+                case ShadowStyles.Opaque:
+                case ShadowStyles.Transparent when (marginView?.ShadowSize.Width == 0 || marginView?.ShadowSize.Height == 0):
+                {
+                    if (marginView.ShadowSize.Width != 1)
+                    {
+                        marginView.ShadowSize = marginView.ShadowSize with { Width = 1 };
+                    }
+
+                    if (marginView.ShadowSize.Height != 1)
+                    {
+                        marginView.ShadowSize = marginView.ShadowSize with { Height = 1 };
+                    }
+
+                    break;
+                }
             }
         }
     }
