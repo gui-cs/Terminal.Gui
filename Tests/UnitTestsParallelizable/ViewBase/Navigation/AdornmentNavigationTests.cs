@@ -206,9 +206,10 @@ public class AdornmentNavigationTests
             CanFocus = true
         };
 
-        view.Padding!.Thickness = new (1);
-        view.Padding.CanFocus = true;
-        view.Padding.TabStop = TabBehavior.TabStop;
+        view.Padding.Thickness = new Thickness (1);
+        view.Padding.EnsureView ();
+        view.Padding.View?.CanFocus = true;
+        view.Padding.View?.TabStop = TabBehavior.TabStop;
 
         view.BeginInit ();
         view.EndInit ();
@@ -310,9 +311,9 @@ public class AdornmentNavigationTests
             Height = 10,
             CanFocus = true
         };
-
-        view.Border!.Thickness = new Thickness (1);
-        view.Border.CanFocus = true;
+        view.Border.EnsureView ();
+        view.Border.Thickness = new Thickness (1);
+        view.Border.View?.CanFocus = true;
 
         view.BeginInit ();
         view.EndInit ();
@@ -344,9 +345,10 @@ public class AdornmentNavigationTests
             CanFocus = true
         };
 
-        view.Margin!.Thickness = new Thickness (1);
-        view.Margin.CanFocus = true;
-        view.Margin.TabStop = TabBehavior.TabStop;
+        view.Margin.EnsureView ();
+        view.Margin.Thickness = new Thickness (1);
+        view.Margin.View?.CanFocus = true;
+        view.Margin.View?.TabStop = TabBehavior.TabStop;
 
         view.BeginInit ();
         view.EndInit ();

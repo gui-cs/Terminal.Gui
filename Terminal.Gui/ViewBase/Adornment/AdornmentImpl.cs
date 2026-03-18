@@ -191,19 +191,6 @@ public abstract class AdornmentImpl : IAdornment
     /// <summary>Gets the <see cref="Scheme"/> from the backing <see cref="View"/>.</summary>
     public Scheme? GetScheme () => View?.GetScheme ();
 
-    /// <summary>Gets or sets whether the backing <see cref="View"/> can receive focus.</summary>
-    public bool CanFocus
-    {
-        get => View?.CanFocus ?? false;
-        set
-        {
-            if (View is { } v)
-            {
-                v.CanFocus = value;
-            }
-        }
-    }
-
     /// <summary>Gets or sets diagnostic flags on the backing <see cref="View"/>.</summary>
     public ViewDiagnosticFlags Diagnostics
     {
@@ -296,19 +283,6 @@ public abstract class AdornmentImpl : IAdornment
             if (View is { } v)
             {
                 v.Enabled = value;
-            }
-        }
-    }
-
-    /// <summary>Gets or sets the TabStop behavior on the backing <see cref="View"/>.</summary>
-    public TabBehavior? TabStop
-    {
-        get => View?.TabStop;
-        set
-        {
-            if (View is { } v)
-            {
-                v.TabStop = value;
             }
         }
     }

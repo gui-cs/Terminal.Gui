@@ -999,7 +999,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             filteredSubViews = GetSubViews (includePadding: true).Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
         }
 
-        if (Padding is { CanFocus: true, Visible: true, Enabled: true } && Padding.TabStop == behavior && Padding.Thickness != Thickness.Empty)
+        if (this is not IAdornmentView && Padding.View is { CanFocus: true, Visible: true, Enabled: true } && Padding.View?.TabStop == behavior && Padding.Thickness != Thickness.Empty)
         {
             filteredSubViews = filteredSubViews.Append (Padding.View!);
         }

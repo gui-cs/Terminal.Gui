@@ -151,10 +151,9 @@ public class ViewTests
         Assert.True (container2.SubViews.ElementAt (0).WasDisposed);
 #endif
         Assert.False (container2.SubViews.ElementAt (0).CanFocus);
-        Assert.Null (container2.SubViews.ElementAt (0).Margin);
-
-//        Assert.Null (container2.SubViews.ElementAt (0).Border);
-        Assert.Null (container2.SubViews.ElementAt (0).Padding);
+        Assert.Null (container2.SubViews.ElementAt (0).Margin.View);
+        Assert.Null (container2.SubViews.ElementAt (0).Border.View);
+        Assert.Null (container2.SubViews.ElementAt (0).Padding.View);
         Assert.Null (view.SuperView);
 
         container2.Dispose ();

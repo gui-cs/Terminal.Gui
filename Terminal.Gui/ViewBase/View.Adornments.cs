@@ -40,10 +40,10 @@ public partial class View // Adornments
     private void DisposeAdornments ()
     {
         Margin?.Dispose ();
-        Margin = null;
+        //Margin = null;
         Border?.Dispose ();
         Padding?.Dispose ();
-        Padding = null;
+        //Padding = null;
     }
 
     /// <summary>

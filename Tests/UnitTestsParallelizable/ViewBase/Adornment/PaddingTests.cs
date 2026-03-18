@@ -6,9 +6,10 @@ public class PaddingTests
     public void Constructor_Defaults ()
     {
         View view = new () { Height = 3, Width = 3 };
-        Assert.True (view.Padding!.CanFocus);
-        Assert.Equal (TabBehavior.NoStop, view.Padding.TabStop);
-        Assert.Empty (view.Padding!.View!.KeyBindings.GetBindings ());
+        view.Padding.EnsureView ();
+        Assert.True (view.Padding.View?.CanFocus);
+        Assert.Equal (TabBehavior.NoStop, view.Padding.View?.TabStop);
+        Assert.Empty (view.Padding.View?.KeyBindings.GetBindings ()!);
     }
 
     [Fact]
