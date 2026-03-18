@@ -362,7 +362,7 @@ public class ArrangementTests (ITestOutputHelper output)
         // Border object still exists but has no visible style
         Assert.Equal (ViewArrangement.Movable, view.Arrangement);
         Assert.NotNull (view.Border);
-        Assert.Equal (LineStyle.None, view.BorderStyle);
+        Assert.Null (view.BorderStyle);
     }
 
     [Fact]
@@ -373,7 +373,7 @@ public class ArrangementTests (ITestOutputHelper output)
         // Arrangement is set but has limited effect without a visible border style
         Assert.Equal (ViewArrangement.Resizable, view.Arrangement);
         Assert.NotNull (view.Border);
-        Assert.Equal (LineStyle.None, view.BorderStyle);
+        Assert.Null (view.BorderStyle);
     }
 
     #endregion

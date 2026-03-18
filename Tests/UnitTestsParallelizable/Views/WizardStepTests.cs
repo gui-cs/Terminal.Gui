@@ -15,7 +15,7 @@ public class WizardStepTests
         Assert.NotNull (step);
         Assert.True (step.CanFocus);
         Assert.Equal (TabBehavior.TabStop, step.TabStop);
-        Assert.Equal (LineStyle.None, step.BorderStyle);
+        Assert.Null (step.BorderStyle);
         Assert.IsType<DimFill> (step.Width);
         Assert.IsType<DimFill> (step.Height);
     }

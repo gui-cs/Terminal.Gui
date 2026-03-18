@@ -312,7 +312,7 @@ public partial class BorderView : AdornmentView
             Adornment.Parent?.LineCanvas.Exclude (new Region (titleRect));
         }
 
-        if (!canDrawBorder || (Adornment as Border)?.LineStyle == LineStyle.None)
+        if (!canDrawBorder || (Adornment as Border)?.LineStyle is null || (Adornment as Border)?.LineStyle == LineStyle.None)
         {
             return true;
         }
@@ -336,7 +336,7 @@ public partial class BorderView : AdornmentView
         {
             if (borderBounds.Width < 4 || !border.Settings.FastHasFlags (BorderSettings.Title) || string.IsNullOrEmpty (Adornment.Parent?.Title))
             {
-                lc?.AddLine (new Point (borderBounds.Location.X, titleY), borderBounds.Width, Orientation.Horizontal, border.LineStyle!.Value, normalAttribute);
+                lc?.AddLine (new Point (borderBounds.Location.X, titleY), borderBounds.Width, Orientation.Horizontal, border.LineStyle.Value, normalAttribute);
             }
             else
             {
