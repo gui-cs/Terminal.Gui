@@ -404,7 +404,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     {
         Dialog dialog = new () { ShadowStyle = null };
 
-        Assert.Equal (ShadowStyles.None, dialog.ShadowStyle);
+        Assert.Null (dialog.ShadowStyle);
 
         dialog.ShadowStyle = ShadowStyles.Opaque;
         Assert.Equal (ShadowStyles.Opaque, dialog.ShadowStyle);
