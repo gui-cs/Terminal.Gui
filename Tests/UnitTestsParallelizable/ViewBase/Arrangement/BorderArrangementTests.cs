@@ -276,7 +276,7 @@ public class BorderArrangementTests (ITestOutputHelper output)
             Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
             CanFocus = true
         };
-        view2.Border!.Thickness = new Thickness (1);
+        view2.Border.Thickness = new Thickness (1);
         view2.Border.Add (new View { Height = Dim.Auto (), Width = Dim.Auto (), Text = "Hi" });
         view2.SetScheme (new Scheme { Normal = attributes [3], HotNormal = attributes [4] });
 

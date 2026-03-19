@@ -134,7 +134,7 @@ public class LineCanvasExperiment : Scenario
         //};
         //marginWindow.Margin.Scheme = Colors.Schemes ["Error"];
         //marginWindow.Margin.Thickness = new (1);
-        //marginWindow.Border!.Thickness = new (1, 2, 1, 1);
+        //marginWindow.Border.Thickness = new (1, 2, 1, 1);
 
         //frame1.Add (marginWindow);
 

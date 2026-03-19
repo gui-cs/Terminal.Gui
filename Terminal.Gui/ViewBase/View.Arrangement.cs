@@ -39,7 +39,7 @@ public partial class View
     ///     SuperViewRendersLineCanvas = true,
     ///     CanFocus = true
     /// };
-    /// rightPane.Border!.Thickness = new (1, 0, 0, 0); // Only left border
+    /// rightPane.Border.Thickness = new (1, 0, 0, 0); // Only left border
     /// 
     /// container.Add (leftPane, rightPane);
     /// </code>

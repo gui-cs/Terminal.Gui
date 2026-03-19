@@ -249,13 +249,13 @@ public sealed class PosAlignDemo : Scenario
         {
             addedViewsUpDown.X = Pos.Align (_horizAligner.Alignment);
             addedViewsUpDown.Y = Pos.Top (alignOptionSelector);
-            addedViewsUpDown.Border!.Thickness = new (0, 1, 0, 0);
+            addedViewsUpDown.Border.Thickness = new (0, 1, 0, 0);
         }
         else
         {
             addedViewsUpDown.X = Pos.Left (alignOptionSelector);
             addedViewsUpDown.Y = Pos.Align (_vertAligner.Alignment);
-            addedViewsUpDown.Border!.Thickness = new (1, 0, 0, 0);
+            addedViewsUpDown.Border.Thickness = new (1, 0, 0, 0);
         }
 
         addedViewsUpDown.ValueChanging += (_, e) =>
@@ -350,7 +350,7 @@ public sealed class PosAlignDemo : Scenario
             Width = Dim.Percent (40),
             Height = Dim.Percent (40)
         };
-        container.Padding!.Thickness = new (8, 1, 0, 0);
+        container.Padding.Thickness = new (8, 1, 0, 0);
         container.Padding.SchemeName = "Error";
 
         Aligner widthAligner = new () { AlignmentModes = AlignmentModes.StartToEnd };

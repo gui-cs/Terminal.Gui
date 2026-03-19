@@ -22,7 +22,7 @@ public class AdornmentNavigationTests
             CanFocus = true
         };
 
-        view.Padding!.Thickness = new Thickness (1);
+        view.Padding.Thickness = new Thickness (1);
 
         View paddingButton = new ()
         {
@@ -86,7 +86,7 @@ public class AdornmentNavigationTests
             CanFocus = true
         };
 
-        view.Padding!.Thickness = new Thickness (1);
+        view.Padding.Thickness = new Thickness (1);
 
         View paddingButton = new ()
         {
@@ -146,7 +146,7 @@ public class AdornmentNavigationTests
             CanFocus = true
         };
 
-        view.Padding!.Thickness = new Thickness (1);
+        view.Padding.Thickness = new Thickness (1);
 
         View paddingButton = new ()
         {
@@ -219,7 +219,7 @@ public class AdornmentNavigationTests
 
         // Expected: Padding should be in the focus chain
         // This should pass based on the GetFocusChain code
-        Assert.Contains (view.Padding!.View!, focusChain);
+        Assert.Contains (view.Padding.View!, focusChain);
 
         view.Dispose ();
     }
@@ -242,7 +242,7 @@ public class AdornmentNavigationTests
             CanFocus = true
         };
 
-        view.Border!.Thickness = new Thickness (1);
+        view.Border.Thickness = new Thickness (1);
 
         View borderButton = new ()
         {
@@ -380,7 +380,7 @@ public class AdornmentNavigationTests
             CanFocus = true
         };
 
-        parent.Padding!.Thickness = new Thickness (2);
+        parent.Padding.Thickness = new Thickness (2);
 
         View parentPaddingButton = new ()
         {
@@ -406,7 +406,7 @@ public class AdornmentNavigationTests
 
         parent.Add (child);
 
-        child.Padding!.Thickness = new Thickness (1);
+        child.Padding.Thickness = new Thickness (1);
 
         View childPaddingButton = new ()
         {
@@ -494,7 +494,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        view.Padding!.Add (paddingButton);
+        view.Padding.Add (paddingButton);
 
         View contentButton = new ()
         {
@@ -539,7 +539,7 @@ public class AdornmentNavigationTests
             CanFocus = true
         };
 
-        view.Padding!.Thickness = new Thickness (1);
+        view.Padding.Thickness = new Thickness (1);
 
         View paddingButton = new ()
         {

@@ -51,11 +51,6 @@ public class Margin : AdornmentImpl
             return;
         }
 
-        if (ShadowStyle is null)
-        {
-            return;
-        }
-
         EnsureView ();
     }
 

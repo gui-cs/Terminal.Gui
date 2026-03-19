@@ -17,7 +17,7 @@ public class DimAutoDemo : Scenario
         appWindow.Title = GetQuitKeyAndName ();
 
         // For diagnostics
-        appWindow.Padding!.Thickness = new (1);
+        appWindow.Padding.Thickness = new (1);
 
         FrameView dimAutoFrameView = CreateDimAutoContentFrameView (app);
 

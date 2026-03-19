@@ -72,6 +72,7 @@ dotnet run
 7. **Backing fields** - Place immediately before their property
 8. **Early return** - Prefer guard clauses over nested `if`/`else`
 9. **One type per file** - Public and internal types each get their own file
+10. **Prefer early exit `if`** - Reduce nesting and return early when using `if`
 
 ## Detailed Coding Rules
 

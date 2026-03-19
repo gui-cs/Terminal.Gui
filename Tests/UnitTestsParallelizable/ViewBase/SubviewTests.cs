@@ -319,7 +319,7 @@ public class SubViewTests
 
         var inPadding = new View { Id = "inPadding" };
 
-        start.Padding!.Add (inPadding);
+        start.Padding.Add (inPadding);
 
         // Act
         bool result = View.IsInHierarchy (start, inPadding, includeAdornments);
@@ -1215,7 +1215,7 @@ public class SubViewTests
 
         // Add a subview to the Border (e.g., ShadowView)
         View borderSubView = new () { Id = "borderSubView" };
-        superView.Border!.Add (borderSubView);
+        superView.Border.Add (borderSubView);
 
         // Act
         IReadOnlyCollection<View> result = superView.GetSubViews ();
@@ -1241,8 +1241,8 @@ public class SubViewTests
         View borderSubView = new () { Id = "borderSubView" };
 
         // Thickness matters
-        superView.Border!.Thickness = new Thickness (1);
-        superView.Border!.Add (borderSubView);
+        superView.Border.Thickness = new Thickness (1);
+        superView.Border.Add (borderSubView);
 
         // Act
         IReadOnlyCollection<View> result = superView.GetSubViews (includeBorder: true);
@@ -1268,8 +1268,8 @@ public class SubViewTests
         View paddingSubView = new () { Id = "paddingSubView" };
 
         // Thickness matters
-        superView.Padding!.Thickness = new Thickness (1);
-        superView.Padding!.Add (paddingSubView);
+        superView.Padding.Thickness = new Thickness (1);
+        superView.Padding.Add (paddingSubView);
 
         // Act
         IReadOnlyCollection<View> result = superView.GetSubViews (includePadding: true);
@@ -1299,10 +1299,10 @@ public class SubViewTests
         // Thickness matters
         //superView.Margin.Thickness = new  (1);
         //superView.Margin.Add (marginSubView);
-        superView.Border!.Thickness = new Thickness (1);
-        superView.Border!.Add (borderSubView);
-        superView.Padding!.Thickness = new Thickness (1);
-        superView.Padding!.Add (paddingSubView);
+        superView.Border.Thickness = new Thickness (1);
+        superView.Border.Add (borderSubView);
+        superView.Padding.Thickness = new Thickness (1);
+        superView.Padding.Add (paddingSubView);
 
         // Act
         IReadOnlyCollection<View> result = superView.GetSubViews (true, true, true);
@@ -1331,10 +1331,10 @@ public class SubViewTests
         View paddingSubView = new () { Id = "paddingSubView" };
 
         // Thickness matters
-        superView.Border!.Thickness = new Thickness (1);
-        superView.Border!.Add (borderSubView);
-        superView.Padding!.Thickness = new Thickness (1);
-        superView.Padding!.Add (paddingSubView);
+        superView.Border.Thickness = new Thickness (1);
+        superView.Border.Add (borderSubView);
+        superView.Padding.Thickness = new Thickness (1);
+        superView.Padding.Add (paddingSubView);
 
         // Act
         IReadOnlyCollection<View> result = superView.GetSubViews (true, true, true);
@@ -1390,14 +1390,14 @@ public class SubViewTests
         View paddingSubView2 = new () { Id = "paddingSubView2" };
 
         // Thickness matters
-        superView.Border!.Thickness = new Thickness (1);
-        superView.Border!.Add (borderSubView1);
-        superView.Border!.Add (borderSubView2);
+        superView.Border.Thickness = new Thickness (1);
+        superView.Border.Add (borderSubView1);
+        superView.Border.Add (borderSubView2);
 
         // Thickness matters
-        superView.Padding!.Thickness = new Thickness (1);
-        superView.Padding!.Add (paddingSubView1);
-        superView.Padding!.Add (paddingSubView2);
+        superView.Padding.Thickness = new Thickness (1);
+        superView.Padding.Add (paddingSubView1);
+        superView.Padding.Add (paddingSubView2);
 
         // Act
         IReadOnlyCollection<View> result = superView.GetSubViews (true, true, true);
@@ -1420,10 +1420,10 @@ public class SubViewTests
         view.EndInit ();
 
         View paddingSubView = new () { Id = "paddingSubView" };
-        view.Padding!.Add (paddingSubView);
+        view.Padding.Add (paddingSubView);
 
         // Act - Call GetSubViews on the Margin itself
-        IReadOnlyCollection<View> result = view.Padding!.View!.GetSubViews ();
+        IReadOnlyCollection<View> result = view.Padding.View!.GetSubViews ();
 
         // Assert
         Assert.Single (result);
@@ -1440,7 +1440,7 @@ public class SubViewTests
 
         // Border is an Adornment and doesn't have Margin, Border, Padding
         View borderSubView = new () { Id = "borderSubView" };
-        view.Border!.Add (borderSubView);
+        view.Border.Add (borderSubView);
 
         // Act - GetSubViews on Border (an Adornment) with includeAdornments
         IReadOnlyCollection<View> result = view.Border.View!.GetSubViews (true);

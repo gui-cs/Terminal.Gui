@@ -1,5 +1,4 @@
 using UnitTests;
-using UnitTests.Parallelizable;
 
 namespace ApplicationTests.Init;
 
@@ -102,7 +101,7 @@ public class InitTests (ITestOutputHelper output)
                 IApplication app = Application.Create ();
 
                 // Set via static DefaultKeyBindings (modern API)
-                Application.DefaultKeyBindings! [Command.Quit] = Bind.All (Key.Q);
+                Application.DefaultKeyBindings [Command.Quit] = Bind.All (Key.Q);
                 Assert.Equal (Key.Q, Application.GetDefaultKey (Command.Quit));
 
                 app.Init (DriverRegistry.Names.ANSI);
@@ -113,7 +112,7 @@ public class InitTests (ITestOutputHelper output)
             }
             finally
             {
-                Application.DefaultKeyBindings! [Command.Quit] = original;
+                Application.DefaultKeyBindings [Command.Quit] = original;
             }
         }
     }

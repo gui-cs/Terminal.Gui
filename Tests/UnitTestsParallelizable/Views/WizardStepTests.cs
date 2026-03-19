@@ -111,7 +111,7 @@ public class WizardStepTests
         step.HelpText = "Help text content";
 
         // Assert - Padding should have right thickness when help text is present
-        Assert.True (step.Padding!.Thickness.Right > 0);
+        Assert.True (step.Padding.Thickness.Right > 0);
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class WizardStepTests
         step.HelpText = string.Empty;
 
         // Assert - Padding right should be 0 when help text is empty
-        Assert.Equal (0, step.Padding!.Thickness.Right);
+        Assert.Equal (0, step.Padding.Thickness.Right);
     }
 
     #endregion HelpText Tests
@@ -310,7 +310,7 @@ public class WizardStepTests
 
         // Assert
         // The help text view should be in the Padding
-        Assert.True (step.Padding!.SubViews.Count > 0);
+        Assert.True (step.Padding.SubViews.Count > 0);
     }
 
     [Fact]
@@ -326,7 +326,7 @@ public class WizardStepTests
 
         // Assert
         // When help text is set, padding right should be non-zero
-        Assert.True (step.Padding!.Thickness.Right > 0);
+        Assert.True (step.Padding.Thickness.Right > 0);
     }
 
     [Fact]
@@ -343,7 +343,7 @@ public class WizardStepTests
 
         // Assert
         // When help text is cleared, padding right should be 0
-        Assert.Equal (0, step.Padding!.Thickness.Right);
+        Assert.Equal (0, step.Padding.Thickness.Right);
     }
 
     #endregion HelpTextView Tests
@@ -438,7 +438,7 @@ public class WizardStepTests
         // SubViews includes the views we added
         Assert.Contains (nameLabel, step.SubViews);
         Assert.Contains (nameField, step.SubViews);
-        Assert.True (step.Padding!.Thickness.Right > 0);
+        Assert.True (step.Padding.Thickness.Right > 0);
     }
 
     [Fact]

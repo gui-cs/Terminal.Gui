@@ -92,7 +92,7 @@ public class Wizard : Dialog, IDesignable
 
             // strip out movable and resizable
             Arrangement &= ~(ViewArrangement.Movable | ViewArrangement.Resizable);
-            base.ShadowStyle = ShadowStyles.None;
+            base.ShadowStyle = null;
         }
     }
 

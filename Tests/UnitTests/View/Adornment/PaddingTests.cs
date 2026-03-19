@@ -12,7 +12,7 @@ public class PaddingTests (ITestOutputHelper output)
             App = ApplicationImpl.Instance,
             Height = 3, Width = 3
         };
-        view.Padding!.Thickness = new (1);
+        view.Padding.Thickness = new (1);
         view.Padding.Diagnostics = ViewDiagnosticFlags.Thickness;
 
         view.SetScheme (new()

@@ -341,18 +341,18 @@ public class NeedsDrawTests : TestDriverBase
         };
         view.Border.Thickness = new Thickness (1);
         view.BorderStyle = LineStyle.Single; // Force EnsureView
-        view.Padding!.Thickness = new Thickness (1);
+        view.Padding.Thickness = new Thickness (1);
         view.BeginInit ();
         view.EndInit ();
         view.LayoutSubViews ();
 
         Assert.True (view.Border.View?.NeedsDraw);
-        Assert.True (view.Padding!.NeedsDraw);
+        Assert.True (view.Padding.NeedsDraw);
 
         view.Draw ();
 
         Assert.False (view.Border.View?.NeedsDraw);
-        Assert.False (view.Padding!.NeedsDraw);
+        Assert.False (view.Padding.NeedsDraw);
     }
 
     [Fact]
@@ -542,16 +542,16 @@ public class NeedsDrawTests : TestDriverBase
     public void SetNeedsDraw_SetsAdornmentsNeedsDraw ()
     {
         var view = new View { X = 0, Y = 0, Width = 20, Height = 20 };
-        view.Border!.Thickness = new Thickness (1);
-        view.Padding!.Thickness = new Thickness (1);
+        view.Border.Thickness = new Thickness (1);
+        view.Padding.Thickness = new Thickness (1);
         view.BeginInit ();
         view.EndInit ();
         view.LayoutSubViews ();
 
         view.SetNeedsDraw ();
 
-        Assert.True (view.Border!.NeedsDraw);
-        Assert.True (view.Padding!.NeedsDraw);
+        Assert.True (view.Border.NeedsDraw);
+        Assert.True (view.Padding.NeedsDraw);
     }
 
     [Fact]

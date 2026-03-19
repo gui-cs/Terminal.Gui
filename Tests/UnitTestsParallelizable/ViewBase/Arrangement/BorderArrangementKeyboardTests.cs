@@ -32,14 +32,14 @@ public class BorderArrangementKeyboardTests
         superView.EndInit ();
 
         // Act - Enter keyboard arrange mode (ViewArrangement.Fixed triggers keyboard mode)
-        bool? result = (view.Border?.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
+        bool? result = (view.Border.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
 
         // Assert
         Assert.True (result);
-        Assert.NotEqual (ViewArrangement.Fixed, (view.Border?.View as BorderView)?.Arranger?.Arranging);
+        Assert.NotEqual (ViewArrangement.Fixed, (view.Border.View as BorderView)?.Arranger?.Arranging);
 
         // Check that the left size button was created and is visible
-        ArrangerButton? leftButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.LeftSize);
+        ArrangerButton? leftButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.LeftSize);
         Assert.NotNull (leftButton);
         Assert.True (leftButton.Visible);
 
@@ -71,13 +71,13 @@ public class BorderArrangementKeyboardTests
         superView.EndInit ();
 
         // Act
-        bool? result = (view.Border?.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
+        bool? result = (view.Border.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
 
         // Assert
         Assert.True (result);
-        Assert.NotEqual (ViewArrangement.Fixed, (view.Border?.View as BorderView)?.Arranger.Arranging);
+        Assert.NotEqual (ViewArrangement.Fixed, (view.Border.View as BorderView)?.Arranger.Arranging);
 
-        ArrangerButton? rightButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.RightSize);
+        ArrangerButton? rightButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.RightSize);
         Assert.NotNull (rightButton);
         Assert.True (rightButton.Visible);
 
@@ -109,13 +109,13 @@ public class BorderArrangementKeyboardTests
         superView.EndInit ();
 
         // Act
-        bool? result = (view.Border?.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
+        bool? result = (view.Border.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
 
         // Assert
         Assert.True (result);
-        Assert.NotEqual (ViewArrangement.Fixed, (view.Border?.View as BorderView)?.Arranger.Arranging);
+        Assert.NotEqual (ViewArrangement.Fixed, (view.Border.View as BorderView)?.Arranger.Arranging);
 
-        ArrangerButton? topButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.TopSize);
+        ArrangerButton? topButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.TopSize);
         Assert.NotNull (topButton);
         Assert.True (topButton.Visible);
 
@@ -147,13 +147,13 @@ public class BorderArrangementKeyboardTests
         superView.EndInit ();
 
         // Act
-        bool? result = (view.Border?.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
+        bool? result = (view.Border.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
 
         // Assert
         Assert.True (result);
-        Assert.NotEqual (ViewArrangement.Fixed, (view.Border?.View as BorderView)?.Arranger.Arranging);
+        Assert.NotEqual (ViewArrangement.Fixed, (view.Border.View as BorderView)?.Arranger.Arranging);
 
-        View? bottomButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.BottomSize);
+        View? bottomButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.BottomSize);
         Assert.NotNull (bottomButton);
         Assert.True (bottomButton.Visible);
 
@@ -185,13 +185,13 @@ public class BorderArrangementKeyboardTests
         superView.EndInit ();
 
         // Act
-        bool? result = (view.Border?.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
+        bool? result = (view.Border.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
 
         // Assert
         Assert.True (result);
-        Assert.Equal (ViewArrangement.Movable, (view.Border?.View as BorderView)?.Arranger.Arranging);
+        Assert.Equal (ViewArrangement.Movable, (view.Border.View as BorderView)?.Arranger.Arranging);
 
-        View? moveButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.Move);
+        View? moveButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.Move);
         Assert.NotNull (moveButton);
         Assert.True (moveButton.Visible);
 
@@ -223,19 +223,19 @@ public class BorderArrangementKeyboardTests
         superView.EndInit ();
 
         // Act
-        bool? result = (view.Border?.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
+        bool? result = (view.Border.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
 
         // Assert
         Assert.True (result);
-        Assert.NotEqual (ViewArrangement.Fixed, (view.Border?.View as BorderView)?.Arranger.Arranging);
+        Assert.NotEqual (ViewArrangement.Fixed, (view.Border.View as BorderView)?.Arranger.Arranging);
 
-        ArrangerButton? leftButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.LeftSize);
+        ArrangerButton? leftButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.LeftSize);
         Assert.NotNull (leftButton);
 
-        ArrangerButton? bottomButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.BottomSize);
+        ArrangerButton? bottomButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.BottomSize);
         Assert.NotNull (bottomButton);
 
-        ArrangerButton? moveButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.Move);
+        ArrangerButton? moveButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.Move);
         Assert.Null (moveButton);
 
         // Cleanup
@@ -267,28 +267,28 @@ public class BorderArrangementKeyboardTests
         superView.EndInit ();
 
         // Act
-        bool? result = (view.Border?.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
+        bool? result = (view.Border.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
 
         // Assert
         Assert.True (result);
-        Assert.NotEqual (ViewArrangement.Fixed, (view.Border?.View as BorderView)?.Arranger.Arranging);
+        Assert.NotEqual (ViewArrangement.Fixed, (view.Border.View as BorderView)?.Arranger.Arranging);
 
         // For fully Resizable, only the all-size button should be visible (not individual direction buttons)
-        ArrangerButton? allSizeButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.AllSize);
+        ArrangerButton? allSizeButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.AllSize);
         Assert.NotNull (allSizeButton);
         Assert.True (allSizeButton.Visible);
 
         // Individual direction buttons should be visible for fully Resizable
-        ArrangerButton? leftButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.LeftSize);
+        ArrangerButton? leftButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.LeftSize);
         Assert.NotNull (leftButton);
 
-        ArrangerButton? rightButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.RightSize);
+        ArrangerButton? rightButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.RightSize);
         Assert.NotNull (rightButton);
 
-        ArrangerButton? topButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.TopSize);
+        ArrangerButton? topButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.TopSize);
         Assert.NotNull (topButton);
 
-        ArrangerButton? bottomButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.BottomSize);
+        ArrangerButton? bottomButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.BottomSize);
         Assert.NotNull (bottomButton);
 
         // Cleanup
@@ -319,16 +319,16 @@ public class BorderArrangementKeyboardTests
         superView.EndInit ();
 
         // Act
-        bool? result = (view.Border?.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
+        bool? result = (view.Border.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
 
         // Assert
         Assert.True (result);
-        Assert.NotEqual (ViewArrangement.Fixed, (view.Border?.View as BorderView)?.Arranger.Arranging);
+        Assert.NotEqual (ViewArrangement.Fixed, (view.Border.View as BorderView)?.Arranger.Arranging);
 
-        ArrangerButton? topButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.TopSize);
+        ArrangerButton? topButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.TopSize);
         Assert.NotNull (topButton);
 
-        ArrangerButton? rightButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.RightSize);
+        ArrangerButton? rightButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.RightSize);
         Assert.NotNull (rightButton);
 
         // Cleanup
@@ -358,24 +358,24 @@ public class BorderArrangementKeyboardTests
         superView.EndInit ();
 
         // Act
-        bool? result = (view.Border?.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
+        bool? result = (view.Border.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
 
         // Assert
         Assert.True (result);
 
         // Only left button should be visible
-        ArrangerButton? leftButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.LeftSize);
+        ArrangerButton? leftButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.LeftSize);
         Assert.NotNull (leftButton);
         Assert.True (leftButton.Visible);
 
         // Other buttons should not exist or be invisible
-        ArrangerButton? rightButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.RightSize);
+        ArrangerButton? rightButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.RightSize);
         Assert.True (rightButton is not { Visible: true });
 
-        ArrangerButton? topButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.TopSize);
+        ArrangerButton? topButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.TopSize);
         Assert.True (topButton is not { Visible: true });
 
-        ArrangerButton? bottomButton = view.Border?.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.BottomSize);
+        ArrangerButton? bottomButton = view.Border.SubViews.OfType<ArrangerButton> ().FirstOrDefault (v => v.ButtonType == ArrangeButtons.BottomSize);
         Assert.True (bottomButton is not { Visible: true });
 
         // Cleanup

@@ -182,7 +182,7 @@ public class GetViewsAtLocationTests
     public void ReturnsRoot_WhenPointInsideRootBorder ()
     {
         TestView root = new (0, 0, 10, 10);
-        root.Border!.Thickness = new Thickness (1);
+        root.Border.Thickness = new Thickness (1);
         List<View?> result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Single (result);
         Assert.Equal (root, result [0]);
@@ -192,11 +192,11 @@ public class GetViewsAtLocationTests
     public void ReturnsRoot_And_Padding_WhenPointInsideRootPadding ()
     {
         TestView root = new (0, 0, 10, 10);
-        root.Padding!.Thickness = new Thickness (1);
+        root.Padding.Thickness = new Thickness (1);
         List<View?> result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
-        Assert.Equal (root.Padding!.View!, result [1]);
+        Assert.Equal (root.Padding.View!, result [1]);
     }
 
     [Fact]
@@ -262,14 +262,14 @@ public class GetViewsAtLocationTests
     {
         TestView root = new (0, 0, 10, 10);
         TestView sub = new (2, 2, 5, 5);
-        sub.Padding!.Thickness = new Thickness (1);
+        sub.Padding.Thickness = new Thickness (1);
         root.Add (sub);
 
         List<View?> result = View.GetViewsAtLocation (root, new Point (2, 2));
         Assert.Equal (3, result.Count);
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
-        Assert.Equal (sub.Padding!.View!, result [2]);
+        Assert.Equal (sub.Padding.View!, result [2]);
     }
 
     [Fact]
@@ -296,7 +296,7 @@ public class GetViewsAtLocationTests
     {
         TestView root = new (0, 0, 10, 10);
         TestView sub = new (2, 2, 5, 5);
-        sub.Border!.Thickness = new Thickness (1);
+        sub.Border.Thickness = new Thickness (1);
 
         var closeButton = new Button
         {
@@ -307,9 +307,9 @@ public class GetViewsAtLocationTests
             Height = 1,
             X = Pos.AnchorEnd (),
             Y = 0,
-            ShadowStyle = ShadowStyles.None
+            ShadowStyle = null
         };
-        sub.Border!.Add (closeButton);
+        sub.Border.Add (closeButton);
         root.Add (sub);
 
         root.Layout ();
@@ -695,7 +695,7 @@ public class GetViewsAtLocationTests
         Runnable<bool>? runnable = new () { Width = 10, Height = 10 };
         IApplication? app = Application.Create ();
         app.Begin (runnable);
-        runnable.Padding!.Thickness = new Thickness (1);
+        runnable.Padding.Thickness = new Thickness (1);
 
         var subview = new View { X = Pos.AnchorEnd (1), Y = Pos.AnchorEnd (1), Width = 1, Height = 1 };
         runnable.Padding.Add (subview);
@@ -815,7 +815,7 @@ public class GetViewsAtLocationTests
 
         subview.BorderStyle = LineStyle.Dashed; // Sets thickness to 1 and EnsuresView
         subview.Border.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
-        subview.Border!.Id = "border";
+        subview.Border.Id = "border";
         runnable.Add (subview);
 
         List<View?> viewsUnderMouse = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse);
@@ -844,7 +844,7 @@ public class GetViewsAtLocationTests
 
         // A subview with + Padding
         var subview = new View { X = 1, Y = 1, Width = 5, Height = 5 };
-        subview.Padding!.Thickness = new Thickness (1);
+        subview.Padding.Thickness = new Thickness (1);
 
         // This subview will be at the bottom-right-corner of subview
         // So screen-relative location will be X + Width - 1 = 5
@@ -877,7 +877,7 @@ public class GetViewsAtLocationTests
 
         // A subview with + Padding
         var subview = new View { X = 1, Y = 1, Width = 5, Height = 5 };
-        subview.Padding!.Thickness = new Thickness (1);
+        subview.Padding.Thickness = new Thickness (1);
 
         // Scroll the subview
         subview.SetContentSize (new Size (10, 10));

@@ -31,7 +31,7 @@ public class Adornments : Scenario
             X = Pos.AnchorEnd ()
         };
 
-        adornmentsEditor.Border!.Thickness = new Thickness (1, 2, 1, 1);
+        adornmentsEditor.Border.Thickness = new Thickness (1, 2, 1, 1);
 
         ViewportSettingsEditor viewportSettingsEditor = new ()
         {
@@ -43,7 +43,7 @@ public class Adornments : Scenario
             Y = Pos.AnchorEnd ()
         };
 
-        viewportSettingsEditor.Border!.Thickness = new Thickness (1, 2, 1, 1);
+        viewportSettingsEditor.Border.Thickness = new Thickness (1, 2, 1, 1);
 
         Button appButton = new () { X = Pos.Center (), Y = 1, Text = "_SubView of Window" };
         appWindow.Add (appButton);
@@ -156,10 +156,10 @@ public class Adornments : Scenario
                                   window.Padding.Add (btnButtonInPadding);
 
 #if SUBVIEW_BASED_BORDER
-                                btnButtonInPadding.Border!.CloseButton.Visible = true;
+                                btnButtonInPadding.Border.CloseButton.Visible = true;
 
-                                view.Border!.CloseButton.Visible = true;
-                                view.Border!.CloseButton.Accept += (_, _) =>
+                                view.Border.CloseButton.Visible = true;
+                                view.Border.CloseButton.Accept += (_, _) =>
                                                                   {
                                                                       MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
                                                                       e.Handled = true;

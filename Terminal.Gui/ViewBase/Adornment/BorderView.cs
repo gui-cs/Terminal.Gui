@@ -178,7 +178,7 @@ public partial class BorderView : AdornmentView
 #if SUBVIEW_BASED_BORDER
     private void OnLayoutStarted (object sender, LayoutEventArgs e)
     {
-        _left.Border!.LineStyle = LineStyle;
+        _left.Border.LineStyle = LineStyle;
 
         _left.X = Thickness.Left - 1;
         _left.Y = Thickness.Top - 1;

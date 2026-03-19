@@ -57,7 +57,7 @@ internal class ShadowView : View
         get;
         set
         {
-            Visible = value != ShadowStyles.None;
+            Visible = value is not null;
             field = value;
 
             ViewportSettings |= ViewportSettingsFlags.TransparentMouse;

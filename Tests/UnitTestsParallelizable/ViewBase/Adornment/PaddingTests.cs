@@ -16,7 +16,7 @@ public class PaddingTests
     public void Thickness_Is_Empty_By_Default ()
     {
         View view = new () { Height = 3, Width = 3 };
-        Assert.Equal (Thickness.Empty, view.Padding!.Thickness);
+        Assert.Equal (Thickness.Empty, view.Padding.Thickness);
     }
 
     [Fact]

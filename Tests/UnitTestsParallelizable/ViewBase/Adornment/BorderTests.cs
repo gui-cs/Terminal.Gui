@@ -62,7 +62,7 @@ public class BorderTests : TestDriverBase
     public void WithView_Thickness_Is_Empty_By_Default ()
     {
         View view = new () { Height = 3, Width = 3 };
-        Assert.Equal (Thickness.Empty, view.Border!.Thickness);
+        Assert.Equal (Thickness.Empty, view.Border.Thickness);
     }
 
     [Fact]

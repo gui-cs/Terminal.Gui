@@ -706,12 +706,12 @@ internal class TabRow : View
 
                 if (_host.Style.TabsOnBottom)
                 {
-                    tab.Border!.Thickness = new (1, 0, 1, topLine);
+                    tab.Border.Thickness = new (1, 0, 1, topLine);
                     tab.Margin.Thickness = new (0, 1, 0, 0);
                 }
                 else
                 {
-                    tab.Border!.Thickness = new (1, topLine, 1, 0);
+                    tab.Border.Thickness = new (1, topLine, 1, 0);
                     tab.Margin.Thickness = new (0, 0, 0, topLine);
                 }
             }
@@ -719,12 +719,12 @@ internal class TabRow : View
             {
                 if (_host.Style.TabsOnBottom)
                 {
-                    tab.Border!.Thickness = new (1, 1, 1, topLine);
+                    tab.Border.Thickness = new (1, 1, 1, topLine);
                     tab.Margin.Thickness = new (0, 0, 0, 0);
                 }
                 else
                 {
-                    tab.Border!.Thickness = new (1, topLine, 1, 1);
+                    tab.Border.Thickness = new (1, topLine, 1, 1);
                     tab.Margin.Thickness = new (0, 0, 0, 0);
                 }
             }
@@ -732,12 +732,12 @@ internal class TabRow : View
             {
                 if (_host.Style.TabsOnBottom)
                 {
-                    tab.Border!.Thickness = new (1, 1, 1, topLine);
+                    tab.Border.Thickness = new (1, 1, 1, topLine);
                     tab.Margin.Thickness = new (0, 0, 0, 0);
                 }
                 else
                 {
-                    tab.Border!.Thickness = new (1, topLine, 1, 1);
+                    tab.Border.Thickness = new (1, topLine, 1, 1);
                     tab.Margin.Thickness = new (0, 0, 0, 0);
                 }
             }

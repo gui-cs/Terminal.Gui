@@ -50,7 +50,7 @@ public sealed class ArrangementEditor : EditorBase
         }
         else
         {
-            ViewToEdit.ShadowStyle = ShadowStyles.None;
+            ViewToEdit.ShadowStyle = null;
             ViewToEdit.SchemeName = ViewToEdit!.SuperView!.SchemeName;
         }
 

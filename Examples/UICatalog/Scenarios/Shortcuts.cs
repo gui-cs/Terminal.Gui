@@ -151,7 +151,7 @@ public class Shortcuts : Scenario
                 Title = "_Button",
 
                 // Set the ShadowStyle to None as shadows look awkward on a single-line Button CommandView, and the Shortcut/MenuItem default
-                ShadowStyle = ShadowStyles.None,
+                ShadowStyle = null,
 
                 // Shortcut/MenuItem override GettingAttributeForRole to ensure CommandViews with multiple selectable items (like a ListView or Selector)
                 // show the selected item distinctly, but for a CommandView with only a single selectable item (like a CheckBox or Button),
@@ -325,7 +325,7 @@ public class Shortcuts : Scenario
             BorderStyle = LineStyle.Dotted,
             Arrangement = ViewArrangement.RightResizable | ViewArrangement.BottomResizable
         };
-        framedShortcut.Border!.Settings = BorderSettings.Title;
+        framedShortcut.Border.Settings = BorderSettings.Title;
 
         //framedShortcut.Orientation = Orientation.Horizontal;
 

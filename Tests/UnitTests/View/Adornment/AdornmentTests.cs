@@ -33,7 +33,7 @@ public class AdornmentTests (ITestOutputHelper output)
                                                        output);
 
         // Add border bottom thickness
-        view.Border!.Thickness = new Thickness (1, 1, 1, 1);
+        view.Border.Thickness = new Thickness (1, 1, 1, 1);
 
         // Remove margin bottom thickness
         view.Margin.Thickness = new Thickness (0, 0, 0, 0);
@@ -51,7 +51,7 @@ public class AdornmentTests (ITestOutputHelper output)
                                                        output);
 
         // Remove border bottom thickness
-        view.Border!.Thickness = new Thickness (1, 1, 1, 0);
+        view.Border.Thickness = new Thickness (1, 1, 1, 0);
 
         // Add margin bottom thickness
         view.Margin.Thickness = new Thickness (0, 0, 0, 1);

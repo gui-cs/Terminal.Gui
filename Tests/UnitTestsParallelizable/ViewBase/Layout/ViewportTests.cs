@@ -45,10 +45,10 @@ public class ViewportTests (ITestOutputHelper output)
         // We test with only X because Y is equivalent. Height/Width are irrelevant.
         // Arrange
         var superSuperView = new View { X = 0, Y = 0, Height = 10, Width = 10 };
-        superSuperView.Border!.Thickness = new Thickness (borderThickness);
+        superSuperView.Border.Thickness = new Thickness (borderThickness);
 
         var superView = new View { X = 0, Y = 0, Height = Dim.Fill (), Width = Dim.Fill () };
-        superView.Border!.Thickness = new Thickness (borderThickness);
+        superView.Border.Thickness = new Thickness (borderThickness);
 
         superSuperView.Add (superView);
 
@@ -82,15 +82,15 @@ public class ViewportTests (ITestOutputHelper output)
         // We test with only X because Y is equivalent. Height/Width are irrelevant.
         // Arrange
         var superSuperView = new View { X = 0, Y = 0, Height = 10, Width = 10 };
-        superSuperView.Border!.Thickness = new Thickness (borderThickness);
+        superSuperView.Border.Thickness = new Thickness (borderThickness);
 
         var superView = new View { X = 0, Y = 0, Height = Dim.Fill (), Width = Dim.Fill () };
-        superView.Border!.Thickness = new Thickness (borderThickness);
+        superView.Border.Thickness = new Thickness (borderThickness);
 
         superSuperView.Add (superView);
 
         var view = new View { X = frameX, Y = 0, Height = Dim.Fill (), Width = Dim.Fill () };
-        view.Border!.Thickness = new Thickness (borderThickness);
+        view.Border.Thickness = new Thickness (borderThickness);
 
         superView.Add (view);
         superSuperView.BeginInit ();

@@ -113,7 +113,7 @@ public sealed class WideGlyphs : Scenario
         arrangeableViewAtEven.SetScheme (new Scheme { Normal = new Attribute (Color.Black, Color.Green) });
 
         // Proves it's not LineCanvas related
-        arrangeableViewAtEven.Border!.Thickness = new Thickness (1);
+        arrangeableViewAtEven.Border.Thickness = new Thickness (1);
         arrangeableViewAtEven.Border.Add (new View { Height = Dim.Auto (), Width = Dim.Auto (), Text = "Even" });
         appWindow.Add (arrangeableViewAtEven);
 

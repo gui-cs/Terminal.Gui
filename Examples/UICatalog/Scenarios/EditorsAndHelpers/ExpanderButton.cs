@@ -72,7 +72,7 @@ public class ExpanderButton : Button
 
     private void ExpanderButton_Initialized (object? sender, EventArgs e)
     {
-        ShadowStyle = ShadowStyles.None;
+        ShadowStyle = null;
 
         ExpandOrCollapse (Collapsed);
 

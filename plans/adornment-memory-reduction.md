@@ -109,7 +109,7 @@ Auditing the codebase (79 unique callsites in library code, 541 in tests):
 
 **Needs the View (heavy path):**
 - `border.Arranger.EnterArrangeMode(...)` — arrangement buttons
-- `tab.Border!.Activating += ...` — event from Border-as-View
+- `tab.Border.Activating += ...` — event from Border-as-View
 - `margin.SubViews.Count` / `border.SubViews.Count` — subview hosting
 - `margin.ViewportSettings |= ...` — viewport flags
 - `border.Add(subview)` — adding views to adornment
@@ -785,7 +785,7 @@ The table below documents the key `Parent` accesses in each class to make clear 
 | Class | Representative `Parent` usages |
 |-------|-------------------------------|
 | `BorderView` | `Parent.TitleTextFormatter.Draw(...)`, `Parent.HasFocus`, `Parent.Arrangement`, `Parent.LineCanvas`, `Parent.InvokeCommand(Command.Quit)`, `Parent.SuperView?.BorderStyle` |
-| `MarginView` | `Parent.MouseStateChanged += ...`, `Parent.Border!.GetBorderRectangle()`, `Parent.Border!.Thickness` |
+| `MarginView` | `Parent.MouseStateChanged += ...`, `Parent.Border.GetBorderRectangle()`, `Parent.Border.Thickness` |
 | `PaddingView` | `Parent.CanFocus`, `Parent.HasFocus`, `Parent.SetFocus()`, `Parent.SetNeedsDraw()`, `Parent.GetSubViews(...)` |
 
 ```csharp
@@ -1008,7 +1008,7 @@ This avoids View creation for the rendering of simple borders. The complexity tr
 
 > **Lesson Learned (from attempted incremental Margin-only migration):** The `is Adornment` type checks are cross-cutting — 23+ callsites across 10+ files. When ANY adornment moves from `Adornment : View` to `AdornmentView : View`, ALL these checks must be updated because the new type no longer matches `is Adornment`. Doing one adornment at a time forces either (a) updating all 23+ sites in Phase 1 anyway, or (b) using verbose `is Adornment or is AdornmentView` patterns that get replaced later. Both defeat the purpose of incremental migration. **Doing all three at once is actually simpler** — one clean pass through the type checks, no transitional mixed state.
 >
-> Additionally, many `.Margin`/`.Border`/`.Padding` accesses in `View.*.cs` currently treat the adornment as a `View` (e.g., `viewsUnderLocation.Contains(v.Margin)`, `return Margin`, `IsInHierarchy(start.Margin, ...)`). Since lightweight adornments are NOT Views, these need updating to `v.Margin?.View`, etc. This is the same mechanical change for all three adornments.
+> Additionally, many `.Margin`/`.Border`/`.Padding` accesses in `View.*.cs` currently treat the adornment as a `View` (e.g., `viewsUnderLocation.Contains(v.Margin)`, `return Margin`, `IsInHierarchy(start.Margin, ...)`). Since lightweight adornments are NOT Views, these need updating to `v.Margin.View`, etc. This is the same mechanical change for all three adornments.
 
 **Design decision:** `Adornment` is **renamed** to `AdornmentView` (not copied). An `[Obsolete]` type alias is provided for one release cycle.
 
@@ -1102,9 +1102,9 @@ These are places where `Margin`/`Border`/`Padding` was passed to methods expecti
 
 | Pattern | Current | New |
 |---------|---------|-----|
-| Collection membership | `viewsUnderLocation.Contains(v.Margin)` | `viewsUnderLocation.Contains(v.Margin?.View)` |
+| Collection membership | `viewsUnderLocation.Contains(v.Margin)` | `viewsUnderLocation.Contains(v.Margin.View)` |
 | View return | `return Margin;` | `return Margin?.View;` |
-| Hierarchy check | `IsInHierarchy(start.Margin, ...)` | `IsInHierarchy(start.Margin?.View, ...)` |
+| Hierarchy check | `IsInHierarchy(start.Margin, ...)` | `IsInHierarchy(start.Margin.View, ...)` |
 | Stack push | `viewsToProcess.Push(margin)` | `if (margin.View is { } mv) viewsToProcess.Push(mv)` |
 | Drawing via .Margin | `Margin?.Draw()` | `Margin?.Draw()` (convenience on AdornmentImpl) |
 | SetNeedsDraw via .Margin | `Margin?.SetNeedsDraw()` | `Margin?.SetNeedsDraw()` (convenience on AdornmentImpl) |
@@ -1195,13 +1195,13 @@ These are **breaking for contributors** but not for library users.
 | `View.Drawing.Clipping.cs` | `if (this is Adornment adornment)` | `if (this is IAdornmentView adornment)` |
 | `View.NeedsDraw.cs` | `if (this is Adornment adornment)` | `if (this is IAdornmentView adornment)` |
 | `View.Layout.cs` | `if (current is Adornment adornment)` | `if (current is IAdornmentView)` |
-| `View.Layout.cs` | `viewsUnderLocation.Contains(v.Margin)` | `viewsUnderLocation.Contains(v.Margin?.View)` |
+| `View.Layout.cs` | `viewsUnderLocation.Contains(v.Margin)` | `viewsUnderLocation.Contains(v.Margin.View)` |
 | `View.Layout.cs` | `viewsToProcess.Push(margin)` | `if (margin.View is { } mv) viewsToProcess.Push(mv)` |
 | `View.Navigation.cs` | `var thisAsAdornment = this as Adornment` | `IAdornmentView? thisAsAdornment = this as IAdornmentView` |
 | `View.Navigation.cs` | `return Margin;` | `return Margin?.View;` |
 | `View.ScrollBars.cs` | `if (this is Adornment)` | `if (this is IAdornmentView)` |
 | `View.Hierarchy.cs` | `if (this is Margin)` | `if (this is MarginView)` |
-| `View.Hierarchy.cs` | `IsInHierarchy(start.Margin, ...)` | `IsInHierarchy(start.Margin?.View, ...)` |
+| `View.Hierarchy.cs` | `IsInHierarchy(start.Margin, ...)` | `IsInHierarchy(start.Margin.View, ...)` |
 | `ApplicationMouse.cs` | `if (... is Adornment adornment)` | `if (... is IAdornmentView adornment)` |
 | `TabRow.cs` | `me.View is Adornment adornment` | `me.View is IAdornmentView adornment` |
 | `ShadowView.cs` | `SuperView is not Adornment` | `SuperView is not IAdornmentView` |
@@ -1215,7 +1215,7 @@ These are **breaking for contributors** but not for library users.
 | `View.Padding` type | Same pattern | Same |
 | `Adornment` class | Renamed to `AdornmentView` | Provide `[Obsolete]` alias for one release cycle |
 | `new Adornment(parent)` | Constructor on `AdornmentView` | Tests use `new Adornment()` parameter-less constructor — keep on `AdornmentView` |
-| `view.Border?.SetNeedsDraw()` | Use convenience `view.Border?.SetNeedsDraw()` | Works — pass-through on AdornmentImpl |
+| `view.Border.SetNeedsDraw()` | Use convenience `view.Border.SetNeedsDraw()` | Works — pass-through on AdornmentImpl |
 | `view.Border.Add(subView)` | Use convenience `view.Border.Add(subView)` (internally calls `EnsureView()`) | Convenience methods hide lazy creation |
 | `view.Padding.GetSubViews(...)` | Must use `view.Padding.View?.GetSubViews(...)` — callers updated, no wrapper on Padding | Callers updated to call through `.View` |
 
@@ -1223,7 +1223,7 @@ These are **breaking for contributors** but not for library users.
 
 `View.Border`, `View.Margin`, `View.Padding` remain **always non-null** after construction (as today). The `null` is on `Border.View`, `Margin.View`, `Padding.View`.
 
-Code that does `v.Border?.XYZ` with nullable check is not needed for the lightweight object itself — but IS needed if accessing `.View?.XYZ`.
+Code that does `v.Border.XYZ` with nullable check is not needed for the lightweight object itself — but IS needed if accessing `.View?.XYZ`.
 
 ---
 
@@ -1265,10 +1265,10 @@ Code that does `v.Border?.XYZ` with nullable check is not needed for the lightwe
 | `View.Drawing.cs` | `is Adornment` → `is IAdornmentView` (3 sites), Margin drawing delegates |
 | `View.Drawing.Clipping.cs` | `is Adornment` → `is IAdornmentView` (2 sites) |
 | `View.NeedsDraw.cs` | `is Adornment` → `is IAdornmentView` (2 sites) |
-| `View.Layout.cs` | `is Adornment` → `is IAdornmentView` (3 sites), `v.Margin?.View` (2 sites) |
+| `View.Layout.cs` | `is Adornment` → `is IAdornmentView` (3 sites), `v.Margin.View` (2 sites) |
 | `View.Navigation.cs` | `as Adornment` → `as IAdornmentView` (2 sites), `return Margin?.View` |
 | `View.ScrollBars.cs` | `is Adornment` → `is IAdornmentView` (3 sites) |
-| `View.Hierarchy.cs` | `is Margin` → `is MarginView`, `IsInHierarchy(start.Margin?.View, ...)` |
+| `View.Hierarchy.cs` | `is Margin` → `is MarginView`, `IsInHierarchy(start.Margin.View, ...)` |
 | `ShadowView.cs` | `is not Adornment` → `is not IAdornmentView` |
 | `ApplicationMouse.cs` | `is Adornment` → `is IAdornmentView` (3 sites) |
 | `TabRow.cs` | `is Adornment` → `is IAdornmentView` |
@@ -1312,9 +1312,9 @@ if (view.Border is { }) { /* always true */ }
 
 // ✅ UNCHANGED — Accessing View events via convenience methods on lightweight Border
 // Old:
-tab.Border!.Activating += MyHandler;
+tab.Border.Activating += MyHandler;
 // New (Border promotes Activating, internally calls EnsureView()):
-tab.Border!.Activating += MyHandler;
+tab.Border.Activating += MyHandler;
 
 // ✅ UNCHANGED — Adding SubViews to adornments (convenience methods)
 // Old:
@@ -1414,7 +1414,7 @@ A medium-complexity Terminal.Gui application with **200 views** (mix: 40% plain,
 | File | Line | Access | Needs EnsureView? |
 |------|------|--------|-------------------|
 | `View.Layout.cs` | 886–898 | `Margin.SubViews.Count`, `Border.SubViews.Count`, `Padding.SetNeedsLayout()` | Yes |
-| `TabView.cs` | 576, 607, 689, 699 | `tab.Border!.Activating +=/-=` | No — Border promotes Activating |
+| `TabView.cs` | 576, 607, 689, 699 | `tab.Border.Activating +=/-=` | No — Border promotes Activating |
 | `ApplicationKeyboard.cs` | 266 | `Border?.Arranger.EnterArrangeMode()` | Via promoted `Arranger` property |
 | `View.Drawing.cs` | 180 | `Margin?.CacheClip()` | Via delegated method on lightweight Margin |
 | `Margin.cs` | 89–103 | `DrawMargins` iterates, calls `margin.Draw()` | Via `margin.View?.Draw()` |
@@ -1546,7 +1546,7 @@ This ensures ~95% of existing callsites require no change beyond the type rename
 
 2. **Mixed state is fragile.** Having Margin as lightweight + Border/Padding as View creates two code paths in `SetupAdornments()`, `SetAdornmentFrames()`, `BeginInitAdornments()`, etc. Each path must handle the other type correctly.
 
-3. **Callsite patterns are identical across adornments.** The `.Margin?.View` / `.Border?.View` / `.Padding?.View` changes are the same mechanical transformation. Doing all three together is one pass; doing them incrementally is three passes touching the same files.
+3. **Callsite patterns are identical across adornments.** The `.Margin.View` / `.Border.View` / `.Padding.View` changes are the same mechanical transformation. Doing all three together is one pass; doing them incrementally is three passes touching the same files.
 
 **Resolution:** Collapsed Phases 1–3 into a single Phase 1 that migrates all three adornments simultaneously. This is actually lower risk because there's no transitional mixed state. See updated §6.
 

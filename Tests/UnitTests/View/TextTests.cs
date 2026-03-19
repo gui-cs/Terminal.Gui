@@ -126,7 +126,7 @@ Y
 
         Assert.Equal (new (0, 0, 15, 15), win.Frame);
         Assert.Equal (new (0, 0, 15, 15), win.Margin.GetFrame ());
-        Assert.Equal (new (0, 0, 15, 15), win.Border!.GetFrame ());
+        Assert.Equal (new (0, 0, 15, 15), win.Border.GetFrame ());
         Assert.Equal (new (1, 1, 13, 13), win.Padding.GetFrame ());
 
         Assert.Equal (TextDirection.LeftRight_TopBottom, view.TextDirection);

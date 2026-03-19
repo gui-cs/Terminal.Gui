@@ -63,13 +63,13 @@ public class MouseTester : Scenario
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
-            Height = Dim.Func (_ => demo.Padding!.Thickness.Top),
+            Height = Dim.Func (_ => demo.Padding.Thickness.Top),
             Title = "inPadding",
             Id = "inPadding"
         };
-        demo.Padding!.Add (demoInPadding);
+        demo.Padding.Add (demoInPadding);
 
-        demo.Padding!.View!.Initialized += DemoPaddingOnInitialized;
+        demo.Padding.View!.Initialized += DemoPaddingOnInitialized;
 
         MouseEventDemoView sub1 = new ()
         {
@@ -365,7 +365,7 @@ public class MouseTester : Scenario
 
         return;
 
-        void DemoPaddingOnInitialized (object? o, EventArgs eventArgs) => demo.Padding!.Thickness = demo.Padding.Thickness with { Top = 5 };
+        void DemoPaddingOnInitialized (object? o, EventArgs eventArgs) => demo.Padding.Thickness = demo.Padding.Thickness with { Top = 5 };
     }
 
     public class MouseEventDemoView : View

@@ -90,7 +90,7 @@ public class AllViewsTester : Scenario
             AutoSelectAdornments = false,
             SuperViewRendersLineCanvas = true
         };
-        _adornmentsEditor.Border!.Thickness = new Thickness (1);
+        _adornmentsEditor.Border.Thickness = new Thickness (1);
         _adornmentsEditor.ExpanderButton!.Orientation = Orientation.Horizontal;
         _adornmentsEditor.ExpanderButton.Enabled = false;
 
@@ -108,7 +108,7 @@ public class AllViewsTester : Scenario
         _arrangementEditor.ExpanderButton!.Orientation = Orientation.Horizontal;
 
         _arrangementEditor.ExpanderButton.CollapsedChanging += (_, args) => { _adornmentsEditor.ExpanderButton.Collapsed = args.NewValue; };
-        _arrangementEditor.Border!.Thickness = new Thickness (1);
+        _arrangementEditor.Border.Thickness = new Thickness (1);
 
         _layoutEditor = new LayoutEditor
         {
@@ -123,7 +123,7 @@ public class AllViewsTester : Scenario
             AutoSelectAdornments = false,
             SuperViewRendersLineCanvas = true
         };
-        _layoutEditor.Border!.Thickness = new Thickness (1, 1, 1, 0);
+        _layoutEditor.Border.Thickness = new Thickness (1, 1, 1, 0);
 
         _viewportSettingsEditor = new ViewportSettingsEditor
         {

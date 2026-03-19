@@ -37,21 +37,21 @@ public class AdornmentsEditor : EditorBase
         ExpanderButton?.Orientation = Orientation.Horizontal;
 
         MarginEditor = new MarginEditor { X = -1, Y = 0, SuperViewRendersLineCanvas = true, BorderStyle = BorderStyle };
-        MarginEditor.Border!.Thickness = MarginEditor.Border!.Thickness with { Bottom = 0 };
+        MarginEditor.Border.Thickness = MarginEditor.Border.Thickness with { Bottom = 0 };
         Add (MarginEditor);
 
         BorderEditor = new BorderEditor
         {
             X = Pos.Left (MarginEditor), Y = Pos.Bottom (MarginEditor), SuperViewRendersLineCanvas = true, BorderStyle = BorderStyle
         };
-        BorderEditor.Border!.Thickness = BorderEditor.Border!.Thickness with { Bottom = 0 };
+        BorderEditor.Border.Thickness = BorderEditor.Border.Thickness with { Bottom = 0 };
         Add (BorderEditor);
 
         PaddingEditor = new PaddingEditor
         {
             X = Pos.Left (BorderEditor), Y = Pos.Bottom (BorderEditor), SuperViewRendersLineCanvas = true, BorderStyle = BorderStyle
         };
-        PaddingEditor.Border!.Thickness = PaddingEditor.Border!.Thickness with { Bottom = 0 };
+        PaddingEditor.Border.Thickness = PaddingEditor.Border.Thickness with { Bottom = 0 };
         Add (PaddingEditor);
 
         Width = Dim.Auto (maximumContentDim: Dim.Func (_ => MarginEditor.Frame.Width - 2));

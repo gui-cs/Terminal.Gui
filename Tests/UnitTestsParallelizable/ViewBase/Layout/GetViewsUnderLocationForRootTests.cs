@@ -103,12 +103,12 @@ public class GetViewsUnderLocationForRootTests
     public void ReturnsAdornment_WhenPointInPadding ()
     {
         Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
-        top.Border!.Thickness = new Thickness (1);
-        top.Padding!.Thickness = new Thickness (1);
+        top.Border.Thickness = new Thickness (1);
+        top.Padding.Thickness = new Thickness (1);
         top.Layout ();
         List<View?> result = View.GetViewsUnderLocation (top, new Point (1, 1), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
-        Assert.Contains (top.Padding!.View!, result);
+        Assert.Contains (top.Padding.View!, result);
     }
 
     [Fact]
@@ -183,13 +183,13 @@ public class GetViewsUnderLocationForRootTests
                 break;
 
             case "Border":
-                subView.Border!.Thickness = new Thickness (2);
+                subView.Border.Thickness = new Thickness (2);
                 adornment = subView.Border;
 
                 break;
 
             case "Padding":
-                subView.Padding!.Thickness = new Thickness (2);
+                subView.Padding.Thickness = new Thickness (2);
                 adornment = subView.Padding;
 
                 break;
@@ -246,13 +246,13 @@ public class GetViewsUnderLocationForRootTests
                 break;
 
             case "Border":
-                subView.Border!.Thickness = new Thickness (2);
+                subView.Border.Thickness = new Thickness (2);
                 adornment = subView.Border;
 
                 break;
 
             case "Padding":
-                subView.Padding!.Thickness = new Thickness (2);
+                subView.Padding.Thickness = new Thickness (2);
                 adornment = subView.Padding;
 
                 break;

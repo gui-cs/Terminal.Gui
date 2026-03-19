@@ -579,7 +579,7 @@ public class ArrangementTests (ITestOutputHelper output)
         var view = new View { Arrangement = ViewArrangement.LeftResizable, BorderStyle = LineStyle.Single };
 
         // Set custom thickness - only left border
-        view.Border!.Thickness = new Thickness (2, 0, 0, 0);
+        view.Border.Thickness = new Thickness (2, 0, 0, 0);
 
         Assert.Equal (2, view.Border.Thickness.Left);
         Assert.Equal (0, view.Border.Thickness.Top);

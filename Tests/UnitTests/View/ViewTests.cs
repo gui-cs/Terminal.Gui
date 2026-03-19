@@ -177,9 +177,9 @@ public class ViewTests
 #endif
 
         view.Dispose ();
-        Assert.Null (view.Margin?.View);
-        Assert.Null (view.Border?.View);
-        Assert.Null (view.Padding?.View);
+        Assert.Null (view.Margin.View);
+        Assert.Null (view.Border.View);
+        Assert.Null (view.Padding.View);
     }
 
     [Fact]
@@ -203,9 +203,9 @@ public class ViewTests
 #endif
 
         view.Dispose ();
-        Assert.Null (view.Margin?.View);
-        Assert.Null (view.Border?.View);
-        Assert.Null (view.Padding?.View);
+        Assert.Null (view.Margin.View);
+        Assert.Null (view.Border.View);
+        Assert.Null (view.Padding.View);
     }
 
     [Fact]

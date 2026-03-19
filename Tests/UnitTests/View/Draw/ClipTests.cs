@@ -40,7 +40,7 @@ public class ClipTests (ITestOutputHelper _output)
             Y = 1,
             Width = 3, Height = 3
         };
-        view.Padding!.Thickness = new (1);
+        view.Padding.Thickness = new (1);
         view.Padding.Diagnostics = ViewDiagnosticFlags.Thickness;
         view.BeginInit ();
         view.EndInit ();
@@ -195,8 +195,8 @@ public class ClipTests (ITestOutputHelper _output)
                    これは広いルーンラインです。
                    """
         };
-        frameView.Border!.LineStyle = LineStyle.Single;
-        frameView.Border!.Thickness = new (1, 0, 0, 0);
+        frameView.Border.LineStyle = LineStyle.Single;
+        frameView.Border.Thickness = new (1, 0, 0, 0);
 
         top.Add (frameView);
         top.SetClipToScreen ();
@@ -219,7 +219,7 @@ public class ClipTests (ITestOutputHelper _output)
             Width = Dim.Auto (),
             BorderStyle = LineStyle.Single
         };
-        view.Border!.Thickness = new (1, 0, 1, 0);
+        view.Border.Thickness = new (1, 0, 1, 0);
 
         top.Add (view);
         top.Layout ();
@@ -262,7 +262,7 @@ public class ClipTests (ITestOutputHelper _output)
             App = ApplicationImpl.Instance
         };
         view.SetContentSize (new Size (10, 10));
-        view.Border!.Thickness = new (1);
+        view.Border.Thickness = new (1);
         view.BeginInit ();
         view.EndInit ();
         Assert.Equal (view.Frame, view.GetClip ()!.GetBounds ());
@@ -297,7 +297,7 @@ public class ClipTests (ITestOutputHelper _output)
             App = ApplicationImpl.Instance
         };
         view.SetContentSize (new Size (10, 10));
-        view.Border!.Thickness = new (1);
+        view.Border.Thickness = new (1);
         view.BeginInit ();
         view.EndInit ();
         Assert.Equal (view.Frame, view.GetClip ()!.GetBounds ());

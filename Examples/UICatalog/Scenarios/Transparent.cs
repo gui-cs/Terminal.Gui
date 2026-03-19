@@ -90,7 +90,7 @@ public sealed class Transparent : Scenario
                 Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
                 ShadowStyle = ShadowStyles.Transparent
             };
-            transparentSubView.Border!.Thickness = new Thickness (1, 1, 1, 1);
+            transparentSubView.Border.Thickness = new Thickness (1, 1, 1, 1);
             transparentSubView.SchemeName = "Dialog";
 
             Button button = new () { Title = "_Opaque Shadow", X = Pos.Center (), Y = 2, SchemeName = "Dialog" };

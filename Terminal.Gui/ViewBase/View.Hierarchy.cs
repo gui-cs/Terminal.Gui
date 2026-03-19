@@ -626,21 +626,21 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
             return false;
         }
 
-        bool inHierarchy = IsInHierarchy (start.Padding?.View, view, includeAdornments);
+        bool inHierarchy = IsInHierarchy (start.Padding.View, view, includeAdornments);
 
         if (inHierarchy)
         {
             return inHierarchy;
         }
 
-        inHierarchy = IsInHierarchy (start.Border?.View, view, includeAdornments);
+        inHierarchy = IsInHierarchy (start.Border.View, view, includeAdornments);
 
         if (inHierarchy)
         {
             return inHierarchy;
         }
 
-        inHierarchy = IsInHierarchy (start.Margin?.View, view, includeAdornments);
+        inHierarchy = IsInHierarchy (start.Margin.View, view, includeAdornments);
 
         if (inHierarchy)
         {

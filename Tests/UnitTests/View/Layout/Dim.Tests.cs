@@ -125,7 +125,7 @@ public class DimTests
                        Assert.Equal (49, f2.Frame.Width); // 50-1=49
                        Assert.Equal (5, f2.Frame.Height);
 
-                       Assert.Equal ($"Combine(View(Width,FrameView(){f1.Border!.GetFrame ()})-Absolute(2))", v1.Width.ToString ());
+                       Assert.Equal ($"Combine(View(Width,FrameView(){f1.Border.GetFrame ()})-Absolute(2))", v1.Width.ToString ());
                        Assert.Equal ("Combine(Fill(Absolute(0))-Absolute(2))", v1.Height.ToString ());
                        Assert.Equal (47, v1.Frame.Width); // 49-2=47
                        Assert.Equal (89, v1.Frame.Height); // 98-5-2-2=89

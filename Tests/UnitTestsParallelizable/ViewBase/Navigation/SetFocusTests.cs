@@ -140,7 +140,7 @@ public class SetFocusTests : TestsAllViews
         var subViewSubView3 = new View { Id = "subViewSubView3", CanFocus = true };
         borderSubView.Add (subViewSubView1, subViewSubView2, subViewSubView3);
 
-        view.Border!.Add (borderSubView);
+        view.Border.Add (borderSubView);
 
         view.SetFocus ();
         Assert.True (view.HasFocus);

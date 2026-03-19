@@ -338,7 +338,7 @@ public class TabView : View
             // Tabs are along the bottom so just dodge the border
             if (Style.ShowBorder)
             {
-                _containerView.Border!.Thickness = new Thickness (1, 1, 1, 0);
+                _containerView.Border.Thickness = new Thickness (1, 1, 1, 0);
             }
 
             _containerView.Y = 0;
@@ -357,7 +357,7 @@ public class TabView : View
             // Tabs are along the top
             if (Style.ShowBorder)
             {
-                _containerView.Border!.Thickness = new Thickness (1, 0, 1, 1);
+                _containerView.Border.Thickness = new Thickness (1, 0, 1, 1);
             }
 
             _tabsBar.Y = 0;

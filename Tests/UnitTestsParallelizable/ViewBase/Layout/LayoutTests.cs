@@ -327,7 +327,7 @@ public class LayoutTests
         Assert.Equal (2, layoutCompleteCount);
 
         // With Border subview
-        view.Border!.Add (new View ());
+        view.Border.Add (new View ());
         superView.LayoutSubViews ();
         Assert.Equal (1, borderLayoutStartedCount);
         Assert.Equal (1, borderLayoutCompleteCount);

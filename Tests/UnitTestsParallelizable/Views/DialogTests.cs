@@ -402,7 +402,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void ShadowStyle_Can_Be_Changed ()
     {
-        Dialog dialog = new () { ShadowStyle = ShadowStyles.None };
+        Dialog dialog = new () { ShadowStyle = null };
 
         Assert.Equal (ShadowStyles.None, dialog.ShadowStyle);
 
@@ -693,7 +693,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
 
         // Height should account for buttons at the bottom
         Assert.True (dialog.Frame.Height > 0);
-        Assert.True (dialog.Padding!.Thickness.Bottom >= button1.Frame.Height);
+        Assert.True (dialog.Padding.Thickness.Bottom >= button1.Frame.Height);
 
         dialog.Dispose ();
     }
@@ -935,13 +935,13 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         dialog.X = 0;
         dialog.Y = 0;
         dialog.BorderStyle = LineStyle.Single;
-        dialog.ShadowStyle = ShadowStyles.None;
+        dialog.ShadowStyle = null;
 
         Button okButton = new ()
         {
             Title = "OK",
             BorderStyle = LineStyle.None,
-            ShadowStyle = ShadowStyles.None,
+            ShadowStyle = null,
             NoPadding = true,
             NoDecorations = true
         };
@@ -972,14 +972,14 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         dialog.X = 0;
         dialog.Y = 0;
         dialog.BorderStyle = LineStyle.Single;
-        dialog.ShadowStyle = ShadowStyles.None;
+        dialog.ShadowStyle = null;
         dialog.ButtonAlignment = Alignment.End;
 
         Button cancelButton = new ()
         {
             Title = "Cancel",
             BorderStyle = LineStyle.None,
-            ShadowStyle = ShadowStyles.None,
+            ShadowStyle = null,
             NoPadding = true,
             NoDecorations = true
         };
@@ -988,7 +988,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         {
             Title = "OK",
             BorderStyle = LineStyle.None,
-            ShadowStyle = ShadowStyles.None,
+            ShadowStyle = null,
             NoPadding = true,
             NoDecorations = true
         };
@@ -1020,14 +1020,14 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         dialog.X = 0;
         dialog.Y = 0;
         dialog.BorderStyle = LineStyle.Single;
-        dialog.ShadowStyle = ShadowStyles.None;
+        dialog.ShadowStyle = null;
         dialog.Text = "Hello World";
 
         Button okButton = new ()
         {
             Title = "OK",
             BorderStyle = LineStyle.None,
-            ShadowStyle = ShadowStyles.None,
+            ShadowStyle = null,
             NoPadding = true,
             NoDecorations = true
         };
@@ -1059,14 +1059,14 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         dialog.X = 0;
         dialog.Y = 0;
         dialog.BorderStyle = LineStyle.Single;
-        dialog.ShadowStyle = ShadowStyles.None;
+        dialog.ShadowStyle = null;
         dialog.Text = "Line 1\nLine 2\nLine 3";
 
         Button okButton = new ()
         {
             Title = "OK",
             BorderStyle = LineStyle.None,
-            ShadowStyle = ShadowStyles.None,
+            ShadowStyle = null,
             NoPadding = true,
             NoDecorations = true
         };
@@ -1100,14 +1100,14 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         dialog.X = 0;
         dialog.Y = 0;
         dialog.BorderStyle = LineStyle.Single;
-        dialog.ShadowStyle = ShadowStyles.None;
+        dialog.ShadowStyle = null;
         dialog.ButtonAlignment = Alignment.End;
 
         Button helpButton = new ()
         {
             Title = "Help",
             BorderStyle = LineStyle.None,
-            ShadowStyle = ShadowStyles.None,
+            ShadowStyle = null,
             NoPadding = true,
             NoDecorations = true
         };
@@ -1116,7 +1116,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         {
             Title = "Cancel",
             BorderStyle = LineStyle.None,
-            ShadowStyle = ShadowStyles.None,
+            ShadowStyle = null,
             NoPadding = true,
             NoDecorations = true
         };
@@ -1125,7 +1125,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         {
             Title = "OK",
             BorderStyle = LineStyle.None,
-            ShadowStyle = ShadowStyles.None,
+            ShadowStyle = null,
             NoPadding = true,
             NoDecorations = true
         };
@@ -1158,14 +1158,14 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         dialog.X = 0;
         dialog.Y = 0;
         dialog.BorderStyle = LineStyle.Single;
-        dialog.ShadowStyle = ShadowStyles.None;
+        dialog.ShadowStyle = null;
         dialog.ButtonAlignment = Alignment.Center;
 
         Button cancelButton = new ()
         {
             Title = "Cancel",
             BorderStyle = LineStyle.None,
-            ShadowStyle = ShadowStyles.None,
+            ShadowStyle = null,
             NoPadding = true,
             NoDecorations = true
         };
@@ -1174,7 +1174,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         {
             Title = "OK",
             BorderStyle = LineStyle.None,
-            ShadowStyle = ShadowStyles.None,
+            ShadowStyle = null,
             NoPadding = true,
             NoDecorations = true
         };
@@ -1206,14 +1206,14 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         dialog.X = 0;
         dialog.Y = 0;
         dialog.BorderStyle = LineStyle.Single;
-        dialog.ShadowStyle = ShadowStyles.None;
+        dialog.ShadowStyle = null;
         dialog.ButtonAlignment = Alignment.Start;
 
         Button cancelButton = new ()
         {
             Title = "Cancel",
             BorderStyle = LineStyle.None,
-            ShadowStyle = ShadowStyles.None,
+            ShadowStyle = null,
             NoPadding = true,
             NoDecorations = true
         };
@@ -1222,7 +1222,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         {
             Title = "OK",
             BorderStyle = LineStyle.None,
-            ShadowStyle = ShadowStyles.None,
+            ShadowStyle = null,
             NoPadding = true,
             NoDecorations = true
         };
@@ -1254,7 +1254,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         dialog.X = 0;
         dialog.Y = 0;
         dialog.BorderStyle = LineStyle.Single;
-        dialog.ShadowStyle = ShadowStyles.None;
+        dialog.ShadowStyle = null;
 
         (dialog as IDesignable).EnableForDesign ();
 
@@ -1287,7 +1287,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         dialog.X = 0;
         dialog.Y = 0;
         dialog.BorderStyle = LineStyle.Single;
-        dialog.ShadowStyle = ShadowStyles.None;
+        dialog.ShadowStyle = null;
         dialog.Title = "Dialog";
 
         var container = new View
@@ -1429,7 +1429,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         dialog.X = 0;
         dialog.Y = 0;
         dialog.BorderStyle = LineStyle.Single;
-        dialog.ShadowStyle = ShadowStyles.None;
+        dialog.ShadowStyle = null;
         dialog.Title = "Dialog";
 
         View view = viewFactory (); // Create fresh instance
@@ -2434,7 +2434,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
             X = 0,
             Y = 0,
             BorderStyle = LineStyle.Single,
-            ShadowStyle = ShadowStyles.None,
+            ShadowStyle = null,
             Driver = driver
         };
 
@@ -2442,7 +2442,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         {
             Title = "No",
             BorderStyle = LineStyle.None,
-            ShadowStyle = ShadowStyles.None,
+            ShadowStyle = null,
             NoPadding = true,
             NoDecorations = true
         };
@@ -2451,7 +2451,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         {
             Title = "Yes",
             BorderStyle = LineStyle.None,
-            ShadowStyle = ShadowStyles.None,
+            ShadowStyle = null,
             NoPadding = true,
             NoDecorations = true
         };

@@ -11,7 +11,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
     {
         var view = new View ();
         var subView = new View ();
-        view.Padding!.Add (subView);
+        view.Padding.Add (subView);
         view.BeginInit ();
         view.EndInit ();
         var raised = false;
@@ -38,23 +38,23 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         Runnable<bool> runnable = new () { Width = 10, Height = 10 };
         app.Begin (runnable);
 
-        runnable.Padding!.Thickness = new Thickness (viewPadding);
+        runnable.Padding.Thickness = new Thickness (viewPadding);
 
         // Turn of TransparentMouse for the test
-        runnable.Padding!.ViewportSettings = ViewportSettingsFlags.None;
+        runnable.Padding.ViewportSettings = ViewportSettingsFlags.None;
 
         var subView = new View { X = 0, Y = 0, Width = 5, Height = 5 };
-        subView.Padding!.Thickness = new Thickness (subViewPadding);
+        subView.Padding.Thickness = new Thickness (subViewPadding);
 
         // Turn of TransparentMouse for the test
-        subView.Padding!.ViewportSettings = ViewportSettingsFlags.None;
+        subView.Padding.ViewportSettings = ViewportSettingsFlags.None;
 
-        runnable.Padding!.Add (subView);
+        runnable.Padding.Add (subView);
         runnable.Layout ();
 
         View? foundView = runnable.GetViewsUnderLocation (new Point (0, 0), ViewportSettingsFlags.None).LastOrDefault ();
 
-        bool found = foundView == subView || foundView == subView.Padding!.View!;
+        bool found = foundView == subView || foundView == subView.Padding.View!;
         Assert.Equal (expectedFound, found);
     }
 
@@ -64,7 +64,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         IApplication? app = Application.Create ();
         Runnable<bool> runnable = new () { Width = 10, Height = 10 };
         app.Begin (runnable);
-        runnable.Padding!.Thickness = new Thickness (1);
+        runnable.Padding.Thickness = new Thickness (1);
 
         var subView = new View
         {
@@ -77,7 +77,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         runnable.Padding.Add (subView);
         runnable.Layout ();
 
-        Assert.Equal (runnable.Padding!.View!, runnable.GetViewsUnderLocation (new Point (0, 0), ViewportSettingsFlags.None).LastOrDefault ());
+        Assert.Equal (runnable.Padding.View!, runnable.GetViewsUnderLocation (new Point (0, 0), ViewportSettingsFlags.None).LastOrDefault ());
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
         // Setup padding with some thickness so we have space for the button
-        window.Border!.Thickness = new Thickness (0, 3, 0, 0);
+        window.Border.Thickness = new Thickness (0, 3, 0, 0);
 
         // Add a button with a transparent shadow to the Padding adornment
         Button buttonInBorder = new ()
@@ -135,7 +135,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
         // Setup padding with some thickness so we have space for the button
-        window.Padding!.Thickness = new Thickness (0, 3, 0, 0);
+        window.Padding.Thickness = new Thickness (0, 3, 0, 0);
 
         // Add a button with a transparent shadow to the Padding adornment
         Button buttonInPadding = new ()

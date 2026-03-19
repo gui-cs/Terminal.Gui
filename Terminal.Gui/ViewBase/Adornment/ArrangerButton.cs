@@ -9,7 +9,7 @@ internal class ArrangerButton : Button
         Height = 1;
         NoDecorations = true;
         NoPadding = true;
-        base.ShadowStyle = ShadowStyles.None;
+        base.ShadowStyle = null;
         base.Visible = false;
     }
 
