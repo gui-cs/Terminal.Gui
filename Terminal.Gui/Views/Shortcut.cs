@@ -110,7 +110,7 @@ public class Shortcut : View, IOrientation, IDesignable
         MouseHighlightStates = MouseState.In;
         CanFocus = true;
 
-        Border?.Settings &= ~BorderSettings.Title;
+        Border.Settings &= ~BorderSettings.Title;
 
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);

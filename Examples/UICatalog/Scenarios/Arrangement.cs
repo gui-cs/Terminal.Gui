@@ -307,7 +307,7 @@ public class Arrangement : Scenario
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
             ViewportSettings |= ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
 
-            Padding!.Thickness = new Thickness (1);
+            Padding.Thickness = new Thickness (1);
 
             Add (new Button { Title = "_Hi", X = Pos.Center (), Y = Pos.Center () });
         }

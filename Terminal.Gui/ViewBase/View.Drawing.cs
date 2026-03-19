@@ -159,7 +159,7 @@ public partial class View // Drawing APIs
 
         // ------------------------------------
         // This causes the Margin to be drawn in a second pass if it has a ShadowStyle
-        Margin?.CacheClip ();
+        Margin.CacheClip ();
 
         // ------------------------------------
         // Reset the clip to what it was when we started
@@ -194,7 +194,7 @@ public partial class View // Drawing APIs
             // NOTE: so we do not call DoDrawSubViews on Margin.
         }
 
-        if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty && Border.NeedsDraw)
+        if (Border.SubViews is { } && Border.Thickness != Thickness.Empty && Border.NeedsDraw)
         {
             // PERFORMANCE: Get the check for DrawIndicator out of this somehow.
             foreach (View subview in Border.SubViews.Where (v => v.Visible || v.Id == "DrawIndicator"))
@@ -207,12 +207,12 @@ public partial class View // Drawing APIs
                 LineCanvas.Exclude (new Region (subview.FrameToScreen ()));
             }
 
-            Region? saved = Border?.AddFrameToClip ();
-            Border?.DoDrawSubViews ();
+            Region? saved = Border.AddFrameToClip ();
+            Border.DoDrawSubViews ();
             SetClip (saved);
         }
 
-        if (Padding?.SubViews is null || Padding.Thickness == Thickness.Empty || !Padding.NeedsDraw)
+        if (Padding.SubViews is null || Padding.Thickness == Thickness.Empty || !Padding.NeedsDraw)
         {
             return;
         }
@@ -222,8 +222,8 @@ public partial class View // Drawing APIs
             subview.SetNeedsDraw ();
         }
 
-        Region? savedPadding = Padding?.AddFrameToClip ();
-        Padding?.DoDrawSubViews ();
+        Region? savedPadding = Padding.AddFrameToClip ();
+        Padding.DoDrawSubViews ();
         SetClip (savedPadding);
     }
 
@@ -306,7 +306,7 @@ public partial class View // Drawing APIs
 
         if (Margin is { } && Margin.Thickness != Thickness.Empty /* && Margin.ShadowStyle == ShadowStyle.None*/)
         {
-            //Margin?.Draw ();
+            //Margin.Draw ();
         }
     }
 
@@ -816,8 +816,8 @@ public partial class View // Drawing APIs
             ExcludeFromClip (context.GetDrawnRegion ());
 
             // Border and Padding are always opaque (they draw lines/fills), so exclude them too
-            ExcludeFromClip (Border?.Thickness.AsRegion (Border.FrameToScreen ()));
-            ExcludeFromClip (Padding?.Thickness.AsRegion (Padding.FrameToScreen ()));
+            ExcludeFromClip (Border.Thickness.AsRegion (Border.FrameToScreen ()));
+            ExcludeFromClip (Padding.Thickness.AsRegion (Padding.FrameToScreen ()));
         }
         else
         {

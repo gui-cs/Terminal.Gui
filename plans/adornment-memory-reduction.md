@@ -876,11 +876,11 @@ internal void SetAdornmentFrames ()
 
 private void DisposeAdornments ()
 {
-    Margin?.Dispose ();
+    Margin.Dispose ();
     Margin = null;
-    Border?.Dispose ();
+    Border.Dispose ();
     Border = null;
-    Padding?.Dispose ();
+    Padding.Dispose ();
     Padding = null;
 }
 ```
@@ -924,17 +924,17 @@ The simplest implementation: `View.BeginInit()` and `View.EndInit()` include nul
 protected override void BeginInit ()
 {
     base.BeginInit ();
-    Margin?.View?.BeginInit ();
-    Border?.View?.BeginInit ();
-    Padding?.View?.BeginInit ();
+    Margin.View?.BeginInit ();
+    Border.View?.BeginInit ();
+    Padding.View?.BeginInit ();
 }
 
 // In View.EndInit() (replaces EndInitAdornments):
 protected override void EndInit ()
 {
-    Margin?.View?.EndInit ();
-    Border?.View?.EndInit ();
-    Padding?.View?.EndInit ();
+    Margin.View?.EndInit ();
+    Border.View?.EndInit ();
+    Padding.View?.EndInit ();
     base.EndInit ();
 }
 
@@ -1103,11 +1103,11 @@ These are places where `Margin`/`Border`/`Padding` was passed to methods expecti
 | Pattern | Current | New |
 |---------|---------|-----|
 | Collection membership | `viewsUnderLocation.Contains(v.Margin)` | `viewsUnderLocation.Contains(v.Margin.View)` |
-| View return | `return Margin;` | `return Margin?.View;` |
+| View return | `return Margin;` | `return Margin.View;` |
 | Hierarchy check | `IsInHierarchy(start.Margin, ...)` | `IsInHierarchy(start.Margin.View, ...)` |
 | Stack push | `viewsToProcess.Push(margin)` | `if (margin.View is { } mv) viewsToProcess.Push(mv)` |
-| Drawing via .Margin | `Margin?.Draw()` | `Margin?.Draw()` (convenience on AdornmentImpl) |
-| SetNeedsDraw via .Margin | `Margin?.SetNeedsDraw()` | `Margin?.SetNeedsDraw()` (convenience on AdornmentImpl) |
+| Drawing via .Margin | `Margin.Draw()` | `Margin.Draw()` (convenience on AdornmentImpl) |
+| SetNeedsDraw via .Margin | `Margin.SetNeedsDraw()` | `Margin.SetNeedsDraw()` (convenience on AdornmentImpl) |
 | SubViews via .Margin | `Margin.SubViews` | `Margin.SubViews` (convenience on AdornmentImpl) |
 | NeedsDraw check | `Margin is { NeedsDraw: true }` | `Margin is { NeedsDraw: true }` (convenience on AdornmentImpl) |
 | ViewportSettings check | `Margin.ViewportSettings.HasFlag(...)` | `Margin.ViewportSettings.HasFlag(...)` (convenience on AdornmentImpl) |
@@ -1157,7 +1157,7 @@ During investigation, `git stash && git checkout <ref> -- .` followed by `git ch
 
 **6. Tests must be mechanically updated in bulk, but spot-checked for semantic correctness.**
 
-An agent was used to bulk-update ~146 test compilation errors (changing `Margin` → `Margin!.View!`, `is Border` → `is BorderView`, etc.). This was efficient and correct for most changes, but the agent couldn't detect semantic issues like: subscribing to `Margin.SubViewLayout` (a View event) vs `Margin!.View!.SubViewLayout` (same event, different object). The test compiles either way, but the assertion semantics depend on which object's event fires. **Lesson:** Mechanical test updates are fine for compilation, but each failing test after that needs manual root-cause analysis — the fix is often in the library, not the test.
+An agent was used to bulk-update ~146 test compilation errors (changing `Margin` → `Margin.View!`, `is Border` → `is BorderView`, etc.). This was efficient and correct for most changes, but the agent couldn't detect semantic issues like: subscribing to `Margin.SubViewLayout` (a View event) vs `Margin.View!.SubViewLayout` (same event, different object). The test compiles either way, but the assertion semantics depend on which object's event fires. **Lesson:** Mechanical test updates are fine for compilation, but each failing test after that needs manual root-cause analysis — the fix is often in the library, not the test.
 
 ---
 
@@ -1198,7 +1198,7 @@ These are **breaking for contributors** but not for library users.
 | `View.Layout.cs` | `viewsUnderLocation.Contains(v.Margin)` | `viewsUnderLocation.Contains(v.Margin.View)` |
 | `View.Layout.cs` | `viewsToProcess.Push(margin)` | `if (margin.View is { } mv) viewsToProcess.Push(mv)` |
 | `View.Navigation.cs` | `var thisAsAdornment = this as Adornment` | `IAdornmentView? thisAsAdornment = this as IAdornmentView` |
-| `View.Navigation.cs` | `return Margin;` | `return Margin?.View;` |
+| `View.Navigation.cs` | `return Margin;` | `return Margin.View;` |
 | `View.ScrollBars.cs` | `if (this is Adornment)` | `if (this is IAdornmentView)` |
 | `View.Hierarchy.cs` | `if (this is Margin)` | `if (this is MarginView)` |
 | `View.Hierarchy.cs` | `IsInHierarchy(start.Margin, ...)` | `IsInHierarchy(start.Margin.View, ...)` |
@@ -1266,7 +1266,7 @@ Code that does `v.Border.XYZ` with nullable check is not needed for the lightwei
 | `View.Drawing.Clipping.cs` | `is Adornment` → `is IAdornmentView` (2 sites) |
 | `View.NeedsDraw.cs` | `is Adornment` → `is IAdornmentView` (2 sites) |
 | `View.Layout.cs` | `is Adornment` → `is IAdornmentView` (3 sites), `v.Margin.View` (2 sites) |
-| `View.Navigation.cs` | `as Adornment` → `as IAdornmentView` (2 sites), `return Margin?.View` |
+| `View.Navigation.cs` | `as Adornment` → `as IAdornmentView` (2 sites), `return Margin.View` |
 | `View.ScrollBars.cs` | `is Adornment` → `is IAdornmentView` (3 sites) |
 | `View.Hierarchy.cs` | `is Margin` → `is MarginView`, `IsInHierarchy(start.Margin.View, ...)` |
 | `ShadowView.cs` | `is not Adornment` → `is not IAdornmentView` |
@@ -1415,8 +1415,8 @@ A medium-complexity Terminal.Gui application with **200 views** (mix: 40% plain,
 |------|------|--------|-------------------|
 | `View.Layout.cs` | 886–898 | `Margin.SubViews.Count`, `Border.SubViews.Count`, `Padding.SetNeedsLayout()` | Yes |
 | `TabView.cs` | 576, 607, 689, 699 | `tab.Border.Activating +=/-=` | No — Border promotes Activating |
-| `ApplicationKeyboard.cs` | 266 | `Border?.Arranger.EnterArrangeMode()` | Via promoted `Arranger` property |
-| `View.Drawing.cs` | 180 | `Margin?.CacheClip()` | Via delegated method on lightweight Margin |
+| `ApplicationKeyboard.cs` | 266 | `Border.Arranger.EnterArrangeMode()` | Via promoted `Arranger` property |
+| `View.Drawing.cs` | 180 | `Margin.CacheClip()` | Via delegated method on lightweight Margin |
 | `Margin.cs` | 89–103 | `DrawMargins` iterates, calls `margin.Draw()` | Via `margin.View?.Draw()` |
 | `ShadowView.cs` | 160 | `SuperView is not Adornment` | Change to `is not AdornmentView` |
 

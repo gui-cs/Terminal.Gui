@@ -107,7 +107,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
             Height = Dim.Auto (),
             CommandsToBubbleUp = CommandsToBubbleUp
         };
-        Padding!.Add (_buttonContainer);
+        Padding.Add (_buttonContainer);
 
         SetStyle ();
     }
@@ -218,7 +218,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <returns></returns>
     private int GetMinimumDialogHeight ()
     {
-        int minSize = Math.Max (_minimumSubViewsSize.Height, _minimumButtonsSize.Height - Border!.Thickness.Vertical - Margin!.Thickness.Vertical);
+        int minSize = Math.Max (_minimumSubViewsSize.Height, _minimumButtonsSize.Height - Border.Thickness.Vertical - Margin.Thickness.Vertical);
 
         return minSize;
     }
@@ -260,7 +260,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         dialogButton.IsDefault = true;
 
         _buttonContainer?.Add (dialogButton);
-        Padding!.Thickness = Padding!.Thickness with { Bottom = _buttonContainer!.GetHeightRequiredForSubViews () };
+        Padding.Thickness = Padding.Thickness with { Bottom = _buttonContainer!.GetHeightRequiredForSubViews () };
         _minimumButtonsSize = new Size (_buttonContainer?.GetWidthRequiredForSubViews () ?? 0, _buttonContainer?.GetHeightRequiredForSubViews () ?? 0);
     }
 
@@ -389,7 +389,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
             return false;
         }
 
-        if (!_drawingText || role is not VisualRole.Focus || Border?.Thickness == Thickness.Empty)
+        if (!_drawingText || role is not VisualRole.Focus || Border.Thickness == Thickness.Empty)
         {
             return false;
         }

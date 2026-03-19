@@ -346,17 +346,17 @@ public partial class View // Focus and cross-view navigation management (TabStop
             // How about in Adornments?
             if (Margin is { HasFocus: true })
             {
-                return Margin?.View;
+                return Margin.View;
             }
 
             if (Border is { HasFocus: true })
             {
-                return Border?.View;
+                return Border.View;
             }
 
             if (Padding is { HasFocus: true })
             {
-                return Padding?.View;
+                return Padding.View;
             }
 
             return null;

@@ -42,7 +42,7 @@ public class WizardStep : View, IDesignable
         //_helpTextView.HorizontalScrollBar.AutoShow = true;
         _helpTextView.Width = Dim.Func (_ => CalculateHelpPaddingWidth ());
 
-        Padding?.Add (_helpTextView);
+        Padding.Add (_helpTextView);
 
         ShowHide ();
         base.EndInit ();

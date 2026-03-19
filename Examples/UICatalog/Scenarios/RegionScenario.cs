@@ -181,7 +181,7 @@ internal class RegionToolsView : Window
     public RegionToolsView ()
     {
         BorderStyle = LineStyle.Dotted;
-        Border!.Thickness = new (1, 2, 1, 1);
+        Border.Thickness = new (1, 2, 1, 1);
         Height = Dim.Auto ();
         Width = Dim.Auto ();
     }
@@ -262,7 +262,7 @@ internal class RegionAttributeView : View
         Height = 4;
 
         BorderStyle = LineStyle.Single;
-        Border!.Thickness = new (0, 1, 0, 0);
+        Border.Thickness = new (0, 1, 0, 0);
         Title = "Attribute";
     }
 

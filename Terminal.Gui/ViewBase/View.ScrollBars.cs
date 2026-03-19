@@ -76,7 +76,7 @@ public partial class View
         scrollBar.Initialized += OnScrollBarInitialized;
 
         // Add after setting Initialized event!
-        Padding?.Add (scrollBar);
+        Padding.Add (scrollBar);
 
         return scrollBar;
     }
@@ -86,10 +86,10 @@ public partial class View
         // Use dynamic Func to set the location & size. Note the -1 for X is to subtract
         // the Padding we add for the scrollbar. The Func is only called if the ScrollBar is
         // visible.
-        scrollBar.X = Pos.AnchorEnd () - Pos.Func (_ => Padding!.Thickness.Right - 1);
-        scrollBar.Y = Pos.Func (_ => Padding!.Thickness.Top);
+        scrollBar.X = Pos.AnchorEnd () - Pos.Func (_ => Padding.Thickness.Right - 1);
+        scrollBar.Y = Pos.Func (_ => Padding.Thickness.Top);
 
-        scrollBar.Height = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Bottom));
+        scrollBar.Height = Dim.Fill (Dim.Func (_ => Padding.Thickness.Bottom));
         scrollBar.ScrollableContentSize = GetContentSize ().Height;
 
         ViewportChanged += (_, _) => { scrollBar.Value = Viewport.Y; };
@@ -102,10 +102,10 @@ public partial class View
         // Use dynamic Func to set the location & size. Note the -1 for Y is to subtract
         // the Padding we add for the scrollbar. The Func is only called if the ScrollBar is
         // visible.
-        scrollBar.X = Pos.Func (_ => Padding!.Thickness.Left);
-        scrollBar.Y = Pos.AnchorEnd () - Pos.Func (_ => Padding!.Thickness.Bottom - 1);
+        scrollBar.X = Pos.Func (_ => Padding.Thickness.Left);
+        scrollBar.Y = Pos.AnchorEnd () - Pos.Func (_ => Padding.Thickness.Bottom - 1);
 
-        scrollBar.Width = Dim.Fill (Dim.Func (_ => Padding!.Thickness.Right));
+        scrollBar.Width = Dim.Fill (Dim.Func (_ => Padding.Thickness.Right));
         scrollBar.ScrollableContentSize = GetContentSize ().Width;
 
         ViewportChanged += (_, _) => { scrollBar.Value = Viewport.X; };
@@ -129,7 +129,7 @@ public partial class View
 
     private void ConfigureVerticalScrollBarEvents (ScrollBar scrollBar)
     {
-        Padding!.Thickness = Padding.Thickness with { Right = scrollBar.Visible ? Padding.Thickness.Right + 1 : Padding.Thickness.Right };
+        Padding.Thickness = Padding.Thickness with { Right = scrollBar.Visible ? Padding.Thickness.Right + 1 : Padding.Thickness.Right };
 
         scrollBar.ValueChanged += (_, args) =>
                                   {
@@ -153,7 +153,7 @@ public partial class View
 
     private void ConfigureHorizontalScrollBarEvents (ScrollBar scrollBar)
     {
-        Padding!.Thickness = Padding.Thickness with { Bottom = scrollBar.Visible ? Padding.Thickness.Bottom + 1 : Padding.Thickness.Bottom };
+        Padding.Thickness = Padding.Thickness with { Bottom = scrollBar.Visible ? Padding.Thickness.Bottom + 1 : Padding.Thickness.Bottom };
 
         scrollBar.ValueChanged += (_, args) =>
                                   {
@@ -228,13 +228,13 @@ public partial class View
 
         if (_horizontalScrollBar.IsValueCreated)
         {
-            Padding?.Remove (_horizontalScrollBar.Value);
+            Padding.Remove (_horizontalScrollBar.Value);
             _horizontalScrollBar.Value.Dispose ();
         }
 
         if (_verticalScrollBar.IsValueCreated)
         {
-            Padding?.Remove (_verticalScrollBar.Value);
+            Padding.Remove (_verticalScrollBar.Value);
             _verticalScrollBar.Value.Dispose ();
         }
     }

@@ -26,7 +26,7 @@ public abstract class EditorBase : View
         {
             if (ExpanderButton is { })
             {
-                Border?.Add (ExpanderButton);
+                Border.Add (ExpanderButton);
             }
 
             App!.Mouse.MouseEvent += ApplicationOnMouseEvent;
@@ -51,7 +51,7 @@ public abstract class EditorBase : View
     public bool ShowViewIdentifier
     {
         get => Padding is { } && Padding.Thickness != Thickness.Empty;
-        set => Padding?.Thickness = value ? new Thickness (0, 2, 0, 0) : Thickness.Empty;
+        set => Padding.Thickness = value ? new Thickness (0, 2, 0, 0) : Thickness.Empty;
     }
 
     public bool UpdatingLayoutSettings { get; private set; }
@@ -97,7 +97,7 @@ public abstract class EditorBase : View
     {
         if (ShowViewIdentifier)
         {
-            Padding?.View?.Text = ViewToEdit?.ToIdentifyingString () ?? "<none>";
+            Padding.View?.Text = ViewToEdit?.ToIdentifyingString () ?? "<none>";
         }
     }
 

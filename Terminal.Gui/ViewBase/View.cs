@@ -350,7 +350,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
             OnEnabledChanged ();
             SetNeedsDraw ();
 
-            Border?.Enabled = field;
+            Border.Enabled = field;
 
             foreach (View view in InternalSubViews)
             {

@@ -180,7 +180,7 @@ internal class ViewportSettingsDemoView : FrameView
 
         // Add a status label to the border that shows Viewport and ContentSize values. Bit of a hack.
         // TODO: Move to Padding with controls
-        Border?.Add (new Label { X = 20 });
+        Border.Add (new Label { X = 20 });
 
         ViewportChanged += VirtualDemoView_LayoutComplete;
 
@@ -216,7 +216,7 @@ internal class ViewportSettingsDemoView : FrameView
 
     private void VirtualDemoView_LayoutComplete (object? sender, DrawEventArgs drawEventArgs)
     {
-        Label? frameLabel = Padding?.SubViews.OfType<Label> ().FirstOrDefault ();
+        Label? frameLabel = Padding.SubViews.OfType<Label> ().FirstOrDefault ();
 
         if (frameLabel is { })
         {

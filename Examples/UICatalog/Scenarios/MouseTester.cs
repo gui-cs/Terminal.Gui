@@ -393,11 +393,11 @@ public class MouseTester : Scenario
             TextAlignment = Alignment.Center;
             VerticalTextAlignment = Alignment.Center;
 
-            Padding!.Thickness = new Thickness (1, 1, 1, 1);
-            Padding!.SetScheme (new Scheme (new Attribute (Color.DarkGray)));
+            Padding.Thickness = new Thickness (1, 1, 1, 1);
+            Padding.SetScheme (new Scheme (new Attribute (Color.DarkGray)));
             Padding.Id = $"{Id}.Padding";
 
-            Border!.Thickness = new Thickness (1);
+            Border.Thickness = new Thickness (1);
             Border.LineStyle = LineStyle.Rounded;
             Border.Id = $"{Id}.Border";
             base.EndInit ();
@@ -407,7 +407,7 @@ public class MouseTester : Scenario
         protected override void OnMouseStateChanged (EventArgs<MouseState> args)
         {
             base.OnMouseStateChanged (args);
-            Border!.LineStyle = args.Value.HasFlag (MouseState.PressedOutside) ? LineStyle.Dotted : LineStyle.Single;
+            Border.LineStyle = args.Value.HasFlag (MouseState.PressedOutside) ? LineStyle.Dotted : LineStyle.Single;
 
             SetNeedsDraw ();
         }
