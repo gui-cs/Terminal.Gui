@@ -12,13 +12,6 @@ public partial class View // Adornments
             Margin.Parent = this;
             Border.Parent = this;
             Padding.Parent = this;
-
-            // Eagerly create the backing Views. The full lazy-creation optimization
-            // requires updating all callsites that assume adornments are Views (drawing,
-            // layout, hit-testing, etc.) — that is a later phase.
-            //Margin.EnsureView ();
-            //Border.EnsureView ();
-            //Padding.EnsureView ();
         }
     }
 
@@ -39,8 +32,11 @@ public partial class View // Adornments
     private void DisposeAdornments ()
     {
         Margin.View?.Dispose ();
+        Margin.View = null;
         Border.View?.Dispose ();
+        Border.View = null;
         Padding.View?.Dispose ();
+        Padding.View = null;
     }
 
     /// <summary>

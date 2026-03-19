@@ -15,8 +15,7 @@ public class ViewTests
     {
         var r = new View ();
 
-        // BUGBUG: Should be: Assert.Single (View.Instances);
-        Assert.Equal (3, View.Instances.Count);
+        Assert.Single (View.Instances);
 
         r.Dispose ();
         Assert.Empty (View.Instances);
@@ -173,7 +172,7 @@ public class ViewTests
         Assert.NotNull (view.Padding);
 
 #if DEBUG_IDISPOSABLE
-        Assert.Equal (3, View.Instances.Count); // BUGBUG: Should be 1
+        Assert.Single (View.Instances);
 #endif
 
         view.Dispose ();

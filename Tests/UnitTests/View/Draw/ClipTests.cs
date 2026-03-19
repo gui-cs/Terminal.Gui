@@ -15,18 +15,19 @@ public class ClipTests (ITestOutputHelper _output)
             App = ApplicationImpl.Instance,
             X = 1,
             Y = 1,
-            Width = 3, Height = 3
+            Width = 3,
+            Height = 3
         };
-        view.Margin.Thickness = new (1);
+        view.Margin.Thickness = new Thickness (1);
 
         view.Move (0, 0);
-        Assert.Equal (new (2, 2), new Point (Application.Driver!.Col, Application.Driver!.Row));
+        Assert.Equal (new Point (2, 2), new Point (Application.Driver!.Col, Application.Driver!.Row));
 
         view.Move (-1, -1);
-        Assert.Equal (new (1, 1), new Point (Application.Driver!.Col, Application.Driver!.Row));
+        Assert.Equal (new Point (1, 1), new Point (Application.Driver!.Col, Application.Driver!.Row));
 
         view.Move (1, 1);
-        Assert.Equal (new (3, 3), new Point (Application.Driver!.Col, Application.Driver!.Row));
+        Assert.Equal (new Point (3, 3), new Point (Application.Driver!.Col, Application.Driver!.Row));
     }
 
     [Fact]
@@ -38,9 +39,11 @@ public class ClipTests (ITestOutputHelper _output)
             App = ApplicationImpl.Instance,
             X = 1,
             Y = 1,
-            Width = 3, Height = 3
+            Width = 3,
+            Height = 3
         };
-        view.Padding.Thickness = new (1);
+        view.Padding.EnsureView ();
+        view.Padding.Thickness = new Thickness (1);
         view.Padding.Diagnostics = ViewDiagnosticFlags.Thickness;
         view.BeginInit ();
         view.EndInit ();
@@ -67,17 +70,15 @@ public class ClipTests (ITestOutputHelper _output)
     [SetupFakeApplication]
     public void FillRect_Fills_HonorsClip (int x, int y, int width, int height)
     {
-        var superView = new View
-        {
-            App = ApplicationImpl.Instance,
-            Width = Dim.Fill (), Height = Dim.Fill ()
-        };
+        var superView = new View { App = ApplicationImpl.Instance, Width = Dim.Fill (), Height = Dim.Fill () };
 
         var view = new View
         {
             Text = "X",
-            X = 1, Y = 1,
-            Width = 3, Height = 3,
+            X = 1,
+            Y = 1,
+            Width = 3,
+            Height = 3,
             BorderStyle = LineStyle.Single
         };
         superView.Add (view);
@@ -87,8 +88,7 @@ public class ClipTests (ITestOutputHelper _output)
 
         superView.Draw ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
  ┌─┐
  │X│
  └─┘",
@@ -98,8 +98,7 @@ public class ClipTests (ITestOutputHelper _output)
         superView.SetClipToScreen ();
         view.FillRect (toFill);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
  ┌─┐
  │ │
  └─┘",
@@ -109,17 +108,15 @@ public class ClipTests (ITestOutputHelper _output)
         superView.SetNeedsDraw ();
         superView.Draw ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
  ┌─┐
  │X│
  └─┘",
                                                        _output);
-        toFill = new (-width, -height, width, height);
+        toFill = new Rectangle (-width, -height, width, height);
         view.FillRect (toFill);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
  ┌─┐
  │X│
  └─┘",
@@ -129,19 +126,17 @@ public class ClipTests (ITestOutputHelper _output)
         superView.SetNeedsDraw ();
         superView.Draw ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
  ┌─┐
  │X│
  └─┘",
                                                        _output);
-        toFill = new (-1, -1, width + 1, height + 1);
+        toFill = new Rectangle (-1, -1, width + 1, height + 1);
 
         superView.SetClipToScreen ();
         view.FillRect (toFill);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
  ┌─┐
  │ │
  └─┘",
@@ -151,18 +146,16 @@ public class ClipTests (ITestOutputHelper _output)
         superView.SetNeedsDraw ();
         superView.Draw ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
  ┌─┐
  │X│
  └─┘",
                                                        _output);
-        toFill = new (0, 0, width * 2, height * 2);
+        toFill = new Rectangle (0, 0, width * 2, height * 2);
         superView.SetClipToScreen ();
         view.FillRect (toFill);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                       @"
+        DriverAssert.AssertDriverContentsWithFrameAre (@"
  ┌─┐
  │ │
  └─┘",
@@ -178,13 +171,7 @@ public class ClipTests (ITestOutputHelper _output)
         Application.Driver!.SetScreenSize (30, 1);
         Application.Driver!.GetOutputBuffer ().SetWideGlyphReplacement ((Rune)'①');
 
-        var top = new View
-        {
-            App = ApplicationImpl.Instance,
-            Id = "top",
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        var top = new View { App = ApplicationImpl.Instance, Id = "top", Width = Dim.Fill (), Height = Dim.Fill () };
 
         var frameView = new View
         {
@@ -196,7 +183,7 @@ public class ClipTests (ITestOutputHelper _output)
                    """
         };
         frameView.Border.LineStyle = LineStyle.Single;
-        frameView.Border.Thickness = new (1, 0, 0, 0);
+        frameView.Border.Thickness = new Thickness (1, 0, 0, 0);
 
         top.Add (frameView);
         top.SetClipToScreen ();
@@ -219,7 +206,7 @@ public class ClipTests (ITestOutputHelper _output)
             Width = Dim.Auto (),
             BorderStyle = LineStyle.Single
         };
-        view.Border.Thickness = new (1, 0, 1, 0);
+        view.Border.Thickness = new Thickness (1, 0, 1, 0);
 
         top.Add (view);
         top.Layout ();
@@ -256,13 +243,10 @@ public class ClipTests (ITestOutputHelper _output)
         // Arrange
         var view = new View
         {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            ViewportSettings = ViewportSettingsFlags.ClipContentOnly,
-            App = ApplicationImpl.Instance
+            Width = Dim.Fill (), Height = Dim.Fill (), ViewportSettings = ViewportSettingsFlags.ClipContentOnly, App = ApplicationImpl.Instance
         };
         view.SetContentSize (new Size (10, 10));
-        view.Border.Thickness = new (1);
+        view.Border.Thickness = new Thickness (1);
         view.BeginInit ();
         view.EndInit ();
         Assert.Equal (view.Frame, view.GetClip ()!.GetBounds ());
@@ -281,6 +265,7 @@ public class ClipTests (ITestOutputHelper _output)
     {
         // Screen is 25x25
         Application.Driver!.SetScreenSize (25, 25);
+
         // View is 25x25
         // Viewport is (0, 0, 23, 23)
         // ContentSize is (10, 10)
@@ -290,14 +275,9 @@ public class ClipTests (ITestOutputHelper _output)
         Rectangle expectedClip = new (1, 1, 23, 23);
 
         // Arrange
-        var view = new View
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            App = ApplicationImpl.Instance
-        };
+        var view = new View { Width = Dim.Fill (), Height = Dim.Fill (), App = ApplicationImpl.Instance };
         view.SetContentSize (new Size (10, 10));
-        view.Border.Thickness = new (1);
+        view.Border.Thickness = new Thickness (1);
         view.BeginInit ();
         view.EndInit ();
         Assert.Equal (view.Frame, view.GetClip ()!.GetBounds ());
