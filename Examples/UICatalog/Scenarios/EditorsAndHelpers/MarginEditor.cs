@@ -10,18 +10,24 @@ public class MarginEditor : AdornmentEditor
         AdornmentChanged += MarginEditor_AdornmentChanged;
     }
 
-    private OptionSelector<Terminal.Gui.ViewBase.ShadowStyles>? _optionsShadow;
+    // Sentinel value representing ShadowStyles? = null (no shadow, no thickness)
+    private const int SHADOW_NULL_SENTINEL = -1;
+
+    private OptionSelector? _optionsShadow;
 
     private FlagSelector? _flagSelectorTransparent;
 
+    private static int ShadowStyleToInt (ShadowStyles? style) => style.HasValue ? (int)style.Value : SHADOW_NULL_SENTINEL;
+    private static ShadowStyles? IntToShadowStyle (int? value) => value is SHADOW_NULL_SENTINEL or null ? null : (ShadowStyles)value.Value;
+
     private void MarginEditor_AdornmentChanged (object? sender, EventArgs e)
     {
-        if (AdornmentToEdit is not null)
+        if (AdornmentToEdit is { })
         {
-            _optionsShadow!.Value = ((Margin)AdornmentToEdit).ShadowStyle;
+            _optionsShadow!.Value = ShadowStyleToInt (((Margin)AdornmentToEdit).ShadowStyle);
         }
 
-        if (AdornmentToEdit is not null)
+        if (AdornmentToEdit is { })
         {
             _flagSelectorTransparent!.Value = (int)((Margin)AdornmentToEdit).ViewportSettings;
         }
@@ -29,23 +35,24 @@ public class MarginEditor : AdornmentEditor
 
     private void MarginEditor_Initialized (object? sender, EventArgs e)
     {
-        _optionsShadow = new ()
+        _optionsShadow = new OptionSelector
         {
             X = 0,
             Y = Pos.Bottom (SubViews.ElementAt (SubViews.Count - 1)),
-
             SuperViewRendersLineCanvas = true,
             Title = "_Shadow",
             BorderStyle = LineStyle.Single,
-            AssignHotKeys = true
+            AssignHotKeys = true,
+            Values = [SHADOW_NULL_SENTINEL, (int)ShadowStyles.None, (int)ShadowStyles.Opaque, (int)ShadowStyles.Transparent],
+            Labels = ["Disabled", "None", "Opaque", "Transparent"]
         };
 
-        if (AdornmentToEdit is not null)
+        if (AdornmentToEdit is { })
         {
-            _optionsShadow.Value = ((Margin)AdornmentToEdit).ShadowStyle;
+            _optionsShadow.Value = ShadowStyleToInt (((Margin)AdornmentToEdit).ShadowStyle);
         }
 
-        _optionsShadow.ValueChanged += (_, args) => ((Margin)AdornmentToEdit!).ShadowStyle = args.Value!.Value;
+        _optionsShadow.ValueChanged += (_, args) => ((Margin)AdornmentToEdit!).ShadowStyle = IntToShadowStyle (args.NewValue);
 
         Add (_optionsShadow);
 
@@ -53,7 +60,6 @@ public class MarginEditor : AdornmentEditor
         {
             X = 0,
             Y = Pos.Bottom (_optionsShadow),
-
             SuperViewRendersLineCanvas = true,
             Title = "_ViewportSettings",
             BorderStyle = LineStyle.Single
@@ -64,7 +70,7 @@ public class MarginEditor : AdornmentEditor
 
         Add (_flagSelectorTransparent);
 
-        if (AdornmentToEdit is not null)
+        if (AdornmentToEdit is { })
         {
             _flagSelectorTransparent.Value = (int)((Margin)AdornmentToEdit).ViewportSettings;
         }

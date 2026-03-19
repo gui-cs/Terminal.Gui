@@ -1,5 +1,3 @@
-using System.Numerics;
-
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
@@ -124,9 +122,7 @@ public class MarginView : AdornmentView
             }
 
             // Do not include Margin views of subviews; not supported
-            foreach (View subview in view.GetSubViews (includePadding: true, includeBorder: true)
-                                         .OrderBy (v => v.ShadowStyle != ShadowStyles.None)
-                                         .Reverse ())
+            foreach (View subview in view.GetSubViews (includePadding: true, includeBorder: true).OrderBy (v => v.ShadowStyle != ShadowStyles.None).Reverse ())
             {
                 stack.Push (subview);
             }
@@ -188,6 +184,8 @@ public class MarginView : AdornmentView
     /// </summary>
     public ShadowStyles? SetShadow (ShadowStyles? style)
     {
+        bool hadShadow = _rightShadow is { } || _bottomShadow is { };
+
         if (_rightShadow is { })
         {
             Remove (_rightShadow);
@@ -204,16 +202,16 @@ public class MarginView : AdornmentView
 
         _originalThickness ??= Thickness;
 
-        if (ShadowStyle is not null)
+        if (hadShadow)
         {
-            // Turn off shadow
+            // Recover the original (pre-shadow) thickness by subtracting the old shadow size
             _originalThickness = new Thickness (Thickness.Left,
                                                 Thickness.Top,
                                                 Math.Max (Thickness.Right - ShadowSize.Width, 0),
                                                 Math.Max (Thickness.Bottom - ShadowSize.Height, 0));
         }
 
-        if (style is not null)
+        if (style is { })
         {
             // Turn on shadow
             _isThicknessChanging = true;
@@ -225,7 +223,7 @@ public class MarginView : AdornmentView
             _isThicknessChanging = false;
         }
 
-        if (style is not null)
+        if (style is { })
         {
             _rightShadow = new ShadowView
             {
@@ -262,11 +260,11 @@ public class MarginView : AdornmentView
         return style;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override ShadowStyles? ShadowStyle
     {
         get => (Adornment as Margin)?.ShadowStyle ?? null;
-        set => throw new InvalidOperationException ($"The ShadowStyle of MarginView cannot be set");
+        set => throw new InvalidOperationException ("The ShadowStyle of MarginView cannot be set");
     }
 
     /// <summary>

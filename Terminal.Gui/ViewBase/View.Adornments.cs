@@ -71,7 +71,8 @@ public partial class View // Adornments
     ///     Margin.
     /// </summary>
     /// <remarks>
-    ///     <see langword="null"/> will disable the shadow. All other values will add a shadow to the right and bottom sides of the Margin.
+    ///     <see langword="null"/> will disable the shadow. All other values will add a shadow to the right and bottom sides of
+    ///     the Margin.
     ///     The View 's <see cref="Frame"/> will be expanded to include the shadow.
     /// </remarks>
     public virtual ShadowStyles? ShadowStyle
@@ -114,16 +115,7 @@ public partial class View // Adornments
     /// <param name="style"></param>
     internal void SetShadowStyle (ShadowStyles? style)
     {
-        if (style is null)
-        {
-            Margin.Thickness = new Thickness (0);
-        }
-        else
-        {
-            // Causes EnsureView
-            Margin.ShadowStyle = style;
-        }
-
+        Margin.ShadowStyle = style;
 
         SetNeedsLayout ();
     }

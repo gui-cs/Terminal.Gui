@@ -38,10 +38,10 @@ public class Margin : AdornmentImpl
         return mv;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override Rectangle GetFrame () => Parent is { } ? Parent.Frame with { Location = Point.Empty } : Rectangle.Empty;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnThicknessChanged ()
     {
         base.OnThicknessChanged ();
@@ -74,16 +74,23 @@ public class Margin : AdornmentImpl
             }
             field = value;
 
-            if (field is null || EnsureView () is not MarginView marginView)
+            if (field is null)
+            {
+                // null means no shadow and no thickness
+                (View as MarginView)?.SetShadow (null);
+
+                return;
+            }
+
+            if (EnsureView () is not MarginView marginView)
             {
                 return;
             }
 
             switch (field)
             {
-                case ShadowStyles.None:
                 case ShadowStyles.Opaque:
-                case ShadowStyles.Transparent when (marginView?.ShadowSize.Width == 0 || marginView?.ShadowSize.Height == 0):
+                case ShadowStyles.Transparent when marginView.ShadowSize.Width == 0 || marginView.ShadowSize.Height == 0:
                 {
                     if (marginView.ShadowSize.Width != 1)
                     {
@@ -98,6 +105,9 @@ public class Margin : AdornmentImpl
                     break;
                 }
             }
+
+            // Always call SetShadow to update thickness and shadow views
+            marginView.SetShadow (field);
         }
     }
 

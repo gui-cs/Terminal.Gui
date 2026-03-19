@@ -65,7 +65,7 @@ public class ShadowTests (ITestOutputHelper output)
         Assert.Equal (new Thickness (3, 3, expected, expected), view.Margin.Thickness);
 
         view.ShadowStyle = ShadowStyles.None;
-        Assert.Equal (new Thickness (3), view.Margin.Thickness);
+        Assert.Equal (new Thickness (3, 3, expected, expected), view.Margin.Thickness);
         view.Dispose ();
     }
 
@@ -111,11 +111,14 @@ public class ShadowTests (ITestOutputHelper output)
     [Fact]
     public void Changing_ShadowStyle_Correctly_Set_ShadowWidth_ShadowHeight_Thickness ()
     {
-        View view = new () { ShadowStyle = ShadowStyles.Transparent };
+        View view = new ();
+        Assert.Equal (new Thickness (0, 0, 0, 0), view.Margin.Thickness);
+
+        view.ShadowStyle = ShadowStyles.Transparent;
         (view.Margin.View as MarginView)?.ShadowSize = new Size (2, 2);
         Assert.Equal (new Size (2, 2), (view.Margin.View as MarginView)?.ShadowSize);
         Assert.Equal (new Thickness (0, 0, 2, 2), view.Margin.Thickness);
-                    
+
         view.ShadowStyle = ShadowStyles.None;
         Assert.Equal (new Size (2, 2), (view.Margin.View as MarginView)?.ShadowSize);
         Assert.Equal (new Thickness (0, 0, 2, 2), view.Margin.Thickness);
@@ -134,7 +137,7 @@ public class ShadowTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (ShadowStyles.None, 2, 1, 3, 0, 0, 0)]
+    [InlineData (ShadowStyles.None, 2, 1, 3, 2, 2, 3)]
     [InlineData (ShadowStyles.Opaque, 1, 1, 1, 1, 1, 1)]
     [InlineData (ShadowStyles.Transparent, 2, 1, 3, 2, 2, 3)]
     public void Changing_ShadowWidth_ShadowHeight_Correctly_Set_Thickness (ShadowStyles style,
@@ -164,7 +167,7 @@ public class ShadowTests (ITestOutputHelper output)
         view.ShadowStyle = ShadowStyles.None;
         Assert.Equal (expectedLength3, (view.Margin.View as MarginView)?.ShadowSize.Width);
         Assert.Equal (expectedLength3, (view.Margin.View as MarginView)?.ShadowSize.Height);
-        Assert.Equal (new Thickness (0, 0, 0, 0), view.Margin.Thickness);
+        Assert.Equal (new Thickness (0, 0, expectedThickness3, expectedThickness3), view.Margin.Thickness);
     }
 
     [Theory]
@@ -422,8 +425,8 @@ public class ShadowTests (ITestOutputHelper output)
 
     [Theory]
     [InlineData (ShadowStyles.None, 3, 4, 4)]
-    [InlineData (ShadowStyles.Opaque, 4, 5, 4)]
-    [InlineData (ShadowStyles.Transparent, 4, 5, 4)]
+    [InlineData (ShadowStyles.Opaque, 4, 5, 5)]
+    [InlineData (ShadowStyles.Transparent, 4, 5, 5)]
     public void Margin_Thickness_Changes_Adjust_Correctly (ShadowStyles style, int expectedThickness, int expectedThicknessAdjust, int expectedThicknessNone)
     {
         var view = new View ();
