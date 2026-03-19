@@ -31,7 +31,7 @@ public interface IAdornmentView
 
     /// <summary>
     ///     The thickness of this adornment layer. Every adornment view renders within
-    ///     its <see cref="Thickness"/>.
+    ///     its <see cref="IAdornment.Thickness"/>.
     /// </summary>
     Thickness Thickness { get; set; }
 }

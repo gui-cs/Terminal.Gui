@@ -32,7 +32,7 @@ public class AdornmentView : View, IAdornmentView, IDesignable
     {
         // Set Adornment FIRST so subclass constructors can reference it safely.
         Adornment = adornment;
-        //Parent = parent;
+
         // By default, Adornments can't get focus; has to be enabled specifically.
         CanFocus = false;
         TabStop = TabBehavior.NoStop;

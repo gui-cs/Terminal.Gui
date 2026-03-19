@@ -104,7 +104,7 @@ internal sealed class Arranger : IDisposable
         // If mouse click is outside of Border.Thickness then exit Arrange Mode
         Point framePos = _border.ScreenToFrame (mouse.ScreenPosition);
 
-        if (!_border.Thickness.Contains (_border.Frame, framePos))
+        if (!_border.Adornment!.Thickness.Contains (_border.Frame, framePos))
         {
             ExitArrangeMode ();
         }
@@ -447,8 +447,8 @@ internal sealed class Arranger : IDisposable
             return false;
         }
 
-        int minHeight = _border.Thickness.Vertical + parent.Margin.Thickness.Bottom;
-        int minWidth = _border.Thickness.Horizontal + parent.Margin.Thickness.Right;
+        int minHeight = _border.Adornment!.Thickness.Vertical + parent.Margin.Thickness.Bottom;
+        int minWidth = _border.Adornment!.Thickness.Horizontal + parent.Margin.Thickness.Right;
         ViewManipulator manipulator = new (parent, minWidth, minHeight);
         var handled = false;
 
@@ -483,8 +483,8 @@ internal sealed class Arranger : IDisposable
             return false;
         }
 
-        int minHeight = _border.Thickness.Vertical + parent.Margin.Thickness.Bottom;
-        int minWidth = _border.Thickness.Horizontal + parent.Margin.Thickness.Right;
+        int minHeight = _border.Adornment!.Thickness.Vertical + parent.Margin.Thickness.Bottom;
+        int minWidth = _border.Adornment!.Thickness.Horizontal + parent.Margin.Thickness.Right;
         ViewManipulator manipulator = new (parent, minWidth, minHeight);
         var handled = false;
 
@@ -519,8 +519,8 @@ internal sealed class Arranger : IDisposable
             return false;
         }
 
-        int minHeight = _border.Thickness.Vertical + parent.Margin.Thickness.Bottom;
-        int minWidth = _border.Thickness.Horizontal + parent.Margin.Thickness.Right;
+        int minHeight = _border.Adornment!.Thickness.Vertical + parent.Margin.Thickness.Bottom;
+        int minWidth = _border.Adornment!.Thickness.Horizontal + parent.Margin.Thickness.Right;
         ViewManipulator manipulator = new (parent, minWidth, minHeight);
         var handled = false;
 
@@ -555,8 +555,8 @@ internal sealed class Arranger : IDisposable
             return false;
         }
 
-        int minHeight = _border.Thickness.Vertical + parent.Margin.Thickness.Bottom;
-        int minWidth = _border.Thickness.Horizontal + parent.Margin.Thickness.Right;
+        int minHeight = _border.Adornment!.Thickness.Vertical + parent.Margin.Thickness.Bottom;
+        int minWidth = _border.Adornment!.Thickness.Horizontal + parent.Margin.Thickness.Right;
         ViewManipulator manipulator = new (parent, minWidth, minHeight);
         var handled = false;
 
@@ -742,7 +742,7 @@ internal sealed class Arranger : IDisposable
 
         ViewArrangement parentArrangement = parent.Arrangement;
         Rectangle frame = _border.Frame;
-        Thickness thickness = _border.Thickness;
+        Thickness thickness = _border.Adornment!.Thickness;
 
         // Check edges first (larger hit areas)
         // Left edge
@@ -881,8 +881,8 @@ internal sealed class Arranger : IDisposable
             return;
         }
 
-        int minHeight = _border.Thickness.Vertical + parent.Margin.Thickness.Bottom;
-        int minWidth = _border.Thickness.Horizontal + parent.Margin.Thickness.Right;
+        int minHeight = _border.Adornment!.Thickness.Vertical + parent.Margin.Thickness.Bottom;
+        int minWidth = _border.Adornment!.Thickness.Horizontal + parent.Margin.Thickness.Right;
 
         ViewManipulator manipulator = new (parent, GrabPoint, minWidth, minHeight);
 

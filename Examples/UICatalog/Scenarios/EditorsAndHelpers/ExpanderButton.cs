@@ -64,8 +64,8 @@ public class ExpanderButton : Button
 
         Visible = Orientation switch
                   {
-                      Orientation.Vertical => borderView.Thickness.Top > 0,
-                      Orientation.Horizontal => borderView.Thickness.Left > 0,
+                      Orientation.Vertical => borderView.Adornment?.Thickness.Top > 0,
+                      Orientation.Horizontal => borderView.Adornment?.Thickness.Left > 0,
                       _ => Visible
                   };
     }
