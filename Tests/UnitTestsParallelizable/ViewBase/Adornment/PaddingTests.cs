@@ -1,4 +1,7 @@
-﻿namespace ViewBaseTests.Adornments;
+﻿using Microsoft.VisualStudio.TestPlatform.Utilities;
+using UnitTests;
+
+namespace ViewBaseTests.Adornments;
 
 public class PaddingTests
 {
@@ -90,5 +93,30 @@ public class PaddingTests
 
         parent.Margin.Thickness = new Thickness (1);
         Assert.Equal (new Rectangle (2, 2, 26, 36), padding.GetFrame ());
+    }
+
+    [Fact]
+    public void Uses_Parent_Scheme ()
+    {
+        View view = new () { Height = 3, Width = 3 };
+        view.Padding.Thickness = new Thickness (1);
+
+        view.SetScheme (new Scheme { Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red) });
+
+        Assert.Equal (ColorName16.Red, view.Padding.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Normal), view.Padding.GetAttributeForRole (VisualRole.Normal));
+    }
+
+    [Fact]
+    public void Uses_Parent_Scheme_With_View ()
+    {
+        View view = new () { Height = 3, Width = 3 };
+        view.Padding.EnsureView ();
+        view.Padding.Thickness = new Thickness (1);
+
+        view.SetScheme (new Scheme { Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red) });
+
+        Assert.Equal (ColorName16.Red, view.Padding.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Normal), view.Padding.GetAttributeForRole (VisualRole.Normal));
     }
 }
