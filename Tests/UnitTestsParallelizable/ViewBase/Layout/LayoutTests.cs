@@ -448,6 +448,32 @@ public class LayoutTests
         superView.BeginInit ();
         superView.EndInit ();
         superView.LayoutSubViews ();
+        Assert.Equal (2, layoutStartedRaised);
+        Assert.Equal (2, layoutCompleteRaised);
+    }
+
+    [Fact]
+    public void LayoutSubViews_Adornment_Views_Raises_LayoutStarted_LayoutComplete ()
+    {
+        var superView = new View { Id = "superView" };
+        var layoutStartedRaised = 0;
+        var layoutCompleteRaised = 0;
+
+        superView.Border.EnsureView ();
+        superView.Padding.EnsureView ();
+        superView.Margin.EnsureView ();
+
+        superView.SubViewLayout += (sender, e) => layoutStartedRaised++;
+        superView.SubViewsLaidOut += (sender, e) => layoutCompleteRaised++;
+
+        superView.SetNeedsLayout ();
+        superView.LayoutSubViews ();
+        Assert.Equal (1, layoutStartedRaised);
+        Assert.Equal (1, layoutCompleteRaised);
+
+        superView.BeginInit ();
+        superView.EndInit ();
+        superView.LayoutSubViews ();
         Assert.Equal (3, layoutStartedRaised);
         Assert.Equal (3, layoutCompleteRaised);
     }

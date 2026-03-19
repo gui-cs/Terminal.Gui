@@ -193,6 +193,7 @@ public class GetViewsAtLocationTests
     {
         TestView root = new (0, 0, 10, 10);
         root.Padding.Thickness = new Thickness (1);
+        root.Padding.EnsureView ();
         List<View?> result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
@@ -263,6 +264,7 @@ public class GetViewsAtLocationTests
         TestView root = new (0, 0, 10, 10);
         TestView sub = new (2, 2, 5, 5);
         sub.Padding.Thickness = new Thickness (1);
+        sub.Padding.EnsureView ();
         root.Add (sub);
 
         List<View?> result = View.GetViewsAtLocation (root, new Point (2, 2));

@@ -1029,7 +1029,7 @@ public class ArrangerTests
         Assert.Equal (1, moveButton.Frame.Height);
         Assert.True (moveButton.NoDecorations);
         Assert.True (moveButton.NoPadding);
-        Assert.Equal (ShadowStyles.None, moveButton.ShadowStyle);
+        Assert.Null (moveButton.ShadowStyle);
     }
 
     #endregion

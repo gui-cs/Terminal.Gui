@@ -105,10 +105,11 @@ public class GetViewsUnderLocationForRootTests
         Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
         top.Border.Thickness = new Thickness (1);
         top.Padding.Thickness = new Thickness (1);
+        top.Padding.EnsureView ();
         top.Layout ();
         List<View?> result = View.GetViewsUnderLocation (top, new Point (1, 1), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
-        Assert.Contains (top.Padding.View!, result);
+        Assert.Contains (top.Padding.View, result);
     }
 
     [Fact]
