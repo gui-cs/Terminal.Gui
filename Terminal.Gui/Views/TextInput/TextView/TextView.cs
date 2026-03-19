@@ -135,9 +135,6 @@ public partial class TextView : View, IDesignable
 
         ContextMenu = CreateContextMenu ();
 
-        base.EndInit ();
-
-        // These depend on IsInitialized (set by base.EndInit) and must run after.
         UpdateScrollBars ();
         UpdateContentSize ();
         PositionCursor ();
@@ -151,6 +148,8 @@ public partial class TextView : View, IDesignable
                 KeyBindings.Add (key, Command.Context);
             }
         }
+
+        base.EndInit ();
     }
 
     /// <inheritdoc/>
