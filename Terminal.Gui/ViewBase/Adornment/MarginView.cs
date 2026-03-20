@@ -13,7 +13,7 @@ namespace Terminal.Gui.ViewBase;
 ///         Margins are drawn after all other Views in the application View hierarchy are drawn.
 ///     </para>
 ///     <para>
-///         Margins have <see cref="ViewportSettingsFlags.TransparentMouse"/> enabled by default and are thus
+///         Margins have <see cref="ViewportSettingsFlags.Transparent"/> and <see cref="ViewportSettingsFlags.TransparentMouse"/> enabled by default and are thus
 ///         transparent to the mouse. This can be overridden by explicitly setting <see cref="ViewportSettingsFlags"/>.
 ///     </para>
 ///     <para>See the <see cref="AdornmentView"/> class.</para>

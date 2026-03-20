@@ -94,11 +94,18 @@ public class MarginTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Is_Transparent_To_Mouse ()
+    public void Is_Transparent_To_Mouse_With_View ()
     {
         View view = new () { Height = 3, Width = 3 };
         view.Margin.EnsureView ();
         Assert.True (view.Margin.View?.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse), "Margin should be transparent to mouse by default.");
+    }
+
+    [Fact]
+    public void Is_Transparent_To_Mouse ()
+    {
+        Margin margin = new Margin ();
+        Assert.True (margin.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse), "Margin should be transparent to mouse by default.");
     }
 
     [Fact]

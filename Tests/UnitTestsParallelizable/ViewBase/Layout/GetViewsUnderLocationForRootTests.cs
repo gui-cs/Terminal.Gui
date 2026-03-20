@@ -69,7 +69,7 @@ public class GetViewsUnderLocationForRootTests
     }
 
     [Fact]
-    public void Returns_WhenPointIn_TransparentToMouseMargin_None ()
+    public void Returns_WhenPointIn_TransparentToMouseMarginView_None ()
     {
         Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
         top.Margin.Thickness = new Thickness (1);
@@ -77,11 +77,22 @@ public class GetViewsUnderLocationForRootTests
         top.Margin.View?.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
         List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
         Assert.DoesNotContain (top, result);
-        Assert.DoesNotContain (top.Margin.View!, result);
+        Assert.DoesNotContain (top.Margin.View, result);
     }
 
     [Fact]
-    public void Returns_WhenPointIn_NotTransparentToMouseMargin_Top_And_Margin ()
+    public void Returns_WhenPointIn_TransparentToMouseMargin_None ()
+    {
+        Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
+        top.Margin.Thickness = new Thickness (1);
+        top.Margin.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
+        List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
+        Assert.DoesNotContain (top, result);
+        Assert.DoesNotContain (top.Margin.View, result);
+    }
+
+    [Fact]
+    public void Returns_WhenPointIn_NotTransparentToMouseMarginView_Top_And_Margin ()
     {
         Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
         top.Margin.Thickness = new Thickness (1);
@@ -90,6 +101,17 @@ public class GetViewsUnderLocationForRootTests
         List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
         Assert.Contains (top.Margin.View!, result);
+    }
+
+    [Fact]
+    public void Returns_WhenPointIn_NotTransparentToMouseMargin_Top ()
+    {
+        Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
+        top.Margin.Thickness = new Thickness (1);
+        top.Margin.ViewportSettings = ViewportSettingsFlags.None;
+        List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
+        Assert.Contains (top, result);
+        Assert.DoesNotContain (top.Margin.View, result);
     }
 
     [Fact]

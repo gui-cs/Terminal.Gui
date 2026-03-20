@@ -14,26 +14,21 @@ namespace Terminal.Gui.ViewBase;
 ///         Margins are drawn after all other Views in the application View hierarchy are drawn.
 ///     </para>
 ///     <para>
-///         Margins have <see cref="ViewportSettingsFlags.TransparentMouse"/> enabled by default and are thus
-///         transparent to the mouse.
+///         Margins have <see cref="ViewportSettingsFlags.Transparent"/> and <see cref="ViewportSettingsFlags.TransparentMouse"/> enabled by default and are thus
+///         transparent to the mouse. This can be overridden by explicitly setting <see cref="ViewportSettingsFlags"/>.
 ///     </para>
 /// </remarks>
 public class Margin : AdornmentImpl
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    public Margin () => ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
+
     /// <inheritdoc/>
     protected override AdornmentView CreateView ()
     {
         MarginView mv = new (this);
-
-        //if (ShadowStyle != ViewBase.ShadowStyle.None)
-        //{
-        //    mv.ShadowStyle = ShadowStyle;
-        //}
-
-        //if (ShadowSize != Size.Empty)
-        //{
-        //    mv.ShadowSize = ShadowSize;
-        //}
 
         return mv;
     }

@@ -1280,14 +1280,14 @@ public partial class View // Layout APIs
 
                                           bool? ret = null;
 
-                                          if (viewsUnderLocation.Contains (v.Margin.View)
-                                              && v.Margin.View!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          if (viewsUnderLocation.Contains (v.Margin.View) 
+                                              && v.Margin.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
                                           {
                                               ret = true;
                                           }
 
                                           if (viewsUnderLocation.Contains (v.Border.View)
-                                              && v.Border.View!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                              && v.Border.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
                                           {
                                               ret = true;
                                           }
@@ -1346,33 +1346,33 @@ public partial class View // Layout APIs
             // Push in reverse order (Padding, Border, Margin) so they're processed in correct order (Margin, Border, Padding)
             Point superViewRelativeLocation = currentView.SuperView?.ScreenToViewport (location) ?? location;
 
-            if (currentView.Padding is { } padding && padding.Thickness != Thickness.Empty)
+            if (currentView.Padding.Thickness != Thickness.Empty)
             {
-                if (padding.Contains (superViewRelativeLocation) && padding.FrameToScreen ().Contains (location))
+                if (currentView.Padding.Contains (superViewRelativeLocation) && currentView.Padding.FrameToScreen ().Contains (location))
                 {
-                    if (padding.View is { } pv)
+                    if (currentView.Padding.View is { } pv)
                     {
                         viewsToProcess.Push (pv);
                     }
                 }
             }
 
-            if (currentView.Border is { } border && border.Thickness != Thickness.Empty)
+            if (currentView.Border.Thickness != Thickness.Empty)
             {
-                if (border.Contains (superViewRelativeLocation) && border.FrameToScreen ().Contains (location))
+                if (currentView.Border.Contains (superViewRelativeLocation) && currentView.Border.FrameToScreen ().Contains (location))
                 {
-                    if (border.View is { } bv)
+                    if (currentView.Border.View is { } bv)
                     {
                         viewsToProcess.Push (bv);
                     }
                 }
             }
 
-            if (currentView.Margin is { } margin && margin.Thickness != Thickness.Empty)
+            if (currentView.Margin.Thickness != Thickness.Empty)
             {
-                if (margin.Contains (superViewRelativeLocation) && margin.FrameToScreen ().Contains (location))
+                if (currentView.Margin.Contains (superViewRelativeLocation) && currentView.Margin.FrameToScreen ().Contains (location))
                 {
-                    if (margin.View is { } mv)
+                    if (currentView.Margin.View is { } mv)
                     {
                         viewsToProcess.Push (mv);
                     }
