@@ -248,4 +248,77 @@ public class AdornmentLayoutTests
     }
 
     #endregion
+
+    #region Padding View Creation via ScrollBar
+
+    [Fact]
+    public void Padding_View_Not_Created_When_Only_Thickness_Set ()
+    {
+        View view = new ();
+        view.Padding.Thickness = new Thickness (1);
+
+        // PaddingView should NOT exist — only Padding.Add triggers EnsureView
+        Assert.Null (view.Padding.View);
+    }
+
+    [Fact]
+    public void Padding_View_Created_When_ScrollBar_Accessed ()
+    {
+        // Replicates what happens in TextView: accessing a ScrollBar triggers
+        // Padding.Add(scrollBar) which calls EnsureView, creating the PaddingView.
+        View view = new () { Width = 10, Height = 5 };
+        view.BeginInit ();
+        view.EndInit ();
+
+        // Access the vertical scrollbar — this triggers lazy creation via Padding.Add
+        ScrollBar vbar = view.VerticalScrollBar;
+        Assert.NotNull (vbar);
+        Assert.NotNull (view.Padding.View);
+    }
+
+    [Fact]
+    public void ScrollBar_In_Padding_Is_Initialized_After_Parent_Init ()
+    {
+        // The real scenario: a View accesses its ScrollBar during EndInit
+        // (like TextView does). The PaddingView must be properly initialized.
+        View view = new () { Width = 10, Height = 5 };
+        view.BeginInit ();
+        view.EndInit ();
+
+        // Force scrollbar creation
+        ScrollBar vbar = view.VerticalScrollBar;
+
+        // The PaddingView should be initialized
+        Assert.True (view.Padding.View!.IsInitialized,
+                      "PaddingView should be initialized after parent init");
+
+        // The scrollbar should be a subview of the PaddingView
+        Assert.Contains (vbar, view.Padding.View.SubViews);
+    }
+
+    [Fact]
+    public void Padding_With_ScrollBar_Found_By_GetViewsAtLocation ()
+    {
+        // When a View has a scrollbar, the PaddingView exists and has non-empty
+        // thickness (configured by OnScrollBarInitialized). Hit testing should find it.
+        View view = new () { Width = 10, Height = 5 };
+        //view.BeginInit ();
+        //view.EndInit ();
+
+        // Force scrollbar creation and make it visible
+        view.VerticalScrollBar.Visible = true;
+        Assert.NotNull (view.Padding.View);
+
+        // After scrollbar is visible, Padding.Thickness.Right should be > 0
+        Assert.True (view.Padding.Thickness.Right > 0,
+                      "Padding should have right thickness for vertical scrollbar");
+
+        view.SetRelativeLayout (new Size (20, 20));
+
+        List<View?> result = View.GetViewsAtLocation (view, new Point (9, 2));
+
+        Assert.Contains (result, v => v == view.Padding.View);
+    }
+
+    #endregion
 }

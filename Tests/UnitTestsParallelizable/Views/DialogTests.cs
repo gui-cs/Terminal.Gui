@@ -2438,6 +2438,35 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
             Driver = driver
         };
 
+        dialog.Layout ();
+        dialog.Draw ();
+
+        var expected = """
+                       ┌────┐
+                       └────┘
+                       """;
+
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
+
+        dialog.Dispose ();
+    }
+
+
+    [Fact]
+    public void Generic_With_Buttons_Draws_Correctly ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (30, 10);
+
+        Dialog<Color> dialog = new ()
+        {
+            X = 0,
+            Y = 0,
+            BorderStyle = LineStyle.Single,
+            ShadowStyle = null,
+            Driver = driver
+        };
+
         Button cancelButton = new ()
         {
             Title = "No",

@@ -59,6 +59,9 @@ public partial class View
 
     private ScrollBar CreateScrollBar (Orientation orientation)
     {
+        // Ensure padding can support SubViews
+        Padding.EnsureView ();
+
         ScrollBar scrollBar = new ()
         {
             Orientation = orientation, Visible = false // Initially hidden until needed
@@ -67,16 +70,20 @@ public partial class View
         if (orientation == Orientation.Vertical)
         {
             ConfigureVerticalScrollBar (scrollBar);
+            ConfigureVerticalScrollBarEvents (scrollBar);
         }
         else
         {
             ConfigureHorizontalScrollBar (scrollBar);
+            ConfigureHorizontalScrollBarEvents (scrollBar);
         }
 
         scrollBar.Initialized += OnScrollBarInitialized;
 
         // Add after setting Initialized event!
-        Padding.Add (scrollBar);
+        Padding.View!.Add (scrollBar);
+
+        scrollBar.Layout ();
 
         return scrollBar;
     }
@@ -95,6 +102,13 @@ public partial class View
         ViewportChanged += (_, _) => { scrollBar.Value = Viewport.Y; };
 
         ContentSizeChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Height; };
+
+        FrameChanged += (_, a) =>
+                        {
+                            scrollBar.VisibleContentSize = Viewport.Height;
+                            scrollBar.ScrollableContentSize = GetContentSize ().Height;
+
+                        };
     }
 
     private void ConfigureHorizontalScrollBar (ScrollBar scrollBar)
@@ -111,6 +125,12 @@ public partial class View
         ViewportChanged += (_, _) => { scrollBar.Value = Viewport.X; };
 
         ContentSizeChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Width; };
+
+        FrameChanged += (_, a) =>
+                        {
+                            scrollBar.VisibleContentSize = Viewport.Width;
+                            scrollBar.ScrollableContentSize = GetContentSize ().Width;
+                        };
     }
 
     private void OnScrollBarInitialized (object? sender, EventArgs e)
@@ -119,12 +139,13 @@ public partial class View
 
         if (scrollBar.Orientation == Orientation.Vertical)
         {
-            ConfigureVerticalScrollBarEvents (scrollBar);
+            Padding.Thickness = Padding.Thickness with { Right = scrollBar.Visible ? Padding.Thickness.Right + 1 : Padding.Thickness.Right };
         }
         else
         {
-            ConfigureHorizontalScrollBarEvents (scrollBar);
+            Padding.Thickness = Padding.Thickness with { Bottom = scrollBar.Visible ? Padding.Thickness.Bottom + 1 : Padding.Thickness.Bottom };
         }
+        scrollBar.Layout ();
     }
 
     private void ConfigureVerticalScrollBarEvents (ScrollBar scrollBar)

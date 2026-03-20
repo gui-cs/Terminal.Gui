@@ -724,9 +724,9 @@ public partial class View // Layout APIs
         SubViewLayout?.Invoke (this, new LayoutEventArgs (contentSize));
 
         // The Adornments already have their Frame's set by SetRelativeLayout so we call LayoutSubViews vs. Layout here.
-        Margin.LayoutSubViews ();
+        Margin.View?.LayoutSubViews ();
         Border.View?.LayoutSubViews ();
-        Padding.LayoutSubViews ();
+        Padding.View?.LayoutSubViews ();
 
         // Sort out the dependencies of the X, Y, Width, Height properties
         HashSet<View> nodes = new ();

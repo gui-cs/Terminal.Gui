@@ -177,13 +177,7 @@ public abstract class AdornmentImpl : IAdornment
     }
 
     /// <summary>Marks the backing <see cref="View"/> as needing layout. No-op if no View exists.</summary>
-    public void SetNeedsLayout ()
-    {
-        if (View is { })
-        {
-            View.SetNeedsLayout ();
-        }
-    }
+    public void SetNeedsLayout () => View?.SetNeedsLayout ();
 
     /// <summary>Sets the <see cref="Scheme"/> on the backing <see cref="View"/>. No-op if no View exists.</summary>
     public void SetScheme (Scheme scheme) => View?.SetScheme (scheme);

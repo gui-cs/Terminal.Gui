@@ -339,12 +339,6 @@ public partial class View
     {
         get
         {
-            if (Margin is null || Border is null || Padding is null)
-            {
-                // CreateAdornments has not been called yet.
-                return new Rectangle (_viewportLocation, Frame.Size);
-            }
-
             Thickness thickness = GetAdornmentsThickness ();
 
             return new Rectangle (_viewportLocation,
