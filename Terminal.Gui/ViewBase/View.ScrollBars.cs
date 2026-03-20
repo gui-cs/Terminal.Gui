@@ -103,12 +103,7 @@ public partial class View
 
         ContentSizeChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Height; };
 
-        FrameChanged += (_, a) =>
-                        {
-                            scrollBar.VisibleContentSize = Viewport.Height;
-                            scrollBar.ScrollableContentSize = GetContentSize ().Height;
-
-                        };
+        FrameChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Height; };
     }
 
     private void ConfigureHorizontalScrollBar (ScrollBar scrollBar)
@@ -126,11 +121,7 @@ public partial class View
 
         ContentSizeChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Width; };
 
-        FrameChanged += (_, a) =>
-                        {
-                            scrollBar.VisibleContentSize = Viewport.Width;
-                            scrollBar.ScrollableContentSize = GetContentSize ().Width;
-                        };
+        FrameChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Width; };
     }
 
     private void OnScrollBarInitialized (object? sender, EventArgs e)

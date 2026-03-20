@@ -8,7 +8,16 @@ public class PaddingTests
     [Fact]
     public void Constructor_Defaults ()
     {
+        Padding padding = new ();
+        Assert.Null (padding.View);
+    }
+
+    [Fact]
+    public void View_Constructor_Defaults ()
+    {
         View view = new () { Height = 3, Width = 3 };
+        Assert.Null (view.Padding.View);
+
         view.Padding.EnsureView ();
         Assert.True (view.Padding.View?.CanFocus);
         Assert.Equal (TabBehavior.NoStop, view.Padding.View?.TabStop);

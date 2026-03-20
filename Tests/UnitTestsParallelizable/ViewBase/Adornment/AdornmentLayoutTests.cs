@@ -31,11 +31,11 @@ public class AdornmentLayoutTests
     }
 
     [Fact]
-    public void Margin_View_Created_When_Thickness_Set ()
+    public void Margin_View_Not_Created_When_Thickness_Set ()
     {
         View view = new ();
         view.Margin.Thickness = new Thickness (1);
-        Assert.NotNull (view.Margin.View);
+        Assert.Null (view.Margin.View);
     }
 
     [Fact]

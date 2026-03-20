@@ -287,19 +287,19 @@ public partial class View // Drawing APIs
     {
         // Only draw Margin here if it is not Transparent. Transparent Margins are drawn in a separate pass in the static View.Draw
         // via Margin.DrawTransparentMargins.
-        if (Margin is { } && !Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
+        if (!Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) || Margin.Thickness != Thickness.Empty)
         {
             Margin.Draw ();
         }
 
         // Each of these renders lines to this View's LineCanvas
         // Those lines will be finally rendered in OnRenderLineCanvas
-        if (Border is { } && Border.Thickness != Thickness.Empty)
+        if (Border.Thickness != Thickness.Empty)
         {
             Border.Draw ();
         }
 
-        if (Padding is { } && Padding.Thickness != Thickness.Empty)
+        if (Padding.Thickness != Thickness.Empty)
         {
             Padding.Draw ();
         }

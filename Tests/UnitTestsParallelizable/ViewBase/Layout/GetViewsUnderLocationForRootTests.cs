@@ -61,7 +61,8 @@ public class GetViewsUnderLocationForRootTests
     {
         Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
         top.Margin.Thickness = new Thickness (1);
-        top.Margin.ViewportSettings = ViewportSettingsFlags.None;
+        top.Margin.EnsureView ();
+        top.Margin.View?.ViewportSettings = ViewportSettingsFlags.None;
         List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
         Assert.Contains (top.Margin.View!, result);
@@ -72,7 +73,8 @@ public class GetViewsUnderLocationForRootTests
     {
         Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
         top.Margin.Thickness = new Thickness (1);
-        top.Margin.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
+        top.Margin.EnsureView ();
+        top.Margin.View?.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
         List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
         Assert.DoesNotContain (top, result);
         Assert.DoesNotContain (top.Margin.View!, result);
@@ -83,7 +85,8 @@ public class GetViewsUnderLocationForRootTests
     {
         Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
         top.Margin.Thickness = new Thickness (1);
-        top.Margin.ViewportSettings = ViewportSettingsFlags.None;
+        top.Margin.EnsureView ();
+        top.Margin.View?.ViewportSettings = ViewportSettingsFlags.None;
         List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
         Assert.Contains (top.Margin.View!, result);
@@ -145,7 +148,8 @@ public class GetViewsUnderLocationForRootTests
 
         View subView = new () { Frame = new Rectangle (0, 0, 5, 5) };
         subView.Margin.Thickness = new Thickness (1);
-        subView.Margin.ViewportSettings = ViewportSettingsFlags.None;
+        subView.Margin.EnsureView ();
+        subView.Margin.View?.ViewportSettings = ViewportSettingsFlags.None;
         top.Add (subView);
 
         Assert.True (subView.Contains (new Point (4, 4)));
@@ -154,7 +158,7 @@ public class GetViewsUnderLocationForRootTests
         Assert.Contains (subView.Margin.View!, result);
         Assert.Contains (subView, result);
 
-        subView.Margin.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
+        subView.Margin.View?.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
 
         result = View.GetViewsUnderLocation (top, new Point (4, 4), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);

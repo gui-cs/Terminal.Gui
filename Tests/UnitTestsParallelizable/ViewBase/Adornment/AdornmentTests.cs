@@ -1,6 +1,8 @@
+using UnitTests;
+
 namespace ViewBaseTests.Adornments;
 
-public class AdornmentTests
+public class AdornmentTests (ITestOutputHelper output) : TestDriverBase
 {
     // Test that Adornment.Viewport_get override returns Frame.Size minus Thickness
     [Theory]
@@ -253,10 +255,10 @@ public class AdornmentTests
         var raised = false;
 
         view.Margin.ThicknessChanged += (s, e) =>
-                                         {
-                                             raised = true;
-                                             Assert.Equal (new Thickness (1, 2, 3, 4), view.Margin.Thickness);
-                                         };
+                                        {
+                                            raised = true;
+                                            Assert.Equal (new Thickness (1, 2, 3, 4), view.Margin.Thickness);
+                                        };
         view.Margin.Thickness = new Thickness (1, 2, 3, 4);
         Assert.True (raised);
     }
@@ -272,7 +274,6 @@ public class AdornmentTests
         parent.SubViewLayout += LayoutStarted;
         parent.Margin.Thickness = new Thickness (1, 2, 3, 4);
         Assert.True (parent.NeedsLayout);
-        Assert.True (parent.Margin.NeedsLayout);
         parent.Layout ();
         Assert.True (raised);
 
@@ -415,6 +416,81 @@ public class AdornmentTests
 
         bool result = adornment.Contains (new Point (pointX, pointY));
         Assert.Equal (expected, result);
+    }
+
+    [Fact]
+    public void Border_Is_Cleared_After_Margin_Thickness_Change ()
+    {
+        IDriver driver = CreateTestDriver ();
+
+        View view = new ()
+        {
+            Driver = driver,
+            Text = "View",
+            Width = 6,
+            Height = 3,
+            BorderStyle = LineStyle.Rounded
+        };
+
+        // Remove border bottom thickness
+        view.Border.Thickness = new Thickness (1, 1, 1, 0);
+
+        // Add margin bottom thickness
+        view.Margin.Thickness = new Thickness (0, 0, 0, 1);
+
+        Assert.Equal (6, view.Width);
+        Assert.Equal (3, view.Height);
+
+        view.Draw ();
+
+        DriverAssert.AssertDriverContentsWithFrameAre ("""
+                                                       ╭────╮
+                                                       │View│
+                                                       """,
+                                                       output,
+                                                       driver);
+
+        // Add border bottom thickness
+        view.Border.Thickness = new Thickness (1, 1, 1, 1);
+
+        // Remove margin bottom thickness
+        view.Margin.Thickness = new Thickness (0, 0, 0, 0);
+
+        view.Draw ();
+
+        Assert.Equal (6, view.Width);
+        Assert.Equal (3, view.Height);
+
+        DriverAssert.AssertDriverContentsWithFrameAre ("""
+                                                       ╭────╮
+                                                       │View│
+                                                       ╰────╯
+                                                       """,
+                                                       output,
+                                                       driver);
+
+        // Remove border bottom thickness
+        view.Border.Thickness = new Thickness (1, 1, 1, 0);
+
+        // Add margin bottom thickness
+        view.Margin.Thickness = new Thickness (0, 0, 0, 1);
+
+        Assert.Equal (6, view.Width);
+        Assert.Equal (3, view.Height);
+
+        // Because view has no SuperView, and because there's no LayoutAndDraw loop
+        // and because the Margin is transparent, the bottom border drawn above
+        // will persist if we don't explicitly ClearContents
+        driver.ClearContents ();
+        view.Layout ();
+        view.Draw ();
+
+        DriverAssert.AssertDriverContentsWithFrameAre ("""
+                                                       ╭────╮
+                                                       │View│
+                                                       """,
+                                                       output,
+                                                       driver);
     }
 
     public class TestAdornment : AdornmentImpl

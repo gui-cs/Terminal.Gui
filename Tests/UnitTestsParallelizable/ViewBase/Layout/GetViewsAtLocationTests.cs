@@ -90,6 +90,7 @@ public class GetViewsAtLocationTests
     {
         TestView root = new (0, 0, 10, 10);
         root.Margin.Thickness = new Thickness (1);
+        root.Margin.EnsureView ();
         List<View?> result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
@@ -101,6 +102,7 @@ public class GetViewsAtLocationTests
     {
         TestView root = new (0, 0, 10, 10);
         root.Margin.Thickness = new Thickness (1);
+        root.Margin.EnsureView ();
         TestView sub = new (2, 2, 5, 5);
         root.Add (sub);
         List<View?> result = View.GetViewsAtLocation (root, new Point (2, 2));
@@ -219,6 +221,7 @@ public class GetViewsAtLocationTests
         TestView root = new (0, 0, 10, 10);
         TestView sub = new (2, 2, 5, 5);
         sub.Margin.Thickness = new Thickness (1);
+        sub.Margin.EnsureView ();
         root.Add (sub);
 
         List<View?> result = View.GetViewsAtLocation (root, new Point (6, 6));
@@ -1086,6 +1089,7 @@ public class GetViewsAtLocationTests
 
         Runnable<bool> secondaryRunnable = new () { Id = "secondaryRunnable", Frame = new Rectangle (5, 5, 10, 10) };
         secondaryRunnable.Margin.Thickness = new Thickness (1);
+        secondaryRunnable.Margin.EnsureView ();
 
         app.Begin (runnable);
         app.Begin (secondaryRunnable);

@@ -14,6 +14,20 @@ public class BorderTests : TestDriverBase
     }
 
     [Fact]
+    public void View_Constructor_Defaults ()
+    {
+        View view = new () { Height = 3, Width = 3 };
+        Assert.Null (view.Border.View);
+
+        view.Border.EnsureView ();
+        Assert.NotNull (view.Border.View);
+        Assert.False (view.Border.View?.CanFocus);
+        Assert.Equal (TabBehavior.TabGroup, view.Border.View?.TabStop);
+        Assert.Empty (view.Border.View?.KeyBindings.GetBindings ()!);
+        Assert.Null (view.Border.View?.ShadowStyle);
+    }
+
+    [Fact]
     public void LineStyle_Set_EnsuresView ()
     {
         Border border = new ();
@@ -32,7 +46,14 @@ public class BorderTests : TestDriverBase
     [Fact]
     public void WithView_NeedsDraw ()
     {
-        var view = new View { X = 0, Y = 0, Width = 4, Height = 4 };
+        var view = new View
+        {
+            X = 0,
+            Y = 0,
+            Width = 4,
+            Height = 4,
+            Driver = CreateTestDriver ()
+        };
         view.Border.Thickness = new Thickness (1);
 
         Assert.Null (view.Border.View);
@@ -44,18 +65,6 @@ public class BorderTests : TestDriverBase
         view.Draw ();
 
         Assert.False (view.Border.View?.NeedsDraw);
-    }
-
-    [Fact]
-    public void WithView_Constructor_Defaults ()
-    {
-        View view = new () { Height = 3, Width = 3 };
-
-        // Cause EnsureView
-        view.BorderStyle = LineStyle.Dashed;
-        Assert.False (view.Border.View?.CanFocus);
-        Assert.Equal (TabBehavior.TabGroup, view.Border.View?.TabStop);
-        Assert.Empty (view.Border.View?.KeyBindings.GetBindings ()!);
     }
 
     [Fact]
@@ -85,7 +94,6 @@ public class BorderTests : TestDriverBase
         Assert.Equal (new Rectangle (0, 0, 18, 18), view.Border.View?.Viewport);
     }
 
-
     [Fact]
     public void GetFrame_Without_View_Is_Parent_Offset_By_Margin ()
     {
@@ -93,10 +101,7 @@ public class BorderTests : TestDriverBase
 
         Assert.Equal (Rectangle.Empty, border.GetFrame ());
 
-        border.Parent = new View ()
-        {
-            Frame = new Rectangle (1, 2, 3, 4)
-        };
+        border.Parent = new View { Frame = new Rectangle (1, 2, 3, 4) };
 
         Assert.Equal (new Rectangle (0, 0, 3, 4), border.GetFrame ());
 
@@ -107,7 +112,6 @@ public class BorderTests : TestDriverBase
         Assert.Equal (new Rectangle (1, 1, 28, 38), border.GetFrame ());
     }
 
-
     [Fact]
     public void GetFrame_With_View_Tracks_View_Frame ()
     {
@@ -115,13 +119,9 @@ public class BorderTests : TestDriverBase
 
         Assert.Equal (Rectangle.Empty, border.GetFrame ());
 
-        border.View = new MarginView () { Id = "border.View" };
+        border.View = new MarginView { Id = "border.View" };
 
-        View parent = new ()
-        {
-            Id = "border.Parent",
-            Frame = new Rectangle (1, 2, 3, 4)
-        };
+        View parent = new () { Id = "border.Parent", Frame = new Rectangle (1, 2, 3, 4) };
 
         border.Parent = parent;
         Assert.Equal (border.View.Frame with { Location = Point.Empty }, border.GetFrame ());
@@ -142,10 +142,7 @@ public class BorderTests : TestDriverBase
 
         border.View = new BorderView ();
 
-        View parent = new ()
-        {
-            Frame = new Rectangle (1, 2, 3, 4)
-        };
+        View parent = new () { Frame = new Rectangle (1, 2, 3, 4) };
 
         border.Parent = parent;
 

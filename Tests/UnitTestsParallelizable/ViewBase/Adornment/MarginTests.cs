@@ -5,6 +5,26 @@ namespace ViewBaseTests.Adornments;
 public class MarginTests (ITestOutputHelper output)
 {
     [Fact]
+    public void Constructor_Defaults ()
+    {
+        Margin margin = new ();
+        Assert.Null (margin.View);
+        Assert.Null (margin.ShadowStyle);
+    }
+
+    [Fact]
+    public void View_Constructor_Defaults ()
+    {
+        View view = new () { Height = 3, Width = 3 };
+        Assert.Null (view.Margin.View);
+
+        view.Margin.EnsureView ();
+        Assert.False (view.Margin.View?.CanFocus);
+        Assert.Equal (TabBehavior.NoStop, view.Margin.View?.TabStop);
+        Assert.Empty (view.Margin.View?.KeyBindings.GetBindings ()!);
+    }
+
+    [Fact]
     public void Margin_Is_Transparent ()
     {
         IApplication? app = Application.Create ();
@@ -104,6 +124,16 @@ public class MarginTests (ITestOutputHelper output)
     {
         var view = new View { Height = 3, Width = 3 };
         Assert.Equal (Thickness.Empty, view.Margin.Thickness);
+    }
+
+    [Fact]
+    public void Thickness_Set_Does_Not_EnsureView ()
+    {
+        View view = new () { Height = 3, Width = 3 };
+        Assert.Null (view.Margin.View);
+
+        view.Margin.Thickness = new Thickness (1);
+        Assert.Null (view.Margin.View);
     }
 
     // ShadowStyle

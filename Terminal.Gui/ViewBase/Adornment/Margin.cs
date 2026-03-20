@@ -51,7 +51,7 @@ public class Margin : AdornmentImpl
             return;
         }
 
-        EnsureView ();
+        //EnsureView ();
     }
 
     /// <summary>
