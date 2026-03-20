@@ -115,6 +115,71 @@ public class GetViewsUnderLocationForRootTests
     }
 
     [Fact]
+    public void Returns_WhenPointIn_TransparentToMouseBorder_None ()
+    {
+        // Claude - Opus 4.6
+        Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
+        top.Border.Thickness = new Thickness (1);
+        top.Border.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
+        List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
+        Assert.DoesNotContain (top, result);
+        Assert.DoesNotContain (top.Border.View, result);
+    }
+
+    [Fact]
+    public void Returns_WhenPointIn_NotTransparentToMouseBorder_Top ()
+    {
+        // Claude - Opus 4.6
+        Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
+        top.Border.Thickness = new Thickness (1);
+        top.Border.ViewportSettings = ViewportSettingsFlags.None;
+        List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
+        Assert.Contains (top, result);
+        Assert.DoesNotContain (top.Border.View, result);
+    }
+
+    [Fact]
+    public void Returns_WhenPointIn_TransparentToMousePadding_None ()
+    {
+        // Claude - Opus 4.6
+        Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
+        top.Border.Thickness = new Thickness (1);
+        top.Padding.Thickness = new Thickness (1);
+        top.Padding.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
+        top.Layout ();
+        List<View?> result = View.GetViewsUnderLocation (top, new Point (1, 1), ViewportSettingsFlags.TransparentMouse);
+        Assert.DoesNotContain (top, result);
+        Assert.DoesNotContain (top.Padding.View, result);
+    }
+
+    [Fact]
+    public void Returns_WhenPointIn_NotTransparentToMousePadding_Top ()
+    {
+        // Claude - Opus 4.6
+        Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
+        top.Border.Thickness = new Thickness (1);
+        top.Padding.Thickness = new Thickness (1);
+        top.Padding.ViewportSettings = ViewportSettingsFlags.None;
+        top.Layout ();
+        List<View?> result = View.GetViewsUnderLocation (top, new Point (1, 1), ViewportSettingsFlags.TransparentMouse);
+        Assert.Contains (top, result);
+        Assert.DoesNotContain (top.Padding.View, result);
+    }
+
+    [Fact]
+    public void Returns_Top_WhenPointInContentArea_TransparentToMouseMargin_None ()
+    {
+        // Claude - Opus 4.6
+        // Verifies that a point in the content area (inside the margin ring) does NOT
+        // cause the view to be removed, even when the margin has TransparentMouse set.
+        Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
+        top.Margin.Thickness = new Thickness (1);
+        top.Margin.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
+        List<View?> result = View.GetViewsUnderLocation (top, new Point (5, 5), ViewportSettingsFlags.TransparentMouse);
+        Assert.Contains (top, result);
+    }
+
+    [Fact]
     public void ReturnsAdornment_WhenPointInBorderView ()
     {
         Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };

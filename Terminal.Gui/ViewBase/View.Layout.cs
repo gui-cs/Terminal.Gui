@@ -1269,6 +1269,9 @@ public partial class View // Layout APIs
             return viewsUnderLocation;
         }
 
+        // Capture to allow use inside lambda (in parameters can't be used in lambdas).
+        Point location = screenLocation;
+
         // Remove all views that have an adornment with ViewportSettings.TransparentMouse; they are in the list
         // because the point was in their adornment, and if the adornment is transparent, they should be removed.
         viewsUnderLocation.RemoveAll (v =>
@@ -1280,20 +1283,29 @@ public partial class View // Layout APIs
 
                                           bool? ret = null;
 
-                                          if (viewsUnderLocation.Contains (v.Margin.View) 
-                                              && v.Margin.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          if (v.Margin.ViewportSettings.HasFlag (excludeViewportSettingsFlags)
+                                              && (viewsUnderLocation.Contains (v.Margin.View)
+                                                  || (v.Margin.View is null
+                                                      && v.Margin.Thickness != Thickness.Empty
+                                                      && v.Margin.Thickness.Contains (v.Margin.FrameToScreen (), location))))
                                           {
                                               ret = true;
                                           }
 
-                                          if (viewsUnderLocation.Contains (v.Border.View)
-                                              && v.Border.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          if (v.Border.ViewportSettings.HasFlag (excludeViewportSettingsFlags)
+                                              && (viewsUnderLocation.Contains (v.Border.View)
+                                                  || (v.Border.View is null
+                                                      && v.Border.Thickness != Thickness.Empty
+                                                      && v.Border.Thickness.Contains (v.Border.FrameToScreen (), location))))
                                           {
                                               ret = true;
                                           }
 
-                                          if (viewsUnderLocation.Contains (v.Padding.View)
-                                              && v.Padding.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          if (v.Padding.ViewportSettings.HasFlag (excludeViewportSettingsFlags)
+                                              && (viewsUnderLocation.Contains (v.Padding.View)
+                                                  || (v.Padding.View is null
+                                                      && v.Padding.Thickness != Thickness.Empty
+                                                      && v.Padding.Thickness.Contains (v.Padding.FrameToScreen (), location))))
                                           {
                                               ret = true;
                                           }
