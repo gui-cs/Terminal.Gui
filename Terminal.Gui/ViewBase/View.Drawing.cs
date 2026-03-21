@@ -252,7 +252,10 @@ public partial class View // Drawing APIs
 
             if (Driver is { })
             {
-                Margin.Thickness.Draw (Driver, FrameToScreen ());
+                if (Margin.View is null)
+                {
+                    Margin.Thickness.Draw (Driver, FrameToScreen ());
+                }
             }
             Margin.Parent?.SetSubViewNeedsDrawDownHierarchy ();
         }
@@ -287,7 +290,7 @@ public partial class View // Drawing APIs
     {
         // Only draw Margin here if it is not Transparent. Transparent Margins are drawn in a separate pass in the static View.Draw
         // via Margin.DrawTransparentMargins.
-        if (!Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) || Margin.Thickness != Thickness.Empty)
+        if (Margin is { } && !Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
         {
             Margin.Draw ();
         }
