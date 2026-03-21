@@ -354,6 +354,14 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     {
         if (IsRunning)
         {
+            // When running, restore to Dialog scheme only if it was set to Base by SetStyle
+            // (i.e., the scheme was not explicitly overridden before running, e.g. by
+            // MessageBox.ErrorQuery which sets SchemeName = "Error" before calling app.Run).
+            if (SchemeName == SchemeManager.SchemesToSchemeName (Schemes.Base))
+            {
+                SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
+            }
+
             Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped;
         }
         else

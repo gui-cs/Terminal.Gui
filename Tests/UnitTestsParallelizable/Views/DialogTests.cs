@@ -412,6 +412,45 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         dialog.Dispose ();
     }
 
+    // Copilot
+    [Fact]
+    public void SchemeName_IsBase_WhenNotRunning ()
+    {
+        // When a Dialog is not running, it should use the Base scheme (not Dialog)
+        Dialog dialog = new ();
+
+        Assert.Equal (SchemeManager.SchemesToSchemeName (Schemes.Base), dialog.SchemeName);
+
+        dialog.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void SchemeName_IsDialog_WhenRunning ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        using Dialog dialog = new ();
+
+        string? schemeNameWhileRunning = null;
+
+        app.Iteration += AppOnIteration;
+        app.Run (dialog);
+        app.Iteration -= AppOnIteration;
+
+        Assert.Equal (SchemeManager.SchemesToSchemeName (Schemes.Dialog), schemeNameWhileRunning);
+
+        return;
+
+        void AppOnIteration (object? sender, EventArgs<IApplication?> e)
+        {
+            schemeNameWhileRunning = dialog.SchemeName;
+            app.Iteration -= AppOnIteration;
+            app.RequestStop ();
+        }
+    }
+
     [Fact]
     public void Text_Property ()
     {
