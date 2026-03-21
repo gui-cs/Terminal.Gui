@@ -6,7 +6,10 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 internal sealed class Arranger : IDisposable
 {
-    // TODO: Simplify this by having _border be of type Border (IAdornment)
+    // NOTE: _border stays as BorderView because Arranger needs extensive View-level access
+    // (App, HotKeyBindings, CanFocus, SetFocus, Add, Remove, Frame, Focused, AdvanceFocus,
+    // MouseState, ScreenToFrame, Contains). Changing to Border would require .EnsureView()/.View!
+    // on ~50 call sites — more complex, not simpler. Settings are accessed via _border.Adornment!.
     private readonly BorderView _border;
 
     /// <summary>

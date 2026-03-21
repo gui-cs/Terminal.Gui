@@ -213,7 +213,7 @@ public class MarginTests (ITestOutputHelper output)
     [Fact]
     public void Margin_GetFrame_With_View_Tracks_View_Frame ()
     {
-        Margin margin = new () { Id = "margin" };
+        Margin margin = new ();
 
         Assert.Equal (Rectangle.Empty, margin.GetFrame ());
 

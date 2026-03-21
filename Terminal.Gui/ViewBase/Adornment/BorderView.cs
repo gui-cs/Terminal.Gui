@@ -61,7 +61,7 @@ public partial class BorderView : AdornmentView
         }
         border.ThicknessChanged += OnThicknessChanged;
         border.Parent?.Margin.ThicknessChanged += OnThicknessChanged;
-   }
+    }
 
     /// <inheritdoc/>
     public override void OnParentFrameChanged (Rectangle newParentFrame)
@@ -88,7 +88,7 @@ public partial class BorderView : AdornmentView
 
     private void ShowHideDrawIndicator ()
     {
-        if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.DrawIndicator) && Thickness != Thickness.Empty)
+        if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.DrawIndicator) && Adornment!.Thickness != Thickness.Empty)
         {
             if (DrawIndicator is { })
             {
@@ -180,12 +180,12 @@ public partial class BorderView : AdornmentView
     {
         _left.Border.LineStyle = LineStyle;
 
-        _left.X = Thickness.Left - 1;
-        _left.Y = Thickness.Top - 1;
+        _left.X = Adornment!.Thickness.Left - 1;
+        _left.Y = Adornment!.Thickness.Top - 1;
         _left.Width = 1;
         _left.Height = Height;
 
-        CloseButton.X = Pos.AnchorEnd (Thickness.Right / 2 + 1) -
+        CloseButton.X = Pos.AnchorEnd (Adornment!.Thickness.Right / 2 + 1) -
                         (Pos.Right (CloseButton) -
                          Pos.Left (CloseButton));
         CloseButton.Y = 0;
@@ -196,16 +196,20 @@ public partial class BorderView : AdornmentView
     {
         Rectangle screenRect = ViewportToScreen (Viewport);
 
-        return new Rectangle (screenRect.X + Math.Max (0, Thickness.Left - 1),
-                              screenRect.Y + Math.Max (0, Thickness.Top - 1),
-                              Math.Max (0, screenRect.Width - Math.Max (0, Math.Max (0, Thickness.Left - 1) + Math.Max (0, Thickness.Right - 1))),
-                              Math.Max (0, screenRect.Height - Math.Max (0, Math.Max (0, Thickness.Top - 1) + Math.Max (0, Thickness.Bottom - 1))));
+        return new Rectangle (screenRect.X + Math.Max (0, Adornment!.Thickness.Left - 1),
+                              screenRect.Y + Math.Max (0, Adornment!.Thickness.Top - 1),
+                              Math.Max (0,
+                                        screenRect.Width
+                                        - Math.Max (0, Math.Max (0, Adornment!.Thickness.Left - 1) + Math.Max (0, Adornment!.Thickness.Right - 1))),
+                              Math.Max (0,
+                                        screenRect.Height
+                                        - Math.Max (0, Math.Max (0, Adornment!.Thickness.Top - 1) + Math.Max (0, Adornment!.Thickness.Bottom - 1))));
     }
 
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
-        if (Thickness == Thickness.Empty || Adornment is null)
+        if (Adornment is null || Adornment.Thickness == Thickness.Empty)
         {
             return true;
         }
@@ -233,34 +237,37 @@ public partial class BorderView : AdornmentView
 
         if (border.Settings.FastHasFlags (BorderSettings.Title))
         {
-            if (Thickness.Top == 2)
+            switch (Adornment!.Thickness.Top)
             {
-                topTitleLineY = borderBounds.Y - 1;
-                titleY = topTitleLineY + 1;
-                titleBarsLength = 2;
-            }
+                case 2:
+                    topTitleLineY = borderBounds.Y - 1;
+                    titleY = topTitleLineY + 1;
+                    titleBarsLength = 2;
 
-            if (Thickness.Top == 3)
-            {
-                topTitleLineY = borderBounds.Y - (Thickness.Top - 1);
-                titleY = topTitleLineY + 1;
-                titleBarsLength = 3;
-                sideLineLength++;
-            }
+                    break;
 
-            if (Thickness.Top > 3)
-            {
-                topTitleLineY = borderBounds.Y - 2;
-                titleY = topTitleLineY + 1;
-                titleBarsLength = 3;
-                sideLineLength++;
+                case 3:
+                    topTitleLineY = borderBounds.Y - (Adornment!.Thickness.Top - 1);
+                    titleY = topTitleLineY + 1;
+                    titleBarsLength = 3;
+                    sideLineLength++;
+
+                    break;
+
+                case > 3:
+                    topTitleLineY = borderBounds.Y - 2;
+                    titleY = topTitleLineY + 1;
+                    titleBarsLength = 3;
+                    sideLineLength++;
+
+                    break;
             }
         }
 
         if (Driver is { }
             && Adornment.Parent is { }
             && canDrawBorder
-            && Thickness.Top > 0
+            && Adornment!.Thickness.Top > 0
             && maxTitleWidth > 0
             && border.Settings.FastHasFlags (BorderSettings.Title)
             && !string.IsNullOrEmpty (Adornment.Parent?.Title))
@@ -280,10 +287,10 @@ public partial class BorderView : AdornmentView
         }
         LineCanvas? lc = Adornment.Parent?.LineCanvas;
 
-        bool drawTop = Thickness.Top > 0 && Frame is { Width: > 1, Height: >= 1 };
-        bool drawLeft = Thickness.Left > 0 && (Frame.Height > 1 || Thickness.Top == 0);
-        bool drawBottom = Thickness.Bottom > 0 && Frame is { Width: > 1, Height: > 1 };
-        bool drawRight = Thickness.Right > 0 && (Frame.Height > 1 || Thickness.Top == 0);
+        bool drawTop = Adornment!.Thickness.Top > 0 && Frame is { Width: > 1, Height: >= 1 };
+        bool drawLeft = Adornment!.Thickness.Left > 0 && (Frame.Height > 1 || Adornment!.Thickness.Top == 0);
+        bool drawBottom = Adornment!.Thickness.Bottom > 0 && Frame is { Width: > 1, Height: > 1 };
+        bool drawRight = Adornment!.Thickness.Right > 0 && (Frame.Height > 1 || Adornment!.Thickness.Top == 0);
 
         Attribute normalAttribute = GetAttributeForRole (VisualRole.Normal);
 
@@ -309,7 +316,7 @@ public partial class BorderView : AdornmentView
             }
             else
             {
-                if (Thickness.Top == 2)
+                if (Adornment!.Thickness.Top == 2)
                 {
                     lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY),
                                  Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
@@ -318,7 +325,7 @@ public partial class BorderView : AdornmentView
                                  normalAttribute);
                 }
 
-                if (borderBounds.Width >= 4 && Thickness.Top > 2)
+                if (borderBounds.Width >= 4 && Adornment!.Thickness.Top > 2)
                 {
                     lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY),
                                  Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
@@ -417,14 +424,21 @@ public partial class BorderView : AdornmentView
             }
         }
 
-        // TODO: This should not be done on each draw?
         if (border.Settings.FastHasFlags (BorderSettings.Gradient))
         {
-            SetupGradientLineCanvas (lc!, screenBounds);
+            if (_cachedGradientFill is null || _cachedGradientRect != screenBounds)
+            {
+                SetupGradientLineCanvas (lc!, screenBounds);
+            }
+            else
+            {
+                lc!.Fill = _cachedGradientFill;
+            }
         }
         else
         {
             lc?.Fill = null;
+            _cachedGradientFill = null;
         }
 
         return true;
@@ -435,16 +449,21 @@ public partial class BorderView : AdornmentView
     /// </summary>
     public SpinnerView? DrawIndicator { get; private set; }
 
+    private FillPair? _cachedGradientFill;
+    private Rectangle _cachedGradientRect;
+
     private void SetupGradientLineCanvas (LineCanvas lc, Rectangle rect)
     {
         GetAppealingGradientColors (out List<Color> stops, out List<int> steps);
 
-        var g = new Gradient (stops, steps);
+        Gradient g = new (stops, steps);
 
-        var fore = new GradientFill (rect, g, GradientDirection.Diagonal);
-        var back = new SolidFill (GetAttributeForRole (VisualRole.Normal).Background);
+        GradientFill fore = new (rect, g, GradientDirection.Diagonal);
+        SolidFill back = new (GetAttributeForRole (VisualRole.Normal).Background);
 
-        lc.Fill = new FillPair (fore, back);
+        _cachedGradientFill = new FillPair (fore, back);
+        _cachedGradientRect = rect;
+        lc.Fill = _cachedGradientFill;
     }
 
     private static void GetAppealingGradientColors (out List<Color> stops, out List<int> steps)

@@ -37,7 +37,6 @@ public abstract class AdornmentImpl : IAdornment
 
     #region Thickness
 
-    // TODO: Thickness should only be on Adornment. AdornmentView should pass through to Adornment
     /// <inheritdoc/>
     public Thickness Thickness
     {
@@ -119,11 +118,8 @@ public abstract class AdornmentImpl : IAdornment
 
     #region Coordinator methods
 
-    // TODO: We should be able to remove this?
     /// <summary>Returns the screen-relative rectangle for this adornment.</summary>
     public Rectangle FrameToScreen () => View is { } v ? v.FrameToScreen () : ComputeFrameToScreen ();
-
-    // TODO: We should be able to remove this?
 
     private Rectangle ComputeFrameToScreen ()
     {
@@ -136,16 +132,12 @@ public abstract class AdornmentImpl : IAdornment
 
     #region Convenience pass-throughs
 
-    // TODO: Remove this - the cost of always drawing an Adornment is minimal
-
     private bool _needsDraw;
 
     /// <summary>Gets whether the backing <see cref="View"/> needs to be redrawn. <see langword="false"/> if no View exists.</summary>
-    // TODO: Remove this - the cost of always drawing an Adornment is minimal
     public bool NeedsDraw => View?.NeedsDraw ?? _needsDraw;
 
     /// <summary>Clears the needs-draw state on the backing <see cref="View"/>. No-op if no View exists.</summary>
-    // TODO: Remove this - the cost of always drawing an Adornment is minimal
     public void ClearNeedsDraw ()
     {
         if (View is { })
@@ -158,7 +150,6 @@ public abstract class AdornmentImpl : IAdornment
         }
     }
 
-    // TODO: Remove this - the cost of always drawing an Adornment is minimal
     /// <summary>Marks the backing <see cref="View"/> as needing to be redrawn. No-op if no View exists.</summary>
     public void SetNeedsDraw ()
     {
@@ -172,8 +163,6 @@ public abstract class AdornmentImpl : IAdornment
         }
     }
 
-    // TODO: Remove this - a non-View adornment never needs layout.
-
     /// <summary>Gets or sets whether the backing <see cref="View"/> needs layout. <see langword="false"/> if no View exists.</summary>
     public bool NeedsLayout
     {
@@ -186,50 +175,51 @@ public abstract class AdornmentImpl : IAdornment
             }
         }
     }
-    // TODO: Remove this - a non-View adornment never needs layout.
 
-    // TODO: Remove this - a non-View adornment never needs layout.
     /// <summary>Marks the backing <see cref="View"/> as needing layout. No-op if no View exists.</summary>
     public void SetNeedsLayout () => View?.SetNeedsLayout ();
 
-    // TODO: Remove this - If a call-site needs to customize the scheme of an adornment, it can just EnsureView
-    /// <summary>Sets the <see cref="Scheme"/> on the backing <see cref="View"/>. No-op if no View exists.</summary>
-    public void SetScheme (Scheme scheme) => View?.SetScheme (scheme);
-    // TODO: Remove this - If a call-site needs to customize the scheme of an adornment, it can just EnsureView
-
-    /// <summary>Gets the <see cref="Scheme"/> from the backing <see cref="View"/>.</summary>
-    public Scheme? GetScheme () => View?.GetScheme ();
-
-    // TODO: This needs to have it's own backing field and pass through only if View is not null;
-
-    /// <summary>Gets or sets diagnostic flags on the backing <see cref="View"/>.</summary>
+    /// <summary>Gets or sets diagnostic flags. Stored locally and forwarded to the backing <see cref="View"/> when it exists.</summary>
     public ViewDiagnosticFlags Diagnostics
     {
-        get => View?.Diagnostics ?? ViewDiagnosticFlags.Off;
+        get => View?.Diagnostics ?? field;
         set
         {
+            field = value;
+
             if (View is { } v)
             {
                 v.Diagnostics = value;
             }
         }
-    }
-
-    // TODO: Remove this - un-needed complexity
+    } = ViewDiagnosticFlags.Off;
 
     /// <summary>Gets the SubViews of the backing <see cref="View"/>. Returns empty if no View exists.</summary>
     public IReadOnlyCollection<View> SubViews => View?.SubViews ?? _emptySubViews;
-    // TODO: Remove this - un-needed complexity
 
     private static readonly IReadOnlyCollection<View> _emptySubViews = Array.Empty<View> ();
 
-    // TODO: Remove this - un-needed complexity
     /// <summary>Adds a SubView to the backing <see cref="View"/>. Forces View creation via <see cref="EnsureView"/>.</summary>
     public virtual void Add (View subView) => EnsureView ().Add (subView);
 
-    // TODO: Remove this - un-needed complexity
     /// <summary>Gets whether the backing <see cref="View"/> has focus. <see langword="false"/> if no View exists.</summary>
     public bool HasFocus => View?.HasFocus ?? false;
+
+    /// <summary>Removes a SubView from the backing <see cref="View"/>. No-op if no View exists.</summary>
+    public void Remove (View subView) => View?.Remove (subView);
+
+    /// <summary>Gets or sets the Enabled state on the backing <see cref="View"/>.</summary>
+    public bool Enabled
+    {
+        get => View?.Enabled ?? true;
+        set
+        {
+            if (View is { } v)
+            {
+                v.Enabled = value;
+            }
+        }
+    }
 
     /// <summary>Gets or sets the viewport settings flags on the backing <see cref="View"/>.</summary>
     public ViewportSettingsFlags ViewportSettings
@@ -246,7 +236,6 @@ public abstract class AdornmentImpl : IAdornment
         }
     }
 
-    // TODO: Remove this - un-needed complexity
     /// <summary>Gets or sets visibility of the backing <see cref="View"/>.</summary>
     public bool Visible
     {
@@ -282,41 +271,6 @@ public abstract class AdornmentImpl : IAdornment
         return Thickness.Contains (outside, location);
     }
 
-    // TODO: Remove this - un-needed complexity
-    /// <summary>Calls <see cref="View.BeginInit"/> on the backing View. No-op if no View exists.</summary>
-    public void BeginInit () => View?.BeginInit ();
-
-    // TODO: Remove this - un-needed complexity
-    /// <summary>Calls <see cref="View.EndInit"/> on the backing View. No-op if no View exists.</summary>
-    public void EndInit () => View?.EndInit ();
-
-    // TODO: Remove this - un-needed complexity
-    /// <summary>Calls <see cref="View.LayoutSubViews"/> on the backing View. No-op if no View exists.</summary>
-    public void LayoutSubViews () => View?.LayoutSubViews ();
-
-    // TODO: Remove this - un-needed complexity
-    /// <summary>Gets or sets the Enabled state on the backing <see cref="View"/>.</summary>
-    public bool Enabled
-    {
-        get => View?.Enabled ?? true;
-        set
-        {
-            if (View is { } v)
-            {
-                v.Enabled = value;
-            }
-        }
-    }
-    // TODO: Remove this - un-needed complexity
-
-    /// <summary>Removes a SubView from the backing <see cref="View"/>. No-op if no View exists.</summary>
-    public void Remove (View subView) => View?.Remove (subView);
-    // TODO: Remove this - un-needed complexity
-
-    /// <summary>Gets or sets the Id on the backing <see cref="View"/>.</summary>
-    public string Id { get; set; } = string.Empty;
-    // TODO: Remove this - un-needed complexity
-
     /// <summary>Gets or sets the SchemeName on the backing <see cref="View"/>.</summary>
     public string? SchemeName
     {
@@ -331,26 +285,18 @@ public abstract class AdornmentImpl : IAdornment
             }
         }
     }
-    // TODO: Remove this - un-needed complexity
-
-    /// <summary>Gets whether the backing <see cref="View"/> is initialized.</summary>
-    public bool IsInitialized => View?.IsInitialized ?? false;
-    // TODO: Remove this - un-needed complexity
 
     /// <summary>
     ///     Delegates to <see cref="View.GetAttributeForRole"/> on the backing <see cref="View"/>.
     ///     Falls back to the <see cref="Parent"/>'s attribute when no View exists.
     /// </summary>
     public Attribute GetAttributeForRole (VisualRole role) => View?.GetAttributeForRole (role) ?? Parent?.GetAttributeForRole (role) ?? default (Attribute);
-    // TODO: Remove this - un-needed complexity
 
     /// <summary>Calls <see cref="View.AddFrameToClip"/> on the backing <see cref="View"/>. Returns null if no View exists.</summary>
     internal Region? AddFrameToClip () => View?.AddFrameToClip ();
-    // TODO: Remove this - un-needed complexity
 
     /// <summary>Calls <see cref="View.DoDrawSubViews"/> on the backing <see cref="View"/>. No-op if no View exists.</summary>
     internal void DoDrawSubViews () => View?.DoDrawSubViews ();
-    // TODO: Remove this - un-needed complexity
 
     /// <summary>Disposes the backing <see cref="View"/> (if any) and clears references.</summary>
     public void Dispose () => DisposeView ();
@@ -362,7 +308,7 @@ public abstract class AdornmentImpl : IAdornment
     /// <summary>
     ///     Draws the adornment content if a <see cref="View"/> exists.
     /// </summary>
-    internal virtual void Draw ()
+    internal void Draw ()
     {
         if (View is null && Parent is { })
         {
@@ -376,7 +322,6 @@ public abstract class AdornmentImpl : IAdornment
     #endregion Drawing
 
     #region Disposal
-    // TODO: Remove this - un-needed complexity
 
     /// <summary>Propagates disposal to the <see cref="View"/> if it exists.</summary>
     internal void DisposeView ()

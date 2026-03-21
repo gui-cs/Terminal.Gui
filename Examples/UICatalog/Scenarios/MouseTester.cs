@@ -394,12 +394,12 @@ public class MouseTester : Scenario
             VerticalTextAlignment = Alignment.Center;
 
             Padding.Thickness = new Thickness (1, 1, 1, 1);
-            Padding.SetScheme (new Scheme (new Attribute (Color.DarkGray)));
-            Padding.Id = $"{Id}.Padding";
+            Padding.EnsureView ().SetScheme (new Scheme (new Attribute (Color.DarkGray)));
+            Padding.View!.Id = $"{Id}.Padding";
 
             Border.Thickness = new Thickness (1);
             Border.LineStyle = LineStyle.Rounded;
-            Border.Id = $"{Id}.Border";
+            Border.View!.Id = $"{Id}.Border";
             base.EndInit ();
         }
 

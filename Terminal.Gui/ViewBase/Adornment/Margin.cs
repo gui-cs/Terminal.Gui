@@ -7,21 +7,24 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         The Margin is transparent by default. This can be overridden by explicitly setting
-///         <see cref="AdornmentImpl.SetScheme"/>.
+///         The Margin is transparent by default. This can be overridden by setting a custom
+///         <see cref="Scheme"/> on the <see cref="AdornmentImpl.View"/> via <see cref="AdornmentImpl.EnsureView"/>.
 ///     </para>
 ///     <para>
 ///         Margins are drawn after all other Views in the application View hierarchy are drawn.
 ///     </para>
 ///     <para>
-///         Margins have <see cref="ViewportSettingsFlags.Transparent"/> and <see cref="ViewportSettingsFlags.TransparentMouse"/> enabled by default and are thus
+///         Margins have <see cref="ViewportSettingsFlags.Transparent"/> and
+///         <see cref="ViewportSettingsFlags.TransparentMouse"/> enabled by default and are thus
 ///         transparent to the mouse. This can be overridden by explicitly setting <see cref="ViewportSettingsFlags"/>.
 ///     </para>
 /// </remarks>
 public class Margin : AdornmentImpl
 {
     /// <summary>
-    /// 
+    ///     Initializes a new instance of the <see cref="Margin"/> class with default settings. By default, Margins are
+    ///     transparent and transparent to mouse events (i.e., they don't block mouse events from reaching underlying views).
+    ///     This can be overridden by explicitly setting <see cref="ViewportSettingsFlags"/>.
     /// </summary>
     public Margin () => ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
 
@@ -42,9 +45,7 @@ public class Margin : AdornmentImpl
         base.OnThicknessChanged ();
 
         if (Thickness == Thickness.Empty)
-        {
-            return;
-        }
+        { }
 
         //EnsureView ();
     }

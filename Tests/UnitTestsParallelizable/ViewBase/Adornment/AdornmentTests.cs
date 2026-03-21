@@ -41,8 +41,8 @@ public class AdornmentTests (ITestOutputHelper output) : TestDriverBase
     [InlineData (1, 1, 1, 0, 4)]
     public void Viewport_Width_Is_Frame_Width (int thickness, int x, int y, int w, int h)
     {
-        var adornment = new AdornmentView ();
-        adornment.Thickness = new Thickness (thickness);
+        AdornmentView adornment = new (new AdornmentTests.TestAdornment ());
+        adornment.Adornment!.Thickness = new Thickness (thickness);
         adornment.Frame = new Rectangle (x, y, w, h);
         Assert.Equal (new Rectangle (x, y, w, h), adornment.Frame);
 
@@ -335,7 +335,7 @@ public class AdornmentTests (ITestOutputHelper output) : TestDriverBase
         AdornmentView adornment = new (new Border ()) { Id = "adornment" };
         adornment.Adornment?.Parent = new View { Id = "parent" };
         adornment.Adornment?.Parent?.Frame = new Rectangle (x, y, width, height);
-        adornment.Thickness = new Thickness (1, 0, 0, 0);
+        adornment.Adornment!.Thickness = new Thickness (1, 0, 0, 0);
         adornment.Frame = adornment.Adornment!.Parent!.Frame with { Location = Point.Empty };
 
         bool result = adornment.Contains (new Point (pointX, pointY));
@@ -361,7 +361,7 @@ public class AdornmentTests (ITestOutputHelper output) : TestDriverBase
         AdornmentView adornment = new (new Border ()) { Id = "adornment" };
         adornment.Adornment!.Parent = new View { Id = "parent" };
         adornment.Adornment.Parent.Frame = new Rectangle (x, y, width, height);
-        adornment.Thickness = new Thickness (0, 0, 1, 0);
+        adornment.Adornment!.Thickness = new Thickness (0, 0, 1, 0);
         adornment.Frame = adornment.Adornment.Parent.Frame with { Location = Point.Empty };
 
         bool result = adornment.Contains (new Point (pointX, pointY));
@@ -387,7 +387,7 @@ public class AdornmentTests (ITestOutputHelper output) : TestDriverBase
         AdornmentView adornment = new (new Border ()) { Id = "adornment" };
         adornment.Adornment!.Parent = new View { Id = "parent" };
         adornment.Adornment.Parent.Frame = new Rectangle (x, y, width, height);
-        adornment.Thickness = new Thickness (0, 1, 0, 0);
+        adornment.Adornment!.Thickness = new Thickness (0, 1, 0, 0);
         adornment.Frame = adornment.Adornment.Parent.Frame with { Location = Point.Empty };
 
         bool result = adornment.Contains (new Point (pointX, pointY));
@@ -410,7 +410,7 @@ public class AdornmentTests (ITestOutputHelper output) : TestDriverBase
     [InlineData (1, 1, 1, 2, 1, 1, true)]
     public void Contains_TopLeft_Only (int x, int y, int width, int height, int pointX, int pointY, bool expected)
     {
-        TestAdornment adornment = new () { Id = "adornment", Parent = new View { Id = "parent" } };
+        TestAdornment adornment = new () { Parent = new View { Id = "parent" } };
         adornment.Parent.Frame = new Rectangle (x, y, width, height);
         adornment.Thickness = new Thickness (1, 1, 0, 0);
 

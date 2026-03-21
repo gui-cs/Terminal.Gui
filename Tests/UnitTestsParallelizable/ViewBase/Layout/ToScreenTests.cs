@@ -133,9 +133,9 @@ public class ToScreenTests
         // Arrange
         var adornmentFrame = new Rectangle (topX, 0, 10, 10);
 
-        var adornment = new AdornmentView ();
+        AdornmentView adornment = new (new Adornments.AdornmentTests.TestAdornment ());
         adornment.Frame = adornmentFrame;
-        adornment.Thickness = new Thickness (1);
+        adornment.Adornment!.Thickness = new Thickness (1);
 
         var subviewOfAdornment = new View
         {

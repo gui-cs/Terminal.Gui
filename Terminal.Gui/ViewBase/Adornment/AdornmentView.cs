@@ -10,7 +10,7 @@ namespace Terminal.Gui.ViewBase;
 /// <remarks>
 ///     <para>
 ///         This class is structurally a copy of <see cref="Adornment"/>. It extends <see cref="View"/> directly
-///         (not <see cref="Adornment"/>) and delegates <see cref="Thickness"/> to the <see cref="IAdornment"/>
+///         (not <see cref="Adornment"/>) and accesses <see cref="IAdornment.Thickness"/> via the <see cref="IAdornment"/>
 ///         back-reference, making <see cref="AdornmentImpl"/> the single authoritative owner of Thickness.
 ///     </para>
 ///     <para>
@@ -46,39 +46,6 @@ public class AdornmentView : View, IAdornmentView, IDesignable
 
     /// <inheritdoc cref="IAdornmentView.Adornment"/>
     public IAdornment? Adornment { get; set; }
-
-    #region Thickness — delegated to IAdornment
-
-    // TODO: Thickness should only be on Adornment. AdornmentView should pass through to Adornment
-
-    // Fallback for standalone AdornmentView instances without a back-reference (AllViewsTester).
-    private Thickness _standaloneFallbackThickness = Thickness.Empty;
-
-    /// <summary>
-    ///     The thickness of this adornment layer. Delegates to <see cref="Adornment"/>
-    ///     when a back-reference exists; falls back to a local field for standalone instances.
-    /// </summary>
-    public Thickness Thickness
-    {
-        get => Adornment?.Thickness ?? _standaloneFallbackThickness;
-        set
-        {
-            if (Adornment is { })
-            {
-                Adornment.Thickness = value;
-            }
-            else
-            {
-                _standaloneFallbackThickness = value;
-            }
-        }
-    }
-
-    // ThicknessChanged event and OnThicknessChanged() live on AdornmentImpl (the single
-    // authoritative owner). AdornmentView does not duplicate them — consumers subscribe to
-    // IAdornment.ThicknessChanged via the Adornment back-reference.
-
-    #endregion Thickness
 
     #region View Overrides
 
@@ -172,14 +139,14 @@ public class AdornmentView : View, IAdornmentView, IDesignable
     /// <returns><see langword="true"/> to stop further clearing.</returns>
     protected override bool OnClearingViewport ()
     {
-        if (Thickness == Thickness.Empty)
+        if (Adornment is null || Adornment.Thickness == Thickness.Empty)
         {
             return true;
         }
 
         if (Driver is { })
         {
-            Thickness.Draw (Driver, ViewportToScreen (Viewport), Diagnostics, ToString ());
+            Adornment!.Thickness.Draw (Driver, ViewportToScreen (Viewport), Diagnostics, ToString ());
         }
 
         SetNeedsDraw ();
@@ -188,10 +155,10 @@ public class AdornmentView : View, IAdornmentView, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingText () => Thickness == Thickness.Empty;
+    protected override bool OnDrawingText () => Adornment is null || Adornment.Thickness == Thickness.Empty;
 
     /// <inheritdoc/>
-    protected override bool OnDrawingSubViews () => Thickness == Thickness.Empty;
+    protected override bool OnDrawingSubViews () => Adornment is null || Adornment.Thickness == Thickness.Empty;
 
     /// <summary>Does nothing for AdornmentView.</summary>
     protected override bool OnRenderingLineCanvas () => true;
@@ -226,7 +193,7 @@ public class AdornmentView : View, IAdornmentView, IDesignable
         Rectangle outside = Frame;
         outside.Offset (parentOrSuperView.Frame.Location);
 
-        return Thickness.Contains (outside, location);
+        return Adornment!.Thickness.Contains (outside, location);
     }
 
     #endregion View Overrides
@@ -234,7 +201,8 @@ public class AdornmentView : View, IAdornmentView, IDesignable
     /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
-        Thickness = new Thickness (3);
+        Adornment?.Thickness = new Thickness (3);
+
         Frame = new Rectangle (0, 0, 10, 10);
         Diagnostics = ViewDiagnosticFlags.Thickness;
 

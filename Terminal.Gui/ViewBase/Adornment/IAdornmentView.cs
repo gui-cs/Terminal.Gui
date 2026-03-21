@@ -23,15 +23,8 @@ public interface IAdornmentView
 
     /// <summary>
     ///     Back-reference to the lightweight <see cref="IAdornment"/> that owns this <see cref="View"/>.
-    ///     <see cref="AdornmentView"/> delegates its <c>Thickness</c> property to this,
-    ///     making <see cref="AdornmentImpl"/> the single authoritative owner of <see cref="IAdornment.Thickness"/>.
+    ///     <see cref="AdornmentImpl"/> is the single authoritative owner of <see cref="IAdornment.Thickness"/>.
     ///     Set by <see cref="AdornmentImpl.EnsureView"/> when the backing <see cref="View"/> is created.
     /// </summary>
     IAdornment? Adornment { get; set; }
-
-    /// <summary>
-    ///     The thickness of this adornment layer. Every adornment view renders within
-    ///     its <see cref="IAdornment.Thickness"/>.
-    /// </summary>
-    Thickness Thickness { get; set; }
 }

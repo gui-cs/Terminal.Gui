@@ -13,7 +13,8 @@ namespace Terminal.Gui.ViewBase;
 ///         Margins are drawn after all other Views in the application View hierarchy are drawn.
 ///     </para>
 ///     <para>
-///         Margins have <see cref="ViewportSettingsFlags.Transparent"/> and <see cref="ViewportSettingsFlags.TransparentMouse"/> enabled by default and are thus
+///         Margins have <see cref="ViewportSettingsFlags.Transparent"/> and
+///         <see cref="ViewportSettingsFlags.TransparentMouse"/> enabled by default and are thus
 ///         transparent to the mouse. This can be overridden by explicitly setting <see cref="ViewportSettingsFlags"/>.
 ///     </para>
 ///     <para>See the <see cref="AdornmentView"/> class.</para>
@@ -65,7 +66,7 @@ public class MarginView : AdornmentView
         {
             return;
         }
-        _originalThickness = new Thickness (Thickness.Left, Thickness.Top, Thickness.Right, Thickness.Bottom);
+        _originalThickness = new Thickness (Adornment!.Thickness.Left, Adornment!.Thickness.Top, Adornment!.Thickness.Right, Adornment!.Thickness.Bottom);
 
         if (ShadowStyle is { })
         {
@@ -82,7 +83,7 @@ public class MarginView : AdornmentView
 
     internal void CacheClip ()
     {
-        if (Thickness != Thickness.Empty && ShadowStyle != ShadowStyles.None)
+        if (Adornment!.Thickness != Thickness.Empty && ShadowStyle != ShadowStyles.None)
         {
             _cachedClip = GetClip ()?.Clone ();
         }
@@ -147,7 +148,7 @@ public class MarginView : AdornmentView
     /// <inheritdoc/>
     protected override bool OnClearingViewport ()
     {
-        if (Thickness == Thickness.Empty)
+        if (Adornment is null || Adornment.Thickness == Thickness.Empty)
         {
             return true;
         }
@@ -157,7 +158,7 @@ public class MarginView : AdornmentView
         if (Diagnostics.HasFlag (ViewDiagnosticFlags.Thickness) || HasScheme)
         {
             // This just draws/clears the thickness, not the insides.
-            Thickness.Draw (Driver, screen, Diagnostics, ToString ());
+            Adornment!.Thickness.Draw (Driver, screen, Diagnostics, ToString ());
         }
 
         return true;
@@ -195,15 +196,15 @@ public class MarginView : AdornmentView
             _bottomShadow = null;
         }
 
-        _originalThickness ??= Thickness;
+        _originalThickness ??= Adornment!.Thickness;
 
         if (hadShadow)
         {
             // Recover the original (pre-shadow) thickness by subtracting the old shadow size
-            _originalThickness = new Thickness (Thickness.Left,
-                                                Thickness.Top,
-                                                Math.Max (Thickness.Right - ShadowSize.Width, 0),
-                                                Math.Max (Thickness.Bottom - ShadowSize.Height, 0));
+            _originalThickness = new Thickness (Adornment!.Thickness.Left,
+                                                Adornment!.Thickness.Top,
+                                                Math.Max (Adornment!.Thickness.Right - ShadowSize.Width, 0),
+                                                Math.Max (Adornment!.Thickness.Bottom - ShadowSize.Height, 0));
         }
 
         if (style is { })
@@ -211,10 +212,10 @@ public class MarginView : AdornmentView
             // Turn on shadow
             _isThicknessChanging = true;
 
-            Thickness = new Thickness (_originalThickness.Value.Left,
-                                       _originalThickness.Value.Top,
-                                       _originalThickness.Value.Right + ShadowSize.Width,
-                                       _originalThickness.Value.Bottom + ShadowSize.Height);
+            Adornment!.Thickness = new Thickness (_originalThickness.Value.Left,
+                                                  _originalThickness.Value.Top,
+                                                  _originalThickness.Value.Right + ShadowSize.Width,
+                                                  _originalThickness.Value.Bottom + ShadowSize.Height);
             _isThicknessChanging = false;
         }
 
@@ -241,14 +242,14 @@ public class MarginView : AdornmentView
             };
             Add (_rightShadow, _bottomShadow);
         }
-        else if (Thickness != _originalThickness)
+        else if (Adornment!.Thickness != _originalThickness)
         {
             _isThicknessChanging = true;
 
-            Thickness = new Thickness (_originalThickness.Value.Left,
-                                       _originalThickness.Value.Top,
-                                       _originalThickness.Value.Right,
-                                       _originalThickness.Value.Bottom);
+            Adornment!.Thickness = new Thickness (_originalThickness.Value.Left,
+                                                  _originalThickness.Value.Top,
+                                                  _originalThickness.Value.Right,
+                                                  _originalThickness.Value.Bottom);
             _isThicknessChanging = false;
         }
 
@@ -337,7 +338,7 @@ public class MarginView : AdornmentView
 
     private void OnParentOnMouseStateChanged (object? sender, EventArgs<MouseState> args)
     {
-        if (sender is not View parent || Thickness == Thickness.Empty || ShadowStyle == ShadowStyles.None)
+        if (sender is not View parent || Adornment is null || Adornment.Thickness == Thickness.Empty || ShadowStyle == ShadowStyles.None)
         {
             return;
         }
@@ -356,10 +357,10 @@ public class MarginView : AdornmentView
             // Note, for visual effects reasons, we only move horizontally.
             _isThicknessChanging = true;
 
-            Thickness = new Thickness (Thickness.Left - PRESS_MOVE_HORIZONTAL,
-                                       Thickness.Top - PRESS_MOVE_VERTICAL,
-                                       Thickness.Right + PRESS_MOVE_HORIZONTAL,
-                                       Thickness.Bottom + PRESS_MOVE_VERTICAL);
+            Adornment!.Thickness = new Thickness (Adornment!.Thickness.Left - PRESS_MOVE_HORIZONTAL,
+                                                  Adornment!.Thickness.Top - PRESS_MOVE_VERTICAL,
+                                                  Adornment!.Thickness.Right + PRESS_MOVE_HORIZONTAL,
+                                                  Adornment!.Thickness.Bottom + PRESS_MOVE_VERTICAL);
             _isThicknessChanging = false;
 
             _rightShadow?.Visible = true;
@@ -380,10 +381,10 @@ public class MarginView : AdornmentView
         // Note, for visual effects reasons, we only move horizontally.
         _isThicknessChanging = true;
 
-        Thickness = new Thickness (Thickness.Left + PRESS_MOVE_HORIZONTAL,
-                                   Thickness.Top + PRESS_MOVE_VERTICAL,
-                                   Thickness.Right - PRESS_MOVE_HORIZONTAL,
-                                   Thickness.Bottom - PRESS_MOVE_VERTICAL);
+        Adornment!.Thickness = new Thickness (Adornment!.Thickness.Left + PRESS_MOVE_HORIZONTAL,
+                                              Adornment!.Thickness.Top + PRESS_MOVE_VERTICAL,
+                                              Adornment!.Thickness.Right - PRESS_MOVE_HORIZONTAL,
+                                              Adornment!.Thickness.Bottom - PRESS_MOVE_VERTICAL);
         _isThicknessChanging = false;
 
         MouseState |= MouseState.Pressed;

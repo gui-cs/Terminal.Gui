@@ -115,7 +115,7 @@ public class BorderTests : TestDriverBase
     [Fact]
     public void GetFrame_With_View_Tracks_View_Frame ()
     {
-        Border border = new () { Id = "border" };
+        Border border = new ();
 
         Assert.Equal (Rectangle.Empty, border.GetFrame ());
 

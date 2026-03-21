@@ -206,7 +206,7 @@ public class AdornmentEditor : EditorBase
                 return;
             }
 
-            AdornmentToEdit.SetScheme (new Scheme (AdornmentToEdit.GetScheme ())
+            AdornmentToEdit.EnsureView ().SetScheme (new Scheme (AdornmentToEdit.EnsureView ().GetScheme ())
             {
                 Normal = new Attribute (_foregroundColorPicker.SelectedColor, _backgroundColorPicker.SelectedColor)
             });

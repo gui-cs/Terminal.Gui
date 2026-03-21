@@ -728,16 +728,13 @@ public class GetViewsAtLocationTests
 
         runnable.Margin.Thickness = new Thickness (1);
         runnable.Margin.EnsureView ();
-        runnable.Margin.Id = "Margin";
-        runnable.Margin.View?.Id = "MarginView";
+        runnable.Margin.View!.Id = "MarginView";
         runnable.Border.Thickness = new Thickness (1);
         runnable.Border.EnsureView ();
-        runnable.Border.Id = "Border";
-        runnable.Border.View?.Id = "BorderView";
+        runnable.Border.View!.Id = "BorderView";
         runnable.Padding.Thickness = new Thickness (1);
         runnable.Padding.EnsureView ();
-        runnable.Padding.Id = "Padding";
-        runnable.Padding.View?.Id = "PaddingView";
+        runnable.Padding.View!.Id = "PaddingView";
 
         var subview = new View
         {
@@ -820,7 +817,7 @@ public class GetViewsAtLocationTests
 
         subview.BorderStyle = LineStyle.Dashed; // Sets thickness to 1 and EnsuresView
         subview.Border.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
-        subview.Border.Id = "border";
+        subview.Border.View!.Id = "border";
         runnable.Add (subview);
 
         List<View?> viewsUnderMouse = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse);

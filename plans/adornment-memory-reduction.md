@@ -2,7 +2,8 @@
 
 > **Issue:** [#4696](https://github.com/gui-cs/Terminal.Gui/issues/4696) — Reduce View class memory footprint  
 > **Branch:** `copilot/reduce-view-class-memory-footprint`  
-> **Status:** Phase 0 ✅ DONE · Phase 1 ✅ DONE · All tests pass · Polish phase in progress
+> **Status:** Phase 0 ✅ DONE · Phase 1 ✅ DONE · Polish ✅ DONE · All tests pass  
+> **Last updated:** 2026-03-21 — All polish items complete. 40 new tests added.
 
 ---
 
@@ -104,15 +105,15 @@ These pass-throughs exist on `AdornmentImpl` so that callers can interact with a
 
 | TODO | Lines | Action |
 |---|---|---|
-| "Thickness should only be on Adornment" | 40 | Remove Thickness from AdornmentView. It should only be on Adornment; call sites that use AdornmentView.Thicnkess should pass-through to Adorment.Thickness |
-| "We should be able to remove this?" (`FrameToScreen`, `ComputeFrameToScreen`) | 122-133 | **Keep.** `FrameToScreen()` is used by the no-View drawing path (`AdornmentImpl.Draw()` calls `FrameToScreen()` when `View` is null). Also used by `DrawAdornments()` clip computation. Essential for lazy creation. Remove the questioning TODO — this is needed. |
-| "Diagnostics needs own backing field" | 203 | **Fix.** Add `ViewDiagnosticFlags` backing field that stores value even without View, forwarding when View exists. Same pattern as `ViewportSettings`. |
+| ~~"Thickness should only be on Adornment"~~ | ~~40~~ | ✅ DONE — Removed `Thickness` from `AdornmentView`. It now only lives on `AdornmentImpl`. All call sites in `BorderView`, `MarginView`, `AdornmentView` updated to use `Adornment!.Thickness`. TODO removed. |
+| ~~"We should be able to remove this?"~~ (`FrameToScreen`, `ComputeFrameToScreen`) | ~~122-133~~ | ✅ DONE — Kept code (essential for no-View drawing path). Removed misleading TODO comments. |
+| ~~"Diagnostics needs own backing field"~~ | ~~203~~ | ✅ DONE — Added `ViewDiagnosticFlags` backing field with same pattern as `ViewportSettings`. |
 
 ### 3.3 AdornmentView.cs TODO
 
 | TODO | Line | Action |
 |---|---|---|
-| "Thickness should only be on Adornment" | 52 |  Remove Thickness from AdornmentView. It should only be on Adornment; call sites that use AdornmentView.Thicnkess should pass-through to Adorment.Thickness |
+| ~~"Thickness should only be on Adornment"~~ | ~~52~~ | ✅ DONE — Removed `Thickness` property entirely from `AdornmentView`. |
 
 ### 3.4 BorderView.cs TODOs
 
@@ -120,7 +121,7 @@ These pass-throughs exist on `AdornmentImpl` so that callers can interact with a
 |---|---|---|
 | "Move DrawIndicator out of Border and into View" | 75 | **Defer.** Future PR. Not in scope. |
 | "This should be moved to LineCanvas as a new BorderStyle.Ruler" | 380 | **Defer.** Future PR. Not in scope. |
-| "This should not be done on each draw?" (gradient setup) | 420 | **Fix.** Cache the gradient FillPair and only recreate when bounds change. |
+| ~~"This should not be done on each draw?" (gradient setup)~~ | ~~420~~ | ✅ DONE — Cached gradient `FillPair` and `Rectangle`; only recreated when bounds change. |
 
 ### 3.5 PaddingView.cs TODO
 
@@ -132,7 +133,7 @@ These pass-throughs exist on `AdornmentImpl` so that callers can interact with a
 
 | TODO | Line | Action |
 |---|---|---|
-| "Simplify this by having _border be of type Border (IAdornment)" | 9 | **Fix.** Change `_border` from `BorderView` to `Border` (the lightweight settings type). Arranger only needs settings access (Thickness, LineStyle, Settings) plus the parent View. If it needs View-level access, go through `border.View` or `border.EnsureView()`. |
+| ~~"Simplify this by having _border be of type Border (IAdornment)"~~ | ~~9~~ | ✅ RESOLVED — Kept `_border` as `BorderView`. Analysis showed Arranger needs extensive View-level access (~50 call sites: App, HotKeyBindings, CanFocus, SetFocus, Add, Remove, Frame, etc.). Changing to `Border` would require `.EnsureView()`/`.View!` everywhere — more complex, not simpler. Settings are already accessed via `_border.Adornment!`. Replaced TODO with explanatory comment. |
 
 ---
 
@@ -152,29 +153,35 @@ These pass-throughs exist on `AdornmentImpl` so that callers can interact with a
 
 ## 5. Polish Plan — Ordered Work Items
 
-### 5.1 Stale TODO Cleanup (Low risk, quick wins)
+### 5.1 Stale TODO Cleanup ✅ DONE
 
-1. Remove "Thickness should only be on Adornment" TODO from `AdornmentImpl.cs:40` and `AdornmentView.cs:52` —  Remove Thickness from AdornmentView. It should only be on Adornment; call sites that use AdornmentView.Thicnkess should pass-through to Adorment.Thickness
-2. Remove "We should be able to remove this?" TODO from `AdornmentImpl.cs:122,126` — `FrameToScreen()` is needed for no-View drawing path
-3. Fix Diagnostics to have its own backing field (`AdornmentImpl.cs:203`)
-4. Remove `SetScheme` / `GetScheme` pass-throughs — callers use `EnsureView()`
-5. Update/remove misleading "Remove this" TODOs on pass-throughs that are essential for the lazy-creation null-safe pattern (see §3.1 analysis)
+1. ✅ Removed "Thickness should only be on Adornment" TODO from `AdornmentImpl.cs` and `AdornmentView.cs` — Thickness removed from AdornmentView entirely
+2. ✅ Removed "We should be able to remove this?" TODOs on `FrameToScreen`/`ComputeFrameToScreen`
+3. ✅ Fixed Diagnostics to have its own backing field (same pattern as `ViewportSettings`)
+4. ✅ Removed `SetScheme` / `GetScheme` pass-throughs — callers updated to `EnsureView().SetScheme()`
+5. ✅ Removed all 20+ misleading "Remove this" TODO comments on essential pass-throughs
 
-### 5.2 Remove Unnecessary Pass-Throughs (Medium risk)
+### 5.2 Remove Unnecessary Pass-Throughs ✅ DONE
 
-Remove ~8 pass-throughs identified as not used by framework (see §3.1 "Remove" items):
-- `HasFocus`, `Enabled`, `Remove(View)`, `Id`, `IsInitialized`, `LayoutSubViews()`
-- Possibly: `Visible`, `SchemeName`, `GetAttributeForRole()`, `BeginInit()`/`EndInit()` (after callsite verification)
+Removed pass-throughs not used by the framework:
+- ✅ `SetScheme`, `GetScheme` — callers updated to `EnsureView().SetScheme()`
+- ✅ `Id` — callers updated to use `.View!.Id`
+- ✅ `IsInitialized` — no callers
+- ✅ `LayoutSubViews` — framework uses `.View?.LayoutSubViews()` directly
+- ✅ `BeginInit`, `EndInit` — no external callers
 
-For each: grep callsites → update to `.View?.XXX` → remove from AdornmentImpl → run tests.
+Kept (have framework callers):
+- `HasFocus` — used by `View.Navigation.cs` to check adornment focus
+- `Enabled` — used by `View.cs` to propagate enabled state
+- `Remove` — used by `View.ScrollBars.cs` to remove scrollbars from Padding
 
-### 5.3 Arranger Simplification
+### 5.3 Arranger Simplification ✅ RESOLVED
 
-Change `Arranger._border` from `BorderView` to `Border` per §3.6. Audit Arranger methods for what they actually need from the View vs. settings.
+Analysis showed `_border` must remain `BorderView` — Arranger needs ~50 View-level call sites. Replaced misleading TODO with explanatory comment. See §3.6.
 
-### 5.4 BorderView Gradient Caching
+### 5.4 BorderView Gradient Caching ✅ DONE
 
-Cache gradient FillPair per §3.4 to avoid recreating on every draw.
+Added `_cachedGradientFill` and `_cachedGradientRect` fields. Gradient `FillPair` is only recreated when bounds change. Cache is cleared when gradient setting is turned off.
 
 ---
 
@@ -209,86 +216,31 @@ Cache gradient FillPair per §3.4 to avoid recreating on every draw.
 | **Margin.OnThicknessChanged does NOT trigger EnsureView** (commented out) | Medium | `MarginTests.cs` |
 | **Memory savings verification** — plain View creates zero AdornmentViews | Medium | `AdornmentLayoutTests.cs` |
 
-### 6.3 New Test Plan
+### 6.3 New Test Plan — ✅ DONE
 
-#### `AdornmentImplPassThroughTests.cs` (NEW — ~25 tests)
+#### `AdornmentImplPassThroughTests.cs` ✅ CREATED — 40 tests
 
-Systematic verification that each convenience pass-through on `AdornmentImpl` correctly delegates to the backing View (or no-ops when null):
+Systematic verification of all convenience pass-throughs on `AdornmentImpl`:
+- NeedsDraw/SetNeedsDraw/ClearNeedsDraw (with/without View)
+- NeedsLayout/SetNeedsLayout (with/without View)
+- Diagnostics (local storage + forwarding)
+- SubViews (empty default + delegation)
+- Add (forces View creation) / Remove (no-op without View)
+- HasFocus, Enabled, Visible (defaults + delegation)
+- ViewportSettings, SchemeName (local storage + delegation)
+- Contains (thickness calc without View, delegation with View)
+- GetAttributeForRole (parent fallback)
+- FrameToScreen (computed without View, delegated with View)
+- Draw (thickness path vs View delegation)
+- EnsureView (creation, idempotency, init synchronization)
+- Dispose (clears View+Parent)
 
-```
-// For each pass-through property/method:
-// 1. Test with View == null (expect default/no-op)
-// 2. Call EnsureView(), then test delegation
-// 3. Test bidirectional sync where applicable
+#### Remaining test gaps (deferred — not blocking this PR)
 
-- NeedsDraw_WithoutView_ReturnsFalse
-- NeedsDraw_WithView_DelegatesToView
-- SetNeedsDraw_WithoutView_IsNoOp (or stores flag)
-- SetNeedsDraw_WithView_DelegatesToView
-- ClearNeedsDraw_WithoutView_IsNoOp
-- ClearNeedsDraw_WithView_DelegatesToView
-- NeedsLayout_WithoutView_ReturnsFalse
-- NeedsLayout_WithView_DelegatesToView
-- SetNeedsLayout_WithoutView_IsNoOp
-- SubViews_WithoutView_ReturnsEmpty
-- SubViews_WithView_DelegatesToView
-- Add_ForcesViewCreation
-- HasFocus_WithoutView_ReturnsFalse
-- Visible_WithoutView_ReturnsTrue
-- Visible_WithView_DelegatesToView
-- Enabled_WithoutView_ReturnsTrue
-- Enabled_WithView_DelegatesToView
-- Contains_WithoutView_UsesThicknessCalculation
-- Contains_WithView_DelegatesToView
-- Diagnostics_WithoutView_ReturnsOff
-- Diagnostics_WithView_DelegatesToView
-- ViewportSettings_StoredLocally_ForwardedToView
-- SchemeName_StoredLocally_ForwardedToView
-- FrameToScreen_WithoutView_ComputesFromParent
-- FrameToScreen_WithView_DelegatesToView
-```
-
-#### `AdornmentTests.cs` additions (~10 tests)
-
-```
-- IAdornmentView_Is_Implemented_By_AdornmentView
-- IAdornmentView_Is_Implemented_By_BorderView
-- IAdornmentView_Is_Implemented_By_MarginView
-- IAdornmentView_Is_Implemented_By_PaddingView
-- EnsureView_MidInit_CallsBeginInitOnly
-- EnsureView_PostInit_CallsBeginAndEndInit
-- EnsureView_PreInit_NoInitCalls
-- Draw_WithoutView_DrawsThickness
-- Draw_WithView_DelegatesToViewDraw
-- AdornmentView_Standalone_Uses_FallbackThickness
-```
-
-#### `MarginTests.cs` additions (~5 tests)
-
-```
-- CacheClip_StoresClipRegion
-- GetCachedClip_ReturnsCachedRegion
-- ClearCachedClip_ClearsRegion
-- OnThicknessChanged_DoesNotCreateView
-- ShadowStyle_None_ClearsShadowOnView
-```
-
-#### `PaddingTests.cs` additions (~4 tests)
-
-```
-- GetSubViews_IncludePadding_IncludesParentSubViews
-- GetSubViews_ExcludePadding_ReturnsOnlyDirect
-- OnMouseEvent_ClickFocusesParent
-- OnMouseEvent_IgnoresNonLeftClick
-```
-
-#### `BorderTests.cs` additions (~3 tests)
-
-```
-- OnThicknessChanged_WithLineStyle_CreatesView
-- OnThicknessChanged_WithoutLineStyle_DoesNotCreateView
-- GradientSetup_CachedBetweenDraws (after §5.4 fix)
-```
+- MarginView.CacheClip / GetCachedClip / ClearCachedClip
+- PaddingView.GetSubViews override
+- PaddingView.OnMouseEvent click-to-focus
+- Memory savings verification (plain View creates zero AdornmentViews)
 
 ---
 
