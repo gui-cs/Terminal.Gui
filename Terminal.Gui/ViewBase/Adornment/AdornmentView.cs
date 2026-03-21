@@ -49,6 +49,8 @@ public class AdornmentView : View, IAdornmentView, IDesignable
 
     #region Thickness — delegated to IAdornment
 
+    // TODO: Thickness should only be on Adornment. AdornmentView should pass through to Adornment
+
     // Fallback for standalone AdornmentView instances without a back-reference (AllViewsTester).
     private Thickness _standaloneFallbackThickness = Thickness.Empty;
 
