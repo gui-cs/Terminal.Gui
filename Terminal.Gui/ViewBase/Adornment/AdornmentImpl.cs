@@ -331,7 +331,7 @@ public abstract class AdornmentImpl : IAdornment
     {
         if (View is null && Parent is { })
         {
-            Thickness.Draw (Parent.Driver, Parent.FrameToScreen (), Diagnostics);
+            Thickness.Draw (Parent.Driver, FrameToScreen (), Diagnostics);
 
             return;
         }
