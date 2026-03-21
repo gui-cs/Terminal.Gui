@@ -44,6 +44,9 @@ internal class ShadowView : View
                 break;
         }
 
+        // Report the drawn region so that Margin's CachedDrawnRegion includes shadow cells.
+        context?.AddDrawnRectangle (ViewportToScreen (Viewport));
+
         return true;
     }
 

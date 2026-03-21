@@ -166,6 +166,12 @@ public partial class Border : Adornment
 }
 #endif
 
+    /// <summary>
+    ///     Gets the screen-coordinate rectangle of the title text from the last draw pass.
+    ///     Used by the parent view to build <see cref="View.CachedDrawnRegion"/> for TransparentMouse hit-testing.
+    /// </summary>
+    internal Rectangle? LastTitleRect { get; set; }
+
     internal Rectangle GetBorderRectangle ()
     {
         Rectangle screenRect = ViewportToScreen (Viewport);
@@ -308,6 +314,10 @@ public partial class Border : Adornment
             // This ensures the title occludes peer subviews when the Border is transparent.
             context?.AddDrawnRectangle (titleRect);
             LineCanvas.Exclude (new Region (titleRect));
+
+            // Cache the title rect for TransparentMouse hit-testing. The parent uses this
+            // to build CachedDrawnRegion since the title is drawn directly (not via LineCanvas).
+            LastTitleRect = titleRect;
         }
 
         if (!canDrawBorder || LineStyle == LineStyle.None)

@@ -770,6 +770,12 @@ public partial class View // Drawing APIs
     internal Region? CachedDrawnRegion { get; set; }
 
     /// <summary>
+    ///     The line canvas region from the last <see cref="RenderLineCanvas"/> call. Used to build
+    ///     <see cref="CachedDrawnRegion"/> for the Border adornment (which draws via merged LineCanvas).
+    /// </summary>
+    private Region? _lastLineCanvasRegion;
+
+    /// <summary>
     ///     Causes the contents of <see cref="LineCanvas"/> to be drawn.
     ///     If <see cref="SuperViewRendersLineCanvas"/> is true, only the
     ///     <see cref="LineCanvas"/> of this view's SubViews will be rendered. If <see cref="SuperViewRendersLineCanvas"/> is
@@ -811,6 +817,10 @@ public partial class View // Drawing APIs
         {
             context.AddDrawnRegion (lineRegion);
         }
+
+        // Cache the line canvas region for use by Border's CachedDrawnRegion.
+        // This includes border lines merged from Border.LineCanvas via SuperViewRendersLineCanvas.
+        _lastLineCanvasRegion = cellMap.Count > 0 ? lineRegion : null;
 
         LineCanvas.Clear ();
     }
@@ -867,7 +877,60 @@ public partial class View // Drawing APIs
         // accumulates what this subview occupied — important when the SuperView itself is
         // transparent and needs to know which areas its subviews drew.
         // -----------------------------------------------------------------------
+        // -----------------------------------------------------------------------
+        // Cache drawn regions for adornments with TransparentMouse BEFORE clip exclusion.
+        // At this point, the context contains fine-grained drawn regions (text, content,
+        // line canvas) but NOT the full borderFrame rectangle that the opaque path adds below.
+        // This gives us accurate per-cell regions for Border's title text + line canvas cells.
+        // -----------------------------------------------------------------------
+        if (this is not Adornment && context is { })
+        {
+            if (Border is { } borderForCache && borderForCache.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+            {
+                // Build the Border's cached region from:
+                // 1. Line canvas region (border lines rendered via SuperViewRendersLineCanvas merge)
+                //    intersected with the Border's frame.
+                // 2. The Border's last title rect (drawn directly, not via LineCanvas).
+                Region borderDrawnRegion = new ();
+
+                if (_lastLineCanvasRegion is { })
+                {
+                    Region lineRegion = _lastLineCanvasRegion.Clone ();
+                    lineRegion.Intersect (borderForCache.FrameToScreen ());
+                    borderDrawnRegion.Union (lineRegion);
+                }
+
+                if (borderForCache.LastTitleRect is { } titleRect)
+                {
+                    borderDrawnRegion.Union (titleRect);
+                }
+
+                borderForCache.CachedDrawnRegion = borderDrawnRegion;
+            }
+
+            if (Margin is { } marginForCache && marginForCache.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+            {
+                Region marginDrawnRegion = context.GetDrawnRegion ().Clone ();
+                marginDrawnRegion.Intersect (marginForCache.FrameToScreen ());
+                marginForCache.CachedDrawnRegion = marginDrawnRegion;
+            }
+
+            if (Padding is { } paddingForCache && paddingForCache.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+            {
+                Region paddingDrawnRegion = context.GetDrawnRegion ().Clone ();
+                paddingDrawnRegion.Intersect (paddingForCache.FrameToScreen ());
+                paddingForCache.CachedDrawnRegion = paddingDrawnRegion;
+            }
+        }
+
         if (this is Adornment && !ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
+        {
+            return;
+        }
+
+        // Transparent adornments drawn without a context (e.g., Margin via DrawShadows) cannot
+        // participate in clip exclusion — they have no DrawContext to report drawn regions.
+        if (this is Adornment && context is null)
         {
             return;
         }
@@ -933,6 +996,29 @@ public partial class View // Drawing APIs
             // what area this subview occupied — critical when the SuperView is transparent and
             // needs to compute its own drawn region (which includes its subviews areas).
             context?.AddDrawnRectangle (borderFrame);
+        }
+
+        // -----------------------------------------------------------------------
+        // Cache drawn region for this view's own TransparentMouse hit-testing.
+        // -----------------------------------------------------------------------
+        if (ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+        {
+            if (isEffectivelyTransparent)
+            {
+                CachedDrawnRegion = context!.GetDrawnRegion ().Clone ();
+            }
+            else
+            {
+                // Opaque view with TransparentMouse — cache the entire border frame.
+                Rectangle frame = FrameToScreen ();
+
+                if (Border is { })
+                {
+                    frame = Border.FrameToScreen ();
+                }
+
+                CachedDrawnRegion = new Region (frame);
+            }
         }
 
         // Post-condition: Driver.Clip now has a "hole" where this view was drawn. Peer views

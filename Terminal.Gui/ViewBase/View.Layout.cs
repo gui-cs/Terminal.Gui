@@ -1270,8 +1270,13 @@ public partial class View // Layout APIs
             return viewsUnderLocation;
         }
 
+        // Capture for use in lambdas (can't use 'in' parameter directly).
+        Point location = screenLocation;
+
         // Remove all views that have an adornment with ViewportSettings.TransparentMouse; they are in the list
         // because the point was in their adornment, and if the adornment is transparent, they should be removed.
+        // Per-cell check: if the adornment has a CachedDrawnRegion, only remove if the point is NOT in the
+        // drawn region (the click is on an undrawn cell). If no cache, fall back to blanket removal.
         viewsUnderLocation.RemoveAll (v =>
                                       {
                                           if (v is null or Adornment)
@@ -1283,24 +1288,51 @@ public partial class View // Layout APIs
 
                                           if (viewsUnderLocation.Contains (v.Margin) && v.Margin!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
                                           {
-                                              ret = true;
+                                              if (v.Margin.CachedDrawnRegion is null
+                                                  || !v.Margin.CachedDrawnRegion.Contains (location.X, location.Y))
+                                              {
+                                                  ret = true;
+                                              }
                                           }
 
                                           if (viewsUnderLocation.Contains (v.Border) && v.Border!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
                                           {
-                                              ret = true;
+                                              if (v.Border.CachedDrawnRegion is null
+                                                  || !v.Border.CachedDrawnRegion.Contains (location.X, location.Y))
+                                              {
+                                                  ret = true;
+                                              }
                                           }
 
                                           if (viewsUnderLocation.Contains (v.Padding) && v.Padding!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
                                           {
-                                              ret = true;
+                                              if (v.Padding.CachedDrawnRegion is null
+                                                  || !v.Padding.CachedDrawnRegion.Contains (location.X, location.Y))
+                                              {
+                                                  ret = true;
+                                              }
                                           }
 
                                           return ret is true;
                                       });
 
-        // Now remove all views that have ViewportSettings.TransparentMouse set
-        viewsUnderLocation.RemoveAll (v => v!.ViewportSettings.HasFlag (excludeViewportSettingsFlags));
+        // Now remove all views that have ViewportSettings.TransparentMouse set.
+        // Per-cell check: if a CachedDrawnRegion exists, only remove if the point is NOT in the drawn region.
+        // If no cache (before first draw), fall back to blanket removal.
+        viewsUnderLocation.RemoveAll (v =>
+                                      {
+                                          if (!v!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          {
+                                              return false;
+                                          }
+
+                                          if (v.CachedDrawnRegion is { } drawnRegion)
+                                          {
+                                              return !drawnRegion.Contains (location.X, location.Y);
+                                          }
+
+                                          return true;
+                                      });
 
         return viewsUnderLocation;
     }

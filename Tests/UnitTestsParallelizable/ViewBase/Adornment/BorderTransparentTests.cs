@@ -277,7 +277,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     are still captured by the Border (only the transparent interior passes through).
     ///     Requires Phase 2e (drawn-region-aware hit-testing).
     /// </summary>
-    [Fact (Skip = "Phase 2e — drawn-region-aware hit-testing not yet implemented")]
+    [Fact]
     public void Border_TransparentMouse_BorderLine_Clicks_Are_Captured ()
     {
         using IApplication app = Application.Create ();
@@ -316,7 +316,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     are captured by the Border. The title is drawn content and should receive clicks.
     ///     Requires Phase 2e.
     /// </summary>
-    [Fact (Skip = "Phase 2e — drawn-region-aware hit-testing not yet implemented")]
+    [Fact]
     public void Border_TransparentMouse_Title_Clicks_Are_Captured ()
     {
         using IApplication app = Application.Create ();
@@ -356,7 +356,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     empty margin cells but captures them on shadow cells.
     ///     Requires Phase 2d (ShadowView reports drawn region) and 2e (drawn-region-aware hit-testing).
     /// </summary>
-    [Fact (Skip = "Phase 2d/2e — ShadowView drawn region and hit-testing not yet implemented")]
+    [Fact]
     public void Margin_TransparentMouse_Shadow_Clicks_Are_Captured ()
     {
         using IApplication app = Application.Create ();
@@ -383,7 +383,11 @@ public class BorderTransparentTests (ITestOutputHelper output)
         // The shadow is drawn on the right (col 6) and bottom (row 4) of the view.
         // The Margin has TransparentMouse set by default.
         // Click on a shadow cell — should be captured (shadow drew there).
-        List<View?> viewsOnShadow = window.GetViewsUnderLocation (new Point (6, 2), ViewportSettingsFlags.TransparentMouse);
+        // The shadow is drawn by two ShadowViews:
+        // - Vertical: at the right edge of the Margin (x=5 in screen coords for view at x=1, w=5)
+        // - Horizontal: at the bottom edge of the Margin (y=3 in screen coords for view at y=1, h=3)
+        // Click on the vertical shadow cell at screen position (5, 2) — should be captured.
+        List<View?> viewsOnShadow = window.GetViewsUnderLocation (new Point (5, 2), ViewportSettingsFlags.TransparentMouse);
         bool marginInList = viewsOnShadow.Any (v => v is Margin);
 
         Assert.True (marginInList, "Margin with shadow should capture mouse events on shadow cells");
@@ -399,7 +403,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     but capture clicks on drawn cells.
     ///     Requires Phase 2a/2b/2e.
     /// </summary>
-    [Fact (Skip = "Phase 2a/2b/2e — drawn-region-aware hit-testing not yet implemented")]
+    [Fact]
     public void View_TransparentMouse_DrawnCells_Captured_UndrawnCells_PassThrough ()
     {
         using IApplication app = Application.Create ();
@@ -449,7 +453,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     falls back to blanket removal (no regression from current behavior).
     ///     Requires Phase 2e.
     /// </summary>
-    [Fact (Skip = "Phase 2e — drawn-region-aware hit-testing not yet implemented")]
+    [Fact]
     public void View_TransparentMouse_NullCache_FallsBackToBlanketRemoval ()
     {
         using IApplication app = Application.Create ();
@@ -490,7 +494,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     between drawn border line cells and empty cells in the border thickness area.
     ///     Requires Phase 2a/2b/2e.
     /// </summary>
-    [Fact (Skip = "Phase 2a/2b/2e — drawn-region-aware hit-testing not yet implemented")]
+    [Fact]
     public void Border_TransparentMouse_ThickBorder_EmptyCells_PassThrough ()
     {
         using IApplication app = Application.Create ();
@@ -516,17 +520,18 @@ public class BorderTransparentTests (ITestOutputHelper output)
         window.Add (borderedView);
         app.Begin (window);
 
-        // The outer border line is at offset 0 from Border frame; inner line at offset 1.
-        // With thickness=2, there's a gap row/col between outer and inner lines where nothing is drawn.
-        // Click on the top-left outer border line — should be captured.
-        List<View?> viewsOnOuterLine = window.GetViewsUnderLocation (new Point (1, 1), ViewportSettingsFlags.TransparentMouse);
-        bool borderCaptured = viewsOnOuterLine.Any (v => v is Border);
-        Assert.True (borderCaptured, "Click on outer border line should be captured");
+        // With thickness=2, GetBorderRectangle() places the line at offset 1 from the Border viewport edge.
+        // View at (1,1,9,7) → Border frame at (1,1,9,7) → border line rectangle at (2,2,7,5).
+        // Click on the top-left corner of the border line (screen 2,2) — should be captured.
+        List<View?> viewsOnBorderLine = window.GetViewsUnderLocation (new Point (2, 2), ViewportSettingsFlags.TransparentMouse);
+        bool borderCaptured = viewsOnBorderLine.Any (v => v is Border);
+        Assert.True (borderCaptured, "Click on border line should be captured");
 
-        // Click on an empty cell in the border thickness gap (between outer and inner lines).
-        // For thickness=2 with single line, the cell at (2, 3) in screen coords should be empty gap.
-        // This is inside the border frame but not on a drawn line — should pass through.
-        // Note: The exact gap position depends on how the lines are drawn with thickness=2.
+        // Click on an empty cell in the outer thickness gap (screen 1,1) — inside the border frame
+        // but NOT on a drawn line. This should pass through.
+        List<View?> viewsOnGap = window.GetViewsUnderLocation (new Point (1, 1), ViewportSettingsFlags.TransparentMouse);
+        bool borderCapturedOnGap = viewsOnGap.Any (v => v is Border);
+        Assert.False (borderCapturedOnGap, "Click on empty gap in border thickness should pass through");
     }
 
     /// <summary>

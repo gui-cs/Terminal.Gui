@@ -11,7 +11,7 @@
 | Phase 1a: Fix Border LineCanvas ownership | Done |
 | Phase 1b: Make Border participate in clip exclusion when Transparent | Done |
 | Phase 1 extras: title occlusion, clip clamping, AnchorEnd tests | Done |
-| Phase 2: Drawn-region-aware TransparentMouse | Tests planned — 14 Skip'd tests ready |
+| Phase 2: Drawn-region-aware TransparentMouse | **DONE** — all 28 tests passing |
 
 ## Context
 

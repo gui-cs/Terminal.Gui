@@ -97,6 +97,23 @@ public class Margin : Adornment
                 margin.Draw ();
                 view.SetClip (saved);
                 margin.ClearCachedClip ();
+
+                // Build CachedDrawnRegion for TransparentMouse hit-testing from visible SubViews
+                // (ShadowViews). Each visible SubView's viewport represents drawn shadow cells.
+                if (margin.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+                {
+                    Region marginDrawnRegion = new ();
+
+                    foreach (View subView in margin.InternalSubViews)
+                    {
+                        if (subView.Visible)
+                        {
+                            marginDrawnRegion.Union (subView.FrameToScreen ());
+                        }
+                    }
+
+                    margin.CachedDrawnRegion = marginDrawnRegion.IsEmpty () ? null : marginDrawnRegion;
+                }
             }
 
             // Do not include Margin views of subviews; not supported

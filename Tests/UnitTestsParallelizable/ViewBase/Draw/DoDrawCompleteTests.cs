@@ -326,7 +326,7 @@ public class DoDrawCompleteTests : TestDriverBase
     ///     Verifies that CachedDrawnRegion is populated after Draw() for a view with TransparentMouse set.
     ///     Requires Phase 2a (add _cachedDrawnRegion field) and 2b (cache in DoDrawComplete).
     /// </summary>
-    [Fact (Skip = "Phase 2a/2b — CachedDrawnRegion not yet implemented")]
+    [Fact]
     public void CachedDrawnRegion_PopulatedAfterDraw_WhenTransparentMouse ()
     {
         IDriver driver = CreateTestDriver ();
@@ -360,7 +360,7 @@ public class DoDrawCompleteTests : TestDriverBase
     ///     No point caching for views that won't be filtered during hit-testing.
     ///     Requires Phase 2a/2b.
     /// </summary>
-    [Fact (Skip = "Phase 2a/2b — CachedDrawnRegion not yet implemented")]
+    [Fact]
     public void CachedDrawnRegion_Null_WhenNotTransparentMouse ()
     {
         IDriver driver = CreateTestDriver ();
@@ -388,7 +388,7 @@ public class DoDrawCompleteTests : TestDriverBase
     ///     Verifies that CachedDrawnRegion is cleared when SetNeedsDraw is called.
     ///     Requires Phase 2c (invalidate cache in SetNeedsDraw).
     /// </summary>
-    [Fact (Skip = "Phase 2c — CachedDrawnRegion invalidation not yet implemented")]
+    [Fact]
     public void CachedDrawnRegion_ClearedBySetNeedsDraw ()
     {
         IDriver driver = CreateTestDriver ();
@@ -420,7 +420,7 @@ public class DoDrawCompleteTests : TestDriverBase
     ///     only the actually-drawn cells, not the entire frame.
     ///     Requires Phase 2a/2b.
     /// </summary>
-    [Fact (Skip = "Phase 2a/2b — CachedDrawnRegion not yet implemented")]
+    [Fact]
     public void CachedDrawnRegion_TransparentView_ContainsOnlyDrawnCells ()
     {
         IDriver driver = CreateTestDriver ();
@@ -459,7 +459,7 @@ public class DoDrawCompleteTests : TestDriverBase
     ///     after Draw(). The cached region should contain the border line cells.
     ///     Requires Phase 2a/2b.
     /// </summary>
-    [Fact (Skip = "Phase 2a/2b — CachedDrawnRegion not yet implemented")]
+    [Fact]
     public void CachedDrawnRegion_BorderAdornment_PopulatedAfterDraw ()
     {
         IDriver driver = CreateTestDriver ();
@@ -498,7 +498,7 @@ public class DoDrawCompleteTests : TestDriverBase
     ///     AND title text. Both are "drawn content" and should receive mouse events.
     ///     Requires Phase 2a/2b.
     /// </summary>
-    [Fact (Skip = "Phase 2a/2b — CachedDrawnRegion not yet implemented")]
+    [Fact]
     public void CachedDrawnRegion_Border_IncludesTitleAndLines ()
     {
         IDriver driver = CreateTestDriver ();
@@ -543,7 +543,7 @@ public class DoDrawCompleteTests : TestDriverBase
     ///     This is needed so that Margin's CachedDrawnRegion includes shadow cells.
     ///     Requires Phase 2d (ShadowView reports drawn region).
     /// </summary>
-    [Fact (Skip = "Phase 2d — ShadowView drawn region reporting not yet implemented")]
+    [Fact]
     public void ShadowView_ReportsDrawnRegionToContext ()
     {
         IDriver driver = CreateTestDriver ();
@@ -578,7 +578,7 @@ public class DoDrawCompleteTests : TestDriverBase
     ///     Verifies that CachedDrawnRegion is repopulated after a redraw following invalidation.
     ///     Requires Phase 2a/2b/2c.
     /// </summary>
-    [Fact (Skip = "Phase 2a/2b/2c — CachedDrawnRegion not yet implemented")]
+    [Fact]
     public void CachedDrawnRegion_RepopulatedAfterRedraw ()
     {
         IDriver driver = CreateTestDriver ();
