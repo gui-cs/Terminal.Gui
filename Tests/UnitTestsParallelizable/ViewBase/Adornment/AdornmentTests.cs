@@ -55,7 +55,7 @@ public class AdornmentTests (ITestOutputHelper output) : TestDriverBase
     public void ViewportToScreen_Uses_Parent_Not_SuperView ()
     {
         var parent = new View { X = 1, Y = 2, Width = 10, Height = 10 };
-        parent.Margin.EnsureView ();
+        parent.Margin.GetOrCreateView ();
 
         parent.BeginInit ();
         parent.EndInit ();
@@ -179,7 +179,7 @@ public class AdornmentTests (ITestOutputHelper output) : TestDriverBase
     public void FrameToScreen_Uses_Parent_Not_SuperView ()
     {
         var parent = new View { X = 1, Y = 2, Width = 10, Height = 10 };
-        parent.Margin.EnsureView ();
+        parent.Margin.GetOrCreateView ();
 
         parent.BeginInit ();
         parent.EndInit ();
@@ -286,7 +286,7 @@ public class AdornmentTests (ITestOutputHelper output) : TestDriverBase
     public void Setting_Thickness_Causes_Adornment_Layout ()
     {
         var parent = new View ();
-        parent.Margin.EnsureView ();
+        parent.Margin.GetOrCreateView ();
         var raised = false;
         parent.BeginInit ();
         parent.EndInit ();
@@ -294,7 +294,7 @@ public class AdornmentTests (ITestOutputHelper output) : TestDriverBase
         parent.Margin.View?.SubViewLayout += LayoutStarted;
         parent.Margin.Thickness = new Thickness (1, 2, 3, 4);
         Assert.True (parent.NeedsLayout);
-        Assert.True (parent.Margin.NeedsLayout);
+        Assert.True (parent.Margin.View?.NeedsLayout == true);
         parent.Layout ();
         Assert.True (raised);
 

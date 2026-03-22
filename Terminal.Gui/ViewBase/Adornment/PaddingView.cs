@@ -2,7 +2,7 @@ namespace Terminal.Gui.ViewBase;
 
 /// <summary>
 ///     The View-backed rendering layer for the Padding adornment.
-///     Created lazily by <see cref="Padding"/> (via <see cref="AdornmentImpl.EnsureView"/>)
+///     Created lazily by <see cref="Padding"/> (via <see cref="AdornmentImpl.GetOrCreateView"/>)
 ///     when SubViews are added or other View-level functionality is needed.
 /// </summary>
 /// <remarks>

@@ -12,6 +12,31 @@ public partial class View // Adornments
             Margin.Parent = this;
             Border.Parent = this;
             Padding.Parent = this;
+
+            // When any adornment's thickness changes, recompute frames and request layout + redraw.
+            Margin.ThicknessChanged += (_, _) =>
+                                       {
+                                           Margin.View?.SetNeedsLayout ();
+                                           SetAdornmentFrames ();
+                                           SetNeedsLayout ();
+                                           SetNeedsDraw ();
+                                       };
+
+            Border.ThicknessChanged += (_, _) =>
+                                       {
+                                           Border.View?.SetNeedsLayout ();
+                                           SetAdornmentFrames ();
+                                           SetNeedsLayout ();
+                                           SetNeedsDraw ();
+                                       };
+
+            Padding.ThicknessChanged += (_, _) =>
+                                        {
+                                            Padding.View?.SetNeedsLayout ();
+                                            SetAdornmentFrames ();
+                                            SetNeedsLayout ();
+                                            SetNeedsDraw ();
+                                        };
         }
     }
 
@@ -33,10 +58,13 @@ public partial class View // Adornments
     {
         Margin.View?.Dispose ();
         Margin.View = null;
+        Margin.Parent = null;
         Border.View?.Dispose ();
         Border.View = null;
+        Border.Parent = null;
         Padding.View?.Dispose ();
         Padding.View = null;
+        Padding.Parent = null;
     }
 
     /// <summary>

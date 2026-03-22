@@ -593,7 +593,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : TestDriverBas
 
         // BUGBUG: Border.set_LineStyle does not call SetNeedsDraw
         viewWithBorderAtX1!.Border.LineStyle = LineStyle.Single;
-        viewWithBorderAtX1.Border.SetNeedsDraw ();
+        viewWithBorderAtX1.Border.View?.SetNeedsDraw ();
         app.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsAre (

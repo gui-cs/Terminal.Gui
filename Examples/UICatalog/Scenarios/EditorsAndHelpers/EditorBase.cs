@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 namespace UICatalog.Scenarios;
 
 public abstract class EditorBase : View
@@ -26,7 +26,7 @@ public abstract class EditorBase : View
         {
             if (ExpanderButton is { })
             {
-                Border.Add (ExpanderButton);
+                Border.GetOrCreateView ().Add (ExpanderButton);
             }
 
             App!.Mouse.MouseEvent += ApplicationOnMouseEvent;
@@ -50,7 +50,7 @@ public abstract class EditorBase : View
 
     public bool ShowViewIdentifier
     {
-        get => Padding is { } && Padding.Thickness != Thickness.Empty;
+        get => Padding.Thickness != Thickness.Empty;
         set => Padding.Thickness = value ? new Thickness (0, 2, 0, 0) : Thickness.Empty;
     }
 

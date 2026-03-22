@@ -75,7 +75,7 @@ public class BorderEditor : AdornmentEditor
                 border.LineStyle = (LineStyle)args.Value;
             }
 
-            border.SetNeedsDraw ();
+            border.View?.SetNeedsDraw ();
             SetNeedsLayout ();
         }
 

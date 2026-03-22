@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 // ReSharper disable AccessToDisposedClosure
 
@@ -98,16 +98,16 @@ public class Adornments : Scenario
             SchemeName = "Dialog"
         };
 
-        window.Margin.EnsureView ();
+        window.Margin.GetOrCreateView ();
         window.Margin.View?.Text = "Margin Text";
         window.Margin.Thickness = new Thickness (2);
 
-        window.Border.EnsureView ();
+        window.Border.GetOrCreateView ();
         //window.Border.View.Text = "Border Text";
         window.Border.Thickness = new Thickness (3);
         window.Border.View?.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
 
-        window.Border.EnsureView ();
+        window.Border.GetOrCreateView ();
         window.Padding.View?.Text = "Padding Text line 1\nPadding Text line 3\nPadding Text line 3\nPadding Text line 4\nPadding Text line 5";
         window.Padding.Thickness = new Thickness (1);
         window.Padding.View?.SetScheme (SchemeManager.GetScheme (Schemes.Menu));
@@ -132,10 +132,10 @@ public class Adornments : Scenario
                                                                      MessageBox.Query (appWindow.App!, 20, 7, "Hi", "Button in Border Pressed!", "Ok");
                                                                      args.Handled = true;
                                                                  };
-                                  window.Border.Add (btnButtonInBorder);
+                                  window.Border.GetOrCreateView ().Add (btnButtonInBorder);
 
                                   Label labelInPadding = new () { X = 0, Y = 1, Title = "_Text:" };
-                                  window.Padding.Add (labelInPadding);
+                                  window.Padding.GetOrCreateView ().Add (labelInPadding);
 
                                   TextField textFieldInPadding = new ()
                                   {
@@ -144,7 +144,7 @@ public class Adornments : Scenario
 
                                   textFieldInPadding.Accepting +=
                                       (_, _) => MessageBox.Query (appWindow.App!, 20, 7, "TextField", textFieldInPadding.Text, "Ok");
-                                  window.Padding.Add (textFieldInPadding);
+                                  window.Padding.GetOrCreateView ().Add (textFieldInPadding);
 
                                   Button btnButtonInPadding = new () { X = Pos.Center (), Y = 1, Text = "_Button in Padding Y = 1", CanFocus = true };
 
@@ -153,7 +153,7 @@ public class Adornments : Scenario
                                                                       MessageBox.Query (appWindow.App!, 20, 7, "Hi", "Button in Padding Pressed!", "Ok");
                                                                       args.Handled = true;
                                                                   };
-                                  window.Padding.Add (btnButtonInPadding);
+                                  window.Padding.GetOrCreateView ().Add (btnButtonInPadding);
 
 #if SUBVIEW_BASED_BORDER
                                 btnButtonInPadding.Border.CloseButton.Visible = true;

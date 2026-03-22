@@ -21,7 +21,7 @@ public partial class View
     ///     </para>
     /// </remarks>
     public bool NeedsDraw =>
-        Visible && (NeedsDrawRect != Rectangle.Empty || Margin.NeedsDraw == true || Border.View?.NeedsDraw == true || Padding.NeedsDraw == true);
+        Visible && (NeedsDrawRect != Rectangle.Empty || Margin.View?.NeedsDraw == true || Border.View?.NeedsDraw == true || Padding.View?.NeedsDraw == true);
 
     /// <summary>
     ///     Sets <see cref="NeedsDraw"/> to <see langword="true"/> indicating the <see cref="Viewport"/> of this View needs to
@@ -90,14 +90,14 @@ public partial class View
 
         // Do not set on Margin - it will be drawn in a separate pass.
 
-        if (Border is { } && Border.Thickness != Thickness.Empty)
+        if (Border.Thickness != Thickness.Empty)
         {
-            Border.SetNeedsDraw ();
+            Border.View?.SetNeedsDraw ();
         }
 
-        if (Padding is { } && Padding.Thickness != Thickness.Empty)
+        if (Padding.Thickness != Thickness.Empty)
         {
-            Padding.SetNeedsDraw ();
+            Padding.View?.SetNeedsDraw ();
         }
 
         SuperView?.SetSubViewNeedsDrawDownHierarchy ();
@@ -129,9 +129,9 @@ public partial class View
     {
         NeedsDrawRect = Rectangle.Empty;
 
-        Margin.ClearNeedsDraw ();
+        Margin.View?.ClearNeedsDraw ();
         Border.View?.ClearNeedsDraw ();
-        Padding.ClearNeedsDraw ();
+        Padding.View?.ClearNeedsDraw ();
 
         foreach (View subview in InternalSubViews.Snapshot ())
         {

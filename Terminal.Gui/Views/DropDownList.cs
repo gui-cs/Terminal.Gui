@@ -169,7 +169,7 @@ public class DropDownList : TextField
 
         // Add toggle button to Padding
         Padding.Thickness = Padding.Thickness with { Right = 1 }; // Add some spacing on the right for the button
-        Padding.Add (_toggleButton);
+        Padding.GetOrCreateView ().Add (_toggleButton);
 
         // Adjust TextField width to account for toggle button
         Width = Dim.Auto (minimumContentDim: Dim.Func (_ => _listPopover.ContentView?.MaxItemLength ?? 0));

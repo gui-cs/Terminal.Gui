@@ -1,4 +1,4 @@
-﻿using UnitTests;
+using UnitTests;
 
 namespace ViewBaseTests.Adornments;
 
@@ -11,7 +11,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
     {
         var view = new View ();
         var subView = new View ();
-        view.Padding.Add (subView);
+        view.Padding.GetOrCreateView ().Add (subView);
         view.BeginInit ();
         view.EndInit ();
         var raised = false;
@@ -49,7 +49,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
         // Turn of TransparentMouse for the test
         subView.Padding.ViewportSettings = ViewportSettingsFlags.None;
 
-        runnable.Padding.Add (subView);
+        runnable.Padding.GetOrCreateView ().Add (subView);
         runnable.Layout ();
 
         View? foundView = runnable.GetViewsUnderLocation (new Point (0, 0), ViewportSettingsFlags.None).LastOrDefault ();
@@ -74,7 +74,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
             Height = 1,
             Visible = false
         };
-        runnable.Padding.Add (subView);
+        runnable.Padding.GetOrCreateView ().Add (subView);
         runnable.Layout ();
 
         Assert.Equal (runnable.Padding.View!, runnable.GetViewsUnderLocation (new Point (0, 0), ViewportSettingsFlags.None).LastOrDefault ());
@@ -109,7 +109,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
             ShadowStyle = ShadowStyles.Opaque
         };
 
-        window.Border.Add (buttonInBorder);
+        window.Border.GetOrCreateView ().Add (buttonInBorder);
         app.Begin (window);
 
         DriverAssert.AssertDriverOutputIs ("""
@@ -148,7 +148,7 @@ public class AdornmentSubViewTests (ITestOutputHelper output)
             ShadowStyle = ShadowStyles.Opaque
         };
 
-        window.Padding.Add (buttonInPadding);
+        window.Padding.GetOrCreateView ().Add (buttonInPadding);
         app.Begin (window);
 
         DriverAssert.AssertDriverOutputIs ("""

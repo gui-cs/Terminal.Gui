@@ -1,4 +1,4 @@
-﻿using UnitTests;
+using UnitTests;
 
 namespace ViewBaseTests.Navigation;
 
@@ -140,14 +140,14 @@ public class SetFocusTests : TestsAllViews
         var subViewSubView3 = new View { Id = "subViewSubView3", CanFocus = true };
         borderSubView.Add (subViewSubView1, subViewSubView2, subViewSubView3);
 
-        view.Border.Add (borderSubView);
+        view.Border.GetOrCreateView ().Add (borderSubView);
 
         view.SetFocus ();
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
         Assert.False (borderSubView.HasFocus);
 
-        view.Border.EnsureView ();
+        view.Border.GetOrCreateView ();
         view.Border.View?.CanFocus = true;
         subViewSubView1.SetFocus ();
         Assert.True (view.HasFocus);

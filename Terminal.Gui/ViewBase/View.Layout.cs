@@ -600,7 +600,7 @@ public partial class View // Layout APIs
 
                 if (newW != Frame.Width)
                 {
-                    // Pos.Calculate gave us a new position. We need to redo dimension
+                    // Pos.Calculate got us a new position. We need to redo dimension
                     newW = _width.Calculate (newX, superviewContentSize.Width, this, Dimension.Width);
                 }
             }
@@ -617,7 +617,7 @@ public partial class View // Layout APIs
 
                 if (newH != Frame.Height)
                 {
-                    // Pos.Calculate gave us a new position. We need to redo dimension
+                    // Pos.Calculate got us a new position. We need to redo dimension
                     newH = _height.Calculate (newY, superviewContentSize.Height, this, Dimension.Height);
                 }
             }
@@ -764,7 +764,6 @@ public partial class View // Layout APIs
         {
             foreach ((View from, View to) in edges)
             {
-                // QUESTION: Do we test this with adornments well enough?
                 to.Layout (from.GetContentSize ());
             }
         }
@@ -850,9 +849,9 @@ public partial class View // Layout APIs
     {
         NeedsLayout = true;
 
-        if (Margin is { SubViews.Count: > 0 })
+        if (Margin.View is { SubViews.Count: > 0 })
         {
-            Margin.SetNeedsLayout ();
+            Margin.View.SetNeedsLayout ();
         }
 
         if (Border.View is { SubViews.Count: > 0 })
@@ -860,9 +859,9 @@ public partial class View // Layout APIs
             Border.View.SetNeedsLayout ();
         }
 
-        if (Padding is { SubViews.Count: > 0 })
+        if (Padding.View is { SubViews.Count: > 0 })
         {
-            Padding.SetNeedsLayout ();
+            Padding.View.SetNeedsLayout ();
         }
 
         // TODO: Optimize this - see Setting_Thickness_Causes_Adornment_SubView_Layout
@@ -881,9 +880,9 @@ public partial class View // Layout APIs
             }
             current.NeedsLayout = true;
 
-            if (current.Margin is { SubViews.Count: > 0 })
+            if (current.Margin.View is { SubViews.Count: > 0 })
             {
-                current.Margin.SetNeedsLayout ();
+                current.Margin.View.SetNeedsLayout ();
             }
 
             if (current.Border.View is { SubViews.Count: > 0 })
@@ -891,9 +890,9 @@ public partial class View // Layout APIs
                 current.Border.View.SetNeedsLayout ();
             }
 
-            if (current.Padding is { SubViews.Count: > 0 })
+            if (current.Padding.View is { SubViews.Count: > 0 })
             {
-                current.Padding.SetNeedsLayout ();
+                current.Padding.View.SetNeedsLayout ();
             }
 
             foreach (View subview in current.SubViews)
@@ -1132,7 +1131,7 @@ public partial class View // Layout APIs
             maxDimension -= superView.GetAdornmentsThickness ().Left + superView.GetAdornmentsThickness ().Right;
         }
 
-        if (viewToMove!.Frame.Width <= maxDimension)
+        if (viewToMove.Frame.Width <= maxDimension)
         {
             nx = Math.Max (targetX, 0);
             nx = nx + viewToMove.Frame.Width > maxDimension ? Math.Max (maxDimension - viewToMove.Frame.Width, 0) : nx;
@@ -1146,7 +1145,7 @@ public partial class View // Layout APIs
 
         ny = Math.Max (targetY, maxDimension);
 
-        if (viewToMove?.SuperView is null || viewToMove == app?.TopRunnableView || viewToMove.SuperView == app?.TopRunnableView)
+        if (viewToMove.SuperView is null || viewToMove == app?.TopRunnableView || viewToMove.SuperView == app?.TopRunnableView)
         {
             maxDimension = app is { } ? app.Screen.Height : 0;
         }
@@ -1155,14 +1154,14 @@ public partial class View // Layout APIs
             maxDimension = viewToMove.SuperView.Viewport.Height;
         }
 
-        if (superView?.Margin is { } && superView == viewToMove?.SuperView)
+        if (superView?.Margin is { } && superView == viewToMove.SuperView)
         {
             maxDimension -= superView.GetAdornmentsThickness ().Top + superView.GetAdornmentsThickness ().Bottom;
         }
 
         ny = Math.Min (ny, maxDimension);
 
-        if (viewToMove?.Frame.Height <= maxDimension)
+        if (viewToMove.Frame.Height <= maxDimension)
         {
             ny = ny + viewToMove.Frame.Height > maxDimension ? Math.Max (maxDimension - viewToMove.Frame.Height, 0) : ny;
         }

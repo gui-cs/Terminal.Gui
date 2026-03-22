@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Collections.ObjectModel;
 
 namespace UICatalog.Scenarios;
@@ -67,7 +67,7 @@ public class MouseTester : Scenario
             Title = "inPadding",
             Id = "inPadding"
         };
-        demo.Padding.Add (demoInPadding);
+        demo.Padding.GetOrCreateView ().Add (demoInPadding);
 
         demo.Padding.View!.Initialized += DemoPaddingOnInitialized;
 
@@ -111,7 +111,7 @@ public class MouseTester : Scenario
                                                      subview.MouseHighlightStates = optionSelector.Value!.Value;
                                                  }
 
-                                                 foreach (View subview in demo.Padding.SubViews)
+                                                 foreach (View subview in demo.Padding.View?.SubViews ?? [])
                                                  {
                                                      subview.MouseHighlightStates = optionSelector.Value!.Value;
                                                  }
@@ -126,7 +126,7 @@ public class MouseTester : Scenario
                                                 subview.MouseHoldRepeat = demo.MouseHoldRepeat;
                                             }
 
-                                            foreach (View subview in demo.Padding.SubViews)
+                                            foreach (View subview in demo.Padding.View?.SubViews ?? [])
                                             {
                                                 subview.MouseHoldRepeat = demo.MouseHoldRepeat;
                                             }
@@ -394,7 +394,7 @@ public class MouseTester : Scenario
             VerticalTextAlignment = Alignment.Center;
 
             Padding.Thickness = new Thickness (1, 1, 1, 1);
-            Padding.EnsureView ().SetScheme (new Scheme (new Attribute (Color.DarkGray)));
+            Padding.GetOrCreateView ().SetScheme (new Scheme (new Attribute (Color.DarkGray)));
             Padding.View!.Id = $"{Id}.Padding";
 
             Border.Thickness = new Thickness (1);

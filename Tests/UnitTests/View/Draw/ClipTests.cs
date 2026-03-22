@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Text;
 
 namespace UnitTests.ViewBaseTests;
@@ -42,7 +42,7 @@ public class ClipTests (ITestOutputHelper _output)
             Width = 3,
             Height = 3
         };
-        view.Padding.EnsureView ();
+        view.Padding.GetOrCreateView ();
         view.Padding.Thickness = new Thickness (1);
         view.Padding.Diagnostics = ViewDiagnosticFlags.Thickness;
         view.BeginInit ();

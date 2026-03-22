@@ -310,7 +310,7 @@ public class WizardStepTests
 
         // Assert
         // The help text view should be in the Padding
-        Assert.True (step.Padding.SubViews.Count > 0);
+        Assert.True (step.Padding.View!.SubViews.Count > 0);
     }
 
     [Fact]

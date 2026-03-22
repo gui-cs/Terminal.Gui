@@ -22,11 +22,6 @@ public class Padding : AdornmentImpl
         }
     }
 
-    /// <summary>
-    ///     Adds a SubView to the Padding. Forces creation of <see cref="PaddingView"/>.
-    /// </summary>
-    public override void Add (View view) => ((PaddingView)EnsureView ()).Add (view);
-
     /// <inheritdoc/>
     protected override AdornmentView CreateView () => new PaddingView (this);
 }

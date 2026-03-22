@@ -5,7 +5,7 @@ namespace Terminal.Gui.ViewBase;
 ///     or <see cref="Padding"/>).
 ///     Implements <see cref="IAdornmentView"/> — i.e., it knows its <see cref="IAdornment.Parent"/> <see cref="View"/>
 ///     and its <see cref="Adornment"/> settings owner.
-///     Created lazily by <see cref="AdornmentImpl.EnsureView"/> when <see cref="View"/>-level functionality is needed.
+///     Created lazily by <see cref="AdornmentImpl.GetOrCreateView"/> when <see cref="View"/>-level functionality is needed.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -55,7 +55,7 @@ public class AdornmentView : View, IAdornmentView, IDesignable
     public new ViewDiagnosticFlags Diagnostics { get; set; } = View.Diagnostics;
 
     /// <inheritdoc/>
-    public override string ToDebugString () => $"{GetType ().Name}({Id}) Parent={(Adornment?.Parent is { } ? Adornment.Parent.ToDebugString () : "null")}";
+    public override string ToDebugString () => $"{this.ToIdentifyingString ()} Parent={(Adornment?.Parent is { } ? Adornment.Parent.ToDebugString () : "null")}";
 
     /// <inheritdoc/>
     protected override IApplication? GetApp () => Adornment?.Parent?.App;

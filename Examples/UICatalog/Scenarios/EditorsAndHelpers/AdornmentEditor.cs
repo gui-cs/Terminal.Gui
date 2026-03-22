@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 namespace UICatalog.Scenarios;
 
 /// <summary>
@@ -206,7 +206,7 @@ public class AdornmentEditor : EditorBase
                 return;
             }
 
-            AdornmentToEdit.EnsureView ().SetScheme (new Scheme (AdornmentToEdit.EnsureView ().GetScheme ())
+            AdornmentToEdit.GetOrCreateView ().SetScheme (new Scheme (AdornmentToEdit.GetOrCreateView ().GetScheme ())
             {
                 Normal = new Attribute (_foregroundColorPicker.SelectedColor, _backgroundColorPicker.SelectedColor)
             });

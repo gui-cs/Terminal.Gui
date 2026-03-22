@@ -114,7 +114,7 @@ public sealed class WideGlyphs : Scenario
 
         // Proves it's not LineCanvas related
         arrangeableViewAtEven.Border.Thickness = new Thickness (1);
-        arrangeableViewAtEven.Border.Add (new View { Height = Dim.Auto (), Width = Dim.Auto (), Text = "Even" });
+        arrangeableViewAtEven.Border.GetOrCreateView ().Add (new View { Height = Dim.Auto (), Width = Dim.Auto (), Text = "Even" });
         appWindow.Add (arrangeableViewAtEven);
 
         Button arrangeableViewAtOdd = new ()

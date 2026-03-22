@@ -190,9 +190,9 @@ public class ViewTests
         Assert.NotNull (view.Border);
         Assert.NotNull (view.Padding);
 
-        view.Margin.EnsureView ();
-        view.Border.EnsureView ();
-        view.Padding.EnsureView ();
+        view.Margin.GetOrCreateView ();
+        view.Border.GetOrCreateView ();
+        view.Padding.GetOrCreateView ();
         Assert.NotNull (view.Margin.View);
         Assert.NotNull (view.Border.View);
         Assert.NotNull (view.Padding.View);

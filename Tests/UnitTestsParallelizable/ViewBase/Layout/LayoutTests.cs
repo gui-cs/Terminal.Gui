@@ -1,4 +1,4 @@
-﻿namespace ViewBaseTests.Layout;
+namespace ViewBaseTests.Layout;
 
 public class LayoutTests
 {
@@ -291,7 +291,7 @@ public class LayoutTests
         // No adornment subviews
         var superView = new View ();
         var view = new View ();
-        view.BorderStyle = LineStyle.None; // Calls EnsureView
+        view.BorderStyle = LineStyle.None; // Calls GetOrCreateView
 
         var layoutStartedCount = 0;
         var layoutCompleteCount = 0;
@@ -327,7 +327,7 @@ public class LayoutTests
         Assert.Equal (2, layoutCompleteCount);
 
         // With Border subview
-        view.Border.Add (new View ());
+        view.Border.GetOrCreateView ().Add (new View ());
         superView.LayoutSubViews ();
         Assert.Equal (1, borderLayoutStartedCount);
         Assert.Equal (1, borderLayoutCompleteCount);
@@ -355,7 +355,7 @@ public class LayoutTests
     {
         var superView = new View ();
         var view = new View ();
-        view.BorderStyle = LineStyle.None; // Calls EnsureView
+        view.BorderStyle = LineStyle.None; // Calls GetOrCreateView
 
         var layoutStartedCount = 0;
         var layoutCompleteCount = 0;
@@ -459,9 +459,9 @@ public class LayoutTests
         var layoutStartedRaised = 0;
         var layoutCompleteRaised = 0;
 
-        superView.Border.EnsureView ();
-        superView.Padding.EnsureView ();
-        superView.Margin.EnsureView ();
+        superView.Border.GetOrCreateView ();
+        superView.Padding.GetOrCreateView ();
+        superView.Margin.GetOrCreateView ();
 
         superView.SubViewLayout += (sender, e) => layoutStartedRaised++;
         superView.SubViewsLaidOut += (sender, e) => layoutCompleteRaised++;

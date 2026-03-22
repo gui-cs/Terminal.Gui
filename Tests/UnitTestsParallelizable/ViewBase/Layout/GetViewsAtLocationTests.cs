@@ -1,4 +1,4 @@
-﻿namespace ViewBaseTests.Layout;
+namespace ViewBaseTests.Layout;
 
 [Trait ("Category", "Layout")]
 public class GetViewsAtLocationTests
@@ -90,7 +90,7 @@ public class GetViewsAtLocationTests
     {
         TestView root = new (0, 0, 10, 10);
         root.Margin.Thickness = new Thickness (1);
-        root.Margin.EnsureView ();
+        root.Margin.GetOrCreateView ();
         List<View?> result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
@@ -102,7 +102,7 @@ public class GetViewsAtLocationTests
     {
         TestView root = new (0, 0, 10, 10);
         root.Margin.Thickness = new Thickness (1);
-        root.Margin.EnsureView ();
+        root.Margin.GetOrCreateView ();
         TestView sub = new (2, 2, 5, 5);
         root.Add (sub);
         List<View?> result = View.GetViewsAtLocation (root, new Point (2, 2));
@@ -195,7 +195,7 @@ public class GetViewsAtLocationTests
     {
         TestView root = new (0, 0, 10, 10);
         root.Padding.Thickness = new Thickness (1);
-        root.Padding.EnsureView ();
+        root.Padding.GetOrCreateView ();
         List<View?> result = View.GetViewsAtLocation (root, new Point (0, 0));
         Assert.Equal (2, result.Count);
         Assert.Equal (root, result [0]);
@@ -221,7 +221,7 @@ public class GetViewsAtLocationTests
         TestView root = new (0, 0, 10, 10);
         TestView sub = new (2, 2, 5, 5);
         sub.Margin.Thickness = new Thickness (1);
-        sub.Margin.EnsureView ();
+        sub.Margin.GetOrCreateView ();
         root.Add (sub);
 
         List<View?> result = View.GetViewsAtLocation (root, new Point (6, 6));
@@ -267,7 +267,7 @@ public class GetViewsAtLocationTests
         TestView root = new (0, 0, 10, 10);
         TestView sub = new (2, 2, 5, 5);
         sub.Padding.Thickness = new Thickness (1);
-        sub.Padding.EnsureView ();
+        sub.Padding.GetOrCreateView ();
         root.Add (sub);
 
         List<View?> result = View.GetViewsAtLocation (root, new Point (2, 2));
@@ -292,8 +292,8 @@ public class GetViewsAtLocationTests
         Assert.Equal (root, result [0]);
         Assert.Equal (sub, result [1]);
         Assert.Equal (sub.Margin.View!, result [2]);
-        Assert.Equal (sub.Margin.SubViews.ElementAt (0), result [3]);
-        Assert.Equal (sub.Margin.SubViews.ElementAt (1), result [4]);
+        Assert.Equal (sub.Margin.View!.SubViews.ElementAt (0), result [3]);
+        Assert.Equal (sub.Margin.View!.SubViews.ElementAt (1), result [4]);
     }
 
     [Fact]
@@ -314,7 +314,7 @@ public class GetViewsAtLocationTests
             Y = 0,
             ShadowStyle = null
         };
-        sub.Border.Add (closeButton);
+        sub.Border.GetOrCreateView ().Add (closeButton);
         root.Add (sub);
 
         root.Layout ();
@@ -491,13 +491,13 @@ public class GetViewsAtLocationTests
         IApplication? app = Application.Create ();
         app.Begin (runnable);
         runnable.Margin.Thickness = new Thickness (marginThickness);
-        runnable.Margin.EnsureView ();
+        runnable.Margin.GetOrCreateView ();
         runnable.Margin.View?.Id = "MarginView";
         runnable.Border.Thickness = new Thickness (borderThickness);
-        runnable.Border.EnsureView ();
+        runnable.Border.GetOrCreateView ();
         runnable.Border.View?.Id = "BorderView";
         runnable.Padding.Thickness = new Thickness (paddingThickness);
-        runnable.Padding.EnsureView ();
+        runnable.Padding.GetOrCreateView ();
         runnable.Padding.View?.Id = "PaddingView";
 
         var location = new Point (testX, testY);
@@ -703,7 +703,7 @@ public class GetViewsAtLocationTests
         runnable.Padding.Thickness = new Thickness (1);
 
         var subview = new View { X = Pos.AnchorEnd (1), Y = Pos.AnchorEnd (1), Width = 1, Height = 1 };
-        runnable.Padding.Add (subview);
+        runnable.Padding.GetOrCreateView ().Add (subview);
 
         View? found = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
 
@@ -727,13 +727,13 @@ public class GetViewsAtLocationTests
         app.Begin (runnable);
 
         runnable.Margin.Thickness = new Thickness (1);
-        runnable.Margin.EnsureView ();
+        runnable.Margin.GetOrCreateView ();
         runnable.Margin.View!.Id = "MarginView";
         runnable.Border.Thickness = new Thickness (1);
-        runnable.Border.EnsureView ();
+        runnable.Border.GetOrCreateView ();
         runnable.Border.View!.Id = "BorderView";
         runnable.Padding.Thickness = new Thickness (1);
-        runnable.Padding.EnsureView ();
+        runnable.Padding.GetOrCreateView ();
         runnable.Padding.View!.Id = "PaddingView";
 
         var subview = new View
@@ -851,7 +851,7 @@ public class GetViewsAtLocationTests
         // This subview will be at the bottom-right-corner of subview
         // So screen-relative location will be X + Width - 1 = 5
         var paddingSubView = new View { X = Pos.AnchorEnd (1), Y = Pos.AnchorEnd (1), Width = 1, Height = 1 };
-        subview.Padding.Add (paddingSubView);
+        subview.Padding.GetOrCreateView ().Add (paddingSubView);
         runnable.Add (subview);
 
         View? found = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
@@ -888,7 +888,7 @@ public class GetViewsAtLocationTests
         // This subview will be at the bottom-right-corner of subview
         // So screen-relative location will be X + Width - 1 = 5
         var paddingSubView = new View { X = Pos.AnchorEnd (1), Y = Pos.AnchorEnd (1), Width = 1, Height = 1 };
-        subview.Padding.Add (paddingSubView);
+        subview.Padding.GetOrCreateView ().Add (paddingSubView);
         runnable.Add (subview);
 
         View? found = runnable.GetViewsUnderLocation (new Point (testX, testY), ViewportSettingsFlags.TransparentMouse).LastOrDefault ();
@@ -1086,7 +1086,7 @@ public class GetViewsAtLocationTests
 
         Runnable<bool> secondaryRunnable = new () { Id = "secondaryRunnable", Frame = new Rectangle (5, 5, 10, 10) };
         secondaryRunnable.Margin.Thickness = new Thickness (1);
-        secondaryRunnable.Margin.EnsureView ();
+        secondaryRunnable.Margin.GetOrCreateView ();
 
         app.Begin (runnable);
         app.Begin (secondaryRunnable);

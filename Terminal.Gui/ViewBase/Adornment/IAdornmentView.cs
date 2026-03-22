@@ -24,7 +24,7 @@ public interface IAdornmentView
     /// <summary>
     ///     Back-reference to the lightweight <see cref="IAdornment"/> that owns this <see cref="View"/>.
     ///     <see cref="AdornmentImpl"/> is the single authoritative owner of <see cref="IAdornment.Thickness"/>.
-    ///     Set by <see cref="AdornmentImpl.EnsureView"/> when the backing <see cref="View"/> is created.
+    ///     Set by <see cref="AdornmentImpl.GetOrCreateView"/> when the backing <see cref="View"/> is created.
     /// </summary>
     IAdornment? Adornment { get; set; }
 }

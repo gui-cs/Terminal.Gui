@@ -774,7 +774,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         Assert.NotNull (dialog.Padding);
 
         // Buttons should be in a button container within padding
-        Assert.True (dialog.Padding.SubViews.Count > 0);
+        Assert.True (dialog.Padding.View!.SubViews.Count > 0);
 
         // Padding bottom should accommodate buttons
         Assert.True (dialog.Padding.Thickness.Bottom > 0);

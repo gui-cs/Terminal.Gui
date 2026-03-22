@@ -344,17 +344,17 @@ public partial class View // Focus and cross-view navigation management (TabStop
             }
 
             // How about in Adornments?
-            if (Margin is { HasFocus: true })
+            if (Margin.View is { HasFocus: true })
             {
                 return Margin.View;
             }
 
-            if (Border is { HasFocus: true })
+            if (Border.View is { HasFocus: true })
             {
                 return Border.View;
             }
 
-            if (Padding is { HasFocus: true })
+            if (Padding.View is { HasFocus: true })
             {
                 return Padding.View;
             }
@@ -999,7 +999,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
             filteredSubViews = GetSubViews (includePadding: true).Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
         }
 
-        if (this is not IAdornmentView && Padding.View is { CanFocus: true, Visible: true, Enabled: true } && Padding.View?.TabStop == behavior && Padding.Thickness != Thickness.Empty)
+        if (this is not IAdornmentView
+            && Padding.View is { CanFocus: true, Visible: true, Enabled: true }
+            && Padding.View?.TabStop == behavior
+            && Padding.Thickness != Thickness.Empty)
         {
             filteredSubViews = filteredSubViews.Append (Padding.View!);
         }
@@ -1011,7 +1014,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             filteredSubViews = filteredSubViews.Reverse ();
         }
 
-        return filteredSubViews?.ToArray () ?? [];
+        return filteredSubViews.ToArray () ?? [];
     }
 
     /// <summary>

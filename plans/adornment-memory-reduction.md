@@ -20,20 +20,20 @@ Two-level split of adornments: lightweight settings objects (`AdornmentImpl` sub
 
 **Phase 1 (Migration):** Migrated all three adornments simultaneously. Updated 30+ `is Adornment` type checks to `is AdornmentView`. All tests pass. Key lessons documented in §4 below.
 
-**Current state:** Lazy creation is fully operational. `SetupAdornments()` only sets `Parent` on each lightweight adornment — it does NOT call `EnsureView()`. The `AdornmentView` backing views start as `null` and are created on-demand only when features require them:
+**Current state:** Lazy creation is fully operational. `SetupAdornments()` only sets `Parent` on each lightweight adornment — it does NOT call `GetOrCreateView()`. The `AdornmentView` backing views start as `null` and are created on-demand only when features require them:
 
 | Trigger | Adornment | Code path |
 |---------|-----------|-----------|
-| `LineStyle` set non-null | Border | `Border.LineStyle` setter → `EnsureView()` |
-| `Thickness` set non-empty (with `LineStyle` non-null) | Border | `Border.OnThicknessChanged()` → `EnsureView()` |
-| `ShadowStyle` set non-null | Margin | `Margin.ShadowStyle` setter → `EnsureView()` |
-| `Add(subView)` called | Any | `AdornmentImpl.Add()` → `EnsureView()` |
-| ScrollBar accessed | Padding | `View.CreateScrollBar()` → `Padding.EnsureView()` |
-| `Dialog<T>` button container | Padding | `DialogTResult` → `Padding.EnsureView()` |
+| `LineStyle` set non-null | Border | `Border.LineStyle` setter → `GetOrCreateView()` |
+| `Thickness` set non-empty (with `LineStyle` non-null) | Border | `Border.OnThicknessChanged()` → `GetOrCreateView()` |
+| `ShadowStyle` set non-null | Margin | `Margin.ShadowStyle` setter → `GetOrCreateView()` |
+| `Add(subView)` called | Any | `AdornmentImpl.Add()` → `GetOrCreateView()` |
+| ScrollBar accessed | Padding | `View.CreateScrollBar()` → `Padding.GetOrCreateView()` |
+| `Dialog<T>` button container | Padding | `DialogTResult` → `Padding.GetOrCreateView()` |
 
-For a plain `View` with no border, no shadow, no padding subviews: **zero `AdornmentView` objects are created**. Drawing falls back to `AdornmentImpl.Draw()` which calls `Thickness.Draw()` directly when `View` is null. The entire framework is null-safe — all `.View` accesses use `?.`, `is { }`, or are behind explicit `EnsureView()` calls.
+For a plain `View` with no border, no shadow, no padding subviews: **zero `AdornmentView` objects are created**. Drawing falls back to `AdornmentImpl.Draw()` which calls `Thickness.Draw()` directly when `View` is null. The entire framework is null-safe — all `.View` accesses use `?.`, `is { }`, or are behind explicit `GetOrCreateView()` calls.
 
-The ~5 null-forgiving (`!`) usages (TabView, CharMap, ScrollBars) are safe because they follow explicit `EnsureView()` calls or code paths that guaranteed View creation (e.g., setting `BorderStyle`).
+The ~5 null-forgiving (`!`) usages (TabView, CharMap, ScrollBars) are safe because they follow explicit `GetOrCreateView()` calls or code paths that guaranteed View creation (e.g., setting `BorderStyle`).
 
 ---
 
@@ -52,7 +52,7 @@ IAdornmentView (interface for View-backed layer)
 ### Key Files
 | File | Role |
 |------|------|
-| `AdornmentImpl.cs` | Base settings class: Thickness, EnsureView(), convenience pass-throughs |
+| `AdornmentImpl.cs` | Base settings class: Thickness, GetOrCreateView(), convenience pass-throughs |
 | `AdornmentView.cs` | Base View class: FrameToScreen, Contains, Scheme, clearing/drawing |
 | `Border.cs` / `BorderView.cs` | Border settings + rendering (title, LineCanvas, arrangement) |
 | `Margin.cs` / `MarginView.cs` | Margin settings + rendering (shadow, transparency, clip cache) |
@@ -79,10 +79,10 @@ These pass-throughs exist on `AdornmentImpl` so that callers can interact with a
 | `SetNeedsDraw()` | 161-172 | Yes — `Thickness` setter calls it; drawing code calls it | **Keep.** Remove TODO. Simplify: drop `_needsDraw` backing field; if View is null the parent's draw handles it. |
 | `NeedsLayout` (get/set) | 177-188 | Yes — `View.Drawing.cs:255` checks `Margin.NeedsLayout` | **Keep.** Remove TODO. |
 | `SetNeedsLayout()` | 191-193 | Yes — `Thickness` setter calls it | **Keep.** Remove TODO. |
-| `SetScheme()` / `GetScheme()` | 196-201 | Minimal | **Remove.** Callers should `EnsureView()` if they need custom scheme. |
+| `SetScheme()` / `GetScheme()` | 196-201 | Minimal | **Remove.** Callers should `GetOrCreateView()` if they need custom scheme. |
 | `Diagnostics` | 205-216 | Yes — `AdornmentImpl.Draw()` uses `Diagnostics` | **Keep.** Fix: add own backing field (like `ViewportSettings`). Remove TODO. |
 | `SubViews` | 220-224 | Yes — `View.Drawing.cs` iterates `Margin.SubViews`, `Border.SubViews`, `Padding.SubViews` | **Keep.** Remove TODO. |
-| `Add(View)` | 227-228 | Yes — triggers `EnsureView()` | **Keep.** Remove TODO. |
+| `Add(View)` | 227-228 | Yes — triggers `GetOrCreateView()` | **Keep.** Remove TODO. |
 | `HasFocus` | 231 | Not directly | **Remove.** Callers can use `.View?.HasFocus ?? false`. |
 | `ViewportSettings` | 234-247 | Yes — drawing code, transparency checks | **Keep.** Already has backing field. Remove TODO. |
 | `Visible` | 250-261 | Not directly in framework | **Evaluate.** May be used by scenarios/tests. |
@@ -133,7 +133,7 @@ These pass-throughs exist on `AdornmentImpl` so that callers can interact with a
 
 | TODO | Line | Action |
 |---|---|---|
-| ~~"Simplify this by having _border be of type Border (IAdornment)"~~ | ~~9~~ | ✅ RESOLVED — Kept `_border` as `BorderView`. Analysis showed Arranger needs extensive View-level access (~50 call sites: App, HotKeyBindings, CanFocus, SetFocus, Add, Remove, Frame, etc.). Changing to `Border` would require `.EnsureView()`/`.View!` everywhere — more complex, not simpler. Settings are already accessed via `_border.Adornment!`. Replaced TODO with explanatory comment. |
+| ~~"Simplify this by having _border be of type Border (IAdornment)"~~ | ~~9~~ | ✅ RESOLVED — Kept `_border` as `BorderView`. Analysis showed Arranger needs extensive View-level access (~50 call sites: App, HotKeyBindings, CanFocus, SetFocus, Add, Remove, Frame, etc.). Changing to `Border` would require `.GetOrCreateView()`/`.View!` everywhere — more complex, not simpler. Settings are already accessed via `_border.Adornment!`. Replaced TODO with explanatory comment. |
 
 ---
 
@@ -141,7 +141,7 @@ These pass-throughs exist on `AdornmentImpl` so that callers can interact with a
 
 1. **Constructor ordering:** `Adornment` back-reference must be set BEFORE subclass constructor body runs. Pass it as a constructor parameter, not post-construction.
 
-2. **Lazy View creation works.** The codebase is fully null-safe — all `.View` accesses use `?.`, `is { }` pattern matching, or follow explicit `EnsureView()` calls. `AdornmentImpl.Draw()` has a no-View fallback path using `Thickness.Draw()`. Only ~5 null-forgiving `!` usages exist, all safe.
+2. **Lazy View creation works.** The codebase is fully null-safe — all `.View` accesses use `?.`, `is { }` pattern matching, or follow explicit `GetOrCreateView()` calls. `AdornmentImpl.Draw()` has a no-View fallback path using `Thickness.Draw()`. Only ~5 null-forgiving `!` usages exist, all safe.
 
 3. **Bidirectional property propagation:** Settings object is "write" authority; View may be "read" authority for derived/computed state. Every getter/setter must be audited for correct delegation direction.
 
@@ -158,13 +158,13 @@ These pass-throughs exist on `AdornmentImpl` so that callers can interact with a
 1. ✅ Removed "Thickness should only be on Adornment" TODO from `AdornmentImpl.cs` and `AdornmentView.cs` — Thickness removed from AdornmentView entirely
 2. ✅ Removed "We should be able to remove this?" TODOs on `FrameToScreen`/`ComputeFrameToScreen`
 3. ✅ Fixed Diagnostics to have its own backing field (same pattern as `ViewportSettings`)
-4. ✅ Removed `SetScheme` / `GetScheme` pass-throughs — callers updated to `EnsureView().SetScheme()`
+4. ✅ Removed `SetScheme` / `GetScheme` pass-throughs — callers updated to `GetOrCreateView().SetScheme()`
 5. ✅ Removed all 20+ misleading "Remove this" TODO comments on essential pass-throughs
 
 ### 5.2 Remove Unnecessary Pass-Throughs ✅ DONE
 
 Removed pass-throughs not used by the framework:
-- ✅ `SetScheme`, `GetScheme` — callers updated to `EnsureView().SetScheme()`
+- ✅ `SetScheme`, `GetScheme` — callers updated to `GetOrCreateView().SetScheme()`
 - ✅ `Id` — callers updated to use `.View!.Id`
 - ✅ `IsInitialized` — no callers
 - ✅ `LayoutSubViews` — framework uses `.View?.LayoutSubViews()` directly
@@ -190,7 +190,7 @@ Added `_cachedGradientFill` and `_cachedGradientRect` fields. Gradient `FillPair
 ### 6.1 Current Coverage Summary
 
 **137 test methods** across 13 files (~4,724 lines). Strong coverage for:
-- ✅ Lazy `EnsureView` triggers (Margin/Border/Padding)
+- ✅ Lazy `GetOrCreateView` triggers (Margin/Border/Padding)
 - ✅ Frame geometry (GetFrame, FrameToScreen, Contains)
 - ✅ Shadow behavior (17 tests)
 - ✅ Arrangement (keyboard + mouse, 13 tests)
@@ -206,14 +206,14 @@ Added `_cachedGradientFill` and `_cachedGradientRect` fields. Gradient `FillPair
 | **Convenience pass-through delegation** — no systematic tests verifying each AdornmentImpl method delegates correctly to View AND no-ops when View is null | High | New: `AdornmentImplPassThroughTests.cs` |
 | **AdornmentImpl.Draw() no-View path** — `Thickness.Draw()` fallback when View is null (critical for lazy creation) | High | `AdornmentTests.cs` |
 | **No-View drawing for Border/Margin/Padding** — verify plain views with Thickness but no View still render correctly | High | `AdornmentTests.cs` or `BorderDrawTests.cs` |
-| **AdornmentImpl.EnsureView lifecycle sync** — no test for mid-init creation (BeginInit called, EndInit not yet) | Medium | `AdornmentTests.cs` |
+| **AdornmentImpl.GetOrCreateView lifecycle sync** — no test for mid-init creation (BeginInit called, EndInit not yet) | Medium | `AdornmentTests.cs` |
 | **AdornmentImpl.FrameToScreen without View** — `ComputeFrameToScreen()` fallback path | Medium | `AdornmentTests.cs` |
 | **MarginView.CacheClip / GetCachedClip / ClearCachedClip** — no direct tests | Medium | `MarginTests.cs` |
 | **PaddingView.GetSubViews override** — `includePadding` parameter logic | Medium | `PaddingTests.cs` |
 | **PaddingView.OnMouseEvent** — click-to-focus behavior | Low | `PaddingTests.cs` |
 | **AdornmentView standalone (no Adornment back-ref)** — `_standaloneFallbackThickness` path | Low | `AdornmentTests.cs` |
-| **Border.OnThicknessChanged triggers EnsureView** (only when LineStyle is set) | Medium | `BorderTests.cs` |
-| **Margin.OnThicknessChanged does NOT trigger EnsureView** (commented out) | Medium | `MarginTests.cs` |
+| **Border.OnThicknessChanged triggers GetOrCreateView** (only when LineStyle is set) | Medium | `BorderTests.cs` |
+| **Margin.OnThicknessChanged does NOT trigger GetOrCreateView** (commented out) | Medium | `MarginTests.cs` |
 | **Memory savings verification** — plain View creates zero AdornmentViews | Medium | `AdornmentLayoutTests.cs` |
 
 ### 6.3 New Test Plan — ✅ DONE
@@ -232,7 +232,7 @@ Systematic verification of all convenience pass-throughs on `AdornmentImpl`:
 - GetAttributeForRole (parent fallback)
 - FrameToScreen (computed without View, delegated with View)
 - Draw (thickness path vs View delegation)
-- EnsureView (creation, idempotency, init synchronization)
+- GetOrCreateView (creation, idempotency, init synchronization)
 - Dispose (clears View+Parent)
 
 #### Remaining test gaps (deferred — not blocking this PR)
@@ -259,7 +259,7 @@ Systematic verification of all convenience pass-throughs on `AdornmentImpl`:
 
 ### Nullability
 
-`View.Border`, `View.Margin`, `View.Padding` remain **always non-null** after construction. The `null` is on `.View` — `Border.View`, `Margin.View`, `Padding.View` are `null` until a feature triggers `EnsureView()`. The entire framework is null-safe via `?.` and `is { }` patterns.
+`View.Border`, `View.Margin`, `View.Padding` remain **always non-null** after construction. The `null` is on `.View` — `Border.View`, `Margin.View`, `Padding.View` are `null` until a feature triggers `GetOrCreateView()`. The entire framework is null-safe via `?.` and `is { }` patterns.
 
 ---
 
@@ -306,7 +306,7 @@ Deferred optimizations for a follow-up PR:
 | `AdornmentSubViewTests.cs` (parallel) | 4 | SubViews in adornments, shadow in border/padding |
 | `AdornmentLayoutTests.cs` (parallel) | 25 | Lazy creation, frame geometry, layout, Contains |
 | `AdornmentNavigationTests.cs` (parallel) | 10 | Focus chain with adornment SubViews |
-| `BorderTests.cs` (parallel) | 9 | Constructor defaults, EnsureView triggers, GetFrame |
+| `BorderTests.cs` (parallel) | 9 | Constructor defaults, GetOrCreateView triggers, GetFrame |
 | `BorderDrawTests.cs` (parallel) | 3 | Transparent border title rendering |
 | `BorderTests.cs` (non-parallel) | 15 | Title, scheme, line joining, FrameToScreen |
 | `MarginTests.cs` (parallel) | 17 | Transparency, shadow styles, GetFrame |

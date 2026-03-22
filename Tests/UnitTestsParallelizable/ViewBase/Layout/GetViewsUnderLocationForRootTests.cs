@@ -61,7 +61,7 @@ public class GetViewsUnderLocationForRootTests
     {
         Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
         top.Margin.Thickness = new Thickness (1);
-        top.Margin.EnsureView ();
+        top.Margin.GetOrCreateView ();
         top.Margin.ViewportSettings = ViewportSettingsFlags.None;
         List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
@@ -73,7 +73,7 @@ public class GetViewsUnderLocationForRootTests
     {
         Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
         top.Margin.Thickness = new Thickness (1);
-        top.Margin.EnsureView ();
+        top.Margin.GetOrCreateView ();
         top.Margin.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
         List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
         Assert.DoesNotContain (top, result);
@@ -96,7 +96,7 @@ public class GetViewsUnderLocationForRootTests
     {
         Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
         top.Margin.Thickness = new Thickness (1);
-        top.Margin.EnsureView ();
+        top.Margin.GetOrCreateView ();
         top.Margin.ViewportSettings = ViewportSettingsFlags.None;
         List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
@@ -195,7 +195,7 @@ public class GetViewsUnderLocationForRootTests
         Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
         top.Border.Thickness = new Thickness (1);
         top.Padding.Thickness = new Thickness (1);
-        top.Padding.EnsureView ();
+        top.Padding.GetOrCreateView ();
         top.Layout ();
         List<View?> result = View.GetViewsUnderLocation (top, new Point (1, 1), ViewportSettingsFlags.TransparentMouse);
         Assert.Contains (top, result);
@@ -235,7 +235,7 @@ public class GetViewsUnderLocationForRootTests
 
         View subView = new () { Frame = new Rectangle (0, 0, 5, 5) };
         subView.Margin.Thickness = new Thickness (1);
-        subView.Margin.EnsureView ();
+        subView.Margin.GetOrCreateView ();
         subView.Margin.ViewportSettings = ViewportSettingsFlags.None;
         top.Add (subView);
 
@@ -311,7 +311,7 @@ public class GetViewsUnderLocationForRootTests
                 break;
         }
 
-        (adornment as AdornmentImpl)?.EnsureView ();
+        (adornment as AdornmentImpl)?.GetOrCreateView ();
 
         subView.Layout ();
 
@@ -374,7 +374,7 @@ public class GetViewsUnderLocationForRootTests
                 break;
         }
 
-        adornment?.EnsureView ();
+        adornment?.GetOrCreateView ();
 
         subView.Layout ();
 
@@ -387,7 +387,7 @@ public class GetViewsUnderLocationForRootTests
             Width = 2,
             Height = 2
         };
-        adornment?.Add (adornmentSubView);
+        adornment?.GetOrCreateView ().Add (adornmentSubView);
 
         adornment?.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
 
@@ -455,7 +455,7 @@ public class GetViewsUnderLocationForRootTests
             Width = 2,
             Height = 2
         };
-        adornment?.Add (adornmentSubView);
+        adornment?.GetOrCreateView ().Add (adornmentSubView);
 
         adornment?.ViewportSettings = ViewportSettingsFlags.TransparentMouse;
 

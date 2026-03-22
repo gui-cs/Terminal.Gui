@@ -35,7 +35,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        view.Padding.Add (paddingButton);
+        view.Padding.GetOrCreateView ().Add (paddingButton);
 
         View contentButton = new ()
         {
@@ -99,7 +99,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        view.Padding.Add (paddingButton);
+        view.Padding.GetOrCreateView ().Add (paddingButton);
 
         View contentButton = new ()
         {
@@ -159,7 +159,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        view.Padding.Add (paddingButton);
+        view.Padding.GetOrCreateView ().Add (paddingButton);
 
         View contentButton = new ()
         {
@@ -207,7 +207,7 @@ public class AdornmentNavigationTests
         };
 
         view.Padding.Thickness = new Thickness (1);
-        view.Padding.EnsureView ();
+        view.Padding.GetOrCreateView ();
         view.Padding.View?.CanFocus = true;
         view.Padding.View?.TabStop = TabBehavior.TabStop;
 
@@ -255,7 +255,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        view.Border.Add (borderButton);
+        view.Border.GetOrCreateView ().Add (borderButton);
 
         View contentButton = new ()
         {
@@ -311,7 +311,7 @@ public class AdornmentNavigationTests
             Height = 10,
             CanFocus = true
         };
-        view.Border.EnsureView ();
+        view.Border.GetOrCreateView ();
         view.Border.Thickness = new Thickness (1);
         view.Border.View?.CanFocus = true;
 
@@ -345,7 +345,7 @@ public class AdornmentNavigationTests
             CanFocus = true
         };
 
-        view.Margin.EnsureView ();
+        view.Margin.GetOrCreateView ();
         view.Margin.Thickness = new Thickness (1);
         view.Margin.View?.CanFocus = true;
         view.Margin.View?.TabStop = TabBehavior.TabStop;
@@ -393,7 +393,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        parent.Padding.Add (parentPaddingButton);
+        parent.Padding.GetOrCreateView ().Add (parentPaddingButton);
 
         View child = new ()
         {
@@ -419,7 +419,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        child.Padding.Add (childPaddingButton);
+        child.Padding.GetOrCreateView ().Add (childPaddingButton);
 
         parent.BeginInit ();
         parent.EndInit ();
@@ -494,7 +494,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        view.Padding.Add (paddingButton);
+        view.Padding.GetOrCreateView ().Add (paddingButton);
 
         View contentButton = new ()
         {
@@ -553,7 +553,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        view.Padding.Add (paddingButton);
+        view.Padding.GetOrCreateView ().Add (paddingButton);
 
         View contentButton = new ()
         {

@@ -185,7 +185,7 @@ public class GetViewsUnderLocationTests
             Text = ">",
             ShadowStyle = null
         };
-        parent.Border.Add (expanderButton);
+        parent.Border.GetOrCreateView ().Add (expanderButton);
 
         // Add a subview at X=-1, Y=-1 (extends outside parent's Viewport in both dimensions)
         // The subview's Border will overlap with the ExpanderButton location

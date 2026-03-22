@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.ViewBase;
+namespace Terminal.Gui.ViewBase;
 
 public partial class View
 {
@@ -60,7 +60,7 @@ public partial class View
     private ScrollBar CreateScrollBar (Orientation orientation)
     {
         // Ensure padding can support SubViews
-        Padding.EnsureView ();
+        Padding.GetOrCreateView ();
 
         ScrollBar scrollBar = new ()
         {
@@ -240,13 +240,13 @@ public partial class View
 
         if (_horizontalScrollBar.IsValueCreated)
         {
-            Padding.Remove (_horizontalScrollBar.Value);
+            Padding.View?.Remove (_horizontalScrollBar.Value);
             _horizontalScrollBar.Value.Dispose ();
         }
 
         if (_verticalScrollBar.IsValueCreated)
         {
-            Padding.Remove (_verticalScrollBar.Value);
+            Padding.View?.Remove (_verticalScrollBar.Value);
             _verticalScrollBar.Value.Dispose ();
         }
     }

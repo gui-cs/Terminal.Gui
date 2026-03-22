@@ -1,4 +1,4 @@
-﻿namespace ViewBaseTests.Layout;
+namespace ViewBaseTests.Layout;
 
 /// <summary>
 ///     Test the <see cref="View.FrameToScreen"/> and <see cref="View.ViewportToScreen"/> methods.
@@ -111,7 +111,7 @@ public class ToScreenTests
             Height = 1
         };
 
-        view.Border.Add (subviewOfBorder);
+        view.Border.GetOrCreateView ().Add (subviewOfBorder);
         view.BeginInit ();
         view.EndInit ();
 

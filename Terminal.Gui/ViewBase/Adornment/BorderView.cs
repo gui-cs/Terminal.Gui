@@ -2,7 +2,7 @@ namespace Terminal.Gui.ViewBase;
 
 /// <summary>
 ///     The View-backed rendering layer for the Border adornment.
-///     Created lazily by <see cref="Border"/> (via <see cref="AdornmentImpl.EnsureView"/>)
+///     Created lazily by <see cref="Border"/> (via <see cref="AdornmentImpl.GetOrCreateView"/>)
 ///     when rendering, arrangement, or other View-level functionality is needed.
 /// </summary>
 /// <remarks>

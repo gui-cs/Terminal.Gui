@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
@@ -177,10 +177,10 @@ public class AllViewsTester : Scenario
             BorderStyle = LineStyle.Double,
             SuperViewRendersLineCanvas = true
         };
-        _hostPane.Border.EnsureView ().SetScheme (window.GetScheme ());
+        _hostPane.Border.GetOrCreateView ().SetScheme (window.GetScheme ());
         _hostPane.Padding.Thickness = new Thickness (1);
         _hostPane.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
-        _hostPane.Padding.EnsureView ().SetScheme (window.GetScheme ());
+        _hostPane.Padding.GetOrCreateView ().SetScheme (window.GetScheme ());
 
         window.Add (_classListView, _adornmentsEditor, _arrangementEditor, _layoutEditor, _viewportSettingsEditor, _propertiesEditor, _eventLog, _hostPane);
 

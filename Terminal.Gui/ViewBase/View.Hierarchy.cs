@@ -64,22 +64,22 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
         // Add direct SubViews
         result.AddRange (InternalSubViews);
 
-        if (includeMargin && Margin is { SubViews.Count: > 0 } && Margin.Thickness != Thickness.Empty)
+        if (includeMargin && Margin.View is { SubViews.Count: > 0 } && Margin.Thickness != Thickness.Empty)
         {
             // Add Margin SubViews
-            result.AddRange (Margin.SubViews);
+            result.AddRange (Margin.View.SubViews);
         }
 
-        if (includeBorder && Border is { SubViews.Count: > 0 } && Border.Thickness != Thickness.Empty)
+        if (includeBorder && Border.View is { SubViews.Count: > 0 } && Border.Thickness != Thickness.Empty)
         {
             // Add Border SubViews
-            result.AddRange (Border.SubViews);
+            result.AddRange (Border.View.SubViews);
         }
 
-        if (includePadding && Padding is { SubViews.Count: > 0 } && Padding.Thickness != Thickness.Empty)
+        if (includePadding && Padding.View is { SubViews.Count: > 0 } && Padding.Thickness != Thickness.Empty)
         {
             // Add Padding SubViews
-            result.AddRange (Padding.SubViews);
+            result.AddRange (Padding.View.SubViews);
         }
 
         return result.AsReadOnly ();
@@ -95,7 +95,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <seealso cref="SuperViewChanging"/>
     /// <seealso cref="OnSuperViewChanged"/>
     /// <seealso cref="SuperViewChanged"/>
-    public View? SuperView => _superView!;
+    public View? SuperView => _superView;
 
     /// <summary>
     ///     INTERNAL: Sets the SuperView of this View.

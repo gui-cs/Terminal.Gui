@@ -122,7 +122,7 @@ public sealed class Transparent : Scenario
             Add (transparentSubView);
 
             Padding.Thickness = new Thickness (1);
-            Padding.EnsureView ();
+            Padding.GetOrCreateView ();
             Padding.View?.Text = "This is the Padding";
         }
 

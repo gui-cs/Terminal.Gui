@@ -42,7 +42,7 @@ public class WizardStep : View, IDesignable
         //_helpTextView.HorizontalScrollBar.AutoShow = true;
         _helpTextView.Width = Dim.Func (_ => CalculateHelpPaddingWidth ());
 
-        Padding.Add (_helpTextView);
+        Padding.GetOrCreateView ().Add (_helpTextView);
 
         ShowHide ();
         base.EndInit ();
@@ -60,7 +60,7 @@ public class WizardStep : View, IDesignable
         base.OnFrameChanged (frame);
 
         // Update padding thickness when frame changes
-        if (Padding is { } && _helpTextView.Text.Length > 0)
+        if (_helpTextView.Text.Length > 0)
         {
             Padding.Thickness = Padding.Thickness with { Right = CalculateHelpPaddingWidth () };
         }
@@ -89,10 +89,6 @@ public class WizardStep : View, IDesignable
     internal void ShowHide ()
     {
         // Check if views are available (might be null during disposal)
-        if (Padding is null)
-        {
-            return;
-        }
 
         if (_helpTextView.Text.Length > 0)
         {
@@ -130,7 +126,7 @@ public class WizardStep : View, IDesignable
         };
         Add (label, textField);
 
-        label = new ()
+        label = new Label
         {
             Title = "    _A List:",
             Y = Pos.Bottom (label) + 1

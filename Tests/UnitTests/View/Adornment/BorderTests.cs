@@ -1,4 +1,4 @@
-﻿namespace UnitTests.ViewBaseTests;
+namespace UnitTests.ViewBaseTests;
 
 public class BorderTests (ITestOutputHelper output)
 {
@@ -18,9 +18,9 @@ public class BorderTests (ITestOutputHelper output)
 
         view.SetScheme (new Scheme { Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red) });
         Assert.NotEqual (view.GetScheme ().Normal.Foreground, view.GetScheme ().Focus.Foreground);
-        Assert.Equal (ColorName16.Red, view.Border.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (ColorName16.Green, view.Border.GetAttributeForRole (VisualRole.Focus).Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.GetAttributeForRole (VisualRole.Focus));
+        Assert.Equal (ColorName16.Red, view.Border.View!.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Green, view.Border.View!.GetAttributeForRole (VisualRole.Focus).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.View!.GetAttributeForRole (VisualRole.Focus));
 
         superView.BeginInit ();
         superView.EndInit ();
@@ -34,9 +34,9 @@ public class BorderTests (ITestOutputHelper output)
         view.SetFocus ();
         view.SetClipToScreen ();
         view.Draw ();
-        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.GetAttributeForRole (VisualRole.Focus));
-        Assert.Equal (view.GetScheme ().Focus.Foreground, view.Border.GetAttributeForRole (VisualRole.Focus).Foreground);
-        Assert.Equal (view.GetScheme ().Normal.Foreground, view.Border.GetAttributeForRole (VisualRole.Normal).Foreground);
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.View!.GetAttributeForRole (VisualRole.Focus));
+        Assert.Equal (view.GetScheme ().Focus.Foreground, view.Border.View!.GetAttributeForRole (VisualRole.Focus).Foreground);
+        Assert.Equal (view.GetScheme ().Normal.Foreground, view.Border.View!.GetAttributeForRole (VisualRole.Normal).Foreground);
         DriverAssert.AssertDriverAttributesAre ("00100", output, null, view.GetScheme ().Normal, view.GetAttributeForRole (VisualRole.Focus));
     }
 
@@ -49,10 +49,10 @@ public class BorderTests (ITestOutputHelper output)
         view.Border.LineStyle = LineStyle.Single;
 
         view.SetScheme (new Scheme { Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red) });
-        Assert.Equal (ColorName16.Red, view.Border.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (ColorName16.Green, view.Border.GetAttributeForRole (VisualRole.Focus).Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (view.GetAttributeForRole (VisualRole.Normal), view.Border.GetAttributeForRole (VisualRole.Normal));
-        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.GetAttributeForRole (VisualRole.Focus));
+        Assert.Equal (ColorName16.Red, view.Border.View!.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Green, view.Border.View!.GetAttributeForRole (VisualRole.Focus).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Normal), view.Border.View!.GetAttributeForRole (VisualRole.Normal));
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.View!.GetAttributeForRole (VisualRole.Focus));
 
         view.BeginInit ();
         view.EndInit ();

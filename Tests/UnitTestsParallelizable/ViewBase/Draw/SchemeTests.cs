@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using UnitTests;
 using Xunit;
 
@@ -317,7 +317,7 @@ public class SchemeTests : TestDriverBase
         // Border (an Adornment) doesn't have a SuperView but should use its Parent's scheme
         View view = new View { SchemeName = "Dialog" };
         Border? border = view.Border;
-        // Force EnsureView
+        // Force GetOrCreateView
         border.LineStyle = LineStyle.Dashed;
 
         Assert.NotNull (border);

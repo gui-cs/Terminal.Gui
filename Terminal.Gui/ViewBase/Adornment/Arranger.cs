@@ -8,7 +8,7 @@ internal sealed class Arranger : IDisposable
 {
     // NOTE: _border stays as BorderView because Arranger needs extensive View-level access
     // (App, HotKeyBindings, CanFocus, SetFocus, Add, Remove, Frame, Focused, AdvanceFocus,
-    // MouseState, ScreenToFrame, Contains). Changing to Border would require .EnsureView()/.View!
+    // MouseState, ScreenToFrame, Contains). Changing to Border would require .GetOrCreateView()/.View!
     // on ~50 call sites — more complex, not simpler. Settings are accessed via _border.Adornment!.
     private readonly BorderView _border;
 

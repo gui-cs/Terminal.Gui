@@ -3,7 +3,7 @@ namespace Terminal.Gui.ViewBase;
 /// <summary>
 ///     Lightweight base class for adornment settings.
 ///     Holds <see cref="Thickness"/> and optional <see cref="Parent"/> reference.
-///     The full <see cref="AdornmentView"/> is created lazily via <see cref="EnsureView"/>
+///     The full <see cref="AdornmentView"/> is created lazily via <see cref="GetOrCreateView"/>
 ///     only when needed.
 /// </summary>
 public abstract class AdornmentImpl : IAdornment
@@ -12,7 +12,7 @@ public abstract class AdornmentImpl : IAdornment
     ///     The <see cref="View"/> this adornment surrounds. Not on <see cref="IAdornment"/> — callers that need
     ///     the parent already have the <see cref="View"/> reference they used to access this adornment.
     ///     Set by <see cref="View.SetupAdornments"/> and used for geometry math and
-    ///     <see cref="EnsureView"/> creation.
+    ///     <see cref="GetOrCreateView"/> creation.
     /// </summary>
     public View? Parent
     {
@@ -51,8 +51,6 @@ public abstract class AdornmentImpl : IAdornment
                 return;
             }
 
-            SetNeedsLayout ();
-
             OnThicknessChanged ();
             ThicknessChanged?.Invoke (this, EventArgs.Empty);
         }
@@ -90,13 +88,19 @@ public abstract class AdornmentImpl : IAdornment
     ///     to match the parent's current initialization state.
     /// </summary>
     /// <remarks>Must be called on the UI thread. Internal to prevent eager allocation by consumers.</remarks>
-    public AdornmentView EnsureView ()
+    public AdornmentView GetOrCreateView ()
     {
         if (View is { })
         {
             return View;
         }
         View = CreateView ();
+
+        // Synchronize frame from parent's current state (we may have missed FrameChanged events).
+        if (Parent is { })
+        {
+            View.OnParentFrameChanged (Parent.Frame);
+        }
 
         // Synchronize init state with the parent.
         if (Parent?.IsInitialized != true)
@@ -130,55 +134,6 @@ public abstract class AdornmentImpl : IAdornment
 
     #endregion Coordinator methods
 
-    #region Convenience pass-throughs
-
-    private bool _needsDraw;
-
-    /// <summary>Gets whether the backing <see cref="View"/> needs to be redrawn. <see langword="false"/> if no View exists.</summary>
-    public bool NeedsDraw => View?.NeedsDraw ?? _needsDraw;
-
-    /// <summary>Clears the needs-draw state on the backing <see cref="View"/>. No-op if no View exists.</summary>
-    public void ClearNeedsDraw ()
-    {
-        if (View is { })
-        {
-            View.ClearNeedsDraw ();
-        }
-        else
-        {
-            _needsDraw = false;
-        }
-    }
-
-    /// <summary>Marks the backing <see cref="View"/> as needing to be redrawn. No-op if no View exists.</summary>
-    public void SetNeedsDraw ()
-    {
-        if (View is { })
-        {
-            View.SetNeedsDraw ();
-        }
-        else
-        {
-            _needsDraw = true;
-        }
-    }
-
-    /// <summary>Gets or sets whether the backing <see cref="View"/> needs layout. <see langword="false"/> if no View exists.</summary>
-    public bool NeedsLayout
-    {
-        get => View?.NeedsLayout ?? false;
-        set
-        {
-            if (View is { } v)
-            {
-                v.NeedsLayout = value;
-            }
-        }
-    }
-
-    /// <summary>Marks the backing <see cref="View"/> as needing layout. No-op if no View exists.</summary>
-    public void SetNeedsLayout () => View?.SetNeedsLayout ();
-
     /// <summary>Gets or sets diagnostic flags. Stored locally and forwarded to the backing <see cref="View"/> when it exists.</summary>
     public ViewDiagnosticFlags Diagnostics
     {
@@ -194,33 +149,6 @@ public abstract class AdornmentImpl : IAdornment
         }
     } = ViewDiagnosticFlags.Off;
 
-    /// <summary>Gets the SubViews of the backing <see cref="View"/>. Returns empty if no View exists.</summary>
-    public IReadOnlyCollection<View> SubViews => View?.SubViews ?? _emptySubViews;
-
-    private static readonly IReadOnlyCollection<View> _emptySubViews = Array.Empty<View> ();
-
-    /// <summary>Adds a SubView to the backing <see cref="View"/>. Forces View creation via <see cref="EnsureView"/>.</summary>
-    public virtual void Add (View subView) => EnsureView ().Add (subView);
-
-    /// <summary>Gets whether the backing <see cref="View"/> has focus. <see langword="false"/> if no View exists.</summary>
-    public bool HasFocus => View?.HasFocus ?? false;
-
-    /// <summary>Removes a SubView from the backing <see cref="View"/>. No-op if no View exists.</summary>
-    public void Remove (View subView) => View?.Remove (subView);
-
-    /// <summary>Gets or sets the Enabled state on the backing <see cref="View"/>.</summary>
-    public bool Enabled
-    {
-        get => View?.Enabled ?? true;
-        set
-        {
-            if (View is { } v)
-            {
-                v.Enabled = value;
-            }
-        }
-    }
-
     /// <summary>Gets or sets the viewport settings flags on the backing <see cref="View"/>.</summary>
     public ViewportSettingsFlags ViewportSettings
     {
@@ -232,19 +160,6 @@ public abstract class AdornmentImpl : IAdornment
             if (View is { } v)
             {
                 v.ViewportSettings = value;
-            }
-        }
-    }
-
-    /// <summary>Gets or sets visibility of the backing <see cref="View"/>.</summary>
-    public bool Visible
-    {
-        get => View?.Visible ?? true;
-        set
-        {
-            if (View is { } v)
-            {
-                v.Visible = value;
             }
         }
     }
@@ -270,66 +185,4 @@ public abstract class AdornmentImpl : IAdornment
 
         return Thickness.Contains (outside, location);
     }
-
-    /// <summary>Gets or sets the SchemeName on the backing <see cref="View"/>.</summary>
-    public string? SchemeName
-    {
-        get => View?.SchemeName ?? field;
-        set
-        {
-            field = value;
-
-            if (View is { } v)
-            {
-                v.SchemeName = value;
-            }
-        }
-    }
-
-    /// <summary>
-    ///     Delegates to <see cref="View.GetAttributeForRole"/> on the backing <see cref="View"/>.
-    ///     Falls back to the <see cref="Parent"/>'s attribute when no View exists.
-    /// </summary>
-    public Attribute GetAttributeForRole (VisualRole role) => View?.GetAttributeForRole (role) ?? Parent?.GetAttributeForRole (role) ?? default (Attribute);
-
-    /// <summary>Calls <see cref="View.AddFrameToClip"/> on the backing <see cref="View"/>. Returns null if no View exists.</summary>
-    internal Region? AddFrameToClip () => View?.AddFrameToClip ();
-
-    /// <summary>Calls <see cref="View.DoDrawSubViews"/> on the backing <see cref="View"/>. No-op if no View exists.</summary>
-    internal void DoDrawSubViews () => View?.DoDrawSubViews ();
-
-    /// <summary>Disposes the backing <see cref="View"/> (if any) and clears references.</summary>
-    public void Dispose () => DisposeView ();
-
-    #endregion Convenience pass-throughs
-
-    #region Drawing
-
-    /// <summary>
-    ///     Draws the adornment content if a <see cref="View"/> exists.
-    /// </summary>
-    internal void Draw ()
-    {
-        if (View is null && Parent is { })
-        {
-            Thickness.Draw (Parent.Driver, FrameToScreen (), Diagnostics);
-
-            return;
-        }
-        View?.Draw ();
-    }
-
-    #endregion Drawing
-
-    #region Disposal
-
-    /// <summary>Propagates disposal to the <see cref="View"/> if it exists.</summary>
-    internal void DisposeView ()
-    {
-        View?.Dispose ();
-        View = null;
-        Parent = null;
-    }
-
-    #endregion Disposal
 }

@@ -8,7 +8,7 @@ namespace Terminal.Gui.ViewBase;
 /// <remarks>
 ///     <para>
 ///         The Margin is transparent by default. This can be overridden by setting a custom
-///         <see cref="Scheme"/> on the <see cref="AdornmentImpl.View"/> via <see cref="AdornmentImpl.EnsureView"/>.
+///         <see cref="Scheme"/> on the <see cref="AdornmentImpl.View"/> via <see cref="AdornmentImpl.GetOrCreateView"/>.
 ///     </para>
 ///     <para>
 ///         Margins are drawn after all other Views in the application View hierarchy are drawn.
@@ -47,7 +47,7 @@ public class Margin : AdornmentImpl
         if (Thickness == Thickness.Empty)
         { }
 
-        //EnsureView ();
+        //GetOrCreateView ();
     }
 
     /// <summary>
@@ -73,7 +73,7 @@ public class Margin : AdornmentImpl
                 return;
             }
 
-            if (EnsureView () is not MarginView marginView)
+            if (GetOrCreateView () is not MarginView marginView)
             {
                 return;
             }
@@ -102,9 +102,4 @@ public class Margin : AdornmentImpl
         }
     }
 
-    // --- Internal clip-cache methods (delegated to MarginView) ---
-
-    internal void CacheClip () => (View as MarginView)?.CacheClip ();
-    internal Region? GetCachedClip () => (View as MarginView)?.GetCachedClip ();
-    internal void ClearCachedClip () => (View as MarginView)?.ClearCachedClip ();
 }

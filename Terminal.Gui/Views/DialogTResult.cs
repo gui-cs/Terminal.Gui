@@ -108,7 +108,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
             CommandsToBubbleUp = CommandsToBubbleUp
         };
 
-        Padding.EnsureView ();
+        Padding.GetOrCreateView ();
         Padding.View?.Add (_buttonContainer);
         UpdateSizes ();
         SetStyle ();
@@ -149,7 +149,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <param name="args">The event data containing information about the layout event.</param>
     protected override void OnSubViewsLaidOut (LayoutEventArgs args)
     {
-        base.OnSubViewsLaidOut(args);
+        base.OnSubViewsLaidOut (args);
 
         if (NeedsLayout)
         {
@@ -168,22 +168,22 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         View? sourceView = null;
         args.Context?.Source?.TryGetTarget (out sourceView);
 
-        if (sourceView is { })
+        if (sourceView is null)
         {
-            RequestStop ();
-
-            return sourceView is IAcceptTarget { IsDefault: false };
+            return false;
         }
+        RequestStop ();
 
-        return false;
+        return sourceView is IAcceptTarget { IsDefault: false };
+
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnViewportChanged (DrawEventArgs e)
     {
         //if (!IsInitialized)
         {
-           SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, Viewport.Width), Math.Max (_minimumButtonsSize.Height, Viewport.Height)));
+            SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, Viewport.Width), Math.Max (_minimumButtonsSize.Height, Viewport.Height)));
         }
         base.OnViewportChanged (e);
     }
@@ -194,7 +194,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         {
             // This is primarily to support MessageBox where there are no subviews but
             // Text is used.
-           return;
+            return;
         }
 
         int subViewsWidth = _minimumSubViewsSize.Width;

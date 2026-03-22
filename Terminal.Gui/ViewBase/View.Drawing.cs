@@ -159,7 +159,7 @@ public partial class View // Drawing APIs
 
         // ------------------------------------
         // This causes the Margin to be drawn in a second pass if it has a ShadowStyle
-        Margin.CacheClip ();
+        (Margin.View as MarginView)?.CacheClip ();
 
         // ------------------------------------
         // Reset the clip to what it was when we started
@@ -181,11 +181,13 @@ public partial class View // Drawing APIs
 
     private void DoDrawAdornmentsSubViews ()
     {
-        // Only SetNeedsDraw on Margin here if it is not Transparent. Transparent Margins are drawn in a separate pass in the static View.Draw
+        // Only process Margin here if it is not Transparent. Transparent Margins are drawn in a separate pass in the static View.Draw
         // via Margin.DrawTransparentMargins.
-        if (Margin is { NeedsDraw: true } && !Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
+        if (Margin.View is { } marginView && !Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
         {
-            foreach (View subview in Margin.SubViews)
+            marginView.SetNeedsDraw ();
+
+            foreach (View subview in marginView.SubViews)
             {
                 subview.SetNeedsDraw ();
             }
@@ -194,10 +196,12 @@ public partial class View // Drawing APIs
             // NOTE: so we do not call DoDrawSubViews on Margin.
         }
 
-        if (Border.SubViews is { } && Border.Thickness != Thickness.Empty && Border.NeedsDraw)
+        if (Border.View is { SubViews.Count: > 0 } borderView && Border.Thickness != Thickness.Empty)
         {
+            borderView.SetNeedsDraw ();
+
             // PERFORMANCE: Get the check for DrawIndicator out of this somehow.
-            foreach (View subview in Border.SubViews.Where (v => v.Visible || v.Id == "DrawIndicator"))
+            foreach (View subview in borderView.SubViews.Where (v => v.Visible || v.Id == "DrawIndicator"))
             {
                 if (subview.Id != "DrawIndicator")
                 {
@@ -207,23 +211,25 @@ public partial class View // Drawing APIs
                 LineCanvas.Exclude (new Region (subview.FrameToScreen ()));
             }
 
-            Region? saved = Border.AddFrameToClip ();
-            Border.DoDrawSubViews ();
+            Region? saved = borderView.AddFrameToClip ();
+            borderView.DoDrawSubViews ();
             SetClip (saved);
         }
 
-        if (Padding.SubViews is null || Padding.Thickness == Thickness.Empty || !Padding.NeedsDraw)
+        if (Padding.View is not { SubViews.Count: > 0 } paddingView || Padding.Thickness == Thickness.Empty)
         {
             return;
         }
 
-        foreach (View subview in Padding.SubViews)
+        paddingView.SetNeedsDraw ();
+
+        foreach (View subview in paddingView.SubViews)
         {
             subview.SetNeedsDraw ();
         }
 
-        Region? savedPadding = Padding.AddFrameToClip ();
-        Padding.DoDrawSubViews ();
+        Region? savedPadding = paddingView.AddFrameToClip ();
+        paddingView.DoDrawSubViews ();
         SetClip (savedPadding);
     }
 
@@ -235,37 +241,38 @@ public partial class View // Drawing APIs
 
             return;
         }
-        else
-        {
-            // Set the clip to be just the thicknesses of the adornments
-            // TODO: Put this union logic in a method on View?
-            Region clipAdornments = Margin.Thickness.AsRegion (Margin.FrameToScreen ());
-            clipAdornments.Combine (Border.Thickness.AsRegion (Border.FrameToScreen ()), RegionOp.Union);
-            clipAdornments.Combine (Padding.Thickness.AsRegion (Padding.FrameToScreen ()), RegionOp.Union);
-            clipAdornments.Combine (originalClip, RegionOp.Intersect);
-            SetClip (clipAdornments);
-        }
 
-        if (Margin.NeedsLayout == true)
+        // Set the clip to be just the thicknesses of the adornments
+        // TODO: Put this union logic in a method on View?
+        Region clipAdornments = Margin.Thickness.AsRegion (Margin.FrameToScreen ());
+        clipAdornments.Combine (Border.Thickness.AsRegion (Border.FrameToScreen ()), RegionOp.Union);
+        clipAdornments.Combine (Padding.Thickness.AsRegion (Padding.FrameToScreen ()), RegionOp.Union);
+        clipAdornments.Combine (originalClip, RegionOp.Intersect);
+        SetClip (clipAdornments);
+
+        if (Margin.View is { NeedsLayout: true } marginView)
         {
-            Margin.NeedsLayout = false;
+            marginView.NeedsLayout = false;
 
             if (Driver is { })
             {
-                if (Margin.View is null)
-                {
-                    Margin.Thickness.Draw (Driver, FrameToScreen ());
-                }
+                Margin.Thickness.Draw (Driver, FrameToScreen ());
             }
-            Margin.Parent?.SetSubViewNeedsDrawDownHierarchy ();
+
+            SetSubViewNeedsDrawDownHierarchy ();
         }
 
-        if (SubViewNeedsDraw)
+        // When parent is drawing, always ensure adornment Views are marked for redraw.
+        Border.View?.SetNeedsDraw ();
+        Padding.View?.SetNeedsDraw ();
+        Margin.View?.SetNeedsDraw ();
+
+        // Ensure NeedsDraw is true for the rest of the draw pipeline (DoClearViewport, DoDrawText, etc.)
+        // When adornment Views are null (lightweight), their NeedsDraw doesn't contribute to the parent's
+        // NeedsDraw property. But if we're here, the parent IS drawing, so we must set NeedsDrawRect.
+        if (NeedsDrawRect == Rectangle.Empty)
         {
-            // A SubView may add to the LineCanvas. This ensures any Adornment LineCanvas updates happen.
-            Border.SetNeedsDraw ();
-            Padding.SetNeedsDraw ();
-            Margin.SetNeedsDraw ();
+            NeedsDrawRect = Viewport;
         }
 
         if (OnDrawingAdornments ())
@@ -290,24 +297,45 @@ public partial class View // Drawing APIs
     {
         // Only draw Margin here if it is not Transparent. Transparent Margins are drawn in a separate pass in the static View.Draw
         // via Margin.DrawTransparentMargins.
-        if (Margin is { } && !Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
+        if (!Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
         {
-            Margin.Draw ();
+            if (Margin.View is { } marginView)
+            {
+                marginView.Draw ();
+            }
+            else if (Margin.Thickness != Thickness.Empty)
+            {
+                Margin.Thickness.Draw (Driver, Margin.FrameToScreen (), Margin.Diagnostics);
+            }
         }
 
         // Each of these renders lines to this View's LineCanvas
         // Those lines will be finally rendered in OnRenderLineCanvas
         if (Border.Thickness != Thickness.Empty)
         {
-            Border.Draw ();
+            if (Border.View is { } borderView)
+            {
+                borderView.Draw ();
+            }
+            else if (Border.Thickness != Thickness.Empty)
+            {
+                Border.Thickness.Draw (Driver, Border.FrameToScreen (), Border.Diagnostics);
+            }
         }
 
         if (Padding.Thickness != Thickness.Empty)
         {
-            Padding.Draw ();
+            if (Padding.View is { } paddingView)
+            {
+                paddingView.Draw ();
+            }
+            else if (Padding.Thickness != Thickness.Empty)
+            {
+                Padding.Thickness.Draw (Driver, Padding.FrameToScreen (), Padding.Diagnostics);
+            }
         }
 
-        if (Margin is { } && Margin.Thickness != Thickness.Empty /* && Margin.ShadowStyle == ShadowStyle.None*/)
+        if (Margin.Thickness != Thickness.Empty /* && Margin.ShadowStyle == ShadowStyle.None*/)
         {
             //Margin.Draw ();
         }
@@ -829,13 +857,9 @@ public partial class View // Drawing APIs
             // the view is considered fully opaque.
 
             // Start with the Frame in screen coordinates
-            Rectangle borderFrame = FrameToScreen ();
 
             // If there's a Border, use its frame instead (includes the border thickness)
-            if (Border is { })
-            {
-                borderFrame = Border.FrameToScreen ();
-            }
+            Rectangle borderFrame = Border.FrameToScreen ();
 
             // Exclude this view's entire area (Border inward, but not Margin) from the clip.
             // This prevents any view drawn after this one from drawing in this area.

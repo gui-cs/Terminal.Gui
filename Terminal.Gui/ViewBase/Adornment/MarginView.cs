@@ -2,7 +2,7 @@ namespace Terminal.Gui.ViewBase;
 
 /// <summary>
 ///     The View-backed rendering layer for the Margin adornment.
-///     Created lazily by <see cref="Margin"/> (via <see cref="AdornmentImpl.EnsureView"/>)
+///     Created lazily by <see cref="Margin"/> (via <see cref="AdornmentImpl.GetOrCreateView"/>)
 ///     when shadow sub-views or other View-level functionality is needed.
 /// </summary>
 /// <remarks>
@@ -109,17 +109,17 @@ public class MarginView : AdornmentView
         {
             View view = stack.Pop ();
 
-            if (view.Margin.View is { } marginView
+            if (view.Margin.View is MarginView marginView
                 && view.Margin.Thickness != Thickness.Empty
                 && marginView.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)
-                && view.Margin.GetCachedClip () != null)
+                && marginView.GetCachedClip () != null)
             {
                 marginView.SetNeedsDraw ();
                 Region? saved = view.GetClip ();
-                view.SetClip (view.Margin.GetCachedClip ());
+                view.SetClip (marginView.GetCachedClip ());
                 marginView.Draw ();
                 view.SetClip (saved);
-                view.Margin.ClearCachedClip ();
+                marginView.ClearCachedClip ();
             }
 
             // Do not include Margin views of subviews; not supported

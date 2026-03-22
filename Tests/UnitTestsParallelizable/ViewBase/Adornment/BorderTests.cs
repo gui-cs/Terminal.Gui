@@ -1,4 +1,4 @@
-﻿using UnitTests;
+using UnitTests;
 
 namespace ViewBaseTests.Adornments;
 
@@ -19,7 +19,7 @@ public class BorderTests : TestDriverBase
         View view = new () { Height = 3, Width = 3 };
         Assert.Null (view.Border.View);
 
-        view.Border.EnsureView ();
+        view.Border.GetOrCreateView ();
         Assert.NotNull (view.Border.View);
         Assert.False (view.Border.View?.CanFocus);
         Assert.Equal (TabBehavior.TabGroup, view.Border.View?.TabStop);
@@ -81,7 +81,7 @@ public class BorderTests : TestDriverBase
 
         Assert.Equal (new Rectangle (1, 2, 20, 20), view.Frame);
         Assert.Equal (new Rectangle (0, 0, 20, 20), view.Viewport);
-        view.Border.EnsureView ();
+        view.Border.GetOrCreateView ();
         Assert.Equal (new Rectangle (0, 0, 20, 20), view.Border.View?.Viewport);
 
         view.Border.Thickness = new Thickness (1);

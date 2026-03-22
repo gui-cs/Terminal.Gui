@@ -43,7 +43,7 @@ public class Border : AdornmentImpl
             return;
         }
 
-        EnsureView ();
+        GetOrCreateView ();
     }
 
     /// <summary>
@@ -65,7 +65,7 @@ public class Border : AdornmentImpl
 
             if (field is not null)
             {
-                EnsureView ();
+                GetOrCreateView ();
             }
         }
     }

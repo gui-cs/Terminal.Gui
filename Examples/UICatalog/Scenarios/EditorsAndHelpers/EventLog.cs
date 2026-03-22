@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Collections.ObjectModel;
 using System.Text;
 
@@ -162,7 +162,7 @@ public class EventLog : ListView
 
     private void EventLog_Initialized (object? _, EventArgs e)
     {
-        Border.Add (ExpandButton!);
+        Border.GetOrCreateView ().Add (ExpandButton!);
         Source = new ListWrapper<string> (_eventSource);
     }
 }

@@ -257,7 +257,7 @@ public class AdornmentLayoutTests
         View view = new ();
         view.Padding.Thickness = new Thickness (1);
 
-        // PaddingView should NOT exist — only Padding.Add triggers EnsureView
+        // PaddingView should NOT exist — only Padding.Add triggers GetOrCreateView
         Assert.Null (view.Padding.View);
     }
 
@@ -265,7 +265,7 @@ public class AdornmentLayoutTests
     public void Padding_View_Created_When_ScrollBar_Accessed ()
     {
         // Replicates what happens in TextView: accessing a ScrollBar triggers
-        // Padding.Add(scrollBar) which calls EnsureView, creating the PaddingView.
+        // Padding.Add(scrollBar) which calls GetOrCreateView, creating the PaddingView.
         View view = new () { Width = 10, Height = 5 };
         view.BeginInit ();
         view.EndInit ();

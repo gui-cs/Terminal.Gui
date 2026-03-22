@@ -1,4 +1,4 @@
-﻿using UnitTests;
+using UnitTests;
 
 namespace ViewBaseTests.Adornments;
 
@@ -18,7 +18,7 @@ public class MarginTests (ITestOutputHelper output)
         View view = new () { Height = 3, Width = 3 };
         Assert.Null (view.Margin.View);
 
-        view.Margin.EnsureView ();
+        view.Margin.GetOrCreateView ();
         Assert.False (view.Margin.View?.CanFocus);
         Assert.Equal (TabBehavior.NoStop, view.Margin.View?.TabStop);
         Assert.Empty (view.Margin.View?.KeyBindings.GetBindings ()!);
@@ -34,6 +34,7 @@ public class MarginTests (ITestOutputHelper output)
         var view = new View { Height = 3, Width = 3 };
         view.Margin.Diagnostics = ViewDiagnosticFlags.Thickness;
         view.Margin.Thickness = new Thickness (1);
+        view.Margin.GetOrCreateView ();
 
         Runnable<bool> runnable = new ();
         app.Begin (runnable);
@@ -41,7 +42,7 @@ public class MarginTests (ITestOutputHelper output)
         runnable.SetScheme (new Scheme { Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red) });
 
         runnable.Add (view);
-        Assert.Equal (ColorName16.Red, view.Margin.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Red, view.Margin.View!.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
         Assert.Equal (ColorName16.Red, runnable.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
 
         app.LayoutAndDraw ();
@@ -58,7 +59,7 @@ public class MarginTests (ITestOutputHelper output)
         app.Driver!.SetScreenSize (5, 5);
 
         View view = new () { Height = 3, Width = 3 };
-        view.Margin.EnsureView ();
+        view.Margin.GetOrCreateView ();
         view.Margin.View?.Diagnostics = ViewDiagnosticFlags.Thickness;
         view.Margin.Thickness = new Thickness (1);
         view.Margin.View?.ViewportSettings = ViewportSettingsFlags.None;
@@ -69,7 +70,7 @@ public class MarginTests (ITestOutputHelper output)
         runnable.SetScheme (new Scheme { Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red) });
 
         runnable.Add (view);
-        Assert.Equal (ColorName16.Red, view.Margin.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Red, view.Margin.View!.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
         Assert.Equal (ColorName16.Red, runnable.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
 
         app.LayoutAndDraw ();
@@ -89,7 +90,7 @@ public class MarginTests (ITestOutputHelper output)
     public void Is_Visually_Transparent ()
     {
         View view = new () { Height = 3, Width = 3 };
-        view.Margin.EnsureView ();
+        view.Margin.GetOrCreateView ();
         Assert.True (view.Margin.View?.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent), "Margin should be transparent by default.");
     }
 
@@ -97,7 +98,7 @@ public class MarginTests (ITestOutputHelper output)
     public void Is_Transparent_To_Mouse_With_View ()
     {
         View view = new () { Height = 3, Width = 3 };
-        view.Margin.EnsureView ();
+        view.Margin.GetOrCreateView ();
         Assert.True (view.Margin.View?.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse), "Margin should be transparent to mouse by default.");
     }
 
@@ -115,7 +116,7 @@ public class MarginTests (ITestOutputHelper output)
 
         // Give the Margin some size
         view.Margin.Thickness = new Thickness (1, 1, 1, 1);
-        view.Margin.EnsureView ();
+        view.Margin.GetOrCreateView ();
 
         // Give it Text
         view.Margin.View?.Text = "Test";
@@ -134,7 +135,7 @@ public class MarginTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Thickness_Set_Does_Not_EnsureView ()
+    public void Thickness_Set_Does_Not_GetOrCreateView ()
     {
         View view = new () { Height = 3, Width = 3 };
         Assert.Null (view.Margin.View);
@@ -259,7 +260,7 @@ public class MarginTests (ITestOutputHelper output)
 
         Assert.Equal (new Rectangle (1, 2, 20, 20), view.Frame);
         Assert.Equal (new Rectangle (0, 0, 20, 20), view.Viewport);
-        view.Margin.EnsureView ();
+        view.Margin.GetOrCreateView ();
         Assert.Equal (new Rectangle (0, 0, 20, 20), view.Margin.View?.Viewport);
 
         view.Margin.Thickness = new Thickness (1);

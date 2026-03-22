@@ -69,7 +69,7 @@ public class StaticDrawTests : TestDriverBase
         Assert.True (subview1.SubViewNeedsDraw);
         Assert.True (subview2.NeedsDraw);
         Assert.True (subSubView.NeedsDraw);
-        Assert.True (subSubView.Margin.NeedsDraw);
+        Assert.True (subSubView.Margin.View?.NeedsDraw == true);
 
         // Call the static Draw method on the subviews
         // This will:
@@ -83,7 +83,7 @@ public class StaticDrawTests : TestDriverBase
         Assert.False (subview1.NeedsDraw, "SubView1 should not need drawing after Draw()");
         Assert.False (subview2.NeedsDraw, "SubView2 should not need drawing after Draw()");
         Assert.False (subSubView.NeedsDraw, "SubSubView should not need drawing after Draw()");
-        Assert.False (subSubView.Margin.NeedsDraw, "SubSubView's Margin should not need drawing after Draw()");
+        Assert.False (subSubView.Margin.View?.NeedsDraw == true, "SubSubView's Margin should not need drawing after Draw()");
 
         // SuperView's SubViewNeedsDraw should be false because the static Draw() method
         // calls ClearNeedsDraw() on all the subviews at the end, AFTER Margin.DrawMargins()
@@ -195,7 +195,7 @@ public class StaticDrawTests : TestDriverBase
             "MiddleView2's SubViewNeedsDraw should be false");
         Assert.False (bottomView.NeedsDraw,
             "BottomView should not need drawing after Draw()");
-        Assert.False (bottomView.Margin.NeedsDraw,
+        Assert.False (bottomView.Margin.View?.NeedsDraw == true,
             "BottomView's Margin should not need drawing after Draw()");
     }
 }
