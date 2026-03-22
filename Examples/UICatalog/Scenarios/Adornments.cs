@@ -45,7 +45,7 @@ public class Adornments : Scenario
 
         viewportSettingsEditor.Border.Thickness = new Thickness (1, 2, 1, 1);
 
-        Button appButton = new () { X = Pos.Center (), Y = 1, Text = "_SubView of Window" };
+        Button appButton = new () { X = Pos.Center (), Y = 4, Text = "_SubView of Window" };
         appWindow.Add (appButton);
 
         Window window = new ()
