@@ -3,7 +3,7 @@ using System.Text;
 using System.Text.Json;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 
-namespace UnitTests.ConfigurationTests;
+namespace UnitTests.NonParallelizable.ConfigurationTests;
 
 public class GlyphTests
 {

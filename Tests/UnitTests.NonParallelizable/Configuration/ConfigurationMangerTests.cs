@@ -10,7 +10,7 @@ using SourcesManager = Terminal.Gui.Configuration.SourcesManager;
 
 #pragma warning disable IDE1006
 
-namespace UnitTests.ConfigurationTests;
+namespace UnitTests.NonParallelizable.ConfigurationTests;
 
 public class ConfigurationManagerTests (ITestOutputHelper output)
 {
