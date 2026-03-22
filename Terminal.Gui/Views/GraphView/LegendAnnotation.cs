@@ -54,9 +54,12 @@ public class LegendAnnotation : View, IAnnotation
         {
             // BUGBUG: View code should never call Draw directly. This
             // BUGBUG: needs to be refactored to decouple.
-            DrawAdornments (drawContext1);
-            LineCanvas.Merge (Border!.LineCanvas);
-            Border.LineCanvas.Clear ();
+            DrawAdornments ();
+            if (Border.View is { } borderView)
+            {
+                LineCanvas.Merge (borderView.LineCanvas);
+                borderView.LineCanvas.Clear ();
+            }
             RenderLineCanvas (drawContext1);
         }
 

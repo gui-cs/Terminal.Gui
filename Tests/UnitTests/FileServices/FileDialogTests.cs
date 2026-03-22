@@ -616,8 +616,8 @@ public class FileDialogTests ()
         Window.DefaultBorderStyle = LineStyle.Single;
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
-        Dialog.DefaultShadow = ShadowStyle.None;
-        Button.DefaultShadow = ShadowStyle.None;
+        Dialog.DefaultShadow = ShadowStyles.None;
+        Button.DefaultShadow = ShadowStyles.None;
 
         var dlg = new FileDialog ();
         Begin (dlg);
@@ -630,8 +630,8 @@ public class FileDialogTests ()
         Window.DefaultBorderStyle = LineStyle.Single;
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
-        Dialog.DefaultShadow = ShadowStyle.None;
-        Button.DefaultShadow = ShadowStyle.None;
+        Dialog.DefaultShadow = ShadowStyles.None;
+        Button.DefaultShadow = ShadowStyles.None;
 
         // Arrange
         var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), "/");
@@ -680,8 +680,8 @@ public class FileDialogTests ()
         Window.DefaultBorderStyle = LineStyle.Single;
         Dialog.DefaultButtonAlignment = Alignment.Center;
         Dialog.DefaultBorderStyle = LineStyle.Single;
-        Dialog.DefaultShadow = ShadowStyle.None;
-        Button.DefaultShadow = ShadowStyle.None;
+        Dialog.DefaultShadow = ShadowStyles.None;
+        Button.DefaultShadow = ShadowStyles.None;
 
         // Arrange
         var fileSystem = new MockFileSystem (new Dictionary<string, MockFileData> (), @"c:\");

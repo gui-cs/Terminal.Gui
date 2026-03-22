@@ -21,7 +21,7 @@ public class DimEditor : EditorBase
     /// <inheritdoc/>
     protected override void OnViewToEditChanged ()
     {
-        if (ViewToEdit is not null)
+        if (ViewToEdit is { })
         {
             ViewToEdit.SubViewsLaidOut += (_, _) => { OnUpdateLayoutSettings (); };
         }
@@ -31,7 +31,7 @@ public class DimEditor : EditorBase
 
     protected override void OnUpdateLayoutSettings ()
     {
-        Enabled = ViewToEdit is not Adornment;
+        Enabled = ViewToEdit is not AdornmentView;
 
         if (ViewToEdit is null)
         {
@@ -42,7 +42,7 @@ public class DimEditor : EditorBase
 
         try
         {
-            _dimOptionSelector!.Value = _dimNames.IndexOf (_dimNames.First (s => dim.ToString ().StartsWith (s)));
+            _dimOptionSelector!.Value = _dimNames.IndexOf (_dimNames.First (s => dim.ToString ().StartsWith (s, StringComparison.Ordinal)));
         }
         catch (InvalidOperationException e)
         {
@@ -60,25 +60,29 @@ public class DimEditor : EditorBase
                 _valueEdit!.Text = _value.ToString ();
 
                 break;
+
             case DimFill fill:
                 var margin = fill.Margin as DimAbsolute;
-                _valueEdit.Enabled = margin is not null;
+                _valueEdit.Enabled = margin is { };
                 _value = margin?.Size ?? 0;
                 _valueEdit!.Text = _value.ToString ();
 
                 break;
+
             case DimFunc func:
                 _valueEdit.Enabled = true;
                 _value = func.Fn (null);
                 _valueEdit!.Text = _value.ToString ();
 
                 break;
+
             case DimPercent percent:
                 _valueEdit.Enabled = true;
                 _value = percent.Percentage;
                 _valueEdit!.Text = _value.ToString ();
 
                 break;
+
             default:
                 _valueEdit!.Text = dim.ToString ();
 
@@ -90,21 +94,14 @@ public class DimEditor : EditorBase
 
     private void DimEditor_Initialized (object? sender, EventArgs e)
     {
-        var label = new Label
-        {
-            X = 0, Y = 0,
-            Text = $"{this.ToIdentifyingString ()}:"
-        };
+        var label = new Label { X = 0, Y = 0, Text = $"{this.ToIdentifyingString ()}:" };
         Add (label);
-        _dimOptionSelector = new () { X = 0, Y = Pos.Bottom (label), Labels = _optionLabels };
+        _dimOptionSelector = new OptionSelector { X = 0, Y = Pos.Bottom (label), Labels = _optionLabels };
         _dimOptionSelector.ValueChanged += OnOptionSelectorOnValueChanged;
 
-        _valueEdit = new ()
+        _valueEdit = new TextField
         {
-            X = Pos.Right (label) + 1,
-            Y = 0,
-            Width = Dim.Func (_ => _optionLabels.Max (i => i.GetColumns ()) - label.Frame.Width + 1),
-            Text = $"{_value}"
+            X = Pos.Right (label) + 1, Y = 0, Width = Dim.Func (_ => _optionLabels.Max (i => i.GetColumns ()) - label.Frame.Width + 1), Text = $"{_value}"
         };
 
         _valueEdit.Accepting += (_, args) =>
@@ -126,7 +123,7 @@ public class DimEditor : EditorBase
         Add (_dimOptionSelector);
     }
 
-    private void OnOptionSelectorOnValueChanged (object? s, ValueChangedEventArgs<int?> args) { DimChanged (); }
+    private void OnOptionSelectorOnValueChanged (object? s, ValueChangedEventArgs<int?> args) => DimChanged ();
 
     // These need to have same order
     private readonly List<string> _dimNames = ["Absolute", "Auto", "Fill", "Func", "Percent"];
@@ -142,14 +139,14 @@ public class DimEditor : EditorBase
         try
         {
             Dim dim = _dimOptionSelector!.Value switch
-                       {
-                           0 => Dim.Absolute (_value),
-                           1 => Dim.Auto (),
-                           2 => Dim.Fill (_value),
-                           3 => Dim.Func (_ => _value),
-                           4 => Dim.Percent (_value),
-                           _ => Dimension == Dimension.Width ? ViewToEdit.Width : ViewToEdit.Height
-                       };
+                      {
+                          0 => Dim.Absolute (_value),
+                          1 => Dim.Auto (),
+                          2 => Dim.Fill (_value),
+                          3 => Dim.Func (_ => _value),
+                          4 => Dim.Percent (_value),
+                          _ => Dimension == Dimension.Width ? ViewToEdit.Width : ViewToEdit.Height
+                      };
 
             if (Dimension == Dimension.Width)
             {

@@ -147,7 +147,7 @@ public class DrawTests (ITestOutputHelper output)
             App = ApplicationImpl.Instance,
             Width = 2, Height = 1, BorderStyle = LineStyle.Single
         };
-        view.Border!.Thickness = new (1, 1, 1, 0);
+        view.Border.Thickness = new (1, 1, 1, 0);
         view.BeginInit ();
         view.EndInit ();
         view.SetRelativeLayout (Application.Screen.Size);
@@ -169,7 +169,7 @@ public class DrawTests (ITestOutputHelper output)
             App = ApplicationImpl.Instance,
             Width = 1, Height = 2, BorderStyle = LineStyle.Single
         };
-        view.Border!.Thickness = new (0, 1, 1, 1);
+        view.Border.Thickness = new (0, 1, 1, 1);
         view.BeginInit ();
         view.EndInit ();
         view.SetRelativeLayout (Application.Screen.Size);
@@ -198,7 +198,7 @@ public class DrawTests (ITestOutputHelper output)
             App = ApplicationImpl.Instance,
             Width = 1, Height = 2, BorderStyle = LineStyle.Single
         };
-        view.Border!.Thickness = new (1, 1, 0, 1);
+        view.Border.Thickness = new (1, 1, 0, 1);
         view.BeginInit ();
         view.EndInit ();
         view.SetRelativeLayout (Application.Screen.Size);
@@ -227,7 +227,7 @@ public class DrawTests (ITestOutputHelper output)
             App = ApplicationImpl.Instance,
             Width = 2, Height = 1, BorderStyle = LineStyle.Single
         };
-        view.Border!.Thickness = new (1, 0, 1, 1);
+        view.Border.Thickness = new (1, 0, 1, 1);
 
         view.BeginInit ();
         view.EndInit ();

@@ -89,22 +89,22 @@ public class DialogTests
     [Fact]
     public void DefaultShadow_Get_Set ()
     {
-        ShadowStyle original = Dialog.DefaultShadow;
+        ShadowStyles original = Dialog.DefaultShadow;
 
         try
         {
-            Dialog.DefaultShadow = ShadowStyle.None;
-            Assert.Equal (ShadowStyle.None, Dialog.DefaultShadow);
+            Dialog.DefaultShadow = ShadowStyles.None;
+            Assert.Equal (ShadowStyles.None, Dialog.DefaultShadow);
 
             Dialog dialog = new ();
-            Assert.Equal (ShadowStyle.None, dialog.ShadowStyle);
+            Assert.Equal (ShadowStyles.None, dialog.ShadowStyle);
             dialog.Dispose ();
 
-            Dialog.DefaultShadow = ShadowStyle.Opaque;
-            Assert.Equal (ShadowStyle.Opaque, Dialog.DefaultShadow);
+            Dialog.DefaultShadow = ShadowStyles.Opaque;
+            Assert.Equal (ShadowStyles.Opaque, Dialog.DefaultShadow);
 
             dialog = new ();
-            Assert.Equal (ShadowStyle.Opaque, dialog.ShadowStyle);
+            Assert.Equal (ShadowStyles.Opaque, dialog.ShadowStyle);
             dialog.Dispose ();
         }
         finally

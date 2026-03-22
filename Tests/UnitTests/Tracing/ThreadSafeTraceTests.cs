@@ -1,7 +1,6 @@
-// Claude - Opus 4.5
+#nullable enable
 
 using Terminal.Gui.Tracing;
-using UnitTests.Parallelizable;
 
 #pragma warning disable xUnit1031
 
@@ -11,7 +10,8 @@ namespace UnitTests.TracingTests;
 ///     Tests for thread-safe tracing behavior.
 ///     These tests verify that tracing is properly isolated per-thread and per-async-context.
 ///     All tests work correctly in both Debug and Release builds.
-///     IMPORTANT: These tests set static state on the Trace class, so they must be run in isolation (not parallelized) to avoid interference between tests.
+///     IMPORTANT: These tests set static state on the Trace class, so they must be run in isolation (not parallelized) to
+///     avoid interference between tests.
 /// </summary>
 public class ThreadSafeTraceTests (ITestOutputHelper output)
 {
@@ -207,6 +207,7 @@ public class ThreadSafeTraceTests (ITestOutputHelper output)
                 await Task.Delay (10, TestContext.Current.CancellationToken);
 
 #if DEBUG
+
                 // This test should only see its own traces
                 Assert.All (backend.Entries, entry => Assert.Contains ("parallel-test-1", entry.Id));
 #else
@@ -240,6 +241,7 @@ public class ThreadSafeTraceTests (ITestOutputHelper output)
                 await Task.Delay (10, TestContext.Current.CancellationToken);
 
 #if DEBUG
+
                 // This test should only see its own traces
                 Assert.All (backend.Entries, entry => Assert.Contains ("parallel-test-2", entry.Id));
 #else
@@ -263,14 +265,12 @@ public class ThreadSafeTraceTests (ITestOutputHelper output)
         {
             Trace.EnabledCategories = TraceCategory.Command;
 
-            TraceCategory capturedCategories = TraceCategory.None;
-
             // Task.Run flows ExecutionContext by default, so the async-local value is visible in the task.
             // The key isolation behavior is that changes in the task don't affect the parent context.
             Task.Run (() =>
                       {
                           // Task sees parent's value due to ExecutionContext flow
-                          capturedCategories = Trace.EnabledCategories;
+                          _ = Trace.EnabledCategories;
 
                           // Set different categories in task context
                           Trace.EnabledCategories = TraceCategory.Mouse;
@@ -297,12 +297,10 @@ public class ThreadSafeTraceTests (ITestOutputHelper output)
         {
             Trace.Backend = mainBackend;
 
-            ITraceBackend? capturedBackend = null;
-
             // Use Task.Run which may or may not flow ExecutionContext
             Task.Run (() =>
                       {
-                          capturedBackend = Trace.Backend;
+                          _ = Trace.Backend;
 
                           // Set different backend in this context
                           Trace.Backend = new ListBackend ();

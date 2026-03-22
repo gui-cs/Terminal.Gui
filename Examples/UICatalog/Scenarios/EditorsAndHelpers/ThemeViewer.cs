@@ -7,8 +7,8 @@ public sealed class ThemeViewer : FrameView
     public ThemeViewer ()
     {
         BorderStyle = LineStyle.Rounded;
-        Border!.Thickness = new (0, 1, 0, 0);
-        Margin!.Thickness = new (0, 0, 1, 0);
+        Border.Thickness = new (0, 1, 0, 0);
+        Margin.Thickness = new (0, 0, 1, 0);
         TabStop = TabBehavior.TabStop;
         CanFocus = true;
         Height = Dim.Fill ();

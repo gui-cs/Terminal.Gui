@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 namespace UICatalog.Scenarios;
 
 public abstract class EditorBase : View
@@ -10,10 +10,7 @@ public abstract class EditorBase : View
 
         CanFocus = true;
 
-        ExpanderButton = new ExpanderButton
-        {
-            Orientation = Orientation.Vertical
-        };
+        ExpanderButton = new ExpanderButton { Orientation = Orientation.Vertical };
 
         TabStop = TabBehavior.TabStop;
 
@@ -27,7 +24,10 @@ public abstract class EditorBase : View
 
         void OnInitialized (object? sender, EventArgs e)
         {
-            Border?.Add (ExpanderButton);
+            if (ExpanderButton is { })
+            {
+                Border.GetOrCreateView ().Add (ExpanderButton);
+            }
 
             App!.Mouse.MouseEvent += ApplicationOnMouseEvent;
             App!.Navigation!.FocusedChanged += NavigationOnFocusedChanged;
@@ -50,11 +50,11 @@ public abstract class EditorBase : View
 
     public bool ShowViewIdentifier
     {
-        get => Padding is { } && Padding.Thickness != Thickness.Empty;
-        set => Padding?.Thickness = value ? new Thickness (0, 2, 0, 0) : Thickness.Empty;
+        get => Padding.Thickness != Thickness.Empty;
+        set => Padding.Thickness = value ? new Thickness (0, 2, 0, 0) : Thickness.Empty;
     }
 
-    public bool UpdatingLayoutSettings { get; internal set; }
+    public bool UpdatingLayoutSettings { get; private set; }
 
     private void View_LayoutComplete (object? sender, LayoutEventArgs e)
     {
@@ -77,11 +77,17 @@ public abstract class EditorBase : View
                 return;
             }
 
-            _viewToEdit?.SubViewsLaidOut -= View_LayoutComplete;
+            if (value is null && _viewToEdit is { })
+            {
+                _viewToEdit.SubViewsLaidOut -= View_LayoutComplete;
+            }
 
             _viewToEdit = value;
 
-            _viewToEdit?.SubViewsLaidOut += View_LayoutComplete;
+            if (_viewToEdit is { })
+            {
+                _viewToEdit.SubViewsLaidOut += View_LayoutComplete;
+            }
 
             OnViewToEditChanged ();
         }
@@ -91,7 +97,7 @@ public abstract class EditorBase : View
     {
         if (ShowViewIdentifier)
         {
-            Padding?.Text = ViewToEdit?.ToIdentifyingString () ?? "<none>";
+            Padding.View?.Text = ViewToEdit?.ToIdentifyingString () ?? "<none>";
         }
     }
 
@@ -140,7 +146,7 @@ public abstract class EditorBase : View
             return;
         }
 
-        if ((AutoSelectSuperView is not null && !AutoSelectSuperView.FrameToScreen ().Contains (mouse.Position!.Value))
+        if ((AutoSelectSuperView is { } && !AutoSelectSuperView.FrameToScreen ().Contains (mouse.Position!.Value))
             || FrameToScreen ().Contains (mouse.Position!.Value))
         {
             return;
@@ -153,9 +159,9 @@ public abstract class EditorBase : View
             return;
         }
 
-        if (view is Adornment adornment)
+        if (view is AdornmentView adornment)
         {
-            ViewToEdit = AutoSelectAdornments ? adornment : adornment.Parent;
+            ViewToEdit = AutoSelectAdornments ? adornment : adornment.Adornment?.Parent;
         }
         else
         {
@@ -163,24 +169,18 @@ public abstract class EditorBase : View
         }
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnSuperViewChanging (ValueChangingEventArgs<View?> args)
     {
         // Clean up event handlers before SuperView is set to null
         // This ensures App is still accessible for proper cleanup
-        if (App is { })
+        if (App is null)
         {
-            App.Navigation!.FocusedChanged -= NavigationOnFocusedChanged;
-            App.Mouse.MouseEvent -= ApplicationOnMouseEvent;
+            return base.OnSuperViewChanging (args);
         }
+        App.Navigation!.FocusedChanged -= NavigationOnFocusedChanged;
+        App.Mouse.MouseEvent -= ApplicationOnMouseEvent;
 
         return base.OnSuperViewChanging (args);
-    }
-
-    /// <inheritdoc />
-    protected override void Dispose (bool disposing)
-    {
-        // Event handlers are now cleaned up in OnSuperViewChanging
-        base.Dispose (disposing);
     }
 }

@@ -104,22 +104,22 @@ public class ThemeScopeTests
         ConcurrentDictionary<string, ThemeScope>? deserialized =
             JsonSerializer.Deserialize<ConcurrentDictionary<string, ThemeScope>> (serialized, SerializerContext.Options);
 
-        ShadowStyle initialShadowStyle = (ShadowStyle)(initial! ["Default"] ["Button.DefaultShadow"].PropertyValue!);
-        Assert.Equal (ShadowStyle.Opaque, initialShadowStyle);
+        ShadowStyles initialShadowStyle = (ShadowStyles)(initial! ["Default"] ["Button.DefaultShadow"].PropertyValue!);
+        Assert.Equal (ShadowStyles.Opaque, initialShadowStyle);
 
-        ShadowStyle deserializedShadowStyle = (ShadowStyle)(deserialized! ["Default"] ["Button.DefaultShadow"].PropertyValue!);
-        Assert.Equal (ShadowStyle.None, deserializedShadowStyle);
+        ShadowStyles deserializedShadowStyle = (ShadowStyles)(deserialized! ["Default"] ["Button.DefaultShadow"].PropertyValue!);
+        Assert.Equal (ShadowStyles.None, deserializedShadowStyle);
 
         initial ["Default"].UpdateFrom (deserialized ["Default"]);
-        initialShadowStyle = (ShadowStyle)(initial! ["Default"] ["Button.DefaultShadow"].PropertyValue!);
-        Assert.Equal (ShadowStyle.None, initialShadowStyle);
+        initialShadowStyle = (ShadowStyles)(initial! ["Default"] ["Button.DefaultShadow"].PropertyValue!);
+        Assert.Equal (ShadowStyles.None, initialShadowStyle);
 
-        Assert.Equal(ShadowStyle.Opaque, Button.DefaultShadow);
+        Assert.Equal(ShadowStyles.Opaque, Button.DefaultShadow);
         initial ["Default"].Apply ();
-        Assert.Equal (ShadowStyle.None, Button.DefaultShadow);
+        Assert.Equal (ShadowStyles.None, Button.DefaultShadow);
 
         Disable (true);
-        Assert.Equal (ShadowStyle.Opaque, Button.DefaultShadow);
+        Assert.Equal (ShadowStyles.Opaque, Button.DefaultShadow);
 
     }
 

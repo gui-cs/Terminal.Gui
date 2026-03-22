@@ -1,74 +1,7 @@
-﻿namespace UnitTests.ViewBaseTests;
+namespace UnitTests.ViewBaseTests;
 
 public class BorderTests (ITestOutputHelper output)
 {
-    [Fact]
-    [SetupFakeApplication]
-    public void Border_Is_Cleared_After_Margin_Thickness_Change ()
-    {
-        View view = new ()
-        {
-            App = ApplicationImpl.Instance,
-            Text = "View",
-            Width = 6,
-            Height = 3,
-            BorderStyle = LineStyle.Rounded
-        };
-
-        // Remove border bottom thickness
-        view.Border!.Thickness = new Thickness (1, 1, 1, 0);
-
-        // Add margin bottom thickness
-        view.Margin!.Thickness = new Thickness (0, 0, 0, 1);
-
-        Assert.Equal (6, view.Width);
-        Assert.Equal (3, view.Height);
-
-        view.Draw ();
-
-        DriverAssert.AssertDriverContentsWithFrameAre (@"
-╭────╮
-│View│
-",
-                                                       output);
-
-        // Add border bottom thickness
-        view.Border!.Thickness = new Thickness (1, 1, 1, 1);
-
-        // Remove margin bottom thickness
-        view.Margin!.Thickness = new Thickness (0, 0, 0, 0);
-
-        view.Draw ();
-
-        Assert.Equal (6, view.Width);
-        Assert.Equal (3, view.Height);
-
-        DriverAssert.AssertDriverContentsWithFrameAre (@"
-╭────╮
-│View│
-╰────╯
-",
-                                                       output);
-
-        // Remove border bottom thickness
-        view.Border!.Thickness = new Thickness (1, 1, 1, 0);
-
-        // Add margin bottom thickness
-        view.Margin!.Thickness = new Thickness (0, 0, 0, 1);
-
-        Assert.Equal (6, view.Width);
-        Assert.Equal (3, view.Height);
-
-        view.App.LayoutAndDraw (true);
-        view.Draw ();
-
-        DriverAssert.AssertDriverContentsWithFrameAre (@"
-╭────╮
-│View│
-",
-                                                       output);
-    }
-
     [Fact]
     [SetupFakeApplication]
     public void Border_Parent_HasFocus_Title_Uses_FocusAttribute ()
@@ -80,14 +13,14 @@ public class BorderTests (ITestOutputHelper output)
         var view = new View { Title = "A", Height = 2, Width = 5 };
         superView.Add (view);
 
-        view.Border!.Thickness = new Thickness (0, 1, 0, 0);
-        view.Border!.LineStyle = LineStyle.Single;
+        view.Border.Thickness = new Thickness (0, 1, 0, 0);
+        view.Border.LineStyle = LineStyle.Single;
 
         view.SetScheme (new Scheme { Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red) });
         Assert.NotEqual (view.GetScheme ().Normal.Foreground, view.GetScheme ().Focus.Foreground);
-        Assert.Equal (ColorName16.Red, view.Border!.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (ColorName16.Green, view.Border!.GetAttributeForRole (VisualRole.Focus).Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border!.GetAttributeForRole (VisualRole.Focus));
+        Assert.Equal (ColorName16.Red, view.Border.View!.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Green, view.Border.View!.GetAttributeForRole (VisualRole.Focus).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.View!.GetAttributeForRole (VisualRole.Focus));
 
         superView.BeginInit ();
         superView.EndInit ();
@@ -101,9 +34,9 @@ public class BorderTests (ITestOutputHelper output)
         view.SetFocus ();
         view.SetClipToScreen ();
         view.Draw ();
-        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border!.GetAttributeForRole (VisualRole.Focus));
-        Assert.Equal (view.GetScheme ().Focus.Foreground, view.Border!.GetAttributeForRole (VisualRole.Focus).Foreground);
-        Assert.Equal (view.GetScheme ().Normal.Foreground, view.Border!.GetAttributeForRole (VisualRole.Normal).Foreground);
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.View!.GetAttributeForRole (VisualRole.Focus));
+        Assert.Equal (view.GetScheme ().Focus.Foreground, view.Border.View!.GetAttributeForRole (VisualRole.Focus).Foreground);
+        Assert.Equal (view.GetScheme ().Normal.Foreground, view.Border.View!.GetAttributeForRole (VisualRole.Normal).Foreground);
         DriverAssert.AssertDriverAttributesAre ("00100", output, null, view.GetScheme ().Normal, view.GetAttributeForRole (VisualRole.Focus));
     }
 
@@ -112,14 +45,14 @@ public class BorderTests (ITestOutputHelper output)
     public void Border_Uses_Parent_Scheme ()
     {
         var view = new View { Driver = ApplicationImpl.Instance.Driver, Title = "A", Height = 2, Width = 5 };
-        view.Border!.Thickness = new Thickness (0, 1, 0, 0);
-        view.Border!.LineStyle = LineStyle.Single;
+        view.Border.Thickness = new Thickness (0, 1, 0, 0);
+        view.Border.LineStyle = LineStyle.Single;
 
         view.SetScheme (new Scheme { Normal = new Attribute (Color.Red, Color.Green), Focus = new Attribute (Color.Green, Color.Red) });
-        Assert.Equal (ColorName16.Red, view.Border!.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (ColorName16.Green, view.Border!.GetAttributeForRole (VisualRole.Focus).Foreground.GetClosestNamedColor16 ());
-        Assert.Equal (view.GetAttributeForRole (VisualRole.Normal), view.Border!.GetAttributeForRole (VisualRole.Normal));
-        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border!.GetAttributeForRole (VisualRole.Focus));
+        Assert.Equal (ColorName16.Red, view.Border.View!.GetAttributeForRole (VisualRole.Normal).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (ColorName16.Green, view.Border.View!.GetAttributeForRole (VisualRole.Focus).Foreground.GetClosestNamedColor16 ());
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Normal), view.Border.View!.GetAttributeForRole (VisualRole.Normal));
+        Assert.Equal (view.GetAttributeForRole (VisualRole.Focus), view.Border.View!.GetAttributeForRole (VisualRole.Focus));
 
         view.BeginInit ();
         view.EndInit ();
@@ -146,7 +79,7 @@ public class BorderTests (ITestOutputHelper output)
     public void Border_With_Title_Border_Double_Thickness_Top_Four_Size_Width (int width)
     {
         var win = new Window { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double };
-        win.Border!.Thickness = win.Border!.Thickness with { Top = 4 };
+        win.Border.Thickness = win.Border.Thickness with { Top = 4 };
 
         SessionToken rs = Application.Begin (win);
 
@@ -285,7 +218,7 @@ public class BorderTests (ITestOutputHelper output)
     public void Border_With_Title_Border_Double_Thickness_Top_Three_Size_Width (int width)
     {
         Window win = new () { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double };
-        win.Border!.Thickness = win.Border!.Thickness with { Top = 3 };
+        win.Border.Thickness = win.Border.Thickness with { Top = 3 };
 
         SessionToken rs = Application.Begin (win);
 
@@ -424,7 +357,7 @@ public class BorderTests (ITestOutputHelper output)
     public void Border_With_Title_Border_Double_Thickness_Top_Two_Size_Width (int width)
     {
         var win = new Window { Title = "1234", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Double };
-        win.Border!.Thickness = win.Border!.Thickness with { Top = 2 };
+        win.Border.Thickness = win.Border.Thickness with { Top = 2 };
 
         SessionToken rs = Application.Begin (win);
 
@@ -865,29 +798,20 @@ public class BorderTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void View_BorderStyle_Defaults ()
-    {
-        var view = new View ();
-        Assert.Equal (LineStyle.None, view.BorderStyle);
-        Assert.Equal (Thickness.Empty, view.Border!.Thickness);
-        view.Dispose ();
-    }
-
-    [Fact]
     public void View_SetBorderStyle ()
     {
         var view = new View ();
         view.BorderStyle = LineStyle.Single;
         Assert.Equal (LineStyle.Single, view.BorderStyle);
-        Assert.Equal (new Thickness (1), view.Border!.Thickness);
+        Assert.Equal (new Thickness (1), view.Border.Thickness);
 
         view.BorderStyle = LineStyle.Double;
         Assert.Equal (LineStyle.Double, view.BorderStyle);
-        Assert.Equal (new Thickness (1), view.Border!.Thickness);
+        Assert.Equal (new Thickness (1), view.Border.Thickness);
 
         view.BorderStyle = LineStyle.None;
         Assert.Equal (LineStyle.None, view.BorderStyle);
-        Assert.Equal (Thickness.Empty, view.Border!.Thickness);
+        Assert.Equal (Thickness.Empty, view.Border.Thickness);
         view.Dispose ();
     }
 

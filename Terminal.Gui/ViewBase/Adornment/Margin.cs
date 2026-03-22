@@ -1,441 +1,105 @@
 namespace Terminal.Gui.ViewBase;
 
-/// <summary>The Margin for a <see cref="View"/>. Accessed via <see cref="View.Margin"/></summary>
+/// <summary>
+///     The lightweight Margin settings for a <see cref="View"/>. Accessed via <see cref="View.Margin"/>.
+///     The underlying <see cref="MarginView"/> is created lazily when shadows, sub-views, or other
+///     View-level functionality is needed.
+/// </summary>
 /// <remarks>
 ///     <para>
-///         The Margin is transparent by default. This can be overriden by explicitly setting <see cref="Scheme"/>.
+///         The Margin is transparent by default. This can be overridden by setting a custom
+///         <see cref="Scheme"/> on the <see cref="AdornmentImpl.View"/> via <see cref="AdornmentImpl.GetOrCreateView"/>.
 ///     </para>
 ///     <para>
 ///         Margins are drawn after all other Views in the application View hierarchy are drawn.
 ///     </para>
 ///     <para>
-///         Margins have <see cref="ViewportSettingsFlags.TransparentMouse"/> enabled by default and are thus
+///         Margins have <see cref="ViewportSettingsFlags.Transparent"/> and
+///         <see cref="ViewportSettingsFlags.TransparentMouse"/> enabled by default and are thus
 ///         transparent to the mouse. This can be overridden by explicitly setting <see cref="ViewportSettingsFlags"/>.
 ///     </para>
-///     <para>See the <see cref="Adornment"/> class.</para>
 /// </remarks>
-public class Margin : Adornment
+public class Margin : AdornmentImpl
 {
-    private const int PRESS_MOVE_HORIZONTAL = 1;
-    private const int PRESS_MOVE_VERTICAL = 0;
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Margin"/> class with default settings. By default, Margins are
+    ///     transparent and transparent to mouse events (i.e., they don't block mouse events from reaching underlying views).
+    ///     This can be overridden by explicitly setting <see cref="ViewportSettingsFlags"/>.
+    /// </summary>
+    public Margin () => ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
 
     /// <inheritdoc/>
-    public Margin ()
-    { /* Do nothing; A parameter-less constructor is required to support all views unit tests. */
+    protected override AdornmentView CreateView ()
+    {
+        MarginView mv = new (this);
+
+        return mv;
     }
 
     /// <inheritdoc/>
-    public Margin (View parent) : base (parent)
+    public override Rectangle GetFrame () => Parent is { } ? Parent.Frame with { Location = Point.Empty } : Rectangle.Empty;
+
+    /// <inheritdoc/>
+    protected override void OnThicknessChanged ()
     {
-        SubViewLayout += Margin_LayoutStarted;
-        ThicknessChanged += OnThicknessChanged;
+        base.OnThicknessChanged ();
 
-        // Margin should not be focusable
-        CanFocus = false;
+        if (Thickness == Thickness.Empty)
+        { }
 
-        // Margins are transparent by default
-        ViewportSettings |= ViewportSettingsFlags.Transparent;
-
-        // Margins are transparent to mouse by default
-        ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
-    }
-
-    private void OnThicknessChanged (object? sender, EventArgs e)
-    {
-        if (_isThicknessChanging)
-        {
-            return;
-        }
-        _originalThickness = new Thickness (Thickness.Left, Thickness.Top, Thickness.Right, Thickness.Bottom);
-        SetShadow (ShadowStyle);
-    }
-
-    // When the Parent is drawn, we cache the clip region so we can draw the Shadows after all other Views
-    private Region? _cachedClip;
-
-    internal Region? GetCachedClip () => _cachedClip;
-
-    internal void ClearCachedClip () => _cachedClip = null;
-
-    internal void CacheClip ()
-    {
-        if (Thickness != Thickness.Empty && ShadowStyle != ShadowStyle.None)
-        {
-            // PERFORMANCE: How expensive are these clones?
-            _cachedClip = GetClip ()?.Clone ();
-        }
+        //GetOrCreateView ();
     }
 
     /// <summary>
-    ///     INTERNAL API - Draws the shadows for the specified views. This is called from
-    ///     <see cref="View.Draw(DrawContext)"/> on each
-    ///     iteration of the main loop after all Views have been drawn.
+    ///     Shadow effect. Setting to anything other than <see cref="ShadowStyles.None"/> forces a <see cref="MarginView"/>
+    ///     to be created so the shadow sub-views can be hosted.
     /// </summary>
-    /// <remarks>
-    ///     Margins with no <see cref="ShadowStyle"/> are drawn as-normal in <see cref="View.DrawAdornments"/>.
-    /// </remarks>
-    /// <param name="views"></param>
-    /// <returns>
-    ///     <see langword="true"/>
-    /// </returns>
-    internal static bool DrawShadows (IEnumerable<View> views)
+    public ShadowStyles? ShadowStyle
     {
-        Stack<View> stack = new (views);
-
-        while (stack.Count > 0)
+        get => field ?? Parent?.SuperView?.ShadowStyle ?? null;
+        set
         {
-            View view = stack.Pop ();
-
-            if (view.Margin is { } margin
-                && margin.Thickness != Thickness.Empty
-                && margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)
-                && margin.GetCachedClip () != null)
+            if (field == value)
             {
-                margin.SetNeedsDraw ();
-                Region? saved = view.GetClip ();
-                view.SetClip (margin.GetCachedClip ());
-                margin.Draw ();
-                view.SetClip (saved);
-                margin.ClearCachedClip ();
+                return;
+            }
+            field = value;
 
-                // Build CachedDrawnRegion for TransparentMouse hit-testing from visible SubViews
-                // (ShadowViews). Each visible SubView's viewport represents drawn shadow cells.
-                if (margin.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+            if (field is null)
+            {
+                // null means no shadow and no thickness
+                (View as MarginView)?.SetShadow (null);
+
+                return;
+            }
+
+            if (GetOrCreateView () is not MarginView marginView)
+            {
+                return;
+            }
+
+            switch (field)
+            {
+                case ShadowStyles.Opaque:
+                case ShadowStyles.Transparent when marginView.ShadowSize.Width == 0 || marginView.ShadowSize.Height == 0:
                 {
-                    Region marginDrawnRegion = new ();
-
-                    foreach (View subView in margin.InternalSubViews)
+                    if (marginView.ShadowSize.Width != 1)
                     {
-                        if (subView.Visible)
-                        {
-                            marginDrawnRegion.Union (subView.FrameToScreen ());
-                        }
+                        marginView.ShadowSize = marginView.ShadowSize with { Width = 1 };
                     }
 
-                    margin.CachedDrawnRegion = marginDrawnRegion.IsEmpty () ? null : marginDrawnRegion;
+                    if (marginView.ShadowSize.Height != 1)
+                    {
+                        marginView.ShadowSize = marginView.ShadowSize with { Height = 1 };
+                    }
+
+                    break;
                 }
             }
 
-            // Do not include Margin views of subviews; not supported
-            foreach (View subview in view.GetSubViews (includePadding: true, includeBorder: true).OrderBy (v => v.ShadowStyle != ShadowStyle.None).Reverse ())
-            {
-                stack.Push (subview);
-            }
-        }
-
-        return true;
-    }
-
-    /// <inheritdoc/>
-    public override void BeginInit ()
-    {
-        base.BeginInit ();
-
-        if (Parent is null)
-        {
-            return;
-        }
-
-        ShadowStyle = base.ShadowStyle;
-
-        Parent.MouseStateChanged += OnParentOnMouseStateChanged;
-    }
-
-    /// <inheritdoc/>
-    protected override bool OnClearingViewport ()
-    {
-        if (Thickness == Thickness.Empty)
-        {
-            return true;
-        }
-
-        Rectangle screen = ViewportToScreen (Viewport);
-
-        if (Diagnostics.HasFlag (ViewDiagnosticFlags.Thickness) || HasScheme)
-        {
-            // This just draws/clears the thickness, not the insides.
-            // TODO: This is a hack. See https://github.com/gui-cs/Terminal.Gui/issues/4016
-            //SetAttribute (GetAttributeForRole (VisualRole.Normal));
-            Thickness.Draw (Driver, screen, Diagnostics, ToString ());
-        }
-
-        if (ShadowStyle != ShadowStyle.None)
-        {
-            // Don't clear where the shadow goes
-        }
-
-        return true;
-    }
-
-    /// <inheritdoc/>
-    protected override bool OnDrawingText () => ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
-
-    #region Shadow
-
-    // private bool _pressed;
-    private ShadowView? _bottomShadow;
-    private ShadowView? _rightShadow;
-    private bool _isThicknessChanging;
-    private Thickness? _originalThickness;
-
-    /// <summary>
-    ///     Sets whether the Margin includes a shadow effect. The shadow is drawn on the right and bottom sides of the
-    ///     Margin.
-    /// </summary>
-    public ShadowStyle SetShadow (ShadowStyle style)
-    {
-        if (_rightShadow is { })
-        {
-            Remove (_rightShadow);
-            _rightShadow.Dispose ();
-            _rightShadow = null;
-        }
-
-        if (_bottomShadow is { })
-        {
-            Remove (_bottomShadow);
-            _bottomShadow.Dispose ();
-            _bottomShadow = null;
-        }
-
-        _originalThickness ??= Thickness;
-
-        if (ShadowStyle != ShadowStyle.None)
-        {
-            // Turn off shadow
-            _originalThickness = new Thickness (Thickness.Left,
-                                                Thickness.Top,
-                                                Math.Max (Thickness.Right - ShadowSize.Width, 0),
-                                                Math.Max (Thickness.Bottom - ShadowSize.Height, 0));
-        }
-
-        if (style != ShadowStyle.None)
-        {
-            // Turn on shadow
-            _isThicknessChanging = true;
-
-            Thickness = new Thickness (_originalThickness.Value.Left,
-                                       _originalThickness.Value.Top,
-                                       _originalThickness.Value.Right + ShadowSize.Width,
-                                       _originalThickness.Value.Bottom + ShadowSize.Height);
-            _isThicknessChanging = false;
-        }
-
-        if (style != ShadowStyle.None)
-        {
-            _rightShadow = new ShadowView
-            {
-                X = Pos.AnchorEnd (ShadowSize.Width),
-                Y = 0,
-                Width = ShadowSize.Width,
-                Height = Dim.Fill (),
-                ShadowStyle = style,
-                Orientation = Orientation.Vertical
-            };
-
-            _bottomShadow = new ShadowView
-            {
-                X = 0,
-                Y = Pos.AnchorEnd (ShadowSize.Height),
-                Width = Dim.Fill (),
-                Height = ShadowSize.Height,
-                ShadowStyle = style,
-                Orientation = Orientation.Horizontal
-            };
-            Add (_rightShadow, _bottomShadow);
-        }
-        else if (Thickness != _originalThickness)
-        {
-            _isThicknessChanging = true;
-
-            Thickness = new Thickness (_originalThickness.Value.Left,
-                                       _originalThickness.Value.Top,
-                                       _originalThickness.Value.Right,
-                                       _originalThickness.Value.Bottom);
-            _isThicknessChanging = false;
-        }
-
-        return style;
-    }
-
-    /// <inheritdoc/>
-    public override ShadowStyle ShadowStyle
-    {
-        get => base.ShadowStyle;
-        set
-        {
-            if (value == ShadowStyle.Opaque || (value == ShadowStyle.Transparent && (ShadowSize.Width == 0 || ShadowSize.Height == 0)))
-            {
-                if (ShadowSize.Width != 1)
-                {
-                    ShadowSize = ShadowSize with { Width = 1 };
-                }
-
-                if (ShadowSize.Height != 1)
-                {
-                    ShadowSize = ShadowSize with { Height = 1 };
-                }
-            }
-
-            base.ShadowStyle = SetShadow (value);
+            // Always call SetShadow to update thickness and shadow views
+            marginView.SetShadow (field);
         }
     }
 
-    /// <summary>
-    ///     Gets or sets the size of the shadow effect.
-    /// </summary>
-    public Size ShadowSize
-    {
-        get;
-        set
-        {
-            if (TryValidateShadowSize (field, value, out Size result))
-            {
-                field = value;
-                SetShadow (ShadowStyle);
-            }
-            else
-            {
-                field = result;
-            }
-        }
-    }
-
-    private bool TryValidateShadowSize (Size originalValue, in Size newValue, out Size result)
-    {
-        result = newValue;
-
-        var wasValid = true;
-
-        if (newValue.Width < 0)
-        {
-            result = ShadowStyle is ShadowStyle.Opaque or ShadowStyle.Transparent ? result with { Width = 1 } : originalValue;
-
-            wasValid = false;
-        }
-
-        if (newValue.Height < 0)
-        {
-            result = ShadowStyle is ShadowStyle.Opaque or ShadowStyle.Transparent ? result with { Height = 1 } : originalValue;
-
-            wasValid = false;
-        }
-
-        if (!wasValid)
-        {
-            return false;
-        }
-
-        var wasUpdated = false;
-
-        if ((ShadowStyle == ShadowStyle.Opaque && newValue.Width != 1) || (ShadowStyle == ShadowStyle.Transparent && newValue.Width < 1))
-        {
-            result = result with { Width = 1 };
-
-            wasUpdated = true;
-        }
-
-        if ((ShadowStyle == ShadowStyle.Opaque && newValue.Height != 1) || (ShadowStyle == ShadowStyle.Transparent && newValue.Height < 1))
-        {
-            result = result with { Height = 1 };
-
-            wasUpdated = true;
-        }
-
-        return !wasUpdated;
-    }
-
-    private void OnParentOnMouseStateChanged (object? sender, EventArgs<MouseState> args)
-    {
-        if (sender is not View parent || Thickness == Thickness.Empty || ShadowStyle == ShadowStyle.None)
-        {
-            return;
-        }
-
-        bool pressed = args.Value.HasFlag (MouseState.Pressed) && parent.MouseHighlightStates.HasFlag (MouseState.Pressed);
-        bool pressedOutside = args.Value.HasFlag (MouseState.PressedOutside) && parent.MouseHighlightStates.HasFlag (MouseState.PressedOutside);
-
-        if (pressedOutside)
-        {
-            pressed = false;
-        }
-
-        if (MouseState.HasFlag (MouseState.Pressed) && !pressed)
-        {
-            // If the view is pressed and the highlight is being removed, move the shadow back.
-            // Note, for visual effects reasons, we only move horizontally.
-            // TODO: Add a setting or flag that lets the view move vertically as well.
-            _isThicknessChanging = true;
-
-            Thickness = new Thickness (Thickness.Left - PRESS_MOVE_HORIZONTAL,
-                                       Thickness.Top - PRESS_MOVE_VERTICAL,
-                                       Thickness.Right + PRESS_MOVE_HORIZONTAL,
-                                       Thickness.Bottom + PRESS_MOVE_VERTICAL);
-            _isThicknessChanging = false;
-
-            _rightShadow?.Visible = true;
-
-            _bottomShadow?.Visible = true;
-
-            MouseState &= ~MouseState.Pressed;
-
-            return;
-        }
-
-        if (MouseState.HasFlag (MouseState.Pressed) || !pressed)
-        {
-            return;
-        }
-
-        // If the view is not pressed, and we want highlight move the shadow
-        // Note, for visual effects reasons, we only move horizontally.
-        // TODO: Add a setting or flag that lets the view move vertically as well.
-        _isThicknessChanging = true;
-
-        Thickness = new Thickness (Thickness.Left + PRESS_MOVE_HORIZONTAL,
-                                   Thickness.Top + PRESS_MOVE_VERTICAL,
-                                   Thickness.Right - PRESS_MOVE_HORIZONTAL,
-                                   Thickness.Bottom - PRESS_MOVE_VERTICAL);
-        _isThicknessChanging = false;
-
-        MouseState |= MouseState.Pressed;
-
-        _rightShadow?.Visible = false;
-
-        _bottomShadow?.Visible = false;
-    }
-
-    private void Margin_LayoutStarted (object? sender, LayoutEventArgs e)
-    {
-        // Adjust the shadow such that it is drawn aligned with the Border
-        if (_rightShadow is null || _bottomShadow is null)
-        {
-            return;
-        }
-
-        switch (ShadowStyle)
-        {
-            case ShadowStyle.Transparent:
-                // BUGBUG: This doesn't work right for all Border.Top sizes - Need an API on Border that gives top-right location of line corner.
-                _rightShadow.Y = Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).Y + 1 : 0;
-
-                break;
-
-            case ShadowStyle.Opaque:
-                // BUGBUG: This doesn't work right for all Border.Top sizes - Need an API on Border that gives top-right location of line corner.
-                _rightShadow.Y = Parent!.Border!.Thickness.Top > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).Y + 1 : 0;
-                _bottomShadow.X = Parent.Border!.Thickness.Left > 0 ? ScreenToViewport (Parent.Border!.GetBorderRectangle ().Location).X + 1 : 0;
-
-                break;
-
-            case ShadowStyle.None:
-            default:
-                _rightShadow.Y = 0;
-                _bottomShadow.X = 0;
-
-                break;
-        }
-    }
-
-    #endregion Shadow
 }

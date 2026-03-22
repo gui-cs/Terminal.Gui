@@ -2,6 +2,7 @@ using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using UnitTests.Parallelizable;
 using Terminal.Gui.Tracing;
+using UnitTests;
 
 namespace ViewsTests;
 
@@ -141,7 +142,8 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             (TrackingPopoverMenu popoverMenu, TrackingMenu menu, MenuItem _, OptionSelector<Schemes> _, CheckBox secondCheckBox) =
                 BuildOptionSelectorInPopoverMenuHierarchy ();
@@ -170,7 +172,8 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             (TrackingPopoverMenu popoverMenu, TrackingMenu menu, MenuItem _, OptionSelector<Schemes> _, CheckBox secondCheckBox) =
                 BuildOptionSelectorInPopoverMenuHierarchy ();
@@ -201,7 +204,8 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             (TrackingPopoverMenu popoverMenu, TrackingMenu menu, MenuItem _, OptionSelector<Schemes> _, CheckBox secondCheckBox) =
                 BuildOptionSelectorInPopoverMenuHierarchy ();
@@ -236,7 +240,8 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             (TrackingPopoverMenu popoverMenu, TrackingMenu _, MenuItem _, OptionSelector<Schemes> selector, CheckBox secondCheckBox) =
                 BuildOptionSelectorInPopoverMenuHierarchy ();
@@ -272,7 +277,8 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             (TrackingPopoverMenu popoverMenu, TrackingMenu menu, MenuItem _, OptionSelector<Schemes> _, CheckBox secondCheckBox) =
                 BuildOptionSelectorInPopoverMenuHierarchy ();
@@ -317,7 +323,8 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             // Arrange: PopoverMenu → Menu → MenuItem, with Target set to a host view
             View host = new () { Id = "host" };
@@ -364,7 +371,8 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(CheckBox CommandView)
             View host = new () { Id = "host", CommandsToBubbleUp = [Command.Activate] };
@@ -415,7 +423,8 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(OptionSelector CommandView → CheckBoxes)
             View host = new () { Id = "host" };
@@ -458,7 +467,8 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             // Arrange: SuperView → Host(Target) ← PopoverMenu → Menu → MenuItem
             View superView = new () { Id = "appWindow", CommandsToBubbleUp = [Command.Activate] };
@@ -492,7 +502,8 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using IDisposable verbose = TestLogging.Verbose (output);
 
-        Trace.EnabledCategories = TraceCategory.Command;
+        // Do not set this unless debugging. It is a static that is process wide.
+        //Trace.EnabledCategories = TraceCategory.Command;
 
         // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(CheckBox CommandView)
         View host = new () { Id = "host" };
@@ -558,7 +569,8 @@ public class PopoverMenuTests (ITestOutputHelper output)
     {
         using IDisposable verbose = TestLogging.Verbose (output);
 
-        Trace.EnabledCategories = TraceCategory.Command;
+        // Do not set this unless debugging. It is a static that is process wide.
+        //Trace.EnabledCategories = TraceCategory.Command;
 
         // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(CheckBox CommandView)
         View host = new () { Id = "host" };
@@ -618,7 +630,8 @@ public class PopoverMenuTests (ITestOutputHelper output)
         app.Init (DriverRegistry.Names.ANSI);
         IRunnable runnable = new Runnable ();
 
-        Trace.EnabledCategories = TraceCategory.Command;
+        // Do not set this unless debugging. It is a static that is process wide.
+        //Trace.EnabledCategories = TraceCategory.Command;
 
         // Arrange: Host ← Target ← PopoverMenu → Menu → MenuItem(CheckBox CommandView)
         View host = new () { Id = "host" };

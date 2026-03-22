@@ -85,7 +85,7 @@ public class RuneWidthGreaterThanOne : Scenario
                         {
                             if (_win is not null)
                             {
-                                _win.Padding!.Thickness = new (1);
+                                _win.Padding.Thickness = new (1);
                             }
                         }
                     },
@@ -96,7 +96,7 @@ public class RuneWidthGreaterThanOne : Scenario
                         {
                             if (_win is not null)
                             {
-                                _win.Padding!.Thickness = new (0);
+                                _win.Padding.Thickness = new (0);
                             }
                         }
                     }

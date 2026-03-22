@@ -5,8 +5,8 @@ namespace Terminal.Gui.ViewBase;
 /// <summary>
 ///     Defines the style of shadow to be drawn on the right and bottom sides of the <see cref="View"/>.
 /// </summary>
-[JsonConverter (typeof (JsonStringEnumConverter<ShadowStyle>))]
-public enum ShadowStyle
+[JsonConverter (typeof (JsonStringEnumConverter<ShadowStyles>))]
+public enum ShadowStyles
 {
     /// <summary>
     ///     No shadow.

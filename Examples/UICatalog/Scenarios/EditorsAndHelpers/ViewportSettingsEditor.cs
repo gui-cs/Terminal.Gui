@@ -22,7 +22,7 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         foreach (View subview in SubViews)
         {
-            subview.Enabled = ViewToEdit is { }; // and not Adornment;
+            subview.Enabled = ViewToEdit is { }; // and not AdornmentView;
         }
 
         if (ViewToEdit is null)
@@ -30,18 +30,7 @@ public sealed class ViewportSettingsEditor : EditorBase
             return;
         }
 
-        UpdatingLayoutSettings = true;
-
-        _viewportEditor?.Value = ViewToEdit?.Viewport;
-
-        if (ViewToEdit?.ContentSizeTracksViewport is false)
-        {
-            _contentSizeEditor?.Value = ViewToEdit?.GetContentSize ();
-        }
-        else
-        {
-            _contentSizeEditor?.Value = ViewToEdit?.Viewport.Size;
-        }
+        _viewportEditor?.Enabled = ViewToEdit is not AdornmentView;
 
         _cbAllowNegativeX?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeX) ? CheckState.Checked : CheckState.UnChecked;
 
@@ -77,9 +66,6 @@ public sealed class ViewportSettingsEditor : EditorBase
         _osHorizontalScrollBar?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar)
                                             ? ScrollBarVisibilityMode.Auto
                                             : ScrollBarVisibilityMode.None;
-
-        SetNeedsDraw ();
-        UpdatingLayoutSettings = false;
     }
 
     /// <inheritdoc/>
@@ -87,7 +73,7 @@ public sealed class ViewportSettingsEditor : EditorBase
     {
         base.OnUpdateLayoutSettings ();
 
-        //Enabled = ViewToEdit is not Adornment;
+        //Enabled = ViewToEdit is not AdornmentView;
 
         if (ViewToEdit is null)
         {
@@ -95,15 +81,7 @@ public sealed class ViewportSettingsEditor : EditorBase
         }
 
         _viewportEditor?.Value = ViewToEdit?.Viewport;
-
-        if (ViewToEdit?.ContentSizeTracksViewport is false)
-        {
-            _contentSizeEditor?.Value = ViewToEdit?.GetContentSize ();
-        }
-        else
-        {
-            _contentSizeEditor?.Value = ViewToEdit?.Viewport.Size;
-        }
+        _contentSizeEditor?.Value = ViewToEdit?.GetContentSize ();
     }
 
     private CheckBox? _cbAllowNegativeX;
@@ -135,17 +113,13 @@ public sealed class ViewportSettingsEditor : EditorBase
                 || vea.NewValue.Value.Height < 0
                 || vea.NewValue.Value.X < 0
                 || vea.NewValue.Value.Y < 0
-                )
+                || ViewToEdit is AdornmentView)
             {
                 vea.Handled = true;
 
                 return;
             }
 
-            if (UpdatingLayoutSettings)
-            {
-                return;
-            }
             ViewToEdit?.Viewport = vea.NewValue.Value;
         }
 
@@ -165,12 +139,7 @@ public sealed class ViewportSettingsEditor : EditorBase
                 return;
             }
 
-            if (UpdatingLayoutSettings)
-            {
-                return;
-            }
-
-            ViewToEdit?.SetContentSize (cea.NewValue!.Value);
+            ViewToEdit?.SetContentSize (cea.NewValue.Value);
         }
 
         _cbAllowNegativeX = new CheckBox { Y = Pos.Bottom (_contentSizeEditor), Title = "Allow X < 0", CanFocus = true };
@@ -370,7 +339,7 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         void VerticalScrollBarChanged (object? sender, EventArgs<ScrollBarVisibilityMode?> rea)
         {
-            if (ViewToEdit is null or Adornment)
+            if (ViewToEdit is null or AdornmentView)
             {
                 return;
             }
@@ -400,7 +369,7 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         void HorizontalScrollBarChanged (object? sender, EventArgs<ScrollBarVisibilityMode?> rea)
         {
-            if (ViewToEdit is null or Adornment)
+            if (ViewToEdit is null or AdornmentView)
             {
                 return;
             }

@@ -32,11 +32,7 @@ public partial class View
     /// </code>
     ///     </para>
     /// </remarks>
-    public Cursor Cursor
-    {
-        get => _cursor;
-        set => SetCursor (value);
-    }
+    public Cursor Cursor { get => _cursor; set => SetCursor (value); }
 
     /// <summary>
     ///     INTERNAL: Sets the cursor for this view.
@@ -59,5 +55,5 @@ public partial class View
     /// <summary>
     ///     Signals that the cursor position needs to be updated without requiring a full redraw.
     /// </summary>
-    public void SetCursorNeedsUpdate () { App?.Driver?.SetCursorNeedsUpdate (true); }
+    public void SetCursorNeedsUpdate () => App?.Driver?.SetCursorNeedsUpdate (true);
 }

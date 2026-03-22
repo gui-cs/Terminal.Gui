@@ -1,4 +1,5 @@
 
+#pragma warning disable CS8629 // Nullable value type may be null.
 namespace Terminal.Gui.Views;
 
 internal class TabRow : View
@@ -47,7 +48,7 @@ internal class TabRow : View
 
     protected override bool OnMouseEvent (Mouse me)
     {
-        View? parent = me.View is Adornment adornment ? adornment.Parent : me.View;
+        View? parent = me.View is AdornmentView adornment ? adornment.Adornment?.Parent : me.View;
         Tab? hit = parent as Tab;
 
         if (me.IsPressed)
@@ -170,7 +171,7 @@ internal class TabRow : View
                                     new Point (vts.X - 1, vts.Y - 1),
                                     -1,
                                     Orientation.Vertical,
-                                    tab.BorderStyle
+                                    tab.BorderStyle.Value
                                    );
                     }
                     else
@@ -180,7 +181,7 @@ internal class TabRow : View
                                     new Point (vts.X - 1, vts.Bottom - selectedOffset),
                                     -1,
                                     Orientation.Vertical,
-                                    tab.BorderStyle
+                                    tab.BorderStyle.Value
                                    );
                     }
                 }
@@ -193,14 +194,14 @@ internal class TabRow : View
                                     new Point (vts.X - 1, vts.Y - 1),
                                     1,
                                     Orientation.Vertical,
-                                    tab.BorderStyle
+                                    tab.BorderStyle.Value
                                    );
 
                         lc.AddLine (
                                     new Point (vts.X - 1, vts.Y - 1),
                                     -1,
                                     Orientation.Horizontal,
-                                    tab.BorderStyle
+                                    tab.BorderStyle.Value
                                    );
                     }
                     else
@@ -210,14 +211,14 @@ internal class TabRow : View
                                     new Point (vts.X - 1, vts.Bottom - selectedOffset),
                                     -1,
                                     Orientation.Vertical,
-                                    tab.BorderStyle
+                                    tab.BorderStyle.Value
                                    );
 
                         lc.AddLine (
                                     new Point (vts.X - 1, vts.Bottom - selectedOffset),
                                     -1,
                                     Orientation.Horizontal,
-                                    tab.BorderStyle
+                                    tab.BorderStyle.Value
                                    );
                     }
 
@@ -230,14 +231,14 @@ internal class TabRow : View
                                         new Point (vts.X - 1, vts.Bottom),
                                         -1,
                                         Orientation.Vertical,
-                                        tab.BorderStyle
+                                        tab.BorderStyle.Value
                                        );
 
                             lc.AddLine (
                                         new Point (vts.X - 1, vts.Bottom),
                                         0,
                                         Orientation.Horizontal,
-                                        tab.BorderStyle
+                                        tab.BorderStyle.Value
                                        );
                         }
                         else
@@ -247,14 +248,14 @@ internal class TabRow : View
                                         new Point (vts.X - 1, vts.Y - 1),
                                         1,
                                         Orientation.Vertical,
-                                        tab.BorderStyle
+                                        tab.BorderStyle.Value
                                        );
 
                             lc.AddLine (
                                         new Point (vts.X - 1, vts.Y - 1),
                                         0,
                                         Orientation.Horizontal,
-                                        tab.BorderStyle
+                                        tab.BorderStyle.Value
                                        );
                         }
                     }
@@ -271,14 +272,14 @@ internal class TabRow : View
                                         new Point (vts.Right, vts.Bottom),
                                         -1,
                                         Orientation.Vertical,
-                                        tab.BorderStyle
+                                        tab.BorderStyle.Value
                                        );
 
                             lc.AddLine (
                                         new Point (vts.Right, vts.Bottom),
                                         0,
                                         Orientation.Horizontal,
-                                        tab.BorderStyle
+                                        tab.BorderStyle.Value
                                        );
                         }
                         else
@@ -288,14 +289,14 @@ internal class TabRow : View
                                         new Point (vts.Right, vts.Y - 1),
                                         1,
                                         Orientation.Vertical,
-                                        tab.BorderStyle
+                                        tab.BorderStyle.Value
                                        );
 
                             lc.AddLine (
                                         new Point (vts.Right, vts.Y - 1),
                                         0,
                                         Orientation.Horizontal,
-                                        tab.BorderStyle
+                                        tab.BorderStyle.Value
                                        );
                         }
                     }
@@ -308,14 +309,14 @@ internal class TabRow : View
                                 new Point (vts.Right, vts.Y - 1),
                                 1,
                                 Orientation.Vertical,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
 
                     lc.AddLine (
                                 new Point (vts.Right, vts.Y - 1),
                                 1,
                                 Orientation.Horizontal,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
                 }
                 else
@@ -325,14 +326,14 @@ internal class TabRow : View
                                 new Point (vts.Right, vts.Bottom - selectedOffset),
                                 -1,
                                 Orientation.Vertical,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
 
                     lc.AddLine (
                                 new Point (vts.Right, vts.Bottom - selectedOffset),
                                 1,
                                 Orientation.Horizontal,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
                 }
             }
@@ -349,14 +350,14 @@ internal class TabRow : View
                                         new Point (vts.X - 1, vts.Bottom),
                                         -1,
                                         Orientation.Vertical,
-                                        tab.BorderStyle
+                                        tab.BorderStyle.Value
                                        );
 
                             lc.AddLine (
                                         new Point (vts.X - 1, vts.Bottom),
                                         1,
                                         Orientation.Horizontal,
-                                        tab.BorderStyle
+                                        tab.BorderStyle.Value
                                        );
                         }
 
@@ -365,14 +366,14 @@ internal class TabRow : View
                                     new Point (vts.X - 1, vts.Y - 1),
                                     1,
                                     Orientation.Vertical,
-                                    tab.BorderStyle
+                                    tab.BorderStyle.Value
                                    );
 
                         lc.AddLine (
                                     new Point (vts.X - 1, vts.Y - 1),
                                     1,
                                     Orientation.Horizontal,
-                                    tab.BorderStyle
+                                    tab.BorderStyle.Value
                                    );
                     }
                     else
@@ -384,14 +385,14 @@ internal class TabRow : View
                                         new Point (vts.X - 1, vts.Y - 1),
                                         1,
                                         Orientation.Vertical,
-                                        tab.BorderStyle
+                                        tab.BorderStyle.Value
                                        );
 
                             lc.AddLine (
                                         new Point (vts.X - 1, vts.Y - 1),
                                         1,
                                         Orientation.Horizontal,
-                                        tab.BorderStyle
+                                        tab.BorderStyle.Value
                                        );
                         }
 
@@ -400,14 +401,14 @@ internal class TabRow : View
                                     new Point (vts.X - 1, vts.Bottom),
                                     -1,
                                     Orientation.Vertical,
-                                    tab.BorderStyle
+                                    tab.BorderStyle.Value
                                    );
 
                         lc.AddLine (
                                     new Point (vts.X - 1, vts.Bottom),
                                     1,
                                     Orientation.Horizontal,
-                                    tab.BorderStyle
+                                    tab.BorderStyle.Value
                                    );
                     }
                 }
@@ -420,14 +421,14 @@ internal class TabRow : View
                                     new Point (vts.X - 1, vts.Y - 1),
                                     1,
                                     Orientation.Vertical,
-                                    tab.BorderStyle
+                                    tab.BorderStyle.Value
                                    );
 
                         lc.AddLine (
                                     new Point (vts.X - 1, vts.Y - 1),
                                     0,
                                     Orientation.Horizontal,
-                                    tab.BorderStyle
+                                    tab.BorderStyle.Value
                                    );
                     }
 
@@ -436,14 +437,14 @@ internal class TabRow : View
                                 new Point (vts.X - 1, vts.Bottom),
                                 -1,
                                 Orientation.Vertical,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
 
                     lc.AddLine (
                                 new Point (vts.X - 1, vts.Bottom),
                                 0,
                                 Orientation.Horizontal,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
                 }
             }
@@ -456,14 +457,14 @@ internal class TabRow : View
                                 new Point (vts.Right, vts.Y - 1),
                                 1,
                                 Orientation.Vertical,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
 
                     lc.AddLine (
                                 new Point (vts.Right, vts.Y - 1),
                                 0,
                                 Orientation.Horizontal,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
                 }
 
@@ -474,14 +475,14 @@ internal class TabRow : View
                                 new Point (vts.Right, vts.Bottom),
                                 -1,
                                 Orientation.Vertical,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
 
                     lc.AddLine (
                                 new Point (vts.Right, vts.Bottom),
                                 0,
                                 Orientation.Horizontal,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
                 }
                 else
@@ -491,14 +492,14 @@ internal class TabRow : View
                                 new Point (vts.Right, vts.Y - 1),
                                 1,
                                 Orientation.Vertical,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
 
                     lc.AddLine (
                                 new Point (vts.Right, vts.Y - 1),
                                 0,
                                 Orientation.Horizontal,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
                 }
             }
@@ -512,14 +513,14 @@ internal class TabRow : View
                                 new Point (vts.X - 1, vts.Y - 1),
                                 0,
                                 Orientation.Vertical,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
 
                     lc.AddLine (
                                 new Point (vts.X - 1, vts.Y - 1),
                                 1,
                                 Orientation.Horizontal,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
                 }
                 else
@@ -529,14 +530,14 @@ internal class TabRow : View
                                 new Point (vts.X - 1, vts.Bottom),
                                 0,
                                 Orientation.Vertical,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
 
                     lc.AddLine (
                                 new Point (vts.X - 1, vts.Bottom),
                                 1,
                                 Orientation.Horizontal,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
                 }
             }
@@ -550,14 +551,14 @@ internal class TabRow : View
                                 new Point (vts.Right, vts.Y - 1),
                                 1,
                                 Orientation.Vertical,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
 
                     lc.AddLine (
                                 new Point (vts.Right, vts.Y - 1),
                                 0,
                                 Orientation.Horizontal,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
                 }
                 else
@@ -567,14 +568,14 @@ internal class TabRow : View
                                 new Point (vts.Right, vts.Bottom),
                                 -1,
                                 Orientation.Vertical,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
 
                     lc.AddLine (
                                 new Point (vts.Right, vts.Bottom),
                                 0,
                                 Orientation.Horizontal,
-                                tab.BorderStyle
+                                tab.BorderStyle.Value
                                );
                 }
             }
@@ -599,7 +600,7 @@ internal class TabRow : View
                                         new Point (vts.Right, vts.Y - lastSelectedTab),
                                         lineLength - arrowOffset,
                                         Orientation.Horizontal,
-                                        tab.BorderStyle
+                                        tab.BorderStyle.Value
                                        );
                         }
                         else
@@ -611,7 +612,7 @@ internal class TabRow : View
                                                   ),
                                         lineLength - arrowOffset,
                                         Orientation.Horizontal,
-                                        tab.BorderStyle
+                                        tab.BorderStyle.Value
                                        );
                         }
                     }
@@ -625,7 +626,7 @@ internal class TabRow : View
                                     new Point (vts.Right, vts.Y - lastSelectedTab),
                                     lineLength,
                                     Orientation.Horizontal,
-                                    tab.BorderStyle
+                                    tab.BorderStyle.Value
                                    );
                     }
                     else
@@ -634,7 +635,7 @@ internal class TabRow : View
                                     new Point (vts.Right, vts.Bottom - lastSelectedTab),
                                     lineLength,
                                     Orientation.Horizontal,
-                                    tab.BorderStyle
+                                    tab.BorderStyle.Value
                                    );
                     }
 
@@ -650,7 +651,7 @@ internal class TabRow : View
                                                   ),
                                         -1,
                                         Orientation.Vertical,
-                                        tab.BorderStyle
+                                        tab.BorderStyle.Value
                                        );
                         }
                         else
@@ -663,7 +664,7 @@ internal class TabRow : View
                                                   ),
                                         1,
                                         Orientation.Vertical,
-                                        tab.BorderStyle
+                                        tab.BorderStyle.Value
                                        );
                         }
                     }
@@ -705,39 +706,39 @@ internal class TabRow : View
 
                 if (_host.Style.TabsOnBottom)
                 {
-                    tab.Border!.Thickness = new (1, 0, 1, topLine);
-                    tab.Margin!.Thickness = new (0, 1, 0, 0);
+                    tab.Border.Thickness = new (1, 0, 1, topLine);
+                    tab.Margin.Thickness = new (0, 1, 0, 0);
                 }
                 else
                 {
-                    tab.Border!.Thickness = new (1, topLine, 1, 0);
-                    tab.Margin!.Thickness = new (0, 0, 0, topLine);
+                    tab.Border.Thickness = new (1, topLine, 1, 0);
+                    tab.Margin.Thickness = new (0, 0, 0, topLine);
                 }
             }
             else if (selected is null)
             {
                 if (_host.Style.TabsOnBottom)
                 {
-                    tab.Border!.Thickness = new (1, 1, 1, topLine);
-                    tab.Margin!.Thickness = new (0, 0, 0, 0);
+                    tab.Border.Thickness = new (1, 1, 1, topLine);
+                    tab.Margin.Thickness = new (0, 0, 0, 0);
                 }
                 else
                 {
-                    tab.Border!.Thickness = new (1, topLine, 1, 1);
-                    tab.Margin!.Thickness = new (0, 0, 0, 0);
+                    tab.Border.Thickness = new (1, topLine, 1, 1);
+                    tab.Margin.Thickness = new (0, 0, 0, 0);
                 }
             }
             else
             {
                 if (_host.Style.TabsOnBottom)
                 {
-                    tab.Border!.Thickness = new (1, 1, 1, topLine);
-                    tab.Margin!.Thickness = new (0, 0, 0, 0);
+                    tab.Border.Thickness = new (1, 1, 1, topLine);
+                    tab.Margin.Thickness = new (0, 0, 0, 0);
                 }
                 else
                 {
-                    tab.Border!.Thickness = new (1, topLine, 1, 1);
-                    tab.Margin!.Thickness = new (0, 0, 0, 0);
+                    tab.Border.Thickness = new (1, topLine, 1, 1);
+                    tab.Margin.Thickness = new (0, 0, 0, 0);
                 }
             }
 

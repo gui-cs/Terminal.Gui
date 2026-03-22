@@ -17,7 +17,7 @@ public class DimAutoDemo : Scenario
         appWindow.Title = GetQuitKeyAndName ();
 
         // For diagnostics
-        appWindow.Padding!.Thickness = new (1);
+        appWindow.Padding.Thickness = new (1);
 
         FrameView dimAutoFrameView = CreateDimAutoContentFrameView (app);
 
@@ -39,7 +39,7 @@ public class DimAutoDemo : Scenario
             Height = Dim.Auto (DimAutoStyle.Content, 10),
             Arrangement = ViewArrangement.Resizable
         };
-        dimAutoFrameView.Margin!.Thickness = new Thickness (1);
+        dimAutoFrameView.Margin.Thickness = new Thickness (1);
         dimAutoFrameView.ValidatePosDim = true;
 
         TextView textEdit = new ()
