@@ -1,7 +1,7 @@
 // Tests that mutate Application.DefaultKeyBindings (static state).
 // These MUST NOT be in UnitTestsParallelizable.
 
-namespace UnitTests.ApplicationTests.Keyboard;
+namespace UnitTests.NonParallelizable.ApplicationTests.Keyboard;
 
 public class KeyboardSetterTests
 {

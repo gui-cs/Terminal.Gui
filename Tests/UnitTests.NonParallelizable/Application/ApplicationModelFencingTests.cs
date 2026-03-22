@@ -1,4 +1,4 @@
-namespace UnitTests.ApplicationTests;
+namespace UnitTests.NonParallelizable.ApplicationTests;
 
 /// <summary>
 ///     Tests to ensure that mixing legacy static Application and modern instance-based models
