@@ -290,7 +290,7 @@ Color color = Color.Yellow; // Was "Brown" in v1
 
 See the [Layout Deep Dive](layout.md) for complete details.
 
-v2 introduces a comprehensive [Adornment](~/api/Terminal.Gui.ViewBase.Adornment.yml) system:
+v2 introduces a comprehensive [Adornment](~/api/Terminal.Gui.ViewBase.IAdornment.yml) system with lightweight adornments that lazily create Views when needed:
 
 - **[Margin](~/api/Terminal.Gui.ViewBase.Margin.yml)** - Transparent spacing outside the border
 - **[Border](~/api/Terminal.Gui.ViewBase.Border.yml)** - Visual frame with title, multiple styles

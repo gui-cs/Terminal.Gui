@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace UnitTests;
 
@@ -12,8 +13,7 @@ public class TestsAllViews : TestDriverBase
     ///     Gets all view types.
     /// </summary>
     public static IEnumerable<object []> AllViewTypes =>
-        typeof (View).Assembly
-                     .GetTypes ()
+        typeof (View).Assembly.GetTypes ()
                      .Where (type => type is { IsClass: true, IsAbstract: false, IsPublic: true }
                                      && (type.IsSubclassOf (typeof (View)) || type == typeof (View)))
                      .Select (type => new object [] { type });
@@ -38,14 +38,10 @@ public class TestsAllViews : TestDriverBase
     ///     Gets a list of all view classes.
     /// </summary>
     /// <returns></returns>
-    public static List<Type> GetAllViewClasses ()
-    {
-        return typeof (View).Assembly.GetTypes ()
-                            .Where (myType => myType is { IsClass: true, IsAbstract: false, IsPublic: true }
-                                              && myType.IsSubclassOf (typeof (View))
-                                   )
-                            .ToList ();
-    }
+    public static List<Type> GetAllViewClasses () =>
+        typeof (View).Assembly.GetTypes ()
+                     .Where (myType => myType is { IsClass: true, IsAbstract: false, IsPublic: true } && myType.IsSubclassOf (typeof (View)))
+                     .ToList ();
 
     /// <summary>
     ///     Creates a view from a type.
@@ -97,6 +93,7 @@ public class TestsAllViews : TestDriverBase
             if (HasRequiredProperties (type))
             {
                 Logging.Warning ($"Cannot create an instance of {type} because it has required properties that must be set.");
+
                 return null;
             }
 
@@ -157,12 +154,10 @@ public class TestsAllViews : TestDriverBase
     /// <summary>
     ///     Checks if a type has required properties (C# 11 feature).
     /// </summary>
-    private static bool HasRequiredProperties (Type type)
-    {
+    private static bool HasRequiredProperties (Type type) =>
+
         // Check all public instance properties for the RequiredMemberAttribute
-        return type.GetProperties (BindingFlags.Public | BindingFlags.Instance)
-                   .Any (p => p.GetCustomAttributes (typeof (System.Runtime.CompilerServices.RequiredMemberAttribute), true).Any ());
-    }
+        type.GetProperties (BindingFlags.Public | BindingFlags.Instance).Any (p => p.GetCustomAttributes (typeof (RequiredMemberAttribute), true).Any ());
 
     private static void AddArguments (Type paramType, List<object> pTypes)
     {

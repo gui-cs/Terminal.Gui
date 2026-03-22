@@ -218,7 +218,7 @@ Terminal.Gui supports drawing lines and shapes using box-drawing glyphs. The <xr
 
 ## Thickness
 
-Describes the thickness of a frame around a rectangle. The thickness is specified for each side of the rectangle using a <xref:Terminal.Gui.Drawing.Thickness> object. The Thickness class contains properties for the left, top, right, and bottom thickness. The <xref:Terminal.Gui.ViewBase.Adornment> class uses <xref:Terminal.Gui.Drawing.Thickness> to support drawing the frame around a view. 
+Describes the thickness of a frame around a rectangle. The thickness is specified for each side of the rectangle using a <xref:Terminal.Gui.Drawing.Thickness> object. The Thickness class contains properties for the left, top, right, and bottom thickness. The <xref:Terminal.Gui.ViewBase.AdornmentImpl> class uses <xref:Terminal.Gui.Drawing.Thickness> to support drawing the frame around a view. 
 
 See [View Deep Dive](View.md) for details.
 

@@ -82,7 +82,7 @@ See the [Scrolling Deep Dive](scrolling.md) for complete details.
 
 ### Adornments
 
-[Adornments](~/api/Terminal.Gui.ViewBase.Adornment.yml) are special Views that surround the content:
+[Adornments](~/api/Terminal.Gui.ViewBase.IAdornment.yml) are lightweight objects that define the spacing around a View's content. When View-level features are needed (e.g., SubViews, shadows), a full [AdornmentView](~/api/Terminal.Gui.ViewBase.AdornmentView.yml) is lazily created via `GetOrCreateView()`:
 
 - **[Margin](~/api/Terminal.Gui.ViewBase.Margin.yml)** - Transparent spacing outside the Border
 - **[Border](~/api/Terminal.Gui.ViewBase.Border.yml)** - Visual frame with [LineStyle](~/api/Terminal.Gui.Drawing.LineStyle.yml), title, and arrangement UI
