@@ -15,12 +15,12 @@ public class BorderTransparentTests (ITestOutputHelper output)
 {
     /// <summary>
     ///     Verifies that a Border with Transparent set only draws border lines,
-    ///     allowing underlying content to show through the interior.
-    ///     Currently, fails because Border doesn't honor Transparent — the interior
-    ///     shows spaces instead of the underlying 'X' background.
+    ///     allowing underlying content to show through in the border gap cells.
+    ///     With Thickness(1), border lines fill the entire thickness so there are no gap cells.
+    ///     The View's content area is independently opaque (cleared to spaces).
     /// </summary>
-    [Fact (Skip = "Transparency not yet ported to new adornment architecture")]
-    public void Border_Transparent_Shows_Underlying_Content_In_Viewport ()
+    [Fact]
+    public void Border_Transparent_Thickness1_View_Opaque_Same_As_Opaque_Border ()
     {
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -50,9 +50,60 @@ public class BorderTransparentTests (ITestOutputHelper output)
         window.Add (borderedView);
         app.Begin (window);
 
-        // The interior (row 2, cols 2-4) should show 'X' from the underlying window,
-        // not spaces from the bordered view's cleared viewport.
-        // Border lines should still be drawn normally.
+        // With Thickness(1), border lines fill the entire thickness — no gap cells.
+        // The View's content area is opaque (View is not Transparent), so interior is spaces.
+        // Result is identical to an opaque border.
+        DriverAssert.AssertDriverContentsAre ("""
+
+                                              XXXXXXX
+                                              X┌───┐X
+                                              X│   │X
+                                              X└───┘X
+                                              XXXXXXX
+                                              """,
+                                              output,
+                                              app.Driver);
+    }
+
+    /// <summary>
+    ///     Verifies that when BOTH the Border AND the View are transparent (Thickness 1),
+    ///     the border lines are drawn but the View's content area shows through to
+    ///     the underlying window content.
+    /// </summary>
+    [Fact]
+    public void Border_Transparent_And_View_Transparent_Shows_Underlying_Content ()
+    {
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (7, 5);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        // Fill window background with 'X' to detect transparency
+        window.ClearingViewport += (_, args) =>
+                                   {
+                                       window.FillRect (args.NewViewport, new Rune ('X'));
+                                       args.Cancel = true;
+                                   };
+
+        View borderedView = new ()
+        {
+            X = 1,
+            Y = 1,
+            Width = 5,
+            Height = 3,
+            BorderStyle = LineStyle.Single,
+            ViewportSettings = ViewportSettingsFlags.Transparent
+        };
+        borderedView.Border!.ViewportSettings |= ViewportSettingsFlags.Transparent;
+
+        window.Add (borderedView);
+        app.Begin (window);
+
+        // Both View and Border are transparent.
+        // Border lines are drawn (opaque). Content area shows through (transparent).
         DriverAssert.AssertDriverContentsAre ("""
 
                                               XXXXXXX
@@ -65,7 +116,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
                                               app.Driver);
     }
 
-    [Fact (Skip = "Transparency not yet ported to new adornment architecture")]
+    [Fact]
     public void Border_Transparent_Shows_Underlying_Content_Where_Border_DrawContent_Are_Not ()
     {
         using IApplication app = Application.Create ();
@@ -98,15 +149,15 @@ public class BorderTransparentTests (ITestOutputHelper output)
         window.Add (borderedView);
         app.Begin (window);
 
-        // The interior (row 2, cols 2-4) should show 'X' from the underlying window,
-        // not spaces from the bordered view's cleared viewport.
-        // Border lines should still be drawn normally.
+        // Gap cells in the thick border show X's (border is transparent, gap cells not drawn).
+        // Content area (inside border lines) shows spaces (View is opaque, not transparent).
+        // Border lines and title are drawn normally.
         DriverAssert.AssertDriverContentsAre ("""
                                               XXXXXXXXXXX
                                               XXXXXXXXXXX
                                               XXXX┌─┐XXXX
                                               XXX┌┘B└┐XXX
-                                              XXX│XXX│XXX
+                                              XXX│   │XXX
                                               XXX└───┘XXX
                                               XXXXXXXXXXX
                                               XXXXXXXXXXX
@@ -116,7 +167,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
                                               app.Driver);
     }
 
-    [Fact (Skip = "Transparency not yet ported to new adornment architecture")]
+    [Fact]
     public void Border_Transparent_Shows_Underlying_SubViews_Where_Border_DrawContent_Are_Not ()
     {
         using IApplication app = Application.Create ();
@@ -159,15 +210,15 @@ public class BorderTransparentTests (ITestOutputHelper output)
         window.Add (borderedView);
         app.Begin (window);
 
-        // The interior (row 2, cols 2-4) should show 'X' from the underlying window,
-        // not spaces from the bordered view's cleared viewport.
-        // Border lines should still be drawn normally.
+        // The subview "sub" shows through the transparent gap cells (it was drawn by the window before the borderedView).
+        // The content area (inside border lines) shows spaces (View is opaque).
+        // Border lines and title are drawn normally.
         DriverAssert.AssertDriverContentsAre ("""
                                               XXXXXXXXXXX
                                               XXXXXXXXXXX
                                               Xsub┌─┐XXXX
                                               XXX┌┘B└┐XXX
-                                              XXX│XXX│XXX
+                                              XXX│   │XXX
                                               XXX└───┘XXX
                                               XXXXXXXXXXX
                                               XXXXXXXXXXX
@@ -177,7 +228,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
                                               app.Driver);
     }
 
-    [Fact (Skip = "Transparency not yet ported to new adornment architecture")]
+    [Fact]
     public void Border_Transparent_Occludes_Underlying_SubViews_Where_Border_DrawContent_Is ()
     {
         using IApplication app = Application.Create ();
@@ -236,7 +287,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     entirely from hit-testing. After per-cell TransparentMouse is implemented, this should
     ///     still pass because the interior cells were not drawn by the Border.
     /// </summary>
-    [Fact (Skip = "Transparency not yet ported to new adornment architecture")]
+    [Fact]
     public void Border_TransparentMouse_Interior_Clicks_Pass_Through ()
     {
         using IApplication app = Application.Create ();
@@ -267,7 +318,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
         List<View?> viewsUnderInterior = window.GetViewsUnderLocation (new Point (4, 2), ViewportSettingsFlags.TransparentMouse);
 
         // The bordered view's Border should NOT be in the hit list for interior points
-        bool borderInList = viewsUnderInterior.Any (v => v is Border);
+        bool borderInList = viewsUnderInterior.Any (v => v is BorderView);
 
         Assert.False (borderInList, "Border with TransparentMouse should not capture mouse events in its transparent interior");
     }
@@ -277,7 +328,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     are still captured by the Border (only the transparent interior passes through).
     ///     Requires Phase 2e (drawn-region-aware hit-testing).
     /// </summary>
-    [Fact (Skip = "Transparency not yet ported to new adornment architecture")]
+    [Fact (Skip = "Phase 2e — drawn-region-aware hit-testing not yet implemented")]
     public void Border_TransparentMouse_BorderLine_Clicks_Are_Captured ()
     {
         using IApplication app = Application.Create ();
@@ -306,7 +357,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
         // This IS on a border line, so it should be captured by the Border.
         List<View?> viewsOnBorderLine = window.GetViewsUnderLocation (new Point (2, 1), ViewportSettingsFlags.TransparentMouse);
 
-        bool borderInList = viewsOnBorderLine.Any (v => v is Border);
+        bool borderInList = viewsOnBorderLine.Any (v => v is BorderView);
 
         Assert.True (borderInList, "Border with TransparentMouse should still capture mouse events on its drawn border lines");
     }
@@ -316,7 +367,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     are captured by the Border. The title is drawn content and should receive clicks.
     ///     Requires Phase 2e.
     /// </summary>
-    [Fact (Skip = "Transparency not yet ported to new adornment architecture")]
+    [Fact (Skip = "Phase 2e — drawn-region-aware hit-testing not yet implemented")]
     public void Border_TransparentMouse_Title_Clicks_Are_Captured ()
     {
         using IApplication app = Application.Create ();
@@ -346,7 +397,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
         // Screen position: border starts at (1,1), title starts at col 3 (after "┌┤").
         List<View?> viewsOnTitle = window.GetViewsUnderLocation (new Point (3, 1), ViewportSettingsFlags.TransparentMouse);
 
-        bool borderInList = viewsOnTitle.Any (v => v is Border);
+        bool borderInList = viewsOnTitle.Any (v => v is BorderView);
 
         Assert.True (borderInList, "Border with TransparentMouse should capture mouse events on its title text");
     }
@@ -356,7 +407,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     empty margin cells but captures them on shadow cells.
     ///     Requires Phase 2d (ShadowView reports drawn region) and 2e (drawn-region-aware hit-testing).
     /// </summary>
-    [Fact (Skip = "Transparency not yet ported to new adornment architecture")]
+    [Fact (Skip = "Phase 2d/2e — ShadowView drawn region and hit-testing not yet implemented")]
     public void Margin_TransparentMouse_Shadow_Clicks_Are_Captured ()
     {
         using IApplication app = Application.Create ();
@@ -388,7 +439,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
         // - Horizontal: at the bottom edge of the Margin (y=3 in screen coords for view at y=1, h=3)
         // Click on the vertical shadow cell at screen position (5, 2) — should be captured.
         List<View?> viewsOnShadow = window.GetViewsUnderLocation (new Point (5, 2), ViewportSettingsFlags.TransparentMouse);
-        bool marginInList = viewsOnShadow.Any (v => v is Margin);
+        bool marginInList = viewsOnShadow.Any (v => v is MarginView);
 
         Assert.True (marginInList, "Margin with shadow should capture mouse events on shadow cells");
 
@@ -403,7 +454,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     but capture clicks on drawn cells.
     ///     Requires Phase 2a/2b/2e.
     /// </summary>
-    [Fact (Skip = "Transparency not yet ported to new adornment architecture")]
+    [Fact (Skip = "Phase 2a/2b/2e — drawn-region-aware hit-testing not yet implemented")]
     public void View_TransparentMouse_DrawnCells_Captured_UndrawnCells_PassThrough ()
     {
         using IApplication app = Application.Create ();
@@ -453,7 +504,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     falls back to blanket removal (no regression from current behavior).
     ///     Requires Phase 2e.
     /// </summary>
-    [Fact (Skip = "Transparency not yet ported to new adornment architecture")]
+    [Fact]
     public void View_TransparentMouse_NullCache_FallsBackToBlanketRemoval ()
     {
         using IApplication app = Application.Create ();
@@ -494,7 +545,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     between drawn border line cells and empty cells in the border thickness area.
     ///     Requires Phase 2a/2b/2e.
     /// </summary>
-    [Fact (Skip = "Transparency not yet ported to new adornment architecture")]
+    [Fact (Skip = "Phase 2a/2b/2e — drawn-region-aware hit-testing not yet implemented")]
     public void Border_TransparentMouse_ThickBorder_EmptyCells_PassThrough ()
     {
         using IApplication app = Application.Create ();
@@ -524,13 +575,13 @@ public class BorderTransparentTests (ITestOutputHelper output)
         // View at (1,1,9,7) → Border frame at (1,1,9,7) → border line rectangle at (2,2,7,5).
         // Click on the top-left corner of the border line (screen 2,2) — should be captured.
         List<View?> viewsOnBorderLine = window.GetViewsUnderLocation (new Point (2, 2), ViewportSettingsFlags.TransparentMouse);
-        bool borderCaptured = viewsOnBorderLine.Any (v => v is Border);
+        bool borderCaptured = viewsOnBorderLine.Any (v => v is BorderView);
         Assert.True (borderCaptured, "Click on border line should be captured");
 
         // Click on an empty cell in the outer thickness gap (screen 1,1) — inside the border frame
         // but NOT on a drawn line. This should pass through.
         List<View?> viewsOnGap = window.GetViewsUnderLocation (new Point (1, 1), ViewportSettingsFlags.TransparentMouse);
-        bool borderCapturedOnGap = viewsOnGap.Any (v => v is Border);
+        bool borderCapturedOnGap = viewsOnGap.Any (v => v is BorderView);
         Assert.False (borderCapturedOnGap, "Click on empty gap in border thickness should pass through");
     }
 
@@ -538,7 +589,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     Verifies that a Border SubView positioned with Pos.AnchorEnd renders at the bottom
     ///     of the border, and repositions correctly when the parent view is resized.
     /// </summary>
-    [Fact (Skip = "Transparency not yet ported to new adornment architecture")]
+    [Fact]
     public void Border_SubView_AnchorEnd_Renders_At_Bottom_Before_And_After_Resize ()
     {
         using IApplication app = Application.Create ();
@@ -567,7 +618,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
             Height = 1,
             Text = "ZZZ"
         };
-        borderedView.Border.View!.Add (borderSubView);
+        borderedView.Border.GetOrCreateView ().Add (borderSubView);
 
         window.Add (borderedView);
         app.Begin (window);

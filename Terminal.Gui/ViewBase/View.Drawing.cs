@@ -372,10 +372,6 @@ public partial class View // Drawing APIs
             return;
         }
 
-        if (ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
-        {
-            return;
-        }
         ClearViewport (context);
         OnClearedViewport ();
         ClearedViewport?.Invoke (this, new DrawEventArgs (Viewport, Viewport, null));
@@ -832,48 +828,66 @@ public partial class View // Drawing APIs
             return;
         }
 
-        if (ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
+        bool borderTransparent = Border.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
+        bool paddingTransparent = Padding.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
+        bool viewTransparent = ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
+
+        if (!borderTransparent && !paddingTransparent && !viewTransparent)
         {
-            // Transparent View Path:
-            // Only exclude the regions that were actually drawn, allowing views beneath
-            // to show through in areas where nothing was drawn.
-
-            // The context.DrawnRegion may include areas outside the Viewport (e.g., if content
-            // was drawn with ViewportSettingsFlags.AllowContentOutsideViewport). We need to clip
-            // it to the Viewport bounds to prevent excluding areas that aren't visible.
-            context!.ClipDrawnRegion (ViewportToScreen (Viewport));
-
-            // Exclude the actually-drawn region from Driver.Clip
-            ExcludeFromClip (context.GetDrawnRegion ());
-
-            // Border and Padding are always opaque (they draw lines/fills), so exclude them too
-            ExcludeFromClip (Border.Thickness.AsRegion (Border.FrameToScreen ()));
-            ExcludeFromClip (Padding.Thickness.AsRegion (Padding.FrameToScreen ()));
-        }
-        else
-        {
-            // Opaque View Path (default):
-            // Exclude the entire view area from Driver.Clip. This is the typical case where
-            // the view is considered fully opaque.
-
-            // Start with the Frame in screen coordinates
-
-            // If there's a Border, use its frame instead (includes the border thickness)
+            // Fast path: All layers opaque — exclude the entire view area as one rectangle.
             Rectangle borderFrame = Border.FrameToScreen ();
-
-            // Exclude this view's entire area (Border inward, but not Margin) from the clip.
-            // This prevents any view drawn after this one from drawing in this area.
             ExcludeFromClip (borderFrame);
-
-            // Update the DrawContext to track that we drew this entire rectangle.
-            // This allows our SuperView (if any) to know what area we occupied,
-            // which is important for transparency calculations at higher levels.
             context?.AddDrawnRectangle (borderFrame);
+
+            return;
         }
 
-        // When this method returns, Driver.Clip has been updated to exclude this view's area.
-        // The next view drawn (earlier in Z-order, typically a peer view or the SuperView) will see
-        // a clip with "holes" where this view (and any SubViews drawn before it) are located.
+        // Per-layer clip exclusion: Each layer (Border, Padding, View content) is independently
+        // transparent. Opaque layers exclude their full area. Transparent layers exclude only
+        // the cells that were actually drawn (tracked via DrawContext).
+        Region exclusion = new ();
+
+        // For each OPAQUE layer, add its full area to the exclusion.
+        if (!borderTransparent)
+        {
+            exclusion.Combine (Border.Thickness.AsRegion (Border.FrameToScreen ()), RegionOp.Union);
+        }
+
+        if (!paddingTransparent)
+        {
+            exclusion.Combine (Padding.Thickness.AsRegion (Padding.FrameToScreen ()), RegionOp.Union);
+        }
+
+        if (!viewTransparent)
+        {
+            exclusion.Combine (ViewportToScreen (Viewport), RegionOp.Union);
+        }
+
+        // For TRANSPARENT layers, only their drawn cells should be excluded.
+        // The DrawContext accumulates all drawn regions: border lines (from LineCanvas),
+        // title text (from LastTitleRect), view text, and content.
+        // Add the title rect (drawn before this context existed) so it participates.
+        if (Border.View is BorderView borderView && borderView.LastTitleRect is { } titleRect)
+        {
+            context?.AddDrawnRectangle (titleRect);
+        }
+
+        // Clamp drawn regions to the border frame (prevents excluding outside our bounds).
+        context?.ClipDrawnRegion (Border.FrameToScreen ());
+
+        // Union drawn regions into the exclusion. For opaque layers this overlaps harmlessly.
+        // For transparent layers this adds exactly the drawn cells.
+        Region? drawnRegion = context?.GetDrawnRegion ();
+
+        if (drawnRegion is { })
+        {
+            exclusion.Combine (drawnRegion, RegionOp.Union);
+        }
+
+        ExcludeFromClip (exclusion);
+
+        // Report the exclusion to the parent's DrawContext so SuperViews can track what we covered.
+        context?.AddDrawnRegion (exclusion);
     }
 
     /// <summary>
