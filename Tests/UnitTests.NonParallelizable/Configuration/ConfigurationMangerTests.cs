@@ -684,7 +684,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
       }
     }
   ]
-}					
+}
 			";
 
             // ResetToCurrentValues ();
@@ -1073,7 +1073,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         // "brown" is not a color
         var json = @"
 			{
-				""Themes"" : [ 
+				""Themes"" : [
                                         {
 						""Default"" : {
 							""Schemes"": [
@@ -1096,7 +1096,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         // AbNormal is not a Scheme attribute
         json = @"
 			{
-				""Themes"" : [ 
+				""Themes"" : [
                                         {
 						""Default"" : {
 							""Schemes"": [
@@ -1119,7 +1119,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         // Modify hotNormal background only
         json = @"
 			{
-				""Themes"" :  [ 
+				""Themes"" :  [
                                         {
 						""Default"" : {
 							""Schemes"": [
@@ -1182,7 +1182,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         // AbNormal is not a Scheme attribute
         json = @"
 			{
-				""Themes"" : [ 
+				""Themes"" : [
                                         {
 						""Default"" : {
 							""Schemes"": [
@@ -1206,7 +1206,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
         // Modify hotNormal background only
         json = @"
 			{
-				""Themes"" : [ 
+				""Themes"" : [
                                         {
 						""Default"" : {
 							""Schemes"": [
@@ -1386,7 +1386,7 @@ public class ConfigurationManagerTests (ITestOutputHelper output)
       }
     }
   ]
-}					
+}
 			";
 
             //ResetToCurrentValues ();
