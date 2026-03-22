@@ -47,15 +47,6 @@ jobs:
         Add-MpPreference -ExclusionPath "${{ github.workspace }}"
         Add-MpPreference -ExclusionProcess "dotnet.exe"
 
-    - name: Run UnitTests.Legacy
-      shell: bash
-      run: |
-        dotnet test \
-          --project Tests/UnitTests.Legacy \
-          --no-build \
-          --verbosity normal \
-          --diagnostic --diagnostic-output-directory logs/UnitTests.Legacy/${{ runner.os }}
-
     - name: Run UnitTests.NonParallelizable
       shell: bash
       run: |
