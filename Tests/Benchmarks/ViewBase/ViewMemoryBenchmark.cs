@@ -80,7 +80,7 @@ public static class ViewMemoryBenchmark
         List<Type> types = [];
 
         foreach (Type type in typeof (View).Assembly.GetTypes ()
-                                           .Where (t => t is { IsClass: true, IsAbstract: false, IsPublic: true }
+                                           .Where (t => t is { IsClass: true, IsAbstract: false }
                                                         && (t == typeof (View) || t.IsSubclassOf (typeof (View))))
                                            .OrderBy (t => t.Name))
         {
