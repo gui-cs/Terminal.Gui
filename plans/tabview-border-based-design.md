@@ -1,4 +1,4 @@
-# TabView via Border Tab Style — Design Plan
+# TabView via Border Tab Style Borders (Built into View) — Design Plan
 
 ## Concept
 
@@ -169,7 +169,7 @@ Combined on shared LineCanvas:
 
 The `╰` where T2's bottom-left meets the content line is an auto-join. The `┴` where T2's bottom-right meets both T2's right and the content line is an auto-join. The left side of T1 continues straight down from the header into the content border — it's one continuous vertical line on the LineCanvas.
 
-## New Design
+## New Design Plan
 
 ### Design Philosophy
 
@@ -184,7 +184,7 @@ Amazon Principal Engineer tenets applied:
 - **Have Resounding Impact**: Proves out Command propagation, content scrolling, KeyBindings, MouseBindings, Adornments, and LineCanvas auto-joins working together in a real compound view.
 - **Breaking changes to the API are ok**: This is a major new feature that requires API additions and some changes to existing Border behavior when `Tab` is enabled.
 
-### New `BorderSettings` flags
+### Phase 1: Extend Border with Tab Support
 
 ```csharp
 [Flags]
@@ -198,14 +198,14 @@ public enum BorderSettings
 ```
 
 When `Tab` is set:
-- Border renders a **tab header** at `TabOffset` columns from the left, using the existing `Thickness.Top == 3` rendering path
+- BorderView renders a **tab header** at `TabOffset` columns from the left, using the existing `Thickness.Top == 3` rendering path
 - The header contains the View's `Title` with top line, vertical connectors, and title text
 - `Title` flag behavior is implied
 - `Thickness.Top` must be 3 (3 rows: header top, title+connectors, content top / header bottom)
 - The bottom line of the title rectangle (Border.cs lines 382-386) is suppressed for the selected tab
 - The Border area outside the header rectangle is transparent (mouse + visual)
 
-### New `Border.TabOffset` 
+### New `BorderView.TabOffset` 
 
 ```csharp
 /// <summary>
@@ -216,7 +216,7 @@ When `Tab` is set:
 public int TabOffset { get; set; }
 ```
 
-### New `Border.TabWidth`
+### New `BorderView.TabWidth`
 
 ```csharp
 /// <summary>
@@ -226,14 +226,27 @@ public int TabOffset { get; set; }
 public int TabWidth => (Parent?.TitleTextFormatter.FormatAndGetSize ().Width (or Height) ?? 0) + 2;
 ```
 
-When `BorderSettings.Tab` is set on View:
+### New `BorderView.TabSide`
 
-- BorderStyle defaults to `Rounded`
+```csharp
+/// <summary>
+///     Gets or sets which side of the View, the Tab-syled Title will be placed. Only meaningful when <see cref="Settings"/>
+///     includes <see cref="BorderSettings.Tab"/>.
+/// </summary>
+public Side TabSide {get;set}
+```
+
+When `BorderSettings.Tab` is set on `View.Border.BorderSettings`:
+
+- The `Border` View is created via `GetOrCreateView`
+- `Border.BorderStyle` defaults to `Rounded`
 - Suppress the bottom line at `topTitleLineY + 2` (Border.cs lines 382-386). The title rectangle becomes open-bottomed, flowing into the content area. Draw the content border's top line in segments around the header gap instead.
 - Make the `Border.ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse` - assuming there are no bugs, this will make it so clicking outside of the "tab" will pass through.
 - Focus is indicated by the presence of the header bottom line. The selected tab has its header bottom line suppressed, creating an open gap that visually connects the header to the content area. Unselected tabs draw the full header rectangle, including the bottom line, creating a closed header. The `Title` text is always drawn using the `Normal`/`HotNormal` attributes, regardless of focus.
 
 Depending on the `Thickness.Top` value, the header rectangle will be taller or shorter. The examples below show the visual difference as you increase `Thickness.Top` from 1 to 4. The "tab" concept starts to emerge at `Thickness.Top = 3` when the bottom line appears, but the exact visuals depend on the LineCanvas auto-join behavior.
+
+These examples show `Side.Top`. All four sides are possible and follow the same pattern. Visual examples are provided in the descripiton of Phase 2 below and not duplicated here.
 
 ### `Border.Thickness.Top = 1`
 
@@ -281,15 +294,15 @@ Depending on the `Thickness.Top` value, the header rectangle will be taller or s
 ╰───────╯
 ```
 
-The Tab style works on all four sides. `Border` will gain a new property (`TabSide`?) of type `Side` which dictates which side the tabs are rendered on. There are renderings below that show the visuals per-side.
+The Tab style works on all four sides. `BorderView` will gain a new property (`TabSide`?) of type `Side` which dictates which side the tabs are rendered on. There are renderings below that show the visuals per-side.
 
-Another new property `TabOffset` (int) specifies how many columns/rows from the left/top edge the tab header starts.
+Another new property `BorderView.TabOffset` (int) specifies how many columns/rows from the left/top edge the tab header starts.
 
 The `TabOffset` property is always along the axis of the tab strip:
 - **Top/Bottom**: `TabOffset` is horizontal (columns from left edge)
 - **Left/Right**: `TabOffset` is vertical (rows from top edge)
 
-For `Border.BorderStyle == BorderStyle.Tab`, `Border.TabSide = Side.Top`, `Border.Thickness.Top = 3` and `Border.TabOffset = 2`, the rendering would look like this:
+For `Border.BorderStyle == BorderStyle.Tab`, `BorderView.TabSide = Side.Top`, `Border.Thickness.Top = 3` and `BorderView.TabOffset = 2`, the rendering would look like this:
 ```
   ╭───╮
   │Tab│
@@ -320,11 +333,56 @@ For completeness if `TabOffset = 5`, causing the right side of the tab to extend
 ```
 
 
+For completeness if `TabOffset = -1`, causing the left side of the tab to extend beyond the right-side's border line:
+```
+───╮
+Tab│
+╭──┴────╮
+│content│
+│       │
+╰───────╯
+```
+
 IOW, it gets clipped by the view's right border, but the header is still visible and functional. The content top line auto-joins with the tab header's right connector at the intersection point, producing a flowing style.
 
 **Important** the renderings above are what happens when the View *does not have focus* (`HasFocus == false`). When a View is using `BorderSettings.Tab`, focus is indicated not by the `Title` being rendered using the focus attribute, but by the presence of the header bottom line. The selected tab has its header bottom line suppressed, creating an open gap that visually connects the header to the content area. Unselected tabs draw the full header rectangle, including the bottom line, creating a closed header.
 
-## "TabView" Style - Enables a replacement for the old TabView
+### Steps
+
+#### 1. Get `Side.Top` working and tested
+
+**Files:** `BorderSettings.cs`, `Border.cs`, `BorderView.cs`
+
+1. Add `BorderSettings.Tab = 4`
+2. Add `BorderView.TabSide` (Side), default `Side.Top`
+3. Add `BorderView.TabOffset` (int), `Border.TabWidth` (computed)
+4. In `OnDrawingContent`, when `Tab` is set:
+   - Draw header rectangle at `TabOffset` (top, left, right, and conditionally bottom)
+   - Draw title text inside header
+   - If `Parent.HasFocus == true`: draw content top line in segments around the header, plus left/right/bottom normally
+   - If `Parent.HasFocus == false`: draw content top line across bottom of header, plus left/right/bottom normally
+   - Handle transparency for the header area
+5. New Unit tests for Border tab rendering in isolation (in `UnitTestsParallelizable`)
+6. Enhance `BorderEditor` to support editing `Tab` settings.
+7. Enhanced `Adornments` Scenario (should not require any work if `BorderEditor` is updated correctly) to include a `Border` with `Tab` settings, allowing visual testing of the tab rendering in the Adornments scenario.
+
+#### 2. Get `Side.Bottom` working and tested
+
+Should be fairly mechanical given Top.
+
+#### 3. Get `Side.Left` and `Side.Right` working and tested 
+
+Should be fairly mechanical given the above.
+
+### Exit Critera
+
+- Robust new tests that both logically and visually prove the `BorderSettings.Tab` and related functionality work
+- All four `Side`s supported
+- `BorderEditor` supports changing `BorderSettings`, `BorderSides`, `TabOffset` (numericupdown), and `TabWidth` (numericupdown) implemented.
+
+## Phase 2 - "TabView" Style - Enables a replacement for the old TabView
+
+Uses the capabilty built in Phase 1 to build a new TabView View-subclass, related helper Views, TabView Example Scenario, and to re-enable the example Scenarios that used the old TabView that were previously commented out/disabled in this PR.
 
 ### `Tab`
 
@@ -336,7 +394,7 @@ public class Tab : View
         Canfocus = true;
         SuperViewRendersLineCanvas = true;
         BorderStyle = LineStyle.Rounded;
-        Border!.Settings = BorderSettings.Tab | BorderSettings.Title;
+        Border.Settings = BorderSettings.Tab | BorderSettings.Title;
 
         // here for example only; in reality thisd would get set based on the TabView's TabSide
         Border.Thickness = new Thickness (1, 3, 1, 1);
@@ -376,14 +434,6 @@ public class Tabs : View, IValue<Tab?>
     // other properties and methods compute TabOffsets, prevent key events from reaching unfocused tabs, etc.
 }
 ```
-
-The existing `Border` code path for `Thickness.Top == 3` does 90% of the work. For `Side.Top`, the changes are surgical:
-1. Offset all title/line positions by `TabOffset`
-2. Conditionally skip the bottom line (lines 382-386) when `Parent.HasFocus == true`
-3. Draw content top as two segments when `Parent.HasFocus == true`
-4. Skip content borders (left/right/bottom) when `Parent.HasFocus == false`
-
-For other sides, the logic is similar but with the appropriate axis changes (horizontal ↔ vertical) and line positions.
 
 ## Tab Style Renderings by Side
 
@@ -606,23 +656,6 @@ Fucking magic.
 - Once #4834 is merged, verify:
   - A `Border` with `ViewportSettingsFlags.Transparent` renders only border lines/title; empty areas are transparent and underlying views show through.
   - A `Border` with `ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse` passes mouse events through transparent areas while still capturing clicks on border lines/title text.
-
-### Phase 1: Extend Border with Tab Support - Side.Top only
-
-**Files:** `BorderSettings.cs`, `Border.cs`
-
-1. Add `BorderSettings.Tab = 4`
-2. Add `Border.TabSide` (Side), default `Side.Top`
-3. Add `Border.TabOffset` (int), `Border.TabWidth` (computed)
-4. In `OnDrawingContent`, when `Tab` is set:
-   - Draw header rectangle at `TabOffset` (top, left, right, and conditionally bottom)
-   - Draw title text inside header
-   - If `Parent.HasFocus == true`: draw content top line in segments around the header, plus left/right/bottom normally
-   - If `Parent.HasFocus == false`: draw content top line across bottom of header, plus left/right/bottom normally
-   - Handle transparency for the header area
-5. New Unit tests for Border tab rendering in isolation (in `UnitTestsParallelizable`)
-6. Enhance `BorderEditor` to support editing `Tab` settings and visualize the tab header in the editor.
-7. Enhanced `Adornments` Scenario (should not require any work if `BorderEditor` is updated correctly) to include a `Border` with `Tab` settings, allowing visual testing of the tab rendering in the Adornments scenario.
 
 ### Phase 2: Add `Tab` and `Tabs` Views, implement "TabView" style
 
