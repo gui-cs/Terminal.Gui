@@ -293,7 +293,7 @@ public class ApplicationImplTests
 
                                                    if (app.TopRunnableView != null)
                                                    {
-                                                       app.Keyboard.RaiseKeyDownEvent (app.Keyboard.QuitKey);
+                                                       app.Keyboard.RaiseKeyDownEvent (Application.GetDefaultKey (Command.Quit));
                                                    }
 
                                                    return false;

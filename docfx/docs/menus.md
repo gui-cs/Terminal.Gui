@@ -181,7 +181,7 @@ MenuBarItem fileMenuBarItem = new ("_File", [
     new MenuItem ("_New", Key.N.WithCtrl, () => NewFile ()),
     new MenuItem ("_Open...", Key.O.WithCtrl, () => OpenFile ()),
     new Line (),
-    new MenuItem ("_Quit", Application.QuitKey, () => Application.RequestStop ())
+    new MenuItem ("_Quit", Application.GetDefaultKey (Command.Quit), () => Application.RequestStop ())
 ]);
 ```
 
@@ -204,7 +204,7 @@ MenuBar menuBar = new ([
         new MenuItem ("_New", Key.N.WithCtrl, () => NewFile ()),
         new MenuItem ("_Open...", Key.O.WithCtrl, () => OpenFile ()),
         new Line (),
-        new MenuItem ("E_xit", Application.QuitKey, () => Application.RequestStop ())
+        new MenuItem ("E_xit", Application.GetDefaultKey (Command.Quit), () => Application.RequestStop ())
     ]),
     new MenuBarItem ("_Edit", [
         new MenuItem ("_Cut", Key.X.WithCtrl, () => Cut ()),
@@ -221,7 +221,7 @@ window.Add (menuBar);
 ```
 
 Key features:
-- `Key` property defines the activation key (default: `F9`)
+- `Key` property defines the activation key (default: `F10`)
 - `Active` property controls whether the MenuBar is active — when `Active` changes, it drives <xref:Terminal.Gui.ViewBase.View.CanFocus> and hides any open PopoverMenus on deactivation
 - `IsOpen()` returns whether any popover menu is visible
 - `DefaultBorderStyle` configurable via themes
@@ -358,7 +358,7 @@ The menu system has two non-containment boundaries that require `CommandBridge`:
 
 | Mode | When It Occurs | Effect |
 |------|---------------|--------|
-| **Direct** | User presses `F9`, or programmatic `InvokeCommand` | MenuBar toggles `Active` on/off |
+| **Direct** | User presses `F10`, or programmatic `InvokeCommand` | MenuBar toggles `Active` on/off |
 | **BubblingUp** | MenuBarItem activation bubbles to MenuBar | MenuBar identifies the source MenuBarItem and shows/hides its PopoverMenu |
 | **Bridged** | MenuItem activation inside PopoverMenu bridges to MenuBarItem | MenuBarItem ignores the command (notification only — no PopoverMenu toggle) |
 
@@ -377,7 +377,7 @@ The menu system has two non-containment boundaries that require `CommandBridge`:
 
 ### MenuBar Activation Flow
 
-1. User presses `F9` (default) or clicks on <xref:Terminal.Gui.Views.MenuBar>
+1. User presses `F10` (default) or clicks on <xref:Terminal.Gui.Views.MenuBar>
 2. MenuBar's HotKey handler fires — for direct activation, this calls [InvokeCommand()](xref:Terminal.Gui.ViewBase.View.InvokeCommand*) (<xref:Terminal.Gui.Input.Command.Activate>)
 3. `MenuBar.OnActivating` runs:
    - If `!Visible || !Enabled`: activation is blocked
@@ -448,13 +448,13 @@ When a user presses Enter or clicks a <xref:Terminal.Gui.Views.MenuItem>:
 
 | Key | Action |
 |-----|--------|
-| `F9` | Toggle MenuBar activation |
+| `F10` | Toggle MenuBar activation |
 | `Shift+F10` | Show context PopoverMenu |
 | `↑` / `↓` | Navigate within Menu |
 | `←` / `→` | Navigate MenuBar items / Expand-collapse submenus |
 | `Enter` | Accept selected MenuItem |
 | `Space` | Activate selected MenuItem (e.g., toggle a CheckBox CommandView) |
-| `Escape` / `QuitKey` | Close menu / Deactivate MenuBar |
+| `Escape` / `Application.GetDefaultKey (Command.Quit)` | Close menu / Deactivate MenuBar |
 | Hotkey (e.g., `Alt+F`) | Activate/toggle specific MenuBarItem |
 | Hotkey in Menu | Jump to MenuItem with matching hotkey |
 
@@ -476,7 +476,7 @@ MenuBar menuBar = new ([
         new MenuItem ("_New", "", () => MessageBox.Query ("New", "Create new file?", "OK", "Cancel")),
         new MenuItem ("_Open...", "", () => MessageBox.Query ("Open", "Open file dialog", "OK")),
         new Line (),
-        new MenuItem ("E_xit", Application.QuitKey, () => Application.RequestStop ())
+        new MenuItem ("E_xit", Application.GetDefaultKey (Command.Quit), () => Application.RequestStop ())
     ]),
     new MenuBarItem ("_Edit", [
         new MenuItem ("_Undo", Key.Z.WithCtrl, () => { }),
@@ -664,11 +664,11 @@ NewKeyDownEvent (key)
 ```
 
 For menus specifically:
-- <xref:Terminal.Gui.Views.MenuBar> binds `F9` to <xref:Terminal.Gui.Input.Command.HotKey> (via `HotKeyBindings`)
-- <xref:Terminal.Gui.Views.MenuBar> binds `F9` and `Application.QuitKey` to `Command.Quit` (via `KeyBindings`)
+- <xref:Terminal.Gui.Views.MenuBar> binds `F10` to <xref:Terminal.Gui.Input.Command.HotKey> (via `HotKeyBindings`)
+- <xref:Terminal.Gui.Views.MenuBar> binds `F10` and `Application.GetDefaultKey (Command.Quit)` to `Command.Quit` (via `KeyBindings`)
 - <xref:Terminal.Gui.Views.MenuBar> binds arrow keys to `Command.Right`/`Command.Left`
 - <xref:Terminal.Gui.Views.PopoverMenu> binds arrow keys to `Command.Right`/`Command.Left` for submenu navigation
-- <xref:Terminal.Gui.Views.PopoverMenu> binds `Escape`/`QuitKey` to `Command.Quit`
+- <xref:Terminal.Gui.Views.PopoverMenu> binds `Escape`/quit key to `Command.Quit`
 
 ---
 
@@ -701,7 +701,7 @@ These can also be configured in `config.json`:
     }
   },
   "Settings": {
-    "MenuBar.DefaultKey": "F9",
+    "MenuBar.DefaultKey": "F10",
     "PopoverMenu.DefaultKey": "Shift+F10"
   }
 }

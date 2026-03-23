@@ -142,7 +142,7 @@ public class CollectionNavigatorTester : Scenario
                                        new MenuItem
                                        {
                                            Title = Strings.cmdQuit,
-                                           Key = Application.QuitKey,
+                                           Key = Application.GetDefaultKey (Command.Quit),
                                            Action = Quit
                                        }
                                    ]
@@ -156,7 +156,7 @@ public class CollectionNavigatorTester : Scenario
                                        new MenuItem
                                        {
                                            Title = Strings.cmdQuit,
-                                           Key = Application.QuitKey,
+                                           Key = Application.GetDefaultKey (Command.Quit),
                                            Action = Quit
                                        }
                                    ]

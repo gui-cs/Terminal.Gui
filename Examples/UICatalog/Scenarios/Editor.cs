@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 using System.Diagnostics;
 using System.Globalization;
@@ -126,7 +126,7 @@ public class Editor : Scenario
 
         StatusBar statusBar =
             new ([
-                     new Shortcut (Application.QuitKey, "Quit", Quit),
+                     new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", Quit),
                      new Shortcut (Key.F2, "Open", Open),
                      new Shortcut (Key.F3, "Save", () => Save ()),
                      new Shortcut (Key.F4, "Save As", () => SaveAs ()),

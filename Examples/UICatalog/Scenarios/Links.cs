@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 namespace UICatalog.Scenarios;
 
@@ -74,7 +74,7 @@ public class Links : Scenario
         // StatusBar
         Shortcut urlIndicator = new (Key.Empty, "", null);
 
-        StatusBar statusBar = new ([new Shortcut (Application.QuitKey, "Quit", Quit), urlIndicator]);
+        StatusBar statusBar = new ([new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", Quit), urlIndicator]);
         _link.MouseEnter += (s, e) => urlIndicator.Title = _link.Text;
         _link.MouseLeave += (s, e) => urlIndicator.Title = "";
         _appWindow.Add (statusBar);

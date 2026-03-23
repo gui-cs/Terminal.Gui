@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Logging;
-using Terminal.Gui.Tests;
+using UnitTests.Parallelizable;
 using Terminal.Gui.Tracing;
 
 namespace ViewBaseTests.Commands;

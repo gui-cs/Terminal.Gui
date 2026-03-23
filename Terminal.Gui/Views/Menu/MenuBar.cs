@@ -16,7 +16,7 @@ namespace Terminal.Gui.Views;
 ///         <see cref="View.SuperView"/>.
 ///     </para>
 ///     <para>
-///         <b>Activation:</b> The <see cref="Key"/> property (default: <see cref="Key.F9"/>, configurable via
+///         <b>Activation:</b> The <see cref="Key"/> property (default: <see cref="Key.F10"/>, configurable via
 ///         <see cref="DefaultKey"/>) activates the <see cref="MenuBar"/>. When activated, the first
 ///         <see cref="MenuBarItem"/> with a <see cref="PopoverMenu"/> is opened. Use <see cref="Active"/> to
 ///         get or set whether the <see cref="MenuBar"/> is in its active state. When <see cref="Active"/> changes,
@@ -36,7 +36,7 @@ namespace Terminal.Gui.Views;
 ///     </para>
 ///     <para>
 ///         <b>Navigation:</b> The <c>Left</c> and <c>Right</c> arrow keys move focus between
-///         <see cref="MenuBarItem"/>s. <see cref="Application.QuitKey"/> and <see cref="Key"/> close any open
+///         <see cref="MenuBarItem"/>s. <see cref="Application.GetDefaultKey"/> and <see cref="Key"/> close any open
 ///         popover and deactivate the <see cref="MenuBar"/>.
 ///     </para>
 ///     <para>
@@ -53,20 +53,31 @@ namespace Terminal.Gui.Views;
 ///             <term>Key</term> <description>Action</description>
 ///         </listheader>
 ///         <item>
-///             <term>F9 (configurable via <see cref="DefaultKey"/>)</term>
+///             <term>F10 (configurable via <see cref="DefaultKey"/>)</term>
 ///             <description>Activates/deactivates the menu bar.</description>
 ///         </item>
 ///         <item>
 ///             <term>Left / Right</term> <description>Moves between menu bar items.</description>
 ///         </item>
 ///         <item>
-///             <term>Escape, <see cref="Application.QuitKey"/></term>
+///             <term>Escape, <see cref="Application.GetDefaultKey"/></term>
 ///             <description>Closes any open popover and deactivates the menu bar.</description>
 ///         </item>
 ///     </list>
 /// </remarks>
 public class MenuBar : Menu, IDesignable
 {
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="MenuBar"/>. All standard navigation bindings are
+    ///     inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary is empty by default.
+    ///     Dynamic bindings (activation key, quit key) are bound directly in the constructor.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
+
     /// <inheritdoc/>
     public MenuBar () : this ([]) { }
 
@@ -85,16 +96,18 @@ public class MenuBar : Menu, IDesignable
         // If we're not focused, Key activates/deactivates
         HotKeyBindings.Add (Key, Command.HotKey);
 
-        KeyBindings.Add (Key, Command.Quit);
-        KeyBindings.ReplaceCommands (Application.QuitKey, Command.Quit);
-
         AddCommand (Command.Quit, Quit);
 
         AddCommand (Command.Right, MoveRight);
-        KeyBindings.Add (Key.CursorRight, Command.Right);
 
         AddCommand (Command.Left, MoveLeft);
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
+
+        // Apply layered key bindings (base View layer + MenuBar-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
+
+        // Dynamic bindings that depend on instance properties
+        KeyBindings.Add (Key, Command.Quit);
+        KeyBindings.ReplaceCommands (Application.GetDefaultKey (Command.Quit), Command.Quit);
 
         // Override the default HotKey handler to correctly route bubbled-up HotKeys
         // from MenuBarItems. Without this, DefaultHotKeyHandler invokes Activate on the
@@ -127,7 +140,7 @@ public class MenuBar : Menu, IDesignable
 
             return true;
 
-            // Non-bubbled HotKey (e.g. F9 pressed on MenuBar directly) — use default behavior.
+            // Non-bubbled HotKey (e.g. F10 pressed on MenuBar directly) — use default behavior.
         }
 
         bool? Quit (ICommandContext? ctx)
@@ -296,7 +309,7 @@ public class MenuBar : Menu, IDesignable
                                                           ]) { Id = "Preferences" }
                                   },
                                   new Line (),
-                                  new MenuItem { TargetView = targetView as View, Key = Application.QuitKey, Command = Command.Quit }
+                                  new MenuItem { TargetView = targetView as View, Key = Application.GetDefaultKey (Command.Quit), Command = Command.Quit }
                               ]));
 
         Add (new MenuBarItem ("_Edit",
@@ -428,7 +441,7 @@ public class MenuBar : Menu, IDesignable
 
     /// <summary>The default key for activating menu bars.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key DefaultKey { get; set; } = Key.F9;
+    public static Key DefaultKey { get; set; } = Key.F10;
 
     /// <inheritdoc/>
     public override void EndInit ()
@@ -518,7 +531,7 @@ public class MenuBar : Menu, IDesignable
     public bool IsOpen () => SubViews.OfType<IMenuBarEntry> ().Any (e => e.IsMenuOpen);
 
     /// <summary>
-    ///     Specifies the key that will activate the MenuBar. The default is <see cref="Key.F9"/> and
+    ///     Specifies the key that will activate the MenuBar. The default is <see cref="Key.F10"/> and
     ///     can be configured using the <see cref="DefaultKey"/> configuraiton property.
     /// </summary>
     public Key Key

@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Text;
 using ColorHelper;
 using SixLabors.ImageSharp;
@@ -66,7 +66,7 @@ public class Images : Scenario
         app.Init ();
         _app = app;
 
-        _win = new Window { Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}" };
+        _win = new Window { Title = $"{Application.GetDefaultKey (Command.Quit)} to Quit - Scenario: {GetName ()}" };
 
         bool canTrueColor = app.Driver?.SupportsTrueColor ?? false;
 

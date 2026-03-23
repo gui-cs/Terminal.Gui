@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Terminal.Gui.Tracing;
 
-namespace Terminal.Gui.Tests;
+namespace UnitTests.Parallelizable;
 
 /// <summary>
 ///     Helper for binding Terminal.Gui logging to xUnit test output.

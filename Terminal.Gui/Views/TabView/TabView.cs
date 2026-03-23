@@ -18,6 +18,22 @@ public class TabView : View, IDesignable
 {
     private readonly TabRow _tabRow;
 
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="TabView"/>. All standard navigation bindings are
+    ///     inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary is empty by default.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    {
+        [Command.Left] = Bind.All (Key.CursorLeft.WithCtrl),
+        [Command.Right] = Bind.All (Key.CursorRight.WithCtrl),
+        [Command.LeftStart] = Bind.All (Key.Home.WithCtrl),
+        [Command.RightEnd] = Bind.All (Key.End.WithCtrl),
+    };
+
     private int? _selectedTabIndex;
 
     /// <summary>Creates a new <see cref="TabView"/>.</summary>
@@ -49,11 +65,8 @@ public class TabView : View, IDesignable
         AddCommand (Command.LeftStart, SelectFirstTab);
         AddCommand (Command.RightEnd, SelectLastTab);
 
-        // Bind keys
-        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.Left);
-        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.Right);
-        KeyBindings.Add (Key.Home.WithCtrl, Command.LeftStart);
-        KeyBindings.Add (Key.End.WithCtrl, Command.RightEnd);
+        // Apply layered key bindings (base View layer + TabView-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
     }
 
     /// <summary>Gets the list of <see cref="Tab"/> SubViews in this TabView.</summary>

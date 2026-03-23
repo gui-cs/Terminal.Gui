@@ -1,12 +1,11 @@
 // ReSharper disable AccessToDisposedClosure
 
-#nullable enable
-namespace ApplicationTests.Keyboard;
+namespace UnitTests.ApplicationTests.Keyboard;
 
 /// <summary>
 ///     Tests to verify that ApplicationKeyboard is thread-safe for concurrent access scenarios.
 /// </summary>
-[Collection("Application Tests")]
+[Collection ("Application Tests")]
 public class ApplicationKeyboardThreadSafetyTests
 {
     [Fact]
@@ -299,6 +298,10 @@ public class ApplicationKeyboardThreadSafetyTests
     public void KeyProperty_Setters_ConcurrentAccess_NoExceptions ()
     {
         // Arrange
+        // Save original bindings so parallel mutation doesn't pollute other tests
+        Dictionary<Command, PlatformKeyBinding>? savedBindings = Application.DefaultKeyBindings is { }
+                                                                     ? new Dictionary<Command, PlatformKeyBinding> (Application.DefaultKeyBindings)
+                                                                     : null;
         var keyboard = new ApplicationKeyboard ();
 
         // Initialize once before concurrent access
@@ -308,7 +311,7 @@ public class ApplicationKeyboardThreadSafetyTests
         const int OPERATIONS_PER_THREAD = 20;
 
         // Act
-        List<Task> tasks = new ();
+        List<Task> tasks = [];
 
         for (var i = 0; i < NUM_THREADS; i++)
         {
@@ -324,32 +327,32 @@ public class ApplicationKeyboardThreadSafetyTests
                                              switch (j % 6)
                                              {
                                                  case 0:
-                                                     keyboard.QuitKey = Key.Q.WithCtrl;
+                                                     Application.DefaultKeyBindings! [Command.Quit] = Bind.All (Key.Q.WithCtrl);
 
                                                      break;
 
                                                  case 1:
-                                                     keyboard.ArrangeKey = Key.F6.WithCtrl;
+                                                     Application.DefaultKeyBindings! [Command.Arrange] = Bind.All (Key.F6.WithCtrl);
 
                                                      break;
 
                                                  case 2:
-                                                     keyboard.NextTabKey = Key.Tab;
+                                                     Application.DefaultKeyBindings! [Command.NextTabStop] = Bind.All (Key.Tab);
 
                                                      break;
 
                                                  case 3:
-                                                     keyboard.PrevTabKey = Key.Tab.WithShift;
+                                                     Application.DefaultKeyBindings! [Command.PreviousTabStop] = Bind.All (Key.Tab.WithShift);
 
                                                      break;
 
                                                  case 4:
-                                                     keyboard.NextTabGroupKey = Key.F6;
+                                                     Application.DefaultKeyBindings! [Command.NextTabGroup] = Bind.All (Key.F6);
 
                                                      break;
 
                                                  case 5:
-                                                     keyboard.PrevTabGroupKey = Key.F6.WithShift;
+                                                     Application.DefaultKeyBindings! [Command.PreviousTabGroup] = Bind.All (Key.F6.WithShift);
 
                                                      break;
                                              }
@@ -370,12 +373,22 @@ public class ApplicationKeyboardThreadSafetyTests
         // Assert
         Assert.Empty (exceptions);
         keyboard.Dispose ();
+
+        // Restore original bindings
+        if (savedBindings is { })
+        {
+            foreach (KeyValuePair<Command, PlatformKeyBinding> kvp in savedBindings)
+            {
+                Application.DefaultKeyBindings! [kvp.Key] = kvp.Value;
+            }
+        }
     }
 
     [Fact]
     public void MixedOperations_ConcurrentAccess_NoExceptions ()
     {
         // Arrange
+        PlatformKeyBinding origQuit = Application.DefaultKeyBindings! [Command.Quit];
         IApplication? app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
         var keyboard = new ApplicationKeyboard { App = app };
@@ -456,7 +469,7 @@ public class ApplicationKeyboardThreadSafetyTests
                                  {
                                      try
                                      {
-                                         keyboard.QuitKey = j % 2 == 0 ? Key.Q.WithCtrl : Key.Esc;
+                                         Application.DefaultKeyBindings! [Command.Quit] = Bind.All (j % 2 == 0 ? Key.Q.WithCtrl : Key.Esc);
                                      }
                                      catch (Exception ex)
                                      {
@@ -474,6 +487,9 @@ public class ApplicationKeyboardThreadSafetyTests
         Assert.Empty (exceptions);
         keyboard.Dispose ();
         app.Dispose ();
+
+        // Restore static DefaultKeyBindings to avoid polluting other tests
+        Application.DefaultKeyBindings! [Command.Quit] = origQuit;
     }
 
     [Fact]

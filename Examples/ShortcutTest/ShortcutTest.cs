@@ -1,4 +1,4 @@
-// Test app for Command Propagation through Shortcut hierarchy
+﻿// Test app for Command Propagation through Shortcut hierarchy
 // Tests: CheckBox (CommandView) -> Shortcut -> Window
 
 using System.Collections.ObjectModel;
@@ -21,7 +21,7 @@ public sealed class ShortcutTestWindow : Window
 
     public ShortcutTestWindow ()
     {
-        Title = $"Shortcut Command Propagation Test ({Application.QuitKey} to quit)";
+        Title = $"Shortcut Command Propagation Test ({Application.GetDefaultKey (Command.Quit)} to quit)";
 
         AssignHotKeys = true;
 

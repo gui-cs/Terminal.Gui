@@ -19,7 +19,7 @@ namespace Terminal.Gui.App;
 ///             Set <see cref="View.ViewportSettings"/> to include <see cref="ViewportSettingsFlags.Transparent"/> and
 ///             <see cref="ViewportSettingsFlags.TransparentMouse"/>.
 ///         </item>
-///         <item>Add a key binding for <see cref="Command.Quit"/> (typically bound to <see cref="Application.QuitKey"/>).</item>
+///         <item>Add a key binding for <see cref="Command.Quit"/> (typically bound to <see cref="Application.GetDefaultKey"/>).</item>
 ///     </list>
 ///     <para>
 ///         <b>Default Behavior:</b><br/>
@@ -61,7 +61,7 @@ public abstract class PopoverImpl : View, IPopoverView
     ///             <see cref="ViewportSettingsFlags.TransparentMouse"/>.
     ///         </item>
     ///         <item>
-    ///             Adds <see cref="Command.Quit"/> bound to <see cref="Application.QuitKey"/> which hides the popover when
+    ///             Adds <see cref="Command.Quit"/> bound to <see cref="Application.GetDefaultKey"/> which hides the popover when
     ///             invoked.
     ///         </item>
     ///     </list>
@@ -82,7 +82,7 @@ public abstract class PopoverImpl : View, IPopoverView
         //base.Text = "popover";
 
         AddCommand (Command.Quit, Quit);
-        KeyBindings.Add (Application.QuitKey, Command.Quit);
+        KeyBindings.Add (Application.GetDefaultKey (Command.Quit), Command.Quit);
         KeyBindings.Remove (Key.Enter);
 
         // Clear all mouse bindings so there's no conflict with subviews

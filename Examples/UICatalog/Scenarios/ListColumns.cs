@@ -85,7 +85,7 @@ public class ListColumns : Scenario
                                        new (Key.F2, "OpenBigListEx", () => OpenSimpleList (true)),
                                        new (Key.F3, "CloseExample", CloseExample),
                                        new (Key.F4, "OpenSmListEx", () => OpenSimpleList (false)),
-                                       new (Application.QuitKey, "Quit", Quit)
+                                       new (Application.GetDefaultKey (Command.Quit), "Quit", Quit)
                                    ]
                                   );
 
