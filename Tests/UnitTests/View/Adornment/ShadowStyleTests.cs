@@ -3,26 +3,26 @@
 public class ShadowStyleTests (ITestOutputHelper output)
 {
     [Theory]
-    [InlineData (ShadowStyle.None,
+    [InlineData (ShadowStyles.None,
                  """
                  011
                  111
                  111
                  """)]
-    [InlineData (ShadowStyle.Transparent,
+    [InlineData (ShadowStyles.Transparent,
                  """
                  031
                  131
                  111
                  """)]
-    [InlineData (ShadowStyle.Opaque,
+    [InlineData (ShadowStyles.Opaque,
                  """
                  021
                  221
                  111
                  """)]
     [SetupFakeApplication]
-    public void ShadowView_Colors (ShadowStyle style, string expectedAttrs)
+    public void ShadowView_Colors (ShadowStyles style, string expectedAttrs)
     {
         Application.Driver!.SetScreenSize (5, 5);
         Color fg = Color.Red;
@@ -51,21 +51,21 @@ public class ShadowStyleTests (ITestOutputHelper output)
 
     // Visual tests
     [Theory]
-    [InlineData (ShadowStyle.None,
+    [InlineData (ShadowStyles.None,
                  """
                  01#$
                  AB#$
                  !@#$
                  !@#$
                  """)]
-    [InlineData (ShadowStyle.Opaque,
+    [InlineData (ShadowStyles.Opaque,
                  """
                  01▖$
                  AB▌$
                  ▝▀▘$
                  !@#$
                  """)]
-    [InlineData (ShadowStyle.Transparent,
+    [InlineData (ShadowStyles.Transparent,
                  """
                  01#$
                  AB#$
@@ -73,7 +73,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
                  !@#$
                  """)]
     [SetupFakeApplication]
-    public void Visual_Test (ShadowStyle style, string expected)
+    public void Visual_Test (ShadowStyles style, string expected)
     {
         Application.Driver!.SetScreenSize (5, 5);
 
@@ -92,11 +92,11 @@ public class ShadowStyleTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (ShadowStyle.None, 0, 0, 0, 0)]
-    [InlineData (ShadowStyle.Opaque, 1, 0, 0, 1)]
-    [InlineData (ShadowStyle.Transparent, 1, 0, 0, 1)]
+    [InlineData (ShadowStyles.None, 0, 0, 0, 0)]
+    [InlineData (ShadowStyles.Opaque, 1, 0, 0, 1)]
+    [InlineData (ShadowStyles.Transparent, 1, 0, 0, 1)]
     [AutoInitShutdown]
-    public void ShadowStyle_LeftButtonPressed_Causes_Movement (ShadowStyle style, int expectedLeft, int expectedTop, int expectedRight, int expectedBottom)
+    public void ShadowStyle_LeftButtonPressed_Causes_Movement (ShadowStyles style, int expectedLeft, int expectedTop, int expectedRight, int expectedBottom)
     {
         var superView = new View { Height = 10, Width = 10, App = ApplicationImpl.Instance };
 
@@ -114,7 +114,7 @@ public class ShadowStyleTests (ITestOutputHelper output)
         superView.BeginInit ();
         superView.EndInit ();
 
-        Thickness origThickness = view.Margin!.Thickness;
+        Thickness origThickness = view.Margin.Thickness;
         view.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed, Position = new Point (0, 0) });
         Assert.Equal (new Thickness (expectedLeft, expectedTop, expectedRight, expectedBottom), view.Margin.Thickness);
 

@@ -1,7 +1,7 @@
-﻿using System.Text;
+using System.Text;
 using UnitTests;
 
-namespace ViewBaseTests.Adornments;
+namespace ViewBaseTests.Arrangement;
 
 public class BorderArrangementTests (ITestOutputHelper output)
 {
@@ -276,8 +276,8 @@ public class BorderArrangementTests (ITestOutputHelper output)
             Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
             CanFocus = true
         };
-        view2.Border!.Thickness = new Thickness (1);
-        view2.Border.Add (new View { Height = Dim.Auto (), Width = Dim.Auto (), Text = "Hi" });
+        view2.Border.Thickness = new Thickness (1);
+        view2.Border.GetOrCreateView ().Add (new View { Height = Dim.Auto (), Width = Dim.Auto (), Text = "Hi" });
         view2.SetScheme (new Scheme { Normal = attributes [3], HotNormal = attributes [4] });
 
         superview.Add (view, view2);

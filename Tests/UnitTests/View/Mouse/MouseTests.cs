@@ -1,4 +1,4 @@
-﻿using Timeout = Terminal.Gui.App.Timeout;
+using Timeout = Terminal.Gui.App.Timeout;
 
 namespace UnitTests.ViewBaseTests.MouseTests;
 
@@ -34,9 +34,10 @@ public class MouseTests : TestsAllViews
             Height = 10,
             Arrangement = ViewArrangement.Movable
         };
-        testView.Margin!.Thickness = new (marginThickness);
-        testView.Border!.Thickness = new (borderThickness);
-        testView.Padding!.Thickness = new (paddingThickness);
+        testView.Border.LineStyle = LineStyle.None; // Calls GetOrCreateView
+        testView.Margin.Thickness = new (marginThickness);
+        testView.Border.Thickness = new (borderThickness);
+        testView.Padding.Thickness = new (paddingThickness);
 
         Runnable top = new ();
         top.Add (testView);

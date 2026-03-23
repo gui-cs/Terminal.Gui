@@ -85,7 +85,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             Title = $"{Glyphs.DownArrow}",
             MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             CanFocus = false,
-            ShadowStyle = ShadowStyle.None
+            ShadowStyle = null
         };
 
         _number = new View
@@ -110,7 +110,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             Title = $"{Glyphs.UpArrow}",
             MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             CanFocus = false,
-            ShadowStyle = ShadowStyle.None
+            ShadowStyle = null
         };
 
         _down.Accepting += OnDownButtonOnAccept;

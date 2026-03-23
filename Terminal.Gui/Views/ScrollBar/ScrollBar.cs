@@ -43,7 +43,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             CanFocus = false,
             NoDecorations = true,
             NoPadding = true,
-            ShadowStyle = ShadowStyle.None,
+            ShadowStyle = null,
             MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         _decreaseButton.Accepting += OnDecreaseButtonOnAccept;
@@ -60,7 +60,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             CanFocus = false,
             NoDecorations = true,
             NoPadding = true,
-            ShadowStyle = ShadowStyle.None,
+            ShadowStyle = null,
             MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         _increaseButton.Accepting += OnIncreaseButtonOnAccept;
@@ -102,7 +102,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             case ScrollBarVisibilityMode.Auto:
                 // If this scrollbar lives in a View's Padding, respect the View's
                 // ViewportSettings as the authority on whether it should be enabled.
-                if (SuperView is Padding { Parent: { } ownerView })
+                if (SuperView is PaddingView { Adornment.Parent: { } ownerView })
                 {
                     ViewportSettingsFlags requiredFlag = Orientation == Orientation.Vertical
                                                              ? ViewportSettingsFlags.HasVerticalScrollBar
@@ -414,7 +414,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<int>>? ValueChanged;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>Called when <see cref="Value"/> has changed. Indicates how much to scroll.</summary>

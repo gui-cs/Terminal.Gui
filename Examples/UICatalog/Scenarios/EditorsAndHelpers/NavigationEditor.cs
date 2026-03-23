@@ -18,7 +18,7 @@ public sealed class NavigationEditor : EditorBase
 
     protected override void OnViewToEditChanged ()
     {
-        _tabBehaviorSelector.Enabled = ViewToEdit is { } and not Adornment;
+        _tabBehaviorSelector.Enabled = ViewToEdit is { } and not AdornmentView;
 
         _tabBehaviorSelector.ValueChanged -= TabStopOnValueChanged;
 
@@ -28,6 +28,8 @@ public sealed class NavigationEditor : EditorBase
         }
 
         _tabBehaviorSelector.ValueChanged += TabStopOnValueChanged;
+
+        base.OnViewToEditChanged ();
     }
 
     private void TabStopOnValueChanged (object? sender, EventArgs<TabBehavior?> e)
@@ -39,7 +41,7 @@ public sealed class NavigationEditor : EditorBase
         ViewToEdit.TabStop = (TabBehavior)e.Value;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override void EndInit ()
     {
         base.EndInit ();

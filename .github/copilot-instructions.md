@@ -194,7 +194,9 @@ public string Name
 - Don't use `[AutoInitShutdown]` or `[SetupFakeApplication]` (legacy, being phased out)
 - Avoid `Application.Init` in tests unless testing that specific functionality
 - Never decrease code coverage
-
+- Do not use Console.Error.WriteLine or Console.WriteLine for debug output in Terminal.Gui code. Use project's Logging infrastructure instead: `Terminal.Gui.App.Logging`, `Terminal.Gui.Tests.TestLogging` and `Terminal.Gui.Tracing.Tracing.Trace`.
+- `Tracing.Trace` is only available in DEBUG builds; do not use it to validate test results as all tests must pass in RELEASE builds.
+ 
 ## Unicode & Grapheme Handling
 
 - Measure display width with `string.GetColumns ()`, never `EnumerateRunes().Sum(r => r.GetColumns())`

@@ -1,5 +1,4 @@
-﻿namespace ViewBaseTests.Adornments;
-
+﻿namespace ViewBaseTests.Arrangement;
 
 public class ArrangementTests (ITestOutputHelper output)
 {
@@ -8,10 +7,7 @@ public class ArrangementTests (ITestOutputHelper output)
     #region ViewArrangement Enum Tests
 
     [Fact]
-    public void ViewArrangement_Fixed_IsZero ()
-    {
-        Assert.Equal (0, (int)ViewArrangement.Fixed);
-    }
+    public void ViewArrangement_Fixed_IsZero () => Assert.Equal (0, (int)ViewArrangement.Fixed);
 
     [Fact]
     public void ViewArrangement_Flags_HaveCorrectValues ()
@@ -28,9 +24,9 @@ public class ArrangementTests (ITestOutputHelper output)
     public void ViewArrangement_Resizable_IsCombinationOfAllResizableFlags ()
     {
         ViewArrangement expected = ViewArrangement.LeftResizable
-            | ViewArrangement.RightResizable
-            | ViewArrangement.TopResizable
-            | ViewArrangement.BottomResizable;
+                                   | ViewArrangement.RightResizable
+                                   | ViewArrangement.TopResizable
+                                   | ViewArrangement.BottomResizable;
 
         Assert.Equal (ViewArrangement.Resizable, expected);
     }
@@ -66,10 +62,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void View_Arrangement_CanSetMultipleFlags ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable
-        };
+        var view = new View { Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable };
 
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Movable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
@@ -91,10 +84,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void View_Arrangement_CanCombineOverlappedWithOtherFlags ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable
-        };
+        var view = new View { Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable };
 
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Overlapped));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Movable));
@@ -107,11 +97,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void TopResizable_WithoutMovable_IsAllowed ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.TopResizable,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = ViewArrangement.TopResizable, BorderStyle = LineStyle.Single };
 
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
         Assert.False (view.Arrangement.HasFlag (ViewArrangement.Movable));
@@ -122,11 +108,7 @@ public class ArrangementTests (ITestOutputHelper output)
     {
         // According to docs and Border.Arrangment.cs line 569:
         // TopResizable is only checked if NOT Movable
-        var view = new View
-        {
-            Arrangement = ViewArrangement.Movable | ViewArrangement.TopResizable,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = ViewArrangement.Movable | ViewArrangement.TopResizable, BorderStyle = LineStyle.Single };
 
         // Both flags can be set on the property
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Movable));
@@ -139,11 +121,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Resizable_WithMovable_IncludesTopResizable ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.Resizable | ViewArrangement.Movable,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = ViewArrangement.Resizable | ViewArrangement.Movable, BorderStyle = LineStyle.Single };
 
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Movable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
@@ -159,11 +137,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Border_WithNoArrangement_HasNoArrangementOptions ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.Fixed,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = ViewArrangement.Fixed, BorderStyle = LineStyle.Single };
 
         Assert.NotNull (view.Border);
         Assert.Equal (ViewArrangement.Fixed, view.Arrangement);
@@ -173,6 +147,7 @@ public class ArrangementTests (ITestOutputHelper output)
     public void Border_WithMovableArrangement_CanEnterArrangeMode ()
     {
         var superView = new View ();
+
         var view = new View
         {
             Arrangement = ViewArrangement.Movable,
@@ -191,11 +166,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Border_WithResizableArrangement_HasResizableOptions ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.Resizable,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = ViewArrangement.Resizable, BorderStyle = LineStyle.Single };
 
         Assert.NotNull (view.Border);
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
@@ -211,11 +182,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [InlineData (ViewArrangement.BottomResizable)]
     public void Border_WithSingleResizableDirection_OnlyHasThatOption (ViewArrangement arrangement)
     {
-        var view = new View
-        {
-            Arrangement = arrangement,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = arrangement, BorderStyle = LineStyle.Single };
 
         Assert.NotNull (view.Border);
         Assert.True (view.Arrangement.HasFlag (arrangement));
@@ -249,11 +216,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Border_BottomRightResizable_CombinesBothFlags ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.BottomResizable | ViewArrangement.RightResizable,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = ViewArrangement.BottomResizable | ViewArrangement.RightResizable, BorderStyle = LineStyle.Single };
 
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.BottomResizable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.RightResizable));
@@ -264,11 +227,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Border_BottomLeftResizable_CombinesBothFlags ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.BottomResizable | ViewArrangement.LeftResizable,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = ViewArrangement.BottomResizable | ViewArrangement.LeftResizable, BorderStyle = LineStyle.Single };
 
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.BottomResizable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
@@ -279,11 +238,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Border_TopRightResizable_CombinesBothFlags ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.TopResizable | ViewArrangement.RightResizable,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = ViewArrangement.TopResizable | ViewArrangement.RightResizable, BorderStyle = LineStyle.Single };
 
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.RightResizable));
@@ -294,11 +249,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Border_TopLeftResizable_CombinesBothFlags ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.TopResizable | ViewArrangement.LeftResizable,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = ViewArrangement.TopResizable | ViewArrangement.LeftResizable, BorderStyle = LineStyle.Single };
 
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.TopResizable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
@@ -336,12 +287,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Overlapped_AllowsSubViewsToOverlap ()
     {
-        var superView = new View
-        {
-            Arrangement = ViewArrangement.Overlapped,
-            Width = 20,
-            Height = 20
-        };
+        var superView = new View { Arrangement = ViewArrangement.Overlapped, Width = 20, Height = 20 };
 
         var view1 = new View { X = 0, Y = 0, Width = 10, Height = 10 };
         var view2 = new View { X = 5, Y = 5, Width = 10, Height = 10 };
@@ -362,13 +308,7 @@ public class ArrangementTests (ITestOutputHelper output)
     {
         var container = new View { Width = 80, Height = 25 };
 
-        var leftPane = new View
-        {
-            X = 0,
-            Y = 0,
-            Width = 40,
-            Height = Dim.Fill ()
-        };
+        var leftPane = new View { X = 0, Y = 0, Width = 40, Height = Dim.Fill () };
 
         var rightPane = new View
         {
@@ -391,13 +331,7 @@ public class ArrangementTests (ITestOutputHelper output)
     {
         var container = new View { Width = 80, Height = 25 };
 
-        var topPane = new View
-        {
-            X = 0,
-            Y = 0,
-            Width = Dim.Fill (),
-            Height = 10
-        };
+        var topPane = new View { X = 0, Y = 0, Width = Dim.Fill (), Height = 10 };
 
         var bottomPane = new View
         {
@@ -422,30 +356,24 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void View_WithoutBorderStyle_CanHaveArrangement ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.Movable
-        };
+        var view = new View { Arrangement = ViewArrangement.Movable };
 
         // Arrangement can be set even without a border style
         // Border object still exists but has no visible style
         Assert.Equal (ViewArrangement.Movable, view.Arrangement);
         Assert.NotNull (view.Border);
-        Assert.Equal (LineStyle.None, view.BorderStyle);
+        Assert.Null (view.BorderStyle);
     }
 
     [Fact]
     public void View_WithNoBorderStyle_ResizableCanBeSet ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.Resizable
-        };
+        var view = new View { Arrangement = ViewArrangement.Resizable };
 
         // Arrangement is set but has limited effect without a visible border style
         Assert.Equal (ViewArrangement.Resizable, view.Arrangement);
         Assert.NotNull (view.Border);
-        Assert.Equal (LineStyle.None, view.BorderStyle);
+        Assert.Null (view.BorderStyle);
     }
 
     #endregion
@@ -458,6 +386,7 @@ public class ArrangementTests (ITestOutputHelper output)
         // This test verifies the documented behavior that TopResizable is ignored
         // when Movable is also set (line 569 in Border.Arrangment.cs)
         var superView = new View { Width = 80, Height = 25 };
+
         var view = new View
         {
             Arrangement = ViewArrangement.TopResizable | ViewArrangement.Movable,
@@ -481,6 +410,7 @@ public class ArrangementTests (ITestOutputHelper output)
     public void DetermineArrangeModeFromClick_TopResizableWorksWithoutMovable ()
     {
         var superView = new View { Width = 80, Height = 25 };
+
         var view = new View
         {
             Arrangement = ViewArrangement.TopResizable,
@@ -503,7 +433,7 @@ public class ArrangementTests (ITestOutputHelper output)
         var superView = new View { Width = 80, Height = 25 };
 
         // Test that all 4 corner combinations are recognized
-        var cornerCombinations = new []
+        ViewArrangement [] cornerCombinations = new []
         {
             ViewArrangement.BottomResizable | ViewArrangement.RightResizable,
             ViewArrangement.BottomResizable | ViewArrangement.LeftResizable,
@@ -511,7 +441,7 @@ public class ArrangementTests (ITestOutputHelper output)
             ViewArrangement.TopResizable | ViewArrangement.LeftResizable
         };
 
-        foreach (var arrangement in cornerCombinations)
+        foreach (ViewArrangement arrangement in cornerCombinations)
         {
             var view = new View
             {
@@ -561,10 +491,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void View_Arrangement_CanRemoveFlags ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable
-        };
+        var view = new View { Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable };
 
         view.Arrangement &= ~ViewArrangement.Movable;
         Assert.False (view.Arrangement.HasFlag (ViewArrangement.Movable));
@@ -578,12 +505,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void SuperView_CanHaveMultipleArrangeableSubViews ()
     {
-        var superView = new View
-        {
-            Arrangement = ViewArrangement.Overlapped,
-            Width = 80,
-            Height = 25
-        };
+        var superView = new View { Arrangement = ViewArrangement.Overlapped, Width = 80, Height = 25 };
 
         var movableView = new View
         {
@@ -643,29 +565,21 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Border_WithDefaultThickness_SupportsArrangement ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.Movable,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = ViewArrangement.Movable, BorderStyle = LineStyle.Single };
 
         Assert.NotNull (view.Border);
+
         // Default thickness should be (1,1,1,1) for Single line style
-        Assert.True (view.Border.Thickness.Left > 0 || view.Border.Thickness.Right > 0
-            || view.Border.Thickness.Top > 0 || view.Border.Thickness.Bottom > 0);
+        Assert.True (view.Border.Thickness.Left > 0 || view.Border.Thickness.Right > 0 || view.Border.Thickness.Top > 0 || view.Border.Thickness.Bottom > 0);
     }
 
     [Fact]
     public void Border_WithCustomThickness_SupportsArrangement ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.LeftResizable,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = ViewArrangement.LeftResizable, BorderStyle = LineStyle.Single };
 
         // Set custom thickness - only left border
-        view.Border!.Thickness = new Thickness (2, 0, 0, 0);
+        view.Border.Thickness = new Thickness (2, 0, 0, 0);
 
         Assert.Equal (2, view.Border.Thickness.Left);
         Assert.Equal (0, view.Border.Thickness.Top);
@@ -755,11 +669,7 @@ public class ArrangementTests (ITestOutputHelper output)
         // can run without Application.Init, making them parallelizable.
         // If this test passes, it confirms no Application dependencies leaked in.
 
-        var view = new View
-        {
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable, BorderStyle = LineStyle.Single };
 
         Assert.NotNull (view);
         Assert.NotNull (view.Border);
@@ -775,9 +685,9 @@ public class ArrangementTests (ITestOutputHelper output)
     public void ViewArrangement_CanCombineAllResizableDirections ()
     {
         ViewArrangement arrangement = ViewArrangement.TopResizable
-                                    | ViewArrangement.BottomResizable
-                                    | ViewArrangement.LeftResizable
-                                    | ViewArrangement.RightResizable;
+                                      | ViewArrangement.BottomResizable
+                                      | ViewArrangement.LeftResizable
+                                      | ViewArrangement.RightResizable;
 
         Assert.True (arrangement.HasFlag (ViewArrangement.TopResizable));
         Assert.True (arrangement.HasFlag (ViewArrangement.BottomResizable));
@@ -812,10 +722,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void View_Arrangement_CanBeSetToCompositeFlagValue ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped
-        };
+        var view = new View { Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped };
 
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Movable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.Resizable));
@@ -834,11 +741,7 @@ public class ArrangementTests (ITestOutputHelper output)
     public void View_ArrangementWithNoBorder_CanStillHaveArrangementValue ()
     {
         // A view can have Arrangement set even if BorderStyle is None
-        var view = new View
-        {
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
-            BorderStyle = LineStyle.None
-        };
+        var view = new View { Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable, BorderStyle = LineStyle.None };
 
         // Border exists but has no visible style
         Assert.NotNull (view.Border);
@@ -849,11 +752,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void View_ChangingBorderStyle_PreservesArrangement ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.Movable,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = ViewArrangement.Movable, BorderStyle = LineStyle.Single };
 
         Assert.NotNull (view.Border);
         Assert.Equal (ViewArrangement.Movable, view.Arrangement);
@@ -868,11 +767,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void View_ChangingToNoBorderStyle_PreservesArrangement ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.Movable,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = ViewArrangement.Movable, BorderStyle = LineStyle.Single };
 
         Assert.NotNull (view.Border);
         Assert.Equal (LineStyle.Single, view.BorderStyle);
@@ -958,8 +853,23 @@ public class ArrangementTests (ITestOutputHelper output)
     {
         var container = new View { Arrangement = ViewArrangement.Fixed };
 
-        var view1 = new View { Id = "view1", X = 0, Y = 0, Width = 10, Height = 5 };
-        var view2 = new View { Id = "view2", X = 5, Y = 2, Width = 10, Height = 5 };
+        var view1 = new View
+        {
+            Id = "view1",
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 5
+        };
+
+        var view2 = new View
+        {
+            Id = "view2",
+            X = 5,
+            Y = 2,
+            Width = 10,
+            Height = 5
+        };
 
         container.Add (view1, view2);
 
@@ -976,11 +886,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Border_OnlyLeftResizable_OtherDirectionsNotResizable ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.LeftResizable,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = ViewArrangement.LeftResizable, BorderStyle = LineStyle.Single };
 
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
         Assert.False (view.Arrangement.HasFlag (ViewArrangement.RightResizable));
@@ -991,11 +897,7 @@ public class ArrangementTests (ITestOutputHelper output)
     [Fact]
     public void Border_TwoOppositeDirections_CanBeResizable ()
     {
-        var view = new View
-        {
-            Arrangement = ViewArrangement.LeftResizable | ViewArrangement.RightResizable,
-            BorderStyle = LineStyle.Single
-        };
+        var view = new View { Arrangement = ViewArrangement.LeftResizable | ViewArrangement.RightResizable, BorderStyle = LineStyle.Single };
 
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.RightResizable));
@@ -1008,8 +910,7 @@ public class ArrangementTests (ITestOutputHelper output)
     {
         var view = new View
         {
-            Arrangement = ViewArrangement.LeftResizable | ViewArrangement.RightResizable | ViewArrangement.BottomResizable,
-            BorderStyle = LineStyle.Single
+            Arrangement = ViewArrangement.LeftResizable | ViewArrangement.RightResizable | ViewArrangement.BottomResizable, BorderStyle = LineStyle.Single
         };
 
         Assert.True (view.Arrangement.HasFlag (ViewArrangement.LeftResizable));

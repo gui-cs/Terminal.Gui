@@ -1,9 +1,9 @@
-// Claude - Opus 4.5
+#nullable enable
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Terminal.Gui.Tracing;
-using UnitTests.Parallelizable;
+using UnitTests;
 
 namespace ApplicationTests;
 
@@ -386,17 +386,11 @@ public class TraceTests (ITestOutputHelper output)
 
     // Copilot
     [Fact]
-    public void TraceCategory_Configuration_HasExpectedValue ()
-    {
-        Assert.Equal (32, (int)TraceCategory.Configuration);
-    }
+    public void TraceCategory_Configuration_HasExpectedValue () => Assert.Equal (32, (int)TraceCategory.Configuration);
 
     // Copilot
     [Fact]
-    public void TraceCategory_All_IncludesConfiguration ()
-    {
-        Assert.True (TraceCategory.All.HasFlag (TraceCategory.Configuration));
-    }
+    public void TraceCategory_All_IncludesConfiguration () => Assert.True (TraceCategory.All.HasFlag (TraceCategory.Configuration));
 
     // Copilot
     [Fact]
@@ -452,14 +446,7 @@ public class TraceTests (ITestOutputHelper output)
     {
         LoggingBackend backend = new ();
 
-        TraceEntry entry = new (
-                                TraceCategory.Configuration,
-                                "my-property",
-                                "Apply",
-                                "InternalApply",
-                                "Test configuration trace",
-                                DateTime.UtcNow,
-                                null);
+        TraceEntry entry = new (TraceCategory.Configuration, "my-property", "Apply", "InternalApply", "Test configuration trace", DateTime.UtcNow, null);
 
         // Verify the Configuration case in the switch does not throw
         backend.Log (entry);
@@ -473,17 +460,11 @@ public class TraceTests (ITestOutputHelper output)
 
     // Copilot
     [Fact]
-    public void TraceCategory_Draw_HasExpectedValue ()
-    {
-        Assert.Equal (64, (int)TraceCategory.Draw);
-    }
+    public void TraceCategory_Draw_HasExpectedValue () => Assert.Equal (64, (int)TraceCategory.Draw);
 
     // Copilot
     [Fact]
-    public void TraceCategory_All_IncludesDraw ()
-    {
-        Assert.True (TraceCategory.All.HasFlag (TraceCategory.Draw));
-    }
+    public void TraceCategory_All_IncludesDraw () => Assert.True (TraceCategory.All.HasFlag (TraceCategory.Draw));
 
     // Copilot
     [Fact]
@@ -570,9 +551,10 @@ public class TraceTests (ITestOutputHelper output)
             checkbox.InvokeCommand (Command.Accept);
 
 #if DEBUG
+
             // Verify traces were captured
             Assert.NotEmpty (backend.Entries);
-            Assert.All (backend.Entries, e => Assert.True (e.Category == TraceCategory.Command || e.Category == TraceCategory.Keyboard));
+            Assert.All (backend.Entries, e => Assert.True (e.Category is TraceCategory.Command or TraceCategory.Keyboard));
 #else
             // In Release, [Conditional("DEBUG")] removes trace calls, so nothing is captured
             Assert.Empty (backend.Entries);

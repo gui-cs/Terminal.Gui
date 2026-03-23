@@ -57,7 +57,7 @@ public class DropDownListTests
         // Claude - Opus 4.6
         DropDownList dropdown = new ();
 
-        Button? toggleButton = dropdown.Padding?.SubViews.OfType<Button> ().FirstOrDefault ();
+        Button? toggleButton = dropdown.Padding.View!.SubViews.OfType<Button> ().FirstOrDefault ();
         Assert.NotNull (toggleButton);
         Assert.False (toggleButton.CanFocus);
         Assert.Equal (TabBehavior.NoStop, toggleButton.TabStop);
@@ -79,7 +79,7 @@ public class DropDownListTests
         // Claude - Opus 4.6
         DropDownList dropdown = new ();
 
-        Assert.Equal (1, dropdown.Padding!.Thickness.Right);
+        Assert.Equal (1, dropdown.Padding.Thickness.Right);
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public class DropDownListTests
         // Claude - Opus 4.6
         DropDownList dropdown = new ();
 
-        Button? toggleButton = dropdown.Padding?.SubViews.OfType<Button> ().FirstOrDefault ();
+        Button? toggleButton = dropdown.Padding.View!.SubViews.OfType<Button> ().FirstOrDefault ();
         Assert.NotNull (toggleButton);
         Assert.Equal (Glyphs.DownArrow.ToString (), toggleButton.Text);
     }
@@ -466,7 +466,7 @@ public class DropDownListTests
         dropdown.EndInit ();
         dropdown.SetFocus ();
 
-        Button? toggleButton = dropdown.Padding?.SubViews.OfType<Button> ().FirstOrDefault ();
+        Button? toggleButton = dropdown.Padding.View!.SubViews.OfType<Button> ().FirstOrDefault ();
         Assert.NotNull (toggleButton);
 
         toggleButton.InvokeCommand (Command.Accept);

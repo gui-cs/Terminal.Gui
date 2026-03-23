@@ -107,8 +107,10 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
             Height = Dim.Auto (),
             CommandsToBubbleUp = CommandsToBubbleUp
         };
-        Padding!.Add (_buttonContainer);
 
+        Padding.GetOrCreateView ();
+        Padding.View?.Add (_buttonContainer);
+        UpdateSizes ();
         SetStyle ();
     }
 
@@ -119,6 +121,10 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     {
         base.EndInit ();
         UpdateSizes ();
+
+        // Don't enable scrollbars until after initialized; otherwise they get created before
+        // our frame has dimensions.
+        ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
     }
 
     /// <inheritdoc/>
@@ -132,10 +138,23 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <inheritdoc/>
     protected override void OnSubViewLayout (LayoutEventArgs args)
     {
-        // HACK: Ensure scrollbars are shown as needed before calculating sizes
-        ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
         UpdateSizes ();
         base.OnSubViewLayout (args);
+    }
+
+    /// <summary>
+    ///     Because Dialog has a complex Dim.Auto setup, we override OnSubViewsLaidOut to see if another
+    ///     Layout is required.
+    /// </summary>
+    /// <param name="args">The event data containing information about the layout event.</param>
+    protected override void OnSubViewsLaidOut (LayoutEventArgs args)
+    {
+        base.OnSubViewsLaidOut (args);
+
+        if (NeedsLayout)
+        {
+            Layout ();
+        }
     }
 
     /// <inheritdoc/>
@@ -149,20 +168,20 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         View? sourceView = null;
         args.Context?.Source?.TryGetTarget (out sourceView);
 
-        if (sourceView is { })
+        if (sourceView is null)
         {
-            RequestStop ();
-
-            return sourceView is IAcceptTarget { IsDefault: false };
+            return false;
         }
+        RequestStop ();
 
-        return false;
+        return sourceView is IAcceptTarget { IsDefault: false };
+
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnViewportChanged (DrawEventArgs e)
     {
-        if (!IsInitialized)
+        //if (!IsInitialized)
         {
             SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, Viewport.Width), Math.Max (_minimumButtonsSize.Height, Viewport.Height)));
         }
@@ -218,7 +237,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <returns></returns>
     private int GetMinimumDialogHeight ()
     {
-        int minSize = Math.Max (_minimumSubViewsSize.Height, _minimumButtonsSize.Height - Border!.Thickness.Vertical - Margin!.Thickness.Vertical);
+        int minSize = Math.Max (_minimumSubViewsSize.Height, _minimumButtonsSize.Height - Border.Thickness.Vertical - Margin.Thickness.Vertical);
 
         return minSize;
     }
@@ -260,7 +279,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         dialogButton.IsDefault = true;
 
         _buttonContainer?.Add (dialogButton);
-        Padding!.Thickness = Padding!.Thickness with { Bottom = _buttonContainer!.GetHeightRequiredForSubViews () };
+        Padding.Thickness = Padding.Thickness with { Bottom = _buttonContainer!.GetHeightRequiredForSubViews () };
         _minimumButtonsSize = new Size (_buttonContainer?.GetWidthRequiredForSubViews () ?? 0, _buttonContainer?.GetHeightRequiredForSubViews () ?? 0);
     }
 
@@ -397,7 +416,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
             return false;
         }
 
-        if (!_drawingText || role is not VisualRole.Focus || Border?.Thickness == Thickness.Empty)
+        if (!_drawingText || role is not VisualRole.Focus || Border.Thickness == Thickness.Empty)
         {
             return false;
         }

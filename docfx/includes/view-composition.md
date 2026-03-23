@@ -4,16 +4,16 @@
 classDiagram
     class View {
         +Frame: Rectangle
-        +Margin: Adornment - outermost
-        +Border: Adornment - border lines and Title
-        +Padding: Adornment - innermost - Scrollbars
+        +Margin: AdornmentImpl - outermost
+        +Border: AdornmentImpl - border lines and Title
+        +Padding: AdornmentImpl - innermost - Scrollbars
         +Viewport: Rectangle describing portal into ContentArea
         +ContentArea: Rectangle with Location always 0,0
         +GetContentSize(): Size
         +SetContentSize(Size)
     }
 
-    class Adornment {
+    class AdornmentImpl {
         +Thickness: Thickness
     }
 
@@ -29,12 +29,12 @@ classDiagram
         +Size: Size
     }
 
-    View --> Adornment : has
-    Adornment --> Thickness : has
+    View --> AdornmentImpl : has
+    AdornmentImpl --> Thickness : has
     View --> Rectangle : has
 
     note for View "Frame defines location and size relative to SuperView"
-    note for Adornment "Separates Frame from Viewport"
+    note for AdornmentImpl "Separates Frame from Viewport"
     note for Rectangle "Defines location and size"
 ```
 

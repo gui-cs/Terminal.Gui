@@ -22,7 +22,7 @@ public class LayoutEditor : EditorBase
 
     protected override void OnViewToEditChanged ()
     {
-        Enabled = ViewToEdit is { } and not Adornment;
+        Enabled = ViewToEdit is { } and not AdornmentView;
 
         _xEditor?.ViewToEdit = ViewToEdit;
 
@@ -31,6 +31,8 @@ public class LayoutEditor : EditorBase
         _widthEditor?.ViewToEdit = ViewToEdit;
 
         _heightEditor?.ViewToEdit = ViewToEdit;
+
+        base.OnViewToEditChanged ();
     }
 
     private void LayoutEditor_Initialized (object? sender, EventArgs e)

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using UnitTests.Parallelizable;
 using Terminal.Gui.Tracing;
+using UnitTests;
 
 namespace ViewsTests;
 
@@ -1892,8 +1893,10 @@ public class MenuBarTests (ITestOutputHelper output)
     {
         ListBackend traceBackend = new ();
         Trace.Backend = traceBackend;
-        Trace.EnabledCategories |= TraceCategory.Command;
-        Trace.EnabledCategories |= TraceCategory.Keyboard;
+
+        // Do not set this unless debugging. It is a static that is process wide.
+        //Trace.EnabledCategories |= TraceCategory.Command;
+        //Trace.EnabledCategories |= TraceCategory.Keyboard;
 
         try
         {
@@ -1953,7 +1956,6 @@ public class MenuBarTests (ITestOutputHelper output)
         }
         finally
         {
-            Trace.EnabledCategories = TraceCategory.None;
             Trace.Backend = new NullBackend ();
         }
     }
@@ -2040,7 +2042,8 @@ public class MenuBarTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             VirtualTimeProvider time = new ();
             using IApplication app = Application.Create (time);
@@ -2148,7 +2151,8 @@ public class MenuBarTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             VirtualTimeProvider time = new ();
             using IApplication app = Application.Create (time);

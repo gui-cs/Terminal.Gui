@@ -31,7 +31,7 @@ public class RegionScenario : Scenario
         using Window appWindow = new ();
         appWindow.Title = GetQuitKeyAndName ();
         appWindow.TabStop = TabBehavior.TabGroup;
-        appWindow.Padding!.Thickness = new (1);
+        appWindow.Padding.Thickness = new (1);
 
         RegionToolsView tools = new () { Title = "Tools", X = Pos.AnchorEnd (), Y = 2 };
 
@@ -181,7 +181,7 @@ internal class RegionToolsView : Window
     public RegionToolsView ()
     {
         BorderStyle = LineStyle.Dotted;
-        Border!.Thickness = new (1, 2, 1, 1);
+        Border.Thickness = new (1, 2, 1, 1);
         Height = Dim.Auto ();
         Width = Dim.Auto ();
     }
@@ -199,7 +199,7 @@ internal class RegionToolsView : Window
             AssignHotKeys = true
         };
         _stylePicker.BorderStyle = LineStyle.Single;
-        _stylePicker.Border!.Thickness = new (0, 1, 0, 0);
+        _stylePicker.Border.Thickness = new (0, 1, 0, 0);
         _stylePicker.Title = "Draw Style";
 
         _stylePicker.ValueChanged += (_, a) => { SetStyle?.Invoke ((RegionDrawStyles)a.Value!); };
@@ -262,7 +262,7 @@ internal class RegionAttributeView : View
         Height = 4;
 
         BorderStyle = LineStyle.Single;
-        Border!.Thickness = new (0, 1, 0, 0);
+        Border.Thickness = new (0, 1, 0, 0);
         Title = "Attribute";
     }
 

@@ -1,4 +1,4 @@
-﻿namespace UICatalog.Scenarios;
+namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Pos.Align", "Demonstrates Pos.Align")]
 [ScenarioCategory ("Layout")]
@@ -18,10 +18,8 @@ public sealed class PosAlignDemo : Scenario
         app.Init ();
 
         // Setup - Create a top-level application window and configure it.
-        using Window appWindow = new ()
-        {
-            Title = $"{Application.GetDefaultKey (Command.Quit)} to Quit - Scenario: {GetName ()} - {GetDescription ()}"
-        };
+        using Window appWindow = new ();
+        appWindow.Title = $"{Application.GetDefaultKey (Command.Quit)} to Quit - Scenario: {GetName ()} - {GetDescription ()}";
 
         SetupControls (appWindow, Dimension.Width, Schemes.Runnable);
 
@@ -35,10 +33,7 @@ public sealed class PosAlignDemo : Scenario
 
     private void SetupControls (Window appWindow, Dimension dimension, Schemes scheme)
     {
-        OptionSelector<Alignment> alignOptionSelector = new ()
-        {
-            SchemeName = SchemeManager.SchemesToSchemeName (scheme)
-        };
+        OptionSelector<Alignment> alignOptionSelector = new () { SchemeName = SchemeManager.SchemesToSchemeName (scheme) };
 
         if (dimension == Dimension.Width)
         {
@@ -72,11 +67,7 @@ public sealed class PosAlignDemo : Scenario
                                             };
         appWindow.Add (alignOptionSelector);
 
-        CheckBox endToStartCheckBox = new ()
-        {
-            SchemeName = SchemeManager.SchemesToSchemeName (scheme),
-            Text = "EndToStart"
-        };
+        CheckBox endToStartCheckBox = new () { SchemeName = SchemeManager.SchemesToSchemeName (scheme), Text = "EndToStart" };
 
         if (dimension == Dimension.Width)
         {
@@ -92,34 +83,29 @@ public sealed class PosAlignDemo : Scenario
         }
 
         endToStartCheckBox.ValueChanging += (_, e) =>
-                                                   {
-                                                       if (dimension == Dimension.Width)
-                                                       {
-                                                           _horizAligner.AlignmentModes = e.NewValue == CheckState.Checked
-                                                                                              ? _horizAligner.AlignmentModes | AlignmentModes.EndToStart
-                                                                                              : _horizAligner.AlignmentModes & ~AlignmentModes.EndToStart;
-                                                           UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
-                                                       }
-                                                       else
-                                                       {
-                                                           _vertAligner.AlignmentModes = e.NewValue == CheckState.Checked
-                                                                                             ? _vertAligner.AlignmentModes | AlignmentModes.EndToStart
-                                                                                             : _vertAligner.AlignmentModes & ~AlignmentModes.EndToStart;
-                                                           UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
-                                                       }
-                                                   };
+                                            {
+                                                if (dimension == Dimension.Width)
+                                                {
+                                                    _horizAligner.AlignmentModes = e.NewValue == CheckState.Checked
+                                                                                       ? _horizAligner.AlignmentModes | AlignmentModes.EndToStart
+                                                                                       : _horizAligner.AlignmentModes & ~AlignmentModes.EndToStart;
+                                                    UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
+                                                }
+                                                else
+                                                {
+                                                    _vertAligner.AlignmentModes = e.NewValue == CheckState.Checked
+                                                                                      ? _vertAligner.AlignmentModes | AlignmentModes.EndToStart
+                                                                                      : _vertAligner.AlignmentModes & ~AlignmentModes.EndToStart;
+                                                    UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
+                                                }
+                                            };
         appWindow.Add (endToStartCheckBox);
 
-        CheckBox ignoreFirstOrLast = new ()
-        {
-            SchemeName = SchemeManager.SchemesToSchemeName (scheme),
-            Text = "IgnoreFirstOrLast"
-        };
+        CheckBox ignoreFirstOrLast = new () { SchemeName = SchemeManager.SchemesToSchemeName (scheme), Text = "IgnoreFirstOrLast" };
 
         if (dimension == Dimension.Width)
         {
-            ignoreFirstOrLast.Value =
-                _horizAligner.AlignmentModes.HasFlag (AlignmentModes.IgnoreFirstOrLast) ? CheckState.Checked : CheckState.UnChecked;
+            ignoreFirstOrLast.Value = _horizAligner.AlignmentModes.HasFlag (AlignmentModes.IgnoreFirstOrLast) ? CheckState.Checked : CheckState.UnChecked;
             ignoreFirstOrLast.X = Pos.Align (_horizAligner.Alignment);
             ignoreFirstOrLast.Y = Pos.Top (alignOptionSelector);
         }
@@ -131,29 +117,25 @@ public sealed class PosAlignDemo : Scenario
         }
 
         ignoreFirstOrLast.ValueChanging += (_, e) =>
-                                                  {
-                                                      if (dimension == Dimension.Width)
-                                                      {
-                                                          _horizAligner.AlignmentModes = e.NewValue == CheckState.Checked
-                                                                                             ? _horizAligner.AlignmentModes | AlignmentModes.IgnoreFirstOrLast
-                                                                                             : _horizAligner.AlignmentModes & ~AlignmentModes.IgnoreFirstOrLast;
-                                                          UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
-                                                      }
-                                                      else
-                                                      {
-                                                          _vertAligner.AlignmentModes = e.NewValue == CheckState.Checked
-                                                                                            ? _vertAligner.AlignmentModes | AlignmentModes.IgnoreFirstOrLast
-                                                                                            : _vertAligner.AlignmentModes & ~AlignmentModes.IgnoreFirstOrLast;
-                                                          UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
-                                                      }
-                                                  };
+                                           {
+                                               if (dimension == Dimension.Width)
+                                               {
+                                                   _horizAligner.AlignmentModes = e.NewValue == CheckState.Checked
+                                                                                      ? _horizAligner.AlignmentModes | AlignmentModes.IgnoreFirstOrLast
+                                                                                      : _horizAligner.AlignmentModes & ~AlignmentModes.IgnoreFirstOrLast;
+                                                   UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
+                                               }
+                                               else
+                                               {
+                                                   _vertAligner.AlignmentModes = e.NewValue == CheckState.Checked
+                                                                                     ? _vertAligner.AlignmentModes | AlignmentModes.IgnoreFirstOrLast
+                                                                                     : _vertAligner.AlignmentModes & ~AlignmentModes.IgnoreFirstOrLast;
+                                                   UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
+                                               }
+                                           };
         appWindow.Add (ignoreFirstOrLast);
 
-        CheckBox addSpacesBetweenItems = new ()
-        {
-            SchemeName = SchemeManager.SchemesToSchemeName (scheme),
-            Text = "AddSpaceBetweenItems"
-        };
+        CheckBox addSpacesBetweenItems = new () { SchemeName = SchemeManager.SchemesToSchemeName (scheme), Text = "AddSpaceBetweenItems" };
 
         if (dimension == Dimension.Width)
         {
@@ -164,41 +146,32 @@ public sealed class PosAlignDemo : Scenario
         }
         else
         {
-            addSpacesBetweenItems.Value =
-                _vertAligner.AlignmentModes.HasFlag (AlignmentModes.AddSpaceBetweenItems) ? CheckState.Checked : CheckState.UnChecked;
+            addSpacesBetweenItems.Value = _vertAligner.AlignmentModes.HasFlag (AlignmentModes.AddSpaceBetweenItems) ? CheckState.Checked : CheckState.UnChecked;
             addSpacesBetweenItems.X = Pos.Left (alignOptionSelector);
             addSpacesBetweenItems.Y = Pos.Align (_vertAligner.Alignment);
         }
 
         addSpacesBetweenItems.ValueChanging += (_, e) =>
-                                                      {
-                                                          if (dimension == Dimension.Width)
-                                                          {
-                                                              _horizAligner.AlignmentModes = e.NewValue == CheckState.Checked
-                                                                                                 ? _horizAligner.AlignmentModes
-                                                                                                   | AlignmentModes.AddSpaceBetweenItems
-                                                                                                 : _horizAligner.AlignmentModes
-                                                                                                   & ~AlignmentModes.AddSpaceBetweenItems;
-                                                              UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
-                                                          }
-                                                          else
-                                                          {
-                                                              _vertAligner.AlignmentModes = e.NewValue == CheckState.Checked
-                                                                                                ? _vertAligner.AlignmentModes
-                                                                                                  | AlignmentModes.AddSpaceBetweenItems
-                                                                                                : _vertAligner.AlignmentModes
-                                                                                                  & ~AlignmentModes.AddSpaceBetweenItems;
-                                                              UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
-                                                          }
-                                                      };
+                                               {
+                                                   if (dimension == Dimension.Width)
+                                                   {
+                                                       _horizAligner.AlignmentModes = e.NewValue == CheckState.Checked
+                                                                                          ? _horizAligner.AlignmentModes | AlignmentModes.AddSpaceBetweenItems
+                                                                                          : _horizAligner.AlignmentModes & ~AlignmentModes.AddSpaceBetweenItems;
+                                                       UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
+                                                   }
+                                                   else
+                                                   {
+                                                       _vertAligner.AlignmentModes = e.NewValue == CheckState.Checked
+                                                                                         ? _vertAligner.AlignmentModes | AlignmentModes.AddSpaceBetweenItems
+                                                                                         : _vertAligner.AlignmentModes & ~AlignmentModes.AddSpaceBetweenItems;
+                                                       UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
+                                                   }
+                                               };
 
         appWindow.Add (addSpacesBetweenItems);
 
-        CheckBox margin = new ()
-        {
-            SchemeName = SchemeManager.SchemesToSchemeName (scheme),
-            Text = "Margin"
-        };
+        CheckBox margin = new () { SchemeName = SchemeManager.SchemesToSchemeName (scheme), Text = "Margin" };
 
         if (dimension == Dimension.Width)
         {
@@ -212,18 +185,18 @@ public sealed class PosAlignDemo : Scenario
         }
 
         margin.ValueChanging += (_, e) =>
-                                       {
-                                           if (dimension == Dimension.Width)
-                                           {
-                                               _leftMargin = e.NewValue == CheckState.Checked ? 1 : 0;
-                                               UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
-                                           }
-                                           else
-                                           {
-                                               _topMargin = e.NewValue == CheckState.Checked ? 1 : 0;
-                                               UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
-                                           }
-                                       };
+                                {
+                                    if (dimension == Dimension.Width)
+                                    {
+                                        _leftMargin = e.NewValue == CheckState.Checked ? 1 : 0;
+                                        UpdatePosAlignObjects (appWindow, dimension, _horizAligner);
+                                    }
+                                    else
+                                    {
+                                        _topMargin = e.NewValue == CheckState.Checked ? 1 : 0;
+                                        UpdatePosAlignObjects (appWindow, dimension, _vertAligner);
+                                    }
+                                };
         appWindow.Add (margin);
 
         List<Button> addedViews =
@@ -249,13 +222,13 @@ public sealed class PosAlignDemo : Scenario
         {
             addedViewsUpDown.X = Pos.Align (_horizAligner.Alignment);
             addedViewsUpDown.Y = Pos.Top (alignOptionSelector);
-            addedViewsUpDown.Border!.Thickness = new (0, 1, 0, 0);
+            addedViewsUpDown.Border.Thickness = new Thickness (0, 1, 0, 0);
         }
         else
         {
             addedViewsUpDown.X = Pos.Left (alignOptionSelector);
             addedViewsUpDown.Y = Pos.Align (_vertAligner.Alignment);
-            addedViewsUpDown.Border!.Thickness = new (1, 0, 0, 0);
+            addedViewsUpDown.Border.Thickness = new Thickness (1, 0, 0, 0);
         }
 
         addedViewsUpDown.ValueChanging += (_, e) =>
@@ -293,7 +266,9 @@ public sealed class PosAlignDemo : Scenario
                                                           X = dimension == Dimension.Width
                                                                   ? Pos.Align (_horizAligner.Alignment)
                                                                   : Pos.Left (alignOptionSelector),
-                                                          Y = dimension == Dimension.Width ? Pos.Top (alignOptionSelector) : Pos.Align (_vertAligner.Alignment),
+                                                          Y = dimension == Dimension.Width
+                                                                  ? Pos.Top (alignOptionSelector)
+                                                                  : Pos.Align (_vertAligner.Alignment),
                                                           Text = NumberToWords.Convert (i + 1)
                                                       };
                                                       appWindow.Add (button);
@@ -322,7 +297,7 @@ public sealed class PosAlignDemo : Scenario
                 var posAlign = view.X as PosAlign;
 
                 view.X = Pos.Align (aligner.Alignment, aligner.AlignmentModes, posAlign!.GroupId);
-                view.Margin!.Thickness = new (_leftMargin, view.Margin!.Thickness.Top, view.Margin!.Thickness.Right, view.Margin!.Thickness.Bottom);
+                view.Margin.Thickness = new Thickness (_leftMargin, view.Margin.Thickness.Top, view.Margin.Thickness.Right, view.Margin.Thickness.Bottom);
             }
             else
             {
@@ -330,7 +305,7 @@ public sealed class PosAlignDemo : Scenario
 
                 view.Y = Pos.Align (aligner.Alignment, aligner.AlignmentModes, posAlign!.GroupId);
 
-                view.Margin!.Thickness = new (view.Margin!.Thickness.Left, _topMargin, view.Margin!.Thickness.Right, view.Margin!.Thickness.Bottom);
+                view.Margin.Thickness = new Thickness (view.Margin.Thickness.Left, _topMargin, view.Margin.Thickness.Right, view.Margin.Thickness.Bottom);
             }
         }
     }
@@ -350,48 +325,34 @@ public sealed class PosAlignDemo : Scenario
             Width = Dim.Percent (40),
             Height = Dim.Percent (40)
         };
-        container.Padding!.Thickness = new (8, 1, 0, 0);
-        container.Padding.SchemeName = "Error";
+        container.Padding.Thickness = new Thickness (8, 1, 0, 0);
+        container.Padding.GetOrCreateView ().SchemeName = "Error";
 
         Aligner widthAligner = new () { AlignmentModes = AlignmentModes.StartToEnd };
 
-        OptionSelector widthAlignOptionSelector = new ()
-        {
-            Labels = Enum.GetNames<Alignment> (),
-            Orientation = Orientation.Horizontal,
-            X = Pos.Center ()
-        };
-        container.Padding.Add (widthAlignOptionSelector);
+        OptionSelector widthAlignOptionSelector = new () { Labels = Enum.GetNames<Alignment> (), Orientation = Orientation.Horizontal, X = Pos.Center () };
+        container.Padding.GetOrCreateView ().Add (widthAlignOptionSelector);
 
         widthAlignOptionSelector.ValueChanged += (_, _) =>
-                                                        {
-                                                            widthAligner.Alignment =
-                                                                (Alignment)Enum.Parse (
-                                                                                       typeof (Alignment),
-                                                                                       widthAlignOptionSelector.Labels [widthAlignOptionSelector
-                                                                                           .Value!.Value]);
-                                                            UpdatePosAlignObjects (container, Dimension.Width, widthAligner);
-                                                        };
+                                                 {
+                                                     widthAligner.Alignment =
+                                                         (Alignment)Enum.Parse (typeof (Alignment),
+                                                                                widthAlignOptionSelector.Labels [widthAlignOptionSelector.Value!.Value]);
+                                                     UpdatePosAlignObjects (container, Dimension.Width, widthAligner);
+                                                 };
 
         Aligner heightAligner = new () { AlignmentModes = AlignmentModes.StartToEnd };
 
-        OptionSelector heightAlignOptionSelector = new ()
-        {
-            Labels = Enum.GetNames<Alignment> (),
-            Orientation = Orientation.Vertical,
-            Y = Pos.Center ()
-        };
-        container.Padding.Add (heightAlignOptionSelector);
+        OptionSelector heightAlignOptionSelector = new () { Labels = Enum.GetNames<Alignment> (), Orientation = Orientation.Vertical, Y = Pos.Center () };
+        container.Padding.GetOrCreateView ().Add (heightAlignOptionSelector);
 
         heightAlignOptionSelector.ValueChanged += (_, _) =>
-                                                         {
-                                                             heightAligner.Alignment =
-                                                                 (Alignment)Enum.Parse (
-                                                                                        typeof (Alignment),
-                                                                                        heightAlignOptionSelector.Labels [heightAlignOptionSelector
-                                                                                            .Value!.Value]);
-                                                             UpdatePosAlignObjects (container, Dimension.Height, heightAligner);
-                                                         };
+                                                  {
+                                                      heightAligner.Alignment =
+                                                          (Alignment)Enum.Parse (typeof (Alignment),
+                                                                                 heightAlignOptionSelector.Labels [heightAlignOptionSelector.Value!.Value]);
+                                                      UpdatePosAlignObjects (container, Dimension.Height, heightAligner);
+                                                  };
 
         for (var i = 0; i < 9; i++)
 

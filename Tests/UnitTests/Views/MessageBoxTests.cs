@@ -21,8 +21,8 @@ public class MessageBoxTests (ITestOutputHelper output)
             // Override CM
             MessageBox.DefaultButtonAlignment = Alignment.End;
             MessageBox.DefaultBorderStyle = LineStyle.Double;
-            Dialog.DefaultShadow = ShadowStyle.None;
-            Button.DefaultShadow = ShadowStyle.None;
+            Dialog.DefaultShadow = ShadowStyles.None;
+            Button.DefaultShadow = ShadowStyles.None;
 
             app.Iteration += OnApplicationOnIteration;
 
