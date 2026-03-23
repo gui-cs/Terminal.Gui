@@ -447,6 +447,8 @@ Tab text is rendered vertically using `TextDirection.TopBottom_LeftRight`.
 
 The Tab style works on all four sides. `BorderView` will gain a new property (`TabSide`?) of type `Side` which dictates which side the tabs are rendered on. There are renderings below that show the visuals per-side.
 
+### TabOffset
+
 Another new property `BorderView.TabOffset` (int) specifies how many columns/rows from the left/top edge the tab header starts.
 
 The `TabOffset` property is always along the axis of the tab strip:
@@ -497,6 +499,132 @@ Tab│
 IOW, it gets clipped by the view's right border, but the header is still visible and functional. The content top line auto-joins with the tab header's right connector at the intersection point, producing a flowing style.
 
 **Important** the renderings above are what happens when the View *does not have focus* (`HasFocus == false`). When a View is using `BorderSettings.Tab`, focus is indicated not by the `Title` being rendered using the focus attribute, but by the presence of the header bottom line. The selected tab has its header bottom line suppressed, creating an open gap that visually connects the header to the content area. Unselected tabs draw the full header rectangle, including the bottom line, creating a closed header.
+
+#### `Side.Bottom` — `TabOffset` examples (`HasFocus == false`)
+
+Same axis as Top (horizontal), but mirrored vertically. The junction row is the **content bottom border**. Junctions are `┬` (top-T: content bottom line meets header border going down).
+
+`TabOffset = 2`:
+```
+╭───────╮
+│content│
+│       │
+╰─┬───┬─╯
+  │Tab│
+  ╰───╯
+```
+
+`TabOffset = 4` (header right edge coincides with view right border → `┤`):
+```
+╭───────╮
+│content│
+│       │
+╰───┬───┤
+    │Tab│
+    ╰───╯
+```
+
+`TabOffset = 5` (overflow right — header clipped):
+```
+╭───────╮
+│content│
+│       │
+╰────┬──╯
+     │Tab
+     ╰───
+```
+
+`TabOffset = -1` (overflow left — header clipped):
+```
+╭───────╮
+│content│
+│       │
+╰──┬────╯
+Tab│
+───╯
+```
+
+#### `Side.Left` — `TabOffset` examples (`HasFocus == false`)
+
+`TabOffset` is **vertical** (rows from the top edge). The junction column is column 2 (the inner edge of `Thickness.Left = 3`). Junctions are `┤` (left-T: content left border continues vertically, horizontal goes left into header). Rows outside the header on columns 0–1 are transparent.
+
+`TabOffset = 0` (header at top, already shown above — repeated for reference):
+```
+╭─┬───────╮
+│T├content│
+│a│       │
+│b│       │
+╰─┴───────╯
+```
+
+`TabOffset = 2` (header starts 2 rows below top, view height = 9):
+```
+  ╭───────╮
+  │content│
+╭─┤       │
+│T│       │
+│a│       │
+│b│       │
+╰─┤       │
+  │       │
+  ╰───────╯
+```
+
+At column 2: `╭` at row 0 (content top-left), `│` on rows 1, `┤` at row 2 (header top arrives — vertical continues, horizontal goes left), `│` on rows 3–5, `┤` at row 6 (header bottom departs), `│` at row 7, `╰` at row 8 (content bottom-left).
+
+`TabOffset = 6` (overflow bottom — header clipped):
+```
+  ╭───────╮
+  │content│
+  │       │
+  │       │
+  │       │
+  │       │
+╭─┤       │
+│T│       │
+  ╰───────╯
+```
+
+#### `Side.Right` — `TabOffset` examples (`HasFocus == false`)
+
+Mirror of Left. `TabOffset` is **vertical**. The junction column is the inner edge of `Thickness.Right = 3`. Junctions are `├` (right-T: content right border continues vertically, horizontal goes right into header). Rows outside the header on the rightmost 2 columns are transparent.
+
+`TabOffset = 0` (header at top, already shown above — repeated for reference):
+```
+╭───────┬─╮
+│content│T│
+│       │a│
+│       │b│
+╰───────┴─╯
+```
+
+`TabOffset = 2` (header starts 2 rows below top, view height = 9):
+```
+╭───────╮
+│content│
+│       ├─╮
+│       │T│
+│       │a│
+│       │b│
+│       ├─╯
+│       │
+╰───────╯
+```
+
+At the content right border column: `╮` at row 0 (content top-right), `│` on row 1, `├` at row 2 (header top arrives — vertical continues, horizontal goes right), `│` on rows 3–5, `├` at row 6 (header bottom departs), `│` at row 7, `╯` at row 8 (content bottom-right).
+
+`TabOffset = 6` (overflow bottom — header clipped):
+```
+╭───────╮
+│content│
+│       │
+│       │
+│       │
+│       │
+│       ├─╮
+│       │T│
+╰───────╯
+```
 
 ### Steps
 
