@@ -548,14 +548,24 @@ Tab│
 
 `TabOffset` is **vertical** (rows from the top edge). The junction column is column 2 (the inner edge of `Thickness.Left = 3`). Junctions are `┤` (left-T: content left border continues vertically, horizontal goes left into header). Rows outside the header on columns 0–1 are transparent.
 
-`TabOffset = 0` (header at top, already shown above — repeated for reference):
+**Header height** = title text length + 2 (top/bottom border rows). For `"Tab"` → `3 + 2 = 5` rows.
+
+**Key behavior:** The header occupies only its 5 rows on the left side. Below (or above) the header, columns 0–1 are transparent and the content left border continues as `│` at column 2.
+
+`TabOffset = 0` (header at top, view height = 9):
 ```
 ╭─┬───────╮
 │T├content│
 │a│       │
 │b│       │
-╰─┴───────╯
+╰─┤       │
+  │       │
+  │       │
+  │       │
+  ╰───────╯
 ```
+
+Row-by-row at the junction column (column 2): `┬` at row 0 (header top meets content top — horizontal both ways, vertical down), `├` at row 1 (header `HasFocus == false` closing line meets content left border — content border continues vertically, horizontal goes right into content), `│` on rows 2–3 (content left border, header interior rows), `┤` at row 4 (header bottom meets content left border — vertical continues, horizontal goes left into header), `│` on rows 5–7 (content left border continues), `╰` at row 8 (content bottom-left).
 
 `TabOffset = 2` (header starts 2 rows below top, view height = 9):
 ```
@@ -570,9 +580,9 @@ Tab│
   ╰───────╯
 ```
 
-At column 2: `╭` at row 0 (content top-left), `│` on rows 1, `┤` at row 2 (header top arrives — vertical continues, horizontal goes left), `│` on rows 3–5, `┤` at row 6 (header bottom departs), `│` at row 7, `╰` at row 8 (content bottom-left).
+At column 2: `╭` at row 0 (content top-left), `│` on row 1, `┤` at row 2 (header top arrives — vertical continues, horizontal goes left), `│` on rows 3–5 (header interior, content border continues), `┤` at row 6 (header bottom departs — vertical continues, horizontal goes left), `│` at row 7, `╰` at row 8 (content bottom-left).
 
-`TabOffset = 6` (overflow bottom — header clipped):
+`TabOffset = 6` (overflow bottom — header clipped, view height = 9):
 ```
   ╭───────╮
   │content│
@@ -582,21 +592,29 @@ At column 2: `╭` at row 0 (content top-left), `│` on rows 1, `┤` at row 2 
   │       │
 ╭─┤       │
 │T│       │
-  ╰───────╯
+│a╰───────╯
 ```
+
+**Overflow clipping:** The header starts at row 6 (5-row header would need rows 6–10, but the view ends at row 8). Row 6: `┤` junction (header top). Row 7: `│` (header interior, `T`). Row 8: the header's `a` character shares the row with the content bottom border `╰───────╯`. Characters `b` and the header bottom border row are clipped entirely — they would be at rows 9–10 which don't exist.
 
 #### `Side.Right` — `TabOffset` examples (`HasFocus == false`)
 
 Mirror of Left. `TabOffset` is **vertical**. The junction column is the inner edge of `Thickness.Right = 3`. Junctions are `├` (right-T: content right border continues vertically, horizontal goes right into header). Rows outside the header on the rightmost 2 columns are transparent.
 
-`TabOffset = 0` (header at top, already shown above — repeated for reference):
+`TabOffset = 0` (header at top, view height = 9):
 ```
 ╭───────┬─╮
 │content│T│
 │       │a│
 │       │b│
-╰───────┴─╯
+│       ├─╯
+│       │
+│       │
+│       │
+╰───────╯
 ```
+
+Row-by-row at the junction column (content right border): `┬` at row 0 (header top meets content top), `│` at row 1 (header closing line — `HasFocus == false`), `│` on rows 2–3 (header interior), `├` at row 4 (header bottom departs — vertical continues, horizontal goes right), `│` on rows 5–7, `╰` at row 8 (content bottom-right... wait, this is `╯`). Correction: `╯` at row 8.
 
 `TabOffset = 2` (header starts 2 rows below top, view height = 9):
 ```
@@ -611,9 +629,9 @@ Mirror of Left. `TabOffset` is **vertical**. The junction column is the inner ed
 ╰───────╯
 ```
 
-At the content right border column: `╮` at row 0 (content top-right), `│` on row 1, `├` at row 2 (header top arrives — vertical continues, horizontal goes right), `│` on rows 3–5, `├` at row 6 (header bottom departs), `│` at row 7, `╯` at row 8 (content bottom-right).
+At the content right border column: `╮` at row 0 (content top-right), `│` on row 1, `├` at row 2 (header top arrives — vertical continues, horizontal goes right), `│` on rows 3–5 (header interior), `├` at row 6 (header bottom departs — vertical continues, horizontal goes right), `│` at row 7, `╯` at row 8 (content bottom-right).
 
-`TabOffset = 6` (overflow bottom — header clipped):
+`TabOffset = 6` (overflow bottom — header clipped, `HasFocus == false`, view height = 9):
 ```
 ╭───────╮
 │content│
@@ -623,8 +641,34 @@ At the content right border column: `╮` at row 0 (content top-right), `│` on
 │       │
 │       ├─╮
 │       │T│
-╰───────╯
+╰───────╯a│
 ```
+
+**Overflow clipping (Right):** Same principle as Left. The header starts at row 6 (5-row header needs rows 6–10, view ends at row 8). Row 6: `├` junction. Row 7: header interior (`T`). Row 8: `a` shares the row with content bottom border `╰───────╯`. The `b` row and header bottom border are clipped.
+
+#### `Side.Right` — Focused overflow (`HasFocus == true`, `TabOffset = 6`, view height = 9)
+
+```
+╭───────╮
+│content│
+│       │
+│       │
+│       │
+│       │
+│       ╰─╮
+│        T│
+╰─────── a│
+```
+
+**The focused overflow nuance:** When `HasFocus == true`, the border segment between header and content is suppressed (the "open gap" rule). For this overflow case:
+
+- **Row 6:** The `├` junction from the unfocused version becomes `╰─╮`. The content right border is suppressed — instead, `╰` (the header's top-left corner curving right) bridges into the header top border `─`, ending at `╮` (header top-right corner). This creates the visual opening where the tab connects to the content.
+- **Row 7:** The content right border `│` is suppressed entirely — replaced by a space. The tab text `T` and the header right border `│` remain. The content area visually "opens" into the header.
+- **Row 8:** The content bottom border `╰───────` runs normally, but where it would meet the content right corner, there is a space (the gap continues). The clipped `a` and header right border `│` continue on the right.
+
+**General principle for focused overflow on any side:** The open gap rule applies identically whether the header fits fully or overflows. The border segment between header and content is always suppressed when focused. In overflow cases, the gap interacts with the content corner glyph — the corner is replaced by the header's outer corner glyph curving into the header, and the content border is replaced by space for the extent of the gap.
+
+This same principle applies to `Side.Left` overflow (mirrored) and to `Side.Top`/`Side.Bottom` overflow on the horizontal axis.
 
 ### Steps
 
