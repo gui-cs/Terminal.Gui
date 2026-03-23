@@ -17,27 +17,6 @@ namespace Terminal.Gui.ViewBase;
 /// </remarks>
 public class Border : AdornmentImpl
 {
-    /// <summary>Gets the list of gaps on the top border line.</summary>
-    public List<BorderGap> TopGaps { get; } = [];
-
-    /// <summary>Gets the list of gaps on the bottom border line.</summary>
-    public List<BorderGap> BottomGaps { get; } = [];
-
-    /// <summary>Gets the list of gaps on the left border line.</summary>
-    public List<BorderGap> LeftGaps { get; } = [];
-
-    /// <summary>Gets the list of gaps on the right border line.</summary>
-    public List<BorderGap> RightGaps { get; } = [];
-
-    /// <summary>Clears all gap lists.</summary>
-    public void ClearAllGaps ()
-    {
-        TopGaps.Clear ();
-        BottomGaps.Clear ();
-        LeftGaps.Clear ();
-        RightGaps.Clear ();
-    }
-
     /// <inheritdoc/>
     protected override AdornmentView CreateView ()
     {

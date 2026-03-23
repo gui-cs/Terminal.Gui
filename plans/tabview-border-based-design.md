@@ -246,9 +246,118 @@ When `BorderSettings.Tab` is set on `View.Border.BorderSettings`:
 
 Depending on the `Thickness.Top` value, the header rectangle will be taller or shorter. The examples below show the visual difference as you increase `Thickness.Top` from 1 to 4. The "tab" concept starts to emerge at `Thickness.Top = 3` when the bottom line appears, but the exact visuals depend on the LineCanvas auto-join behavior.
 
-These examples show `Side.Top`. All four sides are possible and follow the same pattern. Visual examples are provided in the descripiton of Phase 2 below and not duplicated here.
+These examples show `Side.Top`. All four sides follow the same pattern — visual examples for each `Side` variant are below.
+
+#### Visual Examples by `TabSide` (Phase 1 reference)
+
+All examples use `Thickness = 3` on the tab side, `Thickness = 1` on the other three sides, `BorderStyle = Rounded`, and `TabOffset = 0`.
+
+**`HasFocus` determines whether the header is open or closed:**
+
+- **`HasFocus == false`** → **Closed header.** The line adjacent to the content area is **drawn**, fully enclosing the header rectangle. This visually separates the header from the content, indicating that this tab is not selected.
+- **`HasFocus == true`** → **Open header.** The line adjacent to the content area is **suppressed**, creating a gap that visually connects the header to the content area. This open flow indicates the tab is selected and its content is active.
+
+In a multi-tab `Tabs` container, exactly one `Tab` has `HasFocus == true` (the selected tab) and all others have `HasFocus == false`. The visual difference — closed vs. open — is how the user distinguishes the selected tab from the rest.
+
+##### `Side.Top` — `Thickness.Top = 3`
+
+`HasFocus == false` (closed — header bottom line drawn):
+```
+╭───╮
+│Tab│
+╭┴───┴──╮
+│content│
+╰───────╯
+```
+
+`HasFocus == true` (open — header bottom line suppressed, flows into content):
+```
+╭───╮
+│Tab│
+│   ╰───╮
+│content│
+╰───────╯
+```
+
+##### `Side.Bottom` — `Thickness.Bottom = 3`
+
+`HasFocus == false` (closed — header top line drawn):
+```
+╭───────╮
+│content│
+╰┬───┬──╯
+│Tab│
+╰───╯
+```
+
+`HasFocus == true` (open — header top line suppressed, flows into content):
+```
+╭───────╮
+│content│
+│   ╭───╯
+│Tab│
+╰───╯
+```
+
+##### `Side.Left` — `Thickness.Left = 3`
+
+Tab text is rendered vertically using `TextDirection.TopBottom_LeftRight`.
+
+`HasFocus == false` (closed — header right line drawn):
+```
+╭──┬────────╮
+│ T├content │
+│ a│        │
+│ b│        │
+╰──┴────────╯
+```
+
+`HasFocus == true` (open — header right line suppressed, flows into content):
+```
+╭──────────╮
+│ T content│
+│ a        │
+│ b        │
+╰──┬───────╯
+   │ (continues if more tabs below)
+```
+
+##### `Side.Right` — `Thickness.Right = 3`
+
+Tab text is rendered vertically using `TextDirection.TopBottom_LeftRight`.
+
+`HasFocus == false` (closed — header left line drawn):
+```
+╭────────┬──╮
+│content ┤T │
+│        │a │
+│        │b │
+╰────────┴──╯
+```
+
+`HasFocus == true` (open — header left line suppressed, flows into content):
+```
+╭──────────╮
+│content  T│
+│         a│
+│         b│
+╰───────┬──╯
+        │ (continues if more tabs below)
+```
+
+##### Summary: Which Thickness Side = 3, Which Line Gets Suppressed
+
+| `TabSide` | Thickness = 3 on | `HasFocus == true` suppresses | `HasFocus == false` draws | TabOffset axis |
+|-----------|------------------|-------------------------------|---------------------------|----------------|
+| Top       | `Thickness.Top`   | Bottom line of header         | Bottom line (closed)      | Horizontal     |
+| Bottom    | `Thickness.Bottom` | Top line of header           | Top line (closed)         | Horizontal     |
+| Left      | `Thickness.Left`  | Right line of header          | Right line (closed)       | Vertical       |
+| Right     | `Thickness.Right` | Left line of header           | Left line (closed)        | Vertical       |
+
+(HasFocus == true depicted):
 
 ### `Border.Thickness.Top = 1`
+
 
 (No dev will ever do this, but it is possible.)
 ```
@@ -302,7 +411,7 @@ The `TabOffset` property is always along the axis of the tab strip:
 - **Top/Bottom**: `TabOffset` is horizontal (columns from left edge)
 - **Left/Right**: `TabOffset` is vertical (rows from top edge)
 
-For `Border.BorderStyle == BorderStyle.Tab`, `BorderView.TabSide = Side.Top`, `Border.Thickness.Top = 3` and `BorderView.TabOffset = 2`, the rendering would look like this:
+For `Border.BorderStyle == BorderStyle.Tab`, `BorderView.TabSide = Side.Top`, `Border.Thickness.Top = 3` and `BorderView.TabOffset = 2`, the rendering would look like this (HasFocus == false depicted):
 ```
   ╭───╮
   │Tab│

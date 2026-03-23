@@ -192,7 +192,7 @@ public partial class BorderView : AdornmentView
 }
 #endif
 
-    internal Rectangle GetBorderBounds ()
+    private Rectangle GetBorderBounds ()
     {
         Rectangle screenRect = ViewportToScreen (Viewport);
 
