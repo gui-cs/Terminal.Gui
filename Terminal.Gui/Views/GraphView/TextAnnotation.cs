@@ -23,7 +23,8 @@ public class TextAnnotation : IAnnotation
 
     /// <summary>Draws the annotation</summary>
     /// <param name="graph"></param>
-    public void Render (GraphView graph)
+    /// <param name="drawContext"></param>
+    public void Render (GraphView graph, DrawContext? drawContext)
     {
         if (ScreenPosition.HasValue)
         {

@@ -48,13 +48,14 @@ public class TabView : View, IDesignable
         Border!.Thickness = new Thickness (1, 0, 1, 1);
 
         _tabRow = new TabRow ();
-        Padding!.Add (_tabRow);
+        PaddingView paddingView = (PaddingView)Padding!.GetOrCreateView ();
+        paddingView.Add (_tabRow);
 
         // Default: tabs on top — reserve 3 rows in Padding.Top for TabRow
         Padding.Thickness = Padding.Thickness with { Top = 3 };
         _tabRow.Y = 0;
 
-        Padding.TabStop = TabBehavior.TabStop;
+        paddingView.TabStop = TabBehavior.TabStop;
 
         // Recompute border gaps after all subviews (including Padding's TabRow) are laid out
         SubViewsLaidOut += (_, _) => _tabRow.UpdateBorderGaps ();

@@ -678,7 +678,7 @@ public class TabViewTests (ITestOutputHelper output) : TestDriverBase
         tabView.SelectedTabIndex = 0;
 
         // Get the tab row's header views (Padding -> TabRow -> headers)
-        View [] paddingSubViews = [.. tabView.Padding!.SubViews];
+        View [] paddingSubViews = [.. tabView.Padding!.View!.SubViews];
         Assert.NotEmpty (paddingSubViews);
 
         View tabRow = paddingSubViews [0];
@@ -704,7 +704,7 @@ public class TabViewTests (ITestOutputHelper output) : TestDriverBase
         tabView.Add (tab1, tab2);
         tabView.SelectedTabIndex = 1;
 
-        View [] paddingSubViews = [.. tabView.Padding!.SubViews];
+        View [] paddingSubViews = [.. tabView.Padding!.View!.SubViews];
         View tabRow = paddingSubViews [0];
         View [] headers = [.. tabRow.SubViews];
 
@@ -728,7 +728,7 @@ public class TabViewTests (ITestOutputHelper output) : TestDriverBase
         tabView.Add (tab1, tab2, tab3);
         tabView.SelectedTabIndex = 0;
 
-        View [] paddingSubViews = [.. tabView.Padding!.SubViews];
+        View [] paddingSubViews = [.. tabView.Padding!.View!.SubViews];
         View tabRow = paddingSubViews [0];
         View [] headers = [.. tabRow.SubViews];
 
@@ -757,7 +757,7 @@ public class TabViewTests (ITestOutputHelper output) : TestDriverBase
         tabView.SelectedTabIndex = 0;
 
         // Verify the mouse binding exists on the header
-        View [] paddingSubViews = [.. tabView.Padding!.SubViews];
+        View [] paddingSubViews = [.. tabView.Padding!.View!.SubViews];
         View tabRow = paddingSubViews [0];
         View [] headers = [.. tabRow.SubViews];
 
@@ -803,7 +803,7 @@ public class TabViewTests (ITestOutputHelper output) : TestDriverBase
         tabView.SelectedTabIndex = 0;
 
         // Get reference to TabRow before disposing
-        View [] paddingSubViews = [.. tabView.Padding!.SubViews];
+        View [] paddingSubViews = [.. tabView.Padding!.View!.SubViews];
         View tabRow = paddingSubViews [0];
 
         tabView.Dispose ();
@@ -826,7 +826,7 @@ public class TabViewTests (ITestOutputHelper output) : TestDriverBase
         tabView.Layout ();
 
         // Get references to header views before disposing
-        View [] paddingSubViews = [.. tabView.Padding!.SubViews];
+        View [] paddingSubViews = [.. tabView.Padding!.View!.SubViews];
         View tabRow = paddingSubViews [0];
         View [] headers = [.. tabRow.SubViews];
 
@@ -872,9 +872,9 @@ public class TabViewTests (ITestOutputHelper output) : TestDriverBase
         tabView.Add (tab1);
 
         // Capture adornment references before disposing
-        Adornment? padding = tabView.Padding;
-        Adornment? border = tabView.Border;
-        Adornment? margin = tabView.Margin;
+        Padding? padding = tabView.Padding;
+        Border? border = tabView.Border;
+        Margin? margin = tabView.Margin;
 
         Assert.NotNull (padding);
         Assert.NotNull (border);
@@ -883,9 +883,9 @@ public class TabViewTests (ITestOutputHelper output) : TestDriverBase
         tabView.Dispose ();
 
 #if DEBUG_IDISPOSABLE
-        Assert.True (padding!.WasDisposed);
-        Assert.True (border!.WasDisposed);
-        Assert.True (margin!.WasDisposed);
+        Assert.True (padding!.View?.WasDisposed ?? true);
+        Assert.True (border!.View?.WasDisposed ?? true);
+        Assert.True (margin!.View?.WasDisposed ?? true);
 #endif
 
         // After dispose, adornments should be null
@@ -964,7 +964,7 @@ public class TabViewTests (ITestOutputHelper output) : TestDriverBase
         tabView.Add (tab1);
 
         // Get the TabRow and capture its header views
-        View [] paddingSubViews = [.. tabView.Padding!.SubViews];
+        View [] paddingSubViews = [.. tabView.Padding!.View!.SubViews];
         View tabRow = paddingSubViews [0];
         View [] oldHeaders = [.. tabRow.SubViews];
         Assert.Single (oldHeaders);
@@ -997,7 +997,7 @@ public class TabViewTests (ITestOutputHelper output) : TestDriverBase
         Tab tab1 = new () { Title = "T1" };
         tabView.Add (tab1);
 
-        View [] paddingSubViews = [.. tabView.Padding!.SubViews];
+        View [] paddingSubViews = [.. tabView.Padding!.View!.SubViews];
         View tabRow = paddingSubViews [0];
 
         // Capture headers from first RebuildHeaders call

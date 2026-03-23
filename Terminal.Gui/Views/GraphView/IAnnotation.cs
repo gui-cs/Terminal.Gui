@@ -22,5 +22,6 @@ public interface IAnnotation
     ///     <see cref="View.Viewport"/> to avoid drawing outside of graph.
     /// </summary>
     /// <param name="graph"></param>
-    void Render (GraphView graph);
+    /// <param name="drawContext"></param>
+    void Render (GraphView graph, DrawContext? drawContext);
 }

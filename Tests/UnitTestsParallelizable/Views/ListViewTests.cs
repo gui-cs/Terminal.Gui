@@ -766,18 +766,24 @@ Three",
         app.Init (DriverRegistry.Names.ANSI);
 
         ListView lv = new () { Width = 10, Height = 3 };
-        lv.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
         lv.SetSource (["One", "Two", "Three", "Four", "Five"]);
         Runnable top = new ();
         top.Add (lv);
         app.Begin (top);
 
+        // Scrollbar settings can only be applied after Init
+        lv.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+        lv.Layout ();
+        lv.Draw ();
+
         Assert.True (lv.VerticalScrollBar.Visible);
 
-        DriverAssert.AssertDriverContentsWithFrameAre (@"
-One      ▲
-Two      █
-Three    ▼",
+        DriverAssert.AssertDriverContentsWithFrameAre ("""
+
+                                                       One      ▲
+                                                       Two      █
+                                                       Three    ▼
+                                                       """,
                                                        _output,
                                                        app?.Driver);
 

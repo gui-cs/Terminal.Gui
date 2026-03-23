@@ -22,7 +22,7 @@ internal class TabRow : View
     }
 
     /// <summary>Gets the owning TabView by navigating: TabRow -> Padding (SuperView) -> TabView (Parent).</summary>
-    private TabView? TabView => (SuperView as Adornment)?.Parent as TabView;
+    private TabView? TabView => (SuperView as AdornmentView)?.Adornment?.Parent as TabView;
 
     /// <summary>Rebuilds tab header views from the current set of Tabs.</summary>
     internal void RebuildHeaders ()
@@ -275,7 +275,7 @@ internal class TabRow : View
         // horizontal continuation line produces ╮ (not ┤).
         if (tabsOnBottom)
         {
-            tabView.Border.RightGaps.Add (new BorderGap (tabView.Border.Frame.Height - 2, 2));
+            tabView.Border.RightGaps.Add (new BorderGap (tabView.Border.GetFrame ().Height - 2, 2));
         }
         else
         {
@@ -308,7 +308,7 @@ internal class TabRow : View
         int lineY = tabsOnBottom ? 0 : Frame.Height - 1;
 
         // Use the TabView's border rectangle for precise screen coordinates
-        Rectangle borderBounds = tabView.Border!.GetBorderRectangle ();
+        Rectangle borderBounds = ((BorderView)tabView.Border!.GetOrCreateView ()).GetBorderBounds ();
         int screenRightX = borderBounds.X + borderBounds.Width - 1;
 
         // The start position overlaps with the last header's right border
@@ -319,7 +319,7 @@ internal class TabRow : View
         {
             // The horizontal continuation line auto-joins with the Border's segmented right line
             // at the endpoint to produce the corner junction (e.g., ╮ for tabs on top).
-            LineCanvas.AddLine (screenStart, lineLength, Orientation.Horizontal, tabView.BorderStyle);
+            LineCanvas.AddLine (screenStart, lineLength, Orientation.Horizontal, tabView.BorderStyle ?? LineStyle.Single);
         }
 
         return base.OnDrawingContent (context);

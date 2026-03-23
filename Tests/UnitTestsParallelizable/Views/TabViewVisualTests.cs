@@ -702,7 +702,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         tabView.Layout ();
 
         // Get tab headers
-        View [] paddingSubViews = [.. tabView.Padding!.SubViews];
+        View [] paddingSubViews = [.. tabView.Padding!.View!.SubViews];
         View tabRow = paddingSubViews [0];
         View [] headers = [.. tabRow.SubViews];
 
@@ -732,7 +732,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
 
         tabView.Layout ();
 
-        View [] paddingSubViews = [.. tabView.Padding!.SubViews];
+        View [] paddingSubViews = [.. tabView.Padding!.View!.SubViews];
         View tabRow = paddingSubViews [0];
         View [] headers = [.. tabRow.SubViews];
 
@@ -759,7 +759,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
 
         tabView.Layout ();
 
-        View [] paddingSubViews = [.. tabView.Padding!.SubViews];
+        View [] paddingSubViews = [.. tabView.Padding!.View!.SubViews];
         View tabRow = paddingSubViews [0];
         View [] headers = [.. tabRow.SubViews];
 
@@ -788,7 +788,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         tabView.SelectedTabIndex = 0;
         tabView.Layout ();
 
-        View [] paddingSubViews = [.. tabView.Padding!.SubViews];
+        View [] paddingSubViews = [.. tabView.Padding!.View!.SubViews];
         View tabRow = paddingSubViews [0];
         View [] headers = [.. tabRow.SubViews];
 
@@ -813,7 +813,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         tabView.SelectedTabIndex = 0;
         tabView.Layout ();
 
-        View [] paddingSubViews = [.. tabView.Padding!.SubViews];
+        View [] paddingSubViews = [.. tabView.Padding!.View!.SubViews];
         View tabRow = paddingSubViews [0];
         View [] headers = [.. tabRow.SubViews];
 
@@ -905,7 +905,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         // When tabs are on bottom, the RightGap suppresses the bottom 2 rows of the right border
         Assert.NotEmpty (tabView.Border!.RightGaps);
         BorderGap gap = tabView.Border.RightGaps [0];
-        Assert.Equal (tabView.Border.Frame.Height - 2, gap.Position);
+        Assert.Equal (tabView.Border.GetFrame ().Height - 2, gap.Position);
         Assert.Equal (2, gap.Length);
     }
 
@@ -937,7 +937,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         Tab tab1 = new () { Title = "AA" };
         tabView.Add (tab1);
 
-        View [] paddingSubViews = [.. tabView.Padding!.SubViews];
+        View [] paddingSubViews = [.. tabView.Padding!.View!.SubViews];
         View tabRow = paddingSubViews [0];
         Assert.Single (tabRow.SubViews);
 
@@ -958,7 +958,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         Tab tab2 = new () { Title = "BB" };
         tabView.Add (tab1, tab2);
 
-        View [] paddingSubViews = [.. tabView.Padding!.SubViews];
+        View [] paddingSubViews = [.. tabView.Padding!.View!.SubViews];
         View tabRow = paddingSubViews [0];
         Assert.Equal (2, tabRow.SubViews.Count ());
 
@@ -982,7 +982,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         // Force layout
         tabView.Layout ();
 
-        View [] paddingSubViews = [.. tabView.Padding!.SubViews];
+        View [] paddingSubViews = [.. tabView.Padding!.View!.SubViews];
         View tabRow = paddingSubViews [0];
         View [] headers = [.. tabRow.SubViews];
 
@@ -1027,7 +1027,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         app.Begin (top);
 
         // 3 tabs: AA(4) + BB(3) + CC(3) = 10 total width (overlapping borders)
-        View tabRow = tabView.Padding!.SubViews.First ();
+        View tabRow = tabView.Padding!.View!.SubViews.First ();
         Assert.Equal (10, tabRow.GetContentSize ().Width);
 
         top.Dispose ();
@@ -1065,7 +1065,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         top.Layout ();
         top.Draw ();
 
-        View tabRow = tabView.Padding!.SubViews.First ();
+        View tabRow = tabView.Padding!.View!.SubViews.First ();
 
         // Viewport.X should have scrolled right to show CC
         Assert.True (tabRow.Viewport.X > 0);
@@ -1114,7 +1114,7 @@ public class TabViewVisualTests (ITestOutputHelper output) : TestDriverBase
         top.Layout ();
         top.Draw ();
 
-        View tabRow = tabView.Padding!.SubViews.First ();
+        View tabRow = tabView.Padding!.View!.SubViews.First ();
 
         // Viewport.X should be back to 0
         Assert.Equal (0, tabRow.Viewport.X);
