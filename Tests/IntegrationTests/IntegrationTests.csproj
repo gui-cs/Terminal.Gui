@@ -34,7 +34,7 @@
         <ProjectReference Include="..\..\Tests\AppTestHelpers.XunitHelpers\AppTestHelpers.XunitHelpers.csproj" />
         <ProjectReference Include="..\..\Tests\AppTestHelpers\AppTestHelpers.csproj" />
         <ProjectReference Include="..\..\Examples\UICatalog\UICatalog.csproj" />
-        <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
+        <ProjectReference Include="..\UnitTests.Legacy\UnitTests.Legacy.csproj" />
     </ItemGroup>
     <ItemGroup>
         <Using Include="Xunit" />
