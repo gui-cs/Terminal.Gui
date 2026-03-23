@@ -670,38 +670,95 @@ At the content right border column: `╮` at row 0 (content top-right), `│` on
 
 This same principle applies to `Side.Left` overflow (mirrored) and to `Side.Top`/`Side.Bottom` overflow on the horizontal axis.
 
+### Implementation Approach: General-Purpose `TabHeaderRenderer`
+
+Rather than implementing Side.Top first and generalizing later, we build a **standalone, side-agnostic drawing algorithm** from the start. The algorithm is parameterized by `Side` — no per-side code paths, just coordinate transforms.
+
+**Why this works:** LineCanvas auto-join handles all junction glyph resolution. A tab header is just 3 additional line segments (the outer sides of the header rectangle) added to the same LineCanvas as the content border. For `HasFocus == false`, a 4th closing line is added and auto-join produces the junction glyphs (`├`, `┤`, `┬`, `┴`). For `HasFocus == true`, the closing line is omitted and the content border is excluded in the gap region.
+
+**Core algorithm (any side):**
+
+```
+1. Compute headerRect from (side, tabOffset, tabTextLength, contentBorderRect)
+2. Clip headerRect to viewBounds (overflow → partial header)
+3. Add 3 outer header border lines to LineCanvas (the sides NOT adjacent to content)
+4. If !hasFocus → add closing line (adjacent to content); auto-join gives junctions
+5. If hasFocus → Exclude content border in the gap (header interior width/height)
+6. Draw tab text inside clipped header (horizontal for Top/Bottom, vertical for Left/Right)
+```
+
+Steps 3–5 use coordinate rotation based on `Side`: each side defines which edge is "outer", "left-perp", "right-perp", and "closing". The math is identical across all sides.
+
+#### New files
+
+| File | Purpose |
+|------|---------|
+| `Terminal.Gui/Drawing/TabHeaderRenderer.cs` | `internal static class TabHeaderRenderer` — pure drawing helper. Takes `LineCanvas`, `Side`, offset, text, hasFocus, bounds, `LineStyle`, `Attribute`. Adds lines and exclusions. Also uses `TextFormatter` for text. **No dependency on Border/BorderView/View.** |
+| `Tests/UnitTestsParallelizable/Drawing/TabHeaderRendererTests.cs` | TDD tests using `CreateTestDriver()` + `GetCanvas()` pattern from `LineCanvasTests`. Each test creates a LineCanvas, adds content border lines, calls `TabHeaderRenderer`, draws, and asserts with `DriverAssert.AssertDriverContentsAre`. |
+
+#### Test-driven development order
+
+Tests are written first, then the algorithm is iterated until they pass. Tests use the `TestDriverBase` + `GetCanvas` pattern (no Application.Init needed).
+
+**Round 1 — Side.Top, HasFocus == false:**
+- `Tab_Top_Unfocused_TabOffset0` — `├───┴───╮` junction row
+- `Tab_Top_Unfocused_TabOffset2` — `╭─┴───┴──╮` with ┴ junctions
+- `Tab_Top_Unfocused_Overflow` — header clipped at right edge
+
+**Round 2 — Side.Top, HasFocus == true:**
+- `Tab_Top_Focused_TabOffset0` — open gap, `│` continues left border
+- `Tab_Top_Focused_TabOffset2` — `╯` and `╰` curves with gap
+
+**Round 3 — Side.Bottom (mirror of Top):**
+- Unfocused and focused variants, same test structure
+
+**Round 4 — Side.Left and Side.Right:**
+- Vertical text, `┤`/`├` junctions, header height = textLen + 2
+- Overflow clipping at bottom edge
+- Focused overflow (the gap nuance with content corner interaction)
+
+**Round 5 — Edge cases:**
+- Header wider/taller than view (fully clipped)
+- Negative TabOffset (overflow at start edge)
+- Single-character tab text
+- Empty tab text
+
 ### Steps
 
-#### 1. Get `Side.Top` working and tested
+#### 1. Create `TabHeaderRenderer` and tests (all sides)
+
+**Files:** `Terminal.Gui/Drawing/TabHeaderRenderer.cs`, `Tests/UnitTestsParallelizable/Drawing/TabHeaderRendererTests.cs`
+
+1. Create test file with Round 1 tests (Side.Top, unfocused)
+2. Create `TabHeaderRenderer` with the general algorithm
+3. Iterate until Round 1 tests pass
+4. Add Round 2–5 tests incrementally, fixing the algorithm as needed
+5. All tests use `DriverAssert.AssertDriverContentsAre` with exact expected output matching the visual examples in this spec
+
+#### 2. Wire `TabHeaderRenderer` into `BorderView`
 
 **Files:** `BorderSettings.cs`, `Border.cs`, `BorderView.cs`
 
 1. Add `BorderSettings.Tab = 4`
-2. Add `BorderView.TabSide` (Side), default `Side.Top`
-3. Add `BorderView.TabOffset` (int), `Border.TabWidth` (computed)
-4. In `OnDrawingContent`, when `Tab` is set:
-   - Draw header rectangle at `TabOffset` (top, left, right, and conditionally bottom)
-   - Draw title text inside header
-   - If `Parent.HasFocus == true`: draw content top line in segments around the header, plus left/right/bottom normally
-   - If `Parent.HasFocus == false`: draw content top line across bottom of header, plus left/right/bottom normally
-   - Handle transparency for the header area
-5. New Unit tests for Border tab rendering in isolation (in `UnitTestsParallelizable`)
-6. Enhance `BorderEditor` to support editing `Tab` settings.
-7. Enhanced `Adornments` Scenario (should not require any work if `BorderEditor` is updated correctly) to include a `Border` with `Tab` settings, allowing visual testing of the tab rendering in the Adornments scenario.
+2. Add `Border.TabSide` (`Side`, default `Side.Top`), `Border.TabOffset` (`int`), `Border.TabText` (`string`)
+3. In `BorderView.OnDrawingContent`, when `Tab` flag is set, call `TabHeaderRenderer` with the parent's `LineCanvas`, border bounds, and tab properties
+4. Add integration tests verifying Border+Tab rendering end-to-end
 
-#### 2. Get `Side.Bottom` working and tested
+#### 3. Enhance `BorderEditor` and Adornments scenario
 
-Should be fairly mechanical given Top.
+**Files:** `Examples/UICatalog/Scenarios/EditorsAndHelpers/BorderEditor.cs`
 
-#### 3. Get `Side.Left` and `Side.Right` working and tested 
+1. Add UI for `BorderSettings.Tab` toggle, `TabSide` selector, `TabOffset` NumericUpDown, `TabText` TextField
+2. Adornments scenario should work automatically if BorderEditor is updated correctly
 
-Should be fairly mechanical given the above.
+### Exit Criteria
 
-### Exit Critera
-
-- Robust new tests that both logically and visually prove the `BorderSettings.Tab` and related functionality work
-- All four `Side`s supported
-- `BorderEditor` supports changing `BorderSettings`, `BorderSides`, `TabOffset` (numericupdown), and `TabWidth` (numericupdown) implemented.
+- `TabHeaderRenderer` is a standalone, fully-tested drawing helper with no View/Border dependencies
+- All four `Side`s produce correct output matching the visual examples in this spec
+- HasFocus == true/false variants all correct, including overflow cases
+- `BorderView` calls `TabHeaderRenderer` when `BorderSettings.Tab` is set
+- `BorderEditor` supports all tab properties
+- All existing tests still pass
 
 ## Phase 2 - "TabView" Style - Enables a replacement for the old TabView
 
