@@ -24,6 +24,7 @@ public class Adornments : Scenario
         AdornmentsEditor adornmentsEditor = new ()
         {
             BorderStyle = LineStyle.Single,
+            AutoSelectViewToEdit = true,
 
             // This is for giggles, to show that the editor can be moved around.
             Arrangement = ViewArrangement.Movable,
@@ -35,6 +36,7 @@ public class Adornments : Scenario
         ViewportSettingsEditor viewportSettingsEditor = new ()
         {
             BorderStyle = LineStyle.Single,
+            AutoSelectViewToEdit = true,
 
             // This is for giggles, to show that the editor can be moved around.
             Arrangement = ViewArrangement.Movable,
@@ -43,28 +45,17 @@ public class Adornments : Scenario
 
         viewportSettingsEditor.Border.Thickness = new Thickness (1, 2, 1, 1);
 
-        Button appButton = new () { X = Pos.Center (), Y = 4, Text = "_SubView of Window" };
+        Button appButton = new () { X = Pos.Center (), Y = 1, Text = "_SubView of Window" };
         appWindow.Add (appButton);
-
-        appWindow.ClearingViewport += (s, e) =>
-                                      {
-                                          if (s is View sender)
-                                          {
-                                              sender.FillRect (sender.Viewport, Glyphs.Diamond);
-                                          }
-
-                                          e.Cancel = true;
-                                      };
 
         Window window = new ()
         {
             Title = "The _Window",
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
-            X = 5,
-            Y = 5,
-            Width = Dim.Fill (adornmentsEditor) - 1,
-            Height = Dim.Fill (viewportSettingsEditor) - 1
+            Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable,
+            Width = Dim.Fill (adornmentsEditor),
+            Height = Dim.Fill (viewportSettingsEditor)
         };
+        appWindow.Add (window);
 
         TextField tf1 = new () { Width = 10, Text = "TextField" };
         ColorPicker16 color = new () { Title = "BG", BoxHeight = 1, BoxWidth = 1, X = Pos.AnchorEnd () };
@@ -109,15 +100,14 @@ public class Adornments : Scenario
 
         window.Margin.GetOrCreateView ();
         window.Margin.View?.Text = "Margin Text";
-        window.Margin.Thickness = new Thickness (0);
+        window.Margin.Thickness = new Thickness (2);
 
         window.Border.GetOrCreateView ();
-
         //window.Border.View.Text = "Border Text";
         window.Border.Thickness = new Thickness (3);
         window.Border.View?.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
 
-        window.Padding.GetOrCreateView ();
+        window.Border.GetOrCreateView ();
         window.Padding.View?.Text = "Padding Text line 1\nPadding Text line 3\nPadding Text line 3\nPadding Text line 4\nPadding Text line 5";
         window.Padding.Thickness = new Thickness (1);
         window.Padding.View?.SetScheme (SchemeManager.GetScheme (Schemes.Menu));
@@ -127,34 +117,43 @@ public class Adornments : Scenario
         longLabel.TextFormatter.WordWrap = true;
         window.Add (tf1, color, button, label, btnButtonInWindow, labelAnchorEnd, longLabel);
 
-        // NOTE: Adding SubViews to Margin is not supported
+        window.Initialized += (_, _) =>
+                              {
+                                  adornmentsEditor.ViewToEdit = window;
 
-        Button btnButtonInBorder = new () { X = 0, Y = Pos.AnchorEnd (), Text = "Button in Border Y = AnchorEnd", ShadowStyle = ShadowStyles.None };
+                                  adornmentsEditor.ShowViewIdentifier = true;
 
-        btnButtonInBorder.Accepting += (_, args) =>
-                                       {
-                                           MessageBox.Query (appWindow.App!, 20, 7, "Hi", "Button in Border Pressed!", "Ok");
-                                           args.Handled = true;
-                                       };
-        window.Border.GetOrCreateView ().Add (btnButtonInBorder);
+                                  // NOTE: Adding SubViews to Margin is not supported
 
-        Label labelInPadding = new () { X = 0, Y = 1, Title = "_Text:" };
+                                  Button btnButtonInBorder = new () { X = Pos.Center (), Y = Pos.AnchorEnd (), Text = "Button in Border Y = AnchorEnd" };
 
-        window.Padding.GetOrCreateView ().Add (labelInPadding);
+                                  btnButtonInBorder.Accepting += (_, args) =>
+                                                                 {
+                                                                     MessageBox.Query (appWindow.App!, 20, 7, "Hi", "Button in Border Pressed!", "Ok");
+                                                                     args.Handled = true;
+                                                                 };
+                                  window.Border.GetOrCreateView ().Add (btnButtonInBorder);
 
-        TextField textFieldInPadding = new () { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 10, Text = "text (Y = 1)" };
+                                  Label labelInPadding = new () { X = 0, Y = 1, Title = "_Text:" };
+                                  window.Padding.GetOrCreateView ().Add (labelInPadding);
 
-        textFieldInPadding.Accepting += (_, _) => MessageBox.Query (appWindow.App!, 20, 7, "TextField", textFieldInPadding.Text, "Ok");
-        window.Padding.GetOrCreateView ().Add (textFieldInPadding);
+                                  TextField textFieldInPadding = new ()
+                                  {
+                                      X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 10, Text = "text (Y = 1)"
+                                  };
 
-        Button btnButtonInPadding = new () { X = Pos.Center (), Y = 1, Text = "_Button in Padding Y = AE", ShadowStyle = ShadowStyles.None };
+                                  textFieldInPadding.Accepting +=
+                                      (_, _) => MessageBox.Query (appWindow.App!, 20, 7, "TextField", textFieldInPadding.Text, "Ok");
+                                  window.Padding.GetOrCreateView ().Add (textFieldInPadding);
 
-        btnButtonInPadding.Accepting += (_, args) =>
-                                        {
-                                            MessageBox.Query (appWindow.App!, 20, 7, "Hi", "Button in Padding Pressed!", "Ok");
-                                            args.Handled = true;
-                                        };
-        window.Padding.GetOrCreateView ().Add (btnButtonInPadding);
+                                  Button btnButtonInPadding = new () { X = Pos.Center (), Y = 1, Text = "_Button in Padding Y = 1", CanFocus = true };
+
+                                  btnButtonInPadding.Accepting += (_, args) =>
+                                                                  {
+                                                                      MessageBox.Query (appWindow.App!, 20, 7, "Hi", "Button in Padding Pressed!", "Ok");
+                                                                      args.Handled = true;
+                                                                  };
+                                  window.Padding.GetOrCreateView ().Add (btnButtonInPadding);
 
 #if SUBVIEW_BASED_BORDER
                                 btnButtonInPadding.Border.CloseButton.Visible = true;
@@ -168,19 +167,18 @@ public class Adornments : Scenario
 
                                 view.Accept += (_, _) => MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
 #endif
+                              };
 
         adornmentsEditor.AutoSelectViewToEdit = true;
         adornmentsEditor.AutoSelectSuperView = window;
         adornmentsEditor.AutoSelectAdornments = true;
-        adornmentsEditor.ShowViewIdentifier = true;
 
         viewportSettingsEditor.AutoSelectViewToEdit = true;
         viewportSettingsEditor.AutoSelectSuperView = window;
         viewportSettingsEditor.AutoSelectAdornments = true;
         viewportSettingsEditor.ShowViewIdentifier = true;
 
-        appWindow.Add (window, adornmentsEditor, viewportSettingsEditor);
-        window.SetFocus ();
+        appWindow.Add (adornmentsEditor, viewportSettingsEditor);
 
         app.Run (appWindow);
     }

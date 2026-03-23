@@ -32,6 +32,8 @@ public sealed class ViewportSettingsEditor : EditorBase
 
         UpdatingLayoutSettings = true;
 
+        _viewportEditor?.Enabled = ViewToEdit is not AdornmentView;
+
         _viewportEditor?.Value = ViewToEdit?.Viewport;
 
         if (ViewToEdit?.ContentSizeTracksViewport is false)
@@ -135,7 +137,7 @@ public sealed class ViewportSettingsEditor : EditorBase
                 || vea.NewValue.Value.Height < 0
                 || vea.NewValue.Value.X < 0
                 || vea.NewValue.Value.Y < 0
-                )
+                || ViewToEdit is AdornmentView)
             {
                 vea.Handled = true;
 

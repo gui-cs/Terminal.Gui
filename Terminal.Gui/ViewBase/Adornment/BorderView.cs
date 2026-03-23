@@ -454,6 +454,7 @@ public partial class BorderView : AdornmentView
     }
 
     /// <summary>
+    /// <summary>
     ///     Gets the screen-coordinate rectangle of the title text from the last draw pass.
     ///     Used by the parent view to build drawn region for transparent border clip exclusion.
     /// </summary>
