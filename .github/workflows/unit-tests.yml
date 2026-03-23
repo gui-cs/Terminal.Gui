@@ -62,8 +62,6 @@ jobs:
       with:
         name: non_parallel_unittests-logs-${{ runner.os }}
         path: |
-          logs/UnitTests.Legacy/
-          Tests/UnitTests.Legacy/logs/
           logs/UnitTests.NonParallelizable/
           Tests/UnitTests.NonParallelizable/logs/
           TestResults/
