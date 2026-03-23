@@ -13,11 +13,16 @@ public class SynchronizationContextTests
     [Fact]
     public void Init_SetsSynchronizationContext_Shutdown_ClearsIt ()
     {
-        Application.Init (DriverRegistry.Names.ANSI);
+        try
+        {
+            Application.Init (DriverRegistry.Names.ANSI);
 
-        Assert.NotNull (SynchronizationContext.Current);
-
-        Application.Shutdown ();
+            Assert.NotNull (SynchronizationContext.Current);
+        }
+        finally
+        {
+            Application.Shutdown ();
+        }
 
         Assert.Null (SynchronizationContext.Current);
     }
@@ -25,14 +30,19 @@ public class SynchronizationContextTests
     [Fact]
     public void Init_SynchronizationContext_CreateCopy_ReturnsDifferentInstance ()
     {
-        Application.Init (DriverRegistry.Names.ANSI);
+        try
+        {
+            Application.Init (DriverRegistry.Names.ANSI);
 
-        SynchronizationContext context = SynchronizationContext.Current!;
-        SynchronizationContext copy = context.CreateCopy ();
+            SynchronizationContext context = SynchronizationContext.Current!;
+            SynchronizationContext copy = context.CreateCopy ();
 
-        Assert.NotNull (copy);
-        Assert.NotSame (context, copy);
-
-        Application.Shutdown ();
+            Assert.NotNull (copy);
+            Assert.NotSame (context, copy);
+        }
+        finally
+        {
+            Application.Shutdown ();
+        }
     }
 }
