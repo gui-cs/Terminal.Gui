@@ -651,4 +651,94 @@ public class BorderTransparentTests (ITestOutputHelper output)
                                               output,
                                               app.Driver);
     }
+
+    /// <summary>
+    ///     Verifies that when an adornment (Padding) is transparent and has Text,
+    ///     the Text is opaque (drawn cells occlude underlying peer SubViews),
+    ///     while undrawn cells in the Padding are transparent and show peer SubViews through.
+    /// </summary>
+    [Fact]
+    public void Padding_Transparent_Text_Is_Opaque_Over_Peer_SubViews ()
+    {
+        // Copilot
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (12, 6);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        // Fill window background with 'X' to detect transparency
+        window.ClearingViewport += (_, args) =>
+                                   {
+                                       window.FillRect (args.NewViewport, new Rune ('X'));
+                                       args.Cancel = true;
+                                   };
+
+        // A peer subview that will overlap with borderedView's thick padding area
+        // "PEER" at screen (1,1) will be entirely in the padding band
+        View peerView = new ()
+        {
+            Text = "PEER",
+            X = 1,
+            Y = 1,
+            Width = Dim.Auto (),
+            Height = Dim.Auto ()
+        };
+        window.Add (peerView);
+
+        // A view with transparent thick top-padding that has text
+        View borderedView = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 5,
+            BorderStyle = LineStyle.Single
+        };
+
+        // Padding only on top (2 cells thick) to keep geometry simple
+        borderedView.Padding!.ViewportSettings |= ViewportSettingsFlags.Transparent;
+        borderedView.Padding.Thickness = new Thickness (0, 2, 0, 0);
+        borderedView.Padding.GetOrCreateView ();
+        borderedView.Padding.View!.Text = "Pad";
+
+        window.Add (borderedView);
+        app.Begin (window);
+
+        // Layout (12x6):
+        //
+        //        0123456789AB
+        // Row 0: ┌────────┐XX  border top
+        // Row 1: │Pad     │XX  padding row 1: "Pad" text is OPAQUE; cols 4+ are transparent → peer "R" + window "X"s show
+        // Row 2: │        │XX  padding row 2: all transparent → X's from window show through
+        // Row 3: │        │XX  content area (opaque)
+        // Row 4: └────────┘XX  border bottom
+        // Row 5: XXXXXXXXXXXX  window background
+        //
+        // Peer "PEER" at (1,1): P(1,1) E(2,1) E(3,1) R(4,1)
+        // Padding text "Pad" at padding viewport (0,0): P→screen(1,1) a→screen(2,1) d→screen(3,1)
+        //
+        // At screen (1,1): Padding drew "P" → opaque → "P"
+        // At screen (2,1): Padding drew "a" → opaque → "a"
+        // At screen (3,1): Padding drew "d" → opaque → "d"
+        // At screen (4,1): Padding undrawn → transparent → peer "R" shows through → "R"
+        // At screen (5-8,1): Padding undrawn → transparent → window "X" shows through
+        //
+        // Row 2: Padding undrawn → transparent → window "X" should show through
+        //
+        // This test currently FAILS because transparent padding text does not occlude properly.
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌────────┐XX
+                                              │PadRXXXX│XX
+                                              │XXXXXXXX│XX
+                                              │        │XX
+                                              └────────┘XX
+                                              XXXXXXXXXXXX
+                                              """,
+                                              output,
+                                              app.Driver);
+    }
 }

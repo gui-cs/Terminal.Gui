@@ -43,6 +43,15 @@ public sealed class Transparent : Scenario
         };
         appWindow.Add (viewportSettingsEditor);
 
+        AdornmentsEditor adornmentsEditor = new ()
+        {
+            BorderStyle = LineStyle.Single,
+            X = Pos.AnchorEnd (),
+            AutoSelectViewToEdit = true
+        };
+        adornmentsEditor.Border.Thickness = new Thickness (1, 2, 1, 1);
+        appWindow.Add (adornmentsEditor);
+
         Button appButton = new () { X = 10, Y = 4, Title = "_AppButton" };
 
         appButton.Accepting += (sender, args) =>

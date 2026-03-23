@@ -152,7 +152,7 @@ public class Adornments : Scenario
 
         Button btnButtonInPadding = new ()
         {
-            X = Pos.Center (), Y = Pos.AnchorEnd (), Text = "_Button in Padding Y = AE",
+            X = Pos.Center (), Y = 1, Text = "_Button in Padding Y = AE",
             ShadowStyle = ShadowStyles.None
         };
 
