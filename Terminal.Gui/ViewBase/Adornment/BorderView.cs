@@ -278,6 +278,15 @@ public partial class BorderView : AdornmentView
                                                       titleRect,
                                                       GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
                                                       GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
+
+            // Cache the title rect for the parent's DoDrawComplete to use when building
+            // drawn region for transparent borders. The title is drawn directly (not via LineCanvas),
+            // so it won't be captured by RenderLineCanvas's region reporting.
+            LastTitleRect = titleRect;
+
+            // Report the title rect to the DrawContext so it participates in clip exclusion.
+            // This ensures the title occludes peer subviews when the Border is transparent.
+            context?.AddDrawnRectangle (titleRect);
             Adornment.Parent?.LineCanvas.Exclude (new Region (titleRect));
         }
 
@@ -443,6 +452,13 @@ public partial class BorderView : AdornmentView
 
         return true;
     }
+
+    /// <summary>
+    /// <summary>
+    ///     Gets the screen-coordinate rectangle of the title text from the last draw pass.
+    ///     Used by the parent view to build drawn region for transparent border clip exclusion.
+    /// </summary>
+    internal Rectangle? LastTitleRect { get; set; }
 
     /// <summary>
     ///     Gets the subview used to render <see cref="ViewDiagnosticFlags.DrawIndicator"/>.

@@ -30,7 +30,20 @@ public sealed class ViewportSettingsEditor : EditorBase
             return;
         }
 
+        UpdatingLayoutSettings = true;
+
         _viewportEditor?.Enabled = ViewToEdit is not AdornmentView;
+
+        _viewportEditor?.Value = ViewToEdit?.Viewport;
+
+        if (ViewToEdit?.ContentSizeTracksViewport is false)
+        {
+            _contentSizeEditor?.Value = ViewToEdit?.GetContentSize ();
+        }
+        else
+        {
+            _contentSizeEditor?.Value = ViewToEdit?.Viewport.Size;
+        }
 
         _cbAllowNegativeX?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeX) ? CheckState.Checked : CheckState.UnChecked;
 
@@ -66,6 +79,9 @@ public sealed class ViewportSettingsEditor : EditorBase
         _osHorizontalScrollBar?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar)
                                             ? ScrollBarVisibilityMode.Auto
                                             : ScrollBarVisibilityMode.None;
+
+        SetNeedsDraw ();
+        UpdatingLayoutSettings = false;
     }
 
     /// <inheritdoc/>
@@ -81,7 +97,15 @@ public sealed class ViewportSettingsEditor : EditorBase
         }
 
         _viewportEditor?.Value = ViewToEdit?.Viewport;
-        _contentSizeEditor?.Value = ViewToEdit?.GetContentSize ();
+
+        if (ViewToEdit?.ContentSizeTracksViewport is false)
+        {
+            _contentSizeEditor?.Value = ViewToEdit?.GetContentSize ();
+        }
+        else
+        {
+            _contentSizeEditor?.Value = ViewToEdit?.Viewport.Size;
+        }
     }
 
     private CheckBox? _cbAllowNegativeX;
@@ -120,6 +144,11 @@ public sealed class ViewportSettingsEditor : EditorBase
                 return;
             }
 
+            if (UpdatingLayoutSettings)
+            {
+                return;
+            }
+
             ViewToEdit?.Viewport = vea.NewValue.Value;
         }
 
@@ -139,7 +168,12 @@ public sealed class ViewportSettingsEditor : EditorBase
                 return;
             }
 
-            ViewToEdit?.SetContentSize (cea.NewValue.Value);
+            if (UpdatingLayoutSettings)
+            {
+                return;
+            }
+
+            ViewToEdit?.SetContentSize (cea.NewValue!.Value);
         }
 
         _cbAllowNegativeX = new CheckBox { Y = Pos.Bottom (_contentSizeEditor), Title = "Allow X < 0", CanFocus = true };

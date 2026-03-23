@@ -51,10 +51,18 @@ public abstract class EditorBase : View
     public bool ShowViewIdentifier
     {
         get => Padding.Thickness != Thickness.Empty;
-        set => Padding.Thickness = value ? new Thickness (0, 2, 0, 0) : Thickness.Empty;
+        set
+        {
+            Padding.Thickness = value ? new Thickness (0, 2, 0, 0) : Thickness.Empty;
+
+            if (value)
+            {
+                Padding.GetOrCreateView ();
+            }
+        }
     }
 
-    public bool UpdatingLayoutSettings { get; private set; }
+    public bool UpdatingLayoutSettings { get; internal set; }
 
     private void View_LayoutComplete (object? sender, LayoutEventArgs e)
     {
@@ -97,7 +105,7 @@ public abstract class EditorBase : View
     {
         if (ShowViewIdentifier)
         {
-            Padding.View?.Text = ViewToEdit?.ToIdentifyingString () ?? "<none>";
+            Padding.GetOrCreateView ().Text = ViewToEdit?.ToIdentifyingString () ?? "<none>";
         }
     }
 
