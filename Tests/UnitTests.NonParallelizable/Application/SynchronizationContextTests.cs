@@ -5,23 +5,25 @@ namespace UnitTests.NonParallelizable.ApplicationTests;
 
 /// <summary>
 ///     Tests for the <see cref="SynchronizationContext"/> that is set during the Terminal.Gui application lifecycle.
-///     Must run non-concurrently because <see cref="Application.Init"/> and <see cref="Application.Shutdown"/> mutate
+///     Must run non-concurrently because <see cref="IApplication.Init"/> and <see cref="IDisposable.Dispose"/> mutate
 ///     the process-wide <see cref="SynchronizationContext.Current"/>.
 /// </summary>
 public class SynchronizationContextTests
 {
     [Fact]
-    public void Init_SetsSynchronizationContext_Shutdown_ClearsIt ()
+    public void Init_SetsSynchronizationContext_Dispose_ClearsIt ()
     {
+        IApplication app = Application.Create ();
+
         try
         {
-            Application.Init (DriverRegistry.Names.ANSI);
+            app.Init (DriverRegistry.Names.ANSI);
 
             Assert.NotNull (SynchronizationContext.Current);
         }
         finally
         {
-            Application.Shutdown ();
+            app.Dispose ();
         }
 
         Assert.Null (SynchronizationContext.Current);
@@ -30,9 +32,11 @@ public class SynchronizationContextTests
     [Fact]
     public void Init_SynchronizationContext_CreateCopy_ReturnsDifferentInstance ()
     {
+        IApplication app = Application.Create ();
+
         try
         {
-            Application.Init (DriverRegistry.Names.ANSI);
+            app.Init (DriverRegistry.Names.ANSI);
 
             SynchronizationContext context = SynchronizationContext.Current!;
             SynchronizationContext copy = context.CreateCopy ();
@@ -42,7 +46,7 @@ public class SynchronizationContextTests
         }
         finally
         {
-            Application.Shutdown ();
+            app.Dispose ();
         }
     }
 }
