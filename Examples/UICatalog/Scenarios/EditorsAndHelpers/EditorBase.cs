@@ -62,7 +62,7 @@ public abstract class EditorBase : View
         }
     }
 
-    public bool UpdatingLayoutSettings { get; private set; }
+    public bool UpdatingLayoutSettings { get; internal set; }
 
     private void View_LayoutComplete (object? sender, LayoutEventArgs e)
     {

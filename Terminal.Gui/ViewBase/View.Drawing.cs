@@ -148,7 +148,7 @@ public partial class View // Drawing APIs
             // ------------------------------------
             // Re-draw the Border and Padding Adornment SubViews
             // HACK: This is a hack to ensure that the Border and Padding Adornment SubViews are drawn after the line canvas.
-            DoDrawAdornmentsSubViews ();
+            DoDrawAdornmentsSubViews (context);
 
             // ------------------------------------
             // Advance the diagnostics draw indicator
@@ -179,7 +179,7 @@ public partial class View // Drawing APIs
 
     #region DrawAdornments
 
-    private void DoDrawAdornmentsSubViews ()
+    private void DoDrawAdornmentsSubViews (DrawContext? context)
     {
         // Only process Margin here if it is not Transparent. Transparent Margins are drawn in a separate pass in the static View.Draw
         // via Margin.DrawTransparentMargins.
@@ -214,6 +214,13 @@ public partial class View // Drawing APIs
             Region? saved = borderView.AddFrameToClip ();
             borderView.DoDrawSubViews ();
             SetClip (saved);
+
+            // Track drawn subview areas so DoDrawComplete can exclude them from clip
+            // even when Border is transparent.
+            foreach (View subview in borderView.SubViews.Where (v => v.Visible && v.Id != "DrawIndicator"))
+            {
+                context?.AddDrawnRectangle (subview.FrameToScreen ());
+            }
         }
 
         if (Padding.View is not { SubViews.Count: > 0 } paddingView || Padding.Thickness == Thickness.Empty)
@@ -231,6 +238,12 @@ public partial class View // Drawing APIs
         Region? savedPadding = paddingView.AddFrameToClip ();
         paddingView.DoDrawSubViews ();
         SetClip (savedPadding);
+
+        // Track drawn subview areas for Padding transparency support.
+        foreach (View subview in paddingView.SubViews.Where (v => v.Visible))
+        {
+            context?.AddDrawnRectangle (subview.FrameToScreen ());
+        }
     }
 
     internal void DoDrawAdornments (Region? originalClip)
@@ -798,12 +811,30 @@ public partial class View // Drawing APIs
             context.AddDrawnRegion (lineRegion);
         }
 
+        // Cache the line canvas region for use by Border's CachedDrawnRegion.
+        _lastLineCanvasRegion = cellMap.Count > 0 ? lineRegion : null;
+
         LineCanvas.Clear ();
     }
 
     #endregion DrawLineCanvas
 
     #region DrawComplete
+
+    /// <summary>
+    ///     Gets the cached drawn region from the last draw pass. Populated during
+    ///     <see cref="DoDrawComplete"/> for views with <see cref="ViewportSettingsFlags.TransparentMouse"/> set.
+    ///     Used by mouse hit-testing to determine which cells should receive mouse events.
+    ///     Returns <see langword="null"/> if not drawn yet or TransparentMouse not set.
+    ///     Invalidated by <see cref="SetNeedsDraw()"/>.
+    /// </summary>
+    internal Region? CachedDrawnRegion { get; set; }
+
+    /// <summary>
+    ///     The line canvas region from the last <see cref="DoRenderLineCanvas"/> call. Used to build
+    ///     <see cref="CachedDrawnRegion"/> for the Border adornment (which draws via merged LineCanvas).
+    /// </summary>
+    private Region? _lastLineCanvasRegion;
 
     /// <summary>
     ///     Called at the end of <see cref="Draw(DrawContext)"/> to finalize drawing and update the clip region.
@@ -828,6 +859,65 @@ public partial class View // Drawing APIs
             return;
         }
 
+        // Cache drawn regions for adornments with TransparentMouse BEFORE clip exclusion.
+        // At this point, the context contains fine-grained drawn regions (text, content,
+        // line canvas) but NOT the full borderFrame rectangle that the opaque path adds below.
+        if (context is { })
+        {
+            if (Border.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+            {
+                // Build the Border's cached region from:
+                // 1. Line canvas region intersected with the Border's frame.
+                // 2. The Border's last title rect (drawn directly, not via LineCanvas).
+                Region borderDrawnRegion = new ();
+
+                if (_lastLineCanvasRegion is { })
+                {
+                    Region lineRegion = _lastLineCanvasRegion.Clone ();
+                    lineRegion.Intersect (Border.FrameToScreen ());
+                    borderDrawnRegion.Combine (lineRegion, RegionOp.Union);
+                }
+
+                if (Border.View is BorderView bv && bv.LastTitleRect is { } cachedTitleRect)
+                {
+                    borderDrawnRegion.Combine (cachedTitleRect, RegionOp.Union);
+                }
+
+                Border.CachedDrawnRegion = borderDrawnRegion;
+
+                // Also set on the BorderView so per-cell hit-testing in the second
+                // RemoveAll pass (which checks View.CachedDrawnRegion) works correctly.
+                if (Border.View is { } borderViewForCache)
+                {
+                    borderViewForCache.CachedDrawnRegion = borderDrawnRegion;
+                }
+            }
+
+            if (Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+            {
+                Region marginDrawnRegion = context.GetDrawnRegion ().Clone ();
+                marginDrawnRegion.Intersect (Margin.FrameToScreen ());
+                Margin.CachedDrawnRegion = marginDrawnRegion;
+
+                if (Margin.View is { } marginViewForCache)
+                {
+                    marginViewForCache.CachedDrawnRegion = marginDrawnRegion;
+                }
+            }
+
+            if (Padding.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+            {
+                Region paddingDrawnRegion = context.GetDrawnRegion ().Clone ();
+                paddingDrawnRegion.Intersect (Padding.FrameToScreen ());
+                Padding.CachedDrawnRegion = paddingDrawnRegion;
+
+                if (Padding.View is { } paddingViewForCache)
+                {
+                    paddingViewForCache.CachedDrawnRegion = paddingDrawnRegion;
+                }
+            }
+        }
+
         bool borderTransparent = Border.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
         bool paddingTransparent = Padding.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
         bool viewTransparent = ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
@@ -838,6 +928,12 @@ public partial class View // Drawing APIs
             Rectangle borderFrame = Border.FrameToScreen ();
             ExcludeFromClip (borderFrame);
             context?.AddDrawnRectangle (borderFrame);
+
+            // Cache for TransparentMouse hit-testing (opaque = entire frame).
+            if (ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+            {
+                CachedDrawnRegion = new Region (borderFrame);
+            }
 
             return;
         }
@@ -888,6 +984,20 @@ public partial class View // Drawing APIs
 
         // Report the exclusion to the parent's DrawContext so SuperViews can track what we covered.
         context?.AddDrawnRegion (exclusion);
+
+        // Cache the view's own drawn region for TransparentMouse hit-testing.
+        if (ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+        {
+            if (viewTransparent || borderTransparent)
+            {
+                CachedDrawnRegion = context?.GetDrawnRegion ()?.Clone ();
+            }
+            else
+            {
+                // Opaque view with TransparentMouse — cache the entire border frame.
+                CachedDrawnRegion = new Region (Border.FrameToScreen ());
+            }
+        }
     }
 
     /// <summary>

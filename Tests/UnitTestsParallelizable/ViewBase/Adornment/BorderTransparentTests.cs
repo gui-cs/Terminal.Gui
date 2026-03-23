@@ -328,7 +328,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     are still captured by the Border (only the transparent interior passes through).
     ///     Requires Phase 2e (drawn-region-aware hit-testing).
     /// </summary>
-    [Fact (Skip = "Phase 2e — drawn-region-aware hit-testing not yet implemented")]
+    [Fact]
     public void Border_TransparentMouse_BorderLine_Clicks_Are_Captured ()
     {
         using IApplication app = Application.Create ();
@@ -367,7 +367,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     are captured by the Border. The title is drawn content and should receive clicks.
     ///     Requires Phase 2e.
     /// </summary>
-    [Fact (Skip = "Phase 2e — drawn-region-aware hit-testing not yet implemented")]
+    [Fact]
     public void Border_TransparentMouse_Title_Clicks_Are_Captured ()
     {
         using IApplication app = Application.Create ();
@@ -454,7 +454,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     but capture clicks on drawn cells.
     ///     Requires Phase 2a/2b/2e.
     /// </summary>
-    [Fact (Skip = "Phase 2a/2b/2e — drawn-region-aware hit-testing not yet implemented")]
+    [Fact]
     public void View_TransparentMouse_DrawnCells_Captured_UndrawnCells_PassThrough ()
     {
         using IApplication app = Application.Create ();
@@ -545,7 +545,7 @@ public class BorderTransparentTests (ITestOutputHelper output)
     ///     between drawn border line cells and empty cells in the border thickness area.
     ///     Requires Phase 2a/2b/2e.
     /// </summary>
-    [Fact (Skip = "Phase 2a/2b/2e — drawn-region-aware hit-testing not yet implemented")]
+    [Fact]
     public void Border_TransparentMouse_ThickBorder_EmptyCells_PassThrough ()
     {
         using IApplication app = Application.Create ();

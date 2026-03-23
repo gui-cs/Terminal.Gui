@@ -149,6 +149,15 @@ public abstract class AdornmentImpl : IAdornment
         }
     } = ViewDiagnosticFlags.Off;
 
+    /// <summary>
+    ///     Gets the cached drawn region from the last draw pass. Populated during
+    ///     <see cref="View.Draw(DrawContext?)"/> for adornments with <see cref="ViewportSettingsFlags.TransparentMouse"/> set.
+    ///     Used by mouse hit-testing to determine which cells should receive mouse events.
+    ///     Returns <see langword="null"/> if not drawn yet or TransparentMouse not set.
+    ///     Invalidated by <see cref="View.SetNeedsDraw()"/>.
+    /// </summary>
+    internal Region? CachedDrawnRegion { get; set; }
+
     /// <summary>Gets or sets the viewport settings flags on the backing <see cref="View"/>.</summary>
     public ViewportSettingsFlags ViewportSettings
     {
