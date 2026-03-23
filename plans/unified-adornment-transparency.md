@@ -17,7 +17,7 @@ opaque cells within a transparent adornment.
 
 1. **Padding visual transparency doesn't work** — Transparent Padding fills with spaces instead
    of showing underlying content. Test `Padding_Transparent_Text_Is_Opaque_Over_Peer_SubViews`
-   fails: actual shows spaces where underlying window X's should show through.
+   fails: actual shows the underlying window's Text where the padding Text should occlude it.
 
 2. **Border special-casing** — `DoDrawComplete` builds Border's `CachedDrawnRegion` from
    `_lastLineCanvasRegion` + `LastTitleRect`, but Padding/Margin get `context.GetDrawnRegion()`
