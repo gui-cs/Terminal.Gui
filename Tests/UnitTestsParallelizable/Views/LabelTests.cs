@@ -289,8 +289,8 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
         app.Begin (runnable);
 
         var label = new Label { Text = "Test", /*Width = 6, Height = 3,*/ BorderStyle = LineStyle.Single };
-        label.Margin!.Thickness = new Thickness (0, 1, 0, 0);
-        label.Border!.Thickness = new Thickness (1, 0, 1, 1);
+        label.Margin.Thickness = new Thickness (0, 1, 0, 0);
+        label.Border.Thickness = new Thickness (1, 0, 1, 1);
         runnable.Add (label);
         app.LayoutAndDraw ();
 
@@ -314,7 +314,7 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
         app.Begin (runnable);
 
         var label = new Label { Text = "Test", /* Width = 6, Height = 3, */BorderStyle = LineStyle.Single };
-        label.Border!.Thickness = new Thickness (1, 0, 1, 1);
+        label.Border.Thickness = new Thickness (1, 0, 1, 1);
         runnable.Add (label);
         app.LayoutAndDraw ();
 

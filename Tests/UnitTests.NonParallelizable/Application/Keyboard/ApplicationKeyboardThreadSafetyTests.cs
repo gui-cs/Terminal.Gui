@@ -1,3 +1,4 @@
+#nullable enable
 // ReSharper disable AccessToDisposedClosure
 
 namespace UnitTests.NonParallelizable.ApplicationTests.Keyboard;

@@ -347,8 +347,8 @@ public class MenuBar : Menu, IDesignable
 
                 foreach (Menu subMenu in mbi.PopoverMenu.Root?.GetAllSubMenus () ?? [])
                 {
-                    subMenu.Border?.Thickness = bordersCb.Value == CheckState.Checked ? new Thickness (1) : new Thickness (0);
-                    subMenu.Border?.LineStyle = bordersCb.Value == CheckState.Checked ? LineStyle.Rounded : LineStyle.None;
+                    subMenu.Border.Thickness = bordersCb.Value == CheckState.Checked ? new Thickness (1) : new Thickness (0);
+                    subMenu.Border.LineStyle = bordersCb.Value == CheckState.Checked ? LineStyle.Rounded : LineStyle.None;
                 }
             }
         }

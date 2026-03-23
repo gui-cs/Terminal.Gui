@@ -72,7 +72,7 @@ public class Dialog : Dialog<int>
     ///     The default shadow style for new <see cref="Dialog"/> instances. Can be configured via theme files.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
+    public static ShadowStyles DefaultShadow { get; set; } = ShadowStyles.Transparent;
 
     /// <summary>
     ///     Helper property that gets whether the dialog was canceled (Result is <see langword="null"/> or 1).

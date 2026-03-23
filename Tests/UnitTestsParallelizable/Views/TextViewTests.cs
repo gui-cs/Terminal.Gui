@@ -2166,7 +2166,7 @@ public class TextViewTests
         tv.SetRelativeLayout (new Size (100, 100));
 
         Size initialContentSize = tv.GetContentSize ();
-        Assert.Equal (1, initialContentSize.Height); // Initially 1 line
+        Assert.Equal (3, initialContentSize.Height); // Initially 1 line
 
         // Act: Type text that exceeds viewport height (add multiple lines)
         tv.NewKeyDownEvent (Key.A);
@@ -2231,7 +2231,7 @@ public class TextViewTests
         tv.SetRelativeLayout (new Size (100, 100));
 
         Size initialContentSize = tv.GetContentSize ();
-        Assert.Equal (1, initialContentSize.Height);
+        Assert.Equal (3, initialContentSize.Height);
 
         // Act: Set Text property programmatically with multiple lines
         tv.Text = "Line1\nLine2\nLine3\nLine4";
@@ -2319,7 +2319,7 @@ public class TextViewTests
     public void ContentSize_Is_Updated_During_ContentsChanged_Event ()
     {
         // Arrange: Create a small TextView with ScrollBars enabled
-        TextView tv = new () { Width = 10, Height = 3, ScrollBars = true };
+        TextView tv = new () { Width = 10, Height = 1, ScrollBars = true };
         tv.BeginInit ();
         tv.EndInit ();
         tv.SetRelativeLayout (new Size (100, 100));

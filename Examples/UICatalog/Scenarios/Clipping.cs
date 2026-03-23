@@ -124,13 +124,13 @@ public class Clipping : Scenario
             CanFocus = true, // Can't drag without this? BUGBUG
             TabStop = TabBehavior.TabStop,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
-            ShadowStyle = ShadowStyle.Transparent
+            ShadowStyle = ShadowStyles.Transparent
         };
 
         //tiled.Padding.Thickness = new (1);
         //tiled.Padding.Diagnostics =  ViewDiagnosticFlags.Thickness;
 
-        //tiled.Margin!.Thickness = new (1);
+        //tiled.Margin.Thickness = new (1);
 
         FrameView fv = new ()
         {

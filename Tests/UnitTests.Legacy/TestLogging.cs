@@ -1,7 +1,8 @@
+#nullable enable
 using Microsoft.Extensions.Logging;
 using Terminal.Gui.Tracing;
 
-namespace UnitTests.Parallelizable;
+namespace UnitTests;
 
 /// <summary>
 ///     Helper for binding Terminal.Gui logging to xUnit test output.

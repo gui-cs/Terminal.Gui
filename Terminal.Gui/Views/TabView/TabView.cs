@@ -338,7 +338,7 @@ public class TabView : View
             // Tabs are along the bottom so just dodge the border
             if (Style.ShowBorder)
             {
-                _containerView.Border!.Thickness = new Thickness (1, 1, 1, 0);
+                _containerView.Border.Thickness = new Thickness (1, 1, 1, 0);
             }
 
             _containerView.Y = 0;
@@ -357,7 +357,7 @@ public class TabView : View
             // Tabs are along the top
             if (Style.ShowBorder)
             {
-                _containerView.Border!.Thickness = new Thickness (1, 0, 1, 1);
+                _containerView.Border.Thickness = new Thickness (1, 0, 1, 1);
             }
 
             _tabsBar.Y = 0;
@@ -573,7 +573,7 @@ public class TabView : View
             {
                 tab.Visible = true;
                 tab.Activating += Tab_Selecting!;
-                tab.Border!.Activating += Tab_Selecting!;
+                tab.Border.View!.Activating += Tab_Selecting!;
 
                 yield return tab;
 
@@ -604,7 +604,7 @@ public class TabView : View
             // there is enough space!
             tab.Visible = true;
             tab.Activating += Tab_Selecting!;
-            tab.Border!.Activating += Tab_Selecting!;
+            tab.Border.View!.Activating += Tab_Selecting!;
 
             yield return tab;
 
@@ -652,9 +652,9 @@ public class TabView : View
         var tab = sender as Tab;
 
         // If sender is a Border, get the parent Tab
-        if (sender is Border border)
+        if (sender is BorderView border)
         {
-            tab = border.Parent as Tab;
+            tab = border.Adornment?.Parent as Tab;
         }
 
         if (tab is { } && tab != SelectedTab)
@@ -686,7 +686,7 @@ public class TabView : View
                 if (tab.Visible)
                 {
                     tab.Activating -= Tab_Selecting!;
-                    tab.Border!.Activating -= Tab_Selecting!;
+                    tab.Border.View!.Activating -= Tab_Selecting!;
                     tab.Visible = false;
                 }
             }
@@ -696,7 +696,7 @@ public class TabView : View
             foreach (Tab tabToRender in _tabLocations)
             {
                 tabToRender.Activating -= Tab_Selecting!;
-                tabToRender.Border!.Activating -= Tab_Selecting!;
+                tabToRender.Border.View!.Activating -= Tab_Selecting!;
                 tabToRender.Visible = false;
             }
 
