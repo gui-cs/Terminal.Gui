@@ -878,7 +878,7 @@ public partial class View // Drawing APIs
                     borderDrawnRegion.Combine (lineRegion, RegionOp.Union);
                 }
 
-                if (Border.View is BorderView bv && bv.LastTitleRect is { } cachedTitleRect)
+                if (Border.View is BorderView { LastTitleRect: { } cachedTitleRect })
                 {
                     borderDrawnRegion.Combine (cachedTitleRect, RegionOp.Union);
                 }
@@ -963,7 +963,7 @@ public partial class View // Drawing APIs
         // The DrawContext accumulates all drawn regions: border lines (from LineCanvas),
         // title text (from LastTitleRect), view text, and content.
         // Add the title rect (drawn before this context existed) so it participates.
-        if (Border.View is BorderView borderView && borderView.LastTitleRect is { } titleRect)
+        if (Border.View is BorderView { LastTitleRect: { } titleRect })
         {
             context?.AddDrawnRectangle (titleRect);
         }
@@ -986,17 +986,19 @@ public partial class View // Drawing APIs
         context?.AddDrawnRegion (exclusion);
 
         // Cache the view's own drawn region for TransparentMouse hit-testing.
-        if (ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+        if (!ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
         {
-            if (viewTransparent || borderTransparent)
-            {
-                CachedDrawnRegion = context?.GetDrawnRegion ()?.Clone ();
-            }
-            else
-            {
-                // Opaque view with TransparentMouse — cache the entire border frame.
-                CachedDrawnRegion = new Region (Border.FrameToScreen ());
-            }
+            return;
+        }
+
+        if (viewTransparent || borderTransparent)
+        {
+            CachedDrawnRegion = context?.GetDrawnRegion ().Clone ();
+        }
+        else
+        {
+            // Opaque view with TransparentMouse — cache the entire border frame.
+            CachedDrawnRegion = new Region (Border.FrameToScreen ());
         }
     }
 

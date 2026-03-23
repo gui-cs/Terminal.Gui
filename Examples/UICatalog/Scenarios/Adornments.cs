@@ -47,14 +47,14 @@ public class Adornments : Scenario
         appWindow.Add (appButton);
 
         appWindow.ClearingViewport += (s, e) =>
-        {
-            if (s is View sender)
-            {
-                sender.FillRect (sender.Viewport, Glyphs.Diamond);
-            }
+                                      {
+                                          if (s is View sender)
+                                          {
+                                              sender.FillRect (sender.Viewport, Glyphs.Diamond);
+                                          }
 
-            e.Cancel = true;
-        };
+                                          e.Cancel = true;
+                                      };
 
         Window window = new ()
         {
@@ -112,6 +112,7 @@ public class Adornments : Scenario
         window.Margin.Thickness = new Thickness (0);
 
         window.Border.GetOrCreateView ();
+
         //window.Border.View.Text = "Border Text";
         window.Border.Thickness = new Thickness (3);
         window.Border.View?.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
@@ -141,20 +142,12 @@ public class Adornments : Scenario
 
         window.Padding.GetOrCreateView ().Add (labelInPadding);
 
-        TextField textFieldInPadding = new ()
-        {
-            X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 10, Text = "text (Y = 1)"
-        };
+        TextField textFieldInPadding = new () { X = Pos.Right (labelInPadding) + 1, Y = Pos.Top (labelInPadding), Width = 10, Text = "text (Y = 1)" };
 
-        textFieldInPadding.Accepting +=
-            (_, _) => MessageBox.Query (appWindow.App!, 20, 7, "TextField", textFieldInPadding.Text, "Ok");
+        textFieldInPadding.Accepting += (_, _) => MessageBox.Query (appWindow.App!, 20, 7, "TextField", textFieldInPadding.Text, "Ok");
         window.Padding.GetOrCreateView ().Add (textFieldInPadding);
 
-        Button btnButtonInPadding = new ()
-        {
-            X = Pos.Center (), Y = 1, Text = "_Button in Padding Y = AE",
-            ShadowStyle = ShadowStyles.None
-        };
+        Button btnButtonInPadding = new () { X = Pos.Center (), Y = 1, Text = "_Button in Padding Y = AE", ShadowStyle = ShadowStyles.None };
 
         btnButtonInPadding.Accepting += (_, args) =>
                                         {

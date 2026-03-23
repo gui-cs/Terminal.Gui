@@ -39,7 +39,9 @@ public sealed class Transparent : Scenario
             Y = Pos.AnchorEnd (),
 
             //X = Pos.Right (adornmentsEditor),
-            AutoSelectViewToEdit = true
+            AutoSelectViewToEdit = true,
+            AutoSelectAdornments = true,
+            ShowViewIdentifier = true
         };
         appWindow.Add (viewportSettingsEditor);
 
@@ -47,7 +49,9 @@ public sealed class Transparent : Scenario
         {
             BorderStyle = LineStyle.Single,
             X = Pos.AnchorEnd (),
-            AutoSelectViewToEdit = true
+            AutoSelectViewToEdit = true,
+            AutoSelectAdornments = true,
+            ShowViewIdentifier = true
         };
         adornmentsEditor.Border.Thickness = new Thickness (1, 2, 1, 1);
         appWindow.Add (adornmentsEditor);
