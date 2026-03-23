@@ -29,8 +29,9 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 1. Each OS checks out code, restores, and builds locally
 2. **Performance optimizations**:
    - Disables Windows Defender on Windows runners (significant speedup)
-3. Runs two test jobs:
-   - **Non-parallel UnitTests**: `Tests/UnitTests` with diagnostic output
+3. Runs three test jobs:
+   - **Non-parallel UnitTests.Legacy**: `Tests/UnitTests.Legacy` with diagnostic output
+   - **Non-parallel UnitTests.NonParallelizable**: `Tests/UnitTests.NonParallelizable` with diagnostic output
    - **Parallel UnitTestsParallelizable**: `Tests/UnitTestsParallelizable` with diagnostic output
 4. Uploads test logs and diagnostic data from all runners
 
@@ -87,7 +88,8 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 # Full CI sequence:
 dotnet restore
 dotnet build --configuration Debug --no-restore
-dotnet test --project Tests/UnitTests --no-build --verbosity normal
+dotnet test --project Tests/UnitTests.Legacy --no-build --verbosity normal
+dotnet test --project Tests/UnitTests.NonParallelizable --no-build --verbosity normal
 dotnet test --project Tests/UnitTestsParallelizable --no-build --verbosity normal
 dotnet build --configuration Release --no-restore
 ```

@@ -743,7 +743,7 @@ public class MenuBarTests : TestsAllDrivers
 
         c.ScreenShot ("before LeftClick", _out);
 
-        Logging.Debug ($"LeftClick ({errorScreenX}, {errorScreenY})");
+        Logging.Trace ($"LeftClick ({errorScreenX}, {errorScreenY})");
         c = c.LeftClick (errorScreenX, errorScreenY);
 
         c.WriteOutLogs (_out);

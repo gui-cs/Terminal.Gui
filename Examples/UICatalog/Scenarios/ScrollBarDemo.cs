@@ -26,7 +26,7 @@ public class ScrollBarDemo : Scenario
             SchemeName = "Base",
             Arrangement = ViewArrangement.Resizable
         };
-        demoFrame.Padding!.Thickness = new Thickness (1);
+        demoFrame.Padding.Thickness = new Thickness (1);
         demoFrame.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
         window.Add (demoFrame);
 

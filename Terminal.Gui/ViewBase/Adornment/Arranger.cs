@@ -6,13 +6,17 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 internal sealed class Arranger : IDisposable
 {
-    private readonly Border _border;
+    // NOTE: _border stays as BorderView because Arranger needs extensive View-level access
+    // (App, HotKeyBindings, CanFocus, SetFocus, Add, Remove, Frame, Focused, AdvanceFocus,
+    // MouseState, ScreenToFrame, Contains). Changing to Border would require .GetOrCreateView()/.View!
+    // on ~50 call sites — more complex, not simpler. Settings are accessed via _border.Adornment!.
+    private readonly BorderView _border;
 
     /// <summary>
     ///     Creates a new Arranger for the specified border.
     /// </summary>
     /// <param name="border">The border adornment to manage arrangement for.</param>
-    internal Arranger (Border border) => _border = border;
+    internal Arranger (BorderView border) => _border = border;
 
     /// <summary>
     ///     Gets the current arrangement mode.
@@ -32,13 +36,13 @@ internal sealed class Arranger : IDisposable
     internal bool IsDragging => _dragPosition.HasValue;
 
     /// <summary>
-    ///     Starts "Arrange Mode" where <see cref="Adornment.Parent"/> of a <see cref="Border"/> can be moved and/or resized
+    ///     Starts "Arrange Mode" where <see cref="IAdornment.Parent"/> of a <see cref="Border"/> can be moved and/or resized
     ///     using the mouse
     ///     or keyboard.
     /// </summary>
     /// <remarks>
     ///     Arrange Mode is exited by the user pressing the Arrange key, <see cref="Key.Esc"/>, or by
-    ///     clicking the mouse out of the <see cref="Adornment.Parent"/>'s Frame.
+    ///     clicking the mouse out of the <see cref="IAdornment.Parent"/>'s Frame.
     /// </remarks>
     /// <returns></returns>
     internal bool EnterArrangeMode (ViewArrangement arrangement)
@@ -87,7 +91,7 @@ internal sealed class Arranger : IDisposable
             _border.SetFocus ();
 
             // Strip off overlapped
-            Arranging = _border.Parent!.Arrangement & ~ViewArrangement.Overlapped;
+            Arranging = _border.Adornment!.Parent!.Arrangement & ~ViewArrangement.Overlapped;
         }
 
         return true;
@@ -103,7 +107,7 @@ internal sealed class Arranger : IDisposable
         // If mouse click is outside of Border.Thickness then exit Arrange Mode
         Point framePos = _border.ScreenToFrame (mouse.ScreenPosition);
 
-        if (!_border.Thickness.Contains (_border.Frame, framePos))
+        if (!_border.Adornment!.Thickness.Contains (_border.Frame, framePos))
         {
             ExitArrangeMode ();
         }
@@ -172,7 +176,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal bool HasAnyArrangementOptions ()
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment?.Parent;
 
         if (parent is null)
         {
@@ -200,7 +204,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     private void CreateArrangementButtons ()
     {
-        ViewArrangement parentArrangement = _border.Parent!.Arrangement;
+        ViewArrangement parentArrangement = _border.Adornment!.Parent!.Arrangement;
 
         if (parentArrangement.HasFlag (ViewArrangement.Movable))
         {
@@ -214,29 +218,25 @@ internal sealed class Arranger : IDisposable
 
         if (parentArrangement.HasFlag (ViewArrangement.TopResizable))
         {
-            _topSizeButton = CreateArrangerButton (ArrangeButtons.TopSize,
-                                                   Pos.Center () + _border.Parent!.Margin!.Thickness.Horizontal,
-                                                   0);
+            _topSizeButton = CreateArrangerButton (ArrangeButtons.TopSize, Pos.Center () + _border.Adornment.Parent!.Margin.Thickness.Horizontal, 0);
         }
 
         if (parentArrangement.HasFlag (ViewArrangement.RightResizable))
         {
             _rightSizeButton = CreateArrangerButton (ArrangeButtons.RightSize,
                                                      Pos.AnchorEnd (),
-                                                     Pos.Center () + _border.Parent!.Margin!.Thickness.Vertical / 2);
+                                                     Pos.Center () + _border.Adornment.Parent!.Margin.Thickness.Vertical / 2);
         }
 
         if (parentArrangement.HasFlag (ViewArrangement.LeftResizable))
         {
-            _leftSizeButton = CreateArrangerButton (ArrangeButtons.LeftSize,
-                                                    0,
-                                                    Pos.Center () + _border.Parent!.Margin!.Thickness.Vertical / 2);
+            _leftSizeButton = CreateArrangerButton (ArrangeButtons.LeftSize, 0, Pos.Center () + _border.Adornment.Parent!.Margin.Thickness.Vertical / 2);
         }
 
         if (parentArrangement.HasFlag (ViewArrangement.BottomResizable))
         {
             _bottomSizeButton = CreateArrangerButton (ArrangeButtons.BottomSize,
-                                                      Pos.Center () + _border.Parent!.Margin!.Thickness.Horizontal / 2,
+                                                      Pos.Center () + _border.Adornment.Parent!.Margin.Thickness.Horizontal / 2,
                                                       Pos.AnchorEnd ());
         }
     }
@@ -270,7 +270,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     private void SetVisibilityForKeyboardMode ()
     {
-        ViewArrangement parentArrangement = _border.Parent!.Arrangement;
+        ViewArrangement parentArrangement = _border.Adornment!.Parent!.Arrangement;
 
         if (parentArrangement.HasFlag (ViewArrangement.Movable))
         {
@@ -443,15 +443,15 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal bool HandleArrangeModeUp ()
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment?.Parent;
 
         if (parent is null)
         {
             return false;
         }
 
-        int minHeight = _border.Thickness.Vertical + parent.Margin!.Thickness.Bottom;
-        int minWidth = _border.Thickness.Horizontal + parent.Margin!.Thickness.Right;
+        int minHeight = _border.Adornment!.Thickness.Vertical + parent.Margin.Thickness.Bottom;
+        int minWidth = _border.Adornment!.Thickness.Horizontal + parent.Margin.Thickness.Right;
         ViewManipulator manipulator = new (parent, minWidth, minHeight);
         var handled = false;
 
@@ -479,15 +479,15 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal bool HandleArrangeModeDown ()
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment?.Parent;
 
         if (parent is null)
         {
             return false;
         }
 
-        int minHeight = _border.Thickness.Vertical + parent.Margin!.Thickness.Bottom;
-        int minWidth = _border.Thickness.Horizontal + parent.Margin!.Thickness.Right;
+        int minHeight = _border.Adornment!.Thickness.Vertical + parent.Margin.Thickness.Bottom;
+        int minWidth = _border.Adornment!.Thickness.Horizontal + parent.Margin.Thickness.Right;
         ViewManipulator manipulator = new (parent, minWidth, minHeight);
         var handled = false;
 
@@ -515,15 +515,15 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal bool HandleArrangeModeLeft ()
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment?.Parent;
 
         if (parent is null)
         {
             return false;
         }
 
-        int minHeight = _border.Thickness.Vertical + parent.Margin!.Thickness.Bottom;
-        int minWidth = _border.Thickness.Horizontal + parent.Margin!.Thickness.Right;
+        int minHeight = _border.Adornment!.Thickness.Vertical + parent.Margin.Thickness.Bottom;
+        int minWidth = _border.Adornment!.Thickness.Horizontal + parent.Margin.Thickness.Right;
         ViewManipulator manipulator = new (parent, minWidth, minHeight);
         var handled = false;
 
@@ -551,15 +551,15 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal bool HandleArrangeModeRight ()
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment?.Parent;
 
         if (parent is null)
         {
             return false;
         }
 
-        int minHeight = _border.Thickness.Vertical + parent.Margin!.Thickness.Bottom;
-        int minWidth = _border.Thickness.Horizontal + parent.Margin!.Thickness.Right;
+        int minHeight = _border.Adornment!.Thickness.Vertical + parent.Margin.Thickness.Bottom;
+        int minWidth = _border.Adornment!.Thickness.Horizontal + parent.Margin.Thickness.Right;
         ViewManipulator manipulator = new (parent, minWidth, minHeight);
         var handled = false;
 
@@ -645,7 +645,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     private bool HandleMousePressed (Mouse mouseEvent)
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment?.Parent;
 
         if (parent is null)
         {
@@ -693,7 +693,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     private void HandleMouseDrag (Mouse mouseEvent)
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment?.Parent;
 
         if (parent is null)
         {
@@ -736,7 +736,7 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal ViewArrangement DetermineArrangeModeFromClick (Point clickPoint)
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment?.Parent;
 
         if (parent is null)
         {
@@ -745,7 +745,7 @@ internal sealed class Arranger : IDisposable
 
         ViewArrangement parentArrangement = parent.Arrangement;
         Rectangle frame = _border.Frame;
-        Thickness thickness = _border.Thickness;
+        Thickness thickness = _border.Adornment!.Thickness;
 
         // Check edges first (larger hit areas)
         // Left edge
@@ -859,7 +859,7 @@ internal sealed class Arranger : IDisposable
     /// <param name="mouseEvent">The mouse event containing screen position information.</param>
     internal void HandleDragOperation (Mouse mouseEvent)
     {
-        Point targetLocation = _border.Parent!.SuperView?.ScreenToViewport (new Point (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y))
+        Point targetLocation = _border.Adornment?.Parent!.SuperView?.ScreenToViewport (new Point (mouseEvent.ScreenPosition.X, mouseEvent.ScreenPosition.Y))
                                ?? mouseEvent.ScreenPosition;
 
         HandleDragOperation (targetLocation);
@@ -877,15 +877,15 @@ internal sealed class Arranger : IDisposable
     /// </param>
     internal void HandleDragOperation (Point targetLocation)
     {
-        View? parent = _border.Parent;
+        View? parent = _border.Adornment?.Parent;
 
         if (parent is null)
         {
             return;
         }
 
-        int minHeight = _border.Thickness.Vertical + parent.Margin!.Thickness.Bottom;
-        int minWidth = _border.Thickness.Horizontal + parent.Margin!.Thickness.Right;
+        int minHeight = _border.Adornment!.Thickness.Vertical + parent.Margin.Thickness.Bottom;
+        int minWidth = _border.Adornment!.Thickness.Horizontal + parent.Margin.Thickness.Right;
 
         ViewManipulator manipulator = new (parent, GrabPoint, minWidth, minHeight);
 

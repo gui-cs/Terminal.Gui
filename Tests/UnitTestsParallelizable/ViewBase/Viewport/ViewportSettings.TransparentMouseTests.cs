@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace ViewBaseTests.MouseTests;
 
 public class TransparentMouseTests
@@ -11,6 +9,7 @@ public class TransparentMouseTests
         protected override bool OnMouseEvent (Mouse mouse)
         {
             MouseEventReceived = true;
+
             return true;
         }
     }
@@ -20,25 +19,34 @@ public class TransparentMouseTests
     {
         // Arrange
         IApplication? app = Application.Create ();
-        var top = new Runnable ()
-        {
-            Id = "top",
-        };
+        var top = new Runnable { Id = "top" };
         app.Begin (top);
 
-        var underlying = new MouseTrackingView { Id = "underlying", X = 0, Y = 0, Width = 10, Height = 10 };
-        var overlay = new MouseTrackingView { Id = "overlay", X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.TransparentMouse };
+        var underlying = new MouseTrackingView
+        {
+            Id = "underlying",
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 10
+        };
+
+        var overlay = new MouseTrackingView
+        {
+            Id = "overlay",
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 10,
+            ViewportSettings = ViewportSettingsFlags.TransparentMouse
+        };
 
         top.Add (underlying);
         top.Add (overlay);
 
         top.Layout ();
 
-        var mouse = new Mouse
-        {
-            ScreenPosition = new (5, 5),
-            Flags = MouseFlags.LeftButtonClicked
-        };
+        var mouse = new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonClicked };
 
         // Act
         app.Mouse.RaiseMouseEvent (mouse);
@@ -56,18 +64,22 @@ public class TransparentMouseTests
         app.Begin (top);
 
         var underlying = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10 };
-        var overlay = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.None };
+
+        var overlay = new MouseTrackingView
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 10,
+            ViewportSettings = ViewportSettingsFlags.None
+        };
 
         top.Add (underlying);
         top.Add (overlay);
 
         top.Layout ();
 
-        var mouse = new Mouse
-        {
-            ScreenPosition = new Point (5, 5),
-            Flags = MouseFlags.LeftButtonClicked
-        };
+        var mouse = new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonClicked };
 
         // Act
         app.Mouse.RaiseMouseEvent (mouse);
@@ -75,34 +87,43 @@ public class TransparentMouseTests
         // Assert
         Assert.True (overlay.MouseEventReceived);
         Assert.False (underlying.MouseEventReceived);
-     }
+    }
 
     [Fact]
     public void TransparentMouse_Stacked_TransparentMouse_Views ()
     {
         // Arrange
         IApplication? app = Application.Create ();
-        var top = new Runnable ()
-        {
-            Id = "top",
-        };
+        var top = new Runnable { Id = "top" };
         app.Begin (top);
 
-        var underlying = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.TransparentMouse };
-        var overlay = new MouseTrackingView { X = 0, Y = 0, Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.TransparentMouse };
+        var underlying = new MouseTrackingView
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 10,
+            ViewportSettings = ViewportSettingsFlags.TransparentMouse
+        };
+
+        var overlay = new MouseTrackingView
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 10,
+            ViewportSettings = ViewportSettingsFlags.TransparentMouse
+        };
 
         top.Add (underlying);
         top.Add (overlay);
 
         top.Layout ();
 
-        var mouse = new Mouse
-        {
-            ScreenPosition = new Point (5, 5),
-            Flags = MouseFlags.LeftButtonClicked
-        };
+        var mouse = new Mouse { ScreenPosition = new Point (5, 5), Flags = MouseFlags.LeftButtonClicked };
 
-        bool topHandled = false;
+        var topHandled = false;
+
         top.MouseEvent += (sender, args) =>
                           {
                               topHandled = true;

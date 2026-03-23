@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
+    <ProjectReference Include="..\..\Examples\UICatalog\UICatalog.csproj" />
   </ItemGroup>
 
 </Project>
