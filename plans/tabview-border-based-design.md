@@ -259,13 +259,57 @@ All examples use `Thickness = 3` on the tab side, `Thickness = 1` on the other t
 
 In a multi-tab `Tabs` container, exactly one `Tab` has `HasFocus == true` (the selected tab) and all others have `HasFocus == false`. The visual difference — closed vs. open — is how the user distinguishes the selected tab from the rest.
 
+##### Precise Rendering Spec for `Side.Top` (other sides follow by rotation)
+
+This spec describes exactly how to draw a single tab with `BorderSettings.Tab`, `TabSide = Side.Top`, `Thickness.Top = 3`, `Thickness.Left = Thickness.Right = Thickness.Bottom = 1`. The title text is `"Tab"` (3 characters). These rules apply to all `Side` variants via rotation.
+
+**Dimensions and coordinates:**
+
+- **Tab header width** = title text columns + 2 (one border column each side). For `"Tab"` → `3 + 2 = 5`.
+- **Tab header height** = `Thickness.Top` = 3 rows (top line, title row, closing/opening line).
+- **Content area** = the remaining rectangle below the header, bounded by `Thickness.Left`, `Thickness.Right`, `Thickness.Bottom` (all = 1).
+- **View total width** = content width + `Thickness.Left` + `Thickness.Right`. For `"content"` (7 chars) → `7 + 1 + 1 = 9`.
+- **View total height** = content height + `Thickness.Top` + `Thickness.Bottom`. For 2-line content → `2 + 3 + 1 = 6`.
+
+**Text placement:**
+
+- Tab title text is placed **tight against borders** with no padding. The title occupies every cell between the left and right borders of the header. `│Tab│`, never `│ Tab │` or `│Tab │`.
+- For `Side.Left`/`Side.Right`, text is rendered vertically using `TextDirection.TopBottom_LeftRight`, one character per row, still tight: `│T│` on each row, not `│ T │`.
+
+**The three rows of the tab header (`Side.Top`):**
+
+- **Row 0 (header top):** `╭` at header left edge, `───` spanning header width − 2, `╮` at header right edge. Positioned at `TabOffset` columns from the left. Columns outside the header on this row are empty (transparent).
+- **Row 1 (title):** `│` at header left edge, title text filling the interior, `│` at header right edge. Columns outside the header on this row are empty (transparent).
+- **Row 2 (junction / opening row) — depends on `HasFocus`:**
+
+  **`HasFocus == false` (closed):** This row spans the FULL view width. It is the content area's top border with the header's closing line merged in via LineCanvas auto-join:
+
+  - If `TabOffset == 0`: The header left edge coincides with the content left border. The glyph is `├` (T-junction: the continuous left border meets the header closing line going right). Then `───` fills the header interior, `┴` at the header right edge (bottom-T: the header's right border going up meets the horizontal going both ways). Then `───` continues as the content top border to `╮` at the view's right edge.
+  - If `TabOffset > 0`: `╭` at x=0 (content top-left corner), then `─` fills to the header left edge where a `┴` appears (content top line meets header left border coming down). Then `───` fills the header interior, another `┴` at the header right edge. Then `───` continues to `╮` at the view's right edge. If the header right edge IS the view right edge, the final glyph is `┤` instead of `╮`.
+
+  **`HasFocus == true` (open):** The header's closing line is SUPPRESSED. This row has:
+
+  - `│` at x=0 (the left border continues down from the header), then spaces filling the header interior (the open gap), then `╰` at the header right edge (the header right border curves into the continuation line), then `───` continues to `╮` at the view's right edge.
+  - If `TabOffset > 0`: `│` at x=0 continues from above, spaces fill to header left edge where `╯` appears (header left border curves to meet continuation from left). Continue with spaces through the header gap. At the header right edge, `╰` curves into `───` continuing to `╮`. (This case applies to multi-tab layouts managed by `Tabs`.)
+
+**Remaining content rows:**
+
+- **Left border:** `│` at x=0 on every row from row 2 (or row 3 for closed) down to the bottom border row.
+- **Right border:** `│` at x=width−1 on every content row.
+- **Bottom border:** `╰` at x=0, `───` filling, `╯` at x=width−1.
+- **Content text** fills the interior of the content rectangle.
+
+**Key invariant:** The view's left border is ONE continuous vertical line from the top of the header (`╭` at row 0) through every content row down to `╰` at the bottom. It is never broken. When the header is at `TabOffset = 0`, the junction where the closed header's bottom line meets this border is `├` (a T-junction), not `╭` followed by a separate junction. The border is continuous — it does not restart.
+
+**Whitespace rule:** Cells outside the header rectangle on rows 0 and 1 are **transparent** (not drawn). They are not spaces — they literally don't exist in the output, allowing underlying views to show through. Inside the header, text is tight against borders with zero padding.
+
 ##### `Side.Top` — `Thickness.Top = 3`
 
 `HasFocus == false` (closed — header bottom line drawn):
 ```
 ╭───╮
 │Tab│
-╭┴───┴──╮
+├───┴───╮
 │content│
 ╰───────╯
 ```
@@ -285,7 +329,7 @@ In a multi-tab `Tabs` container, exactly one `Tab` has `HasFocus == true` (the s
 ```
 ╭───────╮
 │content│
-╰┬───┬──╯
+├───┬───╯
 │Tab│
 ╰───╯
 ```
@@ -305,21 +349,20 @@ Tab text is rendered vertically using `TextDirection.TopBottom_LeftRight`.
 
 `HasFocus == false` (closed — header right line drawn):
 ```
-╭──┬────────╮
-│ T├content │
-│ a│        │
-│ b│        │
-╰──┴────────╯
+╭─┬───────╮
+│T├content│
+│a│       │
+│b│       │
+╰─┴───────╯
 ```
 
 `HasFocus == true` (open — header right line suppressed, flows into content):
 ```
-╭──────────╮
-│ T content│
-│ a        │
-│ b        │
-╰──┬───────╯
-   │ (continues if more tabs below)
+╭─────────╮
+│T content│
+│a        │
+│b        │
+╰─────────╯
 ```
 
 ##### `Side.Right` — `Thickness.Right = 3`
@@ -328,21 +371,20 @@ Tab text is rendered vertically using `TextDirection.TopBottom_LeftRight`.
 
 `HasFocus == false` (closed — header left line drawn):
 ```
-╭────────┬──╮
-│content ┤T │
-│        │a │
-│        │b │
-╰────────┴──╯
+╭───────┬─╮
+│content│T│
+│       │a│
+│       │b│
+╰───────┴─╯
 ```
 
 `HasFocus == true` (open — header left line suppressed, flows into content):
 ```
-╭──────────╮
-│content  T│
-│         a│
-│         b│
-╰───────┬──╯
-        │ (continues if more tabs below)
+╭─────────╮
+│content T│
+│        a│
+│        b│
+╰─────────╯
 ```
 
 ##### Summary: Which Thickness Side = 3, Which Line Gets Suppressed
