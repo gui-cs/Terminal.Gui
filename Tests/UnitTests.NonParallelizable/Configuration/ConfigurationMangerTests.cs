@@ -12,7 +12,7 @@ using SourcesManager = Terminal.Gui.Configuration.SourcesManager;
 
 namespace UnitTests.NonParallelizable.ConfigurationTests;
 
-public class ConfigurationManagerTests (ITestOutputHelper output)
+public class ConfigurationMangerTests (ITestOutputHelper output)
 {
     [Fact]
     public void ModuleInitializer_Was_Called ()
