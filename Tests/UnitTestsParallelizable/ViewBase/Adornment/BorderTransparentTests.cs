@@ -741,4 +741,266 @@ public class BorderTransparentTests (ITestOutputHelper output)
                                               output,
                                               app.Driver);
     }
+
+    /// <summary>
+    ///     Verifies that a Margin with Transparent draws text opaquely over peer content,
+    ///     while undrawn cells show the underlying content.
+    ///     Currently skipped because transparent non-shadow Margin rendering uses a separate
+    ///     pass (MarginView.DrawMargins) that only supports shadow compositing.
+    /// </summary>
+    [Fact (Skip = "Transparent non-shadow Margin text rendering not yet supported in first-pass drawing")]
+    public void Margin_Transparent_Text_Is_Opaque_Over_Peer_SubViews ()
+    {
+        // Copilot
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (12, 5);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        // Fill window background with 'X'
+        window.ClearingViewport += (_, args) =>
+                                    {
+                                        window.FillRect (args.NewViewport, new Rune ('X'));
+                                        args.Cancel = true;
+                                    };
+
+        // A peer subview behind the margin area
+        View peerView = new ()
+        {
+            Text = "PEER",
+            X = 0,
+            Y = 0,
+            Width = Dim.Auto (),
+            Height = Dim.Auto ()
+        };
+        window.Add (peerView);
+
+        // A view with a transparent thick top-margin that has text
+        View borderedView = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 8,
+            Height = 4,
+            BorderStyle = LineStyle.Single
+        };
+
+        // Margin on top (1 cell thick)
+        borderedView.Margin!.ViewportSettings |= ViewportSettingsFlags.Transparent;
+        borderedView.Margin.Thickness = new Thickness (0, 1, 0, 0);
+        borderedView.Margin.GetOrCreateView ();
+        borderedView.Margin.View!.Text = "Mg";
+
+        window.Add (borderedView);
+        app.Begin (window);
+
+        // Layout (12x5):
+        //        0123456789AB
+        // Row 0: MgRRXXXXXXXX  margin row: "Mg" opaque, cols 2-3→peer "ER", cols 4+→window "X"
+        // Row 1: ┌──────┐XXXXX  border top
+        // Row 2: │      │XXXXX  content area (opaque)
+        // Row 3: └──────┘XXXXX  border bottom
+        // Row 4: XXXXXXXXXXXX   window background
+        //
+        // Peer "PEER" at (0,0): P(0,0) E(1,0) E(2,0) R(3,0)
+        // Margin text "Mg" at margin viewport (0,0): M→screen(0,0) g→screen(1,0)
+        //
+        // At screen (0,0): Margin drew "M" → opaque
+        // At screen (1,0): Margin drew "g" → opaque
+        // At screen (2,0): Margin undrawn → transparent → peer "E" shows through
+        // At screen (3,0): Margin undrawn → transparent → peer "R" shows through
+        // At screen (4-7,0): Margin undrawn → transparent → window "X" shows through
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              MgERXXXXXXXX
+                                              ┌──────┐XXXXX
+                                              │      │XXXXX
+                                              └──────┘XXXXX
+                                              XXXXXXXXXXXX
+                                              """,
+                                              output,
+                                              app.Driver);
+    }
+
+    /// <summary>
+    ///     Verifies that Padding with TransparentMouse has a CachedDrawnRegion that only
+    ///     contains the drawn text cells, not the full padding area.
+    /// </summary>
+    [Fact]
+    public void Padding_TransparentMouse_CachedDrawnRegion_Contains_Only_Drawn_Cells ()
+    {
+        // Copilot
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (12, 6);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        View borderedView = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 5,
+            BorderStyle = LineStyle.Single,
+            Id = "Bordered"
+        };
+
+        // TransparentMouse padding with text
+        borderedView.Padding!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
+        borderedView.Padding.Thickness = new Thickness (0, 2, 0, 0);
+        borderedView.Padding.GetOrCreateView ();
+        borderedView.Padding.View!.Text = "Pad";
+
+        window.Add (borderedView);
+        app.Begin (window);
+
+        // The Padding's CachedDrawnRegion should contain only the "Pad" text cells,
+        // not the full padding area.
+        Region? cachedRegion = borderedView.Padding.CachedDrawnRegion;
+
+        Assert.NotNull (cachedRegion);
+
+        // "Pad" is drawn at padding viewport (0,0), which maps to screen (1,1)
+        // P at (1,1), a at (2,1), d at (3,1)
+        Assert.True (cachedRegion.Contains (1, 1), "CachedDrawnRegion should contain 'P' at (1,1)");
+        Assert.True (cachedRegion.Contains (2, 1), "CachedDrawnRegion should contain 'a' at (2,1)");
+        Assert.True (cachedRegion.Contains (3, 1), "CachedDrawnRegion should contain 'd' at (3,1)");
+
+        // Undrawn padding cells should NOT be in CachedDrawnRegion
+        Assert.False (cachedRegion.Contains (5, 1), "CachedDrawnRegion should not contain undrawn cell (5,1)");
+        Assert.False (cachedRegion.Contains (5, 2), "CachedDrawnRegion should not contain undrawn cell (5,2)");
+    }
+
+    /// <summary>
+    ///     Verifies that Margin with TransparentMouse passes clicks through undrawn cells
+    ///     but captures clicks on drawn text.
+    ///     Currently skipped because transparent non-shadow Margin rendering uses a separate
+    ///     pass that doesn't track drawn regions for mouse hit-testing.
+    /// </summary>
+    [Fact (Skip = "Transparent non-shadow Margin mouse hit-testing not yet supported")]
+    public void Margin_TransparentMouse_DrawnText_Captured_UndrawnCells_PassThrough ()
+    {
+        // Copilot
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (12, 5);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        View borderedView = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 8,
+            Height = 4,
+            BorderStyle = LineStyle.Single,
+            Id = "Bordered"
+        };
+
+        // Transparent thick margin with text
+        borderedView.Margin!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
+        borderedView.Margin.Thickness = new Thickness (0, 1, 0, 0);
+        borderedView.Margin.GetOrCreateView ();
+        borderedView.Margin.View!.Text = "Mg";
+
+        window.Add (borderedView);
+        app.Begin (window);
+
+        // Layout:
+        //        01234567
+        // Row 0: MgXXXXXX  margin row: "Mg" text drawn, cols 2+ undrawn
+        // Row 1: ┌──────┐  border top
+        // Row 2: │      │  content area
+        // Row 3: └──────┘  border bottom
+        //
+        // Click on "M" at screen (0,0) — should be captured by MarginView
+        List<View?> viewsOnText = window.GetViewsUnderLocation (new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
+
+        Assert.True (viewsOnText.Count > 0, "Clicking on margin text should find views");
+
+        // Click on undrawn margin cell at screen (4,0) — should pass through
+        List<View?> viewsOnEmpty = window.GetViewsUnderLocation (new Point (4, 0), ViewportSettingsFlags.TransparentMouse);
+        bool marginNotInEmpty = !viewsOnEmpty.Any (v => v?.Id == borderedView.Margin.View!.Id);
+
+        Assert.True (marginNotInEmpty, "Clicking on undrawn margin cell with TransparentMouse should pass through");
+    }
+
+    /// <summary>
+    ///     Verifies that when Border and Padding are both transparent,
+    ///     each layer's drawn text is opaque while undrawn cells show through to the underlying content.
+    /// </summary>
+    [Fact]
+    public void Border_And_Padding_Transparent_Text_Is_Opaque ()
+    {
+        // Copilot
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (14, 7);
+
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+
+        // Fill window background with 'X'
+        window.ClearingViewport += (_, args) =>
+                                    {
+                                        window.FillRect (args.NewViewport, new Rune ('X'));
+                                        args.Cancel = true;
+                                    };
+
+        View borderedView = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 12,
+            Height = 6,
+            BorderStyle = LineStyle.Single,
+            Text = "Hi"
+        };
+
+        // Transparent border
+        borderedView.Border!.ViewportSettings |= ViewportSettingsFlags.Transparent;
+
+        // Transparent view content (so underlying X's show through content area)
+        borderedView.ViewportSettings |= ViewportSettingsFlags.Transparent;
+
+        // Transparent padding (top 1)
+        borderedView.Padding!.ViewportSettings |= ViewportSettingsFlags.Transparent;
+        borderedView.Padding.Thickness = new Thickness (0, 1, 0, 0);
+        borderedView.Padding.GetOrCreateView ();
+        borderedView.Padding.View!.Text = "Pd";
+
+        window.Add (borderedView);
+        app.Begin (window);
+
+        // Layout (14x7):
+        //        01234567890123
+        // Row 0: ┌──────────┐XX  border top line: opaque (drawn line chars)
+        // Row 1: │PdXXXXXXXX│XX  padding: "Pd" opaque, rest transparent → "X"; border sides opaque
+        // Row 2: │HiXXXXXXXX│XX  content: transparent → "Hi" opaque, rest "X"; border sides opaque
+        // Row 3: │XXXXXXXXXX│XX  content row: transparent → all "X"
+        // Row 4: │XXXXXXXXXX│XX
+        // Row 5: └──────────┘XX  border bottom line: opaque
+        // Row 6: XXXXXXXXXXXXXX  window background
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌──────────┐XX
+                                              │PdXXXXXXXX│XX
+                                              │HiXXXXXXXX│XX
+                                              │XXXXXXXXXX│XX
+                                              │XXXXXXXXXX│XX
+                                              └──────────┘XX
+                                              XXXXXXXXXXXXXX
+                                              """,
+                                              output,
+                                              app.Driver);
+    }
 }
