@@ -1273,6 +1273,8 @@ public partial class View // Layout APIs
 
         // Remove all views that have an adornment with ViewportSettings.TransparentMouse; they are in the list
         // because the point was in their adornment, and if the adornment is transparent, they should be removed.
+        // Per-cell check: if the adornment has a CachedDrawnRegion, only remove if the point is NOT in the
+        // drawn region (the click is on an undrawn cell). If no cache, fall back to blanket removal.
         viewsUnderLocation.RemoveAll (v =>
                                       {
                                           if (v is null or AdornmentView)
@@ -1288,7 +1290,11 @@ public partial class View // Layout APIs
                                                       && v.Margin.Thickness != Thickness.Empty
                                                       && v.Margin.Thickness.Contains (v.Margin.FrameToScreen (), location))))
                                           {
-                                              ret = true;
+                                              if (v.Margin.CachedDrawnRegion is null
+                                                  || !v.Margin.CachedDrawnRegion.Contains (location.X, location.Y))
+                                              {
+                                                  ret = true;
+                                              }
                                           }
 
                                           if (v.Border.ViewportSettings.HasFlag (excludeViewportSettingsFlags)
@@ -1297,7 +1303,11 @@ public partial class View // Layout APIs
                                                       && v.Border.Thickness != Thickness.Empty
                                                       && v.Border.Thickness.Contains (v.Border.FrameToScreen (), location))))
                                           {
-                                              ret = true;
+                                              if (v.Border.CachedDrawnRegion is null
+                                                  || !v.Border.CachedDrawnRegion.Contains (location.X, location.Y))
+                                              {
+                                                  ret = true;
+                                              }
                                           }
 
                                           if (v.Padding.ViewportSettings.HasFlag (excludeViewportSettingsFlags)
@@ -1306,14 +1316,33 @@ public partial class View // Layout APIs
                                                       && v.Padding.Thickness != Thickness.Empty
                                                       && v.Padding.Thickness.Contains (v.Padding.FrameToScreen (), location))))
                                           {
-                                              ret = true;
+                                              if (v.Padding.CachedDrawnRegion is null
+                                                  || !v.Padding.CachedDrawnRegion.Contains (location.X, location.Y))
+                                              {
+                                                  ret = true;
+                                              }
                                           }
 
                                           return ret is true;
                                       });
 
-        // Now remove all views that have ViewportSettings.TransparentMouse set
-        viewsUnderLocation.RemoveAll (v => v!.ViewportSettings.HasFlag (excludeViewportSettingsFlags));
+        // Now remove all views that have ViewportSettings.TransparentMouse set.
+        // Per-cell check: if a CachedDrawnRegion exists, only remove if the point is NOT in the drawn region.
+        // If no cache (before first draw), fall back to blanket removal.
+        viewsUnderLocation.RemoveAll (v =>
+                                      {
+                                          if (!v!.ViewportSettings.HasFlag (excludeViewportSettingsFlags))
+                                          {
+                                              return false;
+                                          }
+
+                                          if (v.CachedDrawnRegion is { } drawnRegion)
+                                          {
+                                              return !drawnRegion.Contains (location.X, location.Y);
+                                          }
+
+                                          return true;
+                                      });
 
         return viewsUnderLocation;
     }

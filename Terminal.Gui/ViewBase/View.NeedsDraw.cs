@@ -57,6 +57,10 @@ public partial class View
     /// <param name="viewPortRelativeRegion">The <see cref="Viewport"/>relative region that needs to be redrawn.</param>
     public void SetNeedsDraw (Rectangle viewPortRelativeRegion)
     {
+        // Invalidate the cached drawn region used for TransparentMouse hit-testing.
+        // It will be repopulated on the next Draw() pass.
+        CachedDrawnRegion = null;
+
         // If we are at the top of the hierarchy, we're a runnable,
         // and we need to ensure any other Runnables get redrawn.
         if (App?.TopRunnableView == this && App is { })
