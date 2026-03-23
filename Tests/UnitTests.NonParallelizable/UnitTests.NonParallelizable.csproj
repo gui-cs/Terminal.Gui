@@ -14,7 +14,7 @@
 		<UseAppHost>true</UseAppHost>
 		<IsTestProject>true</IsTestProject>
 		<IsPackable>false</IsPackable>
-		<UseDataCollector />
+		<UseDataCollector>true</UseDataCollector>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<DefineTrace>true</DefineTrace>
 		<DebugType>portable</DebugType>
