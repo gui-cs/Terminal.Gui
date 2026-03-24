@@ -75,7 +75,7 @@ public class Links : Scenario
         Shortcut urlIndicator = new (Key.Empty, "", null);
 
         StatusBar statusBar = new ([new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", Quit), urlIndicator]);
-        _link.MouseEnter += (s, e) => urlIndicator.Title = _link.Text;
+        _link.MouseEnter += (s, e) => urlIndicator.Title = _link.Url;
         _link.MouseLeave += (s, e) => urlIndicator.Title = "";
         _appWindow.Add (statusBar);
 
