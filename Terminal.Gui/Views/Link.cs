@@ -63,6 +63,8 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class Link : View, IDesignable
 {
+    private ToolTip<Label>? _toolTip;
+
     /// <inheritdoc/>
     public Link ()
     {
@@ -174,13 +176,45 @@ public class Link : View, IDesignable
         }
     }
 
-    /// <summary>
-    ///     The default value for <see cref="Url"/> — an empty string indicating no URL is associated with the link.
-    /// </summary>
-    public const string DEFAULT_URL = "";
-
-    private string _url = DEFAULT_URL;
+    private string _url = "";
     private bool _isUrlValid = false;
+    private bool _useToolTip = false;
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether a tooltip displaying the <see cref="Url"/> should be shown
+    ///     when the mouse hovers over the link.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When <see langword="true"/>, a tooltip containing the URL is displayed on mouse hover, providing
+    ///         browser-like behavior where users can preview the link destination before clicking.
+    ///     </para>
+    ///     <para>
+    ///         The tooltip is automatically created and managed by the <see cref="Link"/> view.
+    ///     </para>
+    /// </remarks>
+    public bool UseToolTip
+    {
+        get => _useToolTip;
+        set
+        {
+            if (_useToolTip == value)
+            {
+                return;
+            }
+
+            _useToolTip = value;
+
+            if (_useToolTip)
+            {
+                EnsureToolTipCreated ();
+            }
+            else
+            {
+                DisposeToolTip ();
+            }
+        }
+    }
 
     /// <summary>
     ///     Gets or sets the URL (hyperlink target) associated with this <see cref="Link"/>.
@@ -383,5 +417,57 @@ public class Link : View, IDesignable
         // Indicate the formatter needs formatting, which will cause UpdateTextFormatterText to be invoked
         TextFormatter.NeedsFormat = true;
         SetNeedsLayout ();
+
+        // Update tooltip text if it exists
+        UpdateToolTipText ();
+    }
+
+    private void EnsureToolTipCreated ()
+    {
+        if (_toolTip is { })
+        {
+            return;
+        }
+
+        _toolTip = new ToolTip<Label>
+        {
+            ContentView = new Label(),
+            Target = new WeakReference<View> (this),
+            Anchor = () => FrameToScreen ()
+        };
+    }
+
+    private void UpdateToolTipText ()
+    {
+        if (_toolTip?.ContentView is { })
+        {
+            _toolTip.ContentView.Text = Url;
+        }
+    }
+
+    private void DisposeToolTip ()
+    {
+        if (_toolTip is null)
+        {
+            return;
+        }
+
+        _toolTip.Visible = false;
+        _toolTip.Dispose ();
+        _toolTip = null;
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     This method disposes the tooltip.
+    /// </remarks>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            DisposeToolTip ();
+        }
+
+        base.Dispose (disposing);
     }
 }
