@@ -208,6 +208,114 @@ public partial class BorderView : AdornmentView
                                         - Math.Max (0, Math.Max (0, Adornment!.Thickness.Top - 1) + Math.Max (0, Adornment!.Thickness.Bottom - 1))));
     }
 
+    /// <summary>
+    ///     Draws the title text inside the tab header area. For Top/Bottom, the text is horizontal.
+    ///     For Left/Right, the text is drawn vertically (one character per row).
+    /// </summary>
+    private void DrawTitleInTabHeader (Border border, Rectangle borderBounds, DrawContext? context)
+    {
+        if (Adornment?.Parent is null || Driver is null)
+        {
+            return;
+        }
+
+        string title = Adornment.Parent.Title ?? "";
+        int tabLength = border.TabLength!.Value;
+        int tabInteriorSize = tabLength - 2;
+
+        if (tabInteriorSize <= 0 || title.Length == 0)
+        {
+            return;
+        }
+
+        Attribute normalAttr = GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal);
+        Attribute hotAttr = GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal);
+
+        Rectangle headerRect = TabHeaderRenderer.ComputeHeaderRect (borderBounds, border.TabSide, border.TabOffset, tabLength, GetTabDepth (border));
+        Rectangle viewBounds = computeViewBounds (borderBounds, border.TabSide, GetTabDepth (border));
+        Rectangle clipped = Rectangle.Intersect (headerRect, viewBounds);
+
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
+        Rectangle contentArea = TabHeaderRenderer.GetContentArea (headerRect, clipped, border.TabSide);
+
+        if (contentArea.IsEmpty)
+        {
+            return;
+        }
+
+        switch (border.TabSide)
+        {
+            case Side.Top:
+            case Side.Bottom:
+            {
+                int titleWidth = Math.Min (title.GetColumns (), contentArea.Width);
+                Rectangle titleRect = new (contentArea.X, contentArea.Y, titleWidth, 1);
+
+                Adornment.Parent.TitleTextFormatter.ConstrainToSize = new Size (titleWidth, 1);
+                Adornment.Parent.TitleTextFormatter.Draw (Driver, titleRect, normalAttr, hotAttr);
+
+                LastTitleRect = titleRect;
+                context?.AddDrawnRectangle (titleRect);
+                Adornment.Parent.LineCanvas.Exclude (new Region (titleRect));
+
+                break;
+            }
+
+            case Side.Left:
+            case Side.Right:
+            {
+                // Draw title vertically, one character per row
+                int maxChars = Math.Min (title.GetColumns (), contentArea.Height);
+
+                for (var i = 0; i < maxChars; i++)
+                {
+                    if (i < title.Length)
+                    {
+                        Driver.Move (contentArea.X, contentArea.Y + i);
+                        SetAttribute (normalAttr);
+                        Driver.AddRune (title [i]);
+                    }
+                }
+
+                Rectangle titleRect = new (contentArea.X, contentArea.Y, 1, maxChars);
+                LastTitleRect = titleRect;
+                context?.AddDrawnRectangle (titleRect);
+                Adornment.Parent.LineCanvas.Exclude (new Region (titleRect));
+
+                break;
+            }
+        }
+
+        // Helper to compute view bounds (matching TabHeaderRenderer's internal logic)
+        static Rectangle computeViewBounds (Rectangle contentBorderRect, Side side, int depth)
+        {
+            return side switch
+            {
+                Side.Top => new (contentBorderRect.X, contentBorderRect.Y - (depth - 1), contentBorderRect.Width, contentBorderRect.Height + (depth - 1)),
+                Side.Bottom => new (contentBorderRect.X, contentBorderRect.Y, contentBorderRect.Width, contentBorderRect.Height + (depth - 1)),
+                Side.Left => new (contentBorderRect.X - (depth - 1), contentBorderRect.Y, contentBorderRect.Width + (depth - 1), contentBorderRect.Height),
+                Side.Right => new (contentBorderRect.X, contentBorderRect.Y, contentBorderRect.Width + (depth - 1), contentBorderRect.Height),
+                _ => contentBorderRect
+            };
+        }
+    }
+
+    private int GetTabDepth (Border border)
+    {
+        return border.TabSide switch
+        {
+            Side.Top => Adornment!.Thickness.Top,
+            Side.Bottom => Adornment!.Thickness.Bottom,
+            Side.Left => Adornment!.Thickness.Left,
+            Side.Right => Adornment!.Thickness.Right,
+            _ => 3
+        };
+    }
+
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
@@ -236,8 +344,12 @@ public partial class BorderView : AdornmentView
 
         int sideLineLength = borderBounds.Height;
         bool canDrawBorder = borderBounds is { Width: > 0, Height: > 0 };
+        bool hasTab = border.Settings.FastHasFlags (BorderSettings.Tab);
+        bool hasTitle = border.Settings.FastHasFlags (BorderSettings.Title);
 
-        if (border.Settings.FastHasFlags (BorderSettings.Title))
+        // Title bar geometry only applies when Title is set WITHOUT Tab.
+        // When Tab is set, the title goes inside the tab header, not a title bar.
+        if (hasTitle && !hasTab)
         {
             switch (Adornment!.Thickness.Top)
             {
@@ -266,35 +378,31 @@ public partial class BorderView : AdornmentView
             }
         }
 
+        // Draw title text
         if (Driver is { }
             && Adornment.Parent is { }
             && canDrawBorder
-            && Adornment!.Thickness.Top > 0
             && maxTitleWidth > 0
-            && border.Settings.FastHasFlags (BorderSettings.Title)
+            && hasTitle
             && !string.IsNullOrEmpty (Adornment.Parent?.Title))
         {
-            Rectangle titleRect = new (borderBounds.X + 2, titleY, maxTitleWidth, 1);
-
-            if (border.Settings.FastHasFlags (BorderSettings.Tab))
+            if (hasTab)
             {
-                titleRect = new Rectangle (borderBounds.X + 1, titleY, maxTitleWidth, 1);
+                DrawTitleInTabHeader (border, borderBounds, context);
             }
+            else if (Adornment!.Thickness.Top > 0)
+            {
+                Rectangle titleRect = new (borderBounds.X + 2, titleY, maxTitleWidth, 1);
 
-            Adornment.Parent.TitleTextFormatter.Draw (Driver,
-                                                      titleRect,
-                                                      GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
-                                                      GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
+                Adornment.Parent.TitleTextFormatter.Draw (Driver,
+                                                          titleRect,
+                                                          GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
+                                                          GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
 
-            // Cache the title rect for the parent's DoDrawComplete to use when building
-            // drawn region for transparent borders. The title is drawn directly (not via LineCanvas),
-            // so it won't be captured by RenderLineCanvas's region reporting.
-            LastTitleRect = titleRect;
-
-            // Report the title rect to the DrawContext so it participates in clip exclusion.
-            // This ensures the title occludes peer subviews when the Border is transparent.
-            context?.AddDrawnRectangle (titleRect);
-            Adornment.Parent?.LineCanvas.Exclude (new Region (titleRect));
+                LastTitleRect = titleRect;
+                context?.AddDrawnRectangle (titleRect);
+                Adornment.Parent?.LineCanvas.Exclude (new Region (titleRect));
+            }
         }
 
         if (!canDrawBorder || (Adornment as Border)?.LineStyle is null || (Adornment as Border)?.LineStyle == LineStyle.None)
@@ -309,8 +417,6 @@ public partial class BorderView : AdornmentView
         bool drawRight = Adornment!.Thickness.Right > 0 && (Frame.Height > 1 || Adornment!.Thickness.Top == 0);
 
         // When a header protrusion is configured, the renderer handles the tab side's content border
-        bool hasTab = border.Settings.FastHasFlags (BorderSettings.Tab);
-
         if (hasTab)
         {
             switch (border.TabSide)
@@ -348,12 +454,15 @@ public partial class BorderView : AdornmentView
 
         if (drawTop)
         {
-            if (borderBounds.Width < 4 || !border.Settings.FastHasFlags (BorderSettings.Title) || string.IsNullOrEmpty (Adornment.Parent?.Title))
+            // When hasTab, always draw a simple top line (title decoration is in the tab header)
+            if (hasTab
+                || borderBounds.Width < 4
+                || !hasTitle
+                || string.IsNullOrEmpty (Adornment.Parent?.Title))
             {
                 if (border.LineStyle is { })
                 {
-                    // Draw the top-line with no Title
-                    lc?.AddLine (new Point (borderBounds.Location.X, titleY),
+                    lc?.AddLine (new Point (borderBounds.Location.X, borderBounds.Y),
                                  borderBounds.Width,
                                  Orientation.Horizontal,
                                  border.LineStyle.Value,
@@ -362,6 +471,7 @@ public partial class BorderView : AdornmentView
             }
             else
             {
+                // Title bar decoration (only when !hasTab)
                 if (Adornment!.Thickness.Top == 2)
                 {
                     lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY),
@@ -370,40 +480,37 @@ public partial class BorderView : AdornmentView
                                  border.LineStyle!.Value,
                                  normalAttribute);
                 }
-                if (!border.Settings.FastHasFlags (BorderSettings.Tab))
+
+                if (borderBounds.Width >= 4 && Adornment!.Thickness.Top > 2)
                 {
-                    if (borderBounds.Width >= 4 && Adornment!.Thickness.Top > 2)
-                    {
-                        // There's enough room for the Title, draw the horiz lines on above and below the title
-                        lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY),
-                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
-                                     Orientation.Horizontal,
-                                     border.LineStyle!.Value,
-                                     normalAttribute);
-
-                        lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY + 2),
-                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
-                                     Orientation.Horizontal,
-                                     border.LineStyle!.Value,
-                                     normalAttribute);
-                    }
-
-                    lc?.AddLine (borderBounds.Location with { Y = titleY }, 2, Orientation.Horizontal, border.LineStyle!.Value, normalAttribute);
-
-                    lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, normalAttribute);
-
-                    lc?.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, topTitleLineY),
-                                 titleBarsLength,
-                                 Orientation.Vertical,
-                                 LineStyle.Single,
+                    lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY),
+                                 Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
+                                 Orientation.Horizontal,
+                                 border.LineStyle!.Value,
                                  normalAttribute);
 
-                    lc?.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, titleY),
-                                 borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
+                    lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY + 2),
+                                 Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
                                  border.LineStyle!.Value,
                                  normalAttribute);
                 }
+
+                lc?.AddLine (borderBounds.Location with { Y = titleY }, 2, Orientation.Horizontal, border.LineStyle!.Value, normalAttribute);
+
+                lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, normalAttribute);
+
+                lc?.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, topTitleLineY),
+                             titleBarsLength,
+                             Orientation.Vertical,
+                             LineStyle.Single,
+                             normalAttribute);
+
+                lc?.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, titleY),
+                             borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
+                             Orientation.Horizontal,
+                             border.LineStyle!.Value,
+                             normalAttribute);
             }
         }
 
@@ -411,7 +518,10 @@ public partial class BorderView : AdornmentView
 
         if (drawLeft)
         {
-            lc?.AddLine (borderBounds.Location with { Y = titleY }, sideLineLength, Orientation.Vertical, border.LineStyle!.Value, normalAttribute);
+            // When hasTab, side borders always start at borderBounds edge (no title bar extension)
+            int sideStartY = hasTab ? borderBounds.Y : titleY;
+            int sideLen = hasTab ? borderBounds.Height : sideLineLength;
+            lc?.AddLine (borderBounds.Location with { Y = sideStartY }, sideLen, Orientation.Vertical, border.LineStyle!.Value, normalAttribute);
         }
 #endif
 
@@ -426,22 +536,33 @@ public partial class BorderView : AdornmentView
 
         if (drawRight)
         {
-            lc?.AddLine (new Point (borderBounds.X + borderBounds.Width - 1, titleY),
-                         sideLineLength,
+            int sideStartY = hasTab ? borderBounds.Y : titleY;
+            int sideLen = hasTab ? borderBounds.Height : sideLineLength;
+            lc?.AddLine (new Point (borderBounds.X + borderBounds.Width - 1, sideStartY),
+                         sideLen,
                          Orientation.Vertical,
                          border.LineStyle!.Value,
                          normalAttribute);
         }
 
-        // Draw header protrusion if configured
+        // Draw tab header protrusion if configured
         if (lc is { } && hasTab)
         {
+            int depth = border.TabSide switch
+            {
+                Side.Top => Adornment!.Thickness.Top,
+                Side.Bottom => Adornment!.Thickness.Bottom,
+                Side.Left => Adornment!.Thickness.Left,
+                Side.Right => Adornment!.Thickness.Right,
+                _ => 3
+            };
+
             TabHeaderRenderer.AddLines (lc,
                                         borderBounds,
                                         border.TabSide,
                                         border.TabOffset,
                                         border.TabLength!.Value,
-                                        3,
+                                        depth,
                                         !border.Parent!.HasFocus,
                                         border.LineStyle!.Value,
                                         normalAttribute);

@@ -86,11 +86,6 @@ public class Border : AdornmentImpl
             }
             field = value;
 
-            if (Settings.HasFlag (BorderSettings.Tab))
-            {
-                BorderView borderView = GetOrCreateView () as BorderView;
-            }
-
             Parent?.SetNeedsLayout ();
         }
     } = BorderSettings.Title;
@@ -107,7 +102,7 @@ public class Border : AdornmentImpl
     public int TabOffset { get; set; }
 
     /// <summary>
-    ///     Gets or sets the total length of the header parallel to the border edge (including border cells).
+    ///     Gets or sets the total length of the tab parallel to the border edge (including border cells).
     ///     If <see langword="null"/> the length will be determined based on <see cref="View.Title"/>.
     ///     Only used when <see cref="BorderSettings.Tab"/> is set.
     /// </summary>
@@ -117,7 +112,12 @@ public class Border : AdornmentImpl
         {
             if (field is null && Settings.HasFlag (BorderSettings.Tab))
             {
-                return Parent?.Title.GetColumns () + 1;
+                int titleColumns = Settings.HasFlag (BorderSettings.Title)
+                                       ? Parent?.Title?.GetColumns () ?? 0
+                                       : 0;
+
+                // Two vertical border lines + title text width (2 when no title)
+                return titleColumns + 2;
             }
             return field;
         }

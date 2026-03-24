@@ -186,6 +186,8 @@ Amazon Principal Engineer tenets applied:
 
 ### Phase 1: Extend Border with Tab Support
 
+**Status: Implemented.** `BorderSettings.Tab`, `Border.TabSide`, `Border.TabOffset`, `Border.TabLength`, `TabHeaderRenderer`, `BorderView` integration, `BorderEditor` UI, and visual tests are all in place. The `TabLength` auto-computation bug (`+1` instead of `+2`) has been fixed.
+
 ```csharp
 [Flags]
 public enum BorderSettings
@@ -199,8 +201,9 @@ public enum BorderSettings
 
 When `Tab` is set:
 - BorderView renders a **tab header** at `TabOffset` columns from the left, using the existing `Thickness.Top == 3` rendering path
-- The header contains the View's `Title` with top line, vertical connectors, and title text
-- `Title` flag behavior is implied
+- **`BorderSettings.Title` and `BorderSettings.Tab` are not mutually exclusive.** When both are set, the `Title` is displayed within the tab header. When only `Tab` is set (without `Title`), no title text is drawn in the header — it is an empty tab rectangle.
+- When `Tab` is set and `Title` is not set, `TabLength` defaults to `2` (0 space for content + 2 vertical border lines).
+- When `Tab` and `Title` are both set, `TabLength` auto-computes as `Title.GetColumns() + 2` (title text width + 2 border lines).
 - `Thickness.Top` must be 3 (3 rows: header top, title+connectors, content top / header bottom)
 - The bottom line of the title rectangle (Border.cs lines 382-386) is suppressed for the selected tab
 - The Border area outside the header rectangle is transparent (mouse + visual)
@@ -216,15 +219,31 @@ When `Tab` is set:
 public int TabOffset { get; set; }
 ```
 
-### New `BorderView.TabWidth`
+### New `BorderView.TabWidth` (implemented as `Border.TabLength`)
 
 ```csharp
 /// <summary>
-///     Gets the rendered width/height of the tab header rectangle. Only meaningful when <see cref="Settings"/>
-///     includes <see cref="BorderSettings.Tab"/>.
+///     Gets or sets the total length of the tab parallel to the border edge (including border cells).
+///     If null, the length will be determined based on View.Title.
+///     Only used when BorderSettings.Tab is set.
 /// </summary>
-public int TabWidth => (Parent?.TitleTextFormatter.FormatAndGetSize ().Width (or Height) ?? 0) + 2;
+public int? TabLength
+{
+    get
+    {
+        if (field is null && Settings.HasFlag (BorderSettings.Tab))
+        {
+            int titleColumns = Parent?.Title?.GetColumns () ?? 0;
+            // Two vertical border lines + title text width
+            return titleColumns + 2;
+        }
+        return field;
+    }
+    set;
+}
 ```
+
+**Note:** The auto-computed default is `Title.GetColumns() + 2` (two vertical border lines flanking the title). When `Title` is empty/null and `Tab` is set, `TabLength` defaults to `2` (just the two border lines, 0 content). An earlier implementation incorrectly used `+ 1`; this was fixed.
 
 ### New `BorderView.TabSide`
 
@@ -1103,7 +1122,7 @@ The following errors/inconsistencies should be corrected:Borde
 
 2. **Line ~337 (`Tab` constructor)**: `Canfocus = true` — typo, should be `CanFocus` (capital F).
 
-3. **Line ~226 (`TabWidth` property)**: Contains pseudo-code `(or Height)` — `Parent?.TitleTextFormatter.FormatAndGetSize ().Width (or Height)` is not valid C#. Should be two separate expressions or a conditional based on `TabSide`.
+3. **Line ~226 (`TabWidth` property)**: ~~Contains pseudo-code `(or Height)` — `Parent?.TitleTextFormatter.FormatAndGetSize ().Width (or Height)` is not valid C#. Should be two separate expressions or a conditional based on `TabSide`.~~ **FIXED:** Implemented as `Border.TabLength` with auto-computation `Title.GetColumns() + 2`. The earlier `+ 1` bug was also fixed.
 
 4. **Line ~364 (`IValue<Tab?>.Value` getter)**: `Focused as Tab` won't work correctly. `View.Focused` returns the *immediate* focused subview — if a control inside a Tab has focus, `Focused` returns that control, not the Tab. Should use `SubViews.OfType<Tab> ().FirstOrDefault (t => t.HasFocus)`.
 
