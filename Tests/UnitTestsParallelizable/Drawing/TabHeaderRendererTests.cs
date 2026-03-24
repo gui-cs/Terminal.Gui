@@ -94,8 +94,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
                                               ╰───────╯
                                               """,
                                               output,
-                                              driver,
-                                              true);
+                                              driver);
 
         v.Dispose ();
     }
@@ -122,8 +121,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
                                               ╰───────╯
                                               """,
                                               output,
-                                              driver,
-                                              true);
+                                              driver);
 
         v.Dispose ();
     }
@@ -151,8 +149,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
                                               ╰───────╯
                                               """,
                                               output,
-                                              driver,
-                                              true);
+                                              driver);
 
         v.Dispose ();
     }
@@ -183,8 +180,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
                                               ╰───────╯
                                               """,
                                               output,
-                                              driver,
-                                              true);
+                                              driver);
 
         v.Dispose ();
     }
@@ -211,8 +207,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
                                               ╰───────╯
                                               """,
                                               output,
-                                              driver,
-                                              true);
+                                              driver);
 
         v.Dispose ();
     }
@@ -244,8 +239,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
                                               ╰───╯
                                               """,
                                               output,
-                                              driver,
-                                              true);
+                                              driver);
 
         v.Dispose ();
     }
@@ -273,8 +267,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
                                               ╰───╯
                                               """,
                                               output,
-                                              driver,
-                                              true);
+                                              driver);
 
         v.Dispose ();
     }
@@ -308,8 +301,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
                                                 ╰───────╯
                                               """,
                                               output,
-                                              driver,
-                                              true);
+                                              driver);
 
         v.Dispose ();
     }
@@ -340,8 +332,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
                                               ╰───────╯
                                               """,
                                               output,
-                                              driver,
-                                              true);
+                                              driver);
 
         v.Dispose ();
     }
@@ -373,8 +364,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
                                               ╰─────── a│
                                               """,
                                               output,
-                                              driver,
-                                              true);
+                                              driver);
 
         v.Dispose ();
     }
@@ -407,8 +397,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
                                               ╰───────╯
                                               """,
                                               output,
-                                              driver,
-                                              true);
+                                              driver);
 
         v.Dispose ();
     }
@@ -440,8 +429,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
                                               │a ───────╯
                                               """,
                                               output,
-                                              driver,
-                                              true);
+                                              driver);
 
         v.Dispose ();
     }
@@ -469,8 +457,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
                                               ╰───────╯
                                               """,
                                               output,
-                                              driver,
-                                              true);
+                                              driver);
 
         v.Dispose ();
     }
@@ -497,8 +484,70 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
                                               ╰───────╯
                                               """,
                                               output,
-                                              driver,
-                                              true);
+                                              driver);
+
+        v.Dispose ();
+    }
+
+    #endregion
+
+    #region Round 6 — Negative TabOffset (overflow at start edge)
+
+    [Fact]
+    public void Top_Unfocused_NegativeOffset ()
+    {
+        // TabOffset = -1: header left side extends beyond content left border
+        Rectangle contentRect = new (0, 2, 9, 4);
+
+        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 6, view => TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Top, -1, "Tab"));
+
+        AddContentBorder (canvas, contentRect, skipSide: Side.Top);
+        TabHeaderRenderer.AddLines (canvas, contentRect, Side.Top, -1, "Tab", false, LineStyle.Rounded);
+
+        v.Draw ();
+        output.WriteLine (driver.ToString ());
+
+        // Left side of header is open (clipped off-screen)
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ───╮
+                                              Tab│
+                                              ╭──┴────╮
+                                              │       │
+                                              │       │
+                                              ╰───────╯
+                                              """,
+                                              output,
+                                              driver);
+
+        v.Dispose ();
+    }
+
+    [Fact]
+    public void Bottom_Unfocused_NegativeOffset ()
+    {
+        // TabOffset = -1: header left side extends beyond content left border
+        Rectangle contentRect = new (0, 0, 9, 4);
+
+        (View v, LineCanvas canvas, IDriver driver) =
+            CreateCanvas (9, 7, view => TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Bottom, -1, "Tab"));
+
+        AddContentBorder (canvas, contentRect, skipSide: Side.Bottom);
+        TabHeaderRenderer.AddLines (canvas, contentRect, Side.Bottom, -1, "Tab", false, LineStyle.Rounded);
+
+        v.Draw ();
+        output.WriteLine (driver.ToString ());
+
+        // Left side of header is open (clipped off-screen)
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭───────╮
+                                              │       │
+                                              │       │
+                                              ╰──┬────╯
+                                              Tab│
+                                              ───╯
+                                              """,
+                                              output,
+                                              driver);
 
         v.Dispose ();
     }
