@@ -1,3 +1,5 @@
+using Terminal.Gui.Drawing;
+
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
@@ -274,6 +276,11 @@ public partial class BorderView : AdornmentView
         {
             Rectangle titleRect = new (borderBounds.X + 2, titleY, maxTitleWidth, 1);
 
+            if (border.Settings.FastHasFlags (BorderSettings.Tab))
+            {
+                titleRect = new Rectangle (borderBounds.X + 1, titleY, maxTitleWidth, 1);
+            }
+
             Adornment.Parent.TitleTextFormatter.Draw (Driver,
                                                       titleRect,
                                                       GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
@@ -301,6 +308,35 @@ public partial class BorderView : AdornmentView
         bool drawBottom = Adornment!.Thickness.Bottom > 0 && Frame is { Width: > 1, Height: > 1 };
         bool drawRight = Adornment!.Thickness.Right > 0 && (Frame.Height > 1 || Adornment!.Thickness.Top == 0);
 
+        // When a header protrusion is configured, the renderer handles the tab side's content border
+        bool hasTab = border.Settings.FastHasFlags (BorderSettings.Tab);
+
+        if (hasTab)
+        {
+            switch (border.TabSide)
+            {
+                case Side.Top:
+                    drawTop = false;
+
+                    break;
+
+                case Side.Bottom:
+                    drawBottom = false;
+
+                    break;
+
+                case Side.Left:
+                    drawLeft = false;
+
+                    break;
+
+                case Side.Right:
+                    drawRight = false;
+
+                    break;
+            }
+        }
+
         Attribute normalAttribute = GetAttributeForRole (VisualRole.Normal);
 
         if (MouseState.HasFlag (MouseState.Pressed))
@@ -316,6 +352,7 @@ public partial class BorderView : AdornmentView
             {
                 if (border.LineStyle is { })
                 {
+                    // Draw the top-line with no Title
                     lc?.AddLine (new Point (borderBounds.Location.X, titleY),
                                  borderBounds.Width,
                                  Orientation.Horizontal,
@@ -333,37 +370,40 @@ public partial class BorderView : AdornmentView
                                  border.LineStyle!.Value,
                                  normalAttribute);
                 }
-
-                if (borderBounds.Width >= 4 && Adornment!.Thickness.Top > 2)
+                if (!border.Settings.FastHasFlags (BorderSettings.Tab))
                 {
-                    lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY),
-                                 Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
-                                 Orientation.Horizontal,
-                                 border.LineStyle!.Value,
+                    if (borderBounds.Width >= 4 && Adornment!.Thickness.Top > 2)
+                    {
+                        // There's enough room for the Title, draw the horiz lines on above and below the title
+                        lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY),
+                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
+                                     Orientation.Horizontal,
+                                     border.LineStyle!.Value,
+                                     normalAttribute);
+
+                        lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY + 2),
+                                     Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
+                                     Orientation.Horizontal,
+                                     border.LineStyle!.Value,
+                                     normalAttribute);
+                    }
+
+                    lc?.AddLine (borderBounds.Location with { Y = titleY }, 2, Orientation.Horizontal, border.LineStyle!.Value, normalAttribute);
+
+                    lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, normalAttribute);
+
+                    lc?.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, topTitleLineY),
+                                 titleBarsLength,
+                                 Orientation.Vertical,
+                                 LineStyle.Single,
                                  normalAttribute);
 
-                    lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY + 2),
-                                 Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
+                    lc?.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, titleY),
+                                 borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
                                  border.LineStyle!.Value,
                                  normalAttribute);
                 }
-
-                lc?.AddLine (borderBounds.Location with { Y = titleY }, 2, Orientation.Horizontal, border.LineStyle!.Value, normalAttribute);
-
-                lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, normalAttribute);
-
-                lc?.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, topTitleLineY),
-                             titleBarsLength,
-                             Orientation.Vertical,
-                             LineStyle.Single,
-                             normalAttribute);
-
-                lc?.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, titleY),
-                             borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
-                             Orientation.Horizontal,
-                             border.LineStyle!.Value,
-                             normalAttribute);
             }
         }
 
@@ -391,6 +431,20 @@ public partial class BorderView : AdornmentView
                          Orientation.Vertical,
                          border.LineStyle!.Value,
                          normalAttribute);
+        }
+
+        // Draw header protrusion if configured
+        if (lc is { } && hasTab)
+        {
+            TabHeaderRenderer.AddLines (lc,
+                                        borderBounds,
+                                        border.TabSide,
+                                        border.TabOffset,
+                                        border.TabLength!.Value,
+                                        3,
+                                        !border.Parent!.HasFocus,
+                                        border.LineStyle!.Value,
+                                        normalAttribute);
         }
 
         // TODO: This should be moved to LineCanvas as a new BorderStyle.Ruler

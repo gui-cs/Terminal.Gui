@@ -1,3 +1,5 @@
+using System.Formats.Asn1;
+
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
@@ -84,7 +86,41 @@ public class Border : AdornmentImpl
             }
             field = value;
 
+            if (Settings.HasFlag (BorderSettings.Tab))
+            {
+                BorderView borderView = GetOrCreateView () as BorderView;
+            }
+
             Parent?.SetNeedsLayout ();
         }
     } = BorderSettings.Title;
+
+    /// <summary>
+    ///     Gets or sets which side the Tab protrudes from. Only used when <see cref="BorderSettings.Tab"/> is set.
+    /// </summary>
+    public Side TabSide { get; set; } = Side.Top;
+
+    /// <summary>
+    ///     Gets or sets the offset along the border edge where the Tab starts (columns for Top/Bottom,
+    ///     rows for Left/Right). Only used when <see cref="BorderSettings.Tab"/> is set.
+    /// </summary>
+    public int TabOffset { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the total length of the header parallel to the border edge (including border cells).
+    ///     If <see langword="null"/> the length will be determined based on <see cref="View.Title"/>.
+    ///     Only used when <see cref="BorderSettings.Tab"/> is set.
+    /// </summary>
+    public int? TabLength
+    {
+        get
+        {
+            if (field is null && Settings.HasFlag (BorderSettings.Tab))
+            {
+                return Parent?.Title.GetColumns () + 1;
+            }
+            return field;
+        }
+        set;
+    }
 }

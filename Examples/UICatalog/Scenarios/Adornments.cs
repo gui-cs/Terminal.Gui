@@ -50,7 +50,7 @@ public class Adornments : Scenario
 
         Window window = new ()
         {
-            Title = "The _Window",
+            Title = "The _Window - The Title is intentionally long",
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable,
             Width = Dim.Fill (adornmentsEditor),
             Height = Dim.Fill (viewportSettingsEditor)
