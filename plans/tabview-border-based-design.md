@@ -674,17 +674,49 @@ This same principle applies to `Side.Left` overflow (mirrored) and to `Side.Top`
 
 Rather than implementing Side.Top first and generalizing later, we build a **standalone, side-agnostic drawing algorithm** from the start. The algorithm is parameterized by `Side` — no per-side code paths, just coordinate transforms.
 
-**Why this works:** LineCanvas auto-join handles all junction glyph resolution. A tab header is just 3 additional line segments (the outer sides of the header rectangle) added to the same LineCanvas as the content border. For `HasFocus == false`, a 4th closing line is added and auto-join produces the junction glyphs (`├`, `┤`, `┬`, `┴`). For `HasFocus == true`, the closing line is omitted and the content border is excluded in the gap region.
+**Why this works:** LineCanvas auto-join handles all junction glyph resolution. A tab header is just 3 additional line segments (the outer sides of the header rectangle) added to the same LineCanvas as the content border. For `showSeparator == true`, a 4th closing line is added and auto-join produces the junction glyphs (`├`, `┤`, `┬`, `┴`). For `showSeparator == false`, the closing line is omitted and the content border is excluded in the gap region.
+
+**New API:**
+
+```csharp
+// Core — just the border lines. Content drawing is the caller's responsibility.
+static void AddLines (LineCanvas lineCanvas,
+                      Rectangle contentBorderRect,
+                      Side side,
+                      int offset,          // along the edge
+                      int length,          // parallel to edge (total including borders)
+                      int depth,           // perpendicular to edge (total including borders)
+                      bool showSeparator,  // true = draw closing line with junctions; false = open gap
+                      LineStyle lineStyle,
+                      Attribute? lineAttribute = null);
+
+// Public so caller knows where to position content (View, text, anything)
+static Rectangle ComputeHeaderRect (Rectangle contentBorderRect,
+                                    Side side, int offset,
+                                    int length, int depth);
+
+// Computes the interior content area within the header rect (excludes border cells)
+static Rectangle GetContentArea (Rectangle headerRect, Rectangle clipped, Side side);
+```
+
+**Key design decisions:**
+
+- **`showSeparator`** replaces `hasFocus` (inverted semantics). `true` = closing line drawn (junctions), `false` = open gap. Generic — caller decides why.
+- **`length` and `depth`** replace `tabText`-derived sizing. Enables arbitrary-size protrusions (multi-row headers, icon+label, etc.)
+- **`lineAttribute`** colors the header border lines (may differ from content border).
+- **`DrawText` removed** — caller owns content rendering. Could be text, a View, custom drawing.
+- **`ComputeHeaderRect` is public** so caller can position their content.
+- **`Render` convenience method removed** — it coupled text drawing to border drawing.
 
 **Core algorithm (any side):**
 
 ```
-1. Compute headerRect from (side, tabOffset, tabTextLength, contentBorderRect)
+1. Compute headerRect from (side, offset, length, depth, contentBorderRect)
 2. Clip headerRect to viewBounds (overflow → partial header)
 3. Add 3 outer header border lines to LineCanvas (the sides NOT adjacent to content)
-4. If !hasFocus → add closing line (adjacent to content); auto-join gives junctions
-5. If hasFocus → Exclude content border in the gap (header interior width/height)
-6. Draw tab text inside clipped header (horizontal for Top/Bottom, vertical for Left/Right)
+4. If showSeparator → add closing line (adjacent to content); auto-join gives junctions
+5. If !showSeparator → split content border into two segments around the gap
+6. Caller draws content inside the header rect (text, View, whatever)
 ```
 
 Steps 3–5 use coordinate rotation based on `Side`: each side defines which edge is "outer", "left-perp", "right-perp", and "closing". The math is identical across all sides.
@@ -693,35 +725,35 @@ Steps 3–5 use coordinate rotation based on `Side`: each side defines which edg
 
 | File | Purpose |
 |------|---------|
-| `Terminal.Gui/Drawing/TabHeaderRenderer.cs` | `internal static class TabHeaderRenderer` — pure drawing helper. Takes `LineCanvas`, `Side`, offset, text, hasFocus, bounds, `LineStyle`, `Attribute`. Adds lines and exclusions. Also uses `TextFormatter` for text. **No dependency on Border/BorderView/View.** |
-| `Tests/UnitTestsParallelizable/Drawing/TabHeaderRendererTests.cs` | TDD tests using `CreateTestDriver()` + `GetCanvas()` pattern from `LineCanvasTests`. Each test creates a LineCanvas, adds content border lines, calls `TabHeaderRenderer`, draws, and asserts with `DriverAssert.AssertDriverContentsAre`. |
+| `Terminal.Gui/Drawing/TabHeaderRenderer.cs` | `internal static class TabHeaderRenderer` — pure geometry drawing helper. Takes `LineCanvas`, `Side`, offset, length, depth, showSeparator, `LineStyle`, `Attribute`. Adds lines and exclusions. **No text drawing, no dependency on Border/BorderView/View.** |
+| `Tests/UnitTestsParallelizable/Drawing/TabHeaderRendererTests.cs` | TDD tests using `CreateTestDriver ()` + `GetCanvas ()` pattern from `LineCanvasTests`. Each test creates a LineCanvas, adds content border lines, calls `TabHeaderRenderer.AddLines ()`, draws, and asserts with `DriverAssert.AssertDriverContentsAre`. Tests verify geometry only — simple text is drawn manually by the test (not by the renderer). |
 
 #### Test-driven development order
 
 Tests are written first, then the algorithm is iterated until they pass. Tests use the `TestDriverBase` + `GetCanvas` pattern (no Application.Init needed).
 
-**Round 1 — Side.Top, HasFocus == false:**
-- `Tab_Top_Unfocused_TabOffset0` — `├───┴───╮` junction row
-- `Tab_Top_Unfocused_TabOffset2` — `╭─┴───┴──╮` with ┴ junctions
-- `Tab_Top_Unfocused_Overflow` — header clipped at right edge
+**Round 1 — Side.Top, showSeparator == true:**
+- `Tab_Top_Separator_TabOffset0` — `├───┴───╮` junction row
+- `Tab_Top_Separator_TabOffset2` — `╭─┴───┴──╮` with ┴ junctions
+- `Tab_Top_Separator_Overflow` — header clipped at right edge
 
-**Round 2 — Side.Top, HasFocus == true:**
-- `Tab_Top_Focused_TabOffset0` — open gap, `│` continues left border
-- `Tab_Top_Focused_TabOffset2` — `╯` and `╰` curves with gap
+**Round 2 — Side.Top, showSeparator == false:**
+- `Tab_Top_Open_TabOffset0` — open gap, `│` continues left border
+- `Tab_Top_Open_TabOffset2` — `╯` and `╰` curves with gap
 
 **Round 3 — Side.Bottom (mirror of Top):**
-- Unfocused and focused variants, same test structure
+- Separator and open variants, same test structure
 
 **Round 4 — Side.Left and Side.Right:**
-- Vertical text, `┤`/`├` junctions, header height = textLen + 2
+- Vertical headers, `┤`/`├` junctions
 - Overflow clipping at bottom edge
-- Focused overflow (the gap nuance with content corner interaction)
+- Open gap overflow (the gap nuance with content corner interaction)
 
 **Round 5 — Edge cases:**
 - Header wider/taller than view (fully clipped)
-- Negative TabOffset (overflow at start edge)
-- Single-character tab text
-- Empty tab text
+- Negative offset (overflow at start edge)
+- Single-cell length
+- Zero-content-area (length or depth == 2, i.e. borders only)
 
 ### Steps
 
@@ -729,11 +761,12 @@ Tests are written first, then the algorithm is iterated until they pass. Tests u
 
 **Files:** `Terminal.Gui/Drawing/TabHeaderRenderer.cs`, `Tests/UnitTestsParallelizable/Drawing/TabHeaderRendererTests.cs`
 
-1. Create test file with Round 1 tests (Side.Top, unfocused)
-2. Create `TabHeaderRenderer` with the general algorithm
+1. Create test file with Round 1 tests (Side.Top, showSeparator == true)
+2. Create `TabHeaderRenderer` with the geometry-only API (`AddLines`, `ComputeHeaderRect`, `GetContentArea`)
 3. Iterate until Round 1 tests pass
 4. Add Round 2–5 tests incrementally, fixing the algorithm as needed
 5. All tests use `DriverAssert.AssertDriverContentsAre` with exact expected output matching the visual examples in this spec
+6. Tests verify geometry only — simple text is drawn manually by the test to confirm content positioning, not by the renderer
 
 #### 2. Wire `TabHeaderRenderer` into `BorderView`
 
@@ -753,9 +786,10 @@ Tests are written first, then the algorithm is iterated until they pass. Tests u
 
 ### Exit Criteria
 
-- `TabHeaderRenderer` is a standalone, fully-tested drawing helper with no View/Border dependencies
+- `TabHeaderRenderer` is a standalone, fully-tested geometry-only drawing helper with no View/Border dependencies
 - All four `Side`s produce correct output matching the visual examples in this spec
-- HasFocus == true/false variants all correct, including overflow cases
+- showSeparator == true/false variants all correct, including overflow cases
+- No text drawing in the renderer — caller owns content rendering
 - `BorderView` calls `TabHeaderRenderer` when `BorderSettings.Tab` is set
 - `BorderEditor` supports all tab properties
 - All existing tests still pass
