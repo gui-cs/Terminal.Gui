@@ -231,8 +231,9 @@ public partial class BorderView : AdornmentView
         Attribute normalAttr = GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal);
         Attribute hotAttr = GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal);
 
-        Rectangle headerRect = TabHeaderRenderer.ComputeHeaderRect (borderBounds, border.TabSide, border.TabOffset, tabLength, GetTabDepth (border));
-        Rectangle viewBounds = computeViewBounds (borderBounds, border.TabSide, GetTabDepth (border));
+        int depth = GetTabDepth (border);
+        Rectangle headerRect = TabHeaderRenderer.ComputeHeaderRect (borderBounds, border.TabSide, border.TabOffset, tabLength, depth);
+        Rectangle viewBounds = computeViewBounds (borderBounds, border.TabSide, depth);
         Rectangle clipped = Rectangle.Intersect (headerRect, viewBounds);
 
         if (clipped.IsEmpty)
@@ -240,7 +241,11 @@ public partial class BorderView : AdornmentView
             return;
         }
 
-        Rectangle contentArea = TabHeaderRenderer.GetContentArea (headerRect, clipped, border.TabSide);
+        // For depth >= 3, title goes in the standard interior content area.
+        // For depth <= 2, there's no interior — title goes ON the closing edge (between side borders).
+        Rectangle contentArea = depth >= 3
+                                    ? TabHeaderRenderer.GetContentArea (headerRect, clipped, border.TabSide)
+                                    : computeClosingEdgeTitleArea (headerRect, clipped, border.TabSide);
 
         if (contentArea.IsEmpty)
         {
@@ -302,11 +307,57 @@ public partial class BorderView : AdornmentView
                 _ => contentBorderRect
             };
         }
+
+        // For depth <= 2, title goes ON the closing edge row/col (between the side border edges).
+        static Rectangle computeClosingEdgeTitleArea (Rectangle headerRect, Rectangle clipped, Side side)
+        {
+            switch (side)
+            {
+                case Side.Top:
+                {
+                    int y = clipped.Bottom - 1;
+                    int left = clipped.X == headerRect.X ? clipped.X + 1 : clipped.X;
+                    int right = clipped.Right == headerRect.Right ? clipped.Right - 1 : clipped.Right;
+
+                    return right - left > 0 ? new (left, y, right - left, 1) : Rectangle.Empty;
+                }
+
+                case Side.Bottom:
+                {
+                    int y = clipped.Y;
+                    int left = clipped.X == headerRect.X ? clipped.X + 1 : clipped.X;
+                    int right = clipped.Right == headerRect.Right ? clipped.Right - 1 : clipped.Right;
+
+                    return right - left > 0 ? new (left, y, right - left, 1) : Rectangle.Empty;
+                }
+
+                case Side.Left:
+                {
+                    int x = clipped.Right - 1;
+                    int top = clipped.Y == headerRect.Y ? clipped.Y + 1 : clipped.Y;
+                    int bottom = clipped.Bottom == headerRect.Bottom ? clipped.Bottom - 1 : clipped.Bottom;
+
+                    return bottom - top > 0 ? new (x, top, 1, bottom - top) : Rectangle.Empty;
+                }
+
+                case Side.Right:
+                {
+                    int x = clipped.X;
+                    int top = clipped.Y == headerRect.Y ? clipped.Y + 1 : clipped.Y;
+                    int bottom = clipped.Bottom == headerRect.Bottom ? clipped.Bottom - 1 : clipped.Bottom;
+
+                    return bottom - top > 0 ? new (x, top, 1, bottom - top) : Rectangle.Empty;
+                }
+
+                default:
+                    return Rectangle.Empty;
+            }
+        }
     }
 
     private int GetTabDepth (Border border)
     {
-        return border.TabSide switch
+        int thickness = border.TabSide switch
         {
             Side.Top => Adornment!.Thickness.Top,
             Side.Bottom => Adornment!.Thickness.Bottom,
@@ -314,6 +365,8 @@ public partial class BorderView : AdornmentView
             Side.Right => Adornment!.Thickness.Right,
             _ => 3
         };
+
+        return Math.Min (thickness, 3);
     }
 
     /// <inheritdoc/>
@@ -548,14 +601,7 @@ public partial class BorderView : AdornmentView
         // Draw tab header protrusion if configured
         if (lc is { } && hasTab)
         {
-            int depth = border.TabSide switch
-            {
-                Side.Top => Adornment!.Thickness.Top,
-                Side.Bottom => Adornment!.Thickness.Bottom,
-                Side.Left => Adornment!.Thickness.Left,
-                Side.Right => Adornment!.Thickness.Right,
-                _ => 3
-            };
+            int depth = GetTabDepth (border);
 
             TabHeaderRenderer.AddLines (lc,
                                         borderBounds,

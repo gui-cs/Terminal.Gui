@@ -24,7 +24,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         int? tabLength,
         bool hasFocus,
         string? title,
-        bool titleFlag)
+        bool titleFlag,
+        Thickness? thickness = null)
     {
         View view = new ()
         {
@@ -41,7 +42,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
             view.Title = title;
         }
 
-        view.Border.Thickness = side switch
+        view.Border.Thickness = thickness ?? side switch
         {
             Side.Top => new Thickness (1, 3, 1, 1),
             Side.Bottom => new Thickness (1, 1, 1, 3),
@@ -511,6 +512,260 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                      │       ╰─╮
                                      │        T│
                                      ╰─────── a│
+                                     """);
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    //  Thickness Variants — Depth capping and non-standard depths
+    //  Depth should be min (thickness_on_tab_side, 3).
+    //  Thickness >= 3 always uses depth 3.
+    //  Thickness 1 and 2 produce shallower tabs per spec.
+    // ════════════════════════════════════════════════════════════════════
+
+    // ──── Thickness = 4 (depth capped to 3) ────
+    // Expected output identical to thickness=3 (extra blank row trimmed).
+
+    [Fact]
+    public void Top_Focused_Depth4_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 7);
+        View view = CreateTabView (driver, 9, 7, Side.Top, tabOffset: 0, tabLength: null,
+                                   hasFocus: true, title: "Tab", titleFlag: true,
+                                   thickness: new Thickness (1, 4, 1, 1));
+
+        DrawAndAssert (view, driver, """
+                                     ╭───╮
+                                     │Tab│
+                                     │   ╰───╮
+                                     │       │
+                                     │       │
+                                     ╰───────╯
+                                     """);
+    }
+
+    [Fact]
+    public void Bottom_Focused_Depth4_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 7);
+        View view = CreateTabView (driver, 9, 7, Side.Bottom, tabOffset: 0, tabLength: null,
+                                   hasFocus: true, title: "Tab", titleFlag: true,
+                                   thickness: new Thickness (1, 1, 1, 4));
+
+        DrawAndAssert (view, driver, """
+                                     ╭───────╮
+                                     │       │
+                                     │       │
+                                     │   ╭───╯
+                                     │Tab│
+                                     ╰───╯
+                                     """);
+    }
+
+    [Fact]
+    public void Left_Focused_Depth4_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (12, 9);
+        View view = CreateTabView (driver, 12, 9, Side.Left, tabOffset: 0, tabLength: null,
+                                   hasFocus: true, title: "Tab", titleFlag: true,
+                                   thickness: new Thickness (4, 1, 1, 1));
+
+        DrawAndAssert (view, driver, """
+                                     ╭─ ───────╮
+                                      │T        │
+                                      │a        │
+                                      │b        │
+                                      ╰─╮       │
+                                        │       │
+                                        │       │
+                                        │       │
+                                        ╰───────╯
+                                     """);
+    }
+
+    [Fact]
+    public void Right_Focused_Depth4_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (12, 9);
+        View view = CreateTabView (driver, 12, 9, Side.Right, tabOffset: 0, tabLength: null,
+                                   hasFocus: true, title: "Tab", titleFlag: true,
+                                   thickness: new Thickness (1, 1, 4, 1));
+
+        DrawAndAssert (view, driver, """
+                                     ╭─────── ─╮
+                                     │        T│
+                                     │        a│
+                                     │        b│
+                                     │       ╭─╯
+                                     │       │
+                                     │       │
+                                     │       │
+                                     ╰───────╯
+                                     """);
+    }
+
+    // ──── Thickness = 2 (depth 2) ────
+    // 2-row tab: cap line + title on closing edge. No bottom line.
+
+    [Fact]
+    public void Top_Focused_Depth2_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 5);
+        View view = CreateTabView (driver, 9, 5, Side.Top, tabOffset: 0, tabLength: null,
+                                   hasFocus: true, title: "Tab", titleFlag: true,
+                                   thickness: new Thickness (1, 2, 1, 1));
+
+        DrawAndAssert (view, driver, """
+                                     ╭───╮
+                                     │Tab╰───╮
+                                     │       │
+                                     │       │
+                                     ╰───────╯
+                                     """);
+    }
+
+    [Fact]
+    public void Bottom_Focused_Depth2_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 5);
+        View view = CreateTabView (driver, 9, 5, Side.Bottom, tabOffset: 0, tabLength: null,
+                                   hasFocus: true, title: "Tab", titleFlag: true,
+                                   thickness: new Thickness (1, 1, 1, 2));
+
+        DrawAndAssert (view, driver, """
+                                     ╭───────╮
+                                     │       │
+                                     │       │
+                                     │Tab╭───╯
+                                     ╰───╯
+                                     """);
+    }
+
+    [Fact]
+    public void Left_Focused_Depth2_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (10, 9);
+        View view = CreateTabView (driver, 10, 9, Side.Left, tabOffset: 0, tabLength: null,
+                                   hasFocus: true, title: "Tab", titleFlag: true,
+                                   thickness: new Thickness (2, 1, 1, 1));
+
+        // Depth=2: cap at col 0, closing edge at col 1. Title on closing edge.
+        // (1,0) excluded by AddTabSideContentBorder → space at col 1 row 0.
+        // (1,4) has ╮ from header bottom edge + content border vertical auto-join.
+        DrawAndAssert (view, driver, """
+                                     ╭ ───────╮
+                                     │T       │
+                                     │a       │
+                                     │b       │
+                                     ╰╮       │
+                                      │       │
+                                      │       │
+                                      │       │
+                                      ╰───────╯
+                                     """);
+    }
+
+    [Fact]
+    public void Right_Focused_Depth2_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (10, 9);
+        View view = CreateTabView (driver, 10, 9, Side.Right, tabOffset: 0, tabLength: null,
+                                   hasFocus: true, title: "Tab", titleFlag: true,
+                                   thickness: new Thickness (1, 1, 2, 1));
+
+        // Depth=2: cap at col 9, closing edge at col 8. Title on closing edge.
+        // (8,0) excluded → space at col 8 row 0. (8,4) has ╭ from auto-join.
+        DrawAndAssert (view, driver, """
+                                     ╭─────── ╮
+                                     │       T│
+                                     │       a│
+                                     │       b│
+                                     │       ╭╯
+                                     │       │
+                                     │       │
+                                     │       │
+                                     ╰───────╯
+                                     """);
+    }
+
+    // ──── Thickness = 1 (depth 1) ────
+    // 1-row tab: title inline on the content border line.
+
+    [Fact]
+    public void Top_Focused_Depth1_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 4);
+        View view = CreateTabView (driver, 9, 4, Side.Top, tabOffset: 0, tabLength: null,
+                                   hasFocus: true, title: "Tab", titleFlag: true,
+                                   thickness: new Thickness (1, 1, 1, 1));
+
+        DrawAndAssert (view, driver, """
+                                     │Tab╰───╮
+                                     │       │
+                                     │       │
+                                     ╰───────╯
+                                     """);
+    }
+
+    [Fact]
+    public void Bottom_Focused_Depth1_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 4);
+        View view = CreateTabView (driver, 9, 4, Side.Bottom, tabOffset: 0, tabLength: null,
+                                   hasFocus: true, title: "Tab", titleFlag: true,
+                                   thickness: new Thickness (1, 1, 1, 1));
+
+        DrawAndAssert (view, driver, """
+                                     ╭───────╮
+                                     │       │
+                                     │       │
+                                     │Tab╭───╯
+                                     """);
+    }
+
+    [Fact]
+    public void Left_Focused_Depth1_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 9);
+        View view = CreateTabView (driver, 9, 9, Side.Left, tabOffset: 0, tabLength: null,
+                                   hasFocus: true, title: "Tab", titleFlag: true,
+                                   thickness: new Thickness (1, 1, 1, 1));
+
+        // Depth=1: no cap line, no tab edges. Title at rows 1-3 (between top/bottom edges).
+        // (0,0) is excluded by AddTabSideContentBorder (tab starts at content border edge).
+        // After Trim(), leading space removed from row 0.
+        DrawAndAssert (view, driver, """
+                                     ───────╮
+                                     T       │
+                                     a       │
+                                     b       │
+                                     │       │
+                                     │       │
+                                     │       │
+                                     │       │
+                                     ╰───────╯
+                                     """);
+    }
+
+    [Fact]
+    public void Right_Focused_Depth1_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 9);
+        View view = CreateTabView (driver, 9, 9, Side.Right, tabOffset: 0, tabLength: null,
+                                   hasFocus: true, title: "Tab", titleFlag: true,
+                                   thickness: new Thickness (1, 1, 1, 1));
+
+        // Depth=1: no cap line, no tab edges. Title at rows 1-3.
+        // (8,0) excluded by AddTabSideContentBorder → trailing space stripped.
+        DrawAndAssert (view, driver, """
+                                     ╭───────
+                                     │       T
+                                     │       a
+                                     │       b
+                                     │       │
+                                     │       │
+                                     │       │
+                                     │       │
+                                     ╰───────╯
                                      """);
     }
 }

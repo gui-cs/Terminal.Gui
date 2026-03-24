@@ -163,7 +163,9 @@ internal static class TabHeaderRenderer
         };
 
     /// <summary>
-    ///     Adds the 3 outer border lines of the header (the sides NOT adjacent to the content border).
+    ///     Adds the outer border lines of the header (the sides NOT adjacent to the content border).
+    ///     For depth >= 2, draws cap + two side edges. For depth == 1, the cap coincides with the
+    ///     closing edge (handled by <see cref="AddTabSideContentBorder"/>), so only side edges are drawn.
     /// </summary>
     private static void AddOuterHeaderLines (LineCanvas lineCanvas,
                                              Rectangle headerRect,
@@ -172,65 +174,73 @@ internal static class TabHeaderRenderer
                                              LineStyle lineStyle,
                                              Attribute? attribute)
     {
+        bool isDepth1 = side is Side.Top or Side.Bottom ? clipped.Height == 1 : clipped.Width == 1;
+
         switch (side)
         {
             case Side.Top:
-                // Top edge of header (the outermost line)
-                if (clipped.Y == headerRect.Y)
+                // Cap line — skip for depth=1 (cap coincides with content border)
+                if (!isDepth1 && clipped.Y == headerRect.Y)
                 {
                     lineCanvas.AddLine (new Point (clipped.X, clipped.Y), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
                 }
 
-                // Left edge of header — only if not clipped on left
+                // Left edge — for depth=1, extend 1 cell outward for correct corner auto-join
                 if (clipped.X == headerRect.X)
                 {
-                    lineCanvas.AddLine (new Point (clipped.X, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
+                    int startY = isDepth1 ? clipped.Y - 1 : clipped.Y;
+                    int height = isDepth1 ? 2 : clipped.Height;
+                    lineCanvas.AddLine (new Point (clipped.X, startY), height, Orientation.Vertical, lineStyle, attribute);
                 }
 
-                // Right edge of header — only if not clipped on right
+                // Right edge
                 if (clipped.Right == headerRect.Right)
                 {
-                    lineCanvas.AddLine (new Point (clipped.Right - 1, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
+                    int startY = isDepth1 ? clipped.Y - 1 : clipped.Y;
+                    int height = isDepth1 ? 2 : clipped.Height;
+                    lineCanvas.AddLine (new Point (clipped.Right - 1, startY), height, Orientation.Vertical, lineStyle, attribute);
                 }
 
                 break;
 
             case Side.Bottom:
-                // Bottom edge of header (the outermost line)
-                if (clipped.Bottom == headerRect.Bottom)
+                // Cap line — skip for depth=1
+                if (!isDepth1 && clipped.Bottom == headerRect.Bottom)
                 {
                     lineCanvas.AddLine (new Point (clipped.X, clipped.Bottom - 1), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
                 }
 
-                // Left edge — only if not clipped on left
+                // Left edge
                 if (clipped.X == headerRect.X)
                 {
-                    lineCanvas.AddLine (new Point (clipped.X, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
+                    int height = isDepth1 ? 2 : clipped.Height;
+                    lineCanvas.AddLine (new Point (clipped.X, clipped.Y), height, Orientation.Vertical, lineStyle, attribute);
                 }
 
-                // Right edge — only if not clipped on right
+                // Right edge
                 if (clipped.Right == headerRect.Right)
                 {
-                    lineCanvas.AddLine (new Point (clipped.Right - 1, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
+                    int height = isDepth1 ? 2 : clipped.Height;
+                    lineCanvas.AddLine (new Point (clipped.Right - 1, clipped.Y), height, Orientation.Vertical, lineStyle, attribute);
                 }
 
                 break;
 
             case Side.Left:
-                // Left edge of header (the outermost line)
-                if (clipped.X == headerRect.X)
+                // Cap line — skip for depth=1
+                if (!isDepth1 && clipped.X == headerRect.X)
                 {
                     lineCanvas.AddLine (new Point (clipped.X, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
                 }
 
-                // Top edge — only if not clipped on top
-                if (clipped.Y == headerRect.Y)
+                // Top edge — skip for depth=1 (content top border handles this)
+                if (!isDepth1 && clipped.Y == headerRect.Y)
                 {
                     lineCanvas.AddLine (new Point (clipped.X, clipped.Y), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
                 }
 
-                // Bottom edge — only if not clipped on bottom
-                if (clipped.Bottom == headerRect.Bottom)
+                // Bottom edge — skip for depth=1
+                if (!isDepth1 && clipped.Bottom == headerRect.Bottom)
                 {
                     lineCanvas.AddLine (new Point (clipped.X, clipped.Bottom - 1), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
                 }
@@ -238,20 +248,20 @@ internal static class TabHeaderRenderer
                 break;
 
             case Side.Right:
-                // Right edge of header (the outermost line)
-                if (clipped.Right == headerRect.Right)
+                // Cap line — skip for depth=1
+                if (!isDepth1 && clipped.Right == headerRect.Right)
                 {
                     lineCanvas.AddLine (new Point (clipped.Right - 1, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
                 }
 
-                // Top edge — only if not clipped on top
-                if (clipped.Y == headerRect.Y)
+                // Top edge — skip for depth=1
+                if (!isDepth1 && clipped.Y == headerRect.Y)
                 {
                     lineCanvas.AddLine (new Point (clipped.X, clipped.Y), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
                 }
 
-                // Bottom edge — only if not clipped on bottom
-                if (clipped.Bottom == headerRect.Bottom)
+                // Bottom edge — skip for depth=1
+                if (!isDepth1 && clipped.Bottom == headerRect.Bottom)
                 {
                     lineCanvas.AddLine (new Point (clipped.X, clipped.Bottom - 1), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
                 }
