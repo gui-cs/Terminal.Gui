@@ -15,17 +15,16 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     //  Helpers
     // ────────────────────────────────────────────────────────────────────
 
-    private static View CreateTabView (
-        IDriver driver,
-        int width,
-        int height,
-        Side side,
-        int tabOffset,
-        int? tabLength,
-        bool hasFocus,
-        string? title,
-        bool titleFlag,
-        Thickness? thickness = null)
+    private static View CreateTabView (IDriver driver,
+                                       int width,
+                                       int height,
+                                       Side side,
+                                       int tabOffset,
+                                       int? tabLength,
+                                       bool hasFocus,
+                                       string? title,
+                                       bool titleFlag,
+                                       Thickness? thickness = null)
     {
         View view = new ()
         {
@@ -37,21 +36,22 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
             BorderStyle = LineStyle.Rounded
         };
 
-        if (title is not null)
+        if (title is { })
         {
             view.Title = title;
         }
 
-        view.Border.Thickness = thickness ?? side switch
-        {
-            Side.Top => new Thickness (1, 3, 1, 1),
-            Side.Bottom => new Thickness (1, 1, 1, 3),
-            Side.Left => new Thickness (3, 1, 1, 1),
-            Side.Right => new Thickness (1, 1, 3, 1),
-            _ => throw new ArgumentOutOfRangeException (nameof (side))
-        };
+        view.Border.Thickness = thickness
+                                ?? side switch
+                                   {
+                                       Side.Top => new Thickness (1, 3, 1, 1),
+                                       Side.Bottom => new Thickness (1, 1, 1, 3),
+                                       Side.Left => new Thickness (3, 1, 1, 1),
+                                       Side.Right => new Thickness (1, 1, 3, 1),
+                                       _ => throw new ArgumentOutOfRangeException (nameof (side))
+                                   };
 
-        BorderSettings settings = BorderSettings.Tab;
+        var settings = BorderSettings.Tab;
 
         if (titleFlag)
         {
@@ -88,211 +88,360 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     public void Top_Unfocused_Offset0_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Top, tabOffset: 0, tabLength: null,
-                                   hasFocus: false, title: "Tab", titleFlag: true);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true);
 
         Assert.Equal (5, view.Border.TabLength!.Value);
 
-        DrawAndAssert (view, driver, """
-                                     ╭───╮
-                                     │Tab│
-                                     ├───┴───╮
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───╮
+                       │Tab│
+                       ├───┴───╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Top_Unfocused_Offset2_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Top, tabOffset: 2, tabLength: null,
-                                   hasFocus: false, title: "Tab", titleFlag: true);
 
-        DrawAndAssert (view, driver, """
-                                       ╭───╮
-                                       │Tab│
-                                     ╭─┴───┴─╮
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   2,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                         ╭───╮
+                         │Tab│
+                       ╭─┴───┴─╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Top_Unfocused_OverflowRight_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Top, tabOffset: 5, tabLength: null,
-                                   hasFocus: false, title: "Tab", titleFlag: true);
 
-        DrawAndAssert (view, driver, """
-                                          ╭───
-                                          │Tab
-                                     ╭────┴──╮
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   5,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                            ╭───
+                            │Tab
+                       ╭────┴──╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Top_Focused_Offset0_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Top, tabOffset: 0, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true);
 
-        DrawAndAssert (view, driver, """
-                                     ╭───╮
-                                     │Tab│
-                                     │   ╰───╮
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───╮
+                       │Tab│
+                       │   ╰───╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Top_Focused_Offset2_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Top, tabOffset: 2, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true);
 
-        DrawAndAssert (view, driver, """
-                                       ╭───╮
-                                       │Tab│
-                                     ╭─╯   ╰─╮
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   2,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                         ╭───╮
+                         │Tab│
+                       ╭─╯   ╰─╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Top_Focused_OverflowRight_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Top, tabOffset: 5, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true);
 
-        DrawAndAssert (view, driver, """
-                                          ╭───
-                                          │Tab
-                                     ╭────╯  │
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   5,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                            ╭───
+                            │Tab
+                       ╭────╯  │
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Top_Unfocused_Offset0_NoTitle ()
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Top, tabOffset: 0, tabLength: null,
-                                   hasFocus: false, title: null, titleFlag: false);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   false,
+                                   null,
+                                   false);
 
         Assert.Equal (2, view.Border.TabLength!.Value);
 
-        DrawAndAssert (view, driver, """
-                                     ╭╮
-                                     ││
-                                     ├┴──────╮
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭╮
+                       ││
+                       ├┴──────╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Top_Unfocused_SingleCharTitle ()
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Top, tabOffset: 2, tabLength: null,
-                                   hasFocus: false, title: "X", titleFlag: true);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   2,
+                                   null,
+                                   false,
+                                   "X",
+                                   true);
 
         Assert.Equal (3, view.Border.TabLength!.Value);
 
-        DrawAndAssert (view, driver, """
-                                       ╭─╮
-                                       │X│
-                                     ╭─┴─┴───╮
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        DrawAndAssert (view,
+                       driver,
+                       """
+                         ╭─╮
+                         │X│
+                       ╭─┴─┴───╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Top_Unfocused_NegativeOffset_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Top, tabOffset: -1, tabLength: null,
-                                   hasFocus: false, title: "Tab", titleFlag: true);
 
-        DrawAndAssert (view, driver, """
-                                     ───╮
-                                     Tab│
-                                     ╭──┴────╮
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   -1,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ───╮
+                       Tab│
+                       ╭──┴────╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Unfocused_NegativeOffset_WithTitle_Thick_Border ()
+    {
+        IDriver driver = CreateTestDriver ();
+
+        View view = CreateTabView (driver,
+                                   17,
+                                   12,
+                                   Side.Top,
+                                   -1,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true);
+
+        view.Border.Thickness = new Thickness (5, 5, 5, 5);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ───╮
+                       Tab│
+                       ╭──┴────╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Top_Unfocused_NegativeOffset2_WithTitle () // Copilot
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Top, tabOffset: -2, tabLength: null,
-                                   hasFocus: false, title: "Tab", titleFlag: true);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   -2,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true);
 
         // Header at X=-2. Left edge and 'T' clipped. Visible: cap ──╮, title ab│.
-        DrawAndAssert (view, driver, """
-                                     ──╮
-                                     ab│
-                                     ╭─┴─────╮
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ──╮
+                       ab│
+                       ╭─┴─────╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Top_Unfocused_NegativeOffset4_WithTitle () // Copilot
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Top, tabOffset: -4, tabLength: null,
-                                   hasFocus: false, title: "Tab", titleFlag: true);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   -4,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true);
 
         // Header at X=-4. Only right edge visible at col 0. No title visible.
-        DrawAndAssert (view, driver, """
-                                     ╮
-                                     │
-                                     ├───────╮
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╮
+                       │
+                       ├───────╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Top_Unfocused_NegativeOffset5_WithTitle () // Copilot
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Top, tabOffset: -5, tabLength: null,
-                                   hasFocus: false, title: "Tab", titleFlag: true);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   -5,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true);
 
         // Header completely off-screen. Content border drawn normally.
-        DrawAndAssert (view, driver, """
-                                     ╭───────╮
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     // ════════════════════════════════════════════════════════════════════
@@ -304,89 +453,139 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     public void Bottom_Unfocused_Offset0_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Bottom, tabOffset: 0, tabLength: null,
-                                   hasFocus: false, title: "Tab", titleFlag: true);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Bottom,
+                                   0,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true);
 
         Assert.Equal (5, view.Border.TabLength!.Value);
 
-        DrawAndAssert (view, driver, """
-                                     ╭───────╮
-                                     │       │
-                                     │       │
-                                     ├───┬───╯
-                                     │Tab│
-                                     ╰───╯
-                                     """);
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       ├───┬───╯
+                       │Tab│
+                       ╰───╯
+                       """);
     }
 
     [Fact]
     public void Bottom_Focused_Offset0_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Bottom, tabOffset: 0, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true);
 
-        DrawAndAssert (view, driver, """
-                                     ╭───────╮
-                                     │       │
-                                     │       │
-                                     │   ╭───╯
-                                     │Tab│
-                                     ╰───╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Bottom,
+                                   0,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       │   ╭───╯
+                       │Tab│
+                       ╰───╯
+                       """);
     }
 
     [Fact]
     public void Bottom_Unfocused_Offset2_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Bottom, tabOffset: 2, tabLength: null,
-                                   hasFocus: false, title: "Tab", titleFlag: true);
 
-        DrawAndAssert (view, driver, """
-                                     ╭───────╮
-                                     │       │
-                                     │       │
-                                     ╰─┬───┬─╯
-                                       │Tab│
-                                       ╰───╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Bottom,
+                                   2,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       ╰─┬───┬─╯
+                         │Tab│
+                         ╰───╯
+                       """);
     }
 
     [Fact]
     public void Bottom_Unfocused_NegativeOffset_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Bottom, tabOffset: -1, tabLength: null,
-                                   hasFocus: false, title: "Tab", titleFlag: true);
 
-        DrawAndAssert (view, driver, """
-                                     ╭───────╮
-                                     │       │
-                                     │       │
-                                     ╰──┬────╯
-                                     Tab│
-                                     ───╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Bottom,
+                                   -1,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       ╰──┬────╯
+                       Tab│
+                       ───╯
+                       """);
     }
 
     [Fact]
     public void Bottom_Unfocused_Offset0_NoTitle ()
     {
         IDriver driver = CreateTestDriver (9, 6);
-        View view = CreateTabView (driver, 9, 6, Side.Bottom, tabOffset: 0, tabLength: null,
-                                   hasFocus: false, title: null, titleFlag: false);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Bottom,
+                                   0,
+                                   null,
+                                   false,
+                                   null,
+                                   false);
 
         Assert.Equal (2, view.Border.TabLength!.Value);
 
-        DrawAndAssert (view, driver, """
-                                     ╭───────╮
-                                     │       │
-                                     │       │
-                                     ├┬──────╯
-                                     ││
-                                     ╰╯
-                                     """);
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       ├┬──────╯
+                       ││
+                       ╰╯
+                       """);
     }
 
     // ════════════════════════════════════════════════════════════════════
@@ -398,84 +597,124 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     public void Left_Unfocused_Offset0_WithTitle ()
     {
         IDriver driver = CreateTestDriver (11, 9);
-        View view = CreateTabView (driver, 11, 9, Side.Left, tabOffset: 0, tabLength: null,
-                                   hasFocus: false, title: "Tab", titleFlag: true);
+
+        View view = CreateTabView (driver,
+                                   11,
+                                   9,
+                                   Side.Left,
+                                   0,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true);
 
         Assert.Equal (5, view.Border.TabLength!.Value);
 
-        DrawAndAssert (view, driver, """
-                                     ╭─┬───────╮
-                                     │T│       │
-                                     │a│       │
-                                     │b│       │
-                                     ╰─┤       │
-                                       │       │
-                                       │       │
-                                       │       │
-                                       ╰───────╯
-                                     """);
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭─┬───────╮
+                       │T│       │
+                       │a│       │
+                       │b│       │
+                       ╰─┤       │
+                         │       │
+                         │       │
+                         │       │
+                         ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Left_Unfocused_Offset0_NoTitle ()
     {
         IDriver driver = CreateTestDriver (11, 9);
-        View view = CreateTabView (driver, 11, 9, Side.Left, tabOffset: 0, tabLength: null,
-                                   hasFocus: false, title: null, titleFlag: false);
+
+        View view = CreateTabView (driver,
+                                   11,
+                                   9,
+                                   Side.Left,
+                                   0,
+                                   null,
+                                   false,
+                                   null,
+                                   false);
 
         Assert.Equal (2, view.Border.TabLength!.Value);
 
-        DrawAndAssert (view, driver, """
-                                     ╭─┬───────╮
-                                     ╰─┤       │
-                                       │       │
-                                       │       │
-                                       │       │
-                                       │       │
-                                       │       │
-                                       │       │
-                                       ╰───────╯
-                                     """);
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭─┬───────╮
+                       ╰─┤       │
+                         │       │
+                         │       │
+                         │       │
+                         │       │
+                         │       │
+                         │       │
+                         ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Left_Unfocused_Offset2_WithTitle ()
     {
         IDriver driver = CreateTestDriver (11, 9);
-        View view = CreateTabView (driver, 11, 9, Side.Left, tabOffset: 2, tabLength: null,
-                                   hasFocus: false, title: "Tab", titleFlag: true);
 
-        DrawAndAssert (view, driver, """
-                                       ╭───────╮
-                                       │       │
-                                     ╭─┤       │
-                                     │T│       │
-                                     │a│       │
-                                     │b│       │
-                                     ╰─┤       │
-                                       │       │
-                                       ╰───────╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   11,
+                                   9,
+                                   Side.Left,
+                                   2,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                         ╭───────╮
+                         │       │
+                       ╭─┤       │
+                       │T│       │
+                       │a│       │
+                       │b│       │
+                       ╰─┤       │
+                         │       │
+                         ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Left_Focused_Overflow_WithTitle ()
     {
         IDriver driver = CreateTestDriver (11, 9);
-        View view = CreateTabView (driver, 11, 9, Side.Left, tabOffset: 6, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true);
 
-        DrawAndAssert (view, driver, """
-                                       ╭───────╮
-                                       │       │
-                                       │       │
-                                       │       │
-                                       │       │
-                                       │       │
-                                     ╭─╯       │
-                                     │T        │
-                                     │a ───────╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   11,
+                                   9,
+                                   Side.Left,
+                                   6,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                         ╭───────╮
+                         │       │
+                         │       │
+                         │       │
+                         │       │
+                         │       │
+                       ╭─╯       │
+                       │T        │
+                       │a ───────╯
+                       """);
     }
 
     // ════════════════════════════════════════════════════════════════════
@@ -487,84 +726,124 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     public void Right_Unfocused_Offset0_WithTitle ()
     {
         IDriver driver = CreateTestDriver (11, 9);
-        View view = CreateTabView (driver, 11, 9, Side.Right, tabOffset: 0, tabLength: null,
-                                   hasFocus: false, title: "Tab", titleFlag: true);
+
+        View view = CreateTabView (driver,
+                                   11,
+                                   9,
+                                   Side.Right,
+                                   0,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true);
 
         Assert.Equal (5, view.Border.TabLength!.Value);
 
-        DrawAndAssert (view, driver, """
-                                     ╭───────┬─╮
-                                     │       │T│
-                                     │       │a│
-                                     │       │b│
-                                     │       ├─╯
-                                     │       │
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────┬─╮
+                       │       │T│
+                       │       │a│
+                       │       │b│
+                       │       ├─╯
+                       │       │
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Right_Unfocused_Offset0_NoTitle ()
     {
         IDriver driver = CreateTestDriver (11, 9);
-        View view = CreateTabView (driver, 11, 9, Side.Right, tabOffset: 0, tabLength: null,
-                                   hasFocus: false, title: null, titleFlag: false);
+
+        View view = CreateTabView (driver,
+                                   11,
+                                   9,
+                                   Side.Right,
+                                   0,
+                                   null,
+                                   false,
+                                   null,
+                                   false);
 
         Assert.Equal (2, view.Border.TabLength!.Value);
 
-        DrawAndAssert (view, driver, """
-                                     ╭───────┬─╮
-                                     │       ├─╯
-                                     │       │
-                                     │       │
-                                     │       │
-                                     │       │
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────┬─╮
+                       │       ├─╯
+                       │       │
+                       │       │
+                       │       │
+                       │       │
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Right_Unfocused_Offset2_WithTitle ()
     {
         IDriver driver = CreateTestDriver (11, 9);
-        View view = CreateTabView (driver, 11, 9, Side.Right, tabOffset: 2, tabLength: null,
-                                   hasFocus: false, title: "Tab", titleFlag: true);
 
-        DrawAndAssert (view, driver, """
-                                     ╭───────╮
-                                     │       │
-                                     │       ├─╮
-                                     │       │T│
-                                     │       │a│
-                                     │       │b│
-                                     │       ├─╯
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   11,
+                                   9,
+                                   Side.Right,
+                                   2,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       ├─╮
+                       │       │T│
+                       │       │a│
+                       │       │b│
+                       │       ├─╯
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Right_Focused_Overflow_WithTitle ()
     {
         IDriver driver = CreateTestDriver (11, 9);
-        View view = CreateTabView (driver, 11, 9, Side.Right, tabOffset: 6, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true);
 
-        DrawAndAssert (view, driver, """
-                                     ╭───────╮
-                                     │       │
-                                     │       │
-                                     │       │
-                                     │       │
-                                     │       │
-                                     │       ╰─╮
-                                     │        T│
-                                     ╰─────── a│
-                                     """);
+        View view = CreateTabView (driver,
+                                   11,
+                                   9,
+                                   Side.Right,
+                                   6,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       │       │
+                       │       │
+                       │       │
+                       │       ╰─╮
+                       │        T│
+                       ╰─────── a│
+                       """);
     }
 
     // ════════════════════════════════════════════════════════════════════
@@ -581,78 +860,118 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     public void Top_Focused_Depth4_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 7);
-        View view = CreateTabView (driver, 9, 7, Side.Top, tabOffset: 0, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true,
-                                   thickness: new Thickness (1, 4, 1, 1));
 
-        DrawAndAssert (view, driver, """
-                                     ╭───╮
-                                     │Tab│
-                                     │   ╰───╮
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   9,
+                                   7,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true,
+                                   new Thickness (1, 4, 1, 1));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───╮
+                       │Tab│
+                       │   ╰───╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Bottom_Focused_Depth4_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 7);
-        View view = CreateTabView (driver, 9, 7, Side.Bottom, tabOffset: 0, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true,
-                                   thickness: new Thickness (1, 1, 1, 4));
 
-        DrawAndAssert (view, driver, """
-                                     ╭───────╮
-                                     │       │
-                                     │       │
-                                     │   ╭───╯
-                                     │Tab│
-                                     ╰───╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   9,
+                                   7,
+                                   Side.Bottom,
+                                   0,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true,
+                                   new Thickness (1, 1, 1, 4));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       │   ╭───╯
+                       │Tab│
+                       ╰───╯
+                       """);
     }
 
     [Fact]
     public void Left_Focused_Depth4_WithTitle ()
     {
         IDriver driver = CreateTestDriver (12, 9);
-        View view = CreateTabView (driver, 12, 9, Side.Left, tabOffset: 0, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true,
-                                   thickness: new Thickness (4, 1, 1, 1));
 
-        DrawAndAssert (view, driver, """
-                                     ╭─ ───────╮
-                                      │T        │
-                                      │a        │
-                                      │b        │
-                                      ╰─╮       │
-                                        │       │
-                                        │       │
-                                        │       │
-                                        ╰───────╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   12,
+                                   9,
+                                   Side.Left,
+                                   0,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true,
+                                   new Thickness (4, 1, 1, 1));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭─ ───────╮
+                        │T        │
+                        │a        │
+                        │b        │
+                        ╰─╮       │
+                          │       │
+                          │       │
+                          │       │
+                          ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Right_Focused_Depth4_WithTitle ()
     {
         IDriver driver = CreateTestDriver (12, 9);
-        View view = CreateTabView (driver, 12, 9, Side.Right, tabOffset: 0, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true,
-                                   thickness: new Thickness (1, 1, 4, 1));
 
-        DrawAndAssert (view, driver, """
-                                     ╭─────── ─╮
-                                     │        T│
-                                     │        a│
-                                     │        b│
-                                     │       ╭─╯
-                                     │       │
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   12,
+                                   9,
+                                   Side.Right,
+                                   0,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true,
+                                   new Thickness (1, 1, 4, 1));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭─────── ─╮
+                       │        T│
+                       │        a│
+                       │        b│
+                       │       ╭─╯
+                       │       │
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     // ──── Thickness = 2 (depth 2) ────
@@ -662,81 +981,121 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     public void Top_Focused_Depth2_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 5);
-        View view = CreateTabView (driver, 9, 5, Side.Top, tabOffset: 0, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true,
-                                   thickness: new Thickness (1, 2, 1, 1));
 
-        DrawAndAssert (view, driver, """
-                                     ╭───╮
-                                     │Tab╰───╮
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   9,
+                                   5,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true,
+                                   new Thickness (1, 2, 1, 1));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───╮
+                       │Tab╰───╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Bottom_Focused_Depth2_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 5);
-        View view = CreateTabView (driver, 9, 5, Side.Bottom, tabOffset: 0, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true,
-                                   thickness: new Thickness (1, 1, 1, 2));
 
-        DrawAndAssert (view, driver, """
-                                     ╭───────╮
-                                     │       │
-                                     │       │
-                                     │Tab╭───╯
-                                     ╰───╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   9,
+                                   5,
+                                   Side.Bottom,
+                                   0,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true,
+                                   new Thickness (1, 1, 1, 2));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       │Tab╭───╯
+                       ╰───╯
+                       """);
     }
 
     [Fact]
     public void Left_Focused_Depth2_WithTitle ()
     {
         IDriver driver = CreateTestDriver (10, 9);
-        View view = CreateTabView (driver, 10, 9, Side.Left, tabOffset: 0, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true,
-                                   thickness: new Thickness (2, 1, 1, 1));
+
+        View view = CreateTabView (driver,
+                                   10,
+                                   9,
+                                   Side.Left,
+                                   0,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true,
+                                   new Thickness (2, 1, 1, 1));
 
         // Depth=2: cap at col 0, closing edge at col 1. Title on closing edge.
         // (1,0) excluded by AddTabSideContentBorder → space at col 1 row 0.
         // (1,4) has ╮ from header bottom edge + content border vertical auto-join.
-        DrawAndAssert (view, driver, """
-                                     ╭ ───────╮
-                                     │T       │
-                                     │a       │
-                                     │b       │
-                                     ╰╮       │
-                                      │       │
-                                      │       │
-                                      │       │
-                                      ╰───────╯
-                                     """);
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭ ───────╮
+                       │T       │
+                       │a       │
+                       │b       │
+                       ╰╮       │
+                        │       │
+                        │       │
+                        │       │
+                        ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Right_Focused_Depth2_WithTitle ()
     {
         IDriver driver = CreateTestDriver (10, 9);
-        View view = CreateTabView (driver, 10, 9, Side.Right, tabOffset: 0, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true,
-                                   thickness: new Thickness (1, 1, 2, 1));
+
+        View view = CreateTabView (driver,
+                                   10,
+                                   9,
+                                   Side.Right,
+                                   0,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true,
+                                   new Thickness (1, 1, 2, 1));
 
         // Depth=2: cap at col 9, closing edge at col 8. Title on closing edge.
         // (8,0) excluded → space at col 8 row 0. (8,4) has ╭ from auto-join.
-        DrawAndAssert (view, driver, """
-                                     ╭─────── ╮
-                                     │       T│
-                                     │       a│
-                                     │       b│
-                                     │       ╭╯
-                                     │       │
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭─────── ╮
+                       │       T│
+                       │       a│
+                       │       b│
+                       │       ╭╯
+                       │       │
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     // ──── Thickness = 1 (depth 1) ────
@@ -746,78 +1105,118 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     public void Top_Focused_Depth1_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 4);
-        View view = CreateTabView (driver, 9, 4, Side.Top, tabOffset: 0, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true,
-                                   thickness: new Thickness (1, 1, 1, 1));
 
-        DrawAndAssert (view, driver, """
-                                     │Tab╰───╮
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   9,
+                                   4,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true,
+                                   new Thickness (1, 1, 1, 1));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       │Tab╰───╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Bottom_Focused_Depth1_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 4);
-        View view = CreateTabView (driver, 9, 4, Side.Bottom, tabOffset: 0, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true,
-                                   thickness: new Thickness (1, 1, 1, 1));
 
-        DrawAndAssert (view, driver, """
-                                     ╭───────╮
-                                     │       │
-                                     │       │
-                                     │Tab╭───╯
-                                     """);
+        View view = CreateTabView (driver,
+                                   9,
+                                   4,
+                                   Side.Bottom,
+                                   0,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true,
+                                   new Thickness (1, 1, 1, 1));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       │Tab╭───╯
+                       """);
     }
 
     [Fact]
     public void Left_Focused_Depth1_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 9);
-        View view = CreateTabView (driver, 9, 9, Side.Left, tabOffset: 0, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true,
-                                   thickness: new Thickness (1, 1, 1, 1));
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   9,
+                                   Side.Left,
+                                   0,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true,
+                                   new Thickness (1, 1, 1, 1));
 
         // Depth=1: no cap line, no tab edges. Title at rows 1-3 (between top/bottom edges).
         // (0,0) is excluded by AddTabSideContentBorder (tab starts at content border edge).
         // After Trim(), leading space removed from row 0.
-        DrawAndAssert (view, driver, """
-                                     ───────╮
-                                     T       │
-                                     a       │
-                                     b       │
-                                     │       │
-                                     │       │
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ───────╮
+                       T       │
+                       a       │
+                       b       │
+                       │       │
+                       │       │
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
     public void Right_Focused_Depth1_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 9);
-        View view = CreateTabView (driver, 9, 9, Side.Right, tabOffset: 0, tabLength: null,
-                                   hasFocus: true, title: "Tab", titleFlag: true,
-                                   thickness: new Thickness (1, 1, 1, 1));
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   9,
+                                   Side.Right,
+                                   0,
+                                   null,
+                                   true,
+                                   "Tab",
+                                   true,
+                                   new Thickness (1, 1, 1, 1));
 
         // Depth=1: no cap line, no tab edges. Title at rows 1-3.
         // (8,0) excluded by AddTabSideContentBorder → trailing space stripped.
-        DrawAndAssert (view, driver, """
-                                     ╭───────
-                                     │       T
-                                     │       a
-                                     │       b
-                                     │       │
-                                     │       │
-                                     │       │
-                                     │       │
-                                     ╰───────╯
-                                     """);
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────
+                       │       T
+                       │       a
+                       │       b
+                       │       │
+                       │       │
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 }

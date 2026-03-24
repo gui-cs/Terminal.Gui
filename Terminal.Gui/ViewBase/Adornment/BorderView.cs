@@ -233,7 +233,7 @@ public partial class BorderView : AdornmentView
 
         int depth = GetTabDepth (border);
         Rectangle headerRect = TabHeaderRenderer.ComputeHeaderRect (borderBounds, border.TabSide, border.TabOffset, tabLength, depth);
-        Rectangle viewBounds = computeViewBounds (borderBounds, border.TabSide, depth);
+        Rectangle viewBounds = TabHeaderRenderer.ComputeViewBounds (borderBounds, border.TabSide, depth);
         Rectangle clipped = Rectangle.Intersect (headerRect, viewBounds);
 
         if (clipped.IsEmpty)
@@ -257,11 +257,27 @@ public partial class BorderView : AdornmentView
             case Side.Top:
             case Side.Bottom:
             {
-                int titleWidth = Math.Min (title.GetColumns (), contentArea.Width);
-                Rectangle titleRect = new (contentArea.X, contentArea.Y, titleWidth, 1);
+                // When the header is clipped on the left, skip the first N title characters
+                int titleSkipChars = contentArea.X > headerRect.X + 1
+                                         ? contentArea.X - (headerRect.X + 1)
+                                         : 0;
+                string visibleTitle = titleSkipChars > 0 && titleSkipChars < title.Length
+                                          ? title.Substring (titleSkipChars)
+                                          : title;
+                int titleWidth = Math.Min (visibleTitle.GetColumns (), contentArea.Width);
 
+                if (titleWidth <= 0)
+                {
+                    break;
+                }
+
+                Rectangle titleRect = new (contentArea.X, contentArea.Y, titleWidth, 1);
+                Adornment.Parent.TitleTextFormatter.Text = visibleTitle;
                 Adornment.Parent.TitleTextFormatter.ConstrainToSize = new Size (titleWidth, 1);
                 Adornment.Parent.TitleTextFormatter.Draw (Driver, titleRect, normalAttr, hotAttr);
+
+                // Restore the original title text
+                Adornment.Parent.TitleTextFormatter.Text = title;
 
                 LastTitleRect = titleRect;
                 context?.AddDrawnRectangle (titleRect);
@@ -273,16 +289,22 @@ public partial class BorderView : AdornmentView
             case Side.Left:
             case Side.Right:
             {
-                // Draw title vertically, one character per row
+                // When the header is clipped on the top, skip the first N title characters
+                int titleSkipChars = contentArea.Y > headerRect.Y + 1
+                                         ? contentArea.Y - (headerRect.Y + 1)
+                                         : 0;
                 int maxChars = Math.Min (title.GetColumns (), contentArea.Height);
+                int startIdx = titleSkipChars;
 
                 for (var i = 0; i < maxChars; i++)
                 {
-                    if (i < title.Length)
+                    int charIdx = startIdx + i;
+
+                    if (charIdx < title.Length)
                     {
                         Driver.Move (contentArea.X, contentArea.Y + i);
                         SetAttribute (normalAttr);
-                        Driver.AddRune (title [i]);
+                        Driver.AddRune (title [charIdx]);
                     }
                 }
 
@@ -293,19 +315,6 @@ public partial class BorderView : AdornmentView
 
                 break;
             }
-        }
-
-        // Helper to compute view bounds (matching TabHeaderRenderer's internal logic)
-        static Rectangle computeViewBounds (Rectangle contentBorderRect, Side side, int depth)
-        {
-            return side switch
-            {
-                Side.Top => new (contentBorderRect.X, contentBorderRect.Y - (depth - 1), contentBorderRect.Width, contentBorderRect.Height + (depth - 1)),
-                Side.Bottom => new (contentBorderRect.X, contentBorderRect.Y, contentBorderRect.Width, contentBorderRect.Height + (depth - 1)),
-                Side.Left => new (contentBorderRect.X - (depth - 1), contentBorderRect.Y, contentBorderRect.Width + (depth - 1), contentBorderRect.Height),
-                Side.Right => new (contentBorderRect.X, contentBorderRect.Y, contentBorderRect.Width + (depth - 1), contentBorderRect.Height),
-                _ => contentBorderRect
-            };
         }
 
         // For depth <= 2, title goes ON the closing edge row/col (between the side border edges).
@@ -469,30 +478,39 @@ public partial class BorderView : AdornmentView
         bool drawBottom = Adornment!.Thickness.Bottom > 0 && Frame is { Width: > 1, Height: > 1 };
         bool drawRight = Adornment!.Thickness.Right > 0 && (Frame.Height > 1 || Adornment!.Thickness.Top == 0);
 
-        // When a header protrusion is configured, the renderer handles the tab side's content border
+        // When a header protrusion is configured, the renderer handles the tab side's content border.
+        // Only suppress the normal border drawing if the tab header is actually visible.
         if (hasTab)
         {
-            switch (border.TabSide)
+            int tabDepth = GetTabDepth (border);
+            Rectangle tabHeaderRect = TabHeaderRenderer.ComputeHeaderRect (borderBounds, border.TabSide, border.TabOffset, border.TabLength!.Value, tabDepth);
+            Rectangle tabViewBounds = TabHeaderRenderer.ComputeViewBounds (borderBounds, border.TabSide, tabDepth);
+            Rectangle tabClipped = Rectangle.Intersect (tabHeaderRect, tabViewBounds);
+
+            if (!tabClipped.IsEmpty)
             {
-                case Side.Top:
-                    drawTop = false;
+                switch (border.TabSide)
+                {
+                    case Side.Top:
+                        drawTop = false;
 
-                    break;
+                        break;
 
-                case Side.Bottom:
-                    drawBottom = false;
+                    case Side.Bottom:
+                        drawBottom = false;
 
-                    break;
+                        break;
 
-                case Side.Left:
-                    drawLeft = false;
+                    case Side.Left:
+                        drawLeft = false;
 
-                    break;
+                        break;
 
-                case Side.Right:
-                    drawRight = false;
+                    case Side.Right:
+                        drawRight = false;
 
-                    break;
+                        break;
+                }
             }
         }
 

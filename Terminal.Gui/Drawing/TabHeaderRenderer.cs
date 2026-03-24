@@ -145,7 +145,7 @@ internal static class TabHeaderRenderer
     /// <summary>
     ///     Computes the full view bounds (content border + header protrusion area).
     /// </summary>
-    private static Rectangle ComputeViewBounds (Rectangle contentBorderRect, Side side, int depth) =>
+    internal static Rectangle ComputeViewBounds (Rectangle contentBorderRect, Side side, int depth) =>
         side switch
         {
             Side.Top => new Rectangle (contentBorderRect.X, contentBorderRect.Y - (depth - 1), contentBorderRect.Width, contentBorderRect.Height + (depth - 1)),
@@ -179,10 +179,14 @@ internal static class TabHeaderRenderer
         switch (side)
         {
             case Side.Top:
-                // Cap line — skip for depth=1 (cap coincides with content border)
+                // Cap line — skip for depth=1 (cap coincides with content border).
+                // When left/right side is clipped, extend cap 1 cell into invisible area
+                // so LineCanvas auto-join produces the correct corner direction.
                 if (!isDepth1 && clipped.Y == headerRect.Y)
                 {
-                    lineCanvas.AddLine (new Point (clipped.X, clipped.Y), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
+                    int capX = clipped.X > headerRect.X ? clipped.X - 1 : clipped.X;
+                    int capW = clipped.Width + (clipped.X > headerRect.X ? 1 : 0) + (clipped.Right < headerRect.Right ? 1 : 0);
+                    lineCanvas.AddLine (new Point (capX, clipped.Y), capW, Orientation.Horizontal, lineStyle, attribute);
                 }
 
                 // Left edge — for depth=1, extend 1 cell outward for correct corner auto-join
@@ -204,10 +208,12 @@ internal static class TabHeaderRenderer
                 break;
 
             case Side.Bottom:
-                // Cap line — skip for depth=1
+                // Cap line — skip for depth=1. Extend when clipped on left/right.
                 if (!isDepth1 && clipped.Bottom == headerRect.Bottom)
                 {
-                    lineCanvas.AddLine (new Point (clipped.X, clipped.Bottom - 1), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
+                    int capX = clipped.X > headerRect.X ? clipped.X - 1 : clipped.X;
+                    int capW = clipped.Width + (clipped.X > headerRect.X ? 1 : 0) + (clipped.Right < headerRect.Right ? 1 : 0);
+                    lineCanvas.AddLine (new Point (capX, clipped.Bottom - 1), capW, Orientation.Horizontal, lineStyle, attribute);
                 }
 
                 // Left edge
@@ -227,10 +233,12 @@ internal static class TabHeaderRenderer
                 break;
 
             case Side.Left:
-                // Cap line — skip for depth=1
+                // Cap line — skip for depth=1. Extend when clipped on top/bottom.
                 if (!isDepth1 && clipped.X == headerRect.X)
                 {
-                    lineCanvas.AddLine (new Point (clipped.X, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
+                    int capY = clipped.Y > headerRect.Y ? clipped.Y - 1 : clipped.Y;
+                    int capH = clipped.Height + (clipped.Y > headerRect.Y ? 1 : 0) + (clipped.Bottom < headerRect.Bottom ? 1 : 0);
+                    lineCanvas.AddLine (new Point (clipped.X, capY), capH, Orientation.Vertical, lineStyle, attribute);
                 }
 
                 // Top edge — skip for depth=1 (content top border handles this)
@@ -248,10 +256,12 @@ internal static class TabHeaderRenderer
                 break;
 
             case Side.Right:
-                // Cap line — skip for depth=1
+                // Cap line — skip for depth=1. Extend when clipped on top/bottom.
                 if (!isDepth1 && clipped.Right == headerRect.Right)
                 {
-                    lineCanvas.AddLine (new Point (clipped.Right - 1, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
+                    int capY = clipped.Y > headerRect.Y ? clipped.Y - 1 : clipped.Y;
+                    int capH = clipped.Height + (clipped.Y > headerRect.Y ? 1 : 0) + (clipped.Bottom < headerRect.Bottom ? 1 : 0);
+                    lineCanvas.AddLine (new Point (clipped.Right - 1, capY), capH, Orientation.Vertical, lineStyle, attribute);
                 }
 
                 // Top edge — skip for depth=1
