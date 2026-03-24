@@ -9,6 +9,7 @@ namespace DrawingTests;
 ///     then calls <see cref="TabHeaderRenderer.DrawText"/> in a post-canvas callback so text
 ///     renders on top of line art.
 /// </summary>
+
 // Copilot
 public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
 {
@@ -76,8 +77,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
     {
         Rectangle contentRect = new (0, 2, 9, 4);
 
-        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 6, view =>
-            TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Top, 0, "Tab"));
+        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 6, view => TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Top, 0, "Tab"));
 
         AddContentBorder (canvas, contentRect, skipSide: Side.Top);
         TabHeaderRenderer.AddLines (canvas, contentRect, Side.Top, 0, "Tab", false, LineStyle.Rounded);
@@ -85,16 +85,17 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         v.Draw ();
         output.WriteLine (driver.ToString ());
 
-        DriverAssert.AssertDriverContentsAre (
-            """
-            ╭───╮
-            │Tab│
-            ├───┴───╮
-            │       │
-            │       │
-            ╰───────╯
-            """,
-            output, driver, ignoreLeadingWhitespace: true);
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭───╮
+                                              │Tab│
+                                              ├───┴───╮
+                                              │       │
+                                              │       │
+                                              ╰───────╯
+                                              """,
+                                              output,
+                                              driver,
+                                              true);
 
         v.Dispose ();
     }
@@ -104,8 +105,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
     {
         Rectangle contentRect = new (0, 2, 9, 4);
 
-        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 6, view =>
-            TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Top, 2, "Tab"));
+        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 6, view => TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Top, 2, "Tab"));
 
         AddContentBorder (canvas, contentRect, skipSide: Side.Top);
         TabHeaderRenderer.AddLines (canvas, contentRect, Side.Top, 2, "Tab", false, LineStyle.Rounded);
@@ -113,16 +113,17 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         v.Draw ();
         output.WriteLine (driver.ToString ());
 
-        DriverAssert.AssertDriverContentsAre (
-            """
-              ╭───╮
-              │Tab│
-            ╭─┴───┴─╮
-            │       │
-            │       │
-            ╰───────╯
-            """,
-            output, driver, ignoreLeadingWhitespace: true);
+        DriverAssert.AssertDriverContentsAre ("""
+                                                ╭───╮
+                                                │Tab│
+                                              ╭─┴───┴─╮
+                                              │       │
+                                              │       │
+                                              ╰───────╯
+                                              """,
+                                              output,
+                                              driver,
+                                              true);
 
         v.Dispose ();
     }
@@ -132,8 +133,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
     {
         Rectangle contentRect = new (0, 2, 9, 4);
 
-        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 6, view =>
-            TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Top, 5, "Tab"));
+        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 6, view => TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Top, 5, "Tab"));
 
         AddContentBorder (canvas, contentRect, skipSide: Side.Top);
         TabHeaderRenderer.AddLines (canvas, contentRect, Side.Top, 5, "Tab", false, LineStyle.Rounded);
@@ -142,16 +142,17 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         output.WriteLine (driver.ToString ());
 
         // Right side of header is open (clipped off-screen)
-        DriverAssert.AssertDriverContentsAre (
-            """
-                 ╭───
-                 │Tab
-            ╭────┴──╮
-            │       │
-            │       │
-            ╰───────╯
-            """,
-            output, driver, ignoreLeadingWhitespace: true);
+        DriverAssert.AssertDriverContentsAre ("""
+                                                   ╭───
+                                                   │Tab
+                                              ╭────┴──╮
+                                              │       │
+                                              │       │
+                                              ╰───────╯
+                                              """,
+                                              output,
+                                              driver,
+                                              true);
 
         v.Dispose ();
     }
@@ -165,8 +166,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
     {
         Rectangle contentRect = new (0, 2, 9, 4);
 
-        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 6, view =>
-            TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Top, 0, "Tab"));
+        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 6, view => TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Top, 0, "Tab"));
 
         AddContentBorder (canvas, contentRect, skipSide: Side.Top);
         TabHeaderRenderer.AddLines (canvas, contentRect, Side.Top, 0, "Tab", true, LineStyle.Rounded);
@@ -174,16 +174,17 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         v.Draw ();
         output.WriteLine (driver.ToString ());
 
-        DriverAssert.AssertDriverContentsAre (
-            """
-            ╭───╮
-            │Tab│
-            │   ╰───╮
-            │       │
-            │       │
-            ╰───────╯
-            """,
-            output, driver, ignoreLeadingWhitespace: true);
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭───╮
+                                              │Tab│
+                                              │   ╰───╮
+                                              │       │
+                                              │       │
+                                              ╰───────╯
+                                              """,
+                                              output,
+                                              driver,
+                                              true);
 
         v.Dispose ();
     }
@@ -193,8 +194,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
     {
         Rectangle contentRect = new (0, 2, 9, 4);
 
-        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 6, view =>
-            TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Top, 2, "Tab"));
+        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 6, view => TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Top, 2, "Tab"));
 
         AddContentBorder (canvas, contentRect, skipSide: Side.Top);
         TabHeaderRenderer.AddLines (canvas, contentRect, Side.Top, 2, "Tab", true, LineStyle.Rounded);
@@ -202,16 +202,17 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         v.Draw ();
         output.WriteLine (driver.ToString ());
 
-        DriverAssert.AssertDriverContentsAre (
-            """
-              ╭───╮
-              │Tab│
-            ╭─╯   ╰─╮
-            │       │
-            │       │
-            ╰───────╯
-            """,
-            output, driver, ignoreLeadingWhitespace: true);
+        DriverAssert.AssertDriverContentsAre ("""
+                                                ╭───╮
+                                                │Tab│
+                                              ╭─╯   ╰─╮
+                                              │       │
+                                              │       │
+                                              ╰───────╯
+                                              """,
+                                              output,
+                                              driver,
+                                              true);
 
         v.Dispose ();
     }
@@ -225,8 +226,8 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
     {
         Rectangle contentRect = new (0, 0, 9, 4);
 
-        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 7, view =>
-            TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Bottom, 0, "Tab"));
+        (View v, LineCanvas canvas, IDriver driver) =
+            CreateCanvas (9, 7, view => TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Bottom, 0, "Tab"));
 
         AddContentBorder (canvas, contentRect, skipSide: Side.Bottom);
         TabHeaderRenderer.AddLines (canvas, contentRect, Side.Bottom, 0, "Tab", false, LineStyle.Rounded);
@@ -234,16 +235,17 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         v.Draw ();
         output.WriteLine (driver.ToString ());
 
-        DriverAssert.AssertDriverContentsAre (
-            """
-            ╭───────╮
-            │       │
-            │       │
-            ├───┬───╯
-            │Tab│
-            ╰───╯
-            """,
-            output, driver, ignoreLeadingWhitespace: true);
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭───────╮
+                                              │       │
+                                              │       │
+                                              ├───┬───╯
+                                              │Tab│
+                                              ╰───╯
+                                              """,
+                                              output,
+                                              driver,
+                                              true);
 
         v.Dispose ();
     }
@@ -253,8 +255,8 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
     {
         Rectangle contentRect = new (0, 0, 9, 4);
 
-        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 7, view =>
-            TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Bottom, 0, "Tab"));
+        (View v, LineCanvas canvas, IDriver driver) =
+            CreateCanvas (9, 7, view => TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Bottom, 0, "Tab"));
 
         AddContentBorder (canvas, contentRect, skipSide: Side.Bottom);
         TabHeaderRenderer.AddLines (canvas, contentRect, Side.Bottom, 0, "Tab", true, LineStyle.Rounded);
@@ -262,16 +264,17 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         v.Draw ();
         output.WriteLine (driver.ToString ());
 
-        DriverAssert.AssertDriverContentsAre (
-            """
-            ╭───────╮
-            │       │
-            │       │
-            │   ╭───╯
-            │Tab│
-            ╰───╯
-            """,
-            output, driver, ignoreLeadingWhitespace: true);
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭───────╮
+                                              │       │
+                                              │       │
+                                              │   ╭───╯
+                                              │Tab│
+                                              ╰───╯
+                                              """,
+                                              output,
+                                              driver,
+                                              true);
 
         v.Dispose ();
     }
@@ -285,8 +288,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
     {
         Rectangle contentRect = new (2, 0, 9, 9);
 
-        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (11, 9, view =>
-            TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Left, 0, "Tab"));
+        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (11, 9, view => TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Left, 0, "Tab"));
 
         AddContentBorder (canvas, contentRect, skipSide: Side.Left);
         TabHeaderRenderer.AddLines (canvas, contentRect, Side.Left, 0, "Tab", false, LineStyle.Rounded);
@@ -294,19 +296,20 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         v.Draw ();
         output.WriteLine (driver.ToString ());
 
-        DriverAssert.AssertDriverContentsAre (
-            """
-            ╭─┬───────╮
-            │T│       │
-            │a│       │
-            │b│       │
-            ╰─┤       │
-              │       │
-              │       │
-              │       │
-              ╰───────╯
-            """,
-            output, driver, ignoreLeadingWhitespace: true);
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭─┬───────╮
+                                              │T│       │
+                                              │a│       │
+                                              │b│       │
+                                              ╰─┤       │
+                                                │       │
+                                                │       │
+                                                │       │
+                                                ╰───────╯
+                                              """,
+                                              output,
+                                              driver,
+                                              true);
 
         v.Dispose ();
     }
@@ -316,8 +319,8 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
     {
         Rectangle contentRect = new (0, 0, 9, 9);
 
-        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (11, 9, view =>
-            TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Right, 0, "Tab"));
+        (View v, LineCanvas canvas, IDriver driver) =
+            CreateCanvas (11, 9, view => TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Right, 0, "Tab"));
 
         AddContentBorder (canvas, contentRect, skipSide: Side.Right);
         TabHeaderRenderer.AddLines (canvas, contentRect, Side.Right, 0, "Tab", false, LineStyle.Rounded);
@@ -325,19 +328,20 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         v.Draw ();
         output.WriteLine (driver.ToString ());
 
-        DriverAssert.AssertDriverContentsAre (
-            """
-            ╭───────┬─╮
-            │       │T│
-            │       │a│
-            │       │b│
-            │       ├─╯
-            │       │
-            │       │
-            │       │
-            ╰───────╯
-            """,
-            output, driver, ignoreLeadingWhitespace: true);
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭───────┬─╮
+                                              │       │T│
+                                              │       │a│
+                                              │       │b│
+                                              │       ├─╯
+                                              │       │
+                                              │       │
+                                              │       │
+                                              ╰───────╯
+                                              """,
+                                              output,
+                                              driver,
+                                              true);
 
         v.Dispose ();
     }
@@ -347,8 +351,8 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
     {
         Rectangle contentRect = new (0, 0, 9, 9);
 
-        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (11, 9, view =>
-            TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Right, 6, "Tab"));
+        (View v, LineCanvas canvas, IDriver driver) =
+            CreateCanvas (11, 9, view => TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Right, 6, "Tab"));
 
         AddContentBorder (canvas, contentRect, skipSide: Side.Right);
         TabHeaderRenderer.AddLines (canvas, contentRect, Side.Right, 6, "Tab", true, LineStyle.Rounded);
@@ -357,19 +361,20 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         output.WriteLine (driver.ToString ());
 
         // Bottom of header is open (clipped). Gap suppresses corner at (8,8).
-        DriverAssert.AssertDriverContentsAre (
-            """
-            ╭───────╮
-            │       │
-            │       │
-            │       │
-            │       │
-            │       │
-            │       ╰─╮
-            │        T│
-            ╰─────── a│
-            """,
-            output, driver, ignoreLeadingWhitespace: true);
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭───────╮
+                                              │       │
+                                              │       │
+                                              │       │
+                                              │       │
+                                              │       │
+                                              │       ╰─╮
+                                              │        T│
+                                              ╰─────── a│
+                                              """,
+                                              output,
+                                              driver,
+                                              true);
 
         v.Dispose ();
     }
@@ -384,8 +389,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         // Header extends past right edge with focus gap — right side open
         Rectangle contentRect = new (0, 2, 9, 4);
 
-        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 6, view =>
-            TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Top, 5, "Tab"));
+        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 6, view => TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Top, 5, "Tab"));
 
         AddContentBorder (canvas, contentRect, skipSide: Side.Top);
         TabHeaderRenderer.AddLines (canvas, contentRect, Side.Top, 5, "Tab", true, LineStyle.Rounded);
@@ -394,16 +398,17 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         output.WriteLine (driver.ToString ());
 
         // Right side open, focused gap from x=5 to right edge
-        DriverAssert.AssertDriverContentsAre (
-            """
-                 ╭───
-                 │Tab
-            ╭────╯  │
-            │       │
-            │       │
-            ╰───────╯
-            """,
-            output, driver, ignoreLeadingWhitespace: true);
+        DriverAssert.AssertDriverContentsAre ("""
+                                                   ╭───
+                                                   │Tab
+                                              ╭────╯  │
+                                              │       │
+                                              │       │
+                                              ╰───────╯
+                                              """,
+                                              output,
+                                              driver,
+                                              true);
 
         v.Dispose ();
     }
@@ -414,8 +419,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         // Header on left overflows bottom with focus gap — bottom side open
         Rectangle contentRect = new (2, 0, 9, 9);
 
-        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (11, 9, view =>
-            TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Left, 6, "Tab"));
+        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (11, 9, view => TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Left, 6, "Tab"));
 
         AddContentBorder (canvas, contentRect, skipSide: Side.Left);
         TabHeaderRenderer.AddLines (canvas, contentRect, Side.Left, 6, "Tab", true, LineStyle.Rounded);
@@ -424,19 +428,20 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         output.WriteLine (driver.ToString ());
 
         // Bottom of header is open (clipped). Gap suppresses corner at (2,8).
-        DriverAssert.AssertDriverContentsAre (
-            """
-              ╭───────╮
-              │       │
-              │       │
-              │       │
-              │       │
-              │       │
-            ╭─╯       │
-            │T        │
-            │a ───────╯
-            """,
-            output, driver, ignoreLeadingWhitespace: true);
+        DriverAssert.AssertDriverContentsAre ("""
+                                                ╭───────╮
+                                                │       │
+                                                │       │
+                                                │       │
+                                                │       │
+                                                │       │
+                                              ╭─╯       │
+                                              │T        │
+                                              │a ───────╯
+                                              """,
+                                              output,
+                                              driver,
+                                              true);
 
         v.Dispose ();
     }
@@ -447,8 +452,7 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         // Single character tab text
         Rectangle contentRect = new (0, 2, 9, 4);
 
-        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 6, view =>
-            TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Top, 2, "X"));
+        (View v, LineCanvas canvas, IDriver driver) = CreateCanvas (9, 6, view => TabHeaderRenderer.DrawText (view.Driver!, contentRect, Side.Top, 2, "X"));
 
         AddContentBorder (canvas, contentRect, skipSide: Side.Top);
         TabHeaderRenderer.AddLines (canvas, contentRect, Side.Top, 2, "X", false, LineStyle.Rounded);
@@ -456,16 +460,17 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         v.Draw ();
         output.WriteLine (driver.ToString ());
 
-        DriverAssert.AssertDriverContentsAre (
-            """
-              ╭─╮
-              │X│
-            ╭─┴─┴───╮
-            │       │
-            │       │
-            ╰───────╯
-            """,
-            output, driver, ignoreLeadingWhitespace: true);
+        DriverAssert.AssertDriverContentsAre ("""
+                                                ╭─╮
+                                                │X│
+                                              ╭─┴─┴───╮
+                                              │       │
+                                              │       │
+                                              ╰───────╯
+                                              """,
+                                              output,
+                                              driver,
+                                              true);
 
         v.Dispose ();
     }
@@ -485,14 +490,15 @@ public class TabHeaderRendererTests (ITestOutputHelper output) : TestDriverBase
         output.WriteLine (driver.ToString ());
 
         // Only 3 content border sides drawn (no top, no header). Content starts at y=2.
-        DriverAssert.AssertDriverContentsAre (
-            """
-            │       │
-            │       │
-            │       │
-            ╰───────╯
-            """,
-            output, driver, ignoreLeadingWhitespace: true);
+        DriverAssert.AssertDriverContentsAre ("""
+                                              │       │
+                                              │       │
+                                              │       │
+                                              ╰───────╯
+                                              """,
+                                              output,
+                                              driver,
+                                              true);
 
         v.Dispose ();
     }

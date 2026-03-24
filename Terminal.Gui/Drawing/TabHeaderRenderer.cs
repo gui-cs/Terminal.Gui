@@ -53,7 +53,7 @@ internal static class TabHeaderRenderer
         }
 
         Rectangle headerRect = ComputeHeaderRect (contentBorderRect, side, tabOffset, textLen);
-        Rectangle viewBounds = ComputeViewBounds (contentBorderRect, side, textLen);
+        Rectangle viewBounds = ComputeViewBounds (contentBorderRect, side);
         Rectangle clipped = Rectangle.Intersect (headerRect, viewBounds);
 
         if (clipped.IsEmpty)
@@ -65,7 +65,7 @@ internal static class TabHeaderRenderer
         AddOuterHeaderLines (lineCanvas, headerRect, clipped, side, lineStyle, attribute);
 
         // Add the content border on the tab side — either continuous (unfocused) or split (focused)
-        AddTabSideContentBorder (lineCanvas, headerRect, clipped, contentBorderRect, side, hasFocus, lineStyle, attribute);
+        AddTabSideContentBorder (lineCanvas, clipped, contentBorderRect, side, hasFocus, lineStyle, attribute);
     }
 
     /// <summary>
@@ -93,7 +93,7 @@ internal static class TabHeaderRenderer
         }
 
         Rectangle headerRect = ComputeHeaderRect (contentBorderRect, side, tabOffset, textLen);
-        Rectangle viewBounds = ComputeViewBounds (contentBorderRect, side, textLen);
+        Rectangle viewBounds = ComputeViewBounds (contentBorderRect, side);
         Rectangle clipped = Rectangle.Intersect (headerRect, viewBounds);
 
         if (clipped.IsEmpty)
@@ -151,7 +151,7 @@ internal static class TabHeaderRenderer
     /// <summary>
     ///     Computes the full view bounds (content border + header protrusion area).
     /// </summary>
-    private static Rectangle ComputeViewBounds (Rectangle contentBorderRect, Side side, int textLen) =>
+    private static Rectangle ComputeViewBounds (Rectangle contentBorderRect, Side side) =>
         side switch
         {
             Side.Top => new Rectangle (contentBorderRect.X, contentBorderRect.Y - 2, contentBorderRect.Width, contentBorderRect.Height + 2),
@@ -260,6 +260,8 @@ internal static class TabHeaderRenderer
                 }
 
                 break;
+
+            default: throw new ArgumentOutOfRangeException (nameof (side), side, null);
         }
     }
 
@@ -269,7 +271,6 @@ internal static class TabHeaderRenderer
     ///     the border is split into two segments around the gap, producing corner glyphs naturally.
     /// </summary>
     private static void AddTabSideContentBorder (LineCanvas lineCanvas,
-                                                 Rectangle headerRect,
                                                  Rectangle clipped,
                                                  Rectangle contentBorderRect,
                                                  Side side,
@@ -438,6 +439,8 @@ internal static class TabHeaderRenderer
 
                 break;
             }
+
+            default: throw new ArgumentOutOfRangeException (nameof (side), side, null);
         }
     }
 
@@ -562,6 +565,8 @@ internal static class TabHeaderRenderer
 
                 break;
             }
+
+            default: throw new ArgumentOutOfRangeException (nameof (side), side, null);
         }
     }
 }
