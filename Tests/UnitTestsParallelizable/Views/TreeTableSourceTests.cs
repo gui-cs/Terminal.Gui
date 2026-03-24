@@ -17,13 +17,13 @@ public class TreeTableSourceTests : TestDriverBase
         TableView tv = GetTreeTableView (out _);
 
         // Initially 2 root nodes visible.
-        Assert.Equal (2, tv.Table.Rows);
+        Assert.Equal (2, tv.Table?.Rows);
 
         // CursorRight expands the selected (first) root node.
         tv.NewKeyDownEvent (Key.CursorRight);
 
         // Lost Highway has 2 child cars, so total rows = 4.
-        Assert.Equal (4, tv.Table.Rows);
+        Assert.Equal (4, tv.Table?.Rows);
     }
 
     [Fact]
@@ -33,11 +33,11 @@ public class TreeTableSourceTests : TestDriverBase
 
         // Expand the first root node.
         tv.NewKeyDownEvent (Key.CursorRight);
-        Assert.Equal (4, tv.Table.Rows);
+        Assert.Equal (4, tv.Table?.Rows);
 
         // CursorLeft collapses it.
         tv.NewKeyDownEvent (Key.CursorLeft);
-        Assert.Equal (2, tv.Table.Rows);
+        Assert.Equal (2, tv.Table?.Rows);
     }
 
     [Fact]

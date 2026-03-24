@@ -1,5 +1,3 @@
-using Terminal.Gui.ViewBase;
-
 namespace Terminal.Gui.Drawing;
 
 /// <summary>
@@ -33,15 +31,14 @@ internal static class TabHeaderRenderer
     /// </param>
     /// <param name="lineStyle">The <see cref="LineStyle"/> for the header border lines.</param>
     /// <param name="attribute">Optional <see cref="Attribute"/> for coloring the header lines.</param>
-    public static void AddLines (
-        LineCanvas lineCanvas,
-        Rectangle contentBorderRect,
-        Side side,
-        int tabOffset,
-        string tabText,
-        bool hasFocus,
-        LineStyle lineStyle,
-        Attribute? attribute = null)
+    public static void AddLines (LineCanvas lineCanvas,
+                                 Rectangle contentBorderRect,
+                                 Side side,
+                                 int tabOffset,
+                                 string tabText,
+                                 bool hasFocus,
+                                 LineStyle lineStyle,
+                                 Attribute? attribute = null)
     {
         if (string.IsNullOrEmpty (tabText))
         {
@@ -81,13 +78,7 @@ internal static class TabHeaderRenderer
     /// <param name="tabOffset">Offset along the border edge.</param>
     /// <param name="tabText">The text to display.</param>
     /// <param name="attribute">Optional <see cref="Attribute"/> for text color.</param>
-    public static void DrawText (
-        IDriver driver,
-        Rectangle contentBorderRect,
-        Side side,
-        int tabOffset,
-        string tabText,
-        Attribute? attribute = null)
+    public static void DrawText (IDriver driver, Rectangle contentBorderRect, Side side, int tabOffset, string tabText, Attribute? attribute = null)
     {
         if (string.IsNullOrEmpty (tabText))
         {
@@ -118,17 +109,16 @@ internal static class TabHeaderRenderer
     ///     Note: If the text is drawn before the LineCanvas is rendered, it will be overwritten.
     ///     Use <see cref="AddLines"/> + <see cref="DrawText"/> separately when you control render order.
     /// </summary>
-    public static void Render (
-        LineCanvas lineCanvas,
-        Rectangle contentBorderRect,
-        Side side,
-        int tabOffset,
-        string tabText,
-        bool hasFocus,
-        LineStyle lineStyle,
-        Attribute? attribute = null,
-        IDriver? driver = null,
-        Attribute? textAttribute = null)
+    public static void Render (LineCanvas lineCanvas,
+                               Rectangle contentBorderRect,
+                               Side side,
+                               int tabOffset,
+                               string tabText,
+                               bool hasFocus,
+                               LineStyle lineStyle,
+                               Attribute? attribute = null,
+                               IDriver? driver = null,
+                               Attribute? textAttribute = null)
     {
         AddLines (lineCanvas, contentBorderRect, side, tabOffset, tabText, hasFocus, lineStyle, attribute);
 
@@ -141,85 +131,49 @@ internal static class TabHeaderRenderer
     /// <summary>
     ///     Computes the unclipped header rectangle for the given side, offset, and text length.
     /// </summary>
-    private static Rectangle ComputeHeaderRect (Rectangle contentBorderRect, Side side, int tabOffset, int textLen)
-    {
+    private static Rectangle ComputeHeaderRect (Rectangle contentBorderRect, Side side, int tabOffset, int textLen) =>
+
         // Header dimensions: for Top/Bottom, width = textLen + 2, height = 3
         // For Left/Right, width = 3, height = textLen + 2
-        return side switch
+        side switch
         {
-            Side.Top => new Rectangle (
-                contentBorderRect.X + tabOffset,
-                contentBorderRect.Y - 2,
-                textLen + 2,
-                3),
+            Side.Top => new Rectangle (contentBorderRect.X + tabOffset, contentBorderRect.Y - 2, textLen + 2, 3),
 
-            Side.Bottom => new Rectangle (
-                contentBorderRect.X + tabOffset,
-                contentBorderRect.Bottom - 1,
-                textLen + 2,
-                3),
+            Side.Bottom => new Rectangle (contentBorderRect.X + tabOffset, contentBorderRect.Bottom - 1, textLen + 2, 3),
 
-            Side.Left => new Rectangle (
-                contentBorderRect.X - 2,
-                contentBorderRect.Y + tabOffset,
-                3,
-                textLen + 2),
+            Side.Left => new Rectangle (contentBorderRect.X - 2, contentBorderRect.Y + tabOffset, 3, textLen + 2),
 
-            Side.Right => new Rectangle (
-                contentBorderRect.Right - 1,
-                contentBorderRect.Y + tabOffset,
-                3,
-                textLen + 2),
+            Side.Right => new Rectangle (contentBorderRect.Right - 1, contentBorderRect.Y + tabOffset, 3, textLen + 2),
 
             _ => Rectangle.Empty
         };
-    }
 
     /// <summary>
     ///     Computes the full view bounds (content border + header protrusion area).
     /// </summary>
-    private static Rectangle ComputeViewBounds (Rectangle contentBorderRect, Side side, int textLen)
-    {
-        return side switch
+    private static Rectangle ComputeViewBounds (Rectangle contentBorderRect, Side side, int textLen) =>
+        side switch
         {
-            Side.Top => new Rectangle (
-                contentBorderRect.X,
-                contentBorderRect.Y - 2,
-                contentBorderRect.Width,
-                contentBorderRect.Height + 2),
+            Side.Top => new Rectangle (contentBorderRect.X, contentBorderRect.Y - 2, contentBorderRect.Width, contentBorderRect.Height + 2),
 
-            Side.Bottom => new Rectangle (
-                contentBorderRect.X,
-                contentBorderRect.Y,
-                contentBorderRect.Width,
-                contentBorderRect.Height + 2),
+            Side.Bottom => new Rectangle (contentBorderRect.X, contentBorderRect.Y, contentBorderRect.Width, contentBorderRect.Height + 2),
 
-            Side.Left => new Rectangle (
-                contentBorderRect.X - 2,
-                contentBorderRect.Y,
-                contentBorderRect.Width + 2,
-                contentBorderRect.Height),
+            Side.Left => new Rectangle (contentBorderRect.X - 2, contentBorderRect.Y, contentBorderRect.Width + 2, contentBorderRect.Height),
 
-            Side.Right => new Rectangle (
-                contentBorderRect.X,
-                contentBorderRect.Y,
-                contentBorderRect.Width + 2,
-                contentBorderRect.Height),
+            Side.Right => new Rectangle (contentBorderRect.X, contentBorderRect.Y, contentBorderRect.Width + 2, contentBorderRect.Height),
 
             _ => contentBorderRect
         };
-    }
 
     /// <summary>
     ///     Adds the 3 outer border lines of the header (the sides NOT adjacent to the content border).
     /// </summary>
-    private static void AddOuterHeaderLines (
-        LineCanvas lineCanvas,
-        Rectangle headerRect,
-        Rectangle clipped,
-        Side side,
-        LineStyle lineStyle,
-        Attribute? attribute)
+    private static void AddOuterHeaderLines (LineCanvas lineCanvas,
+                                             Rectangle headerRect,
+                                             Rectangle clipped,
+                                             Side side,
+                                             LineStyle lineStyle,
+                                             Attribute? attribute)
     {
         switch (side)
         {
@@ -227,29 +181,20 @@ internal static class TabHeaderRenderer
                 // Top edge of header (the outermost line)
                 if (clipped.Y == headerRect.Y)
                 {
-                    lineCanvas.AddLine (
-                        new Point (clipped.X, clipped.Y),
-                        clipped.Width,
-                        Orientation.Horizontal,
-                        lineStyle,
-                        attribute);
+                    lineCanvas.AddLine (new Point (clipped.X, clipped.Y), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
                 }
 
-                // Left edge of header
-                lineCanvas.AddLine (
-                    new Point (clipped.X, clipped.Y),
-                    clipped.Height,
-                    Orientation.Vertical,
-                    lineStyle,
-                    attribute);
+                // Left edge of header — only if not clipped on left
+                if (clipped.X == headerRect.X)
+                {
+                    lineCanvas.AddLine (new Point (clipped.X, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
+                }
 
-                // Right edge of header
-                lineCanvas.AddLine (
-                    new Point (clipped.Right - 1, clipped.Y),
-                    clipped.Height,
-                    Orientation.Vertical,
-                    lineStyle,
-                    attribute);
+                // Right edge of header — only if not clipped on right
+                if (clipped.Right == headerRect.Right)
+                {
+                    lineCanvas.AddLine (new Point (clipped.Right - 1, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
+                }
 
                 break;
 
@@ -257,29 +202,20 @@ internal static class TabHeaderRenderer
                 // Bottom edge of header (the outermost line)
                 if (clipped.Bottom == headerRect.Bottom)
                 {
-                    lineCanvas.AddLine (
-                        new Point (clipped.X, clipped.Bottom - 1),
-                        clipped.Width,
-                        Orientation.Horizontal,
-                        lineStyle,
-                        attribute);
+                    lineCanvas.AddLine (new Point (clipped.X, clipped.Bottom - 1), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
                 }
 
-                // Left edge of header
-                lineCanvas.AddLine (
-                    new Point (clipped.X, clipped.Y),
-                    clipped.Height,
-                    Orientation.Vertical,
-                    lineStyle,
-                    attribute);
+                // Left edge — only if not clipped on left
+                if (clipped.X == headerRect.X)
+                {
+                    lineCanvas.AddLine (new Point (clipped.X, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
+                }
 
-                // Right edge of header
-                lineCanvas.AddLine (
-                    new Point (clipped.Right - 1, clipped.Y),
-                    clipped.Height,
-                    Orientation.Vertical,
-                    lineStyle,
-                    attribute);
+                // Right edge — only if not clipped on right
+                if (clipped.Right == headerRect.Right)
+                {
+                    lineCanvas.AddLine (new Point (clipped.Right - 1, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
+                }
 
                 break;
 
@@ -287,31 +223,19 @@ internal static class TabHeaderRenderer
                 // Left edge of header (the outermost line)
                 if (clipped.X == headerRect.X)
                 {
-                    lineCanvas.AddLine (
-                        new Point (clipped.X, clipped.Y),
-                        clipped.Height,
-                        Orientation.Vertical,
-                        lineStyle,
-                        attribute);
+                    lineCanvas.AddLine (new Point (clipped.X, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
                 }
 
-                // Top edge of header
-                lineCanvas.AddLine (
-                    new Point (clipped.X, clipped.Y),
-                    clipped.Width,
-                    Orientation.Horizontal,
-                    lineStyle,
-                    attribute);
+                // Top edge — only if not clipped on top
+                if (clipped.Y == headerRect.Y)
+                {
+                    lineCanvas.AddLine (new Point (clipped.X, clipped.Y), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
+                }
 
-                // Bottom edge of header
+                // Bottom edge — only if not clipped on bottom
                 if (clipped.Bottom == headerRect.Bottom)
                 {
-                    lineCanvas.AddLine (
-                        new Point (clipped.X, clipped.Bottom - 1),
-                        clipped.Width,
-                        Orientation.Horizontal,
-                        lineStyle,
-                        attribute);
+                    lineCanvas.AddLine (new Point (clipped.X, clipped.Bottom - 1), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
                 }
 
                 break;
@@ -320,31 +244,19 @@ internal static class TabHeaderRenderer
                 // Right edge of header (the outermost line)
                 if (clipped.Right == headerRect.Right)
                 {
-                    lineCanvas.AddLine (
-                        new Point (clipped.Right - 1, clipped.Y),
-                        clipped.Height,
-                        Orientation.Vertical,
-                        lineStyle,
-                        attribute);
+                    lineCanvas.AddLine (new Point (clipped.Right - 1, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
                 }
 
-                // Top edge of header
-                lineCanvas.AddLine (
-                    new Point (clipped.X, clipped.Y),
-                    clipped.Width,
-                    Orientation.Horizontal,
-                    lineStyle,
-                    attribute);
+                // Top edge — only if not clipped on top
+                if (clipped.Y == headerRect.Y)
+                {
+                    lineCanvas.AddLine (new Point (clipped.X, clipped.Y), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
+                }
 
-                // Bottom edge of header
+                // Bottom edge — only if not clipped on bottom
                 if (clipped.Bottom == headerRect.Bottom)
                 {
-                    lineCanvas.AddLine (
-                        new Point (clipped.X, clipped.Bottom - 1),
-                        clipped.Width,
-                        Orientation.Horizontal,
-                        lineStyle,
-                        attribute);
+                    lineCanvas.AddLine (new Point (clipped.X, clipped.Bottom - 1), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
                 }
 
                 break;
@@ -356,15 +268,14 @@ internal static class TabHeaderRenderer
     ///     (producing junction glyphs where the header meets it via auto-join). For focused tabs,
     ///     the border is split into two segments around the gap, producing corner glyphs naturally.
     /// </summary>
-    private static void AddTabSideContentBorder (
-        LineCanvas lineCanvas,
-        Rectangle headerRect,
-        Rectangle clipped,
-        Rectangle contentBorderRect,
-        Side side,
-        bool hasFocus,
-        LineStyle lineStyle,
-        Attribute? attribute)
+    private static void AddTabSideContentBorder (LineCanvas lineCanvas,
+                                                 Rectangle headerRect,
+                                                 Rectangle clipped,
+                                                 Rectangle contentBorderRect,
+                                                 Side side,
+                                                 bool hasFocus,
+                                                 LineStyle lineStyle,
+                                                 Attribute? attribute)
     {
         switch (side)
         {
@@ -374,11 +285,7 @@ internal static class TabHeaderRenderer
 
                 if (!hasFocus)
                 {
-                    lineCanvas.AddLine (
-                        new Point (contentBorderRect.X, borderY),
-                        contentBorderRect.Width,
-                        Orientation.Horizontal,
-                        lineStyle, attribute);
+                    lineCanvas.AddLine (new Point (contentBorderRect.X, borderY), contentBorderRect.Width, Orientation.Horizontal, lineStyle, attribute);
                 }
                 else
                 {
@@ -388,21 +295,21 @@ internal static class TabHeaderRenderer
                     // Left segment: from content left to headerLeft (inclusive for junction)
                     if (headerLeft > contentBorderRect.X)
                     {
-                        lineCanvas.AddLine (
-                            new Point (contentBorderRect.X, borderY),
-                            headerLeft - contentBorderRect.X + 1,
-                            Orientation.Horizontal,
-                            lineStyle, attribute);
+                        lineCanvas.AddLine (new Point (contentBorderRect.X, borderY),
+                                            headerLeft - contentBorderRect.X + 1,
+                                            Orientation.Horizontal,
+                                            lineStyle,
+                                            attribute);
                     }
 
                     // Right segment: from headerRight (inclusive for junction) to content right
                     if (headerRight < contentBorderRect.Right - 1)
                     {
-                        lineCanvas.AddLine (
-                            new Point (headerRight, borderY),
-                            contentBorderRect.Right - headerRight,
-                            Orientation.Horizontal,
-                            lineStyle, attribute);
+                        lineCanvas.AddLine (new Point (headerRight, borderY),
+                                            contentBorderRect.Right - headerRight,
+                                            Orientation.Horizontal,
+                                            lineStyle,
+                                            attribute);
                     }
                 }
 
@@ -415,11 +322,7 @@ internal static class TabHeaderRenderer
 
                 if (!hasFocus)
                 {
-                    lineCanvas.AddLine (
-                        new Point (contentBorderRect.X, borderY),
-                        contentBorderRect.Width,
-                        Orientation.Horizontal,
-                        lineStyle, attribute);
+                    lineCanvas.AddLine (new Point (contentBorderRect.X, borderY), contentBorderRect.Width, Orientation.Horizontal, lineStyle, attribute);
                 }
                 else
                 {
@@ -428,20 +331,20 @@ internal static class TabHeaderRenderer
 
                     if (headerLeft > contentBorderRect.X)
                     {
-                        lineCanvas.AddLine (
-                            new Point (contentBorderRect.X, borderY),
-                            headerLeft - contentBorderRect.X + 1,
-                            Orientation.Horizontal,
-                            lineStyle, attribute);
+                        lineCanvas.AddLine (new Point (contentBorderRect.X, borderY),
+                                            headerLeft - contentBorderRect.X + 1,
+                                            Orientation.Horizontal,
+                                            lineStyle,
+                                            attribute);
                     }
 
                     if (headerRight < contentBorderRect.Right - 1)
                     {
-                        lineCanvas.AddLine (
-                            new Point (headerRight, borderY),
-                            contentBorderRect.Right - headerRight,
-                            Orientation.Horizontal,
-                            lineStyle, attribute);
+                        lineCanvas.AddLine (new Point (headerRight, borderY),
+                                            contentBorderRect.Right - headerRight,
+                                            Orientation.Horizontal,
+                                            lineStyle,
+                                            attribute);
                     }
                 }
 
@@ -454,11 +357,7 @@ internal static class TabHeaderRenderer
 
                 if (!hasFocus)
                 {
-                    lineCanvas.AddLine (
-                        new Point (borderX, contentBorderRect.Y),
-                        contentBorderRect.Height,
-                        Orientation.Vertical,
-                        lineStyle, attribute);
+                    lineCanvas.AddLine (new Point (borderX, contentBorderRect.Y), contentBorderRect.Height, Orientation.Vertical, lineStyle, attribute);
                 }
                 else
                 {
@@ -467,11 +366,11 @@ internal static class TabHeaderRenderer
 
                     if (headerTop > contentBorderRect.Y)
                     {
-                        lineCanvas.AddLine (
-                            new Point (borderX, contentBorderRect.Y),
-                            headerTop - contentBorderRect.Y + 1,
-                            Orientation.Vertical,
-                            lineStyle, attribute);
+                        lineCanvas.AddLine (new Point (borderX, contentBorderRect.Y),
+                                            headerTop - contentBorderRect.Y + 1,
+                                            Orientation.Vertical,
+                                            lineStyle,
+                                            attribute);
                     }
                     else
                     {
@@ -480,11 +379,11 @@ internal static class TabHeaderRenderer
 
                     if (headerBottom < contentBorderRect.Bottom - 1)
                     {
-                        lineCanvas.AddLine (
-                            new Point (borderX, headerBottom),
-                            contentBorderRect.Bottom - headerBottom,
-                            Orientation.Vertical,
-                            lineStyle, attribute);
+                        lineCanvas.AddLine (new Point (borderX, headerBottom),
+                                            contentBorderRect.Bottom - headerBottom,
+                                            Orientation.Vertical,
+                                            lineStyle,
+                                            attribute);
                     }
                     else
                     {
@@ -501,11 +400,7 @@ internal static class TabHeaderRenderer
 
                 if (!hasFocus)
                 {
-                    lineCanvas.AddLine (
-                        new Point (borderX, contentBorderRect.Y),
-                        contentBorderRect.Height,
-                        Orientation.Vertical,
-                        lineStyle, attribute);
+                    lineCanvas.AddLine (new Point (borderX, contentBorderRect.Y), contentBorderRect.Height, Orientation.Vertical, lineStyle, attribute);
                 }
                 else
                 {
@@ -514,11 +409,11 @@ internal static class TabHeaderRenderer
 
                     if (headerTop > contentBorderRect.Y)
                     {
-                        lineCanvas.AddLine (
-                            new Point (borderX, contentBorderRect.Y),
-                            headerTop - contentBorderRect.Y + 1,
-                            Orientation.Vertical,
-                            lineStyle, attribute);
+                        lineCanvas.AddLine (new Point (borderX, contentBorderRect.Y),
+                                            headerTop - contentBorderRect.Y + 1,
+                                            Orientation.Vertical,
+                                            lineStyle,
+                                            attribute);
                     }
                     else
                     {
@@ -528,11 +423,11 @@ internal static class TabHeaderRenderer
 
                     if (headerBottom < contentBorderRect.Bottom - 1)
                     {
-                        lineCanvas.AddLine (
-                            new Point (borderX, headerBottom),
-                            contentBorderRect.Bottom - headerBottom,
-                            Orientation.Vertical,
-                            lineStyle, attribute);
+                        lineCanvas.AddLine (new Point (borderX, headerBottom),
+                                            contentBorderRect.Bottom - headerBottom,
+                                            Orientation.Vertical,
+                                            lineStyle,
+                                            attribute);
                     }
                     else
                     {
@@ -550,13 +445,7 @@ internal static class TabHeaderRenderer
     ///     Draws the tab text inside the header rectangle.
     ///     For Top/Bottom, text is horizontal. For Left/Right, text is vertical.
     /// </summary>
-    private static void DrawTabText (
-        IDriver driver,
-        Rectangle headerRect,
-        Rectangle clipped,
-        Side side,
-        string tabText,
-        Attribute? attribute)
+    private static void DrawTabText (IDriver driver, Rectangle headerRect, Rectangle clipped, Side side, string tabText, Attribute? attribute)
     {
         if (attribute is { })
         {
@@ -573,19 +462,20 @@ internal static class TabHeaderRenderer
                 {
                     int textX = headerRect.X + 1;
 
-                    // Vertical borders are always drawn, so always exclude them
-                    int clipLeft = Math.Max (clipped.X + 1, headerRect.X + 1);
-                    int clipRight = clipped.Right - 1;
+                    // Only exclude border column if that border is actually drawn (not clipped)
+                    int clipLeft = clipped.X == headerRect.X ? clipped.X + 1 : clipped.X;
+                    int clipRight = clipped.Right == headerRect.Right ? clipped.Right - 1 : clipped.Right;
 
                     for (var i = 0; i < tabText.Length; i++)
                     {
                         int x = textX + i;
 
-                        if (x >= clipLeft && x < clipRight)
+                        if (x < clipLeft || x >= clipRight)
                         {
-                            driver.Move (x, textY);
-                            driver.AddRune ((Rune)tabText [i]);
+                            continue;
                         }
+                        driver.Move (x, textY);
+                        driver.AddRune ((Rune)tabText [i]);
                     }
                 }
 
@@ -600,19 +490,19 @@ internal static class TabHeaderRenderer
                 {
                     int textX = headerRect.X + 1;
 
-                    // Vertical borders are always drawn, so always exclude them
-                    int clipLeft = Math.Max (clipped.X + 1, headerRect.X + 1);
-                    int clipRight = clipped.Right - 1;
+                    int clipLeft = clipped.X == headerRect.X ? clipped.X + 1 : clipped.X;
+                    int clipRight = clipped.Right == headerRect.Right ? clipped.Right - 1 : clipped.Right;
 
                     for (var i = 0; i < tabText.Length; i++)
                     {
                         int x = textX + i;
 
-                        if (x >= clipLeft && x < clipRight)
+                        if (x < clipLeft || x >= clipRight)
                         {
-                            driver.Move (x, textY);
-                            driver.AddRune ((Rune)tabText [i]);
+                            continue;
                         }
+                        driver.Move (x, textY);
+                        driver.AddRune ((Rune)tabText [i]);
                     }
                 }
 
@@ -627,19 +517,19 @@ internal static class TabHeaderRenderer
                 {
                     int textY = headerRect.Y + 1;
 
-                    // Top border always drawn. Bottom border only drawn when not clipped.
-                    int clipTop = Math.Max (clipped.Y + 1, headerRect.Y + 1);
+                    int clipTop = clipped.Y == headerRect.Y ? clipped.Y + 1 : clipped.Y;
                     int clipBottom = clipped.Bottom == headerRect.Bottom ? clipped.Bottom - 1 : clipped.Bottom;
 
                     for (var i = 0; i < tabText.Length; i++)
                     {
                         int y = textY + i;
 
-                        if (y >= clipTop && y < clipBottom)
+                        if (y < clipTop || y >= clipBottom)
                         {
-                            driver.Move (textX, y);
-                            driver.AddRune ((Rune)tabText [i]);
+                            continue;
                         }
+                        driver.Move (textX, y);
+                        driver.AddRune ((Rune)tabText [i]);
                     }
                 }
 
@@ -654,19 +544,19 @@ internal static class TabHeaderRenderer
                 {
                     int textY = headerRect.Y + 1;
 
-                    // Top border always drawn. Bottom border only drawn when not clipped.
-                    int clipTop = Math.Max (clipped.Y + 1, headerRect.Y + 1);
+                    int clipTop = clipped.Y == headerRect.Y ? clipped.Y + 1 : clipped.Y;
                     int clipBottom = clipped.Bottom == headerRect.Bottom ? clipped.Bottom - 1 : clipped.Bottom;
 
                     for (var i = 0; i < tabText.Length; i++)
                     {
                         int y = textY + i;
 
-                        if (y >= clipTop && y < clipBottom)
+                        if (y < clipTop || y >= clipBottom)
                         {
-                            driver.Move (textX, y);
-                            driver.AddRune ((Rune)tabText [i]);
+                            continue;
                         }
+                        driver.Move (textX, y);
+                        driver.AddRune ((Rune)tabText [i]);
                     }
                 }
 

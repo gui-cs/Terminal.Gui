@@ -33,7 +33,7 @@ public enum VisualRole
     /// <summary>
     ///     The visual role for elements that are active or selected (e.g., selected item in a <see cref="ListView"/>). Also
     ///     used
-    ///     for headers in, <see cref="HexView"/>, <see cref="CharMap"/> and  <see cref="TabView"/>.
+    ///     for headers in, <see cref="HexView"/>, <see cref="CharMap"/>.
     /// </summary>
     Active,
 
