@@ -724,11 +724,12 @@ public class DropDownListGenericTests
         // Copilot
         DropDownList<Season> dropdown = new ();
 
-        IList<object?> items = dropdown.Source!.ToList ();
-        Assert.Contains ("Spring", items.Select (i => i?.ToString ()));
-        Assert.Contains ("Summer", items.Select (i => i?.ToString ()));
-        Assert.Contains ("Autumn", items.Select (i => i?.ToString ()));
-        Assert.Contains ("Winter", items.Select (i => i?.ToString ()));
+        System.Collections.IList items = dropdown.Source!.ToList ();
+        List<string?> names = items.Cast<object?> ().Select (i => i?.ToString ()).ToList ();
+        Assert.Contains ("Spring", names);
+        Assert.Contains ("Summer", names);
+        Assert.Contains ("Autumn", names);
+        Assert.Contains ("Winter", names);
 
         dropdown.Dispose ();
     }
