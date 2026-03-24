@@ -515,6 +515,37 @@ Tab│
 ╰───────╯
 ```
 
+For completeness if `TabOffset = -2`, causing the left side of the tab to extend beyond the right-side's border line:
+```
+──╮
+ab│
+╭─┴─────╮
+│content│
+│       │
+╰───────╯
+```
+
+
+For completeness if `TabOffset = -4`, causing the left side of the tab to extend beyond the right-side's border line:
+```
+╮
+│
+├───────╮
+│content│
+│       │
+╰───────╯
+```
+
+For completeness if `TabOffset = -5`, causing the left side of the tab to extend beyond the right-side's border line:
+```
+
+
+╭───────╮
+│content│
+│       │
+╰───────╯
+```
+
 IOW, it gets clipped by the view's right border, but the header is still visible and functional. The content top line auto-joins with the tab header's right connector at the intersection point, producing a flowing style.
 
 **Important** the renderings above are what happens when the View *does not have focus* (`HasFocus == false`). When a View is using `BorderSettings.Tab`, focus is indicated not by the `Title` being rendered using the focus attribute, but by the presence of the header bottom line. The selected tab has its header bottom line suppressed, creating an open gap that visually connects the header to the content area. Unselected tabs draw the full header rectangle, including the bottom line, creating a closed header.

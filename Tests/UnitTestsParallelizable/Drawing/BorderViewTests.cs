@@ -243,6 +243,58 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                      """);
     }
 
+    [Fact]
+    public void Top_Unfocused_NegativeOffset2_WithTitle () // Copilot
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+        View view = CreateTabView (driver, 9, 6, Side.Top, tabOffset: -2, tabLength: null,
+                                   hasFocus: false, title: "Tab", titleFlag: true);
+
+        // Header at X=-2. Left edge and 'T' clipped. Visible: cap ──╮, title ab│.
+        DrawAndAssert (view, driver, """
+                                     ──╮
+                                     ab│
+                                     ╭─┴─────╮
+                                     │       │
+                                     │       │
+                                     ╰───────╯
+                                     """);
+    }
+
+    [Fact]
+    public void Top_Unfocused_NegativeOffset4_WithTitle () // Copilot
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+        View view = CreateTabView (driver, 9, 6, Side.Top, tabOffset: -4, tabLength: null,
+                                   hasFocus: false, title: "Tab", titleFlag: true);
+
+        // Header at X=-4. Only right edge visible at col 0. No title visible.
+        DrawAndAssert (view, driver, """
+                                     ╮
+                                     │
+                                     ├───────╮
+                                     │       │
+                                     │       │
+                                     ╰───────╯
+                                     """);
+    }
+
+    [Fact]
+    public void Top_Unfocused_NegativeOffset5_WithTitle () // Copilot
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+        View view = CreateTabView (driver, 9, 6, Side.Top, tabOffset: -5, tabLength: null,
+                                   hasFocus: false, title: "Tab", titleFlag: true);
+
+        // Header completely off-screen. Content border drawn normally.
+        DrawAndAssert (view, driver, """
+                                     ╭───────╮
+                                     │       │
+                                     │       │
+                                     ╰───────╯
+                                     """);
+    }
+
     // ════════════════════════════════════════════════════════════════════
     //  Side.Bottom — View 9×6, Thickness(1,1,1,3), borderBounds=(0,0,9,4)
     //  Content border: 9 wide, 4 tall. Tab protrudes below.
