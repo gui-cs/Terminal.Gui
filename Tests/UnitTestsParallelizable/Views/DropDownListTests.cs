@@ -695,3 +695,154 @@ public class DropDownListTests
     private static IPopoverView? FindDropDownPopover (IApplication app) =>
         app.Popovers?.Popovers.OfType<Popover<ListView, string?>> ().FirstOrDefault ();
 }
+
+public class DropDownListGenericTests
+{
+    private enum Season
+    {
+        Spring,
+        Summer,
+        Autumn,
+        Winter
+    }
+
+    [Fact]
+    public void Constructor_PopulatesSourceFromEnum ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+
+        Assert.NotNull (dropdown.Source);
+        Assert.Equal (4, dropdown.Source.Count);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void Constructor_SourceContainsEnumNames ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+
+        IList<object?> items = dropdown.Source!.ToList ();
+        Assert.Contains ("Spring", items.Select (i => i?.ToString ()));
+        Assert.Contains ("Summer", items.Select (i => i?.ToString ()));
+        Assert.Contains ("Autumn", items.Select (i => i?.ToString ()));
+        Assert.Contains ("Winter", items.Select (i => i?.ToString ()));
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void Value_Get_ReturnsNullWhenTextIsEmpty ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+
+        Assert.Null (dropdown.Value);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void Value_Set_UpdatesText ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+
+        dropdown.Value = Season.Summer;
+
+        Assert.Equal ("Summer", dropdown.Text);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void Value_Get_ReturnsCorrectEnum ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+        dropdown.Text = "Autumn";
+
+        Assert.Equal (Season.Autumn, dropdown.Value);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void Value_SetNull_ClearsText ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+        dropdown.Value = Season.Winter;
+
+        dropdown.Value = null;
+
+        Assert.Equal (string.Empty, dropdown.Text);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void ValueChanged_RaisedWithTypedEnum ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+
+        Season? receivedValue = null;
+        dropdown.ValueChanged += (_, e) => { receivedValue = e.Value; };
+
+        dropdown.Value = Season.Spring;
+
+        Assert.Equal (Season.Spring, receivedValue);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void ValueChanged_RaisedNullWhenTextCleared ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+        dropdown.Value = Season.Winter;
+
+        Season? receivedValue = Season.Winter; // set to non-null sentinel
+        dropdown.ValueChanged += (_, e) => { receivedValue = e.Value; };
+
+        dropdown.Value = null;
+
+        Assert.Null (receivedValue);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void GetValue_ReturnsBoxedEnum ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+        dropdown.Value = Season.Autumn;
+
+        object? boxed = ((IValue)dropdown).GetValue ();
+
+        Assert.Equal (Season.Autumn, boxed);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void IsInterchangeableWithOptionSelector_SameValueInterface ()
+    {
+        // Copilot - demonstrates that both implement IValue with the same TEnum type
+        DropDownList<Season> dropDown = new ();
+        OptionSelector<Season> optionSelector = new ();
+
+        dropDown.Value = Season.Summer;
+        optionSelector.Value = Season.Summer;
+
+        Assert.Equal (optionSelector.Value, dropDown.Value);
+
+        dropDown.Dispose ();
+        optionSelector.Dispose ();
+    }
+}

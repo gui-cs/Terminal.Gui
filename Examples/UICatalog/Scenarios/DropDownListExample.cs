@@ -7,6 +7,17 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 public class DropDownListExample : Scenario
 {
+    private enum DayOfWeekShort
+    {
+        Monday,
+        Tuesday,
+        Wednesday,
+        Thursday,
+        Friday,
+        Saturday,
+        Sunday
+    }
+
     private IApplication? _app;
     private EventLog? _eventLog;
 
@@ -117,8 +128,21 @@ public class DropDownListExample : Scenario
                                               _eventLog?.Log ($"Editable: ValueChanging - CurrentValue: '{e.CurrentValue}', NewValue: '{e.NewValue}'");
                                           };
 
+        // Enum-typed dropdown (DropDownList<TEnum>) example
+        Label enumLabel = new () { X = 1, Y = Pos.Bottom (editableDropDown) + 1, Text = "Enum Mode (DropDownList<TEnum>):" };
+
+        DropDownList<DayOfWeekShort> enumDropDown = new ()
+        {
+            X = Pos.Right (enumLabel) + 1,
+            Y = Pos.Top (enumLabel),
+            Title = "Select Day",
+            Value = DayOfWeekShort.Monday
+        };
+
+        enumDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"Enum: ValueChanged - NewValue: '{e.Value}'"); };
+
         // Different positions example
-        Label positionLabel = new () { X = 1, Y = Pos.Bottom (editableDropDown) + 1, Text = "Different Positions (with Borders and Resizable right sides):" };
+        Label positionLabel = new () { X = 1, Y = Pos.Bottom (enumDropDown) + 1, Text = "Different Positions (with Borders and Resizable right sides):" };
 
         DropDownList topLeftDropDown = new ()
         {
@@ -183,6 +207,8 @@ public class DropDownListExample : Scenario
                           readOnlyDropDown,
                           editableLabel,
                           editableDropDown,
+                          enumLabel,
+                          enumDropDown,
                           positionLabel,
                           topLeftDropDown,
                           topRightDropDown,
