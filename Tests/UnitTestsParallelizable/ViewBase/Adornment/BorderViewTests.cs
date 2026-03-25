@@ -160,7 +160,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        """
                             ╭───
                             │Tab
-                       ╭────┴──╮
+                       ╭────┴──┬
                        │       │
                        │       │
                        ╰───────╯
@@ -326,7 +326,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        """
                        ───╮
                        Tab│
-                       ╭──┴────╮
+                       ┬──┴────╮
                        │       │
                        │       │
                        ╰───────╯
@@ -357,7 +357,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        """
                        ───╮
                        Tab│
-                       ╭──┴────────────╮
+                       ┬──┴────────────╮
                        │               │
                        │               │
                        │               │
@@ -491,7 +491,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        """
                        ──╮
                        ab│
-                       ╭─┴─────╮
+                       ┬─┴─────╮
                        │       │
                        │       │
                        ╰───────╯
@@ -519,7 +519,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        """
                        ╮
                        │
-                       ├───────╮
+                       ┼───────╮
                        │       │
                        │       │
                        ╰───────╯
@@ -607,8 +607,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        ╭───────╮
                        │       │
                        │       │
-                       │   ╭───╯
-                       │Tab│
+                       │Tab╭───╯
+                       │   │
                        ╰───╯
                        """);
     }
@@ -661,7 +661,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        ╭───────╮
                        │       │
                        │       │
-                       ╰──┬────╯
+                       ┴──┬────╯
                        Tab│
                        ───╯
                        """);
@@ -949,8 +949,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        │       │
                        │       │
                        │       ╰─╮
-                       │        T│
-                       ╰─────── a│
+                       │       T │
+                       ╰───────a │
                        """);
     }
 
@@ -1014,8 +1014,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        ╭───────╮
                        │       │
                        │       │
-                       │   ╭───╯
-                       │Tab│
+                       │Tab╭───╯
+                       │   │
                        ╰───╯
                        """);
     }
@@ -1071,9 +1071,9 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        driver,
                        """
                        ╭─────────╮
-                       │        T│
-                       │        a│
-                       │        b│
+                       │       T │
+                       │       a │
+                       │       b │
                        │       ╭─╯
                        │       │
                        │       │
@@ -1283,7 +1283,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (view,
                        driver,
                        """
-                       │Tab╰───╮
+                       │Tab╭───╮
                        │       │
                        │       │
                        ╰───────╯
@@ -1310,7 +1310,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (view,
                        driver,
                        """
-                       │Tab╰───╮
+                       │Tab╭───╮
                        │       │
                        │       │
                        ╰───────╯
@@ -1339,7 +1339,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (view,
                        driver,
                        """
-                       │Long Title╰──╮
+                       │Long Title╭──╮
                        │             │
                        │             │
                        ╰─────────────╯
@@ -1424,7 +1424,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        T       │
                        a       │
                        b       │
-                       ╮       │
+                       │       │
                        │       │
                        │       │
                        │       │
@@ -1457,7 +1457,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        │       T
                        │       a
                        │       b
-                       │       ╭
+                       │       │
                        │       │
                        │       │
                        │       │
@@ -1775,7 +1775,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         DriverAssert.AssertDriverContentsAre ("""
                                               ╭───────────╮
                                               │◊◊◊◊◊◊◊◊◊◊◊│
-                                              │◊│Tab╰───╮◊│
+                                              │◊│Tab╭───╮◊│
                                               │◊│       │◊│
                                               │◊│       │◊│
                                               │◊╰───────╯◊│
@@ -1790,7 +1790,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void SuperView_Top_Depth2_Focused () // Copilot
+    public void SuperView_Top_Depth2_Focused() // Copilot
     {
         // Thickness(1,2,1,1) → depth=2. Subview 9×5.
         (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
