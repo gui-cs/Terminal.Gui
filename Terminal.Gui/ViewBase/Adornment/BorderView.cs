@@ -125,15 +125,6 @@ public partial class BorderView : AdornmentView
         DrawIndicator.Render ();
     }
 
-#if SUBVIEW_BASED_BORDER
-    private Line _left;
-
-    /// <summary>
-    ///    The close button for the border. Set to <see cref="View.Visible"/>, to <see langword="true"/> to enable.
-    /// </summary>
-    public Button CloseButton { get; internal set; }
-#endif
-
     /// <inheritdoc/>
     public override void BeginInit ()
     {
@@ -147,50 +138,7 @@ public partial class BorderView : AdornmentView
         ShowHideDrawIndicator ();
 
         MouseHighlightStates |= Adornment.Parent.Arrangement != ViewArrangement.Fixed ? MouseState.Pressed : MouseState.None;
-
-#if SUBVIEW_BASED_BORDER
-        if (Adornment.Parent is { })
-        {
-            // Left
-            _left = new ()
-            {
-                Orientation = Orientation.Vertical,
-            };
-            Add (_left);
-
-            CloseButton = new Button ()
-            {
-                Text = "X",
-                CanFocus = true,
-                Visible = false,
-            };
-            CloseButton.Accept += (s, e) =>
-            {
-                e.Handled = Parent.InvokeCommand (Command.Quit) == true;
-            };
-            Add (CloseButton);
-
-            LayoutStarted += OnLayoutStarted;
     }
-#endif
-    }
-
-#if SUBVIEW_BASED_BORDER
-    private void OnLayoutStarted (object sender, LayoutEventArgs e)
-    {
-        _left.Border.LineStyle = LineStyle;
-
-        _left.X = Adornment!.Thickness.Left - 1;
-        _left.Y = Adornment!.Thickness.Top - 1;
-        _left.Width = 1;
-        _left.Height = Height;
-
-        CloseButton.X = Pos.AnchorEnd (Adornment!.Thickness.Right / 2 + 1) -
-                        (Pos.Right (CloseButton) -
-                         Pos.Left (CloseButton));
-        CloseButton.Y = 0;
-}
-#endif
 
     private Rectangle GetBorderBounds ()
     {
@@ -247,33 +195,76 @@ public partial class BorderView : AdornmentView
         return new Rectangle (left, top, Math.Max (0, right - left), Math.Max (0, bottom - top));
     }
 
-    #region Tab Title Label
-
-    private Label? _tabTitleLabel;
+    #region Tab Title View
 
     /// <summary>
-    ///     Gets or lazily creates the <see cref="Label"/> SubView used to render the tab header.
-    ///     The Label has its own border with <see cref="View.SuperViewRendersLineCanvas"/> = true,
+    ///     A lightweight View that renders tab title text using the parent View's focus-appropriate
+    ///     attributes. Because this View never has focus itself, the base <see cref="View.DrawText"/>
+    ///     would always use Normal/HotNormal. This override uses the owning View's <see cref="View.HasFocus"/>
+    ///     to select Focus/HotFocus when appropriate.
+    /// </summary>
+    private sealed class TabTitleView : View
+    {
+        /// <summary>The View whose focus state determines which attributes to use.</summary>
+        internal View? OwnerView { get; init; }
+
+        /// <summary>Sync <see cref="View.HotKeySpecifier"/> to <see cref="TextFormatter"/> (same as Label).</summary>
+        public override Rune HotKeySpecifier { get => base.HotKeySpecifier; set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value; }
+
+        /// <inheritdoc/>
+        protected override bool OnDrawingText (DrawContext? context)
+        {
+            if (Driver is null)
+            {
+                return false;
+            }
+
+            bool ownerHasFocus = OwnerView?.HasFocus ?? false;
+
+            Rectangle drawRect = new (ContentToScreen (Point.Empty), GetContentSize ());
+            Region textRegion = TextFormatter.GetDrawRegion (drawRect);
+            context?.AddDrawnRegion (textRegion);
+
+            TextFormatter.Draw (Driver,
+                                drawRect,
+                                ownerHasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
+                                ownerHasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
+                                Rectangle.Empty);
+
+            SetSubViewNeedsDrawDownHierarchy ();
+
+            return true;
+        }
+    }
+
+    private TabTitleView? _tabTitleView;
+
+    /// <summary>
+    ///     Gets or lazily creates the <see cref="TabTitleView"/> SubView used to render the tab header.
+    ///     The view has its own border with <see cref="View.SuperViewRendersLineCanvas"/> = true,
     ///     so its border lines auto-join with the View's content border via <see cref="View.LineCanvas"/>.
     /// </summary>
-    private Label EnsureTabTitleLabel (Border border)
+    private TabTitleView EnsureTabTitleView ()
     {
-        if (_tabTitleLabel is null)
+        if (_tabTitleView is { })
         {
-            _tabTitleLabel = new Label
-            {
-#if DEBUG
-                Id = "TabTitleLabel",
-#endif
-                CanFocus = false,
-                TabStop = TabBehavior.NoStop,
-                SuperViewRendersLineCanvas = true,
-            };
-            _tabTitleLabel.Border.Settings = BorderSettings.None;
-            Add (_tabTitleLabel);
+            return _tabTitleView;
         }
 
-        return _tabTitleLabel;
+        _tabTitleView = new TabTitleView
+        {
+#if DEBUG
+            Id = "TabTitleView",
+#endif
+            CanFocus = false,
+            TabStop = TabBehavior.NoStop,
+            SuperViewRendersLineCanvas = true,
+            OwnerView = Adornment?.Parent
+        };
+        _tabTitleView.Border.Settings = BorderSettings.None;
+        Add (_tabTitleView);
+
+        return _tabTitleView;
     }
 
     /// <summary>
@@ -297,10 +288,10 @@ public partial class BorderView : AdornmentView
     private static Rectangle ComputeViewBounds (Rectangle contentBorderRect, Side side, int depth) =>
         side switch
         {
-            Side.Top => new Rectangle (contentBorderRect.X, contentBorderRect.Y - (depth - 1), contentBorderRect.Width, contentBorderRect.Height + (depth - 1)),
-            Side.Bottom => new Rectangle (contentBorderRect.X, contentBorderRect.Y, contentBorderRect.Width, contentBorderRect.Height + (depth - 1)),
-            Side.Left => new Rectangle (contentBorderRect.X - (depth - 1), contentBorderRect.Y, contentBorderRect.Width + (depth - 1), contentBorderRect.Height),
-            Side.Right => new Rectangle (contentBorderRect.X, contentBorderRect.Y, contentBorderRect.Width + (depth - 1), contentBorderRect.Height),
+            Side.Top => contentBorderRect with { Y = contentBorderRect.Y - (depth - 1), Height = contentBorderRect.Height + (depth - 1) },
+            Side.Bottom => contentBorderRect with { Height = contentBorderRect.Height + (depth - 1) },
+            Side.Left => contentBorderRect with { X = contentBorderRect.X - (depth - 1), Width = contentBorderRect.Width + (depth - 1) },
+            Side.Right => contentBorderRect with { Width = contentBorderRect.Width + (depth - 1) },
             _ => contentBorderRect
         };
 
@@ -321,13 +312,13 @@ public partial class BorderView : AdornmentView
         int contentSide = depth >= 3 && !hasFocus ? 1 : 0;
 
         return tabSide switch
-        {
-            Side.Top => new Thickness (1, cap, 1, contentSide),
-            Side.Bottom => new Thickness (1, contentSide, 1, cap),
-            Side.Left => new Thickness (cap, 1, contentSide, 1),
-            Side.Right => new Thickness (contentSide, 1, cap, 1),
-            _ => Thickness.Empty
-        };
+               {
+                   Side.Top => new Thickness (1, cap, 1, contentSide),
+                   Side.Bottom => new Thickness (1, contentSide, 1, cap),
+                   Side.Left => new Thickness (cap, 1, contentSide, 1),
+                   Side.Right => new Thickness (contentSide, 1, cap, 1),
+                   _ => Thickness.Empty
+               };
     }
 
     #endregion Tab Title Label
@@ -352,7 +343,7 @@ public partial class BorderView : AdornmentView
     ///     <see cref="View.SuperViewRendersLineCanvas"/> = true for the tab header.
     ///     The Label's border lines auto-join with the content border via <see cref="View.LineCanvas"/>.
     /// </summary>
-    private bool DrawTabBorder (Border border, DrawContext? context)
+    private bool DrawTabBorder (Border border)
     {
         if (Adornment?.Parent is null || Driver is null)
         {
@@ -424,13 +415,21 @@ public partial class BorderView : AdornmentView
         // Draw the tab-side content border (gap segments around the tab)
         if (tabVisible)
         {
-            AddTabSideContentBorder (lc, clipped, headerRect, borderBounds, border.TabSide, hasFocus, tabDepth, lineStyle, normalAttribute);
+            AddTabSideContentBorder (lc,
+                                     clipped,
+                                     headerRect,
+                                     borderBounds,
+                                     border.TabSide,
+                                     hasFocus,
+                                     tabDepth,
+                                     lineStyle,
+                                     normalAttribute);
         }
 
         // Position and configure the Label SubView for the tab header
         if (tabVisible)
         {
-            Label label = EnsureTabTitleLabel (border);
+            TabTitleView label = EnsureTabTitleView ();
             label.Visible = true;
             label.HotKeySpecifier = Adornment.Parent!.HotKeySpecifier;
             label.Text = Adornment.Parent!.Title;
@@ -441,17 +440,11 @@ public partial class BorderView : AdornmentView
             label.Border.Thickness = labelBorderThickness;
 
             // For Left/Right, render text vertically
-            label.TextFormatter.Direction = border.TabSide is Side.Left or Side.Right
-                                                ? TextDirection.TopBottom_LeftRight
-                                                : TextDirection.LeftRight_TopBottom;
+            label.TextFormatter.Direction = border.TabSide is Side.Left or Side.Right ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
 
             // Convert header rect from screen to BorderView viewport coords
             Point screenOrigin = ViewportToScreen (Point.Empty);
-            Rectangle labelFrame = new (
-                headerRect.X - screenOrigin.X,
-                headerRect.Y - screenOrigin.Y,
-                headerRect.Width,
-                headerRect.Height);
+            Rectangle labelFrame = headerRect with { X = headerRect.X - screenOrigin.X, Y = headerRect.Y - screenOrigin.Y };
             label.Frame = labelFrame;
             label.Width = labelFrame.Width;
             label.Height = labelFrame.Height;
@@ -464,10 +457,7 @@ public partial class BorderView : AdornmentView
         else
         {
             // Tab is off-screen — hide Label
-            if (_tabTitleLabel is { })
-            {
-                _tabTitleLabel.Visible = false;
-            }
+            _tabTitleView?.Visible = false;
 
             LastTitleRect = null;
         }
@@ -498,16 +488,15 @@ public partial class BorderView : AdornmentView
     ///     around the gap. For unfocused depth ≥ 3, draws the full line (auto-join creates junctions).
     ///     For depth &lt; 3, draws the full line.
     /// </summary>
-    private static void AddTabSideContentBorder (
-        LineCanvas lc,
-        Rectangle clipped,
-        Rectangle headerRect,
-        Rectangle contentBorderRect,
-        Side side,
-        bool hasFocus,
-        int depth,
-        LineStyle lineStyle,
-        Attribute? attribute)
+    private static void AddTabSideContentBorder (LineCanvas lc,
+                                                 Rectangle clipped,
+                                                 Rectangle headerRect,
+                                                 Rectangle contentBorderRect,
+                                                 Side side,
+                                                 bool hasFocus,
+                                                 int depth,
+                                                 LineStyle lineStyle,
+                                                 Attribute? attribute)
     {
         // Open gap when: focused at depth ≥ 3 (no content-side border on tab), or
         // depth < 3 (content border coincides with tab title row — must not overwrite it).
@@ -527,12 +516,20 @@ public partial class BorderView : AdornmentView
                 {
                     if (clipped.X > contentBorderRect.X)
                     {
-                        lc.AddLine (new Point (contentBorderRect.X, borderY), clipped.X - contentBorderRect.X + 1, Orientation.Horizontal, lineStyle, attribute);
+                        lc.AddLine (new Point (contentBorderRect.X, borderY),
+                                    clipped.X - contentBorderRect.X + 1,
+                                    Orientation.Horizontal,
+                                    lineStyle,
+                                    attribute);
                     }
 
                     if (clipped.Right - 1 < contentBorderRect.Right - 1)
                     {
-                        lc.AddLine (new Point (clipped.Right - 1, borderY), contentBorderRect.Right - (clipped.Right - 1), Orientation.Horizontal, lineStyle, attribute);
+                        lc.AddLine (new Point (clipped.Right - 1, borderY),
+                                    contentBorderRect.Right - (clipped.Right - 1),
+                                    Orientation.Horizontal,
+                                    lineStyle,
+                                    attribute);
                     }
                 }
 
@@ -551,12 +548,20 @@ public partial class BorderView : AdornmentView
                 {
                     if (clipped.X > contentBorderRect.X)
                     {
-                        lc.AddLine (new Point (contentBorderRect.X, borderY), clipped.X - contentBorderRect.X + 1, Orientation.Horizontal, lineStyle, attribute);
+                        lc.AddLine (new Point (contentBorderRect.X, borderY),
+                                    clipped.X - contentBorderRect.X + 1,
+                                    Orientation.Horizontal,
+                                    lineStyle,
+                                    attribute);
                     }
 
                     if (clipped.Right - 1 < contentBorderRect.Right - 1)
                     {
-                        lc.AddLine (new Point (clipped.Right - 1, borderY), contentBorderRect.Right - (clipped.Right - 1), Orientation.Horizontal, lineStyle, attribute);
+                        lc.AddLine (new Point (clipped.Right - 1, borderY),
+                                    contentBorderRect.Right - (clipped.Right - 1),
+                                    Orientation.Horizontal,
+                                    lineStyle,
+                                    attribute);
                     }
                 }
 
@@ -585,7 +590,11 @@ public partial class BorderView : AdornmentView
 
                     if (clipped.Bottom - 1 < contentBorderRect.Bottom - 1)
                     {
-                        lc.AddLine (new Point (borderX, clipped.Bottom - 1), contentBorderRect.Bottom - (clipped.Bottom - 1), Orientation.Vertical, lineStyle, attribute);
+                        lc.AddLine (new Point (borderX, clipped.Bottom - 1),
+                                    contentBorderRect.Bottom - (clipped.Bottom - 1),
+                                    Orientation.Vertical,
+                                    lineStyle,
+                                    attribute);
                     }
                     else if (clipped.Bottom < headerRect.Bottom)
                     {
@@ -619,7 +628,11 @@ public partial class BorderView : AdornmentView
 
                     if (clipped.Bottom - 1 < contentBorderRect.Bottom - 1)
                     {
-                        lc.AddLine (new Point (borderX, clipped.Bottom - 1), contentBorderRect.Bottom - (clipped.Bottom - 1), Orientation.Vertical, lineStyle, attribute);
+                        lc.AddLine (new Point (borderX, clipped.Bottom - 1),
+                                    contentBorderRect.Bottom - (clipped.Bottom - 1),
+                                    Orientation.Vertical,
+                                    lineStyle,
+                                    attribute);
                     }
                     else if (clipped.Bottom < headerRect.Bottom)
                     {
@@ -685,7 +698,7 @@ public partial class BorderView : AdornmentView
         // Tab mode: completely separate codepath with edge-based border positioning
         if (border.Settings.FastHasFlags (BorderSettings.Tab))
         {
-            return DrawTabBorder (border, context);
+            return DrawTabBorder (border);
         }
 
         // ═══════════════════════════════════════════════════════════════
@@ -785,7 +798,7 @@ public partial class BorderView : AdornmentView
             {
                 if (border.LineStyle is { })
                 {
-                    lc?.AddLine (new Point (borderBounds.Location.X, borderBounds.Y),
+                    lc?.AddLine (borderBounds.Location with { Y = borderBounds.Y },
                                  borderBounds.Width,
                                  Orientation.Horizontal,
                                  border.LineStyle.Value,

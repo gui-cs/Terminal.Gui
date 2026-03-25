@@ -1790,7 +1790,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void SuperView_Top_Depth2_Focused() // Copilot
+    public void SuperView_Top_Depth2_Focused () // Copilot
     {
         // Thickness(1,2,1,1) → depth=2. Subview 9×5.
         (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
@@ -1822,6 +1822,170 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                               app.Driver!);
 
         subview.Dispose ();
+        app.Dispose ();
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    //  Attribute Tests
+    //  Verify that tab title text renders with the correct Scheme
+    //  attributes depending on focus state.
+    // ════════════════════════════════════════════════════════════════════
+
+    [Fact]
+    public void Top_Focused_TitleText_Uses_Focus_Attributes () // Copilot
+    {
+        // When a View has focus, the tab title text ("Tab") should render
+        // with Focus attributes, and the hotkey character with HotFocus.
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (9, 6);
+        app.Driver!.Clipboard = new FakeClipboard ();
+
+        Runnable runnable = new () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+        View view = new ()
+        {
+            X = 0,
+            Y = 0,
+            CanFocus = true,
+            Width = 9,
+            Height = 6,
+            BorderStyle = LineStyle.Rounded,
+            Title = "T_ab"
+        };
+
+        // Set a scheme with distinct attributes for each role so we can verify
+        Scheme scheme = new ()
+        {
+            Normal = new Attribute (Color.White, Color.Black),
+            Focus = new Attribute (Color.BrightGreen, Color.DarkGray),
+            HotNormal = new Attribute (Color.BrightRed, Color.Black),
+            HotFocus = new Attribute (Color.BrightYellow, Color.DarkGray)
+        };
+        view.SetScheme (scheme);
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Border.TabOffset = 0;
+
+        runnable.Add (view);
+        app.Begin (runnable);
+
+        // Give focus to our view
+        view.SetFocus ();
+        Assert.True (view.HasFocus);
+
+        app.LayoutAndDraw ();
+
+        output.WriteLine (app.Driver!.ToString ());
+
+        // Attribute map:
+        // 0 = Normal (border lines when unfocused — but LineCanvas uses Normal)
+        // 1 = Focus (title text)
+        // 2 = HotFocus (hotkey char 'a')
+        Attribute focusAttr = view.GetAttributeForRole (VisualRole.Focus);
+        Attribute hotFocusAttr = view.GetAttributeForRole (VisualRole.HotFocus);
+
+        // Row 1 is "│Tab│" — columns 1,2,3 are the title text "Tab"
+        // 'T' at [1,1] should be Focus, 'a' at [1,2] should be HotFocus, 'b' at [1,3] should be Focus
+        Cell [,] contents = app.Driver!.Contents!;
+        Attribute actualT = contents [1, 1].Attribute!.Value;
+        Attribute actualA = contents [1, 2].Attribute!.Value;
+        Attribute actualB = contents [1, 3].Attribute!.Value;
+
+        output.WriteLine ($"Expected Focus: {focusAttr}");
+        output.WriteLine ($"Expected HotFocus: {hotFocusAttr}");
+        output.WriteLine ($"Actual 'T' [1,1]: {actualT}");
+        output.WriteLine ($"Actual 'a' [1,2]: {actualA}");
+        output.WriteLine ($"Actual 'b' [1,3]: {actualB}");
+
+        Assert.Equal (focusAttr, actualT);
+        Assert.Equal (hotFocusAttr, actualA);
+        Assert.Equal (focusAttr, actualB);
+
+        view.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Top_Unfocused_TitleText_Uses_Normal_Attributes () // Copilot
+    {
+        // When a View does NOT have focus, the tab title text should render
+        // with Normal attributes, and the hotkey character with HotNormal.
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (9, 6);
+        app.Driver!.Clipboard = new FakeClipboard ();
+
+        Runnable runnable = new () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+        View view = new ()
+        {
+            X = 0,
+            Y = 0,
+            CanFocus = true,
+            Width = 9,
+            Height = 6,
+            BorderStyle = LineStyle.Rounded,
+            Title = "T_ab"
+        };
+
+        Scheme scheme = new ()
+        {
+            Normal = new Attribute (Color.White, Color.Black),
+            Focus = new Attribute (Color.BrightGreen, Color.DarkGray),
+            HotNormal = new Attribute (Color.BrightRed, Color.Black),
+            HotFocus = new Attribute (Color.BrightYellow, Color.DarkGray)
+        };
+        view.SetScheme (scheme);
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Border.TabOffset = 0;
+
+        // Add a second focusable view so focus goes there, not to `view`
+        View other = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 1,
+            Height = 1,
+            CanFocus = true
+        };
+        runnable.Add (other);
+        runnable.Add (view);
+        app.Begin (runnable);
+
+        // Ensure the other view has focus, not our tab view
+        other.SetFocus ();
+        Assert.False (view.HasFocus);
+
+        app.LayoutAndDraw ();
+
+        output.WriteLine (app.Driver!.ToString ());
+
+        Attribute normalAttr = view.GetAttributeForRole (VisualRole.Normal);
+        Attribute hotNormalAttr = view.GetAttributeForRole (VisualRole.HotNormal);
+
+        // Row 1 "│Tab│" — 'T' at [1,1] Normal, 'a' at [1,2] HotNormal, 'b' at [1,3] Normal
+        Cell [,] contents = app.Driver!.Contents!;
+        Attribute actualT = contents [1, 1].Attribute!.Value;
+        Attribute actualA = contents [1, 2].Attribute!.Value;
+        Attribute actualB = contents [1, 3].Attribute!.Value;
+
+        output.WriteLine ($"Expected Normal: {normalAttr}");
+        output.WriteLine ($"Expected HotNormal: {hotNormalAttr}");
+        output.WriteLine ($"Actual 'T' [1,1]: {actualT}");
+        output.WriteLine ($"Actual 'a' [1,2]: {actualA}");
+        output.WriteLine ($"Actual 'b' [1,3]: {actualB}");
+
+        Assert.Equal (normalAttr, actualT);
+        Assert.Equal (hotNormalAttr, actualA);
+        Assert.Equal (normalAttr, actualB);
+
+        view.Dispose ();
         app.Dispose ();
     }
 }
