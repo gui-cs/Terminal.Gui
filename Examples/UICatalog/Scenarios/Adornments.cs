@@ -110,8 +110,62 @@ public class Adornments : Scenario
         window.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
         window.BorderStyle = LineStyle.Rounded;
 
+        // Enable dragging the tab title to slide it by changing TabOffset.
+        // Hook into TabTitleView.MouseEvent — it fires before the Arranger, so no conflict.
+        Point? dragStart = null;
+        var dragStartOffset = 0;
+        var tabDragHooked = false;
 
-        window.Border.GetOrCreateView ();
+        window.DrawComplete += (_, _) =>
+                        {
+                            if (tabDragHooked || ((BorderView)window.Border.View!).TabTitle is not { } tabTitle)
+                            {
+                                return;
+                            }
+
+                            tabDragHooked = true;
+
+                            tabTitle.MouseEvent += (_, mouse) =>
+                                                    {
+                                                        // Start drag
+                                                        if (!dragStart.HasValue && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+                                                        {
+                                                            dragStart = mouse.ScreenPosition;
+                                                            dragStartOffset = window.Border.TabOffset;
+                                                            window.App?.Mouse.GrabMouse (tabTitle);
+                                                            mouse.Handled = true;
+                                                        }
+
+                                                        // Dragging
+                                                        if (dragStart.HasValue
+                                                            && mouse.Flags is (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
+                                                        {
+                                                            int delta = window.Border.TabSide is Side.Top or Side.Bottom
+                                                                            ? mouse.ScreenPosition.X - dragStart.Value.X
+                                                                            : mouse.ScreenPosition.Y - dragStart.Value.Y;
+
+                                                            int tabLen = window.Border.TabLength ?? 0;
+
+                                                            // Content border edge length (the side the tab slides along)
+                                                            int edgeLen = window.Border.TabSide is Side.Top or Side.Bottom
+                                                                              ? window.Frame.Width - window.Border.Thickness.Left - window.Border.Thickness.Right
+                                                                              : window.Frame.Height - window.Border.Thickness.Top - window.Border.Thickness.Bottom;
+
+                                                            int newOffset = Math.Clamp (dragStartOffset + delta, 1 - tabLen, edgeLen - 1);
+
+                                                            window.Border.TabOffset = newOffset;
+                                                            mouse.Handled = true;
+                                                        }
+
+                                                        // Release
+                                                        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased) && dragStart.HasValue)
+                                                        {
+                                                            dragStart = null;
+                                                            window.App?.Mouse.UngrabMouse ();
+                                                            mouse.Handled = true;
+                                                        }
+                                                    };
+                        };
         window.Padding.View?.Text = "Padding Text line 1\nPadding Text line 3\nPadding Text line 3\nPadding Text line 4\nPadding Text line 5";
         window.Padding.Thickness = new Thickness (1);
         window.Padding.View?.SetScheme (SchemeManager.GetScheme (Schemes.Menu));

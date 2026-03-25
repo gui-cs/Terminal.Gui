@@ -239,6 +239,9 @@ public partial class BorderView : AdornmentView
 
     private TabTitleView? _tabTitleView;
 
+    /// <summary>Gets the tab title <see cref="View"/>, or <see langword="null"/> if not yet created.</summary>
+    public View? TabTitle => _tabTitleView;
+
     /// <summary>
     ///     Gets or lazily creates the <see cref="TabTitleView"/> SubView used to render the tab header.
     ///     The view has its own border with <see cref="View.SuperViewRendersLineCanvas"/> = true,
