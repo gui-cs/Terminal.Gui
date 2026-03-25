@@ -186,7 +186,7 @@ Amazon Principal Engineer tenets applied:
 
 ### Phase 1: Extend Border with Tab Support
 
-**Status: Implemented.** `BorderSettings.Tab`, `Border.TabSide`, `Border.TabOffset`, `Border.TabLength`, `TabHeaderRenderer`, `BorderView` integration, `BorderEditor` UI, and visual tests are all in place. The `TabLength` auto-computation bug (`+1` instead of `+2`) has been fixed.
+**Status: Implemented (Label SubView approach).** `BorderSettings.Tab`, `Border.TabSide`, `Border.TabOffset`, `Border.TabLength`, `BorderView` integration, `BorderEditor` UI, and visual tests are all in place. The original `TabHeaderRenderer` class has been deleted — tab rendering now uses a Label SubView for title text and manual LineCanvas calls for box lines, all within `BorderView`.
 
 ```csharp
 [Flags]
@@ -775,187 +775,138 @@ Title side (Top): border at y = thickness - 1 = 4
 
 With `TabOffset = -5`, the header box X starts at -5. Drawing at x < 0 is outside the Viewport and automatically clipped — nothing renders in the header region. The content border at y=4 still draws normally because it's fully inside the Viewport.
 
-### Implementation Approach: Simplified `TabHeaderRenderer` + Viewport Clipping
+### Implementation Approach: Label SubView (Current)
 
-> **Supersedes the original implementation approach.** The original approach manually clipped header
-> geometry against computed view bounds. The new approach leverages `BorderView.Viewport` clipping
-> by positioning border lines at thickness edges, eliminating manual intersection logic entirely.
+> **Supersedes both the original manual clipping approach AND the simplified `TabHeaderRenderer` approach.**
+> The `TabHeaderRenderer` class has been deleted entirely. All tab rendering now lives in `BorderView`
+> using a Label SubView for title text and manual LineCanvas calls for the tab box border lines.
 
-#### What changes
+#### Architecture
 
-**`GetBorderBounds()` → `GetTabBorderBounds()`**: When `BorderSettings.Tab` is set, compute a different
-content border rectangle. Instead of placing ALL borders at `thickness - 1` from each edge (the legacy
-"inner" model), use edge-based positioning:
+The tab header is rendered using two complementary mechanisms:
 
-```
-Side.Top example, Thickness(5,5,5,5), Viewport = (0,0,17,12):
+1. **Label SubView** — A `Label` added as a SubView of `BorderView`. It handles:
+   - Title text rendering (with hotkey support via `HotKeySpecifier`)
+   - Vertical text direction for `Side.Left` / `Side.Right` tabs (`TextDirection.TopBottom_LeftRight`)
+   - Natural clipping when the tab scrolls partially off-screen (no manual substring logic)
+   - Scheme/attribute management for focused vs unfocused appearance
 
-Legacy GetBorderBounds():
-  borderBounds = (4, 4, 9, 4)  ← all borders at thickness-1 inward
+2. **Manual LineCanvas lines** — Tab box border lines drawn on the parent View's `LineCanvas`
+   during `DrawTabBorder()`. This handles:
+   - Cap line, side edges, and closing edge of the tab header box
+   - Content border gap/separator on the tab side
+   - Corner extensions for depth 1 (so auto-join creates curved corners)
+   - Junction glyphs where tab box meets content border
 
-New GetTabBorderBounds():
-  left   = 0                    ← outer edge
-  top    = Thickness.Top - 1    = 4   ← title-side: thickness-1
-  right  = Viewport.Width - 1   = 16  ← outer edge
-  bottom = Viewport.Height - 1  = 11  ← outer edge
-  borderBounds = (0, 4, 17, 8)
-```
+#### Why Not Label With Border?
 
-This is the rectangle where the 4 content border lines are drawn. The tab header box sits in the
-rows/columns BETWEEN the outer edge and the title-side border line (y=0 to y=3 for the example above).
+The original vision was to give the Label a `Border` with `Thickness = 1` and matching `LineStyle`,
+so the Label's border lines would replace both the title text AND the tab box lines. However, the
+View draw pipeline prevents this:
 
-**`TabHeaderRenderer` simplification**: Remove all manual clipping logic. The renderer just adds
-lines at the coordinates it computes — lines outside the Viewport are automatically invisible.
+- Parent's `DoRenderLineCanvas` (step 146) renders the parent's `LineCanvas` to screen
+- Border SubViews draw at step 151 (`DoDrawAdornmentsSubViews`)
+- Label border lines merge into an **already-rendered** LineCanvas — they never display
 
-| Current method | What happens |
-|----------------|-------------|
-| `ComputeHeaderRect` | **Keep.** Still computes the unclipped header rect — but now relative to the new `borderBounds`. Coordinates outside Viewport are fine (they just don't render). |
-| `ComputeViewBounds` | **Delete.** No longer needed — Viewport IS the view bounds. |
-| `GetContentArea` | **Simplify.** No `clipped` parameter needed. Just inset the header rect by 1 on each side (excluding the closing edge). No clipping-aware conditionals. |
-| `AddOuterHeaderLines` | **Simplify radically.** No `clipped` parameter. No depth=1 special cases (extend/skip). No cap-line extension hacks. Just: draw cap line, draw left edge, draw right edge. Three `AddLine` calls. If coordinates are off-screen, Viewport clips them. |
-| `AddTabSideContentBorder` | **Keep but simplify.** Still splits content border around gap for `openGap=true`. But no `clipped` parameter — uses `headerRect` directly. The `Exclude` hacks for corner cells go away. |
+The hybrid approach (Label for text, manual lines for box) works because `DrawTabBorder` runs
+during `DoDrawAdornments` (step 103), which is **before** `DoRenderLineCanvas`.
 
-**`BorderView.DrawTitleInTabHeader` simplification**: No more title substring math. The title is drawn
-at the content area coordinates from `GetContentArea`. If the header is partially off-screen, the
-Viewport clips the title characters automatically — the driver won't render anything outside the
-Viewport. Remove `titleSkipChars`, `visibleTitle`, `computeClosingEdgeTitleArea`.
-
-**`BorderView.OnDrawingContent` simplification**: When `hasTab`:
-1. Compute `borderBounds` via `GetTabBorderBounds()` (edge-based)
-2. Draw all 4 content border lines unconditionally at `borderBounds` edges
-3. Call `TabHeaderRenderer.AddLines()` — no visibility check needed
-4. Call `DrawTitleInTabHeader()` — no clipping logic needed
-5. Remove the `drawTop`/`drawLeft`/`drawBottom`/`drawRight` suppression for the tab side — the
-   renderer draws the content border itself, and both use the same `borderBounds`
-
-#### Simplified `TabHeaderRenderer` API
+#### Label Configuration
 
 ```csharp
-internal static class TabHeaderRenderer
-{
-    // Unchanged — computes unclipped header rect
-    public static Rectangle ComputeHeaderRect (
-        Rectangle contentBorderRect, Side side, int offset, int length, int depth);
-
-    // Simplified — no clipped param, just inset by 1 excluding closing edge
-    public static Rectangle GetContentArea (Rectangle headerRect, Side side);
-
-    // Simplified — no clipping, no depth=1 hacks
-    public static void AddLines (
-        LineCanvas lineCanvas,
-        Rectangle contentBorderRect,
-        Side side,
-        int offset, int length, int depth,
-        bool showSeparator,
-        LineStyle lineStyle,
-        Attribute? lineAttribute = null);
-}
+Label _tabTitleLabel:
+  CanFocus = false
+  TabStop = TabBehavior.NoStop
+  Border.Thickness = Thickness.Empty
+  Border.Settings = BorderSettings.None
+  HotKeySpecifier = parent.TitleTextFormatter.HotKeySpecifier
+  TextDirection = TopBottom_LeftRight (for Left/Right sides)
+  Visible = true/false (based on tab visibility)
 ```
 
-**Deleted methods:** `ComputeViewBounds`, all `clipped`-parameter overloads.
+The Label is lazily created by `EnsureTabTitleLabel()` and repositioned each draw cycle.
 
-**Deleted complexity in `AddOuterHeaderLines`:**
-- No `isDepth1` branches (extend side edges, skip cap, skip all edges for Left/Right)
-- No cap-line extension for clipped edges (`capX = clipped.X - 1` hack)
-- Just 3 straight `AddLine` calls per side
+#### Depth → Thickness Mapping
 
-**Deleted complexity in `AddTabSideContentBorder`:**
-- No `Exclude` calls for corner cells
-- Gap segment math uses `headerRect` directly (not `clipped`)
+When `BorderSettings.Tab` is set, the relevant border thickness determines the "depth" of the
+tab header. **When depth < 3, focused and unfocused tabs look identical** — the title text
+attributes (Scheme) differentiate them instead. Only at depth ≥ 3 does the content-side border
+line toggle between separator (unfocused) and gap (focused).
 
-**Deleted complexity in `BorderView`:**
-- `computeClosingEdgeTitleArea` local function
-- `titleSkipChars` / `visibleTitle` / `Substring` logic
-- `ComputeViewBounds` / `Rectangle.Intersect` calls
-- `drawTop`/`drawLeft`/etc. suppression logic for tab side
-- Off-screen tab visibility check
+| Depth | Header Structure | Focus Differentiation |
+|-------|-----------------|----------------------|
+| 1 | Title text inline on border line | Attributes only (same border look) |
+| 2 | Cap line + title row (no closing edge) | Attributes only (same border look) |
+| 3+ | Full box: cap + title + closing edge | Closing edge = gap (focused) or separator (unfocused) |
 
-#### Steps
+**Side.Top depth → Label thickness example:**
 
-**Key design principle:** `OnDrawingContent` gets TWO distinct codepaths — an early `if (hasTab)` 
-branch that calls a new dedicated method, and the existing legacy path left untouched.
+| Depth | Label Thickness (top, left, bottom, right) | Notes |
+|-------|---------------------------------------------|-------|
+| 3 (focused) | `(1, 1, 0, 1)` | No bottom = gap into content |
+| 3 (unfocused) | `(1, 1, 1, 1)` | Bottom = separator line |
+| 2 | `(1, 1, 0, 0)` | No closing edge |
+| 1 | `(0, 1, 0, 1)` | Inline on border, side edges only |
 
-##### Step 0: Revert `OnDrawingContent` to its pre-Tab state
+Other sides rotate accordingly.
 
-Restore `OnDrawingContent` to its original form before any Tab-related modifications were added.
-This means removing:
-- The `hasTab` flag and all its conditionals
-- The `drawTop`/`drawLeft`/`drawBottom`/`drawRight` suppression logic for tab side
-- The `DrawTitleInTabHeader` call
-- The `TabHeaderRenderer.AddLines` call
-- The `GetTabDepth` helper
-- The `ComputeViewBounds` / `Rectangle.Intersect` visibility check
+#### Key Methods in `BorderView`
 
-The method should look exactly like it did before the Tab feature was added — clean legacy 
-border rendering with no Tab awareness.
+| Method | Purpose |
+|--------|---------|
+| `DrawTabBorder()` | Main entry point. Computes geometry, positions Label, draws lines. |
+| `EnsureTabTitleLabel()` | Lazy-creates the Label SubView with correct configuration. |
+| `ComputeHeaderRect()` | Computes the unclipped header rectangle in screen coordinates. |
+| `ComputeViewBounds()` | Gets the visible bounds for clipping (uses `ViewportToScreen`). |
+| `ComputeTabLabelThickness()` | Maps depth + side + focus → `Thickness` for the Label. |
+| `AddTabBoxLines()` | Draws cap line, side edges, closing edge on parent's `LineCanvas`. |
+| `AddTabSideContentBorder()` | Draws content border with gap/separator segments. |
+| `ComputeTabContentArea()` | Returns content area inside the tab box for Label positioning. |
+| `AddDepth1CornerExtensions()` | Adds 2-cell extension lines for depth 1 curved corners. |
 
-##### Step 1: Add the `if (hasTab)` early branch
+#### Depth 1 Corner Handling
 
-At the top of `OnDrawingContent` (after the null/empty checks), add:
+At depth 1, the tab header is just 1 cell tall. The side edges are only 1 cell, which is too
+short for `LineCanvas` to auto-join into curved corners. Solution: add 2-cell extension lines
+outward from each corner. `AddTabBoxLines()` is **skipped** for depth 1 — the extensions replace
+the side edges. If both draw, the overlap creates T-junctions (`├`) instead of corners (`╰`).
+
+#### Overflow and Clipping
+
+- Label is positioned at the **unclipped** `headerRect` content area
+- The View system's natural clipping handles partial visibility
+- Using the clipped rect would show wrong characters (e.g., "Ta" instead of "ab" when left side clipped)
+- For Left/Right overflow past the content border, `Exclude` calls suppress corner glyphs
+
+#### Content Border Gap Logic
 
 ```csharp
-if (hasTab)
-{
-    return DrawTabBorder (border, context);
-}
+openGap = (hasFocus && depth >= 3) || depth < 3
 ```
 
-Everything below this `if` is the untouched legacy codepath.
+For depth < 3, the content border line coincides with the tab title row, so gap segments are
+always needed to avoid overwriting the title. For depth ≥ 3, the gap only opens when focused.
 
-##### Step 2: Implement `DrawTabBorder()`
+#### Deleted Code
 
-New private method that owns ALL Tab rendering. Clean, self-contained, no interaction with 
-legacy code. Structure:
-
-```csharp
-private bool DrawTabBorder (Border border, DrawContext? context)
-{
-    // 1. Compute edge-based borderBounds via GetTabBorderBounds()
-    // 2. Draw all 4 content border lines at borderBounds edges
-    // 3. Call TabHeaderRenderer.AddLines() with borderBounds
-    // 4. Draw title in tab header (if Title flag set)
-    // 5. Handle diagnostics/gradient (shared with legacy)
-    return true;
-}
-```
-
-##### Step 3: Add `GetTabBorderBounds()`
-
-New private method that computes the edge-based content border rectangle:
-- Non-title sides: border at outer edge (x=0, y=0, etc.)
-- Title side: border at `thickness - 1`
-- Returns a `Rectangle` in screen coordinates
-
-##### Step 4: Simplify `TabHeaderRenderer`
-
-- Delete `ComputeViewBounds`
-- Remove `clipped` parameter from `GetContentArea` — just inset by 1 on each bordered side
-- Simplify `AddOuterHeaderLines` — remove depth=1 hacks, cap-line extensions. Just 3 `AddLine` calls.
-- Simplify `AddTabSideContentBorder` — remove `Exclude` hacks, use `headerRect` directly
-
-##### Step 5: Simplify `DrawTitleInTabHeader`
-
-- Remove `titleSkipChars` / `visibleTitle` / `Substring` logic
-- Remove `computeClosingEdgeTitleArea`
-- Just draw title at `GetContentArea` coordinates; Viewport clips automatically
-
-##### Step 6: Update tests
-
-- Existing thin-border `BorderViewTests` should produce identical visuals (verify)
-- Update thick-border test expected strings (border positions change)
-- Add `Thickness(5,5,5,5)` tests with negative offsets
-- Run full suite
+- **`TabHeaderRenderer.cs`** — Entire class deleted
+- **`TabHeaderRendererTests.cs`** — Deleted (unit tests for removed class)
+- **`BorderHeaderIntegrationTests.cs`** — Deleted (integration tests for removed class)
+- **`DrawTitleInTabHeader()`** — Removed from `BorderView`
+- **`ComputeClosingEdgeTitleArea()`** — Removed from `BorderView`
 
 ### Exit Criteria
 
-- `TabHeaderRenderer` has no `clipped` parameter on any method
-- `TabHeaderRenderer` has no `ComputeViewBounds`
-- `AddOuterHeaderLines` is ≤30 lines (currently ~100)
-- `BorderView.DrawTitleInTabHeader` has no substring/skip logic
-- `BorderView.OnDrawingContent` tab path has no suppression flags
-- All existing tests pass (thin-border visuals unchanged)
-- Thick-border + negative offset tests pass
-- Total LOC reduction ≥ 100 lines
+- ~~`TabHeaderRenderer` has no `clipped` parameter on any method~~ → `TabHeaderRenderer` deleted entirely
+- ~~`AddOuterHeaderLines` is ≤30 lines~~ → No separate renderer class
+- ~~`BorderView.DrawTitleInTabHeader` has no substring/skip logic~~ → Method deleted
+- `BorderView.OnDrawingContent` tab path uses single `DrawTabBorder()` call
+- Title rendering uses a Label SubView (no manual `TitleTextFormatter` manipulation)
+- Tab box lines drawn on parent `LineCanvas` for correct auto-join timing
+- When depth < 3, focused/unfocused border lines are identical (differentiated by attributes)
+- All 54 `BorderViewTests` pass
+- Full 15,125 test suite passes with zero failures
+- Total LOC reduction from `TabHeaderRenderer` deletion
 
 ## Phase 2 - "TabView" Style - Enables a replacement for the old TabView
 

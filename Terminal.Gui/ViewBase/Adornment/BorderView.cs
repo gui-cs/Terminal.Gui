@@ -247,182 +247,90 @@ public partial class BorderView : AdornmentView
         return new Rectangle (left, top, Math.Max (0, right - left), Math.Max (0, bottom - top));
     }
 
+    #region Tab Title Label
+
+    private Label? _tabTitleLabel;
+
     /// <summary>
-    ///     Draws the title text inside the tab header area. For Top/Bottom, the text is horizontal.
-    ///     For Left/Right, the text is drawn vertically (one character per row).
+    ///     Gets or lazily creates the <see cref="Label"/> SubView used to render the tab title text.
+    ///     The Label handles text rendering (with hotkey and vertical direction support).
+    ///     The tab box lines are drawn manually on the parent's <see cref="View.LineCanvas"/> for correct auto-join timing.
     /// </summary>
-    /// <exception cref="ArgumentOutOfRangeException"></exception>
-    private void DrawTitleInTabHeader (Border border, Rectangle borderBounds, DrawContext? context)
+    private Label EnsureTabTitleLabel ()
     {
-        if (Adornment?.Parent is null || Driver is null)
+        if (_tabTitleLabel is null)
         {
-            return;
-        }
-
-        string title = Adornment.Parent.Title;
-        int titleLength = Adornment.Parent.TitleTextFormatter.FormatAndGetSize ().Width;
-        int tabLength = border.TabLength ?? titleLength + 2;
-        int tabInteriorSize = tabLength - 2;
-
-        if (tabInteriorSize <= 0 || string.IsNullOrEmpty (title))
-        {
-            return;
-        }
-
-        Attribute normalAttr = GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal);
-        Attribute hotAttr = GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal);
-
-        int depth = GetTabDepth (border);
-        Rectangle headerRect = TabHeaderRenderer.ComputeHeaderRect (borderBounds, border.TabSide, border.TabOffset, tabLength, depth);
-        Rectangle viewBounds = TabHeaderRenderer.ComputeViewBounds (borderBounds, border.TabSide, depth);
-        Rectangle clipped = Rectangle.Intersect (headerRect, viewBounds);
-
-        if (clipped.IsEmpty)
-        {
-            return;
-        }
-
-        // For depth >= 3, title goes in the standard interior content area.
-        // For depth <= 2, there's no interior — title goes ON the closing edge (between side borders).
-        Rectangle contentArea = depth >= 3
-                                    ? TabHeaderRenderer.GetContentArea (headerRect, clipped, border.TabSide)
-                                    : ComputeClosingEdgeTitleArea (headerRect, clipped, border.TabSide);
-
-        if (contentArea.IsEmpty)
-        {
-            return;
-        }
-
-        switch (border.TabSide)
-        {
-            case Side.Top:
-            case Side.Bottom:
+            _tabTitleLabel = new Label
             {
-                // When the header is clipped on the left, skip the first N title characters
-                int titleSkipChars = contentArea.X > headerRect.X + 1 ? contentArea.X - (headerRect.X + 1) : 0;
-                string visibleTitle = titleSkipChars > 0 && titleSkipChars < titleLength ? title [titleSkipChars..] : title;
-
-                // Measure display width accounting for hotkey markers
-                Adornment.Parent.TitleTextFormatter.Text = visibleTitle;
-                int visibleWidth = Adornment.Parent.TitleTextFormatter.FormatAndGetSize (new Size (contentArea.Width, 1)).Width;
-                int titleWidth = Math.Min (visibleWidth, contentArea.Width);
-
-                if (titleWidth <= 0)
-                {
-                    Adornment.Parent.TitleTextFormatter.Text = title;
-
-                    break;
-                }
-
-                Rectangle titleRect = contentArea with { Width = titleWidth, Height = 1 };
-                Size savedConstraint = Adornment.Parent.TitleTextFormatter.ConstrainToSize ?? Size.Empty;
-                Adornment.Parent.TitleTextFormatter.ConstrainToSize = new Size (titleWidth, 1);
-                Adornment.Parent.TitleTextFormatter.Draw (Driver, titleRect, normalAttr, hotAttr);
-
-                // Restore the original title text and constraint
-                Adornment.Parent.TitleTextFormatter.Text = title;
-                Adornment.Parent.TitleTextFormatter.ConstrainToSize = savedConstraint;
-
-                LastTitleRect = titleRect;
-                context?.AddDrawnRectangle (titleRect);
-                Adornment.Parent.LineCanvas.Exclude (new Region (titleRect));
-
-                break;
-            }
-
-            case Side.Left:
-            case Side.Right:
-            {
-                // When the header is clipped on the top, skip the first N title characters
-                int titleSkipChars = contentArea.Y > headerRect.Y + 1 ? contentArea.Y - (headerRect.Y + 1) : 0;
-                string visibleTitle = titleSkipChars > 0 && titleSkipChars < titleLength ? title [titleSkipChars..] : title;
-
-                // Set up TextFormatter for vertical rendering
-                TextDirection savedDirection = Adornment.Parent.TitleTextFormatter.Direction;
-                Size savedConstraint = Adornment.Parent.TitleTextFormatter.ConstrainToSize ?? Size.Empty;
-                Adornment.Parent.TitleTextFormatter.Direction = TextDirection.TopBottom_LeftRight;
-                Adornment.Parent.TitleTextFormatter.Text = visibleTitle;
-
-                // Measure display height accounting for hotkey markers
-                int visibleHeight = Adornment.Parent.TitleTextFormatter.FormatAndGetSize (new Size (1, contentArea.Height)).Height;
-                int maxChars = Math.Min (visibleHeight, contentArea.Height);
-
-                if (maxChars <= 0)
-                {
-                    Adornment.Parent.TitleTextFormatter.Direction = savedDirection;
-                    Adornment.Parent.TitleTextFormatter.Text = title;
-                    Adornment.Parent.TitleTextFormatter.ConstrainToSize = savedConstraint;
-
-                    break;
-                }
-
-                Rectangle titleRect = contentArea with { Width = 1, Height = maxChars };
-                Adornment.Parent.TitleTextFormatter.ConstrainToSize = new Size (1, maxChars);
-                Adornment.Parent.TitleTextFormatter.Draw (Driver, titleRect, normalAttr, hotAttr);
-
-                // Restore
-                Adornment.Parent.TitleTextFormatter.Direction = savedDirection;
-                Adornment.Parent.TitleTextFormatter.Text = title;
-                Adornment.Parent.TitleTextFormatter.ConstrainToSize = savedConstraint;
-
-                LastTitleRect = titleRect;
-                context?.AddDrawnRectangle (titleRect);
-                Adornment.Parent.LineCanvas.Exclude (new Region (titleRect));
-
-                break;
-            }
-
-            default: throw new ArgumentOutOfRangeException ();
+#if DEBUG
+                Id = "TabTitleLabel",
+#endif
+                CanFocus = false,
+                TabStop = TabBehavior.NoStop,
+            };
+            _tabTitleLabel.Border.Thickness = Thickness.Empty;
+            _tabTitleLabel.Border.Settings = BorderSettings.None;
+            Add (_tabTitleLabel);
         }
 
-        return;
-
-        // For depth <= 2, title goes ON the closing edge row/col (between the side border edges).
-        static Rectangle ComputeClosingEdgeTitleArea (Rectangle headerRect, Rectangle clipped, Side side)
-        {
-            switch (side)
-            {
-                case Side.Top:
-                {
-                    int y = clipped.Bottom - 1;
-                    int left = clipped.X == headerRect.X ? clipped.X + 1 : clipped.X;
-                    int right = clipped.Right == headerRect.Right ? clipped.Right - 1 : clipped.Right;
-
-                    return right - left > 0 ? new Rectangle (left, y, right - left, 1) : Rectangle.Empty;
-                }
-
-                case Side.Bottom:
-                {
-                    int y = clipped.Y;
-                    int left = clipped.X == headerRect.X ? clipped.X + 1 : clipped.X;
-                    int right = clipped.Right == headerRect.Right ? clipped.Right - 1 : clipped.Right;
-
-                    return right - left > 0 ? new Rectangle (left, y, right - left, 1) : Rectangle.Empty;
-                }
-
-                case Side.Left:
-                {
-                    int x = clipped.Right - 1;
-                    int top = clipped.Y == headerRect.Y ? clipped.Y + 1 : clipped.Y;
-                    int bottom = clipped.Bottom == headerRect.Bottom ? clipped.Bottom - 1 : clipped.Bottom;
-
-                    return bottom - top > 0 ? new Rectangle (x, top, 1, bottom - top) : Rectangle.Empty;
-                }
-
-                case Side.Right:
-                {
-                    int x = clipped.X;
-                    int top = clipped.Y == headerRect.Y ? clipped.Y + 1 : clipped.Y;
-                    int bottom = clipped.Bottom == headerRect.Bottom ? clipped.Bottom - 1 : clipped.Bottom;
-
-                    return bottom - top > 0 ? new Rectangle (x, top, 1, bottom - top) : Rectangle.Empty;
-                }
-
-                default:
-                    return Rectangle.Empty;
-            }
-        }
+        return _tabTitleLabel;
     }
+
+    /// <summary>
+    ///     Computes the unclipped header rectangle for the given side, offset, length, and depth.
+    ///     Moved from <c>TabHeaderRenderer</c>.
+    /// </summary>
+    private static Rectangle ComputeHeaderRect (Rectangle contentBorderRect, Side side, int offset, int length, int depth) =>
+        side switch
+        {
+            Side.Top => new Rectangle (contentBorderRect.X + offset, contentBorderRect.Y - (depth - 1), length, depth),
+            Side.Bottom => new Rectangle (contentBorderRect.X + offset, contentBorderRect.Bottom - 1, length, depth),
+            Side.Left => new Rectangle (contentBorderRect.X - (depth - 1), contentBorderRect.Y + offset, depth, length),
+            Side.Right => new Rectangle (contentBorderRect.Right - 1, contentBorderRect.Y + offset, depth, length),
+            _ => Rectangle.Empty
+        };
+
+    /// <summary>
+    ///     Computes the full view bounds (content border + header protrusion area).
+    ///     Moved from <c>TabHeaderRenderer</c>.
+    /// </summary>
+    private static Rectangle ComputeViewBounds (Rectangle contentBorderRect, Side side, int depth) =>
+        side switch
+        {
+            Side.Top => new Rectangle (contentBorderRect.X, contentBorderRect.Y - (depth - 1), contentBorderRect.Width, contentBorderRect.Height + (depth - 1)),
+            Side.Bottom => new Rectangle (contentBorderRect.X, contentBorderRect.Y, contentBorderRect.Width, contentBorderRect.Height + (depth - 1)),
+            Side.Left => new Rectangle (contentBorderRect.X - (depth - 1), contentBorderRect.Y, contentBorderRect.Width + (depth - 1), contentBorderRect.Height),
+            Side.Right => new Rectangle (contentBorderRect.X, contentBorderRect.Y, contentBorderRect.Width + (depth - 1), contentBorderRect.Height),
+            _ => contentBorderRect
+        };
+
+    /// <summary>
+    ///     Computes the <see cref="Thickness"/> for the tab title Label's border based on
+    ///     depth, focus state, and which side the tab is on.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         "Cap" is the outward edge (away from content). "Content" is the inward edge (toward content area).
+    ///         For depth ≥ 3, the content-side thickness toggles with focus to create the open gap / separator.
+    ///         For depth &lt; 3, no focus distinction in border lines.
+    ///     </para>
+    /// </remarks>
+    private static Thickness ComputeTabLabelThickness (Side tabSide, int depth, bool hasFocus)
+    {
+        int cap = depth >= 2 ? 1 : 0;
+        int contentSide = depth >= 3 && !hasFocus ? 1 : 0;
+
+        return tabSide switch
+        {
+            Side.Top => new Thickness (1, cap, 1, contentSide),
+            Side.Bottom => new Thickness (1, contentSide, 1, cap),
+            Side.Left => new Thickness (cap, 1, contentSide, 1),
+            Side.Right => new Thickness (contentSide, 1, cap, 1),
+            _ => Thickness.Empty
+        };
+    }
+
+    #endregion Tab Title Label
 
     private int GetTabDepth (Border border)
     {
@@ -440,8 +348,8 @@ public partial class BorderView : AdornmentView
 
     /// <summary>
     ///     Draws the border and tab header when <see cref="BorderSettings.Tab"/> is set.
-    ///     Uses edge-based positioning: non-title sides at outer edge, title side at <c>thickness - 1</c>.
-    ///     This is a self-contained codepath — the legacy <see cref="OnDrawingContent"/> does not participate.
+    ///     Uses a <see cref="Label"/> SubView for the tab header box and title.
+    ///     The Label's border lines auto-join with the content border via <see cref="View.LineCanvas"/>.
     /// </summary>
     private bool DrawTabBorder (Border border, DrawContext? context)
     {
@@ -482,15 +390,16 @@ public partial class BorderView : AdornmentView
         int tabDepth = GetTabDepth (border);
         int tabLength = border.TabLength!.Value;
         LineStyle lineStyle = border.LineStyle.Value;
+        bool hasFocus = border.Parent!.HasFocus;
 
-        // Check whether the tab header is visible (for deciding who draws the tab-side border)
-        Rectangle headerRect = TabHeaderRenderer.ComputeHeaderRect (borderBounds, border.TabSide, border.TabOffset, tabLength, tabDepth);
-        Rectangle viewBounds = TabHeaderRenderer.ComputeViewBounds (borderBounds, border.TabSide, tabDepth);
+        // Compute tab header geometry
+        Rectangle headerRect = ComputeHeaderRect (borderBounds, border.TabSide, border.TabOffset, tabLength, tabDepth);
+        Rectangle viewBounds = ComputeViewBounds (borderBounds, border.TabSide, tabDepth);
         Rectangle clipped = Rectangle.Intersect (headerRect, viewBounds);
         bool tabVisible = !clipped.IsEmpty;
 
-        // Draw the 3 non-tab-side content border lines.
-        // The tab side is handled by TabHeaderRenderer (if visible) or drawn fully (if off-screen).
+        // Draw the 3 non-tab-side content border lines (always drawn).
+        // The tab-side line is handled below — conditionally, based on whether the tab is visible.
         if (Adornment!.Thickness.Top > 0 && (border.TabSide != Side.Top || !tabVisible))
         {
             lc.AddLine (new Point (borderBounds.X, borderBounds.Y), borderBounds.Width, Orientation.Horizontal, lineStyle, normalAttribute);
@@ -511,31 +420,75 @@ public partial class BorderView : AdornmentView
             lc.AddLine (new Point (borderBounds.Right - 1, borderBounds.Y), borderBounds.Height, Orientation.Vertical, lineStyle, normalAttribute);
         }
 
-        // Draw tab header (cap line, side edges, tab-side content border with gap/separator).
-        // When depth < 3 there is no interior content row — the tab header is just cap + closing edge
-        // (or just the closing edge for depth 1). In that case focused and unfocused look identical;
-        // only the title attributes (Normal vs Focus) differentiate them.
+        // Draw tab header box lines and position the title Label
         if (tabVisible)
         {
-            bool showSeparator = tabDepth >= 3 && !border.Parent!.HasFocus;
+            Thickness tabThickness = ComputeTabLabelThickness (border.TabSide, tabDepth, hasFocus);
 
-            TabHeaderRenderer.AddLines (lc,
-                                        borderBounds,
-                                        border.TabSide,
-                                        border.TabOffset,
-                                        tabLength,
-                                        tabDepth,
-                                        showSeparator,
-                                        lineStyle,
-                                        normalAttribute);
+            // Draw the tab box lines on the parent's LineCanvas (for correct auto-join timing).
+            // For depth 1, skip — the extension lines below handle the side edges instead.
+            if (tabDepth > 1)
+            {
+                AddTabBoxLines (lc, headerRect, clipped, border.TabSide, tabThickness, lineStyle, normalAttribute);
+            }
+
+            // Draw the tab-side content border (gap or separator)
+            AddTabSideContentBorder (lc, clipped, headerRect, borderBounds, border.TabSide, hasFocus, tabDepth, lineStyle, normalAttribute);
+
+            // For depth 1, add 1-cell extension lines for corner auto-join
+            if (tabDepth == 1)
+            {
+                AddDepth1CornerExtensions (lc, clipped, border.TabSide, lineStyle, normalAttribute);
+            }
+
+            // Position the Label for text rendering (no border on Label itself).
+            // Use the UNCLIPPED headerRect for label placement so the View system's
+            // natural clipping handles partial visibility (negative offsets, overflow).
+            Rectangle unclippedContent = ComputeTabContentArea (headerRect, headerRect, border.TabSide, tabThickness, tabDepth);
+            Rectangle visibleContent = ComputeTabContentArea (clipped, headerRect, border.TabSide, tabThickness, tabDepth);
+
+            if (!unclippedContent.IsEmpty && !visibleContent.IsEmpty)
+            {
+                Label label = EnsureTabTitleLabel ();
+                label.Visible = true;
+                label.HotKeySpecifier = Adornment.Parent!.HotKeySpecifier;
+                label.Text = Adornment.Parent!.Title;
+
+                // For Left/Right, render text vertically
+                label.TextFormatter.Direction = border.TabSide is Side.Left or Side.Right
+                                                    ? TextDirection.TopBottom_LeftRight
+                                                    : TextDirection.LeftRight_TopBottom;
+
+                // Convert unclipped content area from screen to BorderView viewport coords.
+                // The Label extends beyond the visible area — BorderView's viewport clips it.
+                Point screenOrigin = ViewportToScreen (Point.Empty);
+                Rectangle labelFrame = new (
+                    unclippedContent.X - screenOrigin.X,
+                    unclippedContent.Y - screenOrigin.Y,
+                    unclippedContent.Width,
+                    unclippedContent.Height);
+                label.Frame = labelFrame;
+                label.Width = labelFrame.Width;
+                label.Height = labelFrame.Height;
+
+                // Set LastTitleRect to the visible portion for clip exclusion
+                LastTitleRect = visibleContent;
+            }
+            else if (_tabTitleLabel is { })
+            {
+                _tabTitleLabel.Visible = false;
+                LastTitleRect = null;
+            }
         }
-
-        // Draw title in tab header
-        bool hasTitle = border.Settings.FastHasFlags (BorderSettings.Title);
-
-        if (hasTitle && !string.IsNullOrEmpty (Adornment.Parent?.Title))
+        else
         {
-            DrawTitleInTabHeader (border, borderBounds, context);
+            // Tab is off-screen — hide Label
+            if (_tabTitleLabel is { })
+            {
+                _tabTitleLabel.Visible = false;
+            }
+
+            LastTitleRect = null;
         }
 
         // Gradient support
@@ -557,6 +510,349 @@ public partial class BorderView : AdornmentView
         }
 
         return true;
+    }
+
+    /// <summary>
+    ///     For depth-1 tabs, adds 1-cell line extensions at the side edges of the tab header so that
+    ///     LineCanvas auto-join produces curved corner glyphs where the tab meets the content border.
+    /// </summary>
+    private static void AddDepth1CornerExtensions (LineCanvas lc, Rectangle clipped, Side side, LineStyle lineStyle, Attribute? attribute)
+    {
+        switch (side)
+        {
+            case Side.Top:
+                // Extend left/right edges 1 cell upward (outward)
+                if (clipped.Width >= 1)
+                {
+                    lc.AddLine (new Point (clipped.X, clipped.Y - 1), 2, Orientation.Vertical, lineStyle, attribute);
+                    lc.AddLine (new Point (clipped.Right - 1, clipped.Y - 1), 2, Orientation.Vertical, lineStyle, attribute);
+                }
+
+                break;
+
+            case Side.Bottom:
+                // Extend left/right edges 1 cell downward (outward)
+                if (clipped.Width >= 1)
+                {
+                    lc.AddLine (new Point (clipped.X, clipped.Y), 2, Orientation.Vertical, lineStyle, attribute);
+                    lc.AddLine (new Point (clipped.Right - 1, clipped.Y), 2, Orientation.Vertical, lineStyle, attribute);
+                }
+
+                break;
+
+            case Side.Left:
+                // Extend top/bottom edges 1 cell leftward (outward)
+                if (clipped.Height >= 1)
+                {
+                    lc.AddLine (new Point (clipped.X - 1, clipped.Y), 2, Orientation.Horizontal, lineStyle, attribute);
+                    lc.AddLine (new Point (clipped.X - 1, clipped.Bottom - 1), 2, Orientation.Horizontal, lineStyle, attribute);
+                }
+
+                break;
+
+            case Side.Right:
+                // Extend top/bottom edges 1 cell rightward (outward)
+                if (clipped.Height >= 1)
+                {
+                    lc.AddLine (new Point (clipped.X, clipped.Y), 2, Orientation.Horizontal, lineStyle, attribute);
+                    lc.AddLine (new Point (clipped.X, clipped.Bottom - 1), 2, Orientation.Horizontal, lineStyle, attribute);
+                }
+
+                break;
+        }
+    }
+
+    /// <summary>
+    ///     Adds the tab box border lines (cap, side edges) to the parent's <see cref="View.LineCanvas"/>.
+    ///     These are the lines that would be drawn by the Label's border if the draw pipeline timing allowed it.
+    /// </summary>
+    private static void AddTabBoxLines (
+        LineCanvas lc,
+        Rectangle headerRect,
+        Rectangle clipped,
+        Side side,
+        Thickness tabThickness,
+        LineStyle lineStyle,
+        Attribute? attribute)
+    {
+        switch (side)
+        {
+            case Side.Top:
+            {
+                // Cap line (top edge of tab box)
+                if (tabThickness.Top > 0 && clipped.Y == headerRect.Y)
+                {
+                    int capX = clipped.X > headerRect.X ? clipped.X - 1 : clipped.X;
+                    int capW = clipped.Width + (clipped.X > headerRect.X ? 1 : 0) + (clipped.Right < headerRect.Right ? 1 : 0);
+                    lc.AddLine (new Point (capX, clipped.Y), capW, Orientation.Horizontal, lineStyle, attribute);
+                }
+
+                // Left edge
+                if (tabThickness.Left > 0 && clipped.X == headerRect.X)
+                {
+                    lc.AddLine (new Point (clipped.X, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
+                }
+
+                // Right edge
+                if (tabThickness.Right > 0 && clipped.Right == headerRect.Right)
+                {
+                    lc.AddLine (new Point (clipped.Right - 1, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
+                }
+
+                break;
+            }
+
+            case Side.Bottom:
+            {
+                // Cap line (bottom edge of tab box)
+                if (tabThickness.Bottom > 0 && clipped.Bottom == headerRect.Bottom)
+                {
+                    int capX = clipped.X > headerRect.X ? clipped.X - 1 : clipped.X;
+                    int capW = clipped.Width + (clipped.X > headerRect.X ? 1 : 0) + (clipped.Right < headerRect.Right ? 1 : 0);
+                    lc.AddLine (new Point (capX, clipped.Bottom - 1), capW, Orientation.Horizontal, lineStyle, attribute);
+                }
+
+                // Left edge
+                if (tabThickness.Left > 0 && clipped.X == headerRect.X)
+                {
+                    lc.AddLine (new Point (clipped.X, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
+                }
+
+                // Right edge
+                if (tabThickness.Right > 0 && clipped.Right == headerRect.Right)
+                {
+                    lc.AddLine (new Point (clipped.Right - 1, clipped.Y), clipped.Height, Orientation.Vertical, lineStyle, attribute);
+                }
+
+                break;
+            }
+
+            case Side.Left:
+            {
+                // Cap line (left edge of tab box)
+                if (tabThickness.Left > 0 && clipped.X == headerRect.X)
+                {
+                    int capY = clipped.Y > headerRect.Y ? clipped.Y - 1 : clipped.Y;
+                    int capH = clipped.Height + (clipped.Y > headerRect.Y ? 1 : 0) + (clipped.Bottom < headerRect.Bottom ? 1 : 0);
+                    lc.AddLine (new Point (clipped.X, capY), capH, Orientation.Vertical, lineStyle, attribute);
+                }
+
+                // Top edge
+                if (tabThickness.Top > 0 && clipped.Y == headerRect.Y)
+                {
+                    lc.AddLine (new Point (clipped.X, clipped.Y), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
+                }
+
+                // Bottom edge
+                if (tabThickness.Bottom > 0 && clipped.Bottom == headerRect.Bottom)
+                {
+                    lc.AddLine (new Point (clipped.X, clipped.Bottom - 1), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
+                }
+
+                break;
+            }
+
+            case Side.Right:
+            {
+                // Cap line (right edge of tab box)
+                if (tabThickness.Right > 0 && clipped.Right == headerRect.Right)
+                {
+                    int capY = clipped.Y > headerRect.Y ? clipped.Y - 1 : clipped.Y;
+                    int capH = clipped.Height + (clipped.Y > headerRect.Y ? 1 : 0) + (clipped.Bottom < headerRect.Bottom ? 1 : 0);
+                    lc.AddLine (new Point (clipped.Right - 1, capY), capH, Orientation.Vertical, lineStyle, attribute);
+                }
+
+                // Top edge
+                if (tabThickness.Top > 0 && clipped.Y == headerRect.Y)
+                {
+                    lc.AddLine (new Point (clipped.X, clipped.Y), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
+                }
+
+                // Bottom edge
+                if (tabThickness.Bottom > 0 && clipped.Bottom == headerRect.Bottom)
+                {
+                    lc.AddLine (new Point (clipped.X, clipped.Bottom - 1), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
+                }
+
+                break;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Draws the tab-side content border line. For focused depth ≥ 3, draws split segments
+    ///     around the gap. For unfocused depth ≥ 3, draws the full line (auto-join creates junctions).
+    ///     For depth &lt; 3, draws the full line.
+    /// </summary>
+    private static void AddTabSideContentBorder (
+        LineCanvas lc,
+        Rectangle clipped,
+        Rectangle headerRect,
+        Rectangle contentBorderRect,
+        Side side,
+        bool hasFocus,
+        int depth,
+        LineStyle lineStyle,
+        Attribute? attribute)
+    {
+        // Open gap when: focused at depth ≥ 3 (no content-side border on tab), or
+        // depth < 3 (content border coincides with tab title row — must not overwrite it).
+        bool openGap = (hasFocus && depth >= 3) || depth < 3;
+
+        switch (side)
+        {
+            case Side.Top:
+            {
+                int borderY = contentBorderRect.Y;
+
+                if (!openGap)
+                {
+                    lc.AddLine (new Point (contentBorderRect.X, borderY), contentBorderRect.Width, Orientation.Horizontal, lineStyle, attribute);
+                }
+                else
+                {
+                    if (clipped.X > contentBorderRect.X)
+                    {
+                        lc.AddLine (new Point (contentBorderRect.X, borderY), clipped.X - contentBorderRect.X + 1, Orientation.Horizontal, lineStyle, attribute);
+                    }
+
+                    if (clipped.Right - 1 < contentBorderRect.Right - 1)
+                    {
+                        lc.AddLine (new Point (clipped.Right - 1, borderY), contentBorderRect.Right - (clipped.Right - 1), Orientation.Horizontal, lineStyle, attribute);
+                    }
+                }
+
+                break;
+            }
+
+            case Side.Bottom:
+            {
+                int borderY = contentBorderRect.Bottom - 1;
+
+                if (!openGap)
+                {
+                    lc.AddLine (new Point (contentBorderRect.X, borderY), contentBorderRect.Width, Orientation.Horizontal, lineStyle, attribute);
+                }
+                else
+                {
+                    if (clipped.X > contentBorderRect.X)
+                    {
+                        lc.AddLine (new Point (contentBorderRect.X, borderY), clipped.X - contentBorderRect.X + 1, Orientation.Horizontal, lineStyle, attribute);
+                    }
+
+                    if (clipped.Right - 1 < contentBorderRect.Right - 1)
+                    {
+                        lc.AddLine (new Point (clipped.Right - 1, borderY), contentBorderRect.Right - (clipped.Right - 1), Orientation.Horizontal, lineStyle, attribute);
+                    }
+                }
+
+                break;
+            }
+
+            case Side.Left:
+            {
+                int borderX = contentBorderRect.X;
+
+                if (!openGap)
+                {
+                    lc.AddLine (new Point (borderX, contentBorderRect.Y), contentBorderRect.Height, Orientation.Vertical, lineStyle, attribute);
+                }
+                else
+                {
+                    if (clipped.Y > contentBorderRect.Y)
+                    {
+                        lc.AddLine (new Point (borderX, contentBorderRect.Y), clipped.Y - contentBorderRect.Y + 1, Orientation.Vertical, lineStyle, attribute);
+                    }
+                    else if (clipped.Y > headerRect.Y)
+                    {
+                        // Header clipped at top (overflow) — suppress corner glyph
+                        lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Y, 1, 1)));
+                    }
+
+                    if (clipped.Bottom - 1 < contentBorderRect.Bottom - 1)
+                    {
+                        lc.AddLine (new Point (borderX, clipped.Bottom - 1), contentBorderRect.Bottom - (clipped.Bottom - 1), Orientation.Vertical, lineStyle, attribute);
+                    }
+                    else if (clipped.Bottom < headerRect.Bottom)
+                    {
+                        // Header clipped at bottom (overflow) — suppress corner glyph
+                        lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Bottom - 1, 1, 1)));
+                    }
+                }
+
+                break;
+            }
+
+            case Side.Right:
+            {
+                int borderX = contentBorderRect.Right - 1;
+
+                if (!openGap)
+                {
+                    lc.AddLine (new Point (borderX, contentBorderRect.Y), contentBorderRect.Height, Orientation.Vertical, lineStyle, attribute);
+                }
+                else
+                {
+                    if (clipped.Y > contentBorderRect.Y)
+                    {
+                        lc.AddLine (new Point (borderX, contentBorderRect.Y), clipped.Y - contentBorderRect.Y + 1, Orientation.Vertical, lineStyle, attribute);
+                    }
+                    else if (clipped.Y > headerRect.Y)
+                    {
+                        // Header clipped at top (overflow) — suppress corner glyph
+                        lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Y, 1, 1)));
+                    }
+
+                    if (clipped.Bottom - 1 < contentBorderRect.Bottom - 1)
+                    {
+                        lc.AddLine (new Point (borderX, clipped.Bottom - 1), contentBorderRect.Bottom - (clipped.Bottom - 1), Orientation.Vertical, lineStyle, attribute);
+                    }
+                    else if (clipped.Bottom < headerRect.Bottom)
+                    {
+                        // Header clipped at bottom (overflow) — suppress corner glyph
+                        lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Bottom - 1, 1, 1)));
+                    }
+                }
+
+                break;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Computes the content area within the tab header where the title text is drawn.
+    ///     For depth ≥ 3, always reserves 1 cell on each side (cap, content-side closing edge,
+    ///     side edges) — even when the content-side thickness is 0 (focused gap).
+    ///     For depth &lt; 3, uses the actual tab thickness.
+    /// </summary>
+    private static Rectangle ComputeTabContentArea (Rectangle clipped, Rectangle headerRect, Side side, Thickness tabThickness, int depth)
+    {
+        // For depth >= 3, always reserve 1 cell on the content side for the closing edge/gap
+        Thickness effectiveThickness = depth >= 3
+                                           ? side switch
+                                             {
+                                                 Side.Top => tabThickness with { Bottom = 1 },
+                                                 Side.Bottom => tabThickness with { Top = 1 },
+                                                 Side.Left => tabThickness with { Right = 1 },
+                                                 Side.Right => tabThickness with { Left = 1 },
+                                                 _ => tabThickness
+                                             }
+                                           : tabThickness;
+
+        int left = clipped.X + (clipped.X == headerRect.X ? effectiveThickness.Left : 0);
+        int top = clipped.Y + (clipped.Y == headerRect.Y ? effectiveThickness.Top : 0);
+        int right = clipped.Right - (clipped.Right == headerRect.Right ? effectiveThickness.Right : 0);
+        int bottom = clipped.Bottom - (clipped.Bottom == headerRect.Bottom ? effectiveThickness.Bottom : 0);
+
+        int w = right - left;
+        int h = bottom - top;
+
+        if (w <= 0 || h <= 0)
+        {
+            return Rectangle.Empty;
+        }
+
+        return new Rectangle (left, top, w, h);
     }
 
     /// <inheritdoc/>
