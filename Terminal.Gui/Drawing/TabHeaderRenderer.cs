@@ -66,7 +66,7 @@ internal static class TabHeaderRenderer
         AddOuterHeaderLines (lineCanvas, headerRect, clipped, side, lineStyle, lineAttribute);
 
         // Add the content border on the header side — either continuous (separator) or split (gap)
-        AddTabSideContentBorder (lineCanvas, clipped, contentBorderRect, side, !showSeparator, lineStyle, lineAttribute);
+        AddTabSideContentBorder (lineCanvas, headerRect, clipped, contentBorderRect, side, !showSeparator, lineStyle, lineAttribute);
     }
 
     /// <summary>
@@ -241,16 +241,20 @@ internal static class TabHeaderRenderer
                     lineCanvas.AddLine (new Point (clipped.X, capY), capH, Orientation.Vertical, lineStyle, attribute);
                 }
 
-                // Top edge — skip for depth=1 (content top border handles this)
-                if (!isDepth1 && clipped.Y == headerRect.Y)
+                // Top edge — for depth=1, extend 1 cell outward (left) for correct corner auto-join
+                if (clipped.Y == headerRect.Y)
                 {
-                    lineCanvas.AddLine (new Point (clipped.X, clipped.Y), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
+                    int startX = isDepth1 ? clipped.X - 1 : clipped.X;
+                    int width = isDepth1 ? 2 : clipped.Width;
+                    lineCanvas.AddLine (new Point (startX, clipped.Y), width, Orientation.Horizontal, lineStyle, attribute);
                 }
 
-                // Bottom edge — skip for depth=1
-                if (!isDepth1 && clipped.Bottom == headerRect.Bottom)
+                // Bottom edge — for depth=1, extend 1 cell outward (left) for correct corner auto-join
+                if (clipped.Bottom == headerRect.Bottom)
                 {
-                    lineCanvas.AddLine (new Point (clipped.X, clipped.Bottom - 1), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
+                    int startX = isDepth1 ? clipped.X - 1 : clipped.X;
+                    int width = isDepth1 ? 2 : clipped.Width;
+                    lineCanvas.AddLine (new Point (startX, clipped.Bottom - 1), width, Orientation.Horizontal, lineStyle, attribute);
                 }
 
                 break;
@@ -264,16 +268,18 @@ internal static class TabHeaderRenderer
                     lineCanvas.AddLine (new Point (clipped.Right - 1, capY), capH, Orientation.Vertical, lineStyle, attribute);
                 }
 
-                // Top edge — skip for depth=1
-                if (!isDepth1 && clipped.Y == headerRect.Y)
+                // Top edge — for depth=1, extend 1 cell outward (right) for correct corner auto-join
+                if (clipped.Y == headerRect.Y)
                 {
-                    lineCanvas.AddLine (new Point (clipped.X, clipped.Y), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
+                    int width = isDepth1 ? 2 : clipped.Width;
+                    lineCanvas.AddLine (new Point (clipped.X, clipped.Y), width, Orientation.Horizontal, lineStyle, attribute);
                 }
 
-                // Bottom edge — skip for depth=1
-                if (!isDepth1 && clipped.Bottom == headerRect.Bottom)
+                // Bottom edge — for depth=1, extend 1 cell outward (right) for correct corner auto-join
+                if (clipped.Bottom == headerRect.Bottom)
                 {
-                    lineCanvas.AddLine (new Point (clipped.X, clipped.Bottom - 1), clipped.Width, Orientation.Horizontal, lineStyle, attribute);
+                    int width = isDepth1 ? 2 : clipped.Width;
+                    lineCanvas.AddLine (new Point (clipped.X, clipped.Bottom - 1), width, Orientation.Horizontal, lineStyle, attribute);
                 }
 
                 break;
@@ -289,6 +295,7 @@ internal static class TabHeaderRenderer
     ///     the gap, producing corner glyphs naturally.
     /// </summary>
     private static void AddTabSideContentBorder (LineCanvas lineCanvas,
+                                                 Rectangle headerRect,
                                                  Rectangle clipped,
                                                  Rectangle contentBorderRect,
                                                  Side side,
@@ -391,8 +398,9 @@ internal static class TabHeaderRenderer
                                             lineStyle,
                                             attribute);
                     }
-                    else
+                    else if (clipped.Y > headerRect.Y)
                     {
+                        // Header is clipped at top (overflow) — no header edge drawn here, suppress corner
                         lineCanvas.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Y, 1, 1)));
                     }
 
@@ -404,8 +412,9 @@ internal static class TabHeaderRenderer
                                             lineStyle,
                                             attribute);
                     }
-                    else
+                    else if (clipped.Bottom < headerRect.Bottom)
                     {
+                        // Header is clipped at bottom (overflow) — no header edge drawn here, suppress corner
                         lineCanvas.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Bottom - 1, 1, 1)));
                     }
                 }
@@ -434,9 +443,9 @@ internal static class TabHeaderRenderer
                                             lineStyle,
                                             attribute);
                     }
-                    else
+                    else if (clipped.Y > headerRect.Y)
                     {
-                        // Gap reaches the top corner — suppress it so adjacent border doesn't show
+                        // Header is clipped at top (overflow) — suppress corner
                         lineCanvas.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Y, 1, 1)));
                     }
 
@@ -448,9 +457,9 @@ internal static class TabHeaderRenderer
                                             lineStyle,
                                             attribute);
                     }
-                    else
+                    else if (clipped.Bottom < headerRect.Bottom)
                     {
-                        // Gap reaches the bottom corner — suppress it so adjacent border doesn't show
+                        // Header is clipped at bottom (overflow) — suppress corner
                         lineCanvas.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Bottom - 1, 1, 1)));
                     }
                 }

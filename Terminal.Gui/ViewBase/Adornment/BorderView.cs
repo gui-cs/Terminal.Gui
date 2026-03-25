@@ -492,16 +492,21 @@ public partial class BorderView : AdornmentView
             lc.AddLine (new Point (borderBounds.Right - 1, borderBounds.Y), borderBounds.Height, Orientation.Vertical, lineStyle, normalAttribute);
         }
 
-        // Draw tab header (cap line, side edges, tab-side content border with gap/separator)
+        // Draw tab header (cap line, side edges, tab-side content border with gap/separator).
+        // When depth < 3 there is no interior content row — the tab header is just cap + closing edge
+        // (or just the closing edge for depth 1). In that case focused and unfocused look identical;
+        // only the title attributes (Normal vs Focus) differentiate them.
         if (tabVisible)
         {
+            bool showSeparator = tabDepth >= 3 && !border.Parent!.HasFocus;
+
             TabHeaderRenderer.AddLines (lc,
                                         borderBounds,
                                         border.TabSide,
                                         border.TabOffset,
                                         tabLength,
                                         tabDepth,
-                                        !border.Parent!.HasFocus,
+                                        showSeparator,
                                         lineStyle,
                                         normalAttribute);
         }

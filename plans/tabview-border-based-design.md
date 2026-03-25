@@ -261,7 +261,7 @@ When `BorderSettings.Tab` is set on `View.Border.BorderSettings`:
 - `Border.BorderStyle` defaults to `Rounded`
 - Suppress the bottom line at `topTitleLineY + 2` (Border.cs lines 382-386). The title rectangle becomes open-bottomed, flowing into the content area. Draw the content border's top line in segments around the header gap instead.
 - Make the `Border.ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse` - assuming there are no bugs, this will make it so clicking outside of the "tab" will pass through.
-- Focus is indicated by the presence of the header bottom line. The selected tab has its header bottom line suppressed, creating an open gap that visually connects the header to the content area. Unselected tabs draw the full header rectangle, including the bottom line, creating a closed header. The `Title` text is always drawn using the `Normal`/`HotNormal` attributes, regardless of focus.
+- Focus is indicated by the presence of the header bottom line. The selected tab has its header bottom line suppressed, creating an open gap that visually connects the header to the content area. Unselected tabs draw the full header rectangle, including the bottom line, creating a closed header. The `Title` text is always drawn using the `Normal`/`HotNormal` attributes, regardless of focus. **Note:** This open/closed gap behavior only applies when the tab-side thickness ≥ 3. When thickness < 3 (depth 1 or 2), focused and unfocused render identically — only the title attributes differentiate them.
 
 Depending on the `Thickness.Top` value, the header rectangle will be taller or shorter. The examples below show the visual difference as you increase `Thickness.Top` from 1 to 4. The "tab" concept starts to emerge at `Thickness.Top = 3` when the bottom line appears, but the exact visuals depend on the LineCanvas auto-join behavior.
 
@@ -275,6 +275,8 @@ All examples use `Thickness = 3` on the tab side, `Thickness = 1` on the other t
 
 - **`HasFocus == false`** → **Closed header.** The line adjacent to the content area is **drawn**, fully enclosing the header rectangle. This visually separates the header from the content, indicating that this tab is not selected.
 - **`HasFocus == true`** → **Open header.** The line adjacent to the content area is **suppressed**, creating a gap that visually connects the header to the content area. This open flow indicates the tab is selected and its content is active.
+
+**Important: The open/closed distinction only applies when the tab-side thickness ≥ 3 (depth ≥ 3).** When the thickness is < 3 (depth 1 or 2), there is no interior content row in the header — the title sits directly on the closing edge (depth 1) or between a cap line and the closing edge (depth 2). In these cases, the focused and unfocused border geometry is **identical**; only the title text attributes differentiate them (`VisualRole.Focus`/`HotFocus` for focused vs. `VisualRole.Normal`/`HotNormal` for unfocused). The separator/gap distinction is suppressed because at small depths the junction glyphs would clash with the title text placement.
 
 In a multi-tab `Tabs` container, exactly one `Tab` has `HasFocus == true` (the selected tab) and all others have `HasFocus == false`. The visual difference — closed vs. open — is how the user distinguishes the selected tab from the rest.
 
@@ -548,7 +550,7 @@ For completeness if `TabOffset = -5`, causing the left side of the tab to extend
 
 IOW, it gets clipped by the view's right border, but the header is still visible and functional. The content top line auto-joins with the tab header's right connector at the intersection point, producing a flowing style.
 
-**Important** the renderings above are what happens when the View *does not have focus* (`HasFocus == false`). When a View is using `BorderSettings.Tab`, focus is indicated not by the `Title` being rendered using the focus attribute, but by the presence of the header bottom line. The selected tab has its header bottom line suppressed, creating an open gap that visually connects the header to the content area. Unselected tabs draw the full header rectangle, including the bottom line, creating a closed header.
+**Important** the renderings above are what happens when the View *does not have focus* (`HasFocus == false`). When a View is using `BorderSettings.Tab`, focus is indicated not by the `Title` being rendered using the focus attribute, but by the presence of the header bottom line. The selected tab has its header bottom line suppressed, creating an open gap that visually connects the header to the content area. Unselected tabs draw the full header rectangle, including the bottom line, creating a closed header. **This open/closed distinction only applies when the tab-side thickness ≥ 3 (depth ≥ 3). For thickness < 3, focused and unfocused render identically — only the title visual role attributes differentiate them.**
 
 #### `Side.Bottom` — `TabOffset` examples (`HasFocus == false`)
 
@@ -710,6 +712,8 @@ At the content right border column: `╮` at row 0 (content top-right), `│` on
 ╰─────── a│
 ```
 
+### Focus
+
 **The focused overflow nuance:** When `HasFocus == true`, the border segment between header and content is suppressed (the "open gap" rule). For this overflow case:
 
 - **Row 6:** The `├` junction from the unfocused version becomes `╰─╮`. The content right border is suppressed — instead, `╰` (the header's top-left corner curving right) bridges into the header top border `─`, ending at `╮` (header top-right corner). This creates the visual opening where the tab connects to the content.
@@ -719,6 +723,8 @@ At the content right border column: `╮` at row 0 (content top-right), `│` on
 **General principle for focused overflow on any side:** The open gap rule applies identically whether the header fits fully or overflows. The border segment between header and content is always suppressed when focused. In overflow cases, the gap interacts with the content corner glyph — the corner is replaced by the header's outer corner glyph curving into the header, and the content border is replaced by space for the extent of the gap.
 
 This same principle applies to `Side.Left` overflow (mirrored) and to `Side.Top`/`Side.Bottom` overflow on the horizontal axis.
+
+When a View has focus, (HasFocus == true), the title is shown using the focus visual role. The tab lines (but not the rest of the border) should be shown using the focus visual style too.
 
 ### Border Line Positioning with `BorderSettings.Tab`
 

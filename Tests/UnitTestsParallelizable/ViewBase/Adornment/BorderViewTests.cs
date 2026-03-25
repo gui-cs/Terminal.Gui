@@ -1039,7 +1039,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (view,
                        driver,
                        """
-                       ╭─ ───────╮
+                        ╭─────────╮
                         │T        │
                         │a        │
                         │b        │
@@ -1070,7 +1070,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (view,
                        driver,
                        """
-                       ╭─────── ─╮
+                       ╭─────────╮
                        │        T│
                        │        a│
                        │        b│
@@ -1113,6 +1113,34 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void Top_Unfocused_Depth2_WithTitle () // Copilot
+    {
+        IDriver driver = CreateTestDriver (9, 5);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   5,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true,
+                                   new Thickness (1, 2, 1, 1));
+
+        // Depth=2: cap line + closing edge with title. Separator on closing edge.
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───╮
+                       │Tab╰───╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
     public void Bottom_Focused_Depth2_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 5);
@@ -1124,6 +1152,33 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
+                                   "Tab",
+                                   true,
+                                   new Thickness (1, 1, 1, 2));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       │Tab╭───╯
+                       ╰───╯
+                       """);
+    }
+
+    [Fact]
+    public void Bottom_Unfocused_Depth2_WithTitle () // Copilot
+    {
+        IDriver driver = CreateTestDriver (9, 5);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   5,
+                                   Side.Bottom,
+                                   0,
+                                   null,
+                                   false,
                                    "Tab",
                                    true,
                                    new Thickness (1, 1, 1, 2));
@@ -1161,7 +1216,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (view,
                        driver,
                        """
-                       ╭ ───────╮
+                       ╭────────╮
                        │T       │
                        │a       │
                        │b       │
@@ -1194,7 +1249,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (view,
                        driver,
                        """
-                       ╭─────── ╮
+                       ╭────────╮
                        │       T│
                        │       a│
                        │       b│
@@ -1236,6 +1291,62 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void Top_Unfocused_Depth1_WithTitle () // Copilot
+    {
+        IDriver driver = CreateTestDriver (9, 4);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   4,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   false,
+                                   "Tab",
+                                   true,
+                                   new Thickness (1, 1, 1, 1));
+
+        // Depth=1: separator coincides with content border line.
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       │Tab╰───╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Focused_Depth1_LongTitle () // Copilot
+    {
+        // Title wider than content area → tab header spans full width.
+        IDriver driver = CreateTestDriver (15, 4);
+
+        View view = CreateTabView (driver,
+                                   15,
+                                   4,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   true,
+                                   "Long Title",
+                                   true,
+                                   new Thickness (1, 1, 1, 1));
+
+        // Depth=1: title on content border line, tab header = 12 wide (10+2 borders).
+        // Focused → open gap. Title fills the header interior.
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       │Long Title╰──╮
+                       │             │
+                       │             │
+                       ╰─────────────╯
+                       """);
+    }
+
+    [Fact]
     public void Bottom_Focused_Depth1_WithTitle ()
     {
         IDriver driver = CreateTestDriver (9, 4);
@@ -1247,6 +1358,32 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
+                                   "Tab",
+                                   true,
+                                   new Thickness (1, 1, 1, 1));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       │Tab╭───╯
+                       """);
+    }
+
+    [Fact]
+    public void Bottom_Unfocused_Depth1_WithTitle () // Copilot
+    {
+        IDriver driver = CreateTestDriver (9, 4);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   4,
+                                   Side.Bottom,
+                                   0,
+                                   null,
+                                   false,
                                    "Tab",
                                    true,
                                    new Thickness (1, 1, 1, 1));
@@ -1283,11 +1420,11 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (view,
                        driver,
                        """
-                       ───────╮
+                       ────────╮
                        T       │
                        a       │
                        b       │
-                       │       │
+                       ╮       │
                        │       │
                        │       │
                        │       │
@@ -1311,16 +1448,16 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    true,
                                    new Thickness (1, 1, 1, 1));
 
-        // Depth=1: no cap line, no tab edges. Title at rows 1-3.
-        // (8,0) excluded by AddTabSideContentBorder → trailing space stripped.
+        // Depth=1: no cap line, no tab edges. Title at rows 0-2.
+        // The top-right corner shows ─ (horizontal border continues; no vertical at the gap).
         DrawAndAssert (view,
                        driver,
                        """
-                       ╭───────
+                       ╭────────
                        │       T
                        │       a
                        │       b
-                       │       │
+                       │       ╭
                        │       │
                        │       │
                        │       │
@@ -1613,6 +1750,77 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         // This test documents current behavior. Expected string will be updated
         // when edge-based positioning is implemented.
+        subview.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void SuperView_Top_Depth1_Focused () // Copilot
+    {
+        // Thickness(1,1,1,1) → depth=1. Subview 9×4.
+        (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
+                                                                        6,
+                                                                        9,
+                                                                        4,
+                                                                        Side.Top,
+                                                                        0,
+                                                                        true,
+                                                                        "Tab",
+                                                                        true,
+                                                                        new Thickness (1, 1, 1, 1));
+
+        output.WriteLine (app.Driver!.ToString ());
+
+        // Per spec: Thickness.Top = 1, focused → title inline on content border, open gap
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭───────────╮
+                                              │◊◊◊◊◊◊◊◊◊◊◊│
+                                              │◊│Tab╰───╮◊│
+                                              │◊│       │◊│
+                                              │◊│       │◊│
+                                              │◊╰───────╯◊│
+                                              │◊◊◊◊◊◊◊◊◊◊◊│
+                                              ╰───────────╯
+                                              """,
+                                              output,
+                                              app.Driver!);
+
+        subview.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void SuperView_Top_Depth2_Focused () // Copilot
+    {
+        // Thickness(1,2,1,1) → depth=2. Subview 9×5.
+        (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
+                                                                        7,
+                                                                        9,
+                                                                        5,
+                                                                        Side.Top,
+                                                                        0,
+                                                                        true,
+                                                                        "Tab",
+                                                                        true,
+                                                                        new Thickness (1, 2, 1, 1));
+
+        output.WriteLine (app.Driver!.ToString ());
+
+        // Per spec: Thickness.Top = 2, focused → cap line + title on closing edge, open gap
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭───────────╮
+                                              │◊◊◊◊◊◊◊◊◊◊◊│
+                                              │◊╭───╮    ◊│
+                                              │◊│Tab╰───╮◊│
+                                              │◊│       │◊│
+                                              │◊│       │◊│
+                                              │◊╰───────╯◊│
+                                              │◊◊◊◊◊◊◊◊◊◊◊│
+                                              ╰───────────╯
+                                              """,
+                                              output,
+                                              app.Driver!);
+
         subview.Dispose ();
         app.Dispose ();
     }
