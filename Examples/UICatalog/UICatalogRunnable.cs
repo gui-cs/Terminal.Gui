@@ -1,7 +1,5 @@
 ﻿#nullable enable
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Terminal.Gui;
@@ -154,14 +152,7 @@ public sealed class UICatalogRunnable : Runnable
                                                                       "Project readme",
                                                                       () => Link.OpenUrl ("https://github.com/gui-cs/Terminal.Gui"),
                                                                       Key.F2),
-                                                        new MenuItem ("_About...",
-                                                                      "About UI Catalog",
-                                                                      () => MessageBox.Query (App!,
-                                                                                              "",
-                                                                                              GetAboutBoxMessage (),
-                                                                                              wrapMessage: false,
-                                                                                              buttons: Strings.btnOk),
-                                                                      Key.A.WithCtrl)
+                                                        new MenuItem ("_About...", "About UI Catalog", ShowAboutDialog, Key.A.WithCtrl)
                                                     ])
                                ]) { Title = "menuBar", Id = "menuBar" };
 
@@ -421,9 +412,7 @@ public sealed class UICatalogRunnable : Runnable
 
             CheckBox drawTraceCheckBox = new ()
             {
-                Text = "_Draw",
-                Value = Trace.EnabledCategories.HasFlag (TraceCategory.Draw) ? CheckState.Checked : CheckState.UnChecked,
-                CanFocus = false
+                Text = "_Draw", Value = Trace.EnabledCategories.HasFlag (TraceCategory.Draw) ? CheckState.Checked : CheckState.UnChecked, CanFocus = false
             };
 
             drawTraceCheckBox.ValueChanging += (_, e) =>
@@ -762,31 +751,127 @@ public sealed class UICatalogRunnable : Runnable
     #endregion Configuration Manager
 
     /// <summary>
-    ///     Gets the message displayed in the About Box. `public` so it can be used from Unit tests.
+    ///     The URL displayed in the About Box.
     /// </summary>
-    /// <returns></returns>
-    public static string GetAboutBoxMessage ()
+    public const string AboutUrl = "https://github.com/gui-cs/Terminal.Gui";
+
+    private void ShowAboutDialog ()
     {
-        // NOTE: Do not use multiline verbatim strings here.
-        // WSL gets all confused.
-        StringBuilder msg = new ();
-        msg.AppendLine ("UI Catalog: A comprehensive sample library and test app for");
-        msg.AppendLine ();
+        Dialog dialog = new () { Title = "", Buttons = [new Button { Title = Strings.btnOk, IsDefault = true }] };
 
-        msg.AppendLine ("""
-                         _______                  _             _   _____       _ 
-                        |__   __|                (_)           | | / ____|     (_)
-                           | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _ 
-                           | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | |
-                           | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |
-                           |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|
-                        """);
-        msg.AppendLine ();
-        msg.AppendLine ("v2 - Beta");
-        msg.AppendLine ();
-        msg.Append ("https://github.com/gui-cs/Terminal.Gui");
+        Label tagline = new ()
+        {
+            Text = "UI Catalog: A comprehensive sample library and test app for",
+            TextAlignment = Alignment.Center,
+            X = Pos.Center (),
+            Width = Dim.Auto (DimAutoStyle.Text),
+            Height = Dim.Auto (DimAutoStyle.Text)
+        };
 
-        return msg.ToString ();
+        GradientArtView asciiArt = new () { X = Pos.Center (), Y = Pos.Bottom (tagline) + 1 };
+
+        Link link = new ()
+        {
+            Text = AboutUrl,
+            Url = AboutUrl,
+            X = Pos.Center (),
+            Y = Pos.Bottom (asciiArt) + 1,
+            UseToolTip = true
+        };
+
+        dialog.Add (tagline, asciiArt, link);
+        dialog.Buttons.ElementAt (0).SetFocus ();
+        App!.Run (dialog);
+        dialog.Dispose ();
+    }
+
+    /// <summary>
+    ///     Renders the Terminal.Gui logo in box-drawing characters with a diagonal gradient.
+    /// </summary>
+    private sealed class GradientArtView : View
+    {
+        // @formatter:off
+        private const string ART = """
+                                    ╺┳╸┏━╸┏━┓┏┳┓╻┏┓╻┏━┓╻   ┏━╸╻ ╻╻
+                                     ┃ ┣╸ ┣┳┛┃┃┃┃┃┗┫┣━┫┃   ┃╺┓┃ ┃┃
+                                     ╹ ┗━╸╹┗╸╹ ╹╹╹ ╹╹ ╹┗━╸╹┗━┛┗━┛╹
+
+                                               v2 - Beta
+                                    """;
+
+        // @formatter:on
+
+        private static readonly string [] _artLines = ART.ReplaceLineEndings ("\n").Split ('\n');
+
+        public GradientArtView ()
+        {
+            int artWidth = _artLines.Select (line => line.Length).Prepend (0).Max ();
+
+            Width = artWidth;
+            Height = _artLines.Length;
+        }
+
+        /// <inheritdoc/>
+        protected override bool OnDrawingContent (DrawContext? context)
+        {
+            List<Color> stops =
+            [
+                new (0, 128, 255), // Bright Blue
+                new (0, 255, 128), // Bright Green
+                new (255, 255), // Bright Yellow
+                new (255, 128) // Bright Orange
+            ];
+
+            List<int> steps = [10];
+
+            Gradient gradient = new (stops, steps);
+
+            var artHeight = 3; // Only the box-drawing lines get the gradient
+            int artWidth = _artLines [0].Length;
+
+            Dictionary<Point, Color> colorMap = gradient.BuildCoordinateColorMapping (artHeight, artWidth, GradientDirection.Diagonal);
+
+            Attribute normalAttr = GetAttributeForRole (VisualRole.Normal);
+
+            for (var row = 0; row < _artLines.Length; row++)
+            {
+                string line = _artLines [row];
+
+                for (var col = 0; col < line.Length; col++)
+                {
+                    char ch = line [col];
+
+                    if (ch == ' ')
+                    {
+                        continue;
+                    }
+
+                    // Gradient only on the 3 art lines; version text uses normal color
+                    if (row < 3)
+                    {
+                        Point coord = new (col, row);
+
+                        if (colorMap.TryGetValue (coord, out Color color))
+                        {
+                            SetAttribute (new Attribute (color, normalAttr.Background));
+                        }
+                        else
+                        {
+                            SetAttribute (normalAttr);
+                        }
+                    }
+                    else
+                    {
+                        SetAttribute (normalAttr);
+                    }
+
+                    Move (col, row);
+                    AddStr (ch.ToString ());
+                }
+            }
+
+            return true;
+        }
     }
 
     /// <summary>

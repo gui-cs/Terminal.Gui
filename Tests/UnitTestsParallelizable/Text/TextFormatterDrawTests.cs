@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System.Text;
-using UICatalog;
 using UnitTests;
 
 // Alias Console to MockConsole so we don't accidentally use Console
@@ -417,46 +416,6 @@ Nice       Work")]
         tf.Draw (driver: driver, screen: new (0, 0, width, height), normalColor: Attribute.Default, hotColor: Attribute.Default);
 
         DriverAssert.AssertDriverContentsWithFrameAre (expectedText, output, driver);
-    }
-
-    [Fact]
-    public void UICatalog_AboutBox_Text ()
-    {
-        IDriver? driver = CreateTestDriver ();
-
-        TextFormatter tf = new ()
-        {
-            Text = UICatalogRunnable.GetAboutBoxMessage (),
-            Alignment = Alignment.Center,
-            VerticalAlignment = Alignment.Start,
-            WordWrap = false,
-            MultiLine = true,
-            HotKeySpecifier = (Rune)0xFFFF
-        };
-
-        Size tfSize = tf.FormatAndGetSize ();
-
-        driver!.SetScreenSize (tfSize.Width, tfSize.Height);
-
-        driver.FillRect (driver.Screen, (Rune)'*');
-        tf.Draw (driver: driver, screen: driver.Screen, normalColor: Attribute.Default, hotColor: Attribute.Default);
-
-        var expectedText = """
-                           UI Catalog: A comprehensive sample library and test app for
-                           ***********************************************************
-                            _______                  _             _   _____       _ *
-                           |__   __|                (_)           | | / ____|     (_)*
-                              | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _ *
-                              | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | |*
-                              | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |*
-                              |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|*
-                           ***********************************************************
-                           *************************v2 - Beta*************************
-                           ***********************************************************
-                           **********https://github.com/gui-cs/Terminal.Gui***********
-                           """;
-
-        DriverAssert.AssertDriverContentsAre (expectedText.ReplaceLineEndings (), output, driver);
     }
 
     #region FormatAndGetSizeTests
