@@ -251,6 +251,7 @@ public partial class BorderView : AdornmentView
     ///     Draws the title text inside the tab header area. For Top/Bottom, the text is horizontal.
     ///     For Left/Right, the text is drawn vertically (one character per row).
     /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"></exception>
     private void DrawTitleInTabHeader (Border border, Rectangle borderBounds, DrawContext? context)
     {
         if (Adornment?.Parent is null || Driver is null)
@@ -285,7 +286,7 @@ public partial class BorderView : AdornmentView
         // For depth <= 2, there's no interior — title goes ON the closing edge (between side borders).
         Rectangle contentArea = depth >= 3
                                     ? TabHeaderRenderer.GetContentArea (headerRect, clipped, border.TabSide)
-                                    : computeClosingEdgeTitleArea (headerRect, clipped, border.TabSide);
+                                    : ComputeClosingEdgeTitleArea (headerRect, clipped, border.TabSide);
 
         if (contentArea.IsEmpty)
         {
@@ -300,20 +301,27 @@ public partial class BorderView : AdornmentView
                 // When the header is clipped on the left, skip the first N title characters
                 int titleSkipChars = contentArea.X > headerRect.X + 1 ? contentArea.X - (headerRect.X + 1) : 0;
                 string visibleTitle = titleSkipChars > 0 && titleSkipChars < titleLength ? title [titleSkipChars..] : title;
-                int titleWidth = Math.Min (visibleTitle.GetColumns (), contentArea.Width);
+
+                // Measure display width accounting for hotkey markers
+                Adornment.Parent.TitleTextFormatter.Text = visibleTitle;
+                int visibleWidth = Adornment.Parent.TitleTextFormatter.FormatAndGetSize (new Size (contentArea.Width, 1)).Width;
+                int titleWidth = Math.Min (visibleWidth, contentArea.Width);
 
                 if (titleWidth <= 0)
                 {
+                    Adornment.Parent.TitleTextFormatter.Text = title;
+
                     break;
                 }
 
-                Rectangle titleRect = new (contentArea.X, contentArea.Y, titleWidth, 1);
-                Adornment.Parent.TitleTextFormatter.Text = visibleTitle;
+                Rectangle titleRect = contentArea with { Width = titleWidth, Height = 1 };
+                Size savedConstraint = Adornment.Parent.TitleTextFormatter.ConstrainToSize ?? Size.Empty;
                 Adornment.Parent.TitleTextFormatter.ConstrainToSize = new Size (titleWidth, 1);
                 Adornment.Parent.TitleTextFormatter.Draw (Driver, titleRect, normalAttr, hotAttr);
 
-                // Restore the original title text
+                // Restore the original title text and constraint
                 Adornment.Parent.TitleTextFormatter.Text = title;
+                Adornment.Parent.TitleTextFormatter.ConstrainToSize = savedConstraint;
 
                 LastTitleRect = titleRect;
                 context?.AddDrawnRectangle (titleRect);
@@ -327,32 +335,50 @@ public partial class BorderView : AdornmentView
             {
                 // When the header is clipped on the top, skip the first N title characters
                 int titleSkipChars = contentArea.Y > headerRect.Y + 1 ? contentArea.Y - (headerRect.Y + 1) : 0;
-                int maxChars = Math.Min (titleLength, contentArea.Height);
+                string visibleTitle = titleSkipChars > 0 && titleSkipChars < titleLength ? title [titleSkipChars..] : title;
 
-                for (var i = 0; i < maxChars; i++)
+                // Set up TextFormatter for vertical rendering
+                TextDirection savedDirection = Adornment.Parent.TitleTextFormatter.Direction;
+                Size savedConstraint = Adornment.Parent.TitleTextFormatter.ConstrainToSize ?? Size.Empty;
+                Adornment.Parent.TitleTextFormatter.Direction = TextDirection.TopBottom_LeftRight;
+                Adornment.Parent.TitleTextFormatter.Text = visibleTitle;
+
+                // Measure display height accounting for hotkey markers
+                int visibleHeight = Adornment.Parent.TitleTextFormatter.FormatAndGetSize (new Size (1, contentArea.Height)).Height;
+                int maxChars = Math.Min (visibleHeight, contentArea.Height);
+
+                if (maxChars <= 0)
                 {
-                    int charIdx = titleSkipChars + i;
+                    Adornment.Parent.TitleTextFormatter.Direction = savedDirection;
+                    Adornment.Parent.TitleTextFormatter.Text = title;
+                    Adornment.Parent.TitleTextFormatter.ConstrainToSize = savedConstraint;
 
-                    if (charIdx >= titleLength)
-                    {
-                        continue;
-                    }
-                    Driver.Move (contentArea.X, contentArea.Y + i);
-                    SetAttribute (normalAttr);
-                    Driver.AddRune (title [charIdx]);
+                    break;
                 }
 
-                Rectangle titleRect = new (contentArea.X, contentArea.Y, 1, maxChars);
+                Rectangle titleRect = contentArea with { Width = 1, Height = maxChars };
+                Adornment.Parent.TitleTextFormatter.ConstrainToSize = new Size (1, maxChars);
+                Adornment.Parent.TitleTextFormatter.Draw (Driver, titleRect, normalAttr, hotAttr);
+
+                // Restore
+                Adornment.Parent.TitleTextFormatter.Direction = savedDirection;
+                Adornment.Parent.TitleTextFormatter.Text = title;
+                Adornment.Parent.TitleTextFormatter.ConstrainToSize = savedConstraint;
+
                 LastTitleRect = titleRect;
                 context?.AddDrawnRectangle (titleRect);
                 Adornment.Parent.LineCanvas.Exclude (new Region (titleRect));
 
                 break;
             }
+
+            default: throw new ArgumentOutOfRangeException ();
         }
 
+        return;
+
         // For depth <= 2, title goes ON the closing edge row/col (between the side border edges).
-        static Rectangle computeClosingEdgeTitleArea (Rectangle headerRect, Rectangle clipped, Side side)
+        static Rectangle ComputeClosingEdgeTitleArea (Rectangle headerRect, Rectangle clipped, Side side)
         {
             switch (side)
             {

@@ -96,7 +96,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         Assert.Equal (5, view.Border.TabLength!.Value);
@@ -125,7 +125,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    2,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         DrawAndAssert (view,
@@ -152,7 +152,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    5,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         DrawAndAssert (view,
@@ -179,7 +179,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         DrawAndAssert (view,
@@ -206,7 +206,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    2,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         DrawAndAssert (view,
@@ -233,7 +233,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    5,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         DrawAndAssert (view,
@@ -318,7 +318,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    -1,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         DrawAndAssert (view,
@@ -345,7 +345,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    -1,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         view.Border.Thickness = new Thickness (5, 5, 5, 5);
@@ -380,7 +380,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         view.Border.Thickness = new Thickness (5, 5, 5, 5);
@@ -415,7 +415,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         view.Border.Thickness = new Thickness (5, 5, 5, 5);
@@ -450,7 +450,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    -5,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         view.Border.Thickness = new Thickness (5, 5, 5, 5);
@@ -482,7 +482,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    -2,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         // Header at X=-2. Left edge and 'T' clipped. Visible: cap ──╮, title ab│.
@@ -510,7 +510,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    -4,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         // Header at X=-4. Only right edge visible at col 0. No title visible.
@@ -538,7 +538,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    -5,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         // Header completely off-screen. Content border drawn normally.
@@ -569,7 +569,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         Assert.Equal (5, view.Border.TabLength!.Value);
@@ -598,7 +598,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         DrawAndAssert (view,
@@ -625,7 +625,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    2,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         DrawAndAssert (view,
@@ -652,7 +652,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    -1,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         DrawAndAssert (view,
@@ -713,7 +713,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         Assert.Equal (5, view.Border.TabLength!.Value);
@@ -777,7 +777,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    2,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         DrawAndAssert (view,
@@ -807,7 +807,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    6,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         DrawAndAssert (view,
@@ -842,7 +842,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         Assert.Equal (5, view.Border.TabLength!.Value);
@@ -906,7 +906,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    2,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         DrawAndAssert (view,
@@ -936,7 +936,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    6,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true);
 
         DrawAndAssert (view,
@@ -976,7 +976,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true,
                                    new Thickness (1, 4, 1, 1));
 
@@ -1004,7 +1004,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true,
                                    new Thickness (1, 1, 1, 4));
 
@@ -1032,7 +1032,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true,
                                    new Thickness (4, 1, 1, 1));
 
@@ -1063,7 +1063,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true,
                                    new Thickness (1, 1, 4, 1));
 
@@ -1097,7 +1097,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true,
                                    new Thickness (1, 2, 1, 1));
 
@@ -1124,7 +1124,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true,
                                    new Thickness (1, 2, 1, 1));
 
@@ -1152,7 +1152,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true,
                                    new Thickness (1, 1, 1, 2));
 
@@ -1179,7 +1179,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true,
                                    new Thickness (1, 1, 1, 2));
 
@@ -1206,7 +1206,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true,
                                    new Thickness (2, 1, 1, 1));
 
@@ -1240,7 +1240,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true,
                                    new Thickness (1, 1, 2, 1));
 
@@ -1276,7 +1276,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true,
                                    new Thickness (1, 1, 1, 1));
 
@@ -1302,7 +1302,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true,
                                    new Thickness (1, 1, 1, 1));
 
@@ -1358,7 +1358,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true,
                                    new Thickness (1, 1, 1, 1));
 
@@ -1384,7 +1384,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    false,
-                                   "Tab",
+                                   "T_ab",
                                    true,
                                    new Thickness (1, 1, 1, 1));
 
@@ -1410,7 +1410,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true,
                                    new Thickness (1, 1, 1, 1));
 
@@ -1444,7 +1444,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    0,
                                    null,
                                    true,
-                                   "Tab",
+                                   "T_ab",
                                    true,
                                    new Thickness (1, 1, 1, 1));
 
@@ -1563,7 +1563,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                                                         Side.Top,
                                                                         0,
                                                                         true,
-                                                                        "Tab",
+                                                                        "T_ab",
                                                                         true);
 
         output.WriteLine (app.Driver!.ToString ());
@@ -1599,7 +1599,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                                                         Side.Top,
                                                                         0,
                                                                         false,
-                                                                        "Tab",
+                                                                        "T_ab",
                                                                         true);
 
         output.WriteLine (app.Driver!.ToString ());
@@ -1633,7 +1633,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                                                         Side.Top,
                                                                         -2,
                                                                         false,
-                                                                        "Tab",
+                                                                        "T_ab",
                                                                         true);
 
         output.WriteLine (app.Driver!.ToString ());
@@ -1668,7 +1668,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                                                         Side.Top,
                                                                         -2,
                                                                         false,
-                                                                        "Tab",
+                                                                        "T_ab",
                                                                         true);
 
         // Bug #4853: cap-line extension bleeds into Margin when Margin has thickness.
@@ -1706,7 +1706,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                                                         Side.Top,
                                                                         -5,
                                                                         false,
-                                                                        "Tab",
+                                                                        "T_ab",
                                                                         true);
 
         output.WriteLine (app.Driver!.ToString ());
@@ -1742,7 +1742,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                                                         Side.Top,
                                                                         0,
                                                                         false,
-                                                                        "Tab",
+                                                                        "T_ab",
                                                                         true,
                                                                         new Thickness (3, 3, 3, 3));
 
@@ -1765,7 +1765,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                                                         Side.Top,
                                                                         0,
                                                                         true,
-                                                                        "Tab",
+                                                                        "T_ab",
                                                                         true,
                                                                         new Thickness (1, 1, 1, 1));
 
@@ -1800,7 +1800,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                                                         Side.Top,
                                                                         0,
                                                                         true,
-                                                                        "Tab",
+                                                                        "T_ab",
                                                                         true,
                                                                         new Thickness (1, 2, 1, 1));
 
