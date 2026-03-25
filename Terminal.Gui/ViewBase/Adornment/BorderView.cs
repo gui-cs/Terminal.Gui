@@ -1,5 +1,3 @@
-using Terminal.Gui.Drawing;
-
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
@@ -260,11 +258,12 @@ public partial class BorderView : AdornmentView
             return;
         }
 
-        string title = Adornment.Parent.Title ?? "";
-        int tabLength = border.TabLength!.Value;
+        string title = Adornment.Parent.Title;
+        int titleLength = Adornment.Parent.TitleTextFormatter.FormatAndGetSize ().Width;
+        int tabLength = border.TabLength ?? titleLength + 2;
         int tabInteriorSize = tabLength - 2;
 
-        if (tabInteriorSize <= 0 || title.Length == 0)
+        if (tabInteriorSize <= 0 || string.IsNullOrEmpty (title))
         {
             return;
         }
@@ -299,12 +298,8 @@ public partial class BorderView : AdornmentView
             case Side.Bottom:
             {
                 // When the header is clipped on the left, skip the first N title characters
-                int titleSkipChars = contentArea.X > headerRect.X + 1
-                                         ? contentArea.X - (headerRect.X + 1)
-                                         : 0;
-                string visibleTitle = titleSkipChars > 0 && titleSkipChars < title.Length
-                                          ? title.Substring (titleSkipChars)
-                                          : title;
+                int titleSkipChars = contentArea.X > headerRect.X + 1 ? contentArea.X - (headerRect.X + 1) : 0;
+                string visibleTitle = titleSkipChars > 0 && titleSkipChars < titleLength ? title [titleSkipChars..] : title;
                 int titleWidth = Math.Min (visibleTitle.GetColumns (), contentArea.Width);
 
                 if (titleWidth <= 0)
@@ -331,22 +326,20 @@ public partial class BorderView : AdornmentView
             case Side.Right:
             {
                 // When the header is clipped on the top, skip the first N title characters
-                int titleSkipChars = contentArea.Y > headerRect.Y + 1
-                                         ? contentArea.Y - (headerRect.Y + 1)
-                                         : 0;
-                int maxChars = Math.Min (title.GetColumns (), contentArea.Height);
-                int startIdx = titleSkipChars;
+                int titleSkipChars = contentArea.Y > headerRect.Y + 1 ? contentArea.Y - (headerRect.Y + 1) : 0;
+                int maxChars = Math.Min (titleLength, contentArea.Height);
 
                 for (var i = 0; i < maxChars; i++)
                 {
-                    int charIdx = startIdx + i;
+                    int charIdx = titleSkipChars + i;
 
-                    if (charIdx < title.Length)
+                    if (charIdx >= titleLength)
                     {
-                        Driver.Move (contentArea.X, contentArea.Y + i);
-                        SetAttribute (normalAttr);
-                        Driver.AddRune (title [charIdx]);
+                        continue;
                     }
+                    Driver.Move (contentArea.X, contentArea.Y + i);
+                    SetAttribute (normalAttr);
+                    Driver.AddRune (title [charIdx]);
                 }
 
                 Rectangle titleRect = new (contentArea.X, contentArea.Y, 1, maxChars);
@@ -369,7 +362,7 @@ public partial class BorderView : AdornmentView
                     int left = clipped.X == headerRect.X ? clipped.X + 1 : clipped.X;
                     int right = clipped.Right == headerRect.Right ? clipped.Right - 1 : clipped.Right;
 
-                    return right - left > 0 ? new (left, y, right - left, 1) : Rectangle.Empty;
+                    return right - left > 0 ? new Rectangle (left, y, right - left, 1) : Rectangle.Empty;
                 }
 
                 case Side.Bottom:
@@ -378,7 +371,7 @@ public partial class BorderView : AdornmentView
                     int left = clipped.X == headerRect.X ? clipped.X + 1 : clipped.X;
                     int right = clipped.Right == headerRect.Right ? clipped.Right - 1 : clipped.Right;
 
-                    return right - left > 0 ? new (left, y, right - left, 1) : Rectangle.Empty;
+                    return right - left > 0 ? new Rectangle (left, y, right - left, 1) : Rectangle.Empty;
                 }
 
                 case Side.Left:
@@ -387,7 +380,7 @@ public partial class BorderView : AdornmentView
                     int top = clipped.Y == headerRect.Y ? clipped.Y + 1 : clipped.Y;
                     int bottom = clipped.Bottom == headerRect.Bottom ? clipped.Bottom - 1 : clipped.Bottom;
 
-                    return bottom - top > 0 ? new (x, top, 1, bottom - top) : Rectangle.Empty;
+                    return bottom - top > 0 ? new Rectangle (x, top, 1, bottom - top) : Rectangle.Empty;
                 }
 
                 case Side.Right:
@@ -396,7 +389,7 @@ public partial class BorderView : AdornmentView
                     int top = clipped.Y == headerRect.Y ? clipped.Y + 1 : clipped.Y;
                     int bottom = clipped.Bottom == headerRect.Bottom ? clipped.Bottom - 1 : clipped.Bottom;
 
-                    return bottom - top > 0 ? new (x, top, 1, bottom - top) : Rectangle.Empty;
+                    return bottom - top > 0 ? new Rectangle (x, top, 1, bottom - top) : Rectangle.Empty;
                 }
 
                 default:
@@ -408,13 +401,13 @@ public partial class BorderView : AdornmentView
     private int GetTabDepth (Border border)
     {
         int thickness = border.TabSide switch
-        {
-            Side.Top => Adornment!.Thickness.Top,
-            Side.Bottom => Adornment!.Thickness.Bottom,
-            Side.Left => Adornment!.Thickness.Left,
-            Side.Right => Adornment!.Thickness.Right,
-            _ => 3
-        };
+                        {
+                            Side.Top => Adornment!.Thickness.Top,
+                            Side.Bottom => Adornment!.Thickness.Bottom,
+                            Side.Left => Adornment!.Thickness.Left,
+                            Side.Right => Adornment!.Thickness.Right,
+                            _ => 3
+                        };
 
         return Math.Min (thickness, 3);
     }
@@ -439,7 +432,7 @@ public partial class BorderView : AdornmentView
             return true;
         }
 
-        if (border.LineStyle is null || border.LineStyle == LineStyle.None)
+        if (border.LineStyle is null or LineStyle.None)
         {
             return true;
         }
@@ -652,9 +645,7 @@ public partial class BorderView : AdornmentView
 
         if (drawTop)
         {
-            if (borderBounds.Width < 4
-                || !hasTitle
-                || string.IsNullOrEmpty (Adornment.Parent?.Title))
+            if (borderBounds.Width < 4 || !hasTitle || string.IsNullOrEmpty (Adornment.Parent?.Title))
             {
                 if (border.LineStyle is { })
                 {

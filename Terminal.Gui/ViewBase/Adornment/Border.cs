@@ -113,7 +113,7 @@ public class Border : AdornmentImpl
             if (field is null && Settings.HasFlag (BorderSettings.Tab))
             {
                 int titleColumns = Settings.HasFlag (BorderSettings.Title)
-                                       ? Parent?.Title?.GetColumns () ?? 0
+                                       ? Parent?.TitleTextFormatter.FormatAndGetSize ().Width ?? 0
                                        : 0;
 
                 // Two vertical border lines + title text width (2 when no title)
