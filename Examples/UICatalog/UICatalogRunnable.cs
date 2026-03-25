@@ -156,11 +156,7 @@ public sealed class UICatalogRunnable : Runnable
                                                                       Key.F2),
                                                         new MenuItem ("_About...",
                                                                       "About UI Catalog",
-                                                                      () => MessageBox.Query (App!,
-                                                                                              "",
-                                                                                              GetAboutBoxMessage (),
-                                                                                              wrapMessage: false,
-                                                                                              buttons: Strings.btnOk),
+                                                                      ShowAboutDialog,
                                                                       Key.A.WithCtrl)
                                                     ])
                                ]) { Title = "menuBar", Id = "menuBar" };
@@ -762,31 +758,63 @@ public sealed class UICatalogRunnable : Runnable
     #endregion Configuration Manager
 
     /// <summary>
-    ///     Gets the message displayed in the About Box. `public` so it can be used from Unit tests.
+    ///     The URL displayed in the About Box.
     /// </summary>
-    /// <returns></returns>
-    public static string GetAboutBoxMessage ()
+    public const string AboutUrl = "https://github.com/gui-cs/Terminal.Gui";
+
+    private void ShowAboutDialog ()
     {
+        Dialog dialog = new ()
+        {
+            Title = "",
+            Buttons = [new Button { Title = Strings.btnOk, IsDefault = true }]
+        };
+
+        Label tagline = new ()
+        {
+            Text = "UI Catalog: A comprehensive sample library and test app for",
+            TextAlignment = Alignment.Center,
+            X = Pos.Center (),
+            Width = Dim.Auto (DimAutoStyle.Text),
+            Height = Dim.Auto (DimAutoStyle.Text)
+        };
+
         // NOTE: Do not use multiline verbatim strings here.
         // WSL gets all confused.
-        StringBuilder msg = new ();
-        msg.AppendLine ("UI Catalog: A comprehensive sample library and test app for");
-        msg.AppendLine ();
-
-        msg.AppendLine ("""
-                         _______                  _             _   _____       _ 
+        StringBuilder art = new ();
+        art.AppendLine ("""
+                         _______                  _             _   _____       _
                         |__   __|                (_)           | | / ____|     (_)
-                           | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _ 
+                           | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _
                            | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | |
                            | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |
                            |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|
                         """);
-        msg.AppendLine ();
-        msg.AppendLine ("v2 - Beta");
-        msg.AppendLine ();
-        msg.Append ("https://github.com/gui-cs/Terminal.Gui");
+        art.Append ("v2 - Beta");
 
-        return msg.ToString ();
+        Label asciiArt = new ()
+        {
+            Text = art.ToString (),
+            TextAlignment = Alignment.Center,
+            X = Pos.Center (),
+            Y = Pos.Bottom (tagline) + 1,
+            Width = Dim.Auto (DimAutoStyle.Text),
+            Height = Dim.Auto (DimAutoStyle.Text)
+        };
+
+        Link link = new ()
+        {
+            Text = AboutUrl,
+            Url = AboutUrl,
+            X = Pos.Center (),
+            Y = Pos.Bottom (asciiArt) + 1,
+            UseToolTip = true
+        };
+
+        dialog.Add (tagline, asciiArt, link);
+        dialog.Buttons.ElementAt (0).SetFocus ();
+        App!.Run (dialog);
+        dialog.Dispose ();
     }
 
     /// <summary>

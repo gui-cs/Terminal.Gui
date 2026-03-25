@@ -57,7 +57,8 @@ namespace Terminal.Gui.Views;
 ///             <term>Mouse Event</term> <description>Action</description>
 ///         </listheader>
 ///         <item>
-///             <term>Click</term> <description>Accepts the link, opening the URL (<see cref="Command.Accept"/>).</description>
+///             <term>Click</term>
+///             <description>Accepts the link, opening the URL (<see cref="Command.Accept"/>).</description>
 ///         </item>
 ///     </list>
 /// </remarks>
@@ -76,7 +77,7 @@ public class Link : View, IDesignable
         // On HotKey, pass it to the next view
         AddCommand (Command.HotKey, InvokeHotKeyOnNextPeer!);
 
-        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Accept);
+        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
     }
 
     /// <summary>
@@ -99,11 +100,11 @@ public class Link : View, IDesignable
     ///     Called when the link is accepted (e.g., clicked or <see cref="Command.Accept"/> is invoked).
     ///     Opens <see cref="Url"/> in the default browser via <see cref="OpenUrl"/>.
     /// </summary>
-    protected override void OnAccepted (ICommandContext? ctx)
+    protected override void OnActivated (ICommandContext? ctx)
     {
-        base.OnAccepted (ctx);
-
         OpenUrl (Url);
+
+        base.OnActivated (ctx);
     }
 
     /// <summary>
@@ -120,7 +121,7 @@ public class Link : View, IDesignable
     /// <param name="url">The URL to open. Should be a well-formed absolute URI.</param>
     public static void OpenUrl (string url)
     {
-        if (!Uri.IsWellFormedUriString (url, UriKind.Absolute))
+        if (!Uri.IsWellFormedUriString (url, UriKind.Absolute) || Environment.GetEnvironmentVariable ("DisableRealDriverIO") is { })
         {
             return;
         }
@@ -177,8 +178,7 @@ public class Link : View, IDesignable
     }
 
     private string _url = "";
-    private bool _isUrlValid = false;
-    private bool _useToolTip = false;
+    private bool _isUrlValid;
 
     /// <summary>
     ///     Gets or sets a value indicating whether a tooltip displaying the <see cref="Url"/> should be shown
@@ -195,17 +195,17 @@ public class Link : View, IDesignable
     /// </remarks>
     public bool UseToolTip
     {
-        get => _useToolTip;
+        get;
         set
         {
-            if (_useToolTip == value)
+            if (field == value)
             {
                 return;
             }
 
-            _useToolTip = value;
+            field = value;
 
-            if (_useToolTip)
+            if (field)
             {
                 EnsureToolTipCreated ();
             }
@@ -214,7 +214,7 @@ public class Link : View, IDesignable
                 DisposeToolTip ();
             }
         }
-    }
+    } = false;
 
     /// <summary>
     ///     Gets or sets the URL (hyperlink target) associated with this <see cref="Link"/>.
@@ -281,15 +281,17 @@ public class Link : View, IDesignable
             return true;
         }
 
-        if (HotKey.IsValid)
+        if (!HotKey.IsValid)
         {
-            // If the Link has a hotkey, we need to find the next view in the subview list
-            int me = SuperView?.SubViews.IndexOf (this) ?? -1;
+            return false;
+        }
 
-            if (me != -1 && me < SuperView?.SubViews.Count - 1)
-            {
-                return SuperView?.SubViews.ElementAt (me + 1).InvokeCommand (Command.HotKey) == true;
-            }
+        // If the Link has a hotkey, we need to find the next view in the subview list
+        int me = SuperView?.SubViews.IndexOf (this) ?? -1;
+
+        if (me != -1 && me < SuperView?.SubViews.Count - 1)
+        {
+            return SuperView?.SubViews.ElementAt (me + 1).InvokeCommand (Command.HotKey) == true;
         }
 
         return false;
@@ -429,21 +431,10 @@ public class Link : View, IDesignable
             return;
         }
 
-        _toolTip = new ToolTip<Label>
-        {
-            ContentView = new Label(),
-            Target = new WeakReference<View> (this),
-            Anchor = () => FrameToScreen ()
-        };
+        _toolTip = new ToolTip<Label> { ContentView = new Label (), Target = new WeakReference<View> (this), Anchor = () => FrameToScreen () };
     }
 
-    private void UpdateToolTipText ()
-    {
-        if (_toolTip?.ContentView is { })
-        {
-            _toolTip.ContentView.Text = Url;
-        }
-    }
+    private void UpdateToolTipText () => _toolTip?.ContentView?.Text = Url;
 
     private void DisposeToolTip ()
     {
