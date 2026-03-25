@@ -137,22 +137,18 @@ public partial class View // Drawing APIs
             DoDrawContent (context);
 
             // ------------------------------------
-            // Draw the line canvas
-            // Restore the clip before rendering the line canvas and adornment subviews
-            // because they may draw outside the viewport.
+            // Draw adornment SubViews BEFORE rendering LineCanvas so their lines
+            // (merged via LineCanvas.Merge) participate in auto-join.
+            // Restore the clip because adornment subviews may draw outside the viewport.
             SetClip (originalClip);
             originalClip = AddFrameToClip ();
-            Trace.Draw (this.ToIdentifyingString (), "LineCanvas");
-            DoRenderLineCanvas (context);
+            Trace.Draw (this.ToIdentifyingString (), "AdornmentSubViews");
+            DoDrawAdornmentsSubViews (context);
 
             // ------------------------------------
-            // Re-draw the Border and Padding Adornment SubViews
-            // HACK: This is a hack to ensure that the Border and Padding Adornment SubViews are drawn after the line canvas.
-            // BUG: This means adornment SubView border lines (merged via LineCanvas.Merge) arrive AFTER
-            // DoRenderLineCanvas has already rendered and cleared the parent's LineCanvas. Auto-join between
-            // adornment SubView borders and the parent's border doesn't work in a single frame.
-            // See AdornmentSubViewLineCanvasTests for failing tests that demonstrate this.
-            DoDrawAdornmentsSubViews (context);
+            // Draw the line canvas (includes merged lines from adornment SubViews)
+            Trace.Draw (this.ToIdentifyingString (), "LineCanvas");
+            DoRenderLineCanvas (context);
 
             // ------------------------------------
             // Advance the diagnostics draw indicator
@@ -212,7 +208,13 @@ public partial class View // Drawing APIs
                     subview.SetNeedsDraw ();
                 }
 
-                LineCanvas.Exclude (new Region (subview.FrameToScreen ()));
+                // Only Exclude SubViews that don't merge their LC into the parent.
+                // SuperViewRendersLineCanvas SubViews contribute LC lines via Merge, and
+                // excluding them would prevent those merged lines from rendering.
+                if (!subview.SuperViewRendersLineCanvas)
+                {
+                    LineCanvas.Exclude (new Region (subview.FrameToScreen ()));
+                }
             }
 
             Region? saved = borderView.AddFrameToClip ();
@@ -773,6 +775,7 @@ public partial class View // Drawing APIs
             {
                 continue;
             }
+
             LineCanvas.Merge (view.LineCanvas);
             view.LineCanvas.Clear ();
         }

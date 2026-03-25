@@ -1,126 +1,78 @@
 // Copilot
+using Terminal.Gui.Tracing;
 using UnitTests;
 
 namespace ViewBaseTests.Draw;
 
 /// <summary>
-///     Tests that SubViews of Border (and Padding) adornments can have their own border lines
-///     that auto-join with the parent View's border lines via <see cref="LineCanvas"/> merging.
-///     These tests verify that the draw pipeline renders all lines in a single frame — no
-///     one-frame delay for auto-join between adornment SubView borders and parent borders.
+///     Tests that SubViews of adornments with <see cref="View.SuperViewRendersLineCanvas"/> = true
+///     get their border lines auto-joined with the parent View's border lines.
 ///
-///     BUG: <see cref="View.DoDrawAdornmentsSubViews"/> runs AFTER <see cref="View.DoRenderLineCanvas"/>,
-///     so adornment SubView border lines merged via <see cref="LineCanvas.Merge"/> arrive too late for
-///     auto-join. The fix is to move <see cref="View.DoDrawAdornmentsSubViews"/> BEFORE
-///     <see cref="View.DoRenderLineCanvas"/> in the draw pipeline.
+///     BUG (#4854): <see cref="View.DoDrawAdornmentsSubViews"/> runs AFTER
+///     <see cref="View.DoRenderLineCanvas"/> in the draw pipeline, so merged lines arrive too late.
 /// </summary>
 public class AdornmentSubViewLineCanvasTests (ITestOutputHelper output) : TestDriverBase
 {
     /// <summary>
-    ///     A View with a bordered SubView inside its Border adornment. The SubView's bottom border
-    ///     sits on the same row as the parent's content border. With correct auto-join, the
-    ///     SubView's bottom-left corner should become a ┴ junction (bottom of SubView side edge
-    ///     meets parent's horizontal content border). Without auto-join, it's └ (no merge).
+    ///     Simplest repro: A 7×3 View with only a top border line. A SubView in the Border
+    ///     adds a double-line segment via SuperViewRendersLineCanvas. The ═ should appear
+    ///     but doesn't because the merge happens after the LineCanvas was already rendered.
     /// </summary>
-    [Fact (Skip = "BUG: DoDrawAdornmentsSubViews runs after DoRenderLineCanvas — auto-join fails")]
-    public void BorderSubView_WithBorder_AutoJoins_ParentBorder ()
+    [Fact]
+    public void BorderSubView_Lines_Not_Rendered ()
     {
-        IDriver driver = CreateTestDriver (12, 6);
+        using IDisposable tracing = TestLogging.Verbose (output, TraceCategory.Draw);
+
+        IDriver driver = CreateTestDriver (7, 3);
         driver.Clip = new Region (driver.Screen);
 
-        // Parent: 12×6, top border thickness = 3 so rows 0-2 are border, row 2 is content border
         View parent = new ()
         {
+            Id = "parent",
             Driver = driver,
-            Width = 12,
-            Height = 6,
-            BorderStyle = LineStyle.Single
-        };
-        parent.Border.Thickness = new Thickness (1, 3, 1, 1);
-
-        // SubView: 4×3 at (1,0) in border area. Its bottom edge is at row 2 = content border row.
-        // SuperViewRendersLineCanvas = true so its border lines merge into parent's LineCanvas.
-        View borderSubView = new ()
-        {
-            X = 1,
-            Y = 0,
-            Width = 4,
+            Width = 7,
             Height = 3,
-            BorderStyle = LineStyle.Single,
-            SuperViewRendersLineCanvas = true,
-            Text = "Hi"
-        };
-        parent.Border.GetOrCreateView ().Add (borderSubView);
-
-        parent.BeginInit ();
-        parent.EndInit ();
-        parent.Layout ();
-        parent.Draw ();
-
-        output.WriteLine (driver.ToString ());
-
-        string driverContents = driver.ToString ()!;
-
-        // Verify the SubView's text is visible
-        Assert.Contains ("Hi", driverContents);
-
-        // With auto-join working correctly, the SubView's bottom-left corner (└) should merge
-        // with the parent's horizontal content border (─) to become ┴ (T-junction from above).
-        // Similarly bottom-right corner (┘) → ┴.
-        //
-        // Without the fix: SubView's lines are merged AFTER parent LC is rendered.
-        // Auto-join doesn't happen — ┴ never appears.
-        Assert.Contains ("┴", driverContents);
-    }
-
-    /// <summary>
-    ///     Same as above but with the SubView on the left side of the border.
-    ///     Verifies auto-join works for vertical borders meeting horizontal borders.
-    /// </summary>
-    [Fact (Skip = "BUG: DoDrawAdornmentsSubViews runs after DoRenderLineCanvas — auto-join fails")]
-    public void PaddingSubView_WithBorder_AutoJoins_ParentBorder ()
-    {
-        IDriver driver = CreateTestDriver (12, 6);
-        driver.Clip = new Region (driver.Screen);
-
-        // Parent: 12×6, padding thickness = 2 on top, border = 1 all around
-        View parent = new ()
-        {
-            Driver = driver,
-            Width = 12,
-            Height = 6,
             BorderStyle = LineStyle.Single
         };
-        parent.Border.Thickness = new Thickness (1);
-        parent.Padding.Thickness = new Thickness (0, 2, 0, 0);
+        parent.Border.Thickness = new Thickness (0, 1, 0, 0);
 
-        // SubView in Padding with its own border, SuperViewRendersLineCanvas = true
-        View paddingSubView = new ()
+        View sub = new ()
         {
-            X = 1,
+            Id = "sub",
+            X = 2,
             Y = 0,
-            Width = 4,
-            Height = 2,
-            BorderStyle = LineStyle.Single,
-            SuperViewRendersLineCanvas = true,
-            Text = "P"
+            Width = 3,
+            Height = 1,
+            SuperViewRendersLineCanvas = true
         };
-        parent.Padding.GetOrCreateView ().Add (paddingSubView);
+        parent.Border.GetOrCreateView ().Add (sub);
 
         parent.BeginInit ();
         parent.EndInit ();
         parent.Layout ();
+
+        Rectangle subScreen = sub.FrameToScreen ();
+        output.WriteLine ($"subScreen: {subScreen}");
+
+        sub.LineCanvas.AddLine (
+            new Point (subScreen.X, subScreen.Y),
+            3,
+            Orientation.Horizontal,
+            LineStyle.Double);
+
+        output.WriteLine ($"sub.LC.Bounds before Draw: {sub.LineCanvas.Bounds}");
+
         parent.Draw ();
 
+        output.WriteLine ($"Driver output:");
         output.WriteLine (driver.ToString ());
 
-        string driverContents = driver.ToString ()!;
-
-        // Verify SubView text is visible
-        Assert.Contains ("P", driverContents);
-
-        // The SubView's border should auto-join with the parent's border lines.
-        // Without the pipeline fix, auto-join fails for Padding SubViews too.
-        Assert.Contains ("┴", driverContents);
+        // Expected: ──═══──    (double-line from SubView merged with parent's single-line)
+        DriverAssert.AssertDriverContentsAre (
+            """
+            ──═══──
+            """,
+            output,
+            driver);
     }
 }
