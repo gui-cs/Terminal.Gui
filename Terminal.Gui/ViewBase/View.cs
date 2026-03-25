@@ -581,7 +581,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     /// <summary>
     /// Enables or disables the display of a tooltip showing the link URL.
     /// </summary>
-    public bool UseTooltip
+    public bool UseToolTip
     {
         get => _useTooltip;
         set
