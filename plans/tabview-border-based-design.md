@@ -1,934 +1,33 @@
-# TabView via Border Tab Style Borders (Built into View) — Design Plan
+# New TabView — Design Plan
 
-## Concept
+## Overview
 
-Instead of a `TabRow` containing dynamically-created header views, make **Border itself** support a "tab style" rendering mode. When enabled, a View's Border renders a small **tab header rectangle** (containing the View's `Title`) at an offset along any side (top, bottom, left, or right). A `TabView` is then a simple superview of `Tab` views whose Borders all use tab style — TabView computes each tab's offset so headers sit side-by-side.
+Build `Tab` and `Tabs` View subclasses that leverage the **tab-style border rendering** built into `Border` (see [Borders Deep Dive](../docfx/docs/borders.md)). Each `Tab` is a View whose `Border.Settings = BorderSettings.Tab | BorderSettings.Title`; the `Tabs` container computes `TabOffset` for each `Tab` so headers sit side-by-side. `LineCanvas` auto-join produces flowing connected tab styles with zero manual line drawing:
 
-**The critical design constraint:** all Tab views must share a single `LineCanvas` via `SuperViewRendersLineCanvas = true`. When adjacent tab headers overlap by one column, LineCanvas **auto-joins** the intersecting border lines into correct junction glyphs (`┬`, `┴`, `╮`, `╰`, etc.), producing the flowing connected style with zero manual line-drawing:
-
-```
-╭───┬───╮
-│T1 │T2 │
-│   ╰───┴────╮
-│content     │
-╰────────────╯
-```
-
-This eliminates `TabRow` entirely and makes the "tab" concept a **first-class Border capability**.
-
-## How Border Renders Titles Today
-
-**Definitive reference:** `./ViewBase/Adornment/Border.cs` and `Tests/UnitTests/View/Adornment/BorderTests.cs`
-
-### `Border.Thickness.Top == 1` — Title Inline on Border Line
-
-The title sits directly on the single top border line. The `┤` and `├` connectors flank the title text. The border occupies exactly 1 row at the top.
-
-```
-Single, View.Width = 10:
-┌┤1234├──┐       ← row 0: top border line with title inline
-│        │       ← row 1: content (inside the border)
-│        │
-└────────┘       ← bottom border line
-```
-
-Width variations (Single style):
-```
-Width 4:   ┌┤├┐         (too narrow for title text, just connectors)
-Width 5:   ┌┤1├┐        (1 char fits)
-Width 8:   ┌┤1234├┐     (full title, no extra border)
-Width 10:  ┌┤1234├──┐   (full title + extra border line)
-```
-
-### `Border.Thickness.Top == 2` — Title in a Cap (2 Rows, No Bottom Line)
-
-The border occupies 2 rows at the top. Row 0 has a small horizontal cap line above the title. Row 1 has the main border's top line with the title text. The connectors are **corner glyphs** (`╛`/`╘` for Double, `┘`/`└` for Single) — they terminate, meaning there is **no bottom line** closing the title area.
-
-```
-Double, View.Width = 10:
- ╒════╕            ← row 0 (topTitleLineY): cap line above title
-╔╛1234╘══╗         ← row 1 (titleY): main border top + title + corner connectors ╛/╘
-║        ║         ← row 2: content
-╚════════╝         ← bottom border
-```
-
-Code (Border.cs lines 279-284):
-```csharp
-topTitleLineY = borderBounds.Y - 1;   // 1 row above the main border line
-titleY = topTitleLineY + 1;            // title on the main border line
-titleBarsLength = 2;                    // connectors span 2 rows (cap → title)
-```
-
-### `Border.Thickness.Top == 3` — Title in Enclosed Rectangle (3 Rows, WITH Bottom Line)
-
-The border occupies 3 rows at the top. A complete rectangle encloses the title: top line (row 0), title + T-junction connectors (row 1), and a **bottom line** (row 2). The connectors are **T-junction glyphs** (`╡`/`╞` for Double, `┤`/`├` for Single) — they continue through, connecting all three rows.
-
-```
-Double, View.Width = 10:
- ╒════╕            ← row 0 (topTitleLineY): top of title rectangle
-╔╡1234╞══╗         ← row 1 (titleY): main border top + title + T-junction connectors ╡/╞
-║╘════╛  ║         ← row 2 (topTitleLineY+2): *** BOTTOM LINE of title rectangle ***
-╚════════╝         ← bottom border
-
-Rounded, View.Width = 10:
- ╭────╮
-╭┤1234├──╮
-│╰────╯  │        ← row 2: bottom line (╰────╯) — THIS gets suppressed in Tab mode
-│        │
-╰────────╯
-```
-
-Code (Border.cs lines 289-295):
-```csharp
-topTitleLineY = borderBounds.Y - 2;   // 2 rows above the main border line
-titleY = topTitleLineY + 1;            // title on middle row
-titleBarsLength = 3;                    // connectors span 3 rows (top → title → bottom)
-sideLineLength++;                       // side borders extend up one more row
-```
-
-The bottom line is drawn at Border.cs lines 382-386:
-```csharp
-lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY + 2),
-             Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
-             Orientation.Horizontal, lineStyle, normalAttribute);
-```
-
-**Key differences from `Top == 2`:**
-
-| Aspect | `Top == 2` | `Top == 3` |
-|--------|-----------|-----------|
-| Connectors | `╛`/`╘` (corners, terminate) | `╡`/`╞` (T-junctions, continue) |
-| Bottom line | None | `╘════╛` drawn at row 2 |
-| `titleBarsLength` | 2 | 3 |
-| `sideLineLength` | unchanged | `++` (extends up) |
-
-### `Border.Thickness.Top == 4` — Same as 3, Extra Space Above
-
-Identical rendering to `Top == 3` but with one additional empty row above. The title rectangle is the same shape; it just floats one row higher.
-
-### Auto-Join with `SuperViewRendersLineCanvas`
-
-From `SuperViewRendersLineCanvas_Title_AutoJoinsLines` test — two overlapping SubViews with different `LineStyle`s:
-
-```
-Without SuperViewRendersLineCanvas:     With SuperViewRendersLineCanvas:
-┌┤A├──────┐                            ╔╡A╞═╦────┐
-│    ║    │                            ║    ║    │
-│    ║    │                            ║    ║    │
-│════┌┤C├┄│                            ╠════╬┤C├┄┤
-│    ┊    │                            │    ┊    ┊
-│    ┊    │                            │    ┊    ┊
-└─────────┘                            └────┴┄┄┄┄┘
-```
-
-When `SuperViewRendersLineCanvas = true`, all border lines render to the **same LineCanvas**, and overlapping lines auto-join into correct junction glyphs (`╦`, `╬`, `╠`, `┴`). **This is the mechanism Tab mode relies on** for producing the flowing connected tab style.
-
-## How Auto-Join Produces the Flowing Style
-
-### What LineCanvas Does
-
-When two border lines are drawn at the same `(x, y)` on the same `LineCanvas`, it resolves them into the correct glyph:
-
-| Overlap | Result |
-|---------|--------|
-| `╮` + `╭` at same cell | `┬` (T-junction) |
-| `╯` + `╰` at same cell | `┴` (bottom T-junction) |
-| horizontal end + vertical | `├`, `┤` |
-| two verticals | continuous `│` |
-
-### How It Works for Tabs
-
-All `Tab` views are siblings inside `TabView`, all with `SuperViewRendersLineCanvas = true`. Every Tab's Border writes its header lines to **TabView's shared LineCanvas**. When tabs overlap by one column at shared edges:
-
-```
-Tab1's header:         Tab2's header:          Shared LineCanvas result:
-╭────╮                      ╭────╮             ╭────┬────╮
-│ T1 │                      │ T2 │             │ T1 │ T2 │
-╰────╯                      ╰────╯             ╰────┴────╯
-       ↑                    ↑
-       Tab1 right edge overlaps Tab2 left edge
-       → ╮ + ╭ = ┬ (top)
-       → ╯ + ╰ = ┴ (bottom)
-```
-
-For the **selected tab** (T1), its header bottom is open (no bottom line drawn). The selected tab's content border top line runs along the same row. Unselected tabs DO draw their header bottom. Everything auto-joins:
-
-```
-Tab1 header (no bottom):   Tab2 header (closed):   Content top line:
-╭────╮                      ╭────╮
-│ T1 │                      │ T2 │
-     (gap)                  ╰────╯                  ─────────────────
-
-Combined on shared LineCanvas:
-╭────┬────╮              ← ╮+╭ → ┬
-│ T1 │ T2 │
-│    ╰────┴──────╮       ← T2 bottom + content top auto-join → ┴
-│ content        │          T1 sides continue into content borders
-╰────────────────╯
-```
-
-The `╰` where T2's bottom-left meets the content line is an auto-join. The `┴` where T2's bottom-right meets both T2's right and the content line is an auto-join. The left side of T1 continues straight down from the header into the content border — it's one continuous vertical line on the LineCanvas.
-
-## New Design Plan
-
-### Design Philosophy
-
-Amazon Principal Engineer tenets applied:
-
-- **Exemplary Practitioner**: `Tab` and `Tabs` become THE reference implementation for building compound views in Terminal.Gui v2. It should teach other contributors the right patterns.
-- **Technically Fearless**: Tackle the Border rendering problems head-on. The whole point is to prove the v2 infrastructure works.
-- **Balanced and Pragmatic**: Solve the Border rendering, mouse/keyboard interaction, etc... problems with a minimal, targeted enhancement — not the full #3407 refactor.
-- **Illuminate and Clarify**: Simple architecture. `Tab` is just a `View` that gets added to `Tabs`. No complex switch statements, no scattered layout math, no manual line drawing.
-- **Flexible in Approach**: Leverage `Adornments`, `ViewportSettingsFlags.Transparent`, `ViewArrangement.Overlapped`, and `SuperViewRendersLineCanvas` to solve the rendering, selection, and nav problems with minimal changes to Border and View.
-- **Respect What Came Before**: Preserve the spirit and capabilities of the original TabView (scrolling tabs, hotkeys, top/bottom positioning, mouse support) while completely rethinking the implementation.
-- **Have Resounding Impact**: Proves out Command propagation, content scrolling, KeyBindings, MouseBindings, Adornments, and LineCanvas auto-joins working together in a real compound view.
-- **Breaking changes to the API are ok**: This is a major new feature that requires API additions and some changes to existing Border behavior when `Tab` is enabled.
-
-### Phase 1: Extend Border with Tab Support
-
-**Status: Implemented (Label SubView approach).** `BorderSettings.Tab`, `Border.TabSide`, `Border.TabOffset`, `Border.TabLength`, `BorderView` integration, `BorderEditor` UI, and visual tests are all in place. The original `TabHeaderRenderer` class has been deleted — tab rendering now uses a Label SubView for title text and manual LineCanvas calls for box lines, all within `BorderView`.
-
-```csharp
-[Flags]
-public enum BorderSettings
-{
-    None = 0,
-    Title = 1,
-    Gradient = 2,
-    Tab = 4,                // NEW: Renders a tab header rectangle at TabOffset
-}
-```
-
-When `Tab` is set:
-- BorderView renders a **tab header** at `TabOffset` columns from the left, using the existing `Thickness.Top == 3` rendering path
-- **`BorderSettings.Title` and `BorderSettings.Tab` are not mutually exclusive.** When both are set, the `Title` is displayed within the tab header. When only `Tab` is set (without `Title`), no title text is drawn in the header — it is an empty tab rectangle.
-- When `Tab` is set and `Title` is not set, `TabLength` defaults to `2` (0 space for content + 2 vertical border lines).
-- When `Tab` and `Title` are both set, `TabLength` auto-computes as `Title.GetColumns() + 2` (title text width + 2 border lines).
-- `Thickness.Top` must be 3 (3 rows: header top, title+connectors, content top / header bottom)
-- The bottom line of the title rectangle (Border.cs lines 382-386) is suppressed for the selected tab
-- The Border area outside the header rectangle is transparent (mouse + visual)
-
-### New `BorderView.TabOffset` 
-
-```csharp
-/// <summary>
-///     Gets or sets the horizontal/vertical offset (in columns/rows) at which the tab header
-///     rectangle starts. Only effective when <see cref="Settings"/> includes
-///     <see cref="BorderSettings.Tab"/>.
-/// </summary>
-public int TabOffset { get; set; }
-```
-
-### New `BorderView.TabWidth` (implemented as `Border.TabLength`)
-
-```csharp
-/// <summary>
-///     Gets or sets the total length of the tab parallel to the border edge (including border cells).
-///     If null, the length will be determined based on View.Title.
-///     Only used when BorderSettings.Tab is set.
-/// </summary>
-public int? TabLength
-{
-    get
-    {
-        if (field is null && Settings.HasFlag (BorderSettings.Tab))
-        {
-            int titleColumns = Parent?.Title?.GetColumns () ?? 0;
-            // Two vertical border lines + title text width
-            return titleColumns + 2;
-        }
-        return field;
-    }
-    set;
-}
-```
-
-**Note:** The auto-computed default is `Title.GetColumns() + 2` (two vertical border lines flanking the title). When `Title` is empty/null and `Tab` is set, `TabLength` defaults to `2` (just the two border lines, 0 content). An earlier implementation incorrectly used `+ 1`; this was fixed.
-
-### New `BorderView.TabSide`
-
-```csharp
-/// <summary>
-///     Gets or sets which side of the View, the Tab-syled Title will be placed. Only meaningful when <see cref="Settings"/>
-///     includes <see cref="BorderSettings.Tab"/>.
-/// </summary>
-public Side TabSide {get;set}
-```
-
-When `BorderSettings.Tab` is set on `View.Border.BorderSettings`:
-
-- The `Border` View is created via `GetOrCreateView`
-- `Border.BorderStyle` defaults to `Rounded`
-- Suppress the bottom line at `topTitleLineY + 2` (Border.cs lines 382-386). The title rectangle becomes open-bottomed, flowing into the content area. Draw the content border's top line in segments around the header gap instead.
-- Make the `Border.ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse` - assuming there are no bugs, this will make it so clicking outside of the "tab" will pass through.
-- Focus is indicated by the presence of the header bottom line. The selected tab has its header bottom line suppressed, creating an open gap that visually connects the header to the content area. Unselected tabs draw the full header rectangle, including the bottom line, creating a closed header. The `Title` text is always drawn using the `Normal`/`HotNormal` attributes, regardless of focus. **Note:** This open/closed gap behavior only applies when the tab-side thickness ≥ 3. When thickness < 3 (depth 1 or 2), focused and unfocused render identically — only the title attributes differentiate them.
-
-Depending on the `Thickness.Top` value, the header rectangle will be taller or shorter. The examples below show the visual difference as you increase `Thickness.Top` from 1 to 4. The "tab" concept starts to emerge at `Thickness.Top = 3` when the bottom line appears, but the exact visuals depend on the LineCanvas auto-join behavior.
-
-These examples show `Side.Top`. All four sides follow the same pattern — visual examples for each `Side` variant are below.
-
-#### Visual Examples by `TabSide` (Phase 1 reference)
-
-All examples use `Thickness = 3` on the tab side, `Thickness = 1` on the other three sides, `BorderStyle = Rounded`, and `TabOffset = 0`.
-
-**`HasFocus` determines whether the header is open or closed:**
-
-- **`HasFocus == false`** → **Closed header.** The line adjacent to the content area is **drawn**, fully enclosing the header rectangle. This visually separates the header from the content, indicating that this tab is not selected.
-- **`HasFocus == true`** → **Open header.** The line adjacent to the content area is **suppressed**, creating a gap that visually connects the header to the content area. This open flow indicates the tab is selected and its content is active.
-
-**Important: The open/closed distinction only applies when the tab-side thickness ≥ 3 (depth ≥ 3).** When the thickness is < 3 (depth 1 or 2), there is no interior content row in the header — the title sits directly on the closing edge (depth 1) or between a cap line and the closing edge (depth 2). In these cases, the focused and unfocused border geometry is **identical**; only the title text attributes differentiate them (`VisualRole.Focus`/`HotFocus` for focused vs. `VisualRole.Normal`/`HotNormal` for unfocused). The separator/gap distinction is suppressed because at small depths the junction glyphs would clash with the title text placement.
-
-In a multi-tab `Tabs` container, exactly one `Tab` has `HasFocus == true` (the selected tab) and all others have `HasFocus == false`. The visual difference — closed vs. open — is how the user distinguishes the selected tab from the rest.
-
-##### Precise Rendering Spec for `Side.Top` (other sides follow by rotation)
-
-This spec describes exactly how to draw a single tab with `BorderSettings.Tab`, `TabSide = Side.Top`, `Thickness.Top = 3`, `Thickness.Left = Thickness.Right = Thickness.Bottom = 1`. The title text is `"Tab"` (3 characters). These rules apply to all `Side` variants via rotation.
-
-**Dimensions and coordinates:**
-
-- **Tab header width** = title text columns + 2 (one border column each side). For `"Tab"` → `3 + 2 = 5`.
-- **Tab header height** = `Thickness.Top` = 3 rows (top line, title row, closing/opening line).
-- **Content area** = the remaining rectangle below the header, bounded by `Thickness.Left`, `Thickness.Right`, `Thickness.Bottom` (all = 1).
-- **View total width** = content width + `Thickness.Left` + `Thickness.Right`. For `"content"` (7 chars) → `7 + 1 + 1 = 9`.
-- **View total height** = content height + `Thickness.Top` + `Thickness.Bottom`. For 2-line content → `2 + 3 + 1 = 6`.
-
-**Text placement:**
-
-- Tab title text is placed **tight against borders** with no padding. The title occupies every cell between the left and right borders of the header. `│Tab│`, never `│ Tab │` or `│Tab │`.
-- For `Side.Left`/`Side.Right`, text is rendered vertically using `TextDirection.TopBottom_LeftRight`, one character per row, still tight: `│T│` on each row, not `│ T │`.
-
-**The three rows of the tab header (`Side.Top`):**
-
-- **Row 0 (header top):** `╭` at header left edge, `───` spanning header width − 2, `╮` at header right edge. Positioned at `TabOffset` columns from the left. Columns outside the header on this row are empty (transparent).
-- **Row 1 (title):** `│` at header left edge, title text filling the interior, `│` at header right edge. Columns outside the header on this row are empty (transparent).
-- **Row 2 (junction / opening row) — depends on `HasFocus`:**
-
-  **`HasFocus == false` (closed):** This row spans the FULL view width. It is the content area's top border with the header's closing line merged in via LineCanvas auto-join:
-
-  - If `TabOffset == 0`: The header left edge coincides with the content left border. The glyph is `├` (T-junction: the continuous left border meets the header closing line going right). Then `───` fills the header interior, `┴` at the header right edge (bottom-T: the header's right border going up meets the horizontal going both ways). Then `───` continues as the content top border to `╮` at the view's right edge.
-  - If `TabOffset > 0`: `╭` at x=0 (content top-left corner), then `─` fills to the header left edge where a `┴` appears (content top line meets header left border coming down). Then `───` fills the header interior, another `┴` at the header right edge. Then `───` continues to `╮` at the view's right edge. If the header right edge IS the view right edge, the final glyph is `┤` instead of `╮`.
-
-  **`HasFocus == true` (open):** The header's closing line is SUPPRESSED. This row has:
-
-  - `│` at x=0 (the left border continues down from the header), then spaces filling the header interior (the open gap), then `╰` at the header right edge (the header right border curves into the continuation line), then `───` continues to `╮` at the view's right edge.
-  - If `TabOffset > 0`: `│` at x=0 continues from above, spaces fill to header left edge where `╯` appears (header left border curves to meet continuation from left). Continue with spaces through the header gap. At the header right edge, `╰` curves into `───` continuing to `╮`. (This case applies to multi-tab layouts managed by `Tabs`.)
-
-**Remaining content rows:**
-
-- **Left border:** `│` at x=0 on every row from row 2 (or row 3 for closed) down to the bottom border row.
-- **Right border:** `│` at x=width−1 on every content row.
-- **Bottom border:** `╰` at x=0, `───` filling, `╯` at x=width−1.
-- **Content text** fills the interior of the content rectangle.
-
-**Key invariant:** The view's left border is ONE continuous vertical line from the top of the header (`╭` at row 0) through every content row down to `╰` at the bottom. It is never broken. When the header is at `TabOffset = 0`, the junction where the closed header's bottom line meets this border is `├` (a T-junction), not `╭` followed by a separate junction. The border is continuous — it does not restart.
-
-**Whitespace rule:** Cells outside the header rectangle on rows 0 and 1 are **transparent** (not drawn). They are not spaces — they literally don't exist in the output, allowing underlying views to show through. Inside the header, text is tight against borders with zero padding.
-
-##### `Side.Top` — `Thickness.Top = 3`
-
-`HasFocus == false` (closed — header bottom line drawn):
-```
-╭───╮
-│Tab│
-├───┴───╮
-│content│
-╰───────╯
-```
-
-`HasFocus == true` (open — header bottom line suppressed, flows into content):
-```
-╭───╮
-│Tab│
-│   ╰───╮
-│content│
-╰───────╯
-```
-
-##### `Side.Bottom` — `Thickness.Bottom = 3`
-
-`HasFocus == false` (closed — header top line drawn):
-```
-╭───────╮
-│content│
-├───┬───╯
-│Tab│
-╰───╯
-```
-
-`HasFocus == true` (open — header top line suppressed, flows into content):
-```
-╭───────╮
-│content│
-│   ╭───╯
-│Tab│
-╰───╯
-```
-
-##### `Side.Left` — `Thickness.Left = 3`
-
-Tab text is rendered vertically using `TextDirection.TopBottom_LeftRight`.
-
-`HasFocus == false` (closed — header right line drawn):
-```
-╭─┬───────╮
-│T├content│
-│a│       │
-│b│       │
-╰─┴───────╯
-```
-
-`HasFocus == true` (open — header right line suppressed, flows into content):
-```
-╭─────────╮
-│T content│
-│a        │
-│b        │
-╰─────────╯
-```
-
-##### `Side.Right` — `Thickness.Right = 3`
-
-Tab text is rendered vertically using `TextDirection.TopBottom_LeftRight`.
-
-`HasFocus == false` (closed — header left line drawn):
-```
-╭───────┬─╮
-│content│T│
-│       │a│
-│       │b│
-╰───────┴─╯
-```
-
-`HasFocus == true` (open — header left line suppressed, flows into content):
-```
-╭─────────╮
-│content T│
-│        a│
-│        b│
-╰─────────╯
-```
-
-##### Summary: Which Thickness Side = 3, Which Line Gets Suppressed
-
-| `TabSide` | Thickness = 3 on | `HasFocus == true` suppresses | `HasFocus == false` draws | TabOffset axis |
-|-----------|------------------|-------------------------------|---------------------------|----------------|
-| Top       | `Thickness.Top`   | Bottom line of header         | Bottom line (closed)      | Horizontal     |
-| Bottom    | `Thickness.Bottom` | Top line of header           | Top line (closed)         | Horizontal     |
-| Left      | `Thickness.Left`  | Right line of header          | Right line (closed)       | Vertical       |
-| Right     | `Thickness.Right` | Left line of header           | Left line (closed)        | Vertical       |
-
-(HasFocus == true depicted):
-
-### `Border.Thickness.Top = 1`
-
-
-(No dev will ever do this, but it is possible.)
-```
-│Tab╰───╮ 
-│content│ 
-│       │ 
-╰───────╯
-```
-
-### `Border.Thickness.Top = 2`
-
-(Devs who do this, will need to provide an alternative for indicating focus, since there is no ability to have bottom line.)
-```
-╭───╮
-│Tab╰───╮ 
-│content│ 
-│       │ 
-╰───────╯
-```
-
-### `Border.Thickness.Top = 3`
-
-(The intended "tab" style. The bottom line of the header rectangle is drawn, creating a closed tab. Focus is indicated by suppressing the bottom line, creating an open tab that visually connects to the content area. The exact visuals depend on LineCanvas auto-join behavior.)
-```
-╭───╮
-│Tab│         
-│   ╰───╮ 
-│content│ 
-│       │ 
-╰───────╯
-```
-
-### `Border.Thickness.Top = 4`
-
-(Shown for completeness.)
-```
-
-╭───╮
-│Tab│         
-│   ╰───╮ 
-│content│ 
-│       │ 
-╰───────╯
-```
-
-The Tab style works on all four sides. `BorderView` will gain a new property (`TabSide`?) of type `Side` which dictates which side the tabs are rendered on. There are renderings below that show the visuals per-side.
-
-### TabOffset
-
-Another new property `BorderView.TabOffset` (int) specifies how many columns/rows from the left/top edge the tab header starts.
-
-The `TabOffset` property is always along the axis of the tab strip:
-- **Top/Bottom**: `TabOffset` is horizontal (columns from left edge)
-- **Left/Right**: `TabOffset` is vertical (rows from top edge)
-
-For `Border.BorderStyle == BorderStyle.Tab`, `BorderView.TabSide = Side.Top`, `Border.Thickness.Top = 3` and `BorderView.TabOffset = 2`, the rendering would look like this (HasFocus == false depicted):
-```
-  ╭───╮
-  │Tab│
-╭─┴───┴─╮
-│content│
-│       │
-╰───────╯
-```
-
-With `TabOffset = 4`:
-```
-    ╭───╮
-    │Tab│
-╭───┴───┤
-│content│
-│       │
-╰───────╯
-```
-
-For completeness if `TabOffset = 5`, causing the right side of the tab to extend beyond the right-side's border line:
-```
-     ╭───
-     │Tab
-╭────┴──╮
-│content│
-│       │
-╰───────╯
-```
-
-
-For completeness if `TabOffset = -1`, causing the left side of the tab to extend beyond the right-side's border line:
-```
-───╮
-Tab│
-╭──┴────╮
-│content│
-│       │
-╰───────╯
-```
-
-For completeness if `TabOffset = -2`, causing the left side of the tab to extend beyond the right-side's border line:
-```
-──╮
-ab│
-╭─┴─────╮
-│content│
-│       │
-╰───────╯
-```
-
-
-For completeness if `TabOffset = -4`, causing the left side of the tab to extend beyond the right-side's border line:
-```
-╮
-│
-├───────╮
-│content│
-│       │
-╰───────╯
-```
-
-For completeness if `TabOffset = -5`, causing the left side of the tab to extend beyond the right-side's border line:
-```
-
-
-╭───────╮
-│content│
-│       │
-╰───────╯
-```
-
-IOW, it gets clipped by the view's right border, but the header is still visible and functional. The content top line auto-joins with the tab header's right connector at the intersection point, producing a flowing style.
-
-**Important** the renderings above are what happens when the View *does not have focus* (`HasFocus == false`). When a View is using `BorderSettings.Tab`, focus is indicated not by the `Title` being rendered using the focus attribute, but by the presence of the header bottom line. The selected tab has its header bottom line suppressed, creating an open gap that visually connects the header to the content area. Unselected tabs draw the full header rectangle, including the bottom line, creating a closed header. **This open/closed distinction only applies when the tab-side thickness ≥ 3 (depth ≥ 3). For thickness < 3, focused and unfocused render identically — only the title visual role attributes differentiate them.**
-
-#### `Side.Bottom` — `TabOffset` examples (`HasFocus == false`)
-
-Same axis as Top (horizontal), but mirrored vertically. The junction row is the **content bottom border**. Junctions are `┬` (top-T: content bottom line meets header border going down).
-
-`TabOffset = 2`:
-```
-╭───────╮
-│content│
-│       │
-╰─┬───┬─╯
-  │Tab│
-  ╰───╯
-```
-
-`TabOffset = 4` (header right edge coincides with view right border → `┤`):
-```
-╭───────╮
-│content│
-│       │
-╰───┬───┤
-    │Tab│
-    ╰───╯
-```
-
-`TabOffset = 5` (overflow right — header clipped):
-```
-╭───────╮
-│content│
-│       │
-╰────┬──╯
-     │Tab
-     ╰───
-```
-
-`TabOffset = -1` (overflow left — header clipped):
-```
-╭───────╮
-│content│
-│       │
-╰──┬────╯
-Tab│
-───╯
-```
-
-#### `Side.Left` — `TabOffset` examples (`HasFocus == false`)
-
-`TabOffset` is **vertical** (rows from the top edge). The junction column is column 2 (the inner edge of `Thickness.Left = 3`). Junctions are `┤` (left-T: content left border continues vertically, horizontal goes left into header). Rows outside the header on columns 0–1 are transparent.
-
-**Header height** = title text length + 2 (top/bottom border rows). For `"Tab"` → `3 + 2 = 5` rows.
-
-**Key behavior:** The header occupies only its 5 rows on the left side. Below (or above) the header, columns 0–1 are transparent and the content left border continues as `│` at column 2.
-
-`TabOffset = 0` (header at top, view height = 9):
-```
-╭─┬───────╮
-│T├content│
-│a│       │
-│b│       │
-╰─┤       │
-  │       │
-  │       │
-  │       │
-  ╰───────╯
-```
-
-Row-by-row at the junction column (column 2): `┬` at row 0 (header top meets content top — horizontal both ways, vertical down), `├` at row 1 (header `HasFocus == false` closing line meets content left border — content border continues vertically, horizontal goes right into content), `│` on rows 2–3 (content left border, header interior rows), `┤` at row 4 (header bottom meets content left border — vertical continues, horizontal goes left into header), `│` on rows 5–7 (content left border continues), `╰` at row 8 (content bottom-left).
-
-`TabOffset = 2` (header starts 2 rows below top, view height = 9):
-```
-  ╭───────╮
-  │content│
-╭─┤       │
-│T│       │
-│a│       │
-│b│       │
-╰─┤       │
-  │       │
-  ╰───────╯
-```
-
-At column 2: `╭` at row 0 (content top-left), `│` on row 1, `┤` at row 2 (header top arrives — vertical continues, horizontal goes left), `│` on rows 3–5 (header interior, content border continues), `┤` at row 6 (header bottom departs — vertical continues, horizontal goes left), `│` at row 7, `╰` at row 8 (content bottom-left).
-
-`TabOffset = 6` (overflow bottom — header clipped, view height = 9):
-```
-  ╭───────╮
-  │content│
-  │       │
-  │       │
-  │       │
-  │       │
-╭─┤       │
-│T│       │
-│a╰───────╯
-```
-
-**Overflow clipping:** The header starts at row 6 (5-row header would need rows 6–10, but the view ends at row 8). Row 6: `┤` junction (header top). Row 7: `│` (header interior, `T`). Row 8: the header's `a` character shares the row with the content bottom border `╰───────╯`. Characters `b` and the header bottom border row are clipped entirely — they would be at rows 9–10 which don't exist.
-
-#### `Side.Right` — `TabOffset` examples (`HasFocus == false`)
-
-Mirror of Left. `TabOffset` is **vertical**. The junction column is the inner edge of `Thickness.Right = 3`. Junctions are `├` (right-T: content right border continues vertically, horizontal goes right into header). Rows outside the header on the rightmost 2 columns are transparent.
-
-`TabOffset = 0` (header at top, view height = 9):
-```
-╭───────┬─╮
-│content│T│
-│       │a│
-│       │b│
-│       ├─╯
-│       │
-│       │
-│       │
-╰───────╯
-```
-
-Row-by-row at the junction column (content right border): `┬` at row 0 (header top meets content top), `│` at row 1 (header closing line — `HasFocus == false`), `│` on rows 2–3 (header interior), `├` at row 4 (header bottom departs — vertical continues, horizontal goes right), `│` on rows 5–7, `╰` at row 8 (content bottom-right... wait, this is `╯`). Correction: `╯` at row 8.
-
-`TabOffset = 2` (header starts 2 rows below top, view height = 9):
-```
-╭───────╮
-│content│
-│       ├─╮
-│       │T│
-│       │a│
-│       │b│
-│       ├─╯
-│       │
-╰───────╯
-```
-
-At the content right border column: `╮` at row 0 (content top-right), `│` on row 1, `├` at row 2 (header top arrives — vertical continues, horizontal goes right), `│` on rows 3–5 (header interior), `├` at row 6 (header bottom departs — vertical continues, horizontal goes right), `│` at row 7, `╯` at row 8 (content bottom-right).
-
-`TabOffset = 6` (overflow bottom — header clipped, `HasFocus == false`, view height = 9):
-```
-╭───────╮
-│content│
-│       │
-│       │
-│       │
-│       │
-│       ├─╮
-│       │T│
-╰───────╯a│
-```
-
-**Overflow clipping (Right):** Same principle as Left. The header starts at row 6 (5-row header needs rows 6–10, view ends at row 8). Row 6: `├` junction. Row 7: header interior (`T`). Row 8: `a` shares the row with content bottom border `╰───────╯`. The `b` row and header bottom border are clipped.
-
-#### `Side.Right` — Focused overflow (`HasFocus == true`, `TabOffset = 6`, view height = 9)
-
-```
-╭───────╮
-│content│
-│       │
-│       │
-│       │
-│       │
-│       ╰─╮
-│        T│
-╰─────── a│
-```
-
-### Focus
-
-**The focused overflow nuance:** When `HasFocus == true`, the border segment between header and content is suppressed (the "open gap" rule). For this overflow case:
-
-- **Row 6:** The `├` junction from the unfocused version becomes `╰─╮`. The content right border is suppressed — instead, `╰` (the header's top-left corner curving right) bridges into the header top border `─`, ending at `╮` (header top-right corner). This creates the visual opening where the tab connects to the content.
-- **Row 7:** The content right border `│` is suppressed entirely — replaced by a space. The tab text `T` and the header right border `│` remain. The content area visually "opens" into the header.
-- **Row 8:** The content bottom border `╰───────` runs normally, but where it would meet the content right corner, there is a space (the gap continues). The clipped `a` and header right border `│` continue on the right.
-
-**General principle for focused overflow on any side:** The open gap rule applies identically whether the header fits fully or overflows. The border segment between header and content is always suppressed when focused. In overflow cases, the gap interacts with the content corner glyph — the corner is replaced by the header's outer corner glyph curving into the header, and the content border is replaced by space for the extent of the gap.
-
-This same principle applies to `Side.Left` overflow (mirrored) and to `Side.Top`/`Side.Bottom` overflow on the horizontal axis.
-
-When a View has focus, (HasFocus == true), the title is shown using the focus visual role. The tab lines (but not the rest of the border) should be shown using the focus visual style too.
-
-### Border Line Positioning with `BorderSettings.Tab`
-
-> **This section supersedes the manual clipping approach described in the Implementation Approach below.**
-
-Without `BorderSettings.Tab` (the existing/legacy model), border lines are drawn on the **inside** of the thickness — e.g., for `Thickness.Top = 5`, the top border line is at `y = 4` (the innermost row of the thickness). This was an arbitrary decision and remains unchanged for the non-Tab case.
-
-When `BorderSettings.Tab` **is** set, border line positioning changes to leverage `BorderView.Viewport` clipping:
-
-**Non-title sides** (the 3 sides that do NOT have the tab):
-The content border line is drawn at the **outer edge** of the thickness (the very first row/column of the adornment). This keeps the visual frame tight.
-
-**Title side** (the side where the tab protrudes):
-The content border line is drawn at `thickness - 1` from the outer edge. The rows/columns between the outer edge and the content border line become the **tab header region**.
-
-| Title-side thickness | Content border position (Side.Top example) | Tab header region | Header depth |
-|----------------------|---------------------------------------------|-------------------|--------------|
-| 0                    | Nothing drawn                               | None              | 0            |
-| 1                    | y = 0                                       | None (border only) | 0           |
-| 2                    | y = 1                                       | y = 0 (1 row)     | 1            |
-| 3                    | y = 2                                       | y = 0–1 (2 rows)  | 2            |
-| 4                    | y = 3                                       | y = 0–2 (3 rows)  | 3            |
-| N (N ≥ 4)           | y = N - 1                                   | y = 0 to N-2      | capped at 3  |
-
-General rule: content border at `y = thickness - 1`. Header depth = `min(thickness - 1, 3)`.
-
-**Why this works for clipping:** The tab header box is positioned using absolute coordinates within the `BorderView.Viewport`. When `TabOffset` is negative or pushes the header past the far edge, the header's coordinates fall **outside the Viewport**. Since all drawing is clipped to the Viewport, the header lines and title text are automatically clipped — no manual `Rectangle.Intersect`, no title substring calculations, no cap-line extension hacks needed.
-
-**Example: Side.Top, Thickness(5,5,5,5), View 17×12**
-
-```
-BorderView.Viewport = (0, 0, 17, 12)
-
-Non-title sides: border at outer edge of thickness
-  - Left border:   x = 0
-  - Right border:  x = 16  (width - 1)
-  - Bottom border: y = 11  (height - 1)
-
-Title side (Top): border at y = thickness - 1 = 4
-  - Content border line: y = 4
-  - Tab header region: y = 0 to 3 (4 rows, but depth capped at 3)
-  - y = 0: unused (thickness > depth + 1)
-  - y = 1: cap line    ╭───╮
-  - y = 2: title row   │Tab│
-  - y = 3: closing row ├───┴──────────╮  (with junction/gap)
-  - y = 4: content border ─────────────
 ```
-
-With `TabOffset = -5`, the header box X starts at -5. Drawing at x < 0 is outside the Viewport and automatically clipped — nothing renders in the header region. The content border at y=4 still draws normally because it's fully inside the Viewport.
-
-### Implementation Approach: Label SubView (Current)
-
-> **Supersedes both the original manual clipping approach AND the simplified `TabHeaderRenderer` approach.**
-> The `TabHeaderRenderer` class has been deleted entirely. All tab rendering now lives in `BorderView`
-> using a Label SubView for title text and manual LineCanvas calls for the tab box border lines.
-
-#### Architecture
-
-The tab header is rendered using two complementary mechanisms:
-
-1. **Label SubView** — A `Label` added as a SubView of `BorderView`. It handles:
-   - Title text rendering (with hotkey support via `HotKeySpecifier`)
-   - Vertical text direction for `Side.Left` / `Side.Right` tabs (`TextDirection.TopBottom_LeftRight`)
-   - Natural clipping when the tab scrolls partially off-screen (no manual substring logic)
-   - Scheme/attribute management for focused vs unfocused appearance
-
-2. **Manual LineCanvas lines** — Tab box border lines drawn on the parent View's `LineCanvas`
-   during `DrawTabBorder()`. This handles:
-   - Cap line, side edges, and closing edge of the tab header box
-   - Content border gap/separator on the tab side
-   - Corner extensions for depth 1 (so auto-join creates curved corners)
-   - Junction glyphs where tab box meets content border
-
-#### Why Not Label With Border?
-
-The original vision was to give the Label a `Border` with `Thickness = 1` and matching `LineStyle`,
-so the Label's border lines would replace both the title text AND the tab box lines. However, the
-View draw pipeline prevents this:
-
-- Parent's `DoRenderLineCanvas` (step 146) renders the parent's `LineCanvas` to screen
-- Border SubViews draw at step 151 (`DoDrawAdornmentsSubViews`)
-- Label border lines merge into an **already-rendered** LineCanvas — they never display
-
-The hybrid approach (Label for text, manual lines for box) works because `DrawTabBorder` runs
-during `DoDrawAdornments` (step 103), which is **before** `DoRenderLineCanvas`.
-
-#### Label Configuration
-
-```csharp
-Label _tabTitleLabel:
-  CanFocus = false
-  TabStop = TabBehavior.NoStop
-  Border.Thickness = Thickness.Empty
-  Border.Settings = BorderSettings.None
-  HotKeySpecifier = parent.TitleTextFormatter.HotKeySpecifier
-  TextDirection = TopBottom_LeftRight (for Left/Right sides)
-  Visible = true/false (based on tab visibility)
-```
-
-The Label is lazily created by `EnsureTabTitleLabel()` and repositioned each draw cycle.
-
-#### Depth → Thickness Mapping
-
-When `BorderSettings.Tab` is set, the relevant border thickness determines the "depth" of the
-tab header. **When depth < 3, focused and unfocused tabs look identical** — the title text
-attributes (Scheme) differentiate them instead. Only at depth ≥ 3 does the content-side border
-line toggle between separator (unfocused) and gap (focused).
-
-| Depth | Header Structure | Focus Differentiation |
-|-------|-----------------|----------------------|
-| 1 | Title text inline on border line | Attributes only (same border look) |
-| 2 | Cap line + title row (no closing edge) | Attributes only (same border look) |
-| 3+ | Full box: cap + title + closing edge | Closing edge = gap (focused) or separator (unfocused) |
-
-**Side.Top depth → Label thickness example:**
-
-| Depth | Label Thickness (top, left, bottom, right) | Notes |
-|-------|---------------------------------------------|-------|
-| 3 (focused) | `(1, 1, 0, 1)` | No bottom = gap into content |
-| 3 (unfocused) | `(1, 1, 1, 1)` | Bottom = separator line |
-| 2 | `(1, 1, 0, 0)` | No closing edge |
-| 1 | `(0, 1, 0, 1)` | Inline on border, side edges only |
-
-Other sides rotate accordingly.
-
-#### Key Methods in `BorderView`
-
-| Method | Purpose |
-|--------|---------|
-| `DrawTabBorder()` | Main entry point. Computes geometry, positions Label, draws lines. |
-| `EnsureTabTitleLabel()` | Lazy-creates the Label SubView with correct configuration. |
-| `ComputeHeaderRect()` | Computes the unclipped header rectangle in screen coordinates. |
-| `ComputeViewBounds()` | Gets the visible bounds for clipping (uses `ViewportToScreen`). |
-| `ComputeTabLabelThickness()` | Maps depth + side + focus → `Thickness` for the Label. |
-| `AddTabBoxLines()` | Draws cap line, side edges, closing edge on parent's `LineCanvas`. |
-| `AddTabSideContentBorder()` | Draws content border with gap/separator segments. |
-| `ComputeTabContentArea()` | Returns content area inside the tab box for Label positioning. |
-| `AddDepth1CornerExtensions()` | Adds 2-cell extension lines for depth 1 curved corners. |
-
-#### Depth 1 Corner Handling
-
-At depth 1, the tab header is just 1 cell tall. The side edges are only 1 cell, which is too
-short for `LineCanvas` to auto-join into curved corners. Solution: add 2-cell extension lines
-outward from each corner. `AddTabBoxLines()` is **skipped** for depth 1 — the extensions replace
-the side edges. If both draw, the overlap creates T-junctions (`├`) instead of corners (`╰`).
-
-#### Overflow and Clipping
-
-- Label is positioned at the **unclipped** `headerRect` content area
-- The View system's natural clipping handles partial visibility
-- Using the clipped rect would show wrong characters (e.g., "Ta" instead of "ab" when left side clipped)
-- For Left/Right overflow past the content border, `Exclude` calls suppress corner glyphs
-
-#### Content Border Gap Logic
-
-```csharp
-openGap = (hasFocus && depth >= 3) || depth < 3
+╭────┬────╮
+│Tab1│Tab2│
+│    ╰────┴───────╮
+│content for Tab1 │
+╰─────────────────╯
 ```
-
-For depth < 3, the content border line coincides with the tab title row, so gap segments are
-always needed to avoid overwriting the title. For depth ≥ 3, the gap only opens when focused.
-
-#### Deleted Code
-
-- **`TabHeaderRenderer.cs`** — Entire class deleted
-- **`TabHeaderRendererTests.cs`** — Deleted (unit tests for removed class)
-- **`BorderHeaderIntegrationTests.cs`** — Deleted (integration tests for removed class)
-- **`DrawTitleInTabHeader()`** — Removed from `BorderView`
-- **`ComputeClosingEdgeTitleArea()`** — Removed from `BorderView`
-
-### Exit Criteria
-
-- ~~`TabHeaderRenderer` has no `clipped` parameter on any method~~ → `TabHeaderRenderer` deleted entirely
-- ~~`AddOuterHeaderLines` is ≤30 lines~~ → No separate renderer class
-- ~~`BorderView.DrawTitleInTabHeader` has no substring/skip logic~~ → Method deleted
-- `BorderView.OnDrawingContent` tab path uses single `DrawTabBorder()` call
-- Title rendering uses a Label SubView (no manual `TitleTextFormatter` manipulation)
-- Tab box lines drawn on parent `LineCanvas` for correct auto-join timing
-- When depth < 3, focused/unfocused border lines are identical (differentiated by attributes)
-- All 54 `BorderViewTests` pass
-- Full 15,125 test suite passes with zero failures
-- Total LOC reduction from `TabHeaderRenderer` deletion
-
-## Phase 2 - "TabView" Style - Enables a replacement for the old TabView
-
-Uses the capabilty built in Phase 1 to build a new TabView View-subclass, related helper Views, TabView Example Scenario, and to re-enable the example Scenarios that used the old TabView that were previously commented out/disabled in this PR.
 
 ### `Tab`
 
 ```cs
 public class Tab : View
 {
-    public Tab
+    public Tab ()
     {
-        Canfocus = true;
+        CanFocus = true;
         SuperViewRendersLineCanvas = true;
         BorderStyle = LineStyle.Rounded;
         Border.Settings = BorderSettings.Tab | BorderSettings.Title;
 
-        // here for example only; in reality thisd would get set based on the TabView's TabSide
+        // Thickness set by Tabs based on TabSide; example for Side.Top:
         Border.Thickness = new Thickness (1, 3, 1, 1);
 
-        // This enables Views to be arranged overlapping each other with the subview order determining z-order.
-        // The focused view is automatically brought to the front, so the selected tab will always render above the unselected tabs.
+        // Overlapped enables z-order: focused tab renders above unselected tabs
         Arrangement = ViewArrangement.Overlapped;
     }
 }
@@ -940,26 +39,25 @@ public class Tab : View
 ```cs
 public class Tabs : View, IValue<Tab?>
 {
-    // The `Tab`s are just subviews of `Tabs`. They can be retrieved via `Tabs.SubViews.OfType<Tab>()` or similar.
+    // Tabs are SubViews of Tabs, retrieved via SubViews.OfType<Tab>()
 
     public Side TabSide { get; set; } = Side.Top;
 
     // IValue<Tab?> implementation
     public Tab? Value
     {
-        get => Focused as Tab;
+        get => SubViews.OfType<Tab> ().FirstOrDefault (t => t.HasFocus);
         set
         {
-            if (Focused != value)
+            if (Value != value)
             {
-                value.SetFocus ();
-
-                // code to raise ValueChanged event if needed etc..
+                value?.SetFocus ();
+                // raise ValueChanged event etc.
             }
         }
     }
 
-    // other properties and methods compute TabOffsets, prevent key events from reaching unfocused tabs, etc.
+    // Computes TabOffsets, manages thickness per TabSide, prevents key events from reaching unfocused tabs, etc.
 }
 ```
 
@@ -1158,7 +256,7 @@ With the above we'd have:
 
 But THEN, if we did this:
 
-- make `ScrollBar._slider` public as `Scrollbar.Slider`
+- make `ScrollBar._slider` public as `ScrollBar.Slider`
 - In `Tabs`, set `HorizontalScrollBar.Slider.ViewportSettings |= ViewportSettingsFlags.Transparent`
 
 We'd have this:
@@ -1174,58 +272,57 @@ We'd have this:
 
 Fucking magic.
 
-## Implementation Phases
+## Implementation Steps
 
-### Phase 0: Prerequisites — Border transparency support
+### Step 0: Build a set of ViewBase tests that use nothing but View or test-defined test sub-classes to prove the basic concepts:
 
-**BLOCKER:** `Border` does not currently support `ViewportSettingsFlags.Transparent` or `ViewportSettingsFlags.TransparentMouse`. This must be fixed first, in a separate PR.
+1. Two Views arragned to look like this:
 
-- **GitHub Issue:** [#4834](https://github.com/gui-cs/Terminal.Gui/issues/4834) — `Border` should support `ViewportSettings.Transparent` & `ViewportSettings.TransparentMouse`
-- Once #4834 is merged, verify:
-  - A `Border` with `ViewportSettingsFlags.Transparent` renders only border lines/title; empty areas are transparent and underlying views show through.
-  - A `Border` with `ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse` passes mouse events through transparent areas while still capturing clicks on border lines/title text.
+```
+╭────┬────╮
+│Tab1│Tab2│
+│    ╰────┴───────╮
+│content for Tab1 │
+╰─────────────────╯
+```
 
-### Phase 2: Add `Tab` and `Tabs` Views, implement "TabView" style
+2. Same thing for Left, Right, and Bottom
+
+3. A test that proves setting focus to Tab2 in the first example causes Tab2 to get focus and the visuals are correct.
+
+```
+╭────┬────╮
+│Tab1│Tab2│         
+├────╯    ╰───────╮ 
+│content for Tab  │
+╰─────────────────╯
+```
+
+### Step 1: Add `Tab` and `Tabs` Views
 
 1. Add `Tab` and `Tabs` views as described above.
 2. Unit tests for Tab/Tabs behavior, including focus management and TabOffset calculations.
 3. New Scenario based on `TabViewExample` named `TabsExample` that uses the new `Tabs` and `Tab` views, with multiple tabs and content, demonstrating focus switching and TabOffset.
 4. Update Scenarios that were disabled in this PR with `#if false` to use the new `Tabs` and `Tab` views instead of the old `TabView`.
 
-### Phase 3: Polish
+### Step 2: Scrolling
 
-1. **Scrolling**: Add `TabView.ScrollOffset` subtracted from all `TabOffset` values. Headers with negative effective offset are clipped.
-2. **All four sides**: Implement `Side.Bottom` (mirror of Top, `Thickness.Bottom = 3`), `Side.Left` (`Thickness.Left = N`, vertical `TabOffset`), and `Side.Right` (`Thickness.Right = N`, vertical `TabOffset`). See "Tab Style Renderings by Side" section for target visuals.
-3. **Focus/Hotkeys**: Tab title `_` convention for hotkeys works via Tab's Title property. Click on header detected in Border's mouse handling.
-4. **Draw order**: Selected tab should be drawn last (Z-order). May need to reorder SubViews or rely on focused-view-drawn-last.
+Add `Tabs.ScrollOffset` subtracted from all `TabOffset` values. Headers with negative effective offset are clipped. Use built-in `View` scrollbar with transparent slider as described above.
 
-## Open Questions
+### Step 3: All Four Sides
 
-### Resolved
+Implement `Side.Bottom` (mirror of Top, `Thickness.Bottom = 3`), `Side.Left` (`Thickness.Left = N`, vertical `TabOffset`), and `Side.Right` (`Thickness.Right = N`, vertical `TabOffset`). See "Tab Style Renderings by Side" section for target visuals.
+
+### Step 4: Focus, Hotkeys, and Draw Order
+
+1. **Focus/Hotkeys**: Tab title `_` convention for hotkeys works via Tab's Title property. Click on header detected in Border's mouse handling.
+2. **Draw order**: Selected tab should be drawn last (Z-order). May need to reorder SubViews or rely on focused-view-drawn-last.
+
+## Resolved Design Questions
 
 1. **Z-order of headers vs content**: With `Overlapped`, the selected tab is brought to the front (z-order), which means its content area could cover unselected tabs' headers. **Resolution**: This is not a problem because headers render in the **Border adornment** (Thickness.Top=3), which occupies space *above* the content Viewport. The selected tab's content renders inside its Viewport and cannot cover the Border area of sibling tabs. All Borders render to the same `LineCanvas` via `SuperViewRendersLineCanvas`.
 
 2. **Vertical text for Side.Left/Right**: `TextDirection.TopBottom_LeftRight` already exists in the `TextDirection` enum and is supported by `TextFormatter`. Tab headers on left/right sides can use this for vertical title rendering.
 
 3. **Migration from existing TabRow-based implementation**: Delete all existing `Tab.cs`, `TabRow.cs`, `TabView.cs`, and all tests. Start fresh with the Border-based design. Existing `TabViewVisualTests` patterns may inform new tests but won't be preserved.
-
-## Issues Found in This Plan (To Fix)
-
-The following errors/inconsistencies should be corrected:Borde
-
-1. **Line ~292**: `Border.BorderStyle == BorderStyle.Tab` — `BorderStyle` is actually `LineStyle` (Rounded, Single, etc.). The Tab flag is on `BorderSettings`, not `BorderStyle`. Should be `Border.Settings.HasFlag (BorderSettings.Tab)`.
-
-2. **Line ~337 (`Tab` constructor)**: `Canfocus = true` — typo, should be `CanFocus` (capital F).
-
-3. **Line ~226 (`TabWidth` property)**: ~~Contains pseudo-code `(or Height)` — `Parent?.TitleTextFormatter.FormatAndGetSize ().Width (or Height)` is not valid C#. Should be two separate expressions or a conditional based on `TabSide`.~~ **FIXED:** Implemented as `Border.TabLength` with auto-computation `Title.GetColumns() + 2`. The earlier `+ 1` bug was also fixed.
-
-4. **Line ~364 (`IValue<Tab?>.Value` getter)**: `Focused as Tab` won't work correctly. `View.Focused` returns the *immediate* focused subview — if a control inside a Tab has focus, `Focused` returns that control, not the Tab. Should use `SubViews.OfType<Tab> ().FirstOrDefault (t => t.HasFocus)`.
-
-5. **Line ~584**: `Scrollbar.Slider` — inconsistent casing. The class is `ScrollBar` (capital B), not `Scrollbar`.
-
-6. **Line ~233**: `ViewportSettingsFlags.TransparentMouse` — should clarify this goes on the **Border adornment's** `ViewportSettings`, not the Tab view's ViewportSettings.
-
-7. **Line ~604**: `ViewportSettingsFlags.MouseEventsTransparent` — the actual flag name is `ViewportSettingsFlags.TransparentMouse` (used elsewhere in the codebase, e.g. `Arrangement.cs`).
-
-8. **Phase 3 scope**: Phase 3 ("Polish") bundles scrolling, all four sides, focus/hotkeys, and draw order — this is very large and should probably be split into 3-4 separate phases.
 

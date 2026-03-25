@@ -324,7 +324,7 @@ public partial class BorderView : AdornmentView
                };
     }
 
-    #endregion Tab Title Label
+    #endregion Tab Title View
 
     private int GetTabDepth (Border border)
     {
