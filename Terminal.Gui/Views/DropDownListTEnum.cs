@@ -43,7 +43,7 @@ public sealed class DropDownList<TEnum> : DropDownList, IValue where TEnum : str
     {
         TEnum? newValue = null;
 
-        if (!string.IsNullOrEmpty (e.NewValue) && Enum.TryParse<TEnum> (e.NewValue, out TEnum parsed))
+        if (!string.IsNullOrEmpty (e.NewValue) && Enum.TryParse (e.NewValue, out TEnum parsed))
         {
             newValue = parsed;
         }
@@ -56,7 +56,7 @@ public sealed class DropDownList<TEnum> : DropDownList, IValue where TEnum : str
     /// </summary>
     public new TEnum? Value
     {
-        get => !string.IsNullOrEmpty (Text) && Enum.TryParse<TEnum> (Text, out TEnum result) ? result : null;
+        get => !string.IsNullOrEmpty (Text) && Enum.TryParse (Text, out TEnum result) ? result : null;
         set => base.Value = value?.ToString ();
     }
 
