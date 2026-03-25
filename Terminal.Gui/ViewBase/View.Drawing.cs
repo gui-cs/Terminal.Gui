@@ -148,6 +148,10 @@ public partial class View // Drawing APIs
             // ------------------------------------
             // Re-draw the Border and Padding Adornment SubViews
             // HACK: This is a hack to ensure that the Border and Padding Adornment SubViews are drawn after the line canvas.
+            // BUG: This means adornment SubView border lines (merged via LineCanvas.Merge) arrive AFTER
+            // DoRenderLineCanvas has already rendered and cleared the parent's LineCanvas. Auto-join between
+            // adornment SubView borders and the parent's border doesn't work in a single frame.
+            // See AdornmentSubViewLineCanvasTests for failing tests that demonstrate this.
             DoDrawAdornmentsSubViews (context);
 
             // ------------------------------------
