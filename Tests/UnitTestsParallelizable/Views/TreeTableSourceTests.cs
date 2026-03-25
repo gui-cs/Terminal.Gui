@@ -49,19 +49,19 @@ public class TreeTableSourceTests : TestDriverBase
         // Column 2 is the '+' expand indicator within the Name cell.
         tv.NewMouseEvent (new Mouse { Position = new (2, 2), Flags = MouseFlags.LeftButtonClicked });
 
-        Assert.Equal (4, tv.Table.Rows);
+        Assert.Equal (4, tv.Table?.Rows);
 
         // Clicking the same spot again collapses.
         tv.NewMouseEvent (new Mouse { Position = new (2, 2), Flags = MouseFlags.LeftButtonClicked });
 
-        Assert.Equal (2, tv.Table.Rows);
+        Assert.Equal (2, tv.Table?.Rows);
     }
 
     [Fact]
     public void Space_WithCheckBoxWrapper_TogglesCheckState ()
     {
         TableView tv = GetTreeTableView (out _);
-        CheckBoxTableSourceWrapperByIndex checkSource = new (tv, tv.Table);
+        CheckBoxTableSourceWrapperByIndex checkSource = new (tv, tv.Table!);
         tv.Table = checkSource;
 
         // Initially no checked rows.
