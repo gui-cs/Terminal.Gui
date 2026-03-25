@@ -98,7 +98,7 @@ public class DropDownListExample : Scenario
             Title = "Select Color",
             Source = new ListWrapper<string> (colors),
             ReadOnly = true,
-            Text = "Red"
+            Value = colors [0]
         };
 
         readOnlyDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"ReadOnly: ValueChanged - OldValue: '{e.OldValue}', NewValue: '{e.NewValue}'"); };
@@ -133,10 +133,7 @@ public class DropDownListExample : Scenario
 
         DropDownList<DayOfWeekShort> enumDropDown = new ()
         {
-            X = Pos.Right (enumLabel) + 1,
-            Y = Pos.Top (enumLabel),
-            Title = "Select Day",
-            Value = DayOfWeekShort.Monday
+            X = Pos.Right (enumLabel) + 1, Y = Pos.Top (enumLabel), Title = "Select Day", Value = DayOfWeekShort.Monday
         };
 
         enumDropDown.ValueChanged += (s, e) => { _eventLog?.Log ($"Enum: ValueChanged - NewValue: '{e.Value}'"); };
