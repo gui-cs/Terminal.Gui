@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
-using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
+using UnitTests;
+using UnitTests.Parallelizable;
 
 namespace ViewsTests;
 
@@ -2314,7 +2315,8 @@ public class MenuTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             Menu menu = new ();
             MenuItem item = new () { Title = "Item1" };
@@ -2417,7 +2419,8 @@ public class MenuTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             VirtualTimeProvider time = new ();
             using IApplication app = Application.Create (time);
@@ -2456,7 +2459,8 @@ public class MenuTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             VirtualTimeProvider time = new ();
             using IApplication app = Application.Create (time);
@@ -2495,8 +2499,9 @@ public class MenuTests (ITestOutputHelper output)
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
             ListBackend traceBackend = new ();
-            Trace.Backend = traceBackend;
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.Backend = traceBackend;
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             try
             {
@@ -2589,7 +2594,6 @@ public class MenuTests (ITestOutputHelper output)
             }
             finally
             {
-                Trace.EnabledCategories = TraceCategory.None;
                 Trace.Backend = new NullBackend ();
             }
         }

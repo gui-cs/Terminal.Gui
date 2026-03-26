@@ -136,7 +136,7 @@ public class Runner
 
         if (benchmarkWindow.Border is { })
         {
-            benchmarkWindow.Border!.Thickness = new Thickness (0, 0, 0, 0);
+            benchmarkWindow.Border.Thickness = new Thickness (0, 0, 0, 0);
         }
 
         TableView resultsTableView = new () { Width = Dim.Fill (), Height = Dim.Fill () };

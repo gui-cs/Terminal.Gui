@@ -16,7 +16,7 @@ namespace Terminal.Gui.Views;
 /// <seealso cref="FrameView"/>
 public class Window : Runnable
 {
-    private static ShadowStyle _defaultShadow = ShadowStyle.None; // Resources/config.json overrides
+    private static ShadowStyles _defaultShadow = ShadowStyles.None; // Resources/config.json overrides
     private static LineStyle _defaultBorderStyle = LineStyle.Single; // Resources/config.json overrides
 
     /// <summary>
@@ -36,7 +36,7 @@ public class Window : Runnable
     ///     Gets or sets whether all <see cref="Window"/>s are shown with a shadow effect by default.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyle DefaultShadow
+    public static ShadowStyles DefaultShadow
     {
         get => _defaultShadow;
         set => _defaultShadow = value;

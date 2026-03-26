@@ -262,7 +262,7 @@ public class ViewClearViewportTests () : TestDriverBase
             Height = 1,
             Driver = driver
         };
-        view.Border!.Thickness = new Thickness (1);
+        view.Border.Thickness = new Thickness (1);
         view.BeginInit ();
         view.EndInit ();
         view.LayoutSubViews ();

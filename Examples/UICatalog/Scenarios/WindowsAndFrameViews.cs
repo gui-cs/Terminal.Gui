@@ -36,8 +36,8 @@ public class WindowsAndFrameViews : Scenario
             SchemeName = "Dialog",
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable
         };
-        win.Padding!.Thickness = new (PADDING);
-        win.Margin!.Thickness = new (MARGIN);
+        win.Padding.Thickness = new (PADDING);
+        win.Margin.Thickness = new (MARGIN);
 
         Button paddingButton = new ()
         {
@@ -78,7 +78,7 @@ public class WindowsAndFrameViews : Scenario
                 Height = CONTENT_HEIGHT + pad * 2 + 2,
                 Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable
             };
-            loopWin.Padding!.Thickness = new (pad);
+            loopWin.Padding.Thickness = new (pad);
 
             loopWin.SchemeName = "Dialog";
 

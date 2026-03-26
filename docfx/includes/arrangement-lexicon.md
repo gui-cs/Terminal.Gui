@@ -1,6 +1,6 @@
 | Term | Meaning |
 |:-----|:--------|
-| **Arrange Mode** | Interactive mode activated via `Ctrl+F5` (configurable via <xref:Terminal.Gui.App.Application.ArrangeKey>) that displays indicators on arrangeable views and allows keyboard-based arrangement. |
+| **Arrange Mode** | Interactive mode activated via `Ctrl+F5` (configurable via `Application.DefaultKeyBindings` for `Command.Arrange`) that displays indicators on arrangeable views and allows keyboard-based arrangement. |
 | **Arrangement** | The feature of [Layout](~/docs/layout.md) which controls how the user can use the mouse and keyboard to arrange views and enables either **Tiled** or **Overlapped** layouts. |
 | **Modal** | A view run as an "application" via [Application.Run](~/api/Terminal.Gui.App.Application.yml) where `Modal == true`. Has constrained z-order with modal view at z-order 1. |
 | **Movable** | A View that can be moved by the user using keyboard or mouse. Enabled by setting [ViewArrangement.Movable](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml) flag. |

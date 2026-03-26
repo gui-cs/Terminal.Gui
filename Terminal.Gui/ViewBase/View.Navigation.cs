@@ -154,16 +154,13 @@ public partial class View // Focus and cross-view navigation management (TabStop
                 return false;
             }
 
-            if (focusChain [focusedTabGroupIndex].PreviouslyFocused is { } && subViews.Any (v => v == focusChain [focusedTabGroupIndex].PreviouslyFocused))
+            if (focusChain [focusedTabGroupIndex].PreviouslyFocused is null || subViews.All (v => v != focusChain [focusedTabGroupIndex].PreviouslyFocused))
             {
-                if (focusChain [focusedTabGroupIndex].PreviouslyFocused!.SetFocus ())
-                {
-                    return true;
-                }
+                return subViews [0].SetFocus ();
             }
 
             // We have a subview that can be focused
-            return subViews [0].SetFocus ();
+            return focusChain [focusedTabGroupIndex].PreviouslyFocused!.SetFocus () || subViews [0].SetFocus ();
         }
     }
 
@@ -218,13 +215,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
         var args = new AdvanceFocusEventArgs (direction, behavior);
         AdvancingFocus?.Invoke (this, args);
 
-        if (args.Cancel)
-        {
-            // The event was cancelled
-            return true;
-        }
-
-        return false;
+        // The event was cancelled
+        return args.Cancel;
     }
 
     /// <summary>
@@ -352,19 +344,19 @@ public partial class View // Focus and cross-view navigation management (TabStop
             }
 
             // How about in Adornments?
-            if (Margin is { HasFocus: true })
+            if (Margin.View is { HasFocus: true })
             {
-                return Margin;
+                return Margin.View;
             }
 
-            if (Border is { HasFocus: true })
+            if (Border.View is { HasFocus: true })
             {
-                return Border;
+                return Border.View;
             }
 
-            if (Padding is { HasFocus: true })
+            if (Padding.View is { HasFocus: true })
             {
-                return Padding;
+                return Padding.View;
             }
 
             return null;
@@ -611,17 +603,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
             throw new ArgumentException ("SetHasFocusTrue: currentFocusedView must HasFocus.");
         }
 
-        var thisAsAdornment = this as Adornment;
-        View? superViewOrParent = thisAsAdornment?.Parent ?? SuperView;
+        var thisAsAdornment = this as AdornmentView;
+        View? superViewOrParent = thisAsAdornment?.Adornment?.Parent ?? SuperView;
 
-        if (CanFocus && superViewOrParent is { CanFocus: false })
-        {
-            //Logging.Warning ($@"Attempt to FocusChanging where SuperView.CanFocus == false. {this}");
-
-            return (false, false);
-        }
-
-        if (!CanBeVisible (this) || !Enabled || !CanFocus)
+        if ((CanFocus && superViewOrParent is { CanFocus: false }) || !CanBeVisible (this) || !Enabled || !CanFocus)
         {
             return (false, false);
         }
@@ -800,8 +785,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
             throw new InvalidOperationException ("SetHasFocusFalse new focused view does not have focus.");
         }
 
-        var thisAsAdornment = this as Adornment;
-        View? superViewOrParent = thisAsAdornment?.Parent ?? SuperView;
+        var thisAsAdornment = this as AdornmentView;
+        View? superViewOrParent = thisAsAdornment?.Adornment?.Parent ?? SuperView;
 
         // If newFocusedVew is null, we need to find the view that should get focus, and SetFocus on it.
         if (!traversingDown && newFocusedView is null)
@@ -1014,22 +999,23 @@ public partial class View // Focus and cross-view navigation management (TabStop
             filteredSubViews = GetSubViews (includePadding: true).Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
         }
 
-        if (Padding is { CanFocus: true, Visible: true, Enabled: true } && Padding.TabStop == behavior && Padding.Thickness != Thickness.Empty)
+        if (this is not IAdornmentView
+            && Padding.View is { CanFocus: true, Visible: true, Enabled: true }
+            && Padding.View?.TabStop == behavior
+            && Padding.Thickness != Thickness.Empty)
         {
-            filteredSubViews = filteredSubViews.Append (Padding);
+            filteredSubViews = filteredSubViews.Append (Padding.View!);
         }
 
         // Border and Margin do not participate in focus chain navigation.
 
         if (direction == NavigationDirection.Backward)
         {
-            filteredSubViews = filteredSubViews?.Reverse ();
+            filteredSubViews = filteredSubViews.Reverse ();
         }
 
-        return filteredSubViews?.ToArray () ?? [];
+        return filteredSubViews.ToArray () ?? [];
     }
-
-    private TabBehavior? _tabStop;
 
     /// <summary>
     ///     Gets or sets the behavior of <see cref="AdvanceFocus"/> for keyboard navigation.
@@ -1050,25 +1036,25 @@ public partial class View // Focus and cross-view navigation management (TabStop
     ///         focus even if this property is set and vice versa.
     ///     </para>
     ///     <para>
-    ///         The default <see cref="TabBehavior.TabStop"/> keys are <see cref="IKeyboard.NextTabKey"/> (<c>Key.Tab</c>)
-    ///         and <see cref="IKeyboard.PrevTabKey"/> (<c>Key>Tab.WithShift</c>).
+    ///         The default <see cref="TabBehavior.TabStop"/> keys are <c>Key.Tab</c>
+    ///         and <c>Key.Tab.WithShift</c>.
     ///     </para>
     ///     <para>
-    ///         The default <see cref="TabBehavior.TabGroup"/> keys are <see cref="IKeyboard.NextTabGroupKey"/> (
-    ///         <c>Key.F6</c>) and <see cref="IKeyboard.PrevTabGroupKey"/> (<c>Key>Key.F6.WithShift</c>).
+    ///         The default <see cref="TabBehavior.TabGroup"/> keys are <c>Key.F6</c>
+    ///         and <c>Key.F6.WithShift</c>.
     ///     </para>
     /// </remarks>
     public TabBehavior? TabStop
     {
-        get => _tabStop;
+        get;
         set
         {
-            if (_tabStop is { } && _tabStop == value)
+            if (field is { } && field == value)
             {
                 return;
             }
 
-            _tabStop = value;
+            field = value;
         }
     }
 

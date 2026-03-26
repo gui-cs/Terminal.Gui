@@ -512,7 +512,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     /// <summary>
     ///     The visual role for elements that are active or selected (e.g., selected item in a <see cref="ListView"/>). Also
     ///     used
-    ///     for headers in, <see cref="HexView"/>, <see cref="CharMap"/> and  <see cref="TabView"/>.
+    ///     for headers in, <see cref="HexView"/>, <see cref="CharMap"/>.
     ///     If not explicitly set, will be a derived value. See the description for <see cref="Scheme"/> for details on the
     ///     algorithm used.
     /// </summary>

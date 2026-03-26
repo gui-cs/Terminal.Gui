@@ -7,6 +7,7 @@ using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
+using Terminal.Gui.Input;
 
 // Override the default configuration for the application to use the Amber Phosphor theme
 ConfigurationManager.RuntimeConfig = """{ "Theme": "Amber Phosphor" }""";
@@ -32,7 +33,7 @@ public sealed class ExampleWindow : Runnable<string?>
 {
     public ExampleWindow ()
     {
-        Title = $"Example App ({Application.QuitKey} to quit)";
+        Title = $"Example App ({Application.GetDefaultKey (Command.Quit)} to quit)";
 
         // Create input components and labels
         var usernameLabel = new Label { Text = "Username:" };

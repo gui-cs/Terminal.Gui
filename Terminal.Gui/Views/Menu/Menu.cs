@@ -70,7 +70,7 @@ public class Menu : Bar, IValue<MenuItem?>
         Height = Dim.Auto (DimAutoStyle.Content, 1);
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Menu);
 
-        Border?.Settings &= ~BorderSettings.Title;
+        Border.Settings &= ~BorderSettings.Title;
 
         BorderStyle = DefaultBorderStyle;
 
@@ -164,8 +164,8 @@ public class Menu : Bar, IValue<MenuItem?>
 
             case Line line:
                 // Grow line so we get auto-join line
-                line.X = Pos.Func (_ => -Border!.Thickness.Left);
-                line.Width = Dim.Fill () + Dim.Func (_ => Border!.Thickness.Right);
+                line.X = Pos.Func (_ => -Border.Thickness.Left);
+                line.Width = Dim.Fill () + Dim.Func (_ => Border.Thickness.Right);
 
                 break;
         }

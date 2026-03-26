@@ -8,13 +8,13 @@ public enum ViewDiagnosticFlags : uint
     Off = 0b_0000_0000,
 
     /// <summary>
-    ///     When enabled, <see cref="Adornment"/> will draw a ruler in the Thickness. See <see cref="Adornment.Diagnostics"/>.
+    ///     When enabled, <see cref="AdornmentView"/> will draw a ruler in the Thickness. See <see cref="AdornmentView.Diagnostics"/>.
     /// </summary>
     Ruler = 0b_0000_0001,
 
     /// <summary>
-    ///     When enabled, <see cref="Adornment"/> will draw the first letter of the Adornment name ('M', 'B', or 'P')
-    ///     in the Thickness. See <see cref="Adornment.Diagnostics"/>.
+    ///     When enabled, <see cref="AdornmentView"/> will draw the first letter of the Adornment name ('M', 'B', or 'P')
+    ///     in the Thickness. See <see cref="AdornmentView.Diagnostics"/>.
     /// </summary>
     Thickness = 0b_0000_0010,
 

@@ -20,7 +20,7 @@ public sealed class ArrangementEditor : EditorBase
 
     protected override void OnViewToEditChanged ()
     {
-        _arrangementSelector.Enabled = ViewToEdit is { } and not Adornment;
+        _arrangementSelector.Enabled = ViewToEdit is { } and not AdornmentView;
 
         _arrangementSelector.ValueChanged -= ArrangementFlagsOnValueChanged;
 
@@ -45,12 +45,12 @@ public sealed class ArrangementEditor : EditorBase
 
         if (ViewToEdit.Arrangement.HasFlag (ViewArrangement.Overlapped))
         {
-            ViewToEdit.ShadowStyle = ShadowStyle.Transparent;
+            ViewToEdit.ShadowStyle = ShadowStyles.Transparent;
             ViewToEdit.SchemeName = "Runnable";
         }
         else
         {
-            ViewToEdit.ShadowStyle = ShadowStyle.None;
+            ViewToEdit.ShadowStyle = null;
             ViewToEdit.SchemeName = ViewToEdit!.SuperView!.SchemeName;
         }
 

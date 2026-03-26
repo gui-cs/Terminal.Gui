@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using AppTestHelpers;
 using AppTestHelpers.XunitHelpers;
 
@@ -130,8 +130,8 @@ public class PopoverMenuTests : TestsAllDrivers
                                         .Then (_ => app?.Popovers!.Show (app?.Popovers.Popovers.First ()))
                                         .ScreenShot ("After Show", _out)
                                         .AssertTrue (app?.Popovers?.GetActivePopover () is PopoverMenu)
-                                        .KeyDown (Application.QuitKey)
-                                        .ScreenShot ($"After {Application.QuitKey}", _out)
+                                        .KeyDown (Application.GetDefaultKey (Command.Quit))
+                                        .ScreenShot ($"After {Application.GetDefaultKey (Command.Quit)}", _out)
                                         .AssertFalse (app?.Popovers!.Popovers.Cast<PopoverMenu> ().FirstOrDefault ()!.Visible)
                                         .AssertNull (app?.Popovers!.GetActivePopover ())
                                         .AssertTrue (app?.TopRunnable!.IsRunning);
@@ -177,8 +177,8 @@ public class PopoverMenuTests : TestsAllDrivers
                                         .ScreenShot ("After Show", _out)
                                         .AssertTrue (app?.Popovers?.GetActivePopover () is PopoverMenu)
                                         .AssertIsType<MenuItem> (app?.Navigation!.GetFocused ())
-                                        .KeyDown (Application.QuitKey)
-                                        .ScreenShot ($"After {Application.QuitKey}", _out)
+                                        .KeyDown (Application.GetDefaultKey (Command.Quit))
+                                        .ScreenShot ($"After {Application.GetDefaultKey (Command.Quit)}", _out)
                                         .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
                                         .AssertIsNotType<MenuItem> (app?.Navigation!.GetFocused ());
     }
@@ -222,8 +222,8 @@ public class PopoverMenuTests : TestsAllDrivers
                                         .ScreenShot ("PopoverMenu after Show", _out)
                                         .AssertEqual ("Cu_t", app?.Navigation!.GetFocused ()!.Title)
                                         .AssertTrue (app?.TopRunnable!.IsRunning)
-                                        .KeyDown (Application.QuitKey)
-                                        .ScreenShot ($"After {Application.QuitKey}", _out)
+                                        .KeyDown (Application.GetDefaultKey (Command.Quit))
+                                        .ScreenShot ($"After {Application.GetDefaultKey (Command.Quit)}", _out)
                                         .AssertFalse (app?.Popovers?.GetActivePopover () is PopoverMenu)
                                         .AssertTrue (app?.TopRunnable!.IsRunning);
     }
@@ -304,7 +304,7 @@ public class PopoverMenuTests : TestsAllDrivers
 
         testView.KeyDown += (sender, key) =>
                             {
-                                if (key == Application.QuitKey)
+                                if (key == Application.GetDefaultKey (Command.Quit))
                                 {
                                     quitKeyDownCount++;
                                 }
@@ -322,7 +322,7 @@ public class PopoverMenuTests : TestsAllDrivers
                                                    app?.Popovers!.Register (popoverMenu);
                                                })
                                         .Add (testView)
-                                        .KeyDown (Application.QuitKey)
+                                        .KeyDown (Application.GetDefaultKey (Command.Quit))
                                         .AssertEqual (1, quitKeyDownCount);
     }
 

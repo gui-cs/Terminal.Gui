@@ -1,4 +1,4 @@
-﻿namespace ViewBaseTests.Layout;
+namespace ViewBaseTests.Layout;
 
 /// <summary>
 ///     Test the <see cref="View.FrameToScreen"/> and <see cref="View.ViewportToScreen"/> methods.
@@ -111,7 +111,7 @@ public class ToScreenTests
             Height = 1
         };
 
-        view.Border!.Add (subviewOfBorder);
+        view.Border.GetOrCreateView ().Add (subviewOfBorder);
         view.BeginInit ();
         view.EndInit ();
 
@@ -133,9 +133,9 @@ public class ToScreenTests
         // Arrange
         var adornmentFrame = new Rectangle (topX, 0, 10, 10);
 
-        var adornment = new Adornment ();
+        AdornmentView adornment = new (new Adornments.AdornmentTests.TestAdornment ());
         adornment.Frame = adornmentFrame;
-        adornment.Thickness = new Thickness (1);
+        adornment.Adornment!.Thickness = new Thickness (1);
 
         var subviewOfAdornment = new View
         {

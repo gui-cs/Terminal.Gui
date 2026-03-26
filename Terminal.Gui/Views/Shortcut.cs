@@ -110,7 +110,7 @@ public class Shortcut : View, IOrientation, IDesignable
         MouseHighlightStates = MouseState.In;
         CanFocus = true;
 
-        Border?.Settings &= ~BorderSettings.Title;
+        Border.Settings &= ~BorderSettings.Title;
 
         Width = GetWidthDimAuto ();
         Height = Dim.Auto (DimAutoStyle.Content, 1);
@@ -220,7 +220,7 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             Thickness t = GetMarginThickness ();
 
-            HelpView.Margin!.Thickness = _maxHelpWidth switch
+            HelpView.Margin.Thickness = _maxHelpWidth switch
                                          {
                                              0 or 1 =>
 
@@ -230,16 +230,16 @@ public class Shortcut : View, IOrientation, IDesignable
 
                                                  // Scrunch just the right margin
                                                  new Thickness (t.Right, t.Top, t.Left - 1, t.Bottom),
-                                             _ => HelpView.Margin!.Thickness
+                                             _ => HelpView.Margin.Thickness
                                          };
         }
         else
         {
             // Reset to default
-            HelpView.Margin!.Thickness = GetMarginThickness ();
+            HelpView.Margin.Thickness = GetMarginThickness ();
 
             // Margin must be transparent to mouse, so clicks pass through to Shortcut
-            HelpView.Margin!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
+            HelpView.Margin.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
         }
     }
 
@@ -537,10 +537,10 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         if (CommandView.Margin is { })
         {
-            CommandView.Margin!.Thickness = GetMarginThickness ();
+            CommandView.Margin.Thickness = GetMarginThickness ();
 
             // Margin must be transparent to mouse, so clicks pass through to Shortcut
-            CommandView.Margin!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
+            CommandView.Margin.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
         }
 
         CommandView.X = Pos.Align (Alignment.End, AlignmentModes);
@@ -660,10 +660,10 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         if (HelpView.Margin is { })
         {
-            HelpView.Margin!.Thickness = GetMarginThickness ();
+            HelpView.Margin.Thickness = GetMarginThickness ();
 
             // Margin must be transparent to mouse, so clicks pass through to Shortcut
-            HelpView.Margin!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
+            HelpView.Margin.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
         }
 
         HelpView.X = Pos.Align (Alignment.End, AlignmentModes);
@@ -784,10 +784,10 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         if (KeyView.Margin is { })
         {
-            KeyView.Margin!.Thickness = GetMarginThickness ();
+            KeyView.Margin.Thickness = GetMarginThickness ();
 
             // Margin must be transparent to mouse, so clicks pass through to Shortcut
-            KeyView.Margin!.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
+            KeyView.Margin.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
         }
 
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes);

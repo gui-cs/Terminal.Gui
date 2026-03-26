@@ -14,7 +14,7 @@ public class ScrollBarDemo : Scenario
         app.Init ();
 
         using Window window = new ();
-        window.Title = $"{Application.QuitKey} to Quit - Scenario: {GetName ()}";
+        window.Title = $"{Application.GetDefaultKey (Command.Quit)} to Quit - Scenario: {GetName ()}";
         window.Arrangement = ViewArrangement.Fixed;
 
         FrameView demoFrame = new ()
@@ -26,7 +26,7 @@ public class ScrollBarDemo : Scenario
             SchemeName = "Base",
             Arrangement = ViewArrangement.Resizable
         };
-        demoFrame.Padding!.Thickness = new Thickness (1);
+        demoFrame.Padding.Thickness = new Thickness (1);
         demoFrame.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
         window.Add (demoFrame);
 

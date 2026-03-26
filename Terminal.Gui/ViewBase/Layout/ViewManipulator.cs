@@ -67,7 +67,7 @@ public sealed class ViewManipulator
     ///     Resizes view from the bottom edge, adjusting height only.
     /// </summary>
     /// <param name="location">Mouse position in view's coordinate space.</param>
-    public void ResizeBottom (Point location) => _view.Height = Math.Max (_minHeight, location.Y - _view.Frame.Y + _view.Margin!.Thickness.Bottom + 1);
+    public void ResizeBottom (Point location) => _view.Height = Math.Max (_minHeight, location.Y - _view.Frame.Y + _view.Margin.Thickness.Bottom + 1);
 
     /// <summary>
     ///     Resizes view from the left edge, adjusting X position and width.
@@ -90,7 +90,7 @@ public sealed class ViewManipulator
     ///     Resizes view from the right edge, adjusting width only.
     /// </summary>
     /// <param name="location">Mouse position in view's coordinate space.</param>
-    public void ResizeRight (Point location) => _view.Width = Math.Max (_minWidth, location.X - _view.Frame.X + _view.Margin!.Thickness.Right + 1);
+    public void ResizeRight (Point location) => _view.Width = Math.Max (_minWidth, location.X - _view.Frame.X + _view.Margin.Thickness.Right + 1);
 
     #endregion
 
