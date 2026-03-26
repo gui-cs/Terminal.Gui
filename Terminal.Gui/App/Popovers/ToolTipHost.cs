@@ -1,5 +1,3 @@
-using System.ComponentModel;
-
 namespace Terminal.Gui.App;
 
 /// <summary>
@@ -18,22 +16,22 @@ namespace Terminal.Gui.App;
 ///         Hover handling and target registration should be managed externally by a tooltip manager.
 ///     </para>
 /// </remarks>
-public class ToolTip<TView> : PopoverImpl, IDesignable where TView : View, new()
+public class ToolTipHost<TView> : PopoverImpl, IDesignable where TView : View, new()
 {
     private CommandBridge? _contentCommandBridge;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ToolTip{TView}"/> class.
+    ///     Initializes a new instance of the <see cref="ToolTipHost{TView}"/> class.
     /// </summary>
-    public ToolTip () : this (null) { }
+    public ToolTipHost () : this (null) { }
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="ToolTip{TView}"/> class with the specified content view.
+    ///     Initializes a new instance of the <see cref="ToolTipHost{TView}"/> class with the specified content view.
     /// </summary>
     /// <param name="contentView">
     ///     The view to host in the tooltip. If <see langword="null"/>, a new instance will be created.
     /// </param>
-    public ToolTip (TView? contentView)
+    public ToolTipHost (TView? contentView)
     {
         // Do this to support debugging traces where Title gets set
         // Unicode Character 'REPLACEMENT CHARACTER' (U+FFFF) is used to indicate an invalid HotKeySpecifier

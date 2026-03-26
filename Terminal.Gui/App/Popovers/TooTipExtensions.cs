@@ -1,58 +1,70 @@
-﻿namespace Terminal.Gui.App;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Terminal.Gui.App;
 
 /// <summary>
-/// Provides helper extension methods to attach tooltips to <see cref="View"/> instances.
+/// Provides extension methods for associating tooltips with views in a Terminal.Gui application.
 /// </summary>
-/// <remarks>
-/// These methods delegate to the <see cref="TooltipManager"/> associated with a <see cref="IApplication"/>.
-/// They allow attaching tooltip content without adding state directly to <see cref="View"/>.
-/// </remarks>
-public static class TooltipExtensions
+/// <remarks>These extension methods enable developers to attach or remove tooltips from any View instance.
+/// Tooltips can be specified as static text, dynamically generated text, or as a custom View for advanced scenarios.
+/// Tooltips enhance user experience by providing contextual information when users interact with UI elements.</remarks>
+public static class ToolTipExtensions
 {
     /// <summary>
-    /// Associates a tooltip content factory with the specified view.
+    ///     Associates a tooltip with the specified view, displaying the provided text when the user hovers over or focuses
+    /// on the view.
     /// </summary>
-    /// <param name="view">The target view.</param>
-    /// <param name="contentFactory">
-    /// A factory that creates the tooltip content each time it is displayed.
-    /// </param>
-    /// <remarks>
-    /// The tooltip will be shown when the mouse enters the view and hidden when it leaves.
-    /// </remarks>
-    public static void SetTooltipContent (this View view, Func<View> contentFactory)
+    /// <remarks>If a tooltip is already set for the view, this method replaces it with the new text. Tooltips
+    /// provide additional context or guidance to users interacting with the UI element.</remarks>
+    /// <param name="view">The view to which the tooltip will be attached. Cannot be null.</param>
+    /// <param name="text">The text to display in the tooltip. If null or empty, no tooltip will be shown.</param>
+    public static void SetToolTip (this View view, string text)
     {
         ArgumentNullException.ThrowIfNull (view);
-        ArgumentNullException.ThrowIfNull (contentFactory);
-
-        TooltipManager.Instance.SetTooltipContent (view, contentFactory);
+        TooltipManager.Instance.SetToolTip (view, new ToolTipProvider (text));
     }
 
     /// <summary>
-    /// Associates a text-based tooltip with the specified view.
+    /// Associates a dynamic tooltip with the specified view using a factory function to generate the tooltip text.
     /// </summary>
-    /// <param name="view">The target view.</param>
-    /// <param name="textFactory">
-    /// A factory that provides the tooltip text dynamically.
-    /// </param>
-    /// <remarks>
-    /// This is a convenience method that creates a <see cref="Label"/> internally.
-    /// </remarks>
-    public static void SetTooltipText (this View view, Func<string> textFactory)
+    /// <remarks>Use this method to provide tooltips that can change dynamically based on application state or
+    /// user interaction. The tooltip text is evaluated at the time the tooltip is displayed, allowing for
+    /// context-sensitive information.</remarks>
+    /// <param name="view">The view to which the tooltip will be attached. Cannot be null.</param>
+    /// <param name="textFactory">A function that returns the tooltip text to display. This function is invoked each time the tooltip is shown.
+    /// Cannot be null.</param>
+    public static void SetToolTip (this View view, Func<string> textFactory)
     {
         ArgumentNullException.ThrowIfNull (view);
         ArgumentNullException.ThrowIfNull (textFactory);
-
-        TooltipManager.Instance.SetTooltipText (view, textFactory);
+        TooltipManager.Instance.SetToolTip (view, new ToolTipProvider (textFactory));
     }
 
     /// <summary>
-    /// Removes any tooltip associated with the specified view.
+    /// Associates a dynamic tooltip with the specified view using a factory function to generate the tooltip content.
     /// </summary>
-    /// <param name="view">The target view.</param>
-    public static void RemoveTooltip (this View view)
+    /// <remarks>The tooltip content is generated each time the tooltip is shown by invoking the provided
+    /// factory function. This allows the tooltip to reflect dynamic or context-sensitive information.</remarks>
+    /// <param name="view">The view to which the tooltip will be attached. Cannot be null.</param>
+    /// <param name="contentFactory">A function that returns the content view to display as the tooltip. Cannot be null.</param>
+    public static void SetToolTip (this View view, Func<View> contentFactory)
     {
         ArgumentNullException.ThrowIfNull (view);
+        ArgumentNullException.ThrowIfNull (contentFactory);
+        TooltipManager.Instance.SetToolTip (view, new ToolTipProvider (contentFactory));
+    }
 
-        TooltipManager.Instance.RemoveTooltipContent (view);
+    /// <summary>
+    /// Removes the tooltip associated with the specified view, if one exists.
+    /// </summary>
+    /// <remarks>If the specified view does not have an associated tooltip, this method has no
+    /// effect.</remarks>
+    /// <param name="view">The view from which to remove the tooltip. Cannot be null.</param>
+    public static void RemoveToolTip (this View view)
+    {
+        ArgumentNullException.ThrowIfNull (view);
+        TooltipManager.Instance.RemoveTooltip (view);
     }
 }

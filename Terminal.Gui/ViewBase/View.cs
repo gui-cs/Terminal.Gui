@@ -573,49 +573,6 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     #endregion
 
-    #region Navigation and Popover
-
-
-    private bool _useTooltip;
-
-    /// <summary>
-    /// Enables or disables the display of a tooltip showing the link URL.
-    /// </summary>
-    public bool UseToolTip
-    {
-        get => _useTooltip;
-        set
-        {
-            if (_useTooltip == value)
-            {
-                return;
-            }
-
-            _useTooltip = value;
-
-            if (value)
-            {
-                SetToolTip ();
-            }
-            else
-            {
-                this.RemoveTooltip ();
-            }
-        }
-    }
-
-    /// <summary>
-    /// Sets the tooltip for the control based on its current title.
-    /// </summary>
-    /// <remarks>Override this method to customize how the tooltip text is determined or set for the control.
-    /// By default, the tooltip displays the value of the Title property.</remarks>
-    protected virtual void SetToolTip () 
-    {
-        this.SetTooltipText (() => Title);
-    }
-
-    #endregion
-
 #if DEBUG_IDISPOSABLE
 #pragma warning disable CS0419 // Ambiguous reference in cref attribute
     /// <summary>

@@ -775,8 +775,7 @@ public sealed class UICatalogRunnable : Runnable
             Text = AboutUrl,
             Url = AboutUrl,
             X = Pos.Center (),
-            Y = Pos.Bottom (asciiArt) + 1,
-            UseToolTip = true
+            Y = Pos.Bottom (asciiArt) + 1
         };
 
         dialog.Add (tagline, asciiArt, link);

@@ -28,10 +28,10 @@ public sealed class TooltipManager : IDisposable
     public static TooltipManager Instance { get; } = new TooltipManager ();
 
     // Stores tooltip registrations for each target view
-    private readonly Dictionary<View, Registration> _registrations = new ();
+    private readonly Dictionary<View, ToolTipRegistration> _registrations = new ();
 
     // Shared tooltip instance reused across all views
-    private ToolTip<View>? _sharedTooltip;
+    private ToolTipHost<View>? _sharedTooltip;
 
     // Currently active target view (if any)
     private View? _currentTarget;
@@ -42,31 +42,25 @@ public sealed class TooltipManager : IDisposable
     }
 
     /// <summary>
-    /// Associates a tooltip content factory with a target view.
+    /// Registers a tooltip provider for the specified view, enabling tooltips to be displayed when the user hovers over
+    /// the view.
     /// </summary>
-    /// <param name="target">The view that will trigger the tooltip.</param>
-    /// <param name="contentFactory">
-    /// A factory that creates the tooltip content each time it is shown.
-    /// </param>
-    /// <remarks>
-    /// <para>
-    /// The tooltip is displayed when the mouse enters the target view and hidden when it leaves.
-    /// </para>
-    /// <para>
-    /// The content is recreated on each display to avoid state retention and parent conflicts.
-    /// </para>
-    /// </remarks>
-    public void SetTooltipContent (View target, Func<View> contentFactory)
+    /// <remarks>If a tooltip provider is already registered for the specified view, it will be replaced by
+    /// the new provider. Tooltips are shown when the mouse enters the view and hidden when the mouse leaves. To remove
+    /// a tooltip, use the appropriate removal method.</remarks>
+    /// <param name="target">The view for which the tooltip should be displayed. Cannot be null.</param>
+    /// <param name="provider">The provider that supplies tooltip content for the target view. Cannot be null.</param>
+    public void SetToolTip (View target, ToolTipProvider provider)
     {
         ArgumentNullException.ThrowIfNull (target);
-        ArgumentNullException.ThrowIfNull (contentFactory);
+        ArgumentNullException.ThrowIfNull (provider);
 
         // Ensure previous registration is removed to avoid duplicate subscriptions
-        RemoveTooltipContent (target);
+        RemoveTooltip (target);
 
         void OnMouseEnter (object? sender, CancelEventArgs e)
         {
-            ShowFor (target, contentFactory);
+            ShowFor (target, provider);
         }
 
         void OnMouseLeave (object? sender, EventArgs e)
@@ -81,33 +75,18 @@ public sealed class TooltipManager : IDisposable
         // Subscribe to hover events
         target.MouseEnter += OnMouseEnter;
         target.MouseLeave += OnMouseLeave;
-
+        target.Disposing += OnDisposing;
 
         // Store registration for later removal
-        _registrations [target] = new Registration (contentFactory, OnMouseEnter, OnMouseLeave);
+        _registrations [target] = new ToolTipRegistration (provider, OnMouseEnter, OnMouseLeave, OnDisposing);
     }
 
-    /// <summary>
-    /// Associates a text-based tooltip with a target view.
-    /// </summary>
-    /// <param name="target">The target view.</param>
-    /// <param name="textFactory">
-    /// A factory that provides the tooltip text dynamically.
-    /// </param>
-    /// <remarks>
-    /// This is a convenience wrapper that creates a <see cref="Label"/> internally.
-    /// </remarks>
-    public void SetTooltipText (View target, Func<string> textFactory)
+    private void OnDisposing (object? sender, EventArgs e)
     {
-        ArgumentNullException.ThrowIfNull (textFactory);
-
-        SetTooltipContent (
-            target,
-            () => new Label
-            {
-                Text = textFactory ()
-            }
-        );
+        if (sender is View target)
+        {
+            target.RemoveToolTip ();
+        }
     }
 
     /// <summary>
@@ -117,15 +96,16 @@ public sealed class TooltipManager : IDisposable
     /// <remarks>
     /// This unsubscribes from events and removes any stored tooltip content.
     /// </remarks>
-    public void RemoveTooltipContent (View target)
+    public void RemoveTooltip (View target)
     {
         ArgumentNullException.ThrowIfNull (target);
 
-        if (_registrations.TryGetValue (target, out Registration? registration))
+        if (_registrations.TryGetValue (target, out ToolTipRegistration? registration))
         {
             // Unsubscribe from events
             target.MouseEnter -= registration.MouseEnter;
             target.MouseLeave -= registration.MouseLeave;
+            target.Disposing -= registration.Disposing;
 
             _registrations.Remove (target);
         }
@@ -138,20 +118,19 @@ public sealed class TooltipManager : IDisposable
     }
 
     /// <summary>
-    /// Shows the tooltip for the specified target view.
+    /// Displays a tooltip for the specified target view using the provided tooltip content provider.
     /// </summary>
-    /// <param name="target">The target view.</param>
-    /// <param name="contentFactory">The content factory.</param>
-    /// <remarks>
-    /// This method reuses a single shared tooltip instance and updates its content.
-    /// </remarks>
-    public void ShowFor (View target, Func<View> contentFactory)
+    /// <remarks>If a tooltip is already visible for another view, it will be updated to display content for
+    /// the new target. The tooltip is anchored relative to the target view's position on the screen.</remarks>
+    /// <param name="target">The view for which the tooltip will be shown. Cannot be null.</param>
+    /// <param name="provider">The provider that supplies the tooltip content for the target view. Cannot be null.</param>
+    public void ShowFor (View target, ToolTipProvider provider)
     {
         ArgumentNullException.ThrowIfNull (target);
-        ArgumentNullException.ThrowIfNull (contentFactory);
+        ArgumentNullException.ThrowIfNull (provider);
 
         // Create the shared tooltip if needed
-        _sharedTooltip ??= new ToolTip<View> ();
+        _sharedTooltip ??= new ToolTipHost<View> ();
 
         // Ensure the tooltip is attached to the correct application context
         _sharedTooltip.App ??= target.App;
@@ -160,10 +139,9 @@ public sealed class TooltipManager : IDisposable
         _sharedTooltip.Anchor = () => target.FrameToScreen ();
 
         // Update content dynamically
-        _sharedTooltip.SetContent (contentFactory);
+        _sharedTooltip.SetContent (provider.GetContent);
 
         _currentTarget = target;
-        target.App?.Popovers?.Register (_sharedTooltip);
 
         // Display tooltip
         _sharedTooltip.MakeVisible ();
@@ -187,7 +165,7 @@ public sealed class TooltipManager : IDisposable
     /// </remarks>
     public void Dispose ()
     {
-        foreach ((View target, Registration registration) in _registrations)
+        foreach ((View target, ToolTipRegistration registration) in _registrations)
         {
             target.MouseEnter -= registration.MouseEnter;
             target.MouseLeave -= registration.MouseLeave;
@@ -204,9 +182,10 @@ public sealed class TooltipManager : IDisposable
     /// <summary>
     /// Stores event handlers and content factory for a registered view.
     /// </summary>
-    private sealed record Registration (
-        Func<View> ContentFactory,
+    private sealed record ToolTipRegistration (
+        ToolTipProvider Provider,
         EventHandler<CancelEventArgs> MouseEnter,
-        EventHandler MouseLeave
+        EventHandler MouseLeave,
+        EventHandler Disposing
     );
 }

@@ -76,6 +76,9 @@ public class Link : View, IDesignable
         AddCommand (Command.HotKey, InvokeHotKeyOnNextPeer!);
 
         MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
+
+        // Default tooltip shows the URL
+        this.SetToolTip(() => Url);
     }
 
     /// <summary>
@@ -197,9 +200,6 @@ public class Link : View, IDesignable
     ///     </para>
     /// </remarks>
     public string Url { get => _url; set => SetUrl (value); }
-
-    /// <inheritdoc/>
-    protected override void SetToolTip () => this.SetTooltipText (() => Url);
 
     /// <summary>
     ///     Raised when <see cref="Url"/> is about to change. Set <see cref="ValueChangingEventArgs{T}.Handled"/> to
@@ -386,4 +386,20 @@ public class Link : View, IDesignable
         SetNeedsLayout ();
     }
 
+
+    /// <summary>
+    /// Releases the unmanaged resources used by the object and optionally releases the managed resources.
+    /// </summary>
+    /// <remarks>When disposing is true, this method removes the tooltip content associated with this instance
+    /// from the TooltipManager. Always call the base class Dispose method to ensure proper resource cleanup.</remarks>
+    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            this.RemoveToolTip ();
+        }
+
+        base.Dispose (disposing);
+    }
 }

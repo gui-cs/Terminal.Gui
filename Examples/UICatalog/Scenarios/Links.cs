@@ -52,7 +52,7 @@ public class Links : Scenario
             TabStop = TabBehavior.TabStop
         };
 
-        _link = new Link { X = 1, Y = 1, BorderStyle = LineStyle.Dotted, UseToolTip = true };
+        _link = new Link { X = 1, Y = 1, BorderStyle = LineStyle.Dotted };
 
         _link.TextChanged += (s, e) => simpleUrlLabel.Text = $"This is just a Label with a URL in Text (WT automatically enables URLs) - {_link.Text}";
         titleTextField.ValueChanged += (s, e) => _link.Title = e.NewValue ?? string.Empty;
