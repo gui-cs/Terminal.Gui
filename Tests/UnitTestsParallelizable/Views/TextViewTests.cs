@@ -2167,7 +2167,7 @@ public class TextViewTests (ITestOutputHelper output)
         tv.SetRelativeLayout (new Size (100, 100));
 
         Size initialContentSize = tv.GetContentSize ();
-        Assert.Equal (3, initialContentSize.Height); // Initially 1 line
+        Assert.Equal (1, initialContentSize.Height); // Empty text should initially have 1 cell for the cursor
 
         // Act: Type text that exceeds viewport height (add multiple lines)
         tv.NewKeyDownEvent (Key.A);
@@ -2261,7 +2261,7 @@ public class TextViewTests (ITestOutputHelper output)
         tv.SetRelativeLayout (new Size (100, 100));
 
         Size initialContentSize = tv.GetContentSize ();
-        Assert.Equal (3, initialContentSize.Height);
+        Assert.Equal (1, initialContentSize.Height); // Empty text should have one cell for the cursor
 
         // Act: Set Text property programmatically with multiple lines
         tv.Text = "Line1\nLine2\nLine3\nLine4";
