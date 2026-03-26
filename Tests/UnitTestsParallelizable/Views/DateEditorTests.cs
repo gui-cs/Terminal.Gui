@@ -14,7 +14,6 @@ public class DateEditorTests (ITestOutputHelper output) : TestDriverBase
 
         Assert.NotNull (de.Provider);
         Assert.IsType<DateTextProvider> (de.Provider);
-        Assert.NotNull (de.Value);
         Assert.Equal (DateTime.Today, de.Value);
         Assert.NotNull (de.Format);
         Assert.Equal (CultureInfo.CurrentCulture.DateTimeFormat, de.Format);

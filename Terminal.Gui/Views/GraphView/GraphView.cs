@@ -255,7 +255,7 @@ public class GraphView : View, IDesignable
         // Draw 'before' annotations
         foreach (IAnnotation a in Annotations.ToArray ().Where (a => a.BeforeSeries))
         {
-            a.Render (this);
+            a.Render (this, context);
         }
 
         SetDriverColorToGraphColor ();
@@ -294,7 +294,7 @@ public class GraphView : View, IDesignable
         // Draw 'after' annotations
         foreach (IAnnotation a in Annotations.ToArray ().Where (a => !a.BeforeSeries))
         {
-            a.Render (this);
+            a.Render (this, context);
         }
 
         return true;

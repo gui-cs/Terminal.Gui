@@ -355,8 +355,8 @@ public class Popovers : Scenario
         IEnumerable<Type> types = typeof (View).Assembly.GetTypes ()
                                                .Where (t => t is { IsPublic: true, IsAbstract: false }
                                                             && t.IsSubclassOf (typeof (View))
-                                                            && t != typeof (Adornment)
-                                                            && !t.IsSubclassOf (typeof (Adornment))
+                                                            && t != typeof (AdornmentView)
+                                                            && !t.IsSubclassOf (typeof (AdornmentView))
                                                             && t != typeof (PopoverMenu)
                                                             && !t.IsGenericType);
 

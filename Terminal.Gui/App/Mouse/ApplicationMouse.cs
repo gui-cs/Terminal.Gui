@@ -44,6 +44,15 @@ internal class ApplicationMouse : IMouse, IDisposable
     private IPopoverView? _dismissedByMousePress;
 
     /// <summary>
+    ///     The active popover at the time of the most recent mouse press. Used to detect when a popover
+    ///     closes programmatically during the press → release → click cycle (e.g., when a ListView item
+    ///     selection hides the popover on Released). If this was set during Pressed but the popover is no
+    ///     longer active at Clicked time, the Clicked event is suppressed to prevent it from leaking to
+    ///     views below the now-hidden popover.
+    /// </summary>
+    private IPopoverView? _activePopoverAtPress;
+
+    /// <summary>
     ///     Tracks whether <see cref="RaiseMouseEvent"/> is currently executing within the
     ///     dismiss recursion, to avoid clearing <see cref="_dismissedByMousePress"/> prematurely.
     /// </summary>
@@ -99,6 +108,23 @@ internal class ApplicationMouse : IMouse, IDisposable
             return;
         }
 
+        // Record the active popover when a press starts so we can detect if it closes mid-cycle.
+        if (mouseEvent.IsPressed)
+        {
+            _activePopoverAtPress = App?.Popovers?.GetActivePopover ();
+        }
+
+        // Suppress Clicked events that were synthesized after a popover closed during the same
+        // press → release → click cycle. Without this, selecting an item in a popover (which
+        // hides the popover on Released) causes the Clicked event to leak to views below.
+        if (mouseEvent.IsSingleDoubleOrTripleClicked && _activePopoverAtPress is { } && App?.Popovers?.GetActivePopover () != _activePopoverAtPress)
+        {
+            Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Popovers", "Suppressing Clicked - popover closed mid-cycle");
+            _activePopoverAtPress = null;
+
+            return;
+        }
+
         // Clear the dismissed-popover guard on a genuinely new press that isn't part of dismiss recursion.
         if (mouseEvent.IsPressed && !_isDismissRecursing && _dismissedByMousePress is { })
         {
@@ -151,7 +177,7 @@ internal class ApplicationMouse : IMouse, IDisposable
         // Create a view-relative mouse event to send to the view that is under the mouse.
         Mouse viewMouseEvent;
 
-        if (deepestViewUnderMouse is Adornment adornment)
+        if (deepestViewUnderMouse is AdornmentView adornment)
         {
             Point frameLoc = adornment.ScreenToFrame (mouseEvent.ScreenPosition);
 
@@ -195,9 +221,9 @@ internal class ApplicationMouse : IMouse, IDisposable
 
         while (deepestViewUnderMouse.NewMouseEvent (viewMouseEvent) is not true && _mouseGrabViewRef is null)
         {
-            if (deepestViewUnderMouse is Adornment adornmentView)
+            if (deepestViewUnderMouse is AdornmentView adornmentView)
             {
-                deepestViewUnderMouse = adornmentView.Parent?.SuperView;
+                deepestViewUnderMouse = adornmentView.Adornment?.Parent?.SuperView;
             }
             else
             {
@@ -237,11 +263,8 @@ internal class ApplicationMouse : IMouse, IDisposable
     ///     Returns <see langword="true"/> when the mouse is currently grabbed by a view
     ///     that belongs to <paramref name="hierarchyRoot"/>'s view hierarchy.
     /// </summary>
-    private bool IsGrabbedByViewInHierarchy (View hierarchyRoot)
-    {
-        return _mouseGrabViewRef?.TryGetTarget (out View? grabbed) is true
-               && View.IsInHierarchy (hierarchyRoot, grabbed, true);
-    }
+    private bool IsGrabbedByViewInHierarchy (View hierarchyRoot) =>
+        _mouseGrabViewRef?.TryGetTarget (out View? grabbed) is true && View.IsInHierarchy (hierarchyRoot, grabbed, true);
 
     /// <inheritdoc/>
     public void RaiseMouseEnterLeaveEvents (Point screenPosition, List<View?> currentViewsUnderMouse)
@@ -286,9 +309,9 @@ internal class ApplicationMouse : IMouse, IDisposable
             CachedViewsUnderMouse.Add (view);
             bool raise;
 
-            if (view is Adornment { Parent: { } } adornmentView)
+            if (view is AdornmentView { Adornment.Parent: { } } adornmentView)
             {
-                Point superViewLoc = adornmentView.Parent.SuperView?.ScreenToViewport (screenPosition) ?? screenPosition;
+                Point superViewLoc = adornmentView.Adornment.Parent.SuperView?.ScreenToViewport (screenPosition) ?? screenPosition;
                 raise = adornmentView.Contains (superViewLoc);
             }
             else

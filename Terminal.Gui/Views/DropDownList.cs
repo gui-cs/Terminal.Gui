@@ -96,7 +96,7 @@ public class DropDownList : TextField
     /// </summary>
     public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
-        [Command.Toggle] = Bind.All (Key.F4, Key.CursorDown.WithAlt),
+        [Command.Toggle] = Bind.All (Key.F4, Key.CursorDown.WithAlt)
     };
 
     private readonly Button? _toggleButton;
@@ -118,7 +118,7 @@ public class DropDownList : TextField
             TabStop = TabBehavior.NoStop,
             NoPadding = true,
             NoDecorations = true,
-            ShadowStyle = ShadowStyle.None
+            ShadowStyle = null
         };
 
 #if DEBUG
@@ -146,7 +146,6 @@ public class DropDownList : TextField
 
                                              return Math.Min (Source?.Count ?? 0, Math.Max (1, available));
                                          })),
-
             ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar
         };
 
@@ -169,8 +168,8 @@ public class DropDownList : TextField
         _listPopover.Anchor = GetAnchor;
 
         // Add toggle button to Padding
-        Padding?.Thickness = Padding.Thickness with { Right = 1 }; // Add some spacing on the right for the button
-        Padding!.Add (_toggleButton);
+        Padding.Thickness = Padding.Thickness with { Right = 1 }; // Add some spacing on the right for the button
+        Padding.GetOrCreateView ().Add (_toggleButton);
 
         // Adjust TextField width to account for toggle button
         Width = Dim.Auto (minimumContentDim: Dim.Func (_ => _listPopover.ContentView?.MaxItemLength ?? 0));

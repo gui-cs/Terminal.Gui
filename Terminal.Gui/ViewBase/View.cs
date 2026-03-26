@@ -4,7 +4,6 @@ using System.Diagnostics;
 
 namespace Terminal.Gui.ViewBase;
 
-
 /// <summary>
 ///     View is the base class for all visible elements. View can render itself and
 ///     contains zero or more nested views, called SubViews. View provides basic functionality for layout, arrangement, and
@@ -37,10 +36,12 @@ namespace Terminal.Gui.ViewBase;
 ///             <term>Mouse Event</term> <description>Action</description>
 ///         </listheader>
 ///         <item>
-///             <term>Left Button Released</term> <description>Activates the view (<see cref="Command.Activate"/>).</description>
+///             <term>Left Button Released</term>
+///             <description>Activates the view (<see cref="Command.Activate"/>).</description>
 ///         </item>
 ///         <item>
-///             <term>Ctrl+Left Button Released</term> <description>Opens the context menu (<see cref="Command.Context"/>).</description>
+///             <term>Ctrl+Left Button Released</term>
+///             <description>Opens the context menu (<see cref="Command.Context"/>).</description>
 ///         </item>
 ///     </list>
 /// </remarks>
@@ -158,7 +159,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     /// <summary>
     ///     Gets the <see cref="IApplication"/> instance this view is running in. Used internally to allow overrides by
-    ///     <see cref="Adornment"/>.
+    ///     <see cref="IAdornment"/>.
     /// </summary>
     /// <returns>
     ///     If this view is at the top of the view hierarchy, and <see cref="App"/> was not explicitly set,
@@ -177,7 +178,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
 
     /// <summary>
     ///     Gets the <see cref="IDriver"/> instance for this view. Used internally to allow overrides by
-    ///     <see cref="Adornment"/>.
+    ///     <see cref="IAdornment"/>.
     /// </summary>
     /// <returns>If this view is at the top of the view hierarchy, returns <see langword="null"/>.</returns>
     protected virtual IDriver? GetDriver () => _driver ?? App?.Driver ?? SuperView?.Driver /*?? ApplicationImpl.Instance.Driver*/;
@@ -310,10 +311,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
         }
 
         // Force a layout each time a View is initialized
-        // BUGBUG: This Layout call is a hack to work around some bug in Layout.
-        // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4522
-        // See: https://github.com/gui-cs/Terminal.Gui/issues/3951
-        Layout (); // the EventLog in AllViewsTester fails to layout correctly if this is not here
+        Layout ();
 
         // Complex layout scenarios (e.g. DimAuto and PosAlign) may require multiple layouts to be performed.
         // Thus, we call SetNeedsLayout() to ensure that the layout is performed at least once.
@@ -352,7 +350,10 @@ public partial class View : IDisposable, ISupportInitializeNotification
             OnEnabledChanged ();
             SetNeedsDraw ();
 
-            Border?.Enabled = field;
+            if (Border.View is { } bev)
+            {
+                bev.Enabled = field;
+            }
 
             foreach (View view in InternalSubViews)
             {

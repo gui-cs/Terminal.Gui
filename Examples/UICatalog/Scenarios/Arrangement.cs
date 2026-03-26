@@ -20,23 +20,13 @@ public class Arrangement : Scenario
         using Window mainWindow = new ();
         mainWindow.Title = GetQuitKeyAndName ();
         mainWindow.TabStop = TabBehavior.TabGroup;
-        mainWindow.ShadowStyle = ShadowStyle.None;
+        mainWindow.ShadowStyle = null;
 
-        AdornmentsEditor adornmentsEditor = new ()
-        {
-            AutoSelectViewToEdit = true,
-            TabStop = TabBehavior.NoStop,
-            ShowViewIdentifier = true
-        };
+        AdornmentsEditor adornmentsEditor = new () { AutoSelectViewToEdit = true, TabStop = TabBehavior.NoStop, ShowViewIdentifier = true };
 
         adornmentsEditor.ExpanderButton!.Orientation = Orientation.Horizontal;
 
-        ArrangementEditor arrangementEditor = new ()
-        {
-            Y = Pos.Bottom (adornmentsEditor) + 1,
-            AutoSelectViewToEdit = true,
-            TabStop = TabBehavior.NoStop
-        };
+        ArrangementEditor arrangementEditor = new () { Y = Pos.Bottom (adornmentsEditor) + 1, AutoSelectViewToEdit = true, TabStop = TabBehavior.NoStop };
         mainWindow.Add (adornmentsEditor, arrangementEditor);
 
         FrameView testFrame = new ()
@@ -53,12 +43,7 @@ public class Arrangement : Scenario
 
         mainWindow.Add (testFrame);
 
-        FrameView tiledFrame = new ()
-        {
-            Title = "Frame for Tiled Demo",
-            Width = Dim.Fill (),
-            Height = Dim.Auto ()
-        };
+        FrameView tiledFrame = new () { Title = "Frame for Tiled Demo", Width = Dim.Fill (), Height = Dim.Auto () };
         View tiledView1 = CreateTiledView (0, 2, 1);
         View tiledView2 = CreateTiledView (1, Pos.Right (tiledView1) - 1, Pos.Top (tiledView1));
         tiledView2.Height = Dim.Height (tiledView1);
@@ -83,18 +68,10 @@ public class Arrangement : Scenario
         tiledSubView.Arrangement = ViewArrangement.Fixed;
         movableSizeableWithProgress.Add (tiledSubView);
 
-        ProgressBar progressBar = new ()
-        {
-            Y = Pos.AnchorEnd (),
-            Width = Dim.Fill (),
-            Id = "progressBar"
-        };
+        ProgressBar progressBar = new () { Y = Pos.AnchorEnd (), Width = Dim.Fill (), Id = "progressBar" };
         movableSizeableWithProgress.Add (progressBar);
 
-        Timer timer = new (10)
-        {
-            AutoReset = true
-        };
+        Timer timer = new (10) { AutoReset = true };
 
         timer.Elapsed += (_, _) =>
                          {
@@ -117,51 +94,42 @@ public class Arrangement : Scenario
 
         StatusBar statusBar = new ();
 
-        statusBar.Add (
-                       new Shortcut
-                       {
-                           Title = "Hide",
-                           Text = "Hotkey",
-                           Key = Key.F4,
-                           Action = () =>
-                                    {
-                                        // TODO: move this logic into `View.ShowHide()` or similar
-                                        overlappedView2.Visible = false;
-                                        overlappedView2.Enabled = overlappedView2.Visible;
-                                    }
-                       });
+        statusBar.Add (new Shortcut
+        {
+            Title = "Hide",
+            Text = "Hotkey",
+            Key = Key.F4,
+            Action = () =>
+                     {
+                         // TODO: move this logic into `View.ShowHide()` or similar
+                         overlappedView2.Visible = false;
+                         overlappedView2.Enabled = overlappedView2.Visible;
+                     }
+        });
 
-        statusBar.Add (
-                       new Shortcut
-                       {
-                           Title = "Toggle Hide",
-                           Text = "App",
-                           BindKeyToApplication = true,
-                           Key = Key.F4.WithCtrl,
-                           Action = () =>
-                                    {
-                                        // TODO: move this logic into `View.ShowHide()` or similar
-                                        overlappedView2.Visible = !overlappedView2.Visible;
-                                        overlappedView2.Enabled = overlappedView2.Visible;
+        statusBar.Add (new Shortcut
+        {
+            Title = "Toggle Hide",
+            Text = "App",
+            BindKeyToApplication = true,
+            Key = Key.F4.WithCtrl,
+            Action = () =>
+                     {
+                         // TODO: move this logic into `View.ShowHide()` or similar
+                         overlappedView2.Visible = !overlappedView2.Visible;
+                         overlappedView2.Enabled = overlappedView2.Visible;
 
-                                        if (overlappedView2.Visible)
-                                        {
-                                            overlappedView2.SetFocus ();
-                                        }
-                                    }
-                       });
+                         if (overlappedView2.Visible)
+                         {
+                             overlappedView2.SetFocus ();
+                         }
+                     }
+        });
         overlappedView2.Add (statusBar);
 
         ColorPicker colorPicker = new ()
         {
-            Y = 12,
-            Width = Dim.Fill (),
-            Id = "colorPicker",
-            Style = new ()
-            {
-                ShowTextFields = true,
-                ShowColorName = true
-            }
+            Y = 12, Width = Dim.Fill (), Id = "colorPicker", Style = new ColorPickerStyle { ShowTextFields = true, ShowColorName = true }
         };
         colorPicker.ApplyStyleChanges ();
 
@@ -176,18 +144,15 @@ public class Arrangement : Scenario
             Y = 15,
             Id = "datePicker",
             Title = "Not _Sizeable",
-            ShadowStyle = ShadowStyle.Transparent,
+            ShadowStyle = ShadowStyles.Transparent,
             BorderStyle = LineStyle.Double,
             TabStop = TabBehavior.TabGroup,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped
         };
 
-        datePicker.SetScheme (
-                              new (
-                                   new Attribute (
-                                                  SchemeManager.GetScheme (Schemes.Runnable).Normal.Foreground.GetBrighterColor (),
-                                                  SchemeManager.GetScheme (Schemes.Runnable).Normal.Background.GetBrighterColor (),
-                                                  SchemeManager.GetScheme (Schemes.Runnable).Normal.Style)));
+        datePicker.SetScheme (new Scheme (new Attribute (SchemeManager.GetScheme (Schemes.Runnable).Normal.Foreground.GetBrighterColor (),
+                                                         SchemeManager.GetScheme (Schemes.Runnable).Normal.Background.GetBrighterColor (),
+                                                         SchemeManager.GetScheme (Schemes.Runnable).Normal.Style)));
 
         TransparentView transparentView = new ()
         {
@@ -204,16 +169,15 @@ public class Arrangement : Scenario
         testFrame.Add (movableSizeableWithProgress);
         testFrame.Add (transparentView);
 
-        testFrame.Add (
-                       new TransparentView
-                       {
-                           X = 50,
-                           Y = 25,
-                           Width = 35,
-                           Height = 15,
-                           Title = "Transparent|TransparentMouse",
-                           ViewportSettings = ViewportSettingsFlags.TransparentMouse | ViewportSettingsFlags.Transparent
-                       });
+        testFrame.Add (new TransparentView
+        {
+            X = 50,
+            Y = 25,
+            Width = 35,
+            Height = 15,
+            Title = "Transparent|TransparentMouse",
+            ViewportSettings = ViewportSettingsFlags.TransparentMouse | ViewportSettingsFlags.Transparent
+        });
 
         mainWindow.Initialized += OnMainWindowInitialized;
 
@@ -231,10 +195,11 @@ public class Arrangement : Scenario
             movableSizeableWithProgress.SetFocus ();
         }
 
-        void ColorPickerColorChanged (object? sender, ValueChangedEventArgs<Color?> e)
-        {
-            testFrame.SetScheme (testFrame.GetScheme () with { Normal = new (testFrame.GetAttributeForRole (VisualRole.Normal).Foreground, e.NewValue ?? Color.Black) });
-        }
+        void ColorPickerColorChanged (object? sender, ValueChangedEventArgs<Color?> e) =>
+            testFrame.SetScheme (testFrame.GetScheme () with
+            {
+                Normal = new Attribute (testFrame.GetAttributeForRole (VisualRole.Normal).Foreground, e.NewValue ?? Color.Black)
+            });
     }
 
     private View CreateOverlappedView (int id, Pos x, Pos y)
@@ -248,7 +213,7 @@ public class Arrangement : Scenario
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
             SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Runnable),
             Id = $"Overlapped{id}",
-            ShadowStyle = ShadowStyle.Transparent,
+            ShadowStyle = ShadowStyles.Transparent,
             BorderStyle = LineStyle.Double,
             CanFocus = true,
             TabStop = TabBehavior.TabGroup,
@@ -281,11 +246,7 @@ public class Arrangement : Scenario
 
     public override List<Key> GetDemoKeyStrokes (IApplication? app)
     {
-        List<Key> keys =
-        [
-            '&',
-            Application.GetDefaultKey (Command.Arrange)
-        ];
+        List<Key> keys = ['&', Application.GetDefaultKey (Command.Arrange)];
 
         // Select view with progress bar
 
@@ -346,15 +307,9 @@ public class Arrangement : Scenario
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable | ViewArrangement.Movable;
             ViewportSettings |= ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
 
-            Padding!.Thickness = new (1);
+            Padding.Thickness = new Thickness (1);
 
-            Add (
-                 new Button
-                 {
-                     Title = "_Hi",
-                     X = Pos.Center (),
-                     Y = Pos.Center ()
-                 });
+            Add (new Button { Title = "_Hi", X = Pos.Center (), Y = Pos.Center () });
         }
     }
 }

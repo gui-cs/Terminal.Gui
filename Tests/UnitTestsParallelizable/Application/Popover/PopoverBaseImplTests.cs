@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Terminal.Gui.Tracing;
+using UnitTests;
 using UnitTests.Parallelizable;
 
 namespace ApplicationTests.Popover;

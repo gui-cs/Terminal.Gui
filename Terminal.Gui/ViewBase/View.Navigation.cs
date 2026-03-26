@@ -130,43 +130,37 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         bool AdvanceFocusChain ()
         {
-            if (focusChain.Length > 0)
+            if (focusChain.Length <= 0)
             {
-                // Get the index of the currently focused view
-                int focusedTabGroupIndex = focusChain.IndexOf (Focused); // Will return -1 if Focused can't be found or is null
-
-                if (focusedTabGroupIndex + 1 > focusChain.Length - 1)
-                {
-                    focusedTabGroupIndex = 0;
-                }
-                else
-                {
-                    focusedTabGroupIndex++;
-                }
-
-                View [] subViews = focusChain [focusedTabGroupIndex].GetFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
-
-                if (subViews.Length <= 0)
-                {
-                    return false;
-                }
-
-                if (focusChain [focusedTabGroupIndex].PreviouslyFocused is { } && subViews.Any (v => v == focusChain [focusedTabGroupIndex].PreviouslyFocused))
-                {
-                    if (focusChain [focusedTabGroupIndex].PreviouslyFocused!.SetFocus ())
-                    {
-                        return true;
-                    }
-                }
-
-                // We have a subview that can be focused
-                if (subViews [0].SetFocus ())
-                {
-                    return true;
-                }
+                return false;
             }
 
-            return false;
+            // Get the index of the currently focused view
+            int focusedTabGroupIndex = focusChain.IndexOf (Focused); // Will return -1 if Focused can't be found or is null
+
+            if (focusedTabGroupIndex + 1 > focusChain.Length - 1)
+            {
+                focusedTabGroupIndex = 0;
+            }
+            else
+            {
+                focusedTabGroupIndex++;
+            }
+
+            View [] subViews = focusChain [focusedTabGroupIndex].GetFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
+
+            if (subViews.Length <= 0)
+            {
+                return false;
+            }
+
+            if (focusChain [focusedTabGroupIndex].PreviouslyFocused is null || subViews.All (v => v != focusChain [focusedTabGroupIndex].PreviouslyFocused))
+            {
+                return subViews [0].SetFocus ();
+            }
+
+            // We have a subview that can be focused
+            return focusChain [focusedTabGroupIndex].PreviouslyFocused!.SetFocus () || subViews [0].SetFocus ();
         }
     }
 
@@ -196,7 +190,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             }
 
             // If parent has only 1 child but parent is also TabStop with a SuperView, continue checking up the hierarchy
-            if (currentView.TabStop == TabBehavior.TabStop && currentView.SuperView is { })
+            if (currentView is { TabStop: TabBehavior.TabStop, SuperView: { } })
             {
                 currentView = currentView.SuperView;
             }
@@ -221,13 +215,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
         var args = new AdvanceFocusEventArgs (direction, behavior);
         AdvancingFocus?.Invoke (this, args);
 
-        if (args.Cancel)
-        {
-            // The event was cancelled
-            return true;
-        }
-
-        return false;
+        // The event was cancelled
+        return args.Cancel;
     }
 
     /// <summary>
@@ -355,19 +344,19 @@ public partial class View // Focus and cross-view navigation management (TabStop
             }
 
             // How about in Adornments?
-            if (Margin is { HasFocus: true })
+            if (Margin.View is { HasFocus: true })
             {
-                return Margin;
+                return Margin.View;
             }
 
-            if (Border is { HasFocus: true })
+            if (Border.View is { HasFocus: true })
             {
-                return Border;
+                return Border.View;
             }
 
-            if (Padding is { HasFocus: true })
+            if (Padding.View is { HasFocus: true })
             {
-                return Padding;
+                return Padding.View;
             }
 
             return null;
@@ -444,17 +433,19 @@ public partial class View // Focus and cross-view navigation management (TabStop
     internal bool RestoreFocus ()
     {
         // Ignore TabStop
-        View [] indicies = GetFocusChain (NavigationDirection.Forward, null);
+        View [] indices = GetFocusChain (NavigationDirection.Forward, null);
 
-        if (Focused is null && PreviouslyFocused is { } && indicies.Contains (PreviouslyFocused))
+        if (Focused is { } || PreviouslyFocused is null || !indices.Contains (PreviouslyFocused))
         {
-            if (PreviouslyFocused.SetFocus ())
-            {
-                return true;
-            }
-
-            PreviouslyFocused = null;
+            return false;
         }
+
+        if (PreviouslyFocused.SetFocus ())
+        {
+            return true;
+        }
+
+        PreviouslyFocused = null;
 
         return false;
     }
@@ -466,9 +457,9 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
     private View? FindDeepestFocusableView (NavigationDirection direction, TabBehavior? behavior)
     {
-        View [] indicies = GetFocusChain (direction, behavior);
+        View [] indices = GetFocusChain (direction, behavior);
 
-        foreach (View v in indicies)
+        foreach (View v in indices)
         {
             return v.FindDeepestFocusableView (direction, behavior);
         }
@@ -569,8 +560,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
     }
 
     /// <summary>
-    ///     When this view loses focus, this property is set to the subview that had focus before the view lost focus. This allows
-    ///     focus to be restored to the same subview when focus returns to this view. This is set to <see langword="null"/> when
+    ///     When this view loses focus, this property is set to the subview that had focus before the view lost focus. This
+    ///     allows
+    ///     focus to be restored to the same subview when focus returns to this view. This is set to <see langword="null"/>
+    ///     when
     ///     the view gains focus.
     /// </summary>
     public View? PreviouslyFocused { get; private set; }
@@ -610,22 +603,10 @@ public partial class View // Focus and cross-view navigation management (TabStop
             throw new ArgumentException ("SetHasFocusTrue: currentFocusedView must HasFocus.");
         }
 
-        var thisAsAdornment = this as Adornment;
-        View? superViewOrParent = thisAsAdornment?.Parent ?? SuperView;
+        var thisAsAdornment = this as AdornmentView;
+        View? superViewOrParent = thisAsAdornment?.Adornment?.Parent ?? SuperView;
 
-        if (CanFocus && superViewOrParent is { CanFocus: false })
-        {
-            //Logging.Warning ($@"Attempt to FocusChanging where SuperView.CanFocus == false. {this}");
-
-            return (false, false);
-        }
-
-        if (!CanBeVisible (this) || !Enabled)
-        {
-            return (false, false);
-        }
-
-        if (!CanFocus)
+        if ((CanFocus && superViewOrParent is { CanFocus: false }) || !CanBeVisible (this) || !Enabled || !CanFocus)
         {
             return (false, false);
         }
@@ -641,9 +622,9 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         // Make sure superviews up the superview hierarchy have focus.
         // Any of them may cancel gaining focus. In which case we need to back out.
-        if (superViewOrParent is { HasFocus: false } sv)
+        if (superViewOrParent is { HasFocus: false })
         {
-            (bool focusSet, bool svCancelled) = sv.SetHasFocusTrue (currentFocusedView, true);
+            (bool focusSet, bool svCancelled) = superViewOrParent.SetHasFocusTrue (currentFocusedView, true);
 
             if (!focusSet)
             {
@@ -715,8 +696,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
     // TODO: the result can be changed.
     private bool RaiseFocusChanging (bool currentHasFocus, bool newHasFocus, View? currentFocused, View? newFocused)
     {
-        Debug.Assert (currentFocused is null || currentFocused is { HasFocus: true });
-        Debug.Assert (newFocused is null || newFocused is { CanFocus: true });
+        Debug.Assert (currentFocused is null or { HasFocus: true });
+        Debug.Assert (newFocused is null or { CanFocus: true });
 
         // Call the virtual method
         if (OnHasFocusChanging (currentHasFocus, newHasFocus, currentFocused, newFocused))
@@ -736,17 +717,12 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         View? appFocused = App?.Navigation?.GetFocused ();
 
-        if (appFocused == currentFocused)
+        if (appFocused != currentFocused)
         {
-            if (newFocused is { HasFocus: true })
-            {
-                App?.Navigation?.SetFocused (newFocused);
-            }
-            else
-            {
-                App?.Navigation?.SetFocused (null);
-            }
+            return false;
         }
+
+        App?.Navigation?.SetFocused (newFocused is { HasFocus: true } ? newFocused : null);
 
         return false;
     }
@@ -809,8 +785,8 @@ public partial class View // Focus and cross-view navigation management (TabStop
             throw new InvalidOperationException ("SetHasFocusFalse new focused view does not have focus.");
         }
 
-        var thisAsAdornment = this as Adornment;
-        View? superViewOrParent = thisAsAdornment?.Parent ?? SuperView;
+        var thisAsAdornment = this as AdornmentView;
+        View? superViewOrParent = thisAsAdornment?.Adornment?.Parent ?? SuperView;
 
         // If newFocusedVew is null, we need to find the view that should get focus, and SetFocus on it.
         if (!traversingDown && newFocusedView is null)
@@ -916,10 +892,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             Debug.Assert (_hasFocus);
         }
 
-        if (superViewOrParent is { })
-        {
-            superViewOrParent.PreviouslyFocused = this;
-        }
+        superViewOrParent?.PreviouslyFocused = this;
 
         bool previousValue = HasFocus;
 
@@ -1026,22 +999,23 @@ public partial class View // Focus and cross-view navigation management (TabStop
             filteredSubViews = GetSubViews (includePadding: true).Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
         }
 
-        if (Padding is { CanFocus: true, Visible: true, Enabled: true } && Padding.TabStop == behavior && Padding.Thickness != Thickness.Empty)
+        if (this is not IAdornmentView
+            && Padding.View is { CanFocus: true, Visible: true, Enabled: true }
+            && Padding.View?.TabStop == behavior
+            && Padding.Thickness != Thickness.Empty)
         {
-            filteredSubViews = filteredSubViews.Append (Padding);
+            filteredSubViews = filteredSubViews.Append (Padding.View!);
         }
 
         // Border and Margin do not participate in focus chain navigation.
 
         if (direction == NavigationDirection.Backward)
         {
-            filteredSubViews = filteredSubViews?.Reverse ();
+            filteredSubViews = filteredSubViews.Reverse ();
         }
 
-        return filteredSubViews?.ToArray () ?? [];
+        return filteredSubViews.ToArray () ?? [];
     }
-
-    private TabBehavior? _tabStop;
 
     /// <summary>
     ///     Gets or sets the behavior of <see cref="AdvanceFocus"/> for keyboard navigation.
@@ -1072,15 +1046,15 @@ public partial class View // Focus and cross-view navigation management (TabStop
     /// </remarks>
     public TabBehavior? TabStop
     {
-        get => _tabStop;
+        get;
         set
         {
-            if (_tabStop is { } && _tabStop == value)
+            if (field is { } && field == value)
             {
                 return;
             }
 
-            _tabStop = value;
+            field = value;
         }
     }
 

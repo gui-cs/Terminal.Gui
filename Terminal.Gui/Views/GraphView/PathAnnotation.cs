@@ -17,7 +17,8 @@ public class PathAnnotation : IAnnotation
 
     /// <summary>Draws lines connecting each of the <see cref="Points"/></summary>
     /// <param name="graph"></param>
-    public void Render (GraphView graph)
+    /// <param name="drawContext"></param>
+    public void Render (GraphView graph, DrawContext? drawContext)
     {
         graph.SetAttribute (LineColor ?? graph.GetAttributeForRole (VisualRole.Normal));
 

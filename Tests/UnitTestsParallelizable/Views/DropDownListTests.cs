@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
+using Terminal.Gui.Tracing;
+using UnitTests;
 
 namespace ViewsTests;
 
-public class DropDownListTests
+public class DropDownListTests (ITestOutputHelper output)
 {
     [Fact]
     public void AltDown_OpensDropdown ()
@@ -57,7 +59,7 @@ public class DropDownListTests
         // Claude - Opus 4.6
         DropDownList dropdown = new ();
 
-        Button? toggleButton = dropdown.Padding?.SubViews.OfType<Button> ().FirstOrDefault ();
+        Button? toggleButton = dropdown.Padding.View!.SubViews.OfType<Button> ().FirstOrDefault ();
         Assert.NotNull (toggleButton);
         Assert.False (toggleButton.CanFocus);
         Assert.Equal (TabBehavior.NoStop, toggleButton.TabStop);
@@ -79,7 +81,7 @@ public class DropDownListTests
         // Claude - Opus 4.6
         DropDownList dropdown = new ();
 
-        Assert.Equal (1, dropdown.Padding!.Thickness.Right);
+        Assert.Equal (1, dropdown.Padding.Thickness.Right);
     }
 
     [Fact]
@@ -88,7 +90,7 @@ public class DropDownListTests
         // Claude - Opus 4.6
         DropDownList dropdown = new ();
 
-        Button? toggleButton = dropdown.Padding?.SubViews.OfType<Button> ().FirstOrDefault ();
+        Button? toggleButton = dropdown.Padding.View!.SubViews.OfType<Button> ().FirstOrDefault ();
         Assert.NotNull (toggleButton);
         Assert.Equal (Glyphs.DownArrow.ToString (), toggleButton.Text);
     }
@@ -466,7 +468,7 @@ public class DropDownListTests
         dropdown.EndInit ();
         dropdown.SetFocus ();
 
-        Button? toggleButton = dropdown.Padding?.SubViews.OfType<Button> ().FirstOrDefault ();
+        Button? toggleButton = dropdown.Padding.View!.SubViews.OfType<Button> ().FirstOrDefault ();
         Assert.NotNull (toggleButton);
 
         toggleButton.InvokeCommand (Command.Accept);
@@ -691,7 +693,237 @@ public class DropDownListTests
 
     // Claude - Opus 4.5
 
+    /// <summary>
+    ///     Regression test: clicking on a list item in the popover should close the popover
+    ///     and select the item, but the synthesized Click event must NOT flow through to views underneath.
+    ///     The bug: Released on the ListView fires Activate → popover closes. The subsequent synthesized
+    ///     Clicked event then finds no popover and falls through to whatever view is below.
+    /// </summary>
+    [Fact]
+    public void ClickListItem_DoesNotActivateViewBelow ()
+    {
+        // Claude - Opus 4.6
+        using IDisposable logging = TestLogging.Verbose (output, TraceCategory.Mouse | TraceCategory.Command);
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (40, 15);
+
+        using Runnable top = new ();
+        SessionToken? token = app.Begin (top);
+
+        // DropDownList at the top of the screen
+        ObservableCollection<string> items = ["Apple", "Banana", "Cherry"];
+
+        DropDownList dropdown = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 20,
+            Source = new ListWrapper<string> (items),
+            ReadOnly = true
+        };
+
+        top.Add (dropdown);
+        top.Layout ();
+
+        // Give focus to the dropdown and open the popover via key injection
+        dropdown.SetFocus ();
+        app.InjectKey (Key.F4);
+
+        IPopoverView? popover = FindDropDownPopover (app);
+        Assert.NotNull (popover);
+        Assert.True (popover.Visible, "Popover should be open");
+
+        // Track whether ANY mouse Click event leaks to the Runnable after the popover closes.
+        // The Clicked event at the popover item position should NOT reach views below.
+        var runnableReceivedClick = false;
+
+        top.MouseEvent += (_, e) =>
+                          {
+                              if (e.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+                              {
+                                  runnableReceivedClick = true;
+                              }
+                          };
+
+        // Click on the third item ("Cherry") at screen Y=3
+        // (screen Y=1 = item 0 "Apple", Y=2 = item 1 "Banana", Y=3 = item 2 "Cherry")
+        Point clickPos = new (2, 3);
+
+        DateTime baseTime = new (2025, 1, 1, 12, 0, 0);
+        InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
+        IInputInjector injector = app.GetInputInjector ();
+
+        // Simulate click via input injection: Pressed → Released (system synthesizes Click)
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
+
+        injector.InjectMouse (
+                              new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) },
+                              options);
+
+        // The popover should have closed and the item should be selected
+        Assert.False (popover.Visible, "Popover should be closed after clicking a list item");
+        Assert.Equal ("Cherry", dropdown.Text);
+
+        // CRITICAL: The synthesized Clicked event should NOT leak through to the Runnable
+        Assert.False (runnableReceivedClick, "Runnable should NOT receive the Clicked event that was synthesized after the popover closed");
+
+        app.End (token!);
+    }
+
     // Helper to find the DropDownList popover (excludes the context menu popover)
     private static IPopoverView? FindDropDownPopover (IApplication app) =>
         app.Popovers?.Popovers.OfType<Popover<ListView, string?>> ().FirstOrDefault ();
+}
+
+public class DropDownListGenericTests
+{
+    private enum Season
+    {
+        Spring,
+        Summer,
+        Autumn,
+        Winter
+    }
+
+    [Fact]
+    public void Constructor_PopulatesSourceFromEnum ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+
+        Assert.NotNull (dropdown.Source);
+        Assert.Equal (4, dropdown.Source.Count);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void Constructor_SourceContainsEnumNames ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+
+        System.Collections.IList items = dropdown.Source!.ToList ();
+        List<string?> names = items.Cast<object?> ().Select (i => i?.ToString ()).ToList ();
+        Assert.Contains ("Spring", names);
+        Assert.Contains ("Summer", names);
+        Assert.Contains ("Autumn", names);
+        Assert.Contains ("Winter", names);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void Value_Get_ReturnsNullWhenTextIsEmpty ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+
+        Assert.Null (dropdown.Value);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void Value_Set_UpdatesText ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+
+        dropdown.Value = Season.Summer;
+
+        Assert.Equal ("Summer", dropdown.Text);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void Value_Get_ReturnsCorrectEnum ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+        dropdown.Text = "Autumn";
+
+        Assert.Equal (Season.Autumn, dropdown.Value);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void Value_SetNull_ClearsText ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+        dropdown.Value = Season.Winter;
+
+        dropdown.Value = null;
+
+        Assert.Equal (string.Empty, dropdown.Text);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void ValueChanged_RaisedWithTypedEnum ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+
+        Season? receivedValue = null;
+        dropdown.ValueChanged += (_, e) => { receivedValue = e.Value; };
+
+        dropdown.Value = Season.Spring;
+
+        Assert.Equal (Season.Spring, receivedValue);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void ValueChanged_RaisedNullWhenTextCleared ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+        dropdown.Value = Season.Winter;
+
+        Season? receivedValue = Season.Winter; // set to non-null sentinel
+        dropdown.ValueChanged += (_, e) => { receivedValue = e.Value; };
+
+        dropdown.Value = null;
+
+        Assert.Null (receivedValue);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void GetValue_ReturnsBoxedEnum ()
+    {
+        // Copilot
+        DropDownList<Season> dropdown = new ();
+        dropdown.Value = Season.Autumn;
+
+        object? boxed = ((IValue)dropdown).GetValue ();
+
+        Assert.Equal (Season.Autumn, boxed);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void IsInterchangeableWithOptionSelector_SameValueInterface ()
+    {
+        // Copilot - demonstrates that both implement IValue with the same TEnum type
+        DropDownList<Season> dropDown = new ();
+        OptionSelector<Season> optionSelector = new ();
+
+        dropDown.Value = Season.Summer;
+        optionSelector.Value = Season.Summer;
+
+        Assert.Equal (optionSelector.Value, dropDown.Value);
+
+        dropDown.Dispose ();
+        optionSelector.Dispose ();
+    }
 }

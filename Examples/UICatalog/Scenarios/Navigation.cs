@@ -164,7 +164,7 @@ public class Navigation : Scenario
             Y = 7,
             Id = "datePicker",
             SchemeName = "Runnable",
-            ShadowStyle = ShadowStyle.Transparent,
+            ShadowStyle = ShadowStyles.Transparent,
             BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
             TabStop = TabBehavior.TabGroup,
@@ -217,7 +217,7 @@ public class Navigation : Scenario
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
             SchemeName = "Runnable",
             Id = $"Overlapped{id}",
-            ShadowStyle = ShadowStyle.Transparent,
+            ShadowStyle = ShadowStyles.Transparent,
             BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
             TabStop = TabBehavior.TabGroup,
