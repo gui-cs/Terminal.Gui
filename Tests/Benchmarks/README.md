@@ -1,8 +1,38 @@
 # Terminal.Gui Benchmarks
 
-This project contains performance benchmarks for Terminal.Gui using [BenchmarkDotNet](https://benchmarkdotnet.org/).
+This project contains performance benchmarks and memory profilers for Terminal.Gui.
 
-## Running Benchmarks
+## Memory Profilers
+
+Fast, in-process memory measurement using `GC.GetAllocatedBytesForCurrentThread()`. Results are printed as markdown tables.
+
+### View Memory (`memory`)
+
+Measures memory allocated when instantiating each concrete `View` subclass. Discovers all types via reflection (same technique as `TestsAllViews`). Tracks per-view footprint for [#4696](https://github.com/gui-cs/Terminal.Gui/issues/4696).
+
+```bash
+# Print to console (note the -- separator before the command)
+dotnet run --project Tests/Benchmarks -c Release -- memory
+
+# Export for comparison
+dotnet run --project Tests/Benchmarks -c Release -- memory > after.md
+```
+
+### Scenario Memory (`scenarios`)
+
+Runs each UICatalog `Scenario` for one main-loop iteration and reports total memory allocated. Uses `StopAfterFirstIteration` for fast exit plus `Scenario.StartBenchmark()` timeout as a safety net.
+
+```bash
+# Print to console (note the -- separator before the command)
+dotnet run --project Tests/Benchmarks -c Release -- scenarios
+
+# Export for comparison
+dotnet run --project Tests/Benchmarks -c Release -- scenarios > scenarios.md
+```
+
+## BenchmarkDotNet Benchmarks
+
+Formal performance benchmarks using [BenchmarkDotNet](https://benchmarkdotnet.org/).
 
 ### Run All Benchmarks
 
@@ -50,36 +80,18 @@ The `DimAutoBenchmark` class tests layout performance with `Dim.Auto()` in vario
 - **ComplexLayout**: 20 subviews with mixed Pos/Dim types (tests iteration overhead)
 - **DeeplyNestedLayout**: 5 levels of nested views with DimAuto (tests recursive performance)
 
-### Example Output
-
-```
-BenchmarkDotNet v0.14.0, Windows 11 (10.0.22631.4602/23H2/2023Update/SunValley3)
-Intel Core i7-9750H CPU 2.60GHz, 1 CPU, 12 logical and 6 physical cores
-.NET SDK 10.0.102
-  [Host]     : .NET 10.0.1 (10.0.125.52708), X64 RyuJIT AVX2
-  DefaultJob : .NET 10.0.1 (10.0.125.52708), X64 RyuJIT AVX2
-
-| Method              | Mean       | Error     | StdDev    | Ratio | RatioSD | Gen0   | Allocated | Alloc Ratio |
-|-------------------- |-----------:|----------:|----------:|------:|--------:|-------:|----------:|------------:|
-| SimpleLayout        |   5.234 μs | 0.0421 μs | 0.0394 μs |  1.00 |    0.01 | 0.3586 |   3.03 KB |        1.00 |
-| ComplexLayout       |  42.561 μs | 0.8234 μs | 0.7701 μs |  8.13 |    0.17 | 2.8076 |  23.45 KB |        7.74 |
-| DeeplyNestedLayout  |  25.123 μs | 0.4892 μs | 0.4577 μs |  4.80 |    0.10 | 1.7090 |  14.28 KB |        4.71 |
-```
-
 ## Adding New Benchmarks
 
-1. Create a new class in an appropriate subdirectory (e.g., `Layout/`, `Text/`)
-2. Add the `[MemoryDiagnoser]` attribute to measure allocations
-3. Add `[BenchmarkCategory("CategoryName")]` to group related benchmarks
-4. Mark baseline scenarios with `[Benchmark(Baseline = true)]`
-5. Use `[GlobalSetup]` and `[GlobalCleanup]` for initialization/cleanup
+1. Create a new class in an appropriate subdirectory (e.g., `Layout/`, `Text/`, `ViewBase/`)
+2. For BenchmarkDotNet: add `[MemoryDiagnoser]`, `[BenchmarkCategory]`, `[Benchmark(Baseline = true)]`
+3. For memory profilers: add a `public static void Run()` method and route it from `Program.cs`
+4. Use `[GlobalSetup]`/`[GlobalCleanup]` for `Application.Init`/`Shutdown`
 
 ## Best Practices
 
 - Always run benchmarks in **Release** configuration
-- Run multiple iterations for accurate results (default is better than `-j short`)
-- Use `[ArgumentsSource]` for parametrized benchmarks
-- Include baseline scenarios for comparison
+- Use the `memory` / `scenarios` commands for quick allocation checks
+- Use BenchmarkDotNet for formal timing benchmarks with statistical rigor
 - Document what each benchmark measures
 
 ## Continuous Integration
@@ -92,4 +104,4 @@ Benchmarks are not run automatically in CI. Run them locally when:
 ## Resources
 
 - [BenchmarkDotNet Documentation](https://benchmarkdotnet.org/)
-- [Performance Analysis Plan](../../plans/dimauto-perf-plan.md)
+- [Issue #4696 — View memory footprint](https://github.com/gui-cs/Terminal.Gui/issues/4696)

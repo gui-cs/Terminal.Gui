@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 
@@ -35,8 +35,8 @@ public class AllViewsTester : Scenario
         window.Title = GetQuitKeyAndName ();
 
         // Set the BorderStyle we use for all subviews, but disable the app border thickness
-        window.Border!.LineStyle = LineStyle.Heavy;
-        window.Border!.Thickness = new Thickness (0);
+        window.BorderStyle = LineStyle.Heavy;
+        window.Border.Thickness = new Thickness (0);
 
         _viewClasses = GetAllViewClassesCollection ()
                        .OrderBy (t => t.Name)
@@ -55,7 +55,6 @@ public class AllViewsTester : Scenario
             Source = new ListWrapper<string> (new ObservableCollection<string> (_viewClasses.Keys.ToList ())),
             SuperViewRendersLineCanvas = true
         };
-        _classListView.Border!.Thickness = new Thickness (1);
 
         _classListView.ValueChanged += (_, _) =>
                                        {
@@ -91,7 +90,7 @@ public class AllViewsTester : Scenario
             AutoSelectAdornments = false,
             SuperViewRendersLineCanvas = true
         };
-        _adornmentsEditor.Border!.Thickness = new Thickness (1);
+        _adornmentsEditor.Border.Thickness = new Thickness (1);
         _adornmentsEditor.ExpanderButton!.Orientation = Orientation.Horizontal;
         _adornmentsEditor.ExpanderButton.Enabled = false;
 
@@ -109,7 +108,7 @@ public class AllViewsTester : Scenario
         _arrangementEditor.ExpanderButton!.Orientation = Orientation.Horizontal;
 
         _arrangementEditor.ExpanderButton.CollapsedChanging += (_, args) => { _adornmentsEditor.ExpanderButton.Collapsed = args.NewValue; };
-        _arrangementEditor.Border!.Thickness = new Thickness (1);
+        _arrangementEditor.Border.Thickness = new Thickness (1);
 
         _layoutEditor = new LayoutEditor
         {
@@ -124,7 +123,7 @@ public class AllViewsTester : Scenario
             AutoSelectAdornments = false,
             SuperViewRendersLineCanvas = true
         };
-        _layoutEditor.Border!.Thickness = new Thickness (1, 1, 1, 0);
+        _layoutEditor.Border.Thickness = new Thickness (1, 1, 1, 0);
 
         _viewportSettingsEditor = new ViewportSettingsEditor
         {
@@ -138,7 +137,7 @@ public class AllViewsTester : Scenario
             AutoSelectAdornments = false,
             SuperViewRendersLineCanvas = true
         };
-        _viewportSettingsEditor.Border!.Thickness = new Thickness (1, 1, 1, 1);
+        _viewportSettingsEditor.Border.Thickness = new Thickness (1, 1, 1, 1);
 
         _propertiesEditor = new ViewPropertiesEditor
         {
@@ -150,18 +149,18 @@ public class AllViewsTester : Scenario
             CanFocus = true,
             SuperViewRendersLineCanvas = true
         };
-        _propertiesEditor.Border!.Thickness = new Thickness (1, 1, 1, 0);
+        _propertiesEditor.Border.Thickness = new Thickness (1, 1, 1, 0);
 
         _eventLog = new EventLog
         {
             X = Pos.AnchorEnd () - 1,
             Y = 0,
-            Width = Dim.Percent(20),
+            Width = Dim.Percent (20),
             Height = Dim.Fill (),
             SuperViewRendersLineCanvas = true,
             Arrangement = ViewArrangement.LeftResizable
         };
-        _eventLog.Border!.Thickness = new Thickness (1);
+        _eventLog.Border.Thickness = new Thickness (1);
 
         _layoutEditor.Width = Dim.Fill (_eventLog);
 
@@ -178,12 +177,15 @@ public class AllViewsTester : Scenario
             BorderStyle = LineStyle.Double,
             SuperViewRendersLineCanvas = true
         };
-        _hostPane.Border!.SetScheme (window.GetScheme ());
-        _hostPane.Padding!.Thickness = new Thickness (1);
+        _hostPane.Border.GetOrCreateView ().SetScheme (window.GetScheme ());
+        _hostPane.Padding.Thickness = new Thickness (1);
         _hostPane.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
-        _hostPane.Padding.SetScheme (window.GetScheme ());
+        _hostPane.Padding.GetOrCreateView ().SetScheme (window.GetScheme ());
 
         window.Add (_classListView, _adornmentsEditor, _arrangementEditor, _layoutEditor, _viewportSettingsEditor, _propertiesEditor, _eventLog, _hostPane);
+
+        // BorderStyle inheritance only works if SuperView has been set
+        _classListView.Border.Thickness = new Thickness (1);
 
         window.Initialized += App_Initialized;
 

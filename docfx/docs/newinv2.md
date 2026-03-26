@@ -290,7 +290,7 @@ Color color = Color.Yellow; // Was "Brown" in v1
 
 See the [Layout Deep Dive](layout.md) for complete details.
 
-v2 introduces a comprehensive [Adornment](~/api/Terminal.Gui.ViewBase.Adornment.yml) system:
+v2 introduces a comprehensive [Adornment](~/api/Terminal.Gui.ViewBase.IAdornment.yml) system with lightweight adornments that lazily create Views when needed:
 
 - **[Margin](~/api/Terminal.Gui.ViewBase.Margin.yml)** - Transparent spacing outside the border
 - **[Border](~/api/Terminal.Gui.ViewBase.Border.yml)** - Visual frame with title, multiple styles
@@ -502,7 +502,7 @@ See the [Arrangement Deep Dive](arrangement.md) for complete details.
 - **[ViewArrangement.Resizable](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Resize edges with mouse or keyboard
 - **[ViewArrangement.Overlapped](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Z-order management for overlapping views
 
-**Arrangement Key**: Press `Ctrl+F5` (configurable via `Application.ArrangeKey`) to enter arrange mode
+**Arrangement Key**: Press `Ctrl+F5` (configurable via `Application.DefaultKeyBindings` for `Command.Arrange`) to enter arrange mode
 
 ```csharp
 // Movable and resizable window
@@ -528,11 +528,11 @@ v2 decouples navigation concepts:
 - Arrow keys - Same as Tab navigation
 
 ```csharp
-// Configure navigation keys
-App.Keyboard.NextTabStopKey = Key.Tab;
-App.Keyboard.PrevTabStopKey = Key.Tab.WithShift;
-App.Keyboard.NextTabGroupKey = Key.F6;
-App.Keyboard.PrevTabGroupKey = Key.F6.WithShift;
+// Configure navigation keys via Application.DefaultKeyBindings
+Application.DefaultKeyBindings[Command.NextTabStop] = Bind.All (Key.Tab);
+Application.DefaultKeyBindings[Command.PreviousTabStop] = Bind.All (Key.Tab.WithShift);
+Application.DefaultKeyBindings[Command.NextTabGroup] = Bind.All (Key.F6);
+Application.DefaultKeyBindings[Command.PreviousTabGroup] = Bind.All (Key.F6.WithShift);
 
 // Set tab behavior
 view.CanFocus = true;
@@ -611,10 +611,10 @@ private bool HandleAccept ()
 }
 ```
 
-**Configurable Keys:**
-- `Application.QuitKey` - Close app (default: Esc)
-- `Application.ArrangeKey` - Arrange mode (default: Ctrl+F5)
-- Navigation keys (Tab, F6, arrows)
+**Configurable Keys** (via `Application.DefaultKeyBindings`):
+- `Command.Quit` - Close app (default: Esc)
+- `Command.Arrange` - Arrange mode (default: Ctrl+F5)
+- Navigation commands (`Command.NextTabStop`, `Command.NextTabGroup`, etc.)
 
 ### Mouse API
 

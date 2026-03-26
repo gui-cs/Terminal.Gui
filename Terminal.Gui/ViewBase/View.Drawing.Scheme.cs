@@ -22,10 +22,8 @@ public partial class View
     public string? SchemeName
     {
         get => _schemeName;
-        set
-        {
-            CWPPropertyHelper.ChangeProperty (
-                                              this,
+        set =>
+            CWPPropertyHelper.ChangeProperty (this,
                                               ref _schemeName,
                                               value,
                                               OnSchemeNameChanging,
@@ -34,7 +32,6 @@ public partial class View
                                               OnSchemeNameChanged,
                                               SchemeNameChanged,
                                               out string? _);
-        }
     }
 
     /// <summary>
@@ -42,7 +39,7 @@ public partial class View
     /// </summary>
     /// <param name="args">The event arguments containing the current and proposed new scheme name.</param>
     /// <returns>True to cancel the change, false to proceed.</returns>
-    protected virtual bool OnSchemeNameChanging (ValueChangingEventArgs<string?> args) { return false; }
+    protected virtual bool OnSchemeNameChanging (ValueChangingEventArgs<string?> args) => false;
 
     /// <summary>
     ///     Called after the <see cref="SchemeName"/> property changes, allowing subclasses to react to the change.
@@ -124,8 +121,7 @@ public partial class View
     {
         ResultEventArgs<Scheme?> args = new ();
 
-        return CWPWorkflowHelper.ExecuteWithResult (
-                                                    resultEventArgs =>
+        return CWPWorkflowHelper.ExecuteWithResult (resultEventArgs =>
                                                     {
                                                         bool cancelled = OnGettingScheme (out Scheme? newScheme);
                                                         resultEventArgs.Result = newScheme;
@@ -206,32 +202,29 @@ public partial class View
     ///         bool set = view.SetScheme(SchemeManager.GetScheme("Base"));
     ///     </code>
     /// </example>
-    public bool SetScheme (Scheme? scheme)
-    {
-        return CWPPropertyHelper.ChangeProperty (
-                                                 this,
-                                                 ref _scheme,
-                                                 scheme,
-                                                 OnSettingScheme,
-                                                 SchemeChanging,
-                                                 newValue => _scheme = newValue,
-                                                 OnSchemeChanged,
-                                                 SchemeChanged,
-                                                 out Scheme? _);
-    }
+    public bool SetScheme (Scheme? scheme) =>
+        CWPPropertyHelper.ChangeProperty (this,
+                                          ref _scheme,
+                                          scheme,
+                                          OnSettingScheme,
+                                          SchemeChanging,
+                                          newValue => _scheme = newValue,
+                                          OnSchemeChanged,
+                                          SchemeChanged,
+                                          out Scheme? _);
 
     /// <summary>
     ///     Called before the scheme is set, allowing subclasses to cancel or modify the change.
     /// </summary>
     /// <param name="args">The event arguments containing the current and proposed new scheme.</param>
     /// <returns>True to cancel the change, false to proceed.</returns>
-    protected virtual bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args) { return false; }
+    protected virtual bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args) => false;
 
     /// <summary>
     ///     Called after the scheme is set, allowing subclasses to react to the change.
     /// </summary>
     /// <param name="args">The event arguments containing the old and new scheme.</param>
-    protected virtual void OnSchemeChanged (ValueChangedEventArgs<Scheme?> args) { SetNeedsDraw (); }
+    protected virtual void OnSchemeChanged (ValueChangedEventArgs<Scheme?> args) => SetNeedsDraw ();
 
     /// <summary>
     ///     Raised before the scheme is set, allowing handlers to modify or cancel the change.

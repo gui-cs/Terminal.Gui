@@ -57,7 +57,7 @@ public class ButtonTests
     public void AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
     {
         var btn1 = new Button ();
-        btn1.ShadowStyle = ShadowStyle.None;
+        btn1.ShadowStyle = null;
         btn1.Width = width;
         btn1.Height = height;
 
@@ -88,7 +88,7 @@ public class ButtonTests
     [InlineData ("0_12你", 10, 1, 10, 1)]
     public void AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
     {
-        var btn1 = new Button { ShadowStyle = ShadowStyle.None, Text = text, Width = width, Height = height };
+        var btn1 = new Button { ShadowStyle = null, Text = text, Width = width, Height = height };
 
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Frame.Size);
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Viewport.Size);

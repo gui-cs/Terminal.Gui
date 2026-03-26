@@ -440,12 +440,12 @@ public class SelectorBaseTests
         CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
 
         // HorizontalSpace is applied via Margin.Thickness.Right
-        int spacing2 = checkBoxes [0].Margin!.Thickness.Right;
+        int spacing2 = checkBoxes [0].Margin.Thickness.Right;
 
         selector.HorizontalSpace = 5;
         selector.Layout ();
 
-        int spacing5 = checkBoxes [0].Margin!.Thickness.Right;
+        int spacing5 = checkBoxes [0].Margin.Thickness.Right;
         Assert.True (spacing5 > spacing2);
         Assert.Equal (2, spacing2);
         Assert.Equal (5, spacing5);

@@ -1,0 +1,156 @@
+{
+    "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
+    "ConfigurationManager.ThrowOnJsonErrors": false,
+    "Application.DefaultKeyBindings": {
+        "Quit": { "All": ["Esc"] },
+        "Suspend": { "Linux": ["Ctrl+Z"], "Macos": ["Ctrl+Z"] },
+        "Arrange": { "All": ["Ctrl+F5"] },
+        "NextTabStop": { "All": ["Tab"] },
+        "PreviousTabStop": { "All": ["Shift+Tab"] },
+        "NextTabGroup": { "All": ["F6"] },
+        "PreviousTabGroup": { "All": ["Shift+F6"] },
+        "Refresh": { "All": ["F5"] }
+    },
+    "Driver.Force16Colors": false,  
+    "Application.ForceDriver": "",
+    "Application.IsMouseDisabled": false,
+    "Key.Separator": "+",
+    "MenuBar.DefaultKey": "F10",
+    "PopoverMenu.DefaultKey": "Shift+F10",
+    "FileDialog.MaxSearchResults": 10000,
+    "FileDialogStyle.DefaultUseColors": false,
+    "FileDialogStyle.DefaultUseUnicodeCharacters": false,
+    "Theme": "Gruntled",
+    "Themes": [
+        {
+            "Gruntled": {
+                "Glyphs": {
+                    "CheckStateChecked": "✓"
+                },
+                "Schemes": [
+                    {
+                        "TopLevel": {
+                            "Normal": {
+                                "Foreground": "OrangeRed",
+                                "Background": "AntiqueWhite"
+                            },
+                            "Focus": {
+                                "Foreground": "White",
+                                "Background": "Maroon"
+                            },
+                            "HotNormal": {
+                                "Foreground": "DarkRed",
+                                "Background": "AntiqueWhite"
+                            },
+                            "HotFocus": {
+                                "Foreground": "Yellow",
+                                "Background": "Maroon"
+                            },
+                            "Disabled": {
+                                "Foreground": "LightPink",
+                                "Background": "AntiqueWhite"
+                            }
+                        }
+                    },
+                    {
+                        "Base": {
+                            "Normal": {
+                                "Foreground": "White",
+                                "Background": "OrangeRed"
+                            },
+                            "Focus": {
+                                "Foreground": "FireBrick",
+                                "Background": "AntiqueWhite"
+                            },
+                            "HotNormal": {
+                                "Foreground": "Gold",
+                                "Background": "OrangeRed"
+                            },
+                            "HotFocus": {
+                                "Foreground": "FireBrick",
+                                "Background": "AntiqueWhite"
+                            },
+                            "Disabled": {
+                                "Foreground": "LightPink",
+                                "Background": "OrangeRed"
+                            }
+                        }
+                    },
+                    {
+                        "Dialog": {
+                            "Normal": {
+                                "Foreground": "FireBrick",
+                                "Background": "GhostWhite"
+                            },
+                            "Focus": {
+                                "Foreground": "DarkGray",
+                                "Background": "LightGray"
+                            },
+                            "HotNormal": {
+                                "Foreground": "FireBrick",
+                                "Background": "GhostWhite"
+                            },
+                            "HotFocus": {
+                                "Foreground": "FireBrick",
+                                "Background": "GhostWhite"
+                            },
+                            "Disabled": {
+                                "Foreground": "Gray",
+                                "Background": "DarkGray"
+                            }
+                        }
+                    },
+                    {
+                        "Menu": {
+                            "Normal": {
+                                "Foreground": "White",
+                                "Background": "FireBrick"
+                            },
+                            "Focus": {
+                                "Foreground": "White",
+                                "Background": "DarkRed"
+                            },
+                            "HotNormal": {
+                                "Foreground": "Yellow",
+                                "Background": "FireBrick"
+                            },
+                            "HotFocus": {
+                                "Foreground": "Yellow",
+                                "Background": "DarkRed"
+                            },
+                            "Disabled": {
+                                "Foreground": "Gray",
+                                "Background": "DarkGray"
+                            }
+                        }
+                    },
+                    {
+                        "Error": {
+                            "Normal": {
+                                "Foreground": "Yellow",
+                                "Background": "DarkRed"
+                            },
+                            "Focus": {
+                                "Foreground": "DarkSalmon",
+                                "Background": "Brown"
+                            },
+                            "HotNormal": {
+                                "Foreground": "Black",
+                                "Background": "DarkRed"
+                            },
+                            "HotFocus": {
+                                "Foreground": "FireBrick",
+                                "Background": "Brown"
+                            },
+                            "Disabled": {
+                                "Foreground": "DarkGray",
+                                "Background": "DarkRed"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+        
+    ]
+}

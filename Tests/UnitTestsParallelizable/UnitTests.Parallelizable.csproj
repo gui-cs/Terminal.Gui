@@ -34,7 +34,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\UnitTests\OutputAssert.cs" Link="OutputAssert.cs" />
+    <Compile Include="..\UnitTests.Legacy\OutputAssert.cs" Link="OutputAssert.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -57,7 +57,7 @@
     <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj">
     </ProjectReference>
     <ProjectReference Include="..\AppTestHelpers\AppTestHelpers.csproj" />
-    <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
+    <ProjectReference Include="..\UnitTests.Legacy\UnitTests.Legacy.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />

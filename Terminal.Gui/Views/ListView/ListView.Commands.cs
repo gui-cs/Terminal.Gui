@@ -2,10 +2,44 @@ namespace Terminal.Gui.Views;
 
 public partial class ListView
 {
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="ListView"/>. These are layered on top of
+    ///     <see cref="View.DefaultKeyBindings"/> when the view is created.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Only single-command bindings are included here. Multi-command bindings (e.g., Shift+Space for
+    ///         Activate+Down) and bindings with data payloads are added directly in the constructor.
+    ///     </para>
+    /// </remarks>
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    {
+        // Emacs navigation
+        [Command.Up] = Bind.All (Key.P.WithCtrl),
+        [Command.Down] = Bind.All (Key.N.WithCtrl),
+        [Command.PageDown] = Bind.All (Key.V.WithCtrl),
+
+        // ListView adds Home/End as additional Start/End bindings (the base layer also provides Ctrl+Home/Ctrl+End)
+        [Command.Start] = Bind.All (Key.Home),
+        [Command.End] = Bind.All (Key.End),
+
+        // Emacs extend
+        [Command.UpExtend] = Bind.All (Key.P.WithCtrl.WithShift),
+        [Command.DownExtend] = Bind.All (Key.N.WithCtrl.WithShift),
+
+        // ListView uses Shift+Home/End (not Ctrl+Shift+Home/End like the base layer)
+        [Command.StartExtend] = Bind.All (Key.Home.WithShift),
+        [Command.EndExtend] = Bind.All (Key.End.WithShift),
+    };
+
     private void SetupBindingsAndCommands ()
     {
         // Things this view knows how to do
-        // 
+        //
         AddCommand (Command.Up, ctx => RaiseActivating (ctx) == true || MoveUp ());
         AddCommand (Command.Down, ctx => RaiseActivating (ctx) == true || MoveDown ());
 
@@ -28,32 +62,15 @@ public partial class ListView
 
         AddCommand (Command.SelectAll, HandleSelectAll);
 
-        // Default keybindings for all ListViews
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.P.WithCtrl, Command.Up);
-        KeyBindings.Add (Key.CursorDown, Command.Down);
-        KeyBindings.Add (Key.N.WithCtrl, Command.Down);
-        KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.V.WithCtrl, Command.PageDown);
-        KeyBindings.Add (Key.Home, Command.Start);
-        KeyBindings.Add (Key.End, Command.End);
+        // Apply configurable key bindings (base layer + ListView-specific layer)
+        ApplyKeyBindings (DefaultKeyBindings, View.DefaultKeyBindings);
 
-        // Shift+Arrow for extending selection
-        KeyBindings.Add (Key.CursorUp.WithShift, Command.UpExtend);
-        KeyBindings.Add (Key.P.WithCtrl.WithShift, Command.UpExtend);
-        KeyBindings.Add (Key.CursorDown.WithShift, Command.DownExtend);
-        KeyBindings.Add (Key.N.WithCtrl.WithShift, Command.DownExtend);
-
-        KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
-        KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
-        KeyBindings.Add (Key.Home.WithShift, Command.StartExtend);
-        KeyBindings.Add (Key.End.WithShift, Command.EndExtend);
-
-        // Key.Space is already bound to Command.Activate; this gives us activate then move down
+        // Multi-command binding: activate then move down (can't be expressed in single-command dict)
         KeyBindings.Add (Key.Space.WithShift, Command.Activate, Command.Down);
 
-        // Use the form of Add that lets us pass data with the binding
+        // Use the form of Add that lets us pass data with the binding.
+        // Remove Ctrl+A first since ApplyKeyBindings may have already bound it (without data).
+        KeyBindings.Remove (Key.A.WithCtrl);
         KeyBindings.Add (Key.A.WithCtrl, new KeyBinding ([Command.SelectAll], true));
         KeyBindings.Add (Key.U.WithCtrl, new KeyBinding ([Command.SelectAll], false));
 

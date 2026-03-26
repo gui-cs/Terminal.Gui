@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel;
 using Microsoft.Extensions.Logging;
-using Terminal.Gui.Tests;
+using UnitTests.Parallelizable;
 using Terminal.Gui.Tracing;
+using UnitTests;
 
 namespace ViewsTests;
 
@@ -532,7 +533,8 @@ public class MenuItemTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             MenuItem menuItem = new () { Title = "TestItem" };
 

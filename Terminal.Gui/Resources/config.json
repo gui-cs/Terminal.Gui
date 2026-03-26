@@ -23,14 +23,8 @@
   "Key.Separator": "+",
 
   "Driver.Force16Colors": false,
-  "Application.ArrangeKey": "Ctrl+F5",
   //"Application.ForceDriver": "", // TODO: ForceDriver should be nullable
   "Application.IsMouseDisabled": false,
-  "Application.NextTabGroupKey": "F6",
-  "Application.NextTabKey": "Tab",
-  "Application.PrevTabGroupKey": "Shift+F6",
-  "Application.PrevTabKey": "Shift+Tab",
-  "Application.QuitKey": "Esc",
 
   // --------------- Colors ---------------
 

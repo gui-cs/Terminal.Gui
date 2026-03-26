@@ -82,7 +82,7 @@ public class TestContextTests (ITestOutputHelper outputHelper) : TestsAllDrivers
                                               .Then (app =>
                                                      {
                                                          app.TopRunnableView!.BorderStyle = LineStyle.None;
-                                                         app.TopRunnableView!.Border!.Thickness = Thickness.Empty;
+                                                         app.TopRunnableView!.Border.Thickness = Thickness.Empty;
                                                          app.TopRunnableView.Text = "hello";
                                                      })
                                               .ScreenShot ("ScreenShot", _out)

@@ -2,7 +2,8 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Terminal.Gui.Tests;
+using UnitTests;
+using UnitTests.Parallelizable;
 
 // ReSharper disable AccessToDisposedClosure
 #pragma warning disable xUnit1031
