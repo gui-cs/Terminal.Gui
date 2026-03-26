@@ -1988,4 +1988,209 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         view.Dispose ();
         app.Dispose ();
     }
+
+    // ════════════════════════════════════════════════════════════════════
+    //  Setup-trigger tests — verify configuration happens at property-change
+    //   time, NOT deferred to Draw.
+    // ════════════════════════════════════════════════════════════════════
+
+    // Copilot
+    [Fact]
+    public void Settings_Tab_Creates_BorderView ()
+    {
+        // Setting Border.Settings to include Tab should cause GetOrCreateView
+        View view = new () { Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
+
+        // Before setting Tab, View may or may not exist depending on LineStyle
+        // but TabTitleView should not exist
+
+        if (view.Border.View is BorderView bv)
+        {
+            Assert.Null (bv.TabTitleView);
+        }
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+
+        // After setting Tab, the BorderView must exist
+        bv = (view.Border.View as BorderView)!;
+        Assert.NotNull (bv);
+
+        view.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Settings_Tab_Sets_ViewportSettings_Transparent_Before_Draw ()
+    {
+        IDriver driver = CreateTestDriver (10, 6);
+
+        View view = new () { Driver = driver, Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Title = "Tab";
+
+        // Layout but do NOT draw
+        view.Layout ();
+
+        var bv = (BorderView)view.Border.View!;
+
+        // ViewportSettings should already include Transparent before any Draw call
+        Assert.True (bv.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent), "Transparent should be set after Settings change, not deferred to Draw");
+
+        Assert.True (bv.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse),
+                     "TransparentMouse should be set after Settings change, not deferred to Draw");
+
+        view.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Settings_Tab_Creates_TabTitleView_Before_Draw ()
+    {
+        IDriver driver = CreateTestDriver (10, 6);
+
+        View view = new () { Driver = driver, Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Title = "Tab";
+
+        // Layout but do NOT draw
+        view.Layout ();
+
+        var bv = (BorderView)view.Border.View!;
+
+        // TabTitleView should already exist after layout, before any Draw call
+        Assert.NotNull (bv.TabTitleView);
+
+        view.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Settings_Tab_TabTitleView_Has_Correct_Frame_Before_Draw ()
+    {
+        IDriver driver = CreateTestDriver (10, 7);
+
+        View view = new ()
+        {
+            Driver = driver,
+            Width = 10,
+            Height = 7,
+            CanFocus = true,
+            HasFocus = false,
+            BorderStyle = LineStyle.Rounded
+        };
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Border.TabOffset = 0;
+        view.Title = "T_ab";
+
+        // Layout but do NOT draw
+        view.Layout ();
+
+        var bv = (BorderView)view.Border.View!;
+        View? ttv = bv.TabTitleView;
+        Assert.NotNull (ttv);
+
+        // TabTitleView should have non-empty Frame set by layout, before Draw
+        Assert.NotEqual (Rectangle.Empty, ttv.Frame);
+
+        // Width should match TabLength (auto-computed: "Tab".GetColumns() + 2 = 5)
+        Assert.Equal (5, ttv.Frame.Width);
+
+        view.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Settings_Tab_TabTitleView_Has_SuperViewRendersLineCanvas ()
+    {
+        View view = new () { Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Title = "Tab";
+
+        view.Layout ();
+
+        var bv = (BorderView)view.Border.View!;
+        View? ttv = bv.TabTitleView;
+        Assert.NotNull (ttv);
+        Assert.True (ttv.SuperViewRendersLineCanvas, "TabTitleView must have SuperViewRendersLineCanvas = true for auto-join");
+
+        view.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Thickness_Change_Updates_TabTitleView_Layout ()
+    {
+        IDriver driver = CreateTestDriver (10, 7);
+
+        View view = new ()
+        {
+            Driver = driver,
+            Width = 10,
+            Height = 7,
+            CanFocus = true,
+            HasFocus = false,
+            BorderStyle = LineStyle.Rounded
+        };
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Title = "Tab";
+
+        view.Layout ();
+
+        var bv = (BorderView)view.Border.View!;
+        View? ttv = bv.TabTitleView;
+        Assert.NotNull (ttv);
+        int originalHeight = ttv.Frame.Height;
+
+        // Change thickness — TabTitleView should get updated frame after re-layout
+        view.Border.Thickness = new Thickness (1, 2, 1, 1);
+        view.Layout ();
+
+        int newHeight = ttv.Frame.Height;
+        Assert.NotEqual (originalHeight, newHeight);
+
+        view.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Clearing_Tab_Flag_Hides_TabTitleView ()
+    {
+        IDriver driver = CreateTestDriver (10, 6);
+
+        View view = new () { Driver = driver, Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Title = "Tab";
+        view.Layout ();
+
+        var bv = (BorderView)view.Border.View!;
+        Assert.NotNull (bv.TabTitleView);
+
+        // Clear the Tab flag
+        view.Border.Settings = BorderSettings.Title;
+        view.Layout ();
+
+        // TabTitleView should be hidden (Visible = false)
+        Assert.False (bv.TabTitleView!.Visible, "TabTitleView should be hidden when Tab flag is cleared");
+
+        view.Dispose ();
+    }
 }

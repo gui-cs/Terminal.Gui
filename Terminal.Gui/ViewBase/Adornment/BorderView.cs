@@ -61,6 +61,7 @@ public partial class BorderView : AdornmentView
         }
         border.ThicknessChanged += OnThicknessChanged;
         border.Parent?.Margin.ThicknessChanged += OnThicknessChanged;
+        border.SettingsChanged += OnSettingsChanged;
     }
 
     /// <inheritdoc/>
@@ -84,6 +85,121 @@ public partial class BorderView : AdornmentView
         {
             ShowHideDrawIndicator ();
         }
+
+        ConfigureForTabMode ();
+    }
+
+    private void OnSettingsChanged (object? sender, EventArgs e) => ConfigureForTabMode ();
+
+    private bool _tabModeSetTransparent;
+
+    /// <summary>
+    ///     Configures persistent state for tab mode. Called when <see cref="Border.Settings"/> or
+    ///     <see cref="IAdornment.Thickness"/> changes. Sets <see cref="View.ViewportSettings"/> and
+    ///     ensures the <see cref="TabTitleView"/> SubView exists with the correct static properties.
+    /// </summary>
+    private void ConfigureForTabMode ()
+    {
+        if (Adornment is not Border border)
+        {
+            return;
+        }
+
+        if (border.Settings.FastHasFlags (BorderSettings.Tab))
+        {
+            ViewportSettings |= ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
+            _tabModeSetTransparent = true;
+
+            TabTitleView label = EnsureTabTitleView ();
+
+            if (border.LineStyle is { } ls)
+            {
+                label.BorderStyle = ls;
+            }
+
+            label.TextFormatter.Direction = border.TabSide is Side.Left or Side.Right ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
+        }
+        else
+        {
+            // Only clear flags if we set them for tab mode
+            if (_tabModeSetTransparent)
+            {
+                ViewportSettings &= ~(ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse);
+                _tabModeSetTransparent = false;
+            }
+
+            _tabTitleView?.Visible = false;
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnSubViewLayout (LayoutEventArgs args) => UpdateTabTitleViewLayout ();
+
+    /// <summary>
+    ///     Computes and sets the <see cref="TabTitleView"/>'s frame, size, border thickness,
+    ///     text, and visibility during the layout pass. Called via <see cref="View.SubViewLayout"/>.
+    /// </summary>
+    private void UpdateTabTitleViewLayout ()
+    {
+        if (Adornment is not Border border || !border.Settings.FastHasFlags (BorderSettings.Tab))
+        {
+            return;
+        }
+
+        if (_tabTitleView is null)
+        {
+            return;
+        }
+
+        Rectangle borderBounds = GetTabBorderBounds (border);
+
+        if (borderBounds is not { Width: > 0, Height: > 0 })
+        {
+            _tabTitleView.Visible = false;
+
+            return;
+        }
+
+        int tabDepth = GetTabDepth (border);
+        int tabLength = border.TabLength!.Value;
+        bool hasFocus = border.Parent?.HasFocus ?? false;
+
+        Rectangle headerRect = ComputeHeaderRect (borderBounds, border.TabSide, border.TabOffset, tabLength, tabDepth);
+        Rectangle viewBounds = ComputeViewBounds (borderBounds, border.TabSide, tabDepth);
+        Rectangle clipped = Rectangle.Intersect (headerRect, viewBounds);
+        bool tabVisible = !clipped.IsEmpty;
+
+        if (!tabVisible)
+        {
+            _tabTitleView.Visible = false;
+
+            return;
+        }
+
+        _tabTitleView.Visible = true;
+        _tabTitleView.HotKeySpecifier = Adornment.Parent?.HotKeySpecifier ?? default (Rune);
+        _tabTitleView.Text = Adornment.Parent?.Title ?? string.Empty;
+
+        if (border.LineStyle is { } ls)
+        {
+            _tabTitleView.BorderStyle = ls;
+        }
+
+        // Configure the label's border thickness based on depth and focus
+        Thickness labelBorderThickness = ComputeTabLabelThickness (border.TabSide, tabDepth, hasFocus);
+        _tabTitleView.Border.Thickness = labelBorderThickness;
+
+        // For Left/Right, render text vertically
+        _tabTitleView.TextFormatter.Direction = border.TabSide is Side.Left or Side.Right
+                                                    ? TextDirection.TopBottom_LeftRight
+                                                    : TextDirection.LeftRight_TopBottom;
+
+        // Convert header rect from screen to BorderView viewport coords
+        Point screenOrigin = ViewportToScreen (Point.Empty);
+        Rectangle labelFrame = headerRect with { X = headerRect.X - screenOrigin.X, Y = headerRect.Y - screenOrigin.Y };
+        _tabTitleView.Frame = labelFrame;
+        _tabTitleView.Width = labelFrame.Width;
+        _tabTitleView.Height = labelFrame.Height;
     }
 
     private void ShowHideDrawIndicator ()
@@ -136,6 +252,7 @@ public partial class BorderView : AdornmentView
         }
 
         ShowHideDrawIndicator ();
+        ConfigureForTabMode ();
 
         MouseHighlightStates |= Adornment.Parent.Arrangement != ViewArrangement.Fixed ? MouseState.Pressed : MouseState.None;
     }
@@ -385,39 +502,15 @@ public partial class BorderView : AdornmentView
                                      normalAttribute);
         }
 
-        // Position and configure the Label SubView for the tab header
-        if (tabVisible)
+        // Update LastTitleRect for click handling (uses draw-time geometry)
+        if (tabVisible && _tabTitleView is { Visible: true })
         {
-            TabTitleView label = EnsureTabTitleView ();
-            label.Visible = true;
-            label.HotKeySpecifier = Adornment.Parent!.HotKeySpecifier;
-            label.Text = Adornment.Parent!.Title;
-            label.BorderStyle = lineStyle;
-
-            // Configure the Label's border thickness based on depth and focus
-            Thickness labelBorderThickness = ComputeTabLabelThickness (border.TabSide, tabDepth, hasFocus);
-            label.Border.Thickness = labelBorderThickness;
-
-            // For Left/Right, render text vertically
-            label.TextFormatter.Direction = border.TabSide is Side.Left or Side.Right ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
-
-            // Convert header rect from screen to BorderView viewport coords
-            Point screenOrigin = ViewportToScreen (Point.Empty);
-            Rectangle labelFrame = headerRect with { X = headerRect.X - screenOrigin.X, Y = headerRect.Y - screenOrigin.Y };
-            label.Frame = labelFrame;
-            label.Width = labelFrame.Width;
-            label.Height = labelFrame.Height;
-
-            // Set LastTitleRect to the visible content portion for click handling
             Thickness effectiveThickness = ComputeTabLabelThickness (border.TabSide, tabDepth, hasFocus);
             Rectangle visibleContent = ComputeTabContentArea (clipped, headerRect, border.TabSide, effectiveThickness, tabDepth);
             LastTitleRect = visibleContent.IsEmpty ? null : visibleContent;
         }
         else
         {
-            // Tab is off-screen — hide Label
-            _tabTitleView?.Visible = false;
-
             LastTitleRect = null;
         }
 
@@ -657,8 +750,6 @@ public partial class BorderView : AdornmentView
         // Tab mode: completely separate codepath with edge-based border positioning
         if (border.Settings.FastHasFlags (BorderSettings.Tab))
         {
-            ViewportSettings |= ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
-
             return DrawTabBorder (border);
         }
 
