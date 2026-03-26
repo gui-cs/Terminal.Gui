@@ -344,8 +344,7 @@ public partial class BorderView : AdornmentView
     }
 
     /// <summary>
-    ///     Computes the unclipped header rectangle for the given side, offset, length, and depth.
-    ///     Moved from <c>TabHeaderRenderer</c>.
+    ///     Computes the unclipped header rectangle for the given side, offset, length, and depth. In content coordinates.
     /// </summary>
     private static Rectangle ComputeHeaderRect (Rectangle contentBorderRect, Side side, int offset, int length, int depth) =>
         side switch
@@ -358,8 +357,7 @@ public partial class BorderView : AdornmentView
         };
 
     /// <summary>
-    ///     Computes the full view bounds (content border + header protrusion area).
-    ///     Moved from <c>TabHeaderRenderer</c>.
+    ///     Computes the full view bounds (content border + header protrusion area). In content coordinates.
     /// </summary>
     private static Rectangle ComputeViewBounds (Rectangle contentBorderRect, Side side, int depth) =>
         side switch
@@ -693,6 +691,8 @@ public partial class BorderView : AdornmentView
 
                 break;
             }
+
+            default: throw new ArgumentOutOfRangeException (nameof (side), side, null);
         }
     }
 
