@@ -18,6 +18,7 @@ public class Navigation : Scenario
         app.Init ();
 
         using Window window = new ();
+        window.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
         window.Title = GetQuitKeyAndName ();
         window.TabStop = TabBehavior.TabGroup;
 

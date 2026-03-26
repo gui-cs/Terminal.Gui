@@ -70,13 +70,12 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
 
         // Tab1: focused, offset 0. Title "Tab1" → TabLength = 6.
         View tab1 = CreateTabView (driver, 12, 5, Side.Top, 0, false, "Tab1");
-        tab1.Arrangement = ViewArrangement.Overlapped;
+        tab1.Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable;
         tab1.Text = "content1";
 
         // Tab2: unfocused, offset 6 (right after Tab1). Title "Tab2" → TabLength = 6.
         View tab2 = CreateTabView (driver, 12, 5, Side.Top, 5, false, "Tab2");
-        tab2.Arrangement = ViewArrangement.Overlapped;
-        tab2.BorderStyle = LineStyle.RoundedDashed;
+        tab2.Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable;
         tab2.Text = "content2";
 
         View superView = new ()
@@ -96,6 +95,7 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
                        ╭────┬────╮
                        │Tab1│Tab2│
                        │    ╰────┴╮
+                       │content1  │
                        ╰──────────╯
                        """);
     }

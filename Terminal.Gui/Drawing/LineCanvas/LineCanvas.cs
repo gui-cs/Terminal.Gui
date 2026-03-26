@@ -1,4 +1,3 @@
-
 using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.Drawing;
@@ -7,19 +6,18 @@ namespace Terminal.Gui.Drawing;
 public class LineCanvas : IDisposable
 {
     /// <summary>Creates a new instance.</summary>
-    public LineCanvas ()
-    {
+    public LineCanvas () =>
+
         // TODO: Refactor ConfigurationManager to not use an event handler for this.
         // Instead, have it call a method on any class appropriately attributed
         // to update the cached values. See Issue #2871
         ConfigurationManager.Applied += ConfigurationManager_Applied;
-    }
 
     private readonly List<StraightLine> _lines = [];
 
     /// <summary>Creates a new instance with the given <paramref name="lines"/>.</summary>
     /// <param name="lines">Initial lines for the canvas.</param>
-    public LineCanvas (IEnumerable<StraightLine> lines) : this () { _lines = lines.ToList (); }
+    public LineCanvas (IEnumerable<StraightLine> lines) : this () => _lines = lines.ToList ();
 
     /// <summary>
     ///     Optional <see cref="FillPair"/> which when present overrides the <see cref="StraightLine.Attribute"/>
@@ -38,31 +36,24 @@ public class LineCanvas : IDisposable
     {
         get
         {
-            if (_cachedBounds.IsEmpty)
+            if (!_cachedBounds.IsEmpty || _lines.Count == 0)
             {
-                if (_lines.Count == 0)
-                {
-                    return _cachedBounds;
-                }
-
-                Rectangle bounds = _lines [0].Bounds;
-
-                for (var i = 1; i < _lines.Count; i++)
-                {
-                    bounds = Rectangle.Union (bounds, _lines [i].Bounds);
-                }
-
-                if (bounds is { Width: 0 } or { Height: 0 })
-                {
-                    bounds = bounds with
-                    {
-                        Width = Math.Clamp (bounds.Width, 1, short.MaxValue),
-                        Height = Math.Clamp (bounds.Height, 1, short.MaxValue)
-                    };
-                }
-
-                _cachedBounds = bounds;
+                return _cachedBounds;
             }
+
+            Rectangle bounds = _lines [0].Bounds;
+
+            for (var i = 1; i < _lines.Count; i++)
+            {
+                bounds = Rectangle.Union (bounds, _lines [i].Bounds);
+            }
+
+            if (bounds is { Width: 0 } or { Height: 0 })
+            {
+                bounds = bounds with { Width = Math.Clamp (bounds.Width, 1, short.MaxValue), Height = Math.Clamp (bounds.Height, 1, short.MaxValue) };
+            }
+
+            _cachedBounds = bounds;
 
             return _cachedBounds;
         }
@@ -90,16 +81,10 @@ public class LineCanvas : IDisposable
     /// <param name="orientation">The direction of the line.</param>
     /// <param name="style">The style of line to use</param>
     /// <param name="attribute"></param>
-    public void AddLine (
-        Point start,
-        int length,
-        Orientation orientation,
-        LineStyle style,
-        Attribute? attribute = null
-    )
+    public void AddLine (Point start, int length, Orientation orientation, LineStyle style, Attribute? attribute = null)
     {
         _cachedBounds = Rectangle.Empty;
-        _lines.Add (new (start, length, orientation, style, attribute));
+        _lines.Add (new StraightLine (start, length, orientation, style, attribute));
     }
 
     /// <summary>Adds a new line to the canvas</summary>
@@ -123,7 +108,7 @@ public class LineCanvas : IDisposable
     /// </remarks>
     public void Exclude (Region region)
     {
-        _exclusionRegion ??= new ();
+        _exclusionRegion ??= new Region ();
         _exclusionRegion.Union (region);
     }
 
@@ -131,7 +116,7 @@ public class LineCanvas : IDisposable
     ///     Clears the exclusion region. After calling this method, <see cref="GetCellMap"/> and <see cref="GetMap()"/> will
     ///     return all points in the canvas.
     /// </summary>
-    public void ClearExclusions () { _exclusionRegion = null; }
+    public void ClearExclusions () => _exclusionRegion = null;
 
     /// <summary>Clears all lines from the LineCanvas.</summary>
     public void Clear ()
@@ -145,7 +130,7 @@ public class LineCanvas : IDisposable
     ///     Clears any cached states from the canvas. Call this method if you make changes to lines that have already been
     ///     added.
     /// </summary>
-    public void ClearCache () { _cachedBounds = Rectangle.Empty; }
+    public void ClearCache () => _cachedBounds = Rectangle.Empty;
 
     /// <summary>
     ///     Evaluates the lines that have been added to the canvas and returns a map containing the glyphs and their
@@ -171,20 +156,23 @@ public class LineCanvas : IDisposable
             for (int x = Bounds.X; x < Bounds.X + Bounds.Width; x++)
             {
                 intersectionsBufferList.Clear ();
-                foreach (var line in _lines)
+
+                foreach (StraightLine line in _lines)
                 {
                     if (line.Intersects (x, y) is { } intersect)
                     {
                         intersectionsBufferList.Add (intersect);
                     }
                 }
+
                 // Safe as long as the list is not modified while the span is in use.
                 ReadOnlySpan<IntersectionDefinition> intersects = CollectionsMarshal.AsSpan (intersectionsBufferList);
                 Cell? cell = GetCellForIntersects (intersects);
+
                 // TODO: Can we skip the whole nested looping if _exclusionRegion is null?
                 if (cell is { } && _exclusionRegion?.Contains (x, y) is null or false)
                 {
-                    map.Add (new (x, y), cell);
+                    map.Add (new Point (x, y), cell);
                 }
             }
         }
@@ -214,6 +202,7 @@ public class LineCanvas : IDisposable
             for (int x = Bounds.X; x < Bounds.X + Bounds.Width; x++)
             {
                 intersectionsBufferList.Clear ();
+
                 foreach (StraightLine line in _lines)
                 {
                     if (line.Intersects (x, y) is { } intersect)
@@ -221,15 +210,17 @@ public class LineCanvas : IDisposable
                         intersectionsBufferList.Add (intersect);
                     }
                 }
+
                 // Safe as long as the list is not modified while the span is in use.
                 ReadOnlySpan<IntersectionDefinition> intersects = CollectionsMarshal.AsSpan (intersectionsBufferList);
                 Cell? cell = GetCellForIntersects (intersects);
 
-                if (cell is { } && _exclusionRegion?.Contains (x, y) is null or false)
+                if (cell is null || _exclusionRegion?.Contains (x, y) is not (null or false))
                 {
-                    map.Add (new (x, y), cell);
-                    rowXValues.Add (x);
+                    continue;
                 }
+                map.Add (new Point (x, y), cell);
+                rowXValues.Add (x);
             }
 
             // Build Region spans for this completed row
@@ -242,20 +233,15 @@ public class LineCanvas : IDisposable
             int spanStart = rowXValues [0];
             int spanEnd = rowXValues [0];
 
-            for (int i = 1; i < rowXValues.Count; i++)
+            for (var i = 1; i < rowXValues.Count; i++)
             {
-                if (rowXValues [i] == spanEnd + 1)
-                {
-                    // Continue the span
-                    spanEnd = rowXValues [i];
-                }
-                else
+                if (rowXValues [i] != spanEnd + 1)
                 {
                     // End the current span and add it to the region
                     region.Combine (new Rectangle (spanStart, y, spanEnd - spanStart + 1, 1), RegionOp.Union);
                     spanStart = rowXValues [i];
-                    spanEnd = rowXValues [i];
                 }
+                spanEnd = rowXValues [i];
             }
 
             // Add the final span for this row
@@ -276,16 +262,14 @@ public class LineCanvas : IDisposable
     {
         // Group cells by row for efficient horizontal span detection
         // Sort by Y then X so that within each row group, X values are in order
-        IEnumerable<IGrouping<int, Point>> rowGroups = cellMap.Keys
-                                                              .OrderBy (p => p.Y)
-                                                              .ThenBy (p => p.X)
-                                                              .GroupBy (p => p.Y);
+        IEnumerable<IGrouping<int, Point>> rowGroups = cellMap.Keys.OrderBy (p => p.Y).ThenBy (p => p.X).GroupBy (p => p.Y);
 
         Region region = new ();
 
         foreach (IGrouping<int, Point> row in rowGroups)
         {
             int y = row.Key;
+
             // X values are sorted due to ThenBy above
             List<int> xValues = row.Select (p => p.X).ToList ();
 
@@ -299,7 +283,7 @@ public class LineCanvas : IDisposable
             int spanStart = xValues [0];
             int spanEnd = xValues [0];
 
-            for (int i = 1; i < xValues.Count; i++)
+            for (var i = 1; i < xValues.Count; i++)
             {
                 if (xValues [i] == spanEnd + 1)
                 {
@@ -349,13 +333,15 @@ public class LineCanvas : IDisposable
             for (int x = inArea.X; x < inArea.X + inArea.Width; x++)
             {
                 intersectionsBufferList.Clear ();
-                foreach (var line in _lines)
+
+                foreach (StraightLine line in _lines)
                 {
                     if (line.Intersects (x, y) is { } intersect)
                     {
                         intersectionsBufferList.Add (intersect);
                     }
                 }
+
                 // Safe as long as the list is not modified while the span is in use.
                 ReadOnlySpan<IntersectionDefinition> intersects = CollectionsMarshal.AsSpan (intersectionsBufferList);
 
@@ -363,7 +349,7 @@ public class LineCanvas : IDisposable
 
                 if (rune is { } && _exclusionRegion?.Contains (x, y) is null or false)
                 {
-                    map.Add (new (x, y), rune.Value);
+                    map.Add (new Point (x, y), rune.Value);
                 }
             }
         }
@@ -383,7 +369,7 @@ public class LineCanvas : IDisposable
     ///     </para>
     /// </remarks>
     /// <returns>A map of all the points within the canvas.</returns>
-    public Dictionary<Point, Rune> GetMap () { return GetMap (Bounds); }
+    public Dictionary<Point, Rune> GetMap () => GetMap (Bounds);
 
     /// <summary>Merges one line canvas into this one.</summary>
     /// <param name="lineCanvas"></param>
@@ -394,11 +380,12 @@ public class LineCanvas : IDisposable
             AddLine (line);
         }
 
-        if (lineCanvas._exclusionRegion is { })
+        if (lineCanvas._exclusionRegion is null)
         {
-            _exclusionRegion ??= new ();
-            _exclusionRegion.Union (lineCanvas._exclusionRegion);
+            return;
         }
+        _exclusionRegion ??= new Region ();
+        _exclusionRegion.Union (lineCanvas._exclusionRegion);
     }
 
     /// <summary>Removes the last line added to the canvas</summary>
@@ -464,13 +451,14 @@ public class LineCanvas : IDisposable
 
     private static bool All (ReadOnlySpan<IntersectionDefinition> intersects, Orientation orientation)
     {
-        foreach (var intersect in intersects)
+        foreach (IntersectionDefinition intersect in intersects)
         {
             if (intersect.Line.Orientation != orientation)
             {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -489,51 +477,22 @@ public class LineCanvas : IDisposable
     /// <param name="intersects"></param>
     /// <param name="types"></param>
     /// <returns></returns>
-    private static bool Exactly (HashSet<IntersectionType> intersects, params IntersectionType [] types) { return intersects.SetEquals (types); }
+    private static bool Exactly (HashSet<IntersectionType> intersects, params IntersectionType [] types) => intersects.SetEquals (types);
 
-    private Attribute? GetAttributeForIntersects (ReadOnlySpan<IntersectionDefinition> intersects)
-    {
-        return Fill?.GetAttribute (intersects [0].Point) ?? intersects [0].Line.Attribute;
-    }
+    private Attribute? GetAttributeForIntersects (ReadOnlySpan<IntersectionDefinition> intersects) =>
+        Fill?.GetAttribute (intersects [0].Point) ?? intersects [0].Line.Attribute;
 
     private readonly Dictionary<IntersectionRuneType, IntersectionRuneResolver> _runeResolvers = new ()
     {
-        {
-            IntersectionRuneType.ULCorner,
-            new ULIntersectionRuneResolver ()
-        },
-        {
-            IntersectionRuneType.URCorner,
-            new URIntersectionRuneResolver ()
-        },
-        {
-            IntersectionRuneType.LLCorner,
-            new LLIntersectionRuneResolver ()
-        },
-        {
-            IntersectionRuneType.LRCorner,
-            new LRIntersectionRuneResolver ()
-        },
-        {
-            IntersectionRuneType.TopTee,
-            new TopTeeIntersectionRuneResolver ()
-        },
-        {
-            IntersectionRuneType.LeftTee,
-            new LeftTeeIntersectionRuneResolver ()
-        },
-        {
-            IntersectionRuneType.RightTee,
-            new RightTeeIntersectionRuneResolver ()
-        },
-        {
-            IntersectionRuneType.BottomTee,
-            new BottomTeeIntersectionRuneResolver ()
-        },
-        {
-            IntersectionRuneType.Cross,
-            new CrossIntersectionRuneResolver ()
-        }
+        { IntersectionRuneType.ULCorner, new ULIntersectionRuneResolver () },
+        { IntersectionRuneType.URCorner, new URIntersectionRuneResolver () },
+        { IntersectionRuneType.LLCorner, new LLIntersectionRuneResolver () },
+        { IntersectionRuneType.LRCorner, new LRIntersectionRuneResolver () },
+        { IntersectionRuneType.TopTee, new TopTeeIntersectionRuneResolver () },
+        { IntersectionRuneType.LeftTee, new LeftTeeIntersectionRuneResolver () },
+        { IntersectionRuneType.RightTee, new RightTeeIntersectionRuneResolver () },
+        { IntersectionRuneType.BottomTee, new BottomTeeIntersectionRuneResolver () },
+        { IntersectionRuneType.Cross, new CrossIntersectionRuneResolver () }
 
         // TODO: Add other resolvers
     };
@@ -566,6 +525,7 @@ public class LineCanvas : IDisposable
         }
 
         IntersectionRuneType runeType = GetRuneTypeForIntersects (intersects);
+
         if (_runeResolvers.TryGetValue (runeType, out IntersectionRuneResolver? resolver))
         {
             return resolver.GetRuneForIntersects (intersects);
@@ -589,8 +549,10 @@ public class LineCanvas : IDisposable
         {
             case IntersectionRuneType.None:
                 return null;
+
             case IntersectionRuneType.Dot:
                 return Glyphs.Dot;
+
             case IntersectionRuneType.HLine:
                 if (useDouble)
                 {
@@ -607,9 +569,8 @@ public class LineCanvas : IDisposable
                     return Glyphs.HLineDa3;
                 }
 
-                return useThick ? Glyphs.HLineHv :
-                       useThickDashed ? Glyphs.HLineHvDa2 :
-                       useThickDotted ? Glyphs.HLineHvDa3 : Glyphs.HLine;
+                return useThick ? Glyphs.HLineHv : useThickDashed ? Glyphs.HLineHvDa2 : useThickDotted ? Glyphs.HLineHvDa3 : Glyphs.HLine;
+
             case IntersectionRuneType.VLine:
                 if (useDouble)
                 {
@@ -626,19 +587,11 @@ public class LineCanvas : IDisposable
                     return Glyphs.VLineDa4;
                 }
 
-                return useThick ? Glyphs.VLineHv :
-                       useThickDashed ? Glyphs.VLineHvDa3 :
-                       useThickDotted ? Glyphs.VLineHvDa4 : Glyphs.VLine;
+                return useThick ? Glyphs.VLineHv : useThickDashed ? Glyphs.VLineHvDa3 : useThickDotted ? Glyphs.VLineHvDa4 : Glyphs.VLine;
 
             default:
-                throw new (
-                           "Could not find resolver or switch case for "
-                           + nameof (runeType)
-                           + ":"
-                           + runeType
-                          );
+                throw new Exception ("Could not find resolver or switch case for " + nameof (runeType) + ":" + runeType);
         }
-
 
         static bool AnyLineStyles (ReadOnlySpan<IntersectionDefinition> intersects, ReadOnlySpan<LineStyle> lineStyles)
         {
@@ -652,56 +605,38 @@ public class LineCanvas : IDisposable
                     }
                 }
             }
+
             return false;
         }
     }
 
     private IntersectionRuneType GetRuneTypeForIntersects (ReadOnlySpan<IntersectionDefinition> intersects)
     {
-        HashSet<IntersectionType> set = new (capacity: intersects.Length);
-        foreach (var intersect in intersects)
+        HashSet<IntersectionType> set = new (intersects.Length);
+
+        foreach (IntersectionDefinition intersect in intersects)
         {
             set.Add (intersect.Type);
         }
 
         #region Cross Conditions
 
-        if (Has (
-                 set,
-                 [IntersectionType.PassOverHorizontal,
-                 IntersectionType.PassOverVertical]
-                ))
+        if (Has (set, [IntersectionType.PassOverHorizontal, IntersectionType.PassOverVertical]))
         {
             return IntersectionRuneType.Cross;
         }
 
-        if (Has (
-                 set,
-                 [IntersectionType.PassOverVertical,
-                 IntersectionType.StartLeft,
-                 IntersectionType.StartRight]
-                ))
+        if (Has (set, [IntersectionType.PassOverVertical, IntersectionType.StartLeft, IntersectionType.StartRight]))
         {
             return IntersectionRuneType.Cross;
         }
 
-        if (Has (
-                 set,
-                 [IntersectionType.PassOverHorizontal,
-                 IntersectionType.StartUp,
-                 IntersectionType.StartDown]
-                ))
+        if (Has (set, [IntersectionType.PassOverHorizontal, IntersectionType.StartUp, IntersectionType.StartDown]))
         {
             return IntersectionRuneType.Cross;
         }
 
-        if (Has (
-                 set,
-                 [IntersectionType.StartLeft,
-                 IntersectionType.StartRight,
-                 IntersectionType.StartUp,
-                 IntersectionType.StartDown]
-                ))
+        if (Has (set, [IntersectionType.StartLeft, IntersectionType.StartRight, IntersectionType.StartUp, IntersectionType.StartDown]))
         {
             return IntersectionRuneType.Cross;
         }
@@ -734,78 +669,22 @@ public class LineCanvas : IDisposable
 
         #region T Conditions
 
-        if (Has (
-                 set,
-                 [IntersectionType.PassOverHorizontal,
-                 IntersectionType.StartDown]
-                ))
+        if (Has (set, [IntersectionType.PassOverHorizontal, IntersectionType.StartDown]) || Has (set, [IntersectionType.StartRight, IntersectionType.StartLeft, IntersectionType.StartDown]))
         {
             return IntersectionRuneType.TopTee;
         }
 
-        if (Has (
-                 set,
-                 [IntersectionType.StartRight,
-                 IntersectionType.StartLeft,
-                 IntersectionType.StartDown]
-                ))
-        {
-            return IntersectionRuneType.TopTee;
-        }
-
-        if (Has (
-                 set,
-                 [IntersectionType.PassOverHorizontal,
-                 IntersectionType.StartUp]
-                ))
+        if (Has (set, [IntersectionType.PassOverHorizontal, IntersectionType.StartUp]) || Has (set, [IntersectionType.StartRight, IntersectionType.StartLeft, IntersectionType.StartUp]))
         {
             return IntersectionRuneType.BottomTee;
         }
 
-        if (Has (
-                 set,
-                 [IntersectionType.StartRight,
-                 IntersectionType.StartLeft,
-                 IntersectionType.StartUp]
-                ))
-        {
-            return IntersectionRuneType.BottomTee;
-        }
-
-        if (Has (
-                 set,
-                 [IntersectionType.PassOverVertical,
-                 IntersectionType.StartRight]
-                ))
+        if (Has (set, [IntersectionType.PassOverVertical, IntersectionType.StartRight]) || Has (set, [IntersectionType.StartRight, IntersectionType.StartDown, IntersectionType.StartUp]))
         {
             return IntersectionRuneType.LeftTee;
         }
 
-        if (Has (
-                 set,
-                 [IntersectionType.StartRight,
-                 IntersectionType.StartDown,
-                 IntersectionType.StartUp]
-                ))
-        {
-            return IntersectionRuneType.LeftTee;
-        }
-
-        if (Has (
-                 set,
-                 [IntersectionType.PassOverVertical,
-                 IntersectionType.StartLeft]
-                ))
-        {
-            return IntersectionRuneType.RightTee;
-        }
-
-        if (Has (
-                 set,
-                 [IntersectionType.StartLeft,
-                 IntersectionType.StartDown,
-                 IntersectionType.StartUp]
-                ))
+        if (Has (set, [IntersectionType.PassOverVertical, IntersectionType.StartLeft]) || Has (set, [IntersectionType.StartLeft, IntersectionType.StartDown, IntersectionType.StartUp]))
         {
             return IntersectionRuneType.RightTee;
         }
@@ -817,12 +696,7 @@ public class LineCanvas : IDisposable
             return IntersectionRuneType.HLine;
         }
 
-        if (All (intersects, Orientation.Vertical))
-        {
-            return IntersectionRuneType.VLine;
-        }
-
-        return IntersectionRuneType.Dot;
+        return All (intersects, Orientation.Vertical) ? IntersectionRuneType.VLine : IntersectionRuneType.Dot;
     }
 
     /// <summary>
@@ -834,25 +708,25 @@ public class LineCanvas : IDisposable
     /// <returns></returns>
     private bool Has (HashSet<IntersectionType> intersects, ReadOnlySpan<IntersectionType> types)
     {
-        foreach (var type in types)
+        foreach (IntersectionType type in types)
         {
             if (!intersects.Contains (type))
             {
                 return false;
             }
         }
+
         return true;
     }
 
-
     /// <summary>
-    /// Preallocated arrays for <see cref="GetRuneTypeForIntersects"/> calls to <see cref="Exactly"/>.
+    ///     Preallocated arrays for <see cref="GetRuneTypeForIntersects"/> calls to <see cref="Exactly"/>.
     /// </summary>
     /// <remarks>
-    /// Optimization to avoid array allocation for each call from array params. Please do not edit the arrays at runtime. :)
-    /// 
-    /// More ideal solution would be to change <see cref="Exactly"/> to take ReadOnlySpan instead of an array
-    /// but that would require replacing the HashSet.SetEquals call.
+    ///     Optimization to avoid array allocation for each call from array params. Please do not edit the arrays at runtime.
+    ///     :)
+    ///     More ideal solution would be to change <see cref="Exactly"/> to take ReadOnlySpan instead of an array
+    ///     but that would require replacing the HashSet.SetEquals call.
     /// </remarks>
     private static class CornerIntersections
     {
@@ -904,10 +778,7 @@ public class LineCanvas : IDisposable
         internal Rune _thickH;
         internal Rune _thickV;
 
-        protected IntersectionRuneResolver ()
-        {
-            SetGlyphs ();
-        }
+        protected IntersectionRuneResolver () => SetGlyphs ();
 
         public Rune? GetRuneForIntersects (ReadOnlySpan<IntersectionDefinition> intersects)
         {
@@ -926,10 +797,11 @@ public class LineCanvas : IDisposable
                 return _doubleV;
             }
 
-            bool thickHorizontal = AnyWithOrientationAndAnyLineStyle (intersects, Orientation.Horizontal,
-                [LineStyle.Heavy, LineStyle.HeavyDashed, LineStyle.HeavyDotted]);
-            bool thickVertical = AnyWithOrientationAndAnyLineStyle (intersects, Orientation.Vertical,
-                [LineStyle.Heavy, LineStyle.HeavyDashed, LineStyle.HeavyDotted]);
+            bool thickHorizontal =
+                AnyWithOrientationAndAnyLineStyle (intersects, Orientation.Horizontal, [LineStyle.Heavy, LineStyle.HeavyDashed, LineStyle.HeavyDotted]);
+
+            bool thickVertical =
+                AnyWithOrientationAndAnyLineStyle (intersects, Orientation.Vertical, [LineStyle.Heavy, LineStyle.HeavyDashed, LineStyle.HeavyDotted]);
 
             if (thickHorizontal)
             {
@@ -945,30 +817,27 @@ public class LineCanvas : IDisposable
 
             static bool UseRounded (ReadOnlySpan<IntersectionDefinition> intersects)
             {
-                foreach (var intersect in intersects)
+                foreach (IntersectionDefinition intersect in intersects)
                 {
                     if (intersect.Line.Length == 0)
                     {
                         continue;
                     }
 
-                    if (intersect.Line.Style is
-                        LineStyle.Rounded or
-                        LineStyle.RoundedDashed or
-                        LineStyle.RoundedDotted)
+                    if (intersect.Line.Style is LineStyle.Rounded or LineStyle.RoundedDashed or LineStyle.RoundedDotted)
                     {
                         return true;
                     }
                 }
+
                 return false;
             }
 
-            static bool AnyWithOrientationAndAnyLineStyle (
-                ReadOnlySpan<IntersectionDefinition> intersects,
-                Orientation orientation,
-                ReadOnlySpan<LineStyle> lineStyles)
+            static bool AnyWithOrientationAndAnyLineStyle (ReadOnlySpan<IntersectionDefinition> intersects,
+                                                           Orientation orientation,
+                                                           ReadOnlySpan<LineStyle> lineStyles)
             {
-                foreach (var i in intersects)
+                foreach (IntersectionDefinition i in intersects)
                 {
                     if (i.Line.Orientation != orientation)
                     {
@@ -976,7 +845,7 @@ public class LineCanvas : IDisposable
                     }
 
                     // Any line style
-                    foreach (var style in lineStyles)
+                    foreach (LineStyle style in lineStyles)
                     {
                         if (i.Line.Style == style)
                         {
@@ -984,6 +853,7 @@ public class LineCanvas : IDisposable
                         }
                     }
                 }
+
                 return false;
             }
         }
