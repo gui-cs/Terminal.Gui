@@ -491,7 +491,8 @@ public partial class View // Drawing APIs
 
         Driver.FillRect (toClear);
 
-        // context.AddDrawnRectangle (toClear);
+        // BUGBUG: Why is this commented out. If there's a good reason, it should be clearly documented here.
+        //context.AddDrawnRectangle (toClear);
 
         SetNeedsDraw ();
     }

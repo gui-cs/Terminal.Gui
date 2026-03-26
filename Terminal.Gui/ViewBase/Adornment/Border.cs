@@ -1,5 +1,3 @@
-using System.Formats.Asn1;
-
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
@@ -27,10 +25,10 @@ public class Border : AdornmentImpl
         return bv;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public override Rectangle GetFrame () => Parent is { } ? Parent.Margin.Thickness.GetInside (Parent!.Margin.GetFrame ()) : Rectangle.Empty;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnThicknessChanged ()
     {
         base.OnThicknessChanged ();
@@ -50,7 +48,8 @@ public class Border : AdornmentImpl
 
     /// <summary>
     ///     Sets the style of the lines drawn in the <see cref="Border"/>. If not set, will inherit the style from
-    ///     the <see cref="IAdornment.Parent"/>'s <see cref="View.SuperView"/>'s <see cref="View.BorderStyle"/>. If set, will cause <see cref="IAdornment.View"/>
+    ///     the <see cref="IAdornment.Parent"/>'s <see cref="View.SuperView"/>'s <see cref="View.BorderStyle"/>. If set, will
+    ///     cause <see cref="IAdornment.View"/>
     ///     to be created.
     /// </summary>
     public LineStyle? LineStyle
@@ -65,7 +64,7 @@ public class Border : AdornmentImpl
 
             field = value;
 
-            if (field is not null)
+            if (field is { })
             {
                 GetOrCreateView ();
             }
@@ -84,7 +83,13 @@ public class Border : AdornmentImpl
             {
                 return;
             }
+
             field = value;
+
+            if (field.HasFlag (BorderSettings.Tab))
+            {
+                GetOrCreateView ();
+            }
 
             Parent?.SetNeedsLayout ();
         }
@@ -110,16 +115,15 @@ public class Border : AdornmentImpl
     {
         get
         {
-            if (field is null && Settings.HasFlag (BorderSettings.Tab))
+            if (field is { } || !Settings.HasFlag (BorderSettings.Tab))
             {
-                int titleColumns = Settings.HasFlag (BorderSettings.Title)
-                                       ? Parent?.TitleTextFormatter.FormatAndGetSize ().Width ?? 0
-                                       : 0;
-
-                // Two vertical border lines + title text width (2 when no title)
-                return titleColumns + 2;
+                return field;
             }
-            return field;
+            int titleColumns = Settings.HasFlag (BorderSettings.Title) ? Parent?.TitleTextFormatter.FormatAndGetSize ().Width ?? 0 : 0;
+
+            // Two vertical border lines + title text width (2 when no title)
+            return titleColumns + 2;
+
         }
         set;
     }

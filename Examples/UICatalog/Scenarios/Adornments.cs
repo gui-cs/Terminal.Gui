@@ -118,7 +118,7 @@ public class Adornments : Scenario
 
         window.DrawComplete += (_, _) =>
                         {
-                            if (tabDragHooked || ((BorderView)window.Border.View!).TabTitle is not { } tabTitle)
+                            if (tabDragHooked || ((BorderView)window.Border.View!).TabTitleView is not { } tabTitle)
                             {
                                 return;
                             }
