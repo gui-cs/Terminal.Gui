@@ -131,6 +131,8 @@ public partial class TextView : View, IDesignable
     /// <inheritdoc/>
     public override void EndInit ()
     {
+        base.EndInit ();
+
         Autocomplete.HostControl ??= this;
 
         ContextMenu = CreateContextMenu ();
@@ -148,8 +150,6 @@ public partial class TextView : View, IDesignable
                 KeyBindings.Add (key, Command.Context);
             }
         }
-
-        base.EndInit ();
     }
 
     /// <inheritdoc/>
