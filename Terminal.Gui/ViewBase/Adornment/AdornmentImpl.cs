@@ -16,7 +16,7 @@ public abstract class AdornmentImpl : IAdornment
     /// </summary>
     public View? Parent
     {
-        get => field;
+        get;
         set
         {
             if (field == value)

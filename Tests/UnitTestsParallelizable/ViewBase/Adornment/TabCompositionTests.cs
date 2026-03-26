@@ -54,7 +54,7 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
     {
         view.Layout ();
         view.Draw ();
-        output.WriteLine (driver.ToString ());
+        //output.WriteLine (driver.ToString ());
         DriverAssert.AssertDriverContentsAre (expected, output, driver);
         view.Dispose ();
     }
@@ -63,34 +63,40 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
     //  Side.Top — Two tabs, Tab1 focused
     // ════════════════════════════════════════════════════════════════════
 
-    [Fact (Skip = "Border needs refactoring")]
+    [Fact]
     public void Top_TwoTabs_Tab1Focused ()
     {
-        IDriver driver = CreateTestDriver (19, 6);
+        IDriver driver = CreateTestDriver (40, 5);
 
         // Tab1: focused, offset 0. Title "Tab1" → TabLength = 6.
-        View tab1 = CreateTabView (driver, 19, 6, Side.Top, 0, true, "Tab1");
+        View tab1 = CreateTabView (driver, 12, 5, Side.Top, 0, false, "Tab1");
+        tab1.Arrangement = ViewArrangement.Overlapped;
+        tab1.Text = "content1";
 
         // Tab2: unfocused, offset 6 (right after Tab1). Title "Tab2" → TabLength = 6.
-        View tab2 = CreateTabView (driver, 19, 6, Side.Top, 5, false, "Tab2");
+        View tab2 = CreateTabView (driver, 12, 5, Side.Top, 5, false, "Tab2");
+        tab2.Arrangement = ViewArrangement.Overlapped;
+        tab2.BorderStyle = LineStyle.RoundedDashed;
+        tab2.Text = "content2";
 
-        View container = new ()
+        View superView = new ()
         {
+            CanFocus = true,
             Driver = driver,
-            Width = 19,
-            Height = 6
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
         };
-        container.Add (tab1, tab2);
+        superView.Add (tab1, tab2);
+        tab1.SetFocus ();
+        Assert.Equal (tab1, superView.SubViews.ElementAt (1));
 
-        DrawAndAssert (container,
+        DrawAndAssert (superView,
                        driver,
                        """
                        ╭────┬────╮
                        │Tab1│Tab2│
-                       │    ╰────┴───────╮
-                       │                 │
-                       │                 │
-                       ╰─────────────────╯
+                       │    ╰────┴╮
+                       ╰──────────╯
                        """);
     }
 

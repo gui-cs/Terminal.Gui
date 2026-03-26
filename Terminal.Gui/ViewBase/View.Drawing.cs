@@ -492,7 +492,7 @@ public partial class View // Drawing APIs
         Driver.FillRect (toClear);
 
         // BUGBUG: Why is this commented out. If there's a good reason, it should be clearly documented here.
-        //context.AddDrawnRectangle (toClear);
+        //context?.AddDrawnRectangle (toClear);
 
         SetNeedsDraw ();
     }
@@ -764,12 +764,6 @@ public partial class View // Drawing APIs
         // SubViews earlier in the collection are drawn last (on top).
         foreach (View view in InternalSubViews.Snapshot ().Where (v => v.Visible).Reverse ())
         {
-            // TODO: HACK - This forcing of SetNeedsDraw with SuperViewRendersLineCanvas enables auto line join to work, but is brute force.
-            if (view.SuperViewRendersLineCanvas || view.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
-            {
-                //view.SetNeedsDraw ();
-            }
-
             view.Draw (context);
 
             if (!view.SuperViewRendersLineCanvas)
@@ -912,40 +906,9 @@ public partial class View // Drawing APIs
         // Each adornment's LastDrawnRegion was populated during DrawAdornments() using per-adornment
         // DrawContexts. We combine with _lastLineCanvasRegion (rendered by the parent) for Border.
         // All three adornment types are handled uniformly.
-        cacheAdornmentDrawnRegion (Border, _lastLineCanvasRegion);
-        cacheAdornmentDrawnRegion (Margin, lastLineCanvasRegion: null);
-        cacheAdornmentDrawnRegion (Padding, lastLineCanvasRegion: null);
-
-        void cacheAdornmentDrawnRegion (AdornmentImpl adornment, Region? lastLineCanvasRegion)
-        {
-            if (!adornment.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
-            {
-                return;
-            }
-
-            Region adornmentDrawnRegion = new ();
-
-            if (adornment.LastDrawnRegion is { })
-            {
-                adornmentDrawnRegion.Combine (adornment.LastDrawnRegion, RegionOp.Union);
-            }
-
-            // The parent's LineCanvas includes border lines rendered in DoRenderLineCanvas.
-            // Intersect with this adornment's frame to get only the lines within it.
-            if (lastLineCanvasRegion is { })
-            {
-                Region lineRegion = lastLineCanvasRegion.Clone ();
-                lineRegion.Intersect (adornment.FrameToScreen ());
-                adornmentDrawnRegion.Combine (lineRegion, RegionOp.Union);
-            }
-
-            adornment.CachedDrawnRegion = adornmentDrawnRegion;
-
-            if (adornment.View is { } adornmentView)
-            {
-                adornmentView.CachedDrawnRegion = adornmentDrawnRegion;
-            }
-        }
+        CacheAdornmentDrawnRegion (Border, _lastLineCanvasRegion);
+        CacheAdornmentDrawnRegion (Margin, null);
+        CacheAdornmentDrawnRegion (Padding, null);
 
         bool marginTransparent = Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
         bool borderTransparent = Border.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
@@ -982,7 +945,7 @@ public partial class View // Drawing APIs
         }
         else
         {
-            addDrawnRegionForAdornment (Margin, lastLineCanvasRegion: null);
+            AddDrawnRegionForAdornment (Margin, null);
         }
 
         if (!borderTransparent)
@@ -991,7 +954,7 @@ public partial class View // Drawing APIs
         }
         else
         {
-            addDrawnRegionForAdornment (Border, _lastLineCanvasRegion);
+            AddDrawnRegionForAdornment (Border, _lastLineCanvasRegion);
         }
 
         if (!paddingTransparent)
@@ -1000,18 +963,12 @@ public partial class View // Drawing APIs
         }
         else
         {
-            addDrawnRegionForAdornment (Padding, lastLineCanvasRegion: null);
+            AddDrawnRegionForAdornment (Padding, null);
         }
 
         if (!viewTransparent)
         {
             exclusion.Combine (ViewportToScreen (Viewport), RegionOp.Union);
-        }
-
-        // Add title rect (drawn directly, not via LineCanvas) to context.
-        if (Border.View is BorderView { LastTitleRect: { } titleRect })
-        {
-            context?.AddDrawnRectangle (titleRect);
         }
 
         // For transparent layers, also include context drawn regions (text, content, subviews)
@@ -1022,24 +979,6 @@ public partial class View // Drawing APIs
             Region contentDrawn = context.GetDrawnRegion ().Clone ();
             contentDrawn.Intersect (Border.FrameToScreen ());
             exclusion.Combine (contentDrawn, RegionOp.Union);
-        }
-
-        void addDrawnRegionForAdornment (AdornmentImpl adornment, Region? lastLineCanvasRegion)
-        {
-            if (adornment.LastDrawnRegion is { })
-            {
-                Region clipped = adornment.LastDrawnRegion.Clone ();
-                clipped.Intersect (adornment.FrameToScreen ());
-                exclusion.Combine (clipped, RegionOp.Union);
-            }
-
-            // The parent's LineCanvas includes border lines rendered in DoRenderLineCanvas.
-            if (lastLineCanvasRegion is { })
-            {
-                Region lineRegion = lastLineCanvasRegion.Clone ();
-                lineRegion.Intersect (adornment.FrameToScreen ());
-                exclusion.Combine (lineRegion, RegionOp.Union);
-            }
         }
 
         ExcludeFromClip (exclusion);
@@ -1061,6 +1000,58 @@ public partial class View // Drawing APIs
         {
             // Opaque view with TransparentMouse — cache the entire border frame.
             CachedDrawnRegion = new Region (Border.FrameToScreen ());
+        }
+
+        return;
+
+        void AddDrawnRegionForAdornment (AdornmentImpl adornment, Region? lastLineCanvasRegion)
+        {
+            if (adornment.LastDrawnRegion is { })
+            {
+                Region clipped = adornment.LastDrawnRegion.Clone ();
+                clipped.Intersect (adornment.FrameToScreen ());
+                exclusion.Combine (clipped, RegionOp.Union);
+            }
+
+            // The parent's LineCanvas includes border lines rendered in DoRenderLineCanvas.
+            if (lastLineCanvasRegion is null)
+            {
+                return;
+            }
+            Region lineRegion = lastLineCanvasRegion.Clone ();
+            lineRegion.Intersect (adornment.FrameToScreen ());
+            exclusion.Combine (lineRegion, RegionOp.Union);
+        }
+
+        void CacheAdornmentDrawnRegion (AdornmentImpl adornment, Region? lastLineCanvasRegion)
+        {
+            if (!adornment.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+            {
+                return;
+            }
+
+            Region adornmentDrawnRegion = new ();
+
+            if (adornment.LastDrawnRegion is { })
+            {
+                adornmentDrawnRegion.Combine (adornment.LastDrawnRegion, RegionOp.Union);
+            }
+
+            // The parent's LineCanvas includes border lines rendered in DoRenderLineCanvas.
+            // Intersect with this adornment's frame to get only the lines within it.
+            if (lastLineCanvasRegion is { })
+            {
+                Region lineRegion = lastLineCanvasRegion.Clone ();
+                lineRegion.Intersect (adornment.FrameToScreen ());
+                adornmentDrawnRegion.Combine (lineRegion, RegionOp.Union);
+            }
+
+            adornment.CachedDrawnRegion = adornmentDrawnRegion;
+
+            if (adornment.View is { } adornmentView)
+            {
+                adornmentView.CachedDrawnRegion = adornmentDrawnRegion;
+            }
         }
     }
 

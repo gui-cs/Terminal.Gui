@@ -43,13 +43,13 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = thickness
                                 ?? side switch
-                                   {
-                                       Side.Top => new Thickness (1, 3, 1, 1),
-                                       Side.Bottom => new Thickness (1, 1, 1, 3),
-                                       Side.Left => new Thickness (3, 1, 1, 1),
-                                       Side.Right => new Thickness (1, 1, 3, 1),
-                                       _ => throw new ArgumentOutOfRangeException (nameof (side))
-                                   };
+                                {
+                                    Side.Top => new Thickness (1, 3, 1, 1),
+                                    Side.Bottom => new Thickness (1, 1, 1, 3),
+                                    Side.Left => new Thickness (3, 1, 1, 1),
+                                    Side.Right => new Thickness (1, 1, 3, 1),
+                                    _ => throw new ArgumentOutOfRangeException (nameof (side))
+                                };
 
         var settings = BorderSettings.Tab;
 
@@ -1497,14 +1497,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         // Fill window viewport with diamonds
         window.DrawingContent += (_, e) =>
                                  {
-                                     for (var r = 0; r < window.Viewport.Height; r++)
-                                     {
-                                         for (var c = 0; c < window.Viewport.Width; c++)
-                                         {
-                                             window.AddRune (c, r, Glyphs.Diamond);
-                                         }
-                                     }
-
+                                     window!.FillRect (window!.Viewport, Glyphs.Diamond);
                                      e.DrawContext?.AddDrawnRectangle (window.Viewport);
                                  };
 
@@ -1526,13 +1519,13 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         subview.Border.Thickness = thickness
                                    ?? side switch
-                                      {
-                                          Side.Top => new Thickness (1, 3, 1, 1),
-                                          Side.Bottom => new Thickness (1, 1, 1, 3),
-                                          Side.Left => new Thickness (3, 1, 1, 1),
-                                          Side.Right => new Thickness (1, 1, 3, 1),
-                                          _ => throw new ArgumentOutOfRangeException (nameof (side))
-                                      };
+                                   {
+                                       Side.Top => new Thickness (1, 3, 1, 1),
+                                       Side.Bottom => new Thickness (1, 1, 1, 3),
+                                       Side.Left => new Thickness (3, 1, 1, 1),
+                                       Side.Right => new Thickness (1, 1, 3, 1),
+                                       _ => throw new ArgumentOutOfRangeException (nameof (side))
+                                   };
 
         var settings = BorderSettings.Tab;
 
@@ -1624,38 +1617,174 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void SuperView_Top_NegativeOffset1_Min () // Copilot
+    {
+        //using (TestLogging.Verbose (output, TraceCategory.Draw))
+        {
+            View subview = new ()
+            {
+                Driver = CreateTestDriver (4, 2),
+                Height = 2,
+                Width = 4
+            };
+            subview.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+            subview.Border.Thickness = new Thickness (0, 2, 0, 0);
+            subview.Border.LineStyle = LineStyle.Single;
+            subview.Title = "t";
+
+            subview.Driver.FillRect (subview.Driver.Screen, Glyphs.Diamond);
+            subview.Layout ();
+            subview.Draw ();
+
+            DriverAssert.AssertDriverContentsWithFrameAre ("""
+                                                           ┌─┐◊
+                                                           │t└─
+                                                           """,
+                                                           output,
+                                                           subview.Driver!);
+
+            subview.Border.TabOffset = -1;
+            subview.Driver.ClearContents ();
+            subview.Driver.FillRect (subview.Driver.Screen, Glyphs.Diamond);
+
+            subview.Layout ();
+            subview.Draw ();
+
+            DriverAssert.AssertDriverContentsWithFrameAre ("""
+                                                  ─┐◊◊
+                                                  t└──
+                                                  """,
+                                                  output,
+                                                  subview.Driver!);
+
+            View superView = new ()
+            {
+                Driver = subview.Driver, Width = Dim.Fill (), Height = Dim.Fill (),
+            };
+            superView.DrawingContent += (_, e) =>
+                                        {
+                                            superView!.FillRect (superView!.Viewport, Glyphs.Diamond);
+                                            e.DrawContext?.AddDrawnRectangle (superView.Viewport);
+                                        };
+            superView.Add (subview);
+
+            superView.Layout ();
+            subview.Driver.ClearContents ();
+            superView.Draw ();
+
+            DriverAssert.AssertDriverContentsWithFrameAre ("""
+                                                           ─┐◊◊
+                                                           t└──
+                                                           """,
+                                                           output,
+                                                           subview.Driver!);
+        }
+    }
+
+    [Fact]
+    public void SuperView_Top_NegativeOffset1_WithTitle () // Copilot
+    {
+        //using (TestLogging.Verbose (output, TraceCategory.Draw))
+        {
+            (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
+                                                                            8,
+                                                                            9,
+                                                                            6,
+                                                                            Side.Top,
+                                                                            -1,
+                                                                            false,
+                                                                            "T_ab",
+                                                                            true);
+
+            DriverAssert.AssertDriverContentsAre ("""
+                                                  ╭───────────╮
+                                                  │◊◊◊◊◊◊◊◊◊◊◊│
+                                                  │◊───╮◊◊◊◊◊◊│
+                                                  │◊Tab│◊◊◊◊◊◊│
+                                                  │◊│  ╰────╮◊│
+                                                  │◊│       │◊│
+                                                  │◊│       │◊│
+                                                  │◊╰───────╯◊│
+                                                  │◊◊◊◊◊◊◊◊◊◊◊│
+                                                  ╰───────────╯
+                                                  """,
+                                                  output,
+                                                  app.Driver!);
+
+            subview.Dispose ();
+            app.Dispose ();
+        }
+    }
+
+    [Fact]
     public void SuperView_Top_NegativeOffset2_WithTitle () // Copilot
     {
-        (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
-                                                                        8,
-                                                                        9,
-                                                                        6,
-                                                                        Side.Top,
-                                                                        -2,
-                                                                        false,
-                                                                        "T_ab",
-                                                                        true);
+        //using (TestLogging.Verbose (output, TraceCategory.Draw))
+        {
+            (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
+                                                                            8,
+                                                                            9,
+                                                                            6,
+                                                                            Side.Top,
+                                                                            -2,
+                                                                            false,
+                                                                            "T_ab",
+                                                                            true);
 
-        output.WriteLine (app.Driver!.ToString ());
+            // Header at offset=-2: left edge and 'T' clipped. Visible: cap ──╮, title ab│.
+            DriverAssert.AssertDriverContentsAre ("""
+                                                  ╭───────────╮
+                                                  │◊◊◊◊◊◊◊◊◊◊◊│
+                                                  │◊──╮◊◊◊◊◊◊◊│
+                                                  │◊ab│◊◊◊◊◊◊◊│
+                                                  │◊│ ╰─────╮◊│
+                                                  │◊│       │◊│
+                                                  │◊│       │◊│
+                                                  │◊╰───────╯◊│
+                                                  │◊◊◊◊◊◊◊◊◊◊◊│
+                                                  ╰───────────╯
+                                                  """,
+                                                  output,
+                                                  app.Driver!);
 
-        // Header at offset=-2: left edge and 'T' clipped. Visible: cap ──╮, title ab│.
-        DriverAssert.AssertDriverContentsAre ("""
-                                              ╭───────────╮
-                                              │◊◊◊◊◊◊◊◊◊◊◊│
-                                              │◊──╮      ◊│
-                                              │◊ab│      ◊│
-                                              │◊│ ╰─────╮◊│
-                                              │◊│       │◊│
-                                              │◊│       │◊│
-                                              │◊╰───────╯◊│
-                                              │◊◊◊◊◊◊◊◊◊◊◊│
-                                              ╰───────────╯
-                                              """,
-                                              output,
-                                              app.Driver!);
+            subview.Dispose ();
+            app.Dispose ();
+        }
+    }
 
-        subview.Dispose ();
-        app.Dispose ();
+    [Fact]
+    public void SuperView_Left_NegativeOffset2_WithTitle () // Copilot
+    {
+        //using (TestLogging.Verbose (output, TraceCategory.Draw))
+        {
+            (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
+                                                                            8,
+                                                                            9,
+                                                                            6,
+                                                                            Side.Left,
+                                                                            -2,
+                                                                            false,
+                                                                            "T_ab",
+                                                                            true);
+
+            DriverAssert.AssertDriverContentsAre ("""
+                                                  ╭───────────╮
+                                                  │◊◊◊◊◊◊◊◊◊◊◊│
+                                                  │◊│a ─────╮◊│
+                                                  │◊│b      │◊│
+                                                  │◊╰─╮     │◊│
+                                                  │◊◊◊│     │◊│
+                                                  │◊◊◊│     │◊│
+                                                  │◊◊◊╰─────╯◊│
+                                                  │◊◊◊◊◊◊◊◊◊◊◊│
+                                                  ╰───────────╯
+                                                  """,
+                                                  output,
+                                                  app.Driver!);
+
+            subview.Dispose ();
+            app.Dispose ();
+        }
     }
 
     [Fact]
@@ -1680,8 +1809,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         DriverAssert.AssertDriverContentsAre ("""
                                               ╭───────────╮
                                               │◊◊◊◊◊◊◊◊◊◊◊│
-                                              │◊◊──╮     ◊│
-                                              │◊◊ab│     ◊│
+                                              │◊◊──╮◊◊◊◊◊◊│
+                                              │◊◊ab│◊◊◊◊◊◊│
                                               │◊◊│ ╰────╮◊│
                                               │◊◊│      │◊│
                                               │◊◊│      │◊│
@@ -1715,8 +1844,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         DriverAssert.AssertDriverContentsAre ("""
                                               ╭───────────╮
                                               │◊◊◊◊◊◊◊◊◊◊◊│
-                                              │◊         ◊│
-                                              │◊         ◊│
+                                              │◊◊◊◊◊◊◊◊◊◊◊│
+                                              │◊◊◊◊◊◊◊◊◊◊◊│
                                               │◊┬───────╮◊│
                                               │◊│       │◊│
                                               │◊│       │◊│

@@ -198,8 +198,6 @@ public partial class BorderView : AdornmentView
         Point screenOrigin = ViewportToScreen (Point.Empty);
         Rectangle labelFrame = headerRect with { X = headerRect.X - screenOrigin.X, Y = headerRect.Y - screenOrigin.Y };
         _tabTitleView.Frame = labelFrame;
-        _tabTitleView.Width = labelFrame.Width;
-        _tabTitleView.Height = labelFrame.Height;
     }
 
     private void ShowHideDrawIndicator ()

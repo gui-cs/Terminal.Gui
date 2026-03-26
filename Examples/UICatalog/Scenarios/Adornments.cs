@@ -239,6 +239,12 @@ public class Adornments : Scenario
 
         appWindow.Add (adornmentsEditor, viewportSettingsEditor);
 
+        appWindow.DrawingContent += (_, e) =>
+                                    {
+                                        appWindow.FillRect (appWindow.Viewport, Glyphs.Diamond);
+                                        e.Cancel = true;
+                                    };
+
         app.Run (appWindow);
     }
 }

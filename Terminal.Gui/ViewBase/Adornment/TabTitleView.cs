@@ -25,8 +25,9 @@ internal sealed class TabTitleView : View
         bool ownerHasFocus = OwnerView?.HasFocus ?? false;
 
         Rectangle drawRect = new (ContentToScreen (Point.Empty), GetContentSize ());
-        Region textRegion = TextFormatter.GetDrawRegion (drawRect);
-        context?.AddDrawnRegion (textRegion);
+
+        // Add the entire content area to the drawn region so that it is not transparent
+        context?.AddDrawnRectangle(drawRect);
 
         TextFormatter.Draw (Driver,
                             drawRect,
