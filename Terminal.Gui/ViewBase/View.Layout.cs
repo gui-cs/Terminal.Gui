@@ -721,6 +721,10 @@ public partial class View // Layout APIs
         Size contentSize = GetContentSize ();
 
         OnSubViewLayout (new LayoutEventArgs (contentSize));
+
+        // Re-read content size — OnSubViewLayout handlers (e.g. Dialog.UpdateSizes) may have called SetContentSize.
+        contentSize = GetContentSize ();
+
         SubViewLayout?.Invoke (this, new LayoutEventArgs (contentSize));
 
         // The Adornments already have their Frame's set by SetRelativeLayout so we call LayoutSubViews vs. Layout here.
