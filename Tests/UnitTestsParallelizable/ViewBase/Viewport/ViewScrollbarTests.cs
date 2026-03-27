@@ -152,4 +152,40 @@ public class ViewScrollbarTests
         Assert.True (view.VerticalScrollBar.IsInitialized);
         Assert.True (view.VerticalScrollBar.Visible);
     }
+
+    [Fact] // Copilot
+    public void Vertical_ScrollBar_With_Border_Positioned_At_Right_Edge ()
+    {
+        View view = new ()
+        {
+            Frame = new Rectangle (0, 0, 20, 10),
+            BorderStyle = LineStyle.Rounded
+        };
+
+        view.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+        view.SetContentSize (new Size (20, 30));
+
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        // Verify scrollbar is visible
+        Assert.True (view.VerticalScrollBar.Visible);
+
+        // Border should add thickness (1,1,1,1) for Rounded style
+        Assert.Equal (new Thickness (1, 1, 1, 1), view.Border.Thickness);
+
+        // Padding should have Right=1 for the scrollbar
+        Assert.Equal (new Thickness (0, 0, 1, 0), view.Padding.Thickness);
+
+        // PaddingView frame should be inside the border
+        Rectangle expectedPaddingFrame = new Rectangle (1, 1, 18, 8);
+        Assert.Equal (expectedPaddingFrame, view.Padding.View!.Frame);
+
+        // The scrollbar should be at the right edge of PaddingView
+        // PaddingView width = 18, ScrollBar width = 1
+        // AnchorEnd() = 18 - 1 = 17, minus Func(Padding.Thickness.Right - 1) = Func(0) = 0
+        // So X should be 17
+        Assert.Equal (17, view.VerticalScrollBar.Frame.X);
+    }
 }
