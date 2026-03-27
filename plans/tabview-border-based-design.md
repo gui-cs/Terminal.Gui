@@ -23,14 +23,17 @@ public class Tab : View
         SuperViewRendersLineCanvas = true;
         Border.Settings = BorderSettings.Tab | BorderSettings.Title;
 
-        // Thickness set by Tabs based on TabSide; example for Side.Top:
-        Border.Thickness = new Thickness (1, 3, 1, 1);
-
-        // BorderStyle should inherit automatically from Tabs (SuperView).
-
         // Overlapped enables z-order: focused tab renders above unselected tabs
         Arrangement = ViewArrangement.Overlapped;
     }  
+
+    // gets the logical index of the tab, determined by Tabs when the Tab is added as a SubView
+    // updated by Tabs OnSubViewAdded/Removed to maintain correct indices as tabs are added/removed
+    public int TabIndex {get; internal set;}
+
+    // gets or sets the side the tab header is on (top, bottom, left, right)
+    // when part of a Tabs view, this is set by Tabs when the Tab is added as a SubView, and Tabs will update the Border.Thickness of all Tabs accordingly
+    public Side TabSide { get; set; } 
 }
 ```
 
@@ -38,14 +41,18 @@ public class Tab : View
 ### `Tabs`
 
 ```cs
-public class Tabs : View, IValue<Tab?>
+public class Tabs : View, IValue<Tab?>, IDesignable
 {
     public Tabs ()
     {
         CanFocus = true;
-        BorderStyle = LineStyle.Rounded;
+        Width = Din.Fill();
+        Height = Dim.Fill();
     }
+
     // Tabs are SubViews of Tabs, retrieved via SubViews.OfType<Tab>()
+
+ 
 
     // TabSide determines which side the tab headers are on and which Border thickness to use
     // the set handler for TabSide will update the Border.Thickness of all Tabs accordingly
@@ -65,15 +72,50 @@ public class Tabs : View, IValue<Tab?>
         }
     }
 
-    // Computes TabOffsets, manages thickness per TabSide, prevents key events from reaching unfocused tabs, etc.
+    // Gets or sets the line style for the Tabs. When set call UpdateZOrder, UpdateTabOffsets, and UpdateTabBorderThickness to ensure all Tabs are updated with the new style.
+    public LineStyle TabLineStyle {get;set;}
+
+    // Gets the tabs in logical order (by TabIndex), which may differ from SubViews order due to z-ordering of focused tab
+    public IEnumerable<Tab> Tabs => SubViews.OfType<Tab> ().OrderBy (t => t.TabIndex);
+
+    private void UpdateZOrder()
+    {
+         // iterate over Tabs (logical order and use MoveTabToStart to order.
+
+         // Then, use MoveTabToEnd for the focused tab to ensure it is drawn last (on top).       
+    }
+
+    private void UpdateTabOffsets()
+    {
+        // iterate over Tabs in logical order and set TabOffset based on TabSide and cumulative widths/heights of previous tabs
+        // for Side.Top/Bottom, TabOffset is horizontal (columns from left)
+        // for Side.Left/Right, TabOffset is vertical (rows from top)
+    }
+
+    private void UpdateTabBorderThickness()
+    {
+        // iterate over Tabs and set Border.Thickness based on TabSide
+        // for Side.Top, set Thickness.Top = 3, others = 1
+        // for Side.Bottom, set Thickness.Bottom = 3, others = 1
+        // for Side.Left, set Thickness.Left = 3, others = 1
+        // for Side.Right, set Thickness.Right = 3, others = 1
+    }
+
+    // override OnSubViewAdded/Removed to call UpdateZOrder, UpdateTabOffsets, and UpdateTabBorderThickness whenever a Tab is added or removed
+    // OnSubViewAdded should set the TabIndex of the added Tab based on the current Tabs collection (e.g. max existing TabIndex + 1)
+    // OnSubViewRemoved shoul set Width and Height to Dim.Fill() 
+
+    // EnableForDesign should setup the tabs the way the TabStyles Scenario does (but using the Tab and Tabs API).
+
+
 }
 ```
 
-#### Z-order and Focus
-
-The focused tab will always be the last subview. the rest need to be in reverse order as they appear.
-
 ## Tab Style Renderings by Side
+
+See the TabCompositionTests and BorderViewTests for the definitive look & feel. The draings below are slightly incorrect.
+
+**IMPORTANT**: The drawings below are slightly incorrect. Use the existing tests as the source of truth for the exact visuals. The drawings are meant to illustrate the general layout and mechanics, but the actual line characters at junctions will depend on how `LineCanvas` auto-joins the lines based on the `AddLine` calls made by the `Border` rendering of each `Tab`. The key visual properties to verify in tests are:
 
 ### `Side.Top` — `Thickness.Top = 3` - "Tab View" with tabs on top
 
