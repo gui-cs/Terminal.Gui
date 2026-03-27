@@ -29,7 +29,7 @@ due to title width), so the content area should always be at least Viewport-size
 - [x] All 7 StaleContentSizeCaptureTests pass (including Test 3 which was the failing proof)
 - [x] Full UnitTestsParallelizable suite passes (15,113 tests, 0 failures)
 - [x] Full UnitTests.NonParallelizable suite passes (59 tests, 0 failures)
-- [ ] Commit the fix
+- [x] Commit the fix
 
 ## Files Changed
 - `Terminal.Gui/ViewBase/View.Layout.cs` — LayoutSubViews method
