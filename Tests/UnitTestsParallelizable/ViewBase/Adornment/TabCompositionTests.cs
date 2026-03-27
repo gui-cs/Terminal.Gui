@@ -31,13 +31,13 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         };
 
         view.Border.Thickness = side switch
-        {
-            Side.Top => new Thickness (1, 3, 1, 1),
-            Side.Bottom => new Thickness (1, 1, 1, 3),
-            Side.Left => new Thickness (3, 1, 1, 1),
-            Side.Right => new Thickness (1, 1, 3, 1),
-            _ => throw new ArgumentOutOfRangeException (nameof (side))
-        };
+                                {
+                                    Side.Top => new Thickness (1, 3, 1, 1),
+                                    Side.Bottom => new Thickness (1, 1, 1, 3),
+                                    Side.Left => new Thickness (3, 1, 1, 1),
+                                    Side.Right => new Thickness (1, 1, 3, 1),
+                                    _ => throw new ArgumentOutOfRangeException (nameof (side))
+                                };
 
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
         view.Border.TabSide = side;
@@ -78,11 +78,13 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         View tab2 = CreateTabView (driver, Side.Top, 5, false, "Tab2");
 
         View superView = new () { CanFocus = true, Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
+
         superView.DrawingContent += (_, e) =>
                                     {
                                         superView.FillRect (superView.Viewport, Glyphs.Dot);
                                         e.Cancel = true;
-                                    }; superView.Add (tab1, tab2);
+                                    };
+        superView.Add (tab1, tab2);
         tab1.SetFocus ();
         Assert.Equal (tab1, superView.SubViews.ElementAt (1));
 
@@ -109,6 +111,7 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         View tab2 = CreateTabView (driver, Side.Top, 5, false, "Tab2");
 
         View superView = new () { CanFocus = true, Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
+
         superView.DrawingContent += (_, e) =>
                                     {
                                         superView.FillRect (superView.Viewport, Glyphs.Dot);
@@ -139,6 +142,7 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
 
         tab1.Width = tab2.Width = tab3.Width = 20;
         View superView = new () { CanFocus = true, Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
+
         superView.DrawingContent += (_, e) =>
                                     {
                                         superView.FillRect (superView.Viewport, Glyphs.Dot);
@@ -171,6 +175,7 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         View tab2 = CreateTabView (driver, Side.Bottom, 5, false, "Tab2");
 
         View superView = new () { CanFocus = true, Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
+
         superView.DrawingContent += (_, e) =>
                                     {
                                         superView.FillRect (superView.Viewport, Glyphs.Dot);
@@ -199,6 +204,7 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         View tab2 = CreateTabView (driver, Side.Bottom, 5, false, "Tab2");
 
         View superView = new () { CanFocus = true, Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
+
         superView.DrawingContent += (_, e) =>
                                     {
                                         superView.FillRect (superView.Viewport, Glyphs.Dot);
@@ -231,6 +237,7 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         View tab2 = CreateTabView (driver, Side.Left, 5, false, "Tab2");
 
         View superView = new () { CanFocus = true, Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
+
         superView.DrawingContent += (_, e) =>
                                     {
                                         superView.FillRect (superView.Viewport, Glyphs.Dot);
@@ -267,6 +274,7 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         View tab2 = CreateTabView (driver, Side.Left, 5, false, "Tab2");
 
         View superView = new () { CanFocus = true, Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
+
         superView.DrawingContent += (_, e) =>
                                     {
                                         superView.FillRect (superView.Viewport, Glyphs.Dot);
@@ -307,6 +315,7 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         View tab2 = CreateTabView (driver, Side.Right, 5, false, "Tab2");
 
         View superView = new () { CanFocus = true, Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
+
         superView.DrawingContent += (_, e) =>
                                     {
                                         superView.FillRect (superView.Viewport, Glyphs.Dot);
@@ -343,6 +352,7 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         View tab2 = CreateTabView (driver, Side.Right, 5, false, "Tab2");
 
         View superView = new () { CanFocus = true, Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
+
         superView.DrawingContent += (_, e) =>
                                     {
                                         superView.FillRect (superView.Viewport, Glyphs.Dot);
