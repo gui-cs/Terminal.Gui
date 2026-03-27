@@ -173,12 +173,7 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     {
         IDriver driver = CreateTestDriver ();
 
-        Tabs tabs = new ()
-        {
-            Driver = driver,
-            Width = 40,
-            Height = 10
-        };
+        Tabs tabs = new () { Driver = driver, Width = 40, Height = 10 };
 
         Tab tab1 = new () { Title = "Tab1" };
         Tab tab2 = new () { Title = "Tab2" };
@@ -270,18 +265,12 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
         Assert.NotNull (tabs.Value);
     }
 
-
     [Fact]
     public void Top_TwoTabs_Tab1Focused_DrawsCorrectly ()
     {
         IDriver driver = CreateTestDriver (14, 5);
 
-        Tabs tabs = new ()
-        {
-            Driver = driver,
-            Width = 14,
-            Height = 5
-        };
+        Tabs tabs = new () { Driver = driver, Width = 14, Height = 5 };
 
         Tab tab1 = new () { Title = "Tab1", Text = "Tab1 content" };
         Tab tab2 = new () { Title = "Tab2", Text = "Tab2 content" };
@@ -292,14 +281,13 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
         tabs.Layout ();
         tabs.Draw ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                        "╭────╮────╮   \r\n" +
-                                                        "│Tab1│Tab2│   \r\n" +
-                                                        "│    ╰────┴──╮\r\n" +
-                                                        "│Tab1 content│\r\n" +
-                                                        "╰────────────╯",
-                                                        output,
-                                                        driver);
+        DriverAssert.AssertDriverContentsWithFrameAre ("╭────╮────╮   \r\n"
+                                                       + "│Tab1│Tab2│   \r\n"
+                                                       + "│    ╰────┴──╮\r\n"
+                                                       + "│Tab1 content│\r\n"
+                                                       + "╰────────────╯",
+                                                       output,
+                                                       driver);
 
         tabs.Dispose ();
     }
@@ -309,12 +297,7 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     {
         IDriver driver = CreateTestDriver (14, 5);
 
-        Tabs tabs = new ()
-        {
-            Driver = driver,
-            Width = 14,
-            Height = 5
-        };
+        Tabs tabs = new () { Driver = driver, Width = 14, Height = 5 };
 
         Tab tab1 = new () { Title = "Tab1", Text = "Tab1 content" };
         Tab tab2 = new () { Title = "Tab2", Text = "Tab2 content" };
@@ -325,14 +308,13 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
         tabs.Layout ();
         tabs.Draw ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                        "╭────╭────╮   \r\n" +
-                                                        "│Tab1│Tab2│   \r\n" +
-                                                        "├────╯    ╰──╮\r\n" +
-                                                        "│Tab2 content│\r\n" +
-                                                        "╰────────────╯",
-                                                        output,
-                                                        driver);
+        DriverAssert.AssertDriverContentsWithFrameAre ("╭────╭────╮   \r\n"
+                                                       + "│Tab1│Tab2│   \r\n"
+                                                       + "├────╯    ╰──╮\r\n"
+                                                       + "│Tab2 content│\r\n"
+                                                       + "╰────────────╯",
+                                                       output,
+                                                       driver);
 
         tabs.Dispose ();
     }
@@ -342,12 +324,7 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     {
         IDriver driver = CreateTestDriver (20, 5);
 
-        Tabs tabs = new ()
-        {
-            Driver = driver,
-            Width = 20,
-            Height = 5
-        };
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 5 };
 
         Tab tab1 = new () { Title = "Tab1", Text = "Tab1 content" };
         Tab tab2 = new () { Title = "Tab2", Text = "Tab2 content" };
@@ -359,14 +336,13 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
         tabs.Layout ();
         tabs.Draw ();
 
-        DriverAssert.AssertDriverContentsWithFrameAre (
-                                                        "╭────╭────╮────╮    \r\n" +
-                                                        "│Tab1│Tab2│Tab3│    \r\n" +
-                                                        "├────╯    ╰────┴───╮\r\n" +
-                                                        "│Tab2 content      │\r\n" +
-                                                        "╰──────────────────╯",
-                                                        output,
-                                                        driver);
+        DriverAssert.AssertDriverContentsWithFrameAre ("╭────╭────╮────╮    \r\n"
+                                                       + "│Tab1│Tab2│Tab3│    \r\n"
+                                                       + "├────╯    ╰────┴───╮\r\n"
+                                                       + "│Tab2 content      │\r\n"
+                                                       + "╰──────────────────╯",
+                                                       output,
+                                                       driver);
 
         tabs.Dispose ();
     }

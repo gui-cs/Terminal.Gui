@@ -28,8 +28,6 @@ public class Tabs : View, IValue<Tab?>, IDesignable
         CanFocus = true;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
-
-        HasFocusChanged += OnHasFocusChanged;
     }
 
     /// <summary>
@@ -101,11 +99,7 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     ///     Gets or sets the currently selected <see cref="Tab"/>.
     ///     Setting this focuses the specified tab.
     /// </summary>
-    public Tab? Value
-    {
-        get => _value;
-        set => ChangeValue (value);
-    }
+    public Tab? Value { get => _value; set => ChangeValue (value); }
 
     /// <inheritdoc/>
     public event EventHandler<ValueChangingEventArgs<Tab?>>? ValueChanging;
@@ -129,11 +123,11 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     /// <param name="args">The event arguments containing old and new values.</param>
     protected virtual void OnValueChanged (ValueChangedEventArgs<Tab?> args) { }
 
-    private bool? ChangeValue (Tab? newValue)
+    private void ChangeValue (Tab? newValue)
     {
         if (_value == newValue)
         {
-            return null;
+            return;
         }
 
         Tab? oldValue = _value;
@@ -142,19 +136,19 @@ public class Tabs : View, IValue<Tab?>, IDesignable
 
         if (OnValueChanging (changingArgs) || changingArgs.Handled)
         {
-            return true;
+            return;
         }
 
         ValueChanging?.Invoke (this, changingArgs);
 
         if (changingArgs.Handled)
         {
-            return true;
+            return;
         }
 
         _value = newValue;
 
-        if (_value is { } && !_value.HasFocus)
+        if (_value is { HasFocus: false })
         {
             _value.SetFocus ();
         }
@@ -167,8 +161,6 @@ public class Tabs : View, IValue<Tab?>, IDesignable
         ValueChanged?.Invoke (this, changedArgs);
 
         ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, _value));
-
-        return false;
     }
 
     #endregion
@@ -241,7 +233,7 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     private void UpdateZOrder ()
     {
         // Move tabs to start in logical order
-        foreach (Tab tab in TabCollection.Reverse ())
+        foreach (Tab tab in TabCollection)
         {
             MoveSubViewToStart (tab);
         }
@@ -285,13 +277,13 @@ public class Tabs : View, IValue<Tab?>, IDesignable
             tab.Border.TabSide = _tabSide;
 
             tab.Border.Thickness = _tabSide switch
-            {
-                Side.Top => new Thickness (1, 3, 1, 1),
-                Side.Bottom => new Thickness (1, 1, 1, 3),
-                Side.Left => new Thickness (3, 1, 1, 1),
-                Side.Right => new Thickness (1, 1, 3, 1),
-                _ => new Thickness (1, 3, 1, 1)
-            };
+                                   {
+                                       Side.Top => new Thickness (1, 3, 1, 1),
+                                       Side.Bottom => new Thickness (1, 1, 1, 3),
+                                       Side.Left => new Thickness (3, 1, 1, 1),
+                                       Side.Right => new Thickness (1, 1, 3, 1),
+                                       _ => new Thickness (1, 3, 1, 1)
+                                   };
         }
     }
 
@@ -299,8 +291,11 @@ public class Tabs : View, IValue<Tab?>, IDesignable
 
     #region Focus Handling
 
-    private void OnHasFocusChanged (object? sender, HasFocusEventArgs e)
+    /// <inheritdoc />
+    protected override void OnFocusedChanged (View? previousFocused, View? focused)
     {
+        base.OnFocusedChanged (previousFocused, focused);
+
         // Find which Tab now has focus
         Tab? focusedTab = SubViews.OfType<Tab> ().FirstOrDefault (t => t.HasFocus);
 

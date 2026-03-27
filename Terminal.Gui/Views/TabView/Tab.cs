@@ -24,7 +24,7 @@ public class Tab : View
     public Tab ()
     {
         CanFocus = true;
-        SuperViewRendersLineCanvas = true;
+        base.SuperViewRendersLineCanvas = true;
         BorderStyle = LineStyle.Rounded;
 
         Border.Settings = BorderSettings.Tab | BorderSettings.Title;
