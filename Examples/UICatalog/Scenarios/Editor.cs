@@ -953,14 +953,29 @@ public class Editor : Scenario
 
         _findReplaceWindow = new FindReplaceWindow (_textView);
 
-        // TODO: Restore TabView usage after TabView rewrite (#4183)
+        // Restored: Tabs with Find and Replace tabs (#4183)
+        Tabs tabs = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        Tab findTab = new () { Title = "_Find" };
         View findView = CreateFindTab ();
-        findView.X = 0;
-        findView.Y = 0;
         findView.Width = Dim.Fill ();
         findView.Height = Dim.Fill ();
+        findTab.Add (findView);
 
-        _findReplaceWindow.Add (findView);
+        Tab replaceTab = new () { Title = "_Replace" };
+        View replaceView = CreateReplaceTab ();
+        replaceView.Width = Dim.Fill ();
+        replaceView.Height = Dim.Fill ();
+        replaceTab.Add (replaceView);
+
+        tabs.Add (findTab, replaceTab);
+        tabs.Value = findTab;
+
+        _findReplaceWindow.Add (tabs);
         _findReplaceWindow.Visible = false;
         _appWindow.Add (_findReplaceWindow);
     }

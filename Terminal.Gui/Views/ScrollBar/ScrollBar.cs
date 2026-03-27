@@ -30,6 +30,11 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     private readonly ScrollSlider _slider;
     private readonly Button _increaseButton;
 
+    /// <summary>
+    ///     Gets the <see cref="ScrollSlider"/> used by this <see cref="ScrollBar"/>.
+    /// </summary>
+    public ScrollSlider Slider => _slider;
+
     /// <inheritdoc/>
     public ScrollBar ()
     {

@@ -31,7 +31,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         app.Init ();
         _app = app;
 
-        // TODO: Restore TabView usage after TabView rewrite (#4183)
+        // Restored: Tabs with Single and Bulk tabs (#4183)
         View singleView = BuildSingleTab ();
         View bulkView = BuildBulkTab ();
 
@@ -39,14 +39,30 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         using Window appWindow = new ();
         appWindow.Title = GetQuitKeyAndName ();
 
+        Tabs tabs = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        Tab singleTab = new () { Title = "_Single" };
         singleView.Width = Dim.Fill ();
         singleView.Height = Dim.Fill ();
-        appWindow.Add (singleView);
+        singleTab.Add (singleView);
+
+        Tab bulkTab = new () { Title = "_Bulk" };
+        bulkView.Width = Dim.Fill ();
+        bulkView.Height = Dim.Fill ();
+        bulkTab.Add (bulkView);
+
+        tabs.Add (singleTab, bulkTab);
+        tabs.Value = singleTab;
+
+        appWindow.Add (tabs);
 
         // Run - Start the application.
         app.Run (appWindow);
-        bulkView.Dispose ();
-        singleView.Dispose ();
+        tabs.Dispose ();
 
         _app.RemoveTimeout (_updateTimeoutToken!);
         _app.RemoveTimeout (_sendDarTimeoutToken!);
