@@ -327,6 +327,22 @@ public class Tabs : View, IValue<Tab?>, IDesignable
         Add (tab1, tab2, tab3);
         Value = tab1;
 
+        lineStyleSelector.ValueChanged += (_, e) =>
+                                           {
+                                               if (e.Value is { })
+                                               {
+                                                   TabLineStyle = e.Value.Value;
+                                               }
+                                           };
+
+        tabSideSelector.ValueChanged += (_, e) =>
+                                         {
+                                             if (e.Value is { })
+                                             {
+                                                 TabSide = e.Value.Value;
+                                             }
+                                         };
+
         return true;
     }
 
