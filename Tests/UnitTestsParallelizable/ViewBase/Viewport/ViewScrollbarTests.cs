@@ -1,6 +1,8 @@
+using System.Collections.ObjectModel;
+
 namespace ViewBaseTests.Viewport;
 
-public class ViewScrollbarTests
+public class ViewScrollbarTests (ITestOutputHelper output)
 {
     [Fact]
     public void Horizonal_Constructor_Defaults ()
@@ -187,5 +189,61 @@ public class ViewScrollbarTests
         // AnchorEnd() = 18 - 1 = 17, minus Func(Padding.Thickness.Right - 1) = Func(0) = 0
         // So X should be 17
         Assert.Equal (17, view.VerticalScrollBar.Frame.X);
+    }
+
+    [Fact] // Copilot
+    public void ListView_Scrolled_Items_Draw_At_Top_Of_Viewport ()
+    {
+        // Regression: when a ListView with a scrollbar is scrolled and then LayoutAndDraw runs,
+        // the items at the top of the visible area must render (not be blank).
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (20, 10);
+
+        using Runnable top = new ();
+        SessionToken? token = app.Begin (top);
+
+        ListView lv = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 10,
+            Height = 8,
+            Source = new ListWrapper<string> (["Item_00", "Item_01", "Item_02", "Item_03", "Item_04",
+                                               "Item_05", "Item_06", "Item_07", "Item_08", "Item_09",
+                                               "Item_10", "Item_11", "Item_12", "Item_13", "Item_14",
+                                               "Item_15", "Item_16", "Item_17", "Item_18", "Item_19"]),
+            ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar
+        };
+
+        top.Add (lv);
+        app.LayoutAndDraw ();
+
+        Assert.True (lv.VerticalScrollBar.Visible, "ScrollBar should be visible");
+        Assert.Equal (0, lv.Viewport.Y);
+
+        // Scroll down 5 items
+        lv.VerticalScrollBar.Value = 5;
+        app.LayoutAndDraw ();
+
+        output.WriteLine ($"Viewport.Y = {lv.Viewport.Y}");
+        Assert.Equal (5, lv.Viewport.Y);
+
+        // Check the rendered output
+        Cell [,]? contents = app.Driver.GetOutputBuffer ()?.Contents;
+        Assert.NotNull (contents);
+
+        // The first visible row should show "Item_05"
+        var topRowText = "";
+
+        for (var col = 0; col < 7; col++)
+        {
+            topRowText += contents [0, col].Grapheme;
+        }
+
+        output.WriteLine ($"Row 0 text: '{topRowText}'");
+        Assert.Contains ("Item_05", topRowText);
+
+        app.End (token!);
     }
 }
