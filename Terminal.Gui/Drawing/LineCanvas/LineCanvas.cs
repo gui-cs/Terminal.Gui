@@ -384,8 +384,97 @@ public class LineCanvas : IDisposable
         {
             return;
         }
+
         _exclusionRegion ??= new Region ();
         _exclusionRegion.Union (lineCanvas._exclusionRegion);
+    }
+
+    /// <summary>
+    ///     Merges one line canvas into this one, excluding lines (or portions of lines) that fall
+    ///     within <paramref name="exclude"/>. Lines that partially overlap the exclusion region are
+    ///     split into segments that skip the excluded cells. The exclusion is applied at the line level
+    ///     so that excluded cells do not participate in auto-join intersection resolution.
+    /// </summary>
+    /// <param name="lineCanvas">The source canvas to merge from.</param>
+    /// <param name="exclude">
+    ///     The region to exclude. Cells of incoming lines that fall within this region will not be merged.
+    ///     Pass <see langword="null"/> for default merge behavior (no exclusion).
+    /// </param>
+    public void Merge (LineCanvas lineCanvas, Region? exclude)
+    {
+        if (exclude is null)
+        {
+            Merge (lineCanvas);
+
+            return;
+        }
+
+        foreach (StraightLine line in lineCanvas._lines)
+        {
+            AddLineExcluding (line, exclude);
+        }
+
+        if (lineCanvas._exclusionRegion is null)
+        {
+            return;
+        }
+
+        _exclusionRegion ??= new Region ();
+        _exclusionRegion.Union (lineCanvas._exclusionRegion);
+
+        return;
+
+        // Adds segments of `line` that do not overlap with `exclusion`.
+        void AddLineExcluding (StraightLine line, Region exclusion)
+        {
+            // Walk cells along the line's axis, building non-excluded segments.
+            Rectangle bounds = line.Bounds;
+            bool isHorizontal = line.Orientation == Orientation.Horizontal;
+            int axisStart = isHorizontal ? bounds.X : bounds.Y;
+            int axisEnd = axisStart + (isHorizontal ? bounds.Width : bounds.Height);
+            int fixedCoord = isHorizontal ? bounds.Y : bounds.X;
+
+            var segStart = -1;
+
+            for (int i = axisStart; i < axisEnd; i++)
+            {
+                int x = isHorizontal ? i : fixedCoord;
+                int y = isHorizontal ? fixedCoord : i;
+
+                if (exclusion.Contains (x, y))
+                {
+                    // Flush any pending segment.
+                    if (segStart < 0)
+                    {
+                        continue;
+                    }
+                    EmitSegment (line, isHorizontal, fixedCoord, segStart, i - segStart);
+                    segStart = -1;
+                }
+                else
+                {
+                    if (segStart < 0)
+                    {
+                        segStart = i;
+                    }
+                }
+            }
+
+            // Flush trailing segment.
+            if (segStart >= 0)
+            {
+                EmitSegment (line, isHorizontal, fixedCoord, segStart, axisEnd - segStart);
+            }
+        }
+
+        void EmitSegment (StraightLine original, bool isHorizontal, int fixedCoord, int segAxisStart, int segLength)
+        {
+            Point start = isHorizontal
+                              ? new Point (segAxisStart, fixedCoord)
+                              : new Point (fixedCoord, segAxisStart);
+
+            AddLine (new StraightLine (start, segLength, original.Orientation, original.Style, original.Attribute));
+        }
     }
 
     /// <summary>Removes the last line added to the canvas</summary>

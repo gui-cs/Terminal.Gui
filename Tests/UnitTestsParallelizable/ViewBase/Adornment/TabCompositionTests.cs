@@ -14,13 +14,7 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
     //  Helpers
     // ────────────────────────────────────────────────────────────────────
 
-    private static View CreateTabView (IDriver driver,
-                                       int width,
-                                       int height,
-                                       Side side,
-                                       int tabOffset,
-                                       bool hasFocus,
-                                       string title)
+    private static View CreateTabView (IDriver driver, Side side, int tabOffset, bool hasFocus, string title)
     {
         View view = new ()
         {
@@ -28,20 +22,22 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
             CanFocus = true,
             HasFocus = hasFocus,
             SuperViewRendersLineCanvas = true,
-            Width = width,
-            Height = height,
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
             BorderStyle = LineStyle.Rounded,
-            Title = title
+            Title = title,
+            Text = $"{title} content",
+            Arrangement = ViewArrangement.Overlapped
         };
 
         view.Border.Thickness = side switch
-        {
-            Side.Top => new Thickness (1, 3, 1, 1),
-            Side.Bottom => new Thickness (1, 1, 1, 3),
-            Side.Left => new Thickness (3, 1, 1, 1),
-            Side.Right => new Thickness (1, 1, 3, 1),
-            _ => throw new ArgumentOutOfRangeException (nameof (side))
-        };
+                                {
+                                    Side.Top => new Thickness (1, 3, 1, 1),
+                                    Side.Bottom => new Thickness (1, 1, 1, 3),
+                                    Side.Left => new Thickness (3, 1, 1, 1),
+                                    Side.Right => new Thickness (1, 1, 3, 1),
+                                    _ => throw new ArgumentOutOfRangeException (nameof (side))
+                                };
 
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
         view.Border.TabSide = side;
@@ -54,7 +50,6 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
     {
         view.Layout ();
         view.Draw ();
-        //output.WriteLine (driver.ToString ());
         DriverAssert.AssertDriverContentsAre (expected, output, driver);
         view.Dispose ();
     }
@@ -69,22 +64,12 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         IDriver driver = CreateTestDriver (40, 5);
 
         // Tab1: focused, offset 0. Title "Tab1" → TabLength = 6.
-        View tab1 = CreateTabView (driver, 12, 5, Side.Top, 0, false, "Tab1");
-        tab1.Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable;
-        tab1.Text = "content1";
+        View tab1 = CreateTabView (driver, Side.Top, 0, false, "Tab1");
 
         // Tab2: unfocused, offset 6 (right after Tab1). Title "Tab2" → TabLength = 6.
-        View tab2 = CreateTabView (driver, 12, 5, Side.Top, 5, false, "Tab2");
-        tab2.Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable;
-        tab2.Text = "content2";
+        View tab2 = CreateTabView (driver, Side.Top, 5, false, "Tab2");
 
-        View superView = new ()
-        {
-            CanFocus = true,
-            Driver = driver,
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        View superView = new () { CanFocus = true, Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
         superView.Add (tab1, tab2);
         tab1.SetFocus ();
         Assert.Equal (tab1, superView.SubViews.ElementAt (1));
@@ -92,71 +77,64 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (superView,
                        driver,
                        """
-                       ╭────┬────╮
+                       ╭────╮────╮
                        │Tab1│Tab2│
-                       │    ╰────┴╮
-                       │content1  │
-                       ╰──────────╯
+                       │    ╰────┴──╮
+                       │Tab1 content│
+                       ╰────────────╯
                        """);
     }
 
-    [Fact (Skip = "Border needs refactoring")]
+    [Fact]
     public void Top_TwoTabs_Tab2Focused ()
     {
-        IDriver driver = CreateTestDriver (19, 6);
+        IDriver driver = CreateTestDriver (40, 5);
 
-        // Tab1: unfocused, offset 0.
-        View tab1 = CreateTabView (driver, 19, 6, Side.Top, 0, false, "Tab1");
+        // Tab1: focused, offset 0. Title "Tab1" → TabLength = 6.
+        View tab1 = CreateTabView (driver, Side.Top, 0, false, "Tab1");
+        tab1.Arrangement = ViewArrangement.Overlapped;
 
-        // Tab2: focused, offset 6.
-        View tab2 = CreateTabView (driver, 19, 6, Side.Top, 6, true, "Tab2");
+        // Tab2: unfocused, offset 6 (right after Tab1). Title "Tab2" → TabLength = 6.
+        View tab2 = CreateTabView (driver, Side.Top, 5, false, "Tab2");
+        tab2.Arrangement = ViewArrangement.Overlapped;
 
-        View container = new ()
-        {
-            Driver = driver,
-            Width = 19,
-            Height = 6
-        };
-        container.Add (tab1, tab2);
+        View superView = new () { CanFocus = true, Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
+        superView.Add (tab1, tab2);
+        tab2.SetFocus ();
 
-        DrawAndAssert (container,
+        DrawAndAssert (superView,
                        driver,
                        """
-                       ╭────┬────╮
+                       ╭────╭────╮
                        │Tab1│Tab2│
-                       ├────╯    ╰───────╮
-                       │                 │
-                       │                 │
-                       ╰─────────────────╯
+                       ├────╯    ╰──╮
+                       │Tab2 content│
+                       ╰────────────╯
                        """);
     }
 
-    [Fact (Skip = "Border needs refactoring")]
+    [Fact]
     public void Top_ThreeTabs_Tab2Focused ()
     {
-        IDriver driver = CreateTestDriver (19, 6);
+        IDriver driver = CreateTestDriver (40, 5);
 
-        View tab1 = CreateTabView (driver, 19, 6, Side.Top, 0, false, "Tab1");
-        View tab2 = CreateTabView (driver, 19, 6, Side.Top, 6, true, "Tab2");
-        View tab3 = CreateTabView (driver, 19, 6, Side.Top, 12, false, "Tab3");
+        View tab1 = CreateTabView (driver, Side.Top, 0, false, "Tab1");
+        View tab2 = CreateTabView (driver, Side.Top, 5, true, "Tab2");
+        View tab3 = CreateTabView (driver, Side.Top, 10, false, "Tab3");
 
-        View container = new ()
-        {
-            Driver = driver,
-            Width = 19,
-            Height = 6
-        };
-        container.Add (tab1, tab2, tab3);
+        tab1.Width = tab2.Width = tab3.Width = 20;
+        View superView = new () { CanFocus = true, Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
+        superView.Add (tab1, tab2, tab3);
+        tab2.SetFocus ();
 
-        DrawAndAssert (container,
+        DrawAndAssert (superView,
                        driver,
                        """
-                       ╭────┬────┬────╮
+                       ╭────╭────╮────╮
                        │Tab1│Tab2│Tab3│
-                       ├────╯    ╰────┴──╮
-                       │                 │
-                       │                 │
-                       ╰─────────────────╯
+                       ├────╯    ╰────┴───╮
+                       │Tab2 content      │
+                       ╰──────────────────╯
                        """);
     }
 }

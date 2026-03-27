@@ -761,6 +761,10 @@ public partial class View // Drawing APIs
             return;
         }
 
+        // Track the cumulative drawn region from higher-Z subviews so that when merging
+        // lower-Z subviews LineCanvas, their lines can be clipped against areas already drawn.
+        Region? priorDrawnRegion = null;
+
         // Draw the SubViews in reverse Z-order to leverage clipping.
         // SubViews earlier in the collection are drawn last (on top).
         foreach (View view in InternalSubViews.Snapshot ().Where (v => v.Visible).Reverse ())
@@ -772,8 +776,19 @@ public partial class View // Drawing APIs
                 continue;
             }
 
-            LineCanvas.Merge (view.LineCanvas);
+            // Merge with clipping: exclude areas already drawn by higher-Z subviews.
+            // This prevents a lower-Z subview's border lines from rendering where a higher-Z
+            // subview already drew (e.g., a focused tab's open gap must not be filled by an
+            // unfocused tab's border). Lines are split at the boundary so auto-join only sees
+            // the higher-Z subview's lines at those cells.
+            LineCanvas.Merge (view.LineCanvas, priorDrawnRegion);
             view.LineCanvas.Clear ();
+
+            // Snapshot the drawn region after this subview for the next iteration.
+            if (context is { })
+            {
+                priorDrawnRegion = context.GetDrawnRegion ();
+            }
         }
     }
 

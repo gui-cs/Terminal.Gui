@@ -59,6 +59,24 @@ dotnet run
 **Test:** `dotnet test --project Tests/UnitTests --no-build && dotnet test --project Tests/UnitTestsParallelizable --no-build`
 **Details:** [Build & Test Workflow](.claude/workflows/build-test-workflow.md)
 
+### xUnit v3 Test Filtering (Microsoft Testing Platform)
+
+This project uses **xUnit v3** with Microsoft Testing Platform. The old `--filter "FullyQualifiedName~Foo"` syntax does **NOT** work. Use these instead:
+
+```bash
+# Run a single test by method name
+dotnet test --project Tests/UnitTestsParallelizable --no-build --filter-method "*MyTestMethod"
+
+# Run all tests in a class
+dotnet test --project Tests/UnitTestsParallelizable --no-build --filter-class "*MyTestClass"
+
+# Query filter language (xUnit v3 native): /<assembly>/<namespace>/<class>/<method>
+dotnet test --project Tests/UnitTestsParallelizable --no-build --filter "/*/*/MyTestClass/MyTestMethod"
+
+# Show live test output (ITestOutputHelper)
+dotnet test --project Tests/UnitTestsParallelizable --no-build --filter-method "*MyTest" -- --show-live-output on
+```
+
 ## Quick Rules
 
 **⚠️ READ THIS BEFORE MODIFYING ANY FILE - These are Terminal.Gui-specific conventions:**
