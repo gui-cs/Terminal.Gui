@@ -30,14 +30,14 @@ public sealed class TabStyle : Scenario
 
         // ── Tab1: focused tab at offset 0 ──────────────────────────────
         View tab1 = CreateTabView ("Tab1", 0, false);
-        tab1.Width = Dim.Percent (50);
-        tab1.Height = Dim.Fill (viewportSettingsEditor);
+        tab1.Width = Dim.Percent (60);
+        tab1.Height = Dim.Percent (70);
         tab1.Text = "content1";
 
         // ── Tab2: unfocused tab at offset 5 ────────────────────────────
         View tab2 = CreateTabView ("Tab2", 5, false);
-        tab2.Width = Dim.Percent (50);
-        tab2.Height = Dim.Fill (viewportSettingsEditor);
+        tab2.Width = Dim.Percent (60);
+        tab2.Height = Dim.Percent (70);
         tab2.Text = "content2";
 
         appWindow.Add (tab1, tab2);

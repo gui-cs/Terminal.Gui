@@ -139,36 +139,36 @@ Tab headers stacked vertically on the left edge. `TabOffset` is vertical (rows f
 
 **Selected = Tab1:**
 ```
-╭──────────────╮
-│ T  content T1│
-│ a            │
-│ b            │
-│ 1            │
-├───╮          │
-│ T │          │
-│ a │          │
-│ b │          │
-│ 2 │          │
-╰───┤          │
-    │          │
-    ╰──────────╯
+╭────────────╮
+│T content T1│
+│a           │
+│b           │
+│1           │
+├─╮          │
+│T│          │
+│a│          │
+│b│          │
+│2│          │
+╰─┤          │
+  │          │
+  ╰──────────╯
 ```
 
 **Selected = Tab2:**
 ```
-╭───┬──────────╮
-│ T │content T2│
-│ a │          │
-│ b │          │
-│ 1 │          │
-├───╯          │
-│ T            │
-│ a            │
-│ b            │
-│ 2            │
-╰───╮          │
-    │          │
-    ╰──────────╯
+╭─┬──────────╮
+│T│content T2│
+│a│          │
+│b│          │
+│1│          │
+├─╯          │
+│T           │
+│a           │
+│b           │
+│2           │
+╰─╮          │
+  │          │
+  ╰──────────╯
 ```
 
 How it works:
@@ -185,36 +185,36 @@ Mirror of Left. Tab headers stacked vertically on the right edge. Selected tab's
 
 **Selected = Tab1:**
 ```
-╭──────────────╮
-│content T1  T │
-│            a │
-│            b │
-│            1 │
-│          ╭───┤
-│          │ T │
-│          │ a │
-│          │ b │
-│          │ 2 │
-│          ├───╯
+╭────────────╮
+│content T1 T│
+│           a│
+│           b│
+│           1│
+│          ╭─┤
+│          │T│
+│          │a│
+│          │b│
+│          │2│
+│          ├─╯
 │          │
-╰──────────╯
+╰──────────╯ 
 ```
 
 **Selected = Tab2:**
 ```
-╭──────────┬───╮
-│content T2│ T │
-│          │ a │
-│          │ b │
-│          │ 1 │
-│          ╰───┤
-│            T │
-│            a │
-│            b │
-│            2 │
-│          ╭───╯
-│          │
-╰──────────╯
+╭──────────┬─╮
+│content T2│T│
+│          │a│
+│          │b│
+│          │1│
+│          ╰─┤
+│           T│
+│           a│
+│           b│
+│           2│
+│          ╭─╯
+│          │ 
+╰──────────╯ 
 ```
 
 Same mechanics as Left, horizontally mirrored.
