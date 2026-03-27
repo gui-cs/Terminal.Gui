@@ -21,15 +21,16 @@ public class Tab : View
     {
         CanFocus = true;
         SuperViewRendersLineCanvas = true;
-        BorderStyle = LineStyle.Rounded;
         Border.Settings = BorderSettings.Tab | BorderSettings.Title;
 
         // Thickness set by Tabs based on TabSide; example for Side.Top:
         Border.Thickness = new Thickness (1, 3, 1, 1);
 
+        // BorderStyle should inherit automatically from Tabs (SuperView).
+
         // Overlapped enables z-order: focused tab renders above unselected tabs
         Arrangement = ViewArrangement.Overlapped;
-    }
+    }  
 }
 ```
 
@@ -39,8 +40,15 @@ public class Tab : View
 ```cs
 public class Tabs : View, IValue<Tab?>
 {
+    public Tabs ()
+    {
+        CanFocus = true;
+        BorderStyle = LineStyle.Rounded;
+    }
     // Tabs are SubViews of Tabs, retrieved via SubViews.OfType<Tab>()
 
+    // TabSide determines which side the tab headers are on and which Border thickness to use
+    // the set handler for TabSide will update the Border.Thickness of all Tabs accordingly
     public Side TabSide { get; set; } = Side.Top;
 
     // IValue<Tab?> implementation
@@ -60,6 +68,10 @@ public class Tabs : View, IValue<Tab?>
     // Computes TabOffsets, manages thickness per TabSide, prevents key events from reaching unfocused tabs, etc.
 }
 ```
+
+#### Z-order and Focus
+
+The focused tab will always be the last subview. the rest need to be in reverse order as they appear.
 
 ## Tab Style Renderings by Side
 
@@ -307,11 +319,11 @@ Fucking magic.
 
 ### Step 2: Scrolling
 
-Add `Tabs.ScrollOffset` subtracted from all `TabOffset` values. Headers with negative effective offset are clipped. Use built-in `View` scrollbar with transparent slider as described above.
+Add `Tabs.ScrollOffset` subtracted from all `TabOffset` + `TabEnd` values. Headers with negative effective offset are clipped. Use built-in `View` scrollbar with transparent slider as described above.
 
 ### Step 3: All Four Sides
 
-Implement `Side.Bottom` (mirror of Top, `Thickness.Bottom = 3`), `Side.Left` (`Thickness.Left = N`, vertical `TabOffset`), and `Side.Right` (`Thickness.Right = N`, vertical `TabOffset`). See "Tab Style Renderings by Side" section for target visuals.
+Implement `Side.Bottom` (mirror of Top, `Thickness.Bottom = 3`), `Side.Left` (`Thickness.Left = 3`, vertical `TabOffset`), and `Side.Right` (`Thickness.Right = 3`, vertical `TabOffset`). See "Tab Style Renderings by Side" section for target visuals.
 
 ### Step 4: Focus, Hotkeys, and Draw Order
 

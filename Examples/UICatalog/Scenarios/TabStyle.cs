@@ -70,7 +70,7 @@ public sealed class TabStyle : Scenario
                                             tab3.Border.TabSide = e.Value.Value;
                                         };
 
-        appWindow.Add (tab1, tab2, tab3);
+        appWindow.Add (tab3, tab2, tab1);
 
         attributePicker.ValueChanged += (_, e) =>
                                         {

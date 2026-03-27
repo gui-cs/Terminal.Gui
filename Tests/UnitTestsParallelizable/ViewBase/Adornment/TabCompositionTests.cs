@@ -132,6 +132,38 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void Top_ThreeTabs_Tab1Focused ()
+    {
+        IDriver driver = CreateTestDriver ();
+
+        View tab1 = CreateTabView (driver, Side.Top, 0, false, "Tab1");
+        View tab2 = CreateTabView (driver, Side.Top, 5, true, "Tab2");
+        View tab3 = CreateTabView (driver, Side.Top, 10, false, "Tab3");
+
+        tab1.Width = tab2.Width = tab3.Width = 20;
+        tab3.Layout ();
+        driver.SetScreenSize (tab3.Frame.Width, tab3.Frame.Height);
+        View superView = new () { CanFocus = true, Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        superView.DrawingContent += (_, e) =>
+                                    {
+                                        superView.FillRect (superView.Viewport, Glyphs.Dot);
+                                        e.Cancel = true;
+                                    };
+        superView.Add (tab3, tab2, tab1);
+
+        DrawAndAssert (superView,
+                       driver,
+                       """
+                       ╭────╮────╮────╮∙∙∙∙
+                       │Tab1│Tab2│Tab3│∙∙∙∙
+                       │    ╰────┴────┴───╮
+                       │Tab1 content      │
+                       ╰──────────────────╯
+                       """);
+    }
+
+    [Fact]
     public void Top_ThreeTabs_Tab2Focused ()
     {
         IDriver driver = CreateTestDriver ();
@@ -150,7 +182,7 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
                                         superView.FillRect (superView.Viewport, Glyphs.Dot);
                                         e.Cancel = true;
                                     };
-        superView.Add (tab1, tab2, tab3);
+        superView.Add (tab3, tab2, tab1);
         tab2.SetFocus ();
 
         DrawAndAssert (superView,
@@ -160,6 +192,41 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
                        │Tab1│Tab2│Tab3│∙∙∙∙
                        ├────╯    ╰────┴───╮
                        │Tab2 content      │
+                       ╰──────────────────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_ThreeTabs_Tab3Focused ()
+    {
+        IDriver driver = CreateTestDriver ();
+
+        View tab1 = CreateTabView (driver, Side.Top, 0, false, "Tab1");
+        View tab2 = CreateTabView (driver, Side.Top, 5, true, "Tab2");
+        View tab3 = CreateTabView (driver, Side.Top, 10, false, "Tab3");
+
+        tab1.Width = tab2.Width = tab3.Width = 20;
+        tab3.Layout ();
+        driver.SetScreenSize (tab3.Frame.Width, tab3.Frame.Height);
+        View superView = new () { CanFocus = true, Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        superView.DrawingContent += (_, e) =>
+                                    {
+                                        superView.FillRect (superView.Viewport, Glyphs.Dot);
+                                        e.Cancel = true;
+                                    };
+        superView.Add (tab3, tab2, tab1);
+        tab1.SetFocus ();
+        tab2.SetFocus ();
+        tab3.SetFocus ();
+
+        DrawAndAssert (superView,
+                       driver,
+                       """
+                       ╭────╭────╭────╮∙∙∙∙
+                       │Tab1│Tab2│Tab3│∙∙∙∙
+                       ├────┴────╯    ╰───╮
+                       │Tab3 content      │
                        ╰──────────────────╯
                        """);
     }
