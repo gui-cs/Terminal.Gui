@@ -122,7 +122,7 @@ public class Link : View, IDesignable
     /// <param name="url">The URL to open. Should be a well-formed absolute URI.</param>
     public static void OpenUrl (string url)
     {
-        if (!Uri.IsWellFormedUriString (url, UriKind.Absolute) || Environment.GetEnvironmentVariable ("DisableRealDriverIO") is { })
+        if (!Uri.IsWellFormedUriString (url, UriKind.Absolute) || Environment.GetEnvironmentVariable ("DisableRealDriverIO") == "1")
         {
             return;
         }
