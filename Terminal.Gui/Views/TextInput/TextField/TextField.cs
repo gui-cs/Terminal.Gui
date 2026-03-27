@@ -174,11 +174,11 @@ public partial class TextField : View, IDesignable, IValue<string>
         }
     }
 
-    /// <inheritdoc/>
-    protected override void OnSubViewsLaidOut (LayoutEventArgs args)
+    /// <inheritdoc />
+    protected override void OnViewportChanged (DrawEventArgs e)
     {
-        base.OnSubViewsLaidOut (args);
-        UpdateCursor ();
+        base.OnViewportChanged (e);
+        Adjust ();
     }
 
     /// <summary>Get the Context Menu for this view.</summary>
