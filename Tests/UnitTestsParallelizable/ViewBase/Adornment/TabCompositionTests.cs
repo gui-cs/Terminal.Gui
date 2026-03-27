@@ -141,6 +141,8 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         View tab3 = CreateTabView (driver, Side.Top, 10, false, "Tab3");
 
         tab1.Width = tab2.Width = tab3.Width = 20;
+        tab3.Layout ();
+        driver.SetScreenSize (tab3.Frame.Width, tab3.Frame.Height);
         View superView = new () { CanFocus = true, Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
 
         superView.DrawingContent += (_, e) =>
@@ -154,8 +156,8 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (superView,
                        driver,
                        """
-                       ╭────╭────╮────╮∙∙∙
-                       │Tab1│Tab2│Tab3│∙∙∙
+                       ╭────╭────╮────╮∙∙∙∙
+                       │Tab1│Tab2│Tab3│∙∙∙∙
                        ├────╯    ╰────┴───╮
                        │Tab2 content      │
                        ╰──────────────────╯
@@ -220,7 +222,7 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
                        │Tab2 content│
                        ├────╮    ╭──╯
                        │Tab1│Tab2│∙∙∙
-                       ╰────╯────╯∙∙∙
+                       ╰────╰────╯∙∙∙
                        """);
     }
 
@@ -249,19 +251,20 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (superView,
                        driver,
                        """
-                       ╭────────────╮
-                       │T content T1│
-                       │a           │
-                       │b           │
-                       │1           │
-                       ╰─╮          │
-                       │T│          │
-                       │a│          │
-                       │b│          │
-                       │2│          │
-                       ╰─┤          │
-                       ∙∙│          │
-                       ∙∙╰──────────╯
+                       ╭──────────────╮
+                       │T Tab1 content│
+                       │a             │
+                       │b             │
+                       │1             │
+                       ╰─╮            │
+                       │T│            │
+                       │a│            │
+                       │b│            │
+                       │2│            │
+                       ╰─┤            │
+                       ∙∙│            │
+                       ∙∙│            │
+                       ∙∙╰────────────╯
                        """);
     }
 
@@ -286,19 +289,20 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (superView,
                        driver,
                        """
-                       ╭─┬──────────╮
-                       │T│content T2│
-                       │a│          │
-                       │b│          │
-                       │1│          │
-                       ╰─╯          │
-                       │T           │
-                       │a           │
-                       │b           │
-                       │2           │
-                       ╰─╮          │
-                       ∙∙│          │
-                       ∙∙╰──────────╯
+                       ╭─┬────────────╮
+                       │T│Tab2 content│
+                       │a│            │
+                       │b│            │
+                       │1│            │
+                       ╭─╯            │
+                       │T             │
+                       │a             │
+                       │b             │
+                       │2             │
+                       ╰─╮            │
+                       ∙∙│            │
+                       ∙∙│            │
+                       ∙∙╰────────────╯
                        """);
     }
 
@@ -327,19 +331,20 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (superView,
                        driver,
                        """
-                        ╭────────────╮
-                        │content T1 T│
-                        │           a│
-                        │           b│
-                        │           1│
-                        │          ╭─╯
-                        │          │T│
-                        │          │a│
-                        │          │b│
-                        │          │2│
-                        │          ├─╯
-                        │          │∙∙
-                        ╰──────────╯∙∙
+                       ╭──────────────╮
+                       │Tab1 contentT │
+                       │            a │
+                       │            b │
+                       │            1 │
+                       │            ╭─╯
+                       │            │T│
+                       │            │a│
+                       │            │b│
+                       │            │2│
+                       │            ├─╯
+                       │            │∙∙
+                       │            │∙∙
+                       ╰────────────╯∙∙
                        """);
     }
 
@@ -364,19 +369,20 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (superView,
                        driver,
                        """
-                        ╭──────────┬─╮
-                        │content T2│T│
-                        │          │a│
-                        │          │b│
-                        │          │1│
-                        │          ╰─╮
-                        │           T│
-                        │           a│
-                        │           b│
-                        │           2│
-                        │          ╭─╯
-                        │          │∙∙
-                        ╰──────────╯∙∙
+                       ╭────────────┬─╮
+                       │Tab2 content│T│
+                       │            │a│
+                       │            │b│
+                       │            │1│
+                       │            ╰─╮
+                       │            T │
+                       │            a │
+                       │            b │
+                       │            2 │
+                       │            ╭─╯
+                       │            │∙∙
+                       │            │∙∙
+                       ╰────────────╯∙∙
                        """);
     }
 }

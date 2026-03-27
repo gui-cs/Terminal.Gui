@@ -198,6 +198,15 @@ public partial class BorderView : AdornmentView
         Point screenOrigin = ViewportToScreen (Point.Empty);
         Rectangle labelFrame = headerRect with { X = headerRect.X - screenOrigin.X, Y = headerRect.Y - screenOrigin.Y };
         _tabTitleView.Frame = labelFrame;
+
+        if (border.TabSide == Side.Bottom && Adornment.Parent?.HasFocus is true)
+        {
+            _tabTitleView.Padding.Thickness = _tabTitleView.Padding.Thickness with { Top = 1 };
+        }
+        else
+        {
+            _tabTitleView.Padding.Thickness = _tabTitleView.Padding.Thickness with { Top = 0 };
+        }
     }
 
     private void ShowHideDrawIndicator ()
