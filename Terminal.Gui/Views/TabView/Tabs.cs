@@ -277,13 +277,13 @@ public class Tabs : View, IValue<Tab?>, IDesignable
             tab.Border.TabSide = _tabSide;
 
             tab.Border.Thickness = _tabSide switch
-                                   {
-                                       Side.Top => new Thickness (1, 3, 1, 1),
-                                       Side.Bottom => new Thickness (1, 1, 1, 3),
-                                       Side.Left => new Thickness (3, 1, 1, 1),
-                                       Side.Right => new Thickness (1, 1, 3, 1),
-                                       _ => new Thickness (1, 3, 1, 1)
-                                   };
+            {
+                Side.Top => new Thickness (1, 3, 1, 1),
+                Side.Bottom => new Thickness (1, 1, 1, 3),
+                Side.Left => new Thickness (3, 1, 1, 1),
+                Side.Right => new Thickness (1, 1, 3, 1),
+                _ => new Thickness (1, 3, 1, 1)
+            };
         }
     }
 
@@ -327,13 +327,25 @@ public class Tabs : View, IValue<Tab?>, IDesignable
         Add (tab1, tab2, tab3);
         Value = tab1;
 
+        attributePicker.ValueChanged += (_, e) =>
+                                        {
+                                            if (e.NewValue is { })
+                                            {
+                                                SetScheme (GetScheme () with
+                                                {
+                                                    Normal = new Attribute (e.NewValue.Value.Foreground, e.NewValue.Value.Background),
+                                                    Focus = new Attribute (e.NewValue.Value.Foreground, e.NewValue.Value.Background)
+                                                });
+                                            }
+                                        };
+
         lineStyleSelector.ValueChanged += (_, e) =>
-                                           {
-                                               if (e.Value is { })
-                                               {
-                                                   TabLineStyle = e.Value.Value;
-                                               }
-                                           };
+                                          {
+                                              if (e.Value is { })
+                                              {
+                                                  TabLineStyle = e.Value.Value;
+                                              }
+                                          };
 
         tabSideSelector.ValueChanged += (_, e) =>
                                          {
