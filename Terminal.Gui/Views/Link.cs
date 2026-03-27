@@ -78,7 +78,7 @@ public class Link : View, IDesignable
         MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
 
         // Default tooltip shows the URL
-        this.SetToolTip(() => Url);
+        this.SetToolTip (() => Url);
     }
 
     /// <summary>
@@ -179,7 +179,7 @@ public class Link : View, IDesignable
     }
 
     private string _url = "";
-    private bool _isUrlValid = false;
+    private bool _isUrlValid;
 
     /// <summary>
     ///     Gets or sets the URL (hyperlink target) associated with this <see cref="Link"/>.
@@ -386,13 +386,17 @@ public class Link : View, IDesignable
         SetNeedsLayout ();
     }
 
-
     /// <summary>
-    /// Releases the unmanaged resources used by the object and optionally releases the managed resources.
+    ///     Releases the unmanaged resources used by the object and optionally releases the managed resources.
     /// </summary>
-    /// <remarks>When disposing is true, this method removes the tooltip content associated with this instance
-    /// from the TooltipManager. Always call the base class Dispose method to ensure proper resource cleanup.</remarks>
-    /// <param name="disposing">true to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
+    /// <remarks>
+    ///     When disposing is true, this method removes the tooltip content associated with this instance
+    ///     from the TooltipManager. Always call the base class Dispose method to ensure proper resource cleanup.
+    /// </remarks>
+    /// <param name="disposing">
+    ///     true to release both managed and unmanaged resources; false to release only unmanaged
+    ///     resources.
+    /// </param>
     protected override void Dispose (bool disposing)
     {
         if (disposing)
