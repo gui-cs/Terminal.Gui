@@ -44,6 +44,15 @@ internal class ApplicationMouse : IMouse, IDisposable
     private IPopoverView? _dismissedByMousePress;
 
     /// <summary>
+    ///     The active popover at the time of the most recent mouse press. Used to detect when a popover
+    ///     closes programmatically during the press → release → click cycle (e.g., when a ListView item
+    ///     selection hides the popover on Released). If this was set during Pressed but the popover is no
+    ///     longer active at Clicked time, the Clicked event is suppressed to prevent it from leaking to
+    ///     views below the now-hidden popover.
+    /// </summary>
+    private IPopoverView? _activePopoverAtPress;
+
+    /// <summary>
     ///     Tracks whether <see cref="RaiseMouseEvent"/> is currently executing within the
     ///     dismiss recursion, to avoid clearing <see cref="_dismissedByMousePress"/> prematurely.
     /// </summary>
@@ -96,6 +105,23 @@ internal class ApplicationMouse : IMouse, IDisposable
 
         if (mouseEvent.Handled)
         {
+            return;
+        }
+
+        // Record the active popover when a press starts so we can detect if it closes mid-cycle.
+        if (mouseEvent.IsPressed)
+        {
+            _activePopoverAtPress = App?.Popovers?.GetActivePopover ();
+        }
+
+        // Suppress Clicked events that were synthesized after a popover closed during the same
+        // press → release → click cycle. Without this, selecting an item in a popover (which
+        // hides the popover on Released) causes the Clicked event to leak to views below.
+        if (mouseEvent.IsSingleDoubleOrTripleClicked && _activePopoverAtPress is { } && App?.Popovers?.GetActivePopover () != _activePopoverAtPress)
+        {
+            Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Popovers", "Suppressing Clicked - popover closed mid-cycle");
+            _activePopoverAtPress = null;
+
             return;
         }
 
