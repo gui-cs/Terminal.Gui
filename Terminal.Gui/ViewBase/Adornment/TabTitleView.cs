@@ -8,9 +8,6 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 internal sealed class TabTitleView : View
 {
-    /// <summary>The View whose focus state determines which attributes to use.</summary>
-    internal View? OwnerView { get; init; }
-
     /// <summary>Sync <see cref="View.HotKeySpecifier"/> to <see cref="TextFormatter"/> (same as Label).</summary>
     public override Rune HotKeySpecifier { get => base.HotKeySpecifier; set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value; }
 
@@ -22,7 +19,7 @@ internal sealed class TabTitleView : View
             return false;
         }
 
-        bool ownerHasFocus = OwnerView?.HasFocus ?? false;
+        bool ownerHasFocus = (SuperView as BorderView)?.Adornment?.Parent?.HasFocus ?? false;
 
         Rectangle drawRect = ViewportToScreen ();
 

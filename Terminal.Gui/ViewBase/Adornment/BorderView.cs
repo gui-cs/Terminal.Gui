@@ -199,13 +199,13 @@ public partial class BorderView : AdornmentView
         Rectangle labelFrame = headerRect with { X = headerRect.X - screenOrigin.X, Y = headerRect.Y - screenOrigin.Y };
         _tabTitleView.Frame = labelFrame;
 
-        if (border.TabSide == Side.Bottom && Adornment.Parent?.HasFocus is true)
+        if (Adornment.Parent?.HasFocus is true && border.TabSide == Side.Bottom && border.Thickness.Bottom > 2)
         {
-            _tabTitleView.Padding.Thickness = _tabTitleView.Padding.Thickness with { Top = 1 };
+            _tabTitleView.Padding.Thickness = new Thickness (0, 1, 0, 0);
         }
         else
         {
-            _tabTitleView.Padding.Thickness = _tabTitleView.Padding.Thickness with { Top = 0 };
+            _tabTitleView.Padding.Thickness = new Thickness (0);
         }
     }
 
@@ -344,7 +344,6 @@ public partial class BorderView : AdornmentView
             CanFocus = false,
             TabStop = TabBehavior.NoStop,
             SuperViewRendersLineCanvas = true,
-            OwnerView = Adornment?.Parent
         };
         _tabTitleView.Border.Settings = BorderSettings.None;
         Add (_tabTitleView);

@@ -607,8 +607,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        ╭───────╮
                        │       │
                        │       │
-                       │Tab╭───╯
-                       │   │
+                       │   ╭───╯
+                       │Tab│
                        ╰───╯
                        """);
     }
@@ -1014,8 +1014,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        ╭───────╮
                        │       │
                        │       │
-                       │Tab╭───╯
-                       │   │
+                       │   ╭───╯
+                       │Tab│
                        ╰───╯
                        """);
     }

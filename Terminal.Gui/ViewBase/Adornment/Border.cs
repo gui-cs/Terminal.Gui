@@ -166,4 +166,15 @@ public class Border : AdornmentImpl
             Parent?.SetNeedsLayout ();
         }
     }
+
+    /// <summary>
+    ///     Gets offset along the border edge where the Tab ends (columns for Top/Bottom, rows for Left/Right).
+    /// </summary>
+    public int TabEnd =>
+        TabSide switch
+        {
+            Side.Top or Side.Bottom => GetFrame ().X + TabOffset + (TabLength ?? 0),
+            Side.Left or Side.Right => GetFrame ().Y + TabOffset + (TabLength ?? 0),
+            _ => 0
+        };
 }
