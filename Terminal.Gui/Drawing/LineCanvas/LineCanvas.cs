@@ -2,7 +2,48 @@ using System.Runtime.InteropServices;
 
 namespace Terminal.Gui.Drawing;
 
-/// <summary>Facilitates box drawing and line intersection detection and rendering. Does not support diagonal lines.</summary>
+/// <summary>
+///     A canvas for composing box-drawing and line-art characters with automatic intersection resolution.
+/// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="LineCanvas"/> is the core rendering primitive for borders, frames, and any box-drawing art
+///         in Terminal.Gui. Lines are added via <see cref="AddLine(Point, int, Orientation, LineStyle, Attribute?)"/>
+///         and the canvas automatically resolves intersections — where two lines cross or meet, the correct Unicode
+///         junction glyph (T, cross, corner, etc.) is produced. This makes it trivial to compose complex bordered
+///         layouts without manually computing junction characters.
+///     </para>
+///     <para>
+///         <b>Merging and SuperViewRendersLineCanvas.</b> When <see cref="View.SuperViewRendersLineCanvas"/> is
+///         <see langword="true"/> on a SubView, the SubView's <see cref="LineCanvas"/> is merged into the
+///         SuperView's canvas via <see cref="Merge(LineCanvas)"/>. All lines then participate in a single
+///         intersection-resolution pass, producing seamless junctions across view boundaries. This is how
+///         adjacent tab headers, nested frames, and other multi-view border compositions achieve connected
+///         line art.
+///     </para>
+///     <para>
+///         <b>Exclusion regions.</b> Use <see cref="Exclude"/> to prevent specific cells from appearing in
+///         <see cref="GetCellMap"/>. This is useful when SubViews of an adornment (like title labels) occupy
+///         space that should not contain line-art glyphs.
+///     </para>
+///     <para>
+///         <b>Clipped merge.</b> The <see cref="Merge(LineCanvas, Region?)"/> overload supports merging with
+///         an exclusion region that clips incoming lines at the line level — before intersection resolution.
+///         Excluded cells are not added as lines and therefore do not participate in auto-join. This is used
+///         by the drawing system to prevent lower-Z-order views' border lines from appearing in areas already
+///         drawn by higher-Z-order views (e.g., preventing an unfocused tab's border from filling a focused
+///         tab's open gap).
+///     </para>
+///     <para>
+///         <b>Output.</b> Call <see cref="GetCellMap"/> (or <see cref="GetMap()"/>) to resolve all intersections
+///         and produce a dictionary mapping screen coordinates to the glyphs (with attributes) to render.
+///         <see cref="GetCellMapWithRegion"/> additionally returns a <see cref="Region"/> covering the drawn
+///         cells, which is used for transparency tracking.
+///     </para>
+///     <para>
+///         Does not support diagonal lines. All lines are axis-aligned (horizontal or vertical).
+///     </para>
+/// </remarks>
 public class LineCanvas : IDisposable
 {
     /// <summary>Creates a new instance.</summary>
@@ -402,16 +443,19 @@ public class LineCanvas : IDisposable
     /// </param>
     public void Merge (LineCanvas lineCanvas, Region? exclude)
     {
-        if (exclude is null)
+        if (exclude is null || exclude.IsEmpty ())
         {
             Merge (lineCanvas);
 
             return;
         }
 
+        Rectangle excludeBounds = exclude.GetBounds ();
+        Rectangle [] excludeRects = exclude.GetRectangles ();
+
         foreach (StraightLine line in lineCanvas._lines)
         {
-            AddLineExcluding (line, exclude);
+            AddLineExcluding (line, excludeBounds, excludeRects);
         }
 
         if (lineCanvas._exclusionRegion is null)
@@ -424,40 +468,50 @@ public class LineCanvas : IDisposable
 
         return;
 
-        // Adds segments of `line` that do not overlap with `exclusion`.
-        void AddLineExcluding (StraightLine line, Region exclusion)
+        // Adds segments of `line` that do not overlap with the exclusion rectangles.
+        void AddLineExcluding (StraightLine line, Rectangle exBounds, Rectangle [] exRects)
         {
-            // Walk cells along the line's axis, building non-excluded segments.
             Rectangle bounds = line.Bounds;
+
+            // Fast path: if the line doesn't intersect the exclusion bounds at all, add it whole.
+            if (!bounds.IntersectsWith (exBounds))
+            {
+                AddLine (line);
+
+                return;
+            }
+
+            // Walk cells along the line's axis, building non-excluded segments.
             bool isHorizontal = line.Orientation == Orientation.Horizontal;
             int axisStart = isHorizontal ? bounds.X : bounds.Y;
             int axisEnd = axisStart + (isHorizontal ? bounds.Width : bounds.Height);
             int fixedCoord = isHorizontal ? bounds.Y : bounds.X;
 
-            var segStart = -1;
+            int segStart = -1;
 
             for (int i = axisStart; i < axisEnd; i++)
             {
                 int x = isHorizontal ? i : fixedCoord;
                 int y = isHorizontal ? fixedCoord : i;
 
-                if (exclusion.Contains (x, y))
-                {
-                    // Flush any pending segment.
-                    if (segStart < 0)
-                    {
-                        continue;
-                    }
-                    EmitSegment (line, isHorizontal, fixedCoord, segStart, i - segStart);
-                    segStart = -1;
-                }
-                else
+                if (!ContainedInAny (exRects, x, y))
                 {
                     if (segStart < 0)
                     {
                         segStart = i;
                     }
+
+                    continue;
                 }
+
+                // Cell is excluded — flush any pending segment.
+                if (segStart < 0)
+                {
+                    continue;
+                }
+
+                EmitSegment (line, isHorizontal, fixedCoord, segStart, i - segStart);
+                segStart = -1;
             }
 
             // Flush trailing segment.
@@ -467,11 +521,22 @@ public class LineCanvas : IDisposable
             }
         }
 
+        static bool ContainedInAny (Rectangle [] rects, int x, int y)
+        {
+            for (var i = 0; i < rects.Length; i++)
+            {
+                if (rects [i].Contains (x, y))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         void EmitSegment (StraightLine original, bool isHorizontal, int fixedCoord, int segAxisStart, int segLength)
         {
-            Point start = isHorizontal
-                              ? new Point (segAxisStart, fixedCoord)
-                              : new Point (fixedCoord, segAxisStart);
+            Point start = isHorizontal ? new Point (segAxisStart, fixedCoord) : new Point (fixedCoord, segAxisStart);
 
             AddLine (new StraightLine (start, segLength, original.Orientation, original.Style, original.Attribute));
         }
@@ -758,22 +823,26 @@ public class LineCanvas : IDisposable
 
         #region T Conditions
 
-        if (Has (set, [IntersectionType.PassOverHorizontal, IntersectionType.StartDown]) || Has (set, [IntersectionType.StartRight, IntersectionType.StartLeft, IntersectionType.StartDown]))
+        if (Has (set, [IntersectionType.PassOverHorizontal, IntersectionType.StartDown])
+            || Has (set, [IntersectionType.StartRight, IntersectionType.StartLeft, IntersectionType.StartDown]))
         {
             return IntersectionRuneType.TopTee;
         }
 
-        if (Has (set, [IntersectionType.PassOverHorizontal, IntersectionType.StartUp]) || Has (set, [IntersectionType.StartRight, IntersectionType.StartLeft, IntersectionType.StartUp]))
+        if (Has (set, [IntersectionType.PassOverHorizontal, IntersectionType.StartUp])
+            || Has (set, [IntersectionType.StartRight, IntersectionType.StartLeft, IntersectionType.StartUp]))
         {
             return IntersectionRuneType.BottomTee;
         }
 
-        if (Has (set, [IntersectionType.PassOverVertical, IntersectionType.StartRight]) || Has (set, [IntersectionType.StartRight, IntersectionType.StartDown, IntersectionType.StartUp]))
+        if (Has (set, [IntersectionType.PassOverVertical, IntersectionType.StartRight])
+            || Has (set, [IntersectionType.StartRight, IntersectionType.StartDown, IntersectionType.StartUp]))
         {
             return IntersectionRuneType.LeftTee;
         }
 
-        if (Has (set, [IntersectionType.PassOverVertical, IntersectionType.StartLeft]) || Has (set, [IntersectionType.StartLeft, IntersectionType.StartDown, IntersectionType.StartUp]))
+        if (Has (set, [IntersectionType.PassOverVertical, IntersectionType.StartLeft])
+            || Has (set, [IntersectionType.StartLeft, IntersectionType.StartDown, IntersectionType.StartUp]))
         {
             return IntersectionRuneType.RightTee;
         }

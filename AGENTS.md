@@ -86,7 +86,7 @@ dotnet test --project Tests/UnitTestsParallelizable --no-build --filter-method "
 3. **Use `[...]`** - Collection expressions, not `new () { ... }`
 4. **SubView/SuperView** - Never say "child", "parent", or "container"
 5. **Unused lambda params** - Use `_` discard: `(_, _) => { }`
-6. **Local functions** - Use camelCase: `void myLocalFunc ()`
+6. **Local functions** - Use PascalCase: `void MyLocalFunc ()`
 7. **Backing fields** - Place immediately before their property
 8. **Early return** - Prefer guard clauses over nested `if`/`else`
 9. **One type per file** - Public and internal types each get their own file
