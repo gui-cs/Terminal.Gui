@@ -537,11 +537,9 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         // layout pass, causing the selector to be sized too narrow.
         if (Orientation == Orientation.Horizontal && SubViews.Count > 0)
         {
-            Size screenSize = App?.Screen.Size ?? new Size (2048, 2048);
-
             foreach (View sv in SubViews)
             {
-                sv.SetRelativeLayout (screenSize);
+                sv.SetRelativeLayout (GetContainerSize ());
             }
         }
     }
