@@ -760,7 +760,7 @@ public partial class View // Drawing APIs
         }
 
         // Track the cumulative drawn region from higher-Z subviews so that when merging
-        // lower-Z subviews LineCanvas, their lines can be clipped against areas already drawn.
+        // lower-Z subviews' LineCanvas, their lines can be clipped against areas already drawn.
         Region? priorDrawnRegion = null;
 
         // Draw the SubViews in reverse Z-order to leverage clipping.
