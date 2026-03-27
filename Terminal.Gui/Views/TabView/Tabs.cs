@@ -312,9 +312,17 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
-        Tab tab1 = new () { Title = "_Tab1", Text = "Tab1 Content" };
-        Tab tab2 = new () { Title = "T_ab2", Text = "Tab2 Content" };
-        Tab tab3 = new () { Title = "Ta_b3", Text = "Tab3 Content" };
+        Tab tab1 = new () { Title = "_Attribute" };
+        AttributePicker attributePicker = new () { Y = 1, BorderStyle = LineStyle.Single };
+        tab1.Add (attributePicker);
+
+        Tab tab2 = new () { Title = "_Line Style" };
+        OptionSelector<LineStyle> lineStyleSelector = new () { Y = 1, BorderStyle = LineStyle.Single };
+        tab2.Add (lineStyleSelector);
+
+        Tab tab3 = new () { Title = "Tab _Settings" };
+        OptionSelector<Side> tabSideSelector = new () { Y = 1, BorderStyle = LineStyle.Single, Title = "Tab Side" };
+        tab3.Add (tabSideSelector);
 
         Add (tab1, tab2, tab3);
         Value = tab1;
