@@ -2,6 +2,12 @@ namespace Terminal.Gui.ViewBase;
 
 public partial class View
 {
+    // Track whether scrollbar padding has been applied to prevent accumulation
+    // during layout re-entry. The VisibleChanged handlers use +1/-1 relative
+    // adjustments, which compound when the event fires multiple times per cycle.
+    private bool _verticalScrollBarPaddingApplied;
+    private bool _horizontalScrollBarPaddingApplied;
+
     private Lazy<ScrollBar> _horizontalScrollBar = null!;
 
     /// <summary>
@@ -130,18 +136,30 @@ public partial class View
 
         if (scrollBar.Orientation == Orientation.Vertical)
         {
-            Padding.Thickness = Padding.Thickness with { Right = scrollBar.Visible ? Padding.Thickness.Right + 1 : Padding.Thickness.Right };
+            if (scrollBar.Visible && !_verticalScrollBarPaddingApplied)
+            {
+                Padding.Thickness = Padding.Thickness with { Right = Padding.Thickness.Right + 1 };
+                _verticalScrollBarPaddingApplied = true;
+            }
         }
         else
         {
-            Padding.Thickness = Padding.Thickness with { Bottom = scrollBar.Visible ? Padding.Thickness.Bottom + 1 : Padding.Thickness.Bottom };
+            if (scrollBar.Visible && !_horizontalScrollBarPaddingApplied)
+            {
+                Padding.Thickness = Padding.Thickness with { Bottom = Padding.Thickness.Bottom + 1 };
+                _horizontalScrollBarPaddingApplied = true;
+            }
         }
         scrollBar.Layout ();
     }
 
     private void ConfigureVerticalScrollBarEvents (ScrollBar scrollBar)
     {
-        Padding.Thickness = Padding.Thickness with { Right = scrollBar.Visible ? Padding.Thickness.Right + 1 : Padding.Thickness.Right };
+        if (scrollBar.Visible && !_verticalScrollBarPaddingApplied)
+        {
+            Padding.Thickness = Padding.Thickness with { Right = Padding.Thickness.Right + 1 };
+            _verticalScrollBarPaddingApplied = true;
+        }
 
         scrollBar.ValueChanged += (_, args) =>
                                   {
@@ -156,16 +174,26 @@ public partial class View
                                             Viewport = Viewport with { Y = 0 };
                                         }
 
-                                        Padding.Thickness = Padding.Thickness with
+                                        if (scrollBar.Visible && !_verticalScrollBarPaddingApplied)
                                         {
-                                            Right = scrollBar.Visible ? Padding.Thickness.Right + 1 : Padding.Thickness.Right - 1
-                                        };
+                                            Padding.Thickness = Padding.Thickness with { Right = Padding.Thickness.Right + 1 };
+                                            _verticalScrollBarPaddingApplied = true;
+                                        }
+                                        else if (!scrollBar.Visible && _verticalScrollBarPaddingApplied)
+                                        {
+                                            Padding.Thickness = Padding.Thickness with { Right = Padding.Thickness.Right - 1 };
+                                            _verticalScrollBarPaddingApplied = false;
+                                        }
                                     };
     }
 
     private void ConfigureHorizontalScrollBarEvents (ScrollBar scrollBar)
     {
-        Padding.Thickness = Padding.Thickness with { Bottom = scrollBar.Visible ? Padding.Thickness.Bottom + 1 : Padding.Thickness.Bottom };
+        if (scrollBar.Visible && !_horizontalScrollBarPaddingApplied)
+        {
+            Padding.Thickness = Padding.Thickness with { Bottom = Padding.Thickness.Bottom + 1 };
+            _horizontalScrollBarPaddingApplied = true;
+        }
 
         scrollBar.ValueChanged += (_, args) =>
                                   {
@@ -180,10 +208,16 @@ public partial class View
                                             Viewport = Viewport with { X = 0 };
                                         }
 
-                                        Padding.Thickness = Padding.Thickness with
+                                        if (scrollBar.Visible && !_horizontalScrollBarPaddingApplied)
                                         {
-                                            Bottom = scrollBar.Visible ? Padding.Thickness.Bottom + 1 : Padding.Thickness.Bottom - 1
-                                        };
+                                            Padding.Thickness = Padding.Thickness with { Bottom = Padding.Thickness.Bottom + 1 };
+                                            _horizontalScrollBarPaddingApplied = true;
+                                        }
+                                        else if (!scrollBar.Visible && _horizontalScrollBarPaddingApplied)
+                                        {
+                                            Padding.Thickness = Padding.Thickness with { Bottom = Padding.Thickness.Bottom - 1 };
+                                            _horizontalScrollBarPaddingApplied = false;
+                                        }
                                     };
     }
 

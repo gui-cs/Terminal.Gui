@@ -179,12 +179,10 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     }
 
     /// <inheritdoc/>
+    /// <inheritdoc/>
     protected override void OnViewportChanged (DrawEventArgs e)
     {
-        //if (!IsInitialized)
-        {
-            SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, Viewport.Width), Math.Max (_minimumButtonsSize.Height, Viewport.Height)));
-        }
+        SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, Viewport.Width), Math.Max (_minimumButtonsSize.Height, Viewport.Height)));
         base.OnViewportChanged (e);
     }
 
@@ -192,17 +190,26 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     {
         if (SubViews.Count == 0)
         {
-            // This is primarily to support MessageBox where there are no subviews but
-            // Text is used.
             return;
         }
 
-        // Always floor at Viewport size — the content area should never be smaller
-        // than what's visible. For DimAuto dialogs, the Frame may be larger than
-        // _minimumSubViewsSize (e.g. due to title width), so the content area
-        // should reflect the actual available space.
-        int subViewsWidth = Math.Max (_minimumSubViewsSize.Width, Viewport.Width);
-        int subViewsHeight = Math.Max (_minimumSubViewsSize.Height, Viewport.Height);
+        // For DimAuto dialogs, content must be at least as large as the subviews require
+        // so the dialog grows to fit. For fixed-size dialogs, content should match the
+        // Viewport directly; using _minimumSubViewsSize as a floor causes height drift
+        // on maximize/restore because the minimum captures the high-water mark and never
+        // shrinks back down.
+        int subViewsWidth = _minimumSubViewsSize.Width;
+        int subViewsHeight = _minimumSubViewsSize.Height;
+
+        if (!Width.Has<DimAuto> (out _))
+        {
+            subViewsWidth = Viewport.Width;
+        }
+
+        if (!Height.Has<DimAuto> (out _))
+        {
+            subViewsHeight = Viewport.Height;
+        }
 
         SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, subViewsWidth), Math.Max (_minimumButtonsSize.Height, subViewsHeight)));
     }
