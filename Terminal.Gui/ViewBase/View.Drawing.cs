@@ -466,7 +466,7 @@ public partial class View // Drawing APIs
 
         Driver.FillRect (toClear);
 
-        // context.AddDrawnRectangle (toClear);
+        context?.AddDrawnRectangle (toClear);
 
         SetNeedsDraw ();
     }
