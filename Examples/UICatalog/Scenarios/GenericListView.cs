@@ -1,6 +1,5 @@
 #nullable enable
 using System.Collections.ObjectModel;
-using System.Text;
 
 namespace UICatalog.Scenarios;
 
@@ -26,7 +25,8 @@ public class GenericListView : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Window appWindow = new () { Title = GetQuitKeyAndName () };
+        using Window appWindow = new ();
+        appWindow.Title = GetQuitKeyAndName ();
 
         ObservableCollection<Country> countries =
         [
@@ -42,7 +42,6 @@ public class GenericListView : Scenario
             new ("Japan", "Tokyo", 124_000_000)
         ];
 
-        // -- Cancel checkbox --------------------------------------------------
         _cancelNextCb = new CheckBox
         {
             X = 0,
@@ -52,7 +51,6 @@ public class GenericListView : Scenario
         _cancelNextCb.ValueChanging += (_, args) => _cancelNext = args.NewValue == CheckState.Checked;
         appWindow.Add (_cancelNextCb);
 
-        // -- ListView<Country> ------------------------------------------------
         _listView = new ListView<Country>
         {
             Title = "_Countries",
@@ -75,7 +73,7 @@ public class GenericListView : Scenario
         };
 
         // Use RowRender to color rows with population > 100M (demonstrates
-        // how to achieve per-row coloring without a ColorGetter delegate).
+        // how to achieve per-row coloring).
         _listView.RowRender += (_, args) =>
         {
             if (args.Row < countries.Count && countries [args.Row].Population > 100_000_000)
@@ -85,7 +83,6 @@ public class GenericListView : Scenario
             }
         };
 
-        // -- Detail panel -----------------------------------------------------
         FrameView detailPanel = new ()
         {
             Title = "_Selected",
@@ -116,7 +113,6 @@ public class GenericListView : Scenario
         _indexLabel = new () { X = Pos.Right (indexTitleLbl), Y = 5, Width = Dim.Fill (1), Text = "" };
         detailPanel.Add (_indexLabel);
 
-        // -- Event log --------------------------------------------------------
         _eventList = [];
         _eventListView = new ListView
         {
@@ -130,7 +126,6 @@ public class GenericListView : Scenario
         };
         appWindow.Add (_eventListView);
 
-        // -- Wire events ------------------------------------------------------
         _listView.ValueChanging += OnValueChanging;
         _listView.ValueChanged += OnValueChanged;
 
@@ -144,10 +139,7 @@ public class GenericListView : Scenario
             args.Handled = true;
             _cancelNext = false;
 
-            if (_cancelNextCb is not null)
-            {
-                _cancelNextCb.Value = CheckState.UnChecked;
-            }
+            _cancelNextCb?.Value = CheckState.UnChecked;
 
             LogEvent ($"ValueChanging CANCELLED: {FormatCountry (args.CurrentValue)} -> {FormatCountry (args.NewValue)}");
 
@@ -190,19 +182,15 @@ public class GenericListView : Scenario
     {
         _eventList.Add (message);
 
-        if (_eventListView is not null)
-        {
-            _eventListView.MoveEnd ();
-        }
+        _eventListView?.MoveEnd ();
     }
 
-    private static string FormatCountry (Country? c) => c is null ? "null" : c.Name;
+    private static string FormatCountry (Country? c) { return c is null ? "null" : c.Name; }
 }
 
 /// <summary>A simple record used to demonstrate <see cref="ListView{T}"/>.</summary>
 internal record Country (string Name, string Capital, int Population)
 {
-    // Overriding ToString() so ListView<Country> displays the country name
-    // without needing an AspectGetter delegate.
-    public override string ToString () => Name;
+    // Overriding ToString() so ListView<Country> only displays the country name.
+    public override string ToString () { return Name; }
 }

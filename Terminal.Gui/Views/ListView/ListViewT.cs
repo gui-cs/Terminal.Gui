@@ -5,22 +5,22 @@ namespace Terminal.Gui.Views;
 /// <summary>
 ///     Provides a scrollable list of data where each item can be activated to perform an action,
 ///     with a strongly-typed <see cref="Value"/> property that returns the selected object of type
-///     <typeparamref name="T"/> from the underlying <see cref="ObservableCollection{T}"/>.
+///     <typeparamref name="T"/> from the underlying <see cref="ObservableCollection&lt;T&gt;"/>.
 /// </summary>
 /// <typeparam name="T">The type of items in the collection.</typeparam>
 /// <remarks>
 ///     <para>
-///         <see cref="ListView{T}"/> extends <see cref="ListView"/> by implementing
-///         <see cref="IValue{T}"/>. The <see cref="Value"/> property returns the currently selected
+///         <see cref="ListView&lt;T&gt;"/> extends <see cref="ListView"/> by implementing
+///         <see cref="IValue&lt;T&gt;"/>. The <see cref="Value"/> property returns the currently selected
 ///         object of type <typeparamref name="T"/> rather than the selected index.
 ///     </para>
 ///     <para>
 ///         All <see cref="ListView"/> functionality (rendering, marking, keyboard navigation,
 ///         key and mouse bindings) is inherited unchanged. Use
-///         <see cref="SetSource(ObservableCollection{T}?)"/> to provide the typed source collection.
+///         <see cref="SetSource(ObservableCollection&lt;T&gt;?)"/> to provide the typed source collection.
 ///     </para>
 ///     <para>
-///         The base <see cref="ListView.Value"/> (index-based, <see cref="IValue{T}"/> with
+///         The base <see cref="ListView.Value"/> (index-based, <see cref="IValue&lt;T&gt;"/> with
 ///         <c>T = int?</c>) remains accessible by casting to <see cref="ListView"/> or
 ///         <c>IValue&lt;int?&gt;</c>.
 ///     </para>
@@ -30,7 +30,7 @@ public class ListView<T> : ListView, IValue<T>
     private ObservableCollection<T>? _typedSource;
 
     /// <summary>
-    ///     Initializes a new instance of <see cref="ListView{T}"/>.
+    ///     Initializes a new instance of <see cref="ListView&lt;T&gt;"/>.
     /// </summary>
     public ListView ()
     {
@@ -42,13 +42,13 @@ public class ListView<T> : ListView, IValue<T>
     ///     Sets the source collection and updates the display.
     /// </summary>
     /// <param name="source">
-    ///     The <see cref="ObservableCollection{T}"/> to display,
+    ///     The <see cref="ObservableCollection&lt;T&gt;"/> to display,
     ///     or <see langword="null"/> to clear the list.
     /// </param>
     public void SetSource (ObservableCollection<T>? source)
     {
         _typedSource = source;
-        base.SetSource<T> (source);
+        base.SetSource (source);
     }
 
     #region IValue<T> Implementation
@@ -179,7 +179,7 @@ public class ListView<T> : ListView, IValue<T>
     {
         if (index is null || _typedSource is null || index < 0 || index >= _typedSource.Count)
         {
-            return default;
+            return default (T?);
         }
 
         return _typedSource [index.Value];
