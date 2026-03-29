@@ -185,9 +185,12 @@ public class Tabs : View, IValue<Tab?>, IDesignable
         tab.Width = Dim.Fill ();
         tab.Height = Dim.Fill ();
 
+        // this will cause the first tab added to be focused and selected by default, which is a common convention for tabbed interfaces.
+        // Subsequent tabs will not steal focus when added.
+        TabCollection.FirstOrDefault ()?.SetFocus ();
+
         UpdateTabBorderThickness ();
         UpdateTabOffsets ();
-        UpdateZOrder ();
     }
 
     /// <inheritdoc/>
@@ -207,7 +210,7 @@ public class Tabs : View, IValue<Tab?>, IDesignable
         }
 
         // If the removed tab was the selected one, select the first tab
-        if (_value == removedTab)
+        if (Value == removedTab)
         {
             _value = null;
             Tab? firstTab = TabCollection.FirstOrDefault ();
@@ -227,21 +230,47 @@ public class Tabs : View, IValue<Tab?>, IDesignable
 
     #region Layout Helpers
 
+    /// <inheritdoc />
+    protected override void OnSubViewLayout (LayoutEventArgs args)
+    {
+        base.OnSubViewLayout (args);
+
+        //UpdateZOrder();
+    }
+
     /// <summary>
-    ///     Updates the z-order of tab SubViews so the focused tab is drawn last (on top).
+    ///     Updates the z-order of tab SubViews so the focused tab is drawn last (on top). The tabs before the focused tab are
+    ///     drawn in the order they were added (first added at back).
+    ///     the tabs after the focused tab are drawn in reverse order they were added (last added at back).
     /// </summary>
     private void UpdateZOrder ()
     {
-        // Move tabs to start in logical order
-        foreach (Tab tab in TabCollection)
-        {
-            MoveSubViewToStart (tab);
-        }
+        Tab? focusedTab = SubViews.OfType<Tab> ().FirstOrDefault (t => t.HasFocus);
 
-        // Then move the selected tab to end so it draws on top
-        if (_value is { })
+        if (focusedTab is { })
         {
-            MoveSubViewToEnd (_value);
+            // Tabs before the focused tab are drawn in the order they were added (first added at back)
+            foreach (Tab tab in TabCollection.TakeWhile (t => t != focusedTab))
+            {
+                MoveSubViewToEnd (tab);
+            }
+
+            // Focused tab is drawn on top of all others
+            MoveSubViewToEnd (focusedTab);
+
+            // Tabs after the focused tab are drawn in reverse order they were added (last added at back)
+            foreach (Tab tab in TabCollection.SkipWhile (t => t != focusedTab).Skip (1))
+            {
+                MoveSubViewToStart (tab);
+            }
+        }
+        else
+        {
+            // Tabs before the focused tab are drawn in the order they were added (first added at back)
+            foreach (Tab tab in TabCollection.Reverse())
+            {
+                MoveSubViewToStart (tab);
+            }
         }
     }
 
@@ -277,13 +306,13 @@ public class Tabs : View, IValue<Tab?>, IDesignable
             tab.Border.TabSide = _tabSide;
 
             tab.Border.Thickness = _tabSide switch
-            {
-                Side.Top => new Thickness (1, 3, 1, 1),
-                Side.Bottom => new Thickness (1, 1, 1, 3),
-                Side.Left => new Thickness (3, 1, 1, 1),
-                Side.Right => new Thickness (1, 1, 3, 1),
-                _ => new Thickness (1, 3, 1, 1)
-            };
+                                   {
+                                       Side.Top => new Thickness (1, 3, 1, 1),
+                                       Side.Bottom => new Thickness (1, 1, 1, 3),
+                                       Side.Left => new Thickness (3, 1, 1, 1),
+                                       Side.Right => new Thickness (1, 1, 3, 1),
+                                       _ => new Thickness (1, 3, 1, 1)
+                                   };
         }
     }
 
@@ -291,7 +320,7 @@ public class Tabs : View, IValue<Tab?>, IDesignable
 
     #region Focus Handling
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnFocusedChanged (View? previousFocused, View? focused)
     {
         base.OnFocusedChanged (previousFocused, focused);
@@ -299,7 +328,7 @@ public class Tabs : View, IValue<Tab?>, IDesignable
         // Find which Tab now has focus
         Tab? focusedTab = SubViews.OfType<Tab> ().FirstOrDefault (t => t.HasFocus);
 
-        if (focusedTab is { } && focusedTab != _value)
+        if (focusedTab is { })
         {
             Value = focusedTab;
         }
@@ -324,8 +353,9 @@ public class Tabs : View, IValue<Tab?>, IDesignable
         OptionSelector<Side> tabSideSelector = new () { Y = 1, BorderStyle = LineStyle.Single, Title = "Tab Side" };
         tab3.Add (tabSideSelector);
 
-        Add (tab1, tab2, tab3);
-        Value = tab1;
+        Tab tab4 = new () { Title = "Fourth" };
+
+        Add (tab1, tab2, tab3, tab4);
 
         attributePicker.ValueChanged += (_, e) =>
                                         {
@@ -348,12 +378,14 @@ public class Tabs : View, IValue<Tab?>, IDesignable
                                           };
 
         tabSideSelector.ValueChanged += (_, e) =>
-                                         {
-                                             if (e.Value is { })
-                                             {
-                                                 TabSide = e.Value.Value;
-                                             }
-                                         };
+                                        {
+                                            if (e.Value is { })
+                                            {
+                                                TabSide = e.Value.Value;
+                                            }
+                                        };
+
+        tab1.BorderStyle = LineStyle.Double;
 
         return true;
     }

@@ -32,8 +32,8 @@ public class Tab : View
         // Overlapped enables z-order: focused tab renders above unselected tabs
         Arrangement = ViewArrangement.Overlapped;
 
-        Width = Dim.Fill ();
-        Height = Dim.Fill ();
+        Width = Dim.Auto ();
+        Height = Dim.Auto ();
     }
 
     /// <summary>

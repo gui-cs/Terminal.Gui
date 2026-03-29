@@ -162,7 +162,7 @@ public partial class BorderView : AdornmentView
 
         int tabDepth = GetTabDepth (border);
         int tabLength = border.TabLength!.Value;
-        bool hasFocus = border.Parent?.HasFocus ?? false;
+        bool hasFocus = IsFocusedOrLastTab ();
 
         Rectangle headerRect = ComputeHeaderRect (borderBounds, border.TabSide, border.TabOffset, tabLength, tabDepth);
         Rectangle viewBounds = ComputeViewBounds (borderBounds, border.TabSide, tabDepth);
@@ -199,7 +199,7 @@ public partial class BorderView : AdornmentView
         Rectangle labelFrame = headerRect with { X = headerRect.X - screenOrigin.X, Y = headerRect.Y - screenOrigin.Y };
         _tabTitleView.Frame = labelFrame;
 
-        if (Adornment.Parent?.HasFocus is true && border.TabSide == Side.Bottom && border.Thickness.Bottom > 2)
+        if (hasFocus && border is { TabSide: Side.Bottom, Thickness.Bottom: > 2 })
         {
             _tabTitleView.Padding.Thickness = new Thickness (0, 1, 0, 0);
         }
@@ -462,7 +462,7 @@ public partial class BorderView : AdornmentView
         int tabDepth = GetTabDepth (border);
         int tabLength = border.TabLength!.Value;
         LineStyle lineStyle = border.LineStyle.Value;
-        bool hasFocus = border.Parent!.HasFocus;
+        bool hasFocus = IsFocusedOrLastTab ();
 
         // Compute tab header geometry
         Rectangle headerRect = ComputeHeaderRect (borderBounds, border.TabSide, border.TabOffset, tabLength, tabDepth);
@@ -506,18 +506,6 @@ public partial class BorderView : AdornmentView
                                      normalAttribute);
         }
 
-        // Update LastTitleRect for click handling (uses draw-time geometry)
-        if (tabVisible && _tabTitleView is { Visible: true })
-        {
-            Thickness effectiveThickness = ComputeTabLabelThickness (border.TabSide, tabDepth, hasFocus);
-            Rectangle visibleContent = ComputeTabContentArea (clipped, headerRect, border.TabSide, effectiveThickness, tabDepth);
-            LastTitleRect = visibleContent.IsEmpty ? null : visibleContent;
-        }
-        else
-        {
-            LastTitleRect = null;
-        }
-
         // Gradient support
         if (border.Settings.FastHasFlags (BorderSettings.Gradient))
         {
@@ -537,6 +525,21 @@ public partial class BorderView : AdornmentView
         }
 
         return true;
+    }
+
+    private bool IsFocusedOrLastTab ()
+    {
+        if (Adornment is not Border border || !border.Settings.FastHasFlags (BorderSettings.Tab))
+        {
+            return false;
+        }
+
+        // If the Parent is a Tab, and it is the last subview of it's SuperView, treat it as though it is focused
+        if (border.Parent is Tab { SuperView: { } } tab && tab.SuperView.SubViews.LastOrDefault () == tab)
+        {
+            return true;
+        }
+        return border.Parent!.HasFocus;
     }
 
     /// <summary>
@@ -824,7 +827,6 @@ public partial class BorderView : AdornmentView
                                                       GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
                                                       GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
 
-            LastTitleRect = titleRect;
             context?.AddDrawnRectangle (titleRect);
             Adornment.Parent?.LineCanvas.Exclude (new Region (titleRect));
         }
@@ -993,13 +995,7 @@ public partial class BorderView : AdornmentView
 
         return true;
     }
-
-    /// <summary>
-    ///     Gets the screen-coordinate rectangle of the title text from the last draw pass.
-    ///     Used by the parent view to build drawn region for transparent border clip exclusion.
-    /// </summary>
-    internal Rectangle? LastTitleRect { get; set; }
-
+    
     /// <summary>
     ///     Gets the subview used to render <see cref="ViewDiagnosticFlags.DrawIndicator"/>.
     /// </summary>
