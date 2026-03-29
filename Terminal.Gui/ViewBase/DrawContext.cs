@@ -1,4 +1,4 @@
-﻿namespace Terminal.Gui.ViewBase;
+namespace Terminal.Gui.ViewBase;
 
 /// <summary>
 ///     Tracks the region that has been drawn during <see cref="View.Draw(DrawContext?)"/>. This is primarily
@@ -28,12 +28,12 @@
 ///             Rectangle rect2 = new Rectangle (8, 8, 4, 7);
 ///             FillRect (rect1, Glyphs.BlackCircle);
 ///             FillRect (rect2, Glyphs.BlackCircle);
-///             
+///
 ///             // Report the drawn region in screen-relative coordinates
 ///             Region drawnRegion = new Region (ViewportToScreen (rect1));
 ///             drawnRegion.Union (ViewportToScreen (rect2));
 ///             context?.AddDrawnRegion (drawnRegion);
-///             
+///
 ///             return true;
 ///         }
 ///     </code>
@@ -41,15 +41,28 @@
 public class DrawContext
 {
     private readonly Region _drawnRegion = new Region ();
+    private readonly Region _clearedRegion = new Region ();
 
     /// <summary>
     /// Gets a copy of the region drawn so far in this context.
     /// </summary>
     /// <remarks>
     ///     The returned region contains all areas that have been reported as drawn via <see cref="AddDrawnRectangle"/>
-    ///     or <see cref="AddDrawnRegion"/>, in screen-relative coordinates.
+    ///     or <see cref="AddDrawnRegion"/>, in screen-relative coordinates. This includes areas that were cleared
+    ///     via <see cref="AddClearedRectangle"/>.
     /// </remarks>
     public Region GetDrawnRegion () => _drawnRegion.Clone ();
+
+    /// <summary>
+    /// Gets a copy of the region that was cleared (filled with background) but not explicitly drawn with content.
+    /// </summary>
+    /// <remarks>
+    ///     Cleared regions are tracked separately from content-drawn regions to support
+    ///     <see cref="ViewportSettingsFlags.TransparentMouse"/> hit-testing. Cleared areas protect
+    ///     opaque views from being overwritten by peer views, but should not be considered
+    ///     "drawn content" for mouse hit-testing on transparent views.
+    /// </remarks>
+    public Region GetClearedRegion () => _clearedRegion.Clone ();
 
     /// <summary>
     /// Reports that a rectangle has been drawn.
@@ -62,6 +75,28 @@ public class DrawContext
     public void AddDrawnRectangle (Rectangle rect)
     {
         _drawnRegion.Combine (rect, RegionOp.Union);
+
+        // Content drawn over a previously cleared area supersedes the clear.
+        // Remove this area from the cleared region so it is treated as drawn content
+        // for TransparentMouse hit-testing.
+        _clearedRegion.Exclude (rect);
+    }
+
+    /// <summary>
+    /// Reports that a rectangle was cleared (filled with background).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Cleared areas are added to both the drawn region (for clip exclusion, preventing peer
+    ///         views from overwriting) and the cleared region (so transparent views can exclude them
+    ///         from <see cref="View.CachedDrawnRegion"/> for mouse hit-testing).
+    ///     </para>
+    /// </remarks>
+    /// <param name="rect">The rectangle that was cleared, in screen-relative coordinates.</param>
+    public void AddClearedRectangle (Rectangle rect)
+    {
+        _drawnRegion.Combine (rect, RegionOp.Union);
+        _clearedRegion.Combine (rect, RegionOp.Union);
     }
 
     /// <summary>
@@ -82,6 +117,9 @@ public class DrawContext
     public void AddDrawnRegion (Region region)
     {
         _drawnRegion.Combine (region, RegionOp.Union);
+
+        // Content drawn over a previously cleared area supersedes the clear.
+        _clearedRegion.Exclude (region);
     }
 
     /// <summary>

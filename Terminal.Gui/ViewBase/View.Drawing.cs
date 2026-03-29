@@ -466,7 +466,7 @@ public partial class View // Drawing APIs
 
         Driver.FillRect (toClear);
 
-        context?.AddDrawnRectangle (toClear);
+        context?.AddClearedRectangle (toClear);
 
         SetNeedsDraw ();
     }
@@ -885,40 +885,9 @@ public partial class View // Drawing APIs
         // Each adornment's LastDrawnRegion was populated during DrawAdornments() using per-adornment
         // DrawContexts. We combine with _lastLineCanvasRegion (rendered by the parent) for Border.
         // All three adornment types are handled uniformly.
-        cacheAdornmentDrawnRegion (Border, _lastLineCanvasRegion);
-        cacheAdornmentDrawnRegion (Margin, lastLineCanvasRegion: null);
-        cacheAdornmentDrawnRegion (Padding, lastLineCanvasRegion: null);
-
-        void cacheAdornmentDrawnRegion (AdornmentImpl adornment, Region? lastLineCanvasRegion)
-        {
-            if (!adornment.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
-            {
-                return;
-            }
-
-            Region adornmentDrawnRegion = new ();
-
-            if (adornment.LastDrawnRegion is { })
-            {
-                adornmentDrawnRegion.Combine (adornment.LastDrawnRegion, RegionOp.Union);
-            }
-
-            // The parent's LineCanvas includes border lines rendered in DoRenderLineCanvas.
-            // Intersect with this adornment's frame to get only the lines within it.
-            if (lastLineCanvasRegion is { })
-            {
-                Region lineRegion = lastLineCanvasRegion.Clone ();
-                lineRegion.Intersect (adornment.FrameToScreen ());
-                adornmentDrawnRegion.Combine (lineRegion, RegionOp.Union);
-            }
-
-            adornment.CachedDrawnRegion = adornmentDrawnRegion;
-
-            if (adornment.View is { } adornmentView)
-            {
-                adornmentView.CachedDrawnRegion = adornmentDrawnRegion;
-            }
-        }
+        CacheAdornmentDrawnRegion (Border, _lastLineCanvasRegion);
+        CacheAdornmentDrawnRegion (Margin, lastLineCanvasRegion: null);
+        CacheAdornmentDrawnRegion (Padding, lastLineCanvasRegion: null);
 
         bool marginTransparent = Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
         bool borderTransparent = Border.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
@@ -955,7 +924,7 @@ public partial class View // Drawing APIs
         }
         else
         {
-            addDrawnRegionForAdornment (Margin, lastLineCanvasRegion: null);
+            AddDrawnRegionForAdornment (Margin, lastLineCanvasRegion: null);
         }
 
         if (!borderTransparent)
@@ -964,7 +933,7 @@ public partial class View // Drawing APIs
         }
         else
         {
-            addDrawnRegionForAdornment (Border, _lastLineCanvasRegion);
+            AddDrawnRegionForAdornment (Border, _lastLineCanvasRegion);
         }
 
         if (!paddingTransparent)
@@ -973,7 +942,7 @@ public partial class View // Drawing APIs
         }
         else
         {
-            addDrawnRegionForAdornment (Padding, lastLineCanvasRegion: null);
+            AddDrawnRegionForAdornment (Padding, lastLineCanvasRegion: null);
         }
 
         if (!viewTransparent)
@@ -997,7 +966,45 @@ public partial class View // Drawing APIs
             exclusion.Combine (contentDrawn, RegionOp.Union);
         }
 
-        void addDrawnRegionForAdornment (AdornmentImpl adornment, Region? lastLineCanvasRegion)
+        ExcludeFromClip (exclusion);
+
+        // Cache the view's own drawn region for TransparentMouse hit-testing.
+        // This must be computed BEFORE adding the exclusion to the context, because
+        // AddDrawnRegion modifies the cleared region tracking (content supersedes clears),
+        // which would make the CachedDrawnRegion include the entire exclusion area rather
+        // than just the explicitly drawn content.
+        if (ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+        {
+            if (viewTransparent || borderTransparent)
+            {
+                Region? drawnRegion = context?.GetDrawnRegion ();
+
+                // Exclude cleared-but-not-content-drawn regions from CachedDrawnRegion.
+                // ClearViewport fills the viewport with spaces and tracks those areas as
+                // "cleared" in the context. For TransparentMouse hit-testing, only cells
+                // with actual content should capture mouse events, not background fills.
+                Region? cleared = context?.GetClearedRegion ();
+
+                if (drawnRegion is { } && cleared is { })
+                {
+                    drawnRegion.Exclude (cleared);
+                }
+
+                CachedDrawnRegion = drawnRegion;
+            }
+            else
+            {
+                // Opaque view with TransparentMouse — cache the entire border frame.
+                CachedDrawnRegion = new Region (Border.FrameToScreen ());
+            }
+        }
+
+        // Report the exclusion to the parent's DrawContext so SuperViews can track what we covered.
+        context?.AddDrawnRegion (exclusion);
+
+        return;
+
+        void AddDrawnRegionForAdornment (AdornmentImpl adornment, Region? lastLineCanvasRegion)
         {
             if (adornment.LastDrawnRegion is { })
             {
@@ -1007,33 +1014,44 @@ public partial class View // Drawing APIs
             }
 
             // The parent's LineCanvas includes border lines rendered in DoRenderLineCanvas.
+            if (lastLineCanvasRegion is null)
+            {
+                return;
+            }
+            Region lineRegion = lastLineCanvasRegion.Clone ();
+            lineRegion.Intersect (adornment.FrameToScreen ());
+            exclusion.Combine (lineRegion, RegionOp.Union);
+        }
+
+        void CacheAdornmentDrawnRegion (AdornmentImpl adornment, Region? lastLineCanvasRegion)
+        {
+            if (!adornment.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+            {
+                return;
+            }
+
+            Region adornmentDrawnRegion = new ();
+
+            if (adornment.LastDrawnRegion is { })
+            {
+                adornmentDrawnRegion.Combine (adornment.LastDrawnRegion, RegionOp.Union);
+            }
+
+            // The parent's LineCanvas includes border lines rendered in DoRenderLineCanvas.
+            // Intersect with this adornment's frame to get only the lines within it.
             if (lastLineCanvasRegion is { })
             {
                 Region lineRegion = lastLineCanvasRegion.Clone ();
                 lineRegion.Intersect (adornment.FrameToScreen ());
-                exclusion.Combine (lineRegion, RegionOp.Union);
+                adornmentDrawnRegion.Combine (lineRegion, RegionOp.Union);
             }
-        }
 
-        ExcludeFromClip (exclusion);
+            adornment.CachedDrawnRegion = adornmentDrawnRegion;
 
-        // Report the exclusion to the parent's DrawContext so SuperViews can track what we covered.
-        context?.AddDrawnRegion (exclusion);
-
-        // Cache the view's own drawn region for TransparentMouse hit-testing.
-        if (!ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
-        {
-            return;
-        }
-
-        if (viewTransparent || borderTransparent)
-        {
-            CachedDrawnRegion = context?.GetDrawnRegion ().Clone ();
-        }
-        else
-        {
-            // Opaque view with TransparentMouse — cache the entire border frame.
-            CachedDrawnRegion = new Region (Border.FrameToScreen ());
+            if (adornment.View is { } adornmentView)
+            {
+                adornmentView.CachedDrawnRegion = adornmentDrawnRegion;
+            }
         }
     }
 
