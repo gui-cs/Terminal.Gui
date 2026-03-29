@@ -79,7 +79,7 @@ public class GenericListView : Scenario
 
         Label nameTitleLbl = new () { X = 1, Y = 1, Text = "Name:      " };
         detailPanel.Add (nameTitleLbl);
-        _nameLabel = new Label { X = Pos.Right (nameTitleLbl), Y = 1, Width = Dim.Fill (1), Text = "(none)" };
+        _nameLabel = new () { X = Pos.Right (nameTitleLbl), Y = 1, Width = Dim.Fill (1), Text = "(none)" };
         detailPanel.Add (_nameLabel);
 
         Label capitalTitleLbl = new () { X = 1, Y = 2, Text = "Capital:   " };
