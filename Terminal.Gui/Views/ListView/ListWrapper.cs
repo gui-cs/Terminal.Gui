@@ -66,16 +66,16 @@ public class ListWrapper<T> : IListDataSource
             return;
         }
 
-        T typedItem = _source [item];
+        object? t = _source [item];
 
-        string text = typedItem switch
+        switch (t)
         {
-            null => "",
-            string s => s,
-            _ => typedItem.ToString ()!
-        };
+            case null: RenderString (container, "", width); break;
 
-        RenderString (container, text, width, viewportX);
+            case string s: RenderString (container, s, width, viewportX); break;
+
+            default: RenderString (container, t.ToString ()!, width, viewportX); break;
+        }
     }
 
     /// <inheritdoc/>
@@ -191,9 +191,7 @@ public class ListWrapper<T> : IListDataSource
 
         for (var i = 0; i < _source!.Count; i++)
         {
-            T typedItem = _source [i];
-
-            object? t = typedItem;
+            object? t = _source [i];
 
             if (t is null)
             {
