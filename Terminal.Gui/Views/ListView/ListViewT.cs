@@ -65,8 +65,18 @@ public class ListView<T> : ListView, IValue<T>
     ///     </para>
     ///     <para>
     ///         The setter locates the object in the collection and updates
-    ///         <see cref="ListView.SelectedItem"/> to the corresponding index. If the object is not
-    ///         found in the collection, the selection is unchanged.
+    ///         <see cref="ListView.SelectedItem"/> to the corresponding index.
+    ///     </para>
+    ///     <para>
+    ///         If <paramref name="value"/> is <see langword="null"/>, the selection is cleared.
+    ///     </para>
+    ///     <para>
+    ///         If the source collection has not been set, or if <paramref name="value"/> is not found
+    ///         in the collection, the setter is a no-op and the selection remains unchanged.
+    ///         This differs from the base <see cref="ListView.SelectedItem"/> setter, which throws
+    ///         <see cref="ArgumentException"/> for an out-of-range index. Here, a value not present in
+    ///         the collection is not considered an error — the caller may hold a stale reference or the
+    ///         collection may have changed since the reference was obtained.
     ///     </para>
     /// </remarks>
     public new T? Value
