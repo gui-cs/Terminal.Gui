@@ -129,7 +129,19 @@ public class ListView<T> : ListView, IValue<T>
         }
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    ///     Gets the currently selected item as a boxed <typeparamref name="T"/> object.
+    /// </summary>
+    /// <returns>
+    ///     The selected item of type <typeparamref name="T"/>, boxed as <see cref="object"/>,
+    ///     or <see langword="null"/> if no item is selected.
+    /// </returns>
+    /// <remarks>
+    ///     This explicit implementation overrides the base <see cref="ListView"/>'s behavior,
+    ///     which returns the selected index as <see langword="int?"/>.
+    ///     Here, the returned value is the selected object from the typed source collection,
+    ///     consistent with <see cref="Value"/>.
+    /// </remarks>
     object? IValue.GetValue () => Value;
 
     /// <summary>
