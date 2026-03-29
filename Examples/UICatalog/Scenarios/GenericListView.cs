@@ -60,7 +60,8 @@ public class GenericListView : Scenario
             Y = Pos.Bottom (_cancelNextCb) + 1,
             Width = 22,
             Height = Dim.Fill (4),
-            BorderStyle = LineStyle.Single
+            BorderStyle = LineStyle.Single,
+            AspectGetter = c => c.Name
         };
         _listView.SetSource (countries);
         appWindow.Add (_listView);
