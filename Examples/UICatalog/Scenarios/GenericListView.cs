@@ -94,7 +94,7 @@ public class GenericListView : Scenario
 
         Label indexTitleLbl = new () { X = 1, Y = 5, Text = "Index:     " };
         detailPanel.Add (indexTitleLbl);
-        _indexLabel = new Label { X = Pos.Right (indexTitleLbl), Y = 5, Width = Dim.Fill (1), Text = "" };
+        _indexLabel = new () { X = Pos.Right (indexTitleLbl), Y = 5, Width = Dim.Fill (1), Text = "" };
         detailPanel.Add (_indexLabel);
 
         // -- Event log --------------------------------------------------------
