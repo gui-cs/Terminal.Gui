@@ -1,6 +1,6 @@
 using UnitTests;
 
-namespace ViewTests.TabView;
+namespace ViewsTests.TabView;
 
 // Copilot
 

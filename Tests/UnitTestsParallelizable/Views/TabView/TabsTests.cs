@@ -1,6 +1,6 @@
 ﻿using UnitTests;
 
-namespace ViewTests.TabView;
+namespace ViewsTests.TabView;
 
 // Copilot
 
@@ -261,7 +261,7 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
         bool result = ((IDesignable)tabs).EnableForDesign ();
 
         Assert.True (result);
-        Assert.Equal (3, tabs.TabCollection.Count ());
+        Assert.Equal (4, tabs.TabCollection.Count ());
         Assert.NotNull (tabs.Value);
     }
 

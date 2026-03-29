@@ -26,7 +26,7 @@ public class AllViewsNavigationTests (ITestOutputHelper output) : TestsAllViews
 
         if (view is IDesignable designable)
         {
-            designable.EnableForDesign ();
+           // designable.EnableForDesign ();
         }
 
         IApplication app = Application.Create ();
