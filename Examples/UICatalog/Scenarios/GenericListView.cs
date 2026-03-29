@@ -4,7 +4,7 @@ using System.Text;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Generic ListView<T>", "Demonstrates ListView<T> with typed Value, SelectedItem, and Index")]
+[ScenarioMetadata ("Generic ListView<T>", "Demonstrates ListView<T> with typed Value, SelectedItem, Index, and RowRender for custom row coloring")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("ListView")]
 public class GenericListView : Scenario
@@ -59,12 +59,31 @@ public class GenericListView : Scenario
             X = 0,
             Y = Pos.Bottom (_cancelNextCb) + 1,
             Width = 22,
-            Height = Dim.Fill (4),
-            BorderStyle = LineStyle.Single,
-            AspectGetter = c => c.Name
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Single
         };
         _listView.SetSource (countries);
         appWindow.Add (_listView);
+
+        // Build highlight scheme by inheriting the resolved scheme and only
+        // overriding foreground colors so the background stays theme-consistent.
+        Scheme baseScheme = _listView.GetScheme ();
+        Scheme highlightScheme = new ()
+        {
+            Normal = baseScheme.Normal with { Foreground = Color.BrightRed },
+            Focus  = baseScheme.Focus  with { Foreground = Color.BrightRed, Style = TextStyle.Bold }
+        };
+
+        // Use RowRender to color rows with population > 100M (demonstrates
+        // how to achieve per-row coloring without a ColorGetter delegate).
+        _listView.RowRender += (_, args) =>
+        {
+            if (args.Row < countries.Count && countries [args.Row].Population > 100_000_000)
+            {
+                bool isSelected = args.Row == _listView.Index;
+                args.RowAttribute = isSelected ? highlightScheme.Focus : highlightScheme.Normal;
+            }
+        };
 
         // -- Detail panel -----------------------------------------------------
         FrameView detailPanel = new ()
@@ -73,7 +92,7 @@ public class GenericListView : Scenario
             X = Pos.Right (_listView) + 1,
             Y = Pos.Top (_listView),
             Width = Dim.Fill (),
-            Height = _listView.Height
+            Height = 9
         };
         appWindow.Add (detailPanel);
 
@@ -102,8 +121,8 @@ public class GenericListView : Scenario
         _eventListView = new ListView
         {
             Title = "_Events",
-            X = 0,
-            Y = Pos.Bottom (_listView) + 1,
+            X = Pos.Right (_listView) + 1,
+            Y = Pos.Bottom (detailPanel) + 1,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (_eventList),
@@ -181,4 +200,9 @@ public class GenericListView : Scenario
 }
 
 /// <summary>A simple record used to demonstrate <see cref="ListView{T}"/>.</summary>
-internal record Country (string Name, string Capital, int Population);
+internal record Country (string Name, string Capital, int Population)
+{
+    // Overriding ToString() so ListView<Country> displays the country name
+    // without needing an AspectGetter delegate.
+    public override string ToString () => Name;
+}

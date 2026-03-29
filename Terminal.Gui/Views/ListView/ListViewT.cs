@@ -28,7 +28,6 @@ namespace Terminal.Gui.Views;
 public class ListView<T> : ListView, IValue<T>
 {
     private ObservableCollection<T>? _typedSource;
-    private Func<T, string>? _aspectGetter;
 
     /// <summary>
     ///     Initializes a new instance of <see cref="ListView{T}"/>.
@@ -37,32 +36,6 @@ public class ListView<T> : ListView, IValue<T>
     {
         base.ValueChanging += TranslateValueChanging;
         base.ValueChanged += TranslateValueChanged;
-    }
-
-    /// <summary>
-    ///     Gets or sets a delegate that converts an item of type <typeparamref name="T"/> to its display string.
-    ///     When <see langword="null"/> (the default), items are converted using <see cref="object.ToString()"/>.
-    /// </summary>
-    /// <value>
-    ///     A <see cref="Func{T,TResult}"/> that accepts an item and returns the string to display,
-    ///     or <see langword="null"/> to use <see cref="object.ToString()"/>.
-    /// </value>
-    /// <remarks>
-    ///     Setting this property updates the underlying <see cref="ListWrapper{T}"/> immediately if the source is
-    ///     already set. It is also applied automatically whenever <see cref="SetSource"/> is called.
-    /// </remarks>
-    public Func<T, string>? AspectGetter
-    {
-        get => _aspectGetter;
-        set
-        {
-            _aspectGetter = value;
-
-            if (Source is ListWrapper<T> wrapper)
-            {
-                wrapper.AspectGetter = value;
-            }
-        }
     }
 
     /// <summary>
@@ -76,11 +49,6 @@ public class ListView<T> : ListView, IValue<T>
     {
         _typedSource = source;
         base.SetSource<T> (source);
-
-        if (_aspectGetter is not null && Source is ListWrapper<T> wrapper)
-        {
-            wrapper.AspectGetter = _aspectGetter;
-        }
     }
 
     #region IValue<T> Implementation

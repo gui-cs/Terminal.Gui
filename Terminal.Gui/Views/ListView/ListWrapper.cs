@@ -6,7 +6,7 @@ namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Provides a default implementation of <see cref="IListDataSource"/> that renders <see cref="ListView"/> items
-///     using <see cref="object.ToString()"/>, or a custom <see cref="AspectGetter"/> delegate when provided.
+///     using <see cref="object.ToString()"/>.
 /// </summary>
 public class ListWrapper<T> : IListDataSource
 {
@@ -31,28 +31,6 @@ public class ListWrapper<T> : IListDataSource
     private readonly ObservableCollection<T>? _source;
     private int _count;
     private BitArray? _marks;
-    private Func<T, string>? _aspectGetter;
-
-    /// <summary>
-    ///     Gets or sets a delegate that converts an item of type <typeparamref name="T"/> to its display string.
-    ///     When <see langword="null"/> (the default), items are converted using <see cref="object.ToString()"/>.
-    /// </summary>
-    /// <value>
-    ///     A <see cref="Func{T,TResult}"/> that accepts an item and returns the string to display,
-    ///     or <see langword="null"/> to use <see cref="object.ToString()"/>.
-    /// </value>
-    /// <remarks>
-    ///     Setting this property immediately recalculates <see cref="MaxItemLength"/>.
-    /// </remarks>
-    public Func<T, string>? AspectGetter
-    {
-        get => _aspectGetter;
-        set
-        {
-            _aspectGetter = value;
-            MaxItemLength = GetMaxLengthItem ();
-        }
-    }
 
     /// <inheritdoc/>
     public event NotifyCollectionChangedEventHandler? CollectionChanged;
@@ -90,21 +68,14 @@ public class ListWrapper<T> : IListDataSource
 
         T typedItem = _source [item];
 
-        if (_aspectGetter is not null)
+        string text = typedItem switch
         {
-            RenderString (container, _aspectGetter (typedItem), width, viewportX);
+            null => "",
+            string s => s,
+            _ => typedItem.ToString ()!
+        };
 
-            return;
-        }
-
-        switch ((object?)typedItem)
-        {
-            case null: RenderString (container, "", width); break;
-
-            case string s: RenderString (container, s, width, viewportX); break;
-
-            default: RenderString (container, typedItem!.ToString ()!, width, viewportX); break;
-        }
+        RenderString (container, text, width, viewportX);
     }
 
     /// <inheritdoc/>
@@ -222,23 +193,14 @@ public class ListWrapper<T> : IListDataSource
         {
             T typedItem = _source [i];
 
-            int l;
+            object? t = typedItem;
 
-            if (_aspectGetter is not null)
+            if (t is null)
             {
-                l = _aspectGetter (typedItem).GetColumns ();
+                continue;
             }
-            else
-            {
-                object? t = typedItem;
 
-                if (t is null)
-                {
-                    continue;
-                }
-
-                l = t is string u ? u.GetColumns () : t.ToString ()!.Length;
-            }
+            int l = t is string s ? s.GetColumns () : t.ToString ()!.GetColumns ();
 
             if (l > maxLength)
             {

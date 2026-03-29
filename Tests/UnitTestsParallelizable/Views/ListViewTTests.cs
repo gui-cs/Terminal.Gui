@@ -283,30 +283,4 @@ public class ListViewTTests
         Assert.Equal (1, listView.Index);
         Assert.Equal ("beta", listView.Value);
     }
-
-    [Fact]
-    public void AspectGetter_SetBeforeSetSource_AppliedToWrapper ()
-    {
-        ObservableCollection<string> source = ["a", "bb", "ccc"];
-        ListView<string> listView = new ();
-        listView.AspectGetter = s => $"[{s}]"; // "[ccc]" = 5
-
-        listView.SetSource (source);
-
-        Assert.Equal (5, listView.Source?.MaxItemLength);
-    }
-
-    [Fact]
-    public void AspectGetter_SetAfterSetSource_UpdatesWrapper ()
-    {
-        ObservableCollection<string> source = ["a", "bb", "ccc"];
-        ListView<string> listView = new ();
-        listView.SetSource (source);
-
-        int before = listView.Source?.MaxItemLength ?? 0; // "ccc" = 3
-        listView.AspectGetter = s => $"({s})"; // "(ccc)" = 5
-
-        Assert.Equal (3, before);
-        Assert.Equal (5, listView.Source?.MaxItemLength);
-    }
 }
