@@ -6,14 +6,16 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         When a <see cref="View"/> has <see cref="ViewportSettingsFlags.Transparent"/> set, the <see cref="DrawContext"/>
+///         When a <see cref="View"/> has <see cref="ViewportSettingsFlags.Transparent"/> set, the
+///         <see cref="DrawContext"/>
 ///         is used to track exactly which areas of the screen have been drawn to. After drawing is complete, these drawn
 ///         regions are excluded from the clip region, allowing views beneath the transparent view to show through in
 ///         the areas that were not drawn.
 ///     </para>
 ///     <para>
 ///         All coordinates tracked by <see cref="DrawContext"/> are in <b>screen-relative coordinates</b>. When reporting
-///         drawn areas from within <see cref="View.OnDrawingContent(DrawContext?)"/>, use <see cref="View.ViewportToScreen(in Rectangle)"/>
+///         drawn areas from within <see cref="View.OnDrawingContent(DrawContext?)"/>, use
+///         <see cref="View.ViewportToScreen(in Rectangle)"/>
 ///         or <see cref="View.ContentToScreen(in Point)"/> to convert viewport-relative or content-relative coordinates to
 ///         screen-relative coordinates before calling <see cref="AddDrawnRectangle"/> or <see cref="AddDrawnRegion"/>.
 ///     </para>
@@ -28,79 +30,41 @@ namespace Terminal.Gui.ViewBase;
 ///             Rectangle rect2 = new Rectangle (8, 8, 4, 7);
 ///             FillRect (rect1, Glyphs.BlackCircle);
 ///             FillRect (rect2, Glyphs.BlackCircle);
-///
+/// 
 ///             // Report the drawn region in screen-relative coordinates
 ///             Region drawnRegion = new Region (ViewportToScreen (rect1));
 ///             drawnRegion.Union (ViewportToScreen (rect2));
 ///             context?.AddDrawnRegion (drawnRegion);
-///
+/// 
 ///             return true;
 ///         }
 ///     </code>
 /// </remarks>
 public class DrawContext
 {
-    private readonly Region _drawnRegion = new Region ();
-    private readonly Region _clearedRegion = new Region ();
+    private readonly Region _drawnRegion = new ();
 
     /// <summary>
-    /// Gets a copy of the region drawn so far in this context.
+    ///     Gets a copy of the region drawn so far in this context.
     /// </summary>
     /// <remarks>
     ///     The returned region contains all areas that have been reported as drawn via <see cref="AddDrawnRectangle"/>
-    ///     or <see cref="AddDrawnRegion"/>, in screen-relative coordinates. This includes areas that were cleared
-    ///     via <see cref="AddClearedRectangle"/>.
+    ///     or <see cref="AddDrawnRegion"/>, in screen-relative coordinates.
     /// </remarks>
     public Region GetDrawnRegion () => _drawnRegion.Clone ();
 
     /// <summary>
-    /// Gets a copy of the region that was cleared (filled with background) but not explicitly drawn with content.
-    /// </summary>
-    /// <remarks>
-    ///     Cleared regions are tracked separately from content-drawn regions to support
-    ///     <see cref="ViewportSettingsFlags.TransparentMouse"/> hit-testing. Cleared areas protect
-    ///     opaque views from being overwritten by peer views, but should not be considered
-    ///     "drawn content" for mouse hit-testing on transparent views.
-    /// </remarks>
-    public Region GetClearedRegion () => _clearedRegion.Clone ();
-
-    /// <summary>
-    /// Reports that a rectangle has been drawn.
+    ///     Reports that a rectangle has been drawn.
     /// </summary>
     /// <param name="rect">The rectangle that was drawn, in screen-relative coordinates.</param>
     /// <remarks>
     ///     When called from within <see cref="View.OnDrawingContent(DrawContext?)"/>, ensure the rectangle is in
     ///     screen-relative coordinates by using <see cref="View.ViewportToScreen(in Rectangle)"/> or similar methods.
     /// </remarks>
-    public void AddDrawnRectangle (Rectangle rect)
-    {
-        _drawnRegion.Combine (rect, RegionOp.Union);
-
-        // Content drawn over a previously cleared area supersedes the clear.
-        // Remove this area from the cleared region so it is treated as drawn content
-        // for TransparentMouse hit-testing.
-        _clearedRegion.Exclude (rect);
-    }
+    public void AddDrawnRectangle (Rectangle rect) => _drawnRegion.Combine (rect, RegionOp.Union);
 
     /// <summary>
-    /// Reports that a rectangle was cleared (filled with background).
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         Cleared areas are added to both the drawn region (for clip exclusion, preventing peer
-    ///         views from overwriting) and the cleared region (so transparent views can exclude them
-    ///         from <see cref="View.CachedDrawnRegion"/> for mouse hit-testing).
-    ///     </para>
-    /// </remarks>
-    /// <param name="rect">The rectangle that was cleared, in screen-relative coordinates.</param>
-    public void AddClearedRectangle (Rectangle rect)
-    {
-        _drawnRegion.Combine (rect, RegionOp.Union);
-        _clearedRegion.Combine (rect, RegionOp.Union);
-    }
-
-    /// <summary>
-    /// Reports that a region has been drawn.
+    ///     Reports that a region has been drawn.
     /// </summary>
     /// <param name="region">The region that was drawn, in screen-relative coordinates.</param>
     /// <remarks>
@@ -114,31 +78,19 @@ public class DrawContext
     ///         rectangle in the region.
     ///     </para>
     /// </remarks>
-    public void AddDrawnRegion (Region region)
-    {
-        _drawnRegion.Combine (region, RegionOp.Union);
-
-        // Content drawn over a previously cleared area supersedes the clear.
-        _clearedRegion.Exclude (region);
-    }
+    public void AddDrawnRegion (Region region) => _drawnRegion.Combine (region, RegionOp.Union);
 
     /// <summary>
-    /// Clips (intersects) the drawn region with the specified rectangle.
-    /// This modifies the internal drawn region directly.
+    ///     Clips (intersects) the drawn region with the specified rectangle.
+    ///     This modifies the internal drawn region directly.
     /// </summary>
     /// <param name="clipRect">The clipping rectangle, in screen-relative coordinates.</param>
-    public void ClipDrawnRegion (Rectangle clipRect)
-    {
-        _drawnRegion.Intersect (clipRect);
-    }
+    public void ClipDrawnRegion (Rectangle clipRect) => _drawnRegion.Intersect (clipRect);
 
     /// <summary>
-    /// Clips (intersects) the drawn region with the specified region.
-    /// This modifies the internal drawn region directly.
+    ///     Clips (intersects) the drawn region with the specified region.
+    ///     This modifies the internal drawn region directly.
     /// </summary>
     /// <param name="clipRegion">The clipping region, in screen-relative coordinates.</param>
-    public void ClipDrawnRegion (Region clipRegion)
-    {
-        _drawnRegion.Intersect (clipRegion);
-    }
+    public void ClipDrawnRegion (Region clipRegion) => _drawnRegion.Intersect (clipRegion);
 }

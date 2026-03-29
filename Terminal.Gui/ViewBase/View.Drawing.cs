@@ -114,6 +114,14 @@ public partial class View // Drawing APIs
             // If no context ...
             context ??= new DrawContext ();
 
+            // Per-view context tracks only what THIS view draws (text + content).
+            // Used for CachedDrawnRegion (TransparentMouse hit-testing) so that a
+            // transparent view's hit region reflects only its own draws, not its
+            // SuperView's ClearViewport or peer SubViews' content.
+            // This follows the same pattern as DrawAdornments(), which creates
+            // per-adornment DrawContexts for the same reason.
+            _localDrawContext = new DrawContext ();
+
             SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
             DoClearViewport (context);
 
@@ -126,15 +134,19 @@ public partial class View // Drawing APIs
             }
 
             // ------------------------------------
-            // Draw the text
+            // Draw the text — tracked in both shared (clip exclusion) and local (hit-testing) contexts
             Trace.Draw (this.ToIdentifyingString (), "Text");
             SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
-            DoDrawText (context);
+            DoDrawText (_localDrawContext);
 
             // ------------------------------------
-            // Draw the content
+            // Draw the content — tracked in both shared (clip exclusion) and local (hit-testing) contexts
             Trace.Draw (this.ToIdentifyingString (), "Content");
-            DoDrawContent (context);
+            DoDrawContent (_localDrawContext);
+
+            // Merge this view's own draws into the shared context so the SuperView
+            // can track the aggregate for clip exclusion.
+            context.AddDrawnRegion (_localDrawContext.GetDrawnRegion ());
 
             // ------------------------------------
             // Draw the line canvas
@@ -466,7 +478,7 @@ public partial class View // Drawing APIs
 
         Driver.FillRect (toClear);
 
-        context?.AddClearedRectangle (toClear);
+        context?.AddDrawnRectangle (toClear);
 
         SetNeedsDraw ();
     }
@@ -859,6 +871,13 @@ public partial class View // Drawing APIs
     private Region? _lastLineCanvasRegion;
 
     /// <summary>
+    ///     Per-view <see cref="DrawContext"/> that tracks only what THIS view drew (text + content),
+    ///     isolated from the shared context. Used to compute <see cref="CachedDrawnRegion"/> for
+    ///     <see cref="ViewportSettingsFlags.TransparentMouse"/> hit-testing.
+    /// </summary>
+    private DrawContext? _localDrawContext;
+
+    /// <summary>
     ///     Called at the end of <see cref="Draw(DrawContext)"/> to finalize drawing and update the clip region.
     /// </summary>
     /// <param name="context">
@@ -886,8 +905,8 @@ public partial class View // Drawing APIs
         // DrawContexts. We combine with _lastLineCanvasRegion (rendered by the parent) for Border.
         // All three adornment types are handled uniformly.
         CacheAdornmentDrawnRegion (Border, _lastLineCanvasRegion);
-        CacheAdornmentDrawnRegion (Margin, lastLineCanvasRegion: null);
-        CacheAdornmentDrawnRegion (Padding, lastLineCanvasRegion: null);
+        CacheAdornmentDrawnRegion (Margin, null);
+        CacheAdornmentDrawnRegion (Padding, null);
 
         bool marginTransparent = Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
         bool borderTransparent = Border.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
@@ -924,7 +943,7 @@ public partial class View // Drawing APIs
         }
         else
         {
-            AddDrawnRegionForAdornment (Margin, lastLineCanvasRegion: null);
+            AddDrawnRegionForAdornment (Margin, null);
         }
 
         if (!borderTransparent)
@@ -942,7 +961,7 @@ public partial class View // Drawing APIs
         }
         else
         {
-            AddDrawnRegionForAdornment (Padding, lastLineCanvasRegion: null);
+            AddDrawnRegionForAdornment (Padding, null);
         }
 
         if (!viewTransparent)
@@ -969,28 +988,14 @@ public partial class View // Drawing APIs
         ExcludeFromClip (exclusion);
 
         // Cache the view's own drawn region for TransparentMouse hit-testing.
-        // This must be computed BEFORE adding the exclusion to the context, because
-        // AddDrawnRegion modifies the cleared region tracking (content supersedes clears),
-        // which would make the CachedDrawnRegion include the entire exclusion area rather
-        // than just the explicitly drawn content.
+        // Uses _localDrawContext (per-view) rather than the shared context, so that only
+        // cells THIS view drew (text + content) are captured — not the SuperView's
+        // ClearViewport fill or peer SubViews' content.
         if (ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
         {
             if (viewTransparent || borderTransparent)
             {
-                Region? drawnRegion = context?.GetDrawnRegion ();
-
-                // Exclude cleared-but-not-content-drawn regions from CachedDrawnRegion.
-                // ClearViewport fills the viewport with spaces and tracks those areas as
-                // "cleared" in the context. For TransparentMouse hit-testing, only cells
-                // with actual content should capture mouse events, not background fills.
-                Region? cleared = context?.GetClearedRegion ();
-
-                if (drawnRegion is { } && cleared is { })
-                {
-                    drawnRegion.Exclude (cleared);
-                }
-
-                CachedDrawnRegion = drawnRegion;
+                CachedDrawnRegion = _localDrawContext?.GetDrawnRegion ();
             }
             else
             {
