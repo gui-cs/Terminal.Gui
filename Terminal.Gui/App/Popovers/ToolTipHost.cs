@@ -105,11 +105,6 @@ public class ToolTipHost<TView> : PopoverImpl, IDesignable where TView : View, n
     /// </param>
     public override void MakeVisible (Point? idealScreenPosition = null, Rectangle? anchor = null)
     {
-        if (Visible)
-        {
-            return;
-        }
-
         Layout ();
         SetPosition (idealScreenPosition, anchor);
 
