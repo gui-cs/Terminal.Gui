@@ -145,7 +145,6 @@ public class BorderDrawTests (ITestOutputHelper output) : TestDriverBase
                                               app.Driver);
     }
 
-
     [Fact]
     public void AutoLineJoin_SideBySide_Overlapping_Peers_Join_Correctly ()
     {
