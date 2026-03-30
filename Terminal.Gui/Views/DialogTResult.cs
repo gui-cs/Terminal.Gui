@@ -197,19 +197,12 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
             return;
         }
 
-        int subViewsWidth = _minimumSubViewsSize.Width;
-
-        if (!Width.Has<DimAuto> (out _))
-        {
-            subViewsWidth = Math.Max (subViewsWidth, Viewport.Width);
-        }
-
-        int subViewsHeight = _minimumSubViewsSize.Height;
-
-        if (!Height.Has<DimAuto> (out _))
-        {
-            subViewsHeight = Math.Max (subViewsHeight, Viewport.Height);
-        }
+        // Always floor at Viewport size — the content area should never be smaller
+        // than what's visible. For DimAuto dialogs, the Frame may be larger than
+        // _minimumSubViewsSize (e.g. due to title width), so the content area
+        // should reflect the actual available space.
+        int subViewsWidth = Math.Max (_minimumSubViewsSize.Width, Viewport.Width);
+        int subViewsHeight = Math.Max (_minimumSubViewsSize.Height, Viewport.Height);
 
         SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, subViewsWidth), Math.Max (_minimumButtonsSize.Height, subViewsHeight)));
     }

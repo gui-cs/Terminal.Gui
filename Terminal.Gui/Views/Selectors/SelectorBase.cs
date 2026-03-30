@@ -529,6 +529,19 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
                 SubViews.ElementAt (i).Width = Dim.Auto ();
             }
         }
+
+        // Pre-calculate each subview's Frame.Width for horizontal layout so that
+        // Dim.Auto (DimAutoStyle.Content) on the selector can correctly compute its
+        // total width via PosAlign.CalculateMinDimension, which reads Frame.Width.
+        // Without this, newly-created subviews have Frame.Width == 0 on the first
+        // layout pass, causing the selector to be sized too narrow.
+        if (Orientation == Orientation.Horizontal && SubViews.Count > 0)
+        {
+            foreach (View sv in SubViews)
+            {
+                sv.SetRelativeLayout (GetContainerSize ());
+            }
+        }
     }
 
     /// <summary>
