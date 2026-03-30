@@ -14,7 +14,7 @@ public class DatePicker : View, IValue<DateTime>
 {
     private TableView? _calendar;
     private DateTime _date;
-    private DateField? _dateField;
+    private DateEditor? _dateEditor;
     private Label? _dateLabel;
     private Button? _nextMonthButton;
     private Button? _previousMonthButton;
@@ -36,6 +36,12 @@ public class DatePicker : View, IValue<DateTime>
             {
                 CultureInfo.CurrentCulture = value;
                 Text = Value.ToString (Format);
+
+                // Propagate format to embedded editor
+                if (_dateEditor is { })
+                {
+                    _dateEditor.Format = value.DateTimeFormat;
+                }
             }
         }
     }
@@ -84,6 +90,12 @@ public class DatePicker : View, IValue<DateTime>
 
             _date = value;
 
+            // Propagate value to embedded editor
+            if (_dateEditor is { })
+            {
+                _dateEditor.Value = value;
+            }
+
             ValueChangedEventArgs<DateTime> changedArgs = new (oldValue, _date);
             OnValueChanged (changedArgs);
             ValueChanged?.Invoke (this, changedArgs);
@@ -94,7 +106,7 @@ public class DatePicker : View, IValue<DateTime>
     /// <inheritdoc/>
     object? IValue.GetValue () => _date;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>
@@ -118,14 +130,14 @@ public class DatePicker : View, IValue<DateTime>
 
     #endregion
 
-    private string Format => StandardizeDateFormat (Culture?.DateTimeFormat.ShortDatePattern);
+    private string Format => DateTextProvider.NormalizePattern (Culture?.DateTimeFormat.ShortDatePattern ?? "MM/dd/yyyy");
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
         _dateLabel?.Dispose ();
         _calendar?.Dispose ();
-        _dateField?.Dispose ();
+        _dateEditor?.Dispose ();
         _table?.Dispose ();
         _previousMonthButton?.Dispose ();
         _nextMonthButton?.Dispose ();
@@ -135,7 +147,7 @@ public class DatePicker : View, IValue<DateTime>
     private void ChangeDayDate (int day)
     {
         Value = new DateTime (Value.Year, Value.Month, day);
-        _dateField!.Value = Value;
+        _dateEditor!.Value = Value;
         CreateCalendar ();
     }
 
@@ -173,18 +185,13 @@ public class DatePicker : View, IValue<DateTime>
         return _table;
     }
 
-    private void DateField_ValueChanged (object? sender, ValueChangedEventArgs<DateTime?> e)
+    private void DateEditor_ValueChanged (object? sender, ValueChangedEventArgs<DateTime> e)
     {
-        if (!e.NewValue.HasValue)
-        {
-            return;
-        }
+        Value = e.NewValue;
 
-        Value = e.NewValue.Value;
-
-        if (e.NewValue.Value.Day != Value.Day)
+        if (e.NewValue.Day != Value.Day)
         {
-            SelectDayOnCalendar (e.NewValue.Value.Day);
+            SelectDayOnCalendar (e.NewValue.Day);
         }
 
         if (Value.Month == DateTime.MinValue.Month && Value.Year == DateTime.MinValue.Year)
@@ -264,17 +271,17 @@ public class DatePicker : View, IValue<DateTime>
             Y = Pos.Bottom (_dateLabel),
             Height = 11,
             Style = new TableStyle { ShowHeaders = true, ShowHorizontalBottomLine = true, ShowVerticalCellLines = true, ExpandLastColumn = true },
-            MultiSelect = false,
+            MultiSelect = false
         };
 
-        _dateField = new DateField (DateTime.Now)
+        _dateEditor = new DateEditor
         {
-            Id = "_dateField",
+            Id = "_dateEditor",
             X = Pos.Right (_dateLabel),
             Y = 0,
             Width = Dim.Width (_calendar) - Dim.Width (_dateLabel),
             Height = 1,
-            Culture = Culture
+            Value = date
         };
 
         _previousMonthButton = new Button
@@ -287,7 +294,7 @@ public class DatePicker : View, IValue<DateTime>
             MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             NoPadding = true,
             NoDecorations = true,
-            ShadowStyle = ShadowStyle.None
+            ShadowStyle = null
         };
         _previousMonthButton.Accepting += (_, _) => AdjustMonth (-1);
 
@@ -301,7 +308,7 @@ public class DatePicker : View, IValue<DateTime>
             MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             NoPadding = true,
             NoDecorations = true,
-            ShadowStyle = ShadowStyle.None
+            ShadowStyle = null
         };
 
         _nextMonthButton.Accepting += (_, _) => AdjustMonth (1);
@@ -328,51 +335,18 @@ public class DatePicker : View, IValue<DateTime>
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
 
-        _dateField.ValueChanged += DateField_ValueChanged;
+        _dateEditor.ValueChanged += DateEditor_ValueChanged;
 
-        Add (_dateLabel, _dateField, _calendar, _previousMonthButton, _nextMonthButton);
+        Add (_dateLabel, _dateEditor, _calendar, _previousMonthButton, _nextMonthButton);
     }
 
     private void AdjustMonth (int offset)
     {
         Value = Value.AddMonths (offset);
         CreateCalendar ();
-        _dateField!.Value = Value;
+        _dateEditor!.Value = Value;
     }
 
     /// <inheritdoc/>
     protected override bool OnDrawingText () => true;
-
-    private static string StandardizeDateFormat (string? format) =>
-        format switch
-        {
-            "MM/dd/yyyy" => "MM/dd/yyyy",
-            "yyyy-MM-dd" => "yyyy-MM-dd",
-            "yyyy/MM/dd" => "yyyy/MM/dd",
-            "dd/MM/yyyy" => "dd/MM/yyyy",
-            "d?/M?/yyyy" => "dd/MM/yyyy",
-            "dd.MM.yyyy" => "dd.MM.yyyy",
-            "dd-MM-yyyy" => "dd-MM-yyyy",
-            "dd/MM yyyy" => "dd/MM/yyyy",
-            "d. M. yyyy" => "dd.MM.yyyy",
-            "yyyy.MM.dd" => "yyyy.MM.dd",
-            "g yyyy/M/d" => "yyyy/MM/dd",
-            "d/M/yyyy" => "dd/MM/yyyy",
-            "d?/M?/yyyy g" => "dd/MM/yyyy",
-            "d-M-yyyy" => "dd-MM-yyyy",
-            "d.MM.yyyy" => "dd.MM.yyyy",
-            "d.MM.yyyy '?'." => "dd.MM.yyyy",
-            "M/d/yyyy" => "MM/dd/yyyy",
-            "d. M. yyyy." => "dd.MM.yyyy",
-            "d.M.yyyy." => "dd.MM.yyyy",
-            "g yyyy-MM-dd" => "yyyy-MM-dd",
-            "d.M.yyyy" => "dd.MM.yyyy",
-            "d/MM/yyyy" => "dd/MM/yyyy",
-            "yyyy/M/d" => "yyyy/MM/dd",
-            "dd. MM. yyyy." => "dd.MM.yyyy",
-            "yyyy. MM. dd." => "yyyy.MM.dd",
-            "yyyy. M. d." => "yyyy.MM.dd",
-            "d. MM. yyyy" => "dd.MM.yyyy",
-            _ => "dd/MM/yyyy"
-        };
 }

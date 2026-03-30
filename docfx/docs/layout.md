@@ -174,7 +174,7 @@ classDiagram
     class Margin ["Margin — where Shadows live"]
     class Border ["Border — Title and Arrangement controls"]
     class Padding ["Padding — where ScrollBars live"]
-    class Adornment
+    class AdornmentImpl ["AdornmentImpl — lightweight settings"]
     class Thickness ["Thickness — each side has a width"]
 
     View --> Frame
@@ -182,10 +182,10 @@ classDiagram
     View --> Margin : has
     View --> Border : has
     View --> Padding : has
-    Margin --|> Adornment
-    Border --|> Adornment
-    Padding --|> Adornment
-    Adornment --> Thickness : has
+    Margin --|> AdornmentImpl
+    Border --|> AdornmentImpl
+    Padding --|> AdornmentImpl
+    AdornmentImpl --> Thickness : has
 ```
 
 ## How To

@@ -156,9 +156,9 @@ public class TextViewInputTests
 
     // CoPilot - decomposed from KeyBindings_Command test
     [Fact]
-    public void CtrlR_Redo_Reapplies_Undone_Change ()
+    public void CtrlY_Redo_Reapplies_Undone_Change ()
     {
-        // Test that Ctrl+R redoes the last undone change
+        // Test that Ctrl+Y redoes the last undone change
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
@@ -176,7 +176,7 @@ public class TextViewInputTests
         Assert.Equal (new Point (23, 2), tv.InsertionPoint);
 
         // Redo should reapply the 'F' character
-        Assert.True (tv.NewKeyDownEvent (Key.R.WithCtrl));
+        Assert.True (tv.NewKeyDownEvent (Key.Y.WithCtrl));
 
         Assert.Equal ($"This is the first line.{Environment.NewLine}This is the second line.{Environment.NewLine}This is the third line.F", tv.Text);
         Assert.Equal (new Point (24, 2), tv.InsertionPoint);

@@ -1,3 +1,5 @@
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
@@ -53,16 +55,10 @@ internal class AnsiSizeMonitor : ISizeMonitor
             return;
         }
 
-        // Set up the callback to queue ANSI requests through the driver
         _queueAnsiRequest = driver.QueueAnsiRequest;
 
-        //Logging.Information ("ANSISizeMonitor: Initialized with driver, sending initial size query");
+        Trace.Lifecycle (nameof (AnsiSizeMonitor), "Initialize", "Driver wired up; sending initial size query");
 
-        // Send the initial size query - response will arrive asynchronously
-        // once the input thread starts reading. We don't block here because:
-        // 1. The input thread may not have started yet
-        // 2. Blocking would create a deadlock (waiting for input that can't be read yet)
-        // 3. The response typically arrives within milliseconds after the input thread starts
         SendSizeQuery ();
     }
 
@@ -78,7 +74,9 @@ internal class AnsiSizeMonitor : ISizeMonitor
         _expectingResponse = true;
         _lastQuery = DateTime.Now;
 
-        var request = new AnsiEscapeSequenceRequest
+        Trace.Lifecycle (nameof (AnsiSizeMonitor), "SendSizeQuery", "Queuing CSI 18t size query");
+
+        AnsiEscapeSequenceRequest request = new ()
         {
             Request = EscSeqUtils.CSI_ReportWindowSizeInChars.Request,
             Value = EscSeqUtils.CSI_ReportWindowSizeInChars.Value,
@@ -122,6 +120,8 @@ internal class AnsiSizeMonitor : ISizeMonitor
         {
             return false;
         }
+
+        Trace.Lifecycle (nameof (AnsiSizeMonitor), "SizeChanged", $"{_lastSize} → {currentSize}");
         _lastSize = currentSize;
         SizeChanged?.Invoke (this, new SizeChangedEventArgs (currentSize));
 
@@ -130,7 +130,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
 
     private void HandleSizeResponse (string? response)
     {
-        //Logging.Trace($"{response}");
+        Trace.Lifecycle (nameof (AnsiSizeMonitor), "HandleSizeResponse", $"Response: '{response ?? "<null>"}'");
         _expectingResponse = false;
 
         if (string.IsNullOrEmpty (response))

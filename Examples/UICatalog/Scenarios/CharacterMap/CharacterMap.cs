@@ -68,7 +68,7 @@ public class CharacterMap : Scenario
             Menus =
             [
                 new MenuBarItem (Strings.menuFile,
-                                 new MenuItem [] { new (Strings.cmdQuit, $"{Application.QuitKey}", () => _charMap?.App?.RequestStop ()) }),
+                                 new MenuItem [] { new (Strings.cmdQuit, $"{Application.GetDefaultKey (Command.Quit)}", () => _charMap?.App?.RequestStop ()) }),
                 new MenuBarItem ("_Options", [CreateMenuShowWidth (), CreateMenuUnicodeCategorySelector ()])
             ]
         };

@@ -22,7 +22,7 @@ namespace Terminal.Gui.Drawing;
 public record struct Thickness
 {
     /// <summary>Initializes a new instance of the <see cref="Thickness"/> class with all widths set to 0.</summary>
-    public Thickness () { _sides = Vector4.Zero; }
+    public Thickness () => _sides = Vector4.Zero;
 
     /// <summary>Initializes a new instance of the <see cref="Thickness"/> class with a uniform width to each side.</summary>
     /// <param name="width"></param>
@@ -52,15 +52,11 @@ public record struct Thickness
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public readonly Thickness Add (Thickness other) { return new (Left + other.Left, Top + other.Top, Right + other.Right, Bottom + other.Bottom); }
+    public readonly Thickness Add (Thickness other) => new (Left + other.Left, Top + other.Top, Right + other.Right, Bottom + other.Bottom);
 
     /// <summary>Gets or sets the width of the lower side of the rectangle.</summary>
     [JsonInclude]
-    public int Bottom
-    {
-        readonly get => (int)_sides.W;
-        set => _sides.W = value;
-    }
+    public int Bottom { readonly get => (int)_sides.W; set => _sides.W = value; }
 
     /// <summary>
     ///     Gets whether the specified coordinates lie within the thickness (inside the bounding rectangle but outside
@@ -120,39 +116,25 @@ public record struct Thickness
         // Draw the Top side
         if (Top > 0)
         {
-            driver?.FillRect (rect with { Height = Math.Min (rect.Height, Top) }, topChar);
+            driver.FillRect (rect with { Height = Math.Min (rect.Height, Top) }, topChar);
         }
 
         // Draw the Left side
         if (Left > 0)
         {
-            driver?.FillRect (rect with { Width = Math.Min (rect.Width, Left) }, leftChar);
+            driver.FillRect (rect with { Width = Math.Min (rect.Width, Left) }, leftChar);
         }
 
         // Draw the Right side
         if (Right > 0)
         {
-            driver?.FillRect (
-                              rect with
-                              {
-                                  X = Math.Max (0, rect.X + rect.Width - Right),
-                                  Width = Math.Min (rect.Width, Right)
-                              },
-                              rightChar
-                             );
+            driver.FillRect (rect with { X = Math.Max (0, rect.X + rect.Width - Right), Width = Math.Min (rect.Width, Right) }, rightChar);
         }
 
         // Draw the Bottom side
         if (Bottom > 0)
         {
-            driver?.FillRect (
-                              rect with
-                              {
-                                  Y = rect.Y + Math.Max (0, rect.Height - Bottom),
-                                  Height = Bottom
-                              },
-                              bottomChar
-                             );
+            driver.FillRect (rect with { Y = rect.Y + Math.Max (0, rect.Height - Bottom), Height = Bottom }, bottomChar);
         }
 
         if (diagnosticFlags.HasFlag (ViewDiagnosticFlags.Ruler))
@@ -163,7 +145,7 @@ public record struct Thickness
 
             if (Top > 0)
             {
-                hRuler.Draw (driver: driver, location: rect.Location);
+                hRuler.Draw (driver, rect.Location);
             }
 
             //Left
@@ -177,35 +159,34 @@ public record struct Thickness
             // Bottom
             if (Bottom > 0)
             {
-                hRuler.Draw (driver: driver, location: rect.Location with { Y = rect.Y + rect.Height - 1 });
+                hRuler.Draw (driver, rect.Location with { Y = rect.Y + rect.Height - 1 });
             }
 
             // Right
             if (Right > 0)
             {
-                vRuler.Draw (driver, new (rect.X + rect.Width - 1, rect.Y + 1), 1);
+                vRuler.Draw (driver, new Point (rect.X + rect.Width - 1, rect.Y + 1), 1);
             }
         }
 
-        if (diagnosticFlags.HasFlag (ViewDiagnosticFlags.Thickness))
+        if (!diagnosticFlags.HasFlag (ViewDiagnosticFlags.Thickness))
         {
-            // Draw the diagnostics label on the bottom
-            string text = label is null ? string.Empty : $"{label} {this}";
-
-            TextFormatter tf = new ()
-            {
-                Text = text,
-                Alignment = Alignment.Center,
-                VerticalAlignment = Alignment.End,
-                ConstrainToWidth = text.GetColumns (),
-                ConstrainToHeight = 1
-            };
-
-            if (driver?.CurrentAttribute is { })
-            {
-                tf.Draw (driver, rect, driver!.CurrentAttribute, driver!.CurrentAttribute, rect);
-            }
+            return GetInside (rect);
         }
+
+        // Draw the diagnostics label on the bottom
+        string text = label is null ? string.Empty : $"{label} {this}";
+
+        TextFormatter tf = new ()
+        {
+            Text = text,
+            Alignment = Alignment.Center,
+            VerticalAlignment = Alignment.End,
+            ConstrainToWidth = text.GetColumns (),
+            ConstrainToHeight = 1
+        };
+
+        tf.Draw (driver, rect, driver.CurrentAttribute, driver.CurrentAttribute, rect);
 
         return GetInside (rect);
     }
@@ -233,7 +214,7 @@ public record struct Thickness
         int width = Math.Max (0, rect.Size.Width - Horizontal);
         int height = Math.Max (0, rect.Size.Height - Vertical);
 
-        return new (x, y, width, height);
+        return new Rectangle (x, y, width, height);
     }
 
     /// <summary>
@@ -253,19 +234,11 @@ public record struct Thickness
     ///     Gets the total width of the left and right sides of the rectangle. Sets the width of the left and right sides
     ///     of the rectangle to half the specified value.
     /// </summary>
-    public int Horizontal
-    {
-        get => Left + Right;
-        set => Left = Right = value / 2;
-    }
+    public int Horizontal { get => Left + Right; set => Left = Right = value / 2; }
 
     /// <summary>Gets or sets the width of the left side of the rectangle.</summary>
     [JsonInclude]
-    public int Left
-    {
-        readonly get => (int)_sides.X;
-        set => _sides.X = value;
-    }
+    public int Left { readonly get => (int)_sides.X; set => _sides.X = value; }
 
     /// <summary>
     ///     Adds the thickness widths of another <see cref="Thickness"/> to another <see cref="Thickness"/>.
@@ -273,35 +246,23 @@ public record struct Thickness
     /// <param name="a"></param>
     /// <param name="b"></param>
     /// <returns></returns>
-    public static Thickness operator + (Thickness a, Thickness b) { return a.Add (b); }
+    public static Thickness operator + (Thickness a, Thickness b) => a.Add (b);
 
     /// <summary>Gets or sets the width of the right side of the rectangle.</summary>
     [JsonInclude]
-    public int Right
-    {
-        readonly get => (int)_sides.Z;
-        set => _sides.Z = value;
-    }
+    public int Right { readonly get => (int)_sides.Z; set => _sides.Z = value; }
 
     /// <summary>Gets or sets the width of the upper side of the rectangle.</summary>
     [JsonInclude]
-    public int Top
-    {
-        readonly get => (int)_sides.Y;
-        set => _sides.Y = value;
-    }
+    public int Top { readonly get => (int)_sides.Y; set => _sides.Y = value; }
 
     /// <summary>Returns the thickness widths of the Thickness formatted as a string.</summary>
     /// <returns>The thickness widths as a string.</returns>
-    public override string ToString () { return $"(Left={Left},Top={Top},Right={Right},Bottom={Bottom})"; }
+    public override string ToString () => $"(Left={Left},Top={Top},Right={Right},Bottom={Bottom})";
 
     /// <summary>
     ///     Gets the total height of the top and bottom sides of the rectangle. Sets the height of the top and bottom
     ///     sides of the rectangle to half the specified value.
     /// </summary>
-    public int Vertical
-    {
-        get => Top + Bottom;
-        set => Top = Bottom = value / 2;
-    }
+    public int Vertical { get => Top + Bottom; set => Top = Bottom = value / 2; }
 }

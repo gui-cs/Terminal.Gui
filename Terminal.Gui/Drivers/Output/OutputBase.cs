@@ -55,6 +55,9 @@ public abstract class OutputBase
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
 
+    // Last URL used for tracking hyperlink state
+    private string? _lastUrl = null;
+
     private readonly StringBuilder _lastOutputStringBuilder = new ();
     private bool _clearLastOutputPending;
 
@@ -83,6 +86,7 @@ public abstract class OutputBase
             }
 
             outputStringBuilder.Clear ();
+            _lastUrl = null; // Reset URL state at the start of each row
 
             // Process columns in row
             for (int col = left; col < cols; col++)
@@ -121,6 +125,29 @@ public abstract class OutputBase
                         lastCol = col;
                     }
 
+                    // Handle URL hyperlink state changes
+                    if (!IsLegacyConsole)
+                    {
+                        string? cellUrl = buffer.GetCellUrl (col, row);
+
+                        if (cellUrl != _lastUrl)
+                        {
+                            // If we were in a hyperlink, end it
+                            if (_lastUrl is { })
+                            {
+                                outputStringBuilder.Append (EscSeqUtils.OSC_EndHyperlink ());
+                            }
+
+                            // If starting a new hyperlink, begin it
+                            if (!string.IsNullOrEmpty (cellUrl))
+                            {
+                                outputStringBuilder.Append (EscSeqUtils.OSC_StartHyperlink (cellUrl));
+                            }
+
+                            _lastUrl = cellUrl;
+                        }
+                    }
+
                     // Append dirty cell as ANSI and mark clean
                     Cell cell = buffer.Contents [row, col];
                     buffer.Contents [row, col].IsDirty = false;
@@ -148,6 +175,13 @@ public abstract class OutputBase
             else
             {
                 SetCursorPositionImpl (lastCol, row);
+
+                // Close any open hyperlink before processing URLs
+                if (_lastUrl is { })
+                {
+                    outputStringBuilder.Append (EscSeqUtils.OSC_EndHyperlink ());
+                    _lastUrl = null;
+                }
 
                 // Wrap URLs with OSC 8 hyperlink sequences
                 StringBuilder processed = Osc8UrlLinker.WrapOsc8 (outputStringBuilder);

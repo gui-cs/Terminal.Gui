@@ -10,7 +10,7 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class CsiCursorPattern : AnsiKeyboardParserPattern
 {
-    private readonly Regex _pattern = new (@"^\u001b\[(?:1;(\d+))?([A-DFHPQRSZ])$");
+    private readonly Regex _pattern = new (@"^\u001b\[(?:1;(\d+(?::\d+)*))?([A-DFHPQRSZ])$");
 
     private readonly Dictionary<char, Key> _cursorMap = new ()
     {
@@ -61,21 +61,6 @@ public class CsiCursorPattern : AnsiKeyboardParserPattern
             return key;
         }
 
-        if (int.TryParse (modifierGroup, out int modifier))
-        {
-            key = modifier switch
-                  {
-                      2 => key.WithShift,
-                      3 => key.WithAlt,
-                      4 => key.WithAlt.WithShift,
-                      5 => key.WithCtrl,
-                      6 => key.WithCtrl.WithShift,
-                      7 => key.WithCtrl.WithAlt,
-                      8 => key.WithCtrl.WithAlt.WithShift,
-                      _ => key
-                  };
-        }
-
-        return key;
+        return ApplyModifiersAndEventType (modifierGroup, key);
     }
 }

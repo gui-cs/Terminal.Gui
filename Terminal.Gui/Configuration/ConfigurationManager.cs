@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Trace = Terminal.Gui.Tracing.Trace;
 
 namespace Terminal.Gui.Configuration;
 
@@ -198,9 +199,14 @@ public static class ConfigurationManager
 
             foreach (KeyValuePair<string, ConfigProperty> hardCodedProperty in _hardCodedConfigPropertyCache)
             {
-                // Set the PropertyValue to the hard coded value
+                // Set the PropertyValue to the hard coded value.
+                // Deep-clone the value to ensure the cache stores independent copies of reference types
+                // (e.g. Dictionary<,>). Without cloning, in-place mutations to a static property like
+                // Application.DefaultKeyBindings (e.g. dict[cmd] = ...) would silently corrupt the
+                // cached "hard-coded default", causing test-order-dependent failures.
                 hardCodedProperty.Value.Immutable = false;
                 hardCodedProperty.Value.UpdateToCurrentValue ();
+                hardCodedProperty.Value.PropertyValue = DeepCloner.DeepClone (hardCodedProperty.Value.PropertyValue);
                 hardCodedProperty.Value.Immutable = true;
             }
         }
@@ -473,6 +479,8 @@ public static class ConfigurationManager
     [RequiresDynamicCode ("Calls Terminal.Gui.Scope<T>.Apply()")]
     private static void InternalApply ()
     {
+        Trace.Configuration ("ConfigurationManager", "Apply", "Start");
+
         var settings = false;
         var themes = false;
         var appSettings = false;
@@ -496,6 +504,8 @@ public static class ConfigurationManager
         }
         finally
         {
+            Trace.Configuration ("ConfigurationManager", "Apply", $"End - settings={settings}, themes={themes}, appSettings={appSettings}");
+
             if (settings || themes || appSettings)
             {
                 OnApplied ();

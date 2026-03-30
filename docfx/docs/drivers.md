@@ -13,29 +13,29 @@ Terminal.Gui v2 uses a sophisticated driver architecture that separates concerns
  
 ## Available Drivers
 
-Terminal.Gui provides four console driver implementations optimized for different platforms:
+Terminal.Gui provides three console driver implementations:
 
 
-|  | **ansi** | **dotnet** | **unix** | **windows** |
-|---|---|---|---|---|
-| **Theme** | Showcase driver with pure ANSI implementation. Works on all platforms. Ideal for testing/CI. Deterministic behavior with virtual time support. | Cross-platform managed .NET driver. Simplest implementation using `System.Console` API. Works with .NET BCL only. | Optimized Unix/Linux/macOS driver. Direct syscall access. | High-performance Windows-only driver. Native Win32 Console API. Direct access to Windows-specific features. |
-| **Input Model** | Reads raw ANSI sequences, parses to Terminal.Gui events | Reads `ConsoleKeyInfo` from `System.Console`, converts to Terminal.Gui events | Reads raw ANSI sequences, parses to Terminal.Gui events | Reads `INPUT_RECORD` structures directly, converts to Terminal.Gui events |
-| **Unix Read APIs** | `poll(STDIN_FILENO, ...)`, `read(STDIN_FILENO, buffer, len)`, `tcgetattr()`/`tcsetattr()` for raw mode via `UnixRawModeHelper` | N/A (uses .NET `Console.ReadKey()` which internally delegates to platform APIs) reads `char` | `poll()`, `read()` syscalls on stdin (fd 0), `tcgetattr()`/`tcsetattr()` for termios raw mode | N/A (Windows-only) |
-| **Windows Read APIs** | P/Invokes `ReadFile()` reads `char` | N/A (uses .NET `Console.ReadKey()` which internally delegates to platform APIs) | N/A (Unix-only) | P/Invokes `ReadConsoleInputW()` reads `INPUT_RECORD`, `GetConsoleMode()`/`SetConsoleMode()` enables mouse input and raw mode |
-| **Output Model** | Pure ANSI escape sequences | Managed .NET + ANSI sequences (when VT mode enabled) | Pure ANSI escape sequences | Direct character output via Win32 API with double buffering |
-| **Unix Write APIs** | `write()` syscall to stdout (fd 1) | N/A (uses .NET `Console.Write()` which internally delegates to platform APIs) | `write()` syscall to stdout, ANSI SGR sequences for colors (16-color and 24-bit RGB) | N/A (Windows-only) |
-| **Windows Write APIs** | P/Invokes `WriteFile()` | N/A (uses .NET `Console.Write()` which internally delegates to platform APIs) | N/A (Unix-only) | P/Invokes `WriteConsoleW()`, `CreateConsoleScreenBuffer()`/`SetConsoleActiveScreenBuffer()` for double buffering, `SetConsoleTextAttribute()` |
-| **Screen Model** | ANSI query-based resize. Throttled to 500ms. Falls back to polling. | Polling-based re-size: `Console.WindowWidth`/`Console.WindowHeight` queried periodically. Falls back to 80x25 on `IOException`. | Polling-based resize: `ioctl(TIOCGWINSZ)` syscall with platform-specific constants (Linux `0x5413`, macOS `0x40087468`). Queries `WinSize` struct. | Event-based re-size: `WINDOW_BUFFER_SIZE_EVENT` received in input stream via `ReadConsoleInputW()`. Immediate resize notification. `GetConsoleScreenBufferInfoEx()` queries dimensions. |
-| **Cursor Handling** | ANSI sequences: DECTCEM (`CSI ? 25 h/l`) for show/hide, DECSCUSR (`CSI Ps SP q`) for style. Full `CursorStyle` support. | ANSI sequences (same as ansi driver). Falls back to `Console.SetCursorPosition()` on Windows. | ANSI sequences (same as ansi driver). Full `CursorStyle` support. | • Legacy mode: Win32 `CONSOLE_CURSOR_INFO` (size percentage only, no blinking control). <br>• Modern VT mode: ANSI sequences (same as ansi driver). Full `CursorStyle` support. |
-| **Advantages** | • Cross-platform (all platforms)<br>• Pure, clean implementation<br>• Perfect for testing/CI<br>• Virtual time support<br>• Deterministic behavior<br> | • Cross-platform (all platforms)<br>• Maximum compatibility<br>• Simple implementation<br>• No P/Invoke; Works with .NET BCL<br> | • Immediate resize detection<br> | • Highest performance on Windows<br>• Immediate resize detection<br> |
-| **Disadvantages** | • Requires proper ANSI support<br>• Throttled size detection (500ms) | • Lower performance (managed overhead)<br>• Limited feature set<br>• `System.ReadKey` has bugs on Windows<br>• Polling-based resize | • Unix-only<br>• Polling-based resize detection | • Windows-only<br>• More complex P/Invoke code |
+|  | **ansi** | **dotnet** | **windows** |
+|---|---|---|---|
+| **Theme** | Default driver for Unix/macOS and a showcase driver for all platforms. Pure ANSI implementation. Ideal for testing/CI. Deterministic behavior with virtual time support. | Cross-platform managed .NET driver. Simplest implementation using `System.Console` API. Works with .NET BCL only. | High-performance Windows-only driver. Native Win32 Console API. Direct access to Windows-specific features. |
+| **Input Model** | Reads raw ANSI sequences, parses to Terminal.Gui events | Reads `ConsoleKeyInfo` from `System.Console`, converts to Terminal.Gui events | Reads `INPUT_RECORD` structures directly, converts to Terminal.Gui events |
+| **Unix Read APIs** | `poll(STDIN_FILENO, ...)`, `read(STDIN_FILENO, buffer, len)`, `tcgetattr()`/`tcsetattr()` for raw mode via `UnixRawModeHelper` | N/A (uses .NET `Console.ReadKey()` which internally delegates to platform APIs) reads `char` | N/A (Windows-only) |
+| **Windows Read APIs** | P/Invokes `ReadFile()` reads `char` | N/A (uses .NET `Console.ReadKey()` which internally delegates to platform APIs) | P/Invokes `ReadConsoleInputW()` reads `INPUT_RECORD`, `GetConsoleMode()`/`SetConsoleMode()` enables mouse input and raw mode |
+| **Output Model** | Pure ANSI escape sequences | Managed .NET + ANSI sequences (when VT mode enabled) | Direct character output via Win32 API with double buffering |
+| **Unix Write APIs** | `write()` syscall to stdout (fd 1) | N/A (uses .NET `Console.Write()` which internally delegates to platform APIs) | N/A (Windows-only) |
+| **Windows Write APIs** | P/Invokes `WriteFile()` | N/A (uses .NET `Console.Write()` which internally delegates to platform APIs) | P/Invokes `WriteConsoleW()`, `CreateConsoleScreenBuffer()`/`SetConsoleActiveScreenBuffer()` for double buffering, `SetConsoleTextAttribute()` |
+| **Screen Model** | Configurable via `Driver.SizeDetection`. Default (`AnsiQuery`): ANSI `CSI 18t` query, throttled to 500 ms. `Polling`: `ioctl(TIOCGWINSZ)` on Unix, Console API on Windows. | Polling-based re-size: `Console.WindowWidth`/`Console.WindowHeight` queried periodically. Falls back to 80x25 on `IOException`. | Event-based re-size: `WINDOW_BUFFER_SIZE_EVENT` received in input stream via `ReadConsoleInputW()`. Immediate resize notification. `GetConsoleScreenBufferInfoEx()` queries dimensions. |
+| **Cursor Handling** | ANSI sequences: DECTCEM (`CSI ? 25 h/l`) for show/hide, DECSCUSR (`CSI Ps SP q`) for style. Full `CursorStyle` support. | ANSI sequences (same as ansi driver). Falls back to `Console.SetCursorPosition()` on Windows. | • Legacy mode: Win32 `CONSOLE_CURSOR_INFO` (size percentage only, no blinking control). <br>• Modern VT mode: ANSI sequences (same as ansi driver). Full `CursorStyle` support. |
+| **Advantages** | • Cross-platform (all platforms)<br>• Pure, clean implementation<br>• Perfect for testing/CI<br>• Virtual time support<br>• Deterministic behavior<br>• Configurable size detection | • Cross-platform (all platforms)<br>• Maximum compatibility<br>• Simple implementation<br>• No P/Invoke; Works with .NET BCL<br> | • Highest performance on Windows<br>• Immediate resize detection<br> |
+| **Disadvantages** | • Requires proper ANSI support | • Lower performance (managed overhead)<br>• Limited feature set<br>• `System.ReadKey` has bugs on Windows<br>• Polling-based resize | • Windows-only<br>• More complex P/Invoke code |
 
 ### Automatic Driver Selection
 
 The appropriate driver is automatically selected based on the platform when <xref:Terminal.Gui.App.Application>'s `Init()` is called:
 
 - **Windows** (Win32NT, Win32S, Win32Windows) → `WindowsDriver`
-- **Unix/Linux/macOS** → `UnixDriver`
+- **Unix/Linux/macOS** → `AnsiDriver`
 
 ### Explicit Driver Selection
 
@@ -53,7 +53,7 @@ Method 2: Pass driver name to Init
 
 ```csharp
 // Use type-safe constants from DriverRegistry.Names
-Application.Init(driverName: DriverRegistry.Names.UNIX);
+Application.Init(driverName: DriverRegistry.Names.ANSI);
 ```
 
 Method 3: Set ForceDriver on instance
@@ -104,7 +104,6 @@ foreach (string name in driverNames)
 // Available drivers:
 //   - dotnet
 //   - windows
-//   - unix
 //   - ansi
 ```
 
@@ -176,7 +175,6 @@ Terminal.Gui v2 uses a **Driver Registry** pattern for managing available driver
 ```csharp
 // Access well-known driver name constants
 string windowsDriver = DriverRegistry.Names.WINDOWS;  // "windows"
-string unixDriver = DriverRegistry.Names.UNIX;        // "unix"
 string dotnetDriver = DriverRegistry.Names.DOTNET;    // "dotnet"
 string ansiDriver = DriverRegistry.Names.ANSI;        // "ansi"
 
@@ -206,9 +204,8 @@ Logging.Information($"Default driver: {defaultDriver.Name}");
 The v2 driver architecture uses the **Component Factory** pattern to create platform-specific components. Each driver has a corresponding factory that implements `IComponentFactory<T>`:
 
 - `NetComponentFactory` - Creates components for DotNetDriver
-- `WindowsComponentFactory` - Creates components for WindowsDriver  
-- `UnixComponentFactory` - Creates components for UnixDriver
-- `AnsiComponentFactory` - Creates components for AnsiDriver
+- `WindowsComponentFactory` - Creates components for WindowsDriver
+- `AnsiComponentFactory` - Creates components for AnsiDriver (all platforms)
 
 Each factory is responsible for:
 - Creating driver-specific components (`IInput<T>`, `IOutput`, `IInputProcessor`, etc.)
@@ -225,14 +222,12 @@ Each driver is composed of specialized components, each with a single responsibi
 Reads raw console input events from the terminal on a dedicated input thread. The generic type `T` represents the platform-specific input record type:
 - `ConsoleKeyInfo` for DotNetDriver (from `Console.ReadKey()`)
 - `WindowsConsole.InputRecord` for WindowsDriver (from `ReadConsoleInputW()`)
-- `char` for UnixDriver and AnsiDriver (raw bytes from `read()` syscall or `ReadFile()`)
+- `char` for AnsiDriver (raw bytes from `read()` syscall or `ReadFile()`)
 
 Input runs on a separate thread managed by `MainLoopCoordinator`, continuously reading from the console and queueing events into a thread-safe `ConcurrentQueue<T>` to avoid blocking the UI thread.
 
 #### IOutput
 Renders the output buffer to the terminal. Platform-specific implementations:
-- **WindowsOutput**: Uses `WriteConsoleW()` for direct character output
-- **UnixOutput**: Writes ANSI sequences to stdout via `write()` syscall
 - **NetOutput**: Uses `Console.Write()` with ANSI sequences (VT mode on Windows)
 - **AnsiOutput**: Pure ANSI escape sequences via `WriteFile()` (Windows) or `write()` (Unix)
 
@@ -249,7 +244,7 @@ Translates raw console input into Terminal.Gui events:
 - Generates `MouseEventArgs` for mouse input
 - Handles platform-specific key mappings
 - Uses `IKeyConverter<T>` to translate `TInputRecord` to <xref:Terminal.Gui.Input.Key>:
-- `AnsiKeyConverter` - For `char` input (UnixDriver, AnsiDriver)
+- `AnsiKeyConverter` - For `char` input (AnsiDriver)
 - `NetKeyConverter` - For `ConsoleKeyInfo` input (DotNetDriver)
 - `WindowsKeyConverter` - For `WindowsConsole.InputRecord` input (WindowsDriver)
 
@@ -349,6 +344,27 @@ The main driver interface that the framework uses internally. `IDriver` is organ
 - `DefaultAttribute` - The terminal's actual default foreground/background colors, detected at startup via OSC 10/11 queries. Used by <xref:Terminal.Gui.Drawing.Scheme> to resolve <xref:Terminal.Gui.Drawing.Color>'s `None` during role derivation. `null` if the terminal didn't respond (e.g., legacy console).
 - `ColorCapabilities` - The terminal's color capability level (`NoColor`, `Colors16`, `Colors256`, `TrueColor`), detected from `$TERM`, `$COLORTERM`, and other environment variables
 
+#### Size Detection (ANSI Driver)
+
+The ANSI driver's terminal-size detection strategy is controlled by `Driver.SizeDetection` (a `[ConfigurationProperty]`):
+
+| Mode | Mechanism | When to use |
+|---|---|---|
+| `AnsiQuery` (default) | Sends `CSI 18t`, parses `ESC[8;h;wt` response. Async, ~500 ms throttle. | Most terminals. Works everywhere ANSI is supported. |
+| `Polling` | `ioctl(TIOCGWINSZ)` on Unix, `Console.WindowWidth/Height` on Windows. Synchronous. | When the ANSI response does not reflect the actual terminal size (e.g., some SSH configurations). |
+
+Set via JSON configuration:
+
+```json
+{ "Driver.SizeDetection": "Polling" }
+```
+
+Or programmatically before `Init()`:
+
+```csharp
+Driver.SizeDetection = SizeDetectionMode.Polling;
+```
+
 #### Content Buffer
 - `Contents` - Screen buffer array
 - `Clip` - Clipping region
@@ -373,10 +389,24 @@ Drivers implement cursor control through `IDriver` which delegates to `IOutput`:
 > See [Cursor Management](cursor.md) for complete details.
 
 #### Input Events
-- `KeyDown`, `MouseEvent` - Input events raised by the driver when input is processed
+- `KeyDown` - Raised for key press and repeat events
+- `KeyUp` - Raised for key release events (only when the driver supports it — currently the ANSI driver with kitty keyboard protocol)
+- `MouseEvent` - Raised for mouse input events
 
 > [!NOTE]
 > For testing, use the input injection API. See [Input Injection](input-injection.md) for details.
+
+#### Kitty Keyboard Protocol
+
+The ANSI driver detects and enables the [kitty keyboard protocol](https://sw.kovidgoyal.net/kitty/keyboard-protocol/) at startup when the terminal supports it. This provides:
+
+- **Disambiguated escape codes** (flag 1) — eliminates ambiguity in legacy ANSI key sequences
+- **Event type reporting** (flag 2) — press, repeat, and release events via `Key.EventType`
+- **Standalone modifier key events** — pressing Shift, Ctrl, Alt alone generates events with `Key.IsModifierOnly == true` and `Key.ModifierKey` identifying the specific modifier (e.g. `ModifierKey.LeftShift`)
+
+Detection uses the `KittyKeyboardProtocolDetector` which queries the terminal via CSI `?u`. If supported, the protocol is enabled with flags 1+2. On shutdown, the protocol is disabled to restore normal terminal behavior.
+
+Three ANSI parser patterns handle kitty event types: `KittyKeyboardPattern` (CSI `u`), `CsiKeyPattern` (CSI `~`), and `CsiCursorPattern` (CSI cursor letters). Release events route to `KeyUp`; press and repeat route to `KeyDown`.
 
 #### ANSI Escape Sequences
 - `QueueAnsiRequest()` - ANSI request handling
@@ -398,7 +428,7 @@ The driver selection logic in `ApplicationImpl.Driver.cs` uses the **Driver Regi
 3. **Application.ForceDriver Configuration**: The `Application.ForceDriver` property is checked and looked up in the registry
 4. **Platform Default**: `DriverRegistry.GetDefaultDriver()` selects based on current platform:
    - Windows (Win32NT, Win32S, Win32Windows) → `WindowsDriver`
-   - Unix/Linux/macOS → `UnixDriver`
+   - Unix/Linux/macOS → `AnsiDriver`
    - Other platforms → `DotNetDriver` (fallback)
 
 **Driver Creation Process:**

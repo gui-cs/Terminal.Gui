@@ -83,6 +83,8 @@
     <ItemGroup>
         <InternalsVisibleTo Include="Benchmarks" />
         <InternalsVisibleTo Include="UnitTests" />
+        <InternalsVisibleTo Include="UnitTests.Legacy" />
+        <InternalsVisibleTo Include="UnitTests.NonParallelizable" />
         <InternalsVisibleTo Include="UnitTests.Parallelizable" />
         <InternalsVisibleTo Include="StressTests" />
         <InternalsVisibleTo Include="IntegrationTests" />

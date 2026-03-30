@@ -142,13 +142,6 @@ A sinple color picker that supports the legacy 16 ANSI colors
 Provides date editing functionality with specialized cursor behavior for date entry.
 
 
-<pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#FFFFFF;background:#000000'>┌┤</span><span style='color:#000000;background:#FFFFFF'>Caption</span><span style='color:#FFFFFF;background:#000000'>├┄┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#808080;font-weight:900'>1/01/0001</span><span style='color:#FFFFFF;background:#808080'> </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┘</span>
-
-</pre>
-
 
 ## [DatePicker](xref:Terminal.Gui.Views.DatePicker)
 
@@ -157,12 +150,12 @@ Lets the user pick a date from a visual calendar.
 
 <pre style='color:#FFFFFF;background:#000000'>
 <span style='color:#FFFFFF;background:#000000'>┌─────────────────────────────┐</span>
-<span style='color:#FFFFFF;background:#000000'>│Date: </span><span style='color:#000000;background:#808080;font-weight:900'> 03/04/2026</span><span style='color:#FFFFFF;background:#808080'>            </span><span style='color:#FFFFFF;background:#000000'>│</span>
+<span style='color:#FFFFFF;background:#000000'>│Date: </span><span style='color:#000000;background:#FFFFFF'>0</span><span style='color:#FFFFFF;background:#808080'>3/10/2026             </span><span style='color:#FFFFFF;background:#000000'>│</span>
 <span style='color:#FFFFFF;background:#000000'>│┌───┬───┬───┬───┬───┬───┬───┐│</span>
 <span style='color:#FFFFFF;background:#000000'>││Sun│Mon│Tue│Wed│Thu│Fri│Sat││</span>
 <span style='color:#FFFFFF;background:#000000'>│├───┼───┼───┼───┼───┼───┼───┤│</span>
-<span style='color:#FFFFFF;background:#000000'>││1  │2  │3  │</span><span style='color:#000000;background:#808080;font-weight:900'>4  </span><span style='color:#FFFFFF;background:#000000'>│5  │6  │7  ││</span>
-<span style='color:#FFFFFF;background:#000000'>││8  │9  │10 │11 │12 │13 │14 ││</span>
+<span style='color:#FFFFFF;background:#000000'>││1  │2  │3  │4  │5  │6  │7  ││</span>
+<span style='color:#FFFFFF;background:#000000'>││8  │9  │</span><span style='color:#000000;background:#808080;font-weight:900'>10 </span><span style='color:#FFFFFF;background:#000000'>│11 │12 │13 │14 ││</span>
 <span style='color:#FFFFFF;background:#000000'>││15 │16 │17 │18 │19 │20 │21 ││</span>
 <span style='color:#FFFFFF;background:#000000'>││22 │23 │24 │25 │26 │27 │28 ││</span>
 <span style='color:#FFFFFF;background:#000000'>││29 │30 │31 │-  │-  │-  │-  ││</span>
@@ -223,14 +216,14 @@ The base-class for <xref:Terminal.Gui.Views.OpenDialog> and <xref:Terminal.Gui.V
 ┃├────────────────────┼──────────┼──────────────────────────────┼───────────┃
 ┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                              │&lt;Directory&gt;</span>┃
 ┃│\_exported_templates│          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
-┃│\_site              │          │2026-03-04T12:17:44           │&lt;Directory&gt;┃
-┃│\api                │          │2026-03-04T12:17:11           │&lt;Directory&gt;┃
-┃│\apispec            │          │2026-01-25T15:20:42           │&lt;Directory&gt;┃
-┃│\docs               │          │2026-03-04T12:16:47           │&lt;Directory&gt;┃
-┃│\images             │          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
-┃│\includes           │          │2026-02-25T08:14:30           │&lt;Directory&gt;┃
+┃│\_site              │          │2026-03-10T11:03:24           │&lt;Directory&gt;┃
+┃│\api                │          │2026-03-10T11:02:45           │&lt;Directory&gt;┃
+┃│\apispec            │          │2026-03-09T09:23:54           │&lt;Directory&gt;┃
+┃│\docs               │          │2026-03-10T10:40:04           │&lt;Directory&gt;┃
+┃│\images             │          │2026-03-04T13:02:07           │&lt;Directory&gt;┃
+┃│\includes           │          │2026-03-04T12:44:37           │&lt;Directory&gt;┃
 ┃│\schemas            │          │2026-01-15T21:25:29           │&lt;Directory&gt;┃
-┃│\scripts            │          │2026-02-26T09:24:26           │&lt;Directory&gt;┃
+┃│\scripts            │          │2026-03-04T12:44:37           │&lt;Directory&gt;┃
 ┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14           │.png       ┃
 ┃                                                                           ┃
 ┃⟦►<span style='text-decoration:underline 1px solid'>T</span>ree⟧                                                  ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧⟦► <span style='text-decoration:underline 1px solid'>O</span>K ◄⟧┃
@@ -543,14 +536,14 @@ Provides an interactive <xref:Terminal.Gui.Views.Dialog> for selecting files or 
 ┃├────────────────────┼──────────┼──────────────────────────────┼───────────┃
 ┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                              │&lt;Directory&gt;</span>┃
 ┃│\_exported_templates│          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
-┃│\_site              │          │2026-03-04T12:17:44           │&lt;Directory&gt;┃
-┃│\api                │          │2026-03-04T12:17:11           │&lt;Directory&gt;┃
-┃│\apispec            │          │2026-01-25T15:20:42           │&lt;Directory&gt;┃
-┃│\docs               │          │2026-03-04T12:16:47           │&lt;Directory&gt;┃
-┃│\images             │          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
-┃│\includes           │          │2026-02-25T08:14:30           │&lt;Directory&gt;┃
+┃│\_site              │          │2026-03-10T11:03:24           │&lt;Directory&gt;┃
+┃│\api                │          │2026-03-10T11:02:45           │&lt;Directory&gt;┃
+┃│\apispec            │          │2026-03-09T09:23:54           │&lt;Directory&gt;┃
+┃│\docs               │          │2026-03-10T10:40:04           │&lt;Directory&gt;┃
+┃│\images             │          │2026-03-04T13:02:07           │&lt;Directory&gt;┃
+┃│\includes           │          │2026-03-04T12:44:37           │&lt;Directory&gt;┃
 ┃│\schemas            │          │2026-01-15T21:25:29           │&lt;Directory&gt;┃
-┃│\scripts            │          │2026-02-26T09:24:26           │&lt;Directory&gt;┃
+┃│\scripts            │          │2026-03-04T12:44:37           │&lt;Directory&gt;┃
 ┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14           │.png       ┃
 ┃                                                                           ┃
 ┃⟦►<span style='text-decoration:underline 1px solid'>T</span>ree⟧                                                  ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧⟦► <span style='text-decoration:underline 1px solid'>O</span>K ◄⟧┃
@@ -680,14 +673,14 @@ Provides an interactive <xref:Terminal.Gui.Views.Dialog> for selecting files or 
 ┃├────────────────────┼──────────┼──────────────────────────────┼───────────┃
 ┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                              │&lt;Directory&gt;</span>┃
 ┃│\_exported_templates│          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
-┃│\_site              │          │2026-03-04T12:17:44           │&lt;Directory&gt;┃
-┃│\api                │          │2026-03-04T12:17:11           │&lt;Directory&gt;┃
-┃│\apispec            │          │2026-01-25T15:20:42           │&lt;Directory&gt;┃
-┃│\docs               │          │2026-03-04T12:16:47           │&lt;Directory&gt;┃
-┃│\images             │          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
-┃│\includes           │          │2026-02-25T08:14:30           │&lt;Directory&gt;┃
+┃│\_site              │          │2026-03-10T11:03:24           │&lt;Directory&gt;┃
+┃│\api                │          │2026-03-10T11:02:45           │&lt;Directory&gt;┃
+┃│\apispec            │          │2026-03-09T09:23:54           │&lt;Directory&gt;┃
+┃│\docs               │          │2026-03-10T10:40:04           │&lt;Directory&gt;┃
+┃│\images             │          │2026-03-04T13:02:07           │&lt;Directory&gt;┃
+┃│\includes           │          │2026-03-04T12:44:37           │&lt;Directory&gt;┃
 ┃│\schemas            │          │2026-01-15T21:25:29           │&lt;Directory&gt;┃
-┃│\scripts            │          │2026-02-26T09:24:26           │&lt;Directory&gt;┃
+┃│\scripts            │          │2026-03-04T12:44:37           │&lt;Directory&gt;┃
 ┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14           │.png       ┃
 ┃                                                                           ┃
 ┃⟦►<span style='text-decoration:underline 1px solid'>T</span>ree⟧                                                ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧⟦► <span style='text-decoration:underline 1px solid'>S</span>ave ◄⟧┃
@@ -894,7 +887,7 @@ Masked text editor that validates input through a <xref:Terminal.Gui.Views.IText
 
 <pre style='color:#FFFFFF;background:#000000'>
 <span style='color:#FFFFFF;background:#000000'>┌┤</span><span style='color:#000000;background:#FFFFFF'>^([0-9]?[0-9]?[0-9]|1000)$</span><span style='color:#FFFFFF;background:#000000'>├──────────────────────────────────────────────────┐</span>
-<span style='color:#FFFFFF;background:#000000'>│</span><span style='color:#000000;background:#FFFFFF'>999                                                                           </span><span style='color:#FFFFFF;background:#000000'>│</span>
+<span style='color:#FFFFFF;background:#000000'>│</span><span style='color:#000000;background:#FFFFFF'>9</span><span style='color:#FFFFFF;background:#808080'>99                                                                           </span><span style='color:#FFFFFF;background:#000000'>│</span>
 <span style='color:#FFFFFF;background:#000000'>└──────────────────────────────────────────────────────────────────────────────┘</span>
 
 </pre>
@@ -934,13 +927,6 @@ Fully featured multi-line text editor
 
 Provides time editing functionality with specialized cursor behavior for time entry.
 
-
-<pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#FFFFFF;background:#000000'>┌┤</span><span style='color:#000000;background:#FFFFFF'>Captio</span><span style='color:#FFFFFF;background:#000000'>├┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#808080;font-weight:900'>2:48:05</span><span style='color:#FFFFFF;background:#808080'> </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┘</span>
-
-</pre>
 
 
 ## [TreeView](xref:Terminal.Gui.Views.TreeView)

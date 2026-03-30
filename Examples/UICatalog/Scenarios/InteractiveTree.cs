@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 namespace UICatalog.Scenarios;
 
@@ -52,7 +52,7 @@ public class InteractiveTree : Scenario
         // StatusBar
         StatusBar statusBar = new (
                                    [
-                                       new (Application.QuitKey, "Quit", Quit),
+                                       new (Application.GetDefaultKey (Command.Quit), "Quit", Quit),
                                        new (Key.C.WithCtrl, "Add Child", AddChildNode),
                                        new (Key.T.WithCtrl, "Add Root", AddRootNode),
                                        new (Key.R.WithCtrl, "Rename Node", RenameNode)

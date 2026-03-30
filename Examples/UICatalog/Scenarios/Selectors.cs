@@ -255,7 +255,7 @@ public sealed class Selectors : Scenario
 
             foreach (SelectorBase selector in selectors)
             {
-                selector.Border!.Thickness = cb.Value == CheckState.Checked ? new Thickness (1) : new Thickness (0);
+                selector.Border.Thickness = cb.Value == CheckState.Checked ? new Thickness (1) : new Thickness (0);
             }
         }
 

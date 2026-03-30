@@ -1,11 +1,55 @@
 namespace Terminal.Gui.Views;
 
-/// <summary>Masked text editor that validates input through a <see cref="ITextValidateProvider"/></summary>
-public class TextValidateField : View, IDesignable
+/// <summary>Masked text editor that validates input through a <see cref="ITextValidateProvider"/>.</summary>
+/// <remarks>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left</term> <description>Moves the cursor left.</description>
+///         </item>
+///         <item>
+///             <term>Right</term> <description>Moves the cursor right.</description>
+///         </item>
+///         <item>
+///             <term>Home</term> <description>Moves the cursor to the start.</description>
+///         </item>
+///         <item>
+///             <term>End</term> <description>Moves the cursor to the end.</description>
+///         </item>
+///         <item>
+///             <term>Delete</term> <description>Deletes the character at the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Backspace</term> <description>Deletes the character before the cursor.</description>
+///         </item>
+///     </list>
+/// </remarks>
+public class TextValidateField : View, IDesignable, IValue<string>
 {
     private const int DEFAULT_LENGTH = 10;
 
     private ITextValidateProvider? _provider;
+    private string _lastKnownText = string.Empty;
+
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="TextValidateField"/>. All standard bindings are
+    ///     inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary is empty by default.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
+
+    /// <summary>
+    ///     Gets or sets whether value change events are suppressed.
+    ///     Subclasses set this to <see langword="true"/> when programmatically updating the provider
+    ///     to prevent re-entrant event firing.
+    /// </summary>
+    protected bool SuppressValueEvents { get; set; }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="TextValidateField"/> class.
@@ -23,13 +67,58 @@ public class TextValidateField : View, IDesignable
         AddCommand (Command.Left, () => CursorLeft ());
         AddCommand (Command.Right, () => CursorRight ());
 
-        // Default keybindings for this view
-        KeyBindings.Add (Key.Home, Command.LeftStart);
-        KeyBindings.Add (Key.End, Command.RightEnd);
-        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
-        KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
-        KeyBindings.Add (Key.CursorRight, Command.Right);
+        // Apply layered key bindings (base View layer + TextValidateField-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
+    }
+
+    /// <inheritdoc/>
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? view)
+    {
+        if (!newHasFocus)
+        {
+            Cursor = Cursor with { Position = null };
+
+            return;
+        }
+
+        if (_provider is null)
+        {
+            return;
+        }
+
+        // When we gain focus, put the insertion point at the start if it's before the start.
+        InsertionPoint = Math.Max (InsertionPoint, _provider.CursorStart ());
+
+        // Match the cursor position to the insertion point.
+        // Don't call UpdateCursor so we can set the style too.
+        Cursor = Cursor with { Style = CursorStyle.BlinkingBar };
+        UpdateCursor ();
+    }
+
+    /// <summary>Updates the cursor position.</summary>
+    /// <remarks>
+    ///     This method calculates the cursor position and calls <see cref="View.SetCursor"/>.
+    /// </remarks>
+    private void UpdateCursor ()
+    {
+        (int left, int right) = GetMargins (Viewport.Width);
+
+        // Fixed = true, is for inputs that have fixed width, like masked ones.
+        // Fixed = false, is for normal input.
+        // When it's right-aligned and it's a normal input, the cursor behaves differently.
+        int curPos;
+
+        if (_provider?.Fixed == false && TextAlignment == Alignment.End)
+        {
+            curPos = _insertionPoint + left - 1;
+        }
+        else
+        {
+            curPos = _insertionPoint + left;
+        }
+
+        Cursor = Cursor with { Position = ViewportToScreen (new Point (curPos, 0)) };
+        SetNeedsDraw ();
     }
 
     /// <summary>This property returns true if the input is valid.</summary>
@@ -52,17 +141,66 @@ public class TextValidateField : View, IDesignable
         get => _provider;
         set
         {
+            if (_provider is { })
+            {
+                _provider.TextChanged -= ProviderOnTextChanged;
+            }
+
             _provider = value;
+
+            if (_provider is { })
+            {
+                _provider.TextChanged += ProviderOnTextChanged;
+                _lastKnownText = _provider.Text;
+            }
 
             if (_provider!.Fixed)
             {
-                Width = _provider.DisplayText == string.Empty ? DEFAULT_LENGTH : _provider.DisplayText.Length;
+                // Add one so there is always a blank cell after the last editable character for the cursor.
+                Width = (_provider.DisplayText == string.Empty ? DEFAULT_LENGTH : _provider.DisplayText.Length) + 1;
             }
 
             // HomeKeyHandler already call SetNeedsDisplay
             HomeKeyHandler ();
         }
     }
+
+    #region IValue<string> Implementation
+
+    /// <summary>
+    ///     Gets or sets the value. This is an alias for <see cref="Text"/>.
+    /// </summary>
+    /// <remarks>
+    ///     This property enables <see cref="TextValidateField"/> to be used with the <see cref="IValue{TValue}"/> pattern
+    ///     for generic value access and command propagation.
+    /// </remarks>
+    public string? Value { get => Text; set => Text = value ?? string.Empty; }
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<string?>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<string?>>? ValueChanged;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
+    /// <summary>
+    ///     Called when <see cref="Value"/> is about to change.
+    ///     Allows derived classes to cancel the change.
+    /// </summary>
+    /// <param name="args">The event arguments.</param>
+    /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<string?> args) => false;
+
+    /// <summary>
+    ///     Called when <see cref="Value"/> has changed.
+    ///     Allows derived classes to react to value changes.
+    /// </summary>
+    /// <param name="args">The event arguments.</param>
+    protected virtual void OnValueChanged (ValueChangedEventArgs<string?> args) { }
+
+    #endregion
 
     /// <summary>Text</summary>
     public override string Text
@@ -75,7 +213,43 @@ public class TextValidateField : View, IDesignable
                 return;
             }
 
+            string oldValue = _provider.Text;
+
+            if (oldValue == value)
+            {
+                return;
+            }
+
+            if (!SuppressValueEvents)
+            {
+                ValueChangingEventArgs<string?> args = new (oldValue, value);
+
+                if (OnValueChanging (args) || args.Handled)
+                {
+                    return;
+                }
+
+                ValueChanging?.Invoke (this, args);
+
+                if (args.Handled)
+                {
+                    return;
+                }
+
+                // Allow subscribers to modify the new value
+                value = args.NewValue ?? string.Empty;
+            }
+
+            _lastKnownText = value;
             _provider.Text = value;
+
+            if (!SuppressValueEvents)
+            {
+                ValueChangedEventArgs<string?> changedArgs = new (oldValue, value);
+                OnValueChanged (changedArgs);
+                ValueChanged?.Invoke (this, changedArgs);
+                ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, value));
+            }
 
             SetNeedsDraw ();
         }
@@ -94,24 +268,70 @@ public class TextValidateField : View, IDesignable
             }
 
             _insertionPoint = value;
-            (int left, _) = GetMargins (Viewport.Width);
 
-            // Fixed = true, is for inputs that have fixed width, like masked ones.
-            // Fixed = false, is for normal input.
-            // When it's right-aligned and it's a normal input, the cursor behaves differently.
-            int curPos;
-
-            if (_provider?.Fixed == false && TextAlignment == Alignment.End)
-            {
-                curPos = _insertionPoint + left - 1;
-            }
-            else
-            {
-                curPos = _insertionPoint + left;
-            }
-
-            Cursor = Cursor with { Position = ViewportToScreen (new Point (curPos, 0)), Style = CursorStyle.Default };
+            UpdateCursor ();
         }
+    }
+
+    /// <summary>
+    ///     Called when the provider's text changes through user input (InsertAt/Delete).
+    ///     The base implementation raises <see cref="ValueChanging"/> and <see cref="ValueChanged"/> events
+    ///     following the Cancellable Work Pattern.
+    /// </summary>
+    /// <param name="oldText">The text before the change.</param>
+    /// <param name="newText">The text after the change.</param>
+    protected virtual void HandleProviderTextChanged (string oldText, string newText)
+    {
+        ValueChangingEventArgs<string?> args = new (oldText, newText);
+
+        if (OnValueChanging (args) || args.Handled)
+        {
+            RevertProviderText (oldText);
+
+            return;
+        }
+
+        ValueChanging?.Invoke (this, args);
+
+        if (args.Handled)
+        {
+            RevertProviderText (oldText);
+
+            return;
+        }
+
+        ValueChangedEventArgs<string?> changedArgs = new (oldText, newText);
+        OnValueChanged (changedArgs);
+        ValueChanged?.Invoke (this, changedArgs);
+        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldText, newText));
+    }
+
+    private void ProviderOnTextChanged (object? sender, EventArgs<string> e)
+    {
+        if (SuppressValueEvents)
+        {
+            return;
+        }
+
+        string currentText = _provider!.Text;
+
+        if (_lastKnownText == currentText)
+        {
+            return;
+        }
+
+        HandleProviderTextChanged (_lastKnownText, currentText);
+
+        // Sync _lastKnownText with actual provider state (may have been reverted by handler)
+        _lastKnownText = _provider.Text;
+    }
+
+    private void RevertProviderText (string oldText)
+    {
+        SuppressValueEvents = true;
+        _provider!.Text = oldText;
+        SuppressValueEvents = false;
+        SetNeedsDraw ();
     }
 
     /// <inheritdoc/>
@@ -147,7 +367,7 @@ public class TextValidateField : View, IDesignable
             return true;
         }
 
-        VisualRole role = HasFocus ? VisualRole.Focus : VisualRole.Editable;
+        var role = VisualRole.Editable;
         Attribute textColor = IsValid ? GetAttributeForRole (role) : SchemeManager.GetScheme (Schemes.Error).GetAttributeForRole (role);
 
         (int marginLeft, int marginRight) = GetMargins (Viewport.Width);
@@ -179,6 +399,15 @@ public class TextValidateField : View, IDesignable
             AddRune ((Rune)' ');
         }
 
+        if (!HasFocus || _provider.DisplayText.Length <= 0 || InsertionPoint >= _provider.DisplayText.Length)
+        {
+            return true;
+        }
+
+        SetAttributeForRole (VisualRole.Focus);
+        Move (InsertionPoint + marginLeft, 0);
+        AddRune ((Rune)_provider.DisplayText [InsertionPoint]);
+
         return true;
     }
 
@@ -190,7 +419,7 @@ public class TextValidateField : View, IDesignable
             return false;
         }
 
-        if (key.AsRune == default (Rune) || key == Application.QuitKey)
+        if (key.AsRune == default (Rune) || key == Application.GetDefaultKey (Command.Quit))
         {
             return false;
         }
@@ -199,14 +428,14 @@ public class TextValidateField : View, IDesignable
 
         bool inserted = _provider.InsertAt ((char)rune.Value, InsertionPoint);
 
-        if (inserted)
+        if (!inserted)
         {
-            CursorRight ();
-
-            return true;
+            return false;
         }
 
-        return false;
+        CursorRight ();
+
+        return true;
     }
 
     /// <summary>Delete char at cursor position - 1, moving the cursor.</summary>
@@ -220,7 +449,9 @@ public class TextValidateField : View, IDesignable
 
         _insertionPoint = _provider.CursorLeft (InsertionPoint);
         _provider.Delete (InsertionPoint);
+
         SetNeedsDraw ();
+        UpdateCursor ();
 
         return true;
     }
@@ -251,7 +482,21 @@ public class TextValidateField : View, IDesignable
         }
 
         int current = InsertionPoint;
+
+        if (_provider.Fixed && current > _provider.CursorEnd ())
+        {
+            // Already in the blank cell past the last editable position. Don't move.
+            return false;
+        }
+
         InsertionPoint = _provider.CursorRight (InsertionPoint);
+
+        if (current == InsertionPoint && _provider.Fixed && current == _provider.CursorEnd ())
+        {
+            // Allow cursor to move one past the last editable position (blank cell for cursor).
+            InsertionPoint = current + 1;
+        }
+
         SetNeedsDraw ();
 
         return current != InsertionPoint;

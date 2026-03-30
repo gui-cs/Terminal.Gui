@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 using System.IO.Abstractions;
 using System.Text;
@@ -122,7 +122,7 @@ public class TreeViewFileSystem : Scenario
         SetCursor ();
         _miCursorCheckBox.ValueChanged += (_, _) => SetCursor ();
 
-        menu.Add (new MenuBarItem (Strings.menuFile, [new MenuItem { Title = Strings.cmdQuit, Key = Application.QuitKey, Action = Quit }]));
+        menu.Add (new MenuBarItem (Strings.menuFile, [new MenuItem { Title = Strings.cmdQuit, Key = Application.GetDefaultKey (Command.Quit), Action = Quit }]));
 
         menu.Add (new MenuBarItem ("_View", [new MenuItem { CommandView = _miFullPathsCheckBox }, new MenuItem { CommandView = _miMultiSelectCheckBox }]));
 

@@ -63,7 +63,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
     {
         var w = new View { Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
 
-        w.Padding!.Thickness = new Thickness (1);
+        w.Padding.Thickness = new Thickness (1);
 
         List<string> scrRequests =
         [

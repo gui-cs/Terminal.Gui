@@ -15,6 +15,7 @@ public sealed class LoggingBackend : ITraceBackend
                             TraceCategory.Mouse => FormatMouse (entry),
                             TraceCategory.Keyboard => FormatKeyboard (entry),
                             TraceCategory.Navigation => FormatNavigation (entry),
+                            TraceCategory.Configuration => string.Empty,
                             _ => $"[{entry.Category}]"
                         };
 

@@ -29,11 +29,11 @@ public class SourcesManagerTests
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope.LoadHardCodedDefaults ();
-        settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
+        settingsScope ["Driver.Force16Colors"].PropertyValue = false;
 
         var json = """
                    {
-                        "Application.QuitKey": "Ctrl+Z"
+                        "Driver.Force16Colors": true
                    }
                    """;
         var location = ConfigLocations.HardCoded;
@@ -49,9 +49,8 @@ public class SourcesManagerTests
         bool result = sourcesManager.Load (settingsScope, stream, source, location);
 
         // Assert
-        // Assert
         Assert.True (result);
-        Assert.Equal (Key.Z.WithCtrl, settingsScope ["Application.QuitKey"].PropertyValue as Key);
+        Assert.Equal (true, settingsScope ["Driver.Force16Colors"].PropertyValue);
         Assert.Contains (source, sourcesManager.Sources.Values);
     }
 
@@ -85,11 +84,11 @@ public class SourcesManagerTests
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope.LoadHardCodedDefaults ();
-        settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
+        settingsScope ["Driver.Force16Colors"].PropertyValue = false;
 
         var json = """
                    {
-                        "Application.QuitKey": "Ctrl+Z"
+                        "Driver.Force16Colors": true
                    }
                    """;
         var source = Path.GetTempFileName ();
@@ -104,7 +103,7 @@ public class SourcesManagerTests
 
             // Assert
             Assert.True (result);
-            Assert.Equal (Key.Z.WithCtrl, settingsScope ["Application.QuitKey"].PropertyValue as Key);
+            Assert.Equal (true, settingsScope ["Driver.Force16Colors"].PropertyValue);
             Assert.Contains (source, sourcesManager.Sources.Values);
         }
         finally
@@ -174,11 +173,11 @@ public class SourcesManagerTests
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope.LoadHardCodedDefaults ();
-        settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
+        settingsScope ["Driver.Force16Colors"].PropertyValue = false;
 
         var json = """
                    {
-                        "Application.QuitKey": "Ctrl+Z"
+                        "Driver.Force16Colors": true
                    }
                    """;
         var source = "Load_WithValidJson_UpdatesSettingsScope";
@@ -189,7 +188,7 @@ public class SourcesManagerTests
 
         // Assert
         Assert.True (result);
-        Assert.Equal (Key.Z.WithCtrl, settingsScope ["Application.QuitKey"].PropertyValue as Key);
+        Assert.Equal (true, settingsScope ["Driver.Force16Colors"].PropertyValue);
         Assert.Contains (source, sourcesManager.Sources.Values);
     }
 
@@ -231,7 +230,7 @@ public class SourcesManagerTests
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope.LoadHardCodedDefaults ();
-        settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
+        settingsScope ["Driver.Force16Colors"].PropertyValue = false;
 
         var assembly = Assembly.GetExecutingAssembly ();
         var location = ConfigLocations.AppResources;
@@ -275,11 +274,11 @@ public class SourcesManagerTests
         var location = ConfigLocations.LibraryResources;
         sourcesManager.Load (settingsScope, assembly!, resourceName, location);
 
-        Assert.Equal (Key.Esc, settingsScope ["Application.QuitKey"].PropertyValue);
+        Assert.Equal (false, settingsScope ["Driver.Force16Colors"].PropertyValue);
 
         var runtimeJson = """
                           {
-                               "Application.QuitKey": "Ctrl+Z"
+                               "Driver.Force16Colors": true
                           }
                           """;
         var runtimeSource = "runtime.json";
@@ -297,7 +296,7 @@ public class SourcesManagerTests
         Assert.True (result);
 
         // Verify settingsScope is updated as expected
-        Assert.Equal (Key.Z.WithCtrl, settingsScope ["Application.QuitKey"].PropertyValue);
+        Assert.Equal (true, settingsScope ["Driver.Force16Colors"].PropertyValue);
     }
 
     #endregion
@@ -311,13 +310,13 @@ public class SourcesManagerTests
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope.LoadHardCodedDefaults ();
-        settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
+        settingsScope ["Driver.Force16Colors"].PropertyValue = true;
 
         // Act
         string json = sourcesManager.ToJson (settingsScope);
 
         // Assert
-        Assert.Contains ("""Application.QuitKey": "Ctrl+Q""", json);
+        Assert.Contains ("\"Driver.Force16Colors\": true", json);
     }
 
     [Fact]
@@ -327,17 +326,17 @@ public class SourcesManagerTests
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
         settingsScope.LoadHardCodedDefaults ();
-        settingsScope ["Application.QuitKey"].PropertyValue = Key.Q.WithCtrl;
+        settingsScope ["Driver.Force16Colors"].PropertyValue = true;
 
         // Act
-        var stream = sourcesManager.ToStream (settingsScope);
+        Stream stream = sourcesManager.ToStream (settingsScope);
 
         // Assert
         Assert.NotNull (stream);
         stream.Position = 0;
-        var reader = new StreamReader (stream);
+        StreamReader reader = new (stream);
         string json = reader.ReadToEnd ();
-        Assert.Contains ("""Application.QuitKey": "Ctrl+Q""", json);
+        Assert.Contains ("\"Driver.Force16Colors\": true", json);
     }
 
     #endregion
@@ -364,11 +363,11 @@ public class SourcesManagerTests
 
         // Act - Update with first source for location
         var firstSource = "first.json";
-        sourcesManager.Load (settingsScope, """{"Application.QuitKey": "Ctrl+A"}""", firstSource, ConfigLocations.Runtime);
+        sourcesManager.Load (settingsScope, """{"Driver.Force16Colors": true}""", firstSource, ConfigLocations.Runtime);
 
         // Update with second source for same location
         var secondSource = "second.json";
-        sourcesManager.Load (settingsScope, """{"Application.QuitKey": "Ctrl+B"}""", secondSource, ConfigLocations.Runtime);
+        sourcesManager.Load (settingsScope, """{"Driver.Force16Colors": false}""", secondSource, ConfigLocations.Runtime);
 
         // Assert - Only the last source should be stored for the location
         Assert.Single (sourcesManager.Sources);
@@ -394,7 +393,7 @@ public class SourcesManagerTests
         foreach (var location in locations)
         {
             var source = $"config-{location}.json";
-            sourcesManager.Load (settingsScope, """{"Application.QuitKey": "Ctrl+Z"}""", source, location);
+            sourcesManager.Load (settingsScope, """{"Driver.Force16Colors": true}""", source, location);
         }
 
         // Assert
@@ -471,14 +470,14 @@ public class SourcesManagerTests
         // Second operation - json string update
         var jsonSource = "jsonstring";
         var location2 = ConfigLocations.Runtime;
-        sourcesManager.Load (settingsScope, """{"Application.QuitKey": "Ctrl+Z"}""", jsonSource, location2);
+        sourcesManager.Load (settingsScope, """{"Driver.Force16Colors": true}""", jsonSource, location2);
 
         // Perform a stream operation
         var streamSource = "streamdata";
         var location3 = ConfigLocations.GlobalCurrent;
         var stream = new MemoryStream ();
         var writer = new StreamWriter (stream);
-        writer.Write ("""{"Application.QuitKey": "Ctrl+Z"}""");
+        writer.Write ("""{"Driver.Force16Colors": true}""");
         writer.Flush ();
         stream.Position = 0;
         sourcesManager.Load (settingsScope, stream, streamSource, location3);

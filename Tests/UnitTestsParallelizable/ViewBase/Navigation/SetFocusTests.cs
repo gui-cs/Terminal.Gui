@@ -1,18 +1,13 @@
-﻿using UnitTests;
+using UnitTests;
 
 namespace ViewBaseTests.Navigation;
 
-
-public class SetFocusTests () : TestsAllViews
+public class SetFocusTests : TestsAllViews
 {
     [Fact]
     public void SetFocus_With_Null_Superview_Does_Not_Throw_Exception ()
     {
-        var view = new View
-        {
-            Id = "view",
-            CanFocus = true
-        };
+        var view = new View { Id = "view", CanFocus = true };
         Assert.True (view.CanFocus);
         Assert.False (view.HasFocus);
 
@@ -26,11 +21,7 @@ public class SetFocusTests () : TestsAllViews
     [Fact]
     public void SetFocus_SetsFocus ()
     {
-        var view = new View
-        {
-            Id = "view",
-            CanFocus = true
-        };
+        var view = new View { Id = "view", CanFocus = true };
         Assert.True (view.CanFocus);
         Assert.False (view.HasFocus);
 
@@ -41,11 +32,7 @@ public class SetFocusTests () : TestsAllViews
     [Fact]
     public void SetFocus_NoSubView_Focused_Is_Null ()
     {
-        var view = new View
-        {
-            Id = "view",
-            CanFocus = true
-        };
+        var view = new View { Id = "view", CanFocus = true };
         Assert.True (view.CanFocus);
         Assert.False (view.HasFocus);
 
@@ -57,17 +44,9 @@ public class SetFocusTests () : TestsAllViews
     [Fact]
     public void SetFocus_SubView_Focused_Is_Set ()
     {
-        var view = new Window
-        {
-            Id = "view",
-            CanFocus = true
-        };
+        var view = new Window { Id = "view", CanFocus = true };
 
-        var subview = new View
-        {
-            Id = "subview",
-            CanFocus = true
-        };
+        var subview = new View { Id = "subview", CanFocus = true };
         view.Add (subview);
         Assert.True (view.CanFocus);
         Assert.False (view.HasFocus);
@@ -80,17 +59,9 @@ public class SetFocusTests () : TestsAllViews
     [Fact]
     public void SetFocus_SetsFocus_DeepestSubView ()
     {
-        var view = new View
-        {
-            Id = "view",
-            CanFocus = true
-        };
+        var view = new View { Id = "view", CanFocus = true };
 
-        var subview = new View
-        {
-            Id = "subview",
-            CanFocus = true
-        };
+        var subview = new View { Id = "subview", CanFocus = true };
         view.Add (subview);
 
         view.SetFocus ();
@@ -101,35 +72,15 @@ public class SetFocusTests () : TestsAllViews
     [Fact]
     public void SetFocus_SetsFocus_DeepestSubView_CompoundSubView ()
     {
-        var view = new View
-        {
-            Id = "view",
-            CanFocus = true
-        };
+        var view = new View { Id = "view", CanFocus = true };
 
-        var subView = new View
-        {
-            Id = "subView",
-            CanFocus = true
-        };
+        var subView = new View { Id = "subView", CanFocus = true };
 
-        var subViewSubView1 = new View
-        {
-            Id = "subViewSubView1",
-            CanFocus = false
-        };
+        var subViewSubView1 = new View { Id = "subViewSubView1", CanFocus = false };
 
-        var subViewSubView2 = new View
-        {
-            Id = "subViewSubView2",
-            CanFocus = true
-        };
+        var subViewSubView2 = new View { Id = "subViewSubView2", CanFocus = true };
 
-        var subViewSubView3 = new View
-        {
-            Id = "subViewSubView3",
-            CanFocus = false
-        };
+        var subViewSubView3 = new View { Id = "subViewSubView3", CanFocus = false };
         subView.Add (subViewSubView1, subViewSubView2, subViewSubView3);
 
         view.Add (subView);
@@ -143,35 +94,15 @@ public class SetFocusTests () : TestsAllViews
     [Fact]
     public void SetFocus_CompoundSubView_SetFocus_Sets ()
     {
-        var view = new View
-        {
-            Id = "view",
-            CanFocus = true
-        };
+        var view = new View { Id = "view", CanFocus = true };
 
-        var subView = new View
-        {
-            Id = "subView",
-            CanFocus = true
-        };
+        var subView = new View { Id = "subView", CanFocus = true };
 
-        var subViewSubView1 = new View
-        {
-            Id = "subViewSubView1",
-            CanFocus = true
-        };
+        var subViewSubView1 = new View { Id = "subViewSubView1", CanFocus = true };
 
-        var subViewSubView2 = new View
-        {
-            Id = "subViewSubView2",
-            CanFocus = true
-        };
+        var subViewSubView2 = new View { Id = "subViewSubView2", CanFocus = true };
 
-        var subViewSubView3 = new View
-        {
-            Id = "subViewSubView3",
-            CanFocus = true
-        };
+        var subViewSubView3 = new View { Id = "subViewSubView3", CanFocus = true };
         subView.Add (subViewSubView1, subViewSubView2, subViewSubView3);
 
         view.Add (subView);
@@ -191,58 +122,33 @@ public class SetFocusTests () : TestsAllViews
         Assert.False (subViewSubView3.HasFocus);
     }
 
-
     [Fact]
     public void SetFocus_AdornmentSubView_SetFocus_Sets ()
     {
-        var view = new View
-        {
-            Id = "view",
-            CanFocus = true
-        };
+        var view = new View { Id = "view", CanFocus = true };
 
-        var subView = new View
-        {
-            Id = "subView",
-            CanFocus = true
-        };
+        var subView = new View { Id = "subView", CanFocus = true };
 
         view.Add (subView);
 
-        var borderSubView = new View
-        {
-            Id = "borderSubView",
-            CanFocus = true
-        };
+        var borderSubView = new View { Id = "borderSubView", CanFocus = true };
 
+        var subViewSubView1 = new View { Id = "subViewSubView1", CanFocus = true };
 
-        var subViewSubView1 = new View
-        {
-            Id = "subViewSubView1",
-            CanFocus = true
-        };
+        var subViewSubView2 = new View { Id = "subViewSubView2", CanFocus = true };
 
-        var subViewSubView2 = new View
-        {
-            Id = "subViewSubView2",
-            CanFocus = true
-        };
-
-        var subViewSubView3 = new View
-        {
-            Id = "subViewSubView3",
-            CanFocus = true
-        };
+        var subViewSubView3 = new View { Id = "subViewSubView3", CanFocus = true };
         borderSubView.Add (subViewSubView1, subViewSubView2, subViewSubView3);
 
-        view.Border!.Add (borderSubView);
+        view.Border.GetOrCreateView ().Add (borderSubView);
 
         view.SetFocus ();
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
         Assert.False (borderSubView.HasFocus);
 
-        view.Border!.CanFocus = true;
+        view.Border.GetOrCreateView ();
+        view.Border.View?.CanFocus = true;
         subViewSubView1.SetFocus ();
         Assert.True (view.HasFocus);
         Assert.False (subView.HasFocus);
@@ -251,47 +157,47 @@ public class SetFocusTests () : TestsAllViews
         Assert.False (subViewSubView2.HasFocus);
         Assert.False (subViewSubView3.HasFocus);
 
-        view.Border!.CanFocus = false;
+        view.Border.View?.CanFocus = false;
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
-        Assert.False (view.Border!.HasFocus);
+        Assert.False (view.Border.View?.HasFocus);
         Assert.False (borderSubView.HasFocus);
         Assert.False (subViewSubView1.HasFocus);
         Assert.False (subViewSubView2.HasFocus);
         Assert.False (subViewSubView3.HasFocus);
 
-        view.Border!.CanFocus = true;
+        view.Border.View?.CanFocus = true;
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
-        Assert.False (view.Border!.HasFocus);
+        Assert.False (view.Border.View?.HasFocus);
         Assert.False (borderSubView.HasFocus);
         Assert.False (subViewSubView1.HasFocus);
         Assert.False (subViewSubView2.HasFocus);
         Assert.False (subViewSubView3.HasFocus);
 
-        view.Border!.SetFocus ();
+        view.Border.View!.SetFocus ();
         Assert.True (view.HasFocus);
-        Assert.True (view.Border!.HasFocus);
+        Assert.True (view.Border.View?.HasFocus);
         Assert.False (subView.HasFocus);
         Assert.True (borderSubView.HasFocus);
         Assert.True (subViewSubView1.HasFocus);
         Assert.False (subViewSubView2.HasFocus);
         Assert.False (subViewSubView3.HasFocus);
 
-        view.Border!.CanFocus = false;
+        view.Border.View?.CanFocus = false;
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
-        Assert.False (view.Border!.HasFocus);
+        Assert.False (view.Border.View?.HasFocus);
         Assert.False (borderSubView.HasFocus);
         Assert.False (subViewSubView1.HasFocus);
         Assert.False (subViewSubView2.HasFocus);
         Assert.False (subViewSubView3.HasFocus);
 
-        view.Border!.CanFocus = true;
+        view.Border.View?.CanFocus = true;
         subViewSubView1.SetFocus ();
         Assert.True (view.HasFocus);
         Assert.False (subView.HasFocus);
-        Assert.True (view.Border!.HasFocus);
+        Assert.True (view.Border.View?.HasFocus);
         Assert.True (borderSubView.HasFocus);
         Assert.True (subViewSubView1.HasFocus);
         Assert.False (subViewSubView2.HasFocus);
@@ -300,34 +206,21 @@ public class SetFocusTests () : TestsAllViews
         subView.SetFocus ();
         Assert.True (view.HasFocus);
         Assert.True (subView.HasFocus);
-        Assert.False (view.Border!.HasFocus);
+        Assert.False (view.Border.View?.HasFocus);
         Assert.False (borderSubView.HasFocus);
         Assert.False (subViewSubView1.HasFocus);
         Assert.False (subViewSubView2.HasFocus);
         Assert.False (subViewSubView3.HasFocus);
     }
 
-
     [Fact]
     public void SetFocus_Peer_LeavesOther ()
     {
-        var view = new View
-        {
-            Id = "view",
-            CanFocus = true
-        };
+        var view = new View { Id = "view", CanFocus = true };
 
-        var subview1 = new View
-        {
-            Id = "subview1",
-            CanFocus = true
-        };
+        var subview1 = new View { Id = "subview1", CanFocus = true };
 
-        var subview2 = new View
-        {
-            Id = "subview2",
-            CanFocus = true
-        };
+        var subview2 = new View { Id = "subview2", CanFocus = true };
         view.Add (subview1, subview2);
 
         view.SetFocus ();
@@ -344,39 +237,19 @@ public class SetFocusTests () : TestsAllViews
     [Fact]
     public void SetFocus_On_Peer_Moves_Focus_To_Peer ()
     {
-        var top = new View
-        {
-            Id = "top",
-            CanFocus = true
-        };
+        var top = new View { Id = "top", CanFocus = true };
 
-        var view1 = new View
-        {
-            Id = "view1",
-            CanFocus = true
-        };
+        var view1 = new View { Id = "view1", CanFocus = true };
 
-        var subView1 = new View
-        {
-            Id = "subView1",
-            CanFocus = true
-        };
+        var subView1 = new View { Id = "subView1", CanFocus = true };
 
         view1.Add (subView1);
 
-        var subView1SubView1 = new View
-        {
-            Id = "subView1subView1",
-            CanFocus = true
-        };
+        var subView1SubView1 = new View { Id = "subView1subView1", CanFocus = true };
 
         subView1.Add (subView1SubView1);
 
-        var view2 = new View
-        {
-            Id = "view2",
-            CanFocus = true
-        };
+        var view2 = new View { Id = "view2", CanFocus = true };
 
         top.Add (view1, view2);
         Assert.False (view1.HasFocus);
