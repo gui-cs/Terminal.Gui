@@ -61,7 +61,7 @@ public class TreeTableSourceTests : TestDriverBase
     public void Space_WithCheckBoxWrapper_TogglesCheckState ()
     {
         TableView tv = GetTreeTableView (out _);
-        CheckBoxTableSourceWrapperByIndex checkSource = new (tv, tv.Table);
+        CheckBoxTableSourceWrapperByIndex checkSource = new (tv, tv.Table!);
         tv.Table = checkSource;
 
         // Initially no checked rows.

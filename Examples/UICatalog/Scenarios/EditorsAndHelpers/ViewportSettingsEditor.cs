@@ -45,38 +45,37 @@ public sealed class ViewportSettingsEditor : EditorBase
             _contentSizeEditor?.Value = ViewToEdit?.Viewport.Size;
         }
 
-        _cbAllowNegativeX?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeX) ? CheckState.Checked : CheckState.UnChecked;
+        _cbAllowNegativeX?.Value = ViewToEdit!.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeX) ? CheckState.Checked : CheckState.UnChecked;
 
-        _cbAllowNegativeY?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeY) ? CheckState.Checked : CheckState.UnChecked;
+        _cbAllowNegativeY?.Value = ViewToEdit!.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeY) ? CheckState.Checked : CheckState.UnChecked;
 
-        _cbAllowXGreaterThanContentWidth?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowXGreaterThanContentWidth)
+        _cbAllowXGreaterThanContentWidth?.Value = ViewToEdit!.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowXGreaterThanContentWidth)
                                                       ? CheckState.Checked
                                                       : CheckState.UnChecked;
 
-        _cbAllowYGreaterThanContentHeight?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowYGreaterThanContentHeight)
+        _cbAllowYGreaterThanContentHeight?.Value = ViewToEdit!.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowYGreaterThanContentHeight)
                                                        ? CheckState.Checked
                                                        : CheckState.UnChecked;
 
-        _cbAllowXPlusWidthGreaterThanContentWidth?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowXPlusWidthGreaterThanContentWidth)
+        _cbAllowXPlusWidthGreaterThanContentWidth?.Value = ViewToEdit!.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowXPlusWidthGreaterThanContentWidth)
                                                                ? CheckState.Checked
                                                                : CheckState.UnChecked;
 
         _cbAllowYPlusHeightGreaterThanContentHeight?.Value =
-            ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowYPlusHeightGreaterThanContentHeight) ? CheckState.Checked : CheckState.UnChecked;
+            ViewToEdit!.ViewportSettings.HasFlag (ViewportSettingsFlags.AllowYPlusHeightGreaterThanContentHeight) ? CheckState.Checked : CheckState.UnChecked;
 
-        _cbClearContentOnly?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.ClearContentOnly) ? CheckState.Checked : CheckState.UnChecked;
+        _cbClearContentOnly?.Value = ViewToEdit!.ViewportSettings.HasFlag (ViewportSettingsFlags.ClearContentOnly) ? CheckState.Checked : CheckState.UnChecked;
 
-        _cbClipContentOnly?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.ClipContentOnly) ? CheckState.Checked : CheckState.UnChecked;
+        _cbClipContentOnly?.Value = ViewToEdit!.ViewportSettings.HasFlag (ViewportSettingsFlags.ClipContentOnly) ? CheckState.Checked : CheckState.UnChecked;
+        _cbTransparent?.Value = ViewToEdit!.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) ? CheckState.Checked : CheckState.UnChecked;
 
-        _cbTransparent?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) ? CheckState.Checked : CheckState.UnChecked;
+        _cbTransparentMouse?.Value = ViewToEdit!.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse) ? CheckState.Checked : CheckState.UnChecked;
 
-        _cbTransparentMouse?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse) ? CheckState.Checked : CheckState.UnChecked;
-
-        _osVerticalScrollBar?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar)
+        _osVerticalScrollBar?.Value = ViewToEdit!.ViewportSettings.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar)
                                           ? ScrollBarVisibilityMode.Auto
                                           : ScrollBarVisibilityMode.None;
 
-        _osHorizontalScrollBar?.Value = ViewToEdit.ViewportSettings.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar)
+        _osHorizontalScrollBar?.Value = ViewToEdit!.ViewportSettings.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar)
                                             ? ScrollBarVisibilityMode.Auto
                                             : ScrollBarVisibilityMode.None;
 

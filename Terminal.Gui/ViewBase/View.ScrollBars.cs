@@ -128,21 +128,13 @@ public partial class View
     {
         var scrollBar = (ScrollBar)sender!;
 
-        if (scrollBar.Orientation == Orientation.Vertical)
-        {
-            Padding.Thickness = Padding.Thickness with { Right = scrollBar.Visible ? Padding.Thickness.Right + 1 : Padding.Thickness.Right };
-        }
-        else
-        {
-            Padding.Thickness = Padding.Thickness with { Bottom = scrollBar.Visible ? Padding.Thickness.Bottom + 1 : Padding.Thickness.Bottom };
-        }
+        // Do NOT adjust Padding.Thickness here — the VisibleChanged handler already does so
+        // when the scrollbar becomes visible. Adjusting here would cause a double-increment.
         scrollBar.Layout ();
     }
 
     private void ConfigureVerticalScrollBarEvents (ScrollBar scrollBar)
     {
-        Padding.Thickness = Padding.Thickness with { Right = scrollBar.Visible ? Padding.Thickness.Right + 1 : Padding.Thickness.Right };
-
         scrollBar.ValueChanged += (_, args) =>
                                   {
                                       Viewport = Viewport with { Y = Math.Min (args.NewValue, scrollBar.ScrollableContentSize - scrollBar.VisibleContentSize) };
@@ -165,8 +157,6 @@ public partial class View
 
     private void ConfigureHorizontalScrollBarEvents (ScrollBar scrollBar)
     {
-        Padding.Thickness = Padding.Thickness with { Bottom = scrollBar.Visible ? Padding.Thickness.Bottom + 1 : Padding.Thickness.Bottom };
-
         scrollBar.ValueChanged += (_, args) =>
                                   {
                                       Viewport = Viewport with { X = Math.Min (args.NewValue, scrollBar.ScrollableContentSize - scrollBar.VisibleContentSize) };
