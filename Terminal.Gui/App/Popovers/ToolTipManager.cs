@@ -11,34 +11,37 @@ namespace Terminal.Gui.App;
 ///         It centralizes hover handling (MouseEnter / MouseLeave) and ensures that only one tooltip is visible at a time.
 ///     </para>
 ///     <para>
-///         Tooltip content is defined per <see cref="View"/> using a factory (<see cref="Func{View}"/>),
+///         ToolTip content is defined per <see cref="View"/> using a factory (<see cref="Func{View}"/>),
 ///         allowing dynamic content creation on each display.
 ///     </para>
 ///     <para>
 ///         The manager avoids adding state directly to <see cref="View"/> by maintaining an external registry.
 ///     </para>
 /// </remarks>
-public sealed class TooltipManager : IDisposable
+public sealed class ToolTipManager : IDisposable
 {
+    private readonly object _syncRoot = new ();
+
     /// <summary>
-    ///     Gets the singleton instance of the TooltipManager class.
+    ///     Gets the singleton instance of the ToolTipManager class.
     /// </summary>
     /// <remarks>
-    ///     Use this property to access the global TooltipManager for managing tooltips throughout the
-    ///     application. This instance is thread-safe and intended to be used as a shared resource.
+    ///     Use this property to access the global ToolTipManager for managing tooltips throughout the
+    ///     application. Instance initialization is thread-safe. Access to internal state is synchronized,
+    ///     but tooltip operations are expected to run on the UI thread.
     /// </remarks>
-    public static TooltipManager Instance { get; } = new ();
+    public static ToolTipManager Instance { get; } = new ();
 
     // Stores tooltip registrations for each target view
     private readonly Dictionary<View, ToolTipRegistration> _registrations = new ();
 
     // Shared tooltip instance reused across all views
-    private ToolTipHost<View>? _sharedTooltip;
+    private ToolTipHost<View>? _sharedToolTip;
 
     // Currently active target view (if any)
     private View? _currentTarget;
 
-    private TooltipManager () { }
+    private ToolTipManager () { }
 
     /// <summary>
     ///     Registers a tooltip provider for the specified view, enabling tooltips to be displayed when the user hovers over
@@ -46,7 +49,7 @@ public sealed class TooltipManager : IDisposable
     /// </summary>
     /// <remarks>
     ///     If a tooltip provider is already registered for the specified view, it will be replaced by
-    ///     the new provider. Tooltips are shown when the mouse enters the view and hidden when the mouse leaves. To remove
+    ///     the new provider. ToolTips are shown when the mouse enters the view and hidden when the mouse leaves. To remove
     ///     a tooltip, use the appropriate removal method.
     /// </remarks>
     /// <param name="target">The view for which the tooltip should be displayed. Cannot be null.</param>
@@ -56,29 +59,26 @@ public sealed class TooltipManager : IDisposable
         ArgumentNullException.ThrowIfNull (target);
         ArgumentNullException.ThrowIfNull (provider);
 
-        // Ensure previous registration is removed to avoid duplicate subscriptions
-        RemoveTooltip (target);
-
-        // Subscribe to hover events
-        target.MouseEnter += OnMouseEnter;
-        target.MouseLeave += OnMouseLeave;
-        target.Disposing += OnDisposing;
-
-        // Store registration for later removal
-        _registrations [target] = new ToolTipRegistration (OnMouseEnter, OnMouseLeave, OnDisposing);
-
-        return;
-
-        void OnMouseLeave (object? sender, EventArgs e)
+        lock (_syncRoot)
         {
-            // Only hide if this target is still the active one
-            if (_currentTarget == target)
-            {
-                Hide ();
-            }
-        }
+            RemoveToolTip (target);
 
-        void OnMouseEnter (object? sender, CancelEventArgs e) => ShowFor (target, provider);
+            target.MouseEnter += OnMouseEnter;
+            target.MouseLeave += OnMouseLeave;
+            target.Disposing += OnDisposing;
+
+            _registrations [target] = new ToolTipRegistration (OnMouseEnter, OnMouseLeave, OnDisposing);
+
+            void OnMouseLeave (object? sender, EventArgs e)
+            {
+                if (_currentTarget == target)
+                {
+                    Hide ();
+                }
+            }
+
+            void OnMouseEnter (object? sender, CancelEventArgs e) => ShowFor (target, provider);
+        }
     }
 
     private void OnDisposing (object? sender, EventArgs e)
@@ -96,24 +96,25 @@ public sealed class TooltipManager : IDisposable
     /// <remarks>
     ///     This unsubscribes from events and removes any stored tooltip content.
     /// </remarks>
-    public void RemoveTooltip (View target)
+    public void RemoveToolTip (View target)
     {
         ArgumentNullException.ThrowIfNull (target);
 
-        if (_registrations.TryGetValue (target, out ToolTipRegistration? registration))
+        lock (_syncRoot)
         {
-            // Unsubscribe from events
-            target.MouseEnter -= registration.MouseEnter;
-            target.MouseLeave -= registration.MouseLeave;
-            target.Disposing -= registration.Disposing;
+            if (_registrations.TryGetValue (target, out ToolTipRegistration? registration))
+            {
+                target.MouseEnter -= registration.MouseEnter;
+                target.MouseLeave -= registration.MouseLeave;
+                target.Disposing -= registration.Disposing;
 
-            _registrations.Remove (target);
-        }
+                _registrations.Remove (target);
+            }
 
-        // If the removed target is currently displayed, hide the tooltip
-        if (_currentTarget == target)
-        {
-            Hide ();
+            if (_currentTarget == target)
+            {
+                Hide ();
+            }
         }
     }
 
@@ -131,22 +132,16 @@ public sealed class TooltipManager : IDisposable
         ArgumentNullException.ThrowIfNull (target);
         ArgumentNullException.ThrowIfNull (provider);
 
-        // Create the shared tooltip if needed
-        _sharedTooltip ??= new ToolTipHost<View> ();
+        lock (_syncRoot)
+        {
+            _sharedToolTip ??= new ToolTipHost<View> ();
+            _sharedToolTip.App ??= target.App;
+            _sharedToolTip.Anchor = () => target.FrameToScreen ();
+            _sharedToolTip.SetContent (provider.GetContent);
 
-        // Ensure the tooltip is attached to the correct application context
-        _sharedTooltip.App ??= target.App;
-
-        // Anchor tooltip relative to the target view
-        _sharedTooltip.Anchor = () => target.FrameToScreen ();
-
-        // Update content dynamically
-        _sharedTooltip.SetContent (provider.GetContent);
-
-        _currentTarget = target;
-
-        // Display tooltip
-        _sharedTooltip.MakeVisible ();
+            _currentTarget = target;
+            _sharedToolTip.MakeVisible ();
+        }
     }
 
     /// <summary>
@@ -154,9 +149,11 @@ public sealed class TooltipManager : IDisposable
     /// </summary>
     public void Hide ()
     {
-        _sharedTooltip?.Visible = false;
-
-        _currentTarget = null;
+        lock (_syncRoot)
+        {
+            _sharedToolTip?.Visible = false;
+            _currentTarget = null;
+        }
     }
 
     /// <summary>
@@ -167,18 +164,20 @@ public sealed class TooltipManager : IDisposable
     /// </remarks>
     public void Dispose ()
     {
-        foreach ((View target, ToolTipRegistration registration) in _registrations)
+        lock (_syncRoot)
         {
-            target.MouseEnter -= registration.MouseEnter;
-            target.MouseLeave -= registration.MouseLeave;
+            foreach ((View target, ToolTipRegistration registration) in _registrations)
+            {
+                target.MouseEnter -= registration.MouseEnter;
+                target.MouseLeave -= registration.MouseLeave;
+                target.Disposing -= registration.Disposing;
+            }
+
+            _registrations.Clear ();
+            _sharedToolTip?.Dispose ();
+            _sharedToolTip = null;
+            _currentTarget = null;
         }
-
-        _registrations.Clear ();
-
-        _sharedTooltip?.Dispose ();
-        _sharedTooltip = null;
-
-        _currentTarget = null;
     }
 
     /// <summary>

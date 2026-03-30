@@ -58,7 +58,7 @@ namespace Terminal.Gui.Views;
 ///         </listheader>
 ///         <item>
 ///             <term>Click</term>
-///             <description>Accepts the link, opening the URL (<see cref="Command.Accept"/>).</description>
+///             <description>Activate the link, opening the URL (<see cref="Command.Activate"/>).</description>
 ///         </item>
 ///     </list>
 /// </remarks>
@@ -122,7 +122,7 @@ public class Link : View, IDesignable
     /// <param name="url">The URL to open. Should be a well-formed absolute URI.</param>
     public static void OpenUrl (string url)
     {
-        if (!Uri.IsWellFormedUriString (url, UriKind.Absolute) || Environment.GetEnvironmentVariable ("DisableRealDriverIO") is { })
+        if (!Uri.IsWellFormedUriString (url, UriKind.Absolute) || Environment.GetEnvironmentVariable ("DisableRealDriverIO") == "1")
         {
             return;
         }
@@ -391,7 +391,7 @@ public class Link : View, IDesignable
     /// </summary>
     /// <remarks>
     ///     When disposing is true, this method removes the tooltip content associated with this instance
-    ///     from the TooltipManager. Always call the base class Dispose method to ensure proper resource cleanup.
+    ///     from the ToolTipManager. Always call the base class Dispose method to ensure proper resource cleanup.
     /// </remarks>
     /// <param name="disposing">
     ///     true to release both managed and unmanaged resources; false to release only unmanaged

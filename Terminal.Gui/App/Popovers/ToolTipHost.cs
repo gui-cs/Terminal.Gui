@@ -1,7 +1,7 @@
 namespace Terminal.Gui.App;
 
 /// <summary>
-///     A generic tooltip view that hosts a view and can be shown by a <c>TooltipManager</c>.
+///     A generic tooltip view that hosts a view and can be shown by a <c>ToolTipManager</c>.
 /// </summary>
 /// <typeparam name="TView">
 ///     The type of view being hosted. Must derive from <see cref="View"/> and have a parameterless constructor.
@@ -105,11 +105,6 @@ public class ToolTipHost<TView> : PopoverImpl, IDesignable where TView : View, n
     /// </param>
     public override void MakeVisible (Point? idealScreenPosition = null, Rectangle? anchor = null)
     {
-        if (Visible)
-        {
-            return;
-        }
-
         Layout ();
         SetPosition (idealScreenPosition, anchor);
 

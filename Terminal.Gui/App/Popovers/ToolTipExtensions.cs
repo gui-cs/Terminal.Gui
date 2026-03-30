@@ -5,8 +5,8 @@
 /// </summary>
 /// <remarks>
 ///     These extension methods enable developers to attach or remove tooltips from any View instance.
-///     Tooltips can be specified as static text, dynamically generated text, or as a custom View for advanced scenarios.
-///     Tooltips enhance user experience by providing contextual information when users interact with UI elements.
+///     ToolTips can be specified as static text, dynamically generated text, or as a custom View for advanced scenarios.
+///     ToolTips enhance user experience by providing contextual information when users interact with UI elements.
 /// </remarks>
 public static class ToolTipExtensions
 {
@@ -18,14 +18,21 @@ public static class ToolTipExtensions
         ///     on the view.
         /// </summary>
         /// <remarks>
-        ///     If a tooltip is already set for the view, this method replaces it with the new text. Tooltips
+        ///     If a tooltip is already set for the view, this method replaces it with the new text. ToolTips
         ///     provide additional context or guidance to users interacting with the UI element.
         /// </remarks>
         /// <param name="text">The text to display in the tooltip. If null or empty, no tooltip will be shown.</param>
         public void SetToolTip (string text)
         {
             ArgumentNullException.ThrowIfNull (view);
-            TooltipManager.Instance.SetToolTip (view, new ToolTipProvider (text));
+            if (string.IsNullOrEmpty (text))
+            {
+                ToolTipManager.Instance.RemoveToolTip (view);
+            }
+            else
+            {
+                ToolTipManager.Instance.SetToolTip (view, new ToolTipProvider (text));
+            }
         }
 
         /// <summary>
@@ -44,7 +51,7 @@ public static class ToolTipExtensions
         {
             ArgumentNullException.ThrowIfNull (view);
             ArgumentNullException.ThrowIfNull (textFactory);
-            TooltipManager.Instance.SetToolTip (view, new ToolTipProvider (textFactory));
+            ToolTipManager.Instance.SetToolTip (view, new ToolTipProvider (textFactory));
         }
 
         /// <summary>
@@ -59,7 +66,7 @@ public static class ToolTipExtensions
         {
             ArgumentNullException.ThrowIfNull (view);
             ArgumentNullException.ThrowIfNull (contentFactory);
-            TooltipManager.Instance.SetToolTip (view, new ToolTipProvider (contentFactory));
+            ToolTipManager.Instance.SetToolTip (view, new ToolTipProvider (contentFactory));
         }
 
         /// <summary>
@@ -72,7 +79,7 @@ public static class ToolTipExtensions
         public void RemoveToolTip ()
         {
             ArgumentNullException.ThrowIfNull (view);
-            TooltipManager.Instance.RemoveTooltip (view);
+            ToolTipManager.Instance.RemoveToolTip (view);
         }
     }
 }
