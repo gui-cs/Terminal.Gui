@@ -11,7 +11,7 @@ namespace Terminal.Gui.App;
 ///         It centralizes hover handling (MouseEnter / MouseLeave) and ensures that only one tooltip is visible at a time.
 ///     </para>
 ///     <para>
-///         Tooltip content is defined per <see cref="View"/> using a factory (<see cref="Func{View}"/>),
+///         ToolTip content is defined per <see cref="View"/> using a factory (<see cref="Func{View}"/>),
 ///         allowing dynamic content creation on each display.
 ///     </para>
 ///     <para>
@@ -21,10 +21,10 @@ namespace Terminal.Gui.App;
 public sealed class ToolTipManager : IDisposable
 {
     /// <summary>
-    ///     Gets the singleton instance of the TooltipManager class.
+    ///     Gets the singleton instance of the ToolTipManager class.
     /// </summary>
     /// <remarks>
-    ///     Use this property to access the global TooltipManager for managing tooltips throughout the
+    ///     Use this property to access the global ToolTipManager for managing tooltips throughout the
     ///     application. This instance is thread-safe and intended to be used as a shared resource.
     /// </remarks>
     public static ToolTipManager Instance { get; } = new ();
@@ -33,7 +33,7 @@ public sealed class ToolTipManager : IDisposable
     private readonly Dictionary<View, ToolTipRegistration> _registrations = new ();
 
     // Shared tooltip instance reused across all views
-    private ToolTipHost<View>? _sharedTooltip;
+    private ToolTipHost<View>? _sharedToolTip;
 
     // Currently active target view (if any)
     private View? _currentTarget;
@@ -46,7 +46,7 @@ public sealed class ToolTipManager : IDisposable
     /// </summary>
     /// <remarks>
     ///     If a tooltip provider is already registered for the specified view, it will be replaced by
-    ///     the new provider. Tooltips are shown when the mouse enters the view and hidden when the mouse leaves. To remove
+    ///     the new provider. ToolTips are shown when the mouse enters the view and hidden when the mouse leaves. To remove
     ///     a tooltip, use the appropriate removal method.
     /// </remarks>
     /// <param name="target">The view for which the tooltip should be displayed. Cannot be null.</param>
@@ -132,21 +132,21 @@ public sealed class ToolTipManager : IDisposable
         ArgumentNullException.ThrowIfNull (provider);
 
         // Create the shared tooltip if needed
-        _sharedTooltip ??= new ToolTipHost<View> ();
+        _sharedToolTip ??= new ToolTipHost<View> ();
 
         // Ensure the tooltip is attached to the correct application context
-        _sharedTooltip.App ??= target.App;
+        _sharedToolTip.App ??= target.App;
 
         // Anchor tooltip relative to the target view
-        _sharedTooltip.Anchor = () => target.FrameToScreen ();
+        _sharedToolTip.Anchor = () => target.FrameToScreen ();
 
         // Update content dynamically
-        _sharedTooltip.SetContent (provider.GetContent);
+        _sharedToolTip.SetContent (provider.GetContent);
 
         _currentTarget = target;
 
         // Display tooltip
-        _sharedTooltip.MakeVisible ();
+        _sharedToolTip.MakeVisible ();
     }
 
     /// <summary>
@@ -154,7 +154,7 @@ public sealed class ToolTipManager : IDisposable
     /// </summary>
     public void Hide ()
     {
-        _sharedTooltip?.Visible = false;
+        _sharedToolTip?.Visible = false;
 
         _currentTarget = null;
     }
@@ -171,12 +171,13 @@ public sealed class ToolTipManager : IDisposable
         {
             target.MouseEnter -= registration.MouseEnter;
             target.MouseLeave -= registration.MouseLeave;
+            target.Disposing -= registration.Disposing;
         }
 
         _registrations.Clear ();
 
-        _sharedTooltip?.Dispose ();
-        _sharedTooltip = null;
+        _sharedToolTip?.Dispose ();
+        _sharedToolTip = null;
 
         _currentTarget = null;
     }
