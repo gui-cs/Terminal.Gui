@@ -430,6 +430,7 @@ public class LineCanvas : IDisposable
         _exclusionRegion.Union (lineCanvas._exclusionRegion);
     }
 
+#if PRIOR_DRAWN_REGION
     /// <summary>
     ///     Merges one line canvas into this one, excluding lines (or portions of lines) that fall
     ///     within <paramref name="exclude"/>. Lines that partially overlap the exclusion region are
@@ -545,6 +546,7 @@ public class LineCanvas : IDisposable
             AddLine (new StraightLine (start, segLength, original.Orientation, original.Style, original.Attribute));
         }
     }
+#endif
 
     /// <summary>Removes the last line added to the canvas</summary>
     /// <returns></returns>
