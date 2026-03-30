@@ -574,6 +574,16 @@ public partial class BorderView : AdornmentView
                 }
                 else
                 {
+                    // Reserve the gap cells so overlapped compositing suppresses
+                    // lower-Z views' content border lines at these positions.
+                    int gapStart = clipped.X + 1;
+                    int gapEnd = clipped.Right - 1;
+
+                    if (gapEnd > gapStart)
+                    {
+                        lc.Reserve (new Rectangle (gapStart, borderY, gapEnd - gapStart, 1));
+                    }
+
                     if (clipped.X > contentBorderRect.X)
                     {
                         lc.AddLine (new Point (contentBorderRect.X, borderY),
@@ -606,6 +616,14 @@ public partial class BorderView : AdornmentView
                 }
                 else
                 {
+                    int gapStart = clipped.X + 1;
+                    int gapEnd = clipped.Right - 1;
+
+                    if (gapEnd > gapStart)
+                    {
+                        lc.Reserve (new Rectangle (gapStart, borderY, gapEnd - gapStart, 1));
+                    }
+
                     if (clipped.X > contentBorderRect.X)
                     {
                         lc.AddLine (new Point (contentBorderRect.X, borderY),
@@ -638,6 +656,14 @@ public partial class BorderView : AdornmentView
                 }
                 else
                 {
+                    int gapStart = clipped.Y + 1;
+                    int gapEnd = clipped.Bottom - 1;
+
+                    if (gapEnd > gapStart)
+                    {
+                        lc.Reserve (new Rectangle (borderX, gapStart, 1, gapEnd - gapStart));
+                    }
+
                     if (clipped.Y > contentBorderRect.Y)
                     {
                         lc.AddLine (new Point (borderX, contentBorderRect.Y), clipped.Y - contentBorderRect.Y + 1, Orientation.Vertical, lineStyle, attribute);
@@ -676,6 +702,14 @@ public partial class BorderView : AdornmentView
                 }
                 else
                 {
+                    int gapStart = clipped.Y + 1;
+                    int gapEnd = clipped.Bottom - 1;
+
+                    if (gapEnd > gapStart)
+                    {
+                        lc.Reserve (new Rectangle (borderX, gapStart, 1, gapEnd - gapStart));
+                    }
+
                     if (clipped.Y > contentBorderRect.Y)
                     {
                         lc.AddLine (new Point (borderX, contentBorderRect.Y), clipped.Y - contentBorderRect.Y + 1, Orientation.Vertical, lineStyle, attribute);

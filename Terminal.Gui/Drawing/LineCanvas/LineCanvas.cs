@@ -22,17 +22,29 @@ namespace Terminal.Gui.Drawing;
 ///         line art.
 ///     </para>
 ///     <para>
-///         <b>Exclusion regions.</b> Use <see cref="Exclude"/> to prevent specific cells from appearing in
-///         <see cref="GetCellMap"/>. This is useful when SubViews of an adornment (like title labels) occupy
-///         space that should not contain line-art glyphs.
+///         <b>Exclusion regions</b> (<see cref="Exclude"/>). Prevents resolved cells from appearing in
+///         <see cref="GetCellMap"/> output. Lines still exist in the canvas and still participate in
+///         intersection resolution (auto-join), but excluded positions are filtered out of the final
+///         output. Use this when something else has already been drawn at a position — for example,
+///         a title label on a border, or a SubView that renders its own <see cref="LineCanvas"/>
+///         independently.
 ///     </para>
 ///     <para>
-///         <b>Clipped merge.</b> The <see cref="Merge(LineCanvas, Region?)"/> overload supports merging with
+///         <b>Reserved cells</b> (<see cref="Reserve"/>). Marks positions as intentionally empty —
+///         no line exists here and none should be rendered by other canvases either. Unlike
+///         <see cref="Exclude"/>, reserved cells have no effect on this canvas's resolution or
+///         output. They are metadata consumed during multi-canvas compositing
+///         (see <see cref="View.RenderLineCanvas"/>): when multiple independently-resolved canvases
+///         are layered, reserved cells claim their positions so that cells from canvases composited
+///         later do not show through. Use this for intentional gaps in borders, such as the opening
+///         where a focused tab header connects to the content area.
+///     </para>
+///     <para>
+///         <b>Clipped merge.</b> The <c>Merge(LineCanvas, Region?)</c> overload supports merging with
 ///         an exclusion region that clips incoming lines at the line level — before intersection resolution.
-///         Excluded cells are not added as lines and therefore do not participate in auto-join. This is used
-///         by the drawing system to prevent lower-Z-order views' border lines from appearing in areas already
-///         drawn by higher-Z-order views (e.g., preventing an unfocused tab's border from filling a focused
-///         tab's open gap).
+///         Excluded cells are not added as lines and therefore do not participate in auto-join. Note that this
+///         can fragment lines and produce incorrect junction glyphs; prefer per-canvas resolution with
+///         <see cref="Reserve"/> and compositing for overlapped views.
 ///     </para>
 ///     <para>
 ///         <b>Output.</b> Call <see cref="GetCellMap"/> (or <see cref="GetMap()"/>) to resolve all intersections
@@ -139,12 +151,71 @@ public class LineCanvas : IDisposable
     private Region? _exclusionRegion;
 
     /// <summary>
-    ///     Causes the provided region to be excluded from <see cref="GetCellMap"/> and <see cref="GetMap()"/>.
+    ///     Positions marked as intentionally empty by <see cref="Reserve"/>. These have no effect on
+    ///     this canvas's resolution or output — they are metadata consumed during multi-canvas
+    ///     compositing in <see cref="View.RenderLineCanvas"/>.
+    /// </summary>
+    private HashSet<Point>? _reservedCells;
+
+    /// <summary>
+    ///     Reserves a rectangular region of cells. Reserved cells do not produce visible output and
+    ///     do not affect this canvas's intersection resolution or <see cref="GetCellMap"/> output.
+    ///     They are metadata consumed during multi-canvas compositing
+    ///     (see <see cref="View.RenderLineCanvas"/>): reserved cells claim their positions so that
+    ///     cells from canvases composited later do not show through.
     /// </summary>
     /// <remarks>
     ///     <para>
+    ///         Use this for intentional gaps in borders — positions where a line is deliberately
+    ///         absent and lines from other canvases should not show through. For example, the open
+    ///         gap in a focused tab's border where the tab header connects to the content area.
+    ///     </para>
+    ///     <para>
+    ///         Compare with <see cref="Exclude"/>: Exclude filters this canvas's own resolved output
+    ///         (lines still auto-join through excluded positions). Reserve has no effect on this
+    ///         canvas — it only affects how multiple canvases are layered during compositing.
+    ///     </para>
+    ///     <para>
+    ///         Reserved cells are cleared when <see cref="Clear"/> is called.
+    ///     </para>
+    /// </remarks>
+    /// <param name="rect">The rectangle of cells to reserve, in canvas coordinates.</param>
+    public void Reserve (Rectangle rect)
+    {
+        _reservedCells ??= [];
+
+        for (int y = rect.Y; y < rect.Bottom; y++)
+        {
+            for (int x = rect.X; x < rect.Right; x++)
+            {
+                _reservedCells.Add (new Point (x, y));
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Gets the set of reserved cells, or <see langword="null"/> if none have been reserved.
+    /// </summary>
+    public HashSet<Point>? GetReservedCells () => _reservedCells;
+
+    /// <summary>
+    ///     Causes the provided region to be excluded from <see cref="GetCellMap"/> and <see cref="GetMap()"/>.
+    ///     Lines at excluded positions still exist in the canvas and still participate in intersection
+    ///     resolution (auto-join), but the resolved cells are filtered out of the output.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Use this when something else has already been drawn at a position and the line-art glyph
+    ///         should not overwrite it — for example, a title label drawn on a border line, or a SubView
+    ///         that renders its own <see cref="LineCanvas"/> independently.
+    ///     </para>
+    ///     <para>
     ///         Each call to this method will add to the exclusion region. To clear the exclusion region, call
     ///         <see cref="ClearCache"/>.
+    ///     </para>
+    ///     <para>
+    ///         Compare with <see cref="Reserve"/>: Exclude filters this canvas's own output; Reserve marks
+    ///         positions as claimed during multi-canvas compositing (see <see cref="View.RenderLineCanvas"/>).
     ///     </para>
     /// </remarks>
     public void Exclude (Region region)
@@ -165,6 +236,7 @@ public class LineCanvas : IDisposable
         _cachedBounds = Rectangle.Empty;
         _lines.Clear ();
         ClearExclusions ();
+        _reservedCells = null;
     }
 
     /// <summary>

@@ -1,33 +1,88 @@
 # Transparent Adornment Drawing — Design Plan
 
+## Status: ✅ IMPLEMENTED AND PASSING
+
+All tests pass:
+- TabsTests: 21/21 (including 3 previously failing)
+- AutoLineJoinTests: 20/20 (regression guard)
+- OverlappedLineCanvasTests: 5/5 (new general tests)
+- BorderTests: 9/9
+- Full parallelizable suite: 15303 total, 0 failures
+- Non-parallelizable suite: 59 total, 0 failures
+
 ## Problem Statement
 
-When SubViews of Adornments (e.g., Tab headers inside a Border) draw their LineCanvas lines,
-the current merge strategy (`LineCanvas.Merge`) has no way to respect Z-order occlusion.
-The attempted fix — `Merge(LineCanvas, Region? exclude)` — clips incoming lines against a
-"prior drawn region," but this **fragments lines before intersection resolution**, breaking
-auto-line-join (e.g., T-junctions and corners become gaps or wrong glyphs).
+When SubViews with `SuperViewRendersLineCanvas=true` AND `Arrangement=ViewArrangement.Overlapped`
+merge their LineCanvas into a SuperView's LC, the flat merge causes wrong junction glyphs
+because lines from different Z-levels auto-join when they shouldn't.
 
-### Concrete symptom
+### Root Cause
 
-3 TabView tests fail (`Top_TwoTabs_Tab1Focused_DrawsCorrectly`, etc.):
-- Expected: focused tab's bottom border is **open** (gap merges seamlessly with content border)
-- Actual: auto-join produces **closed** T-junctions/crosses because the exclude-based merge
-  fragments the lines that would otherwise connect.
+Flat LC merge sees ALL lines from ALL Z-levels simultaneously. The intersection resolver
+produces junctions that imply connections between views at different Z-levels — e.g., a
+focused tab's intentional border gap gets "filled in" by the unfocused tab's border lines.
 
-### Why the exclude approach is fundamentally flawed
+## Solution: Per-Z-Level LineCanvas Compositing with Reserved Cells
 
-`Merge(LineCanvas, Region? exclude)` splits a StraightLine into sub-segments before adding
-them to the target canvas. The intersection resolver then sees disconnected short segments
-instead of one continuous line, so it cannot produce correct junction glyphs. This is a
-**structural** problem — no tuning of the exclude region fixes it.
+### Architecture
 
-## Deep Trace: What Happens During Tab Drawing
+Three key changes work together:
 
-### View hierarchy for a TabView with 2 tabs (Tab1 focused)
+#### 1. Overlapped/Tiled Partition in DrawSubViews (View.Drawing.cs)
 
-```
-Tabs (the container view)
+SubViews with `SuperViewRendersLineCanvas=true` are partitioned:
+- **Tiled views** (no `ViewArrangement.Overlapped`): flat-merged into the SuperView's LC
+  as before. Auto-join works correctly because tiled views don't overlap.
+- **Overlapped views**: resolved independently via `GetCellMap()`, then stored for
+  compositing during `RenderLineCanvas`. Lines from different Z-levels never auto-join.
+
+#### 2. Reserved Cells in LineCanvas (LineCanvas.cs)
+
+New `Reserve(Rectangle)` method marks cells as "intentionally empty." These are used for
+gaps in borders (e.g., the focused tab's open gap). Reserved cells:
+- Do NOT produce visible output
+- DO suppress lower-Z views' LC cells at the same positions during compositing
+- Are cleared when `LineCanvas.Clear()` is called
+
+#### 3. Direction-Aware Compositing in RenderLineCanvas (View.Drawing.cs)
+
+The compositing algorithm processes overlapped views highest-Z first:
+
+1. **Reserved cells** are claimed first — they suppress all lower-Z cells at those positions
+2. **Normal cells** are rendered — highest-Z cell wins at each position  
+3. **Junction upgrade**: when a lower-Z cell is a STRICT SUPERSET of a higher-Z cell's
+   directions (has all existing directions plus more), AND the additional directions don't
+   point toward any reserved cell, the lower-Z cell replaces the higher-Z cell.
+
+This enables:
+- Tab2's `┴` junction (left+right+up) to upgrade Tab1's `─` (left+right) when the
+  additional UP direction doesn't point toward a gap
+- Tab1's `│` to NOT be upgraded by Tab2's `├` because the additional RIGHT direction
+  points toward a reserved gap cell
+
+### Key Design Decisions
+
+1. **No `Merge(LC, Region? exclude)`**: The previous approach fragmented lines before
+   resolution, breaking auto-join. Removed entirely.
+
+2. **Per-view resolution preserves auto-join within each view**: Each overlapped view's
+   border lines auto-join correctly among themselves.
+
+3. **Reserved cells as explicit gap markers**: The gap concept is general-purpose — any
+   border drawing code can reserve cells to prevent lower-Z bleed-through.
+
+4. **Direction analysis via glyph lookup**: A simple char→flags mapping for box-drawing
+   characters enables the junction upgrade logic without exposing LC internals.
+
+## Files Modified
+
+- `Terminal.Gui/ViewBase/View.Drawing.cs`: DrawSubViews, RenderLineCanvas, LineDirections helper
+- `Terminal.Gui/Drawing/LineCanvas/LineCanvas.cs`: Reserve(), GetReservedCells(), Clear()
+- `Terminal.Gui/ViewBase/Adornment/BorderView.cs`: AddTabSideContentBorder gap reservations
+
+## Files Created
+
+- `Tests/UnitTestsParallelizable/ViewBase/Adornment/OverlappedLineCanvasTests.cs`: 5 general tests
   ├─ Tab1 (focused) — SuperViewRendersLineCanvas = true, Arrangement = Overlapped
   │    └─ Border (Adornment, Settings = Tab | Title)
   │         └─ BorderView

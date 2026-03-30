@@ -793,11 +793,7 @@ public partial class View // Drawing APIs
             return;
         }
 
-#if PRIOR_DRAWN_REGION
-        // Track the cumulative drawn region from higher-Z subviews so that when merging
-        // lower-Z subviews LineCanvas, their lines can be clipped against areas already drawn.
-        Region? priorDrawnRegion = null;
-#endif
+        List<(Dictionary<Point, Cell?> CellMap, HashSet<Point>? Reserved)>? overlappedCellMaps = null;
 
         // Draw the SubViews in reverse Z-order to leverage clipping.
         // SubViews earlier in the collection are drawn last (on top).
@@ -810,32 +806,34 @@ public partial class View // Drawing APIs
                 continue;
             }
 
-#if PRIOR_DRAWN_REGION
-            // BUGBUG: This can cause fragmentation of lines that would otherwise auto-join, which can cause visual artifacts
-            // BUGBUG: (e.g., gaps in borders). We should consider a more robust solution for this,
-            // BUGBUG: such as tracking LineCanvas regions and doing a single pass merge at the end.
-            // Merge with clipping: exclude areas already drawn by higher-Z subviews.
-            // This prevents a lower-Z subview's border lines from rendering where a higher-Z
-            // subview already drew (e.g., a focused tab's open gap must not be filled by an
-            // unfocused tab's border). Lines are split at the boundary so auto-join only sees
-            // the higher-Z subview's lines at those cells.
-            LineCanvas.Merge (view.LineCanvas, priorDrawnRegion);
-#else
-
-            // BUGBUG: Using the OG version of Merge works fine:
-            LineCanvas.Merge (view.LineCanvas);
-#endif
-
-            view.LineCanvas.Clear ();
-
-#if PRIOR_DRAWN_REGION
-            // Snapshot the drawn region after this subview for the next iteration.
-            if (context is { })
+            if (view.Arrangement.HasFlag (ViewArrangement.Overlapped))
             {
-                priorDrawnRegion = context.GetDrawnRegion ();
+                // Overlapped views: resolve independently so their lines don't
+                // auto-join with other Z-levels. Deferred for painters' algorithm
+                // compositing in RenderLineCanvas.
+                Dictionary<Point, Cell?>? resolvedCells = null;
+
+                if (view.LineCanvas.Bounds != Rectangle.Empty)
+                {
+                    resolvedCells = view.LineCanvas.GetCellMap ();
+                }
+
+                overlappedCellMaps ??= [];
+                overlappedCellMaps.Add ((resolvedCells ?? [], view.LineCanvas.GetReservedCells ()));
+
+                view.LineCanvas.Clear ();
             }
-#endif
+            else
+            {
+                // Tiled views: flat merge preserves cross-view auto-join.
+                LineCanvas.Merge (view.LineCanvas);
+                view.LineCanvas.Clear ();
+            }
         }
+
+        // Store for compositing during RenderLineCanvas.
+        // List is ordered highest-Z first (matching the iteration order above).
+        _pendingOverlappedCellMaps = overlappedCellMaps;
     }
 
     #endregion DrawSubViews
@@ -887,21 +885,24 @@ public partial class View // Drawing APIs
             return;
         }
 
-        if (SuperViewRendersLineCanvas || LineCanvas.Bounds == Rectangle.Empty)
+        bool hasOverlapped = _pendingOverlappedCellMaps is { Count: > 0 };
+
+        if (SuperViewRendersLineCanvas || (LineCanvas.Bounds == Rectangle.Empty && !hasOverlapped))
         {
             return;
         }
 
-        // Get both cell map and Region in a single pass through the canvas
+        // Resolve the parent's own LineCanvas (includes tiled SubViews' merged lines).
         (Dictionary<Point, Cell?> cellMap, Region lineRegion) = LineCanvas.GetCellMapWithRegion ();
 
+        // Render the parent's resolved cell map (base layer).
         foreach (KeyValuePair<Point, Cell?> p in cellMap)
         {
-            // Get the entire map
             if (p.Value is null)
             {
                 continue;
             }
+
             SetAttribute (p.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
             Driver.Move (p.Key.X, p.Key.Y);
 
@@ -909,20 +910,197 @@ public partial class View // Drawing APIs
             AddStr (p.Value.Value.Grapheme);
         }
 
-        // Report the drawn region for transparency support
-        // Region was built during the GetCellMapWithRegion() call above
-        if (context is { } && cellMap.Count > 0)
+        // Composite overlapped SubViews' cell maps via painters' algorithm.
+        // The list is ordered highest-Z first. We iterate from index 0 (highest Z)
+        // to the end (lowest Z). A higher-Z LC cell at a given position suppresses
+        // all lower-Z LC cells at that same position, UNLESS the lower-Z cell is a
+        // richer junction (more line directions) and the additional directions don't
+        // point toward reserved (gap) cells of any higher-Z view.
+        if (hasOverlapped)
+        {
+            // Track cells already rendered by higher-Z views and the cell value at each position.
+            Dictionary<Point, Cell> renderedCells = new ();
+
+            // Collect all reserved cells from all views for adjacency checks.
+            HashSet<Point> allReserved = [];
+
+            for (var i = 0; i < _pendingOverlappedCellMaps!.Count; i++)
+            {
+                HashSet<Point>? reservedCells = _pendingOverlappedCellMaps [i].Reserved;
+
+                if (reservedCells is { Count: > 0 })
+                {
+                    allReserved.UnionWith (reservedCells);
+                }
+            }
+
+            for (var i = 0; i < _pendingOverlappedCellMaps!.Count; i++)
+            {
+                (Dictionary<Point, Cell?> overlapCellMap, HashSet<Point>? reservedCells) = _pendingOverlappedCellMaps [i];
+
+                // First, claim reserved cells (intentional gaps). These positions suppress
+                // lower-Z cells without rendering anything visible.
+                if (reservedCells is { Count: > 0 })
+                {
+                    foreach (Point rp in reservedCells)
+                    {
+                        renderedCells.TryAdd (rp, default);
+                    }
+                }
+
+                foreach (KeyValuePair<Point, Cell?> p in overlapCellMap)
+                {
+                    if (p.Value is null)
+                    {
+                        continue;
+                    }
+
+                    if (renderedCells.TryGetValue (p.Key, out Cell existingCell))
+                    {
+                        // Position already claimed. Check if this lower-Z cell should upgrade.
+                        if (existingCell.Grapheme is null or "")
+                        {
+                            // Reserved cell — never upgrade.
+                            continue;
+                        }
+
+                        LineDirections existingDirs = GetLineDirections (existingCell.Grapheme);
+                        LineDirections newDirs = GetLineDirections (p.Value.Value.Grapheme);
+
+                        // Lower-Z cell must be a strict superset of the higher-Z cell's directions:
+                        // it must contain ALL existing directions plus at least one more.
+                        if ((newDirs & existingDirs) != existingDirs)
+                        {
+                            // Not a superset — lower-Z cell removes some directions. Skip.
+                            continue;
+                        }
+
+                        LineDirections additionalDirs = newDirs & ~existingDirs;
+
+                        if (additionalDirs == LineDirections.None)
+                        {
+                            // Lower-Z cell doesn't add any directions — skip.
+                            continue;
+                        }
+
+                        // Check if any additional direction points toward a reserved cell.
+                        bool pointsToReserved = false;
+
+                        if (additionalDirs.HasFlag (LineDirections.Up) && allReserved.Contains (new Point (p.Key.X, p.Key.Y - 1)))
+                        {
+                            pointsToReserved = true;
+                        }
+
+                        if (!pointsToReserved && additionalDirs.HasFlag (LineDirections.Down) && allReserved.Contains (new Point (p.Key.X, p.Key.Y + 1)))
+                        {
+                            pointsToReserved = true;
+                        }
+
+                        if (!pointsToReserved && additionalDirs.HasFlag (LineDirections.Left) && allReserved.Contains (new Point (p.Key.X - 1, p.Key.Y)))
+                        {
+                            pointsToReserved = true;
+                        }
+
+                        if (!pointsToReserved && additionalDirs.HasFlag (LineDirections.Right) && allReserved.Contains (new Point (p.Key.X + 1, p.Key.Y)))
+                        {
+                            pointsToReserved = true;
+                        }
+
+                        if (pointsToReserved)
+                        {
+                            // Additional direction points into a gap — keep higher-Z cell.
+                            continue;
+                        }
+
+                        // Upgrade to the richer junction from the lower-Z view.
+                        renderedCells [p.Key] = p.Value.Value;
+                        SetAttribute (p.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
+                        Driver.Move (p.Key.X, p.Key.Y);
+                        AddStr (p.Value.Value.Grapheme);
+
+                        continue;
+                    }
+
+                    SetAttribute (p.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
+                    Driver.Move (p.Key.X, p.Key.Y);
+                    AddStr (p.Value.Value.Grapheme);
+
+                    renderedCells [p.Key] = p.Value.Value;
+                    lineRegion.Union (new Rectangle (p.Key.X, p.Key.Y, 1, 1));
+                }
+            }
+
+            _pendingOverlappedCellMaps = null;
+        }
+
+        // Report the drawn region for transparency support.
+        if (context is { } && (cellMap.Count > 0 || hasOverlapped))
         {
             context.AddDrawnRegion (lineRegion);
         }
 
         // Cache the line canvas region for use by Border's CachedDrawnRegion.
-        _lastLineCanvasRegion = cellMap.Count > 0 ? lineRegion : null;
+        _lastLineCanvasRegion = cellMap.Count > 0 || hasOverlapped ? lineRegion : null;
 
         LineCanvas.Clear ();
     }
 
     #endregion DrawLineCanvas
+
+    #region LineDirectionHelpers
+
+    /// <summary>Direction flags for box-drawing character analysis during overlapped compositing.</summary>
+    [Flags]
+    private enum LineDirections
+    {
+        None = 0,
+        Up = 1,
+        Down = 2,
+        Left = 4,
+        Right = 8
+    }
+
+    /// <summary>
+    ///     Maps a box-drawing grapheme to its line directions. Used during overlapped LC compositing
+    ///     to determine whether a lower-Z cell adds directions that don't point toward reserved gaps.
+    /// </summary>
+    private static LineDirections GetLineDirections (string? grapheme)
+    {
+        if (string.IsNullOrEmpty (grapheme) || grapheme.Length == 0)
+        {
+            return LineDirections.None;
+        }
+
+        char ch = grapheme [0];
+
+        return ch switch
+        {
+            // Horizontal lines
+            '─' or '━' or '═' => LineDirections.Left | LineDirections.Right,
+
+            // Vertical lines
+            '│' or '┃' or '║' => LineDirections.Up | LineDirections.Down,
+
+            // Corners (single, rounded, double, heavy)
+            '┌' or '╭' or '╔' or '┏' => LineDirections.Right | LineDirections.Down,
+            '┐' or '╮' or '╗' or '┓' => LineDirections.Left | LineDirections.Down,
+            '└' or '╰' or '╚' or '┗' => LineDirections.Right | LineDirections.Up,
+            '┘' or '╯' or '╝' or '┛' => LineDirections.Left | LineDirections.Up,
+
+            // T-junctions (single, double, heavy)
+            '├' or '╠' or '┣' => LineDirections.Up | LineDirections.Down | LineDirections.Right,
+            '┤' or '╣' or '┫' => LineDirections.Up | LineDirections.Down | LineDirections.Left,
+            '┬' or '╦' or '┳' => LineDirections.Left | LineDirections.Right | LineDirections.Down,
+            '┴' or '╩' or '┻' => LineDirections.Left | LineDirections.Right | LineDirections.Up,
+
+            // Cross (single, double, heavy)
+            '┼' or '╬' or '╋' => LineDirections.Up | LineDirections.Down | LineDirections.Left | LineDirections.Right,
+
+            _ => LineDirections.None
+        };
+    }
+
+    #endregion LineDirectionHelpers
 
     #region DrawComplete
 
@@ -940,6 +1118,16 @@ public partial class View // Drawing APIs
     ///     <see cref="CachedDrawnRegion"/> for the Border adornment (which draws via merged LineCanvas).
     /// </summary>
     private Region? _lastLineCanvasRegion;
+
+    /// <summary>
+    ///     Cell maps from overlapped SubViews' independently-resolved <see cref="LineCanvas"/>es,
+    ///     collected during <see cref="DrawSubViews"/>. Composited via painters' algorithm
+    ///     in <see cref="RenderLineCanvas"/>: highest-Z cells take priority over lower-Z cells
+    ///     at the same screen position. Each entry also includes reserved cells (intentional gaps)
+    ///     that suppress lower-Z cells without rendering anything.
+    ///     Ordered highest-Z first (matching DrawSubViews iteration order).
+    /// </summary>
+    private List<(Dictionary<Point, Cell?> CellMap, HashSet<Point>? Reserved)>? _pendingOverlappedCellMaps;
 
     /// <summary>
     ///     Per-view <see cref="DrawContext"/> that tracks only what THIS view drew (text + content),
