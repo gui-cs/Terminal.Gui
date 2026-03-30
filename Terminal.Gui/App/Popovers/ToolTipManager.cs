@@ -33,13 +33,13 @@ public sealed class ToolTipManager : IDisposable
     public static ToolTipManager Instance { get; } = new ();
 
     // Stores tooltip registrations for each target view
-    private readonly Dictionary<View, ToolTipRegistration> _registrations = new ();
+    internal readonly Dictionary<View, ToolTipRegistration> Registrations = new ();
 
     // Shared tooltip instance reused across all views
-    private ToolTipHost<View>? _sharedToolTip;
+    internal ToolTipHost<View>? SharedToolTip;
 
     // Currently active target view (if any)
-    private View? _currentTarget;
+    internal View? CurrentTarget;
 
     private ToolTipManager () { }
 
@@ -67,11 +67,11 @@ public sealed class ToolTipManager : IDisposable
             target.MouseLeave += OnMouseLeave;
             target.Disposing += OnDisposing;
 
-            _registrations [target] = new ToolTipRegistration (OnMouseEnter, OnMouseLeave, OnDisposing);
+            Registrations [target] = new ToolTipRegistration (OnMouseEnter, OnMouseLeave, OnDisposing);
 
             void OnMouseLeave (object? sender, EventArgs e)
             {
-                if (_currentTarget == target)
+                if (CurrentTarget == target)
                 {
                     Hide ();
                 }
@@ -102,16 +102,16 @@ public sealed class ToolTipManager : IDisposable
 
         lock (_syncRoot)
         {
-            if (_registrations.TryGetValue (target, out ToolTipRegistration? registration))
+            if (Registrations.TryGetValue (target, out ToolTipRegistration? registration))
             {
                 target.MouseEnter -= registration.MouseEnter;
                 target.MouseLeave -= registration.MouseLeave;
                 target.Disposing -= registration.Disposing;
 
-                _registrations.Remove (target);
+                Registrations.Remove (target);
             }
 
-            if (_currentTarget == target)
+            if (CurrentTarget == target)
             {
                 Hide ();
             }
@@ -134,13 +134,13 @@ public sealed class ToolTipManager : IDisposable
 
         lock (_syncRoot)
         {
-            _sharedToolTip ??= new ToolTipHost<View> ();
-            _sharedToolTip.App ??= target.App;
-            _sharedToolTip.Anchor = () => target.FrameToScreen ();
-            _sharedToolTip.SetContent (provider.GetContent);
+            SharedToolTip ??= new ToolTipHost<View> ();
+            SharedToolTip.App ??= target.App;
+            SharedToolTip.Anchor = () => target.FrameToScreen ();
+            SharedToolTip.SetContent (provider.GetContent);
 
-            _currentTarget = target;
-            _sharedToolTip.MakeVisible ();
+            CurrentTarget = target;
+            SharedToolTip.MakeVisible ();
         }
     }
 
@@ -151,8 +151,8 @@ public sealed class ToolTipManager : IDisposable
     {
         lock (_syncRoot)
         {
-            _sharedToolTip?.Visible = false;
-            _currentTarget = null;
+            SharedToolTip?.Visible = false;
+            CurrentTarget = null;
         }
     }
 
@@ -166,24 +166,24 @@ public sealed class ToolTipManager : IDisposable
     {
         lock (_syncRoot)
         {
-            foreach ((View target, ToolTipRegistration registration) in _registrations)
+            foreach ((View target, ToolTipRegistration registration) in Registrations)
             {
                 target.MouseEnter -= registration.MouseEnter;
                 target.MouseLeave -= registration.MouseLeave;
                 target.Disposing -= registration.Disposing;
             }
 
-            _registrations.Clear ();
-            _sharedToolTip?.Dispose ();
-            _sharedToolTip = null;
-            _currentTarget = null;
+            Registrations.Clear ();
+            SharedToolTip?.Dispose ();
+            SharedToolTip = null;
+            CurrentTarget = null;
         }
     }
 
     /// <summary>
     ///     Stores event handlers and content factory for a registered view.
     /// </summary>
-    private sealed record ToolTipRegistration (EventHandler<CancelEventArgs> MouseEnter,
+    internal sealed record ToolTipRegistration (EventHandler<CancelEventArgs> MouseEnter,
                                                EventHandler MouseLeave,
                                                EventHandler Disposing);
 }
