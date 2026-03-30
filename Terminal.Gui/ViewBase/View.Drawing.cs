@@ -816,10 +816,10 @@ public partial class View // Drawing APIs
             // subview already drew (e.g., a focused tab's open gap must not be filled by an
             // unfocused tab's border). Lines are split at the boundary so auto-join only sees
             // the higher-Z subview's lines at those cells.
-            LineCanvas.Merge (view.LineCanvas, priorDrawnRegion);
+            //LineCanvas.Merge (view.LineCanvas, priorDrawnRegion);
 
             // BUGBUG: Using the OG version of Merge works fine:
-            //LineCanvas.Merge (view.LineCanvas);
+            LineCanvas.Merge (view.LineCanvas);
             view.LineCanvas.Clear ();
 
             // Snapshot the drawn region after this subview for the next iteration.
