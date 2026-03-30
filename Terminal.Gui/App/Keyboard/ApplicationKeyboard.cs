@@ -21,27 +21,7 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
     /// </summary>
     public ApplicationKeyboard ()
     {
-        // DON'T access Application static properties here - they trigger ApplicationImpl.Instance
-        // which sets ModelUsage to LegacyStatic, breaking parallel tests.
-        // These will be initialized from Application static properties in Init() or when accessed.
-
-        // Initialize to reasonable defaults that match Application defaults
-        // These will be updated by property change events if Application properties change
-        _quitKey = Key.Esc;
-        _arrangeKey = Key.F5.WithCtrl;
-        _nextTabGroupKey = Key.F6;
-        _nextTabKey = Key.Tab;
-        _prevTabGroupKey = Key.F6.WithShift;
-        _prevTabKey = Key.Tab.WithShift;
-
-        // Subscribe to Application static property change events
-        // so we get updated if they change
-        Application.QuitKeyChanged += OnQuitKeyChanged;
-        Application.ArrangeKeyChanged += OnArrangeKeyChanged;
-        Application.NextTabGroupKeyChanged += OnNextTabGroupKeyChanged;
-        Application.NextTabKeyChanged += OnNextTabKeyChanged;
-        Application.PrevTabGroupKeyChanged += OnPrevTabGroupKeyChanged;
-        Application.PrevTabKeyChanged += OnPrevTabKeyChanged;
+        Application.DefaultKeyBindingsChanged += OnDefaultKeyBindingsChanged;
 
         AddKeyBindings ();
     }
@@ -51,23 +31,10 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
     /// </summary>
     private readonly ConcurrentDictionary<Command, View.CommandImplementation> _commandImplementations = new ();
 
-    private Key _quitKey;
-    private Key _arrangeKey;
-    private Key _nextTabGroupKey;
-    private Key _nextTabKey;
-    private Key _prevTabGroupKey;
-    private Key _prevTabKey;
-
     /// <inheritdoc/>
     public void Dispose ()
     {
-        // Unsubscribe from Application static property change events
-        Application.QuitKeyChanged -= OnQuitKeyChanged;
-        Application.ArrangeKeyChanged -= OnArrangeKeyChanged;
-        Application.NextTabGroupKeyChanged -= OnNextTabGroupKeyChanged;
-        Application.NextTabKeyChanged -= OnNextTabKeyChanged;
-        Application.PrevTabGroupKeyChanged -= OnPrevTabGroupKeyChanged;
-        Application.PrevTabKeyChanged -= OnPrevTabKeyChanged;
+        Application.DefaultKeyBindingsChanged -= OnDefaultKeyBindingsChanged;
     }
 
     /// <inheritdoc/>
@@ -77,73 +44,51 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
     public KeyBindings KeyBindings { get; internal set; } = new ();
 
     /// <inheritdoc/>
-    public Key QuitKey
-    {
-        get => _quitKey;
-        set
-        {
-            KeyBindings.Replace (_quitKey, value);
-            _quitKey = value;
-        }
-    }
-
-    /// <inheritdoc/>
-    public Key ArrangeKey
-    {
-        get => _arrangeKey;
-        set
-        {
-            KeyBindings.Replace (_arrangeKey, value);
-            _arrangeKey = value;
-        }
-    }
-
-    /// <inheritdoc/>
-    public Key NextTabGroupKey
-    {
-        get => _nextTabGroupKey;
-        set
-        {
-            KeyBindings.Replace (_nextTabGroupKey, value);
-            _nextTabGroupKey = value;
-        }
-    }
-
-    /// <inheritdoc/>
-    public Key NextTabKey
-    {
-        get => _nextTabKey;
-        set
-        {
-            KeyBindings.Replace (_nextTabKey, value);
-            _nextTabKey = value;
-        }
-    }
-
-    /// <inheritdoc/>
-    public Key PrevTabGroupKey
-    {
-        get => _prevTabGroupKey;
-        set
-        {
-            KeyBindings.Replace (_prevTabGroupKey, value);
-            _prevTabGroupKey = value;
-        }
-    }
-
-    /// <inheritdoc/>
-    public Key PrevTabKey
-    {
-        get => _prevTabKey;
-        set
-        {
-            KeyBindings.Replace (_prevTabKey, value);
-            _prevTabKey = value;
-        }
-    }
-
-    /// <inheritdoc/>
     public event EventHandler<Key>? KeyDown;
+
+    /// <inheritdoc/>
+    public event EventHandler<Key>? KeyUp;
+
+    /// <inheritdoc/>
+    public bool RaiseKeyUpEvent (Key key)
+    {
+        KeyUp?.Invoke (this, key);
+
+        if (key.Handled)
+        {
+            return true;
+        }
+
+        if (App?.TopRunnableView is null)
+        {
+            if (App?.SessionStack is null)
+            {
+                return false;
+            }
+
+            foreach (IRunnable? runnable in App.SessionStack.Select (r => r.Runnable))
+            {
+                if (runnable is View view && view.NewKeyUpEvent (key))
+                {
+                    return true;
+                }
+
+                if (runnable!.IsModal)
+                {
+                    break;
+                }
+            }
+        }
+        else
+        {
+            if (App.TopRunnableView.NewKeyUpEvent (key))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /// <inheritdoc/>
     public bool RaiseKeyDownEvent (Key key)
@@ -214,31 +159,31 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
         // Invoke any Application-scoped KeyBindings.
         // The first view that handles the key will stop the loop.
         // foreach (KeyValuePair<Key, KeyBinding> binding in KeyBindings.GetBindings (key))
-        if (KeyBindings.TryGet (key, out KeyBinding binding))
+        if (!KeyBindings.TryGet (key, out KeyBinding binding))
         {
-            Trace.Keyboard ("app", key, "Entry");
+            return handled;
+        }
+        Trace.Keyboard ("app", key, "Entry");
 
-            if (binding.Target is { })
+        if (binding.Target is { })
+        {
+            if (!binding.Target.Enabled)
             {
-                if (!binding.Target.Enabled)
-                {
-                    return null;
-                }
-
-                handled = binding.Target?.InvokeCommands (binding.Commands,
-                                                          binding with { Source = binding.Target is { } t ? new WeakReference<View> (t) : null });
+                return null;
             }
-            else
+
+            handled = binding.Target?.InvokeCommands (binding.Commands, binding with { Source = binding.Target is { } t ? new WeakReference<View> (t) : null });
+        }
+        else
+        {
+            bool? toReturn = null;
+
+            foreach (Command command in binding.Commands)
             {
-                bool? toReturn = null;
-
-                foreach (Command command in binding.Commands)
-                {
-                    toReturn = InvokeCommand (command, key, binding);
-                }
-
-                handled = toReturn ?? true;
+                toReturn = InvokeCommand (command, key, binding);
             }
+
+            handled = toReturn ?? true;
         }
 
         return handled;
@@ -252,14 +197,13 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
             throw new NotSupportedException (@$"A KeyBinding exists for {command} ({key}) but that command is not supported by Application.");
         }
 
-        if (_commandImplementations.TryGetValue (command, out View.CommandImplementation? implementation))
+        if (!_commandImplementations.TryGetValue (command, out View.CommandImplementation? implementation))
         {
-            CommandContext context = new (command, null, binding); // Create the context here
-
-            return implementation (context);
+            return null;
         }
+        CommandContext context = new (command, null, binding); // Create the context here
 
-        return null;
+        return implementation (context);
     }
 
     internal void AddKeyBindings ()
@@ -312,44 +256,33 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
                         {
                             viewToArrange = viewToArrange switch
                                             {
-                                                Adornment adornmentView => adornmentView.Parent,
+                                                AdornmentView adornmentView => adornmentView.Adornment?.Parent,
                                                 _ => viewToArrange.SuperView
                                             };
                         }
 
-                        if (viewToArrange is { })
-                        {
-                            return viewToArrange.Border?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
-                        }
-
-                        return false;
+                        return viewToArrange is { } ? (viewToArrange.Border.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed) : false;
                     });
 
-        // Need to clear after setting the above to ensure actually clear
-        // because set_QuitKey etc. may call Add
-        //KeyBindings.Clear ();
+        // Bind keys from DefaultKeyBindings
+        KeyBindings.Clear ();
 
-        // Use ReplaceCommands instead of Add, because it's possible that
-        // during construction the Application static properties changed, and
-        // we added those keys already.
-        KeyBindings.ReplaceCommands (QuitKey, Command.Quit);
-        KeyBindings.ReplaceCommands (NextTabKey, Command.NextTabStop);
-        KeyBindings.ReplaceCommands (PrevTabKey, Command.PreviousTabStop);
-        KeyBindings.ReplaceCommands (NextTabGroupKey, Command.NextTabGroup);
-        KeyBindings.ReplaceCommands (PrevTabGroupKey, Command.PreviousTabGroup);
-        KeyBindings.ReplaceCommands (ArrangeKey, Command.Arrange);
+        if (Application.DefaultKeyBindings is { })
+        {
+            foreach (KeyValuePair<Command, PlatformKeyBinding> entry in Application.DefaultKeyBindings)
+            {
+                foreach (Key key in entry.Value.GetCurrentPlatformKeys ())
+                {
+                    KeyBindings.ReplaceCommands (key, entry.Key);
+                }
+            }
+        }
 
-        // TODO: Should these be configurable?
+        // Hard-coded cursor arrow aliases for navigation
         KeyBindings.ReplaceCommands (Key.CursorRight, Command.NextTabStop);
         KeyBindings.ReplaceCommands (Key.CursorDown, Command.NextTabStop);
         KeyBindings.ReplaceCommands (Key.CursorLeft, Command.PreviousTabStop);
         KeyBindings.ReplaceCommands (Key.CursorUp, Command.PreviousTabStop);
-
-        // TODO: Refresh Key should be configurable
-        KeyBindings.ReplaceCommands (Key.F5, Command.Refresh);
-
-        // Each driver handles Suspend themselves
-        KeyBindings.ReplaceCommands (Key.Z.WithCtrl, Command.Suspend);
     }
 
     /// <summary>
@@ -368,18 +301,7 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
     /// </remarks>
     /// <param name="command">The command.</param>
     /// <param name="f">The function.</param>
-    private void AddCommand (Command command, Func<bool?> f) => _commandImplementations [command] = ctx => f ();
+    private void AddCommand (Command command, Func<bool?> f) => _commandImplementations [command] = _ => f ();
 
-    private void OnArrangeKeyChanged (object? sender, ValueChangedEventArgs<Key> e) => ArrangeKey = e.NewValue;
-
-    private void OnNextTabGroupKeyChanged (object? sender, ValueChangedEventArgs<Key> e) => NextTabGroupKey = e.NewValue;
-
-    private void OnNextTabKeyChanged (object? sender, ValueChangedEventArgs<Key> e) => NextTabKey = e.NewValue;
-
-    private void OnPrevTabGroupKeyChanged (object? sender, ValueChangedEventArgs<Key> e) => PrevTabGroupKey = e.NewValue;
-
-    private void OnPrevTabKeyChanged (object? sender, ValueChangedEventArgs<Key> e) => PrevTabKey = e.NewValue;
-
-    // Event handlers for Application static property changes
-    private void OnQuitKeyChanged (object? sender, ValueChangedEventArgs<Key> e) => QuitKey = e.NewValue;
+    private void OnDefaultKeyBindingsChanged (object? sender, EventArgs e) => AddKeyBindings ();
 }

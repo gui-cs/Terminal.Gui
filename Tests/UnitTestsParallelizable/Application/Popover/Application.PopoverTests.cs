@@ -1,4 +1,4 @@
-using Moq;
+﻿using Moq;
 
 namespace ApplicationTests.Popover;
 
@@ -305,7 +305,7 @@ public class ApplicationPopoverTests
             HotKeyBindings.Add (Key.N.WithCtrl, Command.New);
 
             AddCommand (Command.Quit, Quit);
-            KeyBindings.Add (Application.QuitKey, Command.Quit);
+            KeyBindings.Add (Application.GetDefaultKey (Command.Quit), Command.Quit);
 
             return;
 

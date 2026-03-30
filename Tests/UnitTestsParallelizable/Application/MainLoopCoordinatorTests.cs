@@ -2,7 +2,8 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Terminal.Gui.Tests;
+using UnitTests;
+using UnitTests.Parallelizable;
 
 // ReSharper disable AccessToDisposedClosure
 #pragma warning disable xUnit1031
@@ -215,6 +216,67 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
     }
 
     [Fact]
+    public async Task StartInputTaskAsync_DetectsKittyKeyboard_WhenTerminalResponds ()
+    {
+        using (TestLogging.Verbose (outputHelper))
+        {
+            ConcurrentQueue<char> inputQueue = new ();
+            TimedEvents timedEvents = new ();
+            ApplicationMainLoop<char> loop = new ();
+            TestAnsiInput input = new ("\u001B[?31u");
+            AnsiOutput output = new ();
+            TestAnsiComponentFactory factory = new (input, output);
+            MainLoopCoordinator<char> coordinator = new (timedEvents, inputQueue, loop, factory);
+            Mock<IApplication> appMock = new ();
+
+            appMock.SetupProperty (a => a.Driver);
+            appMock.SetupProperty (a => a.MainThreadId, 123);
+
+            await coordinator.StartInputTaskAsync (appMock.Object);
+
+            Assert.True (SpinWait.SpinUntil (() => input.ResponseSent, TimeSpan.FromSeconds (1)));
+            loop.InputProcessor.ProcessQueue ();
+
+            var driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
+            Assert.True (driver.KittyKeyboardProtocol.IsSupported);
+            Assert.Equal ((KittyKeyboardFlags)31, driver.KittyKeyboardProtocol.SupportedFlags);
+
+            // In degraded mode (no real terminal), enable/disable are no-ops,
+            // but detection still succeeds via injected response.
+            Assert.Equal (KittyKeyboardFlags.None, driver.KittyKeyboardProtocol.EnabledFlags);
+
+            coordinator.Stop ();
+        }
+    }
+
+    [Fact]
+    public async Task StartInputTaskAsync_DoesNotEnableKittyKeyboard_ForLegacyConsole ()
+    {
+        ConcurrentQueue<char> inputQueue = new ();
+        TimedEvents timedEvents = new ();
+        ApplicationMainLoop<char> loop = new ();
+        TestAnsiInput input = new (null);
+        AnsiOutput output = new () { IsLegacyConsole = true };
+        TestAnsiComponentFactory factory = new (input, output);
+        MainLoopCoordinator<char> coordinator = new (timedEvents, inputQueue, loop, factory);
+        Mock<IApplication> appMock = new ();
+
+        appMock.SetupProperty (a => a.Driver);
+        appMock.SetupProperty (a => a.MainThreadId, 456);
+
+        await coordinator.StartInputTaskAsync (appMock.Object);
+
+        var driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
+        Assert.False (driver.KittyKeyboardProtocol.IsSupported);
+
+        Assert.DoesNotContain (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardRequestedFlags),
+                               output.GetLastOutput (),
+                               StringComparison.Ordinal);
+
+        coordinator.Stop ();
+    }
+
+    [Fact]
     public async Task TestMainLoopCoordinator_InputCrashes_ExceptionSurfacesMainThread ()
     {
         using IDisposable logScope = TestLogging.BindTo (outputHelper, LogLevel.Critical);
@@ -225,7 +287,7 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
 
         MainLoopCoordinator<char> c = new (new TimedEvents (), new ConcurrentQueue<char> (), Mock.Of<IApplicationMainLoop<char>> (), m.Object);
 
-        AggregateException ex = await Assert.ThrowsAsync<AggregateException> (() => c.StartInputTaskAsync (null));
+        var ex = await Assert.ThrowsAsync<AggregateException> (() => c.StartInputTaskAsync (null));
         Assert.Equal ("Crash on boot", ex.InnerExceptions [0].Message);
     }
 

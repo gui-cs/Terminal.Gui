@@ -50,8 +50,6 @@ public class AnsiOutput : OutputBase, IOutput
     /// </summary>
     public AnsiOutput ()
     {
-        // Logging.Information ($"Creating {nameof (AnsiOutput)}");
-
         _platform = AnsiPlatform.Degraded;
 
         _lastBuffer = new OutputBufferImpl ();
@@ -60,6 +58,13 @@ public class AnsiOutput : OutputBase, IOutput
 
         try
         {
+            // Ensure the console output code page is UTF-8 (65001). The ANSI driver writes
+            // UTF-8 encoded bytes via WriteFile; without this, a fresh Windows terminal uses
+            // its default OEM code page (e.g. 437), causing multi-byte UTF-8 characters
+            // (box-drawing glyphs, etc.) to be misinterpreted as garbled single-byte characters.
+            // See https://github.com/gui-cs/Terminal.Gui/issues/4848
+            Console.OutputEncoding = Encoding.UTF8;
+
             // Check if we have a real console first
             if (!IsAttachedToTerminal)
             {
@@ -141,8 +146,30 @@ public class AnsiOutput : OutputBase, IOutput
     /// <inheritdoc/>
     public void SetSize (int width, int height) => _consoleSize = new Size (width, height);
 
+    /// <summary>
+    ///     When non-<see langword="null"/>, <see cref="GetSize"/> calls this delegate to obtain the
+    ///     real terminal size directly from the OS (e.g. <c>ioctl(TIOCGWINSZ)</c> on Unix or the
+    ///     Console API on Windows). Set by <see cref="AnsiComponentFactory"/> when
+    ///     <see cref="Driver.SizeDetection"/> is <see cref="SizeDetectionMode.Polling"/>.
+    /// </summary>
+    internal Func<Size?>? NativeSizeQuery { get; set; }
+
     /// <inheritdoc/>
-    public Size GetSize () => _consoleSize;
+    public Size GetSize ()
+    {
+        if (NativeSizeQuery is null)
+        {
+            return _consoleSize;
+        }
+        Size? native = NativeSizeQuery ();
+
+        if (native is { })
+        {
+            _consoleSize = native.Value;
+        }
+
+        return _consoleSize;
+    }
 
     /// <inheritdoc/>
     protected override void Write (StringBuilder output)
@@ -171,8 +198,6 @@ public class AnsiOutput : OutputBase, IOutput
         }
         catch (Exception)
         {
-            //Logging.Warning (e.Message);
-
             // ignore for unit tests
         }
     }
@@ -206,10 +231,44 @@ public class AnsiOutput : OutputBase, IOutput
         }
         catch (Exception)
         {
-            //Logging.Warning (e.Message);
-
             // ignore for unit tests
         }
+    }
+
+    /// <summary>
+    ///     Gets the kitty keyboard flags currently enabled on the terminal.
+    /// </summary>
+    internal KittyKeyboardFlags KittyKeyboardEnabledFlags { get; private set; }
+
+    /// <summary>
+    ///     Enables kitty keyboard progressive enhancement flags for the active terminal.
+    /// </summary>
+    /// <param name="flags">The kitty keyboard flags to enable.</param>
+    internal void EnableKittyKeyboard (KittyKeyboardFlags flags)
+    {
+        if (flags == KittyKeyboardFlags.None || _platform == AnsiPlatform.Degraded)
+        {
+            return;
+        }
+
+        Trace.Lifecycle (nameof (AnsiOutput), "KittyKeyboard", $"Writing enable sequence for flags {flags}");
+        Write (EscSeqUtils.CSI_EnableKittyKeyboardFlags (flags));
+        KittyKeyboardEnabledFlags = flags;
+    }
+
+    /// <summary>
+    ///     Restores the previous kitty keyboard flag state if kitty mode was enabled.
+    /// </summary>
+    internal void DisableKittyKeyboard ()
+    {
+        if (KittyKeyboardEnabledFlags == KittyKeyboardFlags.None)
+        {
+            return;
+        }
+
+        Trace.Lifecycle (nameof (AnsiOutput), "KittyKeyboard", $"Writing disable sequence for flags {KittyKeyboardEnabledFlags}");
+        Write (EscSeqUtils.CSI_DisableKittyKeyboardFlags);
+        KittyKeyboardEnabledFlags = KittyKeyboardFlags.None;
     }
 
     /// <inheritdoc cref="IOutput.Write(IOutputBuffer)"/>
@@ -316,13 +375,14 @@ public class AnsiOutput : OutputBase, IOutput
     {
         try
         {
+            DisableKittyKeyboard ();
+
             if (_platform == AnsiPlatform.Degraded)
             {
                 return;
             }
 
             // Restore terminal state: disable mouse, restore buffer, show cursor
-            // TODO: Move Input related CSI sequences to AnsiInput
             Write (EscSeqUtils.CSI_DisableMouseEvents);
             Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
             Write (EscSeqUtils.CSI_ShowCursor);
@@ -333,7 +393,7 @@ public class AnsiOutput : OutputBase, IOutput
         }
         finally
         {
-            //Logging.Trace ("Flushing and closing.");
+            Trace.Lifecycle (nameof (AnsiOutput), "Dispose", "Flushing output and releasing resources.");
 
             _windowsVTOutput?.Dispose ();
         }

@@ -16,7 +16,7 @@ namespace Terminal.Gui.Views;
 ///     </para>
 ///     <para>
 ///         To run modally, pass the dialog to <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>.
-///         The dialog executes until terminated by <see cref="Application.QuitKey"/> (Esc by default),
+///         The dialog executes until terminated by <see cref="Application.GetDefaultKey"/> (Esc by default),
 ///         a press of one of the <see cref="Dialog{TResult}.Buttons"/>, or if any subview receives the
 ///         <see cref="Command.Accept"/>
 ///         command
@@ -72,7 +72,7 @@ public class Dialog : Dialog<int>
     ///     The default shadow style for new <see cref="Dialog"/> instances. Can be configured via theme files.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
-    public static ShadowStyle DefaultShadow { get; set; } = ShadowStyle.Transparent;
+    public static ShadowStyles DefaultShadow { get; set; } = ShadowStyles.Transparent;
 
     /// <summary>
     ///     Helper property that gets whether the dialog was canceled (Result is <see langword="null"/> or 1).

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.Drivers;
 
@@ -48,6 +49,7 @@ internal class DriverImpl : IDriver
         _componentFactory = componentFactory;
         _inputProcessor = inputProcessor;
         _inputProcessor.KeyDown += (s, e) => KeyDown?.Invoke (s, e);
+        _inputProcessor.KeyUp += (s, e) => KeyUp?.Invoke (s, e);
         _inputProcessor.SyntheticMouseEvent += (s, e) => MouseEvent?.Invoke (s, e);
         _outputBuffer = outputBuffer;
         _output = output;
@@ -169,6 +171,7 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public virtual void SetScreenSize (int width, int height)
     {
+        Trace.Lifecycle (nameof (DriverImpl), "SetScreenSize", $"{width}×{height}");
         _outputBuffer.SetSize (width, height);
         _output.SetSize (width, height);
         SizeChanged?.Invoke (this, new SizeChangedEventArgs (new Size (width, height)));
@@ -177,7 +180,11 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
-    private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e) => SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
+    private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e)
+    {
+        Trace.Lifecycle (nameof (DriverImpl), "OnSizeMonitorOnSizeChanged", $"{e.Size?.Width}×{e.Size?.Height}");
+        SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
+    }
 
     /// <inheritdoc/>
     public int Cols { get => _outputBuffer.Cols; set => _outputBuffer.Cols = value; }
@@ -229,11 +236,15 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public Region? Clip { get => _outputBuffer.Clip; set => _outputBuffer.Clip = value; }
 
+    /// <inheritdoc/>
+    public string? CurrentUrl { get => _outputBuffer.CurrentUrl; set => _outputBuffer.CurrentUrl = value; }
+
     /// <summary>Clears the <see cref="IDriver.Contents"/> of the driver.</summary>
     public void ClearContents ()
     {
         _outputBuffer.ClearContents ();
         ClearedContents?.Invoke (this, EventArgs.Empty);
+        CurrentUrl = null;
     }
 
     /// <inheritdoc/>
@@ -353,14 +364,34 @@ internal class DriverImpl : IDriver
 
     #region Input Events
 
+    /// <summary>
+    ///     Gets the detected kitty keyboard protocol state for the current driver instance.
+    /// </summary>
+    internal KittyKeyboardProtocolResult KittyKeyboardProtocol { get; private set; } = new ();
+
+    /// <summary>
+    ///     Stores the latest kitty keyboard protocol detection result.
+    /// </summary>
+    /// <param name="result">The detected kitty keyboard protocol result.</param>
+    internal void SetKittyKeyboardProtocol (KittyKeyboardProtocolResult result) => KittyKeyboardProtocol = result;
+
+    /// <summary>
+    ///     Stores the kitty keyboard flags currently enabled on the terminal.
+    /// </summary>
+    /// <param name="enabledFlags">The kitty keyboard flags currently enabled.</param>
+    internal void SetKittyKeyboardEnabledFlags (KittyKeyboardFlags enabledFlags)
+    {
+        KittyKeyboardProtocol.EnabledFlags = enabledFlags;
+    }
+
     /// <summary>Event fired when a key is pressed down.</summary>
     public event EventHandler<Key>? KeyDown;
 
+    /// <summary>Event fired when a key is released.</summary>
+    public event EventHandler<Key>? KeyUp;
+
     /// <summary>Event fired when a mouse event occurs.</summary>
     public event EventHandler<Mouse>? MouseEvent;
-
-    /// <inheritdoc/>
-    public void InjectMouseEvent (Mouse mouse) => GetInputProcessor ().InjectMouseEvent (null, mouse);
 
     #endregion Input Events
 

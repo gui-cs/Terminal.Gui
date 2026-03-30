@@ -1,4 +1,4 @@
-﻿#nullable enable
+﻿using System.Runtime.InteropServices;
 
 namespace ApplicationTests.Keyboard;
 
@@ -6,7 +6,7 @@ namespace ApplicationTests.Keyboard;
 ///     Parallelizable tests for keyboard handling.
 ///     These tests use isolated instances of <see cref="IKeyboard"/> to avoid static state dependencies.
 /// </summary>
-[Collection("Application Tests")]
+[Collection ("Application Tests")]
 public class KeyboardTests
 {
     [Fact]
@@ -33,8 +33,9 @@ public class KeyboardTests
 
         // Assert
         Assert.NotNull (keyboard.KeyBindings);
+
         // Verify that some default bindings exist
-        Assert.True (keyboard.KeyBindings.TryGet (keyboard.QuitKey, out _));
+        Assert.True (keyboard.KeyBindings.TryGet (Application.GetDefaultKey (Command.Quit), out _));
     }
 
     [Fact]
@@ -44,23 +45,7 @@ public class KeyboardTests
         var keyboard = new ApplicationKeyboard ();
 
         // Assert
-        Assert.Equal (Key.Esc, keyboard.QuitKey);
-    }
-
-    [Fact]
-    public void QuitKey_SetValue_UpdatesKeyBindings ()
-    {
-        // Arrange
-        var keyboard = new ApplicationKeyboard ();
-        Key newQuitKey = Key.Q.WithCtrl;
-
-        // Act
-        keyboard.QuitKey = newQuitKey;
-
-        // Assert
-        Assert.Equal (newQuitKey, keyboard.QuitKey);
-        Assert.True (keyboard.KeyBindings.TryGet (newQuitKey, out KeyBinding binding));
-        Assert.Contains (Command.Quit, binding.Commands);
+        Assert.Equal (Key.Esc, Application.GetDefaultKey (Command.Quit));
     }
 
     [Fact]
@@ -70,7 +55,8 @@ public class KeyboardTests
         var keyboard = new ApplicationKeyboard ();
 
         // Assert
-        Assert.Equal (Key.F5.WithCtrl, keyboard.ArrangeKey);
+        Assert.Equal (Key.F5.WithCtrl, Application.GetDefaultKey (Command.Arrange));
+        keyboard.Dispose ();
     }
 
     [Fact]
@@ -80,7 +66,8 @@ public class KeyboardTests
         var keyboard = new ApplicationKeyboard ();
 
         // Assert
-        Assert.Equal (Key.Tab, keyboard.NextTabKey);
+        Assert.Equal (Key.Tab, Application.GetDefaultKey (Command.NextTabStop));
+        keyboard.Dispose ();
     }
 
     [Fact]
@@ -90,7 +77,8 @@ public class KeyboardTests
         var keyboard = new ApplicationKeyboard ();
 
         // Assert
-        Assert.Equal (Key.Tab.WithShift, keyboard.PrevTabKey);
+        Assert.Equal (Key.Tab.WithShift, Application.GetDefaultKey (Command.PreviousTabStop));
+        keyboard.Dispose ();
     }
 
     [Fact]
@@ -100,7 +88,8 @@ public class KeyboardTests
         var keyboard = new ApplicationKeyboard ();
 
         // Assert
-        Assert.Equal (Key.F6, keyboard.NextTabGroupKey);
+        Assert.Equal (Key.F6, Application.GetDefaultKey (Command.NextTabGroup));
+        keyboard.Dispose ();
     }
 
     [Fact]
@@ -110,7 +99,8 @@ public class KeyboardTests
         var keyboard = new ApplicationKeyboard ();
 
         // Assert
-        Assert.Equal (Key.F6.WithShift, keyboard.PrevTabGroupKey);
+        Assert.Equal (Key.F6.WithShift, Application.GetDefaultKey (Command.PreviousTabGroup));
+        keyboard.Dispose ();
     }
 
     [Fact]
@@ -148,13 +138,10 @@ public class KeyboardTests
     {
         // Arrange
         var keyboard = new ApplicationKeyboard ();
-        bool eventRaised = false;
+        var eventRaised = false;
 
         // Act
-        keyboard.KeyDown += (sender, key) =>
-        {
-            eventRaised = true;
-        };
+        keyboard.KeyDown += (sender, key) => { eventRaised = true; };
 
         // Assert - event subscription doesn't throw
         Assert.False (eventRaised); // Event hasn't been raised yet
@@ -165,8 +152,9 @@ public class KeyboardTests
     {
         // Arrange
         var keyboard = new ApplicationKeyboard ();
+
         // Pick a command that isn't registered
-        Command invalidCommand = (Command)9999;
+        var invalidCommand = (Command)9999;
         Key testKey = Key.A;
         var binding = new KeyBinding ([invalidCommand]);
 
@@ -181,13 +169,18 @@ public class KeyboardTests
         var keyboard1 = new ApplicationKeyboard ();
         var keyboard2 = new ApplicationKeyboard ();
 
-        keyboard1.QuitKey = Key.Q.WithCtrl;
-        keyboard2.QuitKey = Key.X.WithCtrl;
+        // Both keyboards should have the same default Quit binding from Application.DefaultKeyBindings
+        Key defaultQuitKey = Application.GetDefaultKey (Command.Quit);
+        Assert.True (keyboard1.KeyBindings.TryGet (defaultQuitKey, out _));
+        Assert.True (keyboard2.KeyBindings.TryGet (defaultQuitKey, out _));
 
-        // Assert - each keyboard maintains independent state
-        Assert.Equal (Key.Q.WithCtrl, keyboard1.QuitKey);
-        Assert.Equal (Key.X.WithCtrl, keyboard2.QuitKey);
-        Assert.NotEqual (keyboard1.QuitKey, keyboard2.QuitKey);
+        // Each keyboard maintains independent custom bindings
+        keyboard1.KeyBindings.Add (Key.X, Command.Accept);
+        Assert.True (keyboard1.KeyBindings.TryGet (Key.X, out _));
+        Assert.False (keyboard2.KeyBindings.TryGet (Key.X, out _));
+
+        keyboard1.Dispose ();
+        keyboard2.Dispose ();
     }
 
     [Fact]
@@ -207,6 +200,7 @@ public class KeyboardTests
 
         // Assert - old key should no longer have the binding
         Assert.False (keyboard.KeyBindings.TryGet (oldKey, out _));
+
         // New key should have the binding
         Assert.True (keyboard.KeyBindings.TryGet (newKey, out KeyBinding newBinding));
         Assert.Contains (Command.Quit, newBinding.Commands);
@@ -217,14 +211,15 @@ public class KeyboardTests
     {
         // Arrange
         var keyboard = new ApplicationKeyboard ();
+
         // Verify initial state has bindings
-        Assert.True (keyboard.KeyBindings.TryGet (keyboard.QuitKey, out _));
+        Assert.True (keyboard.KeyBindings.TryGet (Application.GetDefaultKey (Command.Quit), out _));
 
         // Act
         keyboard.KeyBindings.Clear ();
 
         // Assert - previously existing binding is gone
-        Assert.False (keyboard.KeyBindings.TryGet (keyboard.QuitKey, out _));
+        Assert.False (keyboard.KeyBindings.TryGet (Application.GetDefaultKey (Command.Quit), out _));
     }
 
     [Fact]
@@ -233,13 +228,13 @@ public class KeyboardTests
         // Arrange
         var keyboard = new ApplicationKeyboard ();
         keyboard.KeyBindings.Clear ();
-        Assert.False (keyboard.KeyBindings.TryGet (keyboard.QuitKey, out _));
+        Assert.False (keyboard.KeyBindings.TryGet (Application.GetDefaultKey (Command.Quit), out _));
 
         // Act
         keyboard.AddKeyBindings ();
 
         // Assert
-        Assert.True (keyboard.KeyBindings.TryGet (keyboard.QuitKey, out KeyBinding binding));
+        Assert.True (keyboard.KeyBindings.TryGet (Application.GetDefaultKey (Command.Quit), out KeyBinding binding));
         Assert.Contains (Command.Quit, binding.Commands);
     }
 
@@ -248,8 +243,13 @@ public class KeyboardTests
     [Fact]
     public void KeyBindings_Add_Adds ()
     {
-        // Arrange
+        // Arrange — Dispose immediately to unsubscribe from DefaultKeyBindingsChanged,
+        // preventing interference from parallel tests modifying Application.DefaultKeyBindings.
         var keyboard = new ApplicationKeyboard ();
+        keyboard.Dispose ();
+
+        // Re-init bindings manually without event subscription
+        keyboard.KeyBindings.Clear ();
 
         // Act
         keyboard.KeyBindings.Add (Key.A, Command.Accept);
@@ -265,8 +265,13 @@ public class KeyboardTests
     [Fact]
     public void KeyBindings_Remove_Removes ()
     {
-        // Arrange
+        // Arrange — dispose immediately to detach from DefaultKeyBindingsChanged,
+        // preventing interference from parallel tests modifying Application.DefaultKeyBindings.
         var keyboard = new ApplicationKeyboard ();
+        keyboard.Dispose ();
+
+        // Re-init bindings manually without event subscription
+        keyboard.KeyBindings.Clear ();
         keyboard.KeyBindings.Add (Key.A, Command.Accept);
         Assert.True (keyboard.KeyBindings.TryGet (Key.A, out _));
 
@@ -284,108 +289,11 @@ public class KeyboardTests
         var keyboard = new ApplicationKeyboard ();
 
         // Assert
-        Assert.Equal (Key.Esc, keyboard.QuitKey);
+        Assert.Equal (Key.Esc, Application.GetDefaultKey (Command.Quit));
     }
 
-    [Fact]
-    public void QuitKey_Setter_UpdatesBindings ()
-    {
-        // Arrange
-        var keyboard = new ApplicationKeyboard ();
-        Key prevKey = keyboard.QuitKey;
-
-        // Act - Change QuitKey
-        keyboard.QuitKey = Key.C.WithCtrl;
-
-        // Assert - Old key should no longer trigger quit
-        Assert.False (keyboard.KeyBindings.TryGet (prevKey, out _));
-        // New key should trigger quit
-        Assert.True (keyboard.KeyBindings.TryGet (Key.C.WithCtrl, out KeyBinding binding));
-        Assert.Contains (Command.Quit, binding.Commands);
-    }
-
-    [Fact]
-    public void NextTabKey_Setter_UpdatesBindings ()
-    {
-        // Arrange
-        var keyboard = new ApplicationKeyboard ();
-        Key prevKey = keyboard.NextTabKey;
-        Key newKey = Key.N.WithCtrl;
-
-        // Act
-        keyboard.NextTabKey = newKey;
-
-        // Assert
-        Assert.Equal (newKey, keyboard.NextTabKey);
-        Assert.True (keyboard.KeyBindings.TryGet (newKey, out KeyBinding binding));
-        Assert.Contains (Command.NextTabStop, binding.Commands);
-    }
-
-    [Fact]
-    public void PrevTabKey_Setter_UpdatesBindings ()
-    {
-        // Arrange
-        var keyboard = new ApplicationKeyboard ();
-        Key newKey = Key.P.WithCtrl;
-
-        // Act
-        keyboard.PrevTabKey = newKey;
-
-        // Assert
-        Assert.Equal (newKey, keyboard.PrevTabKey);
-        Assert.True (keyboard.KeyBindings.TryGet (newKey, out KeyBinding binding));
-        Assert.Contains (Command.PreviousTabStop, binding.Commands);
-    }
-
-    [Fact]
-    public void NextTabGroupKey_Setter_UpdatesBindings ()
-    {
-        // Arrange
-        var keyboard = new ApplicationKeyboard ();
-        Key newKey = Key.PageDown.WithCtrl;
-
-        // Act
-        keyboard.NextTabGroupKey = newKey;
-
-        // Assert
-        Assert.Equal (newKey, keyboard.NextTabGroupKey);
-        Assert.Equal (KeyCode.PageDown | KeyCode.CtrlMask, keyboard.NextTabGroupKey.KeyCode);
-        Assert.True (keyboard.KeyBindings.TryGet (newKey, out KeyBinding binding));
-        Assert.Contains (Command.NextTabGroup, binding.Commands);
-    }
-
-    [Fact]
-    public void PrevTabGroupKey_Setter_UpdatesBindings ()
-    {
-        // Arrange
-        var keyboard = new ApplicationKeyboard ();
-        Key newKey = Key.PageUp.WithCtrl;
-
-        // Act
-        keyboard.PrevTabGroupKey = newKey;
-
-        // Assert
-        Assert.Equal (newKey, keyboard.PrevTabGroupKey);
-        Assert.Equal (KeyCode.PageUp | KeyCode.CtrlMask, keyboard.PrevTabGroupKey.KeyCode);
-        Assert.True (keyboard.KeyBindings.TryGet (newKey, out KeyBinding binding));
-        Assert.Contains (Command.PreviousTabGroup, binding.Commands);
-    }
-
-    [Fact]
-    public void ArrangeKey_Setter_UpdatesBindings ()
-    {
-        // Arrange
-        var keyboard = new ApplicationKeyboard ();
-        Key newKey = Key.A.WithCtrl;
-
-        // Act
-        keyboard.ArrangeKey = newKey;
-
-        // Assert
-        Assert.Equal (newKey, keyboard.ArrangeKey);
-        Assert.True (keyboard.KeyBindings.TryGet (newKey, out KeyBinding binding));
-        Assert.Contains (Command.Arrange, binding.Commands);
-    }
+    // Setter tests that mutate Application.DefaultKeyBindings have been moved to
+    // Tests/UnitTests/Application/Keyboard/KeyboardSetterTests.cs
 
     [Fact]
     public void KeyBindings_AddWithTarget_StoresTarget ()
@@ -424,10 +332,11 @@ public class KeyboardTests
     {
         // Arrange
         var keyboard = new ApplicationKeyboard ();
+
         // QuitKey has a bound command by default
 
         // Act
-        bool? result = keyboard.InvokeCommandsBoundToKey (keyboard.QuitKey);
+        bool? result = keyboard.InvokeCommandsBoundToKey (Application.GetDefaultKey (Command.Quit));
 
         // Assert
         // Command.Quit would normally call Application.RequestStop, 
@@ -484,7 +393,14 @@ public class KeyboardTests
         // Act
         bool? result = keyboard.InvokeCommandsBoundToKey (key);
 
-        // Assert
-        Assert.True (result);
+        // Assert — Suspend is NonWindows only, so on Windows this key is unbound
+        if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
+        {
+            Assert.Null (result);
+        }
+        else
+        {
+            Assert.True (result);
+        }
     }
 }

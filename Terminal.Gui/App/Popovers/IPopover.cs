@@ -25,7 +25,7 @@ namespace Terminal.Gui.App;
 ///     </para>
 ///     <list type="bullet">
 ///         <item>The user clicks outside the popover (unless clicking on a subview).</item>
-///         <item>The user presses <see cref="Application.QuitKey"/> (typically <c>Esc</c>).</item>
+///         <item>The user presses <see cref="Application.GetDefaultKey"/> (typically <c>Esc</c>).</item>
 ///         <item>Another popover is shown.</item>
 ///         <item><see cref="View.Visible"/> is set to <see langword="false"/>.</item>
 ///     </list>

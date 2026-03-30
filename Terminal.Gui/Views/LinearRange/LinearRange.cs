@@ -4,6 +4,48 @@ namespace Terminal.Gui.Views;
 ///     Provides a linear range control letting the user navigate from a set of typed options in a linear manner using the
 ///     keyboard or mouse.
 /// </summary>
+/// <remarks>
+///     <para>Default key bindings (when <see cref="Orientation"/> is <see cref="Orientation.Horizontal"/>):</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Moves to the previous or next option.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Left / Ctrl+Right</term> <description>Moves by a larger step.</description>
+///         </item>
+///     </list>
+///     <para>Default key bindings (when <see cref="Orientation"/> is <see cref="Orientation.Vertical"/>):</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Up / Down</term> <description>Moves to the previous or next option.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Up / Ctrl+Down</term> <description>Moves by a larger step.</description>
+///         </item>
+///     </list>
+///     <para>Common key bindings (both orientations):</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last option.</description>
+///         </item>
+///         <item>
+///             <term>Enter</term> <description>Accepts the current selection (<see cref="Command.Accept"/>).</description>
+///         </item>
+///         <item>
+///             <term>Space</term>
+///             <description>Activates the current selection (<see cref="Command.Activate"/>).</description>
+///         </item>
+///     </list>
+/// </remarks>
 public class LinearRange : LinearRange<object>
 {
     /// <summary>
@@ -23,12 +65,79 @@ public class LinearRange : LinearRange<object>
 
 /// <summary>
 ///     Provides a type-safe linear range control letting the user navigate from a set of typed options in a linear manner
-///     using the
-///     keyboard or mouse.
+///     using the keyboard or mouse.
 /// </summary>
-/// <typeparam name="T"></typeparam>
+/// <typeparam name="T">The type of the options.</typeparam>
+/// <remarks>
+///     <para>Default key bindings (when <see cref="Orientation"/> is <see cref="Orientation.Horizontal"/>):</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Moves to the previous or next option.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Left / Ctrl+Right</term> <description>Moves by a larger step.</description>
+///         </item>
+///     </list>
+///     <para>Default key bindings (when <see cref="Orientation"/> is <see cref="Orientation.Vertical"/>):</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Up / Down</term> <description>Moves to the previous or next option.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Up / Ctrl+Down</term> <description>Moves by a larger step.</description>
+///         </item>
+///     </list>
+///     <para>Common key bindings (both orientations):</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last option.</description>
+///         </item>
+///         <item>
+///             <term>Enter</term> <description>Accepts the current selection (<see cref="Command.Accept"/>).</description>
+///         </item>
+///         <item>
+///             <term>Space</term>
+///             <description>Activates the current selection (<see cref="Command.Activate"/>).</description>
+///         </item>
+///     </list>
+///     <para>
+///         Common bindings (Home, End, Enter, Space) are configurable via <see cref="View.DefaultKeyBindings"/> and
+///         <see cref="LinearRange{T}.DefaultKeyBindings"/>. Orientation-dependent cursor bindings are set dynamically
+///         and cannot be reconfigured.
+///     </para>
+/// </remarks>
 public class LinearRange<T> : View, IOrientation
 {
+    /// <summary>
+    ///     Gets or sets the view-specific default key bindings for <see cref="LinearRange{T}"/>. Contains only bindings
+    ///     unique to this view; shared bindings come from <see cref="View.DefaultKeyBindings"/>.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         No <see cref="ConfigurationPropertyAttribute"/> is applied because <see cref="LinearRange{T}"/> is a generic
+    ///         type. Use <see cref="View.ViewKeyBindings"/> with key <c>"LinearRange"</c> to override bindings via
+    ///         configuration.
+    ///     </para>
+    /// </remarks>
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    {
+        [Command.Accept] = Bind.All (Key.Enter),
+        [Command.Activate] = Bind.All (Key.Space),
+    };
+
     private readonly LinearRangeConfiguration _config = new ();
 
     // List of the current set options.
@@ -530,7 +639,6 @@ public class LinearRange<T> : View, IOrientation
         SetFocusedOption ();
 
         return true;
-
     }
 
     /// <summary>Causes the specified option to be un-set and be focused.</summary>
@@ -544,7 +652,6 @@ public class LinearRange<T> : View, IOrientation
         SetFocusedOption ();
 
         return true;
-
     }
 
     /// <summary>Get the indexes of the set options.</summary>
@@ -1515,16 +1622,29 @@ public class LinearRange<T> : View, IOrientation
         AddCommand (Command.RightExtend, () => ExtendPlus ());
         AddCommand (Command.LeftExtend, () => ExtendMinus ());
 
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
+
         SetKeyBindings ();
     }
 
-    // This is called during initialization and anytime orientation changes
+    // This is called during initialization and anytime orientation changes.
+    // Orientation-dependent bindings cannot be in DefaultKeyBindings because they vary per instance.
     private void SetKeyBindings ()
     {
+        // Remove Shift+Cursor extend bindings inherited from View.DefaultKeyBindings;
+        // LinearRange uses Ctrl+Cursor for extend operations instead.
+        KeyBindings.Remove (Key.CursorLeft.WithShift);
+        KeyBindings.Remove (Key.CursorRight.WithShift);
+        KeyBindings.Remove (Key.CursorUp.WithShift);
+        KeyBindings.Remove (Key.CursorDown.WithShift);
+
         if (_config._linearRangeOrientation == Orientation.Horizontal)
         {
+            // Remove before Add: ApplyKeyBindings already bound CursorRight/CursorLeft from View.DefaultKeyBindings
+            KeyBindings.Remove (Key.CursorRight);
             KeyBindings.Add (Key.CursorRight, Command.Right);
             KeyBindings.Remove (Key.CursorDown);
+            KeyBindings.Remove (Key.CursorLeft);
             KeyBindings.Add (Key.CursorLeft, Command.Left);
             KeyBindings.Remove (Key.CursorUp);
 
@@ -1536,8 +1656,11 @@ public class LinearRange<T> : View, IOrientation
         else
         {
             KeyBindings.Remove (Key.CursorRight);
+            // Remove before Add: ApplyKeyBindings already bound CursorDown/CursorUp from View.DefaultKeyBindings
+            KeyBindings.Remove (Key.CursorDown);
             KeyBindings.Add (Key.CursorDown, Command.Down);
             KeyBindings.Remove (Key.CursorLeft);
+            KeyBindings.Remove (Key.CursorUp);
             KeyBindings.Add (Key.CursorUp, Command.Up);
 
             KeyBindings.Remove (Key.CursorRight.WithCtrl);
@@ -1545,15 +1668,6 @@ public class LinearRange<T> : View, IOrientation
             KeyBindings.Remove (Key.CursorLeft.WithCtrl);
             KeyBindings.Add (Key.CursorUp.WithCtrl, Command.LeftExtend);
         }
-
-        KeyBindings.Remove (Key.Home);
-        KeyBindings.Add (Key.Home, Command.LeftStart);
-        KeyBindings.Remove (Key.End);
-        KeyBindings.Add (Key.End, Command.RightEnd);
-        KeyBindings.Remove (Key.Enter);
-        KeyBindings.Add (Key.Enter, Command.Accept);
-        KeyBindings.Remove (Key.Space);
-        KeyBindings.Add (Key.Space, Command.Activate);
     }
 
     private Dictionary<int, LinearRangeOption<T>> GetSetOptionDictionary () => _setOptions.ToDictionary (e => e, e => _options! [e]);

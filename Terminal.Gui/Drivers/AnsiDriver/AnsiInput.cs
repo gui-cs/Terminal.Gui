@@ -81,8 +81,6 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
     /// </summary>
     public AnsiInput ()
     {
-        //Logging.Information ($"Creating {nameof (AnsiInput)}");
-
         _platform = AnsiPlatform.Degraded;
 
         try
@@ -205,7 +203,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                     yield break;
                 }
 
-                string text = Encoding.UTF8.GetString (buffer, 0, bytesRead);
+                string text = _windowsVTInput!.ConsoleInputEncoding.GetString (buffer, 0, bytesRead);
 
                 //Trace.Lifecycle (nameof (AnsiInput), "Read", $"Read {bytesRead} bytes from Windows VT Input: {text}");
 
@@ -226,8 +224,6 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
 
             case AnsiPlatform.Degraded:
             default:
-                // Logging.Trace ("IsVTModeEnabled is NOT enabled");
-
                 yield break;
         }
     }
@@ -305,8 +301,6 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                     // can cause ReadFile to block indefinitely.
                     if (_pollMap == null)
                     {
-                        //Logging.Trace ("");
-
                         return;
                     }
 
@@ -364,12 +358,9 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
         }
     }
 
+    // Will be called on the main loop thread.
     /// <inheritdoc/>
-    public void InjectInput (char input) =>
-
-        //Logging.Trace ($"Enqueuing input: {input.Key}");
-        // Will be called on the main loop thread.
-        _testInput.Enqueue (input);
+    public void InjectInput (char input) => _testInput.Enqueue (input);
 
     /// <inheritdoc/>
     public override void Dispose ()

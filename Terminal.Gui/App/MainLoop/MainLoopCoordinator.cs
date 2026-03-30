@@ -180,6 +180,34 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
             }
         }
 
+        try
+        {
+            KittyKeyboardProtocolDetector kittyKeyboardDetector = new (_driver);
+            kittyKeyboardDetector.Detect (result =>
+                                         {
+                                             _driver.SetKittyKeyboardProtocol (result);
+                                             Trace.Lifecycle (app?.MainThreadId?.ToString (),
+                                                              "KittyKeyboard",
+                                                              $"Probe complete: Supported={result.IsSupported}, SupportedFlags={result.SupportedFlags}, EnabledFlags={result.EnabledFlags}");
+
+                                             if (!result.IsSupported || result.EnabledFlags <= 0 || _output is not AnsiOutput ansiOutput)
+                                             {
+                                                 Trace.Lifecycle (app?.MainThreadId?.ToString (), "KittyKeyboard", "Kitty keyboard mode not enabled");
+                                                 return;
+                                             }
+
+                                             ansiOutput.EnableKittyKeyboard (result.EnabledFlags);
+                                             _driver.SetKittyKeyboardEnabledFlags (ansiOutput.KittyKeyboardEnabledFlags);
+                                             Trace.Lifecycle (app?.MainThreadId?.ToString (),
+                                                              "KittyKeyboard",
+                                                              $"Enabled kitty keyboard flags {ansiOutput.KittyKeyboardEnabledFlags}");
+                                         });
+        }
+        catch (Exception ex)
+        {
+            Logging.Warning ($"Kitty keyboard protocol detection failed: {ex.Message}");
+        }
+
         _startupSemaphore.Release ();
         Logging.Trace ($"app: {app.MainThreadId} Driver: _input: {_input}, _output: {_output}");
     }

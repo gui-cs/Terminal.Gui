@@ -62,7 +62,7 @@ public partial class AppTestHelper
             }
 
             // No, try tab to the next (or first)
-            KeyDown (App!.Keyboard.NextTabKey);
+            KeyDown (Application.GetDefaultKey (Command.NextTabStop));
             WaitIteration ();
 
             next = t.MostFocused;

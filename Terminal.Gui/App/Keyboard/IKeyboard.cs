@@ -59,24 +59,31 @@ public interface IKeyboard
     /// </summary>
     event EventHandler<Key>? KeyDown;
 
+    /// <summary>
+    ///     Called when a key is released (by the <see cref="IDriver"/>). Raises the cancelable
+    ///     <see cref="KeyUp"/> event, then calls <see cref="View.NewKeyUpEvent"/> on all top level views.
+    /// </summary>
+    /// <remarks>
+    ///     This event is only raised when the driver provides key release information.
+    ///     Not all drivers support key-up events.
+    /// </remarks>
+    /// <param name="key"></param>
+    /// <returns><see langword="true"/> if the key was handled.</returns>
+    bool RaiseKeyUpEvent (Key key);
+
+    /// <summary>
+    ///     Raised when the user releases a key.
+    ///     <para>
+    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
+    ///         additional processing.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     This event is only raised when the driver provides key release information.
+    ///     Not all drivers support key-up events.
+    /// </remarks>
+    event EventHandler<Key>? KeyUp;
+
     /// <summary>Gets the Application-scoped key bindings.</summary>
     KeyBindings KeyBindings { get; }
-
-    /// <summary>Gets or sets the key to quit the application.</summary>
-    Key QuitKey { get; set; }
-
-    /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
-    Key ArrangeKey { get; set; }
-
-    /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
-    Key NextTabGroupKey { get; set; }
-
-    /// <summary>Alternative key to navigate forwards through views. Tab is the primary key.</summary>
-    Key NextTabKey { get; set; }
-
-    /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
-    Key PrevTabGroupKey { get; set; }
-
-    /// <summary>Alternative key to navigate backwards through views. Shift+Tab is the primary key.</summary>
-    Key PrevTabKey { get; set; }
 }

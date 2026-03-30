@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
-using Terminal.Gui.Tests;
+using UnitTests.Parallelizable;
 using Terminal.Gui.Tracing;
+using UnitTests;
 
 namespace ViewBaseTests.Commands;
 
@@ -1683,7 +1684,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             TestValueView view = new () { Id = "valueView", Value = "test value" };
             ICommandContext? capturedContext = null;
@@ -1709,7 +1711,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             View view = new () { Id = "plainView" };
             ICommandContext? capturedContext = null;
@@ -1735,7 +1738,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             TestValueView view = new () { Id = "valueView", Value = 42 };
             ICommandContext? capturedContext = null;
@@ -1763,7 +1767,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             TestValueView view = new () { Id = "nullValueView", Value = null };
             ICommandContext? capturedContext = null;
@@ -1789,7 +1794,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             View owner = new () { Id = "owner" };
             TestValueView remote = new () { Id = "remote", Value = "bridged value" };
@@ -1820,7 +1826,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             View owner = new () { Id = "owner" };
             TestValueView remote = new () { Id = "remote", Value = 123 };
@@ -1851,7 +1858,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             View owner = new () { Id = "owner" };
             TestValueView remote = new () { Id = "remote", Value = null };
@@ -1972,7 +1980,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             // Arrange: RelayComposite contains ToggleView as dispatch target
             ToggleView toggleView = new () { Id = "toggleView" };
@@ -2015,7 +2024,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using IDisposable verbose = TestLogging.Verbose (output);
 
-        Trace.EnabledCategories = TraceCategory.Command;
+        // Do not set this unless debugging. It is a static that is process wide.
+        //Trace.EnabledCategories = TraceCategory.Command;
 
         // Arrange: Host ← Bridge ← Composite → ToggleView (dispatch target)
         ToggleView toggleView = new () { Id = "toggleView" };
@@ -2074,7 +2084,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using IDisposable verbose = TestLogging.Verbose (output);
 
-        Trace.EnabledCategories = TraceCategory.Command;
+        // Do not set this unless debugging. It is a static that is process wide.
+        //Trace.EnabledCategories = TraceCategory.Command;
 
         // Arrange: Host ← Bridge ← Composite → ToggleView (dispatch target)
         ToggleView toggleView = new () { Id = "toggleView" };
@@ -2181,7 +2192,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             ToggleView toggleView = new () { Id = "toggleView" };
             CompositeValueView composite = new () { Id = "composite" };
@@ -2223,7 +2235,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             ToggleView toggleView = new () { Id = "toggleView" };
             CompositeValueView composite = new () { Id = "composite" };
@@ -2257,7 +2270,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             TestValueView sourceView = new () { Id = "source", Value = "initial" };
 
@@ -2287,7 +2301,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             ToggleView toggleView = new () { Id = "toggleView" };
             CompositeValueView composite = new () { Id = "composite" };
@@ -2330,7 +2345,8 @@ public class ViewCommandTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Do not set this unless debugging. It is a static that is process wide.
+            //Trace.EnabledCategories = TraceCategory.Command;
 
             View plainView = new () { Id = "plainView" };
 

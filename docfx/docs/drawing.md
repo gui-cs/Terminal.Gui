@@ -69,13 +69,14 @@ The <xref:Terminal.Gui.App.Application> MainLoop will iterate over all Views in 
 8) Sets the clip back to the view's Frame.
 9) Draws <xref:Terminal.Gui.Drawing.LineCanvas> (which may have been added to by any of the steps above).
 10) Draws the <xref:Terminal.Gui.ViewBase.Border> and <xref:Terminal.Gui.ViewBase.Padding> SubViews (just the subviews). (but NOT the Margin).
-11) The Clip at this point excludes all SubViews NOT INCLUDING their Margins. This clip is cached so <xref:Terminal.Gui.ViewBase.Margin> can be rendered later.
-12) DrawComplete is raised.
-13) The current View's Frame NOT INCLUDING the Margin is excluded from the current Clip region.
+11) Draws the <xref:Terminal.Gui.ViewBase.Margin> (but only if it does NOT have a shadow; margins with shadows are drawn later).
+12) If the Margin has a shadow, the current Clip is cached so the shadow can be rendered in a second pass.
+13) DrawComplete is raised.
+14) The current View's Frame NOT INCLUDING the Margin is excluded from the current Clip region.
 
 Most of the steps above can be overridden by developers using the standard [Terminal.Gui Cancellable Work Pattern](cancellable-work-pattern.md). For example, the base <xref:Terminal.Gui.ViewBase.View> always clears the viewport. To override this, a subclass can override `OnClearingViewport()` to simply return `true`. Or, a user of `View` can subscribe to the `ClearingViewport` event and set the `Cancel` argument to `true`.
 
-Then, after the above steps have completed, the Mainloop will iterate through all views in the view hierarchy again, this time calling Draw on any <xref:Terminal.Gui.ViewBase.Margin> objects, using the cached Clip region mentioned above. This enables Margin to be transparent.
+Then, after all views have been drawn, `Margin.DrawShadows` iterates the view hierarchy a second time, drawing only the shadows for margins that have a <xref:Terminal.Gui.ViewBase.ShadowStyle> set. This second pass uses the cached Clip region from step 12 and ensures shadows render on top of all other content. Margins without shadows are fully drawn in the first pass and are not part of this second pass.
 
 ### Declaring that drawing is needed
 
@@ -85,7 +86,7 @@ If a View need to redraw because something changed within it's Content Area it c
 
 ## Clipping
 
-Clipping enables better performance and features like transparent margins by ensuring regions of the terminal that need to be drawn actually get drawn by the driver. Terminal.Gui supports non-rectangular clip regions with <xref:Terminal.Gui.Drawing.Region>. The driver.Clip is the application managed clip region and is managed by <xref:Terminal.Gui.App.Application>. Developers cannot change this directly, but can use `SetClipToScreen()`, `SetClip()`(Terminal.Gui.Region), `SetClipToFrame()`, etc...
+Clipping enables better performance and features like shadows by ensuring regions of the terminal that need to be drawn actually get drawn by the driver. Terminal.Gui supports non-rectangular clip regions with <xref:Terminal.Gui.Drawing.Region>. The driver.Clip is the application managed clip region and is managed by <xref:Terminal.Gui.App.Application>. Developers cannot change this directly, but can use `SetClipToScreen()`, `SetClip()`(Terminal.Gui.Region), `SetClipToFrame()`, etc...
 
 
 ## Cell
@@ -217,7 +218,7 @@ Terminal.Gui supports drawing lines and shapes using box-drawing glyphs. The <xr
 
 ## Thickness
 
-Describes the thickness of a frame around a rectangle. The thickness is specified for each side of the rectangle using a <xref:Terminal.Gui.Drawing.Thickness> object. The Thickness class contains properties for the left, top, right, and bottom thickness. The <xref:Terminal.Gui.ViewBase.Adornment> class uses <xref:Terminal.Gui.Drawing.Thickness> to support drawing the frame around a view. 
+Describes the thickness of a frame around a rectangle. The thickness is specified for each side of the rectangle using a <xref:Terminal.Gui.Drawing.Thickness> object. The Thickness class contains properties for the left, top, right, and bottom thickness. The <xref:Terminal.Gui.ViewBase.AdornmentImpl> class uses <xref:Terminal.Gui.Drawing.Thickness> to support drawing the frame around a view. 
 
 See [View Deep Dive](View.md) for details.
 

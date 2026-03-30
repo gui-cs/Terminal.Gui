@@ -79,14 +79,14 @@ The majority of the Terminal.Gui Navigation system is dedicated to enabling the 
 
 Terminal.Gui defines these keys for keyboard navigation:
 
-- `IKeyboard.NextTabStopKey` (`Key.Tab`) - Navigates to the next subview that is a <xref:Terminal.Gui.ViewBase.TabBehavior.TabStop> (see below). If there is no next, the first subview that is a <xref:Terminal.Gui.ViewBase.TabBehavior.TabStop> will gain focus.
-- `IKeyboard.PrevTabStopKey` (`Key.Tab.WithShift`) - Opposite of `IKeyboard.NextTabStopKey`.
-- `Key.CursorRight` - Operates identically to `IKeyboard.NextTabStopKey`.
-- `Key.CursorDown` - Operates identically to `IKeyboard.NextTabStopKey`.
-- `Key.CursorLeft` - Operates identically to `IKeyboard.PrevTabStopKey`.
-- `Key.CursorUp` - Operates identically to `IKeyboard.PrevTabStopKey`.
-- `IKeyboard.NextTabGroupKey` (`Key.F6`) - Navigates to the next view in the view-hierarchy that is a <xref:Terminal.Gui.ViewBase.TabBehavior.TabGroup> (see below). If there is no next, the first view that is a <xref:Terminal.Gui.ViewBase.TabBehavior.TabGroup> will gain focus.
-- `IKeyboard.PrevTabGroupKey` (`Key.F6.WithShift`) - Opposite of `IKeyboard.NextTabGroupKey`.
+- `Application.GetDefaultKey (Command.NextTabStop)` (`Key.Tab`) - Navigates to the next subview that is a <xref:Terminal.Gui.ViewBase.TabBehavior.TabStop> (see below). If there is no next, the first subview that is a <xref:Terminal.Gui.ViewBase.TabBehavior.TabStop> will gain focus.
+- `Application.GetDefaultKey (Command.PreviousTabStop)` (`Key.Tab.WithShift`) - Opposite of `NextTabStop`.
+- `Key.CursorRight` - Operates identically to `NextTabStop`.
+- `Key.CursorDown` - Operates identically to `NextTabStop`.
+- `Key.CursorLeft` - Operates identically to `PreviousTabStop`.
+- `Key.CursorUp` - Operates identically to `PreviousTabStop`.
+- `Application.GetDefaultKey (Command.NextTabGroup)` (`Key.F6`) - Navigates to the next view in the view-hierarchy that is a <xref:Terminal.Gui.ViewBase.TabBehavior.TabGroup> (see below). If there is no next, the first view that is a <xref:Terminal.Gui.ViewBase.TabBehavior.TabGroup> will gain focus.
+- `Application.GetDefaultKey (Command.PreviousTabGroup)` (`Key.F6.WithShift`) - Opposite of `NextTabGroup`.
 
 `F6` was chosen to match [Windows](https://learn.microsoft.com/en-us/windows/apps/design/input/keyboard-accelerators#common-keyboard-accelerators) conventions.
 
@@ -283,9 +283,9 @@ For keyboard navigation, the <xref:Terminal.Gui.ViewBase.View.TabStop> property 
 
 * <xref:Terminal.Gui.ViewBase.TabBehavior.NoStop> - Prevents the user from using keyboard navigation to cause view (and by definition its subviews) to gain focus. Note: The view can still be focused using code or the mouse.
 
-* <xref:Terminal.Gui.ViewBase.TabBehavior.TabStop> - Indicates a <xref:Terminal.Gui.ViewBase.View> is a focusable view with no focusable subviews. `IKeyboard.Next/PrevTabStopKey` will advance ONLY through the peer-Views (`SuperView.SubViews`).
+* <xref:Terminal.Gui.ViewBase.TabBehavior.TabStop> - Indicates a <xref:Terminal.Gui.ViewBase.View> is a focusable view with no focusable subviews. `NextTabStop`/`PreviousTabStop` keys will advance ONLY through the peer-Views (`SuperView.SubViews`).
 
-* <xref:Terminal.Gui.ViewBase.TabBehavior.TabGroup> - Indicates a <xref:Terminal.Gui.ViewBase.View> is a focusable container for other focusable views and enables keyboard navigation across these containers. This applies to both tiled and overlapped views. For example, `FrameView` is a simple view designed to be a visible container of other views in tiled scenarios. It has <xref:Terminal.Gui.ViewBase.View.TabStop> set to <xref:Terminal.Gui.ViewBase.TabBehavior.TabGroup> (and `Arrangement` set to `ViewArrangement.Fixed`). Likewise, <xref:Terminal.Gui.Views.Window> is a simple view designed to be a visible container of other views in overlapped scenarios. It has <xref:Terminal.Gui.ViewBase.View.TabStop> set to <xref:Terminal.Gui.ViewBase.TabBehavior.TabGroup> (and `Arrangement` set to `ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped`). `IKeyboard.Next/PrevGroupStopKey` will advance across all <xref:Terminal.Gui.ViewBase.TabBehavior.TabGroup> views in the application (unless blocked by a <xref:Terminal.Gui.ViewBase.TabBehavior.NoStop> SuperView).
+* <xref:Terminal.Gui.ViewBase.TabBehavior.TabGroup> - Indicates a <xref:Terminal.Gui.ViewBase.View> is a focusable container for other focusable views and enables keyboard navigation across these containers. This applies to both tiled and overlapped views. For example, `FrameView` is a simple view designed to be a visible container of other views in tiled scenarios. It has <xref:Terminal.Gui.ViewBase.View.TabStop> set to <xref:Terminal.Gui.ViewBase.TabBehavior.TabGroup> (and `Arrangement` set to `ViewArrangement.Fixed`). Likewise, <xref:Terminal.Gui.Views.Window> is a simple view designed to be a visible container of other views in overlapped scenarios. It has <xref:Terminal.Gui.ViewBase.View.TabStop> set to <xref:Terminal.Gui.ViewBase.TabBehavior.TabGroup> (and `Arrangement` set to `ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped`). `NextTabGroup`/`PreviousTabGroup` keys will advance across all <xref:Terminal.Gui.ViewBase.TabBehavior.TabGroup> views in the application (unless blocked by a <xref:Terminal.Gui.ViewBase.TabBehavior.NoStop> SuperView).
 
 ### Focus Requirements Summary
 

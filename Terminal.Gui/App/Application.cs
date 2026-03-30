@@ -20,6 +20,7 @@ global using Terminal.Gui.FileServices;
 using System.Globalization;
 using System.Reflection;
 using System.Resources;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.App;
 
@@ -151,17 +152,17 @@ public static partial class Application
     /// <summary>
     ///     Raises the <see cref="InstanceCreated"/> event on the current thread.
     /// </summary>
-    internal static void RaiseInstanceCreated (IApplication app) => _instanceCreated.Value?.Invoke (null, new (app));
+    internal static void RaiseInstanceCreated (IApplication app) => _instanceCreated.Value?.Invoke (null, new EventArgs<IApplication> (app));
 
     /// <summary>
     ///     Raises the <see cref="InstanceInitialized"/> event on the current thread.
     /// </summary>
-    internal static void RaiseInstanceInitialized (IApplication app) => _instanceInitialized.Value?.Invoke (null, new (app));
+    internal static void RaiseInstanceInitialized (IApplication app) => _instanceInitialized.Value?.Invoke (null, new EventArgs<IApplication> (app));
 
     /// <summary>
     ///     Raises the <see cref="InstanceDisposed"/> event on the current thread.
     /// </summary>
-    internal static void RaiseInstanceDisposed (IApplication app) => _instanceDisposed.Value?.Invoke (null, new (app));
+    internal static void RaiseInstanceDisposed (IApplication app) => _instanceDisposed.Value?.Invoke (null, new EventArgs<IApplication> (app));
 
     #endregion Modern Instance-Based Model Events (Thread-Local)
 
@@ -232,103 +233,76 @@ public static partial class Application
         {
             string oldValue = field;
             field = value;
-            ForceDriverChanged?.Invoke (null, new (oldValue, field));
+            ForceDriverChanged?.Invoke (null, new ValueChangedEventArgs<string> (oldValue, field));
         }
     } = string.Empty;
 
-    /// <summary>Gets or sets the key to quit the application.</summary>
+    /// <summary>
+    ///     Gets or sets the default key bindings for Application-level commands, optionally varying by platform.
+    ///     Each entry maps a <see cref="Command"/> to a <see cref="PlatformKeyBinding"/>
+    ///     that specifies the key strings for all platforms or specific ones.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key QuitKey
+    public static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings
     {
         get;
         set
         {
-            Key oldValue = field;
             field = value;
-            QuitKeyChanged?.Invoke (null, new ValueChangedEventArgs<Key> (oldValue, field));
+            Trace.Configuration ("DefaultKeyBindings", "App Set", $"{string.Join (", ", value?.Select (kvp => $"{kvp.Key}=[{kvp.Value}]") ?? [])}");
+            DefaultKeyBindingsChanged?.Invoke (null, EventArgs.Empty);
         }
-    } = Key.Esc;
-
-    /// <summary>Raised when <see cref="QuitKey"/> changes.</summary>
-    public static event EventHandler<ValueChangedEventArgs<Key>>? QuitKeyChanged;
-
-    /// <summary>Gets or sets the key to activate arranging views using the keyboard.</summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key ArrangeKey
+    } = new ()
     {
-        get;
-        set
-        {
-            Key oldValue = field;
-            field = value;
-            ArrangeKeyChanged?.Invoke (null, new ValueChangedEventArgs<Key> (oldValue, field));
-        }
-    } = Key.F5.WithCtrl;
+        [Command.Quit] = Bind.All (Key.Esc),
+        [Command.Suspend] = Bind.NonWindows (Key.Z.WithCtrl),
+        [Command.Arrange] = Bind.All (Key.F5.WithCtrl),
+        [Command.NextTabStop] = Bind.All (Key.Tab),
+        [Command.PreviousTabStop] = Bind.All (Key.Tab.WithShift),
+        [Command.NextTabGroup] = Bind.All (Key.F6),
+        [Command.PreviousTabGroup] = Bind.All (Key.F6.WithShift),
+        [Command.Refresh] = Bind.All (Key.F5)
+    };
 
-    /// <summary>Raised when <see cref="ArrangeKey"/> changes.</summary>
-    public static event EventHandler<ValueChangedEventArgs<Key>>? ArrangeKeyChanged;
+    /// <summary>
+    ///     Raised when the <see cref="DefaultKeyBindings"/> property is replaced (i.e., a new dictionary is assigned).
+    ///     <para>
+    ///         <b>Note:</b> This event does <b>not</b> fire when individual entries are mutated
+    ///         (e.g., <c>DefaultKeyBindings [Command.Quit] = ...</c>). To ensure the event fires, assign a
+    ///         new dictionary or call the property setter.
+    ///     </para>
+    /// </summary>
+    public static event EventHandler? DefaultKeyBindingsChanged;
 
-    /// <summary>Alternative key to navigate forwards through views. Ctrl+Tab is the primary key.</summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key NextTabGroupKey
+    /// <summary>
+    ///     Returns the first platform-resolved key for the specified <paramref name="command"/>
+    ///     from <see cref="DefaultKeyBindings"/>, or <see cref="Key.Empty"/> if none is configured.
+    /// </summary>
+    public static Key GetDefaultKey (Command command)
     {
-        get;
-        set
+        if (DefaultKeyBindings is null || !DefaultKeyBindings.TryGetValue (command, out PlatformKeyBinding? binding))
         {
-            Key oldValue = field;
-            field = value;
-            NextTabGroupKeyChanged?.Invoke (null, new (oldValue, field));
+            return Key.Empty;
         }
-    } = Key.F6;
 
-    /// <summary>Raised when <see cref="NextTabGroupKey"/> changes.</summary>
-    public static event EventHandler<ValueChangedEventArgs<Key>>? NextTabGroupKeyChanged;
+        return binding.GetCurrentPlatformKeys ().FirstOrDefault () ?? Key.Empty;
+    }
 
-    /// <summary>Alternative key to navigate forwards through views. Tab is the primary key.</summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key NextTabKey
+    /// <summary>
+    ///     Returns all platform-resolved keys for the specified <paramref name="command"/>
+    ///     from <see cref="DefaultKeyBindings"/>.
+    /// </summary>
+    public static IEnumerable<Key> GetDefaultKeys (Command command)
     {
-        get;
-        set
+        if (DefaultKeyBindings is null || !DefaultKeyBindings.TryGetValue (command, out PlatformKeyBinding? binding))
         {
-            Key oldValue = field;
-            field = value;
-            NextTabKeyChanged?.Invoke (null, new (oldValue, field));
+            return [];
         }
-    } = Key.Tab;
 
-    /// <summary>Raised when <see cref="NextTabKey"/> changes.</summary>
-    public static event EventHandler<ValueChangedEventArgs<Key>>? NextTabKeyChanged;
-
-    /// <summary>Alternative key to navigate backwards through views. Shift+Ctrl+Tab is the primary key.</summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key PrevTabGroupKey
-    {
-        get;
-        set
-        {
-            Key oldValue = field;
-            field = value;
-            PrevTabGroupKeyChanged?.Invoke (null, new (oldValue, field));
-        }
-    } = Key.F6.WithShift;
-
-    /// <summary>Raised when <see cref="PrevTabGroupKey"/> changes.</summary>
-    public static event EventHandler<ValueChangedEventArgs<Key>>? PrevTabGroupKeyChanged;
-
-    /// <summary>Alternative key to navigate backwards through views. Shift+Tab is the primary key.</summary>
-    [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static Key PrevTabKey
-    {
-        get;
-        set
-        {
-            Key oldValue = field;
-            field = value;
-            PrevTabKeyChanged?.Invoke (null, new (oldValue, field));
-        }
-    } = Key.Tab.WithShift;
-
-    /// <summary>Raised when <see cref="PrevTabKey"/> changes.</summary>
-    public static event EventHandler<ValueChangedEventArgs<Key>>? PrevTabKeyChanged;
+        return binding.GetCurrentPlatformKeys ();
+    }
 }

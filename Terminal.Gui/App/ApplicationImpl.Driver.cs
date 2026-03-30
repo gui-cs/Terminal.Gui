@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
-using System.Diagnostics;
-using Terminal.Gui.Drivers;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.App;
 
@@ -22,7 +21,7 @@ internal partial class ApplicationImpl
         if (_componentFactory != null)
         {
             _driverName = _componentFactory.GetDriverName ();
-            Tracing.Trace.Lifecycle (MainThreadId?.ToString (), "Init", $"Using provided component factory: {_driverName}");
+            Trace.Lifecycle (MainThreadId?.ToString (), "Init", $"Using provided component factory: {_driverName}");
 
             // Determine the input type and create subcomponents
             if (_componentFactory is IComponentFactory<WindowsConsole.InputRecord> windowsFactory)
@@ -54,20 +53,23 @@ internal partial class ApplicationImpl
             {
                 // Use explicitly specified driver name
                 _driverName = descriptor!.Name;
-                Tracing.Trace.Lifecycle (MainThreadId?.ToString (), "Init", $"Using driver specified by parameter: {descriptor.Name} ({descriptor.DisplayName})");
+                Trace.Lifecycle (MainThreadId?.ToString (), "Init", $"Using driver specified by parameter: {descriptor.Name} ({descriptor.DisplayName})");
             }
             else if (!string.IsNullOrEmpty (ForceDriver) && DriverRegistry.TryGetDriver (ForceDriver, out descriptor))
             {
                 // Use ForceDriver configuration property
                 _driverName = descriptor!.Name;
-                Tracing.Trace.Lifecycle(MainThreadId?.ToString(), "Init", $"Using driver from ForceDriver configuration: {descriptor.Name} ({descriptor.DisplayName})");
+
+                Trace.Lifecycle (MainThreadId?.ToString (),
+                                 "Init",
+                                 $"Using driver from ForceDriver configuration: {descriptor.Name} ({descriptor.DisplayName})");
             }
             else
             {
                 // Use platform default
                 descriptor = DriverRegistry.GetDefaultDriver ();
                 _driverName = descriptor.Name;
-                Tracing.Trace.Lifecycle(MainThreadId?.ToString(), "Init", $"Using platform default driver: {descriptor.Name} ({descriptor.DisplayName})");
+                Trace.Lifecycle (MainThreadId?.ToString (), "Init", $"Using platform default driver: {descriptor.Name} ({descriptor.DisplayName})");
             }
 
             // Create coordinator based on driver name
@@ -80,11 +82,6 @@ internal partial class ApplicationImpl
 
                 case DriverRegistry.Names.DOTNET:
                     Coordinator = CreateSubcomponents (() => new NetComponentFactory ());
-
-                    break;
-
-                case DriverRegistry.Names.UNIX:
-                    Coordinator = CreateSubcomponents (() => new UnixComponentFactory ());
 
                     break;
 
@@ -178,6 +175,7 @@ internal partial class ApplicationImpl
 
         Driver.SizeChanged += Driver_SizeChanged;
         Driver.KeyDown += Driver_KeyDown;
+        Driver.KeyUp += Driver_KeyUp;
         Driver.MouseEvent += Driver_MouseEvent;
     }
 
@@ -192,10 +190,13 @@ internal partial class ApplicationImpl
 
         Driver.SizeChanged -= Driver_SizeChanged;
         Driver.KeyDown -= Driver_KeyDown;
+        Driver.KeyUp -= Driver_KeyUp;
         Driver.MouseEvent -= Driver_MouseEvent;
     }
 
     private void Driver_KeyDown (object? sender, Key e) => Keyboard.RaiseKeyDownEvent (e);
+
+    private void Driver_KeyUp (object? sender, Key e) => Keyboard.RaiseKeyUpEvent (e);
 
     private void Driver_MouseEvent (object? sender, Mouse e) => Mouse.RaiseMouseEvent (e);
 }

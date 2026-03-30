@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
-using Terminal.Gui.Tests;
 using Terminal.Gui.Tracing;
+using UnitTests;
+using UnitTests.Parallelizable;
 
 namespace ApplicationTests.Popover;
 
@@ -96,7 +97,8 @@ public class PopoverImplTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Only uncomment this for debugging; setting a static property in parallel tests will cause interference between tests
+            // Trace.EnabledCategories = TraceCategory.Command;
 
             TestPopover popover = new ();
             View target = new () { Id = "target" };
@@ -126,7 +128,8 @@ public class PopoverImplTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Only uncomment this for debugging; setting a static property in parallel tests will cause interference between tests
+            // Trace.EnabledCategories = TraceCategory.Command;
 
             TestPopover popover = new ();
             View target = new () { Id = "target" };
@@ -156,7 +159,8 @@ public class PopoverImplTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Only uncomment this for debugging; setting a static property in parallel tests will cause interference between tests
+            // Trace.EnabledCategories = TraceCategory.Command;
 
             TestPopover popover = new ();
             View target = new () { Id = "target" };
@@ -181,7 +185,8 @@ public class PopoverImplTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Only uncomment this for debugging; setting a static property in parallel tests will cause interference between tests
+            // Trace.EnabledCategories = TraceCategory.Command;
 
             TestPopover popover = new ();
             View viewA = new () { Id = "viewA" };
@@ -211,7 +216,8 @@ public class PopoverImplTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Only uncomment this for debugging; setting a static property in parallel tests will cause interference between tests
+            // Trace.EnabledCategories = TraceCategory.Command;
 
             TestPopover popover = new ();
             View target = new () { Id = "target" };
@@ -236,7 +242,8 @@ public class PopoverImplTests (ITestOutputHelper output)
     {
         using (TestLogging.BindTo (output, LogLevel.Warning))
         {
-            Trace.EnabledCategories = TraceCategory.Command;
+            // Only uncomment this for debugging; setting a static property in parallel tests will cause interference between tests
+            // Trace.EnabledCategories = TraceCategory.Command;
 
             TestPopover popover = new ();
             View target = new () { Id = "target" };

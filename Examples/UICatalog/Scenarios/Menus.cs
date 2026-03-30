@@ -1,4 +1,4 @@
-#nullable enable
+﻿#nullable enable
 
 namespace UICatalog.Scenarios;
 
@@ -117,7 +117,7 @@ public class Menus : Scenario
 
                             return true;
                         });
-            HotKeyBindings.Add (Application.QuitKey, Command.Quit);
+            HotKeyBindings.Add (Application.GetDefaultKey (Command.Quit), Command.Quit);
 
             // --- Test Menu: demonstrates Menu with MenuItems ---
             Label testMenuLabel = new () { Title = "Menu with MenuItems:", X = 1, Y = Pos.Bottom (lastCommandLabel) + 1 };

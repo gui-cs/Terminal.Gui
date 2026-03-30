@@ -106,7 +106,7 @@ public class DatePicker : View, IValue<DateTime>
     /// <inheritdoc/>
     object? IValue.GetValue () => _date;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>
@@ -271,10 +271,10 @@ public class DatePicker : View, IValue<DateTime>
             Y = Pos.Bottom (_dateLabel),
             Height = 11,
             Style = new TableStyle { ShowHeaders = true, ShowHorizontalBottomLine = true, ShowVerticalCellLines = true, ExpandLastColumn = true },
-            MultiSelect = false,
+            MultiSelect = false
         };
 
-        _dateEditor = new DateEditor ()
+        _dateEditor = new DateEditor
         {
             Id = "_dateEditor",
             X = Pos.Right (_dateLabel),
@@ -294,7 +294,7 @@ public class DatePicker : View, IValue<DateTime>
             MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             NoPadding = true,
             NoDecorations = true,
-            ShadowStyle = ShadowStyle.None
+            ShadowStyle = null
         };
         _previousMonthButton.Accepting += (_, _) => AdjustMonth (-1);
 
@@ -308,7 +308,7 @@ public class DatePicker : View, IValue<DateTime>
             MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             NoPadding = true,
             NoDecorations = true,
-            ShadowStyle = ShadowStyle.None
+            ShadowStyle = null
         };
 
         _nextMonthButton.Accepting += (_, _) => AdjustMonth (1);
@@ -349,5 +349,4 @@ public class DatePicker : View, IValue<DateTime>
 
     /// <inheritdoc/>
     protected override bool OnDrawingText () => true;
-
 }
