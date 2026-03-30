@@ -167,7 +167,7 @@ public abstract class AdornmentImpl : IAdornment
     internal Region? CachedDrawnRegion { get; set; }
 
     /// <summary>
-    ///     Gets the drawn region from this adornment's last Draw pass.
+    ///     Gets the drawn region from this adornment's last <see cref="View.Draw"/> pass.
     ///     Populated by <see cref="View.DrawAdornments"/> using a per-adornment <see cref="DrawContext"/>.
     ///     Used by <see cref="View.DoDrawComplete"/> for both visual transparency clip exclusion
     ///     and <see cref="CachedDrawnRegion"/> computation — uniformly for all adornment types.
