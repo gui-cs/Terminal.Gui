@@ -3,7 +3,8 @@ using System.Runtime.InteropServices;
 namespace Terminal.Gui.Drawing;
 
 /// <summary>
-///     A canvas for composing box-drawing and line-art characters with automatic intersection resolution.
+///     A canvas for composing box-drawing and line-art characters with automatic intersection resolution. See
+///     <see href="../docs/drawing.md">Drawing Deep Dive</see> for an in-depth look at the design and usage of this class.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -126,14 +127,34 @@ public class LineCanvas : IDisposable
     ///         <see cref="Orientation"/> is <see cref="Orientation.Vertical"/>.
     ///     </para>
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         <see cref="LineStyle.None"/> has no special handling inside <see cref="LineCanvas"/>. A line
+    ///         added with <see cref="LineStyle.None"/> is stored and participates in intersection resolution
+    ///         like any other line; because <see cref="LineStyle.None"/> does not match any styled-glyph check,
+    ///         it falls through to the default glyphs and renders identically to <see cref="LineStyle.Single"/>.
+    ///     </para>
+    ///     <para>
+    ///         To erase geometry, do not add a <see cref="LineStyle.None"/> line. Instead, use
+    ///         <see cref="StraightLineExtensions.Exclude(IEnumerable{StraightLine}, Point, int, Orientation)"/>
+    ///         to physically split or remove overlapping lines from the <see cref="Lines"/> collection. To
+    ///         suppress output without removing geometry (e.g., for a title label), use
+    ///         <see cref="Exclude"/>. To claim positions during multi-canvas compositing, use
+    ///         <see cref="Reserve"/>.
+    ///     </para>
+    ///     <para>
+    ///         See the <a href="../docs/drawing.md">Drawing Deep Dive</a> for a detailed comparison of
+    ///         <see cref="LineStyle.None"/>, <see cref="Exclude"/>, and <see cref="Reserve"/>.
+    ///     </para>
+    /// </remarks>
     /// <param name="start">Starting point.</param>
     /// <param name="length">
     ///     The length of line. 0 for an intersection (cross or T). Positive for Down/Right. Negative for
     ///     Up/Left.
     /// </param>
     /// <param name="orientation">The direction of the line.</param>
-    /// <param name="style">The style of line to use</param>
-    /// <param name="attribute"></param>
+    /// <param name="style">The style of line to use.</param>
+    /// <param name="attribute">The color attribute for the line, or <see langword="null"/> to inherit.</param>
     public void AddLine (Point start, int length, Orientation orientation, LineStyle style, Attribute? attribute = null)
     {
         _cachedBounds = Rectangle.Empty;
