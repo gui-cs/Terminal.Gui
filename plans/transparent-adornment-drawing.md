@@ -71,7 +71,7 @@ Tabs (the container view)
 Expected:                    Actual:
 ╭────╮────╮                  ╭────┬────╮        
 │Tab1│Tab2│                  │Tab1│Tab2│        
-│    ╰────┴──╮               ├────┤────┴──╮     
+│    ╰────┴──╮               ├────┴────┴──╮     
 │Tab1 content│               │Tab1 content│     
 ╰────────────╯               ╰────────────╯     
 ```
@@ -161,45 +161,99 @@ cells where they overlap. The gap remains open because Tab1 simply has no line t
 This aligns with how painters' algorithm works in 2D graphics — and it's the correct
 mental model for overlapped views.
 
-### Option B detailed design
+### Option B detailed design (refined)
 
-**Phase 1: Per-view LineCanvas isolation during DrawSubViews**
+**Key insight from user**: Z-order conflicts only occur with `Arrangement = ViewArrangement.Overlapped`.
+Tiled (non-overlapped) views with `SuperViewRendersLineCanvas=true` should continue to use the
+flat merge — their borders SHOULD auto-join (e.g., `Line`, `AttributePicker` segments,
+`FileDialog` children, side-by-side `FrameView`s).
 
-Instead of merging each SubView's LineCanvas into the SuperView's immediately:
-1. Each SubView draws normally (populating its own LineCanvas)
-2. Resolve each SubView's LineCanvas independently → cell maps
-3. Render cell maps in Z-order (back to front), with higher-Z overwriting lower-Z
-4. The SuperView's OWN LineCanvas (from DoDrawAdornments) is treated as the lowest Z
+**This means the change can be scoped to DrawSubViews only, with a simple partition:**
 
-**Phase 2: Same-Z shared canvas (for cross-view auto-join within same Z)**
+1. **Tiled SubViews** (no `Overlapped` flag): Merge into parent's LineCanvas immediately,
+   as today. Auto-join across tiled siblings works correctly.
+   
+2. **Overlapped SubViews** (`Arrangement.HasFlag(ViewArrangement.Overlapped)`): Each
+   resolves its own LineCanvas independently. The resolved cell maps are composited
+   in Z-order (painters' algorithm) directly to the output buffer during RenderLineCanvas.
 
-Views at the same Z-level that need auto-join (e.g., unfocused tabs adjacent to each
-other) can share a canvas. This is an optimization that preserves correct junctions
-between peer views.
-
-**Phase 3: Adornment SubView integration**
-
-`DoDrawAdornmentsSubViews` currently merges TabTitleView's lines into the parent's
-LineCanvas. Under Option B, the TabTitleView's lines should merge into its containing
-Tab's per-view canvas (same Z-level), not into the top-level Tabs' canvas directly.
-
-### Implementation approach
-
-The change is primarily in `DrawSubViews` and `DoRenderLineCanvas`:
+**DrawSubViews algorithm (revised):**
 
 ```
-DrawSubViews:
-  - Don't merge SubView LCs into parent LC immediately
-  - Instead, collect per-SubView resolved cell maps in Z-order
+DrawSubViews(context):
+  // Collect overlapped views' resolved cell maps for deferred compositing
+  List<(Dictionary<Point,Cell?>, int zOrder)> overlappedCellMaps = []
+
+  foreach view in InternalSubViews.Reverse():   // reverse Z-order (highest Z last)
+    view.Draw(context)
+    
+    if !view.SuperViewRendersLineCanvas:
+      continue
+
+    if view.Arrangement.HasFlag(Overlapped):
+      // Resolve independently, defer rendering
+      cellMap = view.LineCanvas.GetCellMap()
+      overlappedCellMaps.Add((cellMap, zOrder))
+      view.LineCanvas.Clear()
+    else:
+      // Tiled: flat merge into parent LC (preserves auto-join)
+      LineCanvas.Merge(view.LineCanvas)
+      view.LineCanvas.Clear()
+
+  // Store overlappedCellMaps for use by RenderLineCanvas
+  _pendingOverlappedCellMaps = overlappedCellMaps
+```
+
+**RenderLineCanvas (revised):**
+
+```
+RenderLineCanvas(context):
+  // 1. Resolve parent's own LC (includes tiled SubViews' merged lines)
+  parentCellMap = LineCanvas.GetCellMap()
   
-DoRenderLineCanvas:
-  - Resolve parent's own LC → base cell map
-  - Composite SubView cell maps on top in Z-order
-  - Render the final composite
+  // 2. Render parent cell map
+  foreach cell in parentCellMap: render(cell)
+  
+  // 3. Composite overlapped views' cell maps on top, in Z-order (low→high)
+  foreach (cellMap, _) in _pendingOverlappedCellMaps:
+    foreach cell in cellMap: render(cell)   // overwrites lower-Z cells
+  
+  LineCanvas.Clear()
+  _pendingOverlappedCellMaps = null
 ```
 
-This keeps the change localized to the draw pipeline without touching LineCanvas
-intersection resolution at all.
+**Why this works for all cases:**
+
+| Scenario | Arrangement | Merge strategy | Auto-join? |
+|----------|------------|----------------|------------|
+| Side-by-side FrameViews | Tiled | Flat merge | ✅ Yes — T-junctions at shared borders |
+| Line views in a container | Tiled | Flat merge | ✅ Yes — lines join correctly |
+| Tab headers (focused/unfocused) | Overlapped | Per-view resolve | ✅ No cross-Z join (correct!) |
+| Stacked dialog windows | Overlapped | Per-view resolve | ✅ Front window occludes back |
+| Unfocused tabs (same Z-level) | Overlapped | Per-view resolve | ⚠️ No auto-join between unfocused tabs |
+
+**The last row is a concern**: unfocused tabs currently share borders (the `╮` between Tab1 and
+Tab2's top). With per-view resolve, these would render as two overlapping `┐` and `┌` instead
+of a joined `┬`. However, looking at the expected test output:
+
+```
+╭────╮────╮    ← Tab1 focused: ╮ at (5,0) is Tab1's top-right corner meeting Tab2's top-left
+│Tab1│Tab2│
+│    ╰────┴──╮
+```
+
+The `╮` at col 5 row 0 is actually produced by Tab2's top-left corner AND Tab1's top-right
+meeting at the same cell. With per-view resolve:
+- Tab1 (higher Z) produces `╮` at (5,0)
+- Tab2 (lower Z) produces `╭` at (5,0)
+- Tab1 wins → `╮` → CORRECT!
+
+And at col 5 row 2:
+- Tab1 (higher Z) has NO line (gap)
+- Tab2 (lower Z) produces `╰` at (5,2)
+- Tab2's glyph shows through the gap → `╰` → CORRECT!
+
+**This is exactly what painters' algorithm produces, and it matches the expected output.**
 
 ## Investigation Status
 
@@ -213,10 +267,31 @@ intersection resolution at all.
 - [x] Study how adornment SubViews' LineCanvas lines flow to SuperView
 - [x] Trace a specific failing test to understand exact line composition
 - [x] Evaluate design options against all test cases
+- [x] Created general-purpose tests independent of BorderSettings.Tab
 - [ ] Validate Option B against AutoLineJoin tests (thought experiment)
 - [ ] Validate Option B against non-Tab scenarios (FrameView nesting, etc.)
 - [ ] Detail implementation plan with specific code changes
 - [ ] Identify edge cases and risks
+
+## Test Results Summary
+
+### New tests (OverlappedLineCanvasTests.cs)
+
+| Test | Result | What it proves |
+|------|--------|---------------|
+| `HigherZ_Gap_Not_Filled_By_LowerZ_Border` | **FAIL** | Higher-Z view's sides get ├/┤ junctions from lower-Z view's top line |
+| `Overlapped_With_Padding_SubViews_HigherZ_Wins` | **FAIL** | Same bug: at overlap cell (0,1), got ├ instead of │ |
+| `Overlapped_Views_HigherZ_Lines_Win_At_Shared_Cells` | PASS (doc) | Renders for design review; confirms ├ at overlap points |
+| `Three_Overlapped_Staircase_HighestZ_Dominates` | PASS (doc) | Confirms ┤ junction artifacts in staircase pattern |
+| `SameZ_SideBySide_AutoJoin_Still_Works` | **PASS** | Regression guard: non-overlapped peers auto-join correctly |
+
+### Existing tests
+
+| Suite | Result | Notes |
+|-------|--------|-------|
+| AutoLineJoinTests (20) | All pass | Same-Z auto-join works correctly |
+| Border tests (112) | 109 pass, 3 skip | No regressions |
+| TabView tests (24) | 21 pass, 3 fail | The 3 Tab rendering tests |
 
 ## Amazon PE Tenets Applied
 
@@ -241,11 +316,45 @@ intersection resolution at all.
 - `Tests/UnitTestsParallelizable/Views/TabView/TabsTests.cs` — 3 failing tests
 - `Tests/UnitTestsParallelizable/Drawing/AutoLineJoinTests.cs` — Auto-join regression guard
 
+## Key Finding: The LineCanvas Merge Chain
+
+Traced via `SuperViewRendersLineCanvas = true` audit:
+
+```
+TabTitleView (SuperViewRendersLineCanvas=true)
+  → merges into BorderView's LineCanvas
+    → BorderView.DrawTabBorder() writes directly to Adornment.Parent.LineCanvas (Tab's LC)
+      Tab (SuperViewRendersLineCanvas=true)
+        → DrawSubViews merges Tab.LineCanvas into Tabs.LineCanvas
+          Tabs.DoRenderLineCanvas() → resolves ALL lines in one pass
+```
+
+**All lines from all tabs — focused AND unfocused — end up in one flat LineCanvas.**
+The intersection resolver has no way to know that some lines should occlude others.
+
+### Views using SuperViewRendersLineCanvas=true (audit)
+
+| View | File | Purpose |
+|------|------|---------|
+| Tab | Views/TabView/Tab.cs:28 | Tab headers merge into Tabs container |
+| TabTitleView | Adornment/TabTitleView.cs:16 | Tab title text merges into BorderView |
+| Line | Views/Line.cs:60 | Line view merges into parent |
+| AttributePicker children | Views/Color/AttributePicker.cs:102+ | Color picker segments |
+| FileDialog children | Views/FileDialogs/FileDialog.cs:133 | File dialog structure |
+
+**This confirms the issue is general**: Any two overlapped views with `SuperViewRendersLineCanvas=true`
+that contribute border lines to the same parent will have the same auto-join conflict.
+
+### No TabRow.cs exists
+
+The `Tabs` class (formerly `TabView`) directly manages tab layout via `UpdateTabOffsets()`
+and `UpdateZOrder()`. There is no intermediate `TabRow` container.
+
 ## Open Questions
 
-1. **Which views use SuperViewRendersLineCanvas?** Need to audit all usages to ensure
-   Option B doesn't break non-Tab scenarios (e.g., FrameViews inside FrameViews).
-2. **DoDrawAdornmentsSubViews merging**: Currently merges borderView.LineCanvas into
+1. **DoDrawAdornmentsSubViews merging**: Currently merges borderView.LineCanvas into
    parent's LC. Under Option B, should this be a separate Z-level or same as parent?
-3. **Performance**: Per-view resolution means N resolve passes instead of 1. For most
+2. **Performance**: Per-view resolution means N resolve passes instead of 1. For most
    views this is trivial (few lines), but need to consider pathological cases.
+3. **Same-Z auto-join**: Unfocused tabs adjacent to each other still need shared
+   T-junctions. Option B's per-view isolation would lose these. Need a grouping strategy.
