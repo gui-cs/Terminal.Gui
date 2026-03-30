@@ -808,12 +808,18 @@ public partial class View // Drawing APIs
                 continue;
             }
 
+            // BUGBUG: This can cause fragmentation of lines that would otherwise auto-join, which can cause visual artifacts
+            // BUGBUG: (e.g., gaps in borders). We should consider a more robust solution for this,
+            // BUGBUG: such as tracking LineCanvas regions and doing a single pass merge at the end.
             // Merge with clipping: exclude areas already drawn by higher-Z subviews.
             // This prevents a lower-Z subview's border lines from rendering where a higher-Z
             // subview already drew (e.g., a focused tab's open gap must not be filled by an
             // unfocused tab's border). Lines are split at the boundary so auto-join only sees
             // the higher-Z subview's lines at those cells.
-            LineCanvas.Merge (view.LineCanvas, priorDrawnRegion);
+            //LineCanvas.Merge (view.LineCanvas, priorDrawnRegion);
+
+            // BUGBUG: Using the OG version of Merge works fine:
+            LineCanvas.Merge (view.LineCanvas);
             view.LineCanvas.Clear ();
 
             // Snapshot the drawn region after this subview for the next iteration.

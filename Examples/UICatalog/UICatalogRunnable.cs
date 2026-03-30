@@ -528,9 +528,9 @@ public sealed class UICatalogRunnable : Runnable
             SuperViewRendersLineCanvas = true
         };
 
-        scenarioList.Border.Settings = BorderSettings.Title | BorderSettings.Tab;
-        scenarioList.Border.TabSide = Side.Top;
-        scenarioList.Border.Thickness = new Thickness (1, 2, 1, 1);
+        //scenarioList.Border.Settings = BorderSettings.Title | BorderSettings.Tab;
+        //scenarioList.Border.TabSide = Side.Top;
+        //scenarioList.Border.Thickness = new Thickness (1, 2, 1, 1);
 
         // TableView provides many options for table headers. For simplicity, we turn all
         // of these off. By enabling FullRowSelect and turning off headers, TableView looks just
@@ -615,9 +615,9 @@ public sealed class UICatalogRunnable : Runnable
             SuperViewRendersLineCanvas = true,
             Source = new ListWrapper<string> (CachedCategories)
         };
-        categoryList.Border.Settings = BorderSettings.Title | BorderSettings.Tab;
-        categoryList.Border.TabSide = Side.Top;
-        categoryList.Border.Thickness = new Thickness (1, 2, 1, 1);
+        //categoryList.Border.Settings = BorderSettings.Title | BorderSettings.Tab;
+        //categoryList.Border.TabSide = Side.Top;
+        //categoryList.Border.Thickness = new Thickness (1, 2, 1, 1);
 
         categoryList.Accepting += (_, e) =>
                                   {

@@ -443,6 +443,10 @@ public class LineCanvas : IDisposable
     /// </param>
     public void Merge (LineCanvas lineCanvas, Region? exclude)
     {
+        // BUGBUG: Using this method can cause fragmentation of lines that would otherwise auto-join, which can cause visual artifacts
+        // BUGBUG: (e.g., gaps in borders). We should consider a more robust solution for this,
+        // BUGBUG: such as tracking LineCanvas regions and doing a single pass merge at the end.
+
         if (exclude is null || exclude.IsEmpty ())
         {
             Merge (lineCanvas);
