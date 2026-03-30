@@ -1,5 +1,3 @@
-using Terminal.Gui.Drawing;
-
 namespace Terminal.Gui.ViewBase;
 
 public partial class View
@@ -115,8 +113,8 @@ public partial class View
                             continue;
                         }
 
-                        LineDirections existingDirs = GetLineDirections (existingCell.Grapheme);
-                        LineDirections newDirs = GetLineDirections (p.Value.Value.Grapheme);
+                        LineDirections existingDirs = LineCanvas.GetLineDirections (existingCell.Grapheme);
+                        LineDirections newDirs = LineCanvas.GetLineDirections (p.Value.Value.Grapheme);
 
                         // Lower-Z cell must be a strict superset of the higher-Z cell's directions:
                         // it must contain ALL existing directions plus at least one more.
@@ -137,22 +135,22 @@ public partial class View
                         // Check if any additional direction points toward a reserved cell.
                         var pointsToReserved = false;
 
-                        if (additionalDirs.HasFlag (LineDirections.Up) && allReserved.Contains (new Point (p.Key.X, p.Key.Y - 1)))
+                        if (additionalDirs.HasFlag (LineDirections.Up) && allReserved.Contains (p.Key with { Y = p.Key.Y - 1 }))
                         {
                             pointsToReserved = true;
                         }
 
-                        if (!pointsToReserved && additionalDirs.HasFlag (LineDirections.Down) && allReserved.Contains (new Point (p.Key.X, p.Key.Y + 1)))
+                        if (!pointsToReserved && additionalDirs.HasFlag (LineDirections.Down) && allReserved.Contains (p.Key with { Y = p.Key.Y + 1 }))
                         {
                             pointsToReserved = true;
                         }
 
-                        if (!pointsToReserved && additionalDirs.HasFlag (LineDirections.Left) && allReserved.Contains (new Point (p.Key.X - 1, p.Key.Y)))
+                        if (!pointsToReserved && additionalDirs.HasFlag (LineDirections.Left) && allReserved.Contains (p.Key with { X = p.Key.X - 1 }))
                         {
                             pointsToReserved = true;
                         }
 
-                        if (!pointsToReserved && additionalDirs.HasFlag (LineDirections.Right) && allReserved.Contains (new Point (p.Key.X + 1, p.Key.Y)))
+                        if (!pointsToReserved && additionalDirs.HasFlag (LineDirections.Right) && allReserved.Contains (p.Key with { X = p.Key.X + 1 }))
                         {
                             pointsToReserved = true;
                         }
@@ -195,59 +193,4 @@ public partial class View
 
         LineCanvas.Clear ();
     }
-
-    #region LineDirectionHelpers
-
-    /// <summary>Direction flags for box-drawing character analysis during overlapped compositing.</summary>
-    [Flags]
-    private enum LineDirections
-    {
-        None = 0,
-        Up = 1,
-        Down = 2,
-        Left = 4,
-        Right = 8
-    }
-
-    /// <summary>
-    ///     Maps a box-drawing grapheme to its line directions. Used during overlapped LC compositing
-    ///     to determine whether a lower-Z cell adds directions that don't point toward reserved gaps.
-    /// </summary>
-    private static LineDirections GetLineDirections (string? grapheme)
-    {
-        if (string.IsNullOrEmpty (grapheme) || grapheme.Length == 0)
-        {
-            return LineDirections.None;
-        }
-
-        char ch = grapheme [0];
-
-        return ch switch
-               {
-                   // Horizontal lines
-                   '─' or '━' or '═' => LineDirections.Left | LineDirections.Right,
-
-                   // Vertical lines
-                   '│' or '┃' or '║' => LineDirections.Up | LineDirections.Down,
-
-                   // Corners (single, rounded, double, heavy)
-                   '┌' or '╭' or '╔' or '┏' => LineDirections.Right | LineDirections.Down,
-                   '┐' or '╮' or '╗' or '┓' => LineDirections.Left | LineDirections.Down,
-                   '└' or '╰' or '╚' or '┗' => LineDirections.Right | LineDirections.Up,
-                   '┘' or '╯' or '╝' or '┛' => LineDirections.Left | LineDirections.Up,
-
-                   // T-junctions (single, double, heavy)
-                   '├' or '╠' or '┣' => LineDirections.Up | LineDirections.Down | LineDirections.Right,
-                   '┤' or '╣' or '┫' => LineDirections.Up | LineDirections.Down | LineDirections.Left,
-                   '┬' or '╦' or '┳' => LineDirections.Left | LineDirections.Right | LineDirections.Down,
-                   '┴' or '╩' or '┻' => LineDirections.Left | LineDirections.Right | LineDirections.Up,
-
-                   // Cross (single, double, heavy)
-                   '┼' or '╬' or '╋' => LineDirections.Up | LineDirections.Down | LineDirections.Left | LineDirections.Right,
-
-                   _ => LineDirections.None
-               };
-    }
-
-    #endregion LineDirectionHelpers
 }

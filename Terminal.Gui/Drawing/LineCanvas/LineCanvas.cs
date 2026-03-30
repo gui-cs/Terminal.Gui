@@ -1109,6 +1109,46 @@ public class LineCanvas : IDisposable
         }
     }
 
+    /// <summary>
+    ///     Maps a box-drawing grapheme to its line directions. Used during overlapped LC compositing
+    ///     to determine whether a lower-Z cell adds directions that don't point toward reserved gaps.
+    /// </summary>
+    public static LineDirections GetLineDirections (string? grapheme)
+    {
+        if (string.IsNullOrEmpty (grapheme) || grapheme.Length == 0)
+        {
+            return LineDirections.None;
+        }
+
+        char ch = grapheme [0];
+
+        return ch switch
+        {
+            // Horizontal lines
+            '─' or '━' or '═' => LineDirections.Left | LineDirections.Right,
+
+            // Vertical lines
+            '│' or '┃' or '║' => LineDirections.Up | LineDirections.Down,
+
+            // Corners (single, rounded, double, heavy)
+            '┌' or '╭' or '╔' or '┏' => LineDirections.Right | LineDirections.Down,
+            '┐' or '╮' or '╗' or '┓' => LineDirections.Left | LineDirections.Down,
+            '└' or '╰' or '╚' or '┗' => LineDirections.Right | LineDirections.Up,
+            '┘' or '╯' or '╝' or '┛' => LineDirections.Left | LineDirections.Up,
+
+            // T-junctions (single, double, heavy)
+            '├' or '╠' or '┣' => LineDirections.Up | LineDirections.Down | LineDirections.Right,
+            '┤' or '╣' or '┫' => LineDirections.Up | LineDirections.Down | LineDirections.Left,
+            '┬' or '╦' or '┳' => LineDirections.Left | LineDirections.Right | LineDirections.Down,
+            '┴' or '╩' or '┻' => LineDirections.Left | LineDirections.Right | LineDirections.Up,
+
+            // Cross (single, double, heavy)
+            '┼' or '╬' or '╋' => LineDirections.Up | LineDirections.Down | LineDirections.Left | LineDirections.Right,
+
+            _ => LineDirections.None
+        };
+    }
+
     /// <inheritdoc/>
     public void Dispose ()
     {
