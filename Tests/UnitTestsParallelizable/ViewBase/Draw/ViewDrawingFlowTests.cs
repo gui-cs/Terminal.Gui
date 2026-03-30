@@ -435,7 +435,7 @@ public class ViewDrawingFlowTests : TestDriverBase
         view.Draw ();
 
         // The drawn area should be excluded from the clip
-        Rectangle unused = view.ViewportToScreen (view.Viewport);
+        Rectangle _ = view.ViewportToScreen (view.Viewport);
 
         // Points inside the view should be excluded
         // Note: This test depends on the DrawContext tracking, which may not exclude if nothing was actually drawn

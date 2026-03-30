@@ -1,5 +1,5 @@
+using System.Collections;
 using System.Collections.ObjectModel;
-using Terminal.Gui.Tracing;
 using UnitTests;
 
 namespace ViewsTests;
@@ -127,7 +127,7 @@ public class DropDownListTests (ITestOutputHelper output)
         // Open dropdown
         dropdown.NewKeyDownEvent (Key.F4);
 
-        Assert.True (app.Popovers!.Popovers.Any());
+        Assert.True (app.Popovers!.Popovers.Any ());
 
         dropdown.Dispose ();
 
@@ -757,8 +757,7 @@ public class DropDownListTests (ITestOutputHelper output)
         // Simulate click via input injection: Pressed → Released (system synthesizes Click)
         injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
 
-        injector.InjectMouse (
-                              new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) },
+        injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) },
                               options);
 
         // The popover should have closed and the item should be selected
@@ -786,10 +785,26 @@ public class DropDownListTests (ITestOutputHelper output)
         // Create a DropDownList with many items (more than the 10-row screen)
         ObservableCollection<string> items =
         [
-            "Item_00", "Item_01", "Item_02", "Item_03", "Item_04",
-            "Item_05", "Item_06", "Item_07", "Item_08", "Item_09",
-            "Item_10", "Item_11", "Item_12", "Item_13", "Item_14",
-            "Item_15", "Item_16", "Item_17", "Item_18", "Item_19"
+            "Item_00",
+            "Item_01",
+            "Item_02",
+            "Item_03",
+            "Item_04",
+            "Item_05",
+            "Item_06",
+            "Item_07",
+            "Item_08",
+            "Item_09",
+            "Item_10",
+            "Item_11",
+            "Item_12",
+            "Item_13",
+            "Item_14",
+            "Item_15",
+            "Item_16",
+            "Item_17",
+            "Item_18",
+            "Item_19"
         ];
 
         DropDownList dropdown = new ()
@@ -824,17 +839,13 @@ public class DropDownListTests (ITestOutputHelper output)
         Assert.True (listView.VerticalScrollBar.Visible, "ScrollBar should be visible for tall dropdown");
         Assert.Equal (0, listView.Viewport.Y);
 
-        // Diagnostic: capture the initial viewport state
-        int initialViewportY = listView.Viewport.Y;
-        int initialViewportH = listView.Viewport.Height;
-
         // Scroll down 5 items
         listView.VerticalScrollBar.Value = 5;
 
         // Capture buffer when the Runnable starts drawing (AFTER the Popover drew)
         top.DrawingContent += (_, _) =>
                               {
-                                  Cell [,]? buf = app.Driver.GetOutputBuffer ()?.Contents;
+                                  Cell [,]? buf = app.Driver.GetOutputBuffer ().Contents;
 
                                   if (buf is null)
                                   {
@@ -855,12 +866,12 @@ public class DropDownListTests (ITestOutputHelper output)
                                       output.WriteLine ($"  Row {r}: '{t}'");
                                   }
 
-                                  output.WriteLine ($"  Clip: not available");
+                                  output.WriteLine ("  Clip: not available");
                               };
 
         app.LayoutAndDraw ();
 
-        Cell [,]? contents = app.Driver.GetOutputBuffer ()?.Contents;
+        Cell [,]? contents = app.Driver.GetOutputBuffer ().Contents;
         Assert.NotNull (contents);
 
         output.WriteLine ("Final buffer:");
@@ -871,7 +882,7 @@ public class DropDownListTests (ITestOutputHelper output)
 
             for (var col = 0; col < 10; col++)
             {
-                rowText += contents! [row, col].Grapheme;
+                rowText += contents [row, col].Grapheme;
             }
 
             output.WriteLine ($"  Row {row}: '{rowText}'");
@@ -881,7 +892,7 @@ public class DropDownListTests (ITestOutputHelper output)
 
         for (var col = 0; col < 7; col++)
         {
-            topRowText += contents! [1, col].Grapheme;
+            topRowText += contents [1, col].Grapheme;
         }
 
         Assert.Contains ("Item_05", topRowText);
@@ -890,8 +901,7 @@ public class DropDownListTests (ITestOutputHelper output)
     }
 
     // Helper to find the DropDownList popover (excludes the context menu popover)
-    private static IPopoverView? FindDropDownPopover (IApplication app) =>
-        app.Popovers?.Popovers.OfType<Popover<ListView, string?>> ().FirstOrDefault ();
+    private static IPopoverView? FindDropDownPopover (IApplication app) => app.Popovers?.Popovers.OfType<Popover<ListView, string?>> ().FirstOrDefault ();
 }
 
 public class DropDownListGenericTests
@@ -922,7 +932,7 @@ public class DropDownListGenericTests
         // Copilot
         DropDownList<Season> dropdown = new ();
 
-        System.Collections.IList items = dropdown.Source!.ToList ();
+        IList items = dropdown.Source!.ToList ();
         List<string?> names = items.Cast<object?> ().Select (i => i?.ToString ()).ToList ();
         Assert.Contains ("Spring", names);
         Assert.Contains ("Summer", names);
