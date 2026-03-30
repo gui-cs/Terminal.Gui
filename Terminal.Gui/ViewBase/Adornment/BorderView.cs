@@ -203,6 +203,10 @@ public partial class BorderView : AdornmentView
         {
             _tabTitleView.Padding.Thickness = new Thickness (0, 1, 0, 0);
         }
+        else if (hasFocus && border is { TabSide: Side.Right, Thickness.Right: > 2 })
+        {
+            _tabTitleView.Padding.Thickness = new Thickness (1, 0, 0, 0);
+        }
         else
         {
             _tabTitleView.Padding.Thickness = new Thickness (0);
@@ -341,11 +345,7 @@ public partial class BorderView : AdornmentView
 #if DEBUG
             Id = "TabTitleView",
 #endif
-            CanFocus = false,
-            TabStop = TabBehavior.NoStop,
-            SuperViewRendersLineCanvas = true,
         };
-        _tabTitleView.Border.Settings = BorderSettings.None;
         Add (_tabTitleView);
 
         return _tabTitleView;
@@ -539,6 +539,7 @@ public partial class BorderView : AdornmentView
         {
             return true;
         }
+
         return border.Parent!.HasFocus;
     }
 
@@ -995,7 +996,7 @@ public partial class BorderView : AdornmentView
 
         return true;
     }
-    
+
     /// <summary>
     ///     Gets the subview used to render <see cref="ViewDiagnosticFlags.DrawIndicator"/>.
     /// </summary>

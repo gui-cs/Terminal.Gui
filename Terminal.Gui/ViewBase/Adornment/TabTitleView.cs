@@ -8,6 +8,14 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 internal sealed class TabTitleView : View
 {
+    public TabTitleView ()
+    {
+        CanFocus = true;
+        TabStop = TabBehavior.NoStop;
+        Border.Settings = BorderSettings.None;
+        SuperViewRendersLineCanvas = true;
+    }
+
     /// <summary>Sync <see cref="View.HotKeySpecifier"/> to <see cref="TextFormatter"/> (same as Label).</summary>
     public override Rune HotKeySpecifier { get => base.HotKeySpecifier; set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value; }
 
@@ -19,7 +27,11 @@ internal sealed class TabTitleView : View
             return false;
         }
 
-        bool ownerHasFocus = (SuperView as BorderView)?.Adornment?.Parent?.HasFocus ?? false;
+        // TODO: Determine best look for focus.
+        // TODO: Option 1: Only draw focused if the TabTitleView has focused. The tab border underline would be the only indication of focus.
+        // TODO: Option 2: Draw focused if the TabTitleView has focus OR the owning BorderView has focus. Double indication: the tab border underline and the focused text attribute.
+        // TODO: Choose option 1 for now.
+        bool ownerHasFocus = HasFocus; // (SuperView as BorderView)?.Adornment?.Parent?.HasFocus ?? false;
 
         Rectangle drawRect = ViewportToScreen ();
 

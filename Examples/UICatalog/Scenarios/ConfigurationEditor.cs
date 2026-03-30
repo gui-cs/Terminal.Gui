@@ -41,14 +41,12 @@ public class ConfigurationEditor : Scenario
 
         StatusBar statusBar = new ([quitShortcut, reloadShortcut, saveShortcut, _lenShortcut]);
 
-        _tabs = new Tabs { Width = Dim.Fill (), Height = Dim.Fill (to: statusBar) };
+        _tabs = new Tabs { Width = Dim.Fill (), Height = Dim.Fill (statusBar) };
 
         win.Add (_tabs, statusBar);
 
-        win.IsModalChanged += (_, e) => { if (e.Value) { Open (); } };
-
         ConfigurationManager.Applied += ConfigurationManagerOnApplied;
-
+        Open ();
         app.Run (win);
 
         return;
@@ -87,24 +85,16 @@ public class ConfigurationEditor : Scenario
             Tab tab = new () { Title = config.Key.ToString () };
             tab.Add (editor);
 
-            _tabs!.Add (tab);
+            _tabs?.Add (tab);
 
             editor.Read ();
 
-            editor.ContentsChanged += (_, _) =>
-                                      {
-                                          _lenShortcut!.Title = _lenShortcut!.Title.Replace ("*", "");
+            //editor.ContentsChanged += OnEditorOnContentsChanged;
 
-                                          if (editor.IsDirty)
-                                          {
-                                              _lenShortcut!.Title += "*";
-                                          }
-                                      };
-
-            _lenShortcut!.Title = $"{editor.Title}";
+            _lenShortcut?.Title = $"{editor.Title}";
         }
 
-        _tabs!.ValueChanged += (_, args) =>
+        _tabs?.ValueChanged += (_, args) =>
                                {
                                    ConfigTextView? editor = args.NewValue?.SubViews.OfType<ConfigTextView> ().FirstOrDefault ();
 
@@ -115,10 +105,20 @@ public class ConfigurationEditor : Scenario
                                };
     }
 
+    private void OnEditorOnContentsChanged (object? o, ContentsChangedEventArgs contentsChangedEventArgs)
+    {
+        var editor = (ConfigTextView)o!;
+        _lenShortcut?.Title = _lenShortcut.Title.Replace ("*", "");
+
+        if (editor.IsDirty)
+        {
+            _lenShortcut?.Title += "*";
+        }
+    }
+
     private void Quit ()
     {
-        foreach (ConfigTextView editor in _tabs!.TabCollection
-                                               .SelectMany (t => t.SubViews.OfType<ConfigTextView> ()))
+        foreach (ConfigTextView editor in _tabs?.TabCollection.SelectMany (t => t.SubViews.OfType<ConfigTextView> ()) ?? [])
         {
             if (!editor.IsDirty)
             {

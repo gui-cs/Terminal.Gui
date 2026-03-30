@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using UnitTests;
 
 namespace ViewBaseTests.Adornments;
@@ -949,8 +950,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        │       │
                        │       │
                        │       ╰─╮
-                       │       T │
-                       ╰───────a │
+                       │        T│
+                       ╰─────── a│
                        """);
     }
 
@@ -1071,9 +1072,9 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        driver,
                        """
                        ╭─────────╮
-                       │       T │
-                       │       a │
-                       │       b │
+                       │        T│
+                       │        a│
+                       │        b│
                        │       ╭─╯
                        │       │
                        │       │
@@ -1959,14 +1960,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         app.Dispose ();
     }
 
-    // ════════════════════════════════════════════════════════════════════
-    //  Attribute Tests
-    //  Verify that tab title text renders with the correct Scheme
-    //  attributes depending on focus state.
-    // ════════════════════════════════════════════════════════════════════
-
     [Fact]
-    public void Top_Focused_TitleText_Uses_Focus_Attributes () // Copilot
+    public void Top_Focused_TitleText_Uses_Normal_Attributes ()
     {
         // When a View has focus, the tab title text ("Tab") should render
         // with Focus attributes, and the hotkey character with HotFocus.
@@ -2018,6 +2013,90 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         // 0 = Normal (border lines when unfocused — but LineCanvas uses Normal)
         // 1 = Focus (title text)
         // 2 = HotFocus (hotkey char 'a')
+        Attribute normalAttribute = view.GetAttributeForRole (VisualRole.Normal);
+        Attribute hotNormalAttr = view.GetAttributeForRole (VisualRole.HotNormal);
+        Attribute focusAttr = view.GetAttributeForRole (VisualRole.Focus);
+        Attribute hotFocusAttr = view.GetAttributeForRole (VisualRole.HotFocus);
+
+        // Row 1 is "│Tab│" — columns 1,2,3 are the title text "Tab"
+        // 'T' at [1,1] should be Focus, 'a' at [1,2] should be HotFocus, 'b' at [1,3] should be Focus
+        Cell [,] contents = app.Driver!.Contents!;
+        Attribute actualT = contents [1, 1].Attribute!.Value;
+        Attribute actualA = contents [1, 2].Attribute!.Value;
+        Attribute actualB = contents [1, 3].Attribute!.Value;
+
+        output.WriteLine ($"Expected Focus: {focusAttr}");
+        output.WriteLine ($"Expected HotFocus: {hotFocusAttr}");
+        output.WriteLine ($"Actual 'T' [1,1]: {actualT}");
+        output.WriteLine ($"Actual 'a' [1,2]: {actualA}");
+        output.WriteLine ($"Actual 'b' [1,3]: {actualB}");
+
+        Assert.Equal (normalAttribute, actualT);
+        Assert.Equal (hotNormalAttr, actualA);
+        Assert.Equal (normalAttribute, actualB);
+
+        view.Dispose ();
+        app.Dispose ();
+    }
+
+
+    [Fact]
+    public void Top_Focused_TabTitleView_Uses_Focused_Attributes ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (9, 6);
+        app.Driver!.Clipboard = new FakeClipboard ();
+
+        Runnable runnable = new () { Width = Dim.Fill (), Height = Dim.Fill () };
+
+        View view = new ()
+        {
+            X = 0,
+            Y = 0,
+            CanFocus = true,
+            Width = 9,
+            Height = 6,
+            BorderStyle = LineStyle.Rounded,
+            Title = "T_ab"
+        };
+
+        // Set a scheme with distinct attributes for each role so we can verify
+        Scheme scheme = new ()
+        {
+            Normal = new Attribute (Color.White, Color.Black),
+            Focus = new Attribute (Color.BrightGreen, Color.DarkGray),
+            HotNormal = new Attribute (Color.BrightRed, Color.Black),
+            HotFocus = new Attribute (Color.BrightYellow, Color.DarkGray)
+        };
+        view.SetScheme (scheme);
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Border.TabOffset = 0;
+
+        runnable.Add (view);
+        app.Begin (runnable);
+
+        // Give focus to our view
+        view.SetFocus ();
+        Assert.True (view.HasFocus);
+        view.Border.View?.CanFocus = true;
+        view.Border.View?.SetFocus (); // TabTitleView should have focus, not the main view
+        Assert.True (view.Border.View?.HasFocus);
+        Assert.True (view.Border.View?.SubViews.OfType<TabTitleView> ().FirstOrDefault ()?.HasFocus);
+
+        app.LayoutAndDraw ();
+
+        output.WriteLine (app.Driver!.ToString ());
+
+        // Attribute map:
+        // 0 = Normal (border lines when unfocused — but LineCanvas uses Normal)
+        // 1 = Focus (title text)
+        // 2 = HotFocus (hotkey char 'a')
+        Attribute normalAttribute = view.GetAttributeForRole (VisualRole.Normal);
+        Attribute hotNormalAttr = view.GetAttributeForRole (VisualRole.HotNormal);
         Attribute focusAttr = view.GetAttributeForRole (VisualRole.Focus);
         Attribute hotFocusAttr = view.GetAttributeForRole (VisualRole.HotFocus);
 

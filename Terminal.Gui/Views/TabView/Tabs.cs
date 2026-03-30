@@ -26,6 +26,7 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     public Tabs ()
     {
         CanFocus = true;
+
         Width = Dim.Fill ();
         Height = Dim.Fill ();
     }
@@ -170,6 +171,8 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
+        base.OnSubViewAdded (view);
+
         if (view is not Tab tab)
         {
             return;
@@ -196,7 +199,9 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     /// <inheritdoc/>
     protected override void OnSubViewRemoved (View view)
     {
-        if (view is not Tab removedTab)
+        base.OnSubViewRemoved (view);
+
+        if (view is not Tab removedTab || _disposing)
         {
             return;
         }
@@ -230,14 +235,10 @@ public class Tabs : View, IValue<Tab?>, IDesignable
 
     #region Layout Helpers
 
-    /// <inheritdoc />
-    protected override void OnSubViewLayout (LayoutEventArgs args)
-    {
-        base.OnSubViewLayout (args);
+    /// <inheritdoc/>
+    protected override void OnSubViewLayout (LayoutEventArgs args) => base.OnSubViewLayout (args);
 
-        //UpdateZOrder();
-    }
-
+    //UpdateZOrder();
     /// <summary>
     ///     Updates the z-order of tab SubViews so the focused tab is drawn last (on top). The tabs before the focused tab are
     ///     drawn in the order they were added (first added at back).
@@ -267,7 +268,7 @@ public class Tabs : View, IValue<Tab?>, IDesignable
         else
         {
             // Tabs before the focused tab are drawn in the order they were added (first added at back)
-            foreach (Tab tab in TabCollection.Reverse())
+            foreach (Tab tab in TabCollection.Reverse ())
             {
                 MoveSubViewToStart (tab);
             }
@@ -297,6 +298,24 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     }
 
     /// <summary>
+    ///     Gets or sets the depth of the tab. The default is 3, which tht tab will have room for the outside border, title,
+    ///     and a 1-character tab border. Adjust this if you have a thicker border or want more/less space in the tab header.
+    /// </summary>
+    public int TabDepth
+    {
+        get => field;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+            field = value;
+            UpdateTabBorderThickness ();
+        }
+    } = 3;
+
+    /// <summary>
     ///     Updates <see cref="Drawing.Thickness"/> for all tabs based on <see cref="TabSide"/>.
     /// </summary>
     private void UpdateTabBorderThickness ()
@@ -307,11 +326,11 @@ public class Tabs : View, IValue<Tab?>, IDesignable
 
             tab.Border.Thickness = _tabSide switch
                                    {
-                                       Side.Top => new Thickness (1, 3, 1, 1),
-                                       Side.Bottom => new Thickness (1, 1, 1, 3),
-                                       Side.Left => new Thickness (3, 1, 1, 1),
-                                       Side.Right => new Thickness (1, 1, 3, 1),
-                                       _ => new Thickness (1, 3, 1, 1)
+                                       Side.Top => new Thickness (1, TabDepth, 1, 1),
+                                       Side.Bottom => new Thickness (1, 1, 1, TabDepth),
+                                       Side.Left => new Thickness (TabDepth, 1, 1, 1),
+                                       Side.Right => new Thickness (1, 1, TabDepth, 1),
+                                       _ => new Thickness (1, TabDepth, 1, 1)
                                    };
         }
     }
@@ -324,6 +343,11 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     protected override void OnFocusedChanged (View? previousFocused, View? focused)
     {
         base.OnFocusedChanged (previousFocused, focused);
+
+        if (focused is TabTitleView)
+        {
+            return;
+        }
 
         // Find which Tab now has focus
         Tab? focusedTab = SubViews.OfType<Tab> ().FirstOrDefault (t => t.HasFocus);
@@ -339,7 +363,7 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     #region IDesignable
 
     /// <inheritdoc/>
-    bool IDesignable.EnableForDesign ()
+    public bool EnableForDesign ()
     {
         Tab tab1 = new () { Title = "_Attribute" };
         AttributePicker attributePicker = new () { Y = 1, BorderStyle = LineStyle.Single };
@@ -350,8 +374,31 @@ public class Tabs : View, IValue<Tab?>, IDesignable
         tab2.Add (lineStyleSelector);
 
         Tab tab3 = new () { Title = "Tab _Settings" };
-        OptionSelector<Side> tabSideSelector = new () { Y = 1, BorderStyle = LineStyle.Single, Title = "Tab Side" };
-        tab3.Add (tabSideSelector);
+        OptionSelector<Side> tabSideSelector = new () { Y = 1, BorderStyle = LineStyle.Single, Title = "S_ide" };
+        tabSideSelector.Value = tab3.Border.TabSide;
+
+        NumericUpDown<int> tabDepthNumericUpDown = new ()
+        {
+            Y = Pos.Top (tabSideSelector),
+            X = Pos.Right (tabSideSelector) + 1,
+            Width = 10,
+            BorderStyle = LineStyle.Single,
+            Title = "_Depth",
+            Value = TabDepth
+        };
+
+        tabDepthNumericUpDown.ValueChanging += (s, e) =>
+                                               {
+                                                   if (e.NewValue is < 0)
+                                                   {
+                                                       e.Handled = true;
+
+                                                       return;
+                                                   }
+
+                                                   TabDepth = e.NewValue;
+                                               };
+        tab3.Add (tabSideSelector, tabDepthNumericUpDown);
 
         Tab tab4 = new () { Title = "Fourth" };
 
@@ -385,10 +432,22 @@ public class Tabs : View, IValue<Tab?>, IDesignable
                                             }
                                         };
 
-        tab1.BorderStyle = LineStyle.Double;
+        //tab1.BorderStyle = LineStyle.Double;
 
         return true;
     }
 
     #endregion
+
+    private bool _disposing;
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            _disposing = true;
+        }
+        base.Dispose (disposing);
+    }
 }

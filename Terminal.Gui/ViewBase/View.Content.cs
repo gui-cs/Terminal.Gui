@@ -543,7 +543,7 @@ public partial class View
     ///     Helper to get the X and Y offset of the Viewport from the Frame. This is the sum of the Left and Top properties
     ///     of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
     /// </summary>
-    public Point GetViewportOffsetFromFrame () => Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.GetFrame ()).Location;
+    public Point GetViewportOffsetFromFrame () => Padding.Thickness.GetInside (Padding.GetFrame ()).Location;
 
     /// <summary>
     ///     Scrolls the view vertically by the specified number of rows.

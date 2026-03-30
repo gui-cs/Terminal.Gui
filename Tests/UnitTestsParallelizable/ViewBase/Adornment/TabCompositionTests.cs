@@ -399,10 +399,10 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
                        driver,
                        """
                        ╭──────────────╮
-                       │Tab1 contentT │
-                       │            a │
-                       │            b │
-                       │            1 │
+                       │Tab1 content T│
+                       │             a│
+                       │             b│
+                       │             1│
                        │            ╭─╯
                        │            │T│
                        │            │a│
@@ -442,10 +442,10 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
                        │            │b│
                        │            │1│
                        │            ╰─╮
-                       │            T │
-                       │            a │
-                       │            b │
-                       │            2 │
+                       │             T│
+                       │             a│
+                       │             b│
+                       │             2│
                        │            ╭─╯
                        │            │∙∙
                        │            │∙∙

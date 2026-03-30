@@ -26,7 +26,7 @@ public class Border : AdornmentImpl
     }
 
     /// <inheritdoc/>
-    public override Rectangle GetFrame () => Parent is { } ? Parent.Margin.Thickness.GetInside (Parent!.Margin.GetFrame ()) : Rectangle.Empty;
+    public override Rectangle GetFrame () => Parent is { } ? Parent.Margin.Thickness.GetInside (Parent.Margin.GetFrame ()) : Rectangle.Empty;
 
     /// <inheritdoc/>
     protected override void OnThicknessChanged ()

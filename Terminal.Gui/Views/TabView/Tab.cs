@@ -23,6 +23,7 @@ public class Tab : View
     /// </summary>
     public Tab ()
     {
+        TabStop = TabBehavior.TabStop;
         CanFocus = true;
         base.SuperViewRendersLineCanvas = true;
         BorderStyle = LineStyle.Rounded;

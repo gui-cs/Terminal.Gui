@@ -19,50 +19,21 @@ public sealed class TabsExample : Scenario
         // ── Main Tabs control ──
         Tabs tabs = new ()
         {
+            X = 2,
+            Y = 3,
+            Title = "_Tabs",
             Width = Dim.Percent (70),
-            Height = Dim.Percent (80)
+            Height = Dim.Percent (70),
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable ,
+            BorderStyle = LineStyle.Double
         };
 
-        Tab tab1 = new () { Title = "_Attribute" };
-        AttributePicker attributePicker = new () { Y = 1, BorderStyle = LineStyle.Single };
-        tab1.Add (attributePicker);
-
-        Tab tab2 = new () { Title = "_Line Style" };
-        OptionSelector<LineStyle> lineStyleSelector = new () { Y = 1, BorderStyle = LineStyle.Single };
-        tab2.Add (lineStyleSelector);
-
-        Tab tab3 = new () { Title = "Tab _Settings" };
-        OptionSelector<Side> tabSideSelector = new () { Y = 1, BorderStyle = LineStyle.Single, Title = "Tab Side" };
-        tab3.Add (tabSideSelector);
-
-        tabs.Add (tab1, tab2, tab3);
-        tabs.Value = tab1;
-
-        // ── Side selector changes TabSide ──
-        tabSideSelector.ValueChanged += (_, e) =>
-                                         {
-                                             if (e.Value is { })
-                                             {
-                                                 tabs.TabSide = e.Value.Value;
-                                             }
-                                         };
-
-        // ── Line style selector changes TabLineStyle ──
-        lineStyleSelector.ValueChanged += (_, e) =>
-                                           {
-                                               if (e.Value is { })
-                                               {
-                                                   tabs.TabLineStyle = e.Value.Value;
-                                               }
-                                           };
+        tabs.EnableForDesign ();
 
         // ── Editors ──
         AdornmentsEditor adornmentsEditor = new ()
         {
-            BorderStyle = LineStyle.Single,
-            AutoSelectViewToEdit = true,
-            Arrangement = ViewArrangement.Movable,
-            X = Pos.AnchorEnd ()
+            BorderStyle = LineStyle.Single, AutoSelectViewToEdit = true, Arrangement = ViewArrangement.Movable, X = Pos.AnchorEnd ()
         };
         adornmentsEditor.Border.Thickness = new Thickness (1, 2, 1, 1);
         adornmentsEditor.AutoSelectSuperView = appWindow;
@@ -71,10 +42,7 @@ public sealed class TabsExample : Scenario
 
         ViewportSettingsEditor viewportSettingsEditor = new ()
         {
-            BorderStyle = LineStyle.Single,
-            AutoSelectViewToEdit = true,
-            Arrangement = ViewArrangement.Movable,
-            Y = Pos.AnchorEnd ()
+            BorderStyle = LineStyle.Single, AutoSelectViewToEdit = true, Arrangement = ViewArrangement.Movable, Y = Pos.AnchorEnd ()
         };
         viewportSettingsEditor.Border.Thickness = new Thickness (1, 2, 1, 1);
         viewportSettingsEditor.AutoSelectSuperView = appWindow;
