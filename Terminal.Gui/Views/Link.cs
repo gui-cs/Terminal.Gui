@@ -58,7 +58,7 @@ namespace Terminal.Gui.Views;
 ///         </listheader>
 ///         <item>
 ///             <term>Click</term>
-///             <description>Accepts the link, opening the URL (<see cref="Command.Accept"/>).</description>
+///             <description>Activate the link, opening the URL (<see cref="Command.Activate"/>).</description>
 ///         </item>
 ///     </list>
 /// </remarks>
