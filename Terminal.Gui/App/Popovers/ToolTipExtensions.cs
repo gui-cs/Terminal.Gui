@@ -5,8 +5,8 @@
 /// </summary>
 /// <remarks>
 ///     These extension methods enable developers to attach or remove tooltips from any View instance.
-///     Tooltips can be specified as static text, dynamically generated text, or as a custom View for advanced scenarios.
-///     Tooltips enhance user experience by providing contextual information when users interact with UI elements.
+///     ToolTips can be specified as static text, dynamically generated text, or as a custom View for advanced scenarios.
+///     ToolTips enhance user experience by providing contextual information when users interact with UI elements.
 /// </remarks>
 public static class ToolTipExtensions
 {
@@ -18,7 +18,7 @@ public static class ToolTipExtensions
         ///     on the view.
         /// </summary>
         /// <remarks>
-        ///     If a tooltip is already set for the view, this method replaces it with the new text. Tooltips
+        ///     If a tooltip is already set for the view, this method replaces it with the new text. ToolTips
         ///     provide additional context or guidance to users interacting with the UI element.
         /// </remarks>
         /// <param name="text">The text to display in the tooltip. If null or empty, no tooltip will be shown.</param>

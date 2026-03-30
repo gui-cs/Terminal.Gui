@@ -391,7 +391,7 @@ public class Link : View, IDesignable
     /// </summary>
     /// <remarks>
     ///     When disposing is true, this method removes the tooltip content associated with this instance
-    ///     from the TooltipManager. Always call the base class Dispose method to ensure proper resource cleanup.
+    ///     from the ToolTipManager. Always call the base class Dispose method to ensure proper resource cleanup.
     /// </remarks>
     /// <param name="disposing">
     ///     true to release both managed and unmanaged resources; false to release only unmanaged
