@@ -25,7 +25,7 @@ public static class ToolTipExtensions
         public void SetToolTip (string text)
         {
             ArgumentNullException.ThrowIfNull (view);
-            TooltipManager.Instance.SetToolTip (view, new ToolTipProvider (text));
+            ToolTipManager.Instance.SetToolTip (view, new ToolTipProvider (text));
         }
 
         /// <summary>
@@ -44,7 +44,7 @@ public static class ToolTipExtensions
         {
             ArgumentNullException.ThrowIfNull (view);
             ArgumentNullException.ThrowIfNull (textFactory);
-            TooltipManager.Instance.SetToolTip (view, new ToolTipProvider (textFactory));
+            ToolTipManager.Instance.SetToolTip (view, new ToolTipProvider (textFactory));
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ public static class ToolTipExtensions
         {
             ArgumentNullException.ThrowIfNull (view);
             ArgumentNullException.ThrowIfNull (contentFactory);
-            TooltipManager.Instance.SetToolTip (view, new ToolTipProvider (contentFactory));
+            ToolTipManager.Instance.SetToolTip (view, new ToolTipProvider (contentFactory));
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ public static class ToolTipExtensions
         public void RemoveToolTip ()
         {
             ArgumentNullException.ThrowIfNull (view);
-            TooltipManager.Instance.RemoveToolTip (view);
+            ToolTipManager.Instance.RemoveToolTip (view);
         }
     }
 }

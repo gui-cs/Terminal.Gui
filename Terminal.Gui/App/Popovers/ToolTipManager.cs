@@ -18,7 +18,7 @@ namespace Terminal.Gui.App;
 ///         The manager avoids adding state directly to <see cref="View"/> by maintaining an external registry.
 ///     </para>
 /// </remarks>
-public sealed class TooltipManager : IDisposable
+public sealed class ToolTipManager : IDisposable
 {
     /// <summary>
     ///     Gets the singleton instance of the TooltipManager class.
@@ -27,7 +27,7 @@ public sealed class TooltipManager : IDisposable
     ///     Use this property to access the global TooltipManager for managing tooltips throughout the
     ///     application. This instance is thread-safe and intended to be used as a shared resource.
     /// </remarks>
-    public static TooltipManager Instance { get; } = new ();
+    public static ToolTipManager Instance { get; } = new ();
 
     // Stores tooltip registrations for each target view
     private readonly Dictionary<View, ToolTipRegistration> _registrations = new ();
@@ -38,7 +38,7 @@ public sealed class TooltipManager : IDisposable
     // Currently active target view (if any)
     private View? _currentTarget;
 
-    private TooltipManager () { }
+    private ToolTipManager () { }
 
     /// <summary>
     ///     Registers a tooltip provider for the specified view, enabling tooltips to be displayed when the user hovers over
