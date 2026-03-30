@@ -212,8 +212,8 @@ internal class MouseInterpreter
             Flags = ToClicks (button, numberOfClicks) | (mouseEventArgs.Flags & (MouseFlags.Shift | MouseFlags.Ctrl | MouseFlags.Alt)),
             ScreenPosition = mouseEventArgs.ScreenPosition
 
-            // View is intentionally NOT copied - it's View-relative and set by MouseImpl/View.Mouse
-            // Position is intentionally NOT copied - it's View-relative and set by MouseImpl/View.Mouse
+            // View is intentionally NOT copied - it's View-relative and set by ApplicationMouse/View.Mouse
+            // Position is intentionally NOT copied - it's View-relative and set by ApplicationMouse/View.Mouse
         };
 
         //Logging.Trace ($"Raising click event:{newClick.Flags} at screen {newClick.ScreenPosition}");

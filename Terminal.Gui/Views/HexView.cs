@@ -28,6 +28,51 @@ namespace Terminal.Gui.Views;
 ///         Control the byte at the caret for editing by setting the <see cref="Address"/> property to an offset in the
 ///         stream.
 ///     </para>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Moves the cursor one nibble/byte.</description>
+///         </item>
+///         <item>
+///             <term>Up / Down</term> <description>Moves the cursor one row up or down.</description>
+///         </item>
+///         <item>
+///             <term>PageUp / PageDown</term> <description>Moves one page up or down.</description>
+///         </item>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last byte in the stream.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Left / Ctrl+Right</term> <description>Moves to the start or end of the current row.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Up / Ctrl+Down</term> <description>Moves to the start or end of the current page.</description>
+///         </item>
+///         <item>
+///             <term>Backspace</term> <description>Deletes the byte before the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Delete</term> <description>Deletes the byte at the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Insert</term> <description>Toggles insert mode.</description>
+///         </item>
+///     </list>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Click / Double-Click</term> <description>Positions the cursor at the clicked byte.</description>
+///         </item>
+///         <item>
+///             <term>Wheel Up / Down</term> <description>Scrolls the view.</description>
+///         </item>
+///     </list>
 /// </remarks>
 public class HexView : View, IDesignable
 {
@@ -36,6 +81,29 @@ public class HexView : View, IDesignable
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static CursorStyle DefaultCursorStyle { get; set; } = CursorStyle.BlinkingBlock;
+
+    /// <summary>
+    ///     Gets or sets the view-specific default key bindings for <see cref="HexView"/>. Contains only bindings
+    ///     unique to this view; shared bindings come from <see cref="View.DefaultKeyBindings"/>.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    {
+        // HexView maps Home/End to stream start/end (overrides base layer's LeftStart/RightEnd)
+        [Command.Start] = Bind.All (Key.Home),
+        [Command.End] = Bind.All (Key.End),
+
+        // Row start/end via Ctrl+Left/Right
+        [Command.LeftStart] = Bind.All (Key.CursorLeft.WithCtrl),
+        [Command.RightEnd] = Bind.All (Key.CursorRight.WithCtrl),
+
+        [Command.StartOfPage] = Bind.All (Key.CursorUp.WithCtrl),
+        [Command.EndOfPage] = Bind.All (Key.CursorDown.WithCtrl),
+        [Command.Insert] = Bind.All (Key.InsertChar),
+    };
 
     private const int DEFAULT_ADDRESS_WIDTH = 8; // The default value for AddressWidth
     private const int NUM_BYTES_PER_HEX_COLUMN = 4;
@@ -60,7 +128,6 @@ public class HexView : View, IDesignable
         _leftSideHasFocus = true;
         _firstNibble = true;
 
-        AddCommand (Command.Activate, HandleMouseClick);
         AddCommand (Command.Left, () => MoveLeft ());
         AddCommand (Command.Right, () => MoveRight ());
         AddCommand (Command.Down, () => MoveDown (BytesPerLine));
@@ -80,22 +147,7 @@ public class HexView : View, IDesignable
         AddCommand (Command.DeleteCharRight, () => true);
         AddCommand (Command.Insert, () => true);
 
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
-        KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.CursorDown, Command.Down);
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.Home, Command.Start);
-        KeyBindings.Add (Key.End, Command.End);
-        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.LeftStart);
-        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.RightEnd);
-        KeyBindings.Add (Key.CursorUp.WithCtrl, Command.StartOfPage);
-        KeyBindings.Add (Key.CursorDown.WithCtrl, Command.EndOfPage);
-
-        KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
-        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
-        KeyBindings.Add (Key.InsertChar, Command.Insert);
+        ApplyKeyBindings (DefaultKeyBindings, View.DefaultKeyBindings);
 
         KeyBindings.Remove (Key.Space);
         KeyBindings.Remove (Key.Enter);
@@ -225,12 +277,13 @@ public class HexView : View, IDesignable
             _source.WriteByte (kv.Value);
             _source.Flush ();
 
-            if (stream is { })
+            if (stream is null)
             {
-                stream.Position = kv.Key;
-                stream.WriteByte (kv.Value);
-                stream.Flush ();
+                continue;
             }
+            stream.Position = kv.Key;
+            stream.WriteByte (kv.Value);
+            stream.Flush ();
         }
 
         _edits = new SortedDictionary<long, byte> ();
@@ -257,7 +310,7 @@ public class HexView : View, IDesignable
         {
             ArgumentNullException.ThrowIfNull (value);
 
-            if (!value!.CanSeek)
+            if (!value.CanSeek)
             {
                 throw new ArgumentException (@"The source stream must be seekable (CanSeek property)");
             }
@@ -276,28 +329,24 @@ public class HexView : View, IDesignable
         }
     }
 
-    private int _bpl;
-
     /// <summary>The bytes length per line.</summary>
     public int BytesPerLine
     {
-        get => _bpl;
+        get;
         set
         {
-            _bpl = value;
+            field = value;
             RaisePositionChanged ();
         }
     }
 
-    private long _address;
-
     /// <summary>Gets or sets the current byte position in the <see cref="Stream"/>.</summary>
     public long Address
     {
-        get => _address;
+        get;
         set
         {
-            if (_address == value)
+            if (field == value)
             {
                 return;
             }
@@ -306,7 +355,7 @@ public class HexView : View, IDesignable
 
             Point offsetToNewCursor = GetCursor (newAddress);
 
-            _address = newAddress;
+            field = newAddress;
 
             // Ensure the new cursor position is visible
             ScrollToMakeCursorVisible (offsetToNewCursor);
@@ -314,39 +363,33 @@ public class HexView : View, IDesignable
         }
     }
 
-    private int _addressWidth = DEFAULT_ADDRESS_WIDTH;
-
     /// <summary>
     ///     Gets or sets the width of the Address column on the left. Set to 0 to hide. The default is 8.
     /// </summary>
     public int AddressWidth
     {
-        get => _addressWidth;
+        get;
         set
         {
-            if (_addressWidth == value)
+            if (field == value)
             {
                 return;
             }
 
-            _addressWidth = value;
+            field = value;
             SetNeedsDraw ();
             SetNeedsLayout ();
         }
-    }
+    } = DEFAULT_ADDRESS_WIDTH;
 
     private int GetLeftSideStartColumn () => AddressWidth == 0 ? 0 : AddressWidth + 1;
 
-    private bool? HandleMouseClick (ICommandContext? commandContext)
+    /// <inheritdoc/>
+    protected override bool OnActivating (CommandEventArgs args)
     {
-        if (commandContext?.Binding is not MouseBinding { MouseEvent: { } mouse })
+        if (args.Context?.Binding is not MouseBinding { MouseEvent: { } mouse })
         {
-            return false;
-        }
-
-        if (RaiseActivating (commandContext) is true)
-        {
-            return true;
+            return base.OnActivating (args);
         }
 
         if (!HasFocus)
@@ -356,6 +399,8 @@ public class HexView : View, IDesignable
 
         if (mouse.Position!.Value.X < GetLeftSideStartColumn ())
         {
+            args.Handled = true;
+
             return true;
         }
 
@@ -365,6 +410,8 @@ public class HexView : View, IDesignable
 
         if (mouse.Position!.Value.X > blocksRightOffset + BytesPerLine - 1)
         {
+            args.Handled = true;
+
             return true;
         }
 
@@ -378,6 +425,8 @@ public class HexView : View, IDesignable
 
         if (!clickIsOnLeftSide && item > 0 && (empty == 0 || x == block * HEX_COLUMN_WIDTH + HEX_COLUMN_WIDTH - 1 - block * 2))
         {
+            args.Handled = true;
+
             return true;
         }
 
@@ -409,7 +458,9 @@ public class HexView : View, IDesignable
             UpdateCursor ();
         }
 
-        return false;
+        args.Handled = true;
+
+        return true;
     }
 
     ///<inheritdoc/>
@@ -431,7 +482,7 @@ public class HexView : View, IDesignable
 
         Attribute editedAttribute = GetAttributeForRole (VisualRole.Editable);
         editedAttribute = editedAttribute with { Style = editedAttribute.Style | TextStyle.Italic | TextStyle.Underline };
-        Attribute editingAttribute = GetAttributeForRole (ReadOnly ? VisualRole.ReadOnly : VisualRole.Editable);
+        Attribute editingAttribute = GetAttributeForRole (ReadOnly ? VisualRole.ReadOnly : VisualRole.Normal);
         Attribute addressAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Active);
 
         for (var line = 0; line < Viewport.Height; line++)
@@ -451,7 +502,7 @@ public class HexView : View, IDesignable
             }
 
             var address = $"{addressOfLine:x8}";
-            AddStr ($"{address.Substring (8 - AddressWidth)}");
+            AddStr ($"{address [(8 - AddressWidth)..]}");
 
             SetAttribute (editingAttribute);
 
@@ -871,24 +922,23 @@ public class HexView : View, IDesignable
             return false;
         }
 
-        if ((direction == NavigationDirection.Forward && _leftSideHasFocus) || (direction == NavigationDirection.Backward && !_leftSideHasFocus))
+        if ((direction != NavigationDirection.Forward || !_leftSideHasFocus) && (direction != NavigationDirection.Backward || _leftSideHasFocus))
         {
-            _leftSideHasFocus = !_leftSideHasFocus;
-            _firstNibble = true;
-            SetNeedsDraw ();
-
-            UpdateCursor ();
-
-            return true;
+            return false;
         }
+        _leftSideHasFocus = !_leftSideHasFocus;
+        _firstNibble = true;
+        SetNeedsDraw ();
 
-        return false;
+        UpdateCursor ();
+
+        return true;
     }
 
     /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
-        Source = new MemoryStream (Encoding.UTF8.GetBytes ("HexView data with wide codepoints: 𝔹Aℝ𝔽!"));
+        Source = new MemoryStream ("HexView data with wide codepoints: 𝔹Aℝ𝔽!"u8.ToArray ());
 
         return true;
     }

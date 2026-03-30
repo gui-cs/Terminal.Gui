@@ -133,12 +133,9 @@ public class Prompt<TView, TResult> : Dialog<TResult> where TView : View, new ()
     ///         result.
     ///     </para>
     /// </remarks>
-    protected override bool OnAccepting (CommandEventArgs args)
+    protected override void OnAccepted (ICommandContext? ctx)
     {
-        if (base.OnAccepting (args))
-        {
-            return true;
-        }
+        base.OnAccepted (ctx);
 
         if (ResultExtractor is { })
         {
@@ -152,7 +149,5 @@ public class Prompt<TView, TResult> : Dialog<TResult> where TView : View, new ()
         {
             Result = (TResult?)(object?)GetWrappedView ().Text;
         }
-
-        return false;
     }
 }

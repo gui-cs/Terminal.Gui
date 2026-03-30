@@ -5,7 +5,7 @@
 ## Table of Contents
 
 - [Quick Reference](#quick-reference)
-- [Tenets for Mouse Handling](#tenets-for-terminal-gui-mouse-handling)
+- [Tenets for Mouse Handling](#tenets-for-mouse-handling)
 - [Mouse Behavior - End User's Perspective](#mouse-behavior---end-users-perspective)
 - [Mouse APIs](#mouse-apis)
 - [Mouse Bindings](#mouse-bindings)
@@ -22,7 +22,7 @@
 ### The Pipeline (TL;DR)
 
 ```
-ANSI Input ? AnsiMouseParser ? MouseInterpreter ? MouseImpl ? View ? Commands
+ANSI Input ? AnsiMouseParser ? MouseInterpreter ? ApplicationMouse ? View ? Commands
    (1-based)     (0-based screen)   (click synthesis)   (routing)  (viewport)  (Activate/Accept)
 ```
 
@@ -33,7 +33,7 @@ ANSI Input ? AnsiMouseParser ? MouseInterpreter ? MouseImpl ? View ? Commands
 | **ANSI** | User clicks | `ESC[<0;10;5M` | Hardware ? ANSI escape sequence |
 | **Parser** | ANSI string | `Mouse{Pressed, Screen(9,4)}` | 1-based ? 0-based, Button code ? MouseFlags |
 | **Interpreter** | Press/Release | `Mouse{Clicked, Screen(9,4)}` | Press+Release ? Clicked, Timing ? DoubleClicked |
-| **MouseImpl** | Screen coords | `Mouse{Clicked, Viewport(2,1)}` | Screen ? Viewport, Find view, Handle grab |
+| **ApplicationMouse** | Screen coords | `Mouse{Clicked, Viewport(2,1)}` | Screen ? Viewport, Find view, Handle grab |
 | **View** | Viewport coords | Command invocation | Clicked ? Command.Activate, MouseState updates |
 | **Commands** | Command | Event | Activate ? Activating, Accept ? Accepting |
 
@@ -106,17 +106,17 @@ Tenets higher in the list have precedence over tenets lower in the list.
 
 Terminal.Gui provides these APIs for handling mouse input:
 
-* **Mouse Bindings** - Declarative approach using `MouseBindings` to map mouse events to commands. **Recommended for most scenarios.**
+* **Mouse Bindings** - Declarative approach using <xref:Terminal.Gui.Input.MouseBindings> to map mouse events to commands. **Recommended for most scenarios.**
 
 * **Mouse Events** - Direct event handling via `MouseEvent` for complex scenarios like drag-and-drop.
 
-* **Mouse State** - `MouseState` property provides current interaction state for visual feedback.
+* **Mouse State** - <xref:Terminal.Gui.ViewBase.MouseState> property provides current interaction state for visual feedback.
 
-* **Mouse** class - Platform-independent abstraction (@Terminal.Gui.Mouse) for mouse events.
+* **Mouse** class - Platform-independent abstraction (<xref:Terminal.Gui.Input.Mouse>) for mouse events.
 
 ## Mouse Bindings
 
-Mouse Bindings is the **recommended** way to handle mouse input. Views call `AddCommand` to declare command support, then use `MouseBindings` to map mouse events to commands:
+Mouse Bindings is the **recommended** way to handle mouse input. Views call `AddCommand` to declare command support, then use <xref:Terminal.Gui.Input.MouseBindings> to map mouse events to commands:
 
 ```csharp
 public class MyView : View
@@ -147,7 +147,7 @@ MouseBindings.Add (MouseFlags.LeftButtonPressed, Command.Activate);
 MouseBindings.Add (MouseFlags.LeftButtonPressed | MouseFlags.Ctrl, Command.Context);
 ```
 
-When a mouse event occurs matching a binding, the bound command is invoked, which raises the corresponding event (e.g., `Command.Activate` ? `Activating` event).
+When a mouse event occurs matching a binding, the bound command is invoked, which raises the corresponding event (e.g., <xref:Terminal.Gui.Input.Command.Activate> ? <xref:Terminal.Gui.ViewBase.View.Activating> event).
 
 ### Common Binding Patterns
 
@@ -168,7 +168,7 @@ Mouse events are processed using the [Cancellable Work Pattern](cancellable-work
    - Pre-condition validation (enabled, visible, wants event type)
    - Low-level `MouseEvent` (raises `OnMouseEvent()` and `MouseEvent` event)
    - Mouse grab handling (if `MouseHighlightStates` or `MouseHoldRepeat` set)
-   - Command invocation via `MouseBindings`
+   - Command invocation via <xref:Terminal.Gui.Input.MouseBindings>
 
 ### Handling Mouse Events Directly
 
@@ -205,7 +205,7 @@ public class CustomView : View
 
 ### Handling Mouse Clicks
 
-**Recommended pattern** - Use `Activating` event with command context:
+**Recommended pattern** - Use <xref:Terminal.Gui.ViewBase.View.Activating> event with command context:
 
 ```csharp
 public class ClickableView : View
@@ -251,7 +251,7 @@ AddCommand(Command.Context, HandleContextMenu);
 
 ### Mouse State
 
-The `MouseState` property tracks the current mouse interaction state:
+The <xref:Terminal.Gui.ViewBase.MouseState> property tracks the current mouse interaction state:
 
 * **None** - No mouse interaction
 * **In** - Mouse over the view's viewport
@@ -279,7 +279,7 @@ view.MouseStateChanged += (sender, e) =>
 
 ### Mouse Grab
 
-Views with `MouseHighlightStates` or `MouseHoldRepeat` enabled **automatically grab the mouse** when a button is pressed. For manual grab control, use the `IMouseGrabHandler` interface via `App.Mouse`.
+Views with `MouseHighlightStates` or `MouseHoldRepeat` enabled **automatically grab the mouse** when a button is pressed. For manual grab control, use the `IMouseGrabHandler` interface via <xref:Terminal.Gui.ViewBase.View.App>`.Mouse`.
 
 **Grab Lifecycle:**
 1. **Press inside** ? Call `GrabMouse(view)` (auto or manual), fires `GrabbingMouse` (cancellable) then `GrabbedMouse`
@@ -340,7 +340,7 @@ App.Mouse.GrabbingMouse += (sender, e) =>
 
 ### Continuous Button Press
 
-When `MouseHoldRepeat` is set, the view receives repeated events while the button is held:
+When `MouseHoldRepeat` is set, the <xref:Terminal.Gui.ViewBase.View> receives repeated events while the button is held:
 
 ```csharp
 view.MouseHoldRepeat = MouseFlags.LeftButtonReleased;
@@ -419,7 +419,7 @@ Release: ESC[<0;10;5m    (button=0, x=10, y=5, 'm'=release)
 1. Parse ANSI sequence: `\u001b\[<(\d+);(\d+);(\d+)(M|m)`
 2. Extract button, x, y, terminator
 3. Convert to **0-based** coordinates (subtract 1)
-4. Map button code + terminator to `MouseFlags`
+4. Map button code + terminator to <xref:Terminal.Gui.Input.MouseFlags>
 5. Extract modifiers
 6. Create `Mouse` instance
 
@@ -448,9 +448,9 @@ Release: ESC[<0;10;5m    (button=0, x=10, y=5, 'm'=release)
 
 **Output:** Stream of `Mouse` events including synthesized clicks
 
-### Stage 4: Application Routing (MouseImpl)
+### Stage 4: Application Routing (ApplicationMouse)
 
-**Location:** `Terminal.Gui/App/Mouse/MouseImpl.cs`
+**Location:** `Terminal.Gui/App/Mouse/ApplicationMouse.cs`
 
 **Entry:** `IMouse.RaiseMouseEvent(Mouse mouse)`
 
@@ -475,6 +475,8 @@ if (mouse.IsPressed &&
     RaiseMouseEvent(mouse); // Recurse to handle event below popover
 }
 ```
+
+**Re-show Guard:** When a popover is dismissed, `ApplicationMouse` records the dismissed popover in `DismissedByMousePress` and wraps the recursive `RaiseMouseEvent` call with an `_isDismissRecursing` flag. `ApplicationPopover.Show` checks this guard and silently returns if the caller is trying to re-show the same popover that was just dismissed. This prevents views beneath the popover (e.g., a `DropDownList` toggle button or a `MenuBarItem`) from re-opening the popover during the recursed press event or during the subsequent release/click events in the same mouse interaction cycle (press → release → click). The guard is cleared when the next fresh press event arrives or when the click cycle completes.
 
 #### 4.3: Mouse Grab Handling
 ```csharp
@@ -605,7 +607,7 @@ This ensures consistent mouse behavior across platforms while maintaining platfo
 ## Best Practices
 
 * **Use Mouse Bindings and Commands** for simple interactions - integrates with keyboard bindings
-* **Use `Activating` event** to handle clicks - provides mouse position via CommandContext
+* **Use <xref:Terminal.Gui.ViewBase.View.Activating> event** to handle clicks - provides mouse position via CommandContext
 * **Access mouse details via CommandContext:**
   ```csharp
   if (e.Context?.Binding is MouseBinding { MouseEvent: { } mouse })
@@ -777,7 +779,7 @@ view.MouseLeave += (sender, e) =>
 };
 ```
 
-These events work with `MouseState` to enable hover effects and visual feedback.
+These events work with <xref:Terminal.Gui.ViewBase.MouseState> to enable hover effects and visual feedback.
 
 ## See Also
 
@@ -785,5 +787,23 @@ These events work with `MouseState` to enable hover effects and visual feedback.
 - [Input Injection](input-injection.md) - Complete testing documentation
 - [View Layout](layout.md) - Understanding coordinate systems and layout
 - [Cancellable Work Pattern](cancellable-work-pattern.md) - Event processing pattern
-- @Terminal.Gui.IMouseGrabHandler - API reference for mouse grab handling
-- @Terminal.Gui.IMouse - API reference for the mouse interface
+- `IMouseGrabHandler` - API reference for mouse grab handling
+- `IMouse` - API reference for the mouse interface
+
+## Mouse Tracing
+
+For debugging mouse event flow, use the `Trace` class from the `Terminal.Gui.Tracing` namespace:
+
+```csharp
+using Terminal.Gui.Tracing;
+
+Trace.MouseEnabled = true;
+```
+
+When enabled, mouse events are logged via `Logging.Trace` showing the flow from Driver → Application → View. Enable via:
+
+- **Code**: `Trace.MouseEnabled = true;`
+- **Config**: `"Trace.MouseEnabled": true`
+- **UICatalog**: Logging menu → Mouse Trace
+
+See [Logging - View Event Tracing](logging.md#view-event-tracing) for more details.

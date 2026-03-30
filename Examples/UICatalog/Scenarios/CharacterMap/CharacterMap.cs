@@ -68,7 +68,7 @@ public class CharacterMap : Scenario
             Menus =
             [
                 new MenuBarItem (Strings.menuFile,
-                                 new MenuItem [] { new (Strings.cmdQuit, $"{Application.QuitKey}", () => _charMap?.App?.RequestStop ()) }),
+                                 new MenuItem [] { new (Strings.cmdQuit, $"{Application.GetDefaultKey (Command.Quit)}", () => _charMap?.App?.RequestStop ()) }),
                 new MenuBarItem ("_Options", [CreateMenuShowWidth (), CreateMenuUnicodeCategorySelector ()])
             ]
         };
@@ -129,22 +129,23 @@ public class CharacterMap : Scenario
 
                                         _categoryList.ScreenToCell (mouse.Position!.Value, out int? clickedCol);
 
-                                        if (clickedCol != null && mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+                                        if (clickedCol == null || !mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
                                         {
-                                            EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
-                                            string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
-                                            isDescending = !isDescending;
-
-                                            _categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
-
-                                            table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
-
-                                            _categoryList.SelectedRow =
-                                                table.Data.Select ((item, index) => new { item, index })
-                                                     .FirstOrDefault (x => x.item.Category == prevSelection)
-                                                     ?.index
-                                                ?? -1;
+                                            return;
                                         }
+                                        EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table!;
+                                        string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
+                                        isDescending = !isDescending;
+
+                                        _categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
+
+                                        table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table!;
+
+                                        _categoryList.SelectedRow =
+                                            table.Data.Select ((item, index) => new { item, index })
+                                                 .FirstOrDefault (x => x.item.Category == prevSelection)
+                                                 ?.index
+                                            ?? -1;
                                     };
 
         int longestName = UnicodeRange.Ranges.Max (r => r.Category.GetColumns ());
@@ -157,7 +158,7 @@ public class CharacterMap : Scenario
 
         _categoryList.SelectedCellChanged += (_, args) =>
                                              {
-                                                 EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table;
+                                                 EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table!;
                                                  _charMap.StartCodePoint = table.Data.ToArray () [args.NewRow].Start;
                                                  jumpEdit.Text = $"U+{_charMap.SelectedCodePoint:x5}";
                                              };
@@ -186,7 +187,7 @@ public class CharacterMap : Scenario
             {
                 result = (uint)jumpEdit.Text.ToRunes () [0].Value;
             }
-            else if (jumpEdit.Text.StartsWith ("U+", StringComparison.OrdinalIgnoreCase) || jumpEdit.Text.StartsWith ("\\u"))
+            else if (jumpEdit.Text.StartsWith ("U+", StringComparison.OrdinalIgnoreCase) || jumpEdit.Text.StartsWith ("\\u", StringComparison.Ordinal))
             {
                 try
                 {
@@ -199,7 +200,7 @@ public class CharacterMap : Scenario
                     return;
                 }
             }
-            else if (jumpEdit.Text.StartsWith ("0", StringComparison.OrdinalIgnoreCase) || jumpEdit.Text.StartsWith ("\\u"))
+            else if (jumpEdit.Text.StartsWith ("0", StringComparison.OrdinalIgnoreCase) || jumpEdit.Text.StartsWith ("\\u", StringComparison.Ordinal))
             {
                 try
                 {
@@ -235,7 +236,7 @@ public class CharacterMap : Scenario
 
             _errorLabel.Visible = false;
 
-            EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList!.Table;
+            EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList!.Table!;
 
             _categoryList.SelectedRow = table.Data.Select ((item, index) => new { item, index })
                                              .FirstOrDefault (x => x.item.Start <= result && x.item.End >= result)

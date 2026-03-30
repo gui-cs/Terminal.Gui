@@ -238,24 +238,7 @@ public class InputInjector : IInputInjector
     }
 
     /// <inheritdoc/>
-    public void ProcessQueue ()
-    {
-        _processor.ProcessQueue ();
-
-        // If using virtual time and parser has stale escape sequences, advance time and process again
-        if (_timeProvider is not VirtualTimeProvider vtp)
-        {
-            return;
-        }
-        IAnsiResponseParser parser = _processor.GetParser ();
-
-        if (parser.State is not AnsiResponseParserState.ExpectingEscapeSequence)
-        {
-            return;
-        }
-        vtp.Advance (TimeSpan.FromMilliseconds (60)); // Past 50ms escape timeout
-        _processor.ProcessQueue ();
-    }
+    public void ProcessQueue () => _processor.ProcessQueue ();
 
     /// <summary>
     ///     Resolves the injection mode, converting <see cref="InputInjectionMode.Auto"/> to a concrete mode.

@@ -1,7 +1,78 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>Single-line text editor.</summary>
-/// <remarks>The <see cref="TextField"/> <see cref="View"/> provides editing functionality and mouse support.</remarks>
+/// <remarks>
+///     <para>The <see cref="TextField"/> <see cref="View"/> provides editing functionality and mouse support.</para>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left, Ctrl+B</term> <description>Moves the cursor left.</description>
+///         </item>
+///         <item>
+///             <term>Right, Ctrl+F</term> <description>Moves the cursor right.</description>
+///         </item>
+///         <item>
+///             <term>Home, Ctrl+Home</term> <description>Moves the cursor to the start of the text.</description>
+///         </item>
+///         <item>
+///             <term>End, Ctrl+End, Ctrl+E</term> <description>Moves the cursor to the end of the text.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Left, Ctrl+Up</term> <description>Moves one word left.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Right, Ctrl+Down</term> <description>Moves one word right.</description>
+///         </item>
+///         <item>
+///             <term>Shift+&lt;movement&gt;</term> <description>Extends the selection in the given direction.</description>
+///         </item>
+///         <item>
+///             <term>Delete, Ctrl+D</term> <description>Deletes the character in front of the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Backspace</term> <description>Deletes the character behind the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+K</term> <description>Cuts text from the cursor to the end of the line.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Shift+K</term> <description>Cuts text from the cursor to the start of the line.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Delete</term> <description>Deletes the word to the right of the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Backspace</term> <description>Deletes the word to the left of the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+C</term> <description>Copies the selected text to the clipboard.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+X</term> <description>Cuts the selected text to the clipboard.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+V</term> <description>Pastes text from the clipboard.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+A</term> <description>Selects all text.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Shift+Delete</term> <description>Deletes all text.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Z</term> <description>Undoes the last change.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Y</term> <description>Redoes the last undone change.</description>
+///         </item>
+///         <item>
+///             <term>Insert</term> <description>Toggles overwrite mode.</description>
+///         </item>
+///     </list>
+/// </remarks>
 public partial class TextField : View, IDesignable, IValue<string>
 {
     /// <summary>
@@ -48,18 +119,12 @@ public partial class TextField : View, IDesignable, IValue<string>
             ScrollOffset = _insertionPoint > Viewport.Width + 1 ? _insertionPoint - Viewport.Width + 1 : 0;
         }
 
-        if (Autocomplete.HostControl is null)
+        if (Autocomplete.HostControl is { })
         {
-            Autocomplete.HostControl = this;
-            Autocomplete.PopupInsideContainer = false;
+            return;
         }
-
-        CreateContextMenu ();
-
-        if (ContextMenu?.Key is { })
-        {
-            KeyBindings.Add (ContextMenu.Key, Command.Context);
-        }
+        Autocomplete.HostControl = this;
+        Autocomplete.PopupInsideContainer = false;
     }
 
     /// <summary>Gets or sets whether the text field is read-only.</summary>
@@ -89,6 +154,24 @@ public partial class TextField : View, IDesignable, IValue<string>
         _focusSetByMouse = false;
 
         UpdateCursor ();
+
+        if (newHasFocus)
+        {
+            CreateContextMenu ();
+
+            if (ContextMenu?.Key is { })
+            {
+                KeyBindings.Add (ContextMenu.Key, Command.Context);
+            }
+        }
+        else
+        {
+            if (ContextMenu?.Key is { })
+            {
+                KeyBindings.Remove (ContextMenu.Key);
+            }
+            DisposeContextMenu ();
+        }
     }
 
     /// <inheritdoc/>
@@ -109,36 +192,43 @@ public partial class TextField : View, IDesignable, IValue<string>
 
         PopoverMenu menu = new (new List<MenuItem>
         {
-            new (this, Command.SelectAll, Strings.ctxSelectAll),
-            new (this, Command.DeleteAll, Strings.ctxDeleteAll),
-            new (this, Command.Copy, Strings.ctxCopy),
-            new (this, Command.Cut, Strings.ctxCut),
-            new (this, Command.Paste, Strings.ctxPaste),
-            new (this, Command.Undo, Strings.ctxUndo),
-            new (this, Command.Redo, Strings.ctxRedo)
-        });
+            new (this, Command.SelectAll),
+            new (this, Command.DeleteAll),
+            new (this, Command.Copy),
+            new (this, Command.Cut),
+            new (this, Command.Paste),
+            new (this, Command.Undo),
+            new (this, Command.Redo)
+        })
+        {
+#if DEBUG
+            Id = "textFieldContextMenu"
+#endif
+        };
 
         HotKeyBindings.Remove (menu.Key);
         HotKeyBindings.Add (menu.Key, Command.Context);
         menu.KeyChanged += ContextMenu_KeyChanged;
 
         ContextMenu = menu;
-        App?.Popover?.Register (ContextMenu);
+        App?.Popovers?.Register (ContextMenu);
     }
 
     private void DisposeContextMenu ()
     {
-        if (ContextMenu is { })
+        if (ContextMenu is null)
         {
-            ContextMenu.Visible = false;
-            ContextMenu.KeyChanged -= ContextMenu_KeyChanged;
-            ContextMenu.Dispose ();
-            ContextMenu = null;
+            return;
         }
+        ContextMenu.Visible = false;
+        App?.Popovers?.DeRegister (ContextMenu);
+        ContextMenu.KeyChanged -= ContextMenu_KeyChanged;
+        ContextMenu.Dispose ();
+        ContextMenu = null;
     }
 
     /// <inheritdoc/>
-    public bool EnableForDesign ()
+    public virtual bool EnableForDesign ()
     {
         Text = "This is a test.";
         Title = "Caption";
@@ -163,6 +253,9 @@ public partial class TextField : View, IDesignable, IValue<string>
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<string?>>? ValueChanged;
 
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
     /// <summary>
     ///     Raises the <see cref="ValueChanging"/> event.
     /// </summary>
@@ -181,6 +274,7 @@ public partial class TextField : View, IDesignable, IValue<string>
     {
         ValueChangedEventArgs<string?> args = new (oldValue, newValue);
         ValueChanged?.Invoke (this, args);
+        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, newValue));
     }
 
     #endregion

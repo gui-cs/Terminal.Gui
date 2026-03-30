@@ -7,12 +7,20 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public abstract class OutputBase
 {
-    private bool _force16Colors;
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="OutputBase"/> class and detects whether the output is attached to a real terminal device.
+    /// </summary>
+    protected OutputBase () => IsAttachedToTerminal = Driver.IsAttachedToTerminal (out _, out _);
+
+    /// <summary>
+    ///     Gets whether this output instance is attached to a real terminal device.
+    /// </summary>
+    protected bool IsAttachedToTerminal { get; }
 
     /// <inheritdoc cref="IOutput.Force16Colors"/>
     public bool Force16Colors
     {
-        get => _force16Colors;
+        get;
         set
         {
             if (IsLegacyConsole && !value)
@@ -20,19 +28,17 @@ public abstract class OutputBase
                 return;
             }
 
-            _force16Colors = value;
+            field = value;
         }
     }
-
-    private bool _isLegacyConsole;
 
     /// <inheritdoc cref="IOutput.IsLegacyConsole"/>
     public bool IsLegacyConsole
     {
-        get => _isLegacyConsole;
+        get;
         set
         {
-            _isLegacyConsole = value;
+            field = value;
 
             if (value) // If legacy console (true), force 16 colors
             {
@@ -43,13 +49,17 @@ public abstract class OutputBase
 
     private readonly ConcurrentQueue<SixelToRender> _sixels = [];
 
-    /// <inheritdoc cref="IOutput.GetSixels"/>>
+    /// <inheritdoc cref="IOutput.GetSixels"/>
     public ConcurrentQueue<SixelToRender> GetSixels () => _sixels;
 
     // Last text style used, for updating style with EscSeqUtils.CSI_AppendTextStyleChange().
     private TextStyle _redrawTextStyle = TextStyle.None;
 
-    StringBuilder _lastOutputStringBuilder = new ();
+    // Last URL used for tracking hyperlink state
+    private string? _lastUrl = null;
+
+    private readonly StringBuilder _lastOutputStringBuilder = new ();
+    private bool _clearLastOutputPending;
 
     /// <summary>
     ///     Writes dirty cells from the buffer to the console. Hides cursor, iterates rows/cols,
@@ -58,9 +68,10 @@ public abstract class OutputBase
     /// </summary>
     public virtual void Write (IOutputBuffer buffer)
     {
+        _clearLastOutputPending = true;
         StringBuilder outputStringBuilder = new ();
-        int top = 0;
-        int left = 0;
+        var top = 0;
+        var left = 0;
         int rows = buffer.Rows;
         int cols = buffer.Cols;
         Attribute? redrawAttr = null;
@@ -75,6 +86,7 @@ public abstract class OutputBase
             }
 
             outputStringBuilder.Clear ();
+            _lastUrl = null; // Reset URL state at the start of each row
 
             // Process columns in row
             for (int col = left; col < cols; col++)
@@ -113,6 +125,29 @@ public abstract class OutputBase
                         lastCol = col;
                     }
 
+                    // Handle URL hyperlink state changes
+                    if (!IsLegacyConsole)
+                    {
+                        string? cellUrl = buffer.GetCellUrl (col, row);
+
+                        if (cellUrl != _lastUrl)
+                        {
+                            // If we were in a hyperlink, end it
+                            if (_lastUrl is { })
+                            {
+                                outputStringBuilder.Append (EscSeqUtils.OSC_EndHyperlink ());
+                            }
+
+                            // If starting a new hyperlink, begin it
+                            if (!string.IsNullOrEmpty (cellUrl))
+                            {
+                                outputStringBuilder.Append (EscSeqUtils.OSC_StartHyperlink (cellUrl));
+                            }
+
+                            _lastUrl = cellUrl;
+                        }
+                    }
+
                     // Append dirty cell as ANSI and mark clean
                     Cell cell = buffer.Contents [row, col];
                     buffer.Contents [row, col].IsDirty = false;
@@ -128,20 +163,29 @@ public abstract class OutputBase
             }
 
             // Flush buffered output for row
-            if (outputStringBuilder.Length > 0)
+            if (outputStringBuilder.Length <= 0)
             {
-                if (IsLegacyConsole)
-                {
-                    Write (outputStringBuilder);
-                }
-                else
-                {
-                    SetCursorPositionImpl (lastCol, row);
+                continue;
+            }
 
-                    // Wrap URLs with OSC 8 hyperlink sequences
-                    StringBuilder processed = Osc8UrlLinker.WrapOsc8 (outputStringBuilder);
-                    Write (processed);
+            if (IsLegacyConsole)
+            {
+                Write (outputStringBuilder);
+            }
+            else
+            {
+                SetCursorPositionImpl (lastCol, row);
+
+                // Close any open hyperlink before processing URLs
+                if (_lastUrl is { })
+                {
+                    outputStringBuilder.Append (EscSeqUtils.OSC_EndHyperlink ());
+                    _lastUrl = null;
                 }
+
+                // Wrap URLs with OSC 8 hyperlink sequences
+                StringBuilder processed = Osc8UrlLinker.WrapOsc8 (outputStringBuilder);
+                Write (processed);
             }
         }
 
@@ -163,7 +207,7 @@ public abstract class OutputBase
         }
     }
 
-    /// <inheritdoc cref="IOutput.GetLastOutput" />
+    /// <inheritdoc cref="IOutput.GetLastOutput"/>
     public virtual string GetLastOutput () => _lastOutputStringBuilder.ToString ();
 
     /// <summary>
@@ -171,12 +215,46 @@ public abstract class OutputBase
     ///     <paramref name="redrawTextStyle"/>.
     ///     If command can be buffered in line with other output (e.g. CSI sequence) then it should be appended to
     ///     <paramref name="output"/>
-    ///     otherwise the relevant output state should be flushed directly (e.g. by calling relevant win 32 API method)
+    ///     otherwise the relevant output state should be flushed directly (e.g. by calling relevant win 32 API method).
+    ///     <para>
+    ///         When a color is <see cref="Color.None"/> (alpha = 0), the terminal's default foreground or
+    ///         background color is used via ANSI reset sequences (CSI 39m / CSI 49m), allowing native terminal
+    ///         transparency to show through.
+    ///     </para>
     /// </summary>
     /// <param name="output"></param>
     /// <param name="attr"></param>
     /// <param name="redrawTextStyle"></param>
-    protected abstract void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle);
+    protected virtual void AppendOrWriteAttribute (StringBuilder output, Attribute attr, TextStyle redrawTextStyle)
+    {
+        if (attr.Foreground == Color.None)
+        {
+            EscSeqUtils.CSI_AppendResetForegroundColor (output);
+        }
+        else if (Force16Colors)
+        {
+            output.Append (EscSeqUtils.CSI_SetForegroundColor (attr.Foreground.GetAnsiColorCode ()));
+        }
+        else
+        {
+            EscSeqUtils.CSI_AppendForegroundColorRGB (output, attr.Foreground.R, attr.Foreground.G, attr.Foreground.B);
+        }
+
+        if (attr.Background == Color.None)
+        {
+            EscSeqUtils.CSI_AppendResetBackgroundColor (output);
+        }
+        else if (Force16Colors)
+        {
+            output.Append (EscSeqUtils.CSI_SetBackgroundColor (attr.Background.GetAnsiColorCode ()));
+        }
+        else
+        {
+            EscSeqUtils.CSI_AppendBackgroundColorRGB (output, attr.Background.R, attr.Background.G, attr.Background.B);
+        }
+
+        EscSeqUtils.CSI_AppendTextStyleChange (output, redrawTextStyle, attr.Style);
+    }
 
     /// <summary>
     ///     When overriden in derived class, positions the terminal draw cursor to the specified point on the screen.
@@ -193,6 +271,12 @@ public abstract class OutputBase
     /// <param name="output"></param>
     protected virtual void Write (StringBuilder output)
     {
+        if (_clearLastOutputPending)
+        {
+            _lastOutputStringBuilder.Clear ();
+            _clearLastOutputPending = false;
+        }
+
         _lastOutputStringBuilder.Append (output);
     }
 
@@ -208,19 +292,17 @@ public abstract class OutputBase
     /// <param name="lastAttr">The last attribute used, for optimization.</param>
     /// <param name="includeCellPredicate">Predicate to determine which cells to include. If null, includes all cells.</param>
     /// <param name="addNewlines">Whether to add newlines between rows.</param>
-    protected void BuildAnsiForRegion (
-        IOutputBuffer buffer,
-        int startRow,
-        int endRow,
-        int startCol,
-        int endCol,
-        StringBuilder output,
-        ref Attribute? lastAttr,
-        Func<int, int, bool>? includeCellPredicate = null,
-        bool addNewlines = true
-    )
+    protected void BuildAnsiForRegion (IOutputBuffer buffer,
+                                       int startRow,
+                                       int endRow,
+                                       int startCol,
+                                       int endCol,
+                                       StringBuilder output,
+                                       ref Attribute? lastAttr,
+                                       Func<int, int, bool>? includeCellPredicate = null,
+                                       bool addNewlines = true)
     {
-        TextStyle redrawTextStyle = TextStyle.None;
+        var redrawTextStyle = TextStyle.None;
 
         for (int row = startRow; row < endRow; row++)
         {
@@ -254,7 +336,13 @@ public abstract class OutputBase
     /// <param name="maxCol">The maximum column, used for wide character handling.</param>
     /// <param name="currentCol">The current column, updated for wide characters.</param>
     /// <param name="outputWidth">The current output width, updated for wide characters.</param>
-    protected void AppendCellAnsi (Cell cell, StringBuilder output, ref Attribute? lastAttr, ref TextStyle redrawTextStyle, int maxCol, ref int currentCol, ref int outputWidth)
+    protected void AppendCellAnsi (Cell cell,
+                                   StringBuilder output,
+                                   ref Attribute? lastAttr,
+                                   ref TextStyle redrawTextStyle,
+                                   int maxCol,
+                                   ref int currentCol,
+                                   ref int outputWidth)
     {
         Attribute? attribute = cell.Attribute;
 
@@ -272,11 +360,12 @@ public abstract class OutputBase
         outputWidth++;
 
         // Handle wide grapheme
-        if (grapheme.GetColumns () > 1 && currentCol + 1 < maxCol)
+        if (grapheme.GetColumns () <= 1 || currentCol + 1 >= maxCol)
         {
-            currentCol++; // Skip next cell for wide character
-            outputWidth++;
+            return;
         }
+        currentCol++; // Skip next cell for wide character
+        outputWidth++;
     }
 
     /// <summary>
@@ -293,9 +382,9 @@ public abstract class OutputBase
         {
             StringBuilder output = new ();
 
-            for (int row = 0; row < buffer.Rows; row++)
+            for (var row = 0; row < buffer.Rows; row++)
             {
-                for (int col = 0; col < buffer.Cols; col++)
+                for (var col = 0; col < buffer.Cols; col++)
                 {
                     Cell cell = buffer.Contents! [row, col];
                     string grapheme = cell.Grapheme;

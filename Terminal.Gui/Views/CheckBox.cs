@@ -5,6 +5,18 @@ namespace Terminal.Gui.Views;
 ///     <para>
 ///         <see cref="RadioStyle"/> is used to display radio button style glyphs (●) instead of checkbox style glyphs (☑).
 ///     </para>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Click</term> <description>Toggles the checked state (<see cref="Command.Activate"/>).</description>
+///         </item>
+///         <item>
+///             <term>Double-Click</term> <description>Accepts the checkbox (<see cref="Command.Accept"/>).</description>
+///         </item>
+///     </list>
 /// </remarks>
 public class CheckBox : View, IValue<CheckState>
 {
@@ -26,14 +38,16 @@ public class CheckBox : View, IValue<CheckState>
 
         // Activate (Space key and single-click) - Raise Activate event and Advance
         // - DO NOT raise Accept
-        // - DO NOT SetFocus
-        AddCommand (Command.Activate, ActivateAndAdvance);
+        // - DO SetFocus (if focus is not desired, set CanFocus to false)
 
         // Accept (Enter key and double-click) - Raise Accept event
         // - DO NOT advance state
-        // The default Accept handler does that.
+
+        // Use LeftButtonClicked instead of LeftButtonReleased to prevent double activation on double-click.
+        // LeftButtonClicked fires once per click; LeftButtonReleased fires on each release (twice for double-click).
+        MouseBindings.Remove (MouseFlags.LeftButtonReleased);
+        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
         MouseBindings.Add (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
-        MouseBindings.Remove (MouseFlags.LeftButtonClicked);
 
         TitleChanged += Checkbox_TitleChanged;
 
@@ -41,37 +55,10 @@ public class CheckBox : View, IValue<CheckState>
     }
 
     /// <inheritdoc/>
-    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    protected override void OnActivated (ICommandContext? commandContext)
     {
-        // Invoke Activate on ourselves
-        if (InvokeCommand (Command.Activate, args.Context) is not true)
-        {
-            return base.OnHandlingHotKey (args);
-        }
-
-        // Default behavior for View is to set Focus on hotkey. We need to return
-        // true here to indicate Activate was handled. That will prevent the default
-        // behavior from setting focus, so we do it here.
-        SetFocus ();
-
-        return true;
-    }
-
-    private bool? ActivateAndAdvance (ICommandContext? commandContext)
-    {
-        if (RaiseActivating (commandContext) is true)
-        {
-            return true;
-        }
-
-        bool? cancelled = AdvanceCheckState ();
-
-        if (cancelled is true)
-        {
-            return true;
-        }
-
-        return commandContext?.Command == Command.HotKey ? cancelled : cancelled is false;
+        base.OnActivated (commandContext);
+        AdvanceCheckState ();
     }
 
     private void Checkbox_TitleChanged (object? sender, EventArgs<string> e)
@@ -86,23 +73,21 @@ public class CheckBox : View, IValue<CheckState>
     /// <inheritdoc/>
     public override Rune HotKeySpecifier { get => base.HotKeySpecifier; set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value; }
 
-    private bool _allowNone;
-
     /// <summary>
     ///     If <see langword="true"/> allows <see cref="Value"/> to be <see cref="CheckState.None"/>. The default is
     ///     <see langword="false"/>.
     /// </summary>
     public bool AllowCheckStateNone
     {
-        get => _allowNone;
+        get;
         set
         {
-            if (_allowNone == value)
+            if (field == value)
             {
                 return;
             }
 
-            _allowNone = value;
+            field = value;
 
             if (Value == CheckState.None)
             {
@@ -160,6 +145,9 @@ public class CheckBox : View, IValue<CheckState>
     /// <param name="args">The event arguments containing old and new values.</param>
     protected virtual void OnValueChanged (ValueChangedEventArgs<CheckState> args) { }
 
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
     /// <summary>
     ///     INTERNAL Sets Value.
     /// </summary>
@@ -198,6 +186,8 @@ public class CheckBox : View, IValue<CheckState>
         ValueChangedEventArgs<CheckState> changedArgs = new (oldValue, _value);
         OnValueChanged (changedArgs);
         ValueChanged?.Invoke (this, changedArgs);
+
+        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, _value));
 
         return false;
     }

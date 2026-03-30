@@ -1,4 +1,3 @@
-#nullable disable
 using System.Data;
 using System.Globalization;
 
@@ -13,17 +12,144 @@ public partial class TableView
     /// <summary>The default minimum cell width for <see cref="ColumnStyle.MinAcceptableWidth"/></summary>
     public const int DEFAULT_MIN_ACCEPTABLE_WIDTH = 100;
 
-    private ITableSource _table;
+    private ITableSource? _table;
 
     /// <summary>The data table to render in the view.  Setting this property automatically updates and redraws the control.</summary>
-    public ITableSource Table
+    public ITableSource? Table
     {
         get => _table;
         set
         {
             _table = value;
+            RefreshContentSize ();
             Update ();
         }
+    }
+
+    /// <summary>
+    ///     Gets or sets whether all rows should be used when calculating content size. When <see langword="false"/>,
+    ///     only visible rows are used for column width calculations.
+    /// </summary>
+    public bool UseAllRowsForContentCalculation
+    {
+        get;
+        set
+        {
+            field = value;
+            RefreshContentSize ();
+        }
+    }
+
+    /// <summary>
+    ///     Recalculates and updates the content size based on the current state.
+    /// </summary>
+    /// <remarks>
+    ///     Call this method after making changes that affect the content's dimensions to ensure the
+    ///     layout remains accurate.
+    ///     Also call this if data in Table has changed.
+    /// </remarks>
+    public void RefreshContentSize () => SetContentSize (CalculateContentSize ());
+
+    /// <inheritdoc/>
+    protected override void OnViewportChanged (DrawEventArgs e)
+    {
+        base.OnViewportChanged (e);
+
+        if (_inCalculatingContentSize)
+        {
+            return;
+        }
+
+        if (e.OldViewport.Size != e.NewViewport.Size || (!UseAllRowsForContentCalculation && e.OldViewport.Y != e.NewViewport.Y))
+        {
+            RefreshContentSize (); //mainly needed only for ExpandLastColumn?!
+        }
+    }
+
+    private bool? HandleRight (ICommandContext? _)
+    {
+        int oldSelectedCol = SelectedColumn;
+        int oldViewportX = Viewport.X;
+        bool result = ChangeSelectionByOffsetWithReturn (1, 0);
+
+        if (oldSelectedCol != SelectedColumn || Viewport.X >= MaxViewPort ().X)
+        {
+            return result;
+        }
+        Point maxViewPort = MaxViewPort ();
+        Viewport = Viewport with { X = Math.Min (oldViewportX + 1, maxViewPort.X) };
+
+        return result;
+    }
+
+    private bool? HandleUp (ICommandContext? _)
+    {
+        if (SelectedRow != 0)
+        {
+            return ChangeSelectionByOffsetWithReturn (0, -1);
+        }
+
+        if (Viewport.Y <= 0)
+        {
+            return false;
+        }
+        Viewport = Viewport with { Y = Viewport.Y - 1 };
+
+        return true;
+    }
+
+    private bool? HandleDown (ICommandContext? _)
+    {
+        if (Table == null || SelectedRow < Table.Rows - 1)
+        {
+            return ChangeSelectionByOffsetWithReturn (0, 1);
+        }
+
+        if (Viewport.Y >= GetContentSize ().Height - Viewport.Height)
+        {
+            return false;
+        }
+        Viewport = Viewport with { Y = Viewport.Y + 1 };
+
+        return true;
+
+    }
+
+    /// <summary>Moves the selection down by one page</summary>
+    /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
+    public void PageDown (bool extend)
+    {
+        int oldSelectedRow = SelectedRow;
+        ChangeSelectionByOffset (0, Viewport.Height /* - CurrentHeaderHeightVisible ()*/, extend);
+
+        //after scrolling the cells, also scroll to lower line
+        int remainingJump = Viewport.Height - (SelectedRow - oldSelectedRow);
+        Point maxViewPort = MaxViewPort ();
+
+        if (remainingJump > 0 && Viewport.Y < maxViewPort.Y)
+        {
+            Viewport = Viewport with { Y = Math.Min (Viewport.Y + remainingJump, maxViewPort.Y) };
+        }
+
+        Update ();
+    }
+
+    /// <summary>Moves the selection up by one page</summary>
+    /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
+    public void PageUp (bool extend)
+    {
+        int oldSelectedRow = SelectedRow;
+        ChangeSelectionByOffset (0, -Viewport.Height /* - CurrentHeaderHeightVisible ()*/, extend);
+
+        //after scrolling the cells, also scroll to header
+        int remainingJump = Viewport.Height - (oldSelectedRow - SelectedRow);
+
+        if (remainingJump > 0 && Viewport.Y > 0)
+        {
+            Viewport = Viewport with { Y = Math.Max (Viewport.Y - remainingJump, 0) };
+        }
+
+        Update ();
     }
 
     /// <summary>
@@ -33,7 +159,7 @@ public partial class TableView
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     public void ChangeSelectionToEndOfTable (bool extend)
     {
-        int finalColumn = Table.Columns - 1;
+        int finalColumn = Table!.Columns - 1;
         SetSelection (FullRowSelect ? SelectedColumn : finalColumn, Table.Rows - 1, extend);
         Update ();
     }
@@ -126,6 +252,7 @@ public partial class TableView
         dt.Columns.Add (new DataColumn ("DoubleCol", typeof (double)));
         dt.Columns.Add (new DataColumn ("NullsCol", typeof (string)));
         dt.Columns.Add (new DataColumn ("Unicode", typeof (string)));
+        dt.Columns.Add (new DataColumn ("VarLength", typeof (string))); //ColIdx = 6
 
         for (var i = 0; i < cols - explicitCols; i++)
         {
@@ -133,6 +260,8 @@ public partial class TableView
         }
 
         var r = new Random (100);
+
+        string numberText = NumberText (rows);
 
         for (var i = 0; i < rows; i++)
         {
@@ -143,7 +272,8 @@ public partial class TableView
                 r.Next (i),
                 r.NextDouble () * i - 0.5 /*add some negatives to demo styles*/,
                 DBNull.Value,
-                "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables"
+                "Les Mise" + char.ConvertFromUtf32 (int.Parse ("0301", NumberStyles.HexNumber)) + "rables",
+                numberText [..i]
             ];
 
             for (var j = 0; j < cols - explicitCols; j++)
@@ -155,5 +285,17 @@ public partial class TableView
         }
 
         return dt;
+
+        static string NumberText (int len)
+        {
+            var result = string.Empty;
+
+            for (var i = 1; i <= len; i++)
+            {
+                result += i % 10;
+            }
+
+            return result;
+        }
     }
 }

@@ -1,9 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+	      <OutputType>Exe</OutputType>
+	      <UseAppHost>true</UseAppHost>
+	      <IsTestProject>true</IsTestProject>
         <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
-        <IsTestProject>true</IsTestProject>
         <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL</DefineConstants>
         <DebugType>portable</DebugType>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -19,18 +21,20 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="coverlet.collector" />
+        <PackageReference Include="coverlet.collector">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.NET.Test.Sdk" />
-        <PackageReference Include="xunit" />
         <PackageReference Include="xunit.runner.visualstudio" />
-        <PackageReference Include="Microsoft.Net.Compilers.Toolset" PrivateAssets="all" />
+        <PackageReference Include="xunit.v3" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
-        <ProjectReference Include="..\..\Tests\TerminalGuiFluentTestingXunit\TerminalGuiFluentTestingXunit.csproj" />
-        <ProjectReference Include="..\..\Tests\TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj" />
+        <ProjectReference Include="..\..\Tests\AppTestHelpers.XunitHelpers\AppTestHelpers.XunitHelpers.csproj" />
+        <ProjectReference Include="..\..\Tests\AppTestHelpers\AppTestHelpers.csproj" />
         <ProjectReference Include="..\..\Examples\UICatalog\UICatalog.csproj" />
-        <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
+        <ProjectReference Include="..\UnitTests.Legacy\UnitTests.Legacy.csproj" />
     </ItemGroup>
     <ItemGroup>
         <Using Include="Xunit" />

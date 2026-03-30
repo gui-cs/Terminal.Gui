@@ -1,10 +1,25 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
 
 namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     The abstract base class for <see cref="OptionSelector{TEnum}"/> and <see cref="FlagSelector{TFlagsEnum}"/>.
 /// </summary>
+/// <remarks>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Up / Left</term> <description>Moves to the previous option.</description>
+///         </item>
+///         <item>
+///             <term>Down / Right</term> <description>Moves to the next option.</description>
+///         </item>
+///     </list>
+/// </remarks>
 public abstract class SelectorBase : View, IOrientation, IValue<int?>
 {
     /// <summary>
@@ -27,9 +42,11 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         _orientationHelper = new OrientationHelper (this);
         _orientationHelper.Orientation = Orientation.Vertical;
 
-        AddCommand (Command.Accept, HandleAcceptCommand);
+        // Clear all mouse bindings; the selector's SubViews will handle all
+        // mouse events.
+        MouseBindings.Clear ();
 
-        MouseBindings.Remove (MouseFlags.LeftButtonClicked);
+        CommandsToBubbleUp = [Command.Activate, Command.Accept];
 
         KeyBindings.ReplaceCommands (Key.CursorDown, Command.Down);
         KeyBindings.ReplaceCommands (Key.CursorRight, Command.Right);
@@ -43,9 +60,17 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         AddCommand (Command.Left, () => MovePrevious (Command.Left));
     }
 
+    // Stores the int value for each checkbox (replaced use of Data property)
+    private readonly Dictionary<CheckBox, int> _checkBoxValues = new ();
+
     private bool MoveNext (Command command)
     {
         if ((command == Command.Down && Orientation == Orientation.Horizontal) || (command == Command.Right && Orientation == Orientation.Vertical))
+        {
+            return false;
+        }
+
+        if (Focused?.TabStop != ViewBase.TabBehavior.NoStop)
         {
             return false;
         }
@@ -78,6 +103,11 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             return false;
         }
 
+        if (Focused?.TabStop != ViewBase.TabBehavior.NoStop)
+        {
+            return false;
+        }
+
         int active = SubViews.OfType<CheckBox> ().ToArray ().IndexOf (Focused);
 
         switch (active)
@@ -93,17 +123,17 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
                 break;
 
             default:
-            {
-                if (Styles.HasFlag (SelectorStyles.ShowValue))
                 {
-                    _valueField?.SetFocus ();
+                    if (Styles.HasFlag (SelectorStyles.ShowValue))
+                    {
+                        _valueField?.SetFocus ();
 
-                    return true;
+                        return true;
+                    }
+                    active = SubViews.OfType<CheckBox> ().Count () - 1;
+
+                    break;
                 }
-                active = SubViews.OfType<CheckBox> ().Count () - 1;
-
-                break;
-            }
         }
         SubViews.OfType<CheckBox> ().ToArray ().ElementAt (active).SetFocus ();
 
@@ -130,32 +160,55 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         }
     }
 
-    private bool? HandleAcceptCommand (ICommandContext? ctx)
-    {
-        if (!DoubleClickAccepts && ctx?.Binding is MouseBinding mouseBinding && mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
-        {
-            return false;
-        }
-
-        return RaiseAccepting (ctx);
-    }
-
     /// <inheritdoc/>
-    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    protected override bool OnAccepting (CommandEventArgs args)
     {
-        // If the command did not come from a keyboard event, ignore it
-        if (args.Context?.Binding is not KeyBinding keyBinding)
+        if (base.OnAccepting (args))
         {
-            return base.OnHandlingHotKey (args);
+            return true;
         }
 
-        if ((HasFocus || !CanFocus) && HotKey == keyBinding.Key?.NoAlt.NoCtrl.NoShift!)
+        // Per spec: Enter key should Activate AND Accept for both OptionSelector and FlagSelector.
+        // Enter only triggers Command.Accept (View's default key binding), so invoke Activate here
+        // before continuing with Accept processing. Also handle direct programmatic Accept invocations
+        // (Binding is null) by activating the currently focused checkbox.
+        bool enterFromCheckBox = args.Context?.Binding is KeyBinding { Key: { } key }
+                                 && key == Key.Enter
+                                 && args.Context?.Source?.TryGetTarget (out View? enterSource) == true
+                                 && enterSource is CheckBox;
+
+        bool directAccept = args.Context?.Binding is null && Focused is CheckBox;
+
+        if (!enterFromCheckBox && !directAccept)
         {
-            // It's this.HotKey OR Another View (Label?) forwarded the hotkey command to us - Act just like `Space` (Activate)
-            return Focused?.InvokeCommand (Command.Activate, args.Context) is true;
+            return args.Context?.Binding switch
+            {
+                { Source: { } weakSource } when weakSource.TryGetTarget (out View? src) && src == this => true,
+                MouseBinding mouseBinding when mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked) => !DoubleClickAccepts,
+                KeyBinding { Key: { } } keyBinding when keyBinding.Key == Key.Enter => false,
+                null => false,
+                _ => true
+            };
         }
 
-        return base.OnHandlingHotKey (args);
+        // Create a fresh context with Command.Activate (not Accept) and IsBubblingUp=false.
+        // The original args.Context may have Command=Accept and IsBubblingUp=true from a bubble,
+        // which would cause TryBubbleUp to bubble the wrong command to SuperView.
+        // For direct invocations, use the focused CheckBox as the source so OnActivated
+        // identifies which item to activate.
+        WeakReference<View> source = enterFromCheckBox ? args.Context!.Source! : new WeakReference<View> (Focused!);
+
+        CommandContext activateCtx = new (Command.Activate, source, args.Context?.Binding);
+        InvokeCommand (Command.Activate, activateCtx);
+
+        return args.Context?.Binding switch
+        {
+            { Source: { } weakSource } when weakSource.TryGetTarget (out View? src) && src == this => true,
+            MouseBinding mouseBinding when mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked) => !DoubleClickAccepts,
+            KeyBinding { Key: { } } keyBinding when keyBinding.Key == Key.Enter => false,
+            null => false,
+            _ => true
+        };
     }
 
     /// <summary>
@@ -184,6 +237,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
                 return;
             }
 
+            Tracing.Trace.Command (this, "Value", $"{previousValue}->{value}");
             field = value;
 
             UpdateChecked ();
@@ -192,6 +246,9 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
     }
 
     #region IValue<int?> Implementation
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>
     ///     Raises the <see cref="ValueChanging"/> event.
@@ -215,8 +272,8 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         _valueField?.Text = Value.ToString ()!;
 
         OnValueChanged (newValue, previousValue);
-
         ValueChanged?.Invoke (this, new ValueChangedEventArgs<int?> (previousValue, newValue));
+        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (previousValue, newValue));
     }
 
     /// <summary>
@@ -296,16 +353,51 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
     // Note: AssignHotKeys and UsedHotKeys are inherited from the View base class.
     // SelectorBase uses the base class's automatic hotkey assignment feature.
 
+    /// <summary>
+    ///     Gets or sets the tab behavior of the checkboxes within the selector. If <see cref="TabBehavior.TabStop"/> (the
+    ///     default),
+    ///     navigating within and out of the selector will follow the standard superview/subview behavior. If
+    ///     <see cref="TabBehavior.NoStop"/>,
+    ///     only the arrow keys wil navigate within the selector.
+    /// </summary>
+    public TabBehavior? TabBehavior
+    {
+        get
+        {
+            if (field is { })
+            {
+                return field;
+            }
+
+            return TabStop;
+        }
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+            field = value;
+            CreateSubViews ();
+        }
+    }
+
     private TextField? _valueField;
 
     /// <summary>
     ///     Creates the subviews for this selector.
     /// </summary>
-    public void CreateSubViews ()
+    public virtual void CreateSubViews ()
     {
         // Note: UsedHotKeys cleanup is handled by the base class's RaiseSubViewRemoved
         foreach (View sv in RemoveAll ())
         {
+            // Clean up checkbox value mapping (replaced use of Data property)
+            if (sv is CheckBox cb)
+            {
+                _checkBoxValues.Remove (cb);
+            }
+
             sv.Dispose ();
         }
 
@@ -319,8 +411,6 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             return;
         }
 
-        OnCreatingSubViews ();
-
         for (var index = 0; index < Labels?.Count; index++)
         {
             Add (CreateCheckBox (Labels.ElementAt (index), Values!.ElementAt (index)));
@@ -330,34 +420,23 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         {
             _valueField = new TextField
             {
+                CanFocus = false,
                 Id = "valueField",
                 Text = Value.ToString ()!,
 
                 // TODO: Don't hardcode this; base it on max Value
                 Width = 5,
                 ReadOnly = true,
-                TabStop = TabBehavior.NoStop
+                TabStop = TabBehavior
             };
 
             Add (_valueField);
         }
 
-        OnCreatedSubViews ();
-
         // Note: Hotkey assignment is now handled automatically by the base class
         // when SubViews are added via Add(). No need to call AssignUniqueHotKeys() here.
         SetLayout ();
     }
-
-    /// <summary>
-    ///     Called before <see cref="CreateSubViews"/> creates the default subviews (Checkboxes and ValueField).
-    /// </summary>
-    protected virtual void OnCreatingSubViews () { }
-
-    /// <summary>
-    ///     Called after <see cref="CreateSubViews"/> creates the default subviews (Checkboxes and ValueField).
-    /// </summary>
-    protected virtual void OnCreatedSubViews () { }
 
     /// <summary>
     ///     INTERNAL: Creates a checkbox subview
@@ -369,12 +448,30 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             CanFocus = true,
             Title = label,
             Id = label,
-            Data = value,
             MouseHighlightStates = DefaultMouseHighlightStates,
-            TabStop = TabBehavior.NoStop
+            TabStop = TabBehavior
         };
 
+        // Store value in dictionary (replaced use of Data property)
+        _checkBoxValues [checkbox] = value;
+
         return checkbox;
+    }
+
+    /// <summary>
+    ///     Gets the int value associated with a checkbox. For testing and advanced scenarios.
+    /// </summary>
+    /// <param name="checkbox">The checkbox to get the value for</param>
+    /// <returns>The integer value associated with the checkbox</returns>
+    /// <exception cref="InvalidOperationException">If the checkbox is not found or not part of this selector</exception>
+    public int GetCheckBoxValue (CheckBox checkbox)
+    {
+        if (_checkBoxValues.TryGetValue (checkbox, out int value))
+        {
+            return value;
+        }
+
+        throw new InvalidOperationException ("CheckBox value not found");
     }
 
     private int _horizontalSpace = 2;
@@ -397,7 +494,10 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         }
     }
 
-    private void SetLayout ()
+    /// <summary>
+    ///     Updates the layout of the subviews based on <see cref="Orientation"/>.
+    /// </summary>
+    protected void SetLayout ()
     {
         var maxNaturalCheckBoxWidth = 0;
 
@@ -418,15 +518,28 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             {
                 SubViews.ElementAt (i).X = 0;
                 SubViews.ElementAt (i).Y = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
-                SubViews.ElementAt (i).Margin!.Thickness = new Thickness (0);
+                SubViews.ElementAt (i).Margin.Thickness = new Thickness (0);
                 SubViews.ElementAt (i).Width = Dim.Func (_ => maxNaturalCheckBoxWidth);
             }
             else
             {
                 SubViews.ElementAt (i).X = Pos.Align (Alignment.Start, AlignmentModes.StartToEnd);
                 SubViews.ElementAt (i).Y = 0;
-                SubViews.ElementAt (i).Margin!.Thickness = new Thickness (0, 0, i < SubViews.Count - 1 ? _horizontalSpace : 0, 0);
+                SubViews.ElementAt (i).Margin.Thickness = new Thickness (0, 0, i < SubViews.Count - 1 ? _horizontalSpace : 0, 0);
                 SubViews.ElementAt (i).Width = Dim.Auto ();
+            }
+        }
+
+        // Pre-calculate each subview's Frame.Width for horizontal layout so that
+        // Dim.Auto (DimAutoStyle.Content) on the selector can correctly compute its
+        // total width via PosAlign.CalculateMinDimension, which reads Frame.Width.
+        // Without this, newly-created subviews have Frame.Width == 0 on the first
+        // layout pass, causing the selector to be sized too narrow.
+        if (Orientation == Orientation.Horizontal && SubViews.Count > 0)
+        {
+            foreach (View sv in SubViews)
+            {
+                sv.SetRelativeLayout (GetContainerSize ());
             }
         }
     }

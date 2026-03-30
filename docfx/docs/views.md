@@ -9,22 +9,49 @@ using Application.ToString to capture the view's rendered output.
 *Terminal.Gui* provides the following set of built-in views and controls for building terminal user interfaces:
 
 
-## [Bar](~/api/Terminal.Gui.Views.Bar.yml)
+## [AttributePicker](xref:Terminal.Gui.Views.AttributePicker)
 
-Provides a horizontally or vertically oriented container for [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)s to be used as a menu, toolbar, or status bar.
+Allows the user to pick an <xref:Terminal.Gui.Drawing.Attribute> by selecting foreground and background colors, and text styles.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'> Q</span><span style='color:#000000;background:#FFFFFF;text-decoration:underline 1px solid'>u</span><span style='color:#000000;background:#FFFFFF'>it  Quit  </span><span style='color:#000000;background:#FFFFFF;text-decoration:underline 1px solid'>Ctrl+Z</span><span style='color:#000000;background:#FFFFFF'> </span><span style='color:#FFFFFF;background:#000000'> Help  Help Text  </span><span style='color:#FFFFFF;background:#000000;text-decoration:underline 1px solid'>F1</span><span style='color:#FFFFFF;background:#000000'>  ☐ </span><span style='color:#FFFFFF;background:#000000;text-decoration:underline 1px solid'>C</span><span style='color:#FFFFFF;background:#000000'>heck  Czech  </span><span style='color:#FFFFFF;background:#000000;text-decoration:underline 1px solid'>F9</span><span style='color:#FFFFFF;background:#000000'> ┊</span>
-<span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
+<span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
+<span style='color:#FFFFFF;background:#000000'>┊┌┤</span><span style='color:#000000;background:#FFFFFF'>Foreground</span><span style='color:#FFFFFF;background:#000000'>├───────────────────────────────────────────────┬┤Style├────────┐ ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│</span><span style='color:#000000;background:#FFFFFF'>H:</span><span style='color:#FF0000;background:#FF0000'> </span><span style='color:#FF1A00;background:#FF1A00'> </span><span style='color:#FF3700;background:#FF3700'> </span><span style='color:#FF5500;background:#FF5500'> </span><span style='color:#FF7300;background:#FF7300'> </span><span style='color:#FF9000;background:#FF9000'> </span><span style='color:#FFAE00;background:#FFAE00'> </span><span style='color:#FFCC00;background:#FFCC00'> </span><span style='color:#FFEA00;background:#FFEA00'> </span><span style='color:#F6FF00;background:#F6FF00'> </span><span style='color:#D9FF00;background:#D9FF00'> </span><span style='color:#BBFF00;background:#BBFF00'> </span><span style='color:#9DFF00;background:#9DFF00'> </span><span style='color:#80FF00;background:#80FF00'> </span><span style='color:#66FF00;background:#66FF00'> </span><span style='color:#48FF00;background:#48FF00'> </span><span style='color:#2BFF00;background:#2BFF00'> </span><span style='color:#0DFF00;background:#0DFF00'> </span><span style='color:#00FF11;background:#00FF11'> </span><span style='color:#00FF2F;background:#00FF2F'> </span><span style='color:#00FF4D;background:#00FF4D'> </span><span style='color:#00FF6A;background:#00FF6A'> </span><span style='color:#00FF88;background:#00FF88'> </span><span style='color:#00FFA6;background:#00FFA6'> </span><span style='color:#00FFC4;background:#00FFC4'> </span><span style='color:#00FFE1;background:#00FFE1'> </span><span style='color:#00FFFF;background:#00FFFF'> </span><span style='color:#00E5FF;background:#00E5FF'> </span><span style='color:#00C8FF;background:#00C8FF'> </span><span style='color:#00AAFF;background:#00AAFF'> </span><span style='color:#008CFF;background:#008CFF'> </span><span style='color:#006EFF;background:#006EFF'> </span><span style='color:#0051FF;background:#0051FF'> </span><span style='color:#0033FF;background:#0033FF'> </span><span style='color:#0015FF;background:#0015FF'> </span><span style='color:#0800FF;background:#0800FF'> </span><span style='color:#2600FF;background:#2600FF'> </span><span style='color:#4400FF;background:#4400FF'> </span><span style='color:#6200FF;background:#6200FF'> </span><span style='color:#7F00FF;background:#7F00FF'> </span><span style='color:#9900FF;background:#9900FF'> </span><span style='color:#B700FF;background:#B700FF'> </span><span style='color:#D400FF;background:#D400FF'> </span><span style='color:#F200FF;background:#F200FF'> </span><span style='color:#FF00EE;background:#FF00EE'> </span><span style='color:#FF00D0;background:#FF00D0'> </span><span style='color:#FF00B2;background:#FF00B2'> </span><span style='color:#FF0095;background:#FF0095'> </span><span style='color:#FF0077;background:#FF0077'> </span><span style='color:#FF0059;background:#FF0059'> </span><span style='color:#FF003B;background:#FF003B'> </span><span style='color:#FF001E;background:#FF001E'> </span><span style='color:#000000;background:#FF0000'>▲</span><span style='color:#FFFFFF;background:#808080'>355 </span><span style='color:#FFFFFF;background:#000000'>│☒ Bold         │ ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│S:</span><span style='color:#E8E8E8;background:#E8E8E8'> </span><span style='color:#E9E7E7;background:#E9E7E7'> </span><span style='color:#E9E2E3;background:#E9E2E3'> </span><span style='color:#E9DDDE;background:#E9DDDE'> </span><span style='color:#E8D8DA;background:#E8D8DA'> </span><span style='color:#E8D4D5;background:#E8D4D5'> </span><span style='color:#E8CED1;background:#E8CED1'> </span><span style='color:#E8C9CC;background:#E8C9CC'> </span><span style='color:#E8C5C8;background:#E8C5C8'> </span><span style='color:#E8C0C3;background:#E8C0C3'> </span><span style='color:#E8BBBE;background:#E8BBBE'> </span><span style='color:#E7B6BA;background:#E7B6BA'> </span><span style='color:#E9B4B9;background:#E9B4B9'> </span><span style='color:#E9AFB4;background:#E9AFB4'> </span><span style='color:#E8ABB0;background:#E8ABB0'> </span><span style='color:#E8A6AB;background:#E8A6AB'> </span><span style='color:#E8A1A7;background:#E8A1A7'> </span><span style='color:#E89CA2;background:#E89CA2'> </span><span style='color:#E89BA2;background:#E89BA2'> </span><span style='color:#E9969D;background:#E9969D'> </span><span style='color:#E89198;background:#E89198'> </span><span style='color:#E88C94;background:#E88C94'> </span><span style='color:#E8878F;background:#E8878F'> </span><span style='color:#E8828B;background:#E8828B'> </span><span style='color:#E87D86;background:#E87D86'> </span><span style='color:#E87881;background:#E87881'> </span><span style='color:#E8737C;background:#E8737C'>  </span><span style='color:#E86D78;background:#E86D78'> </span><span style='color:#E86873;background:#E86873'> </span><span style='color:#E8646F;background:#E8646F'> </span><span style='color:#E85E6A;background:#E85E6A'> </span><span style='color:#E85965;background:#E85965'> </span><span style='color:#E85461;background:#E85461'> </span><span style='color:#E84F5C;background:#E84F5C'>  </span><span style='color:#E94957;background:#E94957'> </span><span style='color:#000000;background:#E84552'>▲</span><span style='color:#E93F4D;background:#E93F4D'> </span><span style='color:#E83B49;background:#E83B49'> </span><span style='color:#E73645;background:#E73645'> </span><span style='color:#E93544;background:#E93544'> </span><span style='color:#E83040;background:#E83040'> </span><span style='color:#E92B3B;background:#E92B3B'> </span><span style='color:#E82636;background:#E82636'> </span><span style='color:#E82132;background:#E82132'> </span><span style='color:#E91C2D;background:#E91C2D'> </span><span style='color:#E81728;background:#E81728'> </span><span style='color:#E71324;background:#E71324'> </span><span style='color:#E70D20;background:#E70D20'> </span><span style='color:#E60A1C;background:#E60A1C'> </span><span style='color:#E60517;background:#E60517'> </span><span style='color:#EB0014;background:#EB0014'> </span><span style='color:#FFFFFF;background:#808080'>70  </span><span style='color:#FFFFFF;background:#000000'>│☐ Faint        │ ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│V:</span><span style='color:#000000;background:#000000'> </span><span style='color:#040101;background:#040101'> </span><span style='color:#080203;background:#080203'> </span><span style='color:#0C0404;background:#0C0404'> </span><span style='color:#140607;background:#140607'> </span><span style='color:#180708;background:#180708'> </span><span style='color:#1B080A;background:#1B080A'> </span><span style='color:#1F090B;background:#1F090B'> </span><span style='color:#270C0E;background:#270C0E'> </span><span style='color:#2B0D0F;background:#2B0D0F'> </span><span style='color:#2F0E11;background:#2F0E11'> </span><span style='color:#371014;background:#371014'> </span><span style='color:#3B1215;background:#3B1215'> </span><span style='color:#3F1316;background:#3F1316'> </span><span style='color:#431418;background:#431418'> </span><span style='color:#471519;background:#471519'> </span><span style='color:#4F171C;background:#4F171C'> </span><span style='color:#52191D;background:#52191D'> </span><span style='color:#561A1F;background:#561A1F'> </span><span style='color:#5A1B20;background:#5A1B20'> </span><span style='color:#621D23;background:#621D23'> </span><span style='color:#661E24;background:#661E24'> </span><span style='color:#6A2026;background:#6A2026'> </span><span style='color:#722229;background:#722229'> </span><span style='color:#76232A;background:#76232A'> </span><span style='color:#7A242B;background:#7A242B'> </span><span style='color:#7E262D;background:#7E262D'> </span><span style='color:#82272E;background:#82272E'> </span><span style='color:#862830;background:#862830'> </span><span style='color:#8D2A32;background:#8D2A32'> </span><span style='color:#912B34;background:#912B34'> </span><span style='color:#952D35;background:#952D35'> </span><span style='color:#9D2F38;background:#9D2F38'> </span><span style='color:#A1303A;background:#A1303A'> </span><span style='color:#A5313B;background:#A5313B'> </span><span style='color:#AD343E;background:#AD343E'> </span><span style='color:#B1353F;background:#B1353F'> </span><span style='color:#B53641;background:#B53641'> </span><span style='color:#B93742;background:#B93742'> </span><span style='color:#C03945;background:#C03945'>  </span><span style='color:#C73D49;background:#C73D49'> </span><span style='color:#CC3E49;background:#CC3E49'> </span><span style='color:#D03E4A;background:#D03E4A'> </span><span style='color:#D7424E;background:#D7424E'> </span><span style='color:#DB434F;background:#DB434F'> </span><span style='color:#E04250;background:#E04250'> </span><span style='color:#E64754;background:#E64754'> </span><span style='color:#000000;background:#EB4755'>▲</span><span style='color:#F04755;background:#F04755'> </span><span style='color:#F44856;background:#F44856'> </span><span style='color:#F94D5B;background:#F94D5B'> </span><span style='color:#FF4D5B;background:#FF4D5B'> </span><span style='color:#FFFFFF;background:#808080'>91  </span><span style='color:#FFFFFF;background:#000000'>│☒ Italic       │ ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│Name: </span><span style='color:#FFFFFF;background:#808080'>BrightRed           </span><span style='color:#FFFFFF;background:#000000'>                                 │☐ Underline    │ ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│Hex:</span><span style='color:#FFFFFF;background:#808080'>#E74856 </span><span style='color:#FFFFFF;background:#000000'> </span><span style='color:#E74856;background:#000000'>■</span><span style='color:#FFFFFF;background:#000000'>                                             │☐ Blink        │ ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊├┼Background┼───────────────────────────────────────────────┤☐ Reverse      │ ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│H:</span><span style='color:#FF0000;background:#FF0000'> </span><span style='color:#FF1A00;background:#FF1A00'> </span><span style='color:#FF3700;background:#FF3700'> </span><span style='color:#FF5500;background:#FF5500'> </span><span style='color:#FF7300;background:#FF7300'> </span><span style='color:#FF9000;background:#FF9000'> </span><span style='color:#FFAE00;background:#FFAE00'> </span><span style='color:#FFCC00;background:#FFCC00'> </span><span style='color:#FFEA00;background:#FFEA00'> </span><span style='color:#F6FF00;background:#F6FF00'> </span><span style='color:#D9FF00;background:#D9FF00'> </span><span style='color:#BBFF00;background:#BBFF00'> </span><span style='color:#9DFF00;background:#9DFF00'> </span><span style='color:#80FF00;background:#80FF00'> </span><span style='color:#66FF00;background:#66FF00'> </span><span style='color:#48FF00;background:#48FF00'> </span><span style='color:#2BFF00;background:#2BFF00'> </span><span style='color:#0DFF00;background:#0DFF00'> </span><span style='color:#00FF11;background:#00FF11'> </span><span style='color:#00FF2F;background:#00FF2F'> </span><span style='color:#00FF4D;background:#00FF4D'> </span><span style='color:#00FF6A;background:#00FF6A'> </span><span style='color:#00FF88;background:#00FF88'> </span><span style='color:#00FFA6;background:#00FFA6'> </span><span style='color:#00FFC4;background:#00FFC4'> </span><span style='color:#00FFE1;background:#00FFE1'> </span><span style='color:#00FFFF;background:#00FFFF'> </span><span style='color:#00E5FF;background:#00E5FF'> </span><span style='color:#00C8FF;background:#00C8FF'> </span><span style='color:#00AAFF;background:#00AAFF'> </span><span style='color:#008CFF;background:#008CFF'> </span><span style='color:#006EFF;background:#006EFF'> </span><span style='color:#0051FF;background:#0051FF'> </span><span style='color:#0033FF;background:#0033FF'> </span><span style='color:#0015FF;background:#0015FF'> </span><span style='color:#767676;background:#0800FF'>▲</span><span style='color:#2600FF;background:#2600FF'> </span><span style='color:#4400FF;background:#4400FF'> </span><span style='color:#6200FF;background:#6200FF'> </span><span style='color:#7F00FF;background:#7F00FF'> </span><span style='color:#9900FF;background:#9900FF'> </span><span style='color:#B700FF;background:#B700FF'> </span><span style='color:#D400FF;background:#D400FF'> </span><span style='color:#F200FF;background:#F200FF'> </span><span style='color:#FF00EE;background:#FF00EE'> </span><span style='color:#FF00D0;background:#FF00D0'> </span><span style='color:#FF00B2;background:#FF00B2'> </span><span style='color:#FF0095;background:#FF0095'> </span><span style='color:#FF0077;background:#FF0077'> </span><span style='color:#FF0059;background:#FF0059'> </span><span style='color:#FF003B;background:#FF003B'> </span><span style='color:#FF001E;background:#FF001E'> </span><span style='color:#FF0000;background:#FF0000'> </span><span style='color:#FFFFFF;background:#808080'>240 </span><span style='color:#FFFFFF;background:#000000'>│☐ Strikethrough│ ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│S:</span><span style='color:#FFFFFF;background:#FFFFFF'>  </span><span style='color:#F5F5FF;background:#F5F5FF'>  </span><span style='color:#EBEBFF;background:#EBEBFF'>  </span><span style='color:#E0E0FF;background:#E0E0FF'>  </span><span style='color:#D6D6FF;background:#D6D6FF'>  </span><span style='color:#CCCCFF;background:#CCCCFF'>  </span><span style='color:#C2C2FF;background:#C2C2FF'>  </span><span style='color:#BDBDFF;background:#BDBDFF'> </span><span style='color:#B8B8FF;background:#B8B8FF'> </span><span style='color:#B2B2FF;background:#B2B2FF'> </span><span style='color:#ADADFF;background:#ADADFF'> </span><span style='color:#A8A8FF;background:#A8A8FF'> </span><span style='color:#A3A3FF;background:#A3A3FF'> </span><span style='color:#9E9EFF;background:#9E9EFF'> </span><span style='color:#9999FF;background:#9999FF'> </span><span style='color:#9494FF;background:#9494FF'> </span><span style='color:#8F8FFF;background:#8F8FFF'> </span><span style='color:#8A8AFF;background:#8A8AFF'> </span><span style='color:#8585FF;background:#8585FF'> </span><span style='color:#8080FF;background:#8080FF'> </span><span style='color:#7A7AFF;background:#7A7AFF'>  </span><span style='color:#7070FF;background:#7070FF'>  </span><span style='color:#6666FF;background:#6666FF'>  </span><span style='color:#5C5CFF;background:#5C5CFF'>  </span><span style='color:#5252FF;background:#5252FF'>  </span><span style='color:#4747FF;background:#4747FF'>  </span><span style='color:#3D3DFF;background:#3D3DFF'>  </span><span style='color:#3838FF;background:#3838FF'> </span><span style='color:#3333FF;background:#3333FF'> </span><span style='color:#2E2EFF;background:#2E2EFF'> </span><span style='color:#2929FF;background:#2929FF'> </span><span style='color:#2424FF;background:#2424FF'> </span><span style='color:#1F1FFF;background:#1F1FFF'> </span><span style='color:#1A1AFF;background:#1A1AFF'> </span><span style='color:#1414FF;background:#1414FF'> </span><span style='color:#0F0FFF;background:#0F0FFF'> </span><span style='color:#0A0AFF;background:#0A0AFF'> </span><span style='color:#0505FF;background:#0505FF'> </span><span style='color:#767676;background:#0000FF'>▲</span><span style='color:#FFFFFF;background:#808080'>100 </span><span style='color:#FFFFFF;background:#000000'>│               │ ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│V:</span><span style='color:#000000;background:#000000'>  </span><span style='color:#00000A;background:#00000A'>  </span><span style='color:#000014;background:#000014'>  </span><span style='color:#00001F;background:#00001F'>  </span><span style='color:#000029;background:#000029'>  </span><span style='color:#000033;background:#000033'>  </span><span style='color:#00003D;background:#00003D'>  </span><span style='color:#000042;background:#000042'> </span><span style='color:#000047;background:#000047'> </span><span style='color:#00004C;background:#00004C'> </span><span style='color:#000052;background:#000052'> </span><span style='color:#000057;background:#000057'> </span><span style='color:#00005C;background:#00005C'> </span><span style='color:#000061;background:#000061'> </span><span style='color:#000066;background:#000066'> </span><span style='color:#00006B;background:#00006B'> </span><span style='color:#000070;background:#000070'> </span><span style='color:#000075;background:#000075'> </span><span style='color:#00007A;background:#00007A'> </span><span style='color:#000080;background:#000080'> </span><span style='color:#000085;background:#000085'>  </span><span style='color:#00008F;background:#00008F'>  </span><span style='color:#000099;background:#000099'>  </span><span style='color:#0000A3;background:#0000A3'>  </span><span style='color:#0000AD;background:#0000AD'>  </span><span style='color:#0000B8;background:#0000B8'>  </span><span style='color:#0000C2;background:#0000C2'>  </span><span style='color:#0000C7;background:#0000C7'> </span><span style='color:#0000CC;background:#0000CC'> </span><span style='color:#0000D1;background:#0000D1'> </span><span style='color:#0000D6;background:#0000D6'> </span><span style='color:#0000DB;background:#0000DB'> </span><span style='color:#0000E0;background:#0000E0'> </span><span style='color:#0000E6;background:#0000E6'> </span><span style='color:#0000EB;background:#0000EB'> </span><span style='color:#0000F0;background:#0000F0'> </span><span style='color:#0000F5;background:#0000F5'> </span><span style='color:#0000FA;background:#0000FA'> </span><span style='color:#767676;background:#0000FF'>▲</span><span style='color:#FFFFFF;background:#808080'>100 </span><span style='color:#FFFFFF;background:#000000'>│               │ ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│Name: </span><span style='color:#FFFFFF;background:#808080'>Blue                </span><span style='color:#FFFFFF;background:#000000'>                                 │               │ ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│Hex:</span><span style='color:#FFFFFF;background:#808080'>#0000FF </span><span style='color:#FFFFFF;background:#000000'> </span><span style='color:#0000FF;background:#000000'>■</span><span style='color:#FFFFFF;background:#000000'>                                             │               │ ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊└───────────────────────────────────────────────────────────┴───────────────┘ ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#E74856;background:#0000FF;font-weight:900;font-style:italic'>                           Multi-line Sample Text.                            </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#E74856;background:#0000FF;font-weight:900;font-style:italic'>                           This is the second line.                           </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
 
 </pre>
 
 
-## [Button](~/api/Terminal.Gui.Views.Button.yml)
+## [Bar](xref:Terminal.Gui.Views.Bar)
 
-A button View that can be pressed with the mouse or keyboard.
+A container for <xref:Terminal.Gui.Views.Shortcut> items that arranges them horizontally or vertically. Serves as the base class for <xref:Terminal.Gui.Views.Menu>, <xref:Terminal.Gui.Views.MenuBar>, and <xref:Terminal.Gui.Views.StatusBar>.
+
+
+<pre style='color:#FFFFFF;background:#000000'>
+<span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'> </span><span style='color:#000000;background:#FFFFFF;text-decoration:underline 1px solid'>S</span><span style='color:#000000;background:#FFFFFF'>hortcut  Shortcut help  </span><span style='color:#000000;background:#FFFFFF;text-decoration:underline 1px solid'>F1</span><span style='color:#000000;background:#FFFFFF'> </span><span style='color:#FFFFFF;background:#000000'> Help  Help Text  </span><span style='color:#FFFFFF;background:#000000;text-decoration:underline 1px solid'>F1</span><span style='color:#FFFFFF;background:#000000'>  ☐ </span><span style='color:#FFFFFF;background:#000000;text-decoration:underline 1px solid'>C</span><span style='color:#FFFFFF;background:#000000'>heck  Czech  </span><span style='color:#FFFFFF;background:#000000;text-decoration:underline 1px solid'>F9</span><span style='color:#FFFFFF;background:#000000'> ┊</span>
+<span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
+
+</pre>
+
+
+## [Button](xref:Terminal.Gui.Views.Button)
+
+Raises the <xref:Terminal.Gui.ViewBase.View.Accepting> and <xref:Terminal.Gui.ViewBase.View.Accepted> events when the user presses <xref:Terminal.Gui.ViewBase.View.HotKey>, `Enter`, or `Space` or clicks with the mouse.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -35,15 +62,15 @@ A button View that can be pressed with the mouse or keyboard.
 </pre>
 
 
-## [CharMap](~/api/Terminal.Gui.Views.CharMap.yml)
+## [CharMap](xref:Terminal.Gui.Views.CharMap)
 
 A scrollable map of the Unicode codepoints.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
 <span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>         </span><span style='color:#828282;background:#7A7A7A;font-weight:900'>0</span><span style='color:#000000;background:#FFFFFF'>  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f                       </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#828282;background:#7A7A7A;font-weight:900'>U+00000_</span><span style='color:#FFFFFF;background:#000000'> </span><span style='color:#828282;background:#7A7A7A;font-weight:900'>␀</span><span style='color:#FFFFFF;background:#000000'>  ␁  ␂  ␃  ␄  ␅  ␆  ␇  ␈  ␉  ␊  ␋  ␌  ␍  ␎  ␏                      </span><span style='color:#000000;background:#FFFFFF'>▲</span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>         </span><span style='color:#000000;background:#808080;font-weight:900'>0</span><span style='color:#000000;background:#FFFFFF'>  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f                       </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#808080;font-weight:900'>U+00000_</span><span style='color:#FFFFFF;background:#000000'> </span><span style='color:#000000;background:#808080;font-weight:900'>␀</span><span style='color:#FFFFFF;background:#000000'>  ␁  ␂  ␃  ␄  ␅  ␆  ␇  ␈  ␉  ␊  ␋  ␌  ␍  ␎  ␏                      </span><span style='color:#000000;background:#FFFFFF'>▲</span><span style='color:#FFFFFF;background:#000000'>┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>U+00001_</span><span style='color:#FFFFFF;background:#000000'> ␐  ␑  ␒  ␓  ␔  ␕  ␖  ␗  ␘  ␙  ␚  ␛  ␜  ␝  ␞  ␟                      </span><span style='color:#000000;background:#FFFFFF'>█</span><span style='color:#FFFFFF;background:#000000'>┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>U+00002_</span><span style='color:#FFFFFF;background:#000000'>    !  &quot;  #  $  %  &amp;  &#39;  (  )  *  +  ,  -  .  /                      </span><span style='color:#000000;background:#FFFFFF'>░</span><span style='color:#FFFFFF;background:#000000'>┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>U+00003_</span><span style='color:#FFFFFF;background:#000000'> 0  1  2  3  4  5  6  7  8  9  :  ;  &lt;  =  &gt;  ?                      </span><span style='color:#000000;background:#FFFFFF'>░</span><span style='color:#FFFFFF;background:#000000'>┊</span>
@@ -53,7 +80,7 @@ A scrollable map of the Unicode codepoints.
 <span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>U+00007_</span><span style='color:#FFFFFF;background:#000000'> p  q  r  s  t  u  v  w  x  y  z  {  |  }  ~  ⑿                      </span><span style='color:#000000;background:#FFFFFF'>░</span><span style='color:#FFFFFF;background:#000000'>┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>U+00008_</span><span style='color:#FFFFFF;background:#000000'> ⒀  ⒁  ⒂  ⒃  ⒄  ⒅  ⒆  ⒇  ⒈  ⒉  ⒊  ⒋  ⒌  ⒍  ⒎  ⒏                      </span><span style='color:#000000;background:#FFFFFF'>░</span><span style='color:#FFFFFF;background:#000000'>┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>U+00009_</span><span style='color:#FFFFFF;background:#000000'> ⒐  ⒑  ⒒  ⒓  ⒔  ⒕  ⒖  ⒗  ⒘  ⒙  ⒚  ⒛  ⒜  ⒝  ⒞  ⒟                      </span><span style='color:#000000;background:#FFFFFF'>░</span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>U+0000a_</span><span style='color:#FFFFFF;background:#000000'> &#160;  &#161;  &#162;  &#163;  &#164;  &#165;  &#166;  &#167;  &#168;  &#169;  &#170;  &#171;  &#172;  </span><span style='color:#828282;background:#000000;font-style:italic'>F</span><span style='color:#FFFFFF;background:#000000'>  &#174;  &#175;                      </span><span style='color:#000000;background:#FFFFFF'>░</span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>U+0000a_</span><span style='color:#FFFFFF;background:#000000'> &#160;  &#161;  &#162;  &#163;  &#164;  &#165;  &#166;  &#167;  &#168;  &#169;  &#170;  &#171;  &#172;  </span><span style='color:#333333;background:#000000;font-style:italic'>F</span><span style='color:#FFFFFF;background:#000000'>  &#174;  &#175;                      </span><span style='color:#000000;background:#FFFFFF'>░</span><span style='color:#FFFFFF;background:#000000'>┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>U+0000b_</span><span style='color:#FFFFFF;background:#000000'> &#176;  &#177;  &#178;  &#179;  &#180;  &#181;  &#182;  &#183;  &#184;  &#185;  &#186;  &#187;  &#188;  &#189;  &#190;  &#191;                      </span><span style='color:#000000;background:#FFFFFF'>░</span><span style='color:#FFFFFF;background:#000000'>┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>U+0000c_</span><span style='color:#FFFFFF;background:#000000'> &#192;  &#193;  &#194;  &#195;  &#196;  &#197;  &#198;  &#199;  &#200;  &#201;  &#202;  &#203;  &#204;  &#205;  &#206;  &#207;                      </span><span style='color:#000000;background:#FFFFFF'>░</span><span style='color:#FFFFFF;background:#000000'>┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>U+0000d_</span><span style='color:#FFFFFF;background:#000000'> &#208;  &#209;  &#210;  &#211;  &#212;  &#213;  &#214;  &#215;  &#216;  &#217;  &#218;  &#219;  &#220;  &#221;  &#222;  &#223;                      </span><span style='color:#000000;background:#FFFFFF'>░</span><span style='color:#FFFFFF;background:#000000'>┊</span>
@@ -65,7 +92,7 @@ A scrollable map of the Unicode codepoints.
 </pre>
 
 
-## [CheckBox](~/api/Terminal.Gui.Views.CheckBox.yml)
+## [CheckBox](xref:Terminal.Gui.Views.CheckBox)
 
 Shows a checkbox that can be cycled between two or three states.
 
@@ -78,23 +105,23 @@ Shows a checkbox that can be cycled between two or three states.
 </pre>
 
 
-## [ColorPicker](~/api/Terminal.Gui.Views.ColorPicker.yml)
+## [ColorPicker](xref:Terminal.Gui.Views.ColorPicker)
 
-Color Picker supporting RGB, HSL, and HSV color models. Supports choosing colors with sliders and color names from the [IColorNameResolver](~/api/Terminal.Gui.Drawing.IColorNameResolver.yml).
+Color Picker supporting RGB, HSL, and HSV color models. Supports choosing colors with sliders and color names from the <xref:Terminal.Gui.Drawing.IColorNameResolver>.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
 <span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>H:</span><span style='color:#FF0000;background:#FF0000'> </span><span style='color:#FF3C00;background:#FF3C00'> </span><span style='color:#FF7700;background:#FF7700'> </span><span style='color:#FFB700;background:#FFB700'> </span><span style='color:#FFF200;background:#FFF200'> </span><span style='color:#CCFF00;background:#CCFF00'> </span><span style='color:#90FF00;background:#90FF00'> </span><span style='color:#55FF00;background:#55FF00'> </span><span style='color:#15FF00;background:#15FF00'> </span><span style='color:#00FF26;background:#00FF26'> </span><span style='color:#00FF66;background:#00FF66'> </span><span style='color:#00FFA2;background:#00FFA2'> </span><span style='color:#00FFDD;background:#00FFDD'> </span><span style='color:#00E1FF;background:#00E1FF'> </span><span style='color:#00A6FF;background:#00A6FF'> </span><span style='color:#0066FF;background:#0066FF'> </span><span style='color:#002BFF;background:#002BFF'> </span><span style='color:#1100FF;background:#1100FF'> </span><span style='color:#5100FF;background:#5100FF'> </span><span style='color:#8C00FF;background:#8C00FF'> </span><span style='color:#CC00FF;background:#CC00FF'> </span><span style='color:#FF00F6;background:#FF00F6'> </span><span style='color:#FF00BB;background:#FF00BB'> </span><span style='color:#FF007B;background:#FF007B'> </span><span style='color:#FF0040;background:#FF0040'> </span><span style='color:#000000;background:#FF0000'>▲</span><span style='color:#FFFFFF;background:#000000'>355 ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊S:</span><span style='color:#E8E8E8;background:#E8E8E8'> </span><span style='color:#E8DEDF;background:#E8DEDF'> </span><span style='color:#E7D4D6;background:#E7D4D6'> </span><span style='color:#E9CED0;background:#E9CED0'> </span><span style='color:#E9C4C7;background:#E9C4C7'> </span><span style='color:#E8BABE;background:#E8BABE'> </span><span style='color:#E8B0B5;background:#E8B0B5'> </span><span style='color:#E8A6AB;background:#E8A6AB'> </span><span style='color:#E89CA2;background:#E89CA2'> </span><span style='color:#E9969D;background:#E9969D'> </span><span style='color:#E88C94;background:#E88C94'> </span><span style='color:#E8828B;background:#E8828B'> </span><span style='color:#E87881;background:#E87881'> </span><span style='color:#E76E78;background:#E76E78'> </span><span style='color:#E86873;background:#E86873'> </span><span style='color:#E85E6A;background:#E85E6A'> </span><span style='color:#E85461;background:#E85461'> </span><span style='color:#E84A58;background:#E84A58'> </span><span style='color:#000000;background:#E7404E'>▲</span><span style='color:#E73645;background:#E73645'> </span><span style='color:#E83040;background:#E83040'> </span><span style='color:#E82636;background:#E82636'> </span><span style='color:#E91C2D;background:#E91C2D'> </span><span style='color:#E71324;background:#E71324'> </span><span style='color:#E60A1C;background:#E60A1C'> </span><span style='color:#EB0014;background:#EB0014'> </span><span style='color:#FFFFFF;background:#000000'>70  ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊V:</span><span style='color:#000000;background:#000000'> </span><span style='color:#0C0404;background:#0C0404'> </span><span style='color:#140607;background:#140607'> </span><span style='color:#1F090B;background:#1F090B'> </span><span style='color:#270C0E;background:#270C0E'> </span><span style='color:#330F12;background:#330F12'> </span><span style='color:#3F1316;background:#3F1316'> </span><span style='color:#471519;background:#471519'> </span><span style='color:#52191D;background:#52191D'> </span><span style='color:#5A1B20;background:#5A1B20'> </span><span style='color:#661E24;background:#661E24'> </span><span style='color:#722229;background:#722229'> </span><span style='color:#7A242B;background:#7A242B'> </span><span style='color:#862830;background:#862830'> </span><span style='color:#8D2A32;background:#8D2A32'> </span><span style='color:#992E37;background:#992E37'> </span><span style='color:#A5313B;background:#A5313B'> </span><span style='color:#AD343E;background:#AD343E'> </span><span style='color:#B93742;background:#B93742'> </span><span style='color:#C03945;background:#C03945'> </span><span style='color:#CC3E49;background:#CC3E49'> </span><span style='color:#D7424E;background:#D7424E'> </span><span style='color:#E04250;background:#E04250'> </span><span style='color:#000000;background:#EB4755'>▲</span><span style='color:#F44856;background:#F44856'> </span><span style='color:#FF4D5B;background:#FF4D5B'> </span><span style='color:#FFFFFF;background:#000000'>91  ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊Hex:#E74856  </span><span style='color:#E74856;background:#000000'>■</span><span style='color:#FFFFFF;background:#000000'>                  ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>H:</span><span style='color:#FF0000;background:#FF0000'> </span><span style='color:#FF3C00;background:#FF3C00'> </span><span style='color:#FF7700;background:#FF7700'> </span><span style='color:#FFB700;background:#FFB700'> </span><span style='color:#FFF200;background:#FFF200'> </span><span style='color:#CCFF00;background:#CCFF00'> </span><span style='color:#90FF00;background:#90FF00'> </span><span style='color:#55FF00;background:#55FF00'> </span><span style='color:#15FF00;background:#15FF00'> </span><span style='color:#00FF26;background:#00FF26'> </span><span style='color:#00FF66;background:#00FF66'> </span><span style='color:#00FFA2;background:#00FFA2'> </span><span style='color:#00FFDD;background:#00FFDD'> </span><span style='color:#00E1FF;background:#00E1FF'> </span><span style='color:#00A6FF;background:#00A6FF'> </span><span style='color:#0066FF;background:#0066FF'> </span><span style='color:#002BFF;background:#002BFF'> </span><span style='color:#1100FF;background:#1100FF'> </span><span style='color:#5100FF;background:#5100FF'> </span><span style='color:#8C00FF;background:#8C00FF'> </span><span style='color:#CC00FF;background:#CC00FF'> </span><span style='color:#FF00F6;background:#FF00F6'> </span><span style='color:#FF00BB;background:#FF00BB'> </span><span style='color:#FF007B;background:#FF007B'> </span><span style='color:#FF0040;background:#FF0040'> </span><span style='color:#000000;background:#FF0000'>▲</span><span style='color:#FFFFFF;background:#808080'>355 </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊S:</span><span style='color:#E8E8E8;background:#E8E8E8'> </span><span style='color:#E8DEDF;background:#E8DEDF'> </span><span style='color:#E7D4D6;background:#E7D4D6'> </span><span style='color:#E9CED0;background:#E9CED0'> </span><span style='color:#E9C4C7;background:#E9C4C7'> </span><span style='color:#E8BABE;background:#E8BABE'> </span><span style='color:#E8B0B5;background:#E8B0B5'> </span><span style='color:#E8A6AB;background:#E8A6AB'> </span><span style='color:#E89CA2;background:#E89CA2'> </span><span style='color:#E9969D;background:#E9969D'> </span><span style='color:#E88C94;background:#E88C94'> </span><span style='color:#E8828B;background:#E8828B'> </span><span style='color:#E87881;background:#E87881'> </span><span style='color:#E76E78;background:#E76E78'> </span><span style='color:#E86873;background:#E86873'> </span><span style='color:#E85E6A;background:#E85E6A'> </span><span style='color:#E85461;background:#E85461'> </span><span style='color:#E84A58;background:#E84A58'> </span><span style='color:#000000;background:#E7404E'>▲</span><span style='color:#E73645;background:#E73645'> </span><span style='color:#E83040;background:#E83040'> </span><span style='color:#E82636;background:#E82636'> </span><span style='color:#E91C2D;background:#E91C2D'> </span><span style='color:#E71324;background:#E71324'> </span><span style='color:#E60A1C;background:#E60A1C'> </span><span style='color:#EB0014;background:#EB0014'> </span><span style='color:#FFFFFF;background:#808080'>70  </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊V:</span><span style='color:#000000;background:#000000'> </span><span style='color:#0C0404;background:#0C0404'> </span><span style='color:#140607;background:#140607'> </span><span style='color:#1F090B;background:#1F090B'> </span><span style='color:#270C0E;background:#270C0E'> </span><span style='color:#330F12;background:#330F12'> </span><span style='color:#3F1316;background:#3F1316'> </span><span style='color:#471519;background:#471519'> </span><span style='color:#52191D;background:#52191D'> </span><span style='color:#5A1B20;background:#5A1B20'> </span><span style='color:#661E24;background:#661E24'> </span><span style='color:#722229;background:#722229'> </span><span style='color:#7A242B;background:#7A242B'> </span><span style='color:#862830;background:#862830'> </span><span style='color:#8D2A32;background:#8D2A32'> </span><span style='color:#992E37;background:#992E37'> </span><span style='color:#A5313B;background:#A5313B'> </span><span style='color:#AD343E;background:#AD343E'> </span><span style='color:#B93742;background:#B93742'> </span><span style='color:#C03945;background:#C03945'> </span><span style='color:#CC3E49;background:#CC3E49'> </span><span style='color:#D7424E;background:#D7424E'> </span><span style='color:#E04250;background:#E04250'> </span><span style='color:#000000;background:#EB4755'>▲</span><span style='color:#F44856;background:#F44856'> </span><span style='color:#FF4D5B;background:#FF4D5B'> </span><span style='color:#FFFFFF;background:#808080'>91  </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊Hex:</span><span style='color:#FFFFFF;background:#808080'>#E74856 </span><span style='color:#FFFFFF;background:#000000'> </span><span style='color:#E74856;background:#000000'>■</span><span style='color:#FFFFFF;background:#000000'>                  ┊</span>
 <span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
 
 </pre>
 
 
-## [ColorPicker16](~/api/Terminal.Gui.Views.ColorPicker16.yml)
+## [ColorPicker16](xref:Terminal.Gui.Views.ColorPicker16)
 
 A sinple color picker that supports the legacy 16 ANSI colors
 
@@ -110,111 +137,104 @@ A sinple color picker that supports the legacy 16 ANSI colors
 </pre>
 
 
-## [ComboBox](~/api/Terminal.Gui.Views.ComboBox.yml)
-
-Provides a drop-down list of items the user can select from.
-
-
-<pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                             </span><span style='color:#000000;background:#FFFFFF'>▼</span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
-
-</pre>
-
-
-## [DateField](~/api/Terminal.Gui.Views.DateField.yml)
+## [DateField](xref:Terminal.Gui.Views.DateField)
 
 Provides date editing functionality with specialized cursor behavior for date entry.
 
 
-<pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#FFFFFF;background:#000000'>┌┤</span><span style='color:#000000;background:#FFFFFF'>Caption</span><span style='color:#FFFFFF;background:#000000'>├┄┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊ 01/01/000┊</span>
-<span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┘</span>
 
-</pre>
-
-
-## [DatePicker](~/api/Terminal.Gui.Views.DatePicker.yml)
+## [DatePicker](xref:Terminal.Gui.Views.DatePicker)
 
 Lets the user pick a date from a visual calendar.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#FFFFFF;background:#000000'>┌────────────────────────────┐</span>
-<span style='color:#FFFFFF;background:#000000'>│Date:  01/12/2026           │</span>
-<span style='color:#FFFFFF;background:#000000'>│┌───┬───┬───┬───┬───┬───┬──┐│</span>
-<span style='color:#FFFFFF;background:#000000'>││Sun│Mon│Tue│Wed│Thu│Fri│Sa││</span>
-<span style='color:#FFFFFF;background:#000000'>│├───┼───┼───┼───┼───┼───┼──┤│</span>
-<span style='color:#FFFFFF;background:#000000'>││-  │-  │-  │-  │1  │2  │3 ││</span>
-<span style='color:#FFFFFF;background:#000000'>││4  │5  │6  │7  │8  │9  │10││</span>
-<span style='color:#FFFFFF;background:#000000'>││11 │</span><span style='color:#828282;background:#7A7A7A;font-weight:900'>12 </span><span style='color:#FFFFFF;background:#000000'>│13 │14 │15 │16 │17││</span>
-<span style='color:#FFFFFF;background:#000000'>││18 │19 │20 │21 │22 │23 │24││</span>
-<span style='color:#FFFFFF;background:#000000'>││25 │26 │27 │28 │29 │30 │31││</span>
-<span style='color:#FFFFFF;background:#000000'>││-  │-  │-  │-  │-  │-  │- ││</span>
-<span style='color:#FFFFFF;background:#000000'>│└───┴───┴───┴───┴───┴───┴──┘│</span>
-<span style='color:#FFFFFF;background:#000000'>│           ◄◄  ►►           │</span>
-<span style='color:#FFFFFF;background:#000000'>└────────────────────────────┘</span>
+<span style='color:#FFFFFF;background:#000000'>┌─────────────────────────────┐</span>
+<span style='color:#FFFFFF;background:#000000'>│Date: </span><span style='color:#000000;background:#FFFFFF'>0</span><span style='color:#FFFFFF;background:#808080'>3/10/2026             </span><span style='color:#FFFFFF;background:#000000'>│</span>
+<span style='color:#FFFFFF;background:#000000'>│┌───┬───┬───┬───┬───┬───┬───┐│</span>
+<span style='color:#FFFFFF;background:#000000'>││Sun│Mon│Tue│Wed│Thu│Fri│Sat││</span>
+<span style='color:#FFFFFF;background:#000000'>│├───┼───┼───┼───┼───┼───┼───┤│</span>
+<span style='color:#FFFFFF;background:#000000'>││1  │2  │3  │4  │5  │6  │7  ││</span>
+<span style='color:#FFFFFF;background:#000000'>││8  │9  │</span><span style='color:#000000;background:#808080;font-weight:900'>10 </span><span style='color:#FFFFFF;background:#000000'>│11 │12 │13 │14 ││</span>
+<span style='color:#FFFFFF;background:#000000'>││15 │16 │17 │18 │19 │20 │21 ││</span>
+<span style='color:#FFFFFF;background:#000000'>││22 │23 │24 │25 │26 │27 │28 ││</span>
+<span style='color:#FFFFFF;background:#000000'>││29 │30 │31 │-  │-  │-  │-  ││</span>
+<span style='color:#FFFFFF;background:#000000'>││-  │-  │-  │-  │-  │-  │-  ││</span>
+<span style='color:#FFFFFF;background:#000000'>│└───┴───┴───┴───┴───┴───┴───┘│</span>
+<span style='color:#FFFFFF;background:#000000'>│           ◄◄  ►►            │</span>
+<span style='color:#FFFFFF;background:#000000'>└─────────────────────────────┘</span>
 
 </pre>
 
 
-## [Dialog](~/api/Terminal.Gui.Views.Dialog.yml)
+## [Dialog](xref:Terminal.Gui.Views.Dialog)
 
-A modal dialog window with buttons across the bottom. When a button is pressed, [Terminal.Gui.App.IRunnable.Result](~/api/Terminal.Gui.App.IRunnable.Result.yml) is set to the button's index.
+A modal dialog window with buttons across the bottom. When a button is pressed, <xref:Terminal.Gui.App.IRunnable%601.Result> is set to the button's index (0-based).
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#ADD8E6;background:#242124'>┏┥</span><span style='color:#242124;background:#ADD8E6'>Dialog Title</span><span style='color:#ADD8E6;background:#242124'>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#ADD8E6;background:#242124;text-decoration:underline 1px solid'>E</span><span style='color:#ADD8E6;background:#242124'>xample: </span><span style='color:#ADD8E6;background:#000000'>Type and press ENTER to accept.         </span><span style='color:#ADD8E6;background:#242124'> ┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃                                                  ┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>                                                  </span><span style='color:#ADD8E6;background:#242124'>┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>                               ⟦ </span><span style='color:#36454F;background:#ADD8E6;font-weight:900;text-decoration:underline 1px solid'>C</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>ancel ⟧ ⟦► </span><span style='color:#36454F;background:#ADD8E6;font-weight:900;text-decoration:underline 1px solid'>O</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>K ◄⟧</span><span style='color:#ADD8E6;background:#242124'>┃</span>
-<span style='color:#ADD8E6;background:#242124'>┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛</span>
+┏┥<span style='color:#0C0C0C;background:#CCCCCC'>Dialog Title</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style='text-decoration:underline 1px solid'>E</span>xample: <span style='color:#000000;background:#FFFFFF;font-weight:900'>Type and press ENTER to accept.</span><span style='color:#CCCCCC;background:#4C4C4C'>         </span> ┃
+┃                                                  ┃
+┃                                                  ┃
+┃                               ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧ ⟦► <span style='text-decoration:underline 1px solid'>O</span>K ◄⟧┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 </pre>
 
 
-## [FileDialog](~/api/Terminal.Gui.Views.FileDialog.yml)
+## [Dialog\<T\>](xref:Terminal.Gui.Views.Dialog`1)
 
-The base-class for [OpenDialog](~/api/Terminal.Gui.Views.OpenDialog.yml) and [SaveDialog](~/api/Terminal.Gui.Views.SaveDialog.yml)
+A generic modal dialog window with buttons across the bottom. Derive from this class to create dialogs that return custom result types.
+
+
+
+## [DropDownList](xref:Terminal.Gui.Views.DropDownList)
+
+A dropdown/combo-box control that combines a <xref:Terminal.Gui.Views.TextField> with a popover <xref:Terminal.Gui.Views.ListView> for selecting from a list of items.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#ADD8E6;background:#242124'>┏┥</span><span style='color:#242124;background:#ADD8E6'>Open</span><span style='color:#ADD8E6;background:#242124'>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#A9A2A9;background:#225A6D;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#ADD8E6;background:#000000'>                                   </span><span style='color:#ADD8E6;background:#242124'>┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃⟦▲⟧                                                                        ┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃┌────────────────────┬──────────┬─────────────────────────────────────────┐┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│Filename (▲)        │Size      │Modified                                 │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃├────────────────────┼──────────┼─────────────────────────────────────────►┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│</span><span style='color:#A9A2A9;background:#225A6D;font-weight:900'>..                  │          │                                         </span><span style='color:#ADD8E6;background:#242124'>│┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\_exported_templates│          │2025-09-12T12:16:14                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\_site              │          │2026-01-12T21:04:46                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\api                │          │2026-01-12T21:04:11                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\apispec            │          │2026-01-12T20:55:38                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\docs               │          │2026-01-12T21:39:42                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\images             │          │2025-09-12T12:16:14                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\includes           │          │2026-01-12T21:17:40                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\schemas            │          │2026-01-12T09:53:44                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\scripts            │          │2026-01-12T19:53:17                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#225A6D;background:#000000;text-decoration:underline 1px solid'>F</span><span style='color:#225A6D;background:#000000'>ind</span><span style='color:#ADD8E6;background:#000000'>                                                                       </span><span style='color:#ADD8E6;background:#242124'>┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃                                                                           ┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>                                                                           </span><span style='color:#ADD8E6;background:#242124'>┃</span>
-<span style='color:#FFFFFF;background:#000000'>                                                                             </span>
-<span style='color:#FFFFFF;background:#000000'>                                                                             </span>
+<span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┐</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>Germany  </span><span style='color:#FFFFFF;background:#000000'>▼┊</span>
+<span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┘</span>
 
 </pre>
 
 
-## [FlagSelector](~/api/Terminal.Gui.Views.FlagSelector.yml)
+## [FileDialog](xref:Terminal.Gui.Views.FileDialog)
 
-Provides a user interface for displaying and selecting non-mutually-exclusive flags from a provided dictionary. [FlagSelector%601](~/api/Terminal.Gui.Views.FlagSelector%601.yml) provides a type-safe version where a `[Flags]` enum can be provided.
+The base-class for <xref:Terminal.Gui.Views.OpenDialog> and <xref:Terminal.Gui.Views.SaveDialog>
+
+
+<pre style='color:#FFFFFF;background:#000000'>
+┏┥<span style='color:#0C0C0C;background:#CCCCCC'>Open</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style='color:#000000;background:#FFFFFF;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#CCCCCC;background:#4C4C4C'>                                   </span>┃
+┃⟦▲⟧                                                                        ┃
+┃┌────────────────────┬──────────┬──────────────────────────────┬───────────┃
+┃│Filename (▲)        │Size      │Modified                      │Type       ┃
+┃├────────────────────┼──────────┼──────────────────────────────┼───────────┃
+┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                              │&lt;Directory&gt;</span>┃
+┃│\_exported_templates│          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
+┃│\_site              │          │2026-03-10T11:03:24           │&lt;Directory&gt;┃
+┃│\api                │          │2026-03-10T11:02:45           │&lt;Directory&gt;┃
+┃│\apispec            │          │2026-03-09T09:23:54           │&lt;Directory&gt;┃
+┃│\docs               │          │2026-03-10T10:40:04           │&lt;Directory&gt;┃
+┃│\images             │          │2026-03-04T13:02:07           │&lt;Directory&gt;┃
+┃│\includes           │          │2026-03-04T12:44:37           │&lt;Directory&gt;┃
+┃│\schemas            │          │2026-01-15T21:25:29           │&lt;Directory&gt;┃
+┃│\scripts            │          │2026-03-04T12:44:37           │&lt;Directory&gt;┃
+┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14           │.png       ┃
+┃                                                                           ┃
+┃⟦►<span style='text-decoration:underline 1px solid'>T</span>ree⟧                                                  ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧⟦► <span style='text-decoration:underline 1px solid'>O</span>K ◄⟧┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+</pre>
+
+
+## [FlagSelector](xref:Terminal.Gui.Views.FlagSelector)
+
+Provides a user interface for displaying and selecting non-mutually-exclusive flags from a provided dictionary. <xref:Terminal.Gui.Views.FlagSelector%601> provides a type-safe version where a `[Flags]` enum can be provided.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -224,19 +244,19 @@ Provides a user interface for displaying and selecting non-mutually-exclusive fl
 <span style='color:#FFFFFF;background:#000000'>┊☐ S</span><span style='color:#FFFFFF;background:#000000;text-decoration:underline 1px solid'>h</span><span style='color:#FFFFFF;background:#000000'>owAllFlag            ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊☐ Sh</span><span style='color:#FFFFFF;background:#000000;text-decoration:underline 1px solid'>o</span><span style='color:#FFFFFF;background:#000000'>w Value Editor Style┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊☐ </span><span style='color:#FFFFFF;background:#000000;text-decoration:underline 1px solid'>A</span><span style='color:#FFFFFF;background:#000000'>ll Styles             ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#BDBDBD;background:#000000'>0</span><span style='color:#FFFFFF;background:#000000'>                        ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#808080;background:#808080'>0</span><span style='color:#FFFFFF;background:#808080'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
 <span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
 
 </pre>
 
 
-## [FlagSelector\<T\>](~/api/Terminal.Gui.Views.FlagSelector-1.yml)
+## [FlagSelector\<T\>](xref:Terminal.Gui.Views.FlagSelector`1)
 
-Provides a user interface for displaying and selecting non-mutually-exclusive flags in a type-safe way. [FlagSelector](~/api/Terminal.Gui.Views.FlagSelector.yml) provides a non-type-safe version. `TFlagsEnum` must be a valid enum type with the '[Flags]' attribute.
+Provides a user interface for displaying and selecting non-mutually-exclusive flags in a type-safe way. <xref:Terminal.Gui.Views.FlagSelector> provides a non-type-safe version. `TFlagsEnum` must be a valid enum type with the '[Flags]' attribute.
 
 
 
-## [FrameView](~/api/Terminal.Gui.Views.FrameView.yml)
+## [FrameView](xref:Terminal.Gui.Views.FrameView)
 
 A non-overlapped container for other views with a border and optional title.
 
@@ -266,7 +286,7 @@ A non-overlapped container for other views with a border and optional title.
 </pre>
 
 
-## [GraphView](~/api/Terminal.Gui.Views.GraphView.yml)
+## [GraphView](xref:Terminal.Gui.Views.GraphView)
 
 Displays graphs (bar, scatter, etc.) with flexible labels, scaling, and scrolling
 
@@ -296,39 +316,39 @@ Displays graphs (bar, scatter, etc.) with flexible labels, scaling, and scrollin
 </pre>
 
 
-## [HexView](~/api/Terminal.Gui.Views.HexView.yml)
+## [HexView](xref:Terminal.Gui.Views.HexView)
 
 Provides a hex editor with the left side showing the hex values of the bytes in a `Stream` and the right side showing the contents (filtered to printable Unicode glyphs).
 
 
 <pre style='color:#FFFFFF;background:#000000'>
 <span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>00000000</span><span style='color:#FFFFFF;background:#000000'> </span><span style='color:#828282;background:#7A7A7A;font-weight:900'>48</span><span style='color:#FFFFFF;background:#000000'> 65 78 56 ┊ 69 65 77 20 ┊ 64 61 74 61  </span><span style='color:#828282;background:#7A7A7A;font-weight:900'>H</span><span style='color:#FFFFFF;background:#000000'>exView data                ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>00000000</span><span style='color:#FFFFFF;background:#000000'> </span><span style='color:#000000;background:#808080;font-weight:900'>48</span><span style='color:#FFFFFF;background:#000000'> 65 78 56 ┊ 69 65 77 20 ┊ 64 61 74 61  </span><span style='color:#000000;background:#808080;font-weight:900'>H</span><span style='color:#FFFFFF;background:#000000'>exView data                ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>0000000c</span><span style='color:#FFFFFF;background:#000000'> 20 77 69 74 ┊ 68 20 77 69 ┊ 64 65 20 63   with wide c                ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>00000018</span><span style='color:#FFFFFF;background:#000000'> 6f 64 65 70 ┊ 6f 69 6e 74 ┊ 73 3a 20 f0  odepoints: �                ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>00000024</span><span style='color:#FFFFFF;background:#000000'> 9d 94 b9 41 ┊ e2 84 9d f0 ┊ 9d 94 bd 21  ���A�������!                ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>00000030</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#BDBDBD;background:#000000'>0000003c</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#BDBDBD;background:#000000'>00000048</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#BDBDBD;background:#000000'>00000054</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#BDBDBD;background:#000000'>00000060</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#BDBDBD;background:#000000'>0000006c</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#BDBDBD;background:#000000'>00000078</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#BDBDBD;background:#000000'>00000084</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#BDBDBD;background:#000000'>00000090</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#BDBDBD;background:#000000'>0000009c</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#BDBDBD;background:#000000'>000000a8</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#BDBDBD;background:#000000'>000000b4</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#BDBDBD;background:#000000'>000000c0</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#BDBDBD;background:#000000'>000000cc</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#E6E6E6;background:#000000'>0000003c</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#E6E6E6;background:#000000'>00000048</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#E6E6E6;background:#000000'>00000054</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#E6E6E6;background:#000000'>00000060</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#E6E6E6;background:#000000'>0000006c</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#E6E6E6;background:#000000'>00000078</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#E6E6E6;background:#000000'>00000084</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#E6E6E6;background:#000000'>00000090</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#E6E6E6;background:#000000'>0000009c</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#E6E6E6;background:#000000'>000000a8</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#E6E6E6;background:#000000'>000000b4</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#E6E6E6;background:#000000'>000000c0</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#E6E6E6;background:#000000'>000000cc</span><span style='color:#FFFFFF;background:#000000'>             ┊             ┊                                          ┊</span>
 <span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
 
 </pre>
 
 
-## [Label](~/api/Terminal.Gui.Views.Label.yml)
+## [Label](xref:Terminal.Gui.Views.Label)
 
-Displays text that describes the View next in the [View.SubViews](~/api/Terminal.Gui.ViewBase.View.SubViews.yml). When the user presses a hotkey that matches the [View.HotKey](~/api/Terminal.Gui.ViewBase.View.HotKey.yml) of the Label, the next [View](~/api/Terminal.Gui.ViewBase.View.yml) in [View.SubViews](~/api/Terminal.Gui.ViewBase.View.SubViews.yml) will be activated.
+Displays text that describes the View next in the <xref:Terminal.Gui.ViewBase.View.SubViews>. When the user presses a hotkey that matches the <xref:Terminal.Gui.ViewBase.View.HotKey> of the Label, the next <xref:Terminal.Gui.ViewBase.View> in <xref:Terminal.Gui.ViewBase.View.SubViews> will be activated.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -339,9 +359,9 @@ Displays text that describes the View next in the [View.SubViews](~/api/Terminal
 </pre>
 
 
-## [LegendAnnotation](~/api/Terminal.Gui.Views.LegendAnnotation.yml)
+## [LegendAnnotation](xref:Terminal.Gui.Views.LegendAnnotation)
 
-Used by [GraphView](~/api/Terminal.Gui.Views.GraphView.yml) to render smbol definitions in a graph, e.g. colors and their meanings
+Used by <xref:Terminal.Gui.Views.GraphView> to render symbol definitions in a graph, e.g. colors and their meanings
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -369,9 +389,9 @@ Used by [GraphView](~/api/Terminal.Gui.Views.GraphView.yml) to render smbol defi
 </pre>
 
 
-## [Line](~/api/Terminal.Gui.Views.Line.yml)
+## [Line](xref:Terminal.Gui.Views.Line)
 
-Draws a single line using the [LineStyle](~/api/Terminal.Gui.Drawing.LineStyle.yml) specified by [Line.Style](~/api/Terminal.Gui.Views.Line.Style.yml).
+Draws a single line using the <xref:Terminal.Gui.Drawing.LineStyle> specified by <xref:Terminal.Gui.Views.Line.Style>.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -380,7 +400,7 @@ Draws a single line using the [LineStyle](~/api/Terminal.Gui.Drawing.LineStyle.y
 </pre>
 
 
-## [LinearRange](~/api/Terminal.Gui.Views.LinearRange.yml)
+## [LinearRange](xref:Terminal.Gui.Views.LinearRange)
 
 Provides a linear range control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
 
@@ -394,13 +414,13 @@ Provides a linear range control letting the user navigate from a set of typed op
 </pre>
 
 
-## [LinearRange\<T\>](~/api/Terminal.Gui.Views.LinearRange-1.yml)
+## [LinearRange\<T\>](xref:Terminal.Gui.Views.LinearRange`1)
 
 Provides a type-safe linear range control letting the user navigate from a set of typed options in a linear manner using the keyboard or mouse.
 
 
 
-## [ListView](~/api/Terminal.Gui.Views.ListView.yml)
+## [ListView](xref:Terminal.Gui.Views.ListView)
 
 Provides a scrollable list of data where each item can be activated to perform an action.
 
@@ -409,6 +429,7 @@ Provides a scrollable list of data where each item can be activated to perform a
 <span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
 <span style='color:#FFFFFF;background:#000000'>┊List Item 1                                                                   ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊List Item two                                                                 ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊List Item 3                                                                   ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊List Item Quattro                                                             ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊Last List Item                                                                ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
@@ -424,30 +445,30 @@ Provides a scrollable list of data where each item can be activated to perform a
 <span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
 <span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
 
 </pre>
 
 
-## [Menu](~/api/Terminal.Gui.Views.Menu.yml)
+## [Menu](xref:Terminal.Gui.Views.Menu)
 
-A [Bar](~/api/Terminal.Gui.Views.Bar.yml)-derived object to be used as a vertically-oriented menu. Each subview is a [MenuItem](~/api/Terminal.Gui.Views.MenuItem.yml).
+A vertically-oriented <xref:Terminal.Gui.Views.Bar> that contains <xref:Terminal.Gui.Views.MenuItem> items, supporting cascading sub-menus, selection tracking, and the <xref:Terminal.Gui.ViewBase.IValue%601> pattern.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#36454F;background:#ADD8E6;font-weight:900'>┌─────────────────────────┐</span>
-<span style='color:#36454F;background:#ADD8E6;font-weight:900'>│</span><span style='color:#ADD8E6;background:#36454F;font-weight:900'> Q</span><span style='color:#ADD8E6;background:#36454F;font-weight:900;text-decoration:underline 1px solid'>u</span><span style='color:#ADD8E6;background:#36454F;font-weight:900'>it       Quit  </span><span style='color:#ADD8E6;background:#36454F;font-weight:900;text-decoration:underline 1px solid'>Ctrl+Z</span><span style='color:#ADD8E6;background:#36454F;font-weight:900'> </span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>│</span>
-<span style='color:#36454F;background:#ADD8E6;font-weight:900'>│ Help  Help Text      </span><span style='color:#36454F;background:#ADD8E6;font-weight:900;text-decoration:underline 1px solid'>F1</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'> │</span>
-<span style='color:#36454F;background:#ADD8E6;font-weight:900'>│ ☐ </span><span style='color:#36454F;background:#ADD8E6;font-weight:900;text-decoration:underline 1px solid'>C</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>heck   Czech      </span><span style='color:#36454F;background:#ADD8E6;font-weight:900;text-decoration:underline 1px solid'>F9</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'> │</span>
-<span style='color:#36454F;background:#ADD8E6;font-weight:900'>└─────────────────────────┘</span>
+<span style='color:#36454F;background:#ADD8E6;font-weight:900'>┌────────────────────────────────────┐</span>
+<span style='color:#36454F;background:#ADD8E6;font-weight:900'>│</span><span style='color:#ADD8E6;background:#36454F;font-weight:900'> </span><span style='color:#ADD8E6;background:#36454F;font-weight:900;text-decoration:underline 1px solid'>F</span><span style='color:#ADD8E6;background:#36454F;font-weight:900'>ormat  Text formatting options  </span><span style='color:#ADD8E6;background:#36454F;font-weight:900;text-decoration:underline 1px solid'>►</span><span style='color:#ADD8E6;background:#36454F;font-weight:900'> </span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>┌</span>
+<span style='color:#36454F;background:#ADD8E6;font-weight:900'>│ </span><span style='color:#36454F;background:#ADD8E6;font-weight:900;text-decoration:underline 1px solid'>V</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>iew               View options  </span><span style='color:#36454F;background:#ADD8E6;font-weight:900;text-decoration:underline 1px solid'>►</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'> │</span>
+<span style='color:#36454F;background:#ADD8E6;font-weight:900'>├────────────────────────────────────│</span>
+<span style='color:#36454F;background:#ADD8E6;font-weight:900'>│ </span><span style='color:#36454F;background:#ADD8E6;font-weight:900;text-decoration:underline 1px solid'>A</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>bout              About this demo │</span>
+<span style='color:#36454F;background:#ADD8E6;font-weight:900'>└────────────────────────────────────└</span>
 
 </pre>
 
 
-## [MenuBar](~/api/Terminal.Gui.Views.MenuBar.yml)
+## [MenuBar](xref:Terminal.Gui.Views.MenuBar)
 
-A horizontal list of [MenuBarItem](~/api/Terminal.Gui.Views.MenuBarItem.yml)s. Each [MenuBarItem](~/api/Terminal.Gui.Views.MenuBarItem.yml) can have a [PopoverMenu](~/api/Terminal.Gui.Views.PopoverMenu.yml) that is shown when the [MenuBarItem](~/api/Terminal.Gui.Views.MenuBarItem.yml) is selected.
+A horizontal <xref:Terminal.Gui.Views.Menu> that contains <xref:Terminal.Gui.Views.MenuBarItem> items. Each <xref:Terminal.Gui.Views.MenuBarItem> owns a <xref:Terminal.Gui.Views.PopoverMenu> that is displayed as a drop-down when the item is selected. Typically placed at the top of a window or view.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -456,9 +477,22 @@ A horizontal list of [MenuBarItem](~/api/Terminal.Gui.Views.MenuBarItem.yml)s. E
 </pre>
 
 
-## [MenuBarItem](~/api/Terminal.Gui.Views.MenuBarItem.yml)
+## [MenuBarItem](xref:Terminal.Gui.Views.MenuBarItem)
 
-A [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)-derived object to be used as items in a [MenuBar](~/api/Terminal.Gui.Views.MenuBar.yml). MenuBarItems hold a [MenuBarItem.PopoverMenu](~/api/Terminal.Gui.Views.MenuBarItem.PopoverMenu.yml) instead of a [MenuBarItem.SubMenu](~/api/Terminal.Gui.Views.MenuBarItem.SubMenu.yml).
+A <xref:Terminal.Gui.Views.MenuItem>-derived item for use in a <xref:Terminal.Gui.Views.MenuBar>. Each <xref:Terminal.Gui.Views.MenuBarItem> holds either a <xref:Terminal.Gui.Views.MenuBarItem.PopoverMenu> (modal, default) or an inline <xref:Terminal.Gui.Views.MenuItem.SubMenu> (non-modal) that is displayed as a drop-down menu when the item is selected. The behavior is controlled by the <xref:Terminal.Gui.Views.MenuBarItem.UsePopoverMenu> property.
+
+
+<pre style='color:#FFFFFF;background:#000000'>
+<span style='color:#FFFFFF;background:#000000'>┌┄┄┐</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'>  </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>└┄┄┘</span>
+
+</pre>
+
+
+## [MenuItem](xref:Terminal.Gui.Views.MenuItem)
+
+A <xref:Terminal.Gui.Views.Shortcut>-derived item for use in a <xref:Terminal.Gui.Views.Menu>. Displays a command, help text, and key binding and supports nested <xref:Terminal.Gui.Views.MenuItem.SubMenu>s for cascading menu hierarchies.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -469,20 +503,7 @@ A [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)-derived object to be used as
 </pre>
 
 
-## [MenuItem](~/api/Terminal.Gui.Views.MenuItem.yml)
-
-A [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)-derived object to be used as a menu item in a [Menu](~/api/Terminal.Gui.Views.Menu.yml). Has title, an A [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)-derived object to be used as a menu item in a [Menu](~/api/Terminal.Gui.Views.Menu.yml). Has title, an associated help text, and an action to execute on activation.
-
-
-<pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#FFFFFF'> </span><span style='color:#000000;background:#FFFFFF;text-decoration:underline 1px solid'>S</span><span style='color:#000000;background:#FFFFFF'>hortcut  Shortcut help  </span><span style='color:#000000;background:#FFFFFF;text-decoration:underline 1px solid'>F1</span><span style='color:#000000;background:#FFFFFF'> </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
-
-</pre>
-
-
-## [NumericUpDown](~/api/Terminal.Gui.Views.NumericUpDown.yml)
+## [NumericUpDown](xref:Terminal.Gui.Views.NumericUpDown)
 
 Enables the user to increase or decrease an int by clicking on the up or down buttons.
 
@@ -495,47 +516,45 @@ Enables the user to increase or decrease an int by clicking on the up or down bu
 </pre>
 
 
-## [NumericUpDown\<T\>](~/api/Terminal.Gui.Views.NumericUpDown-1.yml)
+## [NumericUpDown\<T\>](xref:Terminal.Gui.Views.NumericUpDown`1)
 
 Enables the user to increase or decrease a value with the mouse or keyboard in type-safe way.
 
 
 
-## [OpenDialog](~/api/Terminal.Gui.Views.OpenDialog.yml)
+## [OpenDialog](xref:Terminal.Gui.Views.OpenDialog)
 
-Provides an interactive [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) for selecting files or directories for opening
+Provides an interactive <xref:Terminal.Gui.Views.Dialog> for selecting files or directories for opening
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#ADD8E6;background:#242124'>┏┥</span><span style='color:#242124;background:#ADD8E6'>Open</span><span style='color:#ADD8E6;background:#242124'>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#A9A2A9;background:#225A6D;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#ADD8E6;background:#000000'>                                   </span><span style='color:#ADD8E6;background:#242124'>┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃⟦▲⟧                                                                        ┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃┌────────────────────┬──────────┬─────────────────────────────────────────┐┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│Filename (▲)        │Size      │Modified                                 │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃├────────────────────┼──────────┼─────────────────────────────────────────►┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│</span><span style='color:#A9A2A9;background:#225A6D;font-weight:900'>..                  │          │                                         </span><span style='color:#ADD8E6;background:#242124'>│┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\_exported_templates│          │2025-09-12T12:16:14                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\_site              │          │2026-01-12T21:04:46                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\api                │          │2026-01-12T21:04:11                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\apispec            │          │2026-01-12T20:55:38                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\docs               │          │2026-01-12T21:39:42                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\images             │          │2025-09-12T12:16:14                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\includes           │          │2026-01-12T21:17:40                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\schemas            │          │2026-01-12T09:53:44                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\scripts            │          │2026-01-12T19:53:17                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#225A6D;background:#000000;text-decoration:underline 1px solid'>F</span><span style='color:#225A6D;background:#000000'>ind</span><span style='color:#ADD8E6;background:#000000'>                                                                       </span><span style='color:#ADD8E6;background:#242124'>┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃                                                                           ┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>                                                                           </span><span style='color:#ADD8E6;background:#242124'>┃</span>
-<span style='color:#FFFFFF;background:#000000'>                                                                             </span>
-<span style='color:#FFFFFF;background:#000000'>                                                                             </span>
+┏┥<span style='color:#0C0C0C;background:#CCCCCC'>Open</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style='color:#000000;background:#FFFFFF;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#CCCCCC;background:#4C4C4C'>                                   </span>┃
+┃⟦▲⟧                                                                        ┃
+┃┌────────────────────┬──────────┬──────────────────────────────┬───────────┃
+┃│Filename (▲)        │Size      │Modified                      │Type       ┃
+┃├────────────────────┼──────────┼──────────────────────────────┼───────────┃
+┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                              │&lt;Directory&gt;</span>┃
+┃│\_exported_templates│          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
+┃│\_site              │          │2026-03-10T11:03:24           │&lt;Directory&gt;┃
+┃│\api                │          │2026-03-10T11:02:45           │&lt;Directory&gt;┃
+┃│\apispec            │          │2026-03-09T09:23:54           │&lt;Directory&gt;┃
+┃│\docs               │          │2026-03-10T10:40:04           │&lt;Directory&gt;┃
+┃│\images             │          │2026-03-04T13:02:07           │&lt;Directory&gt;┃
+┃│\includes           │          │2026-03-04T12:44:37           │&lt;Directory&gt;┃
+┃│\schemas            │          │2026-01-15T21:25:29           │&lt;Directory&gt;┃
+┃│\scripts            │          │2026-03-04T12:44:37           │&lt;Directory&gt;┃
+┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14           │.png       ┃
+┃                                                                           ┃
+┃⟦►<span style='text-decoration:underline 1px solid'>T</span>ree⟧                                                  ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧⟦► <span style='text-decoration:underline 1px solid'>O</span>K ◄⟧┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 </pre>
 
 
-## [OptionSelector](~/api/Terminal.Gui.Views.OptionSelector.yml)
+## [OptionSelector](xref:Terminal.Gui.Views.OptionSelector)
 
-Provides a user interface for displaying and selecting a single item from a list of options. Each option is represented by a checkbox, but only one can be selected at a time. [OptionSelector%601](~/api/Terminal.Gui.Views.OptionSelector%601.yml) provides a type-safe version where a enum can be provided.
+Provides a user interface for displaying and selecting a single item from a list of options. Each option is represented by a checkbox, but only one can be selected at a time. <xref:Terminal.Gui.Views.OptionSelector%601> provides a type-safe version where a enum can be provided.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -549,15 +568,15 @@ Provides a user interface for displaying and selecting a single item from a list
 </pre>
 
 
-## [OptionSelector\<T\>](~/api/Terminal.Gui.Views.OptionSelector-1.yml)
+## [OptionSelector\<T\>](xref:Terminal.Gui.Views.OptionSelector`1)
 
-Provides a user interface for displaying and selecting a single item from a list of options in a type-safe way. Each option is represented by a checkbox, but only one can be selected at a time. [OptionSelector](~/api/Terminal.Gui.Views.OptionSelector.yml) provides a non-type-safe version.
+Provides a user interface for displaying and selecting a single item from a list of options in a type-safe way. Each option is represented by a checkbox, but only one can be selected at a time. <xref:Terminal.Gui.Views.OptionSelector> provides a non-type-safe version.
 
 
 
-## [PopoverMenu](~/api/Terminal.Gui.Views.PopoverMenu.yml)
+## [PopoverMenu](xref:Terminal.Gui.Views.PopoverMenu)
 
-A [Terminal.Gui.App.PopoverBaseImpl](~/api/Terminal.Gui.App.PopoverBaseImpl.yml)-derived view that provides a cascading menu. Can be used as a context menu or a drop-down menu as part of [MenuBar](~/api/Terminal.Gui.Views.MenuBar.yml).
+A <xref:Terminal.Gui.App.IPopover>-derived view that provides a cascading menu. Can be used as a context menu or a drop-down menu as part of <xref:Terminal.Gui.Views.MenuBar>.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -585,96 +604,94 @@ A [Terminal.Gui.App.PopoverBaseImpl](~/api/Terminal.Gui.App.PopoverBaseImpl.yml)
 </pre>
 
 
-## [ProgressBar](~/api/Terminal.Gui.Views.ProgressBar.yml)
+## [ProgressBar](xref:Terminal.Gui.Views.ProgressBar)
 
 A Progress Bar view that can indicate progress of an activity visually.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
 <span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#828282;background:#7A7A7A;font-weight:900'>▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌                    </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌▌                    ┊</span>
 <span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
 
 </pre>
 
 
-## [Runnable](~/api/Terminal.Gui.Views.Runnable.yml)
+## [Prompt\<T\>](xref:Terminal.Gui.Views.Prompt`2)
 
-Base implementation of [Terminal.Gui.App.IRunnable](~/api/Terminal.Gui.App.IRunnable.yml) for views that can be run as blocking sessions without returning a result.
+A dialog that wraps any <xref:Terminal.Gui.ViewBase.View> with Ok/Cancel buttons, extracting a typed result when the user accepts.
+
+
+
+## [Runnable](xref:Terminal.Gui.Views.Runnable)
+
+Base implementation of <xref:Terminal.Gui.App.IRunnable> for views that can be run as blocking sessions without returning a result.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#5F9EA0;background:#36454F'>┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#5F9EA0;background:#36454F'>┊</span><span style='color:#36454F;background:#5F9EA0'>This is some demo text.</span><span style='color:#5F9EA0;background:#36454F'>                                                       ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>┊                                                                              ┊</span>
-<span style='color:#5F9EA0;background:#36454F'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
+┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊<span style='color:#0C0C0C;background:#CCCCCC'>This is some demo text.</span>                                                       ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+┊                                                                              ┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 
 </pre>
 
 
-## [Runnable\<T\>](~/api/Terminal.Gui.Views.Runnable-1.yml)
+## [Runnable\<T\>](xref:Terminal.Gui.Views.Runnable`1)
 
-Base implementation of [Terminal.Gui.App.IRunnable%601](~/api/Terminal.Gui.App.IRunnable%601.yml) for views that can be run as blocking sessions.
-
-
-
-## [RunnableWrapper\<T\>](~/api/Terminal.Gui.Views.RunnableWrapper-2.yml)
-
-Wraps any [View](~/api/Terminal.Gui.ViewBase.View.yml) to make it runnable with a typed result, similar to how [FlagSelector%601](~/api/Terminal.Gui.Views.FlagSelector%601.yml) wraps [FlagSelector](~/api/Terminal.Gui.Views.FlagSelector.yml).
+Base implementation of <xref:Terminal.Gui.App.IRunnable%601> for views that can be run as blocking sessions.
 
 
 
-## [SaveDialog](~/api/Terminal.Gui.Views.SaveDialog.yml)
+## [SaveDialog](xref:Terminal.Gui.Views.SaveDialog)
 
-Provides an interactive [Dialog](~/api/Terminal.Gui.Views.Dialog.yml) for selecting files or directories for saving
+Provides an interactive <xref:Terminal.Gui.Views.Dialog> for selecting files or directories for saving
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#ADD8E6;background:#242124'>┏┥</span><span style='color:#242124;background:#ADD8E6'>Save</span><span style='color:#ADD8E6;background:#242124'>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓</span>
-<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#A9A2A9;background:#225A6D;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#ADD8E6;background:#000000'>                                   </span><span style='color:#ADD8E6;background:#242124'>┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃⟦▲⟧                                                                        ┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃┌────────────────────┬──────────┬─────────────────────────────────────────┐┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│Filename (▲)        │Size      │Modified                                 │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃├────────────────────┼──────────┼─────────────────────────────────────────►┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│</span><span style='color:#A9A2A9;background:#225A6D;font-weight:900'>..                  │          │                                         </span><span style='color:#ADD8E6;background:#242124'>│┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\_exported_templates│          │2025-09-12T12:16:14                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\_site              │          │2026-01-12T21:04:46                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\api                │          │2026-01-12T21:04:11                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\apispec            │          │2026-01-12T20:55:38                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\docs               │          │2026-01-12T21:39:42                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\images             │          │2025-09-12T12:16:14                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\includes           │          │2026-01-12T21:17:40                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\schemas            │          │2026-01-12T09:53:44                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│\scripts            │          │2026-01-12T19:53:17                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14                      │┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#225A6D;background:#000000;text-decoration:underline 1px solid'>F</span><span style='color:#225A6D;background:#000000'>ind</span><span style='color:#ADD8E6;background:#000000'>                                                                       </span><span style='color:#ADD8E6;background:#242124'>┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃                                                                           ┃</span>
-<span style='color:#ADD8E6;background:#242124'>┃</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>                                                                           </span><span style='color:#ADD8E6;background:#242124'>┃</span>
-<span style='color:#FFFFFF;background:#000000'>                                                                             </span>
-<span style='color:#FFFFFF;background:#000000'>                                                                             </span>
+┏┥<span style='color:#0C0C0C;background:#CCCCCC'>Save</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style='color:#000000;background:#FFFFFF;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#CCCCCC;background:#4C4C4C'>                                   </span>┃
+┃⟦▲⟧                                                                        ┃
+┃┌────────────────────┬──────────┬──────────────────────────────┬───────────┃
+┃│Filename (▲)        │Size      │Modified                      │Type       ┃
+┃├────────────────────┼──────────┼──────────────────────────────┼───────────┃
+┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                              │&lt;Directory&gt;</span>┃
+┃│\_exported_templates│          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
+┃│\_site              │          │2026-03-10T11:03:24           │&lt;Directory&gt;┃
+┃│\api                │          │2026-03-10T11:02:45           │&lt;Directory&gt;┃
+┃│\apispec            │          │2026-03-09T09:23:54           │&lt;Directory&gt;┃
+┃│\docs               │          │2026-03-10T10:40:04           │&lt;Directory&gt;┃
+┃│\images             │          │2026-03-04T13:02:07           │&lt;Directory&gt;┃
+┃│\includes           │          │2026-03-04T12:44:37           │&lt;Directory&gt;┃
+┃│\schemas            │          │2026-01-15T21:25:29           │&lt;Directory&gt;┃
+┃│\scripts            │          │2026-03-04T12:44:37           │&lt;Directory&gt;┃
+┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14           │.png       ┃
+┃                                                                           ┃
+┃⟦►<span style='text-decoration:underline 1px solid'>T</span>ree⟧                                                ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧⟦► <span style='text-decoration:underline 1px solid'>S</span>ave ◄⟧┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 </pre>
 
 
-## [ScrollBar](~/api/Terminal.Gui.Views.ScrollBar.yml)
+## [ScrollBar](xref:Terminal.Gui.Views.ScrollBar)
 
-Indicates the size of scrollable content and controls the position of the visible content, either vertically or horizontally. Two [Button](~/api/Terminal.Gui.Views.Button.yml)s are provided, one to scroll up or left and one to scroll down or right. Between the buttons is a [ScrollSlider](~/api/Terminal.Gui.Views.ScrollSlider.yml) that can be dragged to control the position of the visible content. The ScrollSlier is sized to show the proportion of the scrollable content to the size of the [View.Viewport](~/api/Terminal.Gui.ViewBase.View.Viewport.yml).
+Indicates the size of scrollable content and controls the position of the visible content, either vertically or horizontally. Two <xref:Terminal.Gui.Views.Button>s are provided, one to scroll up or left and one to scroll down or right. Between the buttons is a <xref:Terminal.Gui.Views.ScrollSlider> that can be dragged to control the position of the visible content. The ScrollSlier is sized to show the proportion of the scrollable content to the size of the <xref:Terminal.Gui.ViewBase.View.Viewport>.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -702,9 +719,9 @@ Indicates the size of scrollable content and controls the position of the visibl
 </pre>
 
 
-## [ScrollSlider](~/api/Terminal.Gui.Views.ScrollSlider.yml)
+## [ScrollSlider](xref:Terminal.Gui.Views.ScrollSlider)
 
-Represents the proportion of the visible content to the Viewport in a [ScrollBar](~/api/Terminal.Gui.Views.ScrollBar.yml). Can be dragged with the mouse, constrained by the size of the Viewport of it's superview. Can be oriented either vertically or horizontally.
+Represents the proportion of the visible content to the Viewport in a <xref:Terminal.Gui.Views.ScrollBar>. Can be dragged with the mouse, constrained by the size of the Viewport of it's superview. Can be oriented either vertically or horizontally.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -717,15 +734,15 @@ Represents the proportion of the visible content to the Viewport in a [ScrollBar
 </pre>
 
 
-## [SelectorBase](~/api/Terminal.Gui.Views.SelectorBase.yml)
+## [SelectorBase](xref:Terminal.Gui.Views.SelectorBase)
 
-The abstract base class for [OptionSelector%601](~/api/Terminal.Gui.Views.OptionSelector%601.yml) and [FlagSelector%601](~/api/Terminal.Gui.Views.FlagSelector%601.yml).
+The abstract base class for <xref:Terminal.Gui.Views.OptionSelector%601> and <xref:Terminal.Gui.Views.FlagSelector%601>.
 
 
 
-## [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)
+## [Shortcut](xref:Terminal.Gui.Views.Shortcut)
 
-Displays a command, help text, and a key binding. When the key specified by [Shortcut.Key](~/api/Terminal.Gui.Views.Shortcut.Key.yml) is pressed, the command will be invoked. Useful for displaying a command in [Bar](~/api/Terminal.Gui.Views.Bar.yml) such as a menu, toolbar, or status bar.
+Displays a command, help text, and a key binding. Serves as the foundational building block for <xref:Terminal.Gui.Views.Bar>, <xref:Terminal.Gui.Views.Menu>, <xref:Terminal.Gui.Views.MenuBar>, and <xref:Terminal.Gui.Views.StatusBar>.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -736,7 +753,7 @@ Displays a command, help text, and a key binding. When the key specified by [Sho
 </pre>
 
 
-## [SpinnerView](~/api/Terminal.Gui.Views.SpinnerView.yml)
+## [SpinnerView](xref:Terminal.Gui.Views.SpinnerView)
 
 Displays a spinning glyph or combinations of glyphs to indicate progress or activity
 
@@ -749,9 +766,9 @@ Displays a spinning glyph or combinations of glyphs to indicate progress or acti
 </pre>
 
 
-## [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml)
+## [StatusBar](xref:Terminal.Gui.Views.StatusBar)
 
-A status bar is a [View](~/api/Terminal.Gui.ViewBase.View.yml) that snaps to the bottom of the Viewport displaying set of [Shortcut](~/api/Terminal.Gui.Views.Shortcut.yml)s. The [StatusBar](~/api/Terminal.Gui.Views.StatusBar.yml) should be context-sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a new instance of a status bar.
+A status bar is a <xref:Terminal.Gui.ViewBase.View> that snaps to the bottom of the Viewport displaying set of <xref:Terminal.Gui.Views.Shortcut>s. The <xref:Terminal.Gui.Views.StatusBar> should be context-sensitive. This means, if the main menu and an open text editor are visible, the items probably shown will be ~F1~ Help ~F2~ Save ~F3~ Load. While a dialog to ask a file to load is executed, the remaining commands will probably be ~F1~ Help. So for each context must be a new instance of a status bar.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -760,9 +777,9 @@ A status bar is a [View](~/api/Terminal.Gui.ViewBase.View.yml) that snaps to the
 </pre>
 
 
-## [Tab](~/api/Terminal.Gui.Views.Tab.yml)
+## [Tab](xref:Terminal.Gui.Views.Tab)
 
-A single tab in a [TabView](~/api/Terminal.Gui.Views.TabView.yml).
+A single tab in a <xref:Terminal.Gui.Views.TabView>.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -790,21 +807,21 @@ A single tab in a [TabView](~/api/Terminal.Gui.Views.TabView.yml).
 </pre>
 
 
-## [TableView](~/api/Terminal.Gui.Views.TableView.yml)
+## [TableView](xref:Terminal.Gui.Views.TableView)
 
-Displays and enables infinite scrolling through tabular data based on a [ITableSource](~/api/Terminal.Gui.Views.ITableSource.yml). See the TableView Deep Dive for more.
+Displays and enables infinite scrolling through tabular data based on a <xref:Terminal.Gui.Views.ITableSource>. See the TableView Deep Dive for more.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
 <span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊┌──────────────────┬──────────────────────┬──────┬───────────────────────────┐┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊│StrCol            │DateCol               │IntCol│DoubleCol                  │┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊├──────────────────┼──────────────────────┼──────┼───────────────────────────►┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊│</span><span style='color:#000000;background:#FFFFFF'>Demo text in row 0</span><span style='color:#FFFFFF;background:#000000'>│12/25/2000 12:00:00 AM│0     │-0.5                       │┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊│Demo text in row 1│12/25/2001 12:00:00 AM│0     │0.40245424998107093        │┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊│Demo text in row 2│12/25/2002 12:00:00 AM│0     │1.3973309257520972         │┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊│Demo text in row 3│12/25/2003 12:00:00 AM│2     │1.3318544644079424         │┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊│Demo text in row 4│12/25/2004 12:00:00 AM│1     │0.09525688765349649        │┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊┌──────────────────┬──────────────────────┬──────┬───────────────────┬────────┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│StrCol            │DateCol               │IntCol│DoubleCol          │NullsCol┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊├──────────────────┼──────────────────────┼──────┼───────────────────┼────────┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│</span><span style='color:#000000;background:#FFFFFF'>Demo text in row 0</span><span style='color:#FFFFFF;background:#000000'>│12/25/2000 12:00:00 AM│0     │-0.5               │-       ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│Demo text in row 1│12/25/2001 12:00:00 AM│0     │0.40245424998107093│-       ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│Demo text in row 2│12/25/2002 12:00:00 AM│0     │1.3973309257520972 │-       ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│Demo text in row 3│12/25/2003 12:00:00 AM│2     │1.3318544644079424 │-       ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊│Demo text in row 4│12/25/2004 12:00:00 AM│1     │0.09525688765349649│-       ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
 <span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
@@ -820,7 +837,7 @@ Displays and enables infinite scrolling through tabular data based on a [ITableS
 </pre>
 
 
-## [TabView](~/api/Terminal.Gui.Views.TabView.yml)
+## [TabView](xref:Terminal.Gui.Views.TabView)
 
 Control that hosts multiple sub views, presenting a single one at once.
 
@@ -850,78 +867,71 @@ Control that hosts multiple sub views, presenting a single one at once.
 </pre>
 
 
-## [TextField](~/api/Terminal.Gui.Views.TextField.yml)
+## [TextField](xref:Terminal.Gui.Views.TextField)
 
 Single-line text editor.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
 <span style='color:#FFFFFF;background:#000000'>┌┤</span><span style='color:#000000;background:#FFFFFF'>Caption</span><span style='color:#FFFFFF;background:#000000'>├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊This is a test.                                                               ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#000000;background:#808080;font-weight:900'>This is a test.</span><span style='color:#FFFFFF;background:#808080'>                                                               </span><span style='color:#FFFFFF;background:#000000'>┊</span>
 <span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
 
 </pre>
 
 
-## [TextValidateField](~/api/Terminal.Gui.Views.TextValidateField.yml)
+## [TextValidateField](xref:Terminal.Gui.Views.TextValidateField)
 
-Masked text editor that validates input through a [ITextValidateProvider](~/api/Terminal.Gui.Views.ITextValidateProvider.yml)
+Masked text editor that validates input through a <xref:Terminal.Gui.Views.ITextValidateProvider>
 
 
 <pre style='color:#FFFFFF;background:#000000'>
 <span style='color:#FFFFFF;background:#000000'>┌┤</span><span style='color:#000000;background:#FFFFFF'>^([0-9]?[0-9]?[0-9]|1000)$</span><span style='color:#FFFFFF;background:#000000'>├──────────────────────────────────────────────────┐</span>
-<span style='color:#FFFFFF;background:#000000'>│</span><span style='color:#000000;background:#FFFFFF'>999                                                                           </span><span style='color:#FFFFFF;background:#000000'>│</span>
+<span style='color:#FFFFFF;background:#000000'>│</span><span style='color:#000000;background:#FFFFFF'>9</span><span style='color:#FFFFFF;background:#808080'>99                                                                           </span><span style='color:#FFFFFF;background:#000000'>│</span>
 <span style='color:#FFFFFF;background:#000000'>└──────────────────────────────────────────────────────────────────────────────┘</span>
 
 </pre>
 
 
-## [TextView](~/api/Terminal.Gui.Views.TextView.yml)
+## [TextView](xref:Terminal.Gui.Views.TextView)
 
 Fully featured multi-line text editor
 
 
 <pre style='color:#FFFFFF;background:#000000'>
 <span style='color:#FFFFFF;background:#000000'>┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊TextView provides a fully featured multi-line text editor.                    ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊It supports word wrap and history for undo.                                   ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                                              ┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>TextView provides a fully featured multi-line text editor.                    </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>It supports word wrap and history for undo.                                   </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                              </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                              </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                              </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                              </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                              </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                              </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                              </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                              </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                              </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                              </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                              </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                              </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                              </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                              </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                              </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#808080'>                                                                              </span><span style='color:#FFFFFF;background:#000000'>┊</span>
 <span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
 
 </pre>
 
 
-## [TimeField](~/api/Terminal.Gui.Views.TimeField.yml)
+## [TimeField](xref:Terminal.Gui.Views.TimeField)
 
 Provides time editing functionality with specialized cursor behavior for time entry.
 
 
-<pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#FFFFFF;background:#000000'>┌┤</span><span style='color:#000000;background:#FFFFFF'>Captio</span><span style='color:#FFFFFF;background:#000000'>├┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊ 02:48:0┊</span>
-<span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┘</span>
 
-</pre>
+## [TreeView](xref:Terminal.Gui.Views.TreeView)
 
-
-## [TreeView](~/api/Terminal.Gui.Views.TreeView.yml)
-
-Convenience implementation of generic [TreeView%601](~/api/Terminal.Gui.Views.TreeView%601.yml) for any tree were all nodes implement [ITreeNode](~/api/Terminal.Gui.Views.ITreeNode.yml). See TreeView Deep Dive for more information.
+Convenience implementation of generic <xref:Terminal.Gui.Views.TreeView%601> for any tree were all nodes implement <xref:Terminal.Gui.Views.ITreeNode>. See TreeView Deep Dive for more information.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
@@ -949,92 +959,92 @@ Convenience implementation of generic [TreeView%601](~/api/Terminal.Gui.Views.Tr
 </pre>
 
 
-## [TreeView\<T\>](~/api/Terminal.Gui.Views.TreeView-1.yml)
+## [TreeView\<T\>](xref:Terminal.Gui.Views.TreeView`1)
 
-Hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a user defined [ITreeBuilder%601](~/api/Terminal.Gui.Views.ITreeBuilder%601.yml). See TreeView Deep Dive for more information.
+Hierarchical tree view with expandable branches. Branch objects are dynamically determined when expanded using a user defined <xref:Terminal.Gui.Views.ITreeBuilder%601>. See TreeView Deep Dive for more information.
 
 
 
-## [Window](~/api/Terminal.Gui.Views.Window.yml)
+## [Window](xref:Terminal.Gui.Views.Window)
 
 An overlapped container for other views with a border and optional title.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#ADD8E6;background:#242124'>┌──────────────────────────────────────────────────────────────────────────────┐</span>
-<span style='color:#ADD8E6;background:#242124'>│</span><span style='color:#242124;background:#ADD8E6'>This is some demo text.</span><span style='color:#ADD8E6;background:#242124'>                                                       │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>│                                                                              │</span>
-<span style='color:#ADD8E6;background:#242124'>└──────────────────────────────────────────────────────────────────────────────┘</span>
+┌──────────────────────────────────────────────────────────────────────────────┐
+│<span style='color:#0C0C0C;background:#CCCCCC'>This is some demo text.</span>                                                       │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+│                                                                              │
+└──────────────────────────────────────────────────────────────────────────────┘
 
 </pre>
 
 
-## [Wizard](~/api/Terminal.Gui.Views.Wizard.yml)
+## [Wizard](xref:Terminal.Gui.Views.Wizard)
 
 A multi-step dialog for collecting related data across sequential steps.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-<span style='color:#ADD8E6;background:#242124'>┌┤</span><span style='color:#242124;background:#ADD8E6'>Wizard Title - Example Step</span><span style='color:#ADD8E6;background:#242124'>├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#ADD8E6;background:#242124'>┊</span><span style='color:#ADD8E6;background:#242124;text-decoration:underline 1px solid'>E</span><span style='color:#ADD8E6;background:#242124'>nter Text: </span><span style='color:#ADD8E6;background:#000000'>                    </span><span style='color:#ADD8E6;background:#242124'>                  </span><span style='color:#48A7C7;background:#000000'>This is some help text  </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊                                                  </span><span style='color:#48A7C7;background:#000000'>for the WizardStep.     </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊    </span><span style='color:#ADD8E6;background:#242124;text-decoration:underline 1px solid'>A</span><span style='color:#ADD8E6;background:#242124'> List: ┌╌╌╌╌╌╌╌╌┐                            </span><span style='color:#48A7C7;background:#000000'>You can provide         </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊            ┆</span><span style='color:#A9A2A9;background:#225A6D;font-weight:900'>Item 1  </span><span style='color:#ADD8E6;background:#242124'>┆                            </span><span style='color:#48A7C7;background:#000000'>instructions or         </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊            ┆Item 2  ┆                            </span><span style='color:#48A7C7;background:#000000'>information to guide the</span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊            ┆Item 3  ┆                            </span><span style='color:#48A7C7;background:#000000'>user through this step  </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊            ┆Item 4  ┆                            </span><span style='color:#48A7C7;background:#000000'>of the wizard.          </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊            ┆Item 5  ┆                            </span><span style='color:#48A7C7;background:#000000'>                        </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊            └╌╌╌╌╌╌╌╌┘                            </span><span style='color:#48A7C7;background:#000000'>                        </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊                                                  </span><span style='color:#48A7C7;background:#000000'>                        </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊                                                  </span><span style='color:#48A7C7;background:#000000'>                        </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>                                                                          </span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>┊</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>                                                             ⟦► </span><span style='color:#36454F;background:#ADD8E6;font-weight:900;text-decoration:underline 1px solid'>N</span><span style='color:#36454F;background:#ADD8E6;font-weight:900'>ext... ◄⟧</span><span style='color:#ADD8E6;background:#242124'>┊</span>
-<span style='color:#ADD8E6;background:#242124'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
+┌┤<span style='color:#0C0C0C;background:#CCCCCC'>Wizard Title - Example Step</span>├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊<span style='text-decoration:underline 1px solid'>E</span>nter Text: <span style='color:#CCCCCC;background:#4C4C4C'>                    </span>                  <span style='color:#B2B2B2;background:#4C4C4C'>This is some help text  </span>┊
+┊                                                  <span style='color:#B2B2B2;background:#4C4C4C'>for the WizardStep.     </span>┊
+┊    <span style='text-decoration:underline 1px solid'>A</span> List: ┌╌╌╌╌╌╌╌╌┐                            <span style='color:#B2B2B2;background:#4C4C4C'>You can provide         </span>┊
+┊            ┆<span style='color:#000000;background:#FFFFFF;font-weight:900'>Item 1  </span>┆                            <span style='color:#B2B2B2;background:#4C4C4C'>instructions or         </span>┊
+┊            ┆Item 2  ┆                            <span style='color:#B2B2B2;background:#4C4C4C'>information to guide the</span>┊
+┊            ┆Item 3  ┆                            <span style='color:#B2B2B2;background:#4C4C4C'>user through this step  </span>┊
+┊            ┆Item 4  ┆                            <span style='color:#B2B2B2;background:#4C4C4C'>of the wizard.          </span>┊
+┊            ┆Item 5  ┆                            <span style='color:#B2B2B2;background:#4C4C4C'>                        </span>┊
+┊            └╌╌╌╌╌╌╌╌┘                            <span style='color:#B2B2B2;background:#4C4C4C'>                        </span>┊
+┊                                                  <span style='color:#B2B2B2;background:#4C4C4C'>                        </span>┊
+┊                                                  <span style='color:#B2B2B2;background:#4C4C4C'>                        </span>┊
+┊                                                                          ┊
+┊                                                             ⟦► <span style='text-decoration:underline 1px solid'>N</span>ext... ◄⟧┊
+└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
 
 </pre>
 
 
-## [WizardStep](~/api/Terminal.Gui.Views.WizardStep.yml)
+## [WizardStep](xref:Terminal.Gui.Views.WizardStep)
 
-A single step in a [Wizard](~/api/Terminal.Gui.Views.Wizard.yml). Can contain arbitrary [View](~/api/Terminal.Gui.ViewBase.View.yml)s and display help text in the right [Padding](~/api/Terminal.Gui.ViewBase.Padding.yml).
+A single step in a <xref:Terminal.Gui.Views.Wizard>. Can contain arbitrary <xref:Terminal.Gui.ViewBase.View>s and display help text in the right <xref:Terminal.Gui.ViewBase.Padding>.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
 <span style='color:#FFFFFF;background:#000000'>┌┤</span><span style='color:#000000;background:#FFFFFF'>Example Step</span><span style='color:#FFFFFF;background:#000000'>├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐</span>
-<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#000000;text-decoration:underline 1px solid'>E</span><span style='color:#FFFFFF;background:#000000'>nter Text:                                           </span><span style='color:#BDBDBD;background:#000000'>This is some help text  </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#BDBDBD;background:#000000'>for the WizardStep.     </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊    </span><span style='color:#FFFFFF;background:#000000;text-decoration:underline 1px solid'>A</span><span style='color:#FFFFFF;background:#000000'> List: ┌╌╌╌╌╌╌╌╌┐                                </span><span style='color:#BDBDBD;background:#000000'>You can provide         </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊            ┆</span><span style='color:#828282;background:#7A7A7A;font-weight:900'>Item 1  </span><span style='color:#FFFFFF;background:#000000'>┆                                </span><span style='color:#BDBDBD;background:#000000'>instructions or         </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊            ┆Item 2  ┆                                </span><span style='color:#BDBDBD;background:#000000'>information to guide the</span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊            ┆Item 3  ┆                                </span><span style='color:#BDBDBD;background:#000000'>user through this step  </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊            ┆Item 4  ┆                                </span><span style='color:#BDBDBD;background:#000000'>of the wizard.          </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊            ┆Item 5  ┆                                </span><span style='color:#BDBDBD;background:#000000'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊            └╌╌╌╌╌╌╌╌┘                                </span><span style='color:#BDBDBD;background:#000000'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#BDBDBD;background:#000000'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#BDBDBD;background:#000000'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#BDBDBD;background:#000000'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#BDBDBD;background:#000000'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#BDBDBD;background:#000000'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#BDBDBD;background:#000000'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#BDBDBD;background:#000000'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#BDBDBD;background:#000000'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
-<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#BDBDBD;background:#000000'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊</span><span style='color:#FFFFFF;background:#000000;text-decoration:underline 1px solid'>E</span><span style='color:#FFFFFF;background:#000000'>nter Text: </span><span style='color:#FFFFFF;background:#808080'>                    </span><span style='color:#FFFFFF;background:#000000'>                      </span><span style='color:#808080;background:#808080'>This is some help text  </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#808080;background:#808080'>for the WizardStep.     </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊    </span><span style='color:#FFFFFF;background:#000000;text-decoration:underline 1px solid'>A</span><span style='color:#FFFFFF;background:#000000'> List: ┌╌╌╌╌╌╌╌╌┐                                </span><span style='color:#808080;background:#808080'>You can provide         </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊            ┆</span><span style='color:#000000;background:#808080;font-weight:900'>Item 1  </span><span style='color:#FFFFFF;background:#000000'>┆                                </span><span style='color:#808080;background:#808080'>instructions or         </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊            ┆Item 2  ┆                                </span><span style='color:#808080;background:#808080'>information to guide the</span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊            ┆Item 3  ┆                                </span><span style='color:#808080;background:#808080'>user through this step  </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊            ┆Item 4  ┆                                </span><span style='color:#808080;background:#808080'>of the wizard.          </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊            ┆Item 5  ┆                                </span><span style='color:#808080;background:#808080'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊            └╌╌╌╌╌╌╌╌┘                                </span><span style='color:#808080;background:#808080'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#808080;background:#808080'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#808080;background:#808080'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#808080;background:#808080'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#808080;background:#808080'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#808080;background:#808080'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#808080;background:#808080'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#808080;background:#808080'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#808080;background:#808080'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
+<span style='color:#FFFFFF;background:#000000'>┊                                                      </span><span style='color:#808080;background:#808080'>                        </span><span style='color:#FFFFFF;background:#000000'>┊</span>
 <span style='color:#FFFFFF;background:#000000'>└┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘</span>
 
 </pre>

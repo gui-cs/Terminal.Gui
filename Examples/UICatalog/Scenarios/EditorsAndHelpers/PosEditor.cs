@@ -21,7 +21,7 @@ public class PosEditor : EditorBase
 
     protected override void OnUpdateLayoutSettings ()
     {
-        Enabled = ViewToEdit is not Adornment;
+        Enabled = ViewToEdit is not AdornmentView;
 
         if (ViewToEdit is null)
         {
@@ -85,7 +85,7 @@ public class PosEditor : EditorBase
         var label = new Label
         {
             X = 0, Y = 0,
-            Text = $"{Title}:"
+            Text = $"{this.ToIdentifyingString ()}:"
         };
         Add (label);
         _posOptionSelector = new () { X = 0, Y = Pos.Bottom (label), Labels = _optionLabels };

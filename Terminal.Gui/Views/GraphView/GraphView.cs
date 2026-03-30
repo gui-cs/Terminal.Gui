@@ -1,6 +1,20 @@
 namespace Terminal.Gui.Views;
 
-/// <summary>Displays graphs (bar, scatter, etc...) with flexible labels, scaling, and scrolling</summary>
+/// <summary>Displays graphs (bar, scatter, etc...) with flexible labels, scaling, and scrolling.</summary>
+/// <remarks>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Scrolls the graph left or right.</description>
+///         </item>
+///         <item>
+///             <term>Up / Down</term> <description>Scrolls the graph up or down.</description>
+///         </item>
+///     </list>
+/// </remarks>
 public class GraphView : View, IDesignable
 {
     /// <summary>Creates a new graph with a 1 to 1 graph space with absolute layout.</summary>
@@ -241,7 +255,7 @@ public class GraphView : View, IDesignable
         // Draw 'before' annotations
         foreach (IAnnotation a in Annotations.ToArray ().Where (a => a.BeforeSeries))
         {
-            a.Render (this);
+            a.Render (this, context);
         }
 
         SetDriverColorToGraphColor ();
@@ -280,7 +294,7 @@ public class GraphView : View, IDesignable
         // Draw 'after' annotations
         foreach (IAnnotation a in Annotations.ToArray ().Where (a => !a.BeforeSeries))
         {
-            a.Render (this);
+            a.Render (this, context);
         }
 
         return true;

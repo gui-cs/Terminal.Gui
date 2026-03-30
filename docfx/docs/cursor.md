@@ -12,7 +12,7 @@ Terminal.Gui provides a unified cursor management system that separates the **Te
 
 ## The Cursor Class
 
-Terminal.Gui uses a `Cursor` record class to represent cursor state:
+Terminal.Gui uses a <xref:Terminal.Gui.Drivers.Cursor> record class to represent cursor state:
 
 ```csharp
 public record Cursor
@@ -36,7 +36,7 @@ public record Cursor
 
 ## CursorStyle Enum
 
-The `CursorStyle` enum is based on ANSI/VT DECSCUSR terminal standards:
+The <xref:Terminal.Gui.Drivers.CursorStyle> enum is based on ANSI/VT DECSCUSR terminal standards:
 
 ```csharp
 public enum CursorStyle
@@ -58,7 +58,7 @@ public enum CursorStyle
 
 ## Setting the Cursor in Views
 
-Views use the `View.Cursor` property to manage cursor state:
+Views use the <xref:Terminal.Gui.ViewBase.View.Cursor> property to manage cursor state:
 
 ### Basic Usage
 
@@ -77,7 +77,7 @@ Point newScreenPos = ViewportToScreen (new Point (6, 0));
 Cursor = Cursor with { Position = newScreenPos };
 ```
 
-### TextField Example
+### <xref:Terminal.Gui.Views.TextField> Example
 
 ```csharp
 protected override void OnDrawContent (Rectangle viewport)
@@ -133,8 +133,8 @@ Cursor = new Cursor { Position = screenPos, Style = CursorStyle.BlinkingBar };
 The framework automatically hides the cursor when:
 1. `view.Enabled == false`
 2. `view.Visible == false`
-3. `view.CanFocus == false`
-4. `view.HasFocus == false`
+3. <xref:Terminal.Gui.ViewBase.View.CanFocus> `== false`
+4. <xref:Terminal.Gui.ViewBase.View.HasFocus> `== false`
 5. View is not the most focused view (not deepest in focus chain)
 6. Cursor position is outside any ancestor viewport bounds
 
@@ -145,7 +145,7 @@ Views only need to:
 
 ## Efficient Cursor Updates
 
-### SetCursorNeedsUpdate()
+### [SetCursorNeedsUpdate()](xref:Terminal.Gui.ViewBase.View.SetCursorNeedsUpdate*)
 
 When cursor position changes without requiring a full redraw, use:
 
@@ -164,7 +164,7 @@ This signals the driver that cursor position needs updating on next iteration wi
 - Focus changes
 
 **When NOT to use:**
-- View content changed (use `SetNeedsDraw()` instead)
+- View content changed (use <xref:Terminal.Gui.ViewBase.View.NeedsDraw> instead)
 - Layout changed
 
 ### Example: Cursor Movement
@@ -214,12 +214,12 @@ Windows supports two modes based on terminal capabilities:
 
 **Legacy Console Mode** (pre-Windows 10 or conhost compatibility mode):
 - Uses Win32 `CONSOLE_CURSOR_INFO` structure with P/Invoke
-- Maps `CursorStyle` to cursor size percentage (Block → 100%, Underline/Bar → 15%)
+- Maps <xref:Terminal.Gui.Drivers.CursorStyle> to cursor size percentage (Block → 100%, Underline/Bar → 15%)
 - Cannot distinguish between blinking and steady styles
 
 **Modern VT Mode** (Windows Terminal, modern ConHost):
 - Uses ANSI escape sequences identical to Unix drivers
-- Full `CursorStyle` support via DECSCUSR
+- Full <xref:Terminal.Gui.Drivers.CursorStyle> support via DECSCUSR
 
 #### UnixOutput / AnsiOutput / NetOutput
 
@@ -280,13 +280,13 @@ The cursor is updated once per main loop iteration:
 Views that display text with a visible insertion point should:
 1. Track cursor position in content coordinates
 2. Check if cursor is within visible viewport bounds
-3. Convert to screen coordinates using `ViewportToScreen()`
-4. Set `Cursor` property with appropriate style (typically `BlinkingBar`)
+3. Convert to screen coordinates using [ViewportToScreen()](xref:Terminal.Gui.ViewBase.View.ViewportToScreen*)
+4. Set <xref:Terminal.Gui.ViewBase.View.Cursor> property with appropriate style (typically `BlinkingBar`)
 5. Hide cursor when out of viewport bounds or unfocused
 
 ### List Selection Pattern
 
-Views using highlight-based selection (like `ListView`) should hide the cursor:
+Views using highlight-based selection (like <xref:Terminal.Gui.Views.ListView>) should hide the cursor:
 
 ```csharp
 Cursor = new Cursor { Position = null };
@@ -298,13 +298,13 @@ The selection is indicated visually through attribute changes, not the terminal 
 
 **Before** (v1 / early v2): `PositionCursor()` override returned viewport-relative coordinates.
 
-**After** (current v2): Set `Cursor` property with screen-absolute coordinates during `OnDrawContent()`.
+**After** (current v2): Set <xref:Terminal.Gui.ViewBase.View.Cursor> property with screen-absolute coordinates during `OnDrawContent()`.
 
 Key changes:
 - No more `PositionCursor()` override
 - Cursor set during drawing, not in separate method
 - Must convert to screen coordinates explicitly
-- Use `ViewportToScreen()` for conversion
+- Use [ViewportToScreen()](xref:Terminal.Gui.ViewBase.View.ViewportToScreen*) for conversion
 
 ## Key Differences from Draw Cursor
 
@@ -313,7 +313,7 @@ Key changes:
 | Aspect | Terminal Cursor | Draw Cursor |
 |--------|----------------|-------------|
 | Purpose | Show user where input goes | Track where next character renders |
-| API | `View.Cursor` property | `IOutputBuffer.Col/Row` |
+| API | <xref:Terminal.Gui.ViewBase.View.Cursor> property | `IOutputBuffer.Col/Row` |
 | Affected by | `Cursor = new Cursor { ... }` | `Move()`, `AddRune()`, `AddStr()` |
 | Visibility | User sees blinking cursor | Internal only |
 | Coordinates | Screen-absolute | Buffer-relative |
@@ -336,10 +336,10 @@ Cursor = new Cursor { Position = screenPos, Style = CursorStyle.BlinkingBar };
 
 1. **Always use screen coordinates** for `Cursor.Position`
 2. **Always convert** from content/viewport to screen before setting
-3. **Use SetCursorNeedsUpdate()** for position-only changes (no redraw needed)
+3. **Use [SetCursorNeedsUpdate()](xref:Terminal.Gui.ViewBase.View.SetCursorNeedsUpdate*)** for position-only changes (no redraw needed)
 4. **Set to null** to hide cursor, don't use visibility tricks
 5. **Never call `Move()`** for cursor positioning (it affects Draw Cursor)
-6. **Don't access Driver directly** from views - use `View.Cursor` property
+6. **Don't access Driver directly** from views - use <xref:Terminal.Gui.ViewBase.View.Cursor> property
 7. **Test with viewport scrolling** to ensure coordinates are correct
 8. **Prefer immutable updates** using `with` expression
 
@@ -350,7 +350,7 @@ Cursor = new Cursor { Position = screenPos, Style = CursorStyle.BlinkingBar };
 **Check:**
 1. Is `Cursor.Position` set to a valid screen coordinate (not null)?
 2. Is `Cursor.Style` something other than `Hidden`?
-3. Does view have `HasFocus == true`?
+3. Does view have <xref:Terminal.Gui.ViewBase.View.HasFocus> `== true`?
 4. Is view the most focused (deepest in focus chain)?
 5. Is cursor position within all ancestor viewports?
 6. Is view `Enabled` and `Visible`?
@@ -359,14 +359,14 @@ Cursor = new Cursor { Position = screenPos, Style = CursorStyle.BlinkingBar };
 
 **Check:**
 1. Are you using screen coordinates (not content/viewport)?
-2. Did you call `ViewportToScreen()` or `ContentToScreen()`?
+2. Did you call [ViewportToScreen()](xref:Terminal.Gui.ViewBase.View.ViewportToScreen*) or [ContentToScreen()](xref:Terminal.Gui.ViewBase.View.ContentToScreen*)?
 3. Is viewport scrolling accounted for?
 4. Are ancestor viewports considered?
 
 ### Cursor flickers
 
 **Check:**
-1. Are you calling `SetNeedsDraw()` when only cursor moved? (Use `SetCursorNeedsUpdate()` instead)
+1. Are you calling `SetNeedsDraw()` when only cursor moved? (Use [SetCursorNeedsUpdate()](xref:Terminal.Gui.ViewBase.View.SetCursorNeedsUpdate*) instead)
 2. Is cursor being set/unset multiple times per frame?
 3. Is cursor style changing unnecessarily?
 

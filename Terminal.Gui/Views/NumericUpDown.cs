@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Numerics;
 
 namespace Terminal.Gui.Views;
@@ -7,11 +6,42 @@ namespace Terminal.Gui.Views;
 ///     Enables the user to increase or decrease a value with the mouse or keyboard in type-safe way.
 /// </summary>
 /// <remarks>
-///     Supports the following types: <see cref="int"/>, <see cref="long"/>, <see cref="double"/>, <see cref="double"/>,
-///     <see cref="decimal"/>. Attempting to use any other type will result in an <see cref="InvalidOperationException"/>.
+///     <para>
+///         Supports the following types: <see cref="int"/>, <see cref="long"/>, <see cref="double"/>, <see cref="double"/>
+///         ,
+///         <see cref="decimal"/>. Attempting to use any other type will result in an
+///         <see cref="InvalidOperationException"/>.
+///     </para>
+///     <para>
+///         Default key bindings are inherited from <see cref="View.DefaultKeyBindings"/>:
+///     </para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>CursorUp</term> <description>Increases the value (<see cref="Command.Up"/>).</description>
+///         </item>
+///         <item>
+///             <term>CursorDown</term> <description>Decreases the value (<see cref="Command.Down"/>).</description>
+///         </item>
+///     </list>
+///     <para>
+///         View-specific bindings can be added via <see cref="DefaultKeyBindings"/>.
+///     </para>
 /// </remarks>
 public class NumericUpDown<T> : View, IValue<T> where T : notnull
 {
+    /// <summary>
+    ///     Gets or sets the view-specific default key bindings for <see cref="NumericUpDown{T}"/>. All standard navigation
+    ///     bindings are inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary is empty by default.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
+
     private readonly Button _down;
 
     // TODO: Use a TextField instead of a Label
@@ -31,6 +61,8 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             throw new InvalidOperationException ("T must be a numeric type that supports addition and subtraction.");
         }
 
+        CanFocus = true;
+
         // `object` is supported only for AllViewsTester
         if (type != typeof (object))
         {
@@ -44,7 +76,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
 
-        _down = new ()
+        _down = new Button
         {
             Height = 1,
             Width = 1,
@@ -53,10 +85,10 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             Title = $"{Glyphs.DownArrow}",
             MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             CanFocus = false,
-            ShadowStyle = ShadowStyle.None,
+            ShadowStyle = null
         };
 
-        _number = new ()
+        _number = new View
         {
             Text = Value?.ToString () ?? "Err",
             X = Pos.Right (_down),
@@ -64,10 +96,10 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             Width = Dim.Auto (minimumContentDim: Dim.Func (_ => string.Format (Format, Value).GetColumns ())),
             Height = 1,
             TextAlignment = Alignment.Center,
-            CanFocus = true,
+            CanFocus = true
         };
 
-        _up = new ()
+        _up = new Button
         {
             X = Pos.Right (_number),
             Y = Pos.Top (_number),
@@ -78,62 +110,52 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             Title = $"{Glyphs.UpArrow}",
             MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             CanFocus = false,
-            ShadowStyle = ShadowStyle.None,
+            ShadowStyle = null
         };
-
-        CanFocus = true;
 
         _down.Accepting += OnDownButtonOnAccept;
         _up.Accepting += OnUpButtonOnAccept;
 
         Add (_down, _number, _up);
 
-        AddCommand (
-                    Command.Up,
-                    (ctx) =>
+        AddCommand (Command.Up,
+                    _ =>
                     {
                         if (type == typeof (object))
                         {
                             return false;
                         }
 
-                        // BUGBUG: If this is uncommented, the numericupdown in a shortcut will not work
-                        //if (RaiseActivating (ctx) is true)
-                        //{
-                        //    return true;
-                        //}
+                        InvokeCommand (Command.Activate);
 
                         if (Value is { } v && Increment is { } i && NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
                         {
                             Value = (T)helper!.Add (v, i);
                         }
+
                         return true;
                     });
 
-        AddCommand (
-                    Command.Down,
-                    (ctx) =>
+        AddCommand (Command.Down,
+                    _ =>
                     {
                         if (type == typeof (object))
                         {
                             return false;
                         }
 
-                        // BUGBUG: If this is uncommented, the numericupdown in a shortcut will not work
-                        //if (RaiseActivating (ctx) is true)
-                        //{
-                        //    return true;
-                        //}
+                        InvokeCommand (Command.Activate);
 
                         if (Value is { } v && Increment is { } i && NumericHelper.TryGetHelper (typeof (T), out INumericHelper? helper))
                         {
                             Value = (T)helper!.Subtract (v, i);
                         }
+
                         return true;
                     });
 
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.CursorDown, Command.Down);
+        // Apply layered key bindings (base View layer + NumericUpDown-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
 
         SetText ();
 
@@ -152,7 +174,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
         }
     }
 
-    private T? _value = default;
+    private T? _value;
 
     /// <summary>
     ///     Gets or sets the value that will be incremented or decremented.
@@ -194,19 +216,18 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             ValueChangedEventArgs<T?> changedArgs = new (oldValue, _value);
             OnValueChanged (changedArgs);
             ValueChanged?.Invoke (this, changedArgs);
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, _value));
         }
     }
 
-    /// <summary>
-    ///     Raised when <see cref="Value"/> is about to change.
-    ///     Set <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/> to cancel the change.
-    /// </summary>
+    /// <inheritdoc/>
     public event EventHandler<ValueChangingEventArgs<T?>>? ValueChanging;
 
-    /// <summary>
-    ///     Raised when <see cref="Value"/> has changed.
-    /// </summary>
+    /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<T?>>? ValueChanged;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>
     ///     Called before <see cref="Value"/> changes. Return <see langword="true"/> to cancel the change.
@@ -218,27 +239,25 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
     /// </summary>
     protected virtual void OnValueChanged (ValueChangedEventArgs<T?> args) { }
 
-    private string _format = "{0}";
-
     /// <summary>
     ///     Gets or sets the format string used to display the value. The default is "{0}".
     /// </summary>
     public string Format
     {
-        get => _format;
+        get;
         set
         {
-            if (_format == value)
+            if (field == value)
             {
                 return;
             }
 
-            _format = value;
+            field = value;
 
-            FormatChanged?.Invoke (this, new (value));
+            FormatChanged?.Invoke (this, new EventArgs<string> (value));
             SetText ();
         }
-    }
+    } = "{0}";
 
     /// <summary>
     ///     Raised when <see cref="Format"/> has changed.
@@ -251,23 +270,21 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
         Text = _number.Text;
     }
 
-    private T? _increment;
-
     /// <summary>
     /// </summary>
     public T? Increment
     {
-        get => _increment;
+        get;
         set
         {
-            if (_increment is { } oldVal && value is { } newVal && oldVal.Equals (newVal))
+            if (field is { } oldVal && value is { } && oldVal.Equals (value))
             {
                 return;
             }
 
-            _increment = value;
+            field = value;
 
-            IncrementChanged?.Invoke (this, new (value!));
+            IncrementChanged?.Invoke (this, new EventArgs<T> (value!));
         }
     }
 
@@ -277,8 +294,8 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
     public event EventHandler<EventArgs<T>>? IncrementChanged;
 
     // Prevent the drawing of Text
-    /// <inheritdoc />
-    protected override bool OnDrawingText () { return true; }
+    /// <inheritdoc/>
+    protected override bool OnDrawingText () => true;
 
     /// <summary>
     ///     Attempts to convert the specified <paramref name="value"/> to type <typeparamref name="TValue"/>.
@@ -312,8 +329,7 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
 /// <summary>
 ///     Enables the user to increase or decrease an <see langword="int"/> by clicking on the up or down buttons.
 /// </summary>
-public class NumericUpDown : NumericUpDown<int>
-{ }
+public class NumericUpDown : NumericUpDown<int>;
 
 internal interface INumericHelper
 {
@@ -335,16 +351,13 @@ internal static class NumericHelper
         Register<float> ();
         Register<double> ();
         Register<decimal> ();
+
         // Add more as needed
     }
 
-    private static void Register<T> () where T : INumber<T>
-    {
-        _helpers [typeof (T)] = new NumericHelperImpl<T> ();
-    }
+    private static void Register<T> () where T : INumber<T> => _helpers [typeof (T)] = new NumericHelperImpl<T> ();
 
-    public static bool TryGetHelper (Type t, out INumericHelper? helper)
-        => _helpers.TryGetValue (t, out helper);
+    public static bool TryGetHelper (Type t, out INumericHelper? helper) => _helpers.TryGetValue (t, out helper);
 
     private class NumericHelperImpl<T> : INumericHelper where T : INumber<T>
     {

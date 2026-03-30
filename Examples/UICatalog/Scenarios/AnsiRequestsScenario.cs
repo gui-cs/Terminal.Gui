@@ -15,7 +15,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
 
     private readonly List<DateTime> _sends = [];
 
-    private readonly object _lockAnswers = new ();
+    private readonly Lock _lockAnswers = new ();
     private readonly Dictionary<DateTime, string> _answers = new ();
     private Label? _lblSummary;
 
@@ -63,7 +63,7 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
     {
         var w = new View { Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
 
-        w.Padding!.Thickness = new Thickness (1);
+        w.Padding.Thickness = new Thickness (1);
 
         List<string> scrRequests =
         [
@@ -76,9 +76,13 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         ];
 
         // TODO: This UI would be cleaner/less rigid if Pos.Align were used
-        var cbRequests = new ComboBox
+        DropDownList cbRequests = new ()
         {
-            Width = 40, Height = 5, ReadOnly = true, Source = new ListWrapper<string> (new ObservableCollection<string> (scrRequests))
+            Title = "Ansi Escape Sequence",
+            BorderStyle = LineStyle.Dotted,
+            ReadOnly = true, 
+            Source = new ListWrapper<string> (new ObservableCollection<string> (scrRequests)),
+            Text = scrRequests [0]
         };
         w.Add (cbRequests);
 
@@ -94,56 +98,53 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         var tfTerminator = new TextField { X = Pos.Left (label), Y = Pos.Bottom (label), Width = 4 };
         w.Add (label, tfTerminator);
 
-        cbRequests.SelectedItemChanged += (_, _) =>
-                                          {
-                                              if (cbRequests.SelectedItem == -1)
-                                              {
-                                                  return;
-                                              }
+        cbRequests.ValueChanged += (_, args) =>
+                                   {
+                                       if (string.IsNullOrEmpty (args.NewValue))
+                                       {
+                                           return;
+                                       }
 
-                                              string selAnsiEscapeSequenceRequestName = scrRequests [cbRequests.SelectedItem];
-                                              AnsiEscapeSequence? selAnsiEscapeSequenceRequest = null;
+                                       string selAnsiEscapeSequenceRequestName = args.NewValue;
+                                       AnsiEscapeSequence? selAnsiEscapeSequenceRequest = null;
 
-                                              switch (selAnsiEscapeSequenceRequestName)
-                                              {
-                                                  case "CSI_SendDeviceAttributes":
-                                                      selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_SendDeviceAttributes;
+                                       switch (selAnsiEscapeSequenceRequestName)
+                                       {
+                                           case "CSI_SendDeviceAttributes":
+                                               selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_SendDeviceAttributes;
 
-                                                      break;
+                                               break;
 
-                                                  case "CSI_ReportTerminalSizeInChars":
-                                                      selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_ReportWindowSizeInChars;
+                                           case "CSI_ReportTerminalSizeInChars":
+                                               selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_ReportWindowSizeInChars;
 
-                                                      break;
+                                               break;
 
-                                                  case "CSI_RequestCursorPositionReport":
-                                                      selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_RequestCursorPositionReport;
+                                           case "CSI_RequestCursorPositionReport":
+                                               selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_RequestCursorPositionReport;
 
-                                                      break;
+                                               break;
 
-                                                  case "CSI_SendDeviceAttributes2":
-                                                      selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_SendDeviceAttributes2;
+                                           case "CSI_SendDeviceAttributes2":
+                                               selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_SendDeviceAttributes2;
 
-                                                      break;
+                                               break;
 
-                                                  case "CSI_RequestWindowSizeInPixels":
-                                                      selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_RequestWindowSizeInPixels;
+                                           case "CSI_RequestWindowSizeInPixels":
+                                               selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_RequestWindowSizeInPixels;
 
-                                                      break;
+                                               break;
 
-                                                  case "CSI_RequestSixelResolution":
-                                                      selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_RequestSixelResolution;
+                                           case "CSI_RequestSixelResolution":
+                                               selAnsiEscapeSequenceRequest = EscSeqUtils.CSI_RequestSixelResolution;
 
-                                                      break;
-                                              }
+                                               break;
+                                       }
 
-                                              tfRequest.Text = selAnsiEscapeSequenceRequest is { } ? selAnsiEscapeSequenceRequest.Request : "";
-                                              tfValue.Text = selAnsiEscapeSequenceRequest is { } ? selAnsiEscapeSequenceRequest.Value ?? "" : "";
-                                              tfTerminator.Text = (selAnsiEscapeSequenceRequest is { } ? selAnsiEscapeSequenceRequest.Terminator : "")!;
-                                          };
-
-        // Forces raise cbRequests.SelectedItemChanged to update TextFields
-        cbRequests.SelectedItem = 0;
+                                       tfRequest.Text = selAnsiEscapeSequenceRequest is { } ? selAnsiEscapeSequenceRequest.Request : "";
+                                       tfValue.Text = selAnsiEscapeSequenceRequest is { } ? selAnsiEscapeSequenceRequest.Value ?? "" : "";
+                                       tfTerminator.Text = (selAnsiEscapeSequenceRequest is { } ? selAnsiEscapeSequenceRequest.Terminator : "")!;
+                                   };
 
         label = new Label { Y = Pos.Bottom (tfRequest) + 2, Text = "Response:" };
 

@@ -25,6 +25,41 @@ public class OutputBufferImpl : IOutputBuffer
     /// </summary>
     public Attribute CurrentAttribute { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the URL that will be associated with cells added via <see cref="AddRune(Rune)"/> or <see cref="AddStr(string)"/>.
+    ///     When set, subsequent cells will include this URL for OSC 8 hyperlink rendering.
+    /// </summary>
+    public string? CurrentUrl { get; set; }
+
+    /// <summary>
+    ///     Maps cell positions to URLs for OSC 8 hyperlink support.
+    ///     Only stores entries for cells that actually have URLs, minimizing memory overhead.
+    /// </summary>
+    private Dictionary<Point, string>? _urlMap;
+
+    /// <summary>
+    ///     Gets the URL associated with the cell at the specified position.
+    /// </summary>
+    /// <param name="col">The column.</param>
+    /// <param name="row">The row.</param>
+    /// <returns>The URL if one exists, otherwise null.</returns>
+    public string? GetCellUrl (int col, int row)
+    {
+        return _urlMap?.TryGetValue (new Point (col, row), out string? url) == true ? url : null;
+    }
+
+    /// <summary>
+    ///     Sets the URL for the cell at the specified position.
+    /// </summary>
+    /// <param name="col">The column.</param>
+    /// <param name="row">The row.</param>
+    /// <param name="url">The URL to associate with this cell.</param>
+    private void SetCellUrl (int col, int row, string url)
+    {
+        _urlMap ??= [];
+        _urlMap [new Point (col, row)] = url;
+    }
+
     /// <summary>The leftmost column in the terminal.</summary>
     public virtual int Left { get; set; } = 0;
 
@@ -190,9 +225,13 @@ public class OutputBufferImpl : IOutputBuffer
                 // Test: AddStr_WideGlyph_Second_Column_Attribute_Set_When_In_Clip
                 if (Clip.Contains (Col, Row))
                 {
-                    // IMPORTANT: We do NOT modify column N+1's IsDirty or Attribute here.
-                    // See: https://github.com/gui-cs/Terminal.Gui/issues/4258
-                    Contents [Row, Col].Attribute = CurrentAttribute;
+                    // Mark dirty only if the attribute is actually changing, to avoid
+                    // invalidating overlapped content unnecessarily (see #4258).
+                    if (Contents [Row, Col].Attribute != CurrentAttribute)
+                    {
+                        Contents [Row, Col].Attribute = CurrentAttribute;
+                        Contents [Row, Col].IsDirty = true;
+                    }
                 }
 
                 // Advance cursor again for wide character
@@ -210,6 +249,12 @@ public class OutputBufferImpl : IOutputBuffer
     {
         Contents! [row, col].Attribute = CurrentAttribute;
         Contents [row, col].IsDirty = true;
+
+        // If CurrentUrl is set, store it in the URL map
+        if (!string.IsNullOrEmpty (CurrentUrl))
+        {
+            SetCellUrl (col, row, CurrentUrl);
+        }
     }
 
     /// <summary>
@@ -316,6 +361,9 @@ public class OutputBufferImpl : IOutputBuffer
         Clip = new (Screen);
 
         DirtyLines = new bool [Rows];
+
+        // Clear the URL map
+        _urlMap?.Clear ();
 
         lock (Contents)
         {

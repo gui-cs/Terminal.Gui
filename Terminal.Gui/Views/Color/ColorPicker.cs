@@ -4,6 +4,17 @@ namespace Terminal.Gui.Views;
 ///     Color Picker supporting RGB, HSL, and HSV color models. Supports choosing colors with
 ///     sliders and color names from the <see cref="IColorNameResolver"/>.
 /// </summary>
+/// <remarks>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Double-Click</term> <description>Accepts the selected color (<see cref="Command.Accept"/>).</description>
+///         </item>
+///     </list>
+/// </remarks>
 public class ColorPicker : View, IValue<Color?>, IDesignable
 {
     /// <summary>
@@ -123,6 +134,9 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
     ///     Raised when <see cref="Value"/> has changed.
     /// </summary>
     public event EventHandler<ValueChangedEventArgs<Color?>>? ValueChanged;
+    
+    /// <inheritdoc />
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>
     ///     Called before <see cref="Value"/> changes. Return <see langword="true"/> to cancel the change.
@@ -276,6 +290,8 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
             ValueChangedEventArgs<Color?> changedArgs = new (oldValue, value);
             OnValueChanged (changedArgs);
             ValueChanged?.Invoke (this, changedArgs);
+
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, value));
         }
 
         SyncSubViewValues (syncBars);

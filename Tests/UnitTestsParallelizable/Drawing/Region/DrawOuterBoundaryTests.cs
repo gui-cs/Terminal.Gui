@@ -1,6 +1,4 @@
 using System.Collections.Concurrent;
-using Xunit.Abstractions;
-
 namespace DrawingTests.RegionTests;
 
 /// <summary>
@@ -86,7 +84,7 @@ public class DrawOuterBoundaryTests (ITestOutputHelper output)
         var canvas = new LineCanvas ();
 
         // Act
-        Exception exception = Record.Exception (() => region.DrawOuterBoundary (canvas, LineStyle.Single));
+        Exception? exception = Record.Exception (() => region.DrawOuterBoundary (canvas, LineStyle.Single));
 
         // Assert
         Assert.Null (exception);
@@ -402,7 +400,7 @@ public class DrawOuterBoundaryTests (ITestOutputHelper output)
         var canvas = new LineCanvas ();
 
         // Act
-        Exception exception = Record.Exception (() => region.DrawOuterBoundary (canvas, LineStyle.Single));
+        Exception? exception = Record.Exception (() => region.DrawOuterBoundary (canvas, LineStyle.Single));
 
         // Assert
         Assert.Null (exception);
@@ -424,7 +422,7 @@ public class DrawOuterBoundaryTests (ITestOutputHelper output)
         var canvas = new LineCanvas ();
 
         // Act
-        Exception exception = Record.Exception (() => region.DrawOuterBoundary (canvas, LineStyle.Single));
+        Exception? exception = Record.Exception (() => region.DrawOuterBoundary (canvas, LineStyle.Single));
 
         // Assert
         Assert.Null (exception);
@@ -455,7 +453,7 @@ public class DrawOuterBoundaryTests (ITestOutputHelper output)
         var canvas = new LineCanvas ();
 
         // Act
-        Exception exception = Record.Exception (() => region.DrawOuterBoundary (canvas, LineStyle.Single));
+        Exception? exception = Record.Exception (() => region.DrawOuterBoundary (canvas, LineStyle.Single));
 
         // Assert
         Assert.Null (exception);
@@ -509,7 +507,7 @@ public class DrawOuterBoundaryTests (ITestOutputHelper output)
         var canvas = new LineCanvas ();
 
         // Act
-        Exception exception = Record.Exception (() => region.DrawOuterBoundary (canvas, LineStyle.Single));
+        Exception? exception = Record.Exception (() => region.DrawOuterBoundary (canvas, LineStyle.Single));
 
         // Assert
         Assert.Null (exception);
@@ -523,7 +521,7 @@ public class DrawOuterBoundaryTests (ITestOutputHelper output)
         var canvas = new LineCanvas ();
 
         // Act
-        Exception exception = Record.Exception (() => region.DrawOuterBoundary (canvas, LineStyle.Single));
+        Exception? exception = Record.Exception (() => region.DrawOuterBoundary (canvas, LineStyle.Single));
 
         // Assert
         Assert.Null (exception);

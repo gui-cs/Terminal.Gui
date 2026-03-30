@@ -1,6 +1,11 @@
 using System.Diagnostics;
 using System.Globalization;
 
+// ReSharper disable UnusedMember.Global
+
+// ReSharper disable CommentTypo
+// ReSharper disable GrammarMistakeInComment
+
 // ReSharper disable InconsistentNaming
 
 namespace Terminal.Gui.Drivers;
@@ -534,27 +539,29 @@ public static class EscSeqUtils
                                           keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control));
         }
 
-        if (keyInfo.Key is >= ConsoleKey.A and <= ConsoleKey.Z)
+        if (keyInfo.Key is < ConsoleKey.A or > ConsoleKey.Z)
         {
-            if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt) || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
-            {
-                // DotNetDriver doesn't support Shift-Ctrl/Shift-Alt combos
-                return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.Key);
-            }
+            return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
+        }
 
-            if (keyInfo.Modifiers == ConsoleModifiers.Shift)
-            {
-                // If ShiftMask is on  add the ShiftMask
-                if (char.IsUpper (keyInfo.KeyChar))
-                {
-                    return (KeyCode)keyInfo.Key | KeyCode.ShiftMask;
-                }
-            }
+        if (keyInfo.Modifiers.HasFlag (ConsoleModifiers.Alt) || keyInfo.Modifiers.HasFlag (ConsoleModifiers.Control))
+        {
+            // DotNetDriver doesn't support Shift-Ctrl/Shift-Alt combos
+            return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers & ~ConsoleModifiers.Shift, (KeyCode)keyInfo.Key);
+        }
 
+        if (keyInfo.Modifiers != ConsoleModifiers.Shift)
+        {
             return (KeyCode)keyInfo.Key;
         }
 
-        return ConsoleKeyMapping.MapToKeyCodeModifiers (keyInfo.Modifiers, (KeyCode)keyInfo.KeyChar);
+        // If ShiftMask is on  add the ShiftMask
+        if (char.IsUpper (keyInfo.KeyChar))
+        {
+            return (KeyCode)keyInfo.Key | KeyCode.ShiftMask;
+        }
+
+        return (KeyCode)keyInfo.Key;
     }
 
     #endregion Keyboard
@@ -643,8 +650,8 @@ public static class EscSeqUtils
     }
 
     //ESC [ <y> ; <x> f - HVP     Horizontal Vertical Position* Cursor moves to<x>; <y> coordinate within the viewport, where <x> is the column of the<y> line
-    //ESC [ s - ANSISYSSC       Save Cursor – Ansi.sys emulation	**With no parameters, performs a save cursor operation like DECSC
-    //ESC [ u - ANSISYSRC       Restore Cursor – Ansi.sys emulation	**With no parameters, performs a restore cursor operation like DECRC
+    //ESC [ s - ANSISYSSC       Save Cursor – Ansi.sys emulation **With no parameters, performs a save cursor operation like DECSC
+    //ESC [ u - ANSISYSRC       Restore Cursor – Ansi.sys emulation **With no parameters, performs a restore cursor operation like DECRC
     //ESC [ ? 12 h - ATT160  Text Cursor Enable Blinking     Start the cursor blinking
     //ESC [ ? 12 l - ATT160  Text Cursor Disable Blinking    Stop blinking the cursor
     /// <summary>
@@ -707,12 +714,12 @@ public static class EscSeqUtils
     public static string CSI_SetBackgroundColor256 (int color) => $"{CSI}48;5;{color}m";
 
     /// <summary>
-    ///     ESC[38;2;{r};{g};{b}m	Set foreground color as RGB.
+    ///     ESC[38;2;{r};{g};{b}m - Set foreground color as RGB.
     /// </summary>
     public static string CSI_SetForegroundColorRGB (int r, int g, int b) => $"{CSI}38;2;{r};{g};{b}m";
 
     /// <summary>
-    ///     ESC[38;2;{r};{g};{b}m	Append foreground color as RGB to StringBuilder.
+    ///     ESC[38;2;{r};{g};{b}m - Append foreground color as RGB to StringBuilder.
     /// </summary>
     public static void CSI_AppendForegroundColorRGB (StringBuilder builder, int r, int g, int b) =>
 
@@ -720,17 +727,28 @@ public static class EscSeqUtils
         builder.Append ($"{CSI}38;2;{r};{g};{b}m");
 
     /// <summary>
-    ///     ESC[48;2;{r};{g};{b}m	Set background color as RGB.
+    ///     ESC[48;2;{r};{g};{b}m - Set background color as RGB.
     /// </summary>
     public static string CSI_SetBackgroundColorRGB (int r, int g, int b) => $"{CSI}48;2;{r};{g};{b}m";
 
     /// <summary>
-    ///     ESC[48;2;{r};{g};{b}m	Append background color as RGB to StringBuilder.
+    ///     ESC[48;2;{r};{g};{b}m - Append background color as RGB to StringBuilder.
     /// </summary>
     public static void CSI_AppendBackgroundColorRGB (StringBuilder builder, int r, int g, int b) =>
 
         // InterpolatedStringHandler is composed in stack, skipping the string allocation.
         builder.Append ($"{CSI}48;2;{r};{g};{b}m");
+
+    /// <summary>
+    ///     ESC[39m - Resets the foreground color to the terminal's default.
+    /// </summary>
+    public static void CSI_AppendResetForegroundColor (StringBuilder builder) => builder.Append ($"{CSI}39m");
+
+    /// <summary>
+    ///     ESC[49m - Resets the background color to the terminal's default. This allows the terminal's
+    ///     native background (including any transparency or acrylic effects) to show through.
+    /// </summary>
+    public static void CSI_AppendResetBackgroundColor (StringBuilder builder) => builder.Append ($"{CSI}49m");
 
     #endregion Colors
 
@@ -876,6 +894,31 @@ public static class EscSeqUtils
     ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) ; 1 R
     /// </summary>
     public static readonly AnsiEscapeSequence CSI_RequestCursorPositionReport = new () { Request = CSI + "?6n", Terminator = "R" };
+
+    /// <summary>
+    ///     ESC [ ? u - Query kitty keyboard progressive enhancement flags.
+    ///     The terminal reply to <see cref="CSI_QueryKittyKeyboardFlags"/> is ESC [ ? flags u.
+    /// </summary>
+    public static readonly AnsiEscapeSequence CSI_QueryKittyKeyboardFlags = new () { Request = CSI + "?u", Terminator = "u", Value = "?" };
+
+    /// <summary>
+    ///     The kitty keyboard flags that Terminal.Gui requests when kitty keyboard protocol is supported.
+    ///     Currently: disambiguate escape codes + report event types + report alternate keys + report all keys as escape codes.
+    /// </summary>
+    public const KittyKeyboardFlags KittyKeyboardRequestedFlags =
+        KittyKeyboardFlags.DisambiguateEscapeCodes | KittyKeyboardFlags.ReportEventTypes | KittyKeyboardFlags.ReportAlternateKeys | KittyKeyboardFlags.ReportAllKeysAsEscapeCodes;
+
+    /// <summary>
+    ///     ESC [ &gt; flags u - Push current kitty keyboard flags and enable the specified flags.
+    /// </summary>
+    /// <param name="flags">The kitty keyboard progressive enhancement flags to enable.</param>
+    /// <returns>The ANSI request string.</returns>
+    public static string CSI_EnableKittyKeyboardFlags (KittyKeyboardFlags flags) => $"{CSI}>{(int)flags}u";
+
+    /// <summary>
+    ///     ESC [ &lt; u - Restore the previously pushed kitty keyboard flag state.
+    /// </summary>
+    public static readonly string CSI_DisableKittyKeyboardFlags = CSI + "<u";
 
     /// <summary>
     ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) R
@@ -1041,6 +1084,97 @@ public static class EscSeqUtils
 
         // Format: ESC ] 8 ; ; ST (empty URL ends hyperlink)
         $"{OSC}8;;{ST}";
+
+    #region OSC Color Queries
+
+    /// <summary>
+    ///     OSC 10 - Queries the terminal's default foreground color.
+    ///     Response format: ESC ] 10 ; rgb:RRRR/GGGG/BBBB ST (or BEL terminated).
+    /// </summary>
+    public static readonly AnsiEscapeSequence OSC_QueryForegroundColor = new () { Request = $"{OSC}10;?{ST}", Terminator = ST, Value = "10" };
+
+    /// <summary>
+    ///     OSC 11 - Queries the terminal's default background color.
+    ///     Response format: ESC ] 11 ; rgb:RRRR/GGGG/BBBB ST (or BEL terminated).
+    /// </summary>
+    public static readonly AnsiEscapeSequence OSC_QueryBackgroundColor = new () { Request = $"{OSC}11;?{ST}", Terminator = ST, Value = "11" };
+
+    /// <summary>
+    ///     Attempts to parse an OSC 10/11 color response into a <see cref="Color"/>.
+    /// </summary>
+    /// <param name="response">
+    ///     The raw response string, e.g. <c>ESC]10;rgb:RRRR/GGGG/BBBB ESC\</c> or <c>ESC]11;rgb:RR/GG/BB BEL</c>.
+    /// </param>
+    /// <param name="color">The parsed color, or <see langword="null"/> if parsing fails.</param>
+    /// <returns><see langword="true"/> if the response was successfully parsed.</returns>
+    /// <remarks>
+    ///     Handles both 4-digit (16-bit) and 2-digit (8-bit) per-channel hex values.
+    ///     For 16-bit values, the high byte is used (e.g. <c>RRRR</c> → <c>RR</c>).
+    /// </remarks>
+    public static bool TryParseOscColorResponse (string? response, out Color? color)
+    {
+        color = null;
+
+        if (string.IsNullOrEmpty (response))
+        {
+            return false;
+        }
+
+        // Find the rgb: prefix
+        int rgbIndex = response.IndexOf ("rgb:", StringComparison.OrdinalIgnoreCase);
+
+        if (rgbIndex < 0)
+        {
+            return false;
+        }
+
+        // Extract the color portion between "rgb:" and the terminator (ST or BEL)
+        string colorPart = response [(rgbIndex + 4)..];
+
+        // Strip trailing terminators: ST (ESC\) or BEL (\a)
+        if (colorPart.EndsWith (ST, StringComparison.Ordinal))
+        {
+            colorPart = colorPart [..^ST.Length];
+        }
+        else if (colorPart.Length > 0 && colorPart [^1] == '\a')
+        {
+            colorPart = colorPart [..^1];
+        }
+
+        // Parse R/G/B components separated by '/'
+        string [] parts = colorPart.Split ('/');
+
+        if (parts.Length != 3)
+        {
+            return false;
+        }
+
+        if (!TryParseHexComponent (parts [0], out int r) || !TryParseHexComponent (parts [1], out int g) || !TryParseHexComponent (parts [2], out int b))
+        {
+            return false;
+        }
+
+        color = new Color (r, g, b);
+
+        return true;
+
+        static bool TryParseHexComponent (string hex, out int value)
+        {
+            value = 0;
+
+            if (hex.Length is not (2 or 4) || !int.TryParse (hex, NumberStyles.HexNumber, null, out int parsed))
+            {
+                return false;
+            }
+
+            // For 16-bit values (4 hex digits), take the high byte
+            value = hex.Length == 4 ? parsed >> 8 : parsed;
+
+            return true;
+        }
+    }
+
+    #endregion OSC Color Queries
 
     #endregion OSC
 

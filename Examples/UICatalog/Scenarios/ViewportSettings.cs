@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("ViewportSettings", "Demonstrates manipulating Viewport, ViewportSettings, and ContentSize to scroll content")]
@@ -30,9 +30,7 @@ public class ViewportSettings : Scenario
 
         ViewportSettingsDemoView view = new ()
         {
-            Title = "ViewportSettings Demo View",
-            Width = Dim.Fill (adornmentsEditor),
-            Height = Dim.Fill (viewportSettingsEditor)
+            Title = "ViewportSettings Demo View", Width = Dim.Fill (adornmentsEditor), Height = Dim.Fill (viewportSettingsEditor)
         };
 
         mainWindow.Add (view);
@@ -52,11 +50,12 @@ public class ViewportSettings : Scenario
 
         colorPicker.ValueChanged += (_, e) =>
                                     {
-                                        colorPicker.SuperView!.SetScheme (new (colorPicker.SuperView.GetScheme ())
+                                        colorPicker.SuperView!.SetScheme (new Scheme (colorPicker.SuperView.GetScheme ())
                                         {
-                                            Normal = new (colorPicker.SuperView.GetAttributeForRole (VisualRole.Normal)
-                                                                     .Foreground,
-                                                          e.NewValue)
+                                            Normal = new Attribute (colorPicker.SuperView
+                                                                               .GetAttributeForRole (VisualRole.Normal)
+                                                                               .Foreground,
+                                                                    e.NewValue)
                                         });
                                     };
 
@@ -73,13 +72,8 @@ public class ViewportSettings : Scenario
         Button buttonAnchored = new () { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Bottom Rig_ht" };
         buttonAnchored.Accepting += (sender, _) => MessageBox.Query ((sender as View)?.App!, "Hi", $"You pressed {((Button)sender!).Text}", Strings.btnOk);
 
-        view.Margin!.Data = "Margin";
-        view.Margin!.Thickness = new (0);
-
-        view.Border!.Data = "Border";
-        view.Border!.Thickness = new (3);
-
-        view.Padding!.Data = "Padding";
+        view.Margin.Thickness = new Thickness (0);
+        view.Border.Thickness = new Thickness (3);
 
         view.Add (buttonAnchored, textField, colorPicker, charMap);
 
@@ -166,10 +160,10 @@ internal class ViewportSettingsDemoView : FrameView
         BorderStyle = LineStyle.Rounded;
         Arrangement = ViewArrangement.Resizable;
 
-        SetContentSize (new (60, 40));
+        SetContentSize (new Size (60, 40));
         ViewportSettings |= ViewportSettingsFlags.ClearContentOnly;
         ViewportSettings |= ViewportSettingsFlags.ClipContentOnly;
-        VerticalScrollBar.Visible = true;
+        ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
 
         // Things this view knows how to do
         AddCommand (Command.ScrollDown, () => ScrollVertical (1));
@@ -186,7 +180,7 @@ internal class ViewportSettingsDemoView : FrameView
 
         // Add a status label to the border that shows Viewport and ContentSize values. Bit of a hack.
         // TODO: Move to Padding with controls
-        Border?.Add (new Label { X = 20 });
+        Border.GetOrCreateView ().Add (new Label { X = 20 });
 
         ViewportChanged += VirtualDemoView_LayoutComplete;
 
@@ -222,7 +216,7 @@ internal class ViewportSettingsDemoView : FrameView
 
     private void VirtualDemoView_LayoutComplete (object? sender, DrawEventArgs drawEventArgs)
     {
-        Label? frameLabel = Padding?.SubViews.OfType<Label> ().FirstOrDefault ();
+        Label? frameLabel = Padding.View?.SubViews.OfType<Label> ().FirstOrDefault ();
 
         if (frameLabel is { })
         {

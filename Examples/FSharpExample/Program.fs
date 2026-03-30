@@ -4,7 +4,7 @@ type ExampleWindow() as this =
     inherit Window()
     
     do
-        this.Title <- sprintf "Example App (%O to quit)" Application.QuitKey
+        this.Title <- sprintf "Example App (%O to quit)" (Application.GetDefaultKey (Command.Quit))
 
         // Create input components and labels
         let usernameLabel = new Label(Text = "Username:")

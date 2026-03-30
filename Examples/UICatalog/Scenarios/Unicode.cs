@@ -209,7 +209,7 @@ public class UnicodeInMenu : Scenario
         StatusBar statusBar = new (
                                    [
                                        new (
-                                            Application.QuitKey,
+                                            Application.GetDefaultKey (Command.Quit),
                                             "Выход",
                                             () => appWindow.RequestStop ()
                                            ),

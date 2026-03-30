@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-namespace ViewBaseTests.Layout;
+﻿namespace ViewBaseTests.Layout;
 
 public class TopologicalSortTests (ITestOutputHelper output)
 {
@@ -35,7 +33,7 @@ public class TopologicalSortTests (ITestOutputHelper output)
         root.Add (sub2);
         sub2.Width = Dim.Width (sub2);
 
-        Exception exception = Record.Exception (root.LayoutSubViews);
+        Exception? exception = Record.Exception (root.LayoutSubViews);
         Assert.Null (exception);
         root.Dispose ();
         sub1.Dispose ();

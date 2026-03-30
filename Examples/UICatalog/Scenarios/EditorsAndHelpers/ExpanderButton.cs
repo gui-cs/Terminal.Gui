@@ -36,6 +36,7 @@ public class ExpanderButton : Button
         NoDecorations = true;
         NoPadding = true;
 
+        AddCommand (Command.Accept, Toggle);
         AddCommand (Command.HotKey, Toggle);
         AddCommand (Command.Toggle, Toggle);
         KeyBindings.Add (Key.F4, Command.Toggle);
@@ -56,32 +57,28 @@ public class ExpanderButton : Button
             Visible = false;
         }
 
-        if (SuperView is Border { } border)
+        if (SuperView is not BorderView { } borderView)
         {
-            switch (Orientation)
-            {
-                case Orientation.Vertical:
-                    Visible = border.Thickness.Top > 0;
-
-                    break;
-
-                case Orientation.Horizontal:
-                    Visible = border.Border?.Thickness.Left > 0;
-
-                    break;
-            }
+            return;
         }
+
+        Visible = Orientation switch
+                  {
+                      Orientation.Vertical => borderView.Adornment?.Thickness.Top > 0,
+                      Orientation.Horizontal => borderView.Adornment?.Thickness.Left > 0,
+                      _ => Visible
+                  };
     }
 
     private void ExpanderButton_Initialized (object? sender, EventArgs e)
     {
-        ShadowStyle = ShadowStyle.None;
+        ShadowStyle = null;
 
         ExpandOrCollapse (Collapsed);
 
-        if (SuperView is Border { } border)
+        if (SuperView is BorderView { } borderView)
         {
-            border.ThicknessChanged += (_, _) => ShowHide ();
+            borderView.Adornment!.ThicknessChanged += (_, _) => ShowHide ();
         }
     }
 
@@ -96,11 +93,7 @@ public class ExpanderButton : Button
     ///         bottom/left.
     ///     </para>
     /// </remarks>
-    public Orientation Orientation
-    {
-        get => _orientation;
-        set => OnOrientationChanging (value);
-    }
+    public Orientation Orientation { get => _orientation; set => OnOrientationChanging (value); }
 
     /// <summary>Called when the orientation is changing. Invokes the <see cref="OrientationChanging"/> event.</summary>
     /// <param name="newOrientation"></param>
@@ -110,27 +103,28 @@ public class ExpanderButton : Button
         CancelEventArgs<Orientation> args = new (in _orientation, ref newOrientation);
         OrientationChanging?.Invoke (this, args);
 
-        if (!args.Cancel)
+        if (args.Cancel)
         {
-            _orientation = newOrientation;
-
-            if (Orientation == Orientation.Vertical)
-            {
-                X = Pos.AnchorEnd () - 1;
-                Y = 0;
-                CollapseGlyph = new ('\u21d1'); // ⇑
-                ExpandGlyph = new ('\u21d3'); // ⇓
-            }
-            else
-            {
-                X = 0;
-                Y = Pos.AnchorEnd () - 1;
-                CollapseGlyph = new ('\u21d0'); // ⇐
-                ExpandGlyph = new ('\u21d2'); // ⇒
-            }
-
-            ExpandOrCollapse (Collapsed);
+            return args.Cancel;
         }
+        _orientation = newOrientation;
+
+        if (Orientation == Orientation.Vertical)
+        {
+            X = Pos.AnchorEnd () - 1;
+            Y = 0;
+            CollapseGlyph = new Rune ('\u21d1'); // ⇑
+            ExpandGlyph = new Rune ('\u21d3'); // ⇓
+        }
+        else
+        {
+            X = 0;
+            Y = Pos.AnchorEnd () - 1;
+            CollapseGlyph = new Rune ('\u21d0'); // ⇐
+            ExpandGlyph = new Rune ('\u21d2'); // ⇒
+        }
+
+        ExpandOrCollapse (Collapsed);
 
         return args.Cancel;
     }
@@ -155,11 +149,7 @@ public class ExpanderButton : Button
     /// <summary>
     ///     Gets or sets a value indicating whether the view is collapsed.
     /// </summary>
-    public bool Collapsed
-    {
-        get => _collapsed;
-        set => OnCollapsedChanging (value);
-    }
+    public bool Collapsed { get => _collapsed; set => OnCollapsedChanging (value); }
 
     /// <summary>Called when the orientation is changing. Invokes the <see cref="OrientationChanging"/> event.</summary>
     /// <param name="newValue"></param>
@@ -169,12 +159,13 @@ public class ExpanderButton : Button
         CancelEventArgs<bool> args = new (ref _collapsed, ref newValue);
         CollapsedChanging?.Invoke (this, args);
 
-        if (!args.Cancel)
+        if (args.Cancel)
         {
-            _collapsed = args.NewValue;
-
-            ExpandOrCollapse (_collapsed);
+            return args.Cancel;
         }
+        _collapsed = args.NewValue;
+
+        ExpandOrCollapse (_collapsed);
 
         return args.Cancel;
     }
@@ -203,9 +194,9 @@ public class ExpanderButton : Button
 
         View? superView = SuperView;
 
-        if (superView is Adornment adornment)
+        if (superView is AdornmentView adornment)
         {
-            superView = adornment.Parent;
+            superView = adornment.Adornment?.Parent;
         }
 
         if (superView is null)

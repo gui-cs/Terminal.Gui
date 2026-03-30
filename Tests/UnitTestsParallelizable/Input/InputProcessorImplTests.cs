@@ -1,5 +1,4 @@
 using System.Collections.Concurrent;
-using Xunit.Abstractions;
 
 // ReSharper disable AccessToModifiedClosure
 #pragma warning disable CS9113 // Parameter is unread
@@ -36,7 +35,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         Assert.Empty (receivedKeys); // Should be held by parser
 
         // Wait for timeout (50ms + buffer)
-        await Task.Delay (100);
+        await Task.Delay (100, TestContext.Current.CancellationToken);
 
         // Process again - should release stale ESC
         processor.ProcessQueue ();
@@ -64,7 +63,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         processor.ProcessQueue ();
 
         // Wait less than timeout (20ms)
-        await Task.Delay (5);
+        await Task.Delay (5, TestContext.Current.CancellationToken);
 
         // Process again - should still be held
         processor.ProcessQueue ();
@@ -293,7 +292,7 @@ public class InputProcessorImplTests (ITestOutputHelper output)
         processor.ProcessQueue ();
 
         // Wait past timeout
-        await Task.Delay (100);
+        await Task.Delay (100, TestContext.Current.CancellationToken);
         processor.ProcessQueue ();
 
         // Assert - Should only process the one key from queue, no releases from parser

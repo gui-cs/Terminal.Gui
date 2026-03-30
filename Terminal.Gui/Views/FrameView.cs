@@ -28,6 +28,9 @@ public class FrameView : View
         CanFocus = true;
         TabStop = TabBehavior.TabGroup;
         BorderStyle = DefaultBorderStyle;
+
+        // BUGBUG: View base really should not be adding key bindings for SPACE and ENTER by default.
+        KeyBindings.Clear ();
     }
 
     /// <summary>

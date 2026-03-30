@@ -1,4 +1,5 @@
-using System.Reactive.Disposables;
+﻿using System.Reactive.Disposables;
+using System.Reactive.Disposables.Fluent;
 using System.Reactive.Linq;
 using ReactiveMarbles.ObservableEvents;
 using ReactiveUI;
@@ -6,6 +7,7 @@ using Terminal.Gui.Configuration;
 using Terminal.Gui.Views;
 using Terminal.Gui.App;
 using Terminal.Gui.ViewBase;
+using Terminal.Gui.Input;
 
 namespace ReactiveExample;
 
@@ -20,7 +22,7 @@ public class LoginView : Window, IViewFor<LoginViewModel>
 
     public LoginView (LoginViewModel viewModel)
     {
-        Title = $"Reactive Extensions Example - {Application.QuitKey} to Exit";
+        Title = $"Reactive Extensions Example - {Application.GetDefaultKey (Command.Quit)} to Exit";
         ViewModel = viewModel;
         var title = this.AddControl<Label> (x => x.Text = "Login Form");
         var unLengthLabel = title.AddControlAfter<Label> ((previous, unLength) =>
@@ -138,7 +140,7 @@ public class LoginView : Window, IViewFor<LoginViewModel>
                 ViewModel
                     .WhenAnyObservable (x => x.Login.IsExecuting)
                     .Select (executing => executing ? ProgressMessage : IdleMessage)
-                    .ObserveOn (RxApp.MainThreadScheduler)
+                    .ObserveOn (Program._rxApp.MainThreadScheduler!)
                     .BindTo (progress, x => x.Text)
                     .DisposeWith (_disposable);
             });

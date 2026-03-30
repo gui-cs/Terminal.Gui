@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using UnitTests;
-using Xunit.Abstractions;
 
 namespace ViewBaseTests.Drawing;
 
@@ -360,7 +359,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : TestDriverBas
             Height = 1,
             Driver = driver
         };
-        view.Border!.Thickness = new (1);
+        view.Border.Thickness = new (1);
         view.BeginInit ();
         view.EndInit ();
         view.LayoutSubViews ();
@@ -584,7 +583,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : TestDriverBas
                                                        output,
                                                        driver);
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m┆viewWithBorderAtX0┆🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m①┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐ 🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m①┆viewWithBorderAtX1┆ 🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m①└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘ 🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎┆viewWithBorderAtX2┆🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m",
+        DriverAssert.AssertDriverOutputIs (@"\x1b[39m\x1b[49m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[39m\x1b[49m┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[39m\x1b[49m┆viewWithBorderAtX0┆🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[39m\x1b[49m└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[39m\x1b[49m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[39m\x1b[49m①┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐ 🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[39m\x1b[49m①┆viewWithBorderAtX1┆ 🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[39m\x1b[49m①└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘ 🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[39m\x1b[49m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[39m\x1b[49m🍎┌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[39m\x1b[49m🍎┆viewWithBorderAtX2┆🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[39m\x1b[49m🍎└╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┘🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m    \x1b[39m\x1b[49m🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎🍎\x1b[38;2;255;255;255m\x1b[48;2;0;0;0m",
                                            output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
@@ -593,8 +592,8 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : TestDriverBas
         output.WriteLine ("Driver Output After Redraw:\n" + driver.GetOutput().GetLastOutput());
 
         // BUGBUG: Border.set_LineStyle does not call SetNeedsDraw
-        viewWithBorderAtX1!.Border!.LineStyle = LineStyle.Single;
-        viewWithBorderAtX1.Border!.SetNeedsDraw ();
+        viewWithBorderAtX1!.Border.LineStyle = LineStyle.Single;
+        viewWithBorderAtX1.Border.View?.SetNeedsDraw ();
         app.LayoutAndDraw ();
 
         DriverAssert.AssertDriverContentsAre (
@@ -678,7 +677,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : TestDriverBas
                                               output,
                                               driver);
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;95;158;160m\x1b[48;2;54;69;79m①┌─┐🍎①│X│🍎①└─┘🍎",
+        DriverAssert.AssertDriverOutputIs (@"\x1b[39m\x1b[49m①┌─┐🍎①│X│🍎①└─┘🍎",
             output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
@@ -744,7 +743,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : TestDriverBas
                                               output,
                                               driver);
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[38;2;95;158;160m\x1b[48;2;54;69;79m🍎①┌─┐🍎①│X│🍎①└─┘",
+        DriverAssert.AssertDriverOutputIs (@"\x1b[39m\x1b[49m🍎①┌─┐🍎①│X│🍎①└─┘",
             output, driver);
 
         DriverImpl? driverImpl = driver as DriverImpl;
@@ -909,7 +908,7 @@ public class ViewDrawingClippingTests (ITestOutputHelper output) : TestDriverBas
             Height = 1,
             Driver = driver
         };
-        view.Border!.Thickness = new (1);
+        view.Border.Thickness = new (1);
         view.BeginInit ();
         view.EndInit ();
         view.LayoutSubViews ();

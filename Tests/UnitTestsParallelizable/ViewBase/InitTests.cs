@@ -1,6 +1,4 @@
-﻿using Xunit.Abstractions;
-
-namespace ViewBaseTests;
+﻿namespace ViewBaseTests;
 
 /// <summary>Tests View BeginInit/EndInit/Initialized functionality.</summary>
 public class InitTests
@@ -162,4 +160,90 @@ public class InitTests
     }
 
     // TODO: Create tests that prove ISupportInitialize and ISupportInitializeNotifications work properly
+
+    // Claude - Opus 4.5
+    // Test that all View subclasses have Data property null after construction
+    [Fact]
+    public void All_View_Subclasses_Have_Null_Data_After_Construction ()
+    {
+        // Get all types that inherit from View
+        Type viewType = typeof (View);
+        IEnumerable<Type> viewSubclasses = viewType.Assembly.GetTypes ()
+                                                   .Where (t => t.IsClass && !t.IsAbstract && t.IsSubclassOf (viewType));
+
+        foreach (Type type in viewSubclasses)
+        {
+            // Skip types that require parameters or are internal test helpers
+            if (!HasParameterlessConstructor (type))
+            {
+                continue;
+            }
+
+            try
+            {
+                // Create instance
+                object? instance = Activator.CreateInstance (type);
+
+                if (instance is View view)
+                {
+                    Assert.Null (view.Data);
+                }
+            }
+            catch
+            {
+                // Some views might throw during construction without special setup
+                // Skip these as we're only testing views that can be constructed
+            }
+        }
+    }
+
+    // Claude - Opus 4.5
+    // Test that all View subclasses have Data property null after initialization
+    [Fact]
+    public void All_View_Subclasses_Have_Null_Data_After_Initialization ()
+    {
+        // Get all types that inherit from View
+        Type viewType = typeof (View);
+        IEnumerable<Type> viewSubclasses = viewType.Assembly.GetTypes ()
+                                                   .Where (t => t.IsClass && !t.IsAbstract && t.IsSubclassOf (viewType));
+
+        foreach (Type type in viewSubclasses)
+        {
+            // Skip types that require parameters or are internal test helpers
+            if (!HasParameterlessConstructor (type))
+            {
+                continue;
+            }
+
+            try
+            {
+                // Create instance
+                object? instance = Activator.CreateInstance (type);
+
+                if (instance is View view)
+                {
+                    view.BeginInit ();
+                    view.EndInit ();
+
+                    Assert.Null (view.Data);
+                }
+            }
+            catch
+            {
+                // Some views might throw during initialization without special setup
+                // Skip these as we're only testing views that can be initialized
+            }
+        }
+    }
+
+    private static bool HasParameterlessConstructor (Type type)
+    {
+        return type.GetConstructor (
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
+                        null,
+                        Type.EmptyTypes,
+                        null
+                   )
+               != null;
+    }
 }

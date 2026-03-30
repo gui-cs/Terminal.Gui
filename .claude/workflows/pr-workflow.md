@@ -27,7 +27,7 @@ Before submitting a PR, ensure:
 
 - [ ] **Build passes** locally: `dotnet build --no-restore`
 
-- [ ] **Tests pass** locally: `dotnet test --no-build`
+- [ ] **Tests pass** locally: `dotnet test --project Tests/UnitTests --no-build && dotnet test --project Tests/UnitTestsParallelizable --no-build`
 
 ## PR Description Template
 
@@ -70,16 +70,14 @@ dotnet build --configuration Debug --no-restore
 ### 2. Run Tests
 
 ```bash
-dotnet test --no-build --verbosity normal
+dotnet test --project Tests/UnitTests --no-build --verbosity normal && dotnet test --project Tests/UnitTestsParallelizable --no-build --verbosity normal
 ```
 
 **Expected:** All tests pass
 
 ### 3. Check Coverage
 
-Coverage is automatically collected on Linux runners in CI.
-
-**Verify coverage didn't decrease** by checking Codecov report on PR.
+Coverage collection is temporarily disabled in CI during the xUnit v3 / MTP migration.
 
 ### 4. Format Code
 

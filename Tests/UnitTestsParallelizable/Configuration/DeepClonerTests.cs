@@ -183,7 +183,7 @@ public class DeepClonerTests
             Disabled = new ("DarkGray", "RaisinBlack", TextStyle.Faint), 
             HotFocus = new ("White", "Green", TextStyle.Underline), 
             Active = new ("White", "Charcoal", TextStyle.Bold), 
-            HotActive = new ("White", "Charcoal", TextStyle.Underline | TextStyle.Bold),
+            HotActive = new ("Yellow", "Charcoal", TextStyle.Underline | TextStyle.Bold),
             Highlight = new ("White", "Onyx", TextStyle.None), 
             Editable = new ("LightYellow", "RaisinBlack", TextStyle.None),
             ReadOnly = new ("Gray", "RaisinBlack", TextStyle.Italic) 
@@ -525,9 +525,9 @@ public class DeepClonerTests
     [Fact]
     public void ConfigProperty_CreatesDeepCopy ()
     {
-        ConfigProperty? source = ConfigProperty.CreateImmutableWithAttributeInfo (CM.GetHardCodedConfigPropertyCache ()! ["Application.QuitKey"].PropertyInfo!);
+        ConfigProperty? source = ConfigProperty.CreateImmutableWithAttributeInfo (CM.GetHardCodedConfigPropertyCache ()! ["Application.DefaultKeyBindings"].PropertyInfo!);
         source.Immutable = false;
-        source.PropertyValue = Key.A;
+        source.PropertyValue = Application.DefaultKeyBindings;
         ConfigProperty? result = DeepCloner.DeepClone (source);
 
         Assert.NotNull (result);

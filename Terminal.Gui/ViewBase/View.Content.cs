@@ -263,22 +263,23 @@ public partial class View
 
     #region Viewport
 
-    private ViewportSettingsFlags _viewportSettings;
-
     /// <summary>
     ///     Gets or sets how scrolling the <see cref="View.Viewport"/> on the View's Content Area is handled.
     /// </summary>
     public ViewportSettingsFlags ViewportSettings
     {
-        get => _viewportSettings;
+        get;
         set
         {
-            if (_viewportSettings == value)
+            if (field == value)
             {
                 return;
             }
 
-            _viewportSettings = value;
+            ViewportSettingsFlags oldFlags = field;
+            field = value;
+
+            SyncScrollBarsToSettings (oldFlags, value);
 
             if (IsInitialized)
             {
@@ -338,15 +339,10 @@ public partial class View
     {
         get
         {
-            if (Margin is null || Border is null || Padding is null)
-            {
-                // CreateAdornments has not been called yet.
-                return new (_viewportLocation, Frame.Size);
-            }
-
             Thickness thickness = GetAdornmentsThickness ();
 
-            return new (_viewportLocation, new (Math.Max (0, Frame.Size.Width - thickness.Horizontal), Math.Max (0, Frame.Size.Height - thickness.Vertical)));
+            return new Rectangle (_viewportLocation,
+                                  new Size (Math.Max (0, Frame.Size.Width - thickness.Horizontal), Math.Max (0, Frame.Size.Height - thickness.Vertical)));
         }
         set => SetViewport (value);
     }
@@ -524,7 +520,7 @@ public partial class View
         Point viewportOffset = GetViewportOffsetFromFrame ();
         screen.Offset (viewportOffset.X, viewportOffset.Y);
 
-        return screen;
+        return screen with { Size = Viewport.Size };
     }
 
     /// <summary>Converts a screen-relative coordinate to a Viewport-relative coordinate.</summary>
@@ -547,7 +543,7 @@ public partial class View
     ///     Helper to get the X and Y offset of the Viewport from the Frame. This is the sum of the Left and Top properties
     ///     of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
     /// </summary>
-    public Point GetViewportOffsetFromFrame () => Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.Frame).Location;
+    public Point GetViewportOffsetFromFrame () => Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.GetFrame ()).Location;
 
     /// <summary>
     ///     Scrolls the view vertically by the specified number of rows.

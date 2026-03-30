@@ -9,6 +9,9 @@
     <InformationalVersion>2.0</InformationalVersion>
   </PropertyGroup>
   <PropertyGroup>
+	  <OutputType>Exe</OutputType>
+	  <UseAppHost>true</UseAppHost>
+	  <IsTestProject>true</IsTestProject>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <UseDataCollector />
@@ -18,6 +21,7 @@
     <DefineConstants>$(DefineConstants);JETBRAINS_ANNOTATIONS;CONTRACTS_FULL</DefineConstants>
     <ImplicitUsings>enable</ImplicitUsings>
     <NoLogo>true</NoLogo>
+    <NoWarn>$(NoWarn);AD0001</NoWarn>
     <SuppressNETCoreSdkPreviewMessage>true</SuppressNETCoreSdkPreviewMessage>
   </PropertyGroup>
 
@@ -30,21 +34,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="..\UnitTests\OutputAssert.cs" Link="OutputAssert.cs" />
+    <Compile Include="..\UnitTests.Legacy\OutputAssert.cs" Link="OutputAssert.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Annotations" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="Moq" />
     <PackageReference Include="ReportGenerator" />
     <PackageReference Include="TestableIO.System.IO.Abstractions.TestingHelpers" />
-    <PackageReference Include="xunit" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="xunit.v3" />
     <PackageReference Include="Xunit.Combinatorial" />
-    <PackageReference Include="xunit.runner.visualstudio">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="coverlet.collector">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -55,8 +56,8 @@
     <ProjectReference Include="..\..\Examples\UICatalog\UICatalog.csproj" />
     <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj">
     </ProjectReference>
-    <ProjectReference Include="..\TerminalGuiFluentTesting\TerminalGuiFluentTesting.csproj" />
-    <ProjectReference Include="..\UnitTests\UnitTests.csproj" />
+    <ProjectReference Include="..\AppTestHelpers\AppTestHelpers.csproj" />
+    <ProjectReference Include="..\UnitTests.Legacy\UnitTests.Legacy.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />

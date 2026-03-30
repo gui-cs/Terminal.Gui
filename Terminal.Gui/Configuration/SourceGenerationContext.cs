@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.Json.Serialization;
+using Terminal.Gui.Input;
 
 namespace Terminal.Gui.Configuration;
 
@@ -19,11 +20,12 @@ namespace Terminal.Gui.Configuration;
 [JsonSerializable (typeof (Attribute))]
 [JsonSerializable (typeof (Color))]
 [JsonSerializable (typeof (Key))]
+[JsonSerializable (typeof (Key []))]
 [JsonSerializable (typeof (Glyphs))]
 [JsonSerializable (typeof (Alignment))]
 [JsonSerializable (typeof (AlignmentModes))]
 [JsonSerializable (typeof (LineStyle))]
-[JsonSerializable (typeof (ShadowStyle))]
+[JsonSerializable (typeof (ShadowStyles))]
 [JsonSerializable (typeof (MouseState))]
 [JsonSerializable (typeof (TextStyle))]
 [JsonSerializable (typeof (CursorStyle))]
@@ -43,6 +45,14 @@ namespace Terminal.Gui.Configuration;
 [JsonSerializable (typeof (Scope<SettingsScope>))]
 [JsonSerializable (typeof (ConcurrentDictionary<string, ThemeScope>))]
 [JsonSerializable (typeof (Dictionary<string, Scheme>))]
+
+[JsonSerializable (typeof (TraceCategory))]
+[JsonSerializable (typeof (SizeDetectionMode))]
+
+[JsonSerializable (typeof (PlatformKeyBinding))]
+
+[JsonSerializable (typeof (Dictionary<Command, PlatformKeyBinding>))]
+[JsonSerializable (typeof (Dictionary<string, Dictionary<Command, PlatformKeyBinding>>))]
 
 internal partial class SourceGenerationContext : JsonSerializerContext
 { }

@@ -1,4 +1,3 @@
-#nullable disable
 using System.Data;
 
 namespace Terminal.Gui.Views;
@@ -6,23 +5,78 @@ namespace Terminal.Gui.Views;
 /// <summary>Delegate for providing color to <see cref="TableView"/> cells based on the value being rendered</summary>
 /// <param name="args">Contains information about the cell for which color is needed</param>
 /// <returns></returns>
-public delegate Scheme CellColorGetterDelegate (CellColorGetterArgs args);
+public delegate Scheme? CellColorGetterDelegate (CellColorGetterArgs args);
 
 /// <summary>Delegate for providing color for a whole row of a <see cref="TableView"/></summary>
 /// <param name="args"></param>
 /// <returns></returns>
-public delegate Scheme RowColorGetterDelegate (RowColorGetterArgs args);
+public delegate Scheme? RowColorGetterDelegate (RowColorGetterArgs args);
 
 /// <summary>
 ///     Displays and enables infinite scrolling through tabular data based on a <see cref="ITableSource"/>.
 ///     <a href="../docs/tableview.md">See the TableView Deep Dive for more</a>.
 /// </summary>
+/// <remarks>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Moves one column left or right.</description>
+///         </item>
+///         <item>
+///             <term>Up / Down</term> <description>Moves one row up or down.</description>
+///         </item>
+///         <item>
+///             <term>PageUp / PageDown</term> <description>Moves one page up or down.</description>
+///         </item>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last column.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Home / Ctrl+End</term> <description>Moves to the first or last row.</description>
+///         </item>
+///         <item>
+///             <term>Shift+&lt;movement&gt;</term> <description>Extends the selection in the given direction.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+A</term> <description>Selects all cells.</description>
+///         </item>
+///     </list>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Click</term> <description>Activates the clicked cell (<see cref="Command.Activate"/>).</description>
+///         </item>
+///     </list>
+/// </remarks>
 public partial class TableView : View, IDesignable
 {
     /// <summary>
     ///     The default maximum cell width for <see cref="TableView.MaxCellWidth"/> and <see cref="ColumnStyle.MaxWidth"/>
     /// </summary>
     public const int DEFAULT_MAX_CELL_WIDTH = 100;
+
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="TableView"/>. All standard navigation and
+    ///     selection-extend bindings are inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary
+    ///     is empty by default.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The <see cref="CellActivationKey"/> binding (<see cref="Command.Accept"/>) is instance-dependent
+    ///         and is added directly in the constructor.
+    ///     </para>
+    /// </remarks>
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
 
     /// <summary>Initializes a <see cref="TableView"/> class.</summary>
     /// <param name="table">The table to display in the control</param>
@@ -38,10 +92,13 @@ public partial class TableView : View, IDesignable
         CollectionNavigator = new TableCollectionNavigator (this);
 
         // Things this view knows how to do
-        AddCommand (Command.Right, () => ChangeSelectionByOffsetWithReturn (1, 0));
+        AddCommand (Command.Right, HandleRight);
+
         AddCommand (Command.Left, () => ChangeSelectionByOffsetWithReturn (-1, 0));
-        AddCommand (Command.Up, () => ChangeSelectionByOffsetWithReturn (0, -1));
-        AddCommand (Command.Down, () => ChangeSelectionByOffsetWithReturn (0, 1));
+
+        AddCommand (Command.Up, HandleUp);
+
+        AddCommand (Command.Down, HandleDown);
 
         AddCommand (Command.PageUp,
                     () =>
@@ -178,41 +235,16 @@ public partial class TableView : View, IDesignable
 
                         return true;
                     });
-        AddCommand (Command.Accept, () => OnCellActivated (new CellActivatedEventArgs (Table, SelectedColumn, SelectedRow)));
+        AddCommand (Command.Accept, () => OnCellActivated (new CellActivatedEventArgs (Table!, SelectedColumn, SelectedRow)));
 
-        AddCommand (Command.Activate, // was Command.ToggleChecked
-                    ctx =>
-                    {
-                        if (ToggleCurrentCellSelection () is true)
-                        {
-                            return RaiseActivating (ctx) is true;
-                        }
+        AddCommand (Command.Toggle, _ => ToggleCurrentCellSelection () is true);
 
-                        return false;
-                    });
+        AddCommand (Command.Activate, ctx => RaiseActivating (ctx) is true);
 
-        // Default keybindings for this view
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
-        KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.CursorDown, Command.Down);
-        KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.Home, Command.LeftStart);
-        KeyBindings.Add (Key.End, Command.RightEnd);
-        KeyBindings.Add (Key.Home.WithCtrl, Command.Start);
-        KeyBindings.Add (Key.End.WithCtrl, Command.End);
-        KeyBindings.Add (Key.CursorLeft.WithShift, Command.LeftExtend);
-        KeyBindings.Add (Key.CursorRight.WithShift, Command.RightExtend);
-        KeyBindings.Add (Key.CursorUp.WithShift, Command.UpExtend);
-        KeyBindings.Add (Key.CursorDown.WithShift, Command.DownExtend);
-        KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
-        KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
-        KeyBindings.Add (Key.Home.WithShift, Command.LeftStartExtend);
-        KeyBindings.Add (Key.End.WithShift, Command.RightEndExtend);
-        KeyBindings.Add (Key.Home.WithCtrl.WithShift, Command.StartExtend);
-        KeyBindings.Add (Key.End.WithCtrl.WithShift, Command.EndExtend);
-        KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
+        // Apply configurable key bindings (base View layer + TableView-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
+
+        // CellActivationKey is instance-dependent, so it stays as a direct binding
         KeyBindings.Remove (CellActivationKey);
         KeyBindings.Add (CellActivationKey, Command.Accept);
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
@@ -228,15 +260,27 @@ public partial class TableView : View, IDesignable
     /// <remarks>This property allows very wide tables to be rendered with horizontal scrolling</remarks>
     public int ColumnOffset
     {
-        get;
-
-        //try to prevent this being set to an out-of-bounds column
+        get => _columnsToRenderCache?.Count (c => c.X + c.Width <= Viewport.X) ?? 0;
         set
         {
-            int prev = field;
-            field = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Columns - 1, value));
+            if (value < 0)
+            {
+                value = 0;
+            }
 
-            if (prev != field)
+            if (_columnsToRenderCache == null)
+            {
+                CalculateContentSize ();
+            }
+
+            if (value >= (_columnsToRenderCache?.Length ?? 0))
+            {
+                value = (_columnsToRenderCache?.Length ?? 0) - 1;
+            }
+            int prev = ColumnOffset;
+            Viewport = Viewport with { X = _columnsToRenderCache! [value].X };
+
+            if (prev != ColumnOffset)
             {
                 SetNeedsDraw ();
             }
@@ -255,21 +299,20 @@ public partial class TableView : View, IDesignable
     /// <summary>The text representation that should be rendered for cells with the value <see cref="DBNull.Value"/></summary>
     public string NullSymbol { get; set; } = "-";
 
-    private int _rowOffset;
-
     /// <summary>
     ///     Vertical scroll offset.  The index of the first row in <see cref="Table"/> to display in the first non header
     ///     line of the control when rendering the view.
     /// </summary>
     public int RowOffset
     {
-        get => _rowOffset;
+        get => Style.AlwaysShowHeaders ? Viewport.Y : Math.Max (Viewport.Y - GetHeaderHeightIfAny (), 0);
         set
         {
-            int prev = _rowOffset;
-            _rowOffset = TableIsNullOrInvisible () ? 0 : Math.Max (0, Math.Min (Table.Rows - 1, value));
+            int oldViewportY = Viewport.Y;
 
-            if (_rowOffset != prev)
+            Viewport = Viewport with { Y = value == 0 ? 0 : Style.AlwaysShowHeaders ? value : GetHeaderHeightIfAny () + value };
+
+            if (Viewport.Y != oldViewportY)
             {
                 SetNeedsDraw ();
             }
@@ -295,173 +338,23 @@ public partial class TableView : View, IDesignable
         }
     }
 
+    private ColumnToRender []? _columnsToRenderCache;
+
+    private bool _inCalculatingContentSize;
+
     /// <summary>
     ///     This event is raised when a cell is activated e.g. by double-clicking or pressing
     ///     <see cref="CellActivationKey"/>
     /// </summary>
-    public event EventHandler<CellActivatedEventArgs> CellActivated;
+    public event EventHandler<CellActivatedEventArgs>? CellActivated;
 
     /// <summary>This event is raised when a cell is toggled (see <see cref="Command.Activate"/></summary>
-    public event EventHandler<CellToggledEventArgs> CellToggled;
-
-    /// <summary>
-    ///     Returns the screen position (relative to the control client area) that the given cell is rendered or null if
-    ///     it is outside the current scroll area or no table is loaded
-    /// </summary>
-    /// <param name="tableColumn">The index of the <see cref="Table"/> column you are looking for</param>
-    /// <param name="tableRow">The index of the row in <see cref="Table"/> that you are looking for</param>
-    /// <returns></returns>
-    public Point? CellToScreen (int tableColumn, int tableRow)
-    {
-        if (TableIsNullOrInvisible ())
-        {
-            return null;
-        }
-
-        IEnumerable<ColumnToRender> viewPort = CalculateViewport (Viewport);
-        int headerHeight = GetHeaderHeightIfAny ();
-        ColumnToRender colHit = viewPort.FirstOrDefault (c => c.Column == tableColumn);
-
-        // current column is outside the scroll area
-        if (colHit is null)
-        {
-            return null;
-        }
-
-        // the cell is too far up above the current scroll area
-        if (RowOffset > tableRow)
-        {
-            return null;
-        }
-
-        // the cell is way down below the scroll area and off the screen
-        if (tableRow > RowOffset + (Viewport.Height - headerHeight))
-        {
-            return null;
-        }
-
-        return new Point (colHit.X, tableRow + headerHeight - RowOffset);
-    }
+    public event EventHandler<CellToggledEventArgs>? CellToggled;
 
     private record TableViewSelectionSnapshot (int SelectedColumn, int SelectedRow, Rectangle [] MultiSelection);
 
-    /// <summary>Moves the selection down by one page</summary>
-    /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
-    public void PageDown (bool extend)
-    {
-        ChangeSelectionByOffset (0, Viewport.Height - GetHeaderHeightIfAny (), extend);
-        Update ();
-    }
-
-    /// <summary>Moves the selection up by one page</summary>
-    /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
-    public void PageUp (bool extend)
-    {
-        ChangeSelectionByOffset (0, -(Viewport.Height - GetHeaderHeightIfAny ()), extend);
-        Update ();
-    }
-
-    /// <summary>
-    ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
-    ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
-    ///     bounds.
-    /// </summary>
-    /// <param name="clientX">X offset from the top left of the control.</param>
-    /// <param name="clientY">Y offset from the top left of the control.</param>
-    /// <returns>Cell clicked or null.</returns>
-    public Point? ScreenToCell (int clientX, int clientY) => ScreenToCell (clientX, clientY, out _, out _);
-
-    /// <summary>
-    ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
-    ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
-    ///     bounds.
-    /// </summary>
-    /// <param name="client">offset from the top left of the control.</param>
-    /// <returns>The position.</returns>
-    public Point? ScreenToCell (Point client) => ScreenToCell (client, out _, out _);
-
-    /// <summary>
-    ///     . Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
-    ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
-    ///     bounds.
-    /// </summary>
-    /// <param name="clientX">X offset from the top left of the control.</param>
-    /// <param name="clientY">Y offset from the top left of the control.</param>
-    /// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>
-    public Point? ScreenToCell (int clientX, int clientY, out int? headerIfAny) => ScreenToCell (clientX, clientY, out headerIfAny, out _);
-
-    /// <summary>
-    ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
-    ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
-    ///     bounds.
-    /// </summary>
-    /// <param name="client">offset from the top left of the control.</param>
-    /// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>
-    public Point? ScreenToCell (Point client, out int? headerIfAny) => ScreenToCell (client, out headerIfAny, out _);
-
-    /// <summary>
-    ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
-    ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
-    ///     bounds.
-    /// </summary>
-    /// <param name="clientX">X offset from the top left of the control.</param>
-    /// <param name="clientY">Y offset from the top left of the control.</param>
-    /// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>
-    /// <param name="offsetX">The horizontal offset of the click within the returned cell.</param>
-    public Point? ScreenToCell (int clientX, int clientY, out int? headerIfAny, out int? offsetX)
-    {
-        headerIfAny = null;
-        offsetX = null;
-
-        if (TableIsNullOrInvisible ())
-        {
-            return null;
-        }
-
-        IEnumerable<ColumnToRender> viewPort = CalculateViewport (Viewport);
-        int headerHeight = GetHeaderHeightIfAny ();
-        ColumnToRender col = viewPort.LastOrDefault (c => c.X <= clientX);
-
-        // Click is on the header section of rendered UI
-        if (clientY < headerHeight)
-        {
-            headerIfAny = col?.Column;
-            offsetX = clientX - col?.X;
-
-            return null;
-        }
-
-        int rowIdx = RowOffset - headerHeight + clientY;
-
-        // if click is off bottom of the rows don't give an
-        // invalid index back to user!
-        if (rowIdx >= Table.Rows)
-        {
-            return null;
-        }
-
-        if (col is not { } || rowIdx < 0)
-        {
-            return null;
-        }
-
-        offsetX = clientX - col.X;
-
-        return new Point (col.Column, rowIdx);
-    }
-
-    /// <summary>
-    ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
-    ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
-    ///     bounds.
-    /// </summary>
-    /// <param name="client">offset from the top left of the control.</param>
-    /// <param name="headerIfAny">If the click is in a header this is the column clicked.</param>
-    /// <param name="offsetX">The horizontal offset of the click within the returned cell.</param>
-    public Point? ScreenToCell (Point client, out int? headerIfAny, out int? offsetX) => ScreenToCell (client.X, client.Y, out headerIfAny, out offsetX);
-
     /// <summary>This event is raised when the selected cell in the table changes.</summary>
-    public event EventHandler<SelectedCellChangedEventArgs> SelectedCellChanged;
+    public event EventHandler<SelectedCellChangedEventArgs>? SelectedCellChanged;
 
     /// <summary>
     ///     Updates the view to reflect changes to <see cref="Table"/> and to (<see cref="ColumnOffset"/> /
@@ -470,6 +363,8 @@ public partial class TableView : View, IDesignable
     /// <remarks>This always calls <see cref="View.SetNeedsDraw()"/></remarks>
     public void Update ()
     {
+        _columnsToRenderCache = null; // this will trigger a recalculation of the size and the columns when needed
+
         if (!IsInitialized || TableIsNullOrInvisible ())
         {
             SetNeedsDraw ();
@@ -483,7 +378,7 @@ public partial class TableView : View, IDesignable
         SetNeedsDraw ();
     }
 
-    // TODO: Update this to follow CWP.
+    // TODO: Refactor to use CWP
     /// <summary>Invokes the <see cref="CellActivated"/> event</summary>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> if the CellActivated event was raised.</returns>
@@ -494,6 +389,7 @@ public partial class TableView : View, IDesignable
         return CellActivated is { };
     }
 
+    // TODO: Refactor to use CWP
     /// <summary>Invokes the <see cref="CellToggled"/> event</summary>
     /// <param name="args"></param>
     protected virtual void OnCellToggled (CellToggledEventArgs args) => CellToggled?.Invoke (this, args);
@@ -531,24 +427,25 @@ public partial class TableView : View, IDesignable
     ///     Returns the maximum of the <paramref name="col"/> name and the maximum length of data that will be rendered
     ///     starting at <see cref="RowOffset"/> and rendering <paramref name="rowsToRender"/>
     /// </summary>
-    /// <param name="col"></param>
-    /// <param name="rowsToRender"></param>
+    /// <param name="col">ColumnIndex</param>
     /// <param name="colStyle"></param>
+    /// <param name="startRow">index of first row</param>
+    /// <param name="rowsToRender">Count of rows to inspect</param>
     /// <returns></returns>
-    private int CalculateMaxCellWidth (int col, int rowsToRender, ColumnStyle colStyle)
+    private int CalculateMaxCellWidth (int col, ColumnStyle? colStyle, int startRow, int rowsToRender)
     {
-        int spaceRequired = _table.ColumnNames [col].EnumerateRunes ().Sum (c => c.GetColumns ());
+        int spaceRequired = _table!.ColumnNames [col].GetColumns ();
 
         // if table has no rows
-        if (RowOffset < 0)
+        if (Table is not { Rows: > 0 })
         {
             return spaceRequired;
         }
 
-        for (int i = RowOffset; i < RowOffset + rowsToRender && i < Table.Rows; i++)
+        for (int i = startRow; i < startRow + rowsToRender; i++)
         {
-            //expand required space if cell is bigger than the last biggest cell or header
-            spaceRequired = Math.Max (spaceRequired, GetRepresentation (Table [i, col], colStyle).EnumerateRunes ().Sum (c => c.GetColumns ()));
+            // expand required space if cell is bigger than the last biggest cell or header
+            spaceRequired = Math.Max (spaceRequired, GetRepresentation (Table [i, col], colStyle).GetColumns ());
         }
 
         // Don't require more space than the style allows
@@ -577,121 +474,138 @@ public partial class TableView : View, IDesignable
     }
 
     /// <summary>
-    ///     Calculates which columns should be rendered given the <paramref name="bounds"/> in which to display and the
-    ///     <see cref="ColumnOffset"/>
+    ///     Returns the cells that shall be shown (all cells except the hidden ones)
     /// </summary>
-    /// <param name="bounds"></param>
-    /// <param name="padding"></param>
     /// <returns></returns>
-    private IEnumerable<ColumnToRender> CalculateViewport (Rectangle bounds, int padding = 1)
+    private ColumnToRender [] NonHiddenCellInfos ()
     {
         if (TableIsNullOrInvisible ())
         {
-            return Enumerable.Empty<ColumnToRender> ();
+            return Array.Empty<ColumnToRender> ();
         }
 
-        List<ColumnToRender> toReturn = new ();
-        var usedSpace = 0;
-
-        //if horizontal space is required at the start of the line (before the first header)
-        if (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines)
+        if (_columnsToRenderCache == null)
         {
-            usedSpace += 1;
+            RefreshContentSize ();
         }
 
-        int availableHorizontalSpace = bounds.Width;
-        int rowsToRender = bounds.Height;
+        return _columnsToRenderCache ?? Array.Empty<ColumnToRender> ();
+    }
 
-        // reserved for the headers row
-        if (ShouldRenderHeaders ())
+    private Size? CalculateContentSize ()
+    {
+        var contentSize = new Size (0, 0);
+        _inCalculatingContentSize = true;
+
+        try
         {
-            rowsToRender -= GetHeaderHeight ();
-        }
+            int headerHeight = GetHeaderHeightIfAny ();
+            int headerHeightVisible = CurrentHeaderHeightVisible ();
+            contentSize.Height += headerHeight + Table?.Rows ?? 0;
 
-        var first = true;
-        int lastColumn = Table.Columns - 1;
-
-        // TODO : Maybe just a for loop?
-        foreach (int col in Enumerable.Range (0, Table.Columns).Skip (ColumnOffset))
-        {
-            int startingIdxForCurrentHeader = usedSpace;
-            ColumnStyle colStyle = Style.GetColumnStyleIfAny (col);
-
-            // if column is not being rendered
-            if (colStyle?.Visible == false)
+            if (Style.ShowHorizontalBottomLine)
             {
-                // do not add it to the returned columns
-                continue;
+                contentSize.Height++;
             }
 
-            // is there enough space for this column (and it's data)?
-            int colWidth = CalculateMaxCellWidth (col, rowsToRender, colStyle) + padding;
+            // we assume that padding is 0 here
+            var padding = 0;
+            List<ColumnToRender> columnsToRender = new ();
 
-            if (MinCellWidth > 0 && colWidth < MinCellWidth + padding)
+            if (Table != null)
             {
-                if (MinCellWidth > MaxCellWidth)
+                List<(int colIdx, ColumnStyle? colStyle)> nonHiddenColumns = Enumerable.Range (0, Table.Columns)
+                                                                                       .Select (c => (colIdx: c, colStyle: Style.GetColumnStyleIfAny (c)))
+                                                                                       .Where (e => e.colStyle?.Visible != false)
+                                                                                       .ToList ();
+
+                int lastColIdx = nonHiddenColumns.Any () ? nonHiddenColumns.Last ().colIdx : -1;
+
+                //right border
+                contentSize.Width += Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
+
+                var startRow = 0;
+                int rowsToRender = Table.Rows;
+
+                if (!UseAllRowsForContentCalculation)
                 {
-                    colWidth = MaxCellWidth + padding;
+                    startRow = Style.AlwaysShowHeaders ? Viewport.Y : Math.Max (Viewport.Y - headerHeight, 0);
+
+                    rowsToRender = Math.Min (Viewport.Height - headerHeightVisible, Table.Rows - startRow);
                 }
-                else
+
+                // Calculate the content size based on the table's data
+                foreach ((int colIdx, ColumnStyle? colStyle) in nonHiddenColumns)
                 {
-                    colWidth = MinCellWidth + padding;
+                    int maxContentSize = CalculateMaxCellWidth (colIdx, colStyle, startRow, rowsToRender) + padding;
+                    int colWidth = maxContentSize + padding;
+
+                    if (MinCellWidth > 0 && colWidth < MinCellWidth + padding)
+                    {
+                        if (MinCellWidth > MaxCellWidth)
+                        {
+                            colWidth = MaxCellWidth + padding;
+                        }
+                        else
+                        {
+                            colWidth = MinCellWidth + padding;
+                        }
+                    }
+
+                    // ToDo: MinAcceptableWidth handling?
+                    // if (colStyle is { MinAcceptableWidth: > 0 }
+
+                    bool isVeryLast = colIdx == lastColIdx;
+
+                    if (isVeryLast)
+                    {
+                        //remaining space for last column
+                        int remainingSpace = Viewport.Width - contentSize.Width - (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0);
+
+                        if (Style.ExpandLastColumn && colWidth < remainingSpace)
+                        {
+                            colWidth = remainingSpace;
+                        }
+                    }
+
+                    columnsToRender.Add (new ColumnToRender (colIdx, contentSize.Width, colWidth + 1, maxContentSize, lastColIdx == colIdx));
+
+                    contentSize.Width += colWidth;
+
+                    if (!isVeryLast)
+                    {
+                        // for separator symbols between columns
+                        contentSize.Width += 1;
+                    }
                 }
+
+                // for left border
+                contentSize.Width += Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
+            }
+            else
+            {
+                contentSize.Width = 0;
             }
 
-            // there is not enough space for this columns
-            // visible content
-            if (usedSpace + colWidth > availableHorizontalSpace)
+            _columnsToRenderCache = columnsToRender.ToArray ();
+
+            //check if it makes sense to scroll to left or up if the scrolled viewport is bigger than needed
+            if (Viewport.X + Viewport.Width > contentSize.Width)
             {
-                var showColumn = false;
-
-                // if this column accepts flexible width rendering and
-                // is therefore happy rendering into less space
-                if (colStyle is { MinAcceptableWidth: > 0 }
-                    && // is there enough space to meet the MinAcceptableWidth
-                    availableHorizontalSpace - usedSpace >= colStyle.MinAcceptableWidth)
-                {
-                    // show column and use whatever space is
-                    // left for rendering it
-                    showColumn = true;
-                    colWidth = availableHorizontalSpace - usedSpace;
-                }
-
-                // If it's the only column we are able to render then
-                // accept it anyway (that must be one massively wide column!)
-                if (first)
-                {
-                    showColumn = true;
-                }
-
-                // no special exceptions and we are out of space
-                // so stop accepting new columns for the render area
-                if (!showColumn)
-                {
-                    break;
-                }
+                Viewport = Viewport with { X = Math.Max (contentSize.Width - Viewport.Width, 0) };
             }
 
-            usedSpace += colWidth;
-
-            // required for if we end up here because first == true i.e. we have a single massive width (overspilling bounds) column to present
-            colWidth = Math.Min (availableHorizontalSpace, colWidth);
-            bool isVeryLast = lastColumn == col;
-
-            // there is space
-            toReturn.Add (new ColumnToRender (col, startingIdxForCurrentHeader, colWidth, isVeryLast));
-            first = false;
+            if (Viewport.Y + Viewport.Height > contentSize.Height)
+            {
+                Viewport = Viewport with { Y = Math.Max (contentSize.Height - Viewport.Height, 0) };
+            }
         }
-
-        if (!Style.ExpandLastColumn)
+        finally
         {
-            return toReturn;
+            _inCalculatingContentSize = false;
         }
 
-        ColumnToRender last = toReturn.Last ();
-        last.Width = Math.Max (last.Width, availableHorizontalSpace - last.X);
-
-        return toReturn;
+        return contentSize;
     }
 
     /// <summary>Clears a line of the console by filling it with spaces</summary>
@@ -742,14 +656,14 @@ public partial class TableView : View, IDesignable
     /// <param name="value"></param>
     /// <param name="colStyle">Optional style defining how to represent cell values</param>
     /// <returns></returns>
-    private string GetRepresentation (object value, ColumnStyle colStyle)
+    private string GetRepresentation (object value, ColumnStyle? colStyle)
     {
-        if (value is null || value == DBNull.Value)
+        if (value == DBNull.Value)
         {
             return NullSymbol;
         }
 
-        return colStyle is { } ? colStyle.GetRepresentation (value) : value.ToString ();
+        return colStyle is { } ? colStyle.GetRepresentation (value) : value.ToString () ?? string.Empty;
     }
 
     private bool HasControlOrAlt (Mouse me) => me.Flags.HasFlag (MouseFlags.Alt) || me.Flags.HasFlag (MouseFlags.Ctrl);
@@ -763,7 +677,7 @@ public partial class TableView : View, IDesignable
     private bool IsColumnVisible (int columnIndex)
     {
         // if the column index provided is out of bounds
-        if (columnIndex < 0 || columnIndex >= _table.Columns)
+        if (_table is null || columnIndex < 0 || columnIndex >= _table.Columns)
         {
             return false;
         }
@@ -781,7 +695,7 @@ public partial class TableView : View, IDesignable
     /// <param name="availableHorizontalSpace"></param>
     /// <param name="colStyle">Optional style indicating custom alignment for the cell</param>
     /// <returns></returns>
-    private string TruncateOrPad (object originalCellValue, string representation, int availableHorizontalSpace, ColumnStyle colStyle)
+    private string TruncateOrPad (object originalCellValue, string representation, int availableHorizontalSpace, ColumnStyle? colStyle)
     {
         if (string.IsNullOrEmpty (representation))
         {
@@ -789,26 +703,26 @@ public partial class TableView : View, IDesignable
         }
 
         // if value is too wide
-        if (representation.EnumerateRunes ().Sum (c => c.GetColumns ()) >= availableHorizontalSpace)
+        if (representation.GetColumns () >= availableHorizontalSpace)
         {
             return new string (representation.TakeWhile (c => (availableHorizontalSpace -= ((Rune)c).GetColumns ()) > 0).ToArray ());
         }
 
         // pad it out with spaces to the given alignment
-        int toPad = availableHorizontalSpace - (representation.EnumerateRunes ().Sum (c => c.GetColumns ()) + 1 /*leave 1 space for cell boundary*/);
+        int toPad = availableHorizontalSpace - (representation.GetColumns () + 1 /*leave 1 space for cell boundary*/);
 
         return (colStyle?.GetAlignment (originalCellValue) ?? Alignment.Start) switch
-        {
-            Alignment.Start => representation + new string (' ', toPad),
-            Alignment.End => new string (' ', toPad) + representation,
+               {
+                   Alignment.Start => representation + new string (' ', toPad),
+                   Alignment.End => new string (' ', toPad) + representation,
 
-            // TODO: With single line cells, centered and justified are the same right?
-            Alignment.Center or Alignment.Fill => new string (' ', (int)Math.Floor (toPad / 2.0))
-                                                   + // round down
-                                                   representation
-                                                   + new string (' ', (int)Math.Ceiling (toPad / 2.0)), // round up
-            _ => representation + new string (' ', toPad)
-        };
+                   // TODO: With single line cells, centered and justified are the same right?
+                   Alignment.Center or Alignment.Fill => new string (' ', (int)Math.Floor (toPad / 2.0))
+                                                         + // round down
+                                                         representation
+                                                         + new string (' ', (int)Math.Ceiling (toPad / 2.0)), // round up
+                   _ => representation + new string (' ', toPad)
+               };
     }
 
     private bool TryGetNearestVisibleColumn (int columnIndex, bool lookRight, bool allowBumpingInOppositeDirection, out int idx)
@@ -822,7 +736,7 @@ public partial class TableView : View, IDesignable
         }
 
         // get the column visibility by index (if no style visible is true)
-        bool [] columnVisibility = Enumerable.Range (0, Table.Columns).Select (c => Style.GetColumnStyleIfAny (c)?.Visible ?? true).ToArray ();
+        bool [] columnVisibility = Enumerable.Range (0, Table!.Columns).Select (c => Style.GetColumnStyleIfAny (c)?.Visible ?? true).ToArray ();
 
         // column is visible
         if (columnVisibility [columnIndex])
@@ -881,7 +795,7 @@ public partial class TableView : View, IDesignable
     }
 
     /// <summary>Describes a desire to render a column at a given horizontal position in the UI</summary>
-    internal class ColumnToRender (int col, int x, int width, bool isVeryLast)
+    internal class ColumnToRender (int col, int x, int width, int maxContentSize, bool isVeryLast)
     {
         /// <summary>The column to render</summary>
         public int Column { get; set; } = col;
@@ -890,10 +804,16 @@ public partial class TableView : View, IDesignable
         public bool IsVeryLast { get; } = isVeryLast;
 
         /// <summary>
-        ///     The width that the column should occupy as calculated by <see cref="CalculateViewport(Rectangle, int)"/>.  Note
+        ///     The width that the column should occupy as calculated by <see cref="TableView.CalculateContentSize"/>.  Note
         ///     that this includes space for padding i.e. the separator between columns.
         /// </summary>
         public int Width { get; internal set; } = width;
+
+        /// <summary>
+        ///     The maximum size of the content that will be rendered in this column as calculated by
+        ///     <see cref="CalculateMaxCellWidth(int, ColumnStyle, int, int)"/>.
+        /// </summary>
+        public int MaxContentSize { get; internal set; } = maxContentSize;
 
         /// <summary>The horizontal position to begin rendering the column at</summary>
         public int X { get; set; } = x;
@@ -908,32 +828,29 @@ public partial class TableView : View, IDesignable
     }
 
     // TODO: Update to use Key instead of KeyCode
-    private KeyCode _cellActivationKey = KeyCode.Enter;
-
-    // TODO: Update to use Key instead of KeyCode
     /// <summary>The key which when pressed should trigger <see cref="CellActivated"/> event.  Defaults to Enter.</summary>
     public KeyCode CellActivationKey
     {
-        get => _cellActivationKey;
+        get;
         set
         {
-            if (_cellActivationKey == value)
+            if (field == value)
             {
                 return;
             }
 
-            if (KeyBindings.TryGet (_cellActivationKey, out _))
+            if (KeyBindings.TryGet (field, out _))
             {
-                KeyBindings.Replace (_cellActivationKey, value);
+                KeyBindings.Replace (field, value);
             }
             else
             {
                 KeyBindings.Add (value, Command.Accept);
             }
 
-            _cellActivationKey = value;
+            field = value;
         }
-    }
+    } = KeyCode.Enter;
 
     /// <inheritdoc/>
     protected override bool OnKeyDown (Key key)
@@ -950,9 +867,8 @@ public partial class TableView : View, IDesignable
             return false;
         }
 
-        if (CollectionNavigator != null
-            && HasFocus
-            && Table.Rows != 0
+        if (HasFocus
+            && Table?.Rows != 0
             && key != KeyBindings.GetFirstFromCommands (Command.Accept)
             && key != CellActivationKey
             && CollectionNavigator.Matcher.IsCompatibleKey (key)
@@ -966,8 +882,21 @@ public partial class TableView : View, IDesignable
         return false;
     }
 
-    private Point? _scrollLeftPoint;
-    private Point? _scrollRightPoint;
+    /// <summary>
+    ///     Gets the maximum top-left coordinates to which the viewport can be scrolled within the content area.
+    /// </summary>
+    /// <remarks>
+    ///     The returned point represents the largest X and Y values for the viewport's position such
+    ///     that the entire viewport remains within the bounds of the content.
+    /// </remarks>
+    public Point MaxViewPort ()
+    {
+        Size contentSize = GetContentSize ();
+        int maxX = Math.Max (contentSize.Width - Viewport.Width, 0);
+        int maxY = Math.Max (contentSize.Height - Viewport.Height, 0);
+
+        return new Point (maxX, maxY);
+    }
 
     /// <summary>
     ///     Updates <see cref="ColumnOffset"/> and <see cref="RowOffset"/> where they are outside the bounds of the table
@@ -983,7 +912,16 @@ public partial class TableView : View, IDesignable
             return;
         }
 
-        ColumnOffset = Math.Max (Math.Min (ColumnOffset, Table.Columns - 1), 0);
-        RowOffset = Math.Max (Math.Min (RowOffset, Table.Rows - 1), 0);
+        Point maxViewPort = MaxViewPort ();
+
+        if (Viewport.Y > maxViewPort.Y)
+        {
+            Viewport = Viewport with { Y = Math.Max (maxViewPort.Y, 0) };
+        }
+
+        if (Viewport.X > maxViewPort.X)
+        {
+            Viewport = Viewport with { X = Math.Max (maxViewPort.X, 0) };
+        }
     }
 }

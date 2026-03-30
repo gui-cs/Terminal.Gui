@@ -11,12 +11,12 @@ Cross-platform UI toolkit for building sophisticated terminal UI (TUI) applicati
 
 ![logo](docfx/images/logo.png)
 
-* **v2 Alpha** (Current): ![NuGet Version](https://img.shields.io/nuget/vpre/Terminal.Gui) - Recommended for new projects
+* **v2 Beta** (Current): ![NuGet Version](https://img.shields.io/nuget/vpre/Terminal.Gui) - Recommended for new projects
 * **v1 (Legacy)**: ![NuGet Version](https://img.shields.io/nuget/v/Terminal.Gui) - Maintenance mode only
 
 > **Important:**
 > - **v1** is in maintenance mode - only critical bug fixes accepted
-> - **v2 Alpha** is recommended for new projects - API is stable with comprehensive features
+> - **v2 Beta** is recommended for new projects - API is stable with comprehensive features
 > - Breaking changes possible before Beta, but core architecture is solid
 
 ![Sample app](docfx/images/sample.gif)
@@ -26,7 +26,7 @@ Cross-platform UI toolkit for building sophisticated terminal UI (TUI) applicati
 Install the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates), create a new TUI app, and run it:
 
 ```powershell
-dotnet new install Terminal.Gui.Templates@2.0.0-alpha.*
+dotnet new install Terminal.Gui.Templates@2.0.0-beta.*
 dotnet new tui-simple -n myproj
 cd myproj
 dotnet run
@@ -102,10 +102,10 @@ See the [documentation index](https://gui-cs.github.io/Terminal.Gui/docs/index) 
 
 # Installing
 
-## v2 Alpha (Recommended)
+## v2 Beta (Recommended)
 
 ```powershell
-dotnet add package Terminal.Gui --version "2.0.0-alpha.*"
+dotnet add package Terminal.Gui --version "2.0.0-beta.*"
 ```
 
 ## v2 Develop (Latest)
@@ -117,7 +117,7 @@ dotnet add package Terminal.Gui --version "2.0.0-develop.*"
 Or use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates):
 
 ```powershell
-dotnet new install Terminal.Gui.Templates@2.0.0-alpha.*
+dotnet new install Terminal.Gui.Templates@2.0.0-beta.*
 ```
 
 ## v1 Legacy

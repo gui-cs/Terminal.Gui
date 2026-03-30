@@ -11,7 +11,7 @@ public class ApplicationNavigation
     /// </summary>
     public ApplicationNavigation ()
     {
-        // TODO: Move navigation key bindings here from KeyboardImpl
+        // TODO: Move navigation key bindings here from ApplicationKeyboard
     }
 
     /// <summary>
@@ -82,6 +82,11 @@ public class ApplicationNavigation
             return;
         }
 
+        if (_focused is { } && App?.Mouse.IsGrabbed (_focused) == true)
+        {
+            App.Mouse.UngrabMouse ();
+        }
+
         //Debug.Assert (value is null or { CanFocus: true, HasFocus: true });
 
         _focused = value;
@@ -109,7 +114,7 @@ public class ApplicationNavigation
     /// </returns>
     public bool AdvanceFocus (NavigationDirection direction, TabBehavior? behavior)
     {
-        if (App?.Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        if (App?.Popovers?.GetActivePopover () is { Visible: true } visiblePopover)
         {
             return visiblePopover.AdvanceFocus (direction, behavior);
         }

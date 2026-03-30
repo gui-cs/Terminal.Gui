@@ -1,5 +1,7 @@
 namespace Terminal.Gui.App;
 
+using Trace = Terminal.Gui.Tracing.Trace;
+
 internal partial class ApplicationImpl
 {
     /// <inheritdoc/>
@@ -48,6 +50,8 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public void LayoutAndDraw (bool forceRedraw = false)
     {
+        Trace.Draw ("ApplicationImpl", "Start", $"forceRedraw={forceRedraw}");
+
         if (ClearScreenNextIteration)
         {
             forceRedraw = true;
@@ -61,11 +65,16 @@ internal partial class ApplicationImpl
 
         List<View?> views = [.. SessionStack!.Select (r => r.Runnable! as View)!];
 
-        if (Popover?.GetActivePopover () as View is { Visible: true } visiblePopover)
+        if (Popovers?.GetActivePopover () is { Visible: true } visiblePopover)
         {
             visiblePopover.SetNeedsDraw ();
             visiblePopover.SetNeedsLayout ();
-            views.Insert (0, visiblePopover);
+
+            // Need View for views.Insert
+            if (visiblePopover is View popoverView)
+            {
+                views.Insert (0, popoverView);
+            }
         }
 
         // Layout
@@ -89,5 +98,7 @@ internal partial class ApplicationImpl
             // Cause the driver to flush any pending updates to the terminal
             Driver?.Refresh ();
         }
+
+        Trace.Draw ("ApplicationImpl", "End", $"neededLayout={neededLayout}, needsDraw={needsDraw}");
     }
 }

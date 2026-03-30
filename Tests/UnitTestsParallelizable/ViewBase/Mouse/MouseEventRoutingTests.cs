@@ -1,5 +1,4 @@
 using Terminal.Gui.App;
-using Xunit.Abstractions;
 
 namespace ViewBaseTests.MouseTests;
 

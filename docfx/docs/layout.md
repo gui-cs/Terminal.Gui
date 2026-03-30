@@ -35,15 +35,15 @@ See [Arrangement Deep Dive](arrangement.md) for more.
 
 ## The Content Area
 
-**Content Area** refers to the rectangle with a location of `0,0` with the size returned by @Terminal.Gui.View.GetContentSize*. 
+**Content Area** refers to the rectangle with a location of `0,0` with the size returned by `GetContentSize()`. 
 
-The content area is the area where the view's content is drawn. Content can be any combination of the @Terminal.Gui.View.Text property, `SubViews`, and other content drawn by the View. The @Terminal.Gui.View.GetContentSize* method gets the size of the content area of the view. 
+The content area is the area where the view's content is drawn. Content can be any combination of the `Text` property, `SubViews`, and other content drawn by the View. The `GetContentSize()` method gets the size of the content area of the view. 
 
- The Content Area size tracks the size of the @Terminal.Gui.View.Viewport by default. If the content size is set via @Terminal.Gui.View.SetContentSize*, the content area is the provided size. If the content size is larger than the @Terminal.Gui.View.Viewport, scrolling is enabled. 
+ The Content Area size tracks the size of the `Viewport` by default. If the content size is set via `SetContentSize()`, the content area is the provided size. If the content size is larger than the `Viewport`, scrolling is enabled. 
 
 ## The Viewport
 
-The @Terminal.Gui.View.Viewport is a rectangle describing the portion of the **Content Area** that is visible to the user. It is a "portal" into the content. The `Viewport.Location` is relative to the top-left corner of the inner rectangle of `View.Padding`. If `Viewport.Size` is the same as `View.GetContentSize()`, `Viewport.Location` will be `0,0`. 
+The `Viewport` is a rectangle describing the portion of the **Content Area** that is visible to the user. It is a "portal" into the content. The `Viewport.Location` is relative to the top-left corner of the inner rectangle of `View.Padding`. If `Viewport.Size` is the same as `View.GetContentSize()`, `Viewport.Location` will be `0,0`. 
 
 To enable scrolling call `View.SetContentSize()` and then set `Viewport.Location` to positive values. Making `Viewport.Location` positive moves the Viewport down and to the right in the content. 
 
@@ -51,7 +51,7 @@ See the [Scrolling Deep Dive](scrolling.md) for details on how to enable scrolli
 
 ### Viewport Settings
 
-The @Terminal.Gui.View.ViewportSettings property controls how the Viewport is constrained using @Terminal.Gui.ViewBase.ViewportSettingsFlags. By default, `ViewportSettings` is `None`, which provides sensible constraints for typical scrolling scenarios.
+The `ViewportSettings` property controls how the Viewport is constrained using <xref:Terminal.Gui.ViewBase.ViewportSettingsFlags>. By default, `ViewportSettings` is `None`, which provides sensible constraints for typical scrolling scenarios.
 
 #### Default Behavior (No Flags Set)
 
@@ -91,9 +91,14 @@ The flags are organized into categories:
 - `Transparent` - The view does not clear its background when drawing
 - `TransparentMouse` - Mouse events pass through areas not occupied by SubViews
 
+**ScrollBar Flags** - Enable built-in scrollbars:
+- `HasVerticalScrollBar` - Enables the built-in `VerticalScrollBar` with <xref:Terminal.Gui.Views.ScrollBarVisibilityMode>.Auto behavior (automatically shown when content exceeds viewport)
+- `HasHorizontalScrollBar` - Enables the built-in `HorizontalScrollBar` with <xref:Terminal.Gui.Views.ScrollBarVisibilityMode>.Auto behavior (automatically shown when content exceeds viewport)
+- `HasScrollBars` - Combines both vertical and horizontal scrollbar flags
+
 ## Layout Engine
 
-Terminal.Gui provides a rich system for how views are laid out relative to each other. The position of a view is set by setting the `X` and `Y` properties, which are of time @Terminal.Gui.Pos. The size is set via `Width` and `Height`, which are of type @Terminal.Gui.Dim.
+Terminal.Gui provides a rich system for how views are laid out relative to each other. The position of a view is set by setting the `X` and `Y` properties, which are of time <xref:Terminal.Gui.ViewBase.Pos>. The size is set via `Width` and `Height`, which are of type <xref:Terminal.Gui.ViewBase.Dim>.
 
 The layout system uses virtual properties for categorization without type checking: `ReferencesOtherViews()`, `DependsOnSuperViewContentSize`, `CanContributeToAutoSizing`, `GetMinimumContribution()`, `IsFixed`, and `RequiresTargetLayout`. This enables extensibility.
 
@@ -109,21 +114,21 @@ var label2 = new Label () {
 };
 ```
 
-### @Terminal.Gui.Pos
+### Pos
 
-@Terminal.Gui.Pos is the type of `View.X` and `View.Y` and supports the following sub-types:
+<xref:Terminal.Gui.ViewBase.Pos> is the type of `View.X` and `View.Y` and supports the following sub-types:
 
-* Absolute position, by passing an integer - @Terminal.Gui.Pos.Absolute*.
-* Percentage of the parent's view size - @Terminal.Gui.Pos.Percent(System.Int32)
-* Anchored from the end of the dimension - @Terminal.Gui.Pos.AnchorEnd(System.Int32)
-* Centered, using @Terminal.Gui.Pos.Center*
-* The @Terminal.Gui.Pos.Left*, @Terminal.Gui.Pos.Right*, @Terminal.Gui.Pos.Top*, and @Terminal.Gui.Pos.Bottom* tracks the position of another view.
-* Aligned (left, right, center, etc...) with other views - @Terminal.Gui.Pos.Align*
-* An arbitrary function - @Terminal.Gui.Pos.Func*
+* Absolute position, by passing an integer - `Pos.Absolute()`.
+* Percentage of the parent's view size - `Pos.Percent()`
+* Anchored from the end of the dimension - `Pos.AnchorEnd()`
+* Centered, using `Pos.Center()`
+* The `Pos.Left()`, `Pos.Right()`, `Pos.Top()`, and `Pos.Bottom()` tracks the position of another view.
+* Aligned (left, right, center, etc...) with other views - `Pos.Align()`
+* An arbitrary function - `Pos.Func()`
 
-All `Pos` coordinates are relative to the SuperView's content area.
+All <xref:Terminal.Gui.ViewBase.Pos> coordinates are relative to the SuperView's content area.
 
-`Pos` values can be combined using addition or subtraction:
+<xref:Terminal.Gui.ViewBase.Pos> values can be combined using addition or subtraction:
 
 ```cs
 // Set the X coordinate to 10 characters left from the center
@@ -136,20 +141,20 @@ anotherView.Width = 9;
 myView.X = Pos.X (view);
 myView.Y = Pos.Bottom (anotherView) + 5;
 ```
-### @Terminal.Gui.Dim
+### Dim
 
-@Terminal.Gui.Dim is the type of `View.Width` and `View.Height` and supports the following sub-types:
+<xref:Terminal.Gui.ViewBase.Dim> is the type of `View.Width` and `View.Height` and supports the following sub-types:
 
-* Automatic size based on the View's content (either SubViews or Text) - @Terminal.Gui.Dim.Auto* - See [Dim.Auto Deep Dive](dimauto.md).
-* Absolute size, by passing an integer - @Terminal.Gui.Dim.Absolute(System.Int32).
-* Percentage of the SuperView's Content Area  - @Terminal.Gui.Dim.Percent(System.Int32).
-* Fill to the end of the SuperView's Content Area - @Terminal.Gui.Dim.Fill*. **Note:** `Dim.Fill` does not contribute to a SuperView's @Terminal.Gui.Dim.Auto sizing unless `minimumContentDim` is specified. See [Dim.Auto Deep Dive](dimauto.md) for details.
-* Reference the Width or Height of another view - @Terminal.Gui.Dim.Width(Terminal.Gui.View), @Terminal.Gui.Dim.Height(Terminal.Gui.View).
-* An arbitrary function - @Terminal.Gui.Dim.Func(System.Func{System.Int32}).
+* Automatic size based on the View's content (either SubViews or Text) - `Dim.Auto()` - See [Dim.Auto Deep Dive](dimauto.md).
+* Absolute size, by passing an integer - `Dim.Absolute()`.
+* Percentage of the SuperView's Content Area  - `Dim.Percent()`.
+* Fill to the end of the SuperView's Content Area - `Dim.Fill()`. **Note:** `Dim.Fill` does not contribute to a SuperView's `Dim.Auto()` sizing unless `minimumContentDim` is specified. See [Dim.Auto Deep Dive](dimauto.md) for details.
+* Reference the Width or Height of another view - `Dim.Width()`, `Dim.Height()`.
+* An arbitrary function - `Dim.Func()`.
 
-All `Dim` dimensions are relative to the SuperView's content area.
+All <xref:Terminal.Gui.ViewBase.Dim> dimensions are relative to the SuperView's content area.
 
-Like, `Pos`, objects of type `Dim` can be combined using addition or subtraction, like this:
+Like, <xref:Terminal.Gui.ViewBase.Pos>, objects of type <xref:Terminal.Gui.ViewBase.Dim> can be combined using addition or subtraction, like this:
 
 ```cs
 // Set the Width to be 10 characters less than filling 
@@ -169,7 +174,7 @@ classDiagram
     class Margin ["Margin — where Shadows live"]
     class Border ["Border — Title and Arrangement controls"]
     class Padding ["Padding — where ScrollBars live"]
-    class Adornment
+    class AdornmentImpl ["AdornmentImpl — lightweight settings"]
     class Thickness ["Thickness — each side has a width"]
 
     View --> Frame
@@ -177,10 +182,10 @@ classDiagram
     View --> Margin : has
     View --> Border : has
     View --> Padding : has
-    Margin --|> Adornment
-    Border --|> Adornment
-    Padding --|> Adornment
-    Adornment --> Thickness : has
+    Margin --|> AdornmentImpl
+    Border --|> AdornmentImpl
+    Padding --|> AdornmentImpl
+    AdornmentImpl --> Thickness : has
 ```
 
 ## How To
@@ -208,7 +213,7 @@ superView.Add (label, textField, btn);
 
 ### Align Multiple Views (Like Dialog Buttons)
 
-**Scenario:** Align buttons horizontally using @Terminal.Gui.Pos.Align, as `Dialog` does:
+**Scenario:** Align buttons horizontally using `Pos.Align()`, as <xref:Terminal.Gui.Views.Dialog> does:
 
 ```cs
 Button cancelBtn = new ()
@@ -228,7 +233,7 @@ The `Pos.Align` method supports different alignments (`Start`, `Center`, `End`, 
 
 ### Center with Auto-Sizing and Constraints (Like Dialog)
 
-**Scenario:** A centered view that auto-sizes to its content, with minimum and maximum constraints that account for adornments (Border, Margin, Padding). This is how `Dialog` positions and sizes itself:
+**Scenario:** A centered view that auto-sizes to its content, with minimum and maximum constraints that account for adornments (<xref:Terminal.Gui.ViewBase.Border>, <xref:Terminal.Gui.ViewBase.Margin>, <xref:Terminal.Gui.ViewBase.Padding>). This is how <xref:Terminal.Gui.Views.Dialog> positions and sizes itself:
 
 ```cs
 Window popup = new ()
@@ -244,5 +249,5 @@ Window popup = new ()
 };
 ```
 
-The key insight is `maximumContentDim` subtracts the adornments thickness from 100% to ensure the view (including its Border, Margin, and Padding) never exceeds the SuperView's bounds.
+The key insight is `maximumContentDim` subtracts the adornments thickness from 100% to ensure the view (including its <xref:Terminal.Gui.ViewBase.Border>, <xref:Terminal.Gui.ViewBase.Margin>, and <xref:Terminal.Gui.ViewBase.Padding>) never exceeds the SuperView's bounds.
 

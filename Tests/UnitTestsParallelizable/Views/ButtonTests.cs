@@ -54,10 +54,10 @@ public class ButtonTests
     [InlineData (1, 1, 1, 1)]
     [InlineData (10, 1, 10, 1)]
     [InlineData (10, 3, 10, 3)]
-    public void Button_AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
+    public void AbsoluteSize_DefaultText (int width, int height, int expectedWidth, int expectedHeight)
     {
         var btn1 = new Button ();
-        btn1.ShadowStyle = ShadowStyle.None;
+        btn1.ShadowStyle = null;
         btn1.Width = width;
         btn1.Height = height;
 
@@ -86,9 +86,9 @@ public class ButtonTests
     [InlineData ("0_12你", 0, 1, 0, 1)]
     [InlineData ("0_12你", 1, 1, 1, 1)]
     [InlineData ("0_12你", 10, 1, 10, 1)]
-    public void Button_AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
+    public void AbsoluteSize_Text (string text, int width, int height, int expectedWidth, int expectedHeight)
     {
-        var btn1 = new Button { ShadowStyle = ShadowStyle.None, Text = text, Width = width, Height = height };
+        var btn1 = new Button { ShadowStyle = null, Text = text, Width = width, Height = height };
 
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Frame.Size);
         Assert.Equal (new Size (expectedWidth, expectedHeight), btn1.Viewport.Size);
@@ -99,16 +99,14 @@ public class ButtonTests
     }
 
     // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
+    // Button does not raise Activating events. See Button.cs documentation.
     [Fact]
-    public void Button_Command_HotKey_RaisesActivatingAndAccepting ()
+    public void Command_HotKey_RaisesAccepting_AndActivating ()
     {
         Button button = new () { Text = "_Test" };
         var activatingFired = false;
         var acceptingFired = false;
 
-        // Don't set Handled in Activating, or it will return early without calling Accepting
         button.Activating += (_, _) => activatingFired = true;
 
         button.Accepting += (_, e) =>
@@ -119,7 +117,7 @@ public class ButtonTests
 
         bool? result = button.InvokeCommand (Command.HotKey);
 
-        // HotKey should raise both Activating and Accepting events
+        // HotKey should raise only Accepting, not Activating
         Assert.True (activatingFired);
         Assert.True (acceptingFired);
         Assert.True (result);
@@ -128,16 +126,15 @@ public class ButtonTests
     }
 
     // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
+    // Button does not raise Activating events. See Button.cs documentation.
     [Fact]
-    public void Button_Enter_InvokesHotKeyCommand ()
+    public void Enter_Raises_Accepting_Not_Activating ()
     {
+        var superView = new View { CanFocus = true };
         Button button = new () { Text = "Test" };
         var activatingFired = false;
         var acceptingFired = false;
 
-        // Don't set Handled in Activating, or it will return early without calling Accepting
         button.Activating += (_, _) => activatingFired = true;
 
         button.Accepting += (_, e) =>
@@ -146,18 +143,19 @@ public class ButtonTests
                                 e.Handled = true;
                             };
 
-        // Enter is bound to HotKey command, which raises both events
-        bool? result = button.NewKeyDownEvent (Key.Enter);
+        superView.Add (button);
+        button.SetFocus ();
 
-        Assert.True (activatingFired);
+        superView.NewKeyDownEvent (Key.Enter);
+
+        Assert.False (activatingFired);
         Assert.True (acceptingFired);
-        Assert.True (result);
 
-        button.Dispose ();
+        superView.Dispose ();
     }
 
     [Fact]
-    public void Button_HotKeyChanged_EventFires ()
+    public void HotKeyChanged_EventFires ()
     {
         var btn = new Button { Text = "_Yar" };
 
@@ -188,7 +186,7 @@ public class ButtonTests
     }
 
     [Fact]
-    public void Button_HotKeyChanged_EventFires_WithNone ()
+    public void HotKeyChanged_EventFires_WithNone ()
     {
         var btn = new Button ();
 
@@ -209,16 +207,15 @@ public class ButtonTests
     }
 
     // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
+    // Button does not raise Activating events. See Button.cs documentation.
     [Fact]
-    public void Button_Space_InvokesHotKeyCommand ()
+    public void Space_Raises_Accepting_Not_Activating ()
     {
+        var superView = new View { CanFocus = true };
         Button button = new () { Text = "Test" };
         var activatingFired = false;
         var acceptingFired = false;
 
-        // Don't set Handled in Activating, or it will return early without calling Accepting
         button.Activating += (_, _) => activatingFired = true;
 
         button.Accepting += (_, e) =>
@@ -227,14 +224,15 @@ public class ButtonTests
                                 e.Handled = true;
                             };
 
-        // Space is bound to HotKey command, which raises both events
-        bool? result = button.NewKeyDownEvent (Key.Space);
+        superView.Add (button);
+        button.SetFocus ();
 
-        Assert.True (activatingFired);
+        superView.NewKeyDownEvent (Key.Space);
+
+        Assert.False (activatingFired);
         Assert.True (acceptingFired);
-        Assert.True (result);
 
-        button.Dispose ();
+        superView.Dispose ();
     }
 
     [Theory]
@@ -307,19 +305,24 @@ public class ButtonTests
         btn.Accepting += (_, _) => clicked = true;
 
         Assert.Equal (KeyCode.T, btn.HotKey);
-        Assert.False (btn.NewKeyDownEvent (Key.T)); // Button processes, but does not handle
+        btn.NewKeyDownEvent (Key.T);
         Assert.True (clicked);
 
         clicked = false;
-        Assert.False (btn.NewKeyDownEvent (Key.T.WithAlt)); // Button processes, but does not handle
+        btn.NewKeyDownEvent (Key.T.WithAlt);
         Assert.True (clicked);
 
         clicked = false;
         btn.HotKey = KeyCode.E;
-        Assert.False (btn.NewKeyDownEvent (Key.E.WithAlt)); // Button processes, but does not handle
+        btn.NewKeyDownEvent (Key.E.WithAlt);
         Assert.True (clicked);
     }
 
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Verifies that LeftButtonClicked on a Button invokes Accept (not Activate).
+    ///     Button binds LeftButtonClicked to Command.Accept, so only Accepting is raised.
+    /// </summary>
     [Fact]
     public void LeftButtonClicked_Accepts ()
     {
@@ -337,22 +340,23 @@ public class ButtonTests
         Assert.Equal (0, activatingCount);
         Assert.Equal (0, acceptingCount);
 
-        button.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
-        Assert.Equal (1, activatingCount);
+        // LeftButtonClicked is bound to Command.Accept, so only Accepting fires (not Activating)
+        button.NewMouseEvent (new Mouse { Position = new Point (1), Flags = MouseFlags.LeftButtonClicked });
+        Assert.Equal (0, activatingCount);
         Assert.Equal (1, acceptingCount);
 
-        button.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
-        Assert.Equal (2, activatingCount);
+        button.NewMouseEvent (new Mouse { Position = new Point (1), Flags = MouseFlags.LeftButtonClicked });
+        Assert.Equal (0, activatingCount);
         Assert.Equal (2, acceptingCount);
 
         // Disable Mouse Highlighting to test that it does not interfere with Accepting event
         button.MouseHighlightStates = MouseState.None;
-        button.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
-        Assert.Equal (3, activatingCount);
+        button.NewMouseEvent (new Mouse { Position = new Point (1), Flags = MouseFlags.LeftButtonClicked });
+        Assert.Equal (0, activatingCount);
         Assert.Equal (3, acceptingCount);
 
-        button.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
-        Assert.Equal (4, activatingCount);
+        button.NewMouseEvent (new Mouse { Position = new Point (1), Flags = MouseFlags.LeftButtonClicked });
+        Assert.Equal (0, activatingCount);
         Assert.Equal (4, acceptingCount);
     }
 
@@ -401,7 +405,7 @@ public class ButtonTests
                               options);
 
         Assert.Equal (1, acceptingCount);
-        Assert.Equal (1, activatingCount);
+        Assert.Equal (0, activatingCount);
 
         // Second click - more than 500ms later to avoid double-click detection
         injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime.AddMilliseconds (600) },
@@ -411,14 +415,13 @@ public class ButtonTests
                               options);
 
         Assert.Equal (2, acceptingCount);
-        Assert.Equal (2, activatingCount);
+        Assert.Equal (0, activatingCount);
     }
 
     /// <summary>
     ///     Tests that Button's Accepting event fires correctly when MouseHighlightStates is disabled.
-    ///     When MouseHighlightStates = None, ShouldAutoGrab = false, which changes the event handling behavior:
-    ///     - Pressed events invoke Command.Activate (fires Activating only)
-    ///     - Clicked events invoke Command.Accept (fires both Activating and Accepting)
+    ///     Button does not raise Activating events. When MouseHighlightStates = None,
+    ///     only the Clicked event is processed, which fires Accepting only.
     ///     Uses Direct mode to bypass ANSI encoding which cannot preserve timestamps.
     /// </summary>
     [Fact]
@@ -460,17 +463,15 @@ public class ButtonTests
         InputInjectionOptions options = new () { Mode = InputInjectionMode.Direct };
         IInputInjector injector = app.GetInputInjector ();
 
-        // First click - when MouseHighlightStates = None:
-        // - Pressed event fires Activating (Command.Activate)
-        // - Clicked event fires both Activating and Accepting (Command.Accept)
+        // First click - Button does not raise Activating events
         injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonPressed, Timestamp = baseTime }, options);
 
         injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) },
                               options);
 
-        // Activating: 1 from Pressed + 1 from Clicked = 2
-        // Accepting: 1 from Clicked only = 1
-        Assert.Equal (1, activatingCount);
+        // Activating: 0 (Button never raises Activating)
+        // Accepting: 1 from Clicked
+        Assert.Equal (0, activatingCount);
         Assert.Equal (1, acceptingCount);
 
         // Second click - more than 500ms later to avoid double-click detection
@@ -480,9 +481,9 @@ public class ButtonTests
         injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (650) },
                               options);
 
-        // Activating: previous 2 + 1 from Pressed + 1 from Clicked = 4
-        // Accepting: previous 1 + 1 from Clicked = 2
-        Assert.Equal (2, activatingCount);
+        // Activating: 0 (Button never raises Activating)
+        // Accepting: 2
+        Assert.Equal (0, activatingCount);
         Assert.Equal (2, acceptingCount);
 
         // Third click - verify it continues to work
@@ -492,9 +493,9 @@ public class ButtonTests
         injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (1250) },
                               options);
 
-        // Activating: previous 4 + 1 from Pressed + 1 from Clicked = 6
-        // Accepting: previous 2 + 1 from Clicked = 3
-        Assert.Equal (3, activatingCount);
+        // Activating: 0 (Button never raises Activating)
+        // Accepting: 3
+        Assert.Equal (0, activatingCount);
         Assert.Equal (3, acceptingCount);
 
         // Fourth click - verify consistency
@@ -504,14 +505,15 @@ public class ButtonTests
         injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (1850) },
                               options);
 
-        // Activating: previous 6 + 1 from Pressed + 1 from Clicked = 8
-        // Accepting: previous 3 + 1 from Clicked = 4
-        Assert.Equal (4, activatingCount);
+        // Activating: 0 (Button never raises Activating)
+        // Accepting: 4
+        Assert.Equal (0, activatingCount);
         Assert.Equal (4, acceptingCount);
     }
 
     /// <summary>
     ///     Tests that Button's Accepting event fires correctly when using Direct mode injection with timestamps.
+    ///     Button does not raise Activating events.
     ///     Uses Direct mode to bypass ANSI encoding which cannot preserve timestamps.
     /// </summary>
     [Fact]
@@ -554,8 +556,8 @@ public class ButtonTests
         injector.InjectMouse (new Mouse { ScreenPosition = clickPos, Flags = MouseFlags.LeftButtonReleased, Timestamp = baseTime.AddMilliseconds (50) },
                               options);
 
-        // Assert - Button should receive Clicked event and fire both Activating and Accepting
-        Assert.Equal (1, activatingCount);
+        // Assert - Button should receive Clicked event and fire Accepting only (not Activating)
+        Assert.Equal (0, activatingCount);
         Assert.Equal (1, acceptingCount);
 
         // Act - Second click with timestamp spacing >500ms should be a new single click
@@ -566,7 +568,7 @@ public class ButtonTests
                               options);
 
         // Assert - Should fire again (two independent single clicks, not a double-click)
-        Assert.Equal (2, activatingCount);
+        Assert.Equal (0, activatingCount);
         Assert.Equal (2, acceptingCount);
 
         // Cleanup
@@ -945,5 +947,62 @@ public class ButtonTests
         Assert.Equal ("Hello", view.Title);
         Assert.Equal ("Hello", view.TitleTextFormatter.Text);
         view.Dispose ();
+    }
+
+    [Fact]
+    public void HotKey_Command_Does_Raise_Activating ()
+    {
+        Button button = new () { Text = "_Test" };
+        var activatingFired = false;
+
+        button.Activating += (_, _) => activatingFired = true;
+
+        button.InvokeCommand (Command.HotKey);
+
+        Assert.True (activatingFired);
+
+        button.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Verifies that Button does NOT raise Activating event when Accept command is invoked.
+    ///     Button only raises Accepting event.
+    /// </summary>
+    [Fact]
+    public void Accept_Command_Does_Not_Raise_Activating ()
+    {
+        Button button = new () { Text = "Test" };
+        var activatingFired = false;
+
+        button.Activating += (_, _) => activatingFired = true;
+
+        button.InvokeCommand (Command.Accept);
+
+        Assert.False (activatingFired);
+
+        button.Dispose ();
+    }
+
+    // Claude - Opus 4.5
+    /// <summary>
+    ///     Verifies that Button does NOT raise Activating event when mouse clicked.
+    ///     This is the primary user interaction method, so it's important to verify
+    ///     that Activating does not fire during clicks.
+    /// </summary>
+    [Fact]
+    public void Mouse_Click_Does_Not_Raise_Activating ()
+    {
+        Button button = new () { Text = "Test" };
+        var activatingFired = false;
+
+        button.Activating += (_, _) => activatingFired = true;
+
+        // Simulate left button clicked
+        button.NewMouseEvent (new Mouse { Position = new Point (1), Flags = MouseFlags.LeftButtonClicked });
+
+        Assert.False (activatingFired);
+
+        button.Dispose ();
     }
 }

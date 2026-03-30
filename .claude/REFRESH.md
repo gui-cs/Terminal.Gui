@@ -11,7 +11,9 @@
 5. **Unused lambda params** - use `_` discard: `(_, _) => { }`
 6. **Local functions** - use camelCase: `void myLocalFunc ()`
 7. **Backing fields** - place immediately before their property (ReSharper bug, must do manually)
-8. **ReShaper Formatting** - run ReSharper code cleanup with "Full Cleanup" profile (not the built-in one).
+8. **SPACE BEFORE PARENTHESES** - `Method ()` not `Method()`, `array [i]` not `array[i]` (see `formatting.md`)
+9. **Braces on next line** - ALL opening braces on next line (Allman style)
+10. **Blank lines** - before `return`/`break`/`continue`/`throw`, after control blocks
 
 ## Before Each File Edit
 
@@ -21,10 +23,14 @@ Ask yourself:
 - [ ] Am I using collection expressions []?
 - [ ] Are my lambda parameters discards if unused?
 - [ ] Am I using correct terminology (SubView, not child)?
+- [ ] **Did I add space BEFORE parentheses and brackets?**
+- [ ] **Are ALL braces on the next line?**
+- [ ] **Did I add blank lines before returns and after control blocks?**
 
 ## If Unsure
 
 Re-read the relevant rule file in `.claude/rules/`:
+- `formatting.md` - **SPACING, BRACES, BLANK LINES** (most commonly violated!)
 - `type-declarations.md` - var vs explicit types
 - `target-typed-new.md` - new() syntax
 - `terminology.md` - SubView/SuperView terms

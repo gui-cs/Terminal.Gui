@@ -1,10 +1,43 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>Control that hosts multiple sub views, presenting a single one at once.</summary>
+/// <remarks>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left / Right</term> <description>Moves to the previous or next tab.</description>
+///         </item>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last tab.</description>
+///         </item>
+///         <item>
+///             <term>PageUp / PageDown</term> <description>Scrolls the tab strip one page.</description>
+///         </item>
+///         <item>
+///             <term>Up</term> <description>Moves focus into the tab content area.</description>
+///         </item>
+///         <item>
+///             <term>Down</term> <description>Moves focus back to the tab strip.</description>
+///         </item>
+///     </list>
+/// </remarks>
 public class TabView : View
 {
     /// <summary>The default <see cref="MaxTabTextWidth"/> to set on new <see cref="TabView"/> controls.</summary>
     public const uint DefaultMaxTabTextWidth = 30;
+
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="TabView"/>. All standard navigation bindings are
+    ///     inherited from <see cref="View.DefaultKeyBindings"/>, so this dictionary is empty by default.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
 
     /// <summary>
     ///     This sub view is the main client area of the current tab.  It hosts the <see cref="Tab.View"/> of the tab, the
@@ -157,15 +190,8 @@ public class TabView : View
                         return false;
                     });
 
-        // Default keybindings for this view
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
-        KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.Home, Command.LeftStart);
-        KeyBindings.Add (Key.End, Command.RightEnd);
-        KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.CursorDown, Command.Down);
+        // Apply layered key bindings (base View layer + TabView-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
     }
 
     /// <summary>
@@ -312,7 +338,7 @@ public class TabView : View
             // Tabs are along the bottom so just dodge the border
             if (Style.ShowBorder)
             {
-                _containerView.Border!.Thickness = new Thickness (1, 1, 1, 0);
+                _containerView.Border.Thickness = new Thickness (1, 1, 1, 0);
             }
 
             _containerView.Y = 0;
@@ -331,7 +357,7 @@ public class TabView : View
             // Tabs are along the top
             if (Style.ShowBorder)
             {
-                _containerView.Border!.Thickness = new Thickness (1, 0, 1, 1);
+                _containerView.Border.Thickness = new Thickness (1, 0, 1, 1);
             }
 
             _tabsBar.Y = 0;
@@ -532,7 +558,7 @@ public class TabView : View
             tab.Y = 0;
 
             // while there is space for the tab
-            int tabTextWidth = tab.DisplayText.EnumerateRunes ().Sum (c => c.GetColumns ());
+            int tabTextWidth = tab.DisplayText.GetColumns ();
 
             // The maximum number of characters to use for the tab name as specified
             // by the user (MaxTabTextWidth).  But not more than the width of the view
@@ -547,7 +573,7 @@ public class TabView : View
             {
                 tab.Visible = true;
                 tab.Activating += Tab_Selecting!;
-                tab.Border!.Activating += Tab_Selecting!;
+                tab.Border.View!.Activating += Tab_Selecting!;
 
                 yield return tab;
 
@@ -578,7 +604,7 @@ public class TabView : View
             // there is enough space!
             tab.Visible = true;
             tab.Activating += Tab_Selecting!;
-            tab.Border!.Activating += Tab_Selecting!;
+            tab.Border.View!.Activating += Tab_Selecting!;
 
             yield return tab;
 
@@ -621,9 +647,30 @@ public class TabView : View
 
     internal void Tab_Selecting (object? sender, CommandEventArgs e)
     {
-        if (e.Context?.Binding is MouseBinding { MouseEvent: { } mouseArgs })
+        // When a tab is activated (via mouse or keyboard), select it.
+        // Don't forward the mouse event back to _tabsBar.NewMouseEvent as that causes infinite recursion.
+        var tab = sender as Tab;
+
+        // If sender is a Border, get the parent Tab
+        if (sender is BorderView border)
         {
-            e.Handled = _tabsBar.NewMouseEvent (mouseArgs) == true;
+            tab = border.Adornment?.Parent as Tab;
+        }
+
+        if (tab is { } && tab != SelectedTab)
+        {
+            SelectedTab = tab;
+            e.Handled = true;
+        }
+        else if (sender is View { Id: "leftScrollIndicator" })
+        {
+            SwitchTabBy (-1);
+            e.Handled = true;
+        }
+        else if (sender is View { Id: "rightScrollIndicator" })
+        {
+            SwitchTabBy (1);
+            e.Handled = true;
         }
     }
 
@@ -639,7 +686,7 @@ public class TabView : View
                 if (tab.Visible)
                 {
                     tab.Activating -= Tab_Selecting!;
-                    tab.Border!.Activating -= Tab_Selecting!;
+                    tab.Border.View!.Activating -= Tab_Selecting!;
                     tab.Visible = false;
                 }
             }
@@ -649,7 +696,7 @@ public class TabView : View
             foreach (Tab tabToRender in _tabLocations)
             {
                 tabToRender.Activating -= Tab_Selecting!;
-                tabToRender.Border!.Activating -= Tab_Selecting!;
+                tabToRender.Border.View!.Activating -= Tab_Selecting!;
                 tabToRender.Visible = false;
             }
 

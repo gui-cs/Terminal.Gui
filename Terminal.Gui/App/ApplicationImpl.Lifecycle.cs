@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Trace = Terminal.Gui.Tracing.Trace;
 
 namespace Terminal.Gui.App;
 
@@ -27,6 +28,8 @@ internal partial class ApplicationImpl
         }
 
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
+
+        Trace.Lifecycle (MainThreadId?.ToString (), "Init", $"driverName: {driverName}");
 
         // Thread-safe fence check: Ensure we're not mixing application models
         // Use lock to make check-and-set atomic
@@ -61,37 +64,17 @@ internal partial class ApplicationImpl
             _driverName = ForceDriver;
         }
 
-        // Preserve existing keyboard settings if they exist
-        // BUGBUG: These should not be needed; KeyboardImpl subscribes to Application static property changes
-        // BUGBUG: and should set these automatically.
-        bool hasExistingKeyboard = _keyboard is { };
-        Key existingQuitKey = _keyboard?.QuitKey ?? Application.QuitKey;
-        Key existingArrangeKey = _keyboard?.ArrangeKey ?? Application.ArrangeKey;
-        Key existingNextTabKey = _keyboard?.NextTabKey ?? Application.NextTabKey;
-        Key existingPrevTabKey = _keyboard?.PrevTabKey ?? Application.PrevTabKey;
-        Key existingNextTabGroupKey = _keyboard?.NextTabGroupKey ?? Application.NextTabGroupKey;
-        Key existingPrevTabGroupKey = _keyboard?.PrevTabGroupKey ?? Application.PrevTabGroupKey;
-
         // Reset keyboard to ensure fresh state with default bindings
-        _keyboard = new KeyboardImpl { App = this };
-
-        // Sync keys from Application static properties (or existing keyboard if it had custom values)
-        // This ensures we respect any Application.QuitKey etc changes made before Init()
-        _keyboard.QuitKey = existingQuitKey;
-        _keyboard.ArrangeKey = existingArrangeKey;
-        _keyboard.NextTabKey = existingNextTabKey;
-        _keyboard.PrevTabKey = existingPrevTabKey;
-        _keyboard.NextTabGroupKey = existingNextTabGroupKey;
-        _keyboard.PrevTabGroupKey = existingPrevTabGroupKey;
+        _keyboard = new ApplicationKeyboard { App = this };
 
         CreateDriver (_driverName);
 
         Initialized = true;
 
-        RaiseInitializedChanged (this, new (true));
+        RaiseInitializedChanged (this, new EventArgs<bool> (true));
         SubscribeDriverEvents ();
 
-        SynchronizationContext.SetSynchronizationContext (new ());
+        SynchronizationContext.SetSynchronizationContext (new SynchronizationContext ());
 
         _result = null;
 
@@ -201,7 +184,7 @@ internal partial class ApplicationImpl
         if (wasInitialized)
         {
             bool init = Initialized; // Will be false after ResetState
-            RaiseInitializedChanged (this, new (in init));
+            RaiseInitializedChanged (this, new EventArgs<bool> (in init));
         }
 
         // Clear the event to prevent memory leaks
@@ -233,8 +216,10 @@ internal partial class ApplicationImpl
         // Init created. Apps that do any threading will need to code defensively for this.
         // e.g. see Issue #537
 
+        Trace.Lifecycle (MainThreadId?.ToString (), "Shutdown");
+
         // === 0. Stop all timers ===
-        TimedEvents?.StopAll ();
+        TimedEvents.StopAll ();
 
         // === 1. Stop all running runnables ===
         foreach (SessionToken token in SessionStack!.Reverse ())
@@ -246,16 +231,9 @@ internal partial class ApplicationImpl
         }
 
         // === 2. Close and dispose popover ===
-        if (Popover?.GetActivePopover () is View popover)
-        {
-            // This forcefully closes the popover; invoking Command.Quit would be more graceful
-            // but since this is shutdown, doing this is ok.
-            popover.Visible = false;
-        }
-
         // Any popovers added to Popover have their lifetime controlled by Popover
-        Popover?.Dispose ();
-        Popover = null;
+        Popovers?.Dispose ();
+        Popovers = null;
 
         // === 3. Clean up runnables ===
         SessionStack?.Clear ();
@@ -270,11 +248,20 @@ internal partial class ApplicationImpl
 #endif
 
         // === 4. Clean up driver ===
-        if (Driver is { })
+        // Capture-and-null to avoid race when Dispose is called concurrently from
+        // multiple threads (e.g. AppTestHelper background thread + test thread).
+        // Null Driver first so concurrent callers see null and skip cleanup.
+        IDriver? driver = Driver;
+        Driver = null;
+
+        if (driver is { })
         {
-            UnsubscribeDriverEvents ();
-            Driver.Dispose ();
-            Driver = null;
+            // Unsubscribe using the captured local since Driver property is now null
+            driver.SizeChanged -= Driver_SizeChanged;
+            driver.KeyDown -= Driver_KeyDown;
+            driver.KeyUp -= Driver_KeyUp;
+            driver.MouseEvent -= Driver_MouseEvent;
+            driver.Dispose ();
         }
 
         // === 5. Clear run state ===
@@ -322,7 +309,7 @@ internal partial class ApplicationImpl
     /// <summary>
     ///     Raises the <see cref="InitializedChanged"/> event.
     /// </summary>
-    internal void RaiseInitializedChanged (object sender, EventArgs<bool> e) { InitializedChanged?.Invoke (sender, e); }
+    internal void RaiseInitializedChanged (object sender, EventArgs<bool> e) => InitializedChanged?.Invoke (sender, e);
 
 #if DEBUG
     /// <summary>
@@ -339,28 +326,20 @@ internal partial class ApplicationImpl
 
         Delegate [] subscribers = eventDelegate.GetInvocationList ();
 
-        if (subscribers.Length > 0)
+        if (subscribers.Length <= 0)
         {
-            string subscriberInfo = string.Join (
-                                                 ", ",
-                                                 subscribers.Select (d => $"{d.Method.DeclaringType?.Name}.{d.Method.Name}"
-                                                                    )
-                                                );
-
-            Debug.Fail (
-                        $"Application.{eventName} has {subscribers.Length} remaining subscriber(s) after Shutdown: {subscriberInfo}"
-                       );
+            return;
         }
+        string subscriberInfo = string.Join (", ", subscribers.Select (d => $"{d.Method.DeclaringType?.Name}.{d.Method.Name}"));
+
+        Debug.Fail ($"Application.{eventName} has {subscribers.Length} remaining subscriber(s) after Shutdown: {subscriberInfo}");
     }
 #endif
 
-    private void OnForceDriverChanged (object? sender, ValueChangedEventArgs<string> e) { ForceDriver = e.NewValue; }
+    private void OnForceDriverChanged (object? sender, ValueChangedEventArgs<string> e) => ForceDriver = e.NewValue;
 
     /// <summary>
     ///     Unsubscribes from Application static property change events.
     /// </summary>
-    private void UnsubscribeApplicationEvents ()
-    {
-        Application.ForceDriverChanged -= OnForceDriverChanged;
-    }
+    private void UnsubscribeApplicationEvents () => Application.ForceDriverChanged -= OnForceDriverChanged;
 }

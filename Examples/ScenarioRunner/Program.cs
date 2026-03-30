@@ -1,8 +1,6 @@
 #nullable enable
 using System.Collections.ObjectModel;
 using System.CommandLine;
-using System.CommandLine.Builder;
-using System.CommandLine.Parsing;
 using System.Reflection;
 using System.Text;
 using Microsoft.Extensions.Logging;
@@ -34,164 +32,178 @@ public static class Program
         // Get allowed driver names
         string? [] allowedDrivers = DriverRegistry.GetDriverNames ().ToArray ();
 
-        Option<string> driverOption = new Option<string> ("--driver", "The IDriver to use.").FromAmong (allowedDrivers!);
-        driverOption.SetDefaultValue (string.Empty);
-        driverOption.AddAlias ("-d");
+        Option<string> driverOption = new Option<string> ("--driver") { Description = "The IDriver to use.", DefaultValueFactory = _ => string.Empty };
+        driverOption.AcceptOnlyFromAmong (allowedDrivers!);
+        driverOption.Aliases.Add ("-d");
 
-        Option<bool> disableConfigManagement = new ("--disable-cm", "Indicates Configuration Management should not be enabled.");
-        disableConfigManagement.AddAlias ("-dcm");
+        Option<bool> disableConfigManagement = new ("--disable-cm") { Description = "Indicates Configuration Management should not be enabled." };
+        disableConfigManagement.Aliases.Add ("-dcm");
 
-        Option<bool> force16Colors = new ("--force-16-colors", "Forces the driver to use 16-color mode instead of TrueColor.");
-        force16Colors.AddAlias ("-16");
+        Option<bool> force16Colors = new ("--force-16-colors") { Description = "Forces the driver to use 16-color mode instead of TrueColor." };
+        force16Colors.Aliases.Add ("-16");
 
-        Option<uint> benchmarkTimeout = new ("--timeout",
-                                             () => Scenario.BenchmarkTimeout,
-                                             $"The maximum time in milliseconds to run a benchmark. Default is {Scenario.BenchmarkTimeout}ms.");
-        benchmarkTimeout.AddAlias ("-t");
+        Option<uint> benchmarkTimeout = new ("--timeout")
+        {
+            Description = $"The maximum time in milliseconds to run a benchmark. Default is {Scenario.BenchmarkTimeout}ms.",
+            DefaultValueFactory = _ => Scenario.BenchmarkTimeout
+        };
+        benchmarkTimeout.Aliases.Add ("-t");
 
-        Option<string> resultsFile = new ("--file", "The file to save benchmark results to.");
-        resultsFile.AddAlias ("-f");
+        Option<string> resultsFile = new ("--file") { Description = "The file to save benchmark results to." };
+        resultsFile.Aliases.Add ("-f");
 
         LogFilePath = $"{LOGFILE_LOCATION}/{Assembly.GetExecutingAssembly ().GetName ().Name}";
 
-        Option<string> debugLogLevel = new Option<string> ("--debug-log-level", "The level to use for logging.").FromAmong (Enum.GetNames<LogLevel> ());
-        debugLogLevel.SetDefaultValue ("Warning");
-        debugLogLevel.AddAlias ("-dl");
+        Option<string> debugLogLevel = new Option<string> ("--debug-log-level")
+        {
+            Description = "The level to use for logging.", DefaultValueFactory = _ => "Warning"
+        };
+        debugLogLevel.AcceptOnlyFromAmong (Enum.GetNames<LogLevel> ());
+        debugLogLevel.Aliases.Add ("-dl");
 
         // List command
         Command listCommand = new ("list", "List all available scenarios");
 
-        listCommand.SetHandler (() =>
-                                {
-                                    ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
+        listCommand.SetAction (_ =>
+                               {
+                                   ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
 
-                                    Console.WriteLine (@$"Available scenarios ({scenarios.Count})");
-                                    Console.WriteLine ();
+                                   Console.WriteLine (@$"Available scenarios ({scenarios.Count})");
+                                   Console.WriteLine ();
 
-                                    foreach (Scenario s in scenarios)
-                                    {
-                                        Console.WriteLine (@$"  {s.GetName (),-30} {s.GetDescription ()}");
-                                    }
-                                });
+                                   foreach (Scenario s in scenarios)
+                                   {
+                                       Console.WriteLine (@$"  {s.GetName (),-30} {s.GetDescription ()}");
+                                   }
+                               });
 
         // Run command
-        Argument<string> scenarioArgument = new ("scenario", "The name of the Scenario to run.");
+        Argument<string> scenarioArgument = new ("scenario") { Description = "The name of the Scenario to run." };
 
         Command runCommand = new ("run", "Run a specific scenario") { scenarioArgument };
 
-        runCommand.AddOption (driverOption);
-        runCommand.AddOption (disableConfigManagement);
-        runCommand.AddOption (force16Colors);
-        runCommand.AddOption (debugLogLevel);
+        runCommand.Options.Add (driverOption);
+        runCommand.Options.Add (disableConfigManagement);
+        runCommand.Options.Add (force16Colors);
+        runCommand.Options.Add (debugLogLevel);
 
-        runCommand.SetHandler ((scenarioName, driver, disableCm, force16, logLevel) =>
-                               {
-                                   SetupLogging (logLevel);
+        runCommand.SetAction (parseResult =>
+                              {
+                                  // Extract the values ​​using parseResult.
+                                  string scenarioName = parseResult.GetRequiredValue (scenarioArgument);
+                                  string driver = parseResult.GetRequiredValue (driverOption);
+                                  bool disableCm = parseResult.GetRequiredValue (disableConfigManagement);
+                                  bool force16 = parseResult.GetRequiredValue (force16Colors);
+                                  string logLevel = parseResult.GetRequiredValue (debugLogLevel);
 
-                                   if (!disableCm)
-                                   {
-                                       ConfigurationManager.Enable (ConfigLocations.All);
-                                   }
+                                  // Executing the original logic
+                                  SetupLogging (logLevel);
 
-                                   Scenario? scenario = FindScenario (scenarioName);
+                                  Runner runner = new ();
 
-                                   if (scenario is null)
-                                   {
-                                       Console.Error.WriteLine ($"Scenario '{scenarioName}' not found.");
+                                  if (!disableCm)
+                                  {
+                                      runner.SetRuntimeConfig (driver, force16 ? true : null);
+                                      ConfigurationManager.Enable (ConfigLocations.All);
+                                  }
 
-                                       return;
-                                   }
+                                  Scenario? scenario = FindScenario (scenarioName);
 
-                                   // Pass force16 only if explicitly set (default false means not set)
-                                   Runner runner = new (driver, force16 ? true : null);
-                                   runner.RunScenario (scenarioName, false);
-                               },
-                               scenarioArgument,
-                               driverOption,
-                               disableConfigManagement,
-                               force16Colors,
-                               debugLogLevel);
+                                  if (scenario is null)
+                                  {
+                                      Console.Error.WriteLine ($"Scenario '{scenarioName}' not found.");
+
+                                      return; // SetAction returns void, so the empty return value works.
+                                  }
+
+                                  // Pass force16 only if explicitly set (default false means not set)
+                                  runner.RunScenario (scenarioName, false);
+                              });
 
         // Benchmark command
-        Argument<string?> benchmarkScenarioArgument =
-            new ("scenario", () => null, "The name of the Scenario to benchmark. If not specified, all scenarios are benchmarked.");
+        Argument<string?> benchmarkScenarioArgument = new ("scenario")
+        {
+            Description = "The name of the Scenario to benchmark. If not specified, all scenarios are benchmarked.", DefaultValueFactory = _ => null
+        };
 
         Command benchmarkCommand = new ("benchmark", "Benchmark scenarios") { benchmarkScenarioArgument };
 
-        benchmarkCommand.AddOption (driverOption);
-        benchmarkCommand.AddOption (disableConfigManagement);
-        benchmarkCommand.AddOption (force16Colors);
-        benchmarkCommand.AddOption (benchmarkTimeout);
-        benchmarkCommand.AddOption (resultsFile);
-        benchmarkCommand.AddOption (debugLogLevel);
+        benchmarkCommand.Options.Add (driverOption);
+        benchmarkCommand.Options.Add (disableConfigManagement);
+        benchmarkCommand.Options.Add (force16Colors);
+        benchmarkCommand.Options.Add (benchmarkTimeout);
+        benchmarkCommand.Options.Add (resultsFile);
+        benchmarkCommand.Options.Add (debugLogLevel);
 
-        benchmarkCommand.SetHandler ((scenarioName, driver, disableCm, force16, timeout, file, logLevel) =>
-                                     {
-                                         SetupLogging (logLevel);
-                                         Scenario.BenchmarkTimeout = timeout;
+        benchmarkCommand.SetAction (parseResult =>
+                                    {
+                                        // Extract the values ​​using parseResult.
+                                        string scenarioName = parseResult.GetRequiredValue (scenarioArgument);
+                                        string driver = parseResult.GetRequiredValue (driverOption);
+                                        bool disableCm = parseResult.GetRequiredValue (disableConfigManagement);
+                                        bool force16 = parseResult.GetRequiredValue (force16Colors);
+                                        uint timeout = parseResult.GetRequiredValue (benchmarkTimeout);
+                                        string file = parseResult.GetRequiredValue (resultsFile);
+                                        string logLevel = parseResult.GetRequiredValue (debugLogLevel);
 
-                                         if (!disableCm)
-                                         {
-                                             ConfigurationManager.Enable (ConfigLocations.All);
-                                         }
+                                        SetupLogging (logLevel);
+                                        Scenario.BenchmarkTimeout = timeout;
 
-                                         // Pass force16 only if explicitly set
-                                         Runner runner = new (driver, force16 ? true : null);
-                                         List<BenchmarkResults> results;
+                                        Runner runner = new ();
 
-                                         if (string.IsNullOrEmpty (scenarioName))
-                                         {
-                                             // Benchmark all scenarios
-                                             ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
-                                             results = runner.BenchmarkAllScenarios (scenarios);
-                                         }
-                                         else
-                                         {
-                                             // Benchmark single scenario
-                                             Scenario? scenario = FindScenario (scenarioName);
+                                        if (!disableCm)
+                                        {
+                                            // Pass force16 only if explicitly set
+                                            runner.SetRuntimeConfig (driver, force16 ? true : null);
+                                            ConfigurationManager.Enable (ConfigLocations.All);
+                                        }
 
-                                             if (scenario is null)
-                                             {
-                                                 Console.Error.WriteLine ($"Scenario '{scenarioName}' not found.");
+                                        List<BenchmarkResults> results;
 
-                                                 return;
-                                             }
+                                        if (string.IsNullOrEmpty (scenarioName))
+                                        {
+                                            // Benchmark all scenarios
+                                            ObservableCollection<Scenario> scenarios = Scenario.GetScenarios ();
+                                            results = runner.BenchmarkAllScenarios (scenarios);
+                                        }
+                                        else
+                                        {
+                                            // Benchmark single scenario
+                                            Scenario? scenario = FindScenario (scenarioName);
 
-                                             BenchmarkResults? result = runner.RunScenario (scenarioName, true);
-                                             results = result is { } ? [result] : [];
-                                         }
+                                            if (scenario is null)
+                                            {
+                                                Console.Error.WriteLine ($"Scenario '{scenarioName}' not found.");
 
-                                         if (results.Count == 0)
-                                         {
-                                             Console.WriteLine (@"No benchmark results collected.");
+                                                return;
+                                            }
 
-                                             return;
-                                         }
+                                            BenchmarkResults? result = runner.RunScenario (scenarioName, true);
+                                            results = result is { } ? [result] : [];
+                                        }
 
-                                         if (!string.IsNullOrEmpty (file))
-                                         {
-                                             Runner.SaveResultsToFile (results, file);
-                                             Console.WriteLine (@$"Results saved to {file}");
-                                         }
-                                         else
-                                         {
-                                             // Display in UI
-                                             Runner.DisplayResultsUI (results);
-                                         }
-                                     },
-                                     benchmarkScenarioArgument,
-                                     driverOption,
-                                     disableConfigManagement,
-                                     force16Colors,
-                                     benchmarkTimeout,
-                                     resultsFile,
-                                     debugLogLevel);
+                                        if (results.Count == 0)
+                                        {
+                                            Console.WriteLine (@"No benchmark results collected.");
+
+                                            return;
+                                        }
+
+                                        if (!string.IsNullOrEmpty (file))
+                                        {
+                                            Runner.SaveResultsToFile (results, file);
+                                            Console.WriteLine (@$"Results saved to {file}");
+                                        }
+                                        else
+                                        {
+                                            // Display in UI
+                                            Runner.DisplayResultsUI (results);
+                                        }
+                                    });
 
         RootCommand rootCommand = new ("Terminal.Gui Scenario Runner - Run and benchmark Terminal.Gui scenarios") { listCommand, runCommand, benchmarkCommand };
 
-        Parser parser = new CommandLineBuilder (rootCommand).UseDefaults ().Build ();
-
-        return parser.Invoke (args);
+        return rootCommand.Parse (args).Invoke ();
     }
 
     private static Scenario? FindScenario (string name)

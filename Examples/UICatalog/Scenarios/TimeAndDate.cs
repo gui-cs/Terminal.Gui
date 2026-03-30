@@ -1,19 +1,16 @@
-﻿#nullable enable
+#nullable enable
 using System;
+using System.Globalization;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Time And Date", "Illustrates TimeField and time & date handling")]
+[ScenarioMetadata ("Time And Date", "Illustrates TimeEditor, DateEditor, DatePicker, and Prompt<DatePicker>")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("DateTime")]
 public class TimeAndDate : Scenario
 {
-    private Label? _lblDateFmt;
-    private Label? _lblNewDate;
-    private Label? _lblNewTime;
-    private Label? _lblOldDate;
-    private Label? _lblOldTime;
-    private Label? _lblTimeFmt;
+    private Label? _lblDateEditorValue;
+    private Label? _lblTimeEditorValue;
 
     public override void Main ()
     {
@@ -23,136 +20,235 @@ public class TimeAndDate : Scenario
         app.Init ();
 
         using Window win = new () { Title = GetQuitKeyAndName () };
-        TimeField longTime = new ()
+
+        // ── TimeEditor examples ──────────────────────────────────────
+        Label teLabel = new ()
         {
-            X = Pos.Center (),
-            Y = 2,
-            IsShortFormat = false,
-            ReadOnly = false,
+            X = 0,
+            Y = 0,
+            Text = "TimeEditor (based on TextValidateField):"
+        };
+        win.Add (teLabel);
+
+        // Default culture time editor
+        TimeEditor defaultTimeEditor = new ()
+        {
+            X = 0,
+            Y = Pos.Bottom (teLabel),
             Value = DateTime.Now.TimeOfDay
         };
-        longTime.ValueChanged += TimeChanged;
-        win.Add (longTime);
+        defaultTimeEditor.ValueChanged += TimeEditorChanged;
+        win.Add (defaultTimeEditor);
 
-        TimeField shortTime = new ()
+        Label defaultPatternLabel = new ()
         {
-            X = Pos.Center (),
-            Y = Pos.Bottom (longTime) + 1,
-            IsShortFormat = true,
-            ReadOnly = false,
-            Value = DateTime.Now.TimeOfDay
+            X = Pos.Right (defaultTimeEditor) + 1,
+            Y = Pos.Top (defaultTimeEditor),
+            Text = $"Pattern: {CultureInfo.CurrentCulture.DateTimeFormat.LongTimePattern}"
         };
-        shortTime.ValueChanged += TimeChanged;
-        win.Add (shortTime);
+        win.Add (defaultPatternLabel);
 
-        DateField shortDate = new (DateTime.Now)
+        // 24-hour format time editor
+        DateTimeFormatInfo format24h = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-GB").DateTimeFormat.Clone ();
+
+        TimeEditor time24Editor = new ()
         {
-            X = Pos.Center (), Y = Pos.Bottom (shortTime) + 1, ReadOnly = true
+            X = 0,
+            Y = Pos.Bottom (defaultTimeEditor) + 1,
+            Value = DateTime.Now.TimeOfDay,
+            Format = format24h
         };
-        shortDate.ValueChanged += DateChanged;
-        win.Add (shortDate);
+        time24Editor.ValueChanged += TimeEditorChanged;
+        win.Add (time24Editor);
 
-        DateField longDate = new (DateTime.Now)
+        Label time24PatternLabel = new ()
         {
-            X = Pos.Center (), Y = Pos.Bottom (shortDate) + 1, ReadOnly = false
+            X = Pos.Right (time24Editor) + 1,
+            Y = Pos.Top (time24Editor),
+            Text = $"Pattern: {format24h.LongTimePattern}"
         };
-        longDate.ValueChanged += DateChanged;
-        win.Add (longDate);
+        win.Add (time24PatternLabel);
 
-        _lblOldTime = new()
+        // Short time format time editor
+        DateTimeFormatInfo shortFormat = (DateTimeFormatInfo)CultureInfo.CurrentCulture.DateTimeFormat.Clone ();
+        shortFormat.LongTimePattern = shortFormat.ShortTimePattern;
+
+        TimeEditor shortTimeEditor = new ()
         {
-            X = Pos.Center (),
-            Y = Pos.Bottom (longDate) + 1,
-            TextAlignment = Alignment.Center,
-
-            Width = Dim.Fill (),
-            Text = "Old Time: "
+            X = 0,
+            Y = Pos.Bottom (time24Editor) + 1,
+            Value = DateTime.Now.TimeOfDay,
+            Format = shortFormat
         };
-        win.Add (_lblOldTime);
+        shortTimeEditor.ValueChanged += TimeEditorChanged;
+        win.Add (shortTimeEditor);
 
-        _lblNewTime = new()
+        Label shortPatternLabel = new ()
         {
-            X = Pos.Center (),
-            Y = Pos.Bottom (_lblOldTime) + 1,
-            TextAlignment = Alignment.Center,
-
-            Width = Dim.Fill (),
-            Text = "New Time: "
+            X = Pos.Right (shortTimeEditor) + 1,
+            Y = Pos.Top (shortTimeEditor),
+            Text = $"Pattern: {shortFormat.LongTimePattern}"
         };
-        win.Add (_lblNewTime);
+        win.Add (shortPatternLabel);
 
-        _lblTimeFmt = new()
+        _lblTimeEditorValue = new ()
         {
-            X = Pos.Center (),
-            Y = Pos.Bottom (_lblNewTime) + 1,
-            TextAlignment = Alignment.Center,
-
-            Width = Dim.Fill (),
-            Text = "Time Format: "
+            X = 0,
+            Y = Pos.Bottom (shortTimeEditor) + 1,
+            Text = "TimeEditor Value: "
         };
-        win.Add (_lblTimeFmt);
+        win.Add (_lblTimeEditorValue);
 
-        _lblOldDate = new()
+        // ── DateEditor examples ──────────────────────────────────────
+        Label deLabel = new ()
         {
-            X = Pos.Center (),
-            Y = Pos.Bottom (_lblTimeFmt) + 2,
-            TextAlignment = Alignment.Center,
-
-            Width = Dim.Fill (),
-            Text = "Old Date: "
+            X = 0,
+            Y = Pos.Bottom (_lblTimeEditorValue) + 1,
+            Text = "DateEditor (based on TextValidateField):"
         };
-        win.Add (_lblOldDate);
+        win.Add (deLabel);
 
-        _lblNewDate = new()
+        // Default culture date editor
+        DateEditor defaultDateEditor = new ()
         {
-            X = Pos.Center (),
-            Y = Pos.Bottom (_lblOldDate) + 1,
-            TextAlignment = Alignment.Center,
-
-            Width = Dim.Fill (),
-            Text = "New Date: "
+            X = 0,
+            Y = Pos.Bottom (deLabel),
+            Value = DateTime.Today
         };
-        win.Add (_lblNewDate);
+        defaultDateEditor.ValueChanged += DateEditorChanged;
+        win.Add (defaultDateEditor);
 
-        _lblDateFmt = new()
+        Label defaultDatePatternLabel = new ()
         {
-            X = Pos.Center (),
-            Y = Pos.Bottom (_lblNewDate) + 1,
-            TextAlignment = Alignment.Center,
-
-            Width = Dim.Fill (),
-            Text = "Date Format: "
+            X = Pos.Right (defaultDateEditor) + 1,
+            Y = Pos.Top (defaultDateEditor),
+            Text = $"Pattern: {CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern}"
         };
-        win.Add (_lblDateFmt);
+        win.Add (defaultDatePatternLabel);
 
-        Button swapButton = new ()
+        // US format date editor
+        DateTimeFormatInfo usFormat = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("en-US").DateTimeFormat.Clone ();
+
+        DateEditor usDateEditor = new ()
         {
-            X = Pos.Center (), Y = Pos.Bottom (win) - 5, Text = "Swap Long/Short & Read/Read Only"
+            X = 0,
+            Y = Pos.Bottom (defaultDateEditor) + 1,
+            Value = DateTime.Today,
+            Format = usFormat
         };
+        usDateEditor.ValueChanged += DateEditorChanged;
+        win.Add (usDateEditor);
 
-        swapButton.Accepting += (_, _) =>
-                             {
-                                 longTime.ReadOnly = !longTime.ReadOnly;
-                                 shortTime.ReadOnly = !shortTime.ReadOnly;
+        Label usDatePatternLabel = new ()
+        {
+            X = Pos.Right (usDateEditor) + 1,
+            Y = Pos.Top (usDateEditor),
+            Text = $"Pattern: {usFormat.ShortDatePattern}"
+        };
+        win.Add (usDatePatternLabel);
 
-                                 longTime.IsShortFormat = !longTime.IsShortFormat;
-                                 shortTime.IsShortFormat = !shortTime.IsShortFormat;
+        // German format date editor
+        DateTimeFormatInfo deFormat = (DateTimeFormatInfo)CultureInfo.GetCultureInfo ("de-DE").DateTimeFormat.Clone ();
 
-                                 longDate.ReadOnly = !longDate.ReadOnly;
-                                 shortDate.ReadOnly = !shortDate.ReadOnly;
-                             };
-        win.Add (swapButton);
+        DateEditor germanDateEditor = new ()
+        {
+            X = 0,
+            Y = Pos.Bottom (usDateEditor) + 1,
+            Value = DateTime.Today,
+            Format = deFormat
+        };
+        germanDateEditor.ValueChanged += DateEditorChanged;
+        win.Add (germanDateEditor);
+
+        Label germanDatePatternLabel = new ()
+        {
+            X = Pos.Right (germanDateEditor) + 1,
+            Y = Pos.Top (germanDateEditor),
+            Text = $"Pattern: {deFormat.ShortDatePattern}"
+        };
+        win.Add (germanDatePatternLabel);
+
+        _lblDateEditorValue = new ()
+        {
+            X = 0,
+            Y = Pos.Bottom (germanDateEditor) + 1,
+            Text = "DateEditor Value: "
+        };
+        win.Add (_lblDateEditorValue);
+
+        // ── Inline DatePicker synced to default DateEditor ───────────
+        Label dpLabel = new ()
+        {
+            X = Pos.Percent (50),
+            Y = Pos.Top (deLabel),
+            Text = "DatePicker (synced with default DateEditor):"
+        };
+        win.Add (dpLabel);
+
+        DatePicker inlineDatePicker = new (defaultDateEditor.Value)
+        {
+            X = Pos.Percent (50),
+            Y = Pos.Bottom (dpLabel)
+        };
+        win.Add (inlineDatePicker);
+
+        // Sync DateEditor → DatePicker
+        defaultDateEditor.ValueChanged += (_, e) =>
+                                          {
+                                              inlineDatePicker.Value = e.NewValue;
+                                          };
+
+        // Sync DatePicker → DateEditor
+        inlineDatePicker.ValueChanged += (_, e) => defaultDateEditor.Value = e.NewValue;
+
+        // ── Prompt<DatePicker> button ────────────────────────────────
+        Button promptDatePickerButton = new ()
+        {
+            X = Pos.Percent (50),
+            Y = Pos.Bottom (inlineDatePicker) + 1,
+            Text = "Prompt<DatePicker>..."
+        };
+        win.Add (promptDatePickerButton);
+
+        Label promptResultLabel = new ()
+        {
+            X = Pos.Percent (50),
+            Y = Pos.Bottom (promptDatePickerButton),
+            Text = "Prompt result: (none)"
+        };
+        win.Add (promptResultLabel);
+
+        promptDatePickerButton.Accepting += (_, _) =>
+                                            {
+                                                DateTime? result = win.Prompt<DatePicker, DateTime?> (
+                                                                                                      view: new DatePicker (defaultDateEditor.Value),
+                                                                                                      resultExtractor: dp => dp.Value,
+                                                                                                      beginInitHandler: prompt =>
+                                                                                                                        {
+                                                                                                                            prompt.Title = "Pick a Date";
+                                                                                                                        });
+
+                                                if (result is { } selectedDate)
+                                                {
+                                                    promptResultLabel.Text = $"Prompt result: {selectedDate:d}";
+                                                    defaultDateEditor.Value = selectedDate;
+                                                }
+                                                else
+                                                {
+                                                    promptResultLabel.Text = "Prompt result: (cancelled)";
+                                                }
+                                            };
 
         app.Run (win);
     }
 
-    private void DateChanged (object? sender, ValueChangedEventArgs<DateTime?> e)
+    private void DateEditorChanged (object? sender, ValueChangedEventArgs<DateTime> e)
     {
-        _lblNewDate!.Text = $"New Date: {e.NewValue}";
+        _lblDateEditorValue!.Text = $"DateEditor Value: {e.NewValue:d}";
     }
 
-    private void TimeChanged (object? sender, ValueChangedEventArgs<TimeSpan> e)
+    private void TimeEditorChanged (object? sender, ValueChangedEventArgs<TimeSpan> e)
     {
-        _lblNewTime!.Text = $"New Time: {e.NewValue}";
+        _lblTimeEditorValue!.Text = $"TimeEditor Value: {e.NewValue}";
     }
 }

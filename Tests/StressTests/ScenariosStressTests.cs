@@ -1,6 +1,5 @@
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using UICatalog;
-using Xunit.Abstractions;
 
 namespace StressTests;
 
@@ -183,7 +182,7 @@ public class ScenariosStressTests
             }
 
             _output.WriteLine (
-                               $"'{scenarioName}' failed to Quit with {Application.QuitKey} after {abortTime}ms and {iterationCount} iterations. Force quit.");
+                               $"'{scenarioName}' failed to Quit with {Application.GetDefaultKey (Command.Quit)} after {abortTime}ms and {iterationCount} iterations. Force quit.");
 
             app?.RequestStop ();
 

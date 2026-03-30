@@ -1,6 +1,5 @@
 #nullable enable
 using System.Collections.Concurrent;
-using Xunit.Abstractions;
 
 namespace DriverTests.DotnetDriver;
 
@@ -207,6 +206,20 @@ public class NetInputOutputTests (ITestOutputHelper output)
 
     [Fact]
     [Trait ("Category", "LowLevelDriver")]
+    public void NetOutput_Suspend_DoesNotThrow_WhenNoTerminalAvailable ()
+    {
+        // Arrange
+        using var output = new NetOutput ();
+
+        // Act
+        Exception? exception = Record.Exception (() => output.Suspend ());
+
+        // Assert
+        Assert.Null (exception);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
     public void NetInputProcessor_Constructor_DoesNotThrow ()
     {
         // Arrange & Act
@@ -273,5 +286,19 @@ public class NetInputOutputTests (ITestOutputHelper output)
         }
 
         Assert.Null (exception);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void NetDriver_IsAttachedToTerminal_ReturnsFalse_InTestHarness ()
+    {
+        // Copilot - generated.
+        // Act — Driver.IsAttachedToTerminal is the shared entry point all drivers use.
+        bool result = Driver.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached);
+
+        // Assert
+        Assert.False (result, "NetDriver: IsAttachedToTerminal should return false in test harness");
+        Assert.False (inputAttached);
+        Assert.False (outputAttached);
     }
 }

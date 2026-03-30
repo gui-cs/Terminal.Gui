@@ -2,9 +2,66 @@ namespace Terminal.Gui.Views;
 
 public partial class TextView
 {
+    /// <summary>
+    ///     Gets or sets the view-specific default key bindings for <see cref="TextView"/>. Contains only bindings
+    ///     unique to this view; shared bindings come from <see cref="View.DefaultKeyBindings"/>.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Only single-command bindings are included here. Dynamic bindings (e.g., Enter for NewLine/Accept
+    ///         depending on <see cref="Multiline"/>, Tab depending on <see cref="TabKeyAddsTab"/>)
+    ///         are added directly in the constructor.
+    ///     </para>
+    /// </remarks>
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    {
+        // Emacs navigation
+        [Command.Down] = Bind.All (Key.N.WithCtrl),
+        [Command.Up] = Bind.All (Key.P.WithCtrl),
+        [Command.Right] = Bind.All (Key.F.WithCtrl),
+        [Command.Left] = Bind.All (Key.B.WithCtrl),
+
+        // Additional RightEnd binding
+        [Command.RightEnd] = Bind.All (Key.E.WithCtrl),
+
+        // Toggle selection mode
+        [Command.ToggleExtend] = Bind.All (Key.Space.WithCtrl),
+
+        // Kill / cut line commands
+        [Command.CutToEndOfLine] = Bind.All (Key.K.WithCtrl),
+        [Command.CutToStartOfLine] = Bind.All (Key.Backspace.WithCtrl.WithShift),
+        [Command.DeleteAll] = Bind.All (Key.Delete.WithCtrl.WithShift),
+
+        // Additional Cut binding (Emacs)
+        [Command.Cut] = Bind.All (Key.W.WithCtrl),
+
+        // Word navigation
+        [Command.WordLeft] = Bind.All (Key.CursorLeft.WithCtrl),
+        [Command.WordRight] = Bind.All (Key.CursorRight.WithCtrl),
+        [Command.WordLeftExtend] = Bind.All (Key.CursorLeft.WithCtrl.WithShift),
+        [Command.WordRightExtend] = Bind.All (Key.CursorRight.WithCtrl.WithShift),
+
+        // Kill word
+        [Command.KillWordRight] = Bind.All (Key.Delete.WithCtrl),
+        [Command.KillWordLeft] = Bind.All (Key.Backspace.WithCtrl),
+
+        // Overwrite mode
+        [Command.ToggleOverwrite] = Bind.All (Key.InsertChar),
+
+        // Open color picker
+        [Command.Open] = Bind.All (Key.L.WithCtrl)
+    };
+
     private void CreateCommandsAndBindings ()
     {
         // Things this view knows how to do
+
+        // TextView does nothing on the Accept command (multiline input)
+        //AddCommand (Command.Accept, () => false);
 
         // Note - NewLine is only bound to Enter if Multiline is true
         AddCommand (Command.NewLine, ctx => ProcessEnterKey (ctx));
@@ -58,95 +115,18 @@ public partial class TextView
         AddCommand (Command.Context, () => ShowContextMenu (null));
         AddCommand (Command.Open, () => PromptForColors ());
 
-        // Default keybindings for this view
+        // Apply configurable key bindings (base layer + TextView-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
+
         KeyBindings.Remove (Key.Space);
 
+        // Dynamic binding: Enter maps to NewLine or Accept depending on Multiline
         KeyBindings.Remove (Key.Enter);
         KeyBindings.Add (Key.Enter, Multiline ? Command.NewLine : Command.Accept);
 
-        KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.V.WithCtrl, Command.PageDown);
-
-        KeyBindings.Add (Key.PageDown.WithShift, Command.PageDownExtend);
-
-        KeyBindings.Add (Key.PageUp, Command.PageUp);
-
-        KeyBindings.Add (Key.PageUp.WithShift, Command.PageUpExtend);
-
-        KeyBindings.Add (Key.N.WithCtrl, Command.Down);
-        KeyBindings.Add (Key.CursorDown, Command.Down);
-
-        KeyBindings.Add (Key.CursorDown.WithShift, Command.DownExtend);
-
-        KeyBindings.Add (Key.P.WithCtrl, Command.Up);
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-
-        KeyBindings.Add (Key.CursorUp.WithShift, Command.UpExtend);
-
-        KeyBindings.Add (Key.F.WithCtrl, Command.Right);
-        KeyBindings.Add (Key.CursorRight, Command.Right);
-
-        KeyBindings.Add (Key.CursorRight.WithShift, Command.RightExtend);
-
-        KeyBindings.Add (Key.B.WithCtrl, Command.Left);
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
-
-        KeyBindings.Add (Key.CursorLeft.WithShift, Command.LeftExtend);
-
-        KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
-
-        KeyBindings.Add (Key.Home, Command.LeftStart);
-
-        KeyBindings.Add (Key.Home.WithShift, Command.LeftStartExtend);
-
-        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
-        KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
-
-        KeyBindings.Add (Key.End, Command.RightEnd);
-        KeyBindings.Add (Key.E.WithCtrl, Command.RightEnd);
-
-        KeyBindings.Add (Key.End.WithShift, Command.RightEndExtend);
-
-        KeyBindings.Add (Key.K.WithCtrl, Command.CutToEndOfLine); // kill-to-end
-
-        KeyBindings.Add (Key.Delete.WithCtrl.WithShift, Command.CutToEndOfLine); // kill-to-end
-
-        KeyBindings.Add (Key.Backspace.WithCtrl.WithShift, Command.CutToStartOfLine); // kill-to-start
-
-        KeyBindings.Add (Key.Y.WithCtrl, Command.Paste); // Control-y, yank
-        KeyBindings.Add (Key.Space.WithCtrl, Command.ToggleExtend);
-
-        KeyBindings.Add (Key.C.WithCtrl, Command.Copy);
-
-        KeyBindings.Add (Key.W.WithCtrl, Command.Cut); // Move to Unix?
-        KeyBindings.Add (Key.X.WithCtrl, Command.Cut);
-
-        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.WordLeft);
-
-        KeyBindings.Add (Key.CursorLeft.WithCtrl.WithShift, Command.WordLeftExtend);
-
-        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.WordRight);
-
-        KeyBindings.Add (Key.CursorRight.WithCtrl.WithShift, Command.WordRightExtend);
-        KeyBindings.Add (Key.Delete.WithCtrl, Command.KillWordRight); // kill-word-forwards
-        KeyBindings.Add (Key.Backspace.WithCtrl, Command.KillWordLeft); // kill-word-backwards
-
-        KeyBindings.Add (Key.End.WithCtrl, Command.End);
-        KeyBindings.Add (Key.End.WithCtrl.WithShift, Command.EndExtend);
-        KeyBindings.Add (Key.Home.WithCtrl, Command.Start);
-        KeyBindings.Add (Key.Home.WithCtrl.WithShift, Command.StartExtend);
-        KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
-        KeyBindings.Add (Key.InsertChar, Command.ToggleOverwrite);
+        // Dynamic bindings: Tab/Shift+Tab (depend on TabKeyAddsTab property)
         KeyBindings.Add (Key.Tab, Command.NextTabStop);
         KeyBindings.Add (Key.Tab.WithShift, Command.PreviousTabStop);
-
-        KeyBindings.Add (Key.Z.WithCtrl, Command.Undo);
-        KeyBindings.Add (Key.R.WithCtrl, Command.Redo);
-
-        KeyBindings.Add (Key.G.WithCtrl, Command.DeleteAll);
-        KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);
-
-        KeyBindings.Add (Key.L.WithCtrl, Command.Open);
     }
 
     private void DoNeededAction ()
@@ -368,9 +348,7 @@ public partial class TextView
             return true;
         }
 
-        _selectionStartColumn = 0;
-        _selectionStartRow = 0;
-        MoveBottomEndExtend ();
+        SelectAll ();
 
         return DeleteCharLeft ();
     }
@@ -484,7 +462,7 @@ public partial class TextView
 
             _historyText.Add ([[.. prevRow]], InsertionPoint);
 
-            List<List<Cell>> removedLines = [[..prevRow], [..GetCurrentLine ()]];
+            List<List<Cell>> removedLines = [[.. prevRow], [.. GetCurrentLine ()]];
 
             _historyText.Add (removedLines, new Point (CurrentColumn, prowIdx), TextEditingLineStatus.Removed);
 
@@ -716,7 +694,7 @@ public partial class TextView
                 CurrentRow--;
                 currentLine = _model.GetLine (CurrentRow);
 
-                List<List<Cell>> removedLine = [[..currentLine], []];
+                List<List<Cell>> removedLine = [[.. currentLine], []];
 
                 _historyText.Add ([.. removedLine], InsertionPoint, TextEditingLineStatus.Removed);
 

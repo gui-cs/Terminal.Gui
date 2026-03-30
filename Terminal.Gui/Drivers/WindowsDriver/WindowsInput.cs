@@ -1,5 +1,5 @@
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.Logging;
+using Terminal.Gui.Tracing;
 using static Terminal.Gui.Drivers.WindowsConsole;
 
 namespace Terminal.Gui.Drivers;
@@ -9,20 +9,10 @@ internal class WindowsInput : InputImpl<InputRecord>, IWindowsInput
     private readonly nint _inputHandle;
 
     [DllImport ("kernel32.dll", EntryPoint = "ReadConsoleInputW", CharSet = CharSet.Unicode)]
-    public static extern bool ReadConsoleInput (
-        nint hConsoleInput,
-        nint lpBuffer,
-        uint nLength,
-        out uint lpNumberOfEventsRead
-    );
+    public static extern bool ReadConsoleInput (nint hConsoleInput, nint lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
 
     [DllImport ("kernel32.dll", EntryPoint = "PeekConsoleInputW", CharSet = CharSet.Unicode)]
-    public static extern bool PeekConsoleInput (
-        nint hConsoleInput,
-        nint lpBuffer,
-        uint nLength,
-        out uint lpNumberOfEventsRead
-    );
+    public static extern bool PeekConsoleInput (nint hConsoleInput, nint lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
 
     [DllImport ("kernel32.dll", SetLastError = true)]
     private static extern nint GetStdHandle (int nStdHandle);
@@ -40,7 +30,13 @@ internal class WindowsInput : InputImpl<InputRecord>, IWindowsInput
 
     public WindowsInput ()
     {
-        //Logging.Information ($"Creating {nameof (WindowsInput)}");
+        // Check if we have a real console first
+        if (!IsAttachedToTerminal)
+        {
+            Trace.Lifecycle (nameof (WindowsInput), "Init", "Console is not attached to a terminal. Running in degraded mode.");
+
+            return;
+        }
 
         try
         {
@@ -101,19 +97,14 @@ internal class WindowsInput : InputImpl<InputRecord>, IWindowsInput
 
         try
         {
-            ReadConsoleInput (
-                              _inputHandle,
-                              pRecord,
-                              BUFFER_SIZE,
-                              out uint numberEventsRead);
+            ReadConsoleInput (_inputHandle, pRecord, BUFFER_SIZE, out uint numberEventsRead);
 
-            return numberEventsRead == 0
-                       ? []
-                       : new [] { Marshal.PtrToStructure<InputRecord> (pRecord) };
+            return numberEventsRead == 0 ? [] : new [] { Marshal.PtrToStructure<InputRecord> (pRecord) };
         }
         catch (Exception)
         {
             Logging.Error ($"Error reading console input, error code: {Marshal.GetLastWin32Error ()}.");
+
             return [];
         }
         finally

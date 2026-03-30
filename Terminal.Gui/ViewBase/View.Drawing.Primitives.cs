@@ -1,6 +1,4 @@
-﻿
-
-namespace Terminal.Gui.ViewBase;
+﻿namespace Terminal.Gui.ViewBase;
 
 public partial class View
 {
@@ -27,17 +25,14 @@ public partial class View
 
     /// <summary>Draws the specified character at the current draw position.</summary>
     /// <param name="rune">The Rune.</param>
-    public void AddRune (Rune rune)
-    {
-        Driver?.AddRune (rune);
-    }
+    public void AddRune (Rune rune) => Driver?.AddRune (rune);
 
     /// <summary>
     ///     Adds the specified <see langword="char"/> to the display at the current cursor position. This method is a
     ///     convenience method that calls <see cref="AddRune(Rune)"/> with the <see cref="Rune"/> constructor.
     /// </summary>
     /// <param name="c">Character to add.</param>
-    public void AddRune (char c) { AddRune (new Rune (c)); }
+    public void AddRune (char c) => AddRune (new Rune (c));
 
     /// <summary>Draws the specified character in the specified viewport-relative column and row of the View.</summary>
     /// <para>
@@ -57,20 +52,17 @@ public partial class View
         }
     }
 
-
     /// <summary>Adds the <paramref name="str"/> to the display at the current draw position.</summary>
     /// <remarks>
     ///     <para>
     ///         When the method returns, the draw position will be incremented by the number of columns
-    ///         <paramref name="str"/> required, unless the new column value is outside the <see cref="GetClip"/> or <see cref="Application.Screen"/>.
+    ///         <paramref name="str"/> required, unless the new column value is outside the <see cref="GetClip"/> or
+    ///         <see cref="Application.Screen"/>.
     ///     </para>
     ///     <para>If <paramref name="str"/> requires more columns than are available, the output will be clipped.</para>
     /// </remarks>
     /// <param name="str">String.</param>
-    public void AddStr (string str)
-    {
-        Driver?.AddStr (str);
-    }
+    public void AddStr (string str) => Driver?.AddStr (str);
 
     /// <summary>Draws the specified <paramref name="str"/> in the specified viewport-relative column and row of the View.</summary>
     /// <para>
@@ -106,16 +98,17 @@ public partial class View
         Rune hotkeySpec = HotKeySpecifier == (Rune)0xffff ? (Rune)'_' : HotKeySpecifier;
         SetAttribute (normalColor);
 
-        foreach (Rune rune in text.EnumerateRunes ())
+        foreach (string grapheme in GraphemeHelper.GetGraphemes (text))
         {
-            if (rune == new Rune (hotkeySpec.Value))
+            // The hotkey specifier is always a single simple character (e.g., '_')
+            if (grapheme.Length == 1 && new Rune (grapheme [0]) == new Rune (hotkeySpec.Value))
             {
                 SetAttribute (hotColor);
 
                 continue;
             }
 
-            AddRune (rune);
+            AddStr (grapheme);
             SetAttribute (normalColor);
         }
     }
@@ -137,11 +130,9 @@ public partial class View
         }
         else
         {
-            DrawHotString (
-                           text,
+            DrawHotString (text,
                            Enabled ? GetAttributeForRole (VisualRole.HotNormal) : GetScheme ().Disabled,
-                           Enabled ? GetAttributeForRole (VisualRole.Normal) : GetScheme ().Disabled
-                          );
+                           Enabled ? GetAttributeForRole (VisualRole.Normal) : GetScheme ().Disabled);
         }
     }
 
@@ -157,7 +148,7 @@ public partial class View
 
         Region? prevClip = AddViewportToClip ();
         Rectangle toClear = ViewportToScreen (rect);
-        Attribute prev = SetAttribute (new (color ?? GetAttributeForRole (VisualRole.Normal).Background));
+        Attribute prev = SetAttribute (new Attribute (color ?? GetAttributeForRole (VisualRole.Normal).Background));
         Driver.FillRect (toClear);
         SetAttribute (prev);
         SetClip (prevClip);
@@ -178,5 +169,4 @@ public partial class View
         Driver.FillRect (toClear, rune);
         SetClip (prevClip);
     }
-
 }

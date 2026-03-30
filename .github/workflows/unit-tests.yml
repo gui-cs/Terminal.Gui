@@ -9,23 +9,19 @@ on:
     branches: [ v2_release, v2_develop ]
     paths-ignore:
       - '**.md'
-      
-jobs:
-  # Call the quick-build workflow to build Debug configuration only
-  build:
-    uses: ./.github/workflows/quick-build.yml
 
+jobs:
   non_parallel_unittests:
-    name: Non-Parallel Unit Tests  
+    name: Non-Parallel Unit Tests
     runs-on: ${{ matrix.os }}
-    needs: build
     strategy:
-      # Turn off fail-fast to let all runners run even if there are errors
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
-    timeout-minutes: 15  # Increased from 10 for Windows
+    timeout-minutes: 15
+    env:
+      DisableRealDriverIO: "1"
     steps:
 
     - name: Checkout code
@@ -37,15 +33,11 @@ jobs:
         dotnet-version: 10.x
         dotnet-quality: 'ga'
 
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: test-build-artifacts
-        path: .
-
-    # KEEP THIS - It's needed for --no-build to work
     - name: Restore NuGet packages
       run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore
 
     # Optimize Windows performance
     - name: Disable Windows Defender (Windows only)
@@ -54,42 +46,15 @@ jobs:
       run: |
         Add-MpPreference -ExclusionPath "${{ github.workspace }}"
         Add-MpPreference -ExclusionProcess "dotnet.exe"
-        Add-MpPreference -ExclusionProcess "testhost.exe"
-        Add-MpPreference -ExclusionProcess "VSTest.Console.exe"
 
-    - name: Set VSTEST_DUMP_PATH
-      shell: bash
-      run: echo "VSTEST_DUMP_PATH=logs/UnitTests/${{ runner.os }}/" >> $GITHUB_ENV
-
-    - name: Run UnitTests
+    - name: Run UnitTests.NonParallelizable
       shell: bash
       run: |
-        if [ "${{ runner.os }}" == "Linux" ]; then
-          # Run with coverage on Linux only
-          dotnet test Tests/UnitTests \
-            --no-build \
-            --verbosity normal \
-            --collect:"XPlat Code Coverage" \
-            --settings Tests/UnitTests/runsettings.xml \
-            --diag:logs/UnitTests/${{ runner.os }}/logs.txt \
-            --blame \
-            --blame-crash \
-            --blame-hang \
-            --blame-hang-timeout 60s \
-            --blame-crash-collect-always
-        else
-          # Run without coverage on Windows/macOS for speed
-          dotnet test Tests/UnitTests \
-            --no-build \
-            --verbosity normal \
-            --settings Tests/UnitTests/runsettings.xml \
-            --diag:logs/UnitTests/${{ runner.os }}/logs.txt \
-            --blame \
-            --blame-crash \
-            --blame-hang \
-            --blame-hang-timeout 120s \
-            --blame-crash-collect-always
-        fi
+        dotnet test \
+          --project Tests/UnitTests.NonParallelizable \
+          --no-build \
+          --verbosity normal \
+          --diagnostic --diagnostic-output-directory logs/UnitTests.NonParallelizable/${{ runner.os }}
 
     - name: Upload Test Logs
       if: always()
@@ -97,34 +62,24 @@ jobs:
       with:
         name: non_parallel_unittests-logs-${{ runner.os }}
         path: |
-          logs/UnitTests/
-          Tests/UnitTests/logs/
+          logs/UnitTests.NonParallelizable/
+          Tests/UnitTests.NonParallelizable/logs/
           TestResults/
           **/*.dmp
         if-no-files-found: ignore
         retention-days: 7
-  
-    - name: Upload Non-Parallel UnitTests Coverage to Codecov
-      if: matrix.os == 'ubuntu-latest' && always()
-      uses: codecov/codecov-action@v4
-      with:
-        files: TestResults/**/coverage.cobertura.xml
-        flags: unittests-nonparallel
-        name: UnitTests-${{ runner.os }}
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: false
 
   parallel_unittests:
-    name: Parallel Unit Tests  
+    name: Parallel Unit Tests
     runs-on: ${{ matrix.os }}
-    needs: build
     strategy:
-      # Turn off fail-fast to let all runners run even if there are errors
       fail-fast: false
       matrix:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
 
     timeout-minutes: 60
+    env:
+      DisableRealDriverIO: "1"
     steps:
 
     - name: Checkout code
@@ -136,14 +91,11 @@ jobs:
         dotnet-version: 10.x
         dotnet-quality: 'ga'
 
-    - name: Download build artifacts
-      uses: actions/download-artifact@v4
-      with:
-        name: test-build-artifacts
-        path: .
-
     - name: Restore NuGet packages
       run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore
 
     - name: Disable Windows Defender (Windows only)
       if: runner.os == 'Windows'
@@ -151,72 +103,16 @@ jobs:
       run: |
         Add-MpPreference -ExclusionPath "${{ github.workspace }}"
         Add-MpPreference -ExclusionProcess "dotnet.exe"
-        Add-MpPreference -ExclusionProcess "testhost.exe"
-        Add-MpPreference -ExclusionProcess "VSTest.Console.exe"
-
-    - name: Set VSTEST_DUMP_PATH
-      shell: bash
-      run: echo "VSTEST_DUMP_PATH=logs/UnitTestsParallelizable/${{ runner.os }}/" >> $GITHUB_ENV
 
     - name: Run UnitTestsParallelizable
       shell: bash
       run: |
-        # Detect CPU count and calculate optimal thread count
-        if [ "${{ runner.os }}" == "Linux" ]; then
-          CPU_COUNT=$(nproc)
-        elif [ "${{ runner.os }}" == "macOS" ]; then
-          CPU_COUNT=$(sysctl -n hw.ncpu)
-        else  # Windows
-          CPU_COUNT=$NUMBER_OF_PROCESSORS
-        fi
-        
-        # Use 2x CPU count for I/O-bound tests, capped at reasonable max
-        # macOS uses lower cap (4) to prevent thread pool exhaustion
-        MAX_THREADS=$((CPU_COUNT * 2))
-        if [ "${{ runner.os }}" == "macOS" ]; then
-          if [ $MAX_THREADS -gt 4 ]; then
-            MAX_THREADS=2
-          fi
-          HANG_TIMEOUT="240s"
-        else
-          if [ $MAX_THREADS -gt 16 ]; then
-            MAX_THREADS=16
-          fi
-          HANG_TIMEOUT="60s"
-        fi
-        
-        echo "Detected $CPU_COUNT CPUs, using $MAX_THREADS parallel threads"
-        
-        # Run tests with dynamic thread count
-        if [ "${{ runner.os }}" == "Linux" ]; then
-          dotnet test Tests/UnitTestsParallelizable \
-            --no-build \
-            --verbosity normal \
-            --collect:"XPlat Code Coverage" \
-            --settings Tests/UnitTests/runsettings.coverage.xml \
-            --diag:logs/UnitTestsParallelizable/${{ runner.os }}/logs.txt \
-            --blame \
-            --blame-crash \
-            --blame-hang \
-            --blame-hang-timeout $HANG_TIMEOUT \
-            --blame-crash-collect-always \
-            -- xUnit.MaxParallelThreads=$MAX_THREADS \
-            -- xUnit.StopOnFail=true
-        else
-          dotnet test Tests/UnitTestsParallelizable \
-            --no-build \
-            --verbosity normal \
-            --settings Tests/UnitTestsParallelizable/runsettings.xml \
-            --diag:logs/UnitTestsParallelizable/${{ runner.os }}/logs.txt \
-            --blame \
-            --blame-crash \
-            --blame-hang \
-            --blame-hang-timeout $HANG_TIMEOUT \
-            --blame-crash-collect-always \
-            -- xUnit.MaxParallelThreads=$MAX_THREADS \
-            -- xUnit.StopOnFail=true
-        fi
-        
+        dotnet test \
+          --project Tests/UnitTestsParallelizable \
+          --no-build \
+          --verbosity normal \
+          --diagnostic --diagnostic-output-directory logs/UnitTestsParallelizable/${{ runner.os }}
+
         echo "============================================"
         echo "Parallel unit tests completed successfully!"
         echo "============================================"
@@ -233,13 +129,3 @@ jobs:
           **/*.dmp
         if-no-files-found: ignore
         retention-days: 7
-  
-    - name: Upload Parallelizable UnitTests Coverage to Codecov
-      if: matrix.os == 'ubuntu-latest' && always()
-      uses: codecov/codecov-action@v4
-      with:
-        files: TestResults/**/coverage.cobertura.xml
-        flags: unittests-parallel
-        name: UnitTestsParallelizable-${{ runner.os }}
-        token: ${{ secrets.CODECOV_TOKEN }}
-        fail_ci_if_error: false

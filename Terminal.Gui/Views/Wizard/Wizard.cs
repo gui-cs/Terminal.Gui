@@ -67,20 +67,9 @@ public class Wizard : Dialog, IDesignable
 
         SetStyle ();
 
-        BackButton = new ()
-        {
-            Text = Strings.wzBack,
-            X = 0,
-            Y = Pos.AnchorEnd ()
-        };
+        BackButton = new Button { Text = Strings.wzBack, X = 0, Y = Pos.AnchorEnd () };
 
-        NextFinishButton = new ()
-        {
-            Text = Strings.wzFinish,
-            IsDefault = true,
-            X = Pos.AnchorEnd (),
-            Y = Pos.AnchorEnd ()
-        };
+        NextFinishButton = new Button { Text = Strings.wzFinish, IsDefault = true, X = Pos.AnchorEnd (), Y = Pos.AnchorEnd () };
 
         BackButton.Accepting += BackBtnOnAccepting;
         NextFinishButton.Accepting += NextFinishBtnOnAccepting;
@@ -103,7 +92,7 @@ public class Wizard : Dialog, IDesignable
 
             // strip out movable and resizable
             Arrangement &= ~(ViewArrangement.Movable | ViewArrangement.Resizable);
-            base.ShadowStyle = ShadowStyle.None;
+            base.ShadowStyle = null;
         }
     }
 
@@ -146,11 +135,7 @@ public class Wizard : Dialog, IDesignable
     /// <remarks>
     ///     Setting this property calls <see cref="GoToStep"/> and may be canceled via <see cref="StepChanging"/>.
     /// </remarks>
-    public WizardStep? CurrentStep
-    {
-        get => _currentStep;
-        set => GoToStep (value);
-    }
+    public WizardStep? CurrentStep { get => _currentStep; set => GoToStep (value); }
 
     /// <summary>
     ///     The Next/Finish button. Advances to the next step or completes the wizard.
@@ -188,9 +173,7 @@ public class Wizard : Dialog, IDesignable
         newStep.SetRelativeLayout (App?.Screen.Size ?? new Size (2048, 2048));
         newStep.LayoutSubViews ();
 
-        _maxStepSize = new (
-                            Math.Max (_maxStepSize.Width, newStep.Frame.Width),
-                            Math.Max (_maxStepSize.Height, newStep.Frame.Height));
+        _maxStepSize = new Size (Math.Max (_maxStepSize.Width, newStep.Frame.Width), Math.Max (_maxStepSize.Height, newStep.Frame.Height));
 
         // Go through all steps to ensure they are the same size
         foreach (WizardStep step in _steps)
@@ -213,13 +196,13 @@ public class Wizard : Dialog, IDesignable
     ///     Gets the first enabled step in the wizard.
     /// </summary>
     /// <returns>The first enabled step, or <see langword="null"/> if no enabled steps exist.</returns>
-    public WizardStep? GetFirstStep () { return _steps.FirstOrDefault (s => s.Enabled); }
+    public WizardStep? GetFirstStep () => _steps.FirstOrDefault (s => s.Enabled);
 
     /// <summary>
     ///     Gets the last enabled step in the wizard.
     /// </summary>
     /// <returns>The last enabled step, or <see langword="null"/> if no enabled steps exist.</returns>
-    public WizardStep? GetLastStep () { return _steps.LastOrDefault (s => s.Enabled); }
+    public WizardStep? GetLastStep () => _steps.LastOrDefault (s => s.Enabled);
 
     /// <summary>
     ///     Gets the next enabled step after <see cref="CurrentStep"/>.
@@ -344,40 +327,37 @@ public class Wizard : Dialog, IDesignable
     ///     Raises <see cref="StepChanging"/> and <see cref="StepChanged"/>. Navigation can be canceled
     ///     via the <see cref="StepChanging"/> event.
     /// </remarks>
-    public bool GoToStep (WizardStep? newStep)
-    {
-        return CWPPropertyHelper.ChangeProperty (
-                                                 this,
-                                                 ref _currentStep,
-                                                 newStep,
-                                                 OnStepChanging,
-                                                 StepChanging,
-                                                 newValue =>
-                                                 {
-                                                     // BUGBUG: the CWP helper already invokes OnStepChanging and StepChanging
-                                                     ValueChangingEventArgs<WizardStep?> args = new (_currentStep, newValue);
-                                                     StepChanging?.Invoke (this, args);
+    public bool GoToStep (WizardStep? newStep) =>
+        CWPPropertyHelper.ChangeProperty (this,
+                                          ref _currentStep,
+                                          newStep,
+                                          OnStepChanging,
+                                          StepChanging,
+                                          newValue =>
+                                          {
+                                              // BUGBUG: the CWP helper already invokes OnStepChanging and StepChanging
+                                              ValueChangingEventArgs<WizardStep?> args = new (_currentStep, newValue);
+                                              StepChanging?.Invoke (this, args);
 
-                                                     if (args.Handled)
-                                                     {
-                                                         return;
-                                                     }
+                                              if (args.Handled)
+                                              {
+                                                  return;
+                                              }
 
-                                                     // Hide all but the new step
-                                                     foreach (WizardStep step in _steps)
-                                                     {
-                                                         step.Visible = step == newValue;
+                                              // Hide all but the new step
+                                              foreach (WizardStep step in _steps)
+                                              {
+                                                  step.Visible = step == newValue;
 
-                                                         step.ShowHide ();
-                                                     }
+                                                  step.ShowHide ();
+                                              }
 
-                                                     _currentStep = newValue;
-                                                     UpdateButtonsAndTitle ();
-                                                 },
-                                                 OnStepChanged,
-                                                 StepChanged,
-                                                 out _);
-    }
+                                              _currentStep = newValue;
+                                              UpdateButtonsAndTitle ();
+                                          },
+                                          OnStepChanged,
+                                          StepChanged,
+                                          out _);
 
     /// <summary>
     ///     Called before <see cref="CurrentStep"/> changes. Override to add custom validation.
@@ -420,21 +400,14 @@ public class Wizard : Dialog, IDesignable
     {
         if (CurrentStep == GetLastStep ())
         {
-            if (RaiseAccepting (e.Context) is false)
-            {
-                e.Handled = true;
-                RequestStop ();
-            }
+            return;
         }
-        else
-        {
-            CancelEventArgs args = new ();
-            MovingNext?.Invoke (this, new ());
+        CancelEventArgs args = new ();
+        MovingNext?.Invoke (this, new CancelEventArgs ());
 
-            if (!args.Cancel)
-            {
-                e.Handled = GoNext ();
-            }
+        if (!args.Cancel)
+        {
+            e.Handled = GoNext ();
         }
     }
 
@@ -448,23 +421,17 @@ public class Wizard : Dialog, IDesignable
         Title = $"{_wizardTitle}{(_steps.Count > 0 ? " - " + CurrentStep.Title : string.Empty)}";
 
         // Configure the Back button
-        BackButton.Text = CurrentStep.BackButtonText != string.Empty
-                              ? CurrentStep.BackButtonText
-                              : Strings.wzBack; // "_Back";
+        BackButton.Text = CurrentStep.BackButtonText != string.Empty ? CurrentStep.BackButtonText : Strings.wzBack; // "_Back";
         BackButton.Visible = CurrentStep != GetFirstStep ();
 
         // Configure the Next/Finished button
         if (CurrentStep == GetLastStep ())
         {
-            NextFinishButton.Text = CurrentStep.NextButtonText != string.Empty
-                                        ? CurrentStep.NextButtonText
-                                        : Strings.wzFinish; // "Fi_nish";
+            NextFinishButton.Text = CurrentStep.NextButtonText != string.Empty ? CurrentStep.NextButtonText : Strings.wzFinish; // "Fi_nish";
         }
         else
         {
-            NextFinishButton.Text = CurrentStep.NextButtonText != string.Empty
-                                        ? CurrentStep.NextButtonText
-                                        : Strings.wzNext; // "_Next...";
+            NextFinishButton.Text = CurrentStep.NextButtonText != string.Empty ? CurrentStep.NextButtonText : Strings.wzNext; // "_Next...";
         }
     }
 
@@ -476,16 +443,9 @@ public class Wizard : Dialog, IDesignable
         (firstStep as IDesignable).EnableForDesign ();
         AddStep (firstStep);
 
-        Label schemeLabel = new ()
-        {
-            Title = "_Scheme:"
-        };
+        Label schemeLabel = new () { Title = "_Scheme:" };
 
-        OptionSelector<Schemes> selector = new ()
-        {
-            X = Pos.Right (schemeLabel) + 1,
-            Title = "Select Scheme"
-        };
+        OptionSelector<Schemes> selector = new () { X = Pos.Right (schemeLabel) + 1, Title = "Select Scheme" };
 
         selector.ValueChanged += (_, _) =>
                                  {
@@ -495,17 +455,9 @@ public class Wizard : Dialog, IDesignable
                                      }
                                  };
 
-        Label borderStyleLabel = new ()
-        {
-            Title = "_Border Style:",
-            X = Pos.Right (selector) + 2
-        };
+        Label borderStyleLabel = new () { Title = "_Border Style:", X = Pos.Right (selector) + 2 };
 
-        OptionSelector<LineStyle> borderStyleSelector = new ()
-        {
-            X = Pos.Right (borderStyleLabel) + 1,
-            Title = "Select Border Style"
-        };
+        OptionSelector<LineStyle> borderStyleSelector = new () { X = Pos.Right (borderStyleLabel) + 1, Title = "Select Border Style" };
 
         borderStyleSelector.ValueChanged += (_, _) =>
                                             {
@@ -515,11 +467,7 @@ public class Wizard : Dialog, IDesignable
                                                 }
                                             };
 
-        WizardStep secondStep = new ()
-        {
-            Title = "Second Step",
-            HelpText = "This is the help text for the Second Step."
-        };
+        WizardStep secondStep = new () { Title = "Second Step", HelpText = "This is the help text for the Second Step." };
         secondStep.Add (schemeLabel, selector, borderStyleLabel, borderStyleSelector);
 
         AddStep (secondStep);

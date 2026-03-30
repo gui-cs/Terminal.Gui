@@ -2,72 +2,93 @@ using System.Globalization;
 
 namespace Terminal.Gui.Views;
 
-/// <summary>Fully featured multi-line text editor</summary>
+/// <summary>Fully featured multi-line text editor.</summary>
 /// <remarks>
+///     <para>Default key bindings:</para>
 ///     <list type="table">
 ///         <listheader>
-///             <term>Shortcut</term> <description>Action performed</description>
+///             <term>Key</term> <description>Action</description>
 ///         </listheader>
 ///         <item>
-///             <term>Left cursor, Control-b</term> <description>Moves the editing point left.</description>
+///             <term>Left, Ctrl+B</term> <description>Moves the editing point left.</description>
 ///         </item>
 ///         <item>
-///             <term>Right cursor, Control-f</term> <description>Moves the editing point right.</description>
+///             <term>Right, Ctrl+F</term> <description>Moves the editing point right.</description>
 ///         </item>
 ///         <item>
-///             <term>Alt-b</term> <description>Moves one word back.</description>
+///             <term>Up, Ctrl+P</term> <description>Moves the editing point one line up.</description>
 ///         </item>
 ///         <item>
-///             <term>Alt-f</term> <description>Moves one word forward.</description>
+///             <term>Down, Ctrl+N</term> <description>Moves the editing point one line down.</description>
 ///         </item>
 ///         <item>
-///             <term>Up cursor, Control-p</term> <description>Moves the editing point one line up.</description>
+///             <term>Home</term> <description>Moves the cursor to the beginning of the line.</description>
 ///         </item>
 ///         <item>
-///             <term>Down cursor, Control-n</term> <description>Moves the editing point one line down</description>
+///             <term>End, Ctrl+E</term> <description>Moves the cursor to the end of the line.</description>
 ///         </item>
 ///         <item>
-///             <term>Home key, Control-a</term> <description>Moves the cursor to the beginning of the line.</description>
+///             <term>Ctrl+Home</term> <description>Moves to the first line and first column.</description>
 ///         </item>
 ///         <item>
-///             <term>End key, Control-e</term> <description>Moves the cursor to the end of the line.</description>
+///             <term>Ctrl+End</term> <description>Moves to the last line and last column.</description>
 ///         </item>
 ///         <item>
-///             <term>Control-Home</term> <description>Scrolls to the first line and moves the cursor there.</description>
+///             <term>Ctrl+Left</term> <description>Moves one word left.</description>
 ///         </item>
 ///         <item>
-///             <term>Control-End</term> <description>Scrolls to the last line and moves the cursor there.</description>
+///             <term>Ctrl+Right</term> <description>Moves one word right.</description>
 ///         </item>
 ///         <item>
-///             <term>Delete, Control-d</term> <description>Deletes the character in front of the cursor.</description>
+///             <term>PageUp / PageDown</term> <description>Moves one page up or down.</description>
+///         </item>
+///         <item>
+///             <term>Shift+&lt;movement&gt;</term> <description>Extends the selection in the given direction.</description>
+///         </item>
+///         <item>
+///             <term>Delete, Ctrl+D</term> <description>Deletes the character in front of the cursor.</description>
 ///         </item>
 ///         <item>
 ///             <term>Backspace</term> <description>Deletes the character behind the cursor.</description>
 ///         </item>
 ///         <item>
-///             <term>Control-k</term>
-///             <description>
-///                 Deletes the text until the end of the line and replaces the kill buffer with the deleted text.
-///                 You can paste this text in a different place by using Control-y.
-///             </description>
+///             <term>Ctrl+K</term> <description>Cuts text from the cursor to the end of the line (kill-to-end).</description>
 ///         </item>
 ///         <item>
-///             <term>Control-y</term>
-///             <description>Pastes the content of the kill ring into the current position.</description>
+///             <term>Ctrl+Shift+Backspace</term> <description>Cuts text from the cursor to the start of the line (kill-to-start).</description>
 ///         </item>
 ///         <item>
-///             <term>Alt-d</term>
-///             <description>
-///                 Deletes the word above the cursor and adds it to the kill ring. You can paste the contents of
-///                 the kill ring with Control-y.
-///             </description>
+///             <term>Ctrl+Delete</term> <description>Deletes the word to the right of the cursor.</description>
 ///         </item>
 ///         <item>
-///             <term>Control-q</term>
-///             <description>
-///                 Quotes the next input character, to prevent the normal processing of key handling to take
-///                 place.
-///             </description>
+///             <term>Ctrl+Backspace</term> <description>Deletes the word to the left of the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+C</term> <description>Copies the selected text to the clipboard.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+X, Ctrl+W</term> <description>Cuts the selected text to the clipboard.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+V</term> <description>Pastes text from the clipboard.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+A</term> <description>Selects all text.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Shift+Delete</term> <description>Deletes all text.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Z</term> <description>Undoes the last change.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Y</term> <description>Redoes the last undone change.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+Space</term> <description>Toggles selection mode.</description>
+///         </item>
+///         <item>
+///             <term>Insert</term> <description>Toggles overwrite mode.</description>
 ///         </item>
 ///     </list>
 /// </remarks>
@@ -113,12 +134,21 @@ public partial class TextView : View, IDesignable
         Autocomplete.HostControl ??= this;
 
         ContextMenu = CreateContextMenu ();
-        App?.Popover?.Register (ContextMenu);
-        KeyBindings.Add (ContextMenu.Key, Command.Context);
 
         UpdateScrollBars ();
         UpdateContentSize ();
         PositionCursor ();
+
+        if (HasFocus)
+        {
+            App?.Popovers?.Register (ContextMenu);
+
+            if (ContextMenu?.Key is { } key && !KeyBindings.TryGet (key, out _))
+            {
+                KeyBindings.Add (key, Command.Context);
+            }
+        }
+
         base.EndInit ();
     }
 
@@ -127,6 +157,7 @@ public partial class TextView : View, IDesignable
     {
         base.OnSubViewsLaidOut (args);
         WrapTextModel ();
+
         // Don't call AdjustViewport() here - it resets viewport to cursor position,
         // undoing any user scrolling via scrollbar. AdjustViewport() is called when
         // cursor actually moves (InsertionPoint setter, movement commands, etc.)
@@ -164,6 +195,21 @@ public partial class TextView : View, IDesignable
         if (newHasFocus)
         {
             PositionCursor ();
+
+            App?.Popovers?.Register (ContextMenu);
+
+            if (ContextMenu?.Key is { })
+            {
+                KeyBindings.Add (ContextMenu.Key, Command.Context);
+            }
+        }
+        else
+        {
+            if (ContextMenu?.Key is { })
+            {
+                KeyBindings.Remove (ContextMenu.Key);
+            }
+            App?.Popovers?.DeRegister (ContextMenu);
         }
     }
 
@@ -239,14 +285,19 @@ public partial class TextView : View, IDesignable
     {
         PopoverMenu menu = new (new List<View>
         {
-            new MenuItem (this, Command.SelectAll, Strings.ctxSelectAll),
-            new MenuItem (this, Command.DeleteAll, Strings.ctxDeleteAll),
-            new MenuItem (this, Command.Copy, Strings.ctxCopy),
-            new MenuItem (this, Command.Cut, Strings.ctxCut),
-            new MenuItem (this, Command.Paste, Strings.ctxPaste),
-            new MenuItem (this, Command.Undo, Strings.ctxUndo),
-            new MenuItem (this, Command.Redo, Strings.ctxRedo)
-        });
+            new MenuItem (this, Command.SelectAll),
+            new MenuItem (this, Command.DeleteAll),
+            new MenuItem (this, Command.Copy),
+            new MenuItem (this, Command.Cut),
+            new MenuItem (this, Command.Paste),
+            new MenuItem (this, Command.Undo),
+            new MenuItem (this, Command.Redo)
+        })
+        {
+#if DEBUG
+            Id = "textViewContextMenu"
+#endif
+        };
 
         menu.KeyChanged += ContextMenu_KeyChanged;
 

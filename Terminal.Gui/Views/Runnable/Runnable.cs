@@ -172,6 +172,10 @@ public class Runnable : View, IRunnable
             SetFocus ();
             App?.Navigation?.SetFocused (Focused);
         }
+        else
+        {
+            App?.Popovers?.Hide ();
+        }
 
         // CWP Phase 3: Post-notification (work already done by Application)
         OnIsModalChanged (newIsModal);

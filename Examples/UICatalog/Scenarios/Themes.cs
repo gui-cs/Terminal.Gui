@@ -1,5 +1,7 @@
 ﻿#nullable enable
 
+using System.Collections.ObjectModel;
+
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Themes", "Shows off Themes, Schemes, and VisualRoles.")]
@@ -21,91 +23,78 @@ public sealed class Themes : Scenario
         _app = app;
 
         // Setup - Create a top-level application window and configure it.
-        using Window appWindow = new ()
-        {
-            Title = GetQuitKeyAndName (),
-            BorderStyle = LineStyle.None
-        };
+        using Window appWindow = new ();
+        appWindow.Title = GetQuitKeyAndName ();
+        appWindow.BorderStyle = LineStyle.None;
 
         string [] options = ThemeManager.GetThemeNames ().Select (option => "_" + option).ToArray ();
+
         OptionSelector themeOptionSelector = new ()
         {
             Title = "_Themes",
             BorderStyle = LineStyle.Rounded,
             Width = Dim.Auto (),
             Height = Dim.Auto (),
-            Labels= options,
+            Labels = options,
             Value = ThemeManager.GetThemeNames ().IndexOf (ThemeManager.Theme)
         };
-        themeOptionSelector.Border!.Thickness = new (0, 1, 0, 0);
-        themeOptionSelector.Margin!.Thickness = new (0, 0, 1, 0);
+        themeOptionSelector.Border.Thickness = new Thickness (0, 1, 0, 0);
+        themeOptionSelector.Margin.Thickness = new Thickness (0, 0, 1, 0);
 
         themeOptionSelector.ValueChanged += (sender, args) =>
-                                             {
-                                                 if (sender is not OptionSelector optionSelector)
-                                                 {
-                                                     return;
-                                                 }
-                                                 string? newTheme = optionSelector.Labels! [(int)args.NewValue!] as string;
-                                                 // strip off the leading underscore
-                                                 ThemeManager.Theme = newTheme!.Substring (1);
-                                                 ConfigurationManager.Apply ();
-                                             };
+                                            {
+                                                if (sender is not OptionSelector optionSelector)
+                                                {
+                                                    return;
+                                                }
+                                                string newTheme = optionSelector.Labels! [(int)args.NewValue!];
 
-        ThemeViewer themeViewer = new ()
-        {
-            X = Pos.Right (themeOptionSelector)
-        };
+                                                // strip off the leading underscore
+                                                ThemeManager.Theme = newTheme [1..];
+                                                ConfigurationManager.Apply ();
+                                            };
+
+        ThemeViewer themeViewer = new () { X = Pos.Right (themeOptionSelector) };
 
         Dictionary<string, Type> viewClasses = GetAllViewClassesCollection ()
                                                .OrderBy (t => t.Name)
                                                .Select (t => new KeyValuePair<string, Type> (t.Name, t))
                                                .ToDictionary (t => t.Key, t => t.Value);
 
-        CheckBox? allViewsCheckBox = new ()
-        {
-            Title = "_All Views",
-            X = Pos.Right (themeViewer),
-        };
+        CheckBox allViewsCheckBox = new () { Title = "_All Views", X = Pos.Right (themeViewer) };
 
         ListView viewListView = new ()
         {
             X = Pos.Right (themeViewer),
-            Y = Pos.Bottom(allViewsCheckBox),
+            Y = Pos.Bottom (allViewsCheckBox),
             Title = "_Views",
             BorderStyle = LineStyle.Rounded,
             Width = Dim.Auto (),
             Height = Dim.Fill (),
-            Source = new ListWrapper<string> (new (viewClasses.Keys))
+            Source = new ListWrapper<string> (new ObservableCollection<string> (viewClasses.Keys))
         };
-        viewListView.Border!.Thickness = new (0, 1, 0, 0);
-        viewListView.Margin!.Thickness = new (0, 0, 1, 0);
+        viewListView.Border.Thickness = new Thickness (0, 1, 0, 0);
+        viewListView.Margin.Thickness = new Thickness (0, 0, 1, 0);
 
-        viewListView.VerticalScrollBar.AutoShow = true;
+        viewListView.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
 
-
-        ViewPropertiesEditor viewPropertiesEditor = new ()
-        {
-            X = Pos.Right (viewListView),
-            Width = Dim.Fill (),
-            Height = Dim.Auto (),
-        };
+        ViewPropertiesEditor viewPropertiesEditor = new () { X = Pos.Right (viewListView), Width = Dim.Fill (), Height = Dim.Auto () };
 
         FrameView viewFrame = new ()
         {
             X = Pos.Right (viewListView),
-            Y = Pos.Bottom(viewPropertiesEditor),
+            Y = Pos.Bottom (viewPropertiesEditor),
             Title = "The View",
             BorderStyle = LineStyle.Rounded,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             TabStop = TabBehavior.TabStop
         };
-        viewFrame.Border!.Thickness = new (0, 1, 0, 0);
+        viewFrame.Border.Thickness = new Thickness (0, 1, 0, 0);
 
         viewListView.ValueChanged += (_, args) =>
                                      {
-                                         if (_view is not null)
+                                         if (_view is { })
                                          {
                                              viewPropertiesEditor.ViewToEdit = null;
                                              viewFrame.Remove (_view);
@@ -118,16 +107,16 @@ public sealed class Themes : Scenario
                                              return;
                                          }
 
-                                         string viewName = (string)viewListView.Source!.ToList () [args.NewValue.Value]!;
+                                         var viewName = (string)viewListView.Source!.ToList () [args.NewValue.Value]!;
                                          _view = CreateView (viewClasses [viewName]);
 
-                                         if (_view is not null)
+                                         if (_view is null)
                                          {
-                                             viewFrame.Add (_view);
-                                             viewPropertiesEditor.ViewToEdit = _view;
+                                             return;
                                          }
+                                         viewFrame.Add (_view);
+                                         viewPropertiesEditor.ViewToEdit = _view;
                                      };
-
 
         appWindow.Add (themeOptionSelector, themeViewer, allViewsCheckBox, viewListView, viewPropertiesEditor, viewFrame);
 
@@ -135,58 +124,57 @@ public sealed class Themes : Scenario
 
         themeViewer.SchemeNameChanging += (_, args) =>
                                           {
-                                              if (_view is not null)
+                                              if (_view is null)
                                               {
-                                                  _app!.TopRunnableView!.SchemeName = args.NewValue;
-
-                                                  if (_view.HasScheme)
-                                                  {
-                                                      _view.SetScheme (null);
-                                                  }
-
-                                                  _view.SchemeName = args.NewValue;
+                                                  return;
                                               }
+                                              _app!.TopRunnableView!.SchemeName = args.NewValue;
+
+                                              if (_view.HasScheme)
+                                              {
+                                                  _view.SetScheme (null);
+                                              }
+
+                                              _view.SchemeName = args.NewValue;
                                           };
 
         AllViewsView? allViewsView = null;
 
         allViewsCheckBox.ValueChanged += (_, args) =>
-                                                {
-                                                    if (args.NewValue == CheckState.Checked)
-                                                    {
-                                                        viewListView.Visible = false;
-                                                        appWindow.Remove (viewFrame);
+                                         {
+                                             if (args.NewValue == CheckState.Checked)
+                                             {
+                                                 viewListView.Visible = false;
+                                                 appWindow.Remove (viewFrame);
 
-                                                        allViewsView = new AllViewsView ()
-                                                        {
-                                                            X = Pos.Right (themeViewer),
-                                                            Y = Pos.Bottom (viewPropertiesEditor),
-                                                            Title = "All Views - Focused: {None}",
-                                                            BorderStyle = LineStyle.Rounded,
-                                                            Width = Dim.Fill (),
-                                                            Height = Dim.Fill (),
-                                                            TabStop = TabBehavior.TabStop
-                                                        };
+                                                 allViewsView = new AllViewsView
+                                                 {
+                                                     X = Pos.Right (themeViewer),
+                                                     Y = Pos.Bottom (viewPropertiesEditor),
+                                                     Title = "All Views - Focused: {None}",
+                                                     BorderStyle = LineStyle.Rounded,
+                                                     Width = Dim.Fill (),
+                                                     Height = Dim.Fill (),
+                                                     TabStop = TabBehavior.TabStop
+                                                 };
 
-                                                        allViewsView.FocusedChanged += (_, a) =>
-                                                                                       {
-                                                                                           allViewsView.Title =
-                                                                                               $"All Views - Focused: {a.NewFocused?.Title}";
-                                                                                           viewPropertiesEditor.ViewToEdit = a.NewFocused?.SubViews.ElementAt(0);
+                                                 allViewsView.FocusedChanged += (_, a) =>
+                                                                                {
+                                                                                    allViewsView.Title = $"All Views - Focused: {a.NewFocused?.Title}";
+                                                                                    viewPropertiesEditor.ViewToEdit = a.NewFocused?.SubViews.ElementAt (0);
+                                                                                };
+                                                 appWindow.Add (allViewsView);
+                                             }
+                                             else
+                                             {
+                                                 appWindow.Remove (allViewsView);
+                                                 allViewsView!.Dispose ();
+                                                 allViewsView = null;
 
-                                                                                       };
-                                                        appWindow.Add (allViewsView);
-                                                    }
-                                                    else
-                                                    {
-                                                        appWindow.Remove (allViewsView);
-                                                        allViewsView!.Dispose ();
-                                                        allViewsView = null;
-
-                                                        appWindow.Add (viewFrame);
-                                                        viewListView.Visible = true;
-                                                    }
-                                                };
+                                                 appWindow.Add (viewFrame);
+                                                 viewListView.Visible = true;
+                                             }
+                                         };
 
         // Run - Start the application.
         app.Run (appWindow);
@@ -196,9 +184,7 @@ public sealed class Themes : Scenario
     private static List<Type> GetAllViewClassesCollection ()
     {
         List<Type> types = typeof (View).Assembly.GetTypes ()
-                                        .Where (
-                                                myType => myType is { IsClass: true, IsAbstract: false, IsPublic: true }
-                                                          && myType.IsSubclassOf (typeof (View)))
+                                        .Where (myType => myType is { IsClass: true, IsAbstract: false, IsPublic: true } && myType.IsSubclassOf (typeof (View)))
                                         .ToList ();
 
         types.Add (typeof (View));
@@ -217,14 +203,7 @@ public sealed class Themes : Scenario
             // use <object> or the original type if applicable
             foreach (Type arg in type.GetGenericArguments ())
             {
-                if (arg.IsValueType && Nullable.GetUnderlyingType (arg) == null)
-                {
-                    typeArguments.Add (arg);
-                }
-                else
-                {
-                    typeArguments.Add (typeof (object));
-                }
+                typeArguments.Add (GetSubstituteType (arg));
             }
 
             // And change what type we are instantiating from MyClass<T> to MyClass<object> or MyClass<T>
@@ -241,8 +220,8 @@ public sealed class Themes : Scenario
         }
 
         // Instantiate view
-        View view = (View)Activator.CreateInstance (type)!;
-        string demoText = "This, that, and the other thing.";
+        var view = (View)Activator.CreateInstance (type)!;
+        var demoText = "This, that, and the other thing.";
 
         if (view is IDesignable designable)
         {
@@ -257,6 +236,34 @@ public sealed class Themes : Scenario
         view.Initialized += OnViewInitialized;
 
         return view;
+    }
+
+    private Type GetSubstituteType (Type genericParam)
+    {
+        // If it's a non-nullable value type, keep it as-is
+        if (genericParam.IsValueType && Nullable.GetUnderlyingType (genericParam) == null)
+        {
+            return genericParam;
+        }
+
+        // Check constraints (e.g., where TView : View, new())
+        Type [] constraints = genericParam.GetGenericParameterConstraints ();
+
+        // Find the most derived base class constraint (ignore interfaces)
+        Type? baseConstraint = constraints
+            .Where (c => c.IsClass)
+            .OrderByDescending (c => c.GetInterfaces ().Length) // rough heuristic for "most derived"
+            .FirstOrDefault ();
+
+        if (baseConstraint != null)
+        {
+            // If the constraint itself is abstract or doesn't have a
+            // parameterless constructor, this may still fail at activation
+            return baseConstraint;
+        }
+
+        // No class constraint — fall back to object
+        return typeof (object);
     }
 
     private void OnViewInitialized (object? sender, EventArgs e)

@@ -1,7 +1,5 @@
 // Claude - Opus 4.5
 
-using Terminal.Gui.App;
-
 namespace ViewBaseTests;
 
 /// <summary>
@@ -12,30 +10,31 @@ public class IValueTests
     /// <summary>
     ///     Test view implementing IValue&lt;int?&gt; using CWPPropertyHelper.
     /// </summary>
-    private class TestIntValueView : View, IValue<int?>
+    private sealed class TestIntValueView : View, IValue<int?>
     {
         private int? _value;
 
         public int? Value
         {
             get => _value;
-            set => CWPPropertyHelper.ChangeProperty (
-                this,
-                ref _value,
-                value,
-                OnValueChanging,
-                ValueChanging,
-                _ => { }, // No additional work needed for this test view
-                OnValueChanged,
-                ValueChanged,
-                out _);
+            set =>
+                CWPPropertyHelper.ChangeProperty (this,
+                                                  ref _value,
+                                                  value,
+                                                  OnValueChanging,
+                                                  ValueChanging,
+                                                  _ => { }, // No additional work needed for this test view
+                                                  OnValueChanged,
+                                                  ValueChanged,
+                                                  out _);
         }
 
         public event EventHandler<ValueChangingEventArgs<int?>>? ValueChanging;
         public event EventHandler<ValueChangedEventArgs<int?>>? ValueChanged;
+        public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
-        protected virtual bool OnValueChanging (ValueChangingEventArgs<int?> args) => false;
-        protected virtual void OnValueChanged (ValueChangedEventArgs<int?> args) { }
+        private bool OnValueChanging (ValueChangingEventArgs<int?> args) => false;
+        private void OnValueChanged (ValueChangedEventArgs<int?> args) => ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (args.OldValue, args.NewValue));
     }
 
     /// <summary>
@@ -48,23 +47,26 @@ public class IValueTests
         public string? Value
         {
             get => _value;
-            set => CWPPropertyHelper.ChangeProperty (
-                this,
-                ref _value,
-                value,
-                OnValueChanging,
-                ValueChanging,
-                _ => { },
-                OnValueChanged,
-                ValueChanged,
-                out _);
+            set =>
+                CWPPropertyHelper.ChangeProperty (this,
+                                                  ref _value,
+                                                  value,
+                                                  OnValueChanging,
+                                                  ValueChanging,
+                                                  _ => { },
+                                                  OnValueChanged,
+                                                  ValueChanged,
+                                                  out _);
         }
 
         public event EventHandler<ValueChangingEventArgs<string?>>? ValueChanging;
         public event EventHandler<ValueChangedEventArgs<string?>>? ValueChanged;
+        public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
         protected virtual bool OnValueChanging (ValueChangingEventArgs<string?> args) => false;
-        protected virtual void OnValueChanged (ValueChangedEventArgs<string?> args) { }
+
+        protected virtual void OnValueChanged (ValueChangedEventArgs<string?> args) =>
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (args.OldValue, args.NewValue));
     }
 
     [Fact]
@@ -87,13 +89,13 @@ public class IValueTests
     {
         TestIntValueView view = new ();
         int? newValue = null;
-        int count = 0;
+        var count = 0;
 
         view.ValueChanged += (_, e) =>
-        {
-            count++;
-            newValue = e.NewValue;
-        };
+                             {
+                                 count++;
+                                 newValue = e.NewValue;
+                             };
 
         view.Value = 42;
 
@@ -106,7 +108,7 @@ public class IValueTests
     {
         TestIntValueView view = new ();
         view.Value = 42;
-        int count = 0;
+        var count = 0;
 
         view.ValueChanged += (_, _) => count++;
 
@@ -122,9 +124,9 @@ public class IValueTests
         view.Value = 10;
 
         view.ValueChanging += (_, e) =>
-        {
-            e.Handled = true; // Cancel the change
-        };
+                              {
+                                  e.Handled = true; // Cancel the change
+                              };
 
         view.Value = 42; // Should be cancelled
 
@@ -155,10 +157,10 @@ public class IValueTests
         int? receivedNew = null;
 
         view.ValueChanging += (_, e) =>
-        {
-            receivedCurrent = e.CurrentValue;
-            receivedNew = e.NewValue;
-        };
+                              {
+                                  receivedCurrent = e.CurrentValue;
+                                  receivedNew = e.NewValue;
+                              };
 
         view.Value = 42;
 
@@ -176,10 +178,10 @@ public class IValueTests
         int? receivedNew = null;
 
         view.ValueChanged += (_, e) =>
-        {
-            receivedOld = e.OldValue;
-            receivedNew = e.NewValue;
-        };
+                             {
+                                 receivedOld = e.OldValue;
+                                 receivedNew = e.NewValue;
+                             };
 
         view.Value = 42;
 
@@ -332,11 +334,7 @@ public class IValueTests
     [Fact]
     public void OptionSelector_GetValue_ReturnsSelectedValue ()
     {
-        OptionSelector optionSelector = new ()
-        {
-            Labels = ["Option 1", "Option 2", "Option 3"],
-            Value = 1
-        };
+        OptionSelector optionSelector = new () { Labels = ["Option 1", "Option 2", "Option 3"], Value = 1 };
 
         IValue valueProvider = optionSelector;
         object? result = valueProvider.GetValue ();
@@ -349,10 +347,7 @@ public class IValueTests
     [Fact]
     public void OptionSelectorT_GetValue_ReturnsTypedValue ()
     {
-        OptionSelector<Alignment> optionSelector = new ()
-        {
-            Value = Alignment.Center
-        };
+        OptionSelector<Alignment> optionSelector = new () { Value = Alignment.Center };
 
         IValue valueProvider = optionSelector;
         object? result = valueProvider.GetValue ();
@@ -365,10 +360,7 @@ public class IValueTests
     [Fact]
     public void FlagSelectorT_GetValue_ReturnsTypedValue ()
     {
-        FlagSelector<AlignmentModes> flagSelector = new ()
-        {
-            Value = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems
-        };
+        FlagSelector<AlignmentModes> flagSelector = new () { Value = AlignmentModes.StartToEnd | AlignmentModes.AddSpaceBetweenItems };
 
         IValue valueProvider = flagSelector;
         object? result = valueProvider.GetValue ();
@@ -404,5 +396,23 @@ public class IValueTests
         // Just verify we get a Color back
         Assert.NotNull (result);
         Assert.IsType<Color> (result);
+    }
+
+    [Fact]
+    public void SenderOfEvents_IsCorrect ()
+    {
+        // Verify that the sender parameter of ValueChanging and ValueChanged events is the view raising the event
+        TestIntValueView view = new ();
+        object? changingSender = null;
+        object? changedSender = null;
+        view.ValueChanging += (sender, _) => changingSender = sender;
+        view.ValueChanged += (sender, _) => changedSender = sender;
+        view.Value = 42;
+
+        // Both events should have the view as sender
+        Assert.NotNull (changingSender);
+        Assert.NotNull (changedSender);
+        Assert.Equal (view, changingSender);
+        Assert.Equal (view, changedSender);
     }
 }

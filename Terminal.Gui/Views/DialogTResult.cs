@@ -16,7 +16,7 @@ namespace Terminal.Gui.Views;
 ///     </para>
 ///     <para>
 ///         To run modally, pass the dialog to <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>.
-///         The dialog executes until terminated by <see cref="Application.QuitKey"/> (Esc by default),
+///         The dialog executes until terminated by <see cref="Application.GetDefaultKey"/> (Esc by default),
 ///         a press of one of the <see cref="Buttons"/>, or if any subview receives the <see cref="Command.Accept"/>
 ///         command
 ///         and does not handle it.
@@ -93,38 +93,25 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
 
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
 
+        CommandsToBubbleUp = [Command.Accept];
+
         _buttonContainer = new View
         {
+#if DEBUG
             Id = "Dialog.ButtonContainer",
+#endif
             CanFocus = true,
             X = 0,
             Y = Pos.AnchorEnd (),
             Width = Dim.Fill (),
-            Height = Dim.Auto ()
+            Height = Dim.Auto (),
+            CommandsToBubbleUp = CommandsToBubbleUp
         };
-        Padding!.Add (_buttonContainer);
 
+        Padding.GetOrCreateView ();
+        Padding.View?.Add (_buttonContainer);
+        UpdateSizes ();
         SetStyle ();
-
-        AddCommand (Command.Accept,
-                    ctx =>
-                    {
-                        View? isDefaultView = _buttonContainer?.GetSubViews (includePadding: true).FirstOrDefault (v => v is Button { IsDefault: true });
-
-                        if (isDefaultView == this || isDefaultView is not Button { IsDefault: true })
-                        {
-                            return RaiseAccepting (ctx);
-                        }
-
-                        bool? handled = isDefaultView.InvokeCommand (Command.Accept, ctx);
-
-                        if (handled == true)
-                        {
-                            return true;
-                        }
-
-                        return RaiseAccepting (ctx);
-                    });
     }
 
     private Size _minimumSubViewsSize;
@@ -134,6 +121,10 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     {
         base.EndInit ();
         UpdateSizes ();
+
+        // Don't enable scrollbars until after initialized; otherwise they get created before
+        // our frame has dimensions.
+        ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
     }
 
     /// <inheritdoc/>
@@ -147,67 +138,54 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <inheritdoc/>
     protected override void OnSubViewLayout (LayoutEventArgs args)
     {
-        // HACK: Ensure scrollbars are shown as needed before calculating sizes
-        VerticalScrollBar.AutoShow = true;
-        HorizontalScrollBar.AutoShow = true;
         UpdateSizes ();
         base.OnSubViewLayout (args);
     }
 
-#pragma warning disable TGUI001
     /// <summary>
-    ///     Propagates the buttons in the Padding Accepting events to the Dialog's Accepting event.
+    ///     Because Dialog has a complex Dim.Auto setup, we override OnSubViewsLaidOut to see if another
+    ///     Layout is required.
     /// </summary>
-    private void OnDialogButtonOnAccepting (object? s, CommandEventArgs e)
+    /// <param name="args">The event data containing information about the layout event.</param>
+    protected override void OnSubViewsLaidOut (LayoutEventArgs args)
     {
-        if (e.Handled || !IsRunning)
+        base.OnSubViewsLaidOut (args);
+
+        if (NeedsLayout)
         {
-            return;
+            Layout ();
         }
-
-        e.Handled = RaiseAccepting (e.Context) is true;
-
-        if (e.Handled)
-        {
-            return;
-        }
-
-        // Only RequestStop if we are running (modal)
-        if (!IsRunning)
-        {
-            return;
-        }
-
-        e.Handled = true;
-        RequestStop ();
     }
-#pragma warning restore
 
-    /// <summary>
-    ///     Overrides the default Accepting behavior to handle Dialog Button presses.
-    /// </summary>
-    /// <param name="args"></param>
-    /// <returns></returns>
+    /// <inheritdoc/>
     protected override bool OnAccepting (CommandEventArgs args)
     {
-        if (!args.Context.TryGetSource (out View? sourceView) || !Buttons.Contains (sourceView))
+        if (base.OnAccepting (args))
+        {
+            return true;
+        }
+
+        View? sourceView = null;
+        args.Context?.Source?.TryGetTarget (out sourceView);
+
+        if (sourceView is null)
         {
             return false;
         }
+        RequestStop ();
 
-        if (Buttons.FirstOrDefault (v => v is Button { IsDefault: true }) == sourceView)
+        return sourceView is IAcceptTarget { IsDefault: false };
+
+    }
+
+    /// <inheritdoc/>
+    protected override void OnViewportChanged (DrawEventArgs e)
+    {
+        //if (!IsInitialized)
         {
-            // Default button pressed
-            return false;
+            SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, Viewport.Width), Math.Max (_minimumButtonsSize.Height, Viewport.Height)));
         }
-
-        // Any other Dialog Button pressed
-        if (IsRunning)
-        {
-            RequestStop ();
-        }
-
-        return true;
+        base.OnViewportChanged (e);
     }
 
     private void UpdateSizes ()
@@ -219,19 +197,12 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
             return;
         }
 
-        int subViewsWidth = _minimumSubViewsSize.Width;
-
-        if (!Width.Has<DimAuto> (out _))
-        {
-            subViewsWidth = Math.Max (subViewsWidth, Viewport.Width);
-        }
-
-        int subViewsHeight = _minimumSubViewsSize.Height;
-
-        if (!Height.Has<DimAuto> (out _))
-        {
-            subViewsHeight = Math.Max (subViewsHeight, Viewport.Height);
-        }
+        // Always floor at Viewport size — the content area should never be smaller
+        // than what's visible. For DimAuto dialogs, the Frame may be larger than
+        // _minimumSubViewsSize (e.g. due to title width), so the content area
+        // should reflect the actual available space.
+        int subViewsWidth = Math.Max (_minimumSubViewsSize.Width, Viewport.Width);
+        int subViewsHeight = Math.Max (_minimumSubViewsSize.Height, Viewport.Height);
 
         SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, subViewsWidth), Math.Max (_minimumButtonsSize.Height, subViewsHeight)));
     }
@@ -259,7 +230,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <returns></returns>
     private int GetMinimumDialogHeight ()
     {
-        int minSize = Math.Max (_minimumSubViewsSize.Height, _minimumButtonsSize.Height - Border!.Thickness.Vertical - Margin!.Thickness.Vertical);
+        int minSize = Math.Max (_minimumSubViewsSize.Height, _minimumButtonsSize.Height - Border.Thickness.Vertical - Margin.Thickness.Vertical);
 
         return minSize;
     }
@@ -292,14 +263,16 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         foreach (Button button in _buttons)
         {
             button.IsDefault = false;
-            button.Accepting -= OnDialogButtonOnAccepting;
-            button.Accepting += OnDialogButtonOnAccepting;
+
+            //button.Accepting -= OnDialogButtonOnAccepting;
+            //button.Accepting += OnDialogButtonOnAccepting;
         }
 
+        DefaultAcceptView = dialogButton;
         dialogButton.IsDefault = true;
 
         _buttonContainer?.Add (dialogButton);
-        Padding!.Thickness = Padding!.Thickness with { Bottom = _buttonContainer!.GetHeightRequiredForSubViews () };
+        Padding.Thickness = Padding.Thickness with { Bottom = _buttonContainer!.GetHeightRequiredForSubViews () };
         _minimumButtonsSize = new Size (_buttonContainer?.GetWidthRequiredForSubViews () ?? 0, _buttonContainer?.GetHeightRequiredForSubViews () ?? 0);
     }
 
@@ -393,6 +366,14 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     {
         if (IsRunning)
         {
+            // When running, restore to Dialog scheme only if it was set to Base by SetStyle
+            // (i.e., the scheme was not explicitly overridden before running, e.g. by
+            // MessageBox.ErrorQuery which sets SchemeName = "Error" before calling app.Run).
+            if (SchemeName == SchemeManager.SchemesToSchemeName (Schemes.Base))
+            {
+                SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
+            }
+
             Arrangement |= ViewArrangement.Movable | ViewArrangement.Resizable | ViewArrangement.Overlapped;
         }
         else
@@ -428,7 +409,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
             return false;
         }
 
-        if (!_drawingText || role is not VisualRole.Focus || Border?.Thickness == Thickness.Empty)
+        if (!_drawingText || role is not VisualRole.Focus || Border.Thickness == Thickness.Empty)
         {
             return false;
         }

@@ -42,7 +42,6 @@ namespace Terminal.Gui.Drivers;
 ///     <list type="bullet">
 ///         <item><see cref="WindowsInput"/> - Uses Windows Console API (<c>ReadConsoleInput</c>)</item>
 ///         <item><see cref="NetInput"/> - Uses .NET <see cref="System.Console"/> API</item>
-///         <item><see cref="UnixInput"/> - Uses Unix terminal APIs</item>
 ///         <item><see cref="AnsiInput"/> - For testing, implements <see cref="ITestableInput{TInputRecord}"/></item>
 ///     </list>
 ///     <para>
@@ -66,7 +65,7 @@ public interface IInput<TInputRecord> : IDisposable
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This property allows external code (e.g., test harnesses like <c>TestContext</c>) to
+    ///         This property allows external code (e.g., test harnesses like <c>AppTestHelper</c>) to
     ///         provide additional cancellation signals such as timeouts or hard-stop conditions.
     ///     </para>
     ///     <para>

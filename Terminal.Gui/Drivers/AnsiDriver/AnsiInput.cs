@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.Drivers;
 
@@ -80,16 +81,14 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
     /// </summary>
     public AnsiInput ()
     {
-        //Logging.Information ($"Creating {nameof (AnsiInput)}");
-
         _platform = AnsiPlatform.Degraded;
 
         try
         {
             // Check if we have a real console first
-            if (Console.IsInputRedirected || Console.IsOutputRedirected)
+            if (!IsAttachedToTerminal)
             {
-                Logging.Warning ($"Console redirected (Output: {Console.IsOutputRedirected}, Input: {Console.IsInputRedirected}). Running in degraded mode.");
+                Trace.Lifecycle (nameof (AnsiInput), "Init", "Console is not attached to a terminal. Running in degraded mode.");
 
                 return;
             }
@@ -104,7 +103,9 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                     _windowsVTInput.Dispose ();
                     _windowsVTInput = null;
 
-                    Logging.Warning ("Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
+                    Trace.Lifecycle (nameof (AnsiInput),
+                                     "Init",
+                                     "Failed to enable Windows VT Input mode. Terminal input will not work. Running in degraded mode.");
 
                     return;
                 }
@@ -120,7 +121,9 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
 
                     if (!_unixRawMode.TryEnable ())
                     {
-                        Logging.Warning ("Failed to enable Unix raw input mode. Terminal input will not work. Running in degraded mode.");
+                        Trace.Lifecycle (nameof (AnsiInput),
+                                         "Init",
+                                         "Failed to enable Unix raw input mode. Terminal input will not work. Running in degraded mode.");
                         _pollMap = null;
                         _unixRawMode?.Dispose ();
                         _unixRawMode = null;
@@ -131,32 +134,14 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                 }
                 catch (DllNotFoundException ex)
                 {
-                    Logging.Warning ($"Failed to enable Unix raw input mode. libc not available: {ex.Message}. Running in degraded mode.");
-
-                    return;
+                    Trace.Lifecycle (nameof (AnsiInput),
+                                     "Init",
+                                     $"Failed to enable Unix raw input mode. libc not available: {ex.Message}. Running in degraded mode.");
                 }
             }
             else
             {
-                Logging.Warning ("Unknown OS platform. Terminal input will not work. Running in degraded mode.");
-
-                return;
-            }
-
-            // Try to disable Ctrl+C handling to allow raw input
-            try
-            {
-                // BUGBUG: This is not needed on Windows as we turn off ENABLE_PROCESSED_INPUT in _windowsVTInput.TryEnable () above
-                // BUGBUG: This does nothing if we're running Unix, because we are using raw mode
-
-                // All TreatConsoleCAsInput does is un-set ENABLE_PROCESSED_INPUT on the input handle
-                Console.TreatControlCAsInput = true;
-            }
-            catch (Exception ex)
-            {
-                Logging.Warning ($"Failed to set TreatControlCAsInput: {ex.Message}");
-
-                // Not supported in all environments - continue anyway
+                Trace.Lifecycle (nameof (AnsiInput), "Init", "Unknown OS platform. Terminal input will not work. Running in degraded mode.");
             }
 
             // NOTE: Output operations (alternate buffer, cursor visibility, mouse events)
@@ -166,8 +151,9 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
         }
         catch (Exception ex)
         {
-            Logging.Warning ($"Failed to initialize terminal: {ex.GetType ().Name}: {ex.Message}. Running in degraded mode.");
-            Logging.Warning ($"Stack trace: {ex.StackTrace}");
+            Trace.Lifecycle (nameof (AnsiInput),
+                             "Init",
+                             $"Failed to initialize terminal: {ex.GetType ().Name}: {ex.Message}. Running in degraded mode. Stack trace: {ex.StackTrace}");
             _platform = AnsiPlatform.Degraded;
         }
     }
@@ -217,13 +203,9 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                     yield break;
                 }
 
-                // Convert UTF-8 bytes to characters
-                uint cp = WindowsVTInputHelper.GetConsoleCP ();
-                var enc = Encoding.GetEncoding ((int)cp);
+                string text = _windowsVTInput!.ConsoleInputEncoding.GetString (buffer, 0, bytesRead);
 
-                string text = enc.GetString (buffer, 0, bytesRead);
-
-                //Logging.Trace ($"AnsiInput.Read: read {bytesRead} text: {text}");
+                //Trace.Lifecycle (nameof (AnsiInput), "Read", $"Read {bytesRead} bytes from Windows VT Input: {text}");
 
                 foreach (char ch in text)
                 {
@@ -242,8 +224,6 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
 
             case AnsiPlatform.Degraded:
             default:
-                // Logging.Trace ("IsVTModeEnabled is NOT enabled");
-
                 yield break;
         }
     }
@@ -284,7 +264,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                     {
                         // Error
                         int errno = Marshal.GetLastWin32Error ();
-                        Logging.Warning ($"Read: read() returned {readResult}, errno={errno}");
+                        Logging.Warning ($"{nameof (AnsiInput)}: read() returned {readResult}, errno={errno}");
 
                         yield break;
                     }
@@ -292,7 +272,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
             }
             else
             {
-                Logging.Error ("Read: read() failed");
+                Logging.Warning ($"{nameof (AnsiInput)}: read() failed");
 
                 yield break;
             }
@@ -321,8 +301,6 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                     // can cause ReadFile to block indefinitely.
                     if (_pollMap == null)
                     {
-                        //Logging.Trace ("");
-
                         return;
                     }
 
@@ -364,7 +342,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
 
                     if (flushCount > 0)
                     {
-                        Logging.Information ($"FlushInput: Flushed input buffer ({flushCount} read attempts)");
+                        Trace.Lifecycle (nameof (AnsiInput), "FlushInput", $"Flushed input buffer ({flushCount} read attempts)");
                     }
 
                     break;
@@ -376,16 +354,13 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
         }
         catch (Exception ex)
         {
-            Logging.Warning ($"Error flushing input: {ex.Message}");
+            Logging.Warning ($"{nameof (AnsiInput)}: Error flushing input: {ex.Message}");
         }
     }
 
+    // Will be called on the main loop thread.
     /// <inheritdoc/>
-    public void InjectInput (char input) =>
-
-        //Logging.Trace ($"Enqueuing input: {input.Key}");
-        // Will be called on the main loop thread.
-        _testInput.Enqueue (input);
+    public void InjectInput (char input) => _testInput.Enqueue (input);
 
     /// <inheritdoc/>
     public override void Dispose ()

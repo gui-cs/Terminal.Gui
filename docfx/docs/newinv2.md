@@ -25,7 +25,7 @@ This document provides an in-depth overview of the new features, improvements, a
 
 Terminal.Gui v2 represents a fundamental redesign of the library's architecture, API, and capabilities. Key improvements include:
 
-- **Instance-Based Application Model** - Move from static singletons to `IApplication` instances
+- **Instance-Based Application Model** - Move from static singletons to <xref:Terminal.Gui.App.IApplication> instances
 - **IRunnable Architecture** - Interface-based pattern for type-safe, runnable views
 - **Proper Resource Management** - Full IDisposable pattern with automatic cleanup
 - **Built-in Scrolling** - Every view supports scrolling inherently
@@ -68,19 +68,19 @@ v2 introduces an instance-based architecture that eliminates global state and en
 ### Key Features
 
 **IApplication Interface:**
-- `Application.Create()` returns an `IApplication` instance
+- [Application.Create()](xref:Terminal.Gui.App.Application.Create*) returns an <xref:Terminal.Gui.App.IApplication> instance
 - Multiple applications can coexist (useful for testing)
 - Each instance manages its own driver, session stack, and resources
 
 **View.App Property:**
-- Every view has an `App` property referencing its `IApplication` context
-- Views access application services through `App` (driver, session management, etc.)
+- Every view has an <xref:Terminal.Gui.ViewBase.View.App> property referencing its <xref:Terminal.Gui.App.IApplication> context
+- Views access application services through <xref:Terminal.Gui.ViewBase.View.App> (driver, session management, etc.)
 - Eliminates static dependencies, improving testability
 
 **Session Management:**
-- `SessionStack` tracks all running sessions as a stack
-- `TopRunnable` property references the currently active session
-- `Begin()` and `End()` methods manage session lifecycle
+- <xref:Terminal.Gui.App.IApplication.SessionStack> tracks all running sessions as a stack
+- <xref:Terminal.Gui.App.IApplication.TopRunnable> property references the currently active session
+- [Begin()](xref:Terminal.Gui.App.IApplication.Begin*) and [End()](xref:Terminal.Gui.App.IApplication.End*) methods manage session lifecycle
 
 ### Example
 
@@ -113,7 +113,7 @@ public class MyView : View
 
 ### Benefits
 
-- **Testability** - Mock `IApplication` for unit tests
+- **Testability** - Mock <xref:Terminal.Gui.App.IApplication> for unit tests
 - **No Global State** - Multiple contexts can coexist
 - **Clear Ownership** - Views explicitly know their context
 - **Proper Cleanup** - IDisposable ensures resources are released
@@ -137,7 +137,7 @@ using (IApplication app = Application.Create ().Init ())
 ```
 
 **Important Changes:**
-- `Shutdown()` method is obsolete - use `Dispose()` instead
+- [Shutdown()](xref:Terminal.Gui.App.Application.Shutdown*) method is obsolete - use `Dispose()` instead
 - Always dispose applications (especially in tests)
 - Input thread runs at ~50 polls/second (20ms throttle) until disposed
 
@@ -147,12 +147,12 @@ using (IApplication app = Application.Create ().Init ())
 
 See the [Application Deep Dive](application.md) for complete details.
 
-v2 introduces `IRunnable<TResult>` - an interface-based pattern for runnable views with type-safe results.
+v2 introduces <xref:Terminal.Gui.App.IRunnable> - an interface-based pattern for runnable views with type-safe results.
 
 ### Key Features
 
 **Interface-Based:**
-- Implement `IRunnable<TResult>` without inheriting from `Runnable`
+- Implement <xref:Terminal.Gui.App.IRunnable> without inheriting from `Runnable`
 - Any view can be runnable
 - Decouples runnability from view hierarchy
 
@@ -232,9 +232,9 @@ using (IApplication app = Application.Create ().Init ())
 ```
 
 **Key Methods:**
-- `Init()` - Returns `IApplication` for chaining
-- `Run<TRunnable>()` - Creates and runs runnable, returns `IApplication`
-- `GetResult<T>()` - Extract typed result after run
+- [Init()](xref:Terminal.Gui.App.IApplication.Init*) - Returns <xref:Terminal.Gui.App.IApplication> for chaining
+- [Run<TRunnable>()](xref:Terminal.Gui.App.IApplication.Run*) - Creates and runs runnable, returns <xref:Terminal.Gui.App.IApplication>
+- [GetResult<T>()](xref:Terminal.Gui.App.IApplication.GetResult*) - Extract typed result after run
 - `Dispose()` - Release all resources
 
 ### Disposal Semantics
@@ -243,7 +243,7 @@ using (IApplication app = Application.Create ().Init ())
 
 | Method | Creator | Owner | Disposal |
 |--------|---------|-------|----------|
-| `Run<TRunnable>()` | Framework | Framework | Automatic when returns |
+| [Run<TRunnable>()](xref:Terminal.Gui.App.IApplication.Run*) | Framework | Framework | Automatic when returns |
 | `Run(IRunnable)` | Caller | Caller | Manual by caller |
 
 ```csharp
@@ -275,7 +275,7 @@ v2 provides full 24-bit color support by default:
 
 - **Implementation**: [Attribute](~/api/Terminal.Gui.Drawing.Attribute.yml) class handles RGB values
 - **Fallback**: Automatic 16-color mode for older terminals
-- **Driver Support**: <xref:Terminal.Gui.Drivers.IDriver.SupportsTrueColor> detection
+- **Driver Support**: `IDriver.SupportsTrueColor` detection
 - **Usage**: Direct RGB input via [Color](~/api/Terminal.Gui.Drawing.Color.yml) struct
 
 ```csharp
@@ -290,7 +290,7 @@ Color color = Color.Yellow; // Was "Brown" in v1
 
 See the [Layout Deep Dive](layout.md) for complete details.
 
-v2 introduces a comprehensive [Adornment](~/api/Terminal.Gui.ViewBase.Adornment.yml) system:
+v2 introduces a comprehensive [Adornment](~/api/Terminal.Gui.ViewBase.IAdornment.yml) system with lightweight adornments that lazily create Views when needed:
 
 - **[Margin](~/api/Terminal.Gui.ViewBase.Margin.yml)** - Transparent spacing outside the border
 - **[Border](~/api/Terminal.Gui.ViewBase.Border.yml)** - Visual frame with title, multiple styles
@@ -404,7 +404,7 @@ view.AdvanceFocus ()
 
 v2 reduces overhead through:
 
-- Smarter `NeedsDraw` system (only draw what changed)
+- Smarter <xref:Terminal.Gui.ViewBase.View.NeedsDraw> system (only draw what changed)
 - Reduced allocations in hot paths (event handling, rendering)
 - Optimized layout calculations
 - Efficient input processing
@@ -445,10 +445,9 @@ view.SetContentSize (new (100, 100));
 view.ScrollVertical (5);
 view.ScrollHorizontal (3);
 
-// Built-in scrollbars
-view.VerticalScrollBar.Visible = true;
-view.HorizontalScrollBar.Visible = true;
-view.VerticalScrollBar.AutoShow = true;
+// Built-in scrollbars with automatic visibility
+view.ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
+view.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 ```
 
 ### Enhanced ScrollBar
@@ -456,10 +455,11 @@ view.VerticalScrollBar.AutoShow = true;
 v2 replaces `ScrollBarView` with [ScrollBar](~/api/Terminal.Gui.Views.ScrollBar.yml):
 
 - Cleaner implementation
-- Automatic show/hide
+- Automatic show/hide via [ScrollBarVisibilityMode](~/api/Terminal.Gui.Views.ScrollBarVisibilityMode.yml)
 - Proportional sizing with `ScrollSlider`
 - Integrated with View's scrolling system
-- Simple to add via [View.VerticalScrollBar](~/api/Terminal.Gui.ViewBase.yml) / [View.HorizontalScrollBar](~/api/Terminal.Gui.ViewBase.yml)
+- Simple to enable via [ViewportSettingsFlags](~/api/Terminal.Gui.ViewBase.ViewportSettingsFlags.yml)
+- Accessible via [View.VerticalScrollBar](~/api/Terminal.Gui.ViewBase.yml) / [View.HorizontalScrollBar](~/api/Terminal.Gui.ViewBase.yml)
 
 ### Advanced Layout Features
 
@@ -502,7 +502,7 @@ See the [Arrangement Deep Dive](arrangement.md) for complete details.
 - **[ViewArrangement.Resizable](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Resize edges with mouse or keyboard
 - **[ViewArrangement.Overlapped](~/api/Terminal.Gui.ViewBase.ViewArrangement.yml)** - Z-order management for overlapping views
 
-**Arrangement Key**: Press `Ctrl+F5` (configurable via <xref:Terminal.Gui.App.Application.ArrangeKey>) to enter arrange mode
+**Arrangement Key**: Press `Ctrl+F5` (configurable via `Application.DefaultKeyBindings` for `Command.Arrange`) to enter arrange mode
 
 ```csharp
 // Movable and resizable window
@@ -528,11 +528,11 @@ v2 decouples navigation concepts:
 - Arrow keys - Same as Tab navigation
 
 ```csharp
-// Configure navigation keys
-App.Keyboard.NextTabStopKey = Key.Tab;
-App.Keyboard.PrevTabStopKey = Key.Tab.WithShift;
-App.Keyboard.NextTabGroupKey = Key.F6;
-App.Keyboard.PrevTabGroupKey = Key.F6.WithShift;
+// Configure navigation keys via Application.DefaultKeyBindings
+Application.DefaultKeyBindings[Command.NextTabStop] = Bind.All (Key.Tab);
+Application.DefaultKeyBindings[Command.PreviousTabStop] = Bind.All (Key.Tab.WithShift);
+Application.DefaultKeyBindings[Command.NextTabGroup] = Bind.All (Key.F6);
+Application.DefaultKeyBindings[Command.PreviousTabGroup] = Bind.All (Key.F6.WithShift);
 
 // Set tab behavior
 view.CanFocus = true;
@@ -611,10 +611,10 @@ private bool HandleAccept ()
 }
 ```
 
-**Configurable Keys:**
-- <xref:Terminal.Gui.App.Application.QuitKey> - Close app (default: Esc)
-- <xref:Terminal.Gui.App.Application.ArrangeKey> - Arrange mode (default: Ctrl+F5)
-- Navigation keys (Tab, F6, arrows)
+**Configurable Keys** (via `Application.DefaultKeyBindings`):
+- `Command.Quit` - Close app (default: Esc)
+- `Command.Arrange` - Arrange mode (default: Ctrl+F5)
+- Navigation commands (`Command.NextTabStop`, `Command.NextTabGroup`, etc.)
 
 ### Mouse API
 
@@ -692,7 +692,7 @@ Logging.Debug ("Rendering view {ViewId}", view.Id);
 
 ### Metrics
 
-<xref:Terminal.Gui.App.Logging.Meter> provides performance metrics:
+`Logging.Meter` provides performance metrics:
 
 - Frame rate tracking
 - Redraw times

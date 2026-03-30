@@ -13,21 +13,18 @@
   "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
 
   // Set this to true in a .config file to be loaded to cause JSON parsing errors
-  // to throw exceptions. 
+  // to throw exceptions.
   "ConfigurationManager.ThrowOnJsonErrors": false,
+
+  // --------------- Tracing ----------------------------
+  "Trace.EnabledCategories": "Lifecycle",
 
   // --------------- Application Settings ---------------
   "Key.Separator": "+",
 
   "Driver.Force16Colors": false,
-  "Application.ArrangeKey": "Ctrl+F5",
   //"Application.ForceDriver": "", // TODO: ForceDriver should be nullable
   "Application.IsMouseDisabled": false,
-  "Application.NextTabGroupKey": "F6",
-  "Application.NextTabKey": "Tab",
-  "Application.PrevTabGroupKey": "Shift+F6",
-  "Application.PrevTabKey": "Shift+Tab",
-  "Application.QuitKey": "Esc",
 
   // --------------- Colors ---------------
 
@@ -188,7 +185,7 @@
             "Runnable": {
               "Normal": {
                 "Foreground": "LightGray",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "None"
               },
               "Focus": {
@@ -198,12 +195,12 @@
               },
               "HotNormal": {
                 "Foreground": "Silver",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "Underline"
               },
               "Disabled": {
                 "Foreground": "DarkGray",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "Faint"
               },
               "HotFocus": {
@@ -228,12 +225,12 @@
               },
               "Editable": {
                 "Foreground": "LightYellow",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "None"
               },
               "ReadOnly": {
                 "Foreground": "Gray",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "Italic"
               }
             }
@@ -242,7 +239,7 @@
             "Base": {
               "Normal": {
                 "Foreground": "LightGray",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "None"
               },
               "Focus": {
@@ -252,12 +249,12 @@
               },
               "HotNormal": {
                 "Foreground": "Silver",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "Underline"
               },
               "Disabled": {
                 "Foreground": "DarkGray",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "Faint"
               },
               "HotFocus": {
@@ -281,12 +278,12 @@
               },
               "Editable": {
                 "Foreground": "Gray",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "None"
               },
               "ReadOnly": {
                 "Foreground": "Gray",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "Italic"
               }
             }
@@ -472,7 +469,7 @@
             "Runnable": {
               "Normal": {
                 "Foreground": "DimGray",
-                "Background": "WhiteSmoke",
+                "Background": "None",
                 "Style": "None"
               },
               "Focus": {
@@ -482,12 +479,12 @@
               },
               "HotNormal": {
                 "Foreground": "Gray",
-                "Background": "WhiteSmoke",
+                "Background": "None",
                 "Style": "Underline"
               },
               "Disabled": {
                 "Foreground": "LightGray",
-                "Background": "WhiteSmoke",
+                "Background": "None",
                 "Style": "Faint"
               },
               "HotFocus": {
@@ -517,7 +514,7 @@
               },
               "ReadOnly": {
                 "Foreground": "Gray",
-                "Background": "WhiteSmoke",
+                "Background": "None",
                 "Style": "Italic"
               }
             }
@@ -526,7 +523,7 @@
             "Base": {
               "Normal": {
                 "Foreground": "Gray",
-                "Background": "WhiteSmoke",
+                "Background": "None",
                 "Style": "None"
               },
               "Focus": {
@@ -536,12 +533,12 @@
               },
               "HotNormal": {
                 "Foreground": "Silver",
-                "Background": "WhiteSmoke",
+                "Background": "None",
                 "Style": "Underline"
               },
               "Disabled": {
                 "Foreground": "LightGray",
-                "Background": "WhiteSmoke",
+                "Background": "None",
                 "Style": "Faint"
               },
               "HotFocus": {
@@ -571,7 +568,7 @@
               },
               "ReadOnly": {
                 "Foreground": "Gray",
-                "Background": "WhiteSmoke",
+                "Background": "None",
                 "Style": "Italic"
               }
             }
@@ -754,7 +751,7 @@
             "Runnable": {
               "Normal": {
                 "Foreground": "GreenPhosphor",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "None"
               }
             }
@@ -763,17 +760,17 @@
             "Base": {
               "Normal": {
                 "Foreground": "GreenPhosphor",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "None"
               },
               "Active": {
                 "Foreground": "GreenPhosphor",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "Bold"
               },
               "Highlight": {
                 "Foreground": "GreenPhosphor",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "Italic"
               },
               "Editable": {
@@ -891,7 +888,7 @@
             "Runnable": {
               "Normal": {
                 "Foreground": "AmberPhosphor",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "None"
               }
             }
@@ -900,17 +897,17 @@
             "Base": {
               "Normal": {
                 "Foreground": "AmberPhosphor",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "None"
               },
               "Active": {
                 "Foreground": "AmberPhosphor",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "Bold"
               },
               "Highlight": {
                 "Foreground": "AmberPhosphor",
-                "Background": "Black",
+                "Background": "None",
                 "Style": "Italic"
               },
               "Editable": {

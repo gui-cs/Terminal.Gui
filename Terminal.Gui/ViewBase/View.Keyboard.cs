@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.ViewBase;
+using Terminal.Gui.Tracing;
+
+namespace Terminal.Gui.ViewBase;
 
 public partial class View // Keyboard APIs
 {
@@ -7,13 +9,13 @@ public partial class View // Keyboard APIs
     /// </summary>
     private void SetupKeyboard ()
     {
-        KeyBindings = new (this);
+        KeyBindings = new KeyBindings ();
         KeyBindings.Add (Key.Space, Command.Activate);
 
         // QUESTION: Should subclasses be required to enable Accept?
         KeyBindings.Add (Key.Enter, Command.Accept);
 
-        HotKeyBindings = new (this);
+        HotKeyBindings = new KeyBindings ();
 
         // Note, setting HotKey will bind HotKey to Command.HotKey
         HotKeySpecifier = (Rune)'_';
@@ -23,7 +25,7 @@ public partial class View // Keyboard APIs
     /// <summary>
     ///     Helper to dispose all things keyboard related for a View. Called from the View Dispose method.
     /// </summary>
-    private void DisposeKeyboard () { TitleTextFormatter.HotKeyChanged -= TitleTextFormatter_HotKeyChanged; }
+    private void DisposeKeyboard () => TitleTextFormatter.HotKeyChanged -= TitleTextFormatter_HotKeyChanged;
 
     #region HotKey Support
 
@@ -31,7 +33,7 @@ public partial class View // Keyboard APIs
     public event EventHandler<KeyChangedEventArgs>? HotKeyChanged;
 
     private Key _hotKey = new ();
-    private void TitleTextFormatter_HotKeyChanged (object? sender, KeyChangedEventArgs e) { HotKeyChanged?.Invoke (this, e); }
+    private void TitleTextFormatter_HotKeyChanged (object? sender, KeyChangedEventArgs e) => HotKeyChanged?.Invoke (this, e);
 
     /// <summary>
     ///     Gets or sets the hot key defined for this view. Pressing the hot key on the keyboard while this view has focus will
@@ -42,9 +44,11 @@ public partial class View // Keyboard APIs
     ///         with a Button with the text of "_Text" <c>Alt+T</c> will cause the button to gain focus and to raise its
     ///         <see cref="Accepting"/> event.
     ///         Or, in a
-    ///         <see cref="Menu"/> with "_File _Edit", <c>Alt+F</c> will select (show) the Strings.menuFile menu. If the Strings.menuFile menu
+    ///         <see cref="Menu"/> with "_File _Edit", <c>Alt+F</c> will select (show) the Strings.menuFile menu. If the
+    ///         Strings.menuFile menu
     ///         has a
-    ///         sub-menu of Strings.cmdNew <c>Alt+N</c> or <c>N</c> will ONLY select the Strings.cmdNew sub-menu if the Strings.menuFile menu is already
+    ///         sub-menu of Strings.cmdNew <c>Alt+N</c> or <c>N</c> will ONLY select the Strings.cmdNew sub-menu if the
+    ///         Strings.menuFile menu is already
     ///         opened.
     ///     </para>
     ///     <para>
@@ -81,19 +85,18 @@ public partial class View // Keyboard APIs
         {
             if (value is null)
             {
-                throw new ArgumentException (
-                                             @"HotKey must not be null. Use Key.Empty to clear the HotKey.",
-                                             nameof (value)
-                                            );
+                throw new ArgumentException (@"HotKey must not be null. Use Key.Empty to clear the HotKey.", nameof (value));
             }
 
-            if (AddKeyBindingsForHotKey (_hotKey, value))
+            if (!AddKeyBindingsForHotKey (_hotKey, value))
             {
-                // This will cause TextFormatter_HotKeyChanged to be called, firing HotKeyChanged
-                // BUGBUG: _hotkey should be set BEFORE setting TextFormatter.HotKey
-                _hotKey = value;
-                TitleTextFormatter.HotKey = value;
+                return;
             }
+
+            // This will cause TextFormatter_HotKeyChanged to be called, firing HotKeyChanged
+            // BUGBUG: _hotkey should be set BEFORE setting TextFormatter.HotKey
+            _hotKey = value;
+            TitleTextFormatter.HotKey = value;
         }
     }
 
@@ -103,23 +106,21 @@ public partial class View // Keyboard APIs
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         By default, key bindings are added for both the base key (e.g. <see cref="Key.D3"/>) and the Alt-shifted key
-    ///         (e.g. <c>Key.D3.WithAlt</c>) This behavior can be overriden by overriding <see cref="AddKeyBindingsForHotKey"/>
-    ///         .
+    ///         Key bindings are added for both the base key (e.g. <see cref="Key.D3"/>) and the Alt-shifted key
+    ///         (e.g. <c>Key.D3.WithAlt</c>).
     ///     </para>
     ///     <para>
-    ///         By default, when <paramref name="hotKey"/> is <see cref="Key.A"/> through <see cref="Key.Z"/> key bindings
+    ///         When <paramref name="hotKey"/> is <see cref="Key.A"/> through <see cref="Key.Z"/> key bindings
     ///         will be added for both the un-shifted and shifted versions. This means if the HotKey is <see cref="Key.A"/>,
-    ///         key bindings for <c>Key.A</c> and <c>Key.A.WithShift</c> will be added. This behavior can be overriden by
-    ///         overriding <see cref="AddKeyBindingsForHotKey"/>.
+    ///         key bindings for <c>Key.A</c> and <c>Key.A.WithShift</c> will be added.
     ///     </para>
     /// </remarks>
     /// <param name="prevHotKey">The HotKey <paramref name="hotKey"/> is replacing. Key bindings for this key will be removed.</param>
     /// <param name="hotKey">The new HotKey. If <see cref="Key.Empty"/> <paramref name="prevHotKey"/> bindings will be removed.</param>
-    /// <param name="context">Arbitrary context that can be associated with this key binding.</param>
+    /// <param name="data">Arbitrary data that can be associated with this key binding.</param>
     /// <returns><see langword="true"/> if the HotKey bindings were added.</returns>
     /// <exception cref="ArgumentException"></exception>
-    public virtual bool AddKeyBindingsForHotKey (Key prevHotKey, Key hotKey, object? context = null)
+    public bool AddKeyBindingsForHotKey (Key prevHotKey, Key hotKey, object? data = null)
     {
         if (_hotKey == hotKey)
         {
@@ -130,9 +131,9 @@ public partial class View // Keyboard APIs
 
         Key baseKey = newKey.NoAlt.NoShift.NoCtrl;
 
-        if (newKey != Key.Empty && (baseKey == Key.Space || Rune.IsControl (baseKey.AsRune)))
+        if (newKey != Key.Empty && Rune.IsControl (baseKey.AsRune))
         {
-            throw new ArgumentException (@$"HotKey must be a printable (and non-space) key ({hotKey}).");
+            throw new ArgumentException (@$"HotKey must be a printable key ({hotKey}).");
         }
 
         if (newKey != baseKey)
@@ -180,30 +181,27 @@ public partial class View // Keyboard APIs
         }
 
         // Add the new
-        if (newKey != Key.Empty)
+        if (newKey == Key.Empty)
         {
-            KeyBinding keyBinding = new ()
-            {
-                Commands = [Command.HotKey],
-                Key = newKey,
-                Data = context
-            };
-
-            // Add the base and Alt key
-            HotKeyBindings.Remove (newKey);
-            HotKeyBindings.Add (newKey, keyBinding);
-            HotKeyBindings.Remove (newKey.WithAlt);
-            HotKeyBindings.Add (newKey.WithAlt, keyBinding);
-
-            // If the Key is A..Z, add ShiftMask and AltMask | ShiftMask
-            if (newKey.IsKeyCodeAtoZ)
-            {
-                HotKeyBindings.Remove (newKey.WithShift);
-                HotKeyBindings.Add (newKey.WithShift, keyBinding);
-                HotKeyBindings.Remove (newKey.WithShift.WithAlt);
-                HotKeyBindings.Add (newKey.WithShift.WithAlt, keyBinding);
-            }
+            return true;
         }
+        KeyBinding keyBinding = new ([Command.HotKey], newKey, this, null, data);
+
+        // Add the base and Alt key
+        HotKeyBindings.Remove (newKey);
+        HotKeyBindings.Add (newKey, keyBinding);
+        HotKeyBindings.Remove (newKey.WithAlt);
+        HotKeyBindings.Add (newKey.WithAlt, keyBinding);
+
+        // If the Key is A-Z, add ShiftMask and AltMask | ShiftMask
+        if (!newKey.IsKeyCodeAtoZ)
+        {
+            return true;
+        }
+        HotKeyBindings.Remove (newKey.WithShift);
+        HotKeyBindings.Add (newKey.WithShift, keyBinding);
+        HotKeyBindings.Remove (newKey.WithShift.WithAlt);
+        HotKeyBindings.Add (newKey.WithShift.WithAlt, keyBinding);
 
         return true;
     }
@@ -248,8 +246,6 @@ public partial class View // Keyboard APIs
 
     #region AutoHotKey Assignment
 
-    private bool _assignHotKeys;
-
     /// <summary>
     ///     If <see langword="true"/>, unique hotkeys will automatically be assigned to focusable subviews that have a
     ///     <see cref="Title"/> but no <see cref="HotKey"/> defined.
@@ -263,11 +259,23 @@ public partial class View // Keyboard APIs
     ///         When enabled, hotkeys are assigned to subviews when they are added via <see cref="Add(View?)"/>.
     ///         The assignment algorithm:
     ///         <list type="number">
-    ///             <item>Checks if the subview already has a programmatically set <see cref="HotKey"/>; if so and the key is not already used, preserves that hotkey</item>
-    ///             <item>If no usable programmatic <see cref="HotKey"/> is found, checks if the subview's <see cref="Title"/> contains a hotkey specifier (e.g., Strings.menuFile) and preserves it if the key is not already used</item>
-    ///             <item>If neither a usable programmatic hotkey nor a usable title specifier is found, assigns a new hotkey from the first available character in the title</item>
-    ///             <item>Skips characters that are already in <see cref="UsedHotKeys"/>, as well as spaces and control characters, when determining whether a hotkey is usable or when assigning a new one</item>
-        ///         </list>
+    ///             <item>
+    ///                 Checks if the subview already has a programmatically set <see cref="HotKey"/>; if so and the key is not
+    ///                 already used, preserves that hotkey
+    ///             </item>
+    ///             <item>
+    ///                 If no usable programmatic <see cref="HotKey"/> is found, checks if the subview's <see cref="Title"/>
+    ///                 contains a hotkey specifier (e.g., Strings.menuFile) and preserves it if the key is not already used
+    ///             </item>
+    ///             <item>
+    ///                 If neither a usable programmatic hotkey nor a usable title specifier is found, assigns a new hotkey
+    ///                 from the first available character in the title
+    ///             </item>
+    ///             <item>
+    ///                 Skips characters that are already in <see cref="UsedHotKeys"/>, as well as spaces and control
+    ///                 characters, when determining whether a hotkey is usable or when assigning a new one
+    ///             </item>
+    ///         </list>
     ///     </para>
     ///     <para>
     ///         Call <see cref="AssignHotKeysToSubViews"/> to manually trigger hotkey assignment for all subviews.
@@ -275,17 +283,17 @@ public partial class View // Keyboard APIs
     /// </remarks>
     public bool AssignHotKeys
     {
-        get => _assignHotKeys;
+        get;
         set
         {
-            if (_assignHotKeys == value)
+            if (field == value)
             {
                 return;
             }
 
-            _assignHotKeys = value;
+            field = value;
 
-            if (_assignHotKeys)
+            if (field)
             {
                 AssignHotKeysToSubViews ();
             }
@@ -384,7 +392,7 @@ public partial class View // Keyboard APIs
                 continue;
             }
 
-            if (!newKey.IsValid || newKey == Key.Empty || newKey == Key.Space || Rune.IsPunctuation (newKey.AsRune) ||  Rune.IsControl (newKey.AsRune))
+            if (!newKey.IsValid || newKey == Key.Empty || newKey == Key.Space || Rune.IsPunctuation (newKey.AsRune) || Rune.IsControl (newKey.AsRune))
             {
                 continue;
             }
@@ -435,6 +443,8 @@ public partial class View // Keyboard APIs
     /// <returns><see langword="true"/> if the event was handled.</returns>
     public bool NewKeyDownEvent (Key key)
     {
+        Trace.Keyboard (this, key, "Entry");
+
         if (!Enabled)
         {
             return false;
@@ -521,7 +531,7 @@ public partial class View // Keyboard APIs
     /// <remarks>
     ///     <para>Fires the <see cref="KeyDown"/> event.</para>
     /// </remarks>
-    protected virtual bool OnKeyDown (Key key) { return false; }
+    protected virtual bool OnKeyDown (Key key) => false;
 
     /// <summary>
     ///     Raised when the user presses a key, allowing subscribers to pre-process the key down event. Called
@@ -545,7 +555,7 @@ public partial class View // Keyboard APIs
     ///     <see langword="false"/> if the key press was not handled. <see langword="true"/> if the keypress was handled
     ///     and no other view should see it.
     /// </returns>
-    protected virtual bool OnKeyDownNotHandled (Key key) { return key.Handled; }
+    protected virtual bool OnKeyDownNotHandled (Key key) => key.Handled;
 
     /// <summary>
     ///     Raised when the user has pressed key it wasn't handled by <see cref="KeyDown"/> and was not bound to a key binding.
@@ -561,6 +571,70 @@ public partial class View // Keyboard APIs
 
     #endregion KeyDown Event
 
+    #region KeyUp Event
+
+    /// <summary>
+    ///     Called when a key is released. This is the view-level entry point for key-up events,
+    ///     following the same pattern as <see cref="NewKeyDownEvent"/>.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Key-up events are only raised when the driver provides key release information.
+    ///         Not all drivers support key-up events.
+    ///     </para>
+    /// </remarks>
+    /// <param name="key">The key that was released.</param>
+    /// <returns><see langword="true"/> if the event was handled.</returns>
+    public bool NewKeyUpEvent (Key key)
+    {
+        if (!Enabled)
+        {
+            return false;
+        }
+
+        if (Focused?.NewKeyUpEvent (key) == true)
+        {
+            return true;
+        }
+
+        if (OnKeyUp (key) || key.Handled)
+        {
+            return true;
+        }
+
+        KeyUp?.Invoke (this, key);
+
+        return key.Handled;
+    }
+
+    /// <summary>
+    ///     Called when the user releases a key, allowing subclasses to pre-process the key up event.
+    ///     Set <see cref="Key.Handled"/> to <see langword="true"/> to stop the key from being processed further.
+    /// </summary>
+    /// <param name="key">The key that produced the event.</param>
+    /// <returns>
+    ///     <see langword="false"/> if the key up event was not handled. <see langword="true"/> if the event was handled
+    ///     and processing should stop.
+    /// </returns>
+    protected virtual bool OnKeyUp (Key key) => false;
+
+    /// <summary>
+    ///     Raised when the user releases a key.
+    ///     <para>
+    ///         Set <see cref="Key.Handled"/> to <see langword="true"/> to indicate the key was handled and to prevent
+    ///         additional processing.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Key-up events are only raised when the driver provides key release information.
+    ///         Not all drivers support key-up events.
+    ///     </para>
+    /// </remarks>
+    public event EventHandler<Key>? KeyUp;
+
+    #endregion KeyUp Event
+
     #endregion Low-level Key handling
 
     #region Key Bindings
@@ -570,6 +644,133 @@ public partial class View // Keyboard APIs
 
     /// <summary>Gets the bindings for this view that will be invoked regardless of whether this view has focus or not.</summary>
     public KeyBindings HotKeyBindings { get; internal set; } = null!;
+
+    /// <summary>
+    ///     Gets or sets the default key bindings shared across all views. Only commands that a view supports
+    ///     (via <see cref="GetSupportedCommands"/>) are actually bound when <see cref="ApplyKeyBindings"/> is called.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings
+    {
+        get;
+        set
+        {
+            field = value;
+            Trace.Configuration ("DefaultKeyBindings", "View Set", $"{string.Join (", ", value?.Select (kvp => $"{kvp.Key}=[{kvp.Value}]") ?? [])}");
+        }
+    } = new ()
+    {
+        // Navigation
+        [Command.Left] = Bind.All (Key.CursorLeft),
+        [Command.Right] = Bind.All (Key.CursorRight),
+        [Command.Up] = Bind.All (Key.CursorUp),
+        [Command.Down] = Bind.All (Key.CursorDown),
+        [Command.PageUp] = Bind.All (Key.PageUp),
+        [Command.PageDown] = Bind.All (Key.PageDown),
+        [Command.LeftStart] = Bind.All (Key.Home),
+        [Command.RightEnd] = Bind.All (Key.End),
+        [Command.Start] = Bind.All (Key.Home.WithCtrl),
+        [Command.End] = Bind.All (Key.End.WithCtrl),
+
+        // Selection-extend
+        [Command.LeftExtend] = Bind.All (Key.CursorLeft.WithShift),
+        [Command.RightExtend] = Bind.All (Key.CursorRight.WithShift),
+        [Command.UpExtend] = Bind.All (Key.CursorUp.WithShift),
+        [Command.DownExtend] = Bind.All (Key.CursorDown.WithShift),
+        [Command.PageUpExtend] = Bind.All (Key.PageUp.WithShift),
+        [Command.PageDownExtend] = Bind.All (Key.PageDown.WithShift),
+        [Command.LeftStartExtend] = Bind.All (Key.Home.WithShift),
+        [Command.RightEndExtend] = Bind.All (Key.End.WithShift),
+        [Command.StartExtend] = Bind.All (Key.Home.WithCtrl.WithShift),
+        [Command.EndExtend] = Bind.All (Key.End.WithCtrl.WithShift),
+
+        // Clipboard
+        [Command.Copy] = Bind.All (Key.C.WithCtrl),
+        [Command.Cut] = Bind.All (Key.X.WithCtrl),
+        [Command.Paste] = Bind.All (Key.V.WithCtrl),
+
+        // Editing
+        [Command.Undo] = Bind.AllPlus (Key.Z.WithCtrl, [new Key ('/').WithCtrl]),
+        [Command.Redo] = Bind.AllPlus (Key.Y.WithCtrl, [Key.Z.WithCtrl.WithShift]),
+        [Command.SelectAll] = Bind.All (Key.A.WithCtrl),
+        [Command.DeleteCharLeft] = Bind.All (Key.Backspace),
+        [Command.DeleteCharRight] = Bind.All (Key.Delete, Key.D.WithCtrl)
+    };
+
+    /// <summary>
+    ///     Gets or sets per-view key binding overrides from configuration. The outer key is the view type name
+    ///     (e.g., "TextField"), the inner dictionary maps commands to platform key bindings.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static Dictionary<string, Dictionary<Command, PlatformKeyBinding>>? ViewKeyBindings { get; set; }
+
+    /// <summary>
+    ///     Applies layered key bindings from the provided dictionaries. Only commands that the view supports
+    ///     (via <see cref="GetSupportedCommands"/>) are bound. Keys already bound are not overwritten.
+    /// </summary>
+    protected void ApplyKeyBindings (params Dictionary<Command, PlatformKeyBinding>? [] layers)
+    {
+        HashSet<Command> supported = new (GetSupportedCommands ());
+
+        foreach (Dictionary<Command, PlatformKeyBinding>? layer in layers)
+        {
+            if (layer is null)
+            {
+                continue;
+            }
+
+            ApplyLayer (layer, supported);
+        }
+
+        // Apply user overrides from View.ViewKeyBindings (CM/MEC bridge)
+        // Strip generic arity suffix (e.g., "TreeView`1" → "TreeView") so config keys match
+        string typeName = GetType ().Name;
+        int backtick = typeName.IndexOf ('`');
+
+        if (backtick >= 0)
+        {
+            typeName = typeName [..backtick];
+        }
+
+        if (ViewKeyBindings?.TryGetValue (typeName, out Dictionary<Command, PlatformKeyBinding>? overrides) == true)
+        {
+            ApplyLayer (overrides, supported);
+        }
+    }
+
+    private void ApplyLayer (Dictionary<Command, PlatformKeyBinding> layer, HashSet<Command> supported)
+    {
+        foreach ((Command command, PlatformKeyBinding platformKeys) in layer)
+        {
+            if (!supported.Contains (command))
+            {
+                continue;
+            }
+
+            foreach (Key key in platformKeys.GetCurrentPlatformKeys ())
+            {
+                if (key == Key.Empty)
+                {
+                    continue;
+                }
+
+                if (KeyBindings.TryGet (key, out _))
+                {
+                    continue;
+                }
+
+                KeyBindings.Add (key, command);
+            }
+        }
+    }
 
     /// <summary>
     ///     INTERNAL: Invokes the Commands bound to <paramref name="key"/>.
@@ -596,7 +797,9 @@ public partial class View // Keyboard APIs
             binding.Key = key;
         }
 
-        return InvokeCommands (binding.Commands, binding);
+        Trace.Keyboard (this, key, "InvokeCommands");
+
+        return InvokeCommands (binding.Commands, binding with { Source = new WeakReference<View> (this) });
     }
 
     /// <summary>
@@ -627,7 +830,7 @@ public partial class View // Keyboard APIs
                 binding.Key = hotKey;
             }
 
-            if (InvokeCommands (binding.Commands, binding) is true)
+            if (InvokeCommands (binding.Commands, binding with { Source = new WeakReference<View> (this) }) is true)
             {
                 return true;
             }

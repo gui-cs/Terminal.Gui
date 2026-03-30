@@ -2,6 +2,61 @@
 
 public partial class TextField
 {
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="TextField"/>. These are layered on top of
+    ///     <see cref="View.DefaultKeyBindings"/> when the view is created.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Only single-command bindings are included here. The context menu binding is added directly
+    ///         in the constructor.
+    ///     </para>
+    /// </remarks>
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    {
+        // Emacs navigation
+        [Command.Left] = Bind.All (Key.B.WithCtrl),
+        [Command.Right] = Bind.All (Key.F.WithCtrl),
+
+        // Additional LeftStart key (Ctrl+Home; base already has Home)
+        [Command.LeftStart] = Bind.All (Key.Home.WithCtrl),
+
+        // Additional RightEnd keys (Ctrl+End, Ctrl+E; base already has End)
+        [Command.RightEnd] = Bind.All (Key.End.WithCtrl, Key.E.WithCtrl),
+
+        // Additional extend keys (CursorUp/CursorDown with Shift; base has CursorLeft/CursorRight with Shift)
+        [Command.LeftExtend] = Bind.All (Key.CursorUp.WithShift),
+        [Command.RightExtend] = Bind.All (Key.CursorDown.WithShift),
+
+        // Additional LeftStartExtend keys (base already has Shift+Home)
+        [Command.LeftStartExtend] = Bind.All (Key.Home.WithCtrl.WithShift, Key.A.WithCtrl.WithShift),
+
+        // Additional RightEndExtend keys (base already has Shift+End)
+        [Command.RightEndExtend] = Bind.All (Key.End.WithCtrl.WithShift, Key.E.WithCtrl.WithShift),
+
+        // Word navigation
+        [Command.WordLeft] = Bind.All (Key.CursorLeft.WithCtrl, Key.CursorUp.WithCtrl),
+        [Command.WordRight] = Bind.All (Key.CursorRight.WithCtrl, Key.CursorDown.WithCtrl),
+        [Command.WordLeftExtend] = Bind.All (Key.CursorLeft.WithCtrl.WithShift, Key.CursorUp.WithCtrl.WithShift),
+        [Command.WordRightExtend] = Bind.All (Key.CursorRight.WithCtrl.WithShift, Key.CursorDown.WithCtrl.WithShift),
+
+        // Kill commands
+        [Command.CutToEndOfLine] = Bind.All (Key.K.WithCtrl),
+        [Command.CutToStartOfLine] = Bind.All (Key.K.WithCtrl.WithShift),
+        [Command.KillWordRight] = Bind.All (Key.Delete.WithCtrl),
+        [Command.KillWordLeft] = Bind.All (Key.Backspace.WithCtrl),
+
+        // Overwrite mode
+        [Command.ToggleOverwrite] = Bind.All (Key.InsertChar),
+
+        // Delete all text
+        [Command.DeleteAll] = Bind.All (Key.Delete.WithCtrl.WithShift)
+    };
+
     private void CreateCommandsAndBindings ()
     {
         // Things this view knows how to do
@@ -34,92 +89,11 @@ public partial class TextField
         AddCommand (Command.SelectAll, () => SelectAll ());
         AddCommand (Command.DeleteAll, () => DeleteAll ());
         AddCommand (Command.Context, () => ShowContextMenu (true));
-        AddCommand (
-                    Command.HotKey,
-                    ctx =>
-                    {
-                        if (RaiseHandlingHotKey (ctx) is true)
-                        { }
 
-                        // If we have focus, then ignore the hotkey because the user
-                        // means to enter it
-                        if (HasFocus)
-                        {
-                            return false;
-                        }
+        // Apply configurable key bindings (base layer + TextField-specific layer)
+        ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
 
-                        // This is what the default HotKey handler does:
-                        SetFocus ();
-
-                        // Always return true on hotkey, even if SetFocus fails because
-                        // hotkeys are always handled by the View (unless RaiseHandlingHotKey cancels).
-                        return true;
-                    });
-
-        // Default keybindings for this view
-        // We follow this as closely as possible: https://en.wikipedia.org/wiki/Table_of_keyboard_shortcuts
-        KeyBindings.Add (Key.Delete, Command.DeleteCharRight);
-        KeyBindings.Add (Key.D.WithCtrl, Command.DeleteCharRight);
-
-        KeyBindings.Add (Key.Backspace, Command.DeleteCharLeft);
-
-        KeyBindings.Add (Key.Home.WithShift, Command.LeftStartExtend);
-        KeyBindings.Add (Key.Home.WithShift.WithCtrl, Command.LeftStartExtend);
-        KeyBindings.Add (Key.A.WithShift.WithCtrl, Command.LeftStartExtend);
-
-        KeyBindings.Add (Key.End.WithShift, Command.RightEndExtend);
-        KeyBindings.Add (Key.End.WithShift.WithCtrl, Command.RightEndExtend);
-        KeyBindings.Add (Key.E.WithShift.WithCtrl, Command.RightEndExtend);
-
-        KeyBindings.Add (Key.Home, Command.LeftStart);
-        KeyBindings.Add (Key.Home.WithCtrl, Command.LeftStart);
-
-        KeyBindings.Add (Key.CursorLeft.WithShift, Command.LeftExtend);
-        KeyBindings.Add (Key.CursorUp.WithShift, Command.LeftExtend);
-
-        KeyBindings.Add (Key.CursorRight.WithShift, Command.RightExtend);
-        KeyBindings.Add (Key.CursorDown.WithShift, Command.RightExtend);
-
-        KeyBindings.Add (Key.CursorLeft.WithShift.WithCtrl, Command.WordLeftExtend);
-        KeyBindings.Add (Key.CursorUp.WithShift.WithCtrl, Command.WordLeftExtend);
-
-        KeyBindings.Add (Key.CursorRight.WithShift.WithCtrl, Command.WordRightExtend);
-        KeyBindings.Add (Key.CursorDown.WithShift.WithCtrl, Command.WordRightExtend);
-
-        KeyBindings.Add (Key.CursorLeft, Command.Left);
-        KeyBindings.Add (Key.B.WithCtrl, Command.Left);
-
-        KeyBindings.Add (Key.End, Command.RightEnd);
-        KeyBindings.Add (Key.End.WithCtrl, Command.RightEnd);
-        KeyBindings.Add (Key.E.WithCtrl, Command.RightEnd);
-
-        KeyBindings.Add (Key.CursorRight, Command.Right);
-        KeyBindings.Add (Key.F.WithCtrl, Command.Right);
-
-        KeyBindings.Add (Key.K.WithCtrl, Command.CutToEndOfLine);
-        KeyBindings.Add (Key.K.WithCtrl.WithShift, Command.CutToStartOfLine);
-
-        KeyBindings.Add (Key.Z.WithCtrl, Command.Undo);
-
-        KeyBindings.Add (Key.Y.WithCtrl, Command.Redo);
-
-        KeyBindings.Add (Key.CursorLeft.WithCtrl, Command.WordLeft);
-        KeyBindings.Add (Key.CursorUp.WithCtrl, Command.WordLeft);
-
-        KeyBindings.Add (Key.CursorRight.WithCtrl, Command.WordRight);
-        KeyBindings.Add (Key.CursorDown.WithCtrl, Command.WordRight);
-
-        KeyBindings.Add (Key.Delete.WithCtrl, Command.KillWordRight);
-        KeyBindings.Add (Key.Backspace.WithCtrl, Command.KillWordLeft);
-        KeyBindings.Add (Key.InsertChar, Command.ToggleOverwrite);
-        KeyBindings.Add (Key.C.WithCtrl, Command.Copy);
-        KeyBindings.Add (Key.X.WithCtrl, Command.Cut);
-        KeyBindings.Add (Key.V.WithCtrl, Command.Paste);
-        KeyBindings.Add (Key.A.WithCtrl, Command.SelectAll);
-
-        KeyBindings.Add (Key.R.WithCtrl, Command.DeleteAll);
-        KeyBindings.Add (Key.D.WithCtrl.WithShift, Command.DeleteAll);
-
+        // Remove Space binding inherited from View base (not applicable in a text field)
         KeyBindings.Remove (Key.Space);
     }
 
@@ -136,10 +110,7 @@ public partial class TextField
 
         if (newPos.Value.col != -1)
         {
-            SetText (
-                     _text.GetRange (0, newPos.Value.col)
-                          .Concat (_text.GetRange (_insertionPoint, _text.Count - _insertionPoint))
-                    );
+            SetText (_text.GetRange (0, newPos.Value.col).Concat (_text.GetRange (_insertionPoint, _text.Count - _insertionPoint)));
             _insertionPoint = newPos.Value.col;
         }
 
@@ -161,10 +132,7 @@ public partial class TextField
 
         if (newPos.Value.col != -1)
         {
-            SetText (
-                     _text.GetRange (0, _insertionPoint)
-                          .Concat (_text.GetRange (newPos.Value.col, _text.Count - newPos.Value.col))
-                    );
+            SetText (_text.GetRange (0, _insertionPoint).Concat (_text.GetRange (newPos.Value.col, _text.Count - newPos.Value.col)));
         }
 
         Adjust ();
@@ -202,12 +170,7 @@ public partial class TextField
 
         Text = StringExtensions.ToString (_text.GetRange (0, selStart))
                + cbTxt
-               + StringExtensions.ToString (
-                                            _text.GetRange (
-                                                            selStart + SelectedLength,
-                                                            _text.Count - (selStart + SelectedLength)
-                                                           )
-                                           );
+               + StringExtensions.ToString (_text.GetRange (selStart + SelectedLength, _text.Count - (selStart + SelectedLength)));
 
         _insertionPoint = Math.Min (selStart + cbTxt.GetRuneCount (), _text.Count);
         ClearAllSelection ();
@@ -273,14 +236,7 @@ public partial class TextField
             _currentCulture = Thread.CurrentThread.CurrentUICulture;
         }
 
-        if (keyboard)
-        {
-            ContextMenu?.MakeVisible (ViewportToScreen (new Point (_insertionPoint - ScrollOffset, 1)));
-        }
-        else
-        {
-            ContextMenu?.MakeVisible ();
-        }
+        ContextMenu?.MakeVisible (ViewportToScreen (new Point (_insertionPoint - ScrollOffset, 1)));
 
         return true;
     }
@@ -313,10 +269,7 @@ public partial class TextField
             return true;
         }
 
-        _historyText.Add (
-                          [Cell.ToCells (_text)],
-                          new (_insertionPoint, 0)
-                         );
+        _historyText.Add ([Cell.ToCells (_text)], new Point (_insertionPoint, 0));
 
         if (SelectedLength == 0)
         {
@@ -334,15 +287,8 @@ public partial class TextField
 
             if (_preChangeInsertionPoint < _text.Count)
             {
-                SetText (
-                         _text.GetRange (0, _preChangeInsertionPoint - 1)
-                              .Concat (
-                                       _text.GetRange (
-                                                       _preChangeInsertionPoint,
-                                                       _text.Count - _preChangeInsertionPoint
-                                                      )
-                                      )
-                        );
+                SetText (_text.GetRange (0, _preChangeInsertionPoint - 1)
+                              .Concat (_text.GetRange (_preChangeInsertionPoint, _text.Count - _preChangeInsertionPoint)));
             }
             else
             {
@@ -368,10 +314,7 @@ public partial class TextField
             return true;
         }
 
-        _historyText.Add (
-                          [Cell.ToCells (_text)],
-                          new (_insertionPoint, 0)
-                         );
+        _historyText.Add ([Cell.ToCells (_text)], new Point (_insertionPoint, 0));
 
         if (SelectedLength == 0)
         {
@@ -380,10 +323,7 @@ public partial class TextField
                 return true;
             }
 
-            SetText (
-                     _text.GetRange (0, _insertionPoint)
-                          .Concat (_text.GetRange (_insertionPoint + 1, _text.Count - (_insertionPoint + 1)))
-                    );
+            SetText (_text.GetRange (0, _insertionPoint).Concat (_text.GetRange (_insertionPoint + 1, _text.Count - (_insertionPoint + 1))));
         }
         else
         {
@@ -398,12 +338,13 @@ public partial class TextField
 
     private bool MoveEndExtend ()
     {
-        if (_insertionPoint <= _text.Count)
+        if (_insertionPoint > _text.Count)
         {
-            int x = _insertionPoint;
-            _insertionPoint = _text.Count;
-            PrepareSelection (x, _insertionPoint - x);
+            return true;
         }
+        int x = _insertionPoint;
+        _insertionPoint = _text.Count;
+        PrepareSelection (x, _insertionPoint - x);
 
         return true;
     }
@@ -419,12 +360,13 @@ public partial class TextField
 
     private bool MoveHomeExtend ()
     {
-        if (_insertionPoint > 0)
+        if (_insertionPoint <= 0)
         {
-            int x = _insertionPoint;
-            _insertionPoint = 0;
-            PrepareSelection (x, _insertionPoint - x);
+            return true;
         }
+        int x = _insertionPoint;
+        _insertionPoint = 0;
+        PrepareSelection (x, _insertionPoint - x);
 
         return true;
     }
@@ -441,7 +383,7 @@ public partial class TextField
     private bool Move (int distance)
     {
         int oldCursorPosition = _insertionPoint;
-        bool hadSelection = _selectedText != null && _selectedText.Length > 0;
+        bool hadSelection = _selectedText is { Length: > 0 };
 
         _insertionPoint = Math.Min (_text.Count, Math.Max (0, _insertionPoint + distance));
         ClearAllSelection ();
@@ -450,7 +392,7 @@ public partial class TextField
         return _insertionPoint != oldCursorPosition || hadSelection;
     }
 
-    private bool MoveLeft () { return Move (-1); }
+    private bool MoveLeft () => Move (-1);
 
     private bool MoveLeftExtend ()
     {
@@ -462,7 +404,7 @@ public partial class TextField
         return true;
     }
 
-    private bool MoveRight () { return Move (1); }
+    private bool MoveRight () => Move (1);
 
     private bool MoveRightExtend ()
     {
@@ -501,10 +443,7 @@ public partial class TextField
             return false;
         }
 
-        int x = Math.Min (
-                          _selectionStart > -1 && _selectionStart > _insertionPoint ? _selectionStart : _insertionPoint,
-                          _text.Count
-                         );
+        int x = Math.Min (_selectionStart > -1 && _selectionStart > _insertionPoint ? _selectionStart : _insertionPoint, _text.Count);
 
         if (x <= 0)
         {
@@ -653,11 +592,9 @@ public partial class TextField
         }
     }
 
-
     /// <summary>
     ///     Gets or sets whether the word forward and word backward navigation should use the same or equivalent rune type.
     ///     Default is <c>false</c> meaning using equivalent rune type.
     /// </summary>
     public bool UseSameRuneTypeForWords { get; set; }
-
 }

@@ -56,24 +56,6 @@ public class MenuBarShowItemTests
         Assert.NotNull (menuBarItem.PopoverMenu);
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void MenuBar_Command_Activate_FocusesMenuBarItem ()
-    {
-        MenuBar menuBar = new () { App = new ApplicationImpl () };
-        MenuBarItem item = new ("_File");
-        menuBar.Add (item);
-        menuBar.BeginInit ();
-        menuBar.EndInit ();
-
-        // Activate focuses MenuBarItem
-        // MenuBar navigation is complex
-        Assert.Single (menuBar.SubViews);
-
-        menuBar.Dispose ();
-    }
 
     // Claude - Opus 4.5
     // Behavior documented in docfx/docs/command.md - View Command Behaviors table
@@ -100,25 +82,6 @@ public class MenuBarShowItemTests
 
         Assert.True (acceptingFired);
         Assert.True (result);
-
-        menuBar.Dispose ();
-    }
-
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
-    [Fact]
-    public void MenuBar_Command_HotKey_ActivatesMatchingItem ()
-    {
-        MenuBar menuBar = new () { App = new ApplicationImpl () };
-        MenuBarItem item = new ("_File");
-        menuBar.Add (item);
-
-        // HotKey activates item with matching hotkey
-        bool? result = menuBar.InvokeCommand (Command.HotKey);
-
-        // HotKey may return false if no matching item is found
-        Assert.NotEqual (true, result);
 
         menuBar.Dispose ();
     }

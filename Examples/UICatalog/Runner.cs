@@ -11,30 +11,34 @@ namespace UICatalog;
 public class Runner
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="Runner"/> class.
+    ///     Sets <see cref="ConfigurationManager.RuntimeConfig"/> with "Application.ForceDriver" and ["Driver.Force16Colors" based on the params.
     /// </summary>
     /// <param name="forceDriver">The driver to use, or null to use the default.</param>
     /// <param name="force16Colors">
     ///     Whether to force 16-color mode. If null, the current setting is preserved.
     /// </param>
-    public Runner (string? forceDriver = null, bool? force16Colors = null)
+    public void SetRuntimeConfig (string? forceDriver = null, bool? force16Colors = null)
     {
         // Create runtime config JSON containing "Application.ForceDriver" and "Driver.Force16Colors" if specified
         Dictionary<string, object> runtimeConfig = new ();
+
         if (!string.IsNullOrEmpty (forceDriver))
         {
             runtimeConfig ["Application.ForceDriver"] = forceDriver;
         }
+
         if (force16Colors.HasValue)
         {
             runtimeConfig ["Driver.Force16Colors"] = force16Colors.Value;
         }
+
         if (runtimeConfig.Count == 0)
         {
             return;
         }
         ConfigurationManager.RuntimeConfig = JsonSerializer.Serialize (runtimeConfig);
     }
+
     /// <summary>
     ///     Runs a single scenario with optional benchmarking.
     /// </summary>
@@ -47,8 +51,7 @@ public class Runner
         UICatalog.LogCapture.MarkScenarioStart ();
 
         // Create instance of the scenario
-        var scenario = (Scenario)Activator.CreateInstance (
-                                                           Scenario.GetScenarios ()
+        var scenario = (Scenario)Activator.CreateInstance (Scenario.GetScenarios ()
                                                                    .FirstOrDefault (s => s.GetName ().Equals (scenarioName, StringComparison.OrdinalIgnoreCase))
                                                                    !.GetType ())!;
 
@@ -107,12 +110,7 @@ public class Runner
     /// <param name="filePath">The file path to write to.</param>
     public static void SaveResultsToFile (List<BenchmarkResults> results, string filePath)
     {
-        string output = JsonSerializer.Serialize (
-                                                  results,
-                                                  new JsonSerializerOptions
-                                                  {
-                                                      WriteIndented = true
-                                                  });
+        string output = JsonSerializer.Serialize (results, new JsonSerializerOptions { WriteIndented = true });
 
         using StreamWriter file = File.CreateText (filePath);
         file.Write (output);
@@ -138,14 +136,10 @@ public class Runner
 
         if (benchmarkWindow.Border is { })
         {
-            benchmarkWindow.Border!.Thickness = new (0, 0, 0, 0);
+            benchmarkWindow.Border.Thickness = new Thickness (0, 0, 0, 0);
         }
 
-        TableView resultsTableView = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        TableView resultsTableView = new () { Width = Dim.Fill (), Height = Dim.Fill () };
 
         // TableView provides many options for table headers. For simplicity we turn all
         // of these off. By enabling FullRowSelect and turning off headers, TableView looks just
@@ -154,7 +148,7 @@ public class Runner
         resultsTableView.Style.ShowHeaders = true;
         resultsTableView.Style.ShowHorizontalHeaderOverline = false;
         resultsTableView.Style.ShowHorizontalHeaderUnderline = true;
-        resultsTableView.Style.ShowHorizontalBottomline = false;
+        resultsTableView.Style.ShowHorizontalBottomLine = false;
         resultsTableView.Style.ShowVerticalCellLines = true;
         resultsTableView.Style.ShowVerticalHeaderLines = true;
 
@@ -181,22 +175,20 @@ public class Runner
 
         foreach (BenchmarkResults r in results)
         {
-            dt.Rows.Add (
-                         r.Scenario,
+            dt.Rows.Add (r.Scenario,
                          r.Duration,
                          r.RefreshedCount,
                          r.LaidOutCount,
                          r.ClearedContentCount,
                          r.DrawCompleteCount,
                          r.UpdatedCount,
-                         r.IterationCount
-                        );
+                         r.IterationCount);
         }
 
         BenchmarkResults totalRow = new ()
         {
             Scenario = "TOTAL",
-            Duration = new (results.Sum (r => r.Duration.Ticks)),
+            Duration = new TimeSpan (results.Sum (r => r.Duration.Ticks)),
             RefreshedCount = results.Sum (r => r.RefreshedCount),
             LaidOutCount = results.Sum (r => r.LaidOutCount),
             ClearedContentCount = results.Sum (r => r.ClearedContentCount),
@@ -205,16 +197,14 @@ public class Runner
             IterationCount = results.Sum (r => r.IterationCount)
         };
 
-        dt.Rows.Add (
-                     totalRow.Scenario,
+        dt.Rows.Add (totalRow.Scenario,
                      totalRow.Duration,
                      totalRow.RefreshedCount,
                      totalRow.LaidOutCount,
                      totalRow.ClearedContentCount,
                      totalRow.DrawCompleteCount,
                      totalRow.UpdatedCount,
-                     totalRow.IterationCount
-                    );
+                     totalRow.IterationCount);
 
         dt.DefaultView.Sort = "Duration";
         DataTable sortedCopy = dt.DefaultView.ToTable ();
@@ -238,7 +228,7 @@ public class Runner
     /// </summary>
     /// <typeparam name="T">The Runnable type to use as the scenario browser UI.</typeparam>
     /// <param name="enableConfigWatcher">Whether to enable config file watching.</param>
-    public void RunInteractive<T> (bool enableConfigWatcher = true) where T : Runnable, new()
+    public void RunInteractive<T> (bool enableConfigWatcher = true) where T : Runnable, new ()
     {
         Logging.Information ($"{typeof (T).Name}");
 
@@ -258,6 +248,7 @@ public class Runner
             {
                 IApplication app = RunBrowserUI<T> ();
                 var selectedScenarioName = app.GetResult<string> ();
+
                 //Logging.Trace($"Disposing app");
                 app.Dispose ();
 
@@ -287,9 +278,8 @@ public class Runner
     ///     Runs the browser UI. The browser UI should set <see cref="IRunnable.Result"/> to the selected scenario name
     /// </summary>
     /// <typeparam name="T">The Runnable type to use as the browser UI.</typeparam>
-    private IApplication RunBrowserUI<T> () where T : Runnable, new()
+    private IApplication RunBrowserUI<T> () where T : Runnable, new ()
     {
-        ConfigurationManager.Enable (ConfigLocations.All);
         IApplication app = Application.Create ();
         app.Init ();
 
@@ -380,7 +370,7 @@ public class Runner
         _configWatcherStarted = false;
     }
 
-    private static void ThemeManagerOnThemeChanged (object? sender, EventArgs<string> e) { ConfigurationManager.Apply (); }
+    private static void ThemeManagerOnThemeChanged (object? sender, EventArgs<string> e) => ConfigurationManager.Apply ();
 
     private static void ConfigFileChanged (object sender, FileSystemEventArgs e)
     {

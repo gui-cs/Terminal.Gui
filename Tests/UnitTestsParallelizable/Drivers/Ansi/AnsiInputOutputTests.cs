@@ -1,6 +1,3 @@
-#nullable enable
-using Xunit.Abstractions;
-
 namespace DriverTests.AnsiDriver;
 
 /// <summary>
@@ -60,6 +57,59 @@ public class AnsiInputOutputTests (ITestOutputHelper output)
 
     [Fact]
     [Trait ("Category", "LowLevelDriver")]
+    public void AnsiOutput_Suspend_DoesNotThrow_WhenNoTerminalAvailable ()
+    {
+        // Arrange
+        using var output = new AnsiOutput ();
+
+        // Act
+        Exception? exception = Record.Exception (() => output.Suspend ());
+
+        // Assert
+        Assert.Null (exception);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void AnsiOutput_EnableKittyKeyboard_DoesNotWriteEnableSequence_WhenNoTerminalAvailable ()
+    {
+        using AnsiOutput output = new ();
+
+        output.EnableKittyKeyboard (EscSeqUtils.KittyKeyboardRequestedFlags);
+
+        Assert.Equal (KittyKeyboardFlags.None, output.KittyKeyboardEnabledFlags);
+
+        Assert.DoesNotContain (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardRequestedFlags),
+                               output.GetLastOutput (),
+                               StringComparison.Ordinal);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void AnsiOutput_Dispose_DoesNotWriteDisableSequence_WhenNoTerminalAvailable ()
+    {
+        AnsiOutput output = new ();
+        output.EnableKittyKeyboard (EscSeqUtils.KittyKeyboardRequestedFlags);
+
+        output.Dispose ();
+
+        Assert.Equal (KittyKeyboardFlags.None, output.KittyKeyboardEnabledFlags);
+        Assert.DoesNotContain (EscSeqUtils.CSI_DisableKittyKeyboardFlags, output.GetLastOutput (), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void AnsiOutput_Dispose_DoesNotWriteDisableSequence_WhenKittyKeyboardWasNotEnabled ()
+    {
+        using AnsiOutput output = new ();
+
+        output.DisableKittyKeyboard ();
+
+        Assert.DoesNotContain (EscSeqUtils.CSI_DisableKittyKeyboardFlags, output.GetLastOutput (), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
     public void AnsiComponentFactory_CreateInput_DoesNotThrow ()
     {
         // Arrange
@@ -92,5 +142,19 @@ public class AnsiInputOutputTests (ITestOutputHelper output)
 
         // Assert
         Assert.Null (exception);
+    }
+
+    [Fact]
+    [Trait ("Category", "LowLevelDriver")]
+    public void AnsiDriver_IsAttachedToTerminal_ReturnsFalse_InTestHarness ()
+    {
+        // Copilot - generated.
+        // Act — Driver.IsAttachedToTerminal is the shared entry point all drivers use.
+        bool result = Driver.IsAttachedToTerminal (out bool inputAttached, out bool outputAttached);
+
+        // Assert
+        Assert.False (result, "AnsiDriver: IsAttachedToTerminal should return false in test harness");
+        Assert.False (inputAttached);
+        Assert.False (outputAttached);
     }
 }

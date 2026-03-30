@@ -8,6 +8,7 @@ public class AnsiKeyboardParser
     private readonly List<AnsiKeyboardParserPattern> _patterns =
     [
         new Ss3Pattern (),
+        new KittyKeyboardPattern (),
         new CsiKeyPattern (),
         new CsiCursorPattern (),
         new EscAsAltPattern { IsLastMinute = true }

@@ -40,6 +40,48 @@ namespace Terminal.Gui.Views;
 ///         Searching the ListView with the keyboard is supported. Users type the first characters of an item, and the
 ///         first item that starts with what the user types will be selected.
 ///     </para>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Up, Ctrl+P</term> <description>Moves up one item.</description>
+///         </item>
+///         <item>
+///             <term>Down, Ctrl+N</term> <description>Moves down one item.</description>
+///         </item>
+///         <item>
+///             <term>PageUp / PageDown</term> <description>Moves one page up or down.</description>
+///         </item>
+///         <item>
+///             <term>Home / End</term> <description>Moves to the first or last item.</description>
+///         </item>
+///         <item>
+///             <term>Shift+&lt;movement&gt;</term> <description>Extends the selection in the given direction.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+A</term> <description>Selects all items.</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+U</term> <description>Deselects all items.</description>
+///         </item>
+///     </list>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Click</term> <description>Activates (selects) the clicked item.</description>
+///         </item>
+///         <item>
+///             <term>Double-Click</term> <description>Accepts the clicked item (<see cref="Command.Accept"/>).</description>
+///         </item>
+///         <item>
+///             <term>Wheel Up / Down</term> <description>Scrolls the list.</description>
+///         </item>
+///     </list>
 /// </remarks>
 public partial class ListView : View, IDesignable, IValue<int?>
 {
@@ -194,52 +236,6 @@ public partial class ListView : View, IDesignable, IValue<int?>
     /// <summary>INTERNAL: Gets the effective content width including mark columns when <see cref="ShowMarks"/> is true.</summary>
     private int EffectiveMaxItemLength => MaxItemLength + MarkWidth;
 
-    /// <summary>Gets or sets the index of the item that will appear at the top of the <see cref="View.Viewport"/>.</summary>
-    /// <remarks>
-    ///     This a helper property for accessing <c>listView.Viewport.Y</c>.
-    /// </remarks>
-    /// <value>The top item.</value>
-    /// <remarks>
-    ///     Values are clamped to the valid range [0, Count - Viewport.Height].
-    /// </remarks>
-    [Obsolete ("Used only internally by ComboBox which will be replaced soon. Do not use.")]
-    public int TopItem
-    {
-        get => Viewport.Y;
-        set
-        {
-            if (Source is null)
-            {
-                return;
-            }
-
-            // Clamp to valid range: [0, Count - Viewport.Height]
-            int maxTopItem = Math.Max (0, Source.Count - Viewport.Height);
-            value = Math.Clamp (value, 0, maxTopItem);
-            Viewport = Viewport with { Y = value };
-        }
-    }
-
-    /// <summary>Gets or sets the leftmost column that is currently visible (when scrolling horizontally).</summary>
-    [Obsolete ("Used only internally by ComboBox which will be replaced soon. Do not use.")]
-    internal int LeftItem
-    {
-        get => Viewport.X;
-        set
-        {
-            if (Source is null)
-            {
-                return;
-            }
-
-            // Clamp to valid range: [0, EffectiveMaxItemLength - Viewport.Width]
-            int maxLeftItem = Math.Max (0, EffectiveMaxItemLength - Viewport.Width);
-            value = Math.Clamp (value, 0, maxLeftItem);
-            Viewport = Viewport with { X = value };
-            SetNeedsDraw ();
-        }
-    }
-
     #endregion Viewport/ContentSize Management
 
     #region Keystroke Navigation
@@ -285,7 +281,7 @@ public partial class ListView : View, IDesignable, IValue<int?>
     /// <inheritdoc/>
     public bool EnableForDesign ()
     {
-        ListWrapper<string> source = new (["List Item 1", "List Item two", "List Item Quattro", "Last List Item"]);
+        ListWrapper<string> source = new (["List Item 1", "List Item two", "List Item 3", "List Item Quattro", "Last List Item"]);
         Source = source;
 
         return true;

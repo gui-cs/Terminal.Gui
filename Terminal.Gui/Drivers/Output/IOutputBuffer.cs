@@ -116,6 +116,21 @@ public interface IOutputBuffer
     int Rows { get; set; }
 
     /// <summary>
+    ///     Gets or sets the URL that will be associated with cells added via <see cref="AddRune(Rune)"/> or <see cref="AddStr(string)"/>.
+    ///     When set, subsequent cells will include this URL for OSC 8 hyperlink rendering.
+    /// </summary>
+    string? CurrentUrl { get; set; }
+
+    /// <summary>
+    ///     Gets the URL associated with the cell at the specified position.
+    ///     Returns <see langword="null"/> if no URL is associated with the cell.
+    /// </summary>
+    /// <param name="col">The column position.</param>
+    /// <param name="row">The row position.</param>
+    /// <returns>The URL associated with the cell, or <see langword="null"/> if none exists.</returns>
+    string? GetCellUrl (int col, int row);
+
+    /// <summary>
     ///     Changes the size of the buffer to the given size
     /// </summary>
     /// <param name="cols"></param>

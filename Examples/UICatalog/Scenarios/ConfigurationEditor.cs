@@ -27,7 +27,7 @@ public class ConfigurationEditor : Scenario
 
         _lenShortcut = new Shortcut { Title = "" };
 
-        Shortcut quitShortcut = new () { Key = Application.QuitKey, Title = "Quit", Action = Quit };
+        Shortcut quitShortcut = new () { Key = Application.GetDefaultKey (Command.Quit), Title = "Quit", Action = Quit };
 
         Shortcut reloadShortcut = new () { Key = Key.F5.WithShift, Title = "Reload" };
 

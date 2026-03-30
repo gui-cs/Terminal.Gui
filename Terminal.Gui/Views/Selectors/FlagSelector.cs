@@ -1,7 +1,7 @@
 namespace Terminal.Gui.Views;
 
-// DoubleClick - Focus, Select (Toggle), and Accept the item under the mouse.
-// Click - Focus, Select (Toggle), and do NOT Accept the item under the mouse.
+// DoubleClick - Focus, Activate, and Accept the item under the mouse (CanFocus or not)
+// Click - Focus, Activate, and do NOT Accept the item under the mouse (CanFocus or not).
 // Not Focused:
 //  HotKey - Restore Focus. Do NOT change Active.
 //  Item HotKey - Focus item. Activate (Toggle) item. Do NOT Accept.
@@ -18,6 +18,110 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public class FlagSelector : SelectorBase, IDesignable
 {
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="FlagSelector"/> class.
+    /// </summary>
+    public FlagSelector ()
+    {
+        KeyBindings.Remove (Key.Space);
+        KeyBindings.Remove (Key.Enter);
+    }
+
+    /// <summary>
+    ///     Returns the dispatch target for composite command handling.
+    ///     Only dispatches for Activate commands — Accept should bubble normally.
+    /// </summary>
+    protected override View? GetDispatchTarget (ICommandContext? ctx)
+    {
+        // Only dispatch Activate, not Accept. Accept should bubble to Menu/MenuBar normally.
+        if (ctx?.Command != Command.Activate)
+        {
+            return null;
+        }
+
+        // When a CheckBox's activation bubbles up, the source IS the CheckBox.
+        if (ctx.Source?.TryGetTarget (out View? source) == true && source is CheckBox)
+        {
+            return source;
+        }
+
+        // Suppress dispatch when the HotKey flag is set (HotKey → SetFocus only, no toggle).
+        if (!_suppressHotKeyActivate)
+        {
+            return Focused;
+        }
+        _suppressHotKeyActivate = false;
+
+        return null;
+    }
+
+    /// <summary>
+    ///     Consumes: FlagSelector owns toggle semantics.
+    /// </summary>
+    protected override bool ConsumeDispatch => true;
+
+    // Set by OnHandlingHotKey to suppress the Activate that DefaultHotKeyHandler
+    // fires after RaiseHandlingHotKey. Checked and cleared in GetDispatchTarget.
+    private bool _suppressHotKeyActivate;
+
+    /// <inheritdoc/>
+    protected override bool OnHandlingHotKey (CommandEventArgs args)
+    {
+        if (base.OnHandlingHotKey (args))
+        {
+            return true;
+        }
+
+        // When focused, HotKey is a no-op
+        if (HasFocus)
+        {
+            return true;
+        }
+
+        // Not focused: restore focus, suppress the Activate dispatch that DefaultHotKeyHandler will invoke.
+        _suppressHotKeyActivate = true;
+
+        if (CanFocus)
+        {
+            SetFocus ();
+        }
+
+        // Return false so HandlingHotKey event fires (required by AllViews contract)
+        return false;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        base.OnActivated (ctx);
+
+        if (ctx?.Binding is { } && ctx.Binding.Commands.Contains (Command.Accept))
+        {
+            // If the binding was via Accept, don't change the state
+            return;
+        }
+
+        CheckBox? checkBox = null;
+
+        // Toggle when the source is a CheckBox (BubblingUp path where consume prevented
+        // CheckBox.AdvanceCheckState).
+        if (ctx?.Source?.TryGetTarget (out View? source) == true && source is CheckBox cb)
+        {
+            checkBox = cb;
+        }
+        else if (ctx?.Routing == CommandRouting.DispatchingDown && Focused is CheckBox focusedCb)
+        {
+            // External dispatch (e.g. Menu → MenuItem → FlagSelector): the DispatchingDown guard
+            // blocked dispatch to inner CheckBoxes. Use the currently focused CheckBox as the
+            // toggle target — SetFocus() was called before OnActivated, so Focused is reliable.
+            checkBox = focusedCb;
+        }
+
+        checkBox?.Value = checkBox.Value == CheckState.Checked ? CheckState.UnChecked : CheckState.Checked;
+
+        // CheckboxOnValueChanged handler updates FlagSelector.Value bitmask
+    }
+
     /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
@@ -31,9 +135,7 @@ public class FlagSelector : SelectorBase, IDesignable
         checkbox.RadioStyle = false;
 
         checkbox.ValueChanging += OnCheckboxOnValueChanging;
-        checkbox.ValueChanged += OnCheckboxOnValueChanged;
-        checkbox.Activating += OnCheckboxOnActivating;
-        checkbox.Accepting += OnCheckboxOnAccepting;
+        checkbox.ValueChanged += CheckboxOnValueChanged;
     }
 
     private void OnCheckboxOnValueChanging (object? sender, ValueChangingEventArgs<CheckState> args)
@@ -43,90 +145,57 @@ public class FlagSelector : SelectorBase, IDesignable
             return;
         }
 
-        if (checkbox.Value == CheckState.Checked && (int)checkbox.Data! == 0 && Value == 0)
+        if (checkbox.Value == CheckState.Checked && GetCheckBoxValue (checkbox) == 0 && Value == 0)
         {
+            // None flag was already checked; prevent changing again
             args.Handled = true;
         }
     }
 
-    private void OnCheckboxOnValueChanged (object? sender, ValueChangedEventArgs<CheckState> args)
+    private void CheckboxOnValueChanged (object? sender, ValueChangedEventArgs<CheckState> args)
     {
-        if (sender is not CheckBox checkbox)
+        if (sender is not CheckBox checkBox)
         {
             return;
         }
 
         int newValue = Value ?? 0;
 
-        if (checkbox.Value == CheckState.Checked)
+        if (checkBox.Value == CheckState.Checked)
         {
-            if ((int)checkbox.Data! == 0)
+            if (GetCheckBoxValue (checkBox) == 0)
             {
                 newValue = 0;
             }
             else
             {
-                newValue |= (int)checkbox.Data!;
+                newValue |= GetCheckBoxValue (checkBox);
             }
         }
         else
         {
-            newValue &= ~(int)checkbox.Data!;
+            newValue &= ~GetCheckBoxValue (checkBox);
         }
 
         Value = newValue;
     }
 
-    private void OnCheckboxOnActivating (object? sender, CommandEventArgs args)
-    {
-        if (sender is not CheckBox checkbox)
-        {
-            return;
-        }
-
-        if (checkbox.CanFocus)
-        {
-            // For Activate, if the view is focusable and SetFocus succeeds, by definition,
-            // the event is handled. So return what SetFocus returns.
-            checkbox.SetFocus ();
-        }
-
-        // Activating doesn't normally propagate, so we do it here
-        if (InvokeCommand (Command.Activate, args.Context) is true)
-        {
-            // Do not return here; we want to toggle the checkbox state
-            args.Handled = true;
-
-            //return;
-        }
-    }
-
-    private void OnCheckboxOnAccepting (object? sender, CommandEventArgs args)
-    {
-        if (sender is not CheckBox checkbox)
-        {
-            return;
-        }
-        Value = (int)checkbox.Data!;
-        args.Handled = false; // Do not set to false; let Accepting propagate
-    }
-
-    private int? _value;
+    private bool _updatingChecked;
 
     /// <summary>
     ///     Gets or sets the value of the selected flags.
     /// </summary>
     public override int? Value
     {
-        get => _value;
+        get;
         set
         {
-            if (_updatingChecked || _value == value)
+            if (_updatingChecked || field == value)
             {
                 return;
             }
 
-            int? previousValue = _value;
+            int? previousValue = field;
 
             // Raise ValueChanging (cancellable) - use base class implementation
             if (RaiseValueChanging (previousValue, value))
@@ -134,9 +203,9 @@ public class FlagSelector : SelectorBase, IDesignable
                 return;
             }
 
-            _value = value;
+            field = value;
 
-            if (_value is null)
+            if (field is null)
             {
                 UncheckNone ();
                 UncheckAll ();
@@ -146,16 +215,17 @@ public class FlagSelector : SelectorBase, IDesignable
                 UpdateChecked ();
             }
 
-            RaiseValueChanged (previousValue, _value);
+            RaiseValueChanged (previousValue, field);
         }
     }
 
     private void UncheckNone ()
     {
-        // Uncheck ONLY the None checkbox (Data == 0)
         _updatingChecked = true;
 
-        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)sv.Data! == 0))
+        // Uncheck ONLY the None checkbox (value == 0)
+
+        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => GetCheckBoxValue (sv) == 0))
         {
             cb.Value = CheckState.UnChecked;
         }
@@ -164,30 +234,25 @@ public class FlagSelector : SelectorBase, IDesignable
 
     private void UncheckAll ()
     {
-        // Uncheck all NON-None checkboxes (Data != 0)
         _updatingChecked = true;
 
-        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => (int)(sv.Data ?? null!) != 0))
+        // Uncheck all NON-None checkboxes (value != 0)
+
+        foreach (CheckBox cb in SubViews.OfType<CheckBox> ().Where (sv => GetCheckBoxValue (sv) != 0))
         {
             cb.Value = CheckState.UnChecked;
         }
         _updatingChecked = false;
     }
 
-    private bool _updatingChecked;
-
     /// <inheritdoc/>
     public override void UpdateChecked ()
     {
-        if (_updatingChecked)
-        {
-            return;
-        }
         _updatingChecked = true;
 
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
-            var flag = (int)(cb.Data ?? throw new InvalidOperationException ("CheckBox.Data must be set"));
+            int flag = GetCheckBoxValue (cb);
 
             // If this flag is set in Value, check the checkbox. Otherwise, uncheck it.
             if (flag == 0)
@@ -204,28 +269,35 @@ public class FlagSelector : SelectorBase, IDesignable
     }
 
     /// <inheritdoc/>
-    protected override void OnCreatingSubViews ()
+    public override void CreateSubViews ()
     {
+        base.CreateSubViews ();
+
+        var changed = false;
+
         // FlagSelector supports a "None" check box; add it
         if (Styles.HasFlag (SelectorStyles.ShowNoneFlag) && Values is { } && !Values.Contains (0))
         {
             Add (CreateCheckBox ("None", 0));
+            changed = true;
         }
-    }
 
-    /// <inheritdoc/>
-    protected override void OnCreatedSubViews ()
-    {
-        // If the values include 0, and ShowNoneFlag is not specified, remove the "None" check box
+        // If the values include 0 and ShowNoneFlag is not specified, remove the zero-value check box
         if (!Styles.HasFlag (SelectorStyles.ShowNoneFlag))
         {
-            CheckBox? noneCheckBox = SubViews.OfType<CheckBox> ().FirstOrDefault (cb => (int)cb.Data! == 0);
+            CheckBox? noneCheckBox = SubViews.OfType<CheckBox> ().FirstOrDefault (cb => GetCheckBoxValue (cb) == 0);
 
             if (noneCheckBox is { })
             {
                 Remove (noneCheckBox);
                 noneCheckBox.Dispose ();
+                changed = true;
             }
+        }
+
+        if (changed)
+        {
+            SetLayout ();
         }
     }
 
