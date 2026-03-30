@@ -72,7 +72,7 @@ public static class ToolTipExtensions
         public void RemoveToolTip ()
         {
             ArgumentNullException.ThrowIfNull (view);
-            TooltipManager.Instance.RemoveTooltip (view);
+            TooltipManager.Instance.RemoveToolTip (view);
         }
     }
 }

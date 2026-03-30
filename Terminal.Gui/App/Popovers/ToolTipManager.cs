@@ -57,7 +57,7 @@ public sealed class TooltipManager : IDisposable
         ArgumentNullException.ThrowIfNull (provider);
 
         // Ensure previous registration is removed to avoid duplicate subscriptions
-        RemoveTooltip (target);
+        RemoveToolTip (target);
 
         // Subscribe to hover events
         target.MouseEnter += OnMouseEnter;
@@ -96,7 +96,7 @@ public sealed class TooltipManager : IDisposable
     /// <remarks>
     ///     This unsubscribes from events and removes any stored tooltip content.
     /// </remarks>
-    public void RemoveTooltip (View target)
+    public void RemoveToolTip (View target)
     {
         ArgumentNullException.ThrowIfNull (target);
 
