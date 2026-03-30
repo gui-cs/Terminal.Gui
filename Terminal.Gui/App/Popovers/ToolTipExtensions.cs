@@ -25,7 +25,14 @@ public static class ToolTipExtensions
         public void SetToolTip (string text)
         {
             ArgumentNullException.ThrowIfNull (view);
-            ToolTipManager.Instance.SetToolTip (view, new ToolTipProvider (text));
+            if (string.IsNullOrEmpty (text))
+            {
+                ToolTipManager.Instance.RemoveToolTip (view);
+            }
+            else
+            {
+                ToolTipManager.Instance.SetToolTip (view, new ToolTipProvider (text));
+            }
         }
 
         /// <summary>

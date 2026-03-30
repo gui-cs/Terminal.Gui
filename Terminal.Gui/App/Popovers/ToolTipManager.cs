@@ -25,7 +25,7 @@ public sealed class ToolTipManager : IDisposable
     /// </summary>
     /// <remarks>
     ///     Use this property to access the global ToolTipManager for managing tooltips throughout the
-    ///     application. This instance is thread-safe and intended to be used as a shared resource.
+    ///     application. This instance is not thread-safe for the moment and intended to be used as a shared resource.
     /// </remarks>
     public static ToolTipManager Instance { get; } = new ();
 
