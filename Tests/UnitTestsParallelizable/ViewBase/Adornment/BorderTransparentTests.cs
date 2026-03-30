@@ -500,6 +500,63 @@ public class BorderTransparentTests (ITestOutputHelper output)
     }
 
     /// <summary>
+    ///     A transparent overlay with TransparentMouse must not capture mouse events on cells
+    ///     drawn by a peer SubView. The overlay's CachedDrawnRegion must reflect only what the
+    ///     overlay itself drew, not what leaked into the shared DrawContext from peers.
+    /// </summary>
+    [Fact]
+    public void TransparentMouse_Overlay_Does_Not_Capture_Peer_SubView_Drawn_Cells ()
+    {
+        // Claude - Opus 4.6
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (20, 10);
+
+        using Runnable top = new ();
+        top.Width = Dim.Fill ();
+        top.Height = Dim.Fill ();
+
+        // Opaque button-like view at top-left
+        View button = new ()
+        {
+            X = 0, Y = 0, Width = 8, Height = 3, Id = "Button"
+        };
+
+        // Transparent overlay covering the whole top area.
+        // Draws a 2x2 indicator at viewport (15, 1) — far from the button.
+        View overlay = new ()
+        {
+            X = 0, Y = 0, Width = 20, Height = 10, Id = "Overlay",
+            ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse
+        };
+
+        overlay.DrawingContent += (_, args) =>
+                                  {
+                                      overlay.FillRect (new Rectangle (15, 1, 2, 2), new Rune ('*'));
+                                      args.DrawContext?.AddDrawnRectangle (overlay.ViewportToScreen (new Rectangle (15, 1, 2, 2)));
+                                  };
+
+        // Add order matters for Z-order: button first (behind), overlay second (in front).
+        top.Add (button, overlay);
+        app.Begin (top);
+
+        // 1. Click on the overlay's indicator (screen 15,1) — overlay should capture.
+        List<View?> viewsOnIndicator = top.GetViewsUnderLocation (new Point (15, 1), ViewportSettingsFlags.TransparentMouse);
+        Assert.Contains (viewsOnIndicator, v => v?.Id == "Overlay");
+
+        // 2. Click on the button area (screen 2,1) — overlay should NOT capture.
+        //    The button drew there, but that's the button's content, not the overlay's.
+        List<View?> viewsOnButton = top.GetViewsUnderLocation (new Point (2, 1), ViewportSettingsFlags.TransparentMouse);
+        Assert.DoesNotContain (viewsOnButton, v => v?.Id == "Overlay");
+
+        // 3. Click on empty area (screen 10,5) — overlay should NOT capture.
+        List<View?> viewsOnEmpty = top.GetViewsUnderLocation (new Point (10, 5), ViewportSettingsFlags.TransparentMouse);
+        Assert.DoesNotContain (viewsOnEmpty, v => v?.Id == "Overlay");
+
+        app.End (app.SessionStack?.FirstOrDefault ()!);
+    }
+
+    /// <summary>
     ///     Verifies that when CachedDrawnRegion is null (before first draw), TransparentMouse
     ///     falls back to blanket removal (no regression from current behavior).
     ///     Requires Phase 2e.

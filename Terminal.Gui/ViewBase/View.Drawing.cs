@@ -114,6 +114,14 @@ public partial class View // Drawing APIs
             // If no context ...
             context ??= new DrawContext ();
 
+            // Per-view context tracks only what THIS view draws (text + content).
+            // Used for CachedDrawnRegion (TransparentMouse hit-testing) so that a
+            // transparent view's hit region reflects only its own draws, not its
+            // SuperView's ClearViewport or peer SubViews' content.
+            // This follows the same pattern as DrawAdornments(), which creates
+            // per-adornment DrawContexts for the same reason.
+            _localDrawContext = new DrawContext ();
+
             SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
             DoClearViewport (context);
 
@@ -125,16 +133,29 @@ public partial class View // Drawing APIs
                 DoDrawSubViews (context);
             }
 
-            // ------------------------------------
-            // Draw the text
-            Trace.Draw (this.ToIdentifyingString (), "Text");
-            SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
-            DoDrawText (context);
+            // Add the ClearViewport rect to the shared context AFTER SubViews have drawn.
+            // This ensures SubViews' DoDrawComplete doesn't see the SuperView's cleared area
+            // in the context (which would over-exclude for overlapping views like Tabs).
+            if (_lastClearedViewport is { } clearedRect)
+            {
+                context.AddDrawnRectangle (clearedRect);
+                _lastClearedViewport = null;
+            }
 
             // ------------------------------------
-            // Draw the content
+            // Draw the text — tracked in both shared (clip exclusion) and local (hit-testing) contexts
+            Trace.Draw (this.ToIdentifyingString (), "Text");
+            SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
+            DoDrawText (_localDrawContext);
+
+            // ------------------------------------
+            // Draw the content — tracked in both shared (clip exclusion) and local (hit-testing) contexts
             Trace.Draw (this.ToIdentifyingString (), "Content");
-            DoDrawContent (context);
+            DoDrawContent (_localDrawContext);
+
+            // Merge this view's own draws into the shared context so the SuperView
+            // can track the aggregate for clip exclusion.
+            context.AddDrawnRegion (_localDrawContext.GetDrawnRegion ());
 
             // ------------------------------------
             // Draw adornment SubViews BEFORE rendering LineCanvas so their lines
@@ -491,11 +512,22 @@ public partial class View // Drawing APIs
 
         Driver.FillRect (toClear);
 
-        // BUGBUG: Why is this commented out. If there's a good reason, it should be clearly documented here.
-        //context?.AddDrawnRectangle (toClear);
+        // NOTE: ClearViewport does NOT add to the context here. The cleared viewport rect is
+        // added to the shared context in Draw() AFTER DoDrawSubViews completes. This prevents
+        // the SuperView's ClearViewport from leaking into SubViews' DoDrawComplete exclusion
+        // calculations — which would cause overlapping SubViews (e.g., Tab views that all use
+        // Dim.Fill) to exclude the entire frame and prevent peer SubViews from drawing.
+        _lastClearedViewport = toClear;
 
         SetNeedsDraw ();
     }
+
+    /// <summary>
+    ///     Stores the last viewport rectangle cleared by <see cref="ClearViewport"/>. Added to the shared
+    ///     <see cref="DrawContext"/> in <see cref="Draw(DrawContext?)"/> after SubViews have drawn, so that
+    ///     SubViews' <see cref="DoDrawComplete"/> doesn't see the SuperView's cleared area in the context.
+    /// </summary>
+    private Rectangle? _lastClearedViewport;
 
     #endregion ClearViewport
 
@@ -896,6 +928,13 @@ public partial class View // Drawing APIs
     private Region? _lastLineCanvasRegion;
 
     /// <summary>
+    ///     Per-view <see cref="DrawContext"/> that tracks only what THIS view drew (text + content),
+    ///     isolated from the shared context. Used to compute <see cref="CachedDrawnRegion"/> for
+    ///     <see cref="ViewportSettingsFlags.TransparentMouse"/> hit-testing.
+    /// </summary>
+    private DrawContext? _localDrawContext;
+
+    /// <summary>
     ///     Called at the end of <see cref="Draw(DrawContext)"/> to finalize drawing and update the clip region.
     /// </summary>
     /// <param name="context">
@@ -999,24 +1038,25 @@ public partial class View // Drawing APIs
 
         ExcludeFromClip (exclusion);
 
+        // Cache the view's own drawn region for TransparentMouse hit-testing.
+        // Uses _localDrawContext (per-view) rather than the shared context, so that only
+        // cells THIS view drew (text + content) are captured — not the SuperView's
+        // ClearViewport fill or peer SubViews' content.
+        if (ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+        {
+            if (viewTransparent || borderTransparent)
+            {
+                CachedDrawnRegion = _localDrawContext?.GetDrawnRegion ();
+            }
+            else
+            {
+                // Opaque view with TransparentMouse — cache the entire border frame.
+                CachedDrawnRegion = new Region (Border.FrameToScreen ());
+            }
+        }
+
         // Report the exclusion to the parent's DrawContext so SuperViews can track what we covered.
         context?.AddDrawnRegion (exclusion);
-
-        // Cache the view's own drawn region for TransparentMouse hit-testing.
-        if (!ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
-        {
-            return;
-        }
-
-        if (viewTransparent || borderTransparent)
-        {
-            CachedDrawnRegion = context?.GetDrawnRegion ().Clone ();
-        }
-        else
-        {
-            // Opaque view with TransparentMouse — cache the entire border frame.
-            CachedDrawnRegion = new Region (Border.FrameToScreen ());
-        }
 
         return;
 
