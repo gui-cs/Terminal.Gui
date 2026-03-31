@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -265,6 +267,26 @@ public class Tabs : View, IValue<View?>, IDesignable
         UpdateZOrder ();
     }
 
+    /// <summary>
+    ///     Inserts a view as a tab at the specified logical index. The view is added as a SubView
+    ///     and configured as a tab, but placed at <paramref name="index"/> in the logical tab order.
+    /// </summary>
+    /// <param name="index">The zero-based index at which to insert the tab.</param>
+    /// <param name="view">The view to insert.</param>
+    public void InsertTab (int index, View view)
+    {
+        // Add will trigger OnSubViewAdded, which appends to _tabList
+        Add (view);
+
+        // Move from the end (where OnSubViewAdded appended it) to the requested index
+        WeakReference<View> lastRef = _tabList [^1];
+        _tabList.RemoveAt (_tabList.Count - 1);
+        _tabList.Insert (Math.Clamp (index, 0, _tabList.Count), lastRef);
+
+        UpdateTabOffsets ();
+        UpdateZOrder ();
+    }
+
     #endregion
 
     #region Layout Helpers
@@ -438,9 +460,105 @@ public class Tabs : View, IValue<View?>, IDesignable
                                                };
         tab3.Add (tabSideSelector, tabDepthNumericUpDown);
 
-        View tab4 = new () { Title = "A_dd/Remove" };
+        View addRemoveTab = new () { Title = "A_dd/Remove" };
 
-        Add (tab1, lineStyleSelector, tab3, tab4);
+        // Tab list showing all tabs in logical order
+        ObservableCollection<string> tabListSource = new (TabCollection.Select (t => t.Title ?? "(untitled)"));
+
+        ListView tabListView = new ()
+        {
+            Width= Dim.Auto(),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Single,
+            Title = "Ta_bs"
+        };
+        tabListView.SetSource (tabListSource);
+
+        // Title input for new tabs
+        Label titleLabel = new ()
+        {
+            X = Pos.Right (tabListView) + 1,
+            Text = "Title:"
+        };
+
+        TextField titleTextField = new ()
+        {
+            X = Pos.Right (titleLabel) + 1,
+            Y = Pos.Top (titleLabel),
+            Width = Dim.Fill (),
+            Text = "New Tab"
+        };
+
+        // Add Before button
+        Button addBeforeButton = new ()
+        {
+            X = Pos.Right (tabListView) + 1,
+            Y = Pos.Bottom (titleTextField),
+            Text = "Add _Before"
+        };
+
+        addBeforeButton.Accepting += (_, _) =>
+                                     {
+                                         var title = titleTextField.Text ?? "New Tab";
+                                         View newTab = new () { Title = title };
+                                         int selectedIndex = tabListView.SelectedItem ?? 0;
+                                         InsertTab (selectedIndex, newTab);
+                                         RefreshList ();
+                                         Value = addRemoveTab;
+                                     };
+
+        // Add After button
+        Button addAfterButton = new ()
+        {
+            X = Pos.Right (addBeforeButton) + 1,
+            Y = Pos.Top (addBeforeButton),
+            Text = "Add _After"
+        };
+
+        addAfterButton.Accepting += (_, _) =>
+                                    {
+                                        var title = titleTextField.Text ?? "New Tab";
+                                        View newTab = new () { Title = title };
+                                        int selectedIndex = (tabListView.SelectedItem ?? 0) + 1;
+                                        InsertTab (selectedIndex, newTab);
+                                        RefreshList ();
+                                        Value = addRemoveTab;
+                                    };
+
+        // Remove button
+        Button removeButton = new ()
+        {
+            X = Pos.Right (addAfterButton) + 1,
+            Y = Pos.Top (addAfterButton),
+            Text = "_Remove"
+        };
+
+        removeButton.Accepting += (_, _) =>
+                                  {
+                                      int? selectedIndex = tabListView.SelectedItem;
+
+                                      if (selectedIndex is null)
+                                      {
+                                          return;
+                                      }
+
+                                      List<View> tabs = TabCollection.ToList ();
+
+                                      if (selectedIndex.Value < tabs.Count)
+                                      {
+                                          Remove (tabs [selectedIndex.Value]);
+                                          tabs [selectedIndex.Value].Dispose ();
+                                          RefreshList ();
+                                          Value = addRemoveTab;
+                                      }
+                                  };
+
+        addRemoveTab.Add (tabListView, titleLabel, titleTextField, addBeforeButton, addAfterButton, removeButton);
+
+        Add (tab1, lineStyleSelector, tab3, addRemoveTab);
+
+        // Refresh the list whenever Value changes (tab added/removed/selected)
+        ValueChanged += (_, _) => RefreshList ();
 
         attributePicker.ValueChanged += (_, e) =>
                                         {
@@ -471,6 +589,17 @@ public class Tabs : View, IValue<View?>, IDesignable
                                         };
 
         return true;
+
+        // Helper to refresh the list from current TabCollection
+        void RefreshList ()
+        {
+            tabListSource.Clear ();
+
+            foreach (View t in TabCollection)
+            {
+                tabListSource.Add (t.Title ?? "(untitled)");
+            }
+        }
     }
 
     #endregion
