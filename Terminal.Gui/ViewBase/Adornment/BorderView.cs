@@ -469,7 +469,6 @@ public partial class BorderView : AdornmentView
             normalAttribute = GetAttributeForRole (VisualRole.Highlight);
         }
 
-
         SetAttribute (normalAttribute);
 
         LineCanvas? lc = Adornment.Parent?.LineCanvas;

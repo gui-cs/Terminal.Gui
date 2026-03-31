@@ -38,8 +38,7 @@ public class BorderEditor : AdornmentEditor
             Source = new ListWrapper<string> (new ObservableCollection<string> (Enum.GetNames<LineStyle> ())),
             Value = $"{(AdornmentToEdit as Border)?.LineStyle ?? LineStyle.None}",
             BorderStyle = LineStyle.Single,
-            Title = "Border St_yle",
-            SuperViewRendersLineCanvas = true
+            Title = "St_yle",
         };
         Add (_osBorderStyle);
 
@@ -49,10 +48,9 @@ public class BorderEditor : AdornmentEditor
         {
             Y = Pos.Bottom (_osBorderStyle),
             Value = (AdornmentToEdit as Border)?.Settings ?? BorderSettings.None,
-            Width = Dim.Width(_osBorderStyle),
+            Width = Dim.Auto(),
             BorderStyle = LineStyle.Single,
-            SuperViewRendersLineCanvas = true,
-            Title = "Border S_ettings"
+            Title = "S_ettings"
         };
 
         Add (_osBorderSettings);
@@ -65,8 +63,7 @@ public class BorderEditor : AdornmentEditor
             Width = Dim.Width (_osBorderStyle),
             Value = (AdornmentToEdit as Border)?.TabSide ?? Side.Top,
             BorderStyle = LineStyle.Single,
-            Title = "Header _Side",
-            SuperViewRendersLineCanvas = true,
+            Title = "_Side",
             Enabled = (AdornmentToEdit as Border)?.Settings.HasFlag (BorderSettings.Tab) ?? false
         };
 
@@ -75,7 +72,7 @@ public class BorderEditor : AdornmentEditor
 
         Label labelOffset = new ()
         {
-            Title = "_Offset:", Y = Pos.Bottom (_osTabSide), Enabled = (AdornmentToEdit as Border)?.Settings.HasFlag(BorderSettings.Tab) ?? false
+            Title = "Tab _Offset:", Y = Pos.Bottom (_osTabSide)
         };
 
         _nudTabOffset = new NumericUpDown<int>
@@ -83,8 +80,6 @@ public class BorderEditor : AdornmentEditor
             X = Pos.Right (labelOffset) + 1,
             Y = Pos.Top (labelOffset),
             Value = (AdornmentToEdit as Border)?.TabOffset ?? 0,
-            Title = "Header _Offset",
-            SuperViewRendersLineCanvas = true,
             Enabled = (AdornmentToEdit as Border)?.Settings.HasFlag (BorderSettings.Tab) ?? false
         };
 

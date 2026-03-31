@@ -46,45 +46,37 @@ public class AdornmentsEditor : EditorBase
     {
         ExpanderButton?.Orientation = Orientation.Horizontal;
 
-        MarginEditor = new MarginEditor { BorderStyle = LineStyle.None };
-        View marginTab = new () { Title = "Margin" };
-        marginTab.Add (MarginEditor);
-        _tabs.Add (marginTab);
+        MarginEditor = new MarginEditor { };
+        _tabs.Add (MarginEditor);
 
-        View borderTab = new () { Title = "Border" };
-        BorderEditor = new BorderEditor { BorderStyle = LineStyle.None };
-        borderTab.Add (BorderEditor);
-        _tabs.Add (borderTab);
+        BorderEditor = new BorderEditor { };
+        _tabs.Add (BorderEditor);
 
-        View paddingTab = new () { Title = "Padding" };
-        PaddingEditor = new PaddingEditor { BorderStyle = LineStyle.None };
-        paddingTab.Add (PaddingEditor);
-        _tabs.Add (paddingTab);
+        PaddingEditor = new PaddingEditor { };
+        _tabs.Add (PaddingEditor);
 
         // Set all tabs to Dim.Auto 
-        marginTab.Width = Dim.Auto ();
-        borderTab.Width = Dim.Auto ();
-        paddingTab.Width = Dim.Auto ();
-
-        marginTab.Height = Dim.Auto ();
-        borderTab.Height = Dim.Auto ();
-        paddingTab.Height = Dim.Auto ();
-
+        MarginEditor.Width = Dim.Auto ();
+        BorderEditor.Width = Dim.Auto ();
+        PaddingEditor.Width = Dim.Auto ();
+        MarginEditor.Height = Dim.Auto ();
+        BorderEditor.Height = Dim.Auto ();
+        PaddingEditor.Height = Dim.Auto ();
         Layout ();
 
         // Get the largest 
         int max = new [] { MarginEditor.Frame.Width, BorderEditor.Frame.Width, PaddingEditor.Frame.Width }.Max ();
-        _tabs.Width = Dim.Auto (minimumContentDim: max + marginTab.GetAdornmentsThickness ().Horizontal);
+        _tabs.Width = Dim.Auto (minimumContentDim: max);
 
         max = new [] { MarginEditor.Frame.Height, BorderEditor.Frame.Height, PaddingEditor.Frame.Height }.Max ();
-        _tabs.Height = Dim.Auto (minimumContentDim: max + marginTab.GetAdornmentsThickness ().Vertical);
+        _tabs.Height = Dim.Auto (minimumContentDim: max);
 
-        marginTab.Width = Dim.Fill ();
-        borderTab.Width = Dim.Fill ();
-        paddingTab.Width = Dim.Fill ();
-        marginTab.Height = Dim.Fill ();
-        borderTab.Height = Dim.Fill ();
-        paddingTab.Height = Dim.Fill ();
+        MarginEditor.Width = Dim.Fill ();
+        BorderEditor.Width = Dim.Fill ();
+        PaddingEditor.Width = Dim.Fill ();
+        MarginEditor.Height = Dim.Fill ();
+        BorderEditor.Height = Dim.Fill ();
+        PaddingEditor.Height = Dim.Fill ();
 
         MarginEditor.AdornmentToEdit = ViewToEdit?.Margin ?? null;
         BorderEditor.AdornmentToEdit = ViewToEdit?.Border ?? null;
