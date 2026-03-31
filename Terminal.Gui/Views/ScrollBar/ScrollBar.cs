@@ -27,13 +27,12 @@ namespace Terminal.Gui.Views;
 public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 {
     private readonly Button _decreaseButton;
-    private readonly ScrollSlider _slider;
     private readonly Button _increaseButton;
 
     /// <summary>
     ///     Gets the <see cref="ScrollSlider"/> used by this <see cref="ScrollBar"/>.
     /// </summary>
-    public ScrollSlider Slider => _slider;
+    public ScrollSlider Slider { get; }
 
     /// <inheritdoc/>
     public ScrollBar ()
@@ -53,12 +52,12 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         };
         _decreaseButton.Accepting += OnDecreaseButtonOnAccept;
 
-        _slider = new ScrollSlider
+        Slider = new ScrollSlider
         {
             SliderPadding = 2 // For the buttons
         };
-        _slider.Scrolled += SliderOnScroll;
-        _slider.PositionChanged += SliderOnPositionChanged;
+        Slider.Scrolled += SliderOnScroll;
+        Slider.PositionChanged += SliderOnPositionChanged;
 
         _increaseButton = new Button
         {
@@ -69,7 +68,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             MouseHoldRepeat = MouseFlags.LeftButtonReleased
         };
         _increaseButton.Accepting += OnIncreaseButtonOnAccept;
-        Add (_decreaseButton, _slider, _increaseButton);
+        Add (_decreaseButton, Slider, _increaseButton);
 
         CanFocus = false;
 
@@ -107,7 +106,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             case ScrollBarVisibilityMode.Auto:
                 // If this scrollbar lives in a View's Padding, respect the View's
                 // ViewportSettings as the authority on whether it should be enabled.
-                if (SuperView is PaddingView { Adornment.Parent: { } ownerView })
+                if (SuperView is PaddingView { Adornment.Parent: { } ownerView } && (this == ownerView.VerticalScrollBar || this == ownerView.HorizontalScrollBar))
                 {
                     ViewportSettingsFlags requiredFlag = Orientation == Orientation.Vertical
                                                              ? ViewportSettingsFlags.HasVerticalScrollBar
@@ -140,10 +139,10 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
                 break;
         }
 
-        _slider.VisibleContentSize = VisibleContentSize;
-        _slider.Size = CalculateSliderSize ();
+        Slider.VisibleContentSize = VisibleContentSize;
+        Slider.Size = CalculateSliderSize ();
         _sliderPosition = CalculateSliderPositionFromContentPosition (_value);
-        _slider.Position = _sliderPosition.Value;
+        Slider.Position = _sliderPosition.Value;
     }
 
     private void PositionSubViews ()
@@ -156,9 +155,9 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             _decreaseButton.Height = 1;
             _decreaseButton.Title = Glyphs.UpArrow.ToString ();
 
-            _slider.X = 0;
-            _slider.Y = 1;
-            _slider.Width = Dim.Fill ();
+            Slider.X = 0;
+            Slider.Y = 1;
+            Slider.Width = Dim.Fill ();
 
             _increaseButton.Y = Pos.AnchorEnd ();
             _increaseButton.X = 0;
@@ -174,9 +173,9 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             _decreaseButton.Height = Dim.Fill ();
             _decreaseButton.Title = Glyphs.LeftArrow.ToString ();
 
-            _slider.Y = 0;
-            _slider.X = 1;
-            _slider.Height = Dim.Fill ();
+            Slider.Y = 0;
+            Slider.X = 1;
+            Slider.Height = Dim.Fill ();
 
             _increaseButton.Y = 0;
             _increaseButton.X = Pos.AnchorEnd ();
@@ -208,7 +207,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         TextDirection = Orientation == Orientation.Vertical ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
         TextAlignment = Alignment.Center;
         VerticalTextAlignment = Alignment.Center;
-        _slider.Orientation = newOrientation;
+        Slider.Orientation = newOrientation;
         PositionSubViews ();
 
         OrientationChanged?.Invoke (this, new EventArgs<Orientation> (newOrientation));
@@ -278,7 +277,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         set
         {
             _visibleContentSize = value;
-            _slider.Size = CalculateSliderSize ();
+            Slider.Size = CalculateSliderSize ();
             ShowHide ();
         }
     }
@@ -308,7 +307,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             }
 
             _scrollableContentSize = value;
-            _slider.Size = CalculateSliderSize ();
+            Slider.Size = CalculateSliderSize ();
             ShowHide ();
 
             if (!Visible)
@@ -386,9 +385,9 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
             _sliderPosition = CalculateSliderPositionFromContentPosition (_value, direction);
 
-            if (_slider.Position != _sliderPosition)
+            if (Slider.Position != _sliderPosition)
             {
-                _slider.Position = _sliderPosition.Value;
+                Slider.Position = _sliderPosition.Value;
             }
 
             ValueChangedEventArgs<int> changedArgs = new (oldValue, _value);
@@ -444,7 +443,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     {
         int scrollBarSize = Orientation == Orientation.Vertical ? Viewport.Height : Viewport.Width;
 
-        return ScrollSlider.CalculateContentPosition (ScrollableContentSize, VisibleContentSize, sliderPosition, scrollBarSize - _slider.SliderPadding);
+        return ScrollSlider.CalculateContentPosition (ScrollableContentSize, VisibleContentSize, sliderPosition, scrollBarSize - Slider.SliderPadding);
     }
 
     #region Slider Management
@@ -536,6 +535,11 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
     /// <inheritdoc/>
     protected override bool OnClearingViewport ()
     {
+        if (!Slider.Visible)
+        {
+            return true;
+        }
+
         if (Orientation == Orientation.Vertical)
         {
             FillRect (Viewport with { Y = Viewport.Y + 1, Height = Viewport.Height - 2 }, Glyphs.Stipple);
@@ -564,12 +568,12 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
         if (Orientation == Orientation.Vertical)
         {
-            sliderCenter = 1 + _slider.Frame.Y + _slider.Frame.Height / 2;
+            sliderCenter = 1 + Slider.Frame.Y + Slider.Frame.Height / 2;
             distanceFromCenter = mouse.Position!.Value.Y - sliderCenter;
         }
         else
         {
-            sliderCenter = 1 + _slider.Frame.X + _slider.Frame.Width / 2;
+            sliderCenter = 1 + Slider.Frame.X + Slider.Frame.Width / 2;
             distanceFromCenter = mouse.Position!.Value.X - sliderCenter;
         }
 
@@ -592,7 +596,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         }
         else
         {
-            Value = Math.Min (ScrollableContentSize - _slider.VisibleContentSize, Value + jump);
+            Value = Math.Min (ScrollableContentSize - Slider.VisibleContentSize, Value + jump);
         }
 
         return true;
