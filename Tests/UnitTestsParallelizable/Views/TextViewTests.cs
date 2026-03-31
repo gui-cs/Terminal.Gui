@@ -2164,7 +2164,6 @@ public class TextViewTests (ITestOutputHelper output)
         TextView tv = new () { Width = 10, Height = 3, ScrollBars = true };
         tv.BeginInit ();
         tv.EndInit ();
-        tv.SetRelativeLayout (new Size (100, 100));
 
         Size initialContentSize = tv.GetContentSize ();
         Assert.Equal (1, initialContentSize.Height); // Empty text should initially have 1 cell for the cursor
@@ -2193,7 +2192,6 @@ public class TextViewTests (ITestOutputHelper output)
         TextView tv = new () { Width = 10, Height = 3, ScrollBars = true, Text = "A\nB\nC\nD" };
         tv.BeginInit ();
         tv.EndInit ();
-        tv.SetRelativeLayout (new Size (100, 100));
 
         Size initialContentSize = tv.GetContentSize ();
         Assert.Equal (4, initialContentSize.Height); // Initially 4 lines
@@ -2258,7 +2256,6 @@ public class TextViewTests (ITestOutputHelper output)
         TextView tv = new () { Width = 10, Height = 3, ScrollBars = true };
         tv.BeginInit ();
         tv.EndInit ();
-        tv.SetRelativeLayout (new Size (100, 100));
 
         Size initialContentSize = tv.GetContentSize ();
         Assert.Equal (1, initialContentSize.Height); // Empty text should have one cell for the cursor
@@ -2288,7 +2285,6 @@ public class TextViewTests (ITestOutputHelper output)
         TextView tv = new () { Width = 10, Height = 3, ScrollBars = true };
         tv.BeginInit ();
         tv.EndInit ();
-        tv.SetRelativeLayout (new Size (100, 100));
 
         // Track ContentsChanged events and content size at each event
         var contentsChangedCount = 0;
@@ -2352,7 +2348,6 @@ public class TextViewTests (ITestOutputHelper output)
         TextView tv = new () { Width = 10, Height = 1, ScrollBars = true };
         tv.BeginInit ();
         tv.EndInit ();
-        tv.SetRelativeLayout (new Size (100, 100));
 
         // Track whether content size is correct INSIDE the ContentsChanged handler
         // The bug is that UpdateContentSize() isn't called in OnContentsChanged(),
@@ -2397,7 +2392,6 @@ public class TextViewTests (ITestOutputHelper output)
         TextView tv = new () { Width = 10, Height = 3, ScrollBars = true };
         tv.BeginInit ();
         tv.EndInit ();
-        tv.SetRelativeLayout (new Size (100, 100));
 
         // Track whether scrollbar visibility was correct when ContentsChanged fired
         // and content exceeded viewport
