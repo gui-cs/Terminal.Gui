@@ -717,7 +717,7 @@ public class Region
 
         foreach ((int yTop, int yBottom) in active)
         {
-            if (currentTop == null)
+            if (currentTop is null)
             {
                 currentTop = yTop;
                 currentBottom = yBottom;
@@ -728,15 +728,23 @@ public class Region
             }
             else
             {
-                result.Add (new Rectangle (startX, currentTop.Value, endX - startX, currentBottom!.Value - currentTop.Value));
-                currentTop = yTop;
+                if (currentBottom is { })
+                {
+                    result.Add (new Rectangle (startX, currentTop.Value, endX - startX, currentBottom.Value - currentTop.Value));
+                    currentTop = yTop;
+                }
                 currentBottom = yBottom;
             }
         }
 
-        if (currentTop != null)
+        if (currentTop is null)
         {
-            result.Add (new Rectangle (startX, currentTop.Value, endX - startX, currentBottom!.Value - currentTop.Value));
+            return result;
+        }
+
+        if (currentBottom is { })
+        {
+            result.Add (new Rectangle (startX, currentTop.Value, endX - startX, currentBottom.Value - currentTop.Value));
         }
 
         return result;
@@ -907,7 +915,7 @@ public class Region
     {
         ArgumentNullException.ThrowIfNull (driver);
 
-        if (_rectangles.Count == 0)
+        if (_rectangles.Count == 0 || attribute is null)
         {
             return;
         }
@@ -919,7 +927,7 @@ public class Region
                 continue;
             }
 
-            driver?.SetAttribute (attribute!.Value);
+            driver?.SetAttribute (attribute.Value);
 
             for (int y = rect.Top; y < rect.Bottom; y++)
             {
