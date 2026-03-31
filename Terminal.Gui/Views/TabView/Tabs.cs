@@ -189,6 +189,7 @@ public class Tabs : View, IValue<Tab?>, IDesignable
         // Configure the tab
         tab.Border.TabSide = _tabSide;
         tab.BorderStyle = _tabLineStyle;
+        base.SuperViewRendersLineCanvas = true;
         tab.Width = Dim.Fill ();
         tab.Height = Dim.Fill ();
 

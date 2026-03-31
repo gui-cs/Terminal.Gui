@@ -25,10 +25,11 @@ public class Tab : View
     {
         TabStop = TabBehavior.TabStop;
         CanFocus = true;
-        base.SuperViewRendersLineCanvas = true;
         BorderStyle = LineStyle.Rounded;
 
         Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+
+        Border.Thickness = new Thickness (1, 3, 1, 1);
 
         // Overlapped enables z-order: focused tab renders above unselected tabs
         Arrangement = ViewArrangement.Overlapped;

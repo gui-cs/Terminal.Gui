@@ -191,8 +191,7 @@ public partial class BorderView : AdornmentView
         }
 
         // Configure the label's border thickness based on depth and focus
-        Thickness labelBorderThickness = ComputeTabLabelThickness (border.TabSide, tabDepth, hasFocus);
-        _tabTitleView.Border.Thickness = labelBorderThickness;
+        _tabTitleView.Border.Thickness = ComputeTabLabelThickness (border.TabSide, tabDepth, hasFocus, clipped);
 
         // For Left/Right, render text vertically
         _tabTitleView.TextFormatter.Direction = border.TabSide is Side.Left or Side.Right
@@ -403,7 +402,7 @@ public partial class BorderView : AdornmentView
     ///         For depth &lt; 3, no focus distinction in border lines.
     ///     </para>
     /// </remarks>
-    private static Thickness ComputeTabLabelThickness (Side tabSide, int depth, bool hasFocus)
+    private static Thickness ComputeTabLabelThickness (Side tabSide, int depth, bool hasFocus, Rectangle clipped)
     {
         int cap = depth >= 2 ? 1 : 0;
         int contentSide = depth >= 3 && !hasFocus ? 1 : 0;
@@ -469,6 +468,7 @@ public partial class BorderView : AdornmentView
         {
             normalAttribute = GetAttributeForRole (VisualRole.Highlight);
         }
+
 
         SetAttribute (normalAttribute);
 
@@ -559,7 +559,7 @@ public partial class BorderView : AdornmentView
         }
 
         // If the Parent is a Tab, and it is the last subview of it's SuperView, treat it as though it is focused
-        if (border.Parent is Tab { SuperView: { } } tab && tab.SuperView.SubViews.LastOrDefault () == tab)
+        if (border.Parent is Tab { SuperView: { } } tab && tab.SuperView?.SubViews.LastOrDefault () == tab)
         {
             return true;
         }
@@ -764,42 +764,6 @@ public partial class BorderView : AdornmentView
 
             default: throw new ArgumentOutOfRangeException (nameof (side), side, null);
         }
-    }
-
-    /// <summary>
-    ///     Computes the content area within the tab header where the title text is drawn.
-    ///     For depth ≥ 3, always reserves 1 cell on each side (cap, content-side closing edge,
-    ///     side edges) — even when the content-side thickness is 0 (focused gap).
-    ///     For depth &lt; 3, uses the actual tab thickness.
-    /// </summary>
-    private static Rectangle ComputeTabContentArea (Rectangle clipped, Rectangle headerRect, Side side, Thickness tabThickness, int depth)
-    {
-        // For depth >= 3, always reserve 1 cell on the content side for the closing edge/gap
-        Thickness effectiveThickness = depth >= 3
-                                           ? side switch
-                                           {
-                                               Side.Top => tabThickness with { Bottom = 1 },
-                                               Side.Bottom => tabThickness with { Top = 1 },
-                                               Side.Left => tabThickness with { Right = 1 },
-                                               Side.Right => tabThickness with { Left = 1 },
-                                               _ => tabThickness
-                                           }
-                                           : tabThickness;
-
-        int left = clipped.X + (clipped.X == headerRect.X ? effectiveThickness.Left : 0);
-        int top = clipped.Y + (clipped.Y == headerRect.Y ? effectiveThickness.Top : 0);
-        int right = clipped.Right - (clipped.Right == headerRect.Right ? effectiveThickness.Right : 0);
-        int bottom = clipped.Bottom - (clipped.Bottom == headerRect.Bottom ? effectiveThickness.Bottom : 0);
-
-        int w = right - left;
-        int h = bottom - top;
-
-        if (w <= 0 || h <= 0)
-        {
-            return Rectangle.Empty;
-        }
-
-        return new Rectangle (left, top, w, h);
     }
 
     /// <inheritdoc/>
