@@ -401,14 +401,16 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// <inheritdoc/>
     public bool EnableForDesign ()
     {
+        // BUGBUG: AttributePicker sets SuperViewRendersLineCanvas on it's subviews. In order to
+        // BUGBUG: Prevent Tabs from being that superview, we must add via an intermediary View
         View tab1 = new () { Title = "_Attribute" };
         AttributePicker attributePicker = new () { Y = 1, BorderStyle = LineStyle.Single };
         tab1.Add (attributePicker);
 
-        View tab2 = new () { Title = "_Line Style" };
-        OptionSelector<LineStyle> lineStyleSelector = new () { Y = 1, BorderStyle = LineStyle.Single };
-        tab2.Add (lineStyleSelector);
+        // Add an OptionSelector directly
+        OptionSelector<LineStyle> lineStyleSelector = new () { Title = "_Line Style" };
 
+        // Create an intermediary tab to hold multiple subviews
         View tab3 = new () { Title = "Tab _Settings" };
         OptionSelector<Side> tabSideSelector = new () { Y = 1, BorderStyle = LineStyle.Single, Title = "S_ide" };
         tabSideSelector.Value = tab3.Border.TabSide;
@@ -436,9 +438,9 @@ public class Tabs : View, IValue<View?>, IDesignable
                                                };
         tab3.Add (tabSideSelector, tabDepthNumericUpDown);
 
-        View tab4 = new () { Title = "Fourth" };
+        View tab4 = new () { Title = "A_dd/Remove" };
 
-        Add (tab1, tab2, tab3, tab4);
+        Add (tab1, lineStyleSelector, tab3, tab4);
 
         attributePicker.ValueChanged += (_, e) =>
                                         {
