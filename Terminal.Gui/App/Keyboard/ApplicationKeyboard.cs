@@ -73,7 +73,7 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
                     return true;
                 }
 
-                if (runnable!.IsModal)
+                if (runnable is { IsModal: true })
                 {
                     break;
                 }
@@ -121,7 +121,7 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
                         return true;
                     }
 
-                    if (runnable!.IsModal)
+                    if (runnable is { IsModal: true })
                     {
                         break;
                     }
