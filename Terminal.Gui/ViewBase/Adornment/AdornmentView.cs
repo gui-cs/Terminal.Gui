@@ -146,7 +146,7 @@ public class AdornmentView : View, IAdornmentView, IDesignable
 
         if (Driver is { })
         {
-            Adornment!.Thickness.Draw (Driver, ViewportToScreen (Viewport), Diagnostics, ToString ());
+            Adornment.Thickness.Draw (Driver, ViewportToScreen (Viewport), Diagnostics, ToString ());
         }
 
         SetNeedsDraw ();

@@ -24,17 +24,18 @@ public class MarginEditor : AdornmentEditor
     {
         if (AdornmentToEdit is { })
         {
-            _optionsShadow!.Value = ShadowStyleToInt (((Margin)AdornmentToEdit).ShadowStyle);
+            _optionsShadow?.Value = ShadowStyleToInt (((Margin)AdornmentToEdit).ShadowStyle);
         }
 
         if (AdornmentToEdit is { })
         {
-            _flagSelectorTransparent!.Value = (int)((Margin)AdornmentToEdit).ViewportSettings;
+            _flagSelectorTransparent?.Value = (int)((Margin)AdornmentToEdit).ViewportSettings;
         }
     }
 
     private void MarginEditor_Initialized (object? sender, EventArgs e)
     {
+        ExpanderButton?.Collapsed = false;
         _optionsShadow = new OptionSelector
         {
             X = 0,

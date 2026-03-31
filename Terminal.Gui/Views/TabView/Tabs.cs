@@ -171,6 +171,10 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
+        if (view is not Tab)
+        {
+            throw new ArgumentException (@"Only Views of type Tab can be added to Tabs", nameof (view));
+        }
         base.OnSubViewAdded (view);
 
         if (view is not Tab tab)
@@ -431,8 +435,6 @@ public class Tabs : View, IValue<Tab?>, IDesignable
                                                 TabSide = e.Value.Value;
                                             }
                                         };
-
-        //tab1.BorderStyle = LineStyle.Double;
 
         return true;
     }

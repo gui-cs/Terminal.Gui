@@ -161,7 +161,12 @@ public partial class BorderView : AdornmentView
         }
 
         int tabDepth = GetTabDepth (border);
-        int tabLength = border.TabLength!.Value;
+
+        if (border.TabLength is null)
+        {
+            return;
+        }
+        int tabLength = border.TabLength.Value;
         bool hasFocus = IsFocusedOrLastTab ();
 
         Rectangle headerRect = ComputeHeaderRect (borderBounds, border.TabSide, border.TabOffset, tabLength, tabDepth);
@@ -215,7 +220,7 @@ public partial class BorderView : AdornmentView
 
     private void ShowHideDrawIndicator ()
     {
-        if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.DrawIndicator) && Adornment!.Thickness != Thickness.Empty)
+        if (View.Diagnostics.HasFlag (ViewDiagnosticFlags.DrawIndicator) && Adornment?.Thickness != Thickness.Empty)
         {
             if (DrawIndicator is { })
             {
@@ -237,7 +242,7 @@ public partial class BorderView : AdornmentView
         else if (DrawIndicator is { })
         {
             Remove (DrawIndicator);
-            DrawIndicator!.Dispose ();
+            DrawIndicator?.Dispose ();
             DrawIndicator = null;
         }
     }
@@ -270,16 +275,21 @@ public partial class BorderView : AdornmentView
 
     private Rectangle GetBorderBounds ()
     {
+        if (Adornment is null)
+        {
+            return ViewportToScreen (Viewport);
+        }
+
         Rectangle screenRect = ViewportToScreen (Viewport);
 
-        return new Rectangle (screenRect.X + Math.Max (0, Adornment!.Thickness.Left - 1),
-                              screenRect.Y + Math.Max (0, Adornment!.Thickness.Top - 1),
+        return new Rectangle (screenRect.X + Math.Max (0, Adornment.Thickness.Left - 1),
+                              screenRect.Y + Math.Max (0, Adornment.Thickness.Top - 1),
                               Math.Max (0,
                                         screenRect.Width
-                                        - Math.Max (0, Math.Max (0, Adornment!.Thickness.Left - 1) + Math.Max (0, Adornment!.Thickness.Right - 1))),
+                                        - Math.Max (0, Math.Max (0, Adornment.Thickness.Left - 1) + Math.Max (0, Adornment.Thickness.Right - 1))),
                               Math.Max (0,
                                         screenRect.Height
-                                        - Math.Max (0, Math.Max (0, Adornment!.Thickness.Top - 1) + Math.Max (0, Adornment!.Thickness.Bottom - 1))));
+                                        - Math.Max (0, Math.Max (0, Adornment.Thickness.Top - 1) + Math.Max (0, Adornment.Thickness.Bottom - 1))));
     }
 
     /// <summary>
@@ -291,6 +301,11 @@ public partial class BorderView : AdornmentView
     {
         Rectangle screenRect = ViewportToScreen (Viewport);
 
+        if (Adornment is null)
+        {
+            return screenRect;
+        }
+
         int left = screenRect.X;
         int top = screenRect.Y;
         int right = screenRect.Right;
@@ -300,22 +315,22 @@ public partial class BorderView : AdornmentView
         switch (border.TabSide)
         {
             case Side.Top:
-                top += Math.Max (0, Adornment!.Thickness.Top - 1);
+                top += Math.Max (0, Adornment.Thickness.Top - 1);
 
                 break;
 
             case Side.Bottom:
-                bottom -= Math.Max (0, Adornment!.Thickness.Bottom - 1);
+                bottom -= Math.Max (0, Adornment.Thickness.Bottom - 1);
 
                 break;
 
             case Side.Left:
-                left += Math.Max (0, Adornment!.Thickness.Left - 1);
+                left += Math.Max (0, Adornment.Thickness.Left - 1);
 
                 break;
 
             case Side.Right:
-                right -= Math.Max (0, Adornment!.Thickness.Right - 1);
+                right -= Math.Max (0, Adornment.Thickness.Right - 1);
 
                 break;
         }
@@ -394,25 +409,30 @@ public partial class BorderView : AdornmentView
         int contentSide = depth >= 3 && !hasFocus ? 1 : 0;
 
         return tabSide switch
-               {
-                   Side.Top => new Thickness (1, cap, 1, contentSide),
-                   Side.Bottom => new Thickness (1, contentSide, 1, cap),
-                   Side.Left => new Thickness (cap, 1, contentSide, 1),
-                   Side.Right => new Thickness (contentSide, 1, cap, 1),
-                   _ => Thickness.Empty
-               };
+        {
+            Side.Top => new Thickness (1, cap, 1, contentSide),
+            Side.Bottom => new Thickness (1, contentSide, 1, cap),
+            Side.Left => new Thickness (cap, 1, contentSide, 1),
+            Side.Right => new Thickness (contentSide, 1, cap, 1),
+            _ => Thickness.Empty
+        };
     }
 
     private int GetTabDepth (Border border)
     {
+        if (Adornment is null)
+        {
+            return 0;
+        }
+
         int thickness = border.TabSide switch
-                        {
-                            Side.Top => Adornment!.Thickness.Top,
-                            Side.Bottom => Adornment!.Thickness.Bottom,
-                            Side.Left => Adornment!.Thickness.Left,
-                            Side.Right => Adornment!.Thickness.Right,
-                            _ => 3
-                        };
+        {
+            Side.Top => Adornment.Thickness.Top,
+            Side.Bottom => Adornment.Thickness.Bottom,
+            Side.Left => Adornment.Thickness.Left,
+            Side.Right => Adornment.Thickness.Right,
+            _ => 3
+        };
 
         return Math.Min (thickness, 3);
     }
@@ -460,50 +480,54 @@ public partial class BorderView : AdornmentView
         }
 
         int tabDepth = GetTabDepth (border);
-        int tabLength = border.TabLength!.Value;
-        LineStyle lineStyle = border.LineStyle.Value;
-        bool hasFocus = IsFocusedOrLastTab ();
 
-        // Compute tab header geometry
-        Rectangle headerRect = ComputeHeaderRect (borderBounds, border.TabSide, border.TabOffset, tabLength, tabDepth);
-        Rectangle viewBounds = ComputeViewBounds (borderBounds, border.TabSide, tabDepth);
-        Rectangle clipped = Rectangle.Intersect (headerRect, viewBounds);
-        bool tabVisible = !clipped.IsEmpty;
-
-        // Draw the 3 non-tab-side content border lines (always drawn).
-        // The tab-side line is handled below — conditionally, based on whether the tab is visible.
-        if (Adornment!.Thickness.Top > 0 && (border.TabSide != Side.Top || !tabVisible))
+        if (border.TabLength is { })
         {
-            lc.AddLine (new Point (borderBounds.X, borderBounds.Y), borderBounds.Width, Orientation.Horizontal, lineStyle, normalAttribute);
-        }
+            int tabLength = border.TabLength.Value;
+            LineStyle lineStyle = border.LineStyle.Value;
+            bool hasFocus = IsFocusedOrLastTab ();
 
-        if (Adornment!.Thickness.Bottom > 0 && (border.TabSide != Side.Bottom || !tabVisible))
-        {
-            lc.AddLine (new Point (borderBounds.X, borderBounds.Bottom - 1), borderBounds.Width, Orientation.Horizontal, lineStyle, normalAttribute);
-        }
+            // Compute tab header geometry
+            Rectangle headerRect = ComputeHeaderRect (borderBounds, border.TabSide, border.TabOffset, tabLength, tabDepth);
+            Rectangle viewBounds = ComputeViewBounds (borderBounds, border.TabSide, tabDepth);
+            Rectangle clipped = Rectangle.Intersect (headerRect, viewBounds);
+            bool tabVisible = !clipped.IsEmpty;
 
-        if (Adornment!.Thickness.Left > 0 && (border.TabSide != Side.Left || !tabVisible))
-        {
-            lc.AddLine (new Point (borderBounds.X, borderBounds.Y), borderBounds.Height, Orientation.Vertical, lineStyle, normalAttribute);
-        }
+            // Draw the 3 non-tab-side content border lines (always drawn).
+            // The tab-side line is handled below — conditionally, based on whether the tab is visible.
+            if (Adornment.Thickness.Top > 0 && (border.TabSide != Side.Top || !tabVisible))
+            {
+                lc.AddLine (new Point (borderBounds.X, borderBounds.Y), borderBounds.Width, Orientation.Horizontal, lineStyle, normalAttribute);
+            }
 
-        if (Adornment!.Thickness.Right > 0 && (border.TabSide != Side.Right || !tabVisible))
-        {
-            lc.AddLine (new Point (borderBounds.Right - 1, borderBounds.Y), borderBounds.Height, Orientation.Vertical, lineStyle, normalAttribute);
-        }
+            if (Adornment.Thickness.Bottom > 0 && (border.TabSide != Side.Bottom || !tabVisible))
+            {
+                lc.AddLine (new Point (borderBounds.X, borderBounds.Bottom - 1), borderBounds.Width, Orientation.Horizontal, lineStyle, normalAttribute);
+            }
 
-        // Draw the tab-side content border (gap segments around the tab)
-        if (tabVisible)
-        {
-            AddTabSideContentBorder (lc,
-                                     clipped,
-                                     headerRect,
-                                     borderBounds,
-                                     border.TabSide,
-                                     hasFocus,
-                                     tabDepth,
-                                     lineStyle,
-                                     normalAttribute);
+            if (Adornment.Thickness.Left > 0 && (border.TabSide != Side.Left || !tabVisible))
+            {
+                lc.AddLine (new Point (borderBounds.X, borderBounds.Y), borderBounds.Height, Orientation.Vertical, lineStyle, normalAttribute);
+            }
+
+            if (Adornment.Thickness.Right > 0 && (border.TabSide != Side.Right || !tabVisible))
+            {
+                lc.AddLine (new Point (borderBounds.Right - 1, borderBounds.Y), borderBounds.Height, Orientation.Vertical, lineStyle, normalAttribute);
+            }
+
+            // Draw the tab-side content border (gap segments around the tab)
+            if (tabVisible)
+            {
+                AddTabSideContentBorder (lc,
+                                         clipped,
+                                         headerRect,
+                                         borderBounds,
+                                         border.TabSide,
+                                         hasFocus,
+                                         tabDepth,
+                                         lineStyle,
+                                         normalAttribute);
+            }
         }
 
         // Gradient support
@@ -540,7 +564,7 @@ public partial class BorderView : AdornmentView
             return true;
         }
 
-        return border.Parent!.HasFocus;
+        return border.Parent?.HasFocus ?? false;
     }
 
     /// <summary>
@@ -565,178 +589,178 @@ public partial class BorderView : AdornmentView
         switch (side)
         {
             case Side.Top:
-            {
-                int borderY = contentBorderRect.Y;
-
-                if (!openGap)
                 {
-                    lc.AddLine (new Point (contentBorderRect.X, borderY), contentBorderRect.Width, Orientation.Horizontal, lineStyle, attribute);
+                    int borderY = contentBorderRect.Y;
+
+                    if (!openGap)
+                    {
+                        lc.AddLine (new Point (contentBorderRect.X, borderY), contentBorderRect.Width, Orientation.Horizontal, lineStyle, attribute);
+                    }
+                    else
+                    {
+                        // Reserve the gap cells so overlapped compositing suppresses
+                        // lower-Z views' content border lines at these positions.
+                        int gapStart = clipped.X + 1;
+                        int gapEnd = clipped.Right - 1;
+
+                        if (gapEnd > gapStart)
+                        {
+                            lc.Reserve (new Rectangle (gapStart, borderY, gapEnd - gapStart, 1));
+                        }
+
+                        if (clipped.X > contentBorderRect.X)
+                        {
+                            lc.AddLine (new Point (contentBorderRect.X, borderY),
+                                        clipped.X - contentBorderRect.X + 1,
+                                        Orientation.Horizontal,
+                                        lineStyle,
+                                        attribute);
+                        }
+
+                        if (clipped.Right - 1 < contentBorderRect.Right - 1)
+                        {
+                            lc.AddLine (new Point (clipped.Right - 1, borderY),
+                                        contentBorderRect.Right - (clipped.Right - 1),
+                                        Orientation.Horizontal,
+                                        lineStyle,
+                                        attribute);
+                        }
+                    }
+
+                    break;
                 }
-                else
-                {
-                    // Reserve the gap cells so overlapped compositing suppresses
-                    // lower-Z views' content border lines at these positions.
-                    int gapStart = clipped.X + 1;
-                    int gapEnd = clipped.Right - 1;
-
-                    if (gapEnd > gapStart)
-                    {
-                        lc.Reserve (new Rectangle (gapStart, borderY, gapEnd - gapStart, 1));
-                    }
-
-                    if (clipped.X > contentBorderRect.X)
-                    {
-                        lc.AddLine (new Point (contentBorderRect.X, borderY),
-                                    clipped.X - contentBorderRect.X + 1,
-                                    Orientation.Horizontal,
-                                    lineStyle,
-                                    attribute);
-                    }
-
-                    if (clipped.Right - 1 < contentBorderRect.Right - 1)
-                    {
-                        lc.AddLine (new Point (clipped.Right - 1, borderY),
-                                    contentBorderRect.Right - (clipped.Right - 1),
-                                    Orientation.Horizontal,
-                                    lineStyle,
-                                    attribute);
-                    }
-                }
-
-                break;
-            }
 
             case Side.Bottom:
-            {
-                int borderY = contentBorderRect.Bottom - 1;
-
-                if (!openGap)
                 {
-                    lc.AddLine (new Point (contentBorderRect.X, borderY), contentBorderRect.Width, Orientation.Horizontal, lineStyle, attribute);
+                    int borderY = contentBorderRect.Bottom - 1;
+
+                    if (!openGap)
+                    {
+                        lc.AddLine (new Point (contentBorderRect.X, borderY), contentBorderRect.Width, Orientation.Horizontal, lineStyle, attribute);
+                    }
+                    else
+                    {
+                        int gapStart = clipped.X + 1;
+                        int gapEnd = clipped.Right - 1;
+
+                        if (gapEnd > gapStart)
+                        {
+                            lc.Reserve (new Rectangle (gapStart, borderY, gapEnd - gapStart, 1));
+                        }
+
+                        if (clipped.X > contentBorderRect.X)
+                        {
+                            lc.AddLine (new Point (contentBorderRect.X, borderY),
+                                        clipped.X - contentBorderRect.X + 1,
+                                        Orientation.Horizontal,
+                                        lineStyle,
+                                        attribute);
+                        }
+
+                        if (clipped.Right - 1 < contentBorderRect.Right - 1)
+                        {
+                            lc.AddLine (new Point (clipped.Right - 1, borderY),
+                                        contentBorderRect.Right - (clipped.Right - 1),
+                                        Orientation.Horizontal,
+                                        lineStyle,
+                                        attribute);
+                        }
+                    }
+
+                    break;
                 }
-                else
-                {
-                    int gapStart = clipped.X + 1;
-                    int gapEnd = clipped.Right - 1;
-
-                    if (gapEnd > gapStart)
-                    {
-                        lc.Reserve (new Rectangle (gapStart, borderY, gapEnd - gapStart, 1));
-                    }
-
-                    if (clipped.X > contentBorderRect.X)
-                    {
-                        lc.AddLine (new Point (contentBorderRect.X, borderY),
-                                    clipped.X - contentBorderRect.X + 1,
-                                    Orientation.Horizontal,
-                                    lineStyle,
-                                    attribute);
-                    }
-
-                    if (clipped.Right - 1 < contentBorderRect.Right - 1)
-                    {
-                        lc.AddLine (new Point (clipped.Right - 1, borderY),
-                                    contentBorderRect.Right - (clipped.Right - 1),
-                                    Orientation.Horizontal,
-                                    lineStyle,
-                                    attribute);
-                    }
-                }
-
-                break;
-            }
 
             case Side.Left:
-            {
-                int borderX = contentBorderRect.X;
-
-                if (!openGap)
                 {
-                    lc.AddLine (new Point (borderX, contentBorderRect.Y), contentBorderRect.Height, Orientation.Vertical, lineStyle, attribute);
+                    int borderX = contentBorderRect.X;
+
+                    if (!openGap)
+                    {
+                        lc.AddLine (new Point (borderX, contentBorderRect.Y), contentBorderRect.Height, Orientation.Vertical, lineStyle, attribute);
+                    }
+                    else
+                    {
+                        int gapStart = clipped.Y + 1;
+                        int gapEnd = clipped.Bottom - 1;
+
+                        if (gapEnd > gapStart)
+                        {
+                            lc.Reserve (new Rectangle (borderX, gapStart, 1, gapEnd - gapStart));
+                        }
+
+                        if (clipped.Y > contentBorderRect.Y)
+                        {
+                            lc.AddLine (new Point (borderX, contentBorderRect.Y), clipped.Y - contentBorderRect.Y + 1, Orientation.Vertical, lineStyle, attribute);
+                        }
+                        else if (clipped.Y > headerRect.Y)
+                        {
+                            // Header clipped at top (overflow) — suppress corner glyph
+                            lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Y, 1, 1)));
+                        }
+
+                        if (clipped.Bottom - 1 < contentBorderRect.Bottom - 1)
+                        {
+                            lc.AddLine (new Point (borderX, clipped.Bottom - 1),
+                                        contentBorderRect.Bottom - (clipped.Bottom - 1),
+                                        Orientation.Vertical,
+                                        lineStyle,
+                                        attribute);
+                        }
+                        else if (clipped.Bottom < headerRect.Bottom)
+                        {
+                            // Header clipped at bottom (overflow) — suppress corner glyph
+                            lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Bottom - 1, 1, 1)));
+                        }
+                    }
+
+                    break;
                 }
-                else
-                {
-                    int gapStart = clipped.Y + 1;
-                    int gapEnd = clipped.Bottom - 1;
-
-                    if (gapEnd > gapStart)
-                    {
-                        lc.Reserve (new Rectangle (borderX, gapStart, 1, gapEnd - gapStart));
-                    }
-
-                    if (clipped.Y > contentBorderRect.Y)
-                    {
-                        lc.AddLine (new Point (borderX, contentBorderRect.Y), clipped.Y - contentBorderRect.Y + 1, Orientation.Vertical, lineStyle, attribute);
-                    }
-                    else if (clipped.Y > headerRect.Y)
-                    {
-                        // Header clipped at top (overflow) — suppress corner glyph
-                        lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Y, 1, 1)));
-                    }
-
-                    if (clipped.Bottom - 1 < contentBorderRect.Bottom - 1)
-                    {
-                        lc.AddLine (new Point (borderX, clipped.Bottom - 1),
-                                    contentBorderRect.Bottom - (clipped.Bottom - 1),
-                                    Orientation.Vertical,
-                                    lineStyle,
-                                    attribute);
-                    }
-                    else if (clipped.Bottom < headerRect.Bottom)
-                    {
-                        // Header clipped at bottom (overflow) — suppress corner glyph
-                        lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Bottom - 1, 1, 1)));
-                    }
-                }
-
-                break;
-            }
 
             case Side.Right:
-            {
-                int borderX = contentBorderRect.Right - 1;
-
-                if (!openGap)
                 {
-                    lc.AddLine (new Point (borderX, contentBorderRect.Y), contentBorderRect.Height, Orientation.Vertical, lineStyle, attribute);
+                    int borderX = contentBorderRect.Right - 1;
+
+                    if (!openGap)
+                    {
+                        lc.AddLine (new Point (borderX, contentBorderRect.Y), contentBorderRect.Height, Orientation.Vertical, lineStyle, attribute);
+                    }
+                    else
+                    {
+                        int gapStart = clipped.Y + 1;
+                        int gapEnd = clipped.Bottom - 1;
+
+                        if (gapEnd > gapStart)
+                        {
+                            lc.Reserve (new Rectangle (borderX, gapStart, 1, gapEnd - gapStart));
+                        }
+
+                        if (clipped.Y > contentBorderRect.Y)
+                        {
+                            lc.AddLine (new Point (borderX, contentBorderRect.Y), clipped.Y - contentBorderRect.Y + 1, Orientation.Vertical, lineStyle, attribute);
+                        }
+                        else if (clipped.Y > headerRect.Y)
+                        {
+                            // Header clipped at top (overflow) — suppress corner glyph
+                            lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Y, 1, 1)));
+                        }
+
+                        if (clipped.Bottom - 1 < contentBorderRect.Bottom - 1)
+                        {
+                            lc.AddLine (new Point (borderX, clipped.Bottom - 1),
+                                        contentBorderRect.Bottom - (clipped.Bottom - 1),
+                                        Orientation.Vertical,
+                                        lineStyle,
+                                        attribute);
+                        }
+                        else if (clipped.Bottom < headerRect.Bottom)
+                        {
+                            // Header clipped at bottom (overflow) — suppress corner glyph
+                            lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Bottom - 1, 1, 1)));
+                        }
+                    }
+
+                    break;
                 }
-                else
-                {
-                    int gapStart = clipped.Y + 1;
-                    int gapEnd = clipped.Bottom - 1;
-
-                    if (gapEnd > gapStart)
-                    {
-                        lc.Reserve (new Rectangle (borderX, gapStart, 1, gapEnd - gapStart));
-                    }
-
-                    if (clipped.Y > contentBorderRect.Y)
-                    {
-                        lc.AddLine (new Point (borderX, contentBorderRect.Y), clipped.Y - contentBorderRect.Y + 1, Orientation.Vertical, lineStyle, attribute);
-                    }
-                    else if (clipped.Y > headerRect.Y)
-                    {
-                        // Header clipped at top (overflow) — suppress corner glyph
-                        lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Y, 1, 1)));
-                    }
-
-                    if (clipped.Bottom - 1 < contentBorderRect.Bottom - 1)
-                    {
-                        lc.AddLine (new Point (borderX, clipped.Bottom - 1),
-                                    contentBorderRect.Bottom - (clipped.Bottom - 1),
-                                    Orientation.Vertical,
-                                    lineStyle,
-                                    attribute);
-                    }
-                    else if (clipped.Bottom < headerRect.Bottom)
-                    {
-                        // Header clipped at bottom (overflow) — suppress corner glyph
-                        lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Bottom - 1, 1, 1)));
-                    }
-                }
-
-                break;
-            }
 
             default: throw new ArgumentOutOfRangeException (nameof (side), side, null);
         }
@@ -753,13 +777,13 @@ public partial class BorderView : AdornmentView
         // For depth >= 3, always reserve 1 cell on the content side for the closing edge/gap
         Thickness effectiveThickness = depth >= 3
                                            ? side switch
-                                             {
-                                                 Side.Top => tabThickness with { Bottom = 1 },
-                                                 Side.Bottom => tabThickness with { Top = 1 },
-                                                 Side.Left => tabThickness with { Right = 1 },
-                                                 Side.Right => tabThickness with { Left = 1 },
-                                                 _ => tabThickness
-                                             }
+                                           {
+                                               Side.Top => tabThickness with { Bottom = 1 },
+                                               Side.Bottom => tabThickness with { Top = 1 },
+                                               Side.Left => tabThickness with { Right = 1 },
+                                               Side.Right => tabThickness with { Left = 1 },
+                                               _ => tabThickness
+                                           }
                                            : tabThickness;
 
         int left = clipped.X + (clipped.X == headerRect.X ? effectiveThickness.Left : 0);
@@ -819,7 +843,7 @@ public partial class BorderView : AdornmentView
 
         if (hasTitle)
         {
-            switch (Adornment!.Thickness.Top)
+            switch (Adornment.Thickness.Top)
             {
                 case 2:
                     topTitleLineY = borderBounds.Y - 1;
@@ -829,7 +853,7 @@ public partial class BorderView : AdornmentView
                     break;
 
                 case 3:
-                    topTitleLineY = borderBounds.Y - (Adornment!.Thickness.Top - 1);
+                    topTitleLineY = borderBounds.Y - (Adornment.Thickness.Top - 1);
                     titleY = topTitleLineY + 1;
                     titleBarsLength = 3;
                     sideLineLength++;
@@ -853,7 +877,7 @@ public partial class BorderView : AdornmentView
             && maxTitleWidth > 0
             && hasTitle
             && !string.IsNullOrEmpty (Adornment.Parent?.Title)
-            && Adornment!.Thickness.Top > 0)
+            && Adornment.Thickness.Top > 0)
         {
             Rectangle titleRect = new (borderBounds.X + 2, titleY, maxTitleWidth, 1);
 
@@ -873,10 +897,10 @@ public partial class BorderView : AdornmentView
 
         LineCanvas? lc = Adornment.Parent?.LineCanvas;
 
-        bool drawTop = Adornment!.Thickness.Top > 0 && Frame is { Width: > 1, Height: >= 1 };
-        bool drawLeft = Adornment!.Thickness.Left > 0 && (Frame.Height > 1 || Adornment!.Thickness.Top == 0);
-        bool drawBottom = Adornment!.Thickness.Bottom > 0 && Frame is { Width: > 1, Height: > 1 };
-        bool drawRight = Adornment!.Thickness.Right > 0 && (Frame.Height > 1 || Adornment!.Thickness.Top == 0);
+        bool drawTop = Adornment.Thickness.Top > 0 && Frame is { Width: > 1, Height: >= 1 };
+        bool drawLeft = Adornment.Thickness.Left > 0 && (Frame.Height > 1 || Adornment.Thickness.Top == 0);
+        bool drawBottom = Adornment.Thickness.Bottom > 0 && Frame is { Width: > 1, Height: > 1 };
+        bool drawRight = Adornment.Thickness.Right > 0 && (Frame.Height > 1 || Adornment.Thickness.Top == 0);
 
         Attribute normalAttribute = GetAttributeForRole (VisualRole.Normal);
 
@@ -903,31 +927,31 @@ public partial class BorderView : AdornmentView
             else
             {
                 // Title bar decoration
-                if (Adornment!.Thickness.Top == 2)
+                if (Adornment.Thickness.Top == 2)
                 {
                     lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY),
                                  Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
-                                 border.LineStyle!.Value,
+                                 border.LineStyle ?? LineStyle.None,
                                  normalAttribute);
                 }
 
-                if (borderBounds.Width >= 4 && Adornment!.Thickness.Top > 2)
+                if (borderBounds.Width >= 4 && Adornment.Thickness.Top > 2)
                 {
                     lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY),
                                  Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
-                                 border.LineStyle!.Value,
+                                 border.LineStyle ?? LineStyle.None,
                                  normalAttribute);
 
                     lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY + 2),
                                  Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                                  Orientation.Horizontal,
-                                 border.LineStyle!.Value,
+                                 border.LineStyle ?? LineStyle.None,
                                  normalAttribute);
                 }
 
-                lc?.AddLine (borderBounds.Location with { Y = titleY }, 2, Orientation.Horizontal, border.LineStyle!.Value, normalAttribute);
+                lc?.AddLine (borderBounds.Location with { Y = titleY }, 2, Orientation.Horizontal, border.LineStyle ?? LineStyle.None, normalAttribute);
 
                 lc?.AddLine (new Point (borderBounds.X + 1, topTitleLineY), titleBarsLength, Orientation.Vertical, LineStyle.Single, normalAttribute);
 
@@ -940,7 +964,7 @@ public partial class BorderView : AdornmentView
                 lc?.AddLine (new Point (borderBounds.X + 1 + Math.Min (borderBounds.Width - 2, maxTitleWidth + 2) - 1, titleY),
                              borderBounds.Width - Math.Min (borderBounds.Width - 2, maxTitleWidth + 2),
                              Orientation.Horizontal,
-                             border.LineStyle!.Value,
+                             border.LineStyle ?? LineStyle.None,
                              normalAttribute);
             }
         }
@@ -949,7 +973,7 @@ public partial class BorderView : AdornmentView
 
         if (drawLeft)
         {
-            lc?.AddLine (borderBounds.Location with { Y = titleY }, sideLineLength, Orientation.Vertical, border.LineStyle!.Value, normalAttribute);
+            lc?.AddLine (borderBounds.Location with { Y = titleY }, sideLineLength, Orientation.Vertical, border.LineStyle ?? LineStyle.None, normalAttribute);
         }
 #endif
 
@@ -958,7 +982,7 @@ public partial class BorderView : AdornmentView
             lc?.AddLine (new Point (borderBounds.X, borderBounds.Y + borderBounds.Height - 1),
                          borderBounds.Width,
                          Orientation.Horizontal,
-                         border.LineStyle!.Value,
+                         border.LineStyle ?? LineStyle.None,
                          normalAttribute);
         }
 
@@ -967,7 +991,7 @@ public partial class BorderView : AdornmentView
             lc?.AddLine (new Point (borderBounds.X + borderBounds.Width - 1, titleY),
                          sideLineLength,
                          Orientation.Vertical,
-                         border.LineStyle!.Value,
+                         border.LineStyle ?? LineStyle.None,
                          normalAttribute);
         }
 
@@ -983,7 +1007,7 @@ public partial class BorderView : AdornmentView
 
             if (drawTop && maxTitleWidth > 0 && border.Settings.FastHasFlags (BorderSettings.Title))
             {
-                Adornment.Parent!.TitleTextFormatter.Draw (Driver,
+                Adornment.Parent?.TitleTextFormatter.Draw (Driver,
                                                            new Rectangle (borderBounds.X + 2, titleY, maxTitleWidth, 1),
                                                            Adornment.Parent.HasFocus
                                                                ? Adornment.Parent.GetAttributeForRole (VisualRole.Focus)
@@ -1011,15 +1035,15 @@ public partial class BorderView : AdornmentView
             }
         }
 
-        if (border.Settings.FastHasFlags (BorderSettings.Gradient))
+        if (lc is { } && border.Settings.FastHasFlags (BorderSettings.Gradient))
         {
             if (_cachedGradientFill is null || _cachedGradientRect != screenBounds)
             {
-                SetupGradientLineCanvas (lc!, screenBounds);
+                SetupGradientLineCanvas (lc, screenBounds);
             }
             else
             {
-                lc!.Fill = _cachedGradientFill;
+                lc.Fill = _cachedGradientFill;
             }
         }
         else

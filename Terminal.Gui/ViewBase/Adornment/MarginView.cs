@@ -62,11 +62,11 @@ public class MarginView : AdornmentView
 
     private void OnThicknessChanged (object? sender, EventArgs e)
     {
-        if (_isThicknessChanging)
+        if (_isThicknessChanging || Adornment is null)
         {
             return;
         }
-        _originalThickness = new Thickness (Adornment!.Thickness.Left, Adornment!.Thickness.Top, Adornment!.Thickness.Right, Adornment!.Thickness.Bottom);
+        _originalThickness = new Thickness (Adornment.Thickness.Left, Adornment.Thickness.Top, Adornment.Thickness.Right, Adornment.Thickness.Bottom);
 
         if (ShadowStyle is { })
         {
@@ -83,7 +83,7 @@ public class MarginView : AdornmentView
 
     internal void CacheClip ()
     {
-        if (Adornment!.Thickness != Thickness.Empty && ShadowStyle != ShadowStyles.None)
+        if (Adornment?.Thickness != Thickness.Empty && ShadowStyle != ShadowStyles.None)
         {
             _cachedClip = GetClip ()?.Clone ();
         }
@@ -357,10 +357,10 @@ public class MarginView : AdornmentView
             // Note, for visual effects reasons, we only move horizontally.
             _isThicknessChanging = true;
 
-            Adornment!.Thickness = new Thickness (Adornment!.Thickness.Left - PRESS_MOVE_HORIZONTAL,
-                                                  Adornment!.Thickness.Top - PRESS_MOVE_VERTICAL,
-                                                  Adornment!.Thickness.Right + PRESS_MOVE_HORIZONTAL,
-                                                  Adornment!.Thickness.Bottom + PRESS_MOVE_VERTICAL);
+            Adornment.Thickness = new Thickness (Adornment.Thickness.Left - PRESS_MOVE_HORIZONTAL,
+                                                  Adornment.Thickness.Top - PRESS_MOVE_VERTICAL,
+                                                  Adornment.Thickness.Right + PRESS_MOVE_HORIZONTAL,
+                                                  Adornment.Thickness.Bottom + PRESS_MOVE_VERTICAL);
             _isThicknessChanging = false;
 
             _rightShadow?.Visible = true;
@@ -381,10 +381,10 @@ public class MarginView : AdornmentView
         // Note, for visual effects reasons, we only move horizontally.
         _isThicknessChanging = true;
 
-        Adornment!.Thickness = new Thickness (Adornment!.Thickness.Left + PRESS_MOVE_HORIZONTAL,
-                                              Adornment!.Thickness.Top + PRESS_MOVE_VERTICAL,
-                                              Adornment!.Thickness.Right - PRESS_MOVE_HORIZONTAL,
-                                              Adornment!.Thickness.Bottom - PRESS_MOVE_VERTICAL);
+        Adornment.Thickness = new Thickness (Adornment.Thickness.Left + PRESS_MOVE_HORIZONTAL,
+                                              Adornment.Thickness.Top + PRESS_MOVE_VERTICAL,
+                                              Adornment.Thickness.Right - PRESS_MOVE_HORIZONTAL,
+                                              Adornment.Thickness.Bottom - PRESS_MOVE_VERTICAL);
         _isThicknessChanging = false;
 
         MouseState |= MouseState.Pressed;
@@ -405,13 +405,13 @@ public class MarginView : AdornmentView
         switch (ShadowStyle)
         {
             case ShadowStyles.Transparent:
-                _rightShadow.Y = Adornment.Parent!.Border.Thickness.Top > 0 ? ScreenToViewport (Adornment.Parent.Border.FrameToScreen ().Location).Y + 1 : 0;
+                _rightShadow.Y = Adornment.Parent?.Border.Thickness.Top > 0 ? ScreenToViewport (Adornment.Parent.Border.FrameToScreen ().Location).Y + 1 : 0;
 
                 break;
 
             case ShadowStyles.Opaque:
-                _rightShadow.Y = Adornment.Parent!.Border.Thickness.Top > 0 ? ScreenToViewport (Adornment.Parent.Border.FrameToScreen ().Location).Y + 1 : 0;
-                _bottomShadow.X = Adornment.Parent.Border.Thickness.Left > 0 ? ScreenToViewport (Adornment.Parent.Border.FrameToScreen ().Location).X + 1 : 0;
+                _rightShadow.Y = Adornment.Parent?.Border.Thickness.Top > 0 ? ScreenToViewport (Adornment.Parent.Border.FrameToScreen ().Location).Y + 1 : 0;
+                _bottomShadow.X = Adornment.Parent?.Border.Thickness.Left > 0 ? ScreenToViewport (Adornment.Parent.Border.FrameToScreen ().Location).X + 1 : 0;
 
                 break;
 

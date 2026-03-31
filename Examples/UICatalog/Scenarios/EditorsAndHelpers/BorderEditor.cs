@@ -23,10 +23,10 @@ public class BorderEditor : AdornmentEditor
         {
             return;
         }
-        _osBorderStyle!.Value = ((Border)AdornmentToEdit).LineStyle.ToString ();
-        _osBorderSettings!.Value = ((Border)AdornmentToEdit).Settings;
-        _osTabSide!.Value = ((Border)AdornmentToEdit).TabSide;
-        _nudTabOffset!.Value = ((Border)AdornmentToEdit).TabOffset;
+        _osBorderStyle?.Value = ((Border)AdornmentToEdit).LineStyle.ToString ();
+        _osBorderSettings?.Value = ((Border)AdornmentToEdit).Settings;
+        _osTabSide?.Value = ((Border)AdornmentToEdit).TabSide;
+        _nudTabOffset?.Value = ((Border)AdornmentToEdit).TabOffset;
     }
 
     private void BorderEditor_Initialized (object? sender, EventArgs e)

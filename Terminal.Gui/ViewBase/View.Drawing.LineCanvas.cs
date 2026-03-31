@@ -73,109 +73,108 @@ public partial class View
             // Collect all reserved cells from all views for adjacency checks.
             HashSet<Point> allReserved = [];
 
-            for (var i = 0; i < _pendingOverlappedCellMaps!.Count; i++)
+            if (_pendingOverlappedCellMaps is { })
             {
-                HashSet<Point>? reservedCells = _pendingOverlappedCellMaps [i].Reserved;
-
-                if (reservedCells is { Count: > 0 })
+                for (var i = 0; i < _pendingOverlappedCellMaps.Count; i++)
                 {
-                    allReserved.UnionWith (reservedCells);
-                }
-            }
+                    HashSet<Point>? reservedCells = _pendingOverlappedCellMaps [i].Reserved;
 
-            for (var i = 0; i < _pendingOverlappedCellMaps!.Count; i++)
-            {
-                (Dictionary<Point, Cell?> overlapCellMap, HashSet<Point>? reservedCells) = _pendingOverlappedCellMaps [i];
-
-                // First, claim reserved cells (intentional gaps). These positions suppress
-                // lower-Z cells without rendering anything visible.
-                if (reservedCells is { Count: > 0 })
-                {
-                    foreach (Point rp in reservedCells)
+                    if (reservedCells is { Count: > 0 })
                     {
-                        renderedCells.TryAdd (rp, default (Cell));
+                        allReserved.UnionWith (reservedCells);
                     }
                 }
 
-                foreach (KeyValuePair<Point, Cell?> p in overlapCellMap)
+                foreach ((Dictionary<Point, Cell?> overlapCellMap, HashSet<Point>? reservedCells) in _pendingOverlappedCellMaps)
                 {
-                    if (p.Value is null)
+                    if (reservedCells is { Count: > 0 })
                     {
-                        continue;
+                        foreach (Point rp in reservedCells)
+                        {
+                            renderedCells.TryAdd (rp, default (Cell));
+                        }
                     }
 
-                    if (renderedCells.TryGetValue (p.Key, out Cell existingCell))
+                    foreach (KeyValuePair<Point, Cell?> p in overlapCellMap)
                     {
-                        // Position already claimed. Check if this lower-Z cell should upgrade.
-                        if (existingCell.Grapheme is null or "")
+                        if (p.Value is null)
                         {
-                            // Reserved cell — never upgrade.
                             continue;
                         }
 
-                        LineDirections existingDirs = LineCanvas.GetLineDirections (existingCell.Grapheme);
-                        LineDirections newDirs = LineCanvas.GetLineDirections (p.Value.Value.Grapheme);
-
-                        // Lower-Z cell must be a strict superset of the higher-Z cell's directions:
-                        // it must contain ALL existing directions plus at least one more.
-                        if ((newDirs & existingDirs) != existingDirs)
+                        if (renderedCells.TryGetValue (p.Key, out Cell existingCell))
                         {
-                            // Not a superset — lower-Z cell removes some directions. Skip.
+                            // Position already claimed. Check if this lower-Z cell should upgrade.
+                            if (existingCell.Grapheme is null or "")
+                            {
+                                // Reserved cell — never upgrade.
+                                continue;
+                            }
+
+                            LineDirections existingDirs = LineCanvas.GetLineDirections (existingCell.Grapheme);
+                            LineDirections newDirs = LineCanvas.GetLineDirections (p.Value.Value.Grapheme);
+
+                            // Lower-Z cell must be a strict superset of the higher-Z cell's directions:
+                            // it must contain ALL existing directions plus at least one more.
+                            if ((newDirs & existingDirs) != existingDirs)
+                            {
+                                // Not a superset — lower-Z cell removes some directions. Skip.
+                                continue;
+                            }
+
+                            LineDirections additionalDirs = newDirs & ~existingDirs;
+
+                            if (additionalDirs == LineDirections.None)
+                            {
+                                // Lower-Z cell doesn't add any directions — skip.
+                                continue;
+                            }
+
+                            // Check if any additional direction points toward a reserved cell.
+                            var pointsToReserved = false;
+
+                            if (additionalDirs.HasFlag (LineDirections.Up) && allReserved.Contains (p.Key with { Y = p.Key.Y - 1 }))
+                            {
+                                pointsToReserved = true;
+                            }
+
+                            if (!pointsToReserved && additionalDirs.HasFlag (LineDirections.Down) && allReserved.Contains (p.Key with { Y = p.Key.Y + 1 }))
+                            {
+                                pointsToReserved = true;
+                            }
+
+                            if (!pointsToReserved && additionalDirs.HasFlag (LineDirections.Left) && allReserved.Contains (p.Key with { X = p.Key.X - 1 }))
+                            {
+                                pointsToReserved = true;
+                            }
+
+                            if (!pointsToReserved && additionalDirs.HasFlag (LineDirections.Right) && allReserved.Contains (p.Key with { X = p.Key.X + 1 }))
+                            {
+                                pointsToReserved = true;
+                            }
+
+                            if (pointsToReserved)
+                            {
+                                // Additional direction points into a gap — keep higher-Z cell.
+                                continue;
+                            }
+
+                            // Upgrade to the richer junction from the lower-Z view.
+                            renderedCells [p.Key] = p.Value.Value;
+                            SetAttribute (p.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
+                            Driver.Move (p.Key.X, p.Key.Y);
+                            AddStr (p.Value.Value.Grapheme);
+
                             continue;
                         }
 
-                        LineDirections additionalDirs = newDirs & ~existingDirs;
-
-                        if (additionalDirs == LineDirections.None)
-                        {
-                            // Lower-Z cell doesn't add any directions — skip.
-                            continue;
-                        }
-
-                        // Check if any additional direction points toward a reserved cell.
-                        var pointsToReserved = false;
-
-                        if (additionalDirs.HasFlag (LineDirections.Up) && allReserved.Contains (p.Key with { Y = p.Key.Y - 1 }))
-                        {
-                            pointsToReserved = true;
-                        }
-
-                        if (!pointsToReserved && additionalDirs.HasFlag (LineDirections.Down) && allReserved.Contains (p.Key with { Y = p.Key.Y + 1 }))
-                        {
-                            pointsToReserved = true;
-                        }
-
-                        if (!pointsToReserved && additionalDirs.HasFlag (LineDirections.Left) && allReserved.Contains (p.Key with { X = p.Key.X - 1 }))
-                        {
-                            pointsToReserved = true;
-                        }
-
-                        if (!pointsToReserved && additionalDirs.HasFlag (LineDirections.Right) && allReserved.Contains (p.Key with { X = p.Key.X + 1 }))
-                        {
-                            pointsToReserved = true;
-                        }
-
-                        if (pointsToReserved)
-                        {
-                            // Additional direction points into a gap — keep higher-Z cell.
-                            continue;
-                        }
-
-                        // Upgrade to the richer junction from the lower-Z view.
-                        renderedCells [p.Key] = p.Value.Value;
                         SetAttribute (p.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
                         Driver.Move (p.Key.X, p.Key.Y);
                         AddStr (p.Value.Value.Grapheme);
 
-                        continue;
+                        renderedCells [p.Key] = p.Value.Value;
+                        lineRegion.Union (new Rectangle (p.Key.X, p.Key.Y, 1, 1));
                     }
-
-                    SetAttribute (p.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
-                    Driver.Move (p.Key.X, p.Key.Y);
-                    AddStr (p.Value.Value.Grapheme);
-
-                    renderedCells [p.Key] = p.Value.Value;
-                    lineRegion.Union (new Rectangle (p.Key.X, p.Key.Y, 1, 1));
                 }
             }
 
