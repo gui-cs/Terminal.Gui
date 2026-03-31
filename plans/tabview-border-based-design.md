@@ -361,7 +361,327 @@ Fucking magic.
 
 ### Step 2: Scrolling
 
-Add `Tabs.ScrollOffset` subtracted from all `TabOffset` + `TabEnd` values. Headers with negative effective offset are clipped. Use built-in `View` scrollbar with transparent slider as described above.
+Tab header scrolling allows more tabs than fit in the visible width (or height, for left/right sides). The approach uses the built-in `View` scrollbar infrastructure with a transparent slider, so the content border line shows through the scrollbar area.
+
+#### Architecture
+
+Tab headers are rendered by each tab's `BorderView` using `ComputeHeaderRect()`, which positions the header at `contentBorderRect.X + TabOffset` (for Top/Bottom). The `TabOffset` is an absolute value in content coordinates. When `Tabs` has a `ContentSize` larger than its `Viewport`, scrolling the `Viewport` shifts all content coordinates, which naturally shifts where tab headers render. `BorderView` already clips headers via `Rectangle.Intersect (headerRect, viewBounds)` and hides tabs when `clipped.IsEmpty`.
+
+This means: **no changes to `BorderView` rendering are needed**. All scrolling behavior comes from setting `ContentSize` and managing `Viewport`.
+
+#### Implementation Steps
+
+##### 2a. Set ContentSize in Tabs based on total tab header span
+
+In `Tabs`, after `UpdateTabOffsets()`, compute the total span of all tab headers and set `ContentSize` accordingly:
+
+```csharp
+private void UpdateContentSize ()
+{
+    View? lastTab = TabCollection.LastOrDefault ();
+
+    if (lastTab is null)
+    {
+        ContentSizeTracksViewport = true;
+
+        return;
+    }
+
+    int totalSpan = lastTab.Border.TabEnd;
+
+    // ContentSize must be at least as large as Viewport to prevent negative scrolling
+    if (_tabSide is Side.Top or Side.Bottom)
+    {
+        int width = Math.Max (totalSpan, Viewport.Width);
+        SetContentSize (new Size (width, Viewport.Height));
+    }
+    else
+    {
+        int height = Math.Max (totalSpan, Viewport.Height);
+        SetContentSize (new Size (Viewport.Width, height));
+    }
+}
+```
+
+Call `UpdateContentSize()` at the end of `UpdateTabOffsets()`, and also from `OnSubViewAdded`/`OnSubViewRemoved`/`TabSide` setter.
+
+**Key concern:** `Border.TabEnd` returns `Frame.X + TabOffset + TabLength`. Since tab SubViews use `Dim.Fill()`, their `Frame.X` is 0. So `TabEnd` = `TabOffset + TabLength`. The last tab's `TabEnd` gives us the total span.
+
+Actually, `TabEnd` on the `Border` includes `GetFrame().X`. For tabs inside a `Tabs` container, the tab's border frame starts at the tab's position. Since all tabs use `Dim.Fill()` and are overlapped, their frames all start at (0, 0) relative to the `Tabs` content area. So `Border.GetFrame()` will return the border's frame relative to its parent tab, which starts at X=0. Therefore `TabEnd = 0 + TabOffset + TabLength`. This is correct — the last tab's `TabEnd` gives the total header span in content coordinates.
+
+##### 2b. Enable horizontal scrollbar with transparent slider
+
+In the `Tabs` constructor:
+
+```csharp
+public Tabs ()
+{
+    CanFocus = true;
+    Width = Dim.Fill ();
+    Height = Dim.Fill ();
+
+    // Enable horizontal scrollbar for tab header overflow
+    ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
+}
+```
+
+After the scrollbar is created (e.g., in an `Initialized` handler or after first layout), reposition and configure it:
+
+```csharp
+// In Tabs constructor or Initialized handler:
+Initialized += (_, _) =>
+{
+    // Move scrollbar to top of Padding (just below tab headers) instead of bottom
+    HorizontalScrollBar.Y = Pos.Func (_ => Padding.Thickness.Top);
+    // Keep X and Width as default (fills the width)
+
+    // Make the slider transparent so the content border line shows through
+    HorizontalScrollBar.Slider.ViewportSettings |= ViewportSettingsFlags.Transparent;
+};
+```
+
+**Default behavior (View.ScrollBars.cs):**
+- `ConfigureHorizontalScrollBar` sets: `Y = Pos.AnchorEnd() - Pos.Func(_ => Padding.Thickness.Bottom - 1)` (bottom of padding)
+- `ConfigureHorizontalScrollBarEvents` adjusts `Padding.Thickness.Bottom` when scrollbar visibility changes
+
+**What we must change:**
+- Reposition `HorizontalScrollBar.Y` to the top of Padding (below the tab depth area)
+- Override the `VisibleChanged` handler to adjust `Padding.Thickness.Top` instead of `.Bottom`
+- The scrollbar must sit at the exact row where the content border line is drawn, so the transparent slider lets the line show through
+
+##### 2c. Scrollbar position calculation
+
+For `Side.Top` with `TabDepth = 3`:
+- Border thickness: `(1, 3, 1, 1)` → top=3 means rows 0-2 are: outer border, title, inner border
+- The scrollbar should sit on the "inner border" row (row 2 of the border, which is the content border top line)
+- In Padding coordinates, this is at Y=0 (the first row of the Padding area, which is immediately below Border)
+
+For `Side.Bottom`:
+- Border thickness: `(1, 1, 1, 3)` → bottom=3
+- The scrollbar should sit at the bottom of the Padding area (the last row before the bottom border)
+- `HorizontalScrollBar.Y = Pos.AnchorEnd()`
+
+For `Side.Left`/`Side.Right`:
+- Use `VerticalScrollBar` instead of `HorizontalScrollBar`
+- Similar repositioning logic (left edge or right edge of padding)
+
+**This means the scrollbar position must update when `TabSide` changes.** Add a `UpdateScrollBarPosition()` method called from the `TabSide` setter.
+
+##### 2d. ScrollBar VisibleChanged override
+
+The default `ConfigureHorizontalScrollBarEvents` adjusts `Padding.Thickness.Bottom` when the scrollbar appears/disappears. For `Tabs`, we need to suppress this and instead adjust the correct side:
+
+```csharp
+// After scrollbar creation, override the thickness adjustment
+HorizontalScrollBar.VisibleChanged += (_, _) =>
+{
+    // The default handler already adjusted Padding.Thickness.Bottom.
+    // We need to undo that and adjust the correct side based on TabSide.
+    // ...
+};
+```
+
+**Alternative (simpler):** Since the scrollbar overlays the content border line (transparent slider), we may NOT need to adjust Padding thickness at all. The scrollbar sits on top of the border line and the transparent slider lets the line show through. The `◄` and `►` buttons replace the first/last characters of the content border line.
+
+This depends on whether the scrollbar is in `Padding` (which is inside Border) or needs to be in `Border` itself. If in Padding, the scrollbar row takes space from the content area. If we want zero space impact, the scrollbar must overlay the border line, which means it needs to be in `Border`, not `Padding`.
+
+**Decision needed:** The plan says "move the scrollbar out of Padding into Border" as an option. This is the cleaner approach since:
+1. The scrollbar replaces the content border line visually
+2. No content space is lost
+3. The transparent slider naturally overlays the border line drawing
+
+To do this:
+- Create a custom `ScrollBar` instance (not using `View.HorizontalScrollBar` which is locked to Padding)
+- Add it to `Border.View` instead of `Padding.View`
+- Manually wire up `ValueChanged` to adjust tab offsets (or Viewport)
+
+**OR** keep it simple for now:
+- Use the built-in `HorizontalScrollBar` in Padding
+- Accept that the scrollbar takes 1 row from content when visible
+- The transparent slider still shows the content border line
+- Iterate on the "zero-space" approach later
+
+##### 2e. Auto-scroll to focused tab
+
+When a tab is selected (focused), ensure its header is fully visible by scrolling if needed:
+
+```csharp
+// In OnFocusedChanged or ChangeValue, after setting Value:
+private void EnsureTabVisible (View tab)
+{
+    int tabStart = tab.Border.TabOffset;
+    int tabEnd = tab.Border.TabEnd;
+
+    if (_tabSide is Side.Top or Side.Bottom)
+    {
+        // Scroll left if tab starts before viewport
+        if (tabStart < Viewport.X)
+        {
+            Viewport = Viewport with { X = tabStart };
+        }
+        // Scroll right if tab ends after viewport
+        else if (tabEnd > Viewport.X + Viewport.Width)
+        {
+            Viewport = Viewport with { X = tabEnd - Viewport.Width };
+        }
+    }
+    else
+    {
+        // Same logic for Y axis (Side.Left/Right)
+        if (tabStart < Viewport.Y)
+        {
+            Viewport = Viewport with { Y = tabStart };
+        }
+        else if (tabEnd > Viewport.Y + Viewport.Height)
+        {
+            Viewport = Viewport with { Y = tabEnd - Viewport.Height };
+        }
+    }
+}
+```
+
+Call `EnsureTabVisible()` from `ChangeValue()` after setting `_value`, and from anywhere that selects a tab programmatically.
+
+**Important:** `Border.TabEnd` returns `GetFrame().X + TabOffset + TabLength`. For tabs with `Dim.Fill()` inside `Tabs`, `GetFrame().X` will be relative to the `Tabs` content area. Need to verify this returns the correct absolute content-coordinate position.
+
+##### 2f. UpdateTabOffsets must NOT subtract scroll offset
+
+`UpdateTabOffsets()` computes cumulative `TabOffset` values in **content coordinates** (not viewport coordinates). The viewport scroll handles the visual shift. Do NOT modify `UpdateTabOffsets()` to account for scrolling — that's the Viewport's job.
+
+#### Summary of changes for scrolling
+
+| File | Change |
+|------|--------|
+| `Tabs.cs` constructor | Add `ViewportSettings \|= HasHorizontalScrollBar` |
+| `Tabs.cs` constructor/Initialized | Reposition scrollbar, set `Slider.ViewportSettings \|= Transparent` |
+| `Tabs.cs` new method | `UpdateContentSize()` — sets `ContentSize` based on total tab header span |
+| `Tabs.cs` `UpdateTabOffsets()` | Call `UpdateContentSize()` at the end |
+| `Tabs.cs` new method | `EnsureTabVisible (View tab)` — auto-scrolls to keep focused tab visible |
+| `Tabs.cs` `ChangeValue()` | Call `EnsureTabVisible()` after setting value |
+| `Tabs.cs` `TabSide` setter | Call `UpdateScrollBarPosition()` to switch between H/V scrollbar |
+| `Tabs.cs` new method | `UpdateScrollBarPosition()` — repositions scrollbar based on TabSide |
+| No changes needed | `BorderView.cs` — already clips headers via `Rectangle.Intersect` |
+
+#### Open questions
+
+1. **Scrollbar in Padding vs Border**: Using the built-in scrollbar (in Padding) costs 1 row of content space. Moving to Border avoids this but requires manual scrollbar management. Start with Padding; optimize to Border later if needed.
+
+2. **Left/Right side scrolling**: Uses `VerticalScrollBar` instead. Same pattern, different axis. The scrollbar would be positioned at the left or right edge of Padding.
+
+3. **TabEnd accuracy**: Need to verify that `Border.TabEnd` returns the correct value when the tab's Frame starts at (0,0) due to `Dim.Fill()` / `ViewArrangement.Overlapped`. If `GetFrame()` returns the Border's frame (not the tab's frame), the value may already be correct since Border's frame is relative to its parent (the tab View).
+
+4. **Content area scrolling vs header-only scrolling**: The current approach scrolls the entire Viewport, which would also scroll tab content. This is wrong — only headers should scroll. **This is the critical design issue.** Tab content should NOT scroll horizontally just because headers overflow.
+
+   **Solution:** The tab headers are rendered by each tab's `Border` (an adornment, not content). Adornments render in screen coordinates, not viewport coordinates. `ComputeHeaderRect` uses `contentBorderRect` which is derived from the Border's frame, not the Viewport. So **Viewport scrolling does NOT affect header position**.
+
+   This means we **cannot** use Viewport scrolling to scroll headers. We need a different approach:
+
+   **Revised approach — ScrollOffset on TabOffset:**
+   - Add a `_scrollOffset` field to `Tabs`
+   - In `UpdateTabOffsets()`, subtract `_scrollOffset` from each tab's `TabOffset`
+   - The scrollbar's `Value` drives `_scrollOffset`
+   - `EnsureTabVisible()` adjusts `_scrollOffset` (not Viewport)
+   - `ContentSize` and `Viewport` are NOT used for tab header scrolling
+   - The scrollbar is a standalone `ScrollBar` added to the `Tabs` view (not the built-in one)
+
+   This is cleaner because:
+   - Tab content is unaffected by header scrolling
+   - `TabOffset` directly controls header position; subtracting scroll offset is straightforward
+   - The scrollbar can be positioned in the border area (row where content border line is)
+   - Transparent slider shows the content border line through
+
+   **Implementation of revised approach:**
+
+   ```csharp
+   private int _scrollOffset;
+
+   internal void UpdateTabOffsets ()
+   {
+       var offset = 0;
+
+       foreach (View tab in TabCollection)
+       {
+           tab.Border.TabOffset = offset - _scrollOffset;
+
+           int? tabLength = tab.Border.TabLength;
+
+           if (tabLength is { })
+           {
+               offset += tabLength.Value - 1;
+           }
+       }
+   }
+   ```
+
+   The scrollbar is a custom `ScrollBar` instance managed by `Tabs`:
+
+   ```csharp
+   private ScrollBar? _headerScrollBar;
+
+   private void SetupHeaderScrollBar ()
+   {
+       _headerScrollBar = new ScrollBar
+       {
+           Orientation = _tabSide is Side.Top or Side.Bottom
+                             ? Orientation.Horizontal
+                             : Orientation.Vertical,
+           VisibilityMode = ScrollBarVisibilityMode.Auto
+       };
+
+       // Make slider transparent so border line shows through
+       _headerScrollBar.Slider.ViewportSettings |= ViewportSettingsFlags.Transparent;
+
+       _headerScrollBar.ValueChanged += (_, args) =>
+       {
+           _scrollOffset = args.NewValue;
+           UpdateTabOffsets ();
+           UpdateZOrder ();
+           SetNeedsLayout ();
+       };
+
+       // Position based on TabSide (in the Border adornment area)
+       // For Side.Top: at the content border line row
+       // ...
+   }
+   ```
+
+   `EnsureTabVisible()` adjusts `_scrollOffset`:
+
+   ```csharp
+   private void EnsureTabVisible (View tab)
+   {
+       int tabStart = IndexOf (tab);
+       // Compute the absolute (unscrolled) offset for this tab
+       var absOffset = 0;
+       foreach (View t in TabCollection)
+       {
+           if (t == tab) break;
+           absOffset += (t.Border.TabLength ?? 0) - 1;
+       }
+       int tabEnd = absOffset + (tab.Border.TabLength ?? 0);
+
+       if (_tabSide is Side.Top or Side.Bottom)
+       {
+           int visibleWidth = Viewport.Width;
+           if (absOffset < _scrollOffset)
+           {
+               _scrollOffset = absOffset;
+           }
+           else if (tabEnd > _scrollOffset + visibleWidth)
+           {
+               _scrollOffset = tabEnd - visibleWidth;
+           }
+       }
+       // ... similar for Left/Right with Height
+
+       _headerScrollBar.Value = _scrollOffset;
+       UpdateTabOffsets ();
+   }
+   ```
+
+   **ScrollBar sizing:** `_headerScrollBar.ScrollableContentSize` = total unscrolled tab header span. `_headerScrollBar.VisibleContentSize` = Viewport width (or height). Update these in `UpdateContentSize()` (renamed from its original purpose).
+
+   **ScrollBar placement:** The scrollbar needs to sit where the content border line is drawn. For `Side.Top`, this is the bottom row of the border's tab-depth area. This requires adding the scrollbar as a SubView of the `Border` adornment's view, not Padding. Use `Border.GetOrCreateView()` then `Border.View!.Add(_headerScrollBar)`.
 
 ### Step 3: All Four Sides
 
