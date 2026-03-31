@@ -35,9 +35,9 @@ public class Tabs : View, IValue<View?>, IDesignable
     private readonly List<WeakReference<View>> _tabList = [];
 
     /// <summary>
-    ///     Resolves live tab views from the internal weak reference list, preserving logical order.
+    ///     Resolves the tabs from the internal weak reference list, preserving logical order.
     /// </summary>
-    private IEnumerable<View> GetLiveTabViews ()
+    private IEnumerable<View> ResolveTabCollection ()
     {
         foreach (WeakReference<View> wr in _tabList)
         {
@@ -52,7 +52,29 @@ public class Tabs : View, IValue<View?>, IDesignable
     ///     Gets the tabs in logical order, which may differ from SubViews order
     ///     due to z-ordering of the focused tab.
     /// </summary>
-    public IEnumerable<View> TabCollection => GetLiveTabViews ();
+    public IEnumerable<View> TabCollection => ResolveTabCollection ();
+
+    /// <summary>
+    ///     Gets the logical index of the specified view within this <see cref="Tabs"/> container.
+    /// </summary>
+    /// <param name="view">The view to find.</param>
+    /// <returns>The zero-based index, or -1 if the view is not a tab in this container.</returns>
+    public int IndexOf (View view)
+    {
+        var i = 0;
+
+        foreach (WeakReference<View> wr in _tabList)
+        {
+            if (wr.TryGetTarget (out View? target) && target == view)
+            {
+                return i;
+            }
+
+            i++;
+        }
+
+        return -1;
+    }
 
     private Side _tabSide = Side.Top;
 
@@ -370,32 +392,6 @@ public class Tabs : View, IValue<View?>, IDesignable
         {
             Value = focusedTab;
         }
-    }
-
-    #endregion
-
-    #region Public Helpers
-
-    /// <summary>
-    ///     Gets the logical index of the specified view within this <see cref="Tabs"/> container.
-    /// </summary>
-    /// <param name="view">The view to find.</param>
-    /// <returns>The zero-based index, or -1 if the view is not a tab in this container.</returns>
-    public int IndexOf (View view)
-    {
-        var i = 0;
-
-        foreach (WeakReference<View> wr in _tabList)
-        {
-            if (wr.TryGetTarget (out View? target) && target == view)
-            {
-                return i;
-            }
-
-            i++;
-        }
-
-        return -1;
     }
 
     #endregion
