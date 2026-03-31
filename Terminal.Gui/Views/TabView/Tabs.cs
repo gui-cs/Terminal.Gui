@@ -171,12 +171,6 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
-        if (view is not Tab)
-        {
-            throw new ArgumentException (@"Only Views of type Tab can be added to Tabs", nameof (view));
-        }
-        base.OnSubViewAdded (view);
-
         if (view is not Tab tab)
         {
             return;
@@ -199,6 +193,8 @@ public class Tabs : View, IValue<Tab?>, IDesignable
 
         UpdateTabBorderThickness ();
         UpdateTabOffsets ();
+
+        base.OnSubViewAdded (view);
     }
 
     /// <inheritdoc/>
