@@ -17,7 +17,15 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     public void Step0_AllTabsFit_NoScroll_Tab1Selected ()
     {
         IDriver driver = CreateTestDriver (30, 8);
-        View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Dotted };
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
         Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
         superView.Add (tabs);
 
@@ -51,7 +59,15 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     public void Step1_ReducedWidth_Tab1Selected_RightIndicator ()
     {
         IDriver driver = CreateTestDriver (30, 8);
-        View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Dotted };
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
         Tabs tabs = new () { Driver = driver, Width = 26, Height = Dim.Fill () };
         superView.Add (tabs);
 
@@ -86,7 +102,15 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     public void Step2_Tab2Selected_NoScrollChange ()
     {
         IDriver driver = CreateTestDriver (30, 8);
-        View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Dotted };
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
         Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
         superView.Add (tabs);
 
@@ -122,7 +146,15 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     public void Step4_ScrolledRight5_Tab2Selected ()
     {
         IDriver driver = CreateTestDriver (30, 8);
-        View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Dotted };
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
         Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
         superView.Add (tabs);
 
@@ -167,7 +199,15 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     public void Step6_Tab4Selected_ScrolledRight ()
     {
         IDriver driver = CreateTestDriver (30, 8);
-        View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Dotted };
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
         Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
         superView.Add (tabs);
 
@@ -175,6 +215,7 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Add (tab1, tab2, tab3, tab4, tab5);
 
         tabs.Width = 18;
+
         // Select Tab4 — EnsureTabVisible should scroll right so Tab4 is visible
         tabs.Value = tab4;
         superView.Layout ();
@@ -203,7 +244,15 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     public void Step9_SelectTab1_ScrollsBackToStart ()
     {
         IDriver driver = CreateTestDriver (30, 8);
-        View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Dotted };
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
         Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
         superView.Add (tabs);
 
@@ -236,7 +285,7 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
 
         tabs.Dispose ();
     }
-    
+
     /// <summary>
     ///     Step 11: Width back to 26. All tabs fit. No scroll indicators. Tab4 selected.
     /// </summary>
@@ -244,7 +293,15 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     public void Step11_FullWidth_AllFit_NoScrollIndicators ()
     {
         IDriver driver = CreateTestDriver (30, 8);
-        View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Dotted };
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
         Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
         superView.Add (tabs);
 
@@ -278,7 +335,15 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     public void TabOffsets_AfterScrollBack_ResetToNatural ()
     {
         IDriver driver = CreateTestDriver (30, 8);
-        View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Dotted };
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
         Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
         superView.Add (tabs);
 
@@ -289,6 +354,7 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         // Scroll right
         tabs.Value = tab5;
         superView.Layout ();
+
         // Scroll back
         tabs.Value = tab1;
         superView.Layout ();
@@ -310,7 +376,15 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     public void TabOffsets_AfterScrollRight_AreNegativeForOffScreenTabs ()
     {
         IDriver driver = CreateTestDriver (30, 8);
-        View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Dotted };
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
         Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
         superView.Add (tabs);
 
