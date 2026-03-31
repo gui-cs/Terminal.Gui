@@ -1,24 +1,25 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A container <see cref="View"/> that manages a collection of <see cref="Tab"/> SubViews,
-///     rendering them as a tabbed interface. The currently focused <see cref="Tab"/> is the selected tab.
+///     A container <see cref="View"/> that manages a collection of <see cref="View"/> SubViews,
+///     rendering them as a tabbed interface. The currently focused view is the selected tab.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Add <see cref="Tab"/> instances as SubViews via <see cref="View.Add(View)"/>. The <see cref="Tabs"/>
-///         container automatically manages tab indices, offsets, border thickness, and z-order.
+///         Add any <see cref="View"/> instances as SubViews via <see cref="View.Add(View)"/>. The <see cref="Tabs"/>
+///         container automatically configures tab-related properties (border settings, thickness, arrangement,
+///         and z-order) on each added view.
 ///     </para>
 ///     <para>
-///         The selected tab is determined by focus — whichever <see cref="Tab"/> has focus is the
-///         selected tab. Use <see cref="Value"/> to get or set the selected <see cref="Tab"/>.
+///         The selected tab is determined by focus — whichever view has focus is the
+///         selected tab. Use <see cref="Value"/> to get or set the selected view.
 ///     </para>
 ///     <para>
-///         Implements <see cref="IValue{T}"/> with <c>Tab?</c> as the value type, enabling
+///         Implements <see cref="IValue{T}"/> with <c>View?</c> as the value type, enabling
 ///         integration with the command/prompt system.
 ///     </para>
 /// </remarks>
-public class Tabs : View, IValue<Tab?>, IDesignable
+public class Tabs : View, IValue<View?>, IDesignable
 {
     /// <summary>
     ///     Initializes a new instance of the <see cref="Tabs"/> class.
@@ -31,11 +32,27 @@ public class Tabs : View, IValue<Tab?>, IDesignable
         Height = Dim.Fill ();
     }
 
+    private readonly List<WeakReference<View>> _tabList = [];
+
     /// <summary>
-    ///     Gets the tabs in logical order (by <see cref="Tab.TabIndex"/>), which may differ
-    ///     from SubViews order due to z-ordering of the focused tab.
+    ///     Resolves live tab views from the internal weak reference list, preserving logical order.
     /// </summary>
-    public IEnumerable<Tab> TabCollection => SubViews.OfType<Tab> ().OrderBy (t => t.TabIndex);
+    private IEnumerable<View> GetLiveTabViews ()
+    {
+        foreach (WeakReference<View> wr in _tabList)
+        {
+            if (wr.TryGetTarget (out View? view))
+            {
+                yield return view;
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Gets the tabs in logical order, which may differ from SubViews order
+    ///     due to z-ordering of the focused tab.
+    /// </summary>
+    public IEnumerable<View> TabCollection => GetLiveTabViews ();
 
     private Side _tabSide = Side.Top;
 
@@ -44,7 +61,7 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     /// </summary>
     /// <remarks>
     ///     Changing this property updates the <see cref="Border.TabSide"/> and
-    ///     <see cref="Drawing.Thickness"/> of all <see cref="Tab"/> SubViews.
+    ///     <see cref="Drawing.Thickness"/> of all tab SubViews.
     /// </remarks>
     public Side TabSide
     {
@@ -69,7 +86,7 @@ public class Tabs : View, IValue<Tab?>, IDesignable
 
     /// <summary>
     ///     Gets or sets the <see cref="LineStyle"/> used for tab borders.
-    ///     When set, updates all <see cref="Tab"/> SubViews.
+    ///     When set, updates all tab SubViews.
     /// </summary>
     public LineStyle TabLineStyle
     {
@@ -83,7 +100,7 @@ public class Tabs : View, IValue<Tab?>, IDesignable
 
             _tabLineStyle = value;
 
-            foreach (Tab tab in TabCollection)
+            foreach (View tab in TabCollection)
             {
                 tab.BorderStyle = _tabLineStyle;
             }
@@ -92,21 +109,21 @@ public class Tabs : View, IValue<Tab?>, IDesignable
         }
     }
 
-    #region IValue<Tab?> Implementation
+    #region IValue<View?> Implementation
 
-    private Tab? _value;
+    private View? _value;
 
     /// <summary>
-    ///     Gets or sets the currently selected <see cref="Tab"/>.
-    ///     Setting this focuses the specified tab.
+    ///     Gets or sets the currently selected tab view.
+    ///     Setting this focuses the specified view.
     /// </summary>
-    public Tab? Value { get => _value; set => ChangeValue (value); }
+    public View? Value { get => _value; set => ChangeValue (value); }
 
     /// <inheritdoc/>
-    public event EventHandler<ValueChangingEventArgs<Tab?>>? ValueChanging;
+    public event EventHandler<ValueChangingEventArgs<View?>>? ValueChanging;
 
     /// <inheritdoc/>
-    public event EventHandler<ValueChangedEventArgs<Tab?>>? ValueChanged;
+    public event EventHandler<ValueChangedEventArgs<View?>>? ValueChanged;
 
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
@@ -116,24 +133,24 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     /// </summary>
     /// <param name="args">The event arguments containing old and new values.</param>
     /// <returns><see langword="true"/> to cancel the change; otherwise <see langword="false"/>.</returns>
-    protected virtual bool OnValueChanging (ValueChangingEventArgs<Tab?> args) => false;
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<View?> args) => false;
 
     /// <summary>
     ///     Called when <see cref="Value"/> has changed.
     /// </summary>
     /// <param name="args">The event arguments containing old and new values.</param>
-    protected virtual void OnValueChanged (ValueChangedEventArgs<Tab?> args) { }
+    protected virtual void OnValueChanged (ValueChangedEventArgs<View?> args) { }
 
-    private void ChangeValue (Tab? newValue)
+    private void ChangeValue (View? newValue)
     {
         if (_value == newValue)
         {
             return;
         }
 
-        Tab? oldValue = _value;
+        View? oldValue = _value;
 
-        ValueChangingEventArgs<Tab?> changingArgs = new (oldValue, newValue);
+        ValueChangingEventArgs<View?> changingArgs = new (oldValue, newValue);
 
         if (OnValueChanging (changingArgs) || changingArgs.Handled)
         {
@@ -157,7 +174,7 @@ public class Tabs : View, IValue<Tab?>, IDesignable
         UpdateZOrder ();
         SetNeedsLayout ();
 
-        ValueChangedEventArgs<Tab?> changedArgs = new (oldValue, _value);
+        ValueChangedEventArgs<View?> changedArgs = new (oldValue, _value);
         OnValueChanged (changedArgs);
         ValueChanged?.Invoke (this, changedArgs);
 
@@ -171,30 +188,29 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     /// <inheritdoc/>
     protected override void OnSubViewAdded (View view)
     {
-        if (view is not Tab tab)
-        {
-            return;
-        }
+        base.OnSubViewAdded (view);
 
-        // Assign TabIndex as max existing + 1
-        int maxIndex = SubViews.OfType<Tab> ().Where (t => t != tab).Select (t => t.TabIndex).DefaultIfEmpty (-1).Max ();
-        tab.TabIndex = maxIndex + 1;
+        // Add to internal tracking list
+        _tabList.Add (new WeakReference<View> (view));
 
-        // Configure the tab
-        tab.Border.TabSide = _tabSide;
-        tab.BorderStyle = _tabLineStyle;
-        base.SuperViewRendersLineCanvas = true;
-        tab.Width = Dim.Fill ();
-        tab.Height = Dim.Fill ();
+        // Configure the view as a tab
+        view.TabStop = TabBehavior.TabStop;
+        view.CanFocus = true;
+        view.BorderStyle = _tabLineStyle;
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = _tabSide;
+        view.Arrangement = ViewArrangement.Overlapped;
+        view.Width = Dim.Fill ();
+        view.Height = Dim.Fill ();
+        view.SuperViewRendersLineCanvas = true;
 
-        // this will cause the first tab added to be focused and selected by default, which is a common convention for tabbed interfaces.
+        // Focus first tab added (common convention for tabbed interfaces).
         // Subsequent tabs will not steal focus when added.
         TabCollection.FirstOrDefault ()?.SetFocus ();
 
+        UpdateZOrder ();
         UpdateTabBorderThickness ();
         UpdateTabOffsets ();
-
-        base.OnSubViewAdded (view);
     }
 
     /// <inheritdoc/>
@@ -202,24 +218,19 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     {
         base.OnSubViewRemoved (view);
 
-        if (view is not Tab removedTab || _disposing)
+        if (_disposing)
         {
             return;
         }
 
-        // Re-index remaining tabs
-        var i = 0;
+        // Remove the view (and any dead refs) from the tracking list
+        _tabList.RemoveAll (wr => !wr.TryGetTarget (out View? target) || target == view);
 
-        foreach (Tab tab in TabCollection)
-        {
-            tab.TabIndex = i++;
-        }
-
-        // If the removed tab was the selected one, select the first tab
-        if (Value == removedTab)
+        // If the removed view was the selected one, select the first tab
+        if (Value == view)
         {
             _value = null;
-            Tab? firstTab = TabCollection.FirstOrDefault ();
+            View? firstTab = TabCollection.FirstOrDefault ();
 
             if (firstTab is { })
             {
@@ -236,23 +247,23 @@ public class Tabs : View, IValue<Tab?>, IDesignable
 
     #region Layout Helpers
 
-    /// <inheritdoc/>
-    protected override void OnSubViewLayout (LayoutEventArgs args) => base.OnSubViewLayout (args);
-
-    //UpdateZOrder();
     /// <summary>
     ///     Updates the z-order of tab SubViews so the focused tab is drawn last (on top). The tabs before the focused tab are
     ///     drawn in the order they were added (first added at back).
-    ///     the tabs after the focused tab are drawn in reverse order they were added (last added at back).
+    ///     The tabs after the focused tab are drawn in reverse order they were added (last added at back).
     /// </summary>
+    /// <remarks>
+    ///     Z-ordering uses <see cref="View.SubViews"/> (draw order). Logical tab order is maintained
+    ///     separately in the internal tab list.
+    /// </remarks>
     private void UpdateZOrder ()
     {
-        Tab? focusedTab = SubViews.OfType<Tab> ().FirstOrDefault (t => t.HasFocus);
+        View? focusedTab = TabCollection.FirstOrDefault (t => t.HasFocus);
 
         if (focusedTab is { })
         {
             // Tabs before the focused tab are drawn in the order they were added (first added at back)
-            foreach (Tab tab in TabCollection.TakeWhile (t => t != focusedTab))
+            foreach (View tab in TabCollection.TakeWhile (t => t != focusedTab))
             {
                 MoveSubViewToEnd (tab);
             }
@@ -261,15 +272,15 @@ public class Tabs : View, IValue<Tab?>, IDesignable
             MoveSubViewToEnd (focusedTab);
 
             // Tabs after the focused tab are drawn in reverse order they were added (last added at back)
-            foreach (Tab tab in TabCollection.SkipWhile (t => t != focusedTab).Skip (1))
+            foreach (View tab in TabCollection.SkipWhile (t => t != focusedTab).Skip (1))
             {
                 MoveSubViewToStart (tab);
             }
         }
         else
         {
-            // Tabs before the focused tab are drawn in the order they were added (first added at back)
-            foreach (Tab tab in TabCollection.Reverse ())
+            // No focused tab - draw in reverse logical order (first tab at front)
+            foreach (View tab in TabCollection.Reverse ())
             {
                 MoveSubViewToStart (tab);
             }
@@ -284,7 +295,7 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     {
         var offset = 0;
 
-        foreach (Tab tab in TabCollection)
+        foreach (View tab in TabCollection)
         {
             tab.Border.TabOffset = offset;
 
@@ -299,18 +310,20 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     }
 
     /// <summary>
-    ///     Gets or sets the depth of the tab. The default is 3, which tht tab will have room for the outside border, title,
-    ///     and a 1-character tab border. Adjust this if you have a thicker border or want more/less space in the tab header.
+    ///     Gets or sets the depth of the tab. The default is 3, which means the tab will have room for the outside border,
+    ///     title, and a 1-character tab border. Adjust this if you have a thicker border or want more/less space in the tab
+    ///     header.
     /// </summary>
     public int TabDepth
     {
-        get => field;
+        get;
         set
         {
             if (field == value)
             {
                 return;
             }
+
             field = value;
             UpdateTabBorderThickness ();
         }
@@ -321,18 +334,18 @@ public class Tabs : View, IValue<Tab?>, IDesignable
     /// </summary>
     private void UpdateTabBorderThickness ()
     {
-        foreach (Tab tab in TabCollection)
+        foreach (View tab in TabCollection)
         {
             tab.Border.TabSide = _tabSide;
 
             tab.Border.Thickness = _tabSide switch
-                                   {
-                                       Side.Top => new Thickness (1, TabDepth, 1, 1),
-                                       Side.Bottom => new Thickness (1, 1, 1, TabDepth),
-                                       Side.Left => new Thickness (TabDepth, 1, 1, 1),
-                                       Side.Right => new Thickness (1, 1, TabDepth, 1),
-                                       _ => new Thickness (1, TabDepth, 1, 1)
-                                   };
+            {
+                Side.Top => new Thickness (1, TabDepth, 1, 1),
+                Side.Bottom => new Thickness (1, 1, 1, TabDepth),
+                Side.Left => new Thickness (TabDepth, 1, 1, 1),
+                Side.Right => new Thickness (1, 1, TabDepth, 1),
+                _ => new Thickness (1, TabDepth, 1, 1)
+            };
         }
     }
 
@@ -350,8 +363,8 @@ public class Tabs : View, IValue<Tab?>, IDesignable
             return;
         }
 
-        // Find which Tab now has focus
-        Tab? focusedTab = SubViews.OfType<Tab> ().FirstOrDefault (t => t.HasFocus);
+        // Find which tab view now has focus (using logical order)
+        View? focusedTab = TabCollection.FirstOrDefault (t => t.HasFocus);
 
         if (focusedTab is { })
         {
@@ -361,20 +374,46 @@ public class Tabs : View, IValue<Tab?>, IDesignable
 
     #endregion
 
+    #region Public Helpers
+
+    /// <summary>
+    ///     Gets the logical index of the specified view within this <see cref="Tabs"/> container.
+    /// </summary>
+    /// <param name="view">The view to find.</param>
+    /// <returns>The zero-based index, or -1 if the view is not a tab in this container.</returns>
+    public int IndexOf (View view)
+    {
+        var i = 0;
+
+        foreach (WeakReference<View> wr in _tabList)
+        {
+            if (wr.TryGetTarget (out View? target) && target == view)
+            {
+                return i;
+            }
+
+            i++;
+        }
+
+        return -1;
+    }
+
+    #endregion
+
     #region IDesignable
 
     /// <inheritdoc/>
     public bool EnableForDesign ()
     {
-        Tab tab1 = new () { Title = "_Attribute" };
+        View tab1 = new () { Title = "_Attribute" };
         AttributePicker attributePicker = new () { Y = 1, BorderStyle = LineStyle.Single };
         tab1.Add (attributePicker);
 
-        Tab tab2 = new () { Title = "_Line Style" };
+        View tab2 = new () { Title = "_Line Style" };
         OptionSelector<LineStyle> lineStyleSelector = new () { Y = 1, BorderStyle = LineStyle.Single };
         tab2.Add (lineStyleSelector);
 
-        Tab tab3 = new () { Title = "Tab _Settings" };
+        View tab3 = new () { Title = "Tab _Settings" };
         OptionSelector<Side> tabSideSelector = new () { Y = 1, BorderStyle = LineStyle.Single, Title = "S_ide" };
         tabSideSelector.Value = tab3.Border.TabSide;
 
@@ -388,9 +427,9 @@ public class Tabs : View, IValue<Tab?>, IDesignable
             Value = TabDepth
         };
 
-        tabDepthNumericUpDown.ValueChanging += (s, e) =>
+        tabDepthNumericUpDown.ValueChanging += (_, e) =>
                                                {
-                                                   if (e.NewValue is < 0)
+                                                   if (e.NewValue < 0)
                                                    {
                                                        e.Handled = true;
 
@@ -401,7 +440,7 @@ public class Tabs : View, IValue<Tab?>, IDesignable
                                                };
         tab3.Add (tabSideSelector, tabDepthNumericUpDown);
 
-        Tab tab4 = new () { Title = "Fourth" };
+        View tab4 = new () { Title = "Fourth" };
 
         Add (tab1, tab2, tab3, tab4);
 
@@ -447,6 +486,7 @@ public class Tabs : View, IValue<Tab?>, IDesignable
         {
             _disposing = true;
         }
+
         base.Dispose (disposing);
     }
 }

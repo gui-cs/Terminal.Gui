@@ -45,12 +45,12 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
             Height = Dim.Fill ()
         };
 
-        Tab singleTab = new () { Title = "_Single" };
+        View singleTab = new () { Title = "_Single" };
         singleView.Width = Dim.Fill ();
         singleView.Height = Dim.Fill ();
         singleTab.Add (singleView);
 
-        Tab bulkTab = new () { Title = "_Bulk" };
+        View bulkTab = new () { Title = "_Bulk" };
         bulkView.Width = Dim.Fill ();
         bulkView.Height = Dim.Fill ();
         bulkTab.Add (bulkView);

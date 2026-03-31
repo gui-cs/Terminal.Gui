@@ -558,8 +558,8 @@ public partial class BorderView : AdornmentView
             return false;
         }
 
-        // If the Parent is a Tab, and it is the last subview of it's SuperView, treat it as though it is focused
-        if (border.Parent is Tab { SuperView: { } } tab && tab.SuperView?.SubViews.LastOrDefault () == tab)
+        // If the Parent is in a Tabs container, and it is the last subview of its SuperView, treat it as though it is focused
+        if (border.Parent is { SuperView: Tabs } tab && tab.SuperView?.SubViews.LastOrDefault () == tab)
         {
             return true;
         }

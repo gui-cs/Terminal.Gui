@@ -1,8 +1,8 @@
-﻿using UnitTests;
+using UnitTests;
 
-namespace ViewsTests.TabView;
+namespace ViewsTests;
 
-// Copilot
+// Claude - Opus 4.6
 
 /// <summary>
 ///     Tests for the <see cref="Tabs"/> class.
@@ -21,25 +21,52 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Add_Tab_AssignsTabIndex ()
+    public void Add_View_ConfiguresAsTabs ()
     {
         Tabs tabs = new ();
-        Tab tab1 = new () { Title = "Tab1" };
-        Tab tab2 = new () { Title = "Tab2" };
-        Tab tab3 = new () { Title = "Tab3" };
+        View tab1 = new () { Title = "Tab1" };
 
-        tabs.Add (tab1, tab2, tab3);
+        tabs.Add (tab1);
 
-        Assert.Equal (0, tab1.TabIndex);
-        Assert.Equal (1, tab2.TabIndex);
-        Assert.Equal (2, tab3.TabIndex);
+        Assert.True (tab1.CanFocus);
+        Assert.Equal (TabBehavior.TabStop, tab1.TabStop);
+        Assert.Equal (BorderSettings.Tab | BorderSettings.Title, tab1.Border.Settings);
+        Assert.Equal (ViewArrangement.Overlapped, tab1.Arrangement);
+        Assert.True (tab1.SuperViewRendersLineCanvas);
     }
 
     [Fact]
-    public void Add_Tab_SetsTabSide ()
+    public void IndexOf_ReturnsCorrectIndex ()
+    {
+        Tabs tabs = new ();
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+
+        tabs.Add (tab1, tab2, tab3);
+
+        Assert.Equal (0, tabs.IndexOf (tab1));
+        Assert.Equal (1, tabs.IndexOf (tab2));
+        Assert.Equal (2, tabs.IndexOf (tab3));
+    }
+
+    [Fact]
+    public void IndexOf_ReturnsMinusOne_ForUnknownView ()
+    {
+        Tabs tabs = new ();
+        View tab1 = new () { Title = "Tab1" };
+        View unknown = new () { Title = "Unknown" };
+
+        tabs.Add (tab1);
+
+        Assert.Equal (-1, tabs.IndexOf (unknown));
+    }
+
+    [Fact]
+    public void Add_View_SetsTabSide ()
     {
         Tabs tabs = new () { TabSide = Side.Bottom };
-        Tab tab1 = new () { Title = "Tab1" };
+        View tab1 = new () { Title = "Tab1" };
 
         tabs.Add (tab1);
 
@@ -47,10 +74,10 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Add_Tab_SetsLineStyle ()
+    public void Add_View_SetsLineStyle ()
     {
         Tabs tabs = new () { TabLineStyle = LineStyle.Single };
-        Tab tab1 = new () { Title = "Tab1" };
+        View tab1 = new () { Title = "Tab1" };
 
         tabs.Add (tab1);
 
@@ -58,10 +85,10 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Add_Tab_SetsBorderThickness_Top ()
+    public void Add_View_SetsBorderThickness_Top ()
     {
         Tabs tabs = new () { TabSide = Side.Top };
-        Tab tab1 = new () { Title = "Tab1" };
+        View tab1 = new () { Title = "Tab1" };
 
         tabs.Add (tab1);
 
@@ -69,10 +96,10 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Add_Tab_SetsBorderThickness_Bottom ()
+    public void Add_View_SetsBorderThickness_Bottom ()
     {
         Tabs tabs = new () { TabSide = Side.Bottom };
-        Tab tab1 = new () { Title = "Tab1" };
+        View tab1 = new () { Title = "Tab1" };
 
         tabs.Add (tab1);
 
@@ -80,10 +107,10 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Add_Tab_SetsBorderThickness_Left ()
+    public void Add_View_SetsBorderThickness_Left ()
     {
         Tabs tabs = new () { TabSide = Side.Left };
-        Tab tab1 = new () { Title = "Tab1" };
+        View tab1 = new () { Title = "Tab1" };
 
         tabs.Add (tab1);
 
@@ -91,10 +118,10 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Add_Tab_SetsBorderThickness_Right ()
+    public void Add_View_SetsBorderThickness_Right ()
     {
         Tabs tabs = new () { TabSide = Side.Right };
-        Tab tab1 = new () { Title = "Tab1" };
+        View tab1 = new () { Title = "Tab1" };
 
         tabs.Add (tab1);
 
@@ -102,16 +129,16 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void TabCollection_ReturnsTabsInLogicalOrder ()
+    public void TabCollection_ReturnsViewsInLogicalOrder ()
     {
         Tabs tabs = new ();
-        Tab tab1 = new () { Title = "Tab1" };
-        Tab tab2 = new () { Title = "Tab2" };
-        Tab tab3 = new () { Title = "Tab3" };
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
 
         tabs.Add (tab1, tab2, tab3);
 
-        List<Tab> ordered = tabs.TabCollection.ToList ();
+        List<View> ordered = tabs.TabCollection.ToList ();
         Assert.Equal (3, ordered.Count);
         Assert.Same (tab1, ordered [0]);
         Assert.Same (tab2, ordered [1]);
@@ -119,18 +146,23 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Remove_Tab_ReindexesRemainingTabs ()
+    public void Remove_View_UpdatesTabCollection ()
     {
         Tabs tabs = new ();
-        Tab tab1 = new () { Title = "Tab1" };
-        Tab tab2 = new () { Title = "Tab2" };
-        Tab tab3 = new () { Title = "Tab3" };
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
 
         tabs.Add (tab1, tab2, tab3);
         tabs.Remove (tab2);
 
-        Assert.Equal (0, tab1.TabIndex);
-        Assert.Equal (1, tab3.TabIndex);
+        List<View> ordered = tabs.TabCollection.ToList ();
+        Assert.Equal (2, ordered.Count);
+        Assert.Same (tab1, ordered [0]);
+        Assert.Same (tab3, ordered [1]);
+
+        Assert.Equal (0, tabs.IndexOf (tab1));
+        Assert.Equal (1, tabs.IndexOf (tab3));
     }
 
     [Fact]
@@ -138,11 +170,11 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     {
         Tabs tabs = new ();
 
-        // "Tab1" title → TabLength = 6 (4 chars + 2 border cells)
-        Tab tab1 = new () { Title = "Tab1" };
+        // "Tab1" title -> TabLength = 6 (4 chars + 2 border cells)
+        View tab1 = new () { Title = "Tab1" };
 
-        // "Tab2" title → TabLength = 6
-        Tab tab2 = new () { Title = "Tab2" };
+        // "Tab2" title -> TabLength = 6
+        View tab2 = new () { Title = "Tab2" };
 
         tabs.Add (tab1, tab2);
 
@@ -157,9 +189,9 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     public void UpdateTabOffsets_ThreeTabs ()
     {
         Tabs tabs = new ();
-        Tab tab1 = new () { Title = "Tab1" };
-        Tab tab2 = new () { Title = "Tab2" };
-        Tab tab3 = new () { Title = "Tab3" };
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
 
         tabs.Add (tab1, tab2, tab3);
 
@@ -175,8 +207,8 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
 
         Tabs tabs = new () { Driver = driver, Width = 40, Height = 10 };
 
-        Tab tab1 = new () { Title = "Tab1" };
-        Tab tab2 = new () { Title = "Tab2" };
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
 
         tabs.Add (tab1, tab2);
         tabs.Layout ();
@@ -190,8 +222,8 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     public void ValueChanging_CanCancel ()
     {
         Tabs tabs = new ();
-        Tab tab1 = new () { Title = "Tab1" };
-        Tab tab2 = new () { Title = "Tab2" };
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
 
         tabs.Add (tab1, tab2);
         tabs.Value = tab1;
@@ -208,13 +240,13 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     public void ValueChanged_Fires ()
     {
         Tabs tabs = new ();
-        Tab tab1 = new () { Title = "Tab1" };
-        Tab tab2 = new () { Title = "Tab2" };
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
 
         tabs.Add (tab1, tab2);
         tabs.Value = tab1;
 
-        Tab? newValue = null;
+        View? newValue = null;
         tabs.ValueChanged += (_, args) => newValue = args.NewValue;
 
         tabs.Value = tab2;
@@ -226,8 +258,8 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     public void TabSide_Change_UpdatesAllTabs ()
     {
         Tabs tabs = new () { TabSide = Side.Top };
-        Tab tab1 = new () { Title = "Tab1" };
-        Tab tab2 = new () { Title = "Tab2" };
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
 
         tabs.Add (tab1, tab2);
 
@@ -243,8 +275,8 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     public void TabLineStyle_Change_UpdatesAllTabs ()
     {
         Tabs tabs = new ();
-        Tab tab1 = new () { Title = "Tab1" };
-        Tab tab2 = new () { Title = "Tab2" };
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
 
         tabs.Add (tab1, tab2);
 
@@ -272,8 +304,8 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
 
         Tabs tabs = new () { Driver = driver, Width = 14, Height = 5 };
 
-        Tab tab1 = new () { Title = "Tab1", Text = "Tab1 content" };
-        Tab tab2 = new () { Title = "Tab2", Text = "Tab2 content" };
+        View tab1 = new () { Title = "Tab1", Text = "Tab1 content" };
+        View tab2 = new () { Title = "Tab2", Text = "Tab2 content" };
 
         tabs.Add (tab1, tab2);
         tabs.Value = tab1;
@@ -299,8 +331,8 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
 
         Tabs tabs = new () { Driver = driver, Width = 14, Height = 5 };
 
-        Tab tab1 = new () { Title = "Tab1", Text = "Tab1 content" };
-        Tab tab2 = new () { Title = "Tab2", Text = "Tab2 content" };
+        View tab1 = new () { Title = "Tab1", Text = "Tab1 content" };
+        View tab2 = new () { Title = "Tab2", Text = "Tab2 content" };
 
         tabs.Add (tab1, tab2);
         tabs.Value = tab2;
@@ -326,9 +358,9 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
 
         Tabs tabs = new () { Driver = driver, Width = 20, Height = 5 };
 
-        Tab tab1 = new () { Title = "Tab1", Text = "Tab1 content" };
-        Tab tab2 = new () { Title = "Tab2", Text = "Tab2 content" };
-        Tab tab3 = new () { Title = "Tab3", Text = "Tab3 content" };
+        View tab1 = new () { Title = "Tab1", Text = "Tab1 content" };
+        View tab2 = new () { Title = "Tab2", Text = "Tab2 content" };
+        View tab3 = new () { Title = "Tab3", Text = "Tab3 content" };
 
         tabs.Add (tab1, tab2, tab3);
         tabs.Value = tab2;

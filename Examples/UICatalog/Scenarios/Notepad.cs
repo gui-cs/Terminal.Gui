@@ -277,7 +277,7 @@ public class Notepad : Scenario
         return 0;
     }
 
-    private void Tabs_ValueChanged (object? sender, ValueChangedEventArgs<Tab?> e)
+    private void Tabs_ValueChanged (object? sender, ValueChangedEventArgs<View?> e)
     {
         if (LenShortcut is not null)
         {
@@ -297,7 +297,7 @@ public class Notepad : Scenario
         }
     }
 
-    private class OpenedFile (Notepad notepad) : Tab
+    private class OpenedFile (Notepad notepad) : View
     {
         private readonly Notepad _notepad = notepad;
 

@@ -960,13 +960,13 @@ public class Editor : Scenario
             Height = Dim.Fill ()
         };
 
-        Tab findTab = new () { Title = "_Find" };
+        View findTab = new () { Title = "_Find" };
         View findView = CreateFindTab ();
         findView.Width = Dim.Fill ();
         findView.Height = Dim.Fill ();
         findTab.Add (findView);
 
-        Tab replaceTab = new () { Title = "_Replace" };
+        View replaceTab = new () { Title = "_Replace" };
         View replaceView = CreateReplaceTab ();
         replaceView.Width = Dim.Fill ();
         replaceView.Height = Dim.Fill ();

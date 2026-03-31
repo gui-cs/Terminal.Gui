@@ -82,7 +82,7 @@ public class ConfigurationEditor : Scenario
                 editor.Title = "HardCoded";
             }
 
-            Tab tab = new () { Title = config.Key.ToString () };
+            View tab = new () { Title = config.Key.ToString () };
             tab.Add (editor);
 
             _tabs?.Add (tab);

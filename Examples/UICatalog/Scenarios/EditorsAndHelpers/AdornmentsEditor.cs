@@ -47,16 +47,16 @@ public class AdornmentsEditor : EditorBase
         ExpanderButton?.Orientation = Orientation.Horizontal;
 
         MarginEditor = new MarginEditor { BorderStyle = LineStyle.None };
-        Tab marginTab = new Tab () { Title = "Margin" };
+        View marginTab = new () { Title = "Margin" };
         marginTab.Add (MarginEditor);
         _tabs.Add (marginTab);
 
-        Tab borderTab = new Tab () { Title = "Border" };
-        BorderEditor = new BorderEditor { BorderStyle = LineStyle.None};
+        View borderTab = new () { Title = "Border" };
+        BorderEditor = new BorderEditor { BorderStyle = LineStyle.None };
         borderTab.Add (BorderEditor);
         _tabs.Add (borderTab);
 
-        Tab paddingTab = new Tab () { Title = "Padding" };
+        View paddingTab = new () { Title = "Padding" };
         PaddingEditor = new PaddingEditor { BorderStyle = LineStyle.None };
         paddingTab.Add (PaddingEditor);
         _tabs.Add (paddingTab);
