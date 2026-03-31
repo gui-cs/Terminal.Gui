@@ -88,12 +88,20 @@ public class ToolTipManagerTests
     [Fact]
     public void EnterView_ShowsHidesToolTip()
     {
-        using IApplication app = Application.Create ();
+        using IApplication app = Application.Create ().Init ();
+
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
         View view = new ();
+        window.Add (view);
         View toolTipContent = new ();
         
         view.SetToolTip (() => toolTipContent);
-        
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+        app.Driver!.Refresh ();
+
         Assert.False (toolTipContent.Visible);
         // Simulate mouse enter event
         CancelEventArgs eventArgs = new ();
@@ -104,5 +112,7 @@ public class ToolTipManagerTests
         view.NewMouseLeaveEvent ();
         
         Assert.False (toolTipContent.Visible);
+
+        window.Dispose ();
     }
 }
