@@ -209,7 +209,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         }
 
         _startupSemaphore.Release ();
-        Logging.Trace ($"app: {app.MainThreadId} Driver: _input: {_input}, _output: {_output}");
+        Logging.Trace ($"app: {app?.MainThreadId} Driver: _input: {_input}, _output: {_output}");
     }
 
     /// <summary>
