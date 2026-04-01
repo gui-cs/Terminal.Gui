@@ -360,7 +360,8 @@ public class Tabs : View, IValue<View?>, IDesignable
             }
         }
 
-        UpdateScrollBarSizes (offset);
+        // Add 1 because the last tab's trailing border is not shared
+        UpdateScrollBarSizes (offset > 0 ? offset + 1 : 0);
     }
 
     /// <summary>
@@ -393,13 +394,13 @@ public class Tabs : View, IValue<View?>, IDesignable
             tab.Border.TabSide = _tabSide;
 
             tab.Border.Thickness = _tabSide switch
-                                   {
-                                       Side.Top => new Thickness (1, TabDepth, 1, 1),
-                                       Side.Bottom => new Thickness (1, 1, 1, TabDepth),
-                                       Side.Left => new Thickness (TabDepth, 1, 1, 1),
-                                       Side.Right => new Thickness (1, 1, TabDepth, 1),
-                                       _ => new Thickness (1, TabDepth, 1, 1)
-                                   };
+            {
+                Side.Top => new Thickness (1, TabDepth, 1, 1),
+                Side.Bottom => new Thickness (1, 1, 1, TabDepth),
+                Side.Left => new Thickness (TabDepth, 1, 1, 1),
+                Side.Right => new Thickness (1, 1, TabDepth, 1),
+                _ => new Thickness (1, TabDepth, 1, 1)
+            };
         }
     }
 
@@ -434,7 +435,30 @@ public class Tabs : View, IValue<View?>, IDesignable
         get;
         set
         {
-            field = value;
+            if (field == value)
+            {
+                return;
+            }
+
+            if (value > _headerScrollBar?.ScrollableContentSize)
+            {
+                // If value is greater than the maximum scroll offset, clamp it such that the last tab is flush with the edge of the viewport
+                View? last = TabCollection.LastOrDefault ();
+
+                if (last is { })
+                {
+                    field = _headerScrollBar?.ScrollableContentSize - (last.Border.TabOffset - 2) ?? 0;
+                }
+            }
+            else if (value < 0)
+            {
+                // If value is less than 0, clamp it to 0
+                field = 0;
+            }
+            else
+            {
+                field = value;
+            }
 
             UpdateTabOffsets ();
             UpdateZOrder ();
@@ -529,13 +553,13 @@ public class Tabs : View, IValue<View?>, IDesignable
         int scrollBarSize = _headerScrollBar.Visible ? 1 : 0;
 
         Padding.Thickness = _tabSide switch
-                            {
-                                Side.Top => new Thickness (0, scrollBarSize, 0, 0),
-                                Side.Bottom => new Thickness (0, 0, 0, scrollBarSize),
-                                Side.Left => new Thickness (scrollBarSize, 0, 0, 0),
-                                Side.Right => new Thickness (0, 0, scrollBarSize, 0),
-                                _ => new Thickness (0, scrollBarSize, 0, 0)
-                            };
+        {
+            Side.Top => new Thickness (0, scrollBarSize, 0, 0),
+            Side.Bottom => new Thickness (0, 0, 0, scrollBarSize),
+            Side.Left => new Thickness (scrollBarSize, 0, 0, 0),
+            Side.Right => new Thickness (0, 0, scrollBarSize, 0),
+            _ => new Thickness (0, scrollBarSize, 0, 0)
+        };
     }
 
     /// <inheritdoc/>
@@ -678,7 +702,23 @@ public class Tabs : View, IValue<View?>, IDesignable
 
                                                    TabDepth = e.NewValue;
                                                };
-        tab3.Add (tabSideSelector, tabDepthNumericUpDown);
+
+
+        NumericUpDown<int> scrollOffsetNumericUpDown = new ()
+        {
+            Y = Pos.Bottom (tabSideSelector),
+            Width = 20,
+            BorderStyle = LineStyle.Single,
+            Title = "Scroll _Offset",
+            Value = ScrollOffset
+        };
+
+        scrollOffsetNumericUpDown.ValueChanging += (_, e) =>
+                                                   {
+                                                       ScrollOffset = e.NewValue;
+                                                   };
+
+        tab3.Add (tabSideSelector, tabDepthNumericUpDown, scrollOffsetNumericUpDown);
 
         View addRemoveTab = new () { Title = "A_dd/Remove" };
 

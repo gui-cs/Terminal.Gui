@@ -96,7 +96,7 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void ScrollOffset_ReducedWidth_Tab1Selected_Scroll_Right_To_End ()
+    public void ScrollOffset_ReducedWidth_Tab1Selected_Scroll_Right_1 ()
     {
         IDriver driver = CreateTestDriver (30, 8);
 
@@ -146,6 +146,128 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
                                               ┊Tab1│Tab2│Tab3│Tab          ┊
                                               ┊│   ╰────┴────┴──┬          ┊
                                               ┊│Tab1 content    │          ┊
+                                              ┊╰────────────────╯          ┊
+                                              └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
+
+        tabs.Dispose ();
+    }
+
+
+    [Fact]
+    public void ScrollOffset_ReducedWidth_Tab1Selected_Scroll_Right_Past_End ()
+    {
+        IDriver driver = CreateTestDriver (30, 8);
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
+        Tabs tabs = new () { Driver = driver, Width = 26, Height = Dim.Fill () };
+        superView.Add (tabs);
+
+        (View tab1, View tab2, View tab3, View tab4, View tab5) = CreateFiveTabs ();
+        tabs.Add (tab1, tab2, tab3, tab4, tab5);
+
+        tabs.Width = 18;
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+                                              ┊◄                ►          ┊
+                                              ┊╭────╮────╮────╮──          ┊
+                                              ┊│Tab1│Tab2│Tab3│Ta          ┊
+                                              ┊│    ╰────┴────┴─┬          ┊
+                                              ┊│Tab1 content    │          ┊
+                                              ┊╰────────────────╯          ┊
+                                              └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
+
+        tabs.ScrollOffset += 100;
+        superView.Layout ();
+        driver.ClearContents ();
+        superView.Draw ();
+
+        // Assert.Equal (0, tabs.ScrollOffset);
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+                                              ┊◄                ►          ┊
+                                              ┊──╮────╮────╮────╮          ┊
+                                              ┊b2│Tab3│Tab4│Tab5│          ┊
+                                              ┊┬─┴────┴────┴────┤          ┊
+                                              ┊│Tab1 content    │          ┊
+                                              ┊╰────────────────╯          ┊
+                                              └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void ScrollOffset_ReducedWidth_Tab5Selected_Scroll_Left_Past_Start ()
+    {
+        IDriver driver = CreateTestDriver (30, 8);
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
+        Tabs tabs = new () { Driver = driver, Width = 26, Height = Dim.Fill () };
+        superView.Add (tabs);
+
+        (View tab1, View tab2, View tab3, View tab4, View tab5) = CreateFiveTabs ();
+        tabs.Add (tab1, tab2, tab3, tab4, tab5);
+
+        tabs.Width = 18;
+        tabs.Value = tab5;
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+                                              ┊◄                ►          ┊
+                                              ┊──╭────╭────╭────╮          ┊
+                                              ┊b2│Tab3│Tab4│Tab5│          ┊
+                                              ┊┬─┴────┴────╯    │          ┊
+                                              ┊│Tab5 content    │          ┊
+                                              ┊╰────────────────╯          ┊
+                                              └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
+
+        tabs.ScrollOffset -= 100;
+        superView.Layout ();
+        driver.ClearContents ();
+        superView.Draw ();
+
+        // Assert.Equal (0, tabs.ScrollOffset);
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+                                              ┊◄                ►          ┊
+                                              ┊╭────╭────╭────╭──          ┊
+                                              ┊│Tab1│Tab2│Tab3│Ta          ┊
+                                              ┊├────┴────┴────┴─┬          ┊
+                                              ┊│Tab5 content    │          ┊
                                               ┊╰────────────────╯          ┊
                                               └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
                                               """,
