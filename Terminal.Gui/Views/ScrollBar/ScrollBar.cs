@@ -26,8 +26,8 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 {
-    private readonly Button _decreaseButton;
-    private readonly Button _increaseButton;
+    private readonly ScrollButton _decreaseButton;
+    private readonly ScrollButton _increaseButton;
 
     /// <summary>
     ///     Gets the <see cref="ScrollSlider"/> used by this <see cref="ScrollBar"/>.
@@ -42,14 +42,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
         Height = Dim.Auto (DimAutoStyle.Content, Dim.Func (_ => Orientation == Orientation.Vertical ? SuperView?.Viewport.Height ?? 0 : 1));
 
-        _decreaseButton = new Button
-        {
-            CanFocus = false,
-            NoDecorations = true,
-            NoPadding = true,
-            ShadowStyle = null,
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased
-        };
+        _decreaseButton = new ScrollButton ();
         _decreaseButton.Accepting += OnDecreaseButtonOnAccept;
 
         Slider = new ScrollSlider
@@ -59,14 +52,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         Slider.Scrolled += SliderOnScroll;
         Slider.PositionChanged += SliderOnPositionChanged;
 
-        _increaseButton = new Button
-        {
-            CanFocus = false,
-            NoDecorations = true,
-            NoPadding = true,
-            ShadowStyle = null,
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased
-        };
+        _increaseButton = new ScrollButton ();
         _increaseButton.Accepting += OnIncreaseButtonOnAccept;
         Add (_decreaseButton, Slider, _increaseButton);
 
@@ -106,7 +92,8 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             case ScrollBarVisibilityMode.Auto:
                 // If this scrollbar lives in a View's Padding, respect the View's
                 // ViewportSettings as the authority on whether it should be enabled.
-                if (SuperView is PaddingView { Adornment.Parent: { } ownerView } && (this == ownerView.VerticalScrollBar || this == ownerView.HorizontalScrollBar))
+                if (SuperView is PaddingView { Adornment.Parent: { } ownerView }
+                    && (this == ownerView.VerticalScrollBar || this == ownerView.HorizontalScrollBar))
                 {
                     ViewportSettingsFlags requiredFlag = Orientation == Orientation.Vertical
                                                              ? ViewportSettingsFlags.HasVerticalScrollBar
@@ -147,6 +134,9 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
     private void PositionSubViews ()
     {
+        _decreaseButton.Orientation = Orientation;
+        _increaseButton.Orientation = Orientation;
+
         if (Orientation == Orientation.Vertical)
         {
             _decreaseButton.Y = 0;
@@ -163,7 +153,6 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             _increaseButton.X = 0;
             _increaseButton.Width = Dim.Fill ();
             _increaseButton.Height = 1;
-            _increaseButton.Title = Glyphs.DownArrow.ToString ();
         }
         else
         {
@@ -171,7 +160,6 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             _decreaseButton.X = 0;
             _decreaseButton.Width = 1;
             _decreaseButton.Height = Dim.Fill ();
-            _decreaseButton.Title = Glyphs.LeftArrow.ToString ();
 
             Slider.Y = 0;
             Slider.X = 1;
@@ -181,7 +169,6 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
             _increaseButton.X = Pos.AnchorEnd ();
             _increaseButton.Width = 1;
             _increaseButton.Height = Dim.Fill ();
-            _increaseButton.Title = Glyphs.RightArrow.ToString ();
         }
     }
 

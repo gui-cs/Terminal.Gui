@@ -457,27 +457,15 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// <param name="tab">The tab whose border receives the scroll buttons.</param>
     private void AddScrollButtonsToBorder (View tab)
     {
-        Button scrollBack = new ()
+        ScrollButton scrollBack = new ()
         {
-            CanFocus = false,
-            NoDecorations = true,
-            NoPadding = true,
-            ShadowStyle = null,
-            Visible = false,
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             Id = ScrollBackTag
         };
 
         scrollBack.Accepting += (_, _) => { ScrollOffset--; };
 
-        Button scrollForward = new ()
+        ScrollButton scrollForward = new ()
         {
-            CanFocus = false,
-            NoDecorations = true,
-            NoPadding = true,
-            ShadowStyle = null,
-            Visible = false,
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             Id = ScrollForwardTag
         };
 
@@ -491,37 +479,33 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// <summary>
     ///     Positions scroll buttons within a tab's border based on <see cref="TabSide"/>.
     /// </summary>
-    private void PositionScrollButtons (Button scrollBack, Button scrollForward)
+    private void PositionScrollButtons (ScrollButton scrollBack, ScrollButton scrollForward)
     {
         bool isHorizontal = _tabSide is Side.Top or Side.Bottom;
 
         if (isHorizontal)
         {
             int separatorY = _tabSide == Side.Top ? TabDepth - 1 : 0;
-            scrollBack.Title = Glyphs.LeftArrow.ToString ();
+            scrollBack.Orientation = Orientation.Horizontal;
+            scrollBack.Direction = NavigationDirection.Backward;
             scrollBack.X = 0;
             scrollBack.Y = separatorY;
-            scrollBack.Width = 1;
-            scrollBack.Height = 1;
-            scrollForward.Title = Glyphs.RightArrow.ToString ();
+            scrollForward.Orientation = Orientation.Horizontal;
+            scrollForward.Direction = NavigationDirection.Forward;
             scrollForward.X = Pos.AnchorEnd ();
             scrollForward.Y = separatorY;
-            scrollForward.Width = 1;
-            scrollForward.Height = 1;
         }
         else
         {
             int separatorX = _tabSide == Side.Left ? TabDepth - 1 : 0;
-            scrollBack.Title = Glyphs.UpArrow.ToString ();
+            scrollBack.Orientation = Orientation.Vertical;
+            scrollBack.Direction = NavigationDirection.Backward;
             scrollBack.X = separatorX;
             scrollBack.Y = 0;
-            scrollBack.Width = 1;
-            scrollBack.Height = 1;
-            scrollForward.Title = Glyphs.DownArrow.ToString ();
+            scrollForward.Orientation = Orientation.Vertical;
+            scrollForward.Direction = NavigationDirection.Forward;
             scrollForward.X = separatorX;
             scrollForward.Y = Pos.AnchorEnd ();
-            scrollForward.Width = 1;
-            scrollForward.Height = 1;
         }
     }
 
@@ -537,8 +521,8 @@ public class Tabs : View, IValue<View?>, IDesignable
                 continue;
             }
 
-            Button? back = tab.Border.View.SubViews.OfType<Button> ().FirstOrDefault (b => b.Id == ScrollBackTag);
-            Button? forward = tab.Border.View.SubViews.OfType<Button> ().FirstOrDefault (b => b.Id == ScrollForwardTag);
+            ScrollButton? back = tab.Border.View.SubViews.OfType<ScrollButton> ().FirstOrDefault (b => b.Id == ScrollBackTag);
+            ScrollButton? forward = tab.Border.View.SubViews.OfType<ScrollButton> ().FirstOrDefault (b => b.Id == ScrollForwardTag);
 
             if (back is { } && forward is { })
             {
