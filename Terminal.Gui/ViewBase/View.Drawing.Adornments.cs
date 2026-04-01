@@ -76,7 +76,7 @@ public partial class View
         Region? savedPadding = paddingView.AddFrameToClip ();
         paddingView.DoDrawSubViews ();
 
-        // Merge any LineCanvas lines from Padding's SubViews (e.g., TabView's tab headers)
+        // Merge any LineCanvas lines from Padding's SubViews (e.g., Tabs tab headers)
         // into this View's LineCanvas. This ensures auto-join works between adornment subview
         // borders and the view's own border.
         if (paddingView.LineCanvas.Bounds != Rectangle.Empty)

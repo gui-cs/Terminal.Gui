@@ -474,9 +474,6 @@ public class Tabs : View, IValue<View?>, IDesignable
 
     #region Scrolling
 
-    private const string SCROLL_BACK_TAG = "TabScrollBack";
-    private const string SCROLL_FORWARD_TAG = "TabScrollForward";
-
     /// <summary>
     ///     Adds scroll indicator buttons to a tab's border. The buttons are positioned at the
     ///     start and end of the separator line and occlude it when visible.
@@ -484,11 +481,11 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// <param name="tab">The tab whose border receives the scroll buttons.</param>
     private void AddScrollButtonsToBorder (View tab)
     {
-        ScrollButton scrollBack = new () { Id = SCROLL_BACK_TAG };
+        ScrollButton scrollBack = new ();
 
         scrollBack.Accepting += (_, _) => { ScrollOffset--; };
 
-        ScrollButton scrollForward = new () { Id = SCROLL_FORWARD_TAG };
+        ScrollButton scrollForward = new ();
 
         scrollForward.Accepting += (_, _) => { ScrollOffset++; };
 
@@ -542,8 +539,8 @@ public class Tabs : View, IValue<View?>, IDesignable
                 continue;
             }
 
-            ScrollButton? back = tab.Border.View.SubViews.OfType<ScrollButton> ().FirstOrDefault (b => b.Id == SCROLL_BACK_TAG);
-            ScrollButton? forward = tab.Border.View.SubViews.OfType<ScrollButton> ().FirstOrDefault (b => b.Id == SCROLL_FORWARD_TAG);
+            ScrollButton? back = tab.Border.View.SubViews.OfType<ScrollButton> ().FirstOrDefault (b => b.Direction == NavigationDirection.Backward);
+            ScrollButton? forward = tab.Border.View.SubViews.OfType<ScrollButton> ().FirstOrDefault (b => b.Direction == NavigationDirection.Forward);
 
             if (back is { } && forward is { })
             {
@@ -570,14 +567,9 @@ public class Tabs : View, IValue<View?>, IDesignable
                 continue;
             }
 
-            foreach (Button btn in tab.Border.View.SubViews.OfType<Button> ())
+            foreach (ScrollButton btn in tab.Border.View.SubViews.OfType<ScrollButton> ())
             {
-                btn.Visible = btn.Id switch
-                              {
-                                  SCROLL_BACK_TAG => canScrollBack,
-                                  SCROLL_FORWARD_TAG => canScrollForward,
-                                  _ => btn.Visible
-                              };
+                btn.Visible = btn.Direction == NavigationDirection.Backward ? canScrollBack : canScrollForward;
             }
         }
     }
