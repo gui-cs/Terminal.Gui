@@ -81,11 +81,11 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
 
         DriverAssert.AssertDriverContentsAre ("""
                                               ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
-                                              ┊◄                ►          ┊
                                               ┊╭────╮────╮────╮──          ┊
                                               ┊│Tab1│Tab2│Tab3│Ta          ┊
-                                              ┊│    ╰────┴────┴─┬          ┊
+                                              ┊│    ╰────┴────┴─►          ┊
                                               ┊│Tab1 content    │          ┊
+                                              ┊│                │          ┊
                                               ┊╰────────────────╯          ┊
                                               └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
                                               """,
@@ -121,11 +121,11 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
 
         DriverAssert.AssertDriverContentsAre ("""
                                               ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
-                                              ┊◄                ►          ┊
                                               ┊╭────╮────╮────╮──          ┊
                                               ┊│Tab1│Tab2│Tab3│Ta          ┊
-                                              ┊│    ╰────┴────┴─┬          ┊
+                                              ┊│    ╰────┴────┴─►          ┊
                                               ┊│Tab1 content    │          ┊
+                                              ┊│                │          ┊
                                               ┊╰────────────────╯          ┊
                                               └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
                                               """,
@@ -141,11 +141,11 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
 
         DriverAssert.AssertDriverContentsAre ("""
                                               ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
-                                              ┊◄                ►          ┊
                                               ┊────╮────╮────╮───          ┊
                                               ┊Tab1│Tab2│Tab3│Tab          ┊
-                                              ┊│   ╰────┴────┴──┬          ┊
+                                              ┊◄   ╰────┴────┴──►          ┊
                                               ┊│Tab1 content    │          ┊
+                                              ┊│                │          ┊
                                               ┊╰────────────────╯          ┊
                                               └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
                                               """,
@@ -182,11 +182,11 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
 
         DriverAssert.AssertDriverContentsAre ("""
                                               ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
-                                              ┊◄                ►          ┊
                                               ┊╭────╮────╮────╮──          ┊
                                               ┊│Tab1│Tab2│Tab3│Ta          ┊
-                                              ┊│    ╰────┴────┴─┬          ┊
+                                              ┊│    ╰────┴────┴─►          ┊
                                               ┊│Tab1 content    │          ┊
+                                              ┊│                │          ┊
                                               ┊╰────────────────╯          ┊
                                               └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
                                               """,
@@ -202,11 +202,11 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
 
         DriverAssert.AssertDriverContentsAre ("""
                                               ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
-                                              ┊◄                ►          ┊
                                               ┊──╮────╮────╮────╮          ┊
                                               ┊b2│Tab3│Tab4│Tab5│          ┊
-                                              ┊┬─┴────┴────┴────┤          ┊
+                                              ┊◄─┴────┴────┴────┤          ┊
                                               ┊│Tab1 content    │          ┊
+                                              ┊│                │          ┊
                                               ┊╰────────────────╯          ┊
                                               └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
                                               """,
@@ -243,11 +243,11 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
 
         DriverAssert.AssertDriverContentsAre ("""
                                               ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
-                                              ┊◄                ►          ┊
                                               ┊──╭────╭────╭────╮          ┊
                                               ┊b2│Tab3│Tab4│Tab5│          ┊
-                                              ┊┬─┴────┴────╯    │          ┊
+                                              ┊◄─┴────┴────╯    │          ┊
                                               ┊│Tab5 content    │          ┊
+                                              ┊│                │          ┊
                                               ┊╰────────────────╯          ┊
                                               └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
                                               """,
@@ -263,11 +263,11 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
 
         DriverAssert.AssertDriverContentsAre ("""
                                               ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
-                                              ┊◄                ►          ┊
                                               ┊╭────╭────╭────╭──          ┊
                                               ┊│Tab1│Tab2│Tab3│Ta          ┊
-                                              ┊├────┴────┴────┴─┬          ┊
+                                              ┊├────┴────┴────┴─►          ┊
                                               ┊│Tab5 content    │          ┊
+                                              ┊│                │          ┊
                                               ┊╰────────────────╯          ┊
                                               └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
                                               """,
@@ -307,11 +307,11 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
 
         DriverAssert.AssertDriverContentsAre ("""
                                               ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
-                                              ┊◄                ►          ┊
                                               ┊╭────╭────╮────╮──          ┊
                                               ┊│Tab1│Tab2│Tab3│Ta          ┊
-                                              ┊├────╯    ╰────┴─┬          ┊
-                                              ┊│Tab2 content    │          ┊ 
+                                              ┊├────╯    ╰────┴─►          ┊
+                                              ┊│Tab2 content    │          ┊
+                                              ┊│                │          ┊
                                               ┊╰────────────────╯          ┊
                                               └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
                                               """,
@@ -360,11 +360,11 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         // _scrollOffset = 3 (minimum to show Tab4): Tab1 partially clipped, Tab5 partially visible
         DriverAssert.AssertDriverContentsAre ("""
                                               ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
-                                              ┊◄                ►          ┊
                                               ┊──╭────╮────╮────╮          ┊
                                               ┊b1│Tab2│Tab3│Tab4│          ┊
-                                              ┊┬─╯    ╰────┴────┼          ┊
+                                              ┊◄─╯    ╰────┴────►          ┊
                                               ┊│Tab2 content    │          ┊
+                                              ┊│                │          ┊
                                               ┊╰────────────────╯          ┊
                                               └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
                                               """,
@@ -406,11 +406,11 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         // _scrollOffset = 3 (minimum to show Tab4): Tab1 clipped by 3 chars, Tab5 at edge
         DriverAssert.AssertDriverContentsAre ("""
                                               ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
-                                              ┊◄                ►          ┊
                                               ┊──╭────╭────╭────╮          ┊
                                               ┊b1│Tab2│Tab3│Tab4│          ┊
-                                              ┊┬─┴────┴────╯    │          ┊
+                                              ┊◄─┴────┴────╯    ►          ┊
                                               ┊│Tab4 content    │          ┊
+                                              ┊│                │          ┊
                                               ┊╰────────────────╯          ┊
                                               └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
                                               """,
@@ -455,11 +455,11 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
 
         DriverAssert.AssertDriverContentsAre ("""
                                               ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
-                                              ┊◄                ►          ┊
                                               ┊╭────╮────╮────╮──          ┊
                                               ┊│Tab1│Tab2│Tab3│Ta          ┊
-                                              ┊│    ╰────┴────┴─┬          ┊
+                                              ┊│    ╰────┴────┴─►          ┊
                                               ┊│Tab1 content    │          ┊
+                                              ┊│                │          ┊
                                               ┊╰────────────────╯          ┊
                                               └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
                                               """,
@@ -703,10 +703,10 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Draw ();
 
         DriverAssert.AssertDriverContentsAre ("""
-                                              ◄        ►
                                               ╭────╮────
                                               │Tab1│Tab2
-                                              │    ╰───┬
+                                              │    ╰───►
+                                              │        │
                                               ╰────────╯
                                               """,
                                               output,

@@ -32,8 +32,6 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         Width = Dim.Fill ();
         Height = Dim.Fill ();
-
-        //SetupHeaderScrollBar ();
     }
 
     private readonly List<WeakReference<View>> _tabList = [];
@@ -102,9 +100,9 @@ public class Tabs : View, IValue<View?>, IDesignable
             _tabSide = value;
 
             UpdateTabBorderThickness ();
+            UpdateScrollButtonPositions ();
             UpdateTabOffsets ();
             UpdateZOrder ();
-            //PositionHeaderScrollBar ();
             SetNeedsLayout ();
         }
     }
@@ -222,11 +220,6 @@ public class Tabs : View, IValue<View?>, IDesignable
     {
         base.OnSubViewAdded (view);
 
-        if (view is ScrollBar)
-        {
-            return;
-        }
-
         // Add to internal tracking list
         _tabList.Add (new WeakReference<View> (view));
 
@@ -241,20 +234,9 @@ public class Tabs : View, IValue<View?>, IDesignable
         view.Height = Dim.Fill ();
         view.SuperViewRendersLineCanvas = true;
 
-        // Add a scrollbar across the top of the tab.
-        ScrollBar sb = new ScrollBar { VisibilityMode = ScrollBarVisibilityMode.Always };
-
-        sb.Slider.Visible = false;
-        sb.Slider.ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
-        sb.Visible = true;
-        sb.Orientation = Orientation.Horizontal;
-
-        sb.X = 0;
-        sb.Y = 2;
-        sb.Width = Dim.Fill ();
-        sb.Height = 1;
-        sb.ValueChanged += (_, args) => { ScrollOffset = args.NewValue; };
-        view.Border.View?.Add (sb);
+        // Add scroll indicator buttons to the tab's border.
+        // They occlude the separator line when visible, providing scroll affordance.
+        AddScrollButtonsToBorder (view);
 
         // Focus first tab added (common convention for tabbed interfaces).
         // Subsequent tabs will not steal focus when added.
@@ -380,8 +362,7 @@ public class Tabs : View, IValue<View?>, IDesignable
             }
         }
 
-        // Add 1 because the last tab's trailing border is not shared
-        UpdateScrollBarSizes (offset > 0 ? offset + 1 : 0);
+        UpdateScrollButtonVisibility ();
     }
 
     private int GetTotalHeaderSpan ()
@@ -444,126 +425,141 @@ public class Tabs : View, IValue<View?>, IDesignable
 
     #region Scrolling
 
-    //private ScrollBar? _headerScrollBar;
-
-    ///// <summary>
-    /////     Creates and configures the header scrollbar in the Border adornment.
-    /////     The scrollbar overlays the content border line; its slider is transparent
-    /////     so the border line shows through.
-    ///// </summary>
-    //private void SetupHeaderScrollBar ()
-    //{
-    //    _headerScrollBar = new ScrollBar { VisibilityMode = ScrollBarVisibilityMode.Auto, Arrangement = ViewArrangement.Overlapped};
-
-    //    _headerScrollBar.ViewportSettings = ViewportSettingsFlags.Transparent;
-    //    _headerScrollBar.Slider.Visible = false;
-    //    _headerScrollBar.Slider.ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
-    //    _headerScrollBar.Visible = false;
-
-    //    _headerScrollBar.ValueChanged += (_, args) => { ScrollOffset = args.NewValue; };
-
-    //    PositionHeaderScrollBar ();
-    //}
-
-    ///// <summary>
-    /////     Adds the header scrollbar to Padding. Called after initialization to avoid
-    /////     modifying the subview collection during EndInit enumeration.
-    ///// </summary>
-    //private void AddHeaderScrollBarToPadding ()
-    //{
-    //    if (_headerScrollBar is null || _headerScrollBarAdded)
-    //    {
-    //        return;
-    //    }
-
-    //    Padding.GetOrCreateView ();
-    //    Padding.View!.Add (_headerScrollBar);
-    //    _headerScrollBarAdded = true;
-    //}
-
-    //private bool _headerScrollBarAdded;
-
-    ///// <summary>
-    /////     Positions and orients the header scrollbar based on <see cref="TabSide"/>.
-    ///// </summary>
-    //private void PositionHeaderScrollBar ()
-    //{
-    //    if (_headerScrollBar is null)
-    //    {
-    //        return;
-    //    }
-
-    //    switch (_tabSide)
-    //    {
-    //        case Side.Top:
-    //            _headerScrollBar.Orientation = Orientation.Horizontal;
-    //            _headerScrollBar.X = 0;
-    //            _headerScrollBar.Y = 0;
-    //            _headerScrollBar.Width = Dim.Fill ();
-    //            _headerScrollBar.Height = 1;
-
-    //            break;
-
-    //        case Side.Bottom:
-    //            _headerScrollBar.Orientation = Orientation.Horizontal;
-    //            _headerScrollBar.X = 0;
-    //            _headerScrollBar.Y = Pos.AnchorEnd () - 2;
-    //            _headerScrollBar.Width = Dim.Fill ();
-    //            _headerScrollBar.Height = 1;
-
-    //            break;
-
-    //        case Side.Left:
-    //            _headerScrollBar.Orientation = Orientation.Vertical;
-    //            _headerScrollBar.X = 2;
-    //            _headerScrollBar.Y = 0;
-    //            _headerScrollBar.Width = 1;
-    //            _headerScrollBar.Height = Dim.Fill ();
-
-    //            break;
-
-    //        case Side.Right:
-    //            _headerScrollBar.Orientation = Orientation.Vertical;
-    //            _headerScrollBar.X = Pos.AnchorEnd () - 1;
-    //            _headerScrollBar.Y = 0;
-    //            _headerScrollBar.Width = 1;
-    //            _headerScrollBar.Height = Dim.Fill ();
-
-    //            break;
-    //    }
-    //}
+    private const string ScrollBackTag = "TabScrollBack";
+    private const string ScrollForwardTag = "TabScrollForward";
 
     /// <summary>
-    ///     Updates the header scrollbar's <see cref="ScrollBar.ScrollableContentSize"/>
-    ///     and <see cref="ScrollBar.VisibleContentSize"/> based on the total tab header span.
+    ///     Adds scroll indicator buttons to a tab's border. The buttons are positioned at the
+    ///     start and end of the separator line and occlude it when visible.
     /// </summary>
-    /// <param name="totalHeaderSpan">The total cumulative width (or height) of all tab headers.</param>
-    private void UpdateScrollBarSizes (int totalHeaderSpan)
+    /// <param name="tab">The tab whose border receives the scroll buttons.</param>
+    private void AddScrollButtonsToBorder (View tab)
     {
-        //if (_headerScrollBar is null)
-        //{
-        //    return;
-        //}
+        Button scrollBack = new ()
+        {
+            CanFocus = false,
+            NoDecorations = true,
+            NoPadding = true,
+            ShadowStyle = null,
+            Visible = false,
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased,
+            Id = ScrollBackTag
+        };
 
-        //_headerScrollBar.ScrollableContentSize = totalHeaderSpan;
+        scrollBack.Accepting += (_, e) =>
+                               {
+                                   ScrollOffset--;
+                               };
 
-        //_headerScrollBar.VisibleContentSize = _tabSide is Side.Top or Side.Bottom ? Viewport.Width : Viewport.Height;
+        Button scrollForward = new ()
+        {
+            CanFocus = false,
+            NoDecorations = true,
+            NoPadding = true,
+            ShadowStyle = null,
+            Visible = false,
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased, 
+            Id = ScrollForwardTag
+        };
 
-        //int scrollBarSize = _headerScrollBar.Visible ? 1 : 0;
+        scrollForward.Accepting += (_, e) =>
+                                   {
+                                       ScrollOffset++;
+                                   };
 
-        //Padding.Thickness = _tabSide switch
-        //{
-        //    Side.Top => new Thickness (0, scrollBarSize, 0, 0),
-        //    Side.Bottom => new Thickness (0, 0, 0, scrollBarSize),
-        //    Side.Left => new Thickness (scrollBarSize, 0, 0, 0),
-        //    Side.Right => new Thickness (0, 0, scrollBarSize, 0),
-        //    _ => new Thickness (0, scrollBarSize, 0, 0)
-        //};
+        PositionScrollButtons (scrollBack, scrollForward);
+
+        tab.Border.View?.Add (scrollBack, scrollForward);
+    }
+
+    /// <summary>
+    ///     Positions scroll buttons within a tab's border based on <see cref="TabSide"/>.
+    /// </summary>
+    private void PositionScrollButtons (Button scrollBack, Button scrollForward)
+    {
+        bool isHorizontal = _tabSide is Side.Top or Side.Bottom;
+
+        if (isHorizontal)
+        {
+            int separatorY = _tabSide == Side.Top ? TabDepth - 1 : 0;
+            scrollBack.Title = Glyphs.LeftArrow.ToString ();
+            scrollBack.X = 0;
+            scrollBack.Y = separatorY;
+            scrollBack.Width = 1;
+            scrollBack.Height = 1;
+            scrollForward.Title = Glyphs.RightArrow.ToString ();
+            scrollForward.X = Pos.AnchorEnd ();
+            scrollForward.Y = separatorY;
+            scrollForward.Width = 1;
+            scrollForward.Height = 1;
+        }
+        else
+        {
+            int separatorX = _tabSide == Side.Left ? TabDepth - 1 : 0;
+            scrollBack.Title = Glyphs.UpArrow.ToString ();
+            scrollBack.X = separatorX;
+            scrollBack.Y = 0;
+            scrollBack.Width = 1;
+            scrollBack.Height = 1;
+            scrollForward.Title = Glyphs.DownArrow.ToString ();
+            scrollForward.X = separatorX;
+            scrollForward.Y = Pos.AnchorEnd ();
+            scrollForward.Width = 1;
+            scrollForward.Height = 1;
+        }
+    }
+
+    /// <summary>
+    ///     Repositions all scroll indicator buttons when <see cref="TabSide"/> or <see cref="TabDepth"/> changes.
+    /// </summary>
+    private void UpdateScrollButtonPositions ()
+    {
+        foreach (View tab in TabCollection)
+        {
+            if (tab.Border.View is null)
+            {
+                continue;
+            }
+
+            Button? back = tab.Border.View.SubViews.OfType<Button> ().FirstOrDefault (b => b.Id == ScrollBackTag);
+            Button? forward = tab.Border.View.SubViews.OfType<Button> ().FirstOrDefault (b => b.Id == ScrollForwardTag);
+
+            if (back is { } && forward is { })
+            {
+                PositionScrollButtons (back, forward);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Updates the visibility of all scroll indicator buttons across all tabs
+    ///     based on the current <see cref="ScrollOffset"/> and total header span.
+    /// </summary>
+    private void UpdateScrollButtonVisibility ()
+    {
+        int totalSpan = GetTotalHeaderSpan ();
+        int visibleSize = _tabSide is Side.Top or Side.Bottom ? Viewport.Width : Viewport.Height;
+        bool canScrollBack = ScrollOffset > 0;
+        bool canScrollForward = totalSpan > ScrollOffset + visibleSize;
 
         foreach (View tab in TabCollection)
         {
-            tab.Border.View?.SubViews.OfType<ScrollBar>().FirstOrDefault()?.ScrollableContentSize = totalHeaderSpan;
-            tab.Border.View?.SubViews.OfType<ScrollBar> ().FirstOrDefault ()?.VisibleContentSize = _tabSide is Side.Top or Side.Bottom ? Viewport.Width : Viewport.Height;
+            if (tab.Border.View is null)
+            {
+                continue;
+            }
+
+            foreach (Button btn in tab.Border.View.SubViews.OfType<Button> ())
+            {
+                if (btn.Id == ScrollBackTag)
+                {
+                    btn.Visible = canScrollBack;
+                }
+                else if (btn.Id == ScrollForwardTag)
+                {
+                    btn.Visible = canScrollForward;
+                }
+            }
         }
     }
 
@@ -612,7 +608,7 @@ public class Tabs : View, IValue<View?>, IDesignable
             }
 
             UpdateTabOffsets ();
-            UpdateZOrder ();
+            //UpdateZOrder ();
             SetNeedsLayout ();
         }
     }
@@ -633,9 +629,6 @@ public class Tabs : View, IValue<View?>, IDesignable
             return;
         }
 
-        // Ensure the scrollbar is added to Padding (deferred from constructor)
-        //AddHeaderScrollBarToPadding ();
-
         EnsureTabVisible (Value);
     }
 
@@ -644,7 +637,6 @@ public class Tabs : View, IValue<View?>, IDesignable
     {
         base.OnSubViewLayout (args);
 
-        // Update scrollbar visibility/sizing
         UpdateTabOffsets ();
     }
 
@@ -687,10 +679,6 @@ public class Tabs : View, IValue<View?>, IDesignable
             ScrollOffset = tabEnd - visibleSize;
         }
 
-        foreach (View t2 in TabCollection)
-        {
-            t2.Border.View?.SubViews.OfType<ScrollBar> ().FirstOrDefault ()?.Value = ScrollOffset;
-        }
         UpdateTabOffsets ();
     }
 
