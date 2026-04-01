@@ -33,7 +33,7 @@ public class Tabs : View, IValue<View?>, IDesignable
         Width = Dim.Fill ();
         Height = Dim.Fill ();
 
-        SetupHeaderScrollBar ();
+        //SetupHeaderScrollBar ();
     }
 
     private readonly List<WeakReference<View>> _tabList = [];
@@ -104,7 +104,7 @@ public class Tabs : View, IValue<View?>, IDesignable
             UpdateTabBorderThickness ();
             UpdateTabOffsets ();
             UpdateZOrder ();
-            PositionHeaderScrollBar ();
+            //PositionHeaderScrollBar ();
             SetNeedsLayout ();
         }
     }
@@ -222,6 +222,11 @@ public class Tabs : View, IValue<View?>, IDesignable
     {
         base.OnSubViewAdded (view);
 
+        if (view is ScrollBar)
+        {
+            return;
+        }
+
         // Add to internal tracking list
         _tabList.Add (new WeakReference<View> (view));
 
@@ -235,6 +240,21 @@ public class Tabs : View, IValue<View?>, IDesignable
         view.Width = Dim.Fill ();
         view.Height = Dim.Fill ();
         view.SuperViewRendersLineCanvas = true;
+
+        // Add a scrollbar across the top of the tab.
+        ScrollBar sb = new ScrollBar { VisibilityMode = ScrollBarVisibilityMode.Always };
+
+        sb.Slider.Visible = false;
+        sb.Slider.ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
+        sb.Visible = true;
+        sb.Orientation = Orientation.Horizontal;
+
+        sb.X = 0;
+        sb.Y = 2;
+        sb.Width = Dim.Fill ();
+        sb.Height = 1;
+        sb.ValueChanged += (_, args) => { ScrollOffset = args.NewValue; };
+        view.Border.View?.Add (sb);
 
         // Focus first tab added (common convention for tabbed interfaces).
         // Subsequent tabs will not steal focus when added.
@@ -364,6 +384,22 @@ public class Tabs : View, IValue<View?>, IDesignable
         UpdateScrollBarSizes (offset > 0 ? offset + 1 : 0);
     }
 
+    private int GetTotalHeaderSpan ()
+    {
+        var span = 0;
+        foreach (View tab in TabCollection)
+        {
+            int? tabLength = tab.Border.TabLength;
+            if (tabLength is { })
+            {
+                // Subtract 1 because adjacent tabs share an edge
+                span += tabLength.Value - 1;
+            }
+        }
+        // Add 1 because the last tab's trailing border is not shared
+        return span > 0 ? span + 1 : 0;
+    }
+
     /// <summary>
     ///     Gets or sets the depth of the tab. The default is 3, which means the tab will have room for the outside border,
     ///     title, and a 1-character tab border. Adjust this if you have a thicker border or want more/less space in the tab
@@ -408,23 +444,127 @@ public class Tabs : View, IValue<View?>, IDesignable
 
     #region Scrolling
 
-    private ScrollBar? _headerScrollBar;
+    //private ScrollBar? _headerScrollBar;
+
+    ///// <summary>
+    /////     Creates and configures the header scrollbar in the Border adornment.
+    /////     The scrollbar overlays the content border line; its slider is transparent
+    /////     so the border line shows through.
+    ///// </summary>
+    //private void SetupHeaderScrollBar ()
+    //{
+    //    _headerScrollBar = new ScrollBar { VisibilityMode = ScrollBarVisibilityMode.Auto, Arrangement = ViewArrangement.Overlapped};
+
+    //    _headerScrollBar.ViewportSettings = ViewportSettingsFlags.Transparent;
+    //    _headerScrollBar.Slider.Visible = false;
+    //    _headerScrollBar.Slider.ViewportSettings = ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
+    //    _headerScrollBar.Visible = false;
+
+    //    _headerScrollBar.ValueChanged += (_, args) => { ScrollOffset = args.NewValue; };
+
+    //    PositionHeaderScrollBar ();
+    //}
+
+    ///// <summary>
+    /////     Adds the header scrollbar to Padding. Called after initialization to avoid
+    /////     modifying the subview collection during EndInit enumeration.
+    ///// </summary>
+    //private void AddHeaderScrollBarToPadding ()
+    //{
+    //    if (_headerScrollBar is null || _headerScrollBarAdded)
+    //    {
+    //        return;
+    //    }
+
+    //    Padding.GetOrCreateView ();
+    //    Padding.View!.Add (_headerScrollBar);
+    //    _headerScrollBarAdded = true;
+    //}
+
+    //private bool _headerScrollBarAdded;
+
+    ///// <summary>
+    /////     Positions and orients the header scrollbar based on <see cref="TabSide"/>.
+    ///// </summary>
+    //private void PositionHeaderScrollBar ()
+    //{
+    //    if (_headerScrollBar is null)
+    //    {
+    //        return;
+    //    }
+
+    //    switch (_tabSide)
+    //    {
+    //        case Side.Top:
+    //            _headerScrollBar.Orientation = Orientation.Horizontal;
+    //            _headerScrollBar.X = 0;
+    //            _headerScrollBar.Y = 0;
+    //            _headerScrollBar.Width = Dim.Fill ();
+    //            _headerScrollBar.Height = 1;
+
+    //            break;
+
+    //        case Side.Bottom:
+    //            _headerScrollBar.Orientation = Orientation.Horizontal;
+    //            _headerScrollBar.X = 0;
+    //            _headerScrollBar.Y = Pos.AnchorEnd () - 2;
+    //            _headerScrollBar.Width = Dim.Fill ();
+    //            _headerScrollBar.Height = 1;
+
+    //            break;
+
+    //        case Side.Left:
+    //            _headerScrollBar.Orientation = Orientation.Vertical;
+    //            _headerScrollBar.X = 2;
+    //            _headerScrollBar.Y = 0;
+    //            _headerScrollBar.Width = 1;
+    //            _headerScrollBar.Height = Dim.Fill ();
+
+    //            break;
+
+    //        case Side.Right:
+    //            _headerScrollBar.Orientation = Orientation.Vertical;
+    //            _headerScrollBar.X = Pos.AnchorEnd () - 1;
+    //            _headerScrollBar.Y = 0;
+    //            _headerScrollBar.Width = 1;
+    //            _headerScrollBar.Height = Dim.Fill ();
+
+    //            break;
+    //    }
+    //}
 
     /// <summary>
-    ///     Creates and configures the header scrollbar in the Border adornment.
-    ///     The scrollbar overlays the content border line; its slider is transparent
-    ///     so the border line shows through.
+    ///     Updates the header scrollbar's <see cref="ScrollBar.ScrollableContentSize"/>
+    ///     and <see cref="ScrollBar.VisibleContentSize"/> based on the total tab header span.
     /// </summary>
-    private void SetupHeaderScrollBar ()
+    /// <param name="totalHeaderSpan">The total cumulative width (or height) of all tab headers.</param>
+    private void UpdateScrollBarSizes (int totalHeaderSpan)
     {
-        _headerScrollBar = new ScrollBar { VisibilityMode = ScrollBarVisibilityMode.Auto };
+        //if (_headerScrollBar is null)
+        //{
+        //    return;
+        //}
 
-        _headerScrollBar.Slider.Visible = false;
-        _headerScrollBar.Visible = false;
+        //_headerScrollBar.ScrollableContentSize = totalHeaderSpan;
 
-        _headerScrollBar.ValueChanged += (_, args) => { ScrollOffset = args.NewValue; };
+        //_headerScrollBar.VisibleContentSize = _tabSide is Side.Top or Side.Bottom ? Viewport.Width : Viewport.Height;
 
-        PositionHeaderScrollBar ();
+        //int scrollBarSize = _headerScrollBar.Visible ? 1 : 0;
+
+        //Padding.Thickness = _tabSide switch
+        //{
+        //    Side.Top => new Thickness (0, scrollBarSize, 0, 0),
+        //    Side.Bottom => new Thickness (0, 0, 0, scrollBarSize),
+        //    Side.Left => new Thickness (scrollBarSize, 0, 0, 0),
+        //    Side.Right => new Thickness (0, 0, scrollBarSize, 0),
+        //    _ => new Thickness (0, scrollBarSize, 0, 0)
+        //};
+
+        foreach (View tab in TabCollection)
+        {
+            tab.Border.View?.SubViews.OfType<ScrollBar>().FirstOrDefault()?.ScrollableContentSize = totalHeaderSpan;
+            tab.Border.View?.SubViews.OfType<ScrollBar> ().FirstOrDefault ()?.VisibleContentSize = _tabSide is Side.Top or Side.Bottom ? Viewport.Width : Viewport.Height;
+        }
     }
 
     /// <summary>
@@ -451,14 +591,14 @@ public class Tabs : View, IValue<View?>, IDesignable
                 return;
             }
 
-            if (value > _headerScrollBar?.ScrollableContentSize)
+            if (value > GetTotalHeaderSpan ())
             {
                 // If value is greater than the maximum scroll offset, clamp it such that the last tab is flush with the edge of the viewport
                 View? last = TabCollection.LastOrDefault ();
 
                 if (last is { })
                 {
-                    field = _headerScrollBar?.ScrollableContentSize - (last.Border.TabOffset - 2) ?? 0;
+                    field = GetTotalHeaderSpan () - (last.Border.TabOffset - 2);
                 }
             }
             else if (value < 0)
@@ -475,102 +615,6 @@ public class Tabs : View, IValue<View?>, IDesignable
             UpdateZOrder ();
             SetNeedsLayout ();
         }
-    }
-
-    /// <summary>
-    ///     Adds the header scrollbar to Padding. Called after initialization to avoid
-    ///     modifying the subview collection during EndInit enumeration.
-    /// </summary>
-    private void AddHeaderScrollBarToPadding ()
-    {
-        if (_headerScrollBar is null || _headerScrollBarAdded)
-        {
-            return;
-        }
-
-        Padding.GetOrCreateView ();
-        Padding.View!.Add (_headerScrollBar);
-        _headerScrollBarAdded = true;
-    }
-
-    private bool _headerScrollBarAdded;
-
-    /// <summary>
-    ///     Positions and orients the header scrollbar based on <see cref="TabSide"/>.
-    /// </summary>
-    private void PositionHeaderScrollBar ()
-    {
-        if (_headerScrollBar is null)
-        {
-            return;
-        }
-
-        switch (_tabSide)
-        {
-            case Side.Top:
-                _headerScrollBar.Orientation = Orientation.Horizontal;
-                _headerScrollBar.X = 0;
-                _headerScrollBar.Y = 0;
-                _headerScrollBar.Width = Dim.Fill ();
-                _headerScrollBar.Height = 1;
-
-                break;
-
-            case Side.Bottom:
-                _headerScrollBar.Orientation = Orientation.Horizontal;
-                _headerScrollBar.X = 0;
-                _headerScrollBar.Y = Pos.AnchorEnd ();
-                _headerScrollBar.Width = Dim.Fill ();
-                _headerScrollBar.Height = 1;
-
-                break;
-
-            case Side.Left:
-                _headerScrollBar.Orientation = Orientation.Vertical;
-                _headerScrollBar.X = 0;
-                _headerScrollBar.Y = 0;
-                _headerScrollBar.Width = 1;
-                _headerScrollBar.Height = Dim.Fill ();
-
-                break;
-
-            case Side.Right:
-                _headerScrollBar.Orientation = Orientation.Vertical;
-                _headerScrollBar.X = Pos.AnchorEnd ();
-                _headerScrollBar.Y = 0;
-                _headerScrollBar.Width = 1;
-                _headerScrollBar.Height = Dim.Fill ();
-
-                break;
-        }
-    }
-
-    /// <summary>
-    ///     Updates the header scrollbar's <see cref="ScrollBar.ScrollableContentSize"/>
-    ///     and <see cref="ScrollBar.VisibleContentSize"/> based on the total tab header span.
-    /// </summary>
-    /// <param name="totalHeaderSpan">The total cumulative width (or height) of all tab headers.</param>
-    private void UpdateScrollBarSizes (int totalHeaderSpan)
-    {
-        if (_headerScrollBar is null)
-        {
-            return;
-        }
-
-        _headerScrollBar.ScrollableContentSize = totalHeaderSpan;
-
-        _headerScrollBar.VisibleContentSize = _tabSide is Side.Top or Side.Bottom ? Viewport.Width : Viewport.Height;
-
-        int scrollBarSize = _headerScrollBar.Visible ? 1 : 0;
-
-        Padding.Thickness = _tabSide switch
-        {
-            Side.Top => new Thickness (0, scrollBarSize, 0, 0),
-            Side.Bottom => new Thickness (0, 0, 0, scrollBarSize),
-            Side.Left => new Thickness (scrollBarSize, 0, 0, 0),
-            Side.Right => new Thickness (0, 0, scrollBarSize, 0),
-            _ => new Thickness (0, scrollBarSize, 0, 0)
-        };
     }
 
     /// <inheritdoc/>
@@ -590,7 +634,7 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
 
         // Ensure the scrollbar is added to Padding (deferred from constructor)
-        AddHeaderScrollBarToPadding ();
+        //AddHeaderScrollBarToPadding ();
 
         EnsureTabVisible (Value);
     }
@@ -643,8 +687,10 @@ public class Tabs : View, IValue<View?>, IDesignable
             ScrollOffset = tabEnd - visibleSize;
         }
 
-        _headerScrollBar?.Value = ScrollOffset;
-
+        foreach (View t2 in TabCollection)
+        {
+            t2.Border.View?.SubViews.OfType<ScrollBar> ().FirstOrDefault ()?.Value = ScrollOffset;
+        }
         UpdateTabOffsets ();
     }
 
