@@ -1158,4 +1158,181 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     }
 
     #endregion
+
+    #region ScrollOffset Clamping Tests
+
+    [Fact]
+    public void ScrollOffset_NegativeValue_ClampedToZero ()
+    {
+        // Claude - Opus 4.6
+        IDriver driver = CreateTestDriver (20, 5);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 5 };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        tabs.Add (tab1, tab2);
+        tabs.Layout ();
+
+        tabs.ScrollOffset = -5;
+
+        Assert.Equal (0, tabs.ScrollOffset);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void ScrollOffset_Zero_IsValid ()
+    {
+        // Claude - Opus 4.6
+        IDriver driver = CreateTestDriver (20, 5);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 5 };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        tabs.Add (tab1, tab2);
+        tabs.Layout ();
+
+        tabs.ScrollOffset = 0;
+
+        Assert.Equal (0, tabs.ScrollOffset);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void ScrollOffset_ExceedsScrollableContent_IsClamped ()
+    {
+        // Claude - Opus 4.6
+        IDriver driver = CreateTestDriver (10, 5);
+        Tabs tabs = new () { Driver = driver, Width = 10, Height = 5 };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        // Total header span is 16 (3 tabs × 6 - 2 shared edges).
+        // Setting an absurdly high value should be clamped.
+        tabs.ScrollOffset = 100;
+
+        Assert.True (tabs.ScrollOffset < 100, "ScrollOffset should be clamped when exceeding scrollable content");
+        Assert.True (tabs.ScrollOffset >= 0, "ScrollOffset should never be negative after clamping");
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void ScrollOffset_ValidMiddleValue_IsAccepted ()
+    {
+        // Claude - Opus 4.6
+        IDriver driver = CreateTestDriver (10, 5);
+        Tabs tabs = new () { Driver = driver, Width = 10, Height = 5 };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        // A value within the valid range should be accepted as-is
+        tabs.ScrollOffset = 3;
+
+        Assert.Equal (3, tabs.ScrollOffset);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void ScrollOffset_SameValue_DoesNotChange ()
+    {
+        // Claude - Opus 4.6
+        IDriver driver = CreateTestDriver (10, 5);
+        Tabs tabs = new () { Driver = driver, Width = 10, Height = 5 };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        tabs.ScrollOffset = 3;
+        int offsetAfterFirst = tabs.ScrollOffset;
+
+        // Setting same value again should be a no-op
+        tabs.ScrollOffset = 3;
+
+        Assert.Equal (offsetAfterFirst, tabs.ScrollOffset);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void ScrollOffset_NoTabs_StaysAtZero ()
+    {
+        // Claude - Opus 4.6
+        IDriver driver = CreateTestDriver (10, 5);
+        Tabs tabs = new () { Driver = driver, Width = 10, Height = 5 };
+        tabs.Layout ();
+
+        tabs.ScrollOffset = 5;
+
+        // With no tabs, there's nothing to scroll
+        Assert.Equal (0, tabs.ScrollOffset);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void ScrollOffset_AllTabsFit_ValueIsAccepted ()
+    {
+        // Claude - Opus 4.6
+        // When all tabs fit, there's no scrollbar constraining the value,
+        // so the setter accepts it. EnsureTabVisible will keep it at 0
+        // when selecting tabs, but direct assignment is not clamped here.
+        IDriver driver = CreateTestDriver (20, 5);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 5 };
+
+        View tab1 = new () { Title = "A" };
+        View tab2 = new () { Title = "B" };
+        tabs.Add (tab1, tab2);
+        tabs.Layout ();
+
+        // Two tiny tabs (TabLength = 3 each, total span = 5) fit in 20 columns.
+        tabs.ScrollOffset = 3;
+
+        Assert.Equal (3, tabs.ScrollOffset);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void ScrollOffset_UpdatesTabOffsets ()
+    {
+        // Claude - Opus 4.6
+        IDriver driver = CreateTestDriver (10, 5);
+        Tabs tabs = new () { Driver = driver, Width = 10, Height = 5 };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        // Before scrolling — natural offsets
+        Assert.Equal (0, tab1.Border.TabOffset);
+        Assert.Equal (5, tab2.Border.TabOffset);
+        Assert.Equal (10, tab3.Border.TabOffset);
+
+        // After scrolling — offsets shift by scroll amount
+        tabs.ScrollOffset = 4;
+
+        Assert.Equal (-4, tab1.Border.TabOffset);
+        Assert.Equal (1, tab2.Border.TabOffset);
+        Assert.Equal (6, tab3.Border.TabOffset);
+
+        tabs.Dispose ();
+    }
+
+    #endregion
 }

@@ -430,6 +430,17 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// <summary>
     ///     Gets or sets the current scroll offset for the tab headers. Adjusting this value scrolls the tab headers.
     /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         The value is clamped to a valid range: negative values are clamped to <c>0</c>, and values exceeding
+    ///         the maximum scrollable extent (determined by the total header span and viewport size) are clamped so that
+    ///         the last tab remains flush with the trailing edge of the viewport.
+    ///     </para>
+    ///     <para>
+    ///         Setting this property updates all tab <see cref="Border.TabOffset"/> values, refreshes
+    ///         the z-order, and triggers a layout pass.
+    ///     </para>
+    /// </remarks>
     public int ScrollOffset
     {
         get;
