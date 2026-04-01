@@ -3,22 +3,30 @@ using System.Collections.ObjectModel;
 namespace Terminal.Gui.Views;
 
 /// <summary>
-///     A container <see cref="View"/> that manages a collection of <see cref="View"/> SubViews,
-///     rendering them as a tabbed interface. The currently focused view is the selected tab.
+///     A tabbed container <see cref="View"/> that renders each SubView as a selectable tab with a header drawn by
+///     <see cref="Border"/>. The currently focused SubView is the selected (front-most) tab.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Add any <see cref="View"/> instances as SubViews via <see cref="View.Add(View)"/>. The <see cref="Tabs"/>
-///         container automatically configures tab-related properties (border settings, thickness, arrangement,
-///         and z-order) on each added view.
+///         Add any <see cref="View"/> instances via <see cref="View.Add(View)"/>. Each added view is automatically
+///         configured with <see cref="BorderSettings.Tab"/>, <see cref="ViewArrangement.Overlapped"/> arrangement,
+///         and a <see cref="IAdornment.Thickness"/> derived from <see cref="TabDepth"/> and <see cref="TabSide"/>.
 ///     </para>
 ///     <para>
-///         The selected tab is determined by focus — whichever view has focus is the
-///         selected tab. Use <see cref="Value"/> to get or set the selected view.
+///         The selected tab is determined by focus — whichever SubView has focus is drawn on top
+///         and reported as the <see cref="Value"/>. Set <see cref="Value"/> programmatically to switch tabs.
 ///     </para>
 ///     <para>
-///         Implements <see cref="IValue{T}"/> with <c>View?</c> as the value type, enabling
-///         integration with the command/prompt system.
+///         Logical tab order is maintained separately from the draw order (<see cref="View.SubViews"/>).
+///         Use <see cref="TabCollection"/> to enumerate tabs in logical order, and <see cref="InsertTab"/>
+///         to add a tab at a specific position.
+///     </para>
+///     <para>
+///         When tabs overflow the available space, scroll indicator buttons appear on the separator line
+///         of each tab's border. Use <see cref="ScrollOffset"/> to scroll programmatically.
+///     </para>
+///     <para>
+///         In earlier versions of Terminal.Gui, `TabView` provided similar functionality.
 ///     </para>
 /// </remarks>
 public class Tabs : View, IValue<View?>, IDesignable
@@ -51,8 +59,8 @@ public class Tabs : View, IValue<View?>, IDesignable
     }
 
     /// <summary>
-    ///     Gets the tabs in logical order, which may differ from SubViews order
-    ///     due to z-ordering of the focused tab.
+    ///     Gets the tabs in logical order. This may differ from <see cref="View.SubViews"/> order because
+    ///     the focused tab is moved to the end of the draw list to render on top.
     /// </summary>
     public IEnumerable<View> TabCollection => ResolveTabCollection ();
 
@@ -84,8 +92,9 @@ public class Tabs : View, IValue<View?>, IDesignable
     ///     Gets or sets which side the tab headers are displayed on.
     /// </summary>
     /// <remarks>
-    ///     Changing this property updates the <see cref="Border.TabSide"/> and
-    ///     <see cref="Drawing.Thickness"/> of all tab SubViews.
+    ///     Changing this property updates the <see cref="Border.TabSide"/>,
+    ///     <see cref="IAdornment.Thickness"/>, scroll button positions, tab offsets,
+    ///     and z-order for all tab SubViews.
     /// </remarks>
     public Side TabSide
     {
@@ -111,7 +120,7 @@ public class Tabs : View, IValue<View?>, IDesignable
 
     /// <summary>
     ///     Gets or sets the <see cref="LineStyle"/> used for tab borders.
-    ///     When set, updates all tab SubViews.
+    ///     When set, updates the <see cref="View.BorderStyle"/> of all existing tab SubViews.
     /// </summary>
     public LineStyle TabLineStyle
     {
@@ -135,10 +144,14 @@ public class Tabs : View, IValue<View?>, IDesignable
     }
 
     /// <summary>
-    ///     Gets or sets the depth of the tab. The default is 3, which means the tab will have room for the outside border,
-    ///     title, and a 1-character tab border. Adjust this if you have a thicker border or want more/less space in the tab
-    ///     header.
+    ///     Gets or sets the depth of the tab header in rows (for <see cref="Side.Top"/>/<see cref="Side.Bottom"/>)
+    ///     or columns (for <see cref="Side.Left"/>/<see cref="Side.Right"/>). The default is 3, which provides room
+    ///     for the outside border, title text, and a 1-character separator line.
     /// </summary>
+    /// <remarks>
+    ///     Changing this value updates the <see cref="IAdornment.Thickness"/> of all tab SubViews. The depth determines
+    ///     how much of the border is allocated to the tab header vs. the content area.
+    /// </remarks>
     public int TabDepth
     {
         get;
@@ -178,8 +191,8 @@ public class Tabs : View, IValue<View?>, IDesignable
     private View? _value;
 
     /// <summary>
-    ///     Gets or sets the currently selected tab view.
-    ///     Setting this focuses the specified view.
+    ///     Gets or sets the currently selected tab view. Setting this focuses the specified view,
+    ///     scrolls the tab headers to ensure it is visible, and updates the z-order so it draws on top.
     /// </summary>
     public View? Value { get => _value; set => ChangeValue (value); }
 
@@ -254,7 +267,11 @@ public class Tabs : View, IValue<View?>, IDesignable
 
     #region SubView Management
 
-    /// <inheritdoc/>
+    /// <summary>
+    ///     Handles addition of a SubView by configuring it as a tab: sets <see cref="BorderSettings.Tab"/>,
+    ///     <see cref="ViewArrangement.Overlapped"/>, adds scroll buttons to its border, and appends it to
+    ///     the logical <see cref="TabCollection"/>.
+    /// </summary>
     protected override void OnSubViewAdded (View view)
     {
         base.OnSubViewAdded (view);
@@ -286,7 +303,10 @@ public class Tabs : View, IValue<View?>, IDesignable
         UpdateTabOffsets ();
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    ///     Handles removal of a SubView by removing it from the logical tab list.
+    ///     If the removed view was the selected tab, the first remaining tab is selected.
+    /// </summary>
     protected override void OnSubViewRemoved (View view)
     {
         base.OnSubViewRemoved (view);
@@ -317,10 +337,11 @@ public class Tabs : View, IValue<View?>, IDesignable
     }
 
     /// <summary>
-    ///     Inserts a view as a tab at the specified logical index. The view is added as a SubView
-    ///     and configured as a tab, but placed at <paramref name="index"/> in the logical tab order.
+    ///     Inserts a view as a tab at the specified logical index. The view is added as a SubView,
+    ///     configured with tab border settings (same as <see cref="View.Add(View)"/>), and placed at
+    ///     <paramref name="index"/> in the <see cref="TabCollection"/> order.
     /// </summary>
-    /// <param name="index">The zero-based index at which to insert the tab.</param>
+    /// <param name="index">The zero-based index at which to insert the tab. Clamped to the valid range.</param>
     /// <param name="view">The view to insert.</param>
     public void InsertTab (int index, View view)
     {
@@ -404,6 +425,11 @@ public class Tabs : View, IValue<View?>, IDesignable
         UpdateScrollButtonVisibility ();
     }
 
+    /// <summary>
+    ///     Computes the total width (or height, for vertical tabs) of all tab headers, accounting for shared
+    ///     borders between adjacent tabs.
+    /// </summary>
+    /// <returns>The total header span in cells, or 0 if there are no tabs.</returns>
     private int GetTotalHeaderSpan ()
     {
         var span = 0;
@@ -424,7 +450,8 @@ public class Tabs : View, IValue<View?>, IDesignable
     }
 
     /// <summary>
-    ///     Updates <see cref="Drawing.Thickness"/> for all tabs based on <see cref="TabSide"/>.
+    ///     Updates <see cref="IAdornment.Thickness"/> and <see cref="Border.TabSide"/> for all tabs
+    ///     based on the current <see cref="TabSide"/> and <see cref="TabDepth"/>.
     /// </summary>
     private void UpdateTabBorderThickness ()
     {
@@ -447,8 +474,8 @@ public class Tabs : View, IValue<View?>, IDesignable
 
     #region Scrolling
 
-    private const string ScrollBackTag = "TabScrollBack";
-    private const string ScrollForwardTag = "TabScrollForward";
+    private const string SCROLL_BACK_TAG = "TabScrollBack";
+    private const string SCROLL_FORWARD_TAG = "TabScrollForward";
 
     /// <summary>
     ///     Adds scroll indicator buttons to a tab's border. The buttons are positioned at the
@@ -457,17 +484,11 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// <param name="tab">The tab whose border receives the scroll buttons.</param>
     private void AddScrollButtonsToBorder (View tab)
     {
-        ScrollButton scrollBack = new ()
-        {
-            Id = ScrollBackTag
-        };
+        ScrollButton scrollBack = new () { Id = SCROLL_BACK_TAG };
 
         scrollBack.Accepting += (_, _) => { ScrollOffset--; };
 
-        ScrollButton scrollForward = new ()
-        {
-            Id = ScrollForwardTag
-        };
+        ScrollButton scrollForward = new () { Id = SCROLL_FORWARD_TAG };
 
         scrollForward.Accepting += (_, _) => { ScrollOffset++; };
 
@@ -521,8 +542,8 @@ public class Tabs : View, IValue<View?>, IDesignable
                 continue;
             }
 
-            ScrollButton? back = tab.Border.View.SubViews.OfType<ScrollButton> ().FirstOrDefault (b => b.Id == ScrollBackTag);
-            ScrollButton? forward = tab.Border.View.SubViews.OfType<ScrollButton> ().FirstOrDefault (b => b.Id == ScrollForwardTag);
+            ScrollButton? back = tab.Border.View.SubViews.OfType<ScrollButton> ().FirstOrDefault (b => b.Id == SCROLL_BACK_TAG);
+            ScrollButton? forward = tab.Border.View.SubViews.OfType<ScrollButton> ().FirstOrDefault (b => b.Id == SCROLL_FORWARD_TAG);
 
             if (back is { } && forward is { })
             {
@@ -553,8 +574,8 @@ public class Tabs : View, IValue<View?>, IDesignable
             {
                 btn.Visible = btn.Id switch
                               {
-                                  ScrollBackTag => canScrollBack,
-                                  ScrollForwardTag => canScrollForward,
+                                  SCROLL_BACK_TAG => canScrollBack,
+                                  SCROLL_FORWARD_TAG => canScrollForward,
                                   _ => btn.Visible
                               };
             }
@@ -562,17 +583,17 @@ public class Tabs : View, IValue<View?>, IDesignable
     }
 
     /// <summary>
-    ///     Gets or sets the current scroll offset for the tab headers. Adjusting this value scrolls the tab headers.
+    ///     Gets or sets the current scroll offset for the tab headers. Adjusting this value scrolls the tab headers
+    ///     along the <see cref="TabSide"/> edge.
     /// </summary>
     /// <remarks>
     ///     <para>
     ///         The value is clamped to a valid range: negative values are clamped to <c>0</c>, and values exceeding
-    ///         the maximum scrollable extent (determined by the total header span and viewport size) are clamped so that
-    ///         the last tab remains flush with the trailing edge of the viewport.
+    ///         the total header span are clamped so that the last tab remains visible.
     ///     </para>
     ///     <para>
-    ///         Setting this property updates all tab <see cref="Border.TabOffset"/> values, refreshes
-    ///         the z-order, and triggers a layout pass.
+    ///         Setting this property updates all tab <see cref="Border.TabOffset"/> values, updates scroll button
+    ///         visibility, and triggers a layout pass.
     ///     </para>
     /// </remarks>
     public int ScrollOffset
