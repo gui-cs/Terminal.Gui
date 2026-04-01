@@ -272,9 +272,9 @@ public class Tabs : View, IValue<View?>, IDesignable
             }
         }
 
+        UpdateZOrder ();
         UpdateTabBorderThickness ();
         UpdateTabOffsets ();
-        UpdateZOrder ();
     }
 
     /// <summary>
@@ -320,24 +320,15 @@ public class Tabs : View, IValue<View?>, IDesignable
             foreach (View tab in TabCollection.TakeWhile (t => t != focusedTab))
             {
                 MoveSubViewToEnd (tab);
-                Button? back = tab.Border.View?.SubViews.OfType<Button> ().FirstOrDefault (b => b.Id == ScrollBackTag);
-                Button? forward = tab.Border.View?.SubViews.OfType<Button> ().FirstOrDefault (b => b.Id == ScrollForwardTag);
-                back?.Visible = false;
-                forward?.Visible = false;
             }
 
             // Focused tab is drawn on top of all others
             MoveSubViewToEnd (focusedTab);
-            UpdateScrollButtonVisibility ();
 
             // Tabs after the focused tab are drawn in reverse order they were added (last added at back)
             foreach (View tab in TabCollection.SkipWhile (t => t != focusedTab).Skip (1))
             {
                 MoveSubViewToStart (tab);
-                Button? back = tab.Border.View?.SubViews.OfType<Button> ().FirstOrDefault (b => b.Id == ScrollBackTag);
-                Button? forward = tab.Border.View?.SubViews.OfType<Button> ().FirstOrDefault (b => b.Id == ScrollForwardTag);
-                back?.Visible = false;
-                forward?.Visible = false;
             }
         }
         else
@@ -348,7 +339,6 @@ public class Tabs : View, IValue<View?>, IDesignable
                 MoveSubViewToStart (tab);
             }
         }
-
     }
 
     /// <summary>
@@ -378,15 +368,18 @@ public class Tabs : View, IValue<View?>, IDesignable
     private int GetTotalHeaderSpan ()
     {
         var span = 0;
+
         foreach (View tab in TabCollection)
         {
             int? tabLength = tab.Border.TabLength;
+
             if (tabLength is { })
             {
                 // Subtract 1 because adjacent tabs share an edge
                 span += tabLength.Value - 1;
             }
         }
+
         // Add 1 because the last tab's trailing border is not shared
         return span > 0 ? span + 1 : 0;
     }
@@ -421,13 +414,13 @@ public class Tabs : View, IValue<View?>, IDesignable
             tab.Border.TabSide = _tabSide;
 
             tab.Border.Thickness = _tabSide switch
-            {
-                Side.Top => new Thickness (1, TabDepth, 1, 1),
-                Side.Bottom => new Thickness (1, 1, 1, TabDepth),
-                Side.Left => new Thickness (TabDepth, 1, 1, 1),
-                Side.Right => new Thickness (1, 1, TabDepth, 1),
-                _ => new Thickness (1, TabDepth, 1, 1)
-            };
+                                   {
+                                       Side.Top => new Thickness (1, TabDepth, 1, 1),
+                                       Side.Bottom => new Thickness (1, 1, 1, TabDepth),
+                                       Side.Left => new Thickness (TabDepth, 1, 1, 1),
+                                       Side.Right => new Thickness (1, 1, TabDepth, 1),
+                                       _ => new Thickness (1, TabDepth, 1, 1)
+                                   };
         }
     }
 
@@ -456,10 +449,7 @@ public class Tabs : View, IValue<View?>, IDesignable
             Id = ScrollBackTag
         };
 
-        scrollBack.Accepting += (_, e) =>
-                               {
-                                   ScrollOffset--;
-                               };
+        scrollBack.Accepting += (_, _) => { ScrollOffset--; };
 
         Button scrollForward = new ()
         {
@@ -468,14 +458,11 @@ public class Tabs : View, IValue<View?>, IDesignable
             NoPadding = true,
             ShadowStyle = null,
             Visible = false,
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased, 
+            MouseHoldRepeat = MouseFlags.LeftButtonReleased,
             Id = ScrollForwardTag
         };
 
-        scrollForward.Accepting += (_, e) =>
-                                   {
-                                       ScrollOffset++;
-                                   };
+        scrollForward.Accepting += (_, _) => { ScrollOffset++; };
 
         PositionScrollButtons (scrollBack, scrollForward);
 
@@ -561,14 +548,12 @@ public class Tabs : View, IValue<View?>, IDesignable
 
             foreach (Button btn in tab.Border.View.SubViews.OfType<Button> ())
             {
-                if (btn.Id == ScrollBackTag)
-                {
-                    btn.Visible = canScrollBack;
-                }
-                else if (btn.Id == ScrollForwardTag)
-                {
-                    btn.Visible = canScrollForward;
-                }
+                btn.Visible = btn.Id switch
+                              {
+                                  ScrollBackTag => canScrollBack,
+                                  ScrollForwardTag => canScrollForward,
+                                  _ => btn.Visible
+                              };
             }
         }
     }
@@ -618,6 +603,7 @@ public class Tabs : View, IValue<View?>, IDesignable
             }
 
             UpdateTabOffsets ();
+
             //UpdateZOrder ();
             SetNeedsLayout ();
         }
@@ -665,17 +651,7 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
 
         // Compute the absolute (unscrolled) offset for this tab
-        var absOffset = 0;
-
-        foreach (View t in TabCollection)
-        {
-            if (t == tab)
-            {
-                break;
-            }
-
-            absOffset += (t.Border.TabLength ?? 0) - 1;
-        }
+        int absOffset = TabCollection.TakeWhile (t => t != tab).Sum (t => (t.Border.TabLength ?? 0) - 1);
 
         int tabLength = tab.Border.TabLength ?? 0;
         int tabEnd = absOffset + tabLength;
@@ -758,7 +734,6 @@ public class Tabs : View, IValue<View?>, IDesignable
                                                    TabDepth = e.NewValue;
                                                };
 
-
         NumericUpDown<int> scrollOffsetNumericUpDown = new ()
         {
             Y = Pos.Bottom (tabSideSelector),
@@ -768,17 +743,14 @@ public class Tabs : View, IValue<View?>, IDesignable
             Value = ScrollOffset
         };
 
-        scrollOffsetNumericUpDown.ValueChanging += (_, e) =>
-                                                   {
-                                                       ScrollOffset = e.NewValue;
-                                                   };
+        scrollOffsetNumericUpDown.ValueChanging += (_, e) => { ScrollOffset = e.NewValue; };
 
         tab3.Add (tabSideSelector, tabDepthNumericUpDown, scrollOffsetNumericUpDown);
 
-        View addRemoveTab = new () { Title = "A_dd/Remove" };
+        View addRemoveTab = new () { Title = "Add_/Remove" };
 
         // Tab list showing all tabs in logical order
-        ObservableCollection<string> tabListSource = new (TabCollection.Select (t => t.Title ?? "(untitled)"));
+        ObservableCollection<string> tabListSource = new (TabCollection.Select (t => t.Title));
 
         ListView tabListView = new () { Width = Dim.Auto (), Height = Dim.Fill (), BorderStyle = LineStyle.Single, Title = "Ta_bs" };
         tabListView.SetSource (tabListSource);
@@ -786,58 +758,76 @@ public class Tabs : View, IValue<View?>, IDesignable
         // Title input for new tabs
         Label titleLabel = new () { X = Pos.Right (tabListView) + 1, Text = "Title:" };
 
-        TextField titleTextField = new () { X = Pos.Right (titleLabel) + 1, Y = Pos.Top (titleLabel), Width = Dim.Fill (), Text = "New Tab" };
+        TextField titleTextField = new () { X = Pos.Right (titleLabel) + 1, Y = Pos.Top (titleLabel), Text = "New Tab" };
+
+        var setTitleButton = new Button { X = Pos.AnchorEnd (), Y = Pos.Top (titleTextField), Title = "Set _Title" };
+
+        setTitleButton.Accepted += (_, _) =>
+                                   {
+                                       int? selectedIndex = tabListView.SelectedItem;
+
+                                       if (selectedIndex is null)
+                                       {
+                                           return;
+                                       }
+                                       View tab = TabCollection.ElementAt (selectedIndex.Value);
+                                       tab.Title = titleTextField.Text;
+                                       RefreshList ();
+                                   };
+
+        titleTextField.Width = Dim.Fill (setTitleButton) - 1;
 
         // Add Before button
         Button addBeforeButton = new () { X = Pos.Right (tabListView) + 1, Y = Pos.Bottom (titleTextField), Text = "Add _Before" };
 
-        addBeforeButton.Accepting += (_, _) =>
-                                     {
-                                         string title = titleTextField.Text ?? "New Tab";
-                                         View newTab = new () { Title = title };
-                                         int selectedIndex = tabListView.SelectedItem ?? 0;
-                                         InsertTab (selectedIndex, newTab);
-                                         RefreshList ();
-                                         Value = addRemoveTab;
-                                     };
-
-        // Add After button
-        Button addAfterButton = new () { X = Pos.Right (addBeforeButton) + 1, Y = Pos.Top (addBeforeButton), Text = "Add _After" };
-
-        addAfterButton.Accepting += (_, _) =>
+        addBeforeButton.Accepted += (_, _) =>
                                     {
-                                        string title = titleTextField.Text ?? "New Tab";
+                                        string title = titleTextField.Text;
                                         View newTab = new () { Title = title };
-                                        int selectedIndex = (tabListView.SelectedItem ?? 0) + 1;
+                                        int selectedIndex = tabListView.SelectedItem ?? 0;
                                         InsertTab (selectedIndex, newTab);
                                         RefreshList ();
                                         Value = addRemoveTab;
                                     };
 
+        // Add After button
+        Button addAfterButton = new () { X = Pos.Right (addBeforeButton) + 1, Y = Pos.Top (addBeforeButton), Text = "Add _After" };
+
+        addAfterButton.Accepted += (_, _) =>
+                                   {
+                                       string title = titleTextField.Text;
+                                       View newTab = new () { Title = title };
+                                       int selectedIndex = (tabListView.SelectedItem ?? 0) + 1;
+                                       InsertTab (selectedIndex, newTab);
+                                       RefreshList ();
+                                       Value = addRemoveTab;
+                                   };
+
         // Remove button
         Button removeButton = new () { X = Pos.Right (addAfterButton) + 1, Y = Pos.Top (addAfterButton), Text = "_Remove" };
 
-        removeButton.Accepting += (_, _) =>
-                                  {
-                                      int? selectedIndex = tabListView.SelectedItem;
+        removeButton.Accepted += (_, _) =>
+                                 {
+                                     int? selectedIndex = tabListView.SelectedItem;
 
-                                      if (selectedIndex is null)
-                                      {
-                                          return;
-                                      }
+                                     if (selectedIndex is null)
+                                     {
+                                         return;
+                                     }
 
-                                      List<View> tabs = TabCollection.ToList ();
+                                     List<View> tabs = TabCollection.ToList ();
 
-                                      if (selectedIndex.Value < tabs.Count)
-                                      {
-                                          Remove (tabs [selectedIndex.Value]);
-                                          tabs [selectedIndex.Value].Dispose ();
-                                          RefreshList ();
-                                          Value = addRemoveTab;
-                                      }
-                                  };
+                                     if (selectedIndex.Value >= tabs.Count)
+                                     {
+                                         return;
+                                     }
+                                     Remove (tabs [selectedIndex.Value]);
+                                     tabs [selectedIndex.Value].Dispose ();
+                                     RefreshList ();
+                                     Value = addRemoveTab;
+                                 };
 
-        addRemoveTab.Add (tabListView, titleLabel, titleTextField, addBeforeButton, addAfterButton, removeButton);
+        addRemoveTab.Add (tabListView, titleLabel, titleTextField, setTitleButton, addBeforeButton, addAfterButton, removeButton);
 
         Add (tab1, lineStyleSelector, tab3, addRemoveTab);
 
@@ -881,7 +871,7 @@ public class Tabs : View, IValue<View?>, IDesignable
 
             foreach (View t in TabCollection)
             {
-                tabListSource.Add (t.Title ?? "(untitled)");
+                tabListSource.Add (t.Title );
             }
         }
     }
