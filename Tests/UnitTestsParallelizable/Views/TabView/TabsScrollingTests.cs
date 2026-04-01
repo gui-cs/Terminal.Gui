@@ -14,7 +14,7 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     ///     Step 0: All 5 tabs fit in 26 columns. No scroll needed. Tab1 selected.
     /// </summary>
     [Fact]
-    public void Step0_AllTabsFit_NoScroll_Tab1Selected ()
+    public void ScrollOffset_AllTabsFit_NoScroll_Tab1Selected ()
     {
         IDriver driver = CreateTestDriver (30, 8);
 
@@ -56,7 +56,7 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     ///     Right scroll indicator appears.
     /// </summary>
     [Fact]
-    public void Step1_ReducedWidth_Tab1Selected_RightIndicator ()
+    public void ReducedWidth_Tab1Selected_RightIndicator ()
     {
         IDriver driver = CreateTestDriver (30, 8);
 
@@ -95,11 +95,71 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Dispose ();
     }
 
+    [Fact]
+    public void ScrollOffset_ReducedWidth_Tab1Selected_Scroll_Right_To_End ()
+    {
+        IDriver driver = CreateTestDriver (30, 8);
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
+        Tabs tabs = new () { Driver = driver, Width = 26, Height = Dim.Fill () };
+        superView.Add (tabs);
+
+        (View tab1, View tab2, View tab3, View tab4, View tab5) = CreateFiveTabs ();
+        tabs.Add (tab1, tab2, tab3, tab4, tab5);
+
+        tabs.Width = 18;
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+                                              ┊◄                ►          ┊
+                                              ┊╭────╮────╮────╮──          ┊
+                                              ┊│Tab1│Tab2│Tab3│Ta          ┊
+                                              ┊│    ╰────┴────┴─┬          ┊
+                                              ┊│Tab1 content    │          ┊
+                                              ┊╰────────────────╯          ┊
+                                              └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
+
+        tabs.ScrollOffset += 1;
+        superView.Layout ();
+        driver.ClearContents ();
+        superView.Draw ();
+
+        Assert.Equal (1, tabs.ScrollOffset);
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+                                              ┊◄                ►          ┊
+                                              ┊────╮────╮────╮───          ┊
+                                              ┊Tab1│Tab2│Tab3│Tab          ┊
+                                              ┊│   ╰────┴────┴──┬          ┊
+                                              ┊│Tab1 content    │          ┊
+                                              ┊╰────────────────╯          ┊
+                                              └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
+
+        tabs.Dispose ();
+    }
+
     /// <summary>
     ///     Step 2: Width 18, Tab2 selected. No scroll offset change, just focus change.
     /// </summary>
     [Fact]
-    public void Step2_Tab2Selected_NoScrollChange ()
+    public void ScrollOffset_Width18_Tab2Selected_NoScrollChange ()
     {
         IDriver driver = CreateTestDriver (30, 8);
 
@@ -144,7 +204,7 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     ///     the minimum needed. Tab1 is partially clipped, Tab2 is fully visible.
     /// </summary>
     [Fact]
-    public void Step4_SelectTab4ThenTab2_MinimalScroll ()
+    public void ScrollOffset_SelectTab4ThenTab2_MinimalScroll ()
     {
         IDriver driver = CreateTestDriver (30, 8);
 
@@ -196,7 +256,7 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     ///     Step 6: Select Tab4 with width 18. Tab1 partially clipped, Tab5 partially visible.
     /// </summary>
     [Fact]
-    public void Step6_Tab4Selected_ScrolledRight ()
+    public void ScrollOffset_Tab4Selected_ScrolledRight ()
     {
         IDriver driver = CreateTestDriver (30, 8);
 
@@ -242,7 +302,7 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     ///     Step 9: Select Tab1 after being scrolled. EnsureTabVisible scrolls back to offset 0.
     /// </summary>
     [Fact]
-    public void Step9_SelectTab1_ScrollsBackToStart ()
+    public void ScrollOffset_SelectTab1_ScrollsBackToStart ()
     {
         IDriver driver = CreateTestDriver (30, 8);
 
@@ -291,7 +351,7 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     ///     Step 11: Width back to 26. All tabs fit. No scroll indicators. Tab4 selected.
     /// </summary>
     [Fact]
-    public void Step11_FullWidth_AllFit_NoScrollIndicators ()
+    public void FullWidth_AllFit_NoScrollIndicators ()
     {
         IDriver driver = CreateTestDriver (30, 8);
 
@@ -510,7 +570,7 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     public void Top_ScrolledRight_MiddleTabOffset_IsCorrect ()
     {
         IDriver driver = CreateTestDriver (10, 5);
-        Tabs tabs = new () { Driver = driver, Width = 10, Height = 5 };
+        Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
 
         View tab1 = new () { Title = "Tab1" };
         View tab2 = new () { Title = "Tab2" };
@@ -518,10 +578,33 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
 
         tabs.Add (tab1, tab2, tab3);
         tabs.Layout ();
+        tabs.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ◄        ►
+                                              ╭────╮────
+                                              │Tab1│Tab2
+                                              │    ╰───┬
+                                              ╰────────╯
+                                              """,
+                                              output,
+                                              driver);
 
         // Select tab3 to scroll right
         tabs.Value = tab3;
         tabs.Layout ();
+        driver.ClearContents ();
+        tabs.Draw ();
+        ////                                    0123456789
+        //DriverAssert.AssertDriverContentsAre ("""
+        //                                      ◄        ►
+        //                                      ────╭────╮
+        //                                      Tab2│Tab3│
+        //                                      ┬───╯    │
+        //                                      ╰────────╯   
+        //                                      """,
+        //                                      output,
+        //                                      driver);
 
         // Verify exact offsets: _scrollOffset = tabEnd(tab3) - viewportWidth = 16 - 10 = 6
         Assert.Equal (-6, tab1.Border.TabOffset);
@@ -587,6 +670,367 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
 
         // Tab1 should now have a negative offset
         Assert.True (tab1.Border.TabOffset < 0);
+
+        tabs.Dispose ();
+    }
+
+    #endregion
+
+    #region Scrolling Tests (Side.Bottom)
+
+    [Fact]
+    public void Bottom_TabsFit_NoScrollOffset ()
+    {
+        IDriver driver = CreateTestDriver (20, 5);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 5, TabSide = Side.Bottom };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        Assert.Equal (0, tab1.Border.TabOffset);
+        Assert.Equal (5, tab2.Border.TabOffset);
+        Assert.Equal (10, tab3.Border.TabOffset);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void Bottom_TabsOverflow_SelectingLastTab_Scrolls ()
+    {
+        IDriver driver = CreateTestDriver (10, 5);
+        Tabs tabs = new () { Driver = driver, Width = 10, Height = 5, TabSide = Side.Bottom };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        tabs.Value = tab3;
+        tabs.Layout ();
+
+        Assert.True (tab1.Border.TabOffset < 0, "Tab1 should have negative offset");
+        Assert.True (tab3.Border.TabOffset >= 0, "Tab3 should be visible");
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void Bottom_ScrolledRight_SelectingFirstTab_ScrollsBack ()
+    {
+        IDriver driver = CreateTestDriver (10, 5);
+        Tabs tabs = new () { Driver = driver, Width = 10, Height = 5, TabSide = Side.Bottom };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        tabs.Value = tab3;
+        tabs.Layout ();
+
+        tabs.Value = tab1;
+        tabs.Layout ();
+
+        Assert.Equal (0, tab1.Border.TabOffset);
+        Assert.Equal (5, tab2.Border.TabOffset);
+        Assert.Equal (10, tab3.Border.TabOffset);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void Bottom_AllFit_DrawsCorrectly ()
+    {
+        IDriver driver = CreateTestDriver (30, 8);
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
+        Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = Dim.Fill (), TabSide = Side.Bottom };
+        superView.Add (tabs);
+
+        (View tab1, View tab2, View tab3, View tab4, View tab5) = CreateFiveTabs ();
+        tabs.Add (tab1, tab2, tab3, tab4, tab5);
+        tabs.Value = tab1;
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+                                              ┊╭──────────────────────────╮┊
+                                              ┊│Tab1 content              │┊
+                                              ┊│                          │┊
+                                              ┊│    ╭────┬────┬────┬────┬─╯┊
+                                              ┊│Tab1│Tab2│Tab3│Tab4│Tab5│  ┊
+                                              ┊╰────╯────╯────╯────╯────╯  ┊
+                                              └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
+
+        tabs.Dispose ();
+    }
+
+    #endregion
+
+    #region Scrolling Tests (Side.Left)
+
+    [Fact]
+    public void Left_TabsFit_NoScrollOffset ()
+    {
+        IDriver driver = CreateTestDriver (20, 20);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 20, TabSide = Side.Left };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        Assert.Equal (0, tab1.Border.TabOffset);
+        Assert.Equal (5, tab2.Border.TabOffset);
+        Assert.Equal (10, tab3.Border.TabOffset);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void Left_TabsOverflow_SelectingLastTab_Scrolls ()
+    {
+        IDriver driver = CreateTestDriver (20, 10);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = Side.Left };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        tabs.Value = tab3;
+        tabs.Layout ();
+
+        Assert.True (tab1.Border.TabOffset < 0, "Tab1 should have negative offset");
+        Assert.True (tab3.Border.TabOffset >= 0, "Tab3 should be visible");
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void Left_ScrolledDown_SelectingFirstTab_ScrollsBack ()
+    {
+        IDriver driver = CreateTestDriver (20, 10);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = Side.Left };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        tabs.Value = tab3;
+        tabs.Layout ();
+
+        tabs.Value = tab1;
+        tabs.Layout ();
+
+        Assert.Equal (0, tab1.Border.TabOffset);
+        Assert.Equal (5, tab2.Border.TabOffset);
+        Assert.Equal (10, tab3.Border.TabOffset);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void Left_AllFit_DrawsCorrectly ()
+    {
+        IDriver driver = CreateTestDriver (20, 20);
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
+        Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = Dim.Fill (), TabSide = Side.Left };
+        superView.Add (tabs);
+
+        View tab1 = new () { Title = "T1", Text = "Content" };
+        View tab2 = new () { Title = "T2", Text = "Content" };
+        View tab3 = new () { Title = "T3", Text = "Content" };
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Value = tab1;
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+                                              ┊╭────────────────╮┊
+                                              ┊│T Content       │┊
+                                              ┊│1               │┊
+                                              ┊╰─╮              │┊
+                                              ┊│T│              │┊
+                                              ┊│2│              │┊
+                                              ┊╰─┤              │┊
+                                              ┊│T│              │┊
+                                              ┊│3│              │┊
+                                              ┊╰─┤              │┊
+                                              ┊  │              │┊
+                                              ┊  │              │┊
+                                              ┊  │              │┊
+                                              ┊  │              │┊
+                                              ┊  │              │┊
+                                              ┊  │              │┊
+                                              ┊  │              │┊
+                                              ┊  ╰──────────────╯┊
+                                              └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
+
+        tabs.Dispose ();
+    }
+
+    #endregion
+
+    #region Scrolling Tests (Side.Right)
+
+    [Fact]
+    public void Right_TabsFit_NoScrollOffset ()
+    {
+        IDriver driver = CreateTestDriver (20, 20);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 20, TabSide = Side.Right };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        Assert.Equal (0, tab1.Border.TabOffset);
+        Assert.Equal (5, tab2.Border.TabOffset);
+        Assert.Equal (10, tab3.Border.TabOffset);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void Right_TabsOverflow_SelectingLastTab_Scrolls ()
+    {
+        IDriver driver = CreateTestDriver (20, 10);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = Side.Right };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        tabs.Value = tab3;
+        tabs.Layout ();
+
+        Assert.True (tab1.Border.TabOffset < 0, "Tab1 should have negative offset");
+        Assert.True (tab3.Border.TabOffset >= 0, "Tab3 should be visible");
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void Right_ScrolledDown_SelectingFirstTab_ScrollsBack ()
+    {
+        IDriver driver = CreateTestDriver (20, 10);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = Side.Right };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        tabs.Value = tab3;
+        tabs.Layout ();
+
+        tabs.Value = tab1;
+        tabs.Layout ();
+
+        Assert.Equal (0, tab1.Border.TabOffset);
+        Assert.Equal (5, tab2.Border.TabOffset);
+        Assert.Equal (10, tab3.Border.TabOffset);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void Right_AllFit_DrawsCorrectly ()
+    {
+        IDriver driver = CreateTestDriver (20, 20);
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
+        Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = Dim.Fill (), TabSide = Side.Right };
+        superView.Add (tabs);
+
+        View tab1 = new () { Title = "T1", Text = "Content" };
+        View tab2 = new () { Title = "T2", Text = "Content" };
+        View tab3 = new () { Title = "T3", Text = "Content" };
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Value = tab1;
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+                                              ┊╭────────────────╮┊
+                                              ┊│Content        T│┊
+                                              ┊│               1│┊
+                                              ┊│              ╭─╯┊
+                                              ┊│              │T│┊
+                                              ┊│              │2│┊
+                                              ┊│              ├─╯┊
+                                              ┊│              │T│┊
+                                              ┊│              │3│┊
+                                              ┊│              ├─╯┊
+                                              ┊│              │  ┊
+                                              ┊│              │  ┊
+                                              ┊│              │  ┊
+                                              ┊│              │  ┊
+                                              ┊│              │  ┊
+                                              ┊│              │  ┊
+                                              ┊│              │  ┊
+                                              ┊╰──────────────╯  ┊
+                                              └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
 
         tabs.Dispose ();
     }

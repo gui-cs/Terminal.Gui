@@ -339,8 +339,6 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
     }
 
-    private int _scrollOffset;
-
     /// <summary>
     ///     Updates <see cref="Border.TabOffset"/> for all tabs based on <see cref="TabSide"/>
     ///     and the cumulative widths/heights of preceding tabs, adjusted by the current scroll offset.
@@ -351,7 +349,7 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         foreach (View tab in TabCollection)
         {
-            tab.Border.TabOffset = offset - _scrollOffset;
+            tab.Border.TabOffset = offset - ScrollOffset;
 
             int? tabLength = tab.Border.TabLength;
 
@@ -395,13 +393,13 @@ public class Tabs : View, IValue<View?>, IDesignable
             tab.Border.TabSide = _tabSide;
 
             tab.Border.Thickness = _tabSide switch
-            {
-                Side.Top => new Thickness (1, TabDepth, 1, 1),
-                Side.Bottom => new Thickness (1, 1, 1, TabDepth),
-                Side.Left => new Thickness (TabDepth, 1, 1, 1),
-                Side.Right => new Thickness (1, 1, TabDepth, 1),
-                _ => new Thickness (1, TabDepth, 1, 1)
-            };
+                                   {
+                                       Side.Top => new Thickness (1, TabDepth, 1, 1),
+                                       Side.Bottom => new Thickness (1, 1, 1, TabDepth),
+                                       Side.Left => new Thickness (TabDepth, 1, 1, 1),
+                                       Side.Right => new Thickness (1, 1, TabDepth, 1),
+                                       _ => new Thickness (1, TabDepth, 1, 1)
+                                   };
         }
     }
 
@@ -418,23 +416,30 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// </summary>
     private void SetupHeaderScrollBar ()
     {
-        _headerScrollBar = new ScrollBar
-        {
-            VisibilityMode = ScrollBarVisibilityMode.Auto,
-        };
+        _headerScrollBar = new ScrollBar { VisibilityMode = ScrollBarVisibilityMode.Auto };
 
         _headerScrollBar.Slider.Visible = false;
         _headerScrollBar.Visible = false;
 
-        _headerScrollBar.ValueChanged += (_, args) =>
-                                         {
-                                             _scrollOffset = args.NewValue;
-                                             UpdateTabOffsets ();
-                                             UpdateZOrder ();
-                                             SetNeedsLayout ();
-                                         };
+        _headerScrollBar.ValueChanged += (_, args) => { ScrollOffset = args.NewValue; };
 
         PositionHeaderScrollBar ();
+    }
+
+    /// <summary>
+    ///     Gets or sets the current scroll offset for the tab headers. Adjusting this value scrolls the tab headers.
+    /// </summary>
+    public int ScrollOffset
+    {
+        get;
+        set
+        {
+            field = value;
+
+            UpdateTabOffsets ();
+            UpdateZOrder ();
+            SetNeedsLayout ();
+        }
     }
 
     /// <summary>
@@ -471,7 +476,7 @@ public class Tabs : View, IValue<View?>, IDesignable
                 _headerScrollBar.Orientation = Orientation.Horizontal;
                 _headerScrollBar.X = 0;
                 _headerScrollBar.Y = 0;
-                _headerScrollBar.Width = Dim.Fill();
+                _headerScrollBar.Width = Dim.Fill ();
                 _headerScrollBar.Height = 1;
 
                 break;
@@ -479,7 +484,7 @@ public class Tabs : View, IValue<View?>, IDesignable
             case Side.Bottom:
                 _headerScrollBar.Orientation = Orientation.Horizontal;
                 _headerScrollBar.X = 0;
-                _headerScrollBar.Y = 0;
+                _headerScrollBar.Y = Pos.AnchorEnd ();
                 _headerScrollBar.Width = Dim.Fill ();
                 _headerScrollBar.Height = 1;
 
@@ -487,7 +492,7 @@ public class Tabs : View, IValue<View?>, IDesignable
 
             case Side.Left:
                 _headerScrollBar.Orientation = Orientation.Vertical;
-                _headerScrollBar.X = Pos.AnchorEnd ();
+                _headerScrollBar.X = 0;
                 _headerScrollBar.Y = 0;
                 _headerScrollBar.Width = 1;
                 _headerScrollBar.Height = Dim.Fill ();
@@ -496,7 +501,7 @@ public class Tabs : View, IValue<View?>, IDesignable
 
             case Side.Right:
                 _headerScrollBar.Orientation = Orientation.Vertical;
-                _headerScrollBar.X = 0;
+                _headerScrollBar.X = Pos.AnchorEnd ();
                 _headerScrollBar.Y = 0;
                 _headerScrollBar.Width = 1;
                 _headerScrollBar.Height = Dim.Fill ();
@@ -519,39 +524,58 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         _headerScrollBar.ScrollableContentSize = totalHeaderSpan;
 
-        _headerScrollBar.VisibleContentSize = _tabSide is Side.Top or Side.Bottom
-                                                  ? Viewport.Width
-                                                  : Viewport.Height;
-        Padding.Thickness = new Thickness (Padding.Thickness.Left, _headerScrollBar.Visible ? 1 : 0, Padding.Thickness.Right, Padding.Thickness.Bottom);
+        _headerScrollBar.VisibleContentSize = _tabSide is Side.Top or Side.Bottom ? Viewport.Width : Viewport.Height;
+
+        int scrollBarSize = _headerScrollBar.Visible ? 1 : 0;
+
+        Padding.Thickness = _tabSide switch
+                            {
+                                Side.Top => new Thickness (0, scrollBarSize, 0, 0),
+                                Side.Bottom => new Thickness (0, 0, 0, scrollBarSize),
+                                Side.Left => new Thickness (scrollBarSize, 0, 0, 0),
+                                Side.Right => new Thickness (0, 0, scrollBarSize, 0),
+                                _ => new Thickness (0, scrollBarSize, 0, 0)
+                            };
     }
 
-    /// <inheritdoc />
-    protected override void OnSubViewLayout (LayoutEventArgs args)
+    /// <inheritdoc/>
+    protected override void OnViewportChanged (DrawEventArgs e)
     {
-        base.OnSubViewLayout (args);
+        base.OnViewportChanged (e);
+
+        if (e.OldViewport.Size != Size.Empty)
+        {
+            return;
+        }
+
+        // On initial layout, ensure the selected tab is visible (in case it's not the first tab or tabs exceed viewport size)
+        if (Value is null)
+        {
+            return;
+        }
 
         // Ensure the scrollbar is added to Padding (deferred from constructor)
         AddHeaderScrollBarToPadding ();
 
+        EnsureTabVisible (Value);
+    }
+
+    /// <inheritdoc/>
+    protected override void OnSubViewLayout (LayoutEventArgs args)
+    {
+        base.OnSubViewLayout (args);
+
         // Update scrollbar visibility/sizing
         UpdateTabOffsets ();
-
-        // Re-check visibility of the selected tab now that layout has determined sizes
-        if (_value is { })
-        {
-            EnsureTabVisible (_value);
-        }
     }
 
     /// <summary>
-    ///     Adjusts <see cref="_scrollOffset"/> to ensure the specified tab's header is fully visible.
+    ///     Adjusts <see cref="ScrollOffset"/> to ensure the specified tab's header is fully visible.
     /// </summary>
     /// <param name="tab">The tab whose header should be scrolled into view.</param>
     private void EnsureTabVisible (View tab)
     {
-        int visibleSize = _tabSide is Side.Top or Side.Bottom
-                              ? Viewport.Width
-                              : Viewport.Height;
+        int visibleSize = _tabSide is Side.Top or Side.Bottom ? Viewport.Width : Viewport.Height;
 
         // Don't adjust scroll before layout has determined the viewport size
         if (visibleSize <= 0)
@@ -575,16 +599,16 @@ public class Tabs : View, IValue<View?>, IDesignable
         int tabLength = tab.Border.TabLength ?? 0;
         int tabEnd = absOffset + tabLength;
 
-        if (absOffset < _scrollOffset)
+        if (absOffset < ScrollOffset)
         {
-            _scrollOffset = absOffset;
+            ScrollOffset = absOffset;
         }
-        else if (tabEnd > _scrollOffset + visibleSize)
+        else if (tabEnd > ScrollOffset + visibleSize)
         {
-            _scrollOffset = tabEnd - visibleSize;
+            ScrollOffset = tabEnd - visibleSize;
         }
 
-        _headerScrollBar?.Value = _scrollOffset;
+        _headerScrollBar?.Value = ScrollOffset;
 
         UpdateTabOffsets ();
     }
@@ -661,41 +685,20 @@ public class Tabs : View, IValue<View?>, IDesignable
         // Tab list showing all tabs in logical order
         ObservableCollection<string> tabListSource = new (TabCollection.Select (t => t.Title ?? "(untitled)"));
 
-        ListView tabListView = new ()
-        {
-            Width = Dim.Auto (),
-            Height = Dim.Fill (),
-            BorderStyle = LineStyle.Single,
-            Title = "Ta_bs"
-        };
+        ListView tabListView = new () { Width = Dim.Auto (), Height = Dim.Fill (), BorderStyle = LineStyle.Single, Title = "Ta_bs" };
         tabListView.SetSource (tabListSource);
 
         // Title input for new tabs
-        Label titleLabel = new ()
-        {
-            X = Pos.Right (tabListView) + 1,
-            Text = "Title:"
-        };
+        Label titleLabel = new () { X = Pos.Right (tabListView) + 1, Text = "Title:" };
 
-        TextField titleTextField = new ()
-        {
-            X = Pos.Right (titleLabel) + 1,
-            Y = Pos.Top (titleLabel),
-            Width = Dim.Fill (),
-            Text = "New Tab"
-        };
+        TextField titleTextField = new () { X = Pos.Right (titleLabel) + 1, Y = Pos.Top (titleLabel), Width = Dim.Fill (), Text = "New Tab" };
 
         // Add Before button
-        Button addBeforeButton = new ()
-        {
-            X = Pos.Right (tabListView) + 1,
-            Y = Pos.Bottom (titleTextField),
-            Text = "Add _Before"
-        };
+        Button addBeforeButton = new () { X = Pos.Right (tabListView) + 1, Y = Pos.Bottom (titleTextField), Text = "Add _Before" };
 
         addBeforeButton.Accepting += (_, _) =>
                                      {
-                                         var title = titleTextField.Text ?? "New Tab";
+                                         string title = titleTextField.Text ?? "New Tab";
                                          View newTab = new () { Title = title };
                                          int selectedIndex = tabListView.SelectedItem ?? 0;
                                          InsertTab (selectedIndex, newTab);
@@ -704,16 +707,11 @@ public class Tabs : View, IValue<View?>, IDesignable
                                      };
 
         // Add After button
-        Button addAfterButton = new ()
-        {
-            X = Pos.Right (addBeforeButton) + 1,
-            Y = Pos.Top (addBeforeButton),
-            Text = "Add _After"
-        };
+        Button addAfterButton = new () { X = Pos.Right (addBeforeButton) + 1, Y = Pos.Top (addBeforeButton), Text = "Add _After" };
 
         addAfterButton.Accepting += (_, _) =>
                                     {
-                                        var title = titleTextField.Text ?? "New Tab";
+                                        string title = titleTextField.Text ?? "New Tab";
                                         View newTab = new () { Title = title };
                                         int selectedIndex = (tabListView.SelectedItem ?? 0) + 1;
                                         InsertTab (selectedIndex, newTab);
@@ -722,12 +720,7 @@ public class Tabs : View, IValue<View?>, IDesignable
                                     };
 
         // Remove button
-        Button removeButton = new ()
-        {
-            X = Pos.Right (addAfterButton) + 1,
-            Y = Pos.Top (addAfterButton),
-            Text = "_Remove"
-        };
+        Button removeButton = new () { X = Pos.Right (addAfterButton) + 1, Y = Pos.Top (addAfterButton), Text = "_Remove" };
 
         removeButton.Accepting += (_, _) =>
                                   {

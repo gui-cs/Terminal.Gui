@@ -1722,6 +1722,46 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         }
     }
 
+
+    [Fact]
+    public void SuperView_Top_NegativeOffset1_WithTitle_X0 () // Copilot
+    {
+        //using (TestLogging.Verbose (output, TraceCategory.Draw))
+        {
+            (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
+                                                                            8,
+                                                                            9,
+                                                                            6,
+                                                                            Side.Top,
+                                                                            -1,
+                                                                            false,
+                                                                            "T_ab",
+                                                                            true);
+
+            subview.X = 0;
+            subview.SuperView!.Layout ();
+            subview.SuperView!.Draw ();
+
+            DriverAssert.AssertDriverContentsAre ("""
+                                                  ╭───────────╮
+                                                  │◊◊◊◊◊◊◊◊◊◊◊│
+                                                  │───╮◊◊◊◊◊◊◊│
+                                                  │Tab│◊◊◊◊◊◊◊│
+                                                  ││  ╰────╮◊◊│
+                                                  ││       │◊◊│
+                                                  ││       │◊◊│
+                                                  │╰───────╯◊◊│
+                                                  │◊◊◊◊◊◊◊◊◊◊◊│
+                                                  ╰───────────╯
+                                                  """,
+                                                  output,
+                                                  app.Driver!);
+
+            subview.Dispose ();
+            app.Dispose ();
+        }
+    }
+
     [Fact]
     public void SuperView_Top_NegativeOffset2_WithTitle () // Copilot
     {
