@@ -418,8 +418,6 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// </summary>
     private void SetupHeaderScrollBar ()
     {
-        Padding.GetOrCreateView ();
-
         _headerScrollBar = new ScrollBar
         {
             VisibilityMode = ScrollBarVisibilityMode.Auto,
@@ -427,9 +425,6 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         _headerScrollBar.Slider.Visible = false;
         _headerScrollBar.Visible = false;
-
-        // Transparent slider lets the content border line show through
-        //_headerScrollBar.Slider.ViewportSettings |= ViewportSettingsFlags.Transparent;
 
         _headerScrollBar.ValueChanged += (_, args) =>
                                          {
@@ -440,8 +435,25 @@ public class Tabs : View, IValue<View?>, IDesignable
                                          };
 
         PositionHeaderScrollBar ();
-        Padding.View!.Add (_headerScrollBar);
     }
+
+    /// <summary>
+    ///     Adds the header scrollbar to Padding. Called after initialization to avoid
+    ///     modifying the subview collection during EndInit enumeration.
+    /// </summary>
+    private void AddHeaderScrollBarToPadding ()
+    {
+        if (_headerScrollBar is null || _headerScrollBarAdded)
+        {
+            return;
+        }
+
+        Padding.GetOrCreateView ();
+        Padding.View!.Add (_headerScrollBar);
+        _headerScrollBarAdded = true;
+    }
+
+    private bool _headerScrollBarAdded;
 
     /// <summary>
     ///     Positions and orients the header scrollbar based on <see cref="TabSide"/>.
@@ -516,11 +528,19 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// <inheritdoc />
     protected override void OnSubViewLayout (LayoutEventArgs args)
     {
-
         base.OnSubViewLayout (args);
+
+        // Ensure the scrollbar is added to Padding (deferred from constructor)
+        AddHeaderScrollBarToPadding ();
 
         // Update scrollbar visibility/sizing
         UpdateTabOffsets ();
+
+        // Re-check visibility of the selected tab now that layout has determined sizes
+        if (_value is { })
+        {
+            EnsureTabVisible (_value);
+        }
     }
 
     /// <summary>
@@ -529,6 +549,16 @@ public class Tabs : View, IValue<View?>, IDesignable
     /// <param name="tab">The tab whose header should be scrolled into view.</param>
     private void EnsureTabVisible (View tab)
     {
+        int visibleSize = _tabSide is Side.Top or Side.Bottom
+                              ? Viewport.Width
+                              : Viewport.Height;
+
+        // Don't adjust scroll before layout has determined the viewport size
+        if (visibleSize <= 0)
+        {
+            return;
+        }
+
         // Compute the absolute (unscrolled) offset for this tab
         var absOffset = 0;
 
@@ -544,10 +574,6 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         int tabLength = tab.Border.TabLength ?? 0;
         int tabEnd = absOffset + tabLength;
-
-        int visibleSize = _tabSide is Side.Top or Side.Bottom
-                              ? Viewport.Width
-                              : Viewport.Height;
 
         if (absOffset < _scrollOffset)
         {

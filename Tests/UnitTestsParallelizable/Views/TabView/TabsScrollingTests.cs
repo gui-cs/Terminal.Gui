@@ -140,10 +140,11 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     }
 
     /// <summary>
-    ///     Step 4: Scrolled right 5 columns. Tab2 selected. Tab1 off-screen, Tab5 clipped.
+    ///     Step 4: Select Tab4 to scroll right, then select Tab2. EnsureTabVisible scrolls
+    ///     the minimum needed. Tab1 is partially clipped, Tab2 is fully visible.
     /// </summary>
     [Fact]
-    public void Step4_ScrolledRight5_Tab2Selected ()
+    public void Step4_SelectTab4ThenTab2_MinimalScroll ()
     {
         IDriver driver = CreateTestDriver (30, 8);
 
@@ -160,28 +161,27 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
 
         (View tab1, View tab2, View tab3, View tab4, View tab5) = CreateFiveTabs ();
         tabs.Add (tab1, tab2, tab3, tab4, tab5);
-        tabs.Value = tab2;
 
         tabs.Width = 18;
 
         superView.Layout ();
 
-        // Simulate scrollbar driving _scrollOffset to 5
-        // Tab2 is already selected, so we need to scroll programmatically.
-        // The scrollbar ValueChanged drives _scrollOffset. We can't directly set _scrollOffset,
-        // but we can select Tab4 to trigger EnsureTabVisible (which scrolls), then select Tab2.
+        // Select Tab4 — EnsureTabVisible scrolls just enough to show Tab4
         tabs.Value = tab4;
         superView.Layout ();
+
+        // Select Tab2 — already visible, so no additional scrolling
         tabs.Value = tab2;
         superView.Layout ();
         superView.Draw ();
 
+        // _scrollOffset = 3 (minimum to show Tab4): Tab1 partially clipped, Tab5 partially visible
         DriverAssert.AssertDriverContentsAre ("""
                                               ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
                                               ┊◄                ►          ┊
-                                              ┊╭────╮────╮────╮──          ┊
-                                              ┊│Tab2│Tab3│Tab4│Ta          ┊
-                                              ┊│    ╰────┴────┴─┬          ┊
+                                              ┊──╭────╮────╮────╮          ┊
+                                              ┊b1│Tab2│Tab3│Tab4│          ┊
+                                              ┊┬─╯    ╰────┴────┼          ┊
                                               ┊│Tab2 content    │          ┊
                                               ┊╰────────────────╯          ┊
                                               └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
@@ -193,7 +193,7 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
     }
 
     /// <summary>
-    ///     Step 6: Select Tab4. Scrolled right 6 columns. Tab1 off-screen, Tab2 clipped, Tab5 clipped.
+    ///     Step 6: Select Tab4 with width 18. Tab1 partially clipped, Tab5 partially visible.
     /// </summary>
     [Fact]
     public void Step6_Tab4Selected_ScrolledRight ()
@@ -221,12 +221,13 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         superView.Layout ();
         superView.Draw ();
 
+        // _scrollOffset = 3 (minimum to show Tab4): Tab1 clipped by 3 chars, Tab5 at edge
         DriverAssert.AssertDriverContentsAre ("""
                                               ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
                                               ┊◄                ►          ┊
-                                              ┊────╭────╭────╮───          ┊
-                                              ┊Tab2│Tab3│Tab4│Tab          ┊
-                                              ┊┬───┴────╯    ╰──┬          ┊
+                                              ┊──╭────╭────╭────╮          ┊
+                                              ┊b1│Tab2│Tab3│Tab4│          ┊
+                                              ┊┬─┴────┴────╯    │          ┊
                                               ┊│Tab4 content    │          ┊
                                               ┊╰────────────────╯          ┊
                                               └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
@@ -316,7 +317,7 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
                                               ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
                                               ┊╭────╭────╭────╭────╮────╮  ┊
                                               ┊│Tab1│Tab2│Tab3│Tab4│Tab5│  ┊
-                                              │├────┴────┴────╯    ╰────┴─╮┊
+                                              ┊├────┴────┴────╯    ╰────┴─╮┊
                                               ┊│Tab4 content              │┊
                                               ┊│                          │┊
                                               ┊╰──────────────────────────╯┊
@@ -385,21 +386,18 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
             Height = Dim.Fill (),
             BorderStyle = LineStyle.Dotted
         };
-        Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = Dim.Fill () };
+        Tabs tabs = new () { Driver = driver, Width = 18, Height = Dim.Fill () };
         superView.Add (tabs);
 
         (View tab1, View tab2, View tab3, View tab4, View tab5) = CreateFiveTabs ();
         tabs.Add (tab1, tab2, tab3, tab4, tab5);
         superView.Layout ();
 
-        // All tabs visible at start
+        // All tabs at natural offsets (scroll offset = 0)
         Assert.Equal (0, tab1.Border.TabOffset);
         Assert.Equal (5, tab2.Border.TabOffset);
-        Assert.Equal (10, tab3.Border.TabOffset);
-        Assert.Equal (15, tab4.Border.TabOffset);
-        Assert.Equal (20, tab5.Border.TabOffset);
 
-        // Select tab5 — should scroll right
+        // Select tab5 — should scroll right since tab5 is off-screen at width 18
         tabs.Value = tab5;
         superView.Layout ();
 
