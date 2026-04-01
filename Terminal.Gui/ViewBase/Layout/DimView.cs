@@ -44,8 +44,8 @@ public record DimView : Dim
     internal override int GetAnchor (int size) =>
         Dimension switch
         {
-            Dimension.Height => Target!.Frame.Height,
-            Dimension.Width => Target!.Frame.Width,
+            Dimension.Height => Target?.Frame.Height ?? 0,
+            Dimension.Width => Target?.Frame.Width ?? 0,
             _ => 0
         };
 

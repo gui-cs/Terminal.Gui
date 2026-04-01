@@ -28,15 +28,34 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     public void Add_View_Value_Is_First_Added ()
     {
         Tabs tabs = new ();
-        View tab1 = new () { Title = "Tab1" };
 
+        View tab1 = new () { Title = "Tab1" };
         tabs.Add (tab1);
         Assert.True (tab1.HasFocus);
         Assert.Same (tab1, tabs.Value);
 
         View tab2 = new () { Title = "Tab2" };
-
         tabs.Add (tab2);
+        Assert.True (tab1.HasFocus);
+        Assert.Same (tab1, tabs.Value);
+    }
+
+    [Fact]
+    public void Add_View_Value_Is_First_Added_SuperView ()
+    {
+        View superView = new View () { CanFocus = true };
+        Tabs tabs = new ();
+        superView.Add (tabs);
+
+        View tab1 = new () { Title = "Tab1" };
+        tabs.Add (tab1);
+        Assert.True (tab1.HasFocus);
+        Assert.Same (tab1, tabs.Value);
+
+        View tab2 = new () { Title = "Tab2" };
+        tabs.Add (tab2);
+        superView.Layout ();
+
         Assert.True (tab1.HasFocus);
         Assert.Same (tab1, tabs.Value);
     }
