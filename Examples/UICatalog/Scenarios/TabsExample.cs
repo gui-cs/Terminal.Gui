@@ -2,9 +2,11 @@
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Tabs Example", "Demonstrates the Tabs and Tab views with tab-style borders.")]
+[ScenarioMetadata ("Tabs Example", "Demonstrates the Tabs View (a TabView replacement).")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Layout")]
+[ScenarioCategory ("Tabs")]
+
 public sealed class TabsExample : Scenario
 {
     public override void Main ()
@@ -24,7 +26,7 @@ public sealed class TabsExample : Scenario
             Title = "_Tabs",
             Width = Dim.Percent (70),
             Height = Dim.Percent (70),
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable ,
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
             BorderStyle = LineStyle.Double
         };
 
