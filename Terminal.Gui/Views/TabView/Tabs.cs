@@ -320,15 +320,24 @@ public class Tabs : View, IValue<View?>, IDesignable
             foreach (View tab in TabCollection.TakeWhile (t => t != focusedTab))
             {
                 MoveSubViewToEnd (tab);
+                Button? back = tab.Border.View?.SubViews.OfType<Button> ().FirstOrDefault (b => b.Id == ScrollBackTag);
+                Button? forward = tab.Border.View?.SubViews.OfType<Button> ().FirstOrDefault (b => b.Id == ScrollForwardTag);
+                back?.Visible = false;
+                forward?.Visible = false;
             }
 
             // Focused tab is drawn on top of all others
             MoveSubViewToEnd (focusedTab);
+            UpdateScrollButtonVisibility ();
 
             // Tabs after the focused tab are drawn in reverse order they were added (last added at back)
             foreach (View tab in TabCollection.SkipWhile (t => t != focusedTab).Skip (1))
             {
                 MoveSubViewToStart (tab);
+                Button? back = tab.Border.View?.SubViews.OfType<Button> ().FirstOrDefault (b => b.Id == ScrollBackTag);
+                Button? forward = tab.Border.View?.SubViews.OfType<Button> ().FirstOrDefault (b => b.Id == ScrollForwardTag);
+                back?.Visible = false;
+                forward?.Visible = false;
             }
         }
         else
@@ -339,6 +348,7 @@ public class Tabs : View, IValue<View?>, IDesignable
                 MoveSubViewToStart (tab);
             }
         }
+
     }
 
     /// <summary>
