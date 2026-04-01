@@ -134,6 +134,45 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
     }
 
+    /// <summary>
+    ///     Gets or sets the depth of the tab. The default is 3, which means the tab will have room for the outside border,
+    ///     title, and a 1-character tab border. Adjust this if you have a thicker border or want more/less space in the tab
+    ///     header.
+    /// </summary>
+    public int TabDepth
+    {
+        get;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+
+            field = value;
+            UpdateTabBorderThickness ();
+        }
+    } = 3;
+
+    /// <inheritdoc/>
+    protected override void OnFocusedChanged (View? previousFocused, View? focused)
+    {
+        base.OnFocusedChanged (previousFocused, focused);
+
+        if (focused is TabTitleView)
+        {
+            return;
+        }
+
+        // Find which tab view now has focus (using logical order)
+        View? focusedTab = TabCollection.FirstOrDefault (t => t.HasFocus);
+
+        if (focusedTab is { })
+        {
+            Value = focusedTab;
+        }
+    }
+
     #region IValue<View?> Implementation
 
     private View? _value;
@@ -383,26 +422,6 @@ public class Tabs : View, IValue<View?>, IDesignable
         // Add 1 because the last tab's trailing border is not shared
         return span > 0 ? span + 1 : 0;
     }
-
-    /// <summary>
-    ///     Gets or sets the depth of the tab. The default is 3, which means the tab will have room for the outside border,
-    ///     title, and a 1-character tab border. Adjust this if you have a thicker border or want more/less space in the tab
-    ///     header.
-    /// </summary>
-    public int TabDepth
-    {
-        get;
-        set
-        {
-            if (field == value)
-            {
-                return;
-            }
-
-            field = value;
-            UpdateTabBorderThickness ();
-        }
-    } = 3;
 
     /// <summary>
     ///     Updates <see cref="Drawing.Thickness"/> for all tabs based on <see cref="TabSide"/>.
@@ -670,29 +689,6 @@ public class Tabs : View, IValue<View?>, IDesignable
 
     #endregion
 
-    #region Focus Handling
-
-    /// <inheritdoc/>
-    protected override void OnFocusedChanged (View? previousFocused, View? focused)
-    {
-        base.OnFocusedChanged (previousFocused, focused);
-
-        if (focused is TabTitleView)
-        {
-            return;
-        }
-
-        // Find which tab view now has focus (using logical order)
-        View? focusedTab = TabCollection.FirstOrDefault (t => t.HasFocus);
-
-        if (focusedTab is { })
-        {
-            Value = focusedTab;
-        }
-    }
-
-    #endregion
-
     #region IDesignable
 
     /// <inheritdoc/>
@@ -871,7 +867,7 @@ public class Tabs : View, IValue<View?>, IDesignable
 
             foreach (View t in TabCollection)
             {
-                tabListSource.Add (t.Title );
+                tabListSource.Add (t.Title);
             }
         }
     }
