@@ -37,6 +37,7 @@ public class Tabs : View, IValue<View?>, IDesignable
     public Tabs ()
     {
         CanFocus = true;
+        TabStop = TabBehavior.TabGroup;
 
         Width = Dim.Fill ();
         Height = Dim.Fill ();
@@ -267,21 +268,247 @@ public class Tabs : View, IValue<View?>, IDesignable
 
     #region SubView Management
 
+    /// <inheritdoc/>
+    protected override bool OnKeyDownNotHandled (Key key)
+    {
+        return base.OnKeyDownNotHandled (key);
+        if (MostFocused is TabTitleView)
+        {
+            if (TabSide is Side.Top or Side.Bottom)
+            {
+                // Prevent arrow keys from being handled by the title view, which would interfere with expected tab navigation
+                if (key == Key.CursorRight)
+                {
+                    // Set focus to the next tab, wrapping to the first tab if currently on the last tab
+                    View? nextTab = TabCollection.SkipWhile (t => !t.HasFocus).Skip (1).FirstOrDefault () ?? TabCollection.FirstOrDefault ();
+                    BorderView? borderView = nextTab?.Border.View as BorderView;
+
+                    return borderView?.TabTitleView?.SetFocus () ?? true;
+                }
+
+                if (key == Key.CursorLeft)
+                {
+                    // Set focus to the previous tab, wrapping to the last tab if currently on the first tab
+                    View? previousTab = TabCollection.TakeWhile (t => !t.HasFocus).LastOrDefault () ?? TabCollection.LastOrDefault ();
+                    BorderView? borderView = previousTab?.Border.View as BorderView;
+
+                    return borderView?.TabTitleView?.SetFocus () ?? true;
+                }
+
+                if (key == Key.CursorDown && TabSide == Side.Top)
+                {
+                    // If the tab headers are on the top or bottom, allow down arrow to move focus into the selected tab content
+                    if (Value?.PreviouslyFocused is { })
+                    {
+                        return Value?.PreviouslyFocused?.SetFocus () ?? false;
+                    }
+
+                    return Value?.FocusDeepest (NavigationDirection.Forward, null) ?? false;
+                }
+
+                if (key == Key.CursorDown && TabSide == Side.Bottom)
+                {
+                    // If the tab headers are on the top or bottom, allow down arrow to move focus into the selected tab content
+                    HasFocus = false;
+
+                    return true;
+                }
+
+                if (key == Key.CursorUp && TabSide == Side.Top)
+                {
+                    HasFocus = false;
+
+                    return true;
+                }
+
+                if (key == Key.CursorUp && TabSide == Side.Bottom)
+                {
+                    // If the tab headers are on the top or bottom, allow down arrow to move focus into the selected tab content
+                    if (Value?.PreviouslyFocused is { })
+                    {
+                        return Value?.PreviouslyFocused?.SetFocus () ?? false;
+                    }
+
+                    return Value?.FocusDeepest (NavigationDirection.Backward, null) ?? false;
+                }
+            }
+            else
+            {
+                // TabSide is either Right or Left; same logic as above, but oriented for vertical tabs and using left/right arrows instead of up/down
+
+                if (key == Key.CursorDown)
+                {
+                    // Set focus to the next tab, wrapping to the first tab if currently on the last tab
+                    View? nextTab = TabCollection.SkipWhile (t => !t.HasFocus).Skip (1).FirstOrDefault () ?? TabCollection.FirstOrDefault ();
+
+                    BorderView? borderView = nextTab?.Border.View as BorderView;
+
+                    return borderView?.TabTitleView?.SetFocus () ?? true;
+                }
+
+                if (key == Key.CursorUp)
+                {
+                    // Set focus to the previous tab, wrapping to the last tab if currently on the first tab
+                    View? previousTab = TabCollection.TakeWhile (t => !t.HasFocus).LastOrDefault () ?? TabCollection.LastOrDefault ();
+
+                    return previousTab?.Border.View?.FocusDeepest (NavigationDirection.Backward, null) ?? true;
+                }
+
+                if (key == Key.CursorRight && TabSide == Side.Left)
+                {
+                    // Tab headers on the left: right arrow moves focus into the selected tab content
+                    if (Value?.PreviouslyFocused is { })
+                    {
+                        return Value?.PreviouslyFocused?.SetFocus () ?? false;
+                    }
+
+                    return Value?.FocusDeepest (NavigationDirection.Forward, TabBehavior.NoStop) ?? false;
+                }
+
+                if (key == Key.CursorRight && TabSide == Side.Right)
+                {
+                    // Tab headers on the right: right arrow moves away from the strip
+                    HasFocus = false;
+
+                    return true;
+                }
+
+                if (key == Key.CursorLeft && TabSide == Side.Left)
+                {
+                    // Tab headers on the left: left arrow moves away from the strip
+                    HasFocus = false;
+
+                    return true;
+                }
+
+                if (key == Key.CursorLeft && TabSide == Side.Right)
+                {
+                    // Tab headers on the right: left arrow moves focus into the selected tab content
+                    if (Value?.PreviouslyFocused is { })
+                    {
+                        return Value?.PreviouslyFocused?.SetFocus () ?? false;
+                    }
+
+                    return Value?.FocusDeepest (NavigationDirection.Backward, TabBehavior.NoStop) ?? false;
+                }
+            }
+        }
+
+        if (key == Application.GetDefaultKey (Command.NextTabGroup))
+        {
+            // Tab to the text TabHeader if focus is currently in the selected tab content
+
+            return (TabCollection.SkipWhile (t => !t.HasFocus).Skip (1).FirstOrDefault () ?? TabCollection.FirstOrDefault ())?.SetFocus () ?? true;
+
+        }
+
+        if (key == Application.GetDefaultKey (Command.PreviousTabGroup))
+        {
+            // Tab to the TabHeaders if focus is currently in the selected tab content
+            return (TabCollection.TakeWhile (t => !t.HasFocus).LastOrDefault () ?? TabCollection.LastOrDefault ())?.SetFocus () ?? true;
+
+        }
+
+        //// Top or Bottom
+        //if (key == Key.CursorDown && TabSide is Side.Top or Side.Bottom)
+        //{
+        //    // Set focus to the next tab, wrapping to the first tab if currently on the last tab
+        //    View? nextTab = TabCollection.SkipWhile (t => !t.HasFocus).Skip (1).FirstOrDefault () ?? TabCollection.FirstOrDefault ();
+        //    return nextTab?.Border.View?.FocusDeepest (NavigationDirection.Forward, null) ?? true;
+        //}
+        //if (key == Key.CursorUp && TabSide is Side.Top or Side.Bottom)
+        //{
+        //    // Set focus to the previous tab, wrapping to the last tab if currently on the first tab
+        //    View? previousTab = TabCollection.TakeWhile (t => !t.HasFocus).LastOrDefault () ?? TabCollection.LastOrDefault ();
+        //    return previousTab?.Border.View?.FocusDeepest (NavigationDirection.Backward, null) ?? true;
+        //}
+        //// Left or Right
+        //if (key == Key.CursorRight && TabSide is Side.Left or Side.Right)
+        //{
+        //    //Set focus to the next tab, wrapping to the first tab if currently on the last tab
+        //    View? nextTab = TabCollection.SkipWhile (t => !t.HasFocus).Skip (1).FirstOrDefault () ?? TabCollection.FirstOrDefault ();
+        //    return nextTab?.Border.View?.FocusDeepest (NavigationDirection.Forward, null) ?? true;
+        //}
+        //if (key == Key.CursorLeft && TabSide is Side.Left or Side.Right)
+        //{
+        //    // Set focus to the previous tab, wrapping to the last tab if currently on the first tab
+        //    View? previousTab = TabCollection.TakeWhile (t => !t.HasFocus).LastOrDefault () ?? TabCollection.LastOrDefault ();
+        //    return previousTab?.Border.View?.FocusDeepest (NavigationDirection.Backward, null) ?? true;
+        //}
+        // If focus is not on a tab title, allow tabbing into tab title
+        return base.OnKeyDownNotHandled (key);
+    }
+
     /// <summary>
-    ///     Handles addition of a SubView by configuring it as a tab: sets <see cref="BorderSettings.Tab"/>,
-    ///     <see cref="ViewArrangement.Overlapped"/>, adds scroll buttons to its border, and appends it to
-    ///     the logical <see cref="TabCollection"/>.
+    ///     Reorders the SubViews to match the logical tab order defined by <see cref="TabCollection"/>. This ensures that
+    ///     navigation and other operations that rely on SubView order function according to the logical tab order, rather than
+    ///     the draw order which may differ due to focused tab being drawn last.
     /// </summary>
+    /// <param name="includeMargin"></param>
+    /// <param name="includeBorder"></param>
+    /// <param name="includePadding"></param>
+    /// <returns></returns>
+    public override IReadOnlyCollection<View> GetSubViews (bool includeMargin = false, bool includeBorder = false, bool includePadding = false)
+    {
+        List<View> subViewsOfThisTabs = new (base.GetSubViews (includeMargin, includeBorder, includePadding));
+
+        // Reorder according to TabsCollection
+        subViewsOfThisTabs.Sort ((v1, v2) =>
+                                 {
+                                     int index1 = TabCollection.TakeWhile (t => t != v1).Count ();
+                                     int index2 = TabCollection.TakeWhile (t => t != v2).Count ();
+
+                                     return index1.CompareTo (index2);
+                                 });
+
+        return subViewsOfThisTabs;
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
+    {
+        if (base.OnAdvancingFocus (direction, behavior))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    ///     Handles adding the new tab View to an internal tracking list, and ensuring <see cref="View.CanFocus"/> is
+    ///     set to <see langword="false"/> so that focus will not change during the <see cref="View.Add(View)"/> flow.
+    /// </summary>
+    protected override bool OnSubViewAdding (EventArgs<View> args)
+    {
+        if (base.OnSubViewAdding (args))
+        {
+            return true;
+        }
+
+        // Add to internal tracking list
+        _tabList.Add (new WeakReference<View> (args.Value));
+
+        // Ensure CanFocus is false; otherwise Add will try to set focus on it, which can interfere
+        // with the expected flow of focus being set to the first tab added, and then not changing on subsequent adds
+        args.Value.CanFocus = false;
+
+        return false;
+    }
+
+    /// <summary>
+    ///     Configures a subview when it is added to the tab view, applying tab-specific layout, border, and focus settings.
+    /// </summary>
+    /// <remarks>
+    ///     This method customizes the appearance and behavior of the subview to match the tabbed
+    ///     interface, including setting border styles, layout, and focus properties. It also adds scroll indicator buttons
+    ///     to the tab's border to provide visual affordance when scrolling is available.
+    /// </remarks>
+    /// <param name="view">The subview being added to the tab view. Cannot be null.</param>
     protected override void OnSubViewAdded (View view)
     {
         base.OnSubViewAdded (view);
 
-        // Add to internal tracking list
-        _tabList.Add (new WeakReference<View> (view));
-
-        // Configure the view as a tab
-        view.TabStop = TabBehavior.TabStop;
-        view.CanFocus = true;
         view.BorderStyle = _tabLineStyle;
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
         view.Border.TabSide = _tabSide;
@@ -294,13 +521,20 @@ public class Tabs : View, IValue<View?>, IDesignable
         // They occlude the separator line when visible, providing scroll affordance.
         AddScrollButtonsToBorder (view);
 
-        // Focus first tab added (common convention for tabbed interfaces).
-        // Subsequent tabs will not steal focus when added.
-        TabCollection.FirstOrDefault ()?.SetFocus ();
-
         UpdateZOrder ();
         UpdateTabBorderThickness ();
         UpdateTabOffsets ();
+
+        // Re-enable focus on the view now that it has been configured as a tab.
+        // Setting CanFocus causes the View to become focused.
+        view.CanFocus = true;
+        view.TabStop = TabBehavior.TabStop;
+        view.Border.View?.CanFocus = true;
+
+        // Setting the BorderView to NoStop ensures that the only way the TitleTabView will
+        // get focus is if the user explicitly sets focus to it
+        // or, if the users uses the Next/PreviousTabGroup key.
+        view.Border.View?.TabStop = TabBehavior.NoStop;
     }
 
     /// <summary>
@@ -693,17 +927,17 @@ public class Tabs : View, IValue<View?>, IDesignable
     {
         // BUGBUG: AttributePicker sets SuperViewRendersLineCanvas on it's subviews. In order to
         // BUGBUG: Prevent Tabs from being that superview, we must add via an intermediary View
-        View tab1 = new () { Title = "_Attribute" };
+        View attributesTab = new () { Id = "attributesTab", Title = "_Attribute" };
         AttributePicker attributePicker = new () { Y = 1, BorderStyle = LineStyle.Single };
-        tab1.Add (attributePicker);
+        attributesTab.Add (attributePicker);
 
         // Add an OptionSelector directly
-        OptionSelector<LineStyle> lineStyleSelector = new () { Title = "_Line Style" };
+        OptionSelector<LineStyle> lineStyleTab = new () { Id = "lineStyleTab", Title = "_Line Style" };
 
         // Create an intermediary tab to hold multiple subviews
-        View tab3 = new () { Title = "Tab _Settings" };
+        View settingsTab = new () { Id = "settingsTab", Title = "Tab _Settings" };
         OptionSelector<Side> tabSideSelector = new () { Y = 1, BorderStyle = LineStyle.Single, Title = "S_ide" };
-        tabSideSelector.Value = tab3.Border.TabSide;
+        tabSideSelector.Value = settingsTab.Border.TabSide;
 
         NumericUpDown<int> tabDepthNumericUpDown = new ()
         {
@@ -738,9 +972,9 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         scrollOffsetNumericUpDown.ValueChanging += (_, e) => { ScrollOffset = e.NewValue; };
 
-        tab3.Add (tabSideSelector, tabDepthNumericUpDown, scrollOffsetNumericUpDown);
+        settingsTab.Add (tabSideSelector, tabDepthNumericUpDown, scrollOffsetNumericUpDown);
 
-        View addRemoveTab = new () { Title = "Add_/Remove" };
+        View addRemoveTab = new () { Id = "addRemoveTab", Title = "Add_/Remove" };
 
         // Tab list showing all tabs in logical order
         ObservableCollection<string> tabListSource = new (TabCollection.Select (t => t.Title));
@@ -822,8 +1056,6 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         addRemoveTab.Add (tabListView, titleLabel, titleTextField, setTitleButton, addBeforeButton, addAfterButton, removeButton);
 
-        Add (tab1, lineStyleSelector, tab3, addRemoveTab);
-
         // Refresh the list whenever Value changes (tab added/removed/selected)
         ValueChanged += (_, _) => RefreshList ();
 
@@ -839,13 +1071,13 @@ public class Tabs : View, IValue<View?>, IDesignable
                                             }
                                         };
 
-        lineStyleSelector.ValueChanged += (_, e) =>
-                                          {
-                                              if (e.Value is { })
-                                              {
-                                                  TabLineStyle = e.Value.Value;
-                                              }
-                                          };
+        lineStyleTab.ValueChanged += (_, e) =>
+                                     {
+                                         if (e.Value is { })
+                                         {
+                                             TabLineStyle = e.Value.Value;
+                                         }
+                                     };
 
         tabSideSelector.ValueChanged += (_, e) =>
                                         {
@@ -854,6 +1086,10 @@ public class Tabs : View, IValue<View?>, IDesignable
                                                 TabSide = e.Value.Value;
                                             }
                                         };
+
+        Add (attributesTab, lineStyleTab, settingsTab, addRemoveTab);
+
+        //tab1.SetFocus ();
 
         return true;
 

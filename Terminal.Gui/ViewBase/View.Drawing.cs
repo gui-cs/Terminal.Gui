@@ -565,6 +565,8 @@ public partial class View // Drawing APIs
 
         // Draw the SubViews in reverse Z-order to leverage clipping.
         // SubViews earlier in the collection are drawn last (on top).
+        // NOTE: Do not use SubViews or GetSubViews() here as GetSubViews can be overridden to return a different set of views or ordering.
+        // NOTE: We need to draw exactly the views in InternalSubViews.
         foreach (View view in InternalSubViews.Snapshot ().Where (v => v.Visible).Reverse ())
         {
             view.Draw (context);

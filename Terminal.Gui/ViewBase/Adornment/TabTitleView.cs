@@ -11,6 +11,8 @@ internal sealed class TabTitleView : View
     public TabTitleView ()
     {
         CanFocus = true;
+        // Do not allow TabTitleView to participate in tab navigation.
+        // If the user clicks on the TabTitleView it will get focus, but pressing Tab will skip it and move to the next focusable View in the owning BorderView.
         TabStop = TabBehavior.NoStop;
         Border.Settings = BorderSettings.None;
         SuperViewRendersLineCanvas = true;

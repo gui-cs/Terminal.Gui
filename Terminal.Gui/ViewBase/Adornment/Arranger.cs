@@ -137,6 +137,11 @@ internal sealed class Arranger : IDisposable
     /// </summary>
     internal bool? ExitArrangeMode ()
     {
+        if (!HasAnyArrangementOptions ())
+        {
+            return false;
+        }
+
         if (_border.App is { })
         {
             _border.App.Mouse.MouseEvent -= ApplicationOnMouseEvent;

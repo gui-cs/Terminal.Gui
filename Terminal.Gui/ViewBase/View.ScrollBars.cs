@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Terminal.Gui.ViewBase;
 
 public partial class View
@@ -20,6 +22,7 @@ public partial class View
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     /// </remarks>
+    [DebuggerBrowsable (DebuggerBrowsableState.Never)]
     public ScrollBar HorizontalScrollBar => _horizontalScrollBar.Value;
 
     private Lazy<ScrollBar> _verticalScrollBar = null!;
@@ -39,8 +42,8 @@ public partial class View
     ///         See the Layout Deep Dive for more information:
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
-    ///     ///
     /// </remarks>
+    [DebuggerBrowsable (DebuggerBrowsableState.Never)]
     public ScrollBar VerticalScrollBar => _verticalScrollBar.Value;
 
     /// <summary>
@@ -53,8 +56,9 @@ public partial class View
             return;
         }
 
-        _verticalScrollBar = new Lazy<ScrollBar> (() => CreateScrollBar (Orientation.Vertical));
-        _horizontalScrollBar = new Lazy<ScrollBar> (() => CreateScrollBar (Orientation.Horizontal));
+        // Terminal.Gui is single-threaded (UI thread only), so None is appropriate
+        _verticalScrollBar = new Lazy<ScrollBar> (() => CreateScrollBar (Orientation.Vertical), LazyThreadSafetyMode.None);
+        _horizontalScrollBar = new Lazy<ScrollBar> (() => CreateScrollBar (Orientation.Horizontal), LazyThreadSafetyMode.None);
     }
 
     private ScrollBar CreateScrollBar (Orientation orientation)

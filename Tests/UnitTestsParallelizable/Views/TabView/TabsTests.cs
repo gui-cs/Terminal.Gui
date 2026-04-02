@@ -418,4 +418,182 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
         // Change was cancelled, value remains tab1
         Assert.Same (tab1, tabs.Value);
     }
+
+    // Copilot
+
+    [Theory]
+    [InlineData (Side.Left)]
+    [InlineData (Side.Right)]
+    public void Nav_Left_Or_Right_CursorDown_OnTabTitle_MovesToNextTab (Side tabSide)
+    {
+        IDriver driver = CreateTestDriver (20, 10);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = tabSide };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        tab1.Border.View?.SetFocus ();
+
+        tabs.NewKeyDownEvent (Key.CursorDown);
+
+        Assert.True (tab2.Border.View?.HasFocus ?? tab2.HasFocus);
+
+        tabs.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (Side.Left)]
+    [InlineData (Side.Right)]
+    public void Nav_Left_Or_Right_CursorDown_OnLastTabTitle_WrapsToFirstTab (Side tabSide)
+    {
+        IDriver driver = CreateTestDriver (20, 10);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = tabSide };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+
+        tabs.Add (tab1, tab2);
+        tabs.Layout ();
+
+        tab2.Border.View?.SetFocus ();
+
+        tabs.NewKeyDownEvent (Key.CursorDown);
+
+        Assert.True (tab1.Border.View?.HasFocus ?? tab1.HasFocus);
+
+        tabs.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (Side.Left)]
+    [InlineData (Side.Right)]
+    public void Nav_Left_Or_Right_CursorUp_OnTabTitle_MovesToPreviousTab (Side tabSide)
+    {
+        IDriver driver = CreateTestDriver (20, 10);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = tabSide };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        tab3.Border.View?.SetFocus ();
+
+        tabs.NewKeyDownEvent (Key.CursorUp);
+
+        Assert.True (tab2.Border.View?.HasFocus ?? tab2.HasFocus);
+
+        tabs.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (Side.Left)]
+    [InlineData (Side.Right)]
+    public void Nav_Left_Or_Right_CursorUp_OnFirstTabTitle_WrapsToLastTab (Side tabSide)
+    {
+        IDriver driver = CreateTestDriver (20, 10);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = tabSide };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+
+        tabs.Add (tab1, tab2);
+        tabs.Layout ();
+
+        tab1.Border.View?.SetFocus ();
+
+        tabs.NewKeyDownEvent (Key.CursorUp);
+
+        Assert.True (tab2.Border.View?.HasFocus ?? tab2.HasFocus);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void Nav_Left_CursorRight_OnTabTitle_MovesIntoTabContent ()
+    {
+        IDriver driver = CreateTestDriver (20, 10);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = Side.Left };
+
+        View tab1 = new () { Title = "Tab1" };
+        View contentButton = new () { Title = "OK", CanFocus = true, Width = 4, Height = 1 };
+        tab1.Add (contentButton);
+
+        tabs.Add (tab1);
+        tabs.Layout ();
+
+        tab1.Border.View?.SetFocus ();
+
+        tabs.NewKeyDownEvent (Key.CursorRight);
+
+        Assert.True (contentButton.HasFocus);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void Nav_Left_CursorLeft_OnTabTitle_UnfocusesTabsView ()
+    {
+        IDriver driver = CreateTestDriver (20, 10);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = Side.Left };
+
+        View tab1 = new () { Title = "Tab1" };
+        tabs.Add (tab1);
+        tabs.Layout ();
+
+        tab1.Border.View?.SetFocus ();
+
+        tabs.NewKeyDownEvent (Key.CursorLeft);
+
+        Assert.False (tabs.HasFocus);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void Nav_Right_CursorLeft_OnTabTitle_MovesIntoTabContent ()
+    {
+        IDriver driver = CreateTestDriver (20, 10);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = Side.Right };
+
+        View tab1 = new () { Title = "Tab1" };
+        View contentButton = new () { Title = "OK", CanFocus = true, Width = 4, Height = 1 };
+        tab1.Add (contentButton);
+
+        tabs.Add (tab1);
+        tabs.Layout ();
+
+        tab1.Border.View?.SetFocus ();
+
+        tabs.NewKeyDownEvent (Key.CursorLeft);
+
+        Assert.True (contentButton.HasFocus);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
+    public void Nav_Right_CursorRight_OnTabTitle_UnfocusesTabsView ()
+    {
+        IDriver driver = CreateTestDriver (20, 10);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = Side.Right };
+
+        View tab1 = new () { Title = "Tab1" };
+        tabs.Add (tab1);
+        tabs.Layout ();
+
+        tab1.Border.View?.SetFocus ();
+
+        tabs.NewKeyDownEvent (Key.CursorRight);
+
+        Assert.False (tabs.HasFocus);
+
+        tabs.Dispose ();
+    }
 }
