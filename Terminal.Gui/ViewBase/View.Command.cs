@@ -212,7 +212,13 @@ public partial class View // Command APIs
 
     #region Default Event Handlers
 
-    internal bool? DefaultCommandNotBoundHandler (ICommandContext? ctx) => RaiseCommandNotBound (ctx);
+    /// <summary>
+    ///     Called when a command that has not been bound is invoked. The default implementation raises
+    ///     <see cref="CommandNotBound"/>.
+    /// </summary>
+    /// <param name="ctx">The command context.</param>
+    /// <returns><see langword="true"/> if the command was handled; otherwise, <see langword="false"/>.</returns>
+    public bool? DefaultCommandNotBoundHandler (ICommandContext? ctx) => RaiseCommandNotBound (ctx);
 
     /// <summary>
     ///     Called when a command that has not been bound is invoked.
@@ -260,7 +266,12 @@ public partial class View // Command APIs
 
     #region Accept
 
-    internal bool? DefaultAcceptHandler (ICommandContext? ctx)
+    /// <summary>
+    ///     Called when the user is accepting the state of the View and <see cref="Command.Accept"/> has been invoked.
+    /// </summary>
+    /// <param name="ctx">The command context.</param>
+    /// <returns><see langword="true"/> if the command was handled; otherwise, <see langword="false"/>.</returns>
+    public bool? DefaultAcceptHandler (ICommandContext? ctx)
     {
         Trace.Command (this, ctx, "Entry");
 
@@ -492,7 +503,12 @@ public partial class View // Command APIs
 
     #region Activate
 
-    internal bool? DefaultActivateHandler (ICommandContext? ctx)
+    /// <summary>
+    ///     Called when the user is activating the View and <see cref="Command.Activate"/> has been invoked.
+    /// </summary>
+    /// <param name="ctx">The command context.</param>
+    /// <returns><see langword="true"/> if the command was handled; otherwise, <see langword="false"/>.</returns>
+    public bool? DefaultActivateHandler (ICommandContext? ctx)
     {
         Trace.Command (this, ctx, "Entry");
 
@@ -856,7 +872,12 @@ public partial class View // Command APIs
 
     #region HotKey
 
-    internal bool? DefaultHotKeyHandler (ICommandContext? ctx)
+    /// <summary>
+    ///     Called when the user has pressed the View's <see cref="HotKey"/> and <see cref="Command.HotKey"/> has been invoked.
+    /// </summary>
+    /// <param name="ctx">The command context.</param>
+    /// <returns><see langword="true"/> if the command was handled; otherwise, <see langword="false"/>.</returns>
+    public bool? DefaultHotKeyHandler (ICommandContext? ctx)
     {
         Trace.Command (this, ctx, "Entry");
 
