@@ -1292,7 +1292,11 @@ public partial class View // Command APIs
             ICommandContext? refreshed = RefreshValue (ctx);
 
             Trace.Command (this, refreshed, "Routing", $"BubblingUp to Adornment.Parent {adornment.Adornment.Parent.ToIdentifyingString ()}");
-            upCtx = new CommandContext (refreshed!.Command, refreshed.Source, refreshed.Binding) { Routing = CommandRouting.BubblingUp, Values = refreshed.Values };
+
+            upCtx = new CommandContext (refreshed!.Command, refreshed.Source, refreshed.Binding)
+            {
+                Routing = CommandRouting.BubblingUp, Values = refreshed.Values
+            };
 
             return adornment.Adornment.Parent.InvokeCommand (refreshed.Command, upCtx);
         }
@@ -1306,7 +1310,11 @@ public partial class View // Command APIs
         ICommandContext? selfRefreshed = RefreshValue (ctx);
 
         Trace.Command (this, selfRefreshed, "Routing", $"BubblingUp from Adornment to {selfAdornment.Adornment.Parent.ToIdentifyingString ()}");
-        upCtx = new CommandContext (selfRefreshed!.Command, selfRefreshed.Source, selfRefreshed.Binding) { Routing = CommandRouting.BubblingUp, Values = selfRefreshed.Values };
+
+        upCtx = new CommandContext (selfRefreshed!.Command, selfRefreshed.Source, selfRefreshed.Binding)
+        {
+            Routing = CommandRouting.BubblingUp, Values = selfRefreshed.Values
+        };
 
         return selfAdornment.Adornment.Parent.InvokeCommand (selfRefreshed.Command, upCtx);
     }

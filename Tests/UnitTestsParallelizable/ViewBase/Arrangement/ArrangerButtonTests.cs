@@ -336,8 +336,7 @@ public class ArrangerButtonTests
 
     private static void AssertKeyBoundToCommand (ArrangerButton button, Key key, Command expectedCommand)
     {
-        Assert.True (button.KeyBindings.TryGet (key, out KeyBinding binding),
-                     $"Expected key {key} to be bound on {button.ButtonType}");
+        Assert.True (button.KeyBindings.TryGet (key, out KeyBinding binding), $"Expected key {key} to be bound on {button.ButtonType}");
         Assert.Contains (expectedCommand, binding.Commands);
     }
 

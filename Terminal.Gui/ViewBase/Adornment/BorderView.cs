@@ -408,13 +408,13 @@ public partial class BorderView : AdornmentView
         int contentSide = depth >= 3 && !hasFocus ? 1 : 0;
 
         return tabSide switch
-        {
-            Side.Top => new Thickness (1, cap, 1, contentSide),
-            Side.Bottom => new Thickness (1, contentSide, 1, cap),
-            Side.Left => new Thickness (cap, 1, contentSide, 1),
-            Side.Right => new Thickness (contentSide, 1, cap, 1),
-            _ => Thickness.Empty
-        };
+               {
+                   Side.Top => new Thickness (1, cap, 1, contentSide),
+                   Side.Bottom => new Thickness (1, contentSide, 1, cap),
+                   Side.Left => new Thickness (cap, 1, contentSide, 1),
+                   Side.Right => new Thickness (contentSide, 1, cap, 1),
+                   _ => Thickness.Empty
+               };
     }
 
     private int GetTabDepth (Border border)
@@ -425,13 +425,13 @@ public partial class BorderView : AdornmentView
         }
 
         int thickness = border.TabSide switch
-        {
-            Side.Top => Adornment.Thickness.Top,
-            Side.Bottom => Adornment.Thickness.Bottom,
-            Side.Left => Adornment.Thickness.Left,
-            Side.Right => Adornment.Thickness.Right,
-            _ => 3
-        };
+                        {
+                            Side.Top => Adornment.Thickness.Top,
+                            Side.Bottom => Adornment.Thickness.Bottom,
+                            Side.Left => Adornment.Thickness.Left,
+                            Side.Right => Adornment.Thickness.Right,
+                            _ => 3
+                        };
 
         return Math.Min (thickness, 3);
     }
@@ -588,178 +588,178 @@ public partial class BorderView : AdornmentView
         switch (side)
         {
             case Side.Top:
+            {
+                int borderY = contentBorderRect.Y;
+
+                if (!openGap)
                 {
-                    int borderY = contentBorderRect.Y;
-
-                    if (!openGap)
-                    {
-                        lc.AddLine (new Point (contentBorderRect.X, borderY), contentBorderRect.Width, Orientation.Horizontal, lineStyle, attribute);
-                    }
-                    else
-                    {
-                        // Reserve the gap cells so overlapped compositing suppresses
-                        // lower-Z views' content border lines at these positions.
-                        int gapStart = clipped.X + 1;
-                        int gapEnd = clipped.Right - 1;
-
-                        if (gapEnd > gapStart)
-                        {
-                            lc.Reserve (new Rectangle (gapStart, borderY, gapEnd - gapStart, 1));
-                        }
-
-                        if (clipped.X > contentBorderRect.X)
-                        {
-                            lc.AddLine (new Point (contentBorderRect.X, borderY),
-                                        clipped.X - contentBorderRect.X + 1,
-                                        Orientation.Horizontal,
-                                        lineStyle,
-                                        attribute);
-                        }
-
-                        if (clipped.Right - 1 < contentBorderRect.Right - 1)
-                        {
-                            lc.AddLine (new Point (clipped.Right - 1, borderY),
-                                        contentBorderRect.Right - (clipped.Right - 1),
-                                        Orientation.Horizontal,
-                                        lineStyle,
-                                        attribute);
-                        }
-                    }
-
-                    break;
+                    lc.AddLine (new Point (contentBorderRect.X, borderY), contentBorderRect.Width, Orientation.Horizontal, lineStyle, attribute);
                 }
+                else
+                {
+                    // Reserve the gap cells so overlapped compositing suppresses
+                    // lower-Z views' content border lines at these positions.
+                    int gapStart = clipped.X + 1;
+                    int gapEnd = clipped.Right - 1;
+
+                    if (gapEnd > gapStart)
+                    {
+                        lc.Reserve (new Rectangle (gapStart, borderY, gapEnd - gapStart, 1));
+                    }
+
+                    if (clipped.X > contentBorderRect.X)
+                    {
+                        lc.AddLine (new Point (contentBorderRect.X, borderY),
+                                    clipped.X - contentBorderRect.X + 1,
+                                    Orientation.Horizontal,
+                                    lineStyle,
+                                    attribute);
+                    }
+
+                    if (clipped.Right - 1 < contentBorderRect.Right - 1)
+                    {
+                        lc.AddLine (new Point (clipped.Right - 1, borderY),
+                                    contentBorderRect.Right - (clipped.Right - 1),
+                                    Orientation.Horizontal,
+                                    lineStyle,
+                                    attribute);
+                    }
+                }
+
+                break;
+            }
 
             case Side.Bottom:
+            {
+                int borderY = contentBorderRect.Bottom - 1;
+
+                if (!openGap)
                 {
-                    int borderY = contentBorderRect.Bottom - 1;
-
-                    if (!openGap)
-                    {
-                        lc.AddLine (new Point (contentBorderRect.X, borderY), contentBorderRect.Width, Orientation.Horizontal, lineStyle, attribute);
-                    }
-                    else
-                    {
-                        int gapStart = clipped.X + 1;
-                        int gapEnd = clipped.Right - 1;
-
-                        if (gapEnd > gapStart)
-                        {
-                            lc.Reserve (new Rectangle (gapStart, borderY, gapEnd - gapStart, 1));
-                        }
-
-                        if (clipped.X > contentBorderRect.X)
-                        {
-                            lc.AddLine (new Point (contentBorderRect.X, borderY),
-                                        clipped.X - contentBorderRect.X + 1,
-                                        Orientation.Horizontal,
-                                        lineStyle,
-                                        attribute);
-                        }
-
-                        if (clipped.Right - 1 < contentBorderRect.Right - 1)
-                        {
-                            lc.AddLine (new Point (clipped.Right - 1, borderY),
-                                        contentBorderRect.Right - (clipped.Right - 1),
-                                        Orientation.Horizontal,
-                                        lineStyle,
-                                        attribute);
-                        }
-                    }
-
-                    break;
+                    lc.AddLine (new Point (contentBorderRect.X, borderY), contentBorderRect.Width, Orientation.Horizontal, lineStyle, attribute);
                 }
+                else
+                {
+                    int gapStart = clipped.X + 1;
+                    int gapEnd = clipped.Right - 1;
+
+                    if (gapEnd > gapStart)
+                    {
+                        lc.Reserve (new Rectangle (gapStart, borderY, gapEnd - gapStart, 1));
+                    }
+
+                    if (clipped.X > contentBorderRect.X)
+                    {
+                        lc.AddLine (new Point (contentBorderRect.X, borderY),
+                                    clipped.X - contentBorderRect.X + 1,
+                                    Orientation.Horizontal,
+                                    lineStyle,
+                                    attribute);
+                    }
+
+                    if (clipped.Right - 1 < contentBorderRect.Right - 1)
+                    {
+                        lc.AddLine (new Point (clipped.Right - 1, borderY),
+                                    contentBorderRect.Right - (clipped.Right - 1),
+                                    Orientation.Horizontal,
+                                    lineStyle,
+                                    attribute);
+                    }
+                }
+
+                break;
+            }
 
             case Side.Left:
+            {
+                int borderX = contentBorderRect.X;
+
+                if (!openGap)
                 {
-                    int borderX = contentBorderRect.X;
-
-                    if (!openGap)
-                    {
-                        lc.AddLine (new Point (borderX, contentBorderRect.Y), contentBorderRect.Height, Orientation.Vertical, lineStyle, attribute);
-                    }
-                    else
-                    {
-                        int gapStart = clipped.Y + 1;
-                        int gapEnd = clipped.Bottom - 1;
-
-                        if (gapEnd > gapStart)
-                        {
-                            lc.Reserve (new Rectangle (borderX, gapStart, 1, gapEnd - gapStart));
-                        }
-
-                        if (clipped.Y > contentBorderRect.Y)
-                        {
-                            lc.AddLine (new Point (borderX, contentBorderRect.Y), clipped.Y - contentBorderRect.Y + 1, Orientation.Vertical, lineStyle, attribute);
-                        }
-                        else if (clipped.Y > headerRect.Y)
-                        {
-                            // Header clipped at top (overflow) — suppress corner glyph
-                            lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Y, 1, 1)));
-                        }
-
-                        if (clipped.Bottom - 1 < contentBorderRect.Bottom - 1)
-                        {
-                            lc.AddLine (new Point (borderX, clipped.Bottom - 1),
-                                        contentBorderRect.Bottom - (clipped.Bottom - 1),
-                                        Orientation.Vertical,
-                                        lineStyle,
-                                        attribute);
-                        }
-                        else if (clipped.Bottom < headerRect.Bottom)
-                        {
-                            // Header clipped at bottom (overflow) — suppress corner glyph
-                            lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Bottom - 1, 1, 1)));
-                        }
-                    }
-
-                    break;
+                    lc.AddLine (new Point (borderX, contentBorderRect.Y), contentBorderRect.Height, Orientation.Vertical, lineStyle, attribute);
                 }
+                else
+                {
+                    int gapStart = clipped.Y + 1;
+                    int gapEnd = clipped.Bottom - 1;
+
+                    if (gapEnd > gapStart)
+                    {
+                        lc.Reserve (new Rectangle (borderX, gapStart, 1, gapEnd - gapStart));
+                    }
+
+                    if (clipped.Y > contentBorderRect.Y)
+                    {
+                        lc.AddLine (new Point (borderX, contentBorderRect.Y), clipped.Y - contentBorderRect.Y + 1, Orientation.Vertical, lineStyle, attribute);
+                    }
+                    else if (clipped.Y > headerRect.Y)
+                    {
+                        // Header clipped at top (overflow) — suppress corner glyph
+                        lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Y, 1, 1)));
+                    }
+
+                    if (clipped.Bottom - 1 < contentBorderRect.Bottom - 1)
+                    {
+                        lc.AddLine (new Point (borderX, clipped.Bottom - 1),
+                                    contentBorderRect.Bottom - (clipped.Bottom - 1),
+                                    Orientation.Vertical,
+                                    lineStyle,
+                                    attribute);
+                    }
+                    else if (clipped.Bottom < headerRect.Bottom)
+                    {
+                        // Header clipped at bottom (overflow) — suppress corner glyph
+                        lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Bottom - 1, 1, 1)));
+                    }
+                }
+
+                break;
+            }
 
             case Side.Right:
+            {
+                int borderX = contentBorderRect.Right - 1;
+
+                if (!openGap)
                 {
-                    int borderX = contentBorderRect.Right - 1;
-
-                    if (!openGap)
-                    {
-                        lc.AddLine (new Point (borderX, contentBorderRect.Y), contentBorderRect.Height, Orientation.Vertical, lineStyle, attribute);
-                    }
-                    else
-                    {
-                        int gapStart = clipped.Y + 1;
-                        int gapEnd = clipped.Bottom - 1;
-
-                        if (gapEnd > gapStart)
-                        {
-                            lc.Reserve (new Rectangle (borderX, gapStart, 1, gapEnd - gapStart));
-                        }
-
-                        if (clipped.Y > contentBorderRect.Y)
-                        {
-                            lc.AddLine (new Point (borderX, contentBorderRect.Y), clipped.Y - contentBorderRect.Y + 1, Orientation.Vertical, lineStyle, attribute);
-                        }
-                        else if (clipped.Y > headerRect.Y)
-                        {
-                            // Header clipped at top (overflow) — suppress corner glyph
-                            lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Y, 1, 1)));
-                        }
-
-                        if (clipped.Bottom - 1 < contentBorderRect.Bottom - 1)
-                        {
-                            lc.AddLine (new Point (borderX, clipped.Bottom - 1),
-                                        contentBorderRect.Bottom - (clipped.Bottom - 1),
-                                        Orientation.Vertical,
-                                        lineStyle,
-                                        attribute);
-                        }
-                        else if (clipped.Bottom < headerRect.Bottom)
-                        {
-                            // Header clipped at bottom (overflow) — suppress corner glyph
-                            lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Bottom - 1, 1, 1)));
-                        }
-                    }
-
-                    break;
+                    lc.AddLine (new Point (borderX, contentBorderRect.Y), contentBorderRect.Height, Orientation.Vertical, lineStyle, attribute);
                 }
+                else
+                {
+                    int gapStart = clipped.Y + 1;
+                    int gapEnd = clipped.Bottom - 1;
+
+                    if (gapEnd > gapStart)
+                    {
+                        lc.Reserve (new Rectangle (borderX, gapStart, 1, gapEnd - gapStart));
+                    }
+
+                    if (clipped.Y > contentBorderRect.Y)
+                    {
+                        lc.AddLine (new Point (borderX, contentBorderRect.Y), clipped.Y - contentBorderRect.Y + 1, Orientation.Vertical, lineStyle, attribute);
+                    }
+                    else if (clipped.Y > headerRect.Y)
+                    {
+                        // Header clipped at top (overflow) — suppress corner glyph
+                        lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Y, 1, 1)));
+                    }
+
+                    if (clipped.Bottom - 1 < contentBorderRect.Bottom - 1)
+                    {
+                        lc.AddLine (new Point (borderX, clipped.Bottom - 1),
+                                    contentBorderRect.Bottom - (clipped.Bottom - 1),
+                                    Orientation.Vertical,
+                                    lineStyle,
+                                    attribute);
+                    }
+                    else if (clipped.Bottom < headerRect.Bottom)
+                    {
+                        // Header clipped at bottom (overflow) — suppress corner glyph
+                        lc.Exclude (new Region (new Rectangle (borderX, contentBorderRect.Bottom - 1, 1, 1)));
+                    }
+                }
+
+                break;
+            }
 
             default: throw new ArgumentOutOfRangeException (nameof (side), side, null);
         }
