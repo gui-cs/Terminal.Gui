@@ -622,17 +622,12 @@ public partial class View // Command APIs
             return true;
         }
 
-        if (SuperView is PaddingView padding && padding.Adornment?.Parent?.CommandsToBubbleUp.Contains (command) == true)
+        if (SuperView is AdornmentView adornment && adornment.Adornment?.Parent?.CommandsToBubbleUp.Contains (command) == true)
         {
             return true;
         }
 
-        if (this is PaddingView selfPadding && selfPadding.Adornment?.Parent?.CommandsToBubbleUp.Contains (command) == true)
-        {
-            return true;
-        }
-
-        return false;
+        return this is AdornmentView selfAdornment && selfAdornment.Adornment?.Parent?.CommandsToBubbleUp.Contains (command) == true;
     }
 
     /// <summary>
@@ -681,19 +676,19 @@ public partial class View // Command APIs
 
         return;
 
-        // Resolves the next ancestor, handling Padding → Parent traversal (mirrors TryBubbleUp).
+        // Resolves the next ancestor, handling AdornmentView → Parent traversal (mirrors TryBubbleUp).
         static View? GetBubbleAncestor (View current)
         {
             View? next = current.SuperView;
 
-            if (next is PaddingView padding)
+            if (next is AdornmentView adornment)
             {
-                return padding.Adornment?.Parent;
+                return adornment.Adornment?.Parent;
             }
 
-            if (current is PaddingView selfPadding)
+            if (current is AdornmentView selfAdornment)
             {
-                return selfPadding.Adornment?.Parent;
+                return selfAdornment.Adornment?.Parent;
             }
 
             return next;
@@ -1262,25 +1257,25 @@ public partial class View // Command APIs
             return SuperView.InvokeCommand (refreshed.Command, upCtx);
         }
 
-        if (SuperView is PaddingView padding && padding.Adornment?.Parent?.CommandsToBubbleUp.Contains (ctx.Command) == true)
+        if (SuperView is AdornmentView adornment && adornment.Adornment?.Parent?.CommandsToBubbleUp.Contains (ctx.Command) == true)
         {
-            // Check if Padding's Parent wants this command bubbled up to it
-            Trace.Command (this, ctx, "Routing", $"BubblingUp to Padding.Parent {padding.Adornment.Parent.ToIdentifyingString ()}");
+            // Check if Adornment's Parent wants this command bubbled up to it
+            Trace.Command (this, ctx, "Routing", $"BubblingUp to Adornment.Parent {adornment.Adornment.Parent.ToIdentifyingString ()}");
             upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Values = ctx.Values };
 
-            return padding.Adornment.Parent.InvokeCommand (ctx.Command, upCtx);
+            return adornment.Adornment.Parent.InvokeCommand (ctx.Command, upCtx);
         }
 
-        if (this is not PaddingView selfPadding || selfPadding.Adornment?.Parent?.CommandsToBubbleUp.Contains (ctx.Command) != true)
+        if (this is not AdornmentView selfAdornment || selfAdornment.Adornment?.Parent?.CommandsToBubbleUp.Contains (ctx.Command) != true)
         {
             return handled;
         }
 
-        // Handle when THIS view is a Padding
-        Trace.Command (this, ctx, "Routing", $"BubblingUp from Padding to {selfPadding.Adornment.Parent.ToIdentifyingString ()}");
+        // Handle when THIS view is an AdornmentView (Padding, Border, etc.)
+        Trace.Command (this, ctx, "Routing", $"BubblingUp from Adornment to {selfAdornment.Adornment.Parent.ToIdentifyingString ()}");
         upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Values = ctx.Values };
 
-        return selfPadding.Adornment.Parent.InvokeCommand (ctx.Command, upCtx);
+        return selfAdornment.Adornment.Parent.InvokeCommand (ctx.Command, upCtx);
     }
 
     #endregion Command Bubbling

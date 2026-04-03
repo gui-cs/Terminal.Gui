@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using UnitTests.Parallelizable;
 using Terminal.Gui.Tracing;
 using UnitTests;
 
@@ -549,6 +548,377 @@ public class ViewCommandTests (ITestOutputHelper output)
 
         Assert.Equal (0, grandSuperViewAcceptingCalledCount);
     }
+
+    #region Command Propagation Tests — Padding
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Accept_BubblesFromPaddingSubView_ToOwner ()
+    {
+        // Arrange: ownerView has CommandsToBubbleUp and a subview inside Padding
+        View ownerView = new () { Width = 10, Height = 10, CommandsToBubbleUp = [Command.Accept] };
+        ownerView.Padding.Thickness = new Thickness (1);
+
+        View paddingSubView = new () { Width = 5, Height = 1 };
+        ownerView.Padding.GetOrCreateView ().Add (paddingSubView);
+
+        ownerView.BeginInit ();
+        ownerView.EndInit ();
+
+        var ownerAcceptingCount = 0;
+        ownerView.Accepting += (_, _) => ownerAcceptingCount++;
+
+        // Act
+        paddingSubView.InvokeCommand (Command.Accept);
+
+        // Assert
+        Assert.Equal (1, ownerAcceptingCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Accept_DoesNotBubbleFromPaddingSubView_WhenOwnerHasNoCommandsToBubbleUp ()
+    {
+        // Arrange: ownerView does NOT have Accept in CommandsToBubbleUp
+        View ownerView = new () { Width = 10, Height = 10 };
+        ownerView.Padding.Thickness = new Thickness (1);
+
+        View paddingSubView = new () { Width = 5, Height = 1 };
+        ownerView.Padding.GetOrCreateView ().Add (paddingSubView);
+
+        ownerView.BeginInit ();
+        ownerView.EndInit ();
+
+        var ownerAcceptingCount = 0;
+        ownerView.Accepting += (_, _) => ownerAcceptingCount++;
+
+        // Act
+        paddingSubView.InvokeCommand (Command.Accept);
+
+        // Assert - should NOT bubble
+        Assert.Equal (0, ownerAcceptingCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Activate_BubblesFromPaddingSubView_ToOwner ()
+    {
+        // Arrange
+        View ownerView = new () { Width = 10, Height = 10, CommandsToBubbleUp = [Command.Activate] };
+        ownerView.Padding.Thickness = new Thickness (1);
+
+        View paddingSubView = new () { Width = 5, Height = 1 };
+        ownerView.Padding.GetOrCreateView ().Add (paddingSubView);
+
+        ownerView.BeginInit ();
+        ownerView.EndInit ();
+
+        var ownerActivatingCount = 0;
+        ownerView.Activating += (_, _) => ownerActivatingCount++;
+
+        // Act
+        paddingSubView.InvokeCommand (Command.Activate);
+
+        // Assert
+        Assert.Equal (1, ownerActivatingCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Activate_BubblesFromPaddingSubView_ToOwner_Activated ()
+    {
+        // Arrange
+        View ownerView = new () { Width = 10, Height = 10, CommandsToBubbleUp = [Command.Activate] };
+        ownerView.Padding.Thickness = new Thickness (1);
+
+        View paddingSubView = new () { Width = 5, Height = 1 };
+        ownerView.Padding.GetOrCreateView ().Add (paddingSubView);
+
+        ownerView.BeginInit ();
+        ownerView.EndInit ();
+
+        var ownerActivatedCount = 0;
+        ownerView.Activated += (_, _) => ownerActivatedCount++;
+
+        // Act
+        paddingSubView.InvokeCommand (Command.Activate);
+
+        // Assert
+        Assert.Equal (1, ownerActivatedCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Accept_BubblesFromPaddingSubView_ThroughOwner_ToGrandSuperView ()
+    {
+        // Arrange: grandSuperView → ownerView (with Padding subview)
+        View grandSuperView = new () { Width = 20, Height = 20, CommandsToBubbleUp = [Command.Accept] };
+
+        View ownerView = new () { Width = 10, Height = 10, CommandsToBubbleUp = [Command.Accept] };
+        ownerView.Padding.Thickness = new Thickness (1);
+
+        View paddingSubView = new () { Width = 5, Height = 1 };
+        ownerView.Padding.GetOrCreateView ().Add (paddingSubView);
+
+        grandSuperView.Add (ownerView);
+        grandSuperView.BeginInit ();
+        grandSuperView.EndInit ();
+
+        var grandAcceptingCount = 0;
+        grandSuperView.Accepting += (_, _) => grandAcceptingCount++;
+
+        var grandAcceptedCount = 0;
+        grandSuperView.Accepted += (_, _) => grandAcceptedCount++;
+
+        // Act
+        paddingSubView.InvokeCommand (Command.Accept);
+
+        // Assert — should bubble all the way up
+        Assert.Equal (1, grandAcceptingCount);
+        Assert.Equal (1, grandAcceptedCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Accept_HandledInPaddingSubView_DoesNotBubbleToOwner ()
+    {
+        // Arrange
+        View ownerView = new () { Width = 10, Height = 10, CommandsToBubbleUp = [Command.Accept] };
+        ownerView.Padding.Thickness = new Thickness (1);
+
+        View paddingSubView = new () { Width = 5, Height = 1 };
+        ownerView.Padding.GetOrCreateView ().Add (paddingSubView);
+
+        ownerView.BeginInit ();
+        ownerView.EndInit ();
+
+        var ownerAcceptingCount = 0;
+        ownerView.Accepting += (_, _) => ownerAcceptingCount++;
+
+        // Handle it at the subView level
+        paddingSubView.Accepting += (_, e) => e.Handled = true;
+
+        // Act
+        paddingSubView.InvokeCommand (Command.Accept);
+
+        // Assert — should NOT propagate
+        Assert.Equal (0, ownerAcceptingCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Activate_DoesNotBubbleFromPaddingSubView_WhenOwnerHasNoCommandsToBubbleUp ()
+    {
+        // Arrange: ownerView does NOT have Activate in CommandsToBubbleUp
+        View ownerView = new () { Width = 10, Height = 10 };
+        ownerView.Padding.Thickness = new Thickness (1);
+
+        View paddingSubView = new () { Width = 5, Height = 1 };
+        ownerView.Padding.GetOrCreateView ().Add (paddingSubView);
+
+        ownerView.BeginInit ();
+        ownerView.EndInit ();
+
+        var ownerActivatingCount = 0;
+        ownerView.Activating += (_, _) => ownerActivatingCount++;
+
+        // Act
+        paddingSubView.InvokeCommand (Command.Activate);
+
+        // Assert
+        Assert.Equal (0, ownerActivatingCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Accept_BubblesFromPaddingView_ToOwner ()
+    {
+        // Arrange: the PaddingView itself (not a subview of it) invokes the command
+        View ownerView = new () { Width = 10, Height = 10, CommandsToBubbleUp = [Command.Accept] };
+        ownerView.Padding.Thickness = new Thickness (1);
+
+        var paddingView = (PaddingView)ownerView.Padding.GetOrCreateView ();
+
+        ownerView.BeginInit ();
+        ownerView.EndInit ();
+
+        var ownerAcceptingCount = 0;
+        ownerView.Accepting += (_, _) => ownerAcceptingCount++;
+
+        // Act — invoke directly on PaddingView
+        paddingView.InvokeCommand (Command.Accept);
+
+        // Assert
+        Assert.Equal (1, ownerAcceptingCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Activate_BubblesFromPaddingView_ToOwner ()
+    {
+        // Arrange: the PaddingView itself invokes the command
+        View ownerView = new () { Width = 10, Height = 10, CommandsToBubbleUp = [Command.Activate] };
+        ownerView.Padding.Thickness = new Thickness (1);
+
+        var paddingView = (PaddingView)ownerView.Padding.GetOrCreateView ();
+
+        ownerView.BeginInit ();
+        ownerView.EndInit ();
+
+        var ownerActivatingCount = 0;
+        ownerView.Activating += (_, _) => ownerActivatingCount++;
+
+        // Act
+        paddingView.InvokeCommand (Command.Activate);
+
+        // Assert
+        Assert.Equal (1, ownerActivatingCount);
+    }
+
+    #endregion Command Propagation Tests — Padding
+
+    #region Command Propagation Tests — Border
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Accept_BubblesFromBorderSubView_ToOwner ()
+    {
+        // Arrange: ownerView has CommandsToBubbleUp and a subview inside Border
+        View ownerView = new () { Width = 10, Height = 10, BorderStyle = LineStyle.Single, CommandsToBubbleUp = [Command.Accept] };
+
+        View borderSubView = new () { Width = 1, Height = 1 };
+        ownerView.Border.GetOrCreateView ().Add (borderSubView);
+
+        ownerView.BeginInit ();
+        ownerView.EndInit ();
+
+        var ownerAcceptingCount = 0;
+        ownerView.Accepting += (_, _) => ownerAcceptingCount++;
+
+        // Act
+        borderSubView.InvokeCommand (Command.Accept);
+
+        // Assert
+        Assert.Equal (1, ownerAcceptingCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Activate_BubblesFromBorderSubView_ToOwner ()
+    {
+        // Arrange
+        View ownerView = new () { Width = 10, Height = 10, BorderStyle = LineStyle.Single, CommandsToBubbleUp = [Command.Activate] };
+
+        View borderSubView = new () { Width = 1, Height = 1 };
+        ownerView.Border.GetOrCreateView ().Add (borderSubView);
+
+        ownerView.BeginInit ();
+        ownerView.EndInit ();
+
+        var ownerActivatingCount = 0;
+        ownerView.Activating += (_, _) => ownerActivatingCount++;
+
+        // Act
+        borderSubView.InvokeCommand (Command.Activate);
+
+        // Assert
+        Assert.Equal (1, ownerActivatingCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Accept_DoesNotBubbleFromBorderSubView_WhenOwnerHasNoCommandsToBubbleUp ()
+    {
+        // Arrange: ownerView does NOT have Accept in CommandsToBubbleUp
+        View ownerView = new () { Width = 10, Height = 10, BorderStyle = LineStyle.Single };
+
+        View borderSubView = new () { Width = 1, Height = 1 };
+        ownerView.Border.GetOrCreateView ().Add (borderSubView);
+
+        ownerView.BeginInit ();
+        ownerView.EndInit ();
+
+        var ownerAcceptingCount = 0;
+        ownerView.Accepting += (_, _) => ownerAcceptingCount++;
+
+        // Act
+        borderSubView.InvokeCommand (Command.Accept);
+
+        // Assert — should NOT bubble
+        Assert.Equal (0, ownerAcceptingCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Accept_BubblesFromBorderSubView_ThroughOwner_ToGrandSuperView ()
+    {
+        // Arrange: grandSuperView → ownerView (with Border subview)
+        View grandSuperView = new () { Width = 20, Height = 20, CommandsToBubbleUp = [Command.Accept] };
+
+        View ownerView = new () { Width = 10, Height = 10, BorderStyle = LineStyle.Single, CommandsToBubbleUp = [Command.Accept] };
+
+        View borderSubView = new () { Width = 1, Height = 1 };
+        ownerView.Border.GetOrCreateView ().Add (borderSubView);
+
+        grandSuperView.Add (ownerView);
+        grandSuperView.BeginInit ();
+        grandSuperView.EndInit ();
+
+        var grandAcceptingCount = 0;
+        grandSuperView.Accepting += (_, _) => grandAcceptingCount++;
+
+        // Act
+        borderSubView.InvokeCommand (Command.Accept);
+
+        // Assert — should bubble all the way up
+        Assert.Equal (1, grandAcceptingCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Accept_BubblesFromBorderView_ToOwner ()
+    {
+        // Arrange: the BorderView itself (not a subview) invokes the command
+        View ownerView = new () { Width = 10, Height = 10, BorderStyle = LineStyle.Single, CommandsToBubbleUp = [Command.Accept] };
+
+        var borderView = (BorderView)ownerView.Border.GetOrCreateView ();
+
+        ownerView.BeginInit ();
+        ownerView.EndInit ();
+
+        var ownerAcceptingCount = 0;
+        ownerView.Accepting += (_, _) => ownerAcceptingCount++;
+
+        // Act — invoke directly on BorderView
+        borderView.InvokeCommand (Command.Accept);
+
+        // Assert
+        Assert.Equal (1, ownerAcceptingCount);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void Activate_BubblesFromBorderView_ToOwner ()
+    {
+        // Arrange
+        View ownerView = new () { Width = 10, Height = 10, BorderStyle = LineStyle.Single, CommandsToBubbleUp = [Command.Activate] };
+
+        var borderView = (BorderView)ownerView.Border.GetOrCreateView ();
+
+        ownerView.BeginInit ();
+        ownerView.EndInit ();
+
+        var ownerActivatingCount = 0;
+        ownerView.Activating += (_, _) => ownerActivatingCount++;
+
+        // Act
+        borderView.InvokeCommand (Command.Activate);
+
+        // Assert
+        Assert.Equal (1, ownerActivatingCount);
+    }
+
+    #endregion Command Propagation Tests — Border
 
     #endregion Command Propagation Tests
 
@@ -2375,14 +2745,12 @@ public class ViewCommandTests (ITestOutputHelper output)
     ///     cancel via <c>OnActivating</c>, the originator's state has already changed because the
     ///     bridge fires from the post-event (<c>Activated</c>), not the pre-event (<c>Activating</c>).
     ///     Also verifies that a <c>BridgedCancellation</c> trace warning is emitted.
-    ///
     ///     Topology (uses only View base classes):
     ///     <code>
     ///     ancestor (Activating handler cancels for specific source)
     ///       └── owner  ← Bridge ←  container (CommandsToBubbleUp=[Activate])
     ///                                  └── toggleView (IValue, mutates in OnActivated)
     ///     </code>
-    ///
     ///     Expected: cancelling at the ancestor's Activating should prevent the state change.
     ///     Actual:   toggleView.Value has already incremented by the time ancestor's Activating fires.
     /// </summary>
@@ -2412,14 +2780,14 @@ public class ViewCommandTests (ITestOutputHelper output)
         var ancestorActivatingFired = false;
 
         ancestor.Activating += (_, args) =>
-                                {
-                                    ancestorActivatingFired = true;
-                                    valueAtAncestorActivating = toggleView.Value;
+                               {
+                                   ancestorActivatingFired = true;
+                                   valueAtAncestorActivating = toggleView.Value;
 
-                                    // Cancel — this should prevent further processing,
-                                    // but cannot undo the toggleView's state change.
-                                    args.Handled = true;
-                                };
+                                   // Cancel — this should prevent further processing,
+                                   // but cannot undo the toggleView's state change.
+                                   args.Handled = true;
+                               };
 
         Assert.Equal (0, toggleView.Value);
 
@@ -2429,12 +2797,12 @@ public class ViewCommandTests (ITestOutputHelper output)
         // Assert: The bridge should have caused ancestor.Activating to fire.
         Assert.True (ancestorActivatingFired, "ancestor.Activating should have fired via bridge");
 
-        // BUGBUG: By the time ancestor's Activating handler fires, toggleView.Value
         // has already been incremented. The cancellation is too late.
         Assert.Equal (1, toggleView.Value); // State change already happened
         Assert.Equal (1, valueAtAncestorActivating); // Was already 1 when ancestor saw it
 
 #if DEBUG
+
         // Verify the BridgedCancellation trace warning was emitted.
         Assert.Contains (traceBackend.Entries, e => e.Phase == "BridgedCancellation" && e.Message!.Contains ("OnActivated"));
 #endif
@@ -2447,13 +2815,11 @@ public class ViewCommandTests (ITestOutputHelper output)
     ///     calls <c>SuperView.InvokeCommand</c> during <c>RaiseActivating</c> (the pre-event phase).
     ///     The originator's <c>OnActivated</c> only fires if <c>RaiseActivating</c> succeeds.
     ///     No <c>BridgedCancellation</c> trace warning should appear.
-    ///
     ///     Topology:
     ///     <code>
     ///     ancestor (Activating handler cancels)
     ///       └── toggleView (IValue, mutates in OnActivated)
     ///     </code>
-    ///
     ///     This proves the asymmetry: direct containment bubbling supports cancellation;
     ///     bridge-based bubbling does not.
     /// </summary>
@@ -2474,14 +2840,14 @@ public class ViewCommandTests (ITestOutputHelper output)
         var ancestorActivatingFired = false;
 
         ancestor.Activating += (_, args) =>
-                                {
-                                    ancestorActivatingFired = true;
-                                    valueAtAncestorActivating = toggleView.Value;
+                               {
+                                   ancestorActivatingFired = true;
+                                   valueAtAncestorActivating = toggleView.Value;
 
-                                    // Cancel — in the direct path, this DOES prevent
-                                    // the originator's OnActivated from firing.
-                                    args.Handled = true;
-                                };
+                                   // Cancel — in the direct path, this DOES prevent
+                                   // the originator's OnActivated from firing.
+                                   args.Handled = true;
+                               };
 
         Assert.Equal (0, toggleView.Value);
 
@@ -2507,7 +2873,6 @@ public class ViewCommandTests (ITestOutputHelper output)
     ///     cancel via <c>OnAccepting</c>, the originator's state has already changed because the
     ///     bridge fires from the post-event (<c>Accepted</c>).
     ///     Verifies that a <c>BridgedCancellation</c> trace warning is emitted.
-    ///
     ///     Topology:
     ///     <code>
     ///     ancestor (Accepting handler cancels)
@@ -2535,14 +2900,14 @@ public class ViewCommandTests (ITestOutputHelper output)
         var ancestorAcceptingFired = false;
 
         ancestor.Accepting += (_, args) =>
-                               {
-                                   ancestorAcceptingFired = true;
-                                   valueAtAncestorAccepting = acceptToggleView.AcceptedCount;
+                              {
+                                  ancestorAcceptingFired = true;
+                                  valueAtAncestorAccepting = acceptToggleView.AcceptedCount;
 
-                                   // Cancel — this should prevent further processing,
-                                   // but cannot undo the acceptToggleView's state change.
-                                   args.Handled = true;
-                               };
+                                  // Cancel — this should prevent further processing,
+                                  // but cannot undo the acceptToggleView's state change.
+                                  args.Handled = true;
+                              };
 
         Assert.Equal (0, acceptToggleView.AcceptedCount);
 
@@ -2569,7 +2934,6 @@ public class ViewCommandTests (ITestOutputHelper output)
     ///     ancestor's <c>OnAccepting</c> DOES prevent the originator's state change, because
     ///     <c>TryBubbleUp</c> calls <c>SuperView.InvokeCommand</c> during <c>RaiseAccepting</c>
     ///     (the pre-event phase). No <c>BridgedCancellation</c> trace warning should appear.
-    ///
     ///     Topology:
     ///     <code>
     ///     ancestor (Accepting handler cancels)
@@ -2593,14 +2957,14 @@ public class ViewCommandTests (ITestOutputHelper output)
         var ancestorAcceptingFired = false;
 
         ancestor.Accepting += (_, args) =>
-                               {
-                                   ancestorAcceptingFired = true;
-                                   valueAtAncestorAccepting = acceptToggleView.AcceptedCount;
+                              {
+                                  ancestorAcceptingFired = true;
+                                  valueAtAncestorAccepting = acceptToggleView.AcceptedCount;
 
-                                   // Cancel — in the direct path, this DOES prevent
-                                   // the originator's OnAccepted from firing.
-                                   args.Handled = true;
-                               };
+                                  // Cancel — in the direct path, this DOES prevent
+                                  // the originator's OnAccepted from firing.
+                                  args.Handled = true;
+                              };
 
         Assert.Equal (0, acceptToggleView.AcceptedCount);
 
