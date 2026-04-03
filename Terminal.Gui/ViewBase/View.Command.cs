@@ -698,7 +698,7 @@ public partial class View // Command APIs
     /// <summary>
     ///     Called when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View to change state
     ///     or preparing it for interaction.
-    ///     Calls <see cref="OnActivating"/> which can be cancelled; if not cancelled raises <see cref="Accepting"/>.
+    ///     Calls <see cref="OnActivating"/> which can be cancelled; if not cancelled raises <see cref="Activating"/>
     ///     event. The default <see cref="Command.Activate"/> handler calls this method.
     /// </summary>
     /// <remarks>
@@ -1139,15 +1139,22 @@ public partial class View // Command APIs
     public View? DefaultAcceptView { get => field ?? GetSubViews (includePadding: true).FirstOrDefault (v => v is IAcceptTarget { IsDefault: true }); set; }
 
     /// <summary>
-    ///     Gets or sets the list of commands that should bubble up to this View from unhandled SubViews.
+    ///     Gets or sets the list of commands that should bubble up to this View from unhandled SubViews
+    ///     or from SubViews within this View's adornments (Padding, Border).
     ///     When a SubView raises a command that is not handled, and the command is in the SuperView's
     ///     <see cref="CommandsToBubbleUp"/> list, the command will be invoked on the SuperView.
     /// </summary>
     /// <remarks>
-    ///     e.g. to enable <see cref="Command.Activate"/> bubbling for hierarchical views:
-    ///     <code>
-    ///         menuBar.CommandsToBubbleUp = [Command.Activate];
-    ///     </code>
+    ///     <para>
+    ///         For SubViews inside an <see cref="AdornmentView"/> (e.g., a button in Padding or Border),
+    ///         the bubble target is <see cref="IAdornment.Parent"/> rather than <see cref="SuperView"/>.
+    ///     </para>
+    ///     <para>
+    ///         e.g. to enable <see cref="Command.Activate"/> bubbling for hierarchical views:
+    ///         <code>
+    ///             menuBar.CommandsToBubbleUp = [Command.Activate];
+    ///         </code>
+    ///     </para>
     /// </remarks>
     public IReadOnlyList<Command> CommandsToBubbleUp { get; set; } = [];
 
@@ -1172,7 +1179,8 @@ public partial class View // Command APIs
     }
 
     /// <summary>
-    ///     Bubbles a command to the SuperView if the command is in SuperView's <see cref="CommandsToBubbleUp"/> list.
+    ///     Bubbles a command to the SuperView (or to <see cref="IAdornment.Parent"/> for adornment SubViews)
+    ///     if the target's <see cref="CommandsToBubbleUp"/> list contains the command.
     ///     Handles the special case of invoking <see cref="Command.Accept"/> on a peer IsDefault button.
     /// </summary>
     /// <remarks>
@@ -1257,25 +1265,29 @@ public partial class View // Command APIs
             return SuperView.InvokeCommand (refreshed.Command, upCtx);
         }
 
+        // SubView of an AdornmentView: bubble to the adornment's Parent (the owning View)
         if (SuperView is AdornmentView adornment && adornment.Adornment?.Parent?.CommandsToBubbleUp.Contains (ctx.Command) == true)
         {
-            // Check if Adornment's Parent wants this command bubbled up to it
-            Trace.Command (this, ctx, "Routing", $"BubblingUp to Adornment.Parent {adornment.Adornment.Parent.ToIdentifyingString ()}");
-            upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Values = ctx.Values };
+            ICommandContext? refreshed = RefreshValue (ctx);
 
-            return adornment.Adornment.Parent.InvokeCommand (ctx.Command, upCtx);
+            Trace.Command (this, refreshed, "Routing", $"BubblingUp to Adornment.Parent {adornment.Adornment.Parent.ToIdentifyingString ()}");
+            upCtx = new CommandContext (refreshed!.Command, refreshed.Source, refreshed.Binding) { Routing = CommandRouting.BubblingUp, Values = refreshed.Values };
+
+            return adornment.Adornment.Parent.InvokeCommand (refreshed.Command, upCtx);
         }
 
+        // THIS view is an AdornmentView: bubble to its own Parent
         if (this is not AdornmentView selfAdornment || selfAdornment.Adornment?.Parent?.CommandsToBubbleUp.Contains (ctx.Command) != true)
         {
             return handled;
         }
 
-        // Handle when THIS view is an AdornmentView (Padding, Border, etc.)
-        Trace.Command (this, ctx, "Routing", $"BubblingUp from Adornment to {selfAdornment.Adornment.Parent.ToIdentifyingString ()}");
-        upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Values = ctx.Values };
+        ICommandContext? selfRefreshed = RefreshValue (ctx);
 
-        return selfAdornment.Adornment.Parent.InvokeCommand (ctx.Command, upCtx);
+        Trace.Command (this, selfRefreshed, "Routing", $"BubblingUp from Adornment to {selfAdornment.Adornment.Parent.ToIdentifyingString ()}");
+        upCtx = new CommandContext (selfRefreshed!.Command, selfRefreshed.Source, selfRefreshed.Binding) { Routing = CommandRouting.BubblingUp, Values = selfRefreshed.Values };
+
+        return selfAdornment.Adornment.Parent.InvokeCommand (selfRefreshed.Command, upCtx);
     }
 
     #endregion Command Bubbling

@@ -6,10 +6,6 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 internal sealed class Arranger : IDisposable
 {
-    // NOTE: _border stays as BorderView because Arranger needs extensive View-level access
-    // (App, HotKeyBindings, CanFocus, SetFocus, Add, Remove, Frame, Focused, AdvanceFocus,
-    // MouseState, ScreenToFrame, Contains). Changing to Border would require .GetOrCreateView()/.View!
-    // on ~50 call sites — more complex, not simpler. Settings are accessed via _border.Adornment!.
     private readonly BorderView _border;
 
     /// <summary>
@@ -60,7 +56,8 @@ internal sealed class Arranger : IDisposable
 
         bool mouseMode = _border.App is { } && _border.App.Mouse.IsGrabbed (_border);
 
-        _border.HotKeyBindings.Add (Key.Esc, Command.Quit);
+        // Quit: Register Command.Quit to both the Arrange key and Escape to allow exiting Arrange Mode via keyboard regardless of the user's keybindings
+        _border.HotKeyBindings.Add (Application.GetDefaultKey (Command.Quit), Command.Quit);
 
         Key arrangeKey = Application.GetDefaultKey (Command.Arrange);
 
@@ -68,12 +65,6 @@ internal sealed class Arranger : IDisposable
         {
             _border.HotKeyBindings.Add (arrangeKey, Command.Quit);
         }
-        _border.HotKeyBindings.Add (Key.CursorUp, Command.Up);
-        _border.HotKeyBindings.Add (Key.CursorDown, Command.Down);
-        _border.HotKeyBindings.Add (Key.CursorLeft, Command.Left);
-        _border.HotKeyBindings.Add (Key.CursorRight, Command.Right);
-        _border.HotKeyBindings.Add (Key.Tab, Command.NextTabStop);
-        _border.HotKeyBindings.Add (Key.Tab.WithShift, Command.PreviousTabStop);
 
         CreateArrangementButtons ();
 
@@ -238,7 +229,8 @@ internal sealed class Arranger : IDisposable
 
         if (parentArrangement.HasFlag (ViewArrangement.LeftResizable))
         {
-            _leftSizeButton = CreateArrangerButton (ArrangeButtons.LeftSize, 0, Pos.Center () + (_border.Adornment?.Parent?.Margin.Thickness.Vertical ?? 0) / 2);
+            _leftSizeButton =
+                CreateArrangerButton (ArrangeButtons.LeftSize, 0, Pos.Center () + (_border.Adornment?.Parent?.Margin.Thickness.Vertical ?? 0) / 2);
         }
 
         if (parentArrangement.HasFlag (ViewArrangement.BottomResizable))
@@ -246,6 +238,41 @@ internal sealed class Arranger : IDisposable
             _bottomSizeButton = CreateArrangerButton (ArrangeButtons.BottomSize,
                                                       Pos.Center () + (_border.Adornment?.Parent?.Margin.Thickness.Horizontal ?? 0) / 2,
                                                       Pos.AnchorEnd ());
+        }
+
+        // Set buttons to bubble up arrow key commands for keyboard arrangement
+        _border.CommandsToBubbleUp = [Command.Up, Command.Down, Command.Left, Command.Right];
+        _border.CommandNotBound += BorderOnCommandNotBound;
+    }
+
+    private void BorderOnCommandNotBound (object? sender, CommandEventArgs e)
+    {
+        if (e.Context?.TryGetSource (out View? source) is not true)
+        {
+            return;
+        }
+
+        switch (e.Context.Command)
+        {
+            case Command.Up:
+                e.Handled = HandleArrangeModeUp ();
+
+                break;
+
+            case Command.Down:
+                e.Handled = HandleArrangeModeDown ();
+
+                break;
+
+            case Command.Left:
+                e.Handled = HandleArrangeModeLeft ();
+
+                break;
+
+            case Command.Right:
+                e.Handled = HandleArrangeModeRight ();
+
+                break;
         }
     }
 
@@ -264,9 +291,6 @@ internal sealed class Arranger : IDisposable
             Y = y,
             Visible = false
         };
-
-        button.KeyBindings.Remove (Key.Space);
-        button.KeyBindings.Remove (Key.Enter);
 
         _border.Add (button);
 
@@ -669,13 +693,12 @@ internal sealed class Arranger : IDisposable
 
         // Only start grabbing if the user clicks in the Thickness area
         // Adornment.Contains takes Parent SuperView=relative coords.
-            Point clickPoint = new (mouseEvent.Position.Value.X + parent.Frame.X + _border.Frame.X,
-                                    mouseEvent.Position.Value.Y + parent.Frame.Y + _border.Frame.Y);
+        Point clickPoint = new (mouseEvent.Position.Value.X + parent.Frame.X + _border.Frame.X, mouseEvent.Position.Value.Y + parent.Frame.Y + _border.Frame.Y);
 
-            if (!_border.Contains (clickPoint))
-            {
-                return false;
-            }
+        if (!_border.Contains (clickPoint))
+        {
+            return false;
+        }
 
         // If already arranging, exit first
         if (IsArranging)
@@ -958,6 +981,7 @@ internal sealed class Arranger : IDisposable
         // Ungrab mouse if we're still holding it
         if (IsDragging && _border.App is { } && _border.App.Mouse.IsGrabbed (_border))
         {
+            _border.CommandNotBound -= BorderOnCommandNotBound;
             _border.App.Mouse.UngrabMouse ();
         }
 

@@ -336,7 +336,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     {
         get
         {
-            View? focused = GetSubViews (/*includeBorder: true,*/ includePadding: true).FirstOrDefault (v => v.HasFocus);
+            View? focused = GetSubViews ( /*includeBorder: true,*/ includePadding: true).FirstOrDefault (v => v.HasFocus);
 
             if (focused is { })
             {
