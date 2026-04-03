@@ -96,7 +96,7 @@ public partial class BorderView : AdornmentView
     /// <summary>
     ///     Configures persistent state for tab mode. Called when <see cref="Border.Settings"/> or
     ///     <see cref="IAdornment.Thickness"/> changes. Sets <see cref="View.ViewportSettings"/> and
-    ///     ensures the <see cref="TabTitleView"/> SubView exists with the correct static properties.
+    ///     ensures the <see cref="TitleView"/> SubView exists with the correct static properties.
     /// </summary>
     private void ConfigureForTabMode ()
     {
@@ -110,14 +110,14 @@ public partial class BorderView : AdornmentView
             ViewportSettings |= ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
             _tabModeSetTransparent = true;
 
-            TabTitleView label = EnsureTabTitleView ();
+            TitleView label = EnsureTitleView ();
 
             if (border.LineStyle is { } ls)
             {
                 label.BorderStyle = ls;
             }
 
-            label.TextFormatter.Direction = border.TabSide is Side.Left or Side.Right ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
+            label.Orientation = border.TabSide is Side.Left or Side.Right ? Orientation.Vertical : Orientation.Horizontal;
         }
         else
         {
@@ -133,13 +133,13 @@ public partial class BorderView : AdornmentView
     }
 
     /// <inheritdoc/>
-    protected override void OnSubViewLayout (LayoutEventArgs args) => UpdateTabTitleViewLayout ();
+    protected override void OnSubViewLayout (LayoutEventArgs args) => UpdateTitleViewLayout ();
 
     /// <summary>
-    ///     Computes and sets the <see cref="TabTitleView"/>'s frame, size, border thickness,
+    ///     Computes and sets the <see cref="TitleView"/>'s frame, size, border thickness,
     ///     text, and visibility during the layout pass. Called via <see cref="View.SubViewLayout"/>.
     /// </summary>
-    private void UpdateTabTitleViewLayout ()
+    private void UpdateTitleViewLayout ()
     {
         if (Adornment is not Border border || !border.Settings.FastHasFlags (BorderSettings.Tab))
         {
@@ -182,7 +182,7 @@ public partial class BorderView : AdornmentView
         }
 
         _tabTitleView.Visible = true;
-        _tabTitleView.HotKeySpecifier = Adornment.Parent?.HotKeySpecifier ?? default (Rune);
+       // _tabTitleView.HotKeySpecifier = Adornment.Parent?.HotKeySpecifier ?? default (Rune);
         _tabTitleView.Text = Adornment.Parent?.Title ?? string.Empty;
 
         if (border.LineStyle is { } ls)
@@ -193,10 +193,8 @@ public partial class BorderView : AdornmentView
         // Configure the label's border thickness based on depth and focus
         _tabTitleView.Border.Thickness = ComputeTabLabelThickness (border.TabSide, tabDepth, hasFocus, clipped);
 
-        // For Left/Right, render text vertically
-        _tabTitleView.TextFormatter.Direction = border.TabSide is Side.Left or Side.Right
-                                                    ? TextDirection.TopBottom_LeftRight
-                                                    : TextDirection.LeftRight_TopBottom;
+        // Set orientation based on tab side — TitleView updates TextFormatter.Direction automatically
+        _tabTitleView.Orientation = border.TabSide is Side.Left or Side.Right ? Orientation.Vertical : Orientation.Horizontal;
 
         // Convert header rect from screen to BorderView viewport coords
         Point screenOrigin = ViewportToScreen (Point.Empty);
@@ -337,27 +335,27 @@ public partial class BorderView : AdornmentView
         return new Rectangle (left, top, Math.Max (0, right - left), Math.Max (0, bottom - top));
     }
 
-    private TabTitleView? _tabTitleView;
+    private TitleView? _tabTitleView;
 
     /// <summary>Gets the tab title <see cref="View"/>, or <see langword="null"/> if not yet created.</summary>
-    public View? TabTitleView => _tabTitleView;
+    public View? TitleView => _tabTitleView;
 
     /// <summary>
-    ///     Gets or lazily creates the <see cref="ViewBase.TabTitleView"/> SubView used to render the tab header.
+    ///     Gets or lazily creates the <see cref="ViewBase.TitleView"/> SubView used to render the tab header.
     ///     The view has its own border with <see cref="View.SuperViewRendersLineCanvas"/> = true,
     ///     so its border lines auto-join with the View's content border via <see cref="View.LineCanvas"/>.
     /// </summary>
-    private TabTitleView EnsureTabTitleView ()
+    private TitleView EnsureTitleView ()
     {
         if (_tabTitleView is { })
         {
             return _tabTitleView;
         }
 
-        _tabTitleView = new TabTitleView
+        _tabTitleView = new TitleView
         {
 #if DEBUG
-            Id = "TabTitleView",
+            Id = "TitleView",
 #endif
         };
         Add (_tabTitleView);

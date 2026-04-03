@@ -115,14 +115,14 @@ public class Adornments : Scenario
         window.BorderStyle = LineStyle.Rounded;
 
         // Enable dragging the tab title to slide it by changing TabOffset.
-        // Hook into TabTitleView.MouseEvent — it fires before the Arranger, so no conflict.
+        // Hook into TitleView.MouseEvent — it fires before the Arranger, so no conflict.
         Point? dragStart = null;
         var dragStartOffset = 0;
         var tabDragHooked = false;
 
         window.DrawComplete += (_, _) =>
                                {
-                                   if (tabDragHooked || ((BorderView)window.Border.View!).TabTitleView is not { } tabTitle)
+                                   if (tabDragHooked || ((BorderView)window.Border.View!).TitleView is not { } tabTitle)
                                    {
                                        return;
                                    }

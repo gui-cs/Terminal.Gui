@@ -419,7 +419,71 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
         Assert.Same (tab1, tabs.Value);
     }
 
-    // Copilot
+    [Fact]
+    public void Nav_Top_Command_Right_SelectsNextTab ()
+    {
+        IDriver driver = CreateTestDriver (20, 10);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = Side.Top };
+
+        View tab1 = new () { Title = "Tab_11", CanFocus = true };
+        tabs.Add (tab1);
+        View tab2 = new () { Title = "Tab_2", CanFocus = true };
+        tabs.Add (tab2);
+
+        (tab1.Border.View?.SubViews.ElementAt (0) as TitleView)?.SetFocus ();
+        Assert.True ((tab1.Border.View?.SubViews.ElementAt (0) as TitleView)?.HasFocus);
+
+        tabs.InvokeCommand (Command.Right);
+
+        Assert.True ((tab2.Border.View?.SubViews.ElementAt (0) as TitleView)?.HasFocus);
+
+        tabs.Dispose ();
+    }
+
+
+    [Fact]
+    public void Nav_Top_Command_Left_SelectsPreviousTab ()
+    {   
+        IDriver driver = CreateTestDriver (20, 10);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = Side.Top };
+
+        View tab1 = new () { Title = "Tab_11", CanFocus = true };
+        tabs.Add (tab1);
+        View tab2 = new () { Title = "Tab_2", CanFocus = true };
+        tabs.Add (tab2);
+
+        (tab2.Border.View?.SubViews.ElementAt (0) as TitleView)?.SetFocus ();
+        Assert.True ((tab2.Border.View?.SubViews.ElementAt (0) as TitleView)?.HasFocus);
+
+        tabs.InvokeCommand (Command.Left);
+
+        Assert.True ((tab1.Border.View?.SubViews.ElementAt (0) as TitleView)?.HasFocus);
+
+        tabs.Dispose ();
+    }
+
+
+    [Fact]
+    public void Nav_Top_CursorRight_SelectsNextTab ()
+    {
+        IDriver driver = CreateTestDriver (20, 10);
+        Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = Side.Top };
+
+        View tab1 = new () { Title = "Tab_11", CanFocus = true };
+        tabs.Add (tab1);
+        View tab2 = new () { Title = "Tab_2", CanFocus = true };
+        tabs.Add (tab2);
+
+        (tab1.Border.View?.SubViews.ElementAt (0) as TitleView)?.SetFocus ();
+        Assert.True ((tab1.Border.View?.SubViews.ElementAt (0) as TitleView)?.HasFocus);
+
+        (tab1.Border.View?.SubViews.ElementAt (0) as TitleView)?.NewKeyDownEvent (Key.CursorRight);
+
+        Assert.True ((tab2.Border.View?.SubViews.ElementAt (0) as TitleView)?.HasFocus);
+
+        tabs.Dispose ();
+    }
+
 
     [Theory]
     [InlineData (Side.Left)]
@@ -543,11 +607,12 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
         IDriver driver = CreateTestDriver (20, 10);
         Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = Side.Left };
 
-        View tab1 = new () { Title = "Tab1" };
+        View tab1 = new () { Title = "Tab1", CanFocus = true };
         tabs.Add (tab1);
         tabs.Layout ();
 
-        tab1.Border.View?.SetFocus ();
+        (tab1.Border?.View?.SubViews.ElementAt (0) as TitleView)?.SetFocus ();
+        Assert.True ((tab1.Border?.View?.SubViews.ElementAt (0) as TitleView)?.HasFocus);
 
         tabs.NewKeyDownEvent (Key.CursorLeft);
 

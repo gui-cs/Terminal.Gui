@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using UnitTests;
 
 namespace ViewBaseTests.Adornments;
@@ -44,13 +43,13 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = thickness
                                 ?? side switch
-                                {
-                                    Side.Top => new Thickness (1, 3, 1, 1),
-                                    Side.Bottom => new Thickness (1, 1, 1, 3),
-                                    Side.Left => new Thickness (3, 1, 1, 1),
-                                    Side.Right => new Thickness (1, 1, 3, 1),
-                                    _ => throw new ArgumentOutOfRangeException (nameof (side))
-                                };
+                                   {
+                                       Side.Top => new Thickness (1, 3, 1, 1),
+                                       Side.Bottom => new Thickness (1, 1, 1, 3),
+                                       Side.Left => new Thickness (3, 1, 1, 1),
+                                       Side.Right => new Thickness (1, 1, 3, 1),
+                                       _ => throw new ArgumentOutOfRangeException (nameof (side))
+                                   };
 
         var settings = BorderSettings.Tab;
 
@@ -1520,13 +1519,13 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         subview.Border.Thickness = thickness
                                    ?? side switch
-                                   {
-                                       Side.Top => new Thickness (1, 3, 1, 1),
-                                       Side.Bottom => new Thickness (1, 1, 1, 3),
-                                       Side.Left => new Thickness (3, 1, 1, 1),
-                                       Side.Right => new Thickness (1, 1, 3, 1),
-                                       _ => throw new ArgumentOutOfRangeException (nameof (side))
-                                   };
+                                      {
+                                          Side.Top => new Thickness (1, 3, 1, 1),
+                                          Side.Bottom => new Thickness (1, 1, 1, 3),
+                                          Side.Left => new Thickness (3, 1, 1, 1),
+                                          Side.Right => new Thickness (1, 1, 3, 1),
+                                          _ => throw new ArgumentOutOfRangeException (nameof (side))
+                                      };
 
         var settings = BorderSettings.Tab;
 
@@ -1622,12 +1621,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     {
         //using (TestLogging.Verbose (output, TraceCategory.Draw))
         {
-            View subview = new ()
-            {
-                Driver = CreateTestDriver (4, 3),
-                Height = 2,
-                Width = 4
-            };
+            View subview = new () { Driver = CreateTestDriver (4, 3), Height = 2, Width = 4 };
             subview.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
             subview.Border.Thickness = new Thickness (0, 2, 0, 0);
             subview.Border.LineStyle = LineStyle.Single;
@@ -1635,6 +1629,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
             subview.Driver.FillRect (subview.Driver.Screen, Glyphs.Diamond);
             subview.Layout ();
+
             //subview.Draw ();
 
             //DriverAssert.AssertDriverContentsWithFrameAre ("""
@@ -1649,6 +1644,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
             subview.Driver.FillRect (subview.Driver.Screen, Glyphs.Diamond);
 
             subview.Layout ();
+
             //subview.Draw ();
 
             //DriverAssert.AssertDriverContentsWithFrameAre ("""
@@ -1658,10 +1654,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
             //                                      output,
             //                                      subview.Driver!);
 
-            View superView = new ()
-            {
-                Driver = subview.Driver, Width = Dim.Fill (), Height = Dim.Fill (),
-            };
+            View superView = new () { Driver = subview.Driver, Width = Dim.Fill (), Height = Dim.Fill () };
+
             superView.DrawingContent += (_, e) =>
                                         {
                                             superView!.FillRect (superView!.Viewport, Glyphs.Diamond);
@@ -1671,7 +1665,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
             superView.Layout ();
             subview.Driver.ClearContents ();
-            DrawContext context = new DrawContext ();
+            var context = new DrawContext ();
             superView.Draw (context);
 
             Assert.True (subview.Border.View!.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent));
@@ -1721,7 +1715,6 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
             app.Dispose ();
         }
     }
-
 
     [Fact]
     public void SuperView_Top_NegativeOffset1_WithTitle_X0 () // Copilot
@@ -2079,9 +2072,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         app.Dispose ();
     }
 
-
     [Fact]
-    public void Top_Focused_TabTitleView_Uses_Focused_Attributes ()
+    public void Top_Focused_TitleView_Uses_Focused_Attributes ()
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -2123,9 +2115,9 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         view.SetFocus ();
         Assert.True (view.HasFocus);
         view.Border.View?.CanFocus = true;
-        view.Border.View?.SetFocus (); // TabTitleView should have focus, not the main view
+        view.Border.View?.SetFocus (); // TitleView should have focus, not the main view
         Assert.True (view.Border.View?.HasFocus);
-        Assert.True (view.Border.View?.SubViews.OfType<TabTitleView> ().FirstOrDefault ()?.HasFocus);
+        Assert.True (view.Border.View?.SubViews.OfType<TitleView> ().FirstOrDefault ()?.HasFocus);
 
         app.LayoutAndDraw ();
 
@@ -2255,11 +2247,11 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         View view = new () { Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
 
         // Before setting Tab, View may or may not exist depending on LineStyle
-        // but TabTitleView should not exist
+        // but TitleView should not exist
 
         if (view.Border.View is BorderView bv)
         {
-            Assert.Null (bv.TabTitleView);
+            Assert.Null (bv.TitleView);
         }
 
         view.Border.Thickness = new Thickness (1, 3, 1, 1);
@@ -2301,7 +2293,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
     // Copilot
     [Fact]
-    public void Settings_Tab_Creates_TabTitleView_Before_Draw ()
+    public void Settings_Tab_Creates_TitleView_Before_Draw ()
     {
         IDriver driver = CreateTestDriver (10, 6);
 
@@ -2317,15 +2309,15 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         var bv = (BorderView)view.Border.View!;
 
-        // TabTitleView should already exist after layout, before any Draw call
-        Assert.NotNull (bv.TabTitleView);
+        // TitleView should already exist after layout, before any Draw call
+        Assert.NotNull (bv.TitleView);
 
         view.Dispose ();
     }
 
     // Copilot
     [Fact]
-    public void Settings_Tab_TabTitleView_Has_Correct_Frame_Before_Draw ()
+    public void Settings_Tab_TitleView_Has_Correct_Frame_Before_Draw ()
     {
         IDriver driver = CreateTestDriver (10, 7);
 
@@ -2349,10 +2341,10 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         view.Layout ();
 
         var bv = (BorderView)view.Border.View!;
-        View? ttv = bv.TabTitleView;
+        View? ttv = bv.TitleView;
         Assert.NotNull (ttv);
 
-        // TabTitleView should have non-empty Frame set by layout, before Draw
+        // TitleView should have non-empty Frame set by layout, before Draw
         Assert.NotEqual (Rectangle.Empty, ttv.Frame);
 
         // Width should match TabLength (auto-computed: "Tab".GetColumns() + 2 = 5)
@@ -2363,7 +2355,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
     // Copilot
     [Fact]
-    public void Settings_Tab_TabTitleView_Has_SuperViewRendersLineCanvas ()
+    public void Settings_Tab_TitleView_Has_SuperViewRendersLineCanvas ()
     {
         View view = new () { Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
 
@@ -2375,16 +2367,16 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         view.Layout ();
 
         var bv = (BorderView)view.Border.View!;
-        View? ttv = bv.TabTitleView;
+        View? ttv = bv.TitleView;
         Assert.NotNull (ttv);
-        Assert.True (ttv.SuperViewRendersLineCanvas, "TabTitleView must have SuperViewRendersLineCanvas = true for auto-join");
+        Assert.True (ttv.SuperViewRendersLineCanvas, "TitleView must have SuperViewRendersLineCanvas = true for auto-join");
 
         view.Dispose ();
     }
 
     // Copilot
     [Fact]
-    public void Thickness_Change_Updates_TabTitleView_Layout ()
+    public void Thickness_Change_Updates_TitleView_Layout ()
     {
         IDriver driver = CreateTestDriver (10, 7);
 
@@ -2406,11 +2398,11 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         view.Layout ();
 
         var bv = (BorderView)view.Border.View!;
-        View? ttv = bv.TabTitleView;
+        View? ttv = bv.TitleView;
         Assert.NotNull (ttv);
         int originalHeight = ttv.Frame.Height;
 
-        // Change thickness — TabTitleView should get updated frame after re-layout
+        // Change thickness — TitleView should get updated frame after re-layout
         view.Border.Thickness = new Thickness (1, 2, 1, 1);
         view.Layout ();
 
@@ -2422,7 +2414,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
     // Copilot
     [Fact]
-    public void Clearing_Tab_Flag_Hides_TabTitleView ()
+    public void Clearing_Tab_Flag_Hides_TitleView ()
     {
         IDriver driver = CreateTestDriver (10, 6);
 
@@ -2435,14 +2427,14 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         view.Layout ();
 
         var bv = (BorderView)view.Border.View!;
-        Assert.NotNull (bv.TabTitleView);
+        Assert.NotNull (bv.TitleView);
 
         // Clear the Tab flag
         view.Border.Settings = BorderSettings.Title;
         view.Layout ();
 
-        // TabTitleView should be hidden (Visible = false)
-        Assert.False (bv.TabTitleView!.Visible, "TabTitleView should be hidden when Tab flag is cleared");
+        // TitleView should be hidden (Visible = false)
+        Assert.False (bv.TitleView!.Visible, "TitleView should be hidden when Tab flag is cleared");
 
         view.Dispose ();
     }

@@ -41,6 +41,11 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         Width = Dim.Fill ();
         Height = Dim.Fill ();
+
+        AddCommand (Command.Up, NavCommandHandler);
+        AddCommand (Command.Down, NavCommandHandler);
+        AddCommand (Command.Left, NavCommandHandler);
+        AddCommand (Command.Right, NavCommandHandler);
     }
 
     private readonly List<WeakReference<View>> _tabList = [];
@@ -173,7 +178,7 @@ public class Tabs : View, IValue<View?>, IDesignable
     {
         base.OnFocusedChanged (previousFocused, focused);
 
-        if (focused is TabTitleView)
+        if (focused is TitleView)
         {
             return;
         }
@@ -272,7 +277,8 @@ public class Tabs : View, IValue<View?>, IDesignable
     protected override bool OnKeyDownNotHandled (Key key)
     {
         return base.OnKeyDownNotHandled (key);
-        if (MostFocused is TabTitleView)
+
+        if (MostFocused is TitleView)
         {
             if (TabSide is Side.Top or Side.Bottom)
             {
@@ -281,18 +287,18 @@ public class Tabs : View, IValue<View?>, IDesignable
                 {
                     // Set focus to the next tab, wrapping to the first tab if currently on the last tab
                     View? nextTab = TabCollection.SkipWhile (t => !t.HasFocus).Skip (1).FirstOrDefault () ?? TabCollection.FirstOrDefault ();
-                    BorderView? borderView = nextTab?.Border.View as BorderView;
+                    var borderView = nextTab?.Border.View as BorderView;
 
-                    return borderView?.TabTitleView?.SetFocus () ?? true;
+                    return borderView?.TitleView?.SetFocus () ?? true;
                 }
 
                 if (key == Key.CursorLeft)
                 {
                     // Set focus to the previous tab, wrapping to the last tab if currently on the first tab
                     View? previousTab = TabCollection.TakeWhile (t => !t.HasFocus).LastOrDefault () ?? TabCollection.LastOrDefault ();
-                    BorderView? borderView = previousTab?.Border.View as BorderView;
+                    var borderView = previousTab?.Border.View as BorderView;
 
-                    return borderView?.TabTitleView?.SetFocus () ?? true;
+                    return borderView?.TitleView?.SetFocus () ?? true;
                 }
 
                 if (key == Key.CursorDown && TabSide == Side.Top)
@@ -341,9 +347,9 @@ public class Tabs : View, IValue<View?>, IDesignable
                     // Set focus to the next tab, wrapping to the first tab if currently on the last tab
                     View? nextTab = TabCollection.SkipWhile (t => !t.HasFocus).Skip (1).FirstOrDefault () ?? TabCollection.FirstOrDefault ();
 
-                    BorderView? borderView = nextTab?.Border.View as BorderView;
+                    var borderView = nextTab?.Border.View as BorderView;
 
-                    return borderView?.TabTitleView?.SetFocus () ?? true;
+                    return borderView?.TitleView?.SetFocus () ?? true;
                 }
 
                 if (key == Key.CursorUp)
@@ -399,14 +405,12 @@ public class Tabs : View, IValue<View?>, IDesignable
             // Tab to the text TabHeader if focus is currently in the selected tab content
 
             return (TabCollection.SkipWhile (t => !t.HasFocus).Skip (1).FirstOrDefault () ?? TabCollection.FirstOrDefault ())?.SetFocus () ?? true;
-
         }
 
         if (key == Application.GetDefaultKey (Command.PreviousTabGroup))
         {
             // Tab to the TabHeaders if focus is currently in the selected tab content
             return (TabCollection.TakeWhile (t => !t.HasFocus).LastOrDefault () ?? TabCollection.LastOrDefault ())?.SetFocus () ?? true;
-
         }
 
         //// Top or Bottom
@@ -535,6 +539,10 @@ public class Tabs : View, IValue<View?>, IDesignable
         // get focus is if the user explicitly sets focus to it
         // or, if the users uses the Next/PreviousTabGroup key.
         view.Border.View?.TabStop = TabBehavior.NoStop;
+
+        view.HotKeySpecifier = (Rune)'\xffff';
+
+        view.Border.View?.CommandsToBubbleUp = [Command.Up, Command.Down, Command.Left, Command.Right];
     }
 
     /// <summary>
@@ -707,6 +715,38 @@ public class Tabs : View, IValue<View?>, IDesignable
     #endregion
 
     #region Scrolling
+
+    private bool? NavCommandHandler (ICommandContext? ctx)
+    {
+        if (ctx is null)
+        {
+            return false;
+        }
+
+        return TabSide switch
+               {
+                   // if side is top or bottom, left/right select previous/next tab; if side is left or right, up/down select previous/next tab
+                   Side.Top or Side.Bottom when ctx.Command == Command.Right => SelectNextTab (),
+                   Side.Top or Side.Bottom when ctx.Command == Command.Left => SelectPreviousTab (),
+                   Side.Left or Side.Right when ctx.Command == Command.Down => SelectNextTab (),
+                   Side.Left or Side.Right when ctx.Command == Command.Up => SelectPreviousTab (),
+                   _ => false
+               };
+    }
+
+    private bool? SelectNextTab ()
+    {
+        View? nextTab = TabCollection.SkipWhile (t => !t.HasFocus).Skip (1).FirstOrDefault () ?? TabCollection.FirstOrDefault ();
+
+        return (nextTab?.Border.View as BorderView)?.TitleView?.SetFocus () ?? true;
+    }
+
+    private bool? SelectPreviousTab ()
+    {
+        View? previousTab = TabCollection.TakeWhile (t => !t.HasFocus).LastOrDefault () ?? TabCollection.LastOrDefault ();
+
+        return (previousTab?.Border.View as BorderView)?.TitleView?.SetFocus () ?? true;
+    }
 
     /// <summary>
     ///     Adds scroll indicator buttons to a tab's border. The buttons are positioned at the
