@@ -43,7 +43,7 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void Add_View_Value_Is_First_Added_SuperView ()
     {
-        View superView = new View () { CanFocus = true };
+        var superView = new View { CanFocus = true };
         Tabs tabs = new ();
         superView.Add (tabs);
 
@@ -225,6 +225,54 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
 
         Assert.Equal (LineStyle.Double, tab1.BorderStyle);
         Assert.Equal (LineStyle.Double, tab2.BorderStyle);
+    }
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void TabLineStyle_None_ThenBack_RestoresRendering ()
+    {
+        IDriver driver = CreateTestDriver (14, 5);
+
+        Tabs tabs = new () { Driver = driver, Width = 14, Height = 5 };
+
+        View tab1 = new () { Title = "Tab1", Text = "Tab1 content" };
+        View tab2 = new () { Title = "Tab2", Text = "Tab2 content" };
+
+        tabs.Add (tab1, tab2);
+        tabs.Value = tab1;
+
+        // Draw with default Rounded style and capture expected output
+        tabs.Layout ();
+        tabs.Draw ();
+
+        // Verify initial thickness is correct for top tabs (1, TabDepth=3, 1, 1)
+        Assert.Equal (new Thickness (1, 3, 1, 1), tab1.Border.Thickness);
+        Assert.Equal (new Thickness (1, 3, 1, 1), tab2.Border.Thickness);
+
+        // Change to None and back to Rounded
+        tabs.TabLineStyle = LineStyle.None;
+        tabs.TabLineStyle = LineStyle.Rounded;
+
+        // Thickness must be restored to tab-specific values, not generic (1,1,1,1)
+        Assert.Equal (new Thickness (1, 3, 1, 1), tab1.Border.Thickness);
+        Assert.Equal (new Thickness (1, 3, 1, 1), tab2.Border.Thickness);
+
+        // Re-draw and verify rendering matches original
+        driver.ClearContents ();
+        tabs.Layout ();
+        tabs.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭────╮────╮
+                                              │Tab1│Tab2│
+                                              │    ╰────┴──╮
+                                              │Tab1 content│
+                                              ╰────────────╯
+                                              """,
+                                              output,
+                                              driver);
+
+        tabs.Dispose ();
     }
 
     [Fact]
@@ -440,10 +488,9 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
         tabs.Dispose ();
     }
 
-
     [Fact]
     public void Nav_Top_Command_Left_SelectsPreviousTab ()
-    {   
+    {
         IDriver driver = CreateTestDriver (20, 10);
         Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = Side.Top };
 
@@ -461,7 +508,6 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
 
         tabs.Dispose ();
     }
-
 
     [Fact]
     public void Nav_Top_CursorRight_SelectsNextTab ()
@@ -483,7 +529,6 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
 
         tabs.Dispose ();
     }
-
 
     [Theory]
     [InlineData (Side.Left)]
@@ -660,5 +705,69 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
         Assert.False (tabs.HasFocus);
 
         tabs.Dispose ();
+    }
+
+    // BUGBUG: This test should be failing because the same basic thing happens in user testing...
+    [Fact]
+    public void TitleView_Border_Does_Not_Overflow_Into_Tabs_Border ()
+    {
+        IDriver driver = CreateTestDriver (7, 8);
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
+            BorderStyle = LineStyle.Dotted
+        };
+
+        View tabHost = new () { Title = "H", Height = Dim.Fill (), Width = Dim.Fill (), BorderStyle = LineStyle.Double, SuperViewRendersLineCanvas = true };
+        superView.Add (tabHost);
+
+        View tab = new () { Title = "A", Height = Dim.Fill (), Width = Dim.Fill () };
+        tab.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        tab.Border.LineStyle = LineStyle.Single;
+        tab.Border.Thickness = new Thickness (1, 3, 1, 1);
+        tab.Border.TabSide = Side.Top;
+        tab.Border.TabOffset = 0;
+
+        tabHost.Add (tab);
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┐
+                                              ┊╔╡H╞╗┊
+                                              ┊║┌─┐║┊
+                                              ┊║│A│║┊
+                                              ┊║├─┤║┊
+                                              ┊║└─┘║┊
+                                              ┊╚═══╝┊
+                                              └┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
+
+        tab.Border.TabOffset = 1;
+        superView.Layout ();
+        driver.ClearContents ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┐
+                                              ┊╔╡H╞╗┊
+                                              ┊║ ┌─║┊
+                                              ┊║ │A║┊
+                                              ┊║┌┴┬║┊
+                                              ┊║└─┘║┊
+                                              ┊╚═══╝┊
+                                              └┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
+        superView.Dispose ();
     }
 }
