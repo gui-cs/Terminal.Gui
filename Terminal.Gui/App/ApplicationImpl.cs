@@ -259,5 +259,15 @@ internal partial class ApplicationImpl : IApplication
         set;
     }
 
+    public ApplicationToolTip? ToolTips
+    {
+        get
+        {
+            field ??= new ApplicationToolTip { App = this };
+            return field;
+        }
+        set;
+    }
+
     #endregion Navigation and Popover
 }
