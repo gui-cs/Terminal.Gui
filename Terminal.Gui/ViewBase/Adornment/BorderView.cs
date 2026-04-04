@@ -110,14 +110,14 @@ public partial class BorderView : AdornmentView
             ViewportSettings |= ViewportSettingsFlags.Transparent | ViewportSettingsFlags.TransparentMouse;
             _tabModeSetTransparent = true;
 
-            TitleView label = EnsureTitleView ();
+            EnsureTitleView ();
 
             if (border.LineStyle is { } ls)
             {
-                label.BorderStyle = ls;
+                TitleView?.BorderStyle = ls;
             }
 
-            label.Orientation = border.TabSide is Side.Left or Side.Right ? Orientation.Vertical : Orientation.Horizontal;
+            (TitleView as TitleView)?.Orientation = border.TabSide is Side.Left or Side.Right ? Orientation.Vertical : Orientation.Horizontal;
         }
         else
         {
@@ -128,7 +128,7 @@ public partial class BorderView : AdornmentView
                 _tabModeSetTransparent = false;
             }
 
-            _tabTitleView?.Visible = false;
+            TitleView?.Visible = false;
         }
     }
 
@@ -164,7 +164,7 @@ public partial class BorderView : AdornmentView
             return;
         }
 
-        if (_tabTitleView is null)
+        if (TitleView is null)
         {
             return;
         }
@@ -173,7 +173,7 @@ public partial class BorderView : AdornmentView
 
         if (borderBounds is not { Width: > 0, Height: > 0 })
         {
-            _tabTitleView.Visible = false;
+            TitleView.Visible = false;
 
             return;
         }
@@ -194,42 +194,41 @@ public partial class BorderView : AdornmentView
 
         if (!tabVisible)
         {
-            _tabTitleView.Visible = false;
+            TitleView.Visible = false;
 
             return;
         }
 
-        _tabTitleView.Visible = true;
-       // _tabTitleView.HotKeySpecifier = Adornment.Parent?.HotKeySpecifier ?? default (Rune);
-        _tabTitleView.Text = Adornment.Parent?.Title ?? string.Empty;
+        TitleView.Visible = true;
+        TitleView.Text = Adornment.Parent?.Title ?? string.Empty;
 
         if (border.LineStyle is { } ls)
         {
-            _tabTitleView.BorderStyle = ls;
+            TitleView.BorderStyle = ls;
         }
 
-        // Configure the label's border thickness based on depth and focus
-        _tabTitleView.Border.Thickness = ComputeTabLabelThickness (border.TabSide, tabDepth, hasFocus, clipped);
+        // Configure the TitleView's border thickness based on depth and focus
+        TitleView.Border.Thickness = ComputeTitleViewThickness (border.TabSide, tabDepth, hasFocus);
 
         // Set orientation based on tab side — TitleView updates TextFormatter.Direction automatically
-        _tabTitleView.Orientation = border.TabSide is Side.Left or Side.Right ? Orientation.Vertical : Orientation.Horizontal;
+        (TitleView as TitleView)?.Orientation = border.TabSide is Side.Left or Side.Right ? Orientation.Vertical : Orientation.Horizontal;
 
         // Convert header rect from screen to BorderView viewport coords
         Point screenOrigin = ViewportToScreen (Point.Empty);
         Rectangle labelFrame = headerRect with { X = headerRect.X - screenOrigin.X, Y = headerRect.Y - screenOrigin.Y };
-        _tabTitleView.Frame = labelFrame;
+        TitleView.Frame = labelFrame;
 
         if (hasFocus && border is { TabSide: Side.Bottom, Thickness.Bottom: > 2 })
         {
-            _tabTitleView.Padding.Thickness = new Thickness (0, 1, 0, 0);
+            TitleView.Padding.Thickness = new Thickness (0, 1, 0, 0);
         }
         else if (hasFocus && border is { TabSide: Side.Right, Thickness.Right: > 2 })
         {
-            _tabTitleView.Padding.Thickness = new Thickness (1, 0, 0, 0);
+            TitleView.Padding.Thickness = new Thickness (1, 0, 0, 0);
         }
         else
         {
-            _tabTitleView.Padding.Thickness = new Thickness (0);
+            TitleView.Padding.Thickness = new Thickness (0);
         }
     }
 
@@ -353,32 +352,30 @@ public partial class BorderView : AdornmentView
         return new Rectangle (left, top, Math.Max (0, right - left), Math.Max (0, bottom - top));
     }
 
-    private TitleView? _tabTitleView;
+    private TitleView? _titleView;
 
-    /// <summary>Gets the tab title <see cref="View"/>, or <see langword="null"/> if not yet created.</summary>
-    public View? TitleView => _tabTitleView;
+    /// <summary>Gets the tab's <see cref="TitleView"/>, or <see langword="null"/> if not yet created.</summary>
+    public View? TitleView => _titleView;
 
     /// <summary>
-    ///     Gets or lazily creates the <see cref="ViewBase.TitleView"/> SubView used to render the tab header.
+    ///     Gets or lazily creates the <see cref="TitleView"/> SubView used to render the tab header.
     ///     The view has its own border with <see cref="View.SuperViewRendersLineCanvas"/> = true,
     ///     so its border lines auto-join with the View's content border via <see cref="View.LineCanvas"/>.
     /// </summary>
-    private TitleView EnsureTitleView ()
+    private void EnsureTitleView ()
     {
-        if (_tabTitleView is { })
+        if (TitleView is { })
         {
-            return _tabTitleView;
+            return;
         }
 
-        _tabTitleView = new TitleView
+        _titleView = new TitleView
         {
 #if DEBUG
             Id = "TitleView",
 #endif
         };
-        Add (_tabTitleView);
-
-        return _tabTitleView;
+        Add (TitleView);
     }
 
     /// <summary>
@@ -408,7 +405,7 @@ public partial class BorderView : AdornmentView
         };
 
     /// <summary>
-    ///     Computes the <see cref="Thickness"/> for the tab title Label's border based on
+    ///     Computes the <see cref="Thickness"/> for the tab TitleView's border based on
     ///     depth, focus state, and which side the tab is on.
     /// </summary>
     /// <remarks>
@@ -418,7 +415,7 @@ public partial class BorderView : AdornmentView
     ///         For depth &lt; 3, no focus distinction in border lines.
     ///     </para>
     /// </remarks>
-    private static Thickness ComputeTabLabelThickness (Side tabSide, int depth, bool hasFocus, Rectangle clipped)
+    private static Thickness ComputeTitleViewThickness (Side tabSide, int depth, bool hasFocus)
     {
         int cap = depth >= 2 ? 1 : 0;
         int contentSide = depth >= 3 && !hasFocus ? 1 : 0;
@@ -454,9 +451,9 @@ public partial class BorderView : AdornmentView
 
     /// <summary>
     ///     Draws the border and tab header when <see cref="BorderSettings.Tab"/> is set.
-    ///     Uses a <see cref="Label"/> SubView with its own border and
+    ///     Uses a <see cref="TitleView"/> SubView with its own border and
     ///     <see cref="View.SuperViewRendersLineCanvas"/> = true for the tab header.
-    ///     The Label's border lines auto-join with the content border via <see cref="View.LineCanvas"/>.
+    ///     The TitleView's border lines auto-join with the content border via <see cref="View.LineCanvas"/>.
     /// </summary>
     private bool DrawTabBorder (Border border)
     {

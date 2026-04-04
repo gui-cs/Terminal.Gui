@@ -30,6 +30,9 @@ public sealed class TitleView : View, IOrientation
     {
         CanFocus = true;
 
+        Width = Dim.Auto ();
+        Height = Dim.Auto ();
+
         // Do not participate in tab navigation — focus is set by click or by the owning view.
         TabStop = TabBehavior.NoStop;
         Border.Settings = BorderSettings.None;

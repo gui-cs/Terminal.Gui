@@ -1,12 +1,14 @@
 // Claude - Opus 4.6
 
+using UnitTests;
+
 namespace ViewBaseTests.Adornments;
 
 /// <summary>
 ///     Tests for <see cref="TitleView"/> orientation, direction, key bindings, and TextFormatter behavior.
 /// </summary>
 [Trait ("Category", "Adornment")]
-public class TitleViewTests
+public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
 {
     #region Constructor Defaults
 
@@ -200,6 +202,78 @@ public class TitleViewTests
     {
         Assert.True (tv.KeyBindings.TryGet (key, out KeyBinding binding), $"Expected key {key} to be bound");
         Assert.Contains (expectedCommand, binding.Commands);
+    }
+
+    #endregion
+
+    #region Visual Tests
+
+    [Fact]
+    public void HotKey_Without_DrawsCorrectly ()
+    {
+        IDriver driver = CreateTestDriver (8, 5);
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
+
+        TitleView titleView = new () { Text = "Tab1", CanFocus = true, BorderStyle = LineStyle.Rounded };
+
+        superView.Add (titleView);
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┄┐
+                                              ┊╭────╮┊
+                                              ┊│Tab1│┊
+                                              ┊╰────╯┊
+                                              └┄┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
+
+        superView.Dispose ();
+    }
+
+    [Fact]
+    public void HotKey_With_DrawsCorrectly ()
+    {
+        IDriver driver = CreateTestDriver (8, 5);
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
+
+        TitleView titleView = new () { Text = "_Tab1", CanFocus = true, BorderStyle = LineStyle.Rounded };
+
+        superView.Add (titleView);
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┄┐
+                                              ┊╭────╮┊
+                                              ┊│Tab1│┊
+                                              ┊╰────╯┊
+                                              └┄┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
+
+        superView.Dispose ();
     }
 
     #endregion

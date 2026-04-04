@@ -321,6 +321,35 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void Top_TwoTabs_Tab1Focused_HotKey_DrawsCorrectly ()
+    {
+        IDriver driver = CreateTestDriver (14, 5);
+
+        Tabs tabs = new () { Driver = driver, Width = 14, Height = 5 };
+
+        View tab1 = new () { Title = "_Tab1", Text = "Tab1 content" };
+        View tab2 = new () { Title = "Tab2", Text = "Tab2 content" };
+
+        tabs.Add (tab1, tab2);
+        tabs.Value = tab1;
+
+        tabs.Layout ();
+        tabs.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭────╮────╮
+                                              │Tab1│Tab2│
+                                              │    ╰────┴──╮
+                                              │Tab1 content│
+                                              ╰────────────╯
+                                              """,
+                                              output,
+                                              driver);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
     public void Top_TwoTabs_Tab1Focused_DrawsCorrectly ()
     {
         IDriver driver = CreateTestDriver (14, 5);
