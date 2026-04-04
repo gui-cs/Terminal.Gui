@@ -212,7 +212,38 @@ public partial class View // Command APIs
 
     #region Default Event Handlers
 
-    internal bool? DefaultCommandNotBoundHandler (ICommandContext? ctx) => RaiseCommandNotBound (ctx);
+    internal bool? DefaultCommandNotBoundHandler (ICommandContext? ctx)
+    {
+        Trace.Command (this, ctx, "Entry");
+
+        // Reset dispatch state — mirrors DefaultActivateHandler/DefaultAcceptHandler.
+        _dispatchState = DispatchState.None;
+
+        bool? result = RaiseCommandNotBound (ctx);
+
+        if (result is true)
+        {
+            return true;
+        }
+
+        // Refresh value from the dispatch target so that BubbleActivatedUp carries the
+        // post-change value (mirrors DefaultActivateHandler).
+        ctx = RefreshValue (ctx);
+
+        // Notify ALL ancestors (composite and plain) that the command completed.
+        // This ensures bridges and CommandsToBubbleUp subscribers see the event.
+        if (ctx?.Routing != CommandRouting.DispatchingDown)
+        {
+            BubbleActivatedUp (ctx);
+        }
+
+        // Report as handled if the command will bubble to an ancestor — mirrors
+        // DefaultActivateHandler logic so that the key is consumed when an ancestor
+        // subscribes to it via CommandsToBubbleUp.
+        bool willBubble = ctx is not null && CommandWillBubbleToAncestor (ctx.Command);
+
+        return _dispatchState.HasFlag (DispatchState.DispatchOccurred) || willBubble;
+    }
 
     /// <summary>
     ///     Called when a command that has not been bound is invoked.
@@ -239,7 +270,24 @@ public partial class View // Command APIs
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
         CommandNotBound?.Invoke (this, args);
 
-        return CommandNotBound is null ? null : args.Handled;
+        if (args.Handled)
+        {
+            return true;
+        }
+
+        // Framework dispatch: composite views delegate commands to a target SubView.
+        if (!args.Handled)
+        {
+            args.Handled = TryDispatchToTarget (ctx);
+        }
+
+        // Bubble to SuperView if the command is in its CommandsToBubbleUp list.
+        if (!args.Handled)
+        {
+            args.Handled = TryBubbleUp (ctx, args.Handled) is true;
+        }
+
+        return args.Handled;
     }
 
     /// <summary>

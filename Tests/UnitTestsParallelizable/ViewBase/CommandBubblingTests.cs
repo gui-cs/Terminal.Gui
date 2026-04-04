@@ -1192,14 +1192,15 @@ public class CommandBubblingTests (ITestOutputHelper output)
         View subView = new () { Id = "subView" };
         superView.Add (subView);
 
-        var superViewActivatingCount = 0;
-        superView.Activating += (_, _) => superViewActivatingCount++;
+        var superViewCommandNotBoundCount = 0;
 
-        // Command.Up is NOT bound on subView, so it goes through DefaultCommandNotBoundHandler
+        superView.CommandNotBound += (_, _) => superViewCommandNotBoundCount++;
+
+        // Command.Up is NOT bound on subView, so it goes through DefaultCommandNotBoundHandler.
+        // After upgrade, unbound commands should bubble via CommandsToBubbleUp.
         subView.InvokeCommand (Command.Up);
 
-        // After upgrade, unbound commands should bubble via CommandsToBubbleUp
-        Assert.Equal (1, superViewActivatingCount);
+        Assert.Equal (1, superViewCommandNotBoundCount);
     }
 
     // Copilot
@@ -1212,12 +1213,13 @@ public class CommandBubblingTests (ITestOutputHelper output)
         View subView = new () { Id = "subView" };
         superView.Add (subView);
 
-        var superViewActivatingCount = 0;
-        superView.Activating += (_, _) => superViewActivatingCount++;
+        var superViewCommandNotBoundCount = 0;
+
+        superView.CommandNotBound += (_, _) => superViewCommandNotBoundCount++;
 
         subView.InvokeCommand (Command.Up);
 
-        Assert.Equal (0, superViewActivatingCount);
+        Assert.Equal (0, superViewCommandNotBoundCount);
     }
 
     // Copilot
@@ -1234,12 +1236,13 @@ public class CommandBubblingTests (ITestOutputHelper output)
         View subView = new () { Id = "subView" };
         superView.Add (subView);
 
-        var grandActivatingCount = 0;
-        grandSuperView.Activating += (_, _) => grandActivatingCount++;
+        var grandCommandNotBoundCount = 0;
+
+        grandSuperView.CommandNotBound += (_, _) => grandCommandNotBoundCount++;
 
         subView.InvokeCommand (Command.Up);
 
-        Assert.Equal (1, grandActivatingCount);
+        Assert.Equal (1, grandCommandNotBoundCount);
     }
 
     // Copilot
@@ -1252,22 +1255,24 @@ public class CommandBubblingTests (ITestOutputHelper output)
         View subView = new () { Id = "subView" };
         superView.Add (subView);
 
-        var superViewActivatingCount = 0;
-        superView.Activating += (_, _) => superViewActivatingCount++;
+        var superViewCommandNotBoundCount = 0;
+
+        superView.CommandNotBound += (_, _) => superViewCommandNotBoundCount++;
 
         // Handle CommandNotBound on subView — should stop bubbling
         subView.CommandNotBound += (_, e) => e.Handled = true;
 
         subView.InvokeCommand (Command.Up);
 
-        Assert.Equal (0, superViewActivatingCount);
+        Assert.Equal (0, superViewCommandNotBoundCount);
     }
 
     // Copilot
     [Fact]
-    public void UnboundCommand_BubblingUp_ReturnsNotHandled ()
+    public void UnboundCommand_BubblingUp_ReturnsHandled_WhenBubbles ()
     {
-        // Bubbling is notification-only — should return false (not handled)
+        // When an unbound command bubbles via CommandsToBubbleUp, it reports as handled
+        // (mirrors DefaultActivateHandler which returns true when CommandWillBubbleToAncestor).
         View superView = new () { Id = "superView" };
         superView.CommandsToBubbleUp = [Command.Up];
 
@@ -1276,8 +1281,8 @@ public class CommandBubblingTests (ITestOutputHelper output)
 
         bool? result = subView.InvokeCommand (Command.Up);
 
-        // Unbound commands that bubble should not report as handled (notification semantics)
-        Assert.False (result == true);
+        // Unbound commands that bubble report as handled, consistent with bound commands.
+        Assert.True (result);
     }
 
     #endregion Unbound Command Bubbling Tests
