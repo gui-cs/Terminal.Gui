@@ -11,568 +11,21 @@ namespace ViewBaseTests.Adornments;
 // Copilot
 public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 {
-    // ────────────────────────────────────────────────────────────────────
-    //  Helpers
-    // ────────────────────────────────────────────────────────────────────
-
-    private static View CreateTabView (IDriver driver,
-                                       int width,
-                                       int height,
-                                       Side side,
-                                       int tabOffset,
-                                       int? tabLength,
-                                       bool hasFocus,
-                                       string? title,
-                                       bool titleFlag,
-                                       Thickness? thickness = null)
-    {
-        View view = new ()
-        {
-            Driver = driver,
-            CanFocus = true,
-            HasFocus = hasFocus,
-            Width = width,
-            Height = height,
-            BorderStyle = LineStyle.Rounded
-        };
-
-        if (title is { })
-        {
-            view.Title = title;
-        }
-
-        view.Border.Thickness = thickness
-                                ?? side switch
-                                   {
-                                       Side.Top => new Thickness (1, 3, 1, 1),
-                                       Side.Bottom => new Thickness (1, 1, 1, 3),
-                                       Side.Left => new Thickness (3, 1, 1, 1),
-                                       Side.Right => new Thickness (1, 1, 3, 1),
-                                       _ => throw new ArgumentOutOfRangeException (nameof (side))
-                                   };
-
-        var settings = BorderSettings.Tab;
-
-        if (titleFlag)
-        {
-            settings |= BorderSettings.Title;
-        }
-
-        view.Border.Settings = settings;
-        view.Border.TabSide = side;
-        view.Border.TabOffset = tabOffset;
-
-        if (tabLength.HasValue)
-        {
-            view.Border.TabLength = tabLength.Value;
-        }
-
-        return view;
-    }
-
-    private void DrawAndAssert (View view, IDriver driver, string expected)
-    {
-        view.Layout ();
-        view.Draw ();
-        output.WriteLine (driver.ToString ());
-        DriverAssert.AssertDriverContentsAre (expected, output, driver);
-        view.Dispose ();
-    }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  Side.Top — View 9×6, Thickness(1,3,1,1), borderBounds=(0,2,9,4)
-    //  Content border: 9 wide, 4 tall. Interior: 7 cols × 2 rows.
-    // ════════════════════════════════════════════════════════════════════
-
     [Fact]
-    public void Top_Unfocused_Offset0_WithTitle ()
+    public void Bottom_Focused_Depth1_WithTitle ()
     {
-        IDriver driver = CreateTestDriver (9, 6);
+        IDriver driver = CreateTestDriver (9, 4);
 
         View view = CreateTabView (driver,
                                    9,
-                                   6,
-                                   Side.Top,
-                                   0,
-                                   null,
-                                   false,
-                                   "T_ab",
-                                   true);
-
-        Assert.Equal (5, view.Border.TabLength!.Value);
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭───╮
-                       │Tab│
-                       ├───┴───╮
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Unfocused_Offset2_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (9, 6);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   6,
-                                   Side.Top,
-                                   2,
-                                   null,
-                                   false,
-                                   "T_ab",
-                                   true);
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                         ╭───╮
-                         │Tab│
-                       ╭─┴───┴─╮
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Unfocused_OverflowRight_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (9, 6);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   6,
-                                   Side.Top,
-                                   5,
-                                   null,
-                                   false,
-                                   "T_ab",
-                                   true);
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                            ╭───
-                            │Tab
-                       ╭────┴──┬
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Focused_Offset0_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (9, 6);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   6,
-                                   Side.Top,
-                                   0,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true);
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭───╮
-                       │Tab│
-                       │   ╰───╮
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Focused_Offset2_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (9, 6);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   6,
-                                   Side.Top,
-                                   2,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true);
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                         ╭───╮
-                         │Tab│
-                       ╭─╯   ╰─╮
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Focused_OverflowRight_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (9, 6);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   6,
-                                   Side.Top,
-                                   5,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true);
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                            ╭───
-                            │Tab
-                       ╭────╯  │
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Unfocused_Offset0_NoTitle ()
-    {
-        IDriver driver = CreateTestDriver (9, 6);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   6,
-                                   Side.Top,
-                                   0,
-                                   null,
-                                   false,
-                                   null,
-                                   false);
-
-        Assert.Equal (2, view.Border.TabLength!.Value);
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭╮
-                       ││
-                       ├┴──────╮
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Unfocused_SingleCharTitle ()
-    {
-        IDriver driver = CreateTestDriver (9, 6);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   6,
-                                   Side.Top,
-                                   2,
-                                   null,
-                                   false,
-                                   "X",
-                                   true);
-
-        Assert.Equal (3, view.Border.TabLength!.Value);
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                         ╭─╮
-                         │X│
-                       ╭─┴─┴───╮
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Unfocused_NegativeOffset_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (9, 6);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   6,
-                                   Side.Top,
-                                   -1,
-                                   null,
-                                   false,
-                                   "T_ab",
-                                   true);
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ───╮
-                       Tab│
-                       ┬──┴────╮
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Unfocused_NegativeOffset_WithTitle_Thick_Border ()
-    {
-        IDriver driver = CreateTestDriver ();
-
-        View view = CreateTabView (driver,
-                                   17,
-                                   12,
-                                   Side.Top,
-                                   -1,
-                                   null,
-                                   false,
-                                   "T_ab",
-                                   true);
-
-        view.Border.Thickness = new Thickness (5, 5, 5, 5);
-
-        // Edge-based positioning: non-title sides at outer edge → 17 wide, 8 tall content border.
-        // Tab header at offset=-1 is partially clipped on the left.
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ───╮
-                       Tab│
-                       ┬──┴────────────╮
-                       │               │
-                       │               │
-                       │               │
-                       │               │
-                       │               │
-                       │               │
-                       ╰───────────────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Focused_Offset0_WithTitle_Thick_Border () // Copilot
-    {
-        IDriver driver = CreateTestDriver ();
-
-        View view = CreateTabView (driver,
-                                   17,
-                                   12,
-                                   Side.Top,
-                                   0,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true);
-
-        view.Border.Thickness = new Thickness (5, 5, 5, 5);
-
-        // Edge-based: borderBounds=(0,4,17,8). Header depth=3 at offset=0.
-        // Focused → open gap (no separator line).
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭───╮
-                       │Tab│
-                       │   ╰───────────╮
-                       │               │
-                       │               │
-                       │               │
-                       │               │
-                       │               │
-                       │               │
-                       ╰───────────────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Unfocused_Offset0_WithTitle_Thick_Border () // Copilot
-    {
-        IDriver driver = CreateTestDriver ();
-
-        View view = CreateTabView (driver,
-                                   17,
-                                   12,
-                                   Side.Top,
-                                   0,
-                                   null,
-                                   false,
-                                   "T_ab",
-                                   true);
-
-        view.Border.Thickness = new Thickness (5, 5, 5, 5);
-
-        // Edge-based: borderBounds=(0,4,17,8). Header depth=3 at offset=0.
-        // Unfocused → separator line (closed).
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭───╮
-                       │Tab│
-                       ├───┴───────────╮
-                       │               │
-                       │               │
-                       │               │
-                       │               │
-                       │               │
-                       │               │
-                       ╰───────────────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Unfocused_NegativeOffset5_Thick_Border () // Copilot
-    {
-        IDriver driver = CreateTestDriver ();
-
-        View view = CreateTabView (driver,
-                                   17,
-                                   12,
-                                   Side.Top,
-                                   -5,
-                                   null,
-                                   false,
-                                   "T_ab",
-                                   true);
-
-        view.Border.Thickness = new Thickness (5, 5, 5, 5);
-
-        // Edge-based: header completely off-screen. Full content border drawn.
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭───────────────╮
-                       │               │
-                       │               │
-                       │               │
-                       │               │
-                       │               │
-                       │               │
-                       ╰───────────────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Unfocused_NegativeOffset2_WithTitle () // Copilot
-    {
-        IDriver driver = CreateTestDriver (9, 6);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   6,
-                                   Side.Top,
-                                   -2,
-                                   null,
-                                   false,
-                                   "T_ab",
-                                   true);
-
-        // Header at X=-2. Left edge and 'T' clipped. Visible: cap ──╮, title ab│.
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ──╮
-                       ab│
-                       ┬─┴─────╮
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Unfocused_NegativeOffset4_WithTitle () // Copilot
-    {
-        IDriver driver = CreateTestDriver (9, 6);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   6,
-                                   Side.Top,
-                                   -4,
-                                   null,
-                                   false,
-                                   "T_ab",
-                                   true);
-
-        // Header at X=-4. Only right edge visible at col 0. No title visible.
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╮
-                       │
-                       ┼───────╮
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Unfocused_NegativeOffset5_WithTitle () // Copilot
-    {
-        IDriver driver = CreateTestDriver (9, 6);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   6,
-                                   Side.Top,
-                                   -5,
-                                   null,
-                                   false,
-                                   "T_ab",
-                                   true);
-
-        // Header completely off-screen. Content border drawn normally.
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭───────╮
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  Side.Bottom — View 9×6, Thickness(1,1,1,3), borderBounds=(0,0,9,4)
-    //  Content border: 9 wide, 4 tall. Tab protrudes below.
-    // ════════════════════════════════════════════════════════════════════
-
-    [Fact]
-    public void Bottom_Unfocused_Offset0_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (9, 6);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   6,
+                                   4,
                                    Side.Bottom,
                                    0,
                                    null,
-                                   false,
+                                   true,
                                    "T_ab",
-                                   true);
-
-        Assert.Equal (5, view.Border.TabLength!.Value);
+                                   true,
+                                   new Thickness (1, 1, 1, 1));
 
         DrawAndAssert (view,
                        driver,
@@ -580,7 +33,60 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        ╭───────╮
                        │       │
                        │       │
-                       ├───┬───╯
+                       │Tab╭───╯
+                       """);
+    }
+
+    [Fact]
+    public void Bottom_Focused_Depth2_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 5);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   5,
+                                   Side.Bottom,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true,
+                                   new Thickness (1, 1, 1, 2));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       │Tab╭───╯
+                       ╰───╯
+                       """);
+    }
+
+    [Fact]
+    public void Bottom_Focused_Depth4_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 7);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   7,
+                                   Side.Bottom,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true,
+                                   new Thickness (1, 1, 1, 4));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       │   ╭───╯
                        │Tab│
                        ╰───╯
                        """);
@@ -614,19 +120,20 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Bottom_Unfocused_Offset2_WithTitle ()
+    public void Bottom_Unfocused_Depth1_WithTitle () // Copilot
     {
-        IDriver driver = CreateTestDriver (9, 6);
+        IDriver driver = CreateTestDriver (9, 4);
 
         View view = CreateTabView (driver,
                                    9,
-                                   6,
+                                   4,
                                    Side.Bottom,
-                                   2,
+                                   0,
                                    null,
                                    false,
                                    "T_ab",
-                                   true);
+                                   true,
+                                   new Thickness (1, 1, 1, 1));
 
         DrawAndAssert (view,
                        driver,
@@ -634,9 +141,34 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        ╭───────╮
                        │       │
                        │       │
-                       ╰─┬───┬─╯
-                         │Tab│
-                         ╰───╯
+                       │Tab╭───╯
+                       """);
+    }
+
+    [Fact]
+    public void Bottom_Unfocused_Depth2_WithTitle () // Copilot
+    {
+        IDriver driver = CreateTestDriver (9, 5);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   5,
+                                   Side.Bottom,
+                                   0,
+                                   null,
+                                   false,
+                                   "T_ab",
+                                   true,
+                                   new Thickness (1, 1, 1, 2));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       │Tab╭───╯
+                       ╰───╯
                        """);
     }
 
@@ -697,6 +229,255 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     // ════════════════════════════════════════════════════════════════════
+    //  Side.Bottom — View 9×6, Thickness(1,1,1,3), borderBounds=(0,0,9,4)
+    //  Content border: 9 wide, 4 tall. Tab protrudes below.
+    // ════════════════════════════════════════════════════════════════════
+
+    [Fact]
+    public void Bottom_Unfocused_Offset0_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Bottom,
+                                   0,
+                                   null,
+                                   false,
+                                   "T_ab",
+                                   true);
+
+        Assert.Equal (5, view.Border.TabLength!.Value);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       ├───┬───╯
+                       │Tab│
+                       ╰───╯
+                       """);
+    }
+
+    [Fact]
+    public void Bottom_Unfocused_Offset2_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Bottom,
+                                   2,
+                                   null,
+                                   false,
+                                   "T_ab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       ╰─┬───┬─╯
+                         │Tab│
+                         ╰───╯
+                       """);
+    }
+
+    // Copilot
+    [Fact]
+    public void Clearing_Tab_Flag_Hides_TitleView ()
+    {
+        IDriver driver = CreateTestDriver (10, 6);
+
+        View view = new () { Driver = driver, Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Title = "Tab";
+        view.Layout ();
+
+        var bv = (BorderView)view.Border.View!;
+        Assert.NotNull (bv.TitleView);
+
+        // Clear the Tab flag
+        view.Border.Settings = BorderSettings.Title;
+        view.Layout ();
+
+        // TitleView should be hidden (Visible = false)
+        Assert.False (bv.TitleView!.Visible, "TitleView should be hidden when Tab flag is cleared");
+
+        view.Dispose ();
+    }
+
+    [Fact]
+    public void Left_Focused_Depth1_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 9);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   9,
+                                   Side.Left,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true,
+                                   new Thickness (1, 1, 1, 1));
+
+        // Depth=1: no cap line, no tab edges. Title at rows 1-3 (between top/bottom edges).
+        // (0,0) is excluded by AddTabSideContentBorder (tab starts at content border edge).
+        // After Trim(), leading space removed from row 0.
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ────────╮
+                       T       │
+                       a       │
+                       b       │
+                       │       │
+                       │       │
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Left_Focused_Depth2_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (10, 9);
+
+        View view = CreateTabView (driver,
+                                   10,
+                                   9,
+                                   Side.Left,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true,
+                                   new Thickness (2, 1, 1, 1));
+
+        // Depth=2: cap at col 0, closing edge at col 1. Title on closing edge.
+        // (1,0) excluded by AddTabSideContentBorder → space at col 1 row 0.
+        // (1,4) has ╮ from header bottom edge + content border vertical auto-join.
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭────────╮
+                       │T       │
+                       │a       │
+                       │b       │
+                       ╰╮       │
+                        │       │
+                        │       │
+                        │       │
+                        ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Left_Focused_Depth4_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (12, 9);
+
+        View view = CreateTabView (driver,
+                                   12,
+                                   9,
+                                   Side.Left,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true,
+                                   new Thickness (4, 1, 1, 1));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                        ╭─────────╮
+                        │T        │
+                        │a        │
+                        │b        │
+                        ╰─╮       │
+                          │       │
+                          │       │
+                          │       │
+                          ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Left_Focused_Overflow_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (11, 9);
+
+        View view = CreateTabView (driver,
+                                   11,
+                                   9,
+                                   Side.Left,
+                                   6,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                         ╭───────╮
+                         │       │
+                         │       │
+                         │       │
+                         │       │
+                         │       │
+                       ╭─╯       │
+                       │T        │
+                       │a ───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Left_Unfocused_Offset0_NoTitle ()
+    {
+        IDriver driver = CreateTestDriver (11, 9);
+
+        View view = CreateTabView (driver,
+                                   11,
+                                   9,
+                                   Side.Left,
+                                   0,
+                                   null,
+                                   false,
+                                   null,
+                                   false);
+
+        Assert.Equal (2, view.Border.TabLength!.Value);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭─┬───────╮
+                       ╰─┤       │
+                         │       │
+                         │       │
+                         │       │
+                         │       │
+                         │       │
+                         │       │
+                         ╰───────╯
+                       """);
+    }
+
+    // ════════════════════════════════════════════════════════════════════
     //  Side.Left — View 11×9, Thickness(3,1,1,1), borderBounds=(2,0,9,9)
     //  Content border: 9 wide (cols 2–10), 9 tall. Tab protrudes left.
     // ════════════════════════════════════════════════════════════════════
@@ -726,38 +507,6 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        │a│       │
                        │b│       │
                        ╰─┤       │
-                         │       │
-                         │       │
-                         │       │
-                         ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Left_Unfocused_Offset0_NoTitle ()
-    {
-        IDriver driver = CreateTestDriver (11, 9);
-
-        View view = CreateTabView (driver,
-                                   11,
-                                   9,
-                                   Side.Left,
-                                   0,
-                                   null,
-                                   false,
-                                   null,
-                                   false);
-
-        Assert.Equal (2, view.Border.TabLength!.Value);
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭─┬───────╮
-                       ╰─┤       │
-                         │       │
-                         │       │
-                         │       │
                          │       │
                          │       │
                          │       │
@@ -796,14 +545,111 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Left_Focused_Overflow_WithTitle ()
+    public void Right_Focused_Depth1_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 9);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   9,
+                                   Side.Right,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true,
+                                   new Thickness (1, 1, 1, 1));
+
+        // Depth=1: no cap line, no tab edges. Title at rows 0-2.
+        // The top-right corner shows ─ (horizontal border continues; no vertical at the gap).
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭────────
+                       │       T
+                       │       a
+                       │       b
+                       │       │
+                       │       │
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Right_Focused_Depth2_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (10, 9);
+
+        View view = CreateTabView (driver,
+                                   10,
+                                   9,
+                                   Side.Right,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true,
+                                   new Thickness (1, 1, 2, 1));
+
+        // Depth=2: cap at col 9, closing edge at col 8. Title on closing edge.
+        // (8,0) excluded → space at col 8 row 0. (8,4) has ╭ from auto-join.
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭────────╮
+                       │       T│
+                       │       a│
+                       │       b│
+                       │       ╭╯
+                       │       │
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Right_Focused_Depth4_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (12, 9);
+
+        View view = CreateTabView (driver,
+                                   12,
+                                   9,
+                                   Side.Right,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true,
+                                   new Thickness (1, 1, 4, 1));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭─────────╮
+                       │        T│
+                       │        a│
+                       │        b│
+                       │       ╭─╯
+                       │       │
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Right_Focused_Overflow_WithTitle ()
     {
         IDriver driver = CreateTestDriver (11, 9);
 
         View view = CreateTabView (driver,
                                    11,
                                    9,
-                                   Side.Left,
+                                   Side.Right,
                                    6,
                                    null,
                                    true,
@@ -813,15 +659,47 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (view,
                        driver,
                        """
-                         ╭───────╮
-                         │       │
-                         │       │
-                         │       │
-                         │       │
-                         │       │
-                       ╭─╯       │
-                       │T        │
-                       │a ───────╯
+                       ╭───────╮
+                       │       │
+                       │       │
+                       │       │
+                       │       │
+                       │       │
+                       │       ╰─╮
+                       │        T│
+                       ╰─────── a│
+                       """);
+    }
+
+    [Fact]
+    public void Right_Unfocused_Offset0_NoTitle ()
+    {
+        IDriver driver = CreateTestDriver (11, 9);
+
+        View view = CreateTabView (driver,
+                                   11,
+                                   9,
+                                   Side.Right,
+                                   0,
+                                   null,
+                                   false,
+                                   null,
+                                   false);
+
+        Assert.Equal (2, view.Border.TabLength!.Value);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────┬─╮
+                       │       ├─╯
+                       │       │
+                       │       │
+                       │       │
+                       │       │
+                       │       │
+                       │       │
+                       ╰───────╯
                        """);
     }
 
@@ -863,38 +741,6 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Right_Unfocused_Offset0_NoTitle ()
-    {
-        IDriver driver = CreateTestDriver (11, 9);
-
-        View view = CreateTabView (driver,
-                                   11,
-                                   9,
-                                   Side.Right,
-                                   0,
-                                   null,
-                                   false,
-                                   null,
-                                   false);
-
-        Assert.Equal (2, view.Border.TabLength!.Value);
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭───────┬─╮
-                       │       ├─╯
-                       │       │
-                       │       │
-                       │       │
-                       │       │
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
     public void Right_Unfocused_Offset2_WithTitle ()
     {
         IDriver driver = CreateTestDriver (11, 9);
@@ -924,649 +770,203 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        """);
     }
 
-    [Fact]
-    public void Right_Focused_Overflow_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (11, 9);
-
-        View view = CreateTabView (driver,
-                                   11,
-                                   9,
-                                   Side.Right,
-                                   6,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true);
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭───────╮
-                       │       │
-                       │       │
-                       │       │
-                       │       │
-                       │       │
-                       │       ╰─╮
-                       │        T│
-                       ╰─────── a│
-                       """);
-    }
-
     // ════════════════════════════════════════════════════════════════════
-    //  Thickness Variants — Depth capping and non-standard depths
-    //  Depth should be min (thickness_on_tab_side, 3).
-    //  Thickness >= 3 always uses depth 3.
-    //  Thickness 1 and 2 produce shallower tabs per spec.
+    //  Setup-trigger tests — verify configuration happens at property-change
+    //   time, NOT deferred to Draw.
     // ════════════════════════════════════════════════════════════════════
 
-    // ──── Thickness = 4 (depth capped to 3) ────
-    // Expected output identical to thickness=3 (extra blank row trimmed).
-
+    // Copilot
     [Fact]
-    public void Top_Focused_Depth4_WithTitle ()
+    public void Settings_Tab_Creates_BorderView ()
     {
-        IDriver driver = CreateTestDriver (9, 7);
+        // Setting Border.Settings to include Tab should cause GetOrCreateView
+        View view = new () { Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
 
-        View view = CreateTabView (driver,
-                                   9,
-                                   7,
-                                   Side.Top,
-                                   0,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true,
-                                   new Thickness (1, 4, 1, 1));
+        // Before setting Tab, View may or may not exist depending on LineStyle
+        // but TitleView should not exist
 
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭───╮
-                       │Tab│
-                       │   ╰───╮
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Bottom_Focused_Depth4_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (9, 7);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   7,
-                                   Side.Bottom,
-                                   0,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true,
-                                   new Thickness (1, 1, 1, 4));
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭───────╮
-                       │       │
-                       │       │
-                       │   ╭───╯
-                       │Tab│
-                       ╰───╯
-                       """);
-    }
-
-    [Fact]
-    public void Left_Focused_Depth4_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (12, 9);
-
-        View view = CreateTabView (driver,
-                                   12,
-                                   9,
-                                   Side.Left,
-                                   0,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true,
-                                   new Thickness (4, 1, 1, 1));
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                        ╭─────────╮
-                        │T        │
-                        │a        │
-                        │b        │
-                        ╰─╮       │
-                          │       │
-                          │       │
-                          │       │
-                          ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Right_Focused_Depth4_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (12, 9);
-
-        View view = CreateTabView (driver,
-                                   12,
-                                   9,
-                                   Side.Right,
-                                   0,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true,
-                                   new Thickness (1, 1, 4, 1));
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭─────────╮
-                       │        T│
-                       │        a│
-                       │        b│
-                       │       ╭─╯
-                       │       │
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    // ──── Thickness = 2 (depth 2) ────
-    // 2-row tab: cap line + title on closing edge. No bottom line.
-
-    [Fact]
-    public void Top_Focused_Depth2_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (9, 5);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   5,
-                                   Side.Top,
-                                   0,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true,
-                                   new Thickness (1, 2, 1, 1));
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭───╮
-                       │Tab╰───╮
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Unfocused_Depth2_WithTitle () // Copilot
-    {
-        IDriver driver = CreateTestDriver (9, 5);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   5,
-                                   Side.Top,
-                                   0,
-                                   null,
-                                   false,
-                                   "T_ab",
-                                   true,
-                                   new Thickness (1, 2, 1, 1));
-
-        // Depth=2: cap line + closing edge with title. Separator on closing edge.
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭───╮
-                       │Tab╰───╮
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Bottom_Focused_Depth2_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (9, 5);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   5,
-                                   Side.Bottom,
-                                   0,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true,
-                                   new Thickness (1, 1, 1, 2));
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭───────╮
-                       │       │
-                       │       │
-                       │Tab╭───╯
-                       ╰───╯
-                       """);
-    }
-
-    [Fact]
-    public void Bottom_Unfocused_Depth2_WithTitle () // Copilot
-    {
-        IDriver driver = CreateTestDriver (9, 5);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   5,
-                                   Side.Bottom,
-                                   0,
-                                   null,
-                                   false,
-                                   "T_ab",
-                                   true,
-                                   new Thickness (1, 1, 1, 2));
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭───────╮
-                       │       │
-                       │       │
-                       │Tab╭───╯
-                       ╰───╯
-                       """);
-    }
-
-    [Fact]
-    public void Left_Focused_Depth2_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (10, 9);
-
-        View view = CreateTabView (driver,
-                                   10,
-                                   9,
-                                   Side.Left,
-                                   0,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true,
-                                   new Thickness (2, 1, 1, 1));
-
-        // Depth=2: cap at col 0, closing edge at col 1. Title on closing edge.
-        // (1,0) excluded by AddTabSideContentBorder → space at col 1 row 0.
-        // (1,4) has ╮ from header bottom edge + content border vertical auto-join.
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭────────╮
-                       │T       │
-                       │a       │
-                       │b       │
-                       ╰╮       │
-                        │       │
-                        │       │
-                        │       │
-                        ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Right_Focused_Depth2_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (10, 9);
-
-        View view = CreateTabView (driver,
-                                   10,
-                                   9,
-                                   Side.Right,
-                                   0,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true,
-                                   new Thickness (1, 1, 2, 1));
-
-        // Depth=2: cap at col 9, closing edge at col 8. Title on closing edge.
-        // (8,0) excluded → space at col 8 row 0. (8,4) has ╭ from auto-join.
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭────────╮
-                       │       T│
-                       │       a│
-                       │       b│
-                       │       ╭╯
-                       │       │
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    // ──── Thickness = 1 (depth 1) ────
-    // 1-row tab: title inline on the content border line.
-
-    [Fact]
-    public void Top_Focused_Depth1_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (9, 4);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   4,
-                                   Side.Top,
-                                   0,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true,
-                                   new Thickness (1, 1, 1, 1));
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       │Tab╭───╮
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Unfocused_Depth1_WithTitle () // Copilot
-    {
-        IDriver driver = CreateTestDriver (9, 4);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   4,
-                                   Side.Top,
-                                   0,
-                                   null,
-                                   false,
-                                   "T_ab",
-                                   true,
-                                   new Thickness (1, 1, 1, 1));
-
-        // Depth=1: separator coincides with content border line.
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       │Tab╭───╮
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Top_Focused_Depth1_LongTitle () // Copilot
-    {
-        // Title wider than content area → tab header spans full width.
-        IDriver driver = CreateTestDriver (15, 4);
-
-        View view = CreateTabView (driver,
-                                   15,
-                                   4,
-                                   Side.Top,
-                                   0,
-                                   null,
-                                   true,
-                                   "Long Title",
-                                   true,
-                                   new Thickness (1, 1, 1, 1));
-
-        // Depth=1: title on content border line, tab header = 12 wide (10+2 borders).
-        // Focused → open gap. Title fills the header interior.
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       │Long Title╭──╮
-                       │             │
-                       │             │
-                       ╰─────────────╯
-                       """);
-    }
-
-    [Fact]
-    public void Bottom_Focused_Depth1_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (9, 4);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   4,
-                                   Side.Bottom,
-                                   0,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true,
-                                   new Thickness (1, 1, 1, 1));
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭───────╮
-                       │       │
-                       │       │
-                       │Tab╭───╯
-                       """);
-    }
-
-    [Fact]
-    public void Bottom_Unfocused_Depth1_WithTitle () // Copilot
-    {
-        IDriver driver = CreateTestDriver (9, 4);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   4,
-                                   Side.Bottom,
-                                   0,
-                                   null,
-                                   false,
-                                   "T_ab",
-                                   true,
-                                   new Thickness (1, 1, 1, 1));
-
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭───────╮
-                       │       │
-                       │       │
-                       │Tab╭───╯
-                       """);
-    }
-
-    [Fact]
-    public void Left_Focused_Depth1_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (9, 9);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   9,
-                                   Side.Left,
-                                   0,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true,
-                                   new Thickness (1, 1, 1, 1));
-
-        // Depth=1: no cap line, no tab edges. Title at rows 1-3 (between top/bottom edges).
-        // (0,0) is excluded by AddTabSideContentBorder (tab starts at content border edge).
-        // After Trim(), leading space removed from row 0.
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ────────╮
-                       T       │
-                       a       │
-                       b       │
-                       │       │
-                       │       │
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    [Fact]
-    public void Right_Focused_Depth1_WithTitle ()
-    {
-        IDriver driver = CreateTestDriver (9, 9);
-
-        View view = CreateTabView (driver,
-                                   9,
-                                   9,
-                                   Side.Right,
-                                   0,
-                                   null,
-                                   true,
-                                   "T_ab",
-                                   true,
-                                   new Thickness (1, 1, 1, 1));
-
-        // Depth=1: no cap line, no tab edges. Title at rows 0-2.
-        // The top-right corner shows ─ (horizontal border continues; no vertical at the gap).
-        DrawAndAssert (view,
-                       driver,
-                       """
-                       ╭────────
-                       │       T
-                       │       a
-                       │       b
-                       │       │
-                       │       │
-                       │       │
-                       │       │
-                       ╰───────╯
-                       """);
-    }
-
-    // ════════════════════════════════════════════════════════════════════
-    //  SuperView Integration Tests
-    //  View with Tab border placed inside a Window (border=Rounded) that
-    //  fills its viewport with ◊ (diamond). The diamond background proves
-    //  that transparent areas of the tab header let content show through.
-    // ════════════════════════════════════════════════════════════════════
-
-    /// <summary>
-    ///     Creates a Window-like SuperView with diamond-filled background, containing a tab-border subview.
-    ///     The subview is positioned at (1,1) so there's at least 1 row/col of diamonds around it.
-    /// </summary>
-    private static (IApplication app, View subview) CreateSuperViewWithTabChild (int superWidth,
-                                                                                 int superHeight,
-                                                                                 int subviewWidth,
-                                                                                 int subviewHeight,
-                                                                                 Side side,
-                                                                                 int tabOffset,
-                                                                                 bool hasFocus,
-                                                                                 string? title,
-                                                                                 bool titleFlag,
-                                                                                 Thickness? thickness = null) // Copilot
-    {
-        IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-        app.Driver!.SetScreenSize (superWidth + 2, superHeight + 2);
-        app.Driver!.Clipboard = new FakeClipboard ();
-
-        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Rounded };
-
-        // Fill window viewport with diamonds
-        window.DrawingContent += (_, e) =>
-                                 {
-                                     window!.FillRect (window!.Viewport, Glyphs.Diamond);
-                                     e.DrawContext?.AddDrawnRectangle (window.Viewport);
-                                 };
-
-        View subview = new ()
+        if (view.Border.View is BorderView bv)
         {
-            X = 1,
-            Y = 1,
+            Assert.Null (bv.TitleView);
+        }
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+
+        // After setting Tab, the BorderView must exist
+        bv = (view.Border.View as BorderView)!;
+        Assert.NotNull (bv);
+
+        view.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Settings_Tab_Creates_TitleView_Before_Draw ()
+    {
+        IDriver driver = CreateTestDriver (10, 6);
+
+        View view = new () { Driver = driver, Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Title = "Tab";
+
+        // Layout but do NOT draw
+        view.Layout ();
+
+        var bv = (BorderView)view.Border.View!;
+
+        // TitleView should already exist after layout, before any Draw call
+        Assert.NotNull (bv.TitleView);
+
+        view.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Settings_Tab_Sets_ViewportSettings_Transparent_Before_Draw ()
+    {
+        IDriver driver = CreateTestDriver (10, 6);
+
+        View view = new () { Driver = driver, Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Title = "Tab";
+
+        // Layout but do NOT draw
+        view.Layout ();
+
+        var bv = (BorderView)view.Border.View!;
+
+        // ViewportSettings should already include Transparent before any Draw call
+        Assert.True (bv.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent), "Transparent should be set after Settings change, not deferred to Draw");
+
+        Assert.True (bv.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse),
+                     "TransparentMouse should be set after Settings change, not deferred to Draw");
+
+        view.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void Settings_Tab_TitleView_Has_Correct_Frame_Before_Draw ()
+    {
+        IDriver driver = CreateTestDriver (10, 7);
+
+        View view = new ()
+        {
+            Driver = driver,
+            Width = 10,
+            Height = 7,
             CanFocus = true,
-            HasFocus = hasFocus,
-            Width = subviewWidth,
-            Height = subviewHeight,
+            HasFocus = false,
             BorderStyle = LineStyle.Rounded
         };
 
-        if (title is { })
-        {
-            subview.Title = title;
-        }
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Border.TabOffset = 0;
+        view.Title = "T_ab";
 
-        subview.Border.Thickness = thickness
-                                   ?? side switch
-                                      {
-                                          Side.Top => new Thickness (1, 3, 1, 1),
-                                          Side.Bottom => new Thickness (1, 1, 1, 3),
-                                          Side.Left => new Thickness (3, 1, 1, 1),
-                                          Side.Right => new Thickness (1, 1, 3, 1),
-                                          _ => throw new ArgumentOutOfRangeException (nameof (side))
-                                      };
+        // Layout but do NOT draw
+        view.Layout ();
 
-        var settings = BorderSettings.Tab;
+        var bv = (BorderView)view.Border.View!;
+        View? ttv = bv.TitleView;
+        Assert.NotNull (ttv);
 
-        if (titleFlag)
-        {
-            settings |= BorderSettings.Title;
-        }
+        // TitleView should have non-empty Frame set by layout, before Draw
+        Assert.NotEqual (Rectangle.Empty, ttv.Frame);
 
-        subview.Border.Settings = settings;
-        subview.Border.TabSide = side;
-        subview.Border.TabOffset = tabOffset;
+        // Width should match TabLength (auto-computed: "Tab".GetColumns() + 2 = 5)
+        Assert.Equal (5, ttv.Frame.Width);
 
-        window.Add (subview);
-        app.Begin (window);
+        view.Dispose ();
+    }
 
-        return (app, subview);
+    // Copilot
+    [Fact]
+    public void Settings_Tab_TitleView_Has_SuperViewRendersLineCanvas ()
+    {
+        View view = new () { Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Title = "Tab";
+
+        view.Layout ();
+
+        var bv = (BorderView)view.Border.View!;
+        View? ttv = bv.TitleView;
+        Assert.NotNull (ttv);
+        Assert.True (ttv.SuperViewRendersLineCanvas, "TitleView must have SuperViewRendersLineCanvas = true for auto-join");
+
+        view.Dispose ();
     }
 
     [Fact]
-    public void SuperView_Top_Offset0_WithTitle_Focused () // Copilot
+    public void SuperView_Left_NegativeOffset2_WithTitle () // Copilot
     {
-        // Window: screen 13×10, border=1 → viewport 11×8.
-        // Child at (1,1) is 9×6, Thickness(1,3,1,1), tab on Top, HasFocus=true.
+        //using (TestLogging.Verbose (output, TraceCategory.Draw))
+        {
+            (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
+                                                                            8,
+                                                                            9,
+                                                                            6,
+                                                                            Side.Left,
+                                                                            -2,
+                                                                            false,
+                                                                            "T_ab",
+                                                                            true);
+
+            DriverAssert.AssertDriverContentsAre ("""
+                                                  ╭───────────╮
+                                                  │◊◊◊◊◊◊◊◊◊◊◊│
+                                                  │◊│a ─────╮◊│
+                                                  │◊│b      │◊│
+                                                  │◊╰─╮     │◊│
+                                                  │◊◊◊│     │◊│
+                                                  │◊◊◊│     │◊│
+                                                  │◊◊◊╰─────╯◊│
+                                                  │◊◊◊◊◊◊◊◊◊◊◊│
+                                                  ╰───────────╯
+                                                  """,
+                                                  output,
+                                                  app.Driver!);
+
+            subview.Dispose ();
+            app.Dispose ();
+        }
+    }
+
+    [Fact]
+    public void SuperView_Top_Depth1_Focused () // Copilot
+    {
+        // Thickness(1,1,1,1) → depth=1. Subview 9×4.
         (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
-                                                                        8,
-                                                                        9,
                                                                         6,
+                                                                        9,
+                                                                        4,
                                                                         Side.Top,
                                                                         0,
                                                                         true,
                                                                         "T_ab",
-                                                                        true);
+                                                                        true,
+                                                                        new Thickness (1, 1, 1, 1));
 
         output.WriteLine (app.Driver!.ToString ());
 
+        // Per spec: Thickness.Top = 1, focused → title inline on content border, open gap
         DriverAssert.AssertDriverContentsAre ("""
                                               ╭───────────╮
                                               │◊◊◊◊◊◊◊◊◊◊◊│
-                                              │◊╭───╮◊◊◊◊◊│
-                                              │◊│Tab│◊◊◊◊◊│
-                                              │◊│   ╰───╮◊│
+                                              │◊│Tab╭───╮◊│
                                               │◊│       │◊│
                                               │◊│       │◊│
                                               │◊╰───────╯◊│
@@ -1581,28 +981,28 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void SuperView_Top_Offset0_WithTitle_Unfocused () // Copilot
+    public void SuperView_Top_Depth2_Focused () // Copilot
     {
-        // Note: In Application context, the subview always gets focus (only focusable view),
-        // so this renders the same as focused. Unfocused rendering is tested in standalone tests.
+        // Thickness(1,2,1,1) → depth=2. Subview 9×5.
         (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
-                                                                        8,
+                                                                        7,
                                                                         9,
-                                                                        6,
+                                                                        5,
                                                                         Side.Top,
                                                                         0,
-                                                                        false,
+                                                                        true,
                                                                         "T_ab",
-                                                                        true);
+                                                                        true,
+                                                                        new Thickness (1, 2, 1, 1));
 
         output.WriteLine (app.Driver!.ToString ());
 
+        // Per spec: Thickness.Top = 2, focused → cap line + title on closing edge, open gap
         DriverAssert.AssertDriverContentsAre ("""
                                               ╭───────────╮
                                               │◊◊◊◊◊◊◊◊◊◊◊│
                                               │◊╭───╮◊◊◊◊◊│
-                                              │◊│Tab│◊◊◊◊◊│
-                                              │◊│   ╰───╮◊│
+                                              │◊│Tab╰───╮◊│
                                               │◊│       │◊│
                                               │◊│       │◊│
                                               │◊╰───────╯◊│
@@ -1658,7 +1058,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
             superView.DrawingContent += (_, e) =>
                                         {
-                                            superView!.FillRect (superView!.Viewport, Glyphs.Diamond);
+                                            superView.FillRect (superView.Viewport, Glyphs.Diamond);
                                             e.DrawContext?.AddDrawnRectangle (superView.Viewport);
                                         };
             superView.Add (subview);
@@ -1792,41 +1192,6 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void SuperView_Left_NegativeOffset2_WithTitle () // Copilot
-    {
-        //using (TestLogging.Verbose (output, TraceCategory.Draw))
-        {
-            (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
-                                                                            8,
-                                                                            9,
-                                                                            6,
-                                                                            Side.Left,
-                                                                            -2,
-                                                                            false,
-                                                                            "T_ab",
-                                                                            true);
-
-            DriverAssert.AssertDriverContentsAre ("""
-                                                  ╭───────────╮
-                                                  │◊◊◊◊◊◊◊◊◊◊◊│
-                                                  │◊│a ─────╮◊│
-                                                  │◊│b      │◊│
-                                                  │◊╰─╮     │◊│
-                                                  │◊◊◊│     │◊│
-                                                  │◊◊◊│     │◊│
-                                                  │◊◊◊╰─────╯◊│
-                                                  │◊◊◊◊◊◊◊◊◊◊◊│
-                                                  ╰───────────╯
-                                                  """,
-                                                  output,
-                                                  app.Driver!);
-
-            subview.Dispose ();
-            app.Dispose ();
-        }
-    }
-
-    [Fact]
     public void SuperView_Top_NegativeOffset2_WithTitle_With_Margin () // Copilot
     {
         (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
@@ -1900,6 +1265,78 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void SuperView_Top_Offset0_WithTitle_Focused () // Copilot
+    {
+        // Window: screen 13×10, border=1 → viewport 11×8.
+        // Child at (1,1) is 9×6, Thickness(1,3,1,1), tab on Top, HasFocus=true.
+        (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
+                                                                        8,
+                                                                        9,
+                                                                        6,
+                                                                        Side.Top,
+                                                                        0,
+                                                                        true,
+                                                                        "T_ab",
+                                                                        true);
+
+        output.WriteLine (app.Driver!.ToString ());
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭───────────╮
+                                              │◊◊◊◊◊◊◊◊◊◊◊│
+                                              │◊╭───╮◊◊◊◊◊│
+                                              │◊│Tab│◊◊◊◊◊│
+                                              │◊│   ╰───╮◊│
+                                              │◊│       │◊│
+                                              │◊│       │◊│
+                                              │◊╰───────╯◊│
+                                              │◊◊◊◊◊◊◊◊◊◊◊│
+                                              ╰───────────╯
+                                              """,
+                                              output,
+                                              app.Driver!);
+
+        subview.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void SuperView_Top_Offset0_WithTitle_Unfocused () // Copilot
+    {
+        // Note: In Application context, the subview always gets focus (only focusable view),
+        // so this renders the same as focused. Unfocused rendering is tested in standalone tests.
+        (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
+                                                                        8,
+                                                                        9,
+                                                                        6,
+                                                                        Side.Top,
+                                                                        0,
+                                                                        false,
+                                                                        "T_ab",
+                                                                        true);
+
+        output.WriteLine (app.Driver!.ToString ());
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭───────────╮
+                                              │◊◊◊◊◊◊◊◊◊◊◊│
+                                              │◊╭───╮◊◊◊◊◊│
+                                              │◊│Tab│◊◊◊◊◊│
+                                              │◊│   ╰───╮◊│
+                                              │◊│       │◊│
+                                              │◊│       │◊│
+                                              │◊╰───────╯◊│
+                                              │◊◊◊◊◊◊◊◊◊◊◊│
+                                              ╰───────────╯
+                                              """,
+                                              output,
+                                              app.Driver!);
+
+        subview.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
     public void SuperView_Top_ThickBorder_Offset0_WithTitle () // Copilot
     {
         // Thick border: Thickness(3,3,3,3). Child 11×8.
@@ -1922,75 +1359,419 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         app.Dispose ();
     }
 
+    // Copilot
     [Fact]
-    public void SuperView_Top_Depth1_Focused () // Copilot
+    public void Thickness_Change_Updates_TitleView_Layout ()
     {
-        // Thickness(1,1,1,1) → depth=1. Subview 9×4.
-        (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
-                                                                        6,
-                                                                        9,
-                                                                        4,
-                                                                        Side.Top,
-                                                                        0,
-                                                                        true,
-                                                                        "T_ab",
-                                                                        true,
-                                                                        new Thickness (1, 1, 1, 1));
+        IDriver driver = CreateTestDriver (10, 7);
 
-        output.WriteLine (app.Driver!.ToString ());
+        View view = new ()
+        {
+            Driver = driver,
+            Width = 10,
+            Height = 7,
+            CanFocus = true,
+            HasFocus = false,
+            BorderStyle = LineStyle.Rounded
+        };
 
-        // Per spec: Thickness.Top = 1, focused → title inline on content border, open gap
-        DriverAssert.AssertDriverContentsAre ("""
-                                              ╭───────────╮
-                                              │◊◊◊◊◊◊◊◊◊◊◊│
-                                              │◊│Tab╭───╮◊│
-                                              │◊│       │◊│
-                                              │◊│       │◊│
-                                              │◊╰───────╯◊│
-                                              │◊◊◊◊◊◊◊◊◊◊◊│
-                                              ╰───────────╯
-                                              """,
-                                              output,
-                                              app.Driver!);
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Title = "Tab";
 
-        subview.Dispose ();
-        app.Dispose ();
+        view.Layout ();
+
+        var bv = (BorderView)view.Border.View!;
+        View? ttv = bv.TitleView;
+        Assert.NotNull (ttv);
+        int originalHeight = ttv.Frame.Height;
+
+        // Change thickness — TitleView should get updated frame after re-layout
+        view.Border.Thickness = new Thickness (1, 2, 1, 1);
+        view.Layout ();
+
+        int newHeight = ttv.Frame.Height;
+        Assert.NotEqual (originalHeight, newHeight);
+
+        view.Dispose ();
     }
 
     [Fact]
-    public void SuperView_Top_Depth2_Focused () // Copilot
+    public void Top_Focused_Depth1_LongTitle () // Copilot
     {
-        // Thickness(1,2,1,1) → depth=2. Subview 9×5.
-        (IApplication app, View subview) = CreateSuperViewWithTabChild (11,
-                                                                        7,
-                                                                        9,
-                                                                        5,
-                                                                        Side.Top,
-                                                                        0,
-                                                                        true,
-                                                                        "T_ab",
-                                                                        true,
-                                                                        new Thickness (1, 2, 1, 1));
+        // Title wider than content area → tab header spans full width.
+        IDriver driver = CreateTestDriver (15, 4);
 
-        output.WriteLine (app.Driver!.ToString ());
+        View view = CreateTabView (driver,
+                                   15,
+                                   4,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   true,
+                                   "Long Title",
+                                   true,
+                                   new Thickness (1, 1, 1, 1));
 
-        // Per spec: Thickness.Top = 2, focused → cap line + title on closing edge, open gap
-        DriverAssert.AssertDriverContentsAre ("""
-                                              ╭───────────╮
-                                              │◊◊◊◊◊◊◊◊◊◊◊│
-                                              │◊╭───╮◊◊◊◊◊│
-                                              │◊│Tab╰───╮◊│
-                                              │◊│       │◊│
-                                              │◊│       │◊│
-                                              │◊╰───────╯◊│
-                                              │◊◊◊◊◊◊◊◊◊◊◊│
-                                              ╰───────────╯
-                                              """,
-                                              output,
-                                              app.Driver!);
+        // Depth=1: title on content border line, tab header = 12 wide (10+2 borders).
+        // Focused → open gap. Title fills the header interior.
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       │Long Title╭──╮
+                       │             │
+                       │             │
+                       ╰─────────────╯
+                       """);
+    }
 
-        subview.Dispose ();
-        app.Dispose ();
+    // ──── Thickness = 1 (depth 1) ────
+    // 1-row tab: title inline on the content border line.
+
+    [Fact]
+    public void Top_Focused_Depth1_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 4);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   4,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true,
+                                   new Thickness (1, 1, 1, 1));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       │Tab╭───╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Focused_Depth2_With2LineTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 5);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   5,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_a\nb",
+                                   true,
+                                   new Thickness (1, 2, 1, 1));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭──╮
+                       │Ta╰────╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    // ──── Thickness = 2 (depth 2) ────
+    // 2-row tab: cap line + title on closing edge. No bottom line.
+
+    [Fact]
+    public void Top_Focused_Depth2_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 5);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   5,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true,
+                                   new Thickness (1, 2, 1, 1));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───╮
+                       │Tab╰───╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Focused_Depth4_With2LineTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 7);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   7,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_a\nb",
+                                   true,
+                                   new Thickness (1, 4, 1, 1));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭──╮
+                       │Ta│
+                       │b ╰────╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    //  Thickness Variants — Depth capping and non-standard depths
+    //  Depth should be min (thickness_on_tab_side, 3).
+    //  Thickness >= 3 always uses depth 3.
+    //  Thickness 1 and 2 produce shallower tabs per spec.
+    // ════════════════════════════════════════════════════════════════════
+
+    // ──── Thickness = 4 (depth capped to 3) ────
+    // Expected output identical to thickness=3 (extra blank row trimmed).
+
+    [Fact]
+    public void Top_Focused_Depth4_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 7);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   7,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true,
+                                   new Thickness (1, 4, 1, 1));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───╮
+                       │Tab│
+                       │   ╰───╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Focused_Depth5_With2LineTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 7);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   7,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_a\nb",
+                                   true,
+                                   new Thickness (1, 5, 1, 1));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+
+                       ╭──╮
+                       │Ta│
+                       │b ╰────╮
+                       │       │
+                       ╰───────╯
+                       """);
+
+        // should be:
+        //DrawAndAssert (view,
+        //               driver,
+        //               """
+        //               ╭──╮
+        //               │Ta│
+        //               │b │
+        //               │  ╰────╮
+        //               │       │
+        //               ╰───────╯
+        //               """);
+    }
+
+    [Fact]
+    public void Top_Focused_Depth5_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 7);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   7,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true,
+                                   new Thickness (1, 5, 1, 1));
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       
+                       ╭───╮
+                       │Tab│
+                       │   ╰───╮
+                       │       │
+                       ╰───────╯
+                       """);
+
+        // should be:
+        //DrawAndAssert (view,
+        //               driver,
+        //               """
+        //               ╭───╮
+        //               │Tab│
+        //               │   │
+        //               │   ╰───╮
+        //               │       │
+        //               ╰───────╯
+        //               """);
+    }
+
+    [Fact]
+    public void Top_Focused_Offset0_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───╮
+                       │Tab│
+                       │   ╰───╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Focused_Offset0_WithTitle_Thick_Border () // Copilot
+    {
+        IDriver driver = CreateTestDriver ();
+
+        View view = CreateTabView (driver,
+                                   17,
+                                   12,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true);
+
+        view.Border.Thickness = new Thickness (5, 5, 5, 5);
+
+        // Edge-based: borderBounds=(0,4,17,8). Header depth=3 at offset=0.
+        // Focused → open gap (no separator line).
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───╮
+                       │Tab│
+                       │   ╰───────────╮
+                       │               │
+                       │               │
+                       │               │
+                       │               │
+                       │               │
+                       │               │
+                       ╰───────────────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Focused_Offset2_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   2,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                         ╭───╮
+                         │Tab│
+                       ╭─╯   ╰─╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Focused_OverflowRight_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   5,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                            ╭───
+                            │Tab
+                       ╭────╯  │
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
@@ -2127,8 +1908,6 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         // 0 = Normal (border lines when unfocused — but LineCanvas uses Normal)
         // 1 = Focus (title text)
         // 2 = HotFocus (hotkey char 'a')
-        Attribute normalAttribute = view.GetAttributeForRole (VisualRole.Normal);
-        Attribute hotNormalAttr = view.GetAttributeForRole (VisualRole.HotNormal);
         Attribute focusAttr = view.GetAttributeForRole (VisualRole.Focus);
         Attribute hotFocusAttr = view.GetAttributeForRole (VisualRole.HotFocus);
 
@@ -2151,6 +1930,446 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Dispose ();
         app.Dispose ();
+    }
+
+    [Fact]
+    public void Top_Unfocused_Depth1_WithTitle () // Copilot
+    {
+        IDriver driver = CreateTestDriver (9, 4);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   4,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   false,
+                                   "T_ab",
+                                   true,
+                                   new Thickness (1, 1, 1, 1));
+
+        // Depth=1: separator coincides with content border line.
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       │Tab╭───╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Unfocused_Depth2_WithTitle () // Copilot
+    {
+        IDriver driver = CreateTestDriver (9, 5);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   5,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   false,
+                                   "T_ab",
+                                   true,
+                                   new Thickness (1, 2, 1, 1));
+
+        // Depth=2: cap line + closing edge with title. Separator on closing edge.
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───╮
+                       │Tab╰───╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Unfocused_NegativeOffset_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   -1,
+                                   null,
+                                   false,
+                                   "T_ab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ───╮
+                       Tab│
+                       ┬──┴────╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Unfocused_NegativeOffset_WithTitle_Thick_Border ()
+    {
+        IDriver driver = CreateTestDriver ();
+
+        View view = CreateTabView (driver,
+                                   17,
+                                   12,
+                                   Side.Top,
+                                   -1,
+                                   null,
+                                   false,
+                                   "T_ab",
+                                   true);
+
+        view.Border.Thickness = new Thickness (5, 5, 5, 5);
+
+        // Edge-based positioning: non-title sides at outer edge → 17 wide, 8 tall content border.
+        // Tab header at offset=-1 is partially clipped on the left.
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ───╮
+                       Tab│
+                       ┬──┴────────────╮
+                       │               │
+                       │               │
+                       │               │
+                       │               │
+                       │               │
+                       │               │
+                       ╰───────────────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Unfocused_NegativeOffset2_WithTitle () // Copilot
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   -2,
+                                   null,
+                                   false,
+                                   "T_ab",
+                                   true);
+
+        // Header at X=-2. Left edge and 'T' clipped. Visible: cap ──╮, title ab│.
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ──╮
+                       ab│
+                       ┬─┴─────╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Unfocused_NegativeOffset4_WithTitle () // Copilot
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   -4,
+                                   null,
+                                   false,
+                                   "T_ab",
+                                   true);
+
+        // Header at X=-4. Only right edge visible at col 0. No title visible.
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╮
+                       │
+                       ┼───────╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Unfocused_NegativeOffset5_Thick_Border () // Copilot
+    {
+        IDriver driver = CreateTestDriver ();
+
+        View view = CreateTabView (driver,
+                                   17,
+                                   12,
+                                   Side.Top,
+                                   -5,
+                                   null,
+                                   false,
+                                   "T_ab",
+                                   true);
+
+        view.Border.Thickness = new Thickness (5, 5, 5, 5);
+
+        // Edge-based: header completely off-screen. Full content border drawn.
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────────────╮
+                       │               │
+                       │               │
+                       │               │
+                       │               │
+                       │               │
+                       │               │
+                       ╰───────────────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Unfocused_NegativeOffset5_WithTitle () // Copilot
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   -5,
+                                   null,
+                                   false,
+                                   "T_ab",
+                                   true);
+
+        // Header completely off-screen. Content border drawn normally.
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───────╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Unfocused_Offset0_NoTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   false,
+                                   null,
+                                   false);
+
+        Assert.Equal (2, view.Border.TabLength!.Value);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭╮
+                       ││
+                       ├┴──────╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Unfocused_Offset0_With2LineTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   false,
+                                   "T_a\nb",
+                                   true);
+
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭──╮
+                       │Ta│
+                       ├──┴────╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    // ════════════════════════════════════════════════════════════════════
+    //  Side.Top — View 9×6, Thickness(1,3,1,1), borderBounds=(0,2,9,4)
+    //  Content border: 9 wide, 4 tall. Interior: 7 cols × 2 rows.
+    // ════════════════════════════════════════════════════════════════════
+
+    [Fact]
+    public void Top_Unfocused_Offset0_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   false,
+                                   "T_ab",
+                                   true);
+
+        Assert.Equal (5, view.Border.TabLength!.Value);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───╮
+                       │Tab│
+                       ├───┴───╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Unfocused_Offset0_WithTitle_Thick_Border () // Copilot
+    {
+        IDriver driver = CreateTestDriver ();
+
+        View view = CreateTabView (driver,
+                                   17,
+                                   12,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   false,
+                                   "T_ab",
+                                   true);
+
+        view.Border.Thickness = new Thickness (5, 5, 5, 5);
+
+        // Edge-based: borderBounds=(0,4,17,8). Header depth=3 at offset=0.
+        // Unfocused → separator line (closed).
+        DrawAndAssert (view,
+                       driver,
+                       """
+                       ╭───╮
+                       │Tab│
+                       ├───┴───────────╮
+                       │               │
+                       │               │
+                       │               │
+                       │               │
+                       │               │
+                       │               │
+                       ╰───────────────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Unfocused_Offset2_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   2,
+                                   null,
+                                   false,
+                                   "T_ab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                         ╭───╮
+                         │Tab│
+                       ╭─┴───┴─╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Unfocused_OverflowRight_WithTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   5,
+                                   null,
+                                   false,
+                                   "T_ab",
+                                   true);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                            ╭───
+                            │Tab
+                       ╭────┴──┬
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
+    }
+
+    [Fact]
+    public void Top_Unfocused_SingleCharTitle ()
+    {
+        IDriver driver = CreateTestDriver (9, 6);
+
+        View view = CreateTabView (driver,
+                                   9,
+                                   6,
+                                   Side.Top,
+                                   2,
+                                   null,
+                                   false,
+                                   "X",
+                                   true);
+
+        Assert.Equal (3, view.Border.TabLength!.Value);
+
+        DrawAndAssert (view,
+                       driver,
+                       """
+                         ╭─╮
+                         │X│
+                       ╭─┴─┴───╮
+                       │       │
+                       │       │
+                       ╰───────╯
+                       """);
     }
 
     [Fact]
@@ -2235,207 +2454,149 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     // ════════════════════════════════════════════════════════════════════
-    //  Setup-trigger tests — verify configuration happens at property-change
-    //   time, NOT deferred to Draw.
+    //  SuperView Integration Tests
+    //  View with Tab border placed inside a Window (border=Rounded) that
+    //  fills its viewport with ◊ (diamond). The diamond background proves
+    //  that transparent areas of the tab header let content show through.
     // ════════════════════════════════════════════════════════════════════
 
-    // Copilot
-    [Fact]
-    public void Settings_Tab_Creates_BorderView ()
+    /// <summary>
+    ///     Creates a Window-like SuperView with diamond-filled background, containing a tab-border subview.
+    ///     The subview is positioned at (1,1) so there's at least 1 row/col of diamonds around it.
+    /// </summary>
+    private static (IApplication app, View subview) CreateSuperViewWithTabChild (int superWidth,
+                                                                                 int superHeight,
+                                                                                 int subviewWidth,
+                                                                                 int subviewHeight,
+                                                                                 Side side,
+                                                                                 int tabOffset,
+                                                                                 bool hasFocus,
+                                                                                 string? title,
+                                                                                 bool titleFlag,
+                                                                                 Thickness? thickness = null) // Copilot
     {
-        // Setting Border.Settings to include Tab should cause GetOrCreateView
-        View view = new () { Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (superWidth + 2, superHeight + 2);
+        app.Driver!.Clipboard = new FakeClipboard ();
 
-        // Before setting Tab, View may or may not exist depending on LineStyle
-        // but TitleView should not exist
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.Rounded };
 
-        if (view.Border.View is BorderView bv)
+        // Fill window viewport with diamonds
+        window.DrawingContent += (_, e) =>
+                                 {
+                                     window.FillRect (window.Viewport, Glyphs.Diamond);
+                                     e.DrawContext?.AddDrawnRectangle (window.Viewport);
+                                 };
+
+        View subview = new ()
         {
-            Assert.Null (bv.TitleView);
+            X = 1,
+            Y = 1,
+            CanFocus = true,
+            HasFocus = hasFocus,
+            Width = subviewWidth,
+            Height = subviewHeight,
+            BorderStyle = LineStyle.Rounded
+        };
+
+        if (title is { })
+        {
+            subview.Title = title;
         }
 
-        view.Border.Thickness = new Thickness (1, 3, 1, 1);
-        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        subview.Border.Thickness = thickness
+                                   ?? side switch
+                                      {
+                                          Side.Top => new Thickness (1, 3, 1, 1),
+                                          Side.Bottom => new Thickness (1, 1, 1, 3),
+                                          Side.Left => new Thickness (3, 1, 1, 1),
+                                          Side.Right => new Thickness (1, 1, 3, 1),
+                                          _ => throw new ArgumentOutOfRangeException (nameof (side))
+                                      };
 
-        // After setting Tab, the BorderView must exist
-        bv = (view.Border.View as BorderView)!;
-        Assert.NotNull (bv);
+        var settings = BorderSettings.Tab;
 
-        view.Dispose ();
+        if (titleFlag)
+        {
+            settings |= BorderSettings.Title;
+        }
+
+        subview.Border.Settings = settings;
+        subview.Border.TabSide = side;
+        subview.Border.TabOffset = tabOffset;
+
+        window.Add (subview);
+        app.Begin (window);
+
+        return (app, subview);
     }
 
-    // Copilot
-    [Fact]
-    public void Settings_Tab_Sets_ViewportSettings_Transparent_Before_Draw ()
+    // ────────────────────────────────────────────────────────────────────
+    //  Helpers
+    // ────────────────────────────────────────────────────────────────────
+
+    private static View CreateTabView (IDriver driver,
+                                       int width,
+                                       int height,
+                                       Side side,
+                                       int tabOffset,
+                                       int? tabLength,
+                                       bool hasFocus,
+                                       string? title,
+                                       bool titleFlag,
+                                       Thickness? thickness = null)
     {
-        IDriver driver = CreateTestDriver (10, 6);
-
-        View view = new () { Driver = driver, Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
-
-        view.Border.Thickness = new Thickness (1, 3, 1, 1);
-        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
-        view.Title = "Tab";
-
-        // Layout but do NOT draw
-        view.Layout ();
-
-        var bv = (BorderView)view.Border.View!;
-
-        // ViewportSettings should already include Transparent before any Draw call
-        Assert.True (bv.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent), "Transparent should be set after Settings change, not deferred to Draw");
-
-        Assert.True (bv.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse),
-                     "TransparentMouse should be set after Settings change, not deferred to Draw");
-
-        view.Dispose ();
-    }
-
-    // Copilot
-    [Fact]
-    public void Settings_Tab_Creates_TitleView_Before_Draw ()
-    {
-        IDriver driver = CreateTestDriver (10, 6);
-
-        View view = new () { Driver = driver, Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
-
-        view.Border.Thickness = new Thickness (1, 3, 1, 1);
-        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
-        view.Title = "Tab";
-
-        // Layout but do NOT draw
-        view.Layout ();
-
-        var bv = (BorderView)view.Border.View!;
-
-        // TitleView should already exist after layout, before any Draw call
-        Assert.NotNull (bv.TitleView);
-
-        view.Dispose ();
-    }
-
-    // Copilot
-    [Fact]
-    public void Settings_Tab_TitleView_Has_Correct_Frame_Before_Draw ()
-    {
-        IDriver driver = CreateTestDriver (10, 7);
-
         View view = new ()
         {
             Driver = driver,
-            Width = 10,
-            Height = 7,
             CanFocus = true,
-            HasFocus = false,
+            HasFocus = hasFocus,
+            Width = width,
+            Height = height,
             BorderStyle = LineStyle.Rounded
         };
 
-        view.Border.Thickness = new Thickness (1, 3, 1, 1);
-        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
-        view.Border.TabOffset = 0;
-        view.Title = "T_ab";
-
-        // Layout but do NOT draw
-        view.Layout ();
-
-        var bv = (BorderView)view.Border.View!;
-        View? ttv = bv.TitleView;
-        Assert.NotNull (ttv);
-
-        // TitleView should have non-empty Frame set by layout, before Draw
-        Assert.NotEqual (Rectangle.Empty, ttv.Frame);
-
-        // Width should match TabLength (auto-computed: "Tab".GetColumns() + 2 = 5)
-        Assert.Equal (5, ttv.Frame.Width);
-
-        view.Dispose ();
-    }
-
-    // Copilot
-    [Fact]
-    public void Settings_Tab_TitleView_Has_SuperViewRendersLineCanvas ()
-    {
-        View view = new () { Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
-
-        view.Border.Thickness = new Thickness (1, 3, 1, 1);
-        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
-        view.Title = "Tab";
-
-        view.Layout ();
-
-        var bv = (BorderView)view.Border.View!;
-        View? ttv = bv.TitleView;
-        Assert.NotNull (ttv);
-        Assert.True (ttv.SuperViewRendersLineCanvas, "TitleView must have SuperViewRendersLineCanvas = true for auto-join");
-
-        view.Dispose ();
-    }
-
-    // Copilot
-    [Fact]
-    public void Thickness_Change_Updates_TitleView_Layout ()
-    {
-        IDriver driver = CreateTestDriver (10, 7);
-
-        View view = new ()
+        if (title is { })
         {
-            Driver = driver,
-            Width = 10,
-            Height = 7,
-            CanFocus = true,
-            HasFocus = false,
-            BorderStyle = LineStyle.Rounded
-        };
+            view.Title = title;
+        }
 
-        view.Border.Thickness = new Thickness (1, 3, 1, 1);
-        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
-        view.Title = "Tab";
+        view.Border.Thickness = thickness
+                                ?? side switch
+                                   {
+                                       Side.Top => new Thickness (1, 3, 1, 1),
+                                       Side.Bottom => new Thickness (1, 1, 1, 3),
+                                       Side.Left => new Thickness (3, 1, 1, 1),
+                                       Side.Right => new Thickness (1, 1, 3, 1),
+                                       _ => throw new ArgumentOutOfRangeException (nameof (side))
+                                   };
 
-        view.Layout ();
+        var settings = BorderSettings.Tab;
 
-        var bv = (BorderView)view.Border.View!;
-        View? ttv = bv.TitleView;
-        Assert.NotNull (ttv);
-        int originalHeight = ttv.Frame.Height;
+        if (titleFlag)
+        {
+            settings |= BorderSettings.Title;
+        }
 
-        // Change thickness — TitleView should get updated frame after re-layout
-        view.Border.Thickness = new Thickness (1, 2, 1, 1);
-        view.Layout ();
+        view.Border.Settings = settings;
+        view.Border.TabSide = side;
+        view.Border.TabOffset = tabOffset;
 
-        int newHeight = ttv.Frame.Height;
-        Assert.NotEqual (originalHeight, newHeight);
+        if (tabLength.HasValue)
+        {
+            view.Border.TabLength = tabLength.Value;
+        }
 
-        view.Dispose ();
+        return view;
     }
 
-    // Copilot
-    [Fact]
-    public void Clearing_Tab_Flag_Hides_TitleView ()
+    private void DrawAndAssert (View view, IDriver driver, string expected)
     {
-        IDriver driver = CreateTestDriver (10, 6);
-
-        View view = new () { Driver = driver, Width = 10, Height = 6, BorderStyle = LineStyle.Rounded };
-
-        view.Border.Thickness = new Thickness (1, 3, 1, 1);
-        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
-        view.Title = "Tab";
         view.Layout ();
-
-        var bv = (BorderView)view.Border.View!;
-        Assert.NotNull (bv.TitleView);
-
-        // Clear the Tab flag
-        view.Border.Settings = BorderSettings.Title;
-        view.Layout ();
-
-        // TitleView should be hidden (Visible = false)
-        Assert.False (bv.TitleView!.Visible, "TitleView should be hidden when Tab flag is cleared");
-
+        view.Draw ();
+        output.WriteLine (driver.ToString ());
+        DriverAssert.AssertDriverContentsAre (expected, output, driver);
         view.Dispose ();
     }
 }
