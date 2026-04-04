@@ -134,18 +134,43 @@ public partial class View
 
         Scheme DefaultAction ()
         {
-            if (!HasScheme && !string.IsNullOrEmpty (SchemeName))
+            if (HasScheme)
             {
-                return SchemeManager.GetScheme (SchemeName);
+                return _scheme!;
             }
 
-            if (!HasScheme)
+            if (!string.IsNullOrEmpty (SchemeName))
             {
-                return SuperView?.GetScheme () ?? SchemeManager.GetScheme (Schemes.Base);
+                if (SchemeManager.TryGetScheme (SchemeName, out Scheme? namedScheme))
+                {
+                    return namedScheme;
+                }
+
+                Logging.Warning ($"SchemeName '{SchemeName}' not found in current theme. Falling back.");
             }
 
-            return _scheme!;
+            return ResolveFallbackScheme ();
         }
+    }
+
+    /// <summary>
+    ///     Resolves a scheme using the fallback chain when no explicit scheme or valid <see cref="SchemeName"/> is
+    ///     available: <see cref="SuperView"/>'s scheme → "Base" in the current theme → hard-coded "Base".
+    /// </summary>
+    private Scheme ResolveFallbackScheme ()
+    {
+        if (SuperView is { })
+        {
+            return SuperView.GetScheme ();
+        }
+
+        if (SchemeManager.TryGetScheme ("Base", out Scheme? baseScheme))
+        {
+            return baseScheme;
+        }
+
+        // Last resort: hard-coded defaults are always available regardless of configuration state.
+        return SchemeManager.GetHardCodedSchemes ()! ["Base"]!;
     }
 
     /// <summary>

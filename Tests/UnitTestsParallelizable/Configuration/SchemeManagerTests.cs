@@ -77,4 +77,36 @@ public class SchemeManagerTests
         Assert.Throws<KeyNotFoundException> (() => SchemeManager.GetScheme ("NotAScheme"));
     }
 
+    // Copilot
+
+    [Fact]
+    public void TryGetScheme_ExistingScheme_ReturnsTrueAndScheme ()
+    {
+        bool found = SchemeManager.TryGetScheme ("Base", out Scheme? scheme);
+
+        Assert.True (found);
+        Assert.NotNull (scheme);
+    }
+
+    [Fact]
+    public void TryGetScheme_MissingScheme_ReturnsFalseAndNull ()
+    {
+        bool found = SchemeManager.TryGetScheme ("DoesNotExist", out Scheme? scheme);
+
+        Assert.False (found);
+        Assert.Null (scheme);
+    }
+
+    [Fact]
+    public void TryGetScheme_AllBuiltInSchemes_ReturnsTrue ()
+    {
+        foreach (string name in SchemeManager.GetSchemeNames ())
+        {
+            bool found = SchemeManager.TryGetScheme (name, out Scheme? scheme);
+
+            Assert.True (found, $"Expected TryGetScheme to return true for built-in scheme '{name}'");
+            Assert.NotNull (scheme);
+        }
+    }
+
 }

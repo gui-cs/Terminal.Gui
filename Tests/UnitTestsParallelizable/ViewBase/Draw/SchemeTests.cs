@@ -523,4 +523,87 @@ public class SchemeTests : TestDriverBase
         }
     }
 
+    // Copilot - fallback chain tests for discussion #4457
+
+    [Fact]
+    public void GetScheme_SchemeName_MissingScheme_FallsBackToSuperView ()
+    {
+        // A view with SchemeName set to a non-existent scheme should fall back to SuperView's scheme,
+        // not throw a KeyNotFoundException.
+        View superView = new ();
+        View subView = new ();
+        superView.Add (subView);
+
+        Scheme? dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        superView.SetScheme (dialogScheme);
+
+        subView.SchemeName = "NonExistentScheme";
+
+        // Should not throw; should fall back to superView's Dialog scheme
+        Scheme resolved = subView.GetScheme ();
+
+        Assert.Equal (dialogScheme, resolved);
+
+        subView.Dispose ();
+        superView.Dispose ();
+    }
+
+    [Fact]
+    public void GetScheme_SchemeName_MissingScheme_NoSuperView_FallsBackToBase ()
+    {
+        // A view with SchemeName set to a non-existent scheme and no SuperView should fall back
+        // to the "Base" scheme, not throw a KeyNotFoundException.
+        View view = new ();
+        view.SchemeName = "NonExistentScheme";
+
+        Scheme? baseScheme = SchemeManager.GetHardCodedSchemes ()? ["Base"];
+
+        Scheme resolved = view.GetScheme ();
+
+        Assert.Equal (baseScheme, resolved);
+
+        view.Dispose ();
+    }
+
+    [Fact]
+    public void GetScheme_SchemeName_ExistingScheme_NoFallback ()
+    {
+        // Regression: a view with SchemeName pointing to an existing scheme should still
+        // return that scheme and not be affected by the fallback logic.
+        View view = new ();
+        view.SchemeName = "Error";
+
+        Scheme? errorScheme = SchemeManager.GetHardCodedSchemes ()? ["Error"];
+
+        Assert.Equal (errorScheme, view.GetScheme ());
+
+        view.Dispose ();
+    }
+
+    [Fact]
+    public void GetScheme_SchemeName_MissingScheme_SuperViewAlsoMissingScheme_FallsBackToBase ()
+    {
+        // A view whose SchemeName is missing AND whose SuperView has no scheme either
+        // should ultimately fall back all the way to "Base".
+        View grandparent = new ();
+        View parent = new ();
+        View child = new ();
+
+        grandparent.Add (parent);
+        parent.Add (child);
+
+        // Neither grandparent nor parent have explicit schemes
+        child.SchemeName = "NonExistentScheme";
+
+        Scheme? baseScheme = SchemeManager.GetHardCodedSchemes ()? ["Base"];
+
+        Scheme resolved = child.GetScheme ();
+
+        Assert.Equal (baseScheme, resolved);
+
+        child.Dispose ();
+        parent.Dispose ();
+        grandparent.Dispose ();
+    }
+
 }
