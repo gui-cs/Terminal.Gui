@@ -76,8 +76,8 @@ public sealed class TitleView : View, ITitleView
         // default is also Horizontal, so setting it won't trigger OnOrientationChanged.
         SetupKeyBindings ();
 
-        TextFormatter.Alignment = Alignment.Center;
-        TextFormatter.WordWrap = true;
+        //TextFormatter.Alignment = Alignment.Center;
+        //TextFormatter.WordWrap = true;
     }
 
 #if TAB_COLOR_PROTOTYPE
