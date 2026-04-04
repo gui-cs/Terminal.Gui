@@ -51,26 +51,6 @@ public class Tabs : View, IValue<View?>, IDesignable
     private readonly List<WeakReference<View>> _tabList = [];
 
     /// <summary>
-    ///     Resolves the tabs from the internal weak reference list, preserving logical order.
-    /// </summary>
-    private IEnumerable<View> ResolveTabCollection ()
-    {
-        foreach (WeakReference<View> wr in _tabList)
-        {
-            if (wr.TryGetTarget (out View? view))
-            {
-                yield return view;
-            }
-        }
-    }
-
-    /// <summary>
-    ///     Gets the tabs in logical order. This may differ from <see cref="View.SubViews"/> order because
-    ///     the focused tab is moved to the end of the draw list to render on top.
-    /// </summary>
-    public IEnumerable<View> TabCollection => ResolveTabCollection ();
-
-    /// <summary>
     ///     Gets the logical index of the specified view within this <see cref="Tabs"/> container.
     /// </summary>
     /// <param name="view">The view to find.</param>
@@ -90,6 +70,64 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
 
         return -1;
+    }
+
+    /// <summary>
+    ///     Gets the tabs in logical order. This may differ from <see cref="View.SubViews"/> order because
+    ///     the focused tab is moved to the end of the draw list to render on top.
+    /// </summary>
+    public IEnumerable<View> TabCollection => ResolveTabCollection ();
+
+    /// <summary>
+    ///     Gets or sets the depth of the tab header in rows (for <see cref="Side.Top"/>/<see cref="Side.Bottom"/>)
+    ///     or columns (for <see cref="Side.Left"/>/<see cref="Side.Right"/>). The default is 3, which provides room
+    ///     for the outside border, title text, and a 1-character separator line.
+    /// </summary>
+    /// <remarks>
+    ///     Changing this value updates the <see cref="IAdornment.Thickness"/> of all tab SubViews. The depth determines
+    ///     how much of the border is allocated to the tab header vs. the content area.
+    /// </remarks>
+    public int TabDepth
+    {
+        get;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+
+            field = value;
+            UpdateTabBorderThickness ();
+        }
+    } = 3;
+
+    private LineStyle _tabLineStyle = LineStyle.Rounded;
+
+    /// <summary>
+    ///     Gets or sets the <see cref="LineStyle"/> used for tab borders.
+    ///     When set, updates the <see cref="View.BorderStyle"/> of all existing tab SubViews.
+    /// </summary>
+    public LineStyle TabLineStyle
+    {
+        get => _tabLineStyle;
+        set
+        {
+            if (_tabLineStyle == value)
+            {
+                return;
+            }
+
+            _tabLineStyle = value;
+
+            foreach (View tab in TabCollection)
+            {
+                tab.BorderStyle = _tabLineStyle;
+            }
+
+            UpdateTabBorderThickness ();
+            SetNeedsLayout ();
+        }
     }
 
     private Side _tabSide = Side.Top;
@@ -122,74 +160,17 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
     }
 
-    private LineStyle _tabLineStyle = LineStyle.Rounded;
-
     /// <summary>
-    ///     Gets or sets the <see cref="LineStyle"/> used for tab borders.
-    ///     When set, updates the <see cref="View.BorderStyle"/> of all existing tab SubViews.
+    ///     Resolves the tabs from the internal weak reference list, preserving logical order.
     /// </summary>
-    public LineStyle TabLineStyle
+    private IEnumerable<View> ResolveTabCollection ()
     {
-        get => _tabLineStyle;
-        set
+        foreach (WeakReference<View> wr in _tabList)
         {
-            if (_tabLineStyle == value)
+            if (wr.TryGetTarget (out View? view))
             {
-                return;
+                yield return view;
             }
-
-            _tabLineStyle = value;
-
-            foreach (View tab in TabCollection)
-            {
-                tab.BorderStyle = _tabLineStyle;
-            }
-
-            UpdateTabBorderThickness ();
-            SetNeedsLayout ();
-        }
-    }
-
-    /// <summary>
-    ///     Gets or sets the depth of the tab header in rows (for <see cref="Side.Top"/>/<see cref="Side.Bottom"/>)
-    ///     or columns (for <see cref="Side.Left"/>/<see cref="Side.Right"/>). The default is 3, which provides room
-    ///     for the outside border, title text, and a 1-character separator line.
-    /// </summary>
-    /// <remarks>
-    ///     Changing this value updates the <see cref="IAdornment.Thickness"/> of all tab SubViews. The depth determines
-    ///     how much of the border is allocated to the tab header vs. the content area.
-    /// </remarks>
-    public int TabDepth
-    {
-        get;
-        set
-        {
-            if (field == value)
-            {
-                return;
-            }
-
-            field = value;
-            UpdateTabBorderThickness ();
-        }
-    } = 3;
-
-    /// <inheritdoc/>
-    protected override void OnFocusedChanged (View? previousFocused, View? focused)
-    {
-        base.OnFocusedChanged (previousFocused, focused);
-
-        if (focused is TitleView)
-        {
-            return;
-        }
-
-        // Find which tab view now has focus (using logical order)
-        View? focusedTab = TabCollection.FirstOrDefault (t => t.HasFocus);
-
-        if (focusedTab is { })
-        {
-            Value = focusedTab;
         }
     }
 
@@ -273,6 +254,25 @@ public class Tabs : View, IValue<View?>, IDesignable
     #endregion
 
     #region SubView Management
+
+    /// <inheritdoc/>
+    protected override void OnFocusedChanged (View? previousFocused, View? focused)
+    {
+        base.OnFocusedChanged (previousFocused, focused);
+
+        if (focused is TitleView)
+        {
+            return;
+        }
+
+        // Find which tab view now has focus (using logical order)
+        View? focusedTab = TabCollection.FirstOrDefault (t => t.HasFocus);
+
+        if (focusedTab is { })
+        {
+            Value = focusedTab;
+        }
+    }
 
     /// <inheritdoc/>
     protected override bool OnKeyDownNotHandled (Key key)
@@ -1002,6 +1002,51 @@ public class Tabs : View, IValue<View?>, IDesignable
                                                    TabDepth = e.NewValue;
                                                };
 
+        NumericUpDown<int> tabLengthNumericUpDown = new ()
+        {
+            Y = Pos.Top (tabDepthNumericUpDown),
+            X = Pos.Right (tabDepthNumericUpDown) + 1,
+            Width = 10,
+            BorderStyle = LineStyle.Single,
+            Title = "_Length",
+            Value = 0//null//Value?.Border.TabLength ?? 0
+        };
+
+        tabLengthNumericUpDown.ValueChanging += (_, e) =>
+                                                {
+                                                    if (Value is null)
+                                                    {
+                                                        e.Handled = true;
+
+                                                        return;
+                                                    }
+
+                                                    if (e.NewValue <= 0)
+                                                    {
+                                                        foreach (View tab in TabCollection)
+                                                        {
+                                                            tab.Border.TabLength = null;
+                                                        }
+                                                        e.Handled = true;
+                                                    }
+                                                    else
+                                                    {
+                                                        foreach (View tab in TabCollection)
+                                                        {
+                                                            tab.Border.TabLength = e.NewValue;
+                                                        }
+                                                    }
+                                                };
+
+        ViewportChanged += (sender, args) =>
+                           {
+                               // only the first time
+                               if (tabLengthNumericUpDown.Value > 0 && Value?.Border.TabLength is { })
+                               {
+                                   tabLengthNumericUpDown.Value = Value?.Border.TabLength ?? 0;
+                               }
+                           };
+
         NumericUpDown<int> scrollOffsetNumericUpDown = new ()
         {
             Y = Pos.Bottom (tabSideSelector),
@@ -1013,7 +1058,7 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         scrollOffsetNumericUpDown.ValueChanging += (_, e) => { ScrollOffset = e.NewValue; };
 
-        settingsTab.Add (tabSideSelector, tabDepthNumericUpDown, scrollOffsetNumericUpDown);
+        settingsTab.Add (tabSideSelector, tabDepthNumericUpDown, tabLengthNumericUpDown, scrollOffsetNumericUpDown);
 
         View addRemoveTab = new () { Id = "addRemoveTab", Title = "Add_/Remove" };
 

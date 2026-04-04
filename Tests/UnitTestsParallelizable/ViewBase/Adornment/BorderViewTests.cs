@@ -1466,9 +1466,9 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    5,
                                    Side.Top,
                                    0,
-                                   null,
+                                   4,
                                    true,
-                                   "T_a\nb",
+                                   "T_ab",
                                    true,
                                    new Thickness (1, 2, 1, 1));
 
@@ -1628,8 +1628,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        driver,
                        """
                        ╭───╮
-                       │Tab│
                        │   │
+                       │Tab│
                        │   │
                        │   ╰───╮
                        │       │
@@ -1687,8 +1687,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        driver,
                        """
                        ╭───╮
-                       │Tab│
                        │   │
+                       │Tab│
                        │   │
                        │   ╰───────────╮
                        │               │
@@ -2018,8 +2018,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        driver,
                        """
                        ───╮
-                       Tab│
                           │
+                       Tab│
                           │
                        ┬──┴────────────╮
                        │               │
@@ -2195,7 +2195,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        driver,
                        """
                        ╭──╮
-                       │Ta│
+                       │a │
                        ├──┴────╮
                        │       │
                        │       │
@@ -2260,8 +2260,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        driver,
                        """
                        ╭───╮
-                       │Tab│
                        │   │
+                       │Tab│                                                                           
                        │   │
                        ├───┴───────────╮
                        │               │

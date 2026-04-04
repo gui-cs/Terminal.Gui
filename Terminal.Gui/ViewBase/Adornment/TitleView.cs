@@ -76,8 +76,8 @@ public sealed class TitleView : View, ITitleView
         // default is also Horizontal, so setting it won't trigger OnOrientationChanged.
         SetupKeyBindings ();
 
-        //TextFormatter.Alignment = Alignment.Center;
-        //TextFormatter.WordWrap = true;
+        TextFormatter.Alignment = Alignment.Center;
+        TextFormatter.VerticalAlignment = Alignment.Center;
     }
 
 #if TAB_COLOR_PROTOTYPE
@@ -235,20 +235,15 @@ public sealed class TitleView : View, ITitleView
         Frame = labelFrame;
 
         // Compute padding for extra depth rows and focus-dependent adjustments
-        Thickness padding;
 
-        if (hasFocus && TabSide == Side.Bottom && BorderThickness.Bottom > 2)
-        {
-            padding = new Thickness (0, 1, 0, 0);
-        }
-        else if (hasFocus && TabSide == Side.Right && BorderThickness.Right > 2)
-        {
-            padding = new Thickness (1, 0, 0, 0);
-        }
-        else
-        {
-            padding = new Thickness (0);
-        }
+        Thickness padding = hasFocus switch
+                            {
+                                true when TabSide == Side.Top && BorderThickness.Top > 2 => new Thickness (0, 0, 0, 1),
+                                true when TabSide == Side.Bottom && BorderThickness.Bottom > 2 => new Thickness (0, 1, 0, 0),
+                                true when TabSide == Side.Right && BorderThickness.Right > 2 => new Thickness (1, 0, 0, 0),
+                                true when TabSide == Side.Left && BorderThickness.Left > 2 => new Thickness (0, 0, 1, 0),
+                                _ => new Thickness (0)
+                            };
 
         Padding.Thickness = padding;
     }
