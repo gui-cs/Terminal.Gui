@@ -88,6 +88,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        │       │
                        │   ╭───╯
                        │Tab│
+                       │   │
                        ╰───╯
                        """);
     }
@@ -403,11 +404,11 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (view,
                        driver,
                        """
-                        ╭─────────╮
-                        │T        │
-                        │a        │
-                        │b        │
-                        ╰─╮       │
+                       ╭──────────╮
+                       │T         │
+                       │a         │
+                       │b         │
+                       ╰──╮       │
                           │       │
                           │       │
                           │       │
@@ -629,11 +630,11 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (view,
                        driver,
                        """
-                       ╭─────────╮
-                       │        T│
-                       │        a│
-                       │        b│
-                       │       ╭─╯
+                       ╭──────────╮
+                       │        T │
+                       │        a │
+                       │        b │
+                       │       ╭──╯
                        │       │
                        │       │
                        │       │
@@ -1533,7 +1534,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        """
                        ╭──╮
                        │Ta│
-                       │b ╰────╮
+                       │b │
+                       │  ╰────╮
                        │       │
                        │       │
                        ╰───────╯
@@ -1541,14 +1543,12 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     // ════════════════════════════════════════════════════════════════════
-    //  Thickness Variants — Depth capping and non-standard depths
-    //  Depth should be min (thickness_on_tab_side, 3).
-    //  Thickness >= 3 always uses depth 3.
-    //  Thickness 1 and 2 produce shallower tabs per spec.
+    //  Thickness Variants — Depth equals thickness on the tab side.
+    //  Depth > 3 adds extra padding rows between the title and the
+    //  content-side border join.
     // ════════════════════════════════════════════════════════════════════
 
-    // ──── Thickness = 4 (depth capped to 3) ────
-    // Expected output identical to thickness=3 (extra blank row trimmed).
+    // ──── Thickness = 4 (depth 4: cap + title + 1 padding + join) ────
 
     [Fact]
     public void Top_Focused_Depth4_WithTitle ()
@@ -1571,6 +1571,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        """
                        ╭───╮
                        │Tab│
+                       │   │
                        │   ╰───╮
                        │       │
                        │       │
@@ -1597,25 +1598,14 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (view,
                        driver,
                        """
-
                        ╭──╮
                        │Ta│
-                       │b ╰────╮
+                       │b │
+                       │  │
+                       │  ╰────╮
                        │       │
                        ╰───────╯
                        """);
-
-        // should be:
-        //DrawAndAssert (view,
-        //               driver,
-        //               """
-        //               ╭──╮
-        //               │Ta│
-        //               │b │
-        //               │  ╰────╮
-        //               │       │
-        //               ╰───────╯
-        //               """);
     }
 
     [Fact]
@@ -1637,25 +1627,14 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         DrawAndAssert (view,
                        driver,
                        """
-                       
                        ╭───╮
                        │Tab│
+                       │   │
+                       │   │
                        │   ╰───╮
                        │       │
                        ╰───────╯
                        """);
-
-        // should be:
-        //DrawAndAssert (view,
-        //               driver,
-        //               """
-        //               ╭───╮
-        //               │Tab│
-        //               │   │
-        //               │   ╰───╮
-        //               │       │
-        //               ╰───────╯
-        //               """);
     }
 
     [Fact]
@@ -1702,13 +1681,15 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = new Thickness (5, 5, 5, 5);
 
-        // Edge-based: borderBounds=(0,4,17,8). Header depth=3 at offset=0.
-        // Focused → open gap (no separator line).
+        // Edge-based: borderBounds=(0,4,17,8). Header depth=5 at offset=0.
+        // Focused → open gap (no separator line). Extra padding rows for depth > 3.
         DrawAndAssert (view,
                        driver,
                        """
                        ╭───╮
                        │Tab│
+                       │   │
+                       │   │
                        │   ╰───────────╮
                        │               │
                        │               │
@@ -2038,6 +2019,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                        """
                        ───╮
                        Tab│
+                          │
+                          │
                        ┬──┴────────────╮
                        │               │
                        │               │
@@ -2271,13 +2254,15 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = new Thickness (5, 5, 5, 5);
 
-        // Edge-based: borderBounds=(0,4,17,8). Header depth=3 at offset=0.
-        // Unfocused → separator line (closed).
+        // Edge-based: borderBounds=(0,4,17,8). Header depth=5 at offset=0.
+        // Unfocused → separator line (closed). Extra padding rows for depth > 3.
         DrawAndAssert (view,
                        driver,
                        """
                        ╭───╮
                        │Tab│
+                       │   │
+                       │   │
                        ├───┴───────────╮
                        │               │
                        │               │

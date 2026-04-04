@@ -127,17 +127,16 @@ public int TabDepth => TabSide switch
 
 ## Implementation Steps
 
-- [ ] 1. Create `ITitleView.cs` with interface + `TabLayoutContext`
-- [ ] 2. Add `TabSide`, `BorderThickness`, `TabDepth` to TitleView; implement `ITitleView`
-- [ ] 3. Move 3 static geometry methods from BorderView → TitleView
-- [ ] 4. Move layout body into `TitleView.UpdateLayout`, including depth > 3 padding fix
-- [ ] 5. Replace `UpdateTitleViewLayout` in BorderView with context construction + cast call
-- [ ] 6. Simplify `ConfigureForTabMode` — set TabSide/thickness, remove redundant BorderStyle/Orientation
-- [ ] 7. Update `DrawTabBorder` to call `TitleView.ComputeHeaderRect (...)` etc.
-- [ ] 8. Fix `Top_Focused_Depth5_WithTitle` and `Top_Focused_Depth5_With2LineTitle` tests:
-         uncomment the "should be" assertions, remove the wrong ones
+- [x] 1. Create `ITitleView.cs` with interface + `TabLayoutContext`
+- [x] 2. Add `TabSide`, `BorderThickness`, `TabDepth` to TitleView; implement `ITitleView`
+- [x] 3. Move 3 static geometry methods from BorderView → TitleView
+- [x] 4. Move layout body into `TitleView.UpdateLayout`, including depth > 3 padding fix
+- [x] 5. Replace `UpdateTitleViewLayout` in BorderView with context construction + cast call
+- [x] 6. Simplify `ConfigureForTabMode` — set TabSide/thickness, remove redundant BorderStyle/Orientation
+- [x] 7. Update `DrawTabBorder` to call `TitleView.ComputeHeaderRect (...)` etc.
+- [x] 8. Fix depth > 3 test expectations (Depth4, Depth5, ThickBorder — all 4 sides)
 - [ ] 9. Write new ITitleView / refactoring tests (see test plan below)
-- [ ] 10. Build + run all tests
+- [x] 10. Build + run all tests — 0 regressions (14 pre-existing TabsTests failures unchanged)
 
 ## Test Plan
 
@@ -191,12 +190,19 @@ dotnet test --project Tests/UnitTestsParallelizable --no-build --filter-method "
 
 ## Status
 
-**Current:** Planning complete, awaiting approval to begin implementation.
+**Current:** Core refactoring complete. New ITitleView tests (step 9) still pending.
 
 ## Progress Log
 
-_(Updated as implementation proceeds)_
+1. Created `ITitleView.cs` — had to make `TabLayoutContext` `public` (not `internal`) because `ITitleView` is public
+2. Moved static geometry methods and layout body to TitleView
+3. BorderView property `TitleView` shadows class name `TitleView` — used `using TitleViewType = ...` alias for static calls in `DrawTabBorder`
+4. Removing `Math.Min(thickness, 3)` cap fixed depth > 3 rendering automatically
+5. Updated 10 test expectations for depth 4/5/thick border — all now show correct extra padding rows
+6. Verified 0 regressions: same 14 pre-existing TabsTests failures, all BorderViewTests and TabCompositionTests pass
 
 ## Lessons Learned
 
-_(Updated as issues are discovered)_
+- Property names that shadow type names require using aliases for static member access
+- The depth cap removal was the simplest part — just not adding `Math.Min` in the computed property
+- Extra depth rows are handled naturally by TitleView's `Frame` being taller — padding fills the space between title text and the content-side border

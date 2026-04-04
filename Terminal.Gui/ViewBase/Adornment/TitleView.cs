@@ -19,7 +19,7 @@ namespace Terminal.Gui.ViewBase;
 ///         <see cref="View.CommandsToBubbleUp"/>) to handle navigation.
 ///     </para>
 /// </remarks>
-public sealed class TitleView : View, IOrientation
+public sealed class TitleView : View, ITitleView
 {
     private readonly OrientationHelper _orientationHelper;
 
@@ -75,6 +75,9 @@ public sealed class TitleView : View, IOrientation
         // Default to horizontal — call SetupKeyBindings directly because OrientationHelper's
         // default is also Horizontal, so setting it won't trigger OnOrientationChanged.
         SetupKeyBindings ();
+
+        TextFormatter.Alignment = Alignment.Center;
+        TextFormatter.WordWrap = true;
     }
 
 #if TAB_COLOR_PROTOTYPE
@@ -159,6 +162,151 @@ public sealed class TitleView : View, IOrientation
         TextFormatter.Direction = newOrientation == Orientation.Vertical ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
 
         SetupKeyBindings ();
+    }
+
+    #endregion
+
+    #region ITitleView members
+
+    /// <inheritdoc/>
+    public Side TabSide { get; set; }
+
+    /// <inheritdoc/>
+    public Thickness BorderThickness { get; set; }
+
+    /// <inheritdoc/>
+    public int TabDepth => TabSide switch
+                           {
+                               Side.Top => BorderThickness.Top,
+                               Side.Bottom => BorderThickness.Bottom,
+                               Side.Left => BorderThickness.Left,
+                               Side.Right => BorderThickness.Right,
+                               _ => 3
+                           };
+
+    /// <inheritdoc/>
+    public void UpdateLayout (in TabLayoutContext context)
+    {
+        if (context.BorderBounds is not { Width: > 0, Height: > 0 })
+        {
+            Visible = false;
+
+            return;
+        }
+
+        int tabDepth = TabDepth;
+
+        if (context.TabLength is null)
+        {
+            return;
+        }
+
+        int tabLength = context.TabLength.Value;
+        bool hasFocus = context.HasFocus;
+
+        Rectangle headerRect = ComputeHeaderRect (context.BorderBounds, TabSide, context.TabOffset, tabLength, tabDepth);
+        Rectangle viewBounds = ComputeViewBounds (context.BorderBounds, TabSide, tabDepth);
+        Rectangle clipped = Rectangle.Intersect (headerRect, viewBounds);
+        bool tabVisible = !clipped.IsEmpty;
+
+        if (!tabVisible)
+        {
+            Visible = false;
+
+            return;
+        }
+
+        Visible = true;
+        Text = context.Title;
+
+        if (context.LineStyle is { } ls)
+        {
+            BorderStyle = ls;
+        }
+
+        // Configure the border thickness based on depth and focus
+        Border.Thickness = ComputeTitleViewThickness (TabSide, tabDepth, hasFocus);
+
+        // Set orientation based on tab side
+        Orientation = TabSide is Side.Left or Side.Right ? Orientation.Vertical : Orientation.Horizontal;
+
+        // Convert header rect from screen to BorderView viewport coords
+        Rectangle labelFrame = headerRect with { X = headerRect.X - context.ScreenOrigin.X, Y = headerRect.Y - context.ScreenOrigin.Y };
+        Frame = labelFrame;
+
+        // Compute padding for extra depth rows and focus-dependent adjustments
+        Thickness padding;
+
+        if (hasFocus && TabSide == Side.Bottom && BorderThickness.Bottom > 2)
+        {
+            padding = new Thickness (0, 1, 0, 0);
+        }
+        else if (hasFocus && TabSide == Side.Right && BorderThickness.Right > 2)
+        {
+            padding = new Thickness (1, 0, 0, 0);
+        }
+        else
+        {
+            padding = new Thickness (0);
+        }
+
+        Padding.Thickness = padding;
+    }
+
+    #endregion
+
+    #region Static geometry helpers
+
+    /// <summary>
+    ///     Computes the unclipped header rectangle for the given side, offset, length, and depth. In content coordinates.
+    /// </summary>
+    internal static Rectangle ComputeHeaderRect (Rectangle contentBorderRect, Side side, int offset, int length, int depth) =>
+        side switch
+        {
+            Side.Top => new Rectangle (contentBorderRect.X + offset, contentBorderRect.Y - (depth - 1), length, depth),
+            Side.Bottom => new Rectangle (contentBorderRect.X + offset, contentBorderRect.Bottom - 1, length, depth),
+            Side.Left => new Rectangle (contentBorderRect.X - (depth - 1), contentBorderRect.Y + offset, depth, length),
+            Side.Right => new Rectangle (contentBorderRect.Right - 1, contentBorderRect.Y + offset, depth, length),
+            _ => Rectangle.Empty
+        };
+
+    /// <summary>
+    ///     Computes the full view bounds (content border + header protrusion area). In content coordinates.
+    /// </summary>
+    internal static Rectangle ComputeViewBounds (Rectangle contentBorderRect, Side side, int depth) =>
+        side switch
+        {
+            Side.Top => contentBorderRect with { Y = contentBorderRect.Y - (depth - 1), Height = contentBorderRect.Height + (depth - 1) },
+            Side.Bottom => contentBorderRect with { Height = contentBorderRect.Height + (depth - 1) },
+            Side.Left => contentBorderRect with { X = contentBorderRect.X - (depth - 1), Width = contentBorderRect.Width + (depth - 1) },
+            Side.Right => contentBorderRect with { Width = contentBorderRect.Width + (depth - 1) },
+            _ => contentBorderRect
+        };
+
+    /// <summary>
+    ///     Computes the <see cref="Thickness"/> for the tab TitleView's border based on
+    ///     depth, focus state, and which side the tab is on.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         "Cap" is the outward edge (away from content). "Content" is the inward edge (toward content area).
+    ///         For depth ≥ 3, the content-side thickness toggles with focus to create the open gap / separator.
+    ///         For depth &lt; 3, no focus distinction in border lines.
+    ///     </para>
+    /// </remarks>
+    internal static Thickness ComputeTitleViewThickness (Side tabSide, int depth, bool hasFocus)
+    {
+        int cap = depth >= 2 ? 1 : 0;
+        int contentSide = depth >= 3 && !hasFocus ? 1 : 0;
+
+        return tabSide switch
+               {
+                   Side.Top => new Thickness (1, cap, 1, contentSide),
+                   Side.Bottom => new Thickness (1, contentSide, 1, cap),
+                   Side.Left => new Thickness (cap, 1, contentSide, 1),
+                   Side.Right => new Thickness (contentSide, 1, cap, 1),
+                   _ => Thickness.Empty
+               };
     }
 
     #endregion
