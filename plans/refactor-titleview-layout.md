@@ -127,16 +127,55 @@ public int TabDepth => TabSide switch
 
 ## Implementation Steps
 
-1. Create `ITitleView.cs` with interface + `TabLayoutContext`
-2. Add `TabSide`, `BorderThickness`, `TabDepth` to TitleView; implement `ITitleView`
-3. Move 3 static geometry methods from BorderView → TitleView
-4. Move layout body into `TitleView.UpdateLayout`, including depth > 3 padding fix
-5. Replace `UpdateTitleViewLayout` in BorderView with context construction + cast call
-6. Simplify `ConfigureForTabMode` — set TabSide/thickness, remove redundant BorderStyle/Orientation
-7. Update `DrawTabBorder` to call `TitleView.ComputeHeaderRect (...)` etc.
-8. Update `Top_Focused_Depth5_WithTitle` and `Top_Focused_Depth5_With2LineTitle` tests:
-   uncomment the "should be" assertions, remove the wrong ones
-9. Build + run tests
+- [ ] 1. Create `ITitleView.cs` with interface + `TabLayoutContext`
+- [ ] 2. Add `TabSide`, `BorderThickness`, `TabDepth` to TitleView; implement `ITitleView`
+- [ ] 3. Move 3 static geometry methods from BorderView → TitleView
+- [ ] 4. Move layout body into `TitleView.UpdateLayout`, including depth > 3 padding fix
+- [ ] 5. Replace `UpdateTitleViewLayout` in BorderView with context construction + cast call
+- [ ] 6. Simplify `ConfigureForTabMode` — set TabSide/thickness, remove redundant BorderStyle/Orientation
+- [ ] 7. Update `DrawTabBorder` to call `TitleView.ComputeHeaderRect (...)` etc.
+- [ ] 8. Fix `Top_Focused_Depth5_WithTitle` and `Top_Focused_Depth5_With2LineTitle` tests:
+         uncomment the "should be" assertions, remove the wrong ones
+- [ ] 9. Write new ITitleView / refactoring tests (see test plan below)
+- [ ] 10. Build + run all tests
+
+## Test Plan
+
+### New tests for ITitleView contract (in `Tests/UnitTestsParallelizable/ViewBase/Adornment/`)
+
+#### ITitleView property tests
+- [ ] `TabDepth_Computed_FromSideAndThickness_Top` — set TabSide=Top, BorderThickness=(1,5,1,1), assert TabDepth==5
+- [ ] `TabDepth_Computed_FromSideAndThickness_Left` — TabSide=Left, BorderThickness=(4,1,1,1), assert TabDepth==4
+- [ ] `TabSide_Set_UpdatesTabDepth` — change TabSide, verify TabDepth recomputes
+- [ ] `BorderThickness_Set_UpdatesTabDepth` — change thickness, verify TabDepth recomputes
+
+#### UpdateLayout tests
+- [ ] `UpdateLayout_HidesTitleView_WhenBorderBoundsEmpty` — pass zero-size bounds, assert Visible==false
+- [ ] `UpdateLayout_HidesTitleView_WhenTabLengthNull` — pass TabLength=null, assert Visible==false
+- [ ] `UpdateLayout_SetsTextFromContext` — verify Text matches context.Title
+- [ ] `UpdateLayout_SetsOrientation_Horizontal_ForTopSide` — TabSide=Top → Orientation.Horizontal
+- [ ] `UpdateLayout_SetsOrientation_Vertical_ForLeftSide` — TabSide=Left → Orientation.Vertical
+- [ ] `UpdateLayout_SetsBorderThickness_ForDepth3` — verify ComputeTitleViewThickness output applied
+- [ ] `UpdateLayout_SetsPadding_ForDepth5` — verify extra padding rows for depth > 3
+
+#### Static geometry method tests (moved from BorderView, verify still work)
+- [ ] `ComputeHeaderRect_Top_ReturnsCorrectRect`
+- [ ] `ComputeHeaderRect_Left_ReturnsCorrectRect`
+- [ ] `ComputeViewBounds_Top_IncludesHeaderProtrusion`
+- [ ] `ComputeTitleViewThickness_Depth2_HasCap_NoContentSide`
+- [ ] `ComputeTitleViewThickness_Depth3_Unfocused_HasContentSide`
+- [ ] `ComputeTitleViewThickness_Depth3_Focused_NoContentSide`
+
+#### Depth > 3 rendering tests (fix existing + add new)
+- [ ] `Top_Focused_Depth5_WithTitle` — uncomment "should be" assertion
+- [ ] `Top_Focused_Depth5_With2LineTitle` — uncomment "should be" assertion
+- [ ] `Top_Focused_Depth4_WithTitle` — new: verify depth 4 renders correctly
+- [ ] `Bottom_Focused_Depth5_WithTitle` — new: verify bottom side depth > 3
+
+### Existing tests that must still pass
+- All `TabsTests` (filter-class `*TabsTests`)
+- All `TabCompositionTests` (filter-class `*TabCompositionTests`)
+- All `BorderViewTests` (filter-class `*BorderViewTests`)
 
 ## Verification
 
@@ -144,5 +183,20 @@ public int TabDepth => TabSide switch
 dotnet build --verbosity quiet
 dotnet test --project Tests/UnitTestsParallelizable --no-build --filter-class "*TabsTests"
 dotnet test --project Tests/UnitTestsParallelizable --no-build --filter-class "*TabCompositionTests"
+dotnet test --project Tests/UnitTestsParallelizable --no-build --filter-class "*BorderViewTests"
 dotnet test --project Tests/UnitTestsParallelizable --no-build --filter-method "*Depth5*"
 ```
+
+---
+
+## Status
+
+**Current:** Planning complete, awaiting approval to begin implementation.
+
+## Progress Log
+
+_(Updated as implementation proceeds)_
+
+## Lessons Learned
+
+_(Updated as issues are discovered)_
