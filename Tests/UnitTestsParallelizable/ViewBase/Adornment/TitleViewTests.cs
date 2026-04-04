@@ -564,7 +564,47 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
             BorderStyle = LineStyle.Dotted
         };
 
-        TitleView titleView = new () { Text = "Tab1", CanFocus = true, BorderStyle = LineStyle.Rounded };
+        TitleView titleView = new () { Text = "Tab1" };
+        superView.Add (titleView);
+        titleView.SetFocus ();
+
+        Assert.True (titleView.HasFocus);
+        Assert.Equal (Side.Top, titleView.TabSide);
+        Assert.Equal (LineStyle.Rounded, titleView.BorderStyle);
+        Assert.Equal (new Thickness (1, 1, 1, 0), titleView.Border.Thickness);
+
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┄┐
+                                              ┊╭────╮┊
+                                              ┊│Tab1│┊
+                                              ┊      ┊
+                                              └┄┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
+
+        superView.Dispose ();
+    }
+
+    [Fact]
+    public void Standalone_With_HotKey_DrawsCorrectly ()
+    {
+        IDriver driver = CreateTestDriver (8, 5);
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
+
+        TitleView titleView = new () { Text = "_Tab1"  };
 
         superView.Add (titleView);
 
@@ -575,7 +615,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
                                               ┌┄┄┄┄┄┄┐
                                               ┊╭────╮┊
                                               ┊│Tab1│┊
-                                              ┊╰────╯┊
+                                              ┊      ┊
                                               └┄┄┄┄┄┄┘
                                               """,
                                               output,
@@ -591,7 +631,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
 
         View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
 
-        TitleView titleView = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 3, 1, 1) };
+        TitleView titleView = new () { BorderThickness = new Thickness (1, 3, 1, 1) };
 
         superView.Add (titleView);
 
@@ -778,6 +818,43 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void UpdateLayout_CenteredText_With_HotKey_DrawsCorrectly ()
+    {
+        IDriver driver = CreateTestDriver (10, 5);
+
+        View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        TitleView titleView = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 3, 1, 1) };
+
+        superView.Add (titleView);
+
+        // TabLength wider than title text — text should center
+        titleView.UpdateLayout (new TabLayoutContext
+        {
+            BorderBounds = new Rectangle (0, 2, 10, 3),
+            TabOffset = 0,
+            TabLength = 7,
+            HasFocus = true,
+            LineStyle = LineStyle.Rounded,
+            Title = "_A",
+            ScreenOrigin = Point.Empty
+        });
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭─────╮
+                                              │  A  │
+                                              │     │
+                                              """,
+                                              output,
+                                              driver);
+
+        superView.Dispose ();
+    }
+
+    [Fact]
     public void UpdateLayout_HiddenWhenClippedOffscreen ()
     {
         TitleView titleView = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 3, 1, 1) };
@@ -800,4 +877,32 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     #endregion
+
+    [Fact]
+    public void App_EnableForDesign_DrawsCorrectly ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        IDriver? driver = app.Driver;
+        Runnable runnable = new ();
+
+        TitleView titleView = new ();
+        titleView.EnableForDesign ();
+
+        runnable.Add (titleView);
+        app.Begin (runnable);
+        app.LayoutAndDraw ();
+
+        Assert.True (titleView.HasFocus);
+        Assert.Equal(Side.Top, titleView.TabSide);
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭─────╮
+                                              │Title│
+                                              """,
+                                              output,
+                                              driver);
+
+        titleView.Dispose ();
+    }
 }

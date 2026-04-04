@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
@@ -19,7 +21,7 @@ namespace Terminal.Gui.ViewBase;
 ///         <see cref="View.CommandsToBubbleUp"/>) to handle navigation.
 ///     </para>
 /// </remarks>
-public sealed class TitleView : View, ITitleView
+public sealed class TitleView : View, ITitleView, IDesignable
 {
     private readonly OrientationHelper _orientationHelper;
 
@@ -80,7 +82,14 @@ public sealed class TitleView : View, ITitleView
         TextFormatter.VerticalAlignment = Alignment.Center;
 
         // Setup defaults
-        // TODO: Setup defaults: Side.Top, Depth=3, BorderStyle=Rounded
+        BorderStyle = LineStyle.Rounded;
+
+        // TODO: Should not have to do this; Setting TabSide should trigger a
+        // TODO: update that applies the appropriate thickness based on the default depth. 
+        Border.Thickness = new Thickness (1, 1, 1, 0);
+
+        TabSide = Side.Top;
+
     }
 
 #if TAB_COLOR_PROTOTYPE
@@ -307,4 +316,18 @@ public sealed class TitleView : View, ITitleView
     }
 
     #endregion
+
+
+    #region IDesignable
+
+    /// <inheritdoc/>
+    public bool EnableForDesign ()
+    {
+            Text = "_Title";
+            BorderStyle = LineStyle.Rounded;
+            return true;
+    }
+
+    #endregion
+
 }

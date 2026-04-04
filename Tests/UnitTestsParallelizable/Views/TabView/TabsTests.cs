@@ -149,6 +149,99 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void EnableForDesign_DrawsCorrectly ()
+    {
+        IDriver driver = CreateTestDriver (46, 22);
+
+        View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
+        Tabs tabs = new ();
+        superView.Add (tabs);
+
+        tabs.EnableForDesign ();
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭─────────╮──────────╮────────────╮──────────╮
+                                              │Attribute│Line Style│Tab Settings│Add/Remove│
+                                              │         ╰──────────┴────────────┴──────────┤
+                                              │                                            │
+                                              │┌───────────────────────────────────────────│
+                                              │├┤Style├────────┐                           │
+                                              ││☐ Bold         │                           │
+                                              ││☐ Faint        │                           │
+                                              ││☐ Italic       │                           │
+                                              ││☐ Underline    │                           │
+                                              ││☐ Blink        │                           │
+                                              ││☐ Reverse      │                           │
+                                              ││☐ Strikethrough│                           │
+                                              ││               │                           │
+                                              ││               │                           │
+                                              ││               │                           │
+                                              ││               │                           │
+                                              │├───────────────┘                           │
+                                              ││                         Sample Text       │
+                                              │└───────────────────────────────────────────│
+                                              │                                            │
+                                              ╰────────────────────────────────────────────╯
+                                              """,
+                                              output,
+                                              driver);
+
+        tabs.Dispose ();
+    }
+
+
+    [Fact]
+    public void App_EnableForDesign_DrawsCorrectly ()
+    {
+        IApplication? app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        IDriver? driver = app.Driver;
+        Runnable runnable = new ();
+
+        Tabs tabs = new ();
+        tabs.EnableForDesign ();
+
+        runnable.Add (tabs);
+        app.Begin (runnable);
+        app.LayoutAndDraw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭─────────╮──────────╮────────────╮──────────╮
+                                              │Attribute│Line Style│Tab Settings│Add/Remove│
+                                              │         ╰──────────┴────────────┴──────────┴─────────────────────────────────╮
+                                              │                                                                              │
+                                              │┌────────────────────────────────────────────────────────────────────────────┐│
+                                              ││┌┤Foreground├─────────────────────────────────────────────┬┤Style├────────┐ ││
+                                              │││H:▲                                                  0   │☐ Bold         │ ││
+                                              │││S:▲                                                  0   │☐ Faint        │ ││
+                                              │││V:                                                  ▲100 │☐ Italic       │ ││
+                                              │││Name: White                                              │☐ Underline    │ ││
+                                              │││Hex:#FFFFFF  ■                                           │☐ Blink        │ ││
+                                              ││├┼Background┼─────────────────────────────────────────────┤☐ Reverse      │ ││
+                                              │││H:▲                                                  0   │☐ Strikethrough│ ││
+                                              │││S:▲                                                  0   │               │ ││
+                                              │││V:▲                                                  0   │               │ ││
+                                              │││Name: Black                                              │               │ ││
+                                              │││Hex:#000000  ■                                           │               │ ││
+                                              ││└─────────────────────────────────────────────────────────┴───────────────┘ ││
+                                              ││                                Sample Text                                 ││
+                                              │└────────────────────────────────────────────────────────────────────────────┘│
+                                              │                                                                              │
+                                              │                                                                              │
+                                              │                                                                              │
+                                              │                                                                              │
+                                              ╰──────────────────────────────────────────────────────────────────────────────╯
+                                              """,
+                                              output,
+                                              driver);
+
+        tabs.Dispose ();
+    }
+
+    [Fact]
     public void IndexOf_ReturnsCorrectIndex ()
     {
         Tabs tabs = new ();
@@ -327,8 +420,8 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
 
         Tabs tabs = new () { Driver = driver, Width = 14, Height = 5 };
 
-        View tab1 = new () { Title = "_Tab1", Text = "Tab1 content" };
-        View tab2 = new () { Title = "Tab2", Text = "Tab2 content" };
+        View tab1 = new () { Title = "Tab_1", Text = "Tab1 content" };
+        View tab2 = new () { Title = "Tab _2", Text = "Tab2 content" };
 
         tabs.Add (tab1, tab2);
         tabs.Value = tab1;
@@ -799,4 +892,6 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
                                               driver);
         superView.Dispose ();
     }
+
+
 }

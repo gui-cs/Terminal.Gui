@@ -1,22 +1,23 @@
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
-/// Determines the settings for <see cref="Border"/>.
+///     Determines the settings for <see cref="Border"/>.
 /// </summary>
 [Flags]
 public enum BorderSettings
 {
     /// <summary>
-    /// No settings.
+    ///     No settings.
     /// </summary>
     None = 0,
+
     /// <summary>
-    /// Show the title.
+    ///     Show the title.
     /// </summary>
     Title = 1,
 
     /// <summary>
-    /// Use <see cref="GradientFill"/> to draw the border.
+    ///     Use <see cref="GradientFill"/> to draw the border.
     /// </summary>
     Gradient = 2,
 
@@ -25,6 +26,5 @@ public enum BorderSettings
     ///     <see cref="Border.TabSide"/>, <see cref="Border.TabOffset"/>,
     ///     <see cref="Border.TabLength"/>.
     /// </summary>
-    Tab = 4,
+    Tab = 4
 }
-
