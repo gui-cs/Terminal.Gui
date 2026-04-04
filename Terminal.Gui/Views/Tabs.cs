@@ -145,6 +145,7 @@ public class Tabs : View, IValue<View?>, IDesignable
                 tab.BorderStyle = _tabLineStyle;
             }
 
+            UpdateTabBorderThickness ();
             SetNeedsLayout ();
         }
     }
