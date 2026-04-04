@@ -262,7 +262,7 @@ public partial class BorderView : AdornmentView
     }
 
     /// <summary>
-    ///     Computes the content border rectangle when <see cref="BorderSettings.Tab"/> is set.
+    ///     Computes the content border rectangle in screen coordinates when <see cref="BorderSettings.Tab"/> is set.
     ///     Non-title sides use the outer edge of the thickness. The title side uses <c>thickness - 1</c>
     ///     from the outer edge, leaving a tab header region between the outer edge and the content border line.
     /// </summary>
