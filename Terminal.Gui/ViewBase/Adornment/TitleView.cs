@@ -23,6 +23,9 @@ public sealed class TitleView : View, IOrientation
 {
     private readonly OrientationHelper _orientationHelper;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="TitleView"/> class.
+    /// </summary>
     public TitleView ()
     {
         CanFocus = true;
@@ -70,6 +73,33 @@ public sealed class TitleView : View, IOrientation
         // default is also Horizontal, so setting it won't trigger OnOrientationChanged.
         SetupKeyBindings ();
     }
+
+#if TAB_COLOR_PROTOTYPE
+    /// <inheritdoc />
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
+    {
+        if (base.OnGettingAttributeForRole (in role, ref currentAttribute))
+        {
+            return true;
+        }
+
+        if (role == VisualRole.Normal)
+        {
+            currentAttribute = new Attribute (Color.Red, currentAttribute.Background);
+
+            return true;
+        }
+
+        if (role == VisualRole.HotNormal)
+        {
+            currentAttribute = new Attribute (Color.Red, currentAttribute.Background);
+
+            return true;
+        }
+
+        return false;
+    }
+#endif
 
     /// <summary>
     ///     Gets or sets the navigation direction for this title view.

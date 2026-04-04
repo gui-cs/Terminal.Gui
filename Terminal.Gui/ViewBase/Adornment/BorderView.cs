@@ -132,6 +132,24 @@ public partial class BorderView : AdornmentView
         }
     }
 
+#if TAB_COLOR_PROTOTYPE
+    /// <inheritdoc />
+    protected override bool OnGettingAttributeForRole (in VisualRole role, ref Attribute currentAttribute)
+    {
+        if (base.OnGettingAttributeForRole (in role, ref currentAttribute))
+        {
+            return true;
+        }
+
+        if (Adornment is not Border border || !border.Settings.FastHasFlags (BorderSettings.Tab))
+        {
+            return false;
+        }
+
+        return false;
+    }
+#endif
+
     /// <inheritdoc/>
     protected override void OnSubViewLayout (LayoutEventArgs args) => UpdateTitleViewLayout ();
 
@@ -865,10 +883,17 @@ public partial class BorderView : AdornmentView
 
         Attribute normalAttribute = GetAttributeForRole (VisualRole.Normal);
 
+#if TAB_COLOR_PROTOTYPE
+        if (Adornment.Parent is TitleView titleView && Adornment.Parent is { })
+        {
+            normalAttribute = Adornment.Parent.GetAttributeForRole (VisualRole.Normal);
+        }
+
         if (MouseState.HasFlag (MouseState.Pressed))
         {
             normalAttribute = GetAttributeForRole (VisualRole.Highlight);
         }
+#endif
 
         SetAttribute (normalAttribute);
 
