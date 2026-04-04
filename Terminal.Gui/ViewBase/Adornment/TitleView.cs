@@ -1,5 +1,3 @@
-using System.Collections.ObjectModel;
-
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
@@ -89,7 +87,6 @@ public sealed class TitleView : View, ITitleView, IDesignable
         Border.Thickness = new Thickness (1, 1, 1, 0);
 
         TabSide = Side.Top;
-
     }
 
 #if TAB_COLOR_PROTOTYPE
@@ -184,17 +181,7 @@ public sealed class TitleView : View, ITitleView, IDesignable
     public Side TabSide { get; set; }
 
     /// <inheritdoc/>
-    public Thickness BorderThickness { get; set; }
-
-    /// <inheritdoc/>
-    public int TabDepth => TabSide switch
-    {
-        Side.Top => BorderThickness.Top,
-        Side.Bottom => BorderThickness.Bottom,
-        Side.Left => BorderThickness.Left,
-        Side.Right => BorderThickness.Right,
-        _ => 3
-    };
+    public int TabDepth { get; set; } = 3;
 
     /// <inheritdoc/>
     public void UpdateLayout (in TabLayoutContext context)
@@ -247,14 +234,16 @@ public sealed class TitleView : View, ITitleView, IDesignable
 
         // Compute padding for extra depth rows and focus-dependent adjustments
 
-        Thickness padding = hasFocus switch
-        {
-            true when TabSide == Side.Top && BorderThickness.Top > 2 => new Thickness (0, 0, 0, 1),
-            true when TabSide == Side.Bottom && BorderThickness.Bottom > 2 => new Thickness (0, 1, 0, 0),
-            true when TabSide == Side.Right && BorderThickness.Right > 2 => new Thickness (1, 0, 0, 0),
-            true when TabSide == Side.Left && BorderThickness.Left > 2 => new Thickness (0, 0, 1, 0),
-            _ => new Thickness (0)
-        };
+        Thickness padding = hasFocus && tabDepth > 2
+                                ? TabSide switch
+                                  {
+                                      Side.Top => new Thickness (0, 0, 0, 1),
+                                      Side.Bottom => new Thickness (0, 1, 0, 0),
+                                      Side.Right => new Thickness (1, 0, 0, 0),
+                                      Side.Left => new Thickness (0, 0, 1, 0),
+                                      _ => new Thickness (0)
+                                  }
+                                : new Thickness (0);
 
         Padding.Thickness = padding;
     }
@@ -306,28 +295,26 @@ public sealed class TitleView : View, ITitleView, IDesignable
         int contentSide = depth >= 3 && !hasFocus ? 1 : 0;
 
         return tabSide switch
-        {
-            Side.Top => new Thickness (1, cap, 1, contentSide),
-            Side.Bottom => new Thickness (1, contentSide, 1, cap),
-            Side.Left => new Thickness (cap, 1, contentSide, 1),
-            Side.Right => new Thickness (contentSide, 1, cap, 1),
-            _ => Thickness.Empty
-        };
+               {
+                   Side.Top => new Thickness (1, cap, 1, contentSide),
+                   Side.Bottom => new Thickness (1, contentSide, 1, cap),
+                   Side.Left => new Thickness (cap, 1, contentSide, 1),
+                   Side.Right => new Thickness (contentSide, 1, cap, 1),
+                   _ => Thickness.Empty
+               };
     }
 
     #endregion
-
 
     #region IDesignable
 
     /// <inheritdoc/>
     public bool EnableForDesign ()
     {
-            Text = "_Title";
-            BorderStyle = LineStyle.Rounded;
-            return true;
+        Text = "_Title";
+
+        return true;
     }
 
     #endregion
-
 }

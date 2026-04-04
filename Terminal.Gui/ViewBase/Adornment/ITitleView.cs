@@ -34,14 +34,14 @@ public readonly record struct TabLayoutContext
 /// </summary>
 public interface ITitleView : IOrientation
 {
-    /// <summary>Gets the computed tab depth based on <see cref="TabSide"/> and <see cref="BorderThickness"/>.</summary>
-    int TabDepth { get; }
+    /// <summary>
+    ///     Gets or sets the tab depth — the number of rows (or columns) the tab header occupies
+    ///     on its <see cref="TabSide"/>.
+    /// </summary>
+    int TabDepth { get; set; }
 
     /// <summary>Gets or sets which side of the content border the tab header sits on.</summary>
     Side TabSide { get; set; }
-
-    /// <summary>Gets or sets the border thickness of the owning view, used to compute <see cref="TabDepth"/>.</summary>
-    Thickness BorderThickness { get; set; }
 
     /// <summary>
     ///     Updates this title view's frame, border thickness, text, orientation, padding,

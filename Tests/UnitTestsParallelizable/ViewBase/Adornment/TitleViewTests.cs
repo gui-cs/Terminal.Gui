@@ -206,75 +206,26 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
 
     #endregion
 
-    #region ITitleView — TabDepth Computed Property
+    #region ITitleView — TabDepth Property
 
     [Fact]
-    public void TabDepth_Top_ReturnsTopThickness ()
+    public void TabDepth_DefaultIs3 ()
     {
-        TitleView tv = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 5, 1, 1) };
+        TitleView tv = new ();
 
-        Assert.Equal (5, tv.TabDepth);
-
-        tv.Dispose ();
-    }
-
-    [Fact]
-    public void TabDepth_Left_ReturnsLeftThickness ()
-    {
-        TitleView tv = new () { TabSide = Side.Left, BorderThickness = new Thickness (4, 1, 1, 1) };
-
-        Assert.Equal (4, tv.TabDepth);
-
-        tv.Dispose ();
-    }
-
-    [Fact]
-    public void TabDepth_Bottom_ReturnsBottomThickness ()
-    {
-        TitleView tv = new () { TabSide = Side.Bottom, BorderThickness = new Thickness (1, 1, 1, 7) };
-
-        Assert.Equal (7, tv.TabDepth);
-
-        tv.Dispose ();
-    }
-
-    [Fact]
-    public void TabDepth_Right_ReturnsRightThickness ()
-    {
-        TitleView tv = new () { TabSide = Side.Right, BorderThickness = new Thickness (1, 1, 6, 1) };
-
-        Assert.Equal (6, tv.TabDepth);
-
-        tv.Dispose ();
-    }
-
-    [Fact]
-    public void TabSide_Change_UpdatesTabDepth ()
-    {
-        TitleView tv = new () { TabSide = Side.Top, BorderThickness = new Thickness (2, 5, 3, 4) };
-
-        Assert.Equal (5, tv.TabDepth);
-
-        tv.TabSide = Side.Bottom;
-        Assert.Equal (4, tv.TabDepth);
-
-        tv.TabSide = Side.Left;
-        Assert.Equal (2, tv.TabDepth);
-
-        tv.TabSide = Side.Right;
         Assert.Equal (3, tv.TabDepth);
 
         tv.Dispose ();
     }
 
     [Fact]
-    public void BorderThickness_Change_UpdatesTabDepth ()
+    public void TabDepth_CanBeSet ()
     {
-        TitleView tv = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 3, 1, 1) };
+        TitleView tv = new () { TabDepth = 5 };
 
-        Assert.Equal (3, tv.TabDepth);
+        Assert.Equal (5, tv.TabDepth);
 
-        tv.BorderThickness = new Thickness (1, 7, 1, 1);
+        tv.TabDepth = 7;
         Assert.Equal (7, tv.TabDepth);
 
         tv.Dispose ();
@@ -297,7 +248,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void UpdateLayout_HidesTitleView_WhenBorderBoundsEmpty ()
     {
-        TitleView tv = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 3, 1, 1) };
+        TitleView tv = new () { TabSide = Side.Top, TabDepth = 3 };
 
         tv.UpdateLayout (new TabLayoutContext
         {
@@ -318,7 +269,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void UpdateLayout_DoesNotSetVisible_WhenTabLengthNull ()
     {
-        TitleView tv = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 3, 1, 1) };
+        TitleView tv = new () { TabSide = Side.Top, TabDepth = 3 };
 
         // Pre-set Visible to false so we can verify UpdateLayout doesn't change it
         tv.Visible = false;
@@ -343,7 +294,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void UpdateLayout_SetsTextFromContext ()
     {
-        TitleView tv = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 3, 1, 1) };
+        TitleView tv = new () { TabSide = Side.Top, TabDepth = 3 };
 
         tv.UpdateLayout (new TabLayoutContext
         {
@@ -364,7 +315,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void UpdateLayout_SetsOrientation_Horizontal_ForTopSide ()
     {
-        TitleView tv = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 3, 1, 1) };
+        TitleView tv = new () { TabSide = Side.Top, TabDepth = 3 };
 
         tv.UpdateLayout (new TabLayoutContext
         {
@@ -385,7 +336,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void UpdateLayout_SetsOrientation_Vertical_ForLeftSide ()
     {
-        TitleView tv = new () { TabSide = Side.Left, BorderThickness = new Thickness (3, 1, 1, 1) };
+        TitleView tv = new () { TabSide = Side.Left, TabDepth = 3 };
 
         tv.UpdateLayout (new TabLayoutContext
         {
@@ -406,7 +357,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void UpdateLayout_SetsBorderThickness_ForDepth3_Focused ()
     {
-        TitleView tv = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 3, 1, 1) };
+        TitleView tv = new () { TabSide = Side.Top, TabDepth = 3 };
 
         tv.UpdateLayout (new TabLayoutContext
         {
@@ -428,7 +379,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void UpdateLayout_SetsBorderThickness_ForDepth3_Unfocused ()
     {
-        TitleView tv = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 3, 1, 1) };
+        TitleView tv = new () { TabSide = Side.Top, TabDepth = 3 };
 
         tv.UpdateLayout (new TabLayoutContext
         {
@@ -450,7 +401,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void UpdateLayout_SetsBorderStyle_FromContext ()
     {
-        TitleView tv = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 3, 1, 1) };
+        TitleView tv = new () { TabSide = Side.Top, TabDepth = 3 };
 
         tv.UpdateLayout (new TabLayoutContext
         {
@@ -471,7 +422,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void UpdateLayout_SetsVisible_True_WhenTabIsVisible ()
     {
-        TitleView tv = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 3, 1, 1) };
+        TitleView tv = new () { TabSide = Side.Top, TabDepth = 3 };
 
         tv.UpdateLayout (new TabLayoutContext
         {
@@ -630,7 +581,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
 
         View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
 
-        TitleView titleView = new () { BorderThickness = new Thickness (1, 3, 1, 1) };
+        TitleView titleView = new () { TabDepth = 3 };
 
         superView.Add (titleView);
 
@@ -666,7 +617,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
 
         View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
 
-        TitleView titleView = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 3, 1, 1) };
+        TitleView titleView = new () { TabSide = Side.Top, TabDepth = 3 };
 
         superView.Add (titleView);
 
@@ -702,7 +653,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
 
         View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
 
-        TitleView titleView = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 5, 1, 1) };
+        TitleView titleView = new () { TabSide = Side.Top, TabDepth = 5 };
 
         superView.Add (titleView);
 
@@ -743,7 +694,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         TitleView titleView = new ()
         {
             TabSide = Side.Left,
-            BorderThickness = new Thickness (3, 1, 1, 1),
+            TabDepth = 3,
 
             // Disable so TitleView renders its own borders in this standalone test
             SuperViewRendersLineCanvas = false
@@ -786,7 +737,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
 
         View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
 
-        TitleView titleView = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 3, 1, 1) };
+        TitleView titleView = new () { TabSide = Side.Top, TabDepth = 3 };
 
         superView.Add (titleView);
 
@@ -823,7 +774,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
 
         View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
 
-        TitleView titleView = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 3, 1, 1) };
+        TitleView titleView = new () { TabSide = Side.Top, TabDepth = 3 };
 
         superView.Add (titleView);
 
@@ -856,7 +807,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void UpdateLayout_HiddenWhenClippedOffscreen ()
     {
-        TitleView titleView = new () { TabSide = Side.Top, BorderThickness = new Thickness (1, 3, 1, 1) };
+        TitleView titleView = new () { TabSide = Side.Top, TabDepth = 3 };
 
         // Tab offset pushes header entirely outside the view bounds
         titleView.UpdateLayout (new TabLayoutContext

@@ -119,7 +119,7 @@ public partial class BorderView : AdornmentView
                 return;
             }
             itv.TabSide = border.TabSide;
-            itv.BorderThickness = Adornment.Thickness;
+            itv.TabDepth = GetTabDepth (border);
         }
         else
         {
@@ -173,18 +173,18 @@ public partial class BorderView : AdornmentView
 
         // Ensure stored state is current before layout
         itv.TabSide = border.TabSide;
-        itv.BorderThickness = Adornment.Thickness;
+        itv.TabDepth = GetTabDepth (border);
 
         itv.UpdateLayout (new TabLayoutContext
-                          {
-                              BorderBounds = GetTabBorderBounds (border),
-                              TabOffset = border.TabOffset,
-                              TabLength = border.TabLength,
-                              HasFocus = IsFocusedOrLastTab (),
-                              LineStyle = border.LineStyle,
-                              Title = Adornment.Parent?.Title ?? string.Empty,
-                              ScreenOrigin = ViewportToScreen (Point.Empty)
-                          });
+        {
+            BorderBounds = GetTabBorderBounds (border),
+            TabOffset = border.TabOffset,
+            TabLength = border.TabLength,
+            HasFocus = IsFocusedOrLastTab (),
+            LineStyle = border.LineStyle,
+            Title = Adornment.Parent?.Title ?? string.Empty,
+            ScreenOrigin = ViewportToScreen (Point.Empty)
+        });
     }
 
     private void ShowHideDrawIndicator ()
@@ -333,6 +333,23 @@ public partial class BorderView : AdornmentView
         Add (TitleView);
     }
 
+    private int GetTabDepth (Border border)
+    {
+        if (Adornment is null)
+        {
+            return 0;
+        }
+
+        return border.TabSide switch
+               {
+                   Side.Top => Adornment.Thickness.Top,
+                   Side.Bottom => Adornment.Thickness.Bottom,
+                   Side.Left => Adornment.Thickness.Left,
+                   Side.Right => Adornment.Thickness.Right,
+                   _ => 3
+               };
+    }
+
     /// <summary>
     ///     Draws the border and tab header when <see cref="BorderSettings.Tab"/> is set.
     ///     Uses a <see cref="TitleView"/> SubView with its own border and
@@ -375,7 +392,7 @@ public partial class BorderView : AdornmentView
             return true;
         }
 
-        int tabDepth = _titleView is ITitleView itv ? itv.TabDepth : 3;
+        int tabDepth = GetTabDepth (border);
 
         if (border.TabLength is { })
         {
