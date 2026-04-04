@@ -573,7 +573,6 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (LineStyle.Rounded, titleView.BorderStyle);
         Assert.Equal (new Thickness (1, 1, 1, 0), titleView.Border.Thickness);
 
-
         superView.Layout ();
         superView.Draw ();
 
@@ -604,7 +603,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
             BorderStyle = LineStyle.Dotted
         };
 
-        TitleView titleView = new () { Text = "_Tab1"  };
+        TitleView titleView = new () { Text = "_Tab1" };
 
         superView.Add (titleView);
 
@@ -894,7 +893,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         app.LayoutAndDraw ();
 
         Assert.True (titleView.HasFocus);
-        Assert.Equal(Side.Top, titleView.TabSide);
+        Assert.Equal (Side.Top, titleView.TabSide);
 
         DriverAssert.AssertDriverContentsAre ("""
                                               ╭─────╮
