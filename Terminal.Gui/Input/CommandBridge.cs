@@ -31,8 +31,8 @@ public class CommandBridge : IDisposable
     private readonly HashSet<Command> _commands;
     private readonly WeakReference<View> _owner;
     private readonly WeakReference<View> _remote;
+    private readonly bool _subscribedToCommandNotBound;
     private bool _disposed;
-    private bool _hasArbitraryCommands;
 
     private CommandBridge (View owner, View remote, Command [] commands)
     {
@@ -54,9 +54,9 @@ public class CommandBridge : IDisposable
         // For commands other than Accept/Activate, subscribe to CommandNotBound.
         // These are commands that the remote view does not have explicit handlers for,
         // so they flow through DefaultCommandNotBoundHandler.
-        _hasArbitraryCommands = _commands.Any (c => c != Command.Accept && c != Command.Activate);
+        _subscribedToCommandNotBound = _commands.Any (c => c != Command.Accept && c != Command.Activate);
 
-        if (_hasArbitraryCommands)
+        if (_subscribedToCommandNotBound)
         {
             remote.CommandNotBound += OnRemoteCommandNotBound;
         }
@@ -94,7 +94,7 @@ public class CommandBridge : IDisposable
         remote.Accepted -= OnRemoteAccepted;
         remote.Activated -= OnRemoteActivated;
 
-        if (_hasArbitraryCommands)
+        if (_subscribedToCommandNotBound)
         {
             remote.CommandNotBound -= OnRemoteCommandNotBound;
         }

@@ -5,6 +5,10 @@ using UnitTests;
 
 namespace ViewBaseTests.Commands;
 
+/// <summary>
+///     Tests for command bubbling through view hierarchies via <see cref="View.CommandsToBubbleUp"/>,
+///     including dispatch-down, bridge cancellation, and unbound command bubbling.
+/// </summary>
 public class CommandBubblingTests (ITestOutputHelper output)
 {
     #region Command Propagation Tests
