@@ -112,11 +112,12 @@ public partial class TextField : View, IDesignable, IValue<string>
 
     private void TextField_Initialized (object? sender, EventArgs e)
     {
-        _insertionPoint = Text.GetRuneCount ();
+        _insertionPoint = GraphemeHelper.GetGraphemeCount (Text);
 
         if (Viewport.Width > 0)
         {
-            ScrollOffset = _insertionPoint > Viewport.Width + 1 ? _insertionPoint - Viewport.Width + 1 : 0;
+            int colsWidth = Text.GetColumns ();
+            ScrollOffset = colsWidth > Viewport.Width + 1 ? colsWidth - Viewport.Width + 1 : 0;
         }
 
         if (Autocomplete.HostControl is { })

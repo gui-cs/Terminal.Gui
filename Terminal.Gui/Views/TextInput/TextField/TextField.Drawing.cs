@@ -32,12 +32,13 @@ public partial class TextField
         SetAttribute (GetAttributeForRole (VisualRole.Normal));
         Move (0, 0);
 
-        int p = ScrollOffset;
-        var col = 0;
+        _ = TextModel.CursorColumn (_text, ScrollOffset, 0, out List<int> glyphWidths, out _);
+        _ = TextModel.GetColumnWidthsBeforeStart (glyphWidths, ScrollOffset, out int col, out int viewportX);
+
         int width = Viewport.Width;
         int tCount = _text.Count;
 
-        for (int idx = p; idx < tCount; idx++)
+        for (int idx = viewportX; idx < tCount; idx++)
         {
             string text = _text [idx];
             int cols = text.GetColumns ();
