@@ -2765,7 +2765,6 @@ public class TextFormatterTests (ITestOutputHelper output) : TestDriverBase
                         "ฮ",
                         "ฯ",
                         "ะั",
-                        "าำ"
                     }
                 )]
     public void WordWrap_Unicode_SingleWordLine (
@@ -2801,16 +2800,7 @@ public class TextFormatterTests (ITestOutputHelper output) : TestDriverBase
                      expectedClippedWidth >= (wrappedLines.Count > 0 ? wrappedLines.Max (l => l.GetColumns ()) : 0)
                     );
 
-        if (maxWidth == 1)
-        {
-            List<string> newResultLines = resultLines.ToList ();
-            newResultLines [^1] = "";
-            Assert.Equal (newResultLines, wrappedLines);
-        }
-        else
-        {
-            Assert.Equal (resultLines, wrappedLines);
-        }
+        Assert.Equal (resultLines, wrappedLines);
     }
 
     /// <summary>WordWrap strips CRLF</summary>

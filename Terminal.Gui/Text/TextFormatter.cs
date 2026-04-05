@@ -1543,7 +1543,7 @@ public class TextFormatter
 
                 if (end == 0 && incomplete)
                 {
-                    start = text.GetRuneCount ();
+                    start = GraphemeHelper.GetGraphemeCount (text);
 
                     break;
                 }
@@ -1553,7 +1553,7 @@ public class TextFormatter
 
                 if (incomplete)
                 {
-                    start = text.GetRuneCount ();
+                    start = GraphemeHelper.GetGraphemeCount (text);
 
                     break;
                 }
@@ -1725,7 +1725,7 @@ public class TextFormatter
             };
         }
 
-        if (start < text.GetRuneCount ())
+        if (start < GraphemeHelper.GetGraphemeCount (text))
         {
             string str = ReplaceTABWithSpaces (
                                                StringExtensions.ToString (graphemes.GetRange (start, graphemes.Count - start)),
@@ -1931,7 +1931,7 @@ public class TextFormatter
         }
         else
         {
-            textCount = words.Sum (arg => arg.GetRuneCount ()) - text.EnumerateRunes ().Sum (r => r.GetColumns () == 0 ? 1 : 0);
+            textCount = words.Sum (GraphemeHelper.GetGraphemeCount) - GraphemeHelper.GetGraphemes (text).Sum (s => s.GetColumns () == 0 ? 1 : 0);
         }
 
         int spaces = words.Length > 1 ? (width - textCount) / (words.Length - 1) : 0;
