@@ -430,9 +430,9 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
         tabs.Draw ();
 
         DriverAssert.AssertDriverContentsAre ("""
-                                              ╭────╮────╮
-                                              │Tab1│Tab2│
-                                              │    ╰────┴──╮
+                                              ╭────╮─────╮
+                                              │Tab1│Tab 2│
+                                              │    ╰─────┴─╮
                                               │Tab1 content│
                                               ╰────────────╯
                                               """,

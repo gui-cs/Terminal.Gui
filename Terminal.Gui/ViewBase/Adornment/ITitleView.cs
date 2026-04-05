@@ -12,8 +12,11 @@ public readonly record struct TabLayoutContext
     /// <summary>Gets the tab offset along the tab side (in cells from the content border origin).</summary>
     public required int TabOffset { get; init; }
 
-    /// <summary>Gets the tab header length (in cells), or <see langword="null"/> if not yet computed.</summary>
-    public required int? TabLength { get; init; }
+    /// <summary>
+    ///     Gets an explicit tab length override, or <see langword="null"/> to auto-size from the title text.
+    ///     When set, the title view uses this length instead of auto-sizing.
+    /// </summary>
+    public int? TabLengthOverride { get; init; }
 
     /// <summary>Gets whether this tab is focused or is the last tab (open-gap state).</summary>
     public required bool HasFocus { get; init; }
@@ -39,6 +42,12 @@ public interface ITitleView : IOrientation
     ///     on its <see cref="TabSide"/>.
     /// </summary>
     int TabDepth { get; set; }
+
+    /// <summary>
+    ///     Gets the measured tab length (in cells) after <see cref="UpdateLayout"/> has auto-sized the title view.
+    ///     Returns 0 if <see cref="UpdateLayout"/> has not yet been called.
+    /// </summary>
+    int MeasuredTabLength { get; set; }
 
     /// <summary>Gets or sets which side of the content border the tab header sits on.</summary>
     Side TabSide { get; set; }

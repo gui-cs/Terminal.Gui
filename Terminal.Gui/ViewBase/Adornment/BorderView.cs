@@ -179,7 +179,7 @@ public partial class BorderView : AdornmentView
         {
             BorderBounds = GetTabBorderBounds (border),
             TabOffset = border.TabOffset,
-            TabLength = border.TabLength,
+            TabLengthOverride = border.TabLength,
             HasFocus = IsFocusedOrLastTab (),
             LineStyle = border.LineStyle,
             Title = Adornment.Parent?.Title ?? string.Empty,
@@ -394,9 +394,11 @@ public partial class BorderView : AdornmentView
 
         int tabDepth = GetTabDepth (border);
 
-        if (border.TabLength is { })
+        int effectiveTabLength = border.EffectiveTabLength;
+
+        if (effectiveTabLength > 0)
         {
-            int tabLength = border.TabLength.Value;
+            int tabLength = effectiveTabLength;
             LineStyle lineStyle = border.LineStyle.Value;
             bool hasFocus = IsFocusedOrLastTab ();
 

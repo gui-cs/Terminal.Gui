@@ -138,23 +138,12 @@ public class Border : AdornmentImpl
 
     /// <summary>
     ///     Gets or sets the total length of the tab parallel to the border edge (including border cells).
-    ///     If <see langword="null"/> the length will be determined based on <see cref="View.Title"/>.
+    ///     If <see langword="null"/> the length will be determined from the <see cref="TitleView"/>'s laid-out frame.
     ///     Only used when <see cref="BorderSettings.Tab"/> is set.
     /// </summary>
     public int? TabLength
     {
-        get
-        {
-            if (field is { } || !Settings.HasFlag (BorderSettings.Tab))
-            {
-                return field;
-            }
-
-            int titleColumns = Settings.HasFlag (BorderSettings.Title) ? Parent?.TitleTextFormatter.FormatAndGetSize ().Width ?? 0 : 0;
-
-            // Two vertical border lines + title text width (2 when no title)
-            return titleColumns + 2;
-        }
+        get;
         set
         {
             if (field == value)
@@ -170,11 +159,48 @@ public class Border : AdornmentImpl
     /// <summary>
     ///     Gets offset along the border edge where the Tab ends (columns for Top/Bottom, rows for Left/Right).
     /// </summary>
+    /// <summary>
+    ///     Gets the effective tab length — either the explicit <see cref="TabLength"/> or
+    ///     the <see cref="ITitleView.MeasuredTabLength"/> from the laid-out TitleView.
+    /// </summary>
+    internal int EffectiveTabLength
+    {
+        get
+        {
+            if (TabLength is { } explicitLength)
+            {
+                return explicitLength;
+            }
+
+            if (View is BorderView { TitleView: ITitleView itv and View tv })
+            {
+                if (itv.MeasuredTabLength > 0)
+                {
+                    return itv.MeasuredTabLength;
+                }
+
+                // TitleView hasn't been laid out yet — set text and measure to get the auto-size.
+                tv.Text = Parent?.Title ?? string.Empty;
+                tv.SetRelativeLayout (new Size (int.MaxValue, int.MaxValue));
+
+                int measured = TabSide is Side.Top or Side.Bottom ? tv.Frame.Width : tv.Frame.Height;
+                itv.MeasuredTabLength = measured;
+
+                return measured;
+            }
+
+            return 0;
+        }
+    }
+
+    /// <summary>>
+    ///     Gets the column or row of the last cell of the tab.
+    /// </summary>
     public int TabEnd =>
         TabSide switch
         {
-            Side.Top or Side.Bottom => GetFrame ().X + TabOffset + (TabLength ?? 0),
-            Side.Left or Side.Right => GetFrame ().Y + TabOffset + (TabLength ?? 0),
+            Side.Top or Side.Bottom => GetFrame ().X + TabOffset + EffectiveTabLength,
+            Side.Left or Side.Right => GetFrame ().Y + TabOffset + EffectiveTabLength,
             _ => 0
         };
 }

@@ -81,11 +81,6 @@ public sealed class TitleView : View, ITitleView, IDesignable
 
         // Setup defaults
         BorderStyle = LineStyle.Rounded;
-
-        // TODO: Should not have to do this; Setting TabSide should trigger a
-        // TODO: update that applies the appropriate thickness based on the default depth. 
-        Border.Thickness = new Thickness (1, 1, 1, 0);
-
         TabSide = Side.Top;
     }
 
@@ -178,10 +173,38 @@ public sealed class TitleView : View, ITitleView, IDesignable
     #region ITitleView members
 
     /// <inheritdoc/>
-    public Side TabSide { get; set; }
+    public Side TabSide
+    {
+        get;
+        set
+        {
+            field = value;
+            ApplyThickness ();
+        }
+    }
+
+    private int _tabDepth = 3;
 
     /// <inheritdoc/>
-    public int TabDepth { get; set; } = 3;
+    public int TabDepth
+    {
+        get => _tabDepth;
+        set
+        {
+            _tabDepth = value;
+            ApplyThickness ();
+        }
+    }
+
+    /// <summary>
+    ///     Recomputes and applies <see cref="View.Border"/> thickness from
+    ///     <see cref="TabSide"/> and <see cref="TabDepth"/>.
+    /// </summary>
+    private void ApplyThickness () => Border.Thickness = ComputeTitleViewThickness (TabSide, TabDepth, hasFocus: true);
+
+    /// <inheritdoc/>
+    /// <inheritdoc/>
+    public int MeasuredTabLength { get; set; }
 
     /// <inheritdoc/>
     public void UpdateLayout (in TabLayoutContext context)
@@ -194,28 +217,9 @@ public sealed class TitleView : View, ITitleView, IDesignable
         }
 
         int tabDepth = TabDepth;
-
-        if (context.TabLength is null)
-        {
-            return;
-        }
-
-        int tabLength = context.TabLength.Value;
         bool hasFocus = context.HasFocus;
 
-        Rectangle headerRect = ComputeHeaderRect (context.BorderBounds, TabSide, context.TabOffset, tabLength, tabDepth);
-        Rectangle viewBounds = ComputeViewBounds (context.BorderBounds, TabSide, tabDepth);
-        Rectangle clipped = Rectangle.Intersect (headerRect, viewBounds);
-        bool tabVisible = !clipped.IsEmpty;
-
-        if (!tabVisible)
-        {
-            Visible = false;
-
-            return;
-        }
-
-        Visible = true;
+        // 1. Set text, style, and orientation FIRST so auto-sizing measures correctly.
         Text = context.Title;
 
         if (context.LineStyle is { } ls)
@@ -223,16 +227,8 @@ public sealed class TitleView : View, ITitleView, IDesignable
             BorderStyle = ls;
         }
 
-        // Configure the border thickness based on depth and focus
         Border.Thickness = ComputeTitleViewThickness (TabSide, tabDepth, hasFocus);
-
-        // Set orientation based on tab side
         Orientation = TabSide is Side.Left or Side.Right ? Orientation.Vertical : Orientation.Horizontal;
-
-        // Convert header rect from screen to BorderView viewport coords
-        Frame = headerRect with { X = headerRect.X - context.ScreenOrigin.X, Y = headerRect.Y - context.ScreenOrigin.Y };
-
-        // Compute padding for extra depth rows and focus-dependent adjustments
 
         Thickness padding = hasFocus && tabDepth > 2
                                 ? TabSide switch
@@ -246,6 +242,31 @@ public sealed class TitleView : View, ITitleView, IDesignable
                                 : new Thickness (0);
 
         Padding.Thickness = padding;
+
+        // 2. Auto-size via Dim.Auto to measure the natural tab header size.
+        SetRelativeLayout (context.BorderBounds.Size);
+
+        // 3. Use the explicit override if provided, otherwise use the auto-sized frame.
+        int tabLength = context.TabLengthOverride
+                        ?? (TabSide is Side.Top or Side.Bottom ? Frame.Width : Frame.Height);
+
+        MeasuredTabLength = tabLength;
+
+        Rectangle headerRect = ComputeHeaderRect (context.BorderBounds, TabSide, context.TabOffset, tabLength, tabDepth);
+        Rectangle viewBounds = ComputeViewBounds (context.BorderBounds, TabSide, tabDepth);
+        Rectangle clipped = Rectangle.Intersect (headerRect, viewBounds);
+
+        if (clipped.IsEmpty)
+        {
+            Visible = false;
+
+            return;
+        }
+
+        Visible = true;
+
+        // 4. Position the frame using the computed header rect, converted to BorderView viewport coords.
+        Frame = headerRect with { X = headerRect.X - context.ScreenOrigin.X, Y = headerRect.Y - context.ScreenOrigin.Y };
     }
 
     #endregion

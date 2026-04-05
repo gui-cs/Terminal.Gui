@@ -215,8 +215,6 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    null,
                                    false);
 
-        Assert.Equal (2, view.Border.TabLength!.Value);
-
         DrawAndAssert (view,
                        driver,
                        """
@@ -248,8 +246,6 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    false,
                                    "T_ab",
                                    true);
-
-        Assert.Equal (5, view.Border.TabLength!.Value);
 
         DrawAndAssert (view,
                        driver,
@@ -461,8 +457,6 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    null,
                                    false);
 
-        Assert.Equal (2, view.Border.TabLength!.Value);
-
         DrawAndAssert (view,
                        driver,
                        """
@@ -497,8 +491,6 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    false,
                                    "T_ab",
                                    true);
-
-        Assert.Equal (5, view.Border.TabLength!.Value);
 
         DrawAndAssert (view,
                        driver,
@@ -687,8 +679,6 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    null,
                                    false);
 
-        Assert.Equal (2, view.Border.TabLength!.Value);
-
         DrawAndAssert (view,
                        driver,
                        """
@@ -723,8 +713,6 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    false,
                                    "T_ab",
                                    true);
-
-        Assert.Equal (5, view.Border.TabLength!.Value);
 
         DrawAndAssert (view,
                        driver,
@@ -2161,8 +2149,6 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    null,
                                    false);
 
-        Assert.Equal (2, view.Border.TabLength!.Value);
-
         DrawAndAssert (view,
                        driver,
                        """
@@ -2222,8 +2208,6 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    false,
                                    "T_ab",
                                    true);
-
-        Assert.Equal (5, view.Border.TabLength!.Value);
 
         DrawAndAssert (view,
                        driver,
@@ -2342,8 +2326,6 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    false,
                                    "X",
                                    true);
-
-        Assert.Equal (3, view.Border.TabLength!.Value);
 
         DrawAndAssert (view,
                        driver,

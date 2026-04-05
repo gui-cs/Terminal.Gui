@@ -656,12 +656,12 @@ public class Tabs : View, IValue<View?>, IDesignable
         {
             tab.Border.TabOffset = offset - ScrollOffset;
 
-            int? tabLength = tab.Border.TabLength;
+            int tabLength = tab.Border.EffectiveTabLength;
 
-            if (tabLength is { })
+            if (tabLength > 0)
             {
                 // Subtract 1 because adjacent tabs share an edge
-                offset += tabLength.Value - 1;
+                offset += tabLength - 1;
             }
         }
 
@@ -679,12 +679,12 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         foreach (View tab in TabCollection)
         {
-            int? tabLength = tab.Border.TabLength;
+            int tabLength = tab.Border.EffectiveTabLength;
 
-            if (tabLength is { })
+            if (tabLength > 0)
             {
                 // Subtract 1 because adjacent tabs share an edge
-                span += tabLength.Value - 1;
+                span += tabLength - 1;
             }
         }
 
@@ -942,9 +942,9 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
 
         // Compute the absolute (unscrolled) offset for this tab
-        int absOffset = TabCollection.TakeWhile (t => t != tab).Sum (t => (t.Border.TabLength ?? 0) - 1);
+        int absOffset = TabCollection.TakeWhile (t => t != tab).Sum (t => t.Border.EffectiveTabLength - 1);
 
-        int tabLength = tab.Border.TabLength ?? 0;
+        int tabLength = tab.Border.EffectiveTabLength;
         int tabEnd = absOffset + tabLength;
 
         if (absOffset < ScrollOffset)

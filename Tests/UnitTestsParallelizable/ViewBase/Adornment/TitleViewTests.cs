@@ -232,6 +232,84 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void Constructor_DefaultTabSide_IsTop ()
+    {
+        TitleView tv = new ();
+
+        Assert.Equal (Side.Top, tv.TabSide);
+
+        tv.Dispose ();
+    }
+
+    [Fact]
+    public void Constructor_DefaultBorderStyle_IsRounded ()
+    {
+        TitleView tv = new ();
+
+        Assert.Equal (LineStyle.Rounded, tv.BorderStyle);
+
+        tv.Dispose ();
+    }
+
+    [Fact]
+    public void Constructor_DefaultThickness_MatchesTopFocused ()
+    {
+        TitleView tv = new ();
+
+        // Default: Side.Top, depth 3, focused → (1, 1, 1, 0)
+        Assert.Equal (new Thickness (1, 1, 1, 0), tv.Border.Thickness);
+
+        tv.Dispose ();
+    }
+
+    [Theory]
+    [InlineData (Side.Top, 3, 1, 1, 1, 0)]
+    [InlineData (Side.Bottom, 3, 1, 0, 1, 1)]
+    [InlineData (Side.Left, 3, 1, 1, 0, 1)]
+    [InlineData (Side.Right, 3, 0, 1, 1, 1)]
+    [InlineData (Side.Top, 2, 1, 1, 1, 0)]
+    [InlineData (Side.Top, 1, 1, 0, 1, 0)]
+    public void TabSide_Set_AppliesThickness (Side side, int depth, int expectedLeft, int expectedTop, int expectedRight, int expectedBottom)
+    {
+        TitleView tv = new () { TabDepth = depth, TabSide = side };
+
+        Assert.Equal (new Thickness (expectedLeft, expectedTop, expectedRight, expectedBottom), tv.Border.Thickness);
+
+        tv.Dispose ();
+    }
+
+    [Fact]
+    public void TabDepth_Set_AppliesThickness ()
+    {
+        TitleView tv = new () { TabSide = Side.Top };
+
+        // Default depth 3 top focused → (1, 1, 1, 0)
+        Assert.Equal (new Thickness (1, 1, 1, 0), tv.Border.Thickness);
+
+        tv.TabDepth = 1;
+
+        // Depth 1 top: cap=0, contentSide=0 → (1, 0, 1, 0)
+        Assert.Equal (new Thickness (1, 0, 1, 0), tv.Border.Thickness);
+
+        tv.Dispose ();
+    }
+
+    [Fact]
+    public void TabSide_Change_UpdatesThickness ()
+    {
+        TitleView tv = new () { TabSide = Side.Top };
+
+        Assert.Equal (new Thickness (1, 1, 1, 0), tv.Border.Thickness);
+
+        tv.TabSide = Side.Left;
+
+        // Left, depth 3, focused → (1, 1, 0, 1)
+        Assert.Equal (new Thickness (1, 1, 0, 1), tv.Border.Thickness);
+
+        tv.Dispose ();
+    }
+
+    [Fact]
     public void Implements_ITitleView ()
     {
         TitleView tv = new ();
@@ -254,38 +332,13 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         {
             BorderBounds = Rectangle.Empty,
             TabOffset = 0,
-            TabLength = 6,
+
             HasFocus = true,
             LineStyle = LineStyle.Rounded,
             Title = "Tab",
             ScreenOrigin = Point.Empty
         });
 
-        Assert.False (tv.Visible);
-
-        tv.Dispose ();
-    }
-
-    [Fact]
-    public void UpdateLayout_DoesNotSetVisible_WhenTabLengthNull ()
-    {
-        TitleView tv = new () { TabSide = Side.Top, TabDepth = 3 };
-
-        // Pre-set Visible to false so we can verify UpdateLayout doesn't change it
-        tv.Visible = false;
-
-        tv.UpdateLayout (new TabLayoutContext
-        {
-            BorderBounds = new Rectangle (0, 2, 10, 5),
-            TabOffset = 0,
-            TabLength = null,
-            HasFocus = true,
-            LineStyle = LineStyle.Rounded,
-            Title = "Tab",
-            ScreenOrigin = Point.Empty
-        });
-
-        // TabLength null → early return, Visible unchanged
         Assert.False (tv.Visible);
 
         tv.Dispose ();
@@ -300,7 +353,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         {
             BorderBounds = new Rectangle (0, 2, 10, 5),
             TabOffset = 0,
-            TabLength = 6,
+
             HasFocus = true,
             LineStyle = LineStyle.Rounded,
             Title = "MyTab",
@@ -321,7 +374,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         {
             BorderBounds = new Rectangle (0, 2, 10, 5),
             TabOffset = 0,
-            TabLength = 6,
+
             HasFocus = true,
             LineStyle = LineStyle.Rounded,
             Title = "Tab",
@@ -342,7 +395,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         {
             BorderBounds = new Rectangle (2, 0, 5, 10),
             TabOffset = 0,
-            TabLength = 6,
+
             HasFocus = true,
             LineStyle = LineStyle.Rounded,
             Title = "Tab",
@@ -363,7 +416,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         {
             BorderBounds = new Rectangle (0, 2, 10, 5),
             TabOffset = 0,
-            TabLength = 6,
+
             HasFocus = true,
             LineStyle = LineStyle.Rounded,
             Title = "Tab",
@@ -385,7 +438,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         {
             BorderBounds = new Rectangle (0, 2, 10, 5),
             TabOffset = 0,
-            TabLength = 6,
+
             HasFocus = false,
             LineStyle = LineStyle.Rounded,
             Title = "Tab",
@@ -407,7 +460,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         {
             BorderBounds = new Rectangle (0, 2, 10, 5),
             TabOffset = 0,
-            TabLength = 6,
+
             HasFocus = true,
             LineStyle = LineStyle.Double,
             Title = "Tab",
@@ -428,7 +481,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         {
             BorderBounds = new Rectangle (0, 2, 10, 5),
             TabOffset = 0,
-            TabLength = 6,
+
             HasFocus = true,
             LineStyle = LineStyle.Rounded,
             Title = "Tab",
@@ -589,7 +642,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         {
             BorderBounds = new Rectangle (0, 2, 10, 5),
             TabOffset = 0,
-            TabLength = 5,
+
             HasFocus = true,
             LineStyle = LineStyle.Rounded,
             Title = "Tab",
@@ -625,7 +678,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         {
             BorderBounds = new Rectangle (0, 2, 10, 5),
             TabOffset = 0,
-            TabLength = 5,
+
             HasFocus = false,
             LineStyle = LineStyle.Rounded,
             Title = "Tab",
@@ -661,7 +714,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         {
             BorderBounds = new Rectangle (0, 4, 10, 3),
             TabOffset = 0,
-            TabLength = 5,
+
             HasFocus = true,
             LineStyle = LineStyle.Rounded,
             Title = "Tab",
@@ -706,7 +759,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         {
             BorderBounds = new Rectangle (2, 0, 8, 7),
             TabOffset = 0,
-            TabLength = 5,
+
             HasFocus = true,
             LineStyle = LineStyle.Rounded,
             Title = "Tab",
@@ -731,80 +784,6 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void UpdateLayout_CenteredText_DrawsCorrectly ()
-    {
-        IDriver driver = CreateTestDriver (10, 5);
-
-        View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
-
-        TitleView titleView = new () { TabSide = Side.Top, TabDepth = 3 };
-
-        superView.Add (titleView);
-
-        // TabLength wider than title text — text should center
-        titleView.UpdateLayout (new TabLayoutContext
-        {
-            BorderBounds = new Rectangle (0, 2, 10, 3),
-            TabOffset = 0,
-            TabLength = 7,
-            HasFocus = true,
-            LineStyle = LineStyle.Rounded,
-            Title = "A",
-            ScreenOrigin = Point.Empty
-        });
-
-        superView.Layout ();
-        superView.Draw ();
-
-        DriverAssert.AssertDriverContentsAre ("""
-                                              ╭─────╮
-                                              │  A  │
-                                              │     │
-                                              """,
-                                              output,
-                                              driver);
-
-        superView.Dispose ();
-    }
-
-    [Fact]
-    public void UpdateLayout_CenteredText_With_HotKey_DrawsCorrectly ()
-    {
-        IDriver driver = CreateTestDriver (10, 5);
-
-        View superView = new () { Driver = driver, CanFocus = true, Width = Dim.Fill (), Height = Dim.Fill () };
-
-        TitleView titleView = new () { TabSide = Side.Top, TabDepth = 3 };
-
-        superView.Add (titleView);
-
-        // TabLength wider than title text — text should center
-        titleView.UpdateLayout (new TabLayoutContext
-        {
-            BorderBounds = new Rectangle (0, 2, 10, 3),
-            TabOffset = 0,
-            TabLength = 7,
-            HasFocus = true,
-            LineStyle = LineStyle.Rounded,
-            Title = "_A",
-            ScreenOrigin = Point.Empty
-        });
-
-        superView.Layout ();
-        superView.Draw ();
-
-        DriverAssert.AssertDriverContentsAre ("""
-                                              ╭─────╮
-                                              │  A  │
-                                              │     │
-                                              """,
-                                              output,
-                                              driver);
-
-        superView.Dispose ();
-    }
-
-    [Fact]
     public void UpdateLayout_HiddenWhenClippedOffscreen ()
     {
         TitleView titleView = new () { TabSide = Side.Top, TabDepth = 3 };
@@ -814,7 +793,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         {
             BorderBounds = new Rectangle (0, 2, 10, 5),
             TabOffset = 20,
-            TabLength = 5,
+
             HasFocus = true,
             LineStyle = LineStyle.Rounded,
             Title = "Tab",
