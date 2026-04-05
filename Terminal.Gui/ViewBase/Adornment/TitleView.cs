@@ -44,7 +44,7 @@ public sealed class TitleView : View, ITitleView, IDesignable
         //AddCommand (Command.Right, () => false);
 
         AddCommand (Command.Activate,
-                    ctx =>
+                    _ =>
                     {
                         SetFocus ();
 
@@ -52,7 +52,7 @@ public sealed class TitleView : View, ITitleView, IDesignable
                     });
 
         AddCommand (Command.HotKey,
-                    ctx =>
+                    _ =>
                     {
                         SetFocus ();
 
@@ -165,6 +165,9 @@ public sealed class TitleView : View, ITitleView, IDesignable
         // Update TextFormatter direction to match the new orientation
         TextFormatter.Direction = newOrientation == Orientation.Vertical ? TextDirection.TopBottom_LeftRight : TextDirection.LeftRight_TopBottom;
 
+        // Ensure GetAutoWidth/GetAutoHeight will recalculate based on the new orientation.
+        TextFormatter.ConstrainToSize = null;
+
         SetupKeyBindings ();
     }
 
@@ -179,6 +182,7 @@ public sealed class TitleView : View, ITitleView, IDesignable
         set
         {
             field = value;
+            MeasuredTabLength = 0;
             ApplyThickness ();
         }
     }
@@ -200,7 +204,7 @@ public sealed class TitleView : View, ITitleView, IDesignable
     ///     Recomputes and applies <see cref="View.Border"/> thickness from
     ///     <see cref="TabSide"/> and <see cref="TabDepth"/>.
     /// </summary>
-    private void ApplyThickness () => Border.Thickness = ComputeTitleViewThickness (TabSide, TabDepth, hasFocus: true);
+    private void ApplyThickness () => Border.Thickness = ComputeTitleViewThickness (TabSide, TabDepth, true);
 
     /// <inheritdoc/>
     /// <inheritdoc/>
@@ -243,13 +247,13 @@ public sealed class TitleView : View, ITitleView, IDesignable
 
         Padding.Thickness = padding;
 
-        // 2. Measure the natural tab header size via Dim.Auto.
-        //    Use GetAutoWidth for horizontal tabs and GetAutoHeight for vertical.
-        //    Note: GetAutoHeight doesn't account for vertical TextFormatter.Direction,
-        //    so we use GetAutoWidth for vertical too (it measures the text's "length" dimension).
-        // 3. Use the explicit override if provided, otherwise use the auto-sized measurement.
-        int tabLength = context.TabLengthOverride
-                        ?? (TabSide is Side.Top or Side.Bottom ? GetAutoWidth () : GetAutoHeight ());
+        // 2. Clear stale TextFormatter constraints so GetAutoWidth/GetAutoHeight
+        //    recalculate fresh (orientation may have changed since last layout).
+        TextFormatter.ConstrainToSize = null;
+
+        // 3. Measure the natural tab header size via Dim.Auto.
+        //    Use the explicit override if provided, otherwise auto-size.
+        int tabLength = context.TabLengthOverride ?? (TabSide is Side.Top or Side.Bottom ? GetAutoWidth () : GetAutoHeight ());
 
         MeasuredTabLength = tabLength;
 

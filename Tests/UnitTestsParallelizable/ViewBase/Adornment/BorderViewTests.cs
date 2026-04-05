@@ -2176,7 +2176,6 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                    "T_a\nb",
                                    true);
 
-
         DrawAndAssert (view,
                        driver,
                        """
@@ -2557,6 +2556,208 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         return view;
     }
+
+    // ────────────────────────────────────────────────────────────────────
+    //  TabSide switching — EffectiveTabLength must recalculate when
+    //  the tab side changes from horizontal to vertical or vice versa.
+    // ────────────────────────────────────────────────────────────────────
+
+    // Claude - Opus 4.6
+    [Fact]
+    public void TabSide_TopToLeft_EffectiveTabLength_Recalculates ()
+    {
+        IDriver driver = CreateTestDriver (12, 9);
+
+        View view = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = 12,
+            Height = 9,
+            BorderStyle = LineStyle.Rounded,
+            Title = "T_ab"
+        };
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Layout ();
+
+        // Top: "Tab" = 3 cols + 2 border = 5 (width)
+        Assert.Equal (5, view.Border.EffectiveTabLength);
+
+        // Switch to Left — tab length should now be height-based
+        view.Border.TabSide = Side.Left;
+        view.Border.Thickness = new Thickness (3, 1, 1, 1);
+        view.Layout ();
+
+        // Left: "Tab" vertical = 3 rows + 2 border = 5 (height)
+        Assert.Equal (5, view.Border.EffectiveTabLength);
+
+        view.Dispose ();
+    }
+
+    [Fact]
+    public void TabSide_TopToLeft_Renders_Correctly ()
+    {
+        IDriver driver = CreateTestDriver (12, 9);
+
+        View view = CreateTabView (driver,
+                                   12,
+                                   9,
+                                   Side.Top,
+                                   0,
+                                   null,
+                                   true,
+                                   "T_ab",
+                                   true);
+
+        // First render as Top
+        view.Layout ();
+        view.Draw ();
+
+        // Verify top rendering is correct
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭───╮
+                                              │Tab│
+                                              │   ╰──────╮
+                                              │          │
+                                              │          │
+                                              │          │
+                                              │          │
+                                              │          │
+                                              ╰──────────╯
+                                              """,
+                                              output,
+                                              driver);
+
+        // Switch to Left
+        view.Border.TabSide = Side.Left;
+        view.Border.Thickness = new Thickness (3, 1, 1, 1);
+
+        driver.ClearContents ();
+        view.Layout ();
+        view.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╭──────────╮
+                                              │T         │
+                                              │a         │
+                                              │b         │
+                                              ╰─╮        │
+                                                │        │
+                                                │        │
+                                                │        │
+                                                ╰────────╯
+                                              """,
+                                              output,
+                                              driver);
+
+        view.Dispose ();
+    }
+
+    [Fact]
+    public void TabSide_LeftToTop_EffectiveTabLength_Recalculates ()
+    {
+        IDriver driver = CreateTestDriver (12, 9);
+
+        View view = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = 12,
+            Height = 9,
+            BorderStyle = LineStyle.Rounded,
+            Title = "T_ab"
+        };
+
+        view.Border.Thickness = new Thickness (3, 1, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Left;
+        view.Layout ();
+
+        // Left: "Tab" vertical = 3 rows + 2 border = 5 (height)
+        Assert.Equal (5, view.Border.EffectiveTabLength);
+
+        // Switch to Top
+        view.Border.TabSide = Side.Top;
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Layout ();
+
+        // Top: "Tab" = 3 cols + 2 border = 5 (width)
+        Assert.Equal (5, view.Border.EffectiveTabLength);
+
+        view.Dispose ();
+    }
+
+    [Fact]
+    public void TabSide_TopToBottom_EffectiveTabLength_Unchanged ()
+    {
+        IDriver driver = CreateTestDriver (12, 9);
+
+        View view = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = 12,
+            Height = 9,
+            BorderStyle = LineStyle.Rounded,
+            Title = "T_ab"
+        };
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Layout ();
+
+        int topLength = view.Border.EffectiveTabLength;
+
+        // Switch to Bottom — still horizontal, length should be the same
+        view.Border.TabSide = Side.Bottom;
+        view.Border.Thickness = new Thickness (1, 1, 1, 3);
+        view.Layout ();
+
+        Assert.Equal (topLength, view.Border.EffectiveTabLength);
+
+        view.Dispose ();
+    }
+
+    [Fact]
+    public void TabSide_TopToRight_EffectiveTabLength_Recalculates ()
+    {
+        IDriver driver = CreateTestDriver (12, 9);
+
+        View view = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = 12,
+            Height = 9,
+            BorderStyle = LineStyle.Rounded,
+            Title = "T_ab"
+        };
+
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        view.Border.TabSide = Side.Top;
+        view.Layout ();
+
+        Assert.Equal (5, view.Border.EffectiveTabLength);
+
+        // Switch to Right
+        view.Border.TabSide = Side.Right;
+        view.Border.Thickness = new Thickness (1, 1, 3, 1);
+        view.Layout ();
+
+        // Right: "Tab" vertical = 3 rows + 2 border = 5 (height)
+        Assert.Equal (5, view.Border.EffectiveTabLength);
+
+        view.Dispose ();
+    }
+
+    // ────────────────────────────────────────────────────────────────────
+    //  Helpers
+    // ────────────────────────────────────────────────────────────────────
 
     private void DrawAndAssert (View view, IDriver driver, string expected)
     {

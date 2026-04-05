@@ -182,6 +182,7 @@ public class Border : AdornmentImpl
                 // TitleView hasn't been laid out yet — set text and orientation, then measure.
                 tv.Text = Parent?.Title ?? string.Empty;
                 itv.Orientation = TabSide is Side.Left or Side.Right ? Orientation.Vertical : Orientation.Horizontal;
+
                 int measured = TabSide is Side.Top or Side.Bottom ? tv.GetAutoWidth () : tv.GetAutoHeight ();
                 itv.MeasuredTabLength = measured;
 
