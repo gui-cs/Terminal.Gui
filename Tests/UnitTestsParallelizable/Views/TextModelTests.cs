@@ -706,6 +706,37 @@ public class TextModelTests (ITestOutputHelper output)
     #region Static Utility Methods
 
     [Fact]
+    public void CalculateLeftColumn_WrongParameters_ReturnsDefaults ()
+    {
+        List<Cell> cells = Cell.StringToCells ("hello world test");
+
+        // Negative start index is treated as 0
+        int result = TextModel.CalculateLeftColumn (cells, -1, 1, 10);
+        Assert.Equal (0, result);
+
+        // Start index greater than end or greater than list count is ignored
+        result = TextModel.CalculateLeftColumn (cells, 20, 1, 10);
+        Assert.Equal (0, result);
+
+        // Negative end index should return 0
+        result = TextModel.CalculateLeftColumn (cells, 0, -1, 10);
+        Assert.Equal (0, result);
+
+        // End index greater than list count should be treated as list.Count
+        result = TextModel.CalculateLeftColumn (cells, 0, 20, 10);
+        Assert.Equal (7, result);
+
+        // Negative width should be treated as 0 (no viewport) and return until end glyphs width + 1
+        result = TextModel.CalculateLeftColumn (cells, 0, 1, -1);
+        Assert.Equal (2, result);
+
+        // Negative tabWidth is treated as 0
+        cells = Cell.StringToCells ("hello world test\t");
+        result = TextModel.CalculateLeftColumn (cells, 0, 17, 10, -1);
+        Assert.Equal (7, result);
+    }
+
+    [Fact]
     public void CalculateLeftColumn_ReturnsCorrectColumn ()
     {
         List<Cell> cells = Cell.StringToCells ("hello world test");
@@ -734,6 +765,198 @@ public class TextModelTests (ITestOutputHelper output)
         int result = TextModel.CalculateLeftColumn (cells, 0, 11, 10, 4);
 
         Assert.True (result >= 0);
+    }
+
+    [Fact]
+    public void CalculateLeftColumn_NarrowText_ReturnsCorrectColumn ()
+    {
+        // Setup: "hello world test"
+        var text = "hello world test";
+        List<string> list = [];
+
+        foreach (string s in GraphemeHelper.GetGraphemes (text))
+        {
+            list.Add (s);
+        }
+        var width = 10;
+        var leftColumn = 0;
+
+        // 1. FORWARD NAVIGATION (Right)
+        for (var i = 0; i <= list.Count; i++)
+        {
+            leftColumn = TextModel.CalculateLeftColumn (list, leftColumn, i, width);
+            int cursorCol = TextModel.CursorColumn (list, i, 0, out List<int> glyphWidths, out List<int> excludedGlyphWidths);
+            Assert.Equal (i, glyphWidths.Count);
+            Assert.Equal (list.Count - i, excludedGlyphWidths.Count);
+
+            // ASSERT: Cursor must never be hidden to the right
+            // The cursor column must fit within [leftColumn, leftColumn + width]
+            Assert.True (cursorCol <= leftColumn + width, $"Forward: Cursor at {cursorCol} hidden with scroll {leftColumn}");
+        }
+
+        // 2. BACKWARD NAVIGATION (Left)
+        for (int i = list.Count; i >= 0; i--)
+        {
+            int oldLeft = leftColumn;
+            leftColumn = TextModel.CalculateLeftColumn (list, leftColumn, i, width);
+            int cursorCol = TextModel.CursorColumn (list, i, 0, out List<int> glyphWidths, out List<int> excludedGlyphWidths);
+            Assert.Equal (i, glyphWidths.Count);
+            Assert.Equal (list.Count - i, excludedGlyphWidths.Count);
+
+            // ASSERT: If we are not at the start, the previous glyph must be visible (at least 1 col before cursor)
+            if (i > 0 && i == oldLeft)
+            {
+                // When we hit the left boundary (end == start), 
+                // the scroll must decrease to show the previous glyph
+                Assert.True (leftColumn < oldLeft, $"Backward: Scroll failed to retreat at index {i}");
+            }
+
+            Assert.True (cursorCol >= leftColumn, $"Backward: Cursor at {cursorCol} hidden to the left of {leftColumn}");
+        }
+
+        Assert.Equal (0, leftColumn); // Must return to origin
+    }
+
+    [Fact]
+    public void CalculateLeftColumn_MixedText_ReturnsCorrectColumn ()
+    {
+        // Setup: "🍎" (2 cols), "👨‍👩‍👧" (2 cols)
+        var text = "hello 🍎 world 👨‍👩‍👧 test";
+        List<string> list = [];
+
+        foreach (string s in GraphemeHelper.GetGraphemes (text))
+        {
+            list.Add (s);
+        }
+        var width = 10;
+        var leftColumn = 0;
+        List<int> glyphWidths;
+        List<int> excludedGlyphWidths;
+
+        // 1. FORWARD NAVIGATION
+        for (var i = 0; i <= list.Count; i++)
+        {
+            leftColumn = TextModel.CalculateLeftColumn (list, leftColumn, i, width);
+            int cursorCol = TextModel.CursorColumn (list, i, 0, out glyphWidths, out excludedGlyphWidths);
+            Assert.Equal (i, glyphWidths.Count);
+            Assert.Equal (list.Count - i, excludedGlyphWidths.Count);
+
+            // ASSERT: Viewport must contain the cursor
+            Assert.True (cursorCol <= leftColumn + width, $"Forward: Wide glyph at {i} pushed cursor to {cursorCol} out of view");
+        }
+
+        // 2. CHECK END KEY (Direct Jump)
+        // Ensure that jumping to the end doesn't create 2 spaces with wide glyphs
+        int endLeft = TextModel.CalculateLeftColumn (list, 0, list.Count, width);
+        int finalCursorCol = TextModel.CursorColumn (list, list.Count, 0, out glyphWidths, out excludedGlyphWidths);
+        Assert.Equal (list.Count, glyphWidths.Count);
+        Assert.Empty (excludedGlyphWidths);
+
+        int startWidth = TextModel.GetColumnWidthsBeforeStart (glyphWidths, endLeft, out int clipOffset, out int startIndex);
+        int startOffset = startWidth - startIndex;
+
+        Assert.Equal (endLeft, startWidth);
+        Assert.Equal (0, clipOffset);
+
+        // Final column (cursor) should be at the very edge of the viewport
+        Assert.Equal (finalCursorCol - width + startOffset, endLeft);
+
+        // 3. BACKWARD NAVIGATION
+        for (int i = list.Count; i >= 0; i--)
+        {
+            int oldLeft = leftColumn;
+            leftColumn = TextModel.CalculateLeftColumn (list, leftColumn, i, width);
+            int cursorCol = TextModel.CursorColumn (list, i, 0, out glyphWidths, out excludedGlyphWidths);
+            Assert.Equal (i, glyphWidths.Count);
+            Assert.Equal (list.Count - i, excludedGlyphWidths.Count);
+
+            // ASSERT: If cursor hits the scroll start (location 0), scroll must decrease to show previous glyph
+            if (i > 0 && i == oldLeft && oldLeft > 0)
+            {
+                Assert.True (leftColumn < oldLeft, $"Backward: Scroll failed to retreat at index {i}");
+            }
+
+            Assert.True (cursorCol >= leftColumn, $"Backward: Cursor at {cursorCol} hidden to the left of {leftColumn}");
+        }
+
+        Assert.Equal (0, leftColumn);
+    }
+
+    [Fact]
+    public void CalculateLeftColumn_Tab_ReturnsCorrectColumn ()
+    {
+        // Setup: "hello\tworld" 
+        // Visual columns: h(0), e(1), l(2), l(3), o(4), \t(switches to 8), w(8), o(9), r(10), l(11), d(12)
+        var text = "hello\\tworld";
+        List<string> list = [];
+
+        foreach (string s in GraphemeHelper.GetGraphemes (text))
+        {
+            list.Add (s);
+        }
+        int width = 10;
+        int leftColumn = 0;
+        int tabWidth = 4;
+
+        // 1. FORWARD NAVIGATION (Right)
+        // Testing how the scroll reacts to a sudden jump in visual columns caused by \t
+        for (int i = 0; i <= list.Count; i++)
+        {
+            leftColumn = TextModel.CalculateLeftColumn (list, leftColumn, i, width, tabWidth);
+            int cursorCol = TextModel.CursorColumn (list, i, tabWidth, out List<int> glyphWidths, out List<int> excludedGlyphWidths);
+            Assert.Equal (i, glyphWidths.Count);
+            Assert.Equal (list.Count - i, excludedGlyphWidths.Count);
+
+            // ASSERT: Cursor must be within the viewport bounds [leftColumn, leftColumn + width]
+            // Even during the tab jump, the cursor must remain visible.
+            Assert.True (cursorCol <= leftColumn + width, $"Forward: Tab jump at index {i} pushed cursor to {cursorCol} out of view");
+        }
+
+        // 2. BACKWARD NAVIGATION (Left)
+        // Testing the 'end == start' rule when retreating over a Tab (4 columns wide)
+        for (int i = list.Count; i >= 0; i--)
+        {
+            int oldLeft = leftColumn;
+            leftColumn = TextModel.CalculateLeftColumn (list, leftColumn, i, width, tabWidth);
+            int cursorCol = TextModel.CursorColumn (list, i, 0, out List<int> glyphWidths, out List<int> excludedGlyphWidths);
+            Assert.Equal (i, glyphWidths.Count);
+            Assert.Equal (list.Count - i, excludedGlyphWidths.Count);
+
+            // ASSERT: When retreating over a Tab at the scroll boundary, it must jump back 4 columns
+            if (i > 0 && i == oldLeft && oldLeft > 0)
+            {
+                Assert.True (leftColumn < oldLeft, $"Backward: Scroll failed to retreat over Tab at index {i}");
+            }
+
+            Assert.True (cursorCol >= leftColumn, $"Backward: Cursor at {cursorCol} hidden to the left of {leftColumn}");
+        }
+
+        // Final check: Scroll must return to 0 at the start of the line
+        Assert.Equal (0, leftColumn);
+    }
+
+    [Fact]
+    public void GetColumnWidthsBeforeStart_Returns_ClipOffset_If_Start_At_Middle_OfWideGlyph ()
+    {
+        var text = "👨‍👩‍👧‍👦hello 🍎 world 👨‍👩‍👧 test";
+        var width = 10;
+        var leftColumn = 1;
+        List<string> list = [];
+
+        foreach (string s in GraphemeHelper.GetGraphemes (text))
+        {
+            list.Add (s);
+        }
+
+        int finalCursorCol = TextModel.CursorColumn (list, width, 0, out List<int> glyphWidths, out List<int> excludedGlyphWidths);
+        int startWidth = TextModel.GetColumnWidthsBeforeStart (glyphWidths, leftColumn, out int clipOffset, out int startIndex);
+        int wideGlyphsCount = glyphWidths.Sum (s => s > 1 ? 1 : 0);
+
+        Assert.Equal (glyphWidths.Count + wideGlyphsCount, finalCursorCol);
+        Assert.Equal (leftColumn + clipOffset, startIndex);
+        Assert.Equal (startIndex, startWidth);
+        Assert.Equal (-1, clipOffset);
+        Assert.Equal (list.Count - glyphWidths.Count, excludedGlyphWidths.Count);
     }
 
     [Fact]

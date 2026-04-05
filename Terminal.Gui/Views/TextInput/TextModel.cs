@@ -70,12 +70,11 @@ internal class TextModel
         for (int i = first; i < last; i++)
         {
             List<Cell> line = GetLine (i);
-            int tabSum = line.Sum (c => c.Grapheme == "\t" ? Math.Max (tabWidth - 1, 0) : 0);
-            int l = line.Count + tabSum;
+            int colsWidth = CursorColumn (CellsToStringList (line), line.Count, tabWidth, out _, out _);
 
-            if (l > maxLength)
+            if (colsWidth > maxLength)
             {
-                maxLength = l;
+                maxLength = colsWidth;
             }
         }
 
@@ -519,6 +518,13 @@ internal class TextModel
 
     internal static int CalculateLeftColumn (List<Cell> t, int start, int end, int width, int tabWidth = 0)
     {
+        List<string> strings = CellsToStringList (t);
+
+        return CalculateLeftColumn (strings, start, end, width, tabWidth);
+    }
+
+    internal static List<string> CellsToStringList (List<Cell> t)
+    {
         List<string> strings = [];
 
         foreach (Cell cell in t)
@@ -526,7 +532,7 @@ internal class TextModel
             strings.Add (cell.Grapheme);
         }
 
-        return CalculateLeftColumn (strings, start, end, width, tabWidth);
+        return strings;
     }
 
     // Returns the left column in a range of the string.
@@ -537,39 +543,164 @@ internal class TextModel
             return 0;
         }
 
-        var size = 0;
-        int tCount = end > t.Count - 1 ? t.Count - 1 : end;
-        var col = 0;
+        // 1. Calculate absolute cursor position and store each glyph width
+        int cursorColumn = CursorColumn (t, end, tabWidth, out List<int> glyphWidths, out List<int> excludedGlyphWidths);
+        int startWidth = GetColumnWidthsBeforeStart (glyphWidths, Math.Max (start, 0), out _, out int startIndex);
 
-        for (int i = tCount; i >= 0; i--)
+        // 2. LEFT NAVIGATION (Location 0 jump)
+        if (Math.Min (end, t.Count) > 0 && (Math.Min (end, t.Count) <= startIndex || Math.Max (width, 0) > t.Count))
         {
-            string text = t [i];
-            size += text.GetColumns (false);
+            int maxGlyphWith = MaxGlyphWith (Math.Max (startIndex - 1, 0), -1);
 
-            if (text == "\t")
+            if (cursorColumn - 1 > Math.Max (start, 0) - maxGlyphWith)
             {
-                size += tabWidth + 1;
+                return Math.Max (Math.Max (start, 0) - maxGlyphWith, 0);
             }
 
-            if (size > width)
-            {
-                if (col + width == end)
-                {
-                    col++;
-                }
-
-                break;
-            }
-
-            if ((end < t.Count && col > 0 && start < end && col == start) || end - col == width - 1)
-            {
-                break;
-            }
-
-            col = i;
+            return Math.Max (cursorColumn - 1, 0);
         }
 
-        return col;
+        // 3. RIGHT NAVIGATION / END KEY
+        if (cursorColumn >= Math.Max (start, 0) + Math.Max (width, 0)
+            || cursorColumn - Math.Max (width, 0) >= 0
+            || cursorColumn < Math.Max (start, 0) + Math.Max (width, 0))
+        {
+            // Standard right-line navigation
+            int startCol = cursorColumn - Math.Max (width, 0);
+
+            if (startCol < 0)
+            {
+                return 0;
+            }
+
+            startWidth = GetColumnWidthsBeforeStart (glyphWidths, startCol, out int clipOffset, out startIndex);
+            int maxGlyphWith = MaxGlyphWith (startIndex - clipOffset, 1);
+
+            if (cursorColumn + maxGlyphWith < startCol + Math.Max (width, 0))
+            {
+                return startCol;
+            }
+
+            if (cursorColumn + 1 <= Math.Min (end, t.Count) + maxGlyphWith)
+            {
+                return Math.Max (0, Math.Max (startCol, 0) + maxGlyphWith + clipOffset);
+            }
+
+            return startCol + 1;;
+        }
+
+        return Math.Max (start, 0);
+
+        int MaxGlyphWith (int startIdx, int direction)
+        {
+            var glyphIdx = startIdx;
+            var startGlyphWith = 1;
+            var lastGlyphWith = 1;
+
+            if (direction == -1)
+            {
+                startGlyphWith = glyphIdx < glyphWidths.Count ? glyphWidths [glyphIdx] : 1;
+            }
+            else if (startIdx > 0)
+            {
+                startGlyphWith = glyphIdx < glyphWidths.Count ? glyphWidths [glyphIdx] : 1;
+            }
+
+            glyphIdx = startIndex + direction + Math.Max (width, 0);
+
+            if (glyphIdx < glyphWidths.Count)
+            {
+                lastGlyphWith = glyphWidths [glyphIdx];
+            }
+            else if (excludedGlyphWidths.Count > 0)
+            {
+                if (direction == -1)
+                {
+                    glyphIdx -= glyphWidths.Count - direction;
+                }
+                else
+                {
+                    glyphIdx -= glyphWidths.Count + direction;
+                }
+                lastGlyphWith = glyphIdx > -1 && glyphIdx < excludedGlyphWidths.Count ? excludedGlyphWidths [glyphIdx] : 1;
+            }
+
+            int maxGlyphWith = Math.Max (startGlyphWith, lastGlyphWith);
+
+            return maxGlyphWith;
+        }
+    }
+
+    internal static int CursorColumn (List<string> t, int end, int tabWidth, out List<int> glyphWidths, out List<int> excludedGlyphWidths)
+    {
+        var cursorColumn = 0;
+        glyphWidths = [];
+        excludedGlyphWidths = [];
+
+        // Calculate absolute cursor position and store each glyph width
+        for (var i = 0; i < t.Count; i++)
+        {
+            int gWidth = t [i] == "\t"
+
+                             // Calculate columns to next tab stop
+                             // Tab stops are at multiples of TabWidth (0, 4, 8, 12, ...)
+                             // If we're at visual column col, advance to next tab stop
+                             ? tabWidth > 0
+                                   ? Math.Max (tabWidth, 0) - cursorColumn % Math.Max (tabWidth, 0)
+
+                                   // When TabWidth is 0, tabs are invisible (0 columns)
+                                   : 0
+
+                             // Ensures that cols less than 0 to be 1 because it will be converted to a printable rune
+                             : Math.Max (t [i].GetColumns (), 1);
+
+            if (i >= Math.Min (end, t.Count))
+            {
+                excludedGlyphWidths.Add (gWidth);
+
+                continue;
+            }
+
+            glyphWidths.Add (gWidth);
+            cursorColumn += gWidth;
+        }
+
+        return cursorColumn;
+    }
+
+    internal static int GetColumnWidthsBeforeStart (List<int>? glyphsWidths, int start, out int clipOffset, out int startIndex)
+    {
+        clipOffset = 0;
+        startIndex = 0;
+
+        if (glyphsWidths == null || glyphsWidths.Count == 0 || start <= 0)
+        {
+            return 0;
+        }
+
+        var sum = 0;
+        var prev = 0;
+
+        for (var i = 0; i < glyphsWidths.Count; i++)
+        {
+            sum += glyphsWidths [i];
+
+            if (sum > start)
+            {
+                clipOffset = prev - start;
+                startIndex = i;
+
+                return prev;
+            }
+
+            prev = sum;
+        }
+
+        // If start is beyond the line
+        clipOffset = sum - start;
+        startIndex = glyphsWidths.Count;
+
+        return sum;
     }
 
     internal static (int size, int length) DisplaySize (
@@ -614,18 +745,18 @@ internal class TextModel
         for (; i < tCount; i++)
         {
             string text = t [i];
-            int colWidth = text.GetColumns (false);
+            int colWidth = text.GetColumns ();
             size += colWidth;
             len += text.Length;
 
-            if (text == "\t")
+            if (text == "\t" && tabWidth > 0)
             {
-                size += tabWidth + 1;
+                size += tabWidth - size % tabWidth;
                 len += tabWidth - 1;
             }
-            else if (colWidth == -1)
+            else if (colWidth < 1)
             {
-                size += 2; // -1+2=1
+                size += 1;
             }
 
             if (checkNextRune && i == tCount - 1 && t.Count > tCount && IsWideText (t [i + 1], tabWidth, out int s, out int l))
@@ -635,6 +766,8 @@ internal class TextModel
             }
         }
 
+        return (size, len);
+
         bool IsWideText (string s1, int tWidth, out int s, out int l)
         {
             s = s1.GetColumns ();
@@ -642,21 +775,12 @@ internal class TextModel
 
             if (s1 == "\t")
             {
-                s += tWidth + 1;
+                s += tabWidth - s % tabWidth;
                 l += tWidth - 1;
             }
 
             return s > 1;
         }
-
-        return (size, len);
-    }
-
-    internal Size GetDisplaySize ()
-    {
-        var size = Size.Empty;
-
-        return size;
     }
 
     internal (Point current, bool found) FindNextText (
@@ -768,24 +892,26 @@ internal class TextModel
 
         int size = start;
         int pX = x + start;
+        _ = CursorColumn (t, t.Count, tabWidth, out List<int> glyphWidths, out _);
+        _ = GetColumnWidthsBeforeStart (glyphWidths, start, out _, out int startIndex);
 
-        for (int i = start; i < t.Count; i++)
+        for (int i = startIndex; i < t.Count; i++)
         {
             string s = t [i];
             size += s.GetColumns ();
 
             if (s == "\t")
             {
-                size += tabWidth;
+                size += tabWidth - size % tabWidth;
             }
 
-            if (i == pX || size > pX)
+            if (i == pX)
             {
-                return i - start;
+                return i - startIndex;
             }
         }
 
-        return t.Count - start;
+        return t.Count - startIndex;
     }
 
     internal (Point current, bool found) ReplaceAllText (
@@ -862,9 +988,9 @@ internal class TextModel
         _toFind.found = false;
     }
 
-    internal static bool SetCol (ref int col, int width, int cols)
+    internal static bool SetCol (ref int col, int width, int cols, int viewportX = 0)
     {
-        if (col + cols > width)
+        if (col + cols - viewportX > width)
         {
             return false;
         }
@@ -1114,7 +1240,7 @@ internal class TextModel
         var origTxt = Cell.ToString (source);
         (_, int len) = DisplaySize (source, 0, col, false);
         (_, int len2) = DisplaySize (source, col, col + matchText.Length, false);
-        (_, int len3) = DisplaySize (source, col + matchText.Length, origTxt.GetRuneCount (), false);
+        (_, int len3) = DisplaySize (source, col + matchText.Length, GraphemeHelper.GetGraphemeCount (origTxt), false);
 
         return string.Concat (origTxt.AsSpan () [..len], textToReplace, origTxt.AsSpan (len + len2, len3));
     }
