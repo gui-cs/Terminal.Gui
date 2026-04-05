@@ -243,12 +243,13 @@ public sealed class TitleView : View, ITitleView, IDesignable
 
         Padding.Thickness = padding;
 
-        // 2. Auto-size via Dim.Auto to measure the natural tab header size.
-        SetRelativeLayout (context.BorderBounds.Size);
-
-        // 3. Use the explicit override if provided, otherwise use the auto-sized frame.
+        // 2. Measure the natural tab header size via Dim.Auto.
+        //    Use GetAutoWidth for horizontal tabs and GetAutoHeight for vertical.
+        //    Note: GetAutoHeight doesn't account for vertical TextFormatter.Direction,
+        //    so we use GetAutoWidth for vertical too (it measures the text's "length" dimension).
+        // 3. Use the explicit override if provided, otherwise use the auto-sized measurement.
         int tabLength = context.TabLengthOverride
-                        ?? (TabSide is Side.Top or Side.Bottom ? Frame.Width : Frame.Height);
+                        ?? (TabSide is Side.Top or Side.Bottom ? GetAutoWidth () : GetAutoHeight ());
 
         MeasuredTabLength = tabLength;
 

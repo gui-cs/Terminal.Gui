@@ -179,11 +179,10 @@ public class Border : AdornmentImpl
                     return itv.MeasuredTabLength;
                 }
 
-                // TitleView hasn't been laid out yet — set text and measure to get the auto-size.
+                // TitleView hasn't been laid out yet — set text and orientation, then measure.
                 tv.Text = Parent?.Title ?? string.Empty;
-                tv.SetRelativeLayout (new Size (int.MaxValue, int.MaxValue));
-
-                int measured = TabSide is Side.Top or Side.Bottom ? tv.Frame.Width : tv.Frame.Height;
+                itv.Orientation = TabSide is Side.Left or Side.Right ? Orientation.Vertical : Orientation.Horizontal;
+                int measured = TabSide is Side.Top or Side.Bottom ? tv.GetAutoWidth () : tv.GetAutoHeight ();
                 itv.MeasuredTabLength = measured;
 
                 return measured;
