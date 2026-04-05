@@ -310,6 +310,8 @@ public partial class TextView
         }
 
         _historyText.Undo ();
+        SetNeedsDraw ();
+        AdjustViewport ();
 
         return true;
     }
@@ -432,7 +434,6 @@ public partial class TextView
             _historyText.Add ([[.. currentLine]], InsertionPoint);
 
             currentLine.RemoveAt (CurrentColumn - 1);
-            SetNeedsDraw ();
 
             if (_wordWrap)
             {
@@ -442,11 +443,6 @@ public partial class TextView
             CurrentColumn--;
 
             _historyText.Add ([[.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
-
-            if (CurrentColumn < Viewport.X)
-            {
-                SetNeedsDraw ();
-            }
         }
         else
         {
@@ -469,7 +465,6 @@ public partial class TextView
             int prevCount = prevRow.Count;
             _model.GetLine (prowIdx).AddRange (GetCurrentLine ());
             _model.RemoveLine (CurrentRow);
-            SetNeedsDraw ();
 
             if (_wordWrap)
             {
@@ -482,6 +477,11 @@ public partial class TextView
 
             CurrentColumn = prevCount;
         }
+
+        // Always redraw and update content size because a glyph was deleted
+        SetNeedsDraw ();
+        UpdateContentSize ();
+
         UpdateWrapModel ();
         OnContentsChanged ();
 

@@ -2132,7 +2132,7 @@ public class TextViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Viewport_X_Treat_Negative_Width_As_One_Column ()
+    public void Viewport_X_Treat_Negative_Width_Glyph_As_One_Column ()
     {
         TextView tv = new () { Width = 2, Height = 1, Text = "\u001B[" };
 
@@ -2423,7 +2423,7 @@ public class TextViewTests (ITestOutputHelper output)
     [Fact]
     public void Command_Activate_SetsFocus ()
     {
-        TextView textView  = new () { Text = "Test", Width = 10 };
+        TextView textView = new () { Text = "Test", Width = 10 };
         textView.BeginInit ();
         textView.EndInit ();
         Assert.False (textView.HasFocus);
@@ -2453,8 +2453,12 @@ public class TextViewTests (ITestOutputHelper output)
     [Theory]
     [InlineData (0, 4, "\tTest", "    Test")]
     [InlineData (4, 8, "Test\t", "Test    ")]
-    [InlineData (1, 5, "T\test", "T    est")]
-    public void Tab_And_Shift_Tab_ContentsChanged_With_TabKeyAddsTab_True_AddsRemovesTabCharacter (int col, int expectedCursor, string expectedText, string expectedOutput)
+    [InlineData (1, 4, "T\test", "T   est")]
+    public void Tab_And_Shift_Tab_ContentsChanged_With_TabKeyAddsTab_True_AddsRemovesTabCharacter (
+        int col,
+        int expectedCursor,
+        string expectedText,
+        string expectedOutput)
     {
         using IApplication app = Application.Create ().Init ();
         Runnable runnable = new ();
@@ -2493,21 +2497,36 @@ public class TextViewTests (ITestOutputHelper output)
     }
 
     [Theory]
-    [InlineData (0, 0, 4, 0, "\tTesting WordWrap", """
+    [InlineData (0,
+                 0,
+                 4,
+                 0,
+                 "\tTesting WordWrap",
+                 """
 
-                                                   Testing
-                                                   WordWrap
-                                                   """)]
-    [InlineData (8, 1, 4, 2, "Testing WordWrap\t", """
-                                                   Testing 
-                                                   WordWrap
+                 Testing
+                 WordWrap
+                 """)]
+    [InlineData (8,
+                 1,
+                 4,
+                 2,
+                 "Testing WordWrap\t",
+                 """
+                 Testing 
+                 WordWrap
 
-                                                   """)]
-    [InlineData (1, 0, 5, 0, "T\testing WordWrap", """
-                                                   T    
-                                                   esting 
-                                                   WordWrap
-                                                   """)]
+                 """)]
+    [InlineData (1,
+                 0,
+                 4,
+                 0,
+                 "T\testing WordWrap",
+                 """
+                 T    
+                 esting 
+                 WordWrap
+                 """)]
     public void Tab_And_Shift_Tab_ContentsChanged_With_TabKeyAddsTab_And_WordWrap_True_AddsRemovesTabCharacter (
         int col,
         int row,
@@ -2930,10 +2949,10 @@ public class TextViewTests (ITestOutputHelper output)
         textView.Draw ();
 
         expected = """
-                       ┌────────┐
-                       │22222   │
-                       └────────┘
-                       """;
+                   ┌────────┐
+                   │22222   │
+                   └────────┘
+                   """;
 
         DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
 
@@ -3055,11 +3074,11 @@ public class TextViewTests (ITestOutputHelper output)
         textView.Draw ();
 
         expected = """
-                       ┌────────┐
-                       │22222222│
-                       │33333333│
-                       └────────┘
-                       """;
+                   ┌────────┐
+                   │22222222│
+                   │33333333│
+                   └────────┘
+                   """;
 
         DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
 
@@ -3318,26 +3337,29 @@ public class TextViewTests (ITestOutputHelper output)
     [InlineData (8, 0, 2, 0, 8, 0)]
     [InlineData (9, 0, 3, 0, 9, 0)]
     [InlineData (10, 0, 3, 0, 9, 0)]
-    [InlineData (13, 0, 4, 0, 13, 0)]
-    [InlineData (14, 0, 5, 0, 14, 0)]
-    [InlineData (15, 0, 5, 0, 14, 0)]
-    [InlineData (18, 0, 6, 0, 18, 0)]
-    [InlineData (19, 0, 7, 0, 19, 0)]
-    [InlineData (20, 0, 7, 0, 19, 0)]
+    [InlineData (13, 0, 5, 0, 13, 0)]
+    [InlineData (14, 0, 5, 0, 13, 0)]
+    [InlineData (15, 0, 6, 0, 16, 0)]
+    [InlineData (18, 0, 7, 0, 17, 0)]
+    [InlineData (19, 0, 7, 0, 17, 0)]
+    [InlineData (20, 0, 7, 0, 17, 0)]
     [InlineData (1, 1, 0, 1, 0, 1)]
     [InlineData (4, 1, 1, 1, 4, 1)]
     [InlineData (5, 1, 2, 1, 5, 1)]
     [InlineData (6, 1, 2, 1, 5, 1)]
-    [InlineData (9, 1, 3, 1, 9, 1)]
-    [InlineData (10, 1, 3, 1, 9, 1)]
-    [InlineData (13, 1, 4, 1, 13, 1)]
-    [InlineData (14, 1, 5, 1, 14, 1)]
-    [InlineData (15, 1, 6, 1, 15, 1)]
-    [InlineData (16, 1, 6, 1, 15, 1)]
-    [InlineData (19, 1, 7, 1, 19, 1)]
-    [InlineData (20, 1, 7, 1, 19, 1)]
-    [InlineData (23, 1, 8, 1, 23, 1)]
-    [InlineData (24, 1, 8, 1, 23, 1)]
+    [InlineData (9, 1, 3, 1, 8, 1)]
+    [InlineData (10, 1, 4, 1, 12, 1)]
+    [InlineData (13, 1, 5, 1, 13, 1)]
+    [InlineData (14, 1, 6, 1, 14, 1)]
+    [InlineData (15, 1, 6, 1, 14, 1)]
+    [InlineData (16, 1, 7, 1, 16, 1)]
+    [InlineData (19, 1, 8, 1, 20, 1)]
+    [InlineData (20, 1, 8, 1, 20, 1)]
+    [InlineData (23, 1, 8, 1, 20, 1)]
+    [InlineData (24, 1, 8, 1, 20, 1)]
+    [InlineData (1, 2, 0, 2, 0, 2)]
+    [InlineData (2, 2, 1, 2, 2, 2)]
+    [InlineData (3, 2, 2, 2, 3, 2)]
     public void Mouse_Click_On_Text_With_Tabs_Sets_Cursor_At_Correct_Position (int x,
                                                                                int y,
                                                                                int expectedColumn,
@@ -3347,7 +3369,13 @@ public class TextViewTests (ITestOutputHelper output)
     {
         using IApplication app = Application.Create ().Init ();
         TextView textView = CreateTextView ();
-        textView.Text = "\t\t1\t2\t3\n\t4\t\t56\t\t";
+        textView.Text = "\t\t1\t2\t3\n\t4\t\t56\t\t\n🍎7";
+
+        // Will draw likes this:
+        // "        1   2   3"
+        // "    4       56      "
+        // "🍎7"
+
         Runnable runnable = new ();
         runnable.Add (textView);
 
@@ -3355,12 +3383,213 @@ public class TextViewTests (ITestOutputHelper output)
 
         Assert.Equal (4, textView.TabWidth);
 
-        // Click at position "0" stay in first
         textView.NewMouseEvent (new Mouse { Position = new Point (x, y), Flags = MouseFlags.LeftButtonClicked });
         Assert.Equal (expectedColumn, textView.CurrentColumn);
         Assert.Equal (expectedRow, textView.CurrentRow);
         Assert.Equal (expectedCursorX, textView.Cursor.Position!.Value.X);
         Assert.Equal (expectedCursorY, textView.Cursor.Position!.Value.Y);
+    }
+
+    [Fact]
+    public void Mouse_Click_Beyond_Available_Lines_Sets_Last_Line_Position ()
+    {
+        using IApplication app = Application.Create ().Init ();
+        TextView textView = CreateTextView ();
+        textView.Text = "Line1\nLine2\nLine3";
+        Runnable runnable = new ();
+        runnable.Add (textView);
+
+        app.Begin (runnable);
+
+        Assert.Equal (3, textView.Lines);
+        Assert.Equal (10, textView.Viewport.Height);
+
+        textView.NewMouseEvent (new Mouse { Position = new Point (0, textView.Viewport.Height - 1), Flags = MouseFlags.LeftButtonClicked });
+        Assert.Equal (2, textView.CurrentRow);
+    }
+
+    [Fact]
+    public void Mouse_Left_Clicked_At_Start_And_End_Viewport_Change_ViewportX ()
+    {
+        // Create a TextView with text
+        TextView tv = new () { Text = "Hello World", Width = 5, Height = 1 };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Verify initial state with text longer than width
+        Assert.Equal (0, tv.InsertionPoint.X);
+        Assert.Equal (0, tv.Viewport.X);
+
+        // Mouse button clicked at the end of the viewport should move the cursor and adjust incrementing ScrollOffset
+        Mouse ev = new () { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonClicked };
+        tv.NewMouseEvent (ev);
+
+        // Verify cursor is positioned at pressed location
+        Assert.Equal (4, tv.InsertionPoint.X);
+        Assert.Equal (1, tv.Viewport.X);
+
+        // Mouse button clicked at the start of the viewport should move the cursor and adjust decreasing ScrollOffset
+        ev = new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked };
+        tv.NewMouseEvent (ev);
+
+        // Verify cursor is positioned at pressed location
+        Assert.Equal (1, tv.InsertionPoint.X);
+        Assert.Equal (0, tv.Viewport.X);
+    }
+
+    [Fact]
+    public void Mouse_Left_Clicked_At_Start_And_End_Viewport_Change_ViewportX_Wide_Glyphs ()
+    {
+        // Create a TextView with text
+        TextView tv = new () { Text = "👨‍👩‍👧Hello World", Width = 5, Height = 1 };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Verify initial state with text longer than width
+        Assert.Equal (0, tv.InsertionPoint.X);
+        Assert.Equal (0, tv.Viewport.X);
+
+        // Mouse button clicked at the end of the viewport should move the cursor and adjust incrementing ScrollOffset
+        Mouse ev = new () { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonClicked };
+        tv.NewMouseEvent (ev);
+
+        // Verify cursor is positioned at pressed location
+        Assert.Equal (4, tv.InsertionPoint.X);
+        Assert.Equal (2, tv.Viewport.X);
+
+        // Mouse button clicked at the start of the viewport should move the cursor and adjust decreasing ScrollOffset
+        ev = new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked };
+        tv.NewMouseEvent (ev);
+
+        // Verify cursor is positioned at pressed location
+        Assert.Equal (1, tv.InsertionPoint.X);
+        Assert.Equal (0, tv.Viewport.X);
+    }
+
+    [Fact]
+    public void Mouse_Selecting_From_End_And_From_Start_Viewport_SelectsCorrectly ()
+    {
+        // Create a TextView with text
+        TextView tv = new () { Text = "Hello World\n", Width = 5, Height = 2 };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Verify initial state with text longer than width
+        Assert.Equal (0, tv.InsertionPoint.Y);
+        Assert.Equal (0, tv.Viewport.Y);
+        Assert.Equal (0, tv.InsertionPoint.X);
+        Assert.Equal (0, tv.Viewport.X);
+
+        // Mouse button pressed at the end of the viewport should move the cursor and adjust incrementing ScrollOffset
+        Mouse ev = new () { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonPressed };
+        tv.NewMouseEvent (ev);
+
+        // Start selecting text by moving mouse to the left while pressing
+        ev = new Mouse { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tv.NewMouseEvent (ev);
+
+        // Continue selecting text by moving mouse to the left while pressing forcing SelectedLength to be greater than 0
+        ev = new Mouse { Position = new Point (3, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tv.NewMouseEvent (ev);
+
+        // Mouse move to left while pressing should select text and adjust ScrollOffset
+        ev = new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tv.NewMouseEvent (ev);
+
+        // Verify cursor is positioned at pressed location
+        Assert.Equal (0, tv.InsertionPoint.Y);
+        Assert.Equal (0, tv.Viewport.Y);
+        Assert.Equal (0, tv.InsertionPoint.X);
+        Assert.Equal (0, tv.Viewport.X);
+        Assert.Equal ("Hell", tv.SelectedText);
+
+        // Release mouse button
+        ev = new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonReleased };
+        tv.NewMouseEvent (ev);
+
+        // Mouse button pressed at the start of the viewport should move the cursor and adjust decreasing ScrollOffset
+        ev = new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed };
+        tv.NewMouseEvent (ev);
+
+        // Start selecting text by moving mouse to the right while pressing
+        ev = new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tv.NewMouseEvent (ev);
+
+        // Continue selecting text by moving mouse to the left while pressing forcing SelectedLength to be greater than 0
+        ev = new Mouse { Position = new Point (3, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tv.NewMouseEvent (ev);
+
+        // Mouse move to right while pressing should select text and adjust ScrollOffset
+        ev = new Mouse { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tv.NewMouseEvent (ev);
+
+        // Verify cursor is positioned at pressed location
+        Assert.Equal (0, tv.InsertionPoint.Y);
+        Assert.Equal (0, tv.Viewport.Y);
+        Assert.Equal (11, tv.InsertionPoint.X);
+        Assert.Equal (7, tv.Viewport.X);
+        Assert.Equal ("Hello World", tv.SelectedText);
+    }
+
+    [Fact]
+    public void Mouse_Selecting_From_End_And_From_Start_Viewport_SelectsCorrectly_Wide_Glyphs ()
+    {
+        // Create a TextView with text
+        TextView tv = new () { Text = "Hello World👨‍👩‍👧", Width = 5, Height = 1 };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Verify initial state with text longer than width
+        Assert.Equal (0, tv.InsertionPoint.Y);
+        Assert.Equal (0, tv.Viewport.Y);
+        Assert.Equal (0, tv.InsertionPoint.X);
+        Assert.Equal (0, tv.Viewport.X);
+
+        // Mouse button pressed at the end of the viewport should move the cursor and adjust incrementing ScrollOffset
+        Mouse ev = new () { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonPressed };
+        tv.NewMouseEvent (ev);
+
+        // Start selecting text by moving mouse to the left while pressing
+        ev = new Mouse { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tv.NewMouseEvent (ev);
+
+        // Continue selecting text by moving mouse to the left while pressing forcing SelectedLength to be greater than 0
+        ev = new Mouse { Position = new Point (3, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tv.NewMouseEvent (ev);
+
+        // Mouse move to left while pressing should select text and adjust ScrollOffset
+        ev = new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tv.NewMouseEvent (ev);
+
+        // Verify cursor is positioned at pressed location
+        Assert.Equal (0, tv.InsertionPoint.Y);
+        Assert.Equal (0, tv.Viewport.Y);
+        Assert.Equal (0, tv.InsertionPoint.X);
+        Assert.Equal (0, tv.Viewport.X);
+        Assert.Equal ("Hell", tv.SelectedText);
+
+        // Release mouse button
+        ev = new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonReleased };
+        tv.NewMouseEvent (ev);
+
+        // Mouse button pressed at the start of the viewport should move the cursor and adjust decreasing ScrollOffset
+        ev = new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed };
+        tv.NewMouseEvent (ev);
+
+        // Start selecting text by moving mouse to the right while pressing
+        ev = new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tv.NewMouseEvent (ev);
+
+        // Mouse move to right while pressing should select text and adjust ScrollOffset
+        ev = new Mouse { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tv.NewMouseEvent (ev);
+
+        // Verify cursor is positioned at pressed location
+        Assert.Equal (0, tv.InsertionPoint.Y);
+        Assert.Equal (0, tv.Viewport.Y);
+        Assert.Equal (12, tv.InsertionPoint.X);
+        Assert.Equal (9, tv.Viewport.X);
+        Assert.Equal ("Hello World👨‍👩‍👧", tv.SelectedText);
     }
 
     [Fact]
@@ -3439,12 +3668,12 @@ public class TextViewTests (ITestOutputHelper output)
         textView.Draw ();
 
         var expected = """
-                   ┌───┐
-                   │e3 │
-                   │e4 │
-                   │e5 │
-                   └───┘
-                   """;
+                       ┌───┐
+                       │e3 │
+                       │e4 │
+                       │e5 │
+                       └───┘
+                       """;
 
         DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
 
@@ -3547,5 +3776,88 @@ public class TextViewTests (ITestOutputHelper output)
         // Ctrl+Shift+Z → Redo
         Assert.True (tv.NewKeyDownEvent (Key.Z.WithCtrl.WithShift));
         Assert.Equal ("hell", tv.Text);
+    }
+
+    [Theory]
+    [InlineData (0,
+                 """
+                 1234123412
+                 1   2   3
+                 🦮  👨‍👩‍👧‍👦  🍎
+                 """)]
+    [InlineData (1,
+                 """
+                 2341234123
+                    2   3
+                    👨‍👩‍👧‍👦  🍎
+                 """)]
+    [InlineData (2,
+                 """
+                 3412341234
+                   2   3
+                   👨‍👩‍👧‍👦  🍎
+                 """)]
+    [InlineData (3,
+                 """
+                 4123412341
+                  2   3   4
+                  👨‍👩‍👧‍👦  🍎
+                 """)]
+    [InlineData (4,
+                 """
+                 1234123412
+                 2   3   4
+                 👨‍👩‍👧‍👦  🍎  👨‍🚒
+                 """)]
+    [InlineData (5,
+                 """
+                 2341234123
+                    3   4
+                    🍎  👨‍🚒
+                 """)]
+    [InlineData (6,
+                 """
+                 3412341234
+                   3   4
+                   🍎  👨‍🚒
+                 """)]
+    public void Text_With_Tabs_And_Mixed_Glyphs_Draws_Correctly (int viewportX, string expected)
+    {
+        using IApplication app = Application.Create ().Init ();
+        TextView tv = new () { Width = 10, Height = 3, Driver = app.Driver };
+        tv.Text = "1234123412341234\n1\t2\t3\t4\n🦮\t👨‍👩‍👧‍👦\t🍎\t👨‍🚒";
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        Assert.Equal (4, tv.TabWidth);
+
+        tv.Viewport = tv.Viewport with { X = viewportX };
+        tv.Draw ();
+
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+    }
+
+    [Fact]
+    public void Text_Start_With_Wide_Glyph_With_ViewportX_Of_One_Draw_Space_In_The_First_Column ()
+    {
+        using IApplication app = Application.Create ().Init ();
+        TextView tv = new () { Width = 10, Height = 3, Driver = app.Driver };
+        tv.Text = "1234123412341234\n1\t2\t3\t4\n🦮\t👨‍👩‍👧‍👦\t🍎\t👨‍🚒";
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        Assert.Equal (4, tv.TabWidth);
+
+        tv.Viewport = tv.Viewport with { X = 1 };
+        tv.Draw ();
+
+        Assert.Equal (" ", tv.Driver?.Contents! [2, 0].Grapheme);
+
+        var expected = """
+                       2341234123
+                          2   3
+                          👨‍👩‍👧‍👦  🍎
+                       """;
+        DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
     }
 }

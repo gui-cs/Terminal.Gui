@@ -135,7 +135,12 @@ public class Editor : Scenario
                      siCursorPosition
                  ]) { AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast };
 
-        _textView.UnwrappedCursorPositionChanged += (s, e) => { siCursorPosition.Title = $"Ln {e.Y + 1}, Col {e.X + 1}"; };
+        _textView.UnwrappedCursorPositionChanged += (s, e) =>
+                                                    {
+                                                        List<Cell> line = _textView.GetLine (e.Y).Take (e.X).ToList ();
+                                                        int colsWidth = _textView.GetColumnsWidth (line);
+                                                        siCursorPosition.Title = $"Ln {e.Y + 1}, Cc {e.X + 1}, Col {colsWidth + 1}";
+                                                    };
 
         _appWindow.Add (statusBar);
 

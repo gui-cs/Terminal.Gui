@@ -36,35 +36,41 @@ public partial class TextView
     }
 
     /// <summary>
-    ///     Will scroll the <see cref="TextView"/> to display the specified row at the top if <paramref name="isRow"/> is
-    ///     true or will scroll the <see cref="TextView"/> to display the specified column at the left if
-    ///     <paramref name="isRow"/> is false.
+    ///     Will scroll the <see cref="TextView"/> to display the specified row at the top by the <paramref name="position.Y"/>
+    ///     and will scroll the <see cref="TextView"/> to display the specified column at the left by the
+    ///     <paramref name="position.X"/>.
     /// </summary>
-    /// <param name="idx">
-    ///     The row that should be displayed at the top or the column that should be displayed at the left, if the value
+    /// <param name="position">
+    ///     The row that should be displayed at the top and the column that should be displayed at the left, if the value
     ///     is negative it will be reset to zero
     /// </param>
-    /// <param name="isRow">If true (default) the <paramref name="idx"/> is a row, column otherwise.</param>
     /// <remarks>
     ///     The <see cref="CurrentRow"/> and <see cref="CurrentColumn"/> will not be changed by this method.
     /// </remarks>
-    public void ScrollTo (int idx, bool isRow = true)
+    public void ScrollTo (Point position)
     {
-        if (idx < 0)
+        if (position.X < 0)
         {
-            idx = 0;
+            position.X = 0;
         }
 
-        if (isRow)
+        if (position.Y < 0)
         {
-            Viewport = Viewport with { Y = Math.Max (idx > _model.Count - 1 - Viewport.Height ? _model.Count - Viewport.Height : idx, 0) };
+            position.Y = 0;
         }
-        else if (!_wordWrap)
+
+        int newPositionX = position.X;
+
+        if (!_wordWrap)
         {
             int maxlength = _model.GetMaxVisibleLine (Viewport.Y, Viewport.Y + Viewport.Height, TabWidth);
-            Viewport = Viewport with { X = Math.Max (idx > maxlength - Viewport.Width ? maxlength - Viewport.Width + 1 : idx, 0) };
+            newPositionX = Math.Max (position.X > maxlength - Viewport.Width ? maxlength - Viewport.Width + 1 : position.X, 0);
         }
 
+        Viewport = Viewport with
+        {
+            X = newPositionX, Y = Math.Max (position.Y > _model.Count - 1 - Viewport.Height ? _model.Count - Viewport.Height : position.Y, 0)
+        };
         PositionCursor ();
         SetNeedsDraw ();
     }
@@ -139,8 +145,8 @@ public partial class TextView
         List<Cell> currentLine = GetCurrentLine ();
         CurrentColumn = currentLine.Count;
 
-        if (CurrentColumn >= Viewport.X + Viewport.Width)
-        {
+        if (CurrentColumn >= Viewport.X + Viewport.Width || TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _) - Viewport.X >= Viewport.Width)
+{
             SetNeedsDraw ();
         }
         DoNeededAction ();
@@ -154,7 +160,7 @@ public partial class TextView
         {
             CurrentColumn--;
 
-            if (Viewport.X > 0 && CurrentColumn < Viewport.X)
+            if (Viewport.X > 0 && CurrentColumn <= Viewport.X)
             {
                 SetNeedsDraw ();
             }
@@ -290,7 +296,7 @@ public partial class TextView
         {
             CurrentColumn++;
 
-            if (CurrentColumn >= currentLine.Count || CurrentColumn >= Viewport.Width)
+            if (CurrentColumn >= currentLine.Count || TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _) >= Viewport.Width)
             {
                 SetNeedsDraw ();
             }
@@ -302,7 +308,7 @@ public partial class TextView
                 CurrentRow++;
                 CurrentColumn = 0;
 
-                if (CurrentRow >= Viewport.Y + Viewport.Height)
+                if (CurrentRow >= Viewport.Y + Viewport.Height || CurrentColumn < Viewport.X)
                 {
                     SetNeedsDraw ();
                 }

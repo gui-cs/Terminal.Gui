@@ -89,12 +89,21 @@ public partial class TextView
         bool need = contentMayHaveChanged;
 
         (int size, int length) tSize = TextModel.DisplaySize (line, -1, -1, false, TabWidth);
-        (int size, int length) dSize = TextModel.DisplaySize (line, Viewport.X, CurrentColumn, true, TabWidth);
+        (int size, int length) dSize = TextModel.DisplaySize (line, 0, CurrentColumn, true, TabWidth);
+        _ = TextModel.CursorColumn (TextModel.CellsToStringList (line), CurrentColumn, TabWidth, out List<int> glyphWidths, out _);
+        _ = TextModel.GetColumnWidthsBeforeStart (glyphWidths, Viewport.X, out _, out int startIndex);
 
-        // Handle horizontal scrolling (only when WordWrap is off)
-        if (!_wordWrap && CurrentColumn < Viewport.X)
+        // Handle horizontal scrolling (only when CurrentColumn is 0 or WordWrap is off)
+        if (Viewport.X > 0 && CurrentColumn <= startIndex)
         {
-            Viewport = Viewport with { X = CurrentColumn };
+            if (CurrentColumn == 0)
+            {
+                Viewport = Viewport with { X = 0 };
+            }
+            else if (!_wordWrap)
+            {
+                Viewport = Viewport with { X = TextModel.CalculateLeftColumn (line, Viewport.X, CurrentColumn, Viewport.Width, TabWidth) };
+            }
             need = true;
         }
         else if (!_wordWrap && (CurrentColumn - Viewport.X + 1 > Viewport.Width || dSize.size + 1 >= Viewport.Width))
@@ -122,7 +131,7 @@ public partial class TextView
             Viewport = Viewport with { Y = Math.Min (Math.Max (CurrentRow - Viewport.Height + 1, 0), CurrentRow) };
             need = true;
         }
-        else if (Viewport.Y > 0 && CurrentRow < Viewport.Y)
+        else if (Viewport.Y > 0 && CurrentRow - Viewport.Height + 1 < Viewport.Y)
         {
             Viewport = Viewport with { Y = Math.Max (Viewport.Y - 1, 0) };
             need = true;
