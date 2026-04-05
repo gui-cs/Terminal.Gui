@@ -281,6 +281,8 @@ public partial class View // Command APIs
         }
 
         // Bubble to SuperView if the command is in its CommandsToBubbleUp list.
+        // Bubbling is a notification (not consumption) — return false so that the
+        // DefaultCommandNotBoundHandler can still report handled via CommandWillBubbleToAncestor.
         bool bubbled = TryBubbleUp (ctx, false) is true;
 
         if (bubbled)
@@ -288,7 +290,8 @@ public partial class View // Command APIs
             return false;
         }
 
-        // Return null when nobody observed/handled this (no subscribers, no dispatch, no bubbling).
+        // Distinguish: null = nobody observed (no subscribers, no dispatch, no bubbling);
+        // false = a subscriber existed but did not set Handled=true.
         return hasSubscribers ? false : null;
     }
 
