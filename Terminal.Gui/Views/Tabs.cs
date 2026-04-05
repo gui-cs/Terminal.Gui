@@ -1012,40 +1012,40 @@ public class Tabs : View, IValue<View?>, IDesignable
             Value = 0//null//Value?.Border.TabLength ?? 0
         };
 
-        //tabLengthNumericUpDown.ValueChanging += (_, e) =>
-        //                                        {
-        //                                            if (Value is null)
-        //                                            {
-        //                                                e.Handled = true;
+        tabLengthNumericUpDown.ValueChanging += (_, e) =>
+                                                {
+                                                    if (Value is null)
+                                                    {
+                                                        e.Handled = true;
 
-        //                                                return;
-        //                                            }
+                                                        return;
+                                                    }
 
-        //                                            if (e.NewValue <= 0)
-        //                                            {
-        //                                                foreach (View tab in TabCollection)
-        //                                                {
-        //                                                    tab.Border.TabLength = null;
-        //                                                }
-        //                                                e.Handled = true;
-        //                                            }
-        //                                            else
-        //                                            {
-        //                                                foreach (View tab in TabCollection)
-        //                                                {
-        //                                                    tab.Border.TabLength = e.NewValue;
-        //                                                }
-        //                                            }
-        //                                        };
+                                                    if (e.NewValue <= 0)
+                                                    {
+                                                        foreach (View tab in TabCollection)
+                                                        {
+                                                            tab.Border.TabLength = null;
+                                                        }
+                                                        e.Handled = true;
+                                                    }
+                                                    else
+                                                    {
+                                                        foreach (View tab in TabCollection)
+                                                        {
+                                                            tab.Border.TabLength = e.NewValue;
+                                                        }
+                                                    }
+                                                };
 
-        //ViewportChanged += (sender, args) =>
-        //                   {
-        //                       // only the first time
-        //                       if (tabLengthNumericUpDown.Value > 0 && Value?.Border.TabLength is { })
-        //                       {
-        //                           tabLengthNumericUpDown.Value = Value?.Border.TabLength ?? 0;
-        //                       }
-        //                   };
+        ViewportChanged += (sender, args) =>
+                           {
+                               // only the first time
+                               if (tabLengthNumericUpDown.Value > 0 && Value?.Border.TabLength is { })
+                               {
+                                   tabLengthNumericUpDown.Value = Value?.Border.TabLength ?? 0;
+                               }
+                           };
 
         NumericUpDown<int> scrollOffsetNumericUpDown = new ()
         {
