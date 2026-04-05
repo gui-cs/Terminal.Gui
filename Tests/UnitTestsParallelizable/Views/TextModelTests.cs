@@ -936,7 +936,7 @@ public class TextModelTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void GetColumnWidthsBeforeStart_Returns_ClipOffset_If_Start_At_Middle_OfWideGlyph ()
+    public void GetColumnWidthsBeforeStart_Returns_Negative_ClipOffset_If_Start_At_Middle_OfWideGlyph ()
     {
         var text = "👨‍👩‍👧‍👦hello 🍎 world 👨‍👩‍👧 test";
         var width = 10;
@@ -954,8 +954,32 @@ public class TextModelTests (ITestOutputHelper output)
 
         Assert.Equal (glyphWidths.Count + wideGlyphsCount, finalCursorCol);
         Assert.Equal (leftColumn + clipOffset, startIndex);
-        Assert.Equal (startIndex, startWidth);
+        Assert.Equal (leftColumn + clipOffset, startWidth);
         Assert.Equal (-1, clipOffset);
+        Assert.Equal (list.Count - glyphWidths.Count, excludedGlyphWidths.Count);
+    }
+
+    [Fact]
+    public void GetColumnWidthsBeforeStart_Returns_ClipOffset_Is_Zero_If_End_At_Middle_OfWideGlyph ()
+    {
+        var text = "👨‍👩‍👧‍👦hello 🍎 world 👨‍👩‍👧 test";
+        var width = 8;
+        var leftColumn = 2;
+        List<string> list = [];
+
+        foreach (string s in GraphemeHelper.GetGraphemes (text))
+        {
+            list.Add (s);
+        }
+
+        int finalCursorCol = TextModel.CursorColumn (list, width, 0, out List<int> glyphWidths, out List<int> excludedGlyphWidths);
+        int startWidth = TextModel.GetColumnWidthsBeforeStart (glyphWidths, leftColumn, out int clipOffset, out int startIndex);
+        int wideGlyphsCount = glyphWidths.Sum (s => s > 1 ? 1 : 0);
+
+        Assert.Equal (glyphWidths.Count + wideGlyphsCount, finalCursorCol);
+        Assert.Equal (leftColumn - 1, startIndex);
+        Assert.Equal (leftColumn, startWidth);
+        Assert.Equal (0, clipOffset);
         Assert.Equal (list.Count - glyphWidths.Count, excludedGlyphWidths.Count);
     }
 
