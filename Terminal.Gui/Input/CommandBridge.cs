@@ -149,6 +149,12 @@ public class CommandBridge : IDisposable
             return;
         }
 
+        // If the event was already handled/cancelled by another handler, do not bridge.
+        if (e.Handled)
+        {
+            return;
+        }
+
         Command command = e.Context?.Command ?? Command.NotBound;
 
         // Only bridge commands that this bridge is configured for.
@@ -169,5 +175,8 @@ public class CommandBridge : IDisposable
         };
 
         owner.InvokeCommand (command, bridgedCtx);
+
+        // Mark as handled so the remote's own dispatch/bubbling does not duplicate processing.
+        e.Handled = true;
     }
 }

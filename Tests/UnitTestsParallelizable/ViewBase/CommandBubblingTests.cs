@@ -1334,6 +1334,148 @@ public class CommandBubblingTests (ITestOutputHelper output)
 
     #endregion CommandBridge Arbitrary Command Tests
 
+    #region DefaultCommandNotBoundHandler Does Not Raise Activated
+
+    // Copilot
+    [Fact]
+    public void UnboundCommand_DoesNotRaise_Activated_OnSuperView ()
+    {
+        // BubbleActivatedUp must NOT be called for unbound commands — Activated is specific
+        // to the Activate lifecycle and should not fire for arbitrary commands like Command.Up.
+        View superView = new () { Id = "superView" };
+        superView.CommandsToBubbleUp = [Command.Up];
+
+        View subView = new () { Id = "subView" };
+        superView.Add (subView);
+
+        var superViewActivatedCount = 0;
+
+        superView.Activated += (_, _) => superViewActivatedCount++;
+
+        subView.InvokeCommand (Command.Up);
+
+        Assert.Equal (0, superViewActivatedCount);
+    }
+
+    // Copilot
+    [Fact]
+    public void UnboundCommand_DoesNotRaise_Activated_InDeepHierarchy ()
+    {
+        View grandSuperView = new () { Id = "grandSuperView" };
+        grandSuperView.CommandsToBubbleUp = [Command.Up];
+
+        View superView = new () { Id = "superView" };
+        superView.CommandsToBubbleUp = [Command.Up];
+        grandSuperView.Add (superView);
+
+        View subView = new () { Id = "subView" };
+        superView.Add (subView);
+
+        var grandActivatedCount = 0;
+        var superActivatedCount = 0;
+
+        grandSuperView.Activated += (_, _) => grandActivatedCount++;
+        superView.Activated += (_, _) => superActivatedCount++;
+
+        subView.InvokeCommand (Command.Up);
+
+        Assert.Equal (0, grandActivatedCount);
+        Assert.Equal (0, superActivatedCount);
+    }
+
+    #endregion DefaultCommandNotBoundHandler Does Not Raise Activated
+
+    #region RaiseCommandNotBound Null Return Tests
+
+    // Copilot
+    [Fact]
+    public void UnboundCommand_ReturnsNull_WhenNoSubscribersNoBubblingNoDispatch ()
+    {
+        // RaiseCommandNotBound should return null when nobody observed/handled the command
+        // and there are no subscribers, no dispatch, and no bubbling.
+        View view = new () { Id = "view" };
+
+        bool? result = view.InvokeCommand (Command.New);
+
+        Assert.Null (result);
+    }
+
+    // Copilot
+    [Fact]
+    public void UnboundCommand_ReturnsFalse_WhenSubscriberExists_ButNotHandled ()
+    {
+        // When a subscriber exists but does not set Handled=true, return false (not null).
+        View view = new () { Id = "view" };
+
+        view.CommandNotBound += (_, _) => { }; // subscriber present, does NOT set Handled
+
+        bool? result = view.InvokeCommand (Command.New);
+
+        Assert.NotNull (result);
+        Assert.False (result);
+    }
+
+    // Copilot
+    [Fact]
+    public void UnboundCommand_ReturnsTrue_WhenSubscriberHandles ()
+    {
+        View view = new () { Id = "view" };
+
+        view.CommandNotBound += (_, e) => e.Handled = true;
+
+        bool? result = view.InvokeCommand (Command.New);
+
+        Assert.True (result);
+    }
+
+    #endregion RaiseCommandNotBound Null Return Tests
+
+    #region CommandBridge Handled Guard Tests
+
+    // Copilot
+    [Fact]
+    public void CommandBridge_DoesNotBridge_WhenAlreadyHandled ()
+    {
+        View owner = new () { Id = "owner" };
+        View remote = new () { Id = "remote" };
+
+        var ownerCommandNotBoundCount = 0;
+
+        owner.CommandNotBound += (_, _) => ownerCommandNotBoundCount++;
+
+        // A handler on remote sets Handled=true BEFORE the bridge subscribes.
+        // Since event handlers fire in subscription order, this runs first.
+        remote.CommandNotBound += (_, e) => e.Handled = true;
+
+        // Bridge subscribes AFTER the handler, so it sees Handled=true and skips relaying.
+        using CommandBridge bridge = CommandBridge.Connect (owner, remote, Command.Up);
+
+        remote.InvokeCommand (Command.Up);
+
+        Assert.Equal (0, ownerCommandNotBoundCount);
+    }
+
+    // Copilot
+    [Fact]
+    public void CommandBridge_SetsHandled_AfterRelay ()
+    {
+        View owner = new () { Id = "owner" };
+        View remote = new () { Id = "remote" };
+
+        using CommandBridge bridge = CommandBridge.Connect (owner, remote, Command.Up);
+
+        var handledAfterBridge = false;
+
+        // Subscribe AFTER the bridge — this handler sees the Handled flag the bridge set.
+        remote.CommandNotBound += (_, e) => handledAfterBridge = e.Handled;
+
+        remote.InvokeCommand (Command.Up);
+
+        Assert.True (handledAfterBridge);
+    }
+
+    #endregion CommandBridge Handled Guard Tests
+
     #region Test Helpers
 
     // CoPilot - ChatGPT o1

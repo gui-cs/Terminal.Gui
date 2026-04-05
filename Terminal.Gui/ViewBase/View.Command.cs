@@ -226,23 +226,19 @@ public partial class View // Command APIs
             return true;
         }
 
-        // Refresh value from the dispatch target so that BubbleActivatedUp carries the
-        // post-change value (mirrors DefaultActivateHandler).
-        ctx = RefreshValue (ctx);
-
-        // Notify ALL ancestors (composite and plain) that the command completed.
-        // This ensures bridges and CommandsToBubbleUp subscribers see the event.
-        if (ctx?.Routing != CommandRouting.DispatchingDown)
-        {
-            BubbleActivatedUp (ctx);
-        }
-
         // Report as handled if the command will bubble to an ancestor — mirrors
         // DefaultActivateHandler logic so that the key is consumed when an ancestor
         // subscribes to it via CommandsToBubbleUp.
         bool willBubble = ctx is not null && CommandWillBubbleToAncestor (ctx.Command);
 
-        return _dispatchState.HasFlag (DispatchState.DispatchOccurred) || willBubble;
+        if (_dispatchState.HasFlag (DispatchState.DispatchOccurred) || willBubble)
+        {
+            return true;
+        }
+
+        // Propagate the null/false from RaiseCommandNotBound: null = nobody observed,
+        // false = subscriber exists but did not handle.
+        return result;
     }
 
     /// <summary>
@@ -268,6 +264,7 @@ public partial class View // Command APIs
         }
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
+        bool hasSubscribers = CommandNotBound is not null;
         CommandNotBound?.Invoke (this, args);
 
         if (args.Handled)
@@ -276,18 +273,23 @@ public partial class View // Command APIs
         }
 
         // Framework dispatch: composite views delegate commands to a target SubView.
-        if (!args.Handled)
+        bool dispatched = TryDispatchToTarget (ctx);
+
+        if (dispatched)
         {
-            args.Handled = TryDispatchToTarget (ctx);
+            return true;
         }
 
         // Bubble to SuperView if the command is in its CommandsToBubbleUp list.
-        if (!args.Handled)
+        bool bubbled = TryBubbleUp (ctx, false) is true;
+
+        if (bubbled)
         {
-            args.Handled = TryBubbleUp (ctx, args.Handled) is true;
+            return false;
         }
 
-        return args.Handled;
+        // Return null when nobody observed/handled this (no subscribers, no dispatch, no bubbling).
+        return hasSubscribers ? false : null;
     }
 
     /// <summary>
