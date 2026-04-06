@@ -76,9 +76,6 @@ public class Link : View, IDesignable
         AddCommand (Command.HotKey, InvokeHotKeyOnNextPeer!);
 
         MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
-
-        // Default tooltip shows the URL
-        this.SetToolTip (() => Url);
     }
 
     /// <summary>
@@ -384,26 +381,5 @@ public class Link : View, IDesignable
         // Indicate the formatter needs formatting, which will cause UpdateTextFormatterText to be invoked
         TextFormatter.NeedsFormat = true;
         SetNeedsLayout ();
-    }
-
-    /// <summary>
-    ///     Releases the unmanaged resources used by the object and optionally releases the managed resources.
-    /// </summary>
-    /// <remarks>
-    ///     When disposing is true, this method removes the tooltip content associated with this instance
-    ///     from the ToolTipManager. Always call the base class Dispose method to ensure proper resource cleanup.
-    /// </remarks>
-    /// <param name="disposing">
-    ///     true to release both managed and unmanaged resources; false to release only unmanaged
-    ///     resources.
-    /// </param>
-    protected override void Dispose (bool disposing)
-    {
-        if (disposing)
-        {
-            this.RemoveToolTip ();
-        }
-
-        base.Dispose (disposing);
     }
 }

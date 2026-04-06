@@ -53,6 +53,7 @@ public class Links : Scenario
         };
 
         _link = new Link { X = 1, Y = 1, BorderStyle = LineStyle.Dotted };
+        app.ToolTips!.SetToolTip (_link, () => _link.Url);
 
         _link.TextChanged += (s, e) => simpleUrlLabel.Text = $"This is just a Label with a URL in Text (WT automatically enables URLs) - {_link.Text}";
         titleTextField.ValueChanged += (s, e) => _link.Title = e.NewValue ?? string.Empty;

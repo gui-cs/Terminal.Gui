@@ -583,6 +583,14 @@ public interface IApplication : IDisposable
     /// </remarks>
     ApplicationPopover? Popovers { get; set; }
 
+    /// <summary>
+    /// Gets or sets the tool tip manager used to display contextual help for UI elements within the application.
+    /// </summary>
+    /// <remarks>Assigning a value to this property enables tool tip functionality, allowing users to receive
+    /// additional information when interacting with supported controls. If set to null, tool tips are disabled for the
+    /// application.</remarks>
+    ApplicationToolTip? ToolTips { get; set; }
+
     #endregion Navigation and Popover
 
     #region Timeouts
