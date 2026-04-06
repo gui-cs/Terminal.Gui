@@ -74,8 +74,6 @@ public class Link : View, IDesignable
 
         // On HotKey, pass it to the next view
         AddCommand (Command.HotKey, InvokeHotKeyOnNextPeer!);
-
-        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
     }
 
     /// <summary>
