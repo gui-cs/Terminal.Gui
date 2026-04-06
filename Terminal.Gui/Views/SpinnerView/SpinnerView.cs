@@ -18,6 +18,7 @@ public class SpinnerView : View, IDesignable
     private const int DEFAULT_DELAY = 130;
     private static readonly SpinnerStyle DEFAULT_STYLE = new SpinnerStyle.Line ();
 
+    private bool _autoSpin;
     private bool _bounce = DEFAULT_STYLE.SpinBounce;
     private bool _bounceReverse;
     private int _currentIdx;
@@ -46,9 +47,11 @@ public class SpinnerView : View, IDesignable
     /// </summary>
     public bool AutoSpin
     {
-        get => _timeout != null;
+        get => _autoSpin;
         set
         {
+            _autoSpin = value;
+
             if (value)
             {
                 AddAutoSpinTimeout ();
@@ -197,6 +200,17 @@ public class SpinnerView : View, IDesignable
         RemoveAutoSpinTimeout ();
 
         base.Dispose (disposing);
+    }
+
+    /// <inheritdoc/>
+    public override void EndInit ()
+    {
+        base.EndInit ();
+
+        if (_autoSpin)
+        {
+            AddAutoSpinTimeout ();
+        }
     }
 
     private void AddAutoSpinTimeout ()

@@ -38,6 +38,26 @@ public class SpinnerViewTests : TestDriverBase
     }
 
     [Fact]
+    public void AutoSpin_SetBeforeEndInit_GetterReturnsTrueWithNoApp ()
+    {
+        // Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4879
+        // Before the fix AutoSpin returned `_timeout != null`. When App is null the timeout
+        // can never be registered, so the getter falsely returned false even though the
+        // caller had set AutoSpin = true. The fix uses a dedicated _autoSpin backing field.
+        SpinnerView spinner = new () { AutoSpin = true };
+
+        // App is null here (no running application), so _timeout is null.
+        // The getter must still report true based on the backing field.
+        Assert.True (spinner.AutoSpin);
+
+        spinner.BeginInit ();
+        spinner.EndInit ();
+
+        // After init the intent must be preserved.
+        Assert.True (spinner.AutoSpin);
+    }
+
+    [Fact]
     public void AdvanceAnimation_ZeroDelay_AdvancesFrame ()
     {
         // SpinnerStyle.Line sequence: ["-", @"\", "|", "/"]
