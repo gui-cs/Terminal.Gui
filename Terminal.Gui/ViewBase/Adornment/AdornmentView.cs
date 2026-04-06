@@ -190,10 +190,15 @@ public class AdornmentView : View, IAdornmentView, IDesignable
             }
         }
 
+        if (Adornment is null)
+        {
+            return false;
+        }
+
         Rectangle outside = Frame;
         outside.Offset (parentOrSuperView.Frame.Location);
 
-        return Adornment!.Thickness.Contains (outside, location);
+        return Adornment.Thickness.Contains (outside, location);
     }
 
     #endregion View Overrides

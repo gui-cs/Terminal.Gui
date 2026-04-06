@@ -267,8 +267,7 @@ public interface IApplication : IDisposable
     /// </remarks>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
-        where TRunnable : IRunnable, new();
+    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new ();
 
     #region Iteration & Invoke
 
@@ -424,7 +423,7 @@ public interface IApplication : IDisposable
     ///     }
     ///     </code>
     /// </example>
-    T? GetResult<T> () where T : class { return GetResult () as T; }
+    T? GetResult<T> () where T : class => GetResult () as T;
 
     #endregion Result Management
 
@@ -582,6 +581,16 @@ public interface IApplication : IDisposable
     ///     </para>
     /// </remarks>
     ApplicationPopover? Popovers { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the tool tip manager used to display contextual help for UI elements within the application.
+    /// </summary>
+    /// <remarks>
+    ///     Assigning a value to this property enables tool tip functionality, allowing users to receive
+    ///     additional information when interacting with supported controls. If set to null, tool tips are disabled for the
+    ///     application.
+    /// </remarks>
+    ApplicationToolTip? ToolTips { get; set; }
 
     #endregion Navigation and Popover
 

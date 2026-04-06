@@ -7,81 +7,91 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Mouse and Keyboard")]
 public class Links : Scenario
 {
-    private IApplication? _app;
-    private Window? _appWindow;
-    private Link? _link;
-
     public override void Main ()
     {
         ConfigurationManager.Enable (ConfigLocations.All);
         using IApplication app = Application.Create ();
         app.Init ();
-        _app = app;
 
-        _appWindow = new Window { Title = GetName (), BorderStyle = LineStyle.None };
+        using Window appWindow = new ();
+        appWindow.Title = GetName ();
+        appWindow.BorderStyle = LineStyle.None;
 
         Label titleLabel = new () { Text = "_Title:", X = 1, Y = 1 };
-        _appWindow.Add (titleLabel);
+        appWindow.Add (titleLabel);
 
         TextField titleTextField = new () { X = Pos.Right (titleLabel) + 1, Y = Pos.Top (titleLabel), Width = Dim.Fill () };
-        _appWindow.Add (titleTextField);
+        appWindow.Add (titleTextField);
 
-        Label textLabel = new () { Text = " Te_xt:", X = Pos.Left (titleLabel), Y = Pos.Bottom(titleLabel) };
-        _appWindow.Add (textLabel);
+        Label textLabel = new () { Text = " Te_xt:", X = Pos.Left (titleLabel), Y = Pos.Bottom (titleLabel) };
+        appWindow.Add (textLabel);
 
-        TextField textTextField = new () { X = Pos.Right (textLabel) + 1, Y = Pos.Top(textLabel), Width = Dim.Fill () };
-        _appWindow.Add (textTextField);
+        TextField textTextField = new () { X = Pos.Right (textLabel) + 1, Y = Pos.Top (textLabel), Width = Dim.Fill () };
+        appWindow.Add (textTextField);
 
         Label urlLabel = new () { Text = "  _Url:", X = 1, Y = Pos.Bottom (titleTextField) + 1 };
-        _appWindow.Add (urlLabel);
+        appWindow.Add (urlLabel);
 
         TextField urlTextField = new () { X = Pos.Right (urlLabel) + 1, Y = Pos.Bottom (titleTextField) + 1, Width = Dim.Fill () };
-        _appWindow.Add (urlTextField);
+        appWindow.Add (urlTextField);
 
         Label simpleUrlLabel = new () { X = 1, Y = Pos.Bottom (urlTextField) + 2 };
-        _appWindow.Add (simpleUrlLabel);
+        appWindow.Add (simpleUrlLabel);
 
         FrameView linkFrame = new ()
         {
             Title = "_Link Demo",
             X = 0,
             Y = Pos.Bottom (simpleUrlLabel) + 2,
-            Width = Dim.Fill(),
+            Width = Dim.Fill (),
             Height = Dim.Auto (),
             AssignHotKeys = true,
-            TabStop = TabBehavior.TabStop
+            TabStop = TabBehavior.TabStop,
+            Arrangement = ViewArrangement.Resizable
         };
 
-        _link = new Link { X = 1, Y = 1, BorderStyle = LineStyle.Dotted };
+        Link linkWithBorder = new () { BorderStyle = LineStyle.Dotted };
+        app.ToolTips!.SetToolTip (linkWithBorder, () => linkWithBorder.Url);
 
-        _link.TextChanged += (s, e) => simpleUrlLabel.Text = $"This is just a Label with a URL in Text (WT automatically enables URLs) - {_link.Text}";
-        titleTextField.ValueChanged += (s, e) => _link.Title = e.NewValue ?? string.Empty;
-        textTextField.ValueChanged += (s, e) => _link.Text = e.NewValue ?? string.Empty;
-        urlTextField.ValueChanged += (s, e) => _link.Url = e.NewValue ?? Link.DEFAULT_URL;
-        linkFrame.Add (_link);
+        linkWithBorder.TextChanged +=
+            (_, _) => simpleUrlLabel.Text = $"This is just a Label with a URL in Text (WT automatically enables URLs) - {linkWithBorder.Text}";
+        titleTextField.ValueChanged += (_, e) => linkWithBorder.Title = e.NewValue ?? string.Empty;
+        textTextField.ValueChanged += (_, e) => linkWithBorder.Text = e.NewValue ?? string.Empty;
+        urlTextField.ValueChanged += (_, e) => linkWithBorder.Url = e.NewValue ?? string.Empty;
+        linkFrame.Add (linkWithBorder);
 
         titleTextField.Text = "Title";
         textTextField.Text = "GitHub repo";
         urlTextField.Text = "https://github.com/gui-cs/Terminal.Gui";
 
-        Button copyButton = new () { Title = "_Copy", X = Pos.Center (), Y = Pos.AnchorEnd () };
-        copyButton.Accepting += (s, e) => _link.Copy ();
+        Button copyButton = new () { Title = "_Copy", X = Pos.Right (linkWithBorder) + 1, Y = Pos.Top (linkWithBorder) + 1 };
+        copyButton.Accepting += (_, _) => linkWithBorder.Copy ();
 
         linkFrame.Add (copyButton);
 
-        _appWindow.Add (linkFrame);
+        Label label = new () { Y = Pos.Bottom (linkFrame), Title = "_Link to API Docs:" };
+
+        Link link = new ()
+        {
+            X = Pos.Right (label) + 1, Y = Pos.Top (label), Text = "Terminal.Gui.Views.Link", Url = "https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.Link.html"
+        };
+        appWindow.Add (label, link);
+        app.ToolTips!.SetToolTip (link, () => link.Url);
+
+        appWindow.Add (linkFrame);
 
         // StatusBar
         Shortcut urlIndicator = new (Key.Empty, "", null);
 
-        StatusBar statusBar = new ([new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", Quit), urlIndicator]);
-        _link.MouseEnter += (s, e) => urlIndicator.Title = _link.Text;
-        _link.MouseLeave += (s, e) => urlIndicator.Title = "";
-        _appWindow.Add (statusBar);
+        StatusBar statusBar = new ([new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", () => appWindow.RequestStop ()), urlIndicator]);
 
-        _app.Run (_appWindow);
-        _appWindow.Dispose ();
+        // Demonstrate dynamically showing URL in the status bar when hovering over the link.
+        // Note that we use a Shortcut here to show how they can be used in a StatusBar, but you could use any View.
+        linkWithBorder.MouseEnter += (_, _) => urlIndicator.Title = linkWithBorder.Url;
+        linkWithBorder.MouseLeave += (_, _) => urlIndicator.Title = "";
+
+        appWindow.Add (statusBar);
+
+        app.Run (appWindow);
     }
-
-    private void Quit () => _appWindow?.RequestStop ();
 }
