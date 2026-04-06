@@ -523,6 +523,110 @@ public class LineCanvas : IDisposable
         _exclusionRegion.Union (lineCanvas._exclusionRegion);
     }
 
+    /// <summary>Merges one line canvas into this one, clipping all lines to the specified bounds.</summary>
+    /// <remarks>
+    ///     Lines that fall entirely outside <paramref name="clipBounds"/> are discarded.
+    ///     Lines that partially overlap are trimmed to fit within the bounds.
+    /// </remarks>
+    /// <param name="lineCanvas">The source canvas whose lines will be merged.</param>
+    /// <param name="clipBounds">The screen-relative rectangle to clip incoming lines to.</param>
+    public void Merge (LineCanvas lineCanvas, Rectangle clipBounds)
+    {
+        foreach (StraightLine line in lineCanvas._lines)
+        {
+            StraightLine? clipped = ClipLine (line, clipBounds);
+
+            if (clipped is { })
+            {
+                AddLine (clipped);
+            }
+        }
+
+        if (lineCanvas._exclusionRegion is null)
+        {
+            return;
+        }
+
+        Region clippedExclusion = lineCanvas._exclusionRegion.Clone ();
+        clippedExclusion.Intersect (clipBounds);
+        _exclusionRegion ??= new Region ();
+        _exclusionRegion.Union (clippedExclusion);
+    }
+
+    /// <summary>Clips a <see cref="StraightLine"/> to the specified bounds rectangle.</summary>
+    /// <returns>A new clipped line, or <see langword="null"/> if the line falls entirely outside bounds.</returns>
+    private static StraightLine? ClipLine (StraightLine line, Rectangle bounds)
+    {
+        Rectangle lineBounds = line.Bounds;
+
+        if (line.Orientation == Orientation.Horizontal)
+        {
+            // Line is at a fixed Y. If Y is outside bounds, discard.
+            if (lineBounds.Y < bounds.Y || lineBounds.Y >= bounds.Bottom)
+            {
+                return null;
+            }
+
+            // Clamp horizontal extent to bounds
+            int clippedLeft = Math.Max (lineBounds.Left, bounds.Left);
+            int clippedRight = Math.Min (lineBounds.Right, bounds.Right);
+
+            if (clippedLeft >= clippedRight)
+            {
+                return null;
+            }
+
+            // Determine new start and length, preserving the sign convention
+            int newLength = clippedRight - clippedLeft;
+            Point newStart;
+
+            if (line.Length >= 0)
+            {
+                newStart = new Point (clippedLeft, lineBounds.Y);
+            }
+            else
+            {
+                // Negative length: start is at the right end, length is negative
+                newStart = new Point (clippedRight - 1, lineBounds.Y);
+                newLength = -newLength;
+            }
+
+            return new StraightLine (newStart, newLength, Orientation.Horizontal, line.Style, line.Attribute);
+        }
+        else
+        {
+            // Vertical line at a fixed X. If X is outside bounds, discard.
+            if (lineBounds.X < bounds.X || lineBounds.X >= bounds.Right)
+            {
+                return null;
+            }
+
+            // Clamp vertical extent to bounds
+            int clippedTop = Math.Max (lineBounds.Top, bounds.Top);
+            int clippedBottom = Math.Min (lineBounds.Bottom, bounds.Bottom);
+
+            if (clippedTop >= clippedBottom)
+            {
+                return null;
+            }
+
+            int newLength = clippedBottom - clippedTop;
+            Point newStart;
+
+            if (line.Length >= 0)
+            {
+                newStart = new Point (lineBounds.X, clippedTop);
+            }
+            else
+            {
+                newStart = new Point (lineBounds.X, clippedBottom - 1);
+                newLength = -newLength;
+            }
+
+            return new StraightLine (newStart, newLength, Orientation.Vertical, line.Style, line.Attribute);
+        }
+    }
+
     /// <summary>Removes the last line added to the canvas</summary>
     /// <returns></returns>
     public StraightLine RemoveLastLine ()
@@ -1123,30 +1227,30 @@ public class LineCanvas : IDisposable
         char ch = grapheme [0];
 
         return ch switch
-        {
-            // Horizontal lines
-            '─' or '━' or '═' => LineDirections.Left | LineDirections.Right,
+               {
+                   // Horizontal lines
+                   '─' or '━' or '═' => LineDirections.Left | LineDirections.Right,
 
-            // Vertical lines
-            '│' or '┃' or '║' => LineDirections.Up | LineDirections.Down,
+                   // Vertical lines
+                   '│' or '┃' or '║' => LineDirections.Up | LineDirections.Down,
 
-            // Corners (single, rounded, double, heavy)
-            '┌' or '╭' or '╔' or '┏' => LineDirections.Right | LineDirections.Down,
-            '┐' or '╮' or '╗' or '┓' => LineDirections.Left | LineDirections.Down,
-            '└' or '╰' or '╚' or '┗' => LineDirections.Right | LineDirections.Up,
-            '┘' or '╯' or '╝' or '┛' => LineDirections.Left | LineDirections.Up,
+                   // Corners (single, rounded, double, heavy)
+                   '┌' or '╭' or '╔' or '┏' => LineDirections.Right | LineDirections.Down,
+                   '┐' or '╮' or '╗' or '┓' => LineDirections.Left | LineDirections.Down,
+                   '└' or '╰' or '╚' or '┗' => LineDirections.Right | LineDirections.Up,
+                   '┘' or '╯' or '╝' or '┛' => LineDirections.Left | LineDirections.Up,
 
-            // T-junctions (single, double, heavy)
-            '├' or '╠' or '┣' => LineDirections.Up | LineDirections.Down | LineDirections.Right,
-            '┤' or '╣' or '┫' => LineDirections.Up | LineDirections.Down | LineDirections.Left,
-            '┬' or '╦' or '┳' => LineDirections.Left | LineDirections.Right | LineDirections.Down,
-            '┴' or '╩' or '┻' => LineDirections.Left | LineDirections.Right | LineDirections.Up,
+                   // T-junctions (single, double, heavy)
+                   '├' or '╠' or '┣' => LineDirections.Up | LineDirections.Down | LineDirections.Right,
+                   '┤' or '╣' or '┫' => LineDirections.Up | LineDirections.Down | LineDirections.Left,
+                   '┬' or '╦' or '┳' => LineDirections.Left | LineDirections.Right | LineDirections.Down,
+                   '┴' or '╩' or '┻' => LineDirections.Left | LineDirections.Right | LineDirections.Up,
 
-            // Cross (single, double, heavy)
-            '┼' or '╬' or '╋' => LineDirections.Up | LineDirections.Down | LineDirections.Left | LineDirections.Right,
+                   // Cross (single, double, heavy)
+                   '┼' or '╬' or '╋' => LineDirections.Up | LineDirections.Down | LineDirections.Left | LineDirections.Right,
 
-            _ => LineDirections.None
-        };
+                   _ => LineDirections.None
+               };
     }
 
     /// <inheritdoc/>

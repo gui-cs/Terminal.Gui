@@ -65,6 +65,76 @@ public class AdornmentSubViewLineCanvasTests (ITestOutputHelper output) : TestDr
     }
 
     /// <summary>
+    ///     When a SubView of Border has SuperViewRendersLineCanvas = true and its own border,
+    ///     and the SubView's frame extends past the parent Border's bounds, the SubView's
+    ///     border lines must be clipped so they don't corrupt junction glyphs on the parent's
+    ///     content border. Without clipping, the SubView's ─ merges with the parent's │ on
+    ///     the content border row, producing ┬ instead of ┐.
+    /// </summary>
+    [Fact]
+    public void BorderSubView_WithBorder_ClippedWhenExceedingParentBounds ()
+    {
+        // Claude - Opus 4.6
+
+        // 10×5 View with single-line border (thickness 1,3,1,1).
+        // The top border area is 3 rows tall, giving room for a SubView.
+        // An 8×3 SubView is placed at X=4 in the border — its right edge extends
+        // past the parent's border view frame (10 wide).
+        //
+        // Without clipping, the SubView's bottom ─ merges with the parent's vertical
+        // line at the content border row, producing ┬ instead of ┐.
+
+        IDriver driver = CreateTestDriver (10, 5);
+
+        View view = new ()
+        {
+            Id = "view",
+            Driver = driver,
+            Width = 10,
+            Height = 5,
+            BorderStyle = LineStyle.Single
+        };
+        view.Border.Thickness = new Thickness (1, 3, 1, 1);
+        view.Border.Settings = BorderSettings.None;
+
+        View sub = new ()
+        {
+            Id = "sub",
+            X = 4,
+            Y = 0,
+            Width = 8,
+            Height = 3,
+            BorderStyle = LineStyle.Single,
+            SuperViewRendersLineCanvas = true
+        };
+        sub.Border.Thickness = new Thickness (1);
+        sub.Border.Settings = BorderSettings.None;
+        view.Border.GetOrCreateView ().Add (sub);
+
+        view.BeginInit ();
+        view.EndInit ();
+        view.Layout ();
+        view.Draw ();
+
+        output.WriteLine ("Driver output:");
+        output.WriteLine (driver.ToString ());
+
+        // The SubView's border lines are clipped to the border view's frame.
+        // Rows 0-1 are in the top border thickness area (no parent border lines at X=9).
+        // Row 2 is the content border: ┐ at X=9 is the parent's corner, NOT ┬.
+        // The ┴ junction at X=4 proves auto-join still works where SubView meets content border.
+        DriverAssert.AssertDriverContentsAre ("""
+                                                  ┌─────
+                                                  │
+                                              ┌───┴────┐
+                                              │        │
+                                              └────────┘
+                                              """,
+                                              output,
+                                              driver);
+    }
+
+    /// <summary>
     ///     Proves a Label with its own Border and SuperViewRendersLineCanvas = true
     ///     can serve as a tab header: the Label's border auto-joins with the View's
     ///     border, and the Label's text renders inside.
