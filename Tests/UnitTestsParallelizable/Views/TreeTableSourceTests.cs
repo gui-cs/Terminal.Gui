@@ -17,7 +17,7 @@ public class TreeTableSourceTests : TestDriverBase
         TableView tv = GetTreeTableView (out _);
 
         // Initially 2 root nodes visible.
-        Assert.Equal (2, tv.Table.Rows);
+        Assert.Equal (2, tv.Table!.Rows);
 
         // CursorRight expands the selected (first) root node.
         tv.NewKeyDownEvent (Key.CursorRight);
@@ -33,7 +33,7 @@ public class TreeTableSourceTests : TestDriverBase
 
         // Expand the first root node.
         tv.NewKeyDownEvent (Key.CursorRight);
-        Assert.Equal (4, tv.Table.Rows);
+        Assert.Equal (4, tv.Table!.Rows);
 
         // CursorLeft collapses it.
         tv.NewKeyDownEvent (Key.CursorLeft);
@@ -47,12 +47,12 @@ public class TreeTableSourceTests : TestDriverBase
 
         // Header occupies rows 0 and 1; first data row is at screen row 2.
         // Column 2 is the '+' expand indicator within the Name cell.
-        tv.NewMouseEvent (new Mouse { Position = new (2, 2), Flags = MouseFlags.LeftButtonClicked });
+        tv.NewMouseEvent (new Mouse { Position = new Point (2, 2), Flags = MouseFlags.LeftButtonClicked });
 
-        Assert.Equal (4, tv.Table.Rows);
+        Assert.Equal (4, tv.Table!.Rows);
 
         // Clicking the same spot again collapses.
-        tv.NewMouseEvent (new Mouse { Position = new (2, 2), Flags = MouseFlags.LeftButtonClicked });
+        tv.NewMouseEvent (new Mouse { Position = new Point (2, 2), Flags = MouseFlags.LeftButtonClicked });
 
         Assert.Equal (2, tv.Table.Rows);
     }
