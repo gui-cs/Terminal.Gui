@@ -101,7 +101,9 @@ public sealed class UICatalogRunnable : Runnable
 
             if (_scenarioList is { } && App is { } && _scenarioList.Table is { })
             {
-                ShowScenarioErrorsDialog (App, _scenarioList.Table [_scenarioList.SelectedRow, 0].ToString () ?? string.Empty, UICatalog.LogCapture.GetScenarioLogs ());
+                ShowScenarioErrorsDialog (App,
+                                          _scenarioList.Table [_scenarioList.SelectedRow, 0].ToString () ?? string.Empty,
+                                          UICatalog.LogCapture.GetScenarioLogs ());
             }
 
             UICatalog.LogCapture.HasErrors = false;
@@ -142,7 +144,7 @@ public sealed class UICatalogRunnable : Runnable
                                                     ]),
                                    new MenuBarItem ("_Themes", CreateThemeMenuItems ()),
                                    new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems ()),
-                                   new MenuBarItem ("_Logging", CreateLoggingMenuItems ()),
+                                   new MenuBarItem ("_Logging", CreateLoggingMenuItems ()!),
                                    new MenuBarItem (Strings.menuHelp,
                                                     [
                                                         new MenuItem ("_Documentation",
@@ -155,8 +157,7 @@ public sealed class UICatalogRunnable : Runnable
                                                                       Key.F2),
                                                         new MenuItem ("_About...", "About UI Catalog", ShowAboutDialog, Key.A.WithCtrl)
                                                     ])
-                               ])
-        { Title = "menuBar", Id = "menuBar" };
+                               ]) { Title = "menuBar", Id = "menuBar" };
 
         return menuBar;
 
@@ -262,7 +263,7 @@ public sealed class UICatalogRunnable : Runnable
                 Diagnostics = args.Value ?? ViewDiagnosticFlags.Off;
         }
 
-        View? [] CreateLoggingMenuItems ()
+        View [] CreateLoggingMenuItems ()
         {
             List<View?> menuItems = [];
 
@@ -436,13 +437,16 @@ public sealed class UICatalogRunnable : Runnable
 
             menuItems.Add (new MenuItem ("_Open Log Folder", string.Empty, () => Link.OpenUrl (UICatalog.LOGFILE_LOCATION)));
 
-            return menuItems.ToArray () ?? [];
+            return menuItems.ToArray ()!;
 
             void OnLogLevelSelectorOnValueChanged (object? _, ValueChangedEventArgs<int?> args)
             {
                 if (args.NewValue is { })
                 {
-                    UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (Enum.GetValues<LogLevel> () [args.NewValue.Value]) ?? string.Empty };
+                    UICatalog.Options = UICatalog.Options with
+                    {
+                        DebugLogLevel = Enum.GetName (Enum.GetValues<LogLevel> () [args.NewValue.Value]) ?? string.Empty
+                    };
                 }
 
                 UICatalog.LogLevelSwitch.MinimumLevel = UICatalog.LogLevelToLogEventLevel (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel));
@@ -684,7 +688,7 @@ public sealed class UICatalogRunnable : Runnable
     [JsonPropertyName ("UICatalog.StatusBar")]
     public static bool ShowStatusBar
     {
-        get => field;
+        get;
         set
         {
             if (field == value)

@@ -26,16 +26,16 @@ public sealed class ApplicationToolTip : IDisposable
     public IApplication? App { get; set; }
 
     // Stores tooltip registrations for each target view
-    internal readonly Dictionary<View, ToolTipRegistration> Registrations = new ();
+    internal readonly Dictionary<View, ToolTipRegistration> _registrations = new ();
 
     // Shared tooltip instance reused across all views
-    internal ToolTipHost<View>? SharedToolTip;
+    private ToolTipHost<View>? _sharedToolTip;
 
     // Currently active target view (if any)
-    internal View? CurrentTarget;
+    private View? _currentTarget;
 
     /// <summary>
-    /// Sets the tooltip text for the specified view.
+    ///     Sets the tooltip text for the specified view.
     /// </summary>
     /// <param name="target">The view to associate with the tooltip. Cannot be null.</param>
     /// <param name="text">The text to display in the tooltip. Cannot be null.</param>
@@ -48,13 +48,17 @@ public sealed class ApplicationToolTip : IDisposable
     }
 
     /// <summary>
-    /// Associates a tooltip with the specified view, using a delegate to dynamically provide the tooltip text.
+    ///     Associates a tooltip with the specified view, using a delegate to dynamically provide the tooltip text.
     /// </summary>
-    /// <remarks>Use this method when the tooltip text may change over time or depends on runtime conditions.
-    /// The tooltip text is evaluated on demand by calling the provided delegate.</remarks>
+    /// <remarks>
+    ///     Use this method when the tooltip text may change over time or depends on runtime conditions.
+    ///     The tooltip text is evaluated on demand by calling the provided delegate.
+    /// </remarks>
     /// <param name="target">The view to which the tooltip will be attached. Cannot be null.</param>
-    /// <param name="textFactory">A delegate that returns the tooltip text to display. Cannot be null. The delegate is invoked each time the
-    /// tooltip is shown.</param>
+    /// <param name="textFactory">
+    ///     A delegate that returns the tooltip text to display. Cannot be null. The delegate is invoked each time the
+    ///     tooltip is shown.
+    /// </param>
     public void SetToolTip (View target, Func<string> textFactory)
     {
         ArgumentNullException.ThrowIfNull (target);
@@ -64,10 +68,12 @@ public sealed class ApplicationToolTip : IDisposable
     }
 
     /// <summary>
-    /// Associates a tooltip with the specified target view using a factory function to generate the tooltip content.
+    ///     Associates a tooltip with the specified target view using a factory function to generate the tooltip content.
     /// </summary>
-    /// <remarks>The tooltip content is created on demand by invoking the provided factory function each time
-    /// the tooltip is displayed. This allows for dynamic or context-sensitive tooltip content.</remarks>
+    /// <remarks>
+    ///     The tooltip content is created on demand by invoking the provided factory function each time
+    ///     the tooltip is displayed. This allows for dynamic or context-sensitive tooltip content.
+    /// </remarks>
     /// <param name="target">The view to which the tooltip will be attached. Cannot be null.</param>
     /// <param name="contentFactory">A function that returns the view to be used as the tooltip content. Cannot be null.</param>
     public void SetToolTip (View target, Func<View> contentFactory)
@@ -100,11 +106,13 @@ public sealed class ApplicationToolTip : IDisposable
         target.MouseLeave += OnMouseLeave;
         target.Disposing += OnDisposing;
 
-        Registrations [target] = new ToolTipRegistration (OnMouseEnter, OnMouseLeave, OnDisposing);
+        _registrations [target] = new ToolTipRegistration (OnMouseEnter, OnMouseLeave, OnDisposing);
+
+        return;
 
         void OnMouseLeave (object? sender, EventArgs e)
         {
-            if (CurrentTarget == target)
+            if (_currentTarget == target)
             {
                 Hide ();
             }
@@ -132,16 +140,16 @@ public sealed class ApplicationToolTip : IDisposable
     {
         ArgumentNullException.ThrowIfNull (target);
 
-        if (Registrations.TryGetValue (target, out ToolTipRegistration? registration))
+        if (_registrations.TryGetValue (target, out ToolTipRegistration? registration))
         {
             target.MouseEnter -= registration.MouseEnter;
             target.MouseLeave -= registration.MouseLeave;
             target.Disposing -= registration.Disposing;
 
-            Registrations.Remove (target);
+            _registrations.Remove (target);
         }
 
-        if (CurrentTarget == target)
+        if (_currentTarget == target)
         {
             Hide ();
         }
@@ -161,13 +169,13 @@ public sealed class ApplicationToolTip : IDisposable
         ArgumentNullException.ThrowIfNull (target);
         ArgumentNullException.ThrowIfNull (provider);
 
-        SharedToolTip ??= new ToolTipHost<View> ();
-        SharedToolTip.App ??= target.App;
-        SharedToolTip.Anchor = () => target.FrameToScreen ();
-        SharedToolTip.SetContent (provider.GetContent);
+        _sharedToolTip ??= new ToolTipHost<View> ();
+        _sharedToolTip.App ??= target.App;
+        _sharedToolTip.Anchor = () => target.FrameToScreen ();
+        _sharedToolTip.SetContent (provider.GetContent);
 
-        CurrentTarget = target;
-        SharedToolTip.MakeVisible ();
+        _currentTarget = target;
+        _sharedToolTip.MakeVisible ();
     }
 
     /// <summary>
@@ -175,8 +183,8 @@ public sealed class ApplicationToolTip : IDisposable
     /// </summary>
     public void Hide ()
     {
-        SharedToolTip?.Visible = false;
-        CurrentTarget = null;
+        _sharedToolTip?.Visible = false;
+        _currentTarget = null;
     }
 
     /// <summary>
@@ -187,23 +195,21 @@ public sealed class ApplicationToolTip : IDisposable
     /// </remarks>
     public void Dispose ()
     {
-        foreach ((View target, ToolTipRegistration registration) in Registrations)
+        foreach ((View target, ToolTipRegistration registration) in _registrations)
         {
             target.MouseEnter -= registration.MouseEnter;
             target.MouseLeave -= registration.MouseLeave;
             target.Disposing -= registration.Disposing;
         }
 
-        Registrations.Clear ();
-        SharedToolTip?.Dispose ();
-        SharedToolTip = null;
-        CurrentTarget = null;
+        _registrations.Clear ();
+        _sharedToolTip?.Dispose ();
+        _sharedToolTip = null;
+        _currentTarget = null;
     }
 
     /// <summary>
     ///     Stores event handlers and content factory for a registered view.
     /// </summary>
-    internal sealed record ToolTipRegistration (EventHandler<CancelEventArgs> MouseEnter,
-                                               EventHandler MouseLeave,
-                                               EventHandler Disposing);
+    internal sealed record ToolTipRegistration (EventHandler<CancelEventArgs> MouseEnter, EventHandler MouseLeave, EventHandler Disposing);
 }

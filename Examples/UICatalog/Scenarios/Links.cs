@@ -73,7 +73,7 @@ public class Links : Scenario
 
         Link link = new ()
         {
-            X = Pos.Right (label) + 1, Y = Pos.Top (label), Text = "Docs", Url = "https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.Link.html"
+            X = Pos.Right (label) + 1, Y = Pos.Top (label), Text = "Terminal.Gui.Views.Link", Url = "https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.Link.html"
         };
         appWindow.Add (label, link);
         app.ToolTips!.SetToolTip (link, () => link.Url);

@@ -44,8 +44,7 @@ internal partial class ApplicationImpl : IApplication
     /// </summary>
     /// <param name="componentFactory">The component factory.</param>
     /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
-    internal ApplicationImpl (IComponentFactory componentFactory, ITimeProvider timeProvider) : this (timeProvider) =>
-        _componentFactory = componentFactory;
+    internal ApplicationImpl (IComponentFactory componentFactory, ITimeProvider timeProvider) : this (timeProvider) => _componentFactory = componentFactory;
 
     private string? _driverName;
 
@@ -57,7 +56,7 @@ internal partial class ApplicationImpl : IApplication
     /// <summary>
     ///     Lock object for synchronizing access to ModelUsage and _instance.
     /// </summary>
-    private static readonly object _modelUsageLock = new ();
+    private static readonly Lock _modelUsageLock = new ();
 
     /// <summary>
     ///     Tracks which application model has been used in this process.
@@ -174,11 +173,7 @@ internal partial class ApplicationImpl : IApplication
     #region Screen and Driver
 
     /// <inheritdoc/>
-    public IClipboard? Clipboard
-    {
-        get => Driver?.Clipboard;
-        set => Driver?.Clipboard = value;
-    }
+    public IClipboard? Clipboard { get => Driver?.Clipboard; set => Driver?.Clipboard = value; }
 
     #endregion Screen and Driver
 
@@ -264,6 +259,7 @@ internal partial class ApplicationImpl : IApplication
         get
         {
             field ??= new ApplicationToolTip { App = this };
+
             return field;
         }
         set;
