@@ -212,7 +212,34 @@ public partial class View // Command APIs
 
     #region Default Event Handlers
 
-    internal bool? DefaultCommandNotBoundHandler (ICommandContext? ctx) => RaiseCommandNotBound (ctx);
+    internal bool? DefaultCommandNotBoundHandler (ICommandContext? ctx)
+    {
+        Trace.Command (this, ctx, "Entry");
+
+        // Reset dispatch state — mirrors DefaultActivateHandler/DefaultAcceptHandler.
+        _dispatchState = DispatchState.None;
+
+        bool? result = RaiseCommandNotBound (ctx);
+
+        if (result is true)
+        {
+            return true;
+        }
+
+        // Report as handled if the command will bubble to an ancestor — mirrors
+        // DefaultActivateHandler logic so that the key is consumed when an ancestor
+        // subscribes to it via CommandsToBubbleUp.
+        bool willBubble = ctx is not null && CommandWillBubbleToAncestor (ctx.Command);
+
+        if (_dispatchState.HasFlag (DispatchState.DispatchOccurred) || willBubble)
+        {
+            return true;
+        }
+
+        // Propagate the null/false from RaiseCommandNotBound: null = nobody observed,
+        // false = subscriber exists but did not handle.
+        return result;
+    }
 
     /// <summary>
     ///     Called when a command that has not been bound is invoked.
@@ -237,9 +264,35 @@ public partial class View // Command APIs
         }
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
+        bool hasSubscribers = CommandNotBound is not null;
         CommandNotBound?.Invoke (this, args);
 
-        return CommandNotBound is null ? null : args.Handled;
+        if (args.Handled)
+        {
+            return true;
+        }
+
+        // Framework dispatch: composite views delegate commands to a target SubView.
+        bool dispatched = TryDispatchToTarget (ctx);
+
+        if (dispatched)
+        {
+            return true;
+        }
+
+        // Bubble to SuperView if the command is in its CommandsToBubbleUp list.
+        // Bubbling is a notification (not consumption) — return false so that the
+        // DefaultCommandNotBoundHandler can still report handled via CommandWillBubbleToAncestor.
+        bool bubbled = TryBubbleUp (ctx, false) is true;
+
+        if (bubbled)
+        {
+            return false;
+        }
+
+        // Distinguish: null = nobody observed (no subscribers, no dispatch, no bubbling);
+        // false = a subscriber existed but did not set Handled=true.
+        return hasSubscribers ? false : null;
     }
 
     /// <summary>
