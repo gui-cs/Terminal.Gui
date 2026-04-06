@@ -17,6 +17,7 @@ public sealed class TabsExample : Scenario
 
         using Window appWindow = new ();
         appWindow.Title = GetQuitKeyAndName ();
+        appWindow.BorderStyle = LineStyle.None;
 
         // ── Main Tabs control ──
         Tabs tabs = new ()
@@ -29,6 +30,7 @@ public sealed class TabsExample : Scenario
             Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
             BorderStyle = LineStyle.Double
         };
+        tabs.Margin.Thickness = new Thickness (1);
 
         tabs.EnableForDesign ();
 

@@ -105,58 +105,71 @@ public class AdornmentSubViewLineCanvasTests (ITestOutputHelper output) : TestDr
                                               driver);
     }
 
-
     [Fact]
-    public void LineCanvas_Drawn_By_Border_SubView_ClippedWhenIntrudingInto_Border_Of_SuperView ()
+    public void LineCanvas_Drawn_By_Border_SubView_ClippedWhenIntrudingInto_Margin_Of_SuperView ()
     {
-        IDriver driver = CreateTestDriver (8, 3);
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver = CreateTestDriver (5, 5);
+        app.Driver!.Force16Colors = true;
+
+        Window top = new ()
+        {
+            Id = "top",
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.None,
+        };
 
         View superView = new ()
         {
-            Id = "superView",
-            Driver = driver,
+            Id = "tabs",
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            BorderStyle = LineStyle.Double
+            BorderStyle = LineStyle.Double,
+            Arrangement = ViewArrangement.Overlapped | ViewArrangement.Resizable
         };
-        superView.Border.Thickness = new Thickness (2, 1, 2, 0);
+        superView.Border.Thickness = new Thickness (1, 0, 1, 0);
+        superView.Margin.Thickness = new Thickness (1);
+        top.Add (superView);
 
         View view = new ()
         {
-            Id = "view",
+            Id = "tab",
+            Title = "abcdef",
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             SuperViewRendersLineCanvas = true
         };
-        view.Border.Thickness = new Thickness (0, 2, 0, 0);
+        view.Border.Thickness = new Thickness (0, 3, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
+        view.Border.Settings = BorderSettings.Tab;
+        view.Border.TabOffset = -2;
+        view.Border.TabLength = 5;
 
         superView.Add (view);
 
-        View subViewOfBorder = new ()
-        {
-            Id = "subViewOfBorder",
-            X = -2,
-            Y = 0,
-            Width = 8,
-            Height = 1,
-            BorderStyle = LineStyle.Dotted,
-            SuperViewRendersLineCanvas = true
-        };
-        view.Border.GetOrCreateView ().Add (subViewOfBorder);
+        app.Begin (top);
 
-        superView.Layout ();
-        superView.Draw ();
-
+        // Should be:
+        //  ╥─╥
+        //  ║c║
+        //  ╨─╨
         DriverAssert.AssertDriverContentsWithFrameAre ("""
-                                               ╔════╗ 
-                                               ║┄┄┄┄║
-                                               ║────║ 
-                                              """,
-                                              output,
-                                              driver);
+                                                       ┌╥─╥┐
+                                                       │║c║│
+                                                       └╨─╨┘
+                                                       """,
+                                                       output,
+                                                       app.Driver);
+
+        //DriverAssert.AssertDriverOutputIs ("""
+        //                                   \x1b[39m\x1b[49m     ┌╥─╥┐│║c║│└╨─╨┘
+        //                                   """,
+        //                                   output,
+        //                                   app.Driver);
     }
 
     [Fact]
@@ -198,7 +211,6 @@ public class AdornmentSubViewLineCanvasTests (ITestOutputHelper output) : TestDr
                                               output,
                                               driver);
     }
-
 
     /// <summary>
     ///     Proves a Label with its own Border and SuperViewRendersLineCanvas = true

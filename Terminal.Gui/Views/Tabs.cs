@@ -1175,8 +1175,6 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         Add (attributesTab, lineStyleTab, settingsTab, addRemoveTab);
 
-        //tab1.SetFocus ();
-
         return true;
 
         // Helper to refresh the list from current TabCollection
