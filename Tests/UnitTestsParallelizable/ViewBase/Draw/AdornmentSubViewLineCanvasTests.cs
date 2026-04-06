@@ -64,75 +64,141 @@ public class AdornmentSubViewLineCanvasTests (ITestOutputHelper output) : TestDr
                                               driver);
     }
 
-    /// <summary>
-    ///     When a SubView of Border has SuperViewRendersLineCanvas = true and its own border,
-    ///     and the SubView's frame extends past the parent Border's bounds, the SubView's
-    ///     border lines must be clipped so they don't corrupt junction glyphs on the parent's
-    ///     content border. Without clipping, the SubView's ─ merges with the parent's │ on
-    ///     the content border row, producing ┬ instead of ┐.
-    /// </summary>
     [Fact]
-    public void BorderSubView_WithBorder_ClippedWhenExceedingParentBounds ()
+    public void LineCanvas_Drawn_By_Padding_SubView_ClippedWhenIntrudingIntoBorder ()
     {
-        // Claude - Opus 4.6
+        IDriver driver = CreateTestDriver (4, 3);
 
-        // 10×5 View with single-line border (thickness 1,3,1,1).
-        // The top border area is 3 rows tall, giving room for a SubView.
-        // An 8×3 SubView is placed at X=4 in the border — its right edge extends
-        // past the parent's border view frame (10 wide).
-        //
-        // Without clipping, the SubView's bottom ─ merges with the parent's vertical
-        // line at the content border row, producing ┬ instead of ┐.
-
-        IDriver driver = CreateTestDriver (10, 5);
-
-        View view = new ()
+        View superView = new ()
         {
-            Id = "view",
+            Id = "superView",
             Driver = driver,
-            Width = 10,
-            Height = 5,
-            BorderStyle = LineStyle.Single
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Double
         };
-        view.Border.Thickness = new Thickness (1, 3, 1, 1);
-        view.Border.Settings = BorderSettings.None;
+        superView.Padding.Thickness = new Thickness (0, 1, 0, 0);
 
-        View sub = new ()
+        View subViewOfPadding = new ()
         {
-            Id = "sub",
-            X = 4,
+            Id = "subViewOfPadding",
+            X = -1,
             Y = 0,
-            Width = 8,
-            Height = 3,
+            Width = 6,
+            Height = 1,
             BorderStyle = LineStyle.Single,
             SuperViewRendersLineCanvas = true
         };
-        sub.Border.Thickness = new Thickness (1);
-        sub.Border.Settings = BorderSettings.None;
-        view.Border.GetOrCreateView ().Add (sub);
+        subViewOfPadding.Border.Thickness = new Thickness (1);
+        subViewOfPadding.Border.Settings = BorderSettings.None;
+        superView.Padding.GetOrCreateView ().Add (subViewOfPadding);
 
-        view.BeginInit ();
-        view.EndInit ();
-        view.Layout ();
-        view.Draw ();
+        superView.Layout ();
+        superView.Draw ();
 
-        output.WriteLine ("Driver output:");
-        output.WriteLine (driver.ToString ());
-
-        // The SubView's border lines are clipped to the border view's frame.
-        // Rows 0-1 are in the top border thickness area (no parent border lines at X=9).
-        // Row 2 is the content border: ┐ at X=9 is the parent's corner, NOT ┬.
-        // The ┴ junction at X=4 proves auto-join still works where SubView meets content border.
         DriverAssert.AssertDriverContentsAre ("""
-                                                  ┌─────
-                                                  │
-                                              ┌───┴────┐
-                                              │        │
-                                              └────────┘
+                                              ╔══╗
+                                              ║──║
+                                              ╚══╝
                                               """,
                                               output,
                                               driver);
     }
+
+
+    [Fact]
+    public void LineCanvas_Drawn_By_Border_SubView_ClippedWhenIntrudingInto_Border_Of_SuperView ()
+    {
+        IDriver driver = CreateTestDriver (8, 3);
+
+        View superView = new ()
+        {
+            Id = "superView",
+            Driver = driver,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Double
+        };
+        superView.Border.Thickness = new Thickness (2, 1, 2, 0);
+
+        View view = new ()
+        {
+            Id = "view",
+            X = 0,
+            Y = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            SuperViewRendersLineCanvas = true
+        };
+        view.Border.Thickness = new Thickness (0, 2, 0, 0);
+        view.Border.LineStyle = LineStyle.Single;
+
+        superView.Add (view);
+
+        View subViewOfBorder = new ()
+        {
+            Id = "subViewOfBorder",
+            X = -2,
+            Y = 0,
+            Width = 8,
+            Height = 1,
+            BorderStyle = LineStyle.Dotted,
+            SuperViewRendersLineCanvas = true
+        };
+        view.Border.GetOrCreateView ().Add (subViewOfBorder);
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsWithFrameAre ("""
+                                               ╔════╗ 
+                                               ║┄┄┄┄║
+                                               ║────║ 
+                                              """,
+                                              output,
+                                              driver);
+    }
+
+    [Fact]
+    public void LineCanvas_Drawn_By_Padding_AutoJoinsWhenIntrudingIntoBorder ()
+    {
+        IDriver driver = CreateTestDriver (4, 3);
+
+        View superView = new ()
+        {
+            Id = "superView",
+            Driver = driver,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Double
+        };
+        superView.Padding.Thickness = new Thickness (0, 1, 0, 0);
+
+        superView.Padding.GetOrCreateView ().DrawingContent += (s, e) =>
+                                                               {
+                                                                   var pv = s as PaddingView;
+
+                                                                   pv?.Adornment?.Parent?.LineCanvas.AddLine (new Point (pv.FrameToScreen ().Location.X - 1,
+                                                                           pv.FrameToScreen ().Location.Y),
+                                                                       4,
+                                                                       Orientation.Horizontal,
+                                                                       LineStyle.Single);
+
+                                                                   e.Cancel = true;
+                                                               };
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ╔══╗
+                                              ╟──╢
+                                              ╚══╝
+                                              """,
+                                              output,
+                                              driver);
+    }
+
 
     /// <summary>
     ///     Proves a Label with its own Border and SuperViewRendersLineCanvas = true

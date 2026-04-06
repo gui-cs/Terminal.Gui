@@ -47,19 +47,9 @@ public partial class View
             // This ensures auto-join works between adornment subview borders and the view's own border.
             // In Tab mode, lines from the TitleView are allowed to extend past the border frame
             // for correct auto-join at boundary junctions (e.g., ┬ where a tab meets the content border).
-            // In non-Tab mode, clip to the border view's frame so generic SubView lines that extend
-            // past the border don't bleed into the parent's border columns, corrupting junction glyphs.
             if (borderView.LineCanvas.Bounds != Rectangle.Empty)
             {
-                if (Border.Settings.HasFlag (BorderSettings.Tab))
-                {
-                    LineCanvas.Merge (borderView.LineCanvas);
-                }
-                else
-                {
-                    Rectangle borderClip = borderView.FrameToScreen ();
-                    LineCanvas.Merge (borderView.LineCanvas, borderClip);
-                }
+                LineCanvas.Merge (borderView.LineCanvas);
 
                 borderView.LineCanvas.Clear ();
             }
