@@ -259,15 +259,6 @@ public class Link : View, IDesignable
         return false;
     }
 
-    /// <inheritdoc/>
-    bool IDesignable.EnableForDesign ()
-    {
-        Title = "_Link";
-        Url = "https://github.com/gui-cs";
-
-        return true;
-    }
-
     /// <summary>
     ///     Copies the current <see cref="Url"/> to the system clipboard.
     /// </summary>
@@ -382,4 +373,17 @@ public class Link : View, IDesignable
         TextFormatter.NeedsFormat = true;
         SetNeedsLayout ();
     }
+
+    /// <inheritdoc/>
+    bool IDesignable.EnableForDesign ()
+    {
+        Title = "_Link";
+        Url = "https://github.com/gui-cs";
+
+        Initialized += (_, _) => { App?.ToolTips?.SetToolTip (this, "This is a Link. Click to open the URL in the default browser."); };
+
+        return true;
+    }
+
+
 }
