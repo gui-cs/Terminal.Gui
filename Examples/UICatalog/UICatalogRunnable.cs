@@ -23,12 +23,8 @@ public sealed class UICatalogRunnable : Runnable
     // the scheme works.
     public static string? CachedRunnableScheme { get; set; }
 
-    // Diagnostics
-    private static ViewDiagnosticFlags _diagnosticFlags;
-
     public UICatalogRunnable ()
     {
-        _diagnosticFlags = Diagnostics;
         SchemeName = CachedRunnableScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
         ConfigurationManager.Applied += ConfigAppliedHandler;
     }
@@ -60,9 +56,14 @@ public sealed class UICatalogRunnable : Runnable
     /// <inheritdoc/>
     protected override void OnIsModalChanged (bool newIsModal)
     {
-        _disableMouseCb?.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
+        if (App is null)
+        {
+            return;
+        }
 
-        _shVersion?.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {App!.Driver!.GetVersionInfo ()}";
+        _disableMouseCb?.Value = App.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
+
+        _shVersion?.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {App?.Driver?.GetVersionInfo ()}";
 
         if (string.IsNullOrEmpty ((string?)Result))
         {
@@ -79,11 +80,11 @@ public sealed class UICatalogRunnable : Runnable
 
         if (ShowStatusBar)
         {
-            _statusBar!.Height = Dim.Auto ();
+            _statusBar?.Height = Dim.Auto ();
         }
         else
         {
-            _statusBar!.Height = 0;
+            _statusBar?.Height = 0;
         }
     }
 
@@ -98,9 +99,9 @@ public sealed class UICatalogRunnable : Runnable
                 return;
             }
 
-            if (_scenarioList is { })
+            if (_scenarioList is { } && App is { } && _scenarioList.Table is { })
             {
-                ShowScenarioErrorsDialog (App!, (string)_scenarioList.Table! [_scenarioList.SelectedRow, 0], UICatalog.LogCapture.GetScenarioLogs ());
+                ShowScenarioErrorsDialog (App, _scenarioList.Table [_scenarioList.SelectedRow, 0].ToString () ?? string.Empty, UICatalog.LogCapture.GetScenarioLogs ());
             }
 
             UICatalog.LogCapture.HasErrors = false;
@@ -154,7 +155,8 @@ public sealed class UICatalogRunnable : Runnable
                                                                       Key.F2),
                                                         new MenuItem ("_About...", "About UI Catalog", ShowAboutDialog, Key.A.WithCtrl)
                                                     ])
-                               ]) { Title = "menuBar", Id = "menuBar" };
+                               ])
+        { Title = "menuBar", Id = "menuBar" };
 
         return menuBar;
 
@@ -170,7 +172,7 @@ public sealed class UICatalogRunnable : Runnable
                 Action = () =>
                          {
                              Driver.Force16Colors = !Driver.Force16Colors;
-                             _force16ColorsShortcutCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+                             _force16ColorsShortcutCb?.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
                              SetNeedsDraw ();
                          }
             });
@@ -248,10 +250,10 @@ public sealed class UICatalogRunnable : Runnable
 
             _disableMouseCb = new CheckBox
             {
-                Title = "_Disable MouseEventArgs", Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked
+                Title = "_Disable MouseEventArgs", Value = App?.Mouse.IsMouseDisabled == true ? CheckState.Checked : CheckState.UnChecked
             };
 
-            _disableMouseCb.ValueChanged += (_, args) => { App!.Mouse.IsMouseDisabled = args.NewValue == CheckState.Checked; };
+            _disableMouseCb.ValueChanged += (_, args) => { App?.Mouse.IsMouseDisabled = args.NewValue == CheckState.Checked; };
             menuItems.Add (new MenuItem { CommandView = _disableMouseCb, HelpText = "Disable MouseEventArgs" });
 
             return menuItems.ToArray ();
@@ -260,7 +262,7 @@ public sealed class UICatalogRunnable : Runnable
                 Diagnostics = args.Value ?? ViewDiagnosticFlags.Off;
         }
 
-        View [] CreateLoggingMenuItems ()
+        View? [] CreateLoggingMenuItems ()
         {
             List<View?> menuItems = [];
 
@@ -434,11 +436,14 @@ public sealed class UICatalogRunnable : Runnable
 
             menuItems.Add (new MenuItem ("_Open Log Folder", string.Empty, () => Link.OpenUrl (UICatalog.LOGFILE_LOCATION)));
 
-            return menuItems.ToArray ()!;
+            return menuItems.ToArray () ?? [];
 
             void OnLogLevelSelectorOnValueChanged (object? _, ValueChangedEventArgs<int?> args)
             {
-                UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (Enum.GetValues<LogLevel> () [args.NewValue!.Value])! };
+                if (args.NewValue is { })
+                {
+                    UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (Enum.GetValues<LogLevel> () [args.NewValue.Value]) ?? string.Empty };
+                }
 
                 UICatalog.LogLevelSwitch.MinimumLevel = UICatalog.LogLevelToLogEventLevel (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel));
             }
@@ -482,7 +487,11 @@ public sealed class UICatalogRunnable : Runnable
             CachedRunnableScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
         }
 
-        int newSelectedItem = SchemeManager.GetSchemeNames ().IndexOf (CachedRunnableScheme!);
+        if (CachedRunnableScheme is null)
+        {
+            return;
+        }
+        int newSelectedItem = SchemeManager.GetSchemeNames ().IndexOf (CachedRunnableScheme);
 
         // if the item is in bounds then select it
         if (newSelectedItem >= 0 && newSelectedItem < SchemeManager.GetSchemeNames ().Count)
@@ -502,18 +511,28 @@ public sealed class UICatalogRunnable : Runnable
 
     private TableView CreateScenarioList ()
     {
+        if (_categoryList is null)
+        {
+            throw new InvalidOperationException ("Category list must be created before scenario list");
+        }
+
+        if (_menuBar is null)
+        {
+            throw new InvalidOperationException ("Menu bar must be created before scenario list");
+        }
+
         // Create the scenario list. The contents of the scenario list changes whenever the
         // Category list selection changes (to show just the scenarios that belong to the selected
         // category).
         TableView scenarioList = new ()
         {
-            X = Pos.Right (_categoryList!) - 1,
-            Y = Pos.Bottom (_menuBar!),
+            X = Pos.Right (_categoryList) - 1,
+            Y = Pos.Bottom (_menuBar),
             Width = Dim.Fill (),
             Height = Dim.Height (_categoryList),
             CanFocus = true,
             Title = "_Scenarios",
-            BorderStyle = _categoryList!.BorderStyle,
+            BorderStyle = _categoryList?.BorderStyle ?? LineStyle.None,
             SuperViewRendersLineCanvas = true
         };
 
@@ -540,7 +559,7 @@ public sealed class UICatalogRunnable : Runnable
          * we just measure all the data ourselves and set the appropriate
          * max widths as ColumnStyles
          */
-        int longestName = CachedScenarios!.Max (s => s.GetName ().Length);
+        int longestName = CachedScenarios?.Max (s => s.GetName ().Length) ?? 0;
 
         scenarioList.Style.ColumnStyles.Add (0, new ColumnStyle { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
         scenarioList.Style.ColumnStyles.Add (1, new ColumnStyle { MaxWidth = 1 });
@@ -567,11 +586,15 @@ public sealed class UICatalogRunnable : Runnable
     private void ScenarioView_OpenSelectedItem (object? sender, EventArgs? e)
     {
         // Save selected item state
-        _cachedCategoryIndex = _categoryList!.SelectedItem;
-        _cachedScenarioIndex = _scenarioList!.SelectedRow;
+        _cachedCategoryIndex = _categoryList?.SelectedItem;
 
-        // Set the Result to the selected scenario name
-        Result = (string)_scenarioList.Table! [_scenarioList.SelectedRow, 0];
+        if (_scenarioList is { })
+        {
+            _cachedScenarioIndex = _scenarioList.SelectedRow;
+
+            // Set the Result to the selected scenario name
+            Result = _scenarioList.Table? [_scenarioList.SelectedRow, 0];
+        }
         Logging.Information ($"Scenario Selected; Stopping {GetType ().Name}: {Result}");
         App?.RequestStop ();
     }
@@ -586,13 +609,23 @@ public sealed class UICatalogRunnable : Runnable
 
     private ListView CreateCategoryList ()
     {
+        if (_menuBar is null)
+        {
+            throw new InvalidOperationException ("Menu bar must be created before scenario list");
+        }
+
+        if (_statusBar is null)
+        {
+            throw new InvalidOperationException ("Status bar must be created before scenario list");
+        }
+
         // Create the Category list view. This list never changes.
         ListView categoryList = new ()
         {
             X = 0,
-            Y = Pos.Bottom (_menuBar!),
+            Y = Pos.Bottom (_menuBar),
             Width = Dim.Auto (),
-            Height = Dim.Fill (_statusBar!),
+            Height = Dim.Fill (_statusBar),
             ShowMarks = false,
             CanFocus = true,
             Title = "_Categories",
@@ -603,7 +636,7 @@ public sealed class UICatalogRunnable : Runnable
 
         categoryList.Accepting += (_, e) =>
                                   {
-                                      _scenarioList!.SetFocus ();
+                                      _scenarioList?.SetFocus ();
                                       e.Handled = true;
                                   };
         categoryList.ValueChanged += CategoryView_SelectedChanged;
@@ -616,24 +649,25 @@ public sealed class UICatalogRunnable : Runnable
 
     private void CategoryView_SelectedChanged (object? sender, ValueChangedEventArgs<int?> e)
     {
-        if (e.NewValue is null)
+        if (e.NewValue is null || CachedCategories is null)
         {
             return;
         }
-        string item = CachedCategories! [e.NewValue.Value];
-        ObservableCollection<Scenario> newScenarioList;
+        string item = CachedCategories [e.NewValue.Value];
 
-        if (e.NewValue == 0)
+        if (CachedScenarios is null)
         {
-            // First category is "All"
-            newScenarioList = CachedScenarios!;
-        }
-        else
-        {
-            newScenarioList = new ObservableCollection<Scenario> (CachedScenarios!.Where (s => s.GetCategories ().Contains (item)).ToList ());
+            return;
         }
 
-        _scenarioList!.Table = new EnumerableTableSource<Scenario> (newScenarioList,
+        // First category is "All"
+        ObservableCollection<Scenario> newScenarioList = e.NewValue == 0
+                                                             ? CachedScenarios
+                                                             : new ObservableCollection<Scenario> (CachedScenarios
+                                                                                                   .Where (s => s.GetCategories ().Contains (item))
+                                                                                                   .ToList ());
+
+        _scenarioList?.Table = new EnumerableTableSource<Scenario> (newScenarioList,
                                                                     new Dictionary<string, Func<Scenario, object>>
                                                                     {
                                                                         { "Name", s => s.GetName () }, { "Description", s => s.GetDescription () }
@@ -695,7 +729,7 @@ public sealed class UICatalogRunnable : Runnable
             Action = () =>
                      {
                          Driver.Force16Colors = !Driver.Force16Colors;
-                         _force16ColorsMenuItemCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+                         _force16ColorsMenuItemCb?.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
                          SetNeedsDraw ();
                      }
         };
@@ -711,12 +745,12 @@ public sealed class UICatalogRunnable : Runnable
                                 switch (args.NewValue)
                                 {
                                     case true:
-                                        _statusBar!.Height = Dim.Auto ();
+                                        _statusBar?.Height = Dim.Auto ();
 
                                         break;
 
                                     case false:
-                                        _statusBar!.Height = 0;
+                                        _statusBar?.Height = 0;
 
                                         break;
                                 }
@@ -740,10 +774,10 @@ public sealed class UICatalogRunnable : Runnable
 
         _shQuit?.Key = Application.GetDefaultKey (Command.Quit);
 
-        _disableMouseCb!.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
-        _force16ColorsShortcutCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+        _disableMouseCb?.Value = App?.Mouse.IsMouseDisabled == true ? CheckState.Checked : CheckState.UnChecked;
+        _force16ColorsShortcutCb?.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
 
-        App.TopRunnableView?.SetNeedsDraw ();
+        App?.TopRunnableView?.SetNeedsDraw ();
     }
 
     private void ConfigAppliedHandler (object? sender, ConfigurationManagerEventArgs? a) => ConfigApplied ();
@@ -753,7 +787,7 @@ public sealed class UICatalogRunnable : Runnable
     /// <summary>
     ///     The URL displayed in the About Box.
     /// </summary>
-    public const string AboutUrl = "https://github.com/gui-cs/Terminal.Gui";
+    public const string ABOUT_URL = "https://github.com/gui-cs/Terminal.Gui";
 
     private void ShowAboutDialog ()
     {
@@ -770,17 +804,12 @@ public sealed class UICatalogRunnable : Runnable
 
         GradientArtView asciiArt = new () { X = Pos.Center (), Y = Pos.Bottom (tagline) + 1 };
 
-        Link link = new ()
-        {
-            Text = AboutUrl,
-            Url = AboutUrl,
-            X = Pos.Center (),
-            Y = Pos.Bottom (asciiArt) + 1
-        };
+        Link link = new () { Text = ABOUT_URL, Url = ABOUT_URL, X = Pos.Center (), Y = Pos.Bottom (asciiArt) + 1 };
+        App?.ToolTips?.SetToolTip (link, () => link.Url);
 
         dialog.Add (tagline, asciiArt, link);
         dialog.Buttons.ElementAt (0).SetFocus ();
-        App!.Run (dialog);
+        App?.Run (dialog);
         dialog.Dispose ();
     }
 
