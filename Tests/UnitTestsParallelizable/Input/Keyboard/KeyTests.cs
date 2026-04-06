@@ -233,6 +233,45 @@ public class KeyTests
         Assert.Equal (KeyCode.Null, eventArgs.KeyCode);
     }
 
+    [Fact]
+    public void GetPrintableText_Prefers_AssociatedText ()
+    {
+        Key key = new (Key.D1.WithShift) { AssociatedText = "!" };
+
+        Assert.Equal ("!", key.GetPrintableText ());
+        Assert.True (key.TryGetPrintableRune (out Rune rune));
+        Assert.Equal (new Rune ('!'), rune);
+    }
+
+    [Fact]
+    public void GetPrintableText_Falls_Back_To_ShiftedKeyCode ()
+    {
+        Key key = new (Key.D1.WithShift) { ShiftedKeyCode = (KeyCode)'!' };
+
+        Assert.Equal ("!", key.GetPrintableText ());
+        Assert.True (key.TryGetPrintableRune (out Rune rune));
+        Assert.Equal (new Rune ('!'), rune);
+    }
+
+    [Fact]
+    public void GetPrintableText_Falls_Back_To_AsRune ()
+    {
+        Key key = new (Key.D1.WithShift);
+
+        Assert.Equal ("1", key.GetPrintableText ());
+        Assert.True (key.TryGetPrintableRune (out Rune rune));
+        Assert.Equal (new Rune ('1'), rune);
+    }
+
+    [Fact]
+    public void TryGetPrintableRune_Returns_False_For_MultiRune_AssociatedText ()
+    {
+        Key key = new (Key.A) { AssociatedText = "ab" };
+
+        Assert.False (key.TryGetPrintableRune (out Rune rune));
+        Assert.Equal (default (Rune), rune);
+    }
+
     [Theory]
     [InlineData ("Barf")]
     public void Constructor_String_Invalid_Throws (string keyString) { Assert.Throws<ArgumentException> (() => new Key (keyString)); }

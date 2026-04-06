@@ -259,6 +259,40 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         top.Dispose ();
     }
 
+    [Fact]
+    public void KittyAssociatedText_ShiftedPrintableKey_InsertsAssociatedText ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 10 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        Key kittyKey = new ('!') { AssociatedText = "!" };
+
+        Assert.True (top.NewKeyDownEvent (kittyKey));
+        Assert.Equal ("!", tf.Text);
+
+        top.Dispose ();
+    }
+
+    [Fact]
+    public void ShiftedDigitKey_WithoutKittyMetadata_CannotInsertPrintableDigit ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 10 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        Assert.False (top.NewKeyDownEvent (Key.D1.WithShift));
+        Assert.Equal ("", tf.Text);
+
+        top.Dispose ();
+    }
+
     // Claude - Opus 4.6
     /// <summary>
     ///     Verifies that the space key is not consumed by the default View Command.Activate binding.

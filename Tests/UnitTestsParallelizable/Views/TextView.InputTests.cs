@@ -183,6 +183,24 @@ public class TextViewInputTests
         Assert.False (tv.IsSelecting);
     }
 
+    [Fact]
+    public void KittyAssociatedText_ShiftedPrintableKey_InsertsAssociatedText ()
+    {
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new () { Width = 10, Height = 2 };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        Key kittyKey = new ('!') { AssociatedText = "!" };
+
+        Assert.True (tv.NewKeyDownEvent (kittyKey));
+        Assert.Equal ("!", tv.Text);
+        Assert.Equal (new Point (1, 0), tv.InsertionPoint);
+    }
+
     // CoPilot - decomposed from KeyBindings_Command test
     [Fact]
     public void Backspace_Deletes_Previous_Character ()
