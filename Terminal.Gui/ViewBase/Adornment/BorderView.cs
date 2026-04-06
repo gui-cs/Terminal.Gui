@@ -398,12 +398,11 @@ public partial class BorderView : AdornmentView
 
         if (effectiveTabLength > 0)
         {
-            int tabLength = effectiveTabLength;
             LineStyle lineStyle = border.LineStyle.Value;
             bool hasFocus = IsFocusedOrLastTab ();
 
             // Compute tab header geometry
-            Rectangle headerRect = TitleViewType.ComputeHeaderRect (borderBounds, border.TabSide, border.TabOffset, tabLength, tabDepth);
+            Rectangle headerRect = TitleViewType.ComputeHeaderRect (borderBounds, border.TabSide, border.TabOffset, effectiveTabLength, tabDepth);
             Rectangle viewBounds = TitleViewType.ComputeViewBounds (borderBounds, border.TabSide, tabDepth);
             Rectangle clipped = Rectangle.Intersect (headerRect, viewBounds);
             bool tabVisible = !clipped.IsEmpty;
@@ -480,6 +479,32 @@ public partial class BorderView : AdornmentView
         }
 
         return border.Parent?.HasFocus ?? false;
+    }
+
+    /// <summary>
+    ///     When in tab mode, if a command is not handled by the TitleView, bubble it to the SuperView (e.g. Tabs);
+    ///     this enables keyboard navigation commands to be handled by the Tabs container when the TitleView has focus.
+    /// </summary>
+    /// <param name="args"></param>
+    /// <returns></returns>
+    protected override bool OnCommandNotBound (CommandEventArgs args)
+    {
+        if (base.OnCommandNotBound (args))
+        {
+            return true;
+        }
+
+        if (Adornment is not Border border || !border.Settings.FastHasFlags (BorderSettings.Tab))
+        {
+            return false;
+        }
+
+        if (args.Context.TryGetSource (out View? view) && view is TitleView && args.Context is { })
+        {
+            return border.Parent?.SuperView?.InvokeCommand (args.Context.Command, args.Context) is true;
+        }
+
+        return false;
     }
 
     /// <summary>

@@ -43,21 +43,21 @@ public sealed class TitleView : View, ITitleView, IDesignable
         //AddCommand (Command.Left, () => false);
         //AddCommand (Command.Right, () => false);
 
-        AddCommand (Command.Activate,
-                    _ =>
-                    {
-                        SetFocus ();
+        //AddCommand (Command.Activate,
+        //            _ =>
+        //            {
+        //                SetFocus ();
 
-                        return true;
-                    });
+        //                return true;
+        //            });
 
-        AddCommand (Command.HotKey,
-                    _ =>
-                    {
-                        SetFocus ();
+        //AddCommand (Command.HotKey,
+        //            _ =>
+        //            {
+        //                SetFocus ();
 
-                        return true;
-                    });
+        //                return true;
+        //            });
 
         // Remove Enter — title views should not respond to Enter
         KeyBindings.Remove (Key.Enter);
@@ -83,6 +83,9 @@ public sealed class TitleView : View, ITitleView, IDesignable
         BorderStyle = LineStyle.Rounded;
         TabSide = Side.Top;
     }
+
+    /// <inheritdoc />
+    //protected override void OnActivated (ICommandContext? ctx) => SetFocus ();
 
 #if TAB_COLOR_PROTOTYPE
     /// <inheritdoc />

@@ -46,6 +46,8 @@ public class Tabs : View, IValue<View?>, IDesignable
         AddCommand (Command.Down, NavCommandHandler);
         AddCommand (Command.Left, NavCommandHandler);
         AddCommand (Command.Right, NavCommandHandler);
+
+        CommandsToBubbleUp = [Command.Up, Command.Down, Command.Left, Command.Right];
     }
 
     private readonly List<WeakReference<View>> _tabList = [];
@@ -544,6 +546,7 @@ public class Tabs : View, IValue<View?>, IDesignable
         view.HotKeySpecifier = (Rune)'\xffff';
 
         view.Border.View?.CommandsToBubbleUp = [Command.Up, Command.Down, Command.Left, Command.Right];
+        //view.CommandsToBubbleUp = [Command.Up, Command.Down, Command.Left, Command.Right];
     }
 
     /// <summary>
