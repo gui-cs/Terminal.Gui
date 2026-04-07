@@ -58,7 +58,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
     ///     Categorizes views in a single pass to reduce iterations and allocations.
     ///     Phase 1 and 2 Performance Optimization.
     /// </summary>
-    private static ViewCategories CategorizeViews (IList<View> subViews, Dimension dimension, int superviewContentSize)
+    private static ViewCategories CategorizeViews (IList<View> subViews, Dimension dimension)
     {
         ViewCategories categories = new ()
         {
@@ -191,7 +191,11 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
 
                     if (us.TextFormatter.ConstrainToWidth is null)
                     {
-                        width = us.TextFormatter.FormatAndGetSize (new Size (us.Viewport.Width, screenX4)).Width;
+                        // Use Viewport.Width if available; fall back to the max-based width when
+                        // the view hasn't been laid out yet (Viewport.Width == 0) to avoid
+                        // constraining the text to zero width which produces height = 0.
+                        int constrainWidth = us.Viewport.Width > 0 ? us.Viewport.Width : width;
+                        width = us.TextFormatter.FormatAndGetSize (new Size (constrainWidth, screenX4)).Width;
                     }
 
                     textSize = us.TextFormatter.FormatAndGetSize (new Size (us.TextFormatter.ConstrainToWidth ?? width, screenX4)).Height;
@@ -219,7 +223,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 // Work directly with the collection to avoid unnecessary ToList() allocation
 
                 // Categorize views in a single pass
-                ViewCategories categories = CategorizeViews (us.InternalSubViews, dimension, superviewContentSize);
+                ViewCategories categories = CategorizeViews (us.InternalSubViews, dimension);
 
                 // Process not-dependent views
                 foreach (View notDependentSubView in categories.NotDependent)

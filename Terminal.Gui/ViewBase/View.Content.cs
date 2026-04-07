@@ -99,7 +99,31 @@ public partial class View
 
         // DimAuto.Calculate adds the Adornments thickness, so we need to subtract it here since
         // we want the content size only.
-        Dim.Auto ().Calculate (0, GetContainerSize ().Width, this, Dimension.Width) - GetAdornmentsThickness ().Horizontal;
+        GetAutoWidth () - GetAdornmentsThickness ().Horizontal;
+
+    /// <summary>
+    ///     Gets the natural (auto-size) width of the view as calculated by <see cref="Dim.Auto ()"/>.
+    /// </summary>
+    /// <remarks>
+    ///     The returned width is the full auto-calculated width for the view, including adornment thickness.
+    ///     Unlike <see cref="GetWidthRequiredForSubViews ()"/>, this value is not content-only.
+    ///     The calculation may also respect minimum and maximum content constraints applied by the auto dimension logic
+    ///     before adornments are added.
+    /// </remarks>
+    /// <returns></returns>
+    public int GetAutoWidth () => Dim.Auto ().Calculate (0, GetContainerSize ().Width, this, Dimension.Width);
+
+    /// <summary>
+    ///     Gets the natural (auto-size) height of the view as calculated by <see cref="Dim.Auto ()"/>.
+    /// </summary>
+    /// <remarks>
+    ///     The returned height is the full auto-calculated height for the view, including adornment thickness.
+    ///     Unlike <see cref="GetHeightRequiredForSubViews ()"/>, this value is not content-only.
+    ///     The calculation may also respect minimum and maximum content constraints applied by the auto dimension logic
+    ///     before adornments are added.
+    /// </remarks>
+    /// <returns></returns>
+    public int GetAutoHeight () => Dim.Auto ().Calculate (0, GetContainerSize ().Height, this, Dimension.Height);
 
     /// <summary>
     ///     Gets the minimum number of rows required for all the View's SubViews to fit in the content area.
@@ -109,7 +133,7 @@ public partial class View
 
         // DimAuto.Calculate adds the Adornments thickness, so we need to subtract it here since
         // we want the content size only.
-        Dim.Auto ().Calculate (0, GetContainerSize ().Height, this, Dimension.Height) - GetAdornmentsThickness ().Vertical;
+        GetAutoHeight () - GetAdornmentsThickness ().Vertical;
 
     /// <summary>
     ///     Gets or sets a value indicating whether the view's content size tracks the <see cref="Viewport"/>'s
@@ -241,22 +265,6 @@ public partial class View
 
         // Translate to Screen-Relative (our SuperView's Viewport-relative coordinates)
         return ViewportToScreen (contentRelativeToViewport);
-    }
-
-    /// <summary>Converts a Screen-relative coordinate to a Content-relative coordinate.</summary>
-    /// <remarks>
-    ///     Content-relative means relative to the top-left corner of the view's Content, which is
-    ///     always at <c>0, 0</c>.
-    /// </remarks>
-    /// <param name="location">The Screen-relative location.</param>
-    /// <returns>The coordinate relative to this view's Content.</returns>
-    public Point ScreenToContent (in Point location)
-    {
-        Point viewportOffset = GetViewportOffsetFromFrame ();
-        Point screen = ScreenToFrame (location);
-        screen.Offset (Viewport.X - viewportOffset.X, Viewport.Y - viewportOffset.Y);
-
-        return screen;
     }
 
     #endregion Content Area
