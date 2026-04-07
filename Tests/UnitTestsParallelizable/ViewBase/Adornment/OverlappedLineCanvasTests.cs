@@ -398,7 +398,7 @@ internal class GapBorderView : View
     public GapBorderView () =>
 
         // Don't use the standard border — we draw manually via LineCanvas
-        Border.Settings = BorderSettings.None;
+        Border.Settings = BorderSettings.Default;
 
     protected override bool OnDrawingContent (DrawContext? context)
     {

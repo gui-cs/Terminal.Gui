@@ -47,7 +47,7 @@ public class BorderEditor : AdornmentEditor
         _osBorderSettings = new FlagSelector<BorderSettings>
         {
             Y = Pos.Bottom (_osBorderStyle),
-            Value = (AdornmentToEdit as Border)?.Settings ?? BorderSettings.None,
+            Value = (AdornmentToEdit as Border)?.Settings ?? BorderSettings.Default,
             Width = Dim.Auto(),
             BorderStyle = LineStyle.Single,
             Title = "S_ettings"

@@ -3,11 +3,38 @@ using TitleViewType = Terminal.Gui.ViewBase.TitleView;
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
-///     The View-backed rendering, navigation, and arrangement, layer for the Border adornment.
+///     The View-backed rendering, navigation, and arrangement layer for the <see cref="Border"/> adornment.
 ///     Created lazily by <see cref="Border"/> (via <see cref="AdornmentImpl.GetOrCreateView"/>)
 ///     when rendering, arrangement, or other View-level functionality is needed.
-///     <see href="https://gui-cs.github.io/Terminal.Gui/docs/borders.html"/>
 /// </summary>
+/// <remarks>
+///     <para>
+///         <see cref="BorderView"/> has two rendering code paths selected by <see cref="BorderSettings"/>:
+///     </para>
+///     <list type="bullet">
+///         <item>
+///             <description>
+///                 <b>Legacy mode</b> (<see cref="BorderSettings.Tab"/> not set): Draws the border frame and
+///                 inline title using <see cref="LineCanvas"/>. Title position is determined by
+///                 <see cref="IAdornment.Thickness"/> on the title side (1 = inline, 2 = cap line, 3+ = enclosed rectangle).
+///             </description>
+///         </item>
+///         <item>
+///             <description>
+///                 <b>Tab mode</b> (<see cref="BorderSettings.Tab"/> set): Draws a content border frame and a separate
+///                 tab header via a <see cref="TitleView"/> SubView. The TitleView has
+///                 <see cref="View.SuperViewRendersLineCanvas"/> = <see langword="true"/>, so its border lines
+///                 auto-join with the content border via <see cref="View.LineCanvas"/>.
+///             </description>
+///         </item>
+///     </list>
+///     <para>
+///         Mouse-driven move/resize is handled by <see cref="Arranger"/> (see <see cref="BorderView.Arrangement"/>).
+///     </para>
+///     <para>
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/borders.html"/> for the full deep dive.
+///     </para>
+/// </remarks>
 /// <seealso cref="Border"/>
 /// <seealso cref="BorderSettings"/>
 /// <seealso cref="View.Arrangement"/>
@@ -508,7 +535,15 @@ public partial class BorderView : AdornmentView
 
     private TitleView? _titleView;
 
-    /// <summary>Gets the tab's <see cref="TitleView"/>, or <see langword="null"/> if not yet created.</summary>
+    /// <summary>
+    ///     Gets the tab header <see cref="ViewBase.TitleView"/> SubView, or <see langword="null"/> if
+    ///     <see cref="BorderSettings.Tab"/> is not set or the view has not yet been created.
+    /// </summary>
+    /// <remarks>
+    ///     The <see cref="ViewBase.TitleView"/> is created lazily by <see cref="EnsureTitleView"/> when
+    ///     <see cref="BorderSettings.Tab"/> is first set. It can be used to hook mouse events for
+    ///     custom behaviors such as drag-to-slide tab reordering.
+    /// </remarks>
     public View? TitleView => _titleView;
 
     /// <summary>
@@ -910,7 +945,8 @@ public partial class BorderView : AdornmentView
     #region DrawIndicator Support
 
     /// <summary>
-    ///     Gets the subview used to render <see cref="ViewDiagnosticFlags.DrawIndicator"/>.
+    ///     Gets the <see cref="SpinnerView"/> SubView used to render <see cref="ViewDiagnosticFlags.DrawIndicator"/>,
+    ///     or <see langword="null"/> if the diagnostic flag is not set or the border has zero thickness.
     /// </summary>
     public SpinnerView? DrawIndicator { get; private set; }
 

@@ -34,7 +34,7 @@ public sealed class TitleView : View, ITitleView, IDesignable
         Height = Dim.Auto ();
 
         TabStop = TabBehavior.TabStop;
-        Border.Settings = BorderSettings.None;
+        Border.Settings = BorderSettings.Default;
         SuperViewRendersLineCanvas = true;
 
         AddCommand (Command.HotKey,
@@ -74,7 +74,6 @@ public sealed class TitleView : View, ITitleView, IDesignable
         BorderStyle = LineStyle.Rounded;
         TabSide = Side.Top;
     }
-
 
 #if TAB_COLOR_PROTOTYPE
     /// <inheritdoc />

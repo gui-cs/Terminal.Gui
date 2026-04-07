@@ -281,176 +281,6 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
     }
 
-    /// <inheritdoc/>
-    protected override bool OnKeyDownNotHandled (Key key)
-    {
-        return base.OnKeyDownNotHandled (key);
-
-        if (MostFocused is TitleView)
-        {
-            if (TabSide is Side.Top or Side.Bottom)
-            {
-                // Prevent arrow keys from being handled by the title view, which would interfere with expected tab navigation
-                if (key == Key.CursorRight)
-                {
-                    // Set focus to the next tab, wrapping to the first tab if currently on the last tab
-                    View? nextTab = TabCollection.SkipWhile (t => !t.HasFocus).Skip (1).FirstOrDefault () ?? TabCollection.FirstOrDefault ();
-                    var borderView = nextTab?.Border.View as BorderView;
-
-                    return borderView?.TitleView?.SetFocus () ?? true;
-                }
-
-                if (key == Key.CursorLeft)
-                {
-                    // Set focus to the previous tab, wrapping to the last tab if currently on the first tab
-                    View? previousTab = TabCollection.TakeWhile (t => !t.HasFocus).LastOrDefault () ?? TabCollection.LastOrDefault ();
-                    var borderView = previousTab?.Border.View as BorderView;
-
-                    return borderView?.TitleView?.SetFocus () ?? true;
-                }
-
-                if (key == Key.CursorDown && TabSide == Side.Top)
-                {
-                    // If the tab headers are on the top or bottom, allow down arrow to move focus into the selected tab content
-                    if (Value?.PreviouslyFocused is { })
-                    {
-                        return Value?.PreviouslyFocused?.SetFocus () ?? false;
-                    }
-
-                    return Value?.FocusDeepest (NavigationDirection.Forward, null) ?? false;
-                }
-
-                if (key == Key.CursorDown && TabSide == Side.Bottom)
-                {
-                    // If the tab headers are on the top or bottom, allow down arrow to move focus into the selected tab content
-                    HasFocus = false;
-
-                    return true;
-                }
-
-                if (key == Key.CursorUp && TabSide == Side.Top)
-                {
-                    HasFocus = false;
-
-                    return true;
-                }
-
-                if (key == Key.CursorUp && TabSide == Side.Bottom)
-                {
-                    // If the tab headers are on the top or bottom, allow down arrow to move focus into the selected tab content
-                    if (Value?.PreviouslyFocused is { })
-                    {
-                        return Value?.PreviouslyFocused?.SetFocus () ?? false;
-                    }
-
-                    return Value?.FocusDeepest (NavigationDirection.Backward, null) ?? false;
-                }
-            }
-            else
-            {
-                // TabSide is either Right or Left; same logic as above, but oriented for vertical tabs and using left/right arrows instead of up/down
-
-                if (key == Key.CursorDown)
-                {
-                    // Set focus to the next tab, wrapping to the first tab if currently on the last tab
-                    View? nextTab = TabCollection.SkipWhile (t => !t.HasFocus).Skip (1).FirstOrDefault () ?? TabCollection.FirstOrDefault ();
-
-                    var borderView = nextTab?.Border.View as BorderView;
-
-                    return borderView?.TitleView?.SetFocus () ?? true;
-                }
-
-                if (key == Key.CursorUp)
-                {
-                    // Set focus to the previous tab, wrapping to the last tab if currently on the first tab
-                    View? previousTab = TabCollection.TakeWhile (t => !t.HasFocus).LastOrDefault () ?? TabCollection.LastOrDefault ();
-
-                    return previousTab?.Border.View?.FocusDeepest (NavigationDirection.Backward, null) ?? true;
-                }
-
-                if (key == Key.CursorRight && TabSide == Side.Left)
-                {
-                    // Tab headers on the left: right arrow moves focus into the selected tab content
-                    if (Value?.PreviouslyFocused is { })
-                    {
-                        return Value?.PreviouslyFocused?.SetFocus () ?? false;
-                    }
-
-                    return Value?.FocusDeepest (NavigationDirection.Forward, TabBehavior.NoStop) ?? false;
-                }
-
-                if (key == Key.CursorRight && TabSide == Side.Right)
-                {
-                    // Tab headers on the right: right arrow moves away from the strip
-                    HasFocus = false;
-
-                    return true;
-                }
-
-                if (key == Key.CursorLeft && TabSide == Side.Left)
-                {
-                    // Tab headers on the left: left arrow moves away from the strip
-                    HasFocus = false;
-
-                    return true;
-                }
-
-                if (key == Key.CursorLeft && TabSide == Side.Right)
-                {
-                    // Tab headers on the right: left arrow moves focus into the selected tab content
-                    if (Value?.PreviouslyFocused is { })
-                    {
-                        return Value?.PreviouslyFocused?.SetFocus () ?? false;
-                    }
-
-                    return Value?.FocusDeepest (NavigationDirection.Backward, TabBehavior.NoStop) ?? false;
-                }
-            }
-        }
-
-        if (key == Application.GetDefaultKey (Command.NextTabGroup))
-        {
-            // Tab to the text TabHeader if focus is currently in the selected tab content
-
-            return (TabCollection.SkipWhile (t => !t.HasFocus).Skip (1).FirstOrDefault () ?? TabCollection.FirstOrDefault ())?.SetFocus () ?? true;
-        }
-
-        if (key == Application.GetDefaultKey (Command.PreviousTabGroup))
-        {
-            // Tab to the TabHeaders if focus is currently in the selected tab content
-            return (TabCollection.TakeWhile (t => !t.HasFocus).LastOrDefault () ?? TabCollection.LastOrDefault ())?.SetFocus () ?? true;
-        }
-
-        //// Top or Bottom
-        //if (key == Key.CursorDown && TabSide is Side.Top or Side.Bottom)
-        //{
-        //    // Set focus to the next tab, wrapping to the first tab if currently on the last tab
-        //    View? nextTab = TabCollection.SkipWhile (t => !t.HasFocus).Skip (1).FirstOrDefault () ?? TabCollection.FirstOrDefault ();
-        //    return nextTab?.Border.View?.FocusDeepest (NavigationDirection.Forward, null) ?? true;
-        //}
-        //if (key == Key.CursorUp && TabSide is Side.Top or Side.Bottom)
-        //{
-        //    // Set focus to the previous tab, wrapping to the last tab if currently on the first tab
-        //    View? previousTab = TabCollection.TakeWhile (t => !t.HasFocus).LastOrDefault () ?? TabCollection.LastOrDefault ();
-        //    return previousTab?.Border.View?.FocusDeepest (NavigationDirection.Backward, null) ?? true;
-        //}
-        //// Left or Right
-        //if (key == Key.CursorRight && TabSide is Side.Left or Side.Right)
-        //{
-        //    //Set focus to the next tab, wrapping to the first tab if currently on the last tab
-        //    View? nextTab = TabCollection.SkipWhile (t => !t.HasFocus).Skip (1).FirstOrDefault () ?? TabCollection.FirstOrDefault ();
-        //    return nextTab?.Border.View?.FocusDeepest (NavigationDirection.Forward, null) ?? true;
-        //}
-        //if (key == Key.CursorLeft && TabSide is Side.Left or Side.Right)
-        //{
-        //    // Set focus to the previous tab, wrapping to the last tab if currently on the first tab
-        //    View? previousTab = TabCollection.TakeWhile (t => !t.HasFocus).LastOrDefault () ?? TabCollection.LastOrDefault ();
-        //    return previousTab?.Border.View?.FocusDeepest (NavigationDirection.Backward, null) ?? true;
-        //}
-        // If focus is not on a tab title, allow tabbing into tab title
-        return base.OnKeyDownNotHandled (key);
-    }
-
     /// <summary>
     ///     Reorders the SubViews to match the logical tab order defined by <see cref="TabCollection"/>. This ensures that
     ///     navigation and other operations that rely on SubView order function according to the logical tab order, rather than
@@ -712,13 +542,13 @@ public class Tabs : View, IValue<View?>, IDesignable
             tab.Border.TabSide = _tabSide;
 
             tab.Border.Thickness = _tabSide switch
-                                   {
-                                       Side.Top => new Thickness (1, TabDepth, 1, 1),
-                                       Side.Bottom => new Thickness (1, 1, 1, TabDepth),
-                                       Side.Left => new Thickness (TabDepth, 1, 1, 1),
-                                       Side.Right => new Thickness (1, 1, TabDepth, 1),
-                                       _ => new Thickness (1, TabDepth, 1, 1)
-                                   };
+            {
+                Side.Top => new Thickness (1, TabDepth, 1, 1),
+                Side.Bottom => new Thickness (1, 1, 1, TabDepth),
+                Side.Left => new Thickness (TabDepth, 1, 1, 1),
+                Side.Right => new Thickness (1, 1, TabDepth, 1),
+                _ => new Thickness (1, TabDepth, 1, 1)
+            };
         }
     }
 
@@ -734,26 +564,26 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
 
         return TabSide switch
-               {
-                   Side.Top or Side.Bottom when ctx.Command == Command.Right => SelectNextTab (),
-                   Side.Top or Side.Bottom when ctx.Command == Command.Left => SelectPreviousTab (),
+        {
+            Side.Top or Side.Bottom when ctx.Command == Command.Right => SelectNextTab (),
+            Side.Top or Side.Bottom when ctx.Command == Command.Left => SelectPreviousTab (),
 
-                   Side.Top when ctx.Command == Command.Down => FocusContent (),
-                   Side.Top when ctx.Command == Command.Up => SelectPreviousTab (),
+            Side.Top when ctx.Command == Command.Down => FocusContent (),
+            Side.Top when ctx.Command == Command.Up => SelectPreviousTab (),
 
-                   Side.Bottom when ctx.Command == Command.Up => FocusContent (),
-                   Side.Bottom when ctx.Command == Command.Down => SelectNextTab (),
+            Side.Bottom when ctx.Command == Command.Up => FocusContent (),
+            Side.Bottom when ctx.Command == Command.Down => SelectNextTab (),
 
-                   Side.Left or Side.Right when ctx.Command == Command.Down => SelectNextTab (),
-                   Side.Left or Side.Right when ctx.Command == Command.Up => SelectPreviousTab (),
+            Side.Left or Side.Right when ctx.Command == Command.Down => SelectNextTab (),
+            Side.Left or Side.Right when ctx.Command == Command.Up => SelectPreviousTab (),
 
-                   Side.Left when ctx.Command == Command.Right => FocusContent (),
-                   Side.Left when ctx.Command == Command.Left => SelectPreviousTab (),
+            Side.Left when ctx.Command == Command.Right => FocusContent (),
+            Side.Left when ctx.Command == Command.Left => SelectPreviousTab (),
 
-                   Side.Right when ctx.Command == Command.Left => FocusContent (),
-                   Side.Right when ctx.Command == Command.Right => SelectNextTab (),
-                   _ => false
-               };
+            Side.Right when ctx.Command == Command.Left => FocusContent (),
+            Side.Right when ctx.Command == Command.Right => SelectNextTab (),
+            _ => false
+        };
     }
 
     private bool? SelectNextTab ()
@@ -772,15 +602,15 @@ public class Tabs : View, IValue<View?>, IDesignable
 
     private bool? FocusContent ()
     {
-        if (Value?.Border?.View?.HasFocus ?? false)
+        if (!(Value?.Border.View?.HasFocus ?? false))
         {
-            Value?.Border?.View?.HasFocus = false;
-            Value?.RestoreFocus ();
-
-            return true;
+            return false;
         }
+        Value?.Border?.View?.HasFocus = false;
+        Value?.RestoreFocus ();
 
-        return false;
+        return true;
+
     }
 
     /// <summary>
@@ -1072,7 +902,7 @@ public class Tabs : View, IValue<View?>, IDesignable
                                                     }
                                                 };
 
-        ViewportChanged += (sender, args) =>
+        ViewportChanged += (_, _) =>
                            {
                                // only the first time
                                if (tabLengthNumericUpDown.Value > 0 && Value?.Border.TabLength is { })

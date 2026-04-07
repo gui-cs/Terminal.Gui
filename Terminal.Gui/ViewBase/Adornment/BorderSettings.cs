@@ -7,9 +7,10 @@ namespace Terminal.Gui.ViewBase;
 public enum BorderSettings
 {
     /// <summary>
-    ///     No settings.
+    ///     The default settings, which uses <see cref="LineStyle.Single"/> line-drawing glyphs and draws the border flush with
+    ///     the content (i.e., no title or tab, and <see cref="Thickness"/> of 1 on all sides).
     /// </summary>
-    None = 0,
+    Default = 0,
 
     /// <summary>
     ///     Show the title.

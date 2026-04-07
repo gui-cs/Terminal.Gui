@@ -90,7 +90,7 @@ public class AdornmentSubViewLineCanvasTests (ITestOutputHelper output) : TestDr
             SuperViewRendersLineCanvas = true
         };
         subViewOfPadding.Border.Thickness = new Thickness (1);
-        subViewOfPadding.Border.Settings = BorderSettings.None;
+        subViewOfPadding.Border.Settings = BorderSettings.Default;
         superView.Padding.GetOrCreateView ().Add (subViewOfPadding);
 
         superView.Layout ();
@@ -242,7 +242,7 @@ public class AdornmentSubViewLineCanvasTests (ITestOutputHelper output) : TestDr
             BorderStyle = LineStyle.Single
         };
         view.Border.Thickness = new Thickness (1, 3, 1, 1);
-        view.Border.Settings = BorderSettings.None;
+        view.Border.Settings = BorderSettings.Default;
 
         Label tabLabel = new ()
         {
@@ -256,7 +256,7 @@ public class AdornmentSubViewLineCanvasTests (ITestOutputHelper output) : TestDr
             SuperViewRendersLineCanvas = true
         };
         tabLabel.Border.Thickness = new Thickness (1);
-        tabLabel.Border.Settings = BorderSettings.None;
+        tabLabel.Border.Settings = BorderSettings.Default;
         view.Border.GetOrCreateView ().Add (tabLabel);
 
         view.BeginInit ();

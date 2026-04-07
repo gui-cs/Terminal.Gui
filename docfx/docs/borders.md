@@ -14,8 +14,7 @@ This deep dive covers Border's rendering modes, the tab header system, and how `
 - [Tab Offset and Clipping](#tab-offset-and-clipping)
 - [Auto-Join with SuperViewRendersLineCanvas](#auto-join-with-superviewrenderslinecanvas)
 - [Border Line Positioning](#border-line-positioning)
-- [Implementation: TabTitleView](#implementation-tabtitleview)
-- [Drag-to-Slide Example](#drag-to-slide-example)
+- [Implementation: TitleView](#implementation-tabtitleview)
 
 ---
 
@@ -23,15 +22,18 @@ This deep dive covers Border's rendering modes, the tab header system, and how `
 
 Every [View](~/api/Terminal.Gui.ViewBase.View.yml) has a `Border` adornment accessible via `View.Border`. The border's appearance is controlled by:
 
-- **`BorderStyle`** ([LineStyle](~/api/Terminal.Gui.Drawing.LineStyle.yml)) — The line style (`Single`, `Double`, `Rounded`, etc.)
-- **`Border.Thickness`** ([Thickness](~/api/Terminal.Gui.Drawing.Thickness.yml)) — How many rows/columns each side occupies
-- **`Border.Settings`** ([BorderSettings](~/api/Terminal.Gui.ViewBase.BorderSettings.yml)) — Flags controlling title and tab rendering
+- **`View.BorderStyle`** ([BorderStyle](~/api/Terminal.Gui.ViewBase.BorderStyle.yml)) — Helper property that sets `Border.LineStyle`, `Border.Settings`, and `Border.Thickness` to common presets for different line styles. 
+- **`View.Border.Settings`** ([BorderSettings](~/api/Terminal.Gui.ViewBase.BorderSettings.yml)) — Flags controlling title and tab rendering.
+- **`View.Border.LineStyle`** ([LineStyle](~/api/Terminal.Gui.ViewBase.LineStyle.yml)) — Which line-drawing characters to use for the border.
+- **`View.Border.Thickness`** ([Thickness](~/api/Terminal.Gui.Drawing.Thickness.yml)) — How many rows/columns each side occupies.
+
+When `BorderStyle` is set to a non-`None` value, it implicitly sets `Border.Settings` to include `BorderSettings.Title`, enabling title rendering based on the thickness of the top border.
 
 The border is rendered by [BorderView](~/api/Terminal.Gui.ViewBase.BorderView.yml), the internal `AdornmentView` created when `Border.GetOrCreateView()` is called (or implicitly when `BorderStyle` is set).
 
 ---
 
-## Title Rendering by Thickness
+## `BorderSettings.Default | BorderSettings.Title` — Title Rendering by Thickness
 
 The `Thickness` on the title side determines how many rows (or columns) the border occupies and how the title is rendered within that space.
 
@@ -74,7 +76,7 @@ Identical rendering to thickness 3, with additional empty rows above. The title 
 
 ---
 
-## Tab Style Borders
+## `BorderSettings.Default | BorderSettings.Title | BorderSettings.Tab` - Tab Style Borders
 
 When `Border.Settings` includes `BorderSettings.Tab`, the border renders a **tab header** — a small rectangle containing the View's `Title` that protrudes from one side of the content border. This is the foundation for building tabbed interfaces.
 
@@ -96,7 +98,7 @@ view.Border.Thickness = new Thickness (1, 3, 1, 1); // 3 on the tab side
 | `Border.TabSide` | `Side` | Which side the tab header appears on (`Top`, `Bottom`, `Left`, `Right`) |
 | `Border.TabOffset` | `int` | Offset along the tab side where the header starts (can be negative) |
 | `Border.TabLength` | `int?` | Total length of the tab including borders. `null` = auto-compute from `Title` |
-| `BorderView.TabTitle` | `View?` | The `View` rendering the tab title (for custom mouse handling) |
+| `BorderView.TitleView` | `View?` | The `View` rendering the tab title (for custom mouse handling) |
 
 When both `Tab` and `Title` are set, `TabLength` auto-computes as `Title.GetColumns() + 2` (title text width + two border columns). When only `Tab` is set without `Title`, `TabLength` defaults to `2` (just the border columns, no text).
 
@@ -104,14 +106,14 @@ When both `Tab` and `Title` are set, `TabLength` auto-computes as `Title.GetColu
 
 ## Tab Header Geometry
 
-The tab-side thickness determines the **depth** of the header: `depth = min(sideThickness - 1, 3)`.
+The tab-side thickness determines the **depth** of the header (`depth = sideThickness`). The `TitleView`'s border thickness caps its visual structure at depth ≥ 3 (cap line + title + optional closing edge), but the header is positioned `depth - 1` cells outward from the content border, so thickness > 3 adds empty space between the header and the content border.
 
-| Title-Side Thickness | Header Depth | Header Structure |
-|----------------------|--------------|------------------|
-| 1 | 0 | No header (border line only) |
-| 2 | 1 | Title text inline on closing edge |
-| 3 | 2 | Cap line + title row |
-| 4+ | 3 | Cap line + title row + closing edge |
+| Title-Side Thickness | Depth | Header Structure |
+|----------------------|-------|------------------|
+| 1 | 1 | No header (content border line only) |
+| 2 | 2 | Cap line + title row |
+| 3 | 3 | Cap line + title row + closing edge (focus-toggled) |
+| 4+ | N | Same structure as 3, with extra space between header and content |
 
 ### Visual Examples by Side (Thickness = 3, Depth = 2)
 
@@ -214,11 +216,11 @@ Tab text is rendered vertically using `TextDirection.TopBottom_LeftRight`.
 
 Focus state affects tab rendering in two ways:
 
-### Border Geometry (Depth ≥ 3 Only)
+### Border Geometry (Depth ≥ 3)
 
-At depth ≥ 3, the header has a closing edge (the line adjacent to the content area):
-- **Focused**: Closing edge is **suppressed** (open gap), visually connecting the header to the content
-- **Unfocused**: Closing edge is **drawn** (closed), visually separating the header from content
+At depth ≥ 3, the TitleView has a content-side edge (the line adjacent to the content area):
+- **Focused**: Content-side edge is **suppressed** (open gap), visually connecting the header to the content
+- **Unfocused**: Content-side edge is **drawn** (closed separator), visually separating the header from content
 
 **At depth < 3**, focused and unfocused tabs render with **identical border geometry** — only the title text attributes differentiate them.
 
@@ -231,7 +233,7 @@ The tab title text always uses the owning View's focus-appropriate attributes:
 | Focused | `VisualRole.Focus` | `VisualRole.HotFocus` |
 | Unfocused | `VisualRole.Normal` | `VisualRole.HotNormal` |
 
-This is handled by the `TabTitleView` inner class, which overrides `OnDrawingText` to consult `OwnerView.HasFocus` rather than its own `HasFocus` (which is always `false` since it cannot receive focus).
+The `TitleView` uses `SuperViewRendersLineCanvas = true` and inherits color attributes from the owning View's scheme via the adornment hierarchy.
 
 ---
 
@@ -244,7 +246,7 @@ This is handled by the `TabTitleView` inner class, which overrides `OnDrawingTex
 ```
   ╭───╮
   │Tab│
-╭─┴───┴─╮
+╭─┴───┴──╮
 │content │
 ╰────────╯
 ```
@@ -269,13 +271,13 @@ Tab│
 
 ### Clipping Mechanism
 
-The `TabTitleView` is positioned at the **unclipped** header rectangle coordinates. The View system's natural viewport clipping handles partial visibility — both border lines and text are clipped automatically. No manual substring calculations or cap-line extensions are needed.
+The `TitleView` is positioned at the **unclipped** header rectangle coordinates. The View system's natural viewport clipping handles partial visibility — both border lines and text are clipped automatically. No manual substring calculations or cap-line extensions are needed.
 
 ---
 
 ## Auto-Join with SuperViewRendersLineCanvas
 
-The tab header is rendered by a `TabTitleView` SubView that has `SuperViewRendersLineCanvas = true`. This means its border lines merge into the parent View's `LineCanvas` instead of rendering independently.
+The tab header is rendered by a `TitleView` SubView that has `SuperViewRendersLineCanvas = true`. This means its border lines merge into the parent View's `LineCanvas` instead of rendering independently.
 
 ### How LineCanvas Auto-Join Works
 
@@ -321,56 +323,58 @@ When `BorderSettings.Tab` is set, border line positioning differs from the stand
 
 **Tab side**: The content border line is drawn at `thickness - 1` from the outer edge. The rows/columns between the outer edge and the content border line form the **tab header region**.
 
-| Title-Side Thickness | Content Border Position (Side.Top) | Tab Header Region | Header Depth |
-|----------------------|------------------------------------|-------------------|--------------|
-| 1 | y = 0 | None (border only) | 0 |
-| 2 | y = 1 | y = 0 (1 row) | 1 |
-| 3 | y = 2 | y = 0–1 (2 rows) | 2 |
-| 4 | y = 3 | y = 0–2 (3 rows) | 3 |
-| N (N ≥ 4) | y = N − 1 | y = 0 to N − 2 | capped at 3 |
+| Title-Side Thickness | Content Border Position (Side.Top) | Tab Header Region | Depth |
+|----------------------|------------------------------------|-------------------|-------|
+| 1 | y = 0 | None (border only) | 1 |
+| 2 | y = 1 | y = 0 (1 row) | 2 |
+| 3 | y = 2 | y = 0–1 (2 rows) | 3 |
+| 4 | y = 3 | y = 0–2 (3 rows) | 4 |
+| N | y = N − 1 | y = 0 to N − 2 | N |
 
-General rule: content border at `y = thickness − 1`. Header depth = `min(thickness − 1, 3)`.
+General rule: content border at `y = thickness − 1`. Depth = thickness. The `TitleView` border structure is the same for depth ≥ 3 (cap + title + optional closing edge), but the header rectangle grows outward with increasing depth.
 
 ---
 
-## Implementation: TabTitleView
+## Implementation: TitleView
 
-The tab header is rendered by `TabTitleView`, a private `View` subclass inside `BorderView`. It handles both the header border frame and the title text.
+The tab header is rendered by [TitleView](~/api/Terminal.Gui.ViewBase.TitleView.yml), a public sealed `View` subclass that implements [ITitleView](~/api/Terminal.Gui.ViewBase.ITitleView.yml). It handles both the header border frame and the title text.
 
 ### Configuration
 
 ```csharp
-TabTitleView:
-  CanFocus = false
-  TabStop = TabBehavior.NoStop
+TitleView:
+  CanFocus = true
+  TabStop = TabBehavior.TabStop
   SuperViewRendersLineCanvas = true      // border lines merge into parent LineCanvas
-  OwnerView = parentView                 // for focus-aware attribute selection
   BorderStyle = parentLineStyle          // matching parent's line style
   Border.Settings = BorderSettings.None  // no title rendering on the view's own border
-  Border.Thickness = ComputeTabLabelThickness (side, depth, hasFocus)
-  HotKeySpecifier = parent.HotKeySpecifier
+  Border.Thickness = ComputeTitleViewThickness (side, depth, hasFocus)
+  Orientation = Horizontal or Vertical   // based on TabSide
 ```
 
-### Border Thickness by Depth (Side.Top)
+### TitleView Border Thickness (Side.Top)
 
-| Depth | Border.Thickness (left, top, right, bottom) | Notes |
-|-------|---------------------------------------------|-------|
-| 3 (focused) | `(1, 1, 1, 0)` | No bottom = open gap |
-| 3 (unfocused) | `(1, 1, 1, 1)` | Bottom = closed separator |
-| 2 | `(1, 1, 1, 0)` | Cap line, no closing edge |
-| 1 | `(1, 0, 1, 0)` | Side edges only, no cap |
+Computed by `TitleView.ComputeTitleViewThickness(side, depth, hasFocus)`:
 
-Other sides rotate accordingly.
+| Depth | Focus | Border.Thickness (left, top, right, bottom) | Notes |
+|-------|-------|---------------------------------------------|-------|
+| ≥ 3 | focused | `(1, 1, 1, 0)` | No bottom = open gap connecting header to content |
+| ≥ 3 | unfocused | `(1, 1, 1, 1)` | Bottom = closed separator |
+| 2 | any | `(1, 1, 1, 0)` | Cap line, no closing edge |
+| 1 | any | `(1, 0, 1, 0)` | Side edges only, no cap |
+
+Other sides rotate accordingly (cap is always the outward edge, content-side is the inward edge).
 
 ### Key Methods
 
 | Method | Purpose |
 |--------|---------|
-| `DrawTabBorder()` | Main entry. Computes geometry, positions TabTitleView, draws content border segments. |
-| `EnsureTabTitleView()` | Lazy-creates the TabTitleView with correct configuration. |
-| `ComputeHeaderRect()` | Computes the unclipped header rectangle in screen coordinates. |
-| `ComputeTabLabelThickness()` | Maps depth + side + focus → `Thickness` for the TabTitleView's border. |
-| `AddTabSideContentBorder()` | Draws content border with gap/separator segments on the tab side. |
+| `DrawTabBorder()` | Main entry. Computes geometry, positions TitleView, draws content border segments. |
+| `EnsureTitleView()` | Lazy-creates the TitleView with correct configuration. |
+| `TitleView.ComputeHeaderRect()` | Computes the unclipped header rectangle in content coordinates (static). |
+| `TitleView.ComputeTitleViewThickness()` | Maps depth + side + focus → `Thickness` for the TitleView's border (static). |
+| `TitleView.UpdateLayout()` | Sets frame, border thickness, text, orientation, and visibility from `TabLayoutContext`. |
+| `AddTabSideContentBorder()` | Draws content border with gap/separator segments on the tab side (static). |
 
 ### Draw Pipeline
 
@@ -382,55 +386,3 @@ DoDrawAdornments → DoClearViewport → DoDrawSubViews → DoDrawText → DoDra
 ```
 
 The key change: `DoDrawAdornmentsSubViews` now runs **before** `DoRenderLineCanvas`, so SubView border lines are merged into the parent's `LineCanvas` before it is rendered to screen.
-
----
-
-## Drag-to-Slide Example
-
-`BorderView.TabTitle` exposes the tab title `View`, allowing developers to hook `MouseEvent` for custom behaviors like drag-to-slide. Because `TabTitleView` is a SubView of `BorderView`, it receives mouse events **before** the border's `Arranger` — no conflict with move/resize.
-
-```csharp
-// Hook after first draw (TabTitleView is lazily created)
-Point? dragStart = null;
-int dragStartOffset = 0;
-bool hooked = false;
-
-view.DrawComplete += (_, _) =>
-{
-    if (hooked || ((BorderView)view.Border.View!).TabTitle is not { } tabTitle)
-    {
-        return;
-    }
-
-    hooked = true;
-
-    tabTitle.MouseEvent += (_, mouse) =>
-    {
-        if (!dragStart.HasValue && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
-        {
-            dragStart = mouse.ScreenPosition;
-            dragStartOffset = view.Border.TabOffset;
-            view.App?.Mouse.GrabMouse (tabTitle);
-            mouse.Handled = true;
-        }
-
-        if (dragStart.HasValue
-            && mouse.Flags is (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
-        {
-            int delta = view.Border.TabSide is Side.Top or Side.Bottom
-                            ? mouse.ScreenPosition.X - dragStart.Value.X
-                            : mouse.ScreenPosition.Y - dragStart.Value.Y;
-
-            view.Border.TabOffset = dragStartOffset + delta;
-            mouse.Handled = true;
-        }
-
-        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased) && dragStart.HasValue)
-        {
-            dragStart = null;
-            view.App?.Mouse.UngrabMouse ();
-            mouse.Handled = true;
-        }
-    };
-};
-```
