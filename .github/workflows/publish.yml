@@ -2,7 +2,7 @@ name: Publish Terminal.Gui to Nuget
 
 on:
   push:
-    branches: [ v2_release, v2_develop ]
+    branches: [ main, develop ]
     tags:
       - v*
     paths-ignore:
@@ -69,7 +69,7 @@ jobs:
       run: dotnet nuget push Terminal.Gui/bin/Release/Terminal.Gui.${{ steps.gitversion.outputs.SemVer }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }}
     
     # - name: Delist old NuGet packages
-    #   if: github.ref == 'refs/heads/v2_release'
+    #   if: github.ref == 'refs/heads/main'
     #   shell: pwsh
     #   run: |
     #     $version = "${{ steps.gitversion.outputs.SemVer }}"
@@ -77,13 +77,13 @@ jobs:
     #     ./Scripts/delist-nuget.ps1 -ApiKey "${{ secrets.NUGET_API_KEY }}" -JustPublishedVersion "$version"
     
     - name: Prepare payload for template dispatch
-      if: github.ref == 'refs/heads/v2_release'
+      if: github.ref == 'refs/heads/main'
       id: payload
       run: |
         echo "json={\"version\":\"${{ steps.gitversion.outputs.SemVer }}\"}" >> $GITHUB_OUTPUT
     
     - name: Trigger Terminal.Gui.templates update
-      if: github.ref == 'refs/heads/v2_release'
+      if: github.ref == 'refs/heads/main'
       uses: peter-evans/repository-dispatch@v3
       with:
         token: ${{ secrets.TEMPLATE_REPO_TOKEN }}

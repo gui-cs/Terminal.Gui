@@ -35,7 +35,7 @@ window.Add (label);
 app.Run (window);
 ```
 
-See the [Examples](https://github.com/gui-cs/Terminal.Gui/tree/v2_develop/Examples) directory for more.
+See the [Examples](https://github.com/gui-cs/Terminal.Gui/tree/develop/Examples) directory for more.
 
 ## Build Powerful Terminal Applications
 
