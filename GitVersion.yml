@@ -22,7 +22,7 @@
 # - from main (pre-release): 2.0.0-prealpha.1 or 2.0.0-beta.1
 # - from main (release): 2.0.0 (patch version increments)
 #
-mode: ContinuousDelivery   # GitVersion 6.x uses Mainline mode for GitFlow, focusing on main branch releases
+mode: ContinuousDelivery   # GitVersion 6.x is configured here to use ContinuousDelivery mode for this GitFlow-style setup
 
 # We prefix our tags with 'v' or 'V' (e.g., v1.0.0)
 tag-prefix: '[vV]'
