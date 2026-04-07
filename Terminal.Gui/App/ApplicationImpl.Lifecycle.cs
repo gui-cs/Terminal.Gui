@@ -241,7 +241,12 @@ internal partial class ApplicationImpl
         Popovers?.Dispose ();
         Popovers = null;
 
-        // === 3. Clean up runnables ===
+        // === 3. Close and dispose tooltips ===
+        // Any tooltips added to ToolTips have their lifetime controlled by ToolTips
+        ToolTips?.Dispose ();
+        ToolTips = null;
+
+        // === 4. Clean up runnables ===
         SessionStack?.Clear ();
 
 #if DEBUG_IDISPOSABLE
