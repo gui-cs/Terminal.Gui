@@ -89,8 +89,11 @@ public class FileDialogExamples : Scenario
         _osIcons.Labels = ["_None", "_Unicode", "Nerd_*"];
         win.Add (_osIcons);
 
-        win.Add (new Label { Y = Pos.AnchorEnd (2), Text = "* Requires installing Nerd fonts" });
-        win.Add (new Label { Y = Pos.AnchorEnd (1), Text = "  (see: https://github.com/devblackops/Terminal-Icons)" });
+        Label label = new () { Y = Pos.AnchorEnd (), Text = "* Requires installing Nerd fonts:" };
+        win.Add (label);
+        Link link = new () { Y = Pos.Top (label), X = Pos.Right (label) + 1, Url = "https://github.com/devblackops/Terminal-Icons" };
+        app.ToolTips!.SetToolTip (link, () => link.Url);
+        win.Add (link);
 
         y = 5;
         x = 24;

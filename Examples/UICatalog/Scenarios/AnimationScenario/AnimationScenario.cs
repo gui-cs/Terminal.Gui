@@ -1,10 +1,7 @@
 ﻿#nullable enable
-using System;
 using System.Diagnostics;
-using System.IO;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -30,7 +27,7 @@ public class AnimationScenario : Scenario
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
-            Height = Dim.Fill (),
+            Height = Dim.Fill ()
         };
 
         _imageView = new ImageView { Width = Dim.Fill (), Height = Dim.Fill ()! - 2 };
@@ -40,21 +37,20 @@ public class AnimationScenario : Scenario
         var lbl = new Label { Y = Pos.AnchorEnd (), Text = "Image by Wikiscient" };
         win.Add (lbl);
 
-        var lbl2 = new Label
+        Link link = new ()
         {
-            // This ensures the URL that has an underscore is drawn correctly
-            HotKeySpecifier = new Rune ('\xFFFF'),
-            X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), 
-            Text = "https://commons.wikimedia.org/wiki/File:Spinning_globe.gif"
+            X = Pos.AnchorEnd (),
+            Y = Pos.AnchorEnd (),
+            Url = "https://commons.wikimedia.org/wiki/File:Spinning_globe.gif"
         };
-        win.Add (lbl2);
+        app.ToolTips!.SetToolTip (link, () => link.Url);
+        win.Add (link);
 
         // Start the animation after the window is initialized
         win.Initialized += OnWinOnInitialized;
 
         app.Run (win);
     }
-
 
     private void OnWinOnInitialized (object? sender, EventArgs args)
     {
@@ -71,9 +67,7 @@ public class AnimationScenario : Scenario
             dir = new DirectoryInfo (AppContext.BaseDirectory);
         }
 
-        var f = new FileInfo (
-                              Path.Combine (dir.FullName, "Scenarios/AnimationScenario", "Spinning_globe_dark_small.gif")
-                             );
+        var f = new FileInfo (Path.Combine (dir.FullName, "Scenarios/AnimationScenario", "Spinning_globe_dark_small.gif"));
 
         if (!f.Exists)
         {
@@ -85,18 +79,16 @@ public class AnimationScenario : Scenario
 
         _imageView!.SetImage (Image.Load<Rgba32> (File.ReadAllBytes (f.FullName)));
 
-        Task.Run (
-                  () =>
+        Task.Run (() =>
                   {
                       while (_imageView?.App?.Initialized == true)
                       {
                           // When updating from a Thread/Task always use Invoke
-                          _imageView?.App?.Invoke (
-                                              (_) =>
-                                              {
-                                                  _imageView?.NextFrame ();
-                                                  _imageView?.SetNeedsDraw ();
-                                              });
+                          _imageView?.App?.Invoke (_ =>
+                                                   {
+                                                       _imageView?.NextFrame ();
+                                                       _imageView?.SetNeedsDraw ();
+                                                   });
 
                           Task.Delay (100).Wait ();
                       }
@@ -171,7 +163,7 @@ public class AnimationScenario : Scenario
         private Image<Rgba32> []? _fullResImages;
         private Image<Rgba32> []? _matchSizes;
         private Rectangle _oldSize = Rectangle.Empty;
-        public void NextFrame () { _currentFrame = (_currentFrame + 1) % _frameCount; }
+        public void NextFrame () => _currentFrame = (_currentFrame + 1) % _frameCount;
 
         protected override bool OnDrawingContent (DrawContext? context)
         {
@@ -179,6 +171,7 @@ public class AnimationScenario : Scenario
             {
                 return false;
             }
+
             if (_oldSize != Viewport)
             {
                 // Invalidate cached images now size has changed
@@ -198,18 +191,14 @@ public class AnimationScenario : Scenario
                 int newSize = Math.Min (Viewport.Width, Viewport.Height);
 
                 // generate one
-                if (_matchSizes is not null && imgFull is not null)
+                if (_matchSizes is { } && imgFull is { })
                 {
-                    _matchSizes [_currentFrame] = imgScaled = imgFull.Clone (
-                                                                             x => x.Resize (
-                                                                                            newSize * BitmapToBraille.CHAR_HEIGHT,
-                                                                                            newSize * BitmapToBraille.CHAR_HEIGHT
-                                                                                           )
-                                                                            );
+                    _matchSizes [_currentFrame] =
+                        imgScaled = imgFull.Clone (x => x.Resize (newSize * BitmapToBraille.CHAR_HEIGHT, newSize * BitmapToBraille.CHAR_HEIGHT));
                 }
             }
 
-            if (braille == null && _brailleCache is not null)
+            if (braille == null && _brailleCache is { })
             {
                 _brailleCache [_currentFrame] = braille = GetBraille (_matchSizes? [_currentFrame]!);
             }
@@ -249,11 +238,7 @@ public class AnimationScenario : Scenario
 
         private string GetBraille (Image<Rgba32> img)
         {
-            var braille = new BitmapToBraille (
-                                               img.Width,
-                                               img.Height,
-                                               (x, y) => IsLit (img, x, y)
-                                              );
+            var braille = new BitmapToBraille (img.Width, img.Height, (x, y) => IsLit (img, x, y));
 
             return braille.GenerateImage ();
         }
