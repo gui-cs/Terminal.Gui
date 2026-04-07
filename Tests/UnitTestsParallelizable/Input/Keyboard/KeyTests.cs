@@ -272,6 +272,24 @@ public class KeyTests
         Assert.Equal (default (Rune), rune);
     }
 
+    [Fact]
+    public void AsGrapheme_Returns_SingleAssociatedGrapheme ()
+    {
+        Key key = new () { AssociatedText = "👨‍👩‍👧‍👦" };
+
+        Assert.Equal ("👨‍👩‍👧‍👦", key.AsGrapheme);
+        Assert.Equal (default (Rune), key.AsRune);
+    }
+
+    [Fact]
+    public void AsGrapheme_Returns_CombiningSequence_AsSingleGrapheme ()
+    {
+        Key key = new () { AssociatedText = "a\u0301" };
+
+        Assert.Equal ("a\u0301", key.AsGrapheme);
+        Assert.Equal (default (Rune), key.AsRune);
+    }
+
     [Theory]
     [InlineData ("Barf")]
     public void Constructor_String_Invalid_Throws (string keyString) { Assert.Throws<ArgumentException> (() => new Key (keyString)); }

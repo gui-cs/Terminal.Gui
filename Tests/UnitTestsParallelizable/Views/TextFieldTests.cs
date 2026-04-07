@@ -278,7 +278,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void ShiftedDigitKey_WithoutKittyMetadata_CannotInsertPrintableDigit ()
+    public void ShiftedDigitKey_WithoutKittyMetadata_InsertsBaseDigit ()
     {
         Runnable top = new ();
         TextField tf = new () { Width = 10 };
@@ -287,8 +287,8 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         tf.ClearAllSelection ();
         tf.InsertionPoint = 0;
 
-        Assert.False (top.NewKeyDownEvent (Key.D1.WithShift));
-        Assert.Equal ("", tf.Text);
+        Assert.True (top.NewKeyDownEvent (Key.D1.WithShift));
+        Assert.Equal ("1", tf.Text);
 
         top.Dispose ();
     }
@@ -638,6 +638,17 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (2, tf.InsertionPoint);
         Assert.Equal (new Point (3, 0), tf.Cursor.Position);
         Assert.Equal ("📄a", tf.Text);
+    }
+
+    [Fact]
+    public void InsertText_GraphemeSequence_PreservesSingleGrapheme ()
+    {
+        TextField tf = new ();
+
+        tf.InsertText ("👨‍👩‍👧‍👦");
+
+        Assert.Equal ("👨‍👩‍👧‍👦", tf.Text);
+        Assert.Equal (1, tf.InsertionPoint);
     }
 
     [Fact]
