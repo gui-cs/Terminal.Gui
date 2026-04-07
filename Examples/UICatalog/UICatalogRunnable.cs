@@ -709,8 +709,10 @@ public sealed class UICatalogRunnable : Runnable
 
     /// <summary>
     ///     Returns the first F-key (F1–F12) that is not already bound in
-    ///     <see cref="Application.KeyBindings"/>, <see cref="MenuBar.DefaultKey"/>,
-    ///     or <see cref="PopoverMenu.DefaultKey"/>. Falls back to <see cref="Key.F12"/> if all are taken.
+    ///     <see cref="Application.KeyBindings"/>, used as the activation key for
+    ///     <see cref="MenuBar.DefaultKey"/> or <see cref="PopoverMenu.DefaultKey"/>,
+    ///     or assigned to a <see cref="MenuItem.Key"/> on a menu item. Falls back to
+    ///     <see cref="Key.F12"/> if all are taken.
     /// </summary>
     private Key GetFirstUnboundFKey ()
     {
