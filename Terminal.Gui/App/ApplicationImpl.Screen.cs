@@ -10,7 +10,7 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public Rectangle Screen
     {
-        get => Driver?.Screen ?? new (new (0, 0), new (2048, 2048));
+        get => Driver?.Screen ?? new Rectangle (new Point (0, 0), new Size (2048, 2048));
         set
         {
             if (value is { } && (value.X != 0 || value.Y != 0))
@@ -34,7 +34,7 @@ internal partial class ApplicationImpl
     {
         //Screen = new (Point.Empty, screen.Size);
 
-        ScreenChanged?.Invoke (this, new (screen));
+        ScreenChanged?.Invoke (this, new EventArgs<Rectangle> (screen));
 
         foreach (SessionToken t in SessionStack!)
         {
@@ -45,7 +45,7 @@ internal partial class ApplicationImpl
         }
     }
 
-    private void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) { RaiseScreenChangedEvent (new (new (0, 0), e.Size!.Value)); }
+    private void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) => RaiseScreenChangedEvent (new Rectangle (new Point (0, 0), e.Size ?? Size.Empty));
 
     /// <inheritdoc/>
     public void LayoutAndDraw (bool forceRedraw = false)
@@ -63,7 +63,11 @@ internal partial class ApplicationImpl
             Driver?.ClearContents ();
         }
 
-        List<View?> views = [.. SessionStack!.Select (r => r.Runnable! as View)!];
+        if (SessionStack is null)
+        {
+            return;
+        }
+        List<View?> views = [.. SessionStack.Select (r => r.Runnable! as View)!];
 
         if (Popovers?.GetActivePopover () is { Visible: true } visiblePopover)
         {
@@ -87,13 +91,13 @@ internal partial class ApplicationImpl
         {
             Logging.Redraws.Add (1);
 
-            Driver.Clip = new (Screen);
+            Driver.Clip = new Region (Screen);
 
             // Only force a complete redraw if needed (needsLayout or forceRedraw).
             // Otherwise, just redraw views that need it.
             View.Draw (views: views.ToArray ().Cast<View> (), neededLayout || forceRedraw);
 
-            Driver.Clip = new (Screen);
+            Driver.Clip = new Region (Screen);
 
             // Cause the driver to flush any pending updates to the terminal
             Driver?.Refresh ();

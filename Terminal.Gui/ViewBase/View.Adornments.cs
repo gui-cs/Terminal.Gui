@@ -7,37 +7,38 @@ public partial class View // Adornments
     /// </summary>
     private void SetupAdornments ()
     {
-        if (this is not AdornmentView)
+        if (this is AdornmentView)
         {
-            Margin.Parent = this;
-            Border.Parent = this;
-            Padding.Parent = this;
-
-            // When any adornment's thickness changes, recompute frames and request layout + redraw.
-            Margin.ThicknessChanged += (_, _) =>
-                                       {
-                                           Margin.View?.SetNeedsLayout ();
-                                           SetAdornmentFrames ();
-                                           SetNeedsLayout ();
-                                           SetNeedsDraw ();
-                                       };
-
-            Border.ThicknessChanged += (_, _) =>
-                                       {
-                                           Border.View?.SetNeedsLayout ();
-                                           SetAdornmentFrames ();
-                                           SetNeedsLayout ();
-                                           SetNeedsDraw ();
-                                       };
-
-            Padding.ThicknessChanged += (_, _) =>
-                                        {
-                                            Padding.View?.SetNeedsLayout ();
-                                            SetAdornmentFrames ();
-                                            SetNeedsLayout ();
-                                            SetNeedsDraw ();
-                                        };
+            return;
         }
+        Margin.Parent = this;
+        Border.Parent = this;
+        Padding.Parent = this;
+
+        // When any adornment's thickness changes, recompute frames and request layout + redraw.
+        Margin.ThicknessChanged += (_, _) =>
+                                   {
+                                       Margin.View?.SetNeedsLayout ();
+                                       SetAdornmentFrames ();
+                                       SetNeedsLayout ();
+                                       SetNeedsDraw ();
+                                   };
+
+        Border.ThicknessChanged += (_, _) =>
+                                   {
+                                       Border.View?.SetNeedsLayout ();
+                                       SetAdornmentFrames ();
+                                       SetNeedsLayout ();
+                                       SetNeedsDraw ();
+                                   };
+
+        Padding.ThicknessChanged += (_, _) =>
+                                    {
+                                        Padding.View?.SetNeedsLayout ();
+                                        SetAdornmentFrames ();
+                                        SetNeedsLayout ();
+                                        SetNeedsDraw ();
+                                    };
     }
 
     private void BeginInitAdornments ()
@@ -145,47 +146,98 @@ public partial class View // Adornments
     }
 
     /// <summary>
-    ///     The <see cref="IAdornment"/> that offsets the <see cref="Viewport"/> from the <see cref="Margin"/>.
-    ///     <para>
-    ///         The Border provides the space for a visual border (drawn using
-    ///         line-drawing glyphs) and the Title. The Border expands inward; in other words if `Border.Thickness.Top == 2`
-    ///         the
-    ///         border and title will take up the first row and the second row will be filled with spaces.
-    ///     </para>
-    ///     <para>
-    ///         The Border provides the UI for mouse and keyboard arrangement of the View. See <see cref="Arrangement"/>.
-    ///     </para>
+    ///     Gets the <see cref="ViewBase.Border"/> adornment that draws the visual frame, title, and optional tab header
+    ///     between the <see cref="Margin"/> and <see cref="Padding"/> layers.
     /// </summary>
     /// <remarks>
-    ///     <para><see cref="BorderStyle"/> provides a simple helper for turning a simple border frame on or off.</para>
+    ///     <para>
+    ///         The Border provides the space for a visual border (drawn using line-drawing glyphs) and the
+    ///         <see cref="Title"/>. When <see cref="Border.Settings"/> includes <see cref="BorderSettings.Tab"/>,
+    ///         the border renders a tab header on the side specified by <see cref="BorderView.TabSide"/>.
+    ///     </para>
+    ///     <para>
+    ///         The Border expands inward: if <c>Border.Thickness.Top == 2</c>, the border and title occupy the
+    ///         first two rows, reducing the <see cref="Viewport"/>.
+    ///     </para>
+    ///     <para>
+    ///         The Border also provides the UI for mouse and keyboard arrangement of the View.
+    ///         See <see cref="Arrangement"/> and the
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/arrangement.html">Arrangement Deep Dive</see>.
+    ///     </para>
+    ///     <para>
+    ///         <see cref="BorderStyle"/> is a convenience helper that sets <see cref="Border.LineStyle"/> and
+    ///         <see cref="IAdornment.Thickness"/> atomically. Use <see cref="Border"/> directly for advanced
+    ///         configuration (tab mode, gradient, custom thickness per side).
+    ///     </para>
     ///     <para>
     ///         The adornments (<see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/>) are not part of the
     ///         View's content and are not clipped by the View's Clip Area.
     ///     </para>
     ///     <para>
-    ///         Changing the size of an adornment (<see cref="Margin"/>, <see cref="Border"/>, or <see cref="Padding"/>) will
-    ///         change the size of <see cref="Frame"/> which will call <see cref="SetNeedsLayout"/> to update the layout of the
-    ///         <see cref="SuperView"/> and its <see cref="SubViews"/>.
+    ///         Changing the size of an adornment will change the size of <see cref="Frame"/> which will call
+    ///         <see cref="SetNeedsLayout"/> to update the layout of the <see cref="SuperView"/> and its
+    ///         <see cref="SubViews"/>.
     ///     </para>
+    ///     <example>
+    ///         Simple border:
+    ///         <code>
+    ///         view.BorderStyle = LineStyle.Single;
+    ///         // Result:
+    ///         // ┌┤Title├──┐
+    ///         // │         │
+    ///         // └─────────┘
+    ///         </code>
+    ///         Tab-style border:
+    ///         <code>
+    ///         view.BorderStyle = LineStyle.Rounded;
+    ///         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+    ///         view.Border.TabSide = Side.Top;
+    ///         view.Border.Thickness = new Thickness (1, 3, 1, 1);
+    ///         // Result (focused):
+    ///         // ╭───╮
+    ///         // │Tab│
+    ///         // │   ╰───╮
+    ///         // │content│
+    ///         // ╰───────╯
+    ///         </code>
+    ///     </example>
     /// </remarks>
     public Border Border { get; } = new ();
 
-    /// <summary>Gets or sets whether the view has a one row/col thick border.</summary>
+    /// <summary>
+    ///     Gets or sets the <see cref="LineStyle"/> used to draw a one-row/column-thick border around the view.
+    /// </summary>
     /// <remarks>
     ///     <para>
-    ///         This is a helper for manipulating the view's <see cref="Border"/>. Setting this property to any value other
-    ///         than <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s
-    ///         <see cref="IAdornment.Thickness"/> to `1` and <see cref="BorderStyle"/> to the value.
+    ///         This is a convenience helper for manipulating <see cref="Border"/>. Setting this property to any value
+    ///         other than <see cref="LineStyle.None"/> sets <see cref="Border"/>.<see cref="IAdornment.Thickness"/>
+    ///         to <c>1</c> (if currently zero) and <see cref="Border"/>.<see cref="Border.LineStyle"/> to the value.
     ///     </para>
     ///     <para>
-    ///         Setting this property to <see cref="LineStyle.None"/> is equivalent to setting <see cref="Border"/>'s
-    ///         <see cref="IAdornment.Thickness"/> to `0` and <see cref="BorderStyle"/> to <see cref="LineStyle.None"/>.
+    ///         Setting this property to <see cref="LineStyle.None"/> (or <see langword="null"/>) sets
+    ///         <see cref="Border"/>.<see cref="IAdornment.Thickness"/> to <c>0</c>.
     ///     </para>
     ///     <para>
-    ///         Raises <see cref="OnBorderStyleChanged"/> and raises <see cref="BorderStyleChanged"/>, which allows change
-    ///         to be cancelled.
+    ///         Raises <see cref="OnBorderStyleChanged"/> and <see cref="BorderStyleChanged"/>.
     ///     </para>
-    ///     <para>For more advanced customization of the view's border, manipulate see <see cref="Border"/> directly.</para>
+    ///     <para>
+    ///         For tab-style headers, gradient borders, or per-side thickness, configure <see cref="Border"/> directly.
+    ///     </para>
+    ///     <example>
+    ///         <code>
+    ///         // Single-line border: ┌┤Title├──┐
+    ///         view.BorderStyle = LineStyle.Single;
+    ///
+    ///         // Rounded border:     ╭┤Title├──╮
+    ///         view.BorderStyle = LineStyle.Rounded;
+    ///
+    ///         // Double-line border: ╔═Title═══╗
+    ///         view.BorderStyle = LineStyle.Double;
+    ///
+    ///         // Remove border:
+    ///         view.BorderStyle = LineStyle.None;
+    ///         </code>
+    ///     </example>
     /// </remarks>
     public LineStyle? BorderStyle
     {

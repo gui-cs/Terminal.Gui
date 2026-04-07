@@ -142,7 +142,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         // - Console events (WindowsDriver)
         _loop.SizeMonitor.Initialize (_driver);
 
-        app!.Driver = _driver;
+        app?.Driver = _driver;
 
         // Detect terminal color capabilities from environment variables
         TerminalColorCapabilities caps = TerminalEnvironmentDetector.DetectColorCapabilities ();
@@ -209,7 +209,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         }
 
         _startupSemaphore.Release ();
-        Logging.Trace ($"app: {app.MainThreadId} Driver: _input: {_input}, _output: {_output}");
+        Logging.Trace ($"app: {app?.MainThreadId} Driver: _input: {_input}, _output: {_output}");
     }
 
     /// <summary>
