@@ -12,6 +12,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Example", "Examples\Example\Example.csproj", "{B0A602CD-E176-449D-8663-64238D54F857}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E143FB1F-0B88-48CB-9086-72CDCECFCD22}"
+	ProjectSection(SolutionItems) = preProject
+		docfx\docs\borders.md = docfx\docs\borders.md
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunityToolkitExample", "Examples\CommunityToolkitExample\CommunityToolkitExample.csproj", "{58FDCA8F-08F7-4D80-9DA3-6A9AED01E163}"
 EndProject
