@@ -155,7 +155,6 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Dispose ();
     }
 
-
     [Fact]
     public void ScrollOffset_ReducedWidth_Tab1Selected_Scroll_Right_Past_End ()
     {
@@ -907,6 +906,114 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Dispose ();
     }
 
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     When tabs overflow the available width with <see cref="Side.Bottom"/>, a forward scroll indicator
+    ///     (►) should appear on the separator line at the right edge. The separator line is the boundary
+    ///     between content and tabs — for Bottom, it's the top line of the tab header area.
+    /// </summary>
+    [Fact]
+    public void Bottom_TabsOverflow_ScrollIndicatorAppearsOnSeparator ()
+    {
+        IDriver driver = CreateTestDriver (30, 8);
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
+        Tabs tabs = new () { Driver = driver, Width = 18, Height = Dim.Fill (), TabSide = Side.Bottom };
+        superView.Add (tabs);
+
+        (View tab1, View tab2, View tab3, View tab4, View tab5) = CreateFiveTabs ();
+        tabs.Add (tab1, tab2, tab3, tab4, tab5);
+        tabs.Value = tab1;
+
+        superView.Layout ();
+        superView.Draw ();
+
+        // The ► indicator should be on the separator line (the line between content and tabs).
+        // For Side.Bottom, the separator is the top border of the tab headers.
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+                                              ┊╭────────────────╮          ┊
+                                              ┊│Tab1 content    │          ┊
+                                              ┊│                │          ┊
+                                              ┊│    ╭────┬────┬─►          ┊
+                                              ┊│Tab1│Tab2│Tab3│Ta          ┊
+                                              ┊╰────╯────╯────╯──          ┊
+                                              └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘
+                                              """,
+                                              output,
+                                              driver);
+
+        tabs.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     When scrolled right with <see cref="Side.Bottom"/>, a backward scroll indicator (◄) should
+    ///     appear on the separator line at the left edge.
+    /// </summary>
+    [Fact]
+    public void Bottom_ScrolledRight_BothScrollIndicatorsAppear ()
+    {
+        IDriver driver = CreateTestDriver (30, 8);
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
+        Tabs tabs = new () { Driver = driver, Width = 18, Height = Dim.Fill (), TabSide = Side.Bottom };
+        superView.Add (tabs);
+
+        (View tab1, View tab2, View tab3, View tab4, View tab5) = CreateFiveTabs ();
+        tabs.Add (tab1, tab2, tab3, tab4, tab5);
+        tabs.Value = tab3;
+        tabs.ScrollOffset = 1;
+
+        superView.Layout ();
+        superView.Draw ();
+
+        // Both ◄ and ► should appear on the separator line (between content and tab headers).
+        // For Side.Bottom, the separator is the line with ╭────┬── connectors.
+        // They must NOT appear on the content border (the ╭─────╮ line at top).
+        var outputStr = driver.ToString ();
+        string [] lines = outputStr.Split ('\n');
+
+        // Find lines containing the indicators
+        var backOnSeparator = false;
+        var forwardOnSeparator = false;
+
+        foreach (string line in lines)
+        {
+            // The separator line contains tab junction glyphs (┬, ╭ adjacent to tab text)
+            bool isSeparatorLine = line.Contains ('┬') || (line.Contains ('╭') && line.Contains ('┤'));
+
+            if (line.Contains ('◄'))
+            {
+                backOnSeparator = isSeparatorLine;
+            }
+
+            if (line.Contains ('►'))
+            {
+                forwardOnSeparator = isSeparatorLine;
+            }
+        }
+
+        Assert.True (backOnSeparator, "◄ indicator should be on the separator line, not the content border");
+        Assert.True (forwardOnSeparator, "► indicator should be on the separator line, not the content border");
+
+        tabs.Dispose ();
+    }
+
     #endregion
 
     #region Scrolling Tests (Side.Left)
@@ -1153,6 +1260,194 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
                                               """,
                                               output,
                                               driver);
+
+        tabs.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     When tabs overflow the available height with <see cref="Side.Right"/>, a forward scroll indicator
+    ///     (▼) should appear on the separator line at the bottom edge. The separator line is the vertical
+    ///     boundary between content and tabs — for Right, it's the left line of the tab header area.
+    /// </summary>
+    [Fact]
+    public void Right_TabsOverflow_ScrollIndicatorAppearsOnSeparator ()
+    {
+        IDriver driver = CreateTestDriver (20, 12);
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
+        Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = 10, TabSide = Side.Right };
+        superView.Add (tabs);
+
+        View tab1 = new () { Title = "T1", Text = "Content" };
+        View tab2 = new () { Title = "T2", Text = "Content" };
+        View tab3 = new () { Title = "T3", Text = "Content" };
+        View tab4 = new () { Title = "T4", Text = "Content" };
+        View tab5 = new () { Title = "T5", Text = "Content" };
+        tabs.Add (tab1, tab2, tab3, tab4, tab5);
+        tabs.Value = tab1;
+
+        superView.Layout ();
+        superView.Draw ();
+
+        // The ▼ indicator should be on the separator column (vertical boundary between content and tabs).
+        // For Side.Right, the separator is the left border of the tab headers — column where ├ and ╭ appear.
+        // It must NOT appear on the content border's left edge (column 0 of the border viewport).
+        var outputStr = driver.ToString ();
+        string [] lines = outputStr.Split ('\n');
+
+        // Find the column where tab junctions (├ or ╭) appear — that's the separator column
+        int separatorCol = -1;
+
+        foreach (string line in lines)
+        {
+            int idx = line.IndexOf ('├');
+
+            if (idx < 0)
+            {
+                idx = line.IndexOf ('╭');
+
+                // Skip the content border's ╭ at the start — we want the one in the tab area
+                if (idx >= 0 && idx < line.Length - 3 && line [idx + 1] == '─')
+                {
+                    idx = line.IndexOf ('╭', idx + 1);
+                }
+            }
+
+            if (idx < 0)
+            {
+                continue;
+            }
+            separatorCol = idx;
+
+            break;
+        }
+
+        Assert.True (separatorCol >= 0, "Could not find separator column (├ or ╭ glyph) in output");
+
+        // Find the ▼ indicator and verify it's on the separator column
+        int downArrowCol = -1;
+
+        foreach (string line in lines)
+        {
+            int idx = line.IndexOf ('▼');
+
+            if (idx < 0)
+            {
+                continue;
+            }
+            downArrowCol = idx;
+
+            break;
+        }
+
+        Assert.True (downArrowCol >= 0, "▼ indicator not found in output");
+        Assert.Equal (separatorCol, downArrowCol);
+
+        tabs.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     When scrolled down with <see cref="Side.Right"/>, a backward scroll indicator (▲) should
+    ///     appear on the separator column, and a forward indicator (▼) at the bottom.
+    ///     Both must be on the separator column, not on the content border.
+    /// </summary>
+    [Fact]
+    public void Right_ScrolledDown_BothScrollIndicatorsAppear ()
+    {
+        IDriver driver = CreateTestDriver (20, 12);
+
+        View superView = new ()
+        {
+            Driver = driver,
+            CanFocus = true,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.Dotted
+        };
+        Tabs tabs = new () { Driver = driver, Width = Dim.Fill (), Height = 10, TabSide = Side.Right };
+        superView.Add (tabs);
+
+        View tab1 = new () { Title = "T1", Text = "Content" };
+        View tab2 = new () { Title = "T2", Text = "Content" };
+        View tab3 = new () { Title = "T3", Text = "Content" };
+        View tab4 = new () { Title = "T4", Text = "Content" };
+        View tab5 = new () { Title = "T5", Text = "Content" };
+        tabs.Add (tab1, tab2, tab3, tab4, tab5);
+        tabs.Value = tab3;
+        tabs.ScrollOffset = 1;
+
+        superView.Layout ();
+        superView.Draw ();
+
+        // Both ▲ and ▼ should appear on the separator column (where ├ junctions are).
+        // They must NOT appear on column 0 (content border left edge).
+        var outputStr = driver.ToString ();
+        string [] lines = outputStr.Split ('\n');
+
+        // Find separator column from junction glyphs
+        int separatorCol = -1;
+
+        foreach (string line in lines)
+        {
+            int idx = line.IndexOf ('├');
+
+            if (idx < 0)
+            {
+                continue;
+            }
+            separatorCol = idx;
+
+            break;
+        }
+
+        Assert.True (separatorCol >= 0, "Could not find separator column (├ glyph) in output");
+
+        // Verify ▲ is on the separator column
+        int upCol = -1;
+
+        foreach (string line in lines)
+        {
+            int idx = line.IndexOf ('▲');
+
+            if (idx < 0)
+            {
+                continue;
+            }
+            upCol = idx;
+
+            break;
+        }
+
+        Assert.True (upCol >= 0, "▲ indicator not found in output");
+        Assert.Equal (separatorCol, upCol);
+
+        // Verify ▼ is on the separator column
+        int downCol = -1;
+
+        foreach (string line in lines)
+        {
+            int idx = line.IndexOf ('▼');
+
+            if (idx < 0)
+            {
+                continue;
+            }
+            downCol = idx;
+
+            break;
+        }
+
+        Assert.True (downCol >= 0, "▼ indicator not found in output");
+        Assert.Equal (separatorCol, downCol);
 
         tabs.Dispose ();
     }
