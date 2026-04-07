@@ -920,12 +920,11 @@ public class RegionClassTests
 
         Rectangle [] result = region.GetRectangles ();
 
-        // Original & Updated (with normalization disabled) behavior:
-        // Produces [(0,0,1,1), (1,0,1,2), (2,0,0,1)]
-        Assert.Equal (3, result.Length);
+        // The clip produces (0,0,1,1) and (1,0,1,2). The third rect from the Union,
+        // (2,0,1,1), clips to (2,0,0,1) — zero width — which is correctly excluded.
+        Assert.Equal (2, result.Length);
         Assert.Contains (new Rectangle (0, 0, 1, 1), result);
         Assert.Contains (new Rectangle (1, 0, 1, 2), result);
-        Assert.Contains (new Rectangle (2, 0, 0, 1), result);
     }
 
     [Fact]

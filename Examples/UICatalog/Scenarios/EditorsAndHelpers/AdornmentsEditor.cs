@@ -15,7 +15,17 @@ public class AdornmentsEditor : EditorBase
         Initialized += AdornmentsEditor_Initialized;
 
         SchemeName = "Dialog";
+
+        Add (_tabs);
+
+        Height = Dim.Auto ();
+        Width = Dim.Auto ();
     }
+
+    private Tabs _tabs = new Tabs ()
+    {
+        TabSide = Side.Left,
+    };
 
     public MarginEditor? MarginEditor { get; set; }
     public BorderEditor? BorderEditor { get; private set; }
@@ -36,29 +46,37 @@ public class AdornmentsEditor : EditorBase
     {
         ExpanderButton?.Orientation = Orientation.Horizontal;
 
-        MarginEditor = new MarginEditor { X = -1, Y = 0, SuperViewRendersLineCanvas = true, BorderStyle = BorderStyle };
-        MarginEditor.Border.Thickness = MarginEditor.Border.Thickness with { Bottom = 0 };
-        Add (MarginEditor);
+        MarginEditor = new MarginEditor { };
+        _tabs.Add (MarginEditor);
 
-        BorderEditor = new BorderEditor
-        {
-            X = Pos.Left (MarginEditor), Y = Pos.Bottom (MarginEditor), SuperViewRendersLineCanvas = true, BorderStyle = BorderStyle
-        };
-        BorderEditor.Border.Thickness = BorderEditor.Border.Thickness with { Bottom = 0 };
-        Add (BorderEditor);
+        BorderEditor = new BorderEditor { };
+        _tabs.Add (BorderEditor);
 
-        PaddingEditor = new PaddingEditor
-        {
-            X = Pos.Left (BorderEditor), Y = Pos.Bottom (BorderEditor), SuperViewRendersLineCanvas = true, BorderStyle = BorderStyle
-        };
-        PaddingEditor.Border.Thickness = PaddingEditor.Border.Thickness with { Bottom = 0 };
-        Add (PaddingEditor);
+        PaddingEditor = new PaddingEditor { };
+        _tabs.Add (PaddingEditor);
 
-        Width = Dim.Auto (maximumContentDim: Dim.Func (_ => MarginEditor.Frame.Width - 2));
+        // Set all tabs to Dim.Auto 
+        MarginEditor.Width = Dim.Auto ();
+        BorderEditor.Width = Dim.Auto ();
+        PaddingEditor.Width = Dim.Auto ();
+        MarginEditor.Height = Dim.Auto ();
+        BorderEditor.Height = Dim.Auto ();
+        PaddingEditor.Height = Dim.Auto ();
+        Layout ();
 
-        MarginEditor.ExpanderButton!.Collapsed = true;
-        BorderEditor.ExpanderButton!.Collapsed = true;
-        PaddingEditor.ExpanderButton!.Collapsed = true;
+        // Get the largest 
+        int max = new [] { MarginEditor.Frame.Width, BorderEditor.Frame.Width, PaddingEditor.Frame.Width }.Max ();
+        _tabs.Width = Dim.Auto (minimumContentDim: max);
+
+        max = new [] { MarginEditor.Frame.Height, BorderEditor.Frame.Height, PaddingEditor.Frame.Height }.Max ();
+        _tabs.Height = Dim.Auto (minimumContentDim: max);
+
+        MarginEditor.Width = Dim.Fill ();
+        BorderEditor.Width = Dim.Fill ();
+        PaddingEditor.Width = Dim.Fill ();
+        MarginEditor.Height = Dim.Fill ();
+        BorderEditor.Height = Dim.Fill ();
+        PaddingEditor.Height = Dim.Fill ();
 
         MarginEditor.AdornmentToEdit = ViewToEdit?.Margin ?? null;
         BorderEditor.AdornmentToEdit = ViewToEdit?.Border ?? null;

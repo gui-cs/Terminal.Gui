@@ -387,12 +387,16 @@ public partial class View // Mouse APIs
         // 1. Pre-conditions
         mouse.Position ??= mouse.ScreenPosition;
 
+        // BUGBUG: If the mouse is disabled after it's been grabbed or while it's being held down, it will stop receiving events and won't be able to ungrab itself.
+        // BUGBUG: We need tests to prove this behavior and determine if we need to ungrab the mouse when the view is disabled or becomes not visible while the mouse is grabbed.
         if (!Enabled)
         {
             // A disabled view should not eat mouse events
             return false;
         }
 
+        // BUGBUG: If the mouse is hidden after it's been grabbed or while it's being held down, it will stop receiving events and won't be able to ungrab itself.
+        // BUGBUG: We need tests to prove this behavior and determine if we need to ungrab the mouse when the view is disabled or becomes not visible while the mouse is grabbed.
         if (!CanBeVisible (this))
         {
             return false;
