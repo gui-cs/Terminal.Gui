@@ -707,6 +707,54 @@ public sealed class UICatalogRunnable : Runnable
     private Shortcut? _shVersion;
     private CheckBox? _force16ColorsShortcutCb;
 
+    /// <summary>
+    ///     Returns the first F-key (F1–F12) that is not already bound in
+    ///     <see cref="Application.KeyBindings"/>, <see cref="MenuBar.DefaultKey"/>,
+    ///     or <see cref="PopoverMenu.DefaultKey"/>. Falls back to <see cref="Key.F12"/> if all are taken.
+    /// </summary>
+    private Key GetFirstUnboundFKey ()
+    {
+        Key [] fKeys =
+        [
+            Key.F1, Key.F2, Key.F3, Key.F4, Key.F5, Key.F6,
+            Key.F7, Key.F8, Key.F9, Key.F10, Key.F11, Key.F12
+        ];
+
+        // Collect keys already bound at the Application level
+        HashSet<Key> boundKeys = [];
+
+        foreach (Key fKey in fKeys)
+        {
+            if (Application.KeyBindings.TryGet (fKey, out _))
+            {
+                boundKeys.Add (fKey);
+            }
+        }
+
+        // Also exclude the MenuBar and PopoverMenu activation keys
+        boundKeys.Add (MenuBar.DefaultKey);
+        boundKeys.Add (PopoverMenu.DefaultKey);
+
+        // Exclude keys used by MenuBar menu items
+        if (_menuBar is { })
+        {
+            foreach (MenuItem menuItem in _menuBar.GetMenuItemsWith (mi => mi.Key.IsValid))
+            {
+                boundKeys.Add (menuItem.Key);
+            }
+        }
+
+        foreach (Key fKey in fKeys)
+        {
+            if (!boundKeys.Contains (fKey))
+            {
+                return fKey;
+            }
+        }
+
+        return Key.F12;
+    }
+
     private StatusBar CreateStatusBar ()
     {
         StatusBar statusBar = new () { AlignmentModes = AlignmentModes.IgnoreFirstOrLast, CanFocus = false };
@@ -716,7 +764,7 @@ public sealed class UICatalogRunnable : Runnable
 
         _shVersion = new Shortcut { Title = "Version Info", CanFocus = false };
 
-        Shortcut statusBarShortcut = new () { Key = Key.F10, Title = "Show/Hide Status Bar", CanFocus = false, Action = () => ShowStatusBar = !ShowStatusBar };
+        Shortcut statusBarShortcut = new () { Key = GetFirstUnboundFKey (), Title = "Show/Hide Status Bar", CanFocus = false, Action = () => ShowStatusBar = !ShowStatusBar };
 
         _force16ColorsShortcutCb = new CheckBox
         {
