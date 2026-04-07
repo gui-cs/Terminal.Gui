@@ -625,7 +625,7 @@ public partial class BorderView : AdornmentView
     ///     the <see cref="ITitleView.MeasuredTabLength"/> from the laid-out <see cref="TitleView"/>.
     ///     Returns 0 if no <see cref="TitleView"/> exists yet.
     /// </summary>
-    internal int EffectiveTabLength
+    public int EffectiveTabLength
     {
         get
         {

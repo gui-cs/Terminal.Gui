@@ -649,7 +649,7 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         if (isHorizontal)
         {
-            int separatorY = _tabSide == Side.Top ? TabDepth - 1 : 0;
+            Pos separatorY = _tabSide == Side.Top ? TabDepth - 1 : Pos.AnchorEnd (TabDepth);
             scrollBack.Orientation = Orientation.Horizontal;
             scrollBack.Direction = NavigationDirection.Backward;
             scrollBack.X = 0;
@@ -661,7 +661,7 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
         else
         {
-            int separatorX = _tabSide == Side.Left ? TabDepth - 1 : 0;
+            Pos separatorX = _tabSide == Side.Left ? TabDepth - 1 : Pos.AnchorEnd (TabDepth);
             scrollBack.Orientation = Orientation.Vertical;
             scrollBack.Direction = NavigationDirection.Backward;
             scrollBack.X = separatorX;

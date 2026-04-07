@@ -26,11 +26,8 @@ public sealed class TabsExample : Scenario
             Y = 3,
             Title = "_Tabs",
             Width = Dim.Percent (70),
-            Height = Dim.Percent (70),
-            Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
-            BorderStyle = LineStyle.Double
+            Height = Dim.Percent (70)
         };
-        tabs.Margin.Thickness = new Thickness (1);
 
         tabs.EnableForDesign ();
 
