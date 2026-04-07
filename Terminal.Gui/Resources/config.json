@@ -17,7 +17,7 @@
   "ConfigurationManager.ThrowOnJsonErrors": false,
 
   // --------------- Tracing ----------------------------
-  "Trace.EnabledCategories": "Lifecycle",
+  //"Trace.EnabledCategories": "Lifecycle",
 
   // --------------- Application Settings ---------------
   "Key.Separator": "+",

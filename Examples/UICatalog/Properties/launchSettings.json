@@ -2,7 +2,7 @@
   "profiles": {
     "UICatalog": {
       "commandName": "Project",
-      "commandLineArgs": "--debug-log-level Debug"
+      "commandLineArgs": "--debug-log-level Trace"
     },
     "UICatalog --driver windows": {
       "commandName": "Project",

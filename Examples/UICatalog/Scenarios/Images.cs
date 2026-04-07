@@ -37,8 +37,7 @@ public class Images : Scenario
     /// </summary>
     private View _sixelNotSupported;
 
-    private Tab _tabSixel;
-    private TabView _tabView;
+    private View _tabSixel;
 
     /// <summary>
     ///     The view into which the currently opened sixel image is bounded
@@ -71,14 +70,18 @@ public class Images : Scenario
 
         bool canTrueColor = app.Driver?.SupportsTrueColor ?? false;
 
-        Tab tabBasic = new ()
+        View tabBasic = new ()
         {
-            DisplayText = "Basic"
+            Title = "Basic",
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
         };
 
-        _tabSixel = new Tab
+        _tabSixel = new ()
         {
-            DisplayText = "Sixel"
+            Title = "Sixel",
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
         };
 
         Label lblDriverName = new () { X = 0, Y = 0, Text = $"Driver is {app.Driver?.GetType ().Name}" };
@@ -136,13 +139,8 @@ public class Images : Scenario
         Button btnOpenImage = new () { X = Pos.Right (cbUseTrueColor) + 2, Y = 0, Text = "Open Image" };
         _win.Add (btnOpenImage);
 
-        _tabView = new TabView
-        {
-            Y = Pos.Bottom (lblSupportsSixel), Width = Dim.Fill (), Height = Dim.Fill ()
-        };
-
-        _tabView.AddTab (tabBasic, true);
-        _tabView.AddTab (_tabSixel, false);
+        tabBasic.Y = Pos.Bottom (lblSupportsSixel);
+        _tabSixel.Y = Pos.Bottom (lblSupportsSixel);
 
         BuildBasicTab (tabBasic);
         BuildSixelTab ();
@@ -152,7 +150,8 @@ public class Images : Scenario
         btnOpenImage.Accepting += OpenImage;
 
         _win.Add (lblSupportsSixel);
-        _win.Add (_tabView);
+        _win.Add (tabBasic);
+        _win.Add (_tabSixel);
 
         // Start trying to detect sixel support
         SixelSupportDetector sixelSupportDetector = new (app.Driver);
@@ -209,8 +208,9 @@ public class Images : Scenario
 
     private void SetupSixelSupported (bool isSupported)
     {
-        _tabSixel.View = isSupported ? _sixelSupported : _sixelNotSupported;
-        _tabView.SetNeedsDraw ();
+        _tabSixel.RemoveAll ();
+        _tabSixel.Add (isSupported ? _sixelSupported : _sixelNotSupported);
+        _tabSixel.SetNeedsDraw ();
     }
 
     private void BtnStartFireOnAccept (object sender, CommandEventArgs e)
@@ -346,14 +346,10 @@ public class Images : Scenario
 
     private void ApplyShowTabViewHack ()
     {
-        // TODO HACK: This hack seems to be required to make tabview actually refresh itself
-        _tabView.SetNeedsDraw ();
-        Tab orig = _tabView.SelectedTab;
-        _tabView.SelectedTab = _tabView.Tabs.Except ([orig]).ElementAt (0);
-        _tabView.SelectedTab = orig;
+        _win.SetNeedsDraw ();
     }
 
-    private void BuildBasicTab (Tab tabBasic)
+    private void BuildBasicTab (View tabBasic)
     {
         _imageView = new ImageView
         {
@@ -362,7 +358,7 @@ public class Images : Scenario
             CanFocus = true
         };
 
-        tabBasic.View = _imageView;
+        tabBasic.Add (_imageView);
     }
 
     private void BuildSixelTab ()

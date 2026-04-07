@@ -42,11 +42,11 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
     /// </summary>
     public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
 
-    private readonly Button _down;
+    private readonly ScrollButton _down;
 
     // TODO: Use a TextField instead of a Label
     private readonly View _number;
-    private readonly Button _up;
+    private readonly ScrollButton _up;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="NumericUpDown{T}"/> class.
@@ -76,16 +76,10 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
 
-        _down = new Button
+        _down = new ScrollButton
         {
-            Height = 1,
-            Width = 1,
-            NoPadding = true,
-            NoDecorations = true,
-            Title = $"{Glyphs.DownArrow}",
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased,
-            CanFocus = false,
-            ShadowStyle = null
+            Orientation = Orientation.Vertical,
+            Direction = NavigationDirection.Forward
         };
 
         _number = new View
@@ -99,18 +93,12 @@ public class NumericUpDown<T> : View, IValue<T> where T : notnull
             CanFocus = true
         };
 
-        _up = new Button
+        _up = new ScrollButton
         {
             X = Pos.Right (_number),
             Y = Pos.Top (_number),
-            Height = 1,
-            Width = 1,
-            NoPadding = true,
-            NoDecorations = true,
-            Title = $"{Glyphs.UpArrow}",
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased,
-            CanFocus = false,
-            ShadowStyle = null
+            Orientation = Orientation.Vertical,
+            Direction = NavigationDirection.Backward
         };
 
         _down.Accepting += OnDownButtonOnAccept;

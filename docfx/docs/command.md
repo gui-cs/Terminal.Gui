@@ -624,7 +624,7 @@ When an inner <xref:Terminal.Gui.Views.CheckBox> activates (via click/space), th
 | **<xref:Terminal.Gui.Views.HexView>** | Removed | Removed | Not bound | Not bound | Not bound | <xref:Terminal.Gui.Input.Command.Activate> | <xref:Terminal.Gui.Input.Command.Activate> |
 | **<xref:Terminal.Gui.Views.ColorPicker>** | Not bound | Not bound | Not bound | Not bound | Not bound | Not bound (removed) | <xref:Terminal.Gui.Input.Command.Accept> |
 | **<xref:Terminal.Gui.Views.Label>** | Not bound | Not bound | Forwards to next focusable peer | Not bound | Not bound | Not bound | Not bound |
-| **<xref:Terminal.Gui.Views.TabView>** | Not bound | Not bound | <xref:Terminal.Gui.Input.Command.HotKey> | Handled by SubViews | Handled by SubViews | Handled by SubViews | Not bound |
+| **<xref:Terminal.Gui.Views.Tabs>** | Not bound | Not bound | <xref:Terminal.Gui.Input.Command.HotKey> | Handled by SubViews | Handled by SubViews | Handled by SubViews | Not bound |
 | **<xref:Terminal.Gui.Views.NumericUpDown>** | Handled by SubViews | Handled by SubViews | <xref:Terminal.Gui.Input.Command.HotKey> | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **<xref:Terminal.Gui.Views.Dialog>** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **<xref:Terminal.Gui.Views.Wizard>** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |

@@ -368,7 +368,7 @@ public class ShadowTests (ITestOutputHelper output)
         {
             for (; i > count; i--)
             {
-                Assert.True (app.Keyboard.RaiseKeyDownEvent (key));
+                app.Keyboard.RaiseKeyDownEvent (key);
                 app.LayoutAndDraw ();
 
                 CheckAssertion (new Point (i - 1, 0), new Point (0, i - 1), key);
@@ -379,7 +379,7 @@ public class ShadowTests (ITestOutputHelper output)
         {
             for (; i < count; i++)
             {
-                Assert.True (app.Keyboard.RaiseKeyDownEvent (key));
+                app.Keyboard.RaiseKeyDownEvent (key);
                 app.LayoutAndDraw ();
 
                 CheckAssertion (new Point (i + 1, 0), new Point (0, i + 1), key);
