@@ -144,8 +144,11 @@ public partial class View
 
         SubViewNeedsDraw = false;
 
-        // This ensures LineCanvas' get redrawn
-        if (!SuperViewRendersLineCanvas)
+        // This ensures LineCanvas' get redrawn.
+        // AdornmentViews skip this because their LC may hold merged SubView lines
+        // that haven't been consumed by the parent's DoDrawAdornmentsSubViews yet.
+        // Those lines are cleared in DoDrawAdornmentsSubViews after merging into the parent's LC.
+        if (!SuperViewRendersLineCanvas && this is not AdornmentView)
         {
             LineCanvas.Clear ();
         }

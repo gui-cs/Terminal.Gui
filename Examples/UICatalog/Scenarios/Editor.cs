@@ -27,7 +27,6 @@ public class Editor : Scenario
     private CheckBox? _miForceMinimumPosToZeroCheckBox;
     private byte []? _originalText;
     private bool _saved = true;
-    private TabView? _tabView;
     private string _textToFind = string.Empty;
     private string _textToReplace = string.Empty;
     private TextView? _textView;
@@ -940,16 +939,14 @@ public class Editor : Scenario
 
     private void ShowFindReplace (bool isFind = true)
     {
-        if (_findReplaceWindow is null || _tabView is null)
+        if (_findReplaceWindow is null)
         {
             return;
         }
 
         _findReplaceWindow.Visible = true;
         _findReplaceWindow.SuperView?.MoveSubViewToStart (_findReplaceWindow);
-        _tabView.SetFocus ();
-        _tabView.SelectedTab = isFind ? _tabView.Tabs.ToArray () [0] : _tabView.Tabs.ToArray () [1];
-        _tabView.SelectedTab?.View?.FocusDeepest (NavigationDirection.Forward, null);
+        _findReplaceWindow.FocusDeepest (NavigationDirection.Forward, null);
     }
 
     private void CreateFindReplace ()
@@ -961,14 +958,29 @@ public class Editor : Scenario
 
         _findReplaceWindow = new FindReplaceWindow (_textView);
 
-        _tabView = new TabView { X = 0, Y = 0, Width = Dim.Fill (), Height = Dim.Fill (0) };
+        // Restored: Tabs with Find and Replace tabs (#4183)
+        Tabs tabs = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
 
-        _tabView.AddTab (new Tab { DisplayText = "Find", View = CreateFindTab () }, true);
-        _tabView.AddTab (new Tab { DisplayText = "Replace", View = CreateReplaceTab () }, false);
+        View findTab = new () { Title = "_Find" };
+        View findView = CreateFindTab ();
+        findView.Width = Dim.Fill ();
+        findView.Height = Dim.Fill ();
+        findTab.Add (findView);
 
-        _tabView.SelectedTabChanged += (s, e) => { _tabView.SelectedTab?.View?.FocusDeepest (NavigationDirection.Forward, null); };
+        View replaceTab = new () { Title = "_Replace" };
+        View replaceView = CreateReplaceTab ();
+        replaceView.Width = Dim.Fill ();
+        replaceView.Height = Dim.Fill ();
+        replaceTab.Add (replaceView);
 
-        _findReplaceWindow.Add (_tabView);
+        tabs.Add (findTab, replaceTab);
+        tabs.Value = findTab;
+
+        _findReplaceWindow.Add (tabs);
         _findReplaceWindow.Visible = false;
         _appWindow.Add (_findReplaceWindow);
     }

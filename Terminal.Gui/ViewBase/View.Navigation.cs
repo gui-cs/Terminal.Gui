@@ -336,7 +336,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
     {
         get
         {
-            View? focused = GetSubViews (includePadding: true).FirstOrDefault (v => v.HasFocus);
+            View? focused = GetSubViews ( /*includeBorder: true,*/ includePadding: true).FirstOrDefault (v => v.HasFocus);
 
             if (focused is { })
             {
@@ -925,6 +925,11 @@ public partial class View // Focus and cross-view navigation management (TabStop
             throw new InvalidOperationException ("SetHasFocusFalse and the HasFocus value did not change.");
         }
 
+        //if (SuperView is AdornmentView { HasFocus: true } superAsAdornment)
+        //{
+        //    superAsAdornment.SetHasFocusFalse (newFocusedView, true);
+        //}
+
         SetNeedsDraw ();
     }
 
@@ -992,19 +997,30 @@ public partial class View // Focus and cross-view navigation management (TabStop
 
         if (behavior.HasValue)
         {
-            filteredSubViews = GetSubViews (includePadding: true).Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
+            filteredSubViews = GetSubViews (includeBorder: true, includePadding: true).Where (v => v.TabStop == behavior && v is { CanFocus: true, Visible: true, Enabled: true });
         }
         else
         {
-            filteredSubViews = GetSubViews (includePadding: true).Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
+            filteredSubViews = GetSubViews (includeBorder: true, includePadding: true).Where (v => v is { CanFocus: true, Visible: true, Enabled: true });
         }
 
-        if (this is not IAdornmentView
-            && Padding.View is { CanFocus: true, Visible: true, Enabled: true }
-            && Padding.View?.TabStop == behavior
-            && Padding.Thickness != Thickness.Empty)
+        if (this is not IAdornmentView)
         {
-            filteredSubViews = filteredSubViews.Append (Padding.View!);
+
+            if (Padding.View is { CanFocus: true, Visible: true, Enabled: true } && (Padding.View?.TabStop == null || Padding.View?.TabStop == behavior) && Padding.Thickness != Thickness.Empty)
+            {
+                if (Padding.View is { })
+                {
+                    filteredSubViews = filteredSubViews.Append (Padding.View);
+                }
+            }
+            //else if (Border.View is { CanFocus: true, Visible: true, Enabled: true } && (Border.View?.TabStop == null || Border.View?.TabStop == behavior) && Border.Thickness != Thickness.Empty)
+            //{
+            //    if (Border.View is { })
+            //    {
+            //        filteredSubViews = filteredSubViews.Append (Border.View);
+            //    }
+            //}
         }
 
         // Border and Margin do not participate in focus chain navigation.
@@ -1014,7 +1030,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             filteredSubViews = filteredSubViews.Reverse ();
         }
 
-        return filteredSubViews.ToArray () ?? [];
+        return filteredSubViews.ToArray ();
     }
 
     /// <summary>

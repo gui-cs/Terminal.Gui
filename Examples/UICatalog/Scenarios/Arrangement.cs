@@ -18,6 +18,7 @@ public class Arrangement : Scenario
         app.Init ();
 
         using Window mainWindow = new ();
+        mainWindow.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
         mainWindow.Title = GetQuitKeyAndName ();
         mainWindow.TabStop = TabBehavior.TabGroup;
         mainWindow.ShadowStyle = null;
