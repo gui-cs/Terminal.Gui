@@ -102,16 +102,26 @@ public partial class View
         GetAutoWidth () - GetAdornmentsThickness ().Horizontal;
 
     /// <summary>
-    ///     Gets the natural (auto-size) width of the view determined by Dim.Auto, which is the minimum of the size required to
-    ///     fit all subviews and the container size.
+    ///     Gets the natural (auto-size) width of the view as calculated by <see cref="Dim.Auto ()"/>.
     /// </summary>
+    /// <remarks>
+    ///     The returned width is the full auto-calculated width for the view, including adornment thickness.
+    ///     Unlike <see cref="GetWidthRequiredForSubViews ()"/>, this value is not content-only.
+    ///     The calculation may also respect minimum and maximum content constraints applied by the auto dimension logic
+    ///     before adornments are added.
+    /// </remarks>
     /// <returns></returns>
     public int GetAutoWidth () => Dim.Auto ().Calculate (0, GetContainerSize ().Width, this, Dimension.Width);
 
     /// <summary>
-    ///     Gets the natural (auto-size) height of the view determined by Dim.Auto, which is the minimum of the size required
-    ///     to fit all subviews and the container size.
+    ///     Gets the natural (auto-size) height of the view as calculated by <see cref="Dim.Auto ()"/>.
     /// </summary>
+    /// <remarks>
+    ///     The returned height is the full auto-calculated height for the view, including adornment thickness.
+    ///     Unlike <see cref="GetHeightRequiredForSubViews ()"/>, this value is not content-only.
+    ///     The calculation may also respect minimum and maximum content constraints applied by the auto dimension logic
+    ///     before adornments are added.
+    /// </remarks>
     /// <returns></returns>
     public int GetAutoHeight () => Dim.Auto ().Calculate (0, GetContainerSize ().Height, this, Dimension.Height);
 
