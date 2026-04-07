@@ -17,7 +17,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
     {
         Link link = new ();
 
-        Assert.Equal (Link.DEFAULT_URL, link.Url);
+        Assert.Equal (string.Empty, link.Url);
         Assert.Equal (string.Empty, link.Text);
         Assert.Equal (Dim.Auto (DimAutoStyle.Text), link.Height);
         Assert.Equal (Dim.Auto (DimAutoStyle.Text), link.Width);
@@ -287,7 +287,7 @@ public class LinkTests (ITestOutputHelper output) : TestDriverBase
         string? look = app.Driver.GetOutput ().GetLastOutput ();
 
         // Verify OSC 8 sequences are NOT present for default URL
-        Assert.DoesNotContain (EscSeqUtils.OSC_StartHyperlink (Link.DEFAULT_URL), look);
+        Assert.DoesNotContain (EscSeqUtils.OSC_StartHyperlink (string.Empty), look);
         Assert.Contains ("Not a link", look);
         Assert.Contains ("Not a link", ansi);
 
