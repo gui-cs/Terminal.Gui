@@ -6,7 +6,14 @@ namespace Terminal.Gui.Drawing;
 [JsonConverter (typeof (JsonStringEnumConverter<LineStyle>))]
 public enum LineStyle
 {
-    /// <summary>No border is drawn.</summary>
+    /// <summary>
+    ///     No border is drawn. When used with <see cref="LineCanvas.AddLine(Point, int, Orientation, LineStyle, Attribute?)"/>,
+    ///     <see cref="LineCanvas"/> does not treat this value specially — the line is stored and participates in
+    ///     intersection resolution, rendering with default (single-line) glyphs. Callers that want eraser
+    ///     semantics should use
+    ///     <see cref="StraightLineExtensions.Exclude(IEnumerable{StraightLine}, Point, int, Orientation)"/>
+    ///     to remove overlapping geometry from the line collection.
+    /// </summary>
     None,
 
     /// <summary>The border is drawn using thin line Glyphs.</summary>

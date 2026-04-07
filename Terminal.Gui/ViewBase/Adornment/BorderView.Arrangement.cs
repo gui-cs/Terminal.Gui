@@ -8,26 +8,16 @@ public partial class BorderView
 
     /// <summary>
     ///     INTERNAL: Gets the <see cref="Arranger"/> responsible for handling Arrange Mode for this <see cref="BorderView"/>.
+    ///     The Arranger manages mouse hit-testing on border edges, drag operations for move/resize, and
+    ///     keyboard-based arrangement via <c>Ctrl+F5</c>.
     /// </summary>
-    internal Arranger Arranger => _arranger ??= CreateArranger ();
+    /// <remarks>
+    ///     See the <see href="https://gui-cs.github.io/Terminal.Gui/docs/arrangement.html">Arrangement Deep Dive</see>.
+    /// </remarks>
+    internal Arranger Arranger => _arranger ??= new Arranger (this);
 
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouseEvent) => Arranger.HandleMouseEvent (mouseEvent);
-
-    private Arranger CreateArranger ()
-    {
-        var arranger = new Arranger (this);
-
-        AddCommand (Command.Quit, () => _arranger?.ExitArrangeMode ());
-        AddCommand (Command.Up, () => _arranger?.HandleArrangeModeUp ());
-        AddCommand (Command.Down, () => _arranger?.HandleArrangeModeDown ());
-        AddCommand (Command.Left, () => _arranger?.HandleArrangeModeLeft ());
-        AddCommand (Command.Right, () => _arranger?.HandleArrangeModeRight ());
-        AddCommand (Command.NextTabStop, () => _arranger?.HandleArrangeModeTab ());
-        AddCommand (Command.PreviousTabStop, () => _arranger?.HandleArrangeModeBackTab ());
-
-        return arranger;
-    }
 
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)

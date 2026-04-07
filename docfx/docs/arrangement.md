@@ -526,7 +526,7 @@ container.Add(window1, window2);
 **Z-Order:**
 - Order in `SubViews` determines Z-order
 - Later views appear above earlier views
-- Use [View.BringSubviewToFront](~/api/Terminal.Gui.ViewBase.yml) to change Z-order
+- Use [View.MoveSubViewToEnd](~/api/Terminal.Gui.ViewBase.View.yml) / [View.MoveSubViewToStart](~/api/Terminal.Gui.ViewBase.View.yml) to change Z-order
 
 **Navigation:**
 - `Tab` / `Shift+Tab` - Navigate within current overlapped view
@@ -690,14 +690,15 @@ This ensures [LineCanvas](~/api/Terminal.Gui.Drawing.LineCanvas.yml) properly ha
 For overlapped views, manage Z-order with:
 
 ```csharp
-// Bring a view to the front
-container.BringSubviewToFront(window1);
+// Bring a view to the front (end of SubViews = highest Z-order)
+container.MoveSubViewToEnd (window1);
 
-// Send a view to the back
-container.SendSubviewToBack(window2);
+// Send a view to the back (start of SubViews = lowest Z-order)
+container.MoveSubViewToStart (window2);
 
-// Check current order
-int index = container.SubViews.IndexOf(window1);
+// Move one position towards front/back
+container.MoveSubViewTowardsEnd (window1);
+container.MoveSubViewTowardsStart (window2);
 ```
 
 ### Arrangement Events
@@ -705,14 +706,10 @@ int index = container.SubViews.IndexOf(window1);
 Monitor arrangement changes by handling layout events:
 
 ```csharp
-view.FrameChanged += (s, e) =>
+view.FrameChanged += (_, e) =>
 {
-    Console.WriteLine($"View moved/resized to {e.NewValue}");
-};
-
-view.LayoutComplete += (s, e) =>
-{
-    // Layout has completed after arrangement change
+    // Fires when Frame changes (move or resize)
+    Console.WriteLine ($"View moved/resized to {e.CurrentValue}");
 };
 ```
 

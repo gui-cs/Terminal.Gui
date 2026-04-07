@@ -3,7 +3,7 @@ using UnitTests;
 namespace ViewBaseTests.Adornments;
 
 // Claude - Opus 4.6
-public class BorderDrawTests (ITestOutputHelper output)
+public class BorderDrawTests (ITestOutputHelper output) : TestDriverBase
 {
     [Fact]
     public void TransparentView_With_Border_Draws_Title ()
@@ -143,5 +143,47 @@ public class BorderDrawTests (ITestOutputHelper output)
                                               """,
                                               output,
                                               app.Driver);
+    }
+
+    [Fact]
+    public void AutoLineJoin_SideBySide_Overlapping_Peers_Join_Correctly ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (12, 4);
+
+        using View superView = new () { Driver = driver };
+        superView.Width = Dim.Fill ();
+        superView.Height = Dim.Fill ();
+
+        View viewA = new ()
+        {
+            Title = "A",
+            Width = 5,
+            Height = 3,
+            BorderStyle = LineStyle.Single,
+            SuperViewRendersLineCanvas = true
+        };
+
+        View viewB = new ()
+        {
+            Title = "B",
+            X = Pos.Right (viewA) - 1, // Cause overlap
+            Width = 5,
+            Height = 3,
+            BorderStyle = LineStyle.Single,
+            SuperViewRendersLineCanvas = true
+        };
+        superView.Add (viewA, viewB);
+
+        superView.Layout ();
+        superView.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ┌┤A├┬┤B├┐
+                                              │   │   │
+                                              └───┴───┘
+                                              """,
+                                              output,
+                                              driver);
     }
 }
