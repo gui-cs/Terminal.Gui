@@ -29,7 +29,8 @@ namespace Terminal.Gui.ViewBase;
 ///         </item>
 ///     </list>
 ///     <para>
-///         Mouse-driven move/resize is handled by <see cref="Arranger"/> (see <see cref="BorderView.Arrangement"/>).
+///         Mouse and Keyboard-driven move/resize is handled by the <see cref="Arranger"/> (see <see cref="View.Arrangement"/>
+///         and the <see href="https://gui-cs.github.io/Terminal.Gui/docs/arrangement.html">Arrangement Deep Dive</see>).
 ///     </para>
 ///     <para>
 ///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/borders.html"/> for the full deep dive.

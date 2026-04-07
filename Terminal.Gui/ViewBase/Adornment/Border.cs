@@ -16,8 +16,9 @@ namespace Terminal.Gui.ViewBase;
 ///         when <see cref="LineStyle"/>, <see cref="Thickness"/>, or <see cref="BorderSettings.Tab"/> is set.
 ///     </para>
 ///     <para>
-///         The Border also provides keyboard and mouse support for moving and resizing the View. See
-///         <see cref="ViewArrangement"/>.
+///         The Border also provides keyboard and mouse support for moving and resizing the View via
+///         <see cref="ViewArrangement"/>. See the
+///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/arrangement.html">Arrangement Deep Dive</see>.
 ///     </para>
 ///     <para>
 ///         <see cref="View.BorderStyle"/> is a convenience helper that sets <see cref="LineStyle"/> and
@@ -244,24 +245,24 @@ public class Border : AdornmentImpl
                 return explicitLength;
             }
 
-            if (View is BorderView { TitleView: ITitleView itv and View tv })
+            if (View is not BorderView { TitleView: ITitleView itv and View tv })
             {
-                if (itv.MeasuredTabLength > 0)
-                {
-                    return itv.MeasuredTabLength;
-                }
-
-                // TitleView hasn't been laid out yet — set text and orientation, then measure.
-                tv.Text = Parent?.Title ?? string.Empty;
-                itv.Orientation = TabSide is Side.Left or Side.Right ? Orientation.Vertical : Orientation.Horizontal;
-
-                int measured = TabSide is Side.Top or Side.Bottom ? tv.GetAutoWidth () : tv.GetAutoHeight ();
-                itv.MeasuredTabLength = measured;
-
-                return measured;
+                return 0;
             }
 
-            return 0;
+            if (itv.MeasuredTabLength > 0)
+            {
+                return itv.MeasuredTabLength;
+            }
+
+            // TitleView hasn't been laid out yet — set text and orientation, then measure.
+            tv.Text = Parent?.Title ?? string.Empty;
+            itv.Orientation = TabSide is Side.Left or Side.Right ? Orientation.Vertical : Orientation.Horizontal;
+
+            int measured = TabSide is Side.Top or Side.Bottom ? tv.GetAutoWidth () : tv.GetAutoHeight ();
+            itv.MeasuredTabLength = measured;
+
+            return measured;
         }
     }
 

@@ -15,6 +15,7 @@ This deep dive covers Border's rendering modes, the tab header system, and how `
 - [Auto-Join with SuperViewRendersLineCanvas](#auto-join-with-superviewrenderslinecanvas)
 - [Border Line Positioning](#border-line-positioning)
 - [Implementation: TitleView](#implementation-tabtitleview)
+- [Arrangement (Move and Resize)](#arrangement-move-and-resize)
 
 ---
 
@@ -386,3 +387,51 @@ DoDrawAdornments → DoClearViewport → DoDrawSubViews → DoDrawText → DoDra
 ```
 
 The key change: `DoDrawAdornmentsSubViews` now runs **before** `DoRenderLineCanvas`, so SubView border lines are merged into the parent's `LineCanvas` before it is rendered to screen.
+
+---
+
+## Arrangement (Move and Resize)
+
+The [BorderView](~/api/Terminal.Gui.ViewBase.BorderView.yml) provides the interactive surface for mouse-driven move and resize operations. This is powered by the [Arranger](~/api/Terminal.Gui.ViewBase.Arranger.yml) class, which is lazily created by `BorderView` and handles all mouse hit-testing and drag operations.
+
+For a comprehensive guide to the arrangement system (including keyboard-based arrangement, overlapped layouts, and splitter patterns), see the [View Arrangement Deep Dive](arrangement.md).
+
+### How It Works
+
+1. Set [View.Arrangement](~/api/Terminal.Gui.ViewBase.View.yml) to enable move/resize flags
+2. The Border must be visible (non-zero `Thickness`) for mouse interaction
+3. `BorderView.Arranger` handles mouse events on the border edges
+
+### Quick Reference
+
+| Flag | Mouse Behavior |
+|------|----------------|
+| `ViewArrangement.Movable` | Drag the top border to move the view |
+| `ViewArrangement.Resizable` | Drag any border edge to resize |
+| `ViewArrangement.LeftResizable` | Drag the left border edge to resize width |
+| `ViewArrangement.BottomResizable` | Drag the bottom border edge to resize height |
+
+When both `Movable` and `Resizable` are set, `Movable` takes precedence on the top edge (it cannot be resized).
+
+### Keyboard Arrangement
+
+Press `Ctrl+F5` (default, configurable via `Application.DefaultKeyBindings`) to enter **Arrange Mode**. Visual indicators appear on the border:
+
+- `◊` (move indicator) in the top-left corner
+- `⇲` (resize indicator) in the bottom-right corner
+- `↔` / `↕` (edge indicators) on resizable edges
+
+Use arrow keys to move or resize, `Tab` to cycle between modes, and `Esc` to exit.
+
+### Example
+
+```csharp
+Window window = new ()
+{
+    Title = "Drag Me!",
+    X = 10, Y = 5,
+    Width = 40, Height = 15,
+    Arrangement = ViewArrangement.Movable | ViewArrangement.Resizable,
+    BorderStyle = LineStyle.Double
+};
+```

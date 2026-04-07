@@ -161,11 +161,12 @@ public partial class View // Adornments
     ///     </para>
     ///     <para>
     ///         The Border also provides the UI for mouse and keyboard arrangement of the View.
-    ///         See <see cref="Arrangement"/>.
+    ///         See <see cref="Arrangement"/> and the
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/arrangement.html">Arrangement Deep Dive</see>.
     ///     </para>
     ///     <para>
     ///         <see cref="BorderStyle"/> is a convenience helper that sets <see cref="Border.LineStyle"/> and
-    ///         <see cref="Border.Thickness"/> atomically. Use <see cref="Border"/> directly for advanced
+    ///         <see cref="IAdornment.Thickness"/> atomically. Use <see cref="Border"/> directly for advanced
     ///         configuration (tab mode, gradient, custom thickness per side).
     ///     </para>
     ///     <para>
