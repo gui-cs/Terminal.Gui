@@ -7,37 +7,38 @@ public partial class View // Adornments
     /// </summary>
     private void SetupAdornments ()
     {
-        if (this is not AdornmentView)
+        if (this is AdornmentView)
         {
-            Margin.Parent = this;
-            Border.Parent = this;
-            Padding.Parent = this;
-
-            // When any adornment's thickness changes, recompute frames and request layout + redraw.
-            Margin.ThicknessChanged += (_, _) =>
-                                       {
-                                           Margin.View?.SetNeedsLayout ();
-                                           SetAdornmentFrames ();
-                                           SetNeedsLayout ();
-                                           SetNeedsDraw ();
-                                       };
-
-            Border.ThicknessChanged += (_, _) =>
-                                       {
-                                           Border.View?.SetNeedsLayout ();
-                                           SetAdornmentFrames ();
-                                           SetNeedsLayout ();
-                                           SetNeedsDraw ();
-                                       };
-
-            Padding.ThicknessChanged += (_, _) =>
-                                        {
-                                            Padding.View?.SetNeedsLayout ();
-                                            SetAdornmentFrames ();
-                                            SetNeedsLayout ();
-                                            SetNeedsDraw ();
-                                        };
+            return;
         }
+        Margin.Parent = this;
+        Border.Parent = this;
+        Padding.Parent = this;
+
+        // When any adornment's thickness changes, recompute frames and request layout + redraw.
+        Margin.ThicknessChanged += (_, _) =>
+                                   {
+                                       Margin.View?.SetNeedsLayout ();
+                                       SetAdornmentFrames ();
+                                       SetNeedsLayout ();
+                                       SetNeedsDraw ();
+                                   };
+
+        Border.ThicknessChanged += (_, _) =>
+                                   {
+                                       Border.View?.SetNeedsLayout ();
+                                       SetAdornmentFrames ();
+                                       SetNeedsLayout ();
+                                       SetNeedsDraw ();
+                                   };
+
+        Padding.ThicknessChanged += (_, _) =>
+                                    {
+                                        Padding.View?.SetNeedsLayout ();
+                                        SetAdornmentFrames ();
+                                        SetNeedsLayout ();
+                                        SetNeedsDraw ();
+                                    };
     }
 
     private void BeginInitAdornments ()
