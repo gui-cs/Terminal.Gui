@@ -1454,6 +1454,144 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
 
     #endregion
 
+    #region TabSpacing Tests
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies the default TabSpacing is -1 and produces the current overlap behavior:
+    ///     adjacent tabs share one border edge.
+    /// </summary>
+    [Fact]
+    public void TabSpacing_Default_IsNegativeOne ()
+    {
+        IDriver driver = CreateTestDriver (30, 5);
+        Tabs tabs = new () { Driver = driver, Width = 30, Height = 5 };
+
+        Assert.Equal (-1, tabs.TabSpacing);
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        // Default overlap: each tab shares one border edge with its neighbor
+        // Tab1 width=6, offset=0; Tab2 offset=6-1=5; Tab3 offset=5+(6-1)=10
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (5, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (10, ((BorderView)tab3.Border.View!).TabOffset);
+
+        tabs.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Setting TabSpacing = -1 explicitly should produce the same offsets as the default.
+    /// </summary>
+    [Fact]
+    public void TabSpacing_NegativeOne_MatchesOriginalBehavior ()
+    {
+        IDriver driver = CreateTestDriver (30, 5);
+        Tabs tabs = new () { Driver = driver, Width = 30, Height = 5, TabSpacing = -1 };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        // Same as default: 0, 5, 10
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (5, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (10, ((BorderView)tab3.Border.View!).TabOffset);
+
+        tabs.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     TabSpacing = 0 means tabs are placed edge-to-edge with no overlap or gap.
+    ///     Each tab starts at the full width of the previous tab.
+    /// </summary>
+    [Fact]
+    public void TabSpacing_Zero_TabsEdgeToEdge ()
+    {
+        IDriver driver = CreateTestDriver (30, 5);
+        Tabs tabs = new () { Driver = driver, Width = 30, Height = 5, TabSpacing = 0 };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        // Each tab EffectiveTabLength is 6 (4 chars + 2 border cells).
+        // With spacing=0: Tab1 at 0, Tab2 at 6, Tab3 at 12.
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (6, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (12, ((BorderView)tab3.Border.View!).TabOffset);
+
+        tabs.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     TabSpacing = 1 inserts a 1-cell gap between adjacent tab headers.
+    /// </summary>
+    [Fact]
+    public void TabSpacing_Positive_InsertsGap ()
+    {
+        IDriver driver = CreateTestDriver (40, 5);
+        Tabs tabs = new () { Driver = driver, Width = 40, Height = 5, TabSpacing = 1 };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        // Each tab EffectiveTabLength is 6.
+        // With spacing=1: Tab1 at 0, Tab2 at 6+1=7, Tab3 at 7+6+1=14.
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (7, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (14, ((BorderView)tab3.Border.View!).TabOffset);
+
+        tabs.Dispose ();
+    }
+
+    // Claude - Opus 4.6
+    /// <summary>
+    ///     Verifies GetTotalHeaderSpan computes correctly for various TabSpacing values.
+    ///     3 tabs, each EffectiveTabLength = 6.
+    /// </summary>
+    [Theory]
+    [InlineData (-1, 16)] // (6-1)+(6-1)+(6-1)+1 = 5+5+5+1 = 16
+    [InlineData (0, 18)] // (6+0)+(6+0)+(6+0) = 18
+    [InlineData (1, 20)] // (6+1)+(6+1)+(6+1)-1 = 7+7+7-1 = 20
+    [InlineData (2, 22)] // (6+2)+(6+2)+(6+2)-2 = 8+8+8-2 = 22
+    public void TabSpacing_TotalHeaderSpan_CorrectForAllValues (int spacing, int expectedSpan)
+    {
+        IDriver driver = CreateTestDriver (40, 5);
+        Tabs tabs = new () { Driver = driver, Width = 40, Height = 5, TabSpacing = spacing };
+
+        View tab1 = new () { Title = "Tab1" };
+        View tab2 = new () { Title = "Tab2" };
+        View tab3 = new () { Title = "Tab3" };
+        tabs.Add (tab1, tab2, tab3);
+        tabs.Layout ();
+
+        // GetTotalHeaderSpan is private — verify indirectly via tab offsets + last tab length
+        int lastOffset = ((BorderView)tab3.Border.View!).TabOffset;
+        int lastLength = ((BorderView)tab3.Border.View!).EffectiveTabLength;
+        int computedSpan = lastOffset + lastLength;
+
+        Assert.Equal (expectedSpan, computedSpan);
+
+        tabs.Dispose ();
+    }
+
+    #endregion
+
     #region ScrollOffset Clamping Tests
 
     [Fact]

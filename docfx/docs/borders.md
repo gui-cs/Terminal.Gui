@@ -96,10 +96,11 @@ view.Border.Thickness = new Thickness (1, 3, 1, 1); // 3 on the tab side
 | Property | Type | Description |
 |----------|------|-------------|
 | `Border.Settings` | `BorderSettings` | Must include `BorderSettings.Tab` to enable tab rendering |
-| `Border.TabSide` | `Side` | Which side the tab header appears on (`Top`, `Bottom`, `Left`, `Right`) |
-| `Border.TabOffset` | `int` | Offset along the tab side where the header starts (can be negative) |
-| `Border.TabLength` | `int?` | Total length of the tab including borders. `null` = auto-compute from `Title` |
+| `BorderView.TabSide` | `Side` | Which side the tab header appears on (`Top`, `Bottom`, `Left`, `Right`) |
+| `BorderView.TabOffset` | `int` | Offset along the tab side where the header starts (can be negative) |
+| `BorderView.TabLength` | `int?` | Total length of the tab including borders. `null` = auto-compute from `Title` |
 | `BorderView.TitleView` | `View?` | The `View` rendering the tab title (for custom mouse handling) |
+| `Tabs.TabSpacing` | `int` | Gap between adjacent tab headers. `-1` = shared edge (default), `0` = edge-to-edge, `1+` = gap |
 
 When both `Tab` and `Title` are set, `TabLength` auto-computes as `Title.GetColumns() + 2` (title text width + two border columns). When only `Tab` is set without `Title`, `TabLength` defaults to `2` (just the border columns, no text).
 

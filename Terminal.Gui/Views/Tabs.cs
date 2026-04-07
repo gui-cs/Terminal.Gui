@@ -109,6 +109,27 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
     } = 3;
 
+    /// <summary>
+    ///     Gets or sets the spacing between adjacent tab headers. Negative values cause tabs to
+    ///     overlap (sharing border cells). The default is <c>-1</c>, which shares one border edge
+    ///     between adjacent tabs. A value of <c>0</c> places tabs edge-to-edge. Positive values
+    ///     insert a gap between tabs.
+    /// </summary>
+    public int TabSpacing
+    {
+        get;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+
+            field = value;
+            SetNeedsLayout ();
+        }
+    } = -1;
+
     private LineStyle _tabLineStyle = LineStyle.Rounded;
 
     /// <summary>
@@ -504,8 +525,8 @@ public class Tabs : View, IValue<View?>, IDesignable
 
             if (tabLength > 0)
             {
-                // Subtract 1 because adjacent tabs share an edge
-                offset += tabLength - 1;
+                // TabSpacing controls overlap (-1 = shared edge) or gap (0+ = space between)
+                offset += tabLength + TabSpacing;
             }
         }
 
@@ -527,13 +548,13 @@ public class Tabs : View, IValue<View?>, IDesignable
 
             if (tabLength > 0)
             {
-                // Subtract 1 because adjacent tabs share an edge
-                span += tabLength - 1;
+                // TabSpacing controls overlap (-1 = shared edge) or gap (0+ = space between)
+                span += tabLength + TabSpacing;
             }
         }
 
-        // Add 1 because the last tab's trailing border is not shared
-        return span > 0 ? span + 1 : 0;
+        // Remove the trailing spacing that was added after the last tab
+        return span > 0 ? span - TabSpacing : 0;
     }
 
     /// <summary>
@@ -813,7 +834,7 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
 
         // Compute the absolute (unscrolled) offset for this tab
-        int absOffset = TabCollection.TakeWhile (t => t != tab).Sum (t => (t.Border.View as BorderView)?.EffectiveTabLength - 1 ?? 0);
+        int absOffset = TabCollection.TakeWhile (t => t != tab).Sum (t => ((t.Border.View as BorderView)?.EffectiveTabLength ?? 0) + TabSpacing);
 
         int tabLength = (tab.Border.View as BorderView)?.EffectiveTabLength ?? 0;
         int tabEnd = absOffset + tabLength;
@@ -918,6 +939,18 @@ public class Tabs : View, IValue<View?>, IDesignable
                                }
                            };
 
+        NumericUpDown<int> tabSpacingNumericUpDown = new ()
+        {
+            Y = Pos.Top (tabLengthNumericUpDown),
+            X = Pos.Right (tabLengthNumericUpDown) + 1,
+            Width = 10,
+            BorderStyle = LineStyle.Single,
+            Title = "S_pacing",
+            Value = TabSpacing
+        };
+
+        tabSpacingNumericUpDown.ValueChanging += (_, e) => { TabSpacing = e.NewValue; };
+
         NumericUpDown<int> scrollOffsetNumericUpDown = new ()
         {
             Y = Pos.Bottom (tabSideSelector),
@@ -929,7 +962,7 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         scrollOffsetNumericUpDown.ValueChanging += (_, e) => { ScrollOffset = e.NewValue; };
 
-        settingsTab.Add (tabSideSelector, tabDepthNumericUpDown, tabLengthNumericUpDown, scrollOffsetNumericUpDown);
+        settingsTab.Add (tabSideSelector, tabDepthNumericUpDown, tabLengthNumericUpDown, tabSpacingNumericUpDown, scrollOffsetNumericUpDown);
 
         View addRemoveTab = new () { Id = "addRemoveTab", Title = "Add_/Remove" };
 

@@ -30,8 +30,12 @@ public class BorderEditor : AdornmentEditor
         {
             return;
         }
-        _osTabSide?.Value = ((BorderView)AdornmentToEdit.View)?.TabSide;
-        _nudTabOffset?.Value = ((BorderView)AdornmentToEdit.View).TabOffset;
+        _osTabSide?.Value = (AdornmentToEdit.View as BorderView)?.TabSide;
+
+        if (AdornmentToEdit.View is BorderView bv)
+        {
+            _nudTabOffset?.Value = bv.TabOffset;
+        }
     }
 
     private void BorderEditor_Initialized (object? sender, EventArgs e)
