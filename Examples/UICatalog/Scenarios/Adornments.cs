@@ -128,6 +128,7 @@ public class Adornments : Scenario
                                    }
 
                                    tabDragHooked = true;
+                                   var bv = (BorderView)window.Border.View!;
 
                                    tabTitle.MouseEvent += (_, mouse) =>
                                                           {
@@ -135,7 +136,7 @@ public class Adornments : Scenario
                                                               if (!dragStart.HasValue && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
                                                               {
                                                                   dragStart = mouse.ScreenPosition;
-                                                                  dragStartOffset = window.Border.TabOffset;
+                                                                  dragStartOffset = bv.TabOffset;
                                                                   window.App?.Mouse.GrabMouse (tabTitle);
                                                                   mouse.Handled = true;
                                                               }
@@ -144,14 +145,14 @@ public class Adornments : Scenario
                                                               if (dragStart.HasValue
                                                                   && mouse.Flags is (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
                                                               {
-                                                                  int delta = window.Border.TabSide is Side.Top or Side.Bottom
+                                                                  int delta = bv.TabSide is Side.Top or Side.Bottom
                                                                                   ? mouse.ScreenPosition.X - dragStart.Value.X
                                                                                   : mouse.ScreenPosition.Y - dragStart.Value.Y;
 
-                                                                  int tabLen = window.Border.TabLength ?? 0;
+                                                                  int tabLen = bv.TabLength ?? 0;
 
                                                                   // Content border edge length (the side the tab slides along)
-                                                                  int edgeLen = window.Border.TabSide is Side.Top or Side.Bottom
+                                                                  int edgeLen = bv.TabSide is Side.Top or Side.Bottom
                                                                                     ? window.Frame.Width
                                                                                       - window.Border.Thickness.Left
                                                                                       - window.Border.Thickness.Right
@@ -161,7 +162,7 @@ public class Adornments : Scenario
 
                                                                   int newOffset = Math.Clamp (dragStartOffset + delta, 1 - tabLen, edgeLen - 1);
 
-                                                                  window.Border.TabOffset = newOffset;
+                                                                  bv.TabOffset = newOffset;
                                                                   mouse.Handled = true;
                                                               }
 

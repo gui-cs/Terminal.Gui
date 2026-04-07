@@ -123,7 +123,7 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
 
         tabs.Add (tab1);
 
-        Assert.Equal (Side.Bottom, tab1.Border.TabSide);
+        Assert.Equal (Side.Bottom, ((BorderView)tab1.Border.View!).TabSide);
     }
 
     [Fact]
@@ -191,7 +191,6 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
 
         tabs.Dispose ();
     }
-
 
     [Fact]
     public void App_EnableForDesign_DrawsCorrectly ()
@@ -379,8 +378,8 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
 
         tabs.TabSide = Side.Bottom;
 
-        Assert.Equal (Side.Bottom, tab1.Border.TabSide);
-        Assert.Equal (Side.Bottom, tab2.Border.TabSide);
+        Assert.Equal (Side.Bottom, ((BorderView)tab1.Border.View!).TabSide);
+        Assert.Equal (Side.Bottom, ((BorderView)tab2.Border.View!).TabSide);
         Assert.Equal (new Thickness (1, 1, 1, 3), tab1.Border.Thickness);
         Assert.Equal (new Thickness (1, 1, 1, 3), tab2.Border.Thickness);
     }
@@ -514,10 +513,10 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
         tabs.Add (tab1, tab2);
 
         // Tab1 starts at 0
-        Assert.Equal (0, tab1.Border.TabOffset);
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
 
         // Tab2 starts at TabLength-1 = 5 (sharing one edge)
-        Assert.Equal (5, tab2.Border.TabOffset);
+        Assert.Equal (5, ((BorderView)tab2.Border.View!).TabOffset);
     }
 
     [Fact]
@@ -530,9 +529,9 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
 
         tabs.Add (tab1, tab2, tab3);
 
-        Assert.Equal (0, tab1.Border.TabOffset);
-        Assert.Equal (5, tab2.Border.TabOffset);
-        Assert.Equal (10, tab3.Border.TabOffset);
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (5, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (10, ((BorderView)tab3.Border.View!).TabOffset);
     }
 
     [Fact]
@@ -781,8 +780,8 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
         tabs.Add (tab2);
         tabs.Layout ();
 
-        (tab1.Border?.View?.SubViews.ElementAt (0) as TitleView)?.SetFocus ();
-        Assert.True ((tab1.Border?.View?.SubViews.ElementAt (0) as TitleView)?.HasFocus);
+        (tab1.Border.View?.SubViews.ElementAt (0) as TitleView)?.SetFocus ();
+        Assert.True ((tab1.Border.View?.SubViews.ElementAt (0) as TitleView)?.HasFocus);
         Assert.True (tab1.HasFocus);
 
         tabs.NewKeyDownEvent (Key.CursorLeft);
@@ -851,15 +850,22 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
             BorderStyle = LineStyle.Dotted
         };
 
-        View tabHost = new () { Title = "H", Height = Dim.Fill (), Width = Dim.Fill (), BorderStyle = LineStyle.Double, SuperViewRendersLineCanvas = true };
+        View tabHost = new ()
+        {
+            Title = "H",
+            Height = Dim.Fill (),
+            Width = Dim.Fill (),
+            BorderStyle = LineStyle.Double,
+            SuperViewRendersLineCanvas = true
+        };
         superView.Add (tabHost);
 
         View tab = new () { Title = "A", Height = Dim.Fill (), Width = Dim.Fill () };
         tab.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
         tab.Border.LineStyle = LineStyle.Single;
         tab.Border.Thickness = new Thickness (1, 3, 1, 1);
-        tab.Border.TabSide = Side.Top;
-        tab.Border.TabOffset = 0;
+        ((BorderView)tab.Border.View!).TabSide = Side.Top;
+        ((BorderView)tab.Border.View!).TabOffset = 0;
 
         tabHost.Add (tab);
 
@@ -879,7 +885,7 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
                                               output,
                                               driver);
 
-        tab.Border.TabOffset = 1;
+        ((BorderView)tab.Border.View!).TabOffset = 1;
         superView.Layout ();
         driver.ClearContents ();
         superView.Draw ();
@@ -898,6 +904,4 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
                                               driver);
         superView.Dispose ();
     }
-
-
 }

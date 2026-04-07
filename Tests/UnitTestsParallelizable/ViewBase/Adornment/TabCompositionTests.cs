@@ -40,8 +40,8 @@ public class TabCompositionTests (ITestOutputHelper output) : TestDriverBase
                                 };
 
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = side;
-        view.Border.TabOffset = tabOffset;
+        ((BorderView)view.Border.View!).TabSide = side;
+        ((BorderView)view.Border.View!).TabOffset = tabOffset;
 
         if (side is Side.Left or Side.Right)
         {

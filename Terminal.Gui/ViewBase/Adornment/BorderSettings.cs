@@ -24,8 +24,8 @@ public enum BorderSettings
 
     /// <summary>
     ///     Draw a Tab on one side of the border. The <see cref="View.Title"/> will be displayed in the Tab. Configure with
-    ///     <see cref="Border.TabSide"/>, <see cref="Border.TabOffset"/>,
-    ///     <see cref="Border.TabLength"/>.
+    ///     <see cref="BorderView.TabSide"/>, <see cref="BorderView.TabOffset"/>,
+    ///     <see cref="BorderView.TabLength"/>.
     /// </summary>
     Tab = 4
 }

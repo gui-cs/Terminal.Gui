@@ -143,7 +143,7 @@ public class Tabs : View, IValue<View?>, IDesignable
     ///     Gets or sets which side the tab headers are displayed on.
     /// </summary>
     /// <remarks>
-    ///     Changing this property updates the <see cref="Border.TabSide"/>,
+    ///     Changing this property updates the <see cref="BorderView.TabSide"/>,
     ///     <see cref="IAdornment.Thickness"/>, scroll button positions, tab offsets,
     ///     and z-order for all tab SubViews.
     /// </remarks>
@@ -353,7 +353,7 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         view.BorderStyle = _tabLineStyle;
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = _tabSide;
+        ((BorderView)view.Border.View!).TabSide = _tabSide;
         view.Arrangement = ViewArrangement.Overlapped;
         view.Width = Dim.Fill ();
         view.Height = Dim.Fill ();
@@ -484,7 +484,7 @@ public class Tabs : View, IValue<View?>, IDesignable
     }
 
     /// <summary>
-    ///     Updates <see cref="Border.TabOffset"/> for all tabs based on <see cref="TabSide"/>
+    ///     Updates <see cref="BorderView.TabOffset"/> for all tabs based on <see cref="TabSide"/>
     ///     and the cumulative widths/heights of preceding tabs, adjusted by the current scroll offset.
     /// </summary>
     internal void UpdateTabOffsets ()
@@ -493,9 +493,14 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         foreach (View tab in TabCollection)
         {
-            tab.Border.TabOffset = offset - ScrollOffset;
+            if (tab.Border.View is not BorderView bv)
+            {
+                continue;
+            }
 
-            int tabLength = tab.Border.EffectiveTabLength;
+            bv.TabOffset = offset - ScrollOffset;
+
+            int tabLength = bv.EffectiveTabLength;
 
             if (tabLength > 0)
             {
@@ -518,7 +523,7 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         foreach (View tab in TabCollection)
         {
-            int tabLength = tab.Border.EffectiveTabLength;
+            int tabLength = (tab.Border.View as BorderView)?.EffectiveTabLength ?? 0;
 
             if (tabLength > 0)
             {
@@ -532,23 +537,26 @@ public class Tabs : View, IValue<View?>, IDesignable
     }
 
     /// <summary>
-    ///     Updates <see cref="IAdornment.Thickness"/> and <see cref="Border.TabSide"/> for all tabs
+    ///     Updates <see cref="IAdornment.Thickness"/> and <see cref="BorderView.TabSide"/> for all tabs
     ///     based on the current <see cref="TabSide"/> and <see cref="TabDepth"/>.
     /// </summary>
     private void UpdateTabBorderThickness ()
     {
         foreach (View tab in TabCollection)
         {
-            tab.Border.TabSide = _tabSide;
+            if (tab.Border.View is BorderView bv)
+            {
+                bv.TabSide = _tabSide;
+            }
 
             tab.Border.Thickness = _tabSide switch
-            {
-                Side.Top => new Thickness (1, TabDepth, 1, 1),
-                Side.Bottom => new Thickness (1, 1, 1, TabDepth),
-                Side.Left => new Thickness (TabDepth, 1, 1, 1),
-                Side.Right => new Thickness (1, 1, TabDepth, 1),
-                _ => new Thickness (1, TabDepth, 1, 1)
-            };
+                                   {
+                                       Side.Top => new Thickness (1, TabDepth, 1, 1),
+                                       Side.Bottom => new Thickness (1, 1, 1, TabDepth),
+                                       Side.Left => new Thickness (TabDepth, 1, 1, 1),
+                                       Side.Right => new Thickness (1, 1, TabDepth, 1),
+                                       _ => new Thickness (1, TabDepth, 1, 1)
+                                   };
         }
     }
 
@@ -564,26 +572,26 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
 
         return TabSide switch
-        {
-            Side.Top or Side.Bottom when ctx.Command == Command.Right => SelectNextTab (),
-            Side.Top or Side.Bottom when ctx.Command == Command.Left => SelectPreviousTab (),
+               {
+                   Side.Top or Side.Bottom when ctx.Command == Command.Right => SelectNextTab (),
+                   Side.Top or Side.Bottom when ctx.Command == Command.Left => SelectPreviousTab (),
 
-            Side.Top when ctx.Command == Command.Down => FocusContent (),
-            Side.Top when ctx.Command == Command.Up => SelectPreviousTab (),
+                   Side.Top when ctx.Command == Command.Down => FocusContent (),
+                   Side.Top when ctx.Command == Command.Up => SelectPreviousTab (),
 
-            Side.Bottom when ctx.Command == Command.Up => FocusContent (),
-            Side.Bottom when ctx.Command == Command.Down => SelectNextTab (),
+                   Side.Bottom when ctx.Command == Command.Up => FocusContent (),
+                   Side.Bottom when ctx.Command == Command.Down => SelectNextTab (),
 
-            Side.Left or Side.Right when ctx.Command == Command.Down => SelectNextTab (),
-            Side.Left or Side.Right when ctx.Command == Command.Up => SelectPreviousTab (),
+                   Side.Left or Side.Right when ctx.Command == Command.Down => SelectNextTab (),
+                   Side.Left or Side.Right when ctx.Command == Command.Up => SelectPreviousTab (),
 
-            Side.Left when ctx.Command == Command.Right => FocusContent (),
-            Side.Left when ctx.Command == Command.Left => SelectPreviousTab (),
+                   Side.Left when ctx.Command == Command.Right => FocusContent (),
+                   Side.Left when ctx.Command == Command.Left => SelectPreviousTab (),
 
-            Side.Right when ctx.Command == Command.Left => FocusContent (),
-            Side.Right when ctx.Command == Command.Right => SelectNextTab (),
-            _ => false
-        };
+                   Side.Right when ctx.Command == Command.Left => FocusContent (),
+                   Side.Right when ctx.Command == Command.Right => SelectNextTab (),
+                   _ => false
+               };
     }
 
     private bool? SelectNextTab ()
@@ -606,11 +614,10 @@ public class Tabs : View, IValue<View?>, IDesignable
         {
             return false;
         }
-        Value?.Border?.View?.HasFocus = false;
+        Value?.Border.View?.HasFocus = false;
         Value?.RestoreFocus ();
 
         return true;
-
     }
 
     /// <summary>
@@ -723,7 +730,7 @@ public class Tabs : View, IValue<View?>, IDesignable
     ///         the total header span are clamped so that the last tab remains visible.
     ///     </para>
     ///     <para>
-    ///         Setting this property updates all tab <see cref="Border.TabOffset"/> values, updates scroll button
+    ///         Setting this property updates all tab <see cref="BorderView.TabOffset"/> values, updates scroll button
     ///         visibility, and triggers a layout pass.
     ///     </para>
     /// </remarks>
@@ -744,7 +751,7 @@ public class Tabs : View, IValue<View?>, IDesignable
 
                 if (last is { })
                 {
-                    field = GetTotalHeaderSpan () - (last.Border.TabOffset - 2);
+                    field = GetTotalHeaderSpan () - (((last.Border.View as BorderView)?.TabOffset ?? 0) - 2);
                 }
             }
             else if (value < 0)
@@ -806,9 +813,9 @@ public class Tabs : View, IValue<View?>, IDesignable
         }
 
         // Compute the absolute (unscrolled) offset for this tab
-        int absOffset = TabCollection.TakeWhile (t => t != tab).Sum (t => t.Border.EffectiveTabLength - 1);
+        int absOffset = TabCollection.TakeWhile (t => t != tab).Sum (t => (t.Border.View as BorderView)?.EffectiveTabLength - 1 ?? 0);
 
-        int tabLength = tab.Border.EffectiveTabLength;
+        int tabLength = (tab.Border.View as BorderView)?.EffectiveTabLength ?? 0;
         int tabEnd = absOffset + tabLength;
 
         if (absOffset < ScrollOffset)
@@ -842,7 +849,7 @@ public class Tabs : View, IValue<View?>, IDesignable
         // Create an intermediary tab to hold multiple subviews
         View settingsTab = new () { Id = "settingsTab", Title = "Tab _Settings" };
         OptionSelector<Side> tabSideSelector = new () { Y = 1, BorderStyle = LineStyle.Single, Title = "S_ide" };
-        tabSideSelector.Value = settingsTab.Border.TabSide;
+        tabSideSelector.Value = (settingsTab.Border.View as BorderView)?.TabSide ?? Side.Top;
 
         NumericUpDown<int> tabDepthNumericUpDown = new ()
         {
@@ -889,7 +896,7 @@ public class Tabs : View, IValue<View?>, IDesignable
                                                     {
                                                         foreach (View tab in TabCollection)
                                                         {
-                                                            tab.Border.TabLength = null;
+                                                            ((BorderView)tab.Border.View!).TabLength = null;
                                                         }
                                                         e.Handled = true;
                                                     }
@@ -897,7 +904,7 @@ public class Tabs : View, IValue<View?>, IDesignable
                                                     {
                                                         foreach (View tab in TabCollection)
                                                         {
-                                                            tab.Border.TabLength = e.NewValue;
+                                                            ((BorderView)tab.Border.View!).TabLength = e.NewValue;
                                                         }
                                                     }
                                                 };
@@ -905,9 +912,9 @@ public class Tabs : View, IValue<View?>, IDesignable
         ViewportChanged += (_, _) =>
                            {
                                // only the first time
-                               if (tabLengthNumericUpDown.Value > 0 && Value?.Border.TabLength is { })
+                               if (tabLengthNumericUpDown.Value > 0 && Value?.Border.View is BorderView { TabLength: { } } bv)
                                {
-                                   tabLengthNumericUpDown.Value = Value?.Border.TabLength ?? 0;
+                                   tabLengthNumericUpDown.Value = bv.TabLength ?? 0;
                                }
                            };
 

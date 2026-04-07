@@ -153,7 +153,7 @@ public partial class View // Adornments
     ///     <para>
     ///         The Border provides the space for a visual border (drawn using line-drawing glyphs) and the
     ///         <see cref="Title"/>. When <see cref="Border.Settings"/> includes <see cref="BorderSettings.Tab"/>,
-    ///         the border renders a tab header on the side specified by <see cref="Border.TabSide"/>.
+    ///         the border renders a tab header on the side specified by <see cref="BorderView.TabSide"/>.
     ///     </para>
     ///     <para>
     ///         The Border expands inward: if <c>Border.Thickness.Top == 2</c>, the border and title occupy the

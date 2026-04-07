@@ -296,7 +296,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = new Thickness (1, 3, 1, 1);
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
+        ((BorderView)view.Border.View!).TabSide = Side.Top;
         view.Title = "Tab";
         view.Layout ();
 
@@ -799,7 +799,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = new Thickness (1, 3, 1, 1);
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
+        ((BorderView)view.Border.View!).TabSide = Side.Top;
         view.Title = "Tab";
 
         // Layout but do NOT draw
@@ -823,7 +823,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = new Thickness (1, 3, 1, 1);
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
+        ((BorderView)view.Border.View!).TabSide = Side.Top;
         view.Title = "Tab";
 
         // Layout but do NOT draw
@@ -858,8 +858,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = new Thickness (1, 3, 1, 1);
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
-        view.Border.TabOffset = 0;
+        ((BorderView)view.Border.View!).TabSide = Side.Top;
+        ((BorderView)view.Border.View!).TabOffset = 0;
         view.Title = "T_ab";
 
         // Layout but do NOT draw
@@ -886,7 +886,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = new Thickness (1, 3, 1, 1);
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
+        ((BorderView)view.Border.View!).TabSide = Side.Top;
         view.Title = "Tab";
 
         view.Layout ();
@@ -1028,7 +1028,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
             //                                               output,
             //                                               subview.Driver!);
 
-            subview.Border.TabOffset = -1;
+            ((BorderView)subview.Border.View!).TabOffset = -1;
             subview.Driver.ClearContents ();
             subview.Driver.FillRect (subview.Driver.Screen, Glyphs.Diamond);
 
@@ -1366,7 +1366,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = new Thickness (1, 3, 1, 1);
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
+        ((BorderView)view.Border.View!).TabSide = Side.Top;
         view.Title = "Tab";
 
         view.Layout ();
@@ -1778,8 +1778,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = new Thickness (1, 3, 1, 1);
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
-        view.Border.TabOffset = 0;
+        ((BorderView)view.Border.View!).TabSide = Side.Top;
+        ((BorderView)view.Border.View!).TabOffset = 0;
 
         runnable.Add (view);
         app.Begin (runnable);
@@ -1855,8 +1855,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = new Thickness (1, 3, 1, 1);
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
-        view.Border.TabOffset = 0;
+        ((BorderView)view.Border.View!).TabSide = Side.Top;
+        ((BorderView)view.Border.View!).TabOffset = 0;
 
         runnable.Add (view);
         app.Begin (runnable);
@@ -2372,8 +2372,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = new Thickness (1, 3, 1, 1);
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
-        view.Border.TabOffset = 0;
+        ((BorderView)view.Border.View!).TabSide = Side.Top;
+        ((BorderView)view.Border.View!).TabOffset = 0;
 
         // Add a second focusable view so focus goes there, not to `view`
         View other = new ()
@@ -2489,8 +2489,8 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         }
 
         subview.Border.Settings = settings;
-        subview.Border.TabSide = side;
-        subview.Border.TabOffset = tabOffset;
+        ((BorderView)subview.Border.View!).TabSide = side;
+        ((BorderView)subview.Border.View!).TabOffset = tabOffset;
 
         window.Add (subview);
         app.Begin (window);
@@ -2546,12 +2546,12 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
         }
 
         view.Border.Settings = settings;
-        view.Border.TabSide = side;
-        view.Border.TabOffset = tabOffset;
+        ((BorderView)view.Border.View!).TabSide = side;
+        ((BorderView)view.Border.View!).TabOffset = tabOffset;
 
         if (tabLength.HasValue)
         {
-            view.Border.TabLength = tabLength.Value;
+            ((BorderView)view.Border.View!).TabLength = tabLength.Value;
         }
 
         return view;
@@ -2580,19 +2580,19 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = new Thickness (1, 3, 1, 1);
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
+        ((BorderView)view.Border.View!).TabSide = Side.Top;
         view.Layout ();
 
         // Top: "Tab" = 3 cols + 2 border = 5 (width)
-        Assert.Equal (5, view.Border.EffectiveTabLength);
+        Assert.Equal (5, ((BorderView)view.Border.View!).EffectiveTabLength);
 
         // Switch to Left — tab length should now be height-based
-        view.Border.TabSide = Side.Left;
+        ((BorderView)view.Border.View!).TabSide = Side.Left;
         view.Border.Thickness = new Thickness (3, 1, 1, 1);
         view.Layout ();
 
         // Left: "Tab" vertical = 3 rows + 2 border = 5 (height)
-        Assert.Equal (5, view.Border.EffectiveTabLength);
+        Assert.Equal (5, ((BorderView)view.Border.View!).EffectiveTabLength);
 
         view.Dispose ();
     }
@@ -2632,7 +2632,7 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
                                               driver);
 
         // Switch to Left
-        view.Border.TabSide = Side.Left;
+        ((BorderView)view.Border.View!).TabSide = Side.Left;
         view.Border.Thickness = new Thickness (3, 1, 1, 1);
 
         driver.ClearContents ();
@@ -2673,19 +2673,19 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = new Thickness (3, 1, 1, 1);
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Left;
+        ((BorderView)view.Border.View!).TabSide = Side.Left;
         view.Layout ();
 
         // Left: "Tab" vertical = 3 rows + 2 border = 5 (height)
-        Assert.Equal (5, view.Border.EffectiveTabLength);
+        Assert.Equal (5, ((BorderView)view.Border.View!).EffectiveTabLength);
 
         // Switch to Top
-        view.Border.TabSide = Side.Top;
+        ((BorderView)view.Border.View!).TabSide = Side.Top;
         view.Border.Thickness = new Thickness (1, 3, 1, 1);
         view.Layout ();
 
         // Top: "Tab" = 3 cols + 2 border = 5 (width)
-        Assert.Equal (5, view.Border.EffectiveTabLength);
+        Assert.Equal (5, ((BorderView)view.Border.View!).EffectiveTabLength);
 
         view.Dispose ();
     }
@@ -2707,17 +2707,17 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = new Thickness (1, 3, 1, 1);
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
+        ((BorderView)view.Border.View!).TabSide = Side.Top;
         view.Layout ();
 
-        int topLength = view.Border.EffectiveTabLength;
+        int topLength = ((BorderView)view.Border.View!).EffectiveTabLength;
 
         // Switch to Bottom — still horizontal, length should be the same
-        view.Border.TabSide = Side.Bottom;
+        ((BorderView)view.Border.View!).TabSide = Side.Bottom;
         view.Border.Thickness = new Thickness (1, 1, 1, 3);
         view.Layout ();
 
-        Assert.Equal (topLength, view.Border.EffectiveTabLength);
+        Assert.Equal (topLength, ((BorderView)view.Border.View!).EffectiveTabLength);
 
         view.Dispose ();
     }
@@ -2739,18 +2739,18 @@ public class BorderViewTests (ITestOutputHelper output) : TestDriverBase
 
         view.Border.Thickness = new Thickness (1, 3, 1, 1);
         view.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
-        view.Border.TabSide = Side.Top;
+        ((BorderView)view.Border.View!).TabSide = Side.Top;
         view.Layout ();
 
-        Assert.Equal (5, view.Border.EffectiveTabLength);
+        Assert.Equal (5, ((BorderView)view.Border.View!).EffectiveTabLength);
 
         // Switch to Right
-        view.Border.TabSide = Side.Right;
+        ((BorderView)view.Border.View!).TabSide = Side.Right;
         view.Border.Thickness = new Thickness (1, 1, 3, 1);
         view.Layout ();
 
         // Right: "Tab" vertical = 3 rows + 2 border = 5 (height)
-        Assert.Equal (5, view.Border.EffectiveTabLength);
+        Assert.Equal (5, ((BorderView)view.Border.View!).EffectiveTabLength);
 
         view.Dispose ();
     }

@@ -146,8 +146,8 @@ public class AdornmentSubViewLineCanvasTests (ITestOutputHelper output) : TestDr
         view.Border.Thickness = new Thickness (0, 3, 0, 0);
         view.Border.LineStyle = LineStyle.Single;
         view.Border.Settings = BorderSettings.Tab;
-        view.Border.TabOffset = -2;
-        view.Border.TabLength = 5;
+        ((BorderView)view.Border.View!).TabOffset = -2;
+        ((BorderView)view.Border.View!).TabLength = 5;
 
         superView.Add (view);
 

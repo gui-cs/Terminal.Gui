@@ -543,11 +543,11 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         superView.Layout ();
 
         // Offsets should be back to natural (scrollOffset = 0)
-        Assert.Equal (0, tab1.Border.TabOffset);
-        Assert.Equal (5, tab2.Border.TabOffset);
-        Assert.Equal (10, tab3.Border.TabOffset);
-        Assert.Equal (15, tab4.Border.TabOffset);
-        Assert.Equal (20, tab5.Border.TabOffset);
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (5, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (10, ((BorderView)tab3.Border.View!).TabOffset);
+        Assert.Equal (15, ((BorderView)tab4.Border.View!).TabOffset);
+        Assert.Equal (20, ((BorderView)tab5.Border.View!).TabOffset);
 
         tabs.Dispose ();
     }
@@ -576,16 +576,16 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         superView.Layout ();
 
         // All tabs at natural offsets (scroll offset = 0)
-        Assert.Equal (0, tab1.Border.TabOffset);
-        Assert.Equal (5, tab2.Border.TabOffset);
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (5, ((BorderView)tab2.Border.View!).TabOffset);
 
         // Select tab5 — should scroll right since tab5 is off-screen at width 18
         tabs.Value = tab5;
         superView.Layout ();
 
         // Tab1 should now have negative offset (scrolled off-screen)
-        Assert.True (tab1.Border.TabOffset < 0, "Tab1 should have negative offset after scrolling right");
-        Assert.True (tab5.Border.TabOffset >= 0, "Tab5 should have non-negative offset (visible)");
+        Assert.True (((BorderView)tab1.Border.View!).TabOffset < 0, "Tab1 should have negative offset after scrolling right");
+        Assert.True (((BorderView)tab5.Border.View!).TabOffset >= 0, "Tab5 should have non-negative offset (visible)");
 
         tabs.Dispose ();
     }
@@ -622,9 +622,9 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Layout ();
 
         // All offsets should be normal (no scroll applied)
-        Assert.Equal (0, tab1.Border.TabOffset);
-        Assert.Equal (5, tab2.Border.TabOffset);
-        Assert.Equal (10, tab3.Border.TabOffset);
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (5, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (10, ((BorderView)tab3.Border.View!).TabOffset);
 
         tabs.Dispose ();
     }
@@ -653,8 +653,8 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         // tab1.TabOffset = 0 - 6 = -6
         // tab2.TabOffset = 5 - 6 = -1
         // tab3.TabOffset = 10 - 6 = 4
-        Assert.True (tab1.Border.TabOffset < 0, "Tab1 should have scrolled off-screen (negative offset)");
-        Assert.True (tab3.Border.TabOffset >= 0, "Tab3 should be visible (non-negative offset)");
+        Assert.True (((BorderView)tab1.Border.View!).TabOffset < 0, "Tab1 should have scrolled off-screen (negative offset)");
+        Assert.True (((BorderView)tab3.Border.View!).TabOffset >= 0, "Tab3 should be visible (non-negative offset)");
 
         tabs.Dispose ();
     }
@@ -681,9 +681,9 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Layout ();
 
         // Tab1 should be at offset 0 (scrolled back to start)
-        Assert.Equal (0, tab1.Border.TabOffset);
-        Assert.Equal (5, tab2.Border.TabOffset);
-        Assert.Equal (10, tab3.Border.TabOffset);
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (5, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (10, ((BorderView)tab3.Border.View!).TabOffset);
 
         tabs.Dispose ();
     }
@@ -723,15 +723,15 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         //                                      ────╭────╮
         //                                      Tab2│Tab3│
         //                                      ┬───╯    │
-        //                                      ╰────────╯   
+        //                                      ╰────────╯
         //                                      """,
         //                                      output,
         //                                      driver);
 
         // Verify exact offsets: _scrollOffset = tabEnd(tab3) - viewportWidth = 16 - 10 = 6
-        Assert.Equal (-6, tab1.Border.TabOffset);
-        Assert.Equal (-1, tab2.Border.TabOffset);
-        Assert.Equal (4, tab3.Border.TabOffset);
+        Assert.Equal (-6, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (-1, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (4, ((BorderView)tab3.Border.View!).TabOffset);
 
         tabs.Dispose ();
     }
@@ -754,11 +754,11 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Layout ();
 
         // All 5 tabs fit in 14 columns (total span = 11), so no scrolling
-        Assert.Equal (0, tab1.Border.TabOffset);
-        Assert.Equal (2, tab2.Border.TabOffset);
-        Assert.Equal (4, tab3.Border.TabOffset);
-        Assert.Equal (6, tab4.Border.TabOffset);
-        Assert.Equal (8, tab5.Border.TabOffset);
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (2, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (4, ((BorderView)tab3.Border.View!).TabOffset);
+        Assert.Equal (6, ((BorderView)tab4.Border.View!).TabOffset);
+        Assert.Equal (8, ((BorderView)tab5.Border.View!).TabOffset);
 
         tabs.Dispose ();
     }
@@ -774,7 +774,7 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Layout ();
 
         // Single tab fits — offset is 0
-        Assert.Equal (0, tab1.Border.TabOffset);
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
 
         // Insert many tabs to cause overflow
         View tab2 = new () { Title = "Tab2" };
@@ -784,14 +784,14 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Layout ();
 
         // Tab1 should still be at 0 (no scroll yet since tab1 is selected)
-        Assert.Equal (0, tab1.Border.TabOffset);
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
 
         // Select tab3 to trigger scroll
         tabs.Value = tab3;
         tabs.Layout ();
 
         // Tab1 should now have a negative offset
-        Assert.True (tab1.Border.TabOffset < 0);
+        Assert.True (((BorderView)tab1.Border.View!).TabOffset < 0);
 
         tabs.Dispose ();
     }
@@ -813,9 +813,9 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Add (tab1, tab2, tab3);
         tabs.Layout ();
 
-        Assert.Equal (0, tab1.Border.TabOffset);
-        Assert.Equal (5, tab2.Border.TabOffset);
-        Assert.Equal (10, tab3.Border.TabOffset);
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (5, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (10, ((BorderView)tab3.Border.View!).TabOffset);
 
         tabs.Dispose ();
     }
@@ -836,8 +836,8 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Value = tab3;
         tabs.Layout ();
 
-        Assert.True (tab1.Border.TabOffset < 0, "Tab1 should have negative offset");
-        Assert.True (tab3.Border.TabOffset >= 0, "Tab3 should be visible");
+        Assert.True (((BorderView)tab1.Border.View!).TabOffset < 0, "Tab1 should have negative offset");
+        Assert.True (((BorderView)tab3.Border.View!).TabOffset >= 0, "Tab3 should be visible");
 
         tabs.Dispose ();
     }
@@ -861,9 +861,9 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Value = tab1;
         tabs.Layout ();
 
-        Assert.Equal (0, tab1.Border.TabOffset);
-        Assert.Equal (5, tab2.Border.TabOffset);
-        Assert.Equal (10, tab3.Border.TabOffset);
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (5, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (10, ((BorderView)tab3.Border.View!).TabOffset);
 
         tabs.Dispose ();
     }
@@ -924,9 +924,9 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Add (tab1, tab2, tab3);
         tabs.Layout ();
 
-        Assert.Equal (0, tab1.Border.TabOffset);
-        Assert.Equal (5, tab2.Border.TabOffset);
-        Assert.Equal (10, tab3.Border.TabOffset);
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (5, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (10, ((BorderView)tab3.Border.View!).TabOffset);
 
         tabs.Dispose ();
     }
@@ -947,8 +947,8 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Value = tab3;
         tabs.Layout ();
 
-        Assert.True (tab1.Border.TabOffset < 0, "Tab1 should have negative offset");
-        Assert.True (tab3.Border.TabOffset >= 0, "Tab3 should be visible");
+        Assert.True (((BorderView)tab1.Border.View!).TabOffset < 0, "Tab1 should have negative offset");
+        Assert.True (((BorderView)tab3.Border.View!).TabOffset >= 0, "Tab3 should be visible");
 
         tabs.Dispose ();
     }
@@ -972,9 +972,9 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Value = tab1;
         tabs.Layout ();
 
-        Assert.Equal (0, tab1.Border.TabOffset);
-        Assert.Equal (5, tab2.Border.TabOffset);
-        Assert.Equal (10, tab3.Border.TabOffset);
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (5, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (10, ((BorderView)tab3.Border.View!).TabOffset);
 
         tabs.Dispose ();
     }
@@ -1049,9 +1049,9 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Add (tab1, tab2, tab3);
         tabs.Layout ();
 
-        Assert.Equal (0, tab1.Border.TabOffset);
-        Assert.Equal (5, tab2.Border.TabOffset);
-        Assert.Equal (10, tab3.Border.TabOffset);
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (5, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (10, ((BorderView)tab3.Border.View!).TabOffset);
 
         tabs.Dispose ();
     }
@@ -1072,8 +1072,8 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Value = tab3;
         tabs.Layout ();
 
-        Assert.True (tab1.Border.TabOffset < 0, "Tab1 should have negative offset");
-        Assert.True (tab3.Border.TabOffset >= 0, "Tab3 should be visible");
+        Assert.True (((BorderView)tab1.Border.View!).TabOffset < 0, "Tab1 should have negative offset");
+        Assert.True (((BorderView)tab3.Border.View!).TabOffset >= 0, "Tab3 should be visible");
 
         tabs.Dispose ();
     }
@@ -1097,9 +1097,9 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Value = tab1;
         tabs.Layout ();
 
-        Assert.Equal (0, tab1.Border.TabOffset);
-        Assert.Equal (5, tab2.Border.TabOffset);
-        Assert.Equal (10, tab3.Border.TabOffset);
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (5, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (10, ((BorderView)tab3.Border.View!).TabOffset);
 
         tabs.Dispose ();
     }
@@ -1320,16 +1320,16 @@ public class TabsScrollingTests (ITestOutputHelper output) : TestDriverBase
         tabs.Layout ();
 
         // Before scrolling — natural offsets
-        Assert.Equal (0, tab1.Border.TabOffset);
-        Assert.Equal (5, tab2.Border.TabOffset);
-        Assert.Equal (10, tab3.Border.TabOffset);
+        Assert.Equal (0, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (5, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (10, ((BorderView)tab3.Border.View!).TabOffset);
 
         // After scrolling — offsets shift by scroll amount
         tabs.ScrollOffset = 4;
 
-        Assert.Equal (-4, tab1.Border.TabOffset);
-        Assert.Equal (1, tab2.Border.TabOffset);
-        Assert.Equal (6, tab3.Border.TabOffset);
+        Assert.Equal (-4, ((BorderView)tab1.Border.View!).TabOffset);
+        Assert.Equal (1, ((BorderView)tab2.Border.View!).TabOffset);
+        Assert.Equal (6, ((BorderView)tab3.Border.View!).TabOffset);
 
         tabs.Dispose ();
     }

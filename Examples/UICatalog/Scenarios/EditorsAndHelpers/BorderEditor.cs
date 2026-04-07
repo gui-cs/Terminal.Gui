@@ -25,20 +25,25 @@ public class BorderEditor : AdornmentEditor
         }
         _osBorderStyle?.Value = ((Border)AdornmentToEdit).LineStyle.ToString ();
         _osBorderSettings?.Value = ((Border)AdornmentToEdit).Settings;
-        _osTabSide?.Value = ((Border)AdornmentToEdit).TabSide;
-        _nudTabOffset?.Value = ((Border)AdornmentToEdit).TabOffset;
+
+        if (AdornmentToEdit.View is null)
+        {
+            return;
+        }
+        _osTabSide?.Value = ((BorderView)AdornmentToEdit.View)?.TabSide;
+        _nudTabOffset?.Value = ((BorderView)AdornmentToEdit.View).TabOffset;
     }
 
     private void BorderEditor_Initialized (object? sender, EventArgs e)
     {
-        _osBorderStyle = new DropDownList ()
+        _osBorderStyle = new DropDownList
         {
             Y = Pos.Bottom (SubViews.ToArray () [^1]),
             Width = 10,
             Source = new ListWrapper<string> (new ObservableCollection<string> (Enum.GetNames<LineStyle> ())),
             Value = $"{(AdornmentToEdit as Border)?.LineStyle ?? LineStyle.None}",
             BorderStyle = LineStyle.Single,
-            Title = "St_yle",
+            Title = "St_yle"
         };
         Add (_osBorderStyle);
 
@@ -48,7 +53,7 @@ public class BorderEditor : AdornmentEditor
         {
             Y = Pos.Bottom (_osBorderStyle),
             Value = (AdornmentToEdit as Border)?.Settings ?? BorderSettings.Default,
-            Width = Dim.Auto(),
+            Width = Dim.Auto (),
             BorderStyle = LineStyle.Single,
             Title = "S_ettings"
         };
@@ -61,7 +66,7 @@ public class BorderEditor : AdornmentEditor
         {
             Y = Pos.Bottom (_osBorderSettings),
             Width = Dim.Width (_osBorderStyle),
-            Value = (AdornmentToEdit as Border)?.TabSide ?? Side.Top,
+            Value = (AdornmentToEdit?.View as BorderView)?.TabSide ?? Side.Top,
             BorderStyle = LineStyle.Single,
             Title = "_Side",
             Enabled = (AdornmentToEdit as Border)?.Settings.HasFlag (BorderSettings.Tab) ?? false
@@ -70,16 +75,13 @@ public class BorderEditor : AdornmentEditor
         _osTabSide.ValueChanged += OnHeaderSideChanged;
         Add (_osTabSide);
 
-        Label labelOffset = new ()
-        {
-            Title = "Tab _Offset:", Y = Pos.Bottom (_osTabSide)
-        };
+        Label labelOffset = new () { Title = "Tab _Offset:", Y = Pos.Bottom (_osTabSide) };
 
         _nudTabOffset = new NumericUpDown<int>
         {
             X = Pos.Right (labelOffset) + 1,
             Y = Pos.Top (labelOffset),
-            Value = (AdornmentToEdit as Border)?.TabOffset ?? 0,
+            Value = (AdornmentToEdit?.View as BorderView)?.TabOffset ?? 0,
             Enabled = (AdornmentToEdit as Border)?.Settings.HasFlag (BorderSettings.Tab) ?? false
         };
 
@@ -133,8 +135,8 @@ public class BorderEditor : AdornmentEditor
                 return;
             }
 
-            border.TabSide = args.Value.Value;
-            border.Parent?.SetNeedsLayout ();
+            ((BorderView)border.View!).TabSide = args.Value.Value;
+            border.View?.SetNeedsLayout ();
         }
 
         void OnHeaderOffsetChanged (object? _, ValueChangedEventArgs<int> args)
@@ -144,8 +146,8 @@ public class BorderEditor : AdornmentEditor
                 return;
             }
 
-            border.TabOffset = args.NewValue;
-            border.Parent?.SetNeedsLayout ();
+            ((BorderView)border.View!).TabOffset = args.NewValue;
+            border.View?.SetNeedsLayout ();
         }
     }
 }
