@@ -1,6 +1,4 @@
-﻿
-
-namespace Terminal.Gui.Drawing;
+﻿namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Represents a region composed of one or more rectangles, providing methods for geometric set operations such as
@@ -11,7 +9,8 @@ namespace Terminal.Gui.Drawing;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         This class is thread-safe. All operations are synchronized to ensure consistent state when accessed concurrently.
+///         This class is thread-safe. All operations are synchronized to ensure consistent state when accessed
+///         concurrently.
 ///     </para>
 ///     <para>
 ///         The <see cref="Region"/> class adopts a philosophy of efficiency and flexibility, balancing performance with
@@ -53,7 +52,7 @@ public class Region
     private readonly List<Rectangle> _tempRectangles = new ();
 
     // Object used for synchronization
-    private readonly object _syncLock = new object ();
+    private readonly object _syncLock = new ();
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Region"/> class.
@@ -80,7 +79,7 @@ public class Region
     {
         lock (_syncLock)
         {
-            var clone = new Region ();
+            Region clone = new ();
             clone._rectangles.Capacity = _rectangles.Count; // Pre-allocate capacity
             clone._rectangles.AddRange (_rectangles);
 
@@ -147,7 +146,7 @@ public class Region
 
                 foreach (Rectangle rect in region._rectangles)
                 {
-                    List<Rectangle> temp = new ();
+                    List<Rectangle> temp = [];
 
                     foreach (Rectangle r in newRectangles)
                     {
@@ -165,16 +164,13 @@ public class Region
             case RegionOp.Intersect:
                 List<Rectangle> intersections = new (_rectangles.Count); // Pre-allocate
 
-                // Null is same as empty region
-                region ??= new ();
-
                 foreach (Rectangle rect1 in _rectangles)
                 {
-                    foreach (Rectangle rect2 in region!._rectangles)
+                    foreach (Rectangle rect2 in region._rectangles)
                     {
                         Rectangle intersected = Rectangle.Intersect (rect1, rect2);
 
-                        if (!intersected.IsEmpty)
+                        if (intersected.Width > 0 && intersected.Height > 0)
                         {
                             intersections.Add (intersected);
                         }
@@ -190,34 +186,32 @@ public class Region
                 // Avoid collection initialization with spread operator
                 _tempRectangles.Clear ();
                 _tempRectangles.AddRange (_rectangles);
-                if (region != null)
+
+                // Get the region's rectangles safely
+                lock (region._syncLock)
                 {
-                    // Get the region's rectangles safely
-                    lock (region._syncLock)
-                    {
-                        _tempRectangles.AddRange (region._rectangles);
-                    }
+                    _tempRectangles.AddRange (region._rectangles);
                 }
                 List<Rectangle> mergedUnion = MergeRectangles (_tempRectangles, false);
                 _rectangles.Clear ();
                 _rectangles.AddRange (mergedUnion);
+
                 break;
 
             case RegionOp.MinimalUnion:
                 // Avoid collection initialization with spread operator
                 _tempRectangles.Clear ();
                 _tempRectangles.AddRange (_rectangles);
-                if (region != null)
+
+                // Get the region's rectangles safely
+                lock (region._syncLock)
                 {
-                    // Get the region's rectangles safely
-                    lock (region._syncLock)
-                    {
-                        _tempRectangles.AddRange (region._rectangles);
-                    }
+                    _tempRectangles.AddRange (region._rectangles);
                 }
                 List<Rectangle> mergedMinimalUnion = MergeRectangles (_tempRectangles, true);
                 _rectangles.Clear ();
                 _rectangles.AddRange (mergedMinimalUnion);
+
                 break;
 
             case RegionOp.XOR:
@@ -240,6 +234,8 @@ public class Region
                 _rectangles.AddRange (region._rectangles);
 
                 break;
+
+            default: throw new ArgumentOutOfRangeException (nameof (operation), operation, null);
         }
     }
 
@@ -315,7 +311,7 @@ public class Region
     /// </summary>
     /// <param name="obj">The object to compare with this region.</param>
     /// <returns><c>true</c> if the objects are equal; otherwise, <c>false</c>.</returns>
-    public override bool Equals (object? obj) { return obj is Region other && Equals (other); }
+    public override bool Equals (object? obj) => obj is Region other && Equals (other);
 
     private static bool IsRegionEmpty (List<Rectangle> rectangles)
     {
@@ -390,7 +386,7 @@ public class Region
     ///     </para>
     /// </remarks>
     /// <param name="rectangle">The rectangle to exclude from the region.</param>
-    public void Exclude (Rectangle rectangle) { Combine (rectangle, RegionOp.Difference); }
+    public void Exclude (Rectangle rectangle) => Combine (rectangle, RegionOp.Difference);
 
     /// <summary>
     ///     Removes the portion of the specified region from this region.
@@ -402,7 +398,7 @@ public class Region
     ///     </para>
     /// </remarks>
     /// <param name="region">The region to exclude from this region.</param>
-    public void Exclude (Region? region) { Combine (region, RegionOp.Difference); }
+    public void Exclude (Region? region) => Combine (region, RegionOp.Difference);
 
     /// <summary>
     ///     Gets a bounding rectangle for the entire region.
@@ -430,7 +426,7 @@ public class Region
             bottom = Math.Max (bottom, r.Bottom);
         }
 
-        return new (left, top, right - left, bottom - top);
+        return new Rectangle (left, top, right - left, bottom - top);
     }
 
     /// <summary>
@@ -453,7 +449,7 @@ public class Region
     ///     Returns an array of rectangles that represent the region.
     /// </summary>
     /// <returns>An array of <see cref="Rectangle"/> objects that make up the region.</returns>
-    public Rectangle [] GetRectangles () { return _rectangles.ToArray (); }
+    public Rectangle [] GetRectangles () => _rectangles.ToArray ();
 
     /// <summary>
     ///     Updates the region to be the intersection of itself with the specified rectangle.
@@ -465,7 +461,7 @@ public class Region
     ///     </para>
     /// </remarks>
     /// <param name="rectangle">The rectangle to intersect with the region.</param>
-    public void Intersect (Rectangle rectangle) { Combine (rectangle, RegionOp.Intersect); }
+    public void Intersect (Rectangle rectangle) => Combine (rectangle, RegionOp.Intersect);
 
     /// <summary>
     ///     Updates the region to be the intersection of itself with the specified region.
@@ -477,7 +473,7 @@ public class Region
     ///     </para>
     /// </remarks>
     /// <param name="region">The region to intersect with this region.</param>
-    public void Intersect (Region? region) { Combine (region, RegionOp.Intersect); }
+    public void Intersect (Region? region) => Combine (region, RegionOp.Intersect);
 
     /// <summary>
     ///     Determines whether the region is empty.
@@ -524,25 +520,25 @@ public class Region
     ///     Adds the specified rectangle to the region. Merges all rectangles into a minimal or granular bounding shape.
     /// </summary>
     /// <param name="rectangle">The rectangle to add to the region.</param>
-    public void Union (Rectangle rectangle) { Combine (rectangle, RegionOp.Union); }
+    public void Union (Rectangle rectangle) => Combine (rectangle, RegionOp.Union);
 
     /// <summary>
     ///     Adds the specified region to this region. Merges all rectangles into a minimal or granular bounding shape.
     /// </summary>
     /// <param name="region">The region to add to this region.</param>
-    public void Union (Region? region) { Combine (region, RegionOp.Union); }
+    public void Union (Region? region) => Combine (region, RegionOp.Union);
 
     /// <summary>
     ///     Adds the specified rectangle to the region. Merges all rectangles into the smallest possible bounding shape.
     /// </summary>
     /// <param name="rectangle">The rectangle to add to the region.</param>
-    public void MinimalUnion (Rectangle rectangle) { Combine (rectangle, RegionOp.MinimalUnion); }
+    public void MinimalUnion (Rectangle rectangle) => Combine (rectangle, RegionOp.MinimalUnion);
 
     /// <summary>
     ///     Adds the specified region to this region. Merges all rectangles into the smallest possible bounding shape.
     /// </summary>
     /// <param name="region">The region to add to this region.</param>
-    public void MinimalUnion (Region? region) { Combine (region, RegionOp.MinimalUnion); }
+    public void MinimalUnion (Region? region) => Combine (region, RegionOp.MinimalUnion);
 
     /// <summary>
     ///     Merges overlapping rectangles into a minimal or granular set of non-overlapping rectangles with a minimal bounding
@@ -563,13 +559,16 @@ public class Region
 
         // Generate events
         List<(int x, bool isStart, int yTop, int yBottom)> events = new (rectangles.Count * 2);
+
         foreach (Rectangle r in rectangles)
         {
-            if (!r.IsEmpty)
+            if (r.Width <= 0 || r.Height <= 0)
             {
-                events.Add ((r.Left, true, r.Top, r.Bottom));
-                events.Add ((r.Right, false, r.Top, r.Bottom));
+                continue;
             }
+
+            events.Add ((r.Left, true, r.Top, r.Bottom));
+            events.Add ((r.Right, false, r.Top, r.Bottom));
         }
 
         if (events.Count == 0)
@@ -582,11 +581,11 @@ public class Region
         // 2. Secondary: End events before Start events at the same x.
         // 3. Tertiary: By yTop coordinate as a tie-breaker.
         // 4. Quaternary: By yBottom coordinate as a final tie-breaker.
-        events.Sort (
-                     (a, b) =>
+        events.Sort ((a, b) =>
                      {
                          // 1. Sort by X
                          int cmp = a.x.CompareTo (b.x);
+
                          if (cmp != 0)
                          {
                              return cmp;
@@ -596,6 +595,7 @@ public class Region
                          bool aIsEnd = !a.isStart;
                          bool bIsEnd = !b.isStart;
                          cmp = aIsEnd.CompareTo (bIsEnd); // True (End) comes after False (Start)
+
                          if (cmp != 0)
                          {
                              return -cmp; // Reverse: End (true) should come before Start (false)
@@ -603,6 +603,7 @@ public class Region
 
                          // 3. Tie-breaker: Sort by yTop
                          cmp = a.yTop.CompareTo (b.yTop);
+
                          if (cmp != 0)
                          {
                              return cmp;
@@ -613,39 +614,30 @@ public class Region
                      });
 
         List<Rectangle> merged = [];
+
         // Use a dictionary to track active intervals and their overlap counts
         Dictionary<(int yTop, int yBottom), int> activeCounts = new ();
-        // Comparer for sorting intervals when needed
-        var intervalComparer = Comparer<(int yTop, int yBottom)>.Create (
-                                                                         (a, b) =>
-                                                                         {
-                                                                             int cmp = a.yTop.CompareTo (b.yTop);
-                                                                             return cmp != 0 ? cmp : a.yBottom.CompareTo (b.yBottom);
-                                                                         });
 
-        // Helper to get the current active intervals (where count > 0) as a SortedSet
-        SortedSet<(int yTop, int yBottom)> GetActiveIntervals ()
-        {
-            var set = new SortedSet<(int yTop, int yBottom)> (intervalComparer);
-            foreach (var kvp in activeCounts)
-            {
-                if (kvp.Value > 0)
-                {
-                    set.Add (kvp.Key);
-                }
-            }
-            return set;
-        }
+        // Comparer for sorting intervals when needed
+        Comparer<(int yTop, int yBottom)> intervalComparer = Comparer<(int yTop, int yBottom)>.Create ((a, b) =>
+                                                                                                       {
+                                                                                                           int cmp = a.yTop.CompareTo (b.yTop);
+
+                                                                                                           return cmp != 0
+                                                                                                               ? cmp
+                                                                                                               : a.yBottom.CompareTo (b.yBottom);
+                                                                                                       });
 
         // Group events by x-coordinate to process all events at a given x together
-        var groupedEvents = events.GroupBy (e => e.x).OrderBy (g => g.Key);
+        IOrderedEnumerable<IGrouping<int, (int x, bool isStart, int yTop, int yBottom)>> groupedEvents = events.GroupBy (e => e.x).OrderBy (g => g.Key);
         int lastX = groupedEvents.First ().Key; // Initialize with the first event's x
 
-        foreach (var group in groupedEvents)
+        foreach (IGrouping<int, (int x, bool isStart, int yTop, int yBottom)> group in groupedEvents)
         {
             int currentX = group.Key;
+
             // Get active intervals based on state *before* processing events at currentX
-            var currentActiveIntervals = GetActiveIntervals ();
+            SortedSet<(int yTop, int yBottom)> currentActiveIntervals = GetActiveIntervals ();
 
             // 1. Output rectangles for the segment ending *before* this x coordinate
             if (currentX > lastX && currentActiveIntervals.Count > 0)
@@ -654,9 +646,10 @@ public class Region
             }
 
             // 2. Process all events *at* this x coordinate to update counts
-            foreach (var evt in group)
+            foreach ((int x, bool isStart, int yTop, int yBottom) evt in group)
             {
-                var interval = (evt.yTop, evt.yBottom);
+                (int yTop, int yBottom) interval = (evt.yTop, evt.yBottom);
+
                 if (evt.isStart)
                 {
                     activeCounts.TryGetValue (interval, out int count);
@@ -665,16 +658,18 @@ public class Region
                 else
                 {
                     // Only decrement/remove if the interval exists
-                    if (activeCounts.TryGetValue (interval, out int count))
+                    if (!activeCounts.TryGetValue (interval, out int count))
                     {
-                        if (count - 1 <= 0)
-                        {
-                            activeCounts.Remove (interval);
-                        }
-                        else
-                        {
-                            activeCounts [interval] = count - 1;
-                        }
+                        continue;
+                    }
+
+                    if (count - 1 <= 0)
+                    {
+                        activeCounts.Remove (interval);
+                    }
+                    else
+                    {
+                        activeCounts [interval] = count - 1;
                     }
                 }
             }
@@ -684,6 +679,22 @@ public class Region
         }
 
         return minimize ? MinimizeRectangles (merged) : merged;
+
+        // Helper to get the current active intervals (where count > 0) as a SortedSet
+        SortedSet<(int yTop, int yBottom)> GetActiveIntervals ()
+        {
+            SortedSet<(int yTop, int yBottom)> set = new (intervalComparer);
+
+            foreach (KeyValuePair<(int yTop, int yBottom), int> kvp in activeCounts)
+            {
+                if (kvp.Value > 0)
+                {
+                    set.Add (kvp.Key);
+                }
+            }
+
+            return set;
+        }
     }
 
     /// <summary>
@@ -706,7 +717,7 @@ public class Region
 
         foreach ((int yTop, int yBottom) in active)
         {
-            if (currentTop == null)
+            if (currentTop is null)
             {
                 currentTop = yTop;
                 currentBottom = yBottom;
@@ -717,15 +728,23 @@ public class Region
             }
             else
             {
-                result.Add (new (startX, currentTop.Value, endX - startX, currentBottom!.Value - currentTop.Value));
-                currentTop = yTop;
+                if (currentBottom is { })
+                {
+                    result.Add (new Rectangle (startX, currentTop.Value, endX - startX, currentBottom.Value - currentTop.Value));
+                    currentTop = yTop;
+                }
                 currentBottom = yBottom;
             }
         }
 
-        if (currentTop != null)
+        if (currentTop is null)
         {
-            result.Add (new (startX, currentTop.Value, endX - startX, currentBottom!.Value - currentTop.Value));
+            return result;
+        }
+
+        if (currentBottom is { })
+        {
+            result.Add (new Rectangle (startX, currentTop.Value, endX - startX, currentBottom.Value - currentTop.Value));
         }
 
         return result;
@@ -755,8 +774,7 @@ public class Region
             minimized.Clear ();
 
             // Sort by Y then X for consistent processing
-            current.Sort (
-                          (a, b) =>
+            current.Sort ((a, b) =>
                           {
                               int cmp = a.Top.CompareTo (b.Top);
 
@@ -777,12 +795,7 @@ public class Region
                     // Check if rectangles can be merged horizontally (same Y range, adjacent X)
                     if (r.Top == next.Top && r.Bottom == next.Bottom && (r.Right == next.Left || next.Right == r.Left || r.IntersectsWith (next)))
                     {
-                        r = new (
-                                 Math.Min (r.Left, next.Left),
-                                 r.Top,
-                                 Math.Max (r.Right, next.Right) - Math.Min (r.Left, next.Left),
-                                 r.Height
-                                );
+                        r = new Rectangle (Math.Min (r.Left, next.Left), r.Top, Math.Max (r.Right, next.Right) - Math.Min (r.Left, next.Left), r.Height);
                         current.RemoveAt (j);
                         changed = true;
                     }
@@ -790,12 +803,7 @@ public class Region
                     // Check if rectangles can be merged vertically (same X range, adjacent Y)
                     else if (r.Left == next.Left && r.Right == next.Right && (r.Bottom == next.Top || next.Bottom == r.Top || r.IntersectsWith (next)))
                     {
-                        r = new (
-                                 r.Left,
-                                 Math.Min (r.Top, next.Top),
-                                 r.Width,
-                                 Math.Max (r.Bottom, next.Bottom) - Math.Min (r.Top, next.Top)
-                                );
+                        r = new Rectangle (r.Left, Math.Min (r.Top, next.Top), r.Width, Math.Max (r.Bottom, next.Bottom) - Math.Min (r.Top, next.Top));
                         current.RemoveAt (j);
                         changed = true;
                     }
@@ -856,21 +864,13 @@ public class Region
         // Top segment (above subtract)
         if (original.Top < subtract.Top)
         {
-            yield return new (
-                              original.Left,
-                              original.Top,
-                              original.Width,
-                              subtract.Top - original.Top);
+            yield return new Rectangle (original.Left, original.Top, original.Width, subtract.Top - original.Top);
         }
 
         // Bottom segment (below subtract)
         if (original.Bottom > subtract.Bottom)
         {
-            yield return new (
-                              original.Left,
-                              subtract.Bottom,
-                              original.Width,
-                              original.Bottom - subtract.Bottom);
+            yield return new Rectangle (original.Left, subtract.Bottom, original.Width, original.Bottom - subtract.Bottom);
         }
 
         // Left segment (to the left of subtract)
@@ -881,27 +881,23 @@ public class Region
 
             if (bottom > top)
             {
-                yield return new (
-                                  original.Left,
-                                  top,
-                                  subtract.Left - original.Left,
-                                  bottom - top);
+                yield return new Rectangle (original.Left, top, subtract.Left - original.Left, bottom - top);
             }
         }
 
         // Right segment (to the right of subtract)
-        if (original.Right > subtract.Right)
+        if (original.Right <= subtract.Right)
+        {
+            yield break;
+        }
+
         {
             int top = Math.Max (original.Top, subtract.Top);
             int bottom = Math.Min (original.Bottom, subtract.Bottom);
 
             if (bottom > top)
             {
-                yield return new (
-                                  subtract.Right,
-                                  top,
-                                  original.Right - subtract.Right,
-                                  bottom - top);
+                yield return new Rectangle (subtract.Right, top, original.Right - subtract.Right, bottom - top);
             }
         }
     }
@@ -919,7 +915,7 @@ public class Region
     {
         ArgumentNullException.ThrowIfNull (driver);
 
-        if (_rectangles.Count == 0)
+        if (_rectangles.Count == 0 || attribute is null)
         {
             return;
         }
@@ -931,7 +927,7 @@ public class Region
                 continue;
             }
 
-            driver?.SetAttribute (attribute!.Value);
+            driver?.SetAttribute (attribute.Value);
 
             for (int y = rect.Top; y < rect.Bottom; y++)
             {
@@ -943,7 +939,6 @@ public class Region
             }
         }
     }
-
 
     /// <summary>
     ///     Draws the boundaries of all rectangles in the region using the specified attributes, only if the rectangle is big
@@ -972,67 +967,68 @@ public class Region
                 if (rect.Width > 1)
                 {
                     // Add horizontal lines
-                    canvas.AddLine (new (rect.Left, rect.Top), rect.Width, Orientation.Horizontal, style, attribute);
-                    canvas.AddLine (new (rect.Left, rect.Bottom - 1), rect.Width, Orientation.Horizontal, style, attribute);
+                    canvas.AddLine (new Point (rect.Left, rect.Top), rect.Width, Orientation.Horizontal, style, attribute);
+                    canvas.AddLine (new Point (rect.Left, rect.Bottom - 1), rect.Width, Orientation.Horizontal, style, attribute);
                 }
 
-                if (rect.Height > 1)
+                if (rect.Height <= 1)
                 {
-                    // Add vertical lines 
-                    canvas.AddLine (new (rect.Left, rect.Top), rect.Height, Orientation.Vertical, style, attribute);
-                    canvas.AddLine (new (rect.Right - 1, rect.Top), rect.Height, Orientation.Vertical, style, attribute);
+                    continue;
                 }
+
+                // Add vertical lines
+                canvas.AddLine (new Point (rect.Left, rect.Top), rect.Height, Orientation.Vertical, style, attribute);
+                canvas.AddLine (new Point (rect.Right - 1, rect.Top), rect.Height, Orientation.Vertical, style, attribute);
             }
         }
     }
 
-
     // BUGBUG: DrawOuterBoundary does not work right. it draws all regions +1 too tall/wide. It should draw single width/height regions as just a line.
     //
-    // Example: There are 3 regions here. the first is a rect (0,0,1,4). Second is (10, 0, 2, 4). 
+    // Example: There are 3 regions here. the first is a rect (0,0,1,4). Second is (10, 0, 2, 4).
     // This is how they should draw:
     //
     // |123456789|123456789|123456789
-    // 1 │        ┌┐        ┌─┐ 
-    // 2 │        ││        │ │ 
-    // 3 │        ││        │ │ 
+    // 1 │        ┌┐        ┌─┐
+    // 2 │        ││        │ │
+    // 3 │        ││        │ │
     // 4 │        └┘        └─┘
     // 
     // But this is what it draws:
     // |123456789|123456789|123456789
-    // 1┌┐        ┌─┐       ┌──┐     
-    // 2││        │ │       │  │     
-    // 3││        │ │       │  │     
-    // 4││        │ │       │  │     
-    // 5└┘        └─┘       └──┘         
+    // 1┌┐        ┌─┐       ┌──┐
+    // 2││        │ │       │  │
+    // 3││        │ │       │  │
+    // 4││        │ │       │  │
+    // 5└┘        └─┘       └──┘
     //
     // Example: There are two rectangles in this region. (0,0,3,3) and (3, 3, 3, 3).
     // This is fill - correct:
     // |123456789
-    // 1░░░      
-    // 2░░░      
-    // 3░░░░░    
-    // 4  ░░░    
-    // 5  ░░░    
-    // 6         
+    // 1░░░
+    // 2░░░
+    // 3░░░░░
+    // 4  ░░░
+    // 5  ░░░
+    // 6
     //
     // This is what DrawOuterBoundary should draw
     // |123456789|123456789
-    // 1┌─┐               
-    // 2│ │             
-    // 3└─┼─┐             
-    // 4  │ │             
-    // 5  └─┘             
+    // 1┌─┐
+    // 2│ │
+    // 3└─┼─┐
+    // 4  │ │
+    // 5  └─┘
     // 6
     //
     // This is what DrawOuterBoundary actually draws
     // |123456789|123456789
-    // 1┌──┐               
-    // 2│  │               
-    // 3│  └─┐             
-    // 4└─┐  │             
-    // 5  │  │             
-    // 6  └──┘             
+    // 1┌──┐
+    // 2│  │
+    // 3│  └─┐
+    // 4└─┐  │
+    // 5  │  │
+    // 6  └──┘
 
     /// <summary>
     ///     Draws the outer perimeter of the region to <paramref name="lineCanvas"/> using <paramref name="style"/> and
@@ -1058,6 +1054,7 @@ public class Region
         {
             // Fall back to drawing each rectangle's boundary
             DrawBoundaries (lineCanvas, style, attribute);
+
             return;
         }
 
@@ -1112,34 +1109,27 @@ public class Region
                 else
                 {
                     // End the current segment if one exists
-                    if (startX != -1)
+                    if (startX == -1)
                     {
-                        int length = x - startX + 1; // Add 1 to make sure lines connect
-
-                        lineCanvas.AddLine (
-                                            new (startX + bounds.Left, y + bounds.Top),
-                                            length,
-                                            Orientation.Horizontal,
-                                            style,
-                                            attribute
-                                           );
-                        startX = -1;
+                        continue;
                     }
+                    int length = x - startX + 1; // Add 1 to make sure lines connect
+
+                    lineCanvas.AddLine (new Point (startX + bounds.Left, y + bounds.Top), length, Orientation.Horizontal, style, attribute);
+                    startX = -1;
                 }
             }
 
             // End any segment that reaches the right edge
-            if (startX != -1)
+            if (startX == -1)
+            {
+                continue;
+            }
+
             {
                 int length = bounds.Width + 1 - startX + 1; // Add 1 to make sure lines connect
 
-                lineCanvas.AddLine (
-                                    new (startX + bounds.Left, y + bounds.Top),
-                                    length,
-                                    Orientation.Horizontal,
-                                    style,
-                                    attribute
-                                   );
+                lineCanvas.AddLine (new Point (startX + bounds.Left, y + bounds.Top), length, Orientation.Horizontal, style, attribute);
             }
         }
 
@@ -1167,34 +1157,27 @@ public class Region
                 else
                 {
                     // End the current segment if one exists
-                    if (startY != -1)
+                    if (startY == -1)
                     {
-                        int length = y - startY + 1; // Add 1 to make sure lines connect
-
-                        lineCanvas.AddLine (
-                                            new (x + bounds.Left, startY + bounds.Top),
-                                            length,
-                                            Orientation.Vertical,
-                                            style,
-                                            attribute
-                                           );
-                        startY = -1;
+                        continue;
                     }
+                    int length = y - startY + 1; // Add 1 to make sure lines connect
+
+                    lineCanvas.AddLine (new Point (x + bounds.Left, startY + bounds.Top), length, Orientation.Vertical, style, attribute);
+                    startY = -1;
                 }
             }
 
             // End any segment that reaches the bottom edge
-            if (startY != -1)
+            if (startY == -1)
+            {
+                continue;
+            }
+
             {
                 int length = bounds.Height + 1 - startY + 1; // Add 1 to make sure lines connect
 
-                lineCanvas.AddLine (
-                                    new (x + bounds.Left, startY + bounds.Top),
-                                    length,
-                                    Orientation.Vertical,
-                                    style,
-                                    attribute
-                                   );
+                lineCanvas.AddLine (new Point (x + bounds.Left, startY + bounds.Top), length, Orientation.Vertical, style, attribute);
             }
         }
     }

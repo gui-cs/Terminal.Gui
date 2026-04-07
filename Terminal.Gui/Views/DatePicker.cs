@@ -91,10 +91,7 @@ public class DatePicker : View, IValue<DateTime>
             _date = value;
 
             // Propagate value to embedded editor
-            if (_dateEditor is { })
-            {
-                _dateEditor.Value = value;
-            }
+            _dateEditor?.Value = value;
 
             ValueChangedEventArgs<DateTime> changedArgs = new (oldValue, _date);
             OnValueChanged (changedArgs);
@@ -104,7 +101,7 @@ public class DatePicker : View, IValue<DateTime>
     }
 
     /// <inheritdoc/>
-    object? IValue.GetValue () => _date;
+    object IValue.GetValue () => _date;
 
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
@@ -237,21 +234,19 @@ public class DatePicker : View, IValue<DateTime>
         _calendar.Width = Dim.Auto (minimumContentDim: _calendar.Style.ColumnStyles.Sum (c => c.Value.MinWidth));
     }
 
-    private static string GetBackButtonText () => Glyphs.LeftArrow + Glyphs.LeftArrow.ToString ();
-    private static string GetForwardButtonText () => Glyphs.RightArrow + Glyphs.RightArrow.ToString ();
-
     private void SelectDayOnCalendar (int day)
     {
         for (var i = 0; i < _table!.Rows.Count; i++)
         {
             for (var j = 0; j < _table.Columns.Count; j++)
             {
-                if (_table.Rows [i] [j].ToString () == day.ToString ())
+                if (_table.Rows [i] [j].ToString () != day.ToString ())
                 {
-                    _calendar!.SetSelection (j, i, false);
-
-                    return;
+                    continue;
                 }
+                _calendar!.SetSelection (j, i, false);
+
+                return;
             }
         }
     }
@@ -284,34 +279,27 @@ public class DatePicker : View, IValue<DateTime>
             Value = date
         };
 
-        _previousMonthButton = new Button
+        _previousMonthButton = new ScrollButton ()
         {
             Id = "_previousMonthButton",
             X = Pos.Center () - 2,
             Y = Pos.Bottom (_calendar) - 1,
-            Width = 2,
-            Text = GetBackButtonText (),
             MouseHoldRepeat = MouseFlags.LeftButtonReleased,
-            NoPadding = true,
-            NoDecorations = true,
-            ShadowStyle = null
+            Direction = NavigationDirection.Backward
         };
-        _previousMonthButton.Accepting += (_, _) => AdjustMonth (-1);
+        _previousMonthButton.Title = $"{_previousMonthButton.Title}{_previousMonthButton.Title}";
+        _previousMonthButton.Accepted += (_, _) => AdjustMonth (-1);
 
-        _nextMonthButton = new Button
+        _nextMonthButton = new ScrollButton
         {
             Id = "_nextMonthButton",
             X = Pos.Right (_previousMonthButton) + 2,
             Y = Pos.Bottom (_calendar) - 1,
-            Width = 2,
-            Text = GetForwardButtonText (),
-            MouseHoldRepeat = MouseFlags.LeftButtonReleased,
-            NoPadding = true,
-            NoDecorations = true,
-            ShadowStyle = null
+            Direction = NavigationDirection.Forward
         };
+        _nextMonthButton.Title = $"{_nextMonthButton.Title}{_nextMonthButton.Title}";
 
-        _nextMonthButton.Accepting += (_, _) => AdjustMonth (1);
+        _nextMonthButton.Accepted += (_, _) => AdjustMonth (1);
 
         CreateCalendar ();
         SelectDayOnCalendar (Value.Day);

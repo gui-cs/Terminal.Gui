@@ -1077,17 +1077,25 @@ public partial class View // Layout APIs
     #region Utilities
 
     /// <summary>
-    ///     INTERNAL API - Gets the size of the SuperView's content (nominally the same as
+    ///     Gets the size of the SuperView's content (nominally the same as
     ///     the SuperView's <see cref="GetContentSize ()"/>) or the screen size if there's no SuperView.
     /// </summary>
-    /// <returns></returns>
+    /// <remarks>
+    ///     This method provides fallback logic to ensure that a size is always returned, even if the SuperView is not set or
+    ///     not initialized. The order of precedence is:
+    ///     1. SuperView's content size (if SuperView is set and initialized)
+    ///     2. TopRunnableView's content size (if TopRunnableView is set, not the current view, and initialized)
+    ///     3. Application's screen size (if Application is set)
+    ///     4. Driver's screen size (if Driver is set)
+    ///     5. Fallback to a default size of 2048x2048
+    /// </remarks>
     public Size GetContainerSize ()
     {
         // TODO: Get rid of refs to Top
         Size superViewContentSize = SuperView?.GetContentSize ()
                                     ?? (App?.TopRunnableView is { } && App?.TopRunnableView != this && App!.TopRunnableView.IsInitialized
                                             ? App.TopRunnableView.GetContentSize ()
-                                            : App?.Screen.Size ?? new Size (2048, 2048));
+                                            : App?.Screen.Size ?? Driver?.Screen.Size ?? new Size (2048, 2048));
 
         return superViewContentSize;
     }
@@ -1294,8 +1302,7 @@ public partial class View // Layout APIs
                                                       && v.Margin.Thickness != Thickness.Empty
                                                       && v.Margin.Thickness.Contains (v.Margin.FrameToScreen (), location))))
                                           {
-                                              if (v.Margin.CachedDrawnRegion is null
-                                                  || !v.Margin.CachedDrawnRegion.Contains (location.X, location.Y))
+                                              if (v.Margin.CachedDrawnRegion is null || !v.Margin.CachedDrawnRegion.Contains (location.X, location.Y))
                                               {
                                                   ret = true;
                                               }
@@ -1307,8 +1314,7 @@ public partial class View // Layout APIs
                                                       && v.Border.Thickness != Thickness.Empty
                                                       && v.Border.Thickness.Contains (v.Border.FrameToScreen (), location))))
                                           {
-                                              if (v.Border.CachedDrawnRegion is null
-                                                  || !v.Border.CachedDrawnRegion.Contains (location.X, location.Y))
+                                              if (v.Border.CachedDrawnRegion is null || !v.Border.CachedDrawnRegion.Contains (location.X, location.Y))
                                               {
                                                   ret = true;
                                               }
@@ -1320,8 +1326,7 @@ public partial class View // Layout APIs
                                                       && v.Padding.Thickness != Thickness.Empty
                                                       && v.Padding.Thickness.Contains (v.Padding.FrameToScreen (), location))))
                                           {
-                                              if (v.Padding.CachedDrawnRegion is null
-                                                  || !v.Padding.CachedDrawnRegion.Contains (location.X, location.Y))
+                                              if (v.Padding.CachedDrawnRegion is null || !v.Padding.CachedDrawnRegion.Contains (location.X, location.Y))
                                               {
                                                   ret = true;
                                               }

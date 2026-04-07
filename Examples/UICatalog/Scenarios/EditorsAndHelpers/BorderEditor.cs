@@ -1,11 +1,14 @@
-﻿#nullable enable
+#nullable enable
+using System.Collections.ObjectModel;
+
 namespace UICatalog.Scenarios;
 
 public class BorderEditor : AdornmentEditor
 {
-    private CheckBox? _ckbTitle;
-    private OptionSelector<LineStyle>? _osBorderStyle;
-    private CheckBox? _ckbGradient;
+    private DropDownList? _osBorderStyle;
+    private FlagSelector<BorderSettings>? _osBorderSettings;
+    private OptionSelector<Side>? _osTabSide;
+    private NumericUpDown<int>? _nudTabOffset;
 
     public BorderEditor ()
     {
@@ -16,54 +19,101 @@ public class BorderEditor : AdornmentEditor
 
     private void BorderEditor_AdornmentChanged (object? sender, EventArgs e)
     {
-        _ckbTitle!.Value = ((Border)AdornmentToEdit!).Settings.FastHasFlags (BorderSettings.Title) ? CheckState.Checked : CheckState.UnChecked;
-        _osBorderStyle!.Value = ((Border)AdornmentToEdit).LineStyle;
-        _ckbGradient!.Value = ((Border)AdornmentToEdit).Settings.FastHasFlags (BorderSettings.Gradient) ? CheckState.Checked : CheckState.UnChecked;
+        if (AdornmentToEdit is null)
+        {
+            return;
+        }
+        _osBorderStyle?.Value = ((Border)AdornmentToEdit).LineStyle.ToString ();
+        _osBorderSettings?.Value = ((Border)AdornmentToEdit).Settings;
+
+        if (AdornmentToEdit.View is null)
+        {
+            return;
+        }
+        _osTabSide?.Value = (AdornmentToEdit.View as BorderView)?.TabSide;
+
+        if (AdornmentToEdit.View is BorderView bv)
+        {
+            _nudTabOffset?.Value = bv.TabOffset;
+        }
     }
 
     private void BorderEditor_Initialized (object? sender, EventArgs e)
     {
-        _osBorderStyle = new OptionSelector<LineStyle>
+        _osBorderStyle = new DropDownList
         {
-            X = 0,
             Y = Pos.Bottom (SubViews.ToArray () [^1]),
-            Width = Dim.Fill (),
-            Value = (AdornmentToEdit as Border)?.LineStyle ?? LineStyle.None,
+            Width = 10,
+            Source = new ListWrapper<string> (new ObservableCollection<string> (Enum.GetNames<LineStyle> ())),
+            Value = $"{(AdornmentToEdit as Border)?.LineStyle ?? LineStyle.None}",
             BorderStyle = LineStyle.Single,
-            Title = "Border St_yle",
-            SuperViewRendersLineCanvas = true
+            Title = "St_yle"
         };
         Add (_osBorderStyle);
 
         _osBorderStyle.ValueChanged += OnRbBorderStyleOnValueChanged;
 
-        _ckbTitle = new CheckBox
+        _osBorderSettings = new FlagSelector<BorderSettings>
         {
-            X = 0,
             Y = Pos.Bottom (_osBorderStyle),
-            Value = CheckState.Checked,
-            SuperViewRendersLineCanvas = true,
-            Text = "Title"
+            Value = (AdornmentToEdit as Border)?.Settings ?? BorderSettings.Default,
+            Width = Dim.Auto (),
+            BorderStyle = LineStyle.Single,
+            Title = "S_ettings"
         };
 
-        _ckbTitle.ValueChanging += OnCkbTitleOnToggle;
-        Add (_ckbTitle);
+        Add (_osBorderSettings);
 
-        _ckbGradient = new CheckBox
+        _osBorderSettings.ValueChanged += OnRbBorderSettingsOnValueChanged;
+
+        _osTabSide = new OptionSelector<Side>
         {
-            X = 0,
-            Y = Pos.Bottom (_ckbTitle),
-            Value = CheckState.Checked,
-            SuperViewRendersLineCanvas = true,
-            Text = "Gradient"
+            Y = Pos.Bottom (_osBorderSettings),
+            Width = Dim.Width (_osBorderStyle),
+            Value = (AdornmentToEdit?.View as BorderView)?.TabSide ?? Side.Top,
+            BorderStyle = LineStyle.Single,
+            Title = "_Side",
+            Enabled = (AdornmentToEdit as Border)?.Settings.HasFlag (BorderSettings.Tab) ?? false
         };
 
-        _ckbGradient.ValueChanging += OnCkbGradientOnToggle;
-        Add (_ckbGradient);
+        _osTabSide.ValueChanged += OnHeaderSideChanged;
+        Add (_osTabSide);
+
+        Label labelOffset = new () { Title = "Tab _Offset:", Y = Pos.Bottom (_osTabSide) };
+
+        _nudTabOffset = new NumericUpDown<int>
+        {
+            X = Pos.Right (labelOffset) + 1,
+            Y = Pos.Top (labelOffset),
+            Value = (AdornmentToEdit?.View as BorderView)?.TabOffset ?? 0,
+            Enabled = (AdornmentToEdit as Border)?.Settings.HasFlag (BorderSettings.Tab) ?? false
+        };
+
+        _nudTabOffset.ValueChanged += OnHeaderOffsetChanged;
+        Add (labelOffset, _nudTabOffset);
 
         return;
 
-        void OnRbBorderStyleOnValueChanged (object? s, EventArgs<LineStyle?> args)
+        void OnRbBorderStyleOnValueChanged (object? s, ValueChangedEventArgs<string?> args)
+        {
+            if (AdornmentToEdit is not Border border)
+            {
+                return;
+            }
+
+            if (args.NewValue is { })
+            {
+                if (Enum.TryParse (args.NewValue, out LineStyle style))
+                {
+                    border.LineStyle = style;
+                }
+            }
+
+            border.View?.SetNeedsDraw ();
+            SetNeedsLayout ();
+        }
+
+        void OnRbBorderSettingsOnValueChanged (object? s, EventArgs<BorderSettings?> args)
         {
             if (AdornmentToEdit is not Border border)
             {
@@ -72,49 +122,36 @@ public class BorderEditor : AdornmentEditor
 
             if (args.Value is { })
             {
-                border.LineStyle = (LineStyle)args.Value;
+                border.Settings = (BorderSettings)args.Value;
             }
+
+            _nudTabOffset!.Enabled = border.Settings.HasFlag (BorderSettings.Tab);
+            _osTabSide!.Enabled = border.Settings.HasFlag (BorderSettings.Tab);
 
             border.View?.SetNeedsDraw ();
             SetNeedsLayout ();
         }
 
-        void OnCkbTitleOnToggle (object? _, ValueChangingEventArgs<CheckState> args)
+        void OnHeaderSideChanged (object? _, EventArgs<Side?> args)
         {
-            if (AdornmentToEdit is not Border border)
+            if (AdornmentToEdit is not Border border || args.Value is null)
             {
                 return;
             }
 
-            if (args.NewValue == CheckState.Checked)
-
-            {
-                border.Settings |= BorderSettings.Title;
-            }
-            else
-
-            {
-                border.Settings &= ~BorderSettings.Title;
-            }
+            ((BorderView)border.View!).TabSide = args.Value.Value;
+            border.View?.SetNeedsLayout ();
         }
 
-        void OnCkbGradientOnToggle (object? _, ValueChangingEventArgs<CheckState> args)
+        void OnHeaderOffsetChanged (object? _, ValueChangedEventArgs<int> args)
         {
             if (AdornmentToEdit is not Border border)
             {
                 return;
             }
 
-            if (args.NewValue == CheckState.Checked)
-
-            {
-                border.Settings |= BorderSettings.Gradient;
-            }
-            else
-
-            {
-                border.Settings &= ~BorderSettings.Gradient;
-            }
+            ((BorderView)border.View!).TabOffset = args.NewValue;
+            border.View?.SetNeedsLayout ();
         }
     }
 }

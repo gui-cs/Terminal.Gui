@@ -18,6 +18,8 @@
   href: application.md
 - name: Arrangement
   href: arrangement.md
+- name: Borders
+  href: borders.md
 - name: Cancellable Work Pattern
   href: cancellable-work-pattern.md
 - name: Command

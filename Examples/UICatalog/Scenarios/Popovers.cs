@@ -137,8 +137,8 @@ public class Popovers : Scenario
 
         try
         {
-            Point idealPosition = _resultTextField!.FrameToScreen ().Location;
-            idealPosition.Y += _resultTextField!.Frame.Height;
+            Point idealPosition = _resultTextField?.FrameToScreen ().Location ?? Point.Empty;
+            idealPosition.Y += _resultTextField?.Frame.Height ?? 0;
             popover.MakeVisible (idealPosition);
             _eventLog?.Log ($"Showed: {_viewClasses.Keys.ElementAt (selectedIndex)}");
         }
