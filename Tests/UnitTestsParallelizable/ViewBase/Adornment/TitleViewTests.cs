@@ -18,7 +18,7 @@ public class TitleViewTests (ITestOutputHelper output) : TestDriverBase
         TitleView tv = new ();
 
         Assert.True (tv.CanFocus);
-        Assert.Equal (TabBehavior.NoStop, tv.TabStop);
+        Assert.Equal (TabBehavior.TabStop, tv.TabStop);
         Assert.True (tv.SuperViewRendersLineCanvas);
         Assert.Equal (Orientation.Horizontal, tv.Orientation);
 

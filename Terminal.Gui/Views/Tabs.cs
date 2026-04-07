@@ -47,6 +47,11 @@ public class Tabs : View, IValue<View?>, IDesignable
         AddCommand (Command.Left, NavCommandHandler);
         AddCommand (Command.Right, NavCommandHandler);
 
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
+        KeyBindings.Add (Key.CursorLeft, Command.Left);
+        KeyBindings.Add (Key.CursorRight, Command.Right);
+
         CommandsToBubbleUp = [Command.Up, Command.Down, Command.Left, Command.Right];
     }
 
@@ -546,6 +551,7 @@ public class Tabs : View, IValue<View?>, IDesignable
         view.HotKeySpecifier = (Rune)'\xffff';
 
         view.Border.View?.CommandsToBubbleUp = [Command.Up, Command.Down, Command.Left, Command.Right];
+
         //view.CommandsToBubbleUp = [Command.Up, Command.Down, Command.Left, Command.Right];
     }
 
@@ -729,11 +735,23 @@ public class Tabs : View, IValue<View?>, IDesignable
 
         return TabSide switch
                {
-                   // if side is top or bottom, left/right select previous/next tab; if side is left or right, up/down select previous/next tab
                    Side.Top or Side.Bottom when ctx.Command == Command.Right => SelectNextTab (),
                    Side.Top or Side.Bottom when ctx.Command == Command.Left => SelectPreviousTab (),
+
+                   Side.Top when ctx.Command == Command.Down => FocusContent (),
+                   Side.Top when ctx.Command == Command.Up => SelectPreviousTab (),
+
+                   Side.Bottom when ctx.Command == Command.Up => FocusContent (),
+                   Side.Bottom when ctx.Command == Command.Down => SelectNextTab (),
+
                    Side.Left or Side.Right when ctx.Command == Command.Down => SelectNextTab (),
                    Side.Left or Side.Right when ctx.Command == Command.Up => SelectPreviousTab (),
+
+                   Side.Left when ctx.Command == Command.Right => FocusContent (),
+                   Side.Left when ctx.Command == Command.Left => SelectPreviousTab (),
+
+                   Side.Right when ctx.Command == Command.Left => FocusContent (),
+                   Side.Right when ctx.Command == Command.Right => SelectNextTab (),
                    _ => false
                };
     }
@@ -750,6 +768,19 @@ public class Tabs : View, IValue<View?>, IDesignable
         View? previousTab = TabCollection.TakeWhile (t => !t.HasFocus).LastOrDefault () ?? TabCollection.LastOrDefault ();
 
         return (previousTab?.Border.View as BorderView)?.TitleView?.SetFocus () ?? true;
+    }
+
+    private bool? FocusContent ()
+    {
+        if (Value?.Border?.View?.HasFocus ?? false)
+        {
+            Value?.Border?.View?.HasFocus = false;
+            Value?.RestoreFocus ();
+
+            return true;
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -1012,7 +1043,7 @@ public class Tabs : View, IValue<View?>, IDesignable
             Width = 10,
             BorderStyle = LineStyle.Single,
             Title = "_Length",
-            Value = 0//null//Value?.Border.TabLength ?? 0
+            Value = 0 //null//Value?.Border.TabLength ?? 0
         };
 
         tabLengthNumericUpDown.ValueChanging += (_, e) =>

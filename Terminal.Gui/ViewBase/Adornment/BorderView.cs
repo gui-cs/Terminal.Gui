@@ -55,7 +55,7 @@ public partial class BorderView : AdornmentView
             return;
         }
         CanFocus = false;
-        TabStop = TabBehavior.TabGroup;
+        TabStop = TabBehavior.TabStop;
 
         if (border.Parent is { })
         {
@@ -880,13 +880,10 @@ public partial class BorderView : AdornmentView
             }
         }
 
-#if !SUBVIEW_BASED_BORDER
-
         if (drawLeft)
         {
             lc?.AddLine (borderBounds.Location with { Y = titleY }, sideLineLength, Orientation.Vertical, border.LineStyle ?? LineStyle.None, normalAttribute);
         }
-#endif
 
         if (drawBottom)
         {

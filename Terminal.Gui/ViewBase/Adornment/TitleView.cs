@@ -33,31 +33,22 @@ public sealed class TitleView : View, ITitleView, IDesignable
         Width = Dim.Auto ();
         Height = Dim.Auto ();
 
-        // Do not participate in tab navigation — focus is set by click or by the owning view.
-        TabStop = TabBehavior.NoStop;
+        TabStop = TabBehavior.TabStop;
         Border.Settings = BorderSettings.None;
         SuperViewRendersLineCanvas = true;
 
-        //AddCommand (Command.Up, () => false);
-        //AddCommand (Command.Down, () => false);
-        //AddCommand (Command.Left, () => false);
-        //AddCommand (Command.Right, () => false);
+        AddCommand (Command.HotKey,
+                    ctx =>
+                    {
+                        if (RaiseHandlingHotKey (ctx) is true)
+                        {
+                            return true;
+                        }
 
-        //AddCommand (Command.Activate,
-        //            _ =>
-        //            {
-        //                SetFocus ();
+                        SetFocus ();
 
-        //                return true;
-        //            });
-
-        //AddCommand (Command.HotKey,
-        //            _ =>
-        //            {
-        //                SetFocus ();
-
-        //                return true;
-        //            });
+                        return true;
+                    });
 
         // Remove Enter — title views should not respond to Enter
         KeyBindings.Remove (Key.Enter);
@@ -84,8 +75,6 @@ public sealed class TitleView : View, ITitleView, IDesignable
         TabSide = Side.Top;
     }
 
-    /// <inheritdoc />
-    //protected override void OnActivated (ICommandContext? ctx) => SetFocus ();
 
 #if TAB_COLOR_PROTOTYPE
     /// <inheritdoc />

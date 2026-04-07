@@ -752,7 +752,7 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
         IDriver driver = CreateTestDriver (20, 10);
         Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = Side.Left };
 
-        View tab1 = new () { Title = "Tab1" };
+        View tab1 = new () { Title = "Tab1", CanFocus = true };
         View contentButton = new () { Title = "OK", CanFocus = true, Width = 4, Height = 1 };
         tab1.Add (contentButton);
 
@@ -760,6 +760,7 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
         tabs.Layout ();
 
         tab1.Border.View?.SetFocus ();
+        Assert.True ((tab1.Border.View as BorderView)?.TitleView?.HasFocus);
 
         tabs.NewKeyDownEvent (Key.CursorRight);
 
@@ -769,21 +770,24 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Nav_Left_CursorLeft_OnTabTitle_UnfocusesTabsView ()
+    public void Nav_Left_CursorLeft_OnTabTitle_MovesToPreviousTab ()
     {
         IDriver driver = CreateTestDriver (20, 10);
         Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = Side.Left };
 
         View tab1 = new () { Title = "Tab1", CanFocus = true };
         tabs.Add (tab1);
+        View tab2 = new () { Title = "Tab2", CanFocus = true };
+        tabs.Add (tab2);
         tabs.Layout ();
 
         (tab1.Border?.View?.SubViews.ElementAt (0) as TitleView)?.SetFocus ();
         Assert.True ((tab1.Border?.View?.SubViews.ElementAt (0) as TitleView)?.HasFocus);
+        Assert.True (tab1.HasFocus);
 
         tabs.NewKeyDownEvent (Key.CursorLeft);
 
-        Assert.False (tabs.HasFocus);
+        Assert.True (tab2.HasFocus);
 
         tabs.Dispose ();
     }
@@ -811,20 +815,22 @@ public class TabsTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void Nav_Right_CursorRight_OnTabTitle_UnfocusesTabsView ()
+    public void Nav_Right_CursorRight_OnTabTitle_MovesToNextTab ()
     {
         IDriver driver = CreateTestDriver (20, 10);
         Tabs tabs = new () { Driver = driver, Width = 20, Height = 10, TabSide = Side.Right };
 
         View tab1 = new () { Title = "Tab1" };
         tabs.Add (tab1);
+        View tab2 = new () { Title = "Tab2" };
+        tabs.Add (tab2);
         tabs.Layout ();
 
         tab1.Border.View?.SetFocus ();
 
         tabs.NewKeyDownEvent (Key.CursorRight);
 
-        Assert.False (tabs.HasFocus);
+        Assert.True (tab2.HasFocus);
 
         tabs.Dispose ();
     }
