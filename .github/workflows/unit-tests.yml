@@ -2,11 +2,11 @@ name: Build & Run Unit Tests
 
 on:
   push:
-    branches: [ v2_release, v2_develop ]
+    branches: [ main, develop ]
     paths-ignore:
       - '**.md'
   pull_request:
-    branches: [ v2_release, v2_develop ]
+    branches: [ main, develop ]
     paths-ignore:
       - '**.md'
 
@@ -47,14 +47,14 @@ jobs:
         Add-MpPreference -ExclusionPath "${{ github.workspace }}"
         Add-MpPreference -ExclusionProcess "dotnet.exe"
 
-    - name: Run UnitTests
+    - name: Run UnitTests.NonParallelizable
       shell: bash
       run: |
         dotnet test \
-          --project Tests/UnitTests \
+          --project Tests/UnitTests.NonParallelizable \
           --no-build \
           --verbosity normal \
-          --diagnostic --diagnostic-output-directory logs/UnitTests/${{ runner.os }}
+          --diagnostic --diagnostic-output-directory logs/UnitTests.NonParallelizable/${{ runner.os }}
 
     - name: Upload Test Logs
       if: always()
@@ -62,8 +62,8 @@ jobs:
       with:
         name: non_parallel_unittests-logs-${{ runner.os }}
         path: |
-          logs/UnitTests/
-          Tests/UnitTests/logs/
+          logs/UnitTests.NonParallelizable/
+          Tests/UnitTests.NonParallelizable/logs/
           TestResults/
           **/*.dmp
         if-no-files-found: ignore

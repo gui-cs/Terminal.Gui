@@ -1,9 +1,9 @@
 name: Check for Duplicate UnitTests
 on:
   push:
-    branches: [ v2_release, v2_develop ]
+    branches: [ main, develop ]
   pull_request:
-    branches: [ v2_release, v2_develop ]
+    branches: [ main, develop ]
   workflow_dispatch:
 jobs:
   check-duplicates:

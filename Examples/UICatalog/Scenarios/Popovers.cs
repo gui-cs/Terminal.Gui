@@ -137,8 +137,8 @@ public class Popovers : Scenario
 
         try
         {
-            Point idealPosition = _resultTextField!.FrameToScreen ().Location;
-            idealPosition.Y += _resultTextField!.Frame.Height;
+            Point idealPosition = _resultTextField?.FrameToScreen ().Location ?? Point.Empty;
+            idealPosition.Y += _resultTextField?.Frame.Height ?? 0;
             popover.MakeVisible (idealPosition);
             _eventLog?.Log ($"Showed: {_viewClasses.Keys.ElementAt (selectedIndex)}");
         }
@@ -355,8 +355,8 @@ public class Popovers : Scenario
         IEnumerable<Type> types = typeof (View).Assembly.GetTypes ()
                                                .Where (t => t is { IsPublic: true, IsAbstract: false }
                                                             && t.IsSubclassOf (typeof (View))
-                                                            && t != typeof (Adornment)
-                                                            && !t.IsSubclassOf (typeof (Adornment))
+                                                            && t != typeof (AdornmentView)
+                                                            && !t.IsSubclassOf (typeof (AdornmentView))
                                                             && t != typeof (PopoverMenu)
                                                             && !t.IsGenericType);
 

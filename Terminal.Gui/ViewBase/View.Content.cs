@@ -99,7 +99,31 @@ public partial class View
 
         // DimAuto.Calculate adds the Adornments thickness, so we need to subtract it here since
         // we want the content size only.
-        Dim.Auto ().Calculate (0, GetContainerSize ().Width, this, Dimension.Width) - GetAdornmentsThickness ().Horizontal;
+        GetAutoWidth () - GetAdornmentsThickness ().Horizontal;
+
+    /// <summary>
+    ///     Gets the natural (auto-size) width of the view as calculated by <see cref="Dim.Auto ()"/>.
+    /// </summary>
+    /// <remarks>
+    ///     The returned width is the full auto-calculated width for the view, including adornment thickness.
+    ///     Unlike <see cref="GetWidthRequiredForSubViews ()"/>, this value is not content-only.
+    ///     The calculation may also respect minimum and maximum content constraints applied by the auto dimension logic
+    ///     before adornments are added.
+    /// </remarks>
+    /// <returns></returns>
+    public int GetAutoWidth () => Dim.Auto ().Calculate (0, GetContainerSize ().Width, this, Dimension.Width);
+
+    /// <summary>
+    ///     Gets the natural (auto-size) height of the view as calculated by <see cref="Dim.Auto ()"/>.
+    /// </summary>
+    /// <remarks>
+    ///     The returned height is the full auto-calculated height for the view, including adornment thickness.
+    ///     Unlike <see cref="GetHeightRequiredForSubViews ()"/>, this value is not content-only.
+    ///     The calculation may also respect minimum and maximum content constraints applied by the auto dimension logic
+    ///     before adornments are added.
+    /// </remarks>
+    /// <returns></returns>
+    public int GetAutoHeight () => Dim.Auto ().Calculate (0, GetContainerSize ().Height, this, Dimension.Height);
 
     /// <summary>
     ///     Gets the minimum number of rows required for all the View's SubViews to fit in the content area.
@@ -109,7 +133,7 @@ public partial class View
 
         // DimAuto.Calculate adds the Adornments thickness, so we need to subtract it here since
         // we want the content size only.
-        Dim.Auto ().Calculate (0, GetContainerSize ().Height, this, Dimension.Height) - GetAdornmentsThickness ().Vertical;
+        GetAutoHeight () - GetAdornmentsThickness ().Vertical;
 
     /// <summary>
     ///     Gets or sets a value indicating whether the view's content size tracks the <see cref="Viewport"/>'s
@@ -243,43 +267,25 @@ public partial class View
         return ViewportToScreen (contentRelativeToViewport);
     }
 
-    /// <summary>Converts a Screen-relative coordinate to a Content-relative coordinate.</summary>
-    /// <remarks>
-    ///     Content-relative means relative to the top-left corner of the view's Content, which is
-    ///     always at <c>0, 0</c>.
-    /// </remarks>
-    /// <param name="location">The Screen-relative location.</param>
-    /// <returns>The coordinate relative to this view's Content.</returns>
-    public Point ScreenToContent (in Point location)
-    {
-        Point viewportOffset = GetViewportOffsetFromFrame ();
-        Point screen = ScreenToFrame (location);
-        screen.Offset (Viewport.X - viewportOffset.X, Viewport.Y - viewportOffset.Y);
-
-        return screen;
-    }
-
     #endregion Content Area
 
     #region Viewport
-
-    private ViewportSettingsFlags _viewportSettings;
 
     /// <summary>
     ///     Gets or sets how scrolling the <see cref="View.Viewport"/> on the View's Content Area is handled.
     /// </summary>
     public ViewportSettingsFlags ViewportSettings
     {
-        get => _viewportSettings;
+        get;
         set
         {
-            if (_viewportSettings == value)
+            if (field == value)
             {
                 return;
             }
 
-            ViewportSettingsFlags oldFlags = _viewportSettings;
-            _viewportSettings = value;
+            ViewportSettingsFlags oldFlags = field;
+            field = value;
 
             SyncScrollBarsToSettings (oldFlags, value);
 
@@ -341,12 +347,6 @@ public partial class View
     {
         get
         {
-            if (Margin is null || Border is null || Padding is null)
-            {
-                // CreateAdornments has not been called yet.
-                return new Rectangle (_viewportLocation, Frame.Size);
-            }
-
             Thickness thickness = GetAdornmentsThickness ();
 
             return new Rectangle (_viewportLocation,
@@ -551,7 +551,7 @@ public partial class View
     ///     Helper to get the X and Y offset of the Viewport from the Frame. This is the sum of the Left and Top properties
     ///     of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
     /// </summary>
-    public Point GetViewportOffsetFromFrame () => Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.Frame).Location;
+    public Point GetViewportOffsetFromFrame () => Padding.Thickness.GetInside (Padding.GetFrame ()).Location;
 
     /// <summary>
     ///     Scrolls the view vertically by the specified number of rows.

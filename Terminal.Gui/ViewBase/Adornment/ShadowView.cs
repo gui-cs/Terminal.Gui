@@ -19,7 +19,7 @@ internal class ShadowView : View
     {
         switch (ShadowStyle)
         {
-            case ShadowStyle.Opaque:
+            case ShadowStyles.Opaque:
                 if (Orientation == Orientation.Vertical)
                 {
                     DrawVerticalShadowOpaque (Viewport);
@@ -31,7 +31,7 @@ internal class ShadowView : View
 
                 break;
 
-            case ShadowStyle.Transparent:
+            case ShadowStyles.Transparent:
                 if (Orientation == Orientation.Vertical)
                 {
                     DrawVerticalShadowTransparent (Viewport);
@@ -44,6 +44,9 @@ internal class ShadowView : View
                 break;
         }
 
+        // Report the drawn region so that Margin's CachedDrawnRegion includes shadow cells.
+        context?.AddDrawnRectangle (ViewportToScreen (Viewport));
+
         return true;
     }
 
@@ -52,12 +55,12 @@ internal class ShadowView : View
     /// </summary>
     public Orientation Orientation { get; set; }
 
-    public override ShadowStyle ShadowStyle
+    public override ShadowStyles? ShadowStyle
     {
         get;
         set
         {
-            Visible = value != ShadowStyle.None;
+            Visible = value is not null;
             field = value;
 
             ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
@@ -93,15 +96,16 @@ internal class ShadowView : View
                 Driver?.Move (c, r);
                 SetAttribute (GetAttributeUnderLocation (new Point (c, r)));
 
-                if (c < ScreenContents?.GetLength (1) && r < ScreenContents?.GetLength (0))
+                if (!(c < ScreenContents?.GetLength (1)) || !(r < ScreenContents?.GetLength (0)))
                 {
-                    string grapheme = ScreenContents [r, c].Grapheme;
-                    AddStr (grapheme);
+                    continue;
+                }
+                string grapheme = ScreenContents [r, c].Grapheme;
+                AddStr (grapheme);
 
-                    if (grapheme.GetColumns () > 1)
-                    {
-                        c++;
-                    }
+                if (grapheme.GetColumns () > 1)
+                {
+                    c++;
                 }
             }
         }
@@ -157,7 +161,11 @@ internal class ShadowView : View
     // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4491
     private Attribute GetAttributeUnderLocation (Point location)
     {
-        if (SuperView is not Adornment || location.X < 0 || location.X >= App?.Screen.Width || location.Y < 0 || location.Y >= App?.Screen.Height
+        if (SuperView is not AdornmentView
+            || location.X < 0
+            || location.X >= App?.Screen.Width
+            || location.Y < 0
+            || location.Y >= App?.Screen.Height
             || ScreenContents == null
             || location.Y < 0
             || location.Y >= ScreenContents.GetLength (0)
@@ -167,10 +175,16 @@ internal class ShadowView : View
             return Attribute.Default;
         }
 
-        Attribute attr = ScreenContents [location.Y, location.X].Attribute!.Value;
+        Attribute? attribute = ScreenContents [location.Y, location.X].Attribute;
 
-        var newAttribute = new Attribute (ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Foreground.GetDimmerColor (),
-                                          ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Background.GetDimmerColor (0.05),
+        if (attribute is null)
+        {
+            return Attribute.Default;
+        }
+        Attribute attr = attribute.Value;
+
+        var newAttribute = new Attribute (ShadowStyle == ShadowStyles.Opaque ? Color.Black : attr.Foreground.GetDimmerColor (),
+                                          ShadowStyle == ShadowStyles.Opaque ? attr.Background : attr.Background.GetDimmerColor (0.05),
                                           attr.Style);
 
         // If the BG is DarkGray, GetDimmerColor gave up. Instead of using the attribute in the Driver under the shadow,
@@ -183,8 +197,8 @@ internal class ShadowView : View
         View? underView = currentViewsUnderMouse.LastOrDefault ();
         attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
 
-        newAttribute = new Attribute (ShadowStyle == ShadowStyle.Opaque ? Color.Black : attr.Background.GetDimmerColor (),
-                                      ShadowStyle == ShadowStyle.Opaque ? attr.Background : attr.Foreground.GetDimmerColor (0.25),
+        newAttribute = new Attribute (ShadowStyle == ShadowStyles.Opaque ? Color.Black : attr.Background.GetDimmerColor (),
+                                      ShadowStyle == ShadowStyles.Opaque ? attr.Background : attr.Foreground.GetDimmerColor (0.25),
                                       attr.Style);
 
         return newAttribute;

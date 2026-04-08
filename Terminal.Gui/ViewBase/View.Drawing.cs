@@ -33,7 +33,7 @@ public partial class View // Drawing APIs
         }
 
         // Draw Transparent margins last to ensure they are drawn on top of the content.
-        Margin.DrawMargins (viewsArray);
+        MarginView.DrawMargins (viewsArray);
 
         // DrawMargins may have caused some views have NeedsDraw/NeedsSubViewDraw set; clear them all.
         foreach (View view in viewsArray)
@@ -49,18 +49,20 @@ public partial class View // Drawing APIs
 
         foreach (View view in viewsArray)
         {
-            if (view is not Adornment && view.SuperView is { } && view.SuperView != lastSuperView)
+            if (view is AdornmentView || view.SuperView is null || view.SuperView == lastSuperView)
             {
-                // Check if ANY subview of this SuperView still needs drawing
-                bool anySubViewNeedsDrawing = view.SuperView.InternalSubViews.Any (v => v.NeedsDraw || v.SubViewNeedsDraw);
-
-                if (!anySubViewNeedsDrawing)
-                {
-                    view.SuperView.SubViewNeedsDraw = false;
-                }
-
-                lastSuperView = view.SuperView;
+                continue;
             }
+
+            // Check if ANY subview of this SuperView still needs drawing
+            bool anySubViewNeedsDrawing = view.SuperView.InternalSubViews.Any (v => v.NeedsDraw || v.SubViewNeedsDraw);
+
+            if (!anySubViewNeedsDrawing)
+            {
+                view.SuperView.SubViewNeedsDraw = false;
+            }
+
+            lastSuperView = view.SuperView;
         }
     }
 
@@ -110,7 +112,15 @@ public partial class View // Drawing APIs
             originalClip = AddViewportToClip ();
 
             // If no context ...
-            context ??= new ();
+            context ??= new DrawContext ();
+
+            // Per-view context tracks only what THIS view draws (text + content).
+            // Used for CachedDrawnRegion (TransparentMouse hit-testing) so that a
+            // transparent view's hit region reflects only its own draws, not its
+            // SuperView's ClearViewport or peer SubViews' content.
+            // This follows the same pattern as DrawAdornments(), which creates
+            // per-adornment DrawContexts for the same reason.
+            _localDrawContext = new DrawContext ();
 
             SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
             DoClearViewport (context);
@@ -123,61 +133,54 @@ public partial class View // Drawing APIs
                 DoDrawSubViews (context);
             }
 
+            // Add the ClearViewport rect to the shared context AFTER SubViews have drawn.
+            // This ensures SubViews' DoDrawComplete doesn't see the SuperView's cleared area
+            // in the context (which would over-exclude for overlapping views like Tabs).
+            if (_lastClearedViewport is { } clearedRect)
+            {
+                context.AddDrawnRectangle (clearedRect);
+                _lastClearedViewport = null;
+            }
+
             // ------------------------------------
-            // Draw the text
+            // Draw the text — tracked in both shared (clip exclusion) and local (hit-testing) contexts
             Trace.Draw (this.ToIdentifyingString (), "Text");
             SetAttributeForRole (Enabled ? VisualRole.Normal : VisualRole.Disabled);
-            DoDrawText (context);
+            DoDrawText (_localDrawContext);
 
             // ------------------------------------
-            // Draw the content
+            // Draw the content — tracked in both shared (clip exclusion) and local (hit-testing) contexts
             Trace.Draw (this.ToIdentifyingString (), "Content");
-            DoDrawContent (context);
+            DoDrawContent (_localDrawContext);
+
+            // Merge this view's own draws into the shared context so the SuperView
+            // can track the aggregate for clip exclusion.
+            context.AddDrawnRegion (_localDrawContext.GetDrawnRegion ());
 
             // ------------------------------------
-            // Draw the line canvas
-            // Restore the clip before rendering the line canvas and adornment subviews
-            // because they may draw outside the viewport.
+            // Draw adornment SubViews BEFORE rendering LineCanvas so their lines
+            // (merged via LineCanvas.Merge) participate in auto-join.
+            // Restore the clip because adornment subviews may draw outside the viewport.
             SetClip (originalClip);
             originalClip = AddFrameToClip ();
+            Trace.Draw (this.ToIdentifyingString (), "AdornmentSubViews");
+            DoDrawAdornmentsSubViews (context);
+
+            // ------------------------------------
+            // Draw the line canvas (includes merged lines from adornment SubViews)
             Trace.Draw (this.ToIdentifyingString (), "LineCanvas");
             DoRenderLineCanvas (context);
 
             // ------------------------------------
-            // Re-draw the Border and Padding Adornment SubViews
-            // HACK: This is a hack to ensure that the Border and Padding Adornment SubViews are drawn after the line canvas.
-            DoDrawAdornmentsSubViews ();
-
-            // ------------------------------------
             // Advance the diagnostics draw indicator
-            Border?.AdvanceDrawIndicator ();
+            (Border.View as BorderView)?.AdvanceDrawIndicator ();
 
             ClearNeedsDraw ();
-
-            //if (this is not Adornment && SuperView is not Adornment)
-            //{
-            //    // Parent
-            //    Debug.Assert (Margin!.Parent == this);
-            //    Debug.Assert (Border!.Parent == this);
-            //    Debug.Assert (Padding!.Parent == this);
-
-            //    // SubViewNeedsDraw is set to false by ClearNeedsDraw.
-            //    Debug.Assert (SubViewNeedsDraw == false);
-            //    Debug.Assert (Margin!.SubViewNeedsDraw == false);
-            //    Debug.Assert (Border!.SubViewNeedsDraw == false);
-            //    Debug.Assert (Padding!.SubViewNeedsDraw == false);
-
-            //    // NeedsDraw is set to false by ClearNeedsDraw.
-            //    Debug.Assert (NeedsDraw == false);
-            //    Debug.Assert (Margin!.NeedsDraw == false);
-            //    Debug.Assert (Border!.NeedsDraw == false);
-            //    Debug.Assert (Padding!.NeedsDraw == false);
-            //}
         }
 
         // ------------------------------------
         // This causes the Margin to be drawn in a second pass if it has a ShadowStyle
-        Margin?.CacheClip ();
+        (Margin.View as MarginView)?.CacheClip ();
 
         // ------------------------------------
         // Reset the clip to what it was when we started
@@ -195,157 +198,8 @@ public partial class View // Drawing APIs
         // a clip with "holes" where this view (and any SubViews drawn before it) are located.
     }
 
-    #region DrawAdornments
-
-    private void DoDrawAdornmentsSubViews ()
-    {
-        // Only SetNeedsDraw on Margin here if it is not Transparent. Transparent Margins are drawn in a separate pass in the static View.Draw
-        // via Margin.DrawTransparentMargins.
-        if (Margin is { NeedsDraw: true } && !Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
-        {
-            foreach (View subview in Margin.SubViews)
-            {
-                subview.SetNeedsDraw ();
-            }
-
-            // NOTE: We do not support arbitrary SubViews of Margin (only ShadowView)
-            // NOTE: so we do not call DoDrawSubViews on Margin.
-        }
-
-        if (Border?.SubViews is { } && Border.Thickness != Thickness.Empty && Border.NeedsDraw)
-        {
-            // PERFORMANCE: Get the check for DrawIndicator out of this somehow.
-            foreach (View subview in Border.SubViews.Where (v => v.Visible || v.Id == "DrawIndicator"))
-            {
-                if (subview.Id != "DrawIndicator")
-                {
-                    subview.SetNeedsDraw ();
-                }
-
-                LineCanvas.Exclude (new (subview.FrameToScreen ()));
-            }
-
-            Region? saved = Border?.AddFrameToClip ();
-            Border?.DoDrawSubViews ();
-            SetClip (saved);
-        }
-
-        if (Padding?.SubViews is { } && Padding.Thickness != Thickness.Empty && Padding.NeedsDraw)
-        {
-            foreach (View subview in Padding.SubViews)
-            {
-                subview.SetNeedsDraw ();
-            }
-
-            Region? saved = Padding?.AddFrameToClip ();
-            Padding?.DoDrawSubViews ();
-            SetClip (saved);
-        }
-    }
-
-    internal void DoDrawAdornments (Region? originalClip)
-    {
-        if (this is Adornment)
-        {
-            AddFrameToClip ();
-        }
-        else
-        {
-            // Set the clip to be just the thicknesses of the adornments
-            // TODO: Put this union logic in a method on View?
-            Region clipAdornments = Margin!.Thickness.AsRegion (Margin!.FrameToScreen ());
-            clipAdornments.Combine (Border!.Thickness.AsRegion (Border!.FrameToScreen ()), RegionOp.Union);
-            clipAdornments.Combine (Padding!.Thickness.AsRegion (Padding!.FrameToScreen ()), RegionOp.Union);
-            clipAdornments.Combine (originalClip, RegionOp.Intersect);
-            SetClip (clipAdornments);
-        }
-
-        if (Margin?.NeedsLayout == true)
-        {
-            Margin.NeedsLayout = false;
-            Margin?.Thickness.Draw (Driver, FrameToScreen ());
-            Margin?.Parent?.SetSubViewNeedsDrawDownHierarchy ();
-        }
-
-        if (SubViewNeedsDraw)
-        {
-            // A SubView may add to the LineCanvas. This ensures any Adornment LineCanvas updates happen.
-            Border?.SetNeedsDraw ();
-            Padding?.SetNeedsDraw ();
-            Margin?.SetNeedsDraw ();
-        }
-
-        if (OnDrawingAdornments ())
-        {
-            return;
-        }
-
-        // TODO: add event.
-
-        DrawAdornments ();
-    }
-
-    /// <summary>
-    ///     Causes <see cref="Margin"/>, <see cref="Border"/>, and <see cref="Padding"/> to be drawn.
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         <see cref="Margin"/> is drawn in a separate pass if <see cref="ShadowStyle"/> is set.
-    ///     </para>
-    /// </remarks>
-    public void DrawAdornments ()
-    {
-        // Only draw Margin here if it is not Transparent. Transparent Margins are drawn in a separate pass in the static View.Draw
-        // via Margin.DrawTransparentMargins.
-        if (Margin is { } && !Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
-        {
-            Margin?.Draw ();
-        }
-
-        // Each of these renders lines to this View's LineCanvas
-        // Those lines will be finally rendered in OnRenderLineCanvas
-        if (Border is { } && Border.Thickness != Thickness.Empty)
-        {
-            Border?.Draw ();
-        }
-
-        if (Padding is { } && Padding.Thickness != Thickness.Empty)
-        {
-            Padding?.Draw ();
-        }
-
-        if (Margin is { } && Margin.Thickness != Thickness.Empty /* && Margin.ShadowStyle == ShadowStyle.None*/)
-        {
-            //Margin?.Draw ();
-        }
-    }
-
-    private void ClearFrame ()
-    {
-        if (Driver is null)
-        {
-            return;
-        }
-
-        // Get screen-relative coords
-        Rectangle toClear = FrameToScreen ();
-
-        Attribute prev = SetAttribute (GetAttributeForRole (VisualRole.Normal));
-        Driver.FillRect (toClear);
-        SetAttribute (prev);
-        SetNeedsDraw ();
-    }
-
-    /// <summary>
-    ///     Called when the View's Adornments are to be drawn. Prepares <see cref="View.LineCanvas"/>. If
-    ///     <see cref="SuperViewRendersLineCanvas"/> is true, only the
-    ///     <see cref="LineCanvas"/> of this view's SubViews will be rendered. If <see cref="SuperViewRendersLineCanvas"/> is
-    ///     false (the default), this method will cause the <see cref="LineCanvas"/> be prepared to be rendered.
-    /// </summary>
-    /// <returns><see langword="true"/> to stop further drawing of the Adornments.</returns>
-    protected virtual bool OnDrawingAdornments () => false;
-
-    #endregion DrawAdornments
+    // DrawAdornments region (DoDrawAdornmentsSubViews, DoDrawAdornments, DrawAdornments,
+    // OnDrawingAdornments) is in View.Drawing.Adornments.cs.
 
     #region ClearViewport
 
@@ -367,12 +221,9 @@ public partial class View // Drawing APIs
             return;
         }
 
-        if (!ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
-        {
-            ClearViewport (context);
-            OnClearedViewport ();
-            ClearedViewport?.Invoke (this, new (Viewport, Viewport, null));
-        }
+        ClearViewport (context);
+        OnClearedViewport ();
+        ClearedViewport?.Invoke (this, new DrawEventArgs (Viewport, Viewport, null));
     }
 
     /// <summary>
@@ -419,20 +270,32 @@ public partial class View // Drawing APIs
         }
 
         // Get screen-relative coords
-        Rectangle toClear = ViewportToScreen (Viewport with { Location = new (0, 0) });
+        Rectangle toClear = ViewportToScreen (Viewport with { Location = new Point (0, 0) });
 
         if (ViewportSettings.HasFlag (ViewportSettingsFlags.ClearContentOnly))
         {
-            Rectangle visibleContent = ViewportToScreen (new Rectangle (new (-Viewport.X, -Viewport.Y), GetContentSize ()));
+            Rectangle visibleContent = ViewportToScreen (new Rectangle (new Point (-Viewport.X, -Viewport.Y), GetContentSize ()));
             toClear = Rectangle.Intersect (toClear, visibleContent);
         }
 
         Driver.FillRect (toClear);
 
-        // context.AddDrawnRectangle (toClear);
+        // NOTE: ClearViewport does NOT add to the context here. The cleared viewport rect is
+        // added to the shared context in Draw() AFTER DoDrawSubViews completes. This prevents
+        // the SuperView's ClearViewport from leaking into SubViews' DoDrawComplete exclusion
+        // calculations — which would cause overlapping SubViews (e.g., Tab views that all use
+        // Dim.Fill) to exclude the entire frame and prevent peer SubViews from drawing.
+        _lastClearedViewport = toClear;
 
         SetNeedsDraw ();
     }
+
+    /// <summary>
+    ///     Stores the last viewport rectangle cleared by <see cref="ClearViewport"/>. Added to the shared
+    ///     <see cref="DrawContext"/> in <see cref="Draw(DrawContext?)"/> after SubViews have drawn, so that
+    ///     SubViews' <see cref="DoDrawComplete"/> doesn't see the SuperView's cleared area in the context.
+    /// </summary>
+    private Rectangle? _lastClearedViewport;
 
     #endregion ClearViewport
 
@@ -501,7 +364,8 @@ public partial class View // Drawing APIs
     /// <param name="context">The draw context to report drawn areas to.</param>
     public void DrawText (DrawContext? context = null)
     {
-        Rectangle drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
+        // BUGBUG: This excludes the draw region even if there's no text
+        var drawRect = new Rectangle (ContentToScreen (Point.Empty), GetContentSize ());
 
         // Use GetDrawRegion to get precise drawn areas
         Region textRegion = TextFormatter.GetDrawRegion (drawRect);
@@ -511,8 +375,7 @@ public partial class View // Drawing APIs
 
         if (Driver is { })
         {
-            TextFormatter.Draw (
-                                Driver,
+            TextFormatter.Draw (Driver,
                                 drawRect,
                                 HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal),
                                 HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal),
@@ -636,7 +499,7 @@ public partial class View // Drawing APIs
 
     #region DrawSubViews
 
-    private void DoDrawSubViews (DrawContext? context = null)
+    internal void DoDrawSubViews (DrawContext? context = null)
     {
         if (!NeedsDraw || OnDrawingSubViews (context))
         {
@@ -698,24 +561,47 @@ public partial class View // Drawing APIs
             return;
         }
 
+        List<(Dictionary<Point, Cell?> CellMap, HashSet<Point>? Reserved)>? overlappedCellMaps = null;
+
         // Draw the SubViews in reverse Z-order to leverage clipping.
         // SubViews earlier in the collection are drawn last (on top).
+        // NOTE: Do not use SubViews or GetSubViews() here as GetSubViews can be overridden to return a different set of views or ordering.
+        // NOTE: We need to draw exactly the views in InternalSubViews.
         foreach (View view in InternalSubViews.Snapshot ().Where (v => v.Visible).Reverse ())
         {
-            // TODO: HACK - This forcing of SetNeedsDraw with SuperViewRendersLineCanvas enables auto line join to work, but is brute force.
-            if (view.SuperViewRendersLineCanvas || view.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
-            {
-                //view.SetNeedsDraw ();
-            }
-
             view.Draw (context);
 
-            if (view.SuperViewRendersLineCanvas)
+            if (!view.SuperViewRendersLineCanvas)
             {
-                LineCanvas.Merge (view.LineCanvas);
-                view.LineCanvas.Clear ();
+                continue;
             }
+
+            if (view.Arrangement.HasFlag (ViewArrangement.Overlapped))
+            {
+                // Overlapped views: resolve independently so their lines don't
+                // auto-join with other Z-levels. Deferred for painters' algorithm
+                // compositing in RenderLineCanvas.
+                Dictionary<Point, Cell?>? resolvedCells = null;
+
+                if (view.LineCanvas.Bounds != Rectangle.Empty)
+                {
+                    resolvedCells = view.LineCanvas.GetCellMap ();
+                }
+
+                overlappedCellMaps ??= [];
+                overlappedCellMaps.Add ((resolvedCells ?? [], view.LineCanvas.GetReservedCells ()));
+            }
+            else
+            {
+                // Tiled views: flat merge preserves cross-view auto-join.
+                LineCanvas.Merge (view.LineCanvas);
+            }
+            view.LineCanvas.Clear ();
         }
+
+        // Store for compositing during RenderLineCanvas.
+        // List is ordered highest-Z first (matching the iteration order above).
+        _pendingOverlappedCellMaps = overlappedCellMaps;
     }
 
     #endregion DrawSubViews
@@ -735,70 +621,41 @@ public partial class View // Drawing APIs
         RenderLineCanvas (context);
     }
 
-    /// <summary>
-    ///     Called when the <see cref="View.LineCanvas"/> is to be rendered. See <see cref="RenderLineCanvas"/>.
-    /// </summary>
-    /// <returns><see langword="true"/> to stop further drawing of <see cref="LineCanvas"/>.</returns>
-    protected virtual bool OnRenderingLineCanvas () => false;
-
-    /// <summary>The canvas that any line drawing that is to be shared by subviews of this view should add lines to.</summary>
-    /// <remarks><see cref="Border"/> adds lines to this LineCanvas.</remarks>
-    public LineCanvas LineCanvas { get; } = new ();
-
-    /// <summary>
-    ///     Gets or sets whether this View will use its SuperView's <see cref="LineCanvas"/> for rendering any
-    ///     lines. If <see langword="true"/> the rendering of any borders drawn by this view will be done by its
-    ///     SuperView. If <see langword="false"/> (the default) this View's <see cref="OnDrawingAdornments"/> method will
-    ///     be called to render the borders.
-    /// </summary>
-    public virtual bool SuperViewRendersLineCanvas { get; set; } = false;
-
-    /// <summary>
-    ///     Causes the contents of <see cref="LineCanvas"/> to be drawn.
-    ///     If <see cref="SuperViewRendersLineCanvas"/> is true, only the
-    ///     <see cref="LineCanvas"/> of this view's SubViews will be rendered. If <see cref="SuperViewRendersLineCanvas"/> is
-    ///     false (the default), this method will cause the <see cref="LineCanvas"/> to be rendered.
-    /// </summary>
-    /// <param name="context"></param>
-    public void RenderLineCanvas (DrawContext? context)
-    {
-        if (Driver is null)
-        {
-            return;
-        }
-
-        if (!SuperViewRendersLineCanvas && LineCanvas.Bounds != Rectangle.Empty)
-        {
-            // Get both cell map and Region in a single pass through the canvas
-            (Dictionary<Point, Cell?> cellMap, Region lineRegion) = LineCanvas.GetCellMapWithRegion ();
-
-            foreach (KeyValuePair<Point, Cell?> p in cellMap)
-            {
-                // Get the entire map
-                if (p.Value is { })
-                {
-                    SetAttribute (p.Value.Value.Attribute ?? GetAttributeForRole (VisualRole.Normal));
-                    Driver.Move (p.Key.X, p.Key.Y);
-
-                    // TODO: #2616 - Support combining sequences that don't normalize
-                    AddStr (p.Value.Value.Grapheme);
-                }
-            }
-
-            // Report the drawn region for transparency support
-            // Region was built during the GetCellMapWithRegion() call above
-            if (context is { } && cellMap.Count > 0)
-            {
-                context.AddDrawnRegion (lineRegion);
-            }
-
-            LineCanvas.Clear ();
-        }
-    }
-
     #endregion DrawLineCanvas
 
     #region DrawComplete
+
+    /// <summary>
+    ///     Gets the cached drawn region from the last draw pass. Populated during
+    ///     <see cref="DoDrawComplete"/> for views with <see cref="ViewportSettingsFlags.TransparentMouse"/> set.
+    ///     Used by mouse hit-testing to determine which cells should receive mouse events.
+    ///     Returns <see langword="null"/> if not drawn yet or TransparentMouse not set.
+    ///     Invalidated by <see cref="SetNeedsDraw()"/>.
+    /// </summary>
+    internal Region? CachedDrawnRegion { get; set; }
+
+    /// <summary>
+    ///     The line canvas region from the last <see cref="DoRenderLineCanvas"/> call. Used to build
+    ///     <see cref="CachedDrawnRegion"/> for the Border adornment (which draws via merged LineCanvas).
+    /// </summary>
+    private Region? _lastLineCanvasRegion;
+
+    /// <summary>
+    ///     Cell maps from overlapped SubViews' independently-resolved <see cref="LineCanvas"/>es,
+    ///     collected during <see cref="DrawSubViews"/>. Composited via painters' algorithm
+    ///     in <see cref="RenderLineCanvas"/>: highest-Z cells take priority over lower-Z cells
+    ///     at the same screen position. Each entry also includes reserved cells (intentional gaps)
+    ///     that suppress lower-Z cells without rendering anything.
+    ///     Ordered highest-Z first (matching DrawSubViews iteration order).
+    /// </summary>
+    private List<(Dictionary<Point, Cell?> CellMap, HashSet<Point>? Reserved)>? _pendingOverlappedCellMaps;
+
+    /// <summary>
+    ///     Per-view <see cref="DrawContext"/> that tracks only what THIS view drew (text + content),
+    ///     isolated from the shared context. Used to compute <see cref="CachedDrawnRegion"/> for
+    ///     <see cref="ViewportSettingsFlags.TransparentMouse"/> hit-testing.
+    /// </summary>
+    private DrawContext? _localDrawContext;
 
     /// <summary>
     ///     Called at the end of <see cref="Draw(DrawContext)"/> to finalize drawing and update the clip region.
@@ -813,60 +670,116 @@ public partial class View // Drawing APIs
         // Raise virtual method first, then event. This allows subclasses to override behavior
         // before subscribers see the event.
         OnDrawComplete (context);
-        DrawComplete?.Invoke (this, new (Viewport, Viewport, context));
+        DrawComplete?.Invoke (this, new DrawEventArgs (Viewport, Viewport, context));
 
         // Phase 2: Update Driver.Clip to exclude this view's drawn area
         // This prevents views "behind" this one (earlier in draw order/Z-order) from drawing over it.
         // Adornments (Margin, Border, Padding) are handled by their Adornment.Parent view and don't exclude themselves.
-        if (this is not Adornment)
+        if (this is AdornmentView)
         {
-            if (ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
+            return;
+        }
+
+        // Cache drawn regions for adornments with TransparentMouse BEFORE clip exclusion.
+        // Each adornment's LastDrawnRegion was populated during DrawAdornments() using per-adornment
+        // DrawContexts. We combine with _lastLineCanvasRegion (rendered by the parent) for Border.
+        // All three adornment types are handled uniformly.
+        Border.UpdateCachedDrawnRegion (_lastLineCanvasRegion);
+        Margin.UpdateCachedDrawnRegion (null);
+        Padding.UpdateCachedDrawnRegion (null);
+
+        bool marginTransparent = Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
+        bool borderTransparent = Border.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
+        bool paddingTransparent = Padding.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
+        bool viewTransparent = ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
+
+        if (!marginTransparent && !borderTransparent && !paddingTransparent && !viewTransparent)
+        {
+            // Fast path: All layers opaque — exclude the entire view area as one rectangle.
+            // Use Margin frame if Margin has thickness, otherwise Border frame.
+            Rectangle fullFrame = Margin.Thickness != Thickness.Empty ? Margin.FrameToScreen () : Border.FrameToScreen ();
+            ExcludeFromClip (fullFrame);
+            context?.AddDrawnRectangle (fullFrame);
+
+            // Cache for TransparentMouse hit-testing (opaque = entire frame).
+            if (ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
             {
-                // Transparent View Path:
-                // Only exclude the regions that were actually drawn, allowing views beneath
-                // to show through in areas where nothing was drawn.
+                CachedDrawnRegion = new Region (fullFrame);
+            }
 
-                // The context.DrawnRegion may include areas outside the Viewport (e.g., if content
-                // was drawn with ViewportSettingsFlags.AllowContentOutsideViewport). We need to clip
-                // it to the Viewport bounds to prevent excluding areas that aren't visible.
-                context!.ClipDrawnRegion (ViewportToScreen (Viewport));
+            return;
+        }
 
-                // Exclude the actually-drawn region from Driver.Clip
-                ExcludeFromClip (context.GetDrawnRegion ());
+        // Per-layer clip exclusion: Each layer (Margin, Border, Padding, View content) is independently
+        // transparent. Opaque layers exclude their full area. Transparent layers exclude only
+        // the cells that were actually drawn (tracked via AdornmentImpl.LastDrawnRegion).
+        Region exclusion = new ();
 
-                // Border and Padding are always opaque (they draw lines/fills), so exclude them too
-                ExcludeFromClip (Border?.Thickness.AsRegion (Border.FrameToScreen ()));
-                ExcludeFromClip (Padding?.Thickness.AsRegion (Padding.FrameToScreen ()));
+        // For each OPAQUE layer, add its full area to the exclusion.
+        // For each TRANSPARENT layer, add only the cells that were actually drawn.
+        if (!marginTransparent)
+        {
+            exclusion.Combine (Margin.Thickness.AsRegion (Margin.FrameToScreen ()), RegionOp.Union);
+        }
+        else
+        {
+            Margin.AddDrawnRegionTo (exclusion, null);
+        }
+
+        if (!borderTransparent)
+        {
+            exclusion.Combine (Border.Thickness.AsRegion (Border.FrameToScreen ()), RegionOp.Union);
+        }
+        else
+        {
+            Border.AddDrawnRegionTo (exclusion, _lastLineCanvasRegion);
+        }
+
+        if (!paddingTransparent)
+        {
+            exclusion.Combine (Padding.Thickness.AsRegion (Padding.FrameToScreen ()), RegionOp.Union);
+        }
+        else
+        {
+            Padding.AddDrawnRegionTo (exclusion, null);
+        }
+
+        if (!viewTransparent)
+        {
+            exclusion.Combine (ViewportToScreen (Viewport), RegionOp.Union);
+        }
+
+        // For transparent layers, also include context drawn regions (text, content, subviews)
+        // clipped to the border frame. This ensures transparent view/adornment drawn cells are
+        // excluded from the clip so they don't get overdrawn by the SuperView.
+        if (context is { })
+        {
+            Region contentDrawn = context.GetDrawnRegion ().Clone ();
+            contentDrawn.Intersect (Border.FrameToScreen ());
+            exclusion.Combine (contentDrawn, RegionOp.Union);
+        }
+
+        ExcludeFromClip (exclusion);
+
+        // Cache the view's own drawn region for TransparentMouse hit-testing.
+        // Uses _localDrawContext (per-view) rather than the shared context, so that only
+        // cells THIS view drew (text + content) are captured — not the SuperView's
+        // ClearViewport fill or peer SubViews' content.
+        if (ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+        {
+            if (viewTransparent || borderTransparent)
+            {
+                CachedDrawnRegion = _localDrawContext?.GetDrawnRegion ();
             }
             else
             {
-                // Opaque View Path (default):
-                // Exclude the entire view area from Driver.Clip. This is the typical case where
-                // the view is considered fully opaque.
-
-                // Start with the Frame in screen coordinates
-                Rectangle borderFrame = FrameToScreen ();
-
-                // If there's a Border, use its frame instead (includes the border thickness)
-                if (Border is { })
-                {
-                    borderFrame = Border.FrameToScreen ();
-                }
-
-                // Exclude this view's entire area (Border inward, but not Margin) from the clip.
-                // This prevents any view drawn after this one from drawing in this area.
-                ExcludeFromClip (borderFrame);
-
-                // Update the DrawContext to track that we drew this entire rectangle.
-                // This allows our SuperView (if any) to know what area we occupied,
-                // which is important for transparency calculations at higher levels.
-                context?.AddDrawnRectangle (borderFrame);
+                // Opaque view with TransparentMouse — cache the entire border frame.
+                CachedDrawnRegion = new Region (Border.FrameToScreen ());
             }
         }
 
-        // When this method returns, Driver.Clip has been updated to exclude this view's area.
-        // The next view drawn (earlier in Z-order, typically a peer view or the SuperView) will see
-        // a clip with "holes" where this view (and any SubViews drawn before it) are located.
+        // Report the exclusion to the parent's DrawContext so SuperViews can track what we covered.
+        context?.AddDrawnRegion (exclusion);
     }
 
     /// <summary>

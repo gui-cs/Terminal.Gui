@@ -1,8 +1,8 @@
 namespace ViewBaseTests.Navigation;
 
 /// <summary>
-/// Tests for navigation into and out of Adornments (Padding, Border, Margin).
-/// These tests prove that navigation to/from adornments is broken and need to be fixed.
+///     Tests for navigation into and out of Adornments (Padding, Border, Margin).
+///     These tests prove that navigation to/from adornments is broken and need to be fixed.
 /// </summary>
 public class AdornmentNavigationTests
 {
@@ -14,15 +14,9 @@ public class AdornmentNavigationTests
     public void AdvanceFocus_Into_Padding_With_Focusable_SubView ()
     {
         // Setup: View with a focusable subview in Padding
-        View view = new ()
-        {
-            Id = "view",
-            Width = 10,
-            Height = 10,
-            CanFocus = true
-        };
+        View view = new () { Id = "view", Width = 10, Height = 10, CanFocus = true };
 
-        view.Padding!.Thickness = new Thickness (1);
+        view.Padding.Thickness = new Thickness (1);
 
         View paddingButton = new ()
         {
@@ -35,7 +29,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        view.Padding.Add (paddingButton);
+        view.Padding.GetOrCreateView ().Add (paddingButton);
 
         View contentButton = new ()
         {
@@ -78,15 +72,9 @@ public class AdornmentNavigationTests
     public void AdvanceFocus_Out_Of_Padding_To_Content ()
     {
         // Setup: View with focusable padding that has focus
-        View view = new ()
-        {
-            Id = "view",
-            Width = 10,
-            Height = 10,
-            CanFocus = true
-        };
+        View view = new () { Id = "view", Width = 10, Height = 10, CanFocus = true };
 
-        view.Padding!.Thickness = new Thickness (1);
+        view.Padding.Thickness = new Thickness (1);
 
         View paddingButton = new ()
         {
@@ -99,7 +87,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        view.Padding.Add (paddingButton);
+        view.Padding.GetOrCreateView ().Add (paddingButton);
 
         View contentButton = new ()
         {
@@ -138,15 +126,9 @@ public class AdornmentNavigationTests
     public void AdvanceFocus_Backward_Into_Padding ()
     {
         // Setup: View with focusable subviews in both content and padding
-        View view = new ()
-        {
-            Id = "view",
-            Width = 10,
-            Height = 10,
-            CanFocus = true
-        };
+        View view = new () { Id = "view", Width = 10, Height = 10, CanFocus = true };
 
-        view.Padding!.Thickness = new Thickness (1);
+        view.Padding.Thickness = new Thickness (1);
 
         View paddingButton = new ()
         {
@@ -159,7 +141,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        view.Padding.Add (paddingButton);
+        view.Padding.GetOrCreateView ().Add (paddingButton);
 
         View contentButton = new ()
         {
@@ -198,17 +180,12 @@ public class AdornmentNavigationTests
     public void Padding_CanFocus_True_TabStop_TabStop_Should_Be_In_FocusChain ()
     {
         // Setup: View with focusable Padding
-        View view = new ()
-        {
-            Id = "view",
-            Width = 10,
-            Height = 10,
-            CanFocus = true
-        };
+        View view = new () { Id = "view", Width = 10, Height = 10, CanFocus = true };
 
-        view.Padding!.Thickness = new (1);
-        view.Padding.CanFocus = true;
-        view.Padding.TabStop = TabBehavior.TabStop;
+        view.Padding.Thickness = new Thickness (1);
+        view.Padding.GetOrCreateView ();
+        view.Padding.View?.CanFocus = true;
+        view.Padding.View?.TabStop = TabBehavior.TabStop;
 
         view.BeginInit ();
         view.EndInit ();
@@ -218,7 +195,7 @@ public class AdornmentNavigationTests
 
         // Expected: Padding should be in the focus chain
         // This should pass based on the GetFocusChain code
-        Assert.Contains (view.Padding, focusChain);
+        Assert.Contains (view.Padding.View!, focusChain);
 
         view.Dispose ();
     }
@@ -233,15 +210,9 @@ public class AdornmentNavigationTests
     public void AdvanceFocus_Into_Border_With_Focusable_SubView ()
     {
         // Setup: View with a focusable subview in Border
-        View view = new ()
-        {
-            Id = "view",
-            Width = 10,
-            Height = 10,
-            CanFocus = true
-        };
+        View view = new () { Id = "view", Width = 10, Height = 10, CanFocus = true };
 
-        view.Border!.Thickness = new Thickness (1);
+        view.Border.Thickness = new Thickness (1);
 
         View borderButton = new ()
         {
@@ -254,7 +225,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        view.Border.Add (borderButton);
+        view.Border.GetOrCreateView ().Add (borderButton);
 
         View contentButton = new ()
         {
@@ -276,7 +247,7 @@ public class AdornmentNavigationTests
         view.AdvanceFocus (NavigationDirection.Forward, TabBehavior.TabGroup);
 
         // Expected: One of them should have focus
-        var hasFocus = contentButton.HasFocus || borderButton.HasFocus;
+        bool hasFocus = contentButton.HasFocus || borderButton.HasFocus;
         Assert.True (hasFocus, "Either content or border button should have focus");
 
         // Advance again
@@ -303,16 +274,10 @@ public class AdornmentNavigationTests
     public void Border_CanFocus_True_TabStop_TabGroup_Should_NOT_Be_In_FocusChain ()
     {
         // Setup: View with focusable Border (default TabStop is TabGroup for Border)
-        View view = new ()
-        {
-            Id = "view",
-            Width = 10,
-            Height = 10,
-            CanFocus = true
-        };
-
-        view.Border!.Thickness = new Thickness (1);
-        view.Border.CanFocus = true;
+        View view = new () { Id = "view", Width = 10, Height = 10, CanFocus = true };
+        view.Border.GetOrCreateView ();
+        view.Border.Thickness = new Thickness (1);
+        view.Border.View?.CanFocus = true;
 
         view.BeginInit ();
         view.EndInit ();
@@ -321,7 +286,7 @@ public class AdornmentNavigationTests
         View [] focusChain = view.GetFocusChain (NavigationDirection.Forward, TabBehavior.TabGroup);
 
         // Expected: Border should be in the focus chain
-        Assert.DoesNotContain (view.Border, focusChain);
+        Assert.DoesNotContain (view.Border.View!, focusChain);
 
         view.Dispose ();
     }
@@ -336,17 +301,12 @@ public class AdornmentNavigationTests
     public void Margin_CanFocus_True_Should_NOT_Be_In_FocusChain ()
     {
         // Setup: View with focusable Margin
-        View view = new ()
-        {
-            Id = "view",
-            Width = 10,
-            Height = 10,
-            CanFocus = true
-        };
+        View view = new () { Id = "view", Width = 10, Height = 10, CanFocus = true };
 
-        view.Margin!.Thickness = new Thickness (1);
-        view.Margin.CanFocus = true;
-        view.Margin.TabStop = TabBehavior.TabStop;
+        view.Margin.GetOrCreateView ();
+        view.Margin.Thickness = new Thickness (1);
+        view.Margin.View?.CanFocus = true;
+        view.Margin.View?.TabStop = TabBehavior.TabStop;
 
         view.BeginInit ();
         view.EndInit ();
@@ -355,7 +315,7 @@ public class AdornmentNavigationTests
         View [] focusChain = view.GetFocusChain (NavigationDirection.Forward, TabBehavior.TabStop);
 
         // Expected: Margin should be in the focus chain
-        Assert.DoesNotContain (view.Margin, focusChain);
+        Assert.DoesNotContain (view.Margin.View!, focusChain);
 
         view.Dispose ();
     }
@@ -370,15 +330,9 @@ public class AdornmentNavigationTests
     public void AdvanceFocus_Nested_Views_With_Adornment_SubViews ()
     {
         // Setup: Nested views where parent has adornment subviews
-        View parent = new ()
-        {
-            Id = "parent",
-            Width = 30,
-            Height = 30,
-            CanFocus = true
-        };
+        View parent = new () { Id = "parent", Width = 30, Height = 30, CanFocus = true };
 
-        parent.Padding!.Thickness = new Thickness (2);
+        parent.Padding.Thickness = new Thickness (2);
 
         View parentPaddingButton = new ()
         {
@@ -391,7 +345,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        parent.Padding.Add (parentPaddingButton);
+        parent.Padding.GetOrCreateView ().Add (parentPaddingButton);
 
         View child = new ()
         {
@@ -404,7 +358,7 @@ public class AdornmentNavigationTests
 
         parent.Add (child);
 
-        child.Padding!.Thickness = new Thickness (1);
+        child.Padding.Thickness = new Thickness (1);
 
         View childPaddingButton = new ()
         {
@@ -417,7 +371,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        child.Padding.Add (childPaddingButton);
+        child.Padding.GetOrCreateView ().Add (childPaddingButton);
 
         parent.BeginInit ();
         parent.EndInit ();
@@ -449,18 +403,10 @@ public class AdornmentNavigationTests
 
         // Expected: Navigation should reach all elements including adornment subviews
         // This will likely show incomplete navigation, proving the bug exists
-        Assert.True (
-                     focusedIds.Count > 0,
-                     "At least some navigation should occur (this test documents current behavior)"
-                    );
+        Assert.True (focusedIds.Count > 0, "At least some navigation should occur (this test documents current behavior)");
 
         parent.Dispose ();
     }
-
-    #endregion
-
-    #region TabGroup Behavior Tests
-
 
     #endregion
 
@@ -472,13 +418,7 @@ public class AdornmentNavigationTests
     public void AdvanceFocus_Padding_With_No_Thickness_Should_Not_Participate ()
     {
         // Setup: View with Padding that has no thickness but has subviews
-        View view = new ()
-        {
-            Id = "view",
-            Width = 10,
-            Height = 10,
-            CanFocus = true
-        };
+        View view = new () { Id = "view", Width = 10, Height = 10, CanFocus = true };
 
         // Padding has default Thickness.Empty
         View paddingButton = new ()
@@ -492,7 +432,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        view.Padding!.Add (paddingButton);
+        view.Padding.GetOrCreateView ().Add (paddingButton);
 
         View contentButton = new ()
         {
@@ -529,15 +469,9 @@ public class AdornmentNavigationTests
     public void AdvanceFocus_Disabled_Adornment_SubView_Should_Be_Skipped ()
     {
         // Setup: View with disabled subview in Padding
-        View view = new ()
-        {
-            Id = "view",
-            Width = 10,
-            Height = 10,
-            CanFocus = true
-        };
+        View view = new () { Id = "view", Width = 10, Height = 10, CanFocus = true };
 
-        view.Padding!.Thickness = new Thickness (1);
+        view.Padding.Thickness = new Thickness (1);
 
         View paddingButton = new ()
         {
@@ -551,7 +485,7 @@ public class AdornmentNavigationTests
             Height = 1
         };
 
-        view.Padding.Add (paddingButton);
+        view.Padding.GetOrCreateView ().Add (paddingButton);
 
         View contentButton = new ()
         {

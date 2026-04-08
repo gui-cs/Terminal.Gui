@@ -25,7 +25,7 @@ namespace Terminal.Gui.Configuration;
 [JsonSerializable (typeof (Alignment))]
 [JsonSerializable (typeof (AlignmentModes))]
 [JsonSerializable (typeof (LineStyle))]
-[JsonSerializable (typeof (ShadowStyle))]
+[JsonSerializable (typeof (ShadowStyles))]
 [JsonSerializable (typeof (MouseState))]
 [JsonSerializable (typeof (TextStyle))]
 [JsonSerializable (typeof (CursorStyle))]

@@ -180,7 +180,7 @@ public abstract class PopoverImpl : View, IPopoverView
         }
 
         Layout ();
-        App!.Popovers?.Show (this);
+        App?.Popovers?.Show (this);
     }
 
     /// <summary>

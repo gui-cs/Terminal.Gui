@@ -212,7 +212,34 @@ public partial class View // Command APIs
 
     #region Default Event Handlers
 
-    internal bool? DefaultCommandNotBoundHandler (ICommandContext? ctx) => RaiseCommandNotBound (ctx);
+    internal bool? DefaultCommandNotBoundHandler (ICommandContext? ctx)
+    {
+        Trace.Command (this, ctx, "Entry");
+
+        // Reset dispatch state — mirrors DefaultActivateHandler/DefaultAcceptHandler.
+        _dispatchState = DispatchState.None;
+
+        bool? result = RaiseCommandNotBound (ctx);
+
+        if (result is true)
+        {
+            return true;
+        }
+
+        // Report as handled if the command will bubble to an ancestor — mirrors
+        // DefaultActivateHandler logic so that the key is consumed when an ancestor
+        // subscribes to it via CommandsToBubbleUp.
+        bool willBubble = ctx is not null && CommandWillBubbleToAncestor (ctx.Command);
+
+        if (_dispatchState.HasFlag (DispatchState.DispatchOccurred) || willBubble)
+        {
+            return true;
+        }
+
+        // Propagate the null/false from RaiseCommandNotBound: null = nobody observed,
+        // false = subscriber exists but did not handle.
+        return result;
+    }
 
     /// <summary>
     ///     Called when a command that has not been bound is invoked.
@@ -237,9 +264,35 @@ public partial class View // Command APIs
         }
 
         // If the event is not canceled by the virtual method, raise the event to notify any external subscribers.
+        bool hasSubscribers = CommandNotBound is not null;
         CommandNotBound?.Invoke (this, args);
 
-        return CommandNotBound is null ? null : args.Handled;
+        if (args.Handled)
+        {
+            return true;
+        }
+
+        // Framework dispatch: composite views delegate commands to a target SubView.
+        bool dispatched = TryDispatchToTarget (ctx);
+
+        if (dispatched)
+        {
+            return true;
+        }
+
+        // Bubble to SuperView if the command is in its CommandsToBubbleUp list.
+        // Bubbling is a notification (not consumption) — return false so that the
+        // DefaultCommandNotBoundHandler can still report handled via CommandWillBubbleToAncestor.
+        bool bubbled = TryBubbleUp (ctx, false) is true;
+
+        if (bubbled)
+        {
+            return false;
+        }
+
+        // Distinguish: null = nobody observed (no subscribers, no dispatch, no bubbling);
+        // false = a subscriber existed but did not set Handled=true.
+        return hasSubscribers ? false : null;
     }
 
     /// <summary>
@@ -260,7 +313,12 @@ public partial class View // Command APIs
 
     #region Accept
 
-    internal bool? DefaultAcceptHandler (ICommandContext? ctx)
+    /// <summary>
+    ///     Called when the user is accepting the state of the View and <see cref="Command.Accept"/> has been invoked.
+    /// </summary>
+    /// <param name="ctx">The command context.</param>
+    /// <returns><see langword="true"/> if the command was handled; otherwise, <see langword="false"/>.</returns>
+    public bool? DefaultAcceptHandler (ICommandContext? ctx)
     {
         Trace.Command (this, ctx, "Entry");
 
@@ -406,7 +464,9 @@ public partial class View // Command APIs
         // Warn if cancellation (not dispatch) occurred on a bridged command.
         if (args.Handled && ctx?.Routing == CommandRouting.Bridged && !_dispatchState.HasFlag (DispatchState.DispatchOccurred))
         {
-            Trace.Command (this, ctx, "BridgedCancellation",
+            Trace.Command (this,
+                           ctx,
+                           "BridgedCancellation",
                            "Cancellation across a CommandBridge has no effect. "
                            + "The remote view's OnAccepted has already fired before the bridge relayed the command.");
         }
@@ -490,7 +550,12 @@ public partial class View // Command APIs
 
     #region Activate
 
-    internal bool? DefaultActivateHandler (ICommandContext? ctx)
+    /// <summary>
+    ///     Called when the user is activating the View and <see cref="Command.Activate"/> has been invoked.
+    /// </summary>
+    /// <param name="ctx">The command context.</param>
+    /// <returns><see langword="true"/> if the command was handled; otherwise, <see langword="false"/>.</returns>
+    public bool? DefaultActivateHandler (ICommandContext? ctx)
     {
         Trace.Command (this, ctx, "Entry");
 
@@ -620,17 +685,12 @@ public partial class View // Command APIs
             return true;
         }
 
-        if (SuperView is Padding padding && padding.Parent?.CommandsToBubbleUp.Contains (command) == true)
+        if (SuperView is AdornmentView adornment && adornment.Adornment?.Parent?.CommandsToBubbleUp.Contains (command) == true)
         {
             return true;
         }
 
-        if (this is Padding selfPadding && selfPadding.Parent?.CommandsToBubbleUp.Contains (command) == true)
-        {
-            return true;
-        }
-
-        return false;
+        return this is AdornmentView selfAdornment && selfAdornment.Adornment?.Parent?.CommandsToBubbleUp.Contains (command) == true;
     }
 
     /// <summary>
@@ -653,9 +713,7 @@ public partial class View // Command APIs
             return;
         }
 
-        for (View? ancestor = GetBubbleAncestor (this);
-             ancestor?.CommandsToBubbleUp.Contains (ctx.Command) == true;
-             ancestor = GetBubbleAncestor (ancestor))
+        for (View? ancestor = GetBubbleAncestor (this); ancestor?.CommandsToBubbleUp.Contains (ctx.Command) == true; ancestor = GetBubbleAncestor (ancestor))
         {
             if (compositeOnly && ancestor.GetDispatchTarget (ctx) is null)
             {
@@ -671,9 +729,7 @@ public partial class View // Command APIs
             // dispatching to MenuBarItem would overwrite the MenuItem value).
             View? dispatchTarget = ancestor.GetDispatchTarget (ctx);
 
-            if (dispatchTarget is IValue refreshedValue
-                && ctx.Source?.TryGetTarget (out View? source) == true
-                && ReferenceEquals (source, dispatchTarget))
+            if (dispatchTarget is IValue refreshedValue && ctx.Source?.TryGetTarget (out View? source) == true && ReferenceEquals (source, dispatchTarget))
             {
                 upCtx = upCtx.WithValue (refreshedValue.GetValue ());
             }
@@ -683,19 +739,19 @@ public partial class View // Command APIs
 
         return;
 
-        // Resolves the next ancestor, handling Padding → Parent traversal (mirrors TryBubbleUp).
+        // Resolves the next ancestor, handling AdornmentView → Parent traversal (mirrors TryBubbleUp).
         static View? GetBubbleAncestor (View current)
         {
             View? next = current.SuperView;
 
-            if (next is Padding padding)
+            if (next is AdornmentView adornment)
             {
-                return padding.Parent;
+                return adornment.Adornment?.Parent;
             }
 
-            if (current is Padding selfPadding)
+            if (current is AdornmentView selfAdornment)
             {
-                return selfPadding.Parent;
+                return selfAdornment.Adornment?.Parent;
             }
 
             return next;
@@ -705,7 +761,7 @@ public partial class View // Command APIs
     /// <summary>
     ///     Called when the user has performed an action (e.g. <see cref="Command.Activate"/>) causing the View to change state
     ///     or preparing it for interaction.
-    ///     Calls <see cref="OnActivating"/> which can be cancelled; if not cancelled raises <see cref="Accepting"/>.
+    ///     Calls <see cref="OnActivating"/> which can be cancelled; if not cancelled raises <see cref="Activating"/>
     ///     event. The default <see cref="Command.Activate"/> handler calls this method.
     /// </summary>
     /// <remarks>
@@ -731,7 +787,9 @@ public partial class View // Command APIs
             // Warn if cancellation occurs on a bridged command — the remote side has already committed.
             if (ctx?.Routing == CommandRouting.Bridged)
             {
-                Trace.Command (this, ctx, "BridgedCancellation",
+                Trace.Command (this,
+                               ctx,
+                               "BridgedCancellation",
                                "Cancellation across a CommandBridge has no effect. "
                                + "The remote view's OnActivated has already fired before the bridge relayed the command.");
             }
@@ -758,7 +816,9 @@ public partial class View // Command APIs
         // Warn if cancellation (not dispatch) occurred on a bridged command.
         if (args.Handled && ctx?.Routing == CommandRouting.Bridged && !_dispatchState.HasFlag (DispatchState.DispatchOccurred))
         {
-            Trace.Command (this, ctx, "BridgedCancellation",
+            Trace.Command (this,
+                           ctx,
+                           "BridgedCancellation",
                            "Cancellation across a CommandBridge has no effect. "
                            + "The remote view's OnActivated has already fired before the bridge relayed the command.");
         }
@@ -859,7 +919,12 @@ public partial class View // Command APIs
 
     #region HotKey
 
-    internal bool? DefaultHotKeyHandler (ICommandContext? ctx)
+    /// <summary>
+    ///     Called when the user has pressed the View's <see cref="HotKey"/> and <see cref="Command.HotKey"/> has been invoked.
+    /// </summary>
+    /// <param name="ctx">The command context.</param>
+    /// <returns><see langword="true"/> if the command was handled; otherwise, <see langword="false"/>.</returns>
+    public bool? DefaultHotKeyHandler (ICommandContext? ctx)
     {
         Trace.Command (this, ctx, "Entry");
 
@@ -1142,15 +1207,22 @@ public partial class View // Command APIs
     public View? DefaultAcceptView { get => field ?? GetSubViews (includePadding: true).FirstOrDefault (v => v is IAcceptTarget { IsDefault: true }); set; }
 
     /// <summary>
-    ///     Gets or sets the list of commands that should bubble up to this View from unhandled SubViews.
+    ///     Gets or sets the list of commands that should bubble up to this View from unhandled SubViews
+    ///     or from SubViews within this View's adornments (Padding, Border).
     ///     When a SubView raises a command that is not handled, and the command is in the SuperView's
     ///     <see cref="CommandsToBubbleUp"/> list, the command will be invoked on the SuperView.
     /// </summary>
     /// <remarks>
-    ///     e.g. to enable <see cref="Command.Activate"/> bubbling for hierarchical views:
-    ///     <code>
-    ///         menuBar.CommandsToBubbleUp = [Command.Activate];
-    ///     </code>
+    ///     <para>
+    ///         For SubViews inside an <see cref="AdornmentView"/> (e.g., a button in Padding or Border),
+    ///         the bubble target is <see cref="IAdornment.Parent"/> rather than <see cref="SuperView"/>.
+    ///     </para>
+    ///     <para>
+    ///         e.g. to enable <see cref="Command.Activate"/> bubbling for hierarchical views:
+    ///         <code>
+    ///             menuBar.CommandsToBubbleUp = [Command.Activate];
+    ///         </code>
+    ///     </para>
     /// </remarks>
     public IReadOnlyList<Command> CommandsToBubbleUp { get; set; } = [];
 
@@ -1175,7 +1247,8 @@ public partial class View // Command APIs
     }
 
     /// <summary>
-    ///     Bubbles a command to the SuperView if the command is in SuperView's <see cref="CommandsToBubbleUp"/> list.
+    ///     Bubbles a command to the SuperView (or to <see cref="IAdornment.Parent"/> for adornment SubViews)
+    ///     if the target's <see cref="CommandsToBubbleUp"/> list contains the command.
     ///     Handles the special case of invoking <see cref="Command.Accept"/> on a peer IsDefault button.
     /// </summary>
     /// <remarks>
@@ -1260,25 +1333,37 @@ public partial class View // Command APIs
             return SuperView.InvokeCommand (refreshed.Command, upCtx);
         }
 
-        if (SuperView is Padding padding && padding.Parent?.CommandsToBubbleUp.Contains (ctx.Command) == true)
+        // SubView of an AdornmentView: bubble to the adornment's Parent (the owning View)
+        if (SuperView is AdornmentView adornment && adornment.Adornment?.Parent?.CommandsToBubbleUp.Contains (ctx.Command) == true)
         {
-            // Check if Padding's Parent wants this command bubbled up to it
-            Trace.Command (this, ctx, "Routing", $"BubblingUp to Padding.Parent {padding.Parent.ToIdentifyingString ()}");
-            upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Values = ctx.Values };
+            ICommandContext? refreshed = RefreshValue (ctx);
 
-            return padding.Parent.InvokeCommand (ctx.Command, upCtx);
+            Trace.Command (this, refreshed, "Routing", $"BubblingUp to Adornment.Parent {adornment.Adornment.Parent.ToIdentifyingString ()}");
+
+            upCtx = new CommandContext (refreshed!.Command, refreshed.Source, refreshed.Binding)
+            {
+                Routing = CommandRouting.BubblingUp, Values = refreshed.Values
+            };
+
+            return adornment.Adornment.Parent.InvokeCommand (refreshed.Command, upCtx);
         }
 
-        if (this is not Padding selfPadding || selfPadding.Parent?.CommandsToBubbleUp.Contains (ctx.Command) != true)
+        // THIS view is an AdornmentView: bubble to its own Parent
+        if (this is not AdornmentView selfAdornment || selfAdornment.Adornment?.Parent?.CommandsToBubbleUp.Contains (ctx.Command) != true)
         {
             return handled;
         }
 
-        // Handle when THIS view is a Padding
-        Trace.Command (this, ctx, "Routing", $"BubblingUp from Padding to {selfPadding.Parent.ToIdentifyingString ()}");
-        upCtx = new CommandContext (ctx.Command, ctx.Source, ctx.Binding) { Routing = CommandRouting.BubblingUp, Values = ctx.Values };
+        ICommandContext? selfRefreshed = RefreshValue (ctx);
 
-        return selfPadding.Parent.InvokeCommand (ctx.Command, upCtx);
+        Trace.Command (this, selfRefreshed, "Routing", $"BubblingUp from Adornment to {selfAdornment.Adornment.Parent.ToIdentifyingString ()}");
+
+        upCtx = new CommandContext (selfRefreshed!.Command, selfRefreshed.Source, selfRefreshed.Binding)
+        {
+            Routing = CommandRouting.BubblingUp, Values = selfRefreshed.Values
+        };
+
+        return selfAdornment.Adornment.Parent.InvokeCommand (selfRefreshed.Command, upCtx);
     }
 
     #endregion Command Bubbling

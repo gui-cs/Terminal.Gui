@@ -1,4 +1,4 @@
-![v2 Beta Status](https://img.shields.io/github/milestones/progress-percent/gui-cs/Terminal.Gui/9)
+![v2 Release Status](https://img.shields.io/github/milestones/progress-percent/gui-cs/Terminal.Gui/7)
 ![NuGet Version](https://img.shields.io/nuget/vpre/Terminal.Gui)
 ![Bugs](https://img.shields.io/github/issues/gui-cs/Terminal.Gui)
 [![codecov](https://codecov.io/gh/gui-cs/Terminal.Gui/graph/badge.svg?token=1Ac9gyGtrj)](https://codecov.io/gh/gui-cs/Terminal.Gui)
@@ -16,7 +16,7 @@ Cross-platform UI toolkit for building sophisticated terminal UI (TUI) applicati
 
 > **Important:**
 > - **v1** is in maintenance mode - only critical bug fixes accepted
-> - **v2 Beta** is recommended for new projects - API is stable with comprehensive features
+> - **v2 Beta** is recommended for new projects - The team is 100% Focused on v2.0.0 RELEASE!
 > - Breaking changes possible before Beta, but core architecture is solid
 
 ![Sample app](docfx/images/sample.gif)

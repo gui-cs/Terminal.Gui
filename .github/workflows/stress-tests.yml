@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: '0 0 * * *' # Runs every day at midnight UTC
   push:
-    branches: [ v2_release, v2_develop ]
+    branches: [ main, develop ]
     paths-ignore:
       - '**.md'
 

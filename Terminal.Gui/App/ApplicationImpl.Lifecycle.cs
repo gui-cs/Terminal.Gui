@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using Wcwidth;
 using Trace = Terminal.Gui.Tracing.Trace;
 
 namespace Terminal.Gui.App;
@@ -30,6 +31,11 @@ internal partial class ApplicationImpl
         MainThreadId = Thread.CurrentThread.ManagedThreadId;
 
         Trace.Lifecycle (MainThreadId?.ToString (), "Init", $"driverName: {driverName}");
+
+        // In Application.Init(), before starting the input thread:
+        // Pre-warm the Wcwidth static cache to prevent ZeroTable._lookup race condition
+        // See: https://github.com/spectreconsole/wcwidth/issues/11
+        _ = UnicodeCalculator.GetWidth (new Rune ('A'));
 
         // Thread-safe fence check: Ensure we're not mixing application models
         // Use lock to make check-and-set atomic
@@ -235,7 +241,12 @@ internal partial class ApplicationImpl
         Popovers?.Dispose ();
         Popovers = null;
 
-        // === 3. Clean up runnables ===
+        // === 3. Close and dispose tooltips ===
+        // Any tooltips added to ToolTips have their lifetime controlled by ToolTips
+        ToolTips?.Dispose ();
+        ToolTips = null;
+
+        // === 4. Clean up runnables ===
         SessionStack?.Clear ();
 
 #if DEBUG_IDISPOSABLE

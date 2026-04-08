@@ -1,7 +1,8 @@
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
-///     Indicates the side for <see cref="Pos"/> operations.
+///     Indicates the side of a <see cref="View"/>. Used by <see cref="Pos"/> and <see cref="Dim"/> to specify which side
+///     of the view to use for layout calculations.
 /// </summary>
 public enum Side
 {

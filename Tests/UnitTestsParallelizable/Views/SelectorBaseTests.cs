@@ -417,6 +417,31 @@ public class SelectorBaseTests
         Assert.Equal (0, newYDiff); // Both should be at Y=0 now
     }
 
+    // Copilot
+    [Fact]
+    public void Horizontal_Labels_SetAfterConstruction_SelectorWidthAccommodatesAllCheckBoxes ()
+    {
+        // Arrange: create selector with horizontal orientation, no labels yet
+        OptionSelector selector = new () { Orientation = Orientation.Horizontal };
+
+        // Act: set labels/values after construction (simulates reactive-binding scenario)
+        selector.Labels = ["IMDb (Recommended)", "TMDb"];
+        selector.Values = [0, 1];
+        selector.Layout ();
+
+        // Assert: selector width must be wide enough to fully contain every checkbox
+        CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
+        Assert.Equal (2, checkBoxes.Length);
+
+        foreach (CheckBox cb in checkBoxes)
+        {
+            Assert.True (
+                          cb.Frame.X + cb.Frame.Width <= selector.Frame.Width,
+                          $"CheckBox '{cb.Title}' right edge ({cb.Frame.X + cb.Frame.Width}) exceeds selector width ({selector.Frame.Width})"
+                         );
+        }
+    }
+
     #endregion
 
     #region HorizontalSpace Tests
@@ -440,12 +465,12 @@ public class SelectorBaseTests
         CheckBox [] checkBoxes = selector.SubViews.OfType<CheckBox> ().ToArray ();
 
         // HorizontalSpace is applied via Margin.Thickness.Right
-        int spacing2 = checkBoxes [0].Margin!.Thickness.Right;
+        int spacing2 = checkBoxes [0].Margin.Thickness.Right;
 
         selector.HorizontalSpace = 5;
         selector.Layout ();
 
-        int spacing5 = checkBoxes [0].Margin!.Thickness.Right;
+        int spacing5 = checkBoxes [0].Margin.Thickness.Right;
         Assert.True (spacing5 > spacing2);
         Assert.Equal (2, spacing2);
         Assert.Equal (5, spacing5);

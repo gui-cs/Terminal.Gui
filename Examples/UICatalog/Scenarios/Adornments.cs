@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 // ReSharper disable AccessToDisposedClosure
 
@@ -21,7 +21,7 @@ public class Adornments : Scenario
         appWindow.Title = GetQuitKeyAndName ();
         appWindow.BorderStyle = LineStyle.None;
 
-        var editor = new AdornmentsEditor
+        AdornmentsEditor adornmentsEditor = new ()
         {
             BorderStyle = LineStyle.Single,
             AutoSelectViewToEdit = true,
@@ -31,16 +31,31 @@ public class Adornments : Scenario
             X = Pos.AnchorEnd ()
         };
 
-        editor.Border!.Thickness = new Thickness (1, 2, 1, 1);
+        adornmentsEditor.Border.Thickness = new Thickness (1, 2, 1, 1);
 
-        appWindow.Add (editor);
+        ViewportSettingsEditor viewportSettingsEditor = new ()
+        {
+            BorderStyle = LineStyle.Single,
+            AutoSelectViewToEdit = true,
+
+            // This is for giggles, to show that the editor can be moved around.
+            Arrangement = ViewArrangement.Movable,
+            Y = Pos.AnchorEnd ()
+        };
+
+        viewportSettingsEditor.Border.Thickness = new Thickness (1, 2, 1, 1);
+
+        Button appButton = new () { X = Pos.Center (), Y = 1, Text = "_SubView of Window" };
+        appWindow.Add (appButton);
 
         Window window = new ()
         {
-            Title = "The _Window",
-            Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable,
-            Width = Dim.Fill (editor),
-            Height = Dim.Fill ()
+            Title = "The _Window - The Title is long",
+            Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable,
+            X = 5,
+            Y = 5,
+            Width = Dim.Fill (adornmentsEditor) - 10,
+            Height = Dim.Fill (viewportSettingsEditor) - 10
         };
         appWindow.Add (window);
 
@@ -72,7 +87,7 @@ public class Adornments : Scenario
             Width = 40,
             Height = 6 // TODO: Use Dim.Auto
         };
-        label.Border!.Thickness = new Thickness (1, 3, 1, 1);
+        label.Border.Thickness = new Thickness (1, 3, 1, 1);
 
         Button btnButtonInWindow = new () { X = Pos.AnchorEnd (), Y = Pos.AnchorEnd (), Text = "Button" };
 
@@ -85,20 +100,86 @@ public class Adornments : Scenario
             SchemeName = "Dialog"
         };
 
-        window.Margin!.Data = "Margin";
-        window.Margin!.Text = "Margin Text";
-        window.Margin!.Thickness = new Thickness (3);
+        window.Margin.GetOrCreateView ();
+        window.Margin.View?.Text = "Margin Text";
+        window.Margin.Thickness = new Thickness (0);
 
-        window.Border!.Data = "Border";
-        window.Border!.Text = "Border Text";
-        window.Border!.Thickness = new Thickness (5);
-        window.Border!.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
+        window.Border.GetOrCreateView ();
 
-        window.Padding!.Data = "Padding";
-        window.Padding.Text = "Padding Text line 1\nPadding Text line 3\nPadding Text line 3\nPadding Text line 4\nPadding Text line 5";
-        window.Padding.Thickness = new Thickness (4);
-        window.Padding!.SetScheme (SchemeManager.GetScheme (Schemes.Menu));
-        window.Padding.CanFocus = true;
+        //window.Border.View.Text = "Border Text";
+        window.Border.Thickness = new Thickness (3);
+
+        //window.Border.View?.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
+
+        window.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        window.BorderStyle = LineStyle.Rounded;
+
+        // Enable dragging the tab title to slide it by changing TabOffset.
+        // Hook into TitleView.MouseEvent — it fires before the Arranger, so no conflict.
+        Point? dragStart = null;
+        var dragStartOffset = 0;
+        var tabDragHooked = false;
+
+        window.DrawComplete += (_, _) =>
+                               {
+                                   if (tabDragHooked || ((BorderView)window.Border.View!).TitleView is not { } tabTitle)
+                                   {
+                                       return;
+                                   }
+
+                                   tabDragHooked = true;
+                                   var bv = (BorderView)window.Border.View!;
+
+                                   tabTitle.MouseEvent += (_, mouse) =>
+                                                          {
+                                                              // Start drag
+                                                              if (!dragStart.HasValue && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+                                                              {
+                                                                  dragStart = mouse.ScreenPosition;
+                                                                  dragStartOffset = bv.TabOffset;
+                                                                  window.App?.Mouse.GrabMouse (tabTitle);
+                                                                  mouse.Handled = true;
+                                                              }
+
+                                                              // Dragging
+                                                              if (dragStart.HasValue
+                                                                  && mouse.Flags is (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
+                                                              {
+                                                                  int delta = bv.TabSide is Side.Top or Side.Bottom
+                                                                                  ? mouse.ScreenPosition.X - dragStart.Value.X
+                                                                                  : mouse.ScreenPosition.Y - dragStart.Value.Y;
+
+                                                                  int tabLen = bv.TabLength ?? 0;
+
+                                                                  // Content border edge length (the side the tab slides along)
+                                                                  int edgeLen = bv.TabSide is Side.Top or Side.Bottom
+                                                                                    ? window.Frame.Width
+                                                                                      - window.Border.Thickness.Left
+                                                                                      - window.Border.Thickness.Right
+                                                                                    : window.Frame.Height
+                                                                                      - window.Border.Thickness.Top
+                                                                                      - window.Border.Thickness.Bottom;
+
+                                                                  int newOffset = Math.Clamp (dragStartOffset + delta, 1 - tabLen, edgeLen - 1);
+
+                                                                  bv.TabOffset = newOffset;
+                                                                  mouse.Handled = true;
+                                                              }
+
+                                                              // Release
+                                                              if (!mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased) || !dragStart.HasValue)
+                                                              {
+                                                                  return;
+                                                              }
+                                                              dragStart = null;
+                                                              window.App?.Mouse.UngrabMouse ();
+                                                              mouse.Handled = true;
+                                                          };
+                               };
+        window.Padding.View?.Text = "Padding Text line 1\nPadding Text line 3\nPadding Text line 3\nPadding Text line 4\nPadding Text line 5";
+        window.Padding.Thickness = new Thickness (1);
+        window.Padding.View?.SetScheme (SchemeManager.GetScheme (Schemes.Menu));
+        window.Padding.View?.CanFocus = true;
 
         Label longLabel = new () { X = 40, Y = 5, Title = "This is long text (in a label) that should clip." };
         longLabel.TextFormatter.WordWrap = true;
@@ -106,23 +187,23 @@ public class Adornments : Scenario
 
         window.Initialized += (_, _) =>
                               {
-                                  editor.ViewToEdit = window;
+                                  adornmentsEditor.ViewToEdit = window;
 
-                                  editor.ShowViewIdentifier = true;
+                                  adornmentsEditor.ShowViewIdentifier = true;
 
                                   // NOTE: Adding SubViews to Margin is not supported
 
-                                  Button btnButtonInBorder = new () { X = Pos.Center (), Y = 1, Text = "Button in Border _Y = 1" };
+                                  Button btnButtonInBorder = new () { X = Pos.Center (), Y = Pos.AnchorEnd (), Text = "Button in Border Y = AnchorEnd" };
 
                                   btnButtonInBorder.Accepting += (_, args) =>
                                                                  {
                                                                      MessageBox.Query (appWindow.App!, 20, 7, "Hi", "Button in Border Pressed!", "Ok");
                                                                      args.Handled = true;
                                                                  };
-                                  window.Border.Add (btnButtonInBorder);
+                                  window.Border.GetOrCreateView ().Add (btnButtonInBorder);
 
                                   Label labelInPadding = new () { X = 0, Y = 1, Title = "_Text:" };
-                                  window.Padding.Add (labelInPadding);
+                                  window.Padding.GetOrCreateView ().Add (labelInPadding);
 
                                   TextField textFieldInPadding = new ()
                                   {
@@ -131,7 +212,7 @@ public class Adornments : Scenario
 
                                   textFieldInPadding.Accepting +=
                                       (_, _) => MessageBox.Query (appWindow.App!, 20, 7, "TextField", textFieldInPadding.Text, "Ok");
-                                  window.Padding.Add (textFieldInPadding);
+                                  window.Padding.GetOrCreateView ().Add (textFieldInPadding);
 
                                   Button btnButtonInPadding = new () { X = Pos.Center (), Y = 1, Text = "_Button in Padding Y = 1", CanFocus = true };
 
@@ -140,13 +221,13 @@ public class Adornments : Scenario
                                                                       MessageBox.Query (appWindow.App!, 20, 7, "Hi", "Button in Padding Pressed!", "Ok");
                                                                       args.Handled = true;
                                                                   };
-                                  window.Padding.Add (btnButtonInPadding);
+                                  window.Padding.GetOrCreateView ().Add (btnButtonInPadding);
 
 #if SUBVIEW_BASED_BORDER
-                                btnButtonInPadding.Border!.CloseButton.Visible = true;
+                                btnButtonInPadding.Border.CloseButton.Visible = true;
 
-                                view.Border!.CloseButton.Visible = true;
-                                view.Border!.CloseButton.Accept += (_, _) =>
+                                view.Border.CloseButton.Visible = true;
+                                view.Border.CloseButton.Accept += (_, _) =>
                                                                   {
                                                                       MessageBox.Query (20, 7, "Hi", "Window Close Button Pressed!", "Ok");
                                                                       e.Handled = true;
@@ -156,9 +237,22 @@ public class Adornments : Scenario
 #endif
                               };
 
-        editor.AutoSelectViewToEdit = true;
-        editor.AutoSelectSuperView = window;
-        editor.AutoSelectAdornments = true;
+        adornmentsEditor.AutoSelectViewToEdit = true;
+        adornmentsEditor.AutoSelectSuperView = window;
+        adornmentsEditor.AutoSelectAdornments = true;
+
+        viewportSettingsEditor.AutoSelectViewToEdit = true;
+        viewportSettingsEditor.AutoSelectSuperView = window;
+        viewportSettingsEditor.AutoSelectAdornments = true;
+        viewportSettingsEditor.ShowViewIdentifier = true;
+
+        appWindow.Add (adornmentsEditor, viewportSettingsEditor);
+
+        appWindow.DrawingContent += (_, e) =>
+                                    {
+                                        appWindow.FillRect (appWindow.Viewport, Glyphs.Diamond);
+                                        e.Cancel = true;
+                                    };
 
         app.Run (appWindow);
     }

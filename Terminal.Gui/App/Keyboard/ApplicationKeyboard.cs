@@ -73,7 +73,7 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
                     return true;
                 }
 
-                if (runnable!.IsModal)
+                if (runnable is { IsModal: true })
                 {
                     break;
                 }
@@ -121,7 +121,7 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
                         return true;
                     }
 
-                    if (runnable!.IsModal)
+                    if (runnable is { IsModal: true })
                     {
                         break;
                     }
@@ -256,17 +256,12 @@ internal class ApplicationKeyboard : IKeyboard, IDisposable
                         {
                             viewToArrange = viewToArrange switch
                                             {
-                                                Adornment adornmentView => adornmentView.Parent,
+                                                AdornmentView adornmentView => adornmentView.Adornment?.Parent,
                                                 _ => viewToArrange.SuperView
                                             };
                         }
 
-                        if (viewToArrange is { })
-                        {
-                            return viewToArrange.Border?.Arranger.EnterArrangeMode (ViewArrangement.Fixed);
-                        }
-
-                        return false;
+                        return viewToArrange is { } ? (viewToArrange.Border.View as BorderView)?.Arranger.EnterArrangeMode (ViewArrangement.Fixed) : false;
                     });
 
         // Bind keys from DefaultKeyBindings

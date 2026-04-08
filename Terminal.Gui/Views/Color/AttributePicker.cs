@@ -1,7 +1,3 @@
-// Claude - Opus 4.5
-
-using System.Diagnostics;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -35,7 +31,6 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
                                               out _);
     }
 
-
     /// <summary>
     ///     Raised when <see cref="Value"/> is about to change.
     ///     Set <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/> to cancel the change.
@@ -47,7 +42,7 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
     /// </summary>
     public event EventHandler<ValueChangedEventArgs<Attribute?>>? ValueChanged;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     private ColorPicker? _foregroundPicker;
@@ -65,11 +60,12 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
         get => _sampleText;
         set
         {
-            if (_sampleText != value)
+            if (_sampleText == value)
             {
-                _sampleText = value;
-                UpdateSampleLabel ();
+                return;
             }
+            _sampleText = value;
+            UpdateSampleLabel ();
         }
     }
 
@@ -81,26 +77,19 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
         CanFocus = true;
         TabStop = TabBehavior.TabStop;
         Height = Dim.Auto ();
-        Width = Dim.Fill (0, minimumContentDim: 64);
+        Width = Dim.Fill (0, 64);
         CommandsToBubbleUp = [Command.Accept];
         SetupSubViews ();
     }
 
     private void SetupSubViews ()
     {
-        ColorPickerStyle colorPickerStyle = new ()
-        {
-            ShowTextFields = true,
-            ShowColorName = true
-        };
+        ColorPickerStyle colorPickerStyle = new () { ShowTextFields = true, ShowColorName = true };
 
         // Create foreground picker - offset X = -1 for border auto-joining with parent
         _foregroundPicker = new ColorPicker
         {
-            Title = "Foreground",
-            BorderStyle = LineStyle.Single,
-            SuperViewRendersLineCanvas = true,
-            Style = colorPickerStyle,
+            Title = "Foreground", BorderStyle = LineStyle.Single, SuperViewRendersLineCanvas = true, Style = colorPickerStyle
         };
         _foregroundPicker.ValueChanged += OnForegroundColorChanged;
         _foregroundPicker.ApplyStyleChanges ();
@@ -130,7 +119,7 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
             Width = Dim.Auto (),
             Height = Dim.Height (_foregroundPicker) + Dim.Height (_backgroundPicker) - 1
         };
-        _styleSelector.Width = _styleSelector.GetWidthRequiredForSubViews () + _styleSelector.GetAdornmentsThickness ().Horizontal;
+        _styleSelector.Width = _styleSelector.GetAutoWidth ();
         _styleSelector.ValueChanged += OnStyleChanged;
 
         // Set color picker widths relative to style selector
@@ -156,16 +145,6 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
     }
 
     /// <summary>
-    ///     Performs the work after value change is confirmed (sync subviews, update sample).
-    /// </summary>
-    private void DoValueChanged (Attribute? newValue)
-    {
-        _value = newValue;
-        SyncSubViewsToValue ();
-        UpdateSampleLabel ();
-    }
-
-    /// <summary>
     ///     Called before <see cref="Value"/> changes. Return <see langword="true"/> to cancel the change.
     /// </summary>
     protected virtual bool OnValueChanging (ValueChangingEventArgs<Attribute?> args) => false;
@@ -173,7 +152,8 @@ public class AttributePicker : View, IValue<Attribute?>, IDesignable
     /// <summary>
     ///     Called after <see cref="Value"/> has changed.
     /// </summary>
-    protected virtual void OnValueChanged (ValueChangedEventArgs<Attribute?> args) => ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (args.OldValue, args.NewValue));
+    protected virtual void OnValueChanged (ValueChangedEventArgs<Attribute?> args) =>
+        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (args.OldValue, args.NewValue));
 
     private void OnForegroundColorChanged (object? sender, ValueChangedEventArgs<Color?> e) => UpdateValueFromSubViews ();
 
