@@ -14,7 +14,6 @@ This deep dive covers Border's rendering modes, the tab header system, and how `
 - [Tab Offset and Clipping](#tab-offset-and-clipping)
 - [Auto-Join with SuperViewRendersLineCanvas](#auto-join-with-superviewrenderslinecanvas)
 - [Border Line Positioning](#border-line-positioning)
-- [Implementation: TitleView](#implementation-tabtitleview)
 - [Arrangement (Move and Resize)](#arrangement-move-and-resize)
 
 ---
@@ -23,10 +22,10 @@ This deep dive covers Border's rendering modes, the tab header system, and how `
 
 Every [View](~/api/Terminal.Gui.ViewBase.View.yml) has a `Border` adornment accessible via `View.Border`. The border's appearance is controlled by:
 
-- **`View.BorderStyle`** ([BorderStyle](~/api/Terminal.Gui.ViewBase.BorderStyle.yml)) — Helper property that sets `Border.LineStyle`, `Border.Settings`, and `Border.Thickness` to common presets for different line styles. 
+- **`View.BorderStyle`** ([BorderStyle](~/api/Terminal.Gui.ViewBase.View.BorderStyle.yml)) — Helper property that sets `Border.LineStyle`, `Border.Settings`, and `Border.Thickness` to common presets for different line styles. 
 - **`View.Border.Settings`** ([BorderSettings](~/api/Terminal.Gui.ViewBase.BorderSettings.yml)) — Flags controlling title and tab rendering.
-- **`View.Border.LineStyle`** ([LineStyle](~/api/Terminal.Gui.ViewBase.LineStyle.yml)) — Which line-drawing characters to use for the border.
-- **`View.Border.Thickness`** ([Thickness](~/api/Terminal.Gui.Drawing.Thickness.yml)) — How many rows/columns each side occupies.
+- **`View.Border.LineStyle`** ([LineStyle](~/api/Terminal.Gui.ViewBase.Border.LineStyle.yml)) — Which line-drawing characters to use for the border.
+- **`View.Border.Thickness`** ([Thickness](~/api/Terminal.Gui.ViewBase.IAdornment.Thickness.yml)) — How many rows/columns each side occupies.
 
 When `BorderStyle` is set to a non-`None` value, it implicitly sets `Border.Settings` to include `BorderSettings.Title`, enabling title rendering based on the thickness of the top border.
 
@@ -34,9 +33,9 @@ The border is rendered by [BorderView](~/api/Terminal.Gui.ViewBase.BorderView.ym
 
 ---
 
-## `BorderSettings.Default | BorderSettings.Title` — Title Rendering by Thickness
+## Title Rendering by Thickness
 
-The `Thickness` on the title side determines how many rows (or columns) the border occupies and how the title is rendered within that space.
+When `BorderSettings.Default | BorderSettings.Title` is set, the `Thickness` on the title side determines how many rows (or columns) the border occupies and how the title is rendered within that space.
 
 ### `Thickness.Top == 1` — Title Inline on Border Line
 
@@ -77,7 +76,7 @@ Identical rendering to thickness 3, with additional empty rows above. The title 
 
 ---
 
-## `BorderSettings.Default | BorderSettings.Title | BorderSettings.Tab` - Tab Style Borders
+## Tab Style Borders
 
 When `Border.Settings` includes `BorderSettings.Tab`, the border renders a **tab header** — a small rectangle containing the View's `Title` that protrudes from one side of the content border. This is the foundation for building tabbed interfaces.
 
@@ -393,7 +392,7 @@ The key change: `DoDrawAdornmentsSubViews` now runs **before** `DoRenderLineCanv
 
 ## Arrangement (Move and Resize)
 
-The [BorderView](~/api/Terminal.Gui.ViewBase.BorderView.yml) provides the interactive surface for mouse-driven move and resize operations. This is powered by the [Arranger](~/api/Terminal.Gui.ViewBase.Arranger.yml) class, which is lazily created by `BorderView` and handles all mouse hit-testing and drag operations.
+The [BorderView](~/api/Terminal.Gui.ViewBase.BorderView.yml) provides the interactive surface for keyboard and mouse-driven move and resize operations.
 
 For a comprehensive guide to the arrangement system (including keyboard-based arrangement, overlapped layouts, and splitter patterns), see the [View Arrangement Deep Dive](arrangement.md).
 
