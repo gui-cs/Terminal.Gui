@@ -170,7 +170,7 @@ User presses Space on CheckBox
 
 ## Architecture Overview
 
-The <xref:Terminal.Gui.Input.Command> system provides a standardized framework for view actions (selecting, accepting, activating). It integrates with keyboard/mouse input handling and uses the *Cancellable Work Pattern* for extensibility and cancellation. As commands propagate through the view hierarchy, each <xref:Terminal.Gui.IValue>-implementing view appends its value to the <xref:Terminal.Gui.Input.ICommandContext.Values> chain, enabling ancestors to inspect the full value history (see [Value Propagation](#value-propagation)).
+The Command system provides a standardized framework for view actions (selecting, accepting, activating). It integrates with keyboard/mouse input handling and uses the *Cancellable Work Pattern* for extensibility and cancellation. As commands propagate through the view hierarchy, each `IValue`-implementing view appends its value to the `ICommandContext.Values` chain, enabling ancestors to inspect the full value history (see [Value Propagation](#value-propagation)).
 
 Central concepts:
 
