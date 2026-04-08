@@ -60,7 +60,7 @@ PowerShell script to delist old NuGet packages, keeping only the most recent ver
 - **Alpha packages** (`2.0.0-alpha.*`): Keeps only the just-published version (or most recent if not specified)
 - **Beta packages** (`2.0.0-beta.*`): Keeps only the just-published version (or most recent if not specified)
 
-This script is automatically run by the `publish.yml` workflow when publishing from the `v2_release` branch.
+This script is currently intended to be run manually when old NuGet packages need to be delisted; it is not currently run automatically by `publish.yml`.
 
 ### LICENSE
 MIT License

@@ -1026,7 +1026,7 @@ ConfigurationManager.Enable(ConfigLocations.Runtime);
 - **[Drawing Deep Dive](drawing.md)** - Color and attribute system
 - **[View Deep Dive](View.md)** - View configuration properties
 - **[Theme Schema](https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json)** - JSON schema for validation
-- **[Default Config](https://raw.githubusercontent.com/gui-cs/Terminal.Gui/v2_develop/Terminal.Gui/Resources/config.json)** - Complete default configuration
+- **[Default Config](https://raw.githubusercontent.com/gui-cs/Terminal.Gui/develop/Terminal.Gui/Resources/config.json)** - Complete default configuration
 
 ### UICatalog Examples
 
