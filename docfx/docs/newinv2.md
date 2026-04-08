@@ -290,16 +290,15 @@ Color color = Color.Yellow; // Was "Brown" in v1
 
 See the [Layout Deep Dive](layout.md) for complete details.
 
-v2 introduces a comprehensive [Adornment](~/api/Terminal.Gui.ViewBase.IAdornment.yml) system with lightweight adornments that lazily create Views when needed:
+v2 introduces a comprehensive [Adornment](<xref:Terminal.Gui.ViewBase.IAdornment>) system with lightweight adornments that lazily create Views when needed:
 
-- **[Margin](~/api/Terminal.Gui.ViewBase.Margin.yml)** - Transparent spacing outside the border
-- **[Border](~/api/Terminal.Gui.ViewBase.Border.yml)** - Visual frame with title, multiple styles
-- **[Padding](~/api/Terminal.Gui.ViewBase.Padding.yml)** - Spacing inside the border
-
+- **[Margin](<xref:Terminal.Gui.ViewBase.Margin>)** - Transparent spacing outside the border
+- **[Border](<xref:Terminal.Gui.ViewBase.Border>)** - Visual frame with title, multiple styles
+- **[Padding](<xref:Terminal.Gui.ViewBase.Padding>)** - Spacing inside the border
 **Border Features:**
-- Multiple [LineStyle](~/api/Terminal.Gui.Drawing.LineStyle.yml) options: Single, Double, Heavy, Rounded, Dashed, Dotted
-- Automatic line intersection handling via [LineCanvas](~/api/Terminal.Gui.Drawing.LineCanvas.yml)
-- Configurable thickness per side via [Thickness](~/api/Terminal.Gui.Drawing.Thickness.yml)
+- Multiple [LineStyle](<xref:Terminal.Gui.Drawing.LineStyle>) options: Single, Double, Heavy, Rounded, Dashed, Dotted
+- Automatic line intersection handling via [LineCanvas](<xref:Terminal.Gui.Drawing.LineCanvas>)
+- Configurable thickness per side via [Thickness](<xref:Terminal.Gui.Drawing.Thickness>)
 - Title display with alignment options
 
 ```csharp

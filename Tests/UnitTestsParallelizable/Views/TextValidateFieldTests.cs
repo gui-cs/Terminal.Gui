@@ -699,6 +699,16 @@ public class TextValidateField_Regex_Provider_Tests : TestDriverBase
         Assert.False (field.IsValid);
     }
 
+    [Fact]
+    public void KittyAssociatedText_ShiftedPrintableKey_UsesAssociatedText ()
+    {
+        TextValidateField field = new () { Width = 20, Provider = new TextRegexProvider ("^!$") { ValidateOnInput = false } };
+        Key kittyKey = new ('!') { AssociatedText = "!" };
+
+        Assert.True (field.NewKeyDownEvent (kittyKey));
+        Assert.Equal ("!", field.Text);
+    }
+
     // Claude - Opus 4.6
     [Fact]
     public void Right_Key_At_End_DoesNotMoveBackward ()

@@ -6,7 +6,7 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Unicode", "Tries to test Unicode in all controls (#204)")]
 [ScenarioCategory ("Text and Formatting")]
-[ScenarioCategory ("Controls")]
+[ScenarioCategory ("Unicode")]
 public class UnicodeInMenu : Scenario
 {
     public override void Main ()

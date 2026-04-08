@@ -136,8 +136,66 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
     /// </summary>
     /// <param name="schemeName"></param>
     /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
+    /// <exception cref="KeyNotFoundException">If <paramref name="schemeName"/> is not found in the current theme.</exception>
     public static Scheme GetScheme (string schemeName) { return GetSchemesForCurrentTheme ()! [schemeName]!; }
+
+    /// <summary>
+    ///     Attempts to get the <see cref="Scheme"/> for the specified name without throwing.
+    ///     Returns <see langword="false"/> and sets <paramref name="scheme"/> to <see langword="null"/> if the scheme is
+    ///     not found, or if the configuration is not in a state where schemes can be resolved.
+    /// </summary>
+    /// <param name="schemeName">The name of the scheme to retrieve.</param>
+    /// <param name="scheme">
+    ///     When this method returns <see langword="true"/>, contains the resolved <see cref="Scheme"/>; otherwise
+    ///     <see langword="null"/>.
+    /// </param>
+    /// <returns><see langword="true"/> if the scheme was found; otherwise <see langword="false"/>.</returns>
+    public static bool TryGetScheme (string schemeName, [NotNullWhen (true)] out Scheme? scheme)
+    {
+        lock (_schemesLock)
+        {
+            Dictionary<string, Scheme?> schemes;
+
+            if (!ConfigurationManager.IsInitialized ())
+            {
+                // Module initializer / unit-test path — fall back to hard-coded defaults.
+                ImmutableSortedDictionary<string, Scheme?>? hardCoded = GetHardCodedSchemes ();
+
+                if (hardCoded is null)
+                {
+                    scheme = null;
+
+                    return false;
+                }
+
+                schemes = hardCoded.ToDictionary (StringComparer.InvariantCultureIgnoreCase);
+            }
+            else
+            {
+                // Avoid GetSchemesForCurrentTheme() — it throws if the Schemes property is absent.
+                if (ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue
+                    is not Dictionary<string, Scheme?> themeSchemes)
+                {
+                    scheme = null;
+
+                    return false;
+                }
+
+                schemes = themeSchemes;
+            }
+
+            if (schemes.TryGetValue (schemeName, out Scheme? s) && s is not null)
+            {
+                scheme = s;
+
+                return true;
+            }
+
+            scheme = null;
+
+            return false;
+        }
+    }
 
     /// <summary>
     ///     Gets the name of the specified <see cref="Schemes"/>. Will throw an exception if <paramref name="schemeName"/>

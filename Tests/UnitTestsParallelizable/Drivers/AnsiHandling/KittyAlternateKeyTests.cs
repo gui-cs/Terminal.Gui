@@ -93,30 +93,53 @@ public class KittyAlternateKeyTests
     [Fact]
     public void ViewKeyDown_ShiftedAndBase_Preserved ()
     {
-        // ESC[97:64:50;2u = 'a' with shifted '@' (64), base '2' (50), Shift modifier
-        (List<Key> appDown, List<Key> viewDown, _) = InjectRawSequenceToView ("\x1b[97:64:50;2u");
+        // Previous fixture ESC[97:64:50;2u was misleading because 'a', '@', and US-base '2' do not describe
+        // a coherent US-keyboard case.
+        // ESC[50:64;2;64u = '2' with shifted key '@' (64), Shift modifier (2),
+        // and associated text '@' (64). The redundant base-layout field is omitted because
+        // it would duplicate the primary key code on a US keyboard.
+        (List<Key> appDown, List<Key> viewDown, _) = InjectRawSequenceToView ("\x1b[50:64;2;64u");
 
         // App level
         Assert.Single (appDown);
         Assert.Equal ((KeyCode)64, appDown [0].ShiftedKeyCode);
-        Assert.Equal ((KeyCode)50, appDown [0].BaseLayoutKeyCode);
+        Assert.Equal (KeyCode.Null, appDown [0].BaseLayoutKeyCode);
+        Assert.Equal ("@", appDown [0].AssociatedText);
 
         // View level — same alternate key fields must arrive
         Assert.Single (viewDown);
-        Assert.Equal (Key.A.WithShift, viewDown [0]);
+        Assert.Equal (new Key ('@'), viewDown [0]);
         Assert.Equal ((KeyCode)64, viewDown [0].ShiftedKeyCode);
-        Assert.Equal ((KeyCode)50, viewDown [0].BaseLayoutKeyCode);
+        Assert.Equal (KeyCode.Null, viewDown [0].BaseLayoutKeyCode);
+        Assert.Equal ("@", viewDown [0].AssociatedText);
+    }
+
+    [Fact]
+    public void ViewKeyDown_AssociatedText_Preserved ()
+    {
+        // ESC[49;2;33u = physical '1' key with Shift modifier and associated text '!'
+        (List<Key> appDown, List<Key> viewDown, _) = InjectRawSequenceToView ("\x1b[49;2;33u");
+
+        Assert.Single (appDown);
+        Assert.Equal ("!", appDown [0].AssociatedText);
+        Assert.Equal ("!", appDown [0].GetPrintableText ());
+
+        Assert.Single (viewDown);
+        Assert.Equal (new Key ('!'), viewDown [0]);
+        Assert.Equal ("!", viewDown [0].AssociatedText);
+        Assert.Equal ("!", viewDown [0].GetPrintableText ());
     }
 
     // Copilot - Opus 4.6
     [Fact]
     public void ViewKeyDown_ShiftedOnly_Preserved ()
     {
-        // ESC[97:64u = 'a' with shifted '@' (64), no base layout, no modifier field
-        (_, List<Key> viewDown, _) = InjectRawSequenceToView ("\x1b[97:64u");
+        // Previous fixture ESC[97:64u was misleading because 'a' -> '@' is not a sensible US-keyboard example.
+        // ESC[50:64u = '2' with shifted '@' (64), no base layout, no modifier field
+        (_, List<Key> viewDown, _) = InjectRawSequenceToView ("\x1b[50:64u");
 
         Assert.Single (viewDown);
-        Assert.Equal (Key.A, viewDown [0]);
+        Assert.Equal (Key.D2, viewDown [0]);
         Assert.Equal ((KeyCode)64, viewDown [0].ShiftedKeyCode);
         Assert.Equal (KeyCode.Null, viewDown [0].BaseLayoutKeyCode);
     }
@@ -125,11 +148,11 @@ public class KittyAlternateKeyTests
     [Fact]
     public void ViewKeyDown_BaseLayoutOnly_Preserved ()
     {
-        // ESC[97:0:50u = 'a' with no shifted (0), base layout '2' (50)
-        (_, List<Key> viewDown, _) = InjectRawSequenceToView ("\x1b[97:0:50u");
+        // ESC[50:0:50u = '2' with no shifted (0), base layout '2' (50)
+        (_, List<Key> viewDown, _) = InjectRawSequenceToView ("\x1b[50:0:50u");
 
         Assert.Single (viewDown);
-        Assert.Equal (Key.A, viewDown [0]);
+        Assert.Equal (Key.D2, viewDown [0]);
         Assert.Equal (KeyCode.Null, viewDown [0].ShiftedKeyCode);
         Assert.Equal ((KeyCode)50, viewDown [0].BaseLayoutKeyCode);
     }
@@ -151,13 +174,13 @@ public class KittyAlternateKeyTests
     [Fact]
     public void ViewKeyDown_WithModifiersAndEventType_Preserved ()
     {
-        // ESC[97:64:50;6:1u = 'a', shifted '@', base '2', Ctrl+Shift (6), press (1)
-        (_, List<Key> viewDown, _) = InjectRawSequenceToView ("\x1b[97:64:50;6:1u");
+        // ESC[50:64;6:1u = coherent US-keyboard example: '2', shifted '@', Ctrl+Shift, press
+        (_, List<Key> viewDown, _) = InjectRawSequenceToView ("\x1b[50:64;6:1u");
 
         Assert.Single (viewDown);
-        Assert.Equal (Key.A.WithCtrl.WithShift, viewDown [0]);
+        Assert.Equal (new Key ('@').WithCtrl, viewDown [0]);
         Assert.Equal ((KeyCode)64, viewDown [0].ShiftedKeyCode);
-        Assert.Equal ((KeyCode)50, viewDown [0].BaseLayoutKeyCode);
+        Assert.Equal (KeyCode.Null, viewDown [0].BaseLayoutKeyCode);
         Assert.Equal (KeyEventType.Press, viewDown [0].EventType);
     }
 
@@ -165,27 +188,28 @@ public class KittyAlternateKeyTests
     [Fact]
     public void ViewKeyUp_AlternateKeys_Preserved ()
     {
-        // ESC[97:64:50;2:3u = 'a', shifted '@', base '2', Shift (2), release (3)
-        (_, List<Key> viewDown, List<Key> viewUp) = InjectRawSequenceToView ("\x1b[97:64:50;2:3u");
+        // ESC[50:64;2:3u = coherent US-keyboard example, Shift, release
+        (_, List<Key> viewDown, List<Key> viewUp) = InjectRawSequenceToView ("\x1b[50:64;2:3u");
 
         // Release events go to KeyUp, not KeyDown
         Assert.Empty (viewDown);
         Assert.Single (viewUp);
-        Assert.Equal (Key.A.WithShift, viewUp [0]);
+        Assert.Equal (new Key ('@'), viewUp [0]);
         Assert.Equal ((KeyCode)64, viewUp [0].ShiftedKeyCode);
-        Assert.Equal ((KeyCode)50, viewUp [0].BaseLayoutKeyCode);
+        Assert.Equal (KeyCode.Null, viewUp [0].BaseLayoutKeyCode);
         Assert.Equal (KeyEventType.Release, viewUp [0].EventType);
+        Assert.Equal (string.Empty, viewUp [0].AssociatedText);
     }
 
     // Copilot - Opus 4.6
     [Fact]
     public void ViewKeyDown_FullCycle_PressRepeatRelease ()
     {
-        // Simulates holding Shift+'a': press → repeat → release
+        // Simulates holding Shift+'2': press → repeat → release
         // All three should carry the same alternate key fields
-        (_, List<Key> viewDown, List<Key> viewUp) = InjectRawSequenceToView ("\x1b[97:64:50;2:1u", // press
-                                                                             "\x1b[97:64:50;2:2u", // repeat
-                                                                             "\x1b[97:64:50;2:3u" // release
+        (_, List<Key> viewDown, List<Key> viewUp) = InjectRawSequenceToView ("\x1b[50:64;2;64u", // press
+                                                                             "\x1b[50:64;2:2u", // repeat
+                                                                             "\x1b[50:64;2:3u" // release
                                                                             );
 
         Assert.Equal (2, viewDown.Count);
@@ -201,8 +225,12 @@ public class KittyAlternateKeyTests
         foreach (Key k in all)
         {
             Assert.Equal ((KeyCode)64, k.ShiftedKeyCode);
-            Assert.Equal ((KeyCode)50, k.BaseLayoutKeyCode);
+            Assert.Equal (KeyCode.Null, k.BaseLayoutKeyCode);
         }
+
+        Assert.Equal ("@", viewDown [0].AssociatedText);
+        Assert.Equal (string.Empty, viewDown [1].AssociatedText);
+        Assert.Equal (string.Empty, viewUp [0].AssociatedText);
     }
 
     // Copilot - Opus 4.6

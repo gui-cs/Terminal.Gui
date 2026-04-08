@@ -244,7 +244,7 @@ Each <xref:Terminal.Gui.Drawing.StraightLine> is always horizontal or vertical. 
 
 When you call `GetCellMap()`, the canvas walks every point within its bounds:
 
-1. **Collect intersections.** For each point, every line that passes through it produces an <xref:Terminal.Gui.Drawing.IntersectionDefinition> describing *how* the line relates to that point — does it pass over horizontally? Start here going right? End here from below?
+1. **Collect intersections.** For each point, every line that passes through it produces an `IntersectionDefinition` describing *how* the line relates to that point — does it pass over horizontally? Start here going right? End here from below?
 
 2. **Determine glyph type.** The set of intersection types at a point is analyzed to decide the glyph category: corner, T-junction, cross, straight line, etc. For example, `{StartRight, StartDown}` = upper-left corner (`┌`).
 

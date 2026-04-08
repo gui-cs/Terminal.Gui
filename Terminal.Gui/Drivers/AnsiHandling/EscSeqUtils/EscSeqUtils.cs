@@ -903,10 +903,15 @@ public static class EscSeqUtils
 
     /// <summary>
     ///     The kitty keyboard flags that Terminal.Gui requests when kitty keyboard protocol is supported.
-    ///     Currently: disambiguate escape codes + report event types + report alternate keys + report all keys as escape codes.
+    ///     Currently: disambiguate escape codes + report event types + report alternate keys
+    ///     + report all keys as escape codes + report associated text.
     /// </summary>
     public const KittyKeyboardFlags KittyKeyboardRequestedFlags =
-        KittyKeyboardFlags.DisambiguateEscapeCodes | KittyKeyboardFlags.ReportEventTypes | KittyKeyboardFlags.ReportAlternateKeys | KittyKeyboardFlags.ReportAllKeysAsEscapeCodes;
+        KittyKeyboardFlags.DisambiguateEscapeCodes
+        | KittyKeyboardFlags.ReportEventTypes
+        | KittyKeyboardFlags.ReportAlternateKeys
+        | KittyKeyboardFlags.ReportAllKeysAsEscapeCodes
+        | KittyKeyboardFlags.ReportAssociatedText;
 
     /// <summary>
     ///     ESC [ &gt; flags u - Push current kitty keyboard flags and enable the specified flags.

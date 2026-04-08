@@ -57,6 +57,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Docs", "Docs", "{C7A51224-5
 		docfx\docs\ansihandling.md = docfx\docs\ansihandling.md
 		docfx\docs\application.md = docfx\docs\application.md
 		docfx\docs\arrangement.md = docfx\docs\arrangement.md
+		docfx\docs\borders.md = docfx\docs\borders.md
 		docfx\docs\cancellable-work-pattern.md = docfx\docs\cancellable-work-pattern.md
 		.github\CODEOWNERS = .github\CODEOWNERS
 		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md

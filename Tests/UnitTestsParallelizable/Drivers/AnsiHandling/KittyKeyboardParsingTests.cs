@@ -342,11 +342,12 @@ public class KittyKeyboardParsingTests
     [Fact]
     public void KittyPattern_AlternateKeys_ShiftedOnly ()
     {
-        // ESC[97:64u = 'a' with shifted key '@' (codepoint 64)
-        Key? key = _pattern.GetKey ("\u001b[97:64u");
+        // Previous fixture ESC[97:64u was misleading because 'a' -> '@' is not a sensible US-keyboard example.
+        // ESC[50:64u = '2' with shifted key '@' (codepoint 64)
+        Key? key = _pattern.GetKey ("\u001b[50:64u");
 
         Assert.NotNull (key);
-        Assert.Equal (Key.A, key);
+        Assert.Equal (Key.D2, key);
         Assert.Equal ((KeyCode)64, key.ShiftedKeyCode);
         Assert.Equal (KeyCode.Null, key.BaseLayoutKeyCode);
     }
@@ -355,11 +356,12 @@ public class KittyKeyboardParsingTests
     [Fact]
     public void KittyPattern_AlternateKeys_ShiftedAndBaseLayout ()
     {
-        // ESC[97:64:50u = 'a' with shifted key '@' (64) and base layout key '2' (50)
-        Key? key = _pattern.GetKey ("\u001b[97:64:50u");
+        // Previous fixture ESC[97:64:50u was internally inconsistent for a US-keyboard example.
+        // ESC[50:64:50u = '2' with shifted key '@' (64) and base layout key '2' (50)
+        Key? key = _pattern.GetKey ("\u001b[50:64:50u");
 
         Assert.NotNull (key);
-        Assert.Equal (Key.A, key);
+        Assert.Equal (Key.D2, key);
         Assert.Equal ((KeyCode)64, key.ShiftedKeyCode);
         Assert.Equal ((KeyCode)50, key.BaseLayoutKeyCode);
     }
@@ -368,11 +370,11 @@ public class KittyKeyboardParsingTests
     [Fact]
     public void KittyPattern_AlternateKeys_BaseLayoutOnly ()
     {
-        // ESC[97:0:50u = 'a' with no shifted key (0) and base layout key '2' (50)
-        Key? key = _pattern.GetKey ("\u001b[97:0:50u");
+        // ESC[50:0:50u = '2' with no shifted key (0) and base layout key '2' (50)
+        Key? key = _pattern.GetKey ("\u001b[50:0:50u");
 
         Assert.NotNull (key);
-        Assert.Equal (Key.A, key);
+        Assert.Equal (Key.D2, key);
         Assert.Equal (KeyCode.Null, key.ShiftedKeyCode);
         Assert.Equal ((KeyCode)50, key.BaseLayoutKeyCode);
     }
@@ -394,27 +396,55 @@ public class KittyKeyboardParsingTests
     [Fact]
     public void KittyPattern_AlternateKeys_WithModifiers ()
     {
-        // ESC[97:64:50;2u = 'a' with shifted '@', base '2', Shift modifier
-        Key? key = _pattern.GetKey ("\u001b[97:64:50;2u");
+        // Previous fixture ESC[97:64:50;2u was misleading because 'a', '@', and US-base '2' do not describe
+        // a coherent US-keyboard case.
+        // ESC[50:64;2;64u = '2' with shifted key '@' (64), Shift modifier (2),
+        // and associated text '@' (64). The redundant base-layout field is omitted because
+        // it would duplicate the primary key code on a US keyboard.
+        Key? key = _pattern.GetKey ("\u001b[50:64;2;64u");
 
         Assert.NotNull (key);
-        Assert.Equal (Key.A.WithShift, key);
+        Assert.Equal (new Key ('@'), key);
         Assert.Equal ((KeyCode)64, key.ShiftedKeyCode);
-        Assert.Equal ((KeyCode)50, key.BaseLayoutKeyCode);
+        Assert.Equal (KeyCode.Null, key.BaseLayoutKeyCode);
+        Assert.Equal ("@", key.AssociatedText);
     }
 
     // Copilot - Opus 4.6
     [Fact]
     public void KittyPattern_AlternateKeys_WithModifiersAndEventType ()
     {
-        // ESC[97:64:50;2:3u = 'a' with shifted '@', base '2', Shift modifier, release event
-        Key? key = _pattern.GetKey ("\u001b[97:64:50;2:3u");
+        // ESC[50:64;2:3;64u = same coherent US-keyboard example, release event
+        Key? key = _pattern.GetKey ("\u001b[50:64;2:3;64u");
 
         Assert.NotNull (key);
-        Assert.Equal (Key.A.WithShift, key);
+        Assert.Equal (new Key ('@'), key);
         Assert.Equal ((KeyCode)64, key.ShiftedKeyCode);
-        Assert.Equal ((KeyCode)50, key.BaseLayoutKeyCode);
+        Assert.Equal (KeyCode.Null, key.BaseLayoutKeyCode);
         Assert.Equal (KeyEventType.Release, key.EventType);
+        Assert.Equal ("@", key.AssociatedText);
+    }
+
+    [Fact]
+    public void KittyPattern_AssociatedText_ShiftedPrintableKey ()
+    {
+        // ESC[49;2;33u = physical '1' key with Shift modifier and associated text '!'
+        Key? key = _pattern.GetKey ("\u001b[49;2;33u");
+
+        Assert.NotNull (key);
+        Assert.Equal (new Key ('!'), key);
+        Assert.Equal ("!", key.AssociatedText);
+        Assert.Equal ("!", key.GetPrintableText ());
+    }
+
+    [Fact]
+    public void KittyPattern_AssociatedText_MultipleCodePoints ()
+    {
+        // ESC[97;1;769:97u = associated text composed of combining acute accent + 'a'
+        Key? key = _pattern.GetKey ("\u001b[97;1;769:97u");
+
+        Assert.NotNull (key);
+        Assert.Equal ("\u0301a", key.AssociatedText);
     }
 
     // Copilot - Opus 4.6
@@ -451,6 +481,12 @@ public class KittyKeyboardParsingTests
         Assert.True (EscSeqUtils.KittyKeyboardRequestedFlags.HasFlag (KittyKeyboardFlags.ReportAlternateKeys),
                      $"KittyKeyboardRequestedFlags ({EscSeqUtils.KittyKeyboardRequestedFlags}) must include ReportAlternateKeys "
                      + "for international keyboard layout support.");
+
+    [Fact]
+    public void KittyRequestedFlags_IncludesReportAssociatedText () =>
+        Assert.True (EscSeqUtils.KittyKeyboardRequestedFlags.HasFlag (KittyKeyboardFlags.ReportAssociatedText),
+                     $"KittyKeyboardRequestedFlags ({EscSeqUtils.KittyKeyboardRequestedFlags}) must include ReportAssociatedText "
+                     + "for printable text fidelity.");
 
     #endregion
 }

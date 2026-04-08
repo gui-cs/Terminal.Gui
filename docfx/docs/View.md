@@ -82,13 +82,12 @@ See the [Scrolling Deep Dive](scrolling.md) for complete details.
 
 ### Adornments
 
-[Adornments](~/api/Terminal.Gui.ViewBase.IAdornment.yml) are lightweight objects that define the spacing around a View's content. When View-level features are needed (e.g., SubViews, shadows), a full [AdornmentView](~/api/Terminal.Gui.ViewBase.AdornmentView.yml) is lazily created via `GetOrCreateView()`:
+[Adornments](<xref:Terminal.Gui.ViewBase.IAdornment>) are lightweight objects that define the spacing around a View's content. When View-level features are needed (e.g., SubViews, shadows), a full [AdornmentView](<xref:Terminal.Gui.ViewBase.AdornmentView>) is lazily created via `GetOrCreateView()`:
 
-- **[Margin](~/api/Terminal.Gui.ViewBase.Margin.yml)** - Transparent spacing outside the Border
-- **[Border](~/api/Terminal.Gui.ViewBase.Border.yml)** - Visual frame with [LineStyle](~/api/Terminal.Gui.Drawing.LineStyle.yml), title, and arrangement UI
-- **[Padding](~/api/Terminal.Gui.ViewBase.Padding.yml)** - Spacing inside the Border, outside the Viewport
-
-Each adornment has a [Thickness](~/api/Terminal.Gui.Drawing.Thickness.yml) that defines the width of each side (Top, Right, Bottom, Left).
+- **[Margin](<xref:Terminal.Gui.ViewBase.Margin>)** - Transparent spacing outside the Border
+- **[Border](<xref:Terminal.Gui.ViewBase.Border>)** - Visual frame with [LineStyle](<xref:Terminal.Gui.Drawing.LineStyle>), title, and arrangement UI
+- **[Padding](<xref:Terminal.Gui.ViewBase.Padding>)** - Spacing inside the Border, outside the Viewport
+Each adornment has a [Thickness](<xref:Terminal.Gui.Drawing.Thickness>) that defines the width of each side (Top, Right, Bottom, Left).
 
 See the [Layout Deep Dive](layout.md) for complete details on adornments.
 
@@ -125,11 +124,11 @@ View is organized as a partial class across multiple files, each handling a spec
 
 See the [Command Deep Dive](command.md).
 
-- [View.AddCommand](~/api/Terminal.Gui.ViewBase.View.yml) - Declares commands the View supports
-- [View.InvokeCommand](~/api/Terminal.Gui.ViewBase.View.yml) - Invokes a command
-- [Command](~/api/Terminal.Gui.Input.Command.yml) enum - Standard set of commands (Accept, Activate, HotKey, etc.)
+- [View.AddCommand] - Declares commands the View supports
+- [View.InvokeCommand] - Invokes a command
+- [Command] enum - Standard set of commands (Accept, Activate, HotKey, etc.)
 - `CommandsToBubbleUp` - Opt-in list of commands that bubble from SubViews to this View
-- [View.DispatchDown](~/api/Terminal.Gui.ViewBase.View.yml) - Dispatches a command downward to a SubView with bubbling suppressed (inverse of `TryBubbleToSuperView`)
+- [View.DispatchDown] - Dispatches a command downward to a SubView with bubbling suppressed (inverse of `TryBubbleToSuperView`)
 - `DefaultAcceptView` - The SubView that receives <xref:Terminal.Gui.Input.Command.Accept> when no other SubView handles it
 
 ### Input Handling

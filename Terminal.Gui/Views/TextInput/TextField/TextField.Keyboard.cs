@@ -68,8 +68,13 @@ public partial class TextField
         // Needed for the Elmish Wrapper issue https://github.com/DieselMeister/Terminal.Gui.Elmish/issues/2
         _preChangeInsertionPoint = _insertionPoint;
 
+        if (a.AsRune is { } rune && rune != default (Rune) && Rune.IsControl (rune))
+        {
+            return false;
+        }
+
         // Ignore other control characters.
-        if (a is { IsKeyCodeAtoZ: false, KeyCode: < KeyCode.Space or > KeyCode.CharMask })
+        if (string.IsNullOrEmpty (a.AsGrapheme) && a is { IsKeyCodeAtoZ: false, KeyCode: < KeyCode.Space or > KeyCode.CharMask })
         {
             return false;
         }

@@ -1,4 +1,6 @@
 using System.Globalization;
+using System.Text;
+using Terminal.Gui.Drawing;
 
 namespace Terminal.Gui.Input;
 
@@ -94,6 +96,7 @@ public class Key : EventArgs, IEquatable<Key>
         ModifierKey = key.ModifierKey;
         ShiftedKeyCode = key.ShiftedKeyCode;
         BaseLayoutKeyCode = key.BaseLayoutKeyCode;
+        AssociatedText = key.AssociatedText;
     }
 
     /// <summary>Constructs a new <see cref="Key"/> from a char.</summary>
@@ -186,21 +189,96 @@ public class Key : EventArgs, IEquatable<Key>
     }
 
     /// <summary>
-    ///     The key value as a Rune. This is the actual value of the key pressed, and is independent of the modifiers.
-    ///     Useful for determining if a key represents is a printable character.
+    ///     The key value as a single grapheme cluster when the key resolves to exactly one text element.
     /// </summary>
     /// <remarks>
-    ///     <para>Keys with Ctrl or Alt modifiers will return <see langword="default"/>.</para>
+    ///     <para>Keys with Ctrl or Alt modifiers return <see cref="string.Empty"/> unless kitty associated text provides a grapheme.</para>
     ///     <para>
-    ///         If the key is a letter key (A-Z), the Rune will be the upper or lower case letter depending on whether
-    ///         <see cref="KeyCode.ShiftMask"/> is set.
+    ///         When kitty keyboard metadata is available, a single grapheme from <see cref="AssociatedText"/> is
+    ///         preferred, followed by <see cref="ShiftedKeyCode"/> for shifted printable keys.
     ///     </para>
     ///     <para>
-    ///         If the key is outside the <see cref="KeyCode.CharMask"/> range, the returned Rune will be
-    ///         <see langword="default"/>.
+    ///         Grapheme clusters may contain multiple <see cref="Rune"/> values, for example combining sequences or ZWJ emoji.
     ///     </para>
     /// </remarks>
-    public Rune AsRune => ToRune (KeyCode);
+    public string AsGrapheme
+    {
+        get
+        {
+            if (!string.IsNullOrEmpty (AssociatedText))
+            {
+                return GetSingleGraphemeOrEmpty (AssociatedText);
+            }
+
+            if (IsShift && ShiftedKeyCode != KeyCode.Null)
+            {
+                Rune shiftedRune = ToRune (ShiftedKeyCode);
+
+                if (shiftedRune != default (Rune))
+                {
+                    return shiftedRune.ToString ();
+                }
+            }
+
+            Rune rune = ToRune (KeyCode);
+
+            if (rune == default (Rune))
+            {
+                return string.Empty;
+            }
+
+            return rune.ToString ();
+        }
+    }
+
+    /// <summary>
+    ///     The key value as a <see cref="Rune"/> when the key resolves to exactly one rune.
+    ///     Useful for legacy code paths that only handle scalar input.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Keys that resolve to a grapheme composed of multiple runes, such as combining sequences or ZWJ emoji,
+    ///         return <see langword="default"/>.
+    ///     </para>
+    /// </remarks>
+    public Rune AsRune
+    {
+        get
+        {
+            if (!string.IsNullOrEmpty (AssociatedText))
+            {
+                string grapheme = GetSingleGraphemeOrEmpty (AssociatedText);
+
+                if (string.IsNullOrEmpty (grapheme))
+                {
+                    return default (Rune);
+                }
+
+                StringRuneEnumerator enumerator = grapheme.EnumerateRunes ();
+
+                if (!enumerator.MoveNext ())
+                {
+                    return default (Rune);
+                }
+
+                Rune associatedRune = enumerator.Current;
+
+                return enumerator.MoveNext () ? default (Rune) : associatedRune;
+            }
+
+            if (IsShift && ShiftedKeyCode != KeyCode.Null)
+            {
+                Rune shiftedRune = ToRune (ShiftedKeyCode);
+
+                if (shiftedRune != default (Rune))
+                {
+                    return shiftedRune;
+                }
+            }
+
+            return ToRune (KeyCode);
+        }
+    }
 
     /// <summary>
     ///     Indicates if the current Key event has already been processed and the driver should stop notifying any other
@@ -252,9 +330,13 @@ public class Key : EventArgs, IEquatable<Key>
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         When the terminal reports alternate keys, this contains the key code that would be
-    ///         produced with the current modifier state. For example, Shift+2 on a US layout
-    ///         would report <c>ShiftedKeyCode = (KeyCode)'@'</c>.
+    ///         When the terminal reports alternate keys, this contains the shifted alternate key code
+    ///         for the active layout. For example, Shift+2 on a US layout may report
+    ///         <c>ShiftedKeyCode = (KeyCode)'@'</c>.
+    ///     </para>
+    ///     <para>
+    ///         This value is metadata from kitty flag 4. It is not the same as the primary key code
+    ///         or the exact text emitted by the terminal.
     ///     </para>
     ///     <para>
     ///         Defaults to <see cref="KeyCode.Null"/> when the terminal does not report alternate keys.
@@ -275,6 +357,11 @@ public class Key : EventArgs, IEquatable<Key>
     ///         input language or modifier state.
     ///     </para>
     ///     <para>
+    ///         This is layout metadata only. It does not represent the actual text produced by the
+    ///         key event. For example, a US Shift+2 keypress may still produce <c>'@'</c> while
+    ///         <see cref="BaseLayoutKeyCode"/> remains <c>'2'</c>.
+    ///     </para>
+    ///     <para>
     ///         Defaults to <see cref="KeyCode.Null"/> when the terminal does not report alternate keys.
     ///     </para>
     ///     <para>
@@ -282,6 +369,25 @@ public class Key : EventArgs, IEquatable<Key>
     ///     </para>
     /// </remarks>
     public KeyCode BaseLayoutKeyCode { get; init; } = KeyCode.Null;
+
+    /// <summary>
+    ///     Gets the associated text reported by the kitty keyboard protocol (flag 16).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+        ///         When the terminal reports associated text, this contains the exact text produced by the key event.
+    ///         This is preferred for text insertion because it preserves layout-specific printable characters.
+    ///         For example, in kitty input like <c>ESC[50:64;2;64u</c>, the primary key code is <c>'2'</c>,
+    ///         the shifted alternate key code is <c>'@'</c>, and the associated text is also <c>'@'</c>.
+    ///     </para>
+    ///     <para>
+    ///         Defaults to <see cref="string.Empty"/> when the terminal does not report associated text.
+    ///     </para>
+    ///     <para>
+    ///         This property does not participate in equality comparisons.
+    ///     </para>
+    /// </remarks>
+    public string AssociatedText { get; init; } = string.Empty;
 
     /// <summary>
     ///     Gets a value indicating whether this <see cref="Key"/> represents a standalone modifier key event.
@@ -472,6 +578,63 @@ public class Key : EventArgs, IEquatable<Key>
         }
 
         return new Rune ((uint)baseKey);
+    }
+
+    private static string GetSingleGraphemeOrEmpty (string text)
+    {
+        string? grapheme = null;
+
+        foreach (string current in GraphemeHelper.GetGraphemes (text))
+        {
+            if (grapheme is not null)
+            {
+                return string.Empty;
+            }
+
+            grapheme = current;
+        }
+
+        return grapheme ?? string.Empty;
+    }
+
+    /// <summary>
+    ///     Gets the printable text represented by this <see cref="Key"/>, preferring kitty keyboard metadata when present.
+    /// </summary>
+    /// <remarks>
+    ///     Resolution order:
+    ///     <list type="number">
+    ///         <item><description><see cref="AssociatedText"/> when present.</description></item>
+    ///         <item><description><see cref="ShiftedKeyCode"/> when it is printable and the key is shifted.</description></item>
+    ///         <item><description><see cref="AsRune"/> as the backward-compatible fallback.</description></item>
+    ///     </list>
+    /// </remarks>
+    public string GetPrintableText ()
+    {
+        if (string.IsNullOrEmpty (AsGrapheme))
+        {
+            return string.Empty;
+        }
+
+        return AsGrapheme;
+    }
+
+    /// <summary>
+    ///     Attempts to resolve the key to a single printable <see cref="Rune"/>.
+    /// </summary>
+    /// <param name="rune">The resolved rune when successful.</param>
+    /// <returns><see langword="true"/> when exactly one printable rune is available; otherwise <see langword="false"/>.</returns>
+    public bool TryGetPrintableRune (out Rune rune)
+    {
+        rune = AsRune;
+
+        if (rune == default (Rune) || Rune.IsControl (rune))
+        {
+            rune = default (Rune);
+
+            return false;
+        }
+
+        return true;
     }
 
     #region Operators

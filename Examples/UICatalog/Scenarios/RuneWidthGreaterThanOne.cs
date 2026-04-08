@@ -5,9 +5,9 @@ using System;
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("RuneWidthGreaterThanOne", "Test rune width greater than one")]
-[ScenarioCategory ("Controls")]
 [ScenarioCategory ("Text and Formatting")]
 [ScenarioCategory ("Tests")]
+[ScenarioCategory ("Unicode")]
 public class RuneWidthGreaterThanOne : Scenario
 {
     private IApplication? _app;

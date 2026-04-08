@@ -641,6 +641,7 @@ public sealed class UICatalogRunnable : Runnable
             SuperViewRendersLineCanvas = true,
             Source = new ListWrapper<string> (CachedCategories)
         };
+
         //categoryList.Border.Settings = BorderSettings.Title | BorderSettings.Tab;
         //categoryList.Border.TabSide = Side.Top;
         //categoryList.Border.Thickness = new Thickness (1, 2, 1, 1);
@@ -714,6 +715,77 @@ public sealed class UICatalogRunnable : Runnable
     private Shortcut? _shVersion;
     private CheckBox? _force16ColorsShortcutCb;
 
+    /// <summary>
+    ///     Returns the first F-key (F1–F12) that is not already bound in
+    ///     <see cref="Application.KeyBindings"/>, used as the activation key for
+    ///     <see cref="MenuBar.DefaultKey"/> or <see cref="PopoverMenu.DefaultKey"/>,
+    ///     or assigned to a <see cref="MenuItem.Key"/> on a menu item. Falls back to
+    ///     <see cref="Key.F12"/> if all are taken.
+    /// </summary>
+    /// <param name="ignoreKeys"></param>
+    private Key GetFirstUnboundFKey (HashSet<Key> ignoreKeys)
+    {
+        Key [] fKeys =
+        [
+            Key.F1,
+            Key.F2,
+            Key.F3,
+            Key.F4,
+            Key.F5,
+            Key.F6,
+            Key.F7,
+            Key.F8,
+            Key.F9,
+            Key.F10,
+            Key.F11,
+            Key.F12
+        ];
+
+        // Collect keys already bound at the Application level
+        HashSet<Key> boundKeys = ignoreKeys;
+
+        foreach (Key fKey in fKeys)
+        {
+            if (App?.Keyboard.KeyBindings.TryGet (fKey, out _) is true)
+            {
+                boundKeys.Add (fKey);
+            }
+        }
+
+        // Also exclude the MenuBar and PopoverMenu activation keys
+        boundKeys.Add (MenuBar.DefaultKey);
+        boundKeys.Add (PopoverMenu.DefaultKey);
+
+        // Exclude keys used by MenuBar menu items
+        if (_menuBar is { })
+        {
+            foreach (MenuItem menuItem in _menuBar.GetMenuItemsWith (mi => mi.Key.IsValid))
+            {
+                boundKeys.Add (menuItem.Key);
+            }
+        }
+
+        // Exclude keys used by StatusBar items
+        if (_statusBar is { })
+        {
+            foreach (View view in _statusBar.SubViews)
+            {
+                var shortcut = (Shortcut)view;
+                boundKeys.Add (shortcut.Key);
+            }
+        }
+
+        foreach (Key fKey in fKeys)
+        {
+            if (!boundKeys.Contains (fKey))
+            {
+                return fKey;
+            }
+        }
+
+        return Key.F12;
+    }
+
     private StatusBar CreateStatusBar ()
     {
         StatusBar statusBar = new () { AlignmentModes = AlignmentModes.IgnoreFirstOrLast, CanFocus = false };
@@ -723,7 +795,10 @@ public sealed class UICatalogRunnable : Runnable
 
         _shVersion = new Shortcut { Title = "Version Info", CanFocus = false };
 
-        Shortcut statusBarShortcut = new () { Key = Key.F10, Title = "Show/Hide Status Bar", CanFocus = false, Action = () => ShowStatusBar = !ShowStatusBar };
+        Shortcut statusBarShortcut = new ()
+        {
+            Key = GetFirstUnboundFKey ([]), Title = "Show/Hide Status Bar", CanFocus = false, Action = () => ShowStatusBar = !ShowStatusBar
+        };
 
         _force16ColorsShortcutCb = new CheckBox
         {
@@ -736,7 +811,7 @@ public sealed class UICatalogRunnable : Runnable
             CommandView = _force16ColorsShortcutCb,
             HelpText = "",
             BindKeyToApplication = true,
-            Key = Key.F7,
+            Key = GetFirstUnboundFKey ([statusBarShortcut.Key]),
             Action = () =>
                      {
                          Driver.Force16Colors = !Driver.Force16Colors;
