@@ -3,6 +3,7 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Combining Marks", "Illustrates how Unicode Combining Marks work (or don't).")]
 [ScenarioCategory ("Text and Formatting")]
+[ScenarioCategory ("Unicode")]
 public class CombiningMarks : Scenario
 {
     public override void Main ()
