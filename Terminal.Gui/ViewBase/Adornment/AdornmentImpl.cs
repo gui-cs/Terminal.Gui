@@ -16,7 +16,7 @@ public abstract class AdornmentImpl : IAdornment
     /// </summary>
     public View? Parent
     {
-        get => field;
+        get;
         set
         {
             if (field == value)
@@ -167,7 +167,7 @@ public abstract class AdornmentImpl : IAdornment
     internal Region? CachedDrawnRegion { get; set; }
 
     /// <summary>
-    ///     Gets the drawn region from this adornment's last <see cref="View.Draw"/> pass.
+    ///     Gets the drawn region from this adornment's last Draw pass.
     ///     Populated by <see cref="View.DrawAdornments"/> using a per-adornment <see cref="DrawContext"/>.
     ///     Used by <see cref="View.DoDrawComplete"/> for both visual transparency clip exclusion
     ///     and <see cref="CachedDrawnRegion"/> computation — uniformly for all adornment types.
@@ -187,6 +187,76 @@ public abstract class AdornmentImpl : IAdornment
                 v.ViewportSettings = value;
             }
         }
+    }
+
+    /// <summary>
+    ///     Updates <see cref="CachedDrawnRegion"/> (and the backing <see cref="View"/>'s
+    ///     <see cref="View.CachedDrawnRegion"/>) from <see cref="LastDrawnRegion"/> and an
+    ///     optional line-canvas region. Only acts when
+    ///     <see cref="ViewportSettingsFlags.TransparentMouse"/> is set.
+    /// </summary>
+    /// <param name="lineCanvasRegion">
+    ///     The parent view's rendered <see cref="LineCanvas"/> region, or <see langword="null"/>.
+    ///     When non-null, the portion within this adornment's frame is included in the cached region.
+    /// </param>
+    internal void UpdateCachedDrawnRegion (Region? lineCanvasRegion)
+    {
+        if (!ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+        {
+            return;
+        }
+
+        Region adornmentDrawnRegion = new ();
+
+        if (LastDrawnRegion is { })
+        {
+            adornmentDrawnRegion.Combine (LastDrawnRegion, RegionOp.Union);
+        }
+
+        // The parent's LineCanvas includes border lines rendered in DoRenderLineCanvas.
+        // Intersect with this adornment's frame to get only the lines within it.
+        if (lineCanvasRegion is { })
+        {
+            Region lineRegion = lineCanvasRegion.Clone ();
+            lineRegion.Intersect (FrameToScreen ());
+            adornmentDrawnRegion.Combine (lineRegion, RegionOp.Union);
+        }
+
+        CachedDrawnRegion = adornmentDrawnRegion;
+
+        if (View is { } adornmentView)
+        {
+            adornmentView.CachedDrawnRegion = adornmentDrawnRegion;
+        }
+    }
+
+    /// <summary>
+    ///     Adds this adornment's drawn region (from <see cref="LastDrawnRegion"/> and an optional
+    ///     line-canvas region) to the provided <paramref name="exclusion"/> region.
+    ///     Used during transparent-layer clip exclusion in <c>DoDrawComplete</c>.
+    /// </summary>
+    /// <param name="exclusion">The exclusion region to add drawn cells to.</param>
+    /// <param name="lineCanvasRegion">
+    ///     The parent view's rendered <see cref="LineCanvas"/> region, or <see langword="null"/>.
+    /// </param>
+    internal void AddDrawnRegionTo (Region exclusion, Region? lineCanvasRegion)
+    {
+        if (LastDrawnRegion is { })
+        {
+            Region clipped = LastDrawnRegion.Clone ();
+            clipped.Intersect (FrameToScreen ());
+            exclusion.Combine (clipped, RegionOp.Union);
+        }
+
+        // The parent's LineCanvas includes border lines rendered in DoRenderLineCanvas.
+        if (lineCanvasRegion is null)
+        {
+            return;
+        }
+
+        Region lineRegion = lineCanvasRegion.Clone ();
+        lineRegion.Intersect (FrameToScreen ());
+        exclusion.Combine (lineRegion, RegionOp.Union);
     }
 
     /// <summary>

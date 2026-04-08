@@ -149,7 +149,7 @@ public abstract class CommandBindingsBase<TEvent, TBinding> where TBinding : ICo
     {
         if (TryGet (eventArgs, out TBinding? bindings))
         {
-            return bindings!.Commands;
+            return bindings?.Commands ?? [];
         }
 
         return [];

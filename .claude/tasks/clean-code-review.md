@@ -6,10 +6,10 @@ Reimplement the current branch on a new branch with a clean, narrative-quality g
 
 1. **Validate the source branch**
    - Ensure the current branch has no merge conflicts, uncommitted changes, or other issues.
-   - Confirm it is up to date with `v2_develop`.
+   - Confirm it is up to date with `develop`.
 
 2. **Analyze the diff**
-   - Study all changes between the current branch and `v2_develop`.
+   - Study all changes between the current branch and `develop`.
    - Form a clear understanding of the final intended state.
 
 3. **Create the clean branch**
@@ -33,7 +33,7 @@ Reimplement the current branch on a new branch with a clean, narrative-quality g
    - Use `--no-verify` only when necessary (e.g., to bypass known issues). Individual commits do not need to pass tests, but this should be rare.
 
 7. **Open a pull request**
-   - Create a PR from the clean branch to `v2_develop`.
+   - Create a PR from the clean branch to `develop`.
    - Follow Terminal.Gui PR guidelines (see CONTRIBUTING.md).
    - Include a link to the original branch in the PR description.
 

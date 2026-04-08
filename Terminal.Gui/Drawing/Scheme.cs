@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Numerics;
 using System.Text.Json.Serialization;
 
@@ -291,7 +292,9 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         {
             stack.Remove (role);
 
-            return attr!.Value;
+            Debug.Assert (attr != null, nameof (attr) + " != null");
+
+            return attr.Value;
         }
 
         // TODO: Provide an API that lets devs override this algo?
@@ -353,11 +356,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                 bool isDark = normalBg.IsDarkColor ();
                 Color resolvedFg = ResolveNone (normal.Foreground, defaultTerminalColors, true);
 
-                result = normal with
-                {
-                    Foreground = resolvedFg,
-                    Background = resolvedFg.GetDimmerColor (0.5, isDark)
-                };
+                result = normal with { Foreground = resolvedFg, Background = resolvedFg.GetDimmerColor (0.5, isDark) };
 
                 break;
             }
@@ -367,10 +366,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                 Attribute editable = GetAttributeForRoleCore (VisualRole.Editable, stack, defaultTerminalColors);
                 bool isDark = ResolveNone (editable.Background, defaultTerminalColors).IsDarkColor ();
 
-                result = editable with
-                {
-                    Foreground = editable.Foreground.GetDimmerColor (0.05, isDark)
-                };
+                result = editable with { Foreground = editable.Foreground.GetDimmerColor (0.05, isDark) };
 
                 break;
             }
@@ -381,10 +377,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                 Color normalBg = ResolveNone (normal.Background, defaultTerminalColors);
                 bool isDark = normalBg.IsDarkColor ();
 
-                result = normal with
-                {
-                    Foreground = ResolveNone (normal.Foreground, defaultTerminalColors, true).GetDimmerColor (0.05, isDark)
-                };
+                result = normal with { Foreground = ResolveNone (normal.Foreground, defaultTerminalColors, true).GetDimmerColor (0.05, isDark) };
 
                 break;
             }
@@ -393,10 +386,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             {
                 Attribute normal = GetAttributeForRoleCore (VisualRole.Normal, stack, defaultTerminalColors);
 
-                result = normal with
-                {
-                    Style = normal.Style | TextStyle.Underline
-                };
+                result = normal with { Style = normal.Style | TextStyle.Underline };
 
                 break;
             }
@@ -405,10 +395,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             {
                 Attribute focus = GetAttributeForRoleCore (VisualRole.Focus, stack, defaultTerminalColors);
 
-                result = focus with
-                {
-                    Style = focus.Style | TextStyle.Underline
-                };
+                result = focus with { Style = focus.Style | TextStyle.Underline };
 
                 break;
             }
@@ -417,10 +404,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
             {
                 Attribute active = GetAttributeForRoleCore (VisualRole.Active, stack, defaultTerminalColors);
 
-                result = active with
-                {
-                    Style = active.Style | TextStyle.Underline
-                };
+                result = active with { Style = active.Style | TextStyle.Underline };
 
                 break;
             }
@@ -466,7 +450,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     ///     set, will be automatically generated. See the description for <see cref="Scheme"/> for details on the
     ///     algorithm used.
     /// </summary>
-    public Attribute Normal { get => _normal!.Value; init => _normal = value; }
+    public Attribute Normal { get => _normal ?? Attribute.Default; init => _normal = value; }
 
     private readonly Attribute? _hotNormal;
 
@@ -512,7 +496,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
     /// <summary>
     ///     The visual role for elements that are active or selected (e.g., selected item in a <see cref="ListView"/>). Also
     ///     used
-    ///     for headers in, <see cref="HexView"/>, <see cref="CharMap"/> and  <see cref="TabView"/>.
+    ///     for headers in, <see cref="HexView"/>, <see cref="CharMap"/>.
     ///     If not explicitly set, will be a derived value. See the description for <see cref="Scheme"/> for details on the
     ///     algorithm used.
     /// </summary>

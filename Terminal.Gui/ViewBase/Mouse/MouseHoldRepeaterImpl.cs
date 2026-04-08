@@ -153,6 +153,14 @@ internal sealed class MouseHoldRepeaterImpl : IMouseHoldRepeater
     {
         Mouse currentMouseEventArgs = _mouseEvent ?? new Mouse ();
         Mouse newMouseEventArgs = _mouseEvent ?? new Mouse ();
+
+        if (_mouseEvent?.View?.Visible is false || _mouseEvent?.View?.Enabled is false)
+        {
+            Stop ();
+
+            return;
+        }
+
         CancelEventArgs<Mouse> args = new (ref currentMouseEventArgs, ref newMouseEventArgs);
 
         MouseIsHeldDownTick?.Invoke (this, args);

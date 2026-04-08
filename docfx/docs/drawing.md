@@ -49,40 +49,42 @@ See [Layout](layout.md) for more details of the Terminal.Gui coordinate system.
 2) Setting formatting options, such as `TextFormatter.Alignment`.
 3) Calling `TextFormatter.Draw()`(Terminal.Gui.IDriver, System.Drawing.Rectangle,Terminal.Gui.Attribute,Terminal.Gui.Attribute,System.Drawing.Rectangle).
 
-## Line drawing
+## Line Drawing
 
-1) Add the lines via <xref:Terminal.Gui.Drawing.LineCanvas>
-2) Either render the line canvas via `LineCanvas.GetMap()` or let the <xref:Terminal.Gui.ViewBase.View> do so automatically (which enables automatic line joining across Views).
+See [LineCanvas Deep Dive](#linecanvas-deep-dive) below.
 
-## When Drawing Occurs
+## View.Draw — Per-View Drawing Flow
 
-The <xref:Terminal.Gui.App.Application> MainLoop will iterate over all Views in the view hierarchy performing the following steps:
+When `View.Draw()` is called on a view that has <xref:Terminal.Gui.ViewBase.View.NeedsDraw> or `SubViewNeedsDraw` set, it executes these steps in order:
 
-0) Determines if <xref:Terminal.Gui.ViewBase.View.NeedsDraw> or `SubViewNeedsDraw` are set. If neither is set, processing stops.
-1) Sets the clip to the view's Frame.
-2) Draws the <xref:Terminal.Gui.ViewBase.Border> and <xref:Terminal.Gui.ViewBase.Padding> (but NOT the Margin).
-3) Sets the clip to the view's Viewport.
-4) Sets the Normal color scheme.
-5) Calls Draw on any `SubViews`.
-6) Draws `Text`.
-7) Draws any non-text content (the base View does nothing.)
-8) Sets the clip back to the view's Frame.
-9) Draws <xref:Terminal.Gui.Drawing.LineCanvas> (which may have been added to by any of the steps above).
-10) Draws the <xref:Terminal.Gui.ViewBase.Border> and <xref:Terminal.Gui.ViewBase.Padding> SubViews (just the subviews). (but NOT the Margin).
-11) Draws the <xref:Terminal.Gui.ViewBase.Margin> (but only if it does NOT have a shadow; margins with shadows are drawn later).
-12) If the Margin has a shadow, the current Clip is cached so the shadow can be rendered in a second pass.
-13) DrawComplete is raised.
-14) The current View's Frame NOT INCLUDING the Margin is excluded from the current Clip region.
+1. **Draw Adornments** — Draws the <xref:Terminal.Gui.ViewBase.Border> and <xref:Terminal.Gui.ViewBase.Padding> frames (fills and line art). Non-transparent <xref:Terminal.Gui.ViewBase.Margin> is also drawn here. Transparent margins (those with shadows) are deferred to a second pass.
+2. **Clip to Viewport** — Sets the clip region to the view's Viewport, preventing content from drawing outside it.
+3. **Clear Viewport** — Fills the viewport with the background color.
+4. **Draw SubViews** — Draws SubViews in reverse Z-order (earliest added = highest Z = drawn last, on top). For SubViews with `SuperViewRendersLineCanvas = true`, their <xref:Terminal.Gui.Drawing.LineCanvas> is merged into the parent's canvas for unified intersection resolution. Overlapped SubViews' canvases are collected for painters'-algorithm compositing.
+5. **Draw Text** — Renders `View.Text` via <xref:Terminal.Gui.Text.TextFormatter>.
+6. **Draw Content** — Raises `DrawingContent` (override `OnDrawingContent` for custom drawing).
+7. **Draw Adornment SubViews** — Draws SubViews of <xref:Terminal.Gui.ViewBase.Border> and <xref:Terminal.Gui.ViewBase.Padding> (e.g., tab headers, diagnostic indicators). Their <xref:Terminal.Gui.Drawing.LineCanvas> lines are merged into the parent's canvas.
+8. **Render LineCanvas** — Resolves all lines (including merged lines from adornments and SubViews) into glyphs via `GetCellMap`, then composites overlapped canvases using the painters' algorithm.
+9. **Cache Clip for Margin** — If the <xref:Terminal.Gui.ViewBase.Margin> has a shadow, the current clip is cached for the second-pass shadow render.
+10. **DrawComplete & Clip Exclusion** — Raises `DrawComplete`. For opaque views, the entire frame is excluded from the clip. For transparent views, only the actually-drawn cells are excluded. This ensures later-drawn (lower-Z) views don't overwrite this view's content.
 
-Most of the steps above can be overridden by developers using the standard [Terminal.Gui Cancellable Work Pattern](cancellable-work-pattern.md). For example, the base <xref:Terminal.Gui.ViewBase.View> always clears the viewport. To override this, a subclass can override `OnClearingViewport()` to simply return `true`. Or, a user of `View` can subscribe to the `ClearingViewport` event and set the `Cancel` argument to `true`.
+### Peer-View Draw Loop
 
-Then, after all views have been drawn, `Margin.DrawShadows` iterates the view hierarchy a second time, drawing only the shadows for margins that have a <xref:Terminal.Gui.ViewBase.ShadowStyle> set. This second pass uses the cached Clip region from step 12 and ensures shadows render on top of all other content. Margins without shadows are fully drawn in the first pass and are not part of this second pass.
+The static `View.Draw(views, force)` method orchestrates drawing a set of peer views (views sharing the same SuperView):
 
-### Declaring that drawing is needed
+1. Each peer view's `Draw()` is called in order.
+2. After all peers complete, `MarginView.DrawMargins()` performs a **second pass** that draws transparent margins (shadows). This ensures shadows render on top of all other content. The cached clip from step 9 above is restored for each margin so the shadow draws into the correct region.
+3. `NeedsDraw` flags are cleared on all peers.
 
-If a View need to redraw because something changed within it's Content Area it can call `SetNeedsDraw()`. If a View needs to be redrawn because something has changed the size of the Viewport, it can call `SetNeedsLayout()`.
+### Declaring that Drawing is Needed
 
-**Note**: Calling `SetNeedsDraw()` does not immediately cause drawing to occur. It marks the view as needing to be redrawn, which will happen in the next MainLoop iteration. To force immediate drawing (typically only needed in tests), call <xref:Terminal.Gui.App.Application.LayoutAndDraw(System.Boolean)>.
+Call `SetNeedsDraw()` when something changes within a view's content area. Call `SetNeedsLayout()` when the viewport size needs recalculation. Both propagate up the view hierarchy via `SubViewNeedsDraw`.
+
+**Note**: These methods do not cause immediate drawing. They mark the view for redraw in the next MainLoop iteration. To force immediate drawing (typically only in tests), call <xref:Terminal.Gui.App.Application.LayoutAndDraw(System.Boolean)>.
+
+### Overriding Draw Behavior
+
+Most draw steps can be overridden using the [Cancellable Work Pattern](cancellable-work-pattern.md). For example, to prevent the viewport from being cleared, override `OnClearingViewport()` to return `true`, or subscribe to the `ClearingViewport` event and set `Cancel = true`.
 
 ## Clipping
 
@@ -212,9 +214,154 @@ Terminal.Gui supports text formatting using <xref:Terminal.Gui.Text.TextFormatte
 
 The <xref:Terminal.Gui.Drawing.Glyphs> class defines the common set of glyphs used to draw checkboxes, lines, borders, etc... The default glyphs can be changed per-ThemeScope via <xref:Terminal.Gui.Configuration.ConfigurationManager>. 
 
-## Line Drawing
+## LineCanvas Deep Dive
 
-Terminal.Gui supports drawing lines and shapes using box-drawing glyphs. The <xref:Terminal.Gui.Drawing.LineCanvas> class provides *auto join*, a smart TUI drawing system that automatically selects the correct line/box drawing glyphs for intersections making drawing complex shapes easy. See <xref:Terminal.Gui.Drawing.LineCanvas>.
+### What LineCanvas Does
+
+Terminal UI borders are built from Unicode box-drawing characters: `─`, `│`, `┌`, `┐`, `┼`, `├`, and dozens more. When two borders meet, the correct junction glyph must be selected. Doing this by hand is tedious and error-prone.
+
+<xref:Terminal.Gui.Drawing.LineCanvas> solves this. You describe *lines* — start point, length, orientation, style — and the canvas automatically resolves every intersection into the correct Unicode glyph. Where a horizontal and vertical line meet, it produces a `┼`. Where three lines meet, a `├`. Corners, T-junctions, and crosses are all handled automatically.
+
+### Basic Usage
+
+```csharp
+LineCanvas lc = new ();
+
+// Draw a 10-cell horizontal line
+lc.AddLine (new Point (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
+
+// Draw a 5-cell vertical line crossing at (4, 0)
+lc.AddLine (new Point (4, 0), 5, Orientation.Vertical, LineStyle.Single);
+
+// Resolve all intersections and get the glyphs
+Dictionary<Point, Cell?> cells = lc.GetCellMap ();
+// At (4, 0), this returns a ┬ (top-tee), not a ─ or │
+```
+
+Each <xref:Terminal.Gui.Drawing.StraightLine> is always horizontal or vertical. It has a `Start` point, a `Length` (positive = right/down, negative = left/up, zero = a single junction point), an `Orientation`, a <xref:Terminal.Gui.Drawing.LineStyle>, and an optional color <xref:Terminal.Gui.Drawing.Attribute>.
+
+### How Intersection Resolution Works
+
+When you call `GetCellMap()`, the canvas walks every point within its bounds:
+
+1. **Collect intersections.** For each point, every line that passes through it produces an <xref:Terminal.Gui.Drawing.IntersectionDefinition> describing *how* the line relates to that point — does it pass over horizontally? Start here going right? End here from below?
+
+2. **Determine glyph type.** The set of intersection types at a point is analyzed to decide the glyph category: corner, T-junction, cross, straight line, etc. For example, `{StartRight, StartDown}` = upper-left corner (`┌`).
+
+3. **Select style variant.** The <xref:Terminal.Gui.Drawing.LineStyle> of the intersecting lines determines which Unicode variant to render: single (`─`), double (`═`), heavy (`━`), dashed, dotted, or rounded.
+
+4. **Filter exclusions.** Points in the exclusion region (see [Exclude](#linecanvasexclude--output-filter) below) are removed from the output.
+
+### Line Styles
+
+<xref:Terminal.Gui.Drawing.LineStyle> determines the glyph variant used for each line segment and intersection:
+
+| Style | Horizontal | Vertical | Corner |
+|-------|-----------|----------|--------|
+| `Single` | `─` | `│` | `┌` |
+| `Double` | `═` | `║` | `╔` |
+| `Heavy` | `━` | `┃` | `┏` |
+| `Rounded` | `─` | `│` | `╭` |
+| `Dashed` | `╌` | `╎` | `┌` |
+| `Dotted` | `┄` | `┆` | `┌` |
+
+When lines of different styles intersect, the canvas selects the appropriate mixed-style glyph (e.g., a single horizontal meeting a double vertical produces `╥`).
+
+### Merging Canvases Across Views
+
+Every <xref:Terminal.Gui.ViewBase.View> has its own `LineCanvas`. During drawing, the framework merges canvases so that lines from different views auto-join seamlessly.
+
+When `SuperViewRendersLineCanvas` is `true` on a SubView, its lines are merged into the SuperView's canvas via `LineCanvas.Merge()`. All lines then participate in a single intersection-resolution pass. This is how adjacent tab headers, nested frames, and other multi-view border compositions achieve connected line art.
+
+SubViews that render their own `LineCanvas` independently (the default) are composited using a painters' algorithm during `View.RenderLineCanvas()`. Higher-Z views take priority; lower-Z cells only render if they provide richer junctions.
+
+### `LineStyle.None` — A Convention, Not an Eraser
+
+<xref:Terminal.Gui.Drawing.LineStyle.None> has **no special handling** inside <xref:Terminal.Gui.Drawing.LineCanvas>. When passed to `AddLine`, the line is stored and participates in intersection resolution like any other. Because `None` doesn't match any styled-glyph check, it falls through to the default glyphs and **renders identically to `LineStyle.Single`**.
+
+The "eraser" behavior in the LineDrawing scenario is implemented by the *consumer*, not by LineCanvas:
+
+```csharp
+// LineDrawing scenario — eraser logic on mouse-up
+if (_currentLine.Style == LineStyle.None)
+{
+    // Physically remove overlapping segments from the line collection
+    area.CurrentLayer = new LineCanvas (
+        area.CurrentLayer.Lines.Exclude (
+            _currentLine.Start,
+            _currentLine.Length,
+            _currentLine.Orientation));
+}
+```
+
+This calls <xref:Terminal.Gui.Drawing.StraightLineExtensions.Exclude*> to split and remove overlapping lines. The `None`-styled line itself is never kept.
+
+> **Key point:** If you add a `LineStyle.None` line without eraser handling, it renders as a visible single-style line. To suppress lines, use the mechanisms described below.
+
+### Suppressing and Removing Lines
+
+LineCanvas provides three distinct mechanisms for controlling what gets drawn. Each operates at a different stage and has different semantics. Using the wrong one produces subtle bugs.
+
+#### `LineCanvas.Exclude` — Output Filter
+
+<xref:Terminal.Gui.Drawing.LineCanvas.Exclude*> suppresses resolved cells from `GetCellMap` output **without affecting the underlying geometry**. Lines still exist and still auto-join through excluded positions.
+
+```csharp
+LineCanvas lc = new ();
+lc.AddLine (new (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
+
+// Exclude positions 3–5 (a title label occupies those cells)
+lc.Exclude (new Region (new Rectangle (3, 0, 3, 1)));
+
+// GetCellMap returns 7 cells (positions 0–2 and 6–9).
+// The line auto-joins correctly on either side because
+// the full line still participates in intersection resolution.
+```
+
+**Use this when something else is drawn at a position** — for example, a title label on a border. The border joins correctly on either side because the line is continuous behind the label.
+
+**Do not use this as an eraser.** Because lines auto-join through excluded regions, phantom geometry leaks into junction decisions. A vertical line crossing an excluded horizontal line resolves as `┼` instead of `│`.
+
+#### `Reserve` — Compositing Metadata
+
+<xref:Terminal.Gui.Drawing.LineCanvas.Reserve*> marks positions as intentionally empty for multi-canvas compositing. It has **no effect** on the canvas that calls it — `GetCellMap` does not check reserved cells.
+
+Reserved cells are consumed during `View.RenderLineCanvas`, which layers multiple independently-resolved canvases. Reserved cells claim positions so that cells from lower-Z canvases do not show through:
+
+```csharp
+// In a focused tab's border rendering:
+// Reserve the gap where the header connects to the content area.
+// This prevents the content area's top border from showing through.
+lc.Reserve (new Rectangle (gapStart, borderY, gapWidth, 1));
+```
+
+#### `StraightLineExtensions.Exclude` — Geometry Surgery
+
+<xref:Terminal.Gui.Drawing.StraightLineExtensions.Exclude*> physically splits or removes lines from a collection. This is the correct tool for erasing geometry:
+
+```csharp
+LineCanvas lc = new ();
+lc.AddLine (new (0, 0), 10, Orientation.Horizontal, LineStyle.Single);
+
+// Erase positions 4–5 by rebuilding the line collection
+IEnumerable<StraightLine> remaining = lc.Lines.Exclude (
+    new Point (4, 0), 2, Orientation.Horizontal);
+
+LineCanvas erased = new (remaining);
+// erased contains two separate segments: 0–3 and 6–9.
+// A vertical line through x=4 correctly renders as │, not ┼.
+```
+
+> **Warning:** There are two unrelated methods named `Exclude`. `LineCanvas.Exclude (Region)` filters output while preserving auto-join. `StraightLineExtensions.Exclude (...)` physically removes geometry. They have opposite semantics.
+
+#### Choosing the Right Mechanism
+
+| Scenario | Mechanism | Why |
+|----------|-----------|-----|
+| Hide cells behind a title label | `LineCanvas.Exclude (Region)` | Lines auto-join through the label — the border looks continuous |
+| Erase drawn lines | `StraightLineExtensions.Exclude (...)` | Geometry is physically removed — no phantom junctions |
+| Gap where a focused tab meets content | `Reserve (Rectangle)` | Claims positions during compositing so lower-Z borders don't bleed through |
+| "No border" on a view | Don't call `AddLine` | Check `if (style != LineStyle.None)` before adding |
 
 ## Thickness
 
