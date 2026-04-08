@@ -11,7 +11,7 @@ namespace Terminal.Gui.Views;
 //  HotKey - Do NOT Restore Focus. Advance Active. Do NOT Accept.
 //  Item HotKey - Do NOT Focus item. If item is not active, make Active. Do NOT Accept.
 // Focused:
-//  Space key - If focused item is Active, move focus to and Activate next. Else, Activate current. Do NOT Accept.
+//  Space key - Activate the focused item. Do NOT Accept.
 //  Enter key - Activate and Accept the focused item.
 //  HotKey - Restore Focus. Advance Active. Do NOT Accept.
 //  Item HotKey - If item is not active, make Active. Do NOT Accept. If item is active, do nothing.
@@ -93,23 +93,13 @@ public class OptionSelector : SelectorBase, IDesignable
             return;
         }
 
-        if (GetCheckBoxValue (checkBox) == Value
-            && (ctx?.Routing == CommandRouting.DispatchingDown
-                || (ctx?.Binding is KeyBinding { Key: { } } keyBinding && keyBinding.Key == Key.Space)))
+        if (GetCheckBoxValue (checkBox) == Value)
         {
-            // Caused by Key.Space or a SuperView...
-            // If the checkbox is already checked, we cycle to the next one.
-            Cycle ();
+            // Already selected — no-op regardless of activation source (Space, click, etc.).
+            return;
         }
-        else
-        {
-            if (Value == GetCheckBoxValue (checkBox))
-            {
-                return;
-            }
 
-            Value = GetCheckBoxValue (checkBox);
-        }
+        Value = GetCheckBoxValue (checkBox);
     }
 
     /// <inheritdoc/>
