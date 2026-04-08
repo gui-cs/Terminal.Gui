@@ -73,7 +73,7 @@ When in planning mode:
 **Terminal.Gui** - Cross-platform .NET console UI toolkit
 
 - **Language**: C# (net8.0)
-- **Branch**: `v2_develop`
+- **Branch**: `develop`
 - **Version**: v2 (Alpha)
 
 ## Build & Test
