@@ -156,6 +156,31 @@ internal class TextModel
         OnLinesLoaded ();
     }
 
+    internal static Key CreateKeyFromGrapheme (string grapheme)
+    {
+        StringRuneEnumerator enumerator = grapheme.EnumerateRunes ();
+
+        if (enumerator.MoveNext ())
+        {
+            Rune rune = enumerator.Current;
+
+            if (!enumerator.MoveNext ())
+            {
+                return new Key (rune.Value) { AssociatedText = grapheme };
+            }
+        }
+
+        return new Key () { AssociatedText = grapheme };
+    }
+
+    internal static IEnumerable<string> GetInsertableGraphemes (string text)
+    {
+        foreach (string grapheme in GraphemeHelper.GetGraphemes (text))
+        {
+            yield return ContainsInvalidSurrogate (grapheme) ? Rune.ReplacementChar.ToString () : grapheme;
+        }
+    }
+
     /// <summary>Removes the line at the specified position</summary>
     /// <param name="pos">Position.</param>
     public void RemoveLine (int pos)
@@ -198,6 +223,33 @@ internal class TextModel
         }
 
         return sb.ToString ();
+    }
+
+    private static bool ContainsInvalidSurrogate (string text)
+    {
+        for (int i = 0; i < text.Length; i++)
+        {
+            char current = text [i];
+
+            if (char.IsHighSurrogate (current))
+            {
+                if (i + 1 < text.Length && char.IsLowSurrogate (text [i + 1]))
+                {
+                    i++;
+
+                    continue;
+                }
+
+                return true;
+            }
+
+            if (char.IsLowSurrogate (current))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public (int col, int row)? WordBackward (int fromCol, int fromRow, bool useSameRuneType)
