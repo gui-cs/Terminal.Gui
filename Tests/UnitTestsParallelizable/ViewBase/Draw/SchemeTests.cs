@@ -1,18 +1,16 @@
-#nullable enable
+using System.Collections.Immutable;
 using UnitTests;
-using Xunit;
 
 namespace ViewBaseTests.Drawing;
 
 [Trait ("Category", "View.Scheme")]
 public class SchemeTests : TestDriverBase
 {
-
     [Fact]
     public void GetScheme_Default_ReturnsBaseScheme ()
     {
         var view = new View ();
-        var baseScheme = SchemeManager.GetHardCodedSchemes ()? ["Base"];
+        Scheme? baseScheme = SchemeManager.GetHardCodedSchemes ()? ["Base"];
 
         Assert.Equal (baseScheme, view.GetScheme ());
         view.Dispose ();
@@ -22,7 +20,7 @@ public class SchemeTests : TestDriverBase
     public void SetScheme_Explicitly_SetsSchemeCorrectly ()
     {
         var view = new View ();
-        var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        Scheme? dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
 
         view.SetScheme (dialogScheme);
 
@@ -39,7 +37,7 @@ public class SchemeTests : TestDriverBase
 
         superView.Add (subView);
 
-        var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        Scheme? dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
         superView.SetScheme (dialogScheme);
 
         Assert.Equal (dialogScheme, subView.GetScheme ());
@@ -55,7 +53,7 @@ public class SchemeTests : TestDriverBase
         var view = new View ();
         view.SchemeName = "Dialog";
 
-        var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        Scheme? dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
         Assert.Equal (dialogScheme, view.GetScheme ());
         view.Dispose ();
     }
@@ -68,7 +66,7 @@ public class SchemeTests : TestDriverBase
         view.Driver.SetAttribute (new Attribute (Color.Red, Color.Green));
 
         // Act
-        var attribute = view.GetCurrentAttribute ();
+        Attribute attribute = view.GetCurrentAttribute ();
 
         // Assert
         Assert.Equal (new Attribute (Color.Red, Color.Green), attribute);
@@ -107,7 +105,7 @@ public class SchemeTests : TestDriverBase
         view.Driver = CreateTestDriver ();
         view.Driver.SetAttribute (new Attribute (Color.Red, Color.Green));
 
-        var previousAttribute = view.SetAttributeForRole (VisualRole.Focus);
+        Attribute? previousAttribute = view.SetAttributeForRole (VisualRole.Focus);
         Assert.Equal (view.GetScheme ().Focus, view.GetCurrentAttribute ());
         Assert.NotEqual (previousAttribute, view.GetCurrentAttribute ());
 
@@ -118,7 +116,7 @@ public class SchemeTests : TestDriverBase
     public void OnGettingScheme_Override_StopsDefaultBehavior ()
     {
         var view = new CustomView ();
-        var customScheme = SchemeManager.GetHardCodedSchemes ()? ["Error"];
+        Scheme? customScheme = SchemeManager.GetHardCodedSchemes ()? ["Error"];
 
         Assert.Equal (customScheme, view.GetScheme ());
         view.Dispose ();
@@ -128,7 +126,7 @@ public class SchemeTests : TestDriverBase
     public void OnSettingScheme_Override_PreventsSettingScheme ()
     {
         var view = new CustomView ();
-        var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        Scheme? dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
 
         view.SetScheme (dialogScheme);
 
@@ -140,7 +138,7 @@ public class SchemeTests : TestDriverBase
     public void GettingScheme_Event_CanOverrideScheme ()
     {
         var view = new View ();
-        var customScheme = SchemeManager.GetHardCodedSchemes ()? ["Error"]! with { Normal = Attribute.Default };
+        Scheme customScheme = SchemeManager.GetHardCodedSchemes ()? ["Error"]! with { Normal = Attribute.Default };
 
         Assert.NotEqual (Attribute.Default, view.GetScheme ().Normal);
 
@@ -159,7 +157,7 @@ public class SchemeTests : TestDriverBase
     public void SettingScheme_Event_CanCancelSchemeChange ()
     {
         var view = new View ();
-        var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        Scheme? dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
 
         view.SchemeChanging += (sender, args) => args.Handled = true;
 
@@ -191,7 +189,7 @@ public class SchemeTests : TestDriverBase
     [Fact]
     public void GetHardCodedSchemes_ReturnsExpectedSchemes ()
     {
-        var schemes = Scheme.GetHardCodedSchemes ();
+        ImmutableSortedDictionary<string, Scheme> schemes = Scheme.GetHardCodedSchemes ();
 
         Assert.NotNull (schemes);
         Assert.Contains ("Base", schemes.Keys);
@@ -200,7 +198,6 @@ public class SchemeTests : TestDriverBase
         Assert.Contains ("Menu", schemes.Keys);
         Assert.Contains ("Runnable", schemes.Keys);
     }
-
 
     [Fact]
     public void SchemeName_OverridesSuperViewScheme ()
@@ -212,7 +209,7 @@ public class SchemeTests : TestDriverBase
 
         subView.SchemeName = "Error";
 
-        var errorScheme = SchemeManager.GetHardCodedSchemes ()? ["Error"];
+        Scheme? errorScheme = SchemeManager.GetHardCodedSchemes ()? ["Error"];
         Assert.Equal (errorScheme, subView.GetScheme ());
 
         subView.Dispose ();
@@ -223,7 +220,7 @@ public class SchemeTests : TestDriverBase
     public void Scheme_DefaultsToBase_WhenNotSet ()
     {
         var view = new View ();
-        var baseScheme = SchemeManager.GetHardCodedSchemes ()? ["Base"];
+        Scheme? baseScheme = SchemeManager.GetHardCodedSchemes ()? ["Base"];
 
         Assert.Equal (baseScheme, view.GetScheme ());
         view.Dispose ();
@@ -235,7 +232,7 @@ public class SchemeTests : TestDriverBase
         var view = new View ();
         view.SchemeName = "Dialog";
 
-        var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        Scheme? dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
         Assert.Equal (dialogScheme, view.GetScheme ());
 
         view.Dispose ();
@@ -250,10 +247,7 @@ public class SchemeTests : TestDriverBase
             return true;
         }
 
-        protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args)
-        {
-            return true; // Prevent setting the scheme
-        }
+        protected override bool OnSettingScheme (ValueChangingEventArgs<Scheme?> args) => true; // Prevent setting the scheme
     }
 
     [Fact]
@@ -265,14 +259,15 @@ public class SchemeTests : TestDriverBase
 
         // Parent customizes attribute resolution
         var customAttribute = new Attribute (Color.BrightMagenta, Color.BrightGreen);
+
         parentView.GettingAttributeForRole += (sender, args) =>
-        {
-            if (args.Role == VisualRole.Normal)
-            {
-                args.Result = customAttribute;
-                args.Handled = true;
-            }
-        };
+                                              {
+                                                  if (args.Role == VisualRole.Normal)
+                                                  {
+                                                      args.Result = customAttribute;
+                                                      args.Handled = true;
+                                                  }
+                                              };
 
         // Child without explicit scheme should get customized attribute from parent
         Assert.Equal (customAttribute, childView.GetAttributeForRole (VisualRole.Normal));
@@ -289,19 +284,20 @@ public class SchemeTests : TestDriverBase
         parentView.Add (childView);
 
         // Set explicit scheme on child
-        var childScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        Scheme? childScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
         childView.SetScheme (childScheme);
 
         // Parent customizes attribute resolution
         var customAttribute = new Attribute (Color.BrightMagenta, Color.BrightGreen);
+
         parentView.GettingAttributeForRole += (sender, args) =>
-        {
-            if (args.Role == VisualRole.Normal)
-            {
-                args.Result = customAttribute;
-                args.Handled = true;
-            }
-        };
+                                              {
+                                                  if (args.Role == VisualRole.Normal)
+                                                  {
+                                                      args.Result = customAttribute;
+                                                      args.Handled = true;
+                                                  }
+                                              };
 
         // Child with explicit scheme should NOT get customized attribute from parent
         Assert.NotEqual (customAttribute, childView.GetAttributeForRole (VisualRole.Normal));
@@ -315,8 +311,9 @@ public class SchemeTests : TestDriverBase
     public void GetAttributeForRole_Border_UsesParentScheme ()
     {
         // Border (an Adornment) doesn't have a SuperView but should use its Parent's scheme
-        View view = new View { SchemeName = "Dialog" };
+        var view = new View { SchemeName = "Dialog" };
         Border? border = view.Border;
+
         // Force GetOrCreateView
         border.LineStyle = LineStyle.Dashed;
 
@@ -344,18 +341,19 @@ public class SchemeTests : TestDriverBase
 
         // Parent customizes attribute resolution
         var customAttribute = new Attribute (Color.BrightMagenta, Color.BrightGreen);
+
         parentView.GettingAttributeForRole += (sender, args) =>
-        {
-            if (args.Role == VisualRole.Normal)
-            {
-                args.Result = customAttribute;
-                args.Handled = true;
-            }
-        };
+                                              {
+                                                  if (args.Role == VisualRole.Normal)
+                                                  {
+                                                      args.Result = customAttribute;
+                                                      args.Handled = true;
+                                                  }
+                                              };
 
         // Child with SchemeName should NOT get customized attribute from parent
         // It should use the Dialog scheme instead
-        var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        Scheme? dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
         Assert.NotEqual (customAttribute, childView.GetAttributeForRole (VisualRole.Normal));
         Assert.Equal (dialogScheme!.Normal, childView.GetAttributeForRole (VisualRole.Normal));
 
@@ -378,14 +376,15 @@ public class SchemeTests : TestDriverBase
 
         // Grandparent customizes attributes
         var customAttribute = new Attribute (Color.BrightYellow, Color.BrightBlue);
+
         grandparentView.GettingAttributeForRole += (sender, args) =>
-        {
-            if (args.Role == VisualRole.Normal)
-            {
-                args.Result = customAttribute;
-                args.Handled = true;
-            }
-        };
+                                                   {
+                                                       if (args.Role == VisualRole.Normal)
+                                                       {
+                                                           args.Result = customAttribute;
+                                                           args.Handled = true;
+                                                       }
+                                                   };
 
         // Child should get attribute from grandparent through parent
         Assert.Equal (customAttribute, childView.GetAttributeForRole (VisualRole.Normal));
@@ -413,17 +412,18 @@ public class SchemeTests : TestDriverBase
 
         // Grandparent customizes attributes
         var customAttribute = new Attribute (Color.BrightYellow, Color.BrightBlue);
+
         grandparentView.GettingAttributeForRole += (sender, args) =>
-        {
-            if (args.Role == VisualRole.Normal)
-            {
-                args.Result = customAttribute;
-                args.Handled = true;
-            }
-        };
+                                                   {
+                                                       if (args.Role == VisualRole.Normal)
+                                                       {
+                                                           args.Result = customAttribute;
+                                                           args.Handled = true;
+                                                       }
+                                                   };
 
         // Parent should NOT get grandparent's customization (it has SchemeName)
-        var dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
+        Scheme? dialogScheme = SchemeManager.GetHardCodedSchemes ()? ["Dialog"];
         Assert.NotEqual (customAttribute, parentView.GetAttributeForRole (VisualRole.Normal));
         Assert.Equal (dialogScheme!.Normal, parentView.GetAttributeForRole (VisualRole.Normal));
 
@@ -447,14 +447,15 @@ public class SchemeTests : TestDriverBase
 
         // Parent customizes attributes
         var parentAttribute = new Attribute (Color.BrightYellow, Color.BrightBlue);
+
         parentView.GettingAttributeForRole += (sender, args) =>
-        {
-            if (args.Role == VisualRole.Normal)
-            {
-                args.Result = parentAttribute;
-                args.Handled = true;
-            }
-        };
+                                              {
+                                                  if (args.Role == VisualRole.Normal)
+                                                  {
+                                                      args.Result = parentAttribute;
+                                                      args.Handled = true;
+                                                  }
+                                              };
 
         // Child's own override should take precedence
         var childOverrideAttribute = new Attribute (Color.BrightRed, Color.BrightCyan);
@@ -481,23 +482,28 @@ public class SchemeTests : TestDriverBase
         var hotNormalAttr = new Attribute (Color.Magenta, Color.Cyan);
 
         parentView.GettingAttributeForRole += (sender, args) =>
-        {
-            switch (args.Role)
-            {
-                case VisualRole.Normal:
-                    args.Result = normalAttr;
-                    args.Handled = true;
-                    break;
-                case VisualRole.Focus:
-                    args.Result = focusAttr;
-                    args.Handled = true;
-                    break;
-                case VisualRole.HotNormal:
-                    args.Result = hotNormalAttr;
-                    args.Handled = true;
-                    break;
-            }
-        };
+                                              {
+                                                  switch (args.Role)
+                                                  {
+                                                      case VisualRole.Normal:
+                                                          args.Result = normalAttr;
+                                                          args.Handled = true;
+
+                                                          break;
+
+                                                      case VisualRole.Focus:
+                                                          args.Result = focusAttr;
+                                                          args.Handled = true;
+
+                                                          break;
+
+                                                      case VisualRole.HotNormal:
+                                                          args.Result = hotNormalAttr;
+                                                          args.Handled = true;
+
+                                                          break;
+                                                  }
+                                              };
 
         // All roles should defer to parent
         Assert.Equal (normalAttr, childView.GetAttributeForRole (VisualRole.Normal));
@@ -517,8 +523,10 @@ public class SchemeTests : TestDriverBase
             if (OverrideAttribute.HasValue && role == VisualRole.Normal)
             {
                 currentAttribute = OverrideAttribute.Value;
+
                 return true;
             }
+
             return base.OnGettingAttributeForRole (role, ref currentAttribute);
         }
     }
@@ -605,5 +613,4 @@ public class SchemeTests : TestDriverBase
         parent.Dispose ();
         grandparent.Dispose ();
     }
-
 }

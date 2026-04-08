@@ -139,15 +139,17 @@ public partial class View
                 return _scheme!;
             }
 
-            if (!string.IsNullOrEmpty (SchemeName))
+            if (string.IsNullOrEmpty (SchemeName))
             {
-                if (SchemeManager.TryGetScheme (SchemeName, out Scheme? namedScheme))
-                {
-                    return namedScheme;
-                }
-
-                Logging.Warning ($"SchemeName '{SchemeName}' not found in current theme. Falling back.");
+                return ResolveFallbackScheme ();
             }
+
+            if (SchemeManager.TryGetScheme (SchemeName, out Scheme? namedScheme))
+            {
+                return namedScheme;
+            }
+
+            Logging.Warning ($"SchemeName '{SchemeName}' not found in current theme. Falling back.");
 
             return ResolveFallbackScheme ();
         }
