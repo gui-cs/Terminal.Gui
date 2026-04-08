@@ -142,8 +142,13 @@ public partial class TextView
             return Autocomplete.ProcessKey (a);
         }
 
+        if (a.AsRune is { } rune && rune != default (Rune) && Rune.IsControl (rune))
+        {
+            return false;
+        }
+
         // Ignore control characters and other special keys
-        if (a is { IsKeyCodeAtoZ: false, KeyCode: < KeyCode.Space or > KeyCode.CharMask })
+        if (string.IsNullOrEmpty (a.AsGrapheme) && a is { IsKeyCodeAtoZ: false, KeyCode: < KeyCode.Space or > KeyCode.CharMask })
         {
             return false;
         }

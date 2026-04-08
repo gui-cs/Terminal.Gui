@@ -13,7 +13,7 @@
 
 ## Contributing
 
-Contributions welcome! See [CONTRIBUTING.md](https://github.com/gui-cs/Terminal.Gui/blob/v2_develop/CONTRIBUTING.md).
+Contributions welcome! See [CONTRIBUTING.md](https://github.com/gui-cs/Terminal.Gui/blob/develop/CONTRIBUTING.md).
 
 ## History
 

@@ -259,6 +259,40 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         top.Dispose ();
     }
 
+    [Fact]
+    public void KittyAssociatedText_ShiftedPrintableKey_InsertsAssociatedText ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 10 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        Key kittyKey = new ('!') { AssociatedText = "!" };
+
+        Assert.True (top.NewKeyDownEvent (kittyKey));
+        Assert.Equal ("!", tf.Text);
+
+        top.Dispose ();
+    }
+
+    [Fact]
+    public void ShiftedDigitKey_WithoutKittyMetadata_InsertsBaseDigit ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 10 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        Assert.True (top.NewKeyDownEvent (Key.D1.WithShift));
+        Assert.Equal ("1", tf.Text);
+
+        top.Dispose ();
+    }
+
     // Claude - Opus 4.6
     /// <summary>
     ///     Verifies that the space key is not consumed by the default View Command.Activate binding.
@@ -723,6 +757,17 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (2, tf.InsertionPoint);
         Assert.Equal (new Point (3, 0), tf.Cursor.Position);
         Assert.Equal ("📄a", tf.Text);
+    }
+
+    [Fact]
+    public void InsertText_GraphemeSequence_PreservesSingleGrapheme ()
+    {
+        TextField tf = new ();
+
+        tf.InsertText ("👨‍👩‍👧‍👦");
+
+        Assert.Equal ("👨‍👩‍👧‍👦", tf.Text);
+        Assert.Equal (1, tf.InsertionPoint);
     }
 
     [Fact]

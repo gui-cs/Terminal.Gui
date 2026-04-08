@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using Terminal.Gui.Drawing;
 
 namespace Terminal.Gui.Views;
 
@@ -31,11 +32,9 @@ public partial class TextField
     /// <param name="useOldCursorPos">Use the previous cursor position.</param>
     public void InsertText (string toAdd, bool useOldCursorPos = true)
     {
-        foreach (Rune rune in toAdd.EnumerateRunes ())
+        foreach (string grapheme in TextModel.GetInsertableGraphemes (toAdd))
         {
-            // All rune can be mapped to a Key and no exception will throw here because
-            // EnumerateRunes will replace a surrogate char with the Rune.ReplacementChar
-            Key key = rune.Value;
+            Key key = TextModel.CreateKeyFromGrapheme (grapheme);
             InsertText (key, useOldCursorPos);
         }
     }
@@ -83,7 +82,12 @@ public partial class TextField
             _preChangeInsertionPoint = InsertionPoint;
         }
 
-        StringRuneEnumerator enumeratedRunes = a.AsRune.ToString ().EnumerateRunes ();
+        string grapheme = a.AsGrapheme;
+
+        if (string.IsNullOrEmpty (grapheme))
+        {
+            return;
+        }
 
         if (Used)
         {
@@ -91,7 +95,7 @@ public partial class TextField
 
             if (InsertionPoint == newText.Count + 1)
             {
-                SetText (newText.Concat (enumeratedRunes.Select (r => r.ToString ())).ToList ());
+                SetText (newText.Concat ([grapheme]).ToList ());
             }
             else
             {
@@ -101,14 +105,14 @@ public partial class TextField
                 }
 
                 SetText (newText.GetRange (0, _preChangeInsertionPoint)
-                                .Concat (enumeratedRunes.Select (r => r.ToString ()))
+                                .Concat ([grapheme])
                                 .Concat (newText.GetRange (_preChangeInsertionPoint, Math.Min (newText.Count - _preChangeInsertionPoint, newText.Count))));
             }
         }
         else
         {
             SetText (newText.GetRange (0, _preChangeInsertionPoint)
-                            .Concat (enumeratedRunes.Select (r => r.ToString ()))
+                            .Concat ([grapheme])
                             .Concat (newText.GetRange (Math.Min (_preChangeInsertionPoint + 1, newText.Count),
                                                        Math.Max (newText.Count - _preChangeInsertionPoint - 1, 0))));
             InsertionPoint++;

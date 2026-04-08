@@ -1,3 +1,5 @@
+using Terminal.Gui.Drawing;
+
 namespace Terminal.Gui.Views;
 
 public partial class TextView
@@ -235,18 +237,9 @@ public partial class TextView
     /// <param name="toAdd">Text to add</param>
     public void InsertText (string toAdd)
     {
-        foreach (char ch in toAdd)
+        foreach (string grapheme in TextModel.GetInsertableGraphemes (toAdd))
         {
-            Key key;
-
-            try
-            {
-                key = new Key (ch);
-            }
-            catch (Exception)
-            {
-                throw new ArgumentException ($"Cannot insert character '{ch}' because it does not map to a Key");
-            }
+            Key key = TextModel.CreateKeyFromGrapheme (grapheme);
 
             InsertText (key);
 
@@ -558,14 +551,21 @@ public partial class TextView
         }
         else
         {
+            string grapheme = a.AsGrapheme;
+
+            if (string.IsNullOrEmpty (grapheme))
+            {
+                return;
+            }
+
             if (Used)
             {
-                Insert (new Cell { Grapheme = a.AsRune.ToString (), Attribute = attribute });
+                Insert (new Cell { Grapheme = grapheme, Attribute = attribute });
                 CurrentColumn++;
             }
             else
             {
-                Insert (new Cell { Grapheme = a.AsRune.ToString (), Attribute = attribute });
+                Insert (new Cell { Grapheme = grapheme, Attribute = attribute });
                 CurrentColumn++;
             }
             UpdateContentSize ();
