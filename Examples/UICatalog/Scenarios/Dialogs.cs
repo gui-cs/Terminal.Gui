@@ -5,6 +5,7 @@ namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Dialogs", "Demonstrates how to use the Dialog and Dialog<TResult> classes")]
 [ScenarioCategory ("Dialogs")]
+[ScenarioCategory ("Runnable")]
 public class Dialogs : Scenario
 {
     private const int WIDE_CODE_POINT = '你';

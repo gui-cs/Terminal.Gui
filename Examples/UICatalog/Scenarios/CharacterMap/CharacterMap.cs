@@ -16,6 +16,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Layout")]
 [ScenarioCategory ("Scrolling")]
+[ScenarioCategory ("Unicode")]
 public class CharacterMap : Scenario
 {
     private Label? _errorLabel;
