@@ -242,6 +242,13 @@ public static partial class Application
     ///     Each entry maps a <see cref="Command"/> to a <see cref="PlatformKeyBinding"/>
     ///     that specifies the key strings for all platforms or specific ones.
     ///     <para>
+    ///         To change a single binding and have the change take effect immediately, use
+    ///         <see cref="SetDefaultKeyBinding"/> or <see cref="RemoveDefaultKeyBinding"/>
+    ///         instead of mutating the dictionary directly. Direct dictionary mutation
+    ///         (e.g. <c>DefaultKeyBindings [Command.Quit] = ...</c>) does <b>not</b> raise
+    ///         <see cref="DefaultKeyBindingsChanged"/>.
+    ///     </para>
+    ///     <para>
     ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
     ///         Do not set in parallelizable unit tests.
     ///     </para>
@@ -269,14 +276,44 @@ public static partial class Application
     };
 
     /// <summary>
-    ///     Raised when the <see cref="DefaultKeyBindings"/> property is replaced (i.e., a new dictionary is assigned).
-    ///     <para>
-    ///         <b>Note:</b> This event does <b>not</b> fire when individual entries are mutated
-    ///         (e.g., <c>DefaultKeyBindings [Command.Quit] = ...</c>). To ensure the event fires, assign a
-    ///         new dictionary or call the property setter.
-    ///     </para>
+    ///     Raised when the <see cref="DefaultKeyBindings"/> are changed — either by replacing the entire dictionary
+    ///     (property setter) or by calling <see cref="SetDefaultKeyBinding"/> / <see cref="RemoveDefaultKeyBinding"/>.
     /// </summary>
     public static event EventHandler? DefaultKeyBindingsChanged;
+
+    /// <summary>
+    ///     Sets (or replaces) the key binding for a single <paramref name="command"/> in <see cref="DefaultKeyBindings"/>
+    ///     and raises <see cref="DefaultKeyBindingsChanged"/> so that subscribers (e.g. <c>ApplicationKeyboard</c>)
+    ///     pick up the change immediately.
+    /// </summary>
+    /// <param name="command">The command whose binding should be set.</param>
+    /// <param name="binding">The platform key binding to associate with <paramref name="command"/>.</param>
+    public static void SetDefaultKeyBinding (Command command, PlatformKeyBinding binding)
+    {
+        DefaultKeyBindings ??= new ();
+        DefaultKeyBindings [command] = binding;
+        Trace.Configuration ("DefaultKeyBindings", "SetDefaultKeyBinding", $"{command}=[{binding}]");
+        DefaultKeyBindingsChanged?.Invoke (null, EventArgs.Empty);
+    }
+
+    /// <summary>
+    ///     Removes the key binding for <paramref name="command"/> from <see cref="DefaultKeyBindings"/>
+    ///     and raises <see cref="DefaultKeyBindingsChanged"/> so that subscribers pick up the change immediately.
+    /// </summary>
+    /// <param name="command">The command whose binding should be removed.</param>
+    /// <returns><see langword="true"/> if the binding was found and removed; otherwise <see langword="false"/>.</returns>
+    public static bool RemoveDefaultKeyBinding (Command command)
+    {
+        if (DefaultKeyBindings is null || !DefaultKeyBindings.Remove (command))
+        {
+            return false;
+        }
+
+        Trace.Configuration ("DefaultKeyBindings", "RemoveDefaultKeyBinding", $"{command}");
+        DefaultKeyBindingsChanged?.Invoke (null, EventArgs.Empty);
+
+        return true;
+    }
 
     /// <summary>
     ///     Returns the first platform-resolved key for the specified <paramref name="command"/>

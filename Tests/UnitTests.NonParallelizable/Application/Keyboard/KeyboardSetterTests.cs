@@ -15,9 +15,8 @@ public class KeyboardSetterTests
 
         try
         {
-            // Act — mutate dict then re-add bindings (dict mutation doesn't fire the event)
-            Application.DefaultKeyBindings! [Command.Quit] = Bind.All (newQuitKey);
-            keyboard.AddKeyBindings ();
+            // Act — use SetDefaultKeyBinding which fires the event automatically
+            Application.SetDefaultKeyBinding (Command.Quit, Bind.All (newQuitKey));
 
             // Assert
             Assert.Equal (newQuitKey, Application.GetDefaultKey (Command.Quit));
@@ -26,7 +25,7 @@ public class KeyboardSetterTests
         }
         finally
         {
-            Application.DefaultKeyBindings! [Command.Quit] = original;
+            Application.SetDefaultKeyBinding (Command.Quit, original);
             keyboard.Dispose ();
         }
     }
@@ -42,8 +41,7 @@ public class KeyboardSetterTests
         try
         {
             // Act
-            Application.DefaultKeyBindings! [Command.NextTabStop] = Bind.All (newKey);
-            keyboard.AddKeyBindings ();
+            Application.SetDefaultKeyBinding (Command.NextTabStop, Bind.All (newKey));
 
             // Assert
             Assert.Equal (newKey, Application.GetDefaultKey (Command.NextTabStop));
@@ -52,7 +50,7 @@ public class KeyboardSetterTests
         }
         finally
         {
-            Application.DefaultKeyBindings! [Command.NextTabStop] = original;
+            Application.SetDefaultKeyBinding (Command.NextTabStop, original);
             keyboard.Dispose ();
         }
     }
@@ -68,8 +66,7 @@ public class KeyboardSetterTests
         try
         {
             // Act
-            Application.DefaultKeyBindings! [Command.PreviousTabStop] = Bind.All (newKey);
-            keyboard.AddKeyBindings ();
+            Application.SetDefaultKeyBinding (Command.PreviousTabStop, Bind.All (newKey));
 
             // Assert
             Assert.Equal (newKey, Application.GetDefaultKey (Command.PreviousTabStop));
@@ -78,7 +75,7 @@ public class KeyboardSetterTests
         }
         finally
         {
-            Application.DefaultKeyBindings! [Command.PreviousTabStop] = original;
+            Application.SetDefaultKeyBinding (Command.PreviousTabStop, original);
             keyboard.Dispose ();
         }
     }
@@ -94,8 +91,7 @@ public class KeyboardSetterTests
         try
         {
             // Act
-            Application.DefaultKeyBindings! [Command.NextTabGroup] = Bind.All (newKey);
-            keyboard.AddKeyBindings ();
+            Application.SetDefaultKeyBinding (Command.NextTabGroup, Bind.All (newKey));
 
             // Assert
             Assert.Equal (newKey, Application.GetDefaultKey (Command.NextTabGroup));
@@ -104,7 +100,7 @@ public class KeyboardSetterTests
         }
         finally
         {
-            Application.DefaultKeyBindings! [Command.NextTabGroup] = original;
+            Application.SetDefaultKeyBinding (Command.NextTabGroup, original);
             keyboard.Dispose ();
         }
     }
@@ -120,8 +116,7 @@ public class KeyboardSetterTests
         try
         {
             // Act
-            Application.DefaultKeyBindings! [Command.PreviousTabGroup] = Bind.All (newKey);
-            keyboard.AddKeyBindings ();
+            Application.SetDefaultKeyBinding (Command.PreviousTabGroup, Bind.All (newKey));
 
             // Assert
             Assert.Equal (newKey, Application.GetDefaultKey (Command.PreviousTabGroup));
@@ -130,7 +125,7 @@ public class KeyboardSetterTests
         }
         finally
         {
-            Application.DefaultKeyBindings! [Command.PreviousTabGroup] = original;
+            Application.SetDefaultKeyBinding (Command.PreviousTabGroup, original);
             keyboard.Dispose ();
         }
     }
@@ -146,8 +141,7 @@ public class KeyboardSetterTests
         try
         {
             // Act
-            Application.DefaultKeyBindings! [Command.Arrange] = Bind.All (newKey);
-            keyboard.AddKeyBindings ();
+            Application.SetDefaultKeyBinding (Command.Arrange, Bind.All (newKey));
 
             // Assert
             Assert.Equal (newKey, Application.GetDefaultKey (Command.Arrange));
@@ -156,8 +150,98 @@ public class KeyboardSetterTests
         }
         finally
         {
-            Application.DefaultKeyBindings! [Command.Arrange] = original;
+            Application.SetDefaultKeyBinding (Command.Arrange, original);
             keyboard.Dispose ();
+        }
+    }
+
+    // Copilot
+    [Fact]
+    public void SetDefaultKeyBinding_FiresChangedEvent ()
+    {
+        // Arrange
+        PlatformKeyBinding original = Application.DefaultKeyBindings! [Command.Quit];
+        var eventFired = false;
+        EventHandler handler = (_, _) => eventFired = true;
+        Application.DefaultKeyBindingsChanged += handler;
+
+        try
+        {
+            // Act
+            Application.SetDefaultKeyBinding (Command.Quit, Bind.All (Key.Q.WithCtrl));
+
+            // Assert
+            Assert.True (eventFired);
+        }
+        finally
+        {
+            Application.DefaultKeyBindingsChanged -= handler;
+            Application.SetDefaultKeyBinding (Command.Quit, original);
+        }
+    }
+
+    // Copilot
+    [Fact]
+    public void RemoveDefaultKeyBinding_RemovesAndFiresEvent ()
+    {
+        // Arrange
+        PlatformKeyBinding original = Application.DefaultKeyBindings! [Command.Quit];
+        var keyboard = new ApplicationKeyboard ();
+        var eventFired = false;
+        EventHandler handler = (_, _) => eventFired = true;
+        Application.DefaultKeyBindingsChanged += handler;
+
+        try
+        {
+            // Act
+            bool removed = Application.RemoveDefaultKeyBinding (Command.Quit);
+
+            // Assert
+            Assert.True (removed);
+            Assert.True (eventFired);
+            Assert.False (Application.DefaultKeyBindings!.ContainsKey (Command.Quit));
+            Assert.Equal (Key.Empty, Application.GetDefaultKey (Command.Quit));
+        }
+        finally
+        {
+            Application.DefaultKeyBindingsChanged -= handler;
+            Application.SetDefaultKeyBinding (Command.Quit, original);
+            keyboard.Dispose ();
+        }
+    }
+
+    // Copilot
+    [Fact]
+    public void RemoveDefaultKeyBinding_NonExistentCommand_ReturnsFalse ()
+    {
+        // Act
+        bool removed = Application.RemoveDefaultKeyBinding ((Command)9999);
+
+        // Assert
+        Assert.False (removed);
+    }
+
+    // Copilot
+    [Fact]
+    public void SetDefaultKeyBinding_NullDictionary_CreatesDictionary ()
+    {
+        // Arrange
+        Dictionary<Command, PlatformKeyBinding> original = Application.DefaultKeyBindings!;
+
+        try
+        {
+            Application.DefaultKeyBindings = null;
+
+            // Act
+            Application.SetDefaultKeyBinding (Command.Quit, Bind.All (Key.Q.WithCtrl));
+
+            // Assert
+            Assert.NotNull (Application.DefaultKeyBindings);
+            Assert.Equal (Key.Q.WithCtrl, Application.GetDefaultKey (Command.Quit));
+        }
+        finally
+        {
+            Application.DefaultKeyBindings = original;
         }
     }
 }
