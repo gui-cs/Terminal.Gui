@@ -13,14 +13,14 @@ coverage:
       default:
         target: 75%         # Minimum target coverage
         threshold: 1%       # Allow 1% decrease without failing
-        base: auto          # Compare against base branch (v2_develop)
+        base: auto          # Compare against base branch (develop)
         if_ci_failed: error # Fail if CI fails
         # Only measure Terminal.Gui library
         paths:
           - "Terminal.Gui/"
         branches:
-          - v2_develop
-          - v2_release
+          - develop
+          - main
            
     # Per-patch (PR) coverage
     patch:
