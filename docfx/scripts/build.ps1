@@ -21,7 +21,7 @@ try {
     # Force delete generated _site
     Remove-Item ./_site -Recurse -Force -ErrorAction SilentlyContinue
 
-    $env:DOCFX_SOURCE_BRANCH_NAME="v2_develop"
+    $env:DOCFX_SOURCE_BRANCH_NAME="develop"
 
     docfx --serve
 }

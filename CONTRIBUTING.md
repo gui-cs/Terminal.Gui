@@ -27,7 +27,7 @@ Welcome! This guide provides everything you need to know to contribute effective
 - **Platform**: Cross-platform (Windows, macOS, Linux)
 - **Architecture**: Console UI toolkit with driver-based architecture
 - **Version**: v2 (Beta), v1 (maintenance mode)
-- **Branching**: GitFlow model (v2_develop is default/active development)
+- **Branching**: GitFlow model (develop is default/active development)
 
 ## Key Architecture Concepts
 
@@ -334,8 +334,8 @@ foreach (Rune rune in text.EnumerateRunes ())
 
 ### GitFlow Model
 
-- `v2_develop` - Default branch, active development
-- `v2_release` - Stable releases, matches NuGet
+- `develop` - Default branch, active development
+- `main` - Stable releases, matches NuGet
 - `v1_develop`, `v1_release` - Legacy v1 (maintenance only)
 
 ## Release Process
@@ -348,14 +348,14 @@ Releases are now automated using GitHub Actions to prevent manual errors. To cre
 2. **Select "Create Release" workflow** from the left sidebar
 3. **Click "Run workflow"** button
 4. **Configure release parameters:**
-   - **Branch:** Ensure `v2_release` is selected
+   - **Branch:** Ensure `main` is selected
    - **Release type:** Choose from `prealpha`, `alpha`, `beta`, `rc`, or `stable`
    - **Version override:** (Optional) Specify exact version (e.g., `2.0.0`), otherwise GitVersion calculates it automatically
 5. **Click "Run workflow"** to start the automated release process
 
 The workflow will:
 - Create an annotated git tag (e.g., `v2.0.0-prealpha` or `v2.0.0`)
-- Create a release commit on `v2_release`
+- Create a release commit on `main`
 - Push the tag and commit to the repository
 - Create a GitHub Release
 - Automatically trigger the publish workflow to push the package to NuGet.org

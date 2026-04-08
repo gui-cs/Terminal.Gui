@@ -8,7 +8,7 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 
 ### 1) Build Validation (`.github/workflows/build-validation.yml`)
 
-- **Triggers**: push and pull_request to `v2_release`, `v2_develop` (ignores `**.md`)
+- **Triggers**: push and pull_request to `main`, `develop` (ignores `**.md`)
 - **Runner/timeout**: `ubuntu-latest`, 10 minutes
 - **Steps**:
 - Checkout and setup .NET 10.x GA
@@ -22,7 +22,7 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 
 ### 2) Build & Run Unit Tests (`.github/workflows/unit-tests.yml`)
 
-- **Triggers**: push and pull_request to `v2_release`, `v2_develop` (ignores `**.md`)
+- **Triggers**: push and pull_request to `main`, `develop` (ignores `**.md`)
 - **Matrix**: Ubuntu/Windows/macOS
 - **Timeout**: 15 minutes (non-parallel), 60 minutes (parallel)
 - **Process**:
@@ -39,7 +39,7 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 
 ### 3) Build & Run Integration Tests (`.github/workflows/integration-tests.yml`)
 
-- **Triggers**: push and pull_request to `v2_release`, `v2_develop` (ignores `**.md`)
+- **Triggers**: push and pull_request to `main`, `develop` (ignores `**.md`)
 - **Matrix**: Ubuntu/Windows/macOS
 - **Timeout**: 15 minutes
 - **Process**:
@@ -56,7 +56,7 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
   - `release_type`: Choose from `prealpha`, `alpha`, `beta`, `rc`, or `stable`
   - `version_override`: (Optional) Specify exact version number, otherwise GitVersion calculates it
 - **Process**:
-  1. Checks out `v2_release` branch
+  1. Checks out `main` branch
   2. Determines version using GitVersion or override
   3. Creates annotated git tag (e.g., `v2.0.0-prealpha` or `v2.0.0`)
   4. Creates release commit with message
@@ -67,10 +67,10 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 
 ### 5) Publish to NuGet (`.github/workflows/publish.yml`)
 
-- **Triggers**: push to `v2_release`, `v2_develop`, and tags `v*`(ignores `**.md`)
+- **Triggers**: push to `main`, `develop`, and tags `v*`(ignores `**.md`)
 - Uses GitVersion to compute SemVer, builds Release, packs with symbols, and pushes to NuGet.org using `NUGET_API_KEY`
 - **Automatically triggered** by the Create Release workflow when a new tag is pushed
-- **Additional actions on v2_release branch**:
+- **Additional actions on main branch**:
   - Delists old NuGet packages to keep package list clean:
     - Keeps only the most recent `2.0.0-develop.*` package
     - Keeps only the just-published `2.0.0-alpha.*` or `2.0.0-beta.*` package
@@ -78,8 +78,8 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 
 ### 6) Build and publish API docs (`.github/workflows/api-docs.yml`)
 
-- **Triggers**: push to `v1_release` and `v2_develop`
-- Builds DocFX site on Windows and deploys to GitHub Pages when `ref_name` is `v2_release` or `v2_develop`
+- **Triggers**: push to `v1_release` and `develop`
+- Builds DocFX site on Windows and deploys to GitHub Pages when `ref_name` is `main` or `develop`
 
 
 ### Replicating CI Locally
