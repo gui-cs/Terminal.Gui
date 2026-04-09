@@ -53,7 +53,17 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
         { 57384, Key.F21 },
         { 57385, Key.F22 },
         { 57386, Key.F23 },
-        { 57387, Key.F24 }
+        { 57387, Key.F24 },
+        { 57417, Key.CursorLeft },
+        { 57418, Key.CursorRight },
+        { 57419, Key.CursorUp },
+        { 57420, Key.CursorDown },
+        { 57421, Key.PageUp },
+        { 57422, Key.PageDown },
+        { 57423, Key.Home },
+        { 57424, Key.End },
+        { 57425, Key.InsertChar },
+        { 57426, Key.Delete }
     };
 
     /// <inheritdoc/>
