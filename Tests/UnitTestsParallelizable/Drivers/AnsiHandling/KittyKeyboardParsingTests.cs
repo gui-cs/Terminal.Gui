@@ -191,6 +191,17 @@ public class KittyKeyboardParsingTests
     }
 
     [Fact]
+    public void KittyPattern_AltGr_Standalone ()
+    {
+        // ESC[57453u = AltGr / ISO_Level3_Shift
+        Key? key = _pattern.GetKey ("\u001b[57453u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.AltGr, key.ModifierKey);
+    }
+
+    [Fact]
     public void KittyPattern_CapsLock_Standalone ()
     {
         // ESC[57358u = Caps Lock
@@ -221,6 +232,57 @@ public class KittyKeyboardParsingTests
         Assert.NotNull (key);
         Assert.True (key.IsModifierOnly);
         Assert.Equal (ModifierKey.LeftShift, key.ModifierKey);
+        Assert.Equal (KeyEventType.Release, key.EventType);
+    }
+
+    [Fact]
+    public void KittyPattern_AltGr_WithEventType_Release ()
+    {
+        // ESC[57453;1:3u = AltGr / ISO_Level3_Shift, event type 3 (release)
+        Key? key = _pattern.GetKey ("\u001b[57453;1:3u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.AltGr, key.ModifierKey);
+        Assert.Equal (KeyEventType.Release, key.EventType);
+    }
+
+    [Fact]
+    public void KittyPattern_LeftAlt_WithCtrlModifier_PreservesBothStates ()
+    {
+        Key? key = _pattern.GetKey ("\u001b[57443;5u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftAlt, key.ModifierKey);
+        Assert.True (key.IsCtrl);
+        Assert.False (key.IsAlt);
+        Assert.Equal (KeyEventType.Press, key.EventType);
+    }
+
+    [Fact]
+    public void KittyPattern_LeftAlt_Release_WithCtrlAndAltModifiers_PreservesBothStates ()
+    {
+        Key? key = _pattern.GetKey ("\u001b[57443;7:3u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftAlt, key.ModifierKey);
+        Assert.True (key.IsCtrl);
+        Assert.True (key.IsAlt);
+        Assert.Equal (KeyEventType.Release, key.EventType);
+    }
+
+    [Fact]
+    public void KittyPattern_LeftCtrl_Release_WithCtrlModifier_PreservesState ()
+    {
+        Key? key = _pattern.GetKey ("\u001b[57442;5:3u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftCtrl, key.ModifierKey);
+        Assert.True (key.IsCtrl);
+        Assert.False (key.IsAlt);
         Assert.Equal (KeyEventType.Release, key.EventType);
     }
 

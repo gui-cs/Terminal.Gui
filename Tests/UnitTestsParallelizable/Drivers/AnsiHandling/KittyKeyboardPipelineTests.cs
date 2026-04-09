@@ -249,6 +249,7 @@ public class KittyKeyboardPipelineTests
     [InlineData ("\x1b[57447u", ModifierKey.RightShift)]
     [InlineData ("\x1b[57448u", ModifierKey.RightCtrl)]
     [InlineData ("\x1b[57449u", ModifierKey.RightAlt)]
+    [InlineData ("\x1b[57453u", ModifierKey.AltGr)]
     public void Pipeline_ModifierPress_RaisesKeyDown (string sequence, ModifierKey expectedModifier)
     {
         // Standalone modifier press should raise app.Keyboard.KeyDown
@@ -269,6 +270,7 @@ public class KittyKeyboardPipelineTests
     [InlineData ("\x1b[57447;1:3u", ModifierKey.RightShift)]
     [InlineData ("\x1b[57448;1:3u", ModifierKey.RightCtrl)]
     [InlineData ("\x1b[57449;1:3u", ModifierKey.RightAlt)]
+    [InlineData ("\x1b[57453;1:3u", ModifierKey.AltGr)]
     public void Pipeline_ModifierRelease_RaisesKeyUp (string sequence, ModifierKey expectedModifier)
     {
         // Standalone modifier release should raise app.Keyboard.KeyUp
@@ -279,6 +281,19 @@ public class KittyKeyboardPipelineTests
         Assert.True (up [0].IsModifierOnly);
         Assert.Equal (expectedModifier, up [0].ModifierKey);
         Assert.Equal (KeyEventType.Release, up [0].EventType);
+    }
+
+    [Fact]
+    public void Pipeline_LeftAltPress_WithCtrlModifier_PreservesBothStates ()
+    {
+        (List<Key> down, List<Key> up) = InjectRawSequence ("\x1b[57443;5u");
+
+        Assert.Single (down);
+        Assert.True (down [0].IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftAlt, down [0].ModifierKey);
+        Assert.True (down [0].IsCtrl);
+        Assert.False (down [0].IsAlt);
+        Assert.Empty (up);
     }
 
     #endregion

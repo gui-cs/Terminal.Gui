@@ -278,6 +278,24 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void KittyAltGrModifierOnly_DoesNotInsertPrivateUseRune ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 10 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        Key kittyKey = new () { ModifierKey = ModifierKey.AltGr };
+
+        Assert.False (top.NewKeyDownEvent (kittyKey));
+        Assert.Equal (string.Empty, tf.Text);
+
+        top.Dispose ();
+    }
+
+    [Fact]
     public void ShiftedDigitKey_WithoutKittyMetadata_InsertsBaseDigit ()
     {
         Runnable top = new ();

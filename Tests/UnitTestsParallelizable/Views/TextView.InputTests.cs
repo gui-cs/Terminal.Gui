@@ -202,6 +202,24 @@ public class TextViewInputTests
     }
 
     [Fact]
+    public void KittyAltGrModifierOnly_DoesNotInsertPrivateUseRune ()
+    {
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new () { Width = 10, Height = 2 };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        Key kittyKey = new () { ModifierKey = ModifierKey.AltGr };
+
+        Assert.False (tv.NewKeyDownEvent (kittyKey));
+        Assert.Equal (string.Empty, tv.Text);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
+    }
+
+    [Fact]
     public void InsertText_GraphemeSequence_PreservesSingleGrapheme ()
     {
         using IApplication app = Application.Create ();

@@ -231,6 +231,9 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
         { 57447, ModifierKey.RightShift },
         { 57448, ModifierKey.RightCtrl },
         { 57449, ModifierKey.RightAlt },
+        // 57453 = ISO_Level3_Shift (AltGr). Treat it as a dedicated modifier so
+        // standalone AltGr does not fall through as a printable Private Use Area rune.
+        { 57453, ModifierKey.AltGr },
         { 57450, ModifierKey.RightSuper },
         { 57451, ModifierKey.RightHyper }
 
