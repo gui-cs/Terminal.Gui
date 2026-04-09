@@ -198,6 +198,13 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
                                              ansiOutput.EnableKittyKeyboard (result.EnabledFlags);
                                              _driver.SetKittyKeyboardEnabledFlags (ansiOutput.KittyKeyboardEnabledFlags);
+
+                                             // Enable kitty protocol deduplication in AnsiInput if applicable
+                                             if (_input is AnsiInput ansiInput)
+                                             {
+                                                 ansiInput.KittyProtocolEnabled = true;
+                                             }
+
                                              Trace.Lifecycle (app?.MainThreadId?.ToString (),
                                                               "KittyKeyboard",
                                                               $"Enabled kitty keyboard flags {ansiOutput.KittyKeyboardEnabledFlags}");

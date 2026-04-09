@@ -573,6 +573,22 @@ public class KittyKeyboardPipelineTests
         Assert.Equal (KeyEventType.Release, keyUpEvents [0].EventType);
     }
 
+    // Copilot - Opus 4.6
+    [Fact]
+    public void Pipeline_KittyPrintableKey ()
+    {
+        // Test that kitty CSI u sequence produces the expected key event
+        (List<Key> down, List<Key> up) = InjectRawSequence (
+            "\x1b[171;2:1u"  // ESC[171;2:1u = '«'(171) + Shift(2), press(1) - kitty sequence
+        );
+
+        // Should have one key event from kitty
+        Assert.Single (down);
+        // For Shift+«, the kitty sequence should produce a key with KeyCode = 171 and IsShift = true
+        Assert.Equal (171, down [0].AsRune.Value);
+        Assert.True (down [0].IsShift);
+        Assert.Empty (up);
+    }
 
     // Copilot - Opus 4.6
     // Theory test for alternative kitty code points (57417-57426)
@@ -608,3 +624,4 @@ public class KittyKeyboardPipelineTests
         Assert.Empty (up);
     }
 }
+#endregion

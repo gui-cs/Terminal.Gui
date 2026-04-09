@@ -68,6 +68,18 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
     // Queue for storing injected input that will be returned by Peek/Read
     private readonly ConcurrentQueue<char> _testInput = new ();
 
+    private bool _kittyProtocolEnabled;
+    private char? _previousWindowsVTLastChar;
+
+    /// <summary>
+    ///     Gets or sets whether the kitty keyboard protocol is enabled for this input stream.
+    /// </summary>
+    internal bool KittyProtocolEnabled
+    {
+        get => _kittyProtocolEnabled;
+        set => _kittyProtocolEnabled = value;
+    }
+
     private int _peekCallCount;
 
     /// <summary>
@@ -204,6 +216,23 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                 }
 
                 string text = _windowsVTInput!.ConsoleInputEncoding.GetString (buffer, 0, bytesRead);
+
+                if (_kittyProtocolEnabled
+                    && _previousWindowsVTLastChar is { } lastChar
+                    && text.Length > 0
+                    && text [0] == lastChar)
+                {
+                    text = text [1..];
+                }
+
+                if (text.Length == 0)
+                {
+                    _previousWindowsVTLastChar = null;
+
+                    yield break;
+                }
+
+                _previousWindowsVTLastChar = text [^1];
 
                 //Trace.Lifecycle (nameof (AnsiInput), "Read", $"Read {bytesRead} bytes from Windows VT Input: {text}");
 
