@@ -57,6 +57,19 @@ public class KittyKeyboardPipelineTests
         Assert.Empty (up);
     }
 
+    [Fact]
+    public void Pipeline_AltGrE_Press_RaisesEuroKeyDown ()
+    {
+        // ESC[8364;1:1u = Euro symbol press
+        (List<Key> down, List<Key> up) = InjectRawSequence ("\x1b[8364;1:1u");
+
+        Assert.Single (down);
+        Assert.Equal (KeyEventType.Press, down [0].EventType);
+        Assert.Equal ((KeyCode)8364, down [0].KeyCode);
+        Assert.Equal ("€", down [0].AsGrapheme);
+        Assert.Empty (up);
+    }
+
     // Copilot - Opus 4.6
     [Fact]
     public void Pipeline_Repeat_RaisesKeyDown ()

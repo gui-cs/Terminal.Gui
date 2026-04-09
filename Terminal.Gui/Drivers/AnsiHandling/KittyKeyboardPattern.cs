@@ -10,7 +10,7 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class KittyKeyboardPattern : AnsiKeyboardParserPattern
 {
-    private readonly Regex _pattern = new (@"^\u001b\[(\d+)(?::(\d+))?(?::(\d+))?(?:;([^;u]*))?(?:;([^u]+))?u$");
+    private readonly Regex _pattern = new (@"^\u001b\[(\d+)(?::(\d*))?(?::(\d*))?(?:;([^;u]*))?(?:;([^u]+))?u$");
 
     private readonly Dictionary<int, Key> _functionalKeyMap = new ()
     {

@@ -296,6 +296,66 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void KittyAltGr5_InsertsEuroSymbol ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 10 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        Key? key = new KittyKeyboardPattern ().GetKey ("\u001b[8364;1:1u");
+
+        Assert.NotNull (key);
+        Assert.True (top.NewKeyDownEvent (key));
+        Assert.Equal ("€", tf.Text);
+        Assert.Equal (1, tf.InsertionPoint);
+
+        top.Dispose ();
+    }
+
+    [Fact]
+    public void KittyAltGrE_InsertsEuroSymbol ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 10 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        Key? key = new KittyKeyboardPattern ().GetKey ("\u001b[8364;1:1u");
+
+        Assert.NotNull (key);
+        Assert.True (top.NewKeyDownEvent (key));
+        Assert.Equal ("€", tf.Text);
+        Assert.Equal (1, tf.InsertionPoint);
+
+        top.Dispose ();
+    }
+
+    [Fact]
+    public void KittyAltGr2_InsertsAtSign ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 10 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        Key? key = new KittyKeyboardPattern ().GetKey ("\u001b[64::50;;64u");
+
+        Assert.NotNull (key);
+        Assert.True (top.NewKeyDownEvent (key));
+        Assert.Equal ("@", tf.Text);
+        Assert.Equal (1, tf.InsertionPoint);
+
+        top.Dispose ();
+    }
+
+    [Fact]
     public void ShiftedDigitKey_WithoutKittyMetadata_InsertsBaseDigit ()
     {
         Runnable top = new ();

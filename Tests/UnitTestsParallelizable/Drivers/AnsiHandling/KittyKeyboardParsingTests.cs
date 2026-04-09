@@ -522,6 +522,58 @@ public class KittyKeyboardParsingTests
         Assert.Equal ((KeyCode)13, key.BaseLayoutKeyCode);
     }
 
+    [Fact]
+    public void KittyPattern_EmptyFields_WithAssociatedText ()
+    {
+        // ESC[64::50;;64u = '@' with empty shifted field, base layout '2', empty modifiers, associated text '@'
+        Key? key = _pattern.GetKey ("\u001b[64::50;;64u");
+
+        Assert.NotNull (key);
+        Assert.Equal (new Key ('@'), key);
+        Assert.Equal (KeyCode.Null, key.ShiftedKeyCode);
+        Assert.Equal ((KeyCode)50, key.BaseLayoutKeyCode);
+        Assert.Equal ("@", key.AssociatedText);
+    }
+
+    [Fact]
+    public void KittyPattern_AltGr5_Press_ReturnsEuroGrapheme ()
+    {
+        // ESC[8364;1:1u = Euro symbol, no modifiers, press
+        Key? key = _pattern.GetKey ("\u001b[8364;1:1u");
+
+        Assert.NotNull (key);
+        Assert.Equal (KeyEventType.Press, key.EventType);
+        Assert.Equal ((KeyCode)8364, key.KeyCode);
+        Assert.Equal ("€", key.AsGrapheme);
+        Assert.Equal ("€", key.GetPrintableText ());
+    }
+
+    [Fact]
+    public void KittyPattern_AltGrE_EuroKey_Press_ReturnsEuroGrapheme ()
+    {
+        // ESC[8364;1:1u = AltGr+E on many layouts, which sends the euro codepoint 8364.
+        Key? key = _pattern.GetKey ("\u001b[8364;1:1u");
+
+        Assert.NotNull (key);
+        Assert.Equal (KeyEventType.Press, key.EventType);
+        Assert.Equal ((KeyCode)8364, key.KeyCode);
+        Assert.Equal ("€", key.AsGrapheme);
+        Assert.Equal ("€", key.GetPrintableText ());
+    }
+
+    [Fact]
+    public void KittyPattern_AltGrE_EuroKey_Release_ReturnsEuroGrapheme ()
+    {
+        // ESC[8364;1:3u = Euro symbol, no modifiers, release
+        Key? key = _pattern.GetKey ("\u001b[8364;1:3u");
+
+        Assert.NotNull (key);
+        Assert.Equal (KeyEventType.Release, key.EventType);
+        Assert.Equal ((KeyCode)8364, key.KeyCode);
+        Assert.Equal ("€", key.AsGrapheme);
+        Assert.Equal ("€", key.GetPrintableText ());
+    }
+
     #endregion
 
     #region Kitty Flags Validation
