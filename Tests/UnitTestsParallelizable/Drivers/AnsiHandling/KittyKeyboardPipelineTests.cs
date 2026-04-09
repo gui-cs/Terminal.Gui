@@ -573,5 +573,38 @@ public class KittyKeyboardPipelineTests
         Assert.Equal (KeyEventType.Release, keyUpEvents [0].EventType);
     }
 
-    #endregion
+
+    // Copilot - Opus 4.6
+    // Theory test for alternative kitty code points (57417-57426)
+    [Theory]
+    [InlineData (57417, nameof (Key.CursorLeft))]
+    [InlineData (57418, nameof (Key.CursorRight))]
+    [InlineData (57419, nameof (Key.CursorUp))]
+    [InlineData (57420, nameof (Key.CursorDown))]
+    [InlineData (57421, nameof (Key.PageUp))]
+    [InlineData (57422, nameof (Key.PageDown))]
+    [InlineData (57423, nameof (Key.Home))]
+    [InlineData (57424, nameof (Key.End))]
+    [InlineData (57425, nameof (Key.InsertChar))]
+    [InlineData (57426, nameof (Key.Delete))]
+    public void Alternative_KittyCodePoints_Map_To_Correct_Keys (int kittyCode, string expectedKeyName)
+    {
+        // Arrange - Build the kitty sequence for the code point
+        string sequence = $"\x1b[{kittyCode}u";  // ESC[codePointu (press event, no modifiers)
+
+        // Act
+        (List<Key> down, List<Key> up) = InjectRawSequence (sequence);
+
+        // Assert - Should have exactly one key down event
+        Assert.Single (down);
+
+        // Get the expected key by name from the Key class
+        System.Reflection.PropertyInfo? prop = typeof (Key).GetProperty (expectedKeyName);
+        Assert.NotNull (prop);
+        Key expectedKey = (Key)prop!.GetValue (null)!;
+
+        // Verify the mapped key matches the expected key
+        Assert.Equal (expectedKey.KeyCode, down [0].KeyCode);
+        Assert.Empty (up);
+    }
 }
