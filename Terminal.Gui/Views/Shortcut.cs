@@ -805,11 +805,6 @@ public class Shortcut : View, IOrientation, IDesignable
 
     private void UpdateKeyBindings (Key oldKey)
     {
-        //if (!Key.IsValid)
-        //{
-        //    return;
-        //}
-
         if (BindKeyToApplication)
         {
             if (oldKey != Key.Empty)
