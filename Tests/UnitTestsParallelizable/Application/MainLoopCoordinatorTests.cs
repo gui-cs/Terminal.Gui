@@ -238,12 +238,12 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
             loop.InputProcessor.ProcessQueue ();
 
             var driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
-            Assert.True (driver.KittyKeyboardProtocol.IsSupported);
-            Assert.Equal ((KittyKeyboardFlags)31, driver.KittyKeyboardProtocol.SupportedFlags);
+            Assert.True (driver.KittyKeyboardCapabilities?.IsSupported);
+            Assert.Equal ((KittyKeyboardFlags)31, driver.KittyKeyboardCapabilities?.SupportedFlags);
 
             // In degraded mode (no real terminal), enable/disable are no-ops,
             // but detection still succeeds via injected response.
-            Assert.Equal (KittyKeyboardFlags.None, driver.KittyKeyboardProtocol.EnabledFlags);
+            Assert.Equal (KittyKeyboardFlags.None, driver.KittyKeyboardCapabilities?.EnabledFlags);
 
             coordinator.Stop ();
         }
@@ -267,7 +267,7 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
         await coordinator.StartInputTaskAsync (appMock.Object);
 
         var driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
-        Assert.False (driver.KittyKeyboardProtocol.IsSupported);
+        Assert.False (driver.KittyKeyboardCapabilities?.IsSupported);
 
         Assert.DoesNotContain (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardRequestedFlags),
                                output.GetLastOutput (),

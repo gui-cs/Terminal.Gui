@@ -21,7 +21,7 @@ public class KittyKeyboardProtocolDetectorTests
 
         KittyKeyboardProtocolDetector detector = new (driverMock.Object);
 
-        KittyKeyboardProtocolResult? result = null;
+        KittyKeyboardCapabilities? result = null;
 
         detector.Detect (r => result = r);
 
@@ -43,7 +43,7 @@ public class KittyKeyboardProtocolDetectorTests
 
         KittyKeyboardProtocolDetector detector = new (driverMock.Object);
 
-        KittyKeyboardProtocolResult? result = null;
+        KittyKeyboardCapabilities? result = null;
 
         detector.Detect (r => result = r);
 
@@ -61,7 +61,7 @@ public class KittyKeyboardProtocolDetectorTests
 
         KittyKeyboardProtocolDetector detector = new (driverMock.Object);
 
-        KittyKeyboardProtocolResult? result = null;
+        KittyKeyboardCapabilities? result = null;
 
         detector.Detect (r => result = r);
 
@@ -78,7 +78,7 @@ public class KittyKeyboardProtocolDetectorTests
     [InlineData ("", false, 0)]
     public void ParseResponse_ReturnsExpectedResult (string response, bool isSupported, int supportedFlags)
     {
-        KittyKeyboardProtocolResult result = KittyKeyboardProtocolDetector.ParseResponse (response);
+        KittyKeyboardCapabilities result = KittyKeyboardProtocolDetector.ParseResponse (response);
 
         Assert.Equal (isSupported, result.IsSupported);
         Assert.Equal ((KittyKeyboardFlags)supportedFlags, result.SupportedFlags);

@@ -63,7 +63,7 @@ public sealed class UICatalogRunnable : Runnable
 
         _disableMouseCb?.Value = App.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
 
-        _shVersion?.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {App?.Driver?.GetVersionInfo ()}";
+        _shVersion?.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {App?.Driver?.GetName ()}";
 
         if (string.IsNullOrEmpty ((string?)Result))
         {

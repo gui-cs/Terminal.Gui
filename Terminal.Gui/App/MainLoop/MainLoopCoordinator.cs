@@ -185,7 +185,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
             KittyKeyboardProtocolDetector kittyKeyboardDetector = new (_driver);
             kittyKeyboardDetector.Detect (result =>
                                          {
-                                             _driver.SetKittyKeyboardProtocol (result);
+                                             _driver.SetKittyKeyboardCapabilities (result);
                                              Trace.Lifecycle (app?.MainThreadId?.ToString (),
                                                               "KittyKeyboard",
                                                               $"Probe complete: Supported={result.IsSupported}, SupportedFlags={result.SupportedFlags}, EnabledFlags={result.EnabledFlags}");

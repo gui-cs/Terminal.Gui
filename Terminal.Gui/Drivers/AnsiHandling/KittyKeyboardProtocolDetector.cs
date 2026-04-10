@@ -24,14 +24,14 @@ public class KittyKeyboardProtocolDetector
     ///     Detects kitty keyboard protocol support asynchronously through the ANSI request scheduler.
     /// </summary>
     /// <param name="resultCallback">Called when detection completes.</param>
-    public void Detect (Action<KittyKeyboardProtocolResult> resultCallback)
+    public void Detect (Action<KittyKeyboardCapabilities> resultCallback)
     {
         ArgumentNullException.ThrowIfNull (resultCallback);
 
         if (_driver is { IsLegacyConsole: true })
         {
             Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Detect", "Skipping kitty keyboard probe for legacy console");
-            resultCallback (new KittyKeyboardProtocolResult ());
+            resultCallback (new KittyKeyboardCapabilities ());
 
             return;
         }
@@ -43,7 +43,7 @@ public class KittyKeyboardProtocolDetector
         QueueRequest (EscSeqUtils.CSI_QueryKittyKeyboardFlags,
                       response =>
                       {
-                          KittyKeyboardProtocolResult result = ParseResponse (response);
+                          KittyKeyboardCapabilities result = ParseResponse (response);
                           result.EnabledFlags = result.IsSupported ? EscSeqUtils.KittyKeyboardRequestedFlags : KittyKeyboardFlags.None;
 
                           Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector),
@@ -62,7 +62,7 @@ public class KittyKeyboardProtocolDetector
                       () =>
                       {
                           Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Detect", "Kitty keyboard probe abandoned");
-                          resultCallback (new KittyKeyboardProtocolResult ());
+                          resultCallback (new KittyKeyboardCapabilities ());
                       });
     }
 
@@ -80,20 +80,20 @@ public class KittyKeyboardProtocolDetector
         _driver?.QueueAnsiRequest (request);
     }
 
-    internal static KittyKeyboardProtocolResult ParseResponse (string? response)
+    internal static KittyKeyboardCapabilities ParseResponse (string? response)
     {
         if (string.IsNullOrWhiteSpace (response))
         {
-            return new KittyKeyboardProtocolResult ();
+            return new KittyKeyboardCapabilities ();
         }
 
         Match match = Regex.Match (response, @"(?:\x1B)?\[\?(\d+)u$");
 
         if (!match.Success || !int.TryParse (match.Groups [1].Value, out int supportedFlags))
         {
-            return new KittyKeyboardProtocolResult ();
+            return new KittyKeyboardCapabilities ();
         }
 
-        return new KittyKeyboardProtocolResult { IsSupported = true, SupportedFlags = (KittyKeyboardFlags)supportedFlags };
+        return new KittyKeyboardCapabilities { IsSupported = true, SupportedFlags = (KittyKeyboardFlags)supportedFlags };
     }
 }

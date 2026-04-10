@@ -88,14 +88,6 @@ internal class DriverImpl : IDriver
     public string? GetName () => _componentFactory.GetDriverName ();
 
     /// <inheritdoc/>
-    public virtual string GetVersionInfo ()
-    {
-        string? driverName = GetName ();
-
-        return $"{driverName} driver";
-    }
-
-    /// <inheritdoc/>
     public void Suspend ()
     {
         try
@@ -364,16 +356,14 @@ internal class DriverImpl : IDriver
 
     #region Input Events
 
-    /// <summary>
-    ///     Gets the detected kitty keyboard protocol state for the current driver instance.
-    /// </summary>
-    internal KittyKeyboardProtocolResult KittyKeyboardProtocol { get; private set; } = new ();
+    /// <inheritdoc/>
+    public KittyKeyboardCapabilities? KittyKeyboardCapabilities { get; private set; }
 
     /// <summary>
     ///     Stores the latest kitty keyboard protocol detection result.
     /// </summary>
-    /// <param name="result">The detected kitty keyboard protocol result.</param>
-    internal void SetKittyKeyboardProtocol (KittyKeyboardProtocolResult result) => KittyKeyboardProtocol = result;
+    /// <param name="result">The detected kitty keyboard capabilities result.</param>
+    internal void SetKittyKeyboardCapabilities (KittyKeyboardCapabilities result) => KittyKeyboardCapabilities = result;
 
     /// <summary>
     ///     Stores the kitty keyboard flags currently enabled on the terminal.
@@ -381,7 +371,10 @@ internal class DriverImpl : IDriver
     /// <param name="enabledFlags">The kitty keyboard flags currently enabled.</param>
     internal void SetKittyKeyboardEnabledFlags (KittyKeyboardFlags enabledFlags)
     {
-        KittyKeyboardProtocol.EnabledFlags = enabledFlags;
+        if (KittyKeyboardCapabilities is not null)
+        {
+            KittyKeyboardCapabilities.EnabledFlags = enabledFlags;
+        }
     }
 
     /// <summary>Event fired when a key is pressed down.</summary>

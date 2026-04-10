@@ -1,9 +1,9 @@
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
-///     Describes the kitty keyboard protocol state discovered from the active terminal.
+///     Describes the kitty keyboard protocol capabilities discovered from the active terminal.
 /// </summary>
-public class KittyKeyboardProtocolResult
+public class KittyKeyboardCapabilities
 {
     /// <summary>
     ///     Gets or sets whether the active terminal responded to the kitty keyboard protocol query.
