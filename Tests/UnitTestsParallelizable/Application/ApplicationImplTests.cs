@@ -394,7 +394,8 @@ public class ApplicationImplTests
 
     // Copilot
     /// <summary>
-    ///     Regression test for: StopRequested not reset when IsRunningChanging cancels a stop.
+    ///     Regression test for: https://github.com/gui-cs/Terminal.Gui/issues/4920
+    ///     StopRequested not reset when IsRunningChanging cancels a stop.
     ///     When a handler vetoes the stop (by cancelling IsRunningChanging), Run() must re-enter
     ///     the RunLoop instead of returning prematurely with IsRunning still true.
     /// </summary>
