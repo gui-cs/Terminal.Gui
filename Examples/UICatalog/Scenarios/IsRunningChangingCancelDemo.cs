@@ -3,24 +3,27 @@
 namespace UICatalog.Scenarios;
 
 /// <summary>
-///     Demonstrates the "cancel stop" pattern: a dialog that can cancel its own closing via
-///     <see cref="Runnable.OnIsRunningChanging"/>.
+///     Demonstrates vetoing a stop by overriding <see cref="Runnable.OnIsRunningChanging"/>: a dialog that
+///     asks the user to confirm before allowing itself to close.
 /// </summary>
 /// <remarks>
 ///     <para>
-///         This scenario exercises the TG bug where <see cref="IRunnable.StopRequested"/> is not reset
-///         when <see cref="IRunnable.IsRunningChanging"/> is cancelled (i.e. the stop is vetoed by a handler).
+///         When a stop is requested (e.g. Esc or Cancel), <see cref="Runnable.OnIsRunningChanging"/> is
+///         invoked with <c>newIsRunning = false</c>. Returning <see langword="true"/> from that override
+///         cancels the stop and keeps the runnable alive.
 ///     </para>
 ///     <para>
-///         Before the fix the dialog would freeze after the user clicks "Stay" — the run loop had already
-///         exited and was never re-entered, leaving the dialog visually present but unresponsive.
-///         After the fix the dialog resumes normally and the counter keeps incrementing.
+///         This scenario also serves as a regression test for the TG bug where
+///         <see cref="IRunnable.StopRequested"/> was not reset when <see cref="IRunnable.IsRunningChanging"/>
+///         was cancelled — before the fix, clicking "Stay" caused the dialog to freeze because the run loop
+///         had already exited and was never re-entered. After the fix the dialog resumes normally and the
+///         veto counter keeps incrementing.
 ///     </para>
 /// </remarks>
-[ScenarioMetadata ("Cancel Stop Demo", "Demonstrates cancelling a stop via OnIsRunningChanging (freeze-on-cancel regression)")]
+[ScenarioMetadata ("IsRunningChanging Cancel Demo", "Demonstrates vetoing a stop by overriding OnIsRunningChanging — the dialog stays interactive after the user chooses 'Stay'")]
 [ScenarioCategory ("Runnable")]
 [ScenarioCategory ("Dialogs")]
-public class CancelStopDemo : Scenario
+public class IsRunningChangingCancelDemo : Scenario
 {
     public override void Main ()
     {
