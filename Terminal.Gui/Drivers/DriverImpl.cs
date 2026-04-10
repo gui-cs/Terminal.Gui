@@ -382,6 +382,17 @@ internal class DriverImpl : IDriver
     internal void SetKittyKeyboardEnabledFlags (KittyKeyboardFlags enabledFlags)
     {
         KittyKeyboardProtocol.EnabledFlags = enabledFlags;
+
+
+        if ((_componentFactory as AnsiComponentFactory)?.CreateOutput() is AnsiOutput { } output)
+        {
+            output.EnableKittyKeyboard (enabledFlags);
+        }
+
+        if ((_componentFactory as AnsiComponentFactory)?.CreateInput () is AnsiInput { } input)
+        {
+            input.EnableKittyKeyboard (enabledFlags);
+        }
     }
 
     /// <summary>Event fired when a key is pressed down.</summary>

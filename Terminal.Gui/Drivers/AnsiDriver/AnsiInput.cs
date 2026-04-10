@@ -68,17 +68,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
     // Queue for storing injected input that will be returned by Peek/Read
     private readonly ConcurrentQueue<char> _testInput = new ();
 
-    private bool _kittyProtocolEnabled;
     private char? _previousWindowsVTLastChar;
-
-    /// <summary>
-    ///     Gets or sets whether the kitty keyboard protocol is enabled for this input stream.
-    /// </summary>
-    internal bool KittyProtocolEnabled
-    {
-        get => _kittyProtocolEnabled;
-        set => _kittyProtocolEnabled = value;
-    }
 
     private int _peekCallCount;
 
@@ -217,7 +207,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
 
                 string text = _windowsVTInput!.ConsoleInputEncoding.GetString (buffer, 0, bytesRead);
 
-                if (_kittyProtocolEnabled
+                if (_enabledKittyKeyboardFlags != KittyKeyboardFlags.None
                     && _previousWindowsVTLastChar is { } lastChar
                     && text.Length > 0
                     && text [0] == lastChar)
@@ -387,6 +377,19 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
         }
     }
 
+    private KittyKeyboardFlags _enabledKittyKeyboardFlags;
+
+    /// <summary>
+    ///     Enables kitty keyboard progressive enhancement flags for the active terminal.
+    /// </summary>
+    /// <param name="enabledFlags">The kitty keyboard flags to enable.</param>
+    internal void EnableKittyKeyboard (KittyKeyboardFlags enabledFlags)
+    {
+        _enabledKittyKeyboardFlags = enabledFlags;
+
+        Trace.Lifecycle (nameof (AnsiOutput), "KittyKeyboard", $"Input enabled: {enabledFlags}");
+    }
+
     // Will be called on the main loop thread.
     /// <inheritdoc/>
     public void InjectInput (char input) => _testInput.Enqueue (input);
@@ -426,4 +429,6 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
             // ignore exceptions during disposal
         }
     }
+
+
 }
