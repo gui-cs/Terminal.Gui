@@ -392,6 +392,33 @@ public class ApplicationImplTests
         Assert.Equal (0, isRunningChanged);
     }
 
+    // Copilot
+    /// <summary>
+    ///     Regression test for: StopRequested not reset when IsRunningChanging cancels a stop.
+    ///     When a handler vetoes the stop (by cancelling IsRunningChanging), Run() must re-enter
+    ///     the RunLoop instead of returning prematurely with IsRunning still true.
+    /// </summary>
+    [Fact]
+    public void Run_WhenStopCancelledByIsRunningChanging_RunLoopResumes ()
+    {
+        IApplication app = NewMockedApplicationImpl ()!;
+        app.Init (DriverRegistry.Names.ANSI);
+        app.StopAfterFirstIteration = true;
+
+        OnceCancelStopRunnable runnable = new ();
+
+        // Act — must complete without hanging
+        app.Run (runnable);
+
+        // The first stop attempt was cancelled (IsRunning stayed true temporarily).
+        // After the fix, StopRequested was reset and RunLoop re-entered; the second stop
+        // attempt succeeded so IsRunning is now false.
+        Assert.False (runnable.IsRunning);
+        Assert.Equal (1, runnable.CancelCount);
+
+        app.Dispose ();
+    }
+
     private bool IdleExit (IApplication app)
     {
         if (app.TopRunnableView != null)
@@ -489,5 +516,30 @@ public class ApplicationImplTests
         //Assert.Null (v2.Navigation);
         Assert.Null (v2.TopRunnableView);
         Assert.Empty (v2.SessionStack!);
+    }
+
+    /// <summary>
+    ///     A runnable that cancels only the first stop attempt.
+    ///     Used to simulate a "Are you sure?" veto pattern.
+    /// </summary>
+    private class OnceCancelStopRunnable : Runnable<int>
+    {
+        private bool _firstStop = true;
+
+        /// <summary>Gets how many times the stop was cancelled.</summary>
+        public int CancelCount { get; private set; }
+
+        protected override bool OnIsRunningChanging (bool oldIsRunning, bool newIsRunning)
+        {
+            if (!newIsRunning && _firstStop)
+            {
+                _firstStop = false;
+                CancelCount++;
+
+                return true; // Cancel this stop attempt
+            }
+
+            return base.OnIsRunningChanging (oldIsRunning, newIsRunning);
+        }
     }
 }
