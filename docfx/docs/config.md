@@ -227,8 +227,8 @@ A **Theme** is a named collection of visual settings bundled together. Terminal.
 // Get current theme
 ThemeScope currentTheme = ThemeManager.GetCurrentTheme();
 
-// Get all available themes
-Dictionary<string, ThemeScope> themes = ThemeManager.GetThemes();
+// Get all available themes (ConcurrentDictionary<string, ThemeScope>)
+ConcurrentDictionary<string, ThemeScope> themes = ThemeManager.Themes;
 
 // Get theme names
 ImmutableList<string> themeNames = ThemeManager.GetThemeNames();
@@ -240,6 +240,7 @@ ConfigurationManager.Apply();
 // Listen for theme changes
 ThemeManager.ThemeChanged += (sender, e) => 
 {
+    // e.Value is the new theme name
     // Update UI based on new theme
 };
 ```
@@ -264,7 +265,7 @@ See the [Scheme Deep Dive](scheme.md) for complete details on the scheme system.
 
 ```csharp
 // Get all schemes for current theme
-Dictionary<string, Scheme> schemes = SchemeManager.GetCurrentSchemes();
+Dictionary<string, Scheme?> schemes = SchemeManager.GetSchemesForCurrentTheme();
 
 // Get specific scheme
 Scheme dialogScheme = SchemeManager.GetScheme(Schemes.Dialog);
@@ -278,12 +279,6 @@ SchemeManager.AddScheme("MyScheme", new Scheme
     Normal = new Attribute(Color.White, Color.Blue),
     Focus = new Attribute(Color.Black, Color.Cyan)
 });
-
-// Listen for scheme changes
-SchemeManager.CollectionChanged += (sender, e) => 
-{
-    // Handle scheme changes
-};
 ```
 
 #### Scheme Structure
@@ -458,10 +453,22 @@ The ConfigurationManager provides events to track configuration changes:
 Raised after configuration is applied to the application:
 
 ```csharp
-ConfigurationManager.Applied += (sender, e) => 
+ConfigurationManager.Applied += (_, _) => 
 {
     // Configuration has been applied
     // Update UI or refresh views
+};
+```
+
+### Updated Event
+
+Raised after configuration is loaded from a source or reset (before `Apply()` is called):
+
+```csharp
+ConfigurationManager.Updated += (_, _) => 
+{
+    // Configuration has been loaded or reset
+    // Inspect ConfigurationManager.Settings if needed
 };
 ```
 
@@ -470,23 +477,12 @@ ConfigurationManager.Applied += (sender, e) =>
 Raised when the active theme changes:
 
 ```csharp
-ThemeManager.ThemeChanged += (sender, e) => 
+ThemeManager.ThemeChanged += (_, e) => 
 {
-    // Theme has changed
+    // e.Value is the new theme name
     // Refresh all views to use new theme
     // From within a View, use: App?.Current?.SetNeedsDraw();
     // Or access via IApplication instance: app.Current?.SetNeedsDraw();
-};
-```
-
-### CollectionChanged Event
-
-Raised when schemes collection changes:
-
-```csharp
-SchemeManager.CollectionChanged += (sender, e) => 
-{
-    // Schemes have changed
 };
 ```
 
@@ -628,14 +624,12 @@ Each entry uses the `PlatformKeyBinding` format with optional `All`, `Windows`, 
 To find all available configuration properties:
 
 ```csharp
-// Get hard-coded configuration
-SettingsScope hardCoded = ConfigurationManager.GetHardCodedConfig();
+// Get hard-coded configuration as a JSON string
+string hardCodedJson = ConfigurationManager.GetHardCodedConfig();
+Console.WriteLine(hardCodedJson);
 
-// Iterate through all properties
-foreach (var property in hardCoded)
-{
-    Console.WriteLine($"{property.Key} = {property.Value}");
-}
+// Or get an empty configuration skeleton
+string emptyJson = ConfigurationManager.GetEmptyConfig();
 ```
 
 Or search the source code for `[ConfigurationProperty]` attributes.
@@ -892,20 +886,17 @@ Control how JSON parsing errors are handled:
 - `false` (default) - Silent failures, errors logged
 - `true` - Throws exceptions on JSON parsing errors
 
-### Manually Trigger Updates
+### Get Configuration as JSON
 
-Update ConfigurationManager to reflect current static property values:
+Retrieve the current hard-coded defaults as a JSON string:
 
 ```csharp
-// Change a setting programmatically
-Application.DefaultKeyBindings[Command.Quit] = Bind.All (Key.Q.WithCtrl);
-
-// Update ConfigurationManager to reflect the change
-ConfigurationManager.UpdateToCurrentValues();
-
-// Save to file (if needed)
-string json = ConfigurationManager.Serialize();
+// Get the hard-coded configuration as JSON
+string json = ConfigurationManager.GetHardCodedConfig();
 File.WriteAllText("my-config.json", json);
+
+// Get an empty configuration skeleton (just the $schema tag)
+string empty = ConfigurationManager.GetEmptyConfig();
 ```
 
 ### Disable ConfigurationManager
@@ -949,22 +940,25 @@ using Terminal.Gui;
 using Terminal.Gui.Configuration;
 
 ConfigurationManager.Enable(ConfigLocations.All);
-Application.Init();
 
-var themeSelector = new OptionSelector<string>
+using IApplication app = Application.Create();
+app.Init();
+
+OptionSelector<string> themeSelector = new ()
 {
     X = 1,
     Y = 1,
 };
 themeSelector.SetSource(ThemeManager.GetThemeNames());
-themeSelector.SelectedItemChanged += (s, e) =>
+themeSelector.SelectedItemChanged += (_, e) =>
 {
     ThemeManager.Theme = e.Value.ToString();
     ConfigurationManager.Apply();
 };
 
-Application.Run(new Window { Title = "Theme Demo" }).Add(themeSelector);
-Application.Shutdown();
+Window win = new () { Title = "Theme Demo" };
+win.Add(themeSelector);
+app.Run(win);
 ```
 
 ### Example 2: Custom Application Settings
@@ -992,9 +986,8 @@ var window = new Window
     Height = MyApp.WindowHeight
 };
 
-// Later, save updated settings
-MyApp.WindowWidth = 100;
-ConfigurationManager.UpdateToCurrentValues();
+// Later, retrieve the hard-coded config as JSON
+string json = ConfigurationManager.GetHardCodedConfig();
 // Could save to file here
 ```
 
@@ -1006,7 +999,7 @@ ConfigurationManager.RuntimeConfig = @"
   ""Application.DefaultKeyBindings"": {
     ""Quit"": { ""All"": [""Ctrl+Q""] }
   },
-  ""Driver.Force16Colors"": true,
+  ""Application.Force16Colors"": true,
   ""Theme"": ""Dark""
 }";
 
