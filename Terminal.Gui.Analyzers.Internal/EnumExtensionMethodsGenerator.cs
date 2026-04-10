@@ -136,9 +136,6 @@ public sealed class EnumExtensionMethodsGenerator : IIncrementalGenerator
         sb.Append ("/// <summary>Extension methods for the <see cref=\"").Append (info.Name)
           .AppendLine ("\"/> <see langword=\"enum\"/> type.</summary>");
         sb.AppendLine ("[GeneratedCode (\"Terminal.Gui.Analyzers.Internal\", \"1.0\")]");
-        sb.AppendLine ("[CompilerGenerated]");
-        sb.AppendLine ("[DebuggerNonUserCode]");
-        sb.AppendLine ("[ExcludeFromCodeCoverage (Justification = \"Generated code is already tested.\")]");
         sb.Append ("public static partial class ").Append (info.Name).AppendLine ("Extensions");
         sb.AppendLine ("{");
 
