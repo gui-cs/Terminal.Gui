@@ -805,10 +805,10 @@ public class Shortcut : View, IOrientation, IDesignable
 
     private void UpdateKeyBindings (Key oldKey)
     {
-        if (!Key.IsValid)
-        {
-            return;
-        }
+        //if (!Key.IsValid)
+        //{
+        //    return;
+        //}
 
         if (BindKeyToApplication)
         {
@@ -819,8 +819,11 @@ public class Shortcut : View, IOrientation, IDesignable
 
             App?.Keyboard.KeyBindings.Remove (Key);
 
-            // Use the form of Add that provides target since this is an app-level hotkey
-            App?.Keyboard.KeyBindings.AddApp (Key, this, Command.HotKey);
+            if (Key != Key.Empty)
+            {
+                // Use the form of Add that provides target since this is an app-level hotkey
+                App?.Keyboard.KeyBindings.AddApp (Key, this, Command.HotKey);
+            }
         }
         else
         {
@@ -830,7 +833,11 @@ public class Shortcut : View, IOrientation, IDesignable
             }
 
             HotKeyBindings.Remove (Key);
-            HotKeyBindings.Add (Key, Command.HotKey);
+
+            if (Key != Key.Empty)
+            {
+                HotKeyBindings.Add (Key, Command.HotKey);
+            }
         }
     }
 
