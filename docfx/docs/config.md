@@ -97,7 +97,7 @@ public static bool Force16Colors { get; set; } = false;
 
 **Examples:**
 - `Application.DefaultKeyBindings` (e.g. `Command.Quit`) - Default keys for application-level commands
-- `Application.Force16Colors` - Force 16-color mode
+- `Driver.Force16Colors` - Force 16-color mode
 - `Key.Separator` - Character separating keys in key combinations
 
 ### 2. ThemeScope
@@ -307,6 +307,26 @@ Each [Scheme](~/api/Terminal.Gui.Drawing.Scheme.yml) maps [VisualRole](~/api/Ter
       "Background": "Cyan",
       "Style": "Underline"
     },
+    "Active": {
+      "Foreground": "White",
+      "Background": "DarkCyan"
+    },
+    "HotActive": {
+      "Foreground": "Yellow",
+      "Background": "DarkCyan"
+    },
+    "Highlight": {
+      "Foreground": "Black",
+      "Background": "BrightGreen"
+    },
+    "Editable": {
+      "Foreground": "White",
+      "Background": "DarkBlue"
+    },
+    "ReadOnly": {
+      "Foreground": "Gray",
+      "Background": "Black"
+    },
     "Disabled": {
       "Foreground": "DarkGray",
       "Background": "Black",
@@ -497,7 +517,7 @@ System-wide settings from [SettingsScope](~/api/Terminal.Gui.Configuration.Setti
 ```json
 {
   "Application.DefaultKeyBindings.Quit": "Esc",
-  "Application.Force16Colors": false,
+  "Driver.Force16Colors": false,
   "Application.IsMouseDisabled": false,
   "Application.DefaultKeyBindings.Arrange": "Ctrl+F5",
   "Application.DefaultKeyBindings.NextTabStop": "Tab",
@@ -944,15 +964,15 @@ ConfigurationManager.Enable(ConfigLocations.All);
 using IApplication app = Application.Create();
 app.Init();
 
-OptionSelector<string> themeSelector = new ()
+OptionSelector themeSelector = new ()
 {
     X = 1,
     Y = 1,
+    Labels = ThemeManager.GetThemeNames()
 };
-themeSelector.SetSource(ThemeManager.GetThemeNames());
-themeSelector.SelectedItemChanged += (_, e) =>
+themeSelector.ValueChanged += (_, e) =>
 {
-    ThemeManager.Theme = e.Value.ToString();
+    ThemeManager.Theme = ThemeManager.GetThemeNames()[e.NewValue ?? 0];
     ConfigurationManager.Apply();
 };
 
@@ -999,7 +1019,7 @@ ConfigurationManager.RuntimeConfig = @"
   ""Application.DefaultKeyBindings"": {
     ""Quit"": { ""All"": [""Ctrl+Q""] }
   },
-  ""Application.Force16Colors"": true,
+  ""Driver.Force16Colors"": true,
   ""Theme"": ""Dark""
 }";
 
