@@ -383,16 +383,11 @@ internal class DriverImpl : IDriver
     {
         KittyKeyboardProtocol.EnabledFlags = enabledFlags;
 
-
-        if ((_componentFactory as AnsiComponentFactory)?.CreateOutput() is AnsiOutput { } output)
+        if (_output is AnsiOutput output)
         {
             output.EnableKittyKeyboard (enabledFlags);
         }
 
-        if ((_componentFactory as AnsiComponentFactory)?.CreateInput () is AnsiInput { } input)
-        {
-            input.EnableKittyKeyboard (enabledFlags);
-        }
     }
 
     /// <summary>Event fired when a key is pressed down.</summary>

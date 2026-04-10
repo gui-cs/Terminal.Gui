@@ -207,7 +207,12 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                                                   return;
                                               }
 
-                                              _driver.SetKittyKeyboardEnabledFlags (ansiOutput.KittyKeyboardEnabledFlags);
+                                              _driver.SetKittyKeyboardEnabledFlags (_driver.KittyKeyboardProtocol.EnabledFlags);
+
+                                              if (_input is AnsiInput ansiInput)
+                                              {
+                                                  ansiInput.EnableKittyKeyboard (_driver.KittyKeyboardProtocol.EnabledFlags);
+                                              }
 
                                               Trace.Lifecycle (app?.MainThreadId?.ToString (),
                                                                "KittyKeyboard",
