@@ -1,3 +1,5 @@
+using Terminal.Gui.Drivers;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>Specifies the style that a <see cref="ProgressBar"/> uses to indicate the progress of an operation.</summary>
@@ -41,6 +43,8 @@ public class ProgressBar : View, IDesignable
     private int _delta;
     private float _fraction;
     private bool _isActivity;
+    private string? _lastTerminalProgressSequence;
+    private bool _mirrorToTerminal;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProgressBar"/> class, starts in percentage mode and uses relative
@@ -69,7 +73,39 @@ public class ProgressBar : View, IDesignable
         {
             _fraction = Math.Min (value, 1);
             _isActivity = false;
+            UpdateTerminalProgress ();
             SetNeedsDraw ();
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether this <see cref="ProgressBar"/> mirrors its state to the host terminal
+    ///     using OSC 9;4 progress sequences when OSC output is available.
+    /// </summary>
+    /// <remarks>
+    ///     Mirroring is independent of <see cref="View.Visible"/> so the terminal progress indicator can continue to be
+    ///     used even when the on-screen <see cref="ProgressBar"/> is hidden.
+    /// </remarks>
+    public bool MirrorToTerminal
+    {
+        get => _mirrorToTerminal;
+        set
+        {
+            if (_mirrorToTerminal == value)
+            {
+                return;
+            }
+
+            _mirrorToTerminal = value;
+
+            if (value)
+            {
+                UpdateTerminalProgress ();
+            }
+            else
+            {
+                ClearTerminalProgress ();
+            }
         }
     }
 
@@ -134,6 +170,7 @@ public class ProgressBar : View, IDesignable
     ///<inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
+        UpdateTerminalProgress ();
         SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
         Move (0, 0);
@@ -250,7 +287,73 @@ public class ProgressBar : View, IDesignable
             }
         }
 
+        UpdateTerminalProgress ();
         SetNeedsDraw ();
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            ClearTerminalProgress ();
+        }
+
+        base.Dispose (disposing);
+    }
+
+    private bool CanMirrorToTerminal ()
+    {
+        if (!_mirrorToTerminal)
+        {
+            return false;
+        }
+
+        return Driver is { IsLegacyConsole: false };
+    }
+
+    private void ClearTerminalProgress ()
+    {
+        if (!_mirrorToTerminal && _lastTerminalProgressSequence is null)
+        {
+            return;
+        }
+
+        string clearSequence = EscSeqUtils.OSC_ClearProgress ();
+
+        if (Driver is { IsLegacyConsole: false } driver && _lastTerminalProgressSequence != clearSequence)
+        {
+            driver.GetOutput ().Write (clearSequence.AsSpan ());
+        }
+
+        _lastTerminalProgressSequence = null;
+    }
+
+    private int GetProgressPercentage () => Math.Clamp ((int)Math.Round (_fraction * 100), 0, 100);
+
+    private void UpdateTerminalProgress ()
+    {
+        if (!CanMirrorToTerminal ())
+        {
+            return;
+        }
+
+        string sequence = _isActivity
+                              ? EscSeqUtils.OSC_SetProgressIndeterminate ()
+                              : EscSeqUtils.OSC_SetProgressValue (GetProgressPercentage ());
+
+        WriteTerminalProgressSequence (sequence);
+    }
+
+    private void WriteTerminalProgressSequence (string sequence)
+    {
+        if (_lastTerminalProgressSequence == sequence || Driver is not { IsLegacyConsole: false } driver)
+        {
+            return;
+        }
+
+        driver.GetOutput ().Write (sequence.AsSpan ());
+        _lastTerminalProgressSequence = sequence;
     }
 
     private void PopulateActivityPos ()

@@ -91,4 +91,78 @@ public class ProgressBarTests : TestDriverBase
         Assert.Equal (" ", driver.Contents [0, 3].Grapheme);
         Assert.Equal (" ", driver.Contents [0, 4].Grapheme);
     }
+
+    [Fact]
+    public void MirrorToTerminal_Fraction_Writes_Osc_Progress ()
+    {
+        IDriver driver = CreateTestDriver ();
+        ProgressBar pb = new () { Driver = driver, MirrorToTerminal = true };
+
+        pb.Fraction = 0.5F;
+
+        Assert.Contains (EscSeqUtils.OSC_SetProgressValue (50), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MirrorToTerminal_Pulse_Writes_Indeterminate_Osc_Progress ()
+    {
+        IDriver driver = CreateTestDriver (5, 1);
+        driver.Clip = new Region (driver.Screen);
+        ProgressBar pb = new () { Driver = driver, MirrorToTerminal = true, Width = 5 };
+
+        pb.BeginInit ();
+        pb.EndInit ();
+        pb.Frame = new Rectangle (0, 0, 5, 1);
+        pb.LayoutSubViews ();
+
+        pb.Pulse ();
+
+        Assert.Contains (EscSeqUtils.OSC_SetProgressIndeterminate (), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MirrorToTerminal_Hidden_ProgressBar_Still_Writes_Osc_Progress ()
+    {
+        IDriver driver = CreateTestDriver ();
+        ProgressBar pb = new () { Driver = driver, MirrorToTerminal = true, Visible = false };
+
+        pb.Fraction = 0.25F;
+
+        Assert.Contains (EscSeqUtils.OSC_SetProgressValue (25), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MirrorToTerminal_LegacyConsole_Does_Not_Write_Osc_Progress ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.IsLegacyConsole = true;
+        ProgressBar pb = new () { Driver = driver, MirrorToTerminal = true };
+
+        pb.Fraction = 0.5F;
+
+        Assert.DoesNotContain (EscSeqUtils.OSC_SetProgressValue (50), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void MirrorToTerminal_Disabling_Clears_Terminal_Progress ()
+    {
+        IDriver driver = CreateTestDriver ();
+        ProgressBar pb = new () { Driver = driver, MirrorToTerminal = true };
+
+        pb.Fraction = 0.5F;
+        pb.MirrorToTerminal = false;
+
+        Assert.Contains (EscSeqUtils.OSC_ClearProgress (), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Dispose_Without_MirrorToTerminal_Does_Not_Write_Clear_Progress ()
+    {
+        IDriver driver = CreateTestDriver ();
+        ProgressBar pb = new () { Driver = driver };
+
+        pb.Dispose ();
+
+        Assert.DoesNotContain (EscSeqUtils.OSC_ClearProgress (), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
+    }
 }
