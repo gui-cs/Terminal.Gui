@@ -68,7 +68,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
     // Queue for storing injected input that will be returned by Peek/Read
     private readonly ConcurrentQueue<char> _testInput = new ();
 
-    private char? _previousWindowsVTLastChar;
+    private char? _previousLastChar;
 
     private int _peekCallCount;
 
@@ -208,7 +208,7 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                 string text = _windowsVTInput!.ConsoleInputEncoding.GetString (buffer, 0, bytesRead);
 
                 if (_enabledKittyKeyboardFlags != KittyKeyboardFlags.None
-                    && _previousWindowsVTLastChar is { } lastChar
+                    && _previousLastChar is { } lastChar
                     && text.Length > 0
                     && text [0] == lastChar)
                 {
@@ -217,12 +217,12 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
 
                 if (text.Length == 0)
                 {
-                    _previousWindowsVTLastChar = null;
+                    _previousLastChar = null;
 
                     yield break;
                 }
 
-                _previousWindowsVTLastChar = text [^1];
+                _previousLastChar = text [^1];
 
                 //Trace.Lifecycle (nameof (AnsiInput), "Read", $"Read {bytesRead} bytes from Windows VT Input: {text}");
 
