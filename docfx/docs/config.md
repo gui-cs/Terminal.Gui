@@ -227,8 +227,12 @@ A **Theme** is a named collection of visual settings bundled together. Terminal.
 // Get current theme
 ThemeScope currentTheme = ThemeManager.GetCurrentTheme();
 
-// Get all available themes (ConcurrentDictionary<string, ThemeScope>)
-ConcurrentDictionary<string, ThemeScope> themes = ThemeManager.Themes;
+// Get all available themes (null if ConfigurationManager not yet initialized)
+ConcurrentDictionary<string, ThemeScope>? themes = ThemeManager.Themes;
+if (themes is null)
+{
+    return; // ConfigurationManager not yet initialized
+}
 
 // Get theme names
 ImmutableList<string> themeNames = ThemeManager.GetThemeNames();
@@ -283,7 +287,7 @@ SchemeManager.AddScheme("MyScheme", new Scheme
 
 #### Custom Schemes for Individual Views
 
-Any view can be given a named scheme by setting `View.SchemeName`. This overrides scheme inheritance from its SuperView and causes `GetScheme()` to look up that name in the active theme.
+Any view can be given a named scheme by setting `View.SchemeName`. When set, `GetScheme()` looks up that name in the active theme and uses it if found. If the name is not found in the current theme, it falls back through the normal resolution chain (SuperView → `"Base"` → hard-coded `"Base"`) rather than throwing.
 
 ```csharp
 // 1. Register the custom scheme (call before Application.Init or after ConfigurationManager.Apply)
@@ -1050,7 +1054,13 @@ OptionSelector themeSelector = new ()
 };
 themeSelector.ValueChanged += (_, e) =>
 {
-    ThemeManager.Theme = ThemeManager.GetThemeNames()[e.NewValue ?? 0];
+    IReadOnlyList<string>? labels = themeSelector.Labels;
+    if (labels is null || e.NewValue is null)
+    {
+        return;
+    }
+
+    ThemeManager.Theme = labels[e.NewValue.Value];
     ConfigurationManager.Apply();
 };
 
