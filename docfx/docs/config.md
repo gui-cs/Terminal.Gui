@@ -281,6 +281,84 @@ SchemeManager.AddScheme("MyScheme", new Scheme
 });
 ```
 
+#### Custom Schemes for Individual Views
+
+Any view can be given a named scheme by setting `View.SchemeName`. This overrides scheme inheritance from its SuperView and causes `GetScheme()` to look up that name in the active theme.
+
+```csharp
+// 1. Register the custom scheme (call before Application.Init or after ConfigurationManager.Apply)
+SchemeManager.AddScheme("Highlight", new Scheme
+{
+    Normal = new Attribute(Color.Black, Color.BrightYellow),
+    Focus = new Attribute(Color.White, Color.BrightYellow)
+});
+
+// 2. Assign the scheme name to any view
+Label warningLabel = new () { Text = "Warning!" };
+warningLabel.SchemeName = "Highlight";
+```
+
+Custom schemes can also be defined in a config JSON file so they are theme-aware:
+
+```json
+{
+  "Themes": [
+    {
+      "Default": {
+        "Schemes": [
+          {
+            "Highlight": {
+              "Normal": { "Foreground": "Black", "Background": "BrightYellow" },
+              "Focus":  { "Foreground": "White", "Background": "BrightYellow" }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+When the active theme changes, any view with `SchemeName = "Highlight"` automatically picks up the new theme's definition of that scheme.
+
+#### Scheme Resolution Order
+
+`View.GetScheme()` resolves the scheme for a view using the following priority order:
+
+```mermaid
+flowchart TD
+    A([GetScheme called]) --> B{HasScheme?\nexplicit Scheme set}
+    B -- Yes --> C([Return explicit Scheme])
+    B -- No --> D{SchemeName set?}
+    D -- No --> E{SuperView exists?}
+    D -- Yes --> F{TryGetScheme\nSchemeName found?}
+    F -- Yes --> G([Return named Scheme])
+    F -- No --> H[/Logging.Warning emitted/]
+    H --> E
+    E -- Yes --> I([Return SuperView.GetScheme])
+    E -- No --> J{TryGetScheme\n'Base' found?}
+    J -- Yes --> K([Return 'Base' from active theme])
+    J -- No --> L([Return hard-coded 'Base'])
+```
+
+| Priority | Condition | Result |
+|----------|-----------|--------|
+| 1 | `HasScheme` is true | Explicit `Scheme` instance used as-is |
+| 2 | `SchemeName` is set and found in active theme | Named scheme returned |
+| 3 | `SchemeName` is set but **not** found | `Logging.Warning` emitted; fallback continues |
+| 4 | `SuperView` exists | `SuperView.GetScheme()` (recursive) |
+| 5 | `"Base"` exists in active theme | Active theme's `"Base"` scheme |
+| 6 | *(last resort)* | Hard-coded `"Base"` — always available |
+
+When writing code that looks up a scheme by name, prefer `SchemeManager.TryGetScheme()` over `SchemeManager.GetScheme(string)` — the `Try` variant returns `false` instead of throwing `KeyNotFoundException` when the name is not found.
+
+```csharp
+if (SchemeManager.TryGetScheme("Highlight", out Scheme? scheme))
+{
+    // use scheme
+}
+```
+
 #### Scheme Structure
 
 Each [Scheme](~/api/Terminal.Gui.Drawing.Scheme.yml) maps [VisualRole](~/api/Terminal.Gui.Drawing.VisualRole.yml) to [Attribute](~/api/Terminal.Gui.Drawing.Attribute.yml):
