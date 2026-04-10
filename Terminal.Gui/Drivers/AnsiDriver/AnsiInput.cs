@@ -209,10 +209,15 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
 
                 if (_enabledKittyKeyboardFlags != KittyKeyboardFlags.None
                     && _previousLastChar is { } lastChar
-                    && text.Length > 0
-                    && text [0] == lastChar)
+                    && text.Length > 0)
                 {
-                    text = text [1..];
+                    int index = text.IndexOf (lastChar);
+
+                    if (index >= 0)
+                    {
+                        text = text.Remove (index, 1);
+                        _previousLastChar = null;
+                    }
                 }
 
                 if (text.Length == 0)
@@ -222,7 +227,22 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                     yield break;
                 }
 
-                _previousLastChar = text [^1];
+                if (_enabledKittyKeyboardFlags != KittyKeyboardFlags.None)
+                {
+                    // Always search for standalone characters (not part of ANSI sequences)
+                    // Split by sequences and find the last non-empty part
+                    string [] parts = System.Text.RegularExpressions.Regex.Split (text, @"\x1b[^a-zA-Z]*[a-zA-Z]");
+                    string lastStandalonePart = parts.LastOrDefault (p => !string.IsNullOrEmpty (p)) ?? "";
+
+                    if (!string.IsNullOrEmpty (lastStandalonePart))
+                    {
+                        _previousLastChar = lastStandalonePart [^1];
+                    }
+                    else
+                    {
+                        _previousLastChar = null;
+                    }
+                }
 
                 //Trace.Lifecycle (nameof (AnsiInput), "Read", $"Read {bytesRead} bytes from Windows VT Input: {text}");
 
