@@ -362,8 +362,8 @@ internal class DriverImpl : IDriver
     /// <summary>
     ///     Stores the latest kitty keyboard protocol detection result.
     /// </summary>
-    /// <param name="result">The detected kitty keyboard capabilities result.</param>
-    internal void SetKittyKeyboardCapabilities (KittyKeyboardCapabilities result) => KittyKeyboardCapabilities = result;
+    /// <param name="capabilities">The detected kitty keyboard capabilities.</param>
+    internal void SetKittyKeyboardCapabilities (KittyKeyboardCapabilities capabilities) => KittyKeyboardCapabilities = capabilities;
 
     /// <summary>
     ///     Stores the kitty keyboard flags currently enabled on the terminal.
