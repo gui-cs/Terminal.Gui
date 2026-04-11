@@ -4,6 +4,30 @@ namespace DriverTests.AnsiHandling;
 
 public class KittyKeyboardProtocolDetectorTests
 {
+    // Copilot
+    [Fact]
+    public void Enable_QueuesDetect_AndUpdatesDriverFlags_FromDetectionResponse ()
+    {
+        Mock<IDriver> driverMock = new (MockBehavior.Strict);
+        using AnsiOutput output = new ();
+        driverMock.Setup (d => d.IsLegacyConsole).Returns (false);
+        driverMock.Setup (d => d.GetOutput ()).Returns (output);
+        driverMock.SetupProperty (d => d.KittyKeyboardCapabilities, new KittyKeyboardCapabilities { IsSupported = true, Flags = KittyKeyboardFlags.None });
+
+        driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()))
+                  .Callback<AnsiEscapeSequenceRequest> (request => request.ResponseReceived ("\u001B[?31u"));
+
+        KittyKeyboardProtocolDetector detector = new (driverMock.Object);
+
+        detector.Enable (EscSeqUtils.KittyKeyboardRequestedFlags);
+
+        Assert.NotNull (driverMock.Object.KittyKeyboardCapabilities);
+        Assert.True (driverMock.Object.KittyKeyboardCapabilities.IsSupported);
+        Assert.Equal (EscSeqUtils.KittyKeyboardRequestedFlags, driverMock.Object.KittyKeyboardCapabilities.Flags);
+        driverMock.Verify (d => d.GetOutput (), Times.Once);
+        driverMock.Verify (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()), Times.Once);
+    }
+
     [Fact]
     public void Detect_QueuesKittyQuery_AndReturnsSupportedResult_WhenTerminalResponds ()
     {

@@ -237,12 +237,14 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
             Assert.True (SpinWait.SpinUntil (() => input.ResponseSent, TimeSpan.FromSeconds (1)));
             loop.InputProcessor.ProcessQueue ();
 
-            var driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
+            DriverImpl driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
             Assert.True (driver.KittyKeyboardCapabilities?.IsSupported);
 
             Assert.Equal (EscSeqUtils.KittyKeyboardRequestedFlags, driver.KittyKeyboardCapabilities?.Flags);
 
             coordinator.Stop ();
+
+            Assert.Contains (EscSeqUtils.CSI_DisableKittyKeyboardFlags, output.GetLastOutput (), StringComparison.Ordinal);
         }
     }
 
@@ -263,7 +265,7 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
 
         await coordinator.StartInputTaskAsync (appMock.Object);
 
-        var driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
+        DriverImpl driver = Assert.IsType<DriverImpl> (appMock.Object.Driver);
         Assert.Null (driver.KittyKeyboardCapabilities);
 
         Assert.DoesNotContain (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardRequestedFlags),
@@ -271,6 +273,8 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
                                StringComparison.Ordinal);
 
         coordinator.Stop ();
+
+        Assert.DoesNotContain (EscSeqUtils.CSI_DisableKittyKeyboardFlags, output.GetLastOutput (), StringComparison.Ordinal);
     }
 
     [Fact]

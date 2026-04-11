@@ -21,7 +21,8 @@ public class KittyKeyboardProtocolDetector
     }
 
     /// <summary>
-    ///     Enables kitty keyboard progressive enhancement flags for the active terminal.
+    ///     Enables kitty keyboard progressive enhancement flags for the active terminal,
+    ///     then performs a follow-up detect request to confirm and store the flags that were actually enabled.
     /// </summary>
     /// <param name="flags">The kitty keyboard flags to enable.</param>
     internal void Enable (KittyKeyboardFlags flags)
@@ -29,6 +30,7 @@ public class KittyKeyboardProtocolDetector
         if (_driver is { IsLegacyConsole: true })
         {
             Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Enable", "Skipping kitty keyboard probe for legacy console");
+
             return;
         }
 
@@ -39,20 +41,42 @@ public class KittyKeyboardProtocolDetector
 
         Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Enable", $"Writing enable sequence for flags {flags}");
         _driver?.GetOutput ().Write (EscSeqUtils.CSI_EnableKittyKeyboardFlags (flags));
+
+        Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Enable", "Running Detector again, to get reported flags...");
+
+        Detect (result =>
+                {
+                    if (!result.IsSupported || _driver?.KittyKeyboardCapabilities is null)
+                    {
+                        Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector),
+                                         "Enable",
+                                         $"Post-enable detect did not update flags. IsSupported={
+                                             result.IsSupported
+                                         }, HasCapabilities={
+                                             _driver?.KittyKeyboardCapabilities is { }
+                                         }");
+
+                        return;
+                    }
+
+                    _driver.KittyKeyboardCapabilities.Flags = result.Flags;
+                    Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Enable", $"Post-enable detect confirmed kitty flags {result.Flags}");
+                });
     }
 
     /// <summary>
-    ///     Restores the previous kitty keyboard flag state if kitty mode was enabled.
+    ///     Sends the kitty keyboard disable sequence to restore the terminal keyboard protocol mode.
     /// </summary>
     internal void Disable ()
     {
         if (_driver is { IsLegacyConsole: true })
         {
             Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Disable", "Skipping kitty keyboard probe for legacy console");
+
             return;
         }
 
-        Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Disable", $"Writing disable sequence");
+        Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Disable", "Writing disable sequence");
         _driver?.GetOutput ().Write (EscSeqUtils.CSI_DisableKittyKeyboardFlags);
     }
 
@@ -83,13 +107,7 @@ public class KittyKeyboardProtocolDetector
 
                           Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector),
                                            "Detect",
-                                           $"Kitty keyboard response '{
-                                               response
-                                           }' => IsSupported={
-                                               result.IsSupported
-                                           }, Flags={
-                                               result.Flags
-                                           }");
+                                           $"Kitty keyboard response '{response}' => IsSupported={result.IsSupported}, Flags={result.Flags}");
                           _driver?.KittyKeyboardCapabilities = result;
 
                           resultCallback (result);

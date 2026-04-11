@@ -174,7 +174,7 @@ internal class DriverImpl : IDriver
 
     private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e)
     {
-        Trace.Lifecycle (nameof (DriverImpl), "OnSizeMonitorOnSizeChanged", $"{e.Size?.Width}×{e.Size?.Height}");
+        // Trace.Lifecycle (nameof (DriverImpl), "OnSizeMonitorOnSizeChanged", $"{e.Size?.Width}×{e.Size?.Height}");
         SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
     }
 

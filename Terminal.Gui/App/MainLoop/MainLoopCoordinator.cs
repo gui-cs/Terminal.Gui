@@ -108,6 +108,21 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
         _stopCalled = true;
 
+        // Restore terminal kitty keyboard mode before shutting down output resources.
+
+        try
+        {
+            if (_driver is { KittyKeyboardCapabilities.IsSupported: true })
+            {
+                KittyKeyboardProtocolDetector kittyKeyboardDetector = new (_driver);
+                kittyKeyboardDetector.Disable ();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logging.Warning ($"Kitty keyboard protocol disable failed: {ex.Message}");
+        }
+
         _runCancellationTokenSource.Cancel ();
         _output?.Dispose ();
 
@@ -190,7 +205,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
             kittyKeyboardDetector.Detect (result =>
                                           {
-                                              if (!result.IsSupported || _output is not AnsiOutput ansiOutput)
+                                              if (!result.IsSupported)
                                               {
                                                   Trace.Lifecycle (app?.MainThreadId?.ToString (), "KittyKeyboard", "Kitty keyboard mode not enabled");
 
@@ -200,12 +215,11 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                                               // Kitty is supported. Set the flags we care about.
                                               kittyKeyboardDetector.Enable (EscSeqUtils.KittyKeyboardRequestedFlags);
 
-                                              // Assume they all got set and update the Driver.
-                                              _driver.KittyKeyboardCapabilities?.Flags = EscSeqUtils.KittyKeyboardRequestedFlags;
-
                                               Trace.Lifecycle (app?.MainThreadId?.ToString (),
                                                                "KittyKeyboard",
-                                                               $"Enabled kitty keyboard flags {_driver.KittyKeyboardCapabilities?.Flags}");
+                                                               $"Requested kitty keyboard flags {
+                                                                   EscSeqUtils.KittyKeyboardRequestedFlags
+                                                               }; awaiting confirmation");
                                           });
         }
         catch (Exception ex)
