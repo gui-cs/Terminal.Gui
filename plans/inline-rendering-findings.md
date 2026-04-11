@@ -142,9 +142,9 @@ On `Shutdown`, move the cursor to `_startRow + inlineHeight` (the row immediatel
 
 ### 9. Wire inline mode through the driver and component factory
 
-**Files:** `Terminal.Gui/Drivers/Driver.cs`, `Terminal.Gui/Drivers/AnsiDriver/AnsiComponentFactory.cs`
+**Files:** `Terminal.Gui/App/Application.cs`, `Terminal.Gui/Drivers/AnsiDriver/AnsiComponentFactory.cs`
 
-Add an `InlineMode` (or `NoClear`) configuration property to `Driver` alongside `Force16Colors` and `SizeDetection`, decorated with `[ConfigurationProperty(Scope = typeof(SettingsScope))]`. `AnsiComponentFactory` creates `AnsiOutput`; pass the flag into the `AnsiOutput` constructor so all pieces are aware of the mode. Default behavior (alt screen + full clear) is **unchanged** when the flag is `false`.
+Add `Application.AppModel` as a `[ConfigurationProperty(Scope = typeof(SettingsScope))]` static property (default `AppModel.FullScreen`). `AnsiComponentFactory` creates `AnsiOutput`; read `Application.AppModel` there and pass the mode into the `AnsiOutput` constructor. Default behavior (alt screen + full clear) is **unchanged** when `AppModel == FullScreen`.
 
 ---
 
@@ -165,18 +165,91 @@ Add an `InlineMode` (or `NoClear`) configuration property to `Driver` alongside 
 
 ---
 
-## Proposed API (Sketch)
+## Design
+
+### `AppModel` Enum
+
+A new top-level enum names the two rendering modes:
 
 ```csharp
-// Existing full-screen behaviour (unchanged)
-Application.Run(new Window());
+public enum AppModel
+{
+    /// <summary>
+    ///     The application occupies the full terminal screen via the alternate screen buffer.
+    ///     This is the default behavior.
+    /// </summary>
+    FullScreen,
 
-// New inline mode — renders a fixed-height region at the current cursor
-Application.RunInline(view, height: 10);
-
-// Or via Init
-Application.Init(inline: true, inlineHeight: 10);
+    /// <summary>
+    ///     The application renders inline within the primary (scrollback) buffer, anchored
+    ///     to the bottom of the visible terminal. No alternate screen buffer is used.
+    /// </summary>
+    Inline,
+}
 ```
+
+### Configuration property — on `Application`, not `Driver`
+
+`AppModel` is an application-level concept, not a driver-level one. It is declared as a static config property on `Application` (the static façade), analogous to how `Driver.Force16Colors` works at the driver level:
+
+```csharp
+// Terminal.Gui/App/Application.cs
+[ConfigurationProperty(Scope = typeof(SettingsScope))]
+public static AppModel AppModel { get; set; } = AppModel.FullScreen;
+```
+
+Apps that want to force inline mode set this **before** calling `Init()`:
+
+```csharp
+ConfigurationManager.RuntimeConfig["Application.AppModel"] = "Inline";
+using var app = Application.Create().Init();
+app.Run<MyInlineView>();
+```
+
+Or in `appsettings.json` / `config.json`:
+
+```json
+{ "Application.AppModel": "Inline" }
+```
+
+### `IApplication.Screen` as the coordinate system
+
+Rather than a separate `_startRow` / `InlineHeight` pair, **`IApplication.Screen` is the source of truth**:
+
+- In `FullScreen` mode: `Screen` matches `IDriver.Screen` (the full terminal area, top = 0).
+- In `Inline` mode: `Screen` is a sub-rectangle of `IDriver.Screen`.
+  - `Screen.Top` = the terminal row where the app's region begins.
+  - `Screen.Height` = the number of rows the app currently occupies.
+  - `Screen.Width` = full terminal width (same as `IDriver.Screen.Width`).
+
+The ANSI driver reads `IApplication.Screen` when positioning the cursor, so all coordinate offsetting is automatic — no separate `_startRow` field is needed inside the driver.
+
+### Runnable layout for inline mode
+
+The developer's main `IRunnable` view is laid out using standard `Pos` / `Dim` objects:
+
+```csharp
+// Anchor the view to the bottom of the screen and size it by content,
+// with a minimum height.
+myView.Y = Pos.AnchorEnd();
+myView.Height = Dim.Auto(minimumContentSize: initialInlineHeight);
+```
+
+- `Pos.AnchorEnd()` places the view's top edge at `Screen.Height - view.Height`, so it is anchored to the bottom of the visible region.
+- `Dim.Auto(minimumContentSize: N)` sizes the view by its content with a floor of N rows.
+
+The **first `Layout` pass** (which happens before the first `Draw`) determines the final view bounds, and from those bounds `ApplicationImpl` sets `IApplication.Screen.Top` and `IApplication.Screen.Height` so the ANSI driver knows which terminal rows to write into.
+
+### Growing down
+
+If the app needs more rows at runtime (e.g. a dropdown opens), it increases `IApplication.Screen.Height`:
+
+```csharp
+// Inside the app — request one extra row:
+app.Screen = app.Screen with { Height = app.Screen.Height + 1 };
+```
+
+`AnsiOutput` responds by printing newlines to scroll the terminal and reserving the new rows before the next draw.
 
 ---
 
@@ -184,24 +257,27 @@ Application.Init(inline: true, inlineHeight: 10);
 
 | File | Change |
 |------|--------|
-| `Terminal.Gui/Drivers/Driver.cs` | Add `InlineMode` (or `NoClear`) static config property |
-| `Terminal.Gui/Drivers/AnsiDriver/AnsiOutput.cs` | Skip alt-buffer/clear on init; skip restore on dispose; `_startRow` offset; CPR query; scroll-to-make-room |
-| `Terminal.Gui/Drivers/AnsiDriver/AnsiComponentFactory.cs` | Pass inline-mode flag to `AnsiOutput` |
-| `Terminal.Gui/Drivers/Output/OutputBufferImpl.cs` | `ClearContents()` `initiallyDirty` param — most critical change |
-| `Terminal.Gui/Drivers/AnsiDriver/AnsiInputProcessor.cs` | Subtract `_startRow` from mouse row |
+| `Terminal.Gui/App/AppModel.cs` | New file: `AppModel` enum (`FullScreen`, `Inline`) |
+| `Terminal.Gui/App/Application.cs` | Add `[ConfigurationProperty] static AppModel AppModel` |
+| `Terminal.Gui/App/ApplicationImpl.Screen.cs` | Set `Screen.Top` / `Screen.Height` from first layout in inline mode |
+| `Terminal.Gui/Drivers/AnsiDriver/AnsiOutput.cs` | Skip `?1049h`/`?1049l` in inline mode; CPR query for start row; scroll-to-make-room; cursor offset from `Screen.Top` |
+| `Terminal.Gui/Drivers/AnsiDriver/AnsiComponentFactory.cs` | Read `Application.AppModel` and pass mode to `AnsiOutput` |
+| `Terminal.Gui/Drivers/Output/OutputBufferImpl.cs` | `ClearContents()` `initiallyDirty` param — `false` in inline mode |
+| `Terminal.Gui/Drivers/AnsiDriver/AnsiInputProcessor.cs` | Subtract `Screen.Top` from mouse row in inline mode |
 
 ---
 
 ## Suggested Implementation Order
 
-1. Add an `InlineMode` / `InlineHeight` property to `Driver` and wire it through `AnsiComponentFactory` to `AnsiOutput`.
-2. Modify `AnsiOutput` constructor: when `InlineMode` is `true`, skip `CSI ?1049h`, query start row via `ESC[6n`, reserve vertical space.
-3. Fix `OutputBufferImpl.ClearContents()` — add `initiallyDirty` parameter, pass `false` in inline mode.
-4. Offset all row coordinates by `_startRow` in the render path (`SetCursorPositionImpl`).
-5. Correct mouse event row coordinates in `AnsiInputProcessor`.
-6. Implement clean-exit logic in `AnsiOutput.Dispose`.
-7. Add `Application.RunInline(view, height)` convenience method.
-8. Add a `UICatalog` scenario demonstrating inline mode.
+1. Add `AppModel.cs` enum and the `Application.AppModel` static config property.
+2. Modify `AnsiOutput` constructor: when `AppModel == Inline`, skip `CSI ?1049h`, query terminal cursor row via `ESC[6n`, and store it so `ApplicationImpl` can initialize `Screen.Top`.
+3. Fix `OutputBufferImpl.ClearContents()` — add `initiallyDirty` parameter, pass `false` in inline mode (most critical: prevents the first render from overwriting the entire visible terminal).
+4. In `ApplicationImpl`, after the first layout pass, set `IApplication.Screen` to `{ Top = queriedRow, Height = runnableView.Frame.Height, Width = driver.Screen.Width }`.
+5. In `AnsiOutput.SetCursorPositionImpl`, add `Screen.Top` to every row coordinate so output is placed at the correct terminal rows.
+6. Correct mouse event row coordinates in `AnsiInputProcessor` by subtracting `app.Screen.Top`.
+7. Handle "grow down": when `IApplication.Screen.Height` increases, `AnsiOutput` prints newlines and scrolls before the next draw.
+8. Implement clean-exit in `AnsiOutput.Dispose`: move cursor to `Screen.Top + Screen.Height`, emit `CSI_ShowCursor`, skip `?1049l`.
+9. Add a `UICatalog` scenario demonstrating inline mode.
 
 ---
 
