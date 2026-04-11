@@ -224,6 +224,20 @@ public static partial class Application
         return GetAvailableCulturesFromEmbeddedResources ();
     }
 
+    /// <summary>
+    ///     Gets or sets the rendering mode for the application. When set to <see cref="App.AppModel.Inline"/>,
+    ///     the application renders inline within the primary (scrollback) buffer instead of switching to
+    ///     the alternate screen buffer.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Set this property <b>before</b> calling <see cref="IApplication.Init"/> to control how the
+    ///         application interacts with the terminal buffer.
+    ///     </para>
+    /// </remarks>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static AppModel AppModel { get; set; } = AppModel.FullScreen;
+
     /// <inheritdoc cref="IApplication.ForceDriver"/>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static string ForceDriver

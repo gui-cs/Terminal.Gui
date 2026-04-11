@@ -348,7 +348,16 @@ public class OutputBufferImpl : IOutputBuffer
     }
 
     /// <summary>Clears the <see cref="Contents"/> of the driver.</summary>
-    public void ClearContents ()
+    public void ClearContents () => ClearContents (initiallyDirty: true);
+
+    /// <summary>Clears the <see cref="Contents"/> of the driver.</summary>
+    /// <param name="initiallyDirty">
+    ///     When <see langword="true"/> (the default), all cells are marked dirty so the first render
+    ///     overwrites the entire screen. When <see langword="false"/> (used in inline mode), cells start
+    ///     clean so only cells that are explicitly drawn will be flushed, leaving the rest of the terminal
+    ///     untouched.
+    /// </param>
+    public void ClearContents (bool initiallyDirty)
     {
         Contents = new Cell [Rows, Cols];
 
@@ -367,10 +376,10 @@ public class OutputBufferImpl : IOutputBuffer
             {
                 for (var c = 0; c < Cols; c++)
                 {
-                    Contents [row, c] = new Cell { Grapheme = " ", Attribute = new Attribute (Color.White, Color.Black), IsDirty = true };
+                    Contents [row, c] = new Cell { Grapheme = " ", Attribute = new Attribute (Color.White, Color.Black), IsDirty = initiallyDirty };
                 }
 
-                DirtyLines [row] = true;
+                DirtyLines [row] = initiallyDirty;
             }
         }
     }

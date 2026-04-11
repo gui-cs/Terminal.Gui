@@ -45,11 +45,21 @@ public class AnsiOutput : OutputBase, IOutput
     private readonly WindowsVTOutputHelper? _windowsVTOutput;
 
     /// <summary>
+    ///     Gets the <see cref="AppModel"/> that this output was initialized with.
+    /// </summary>
+    internal AppModel AppModel { get; }
+
+    /// <summary>
     ///     Initializes a new instance of <see cref="AnsiOutput"/>.
     ///     Checks if a real console is available for ANSI output and activates the alternate screen buffer.
     /// </summary>
-    public AnsiOutput ()
+    /// <param name="appModel">
+    ///     The rendering mode. When <see cref="AppModel.Inline"/>, the alternate screen buffer is not activated
+    ///     and the terminal's primary (scrollback) buffer is used instead.
+    /// </param>
+    public AnsiOutput (AppModel appModel = AppModel.FullScreen)
     {
+        AppModel = appModel;
         _platform = AnsiPlatform.Degraded;
 
         _lastBuffer = new OutputBufferImpl ();
@@ -107,14 +117,26 @@ public class AnsiOutput : OutputBase, IOutput
             }
 
             // Initialize terminal for ANSI output
-            // Activate alternate screen buffer, hide cursor, enable mouse tracking
-            Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
-            Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.EntireScreen));
-            Write (EscSeqUtils.CSI_SetCursorPosition (1, 1)); // Move to top-left
-            Write (EscSeqUtils.CSI_HideCursor);
+            if (AppModel == AppModel.Inline)
+            {
+                // Inline mode: do NOT switch to alternate screen buffer.
+                // Stay in the primary (scrollback) buffer.
+                Write (EscSeqUtils.CSI_HideCursor);
 
-            // TODO: Move Input related CSI sequences to AnsiInput
-            Write (EscSeqUtils.CSI_EnableMouseEvents);
+                // TODO: Move Input related CSI sequences to AnsiInput
+                Write (EscSeqUtils.CSI_EnableMouseEvents);
+            }
+            else
+            {
+                // FullScreen mode: activate alternate screen buffer, hide cursor, enable mouse tracking
+                Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+                Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.EntireScreen));
+                Write (EscSeqUtils.CSI_SetCursorPosition (1, 1)); // Move to top-left
+                Write (EscSeqUtils.CSI_HideCursor);
+
+                // TODO: Move Input related CSI sequences to AnsiInput
+                Write (EscSeqUtils.CSI_EnableMouseEvents);
+            }
 
             // Flush to ensure all sequences are sent
             AnsiTerminalHelper.FlushNative (_platform);
@@ -382,10 +404,21 @@ public class AnsiOutput : OutputBase, IOutput
                 return;
             }
 
-            // Restore terminal state: disable mouse, restore buffer, show cursor
+            // Restore terminal state: disable mouse, show cursor
             Write (EscSeqUtils.CSI_DisableMouseEvents);
-            Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
-            Write (EscSeqUtils.CSI_ShowCursor);
+
+            if (AppModel == AppModel.Inline)
+            {
+                // Inline mode: do NOT restore alternate buffer. Show cursor so the
+                // shell prompt appears naturally after the rendered content.
+                Write (EscSeqUtils.CSI_ShowCursor);
+            }
+            else
+            {
+                // FullScreen mode: restore alternate buffer and show cursor
+                Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+                Write (EscSeqUtils.CSI_ShowCursor);
+            }
         }
         catch
         {
