@@ -108,7 +108,6 @@ public class KittyKeyboardProtocolDetector
                           Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector),
                                            "Detect",
                                            $"Kitty keyboard response '{response}' => IsSupported={result.IsSupported}, Flags={result.Flags}");
-                          _driver?.KittyKeyboardCapabilities = result;
 
                           resultCallback (result);
                       },

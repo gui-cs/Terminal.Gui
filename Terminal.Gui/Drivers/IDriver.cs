@@ -359,7 +359,7 @@ public interface IDriver : IDisposable
     ///     When non-<see langword="null"/>, use <see cref="KittyKeyboardCapabilities.IsSupported"/> to determine whether the
     ///     terminal supports the protocol.
     /// </summary>
-    KittyKeyboardCapabilities? KittyKeyboardCapabilities { get; set; }
+    KittyKeyboardCapabilities? KittyKeyboardCapabilities { get; }
 
     /// <summary>Event fired when a key is pressed down.</summary>
     event EventHandler<Key>? KeyDown;

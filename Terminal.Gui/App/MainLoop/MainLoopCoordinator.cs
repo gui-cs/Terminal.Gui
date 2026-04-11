@@ -211,7 +211,8 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                                                   return;
                                               }
 
-                                              // Kitty is supported. Set the flags we care about.
+                                              // Kitty is supported. Store the capabilities and set the flags we care about.
+                                              _driver?.SetKittyKeyboardCapabilities (result);
                                               kittyKeyboardDetector.Enable (EscSeqUtils.KittyKeyboardRequestedFlags);
 
                                               Trace.Lifecycle (app?.MainThreadId?.ToString (),
