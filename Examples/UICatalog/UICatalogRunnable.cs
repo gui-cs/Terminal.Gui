@@ -63,7 +63,23 @@ public sealed class UICatalogRunnable : Runnable
 
         _disableMouseCb?.Value = App.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
 
-        _shVersion?.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {App?.Driver?.GetVersionInfo ()}";
+        string? driverName = App.Driver?.GetName ();
+
+        _shVersion?.Title = string.IsNullOrEmpty (driverName)
+                                ? $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}"
+                                : $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {driverName}";
+
+        App.AddTimeout (TimeSpan.FromMilliseconds (100),
+                        () =>
+                        {
+                            // Kitty detection is async, so we update the shortcut in a timeout.
+                            if (App.Driver?.KittyKeyboardCapabilities?.IsSupported is true)
+                            {
+                                _shVersion?.Title += " (kitty)";
+                            }
+
+                            return false;
+                        });
 
         if (string.IsNullOrEmpty ((string?)Result))
         {
