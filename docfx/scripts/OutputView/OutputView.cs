@@ -1,8 +1,9 @@
 ﻿#nullable enable
+using AnsiConsoleToHtml;
 using Terminal.Gui.App;
-using Terminal.Gui.Drivers;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Drawing;
+using Terminal.Gui.Drivers;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 using Attribute = Terminal.Gui.Drawing.Attribute;
@@ -30,8 +31,8 @@ string? viewName = null;
 string? outputFile = null;
 
 string [] commandArgs = Environment.GetCommandLineArgs ();
-bool ansi = false;
-bool addBorderFrame = false;
+var ansi = false;
+var addBorderFrame = false;
 
 for (var i = 0; i < commandArgs.Length; i++)
 {
@@ -103,7 +104,7 @@ if (string.IsNullOrEmpty (output))
 
 if (ansi)
 {
-    output = AnsiConsoleToHtml.AnsiConsole.ToHtml (output);
+    output = AnsiConsole.ToHtml (output);
 }
 
 // Write to file or console
@@ -128,13 +129,13 @@ internal class ViewDemoWindow : Runnable<string>
         Height = 20;
 
         // Use only white on black
-        SetScheme (new (new Attribute (ColorName16.White, ColorName16.Black)));
+        SetScheme (new Scheme (new Attribute (ColorName16.White, ColorName16.Black)));
         BorderStyle = LineStyle.None;
     }
 
     public static bool AddBorderFrame { get; set; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override void OnIsRunningChanged (bool newIsRunning)
     {
         base.OnIsRunningChanged (newIsRunning);
@@ -218,6 +219,7 @@ internal class ViewDemoWindow : Runnable<string>
         {
             view.Text = "This is some demo text.";
         }
+
         //view.Title = $"View: {type.Name}";
 
         return view;
