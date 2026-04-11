@@ -10,9 +10,10 @@ public class KittyKeyboardProtocolDetectorTests
     {
         Mock<IDriver> driverMock = new (MockBehavior.Strict);
         using AnsiOutput output = new ();
+        KittyKeyboardCapabilities existingCapabilities = new () { IsSupported = true, Flags = KittyKeyboardFlags.None };
         driverMock.Setup (d => d.IsLegacyConsole).Returns (false);
         driverMock.Setup (d => d.GetOutput ()).Returns (output);
-        driverMock.SetupProperty (d => d.KittyKeyboardCapabilities, new KittyKeyboardCapabilities { IsSupported = true, Flags = KittyKeyboardFlags.None });
+        driverMock.Setup (d => d.KittyKeyboardCapabilities).Returns (existingCapabilities);
 
         driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()))
                   .Callback<AnsiEscapeSequenceRequest> (request => request.ResponseReceived ("\u001B[?31u"));
@@ -21,9 +22,9 @@ public class KittyKeyboardProtocolDetectorTests
 
         detector.Enable (EscSeqUtils.KittyKeyboardRequestedFlags);
 
-        Assert.NotNull (driverMock.Object.KittyKeyboardCapabilities);
-        Assert.True (driverMock.Object.KittyKeyboardCapabilities.IsSupported);
-        Assert.Equal (EscSeqUtils.KittyKeyboardRequestedFlags, driverMock.Object.KittyKeyboardCapabilities.Flags);
+        Assert.NotNull (existingCapabilities);
+        Assert.True (existingCapabilities.IsSupported);
+        Assert.Equal (EscSeqUtils.KittyKeyboardRequestedFlags, existingCapabilities.Flags);
         driverMock.Verify (d => d.GetOutput (), Times.Once);
         driverMock.Verify (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()), Times.Once);
     }
@@ -33,7 +34,6 @@ public class KittyKeyboardProtocolDetectorTests
     {
         Mock<IDriver> driverMock = new (MockBehavior.Strict);
         driverMock.Setup (d => d.IsLegacyConsole).Returns (false);
-        driverMock.SetupSet (d => d.KittyKeyboardCapabilities = It.IsAny<KittyKeyboardCapabilities?> ());
 
         driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()))
                   .Callback<AnsiEscapeSequenceRequest> (request =>
@@ -54,12 +54,6 @@ public class KittyKeyboardProtocolDetectorTests
         Assert.True (result.IsSupported);
         Assert.Equal (EscSeqUtils.KittyKeyboardRequestedFlags, result.Flags);
         driverMock.Verify (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()), Times.Once);
-
-        driverMock.VerifySet (d => d.KittyKeyboardCapabilities =
-                                       It.Is<KittyKeyboardCapabilities?> (k => k != null
-                                                                               && k.IsSupported
-                                                                               && k.Flags == EscSeqUtils.KittyKeyboardRequestedFlags),
-                              Times.Once);
     }
 
     [Fact]
@@ -80,7 +74,6 @@ public class KittyKeyboardProtocolDetectorTests
         Assert.NotNull (result);
         Assert.False (result.IsSupported);
         Assert.Equal (0, (int)result.Flags);
-        driverMock.VerifySet (d => d.KittyKeyboardCapabilities = It.IsAny<KittyKeyboardCapabilities?> (), Times.Never);
     }
 
     [Fact]
@@ -98,7 +91,6 @@ public class KittyKeyboardProtocolDetectorTests
         Assert.NotNull (result);
         Assert.False (result.IsSupported);
         driverMock.Verify (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()), Times.Never);
-        driverMock.VerifySet (d => d.KittyKeyboardCapabilities = It.IsAny<KittyKeyboardCapabilities?> (), Times.Never);
     }
 
     [Theory]

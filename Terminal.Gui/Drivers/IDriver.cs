@@ -354,10 +354,12 @@ public interface IDriver : IDisposable
 
     /// <summary>
     ///     Gets the terminal kitty keyboard protocol capabilities detected at startup.
-    ///     <see langword="null"/> if the terminal was not queried or detection has not completed.
-    ///     Use <see cref="KittyKeyboardCapabilities.IsSupported"/> to determine whether the terminal supports the protocol.
+    ///     <see langword="null"/> if the terminal was not queried, detection has not completed, or the terminal did not
+    ///     respond and kitty keyboard protocol support could not be confirmed.
+    ///     When non-<see langword="null"/>, use <see cref="KittyKeyboardCapabilities.IsSupported"/> to determine whether the
+    ///     terminal supports the protocol.
     /// </summary>
-    KittyKeyboardCapabilities? KittyKeyboardCapabilities { get; set; }
+    KittyKeyboardCapabilities? KittyKeyboardCapabilities { get; }
 
     /// <summary>Event fired when a key is pressed down.</summary>
     event EventHandler<Key>? KeyDown;

@@ -72,7 +72,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         InputProcessor = inputProcessor;
 
         TimedEvents = timedEvents;
-        AnsiRequestScheduler = new AnsiRequestScheduler (InputProcessor.GetParser ());
+        AnsiRequestScheduler = new (InputProcessor.GetParser ());
 
         OutputBuffer.SetSize (consoleOutput.GetSize ().Width, consoleOutput.GetSize ().Height);
         SizeMonitor = componentFactory.CreateSizeMonitor (Output, OutputBuffer);

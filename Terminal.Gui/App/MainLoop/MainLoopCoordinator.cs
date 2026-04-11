@@ -184,11 +184,10 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                                               return;
                                           }
 
-                                          Logging.Trace ($"app: SetDefaultAttribute ({
-                                              new Attribute (fg ?? new Color (255, 255, 255), bg ?? new Color (0, 0))
-                                          })");
+                                          Attribute attribute = new (fg ?? new Color (255, 255, 255), bg ?? new Color (0, 0));
+                                          Logging.Trace ($"app: SetDefaultAttribute ({attribute})");
 
-                                          _driver.SetDefaultAttribute (new Attribute (fg ?? new Color (255, 255, 255), bg ?? new Color (0, 0)));
+                                          _driver.SetDefaultAttribute (attribute);
                                       });
             }
             catch (Exception ex)
@@ -212,7 +211,8 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                                                   return;
                                               }
 
-                                              // Kitty is supported. Set the flags we care about.
+                                              // Kitty is supported. Store the capabilities and set the flags we care about.
+                                              _driver?.SetKittyKeyboardCapabilities (result);
                                               kittyKeyboardDetector.Enable (EscSeqUtils.KittyKeyboardRequestedFlags);
 
                                               Trace.Lifecycle (app?.MainThreadId?.ToString (),
