@@ -108,6 +108,21 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
         _stopCalled = true;
 
+        // Restore terminal kitty keyboard mode before shutting down output resources.
+
+        try
+        {
+            if (_driver is { KittyKeyboardCapabilities.IsSupported: true })
+            {
+                KittyKeyboardProtocolDetector kittyKeyboardDetector = new (_driver);
+                kittyKeyboardDetector.Disable ();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logging.Warning ($"Kitty keyboard protocol disable failed: {ex.Message}");
+        }
+
         _runCancellationTokenSource.Cancel ();
         _output?.Dispose ();
 
@@ -169,9 +184,10 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
                                               return;
                                           }
 
-                                          Logging.Trace ($"app: SetDefaultAttribute ({new Attribute (fg ?? new Color (255, 255, 255), bg ?? new Color (0, 0))})");
+                                          Attribute attribute = new (fg ?? new Color (255, 255, 255), bg ?? new Color (0, 0));
+                                          Logging.Trace ($"app: SetDefaultAttribute ({attribute})");
 
-                                          _driver.SetDefaultAttribute (new Attribute (fg ?? new Color (255, 255, 255), bg ?? new Color (0, 0)));
+                                          _driver.SetDefaultAttribute (attribute);
                                       });
             }
             catch (Exception ex)
@@ -182,26 +198,29 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
         try
         {
+            // Detect Kitty support. The async response we get back only indicates whether
+            // kitty is supported or not.
             KittyKeyboardProtocolDetector kittyKeyboardDetector = new (_driver);
+
             kittyKeyboardDetector.Detect (result =>
-                                         {
-                                             _driver.SetKittyKeyboardProtocol (result);
-                                             Trace.Lifecycle (app?.MainThreadId?.ToString (),
-                                                              "KittyKeyboard",
-                                                              $"Probe complete: Supported={result.IsSupported}, SupportedFlags={result.SupportedFlags}, EnabledFlags={result.EnabledFlags}");
+                                          {
+                                              if (!result.IsSupported)
+                                              {
+                                                  Trace.Lifecycle (app?.MainThreadId?.ToString (), "KittyKeyboard", "Kitty keyboard mode not enabled");
 
-                                             if (!result.IsSupported || result.EnabledFlags <= 0 || _output is not AnsiOutput ansiOutput)
-                                             {
-                                                 Trace.Lifecycle (app?.MainThreadId?.ToString (), "KittyKeyboard", "Kitty keyboard mode not enabled");
-                                                 return;
-                                             }
+                                                  return;
+                                              }
 
-                                             ansiOutput.EnableKittyKeyboard (result.EnabledFlags);
-                                             _driver.SetKittyKeyboardEnabledFlags (ansiOutput.KittyKeyboardEnabledFlags);
-                                             Trace.Lifecycle (app?.MainThreadId?.ToString (),
-                                                              "KittyKeyboard",
-                                                              $"Enabled kitty keyboard flags {ansiOutput.KittyKeyboardEnabledFlags}");
-                                         });
+                                              // Kitty is supported. Store the capabilities and set the flags we care about.
+                                              _driver?.SetKittyKeyboardCapabilities (result);
+                                              kittyKeyboardDetector.Enable (EscSeqUtils.KittyKeyboardRequestedFlags);
+
+                                              Trace.Lifecycle (app?.MainThreadId?.ToString (),
+                                                               "KittyKeyboard",
+                                                               $"Requested kitty keyboard flags {
+                                                                   EscSeqUtils.KittyKeyboardRequestedFlags
+                                                               }; awaiting confirmation");
+                                          });
         }
         catch (Exception ex)
         {
@@ -209,7 +228,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         }
 
         _startupSemaphore.Release ();
-        Logging.Trace ($"app: {app?.MainThreadId} Driver: _input: {_input}, _output: {_output}");
+        Trace.Lifecycle (app?.MainThreadId.ToString (), "Driver", $"_input: {_input}, _output: {_output}");
     }
 
     /// <summary>
@@ -255,7 +274,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
         if (_stopCalled)
         {
-            Trace.Lifecycle (app?.MainThreadId.ToString (), "Init", $"Input loop exited cleanly");
+            Trace.Lifecycle (app?.MainThreadId.ToString (), "Init", "Input loop exited cleanly");
         }
         else
         {
