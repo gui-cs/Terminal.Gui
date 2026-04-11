@@ -184,24 +184,24 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         {
             KittyKeyboardProtocolDetector kittyKeyboardDetector = new (_driver);
             kittyKeyboardDetector.Detect (result =>
-                                          {
-                                              _driver.SetKittyKeyboardProtocol (result);
-                                              Trace.Lifecycle (app?.MainThreadId?.ToString (),
-                                                               "KittyKeyboard",
-                                                               $"Probe complete: Supported={result.IsSupported}, SupportedFlags={result.SupportedFlags}, EnabledFlags={result.EnabledFlags}");
+                                         {
+                                             _driver.SetKittyKeyboardProtocol (result);
+                                             Trace.Lifecycle (app?.MainThreadId?.ToString (),
+                                                              "KittyKeyboard",
+                                                              $"Probe complete: Supported={result.IsSupported}, SupportedFlags={result.SupportedFlags}, EnabledFlags={result.EnabledFlags}");
 
-                                              if (!result.IsSupported || result.EnabledFlags <= 0 || _output is not AnsiOutput ansiOutput)
-                                              {
-                                                  Trace.Lifecycle (app?.MainThreadId?.ToString (), "KittyKeyboard", "Kitty keyboard mode not enabled");
-                                                  return;
-                                              }
+                                             if (!result.IsSupported || result.EnabledFlags <= 0 || _output is not AnsiOutput ansiOutput)
+                                             {
+                                                 Trace.Lifecycle (app?.MainThreadId?.ToString (), "KittyKeyboard", "Kitty keyboard mode not enabled");
+                                                 return;
+                                             }
 
-                                              ansiOutput.EnableKittyKeyboard (result.EnabledFlags);
-                                              _driver.SetKittyKeyboardEnabledFlags (ansiOutput.KittyKeyboardEnabledFlags);
-                                              Trace.Lifecycle (app?.MainThreadId?.ToString (),
-                                                               "KittyKeyboard",
-                                                               $"Enabled kitty keyboard flags {ansiOutput.KittyKeyboardEnabledFlags}");
-                                          });
+                                             ansiOutput.EnableKittyKeyboard (result.EnabledFlags);
+                                             _driver.SetKittyKeyboardEnabledFlags (ansiOutput.KittyKeyboardEnabledFlags);
+                                             Trace.Lifecycle (app?.MainThreadId?.ToString (),
+                                                              "KittyKeyboard",
+                                                              $"Enabled kitty keyboard flags {ansiOutput.KittyKeyboardEnabledFlags}");
+                                         });
         }
         catch (Exception ex)
         {
