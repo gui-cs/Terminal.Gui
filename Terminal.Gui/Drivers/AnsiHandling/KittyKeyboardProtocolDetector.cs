@@ -9,15 +9,18 @@ namespace Terminal.Gui.Drivers;
 public class KittyKeyboardProtocolDetector
 {
     private readonly IDriver? _driver;
+    private readonly IAnsiStartupGate? _startupGate;
 
     /// <summary>
     ///     Creates a new detector that sends its query through the provided <paramref name="driver"/>.
     /// </summary>
     /// <param name="driver">The driver to send ANSI requests through.</param>
-    public KittyKeyboardProtocolDetector (IDriver? driver)
+    /// <param name="startupGate">Optional startup gate to mark query readiness.</param>
+    public KittyKeyboardProtocolDetector (IDriver? driver, IAnsiStartupGate? startupGate = null)
     {
         ArgumentNullException.ThrowIfNull (driver);
         _driver = driver;
+        _startupGate = startupGate;
     }
 
     /// <summary>
@@ -86,6 +89,9 @@ public class KittyKeyboardProtocolDetector
     /// <param name="resultCallback">Called when detection completes.</param>
     public void Detect (Action<KittyKeyboardCapabilities> resultCallback)
     {
+        const string startupQueryName = "ansi-kitty-keyboard";
+        TimeSpan timeout = TimeSpan.FromSeconds (1);
+
         ArgumentNullException.ThrowIfNull (resultCallback);
 
         if (_driver is { IsLegacyConsole: true })
@@ -100,6 +106,8 @@ public class KittyKeyboardProtocolDetector
                          "Detect",
                          $"Queueing kitty keyboard probe '{EscSeqUtils.CSI_QueryKittyKeyboardFlags.Request}'");
 
+        _startupGate?.RegisterQuery (startupQueryName, timeout);
+
         QueueRequest (EscSeqUtils.CSI_QueryKittyKeyboardFlags,
                       response =>
                       {
@@ -109,11 +117,13 @@ public class KittyKeyboardProtocolDetector
                                            "Detect",
                                            $"Kitty keyboard response '{response}' => IsSupported={result.IsSupported}, Flags={result.Flags}");
 
+                          _startupGate?.MarkComplete (startupQueryName);
                           resultCallback (result);
                       },
                       () =>
                       {
                           Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Detect", "Kitty keyboard probe abandoned");
+                          _startupGate?.MarkComplete (startupQueryName);
                           resultCallback (new KittyKeyboardCapabilities ());
                       });
     }

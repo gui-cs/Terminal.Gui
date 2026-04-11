@@ -139,14 +139,14 @@ public class AnsiSizeMonitorTests
         // Create without a pre-wired queue — Initialize must supply it.
         AnsiSizeMonitor monitor = new (output);
 
-        AnsiEscapeSequenceRequest? queued = null;
+        List<AnsiEscapeSequenceRequest> queued = [];
         Mock<IDriver> driverMock = new ();
-        driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ())).Callback<AnsiEscapeSequenceRequest> (r => queued = r);
+        driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ())).Callback<AnsiEscapeSequenceRequest> (r => queued.Add (r));
 
         monitor.Initialize (driverMock.Object);
 
-        Assert.NotNull (queued);
-        Assert.Contains (EscSeqUtils.CSI_ReportWindowSizeInChars.Request, queued!.Request);
+        Assert.NotEmpty (queued);
+        Assert.Contains (queued, r => r.Request.Contains (EscSeqUtils.CSI_ReportWindowSizeInChars.Request, StringComparison.Ordinal));
     }
 
     /// <summary>

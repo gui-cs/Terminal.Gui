@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Trace = Terminal.Gui.Tracing.Trace;
 
 namespace Terminal.Gui.App;
 
@@ -20,6 +21,9 @@ namespace Terminal.Gui.App;
 /// <typeparam name="TInputRecord">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
 public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputRecord> where TInputRecord : struct
 {
+    private bool _firstRenderCompleted;
+    private bool _startupWaitLogged;
+
     /// <inheritdoc/>
     public IApplication? App { get; private set; }
 
@@ -111,8 +115,34 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         // Check for any size changes; this will cause SizeChanged events
         SizeMonitor.Poll ();
 
+        DriverImpl? driver = App?.Driver as DriverImpl;
+
+        if (!_firstRenderCompleted && driver?.AnsiStartupGate is { IsReady: false } startupGate)
+        {
+            if (!_startupWaitLogged)
+            {
+                string pending = string.Join (", ", startupGate.PendingQueryNames);
+                Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>),
+                                 nameof (IterationImpl),
+                                 $"Deferring first render until ANSI startup queries complete. Pending: {pending}");
+                _startupWaitLogged = true;
+            }
+
+            var swStartupCallbacks = Stopwatch.StartNew ();
+            TimedEvents.RunTimers ();
+            Logging.IterationInvokesAndTimeouts.Record (swStartupCallbacks.Elapsed.Milliseconds);
+
+            return;
+        }
+
+        if (!_firstRenderCompleted && _startupWaitLogged)
+        {
+            Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), nameof (IterationImpl), "ANSI startup gate ready; rendering can begin");
+        }
+
         // Layout and draw any views that need it
         App?.LayoutAndDraw ();
+        _firstRenderCompleted = true;
 
         // Update the cursor
         App?.Navigation?.UpdateCursor ();

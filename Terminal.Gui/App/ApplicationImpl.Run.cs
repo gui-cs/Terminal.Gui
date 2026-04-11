@@ -167,7 +167,17 @@ internal partial class ApplicationImpl
         runnable.RaiseIsRunningChangedEvent (true);
         runnable.RaiseIsModalChangedEvent (true);
 
-        LayoutAndDraw ();
+        DriverImpl? driver = Driver as DriverImpl;
+
+        if (driver?.AnsiStartupGate is { IsReady: false } startupGate)
+        {
+            string pending = string.Join (", ", startupGate.PendingQueryNames);
+            Trace.Lifecycle (MainThreadId.ToString (), "Begin", $"Deferring initial LayoutAndDraw until ANSI startup queries complete. Pending: {pending}");
+        }
+        else
+        {
+            LayoutAndDraw ();
+        }
 
         return token;
     }

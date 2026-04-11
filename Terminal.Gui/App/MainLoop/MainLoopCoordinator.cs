@@ -148,7 +148,20 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         {
             return;
         }
-        _driver = new DriverImpl (_componentFactory, _inputProcessor, _loop.OutputBuffer, _output, _loop.AnsiRequestScheduler, _loop.SizeMonitor);
+        IAnsiStartupGate? startupGate = null;
+
+        if (_output is AnsiOutput { IsLegacyConsole: false } && Driver.IsAttachedToTerminal (out _, out _))
+        {
+            startupGate = new AnsiStartupGate ();
+        }
+
+        _driver = new DriverImpl (_componentFactory,
+                                  _inputProcessor,
+                                  _loop.OutputBuffer,
+                                  _output,
+                                  _loop.AnsiRequestScheduler,
+                                  _loop.SizeMonitor,
+                                  startupGate);
 
         // Initialize the size monitor now that the driver is fully constructed
         // This allows size monitors to set up platform-specific mechanisms:
@@ -175,7 +188,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         {
             try
             {
-                TerminalColorDetector colorDetector = new (_driver);
+                TerminalColorDetector colorDetector = new (_driver, startupGate);
 
                 colorDetector.Detect ((fg, bg) =>
                                       {
@@ -200,7 +213,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         {
             // Detect Kitty support. The async response we get back only indicates whether
             // kitty is supported or not.
-            KittyKeyboardProtocolDetector kittyKeyboardDetector = new (_driver);
+            KittyKeyboardProtocolDetector kittyKeyboardDetector = new (_driver, startupGate);
 
             kittyKeyboardDetector.Detect (result =>
                                           {
@@ -227,8 +240,31 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
             Logging.Warning ($"Kitty keyboard protocol detection failed: {ex.Message}");
         }
 
+        if (startupGate is { })
+        {
+            QueueDeviceAttributesProbe (startupGate);
+        }
+
         _startupSemaphore.Release ();
         Trace.Lifecycle (app?.MainThreadId.ToString (), "Driver", $"_input: {_input}, _output: {_output}");
+    }
+
+    private void QueueDeviceAttributesProbe (IAnsiStartupGate startupGate)
+    {
+        const string queryName = "ansi-device-attributes-da1";
+        TimeSpan timeout = TimeSpan.FromSeconds (1);
+        startupGate.RegisterQuery (queryName, timeout);
+
+        AnsiEscapeSequenceRequest request = new ()
+        {
+            Request = EscSeqUtils.CSI_SendDeviceAttributes.Request,
+            Value = EscSeqUtils.CSI_SendDeviceAttributes.Value,
+            Terminator = EscSeqUtils.CSI_SendDeviceAttributes.Terminator,
+            ResponseReceived = _ => startupGate.MarkComplete (queryName),
+            Abandoned = () => startupGate.MarkComplete (queryName)
+        };
+
+        _driver?.QueueAnsiRequest (request);
     }
 
     /// <summary>

@@ -7,15 +7,18 @@ namespace Terminal.Gui.Drivers;
 public class TerminalColorDetector
 {
     private readonly IDriver? _driver;
+    private readonly IAnsiStartupGate? _startupGate;
 
     /// <summary>
     ///     Creates a new instance of the <see cref="TerminalColorDetector"/> class.
     /// </summary>
     /// <param name="driver">The driver to send ANSI requests through.</param>
-    public TerminalColorDetector (IDriver? driver)
+    /// <param name="startupGate">Optional startup gate to mark query readiness.</param>
+    public TerminalColorDetector (IDriver? driver, IAnsiStartupGate? startupGate = null)
     {
         ArgumentNullException.ThrowIfNull (driver);
         _driver = driver;
+        _startupGate = startupGate;
     }
 
     /// <summary>
@@ -28,6 +31,9 @@ public class TerminalColorDetector
     /// </param>
     public void Detect (Action<Color?, Color?> resultCallback)
     {
+        const string startupQueryName = "ansi-terminal-colors";
+        TimeSpan timeout = TimeSpan.FromSeconds (1);
+
         // Skip on legacy console — it doesn't support ANSI escape sequences
         if (_driver is { IsLegacyConsole: true })
         {
@@ -36,8 +42,14 @@ public class TerminalColorDetector
             return;
         }
 
+        _startupGate?.RegisterQuery (startupQueryName, timeout);
+
         // Query foreground first (OSC 10), then background (OSC 11)
-        QueryForeground (resultCallback);
+        QueryForeground ((fg, bg) =>
+                         {
+                             _startupGate?.MarkComplete (startupQueryName);
+                             resultCallback (fg, bg);
+                         });
     }
 
     private void QueryForeground (Action<Color?, Color?> resultCallback) =>

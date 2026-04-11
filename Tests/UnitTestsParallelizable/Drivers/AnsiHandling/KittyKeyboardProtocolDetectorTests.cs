@@ -57,6 +57,32 @@ public class KittyKeyboardProtocolDetectorTests
     }
 
     [Fact]
+    public void Detect_Registers_And_Completes_StartupGate ()
+    {
+        DateTime nowUtc = DateTime.UtcNow;
+        AnsiStartupGate startupGate = new (() => nowUtc);
+        AnsiEscapeSequenceRequest? capturedRequest = null;
+
+        Mock<IDriver> driverMock = new (MockBehavior.Strict);
+        driverMock.Setup (d => d.IsLegacyConsole).Returns (false);
+        driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()))
+                  .Callback<AnsiEscapeSequenceRequest> (request => capturedRequest = request);
+
+        KittyKeyboardProtocolDetector detector = new (driverMock.Object, startupGate);
+
+        detector.Detect (_ => { });
+
+        Assert.NotNull (capturedRequest);
+        Assert.False (startupGate.IsReady);
+        Assert.Equal (["ansi-kitty-keyboard"], startupGate.PendingQueryNames);
+
+        capturedRequest!.ResponseReceived ("\u001B[?31u");
+
+        Assert.True (startupGate.IsReady);
+        Assert.Empty (startupGate.PendingQueryNames);
+    }
+
+    [Fact]
     public void Detect_ReturnsUnsupportedResult_WhenTerminalDoesNotRespond ()
     {
         Mock<IDriver> driverMock = new (MockBehavior.Strict);
