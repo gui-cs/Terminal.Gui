@@ -13,10 +13,8 @@ public class KittyKeyboardCapabilities
     public bool IsSupported { get; set; }
 
     /// <summary>
-    ///     Gets or sets the kitty keyboard flags reported by the terminal as enabled. If <see cref="IsSupported"/>
-    ///     is <see langword="true"/>, <see cref="KittyKeyboardFlags.None"/> indicates a response to
-    ///     <see cref="EscSeqUtils.CSI_QueryKittyKeyboardFlags"/>
-    ///     had not yet been received.
+    ///     Gets or sets the kitty keyboard flags reported by the terminal as enabled. <see cref="KittyKeyboardFlags.None"/>
+    ///     is a valid value indicating that no kitty keyboard flags were reported as enabled.
     /// </summary>
     public KittyKeyboardFlags Flags { get; set; }
 }
