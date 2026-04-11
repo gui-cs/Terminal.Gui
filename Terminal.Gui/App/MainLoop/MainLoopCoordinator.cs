@@ -248,15 +248,15 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
     private void QueueDeviceAttributesProbe (IAnsiStartupGate startupGate)
     {
-        startupGate.RegisterQuery (AnsiStartupQuery.DeviceAttributesPrimary, DeviceAttributesStartupQueryTimeout);
+        IDisposable completionHandle = startupGate.RegisterQuery (AnsiStartupQuery.DeviceAttributesPrimary, DeviceAttributesStartupQueryTimeout);
 
         AnsiEscapeSequenceRequest request = new ()
         {
             Request = EscSeqUtils.CSI_SendDeviceAttributes.Request,
             Value = EscSeqUtils.CSI_SendDeviceAttributes.Value,
             Terminator = EscSeqUtils.CSI_SendDeviceAttributes.Terminator,
-            ResponseReceived = _ => startupGate.MarkComplete (AnsiStartupQuery.DeviceAttributesPrimary),
-            Abandoned = () => startupGate.MarkComplete (AnsiStartupQuery.DeviceAttributesPrimary)
+            ResponseReceived = _ => completionHandle.Dispose (),
+            Abandoned = completionHandle.Dispose
         };
 
         _driver?.QueueAnsiRequest (request);

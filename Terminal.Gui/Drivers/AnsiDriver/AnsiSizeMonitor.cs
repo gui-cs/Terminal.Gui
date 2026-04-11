@@ -30,6 +30,8 @@ internal class AnsiSizeMonitor : ISizeMonitor
     private readonly AnsiOutput _output;
     private Action<AnsiEscapeSequenceRequest>? _queueAnsiRequest;
     private IAnsiStartupGate? _startupGate;
+    private IDisposable? _startupSizeQueryCompletionHandle;
+    private IDisposable? _startupCursorPositionQueryCompletionHandle;
     private Size _lastSize;
     private DateTime _lastQuery = DateTime.MinValue;
     private readonly TimeSpan _queryThrottle = TimeSpan.FromMilliseconds (500); // Don't spam queries
@@ -64,8 +66,8 @@ internal class AnsiSizeMonitor : ISizeMonitor
 
         Trace.Lifecycle (nameof (AnsiSizeMonitor), "Initialize", "Driver wired up; sending initial size query");
 
-        _startupGate?.RegisterQuery (AnsiStartupQuery.TerminalSize, StartupSizeQueryTimeout);
-        _startupGate?.RegisterQuery (AnsiStartupQuery.CursorPosition, StartupCursorPositionQueryTimeout);
+        _startupSizeQueryCompletionHandle = _startupGate?.RegisterQuery (AnsiStartupQuery.TerminalSize, StartupSizeQueryTimeout);
+        _startupCursorPositionQueryCompletionHandle = _startupGate?.RegisterQuery (AnsiStartupQuery.CursorPosition, StartupCursorPositionQueryTimeout);
 
         SendSizeQuery ();
         SendCursorPositionQuery ();
@@ -94,7 +96,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
             Abandoned = () =>
             {
                 _expectingResponse = false;
-                _startupGate?.MarkComplete (AnsiStartupQuery.TerminalSize);
+                CompleteStartupSizeQuery ();
             }
         };
 
@@ -114,8 +116,8 @@ internal class AnsiSizeMonitor : ISizeMonitor
             Request = EscSeqUtils.CSI_RequestCursorPositionReport.Request,
             Value = EscSeqUtils.CSI_RequestCursorPositionReport.Value,
             Terminator = EscSeqUtils.CSI_RequestCursorPositionReport.Terminator,
-            ResponseReceived = _ => _startupGate?.MarkComplete (AnsiStartupQuery.CursorPosition),
-            Abandoned = () => _startupGate?.MarkComplete (AnsiStartupQuery.CursorPosition)
+            ResponseReceived = _ => CompleteStartupCursorPositionQuery (),
+            Abandoned = CompleteStartupCursorPositionQuery
         };
 
         _queueAnsiRequest (request);
@@ -173,9 +175,21 @@ internal class AnsiSizeMonitor : ISizeMonitor
         // The response is handled by ANSIOutput.HandleSizeQueryResponse
         // which updates the cached size. We just need to check if it changed.
         _output.HandleSizeQueryResponse (response);
-        _startupGate?.MarkComplete (AnsiStartupQuery.TerminalSize);
+        CompleteStartupSizeQuery ();
 
         // Check for size change after the response is processed
         CheckSizeChanged ();
+    }
+
+    private void CompleteStartupSizeQuery ()
+    {
+        _startupSizeQueryCompletionHandle?.Dispose ();
+        _startupSizeQueryCompletionHandle = null;
+    }
+
+    private void CompleteStartupCursorPositionQuery ()
+    {
+        _startupCursorPositionQueryCompletionHandle?.Dispose ();
+        _startupCursorPositionQueryCompletionHandle = null;
     }
 }
