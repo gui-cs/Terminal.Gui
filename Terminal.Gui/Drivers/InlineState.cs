@@ -12,18 +12,4 @@ public struct InlineState
     ///     after initial setup.
     /// </summary>
     public int InlineCursorRow { get; set; }
-
-    /// <summary>
-    ///     The dynamic row offset applied to all cursor positioning during inline-mode rendering.
-    ///     Starts at <see cref="InlineCursorRow"/> but decreases as the terminal scrolls to
-    ///     accommodate growth of the inline region.
-    /// </summary>
-    public int InlineRowOffset { get; set; }
-
-    /// <summary>
-    ///     The current height of the inline content region (the view's rendered height).
-    ///     Updated when the view grows. Used to position the cursor just below the inline
-    ///     region on exit.
-    /// </summary>
-    public int InlineContentHeight { get; set; }
 }

@@ -1,24 +1,39 @@
+using Terminal.Gui.Tracing;
+
 namespace Terminal.Gui.App;
 
-using Trace = Terminal.Gui.Tracing.Trace;
+using Trace = Trace;
 
 internal partial class ApplicationImpl
 {
     /// <inheritdoc/>
     public event EventHandler<EventArgs<Rectangle>>? ScreenChanged;
 
+    /// <summary>
+    ///     Backing field for <see cref="Screen"/> in inline mode. When set, <see cref="Screen"/>
+    ///     returns this instead of <see cref="IDriver.Screen"/>. In fullscreen mode this is <see langword="null"/>.
+    /// </summary>
+    private Rectangle? _screen;
+
     /// <inheritdoc/>
     public Rectangle Screen
     {
-        get => Driver?.Screen ?? new Rectangle (new Point (0, 0), new Size (2048, 2048));
+        get => _screen ?? Driver?.Screen ?? new Rectangle (new Point (0, 0), new Size (2048, 2048));
         set
         {
-            if (value is { } && (value.X != 0 || value.Y != 0))
+            if (Application.AppModel == AppModel.Inline)
             {
-                throw new NotImplementedException ("Screen locations other than 0, 0 are not yet supported");
+                // Inline mode: store the sub-rectangle independently.
+                // Resize the output buffer to match the inline region dimensions.
+                _screen = value;
+                (Driver as DriverImpl)?.ResizeOutputBuffer (value.Width, value.Height);
             }
-
-            Driver?.SetScreenSize (value.Width, value.Height);
+            else
+            {
+                // Fullscreen: sync with Driver.Screen (resizes both terminal tracking and buffer).
+                _screen = null;
+                Driver?.SetScreenSize (value.Width, value.Height);
+            }
         }
     }
 
@@ -50,7 +65,23 @@ internal partial class ApplicationImpl
         }
     }
 
-    private void Driver_SizeChanged (object? sender, SizeChangedEventArgs e) => RaiseScreenChangedEvent (new Rectangle (new Point (0, 0), e.Size ?? Size.Empty));
+    private void Driver_SizeChanged (object? sender, SizeChangedEventArgs e)
+    {
+        Size newSize = e.Size ?? Size.Empty;
+
+        if (Application.AppModel == AppModel.Inline && _screen is { } screen)
+        {
+            // In inline mode, the terminal resized but our inline region keeps its Y offset
+            // and height. Only the width needs to update to match the new terminal width.
+            _screen = screen with { Width = newSize.Width };
+            (Driver as DriverImpl)?.ResizeOutputBuffer (newSize.Width, screen.Height);
+            RaiseScreenChangedEvent (_screen.Value);
+        }
+        else
+        {
+            RaiseScreenChangedEvent (new Rectangle (new Point (0, 0), newSize));
+        }
+    }
 
     /// <inheritdoc/>
     public void LayoutAndDraw (bool forceRedraw = false)
@@ -90,18 +121,18 @@ internal partial class ApplicationImpl
         // Layout
         bool neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
 
-        // Inline mode: on the first draw, ensure enough vertical space exists for the view,
-        // scrolling the terminal if the cursor is near the bottom. Then resize Screen and set
-        // the rendering row offset. This is the technique used by fzf, atuin, etc.
+        // Inline mode: on the first draw, position the inline region at the cursor's starting
+        // terminal row. If the view doesn't fit, scroll the terminal. Then set App.Screen to
+        // the sub-rectangle representing the inline region.
         if (Application.AppModel == AppModel.Inline && !_inlineScreenSized && Driver is { })
         {
             // Get the view's desired height from the initial full-terminal layout
             View? topView = views.LastOrDefault (v => v is { });
             int viewHeight = topView?.Frame.Height ?? 0;
 
-            InlineState state = Driver.InlineState;
-            int cursorRow = state.InlineCursorRow;
-            int termHeight = Screen.Height;
+            int cursorRow = Driver.InlineState.InlineCursorRow;
+            int termHeight = Driver.Screen.Height;
+            int termWidth = Driver.Screen.Width;
 
             if (viewHeight > 0)
             {
@@ -110,11 +141,8 @@ internal partial class ApplicationImpl
 
                 if (overflow > 0)
                 {
-                    // Emit newlines to force the terminal to scroll
                     Driver.WriteRaw (new string ('\n', overflow));
                     Driver.WriteRaw ($"{EscSeqUtils.CSI}{overflow}A");
-
-                    // The scroll shifted everything up — adjust the cursor row
                     cursorRow -= overflow;
                 }
 
@@ -123,16 +151,13 @@ internal partial class ApplicationImpl
                 Driver.WriteRaw ($"{EscSeqUtils.CSI}{viewHeight}A");
             }
 
-            int availableHeight = termHeight - cursorRow;
+            int availableHeight = Math.Min (viewHeight, termHeight - cursorRow);
 
-            if (availableHeight > 0 && cursorRow > 0)
+            if (availableHeight > 0)
             {
-                state.InlineRowOffset = cursorRow;
-                state.InlineContentHeight = viewHeight;
-                Driver.InlineState = state;
-
-                // Resize Screen to only the available rows below the cursor
-                Screen = new Rectangle (0, 0, Screen.Width, availableHeight);
+                // Set App.Screen to the inline sub-rectangle. This resizes the output buffer
+                // to the inline region dimensions and stores the Y offset for cursor positioning.
+                Screen = new Rectangle (0, cursorRow, termWidth, availableHeight);
 
                 // Re-layout with the new (smaller) Screen size
                 neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
@@ -142,7 +167,7 @@ internal partial class ApplicationImpl
         }
 
         // Inline mode: after initial setup, handle dynamic growth. If the view's desired height
-        // exceeds Screen.Height, scroll the terminal to make room and grow Screen.
+        // exceeds Screen.Height, scroll the terminal to make room and grow App.Screen.
         if (Application.AppModel == AppModel.Inline && _inlineScreenSized && Driver is { })
         {
             View? topView = views.LastOrDefault (v => v is { });
@@ -150,36 +175,25 @@ internal partial class ApplicationImpl
 
             if (viewHeight > Screen.Height)
             {
-                InlineState state = Driver.InlineState;
                 int extraRows = viewHeight - Screen.Height;
 
-                // We can only gain rows by decreasing InlineRowOffset (scrolling terminal up).
-                int canScroll = Math.Min (extraRows, state.InlineRowOffset);
+                // We can only gain rows by decreasing Screen.Y (scrolling terminal up).
+                int canScroll = Math.Min (extraRows, Screen.Y);
 
                 if (canScroll > 0)
                 {
-                    // Scroll the terminal up to make room below
                     Driver.WriteRaw (new string ('\n', canScroll));
                     Driver.WriteRaw ($"{EscSeqUtils.CSI}{canScroll}A");
-
-                    state.InlineRowOffset -= canScroll;
                 }
 
-                // Grow screen by however many rows we gained (may be less than extraRows if at top)
-                int newHeight = Screen.Width > 0
-                                    ? Math.Min (viewHeight, Screen.Height + canScroll)
-                                    : Screen.Height;
+                // Grow screen: Y decreases, Height increases
+                int newY = Screen.Y - canScroll;
+                int newHeight = Math.Min (viewHeight, Screen.Height + canScroll);
 
                 if (newHeight != Screen.Height)
                 {
-                    state.InlineContentHeight = newHeight;
-                    Driver.InlineState = state;
-                    Screen = new Rectangle (0, 0, Screen.Width, newHeight);
+                    Screen = new Rectangle (0, newY, Screen.Width, newHeight);
                     neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
-                }
-                else
-                {
-                    Driver.InlineState = state;
                 }
             }
         }
@@ -191,13 +205,15 @@ internal partial class ApplicationImpl
         {
             Logging.Redraws.Add (1);
 
-            Driver.Clip = new Region (Screen);
+            // Clip uses the output buffer dimensions (0-indexed), not the terminal offset.
+            Rectangle clipRect = new (0, 0, Screen.Width, Screen.Height);
+            Driver.Clip = new Region (clipRect);
 
             // Only force a complete redraw if needed (needsLayout or forceRedraw).
             // Otherwise, just redraw views that need it.
-            View.Draw (views: views.ToArray ().Cast<View> (), neededLayout || forceRedraw);
+            View.Draw (views.ToArray ().Cast<View> (), neededLayout || forceRedraw);
 
-            Driver.Clip = new Region (Screen);
+            Driver.Clip = new Region (clipRect);
 
             // Cause the driver to flush any pending updates to the terminal
             Driver?.Refresh ();

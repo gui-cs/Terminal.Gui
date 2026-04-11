@@ -56,6 +56,7 @@ internal class DriverImpl : IDriver
         _ansiRequestScheduler = ansiRequestScheduler;
         _sizeMonitor = sizeMonitor;
         _sizeMonitor.SizeChanged += OnSizeMonitorOnSizeChanged;
+        _terminalSize = new Size (outputBuffer.Cols, outputBuffer.Rows);
 
         CreateClipboard ();
 
@@ -165,16 +166,39 @@ internal class DriverImpl : IDriver
 
     #region Screen and Display
 
+    private Size _terminalSize;
+
     /// <inheritdoc/>
-    public Rectangle Screen => new (0, 0, _outputBuffer.Cols, _outputBuffer.Rows);
+    public Rectangle Screen => new (0, 0, _terminalSize.Width, _terminalSize.Height);
 
     /// <inheritdoc/>
     public virtual void SetScreenSize (int width, int height)
     {
         Trace.Lifecycle (nameof (DriverImpl), "SetScreenSize", $"{width}×{height}");
-        _outputBuffer.SetSize (width, height);
+        _terminalSize = new Size (width, height);
+
+        // Always update the output's knowledge of terminal size
         _output.SetSize (width, height);
+
+        // In inline mode, the output buffer is sized to App.Screen (the inline region),
+        // not the full terminal. Only resize the buffer in fullscreen mode.
+        if (Application.AppModel != AppModel.Inline)
+        {
+            _outputBuffer.SetSize (width, height);
+        }
+
         SizeChanged?.Invoke (this, new SizeChangedEventArgs (new Size (width, height)));
+    }
+
+    /// <summary>
+    ///     Resizes the output buffer independently of the terminal size.
+    ///     Used in inline mode where the buffer represents the inline rendering region
+    ///     (<see cref="IApplication.Screen"/>), not the full terminal.
+    /// </summary>
+    internal void ResizeOutputBuffer (int width, int height)
+    {
+        Trace.Lifecycle (nameof (DriverImpl), "ResizeOutputBuffer", $"{width}×{height}");
+        _outputBuffer.SetSize (width, height);
     }
 
     /// <inheritdoc/>

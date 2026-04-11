@@ -3,6 +3,7 @@
 > **Issue**: [#4932 — Enable Inline rendering in addition to current AlternateScreenBuffer](https://github.com/gui-cs/Terminal.Gui/issues/4932)
 > **PR**: [#4933](https://github.com/gui-cs/Terminal.Gui/pull/4933)
 > **Branch**: `copilot/enable-inline-ren`
+> **Status**: Phase 2 implemented — `App.Screen` sub-rectangle architecture in place
 
 ---
 

@@ -50,11 +50,12 @@ public class AnsiOutput : OutputBase, IOutput
     internal AppModel AppModel { get; }
 
     /// <summary>
-    ///     Gets or sets a callback that returns the current <see cref="InlineState"/> from the driver.
-    ///     Set after the driver is fully constructed. Used by <see cref="SetCursorPositionImpl"/>
-    ///     and <see cref="Dispose"/> to access inline rendering offsets.
+    ///     Gets or sets a callback that returns the current application <see cref="IApplication.Screen"/>
+    ///     rectangle. In inline mode, <see cref="Rectangle.Y"/> is the terminal row offset
+    ///     and <see cref="Rectangle.Height"/> is the inline region height.
+    ///     Set after the application is fully constructed.
     /// </summary>
-    internal Func<InlineState>? InlineStateGetter { get; set; }
+    internal Func<Rectangle>? AppScreenGetter { get; set; }
 
     /// <summary>
     ///     Initializes a new instance of <see cref="AnsiOutput"/>.
@@ -350,9 +351,9 @@ public class AnsiOutput : OutputBase, IOutput
 
         // + 1 is needed because non-Windows is based on 1 instead of 0 and
         // Console.CursorTop/CursorLeft isn't reliable.
-        // InlineRowOffset shifts all rendering down so Screen row 0 maps to the cursor's
-        // starting terminal row (used by inline mode).
-        int inlineRowOffset = InlineStateGetter?.Invoke ().InlineRowOffset ?? 0;
+        // In inline mode, App.Screen.Y is the terminal row where the inline region starts.
+        // Adding it shifts rendering down so buffer row 0 maps to the correct terminal row.
+        int inlineRowOffset = AppScreenGetter?.Invoke ().Y ?? 0;
         Write (EscSeqUtils.CSI_SetCursorPosition (row + 1 + inlineRowOffset, col + 1));
 
         return true;
@@ -414,10 +415,10 @@ public class AnsiOutput : OutputBase, IOutput
                 // Inline mode: do NOT restore alternate buffer. Move cursor to just
                 // below the inline region and show it so the shell prompt appears
                 // naturally after the rendered content.
-                // InlineRowOffset is the 0-indexed terminal row where the inline region starts.
-                // InlineContentHeight is the view's height. Position cursor one row below.
-                InlineState state = InlineStateGetter?.Invoke () ?? default;
-                int cursorRow = state.InlineRowOffset + state.InlineContentHeight + 1; // 1-indexed
+                // App.Screen.Y is the 0-indexed terminal row where the inline region starts.
+                // App.Screen.Height is the view's height. Position cursor one row below.
+                Rectangle appScreen = AppScreenGetter?.Invoke () ?? default;
+                int cursorRow = appScreen.Y + appScreen.Height + 1; // 1-indexed
                 Write (EscSeqUtils.CSI_SetCursorPosition (cursorRow, 1));
                 Write (EscSeqUtils.CSI_ShowCursor);
             }

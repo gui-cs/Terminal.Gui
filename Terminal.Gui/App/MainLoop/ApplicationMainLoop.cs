@@ -21,22 +21,11 @@ namespace Terminal.Gui.App;
 /// <typeparam name="TInputRecord">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
 public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputRecord> where TInputRecord : struct
 {
-    private ITimedEvents? _timedEvents;
-    private ConcurrentQueue<TInputRecord>? _inputQueue;
-    private IInputProcessor? _inputProcessor;
-    private IOutput? _output;
-    private AnsiRequestScheduler? _ansiRequestScheduler;
-    private ISizeMonitor? _sizeMonitor;
-
     /// <inheritdoc/>
     public IApplication? App { get; private set; }
 
     /// <inheritdoc/>
-    public ITimedEvents TimedEvents
-    {
-        get => _timedEvents ?? throw new NotInitializedException (nameof (TimedEvents));
-        private set => _timedEvents = value;
-    }
+    public ITimedEvents TimedEvents { get => field ?? throw new NotInitializedException (nameof (TimedEvents)); private set; }
 
     // TODO: follow above pattern for others too
 
@@ -45,42 +34,22 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     ///     thread by a <see cref="IInput{T}"/>. Is drained as part of each
     ///     <see cref="Iteration"/> on the main loop thread.
     /// </summary>
-    public ConcurrentQueue<TInputRecord> InputQueue
-    {
-        get => _inputQueue ?? throw new NotInitializedException (nameof (InputQueue));
-        private set => _inputQueue = value;
-    }
+    public ConcurrentQueue<TInputRecord> InputQueue { get => field ?? throw new NotInitializedException (nameof (InputQueue)); private set; }
 
     /// <inheritdoc/>
-    public IInputProcessor InputProcessor
-    {
-        get => _inputProcessor ?? throw new NotInitializedException (nameof (InputProcessor));
-        private set => _inputProcessor = value;
-    }
+    public IInputProcessor InputProcessor { get => field ?? throw new NotInitializedException (nameof (InputProcessor)); private set; }
 
     /// <inheritdoc/>
     public IOutputBuffer OutputBuffer { get; } = new OutputBufferImpl ();
 
     /// <inheritdoc/>
-    public IOutput Output
-    {
-        get => _output ?? throw new NotInitializedException (nameof (Output));
-        private set => _output = value;
-    }
+    public IOutput Output { get => field ?? throw new NotInitializedException (nameof (Output)); private set; }
 
     /// <inheritdoc/>
-    public AnsiRequestScheduler AnsiRequestScheduler
-    {
-        get => _ansiRequestScheduler ?? throw new NotInitializedException (nameof (AnsiRequestScheduler));
-        private set => _ansiRequestScheduler = value;
-    }
+    public AnsiRequestScheduler AnsiRequestScheduler { get => field ?? throw new NotInitializedException (nameof (AnsiRequestScheduler)); private set; }
 
     /// <inheritdoc/>
-    public ISizeMonitor SizeMonitor
-    {
-        get => _sizeMonitor ?? throw new NotInitializedException (nameof (SizeMonitor));
-        private set => _sizeMonitor = value;
-    }
+    public ISizeMonitor SizeMonitor { get => field ?? throw new NotInitializedException (nameof (SizeMonitor)); private set; }
 
     /// <summary>
     ///     Initializes the class with the provided subcomponents
@@ -179,8 +148,8 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
             {
                 _inlineSizeConfirmed = true;
 
-                // Pass the cursor row from the ANSI CPR response to the driver's InlineState
-                // so LayoutAndDraw can resize Screen and set the rendering row offset.
+                // Pass the cursor row from the ANSI CPR response to the driver's InlineState.
+                // LayoutAndDraw will use this to position App.Screen at the cursor row.
                 if (App?.Driver is { } driver)
                 {
                     InlineState state = driver.InlineState;

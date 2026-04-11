@@ -67,10 +67,7 @@ public sealed class InlinePromptView : Window
 
         ListView<string> outputList = new ()
         {
-            Y = Pos.Bottom (infoLabel), 
-            Width = Dim.Fill (), 
-            Height = Dim.Auto (minimumContentDim: 1),
-            BorderStyle = LineStyle.Dotted
+            Y = Pos.Bottom (infoLabel), Width = Dim.Fill (), Height = Dim.Auto (minimumContentDim: 1), BorderStyle = LineStyle.Dotted
         };
         outputList.Border.Thickness = new Thickness (0, 0, 0, 1);
 
@@ -90,11 +87,8 @@ public sealed class InlinePromptView : Window
         inputIndicator.Border.Thickness = new Thickness (0, 0, 0, 1);
 
         TextField inputField = new ()
-        { 
-            X = Pos.Right(inputIndicator),
-            Y = Pos.Top (inputIndicator), 
-            Width = Dim.Fill (), 
-            BorderStyle = inputIndicator.BorderStyle
+        {
+            X = Pos.Right (inputIndicator), Y = Pos.Top (inputIndicator), Width = Dim.Fill (), BorderStyle = inputIndicator.BorderStyle
         };
         inputField.Border.Thickness = new Thickness (0, 0, 0, 1);
 
@@ -120,7 +114,10 @@ public sealed class InlinePromptView : Window
 
         if (newIsRunning)
         {
-            _cursorShortcut?.Title = $"{App?.Driver?.InlineState.InlineCursorRow}";
+            _cursorShortcut?.Title = $"Cursor:{App?.Driver?.InlineState.InlineCursorRow}";
+            _driverShortcut?.Title = $"Driver:{Format (App?.Driver?.Screen)}";
+            _screenShortcut?.Title = $"App:{Format (App?.Screen)}";
+            _frameShortcut?.Title = $"Frame:{Format (Frame)}";
             App?.ScreenChanged += AppOnScreenChanged;
             App?.Driver?.SizeChanged += DriverOnSizeChanged;
         }
@@ -132,17 +129,17 @@ public sealed class InlinePromptView : Window
 
         return;
 
-        void AppOnScreenChanged (object? sender, EventArgs<Rectangle> e) => _screenShortcut?.Title = Format (e.Value);
+        void AppOnScreenChanged (object? sender, EventArgs<Rectangle> e) => _screenShortcut?.Title = $"App:{Format (e.Value)}";
 
-        void DriverOnSizeChanged (object? sender, SizeChangedEventArgs e) => _driverShortcut?.Title = Format (new Rectangle (new Point (0, 0), e.Size!.Value));
+        void DriverOnSizeChanged (object? sender, SizeChangedEventArgs e) =>
+            _driverShortcut?.Title = $"Driver:{Format (new Rectangle (new Point (0, 0), e.Size!.Value))}";
     }
 
     /// <inheritdoc/>
     protected override void OnFrameChanged (in Rectangle frame)
     {
         base.OnFrameChanged (in frame);
-        _frameShortcut?.Title = Format (frame);
-        _cursorShortcut?.Title = $"{App?.Driver?.InlineState.InlineCursorRow}";
+        _frameShortcut?.Title = $"Frame:{Format (frame)}";
     }
 
     private static string Format (Rectangle? rect) =>

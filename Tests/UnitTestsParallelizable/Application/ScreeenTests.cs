@@ -378,18 +378,21 @@ public class ScreenTests (ITestOutputHelper output)
         Assert.Equal (new (0, 0, 2048, 2048), screen);
     }
 
+    // Copilot
     [Fact]
-    public void Screen_Property_Throws_When_Setting_Non_Zero_Origin ()
+    public void Screen_Property_Allows_Setting_Non_Zero_Origin_In_Fullscreen ()
     {
         // Arrange
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        // Act & Assert
-        var exception = Assert.Throws<NotImplementedException> (() =>
-                                                                    app.Screen = new (10, 10, 80, 25));
+        // Act — in fullscreen mode, non-zero origin is stored but Driver.SetScreenSize is
+        // called with the new dimensions (the origin is ignored by the driver).
+        Exception? exception = Record.Exception (() =>
+                                                     app.Screen = new (10, 10, 80, 25));
 
-        Assert.Contains ("Screen locations other than 0, 0", exception.Message);
+        // Assert — no exception is thrown; the setter accepts non-zero origins.
+        Assert.Null (exception);
     }
 
     [Fact]
