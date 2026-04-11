@@ -255,11 +255,11 @@ Manages the screen buffer and drawing operations:
 - Handles clipping regions
 - Tracks dirty regions for efficient rendering
 
-#### IWindowSizeMonitor
+#### ISizeMonitor
 Detects terminal size changes and raises `SizeChanged` events when the terminal is resized.
 
-#### DriverFacade&lt;T&gt;
-A unified facade that implements `IDriver` and coordinates all the components. This is what gets assigned to <xref:Terminal.Gui.App.Application>'s `Driver`.
+#### DriverImpl
+The concrete implementation that implements `IDriver` and coordinates all the components. This is what gets assigned to <xref:Terminal.Gui.App.Application>'s `Driver`.
 
 ### Threading Model
 
@@ -288,9 +288,11 @@ The driver architecture employs a **multi-threaded design** for optimal responsi
 
 - **Main UI Thread**: Runs `ApplicationMainLoop.Iteration()` which:
   1. Processes input from the queue via `IInputProcessor`
-  2. Executes timeout callbacks
-  3. Checks for UI changes (layout/drawing)
-  4. Renders updates via `IOutput`
+  2. Pumps queued ANSI requests via `AnsiRequestScheduler.RunSchedule(...)`
+  3. Executes size polling / monitor checks
+  4. Checks for UI changes (layout/drawing)
+  5. Renders updates via `IOutput`
+  6. Executes timeout callbacks
 
 This separation ensures that input is never lost and the UI remains responsive during intensive operations.
 
@@ -300,10 +302,10 @@ When <xref:Terminal.Gui.App.Application>'s `Init()` is called:
 
 1. **IApplication.Init()** is invoked
 2. Creates a `MainLoopCoordinator<T>` with the appropriate `ComponentFactory<T>`
-3. **MainLoopCoordinator.StartAsync()** begins:
+3. **MainLoopCoordinator.StartInputTaskAsync()** begins:
    - Starts the input thread which creates `IInput<T>`
    - Initializes the main UI loop which creates `IOutput`
-   - Creates `DriverFacade<T>` and assigns to <xref:Terminal.Gui.App.IApplication>'s `Driver`
+   - Creates `DriverImpl` and assigns to <xref:Terminal.Gui.App.IApplication>'s `Driver`
    - Waits for both threads to be ready
 4. Returns control to the application
 
@@ -312,10 +314,11 @@ When <xref:Terminal.Gui.App.Application>'s `Init()` is called:
 When <xref:Terminal.Gui.App.IApplication>'s `Shutdown()` is called:
 
 1. Cancellation token is triggered
-2. Input thread exits its read loop
-3. `IOutput` is disposed
-4. Main thread waits for input thread to complete
-5. All resources are cleaned up
+2. If kitty keyboard mode was enabled, `KittyKeyboardProtocolDetector.Disable()` is sent to restore terminal keyboard mode
+3. Input thread exits its read loop
+4. `IOutput` is disposed
+5. Main thread waits for input thread to complete
+6. All resources are cleaned up
 
 ## Component Interfaces
 

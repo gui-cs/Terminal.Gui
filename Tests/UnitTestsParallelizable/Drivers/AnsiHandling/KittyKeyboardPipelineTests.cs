@@ -204,6 +204,55 @@ public class KittyKeyboardPipelineTests
 
     #endregion
 
+    #region Mixed Kitty + Legacy Duplicate Input
+
+    // Copilot
+    [Fact]
+    public void Pipeline_MixedKittyAndLegacyPrintable_DoesNotRaiseDuplicateKeyDown ()
+    {
+        // Reproduces terminals that emit kitty CSI-u and a legacy printable char for the same keypress.
+        // Expected behavior: a single logical key event should be raised.
+        (List<Key> down, List<Key> up) = InjectRawSequence ("\x1b[97u", "a");
+
+        Assert.Single (down);
+        Assert.Equal (Key.A, down [0]);
+        Assert.Empty (up);
+    }
+
+    // Copilot
+    [Theory]
+    [InlineData ("«", 171)]
+    [InlineData ("»", 187)]
+    [InlineData ("ç", 231)]
+    [InlineData ("Ç", 199)]
+    [InlineData ("º", 186)]
+    [InlineData ("ª", 170)]
+    public void Pipeline_MixedKittyAndLegacyPrintable_PortugueseKeys_DoesNotRaiseDuplicateKeyDown (string printable, int kittyCode)
+    {
+        // Issue #4918 (PT keyboard): kitty CSI-u plus legacy printable input for the same key should produce one KeyDown.
+        var kittySequence = $"\x1b[{kittyCode}u";
+        (List<Key> down, List<Key> up) = InjectRawSequence (kittySequence, printable);
+
+        Assert.Single (down);
+        Assert.Equal (printable, down [0].GetPrintableText ());
+        Assert.Empty (up);
+    }
+
+    // Copilot
+    [Fact]
+    public void Pipeline_MixedKittyAssociatedTextAndLegacyPrintable_DoesNotRaiseDuplicateKeyDown ()
+    {
+        // Reproduces terminals that emit a kitty key event with associated text plus a legacy char.
+        // ESC[49;2;33u = shifted '1' producing associated text '!'
+        (List<Key> down, List<Key> up) = InjectRawSequence ("\x1b[49;2;33u", "!");
+
+        Assert.Single (down);
+        Assert.Equal ("!", down [0].GetPrintableText ());
+        Assert.Empty (up);
+    }
+
+    #endregion
+
     #region Standalone Modifier Key Events
 
     // Copilot - Opus 4.6

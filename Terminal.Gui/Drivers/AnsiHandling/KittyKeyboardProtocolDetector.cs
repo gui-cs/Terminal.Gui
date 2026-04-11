@@ -21,17 +21,77 @@ public class KittyKeyboardProtocolDetector
     }
 
     /// <summary>
+    ///     Enables kitty keyboard progressive enhancement flags for the active terminal,
+    ///     then performs a follow-up detect request to confirm and store the flags that were actually enabled.
+    /// </summary>
+    /// <param name="flags">The kitty keyboard flags to enable.</param>
+    internal void Enable (KittyKeyboardFlags flags)
+    {
+        if (_driver is { IsLegacyConsole: true })
+        {
+            Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Enable", "Skipping kitty keyboard probe for legacy console");
+
+            return;
+        }
+
+        if (flags == KittyKeyboardFlags.None)
+        {
+            return;
+        }
+
+        Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Enable", $"Writing enable sequence for flags {flags}");
+        _driver?.GetOutput ().Write (EscSeqUtils.CSI_EnableKittyKeyboardFlags (flags));
+
+        Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Enable", "Running Detector again, to get reported flags...");
+
+        Detect (result =>
+                {
+                    if (!result.IsSupported || _driver?.KittyKeyboardCapabilities is null)
+                    {
+                        Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector),
+                                         "Enable",
+                                         $"Post-enable detect did not update flags. IsSupported={
+                                             result.IsSupported
+                                         }, HasCapabilities={
+                                             _driver?.KittyKeyboardCapabilities is { }
+                                         }");
+
+                        return;
+                    }
+
+                    _driver.KittyKeyboardCapabilities.Flags = result.Flags;
+                    Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Enable", $"Post-enable detect confirmed kitty flags {result.Flags}");
+                });
+    }
+
+    /// <summary>
+    ///     Sends the kitty keyboard disable sequence to restore the terminal keyboard protocol mode.
+    /// </summary>
+    internal void Disable ()
+    {
+        if (_driver is { IsLegacyConsole: true })
+        {
+            Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Disable", "Skipping kitty keyboard probe for legacy console");
+
+            return;
+        }
+
+        Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Disable", "Writing disable sequence");
+        _driver?.GetOutput ().Write (EscSeqUtils.CSI_DisableKittyKeyboardFlags);
+    }
+
+    /// <summary>
     ///     Detects kitty keyboard protocol support asynchronously through the ANSI request scheduler.
     /// </summary>
     /// <param name="resultCallback">Called when detection completes.</param>
-    public void Detect (Action<KittyKeyboardProtocolResult> resultCallback)
+    public void Detect (Action<KittyKeyboardCapabilities> resultCallback)
     {
         ArgumentNullException.ThrowIfNull (resultCallback);
 
         if (_driver is { IsLegacyConsole: true })
         {
             Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Detect", "Skipping kitty keyboard probe for legacy console");
-            resultCallback (new KittyKeyboardProtocolResult ());
+            resultCallback (new KittyKeyboardCapabilities ());
 
             return;
         }
@@ -43,26 +103,18 @@ public class KittyKeyboardProtocolDetector
         QueueRequest (EscSeqUtils.CSI_QueryKittyKeyboardFlags,
                       response =>
                       {
-                          KittyKeyboardProtocolResult result = ParseResponse (response);
-                          result.EnabledFlags = result.IsSupported ? EscSeqUtils.KittyKeyboardRequestedFlags : KittyKeyboardFlags.None;
+                          KittyKeyboardCapabilities result = ParseResponse (response);
 
                           Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector),
                                            "Detect",
-                                           $"Kitty keyboard response '{
-                                               response
-                                           }' => Supported={
-                                               result.IsSupported
-                                           }, SupportedFlags={
-                                               result.SupportedFlags
-                                           }, EnabledFlags={
-                                               result.EnabledFlags
-                                           }");
+                                           $"Kitty keyboard response '{response}' => IsSupported={result.IsSupported}, Flags={result.Flags}");
+
                           resultCallback (result);
                       },
                       () =>
                       {
                           Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Detect", "Kitty keyboard probe abandoned");
-                          resultCallback (new KittyKeyboardProtocolResult ());
+                          resultCallback (new KittyKeyboardCapabilities ());
                       });
     }
 
@@ -80,20 +132,39 @@ public class KittyKeyboardProtocolDetector
         _driver?.QueueAnsiRequest (request);
     }
 
-    internal static KittyKeyboardProtocolResult ParseResponse (string? response)
+    /// <summary>
+    ///     Parses a <see cref="EscSeqUtils.CSI_QueryKittyKeyboardFlags"/> response, returning
+    ///     the parsed result. If the response indicates Kitty support, <see cref="KittyKeyboardCapabilities.IsSupported"/>
+    ///     will be <see langword="true"/>. If <see cref="EscSeqUtils.CSI_EnableKittyKeyboardFlags"/> has been sent,
+    ///     enabling Kitty support <see cref="KittyKeyboardCapabilities.Flags"/> will indicate
+    ///     which flags have been enabled.
+    /// </summary>
+    /// <param name="response">
+    ///     The terminal response to parse. Supported formats are the Kitty keyboard flags reply
+    ///     <c>ESC[?&lt;flags&gt;u</c> and the same sequence without the leading escape character
+    ///     (<c>[?&lt;flags&gt;u</c>).
+    /// </param>
+    /// <returns>
+    ///     A <see cref="KittyKeyboardCapabilities"/> value whose <see cref="KittyKeyboardCapabilities.IsSupported"/>
+    ///     property is <see langword="true"/> when <paramref name="response"/> is a valid Kitty keyboard
+    ///     protocol reply, and whose <see cref="KittyKeyboardCapabilities.Flags"/> property contains the
+    ///     parsed <see cref="KittyKeyboardFlags"/> bit field. If parsing fails, returns a default
+    ///     capabilities value.
+    /// </returns>
+    internal static KittyKeyboardCapabilities ParseResponse (string? response)
     {
         if (string.IsNullOrWhiteSpace (response))
         {
-            return new KittyKeyboardProtocolResult ();
+            return new KittyKeyboardCapabilities ();
         }
 
         Match match = Regex.Match (response, @"(?:\x1B)?\[\?(\d+)u$");
 
         if (!match.Success || !int.TryParse (match.Groups [1].Value, out int supportedFlags))
         {
-            return new KittyKeyboardProtocolResult ();
+            return new KittyKeyboardCapabilities ();
         }
 
-        return new KittyKeyboardProtocolResult { IsSupported = true, SupportedFlags = (KittyKeyboardFlags)supportedFlags };
+        return new KittyKeyboardCapabilities { IsSupported = true, Flags = (KittyKeyboardFlags)supportedFlags };
     }
 }
