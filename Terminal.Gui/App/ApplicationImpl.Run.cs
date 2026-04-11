@@ -169,7 +169,7 @@ internal partial class ApplicationImpl
 
         IDriver? driver = Driver;
 
-        if (EnableAnsiStartupReadinessGate && driver?.AnsiStartupGate is { IsReady: false } startupGate)
+        if (driver?.AnsiStartupGate is { IsReady: false } startupGate)
         {
             string pending = string.Join (", ", startupGate.PendingQueries);
             Trace.Lifecycle (MainThreadId.ToString (), "Begin", $"Deferring initial LayoutAndDraw until ANSI startup queries complete. Pending: {pending}");

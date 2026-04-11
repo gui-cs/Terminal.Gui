@@ -150,7 +150,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         {
             return;
         }
-        IAnsiStartupGate? startupGate = app?.EnableAnsiStartupReadinessGate == true ? new AnsiStartupGate () : null;
+        AnsiStartupGate? startupGate = app?.AnsiStartupGate;
 
         _driver = new DriverImpl (_componentFactory,
                                   _inputProcessor,

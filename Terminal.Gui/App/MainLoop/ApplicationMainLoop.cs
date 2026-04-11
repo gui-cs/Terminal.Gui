@@ -117,7 +117,6 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         IDriver? driver = App?.Driver;
 
         if (!_firstRenderCompleted
-            && App?.EnableAnsiStartupReadinessGate == true
             && driver?.AnsiStartupGate is { IsReady: false } startupGate)
         {
             if (!_startupWaitLogged)

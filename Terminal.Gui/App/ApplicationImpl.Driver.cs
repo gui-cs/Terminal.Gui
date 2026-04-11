@@ -9,7 +9,7 @@ internal partial class ApplicationImpl
     public IDriver? Driver { get; set; }
 
     /// <inheritdoc/>
-    public bool EnableAnsiStartupReadinessGate { get; set; }
+    public AnsiStartupGate? AnsiStartupGate { get; set; }
 
     /// <inheritdoc/>
     public string ForceDriver { get; set; } = string.Empty;

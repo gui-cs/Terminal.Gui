@@ -38,7 +38,7 @@ public class ApplicationMainLoopTests
         appMock.Setup (a => a.LayoutAndDraw (false));
         appMock.SetupGet (a => a.Navigation).Returns ((ApplicationNavigation?)null);
         appMock.SetupProperty (a => a.Driver);
-        appMock.SetupProperty (a => a.EnableAnsiStartupReadinessGate, true);
+        appMock.SetupProperty (a => a.AnsiStartupGate, startupGate);
 
         loop.Initialize (new TimedEvents (),
                          new ConcurrentQueue<char> (),
