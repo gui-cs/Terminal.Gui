@@ -526,7 +526,7 @@ internal class TextModel
         }
 
         if (startCol > 0
-            && StringExtensions.ToString (line.GetRange (startCol, col - startCol).Select (c => c.Grapheme).ToList ()).Trim () == ""
+            && StringExtensions.ToString (line.GetRange (startCol, Math.Max (col - startCol, 0)).Select (c => c.Grapheme).ToList ()).Trim () == ""
             && (col - startCol > 1 || (col - startCol > 0 && line [startCol - 1].Grapheme == " ")))
         {
             while (startCol > 0 && line [startCol - 1].Grapheme == " ")
