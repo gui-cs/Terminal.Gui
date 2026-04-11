@@ -268,22 +268,67 @@ app.Screen = app.Screen with { Height = app.Screen.Height + 1 };
 
 ---
 
+## Implementation Process Rules
+
+> **Every implementing agent must follow these rules before moving from one step to the next.**
+
+1. **Update this plan** — at the start of each step, add a `### Step N — Status` sub-section (below the numbered steps) with:
+   - Current status (`🔵 In progress` / `✅ Done` / `❌ Blocked`).
+   - Any discoveries, surprises, or deviations from the design recorded as **Lessons Learned**.
+   - Links to the commits that implement the step.
+2. **Write tests first (or alongside)** — every step that touches library code must be accompanied by at least one new unit test in `Tests/UnitTestsParallelizable` that would have failed before the change.
+3. **All tests must pass** — run `dotnet test --project Tests/UnitTestsParallelizable --no-build` (and `Tests/UnitTests --no-build` if Application lifecycle is involved) before declaring a step done. **Do not start the next step if any test is red.**
+4. **Commit atomically** — each step gets its own commit (or a small, coherent set). Do not batch multiple steps into one commit.
+
+---
+
 ## Suggested Implementation Order
 
 1. Add `AppModel.cs` enum and the `Application.AppModel` static config property.
+   - *Tests:* `AppModelTests` — verify enum values exist; verify config round-trips via `ConfigurationManager`.
+
 2. Modify `AnsiOutput` constructor: when `AppModel == Inline`, skip `CSI ?1049h`, query terminal cursor row via `ESC[6n`, and store it so `ApplicationImpl` can initialize `Screen.Top`.
+   - *Tests:* `AnsiOutputInlineModeTests` — verify `?1049h` is **not** emitted when `AppModel == Inline`; verify it **is** emitted in `FullScreen` mode (regression guard).
+
 3. Fix `OutputBufferImpl.ClearContents()` — add `initiallyDirty` parameter, pass `false` in inline mode (most critical: prevents the first render from overwriting the entire visible terminal).
+   - *Tests:* `OutputBufferTests` — verify that `initiallyDirty: false` leaves all cells clean; verify that the existing `initiallyDirty: true` behaviour is unchanged.
+
 4. In `ApplicationImpl`, after the first layout pass, set `IApplication.Screen` to `{ Top = queriedRow, Height = runnableView.Frame.Height, Width = driver.Screen.Width }`.
+   - *Tests:* `ApplicationImplInlineScreenTests` — verify `Screen.Top` equals the queried row and `Screen.Height` equals the runnable's `Frame.Height`.
+
 5. In `AnsiOutput.SetCursorPositionImpl`, add `Screen.Top` to every row coordinate so output is placed at the correct terminal rows.
+   - *Tests:* `AnsiOutputCursorOffsetTests` — verify emitted `CSI row;col H` sequences include the `Screen.Top` offset.
+
 6. Correct mouse event row coordinates in `AnsiInputProcessor` by subtracting `app.Screen.Top`.
+   - *Tests:* `AnsiInputProcessorInlineMouseTests` — verify mouse `Y` is adjusted by `−Screen.Top` in inline mode and unchanged in fullscreen mode.
+
 7. Handle "grow down": when `IApplication.Screen.Height` increases, `AnsiOutput` prints newlines and scrolls before the next draw.
+   - *Tests:* `AnsiOutputGrowDownTests` — verify newlines are emitted when `Screen.Height` increases; verify existing height triggers no extra output.
+
 8. Implement clean-exit in `AnsiOutput.Dispose`: move cursor to `Screen.Top + Screen.Height`, emit `CSI_ShowCursor`, skip `?1049l`.
+   - *Tests:* `AnsiOutputDisposeInlineTests` — verify `?1049l` is absent; verify cursor is positioned at `Screen.Top + Screen.Height`.
+
 9. Add a **standalone example** (`Examples/InlineCLI/`) that feels like Claude Code CLI or GitHub Copilot CLI — not a UICatalog scenario. The example should:
    - Use `ConfigurationManager.RuntimeConfig` to set `Application.AppModel = Inline` before `Init()`.
    - Present a prompt-like input bar anchored to the bottom of the terminal (`Y = Pos.AnchorEnd()`, `Height = Dim.Auto(minimumContentSize: 3)`).
    - Stream "thinking…" / response lines above the input bar as normal terminal output, growing the region down as new content arrives.
    - Exit cleanly so the shell prompt appears immediately below the rendered output, with the session left in scrollback history.
    - Be a self-contained `.csproj` in `Examples/InlineCLI/` (mirroring the `Examples/Example/` pattern) with a short `README.md` explaining the inline mode API.
+   - *Tests:* verify the project builds (`dotnet build Examples/InlineCLI`); no new library tests required for the example itself.
+
+---
+
+## Step Status Log
+
+> Implementing agents: add a sub-section here for each step as you work through them.
+
+<!--
+### Step N — Status
+**Status:** 🔵 In progress | ✅ Done | ❌ Blocked  
+**Commits:** (links)  
+**Lessons Learned:**  
+- …
+-->
 
 ---
 
