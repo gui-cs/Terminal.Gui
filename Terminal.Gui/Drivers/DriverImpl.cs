@@ -198,6 +198,9 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public int Top { get => _outputBuffer.Top; set => _outputBuffer.Top = value; }
 
+    /// <inheritdoc/>
+    public InlineState InlineState { get; set; }
+
     #endregion Screen and Display
 
     #region Color Support

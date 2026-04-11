@@ -135,6 +135,13 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         }
         _driver = new DriverImpl (_componentFactory, _inputProcessor, _loop.OutputBuffer, _output, _loop.AnsiRequestScheduler, _loop.SizeMonitor);
 
+        // Wire up the inline state callback so AnsiOutput can read offsets from the driver
+        if (_output is AnsiOutput ansiOutput)
+        {
+            IDriver driver = _driver;
+            ansiOutput.InlineStateGetter = () => driver.InlineState;
+        }
+
         // Initialize the size monitor now that the driver is fully constructed
         // This allows size monitors to set up platform-specific mechanisms:
         // - ANSI queries (ANSIDriver)

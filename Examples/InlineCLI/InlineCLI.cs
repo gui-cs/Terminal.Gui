@@ -9,6 +9,7 @@
 // scrollback history.
 
 using System.Collections.ObjectModel;
+using System.Drawing;
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
 using Terminal.Gui.ViewBase;
@@ -29,44 +30,121 @@ app.Dispose ();
 /// </summary>
 public sealed class InlinePromptView : Window
 {
+    private readonly Shortcut? _cursorShortcut;
+    private readonly Shortcut? _driverShortcut;
+    private readonly Shortcut? _screenShortcut;
+    private readonly Shortcut? _frameShortcut;
+
     public InlinePromptView ()
     {
-        Title = "Inline CLI Demo (Esc to quit)";
+        Title = "Inline CLI Demo";
 
-        Border.Thickness = new Thickness (0, 4, 0, 0);
+        Border.Thickness = new Thickness (0, 3, 0, 0);
         Border.LineStyle = LineStyle.Rounded;
 
         Arrangement = ViewArrangement.TopResizable;
 
         Width = Dim.Fill ();
-        Height = Dim.Auto (minimumContentDim: 10);
+        Height = Dim.Auto ();
 
-        Label statusLabel = new () { Text = "Type a message and press Enter. Press Esc to exit.", Width = Dim.Fill () };
+        StatusBar statusBar = new () { AlignmentModes = AlignmentModes.IgnoreFirstOrLast, SchemeName = SchemeName };
+        Shortcut itemCountShortcut = new () { Title = "No items", MouseHighlightStates = MouseState.None, Enabled = false };
 
-        TextField inputField = new () { Y = Pos.Bottom (statusLabel) + 1, Width = Dim.Fill () };
+        _cursorShortcut = new Shortcut { Text = "Cursor", MouseHighlightStates = MouseState.None, Enabled = false };
+        _driverShortcut = new Shortcut { Text = "Driver", MouseHighlightStates = MouseState.None, Enabled = false };
+        _screenShortcut = new Shortcut { Text = "Screen", MouseHighlightStates = MouseState.None, Enabled = false };
+        _frameShortcut = new Shortcut { Text = "Frame", MouseHighlightStates = MouseState.None, Enabled = false };
+
+        Label infoLabel = new ()
+        {
+            Text = "Demonstrates Inline Application Mode.\nType a message and press Enter. Press Esc to exit.",
+            TextAlignment = Alignment.Center,
+            Width = Dim.Fill (),
+            Enabled = false
+        };
 
         ObservableCollection<string> items = [];
 
         ListView<string> outputList = new ()
         {
-            Y = Pos.Bottom (inputField) + 1,
-            Width = Dim.Fill (),
-            Height = Dim.Auto ()
+            Y = Pos.Bottom (infoLabel), 
+            Width = Dim.Fill (), 
+            Height = Dim.Auto (minimumContentDim: 1),
+            BorderStyle = LineStyle.Dotted
         };
+        outputList.Border.Thickness = new Thickness (0, 0, 0, 1);
+
+        outputList.ValueChanged += (_, _) => { };
 
         outputList.SetSource (items);
+
+        View inputIndicator = new ()
+        {
+            Text = $"{Glyphs.RightArrow}",
+            Y = Pos.Bottom (outputList),
+            Width = 2,
+            Height = 2,
+            Enabled = false,
+            BorderStyle = LineStyle.Dotted
+        };
+        inputIndicator.Border.Thickness = new Thickness (0, 0, 0, 1);
+
+        TextField inputField = new ()
+        { 
+            X = Pos.Right(inputIndicator),
+            Y = Pos.Top (inputIndicator), 
+            Width = Dim.Fill (), 
+            BorderStyle = inputIndicator.BorderStyle
+        };
+        inputField.Border.Thickness = new Thickness (0, 0, 0, 1);
 
         inputField.Accepted += (_, _) =>
                                {
                                    string text = inputField.Text;
 
-                                   if (!string.IsNullOrEmpty (text))
-                                   {
-                                       items.Add ($"> {text}");
-                                       inputField.Text = string.Empty;
-                                   }
+                                   items.Add ($"{Glyphs.BlackCircle} {text}");
+                                   inputField.Text = string.Empty;
+                                   itemCountShortcut.Title = $"Items: {items.Count}";
                                };
 
-        Add (statusLabel, inputField, outputList);
+        statusBar.Add (_cursorShortcut, _driverShortcut, _screenShortcut, _frameShortcut, itemCountShortcut);
+
+        Add (infoLabel, outputList, inputIndicator, inputField, statusBar);
+        inputField.SetFocus ();
     }
+
+    /// <inheritdoc/>
+    protected override void OnIsRunningChanged (bool newIsRunning)
+    {
+        base.OnIsRunningChanged (newIsRunning);
+
+        if (newIsRunning)
+        {
+            _cursorShortcut?.Title = $"{App?.Driver?.InlineState.InlineCursorRow}";
+            App?.ScreenChanged += AppOnScreenChanged;
+            App?.Driver?.SizeChanged += DriverOnSizeChanged;
+        }
+        else
+        {
+            App?.ScreenChanged -= AppOnScreenChanged;
+            App?.Driver?.SizeChanged -= DriverOnSizeChanged;
+        }
+
+        return;
+
+        void AppOnScreenChanged (object? sender, EventArgs<Rectangle> e) => _screenShortcut?.Title = Format (e.Value);
+
+        void DriverOnSizeChanged (object? sender, SizeChangedEventArgs e) => _driverShortcut?.Title = Format (new Rectangle (new Point (0, 0), e.Size!.Value));
+    }
+
+    /// <inheritdoc/>
+    protected override void OnFrameChanged (in Rectangle frame)
+    {
+        base.OnFrameChanged (in frame);
+        _frameShortcut?.Title = Format (frame);
+        _cursorShortcut?.Title = $"{App?.Driver?.InlineState.InlineCursorRow}";
+    }
+
+    private static string Format (Rectangle? rect) =>
+        rect is null ? $"({Glyphs.Null})" : $"({rect.Value.X},{rect.Value.Y},{rect.Value.Width},{rect.Value.Height})";
 }

@@ -106,6 +106,12 @@ public interface IDriver : IDisposable
     /// <summary>The topmost row in the terminal.</summary>
     int Top { get; set; }
 
+    /// <summary>
+    ///     Gets or sets the inline-mode rendering state. Only meaningful when <see cref="Application.AppModel"/>
+    ///     is <see cref="AppModel.Inline"/>.
+    /// </summary>
+    InlineState InlineState { get; set; }
+
     #endregion Screen and Display
 
     #region Color Support

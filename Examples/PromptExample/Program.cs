@@ -8,6 +8,7 @@ using Terminal.Gui.Resources;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 using Color = Terminal.Gui.Drawing.Color;
+// ReSharper disable AccessToDisposedClosure
 
 ConfigurationManager.Enable (ConfigLocations.All);
 using IApplication app = Application.Create ().Init (DriverRegistry.Names.DOTNET);
@@ -15,17 +16,8 @@ using IApplication app = Application.Create ().Init (DriverRegistry.Names.DOTNET
 // Create a main window to host the prompts
 using Window mainWindow = new ();
 mainWindow.Title = "Prompt API Examples (Esc to quit)";
-
-// Add instructions
-mainWindow.Add (new Label
-{
-    Text =
-        "This example demonstrates various uses of the Prompt API.\nPress the buttons to try different prompt types.\nPress Esc to quit.",
-    X = Pos.Center (),
-    Y = 1
-});
-
-var buttonY = 6;
+mainWindow.Text = "This example demonstrates various uses of the Prompt API.\nPress the buttons to try different prompt types.\nPress Esc to quit.";
+mainWindow.TextAlignment = Alignment.Center;
 
 // Example 1: TextField with string result using auto-Text extraction
 Button textFieldButton = new () { Title = "TextField (Auto-Text)", X = Pos.Center (), Y = buttonY++ };

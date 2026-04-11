@@ -179,11 +179,13 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
             {
                 _inlineSizeConfirmed = true;
 
-                // Pass the cursor row from the ANSI CPR response to ApplicationImpl
+                // Pass the cursor row from the ANSI CPR response to the driver's InlineState
                 // so LayoutAndDraw can resize Screen and set the rendering row offset.
-                if (App is ApplicationImpl appImpl)
+                if (App?.Driver is { } driver)
                 {
-                    appImpl.InlineCursorRow = SizeMonitor.InitialCursorRow;
+                    InlineState state = driver.InlineState;
+                    state.InlineCursorRow = SizeMonitor.InitialCursorRow;
+                    driver.InlineState = state;
                 }
 
                 Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeConfirmed", $"Screen={App?.Screen}, CursorRow={SizeMonitor.InitialCursorRow}");

@@ -50,11 +50,11 @@ public class AnsiOutput : OutputBase, IOutput
     internal AppModel AppModel { get; }
 
     /// <summary>
-    ///     Gets or sets the row offset for inline mode rendering. When set, all cursor
-    ///     positioning via <see cref="SetCursorPositionImpl"/> is shifted down by this many rows,
-    ///     so Screen row 0 maps to terminal row <c>InlineRowOffset + 1</c> (1-indexed).
+    ///     Gets or sets a callback that returns the current <see cref="InlineState"/> from the driver.
+    ///     Set after the driver is fully constructed. Used by <see cref="SetCursorPositionImpl"/>
+    ///     and <see cref="Dispose"/> to access inline rendering offsets.
     /// </summary>
-    internal int InlineRowOffset { get; set; }
+    internal Func<InlineState>? InlineStateGetter { get; set; }
 
     /// <summary>
     ///     Initializes a new instance of <see cref="AnsiOutput"/>.
@@ -352,7 +352,8 @@ public class AnsiOutput : OutputBase, IOutput
         // Console.CursorTop/CursorLeft isn't reliable.
         // InlineRowOffset shifts all rendering down so Screen row 0 maps to the cursor's
         // starting terminal row (used by inline mode).
-        Write (EscSeqUtils.CSI_SetCursorPosition (row + 1 + InlineRowOffset, col + 1));
+        int inlineRowOffset = InlineStateGetter?.Invoke ().InlineRowOffset ?? 0;
+        Write (EscSeqUtils.CSI_SetCursorPosition (row + 1 + inlineRowOffset, col + 1));
 
         return true;
     }
@@ -413,7 +414,11 @@ public class AnsiOutput : OutputBase, IOutput
                 // Inline mode: do NOT restore alternate buffer. Move cursor to just
                 // below the inline region and show it so the shell prompt appears
                 // naturally after the rendered content.
-                Write (EscSeqUtils.CSI_SetCursorPosition (_consoleSize.Height + 1, 1));
+                // InlineRowOffset is the 0-indexed terminal row where the inline region starts.
+                // InlineContentHeight is the view's height. Position cursor one row below.
+                InlineState state = InlineStateGetter?.Invoke () ?? default;
+                int cursorRow = state.InlineRowOffset + state.InlineContentHeight + 1; // 1-indexed
+                Write (EscSeqUtils.CSI_SetCursorPosition (cursorRow, 1));
                 Write (EscSeqUtils.CSI_ShowCursor);
             }
             else

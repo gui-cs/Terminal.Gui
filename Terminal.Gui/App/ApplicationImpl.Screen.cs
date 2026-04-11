@@ -31,12 +31,6 @@ internal partial class ApplicationImpl
     private bool _inlineScreenSized;
 
     /// <summary>
-    ///     The terminal row (0-indexed) where the cursor was when the inline-mode app started.
-    ///     Set by the main loop when the ANSI cursor position response is received.
-    /// </summary>
-    internal int InlineCursorRow { get; set; }
-
-    /// <summary>
     ///     INTERNAL: Called when the application's screen has changed.
     ///     Raises the <see cref="ScreenChanged"/> event.
     /// </summary>
@@ -96,24 +90,46 @@ internal partial class ApplicationImpl
         // Layout
         bool neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
 
-        // Inline mode: on the first draw, resize Screen so its height equals only the rows
-        // from the cursor's starting position to the bottom of the terminal. Set the
-        // InlineRowOffset on AnsiOutput so that Screen row 0 maps to the cursor's
-        // terminal row. Then emit newlines to reserve vertical space (scrolling the terminal
-        // if the cursor is near the bottom). This is the technique used by fzf, atuin, etc.
+        // Inline mode: on the first draw, ensure enough vertical space exists for the view,
+        // scrolling the terminal if the cursor is near the bottom. Then resize Screen and set
+        // the rendering row offset. This is the technique used by fzf, atuin, etc.
         if (Application.AppModel == AppModel.Inline && !_inlineScreenSized && Driver is { })
         {
-            int cursorRow = InlineCursorRow;
+            // Get the view's desired height from the initial full-terminal layout
+            View? topView = views.LastOrDefault (v => v is { });
+            int viewHeight = topView?.Frame.Height ?? 0;
+
+            InlineState state = Driver.InlineState;
+            int cursorRow = state.InlineCursorRow;
             int termHeight = Screen.Height;
+
+            if (viewHeight > 0)
+            {
+                // If the view doesn't fit below the cursor, scroll the terminal up
+                int overflow = cursorRow + viewHeight - termHeight;
+
+                if (overflow > 0)
+                {
+                    // Emit newlines to force the terminal to scroll
+                    Driver.WriteRaw (new string ('\n', overflow));
+                    Driver.WriteRaw ($"{EscSeqUtils.CSI}{overflow}A");
+
+                    // The scroll shifted everything up — adjust the cursor row
+                    cursorRow -= overflow;
+                }
+
+                // Reserve the vertical space for the inline region
+                Driver.WriteRaw (new string ('\n', viewHeight));
+                Driver.WriteRaw ($"{EscSeqUtils.CSI}{viewHeight}A");
+            }
+
             int availableHeight = termHeight - cursorRow;
 
-            if (availableHeight > 0 && availableHeight != termHeight)
+            if (availableHeight > 0 && cursorRow > 0)
             {
-                // Set the row offset so SetCursorPositionImpl adds cursorRow to all row positions
-                if (Driver.GetOutput () is AnsiOutput ansiOutput)
-                {
-                    ansiOutput.InlineRowOffset = cursorRow;
-                }
+                state.InlineRowOffset = cursorRow;
+                state.InlineContentHeight = viewHeight;
+                Driver.InlineState = state;
 
                 // Resize Screen to only the available rows below the cursor
                 Screen = new Rectangle (0, 0, Screen.Width, availableHeight);
@@ -122,21 +138,50 @@ internal partial class ApplicationImpl
                 neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
             }
 
+            _inlineScreenSized = true;
+        }
+
+        // Inline mode: after initial setup, handle dynamic growth. If the view's desired height
+        // exceeds Screen.Height, scroll the terminal to make room and grow Screen.
+        if (Application.AppModel == AppModel.Inline && _inlineScreenSized && Driver is { })
+        {
             View? topView = views.LastOrDefault (v => v is { });
+            int viewHeight = topView?.Frame.Height ?? 0;
 
-            if (topView is { })
+            if (viewHeight > Screen.Height)
             {
-                int inlineHeight = topView.Frame.Height;
+                InlineState state = Driver.InlineState;
+                int extraRows = viewHeight - Screen.Height;
 
-                if (inlineHeight > 0)
+                // We can only gain rows by decreasing InlineRowOffset (scrolling terminal up).
+                int canScroll = Math.Min (extraRows, state.InlineRowOffset);
+
+                if (canScroll > 0)
                 {
-                    // Emit newlines to reserve space, then cursor-up to reclaim the region
-                    Driver.WriteRaw (new string ('\n', inlineHeight));
-                    Driver.WriteRaw ($"{EscSeqUtils.CSI}{inlineHeight}A");
+                    // Scroll the terminal up to make room below
+                    Driver.WriteRaw (new string ('\n', canScroll));
+                    Driver.WriteRaw ($"{EscSeqUtils.CSI}{canScroll}A");
+
+                    state.InlineRowOffset -= canScroll;
+                }
+
+                // Grow screen by however many rows we gained (may be less than extraRows if at top)
+                int newHeight = Screen.Width > 0
+                                    ? Math.Min (viewHeight, Screen.Height + canScroll)
+                                    : Screen.Height;
+
+                if (newHeight != Screen.Height)
+                {
+                    state.InlineContentHeight = newHeight;
+                    Driver.InlineState = state;
+                    Screen = new Rectangle (0, 0, Screen.Width, newHeight);
+                    neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
+                }
+                else
+                {
+                    Driver.InlineState = state;
                 }
             }
-
-            _inlineScreenSized = true;
         }
 
         // Draw
