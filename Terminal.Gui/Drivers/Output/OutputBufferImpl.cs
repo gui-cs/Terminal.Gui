@@ -212,26 +212,28 @@ public class OutputBufferImpl : IOutputBuffer
             // Keep Col/Row updates inside the lock to prevent race conditions
             Col++;
 
-            if (printableGraphemeWidth > 1)
+            if (printableGraphemeWidth <= 1)
             {
-                // Skip the second column of a wide character
-                // See issue: https://github.com/gui-cs/Terminal.Gui/issues/4492
-                // Test: AddStr_WideGlyph_Second_Column_Attribute_Outputs_Correctly
-                // Test: AddStr_WideGlyph_Second_Column_Attribute_Set_When_In_Clip
-                if (Clip.Contains (Col, Row))
-                {
-                    // Mark dirty only if the attribute is actually changing, to avoid
-                    // invalidating overlapped content unnecessarily (see #4258).
-                    if (Contents [Row, Col].Attribute != CurrentAttribute)
-                    {
-                        Contents [Row, Col].Attribute = CurrentAttribute;
-                        Contents [Row, Col].IsDirty = true;
-                    }
-                }
-
-                // Advance cursor again for wide character
-                Col++;
+                return;
             }
+
+            // Skip the second column of a wide character
+            // See issue: https://github.com/gui-cs/Terminal.Gui/issues/4492
+            // Test: AddStr_WideGlyph_Second_Column_Attribute_Outputs_Correctly
+            // Test: AddStr_WideGlyph_Second_Column_Attribute_Set_When_In_Clip
+            if (Clip.Contains (Col, Row))
+            {
+                // Mark dirty only if the attribute is actually changing, to avoid
+                // invalidating overlapped content unnecessarily (see #4258).
+                if (Contents [Row, Col].Attribute != CurrentAttribute)
+                {
+                    Contents [Row, Col].Attribute = CurrentAttribute;
+                    Contents [Row, Col].IsDirty = true;
+                }
+            }
+
+            // Advance cursor again for wide character
+            Col++;
         }
     }
 
@@ -260,11 +262,12 @@ public class OutputBufferImpl : IOutputBuffer
     /// <param name="row">The row.</param>
     private void InvalidateOverlappedWideGlyph (int col, int row)
     {
-        if (col > 0 && Contents! [row, col - 1].Grapheme.GetColumns () > 1)
+        if (col <= 0 || Contents! [row, col - 1].Grapheme.GetColumns () <= 1)
         {
-            Contents [row, col - 1].Grapheme = _column1ReplacementChar.ToString ();
-            Contents [row, col - 1].IsDirty = true;
+            return;
         }
+        Contents [row, col - 1].Grapheme = _column1ReplacementChar.ToString ();
+        Contents [row, col - 1].IsDirty = true;
     }
 
     /// <summary>
@@ -347,8 +350,16 @@ public class OutputBufferImpl : IOutputBuffer
         }
     }
 
+    /// <summary>
+    ///     Gets or sets a value indicating whether this buffer is operating in inline mode.
+    ///     When <see langword="true"/>, <see cref="ClearContents()"/> initialises cells with
+    ///     <c>IsDirty = false</c> so that only cells explicitly drawn are flushed to the
+    ///     terminal, leaving the rest of the visible terminal untouched.
+    /// </summary>
+    public bool InlineMode { get; set; }
+
     /// <summary>Clears the <see cref="Contents"/> of the driver.</summary>
-    public void ClearContents () => ClearContents (initiallyDirty: true);
+    public void ClearContents () => ClearContents (!InlineMode);
 
     /// <summary>Clears the <see cref="Contents"/> of the driver.</summary>
     /// <param name="initiallyDirty">

@@ -141,13 +141,22 @@ public class AnsiOutput : OutputBase, IOutput
             // Flush to ensure all sequences are sent
             AnsiTerminalHelper.FlushNative (_platform);
 
-            //Logging.Information ("ANSIOutput initialized successfully");
+            // Initialize _consoleSize with the real terminal dimensions.
+            // In FullScreen mode we cannot rely on Console.WindowWidth/Height because we just
+            // switched to the alternate screen buffer, which may have different dimensions.
+            // The ANSI size monitor will update the size asynchronously via CSI 8 t.
+            // In Inline mode we stay in the primary buffer, so the Console APIs are accurate
+            // and we must query them now — the async ANSI response arrives too late to avoid
+            // a first render using the wrong (default 80×25) size.
+            if (AppModel == AppModel.Inline)
+            {
+                Size? nativeSize = QueryNativeTerminalSize ();
 
-            // Note: Size will be queried via ANSI by ANSISizeMonitor.Initialize()
-            // Don't use Console.WindowWidth/Height here as it may reflect the main buffer,
-            // not the alternate screen buffer we just activated.
-            // Start with default size; actual size will be set when ANSI response arrives.
-            _consoleSize = new Size (80, 25);
+                if (nativeSize is { Width: > 0, Height: > 0 })
+                {
+                    _consoleSize = nativeSize.Value;
+                }
+            }
         }
         catch (Exception ex)
         {
@@ -158,6 +167,37 @@ public class AnsiOutput : OutputBase, IOutput
 
     /// <inheritdoc/>
     public void Suspend () => UnixTerminalHelper.Suspend (this);
+
+    /// <summary>
+    ///     Queries the real terminal size from the OS using platform-native APIs
+    ///     (<see cref="Console.WindowWidth"/>/<see cref="Console.WindowHeight"/> on Windows,
+    ///     <c>ioctl(TIOCGWINSZ)</c> on Unix). Returns <see langword="null"/> when the size
+    ///     cannot be determined (e.g. no terminal attached).
+    /// </summary>
+    internal static Size? QueryNativeTerminalSize ()
+    {
+        try
+        {
+            if (PlatformDetection.IsWindows ())
+            {
+                int w = Console.WindowWidth;
+                int h = Console.WindowHeight;
+
+                return w > 0 && h > 0 ? new Size (w, h) : null;
+            }
+
+            if (PlatformDetection.IsUnixLike ())
+            {
+                return UnixIOHelper.TryGetTerminalSize (out Size s) && s.Width > 0 && s.Height > 0 ? s : null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Trace.Lifecycle (nameof (AnsiOutput), "QueryNativeTerminalSize", $"Failed: {ex.GetType ().Name}: {ex.Message}");
+        }
+
+        return null;
+    }
 
     /// <summary>
     ///     Gets or sets the last output buffer written. The <see cref="IOutputBuffer.Contents"/> contains
