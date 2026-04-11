@@ -409,8 +409,10 @@ public class AnsiOutput : OutputBase, IOutput
 
             if (AppModel == AppModel.Inline)
             {
-                // Inline mode: do NOT restore alternate buffer. Show cursor so the
-                // shell prompt appears naturally after the rendered content.
+                // Inline mode: do NOT restore alternate buffer. Move cursor to just
+                // below the inline region and show it so the shell prompt appears
+                // naturally after the rendered content.
+                Write (EscSeqUtils.CSI_SetCursorPosition (_consoleSize.Height + 1, 1));
                 Write (EscSeqUtils.CSI_ShowCursor);
             }
             else

@@ -102,6 +102,14 @@ internal partial class ApplicationImpl
 
                 if (inlineHeight > 0 && inlineHeight < Screen.Height)
                 {
+                    // Reserve vertical space in the terminal. If the cursor is near the
+                    // bottom of the terminal, emitting newlines forces the terminal to
+                    // scroll its content up, guaranteeing enough room for the inline region.
+                    // Then move the cursor back up to the start of the reserved area.
+                    // This is the same technique used by fzf, atuin, and similar inline TUIs.
+                    Driver.WriteRaw (new string ('\n', inlineHeight));
+                    Driver.WriteRaw ($"\u001B[{inlineHeight}A");
+
                     Screen = new Rectangle (0, 0, Screen.Width, inlineHeight);
 
                     // Re-layout with the resized Screen so the view fills the inline region.
