@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using Trace = Terminal.Gui.Tracing.Trace;
 
 namespace Terminal.Gui.App;
 
@@ -122,9 +121,9 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
             if (!_startupWaitLogged)
             {
                 string pending = string.Join (", ", startupGate.PendingQueryNames);
-                Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>),
-                                 nameof (IterationImpl),
-                                 $"Deferring first render until ANSI startup queries complete. Pending: {pending}");
+                Terminal.Gui.Tracing.Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>),
+                                                      nameof (IterationImpl),
+                                                      $"Deferring first render until ANSI startup queries complete. Pending: {pending}");
                 _startupWaitLogged = true;
             }
 
@@ -137,7 +136,9 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
 
         if (!_firstRenderCompleted && _startupWaitLogged)
         {
-            Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), nameof (IterationImpl), "ANSI startup gate ready; rendering can begin");
+            Terminal.Gui.Tracing.Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>),
+                                                  nameof (IterationImpl),
+                                                  "ANSI startup gate ready; rendering can begin");
         }
 
         // Layout and draw any views that need it
