@@ -6,6 +6,8 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class TerminalColorDetector
 {
+    private static readonly TimeSpan StartupTerminalColorsQueryTimeout = TimeSpan.FromSeconds (1);
+
     private readonly IDriver? _driver;
     private readonly IAnsiStartupGate? _startupGate;
 
@@ -31,9 +33,6 @@ public class TerminalColorDetector
     /// </param>
     public void Detect (Action<Color?, Color?> resultCallback)
     {
-        const string startupQueryName = "ansi-terminal-colors";
-        TimeSpan timeout = TimeSpan.FromSeconds (1);
-
         // Skip on legacy console — it doesn't support ANSI escape sequences
         if (_driver is { IsLegacyConsole: true })
         {
@@ -42,12 +41,12 @@ public class TerminalColorDetector
             return;
         }
 
-        _startupGate?.RegisterQuery (startupQueryName, timeout);
+        _startupGate?.RegisterQuery (AnsiStartupQuery.TerminalColors, StartupTerminalColorsQueryTimeout);
 
         // Query foreground first (OSC 10), then background (OSC 11)
         QueryForeground ((fg, bg) =>
                          {
-                             _startupGate?.MarkComplete (startupQueryName);
+                             _startupGate?.MarkComplete (AnsiStartupQuery.TerminalColors);
                              resultCallback (fg, bg);
                          });
     }

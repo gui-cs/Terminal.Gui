@@ -17,6 +17,8 @@ namespace Terminal.Gui.App;
 /// <typeparam name="TInputRecord">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
 internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TInputRecord : struct
 {
+    private static readonly TimeSpan DeviceAttributesStartupQueryTimeout = TimeSpan.FromSeconds (1);
+
     /// <summary>
     ///     Creates a new coordinator that will manage the main UI loop and input thread.
     /// </summary>
@@ -148,12 +150,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         {
             return;
         }
-        IAnsiStartupGate? startupGate = null;
-
-        if (_output is AnsiOutput { IsLegacyConsole: false } && Driver.IsAttachedToTerminal (out _, out _))
-        {
-            startupGate = new AnsiStartupGate ();
-        }
+        IAnsiStartupGate? startupGate = app?.EnableAnsiStartupReadinessGate == true ? new AnsiStartupGate () : null;
 
         _driver = new DriverImpl (_componentFactory,
                                   _inputProcessor,
@@ -251,17 +248,15 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
     private void QueueDeviceAttributesProbe (IAnsiStartupGate startupGate)
     {
-        const string queryName = "ansi-device-attributes-da1";
-        TimeSpan timeout = TimeSpan.FromSeconds (1);
-        startupGate.RegisterQuery (queryName, timeout);
+        startupGate.RegisterQuery (AnsiStartupQuery.DeviceAttributesPrimary, DeviceAttributesStartupQueryTimeout);
 
         AnsiEscapeSequenceRequest request = new ()
         {
             Request = EscSeqUtils.CSI_SendDeviceAttributes.Request,
             Value = EscSeqUtils.CSI_SendDeviceAttributes.Value,
             Terminator = EscSeqUtils.CSI_SendDeviceAttributes.Terminator,
-            ResponseReceived = _ => startupGate.MarkComplete (queryName),
-            Abandoned = () => startupGate.MarkComplete (queryName)
+            ResponseReceived = _ => startupGate.MarkComplete (AnsiStartupQuery.DeviceAttributesPrimary),
+            Abandoned = () => startupGate.MarkComplete (AnsiStartupQuery.DeviceAttributesPrimary)
         };
 
         _driver?.QueueAnsiRequest (request);

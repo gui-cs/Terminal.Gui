@@ -8,7 +8,7 @@ namespace Terminal.Gui.Drivers;
 public sealed class AnsiStartupGate : IAnsiStartupGate
 {
     private readonly Lock _lock = new ();
-    private readonly Dictionary<string, QueryState> _queries = [];
+    private readonly Dictionary<AnsiStartupQuery, QueryState> _queries = [];
 
     private sealed class QueryState
     {
@@ -29,45 +29,38 @@ public sealed class AnsiStartupGate : IAnsiStartupGate
     internal Func<DateTime> UtcNow { get; }
 
     /// <inheritdoc/>
-    public IDisposable RegisterQuery (string name, TimeSpan timeout)
+    public IDisposable RegisterQuery (AnsiStartupQuery query, TimeSpan timeout)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace (name);
-
         DateTime nowUtc = UtcNow ();
         DateTime deadlineUtc = nowUtc + timeout;
 
         lock (_lock)
         {
-            _queries [name] = new QueryState
+            _queries [query] = new QueryState
             {
                 DeadlineUtc = deadlineUtc
             };
         }
 
-        Trace.Lifecycle (nameof (AnsiStartupGate), "RegisterQuery", $"'{name}' timeout={timeout.TotalMilliseconds}ms");
+        Trace.Lifecycle (nameof (AnsiStartupGate), "RegisterQuery", $"'{query}' timeout={timeout.TotalMilliseconds}ms");
 
-        return new CompletionHandle (this, name);
+        return new CompletionHandle (this, query);
     }
 
     /// <inheritdoc/>
-    public void MarkComplete (string name)
+    public void MarkComplete (AnsiStartupQuery query)
     {
-        if (string.IsNullOrWhiteSpace (name))
-        {
-            return;
-        }
-
         lock (_lock)
         {
-            if (!_queries.TryGetValue (name, out QueryState? query) || query.Completed || query.TimedOut)
+            if (!_queries.TryGetValue (query, out QueryState? state) || state.Completed || state.TimedOut)
             {
                 return;
             }
 
-            query.Completed = true;
+            state.Completed = true;
         }
 
-        Trace.Lifecycle (nameof (AnsiStartupGate), "MarkComplete", $"'{name}' completed");
+        Trace.Lifecycle (nameof (AnsiStartupGate), "MarkComplete", $"'{query}' completed");
     }
 
     /// <inheritdoc/>
@@ -85,7 +78,7 @@ public sealed class AnsiStartupGate : IAnsiStartupGate
     }
 
     /// <inheritdoc/>
-    public IReadOnlyCollection<string> PendingQueryNames
+    public IReadOnlyCollection<AnsiStartupQuery> PendingQueries
     {
         get
         {
@@ -100,38 +93,38 @@ public sealed class AnsiStartupGate : IAnsiStartupGate
 
     private void SweepTimedOutQueries ()
     {
-        string [] timedOutNames;
+        AnsiStartupQuery [] timedOutQueries;
         DateTime nowUtc = UtcNow ();
 
         lock (_lock)
         {
-            timedOutNames = _queries.Where (kvp => !kvp.Value.Completed && !kvp.Value.TimedOut && nowUtc >= kvp.Value.DeadlineUtc)
-                                    .Select (kvp => kvp.Key)
-                                    .ToArray ();
+            timedOutQueries = _queries.Where (kvp => !kvp.Value.Completed && !kvp.Value.TimedOut && nowUtc >= kvp.Value.DeadlineUtc)
+                                      .Select (kvp => kvp.Key)
+                                      .ToArray ();
 
-            foreach (string name in timedOutNames)
+            foreach (AnsiStartupQuery query in timedOutQueries)
             {
-                _queries [name].TimedOut = true;
+                _queries [query].TimedOut = true;
             }
         }
 
-        foreach (string name in timedOutNames)
+        foreach (AnsiStartupQuery query in timedOutQueries)
         {
-            Trace.Lifecycle (nameof (AnsiStartupGate), "Timeout", $"'{name}' timed out");
+            Trace.Lifecycle (nameof (AnsiStartupGate), "Timeout", $"'{query}' timed out");
         }
     }
 
-    private sealed class CompletionHandle : IDisposable
+        private sealed class CompletionHandle : IDisposable
     {
         private readonly AnsiStartupGate _gate;
-        private readonly string _name;
+        private readonly AnsiStartupQuery _query;
 
-        public CompletionHandle (AnsiStartupGate gate, string name)
+        public CompletionHandle (AnsiStartupGate gate, AnsiStartupQuery query)
         {
             _gate = gate;
-            _name = name;
+            _query = query;
         }
 
-        public void Dispose () => _gate.MarkComplete (_name);
+        public void Dispose () => _gate.MarkComplete (_query);
     }
 }

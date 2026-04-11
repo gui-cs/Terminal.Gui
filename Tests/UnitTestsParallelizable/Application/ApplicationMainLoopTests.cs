@@ -13,7 +13,7 @@ public class ApplicationMainLoopTests
     {
         DateTime nowUtc = DateTime.UtcNow;
         AnsiStartupGate startupGate = new (() => nowUtc);
-        startupGate.RegisterQuery ("q1", TimeSpan.FromSeconds (1));
+        startupGate.RegisterQuery (AnsiStartupQuery.TerminalSize, TimeSpan.FromSeconds (1));
 
         Mock<IAnsiResponseParser> parserMock = new ();
         Mock<IInputProcessor> inputProcessorMock = new ();
@@ -38,6 +38,7 @@ public class ApplicationMainLoopTests
         appMock.Setup (a => a.LayoutAndDraw (false));
         appMock.SetupGet (a => a.Navigation).Returns ((ApplicationNavigation?)null);
         appMock.SetupProperty (a => a.Driver);
+        appMock.SetupProperty (a => a.EnableAnsiStartupReadinessGate, true);
 
         loop.Initialize (new TimedEvents (),
                          new ConcurrentQueue<char> (),
@@ -61,7 +62,7 @@ public class ApplicationMainLoopTests
 
         appMock.Verify (a => a.LayoutAndDraw (false), Times.Never);
 
-        startupGate.MarkComplete ("q1");
+        startupGate.MarkComplete (AnsiStartupQuery.TerminalSize);
         loop.IterationImpl ();
 
         appMock.Verify (a => a.LayoutAndDraw (false), Times.Once);

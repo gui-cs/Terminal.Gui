@@ -114,13 +114,15 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         // Check for any size changes; this will cause SizeChanged events
         SizeMonitor.Poll ();
 
-        DriverImpl? driver = App?.Driver as DriverImpl;
+        IDriver? driver = App?.Driver;
 
-        if (!_firstRenderCompleted && driver?.AnsiStartupGate is { IsReady: false } startupGate)
+        if (!_firstRenderCompleted
+            && App?.EnableAnsiStartupReadinessGate == true
+            && driver?.AnsiStartupGate is { IsReady: false } startupGate)
         {
             if (!_startupWaitLogged)
             {
-                string pending = string.Join (", ", startupGate.PendingQueryNames);
+                string pending = string.Join (", ", startupGate.PendingQueries);
                 Terminal.Gui.Tracing.Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>),
                                                       nameof (IterationImpl),
                                                       $"Deferring first render until ANSI startup queries complete. Pending: {pending}");

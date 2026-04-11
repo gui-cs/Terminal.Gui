@@ -11,15 +11,15 @@ public class AnsiStartupGateTests
         DateTime nowUtc = DateTime.UtcNow;
         AnsiStartupGate gate = new (() => nowUtc);
 
-        gate.RegisterQuery ("q1", TimeSpan.FromMilliseconds (500));
+        gate.RegisterQuery (AnsiStartupQuery.TerminalSize, TimeSpan.FromMilliseconds (500));
 
         Assert.False (gate.IsReady);
-        Assert.Equal (["q1"], gate.PendingQueryNames);
+        Assert.Equal ([AnsiStartupQuery.TerminalSize], gate.PendingQueries);
 
-        gate.MarkComplete ("q1");
+        gate.MarkComplete (AnsiStartupQuery.TerminalSize);
 
         Assert.True (gate.IsReady);
-        Assert.Empty (gate.PendingQueryNames);
+        Assert.Empty (gate.PendingQueries);
     }
 
     [Fact]
@@ -28,15 +28,15 @@ public class AnsiStartupGateTests
         DateTime nowUtc = DateTime.UtcNow;
         AnsiStartupGate gate = new (() => nowUtc);
 
-        gate.RegisterQuery ("q1", TimeSpan.FromMilliseconds (100));
+        gate.RegisterQuery (AnsiStartupQuery.TerminalSize, TimeSpan.FromMilliseconds (100));
 
         Assert.False (gate.IsReady);
-        Assert.Equal (["q1"], gate.PendingQueryNames);
+        Assert.Equal ([AnsiStartupQuery.TerminalSize], gate.PendingQueries);
 
         nowUtc = nowUtc.AddMilliseconds (101);
 
         Assert.True (gate.IsReady);
-        Assert.Empty (gate.PendingQueryNames);
+        Assert.Empty (gate.PendingQueries);
     }
 
     [Fact]
@@ -45,12 +45,12 @@ public class AnsiStartupGateTests
         DateTime nowUtc = DateTime.UtcNow;
         AnsiStartupGate gate = new (() => nowUtc);
 
-        gate.RegisterQuery ("q1", TimeSpan.FromSeconds (1));
-        gate.RegisterQuery ("q2", TimeSpan.FromSeconds (1));
+        gate.RegisterQuery (AnsiStartupQuery.TerminalSize, TimeSpan.FromSeconds (1));
+        gate.RegisterQuery (AnsiStartupQuery.CursorPosition, TimeSpan.FromSeconds (1));
 
-        gate.MarkComplete ("q1");
+        gate.MarkComplete (AnsiStartupQuery.TerminalSize);
 
         Assert.False (gate.IsReady);
-        Assert.Equal (["q2"], gate.PendingQueryNames);
+        Assert.Equal ([AnsiStartupQuery.CursorPosition], gate.PendingQueries);
     }
 }

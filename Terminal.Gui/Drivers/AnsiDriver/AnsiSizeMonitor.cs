@@ -24,8 +24,8 @@ namespace Terminal.Gui.Drivers;
 /// </remarks>
 internal class AnsiSizeMonitor : ISizeMonitor
 {
-    private const string SizeStartupQueryName = "ansi-terminal-size";
-    private const string CursorStartupQueryName = "ansi-cursor-position";
+    private static readonly TimeSpan StartupSizeQueryTimeout = TimeSpan.FromMilliseconds (500);
+    private static readonly TimeSpan StartupCursorPositionQueryTimeout = TimeSpan.FromMilliseconds (500);
 
     private readonly AnsiOutput _output;
     private Action<AnsiEscapeSequenceRequest>? _queueAnsiRequest;
@@ -60,12 +60,12 @@ internal class AnsiSizeMonitor : ISizeMonitor
         }
 
         _queueAnsiRequest = driver.QueueAnsiRequest;
-        _startupGate = driver is DriverImpl driverImpl ? driverImpl.AnsiStartupGate : null;
+        _startupGate = driver.AnsiStartupGate;
 
         Trace.Lifecycle (nameof (AnsiSizeMonitor), "Initialize", "Driver wired up; sending initial size query");
 
-        _startupGate?.RegisterQuery (SizeStartupQueryName, TimeSpan.FromMilliseconds (500));
-        _startupGate?.RegisterQuery (CursorStartupQueryName, TimeSpan.FromMilliseconds (500));
+        _startupGate?.RegisterQuery (AnsiStartupQuery.TerminalSize, StartupSizeQueryTimeout);
+        _startupGate?.RegisterQuery (AnsiStartupQuery.CursorPosition, StartupCursorPositionQueryTimeout);
 
         SendSizeQuery ();
         SendCursorPositionQuery ();
@@ -94,7 +94,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
             Abandoned = () =>
             {
                 _expectingResponse = false;
-                _startupGate?.MarkComplete (SizeStartupQueryName);
+                _startupGate?.MarkComplete (AnsiStartupQuery.TerminalSize);
             }
         };
 
@@ -114,8 +114,8 @@ internal class AnsiSizeMonitor : ISizeMonitor
             Request = EscSeqUtils.CSI_RequestCursorPositionReport.Request,
             Value = EscSeqUtils.CSI_RequestCursorPositionReport.Value,
             Terminator = EscSeqUtils.CSI_RequestCursorPositionReport.Terminator,
-            ResponseReceived = _ => _startupGate?.MarkComplete (CursorStartupQueryName),
-            Abandoned = () => _startupGate?.MarkComplete (CursorStartupQueryName)
+            ResponseReceived = _ => _startupGate?.MarkComplete (AnsiStartupQuery.CursorPosition),
+            Abandoned = () => _startupGate?.MarkComplete (AnsiStartupQuery.CursorPosition)
         };
 
         _queueAnsiRequest (request);
@@ -173,7 +173,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
         // The response is handled by ANSIOutput.HandleSizeQueryResponse
         // which updates the cached size. We just need to check if it changed.
         _output.HandleSizeQueryResponse (response);
-        _startupGate?.MarkComplete (SizeStartupQueryName);
+        _startupGate?.MarkComplete (AnsiStartupQuery.TerminalSize);
 
         // Check for size change after the response is processed
         CheckSizeChanged ();

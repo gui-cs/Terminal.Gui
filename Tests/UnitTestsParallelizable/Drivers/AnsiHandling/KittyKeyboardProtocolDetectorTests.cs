@@ -74,12 +74,12 @@ public class KittyKeyboardProtocolDetectorTests
 
         Assert.NotNull (capturedRequest);
         Assert.False (startupGate.IsReady);
-        Assert.Equal (["ansi-kitty-keyboard"], startupGate.PendingQueryNames);
+        Assert.Equal ([AnsiStartupQuery.KittyKeyboard], startupGate.PendingQueries);
 
         capturedRequest!.ResponseReceived ("\u001B[?31u");
 
         Assert.True (startupGate.IsReady);
-        Assert.Empty (startupGate.PendingQueryNames);
+        Assert.Empty (startupGate.PendingQueries);
     }
 
     [Fact]

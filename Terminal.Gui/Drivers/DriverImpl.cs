@@ -157,7 +157,8 @@ internal class DriverImpl : IDriver
 
     private readonly ISizeMonitor _sizeMonitor;
 
-    internal IAnsiStartupGate? AnsiStartupGate { get; }
+    /// <inheritdoc/>
+    public IAnsiStartupGate? AnsiStartupGate { get; }
 
     /// <inheritdoc/>
     public IClipboard? Clipboard { get; set; } = new FakeClipboard ();
