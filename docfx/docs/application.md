@@ -112,7 +112,7 @@ top.Dispose ();
 Application.Shutdown (); // Obsolete - use Dispose() instead
 ```
 
-**Note:** The static <xref:Terminal.Gui.App.Application> class delegates to a singleton instance accessible via `Application.Instance`. [Application.Create()](xref:Terminal.Gui.App.Application.Create*) creates a **new** application instance, enabling multiple application contexts and better testability.
+**Note:** The static <xref:Terminal.Gui.App.Application> class delegates to an internal singleton backend instance. [Application.Create()](xref:Terminal.Gui.App.Application.Create*) creates a **new** application instance, enabling multiple application contexts and better testability.
 
 ### View.App Property
 
@@ -211,6 +211,8 @@ if (result is { })
 ### Disposal Semantics
 
 **"Whoever creates it, owns it":**
+
+During disposal, `MainLoopCoordinator.Stop()` performs terminal-side cleanup (including kitty keyboard disable when it was enabled) before disposing output resources.
 
 | Method | Creator | Owner | Disposal |
 |--------|---------|-------|----------|

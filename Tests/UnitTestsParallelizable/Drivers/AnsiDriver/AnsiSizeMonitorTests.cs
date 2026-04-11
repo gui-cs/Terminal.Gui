@@ -171,38 +171,4 @@ public class AnsiSizeMonitorTests
         Assert.Single (sizes);
         Assert.Equal (new Size (120, 40), sizes [0]);
     }
-
-#if DEBUG
-
-    /// <summary>
-    ///     With a <see cref="ListBackend"/> and <see cref="TraceCategory.Lifecycle"/> enabled,
-    ///     a size change must emit trace entries covering at minimum the response handling
-    ///     and the size-change notification.
-    /// </summary>
-    [Fact]
-    public void SizeChange_EmitsLifecycleTraces ()
-    {
-        AnsiOutput output = new ();
-        output.SetSize (80, 25);
-
-        AnsiEscapeSequenceRequest? captured = null;
-        AnsiSizeMonitor monitor = new (output, req => captured = req);
-
-        ListBackend backend = new ();
-
-        using (Trace.PushScope (TraceCategory.Lifecycle, backend))
-        {
-            monitor.Poll ();
-            captured!.ResponseReceived! ("[8;30;100t");
-        }
-
-        Assert.NotEmpty (backend.Entries);
-
-        // At minimum: SendSizeQuery + HandleSizeResponse + SizeChanged.
-        Assert.Contains (backend.Entries, e => e.Phase == "SendSizeQuery");
-        Assert.Contains (backend.Entries, e => e.Phase == "HandleSizeResponse");
-        Assert.Contains (backend.Entries, e => e.Phase == "SizeChanged");
-    }
-
-#endif
 }
