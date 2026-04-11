@@ -264,6 +264,7 @@ app.Screen = app.Screen with { Height = app.Screen.Height + 1 };
 | `Terminal.Gui/Drivers/AnsiDriver/AnsiComponentFactory.cs` | Read `Application.AppModel` and pass mode to `AnsiOutput` |
 | `Terminal.Gui/Drivers/Output/OutputBufferImpl.cs` | `ClearContents()` `initiallyDirty` param — `false` in inline mode |
 | `Terminal.Gui/Drivers/AnsiDriver/AnsiInputProcessor.cs` | Subtract `Screen.Top` from mouse row in inline mode |
+| `Examples/InlineCLI/` | New standalone example: Claude Code / Copilot CLI-style inline prompt app |
 
 ---
 
@@ -277,7 +278,12 @@ app.Screen = app.Screen with { Height = app.Screen.Height + 1 };
 6. Correct mouse event row coordinates in `AnsiInputProcessor` by subtracting `app.Screen.Top`.
 7. Handle "grow down": when `IApplication.Screen.Height` increases, `AnsiOutput` prints newlines and scrolls before the next draw.
 8. Implement clean-exit in `AnsiOutput.Dispose`: move cursor to `Screen.Top + Screen.Height`, emit `CSI_ShowCursor`, skip `?1049l`.
-9. Add a `UICatalog` scenario demonstrating inline mode.
+9. Add a **standalone example** (`Examples/InlineCLI/`) that feels like Claude Code CLI or GitHub Copilot CLI — not a UICatalog scenario. The example should:
+   - Use `ConfigurationManager.RuntimeConfig` to set `Application.AppModel = Inline` before `Init()`.
+   - Present a prompt-like input bar anchored to the bottom of the terminal (`Y = Pos.AnchorEnd()`, `Height = Dim.Auto(minimumContentSize: 3)`).
+   - Stream "thinking…" / response lines above the input bar as normal terminal output, growing the region down as new content arrives.
+   - Exit cleanly so the shell prompt appears immediately below the rendered output, with the session left in scrollback history.
+   - Be a self-contained `.csproj` in `Examples/InlineCLI/` (mirroring the `Examples/Example/` pattern) with a short `README.md` explaining the inline mode API.
 
 ---
 
