@@ -8,7 +8,9 @@
 // to the alternate screen buffer. On exit, the rendered content stays in
 // scrollback history.
 
+using System.Collections.ObjectModel;
 using Terminal.Gui.App;
+using Terminal.Gui.Drawing;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
@@ -18,9 +20,6 @@ Application.AppModel = AppModel.Inline;
 IApplication app = Application.Create ().Init ();
 app.Run<InlinePromptView> ();
 app.Dispose ();
-
-// After Dispose, the shell prompt appears naturally below the rendered output.
-Console.WriteLine ("Inline session complete. Content remains in scrollback.");
 
 /// <summary>
 ///     A simple inline prompt view that demonstrates the inline rendering mode.
@@ -34,45 +33,44 @@ public sealed class InlinePromptView : Window
     public InlinePromptView ()
     {
         Title = "Inline CLI Demo (Esc to quit)";
+
+        Border.Thickness = new Thickness (0, 4, 0, 0);
+        Border.LineStyle = LineStyle.Rounded;
+
+        Arrangement = ViewArrangement.TopResizable;
+
         Width = Dim.Fill ();
 
         // Anchor to the bottom of the inline region and size by content with a minimum height.
         Y = Pos.AnchorEnd ();
         Height = Dim.Auto (minimumContentDim: 10);
 
-        Label statusLabel = new ()
-        {
-            Text = "Type a message and press Enter. Press Esc to exit.",
-            Width = Dim.Fill ()
-        };
+        Label statusLabel = new () { Text = "Type a message and press Enter. Press Esc to exit.", Width = Dim.Fill () };
 
-        TextField inputField = new ()
-        {
-            Y = Pos.Bottom (statusLabel) + 1,
-            Width = Dim.Fill ()
-        };
+        TextField inputField = new () { Y = Pos.Bottom (statusLabel) + 1, Width = Dim.Fill () };
 
-        Label outputLabel = new ()
+        ObservableCollection<string> items = [];
+
+        ListView<string> outputList = new ()
         {
-            Text = "Output will appear here...",
             Y = Pos.Bottom (inputField) + 1,
             Width = Dim.Fill (),
-            Height = Dim.Fill ()
+            Height = Dim.Auto ()
         };
 
-        inputField.Accepting += (_, e) =>
-                                {
-                                    string text = inputField.Text;
+        outputList.SetSource (items);
 
-                                    if (!string.IsNullOrEmpty (text))
-                                    {
-                                        outputLabel.Text = $"> {text}";
-                                        inputField.Text = string.Empty;
-                                    }
+        inputField.Accepted += (_, _) =>
+                               {
+                                   string text = inputField.Text;
 
-                                    e.Handled = true;
-                                };
+                                   if (!string.IsNullOrEmpty (text))
+                                   {
+                                       items.Add ($"> {text}");
+                                       inputField.Text = string.Empty;
+                                   }
+                               };
 
-        Add (statusLabel, inputField, outputLabel);
+        Add (statusLabel, inputField, outputList);
     }
 }

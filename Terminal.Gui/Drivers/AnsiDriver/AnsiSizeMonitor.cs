@@ -31,6 +31,9 @@ internal class AnsiSizeMonitor : ISizeMonitor
     private readonly TimeSpan _queryThrottle = TimeSpan.FromMilliseconds (500); // Don't spam queries
     private bool _expectingResponse;
 
+    /// <inheritdoc/>
+    public bool InitialSizeReceived { get; private set; }
+
     /// <summary>
     ///     Creates a new ANSISizeMonitor.
     /// </summary>
@@ -132,6 +135,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
     {
         Trace.Lifecycle (nameof (AnsiSizeMonitor), "HandleSizeResponse", $"Response: '{response ?? "<null>"}'");
         _expectingResponse = false;
+        InitialSizeReceived = true;
 
         if (string.IsNullOrEmpty (response))
         {

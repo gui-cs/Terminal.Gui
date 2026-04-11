@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Trace = Terminal.Gui.Tracing.Trace;
 
 namespace Terminal.Gui.App;
 
@@ -105,7 +106,14 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         InputProcessor = inputProcessor;
 
         TimedEvents = timedEvents;
-        AnsiRequestScheduler = new (InputProcessor.GetParser ());
+        AnsiRequestScheduler = new AnsiRequestScheduler (InputProcessor.GetParser ());
+
+        // In inline mode, cells must start clean so the first render only flushes
+        // cells that views explicitly draw, leaving the rest of the terminal untouched.
+        if (Application.AppModel == AppModel.Inline && OutputBuffer is OutputBufferImpl outputBufferImpl)
+        {
+            outputBufferImpl.InlineMode = true;
+        }
 
         OutputBuffer.SetSize (consoleOutput.GetSize ().Width, consoleOutput.GetSize ().Height);
         SizeMonitor = componentFactory.CreateSizeMonitor (Output, OutputBuffer);
@@ -132,19 +140,74 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         }
     }
 
+    /// <summary>
+    ///     Tracks whether the initial terminal size has been confirmed for inline mode.
+    ///     Set to <see langword="true"/> once <see cref="ISizeMonitor.InitialSizeReceived"/> is
+    ///     <see langword="true"/> or the wait timeout expires.
+    /// </summary>
+    private bool _inlineSizeConfirmed;
+
+    private DateTime? _inlineWaitStarted;
+
+    /// <summary>
+    ///     Maximum time to wait for the ANSI size response before rendering with the fallback size.
+    ///     Most terminals respond to CSI 18t within a few milliseconds; 500 ms is a generous upper bound.
+    /// </summary>
+    private static readonly TimeSpan _inlineSizeWaitTimeout = TimeSpan.FromMilliseconds (500);
+
     internal void IterationImpl ()
     {
         // Pull any input events from the input queue and process them
         InputProcessor.ProcessQueue ();
 
+        // Run any queued ANSI requests that previously could not be sent
+        // (e.g. throttled duplicate request sent too soon after an earlier one).
+        AnsiRequestScheduler.RunSchedule (App?.Driver);
+
         // Check for any size changes; this will cause SizeChanged events
         SizeMonitor.Poll ();
 
-        // Layout and draw any views that need it
-        App?.LayoutAndDraw (false);
+        bool shouldDraw = true;
 
-        // Update the cursor
-        App?.Navigation?.UpdateCursor ();
+        // For inline mode, defer the first render until the ANSI size monitor confirms
+        // the terminal's real dimensions via a CSI 18t response. Without this, the first
+        // frame would render using the default 80×25 fallback, placing the inline region
+        // at the wrong terminal row.
+        if (Application.AppModel == AppModel.Inline && !_inlineSizeConfirmed)
+        {
+            if (SizeMonitor.InitialSizeReceived)
+            {
+                _inlineSizeConfirmed = true;
+                Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeConfirmed", $"Screen={App?.Screen}");
+            }
+            else
+            {
+                _inlineWaitStarted ??= DateTime.Now;
+
+                if (DateTime.Now - _inlineWaitStarted.Value < _inlineSizeWaitTimeout)
+                {
+                    shouldDraw = false;
+                    Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeDeferred", "Waiting for ANSI size response");
+                }
+                else
+                {
+                    // Timeout — render with whatever size we have
+                    _inlineSizeConfirmed = true;
+                    Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeTimeout", $"Rendering with fallback. Screen={App?.Screen}");
+                }
+            }
+        }
+
+        if (shouldDraw)
+        {
+            Trace.Draw (nameof (ApplicationMainLoop<TInputRecord>), "IterationDraw", $"Screen={App?.Screen}");
+
+            // Layout and draw any views that need it
+            App?.LayoutAndDraw (false);
+
+            // Update the cursor
+            App?.Navigation?.UpdateCursor ();
+        }
 
         var swCallbacks = Stopwatch.StartNew ();
 

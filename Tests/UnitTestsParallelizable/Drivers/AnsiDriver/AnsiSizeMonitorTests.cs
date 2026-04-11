@@ -172,6 +172,48 @@ public class AnsiSizeMonitorTests
         Assert.Equal (new Size (120, 40), sizes [0]);
     }
 
+    /// <summary>
+    ///     <see cref="AnsiSizeMonitor.InitialSizeReceived"/> starts <see langword="false"/>
+    ///     and becomes <see langword="true"/> after the first response is handled.
+    /// </summary>
+    [Fact]
+    public void InitialSizeReceived_IsFalse_BeforeFirstResponse () // Copilot
+    {
+        AnsiOutput output = new ();
+        output.SetSize (80, 25);
+
+        AnsiEscapeSequenceRequest? captured = null;
+        AnsiSizeMonitor monitor = new (output, req => captured = req);
+
+        Assert.False (monitor.InitialSizeReceived);
+
+        // Trigger a query and simulate a response.
+        monitor.Poll ();
+        Assert.NotNull (captured);
+        captured!.ResponseReceived! ("[8;30;100t");
+
+        Assert.True (monitor.InitialSizeReceived);
+    }
+
+    /// <summary>
+    ///     Even when the response is null or empty, <see cref="AnsiSizeMonitor.InitialSizeReceived"/>
+    ///     becomes <see langword="true"/> — we received *something* from the terminal.
+    /// </summary>
+    [Fact]
+    public void InitialSizeReceived_TrueEvenForNullResponse () // Copilot
+    {
+        AnsiOutput output = new ();
+        output.SetSize (80, 25);
+
+        AnsiEscapeSequenceRequest? captured = null;
+        AnsiSizeMonitor monitor = new (output, req => captured = req);
+
+        monitor.Poll ();
+        captured!.ResponseReceived! (null);
+
+        Assert.True (monitor.InitialSizeReceived);
+    }
+
 #if DEBUG
 
     /// <summary>

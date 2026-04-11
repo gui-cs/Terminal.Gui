@@ -55,7 +55,7 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public void LayoutAndDraw (bool forceRedraw = false)
     {
-        Trace.Draw ("ApplicationImpl", "Start", $"forceRedraw={forceRedraw}");
+        Trace.Draw ("ApplicationImpl", "Start", $"forceRedraw={forceRedraw}, Screen={Screen}, _inlineScreenSized={_inlineScreenSized}");
 
         if (ClearScreenNextIteration)
         {
@@ -90,8 +90,14 @@ internal partial class ApplicationImpl
         // Layout
         bool neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
 
-        // Inline mode: after the first layout pass, resize Screen to match the runnable view's
-        // computed Frame.Height. This prevents the inline region from occupying the entire terminal.
+        // Inline mode: after the first layout pass, reserve vertical space in the terminal.
+        // If the cursor is near the bottom of the terminal, emitting newlines forces the
+        // terminal to scroll its content up, guaranteeing enough room for the inline region.
+        // Then move the cursor back up to the start of the reserved area.
+        // This is the same technique used by fzf, atuin, and similar inline TUIs.
+        // NOTE: The Screen is NOT resized — the view's AnchorEnd() + Dim.Auto() layout against
+        // the full terminal size already positions it at the correct terminal rows. Resizing
+        // Screen would force the view to y=0, causing it to draw at absolute row 1 (the top).
         if (Application.AppModel == AppModel.Inline && !_inlineScreenSized && Driver is { })
         {
             View? topView = views.LastOrDefault (v => v is { });
@@ -100,21 +106,10 @@ internal partial class ApplicationImpl
             {
                 int inlineHeight = topView.Frame.Height;
 
-                if (inlineHeight > 0 && inlineHeight < Screen.Height)
+                if (inlineHeight > 0)
                 {
-                    // Reserve vertical space in the terminal. If the cursor is near the
-                    // bottom of the terminal, emitting newlines forces the terminal to
-                    // scroll its content up, guaranteeing enough room for the inline region.
-                    // Then move the cursor back up to the start of the reserved area.
-                    // This is the same technique used by fzf, atuin, and similar inline TUIs.
                     Driver.WriteRaw (new string ('\n', inlineHeight));
                     Driver.WriteRaw ($"{EscSeqUtils.CSI}{inlineHeight}A");
-
-                    Screen = new Rectangle (0, 0, Screen.Width, inlineHeight);
-
-                    // Re-layout with the resized Screen so the view fills the inline region.
-                    View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
-                    neededLayout = true;
                 }
 
                 _inlineScreenSized = true;

@@ -7,6 +7,15 @@
 public interface ISizeMonitor
 {
     /// <summary>
+    ///     Gets whether the initial terminal size has been determined.
+    ///     Returns <see langword="true"/> for size monitors that know the size synchronously
+    ///     (e.g. via native APIs). For ANSI-based monitors that query size asynchronously
+    ///     via CSI escape sequences, returns <see langword="false"/> until the first size
+    ///     response is received from the terminal.
+    /// </summary>
+    bool InitialSizeReceived => true;
+
+    /// <summary>
     ///     Called after the driver is fully initialized to allow the size monitor to perform
     ///     any setup that requires access to the driver (e.g., queuing ANSI requests, setting up
     ///     signal handlers, registering for console events).
