@@ -108,7 +108,7 @@ internal partial class ApplicationImpl
                     // Then move the cursor back up to the start of the reserved area.
                     // This is the same technique used by fzf, atuin, and similar inline TUIs.
                     Driver.WriteRaw (new string ('\n', inlineHeight));
-                    Driver.WriteRaw ($"\u001B[{inlineHeight}A");
+                    Driver.WriteRaw ($"{EscSeqUtils.CSI}{inlineHeight}A");
 
                     Screen = new Rectangle (0, 0, Screen.Width, inlineHeight);
 
