@@ -114,7 +114,7 @@ public sealed class AnsiStartupGate : IAnsiStartupGate
         }
     }
 
-        private sealed class CompletionHandle : IDisposable
+    private sealed class CompletionHandle : IDisposable
     {
         private readonly AnsiStartupGate _gate;
         private readonly AnsiStartupQuery _query;
