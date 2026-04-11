@@ -80,7 +80,7 @@ app.StopAfterFirstIteration = true;
 app.Driver!.Force16Colors = !ansi;
 app.Driver!.SetScreenSize (80, 20);
 
-var result = app.Run<ViewDemoWindow> ().GetResult<string> ();
+string? result = app.Run<ViewDemoWindow> ().GetResult<string> ();
 
 if (result is { })
 {
