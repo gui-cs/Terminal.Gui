@@ -68,8 +68,6 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
     // Queue for storing injected input that will be returned by Peek/Read
     private readonly ConcurrentQueue<char> _testInput = new ();
 
-    private char? _previousLastChar;
-
     private int _peekCallCount;
 
     /// <summary>
@@ -206,43 +204,6 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
                 }
 
                 string text = _windowsVTInput!.ConsoleInputEncoding.GetString (buffer, 0, bytesRead);
-
-                if (_enabledKittyKeyboardFlags != KittyKeyboardFlags.None
-                    && _previousLastChar is { } lastChar
-                    && text.Length > 0)
-                {
-                    int index = text.IndexOf (lastChar);
-
-                    if (index >= 0)
-                    {
-                        text = text.Remove (index, 1);
-                        _previousLastChar = null;
-                    }
-                }
-
-                if (text.Length == 0)
-                {
-                    _previousLastChar = null;
-
-                    yield break;
-                }
-
-                if (_enabledKittyKeyboardFlags != KittyKeyboardFlags.None)
-                {
-                    // Always search for standalone characters (not part of ANSI sequences)
-                    // Split by sequences and find the last non-empty part
-                    string [] parts = System.Text.RegularExpressions.Regex.Split (text, @"\x1b[^a-zA-Z]*[a-zA-Z]");
-                    string lastStandalonePart = parts.LastOrDefault (p => !string.IsNullOrEmpty (p)) ?? "";
-
-                    if (!string.IsNullOrEmpty (lastStandalonePart))
-                    {
-                        _previousLastChar = lastStandalonePart [^1];
-                    }
-                    else
-                    {
-                        _previousLastChar = null;
-                    }
-                }
 
                 //Trace.Lifecycle (nameof (AnsiInput), "Read", $"Read {bytesRead} bytes from Windows VT Input: {text}");
 
@@ -397,19 +358,6 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
         }
     }
 
-    private KittyKeyboardFlags _enabledKittyKeyboardFlags;
-
-    /// <summary>
-    ///     Enables kitty keyboard progressive enhancement flags for the active terminal.
-    /// </summary>
-    /// <param name="enabledFlags">The kitty keyboard flags to enable.</param>
-    internal void EnableKittyKeyboard (KittyKeyboardFlags enabledFlags)
-    {
-        _enabledKittyKeyboardFlags = enabledFlags;
-
-        Trace.Lifecycle (nameof (AnsiOutput), "KittyKeyboard", $"Input enabled: {enabledFlags}");
-    }
-
     // Will be called on the main loop thread.
     /// <inheritdoc/>
     public void InjectInput (char input) => _testInput.Enqueue (input);
@@ -449,6 +397,4 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
             // ignore exceptions during disposal
         }
     }
-
-
 }

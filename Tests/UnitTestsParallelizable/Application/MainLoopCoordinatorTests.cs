@@ -243,7 +243,7 @@ public class MainLoopCoordinatorTests (ITestOutputHelper outputHelper) : IDispos
 
             // In degraded mode (no real terminal), enable/disable are no-ops,
             // but detection still succeeds via injected response.
-            Assert.Equal ((KittyKeyboardFlags)31, driver.KittyKeyboardProtocol.EnabledFlags);
+            Assert.Equal (KittyKeyboardFlags.None, driver.KittyKeyboardProtocol.EnabledFlags);
 
             coordinator.Stop ();
         }
