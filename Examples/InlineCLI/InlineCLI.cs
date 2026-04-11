@@ -24,6 +24,10 @@ Console.WriteLine ("Inline session complete. Content remains in scrollback.");
 
 /// <summary>
 ///     A simple inline prompt view that demonstrates the inline rendering mode.
+///     Uses <c>Y = Pos.AnchorEnd()</c> and <c>Height = Dim.Auto(minimumContentSize: 10)</c>
+///     so the view anchors to the bottom of the Screen and sizes itself by content
+///     with a minimum height. The first layout pass computes the view's Frame,
+///     then <c>ApplicationImpl</c> sets <c>Screen.Height</c> to match.
 /// </summary>
 public sealed class InlinePromptView : Window
 {
@@ -31,7 +35,10 @@ public sealed class InlinePromptView : Window
     {
         Title = "Inline CLI Demo (Esc to quit)";
         Width = Dim.Fill ();
-        Height = Dim.Fill ();
+
+        // Anchor to the bottom of the inline region and size by content with a minimum height.
+        Y = Pos.AnchorEnd ();
+        Height = Dim.Auto (minimumContentDim: 10);
 
         Label statusLabel = new ()
         {

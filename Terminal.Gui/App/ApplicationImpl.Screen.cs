@@ -26,6 +26,11 @@ internal partial class ApplicationImpl
     public bool ClearScreenNextIteration { get; set; }
 
     /// <summary>
+    ///     Tracks whether the inline-mode Screen has been sized from the first layout pass.
+    /// </summary>
+    private bool _inlineScreenSized;
+
+    /// <summary>
     ///     INTERNAL: Called when the application's screen has changed.
     ///     Raises the <see cref="ScreenChanged"/> event.
     /// </summary>
@@ -67,6 +72,7 @@ internal partial class ApplicationImpl
         {
             return;
         }
+
         List<View?> views = [.. SessionStack.Select (r => r.Runnable! as View)!];
 
         if (Popovers?.GetActivePopover () is { Visible: true } visiblePopover)
@@ -83,6 +89,29 @@ internal partial class ApplicationImpl
 
         // Layout
         bool neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
+
+        // Inline mode: after the first layout pass, resize Screen to match the runnable view's
+        // computed Frame.Height. This prevents the inline region from occupying the entire terminal.
+        if (Application.AppModel == AppModel.Inline && !_inlineScreenSized && Driver is { })
+        {
+            View? topView = views.LastOrDefault (v => v is { });
+
+            if (topView is { })
+            {
+                int inlineHeight = topView.Frame.Height;
+
+                if (inlineHeight > 0 && inlineHeight < Screen.Height)
+                {
+                    Screen = new Rectangle (0, 0, Screen.Width, inlineHeight);
+
+                    // Re-layout with the resized Screen so the view fills the inline region.
+                    View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
+                    neededLayout = true;
+                }
+
+                _inlineScreenSized = true;
+            }
+        }
 
         // Draw
         bool needsDraw = forceRedraw || views.Any (v => v is { NeedsDraw: true } or { SubViewNeedsDraw: true });
