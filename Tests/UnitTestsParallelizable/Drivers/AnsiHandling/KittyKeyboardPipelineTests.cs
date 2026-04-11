@@ -217,7 +217,7 @@ public class KittyKeyboardPipelineTests
     public void Pipeline_MixedKittyAndLegacyPrintable_PortugueseKeys_DoesNotRaiseDuplicateKeyDown (string printable, int kittyCode)
     {
         // Issue #4918 (PT keyboard): kitty CSI-u plus legacy printable input for the same key should produce one KeyDown.
-        string kittySequence = $"\x1b[{kittyCode}u";
+        var kittySequence = $"\x1b[{kittyCode}u";
         (List<Key> down, List<Key> up) = InjectRawSequence (kittySequence, printable);
 
         Assert.Single (down);
