@@ -45,9 +45,16 @@ public class AnsiOutput : OutputBase, IOutput
     private readonly WindowsVTOutputHelper? _windowsVTOutput;
 
     /// <summary>
-    ///     Gets the <see cref="AppModel"/> that this output was initialized with.
+    ///     Gets or sets the <see cref="AppModel"/> that this output was initialized with.
     /// </summary>
     internal AppModel AppModel { get; }
+
+    /// <summary>
+    ///     Gets or sets the row offset for inline mode rendering. When set, all cursor
+    ///     positioning via <see cref="SetCursorPositionImpl"/> is shifted down by this many rows,
+    ///     so Screen row 0 maps to terminal row <c>InlineRowOffset + 1</c> (1-indexed).
+    /// </summary>
+    internal int InlineRowOffset { get; set; }
 
     /// <summary>
     ///     Initializes a new instance of <see cref="AnsiOutput"/>.
@@ -343,7 +350,9 @@ public class AnsiOutput : OutputBase, IOutput
 
         // + 1 is needed because non-Windows is based on 1 instead of 0 and
         // Console.CursorTop/CursorLeft isn't reliable.
-        Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
+        // InlineRowOffset shifts all rendering down so Screen row 0 maps to the cursor's
+        // starting terminal row (used by inline mode).
+        Write (EscSeqUtils.CSI_SetCursorPosition (row + 1 + InlineRowOffset, col + 1));
 
         return true;
     }

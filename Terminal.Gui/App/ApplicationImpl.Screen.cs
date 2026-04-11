@@ -31,6 +31,12 @@ internal partial class ApplicationImpl
     private bool _inlineScreenSized;
 
     /// <summary>
+    ///     The terminal row (0-indexed) where the cursor was when the inline-mode app started.
+    ///     Set by the main loop when the ANSI cursor position response is received.
+    /// </summary>
+    internal int InlineCursorRow { get; set; }
+
+    /// <summary>
     ///     INTERNAL: Called when the application's screen has changed.
     ///     Raises the <see cref="ScreenChanged"/> event.
     /// </summary>
@@ -90,16 +96,32 @@ internal partial class ApplicationImpl
         // Layout
         bool neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
 
-        // Inline mode: after the first layout pass, reserve vertical space in the terminal.
-        // If the cursor is near the bottom of the terminal, emitting newlines forces the
-        // terminal to scroll its content up, guaranteeing enough room for the inline region.
-        // Then move the cursor back up to the start of the reserved area.
-        // This is the same technique used by fzf, atuin, and similar inline TUIs.
-        // NOTE: The Screen is NOT resized — the view's AnchorEnd() + Dim.Auto() layout against
-        // the full terminal size already positions it at the correct terminal rows. Resizing
-        // Screen would force the view to y=0, causing it to draw at absolute row 1 (the top).
+        // Inline mode: on the first draw, resize Screen so its height equals only the rows
+        // from the cursor's starting position to the bottom of the terminal. Set the
+        // InlineRowOffset on AnsiOutput so that Screen row 0 maps to the cursor's
+        // terminal row. Then emit newlines to reserve vertical space (scrolling the terminal
+        // if the cursor is near the bottom). This is the technique used by fzf, atuin, etc.
         if (Application.AppModel == AppModel.Inline && !_inlineScreenSized && Driver is { })
         {
+            int cursorRow = InlineCursorRow;
+            int termHeight = Screen.Height;
+            int availableHeight = termHeight - cursorRow;
+
+            if (availableHeight > 0 && availableHeight != termHeight)
+            {
+                // Set the row offset so SetCursorPositionImpl adds cursorRow to all row positions
+                if (Driver.GetOutput () is AnsiOutput ansiOutput)
+                {
+                    ansiOutput.InlineRowOffset = cursorRow;
+                }
+
+                // Resize Screen to only the available rows below the cursor
+                Screen = new Rectangle (0, 0, Screen.Width, availableHeight);
+
+                // Re-layout with the new (smaller) Screen size
+                neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
+            }
+
             View? topView = views.LastOrDefault (v => v is { });
 
             if (topView is { })
@@ -108,12 +130,13 @@ internal partial class ApplicationImpl
 
                 if (inlineHeight > 0)
                 {
+                    // Emit newlines to reserve space, then cursor-up to reclaim the region
                     Driver.WriteRaw (new string ('\n', inlineHeight));
                     Driver.WriteRaw ($"{EscSeqUtils.CSI}{inlineHeight}A");
                 }
-
-                _inlineScreenSized = true;
             }
+
+            _inlineScreenSized = true;
         }
 
         // Draw

@@ -178,7 +178,15 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
             if (SizeMonitor.InitialSizeReceived)
             {
                 _inlineSizeConfirmed = true;
-                Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeConfirmed", $"Screen={App?.Screen}");
+
+                // Pass the cursor row from the ANSI CPR response to ApplicationImpl
+                // so LayoutAndDraw can resize Screen and set the rendering row offset.
+                if (App is ApplicationImpl appImpl)
+                {
+                    appImpl.InlineCursorRow = SizeMonitor.InitialCursorRow;
+                }
+
+                Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeConfirmed", $"Screen={App?.Screen}, CursorRow={SizeMonitor.InitialCursorRow}");
             }
             else
             {

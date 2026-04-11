@@ -23,10 +23,9 @@ app.Dispose ();
 
 /// <summary>
 ///     A simple inline prompt view that demonstrates the inline rendering mode.
-///     Uses <c>Y = Pos.AnchorEnd()</c> and <c>Height = Dim.Auto(minimumContentSize: 10)</c>
-///     so the view anchors to the bottom of the Screen and sizes itself by content
-///     with a minimum height. The first layout pass computes the view's Frame,
-///     then <c>ApplicationImpl</c> sets <c>Screen.Height</c> to match.
+///     Uses <c>Height = Dim.Auto(minimumContentSize: 10)</c> so the view sizes itself by content
+///     with a minimum height. The framework automatically resizes <c>Screen</c> to the rows
+///     available below the cursor and offsets rendering so the view appears at the cursor position.
 /// </summary>
 public sealed class InlinePromptView : Window
 {
@@ -40,9 +39,6 @@ public sealed class InlinePromptView : Window
         Arrangement = ViewArrangement.TopResizable;
 
         Width = Dim.Fill ();
-
-        // Anchor to the bottom of the inline region and size by content with a minimum height.
-        Y = Pos.AnchorEnd ();
         Height = Dim.Auto (minimumContentDim: 10);
 
         Label statusLabel = new () { Text = "Type a message and press Enter. Press Esc to exit.", Width = Dim.Fill () };

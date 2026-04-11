@@ -16,6 +16,13 @@ public interface ISizeMonitor
     bool InitialSizeReceived => true;
 
     /// <summary>
+    ///     Gets the terminal row (0-indexed) where the cursor was when the application started.
+    ///     Used by inline mode to position the inline region at the cursor's starting row.
+    ///     Returns <c>0</c> by default (top of screen).
+    /// </summary>
+    int InitialCursorRow => 0;
+
+    /// <summary>
     ///     Called after the driver is fully initialized to allow the size monitor to perform
     ///     any setup that requires access to the driver (e.g., queuing ANSI requests, setting up
     ///     signal handlers, registering for console events).

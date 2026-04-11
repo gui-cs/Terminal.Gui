@@ -246,5 +246,107 @@ public class AnsiSizeMonitorTests
         Assert.Contains (backend.Entries, e => e.Phase == "SizeChanged");
     }
 
+    /// <summary>
+    ///     In inline mode, <see cref="AnsiSizeMonitor.InitialSizeReceived"/> requires
+    ///     both the size response AND the cursor position response.
+    /// </summary>
+    [Fact]
+    public void InlineMode_InitialSizeReceived_RequiresBothResponses () // Copilot
+    {
+        AnsiOutput output = new (AppModel.Inline);
+        output.SetSize (80, 25);
+
+        List<AnsiEscapeSequenceRequest> captured = [];
+        AnsiSizeMonitor monitor = new (output, req => captured.Add (req));
+
+        Assert.False (monitor.InitialSizeReceived);
+
+        // Poll triggers the size query
+        monitor.Poll ();
+
+        // Find the size response (terminator "t") and CPR response (terminator "R")
+        AnsiEscapeSequenceRequest? sizeReq = captured.FirstOrDefault (r => r.Terminator == "t");
+        AnsiEscapeSequenceRequest? cprReq = captured.FirstOrDefault (r => r.Terminator == "R");
+
+        // If CPR wasn't sent via Poll, simulate Initialize sending it
+        if (cprReq is null)
+        {
+            Mock<IDriver> driverMock = new ();
+            driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()))
+                      .Callback<AnsiEscapeSequenceRequest> (r => captured.Add (r));
+            monitor.Initialize (driverMock.Object);
+            cprReq = captured.FirstOrDefault (r => r.Terminator == "R");
+        }
+
+        Assert.NotNull (sizeReq);
+        Assert.NotNull (cprReq);
+
+        // Only size response — not yet complete
+        sizeReq!.ResponseReceived! ("[8;30;100t");
+        Assert.False (monitor.InitialSizeReceived);
+
+        // Now cursor position response — both complete
+        cprReq!.ResponseReceived! ("[?10;1R");
+        Assert.True (monitor.InitialSizeReceived);
+    }
+
+    /// <summary>
+    ///     <see cref="AnsiSizeMonitor.InitialCursorRow"/> parses the row from the
+    ///     DECXCPR response and converts from 1-indexed to 0-indexed.
+    /// </summary>
+    [Fact]
+    public void InlineMode_InitialCursorRow_ParsedFromCprResponse () // Copilot
+    {
+        AnsiOutput output = new (AppModel.Inline);
+        output.SetSize (80, 50);
+
+        List<AnsiEscapeSequenceRequest> captured = [];
+
+        Mock<IDriver> driverMock = new ();
+        driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()))
+                  .Callback<AnsiEscapeSequenceRequest> (r => captured.Add (r));
+
+        AnsiSizeMonitor monitor = new (output);
+        monitor.Initialize (driverMock.Object);
+
+        AnsiEscapeSequenceRequest? cprReq = captured.FirstOrDefault (r => r.Terminator == "R");
+        Assert.NotNull (cprReq);
+
+        // Simulate terminal at row 15 (1-indexed), col 1
+        cprReq!.ResponseReceived! ("[?15;1R");
+
+        Assert.Equal (14, monitor.InitialCursorRow); // 0-indexed
+    }
+
+    /// <summary>
+    ///     In FullScreen mode, <see cref="AnsiSizeMonitor.InitialSizeReceived"/> only
+    ///     requires the size response (no cursor position query is sent).
+    /// </summary>
+    [Fact]
+    public void FullScreenMode_InitialSizeReceived_OnlySizeNeeded () // Copilot
+    {
+        AnsiOutput output = new (); // FullScreen default
+        output.SetSize (80, 25);
+
+        List<AnsiEscapeSequenceRequest> captured = [];
+
+        Mock<IDriver> driverMock = new ();
+        driverMock.Setup (d => d.QueueAnsiRequest (It.IsAny<AnsiEscapeSequenceRequest> ()))
+                  .Callback<AnsiEscapeSequenceRequest> (r => captured.Add (r));
+
+        AnsiSizeMonitor monitor = new (output);
+        monitor.Initialize (driverMock.Object);
+
+        // Should NOT have sent a CPR query
+        Assert.DoesNotContain (captured, r => r.Terminator == "R");
+
+        // Size response alone should be sufficient
+        AnsiEscapeSequenceRequest? sizeReq = captured.FirstOrDefault (r => r.Terminator == "t");
+        Assert.NotNull (sizeReq);
+        sizeReq!.ResponseReceived! ("[8;30;100t");
+        Assert.True (monitor.InitialSizeReceived);
+        Assert.Equal (0, monitor.InitialCursorRow); // default
+    }
+
 #endif
 }
