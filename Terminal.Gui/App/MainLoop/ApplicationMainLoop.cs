@@ -60,14 +60,12 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
     /// <param name="consoleOutput"></param>
     /// <param name="componentFactory"></param>
     /// <param name="app"></param>
-    public void Initialize (
-        ITimedEvents timedEvents,
-        ConcurrentQueue<TInputRecord> inputBuffer,
-        IInputProcessor inputProcessor,
-        IOutput consoleOutput,
-        IComponentFactory<TInputRecord> componentFactory,
-        IApplication? app
-    )
+    public void Initialize (ITimedEvents timedEvents,
+                            ConcurrentQueue<TInputRecord> inputBuffer,
+                            IInputProcessor inputProcessor,
+                            IOutput consoleOutput,
+                            IComponentFactory<TInputRecord> componentFactory,
+                            IApplication? app)
     {
         App = app;
         InputQueue = inputBuffer;

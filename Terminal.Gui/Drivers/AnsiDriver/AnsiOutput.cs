@@ -257,42 +257,6 @@ public class AnsiOutput : OutputBase, IOutput
         }
     }
 
-    /// <summary>
-    ///     Gets the kitty keyboard flags currently enabled on the terminal.
-    /// </summary>
-    internal KittyKeyboardFlags KittyKeyboardEnabledFlags { get; private set; }
-
-    /// <summary>
-    ///     Enables kitty keyboard progressive enhancement flags for the active terminal.
-    /// </summary>
-    /// <param name="flags">The kitty keyboard flags to enable.</param>
-    internal void EnableKittyKeyboard (KittyKeyboardFlags flags)
-    {
-        if (flags == KittyKeyboardFlags.None || _platform == AnsiPlatform.Degraded)
-        {
-            return;
-        }
-
-        Trace.Lifecycle (nameof (AnsiOutput), "KittyKeyboard", $"Writing enable sequence for flags {flags}");
-        Write (EscSeqUtils.CSI_EnableKittyKeyboardFlags (flags));
-        KittyKeyboardEnabledFlags = flags;
-    }
-
-    /// <summary>
-    ///     Restores the previous kitty keyboard flag state if kitty mode was enabled.
-    /// </summary>
-    internal void DisableKittyKeyboard ()
-    {
-        if (KittyKeyboardEnabledFlags == KittyKeyboardFlags.None)
-        {
-            return;
-        }
-
-        Trace.Lifecycle (nameof (AnsiOutput), "KittyKeyboard", $"Writing disable sequence for flags {KittyKeyboardEnabledFlags}");
-        Write (EscSeqUtils.CSI_DisableKittyKeyboardFlags);
-        KittyKeyboardEnabledFlags = KittyKeyboardFlags.None;
-    }
-
     /// <inheritdoc cref="IOutput.Write(IOutputBuffer)"/>
     public override void Write (IOutputBuffer buffer)
     {
@@ -400,8 +364,6 @@ public class AnsiOutput : OutputBase, IOutput
     {
         try
         {
-            DisableKittyKeyboard ();
-
             if (_platform == AnsiPlatform.Degraded)
             {
                 return;

@@ -191,6 +191,17 @@ public class KittyKeyboardParsingTests
     }
 
     [Fact]
+    public void KittyPattern_AltGr_Standalone ()
+    {
+        // ESC[57453u = AltGr / ISO_Level3_Shift
+        Key? key = _pattern.GetKey ("\u001b[57453u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.AltGr, key.ModifierKey);
+    }
+
+    [Fact]
     public void KittyPattern_CapsLock_Standalone ()
     {
         // ESC[57358u = Caps Lock
@@ -221,6 +232,57 @@ public class KittyKeyboardParsingTests
         Assert.NotNull (key);
         Assert.True (key.IsModifierOnly);
         Assert.Equal (ModifierKey.LeftShift, key.ModifierKey);
+        Assert.Equal (KeyEventType.Release, key.EventType);
+    }
+
+    [Fact]
+    public void KittyPattern_AltGr_WithEventType_Release ()
+    {
+        // ESC[57453;1:3u = AltGr / ISO_Level3_Shift, event type 3 (release)
+        Key? key = _pattern.GetKey ("\u001b[57453;1:3u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.AltGr, key.ModifierKey);
+        Assert.Equal (KeyEventType.Release, key.EventType);
+    }
+
+    [Fact]
+    public void KittyPattern_LeftAlt_WithCtrlModifier_PreservesBothStates ()
+    {
+        Key? key = _pattern.GetKey ("\u001b[57443;5u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftAlt, key.ModifierKey);
+        Assert.True (key.IsCtrl);
+        Assert.False (key.IsAlt);
+        Assert.Equal (KeyEventType.Press, key.EventType);
+    }
+
+    [Fact]
+    public void KittyPattern_LeftAlt_Release_WithCtrlAndAltModifiers_PreservesBothStates ()
+    {
+        Key? key = _pattern.GetKey ("\u001b[57443;7:3u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftAlt, key.ModifierKey);
+        Assert.True (key.IsCtrl);
+        Assert.True (key.IsAlt);
+        Assert.Equal (KeyEventType.Release, key.EventType);
+    }
+
+    [Fact]
+    public void KittyPattern_LeftCtrl_Release_WithCtrlModifier_PreservesState ()
+    {
+        Key? key = _pattern.GetKey ("\u001b[57442;5:3u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftCtrl, key.ModifierKey);
+        Assert.True (key.IsCtrl);
+        Assert.False (key.IsAlt);
         Assert.Equal (KeyEventType.Release, key.EventType);
     }
 
@@ -458,6 +520,58 @@ public class KittyKeyboardParsingTests
         Assert.Equal (Key.Enter, key);
         Assert.Equal (KeyCode.Null, key.ShiftedKeyCode);
         Assert.Equal ((KeyCode)13, key.BaseLayoutKeyCode);
+    }
+
+    [Fact]
+    public void KittyPattern_EmptyFields_WithAssociatedText ()
+    {
+        // ESC[64::50;;64u = '@' with empty shifted field, base layout '2', empty modifiers, associated text '@'
+        Key? key = _pattern.GetKey ("\u001b[64::50;;64u");
+
+        Assert.NotNull (key);
+        Assert.Equal (new Key ('@'), key);
+        Assert.Equal (KeyCode.Null, key.ShiftedKeyCode);
+        Assert.Equal ((KeyCode)50, key.BaseLayoutKeyCode);
+        Assert.Equal ("@", key.AssociatedText);
+    }
+
+    [Fact]
+    public void KittyPattern_AltGr5_Press_ReturnsEuroGrapheme ()
+    {
+        // ESC[8364;1:1u = Euro symbol, no modifiers, press
+        Key? key = _pattern.GetKey ("\u001b[8364;1:1u");
+
+        Assert.NotNull (key);
+        Assert.Equal (KeyEventType.Press, key.EventType);
+        Assert.Equal ((KeyCode)8364, key.KeyCode);
+        Assert.Equal ("€", key.AsGrapheme);
+        Assert.Equal ("€", key.GetPrintableText ());
+    }
+
+    [Fact]
+    public void KittyPattern_AltGrE_EuroKey_Press_ReturnsEuroGrapheme ()
+    {
+        // ESC[8364;1:1u = AltGr+E on many layouts, which sends the euro codepoint 8364.
+        Key? key = _pattern.GetKey ("\u001b[8364;1:1u");
+
+        Assert.NotNull (key);
+        Assert.Equal (KeyEventType.Press, key.EventType);
+        Assert.Equal ((KeyCode)8364, key.KeyCode);
+        Assert.Equal ("€", key.AsGrapheme);
+        Assert.Equal ("€", key.GetPrintableText ());
+    }
+
+    [Fact]
+    public void KittyPattern_AltGrE_EuroKey_Release_ReturnsEuroGrapheme ()
+    {
+        // ESC[8364;1:3u = Euro symbol, no modifiers, release
+        Key? key = _pattern.GetKey ("\u001b[8364;1:3u");
+
+        Assert.NotNull (key);
+        Assert.Equal (KeyEventType.Release, key.EventType);
+        Assert.Equal ((KeyCode)8364, key.KeyCode);
+        Assert.Equal ("€", key.AsGrapheme);
+        Assert.Equal ("€", key.GetPrintableText ());
     }
 
     #endregion
