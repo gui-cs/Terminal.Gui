@@ -140,8 +140,18 @@ public class KittyKeyboardProtocolDetector
     ///     enabling Kitty support <see cref="KittyKeyboardCapabilities.Flags"/> will indicate
     ///     which flags have been enabled.
     /// </summary>
-    /// <param name="response"></param>
-    /// <returns></returns>
+    /// <param name="response">
+    ///     The terminal response to parse. Supported formats are the Kitty keyboard flags reply
+    ///     <c>ESC[?&lt;flags&gt;u</c> and the same sequence without the leading escape character
+    ///     (<c>[?&lt;flags&gt;u</c>).
+    /// </param>
+    /// <returns>
+    ///     A <see cref="KittyKeyboardCapabilities"/> value whose <see cref="KittyKeyboardCapabilities.IsSupported"/>
+    ///     property is <see langword="true"/> when <paramref name="response"/> is a valid Kitty keyboard
+    ///     protocol reply, and whose <see cref="KittyKeyboardCapabilities.Flags"/> property contains the
+    ///     parsed <see cref="KittyKeyboardFlags"/> bit field. If parsing fails, returns a default
+    ///     capabilities value.
+    /// </returns>
     internal static KittyKeyboardCapabilities ParseResponse (string? response)
     {
         if (string.IsNullOrWhiteSpace (response))
