@@ -19,8 +19,8 @@ public partial class TextView
     {
         if (mouse is { IsSingleDoubleOrTripleClicked: false, IsPressed: false, IsReleased: false, IsWheel: false }
             && !mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport)
-            && !mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.Shift)
-            && !mouse.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked | MouseFlags.Shift)
+            && !mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.Alt)
+            && !mouse.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked | MouseFlags.Alt)
             && ContextMenu is { }
             && !mouse.Flags.HasFlag (ContextMenu.MouseFlags))
         {
@@ -108,7 +108,7 @@ public partial class TextView
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
         }
-        else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.Shift))
+        else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.Alt))
         {
             if (!_shiftSelecting)
             {
@@ -147,7 +147,7 @@ public partial class TextView
         }
         else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
         {
-            if (mouse.Flags.HasFlag (MouseFlags.Shift))
+            if (mouse.Flags.HasFlag (MouseFlags.Alt))
             {
                 if (!IsSelecting)
                 {
