@@ -105,7 +105,8 @@ public class KittyKeyboardProtocolDetector
                          "Detect",
                          $"Queueing kitty keyboard probe '{EscSeqUtils.CSI_QueryKittyKeyboardFlags.Request}'");
 
-        IDisposable? completionHandle = _startupGate?.RegisterQuery (AnsiStartupQuery.KittyKeyboard, StartupKittyKeyboardQueryTimeout);
+        IDisposable? kittyKeyboardQueryCompletionHandle = _startupGate?.RegisterQuery (AnsiStartupQuery.KittyKeyboard,
+                                                                                        StartupKittyKeyboardQueryTimeout);
 
         QueueRequest (EscSeqUtils.CSI_QueryKittyKeyboardFlags,
                       response =>
@@ -116,13 +117,13 @@ public class KittyKeyboardProtocolDetector
                                            "Detect",
                                            $"Kitty keyboard response '{response}' => IsSupported={result.IsSupported}, Flags={result.Flags}");
 
-                          completionHandle?.Dispose ();
+                          kittyKeyboardQueryCompletionHandle?.Dispose ();
                           resultCallback (result);
                       },
                       () =>
                       {
                           Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Detect", "Kitty keyboard probe abandoned");
-                          completionHandle?.Dispose ();
+                          kittyKeyboardQueryCompletionHandle?.Dispose ();
                           resultCallback (new KittyKeyboardCapabilities ());
                       });
     }

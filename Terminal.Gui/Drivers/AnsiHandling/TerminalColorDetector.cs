@@ -41,12 +41,13 @@ public class TerminalColorDetector
             return;
         }
 
-        IDisposable? completionHandle = _startupGate?.RegisterQuery (AnsiStartupQuery.TerminalColors, StartupTerminalColorsQueryTimeout);
+        IDisposable? terminalColorsQueryCompletionHandle = _startupGate?.RegisterQuery (AnsiStartupQuery.TerminalColors,
+                                                                                          StartupTerminalColorsQueryTimeout);
 
         // Query foreground first (OSC 10), then background (OSC 11)
         QueryForeground ((fg, bg) =>
                           {
-                              completionHandle?.Dispose ();
+                              terminalColorsQueryCompletionHandle?.Dispose ();
                               resultCallback (fg, bg);
                           });
     }
