@@ -188,6 +188,9 @@ public enum AppModel
 }
 ```
 
+> **Future value: `StatusBar` (mintty-style)**  
+> mintty (the Cygwin/MSYS2 terminal) supports rendering a persistent status/title bar outside the normal scrolling region by using DECSTBM (Set Top and Bottom Margins) to reserve one or more rows at the bottom of the terminal, then locking them with `CSI … r`. A future `AppModel.StatusBar` value could exploit this to let Terminal.Gui render a thin persistent HUD (e.g. a `StatusBar` view) that survives normal scroll output above it — without switching to the alternate screen buffer. This is a meaningful extension of the `AppModel` concept and the enum is intentionally designed to be extended with additional values.
+
 ### Configuration property — on `Application`, not `Driver`
 
 `AppModel` is an application-level concept, not a driver-level one. It is declared as a static config property on `Application` (the static façade), analogous to how `Driver.Force16Colors` works at the driver level:
