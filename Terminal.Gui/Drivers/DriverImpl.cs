@@ -357,25 +357,7 @@ internal class DriverImpl : IDriver
     #region Input Events
 
     /// <inheritdoc/>
-    public KittyKeyboardCapabilities? KittyKeyboardCapabilities { get; private set; }
-
-    /// <summary>
-    ///     Stores the latest kitty keyboard protocol detection result.
-    /// </summary>
-    /// <param name="capabilities">The detected kitty keyboard capabilities.</param>
-    internal void SetKittyKeyboardCapabilities (KittyKeyboardCapabilities capabilities) => KittyKeyboardCapabilities = capabilities;
-
-    /// <summary>
-    ///     Stores the kitty keyboard flags currently enabled on the terminal.
-    /// </summary>
-    /// <param name="enabledFlags">The kitty keyboard flags currently enabled.</param>
-    internal void SetKittyKeyboardEnabledFlags (KittyKeyboardFlags enabledFlags)
-    {
-        if (KittyKeyboardCapabilities is not null)
-        {
-            KittyKeyboardCapabilities.EnabledFlags = enabledFlags;
-        }
-    }
+    public KittyKeyboardCapabilities? KittyKeyboardCapabilities { get; set; }
 
     /// <summary>Event fired when a key is pressed down.</summary>
     public event EventHandler<Key>? KeyDown;
