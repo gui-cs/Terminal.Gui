@@ -18,10 +18,10 @@ jobs:
     steps:
 
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: 10.x
         dotnet-quality: 'ga'
@@ -34,7 +34,7 @@ jobs:
       run: dotnet build --configuration Debug --no-restore -property:NoWarn=0618%3B0612
 
     - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: test-build-artifacts
         path: |
