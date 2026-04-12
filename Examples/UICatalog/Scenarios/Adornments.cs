@@ -50,10 +50,12 @@ public class Adornments : Scenario
 
         Window window = new ()
         {
-            Title = "The _Window",
+            Title = "The _Window - The Title is long",
             Arrangement = ViewArrangement.Overlapped | ViewArrangement.Movable | ViewArrangement.Resizable,
-            Width = Dim.Fill (adornmentsEditor),
-            Height = Dim.Fill (viewportSettingsEditor)
+            X = 5,
+            Y = 5,
+            Width = Dim.Fill (adornmentsEditor) - 10,
+            Height = Dim.Fill (viewportSettingsEditor) - 10
         };
         appWindow.Add (window);
 
@@ -100,14 +102,80 @@ public class Adornments : Scenario
 
         window.Margin.GetOrCreateView ();
         window.Margin.View?.Text = "Margin Text";
-        window.Margin.Thickness = new Thickness (2);
+        window.Margin.Thickness = new Thickness (0);
 
         window.Border.GetOrCreateView ();
+
         //window.Border.View.Text = "Border Text";
         window.Border.Thickness = new Thickness (3);
-        window.Border.View?.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
 
-        window.Border.GetOrCreateView ();
+        //window.Border.View?.SetScheme (SchemeManager.GetScheme (Schemes.Dialog));
+
+        window.Border.Settings = BorderSettings.Tab | BorderSettings.Title;
+        window.BorderStyle = LineStyle.Rounded;
+
+        // Enable dragging the tab title to slide it by changing TabOffset.
+        // Hook into TitleView.MouseEvent — it fires before the Arranger, so no conflict.
+        Point? dragStart = null;
+        var dragStartOffset = 0;
+        var tabDragHooked = false;
+
+        window.DrawComplete += (_, _) =>
+                               {
+                                   if (tabDragHooked || ((BorderView)window.Border.View!).TitleView is not { } tabTitle)
+                                   {
+                                       return;
+                                   }
+
+                                   tabDragHooked = true;
+                                   var bv = (BorderView)window.Border.View!;
+
+                                   tabTitle.MouseEvent += (_, mouse) =>
+                                                          {
+                                                              // Start drag
+                                                              if (!dragStart.HasValue && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+                                                              {
+                                                                  dragStart = mouse.ScreenPosition;
+                                                                  dragStartOffset = bv.TabOffset;
+                                                                  window.App?.Mouse.GrabMouse (tabTitle);
+                                                                  mouse.Handled = true;
+                                                              }
+
+                                                              // Dragging
+                                                              if (dragStart.HasValue
+                                                                  && mouse.Flags is (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
+                                                              {
+                                                                  int delta = bv.TabSide is Side.Top or Side.Bottom
+                                                                                  ? mouse.ScreenPosition.X - dragStart.Value.X
+                                                                                  : mouse.ScreenPosition.Y - dragStart.Value.Y;
+
+                                                                  int tabLen = bv.TabLength ?? 0;
+
+                                                                  // Content border edge length (the side the tab slides along)
+                                                                  int edgeLen = bv.TabSide is Side.Top or Side.Bottom
+                                                                                    ? window.Frame.Width
+                                                                                      - window.Border.Thickness.Left
+                                                                                      - window.Border.Thickness.Right
+                                                                                    : window.Frame.Height
+                                                                                      - window.Border.Thickness.Top
+                                                                                      - window.Border.Thickness.Bottom;
+
+                                                                  int newOffset = Math.Clamp (dragStartOffset + delta, 1 - tabLen, edgeLen - 1);
+
+                                                                  bv.TabOffset = newOffset;
+                                                                  mouse.Handled = true;
+                                                              }
+
+                                                              // Release
+                                                              if (!mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased) || !dragStart.HasValue)
+                                                              {
+                                                                  return;
+                                                              }
+                                                              dragStart = null;
+                                                              window.App?.Mouse.UngrabMouse ();
+                                                              mouse.Handled = true;
+                                                          };
+                               };
         window.Padding.View?.Text = "Padding Text line 1\nPadding Text line 3\nPadding Text line 3\nPadding Text line 4\nPadding Text line 5";
         window.Padding.Thickness = new Thickness (1);
         window.Padding.View?.SetScheme (SchemeManager.GetScheme (Schemes.Menu));
@@ -179,6 +247,12 @@ public class Adornments : Scenario
         viewportSettingsEditor.ShowViewIdentifier = true;
 
         appWindow.Add (adornmentsEditor, viewportSettingsEditor);
+
+        appWindow.DrawingContent += (_, e) =>
+                                    {
+                                        appWindow.FillRect (appWindow.Viewport, Glyphs.Diamond);
+                                        e.Cancel = true;
+                                    };
 
         app.Run (appWindow);
     }

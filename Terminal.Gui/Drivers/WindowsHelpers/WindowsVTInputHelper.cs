@@ -253,4 +253,22 @@ internal sealed class WindowsVTInputHelper : IDisposable
     /// </summary>
     /// <returns><c>true</c> if there is at least one input event available.</returns>
     public bool Peek () => GetNumberOfConsoleInputEvents (InputHandle, out uint count) && count > 0;
+
+    [DllImport ("kernel32.dll", SetLastError = true)]
+    private static extern bool FlushConsoleInputBuffer (nint hConsoleInput);
+
+    /// <summary>
+    ///     Flushes all pending input from the console input buffer.
+    ///     This prevents protocol-specific sequences (e.g. Kitty keyboard key-release events)
+    ///     from leaking into the shell after the app exits.
+    /// </summary>
+    public void Flush ()
+    {
+        if (!IsEnabled || _disposed || InputHandle == nint.Zero)
+        {
+            return;
+        }
+
+        FlushConsoleInputBuffer (InputHandle);
+    }
 }

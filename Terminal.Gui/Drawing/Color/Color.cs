@@ -27,9 +27,15 @@ namespace Terminal.Gui.Drawing;
 ///         While Terminal.Gui does not currently support alpha blending during rendering, the alpha channel
 ///         is used to indicate rendering intent:
 ///         <list type="bullet">
-///             <item><description>Alpha = 0: Fully transparent (don't render)</description></item>
-///             <item><description>Alpha = 255: Fully opaque (normal rendering)</description></item>
-///             <item><description>Other values: Reserved for future alpha blending support</description></item>
+///             <item>
+///                 <description>Alpha = 0: Fully transparent (don't render)</description>
+///             </item>
+///             <item>
+///                 <description>Alpha = 255: Fully opaque (normal rendering)</description>
+///             </item>
+///             <item>
+///                 <description>Other values: Reserved for future alpha blending support</description>
+///             </item>
 ///         </list>
 ///     </para>
 /// </remarks>
@@ -38,8 +44,7 @@ namespace Terminal.Gui.Drawing;
 /// <seealso cref="ColorName16"/>
 [JsonConverter (typeof (ColorJsonConverter))]
 [StructLayout (LayoutKind.Explicit)]
-public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Color>, ISpanFormattable,
-                                              IUtf8SpanFormattable, IMinMaxValue<Color>
+public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanParsable<Color>, ISpanFormattable, IUtf8SpanFormattable, IMinMaxValue<Color>
 {
     /// <summary>
     ///     No color (alpha = 0). When used in an <see cref="Attribute"/>, the terminal's default
@@ -51,6 +56,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     <c>default(Color)</c> which has all bytes zeroed.
     /// </remarks>
     public static readonly Color None = new (255, 255, 255, 0);
+
     /// <summary>The value of the alpha channel component</summary>
     /// <remarks>
     ///     <para>
@@ -110,10 +116,10 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// <exception cref="ArgumentOutOfRangeException">If the value of any parameter is negative.</exception>
     public Color (int red = 0, int green = 0, int blue = 0, int alpha = byte.MaxValue)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative (red, nameof (red));
-        ArgumentOutOfRangeException.ThrowIfNegative (green, nameof (green));
-        ArgumentOutOfRangeException.ThrowIfNegative (blue, nameof (blue));
-        ArgumentOutOfRangeException.ThrowIfNegative (alpha, nameof (alpha));
+        ArgumentOutOfRangeException.ThrowIfNegative (red);
+        ArgumentOutOfRangeException.ThrowIfNegative (green);
+        ArgumentOutOfRangeException.ThrowIfNegative (blue);
+        ArgumentOutOfRangeException.ThrowIfNegative (alpha);
 
         A = Convert.ToByte (alpha);
         R = Convert.ToByte (red);
@@ -130,7 +136,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect
     ///     rendering.
     /// </remarks>
-    public Color (int rgba) { Rgba = rgba; }
+    public Color (int rgba) => Rgba = rgba;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="Color"/> class with an encoded unsigned 32-bit color value in
@@ -141,14 +147,16 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     The alpha channel is not currently supported, so the value of the alpha channel bits will not affect
     ///     rendering.
     /// </remarks>
-    public Color (uint argb) { Argb = argb; }
+    public Color (uint argb) => Argb = argb;
 
     /// <summary>Initializes a new instance of the <see cref="Color"/> color from a legacy 16-color named value.</summary>
     /// <param name="colorName">The 16-color value.</param>
-    public Color (in ColorName16 colorName) { this = ColorExtensions.ColorName16ToColorMap! [colorName]; }
+    public Color (in ColorName16 colorName) => this = ColorExtensions.ColorName16ToColorMap! [colorName];
 
-
-    /// <summary>Initializes a new instance of the <see cref="Color"/> color from a value in the <see cref="StandardColor"/> enum.</summary>
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="Color"/> color from a value in the <see cref="StandardColor"/>
+    ///     enum.
+    /// </summary>
     /// <param name="colorName">The 16-color value.</param>
     public Color (in StandardColor colorName) : this (StandardColors.GetArgb (colorName)) { }
 
@@ -165,12 +173,12 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// <exception cref="ColorParseException">If thrown by <see cref="Parse(string?,System.IFormatProvider?)"/></exception>
     public Color (string colorString)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace (colorString, nameof (colorString));
+        ArgumentException.ThrowIfNullOrWhiteSpace (colorString);
         this = Parse (colorString, CultureInfo.InvariantCulture);
     }
 
     /// <summary>Initializes a new instance of the <see cref="Color"/> with all channels set to 0.</summary>
-    public Color () { Argb = 0u; }
+    public Color () => Argb = 0u;
 
     /// <summary>Gets or sets the 3-byte/6-character hexadecimal value for each of the legacy 16-color values.</summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
@@ -187,14 +195,12 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
 
             return;
 
-            static Color GetColorToNameMapKey (KeyValuePair<ColorName16, string> kvp) { return new (kvp.Value); }
+            static Color GetColorToNameMapKey (KeyValuePair<ColorName16, string> kvp) => new (kvp.Value);
 
-            static ColorName16 GetColorToNameMapValue (KeyValuePair<ColorName16, string> kvp)
-            {
-                return Enum.TryParse (kvp.Key.ToString (), true, out ColorName16 colorName)
-                           ? colorName
-                           : throw new ArgumentException ($"Invalid color name: {kvp.Key}");
-            }
+            static ColorName16 GetColorToNameMapValue (KeyValuePair<ColorName16, string> kvp) =>
+                Enum.TryParse (kvp.Key.ToString (), true, out ColorName16 colorName)
+                    ? colorName
+                    : throw new ArgumentException ($"Invalid color name: {kvp.Key}");
         }
     }
 
@@ -206,7 +212,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     Get returns the <see cref="GetClosestNamedColor16(Color)"/> of the closest 24-bit color value. Set sets the RGB
     ///     value using a hard-coded map.
     /// </remarks>
-    public AnsiColorCode GetAnsiColorCode () { return ColorExtensions.ColorName16ToAnsiColorMap [GetClosestNamedColor16 ()]; }
+    public AnsiColorCode GetAnsiColorCode () => ColorExtensions.ColorName16ToAnsiColorMap [GetClosestNamedColor16 ()];
 
     /// <summary>
     ///     Gets the <see cref="Color"/> using a legacy 16-color <see cref="ColorName16"/> value. <see langword="get"/>
@@ -217,7 +223,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     ///     sets the RGB
     ///     value using a hard-coded map.
     /// </remarks>
-    public ColorName16 GetClosestNamedColor16 () { return GetClosestNamedColor16 (this); }
+    public ColorName16 GetClosestNamedColor16 () => GetClosestNamedColor16 (this);
 
     /// <summary>
     ///     Determines if the closest named <see cref="Color"/> to <see langword="this"/> is the provided
@@ -237,7 +243,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// </remarks>
     [Pure]
     [MethodImpl (MethodImplOptions.AggressiveInlining)]
-    public bool IsClosestToNamedColor16 (in ColorName16 namedColor) { return GetClosestNamedColor16 () == namedColor; }
+    public bool IsClosestToNamedColor16 (in ColorName16 namedColor) => GetClosestNamedColor16 () == namedColor;
 
     /// <summary>Gets the "closest" named color to this <see cref="Color"/> value.</summary>
     /// <param name="inputColor"></param>
@@ -246,13 +252,11 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// </remarks>
     /// <returns></returns>
     [SkipLocalsInit]
-    internal static ColorName16 GetClosestNamedColor16 (Color inputColor)
-    {
-        return ColorExtensions.ColorToName16Map!.MinBy (pair => CalculateColorDistance (inputColor, pair.Key)).Value;
-    }
+    internal static ColorName16 GetClosestNamedColor16 (Color inputColor) =>
+        ColorExtensions.ColorToName16Map!.MinBy (pair => CalculateColorDistance (inputColor, pair.Key)).Value;
 
     [SkipLocalsInit]
-    private static float CalculateColorDistance (in Vector4 color1, in Vector4 color2) { return Vector4.Distance (color1, color2); }
+    private static float CalculateColorDistance (in Vector4 color1, in Vector4 color2) => Vector4.Distance (color1, color2);
 
     /// <summary>
     ///     Returns a "highlighted" version of this color — visually more prominent against
@@ -287,12 +291,12 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// </param>
     public Color GetBrighterColor (double brightenAmount = 0.2, bool? isDarkBackground = null)
     {
-        HSL hsl = ColorConverter.RgbToHsl (new (R, G, B));
+        HSL hsl = ColorConverter.RgbToHsl (new RGB (R, G, B));
 
         double lNorm = hsl.L / 100.0;
 
         // Determine direction: on dark bg, brighten (increase L); on light bg, darken (decrease L)
-        bool shouldIncrease = isDarkBackground ?? (lNorm < 0.5);
+        bool shouldIncrease = isDarkBackground ?? lNorm < 0.5;
 
         double newL = shouldIncrease ? Math.Min (1.0, lNorm + brightenAmount) : Math.Max (0.0, lNorm - brightenAmount);
 
@@ -304,7 +308,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
         HSL newHsl = new (hsl.H, hsl.S, (byte)(newL * 100));
         RGB rgb = ColorConverter.HslToRgb (newHsl);
 
-        return new (rgb.R, rgb.G, rgb.B);
+        return new Color (rgb.R, rgb.G, rgb.B);
     }
 
     /// <summary>
@@ -343,7 +347,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// </param>
     public Color GetDimmerColor (double dimAmount = 0.2, bool? isDarkBackground = null)
     {
-        HSL hsl = ColorConverter.RgbToHsl (new (R, G, B));
+        HSL hsl = ColorConverter.RgbToHsl (new RGB (R, G, B));
 
         double lNorm = hsl.L / 100.0;
 
@@ -354,12 +358,12 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
         // Note: ColorHelper's HSL uses L in range 0-100.
         if (shouldDecrease && hsl.L <= 10)
         {
-            return new (ColorName16.DarkGray);
+            return new Color (ColorName16.DarkGray);
         }
 
         if (!shouldDecrease && hsl.L >= 90)
         {
-            return new (ColorName16.Gray);
+            return new Color (ColorName16.Gray);
         }
 
         double newL = shouldDecrease ? Math.Max (0.0, lNorm - dimAmount) : Math.Min (1.0, lNorm + dimAmount);
@@ -373,7 +377,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
         HSL newHsl = new (hsl.H, hsl.S, (byte)(newL * 100));
         RGB rgb = ColorConverter.HslToRgb (newHsl);
 
-        return new (rgb.R, rgb.G, rgb.B);
+        return new Color (rgb.R, rgb.G, rgb.B);
     }
 
     /// <summary>
@@ -384,7 +388,7 @@ public readonly partial record struct Color : ISpanParsable<Color>, IUtf8SpanPar
     /// </returns>
     public bool IsDarkColor ()
     {
-        HSL hsl = ColorConverter.RgbToHsl (new (R, G, B));
+        HSL hsl = ColorConverter.RgbToHsl (new RGB (R, G, B));
 
         // ColorHelper's HSL uses L in range 0-100
         return hsl.L < 50;

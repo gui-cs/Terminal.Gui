@@ -2,11 +2,11 @@ name: Build Validation
 
 on:
   push:
-    branches: [ v2_release, v2_develop ]
+    branches: [ main, develop ]
     paths-ignore:
       - '**.md'
   pull_request:
-    branches: [ v2_release, v2_develop ]
+    branches: [ main, develop ]
     paths-ignore:
       - '**.md'
       
@@ -19,10 +19,10 @@ jobs:
     steps:
 
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: 10.x
         dotnet-quality: 'ga'

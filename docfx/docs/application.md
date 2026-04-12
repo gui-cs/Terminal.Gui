@@ -112,7 +112,7 @@ top.Dispose ();
 Application.Shutdown (); // Obsolete - use Dispose() instead
 ```
 
-**Note:** The static <xref:Terminal.Gui.App.Application> class delegates to a singleton instance accessible via `Application.Instance`. [Application.Create()](xref:Terminal.Gui.App.Application.Create*) creates a **new** application instance, enabling multiple application contexts and better testability.
+**Note:** The static <xref:Terminal.Gui.App.Application> class delegates to an internal singleton backend instance. [Application.Create()](xref:Terminal.Gui.App.Application.Create*) creates a **new** application instance, enabling multiple application contexts and better testability.
 
 ### View.App Property
 
@@ -211,6 +211,8 @@ if (result is { })
 ### Disposal Semantics
 
 **"Whoever creates it, owns it":**
+
+During disposal, `MainLoopCoordinator.Stop()` performs terminal-side cleanup (including kitty keyboard disable when it was enabled) before disposing output resources.
 
 | Method | Creator | Owner | Disposal |
 |--------|---------|-------|----------|
@@ -937,6 +939,111 @@ using (IApplication app2 = Application.Create ())
 // Views in top1 use app1
 // Views in top2 use app2
 ```
+
+## Inline Mode (`AppModel.Inline`)
+
+Terminal.Gui supports two rendering modes controlled by <xref:Terminal.Gui.App.AppModel>:
+
+| Mode | Buffer | Screen cleared? | Use case |
+|------|--------|-----------------|----------|
+| `FullScreen` (default) | Alternate screen (`CSI ?1049h`) | Yes | Traditional full-screen TUI |
+| `Inline` | Primary scrollback buffer | No | CLI tools (like Claude Code, GitHub Copilot CLI) |
+
+In inline mode the app renders below the current shell prompt, sizes itself by content, grows dynamically, and on exit leaves its output in scrollback history.
+
+### Quick Start
+
+```csharp
+using IApplication app = Application.Create ();
+app.AppModel = AppModel.Inline;
+app.Init ();
+
+// RunnableWrapper provides the inline container with Dim.Auto sizing
+RunnableWrapper<ColorPicker> wrapper = new () { Width = Dim.Fill () };
+app.Run (wrapper);
+```
+
+### Coordinate System: `App.Screen`
+
+`IApplication.Screen` is the single source of truth for the rendering region:
+
+| Property | FullScreen | Inline |
+|----------|-----------|--------|
+| `Driver.Screen` | Full terminal (e.g. `0,0,120,40`) | Full terminal — **never changes** |
+| `App.Screen` | Same as `Driver.Screen` | Sub-rectangle (e.g. `0,25,120,8`) |
+| `App.Screen.Y` | Always `0` | Terminal row where the inline region starts |
+| `App.Screen.Height` | Terminal height | Rows the app currently occupies |
+
+All coordinate offsetting derives from `App.Screen`:
+
+- **Output**: `AnsiOutput.SetCursorPositionImpl` adds `App.Screen.Y` to row coordinates.
+- **Mouse**: `ApplicationMouse.RaiseMouseEvent` subtracts `App.Screen.Y` from `ScreenPosition.Y`.
+- **Views**: `Frame` is relative to `App.Screen`, so `Frame.Y == 0` is the top of the inline region, not the terminal.
+
+### Startup Sequence
+
+```
+Init()
+  ├─ AnsiOutput: skip CSI ?1049h (stay in primary buffer)
+  ├─ AnsiSizeMonitor: send ESC[6n (CPR) to discover cursor row
+  ├─ AnsiStartupGate: defer first render until CPR + size queries complete
+  └─ OutputBufferImpl: cells start clean (IsDirty = false)
+
+Begin(view)  /  first LayoutAndDraw()
+  ├─ Layout pass with full terminal size → measure view's desired height
+  ├─ If view doesn't fit below cursor → emit newlines to scroll terminal up
+  ├─ Set App.Screen = (0, cursorRow, termWidth, viewHeight)
+  └─ Reserve vertical space with newlines + CSI {n}A
+```
+
+The `AnsiStartupGate` ensures no drawing occurs before the terminal responds to the CPR query. If the terminal never responds, the gate times out and rendering proceeds from row 0.
+
+### Dynamic Growth
+
+When content is added at runtime (e.g. items appended to a `ListView`), `LayoutAndDraw` detects when the view's desired height exceeds `App.Screen.Height`:
+
+1. **Grow down** — use empty terminal rows below the current inline region.
+2. **Grow up** — if no room below, emit newlines to scroll the terminal and adjust `App.Screen.Y`.
+3. **Cap** — height never exceeds `Driver.Screen.Height`.
+
+### Resize Handling
+
+On terminal resize the inline region resets: `App.Screen.Y` → 0, terminal cleared (`CSI H` + `CSI 2J`), and the next `LayoutAndDraw` re-performs initial sizing from scratch. This matches the behavior of Claude Code CLI.
+
+### Output Buffer
+
+In inline mode, `ClearContents()` initializes cells with `IsDirty = false`. Only cells explicitly drawn by the app are flushed — the rest of the visible terminal stays untouched. This is what prevents the app from overwriting the user's shell output.
+
+### Clean Exit
+
+On shutdown the cursor moves to `App.Screen.Y + App.Screen.Height` (the row below the rendered region) so the shell prompt appears naturally. `CSI ?1049l` (restore alternate buffer) is **not** emitted.
+
+### Testing Inline Mode
+
+`IApplication.ForceInlinePosition` bypasses the CPR query for unit tests:
+
+```csharp
+using IApplication app = Application.Create ();
+app.AppModel = AppModel.Inline;
+app.ForceInlinePosition = new Point (0, 10);  // simulate cursor at row 10
+app.Init (DriverRegistry.Names.ANSI);
+```
+
+The `Y` component sets the terminal row. `X` is reserved for future use.
+
+### `RunnableWrapper<TView>`
+
+A convenience wrapper that runs any `View` as an `IRunnable` with `Dim.Auto` sizing — no dialog buttons added. Ideal for inline mode where the view IS the entire UI:
+
+```csharp
+RunnableWrapper<ColorPicker> wrapper = new () { Width = Dim.Fill () };
+Color? result = app.Run (wrapper).Result;
+```
+
+### Examples
+
+- `Examples/InlineCLI/` — prompt + `ListView` that grows as items are added.
+- `Examples/InlineColorPicker/` — `ColorPicker` in inline mode; returns selected color name.
 
 ## See Also
 

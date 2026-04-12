@@ -170,7 +170,7 @@ User presses Space on CheckBox
 
 ## Architecture Overview
 
-The <xref:Terminal.Gui.Input.Command> system provides a standardized framework for view actions (selecting, accepting, activating). It integrates with keyboard/mouse input handling and uses the *Cancellable Work Pattern* for extensibility and cancellation. As commands propagate through the view hierarchy, each <xref:Terminal.Gui.IValue>-implementing view appends its value to the <xref:Terminal.Gui.Input.ICommandContext.Values> chain, enabling ancestors to inspect the full value history (see [Value Propagation](#value-propagation)).
+The Command system provides a standardized framework for view actions (selecting, accepting, activating). It integrates with keyboard/mouse input handling and uses the *Cancellable Work Pattern* for extensibility and cancellation. As commands propagate through the view hierarchy, each `IValue`-implementing view appends its value to the `ICommandContext.Values` chain, enabling ancestors to inspect the full value history (see [Value Propagation](#value-propagation)).
 
 Central concepts:
 
@@ -624,7 +624,7 @@ When an inner <xref:Terminal.Gui.Views.CheckBox> activates (via click/space), th
 | **<xref:Terminal.Gui.Views.HexView>** | Removed | Removed | Not bound | Not bound | Not bound | <xref:Terminal.Gui.Input.Command.Activate> | <xref:Terminal.Gui.Input.Command.Activate> |
 | **<xref:Terminal.Gui.Views.ColorPicker>** | Not bound | Not bound | Not bound | Not bound | Not bound | Not bound (removed) | <xref:Terminal.Gui.Input.Command.Accept> |
 | **<xref:Terminal.Gui.Views.Label>** | Not bound | Not bound | Forwards to next focusable peer | Not bound | Not bound | Not bound | Not bound |
-| **<xref:Terminal.Gui.Views.TabView>** | Not bound | Not bound | <xref:Terminal.Gui.Input.Command.HotKey> | Handled by SubViews | Handled by SubViews | Handled by SubViews | Not bound |
+| **<xref:Terminal.Gui.Views.Tabs>** | Not bound | Not bound | <xref:Terminal.Gui.Input.Command.HotKey> | Handled by SubViews | Handled by SubViews | Handled by SubViews | Not bound |
 | **<xref:Terminal.Gui.Views.NumericUpDown>** | Handled by SubViews | Handled by SubViews | <xref:Terminal.Gui.Input.Command.HotKey> | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **<xref:Terminal.Gui.Views.Dialog>** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |
 | **<xref:Terminal.Gui.Views.Wizard>** | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews | Handled by SubViews |

@@ -116,9 +116,9 @@ git diff
 
 1. **Monitor CI/CD pipelines** - Ensure all checks pass
 2. **Address review feedback** promptly
-3. **Keep PR updated** with `v2_develop` if needed:
+3. **Keep PR updated** with `develop` if needed:
    ```bash
    git fetch origin
-   git rebase origin/v2_develop
+   git rebase origin/develop
    git push --force-with-lease
    ```

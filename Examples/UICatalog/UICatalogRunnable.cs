@@ -63,7 +63,23 @@ public sealed class UICatalogRunnable : Runnable
 
         _disableMouseCb?.Value = App.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
 
-        _shVersion?.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {App?.Driver?.GetVersionInfo ()}";
+        string? driverName = App.Driver?.GetName ();
+
+        _shVersion?.Title = string.IsNullOrEmpty (driverName)
+                                ? $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}"
+                                : $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {driverName}";
+
+        App.AddTimeout (TimeSpan.FromMilliseconds (100),
+                        () =>
+                        {
+                            // Kitty detection is async, so we update the shortcut in a timeout.
+                            if (App.Driver?.KittyKeyboardCapabilities?.IsSupported is true)
+                            {
+                                _shVersion?.Title += " (kitty)";
+                            }
+
+                            return false;
+                        });
 
         if (string.IsNullOrEmpty ((string?)Result))
         {
@@ -540,6 +556,10 @@ public sealed class UICatalogRunnable : Runnable
             SuperViewRendersLineCanvas = true
         };
 
+        //scenarioList.Border.Settings = BorderSettings.Title | BorderSettings.Tab;
+        //scenarioList.Border.TabSide = Side.Top;
+        //scenarioList.Border.Thickness = new Thickness (1, 2, 1, 1);
+
         // TableView provides many options for table headers. For simplicity, we turn all
         // of these off. By enabling FullRowSelect and turning off headers, TableView looks just
         // like a ListView
@@ -638,6 +658,10 @@ public sealed class UICatalogRunnable : Runnable
             Source = new ListWrapper<string> (CachedCategories)
         };
 
+        //categoryList.Border.Settings = BorderSettings.Title | BorderSettings.Tab;
+        //categoryList.Border.TabSide = Side.Top;
+        //categoryList.Border.Thickness = new Thickness (1, 2, 1, 1);
+
         categoryList.Accepting += (_, e) =>
                                   {
                                       _scenarioList?.SetFocus ();
@@ -707,6 +731,77 @@ public sealed class UICatalogRunnable : Runnable
     private Shortcut? _shVersion;
     private CheckBox? _force16ColorsShortcutCb;
 
+    /// <summary>
+    ///     Returns the first F-key (F1–F12) that is not already bound in
+    ///     <see cref="Application.KeyBindings"/>, used as the activation key for
+    ///     <see cref="MenuBar.DefaultKey"/> or <see cref="PopoverMenu.DefaultKey"/>,
+    ///     or assigned to a <see cref="MenuItem.Key"/> on a menu item. Falls back to
+    ///     <see cref="Key.F12"/> if all are taken.
+    /// </summary>
+    /// <param name="ignoreKeys"></param>
+    private Key GetFirstUnboundFKey (HashSet<Key> ignoreKeys)
+    {
+        Key [] fKeys =
+        [
+            Key.F1,
+            Key.F2,
+            Key.F3,
+            Key.F4,
+            Key.F5,
+            Key.F6,
+            Key.F7,
+            Key.F8,
+            Key.F9,
+            Key.F10,
+            Key.F11,
+            Key.F12
+        ];
+
+        // Collect keys already bound at the Application level
+        HashSet<Key> boundKeys = ignoreKeys;
+
+        foreach (Key fKey in fKeys)
+        {
+            if (App?.Keyboard.KeyBindings.TryGet (fKey, out _) is true)
+            {
+                boundKeys.Add (fKey);
+            }
+        }
+
+        // Also exclude the MenuBar and PopoverMenu activation keys
+        boundKeys.Add (MenuBar.DefaultKey);
+        boundKeys.Add (PopoverMenu.DefaultKey);
+
+        // Exclude keys used by MenuBar menu items
+        if (_menuBar is { })
+        {
+            foreach (MenuItem menuItem in _menuBar.GetMenuItemsWith (mi => mi.Key.IsValid))
+            {
+                boundKeys.Add (menuItem.Key);
+            }
+        }
+
+        // Exclude keys used by StatusBar items
+        if (_statusBar is { })
+        {
+            foreach (View view in _statusBar.SubViews)
+            {
+                var shortcut = (Shortcut)view;
+                boundKeys.Add (shortcut.Key);
+            }
+        }
+
+        foreach (Key fKey in fKeys)
+        {
+            if (!boundKeys.Contains (fKey))
+            {
+                return fKey;
+            }
+        }
+
+        return Key.F12;
+    }
+
     private StatusBar CreateStatusBar ()
     {
         StatusBar statusBar = new () { AlignmentModes = AlignmentModes.IgnoreFirstOrLast, CanFocus = false };
@@ -716,7 +811,10 @@ public sealed class UICatalogRunnable : Runnable
 
         _shVersion = new Shortcut { Title = "Version Info", CanFocus = false };
 
-        Shortcut statusBarShortcut = new () { Key = Key.F10, Title = "Show/Hide Status Bar", CanFocus = false, Action = () => ShowStatusBar = !ShowStatusBar };
+        Shortcut statusBarShortcut = new ()
+        {
+            Key = GetFirstUnboundFKey ([]), Title = "Show/Hide Status Bar", CanFocus = false, Action = () => ShowStatusBar = !ShowStatusBar
+        };
 
         _force16ColorsShortcutCb = new CheckBox
         {
@@ -729,7 +827,7 @@ public sealed class UICatalogRunnable : Runnable
             CommandView = _force16ColorsShortcutCb,
             HelpText = "",
             BindKeyToApplication = true,
-            Key = Key.F7,
+            Key = GetFirstUnboundFKey ([statusBarShortcut.Key]),
             Action = () =>
                      {
                          Driver.Force16Colors = !Driver.Force16Colors;
@@ -806,104 +904,24 @@ public sealed class UICatalogRunnable : Runnable
             Height = Dim.Auto (DimAutoStyle.Text)
         };
 
-        GradientArtView asciiArt = new () { X = Pos.Center (), Y = Pos.Bottom (tagline) + 1 };
+        Logo logo = new () { X = Pos.Center (), Y = Pos.Bottom (tagline) + 1 };
 
-        Link link = new () { Text = ABOUT_URL, Url = ABOUT_URL, X = Pos.Center (), Y = Pos.Bottom (asciiArt) + 1 };
+        View version = new ()
+        {
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+            Text = "v2 - Beta",
+            X = Pos.Center (),
+            Y = Pos.Bottom (logo) + 1
+        };
+
+        Link link = new () { Text = ABOUT_URL, Url = ABOUT_URL, X = Pos.Center (), Y = Pos.Bottom (version) + 1 };
         App?.ToolTips?.SetToolTip (link, () => link.Url);
 
-        dialog.Add (tagline, asciiArt, link);
+        dialog.Add (tagline, logo, version, link);
         dialog.Buttons.ElementAt (0).SetFocus ();
         App?.Run (dialog);
         dialog.Dispose ();
-    }
-
-    /// <summary>
-    ///     Renders the Terminal.Gui logo in box-drawing characters with a diagonal gradient.
-    /// </summary>
-    private sealed class GradientArtView : View
-    {
-        // @formatter:off
-        private const string ART = """
-                                    ╺┳╸┏━╸┏━┓┏┳┓╻┏┓╻┏━┓╻   ┏━╸╻ ╻╻
-                                     ┃ ┣╸ ┣┳┛┃┃┃┃┃┗┫┣━┫┃   ┃╺┓┃ ┃┃
-                                     ╹ ┗━╸╹┗╸╹ ╹╹╹ ╹╹ ╹┗━╸╹┗━┛┗━┛╹
-
-                                               v2 - Beta
-                                    """;
-
-        // @formatter:on
-
-        private static readonly string [] _artLines = ART.ReplaceLineEndings ("\n").Split ('\n');
-
-        public GradientArtView ()
-        {
-            int artWidth = _artLines.Select (line => line.Length).Prepend (0).Max ();
-
-            Width = artWidth;
-            Height = _artLines.Length;
-        }
-
-        /// <inheritdoc/>
-        protected override bool OnDrawingContent (DrawContext? context)
-        {
-            List<Color> stops =
-            [
-                new (0, 128, 255), // Bright Blue
-                new (0, 255, 128), // Bright Green
-                new (255, 255), // Bright Yellow
-                new (255, 128) // Bright Orange
-            ];
-
-            List<int> steps = [10];
-
-            Gradient gradient = new (stops, steps);
-
-            var artHeight = 3; // Only the box-drawing lines get the gradient
-            int artWidth = _artLines [0].Length;
-
-            Dictionary<Point, Color> colorMap = gradient.BuildCoordinateColorMapping (artHeight, artWidth, GradientDirection.Diagonal);
-
-            Attribute normalAttr = GetAttributeForRole (VisualRole.Normal);
-
-            for (var row = 0; row < _artLines.Length; row++)
-            {
-                string line = _artLines [row];
-
-                for (var col = 0; col < line.Length; col++)
-                {
-                    char ch = line [col];
-
-                    if (ch == ' ')
-                    {
-                        continue;
-                    }
-
-                    // Gradient only on the 3 art lines; version text uses normal color
-                    if (row < 3)
-                    {
-                        Point coord = new (col, row);
-
-                        if (colorMap.TryGetValue (coord, out Color color))
-                        {
-                            SetAttribute (new Attribute (color, normalAttr.Background));
-                        }
-                        else
-                        {
-                            SetAttribute (normalAttr);
-                        }
-                    }
-                    else
-                    {
-                        SetAttribute (normalAttr);
-                    }
-
-                    Move (col, row);
-                    AddStr (ch.ToString ());
-                }
-            }
-
-            return true;
-        }
     }
 
     /// <summary>

@@ -22,6 +22,7 @@ Welcome to the Terminal.Gui documentation! This comprehensive guide covers every
 - [ANSI Handling](~/docs/ansihandling.md) - Terminal escape sequence parsing, encoding, and state management
 - [Application](~/docs/application.md) - Application lifecycle, initialization, and main loop
 - [Arrangement](~/docs/arrangement.md) - View arrangement and positioning strategies
+- [Borders](~/docs/borders.md) - Border rendering, tab headers, LineCanvas auto-join, and focus-aware styling
 - [Cancellable Work Pattern](~/docs/cancellable-work-pattern.md) - Core design pattern for extensible workflows
 - [Command](~/docs/command.md) - Command execution, key bindings, and the Activating/Accepting concepts
 - [Command Diagrams](~/docs/command-diagrams.md) - Visual diagrams of command flow and processing

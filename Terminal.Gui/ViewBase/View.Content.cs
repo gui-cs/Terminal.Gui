@@ -102,7 +102,7 @@ public partial class View
         GetAutoWidth () - GetAdornmentsThickness ().Horizontal;
 
     /// <summary>
-    ///     Gets the natural (auto-size) width of the view as calculated by <see cref="Dim.Auto ()"/>.
+    ///     Gets the natural (auto-size) width of the view as calculated by <see cref="Dim.Auto"/>.
     /// </summary>
     /// <remarks>
     ///     The returned width is the full auto-calculated width for the view, including adornment thickness.
@@ -114,7 +114,7 @@ public partial class View
     public int GetAutoWidth () => Dim.Auto ().Calculate (0, GetContainerSize ().Width, this, Dimension.Width);
 
     /// <summary>
-    ///     Gets the natural (auto-size) height of the view as calculated by <see cref="Dim.Auto ()"/>.
+    ///     Gets the natural (auto-size) height of the view as calculated by <see cref="Dim.Auto"/>.
     /// </summary>
     /// <remarks>
     ///     The returned height is the full auto-calculated height for the view, including adornment thickness.
@@ -551,7 +551,7 @@ public partial class View
     ///     Helper to get the X and Y offset of the Viewport from the Frame. This is the sum of the Left and Top properties
     ///     of <see cref="Margin"/>, <see cref="Border"/> and <see cref="Padding"/>.
     /// </summary>
-    public Point GetViewportOffsetFromFrame () => Padding is null ? Point.Empty : Padding.Thickness.GetInside (Padding.GetFrame ()).Location;
+    public Point GetViewportOffsetFromFrame () => Padding.Thickness.GetInside (Padding.GetFrame ()).Location;
 
     /// <summary>
     ///     Scrolls the view vertically by the specified number of rows.

@@ -67,6 +67,7 @@ public sealed class ViewportSettingsEditor : EditorBase
         _cbClearContentOnly?.Value = ViewToEdit!.ViewportSettings.HasFlag (ViewportSettingsFlags.ClearContentOnly) ? CheckState.Checked : CheckState.UnChecked;
 
         _cbClipContentOnly?.Value = ViewToEdit!.ViewportSettings.HasFlag (ViewportSettingsFlags.ClipContentOnly) ? CheckState.Checked : CheckState.UnChecked;
+
         _cbTransparent?.Value = ViewToEdit!.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) ? CheckState.Checked : CheckState.UnChecked;
 
         _cbTransparentMouse?.Value = ViewToEdit!.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse) ? CheckState.Checked : CheckState.UnChecked;

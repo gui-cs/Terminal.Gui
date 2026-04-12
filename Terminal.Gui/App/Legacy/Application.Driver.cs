@@ -8,4 +8,10 @@ public static partial class Application // Driver abstractions
 
     /// <summary>Raised when <see cref="ForceDriver"/> changes.</summary>
     public static event EventHandler<ValueChangedEventArgs<string>>? ForceDriverChanged;
+
+    /// <summary>Raised when <see cref="AppModel"/> changes.</summary>
+    public static event EventHandler<ValueChangedEventArgs<AppModel>>? AppModelChanged;
+
+    /// <summary>Raised when <see cref="ForceInlinePosition"/> changes.</summary>
+    public static event EventHandler<ValueChangedEventArgs<Point?>>? ForceInlinePositionChanged;
 }

@@ -26,7 +26,8 @@ public class OutputBufferImpl : IOutputBuffer
     public Attribute CurrentAttribute { get; set; }
 
     /// <summary>
-    ///     Gets or sets the URL that will be associated with cells added via <see cref="AddRune(Rune)"/> or <see cref="AddStr(string)"/>.
+    ///     Gets or sets the URL that will be associated with cells added via <see cref="AddRune(Rune)"/> or
+    ///     <see cref="AddStr(string)"/>.
     ///     When set, subsequent cells will include this URL for OSC 8 hyperlink rendering.
     /// </summary>
     public string? CurrentUrl { get; set; }
@@ -43,10 +44,7 @@ public class OutputBufferImpl : IOutputBuffer
     /// <param name="col">The column.</param>
     /// <param name="row">The row.</param>
     /// <returns>The URL if one exists, otherwise null.</returns>
-    public string? GetCellUrl (int col, int row)
-    {
-        return _urlMap?.TryGetValue (new Point (col, row), out string? url) == true ? url : null;
-    }
+    public string? GetCellUrl (int col, int row) => _urlMap?.TryGetValue (new Point (col, row), out string? url) == true ? url : null;
 
     /// <summary>
     ///     Sets the URL for the cell at the specified position.
@@ -102,11 +100,8 @@ public class OutputBufferImpl : IOutputBuffer
 
     private Rune _column1ReplacementChar = Glyphs.WideGlyphReplacement;
 
-    /// <inheritdoc />
-    public void SetWideGlyphReplacement (Rune column1ReplacementChar)
-    {
-        _column1ReplacementChar = column1ReplacementChar;
-    }
+    /// <inheritdoc/>
+    public void SetWideGlyphReplacement (Rune column1ReplacementChar) => _column1ReplacementChar = column1ReplacementChar;
 
     /// <summary>
     ///     Indicates which lines have been modified and need to be redrawn.
@@ -155,14 +150,14 @@ public class OutputBufferImpl : IOutputBuffer
     ///     </para>
     /// </remarks>
     /// <param name="rune">Text to add.</param>
-    public void AddRune (Rune rune) { AddStr (rune.ToString ()); }
+    public void AddRune (Rune rune) => AddStr (rune.ToString ());
 
     /// <summary>
     ///     Adds the specified <see langword="char"/> to the display at the current cursor position. This method is a
     ///     convenience method that calls <see cref="AddRune(Rune)"/> with the <see cref="Rune"/> constructor.
     /// </summary>
     /// <param name="c">Character to add.</param>
-    public void AddRune (char c) { AddRune (new Rune (c)); }
+    public void AddRune (char c) => AddRune (new Rune (c));
 
     /// <summary>Adds the <paramref name="str"/> to the display at the cursor position.</summary>
     /// <remarks>
@@ -193,7 +188,7 @@ public class OutputBufferImpl : IOutputBuffer
             return;
         }
 
-        Clip ??= new (Screen);
+        Clip ??= new Region (Screen);
         Rectangle clipRect = Clip!.GetBounds ();
 
         int printableGraphemeWidth = -1;
@@ -217,26 +212,28 @@ public class OutputBufferImpl : IOutputBuffer
             // Keep Col/Row updates inside the lock to prevent race conditions
             Col++;
 
-            if (printableGraphemeWidth > 1)
+            if (printableGraphemeWidth <= 1)
             {
-                // Skip the second column of a wide character
-                // See issue: https://github.com/gui-cs/Terminal.Gui/issues/4492
-                // Test: AddStr_WideGlyph_Second_Column_Attribute_Outputs_Correctly
-                // Test: AddStr_WideGlyph_Second_Column_Attribute_Set_When_In_Clip
-                if (Clip.Contains (Col, Row))
-                {
-                    // Mark dirty only if the attribute is actually changing, to avoid
-                    // invalidating overlapped content unnecessarily (see #4258).
-                    if (Contents [Row, Col].Attribute != CurrentAttribute)
-                    {
-                        Contents [Row, Col].Attribute = CurrentAttribute;
-                        Contents [Row, Col].IsDirty = true;
-                    }
-                }
-
-                // Advance cursor again for wide character
-                Col++;
+                return;
             }
+
+            // Skip the second column of a wide character
+            // See issue: https://github.com/gui-cs/Terminal.Gui/issues/4492
+            // Test: AddStr_WideGlyph_Second_Column_Attribute_Outputs_Correctly
+            // Test: AddStr_WideGlyph_Second_Column_Attribute_Set_When_In_Clip
+            if (Clip.Contains (Col, Row))
+            {
+                // Mark dirty only if the attribute is actually changing, to avoid
+                // invalidating overlapped content unnecessarily (see #4258).
+                if (Contents [Row, Col].Attribute != CurrentAttribute)
+                {
+                    Contents [Row, Col].Attribute = CurrentAttribute;
+                    Contents [Row, Col].IsDirty = true;
+                }
+            }
+
+            // Advance cursor again for wide character
+            Col++;
         }
     }
 
@@ -265,11 +262,12 @@ public class OutputBufferImpl : IOutputBuffer
     /// <param name="row">The row.</param>
     private void InvalidateOverlappedWideGlyph (int col, int row)
     {
-        if (col > 0 && Contents! [row, col - 1].Grapheme.GetColumns () > 1)
+        if (col <= 0 || Contents! [row, col - 1].Grapheme.GetColumns () <= 1)
         {
-            Contents [row, col - 1].Grapheme = _column1ReplacementChar.ToString ();
-            Contents [row, col - 1].IsDirty = true;
+            return;
         }
+        Contents [row, col - 1].Grapheme = _column1ReplacementChar.ToString ();
+        Contents [row, col - 1].IsDirty = true;
     }
 
     /// <summary>
@@ -332,6 +330,7 @@ public class OutputBufferImpl : IOutputBuffer
     private void WriteWideGrapheme (int col, int row, string grapheme)
     {
         Debug.Assert (grapheme.GetColumns () == 2);
+
         if (!Clip!.Contains (col + 1, row))
         {
             // Second column is outside clip - can't fit wide char here
@@ -351,14 +350,31 @@ public class OutputBufferImpl : IOutputBuffer
         }
     }
 
+    /// <summary>
+    ///     Gets or sets a value indicating whether this buffer is operating in inline mode.
+    ///     When <see langword="true"/>, <see cref="ClearContents()"/> initialises cells with
+    ///     <c>IsDirty = false</c> so that only cells explicitly drawn are flushed to the
+    ///     terminal, leaving the rest of the visible terminal untouched.
+    /// </summary>
+    public bool InlineMode { get; set; }
+
     /// <summary>Clears the <see cref="Contents"/> of the driver.</summary>
-    public void ClearContents ()
+    public void ClearContents () => ClearContents (!InlineMode);
+
+    /// <summary>Clears the <see cref="Contents"/> of the driver.</summary>
+    /// <param name="initiallyDirty">
+    ///     When <see langword="true"/> (the default), all cells are marked dirty so the first render
+    ///     overwrites the entire screen. When <see langword="false"/> (used in inline mode), cells start
+    ///     clean so only cells that are explicitly drawn will be flushed, leaving the rest of the terminal
+    ///     untouched.
+    /// </param>
+    public void ClearContents (bool initiallyDirty)
     {
         Contents = new Cell [Rows, Cols];
 
         // CONCURRENCY: Unsynchronized access to Clip isn't safe.
         // TODO: ClearContents should not clear the clip; it should only clear the contents. Move clearing it elsewhere.
-        Clip = new (Screen);
+        Clip = new Region (Screen);
 
         DirtyLines = new bool [Rows];
 
@@ -371,15 +387,10 @@ public class OutputBufferImpl : IOutputBuffer
             {
                 for (var c = 0; c < Cols; c++)
                 {
-                    Contents [row, c] = new ()
-                    {
-                        Grapheme = " ",
-                        Attribute = new Attribute (Color.White, Color.Black),
-                        IsDirty = true
-                    };
+                    Contents [row, c] = new Cell { Grapheme = " ", Attribute = new Attribute (Color.White, Color.Black), IsDirty = initiallyDirty };
                 }
 
-                DirtyLines [row] = true;
+                DirtyLines [row] = initiallyDirty;
             }
         }
     }
@@ -411,6 +422,7 @@ public class OutputBufferImpl : IOutputBuffer
     public void FillRect (Rectangle rect, Rune rune)
     {
         Rectangle clipBounds = Clip?.GetBounds () ?? Screen;
+
         // BUGBUG: This should be a method on Region
         rect = Rectangle.Intersect (rect, clipBounds);
 

@@ -175,7 +175,13 @@ internal class ShadowView : View
             return Attribute.Default;
         }
 
-        Attribute attr = ScreenContents [location.Y, location.X].Attribute!.Value;
+        Attribute? attribute = ScreenContents [location.Y, location.X].Attribute;
+
+        if (attribute is null)
+        {
+            return Attribute.Default;
+        }
+        Attribute attr = attribute.Value;
 
         var newAttribute = new Attribute (ShadowStyle == ShadowStyles.Opaque ? Color.Black : attr.Foreground.GetDimmerColor (),
                                           ShadowStyle == ShadowStyles.Opaque ? attr.Background : attr.Background.GetDimmerColor (0.05),

@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Terminal.Gui.Drivers;
@@ -9,7 +10,7 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class KittyKeyboardPattern : AnsiKeyboardParserPattern
 {
-    private readonly Regex _pattern = new (@"^\u001b\[(\d+)(?::(\d+))?(?::(\d+))?(?:;([^;u]+)(?:;[^u]*)?)?u$");
+    private readonly Regex _pattern = new (@"^\u001b\[(\d+)(?::(\d*))?(?::(\d*))?(?:;([^;u]*))?(?:;([^u]+))?u$");
 
     private readonly Dictionary<int, Key> _functionalKeyMap = new ()
     {
@@ -52,7 +53,17 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
         { 57384, Key.F21 },
         { 57385, Key.F22 },
         { 57386, Key.F23 },
-        { 57387, Key.F24 }
+        { 57387, Key.F24 },
+        { 57417, Key.CursorLeft },
+        { 57418, Key.CursorRight },
+        { 57419, Key.CursorUp },
+        { 57420, Key.CursorDown },
+        { 57421, Key.PageUp },
+        { 57422, Key.PageDown },
+        { 57423, Key.Home },
+        { 57424, Key.End },
+        { 57425, Key.InsertChar },
+        { 57426, Key.Delete }
     };
 
     /// <inheritdoc/>
@@ -98,14 +109,118 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
             baseLayoutKeyCode = (KeyCode)baseCode;
         }
 
-        if (shiftedKeyCode != KeyCode.Null || baseLayoutKeyCode != KeyCode.Null)
+        string associatedText = string.Empty;
+
+        if (match.Groups [5].Success)
         {
-            key = new Key (key) { ShiftedKeyCode = shiftedKeyCode, BaseLayoutKeyCode = baseLayoutKeyCode };
+            associatedText = ParseAssociatedText (match.Groups [5].Value);
+        }
+
+        if (shiftedKeyCode != KeyCode.Null || baseLayoutKeyCode != KeyCode.Null || !string.IsNullOrEmpty (associatedText))
+        {
+            key = new Key (key) { ShiftedKeyCode = shiftedKeyCode, BaseLayoutKeyCode = baseLayoutKeyCode, AssociatedText = associatedText };
         }
 
         string modifierField = match.Groups [4].Value;
 
+        if (!string.IsNullOrEmpty (modifierField))
+        {
+            (key, modifierField) = NormalizeShiftedPrintableKey (key, modifierField);
+        }
+
         return string.IsNullOrEmpty (modifierField) ? key : ApplyModifiersAndEventType (modifierField, key);
+    }
+
+    private static string ParseAssociatedText (string textField)
+    {
+        if (string.IsNullOrEmpty (textField))
+        {
+            return string.Empty;
+        }
+
+        string [] codePoints = textField.Split (':', StringSplitOptions.RemoveEmptyEntries);
+
+        if (codePoints.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        StringBuilder builder = new ();
+
+        foreach (string codePoint in codePoints)
+        {
+            if (!int.TryParse (codePoint, CultureInfo.InvariantCulture, out int value) || !Rune.IsValid (value))
+            {
+                return string.Empty;
+            }
+
+            builder.Append (new Rune (value).ToString ());
+        }
+
+        return builder.ToString ();
+    }
+
+    private static (Key Key, string ModifierField) NormalizeShiftedPrintableKey (Key key, string modifierField)
+    {
+        string [] parts = modifierField.Split (':');
+
+        if (parts.Length == 0
+            || !int.TryParse (parts [0], CultureInfo.InvariantCulture, out int encodedModifiers)
+            || encodedModifiers <= 1)
+        {
+            return (key, modifierField);
+        }
+
+        int modifiers = encodedModifiers - 1;
+
+        if ((modifiers & 0b1) == 0)
+        {
+            return (key, modifierField);
+        }
+
+        Rune printableRune = default (Rune);
+
+        if (!string.IsNullOrEmpty (key.AssociatedText))
+        {
+            StringRuneEnumerator enumerator = key.AssociatedText.EnumerateRunes ();
+
+            if (enumerator.MoveNext ())
+            {
+                printableRune = enumerator.Current;
+
+                if (enumerator.MoveNext () || Rune.IsControl (printableRune))
+                {
+                    printableRune = default (Rune);
+                }
+            }
+        }
+
+        if (printableRune == default (Rune) && key.ShiftedKeyCode != KeyCode.Null)
+        {
+            Rune shiftedRune = Key.ToRune (key.ShiftedKeyCode);
+
+            if (!Rune.IsControl (shiftedRune))
+            {
+                printableRune = shiftedRune;
+            }
+        }
+
+        if (printableRune == default (Rune))
+        {
+            return (key, modifierField);
+        }
+
+        Key printableKey = new (printableRune.Value)
+        {
+            ShiftedKeyCode = key.ShiftedKeyCode,
+            BaseLayoutKeyCode = key.BaseLayoutKeyCode,
+            AssociatedText = key.AssociatedText
+        };
+
+        int normalizedEncodedModifiers = encodedModifiers - 1;
+        parts [0] = normalizedEncodedModifiers.ToString (CultureInfo.InvariantCulture);
+
+        return (printableKey, string.Join (':', parts));
     }
 
     /// <summary>
@@ -126,6 +241,9 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
         { 57447, ModifierKey.RightShift },
         { 57448, ModifierKey.RightCtrl },
         { 57449, ModifierKey.RightAlt },
+        // 57453 = ISO_Level3_Shift (AltGr). Treat it as a dedicated modifier so
+        // standalone AltGr does not fall through as a printable Private Use Area rune.
+        { 57453, ModifierKey.AltGr },
         { 57450, ModifierKey.RightSuper },
         { 57451, ModifierKey.RightHyper }
 
