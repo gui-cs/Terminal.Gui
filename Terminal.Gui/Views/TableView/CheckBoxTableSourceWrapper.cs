@@ -159,7 +159,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
         }
 
         // we only care about clicks (not movements)
-        if (!mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+        if (!mouse.Flags.FastHasFlags (MouseFlags.LeftButtonClicked))
         {
             return;
         }

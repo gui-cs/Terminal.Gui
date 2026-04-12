@@ -1273,8 +1273,8 @@ public partial class View // Layout APIs
     {
         List<View?> viewsUnderLocation = GetViewsAtLocation (root, screenLocation);
 
-        if (!excludeViewportSettingsFlags.HasFlag (ViewportSettingsFlags.Transparent)
-            && !excludeViewportSettingsFlags.HasFlag (ViewportSettingsFlags.TransparentMouse))
+        if (!excludeViewportSettingsFlags.FastHasFlags (ViewportSettingsFlags.Transparent)
+            && !excludeViewportSettingsFlags.FastHasFlags (ViewportSettingsFlags.TransparentMouse))
         {
             // Only filter views if we are excluding transparent views.
             return viewsUnderLocation;

@@ -111,7 +111,7 @@ public class MarginView : AdornmentView
 
             if (view.Margin.View is MarginView marginView
                 && view.Margin.Thickness != Thickness.Empty
-                && marginView.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)
+                && marginView.ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent)
                 && marginView.GetCachedClip () != null)
             {
                 marginView.SetNeedsDraw ();
@@ -165,7 +165,7 @@ public class MarginView : AdornmentView
     }
 
     /// <inheritdoc/>
-    protected override bool OnDrawingText () => ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
+    protected override bool OnDrawingText () => ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent);
 
     #region Shadow
 
@@ -343,15 +343,15 @@ public class MarginView : AdornmentView
             return;
         }
 
-        bool pressed = args.Value.HasFlag (MouseState.Pressed) && parent.MouseHighlightStates.HasFlag (MouseState.Pressed);
-        bool pressedOutside = args.Value.HasFlag (MouseState.PressedOutside) && parent.MouseHighlightStates.HasFlag (MouseState.PressedOutside);
+        bool pressed = args.Value.FastHasFlags (MouseState.Pressed) && parent.MouseHighlightStates.FastHasFlags (MouseState.Pressed);
+        bool pressedOutside = args.Value.FastHasFlags (MouseState.PressedOutside) && parent.MouseHighlightStates.FastHasFlags (MouseState.PressedOutside);
 
         if (pressedOutside)
         {
             pressed = false;
         }
 
-        if (MouseState.HasFlag (MouseState.Pressed) && !pressed)
+        if (MouseState.FastHasFlags (MouseState.Pressed) && !pressed)
         {
             // If the view is pressed and the highlight is being removed, move the shadow back.
             // Note, for visual effects reasons, we only move horizontally.
@@ -372,7 +372,7 @@ public class MarginView : AdornmentView
             return;
         }
 
-        if (MouseState.HasFlag (MouseState.Pressed) || !pressed)
+        if (MouseState.FastHasFlags (MouseState.Pressed) || !pressed)
         {
             return;
         }

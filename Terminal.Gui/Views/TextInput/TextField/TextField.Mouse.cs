@@ -18,9 +18,9 @@ public partial class TextField
     protected override bool OnMouseEvent (Mouse ev)
     {
         if (ev is { IsPressed: false, IsReleased: false }
-            && !ev.Flags.HasFlag (MouseFlags.PositionReport)
-            && !ev.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
-            && !ev.Flags.HasFlag (MouseFlags.LeftButtonTripleClicked)
+            && !ev.Flags.FastHasFlags (MouseFlags.PositionReport)
+            && !ev.Flags.FastHasFlags (MouseFlags.LeftButtonDoubleClicked)
+            && !ev.Flags.FastHasFlags (MouseFlags.LeftButtonTripleClicked)
             && ContextMenu is { }
             && !ev.Flags.HasFlag (ContextMenu.MouseFlags))
         {

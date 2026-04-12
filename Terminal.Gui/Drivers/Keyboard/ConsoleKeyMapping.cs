@@ -251,17 +251,17 @@ public static class ConsoleKeyMapping
         // BUGFIX: Only set Shift if ShiftMask is explicitly set.
         // KeyCode.A-Z (65-90) represent UNSHIFTED keys, even though their numeric values
         // match uppercase ASCII characters. Do NOT check char.IsUpper!
-        if (key.HasFlag (KeyCode.ShiftMask))
+        if (key.FastHasFlags (KeyCode.ShiftMask))
         {
             modifiers |= ConsoleModifiers.Shift;
         }
 
-        if (key.HasFlag (KeyCode.AltMask))
+        if (key.FastHasFlags (KeyCode.AltMask))
         {
             modifiers |= ConsoleModifiers.Alt;
         }
 
-        if (key.HasFlag (KeyCode.CtrlMask))
+        if (key.FastHasFlags (KeyCode.CtrlMask))
         {
             modifiers |= ConsoleModifiers.Control;
         }
