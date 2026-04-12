@@ -157,13 +157,13 @@ Lets the user pick a date from a visual calendar.
 
 <pre style='color:#FFFFFF;background:#000000'>
 <span style='color:#FFFFFF;background:#000000'>┌─────────────────────────────┐</span>
-<span style='color:#FFFFFF;background:#000000'>│Date: </span><span style='color:#000000;background:#FFFFFF'>0</span><span style='color:#FFFFFF;background:#808080'>4/08/2026             </span><span style='color:#FFFFFF;background:#000000'>│</span>
+<span style='color:#FFFFFF;background:#000000'>│Date: </span><span style='color:#000000;background:#FFFFFF'>0</span><span style='color:#FFFFFF;background:#808080'>4/13/2026             </span><span style='color:#FFFFFF;background:#000000'>│</span>
 <span style='color:#FFFFFF;background:#000000'>│┌───┬───┬───┬───┬───┬───┬───┐│</span>
 <span style='color:#FFFFFF;background:#000000'>││Sun│Mon│Tue│Wed│Thu│Fri│Sat││</span>
 <span style='color:#FFFFFF;background:#000000'>│├───┼───┼───┼───┼───┼───┼───┤│</span>
 <span style='color:#FFFFFF;background:#000000'>││-  │-  │-  │1  │2  │3  │4  ││</span>
-<span style='color:#FFFFFF;background:#000000'>││5  │6  │7  │</span><span style='color:#000000;background:#808080;font-weight:900'>8  </span><span style='color:#FFFFFF;background:#000000'>│9  │10 │11 ││</span>
-<span style='color:#FFFFFF;background:#000000'>││12 │13 │14 │15 │16 │17 │18 ││</span>
+<span style='color:#FFFFFF;background:#000000'>││5  │6  │7  │8  │9  │10 │11 ││</span>
+<span style='color:#FFFFFF;background:#000000'>││12 │</span><span style='color:#000000;background:#808080;font-weight:900'>13 </span><span style='color:#FFFFFF;background:#000000'>│14 │15 │16 │17 │18 ││</span>
 <span style='color:#FFFFFF;background:#000000'>││19 │20 │21 │22 │23 │24 │25 ││</span>
 <span style='color:#FFFFFF;background:#000000'>││26 │27 │28 │29 │30 │-  │-  ││</span>
 <span style='color:#FFFFFF;background:#000000'>││-  │-  │-  │-  │-  │-  │-  ││</span>
@@ -180,8 +180,8 @@ A modal dialog window with buttons across the bottom. When a button is pressed, 
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-┏┥<span style='color:#282828;background:#FAFAFA'>Dialog Title</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style='text-decoration:underline 1px solid'>E</span>xample: <span style='color:#000000;background:#808080;font-weight:900'>Type and press ENTER to accept.</span><span style='color:#FAFAFA;background:#7A7A7A'>         </span>▼┃
+┏┥<span style='color:#000000;background:#D3D7CF'>Dialog Title</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style='text-decoration:underline 1px solid'>E</span>xample: <span style='color:#000000;background:#FFFFFF;font-weight:900'>Type and press ENTER to accept.</span><span style='color:#D3D7CF;background:#52594A'>         </span>▼┃
 ┃                                                  ┃
 ┃                               ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧ ⟦► <span style='text-decoration:underline 1px solid'>O</span>K ◄⟧┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -220,23 +220,23 @@ The base-class for <xref:Terminal.Gui.Views.OpenDialog> and <xref:Terminal.Gui.V
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-┏┥<span style='color:#282828;background:#FAFAFA'>Open</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style='color:#000000;background:#808080;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#FAFAFA;background:#7A7A7A'>                                   </span>┃
+┏┥<span style='color:#000000;background:#D3D7CF'>Open</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style='color:#000000;background:#FFFFFF;font-weight:900'>C:\Users\Tig\s\gui-cs\pr-4912-enums\docfx</span><span style='color:#D3D7CF;background:#52594A'>                                  </span>┃
 ┃⟦▲⟧                                                                        ┃
 ┃┌────────────────────┬──────────┬──────────────────────────────┬───────────┃
 ┃│Filename (▲)        │Size      │Modified                      │Type       ┃
 ┃├────────────────────┼──────────┼──────────────────────────────┼───────────┃
 ┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                              │&lt;Directory&gt;</span>┃
-┃│\_exported_templates│          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
-┃│\_site              │          │2026-04-08T10:48:11           │&lt;Directory&gt;┃
-┃│\api                │          │2026-04-08T10:47:33           │&lt;Directory&gt;┃
-┃│\apispec            │          │2026-03-10T11:11:00           │&lt;Directory&gt;┃
-┃│\docs               │          │2026-04-08T10:50:05           │&lt;Directory&gt;┃
-┃│\images             │          │2026-03-04T13:02:07           │&lt;Directory&gt;┃
-┃│\includes           │          │2026-04-08T07:55:52           │&lt;Directory&gt;┃
-┃│\schemas            │          │2026-03-26T14:39:08           │&lt;Directory&gt;┃
-┃│\scripts            │          │2026-04-08T07:55:52           │&lt;Directory&gt;┃
-┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14           │.png       ┃
+┃│\_exported_templates│          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\_site              │          │2026-04-13T08:05:26           │&lt;Directory&gt;┃
+┃│\api                │          │2026-04-13T08:04:28           │&lt;Directory&gt;┃
+┃│\apispec            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\docs               │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\images             │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\includes           │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\schemas            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\scripts            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│aboutbox.png        │14.06 KB  │2026-04-13T06:57:40           │.png       ┃
 ┃                                                                           ┃
 ┃⟦►<span style='text-decoration:underline 1px solid'>T</span>ree⟧                                                  ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧⟦► <span style='text-decoration:underline 1px solid'>O</span>K ◄⟧┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -559,23 +559,23 @@ Provides an interactive <xref:Terminal.Gui.Views.Dialog> for selecting files or 
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-┏┥<span style='color:#282828;background:#FAFAFA'>Open</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style='color:#000000;background:#808080;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#FAFAFA;background:#7A7A7A'>                                   </span>┃
+┏┥<span style='color:#000000;background:#D3D7CF'>Open</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style='color:#000000;background:#FFFFFF;font-weight:900'>C:\Users\Tig\s\gui-cs\pr-4912-enums\docfx</span><span style='color:#D3D7CF;background:#52594A'>                                  </span>┃
 ┃⟦▲⟧                                                                        ┃
 ┃┌────────────────────┬──────────┬──────────────────────────────┬───────────┃
 ┃│Filename (▲)        │Size      │Modified                      │Type       ┃
 ┃├────────────────────┼──────────┼──────────────────────────────┼───────────┃
 ┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                              │&lt;Directory&gt;</span>┃
-┃│\_exported_templates│          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
-┃│\_site              │          │2026-04-08T10:48:11           │&lt;Directory&gt;┃
-┃│\api                │          │2026-04-08T10:47:33           │&lt;Directory&gt;┃
-┃│\apispec            │          │2026-03-10T11:11:00           │&lt;Directory&gt;┃
-┃│\docs               │          │2026-04-08T10:50:05           │&lt;Directory&gt;┃
-┃│\images             │          │2026-03-04T13:02:07           │&lt;Directory&gt;┃
-┃│\includes           │          │2026-04-08T07:55:52           │&lt;Directory&gt;┃
-┃│\schemas            │          │2026-03-26T14:39:08           │&lt;Directory&gt;┃
-┃│\scripts            │          │2026-04-08T07:55:52           │&lt;Directory&gt;┃
-┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14           │.png       ┃
+┃│\_exported_templates│          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\_site              │          │2026-04-13T08:05:26           │&lt;Directory&gt;┃
+┃│\api                │          │2026-04-13T08:04:28           │&lt;Directory&gt;┃
+┃│\apispec            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\docs               │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\images             │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\includes           │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\schemas            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\scripts            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│aboutbox.png        │14.06 KB  │2026-04-13T06:57:40           │.png       ┃
 ┃                                                                           ┃
 ┃⟦►<span style='text-decoration:underline 1px solid'>T</span>ree⟧                                                  ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧⟦► <span style='text-decoration:underline 1px solid'>O</span>K ◄⟧┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -661,7 +661,7 @@ Base implementation of <xref:Terminal.Gui.App.IRunnable> for views that can be r
 
 <pre style='color:#FFFFFF;background:#000000'>
 ┌┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
-┊<span style='color:#282828;background:#FAFAFA'>This is some demo text.</span>                                                       ┊
+┊<span style='color:#000000;background:#D3D7CF'>This is some demo text.</span>                                                       ┊
 ┊                                                                              ┊
 ┊                                                                              ┊
 ┊                                                                              ┊
@@ -690,29 +690,35 @@ Base implementation of <xref:Terminal.Gui.App.IRunnable%601> for views that can 
 
 
 
+## [RunnableWrapper\<T\>](xref:Terminal.Gui.Views.RunnableWrapper`2)
+
+Wraps any <xref:Terminal.Gui.ViewBase.View> to make it runnable with a typed result without adding dialog buttons.
+
+
+
 ## [SaveDialog](xref:Terminal.Gui.Views.SaveDialog)
 
 Provides an interactive <xref:Terminal.Gui.Views.Dialog> for selecting files or directories for saving
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-┏┥<span style='color:#282828;background:#FAFAFA'>Save</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style='color:#000000;background:#808080;font-weight:900'>C:\Users\Tig\s\gui-cs\Terminal.Gui\docfx</span><span style='color:#FAFAFA;background:#7A7A7A'>                                   </span>┃
+┏┥<span style='color:#000000;background:#D3D7CF'>Save</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style='color:#000000;background:#FFFFFF;font-weight:900'>C:\Users\Tig\s\gui-cs\pr-4912-enums\docfx</span><span style='color:#D3D7CF;background:#52594A'>                                  </span>┃
 ┃⟦▲⟧                                                                        ┃
 ┃┌────────────────────┬──────────┬──────────────────────────────┬───────────┃
 ┃│Filename (▲)        │Size      │Modified                      │Type       ┃
 ┃├────────────────────┼──────────┼──────────────────────────────┼───────────┃
 ┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                              │&lt;Directory&gt;</span>┃
-┃│\_exported_templates│          │2025-09-12T12:16:14           │&lt;Directory&gt;┃
-┃│\_site              │          │2026-04-08T10:48:11           │&lt;Directory&gt;┃
-┃│\api                │          │2026-04-08T10:47:33           │&lt;Directory&gt;┃
-┃│\apispec            │          │2026-03-10T11:11:00           │&lt;Directory&gt;┃
-┃│\docs               │          │2026-04-08T10:50:05           │&lt;Directory&gt;┃
-┃│\images             │          │2026-03-04T13:02:07           │&lt;Directory&gt;┃
-┃│\includes           │          │2026-04-08T07:55:52           │&lt;Directory&gt;┃
-┃│\schemas            │          │2026-03-26T14:39:08           │&lt;Directory&gt;┃
-┃│\scripts            │          │2026-04-08T07:55:52           │&lt;Directory&gt;┃
-┃│aboutbox.png        │14.06 KB  │2025-09-12T12:16:14           │.png       ┃
+┃│\_exported_templates│          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\_site              │          │2026-04-13T08:05:26           │&lt;Directory&gt;┃
+┃│\api                │          │2026-04-13T08:04:28           │&lt;Directory&gt;┃
+┃│\apispec            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\docs               │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\images             │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\includes           │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\schemas            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\scripts            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│aboutbox.png        │14.06 KB  │2026-04-13T06:57:40           │.png       ┃
 ┃                                                                           ┃
 ┃⟦►<span style='text-decoration:underline 1px solid'>T</span>ree⟧                                                ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧⟦► <span style='text-decoration:underline 1px solid'>S</span>ave ◄⟧┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -993,7 +999,7 @@ An overlapped container for other views with a border and optional title.
 
 <pre style='color:#FFFFFF;background:#000000'>
 ┌──────────────────────────────────────────────────────────────────────────────┐
-│<span style='color:#282828;background:#FAFAFA'>This is some demo text.</span>                                                       │
+│<span style='color:#000000;background:#D3D7CF'>This is some demo text.</span>                                                       │
 │                                                                              │
 │                                                                              │
 │                                                                              │
@@ -1022,18 +1028,18 @@ A multi-step dialog for collecting related data across sequential steps.
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-┌┤<span style='color:#282828;background:#FAFAFA'>Wizard Title - Example Step</span>├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
-┊<span style='text-decoration:underline 1px solid'>E</span>nter Text: <span style='color:#FAFAFA;background:#7A7A7A'>                    </span>                  <span style='color:#E0E0E0;background:#7A7A7A'>This is some help text  </span>┊
-┊                                                  <span style='color:#E0E0E0;background:#7A7A7A'>for the WizardStep.     </span>┊
-┊    <span style='text-decoration:underline 1px solid'>A</span> List: ┌╌╌╌╌╌╌╌╌┐                            <span style='color:#E0E0E0;background:#7A7A7A'>You can provide         </span>┊
-┊            ┆<span style='color:#000000;background:#808080;font-weight:900'>Item 1  </span>┆                            <span style='color:#E0E0E0;background:#7A7A7A'>instructions or         </span>┊
-┊            ┆Item 2  ┆                            <span style='color:#E0E0E0;background:#7A7A7A'>information to guide the</span>┊
-┊            ┆Item 3  ┆                            <span style='color:#E0E0E0;background:#7A7A7A'>user through this step  </span>┊
-┊            ┆Item 4  ┆                            <span style='color:#E0E0E0;background:#7A7A7A'>of the wizard.          </span>┊
-┊            ┆Item 5  ┆                            <span style='color:#E0E0E0;background:#7A7A7A'>                        </span>┊
-┊            └╌╌╌╌╌╌╌╌┘                            <span style='color:#E0E0E0;background:#7A7A7A'>                        </span>┊
-┊                                                  <span style='color:#E0E0E0;background:#7A7A7A'>                        </span>┊
-┊                                                  <span style='color:#E0E0E0;background:#7A7A7A'>                        </span>┊
+┌┤<span style='color:#000000;background:#D3D7CF'>Wizard Title - Example Step</span>├┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┐
+┊<span style='text-decoration:underline 1px solid'>E</span>nter Text: <span style='color:#D3D7CF;background:#52594A'>                    </span>                  <span style='color:#BAC0B4;background:#52594A'>This is some help text  </span>┊
+┊                                                  <span style='color:#BAC0B4;background:#52594A'>for the WizardStep.     </span>┊
+┊    <span style='text-decoration:underline 1px solid'>A</span> List: ┌╌╌╌╌╌╌╌╌┐                            <span style='color:#BAC0B4;background:#52594A'>You can provide         </span>┊
+┊            ┆<span style='color:#000000;background:#FFFFFF;font-weight:900'>Item 1  </span>┆                            <span style='color:#BAC0B4;background:#52594A'>instructions or         </span>┊
+┊            ┆Item 2  ┆                            <span style='color:#BAC0B4;background:#52594A'>information to guide the</span>┊
+┊            ┆Item 3  ┆                            <span style='color:#BAC0B4;background:#52594A'>user through this step  </span>┊
+┊            ┆Item 4  ┆                            <span style='color:#BAC0B4;background:#52594A'>of the wizard.          </span>┊
+┊            ┆Item 5  ┆                            <span style='color:#BAC0B4;background:#52594A'>                        </span>┊
+┊            └╌╌╌╌╌╌╌╌┘                            <span style='color:#BAC0B4;background:#52594A'>                        </span>┊
+┊                                                  <span style='color:#BAC0B4;background:#52594A'>                        </span>┊
+┊                                                  <span style='color:#BAC0B4;background:#52594A'>                        </span>┊
 ┊                                                                          ┊
 ┊                                                             ⟦► <span style='text-decoration:underline 1px solid'>N</span>ext... ◄⟧┊
 └┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄┘

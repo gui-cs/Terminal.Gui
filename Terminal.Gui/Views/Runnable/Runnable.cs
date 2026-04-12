@@ -168,6 +168,12 @@ public class Runnable : View, IRunnable
     {
         if (newIsModal)
         {
+            if (App?.AppModel == AppModel.Inline && Height.Has (out DimFill _))
+            {
+                // If starting inline and height is Dim.Fill, change to Dim.Auto to avoid full screen
+                Height = Dim.Auto ();
+            }
+
             // Set focus to self if becoming modal
             SetFocus ();
             App?.Navigation?.SetFocused (Focused);
