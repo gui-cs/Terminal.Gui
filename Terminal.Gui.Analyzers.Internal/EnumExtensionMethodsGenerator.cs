@@ -1,8 +1,4 @@
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
 using System.Text;
-using System.Threading;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
@@ -12,22 +8,19 @@ namespace Terminal.Gui.Analyzers.Internal;
 /// <summary>
 ///     Incremental source generator that produces high-performance enum extension methods
 ///     (<c>AsInt32</c>, <c>AsUInt32</c>, <c>FastIsDefined</c>, and <c>FastHasFlags</c> for
-///     <see cref="System.FlagsAttribute" /> enums) for every public enum in the compilation.
+///     <see cref="System.FlagsAttribute"/> enums) for every public enum in the compilation.
 /// </summary>
 [Generator (LanguageNames.CSharp)]
 public sealed class EnumExtensionMethodsGenerator : IIncrementalGenerator
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public void Initialize (IncrementalGeneratorInitializationContext context)
     {
         // Collect all enum declarations that are public and in a namespace.
-        IncrementalValuesProvider<EnumInfo?> enumInfos =
-            context
-                .SyntaxProvider
-                .CreateSyntaxProvider (
-                                      static (node, _) => node is EnumDeclarationSyntax,
-                                      static (ctx, ct) => GetEnumInfo (ctx, ct))
-                .Where (static info => info is not null);
+        IncrementalValuesProvider<EnumInfo?> enumInfos = context.SyntaxProvider
+                                                                .CreateSyntaxProvider (static (node, _) => node is EnumDeclarationSyntax,
+                                                                                       static (ctx, ct) => GetEnumInfo (ctx, ct))
+                                                                .Where (static info => info is { });
 
         context.RegisterSourceOutput (enumInfos, static (spc, enumInfo) => Execute (spc, enumInfo!));
     }
@@ -41,7 +34,7 @@ public sealed class EnumExtensionMethodsGenerator : IIncrementalGenerator
             return null;
         }
 
-        INamedTypeSymbol? symbol = context.SemanticModel.GetDeclaredSymbol (enumDecl, cancellationToken) as INamedTypeSymbol;
+        var symbol = context.SemanticModel.GetDeclaredSymbol (enumDecl, cancellationToken) as INamedTypeSymbol;
 
         if (symbol is null)
         {
@@ -57,7 +50,7 @@ public sealed class EnumExtensionMethodsGenerator : IIncrementalGenerator
         // Skip enums nested inside other types (classes, structs, etc.).
         // Unsafe.As reinterpret casts require the struct to be at least 4 bytes,
         // and nested types need special qualification the generated code does not produce.
-        if (symbol.ContainingType is not null)
+        if (symbol.ContainingType is { })
         {
             return null;
         }
@@ -71,11 +64,11 @@ public sealed class EnumExtensionMethodsGenerator : IIncrementalGenerator
         // Only generate for int and uint backed enums.
         // Unsafe.As<TEnum, int/uint> requires the enum to be exactly 4 bytes.
         string? underlyingTypeName = symbol.EnumUnderlyingType?.SpecialType switch
-        {
-            SpecialType.System_Int32 => "int",
-            SpecialType.System_UInt32 => "uint",
-            _ => null
-        };
+                                     {
+                                         SpecialType.System_Int32 => "int",
+                                         SpecialType.System_UInt32 => "uint",
+                                         _ => null
+                                     };
 
         if (underlyingTypeName is null)
         {
@@ -85,32 +78,28 @@ public sealed class EnumExtensionMethodsGenerator : IIncrementalGenerator
         string enumNamespace = symbol.ContainingNamespace.ToDisplayString ();
         string enumName = symbol.Name;
 
-        bool hasFlags = symbol.GetAttributes ()
-                              .Any (static a => a.AttributeClass?.ToDisplayString () == "System.FlagsAttribute");
+        bool hasFlags = symbol.GetAttributes ().Any (static a => a.AttributeClass?.ToDisplayString () == "System.FlagsAttribute");
 
         // Collect member values (deduplicate).
         HashSet<int> memberValues = new ();
 
         foreach (ISymbol member in symbol.GetMembers ())
         {
-            if (member is IFieldSymbol { HasConstantValue: true } field)
+            if (member is not IFieldSymbol { HasConstantValue: true } field)
             {
-                int value = field.ConstantValue switch
-                {
-                    int i => i,
-                    uint u => unchecked((int)u),
-                    _ => 0
-                };
-                memberValues.Add (value);
+                continue;
             }
+
+            int value = field.ConstantValue switch
+                        {
+                            int i => i,
+                            uint u => unchecked ((int)u),
+                            _ => 0
+                        };
+            memberValues.Add (value);
         }
 
-        return new EnumInfo (
-                             enumNamespace,
-                             enumName,
-                             underlyingTypeName,
-                             hasFlags,
-                             memberValues.OrderBy (static v => unchecked((uint)v)).ToArray ());
+        return new EnumInfo (enumNamespace, enumName, underlyingTypeName, hasFlags, memberValues.OrderBy (static v => unchecked ((uint)v)).ToArray ());
     }
 
     private static void Execute (SourceProductionContext context, EnumInfo info)
@@ -133,34 +122,35 @@ public sealed class EnumExtensionMethodsGenerator : IIncrementalGenerator
         sb.AppendLine ();
         sb.Append ("namespace ").Append (info.Namespace).AppendLine (";");
         sb.AppendLine ();
-        sb.Append ("/// <summary>Extension methods for the <see cref=\"").Append (info.Name)
-          .AppendLine ("\"/> <see langword=\"enum\"/> type.</summary>");
+        sb.Append ("/// <summary>Extension methods for the <see cref=\"").Append (info.Name).AppendLine ("\"/> <see langword=\"enum\"/> type.</summary>");
         sb.AppendLine ("[GeneratedCode (\"Terminal.Gui.Analyzers.Internal\", \"1.0\")]");
         sb.Append ("public static partial class ").Append (info.Name).AppendLine ("Extensions");
         sb.AppendLine ("{");
 
         // AsInt32
         sb.AppendLine ("    /// <summary>");
-        sb.Append ("    ///     Directly converts this <see cref=\"").Append (info.Name)
+
+        sb.Append ("    ///     Directly converts this <see cref=\"")
+          .Append (info.Name)
           .AppendLine ("\"/> value to an <see langword=\"int\"/> value with the same");
         sb.AppendLine ("    ///     binary representation.");
         sb.AppendLine ("    /// </summary>");
         sb.AppendLine ("    /// <remarks>NO VALIDATION IS PERFORMED!</remarks>");
         sb.AppendLine ("    [MethodImpl (MethodImplOptions.AggressiveInlining)]");
-        sb.Append ("    public static int AsInt32 (this ").Append (info.Name)
-          .Append (" e) => Unsafe.As<").Append (info.Name).AppendLine (", int> (ref e);");
+        sb.Append ("    public static int AsInt32 (this ").Append (info.Name).Append (" e) => Unsafe.As<").Append (info.Name).AppendLine (", int> (ref e);");
         sb.AppendLine ();
 
         // AsUInt32
         sb.AppendLine ("    /// <summary>");
-        sb.Append ("    ///     Directly converts this <see cref=\"").Append (info.Name)
+
+        sb.Append ("    ///     Directly converts this <see cref=\"")
+          .Append (info.Name)
           .AppendLine ("\"/> value to a <see langword=\"uint\"/> value with the same");
         sb.AppendLine ("    ///     binary representation.");
         sb.AppendLine ("    /// </summary>");
         sb.AppendLine ("    /// <remarks>NO VALIDATION IS PERFORMED!</remarks>");
         sb.AppendLine ("    [MethodImpl (MethodImplOptions.AggressiveInlining)]");
-        sb.Append ("    public static uint AsUInt32 (this ").Append (info.Name)
-          .Append (" e) => Unsafe.As<").Append (info.Name).AppendLine (", uint> (ref e);");
+        sb.Append ("    public static uint AsUInt32 (this ").Append (info.Name).Append (" e) => Unsafe.As<").Append (info.Name).AppendLine (", uint> (ref e);");
 
         // FastHasFlags (for [Flags] enums only)
         if (info.HasFlags)
@@ -169,25 +159,19 @@ public sealed class EnumExtensionMethodsGenerator : IIncrementalGenerator
 
             // Overload 1: same enum type
             sb.AppendLine ("    /// <summary>");
-            sb.Append ("    ///     Determines if the specified flags are set in the current value of this")
-              .AppendLine ();
+            sb.Append ("    ///     Determines if the specified flags are set in the current value of this").AppendLine ();
             sb.Append ("    ///     <see cref=\"").Append (info.Name).AppendLine ("\"/>.");
             sb.AppendLine ("    /// </summary>");
             sb.AppendLine ("    /// <remarks>NO VALIDATION IS PERFORMED!</remarks>");
             sb.AppendLine ("    /// <returns>");
-            sb.Append ("    ///     True, if all flags present in <paramref name=\"checkFlags\"/> are also present in the current value of the")
-              .AppendLine ();
-            sb.Append ("    ///     <see cref=\"").Append (info.Name)
-              .AppendLine ("\"/>.<br/>Otherwise false.");
+            sb.Append ("    ///     True, if all flags present in <paramref name=\"checkFlags\"/> are also present in the current value of the").AppendLine ();
+            sb.Append ("    ///     <see cref=\"").Append (info.Name).AppendLine ("\"/>.<br/>Otherwise false.");
             sb.AppendLine ("    /// </returns>");
             sb.AppendLine ("    [MethodImpl (MethodImplOptions.AggressiveInlining)]");
-            sb.Append ("    public static bool FastHasFlags (this ").Append (info.Name).Append (" e, ")
-              .Append (info.Name).AppendLine (" checkFlags)");
+            sb.Append ("    public static bool FastHasFlags (this ").Append (info.Name).Append (" e, ").Append (info.Name).AppendLine (" checkFlags)");
             sb.AppendLine ("    {");
-            sb.Append ("        ref uint enumCurrentValueRef = ref Unsafe.As<").Append (info.Name)
-              .AppendLine (", uint> (ref e);");
-            sb.Append ("        ref uint checkFlagsValueRef = ref Unsafe.As<").Append (info.Name)
-              .AppendLine (", uint> (ref checkFlags);");
+            sb.Append ("        ref uint enumCurrentValueRef = ref Unsafe.As<").Append (info.Name).AppendLine (", uint> (ref e);");
+            sb.Append ("        ref uint checkFlagsValueRef = ref Unsafe.As<").Append (info.Name).AppendLine (", uint> (ref checkFlags);");
             sb.AppendLine ();
             sb.AppendLine ("        return (enumCurrentValueRef & checkFlagsValueRef) == checkFlagsValueRef;");
             sb.AppendLine ("    }");
@@ -196,27 +180,30 @@ public sealed class EnumExtensionMethodsGenerator : IIncrementalGenerator
 
             // Overload 2: int mask
             sb.AppendLine ("    /// <summary>");
-            sb.Append ("    ///     Determines if the specified mask bits are set in the current value of this")
-              .AppendLine ();
+            sb.Append ("    ///     Determines if the specified mask bits are set in the current value of this").AppendLine ();
             sb.Append ("    ///     <see cref=\"").Append (info.Name).AppendLine ("\"/>.");
             sb.AppendLine ("    /// </summary>");
-            sb.Append ("    /// <param name=\"e\">The <see cref=\"").Append (info.Name)
+
+            sb.Append ("    /// <param name=\"e\">The <see cref=\"")
+              .Append (info.Name)
               .AppendLine ("\"/> value to check against the <paramref name=\"mask\"/> value.</param>");
             sb.AppendLine ("    /// <param name=\"mask\">A mask to apply to the current value.</param>");
             sb.AppendLine ("    /// <returns>");
-            sb.Append ("    ///     True, if all bits set to 1 in the mask are also set to 1 in the current value of the")
-              .AppendLine ();
-            sb.Append ("    ///     <see cref=\"").Append (info.Name)
-              .AppendLine ("\"/>.<br/>Otherwise false.");
+            sb.Append ("    ///     True, if all bits set to 1 in the mask are also set to 1 in the current value of the").AppendLine ();
+            sb.Append ("    ///     <see cref=\"").Append (info.Name).AppendLine ("\"/>.<br/>Otherwise false.");
             sb.AppendLine ("    /// </returns>");
             sb.AppendLine ("    /// <remarks>NO VALIDATION IS PERFORMED!</remarks>");
             sb.AppendLine ("    [MethodImpl (MethodImplOptions.AggressiveInlining)]");
-            sb.Append ("    public static bool FastHasFlags (this ").Append (info.Name)
-              .Append (" e, ").Append (info.UnderlyingKeyword).AppendLine (" mask)");
+            sb.Append ("    public static bool FastHasFlags (this ").Append (info.Name).Append (" e, ").Append (info.UnderlyingKeyword).AppendLine (" mask)");
             sb.AppendLine ("    {");
-            sb.Append ("        ref ").Append (info.UnderlyingKeyword)
-              .Append (" enumCurrentValueRef = ref Unsafe.As<").Append (info.Name).Append (", ")
-              .Append (info.UnderlyingKeyword).AppendLine ("> (ref e);");
+
+            sb.Append ("        ref ")
+              .Append (info.UnderlyingKeyword)
+              .Append (" enumCurrentValueRef = ref Unsafe.As<")
+              .Append (info.Name)
+              .Append (", ")
+              .Append (info.UnderlyingKeyword)
+              .AppendLine ("> (ref e);");
             sb.AppendLine ();
             sb.AppendLine ("        return (enumCurrentValueRef & mask) == mask;");
             sb.AppendLine ("    }");
@@ -225,17 +212,14 @@ public sealed class EnumExtensionMethodsGenerator : IIncrementalGenerator
         // FastIsDefined
         sb.AppendLine ();
         sb.AppendLine ("    /// <summary>");
-        sb.Append ("    ///     Determines if the specified <see langword=\"int\"/> value is explicitly defined as a named value of the")
-          .AppendLine ();
-        sb.Append ("    ///     <see cref=\"").Append (info.Name)
-          .AppendLine ("\"/> <see langword=\"enum\"/> type.");
+        sb.Append ("    ///     Determines if the specified <see langword=\"int\"/> value is explicitly defined as a named value of the").AppendLine ();
+        sb.Append ("    ///     <see cref=\"").Append (info.Name).AppendLine ("\"/> <see langword=\"enum\"/> type.");
         sb.AppendLine ("    /// </summary>");
         sb.AppendLine ("    /// <remarks>");
         sb.AppendLine ("    ///     Only explicitly named values return true, as with IsDefined. Combined valid flag values of flags enums which are");
         sb.AppendLine ("    ///     not explicitly named will return false.");
         sb.AppendLine ("    /// </remarks>");
-        sb.Append ("    public static bool FastIsDefined (this ").Append (info.Name)
-          .AppendLine (" _, int value)");
+        sb.Append ("    public static bool FastIsDefined (this ").Append (info.Name).AppendLine (" _, int value)");
         sb.AppendLine ("    {");
         sb.AppendLine ("        return value switch");
         sb.AppendLine ("               {");
@@ -254,21 +238,12 @@ public sealed class EnumExtensionMethodsGenerator : IIncrementalGenerator
         return sb.ToString ();
     }
 
-    private sealed class EnumInfo
+    private sealed class EnumInfo (string ns, string name, string underlyingKeyword, bool hasFlags, int [] memberValues)
     {
-        public EnumInfo (string ns, string name, string underlyingKeyword, bool hasFlags, int [] memberValues)
-        {
-            Namespace = ns;
-            Name = name;
-            UnderlyingKeyword = underlyingKeyword;
-            HasFlags = hasFlags;
-            MemberValues = memberValues;
-        }
-
-        public string Namespace { get; }
-        public string Name { get; }
-        public string UnderlyingKeyword { get; }
-        public bool HasFlags { get; }
-        public int [] MemberValues { get; }
+        public string Namespace { get; } = ns;
+        public string Name { get; } = name;
+        public string UnderlyingKeyword { get; } = underlyingKeyword;
+        public bool HasFlags { get; } = hasFlags;
+        public int [] MemberValues { get; } = memberValues;
     }
 }
