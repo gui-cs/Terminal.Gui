@@ -47,6 +47,9 @@ public enum ModifierKey
     /// <summary>Right Alt.</summary>
     RightAlt,
 
+    /// <summary>AltGr / ISO Level 3 Shift.</summary>
+    AltGr,
+
     /// <summary>Super / Windows / Cmd key (side not distinguished).</summary>
     Super,
 
