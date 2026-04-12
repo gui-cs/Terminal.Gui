@@ -74,7 +74,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
         _expectingResponse = true;
         _lastQuery = DateTime.Now;
 
-        Trace.Lifecycle (nameof (AnsiSizeMonitor), "SendSizeQuery", "Queuing CSI 18t size query");
+        //Trace.Lifecycle (nameof (AnsiSizeMonitor), "SendSizeQuery", "Queuing CSI 18t size query");
 
         AnsiEscapeSequenceRequest request = new ()
         {
@@ -121,7 +121,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
             return false;
         }
 
-        Trace.Lifecycle (nameof (AnsiSizeMonitor), "SizeChanged", $"{_lastSize} → {currentSize}");
+        //Trace.Lifecycle (nameof (AnsiSizeMonitor), "SizeChanged", $"{_lastSize} → {currentSize}");
         _lastSize = currentSize;
         SizeChanged?.Invoke (this, new SizeChangedEventArgs (currentSize));
 
@@ -130,7 +130,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
 
     private void HandleSizeResponse (string? response)
     {
-        Trace.Lifecycle (nameof (AnsiSizeMonitor), "HandleSizeResponse", $"Response: '{response ?? "<null>"}'");
+        //Trace.Lifecycle (nameof (AnsiSizeMonitor), "HandleSizeResponse", $"Response: '{response ?? "<null>"}'");
         _expectingResponse = false;
 
         if (string.IsNullOrEmpty (response))

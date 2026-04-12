@@ -88,14 +88,6 @@ internal class DriverImpl : IDriver
     public string? GetName () => _componentFactory.GetDriverName ();
 
     /// <inheritdoc/>
-    public virtual string GetVersionInfo ()
-    {
-        string? driverName = GetName ();
-
-        return $"{driverName} driver";
-    }
-
-    /// <inheritdoc/>
     public void Suspend ()
     {
         try
@@ -208,7 +200,7 @@ internal class DriverImpl : IDriver
 
     private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e)
     {
-        Trace.Lifecycle (nameof (DriverImpl), "OnSizeMonitorOnSizeChanged", $"{e.Size?.Width}×{e.Size?.Height}");
+        // Trace.Lifecycle (nameof (DriverImpl), "OnSizeMonitorOnSizeChanged", $"{e.Size?.Width}×{e.Size?.Height}");
         SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
     }
 
@@ -390,25 +382,14 @@ internal class DriverImpl : IDriver
 
     #region Input Events
 
-    /// <summary>
-    ///     Gets the detected kitty keyboard protocol state for the current driver instance.
-    /// </summary>
-    internal KittyKeyboardProtocolResult KittyKeyboardProtocol { get; private set; } = new ();
+    /// <inheritdoc/>
+    public KittyKeyboardCapabilities? KittyKeyboardCapabilities { get; private set; }
 
     /// <summary>
-    ///     Stores the latest kitty keyboard protocol detection result.
+    ///     Stores the detected kitty keyboard protocol capabilities.
     /// </summary>
-    /// <param name="result">The detected kitty keyboard protocol result.</param>
-    internal void SetKittyKeyboardProtocol (KittyKeyboardProtocolResult result) => KittyKeyboardProtocol = result;
-
-    /// <summary>
-    ///     Stores the kitty keyboard flags currently enabled on the terminal.
-    /// </summary>
-    /// <param name="enabledFlags">The kitty keyboard flags currently enabled.</param>
-    internal void SetKittyKeyboardEnabledFlags (KittyKeyboardFlags enabledFlags)
-    {
-        KittyKeyboardProtocol.EnabledFlags = enabledFlags;
-    }
+    /// <param name="capabilities">The detected kitty keyboard capabilities.</param>
+    internal void SetKittyKeyboardCapabilities (KittyKeyboardCapabilities capabilities) => KittyKeyboardCapabilities = capabilities;
 
     /// <summary>Event fired when a key is pressed down.</summary>
     public event EventHandler<Key>? KeyDown;

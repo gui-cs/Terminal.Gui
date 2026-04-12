@@ -21,10 +21,6 @@ public interface IDriver : IDisposable
     /// </summary>
     string? GetName ();
 
-    /// <summary>Returns the name of the driver and relevant library version information.</summary>
-    /// <returns></returns>
-    string GetVersionInfo ();
-
     /// <summary>Suspends the application (e.g. on Linux via SIGTSTP) and upon resume, resets the console driver.</summary>
     /// <remarks>This is only implemented in UnixDriver.</remarks>
     void Suspend ();
@@ -360,6 +356,15 @@ public interface IDriver : IDisposable
     #endregion Cursor
 
     #region Input Events
+
+    /// <summary>
+    ///     Gets the terminal kitty keyboard protocol capabilities detected at startup.
+    ///     <see langword="null"/> if the terminal was not queried, detection has not completed, or the terminal did not
+    ///     respond and kitty keyboard protocol support could not be confirmed.
+    ///     When non-<see langword="null"/>, use <see cref="KittyKeyboardCapabilities.IsSupported"/> to determine whether the
+    ///     terminal supports the protocol.
+    /// </summary>
+    KittyKeyboardCapabilities? KittyKeyboardCapabilities { get; }
 
     /// <summary>Event fired when a key is pressed down.</summary>
     event EventHandler<Key>? KeyDown;

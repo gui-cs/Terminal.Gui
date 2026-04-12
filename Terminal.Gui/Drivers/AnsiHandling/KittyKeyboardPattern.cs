@@ -10,7 +10,7 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class KittyKeyboardPattern : AnsiKeyboardParserPattern
 {
-    private readonly Regex _pattern = new (@"^\u001b\[(\d+)(?::(\d+))?(?::(\d+))?(?:;([^;u]*))?(?:;([^u]+))?u$");
+    private readonly Regex _pattern = new (@"^\u001b\[(\d+)(?::(\d*))?(?::(\d*))?(?:;([^;u]*))?(?:;([^u]+))?u$");
 
     private readonly Dictionary<int, Key> _functionalKeyMap = new ()
     {
@@ -53,7 +53,17 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
         { 57384, Key.F21 },
         { 57385, Key.F22 },
         { 57386, Key.F23 },
-        { 57387, Key.F24 }
+        { 57387, Key.F24 },
+        { 57417, Key.CursorLeft },
+        { 57418, Key.CursorRight },
+        { 57419, Key.CursorUp },
+        { 57420, Key.CursorDown },
+        { 57421, Key.PageUp },
+        { 57422, Key.PageDown },
+        { 57423, Key.Home },
+        { 57424, Key.End },
+        { 57425, Key.InsertChar },
+        { 57426, Key.Delete }
     };
 
     /// <inheritdoc/>
@@ -231,6 +241,9 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
         { 57447, ModifierKey.RightShift },
         { 57448, ModifierKey.RightCtrl },
         { 57449, ModifierKey.RightAlt },
+        // 57453 = ISO_Level3_Shift (AltGr). Treat it as a dedicated modifier so
+        // standalone AltGr does not fall through as a printable Private Use Area rune.
+        { 57453, ModifierKey.AltGr },
         { 57450, ModifierKey.RightSuper },
         { 57451, ModifierKey.RightHyper }
 
