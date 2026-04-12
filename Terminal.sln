@@ -155,6 +155,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InlineCLI", "Examples\Inlin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InlineColorPicker", "Examples\InlineColorPicker\InlineColorPicker.csproj", "{70802F77-F259-44C6-9522-46FCE2FD754E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InlineSelect", "Examples\InlineSelect\InlineSelect.csproj", "{3116547F-A8F2-4189-BC22-0B47C757164C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -429,6 +431,18 @@ Global
 		{70802F77-F259-44C6-9522-46FCE2FD754E}.Release|x64.Build.0 = Release|Any CPU
 		{70802F77-F259-44C6-9522-46FCE2FD754E}.Release|x86.ActiveCfg = Release|Any CPU
 		{70802F77-F259-44C6-9522-46FCE2FD754E}.Release|x86.Build.0 = Release|Any CPU
+		{3116547F-A8F2-4189-BC22-0B47C757164C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3116547F-A8F2-4189-BC22-0B47C757164C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3116547F-A8F2-4189-BC22-0B47C757164C}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3116547F-A8F2-4189-BC22-0B47C757164C}.Debug|x64.Build.0 = Debug|Any CPU
+		{3116547F-A8F2-4189-BC22-0B47C757164C}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3116547F-A8F2-4189-BC22-0B47C757164C}.Debug|x86.Build.0 = Debug|Any CPU
+		{3116547F-A8F2-4189-BC22-0B47C757164C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3116547F-A8F2-4189-BC22-0B47C757164C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3116547F-A8F2-4189-BC22-0B47C757164C}.Release|x64.ActiveCfg = Release|Any CPU
+		{3116547F-A8F2-4189-BC22-0B47C757164C}.Release|x64.Build.0 = Release|Any CPU
+		{3116547F-A8F2-4189-BC22-0B47C757164C}.Release|x86.ActiveCfg = Release|Any CPU
+		{3116547F-A8F2-4189-BC22-0B47C757164C}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -458,6 +472,7 @@ Global
 		{DB0337E6-BBC0-4ECB-9F18-F7310705BDAF} = {3DD033C0-E023-47BF-A808-9CCE30873C3E}
 		{90A42AE4-301D-4B05-8892-60BE5209C1B5} = {3DD033C0-E023-47BF-A808-9CCE30873C3E}
 		{70802F77-F259-44C6-9522-46FCE2FD754E} = {3DD033C0-E023-47BF-A808-9CCE30873C3E}
+		{3116547F-A8F2-4189-BC22-0B47C757164C} = {3DD033C0-E023-47BF-A808-9CCE30873C3E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {9F8F8A4D-7B8D-4C2A-AC5E-CD7117F74C03}
