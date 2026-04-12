@@ -21,7 +21,7 @@ Instead of embedding descriptions, it points to actual source files that agents 
 [Terminal.Gui Source Index]|root: ./Terminal.Gui
 |IMPORTANT: Prefer retrieval-led reasoning over pre-training-led reasoning. Read files when needed.
 |.:{ModuleInitializers.cs}
-|App:{Application.cs,ApplicationImpl.cs,ApplicationImpl.Driver.cs,ApplicationImpl.Lifecycle.cs,ApplicationImpl.Run.cs,ApplicationImpl.Screen.cs,ApplicationModelUsage.cs,ApplicationNavigation.cs,ApplicationPopover.cs,ApplicationToolTip.cs,IApplication.cs,Logging.cs,NotInitializedException.cs}
+|App:{Application.cs,ApplicationImpl.cs,ApplicationImpl.Driver.cs,ApplicationImpl.Lifecycle.cs,ApplicationImpl.Run.cs,ApplicationImpl.Screen.cs,ApplicationModelUsage.cs,ApplicationNavigation.cs,ApplicationPopover.cs,ApplicationToolTip.cs,AppModel.cs,IApplication.cs,Logging.cs,NotInitializedException.cs}
 |App/Clipboard:{Clipboard.cs,ClipboardBase.cs,ClipboardProcessRunner.cs,IClipboard.cs}
 |App/CWP:{CancelEventArgs.cs,CWPEventHelper.cs,CWPPropertyHelper.cs,CWPWorkflowHelper.cs,EventArgs.cs,ResultEventArgs.cs,ValueChangedEventArgs.cs,ValueChangingEventArgs.cs}
 |App/Keyboard:{ApplicationKeyboard.cs,IKeyboard.cs}
@@ -40,7 +40,7 @@ Instead of embedding descriptions, it points to actual source files that agents 
 |Drawing/Sixel:{SixelEncoder.cs,SixelSupportDetector.cs,SixelSupportResult.cs,SixelToRender.cs}
 |Drivers:{ComponentFactoryImpl.cs,Cursor.cs,CursorStyle.cs,Driver.cs,DriverImpl.cs,DriverRegistry.cs,IComponentFactory.cs,IDriver.cs,ISizeMonitor.cs,PlatformDetection.cs,SizeDetectionMode.cs,SizeMonitorImpl.cs,TuiPlatform.cs}
 |Drivers/AnsiDriver:{AnsiComponentFactory.cs,AnsiInput.cs,AnsiInputProcessor.cs,AnsiOutput.cs,AnsiPlatform.cs,AnsiSizeMonitor.cs,AnsiTerminalHelper.cs,FakeClipboard.cs}
-|Drivers/AnsiHandling:{AnsiEscapeSequence.cs,AnsiEscapeSequenceRequest.cs,AnsiKeyboardEncoder.cs,AnsiKeyboardParser.cs,AnsiKeyboardParserPattern.cs,AnsiKeyConverter.cs,AnsiMouseEncoder.cs,AnsiMouseParser.cs,AnsiRequestScheduler.cs,AnsiResponseExpectation.cs,AnsiResponseParser.cs,AnsiResponseParserBase.cs,AnsiResponseParserState.cs,AnsiResponseParserTInputRecord.cs,CsiCursorPattern.cs,CsiKeyPattern.cs,EscAsAltPattern.cs,GenericHeld.cs,IAnsiResponseParser.cs,IHeld.cs,KittyKeyboardFlags.cs,KittyKeyboardPattern.cs,KittyKeyboardProtocolDetector.cs,KittyKeyboardProtocolResult.cs,Osc8UrlLinker.cs,ReasonCannotSend.cs,Ss3Pattern.cs,StringHeld.cs,TerminalColorDetector.cs}
+|Drivers/AnsiHandling:{AnsiEscapeSequence.cs,AnsiEscapeSequenceRequest.cs,AnsiKeyboardEncoder.cs,AnsiKeyboardParser.cs,AnsiKeyboardParserPattern.cs,AnsiKeyConverter.cs,AnsiMouseEncoder.cs,AnsiMouseParser.cs,AnsiRequestScheduler.cs,AnsiResponseExpectation.cs,AnsiResponseParser.cs,AnsiResponseParserBase.cs,AnsiResponseParserState.cs,AnsiResponseParserTInputRecord.cs,AnsiStartupGate.cs,AnsiStartupQuery.cs,CsiCursorPattern.cs,CsiKeyPattern.cs,EscAsAltPattern.cs,GenericHeld.cs,IAnsiResponseParser.cs,IAnsiStartupGate.cs,IHeld.cs,KittyKeyboardCapabilities.cs,KittyKeyboardFlags.cs,KittyKeyboardPattern.cs,KittyKeyboardProtocolDetector.cs,Osc8UrlLinker.cs,ReasonCannotSend.cs,Ss3Pattern.cs,StringHeld.cs,TerminalColorDetector.cs}
 |Drivers/AnsiHandling/EscSeqUtils:{EscSeqReqStatus.cs,EscSeqRequests.cs,EscSeqUtils.cs}
 |Drivers/DotNetDriver:{INetInput.cs,NetComponentFactory.cs,NetInput.cs,NetInputProcessor.cs,NetKeyConverter.cs,NetOutput.cs}
 |Drivers/Input:{ConsoleInputSource.cs,IInput.cs,IInputProcessor.cs,IInputSource.cs,InputImpl.cs,InputProcessorImpl.cs,InputRecord.cs,ITestableInput.cs,TestInputSource.cs}
@@ -77,7 +77,7 @@ Instead of embedding descriptions, it points to actual source files that agents 
 |Views/LinearRange:{LinearRange.cs,LinearRangeAttributes.cs,LinearRangeConfiguration.cs,LinearRangeEventArgs.cs,LinearRangeOption.cs,LinearRangeOptionEventArgs.cs,LinearRangeStyle.cs,LinearRangeType.cs}
 |Views/ListView:{IListDataSource.cs,ListView.Commands.cs,ListView.cs,ListView.Drawing.cs,ListView.Movement.cs,ListView.Selection.cs,ListViewEventArgs.cs,ListViewT.cs,ListWrapper.cs}
 |Views/Menu:{IMenuBarEntry.cs,Menu.cs,MenuBar.cs,MenuBarItem.cs,MenuItem.cs,PopoverMenu.cs}
-|Views/Runnable:{Runnable.cs,RunnableTResult.cs}
+|Views/Runnable:{Runnable.cs,RunnableTResult.cs,RunnableWrapper.cs}
 |Views/ScrollBar:{ScrollBar.cs,ScrollBarVisibilityMode.cs,ScrollButton.cs,ScrollSlider.cs}
 |Views/Selectors:{FlagSelector.cs,FlagSelectorTEnum.cs,OptionSelector.cs,OptionSelectorTEnum.cs,SelectorBase.cs,SelectorStyles.cs}
 |Views/SpinnerView:{SpinnerStyle.cs,SpinnerView.cs}

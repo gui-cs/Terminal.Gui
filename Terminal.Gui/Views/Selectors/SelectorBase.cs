@@ -1,5 +1,5 @@
 using System.Collections.Immutable;
-using System.Diagnostics;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.Views;
 
@@ -123,17 +123,17 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
                 break;
 
             default:
+            {
+                if (Styles.HasFlag (SelectorStyles.ShowValue))
                 {
-                    if (Styles.HasFlag (SelectorStyles.ShowValue))
-                    {
-                        _valueField?.SetFocus ();
+                    _valueField?.SetFocus ();
 
-                        return true;
-                    }
-                    active = SubViews.OfType<CheckBox> ().Count () - 1;
-
-                    break;
+                    return true;
                 }
+                active = SubViews.OfType<CheckBox> ().Count () - 1;
+
+                break;
+            }
         }
         SubViews.OfType<CheckBox> ().ToArray ().ElementAt (active).SetFocus ();
 
@@ -182,13 +182,13 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         if (!enterFromCheckBox && !directAccept)
         {
             return args.Context?.Binding switch
-            {
-                { Source: { } weakSource } when weakSource.TryGetTarget (out View? src) && src == this => true,
-                MouseBinding mouseBinding when mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked) => !DoubleClickAccepts,
-                KeyBinding { Key: { } } keyBinding when keyBinding.Key == Key.Enter => false,
-                null => false,
-                _ => true
-            };
+                   {
+                       { Source: { } weakSource } when weakSource.TryGetTarget (out View? src) && src == this => true,
+                       MouseBinding mouseBinding when mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked) => !DoubleClickAccepts,
+                       KeyBinding { Key: { } } keyBinding when keyBinding.Key == Key.Enter => false,
+                       null => false,
+                       _ => true
+                   };
         }
 
         // Create a fresh context with Command.Activate (not Accept) and IsBubblingUp=false.
@@ -202,13 +202,13 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         InvokeCommand (Command.Activate, activateCtx);
 
         return args.Context?.Binding switch
-        {
-            { Source: { } weakSource } when weakSource.TryGetTarget (out View? src) && src == this => true,
-            MouseBinding mouseBinding when mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked) => !DoubleClickAccepts,
-            KeyBinding { Key: { } } keyBinding when keyBinding.Key == Key.Enter => false,
-            null => false,
-            _ => true
-        };
+               {
+                   { Source: { } weakSource } when weakSource.TryGetTarget (out View? src) && src == this => true,
+                   MouseBinding mouseBinding when mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked) => !DoubleClickAccepts,
+                   KeyBinding { Key: { } } keyBinding when keyBinding.Key == Key.Enter => false,
+                   null => false,
+                   _ => true
+               };
     }
 
     /// <summary>
@@ -237,7 +237,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
                 return;
             }
 
-            Tracing.Trace.Command (this, "Value", $"{previousValue}->{value}");
+            Trace.Command (this, "Value", $"{previousValue}->{value}");
             field = value;
 
             UpdateChecked ();
@@ -535,12 +535,14 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         // total width via PosAlign.CalculateMinDimension, which reads Frame.Width.
         // Without this, newly-created subviews have Frame.Width == 0 on the first
         // layout pass, causing the selector to be sized too narrow.
-        if (Orientation == Orientation.Horizontal && SubViews.Count > 0)
+        if (Orientation != Orientation.Horizontal || SubViews.Count <= 0)
         {
-            foreach (View sv in SubViews)
-            {
-                sv.SetRelativeLayout (GetContainerSize ());
-            }
+            return;
+        }
+
+        foreach (View sv in SubViews)
+        {
+            sv.SetRelativeLayout (GetContainerSize ());
         }
     }
 
