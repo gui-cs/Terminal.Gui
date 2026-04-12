@@ -20,12 +20,12 @@ jobs:
         fetch-depth: 0 # fetch-depth is needed for GitVersion https://github.com/GitTools/actions/blob/main/docs/cloning.md
 
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v3.1.11
+      uses: gittools/actions/gitversion/setup@v4.5.0
       with:
         versionSpec: '6.0.x'
 
     - name: Determine Version
-      uses: gittools/actions/gitversion/execute@v3.1.11
+      uses: gittools/actions/gitversion/execute@v4.5.0
       with:
         useConfigFile: true
         updateAssemblyInfo: true
