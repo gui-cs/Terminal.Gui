@@ -15,7 +15,7 @@ jobs:
 
     steps:
     - name: Checkout ${{ github.ref_name }}
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0 # fetch-depth is needed for GitVersion https://github.com/GitTools/actions/blob/main/docs/cloning.md
 
