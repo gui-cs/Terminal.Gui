@@ -1,5 +1,6 @@
 // Copilot
 
+using ApplicationTests.Popover;
 using UnitTests;
 
 namespace ApplicationTests.MouseTests;
@@ -65,5 +66,55 @@ public class InlineMouseOffsetTests
 
         Assert.NotNull (singleClick);
         Assert.Equal (expectedAdjusted, singleClick.Value.ScreenPosition);
+    }
+
+    /// <summary>
+    ///     When a popover is dismissed by clicking outside it in inline mode, the recursive
+    ///     <see cref="ApplicationMouse.RaiseMouseEvent"/> call must receive terminal-absolute
+    ///     coordinates — not already-adjusted ones — so the inline offset subtraction happens
+    ///     exactly once. Verified via <see cref="ApplicationMouse.LastMousePosition"/> which is
+    ///     set after the inline adjustment in each recursive call.
+    /// </summary>
+    [Fact]
+    public void RaiseMouseEvent_Inline_PopoverDismiss_RecursionGetsAbsoluteCoordinates () // Copilot
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.AppModel = AppModel.Inline;
+        app.ForceInlinePosition = new Point (0, 10);
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (80, 25);
+
+        Runnable top = new () { App = app };
+        SessionToken? token = app.Begin (top);
+        app.LayoutAndDraw ();
+
+        // Force App.Screen.Y = 10 to simulate inline region at terminal row 10
+        app.Screen = new Rectangle (0, 10, 80, 5);
+
+        // Create and show a popover
+        ApplicationPopoverTests.PopoverTestClass popover = new () { App = app };
+        app.Popovers!.Register (popover);
+        app.Popovers.Show (popover);
+
+        Assert.NotNull (app.Popovers.GetActivePopover ());
+
+        // Act: Click OUTSIDE the popover at terminal-absolute row 14 (inline-relative row 4).
+        // This dismisses the popover and recurses. The recursive call adjusts coordinates:
+        //   With fix:    (50, 14) → (50, 4)   [correct: 14 - 10 = 4]
+        //   Without fix: (50,  4) → (50, -6)  [double subtraction: 4 - 10 = -6]
+        app.Mouse.RaiseMouseEvent (new Mouse { ScreenPosition = new Point (50, 14), Flags = MouseFlags.LeftButtonPressed });
+
+        // Assert: popover was dismissed
+        Assert.False (popover.Visible, "Popover should be dismissed");
+
+        // LastMousePosition is set from the RECURSIVE call's adjusted coordinates.
+        // If double-subtraction occurred, Y would be -6 instead of 4.
+        Assert.Equal (4, app.Mouse.LastMousePosition!.Value.Y);
+        Assert.Equal (50, app.Mouse.LastMousePosition!.Value.X);
+
+        app.End (token!);
+        popover.Dispose ();
+        top.Dispose ();
     }
 }

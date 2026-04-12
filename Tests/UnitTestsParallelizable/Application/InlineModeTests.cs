@@ -246,6 +246,32 @@ public class InlineModeTests
     }
 
     /// <summary>
+    ///     When the cursor is at the last terminal row and the view height is 1 (fits exactly),
+    ///     <c>App.Screen.Y</c> equals the cursor row — no extra scroll should push it up.
+    /// </summary>
+    [Fact]
+    public void LayoutAndDraw_Inline_CursorAtBottom_SingleRowView_NoExtraScroll () // Copilot
+    {
+        // Terminal is 25 rows (0-24). Cursor at row 24. View needs 1 row — fits exactly.
+        using IApplication app = CreateInlineApp (24);
+
+        Window view = new () { Width = Dim.Fill (), Height = 1 };
+
+        SessionToken? token = BeginAndLayout (app, view);
+
+        // The view fits at cursorRow without scrolling. App.Screen.Y should be 24, not 23.
+        Assert.Equal (24, app.Screen.Y);
+        Assert.Equal (1, app.Screen.Height);
+
+        if (token is { })
+        {
+            app.End (token);
+        }
+
+        view.Dispose ();
+    }
+
+    /// <summary>
     ///     When the view fits entirely below the cursor, no scrolling occurs and
     ///     <c>App.Screen.Y</c> equals <c>ForceInlinePosition.Y</c>.
     /// </summary>

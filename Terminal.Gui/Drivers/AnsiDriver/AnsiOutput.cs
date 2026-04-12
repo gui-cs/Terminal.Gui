@@ -375,13 +375,13 @@ public class AnsiOutput : OutputBase, IOutput
             if (AppModel == AppModel.Inline)
             {
                 // Inline mode: do NOT restore alternate buffer. Move cursor to just
-                // below the inline region and show it so the shell prompt appears
-                // naturally after the rendered content.
-                // App.Screen.Y is the 0-indexed terminal row where the inline region starts.
-                // App.Screen.Height is the view's height. Position cursor one row below.
+                // below the inline region so the shell prompt appears naturally.
+                // Position to the last row of the inline region (guaranteed to exist),
+                // then write \n to scroll the terminal if at the bottom edge.
                 Rectangle appScreen = AppScreenGetter?.Invoke () ?? default;
-                int cursorRow = appScreen.Y + appScreen.Height + 1; // 1-indexed
-                Write (EscSeqUtils.CSI_SetCursorPosition (cursorRow, 1));
+                int lastInlineRow = appScreen.Y + appScreen.Height; // 1-indexed last row
+                Write (EscSeqUtils.CSI_SetCursorPosition (lastInlineRow, 1));
+                Write ("\n");
                 Write (EscSeqUtils.CSI_ShowCursor);
             }
             else

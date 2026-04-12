@@ -158,9 +158,6 @@ internal partial class ApplicationImpl
                     cursorRow = Math.Max (0, cursorRow - overflow);
                 }
 
-                // Reserve the vertical space for the inline region
-                Driver.WriteRaw (new string ('\n', viewHeight));
-                Driver.WriteRaw ($"{EscSeqUtils.CSI}{viewHeight}A");
             }
 
             int availableHeight = Math.Min (viewHeight, termHeight - cursorRow);

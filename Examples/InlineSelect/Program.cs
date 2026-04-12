@@ -10,6 +10,7 @@
 //   dotnet run --project Examples/InlineSelect -- --vertical One Two Three
 
 using Terminal.Gui.App;
+using Terminal.Gui.Drawing;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
@@ -57,7 +58,8 @@ OptionSelector selector = new ()
 RunnableWrapper<OptionSelector, int?> wrapper = new (selector)
 {
     Title = "Select an option (Enter to accept, Esc to cancel)",
-    Width = Dim.Fill ()
+    Width = Dim.Fill (),
+    BorderStyle = LineStyle.Rounded
 };
 
 // Run inline — blocks until user accepts or cancels
