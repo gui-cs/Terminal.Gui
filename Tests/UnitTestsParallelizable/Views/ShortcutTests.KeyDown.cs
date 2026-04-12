@@ -5,6 +5,67 @@ namespace ViewsTests;
 [TestSubject (typeof (Shortcut))]
 public partial class ShortcutTests
 {
+    // Copilot
+    /// <summary>
+    ///     Verifies that setting <see cref="Shortcut.Key"/> to <see cref="Key.Empty"/> removes the key binding,
+    ///     so the previously-bound key no longer triggers the action.
+    /// </summary>
+    [Fact]
+    public void Setting_Key_To_Empty_Removes_KeyBinding ()
+    {
+        IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        app.Begin (runnable);
+
+        var action = 0;
+
+        Shortcut shortcut = new () { Key = Key.F10, Title = "Test", Action = () => action++ };
+
+        runnable.Add (shortcut);
+
+        app.Keyboard.RaiseKeyDownEvent (Key.F10);
+        Assert.Equal (1, action);
+
+        shortcut.Key = Key.Empty;
+
+        app.Keyboard.RaiseKeyDownEvent (Key.F10);
+        Assert.Equal (1, action); // Should not have incremented; old binding must be gone
+    }
+
+    // Copilot
+    /// <summary>
+    ///     Verifies that setting <see cref="Shortcut.Key"/> to <see cref="Key.Empty"/> removes the
+    ///     application-level key binding when <see cref="Shortcut.BindKeyToApplication"/> is <see langword="true"/>.
+    /// </summary>
+    [Fact]
+    public void Setting_Key_To_Empty_Removes_AppLevel_KeyBinding ()
+    {
+        IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
+        app.Begin (runnable);
+
+        var action = 0;
+
+        Shortcut shortcut = new ()
+        {
+            App = app,
+            Key = Key.F10,
+            Title = "Test",
+            BindKeyToApplication = true,
+            Action = () => action++
+        };
+
+        runnable.Add (shortcut);
+
+        app.Keyboard.RaiseKeyDownEvent (Key.F10);
+        Assert.Equal (1, action);
+
+        shortcut.Key = Key.Empty;
+
+        app.Keyboard.RaiseKeyDownEvent (Key.F10);
+        Assert.Equal (1, action); // Should not have incremented; old app binding must be gone
+    }
+
     // Claude - Opus 4.6
     /// <summary>
     ///     Verifies that pressing various keys invokes the <see cref="Shortcut.Action"/> delegate.
@@ -111,15 +172,15 @@ public partial class ShortcutTests
 
         var accepting = 0;
 
-        shortcut.Accepting += (_, e) => { accepting++; };
+        shortcut.Accepting += (_, _) => { accepting++; };
 
         var activated = 0;
 
-        shortcut.Activating += (_, e) => { activated++; };
+        shortcut.Activating += (_, _) => { activated++; };
 
         var handlingHotKey = 0;
 
-        shortcut.HandlingHotKey += (_, e) => { handlingHotKey++; };
+        shortcut.HandlingHotKey += (_, _) => { handlingHotKey++; };
 
         app.Keyboard.RaiseKeyDownEvent (shortcut.Key);
 
@@ -143,15 +204,15 @@ public partial class ShortcutTests
 
         var accepting = 0;
 
-        shortcut.Accepting += (_, e) => { accepting++; };
+        shortcut.Accepting += (_, _) => { accepting++; };
 
         var activated = 0;
 
-        shortcut.Activating += (_, e) => { activated++; };
+        shortcut.Activating += (_, _) => { activated++; };
 
         var handlingHotKey = 0;
 
-        shortcut.HandlingHotKey += (_, e) => { handlingHotKey++; };
+        shortcut.HandlingHotKey += (_, _) => { handlingHotKey++; };
 
         app.Keyboard.RaiseKeyDownEvent (shortcut.Key);
 
@@ -192,37 +253,17 @@ public partial class ShortcutTests
 
         var accepting = 0;
 
-        shortcut.Accepting += (_, e) =>
-                              {
-                                  accepting++;
-
-                                  //e.Handled = true;
-                              };
+        shortcut.Accepting += (_, _) => { accepting++; };
 
         var activated = 0;
 
-        shortcut.Activating += (_, e) =>
-                               {
-                                   activated++;
-
-                                   //e.Handled = true;
-                               };
-
-        var handlingHotKey = 0;
-
-        shortcut.HandlingHotKey += (_, e) =>
-                                   {
-                                       handlingHotKey++;
-
-                                       //e.Handled = true;
-                                   };
+        shortcut.Activating += (_, _) => { activated++; };
 
         app.Keyboard.RaiseKeyDownEvent (key);
 
         Assert.Equal (expectedAccept, accepting);
         Assert.Equal (expectedActivate, activated);
     }
-
 
     [Fact]
     public void Mouse_Click_On_CommandView_Causes_Activation ()
@@ -255,7 +296,8 @@ public partial class ShortcutTests
 
         // Act & Assert - Click at various X positions across the entire CommandView
         Rectangle screen = shortcut.CommandView.FrameToScreen ();
-        for (var x = screen.X; x < screen.X + screen.Width; x++)
+
+        for (int x = screen.X; x < screen.X + screen.Width; x++)
         {
             int expectedCount = activatingCount + 1;
 
@@ -298,7 +340,8 @@ public partial class ShortcutTests
 
         // Act & Assert - Click at various X positions across the entire HelpView
         Rectangle screen = shortcut.HelpView.FrameToScreen ();
-        for (var x = screen.X; x < screen.X + screen.Width; x++)
+
+        for (int x = screen.X; x < screen.X + screen.Width; x++)
         {
             int expectedCount = activatingCount + 1;
 
@@ -309,7 +352,6 @@ public partial class ShortcutTests
                          $"Click at X={x} should activate the Shortcut. Expected: {expectedCount}, Actual: {activatingCount}");
         }
     }
-
 
     [Fact]
     public void Mouse_Click_On_KeyView_Causes_Activation ()
@@ -342,7 +384,8 @@ public partial class ShortcutTests
 
         // Act & Assert - Click at various X positions across the entire KeyView
         Rectangle screen = shortcut.KeyView.FrameToScreen ();
-        for (var x = screen.X+1; x < screen.X + screen.Width; x++)
+
+        for (int x = screen.X + 1; x < screen.X + screen.Width; x++)
         {
             int expectedCount = activatingCount + 1;
 
@@ -453,5 +496,4 @@ public partial class ShortcutTests
         Assert.Equal (0, buttonActivatingCount);
         Assert.Equal (0, shortcutActivatingCount);
     }
-
 }

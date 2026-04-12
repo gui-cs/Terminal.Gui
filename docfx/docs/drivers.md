@@ -255,11 +255,11 @@ Manages the screen buffer and drawing operations:
 - Handles clipping regions
 - Tracks dirty regions for efficient rendering
 
-#### IWindowSizeMonitor
+#### ISizeMonitor
 Detects terminal size changes and raises `SizeChanged` events when the terminal is resized.
 
-#### DriverFacade&lt;T&gt;
-A unified facade that implements `IDriver` and coordinates all the components. This is what gets assigned to <xref:Terminal.Gui.App.Application>'s `Driver`.
+#### DriverImpl
+The concrete implementation that implements `IDriver` and coordinates all the components. This is what gets assigned to <xref:Terminal.Gui.App.Application>'s `Driver`.
 
 ### Threading Model
 
@@ -288,9 +288,11 @@ The driver architecture employs a **multi-threaded design** for optimal responsi
 
 - **Main UI Thread**: Runs `ApplicationMainLoop.Iteration()` which:
   1. Processes input from the queue via `IInputProcessor`
-  2. Executes timeout callbacks
-  3. Checks for UI changes (layout/drawing)
-  4. Renders updates via `IOutput`
+  2. Pumps queued ANSI requests via `AnsiRequestScheduler.RunSchedule(...)`
+  3. Executes size polling / monitor checks
+  4. Checks for UI changes (layout/drawing)
+  5. Renders updates via `IOutput`
+  6. Executes timeout callbacks
 
 This separation ensures that input is never lost and the UI remains responsive during intensive operations.
 
@@ -300,10 +302,10 @@ When <xref:Terminal.Gui.App.Application>'s `Init()` is called:
 
 1. **IApplication.Init()** is invoked
 2. Creates a `MainLoopCoordinator<T>` with the appropriate `ComponentFactory<T>`
-3. **MainLoopCoordinator.StartAsync()** begins:
+3. **MainLoopCoordinator.StartInputTaskAsync()** begins:
    - Starts the input thread which creates `IInput<T>`
    - Initializes the main UI loop which creates `IOutput`
-   - Creates `DriverFacade<T>` and assigns to <xref:Terminal.Gui.App.IApplication>'s `Driver`
+   - Creates `DriverImpl` and assigns to <xref:Terminal.Gui.App.IApplication>'s `Driver`
    - Waits for both threads to be ready
 4. Returns control to the application
 
@@ -312,10 +314,11 @@ When <xref:Terminal.Gui.App.Application>'s `Init()` is called:
 When <xref:Terminal.Gui.App.IApplication>'s `Shutdown()` is called:
 
 1. Cancellation token is triggered
-2. Input thread exits its read loop
-3. `IOutput` is disposed
-4. Main thread waits for input thread to complete
-5. All resources are cleaned up
+2. If kitty keyboard mode was enabled, `KittyKeyboardProtocolDetector.Disable()` is sent to restore terminal keyboard mode
+3. Input thread exits its read loop
+4. `IOutput` is disposed
+5. Main thread waits for input thread to complete
+6. All resources are cleaned up
 
 ## Component Interfaces
 
@@ -337,6 +340,8 @@ The main driver interface that the framework uses internally. `IDriver` is organ
 #### Screen and Display
 - `Screen`, `Cols`, `Rows`, `Left`, `Top` - Screen dimensions
 - `SetScreenSize()`, `SizeChanged` - Size management
+- `AppModel` - Whether the driver operates in `FullScreen` or `Inline` mode
+- `InlinePosition` - The terminal cursor position (`Point`) where the inline region starts. `Y` is the row discovered via CPR at startup; `X` is reserved for future use. Only meaningful when `AppModel == Inline`.
 
 #### Color Support
 - `SupportsTrueColor` - 24-bit color capability
@@ -369,6 +374,22 @@ Driver.SizeDetection = SizeDetectionMode.Polling;
 - `Contents` - Screen buffer array
 - `Clip` - Clipping region
 - `ClearContents()`, `ClearedContents` - Buffer management
+- In inline mode, `OutputBufferImpl.InlineMode = true` causes `ClearContents()` to initialize cells with `IsDirty = false`. Only cells explicitly drawn by the app are flushed to the terminal — the rest of the visible terminal stays untouched.
+
+#### Inline Mode (ANSI Driver)
+
+When `AppModel == Inline`, the ANSI driver changes behavior in several ways:
+
+| Aspect | FullScreen | Inline |
+|--------|-----------|--------|
+| Screen buffer | Alternate buffer (`CSI ?1049h`) | Primary (scrollback) buffer |
+| `ClearContents()` | All cells dirty | All cells clean |
+| Cursor positioning | Absolute terminal coordinates | Offset by `App.Screen.Y` |
+| Shutdown | Emit `CSI ?1049l` (restore) | Move cursor below inline region |
+
+**Startup gate** (`AnsiStartupGate`): In inline mode, `AnsiSizeMonitor` sends a CPR query (`ESC[6n`) to discover the cursor row. The startup gate defers the first `LayoutAndDraw` until both the CPR response and terminal size query complete. If the terminal never responds, the gate times out and rendering proceeds from row 0.
+
+**`AnsiOutput` changes**: `SetCursorPositionImpl` adds `App.Screen.Y` to all row coordinates so output lands at the correct terminal rows. On init, `CSI ?1049h` and `CSI 2J` are skipped. On shutdown, `CSI ?1049l` is skipped and the cursor is positioned at the bottom of the inline region.
 
 #### Drawing and Rendering
 - `Col`, `Row`, `CurrentAttribute` - Drawing state

@@ -69,13 +69,15 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
 
         Parser.Keyboard += (_, keyEvent) =>
                            {
-                               if (keyEvent.EventType == KeyEventType.Release)
+                               Key normalizedKeyEvent = OnKeyboardEventParsed (keyEvent);
+
+                               if (normalizedKeyEvent.EventType == KeyEventType.Release)
                                {
-                                   RaiseKeyUpEvent (keyEvent);
+                                   RaiseKeyUpEvent (normalizedKeyEvent);
                                }
                                else
                                {
-                                   RaiseKeyDownEvent (keyEvent);
+                                   RaiseKeyDownEvent (normalizedKeyEvent);
                                }
                            };
 
@@ -85,7 +87,6 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
                                                var cur = new string (str.Select (k => k.Item1).ToArray ());
 
                                                // Check if this is an incomplete mouse sequence (timing issue when Run() blocks)
-                                               var mouseParser = new AnsiMouseParser ();
 
                                                Logging.Warning ($"{
                                                    nameof (InputProcessorImpl<TInputRecord>)
@@ -169,14 +170,37 @@ public abstract class InputProcessorImpl<TInputRecord> : IInputProcessor, IDispo
     /// <param name="input">The input record to process.</param>
     protected virtual void ProcessAfterParsing (TInputRecord input)
     {
-        var key = KeyConverter.ToKey (input);
+        Key key = KeyConverter.ToKey (input);
 
         // If the key is not valid, we don't want to raise any events.
-        if (IsValidInput (key, out key))
+        if (!IsValidInput (key, out key))
         {
-            RaiseKeyDownEvent (key);
+            return;
         }
+
+        if (ShouldSuppressFallbackKeyDown (key))
+        {
+            return;
+        }
+
+        RaiseKeyDownEvent (key);
     }
+
+    /// <summary>
+    ///     Called when the ANSI parser raises a keyboard event before it is forwarded to <see cref="KeyDown"/> or
+    ///     <see cref="KeyUp"/> subscribers.
+    /// </summary>
+    /// <param name="keyEvent">The parsed key event.</param>
+    /// <returns>The key event to forward.</returns>
+    protected virtual Key OnKeyboardEventParsed (Key keyEvent) => keyEvent;
+
+    /// <summary>
+    ///     Gives derived processors a chance to suppress keydown events that come from fallback stream processing
+    ///     after ANSI parsing.
+    /// </summary>
+    /// <param name="key">The key produced by fallback processing.</param>
+    /// <returns><see langword="true"/> when the keydown should be ignored; otherwise <see langword="false"/>.</returns>
+    protected virtual bool ShouldSuppressFallbackKeyDown (Key key) => false;
 
     private char _highSurrogate = '\0';
 

@@ -45,11 +45,29 @@ public class AnsiOutput : OutputBase, IOutput
     private readonly WindowsVTOutputHelper? _windowsVTOutput;
 
     /// <summary>
+    ///     Gets or sets the <see cref="AppModel"/> that this output was initialized with.
+    /// </summary>
+    internal AppModel AppModel { get; }
+
+    /// <summary>
+    ///     Gets or sets a callback that returns the current application <see cref="IApplication.Screen"/>
+    ///     rectangle. In inline mode, <see cref="Rectangle.Y"/> is the terminal row offset
+    ///     and <see cref="Rectangle.Height"/> is the inline region height.
+    ///     Set after the application is fully constructed.
+    /// </summary>
+    internal Func<Rectangle>? AppScreenGetter { get; set; }
+
+    /// <summary>
     ///     Initializes a new instance of <see cref="AnsiOutput"/>.
     ///     Checks if a real console is available for ANSI output and activates the alternate screen buffer.
     /// </summary>
-    public AnsiOutput ()
+    /// <param name="appModel">
+    ///     The rendering mode. When <see cref="AppModel.Inline"/>, the alternate screen buffer is not activated
+    ///     and the terminal's primary (scrollback) buffer is used instead.
+    /// </param>
+    public AnsiOutput (AppModel appModel = AppModel.FullScreen)
     {
+        AppModel = appModel;
         _platform = AnsiPlatform.Degraded;
 
         _lastBuffer = new OutputBufferImpl ();
@@ -107,25 +125,29 @@ public class AnsiOutput : OutputBase, IOutput
             }
 
             // Initialize terminal for ANSI output
-            // Activate alternate screen buffer, hide cursor, enable mouse tracking
-            Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
-            Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.EntireScreen));
-            Write (EscSeqUtils.CSI_SetCursorPosition (1, 1)); // Move to top-left
-            Write (EscSeqUtils.CSI_HideCursor);
+            if (AppModel == AppModel.Inline)
+            {
+                // Inline mode: do NOT switch to alternate screen buffer.
+                // Stay in the primary (scrollback) buffer.
+                Write (EscSeqUtils.CSI_HideCursor);
 
-            // TODO: Move Input related CSI sequences to AnsiInput
-            Write (EscSeqUtils.CSI_EnableMouseEvents);
+                // TODO: Move Input related CSI sequences to AnsiInput
+                Write (EscSeqUtils.CSI_EnableMouseEvents);
+            }
+            else
+            {
+                // FullScreen mode: activate alternate screen buffer, hide cursor, enable mouse tracking
+                Write (EscSeqUtils.CSI_SaveCursorAndActivateAltBufferNoBackscroll);
+                Write (EscSeqUtils.CSI_ClearScreen (EscSeqUtils.ClearScreenOptions.EntireScreen));
+                Write (EscSeqUtils.CSI_SetCursorPosition (1, 1)); // Move to top-left
+                Write (EscSeqUtils.CSI_HideCursor);
+
+                // TODO: Move Input related CSI sequences to AnsiInput
+                Write (EscSeqUtils.CSI_EnableMouseEvents);
+            }
 
             // Flush to ensure all sequences are sent
             AnsiTerminalHelper.FlushNative (_platform);
-
-            //Logging.Information ("ANSIOutput initialized successfully");
-
-            // Note: Size will be queried via ANSI by ANSISizeMonitor.Initialize()
-            // Don't use Console.WindowWidth/Height here as it may reflect the main buffer,
-            // not the alternate screen buffer we just activated.
-            // Start with default size; actual size will be set when ANSI response arrives.
-            _consoleSize = new Size (80, 25);
         }
         catch (Exception ex)
         {
@@ -235,42 +257,6 @@ public class AnsiOutput : OutputBase, IOutput
         }
     }
 
-    /// <summary>
-    ///     Gets the kitty keyboard flags currently enabled on the terminal.
-    /// </summary>
-    internal KittyKeyboardFlags KittyKeyboardEnabledFlags { get; private set; }
-
-    /// <summary>
-    ///     Enables kitty keyboard progressive enhancement flags for the active terminal.
-    /// </summary>
-    /// <param name="flags">The kitty keyboard flags to enable.</param>
-    internal void EnableKittyKeyboard (KittyKeyboardFlags flags)
-    {
-        if (flags == KittyKeyboardFlags.None || _platform == AnsiPlatform.Degraded)
-        {
-            return;
-        }
-
-        Trace.Lifecycle (nameof (AnsiOutput), "KittyKeyboard", $"Writing enable sequence for flags {flags}");
-        Write (EscSeqUtils.CSI_EnableKittyKeyboardFlags (flags));
-        KittyKeyboardEnabledFlags = flags;
-    }
-
-    /// <summary>
-    ///     Restores the previous kitty keyboard flag state if kitty mode was enabled.
-    /// </summary>
-    internal void DisableKittyKeyboard ()
-    {
-        if (KittyKeyboardEnabledFlags == KittyKeyboardFlags.None)
-        {
-            return;
-        }
-
-        Trace.Lifecycle (nameof (AnsiOutput), "KittyKeyboard", $"Writing disable sequence for flags {KittyKeyboardEnabledFlags}");
-        Write (EscSeqUtils.CSI_DisableKittyKeyboardFlags);
-        KittyKeyboardEnabledFlags = KittyKeyboardFlags.None;
-    }
-
     /// <inheritdoc cref="IOutput.Write(IOutputBuffer)"/>
     public override void Write (IOutputBuffer buffer)
     {
@@ -329,7 +315,10 @@ public class AnsiOutput : OutputBase, IOutput
 
         // + 1 is needed because non-Windows is based on 1 instead of 0 and
         // Console.CursorTop/CursorLeft isn't reliable.
-        Write (EscSeqUtils.CSI_SetCursorPosition (row + 1, col + 1));
+        // In inline mode, App.Screen.Y is the terminal row where the inline region starts.
+        // Adding it shifts rendering down so buffer row 0 maps to the correct terminal row.
+        int inlineRowOffset = AppScreenGetter?.Invoke ().Y ?? 0;
+        Write (EscSeqUtils.CSI_SetCursorPosition (row + 1 + inlineRowOffset, col + 1));
 
         return true;
     }
@@ -375,17 +364,32 @@ public class AnsiOutput : OutputBase, IOutput
     {
         try
         {
-            DisableKittyKeyboard ();
-
             if (_platform == AnsiPlatform.Degraded)
             {
                 return;
             }
 
-            // Restore terminal state: disable mouse, restore buffer, show cursor
+            // Restore terminal state: disable mouse, show cursor
             Write (EscSeqUtils.CSI_DisableMouseEvents);
-            Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
-            Write (EscSeqUtils.CSI_ShowCursor);
+
+            if (AppModel == AppModel.Inline)
+            {
+                // Inline mode: do NOT restore alternate buffer. Move cursor to just
+                // below the inline region so the shell prompt appears naturally.
+                // Position to the last row of the inline region (guaranteed to exist),
+                // then write \n to scroll the terminal if at the bottom edge.
+                Rectangle appScreen = AppScreenGetter?.Invoke () ?? default;
+                int lastInlineRow = appScreen.Y + appScreen.Height; // 1-indexed last row
+                Write (EscSeqUtils.CSI_SetCursorPosition (lastInlineRow, 1));
+                Write ("\n");
+                Write (EscSeqUtils.CSI_ShowCursor);
+            }
+            else
+            {
+                // FullScreen mode: restore alternate buffer and show cursor
+                Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+                Write (EscSeqUtils.CSI_ShowCursor);
+            }
         }
         catch
         {
