@@ -267,8 +267,7 @@ public interface IApplication : IDisposable
     /// </remarks>
     [RequiresUnreferencedCode ("AOT")]
     [RequiresDynamicCode ("AOT")]
-    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null)
-        where TRunnable : IRunnable, new();
+    public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new ();
 
     #region Iteration & Invoke
 
@@ -424,7 +423,7 @@ public interface IApplication : IDisposable
     ///     }
     ///     </code>
     /// </example>
-    T? GetResult<T> () where T : class { return GetResult () as T; }
+    T? GetResult<T> () where T : class => GetResult () as T;
 
     #endregion Result Management
 
@@ -437,6 +436,21 @@ public interface IApplication : IDisposable
     ///     </para>
     /// </remarks>
     IDriver? Driver { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the ANSI startup readiness gate.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When set, startup rendering can be deferred until required ANSI startup capability
+    ///         probes complete (or time out). When <see langword="null"/>, startup rendering proceeds
+    ///         immediately.
+    ///     </para>
+    ///     <para>
+    ///         Tests and inline app mode can assign a gate instance to opt into this behavior.
+    ///     </para>
+    /// </remarks>
+    AnsiStartupGate? AnsiStartupGate { get; set; }
 
     /// <summary>
     ///     Gets the clipboard for this application instance.
@@ -454,6 +468,21 @@ public interface IApplication : IDisposable
     ///     specified, the driver is selected based on the platform.
     /// </summary>
     string ForceDriver { get; set; }
+
+    /// <summary>
+    ///     Gets or sets how the application interacts with the terminal buffer.
+    ///     <see cref="AppModel.FullScreen"/> uses the alternate screen buffer (default).
+    ///     <see cref="AppModel.Inline"/> renders inline in the primary scrollback buffer.
+    /// </summary>
+    AppModel AppModel { get; set; }
+
+    /// <summary>
+    ///     Gets or sets an override for the initial cursor position used in <see cref="AppModel.Inline"/> mode.
+    ///     When set (non-null) before <see cref="Run{T}"/>, this value is used instead of
+    ///     querying the terminal via ANSI CPR. Useful for testing inline mode at specific cursor positions.
+    ///     The <c>Y</c> component specifies the terminal row; <c>X</c> is reserved for future use.
+    /// </summary>
+    Point? ForceInlinePosition { get; set; }
 
     /// <summary>
     ///     Gets or sets the size of the screen. By default, this is the size of the screen as reported by the
@@ -582,6 +611,16 @@ public interface IApplication : IDisposable
     ///     </para>
     /// </remarks>
     ApplicationPopover? Popovers { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the tool tip manager used to display contextual help for UI elements within the application.
+    /// </summary>
+    /// <remarks>
+    ///     Assigning a value to this property enables tool tip functionality, allowing users to receive
+    ///     additional information when interacting with supported controls. If set to null, tool tips are disabled for the
+    ///     application.
+    /// </remarks>
+    ApplicationToolTip? ToolTips { get; set; }
 
     #endregion Navigation and Popover
 

@@ -57,6 +57,19 @@ public class KittyKeyboardPipelineTests
         Assert.Empty (up);
     }
 
+    [Fact]
+    public void Pipeline_AltGrE_Press_RaisesEuroKeyDown ()
+    {
+        // ESC[8364;1:1u = Euro symbol press
+        (List<Key> down, List<Key> up) = InjectRawSequence ("\x1b[8364;1:1u");
+
+        Assert.Single (down);
+        Assert.Equal (KeyEventType.Press, down [0].EventType);
+        Assert.Equal ((KeyCode)8364, down [0].KeyCode);
+        Assert.Equal ("€", down [0].AsGrapheme);
+        Assert.Empty (up);
+    }
+
     // Copilot - Opus 4.6
     [Fact]
     public void Pipeline_Repeat_RaisesKeyDown ()
@@ -191,6 +204,55 @@ public class KittyKeyboardPipelineTests
 
     #endregion
 
+    #region Mixed Kitty + Legacy Duplicate Input
+
+    // Copilot
+    [Fact]
+    public void Pipeline_MixedKittyAndLegacyPrintable_DoesNotRaiseDuplicateKeyDown ()
+    {
+        // Reproduces terminals that emit kitty CSI-u and a legacy printable char for the same keypress.
+        // Expected behavior: a single logical key event should be raised.
+        (List<Key> down, List<Key> up) = InjectRawSequence ("\x1b[97u", "a");
+
+        Assert.Single (down);
+        Assert.Equal (Key.A, down [0]);
+        Assert.Empty (up);
+    }
+
+    // Copilot
+    [Theory]
+    [InlineData ("«", 171)]
+    [InlineData ("»", 187)]
+    [InlineData ("ç", 231)]
+    [InlineData ("Ç", 199)]
+    [InlineData ("º", 186)]
+    [InlineData ("ª", 170)]
+    public void Pipeline_MixedKittyAndLegacyPrintable_PortugueseKeys_DoesNotRaiseDuplicateKeyDown (string printable, int kittyCode)
+    {
+        // Issue #4918 (PT keyboard): kitty CSI-u plus legacy printable input for the same key should produce one KeyDown.
+        var kittySequence = $"\x1b[{kittyCode}u";
+        (List<Key> down, List<Key> up) = InjectRawSequence (kittySequence, printable);
+
+        Assert.Single (down);
+        Assert.Equal (printable, down [0].GetPrintableText ());
+        Assert.Empty (up);
+    }
+
+    // Copilot
+    [Fact]
+    public void Pipeline_MixedKittyAssociatedTextAndLegacyPrintable_DoesNotRaiseDuplicateKeyDown ()
+    {
+        // Reproduces terminals that emit a kitty key event with associated text plus a legacy char.
+        // ESC[49;2;33u = shifted '1' producing associated text '!'
+        (List<Key> down, List<Key> up) = InjectRawSequence ("\x1b[49;2;33u", "!");
+
+        Assert.Single (down);
+        Assert.Equal ("!", down [0].GetPrintableText ());
+        Assert.Empty (up);
+    }
+
+    #endregion
+
     #region Standalone Modifier Key Events
 
     // Copilot - Opus 4.6
@@ -249,6 +311,7 @@ public class KittyKeyboardPipelineTests
     [InlineData ("\x1b[57447u", ModifierKey.RightShift)]
     [InlineData ("\x1b[57448u", ModifierKey.RightCtrl)]
     [InlineData ("\x1b[57449u", ModifierKey.RightAlt)]
+    [InlineData ("\x1b[57453u", ModifierKey.AltGr)]
     public void Pipeline_ModifierPress_RaisesKeyDown (string sequence, ModifierKey expectedModifier)
     {
         // Standalone modifier press should raise app.Keyboard.KeyDown
@@ -269,6 +332,7 @@ public class KittyKeyboardPipelineTests
     [InlineData ("\x1b[57447;1:3u", ModifierKey.RightShift)]
     [InlineData ("\x1b[57448;1:3u", ModifierKey.RightCtrl)]
     [InlineData ("\x1b[57449;1:3u", ModifierKey.RightAlt)]
+    [InlineData ("\x1b[57453;1:3u", ModifierKey.AltGr)]
     public void Pipeline_ModifierRelease_RaisesKeyUp (string sequence, ModifierKey expectedModifier)
     {
         // Standalone modifier release should raise app.Keyboard.KeyUp
@@ -279,6 +343,19 @@ public class KittyKeyboardPipelineTests
         Assert.True (up [0].IsModifierOnly);
         Assert.Equal (expectedModifier, up [0].ModifierKey);
         Assert.Equal (KeyEventType.Release, up [0].EventType);
+    }
+
+    [Fact]
+    public void Pipeline_LeftAltPress_WithCtrlModifier_PreservesBothStates ()
+    {
+        (List<Key> down, List<Key> up) = InjectRawSequence ("\x1b[57443;5u");
+
+        Assert.Single (down);
+        Assert.True (down [0].IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftAlt, down [0].ModifierKey);
+        Assert.True (down [0].IsCtrl);
+        Assert.False (down [0].IsAlt);
+        Assert.Empty (up);
     }
 
     #endregion
@@ -545,5 +622,55 @@ public class KittyKeyboardPipelineTests
         Assert.Equal (KeyEventType.Release, keyUpEvents [0].EventType);
     }
 
-    #endregion
+    // Copilot - Opus 4.6
+    [Fact]
+    public void Pipeline_KittyPrintableKey ()
+    {
+        // Test that kitty CSI u sequence produces the expected key event
+        (List<Key> down, List<Key> up) = InjectRawSequence (
+            "\x1b[171;2:1u"  // ESC[171;2:1u = '«'(171) + Shift(2), press(1) - kitty sequence
+        );
+
+        // Should have one key event from kitty
+        Assert.Single (down);
+        // For Shift+«, the kitty sequence should produce a key with KeyCode = 171 and IsShift = true
+        Assert.Equal (171, down [0].AsRune.Value);
+        Assert.True (down [0].IsShift);
+        Assert.Empty (up);
+    }
+
+    // Copilot - Opus 4.6
+    // Theory test for alternative kitty code points (57417-57426)
+    [Theory]
+    [InlineData (57417, nameof (Key.CursorLeft))]
+    [InlineData (57418, nameof (Key.CursorRight))]
+    [InlineData (57419, nameof (Key.CursorUp))]
+    [InlineData (57420, nameof (Key.CursorDown))]
+    [InlineData (57421, nameof (Key.PageUp))]
+    [InlineData (57422, nameof (Key.PageDown))]
+    [InlineData (57423, nameof (Key.Home))]
+    [InlineData (57424, nameof (Key.End))]
+    [InlineData (57425, nameof (Key.InsertChar))]
+    [InlineData (57426, nameof (Key.Delete))]
+    public void Alternative_KittyCodePoints_Map_To_Correct_Keys (int kittyCode, string expectedKeyName)
+    {
+        // Arrange - Build the kitty sequence for the code point
+        string sequence = $"\x1b[{kittyCode}u";  // ESC[codePointu (press event, no modifiers)
+
+        // Act
+        (List<Key> down, List<Key> up) = InjectRawSequence (sequence);
+
+        // Assert - Should have exactly one key down event
+        Assert.Single (down);
+
+        // Get the expected key by name from the Key class
+        System.Reflection.PropertyInfo? prop = typeof (Key).GetProperty (expectedKeyName);
+        Assert.NotNull (prop);
+        Key expectedKey = (Key)prop!.GetValue (null)!;
+
+        // Verify the mapped key matches the expected key
+        Assert.Equal (expectedKey.KeyCode, down [0].KeyCode);
+        Assert.Empty (up);
+    }
 }
+#endregion

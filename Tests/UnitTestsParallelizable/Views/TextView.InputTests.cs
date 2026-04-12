@@ -183,6 +183,116 @@ public class TextViewInputTests
         Assert.False (tv.IsSelecting);
     }
 
+    [Fact]
+    public void KittyAssociatedText_ShiftedPrintableKey_InsertsAssociatedText ()
+    {
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new () { Width = 10, Height = 2 };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        Key kittyKey = new ('!') { AssociatedText = "!" };
+
+        Assert.True (tv.NewKeyDownEvent (kittyKey));
+        Assert.Equal ("!", tv.Text);
+        Assert.Equal (new Point (1, 0), tv.InsertionPoint);
+    }
+
+    [Fact]
+    public void KittyAltGrModifierOnly_DoesNotInsertPrivateUseRune ()
+    {
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new () { Width = 10, Height = 2 };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        Key kittyKey = new () { ModifierKey = ModifierKey.AltGr };
+
+        Assert.False (tv.NewKeyDownEvent (kittyKey));
+        Assert.Equal (string.Empty, tv.Text);
+        Assert.Equal (Point.Empty, tv.InsertionPoint);
+    }
+
+    [Fact]
+    public void KittyAltGr5_InsertsEuroSymbol ()
+    {
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new () { Width = 10, Height = 2 };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        Key? key = new KittyKeyboardPattern ().GetKey ("\u001b[8364;1:1u");
+
+        Assert.NotNull (key);
+        Assert.True (tv.NewKeyDownEvent (key));
+        Assert.Equal ("€", tv.Text);
+        Assert.Equal (new Point (1, 0), tv.InsertionPoint);
+    }
+
+    [Fact]
+    public void KittyAltGrE_InsertsEuroSymbol ()
+    {
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new () { Width = 10, Height = 2 };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        Key? key = new KittyKeyboardPattern ().GetKey ("\u001b[8364;1:1u");
+
+        Assert.NotNull (key);
+        Assert.True (tv.NewKeyDownEvent (key));
+        Assert.Equal ("€", tv.Text);
+        Assert.Equal (new Point (1, 0), tv.InsertionPoint);
+    }
+
+    [Fact]
+    public void KittyAltGr2_InsertsAtSign ()
+    {
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new () { Width = 10, Height = 2 };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        Key? key = new KittyKeyboardPattern ().GetKey ("\u001b[64::50;;64u");
+
+        Assert.NotNull (key);
+        Assert.True (tv.NewKeyDownEvent (key));
+        Assert.Equal ("@", tv.Text);
+        Assert.Equal (new Point (1, 0), tv.InsertionPoint);
+    }
+
+    [Fact]
+    public void InsertText_GraphemeSequence_PreservesSingleGrapheme ()
+    {
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new () { Width = 10, Height = 2 };
+
+        runnable.Add (tv);
+        app.Begin (runnable);
+
+        tv.InsertText ("👨‍👩‍👧‍👦");
+
+        Assert.Equal ("👨‍👩‍👧‍👦", tv.Text);
+        Assert.Equal (new Point (1, 0), tv.InsertionPoint);
+    }
+
     // CoPilot - decomposed from KeyBindings_Command test
     [Fact]
     public void Backspace_Deletes_Previous_Character ()

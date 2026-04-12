@@ -27,10 +27,10 @@ jobs:
       contents: write
     
     steps:
-      - name: Checkout v2_release
-        uses: actions/checkout@v4
+      - name: Checkout main
+        uses: actions/checkout@v6
         with:
-          ref: v2_release
+          ref: main
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -40,12 +40,12 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Install GitVersion
-        uses: gittools/actions/gitversion/setup@v3.1.11
+        uses: gittools/actions/gitversion/setup@v4.5.0
         with:
           versionSpec: '6.0.x'
 
       - name: Determine Version
-        uses: gittools/actions/gitversion/execute@v3.1.11
+        uses: gittools/actions/gitversion/execute@v4.5.0
         with:
           useConfigFile: true
           updateAssemblyInfo: true
@@ -99,7 +99,7 @@ jobs:
 
       - name: Push Changes
         run: |
-          git push origin v2_release
+          git push origin main
           git push origin "${{ steps.prepare.outputs.tag }}"
           echo "Pushed branch and tag to origin"
 

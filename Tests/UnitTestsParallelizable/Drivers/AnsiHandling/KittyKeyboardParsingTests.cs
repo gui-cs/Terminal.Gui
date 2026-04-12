@@ -191,6 +191,17 @@ public class KittyKeyboardParsingTests
     }
 
     [Fact]
+    public void KittyPattern_AltGr_Standalone ()
+    {
+        // ESC[57453u = AltGr / ISO_Level3_Shift
+        Key? key = _pattern.GetKey ("\u001b[57453u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.AltGr, key.ModifierKey);
+    }
+
+    [Fact]
     public void KittyPattern_CapsLock_Standalone ()
     {
         // ESC[57358u = Caps Lock
@@ -221,6 +232,57 @@ public class KittyKeyboardParsingTests
         Assert.NotNull (key);
         Assert.True (key.IsModifierOnly);
         Assert.Equal (ModifierKey.LeftShift, key.ModifierKey);
+        Assert.Equal (KeyEventType.Release, key.EventType);
+    }
+
+    [Fact]
+    public void KittyPattern_AltGr_WithEventType_Release ()
+    {
+        // ESC[57453;1:3u = AltGr / ISO_Level3_Shift, event type 3 (release)
+        Key? key = _pattern.GetKey ("\u001b[57453;1:3u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.AltGr, key.ModifierKey);
+        Assert.Equal (KeyEventType.Release, key.EventType);
+    }
+
+    [Fact]
+    public void KittyPattern_LeftAlt_WithCtrlModifier_PreservesBothStates ()
+    {
+        Key? key = _pattern.GetKey ("\u001b[57443;5u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftAlt, key.ModifierKey);
+        Assert.True (key.IsCtrl);
+        Assert.False (key.IsAlt);
+        Assert.Equal (KeyEventType.Press, key.EventType);
+    }
+
+    [Fact]
+    public void KittyPattern_LeftAlt_Release_WithCtrlAndAltModifiers_PreservesBothStates ()
+    {
+        Key? key = _pattern.GetKey ("\u001b[57443;7:3u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftAlt, key.ModifierKey);
+        Assert.True (key.IsCtrl);
+        Assert.True (key.IsAlt);
+        Assert.Equal (KeyEventType.Release, key.EventType);
+    }
+
+    [Fact]
+    public void KittyPattern_LeftCtrl_Release_WithCtrlModifier_PreservesState ()
+    {
+        Key? key = _pattern.GetKey ("\u001b[57442;5:3u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftCtrl, key.ModifierKey);
+        Assert.True (key.IsCtrl);
+        Assert.False (key.IsAlt);
         Assert.Equal (KeyEventType.Release, key.EventType);
     }
 
@@ -342,11 +404,12 @@ public class KittyKeyboardParsingTests
     [Fact]
     public void KittyPattern_AlternateKeys_ShiftedOnly ()
     {
-        // ESC[97:64u = 'a' with shifted key '@' (codepoint 64)
-        Key? key = _pattern.GetKey ("\u001b[97:64u");
+        // Previous fixture ESC[97:64u was misleading because 'a' -> '@' is not a sensible US-keyboard example.
+        // ESC[50:64u = '2' with shifted key '@' (codepoint 64)
+        Key? key = _pattern.GetKey ("\u001b[50:64u");
 
         Assert.NotNull (key);
-        Assert.Equal (Key.A, key);
+        Assert.Equal (Key.D2, key);
         Assert.Equal ((KeyCode)64, key.ShiftedKeyCode);
         Assert.Equal (KeyCode.Null, key.BaseLayoutKeyCode);
     }
@@ -355,11 +418,12 @@ public class KittyKeyboardParsingTests
     [Fact]
     public void KittyPattern_AlternateKeys_ShiftedAndBaseLayout ()
     {
-        // ESC[97:64:50u = 'a' with shifted key '@' (64) and base layout key '2' (50)
-        Key? key = _pattern.GetKey ("\u001b[97:64:50u");
+        // Previous fixture ESC[97:64:50u was internally inconsistent for a US-keyboard example.
+        // ESC[50:64:50u = '2' with shifted key '@' (64) and base layout key '2' (50)
+        Key? key = _pattern.GetKey ("\u001b[50:64:50u");
 
         Assert.NotNull (key);
-        Assert.Equal (Key.A, key);
+        Assert.Equal (Key.D2, key);
         Assert.Equal ((KeyCode)64, key.ShiftedKeyCode);
         Assert.Equal ((KeyCode)50, key.BaseLayoutKeyCode);
     }
@@ -368,11 +432,11 @@ public class KittyKeyboardParsingTests
     [Fact]
     public void KittyPattern_AlternateKeys_BaseLayoutOnly ()
     {
-        // ESC[97:0:50u = 'a' with no shifted key (0) and base layout key '2' (50)
-        Key? key = _pattern.GetKey ("\u001b[97:0:50u");
+        // ESC[50:0:50u = '2' with no shifted key (0) and base layout key '2' (50)
+        Key? key = _pattern.GetKey ("\u001b[50:0:50u");
 
         Assert.NotNull (key);
-        Assert.Equal (Key.A, key);
+        Assert.Equal (Key.D2, key);
         Assert.Equal (KeyCode.Null, key.ShiftedKeyCode);
         Assert.Equal ((KeyCode)50, key.BaseLayoutKeyCode);
     }
@@ -394,27 +458,55 @@ public class KittyKeyboardParsingTests
     [Fact]
     public void KittyPattern_AlternateKeys_WithModifiers ()
     {
-        // ESC[97:64:50;2u = 'a' with shifted '@', base '2', Shift modifier
-        Key? key = _pattern.GetKey ("\u001b[97:64:50;2u");
+        // Previous fixture ESC[97:64:50;2u was misleading because 'a', '@', and US-base '2' do not describe
+        // a coherent US-keyboard case.
+        // ESC[50:64;2;64u = '2' with shifted key '@' (64), Shift modifier (2),
+        // and associated text '@' (64). The redundant base-layout field is omitted because
+        // it would duplicate the primary key code on a US keyboard.
+        Key? key = _pattern.GetKey ("\u001b[50:64;2;64u");
 
         Assert.NotNull (key);
-        Assert.Equal (Key.A.WithShift, key);
+        Assert.Equal (new Key ('@'), key);
         Assert.Equal ((KeyCode)64, key.ShiftedKeyCode);
-        Assert.Equal ((KeyCode)50, key.BaseLayoutKeyCode);
+        Assert.Equal (KeyCode.Null, key.BaseLayoutKeyCode);
+        Assert.Equal ("@", key.AssociatedText);
     }
 
     // Copilot - Opus 4.6
     [Fact]
     public void KittyPattern_AlternateKeys_WithModifiersAndEventType ()
     {
-        // ESC[97:64:50;2:3u = 'a' with shifted '@', base '2', Shift modifier, release event
-        Key? key = _pattern.GetKey ("\u001b[97:64:50;2:3u");
+        // ESC[50:64;2:3;64u = same coherent US-keyboard example, release event
+        Key? key = _pattern.GetKey ("\u001b[50:64;2:3;64u");
 
         Assert.NotNull (key);
-        Assert.Equal (Key.A.WithShift, key);
+        Assert.Equal (new Key ('@'), key);
         Assert.Equal ((KeyCode)64, key.ShiftedKeyCode);
-        Assert.Equal ((KeyCode)50, key.BaseLayoutKeyCode);
+        Assert.Equal (KeyCode.Null, key.BaseLayoutKeyCode);
         Assert.Equal (KeyEventType.Release, key.EventType);
+        Assert.Equal ("@", key.AssociatedText);
+    }
+
+    [Fact]
+    public void KittyPattern_AssociatedText_ShiftedPrintableKey ()
+    {
+        // ESC[49;2;33u = physical '1' key with Shift modifier and associated text '!'
+        Key? key = _pattern.GetKey ("\u001b[49;2;33u");
+
+        Assert.NotNull (key);
+        Assert.Equal (new Key ('!'), key);
+        Assert.Equal ("!", key.AssociatedText);
+        Assert.Equal ("!", key.GetPrintableText ());
+    }
+
+    [Fact]
+    public void KittyPattern_AssociatedText_MultipleCodePoints ()
+    {
+        // ESC[97;1;769:97u = associated text composed of combining acute accent + 'a'
+        Key? key = _pattern.GetKey ("\u001b[97;1;769:97u");
+
+        Assert.NotNull (key);
+        Assert.Equal ("\u0301a", key.AssociatedText);
     }
 
     // Copilot - Opus 4.6
@@ -428,6 +520,58 @@ public class KittyKeyboardParsingTests
         Assert.Equal (Key.Enter, key);
         Assert.Equal (KeyCode.Null, key.ShiftedKeyCode);
         Assert.Equal ((KeyCode)13, key.BaseLayoutKeyCode);
+    }
+
+    [Fact]
+    public void KittyPattern_EmptyFields_WithAssociatedText ()
+    {
+        // ESC[64::50;;64u = '@' with empty shifted field, base layout '2', empty modifiers, associated text '@'
+        Key? key = _pattern.GetKey ("\u001b[64::50;;64u");
+
+        Assert.NotNull (key);
+        Assert.Equal (new Key ('@'), key);
+        Assert.Equal (KeyCode.Null, key.ShiftedKeyCode);
+        Assert.Equal ((KeyCode)50, key.BaseLayoutKeyCode);
+        Assert.Equal ("@", key.AssociatedText);
+    }
+
+    [Fact]
+    public void KittyPattern_AltGr5_Press_ReturnsEuroGrapheme ()
+    {
+        // ESC[8364;1:1u = Euro symbol, no modifiers, press
+        Key? key = _pattern.GetKey ("\u001b[8364;1:1u");
+
+        Assert.NotNull (key);
+        Assert.Equal (KeyEventType.Press, key.EventType);
+        Assert.Equal ((KeyCode)8364, key.KeyCode);
+        Assert.Equal ("€", key.AsGrapheme);
+        Assert.Equal ("€", key.GetPrintableText ());
+    }
+
+    [Fact]
+    public void KittyPattern_AltGrE_EuroKey_Press_ReturnsEuroGrapheme ()
+    {
+        // ESC[8364;1:1u = AltGr+E on many layouts, which sends the euro codepoint 8364.
+        Key? key = _pattern.GetKey ("\u001b[8364;1:1u");
+
+        Assert.NotNull (key);
+        Assert.Equal (KeyEventType.Press, key.EventType);
+        Assert.Equal ((KeyCode)8364, key.KeyCode);
+        Assert.Equal ("€", key.AsGrapheme);
+        Assert.Equal ("€", key.GetPrintableText ());
+    }
+
+    [Fact]
+    public void KittyPattern_AltGrE_EuroKey_Release_ReturnsEuroGrapheme ()
+    {
+        // ESC[8364;1:3u = Euro symbol, no modifiers, release
+        Key? key = _pattern.GetKey ("\u001b[8364;1:3u");
+
+        Assert.NotNull (key);
+        Assert.Equal (KeyEventType.Release, key.EventType);
+        Assert.Equal ((KeyCode)8364, key.KeyCode);
+        Assert.Equal ("€", key.AsGrapheme);
+        Assert.Equal ("€", key.GetPrintableText ());
     }
 
     #endregion
@@ -451,6 +595,12 @@ public class KittyKeyboardParsingTests
         Assert.True (EscSeqUtils.KittyKeyboardRequestedFlags.HasFlag (KittyKeyboardFlags.ReportAlternateKeys),
                      $"KittyKeyboardRequestedFlags ({EscSeqUtils.KittyKeyboardRequestedFlags}) must include ReportAlternateKeys "
                      + "for international keyboard layout support.");
+
+    [Fact]
+    public void KittyRequestedFlags_IncludesReportAssociatedText () =>
+        Assert.True (EscSeqUtils.KittyKeyboardRequestedFlags.HasFlag (KittyKeyboardFlags.ReportAssociatedText),
+                     $"KittyKeyboardRequestedFlags ({EscSeqUtils.KittyKeyboardRequestedFlags}) must include ReportAssociatedText "
+                     + "for printable text fidelity.");
 
     #endregion
 }

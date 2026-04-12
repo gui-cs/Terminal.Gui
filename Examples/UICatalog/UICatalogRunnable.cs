@@ -1,7 +1,5 @@
 ﻿#nullable enable
 using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Text;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 using Terminal.Gui;
@@ -25,12 +23,8 @@ public sealed class UICatalogRunnable : Runnable
     // the scheme works.
     public static string? CachedRunnableScheme { get; set; }
 
-    // Diagnostics
-    private static ViewDiagnosticFlags _diagnosticFlags;
-
     public UICatalogRunnable ()
     {
-        _diagnosticFlags = Diagnostics;
         SchemeName = CachedRunnableScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
         ConfigurationManager.Applied += ConfigAppliedHandler;
     }
@@ -62,9 +56,30 @@ public sealed class UICatalogRunnable : Runnable
     /// <inheritdoc/>
     protected override void OnIsModalChanged (bool newIsModal)
     {
-        _disableMouseCb?.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
+        if (App is null)
+        {
+            return;
+        }
 
-        _shVersion?.Title = $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {App!.Driver!.GetVersionInfo ()}";
+        _disableMouseCb?.Value = App.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
+
+        string? driverName = App.Driver?.GetName ();
+
+        _shVersion?.Title = string.IsNullOrEmpty (driverName)
+                                ? $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}"
+                                : $"{RuntimeEnvironment.OperatingSystem} {RuntimeEnvironment.OperatingSystemVersion}, {driverName}";
+
+        App.AddTimeout (TimeSpan.FromMilliseconds (100),
+                        () =>
+                        {
+                            // Kitty detection is async, so we update the shortcut in a timeout.
+                            if (App.Driver?.KittyKeyboardCapabilities?.IsSupported is true)
+                            {
+                                _shVersion?.Title += " (kitty)";
+                            }
+
+                            return false;
+                        });
 
         if (string.IsNullOrEmpty ((string?)Result))
         {
@@ -81,11 +96,11 @@ public sealed class UICatalogRunnable : Runnable
 
         if (ShowStatusBar)
         {
-            _statusBar!.Height = Dim.Auto ();
+            _statusBar?.Height = Dim.Auto ();
         }
         else
         {
-            _statusBar!.Height = 0;
+            _statusBar?.Height = 0;
         }
     }
 
@@ -100,9 +115,11 @@ public sealed class UICatalogRunnable : Runnable
                 return;
             }
 
-            if (_scenarioList is { })
+            if (_scenarioList is { } && App is { } && _scenarioList.Table is { })
             {
-                ShowScenarioErrorsDialog (App!, (string)_scenarioList.Table! [_scenarioList.SelectedRow, 0], UICatalog.LogCapture.GetScenarioLogs ());
+                ShowScenarioErrorsDialog (App,
+                                          _scenarioList.Table [_scenarioList.SelectedRow, 0].ToString () ?? string.Empty,
+                                          UICatalog.LogCapture.GetScenarioLogs ());
             }
 
             UICatalog.LogCapture.HasErrors = false;
@@ -143,7 +160,7 @@ public sealed class UICatalogRunnable : Runnable
                                                     ]),
                                    new MenuBarItem ("_Themes", CreateThemeMenuItems ()),
                                    new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems ()),
-                                   new MenuBarItem ("_Logging", CreateLoggingMenuItems ()),
+                                   new MenuBarItem ("_Logging", CreateLoggingMenuItems ()!),
                                    new MenuBarItem (Strings.menuHelp,
                                                     [
                                                         new MenuItem ("_Documentation",
@@ -154,14 +171,7 @@ public sealed class UICatalogRunnable : Runnable
                                                                       "Project readme",
                                                                       () => Link.OpenUrl ("https://github.com/gui-cs/Terminal.Gui"),
                                                                       Key.F2),
-                                                        new MenuItem ("_About...",
-                                                                      "About UI Catalog",
-                                                                      () => MessageBox.Query (App!,
-                                                                                              "",
-                                                                                              GetAboutBoxMessage (),
-                                                                                              wrapMessage: false,
-                                                                                              buttons: Strings.btnOk),
-                                                                      Key.A.WithCtrl)
+                                                        new MenuItem ("_About...", "About UI Catalog", ShowAboutDialog, Key.A.WithCtrl)
                                                     ])
                                ]) { Title = "menuBar", Id = "menuBar" };
 
@@ -179,7 +189,7 @@ public sealed class UICatalogRunnable : Runnable
                 Action = () =>
                          {
                              Driver.Force16Colors = !Driver.Force16Colors;
-                             _force16ColorsShortcutCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+                             _force16ColorsShortcutCb?.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
                              SetNeedsDraw ();
                          }
             });
@@ -257,10 +267,10 @@ public sealed class UICatalogRunnable : Runnable
 
             _disableMouseCb = new CheckBox
             {
-                Title = "_Disable MouseEventArgs", Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked
+                Title = "_Disable MouseEventArgs", Value = App?.Mouse.IsMouseDisabled == true ? CheckState.Checked : CheckState.UnChecked
             };
 
-            _disableMouseCb.ValueChanged += (_, args) => { App!.Mouse.IsMouseDisabled = args.NewValue == CheckState.Checked; };
+            _disableMouseCb.ValueChanged += (_, args) => { App?.Mouse.IsMouseDisabled = args.NewValue == CheckState.Checked; };
             menuItems.Add (new MenuItem { CommandView = _disableMouseCb, HelpText = "Disable MouseEventArgs" });
 
             return menuItems.ToArray ();
@@ -421,9 +431,7 @@ public sealed class UICatalogRunnable : Runnable
 
             CheckBox drawTraceCheckBox = new ()
             {
-                Text = "_Draw",
-                Value = Trace.EnabledCategories.HasFlag (TraceCategory.Draw) ? CheckState.Checked : CheckState.UnChecked,
-                CanFocus = false
+                Text = "_Draw", Value = Trace.EnabledCategories.HasFlag (TraceCategory.Draw) ? CheckState.Checked : CheckState.UnChecked, CanFocus = false
             };
 
             drawTraceCheckBox.ValueChanging += (_, e) =>
@@ -449,7 +457,13 @@ public sealed class UICatalogRunnable : Runnable
 
             void OnLogLevelSelectorOnValueChanged (object? _, ValueChangedEventArgs<int?> args)
             {
-                UICatalog.Options = UICatalog.Options with { DebugLogLevel = Enum.GetName (Enum.GetValues<LogLevel> () [args.NewValue!.Value])! };
+                if (args.NewValue is { })
+                {
+                    UICatalog.Options = UICatalog.Options with
+                    {
+                        DebugLogLevel = Enum.GetName (Enum.GetValues<LogLevel> () [args.NewValue.Value]) ?? string.Empty
+                    };
+                }
 
                 UICatalog.LogLevelSwitch.MinimumLevel = UICatalog.LogLevelToLogEventLevel (Enum.Parse<LogLevel> (UICatalog.Options.DebugLogLevel));
             }
@@ -493,7 +507,11 @@ public sealed class UICatalogRunnable : Runnable
             CachedRunnableScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
         }
 
-        int newSelectedItem = SchemeManager.GetSchemeNames ().IndexOf (CachedRunnableScheme!);
+        if (CachedRunnableScheme is null)
+        {
+            return;
+        }
+        int newSelectedItem = SchemeManager.GetSchemeNames ().IndexOf (CachedRunnableScheme);
 
         // if the item is in bounds then select it
         if (newSelectedItem >= 0 && newSelectedItem < SchemeManager.GetSchemeNames ().Count)
@@ -513,20 +531,34 @@ public sealed class UICatalogRunnable : Runnable
 
     private TableView CreateScenarioList ()
     {
+        if (_categoryList is null)
+        {
+            throw new InvalidOperationException ("Category list must be created before scenario list");
+        }
+
+        if (_menuBar is null)
+        {
+            throw new InvalidOperationException ("Menu bar must be created before scenario list");
+        }
+
         // Create the scenario list. The contents of the scenario list changes whenever the
         // Category list selection changes (to show just the scenarios that belong to the selected
         // category).
         TableView scenarioList = new ()
         {
-            X = Pos.Right (_categoryList!) - 1,
-            Y = Pos.Bottom (_menuBar!),
+            X = Pos.Right (_categoryList) - 1,
+            Y = Pos.Bottom (_menuBar),
             Width = Dim.Fill (),
             Height = Dim.Height (_categoryList),
             CanFocus = true,
             Title = "_Scenarios",
-            BorderStyle = _categoryList!.BorderStyle,
+            BorderStyle = _categoryList?.BorderStyle ?? LineStyle.None,
             SuperViewRendersLineCanvas = true
         };
+
+        //scenarioList.Border.Settings = BorderSettings.Title | BorderSettings.Tab;
+        //scenarioList.Border.TabSide = Side.Top;
+        //scenarioList.Border.Thickness = new Thickness (1, 2, 1, 1);
 
         // TableView provides many options for table headers. For simplicity, we turn all
         // of these off. By enabling FullRowSelect and turning off headers, TableView looks just
@@ -551,7 +583,7 @@ public sealed class UICatalogRunnable : Runnable
          * we just measure all the data ourselves and set the appropriate
          * max widths as ColumnStyles
          */
-        int longestName = CachedScenarios!.Max (s => s.GetName ().Length);
+        int longestName = CachedScenarios?.Max (s => s.GetName ().Length) ?? 0;
 
         scenarioList.Style.ColumnStyles.Add (0, new ColumnStyle { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
         scenarioList.Style.ColumnStyles.Add (1, new ColumnStyle { MaxWidth = 1 });
@@ -578,11 +610,15 @@ public sealed class UICatalogRunnable : Runnable
     private void ScenarioView_OpenSelectedItem (object? sender, EventArgs? e)
     {
         // Save selected item state
-        _cachedCategoryIndex = _categoryList!.SelectedItem;
-        _cachedScenarioIndex = _scenarioList!.SelectedRow;
+        _cachedCategoryIndex = _categoryList?.SelectedItem;
 
-        // Set the Result to the selected scenario name
-        Result = (string)_scenarioList.Table! [_scenarioList.SelectedRow, 0];
+        if (_scenarioList is { })
+        {
+            _cachedScenarioIndex = _scenarioList.SelectedRow;
+
+            // Set the Result to the selected scenario name
+            Result = _scenarioList.Table? [_scenarioList.SelectedRow, 0];
+        }
         Logging.Information ($"Scenario Selected; Stopping {GetType ().Name}: {Result}");
         App?.RequestStop ();
     }
@@ -597,13 +633,23 @@ public sealed class UICatalogRunnable : Runnable
 
     private ListView CreateCategoryList ()
     {
+        if (_menuBar is null)
+        {
+            throw new InvalidOperationException ("Menu bar must be created before scenario list");
+        }
+
+        if (_statusBar is null)
+        {
+            throw new InvalidOperationException ("Status bar must be created before scenario list");
+        }
+
         // Create the Category list view. This list never changes.
         ListView categoryList = new ()
         {
             X = 0,
-            Y = Pos.Bottom (_menuBar!),
+            Y = Pos.Bottom (_menuBar),
             Width = Dim.Auto (),
-            Height = Dim.Fill (_statusBar!),
+            Height = Dim.Fill (_statusBar),
             ShowMarks = false,
             CanFocus = true,
             Title = "_Categories",
@@ -612,9 +658,13 @@ public sealed class UICatalogRunnable : Runnable
             Source = new ListWrapper<string> (CachedCategories)
         };
 
+        //categoryList.Border.Settings = BorderSettings.Title | BorderSettings.Tab;
+        //categoryList.Border.TabSide = Side.Top;
+        //categoryList.Border.Thickness = new Thickness (1, 2, 1, 1);
+
         categoryList.Accepting += (_, e) =>
                                   {
-                                      _scenarioList!.SetFocus ();
+                                      _scenarioList?.SetFocus ();
                                       e.Handled = true;
                                   };
         categoryList.ValueChanged += CategoryView_SelectedChanged;
@@ -627,24 +677,25 @@ public sealed class UICatalogRunnable : Runnable
 
     private void CategoryView_SelectedChanged (object? sender, ValueChangedEventArgs<int?> e)
     {
-        if (e.NewValue is null)
+        if (e.NewValue is null || CachedCategories is null)
         {
             return;
         }
-        string item = CachedCategories! [e.NewValue.Value];
-        ObservableCollection<Scenario> newScenarioList;
+        string item = CachedCategories [e.NewValue.Value];
 
-        if (e.NewValue == 0)
+        if (CachedScenarios is null)
         {
-            // First category is "All"
-            newScenarioList = CachedScenarios!;
-        }
-        else
-        {
-            newScenarioList = new ObservableCollection<Scenario> (CachedScenarios!.Where (s => s.GetCategories ().Contains (item)).ToList ());
+            return;
         }
 
-        _scenarioList!.Table = new EnumerableTableSource<Scenario> (newScenarioList,
+        // First category is "All"
+        ObservableCollection<Scenario> newScenarioList = e.NewValue == 0
+                                                             ? CachedScenarios
+                                                             : new ObservableCollection<Scenario> (CachedScenarios
+                                                                                                   .Where (s => s.GetCategories ().Contains (item))
+                                                                                                   .ToList ());
+
+        _scenarioList?.Table = new EnumerableTableSource<Scenario> (newScenarioList,
                                                                     new Dictionary<string, Func<Scenario, object>>
                                                                     {
                                                                         { "Name", s => s.GetName () }, { "Description", s => s.GetDescription () }
@@ -661,7 +712,7 @@ public sealed class UICatalogRunnable : Runnable
     [JsonPropertyName ("UICatalog.StatusBar")]
     public static bool ShowStatusBar
     {
-        get => field;
+        get;
         set
         {
             if (field == value)
@@ -680,6 +731,77 @@ public sealed class UICatalogRunnable : Runnable
     private Shortcut? _shVersion;
     private CheckBox? _force16ColorsShortcutCb;
 
+    /// <summary>
+    ///     Returns the first F-key (F1–F12) that is not already bound in
+    ///     <see cref="Application.KeyBindings"/>, used as the activation key for
+    ///     <see cref="MenuBar.DefaultKey"/> or <see cref="PopoverMenu.DefaultKey"/>,
+    ///     or assigned to a <see cref="MenuItem.Key"/> on a menu item. Falls back to
+    ///     <see cref="Key.F12"/> if all are taken.
+    /// </summary>
+    /// <param name="ignoreKeys"></param>
+    private Key GetFirstUnboundFKey (HashSet<Key> ignoreKeys)
+    {
+        Key [] fKeys =
+        [
+            Key.F1,
+            Key.F2,
+            Key.F3,
+            Key.F4,
+            Key.F5,
+            Key.F6,
+            Key.F7,
+            Key.F8,
+            Key.F9,
+            Key.F10,
+            Key.F11,
+            Key.F12
+        ];
+
+        // Collect keys already bound at the Application level
+        HashSet<Key> boundKeys = ignoreKeys;
+
+        foreach (Key fKey in fKeys)
+        {
+            if (App?.Keyboard.KeyBindings.TryGet (fKey, out _) is true)
+            {
+                boundKeys.Add (fKey);
+            }
+        }
+
+        // Also exclude the MenuBar and PopoverMenu activation keys
+        boundKeys.Add (MenuBar.DefaultKey);
+        boundKeys.Add (PopoverMenu.DefaultKey);
+
+        // Exclude keys used by MenuBar menu items
+        if (_menuBar is { })
+        {
+            foreach (MenuItem menuItem in _menuBar.GetMenuItemsWith (mi => mi.Key.IsValid))
+            {
+                boundKeys.Add (menuItem.Key);
+            }
+        }
+
+        // Exclude keys used by StatusBar items
+        if (_statusBar is { })
+        {
+            foreach (View view in _statusBar.SubViews)
+            {
+                var shortcut = (Shortcut)view;
+                boundKeys.Add (shortcut.Key);
+            }
+        }
+
+        foreach (Key fKey in fKeys)
+        {
+            if (!boundKeys.Contains (fKey))
+            {
+                return fKey;
+            }
+        }
+
+        return Key.F12;
+    }
+
     private StatusBar CreateStatusBar ()
     {
         StatusBar statusBar = new () { AlignmentModes = AlignmentModes.IgnoreFirstOrLast, CanFocus = false };
@@ -689,7 +811,10 @@ public sealed class UICatalogRunnable : Runnable
 
         _shVersion = new Shortcut { Title = "Version Info", CanFocus = false };
 
-        Shortcut statusBarShortcut = new () { Key = Key.F10, Title = "Show/Hide Status Bar", CanFocus = false, Action = () => ShowStatusBar = !ShowStatusBar };
+        Shortcut statusBarShortcut = new ()
+        {
+            Key = GetFirstUnboundFKey ([]), Title = "Show/Hide Status Bar", CanFocus = false, Action = () => ShowStatusBar = !ShowStatusBar
+        };
 
         _force16ColorsShortcutCb = new CheckBox
         {
@@ -702,11 +827,11 @@ public sealed class UICatalogRunnable : Runnable
             CommandView = _force16ColorsShortcutCb,
             HelpText = "",
             BindKeyToApplication = true,
-            Key = Key.F7,
+            Key = GetFirstUnboundFKey ([statusBarShortcut.Key]),
             Action = () =>
                      {
                          Driver.Force16Colors = !Driver.Force16Colors;
-                         _force16ColorsMenuItemCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+                         _force16ColorsMenuItemCb?.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
                          SetNeedsDraw ();
                      }
         };
@@ -722,12 +847,12 @@ public sealed class UICatalogRunnable : Runnable
                                 switch (args.NewValue)
                                 {
                                     case true:
-                                        _statusBar!.Height = Dim.Auto ();
+                                        _statusBar?.Height = Dim.Auto ();
 
                                         break;
 
                                     case false:
-                                        _statusBar!.Height = 0;
+                                        _statusBar?.Height = 0;
 
                                         break;
                                 }
@@ -751,10 +876,10 @@ public sealed class UICatalogRunnable : Runnable
 
         _shQuit?.Key = Application.GetDefaultKey (Command.Quit);
 
-        _disableMouseCb!.Value = App!.Mouse.IsMouseDisabled ? CheckState.Checked : CheckState.UnChecked;
-        _force16ColorsShortcutCb!.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
+        _disableMouseCb?.Value = App?.Mouse.IsMouseDisabled == true ? CheckState.Checked : CheckState.UnChecked;
+        _force16ColorsShortcutCb?.Value = Driver.Force16Colors ? CheckState.Checked : CheckState.UnChecked;
 
-        App.TopRunnableView?.SetNeedsDraw ();
+        App?.TopRunnableView?.SetNeedsDraw ();
     }
 
     private void ConfigAppliedHandler (object? sender, ConfigurationManagerEventArgs? a) => ConfigApplied ();
@@ -762,31 +887,41 @@ public sealed class UICatalogRunnable : Runnable
     #endregion Configuration Manager
 
     /// <summary>
-    ///     Gets the message displayed in the About Box. `public` so it can be used from Unit tests.
+    ///     The URL displayed in the About Box.
     /// </summary>
-    /// <returns></returns>
-    public static string GetAboutBoxMessage ()
+    public const string ABOUT_URL = "https://github.com/gui-cs/Terminal.Gui";
+
+    private void ShowAboutDialog ()
     {
-        // NOTE: Do not use multiline verbatim strings here.
-        // WSL gets all confused.
-        StringBuilder msg = new ();
-        msg.AppendLine ("UI Catalog: A comprehensive sample library and test app for");
-        msg.AppendLine ();
+        Dialog dialog = new () { Title = "", Buttons = [new Button { Title = Strings.btnOk, IsDefault = true }] };
 
-        msg.AppendLine ("""
-                         _______                  _             _   _____       _ 
-                        |__   __|                (_)           | | / ____|     (_)
-                           | | ___ _ __ _ __ ___  _ _ __   __ _| || |  __ _   _ _ 
-                           | |/ _ \ '__| '_ ` _ \| | '_ \ / _` | || | |_ | | | | |
-                           | |  __/ |  | | | | | | | | | | (_| | || |__| | |_| | |
-                           |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|_(_)_____|\__,_|_|
-                        """);
-        msg.AppendLine ();
-        msg.AppendLine ("v2 - Beta");
-        msg.AppendLine ();
-        msg.Append ("https://github.com/gui-cs/Terminal.Gui");
+        Label tagline = new ()
+        {
+            Text = "UI Catalog: A comprehensive sample library and test app for",
+            TextAlignment = Alignment.Center,
+            X = Pos.Center (),
+            Width = Dim.Auto (DimAutoStyle.Text),
+            Height = Dim.Auto (DimAutoStyle.Text)
+        };
 
-        return msg.ToString ();
+        Logo logo = new () { X = Pos.Center (), Y = Pos.Bottom (tagline) + 1 };
+
+        View version = new ()
+        {
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+            Text = "v2 - Beta",
+            X = Pos.Center (),
+            Y = Pos.Bottom (logo) + 1
+        };
+
+        Link link = new () { Text = ABOUT_URL, Url = ABOUT_URL, X = Pos.Center (), Y = Pos.Bottom (version) + 1 };
+        App?.ToolTips?.SetToolTip (link, () => link.Url);
+
+        dialog.Add (tagline, logo, version, link);
+        dialog.Buttons.ElementAt (0).SetFocus ();
+        App?.Run (dialog);
+        dialog.Dispose ();
     }
 
     /// <summary>

@@ -1,5 +1,5 @@
 using System.Reflection;
-using System.Text.Json;
+
 namespace ConfigurationTests;
 
 public class SourcesManagerTests
@@ -54,7 +54,6 @@ public class SourcesManagerTests
         Assert.Contains (source, sourcesManager.Sources.Values);
     }
 
-
     #endregion
 
     #region Update (FilePath)
@@ -91,7 +90,7 @@ public class SourcesManagerTests
                         "Driver.Force16Colors": true
                    }
                    """;
-        var source = Path.GetTempFileName ();
+        string source = Path.GetTempFileName ();
         var location = ConfigLocations.HardCoded;
 
         File.WriteAllText (source, json);
@@ -191,7 +190,6 @@ public class SourcesManagerTests
         Assert.Equal (true, settingsScope ["Driver.Force16Colors"].PropertyValue);
         Assert.Contains (source, sourcesManager.Sources.Values);
     }
-
 
     //[Fact]
     //public void Update_WithValidJson_UpdatesThemeScope ()
@@ -329,7 +327,7 @@ public class SourcesManagerTests
         settingsScope ["Driver.Force16Colors"].PropertyValue = true;
 
         // Act
-        Stream stream = sourcesManager.ToStream (settingsScope);
+        var stream = sourcesManager.ToStream (settingsScope);
 
         // Assert
         Assert.NotNull (stream);
@@ -381,16 +379,10 @@ public class SourcesManagerTests
         var sourcesManager = new SourcesManager ();
         var settingsScope = new SettingsScope ();
 
-        ConfigLocations [] locations =
-        [
-            ConfigLocations.LibraryResources,
-            ConfigLocations.Runtime,
-            ConfigLocations.AppCurrent,
-            ConfigLocations.GlobalHome
-        ];
+        ConfigLocations [] locations = [ConfigLocations.LibraryResources, ConfigLocations.Runtime, ConfigLocations.AppCurrent, ConfigLocations.GlobalHome];
 
         // Act - Update with different sources for different locations
-        foreach (var location in locations)
+        foreach (ConfigLocations location in locations)
         {
             var source = $"config-{location}.json";
             sourcesManager.Load (settingsScope, """{"Driver.Force16Colors": true}""", source, location);
@@ -398,7 +390,8 @@ public class SourcesManagerTests
 
         // Assert
         Assert.Equal (locations.Length, sourcesManager.Sources.Count);
-        foreach (var location in locations)
+
+        foreach (ConfigLocations location in locations)
         {
             Assert.Contains (location, sourcesManager.Sources.Keys);
             Assert.Equal ($"config-{location}.json", sourcesManager.Sources [location]);
@@ -433,22 +426,21 @@ public class SourcesManagerTests
         var settingsScope = new SettingsScope ();
 
         // Define multiple files and locations
-        var fileLocations = new Dictionary<string, ConfigLocations> (StringComparer.InvariantCultureIgnoreCase)
-    {
-        { "file1.json", ConfigLocations.AppCurrent },
-        { "file2.json", ConfigLocations.GlobalHome },
-        { "file3.json", ConfigLocations.AppHome }
-    };
+        Dictionary<string, ConfigLocations> fileLocations = new (StringComparer.InvariantCultureIgnoreCase)
+        {
+            { "file1.json", ConfigLocations.AppCurrent }, { "file2.json", ConfigLocations.GlobalHome }, { "file3.json", ConfigLocations.AppHome }
+        };
 
         // Act
-        foreach (var pair in fileLocations)
+        foreach (KeyValuePair<string, ConfigLocations> pair in fileLocations)
         {
             sourcesManager.Load (settingsScope, pair.Key, pair.Value);
         }
 
         // Assert
         Assert.Equal (fileLocations.Count, sourcesManager.Sources.Count);
-        foreach (var pair in fileLocations)
+
+        foreach (KeyValuePair<string, ConfigLocations> pair in fileLocations)
         {
             Assert.Contains (pair.Value, sourcesManager.Sources.Keys);
             Assert.Equal (pair.Key, sourcesManager.Sources [pair.Value]);
@@ -490,5 +482,4 @@ public class SourcesManagerTests
     }
 
     #endregion
-
 }

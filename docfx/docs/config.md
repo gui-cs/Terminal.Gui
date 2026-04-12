@@ -97,7 +97,7 @@ public static bool Force16Colors { get; set; } = false;
 
 **Examples:**
 - `Application.DefaultKeyBindings` (e.g. `Command.Quit`) - Default keys for application-level commands
-- `Application.Force16Colors` - Force 16-color mode
+- `Driver.Force16Colors` - Force 16-color mode
 - `Key.Separator` - Character separating keys in key combinations
 
 ### 2. ThemeScope
@@ -227,8 +227,12 @@ A **Theme** is a named collection of visual settings bundled together. Terminal.
 // Get current theme
 ThemeScope currentTheme = ThemeManager.GetCurrentTheme();
 
-// Get all available themes
-Dictionary<string, ThemeScope> themes = ThemeManager.GetThemes();
+// Get all available themes (null if ConfigurationManager not yet initialized)
+ConcurrentDictionary<string, ThemeScope>? themes = ThemeManager.Themes;
+if (themes is null)
+{
+    return; // ConfigurationManager not yet initialized
+}
 
 // Get theme names
 ImmutableList<string> themeNames = ThemeManager.GetThemeNames();
@@ -240,6 +244,7 @@ ConfigurationManager.Apply();
 // Listen for theme changes
 ThemeManager.ThemeChanged += (sender, e) => 
 {
+    // e.Value is the new theme name
     // Update UI based on new theme
 };
 ```
@@ -264,7 +269,7 @@ See the [Scheme Deep Dive](scheme.md) for complete details on the scheme system.
 
 ```csharp
 // Get all schemes for current theme
-Dictionary<string, Scheme> schemes = SchemeManager.GetCurrentSchemes();
+Dictionary<string, Scheme?> schemes = SchemeManager.GetSchemesForCurrentTheme();
 
 // Get specific scheme
 Scheme dialogScheme = SchemeManager.GetScheme(Schemes.Dialog);
@@ -278,12 +283,84 @@ SchemeManager.AddScheme("MyScheme", new Scheme
     Normal = new Attribute(Color.White, Color.Blue),
     Focus = new Attribute(Color.Black, Color.Cyan)
 });
+```
 
-// Listen for scheme changes
-SchemeManager.CollectionChanged += (sender, e) => 
+#### Custom Schemes for Individual Views
+
+Any view can be given a named scheme by setting `View.SchemeName`. When set, `GetScheme()` looks up that name in the active theme and uses it if found. If the name is not found in the current theme, it falls back through the normal resolution chain (SuperView → `"Base"` → hard-coded `"Base"`) rather than throwing.
+
+```csharp
+// 1. Register the custom scheme (call before Application.Init or after ConfigurationManager.Apply)
+SchemeManager.AddScheme("Highlight", new Scheme
 {
-    // Handle scheme changes
-};
+    Normal = new Attribute(Color.Black, Color.BrightYellow),
+    Focus = new Attribute(Color.White, Color.BrightYellow)
+});
+
+// 2. Assign the scheme name to any view
+Label warningLabel = new () { Text = "Warning!" };
+warningLabel.SchemeName = "Highlight";
+```
+
+Custom schemes can also be defined in a config JSON file so they are theme-aware:
+
+```json
+{
+  "Themes": [
+    {
+      "Default": {
+        "Schemes": [
+          {
+            "Highlight": {
+              "Normal": { "Foreground": "Black", "Background": "BrightYellow" },
+              "Focus":  { "Foreground": "White", "Background": "BrightYellow" }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
+```
+
+When the active theme changes, any view with `SchemeName = "Highlight"` automatically picks up the new theme's definition of that scheme.
+
+#### Scheme Resolution Order
+
+`View.GetScheme()` resolves the scheme for a view using the following priority order:
+
+```mermaid
+flowchart TD
+    A([GetScheme called]) --> B{HasScheme?\nexplicit Scheme set}
+    B -- Yes --> C([Return explicit Scheme])
+    B -- No --> D{SchemeName set?}
+    D -- No --> E{SuperView exists?}
+    D -- Yes --> F{TryGetScheme\nSchemeName found?}
+    F -- Yes --> G([Return named Scheme])
+    F -- No --> H[/Logging.Warning emitted/]
+    H --> E
+    E -- Yes --> I([Return SuperView.GetScheme])
+    E -- No --> J{TryGetScheme\n'Base' found?}
+    J -- Yes --> K([Return 'Base' from active theme])
+    J -- No --> L([Return hard-coded 'Base'])
+```
+
+| Priority | Condition | Result |
+|----------|-----------|--------|
+| 1 | `HasScheme` is true | Explicit `Scheme` instance used as-is |
+| 2 | `SchemeName` is set and found in active theme | Named scheme returned |
+| 3 | `SchemeName` is set but **not** found | `Logging.Warning` emitted; fallback continues |
+| 4 | `SuperView` exists | `SuperView.GetScheme()` (recursive) |
+| 5 | `"Base"` exists in active theme | Active theme's `"Base"` scheme |
+| 6 | *(last resort)* | Hard-coded `"Base"` — always available |
+
+When writing code that looks up a scheme by name, prefer `SchemeManager.TryGetScheme()` over `SchemeManager.GetScheme(string)` — the `Try` variant returns `false` instead of throwing `KeyNotFoundException` when the name is not found.
+
+```csharp
+if (SchemeManager.TryGetScheme("Highlight", out Scheme? scheme))
+{
+    // use scheme
+}
 ```
 
 #### Scheme Structure
@@ -311,6 +388,26 @@ Each [Scheme](~/api/Terminal.Gui.Drawing.Scheme.yml) maps [VisualRole](~/api/Ter
       "Foreground": "Blue",
       "Background": "Cyan",
       "Style": "Underline"
+    },
+    "Active": {
+      "Foreground": "White",
+      "Background": "DarkCyan"
+    },
+    "HotActive": {
+      "Foreground": "Yellow",
+      "Background": "DarkCyan"
+    },
+    "Highlight": {
+      "Foreground": "Black",
+      "Background": "BrightGreen"
+    },
+    "Editable": {
+      "Foreground": "White",
+      "Background": "DarkBlue"
+    },
+    "ReadOnly": {
+      "Foreground": "Gray",
+      "Background": "Black"
     },
     "Disabled": {
       "Foreground": "DarkGray",
@@ -458,10 +555,22 @@ The ConfigurationManager provides events to track configuration changes:
 Raised after configuration is applied to the application:
 
 ```csharp
-ConfigurationManager.Applied += (sender, e) => 
+ConfigurationManager.Applied += (_, _) => 
 {
     // Configuration has been applied
     // Update UI or refresh views
+};
+```
+
+### Updated Event
+
+Raised after configuration is loaded from a source or reset (before `Apply()` is called):
+
+```csharp
+ConfigurationManager.Updated += (_, _) => 
+{
+    // Configuration has been loaded or reset
+    // Inspect ConfigurationManager.Settings if needed
 };
 ```
 
@@ -470,23 +579,12 @@ ConfigurationManager.Applied += (sender, e) =>
 Raised when the active theme changes:
 
 ```csharp
-ThemeManager.ThemeChanged += (sender, e) => 
+ThemeManager.ThemeChanged += (_, e) => 
 {
-    // Theme has changed
+    // e.Value is the new theme name
     // Refresh all views to use new theme
     // From within a View, use: App?.Current?.SetNeedsDraw();
     // Or access via IApplication instance: app.Current?.SetNeedsDraw();
-};
-```
-
-### CollectionChanged Event
-
-Raised when schemes collection changes:
-
-```csharp
-SchemeManager.CollectionChanged += (sender, e) => 
-{
-    // Schemes have changed
 };
 ```
 
@@ -501,7 +599,7 @@ System-wide settings from [SettingsScope](~/api/Terminal.Gui.Configuration.Setti
 ```json
 {
   "Application.DefaultKeyBindings.Quit": "Esc",
-  "Application.Force16Colors": false,
+  "Driver.Force16Colors": false,
   "Application.IsMouseDisabled": false,
   "Application.DefaultKeyBindings.Arrange": "Ctrl+F5",
   "Application.DefaultKeyBindings.NextTabStop": "Tab",
@@ -628,14 +726,12 @@ Each entry uses the `PlatformKeyBinding` format with optional `All`, `Windows`, 
 To find all available configuration properties:
 
 ```csharp
-// Get hard-coded configuration
-SettingsScope hardCoded = ConfigurationManager.GetHardCodedConfig();
+// Get hard-coded configuration as a JSON string
+string hardCodedJson = ConfigurationManager.GetHardCodedConfig();
+Console.WriteLine(hardCodedJson);
 
-// Iterate through all properties
-foreach (var property in hardCoded)
-{
-    Console.WriteLine($"{property.Key} = {property.Value}");
-}
+// Or get an empty configuration skeleton
+string emptyJson = ConfigurationManager.GetEmptyConfig();
 ```
 
 Or search the source code for `[ConfigurationProperty]` attributes.
@@ -892,20 +988,17 @@ Control how JSON parsing errors are handled:
 - `false` (default) - Silent failures, errors logged
 - `true` - Throws exceptions on JSON parsing errors
 
-### Manually Trigger Updates
+### Get Configuration as JSON
 
-Update ConfigurationManager to reflect current static property values:
+Retrieve the current hard-coded defaults as a JSON string:
 
 ```csharp
-// Change a setting programmatically
-Application.DefaultKeyBindings[Command.Quit] = Bind.All (Key.Q.WithCtrl);
-
-// Update ConfigurationManager to reflect the change
-ConfigurationManager.UpdateToCurrentValues();
-
-// Save to file (if needed)
-string json = ConfigurationManager.Serialize();
+// Get the hard-coded configuration as JSON
+string json = ConfigurationManager.GetHardCodedConfig();
 File.WriteAllText("my-config.json", json);
+
+// Get an empty configuration skeleton (just the $schema tag)
+string empty = ConfigurationManager.GetEmptyConfig();
 ```
 
 ### Disable ConfigurationManager
@@ -949,22 +1042,31 @@ using Terminal.Gui;
 using Terminal.Gui.Configuration;
 
 ConfigurationManager.Enable(ConfigLocations.All);
-Application.Init();
 
-var themeSelector = new OptionSelector<string>
+using IApplication app = Application.Create();
+app.Init();
+
+OptionSelector themeSelector = new ()
 {
     X = 1,
     Y = 1,
+    Labels = ThemeManager.GetThemeNames()
 };
-themeSelector.SetSource(ThemeManager.GetThemeNames());
-themeSelector.SelectedItemChanged += (s, e) =>
+themeSelector.ValueChanged += (_, e) =>
 {
-    ThemeManager.Theme = e.Value.ToString();
+    IReadOnlyList<string>? labels = themeSelector.Labels;
+    if (labels is null || e.NewValue is null)
+    {
+        return;
+    }
+
+    ThemeManager.Theme = labels[e.NewValue.Value];
     ConfigurationManager.Apply();
 };
 
-Application.Run(new Window { Title = "Theme Demo" }).Add(themeSelector);
-Application.Shutdown();
+Window win = new () { Title = "Theme Demo" };
+win.Add(themeSelector);
+app.Run(win);
 ```
 
 ### Example 2: Custom Application Settings
@@ -992,9 +1094,8 @@ var window = new Window
     Height = MyApp.WindowHeight
 };
 
-// Later, save updated settings
-MyApp.WindowWidth = 100;
-ConfigurationManager.UpdateToCurrentValues();
+// Later, retrieve the hard-coded config as JSON
+string json = ConfigurationManager.GetHardCodedConfig();
 // Could save to file here
 ```
 
@@ -1026,7 +1127,7 @@ ConfigurationManager.Enable(ConfigLocations.Runtime);
 - **[Drawing Deep Dive](drawing.md)** - Color and attribute system
 - **[View Deep Dive](View.md)** - View configuration properties
 - **[Theme Schema](https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json)** - JSON schema for validation
-- **[Default Config](https://raw.githubusercontent.com/gui-cs/Terminal.Gui/v2_develop/Terminal.Gui/Resources/config.json)** - Complete default configuration
+- **[Default Config](https://raw.githubusercontent.com/gui-cs/Terminal.Gui/develop/Terminal.Gui/Resources/config.json)** - Complete default configuration
 
 ### UICatalog Examples
 

@@ -2,7 +2,7 @@ name: Build and publish v2 API docs
 
 on:
   push:
-    branches: [v2_develop]
+    branches: [develop]
 
 permissions:
   id-token: write 
@@ -17,10 +17,10 @@ jobs:
     runs-on: windows-latest
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Setup .NET Core
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: 10.x
         dotnet-quality: 'ga'
@@ -41,15 +41,15 @@ jobs:
       continue-on-error: false
 
     - name: Setup Pages
-      uses: actions/configure-pages@v5
+      uses: actions/configure-pages@v6
       
     - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
+      uses: actions/upload-pages-artifact@v4
       with:
         path: docfx/_site
        
     - name: Deploy to GitHub Pages
       id: deployment
-      uses: actions/deploy-pages@v4
+      uses: actions/deploy-pages@v5
       with:
         token: ${{ secrets.GITHUB_TOKEN }}

@@ -69,7 +69,7 @@
       "_disableBreadcrumb": false,
       "_gitContribute": {
         "repo": "https://github.com/gui-cs/Terminal.Gui",
-        "branch": "v2_develop",
+        "branch": "develop",
         "apiSpecFolder": "docfx/overrides"
       },
       "_gitUrlPattern": "github"

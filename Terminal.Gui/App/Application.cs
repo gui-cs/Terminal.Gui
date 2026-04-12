@@ -224,6 +224,46 @@ public static partial class Application
         return GetAvailableCulturesFromEmbeddedResources ();
     }
 
+    /// <summary>
+    ///     Gets or sets the rendering mode for the application. When set to <see cref="App.AppModel.Inline"/>,
+    ///     the application renders inline within the primary (scrollback) buffer instead of switching to
+    ///     the alternate screen buffer.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Set this property <b>before</b> calling <see cref="IApplication.Init"/> to control how the
+    ///         application interacts with the terminal buffer.
+    ///     </para>
+    /// </remarks>
+    [ConfigurationProperty (Scope = typeof (SettingsScope))]
+    public static AppModel AppModel
+    {
+        get;
+        set
+        {
+            AppModel oldValue = field;
+            field = value;
+            AppModelChanged?.Invoke (null, new ValueChangedEventArgs<AppModel> (oldValue, field));
+        }
+    } = AppModel.FullScreen;
+
+    /// <summary>
+    ///     Gets or sets an override for the initial cursor position used in <see cref="AppModel.Inline"/> mode.
+    ///     When set (non-null) before <see cref="IApplication.Run{T}"/>, this value is used instead of
+    ///     querying the terminal via ANSI CPR. Useful for testing inline mode at specific cursor positions.
+    ///     The <c>Y</c> component specifies the terminal row; <c>X</c> is reserved for future use.
+    /// </summary>
+    public static Point? ForceInlinePosition
+    {
+        get;
+        set
+        {
+            Point? oldValue = field;
+            field = value;
+            ForceInlinePositionChanged?.Invoke (null, new ValueChangedEventArgs<Point?> (oldValue, field));
+        }
+    }
+
     /// <inheritdoc cref="IApplication.ForceDriver"/>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
     public static string ForceDriver

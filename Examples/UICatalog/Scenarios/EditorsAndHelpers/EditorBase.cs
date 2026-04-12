@@ -144,12 +144,17 @@ public abstract class EditorBase : View
             return;
         }
 
+        if (!AutoSelectViewToEdit || !AutoSelectAdornments)
+        {
+            return;
+        }
+
         ViewToEdit = App!.Navigation!.GetFocused ();
     }
 
     private void ApplicationOnMouseEvent (object? sender, Mouse mouse)
     {
-        if (mouse.Flags != MouseFlags.LeftButtonClicked || !AutoSelectViewToEdit)
+        if (mouse.Flags != MouseFlags.LeftButtonClicked || !AutoSelectViewToEdit || !AutoSelectAdornments)
         {
             return;
         }
@@ -167,7 +172,7 @@ public abstract class EditorBase : View
             return;
         }
 
-        if (view is AdornmentView adornment)
+        if (AutoSelectAdornments && view is AdornmentView adornment)
         {
             ViewToEdit = AutoSelectAdornments ? adornment : adornment.Adornment?.Parent;
         }

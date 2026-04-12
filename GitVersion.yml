@@ -3,26 +3,26 @@
 # Terminal.Gui uses the GitFlow branching strategy.
 # https://gitversion.net/docs/learn/branching-strategies/gitflow/
 #
-# - We have two main branches: `v2_release` and `v2_develop`.
-# - `v2_release` is the main branch for V2 releases and matches the latest NuGet release package (e.g., 2.0.0);
+# - We have two main branches: `main` and `develop`.
+# - `main` is the main branch for V2 releases and matches the latest NuGet release package (e.g., 2.0.0);
 #   prior to release, it uses pre-release labels (e.g., 2.0.0-prealpha.1).
-# - `v2_develop` is the development branch for V2 and always carries a pre-release label (e.g., 2.1.0-develop.1).
-# - Development happens on feature branches off `v2_develop`.
-# - For releases, we merge feature branches into `v2_develop`, then `v2_develop` into `v2_release`.
-# - The ./.github/workflows/publish.yml builds and publishes on pushes to `v2_develop` and `v2_release`.
+# - `develop` is the development branch for V2 and always carries a pre-release label (e.g., 2.1.0-develop.1).
+# - Development happens on feature branches off `develop`.
+# - For releases, we merge feature branches into `develop`, then `develop` into `main`.
+# - The ./.github/workflows/publish.yml builds and publishes on pushes to `develop` and `main`.
 #
 # Branches:
 # - v1_release: Main branch for V1 (historical)
 # - v1_develop: Develop branch for V1 (historical)
-# - v2_release: Main branch for V2
-# - v2_develop: Develop branch for V2
+# - main: Main branch for V2
+# - develop: Develop branch for V2
 #
 # Package Naming:
-# - from v2_develop: 2.1.0-develop.1 (minor version increments)
-# - from v2_release (pre-release): 2.0.0-prealpha.1 or 2.0.0-beta.1
-# - from v2_release (release): 2.0.0 (patch version increments)
+# - from develop: 2.1.0-develop.1 (minor version increments)
+# - from main (pre-release): 2.0.0-prealpha.1 or 2.0.0-beta.1
+# - from main (release): 2.0.0 (patch version increments)
 #
-mode: ContinuousDelivery   # GitVersion 6.x uses Mainline mode for GitFlow, focusing on main branch releases
+mode: ContinuousDelivery   # GitVersion 6.x is configured here to use ContinuousDelivery mode for this GitFlow-style setup
 
 # We prefix our tags with 'v' or 'V' (e.g., v1.0.0)
 tag-prefix: '[vV]'
@@ -31,19 +31,19 @@ branches:
 
   # V2 Release Branch
   main:
-    # Matches the v2_release branch
-    regex: ^v2_release$
+    # Matches the main branch
+    regex: ^main$
     # Uses 'alpha' as pre-release label before `beta`
     label: beta
     # Increments patch version (x.y.z+1) on commits
     increment: Patch
-    # Specifies v2_develop as the source branch
+    # Specifies develop as the source branch
     source-branches: ['develop']
 
   # V2 Development Branch
   develop:
-    # Matches the v2_develop branch
-    regex: v2_develop
+    # Matches the develop branch
+    regex: develop
     # Adds 'develop' as pre-release label (e.g., 2.1.0-develop.1)
     label: develop
     # Increments minor version (x.y+1.z) on commits

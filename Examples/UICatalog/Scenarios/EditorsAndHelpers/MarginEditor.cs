@@ -24,22 +24,23 @@ public class MarginEditor : AdornmentEditor
     {
         if (AdornmentToEdit is { })
         {
-            _optionsShadow!.Value = ShadowStyleToInt (((Margin)AdornmentToEdit).ShadowStyle);
+            _optionsShadow?.Value = ShadowStyleToInt (((Margin)AdornmentToEdit).ShadowStyle);
         }
 
         if (AdornmentToEdit is { })
         {
-            _flagSelectorTransparent!.Value = (int)((Margin)AdornmentToEdit).ViewportSettings;
+            _flagSelectorTransparent?.Value = (int)((Margin)AdornmentToEdit).ViewportSettings;
         }
     }
 
     private void MarginEditor_Initialized (object? sender, EventArgs e)
     {
+        ExpanderButton?.Collapsed = false;
+
         _optionsShadow = new OptionSelector
         {
             X = 0,
             Y = Pos.Bottom (SubViews.ElementAt (SubViews.Count - 1)),
-            SuperViewRendersLineCanvas = true,
             Title = "_Shadow",
             BorderStyle = LineStyle.Single,
             AssignHotKeys = true,
@@ -58,11 +59,7 @@ public class MarginEditor : AdornmentEditor
 
         _flagSelectorTransparent = new FlagSelector<ViewportSettingsFlags>
         {
-            X = 0,
-            Y = Pos.Bottom (_optionsShadow),
-            SuperViewRendersLineCanvas = true,
-            Title = "_ViewportSettings",
-            BorderStyle = LineStyle.Single
+            X = 0, Y = Pos.Bottom (_optionsShadow), Title = "_ViewportSettings", BorderStyle = LineStyle.Single
         };
         _flagSelectorTransparent.Values = [(int)ViewportSettingsFlags.Transparent, (int)ViewportSettingsFlags.TransparentMouse];
         _flagSelectorTransparent.Labels = ["Transparent", "TransparentMouse"];

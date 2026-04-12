@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace ViewBaseTests.Viewport;
 
 public class ViewScrollbarTests (ITestOutputHelper output)

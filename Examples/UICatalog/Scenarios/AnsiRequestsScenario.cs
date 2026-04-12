@@ -31,29 +31,38 @@ public sealed class AnsiEscapeSequenceRequests : Scenario
         app.Init ();
         _app = app;
 
-        TabView tv = new () { Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = true };
-
-        Tab single = new ();
-        single.DisplayText = "Single";
-        single.View = BuildSingleTab ();
-
-        Tab bulk = new ();
-        bulk.DisplayText = "Multi";
-        bulk.View = BuildBulkTab ();
-
-        tv.AddTab (single, true);
-        tv.AddTab (bulk, false);
+        // Restored: Tabs with Single and Bulk tabs (#4183)
+        View singleView = BuildSingleTab ();
+        View bulkView = BuildBulkTab ();
 
         // Setup - Create a top-level application window and configure it.
         using Window appWindow = new ();
         appWindow.Title = GetQuitKeyAndName ();
 
-        appWindow.Add (tv);
+        Tabs tabs = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
+
+        View singleTab = new () { Title = "_Single" };
+        singleView.Width = Dim.Fill ();
+        singleView.Height = Dim.Fill ();
+        singleTab.Add (singleView);
+
+        View bulkTab = new () { Title = "_Bulk" };
+        bulkView.Width = Dim.Fill ();
+        bulkView.Height = Dim.Fill ();
+        bulkTab.Add (bulkView);
+
+        tabs.Add (singleTab, bulkTab);
+        tabs.Value = singleTab;
+
+        appWindow.Add (tabs);
 
         // Run - Start the application.
         app.Run (appWindow);
-        bulk.View.Dispose ();
-        single.View.Dispose ();
+        tabs.Dispose ();
 
         _app.RemoveTimeout (_updateTimeoutToken!);
         _app.RemoveTimeout (_sendDarTimeoutToken!);

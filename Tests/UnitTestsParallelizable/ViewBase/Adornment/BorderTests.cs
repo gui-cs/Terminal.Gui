@@ -22,7 +22,7 @@ public class BorderTests : TestDriverBase
         view.Border.GetOrCreateView ();
         Assert.NotNull (view.Border.View);
         Assert.False (view.Border.View?.CanFocus);
-        Assert.Equal (TabBehavior.TabGroup, view.Border.View?.TabStop);
+        Assert.Equal (TabBehavior.TabStop, view.Border.View?.TabStop);
         Assert.Empty (view.Border.View?.KeyBindings.GetBindings ()!);
         Assert.Null (view.Border.View?.ShadowStyle);
     }

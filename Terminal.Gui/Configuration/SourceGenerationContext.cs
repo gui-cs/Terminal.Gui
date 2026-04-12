@@ -48,6 +48,7 @@ namespace Terminal.Gui.Configuration;
 
 [JsonSerializable (typeof (TraceCategory))]
 [JsonSerializable (typeof (SizeDetectionMode))]
+[JsonSerializable (typeof (AppModel))]
 
 [JsonSerializable (typeof (PlatformKeyBinding))]
 
