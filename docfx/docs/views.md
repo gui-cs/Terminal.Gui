@@ -221,22 +221,22 @@ The base-class for <xref:Terminal.Gui.Views.OpenDialog> and <xref:Terminal.Gui.V
 
 <pre style='color:#FFFFFF;background:#000000'>
 ┏┥<span style='color:#000000;background:#D3D7CF'>Open</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style='color:#000000;background:#FFFFFF;font-weight:900'>C:\Users\Tig\s\gui-cs\pr-4995-optionselector\docfx</span><span style='color:#D3D7CF;background:#52594A'>                         </span>┃
+┃<span style='color:#000000;background:#FFFFFF;font-weight:900'>C:\Users\Tig\s\gui-cs\pr-4912-enums\docfx</span><span style='color:#D3D7CF;background:#52594A'>                                  </span>┃
 ┃⟦▲⟧                                                                        ┃
 ┃┌────────────────────┬──────────┬──────────────────────────────┬───────────┃
 ┃│Filename (▲)        │Size      │Modified                      │Type       ┃
 ┃├────────────────────┼──────────┼──────────────────────────────┼───────────┃
 ┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                              │&lt;Directory&gt;</span>┃
-┃│\_exported_templates│          │2026-04-13T06:51:39           │&lt;Directory&gt;┃
-┃│\_site              │          │2026-04-13T07:12:29           │&lt;Directory&gt;┃
-┃│\api                │          │2026-04-13T07:11:39           │&lt;Directory&gt;┃
-┃│\apispec            │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│\docs               │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│\images             │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│\includes           │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│\schemas            │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│\scripts            │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│aboutbox.png        │14.06 KB  │2026-04-13T06:51:40           │.png       ┃
+┃│\_exported_templates│          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\_site              │          │2026-04-13T08:05:26           │&lt;Directory&gt;┃
+┃│\api                │          │2026-04-13T08:04:28           │&lt;Directory&gt;┃
+┃│\apispec            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\docs               │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\images             │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\includes           │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\schemas            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\scripts            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│aboutbox.png        │14.06 KB  │2026-04-13T06:57:40           │.png       ┃
 ┃                                                                           ┃
 ┃⟦►<span style='text-decoration:underline 1px solid'>T</span>ree⟧                                                  ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧⟦► <span style='text-decoration:underline 1px solid'>O</span>K ◄⟧┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -560,22 +560,22 @@ Provides an interactive <xref:Terminal.Gui.Views.Dialog> for selecting files or 
 
 <pre style='color:#FFFFFF;background:#000000'>
 ┏┥<span style='color:#000000;background:#D3D7CF'>Open</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style='color:#000000;background:#FFFFFF;font-weight:900'>C:\Users\Tig\s\gui-cs\pr-4995-optionselector\docfx</span><span style='color:#D3D7CF;background:#52594A'>                         </span>┃
+┃<span style='color:#000000;background:#FFFFFF;font-weight:900'>C:\Users\Tig\s\gui-cs\pr-4912-enums\docfx</span><span style='color:#D3D7CF;background:#52594A'>                                  </span>┃
 ┃⟦▲⟧                                                                        ┃
 ┃┌────────────────────┬──────────┬──────────────────────────────┬───────────┃
 ┃│Filename (▲)        │Size      │Modified                      │Type       ┃
 ┃├────────────────────┼──────────┼──────────────────────────────┼───────────┃
 ┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                              │&lt;Directory&gt;</span>┃
-┃│\_exported_templates│          │2026-04-13T06:51:39           │&lt;Directory&gt;┃
-┃│\_site              │          │2026-04-13T07:12:29           │&lt;Directory&gt;┃
-┃│\api                │          │2026-04-13T07:11:39           │&lt;Directory&gt;┃
-┃│\apispec            │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│\docs               │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│\images             │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│\includes           │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│\schemas            │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│\scripts            │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│aboutbox.png        │14.06 KB  │2026-04-13T06:51:40           │.png       ┃
+┃│\_exported_templates│          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\_site              │          │2026-04-13T08:05:26           │&lt;Directory&gt;┃
+┃│\api                │          │2026-04-13T08:04:28           │&lt;Directory&gt;┃
+┃│\apispec            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\docs               │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\images             │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\includes           │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\schemas            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\scripts            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│aboutbox.png        │14.06 KB  │2026-04-13T06:57:40           │.png       ┃
 ┃                                                                           ┃
 ┃⟦►<span style='text-decoration:underline 1px solid'>T</span>ree⟧                                                  ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧⟦► <span style='text-decoration:underline 1px solid'>O</span>K ◄⟧┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
@@ -702,23 +702,23 @@ Provides an interactive <xref:Terminal.Gui.Views.Dialog> for selecting files or 
 
 
 <pre style='color:#FFFFFF;background:#000000'>
-┏┥<span style='color:#000000;background:#FFFFFF'>Save</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
-┃<span style='color:#000000;background:#808080;font-weight:900'>C:\Users\Tig\s\gui-cs\pr-4995-optionselector\docfx</span><span style='color:#FFFFFF;background:#808080'>                         </span>┃
+┏┥<span style='color:#000000;background:#D3D7CF'>Save</span>┝━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span style='color:#000000;background:#FFFFFF;font-weight:900'>C:\Users\Tig\s\gui-cs\pr-4912-enums\docfx</span><span style='color:#D3D7CF;background:#52594A'>                                  </span>┃
 ┃⟦▲⟧                                                                        ┃
 ┃┌────────────────────┬──────────┬──────────────────────────────┬───────────┃
 ┃│Filename (▲)        │Size      │Modified                      │Type       ┃
 ┃├────────────────────┼──────────┼──────────────────────────────┼───────────┃
 ┃│<span style='color:#000000;background:#808080;font-weight:900'>..                  │          │                              │&lt;Directory&gt;</span>┃
-┃│\_exported_templates│          │2026-04-13T06:51:39           │&lt;Directory&gt;┃
-┃│\_site              │          │2026-04-13T07:12:29           │&lt;Directory&gt;┃
-┃│\api                │          │2026-04-13T07:11:39           │&lt;Directory&gt;┃
-┃│\apispec            │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│\docs               │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│\images             │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│\includes           │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│\schemas            │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│\scripts            │          │2026-04-13T06:51:40           │&lt;Directory&gt;┃
-┃│aboutbox.png        │14.06 KB  │2026-04-13T06:51:40           │.png       ┃
+┃│\_exported_templates│          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\_site              │          │2026-04-13T08:05:26           │&lt;Directory&gt;┃
+┃│\api                │          │2026-04-13T08:04:28           │&lt;Directory&gt;┃
+┃│\apispec            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\docs               │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\images             │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\includes           │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\schemas            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│\scripts            │          │2026-04-13T06:57:40           │&lt;Directory&gt;┃
+┃│aboutbox.png        │14.06 KB  │2026-04-13T06:57:40           │.png       ┃
 ┃                                                                           ┃
 ┃⟦►<span style='text-decoration:underline 1px solid'>T</span>ree⟧                                                ⟦ <span style='text-decoration:underline 1px solid'>C</span>ancel ⟧⟦► <span style='text-decoration:underline 1px solid'>S</span>ave ◄⟧┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
