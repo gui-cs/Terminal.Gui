@@ -18,7 +18,7 @@ internal partial class ApplicationImpl
     public AppModel AppModel { get; set; } = AppModel.FullScreen;
 
     /// <inheritdoc/>
-    public int? ForceInlineCursorRow { get; set; }
+    public Point? ForceInlinePosition { get; set; }
 
     /// <summary>
     ///     Creates the appropriate <see cref="IDriver"/> based on platform and driverName.

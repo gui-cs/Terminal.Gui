@@ -114,12 +114,12 @@ public class InlineDrawTimingTests (ITestOutputHelper output)
             IDisposable sizeHandle = startupGate.RegisterQuery (AnsiStartupQuery.TerminalSize, TimeSpan.FromSeconds (30));
             Assert.False (startupGate.IsReady);
 
-            // Create a mock IDriver that returns the startup gate and supports InlineState
+            // Create a mock IDriver that returns the startup gate and supports InlinePosition
             Mock<IDriver> driverMock = new ();
             driverMock.SetupGet (d => d.AnsiStartupGate).Returns (startupGate);
-            InlineState inlineState = new ();
-            driverMock.SetupGet (d => d.InlineState).Returns (inlineState);
-            driverMock.SetupSet (d => d.InlineState = It.IsAny<InlineState> ()).Callback<InlineState> (s => inlineState = s);
+            Point inlinePosition = Point.Empty;
+            driverMock.SetupGet (d => d.InlinePosition).Returns (inlinePosition);
+            driverMock.SetupSet (d => d.InlinePosition = It.IsAny<Point> ()).Callback<Point> (p => inlinePosition = p);
 
             // Instance-based AppModel on the mock (no global static)
             var layoutAndDrawCallCount = 0;
@@ -250,9 +250,9 @@ public class InlineDrawTimingTests (ITestOutputHelper output)
             // Create a mock IDriver
             Mock<IDriver> driverMock = new ();
             driverMock.SetupGet (d => d.AnsiStartupGate).Returns (startupGate);
-            InlineState inlineState = new ();
-            driverMock.SetupGet (d => d.InlineState).Returns (inlineState);
-            driverMock.SetupSet (d => d.InlineState = It.IsAny<InlineState> ()).Callback<InlineState> (s => inlineState = s);
+            Point inlinePosition = Point.Empty;
+            driverMock.SetupGet (d => d.InlinePosition).Returns (inlinePosition);
+            driverMock.SetupSet (d => d.InlinePosition = It.IsAny<Point> ()).Callback<Point> (p => inlinePosition = p);
 
             // Instance-based AppModel on the mock (no global static)
             var layoutAndDrawCallCount = 0;

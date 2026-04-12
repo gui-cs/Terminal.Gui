@@ -248,18 +248,19 @@ public static partial class Application
     } = AppModel.FullScreen;
 
     /// <summary>
-    ///     Gets or sets an override for the initial cursor row used in <see cref="AppModel.Inline"/> mode.
+    ///     Gets or sets an override for the initial cursor position used in <see cref="AppModel.Inline"/> mode.
     ///     When set (non-null) before <see cref="IApplication.Run{T}"/>, this value is used instead of
     ///     querying the terminal via ANSI CPR. Useful for testing inline mode at specific cursor positions.
+    ///     The <c>Y</c> component specifies the terminal row; <c>X</c> is reserved for future use.
     /// </summary>
-    public static int? ForceInlineCursorRow
+    public static Point? ForceInlinePosition
     {
         get;
         set
         {
-            int? oldValue = field;
+            Point? oldValue = field;
             field = value;
-            ForceInlineCursorRowChanged?.Invoke (null, new ValueChangedEventArgs<int?> (oldValue, field));
+            ForceInlinePositionChanged?.Invoke (null, new ValueChangedEventArgs<Point?> (oldValue, field));
         }
     }
 

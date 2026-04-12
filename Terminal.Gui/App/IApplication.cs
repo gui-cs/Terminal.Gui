@@ -477,11 +477,12 @@ public interface IApplication : IDisposable
     AppModel AppModel { get; set; }
 
     /// <summary>
-    ///     Gets or sets an override for the initial cursor row used in <see cref="AppModel.Inline"/> mode.
+    ///     Gets or sets an override for the initial cursor position used in <see cref="AppModel.Inline"/> mode.
     ///     When set (non-null) before <see cref="Run{T}"/>, this value is used instead of
     ///     querying the terminal via ANSI CPR. Useful for testing inline mode at specific cursor positions.
+    ///     The <c>Y</c> component specifies the terminal row; <c>X</c> is reserved for future use.
     /// </summary>
-    int? ForceInlineCursorRow { get; set; }
+    Point? ForceInlinePosition { get; set; }
 
     /// <summary>
     ///     Gets or sets the size of the screen. By default, this is the size of the screen as reported by the

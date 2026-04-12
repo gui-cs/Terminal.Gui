@@ -243,7 +243,7 @@ internal class DriverImpl : IDriver
     public int Top { get => _outputBuffer.Top; set => _outputBuffer.Top = value; }
 
     /// <inheritdoc/>
-    public InlineState InlineState { get; set; }
+    public Point InlinePosition { get; set; }
 
     /// <inheritdoc/>
     public AppModel AppModel { get; set; }

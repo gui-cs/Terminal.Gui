@@ -19,7 +19,7 @@ using UICatalog;
 // Set Inline mode BEFORE Init
 Application.AppModel = AppModel.Inline;
 
-//Application.ForceInlineCursorRow = 3;
+//Application.ForceInlinePosition = new Point (0, 3);
 
 IApplication app = Application.Create ().Init ();
 
@@ -140,7 +140,7 @@ public sealed class InlinePromptView : Window
         Add (logo, infoLabel, outputList, inputIndicator, inputField, statusBar);
         inputField.SetFocus ();
 
-        _cursorShortcut?.Title = $"{App?.Driver?.InlineState.InlineCursorRow}";
+        _cursorShortcut?.Title = $"{App?.Driver?.InlinePosition.Y}";
         _driverShortcut?.Title = $"{Format (App?.Driver?.Screen)}";
         _screenShortcut?.Title = $"{Format (App?.Screen)}";
         _frameShortcut?.Title = $"{Format (Frame)}";
@@ -200,7 +200,7 @@ public sealed class InlinePromptView : Window
     {
         base.OnFrameChanged (in frame);
 
-        _cursorShortcut?.Title = $"{App?.Driver?.InlineState.InlineCursorRow}";
+        _cursorShortcut?.Title = $"{App?.Driver?.InlinePosition.Y}";
         _driverShortcut?.Title = $"{Format (App?.Driver?.Screen)}";
         _screenShortcut?.Title = $"{Format (App?.Screen)}";
         _frameShortcut?.Title = $"{Format (Frame)}";

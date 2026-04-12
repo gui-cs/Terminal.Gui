@@ -128,14 +128,12 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         if (!_firstRenderCompleted
             && driver?.AnsiStartupGate is { IsReady: false } startupGate)
         {
-            // ForceInlineCursorRow bypasses the gate for inline mode testing.
-            if (App?.AppModel == AppModel.Inline && App?.ForceInlineCursorRow.HasValue == true)
+            // ForceInlinePosition bypasses the gate for inline mode testing.
+            if (App?.AppModel == AppModel.Inline && App?.ForceInlinePosition.HasValue == true)
             {
-                InlineState state = driver.InlineState;
-                state.InlineCursorRow = App.ForceInlineCursorRow!.Value;
-                driver.InlineState = state;
+                driver.InlinePosition = new Point (App.ForceInlinePosition!.Value.X, App.ForceInlinePosition!.Value.Y);
 
-                Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeForced", $"CursorRow={App?.ForceInlineCursorRow}");
+                Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeForced", $"Position={App?.ForceInlinePosition}");
             }
             else
             {
@@ -168,12 +166,10 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
                                  "ANSI startup gate ready; rendering can begin");
             }
 
-            // For inline mode, transfer the cursor row from the CPR response to InlineState.
-            if (App?.AppModel == AppModel.Inline && driver is { } && App?.ForceInlineCursorRow.HasValue != true)
+            // For inline mode, transfer the cursor row from the CPR response to InlinePosition.
+            if (App?.AppModel == AppModel.Inline && driver is { } && App?.ForceInlinePosition.HasValue != true)
             {
-                InlineState state = driver.InlineState;
-                state.InlineCursorRow = SizeMonitor.InitialCursorRow;
-                driver.InlineState = state;
+                driver.InlinePosition = new Point (0, SizeMonitor.InitialCursorRow);
 
                 Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeConfirmed", $"CursorRow={SizeMonitor.InitialCursorRow}");
             }

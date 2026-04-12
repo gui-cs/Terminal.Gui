@@ -12,6 +12,6 @@ public static partial class Application // Driver abstractions
     /// <summary>Raised when <see cref="AppModel"/> changes.</summary>
     public static event EventHandler<ValueChangedEventArgs<AppModel>>? AppModelChanged;
 
-    /// <summary>Raised when <see cref="ForceInlineCursorRow"/> changes.</summary>
-    public static event EventHandler<ValueChangedEventArgs<int?>>? ForceInlineCursorRowChanged;
+    /// <summary>Raised when <see cref="ForceInlinePosition"/> changes.</summary>
+    public static event EventHandler<ValueChangedEventArgs<Point?>>? ForceInlinePositionChanged;
 }

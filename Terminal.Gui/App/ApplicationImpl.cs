@@ -23,12 +23,12 @@ internal partial class ApplicationImpl : IApplication
 
         ForceDriver = Application.ForceDriver;
         AppModel = Application.AppModel;
-        ForceInlineCursorRow = Application.ForceInlineCursorRow;
+        ForceInlinePosition = Application.ForceInlinePosition;
 
         // Subscribe to Application static property change events
         Application.ForceDriverChanged += OnForceDriverChanged;
         Application.AppModelChanged += OnAppModelChanged;
-        Application.ForceInlineCursorRowChanged += OnForceInlineCursorRowChanged;
+        Application.ForceInlinePositionChanged += OnForceInlinePositionChanged;
     }
 
     /// <summary>

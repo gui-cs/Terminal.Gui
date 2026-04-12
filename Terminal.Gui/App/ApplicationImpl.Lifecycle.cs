@@ -351,7 +351,7 @@ internal partial class ApplicationImpl
 
     private void OnAppModelChanged (object? sender, ValueChangedEventArgs<AppModel> e) => AppModel = e.NewValue;
 
-    private void OnForceInlineCursorRowChanged (object? sender, ValueChangedEventArgs<int?> e) => ForceInlineCursorRow = e.NewValue;
+    private void OnForceInlinePositionChanged (object? sender, ValueChangedEventArgs<Point?> e) => ForceInlinePosition = e.NewValue;
 
     /// <summary>
     ///     Unsubscribes from Application static property change events.
@@ -360,6 +360,6 @@ internal partial class ApplicationImpl
     {
         Application.ForceDriverChanged -= OnForceDriverChanged;
         Application.AppModelChanged -= OnAppModelChanged;
-        Application.ForceInlineCursorRowChanged -= OnForceInlineCursorRowChanged;
+        Application.ForceInlinePositionChanged -= OnForceInlinePositionChanged;
     }
 }

@@ -11,17 +11,17 @@ public class InlineModeTests
 {
     /// <summary>
     ///     Helper: initializes an inline-mode app at a given cursor row. Sets both
-    ///     <c>ForceInlineCursorRow</c> and <c>Driver.InlineState.InlineCursorRow</c>
+    ///     <c>ForceInlinePosition</c> and <c>Driver.InlinePosition</c>
     ///     so the value is available for <c>LayoutAndDraw</c> without running the main loop.
     /// </summary>
     private static IApplication CreateInlineApp (int cursorRow, int termWidth = 80, int termHeight = 25)
     {
         IApplication app = Application.Create ();
         app.AppModel = AppModel.Inline;
-        app.ForceInlineCursorRow = cursorRow;
+        app.ForceInlinePosition = new Point (0, cursorRow);
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (termWidth, termHeight);
-        app.Driver!.InlineState = new InlineState { InlineCursorRow = cursorRow };
+        app.Driver!.InlinePosition = new Point (0, cursorRow);
 
         return app;
     }
@@ -43,7 +43,7 @@ public class InlineModeTests
 
     /// <summary>
     ///     Verifies that in inline mode, <c>App.Screen.Y</c> is set from
-    ///     <see cref="IApplication.ForceInlineCursorRow"/> when the first LayoutAndDraw runs.
+    ///     <see cref="IApplication.ForceInlinePosition"/> when the first LayoutAndDraw runs.
     /// </summary>
     [Fact]
     public void LayoutAndDraw_Inline_ScreenY_MatchesCursorRow ()
@@ -247,7 +247,7 @@ public class InlineModeTests
 
     /// <summary>
     ///     When the view fits entirely below the cursor, no scrolling occurs and
-    ///     <c>App.Screen.Y</c> equals <c>ForceInlineCursorRow</c>.
+    ///     <c>App.Screen.Y</c> equals <c>ForceInlinePosition.Y</c>.
     /// </summary>
     [Fact]
     public void LayoutAndDraw_Inline_ViewFits_NoScrolling ()
@@ -378,17 +378,17 @@ public class InlineModeTests
     }
 
     /// <summary>
-    ///     Terminal resize resets <c>InlineState.InlineCursorRow</c> to 0.
+    ///     Terminal resize resets <c>InlinePosition.Y</c> to 0.
     /// </summary>
     [Fact]
-    public void Resize_Inline_InlineCursorRow_ResetsToZero ()
+    public void Resize_Inline_InlinePosition_ResetsToZero ()
     {
         using IApplication app = CreateInlineApp (20, 100);
         app.Screen = new Rectangle (0, 20, 100, 3);
 
         app.Driver!.SetScreenSize (80, 25);
 
-        Assert.Equal (0, app.Driver!.InlineState.InlineCursorRow);
+        Assert.Equal (0, app.Driver!.InlinePosition.Y);
     }
 
     /// <summary>
@@ -425,7 +425,7 @@ public class InlineModeTests
         // Resize triggers reset
         app.Driver!.SetScreenSize (80, 25);
 
-        // Next LayoutAndDraw should re-size from row 0 (InlineCursorRow was reset)
+        // Next LayoutAndDraw should re-size from row 0 (InlinePosition was reset)
         app.LayoutAndDraw ();
 
         Assert.Equal (0, app.Screen.Y);
@@ -520,17 +520,17 @@ public class InlineModeTests
 
     #endregion
 
-    #region ForceInlineCursorRow
+    #region ForceInlinePosition
 
     /// <summary>
-    ///     <see cref="IApplication.ForceInlineCursorRow"/> bypasses CPR and sets the inline
-    ///     cursor row directly for testing purposes.
+    ///     <see cref="IApplication.ForceInlinePosition"/> bypasses CPR and sets the inline
+    ///     cursor position directly for testing purposes.
     /// </summary>
     [Theory]
     [InlineData (0)]
     [InlineData (5)]
     [InlineData (20)]
-    public void ForceInlineCursorRow_SetsInitialPosition (int cursorRow)
+    public void ForceInlinePosition_SetsInitialPosition (int cursorRow)
     {
         using IApplication app = CreateInlineApp (cursorRow);
 
@@ -540,7 +540,7 @@ public class InlineModeTests
 
         // App.Screen.Y should match the forced cursor row (possibly adjusted for overflow)
 
-        Assert.True (app.Screen.Y <= cursorRow, $"Screen.Y ({app.Screen.Y}) should be <= ForceInlineCursorRow ({cursorRow})");
+        Assert.True (app.Screen.Y <= cursorRow, $"Screen.Y ({app.Screen.Y}) should be <= ForceInlinePosition.Y ({cursorRow})");
 
         if (token is { })
         {

@@ -23,7 +23,7 @@ public class InlineMouseOffsetTests
         // Arrange
         using IApplication app = Application.Create ();
         app.AppModel = AppModel.Inline;
-        app.ForceInlineCursorRow = 10;
+        app.ForceInlinePosition = new Point (0, 10);
         app.Init (DriverRegistry.Names.ANSI);
 
         // Force App.Screen to have Y = 10 (simulating inline region at terminal row 10)

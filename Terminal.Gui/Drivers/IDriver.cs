@@ -108,10 +108,11 @@ public interface IDriver : IDisposable
     int Top { get; set; }
 
     /// <summary>
-    ///     Gets or sets the inline-mode rendering state. Only meaningful when <see cref="AppModel"/>
-    ///     is <see cref="AppModel.Inline"/>.
+    ///     Gets or sets the inline-mode cursor position. Only meaningful when <see cref="AppModel"/>
+    ///     is <see cref="AppModel.Inline"/>. The <c>Y</c> component is the terminal row where
+    ///     the inline region starts; <c>X</c> is reserved for future use.
     /// </summary>
-    InlineState InlineState { get; set; }
+    Point InlinePosition { get; set; }
 
     /// <summary>
     ///     Gets or sets how the application using this driver interacts with the terminal buffer.

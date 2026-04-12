@@ -79,7 +79,7 @@ internal partial class ApplicationImpl
 
             if (Driver is { } driver)
             {
-                driver.InlineState = new InlineState { InlineCursorRow = 0 };
+                driver.InlinePosition = Point.Empty;
 
                 // Clear the entire terminal
                 driver.WriteRaw ($"{EscSeqUtils.CSI}H{EscSeqUtils.CSI}2J");
@@ -142,7 +142,7 @@ internal partial class ApplicationImpl
             View? topView = views.LastOrDefault (v => v is { });
             int viewHeight = topView?.Frame.Height ?? 0;
 
-            int cursorRow = Driver.InlineState.InlineCursorRow;
+            int cursorRow = Driver.InlinePosition.Y;
             int termHeight = Driver.Screen.Height;
             int termWidth = Driver.Screen.Width;
 

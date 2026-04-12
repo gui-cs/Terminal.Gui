@@ -19,7 +19,7 @@ public class InlineResizeTests
         // Arrange
         using IApplication app = Application.Create ();
         app.AppModel = AppModel.Inline;
-        app.ForceInlineCursorRow = 15;
+        app.ForceInlinePosition = new Point (0, 15);
         app.Init (DriverRegistry.Names.ANSI);
 
         // Simulate that the inline region was initially sized at row 15
@@ -38,26 +38,26 @@ public class InlineResizeTests
 
     /// <summary>
     ///     Verifies that after a terminal resize in inline mode, the driver's
-    ///     <see cref="InlineState.InlineCursorRow"/> is reset to 0.
+    ///     <c>InlinePosition.Y</c> is reset to 0.
     /// </summary>
     [Fact]
-    public void TerminalResize_Inline_ResetsInlineCursorRow ()
+    public void TerminalResize_Inline_ResetsInlinePosition ()
     {
         // Arrange
         using IApplication app = Application.Create ();
         app.AppModel = AppModel.Inline;
-        app.ForceInlineCursorRow = 20;
+        app.ForceInlinePosition = new Point (0, 20);
         app.Init (DriverRegistry.Names.ANSI);
 
-        // Simulate that the driver has InlineCursorRow set (as CPR would do)
-        app.Driver!.InlineState = new InlineState { InlineCursorRow = 20 };
+        // Simulate that the driver has InlinePosition set (as CPR would do)
+        app.Driver!.InlinePosition = new Point (0, 20);
         app.Screen = new Rectangle (0, 20, 100, 3);
-        Assert.Equal (20, app.Driver!.InlineState.InlineCursorRow);
+        Assert.Equal (20, app.Driver!.InlinePosition.Y);
 
         // Act
         app.Driver!.SetScreenSize (80, 25);
 
         // Assert
-        Assert.Equal (0, app.Driver!.InlineState.InlineCursorRow);
+        Assert.Equal (0, app.Driver!.InlinePosition.Y);
     }
 }
