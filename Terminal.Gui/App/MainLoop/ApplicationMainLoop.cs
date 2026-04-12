@@ -21,6 +21,9 @@ namespace Terminal.Gui.App;
 /// <typeparam name="TInputRecord">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
 public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputRecord> where TInputRecord : struct
 {
+    private bool _firstRenderCompleted;
+    private bool _startupWaitLogged;
+
     /// <inheritdoc/>
     public IApplication? App { get; private set; }
 
@@ -107,21 +110,6 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         }
     }
 
-    /// <summary>
-    ///     Tracks whether the initial terminal size has been confirmed for inline mode.
-    ///     Set to <see langword="true"/> once <see cref="ISizeMonitor.InitialSizeReceived"/> is
-    ///     <see langword="true"/> or the wait timeout expires.
-    /// </summary>
-    private bool _inlineSizeConfirmed;
-
-    private DateTime? _inlineWaitStarted;
-
-    /// <summary>
-    ///     Maximum time to wait for the ANSI size response before rendering with the fallback size.
-    ///     Most terminals respond to CSI 18t within a few milliseconds; 500 ms is a generous upper bound.
-    /// </summary>
-    private static readonly TimeSpan _inlineSizeWaitTimeout = TimeSpan.FromMilliseconds (500);
-
     internal void IterationImpl ()
     {
         // Pull any input events from the input queue and process them
@@ -134,71 +122,71 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         // Check for any size changes; this will cause SizeChanged events
         SizeMonitor.Poll ();
 
-        bool shouldDraw = true;
+        IDriver? driver = App?.Driver;
 
-        // For inline mode, defer the first render until the ANSI size monitor confirms
-        // the terminal's real dimensions via a CSI 18t response. Without this, the first
-        // frame would render using the default 80×25 fallback, placing the inline region
-        // at the wrong terminal row.
-        if (App?.AppModel == AppModel.Inline && !_inlineSizeConfirmed)
+        // First-render deferral: wait for the ANSI startup gate unless bypassed.
+        if (!_firstRenderCompleted
+            && driver?.AnsiStartupGate is { IsReady: false } startupGate)
         {
-            // If ForceInlineCursorRow is set, use it immediately without waiting for ANSI CPR.
-            if (App?.ForceInlineCursorRow.HasValue == true)
+            // ForceInlineCursorRow bypasses the gate for inline mode testing.
+            if (App?.AppModel == AppModel.Inline && App?.ForceInlineCursorRow.HasValue == true)
             {
-                _inlineSizeConfirmed = true;
-
-                if (App?.Driver is { } driver)
-                {
-                    InlineState state = driver.InlineState;
-                    state.InlineCursorRow = App.ForceInlineCursorRow!.Value;
-                    driver.InlineState = state;
-                }
+                InlineState state = driver.InlineState;
+                state.InlineCursorRow = App.ForceInlineCursorRow!.Value;
+                driver.InlineState = state;
 
                 Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeForced", $"CursorRow={App?.ForceInlineCursorRow}");
             }
-            else if (SizeMonitor.InitialSizeReceived)
-            {
-                _inlineSizeConfirmed = true;
-
-                // Pass the cursor row from the ANSI CPR response to the driver's InlineState.
-                // LayoutAndDraw will use this to position App.Screen at the cursor row.
-                if (App?.Driver is { } driver)
-                {
-                    InlineState state = driver.InlineState;
-                    state.InlineCursorRow = SizeMonitor.InitialCursorRow;
-                    driver.InlineState = state;
-                }
-
-                Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeConfirmed", $"Screen={App?.Screen}, CursorRow={SizeMonitor.InitialCursorRow}");
-            }
             else
             {
-                _inlineWaitStarted ??= DateTime.Now;
+                if (!_startupWaitLogged)
+                {
+                    string pending = string.Join (", ", startupGate.PendingQueries);
 
-                if (DateTime.Now - _inlineWaitStarted.Value < _inlineSizeWaitTimeout)
-                {
-                    shouldDraw = false;
-                    Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeDeferred", "Waiting for ANSI size response");
+                    Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>),
+                                     nameof (IterationImpl),
+                                     $"Deferring first render until ANSI startup queries complete. Pending: {pending}");
+
+                    _startupWaitLogged = true;
                 }
-                else
-                {
-                    // Timeout — render with whatever size we have
-                    _inlineSizeConfirmed = true;
-                    Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeTimeout", $"Rendering with fallback. Screen={App?.Screen}");
-                }
+
+                var swStartupCallbacks = Stopwatch.StartNew ();
+                TimedEvents.RunTimers ();
+                Logging.IterationInvokesAndTimeouts.Record (swStartupCallbacks.Elapsed.Milliseconds);
+
+                return;
             }
         }
 
-        if (shouldDraw)
+        // Startup gate just became ready — set up inline state if needed.
+        if (!_firstRenderCompleted)
         {
-            Trace.Draw (nameof (ApplicationMainLoop<TInputRecord>), "IterationDraw", $"Screen={App?.Screen}");
+            if (_startupWaitLogged)
+            {
+                Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>),
+                                 nameof (IterationImpl),
+                                 "ANSI startup gate ready; rendering can begin");
+            }
 
-            // Layout and draw any views that need it
-            App?.LayoutAndDraw (false);
+            // For inline mode, transfer the cursor row from the CPR response to InlineState.
+            if (App?.AppModel == AppModel.Inline && driver is { } && App?.ForceInlineCursorRow.HasValue != true)
+            {
+                InlineState state = driver.InlineState;
+                state.InlineCursorRow = SizeMonitor.InitialCursorRow;
+                driver.InlineState = state;
 
-            // Update the cursor
-            App?.Navigation?.UpdateCursor ();
+                Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeConfirmed", $"CursorRow={SizeMonitor.InitialCursorRow}");
+            }
         }
+
+        Trace.Draw (nameof (ApplicationMainLoop<TInputRecord>), "IterationDraw", $"Screen={App?.Screen}");
+
+        // Layout and draw any views that need it
+        App?.LayoutAndDraw (false);
+        _firstRenderCompleted = true;
+
+        // Update the cursor
+        App?.Navigation?.UpdateCursor ();
 
         var swCallbacks = Stopwatch.StartNew ();
 

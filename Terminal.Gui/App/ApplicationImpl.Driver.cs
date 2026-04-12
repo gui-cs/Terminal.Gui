@@ -9,6 +9,9 @@ internal partial class ApplicationImpl
     public IDriver? Driver { get; set; }
 
     /// <inheritdoc/>
+    public AnsiStartupGate? AnsiStartupGate { get; set; }
+
+    /// <inheritdoc/>
     public string ForceDriver { get; set; } = string.Empty;
 
     /// <inheritdoc/>
@@ -170,6 +173,13 @@ internal partial class ApplicationImpl
         // Propagate the instance-based AppModel to the factory so CreateOutput()
         // knows whether to use alternate screen buffer (Inline vs FullScreen).
         cf.AppModel = AppModel;
+
+        // In inline mode, create the startup gate so the driver and size monitor can
+        // register queries (size, cursor position) that must complete before the first render.
+        if (AppModel == AppModel.Inline)
+        {
+            AnsiStartupGate ??= new AnsiStartupGate ();
+        }
 
         return new MainLoopCoordinator<TInputRecord> (TimedEvents, inputQueue, loop, cf, _timeProvider);
     }

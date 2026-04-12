@@ -70,6 +70,11 @@ public interface IDriver : IDisposable
     /// <summary>Gets or sets the clipboard.</summary>
     IClipboard? Clipboard { get; set; }
 
+    /// <summary>
+    ///     Gets the ANSI startup readiness gate, if enabled for this driver instance.
+    /// </summary>
+    IAnsiStartupGate? AnsiStartupGate { get; }
+
     #endregion Driver Components
 
     #region Screen and Display

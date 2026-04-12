@@ -438,6 +438,21 @@ public interface IApplication : IDisposable
     IDriver? Driver { get; set; }
 
     /// <summary>
+    ///     Gets or sets the ANSI startup readiness gate.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When set, startup rendering can be deferred until required ANSI startup capability
+    ///         probes complete (or time out). When <see langword="null"/>, startup rendering proceeds
+    ///         immediately.
+    ///     </para>
+    ///     <para>
+    ///         Tests and inline app mode can assign a gate instance to opt into this behavior.
+    ///     </para>
+    /// </remarks>
+    AnsiStartupGate? AnsiStartupGate { get; set; }
+
+    /// <summary>
     ///     Gets the clipboard for this application instance.
     /// </summary>
     /// <remarks>

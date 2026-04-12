@@ -44,7 +44,31 @@ internal class DriverImpl : IDriver
                        IOutputBuffer outputBuffer,
                        IOutput output,
                        AnsiRequestScheduler ansiRequestScheduler,
-                       ISizeMonitor sizeMonitor)
+                       ISizeMonitor sizeMonitor) : this (componentFactory,
+                                                         inputProcessor,
+                                                         outputBuffer,
+                                                         output,
+                                                         ansiRequestScheduler,
+                                                         sizeMonitor,
+                                                         null) { }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DriverImpl"/> class.
+    /// </summary>
+    /// <param name="componentFactory">The component factory that created the driver components.</param>
+    /// <param name="inputProcessor">The input processor for handling keyboard and mouse events.</param>
+    /// <param name="outputBuffer">The output buffer for managing screen state.</param>
+    /// <param name="output">The output interface for rendering to the console.</param>
+    /// <param name="ansiRequestScheduler">The scheduler for managing ANSI escape sequence requests.</param>
+    /// <param name="sizeMonitor">The monitor for tracking terminal size changes.</param>
+    /// <param name="ansiStartupGate">Optional startup-readiness gate for ANSI capability queries.</param>
+    public DriverImpl (IComponentFactory componentFactory,
+                       IInputProcessor inputProcessor,
+                       IOutputBuffer outputBuffer,
+                       IOutput output,
+                       AnsiRequestScheduler ansiRequestScheduler,
+                       ISizeMonitor sizeMonitor,
+                       IAnsiStartupGate? ansiStartupGate)
     {
         _componentFactory = componentFactory;
         _inputProcessor = inputProcessor;
@@ -57,6 +81,7 @@ internal class DriverImpl : IDriver
         _sizeMonitor = sizeMonitor;
         _sizeMonitor.SizeChanged += OnSizeMonitorOnSizeChanged;
         _terminalSize = new Size (outputBuffer.Cols, outputBuffer.Rows);
+        AnsiStartupGate = ansiStartupGate;
 
         CreateClipboard ();
 
@@ -132,6 +157,9 @@ internal class DriverImpl : IDriver
     private readonly IOutputBuffer _outputBuffer;
 
     private readonly ISizeMonitor _sizeMonitor;
+
+    /// <inheritdoc/>
+    public IAnsiStartupGate? AnsiStartupGate { get; }
 
     /// <inheritdoc/>
     public IClipboard? Clipboard { get; set; } = new FakeClipboard ();

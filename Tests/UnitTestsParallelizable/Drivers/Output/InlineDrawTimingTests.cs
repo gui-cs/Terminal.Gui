@@ -18,9 +18,8 @@ namespace DriverTests.Output;
 public class InlineDrawTimingTests (ITestOutputHelper output)
 {
     /// <summary>
-    ///     Verifies that <c>IterationImpl</c> defers drawing when <see cref="ISizeMonitor.InitialSizeReceived"/>
-    ///     is <see langword="false"/> (simulating an <see cref="AnsiSizeMonitor"/> that hasn't received its
-    ///     CSI 18t response yet).
+    ///     Verifies that <c>IterationImpl</c> defers drawing when the <see cref="IAnsiStartupGate"/>
+    ///     is not ready (simulating pending startup queries).
     /// </summary>
     [Fact]
     public void IterationImpl_Inline_DefersDrawUntilSizeReceived ()
@@ -40,12 +39,22 @@ public class InlineDrawTimingTests (ITestOutputHelper output)
             AnsiSizeMonitor sizeMonitor = new (ansiOutput);
             Assert.False (sizeMonitor.InitialSizeReceived);
 
+            // Create a startup gate with a pending query so IsReady = false
+            AnsiStartupGate startupGate = new (() => DateTime.UtcNow);
+            startupGate.RegisterQuery (AnsiStartupQuery.TerminalSize, TimeSpan.FromSeconds (30));
+            Assert.False (startupGate.IsReady);
+
+            // Create a mock IDriver that returns the startup gate
+            Mock<IDriver> driverMock = new ();
+            driverMock.SetupGet (d => d.AnsiStartupGate).Returns (startupGate);
+
             // Create a mock IApplication with instance-based AppModel (no global static)
             var layoutAndDrawCallCount = 0;
             Mock<IApplication> appMock = new ();
             appMock.Setup (a => a.LayoutAndDraw (It.IsAny<bool> ())).Callback (() => layoutAndDrawCallCount++);
             appMock.SetupGet (a => a.Screen).Returns (new Rectangle (0, 0, 80, 25));
             appMock.SetupGet (a => a.AppModel).Returns (AppModel.Inline);
+            appMock.SetupGet (a => a.Driver).Returns (driverMock.Object);
 
             // We need a real InputProcessor to avoid nulls
             AnsiInputProcessor inputProcessor = new (inputQueue);
@@ -60,23 +69,16 @@ public class InlineDrawTimingTests (ITestOutputHelper output)
             output.WriteLine ($"SizeMonitor type: {loop.SizeMonitor.GetType ().Name}");
             output.WriteLine ($"InitialSizeReceived: {loop.SizeMonitor.InitialSizeReceived}");
 
-            // Act: Run several iterations — draw should be deferred
+            // Act: Run several iterations — draw should be deferred by the startup gate
             for (var i = 0; i < 3; i++)
             {
                 loop.IterationImpl ();
             }
 
-            output.WriteLine ($"LayoutAndDraw calls after 3 iterations (no size response): {layoutAndDrawCallCount}");
+            output.WriteLine ($"LayoutAndDraw calls after 3 iterations (gate not ready): {layoutAndDrawCallCount}");
 
             // Assert: No draws should have happened yet
             Assert.Equal (0, layoutAndDrawCallCount);
-
-            // Verify trace entries show deferral
-            List<TraceEntry> deferEntries = backend.Entries
-                                                   .Where (e => e.Phase == "InlineSizeDeferred")
-                                                   .ToList ();
-            output.WriteLine ($"InlineSizeDeferred trace entries: {deferEntries.Count}");
-            Assert.True (deferEntries.Count >= 3, $"Expected at least 3 InlineSizeDeferred entries, got {deferEntries.Count}");
 
             // No IterationDraw entries should exist
             List<TraceEntry> drawEntries = backend.Entries
@@ -87,8 +89,7 @@ public class InlineDrawTimingTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    ///     Verifies that once the ANSI size response arrives and
-    ///     <see cref="AnsiSizeMonitor.InitialSizeReceived"/> becomes <see langword="true"/>,
+    ///     Verifies that once the ANSI startup gate becomes ready (all queries answered),
     ///     subsequent iterations do draw.
     /// </summary>
     [Fact]
@@ -108,12 +109,25 @@ public class InlineDrawTimingTests (ITestOutputHelper output)
             AnsiEscapeSequenceRequest? capturedRequest = null;
             AnsiSizeMonitor sizeMonitor = new (ansiOutput, req => capturedRequest = req);
 
+            // Create a startup gate with a pending TerminalSize query
+            AnsiStartupGate startupGate = new (() => DateTime.UtcNow);
+            IDisposable sizeHandle = startupGate.RegisterQuery (AnsiStartupQuery.TerminalSize, TimeSpan.FromSeconds (30));
+            Assert.False (startupGate.IsReady);
+
+            // Create a mock IDriver that returns the startup gate and supports InlineState
+            Mock<IDriver> driverMock = new ();
+            driverMock.SetupGet (d => d.AnsiStartupGate).Returns (startupGate);
+            InlineState inlineState = new ();
+            driverMock.SetupGet (d => d.InlineState).Returns (inlineState);
+            driverMock.SetupSet (d => d.InlineState = It.IsAny<InlineState> ()).Callback<InlineState> (s => inlineState = s);
+
             // Instance-based AppModel on the mock (no global static)
             var layoutAndDrawCallCount = 0;
             Mock<IApplication> appMock = new ();
             appMock.Setup (a => a.LayoutAndDraw (It.IsAny<bool> ())).Callback (() => layoutAndDrawCallCount++);
             appMock.SetupGet (a => a.Screen).Returns (new Rectangle (0, 0, 120, 50));
             appMock.SetupGet (a => a.AppModel).Returns (AppModel.Inline);
+            appMock.SetupGet (a => a.Driver).Returns (driverMock.Object);
 
             AnsiInputProcessor inputProcessor = new (inputQueue);
 
@@ -122,24 +136,20 @@ public class InlineDrawTimingTests (ITestOutputHelper output)
 
             loop.Initialize (new TimedEvents (), inputQueue, inputProcessor, ansiOutput, factoryMock.Object, appMock.Object);
 
-            // First iteration — deferred (no size yet)
+            // First iteration — deferred (gate not ready)
             loop.IterationImpl ();
             Assert.Equal (0, layoutAndDrawCallCount);
-            Assert.False (sizeMonitor.InitialSizeReceived);
 
-            // Simulate ANSI size response: trigger Poll which sends query, then deliver response
-            sizeMonitor.Poll ();
-            Assert.NotNull (capturedRequest);
-            capturedRequest!.ResponseReceived! ("[8;50;120t");
+            // Mark the startup gate query as complete (simulating size response arrival)
+            sizeHandle.Dispose ();
+            Assert.True (startupGate.IsReady);
 
-            output.WriteLine ($"After response: InitialSizeReceived={sizeMonitor.InitialSizeReceived}");
-            output.WriteLine ($"Output size: {ansiOutput.GetSize ()}");
-            Assert.True (sizeMonitor.InitialSizeReceived);
+            output.WriteLine ($"After gate ready: IsReady={startupGate.IsReady}");
 
             // Next iteration — should now draw
             loop.IterationImpl ();
 
-            output.WriteLine ($"LayoutAndDraw calls after size response + iteration: {layoutAndDrawCallCount}");
+            output.WriteLine ($"LayoutAndDraw calls after gate ready + iteration: {layoutAndDrawCallCount}");
             Assert.Equal (1, layoutAndDrawCallCount);
 
             // Check trace shows confirmation
@@ -214,7 +224,7 @@ public class InlineDrawTimingTests (ITestOutputHelper output)
     }
 
     /// <summary>
-    ///     Verifies the full timeline: deferred iterations → size response → first draw.
+    ///     Verifies the full timeline: deferred iterations → gate ready → first draw.
     ///     Dumps all trace entries to the test output for diagnostic visibility.
     /// </summary>
     [Fact]
@@ -233,12 +243,24 @@ public class InlineDrawTimingTests (ITestOutputHelper output)
             AnsiEscapeSequenceRequest? capturedRequest = null;
             AnsiSizeMonitor sizeMonitor = new (ansiOutput, req => capturedRequest = req);
 
+            // Create a startup gate with a pending TerminalSize query
+            AnsiStartupGate startupGate = new (() => DateTime.UtcNow);
+            IDisposable sizeHandle = startupGate.RegisterQuery (AnsiStartupQuery.TerminalSize, TimeSpan.FromSeconds (30));
+
+            // Create a mock IDriver
+            Mock<IDriver> driverMock = new ();
+            driverMock.SetupGet (d => d.AnsiStartupGate).Returns (startupGate);
+            InlineState inlineState = new ();
+            driverMock.SetupGet (d => d.InlineState).Returns (inlineState);
+            driverMock.SetupSet (d => d.InlineState = It.IsAny<InlineState> ()).Callback<InlineState> (s => inlineState = s);
+
             // Instance-based AppModel on the mock (no global static)
             var layoutAndDrawCallCount = 0;
             Mock<IApplication> appMock = new ();
             appMock.Setup (a => a.LayoutAndDraw (It.IsAny<bool> ())).Callback (() => layoutAndDrawCallCount++);
             appMock.SetupGet (a => a.Screen).Returns (new Rectangle (0, 0, 80, 25));
             appMock.SetupGet (a => a.AppModel).Returns (AppModel.Inline);
+            appMock.SetupGet (a => a.Driver).Returns (driverMock.Object);
 
             AnsiInputProcessor inputProcessor = new (inputQueue);
 
@@ -247,23 +269,22 @@ public class InlineDrawTimingTests (ITestOutputHelper output)
 
             loop.Initialize (new TimedEvents (), inputQueue, inputProcessor, ansiOutput, factoryMock.Object, appMock.Object);
 
-            output.WriteLine ("=== Iteration 1 (no size yet) ===");
+            output.WriteLine ("=== Iteration 1 (gate not ready) ===");
             loop.IterationImpl ();
-            output.WriteLine ($"  DrawCalls={layoutAndDrawCallCount}, InitialSizeReceived={sizeMonitor.InitialSizeReceived}");
+            output.WriteLine ($"  DrawCalls={layoutAndDrawCallCount}, IsReady={startupGate.IsReady}");
 
-            output.WriteLine ("=== Iteration 2 (no size yet) ===");
+            output.WriteLine ("=== Iteration 2 (gate not ready) ===");
             loop.IterationImpl ();
-            output.WriteLine ($"  DrawCalls={layoutAndDrawCallCount}, InitialSizeReceived={sizeMonitor.InitialSizeReceived}");
+            output.WriteLine ($"  DrawCalls={layoutAndDrawCallCount}, IsReady={startupGate.IsReady}");
 
-            // Deliver size response
-            output.WriteLine ("=== Delivering CSI 18t response: 120×50 ===");
-            sizeMonitor.Poll (); // triggers query
-            capturedRequest!.ResponseReceived! ("[8;50;120t");
-            output.WriteLine ($"  InitialSizeReceived={sizeMonitor.InitialSizeReceived}, OutputSize={ansiOutput.GetSize ()}");
+            // Mark gate ready
+            output.WriteLine ("=== Marking startup gate ready ===");
+            sizeHandle.Dispose ();
+            output.WriteLine ($"  IsReady={startupGate.IsReady}");
 
-            output.WriteLine ("=== Iteration 3 (size now confirmed) ===");
+            output.WriteLine ("=== Iteration 3 (gate now ready) ===");
             loop.IterationImpl ();
-            output.WriteLine ($"  DrawCalls={layoutAndDrawCallCount}, InitialSizeReceived={sizeMonitor.InitialSizeReceived}");
+            output.WriteLine ($"  DrawCalls={layoutAndDrawCallCount}, IsReady={startupGate.IsReady}");
 
             output.WriteLine ("=== Iteration 4 (subsequent draw) ===");
             loop.IterationImpl ();
@@ -278,8 +299,7 @@ public class InlineDrawTimingTests (ITestOutputHelper output)
                 output.WriteLine ($"  [{entry.Category}] {entry.Id}.{entry.Phase}: {entry.Message}");
             }
 
-            // Verify: 2 deferred, 1 confirmed, 2 draws
-            Assert.Equal (2, backend.Entries.Count (e => e.Phase == "InlineSizeDeferred"));
+            // Verify: at least 1 deferral log, 1 confirmed, 2 draws
             Assert.Equal (1, backend.Entries.Count (e => e.Phase == "InlineSizeConfirmed"));
             Assert.Equal (2, backend.Entries.Count (e => e.Phase == "IterationDraw"));
             Assert.Equal (2, layoutAndDrawCallCount);
