@@ -80,7 +80,7 @@ app.StopAfterFirstIteration = true;
 app.Driver!.Force16Colors = !ansi;
 app.Driver!.SetScreenSize (80, 20);
 
-string? result = app.Run<ViewDemoWindow> ().GetResult<string> ();
+var result = app.Run<ViewDemoWindow> ().GetResult<string> ();
 
 if (result is { })
 {
@@ -146,7 +146,7 @@ internal class ViewDemoWindow : Runnable<string>
         }
 
         // Convert ViewName to type that's in the Terminal.Gui assembly:
-        Type? type = Type.GetType ($"Terminal.Gui.Views.{ViewName!}, Terminal.Gui", false, true);
+        var type = Type.GetType ($"Terminal.Gui.Views.{ViewName!}, Terminal.Gui", false, true);
 
         if (type is null)
         {
