@@ -904,104 +904,24 @@ public sealed class UICatalogRunnable : Runnable
             Height = Dim.Auto (DimAutoStyle.Text)
         };
 
-        GradientArtView asciiArt = new () { X = Pos.Center (), Y = Pos.Bottom (tagline) + 1 };
+        Logo logo = new () { X = Pos.Center (), Y = Pos.Bottom (tagline) + 1 };
 
-        Link link = new () { Text = ABOUT_URL, Url = ABOUT_URL, X = Pos.Center (), Y = Pos.Bottom (asciiArt) + 1 };
+        View version = new ()
+        {
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+            Text = "v2 - Beta",
+            X = Pos.Center (),
+            Y = Pos.Bottom (logo) + 1
+        };
+
+        Link link = new () { Text = ABOUT_URL, Url = ABOUT_URL, X = Pos.Center (), Y = Pos.Bottom (version) + 1 };
         App?.ToolTips?.SetToolTip (link, () => link.Url);
 
-        dialog.Add (tagline, asciiArt, link);
+        dialog.Add (tagline, logo, version, link);
         dialog.Buttons.ElementAt (0).SetFocus ();
         App?.Run (dialog);
         dialog.Dispose ();
-    }
-
-    /// <summary>
-    ///     Renders the Terminal.Gui logo in box-drawing characters with a diagonal gradient.
-    /// </summary>
-    private sealed class GradientArtView : View
-    {
-        // @formatter:off
-        private const string ART = """
-                                    ╺┳╸┏━╸┏━┓┏┳┓╻┏┓╻┏━┓╻   ┏━╸╻ ╻╻
-                                     ┃ ┣╸ ┣┳┛┃┃┃┃┃┗┫┣━┫┃   ┃╺┓┃ ┃┃
-                                     ╹ ┗━╸╹┗╸╹ ╹╹╹ ╹╹ ╹┗━╸╹┗━┛┗━┛╹
-
-                                               v2 - Beta
-                                    """;
-
-        // @formatter:on
-
-        private static readonly string [] _artLines = ART.ReplaceLineEndings ("\n").Split ('\n');
-
-        public GradientArtView ()
-        {
-            int artWidth = _artLines.Select (line => line.Length).Prepend (0).Max ();
-
-            Width = artWidth;
-            Height = _artLines.Length;
-        }
-
-        /// <inheritdoc/>
-        protected override bool OnDrawingContent (DrawContext? context)
-        {
-            List<Color> stops =
-            [
-                new (0, 128, 255), // Bright Blue
-                new (0, 255, 128), // Bright Green
-                new (255, 255), // Bright Yellow
-                new (255, 128) // Bright Orange
-            ];
-
-            List<int> steps = [10];
-
-            Gradient gradient = new (stops, steps);
-
-            var artHeight = 3; // Only the box-drawing lines get the gradient
-            int artWidth = _artLines [0].Length;
-
-            Dictionary<Point, Color> colorMap = gradient.BuildCoordinateColorMapping (artHeight, artWidth, GradientDirection.Diagonal);
-
-            Attribute normalAttr = GetAttributeForRole (VisualRole.Normal);
-
-            for (var row = 0; row < _artLines.Length; row++)
-            {
-                string line = _artLines [row];
-
-                for (var col = 0; col < line.Length; col++)
-                {
-                    char ch = line [col];
-
-                    if (ch == ' ')
-                    {
-                        continue;
-                    }
-
-                    // Gradient only on the 3 art lines; version text uses normal color
-                    if (row < 3)
-                    {
-                        Point coord = new (col, row);
-
-                        if (colorMap.TryGetValue (coord, out Color color))
-                        {
-                            SetAttribute (new Attribute (color, normalAttr.Background));
-                        }
-                        else
-                        {
-                            SetAttribute (normalAttr);
-                        }
-                    }
-                    else
-                    {
-                        SetAttribute (normalAttr);
-                    }
-
-                    Move (col, row);
-                    AddStr (ch.ToString ());
-                }
-            }
-
-            return true;
-        }
     }
 
     /// <summary>

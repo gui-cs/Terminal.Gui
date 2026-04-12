@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.Drivers;
@@ -24,12 +25,28 @@ namespace Terminal.Gui.Drivers;
 /// </remarks>
 internal class AnsiSizeMonitor : ISizeMonitor
 {
+    private static readonly TimeSpan StartupSizeQueryTimeout = TimeSpan.FromMilliseconds (500);
+    private static readonly TimeSpan StartupCursorPositionQueryTimeout = TimeSpan.FromMilliseconds (500);
+
     private readonly AnsiOutput _output;
     private Action<AnsiEscapeSequenceRequest>? _queueAnsiRequest;
+    private IAnsiStartupGate? _startupGate;
+    private IDisposable? _startupSizeQueryCompletionHandle;
+    private IDisposable? _startupCursorPositionQueryCompletionHandle;
     private Size _lastSize;
     private DateTime _lastQuery = DateTime.MinValue;
     private readonly TimeSpan _queryThrottle = TimeSpan.FromMilliseconds (500); // Don't spam queries
     private bool _expectingResponse;
+    private bool _sizeResponseReceived;
+    private bool _cursorPositionReceived;
+
+    /// <inheritdoc/>
+    public bool InitialSizeReceived =>
+        _sizeResponseReceived
+        && (_output.AppModel != AppModel.Inline || _cursorPositionReceived);
+
+    /// <inheritdoc/>
+    public int InitialCursorRow { get; private set; }
 
     /// <summary>
     ///     Creates a new ANSISizeMonitor.
@@ -56,10 +73,15 @@ internal class AnsiSizeMonitor : ISizeMonitor
         }
 
         _queueAnsiRequest = driver.QueueAnsiRequest;
+        _startupGate = driver.AnsiStartupGate;
 
         Trace.Lifecycle (nameof (AnsiSizeMonitor), "Initialize", "Driver wired up; sending initial size query");
 
+        _startupSizeQueryCompletionHandle = _startupGate?.RegisterQuery (AnsiStartupQuery.TerminalSize, StartupSizeQueryTimeout);
+        _startupCursorPositionQueryCompletionHandle = _startupGate?.RegisterQuery (AnsiStartupQuery.CursorPosition, StartupCursorPositionQueryTimeout);
+
         SendSizeQuery ();
+        SendCursorPositionQuery ();
     }
 
     private void SendSizeQuery ()
@@ -82,7 +104,11 @@ internal class AnsiSizeMonitor : ISizeMonitor
             Value = EscSeqUtils.CSI_ReportWindowSizeInChars.Value,
             Terminator = EscSeqUtils.CSI_ReportWindowSizeInChars.Terminator,
             ResponseReceived = HandleSizeResponse,
-            Abandoned = () => { _expectingResponse = false; }
+            Abandoned = () =>
+            {
+                _expectingResponse = false;
+                CompleteStartupSizeQuery ();
+            }
         };
 
         //Logging.Trace($"{request.Request}");
@@ -132,17 +158,89 @@ internal class AnsiSizeMonitor : ISizeMonitor
     {
         //Trace.Lifecycle (nameof (AnsiSizeMonitor), "HandleSizeResponse", $"Response: '{response ?? "<null>"}'");
         _expectingResponse = false;
+        _sizeResponseReceived = true;
 
         if (string.IsNullOrEmpty (response))
         {
+            CompleteStartupSizeQuery ();
+
             return;
         }
 
         // The response is handled by ANSIOutput.HandleSizeQueryResponse
         // which updates the cached size. We just need to check if it changed.
         _output.HandleSizeQueryResponse (response);
+        CompleteStartupSizeQuery ();
 
         // Check for size change after the response is processed
         CheckSizeChanged ();
+    }
+
+    private void SendCursorPositionQuery ()
+    {
+        if (_queueAnsiRequest is null)
+        {
+            Logging.Warning ("ANSISizeMonitor: Cannot send cursor position query - _queueAnsiRequest is null");
+            _cursorPositionReceived = true;
+            CompleteStartupCursorPositionQuery ();
+
+            return;
+        }
+
+        Trace.Lifecycle (nameof (AnsiSizeMonitor), "SendCursorPositionQuery", "Queuing CSI ?6n cursor position query");
+
+        AnsiEscapeSequenceRequest request = new ()
+        {
+            Request = EscSeqUtils.CSI_RequestCursorPositionReport.Request,
+            Terminator = EscSeqUtils.CSI_RequestCursorPositionReport.Terminator,
+            ResponseReceived = HandleCursorPositionResponse,
+            Abandoned = () =>
+                        {
+                            Trace.Lifecycle (nameof (AnsiSizeMonitor), "CursorPositionAbandoned", "Defaulting to row 0");
+                            _cursorPositionReceived = true;
+                            CompleteStartupCursorPositionQuery ();
+                        }
+        };
+
+        _queueAnsiRequest! (request);
+    }
+
+    private void HandleCursorPositionResponse (string? response)
+    {
+        Trace.Lifecycle (nameof (AnsiSizeMonitor), "HandleCursorPositionResponse", $"Response: '{response ?? "<null>"}'");
+        _cursorPositionReceived = true;
+
+        if (string.IsNullOrEmpty (response))
+        {
+            CompleteStartupCursorPositionQuery ();
+
+            return;
+        }
+
+        // Response format for DECXCPR: ESC [ ? row ; col R  or  ESC [ ? row ; col ; 1 R
+        // Response format for standard CPR: ESC [ row ; col R
+        Match match = Regex.Match (response, @"\[?\??(\d+);(\d+)");
+
+        if (match.Success && int.TryParse (match.Groups [1].Value, out int row))
+        {
+            // Convert from 1-indexed terminal row to 0-indexed
+            InitialCursorRow = Math.Max (0, row - 1);
+            Trace.Lifecycle (nameof (AnsiSizeMonitor), "CursorPositionParsed", $"Row={InitialCursorRow} (1-indexed: {row})");
+        }
+
+        // Complete AFTER parsing so the gate doesn't release with InitialCursorRow still 0
+        CompleteStartupCursorPositionQuery ();
+    }
+
+    private void CompleteStartupSizeQuery ()
+    {
+        _startupSizeQueryCompletionHandle?.Dispose ();
+        _startupSizeQueryCompletionHandle = null;
+    }
+
+    private void CompleteStartupCursorPositionQuery ()
+    {
+        _startupCursorPositionQueryCompletionHandle?.Dispose ();
+        _startupCursorPositionQueryCompletionHandle = null;
     }
 }

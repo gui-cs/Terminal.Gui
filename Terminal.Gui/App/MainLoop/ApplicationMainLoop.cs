@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Trace = Terminal.Gui.Tracing.Trace;
 
 namespace Terminal.Gui.App;
 
@@ -20,6 +21,9 @@ namespace Terminal.Gui.App;
 /// <typeparam name="TInputRecord">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
 public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputRecord> where TInputRecord : struct
 {
+    private bool _firstRenderCompleted;
+    private bool _startupWaitLogged;
+
     /// <inheritdoc/>
     public IApplication? App { get; private set; }
 
@@ -72,7 +76,14 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         InputProcessor = inputProcessor;
 
         TimedEvents = timedEvents;
-        AnsiRequestScheduler = new (InputProcessor.GetParser ());
+        AnsiRequestScheduler = new AnsiRequestScheduler (InputProcessor.GetParser ());
+
+        // In inline mode, cells must start clean so the first render only flushes
+        // cells that views explicitly draw, leaving the rest of the terminal untouched.
+        if (App?.AppModel == AppModel.Inline && OutputBuffer is OutputBufferImpl outputBufferImpl)
+        {
+            outputBufferImpl.InlineMode = true;
+        }
 
         OutputBuffer.SetSize (consoleOutput.GetSize ().Width, consoleOutput.GetSize ().Height);
         SizeMonitor = componentFactory.CreateSizeMonitor (Output, OutputBuffer);
@@ -111,8 +122,64 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         // Check for any size changes; this will cause SizeChanged events
         SizeMonitor.Poll ();
 
+        IDriver? driver = App?.Driver;
+
+        // First-render deferral: wait for the ANSI startup gate unless bypassed.
+        if (!_firstRenderCompleted
+            && driver?.AnsiStartupGate is { IsReady: false } startupGate)
+        {
+            // ForceInlinePosition bypasses the gate for inline mode testing.
+            if (App?.AppModel == AppModel.Inline && App?.ForceInlinePosition.HasValue == true)
+            {
+                driver.InlinePosition = new Point (App.ForceInlinePosition!.Value.X, App.ForceInlinePosition!.Value.Y);
+
+                Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeForced", $"Position={App?.ForceInlinePosition}");
+            }
+            else
+            {
+                if (!_startupWaitLogged)
+                {
+                    string pending = string.Join (", ", startupGate.PendingQueries);
+
+                    Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>),
+                                     nameof (IterationImpl),
+                                     $"Deferring first render until ANSI startup queries complete. Pending: {pending}");
+
+                    _startupWaitLogged = true;
+                }
+
+                var swStartupCallbacks = Stopwatch.StartNew ();
+                TimedEvents.RunTimers ();
+                Logging.IterationInvokesAndTimeouts.Record (swStartupCallbacks.Elapsed.Milliseconds);
+
+                return;
+            }
+        }
+
+        // Startup gate just became ready — set up inline state if needed.
+        if (!_firstRenderCompleted)
+        {
+            if (_startupWaitLogged)
+            {
+                Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>),
+                                 nameof (IterationImpl),
+                                 "ANSI startup gate ready; rendering can begin");
+            }
+
+            // For inline mode, transfer the cursor row from the CPR response to InlinePosition.
+            if (App?.AppModel == AppModel.Inline && driver is { } && App?.ForceInlinePosition.HasValue != true)
+            {
+                driver.InlinePosition = new Point (0, SizeMonitor.InitialCursorRow);
+
+                Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeConfirmed", $"CursorRow={SizeMonitor.InitialCursorRow}");
+            }
+        }
+
+        Trace.Draw (nameof (ApplicationMainLoop<TInputRecord>), "IterationDraw", $"Screen={App?.Screen}");
+
         // Layout and draw any views that need it
-        App?.LayoutAndDraw ();
+        App?.LayoutAndDraw (false);
+        _firstRenderCompleted = true;
 
         // Update the cursor
         App?.Navigation?.UpdateCursor ();
