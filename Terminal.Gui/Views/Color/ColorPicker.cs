@@ -11,7 +11,8 @@ namespace Terminal.Gui.Views;
 ///             <term>Mouse Event</term> <description>Action</description>
 ///         </listheader>
 ///         <item>
-///             <term>Double-Click</term> <description>Accepts the selected color (<see cref="Command.Accept"/>).</description>
+///             <term>Double-Click</term>
+///             <description>Accepts the selected color (<see cref="Command.Accept"/>).</description>
 ///         </item>
 ///     </list>
 /// </remarks>
@@ -134,8 +135,8 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
     ///     Raised when <see cref="Value"/> has changed.
     /// </summary>
     public event EventHandler<ValueChangedEventArgs<Color?>>? ValueChanged;
-    
-    /// <inheritdoc />
+
+    /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
     /// <summary>
@@ -173,19 +174,21 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
 
         _tfName = new TextField
         {
-            Y = 3, X = 6, Width = 20 // width of "LightGoldenRodYellow" - the longest w3c color name
+            Y = 3, X = 6, Width = 20 // width of "LightGoldenRodYeexllow" - the longest w3c color name
         };
 
         Add (_lbName);
         Add (_tfName);
 
-        var auto = new AppendAutocomplete (_tfName);
+        AppendAutocomplete auto = new (_tfName)
+        {
+            SuggestionGenerator = new SingleWordSuggestionGenerator { AllSuggestions = _colorNameResolver.GetColorNames ().ToList () }
+        };
 
-        auto.SuggestionGenerator = new SingleWordSuggestionGenerator { AllSuggestions = _colorNameResolver.GetColorNames ().ToList () };
         _tfName.Autocomplete = auto;
 
         _tfName.HasFocusChanged += UpdateValueFromName;
-        _tfName.Accepting += (s, _) => UpdateValueFromName ();
+        _tfName.Accepting += (_, _) => UpdateValueFromName ();
     }
 
     private void CreateTextField ()
@@ -311,15 +314,9 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
 
         var colorHex = _selectedColor.ToString ($"#{SelectedColor.R:X2}{SelectedColor.G:X2}{SelectedColor.B:X2}");
 
-        if (_tfName != null)
-        {
-            _tfName.Text = _colorNameResolver.TryNameColor (_selectedColor, out string? name) ? name : string.Empty;
-        }
+        _tfName?.Text = _colorNameResolver.TryNameColor (_selectedColor, out string? name) ? name : string.Empty;
 
-        if (_tfHex != null)
-        {
-            _tfHex.Text = colorHex;
-        }
+        _tfHex?.Text = colorHex;
 
         SetNeedsLayout ();
     }

@@ -19,6 +19,8 @@ mainWindow.Title = "Prompt API Examples (Esc to quit)";
 mainWindow.Text = "This example demonstrates various uses of the Prompt API.\nPress the buttons to try different prompt types.\nPress Esc to quit.";
 mainWindow.TextAlignment = Alignment.Center;
 
+int buttonY = 0;
+
 // Example 1: TextField with string result using auto-Text extraction
 Button textFieldButton = new () { Title = "TextField (Auto-Text)", X = Pos.Center (), Y = buttonY++ };
 

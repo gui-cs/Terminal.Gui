@@ -73,200 +73,214 @@ internal class ApplicationMouse : IMouse, IDisposable
     {
         // In inline mode, the driver reports terminal-absolute coordinates but views
         // expect coordinates relative to App.Screen origin. Subtract the inline offset.
-        if (App?.AppModel == AppModel.Inline)
+        // IMPORTANT: Save and restore the original ScreenPosition because the MouseInterpreter
+        // generator yields the same Mouse object for original and synthesized events. If we
+        // mutate ScreenPosition permanently, synthesized events (click, double-click) inherit
+        // the already-adjusted position and get adjusted again — a double-subtraction bug.
+        Point originalScreenPosition = mouseEvent.ScreenPosition;
+
+        try
         {
-            Rectangle appScreen = App.Screen;
-
-            mouseEvent.ScreenPosition = new Point (
-                                                   mouseEvent.ScreenPosition.X - appScreen.X,
-                                                   mouseEvent.ScreenPosition.Y - appScreen.Y);
-        }
-
-        if (App?.Initialized is true)
-        {
-            // LastMousePosition is only set if the application is initialized.
-            LastMousePosition = mouseEvent.ScreenPosition;
-        }
-
-        if (IsMouseDisabled)
-        {
-            return;
-        }
-
-        // The position of the mouse is the same as the screen position at the application level.
-        mouseEvent.Position = mouseEvent.ScreenPosition;
-
-        List<View?>? currentViewsUnderMouse = App?.TopRunnableView?.GetViewsUnderLocation (mouseEvent.ScreenPosition, ViewportSettingsFlags.TransparentMouse);
-
-        View? deepestViewUnderMouse = currentViewsUnderMouse?.LastOrDefault ();
-
-        if (deepestViewUnderMouse is { })
-        {
-#if DEBUG_IDISPOSABLE
-            if (View.EnableDebugIDisposableAsserts && deepestViewUnderMouse.WasDisposed)
+            if (App?.AppModel == AppModel.Inline)
             {
-                throw new ObjectDisposedException (deepestViewUnderMouse.ToDebugString ());
+                Rectangle appScreen = App.Screen;
+
+                mouseEvent.ScreenPosition = new Point (mouseEvent.ScreenPosition.X - appScreen.X, mouseEvent.ScreenPosition.Y - appScreen.Y);
             }
+
+            if (App?.Initialized is true)
+            {
+                // LastMousePosition is only set if the application is initialized.
+                LastMousePosition = mouseEvent.ScreenPosition;
+            }
+
+            if (IsMouseDisabled)
+            {
+                return;
+            }
+
+            // The position of the mouse is the same as the screen position at the application level.
+            mouseEvent.Position = mouseEvent.ScreenPosition;
+
+            List<View?>? currentViewsUnderMouse =
+                App?.TopRunnableView?.GetViewsUnderLocation (mouseEvent.ScreenPosition, ViewportSettingsFlags.TransparentMouse);
+
+            View? deepestViewUnderMouse = currentViewsUnderMouse?.LastOrDefault ();
+
+            if (deepestViewUnderMouse is { })
+            {
+#if DEBUG_IDISPOSABLE
+                if (View.EnableDebugIDisposableAsserts && deepestViewUnderMouse.WasDisposed)
+                {
+                    throw new ObjectDisposedException (deepestViewUnderMouse.ToDebugString ());
+                }
 #endif
-            mouseEvent.View = deepestViewUnderMouse;
-        }
+                mouseEvent.View = deepestViewUnderMouse;
+            }
 
-        Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Entry", "Invoking MouseEvent");
-        MouseEvent?.Invoke (this, mouseEvent);
+            Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Entry", "Invoking MouseEvent");
+            MouseEvent?.Invoke (this, mouseEvent);
 
-        if (mouseEvent.Handled)
-        {
-            return;
-        }
-
-        // Record the active popover when a press starts so we can detect if it closes mid-cycle.
-        if (mouseEvent.IsPressed)
-        {
-            _activePopoverAtPress = App?.Popovers?.GetActivePopover ();
-        }
-
-        // Suppress Clicked events that were synthesized after a popover closed during the same
-        // press → release → click cycle. Without this, selecting an item in a popover (which
-        // hides the popover on Released) causes the Clicked event to leak to views below.
-        if (mouseEvent.IsSingleDoubleOrTripleClicked && _activePopoverAtPress is { } && App?.Popovers?.GetActivePopover () != _activePopoverAtPress)
-        {
-            Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Popovers", "Suppressing Clicked - popover closed mid-cycle");
-            _activePopoverAtPress = null;
-
-            return;
-        }
-
-        // Clear the dismissed-popover guard on a genuinely new press that isn't part of dismiss recursion.
-        if (mouseEvent.IsPressed && !_isDismissRecursing && _dismissedByMousePress is { })
-        {
-            _dismissedByMousePress = null;
-        }
-
-        // Dismiss the Popover if the user presses mouse outside of it
-        if (mouseEvent.IsPressed
-            && App?.Popovers?.GetActivePopover () is { Visible: true } visiblePopover and View popoverView
-            && !View.IsInHierarchy (popoverView, deepestViewUnderMouse, true)
-            && !IsGrabbedByViewInHierarchy (popoverView))
-        {
-            Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Popovers", "Hide Visible Popover");
-
-            ApplicationPopover.HideWithQuitCommand (visiblePopover);
-
-            // Record the dismissed popover so ApplicationPopover.Show can suppress re-show
-            // during the remainder of this press → release → click cycle.
-            _dismissedByMousePress = visiblePopover;
-            _isDismissRecursing = true;
-
-            // Recurse once so the event can be handled below the popover
-            RaiseMouseEvent (mouseEvent);
-
-            _isDismissRecursing = false;
-
-            return;
-        }
-
-        if (HandleMouseGrab (deepestViewUnderMouse, mouseEvent))
-        {
-            return;
-        }
-
-        // May be null before the prior condition or the condition may set it as null.
-        // So, the checking must be outside the prior condition.
-        if (deepestViewUnderMouse is null)
-        {
-            return;
-        }
-
-        // if the mouse is outside the Application.TopRunnable or Popover hierarchy, we don't want to
-        // send the mouse event to the deepest view under the mouse.
-        if (!View.IsInHierarchy (App?.TopRunnableView, deepestViewUnderMouse, true)
-            && !View.IsInHierarchy (App?.Popovers?.GetActivePopover () as View, deepestViewUnderMouse, true))
-        {
-            return;
-        }
-
-        // Create a view-relative mouse event to send to the view that is under the mouse.
-        Mouse viewMouseEvent;
-
-        if (deepestViewUnderMouse is AdornmentView adornment)
-        {
-            Point frameLoc = adornment.ScreenToFrame (mouseEvent.ScreenPosition);
-
-            viewMouseEvent = new Mouse
+            if (mouseEvent.Handled)
             {
-                Timestamp = mouseEvent.Timestamp,
-                Position = frameLoc,
-                Flags = mouseEvent.Flags,
-                ScreenPosition = mouseEvent.ScreenPosition,
-                View = deepestViewUnderMouse
-            };
-        }
-        else if (deepestViewUnderMouse.ViewportToScreen (Rectangle.Empty with { Size = deepestViewUnderMouse.Viewport.Size })
-                                      .Contains (mouseEvent.ScreenPosition))
-        {
-            Point viewportLocation = deepestViewUnderMouse.ScreenToViewport (mouseEvent.ScreenPosition);
+                return;
+            }
 
-            viewMouseEvent = new Mouse
+            // Record the active popover when a press starts so we can detect if it closes mid-cycle.
+            if (mouseEvent.IsPressed)
             {
-                Timestamp = mouseEvent.Timestamp,
-                Position = viewportLocation,
-                Flags = mouseEvent.Flags,
-                ScreenPosition = mouseEvent.ScreenPosition,
-                View = deepestViewUnderMouse
-            };
-        }
-        else
-        {
-            // The mouse was outside any View's Viewport.
-            // Debug.Fail ("This should never happen. If it does please file an Issue!!");
+                _activePopoverAtPress = App?.Popovers?.GetActivePopover ();
+            }
 
-            return;
-        }
-
-        if (currentViewsUnderMouse is { })
-        {
-            RaiseMouseEnterLeaveEvents (viewMouseEvent.ScreenPosition, currentViewsUnderMouse);
-        }
-
-        Trace.Mouse ("app", viewMouseEvent.Flags, viewMouseEvent.ScreenPosition, "Dispatch");
-
-        while (deepestViewUnderMouse.NewMouseEvent (viewMouseEvent) is not true && _mouseGrabViewRef is null)
-        {
-            if (deepestViewUnderMouse is AdornmentView adornmentView)
+            // Suppress Clicked events that were synthesized after a popover closed during the same
+            // press → release → click cycle. Without this, selecting an item in a popover (which
+            // hides the popover on Released) causes the Clicked event to leak to views below.
+            if (mouseEvent.IsSingleDoubleOrTripleClicked && _activePopoverAtPress is { } && App?.Popovers?.GetActivePopover () != _activePopoverAtPress)
             {
-                deepestViewUnderMouse = adornmentView.Adornment?.Parent?.SuperView;
+                Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Popovers", "Suppressing Clicked - popover closed mid-cycle");
+                _activePopoverAtPress = null;
+
+                return;
+            }
+
+            // Clear the dismissed-popover guard on a genuinely new press that isn't part of dismiss recursion.
+            if (mouseEvent.IsPressed && !_isDismissRecursing && _dismissedByMousePress is { })
+            {
+                _dismissedByMousePress = null;
+            }
+
+            // Dismiss the Popover if the user presses mouse outside of it
+            if (mouseEvent.IsPressed
+                && App?.Popovers?.GetActivePopover () is { Visible: true } visiblePopover and View popoverView
+                && !View.IsInHierarchy (popoverView, deepestViewUnderMouse, true)
+                && !IsGrabbedByViewInHierarchy (popoverView))
+            {
+                Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Popovers", "Hide Visible Popover");
+
+                ApplicationPopover.HideWithQuitCommand (visiblePopover);
+
+                // Record the dismissed popover so ApplicationPopover.Show can suppress re-show
+                // during the remainder of this press → release → click cycle.
+                _dismissedByMousePress = visiblePopover;
+                _isDismissRecursing = true;
+
+                // Recurse once so the event can be handled below the popover
+                RaiseMouseEvent (mouseEvent);
+
+                _isDismissRecursing = false;
+
+                return;
+            }
+
+            if (HandleMouseGrab (deepestViewUnderMouse, mouseEvent))
+            {
+                return;
+            }
+
+            // May be null before the prior condition or the condition may set it as null.
+            // So, the checking must be outside the prior condition.
+            if (deepestViewUnderMouse is null)
+            {
+                return;
+            }
+
+            // if the mouse is outside the Application.TopRunnable or Popover hierarchy, we don't want to
+            // send the mouse event to the deepest view under the mouse.
+            if (!View.IsInHierarchy (App?.TopRunnableView, deepestViewUnderMouse, true)
+                && !View.IsInHierarchy (App?.Popovers?.GetActivePopover () as View, deepestViewUnderMouse, true))
+            {
+                return;
+            }
+
+            // Create a view-relative mouse event to send to the view that is under the mouse.
+            Mouse viewMouseEvent;
+
+            if (deepestViewUnderMouse is AdornmentView adornment)
+            {
+                Point frameLoc = adornment.ScreenToFrame (mouseEvent.ScreenPosition);
+
+                viewMouseEvent = new Mouse
+                {
+                    Timestamp = mouseEvent.Timestamp,
+                    Position = frameLoc,
+                    Flags = mouseEvent.Flags,
+                    ScreenPosition = mouseEvent.ScreenPosition,
+                    View = deepestViewUnderMouse
+                };
+            }
+            else if (deepestViewUnderMouse.ViewportToScreen (Rectangle.Empty with { Size = deepestViewUnderMouse.Viewport.Size })
+                                          .Contains (mouseEvent.ScreenPosition))
+            {
+                Point viewportLocation = deepestViewUnderMouse.ScreenToViewport (mouseEvent.ScreenPosition);
+
+                viewMouseEvent = new Mouse
+                {
+                    Timestamp = mouseEvent.Timestamp,
+                    Position = viewportLocation,
+                    Flags = mouseEvent.Flags,
+                    ScreenPosition = mouseEvent.ScreenPosition,
+                    View = deepestViewUnderMouse
+                };
             }
             else
             {
-                deepestViewUnderMouse = deepestViewUnderMouse.SuperView;
+                // The mouse was outside any View's Viewport.
+                // Debug.Fail ("This should never happen. If it does please file an Issue!!");
+
+                return;
             }
 
-            if (deepestViewUnderMouse is null)
+            if (currentViewsUnderMouse is { })
             {
-                break;
+                RaiseMouseEnterLeaveEvents (viewMouseEvent.ScreenPosition, currentViewsUnderMouse);
             }
-
-            Point boundsPoint = deepestViewUnderMouse.ScreenToViewport (mouseEvent.ScreenPosition);
-
-            viewMouseEvent = new Mouse
-            {
-                Timestamp = mouseEvent.Timestamp,
-                Position = boundsPoint,
-                Flags = mouseEvent.Flags,
-                ScreenPosition = mouseEvent.ScreenPosition,
-                View = deepestViewUnderMouse
-            };
 
             Trace.Mouse ("app", viewMouseEvent.Flags, viewMouseEvent.ScreenPosition, "Dispatch");
+
+            while (deepestViewUnderMouse.NewMouseEvent (viewMouseEvent) is not true && _mouseGrabViewRef is null)
+            {
+                if (deepestViewUnderMouse is AdornmentView adornmentView)
+                {
+                    deepestViewUnderMouse = adornmentView.Adornment?.Parent?.SuperView;
+                }
+                else
+                {
+                    deepestViewUnderMouse = deepestViewUnderMouse.SuperView;
+                }
+
+                if (deepestViewUnderMouse is null)
+                {
+                    break;
+                }
+
+                Point boundsPoint = deepestViewUnderMouse.ScreenToViewport (mouseEvent.ScreenPosition);
+
+                viewMouseEvent = new Mouse
+                {
+                    Timestamp = mouseEvent.Timestamp,
+                    Position = boundsPoint,
+                    Flags = mouseEvent.Flags,
+                    ScreenPosition = mouseEvent.ScreenPosition,
+                    View = deepestViewUnderMouse
+                };
+
+                Trace.Mouse ("app", viewMouseEvent.Flags, viewMouseEvent.ScreenPosition, "Dispatch");
+            }
+
+            Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Exit");
+
+            // Clear the dismissed-popover guard after the click cycle completes.
+            // The Click event is the last event in a press → release → click cycle.
+            if (_dismissedByMousePress is { } && mouseEvent.IsSingleDoubleOrTripleClicked && !_isDismissRecursing)
+            {
+                _dismissedByMousePress = null;
+            }
         }
-
-        Trace.Mouse ("app", mouseEvent.Flags, mouseEvent.ScreenPosition, "Exit");
-
-        // Clear the dismissed-popover guard after the click cycle completes.
-        // The Click event is the last event in a press → release → click cycle.
-        if (_dismissedByMousePress is { } && mouseEvent.IsSingleDoubleOrTripleClicked && !_isDismissRecursing)
+        finally
         {
-            _dismissedByMousePress = null;
+            // Restore original terminal-absolute position so the MouseInterpreter generator
+            // creates synthesized events with the correct (unadjusted) coordinates.
+            mouseEvent.ScreenPosition = originalScreenPosition;
         }
     }
 
