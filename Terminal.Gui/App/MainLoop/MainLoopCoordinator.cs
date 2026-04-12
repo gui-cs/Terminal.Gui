@@ -150,6 +150,12 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         }
         _driver = new DriverImpl (_componentFactory, _inputProcessor, _loop.OutputBuffer, _output, _loop.AnsiRequestScheduler, _loop.SizeMonitor);
 
+        // Set the driver's AppModel from the application instance so it doesn't rely on the static.
+        if (app is { })
+        {
+            _driver.AppModel = app.AppModel;
+        }
+
         // Wire up the inline screen callback so AnsiOutput can read the row offset
         // and dimensions from App.Screen for cursor positioning and exit cleanup.
         if (_output is AnsiOutput ansiOutput && app is { })

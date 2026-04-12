@@ -103,10 +103,15 @@ public interface IDriver : IDisposable
     int Top { get; set; }
 
     /// <summary>
-    ///     Gets or sets the inline-mode rendering state. Only meaningful when <see cref="Application.AppModel"/>
+    ///     Gets or sets the inline-mode rendering state. Only meaningful when <see cref="AppModel"/>
     ///     is <see cref="AppModel.Inline"/>.
     /// </summary>
     InlineState InlineState { get; set; }
+
+    /// <summary>
+    ///     Gets or sets how the application using this driver interacts with the terminal buffer.
+    /// </summary>
+    AppModel AppModel { get; set; }
 
     #endregion Screen and Display
 

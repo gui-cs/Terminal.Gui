@@ -174,7 +174,7 @@ internal class DriverImpl : IDriver
 
         // In inline mode, the output buffer is sized to App.Screen (the inline region),
         // not the full terminal. Only resize the buffer in fullscreen mode.
-        if (Application.AppModel != AppModel.Inline)
+        if (AppModel != AppModel.Inline)
         {
             _outputBuffer.SetSize (width, height);
         }
@@ -216,6 +216,9 @@ internal class DriverImpl : IDriver
 
     /// <inheritdoc/>
     public InlineState InlineState { get; set; }
+
+    /// <inheritdoc/>
+    public AppModel AppModel { get; set; }
 
     #endregion Screen and Display
 

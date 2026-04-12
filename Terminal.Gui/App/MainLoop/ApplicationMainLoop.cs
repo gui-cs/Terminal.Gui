@@ -77,7 +77,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
 
         // In inline mode, cells must start clean so the first render only flushes
         // cells that views explicitly draw, leaving the rest of the terminal untouched.
-        if (Application.AppModel == AppModel.Inline && OutputBuffer is OutputBufferImpl outputBufferImpl)
+        if (App?.AppModel == AppModel.Inline && OutputBuffer is OutputBufferImpl outputBufferImpl)
         {
             outputBufferImpl.InlineMode = true;
         }
@@ -140,9 +140,23 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         // the terminal's real dimensions via a CSI 18t response. Without this, the first
         // frame would render using the default 80×25 fallback, placing the inline region
         // at the wrong terminal row.
-        if (Application.AppModel == AppModel.Inline && !_inlineSizeConfirmed)
+        if (App?.AppModel == AppModel.Inline && !_inlineSizeConfirmed)
         {
-            if (SizeMonitor.InitialSizeReceived)
+            // If ForceInlineCursorRow is set, use it immediately without waiting for ANSI CPR.
+            if (App?.ForceInlineCursorRow.HasValue == true)
+            {
+                _inlineSizeConfirmed = true;
+
+                if (App?.Driver is { } driver)
+                {
+                    InlineState state = driver.InlineState;
+                    state.InlineCursorRow = App.ForceInlineCursorRow!.Value;
+                    driver.InlineState = state;
+                }
+
+                Trace.Lifecycle (nameof (ApplicationMainLoop<TInputRecord>), "InlineSizeForced", $"CursorRow={App?.ForceInlineCursorRow}");
+            }
+            else if (SizeMonitor.InitialSizeReceived)
             {
                 _inlineSizeConfirmed = true;
 

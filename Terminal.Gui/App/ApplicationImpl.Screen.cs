@@ -21,7 +21,7 @@ internal partial class ApplicationImpl
         get => _screen ?? Driver?.Screen ?? new Rectangle (new Point (0, 0), new Size (2048, 2048));
         set
         {
-            if (Application.AppModel == AppModel.Inline)
+            if (AppModel == AppModel.Inline)
             {
                 // Inline mode: store the sub-rectangle independently.
                 // Resize the output buffer to match the inline region dimensions.
@@ -34,6 +34,8 @@ internal partial class ApplicationImpl
                 _screen = null;
                 Driver?.SetScreenSize (value.Width, value.Height);
             }
+
+            RaiseScreenChangedEvent (Screen);
         }
     }
 
@@ -69,7 +71,7 @@ internal partial class ApplicationImpl
     {
         Size newSize = e.Size ?? Size.Empty;
 
-        if (Application.AppModel == AppModel.Inline && _screen is { } screen)
+        if (AppModel == AppModel.Inline && _screen is { } screen)
         {
             // In inline mode, the terminal resized but our inline region keeps its Y offset
             // and height. Only the width needs to update to match the new terminal width.
@@ -119,14 +121,16 @@ internal partial class ApplicationImpl
         }
 
         // Layout
-        bool neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
+        bool neededLayout;
 
         // Inline mode: on the first draw, position the inline region at the cursor's starting
         // terminal row. If the view doesn't fit, scroll the terminal. Then set App.Screen to
         // the sub-rectangle representing the inline region.
-        if (Application.AppModel == AppModel.Inline && !_inlineScreenSized && Driver is { })
+        if (AppModel == AppModel.Inline && !_inlineScreenSized && Driver is { })
         {
-            // Get the view's desired height from the initial full-terminal layout
+            // First layout pass uses full terminal to determine the view's desired height.
+            View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
+
             View? topView = views.LastOrDefault (v => v is { });
             int viewHeight = topView?.Frame.Height ?? 0;
 
@@ -158,45 +162,69 @@ internal partial class ApplicationImpl
                 // Set App.Screen to the inline sub-rectangle. This resizes the output buffer
                 // to the inline region dimensions and stores the Y offset for cursor positioning.
                 Screen = new Rectangle (0, cursorRow, termWidth, availableHeight);
-
-                // Re-layout with the new (smaller) Screen size
-                neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
             }
 
             _inlineScreenSized = true;
         }
 
         // Inline mode: after initial setup, handle dynamic growth. If the view's desired height
-        // exceeds Screen.Height, scroll the terminal to make room and grow App.Screen.
-        if (Application.AppModel == AppModel.Inline && _inlineScreenSized && Driver is { })
+        // exceeds Screen.Height, grow App.Screen. Grow DOWN first (into empty terminal rows
+        // below the inline region), then UP (scrolling the terminal) only when there's no room below.
+        if (AppModel == AppModel.Inline && _inlineScreenSized && Driver is { })
         {
+            // Layout with current Screen to get desired heights from Dim.Auto views.
+            View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
+
             View? topView = views.LastOrDefault (v => v is { });
-            int viewHeight = topView?.Frame.Height ?? 0;
+
+            // Cap the view height at the terminal height — the inline region can never exceed it.
+            int viewHeight = Math.Min (topView?.Frame.Height ?? 0, Driver.Screen.Height);
 
             if (viewHeight > Screen.Height)
             {
                 int extraRows = viewHeight - Screen.Height;
+                int termHeight = Driver.Screen.Height;
 
-                // We can only gain rows by decreasing Screen.Y (scrolling terminal up).
-                int canScroll = Math.Min (extraRows, Screen.Y);
+                // First, grow down: use empty rows below the current inline region.
+                int bottomEdge = Screen.Y + Screen.Height;
+                int canGrowDown = Math.Min (extraRows, termHeight - bottomEdge);
 
-                if (canScroll > 0)
+                // Reserve the new rows by scrolling them into existence.
+                if (canGrowDown > 0)
                 {
-                    Driver.WriteRaw (new string ('\n', canScroll));
-                    Driver.WriteRaw ($"{EscSeqUtils.CSI}{canScroll}A");
+                    Driver.WriteRaw (new string ('\n', canGrowDown));
+                    Driver.WriteRaw ($"{EscSeqUtils.CSI}{canGrowDown}A");
                 }
 
-                // Grow screen: Y decreases, Height increases
-                int newY = Screen.Y - canScroll;
-                int newHeight = Math.Min (viewHeight, Screen.Height + canScroll);
+                int remaining = extraRows - canGrowDown;
+                int newY = Screen.Y;
+
+                // Then, grow up: scroll the terminal to reclaim rows above.
+                if (remaining > 0)
+                {
+                    int canScrollUp = Math.Min (remaining, Screen.Y);
+
+                    if (canScrollUp > 0)
+                    {
+                        Driver.WriteRaw (new string ('\n', canScrollUp));
+                        Driver.WriteRaw ($"{EscSeqUtils.CSI}{canScrollUp}A");
+                    }
+
+                    newY -= canScrollUp;
+                    canGrowDown += canScrollUp;
+                }
+
+                int newHeight = Screen.Height + canGrowDown;
 
                 if (newHeight != Screen.Height)
                 {
                     Screen = new Rectangle (0, newY, Screen.Width, newHeight);
-                    neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
                 }
             }
         }
+
+        // Final layout with the definitive Screen.Size — all inline adjustments are done.
+        neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
 
         // Draw
         bool needsDraw = forceRedraw || views.Any (v => v is { NeedsDraw: true } or { SubViewNeedsDraw: true });

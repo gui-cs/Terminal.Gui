@@ -170,7 +170,7 @@ internal partial class ApplicationImpl
         // In inline mode, skip the initial LayoutAndDraw here — the first render is deferred
         // to IterationImpl until the ANSI size monitor confirms the real terminal dimensions.
         // Drawing now would use the default 80×25 fallback, placing the view at the wrong row.
-        if (Application.AppModel != AppModel.Inline)
+        if (AppModel != AppModel.Inline)
         {
             LayoutAndDraw ();
         }

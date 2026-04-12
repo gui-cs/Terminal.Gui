@@ -11,6 +11,12 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public string ForceDriver { get; set; } = string.Empty;
 
+    /// <inheritdoc/>
+    public AppModel AppModel { get; set; } = AppModel.FullScreen;
+
+    /// <inheritdoc/>
+    public int? ForceInlineCursorRow { get; set; }
+
     /// <summary>
     ///     Creates the appropriate <see cref="IDriver"/> based on platform and driverName.
     /// </summary>
@@ -160,6 +166,10 @@ internal partial class ApplicationImpl
         {
             cf = fallbackFactory ();
         }
+
+        // Propagate the instance-based AppModel to the factory so CreateOutput()
+        // knows whether to use alternate screen buffer (Inline vs FullScreen).
+        cf.AppModel = AppModel;
 
         return new MainLoopCoordinator<TInputRecord> (TimedEvents, inputQueue, loop, cf, _timeProvider);
     }

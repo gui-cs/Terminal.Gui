@@ -109,5 +109,5 @@ public class AnsiComponentFactory : ComponentFactoryImpl<char>
         new AnsiInputProcessor (inputBuffer, timeProvider);
 
     /// <inheritdoc/>
-    public override IOutput CreateOutput () => _output ?? new AnsiOutput (Application.AppModel);
+    public override IOutput CreateOutput () => _output ?? new AnsiOutput (AppModel);
 }

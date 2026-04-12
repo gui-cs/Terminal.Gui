@@ -455,6 +455,20 @@ public interface IApplication : IDisposable
     string ForceDriver { get; set; }
 
     /// <summary>
+    ///     Gets or sets how the application interacts with the terminal buffer.
+    ///     <see cref="AppModel.FullScreen"/> uses the alternate screen buffer (default).
+    ///     <see cref="AppModel.Inline"/> renders inline in the primary scrollback buffer.
+    /// </summary>
+    AppModel AppModel { get; set; }
+
+    /// <summary>
+    ///     Gets or sets an override for the initial cursor row used in <see cref="AppModel.Inline"/> mode.
+    ///     When set (non-null) before <see cref="Run{T}"/>, this value is used instead of
+    ///     querying the terminal via ANSI CPR. Useful for testing inline mode at specific cursor positions.
+    /// </summary>
+    int? ForceInlineCursorRow { get; set; }
+
+    /// <summary>
     ///     Gets or sets the size of the screen. By default, this is the size of the screen as reported by the
     ///     <see cref="IDriver"/>.
     /// </summary>

@@ -486,87 +486,69 @@ public class ScreenTests (ITestOutputHelper output)
     [Fact]
     public void InlineMode_LayoutAndDraw_Sets_Screen_Height_From_Runnable_View ()
     {
-        // Arrange
-        AppModel savedAppModel = Application.AppModel;
+        // Arrange — use instance-based AppModel, not the global static
+        using IApplication app = Application.Create ();
+        app.AppModel = AppModel.Inline;
+        app.Init (DriverRegistry.Names.ANSI);
 
-        try
+        // Set driver to a large terminal size
+        app.Driver!.SetScreenSize (80, 25);
+        Assert.Equal (25, app.Screen.Height);
+
+        // Create a view that uses Dim.Auto with minimumContentDim: 10 and Y = Pos.AnchorEnd()
+        Window inlineView = new ()
         {
-            Application.AppModel = AppModel.Inline;
-            using IApplication app = Application.Create ();
-            app.Init (DriverRegistry.Names.ANSI);
+            Width = Dim.Fill (),
+            Y = Pos.AnchorEnd (),
+            Height = Dim.Auto (minimumContentDim: 10)
+        };
 
-            // Set driver to a large terminal size
-            app.Driver!.SetScreenSize (80, 25);
-            Assert.Equal (25, app.Screen.Height);
+        // Begin adds the view to the session stack and calls LayoutAndDraw
+        SessionToken? token = app.Begin (inlineView);
 
-            // Create a view that uses Dim.Auto with minimumContentDim: 10 and Y = Pos.AnchorEnd()
-            Window inlineView = new ()
-            {
-                Width = Dim.Fill (),
-                Y = Pos.AnchorEnd (),
-                Height = Dim.Auto (minimumContentDim: 10)
-            };
+        // Assert — Screen.Height should now be resized to match the view's frame height
+        Assert.True (app.Screen.Height <= 25, $"Screen.Height ({app.Screen.Height}) should be <= terminal height (25)");
+        Assert.True (app.Screen.Height >= 10, $"Screen.Height ({app.Screen.Height}) should be >= minimumContentDim (10)");
+        Assert.Equal (80, app.Screen.Width);
 
-            // Begin adds the view to the session stack and calls LayoutAndDraw
-            SessionToken? token = app.Begin (inlineView);
-
-            // Assert — Screen.Height should now be resized to match the view's frame height
-            Assert.True (app.Screen.Height <= 25, $"Screen.Height ({app.Screen.Height}) should be <= terminal height (25)");
-            Assert.True (app.Screen.Height >= 10, $"Screen.Height ({app.Screen.Height}) should be >= minimumContentDim (10)");
-            Assert.Equal (80, app.Screen.Width);
-
-            // Cleanup
-            if (token is { })
-            {
-                app.End (token);
-            }
-
-            inlineView.Dispose ();
-        }
-        finally
+        // Cleanup
+        if (token is { })
         {
-            Application.AppModel = savedAppModel;
+            app.End (token);
         }
+
+        inlineView.Dispose ();
     }
 
     [Fact]
     public void FullScreenMode_LayoutAndDraw_Does_Not_Resize_Screen ()
     {
-        // Arrange
-        AppModel savedAppModel = Application.AppModel;
+        // Arrange — use instance-based AppModel, not the global static
+        using IApplication app = Application.Create ();
+        app.AppModel = AppModel.FullScreen;
+        app.Init (DriverRegistry.Names.ANSI);
 
-        try
+        app.Driver!.SetScreenSize (80, 25);
+        Assert.Equal (25, app.Screen.Height);
+
+        Window fullScreenView = new ()
         {
-            Application.AppModel = AppModel.FullScreen;
-            using IApplication app = Application.Create ();
-            app.Init (DriverRegistry.Names.ANSI);
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
 
-            app.Driver!.SetScreenSize (80, 25);
-            Assert.Equal (25, app.Screen.Height);
+        SessionToken? token = app.Begin (fullScreenView);
 
-            Window fullScreenView = new ()
-            {
-                Width = Dim.Fill (),
-                Height = Dim.Fill ()
-            };
+        // Assert — Screen should remain the full terminal size
+        Assert.Equal (25, app.Screen.Height);
+        Assert.Equal (80, app.Screen.Width);
 
-            SessionToken? token = app.Begin (fullScreenView);
-
-            // Assert — Screen should remain the full terminal size
-            Assert.Equal (25, app.Screen.Height);
-            Assert.Equal (80, app.Screen.Width);
-
-            if (token is { })
-            {
-                app.End (token);
-            }
-
-            fullScreenView.Dispose ();
-        }
-        finally
+        if (token is { })
         {
-            Application.AppModel = savedAppModel;
+            app.End (token);
         }
+
+        fullScreenView.Dispose ();
     }
 
     #endregion Inline Mode Screen Tests

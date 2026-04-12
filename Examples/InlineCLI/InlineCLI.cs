@@ -12,13 +12,19 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
+using Terminal.Gui.Drivers;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
+using UICatalog;
 
 // Set Inline mode BEFORE Init
 Application.AppModel = AppModel.Inline;
 
+//Application.ForceInlineCursorRow = 3;
+
 IApplication app = Application.Create ().Init ();
+
+
 app.Run<InlinePromptView> ();
 app.Dispose ();
 
@@ -55,9 +61,16 @@ public sealed class InlinePromptView : Window
         _screenShortcut = new Shortcut { Text = "Screen", MouseHighlightStates = MouseState.None, Enabled = false };
         _frameShortcut = new Shortcut { Text = "Frame", MouseHighlightStates = MouseState.None, Enabled = false };
 
+        Logo logo = new ()
+        {
+            X = Pos.Center (),
+            //Height = Dim.Auto (maximumContentDim: Dim.Func((_) => App?.Screen == App?.Driver?.Screen ? 1000 : 0))
+        };
+
         Label infoLabel = new ()
         {
             Text = "Demonstrates Inline Application Mode.\nType a message and press Enter. Press Esc to exit.",
+            Y = Pos.Bottom(logo),
             TextAlignment = Alignment.Center,
             Width = Dim.Fill (),
             Enabled = false
@@ -65,17 +78,38 @@ public sealed class InlinePromptView : Window
 
         ObservableCollection<string> items = [];
 
-        ListView<string> outputList = new ()
+        // Declared early so the local function can capture them.
+        ListView<string> outputList = null!;
+        View inputIndicator = null!;
+
+        outputList = new ()
         {
-            Y = Pos.Bottom (infoLabel), Width = Dim.Fill (), Height = Dim.Auto (minimumContentDim: 1), BorderStyle = LineStyle.Dotted
+            Y = Pos.Bottom (infoLabel),
+            Width = Dim.Fill (),
+            Height = Dim.Auto (
+               minimumContentDim: 1,
+                maximumContentDim: Dim.Func (_ => getMaxListHeight ())),
+            BorderStyle = LineStyle.Dotted
         };
         outputList.Border.Thickness = new Thickness (0, 0, 0, 1);
 
-        outputList.ValueChanged += (_, _) => { };
+        outputList.ViewportChanged += (sender, args) =>
+                                      {
+                                          outputList.MoveEnd ();
+                                      };
+        outputList.GettingAttributeForRole += (sender, args) =>
+                                              {
+                                                  View? view = sender as View;
+                                                  if (args.Role == VisualRole.Active)
+                                                  {
+                                                      args.Result = view?.GetAttributeForRole (VisualRole.Normal);
+                                                      args.Handled = true;
+                                                  }
+                                              };
 
         outputList.SetSource (items);
 
-        View inputIndicator = new ()
+        inputIndicator = new ()
         {
             Text = $"{Glyphs.RightArrow}",
             Y = Pos.Bottom (outputList),
@@ -94,17 +128,54 @@ public sealed class InlinePromptView : Window
 
         inputField.Accepted += (_, _) =>
                                {
-                                   string text = inputField.Text;
+                                   string text = $"{Glyphs.BlackCircle} {inputField.Text}";
 
-                                   items.Add ($"{Glyphs.BlackCircle} {text}");
+                                   items.Add (text);
+                                   outputList.MoveEnd ();
                                    inputField.Text = string.Empty;
-                                   itemCountShortcut.Title = $"Items: {items.Count}";
+                                   itemCountShortcut.Title = $"{items.Count}";
                                };
 
         statusBar.Add (_cursorShortcut, _driverShortcut, _screenShortcut, _frameShortcut, itemCountShortcut);
 
-        Add (infoLabel, outputList, inputIndicator, inputField, statusBar);
+
+        Add (logo, infoLabel, outputList, inputIndicator, inputField, statusBar);
         inputField.SetFocus ();
+
+
+        _cursorShortcut?.Title = $"{App?.Driver?.InlineState.InlineCursorRow}";
+        _driverShortcut?.Title = $"{Format (App?.Driver?.Screen)}";
+        _screenShortcut?.Title = $"{Format (App?.Screen)}";
+        _frameShortcut?.Title = $"{Format (Frame)}";
+
+        return;
+
+        // Returns the maximum content height for the outputList so it doesn't grow beyond what the
+        // terminal can display. Subtracts all sibling and adornment heights from App.Screen.Height.
+        int getMaxListHeight ()
+        {
+            int screenHeight = App?.Driver?.Screen.Height ?? 100;
+
+            // Adornments of the containing InlinePromptView (this Window)
+            int windowAdornments = (Border?.Thickness.Vertical ?? 0)
+                                   + (Margin?.Thickness.Vertical ?? 0)
+                                   + (Padding?.Thickness.Vertical ?? 0);
+
+            // Heights of sibling views (everything except the list itself)
+            int siblingHeight = (logo?.Frame.Height ?? 0)
+                                + (infoLabel?.Frame.Height ?? 0)
+                                + (inputIndicator?.Frame.Height ?? 0)
+                                + (statusBar?.Frame.Height ?? 0);
+
+            // The list's own adornment overhead (border bottom = 1)
+            int listAdornments = (outputList.Border?.Thickness.Vertical ?? 0)
+                                 + (outputList.Margin?.Thickness.Vertical ?? 0)
+                                 + (outputList.Padding?.Thickness.Vertical ?? 0);
+
+            int maxContent = screenHeight - windowAdornments - siblingHeight - listAdornments;
+
+            return Math.Max (1, maxContent);
+        }
     }
 
     /// <inheritdoc/>
@@ -114,10 +185,6 @@ public sealed class InlinePromptView : Window
 
         if (newIsRunning)
         {
-            _cursorShortcut?.Title = $"Cursor:{App?.Driver?.InlineState.InlineCursorRow}";
-            _driverShortcut?.Title = $"Driver:{Format (App?.Driver?.Screen)}";
-            _screenShortcut?.Title = $"App:{Format (App?.Screen)}";
-            _frameShortcut?.Title = $"Frame:{Format (Frame)}";
             App?.ScreenChanged += AppOnScreenChanged;
             App?.Driver?.SizeChanged += DriverOnSizeChanged;
         }
@@ -127,19 +194,22 @@ public sealed class InlinePromptView : Window
             App?.Driver?.SizeChanged -= DriverOnSizeChanged;
         }
 
-        return;
-
-        void AppOnScreenChanged (object? sender, EventArgs<Rectangle> e) => _screenShortcut?.Title = $"App:{Format (e.Value)}";
-
-        void DriverOnSizeChanged (object? sender, SizeChangedEventArgs e) =>
-            _driverShortcut?.Title = $"Driver:{Format (new Rectangle (new Point (0, 0), e.Size!.Value))}";
     }
+
+    private void AppOnScreenChanged (object? sender, EventArgs<Rectangle> e) => _screenShortcut?.Title = $"{Format (e.Value)}";
+
+    private void DriverOnSizeChanged (object? sender, SizeChangedEventArgs e) =>
+        _driverShortcut?.Title = $"{Format (new Rectangle (new Point (0, 0), e.Size!.Value))}";
 
     /// <inheritdoc/>
     protected override void OnFrameChanged (in Rectangle frame)
     {
         base.OnFrameChanged (in frame);
-        _frameShortcut?.Title = $"Frame:{Format (frame)}";
+
+        _cursorShortcut?.Title = $"{App?.Driver?.InlineState.InlineCursorRow}";
+        _driverShortcut?.Title = $"{Format (App?.Driver?.Screen)}";
+        _screenShortcut?.Title = $"{Format (App?.Screen)}";
+        _frameShortcut?.Title = $"{Format (Frame)}";
     }
 
     private static string Format (Rectangle? rect) =>

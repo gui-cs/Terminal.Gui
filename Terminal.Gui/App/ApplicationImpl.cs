@@ -22,9 +22,13 @@ internal partial class ApplicationImpl : IApplication
         TimedEvents = new TimedEvents (timeProvider);
 
         ForceDriver = Application.ForceDriver;
+        AppModel = Application.AppModel;
+        ForceInlineCursorRow = Application.ForceInlineCursorRow;
 
         // Subscribe to Application static property change events
         Application.ForceDriverChanged += OnForceDriverChanged;
+        Application.AppModelChanged += OnAppModelChanged;
+        Application.ForceInlineCursorRowChanged += OnForceInlineCursorRowChanged;
     }
 
     /// <summary>

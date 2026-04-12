@@ -13,5 +13,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
+    <ProjectReference Include="..\UICatalog\UICatalog.csproj" />
   </ItemGroup>
 </Project>

@@ -236,7 +236,32 @@ public static partial class Application
     ///     </para>
     /// </remarks>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static AppModel AppModel { get; set; } = AppModel.FullScreen;
+    public static AppModel AppModel
+    {
+        get;
+        set
+        {
+            AppModel oldValue = field;
+            field = value;
+            AppModelChanged?.Invoke (null, new ValueChangedEventArgs<AppModel> (oldValue, field));
+        }
+    } = AppModel.FullScreen;
+
+    /// <summary>
+    ///     Gets or sets an override for the initial cursor row used in <see cref="AppModel.Inline"/> mode.
+    ///     When set (non-null) before <see cref="IApplication.Run{T}"/>, this value is used instead of
+    ///     querying the terminal via ANSI CPR. Useful for testing inline mode at specific cursor positions.
+    /// </summary>
+    public static int? ForceInlineCursorRow
+    {
+        get;
+        set
+        {
+            int? oldValue = field;
+            field = value;
+            ForceInlineCursorRowChanged?.Invoke (null, new ValueChangedEventArgs<int?> (oldValue, field));
+        }
+    }
 
     /// <inheritdoc cref="IApplication.ForceDriver"/>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
