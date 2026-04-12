@@ -36,6 +36,7 @@ internal sealed class ChatView : Window
         Height = Dim.Auto ();
         Border.LineStyle = LineStyle.Rounded;
         Border.Thickness = new Thickness (0, 3, 0, 0);
+        Border.Settings = BorderSettings.Gradient | BorderSettings.Title;
 
         _spinner = new SpinnerView
         {

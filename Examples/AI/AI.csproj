@@ -13,5 +13,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="GitHub.Copilot.SDK" />
+    <PackageReference Include="System.CommandLine" />
   </ItemGroup>
 </Project>

@@ -1,64 +1,55 @@
 // AI — A Terminal.Gui inline-mode CLI powered by the GitHub Copilot SDK.
 //
-// Usage:
-//   ai                                    Interactive chat (default)
-//   ai "What is 2+2?"                     Single-turn: answer and exit
-//   ai --model claude-sonnet-4.5 "prompt"  Choose model
-//
 // Requires: GitHub Copilot CLI installed and authenticated (gh extension install github/gh-copilot)
 
+using System.CommandLine;
+using System.CommandLine.Parsing;
 using GitHub.Copilot.SDK;
 using Terminal.Gui.App;
 
-// ── Parse CLI args ───────────────────────────────────────────────────────────
+Option<string> modelOption = new ("--model") { Description = "The Copilot model to use.", DefaultValueFactory = _ => "claude-opus-4.6" };
+modelOption.Aliases.Add ("-m");
 
-var model = "claude-opus-4.6";
-string? prompt = null;
+Argument<string?> promptArgument = new ("prompt") { Description = "Prompt text. If omitted, interactive chat mode starts.", DefaultValueFactory = _ => null };
+promptArgument.Arity = ArgumentArity.ZeroOrOne;
 
-for (var i = 0; i < args.Length; i++)
+RootCommand rootCommand = new ("Terminal.Gui inline-mode Copilot chat") { modelOption, promptArgument };
+
+// Capture parsed values — SetAction runs synchronously, so we store and act after.
+string parsedModel = "claude-opus-4.6";
+string? parsedPrompt = null;
+
+rootCommand.SetAction (context =>
 {
-    switch (args [i])
-    {
-        case "--model" or "-m" when i + 1 < args.Length:
-            model = args [++i];
+    parsedModel = context.GetRequiredValue (modelOption);
+    parsedPrompt = context.GetValue (promptArgument);
+});
 
-            break;
+ParseResult parseResult = rootCommand.Parse (args);
 
-        case "--help" or "-h":
-            Console.WriteLine ("Usage: ai [--model <model>] [\"prompt\"]");
-            Console.WriteLine ();
-            Console.WriteLine ("  No prompt → interactive chat mode");
-            Console.WriteLine ("  With prompt → single-turn answer and exit");
-            Console.WriteLine ();
-            Console.WriteLine ("Options:");
-            Console.WriteLine ("  --model, -m <model>  Model to use (default: claude-opus-4.6)");
-            Console.WriteLine ("  --help, -h           Show this help");
+if (parseResult.Errors.Count > 0 || parseResult.Action is System.CommandLine.Help.HelpAction)
+{
+    parseResult.Invoke ();
 
-            return 0;
-
-        default:
-            prompt = args [i];
-
-            break;
-    }
+    return parseResult.Errors.Count > 0 ? 1 : 0;
 }
 
-// ── Start Copilot SDK ────────────────────────────────────────────────────────
+parseResult.Invoke ();
+
+// ── Start Copilot SDK and run ────────────────────────────────────────────────
 
 await using CopilotClient client = new ();
 await client.StartAsync ();
 
-// ── Run the appropriate mode ─────────────────────────────────────────────────
-
 Application.AppModel = AppModel.Inline;
 IApplication app = Application.Create ().Init ();
 
-if (prompt is not null)
+if (parsedPrompt is not null)
 {
-    return SingleTurnView.Run (app, client, model, prompt);
+    return SingleTurnView.Run (app, client, parsedModel, parsedPrompt);
 }
 
-ChatView chatView = new (app, client, model);
+ChatView chatView = new (app, client, parsedModel);
 app.Run (chatView);
 app.Dispose ();
 
