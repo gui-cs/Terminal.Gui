@@ -95,7 +95,8 @@ public class ProgressBarTests : TestDriverBase
     [Fact]
     public void MirrorToTerminal_Fraction_Writes_Osc_Progress ()
     {
-        IDriver driver = CreateTestDriver ();
+        DriverImpl driver = (DriverImpl)CreateTestDriver ();
+        driver.ProgressIndicator = new ProgressIndicator (driver);
         ProgressBar pb = new () { Driver = driver, MirrorToTerminal = true };
 
         pb.Fraction = 0.5F;
@@ -106,7 +107,8 @@ public class ProgressBarTests : TestDriverBase
     [Fact]
     public void MirrorToTerminal_Pulse_Writes_Indeterminate_Osc_Progress ()
     {
-        IDriver driver = CreateTestDriver (5, 1);
+        DriverImpl driver = (DriverImpl)CreateTestDriver (5, 1);
+        driver.ProgressIndicator = new ProgressIndicator (driver);
         driver.Clip = new Region (driver.Screen);
         ProgressBar pb = new () { Driver = driver, MirrorToTerminal = true, Width = 5 };
 
@@ -123,7 +125,8 @@ public class ProgressBarTests : TestDriverBase
     [Fact]
     public void MirrorToTerminal_Hidden_ProgressBar_Still_Writes_Osc_Progress ()
     {
-        IDriver driver = CreateTestDriver ();
+        DriverImpl driver = (DriverImpl)CreateTestDriver ();
+        driver.ProgressIndicator = new ProgressIndicator (driver);
         ProgressBar pb = new () { Driver = driver, MirrorToTerminal = true, Visible = false };
 
         pb.Fraction = 0.25F;
@@ -134,7 +137,8 @@ public class ProgressBarTests : TestDriverBase
     [Fact]
     public void MirrorToTerminal_LegacyConsole_Does_Not_Write_Osc_Progress ()
     {
-        IDriver driver = CreateTestDriver ();
+        DriverImpl driver = (DriverImpl)CreateTestDriver ();
+        driver.ProgressIndicator = new ProgressIndicator (driver);
         driver.IsLegacyConsole = true;
         ProgressBar pb = new () { Driver = driver, MirrorToTerminal = true };
 
@@ -146,7 +150,8 @@ public class ProgressBarTests : TestDriverBase
     [Fact]
     public void MirrorToTerminal_Disabling_Clears_Terminal_Progress ()
     {
-        IDriver driver = CreateTestDriver ();
+        DriverImpl driver = (DriverImpl)CreateTestDriver ();
+        driver.ProgressIndicator = new ProgressIndicator (driver);
         ProgressBar pb = new () { Driver = driver, MirrorToTerminal = true };
 
         pb.Fraction = 0.5F;
@@ -158,7 +163,8 @@ public class ProgressBarTests : TestDriverBase
     [Fact]
     public void Dispose_Without_MirrorToTerminal_Does_Not_Write_Clear_Progress ()
     {
-        IDriver driver = CreateTestDriver ();
+        DriverImpl driver = (DriverImpl)CreateTestDriver ();
+        driver.ProgressIndicator = new ProgressIndicator (driver);
         ProgressBar pb = new () { Driver = driver };
 
         pb.Dispose ();

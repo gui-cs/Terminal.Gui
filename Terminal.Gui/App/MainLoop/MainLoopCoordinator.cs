@@ -148,6 +148,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         TerminalColorCapabilities caps = TerminalEnvironmentDetector.DetectColorCapabilities ();
 
         _driver.SetColorCapabilities (caps);
+        _driver.InitializeProgressIndicator ();
 
         if (caps.Capability is ColorCapabilityLevel.NoColor or ColorCapabilityLevel.Colors16)
         {

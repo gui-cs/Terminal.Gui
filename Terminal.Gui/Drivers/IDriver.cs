@@ -74,6 +74,11 @@ public interface IDriver : IDisposable
     /// <summary>Gets or sets the clipboard.</summary>
     IClipboard? Clipboard { get; set; }
 
+    /// <summary>
+    ///     Gets the terminal progress indicator when direct terminal progress output is available.
+    /// </summary>
+    ProgressIndicator? ProgressIndicator { get; }
+
     #endregion Driver Components
 
     #region Screen and Display

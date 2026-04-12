@@ -43,7 +43,6 @@ public class ProgressBar : View, IDesignable
     private int _delta;
     private float _fraction;
     private bool _isActivity;
-    private string? _lastTerminalProgressSequence;
     private bool _mirrorToTerminal;
 
     /// <summary>
@@ -170,7 +169,6 @@ public class ProgressBar : View, IDesignable
     ///<inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
-        UpdateTerminalProgress ();
         SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
         Move (0, 0);
@@ -294,7 +292,7 @@ public class ProgressBar : View, IDesignable
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
-        if (disposing)
+        if (disposing && _mirrorToTerminal)
         {
             ClearTerminalProgress ();
         }
@@ -302,58 +300,25 @@ public class ProgressBar : View, IDesignable
         base.Dispose (disposing);
     }
 
-    private bool CanMirrorToTerminal ()
-    {
-        if (!_mirrorToTerminal)
-        {
-            return false;
-        }
-
-        return Driver is { IsLegacyConsole: false };
-    }
-
-    private void ClearTerminalProgress ()
-    {
-        if (!_mirrorToTerminal && _lastTerminalProgressSequence is null)
-        {
-            return;
-        }
-
-        string clearSequence = EscSeqUtils.OSC_ClearProgress ();
-
-        if (Driver is { IsLegacyConsole: false } driver && _lastTerminalProgressSequence != clearSequence)
-        {
-            driver.GetOutput ().Write (clearSequence.AsSpan ());
-        }
-
-        _lastTerminalProgressSequence = null;
-    }
+    private void ClearTerminalProgress () => Driver?.ProgressIndicator?.Clear ();
 
     private int GetProgressPercentage () => Math.Clamp ((int)Math.Round (_fraction * 100), 0, 100);
 
     private void UpdateTerminalProgress ()
     {
-        if (!CanMirrorToTerminal ())
+        if (!_mirrorToTerminal || Driver?.ProgressIndicator is not { } progressIndicator)
         {
             return;
         }
 
-        string sequence = _isActivity
-                              ? EscSeqUtils.OSC_SetProgressIndeterminate ()
-                              : EscSeqUtils.OSC_SetProgressValue (GetProgressPercentage ());
-
-        WriteTerminalProgressSequence (sequence);
-    }
-
-    private void WriteTerminalProgressSequence (string sequence)
-    {
-        if (_lastTerminalProgressSequence == sequence || Driver is not { IsLegacyConsole: false } driver)
+        if (_isActivity)
         {
+            progressIndicator.SetIndeterminate ();
+
             return;
         }
 
-        driver.GetOutput ().Write (sequence.AsSpan ());
-        _lastTerminalProgressSequence = sequence;
+        progressIndicator.SetValue (GetProgressPercentage ());
     }
 
     private void PopulateActivityPos ()
