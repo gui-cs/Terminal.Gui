@@ -44,7 +44,7 @@ jobs:
 
       - name: Upload Test Logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: stress-test-logs-${{ runner.os }}
           path: |
@@ -115,7 +115,7 @@ jobs:
 
       - name: Upload UnitTestsParallelizable Logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: parallel_unittests_stress-logs-${{ runner.os }}
           path: |
