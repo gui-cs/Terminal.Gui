@@ -450,7 +450,7 @@ public interface IApplication : IDisposable
     ///         Tests and inline app mode can assign a gate instance to opt into this behavior.
     ///     </para>
     /// </remarks>
-    IAnsiStartupGate? AnsiStartupGate { get; set; }
+    AnsiStartupGate? AnsiStartupGate { get; set; }
 
     /// <summary>
     ///     Gets the clipboard for this application instance.
