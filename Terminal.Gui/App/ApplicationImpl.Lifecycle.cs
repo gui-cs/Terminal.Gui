@@ -349,8 +349,17 @@ internal partial class ApplicationImpl
 
     private void OnForceDriverChanged (object? sender, ValueChangedEventArgs<string> e) => ForceDriver = e.NewValue;
 
+    private void OnAppModelChanged (object? sender, ValueChangedEventArgs<AppModel> e) => AppModel = e.NewValue;
+
+    private void OnForceInlinePositionChanged (object? sender, ValueChangedEventArgs<Point?> e) => ForceInlinePosition = e.NewValue;
+
     /// <summary>
     ///     Unsubscribes from Application static property change events.
     /// </summary>
-    private void UnsubscribeApplicationEvents () => Application.ForceDriverChanged -= OnForceDriverChanged;
+    private void UnsubscribeApplicationEvents ()
+    {
+        Application.ForceDriverChanged -= OnForceDriverChanged;
+        Application.AppModelChanged -= OnAppModelChanged;
+        Application.ForceInlinePositionChanged -= OnForceInlinePositionChanged;
+    }
 }

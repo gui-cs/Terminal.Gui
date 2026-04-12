@@ -39,6 +39,8 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class AnsiInputProcessor : InputProcessorImpl<char>
 {
+    private string _pendingPrintableSuppression = string.Empty;
+
     /// <inheritdoc/>
     /// <param name="inputBuffer">The input buffer to process.</param>
     /// <param name="timeProvider">Time provider for timestamps and timing control.</param>
@@ -54,6 +56,41 @@ public class AnsiInputProcessor : InputProcessorImpl<char>
         {
             ProcessAfterParsing (released.Item2);
         }
+    }
+
+    /// <inheritdoc/>
+    protected override Key OnKeyboardEventParsed (Key keyEvent)
+    {
+        _pendingPrintableSuppression = string.Empty;
+
+        if (keyEvent.EventType != KeyEventType.Press || keyEvent.IsAlt || keyEvent.IsCtrl || keyEvent.IsModifierOnly)
+        {
+            return keyEvent;
+        }
+
+        string printableText = keyEvent.GetPrintableText ();
+
+        if (!string.IsNullOrEmpty (printableText))
+        {
+            _pendingPrintableSuppression = printableText;
+        }
+
+        return keyEvent;
+    }
+
+    /// <inheritdoc/>
+    protected override bool ShouldSuppressFallbackKeyDown (Key key)
+    {
+        if (string.IsNullOrEmpty (_pendingPrintableSuppression))
+        {
+            return false;
+        }
+
+        string printableText = key.GetPrintableText ();
+        bool suppress = string.Equals (printableText, _pendingPrintableSuppression, StringComparison.Ordinal);
+        _pendingPrintableSuppression = string.Empty;
+
+        return suppress;
     }
 
     /// <inheritdoc/>

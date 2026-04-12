@@ -15,24 +15,24 @@ jobs:
 
     steps:
     - name: Checkout ${{ github.ref_name }}
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0 # fetch-depth is needed for GitVersion https://github.com/GitTools/actions/blob/main/docs/cloning.md
 
     - name: Install GitVersion
-      uses: gittools/actions/gitversion/setup@v3.1.11
+      uses: gittools/actions/gitversion/setup@v4.5.0
       with:
         versionSpec: '6.0.x'
 
     - name: Determine Version
-      uses: gittools/actions/gitversion/execute@v3.1.11
+      uses: gittools/actions/gitversion/execute@v4.5.0
       with:
         useConfigFile: true
         updateAssemblyInfo: true
       id: gitversion # step id used as reference for output values
 
     - name: Setup dotnet
-      uses: actions/setup-dotnet@v4
+      uses: actions/setup-dotnet@v5
       with:
         dotnet-version: 10.x
         dotnet-quality: 'ga'
@@ -84,7 +84,7 @@ jobs:
     
     - name: Trigger Terminal.Gui.templates update
       if: github.ref == 'refs/heads/main'
-      uses: peter-evans/repository-dispatch@v3
+      uses: peter-evans/repository-dispatch@v4
       with:
         token: ${{ secrets.TEMPLATE_REPO_TOKEN }}
         repository: gui-cs/Terminal.Gui.templates
