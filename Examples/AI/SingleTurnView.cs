@@ -28,11 +28,7 @@ internal sealed class SingleTurnView : Window
         Height = Dim.Auto ();
         Border.LineStyle = LineStyle.Rounded;
 
-        _responseLabel = new Label
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Auto ()
-        };
+        _responseLabel = new Label { Width = Dim.Fill (), Height = Dim.Auto () };
 
         Add (_responseLabel);
     }
@@ -63,34 +59,28 @@ internal sealed class SingleTurnView : Window
             TaskCompletionSource done = new ();
 
             session.On (evt =>
-            {
-                switch (evt)
-                {
-                    case AssistantMessageDeltaEvent delta:
-                        responseText.Append (delta.Data.DeltaContent);
-
-                        _app.Invoke (() =>
                         {
-                            _responseLabel.Text = responseText.ToString ();
+                            switch (evt)
+                            {
+                                case AssistantMessageDeltaEvent delta:
+                                    responseText.Append (delta.Data.DeltaContent);
+
+                                    _app.Invoke (() => { _responseLabel.Text = responseText.ToString (); });
+
+                                    break;
+
+                                case SessionIdleEvent:
+                                    done.TrySetResult ();
+
+                                    break;
+
+                                case SessionErrorEvent err:
+                                    _app.Invoke (() => { _responseLabel.Text = $"Error: {err.Data.Message}"; });
+                                    done.TrySetResult ();
+
+                                    break;
+                            }
                         });
-
-                        break;
-
-                    case SessionIdleEvent:
-                        done.TrySetResult ();
-
-                        break;
-
-                    case SessionErrorEvent err:
-                        _app.Invoke (() =>
-                        {
-                            _responseLabel.Text = $"Error: {err.Data.Message}";
-                        });
-                        done.TrySetResult ();
-
-                        break;
-                }
-            });
 
             await session.SendAsync (new MessageOptions { Prompt = _prompt });
             await done.Task;

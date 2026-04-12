@@ -16,14 +16,12 @@ internal sealed class ChatView : Window
     private readonly TextView _conversationView;
     private readonly TextField _inputField;
     private readonly View _inputIndicator;
-    private readonly Shortcut _modelShortcut;
-    private readonly Shortcut _spinnerShortcut;
     private readonly SpinnerView _spinner;
     private readonly StatusBar _statusBar;
     private CopilotSession? _session;
     private bool _isStreaming;
 
-    public int ExitCode { get; private set; }
+    public int ExitCode { get; } = 0;
 
     public ChatView (IApplication app, CopilotClient client, string model)
     {
@@ -46,11 +44,11 @@ internal sealed class ChatView : Window
             Width = 5,
             Visible = false
         };
-        _spinnerShortcut = new Shortcut { CommandView = _spinner, MouseHighlightStates = MouseState.None, Enabled = false };
+        var spinnerShortcut = new Shortcut { CommandView = _spinner, MouseHighlightStates = MouseState.None, Enabled = false };
         Shortcut quitShortcut = new (Application.GetDefaultKey (Command.Quit), "Quit", RequestStop);
 
         _statusBar = new StatusBar { AlignmentModes = AlignmentModes.IgnoreFirstOrLast, SchemeName = SchemeName, BorderStyle = LineStyle.None };
-        _statusBar.Add (_spinnerShortcut, quitShortcut);
+        _statusBar.Add (spinnerShortcut, quitShortcut);
 
         _conversationView = new TextView
         {
@@ -107,7 +105,7 @@ internal sealed class ChatView : Window
 
     private async void OnInputAccepted (object? sender, EventArgs e)
     {
-        string text = _inputField.Text.Trim () ?? string.Empty;
+        string text = _inputField.Text.Trim ();
 
         if (string.IsNullOrEmpty (text) || _isStreaming)
         {
@@ -202,7 +200,6 @@ internal sealed class ChatView : Window
 
             _app.Invoke (() =>
                          {
-                             _modelShortcut.Title = newModel;
                              Title = $"Copilot Chat ({newModel})";
                              AppendToConversation (" \u2713\n");
                              _inputField.Enabled = true;

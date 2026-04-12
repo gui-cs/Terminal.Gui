@@ -3,7 +3,7 @@
 // Requires: GitHub Copilot CLI installed and authenticated (gh extension install github/gh-copilot)
 
 using System.CommandLine;
-using System.CommandLine.Parsing;
+using System.CommandLine.Help;
 using GitHub.Copilot.SDK;
 using Terminal.Gui.App;
 
@@ -16,18 +16,18 @@ promptArgument.Arity = ArgumentArity.ZeroOrOne;
 RootCommand rootCommand = new ("Terminal.Gui inline-mode Copilot chat") { modelOption, promptArgument };
 
 // Capture parsed values — SetAction runs synchronously, so we store and act after.
-string parsedModel = "claude-opus-4.6";
+var parsedModel = "claude-opus-4.6";
 string? parsedPrompt = null;
 
 rootCommand.SetAction (context =>
-{
-    parsedModel = context.GetRequiredValue (modelOption);
-    parsedPrompt = context.GetValue (promptArgument);
-});
+                       {
+                           parsedModel = context.GetRequiredValue (modelOption);
+                           parsedPrompt = context.GetValue (promptArgument);
+                       });
 
 ParseResult parseResult = rootCommand.Parse (args);
 
-if (parseResult.Errors.Count > 0 || parseResult.Action is System.CommandLine.Help.HelpAction)
+if (parseResult.Errors.Count > 0 || parseResult.Action is HelpAction)
 {
     parseResult.Invoke ();
 
@@ -44,7 +44,7 @@ await client.StartAsync ();
 Application.AppModel = AppModel.Inline;
 IApplication app = Application.Create ().Init ();
 
-if (parsedPrompt is not null)
+if (parsedPrompt is { })
 {
     return SingleTurnView.Run (app, client, parsedModel, parsedPrompt);
 }
