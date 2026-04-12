@@ -8,16 +8,21 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class KittyKeyboardProtocolDetector
 {
+    private static readonly TimeSpan StartupKittyKeyboardQueryTimeout = TimeSpan.FromSeconds (1);
+
     private readonly IDriver? _driver;
+    private readonly IAnsiStartupGate? _startupGate;
 
     /// <summary>
     ///     Creates a new detector that sends its query through the provided <paramref name="driver"/>.
     /// </summary>
     /// <param name="driver">The driver to send ANSI requests through.</param>
-    public KittyKeyboardProtocolDetector (IDriver? driver)
+    /// <param name="startupGate">Optional startup gate to mark query readiness.</param>
+    public KittyKeyboardProtocolDetector (IDriver? driver, IAnsiStartupGate? startupGate = null)
     {
         ArgumentNullException.ThrowIfNull (driver);
         _driver = driver;
+        _startupGate = startupGate;
     }
 
     /// <summary>
@@ -100,6 +105,9 @@ public class KittyKeyboardProtocolDetector
                          "Detect",
                          $"Queueing kitty keyboard probe '{EscSeqUtils.CSI_QueryKittyKeyboardFlags.Request}'");
 
+        IDisposable? kittyKeyboardQueryCompletionHandle = _startupGate?.RegisterQuery (AnsiStartupQuery.KittyKeyboard,
+                                                                                        StartupKittyKeyboardQueryTimeout);
+
         QueueRequest (EscSeqUtils.CSI_QueryKittyKeyboardFlags,
                       response =>
                       {
@@ -109,11 +117,13 @@ public class KittyKeyboardProtocolDetector
                                            "Detect",
                                            $"Kitty keyboard response '{response}' => IsSupported={result.IsSupported}, Flags={result.Flags}");
 
+                          kittyKeyboardQueryCompletionHandle?.Dispose ();
                           resultCallback (result);
                       },
                       () =>
                       {
                           Trace.Lifecycle (nameof (KittyKeyboardProtocolDetector), "Detect", "Kitty keyboard probe abandoned");
+                          kittyKeyboardQueryCompletionHandle?.Dispose ();
                           resultCallback (new KittyKeyboardCapabilities ());
                       });
     }
