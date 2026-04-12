@@ -79,7 +79,7 @@ internal partial class ApplicationImpl
 
             if (Driver is { } driver)
             {
-                driver.InlineState = driver.InlineState with { InlineCursorRow = 0 };
+                driver.InlineState = new InlineState { InlineCursorRow = 0 };
 
                 // Clear the entire terminal
                 driver.WriteRaw ($"{EscSeqUtils.CSI}H{EscSeqUtils.CSI}2J");
@@ -130,7 +130,6 @@ internal partial class ApplicationImpl
         }
 
         // Layout
-        bool neededLayout;
 
         // Inline mode: on the first draw, position the inline region at the cursor's starting
         // terminal row. If the view doesn't fit, scroll the terminal. Then set App.Screen to
@@ -156,7 +155,7 @@ internal partial class ApplicationImpl
                 {
                     Driver.WriteRaw (new string ('\n', overflow));
                     Driver.WriteRaw ($"{EscSeqUtils.CSI}{overflow}A");
-                    cursorRow -= overflow;
+                    cursorRow = Math.Max (0, cursorRow - overflow);
                 }
 
                 // Reserve the vertical space for the inline region
@@ -239,7 +238,7 @@ internal partial class ApplicationImpl
         }
 
         // Final layout with the definitive Screen.Size — all inline adjustments are done.
-        neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
+        bool neededLayout = View.Layout (views.ToArray ().Reverse ()!, Screen.Size);
 
         // Draw
         bool needsDraw = forceRedraw || views.Any (v => v is { NeedsDraw: true } or { SubViewNeedsDraw: true });
