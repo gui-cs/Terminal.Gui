@@ -17,6 +17,8 @@ namespace Terminal.Gui.App;
 /// <typeparam name="TInputRecord">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
 internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TInputRecord : struct
 {
+    private static readonly TimeSpan DeviceAttributesStartupQueryTimeout = TimeSpan.FromSeconds (1);
+
     /// <summary>
     ///     Creates a new coordinator that will manage the main UI loop and input thread.
     /// </summary>
@@ -148,7 +150,29 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         {
             return;
         }
-        _driver = new DriverImpl (_componentFactory, _inputProcessor, _loop.OutputBuffer, _output, _loop.AnsiRequestScheduler, _loop.SizeMonitor);
+        AnsiStartupGate? startupGate = app?.AnsiStartupGate;
+
+        _driver = new DriverImpl (_componentFactory,
+                                  _inputProcessor,
+                                  _loop.OutputBuffer,
+                                  _output,
+                                  _loop.AnsiRequestScheduler,
+                                  _loop.SizeMonitor,
+                                  startupGate);
+
+        // Set the driver's AppModel from the application instance so it doesn't rely on the static.
+        if (app is { })
+        {
+            _driver.AppModel = app.AppModel;
+        }
+
+        // Wire up the inline screen callback so AnsiOutput can read the row offset
+        // and dimensions from App.Screen for cursor positioning and exit cleanup.
+        if (_output is AnsiOutput ansiOutput && app is { })
+        {
+            IApplication appRef = app;
+            ansiOutput.AppScreenGetter = () => appRef.Screen;
+        }
 
         // Initialize the size monitor now that the driver is fully constructed
         // This allows size monitors to set up platform-specific mechanisms:
@@ -176,7 +200,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         {
             try
             {
-                TerminalColorDetector colorDetector = new (_driver);
+                TerminalColorDetector colorDetector = new (_driver, startupGate);
 
                 colorDetector.Detect ((fg, bg) =>
                                       {
@@ -201,7 +225,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         {
             // Detect Kitty support. The async response we get back only indicates whether
             // kitty is supported or not.
-            KittyKeyboardProtocolDetector kittyKeyboardDetector = new (_driver);
+            KittyKeyboardProtocolDetector kittyKeyboardDetector = new (_driver, startupGate);
 
             kittyKeyboardDetector.Detect (result =>
                                           {
@@ -228,8 +252,30 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
             Logging.Warning ($"Kitty keyboard protocol detection failed: {ex.Message}");
         }
 
+        if (startupGate is { })
+        {
+            QueueDeviceAttributesProbe (startupGate);
+        }
+
         _startupSemaphore.Release ();
         Trace.Lifecycle (app?.MainThreadId.ToString (), "Driver", $"_input: {_input}, _output: {_output}");
+    }
+
+    private void QueueDeviceAttributesProbe (IAnsiStartupGate startupGate)
+    {
+        IDisposable deviceAttributesQueryCompletionHandle = startupGate.RegisterQuery (AnsiStartupQuery.DeviceAttributesPrimary,
+                                                                                       DeviceAttributesStartupQueryTimeout);
+
+        AnsiEscapeSequenceRequest request = new ()
+        {
+            Request = EscSeqUtils.CSI_SendDeviceAttributes.Request,
+            Value = EscSeqUtils.CSI_SendDeviceAttributes.Value,
+            Terminator = EscSeqUtils.CSI_SendDeviceAttributes.Terminator,
+            ResponseReceived = _ => deviceAttributesQueryCompletionHandle.Dispose (),
+            Abandoned = deviceAttributesQueryCompletionHandle.Dispose
+        };
+
+        _driver?.QueueAnsiRequest (request);
     }
 
     /// <summary>

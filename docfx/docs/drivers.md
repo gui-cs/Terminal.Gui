@@ -340,6 +340,8 @@ The main driver interface that the framework uses internally. `IDriver` is organ
 #### Screen and Display
 - `Screen`, `Cols`, `Rows`, `Left`, `Top` - Screen dimensions
 - `SetScreenSize()`, `SizeChanged` - Size management
+- `AppModel` - Whether the driver operates in `FullScreen` or `Inline` mode
+- `InlinePosition` - The terminal cursor position (`Point`) where the inline region starts. `Y` is the row discovered via CPR at startup; `X` is reserved for future use. Only meaningful when `AppModel == Inline`.
 
 #### Color Support
 - `SupportsTrueColor` - 24-bit color capability
@@ -372,6 +374,22 @@ Driver.SizeDetection = SizeDetectionMode.Polling;
 - `Contents` - Screen buffer array
 - `Clip` - Clipping region
 - `ClearContents()`, `ClearedContents` - Buffer management
+- In inline mode, `OutputBufferImpl.InlineMode = true` causes `ClearContents()` to initialize cells with `IsDirty = false`. Only cells explicitly drawn by the app are flushed to the terminal — the rest of the visible terminal stays untouched.
+
+#### Inline Mode (ANSI Driver)
+
+When `AppModel == Inline`, the ANSI driver changes behavior in several ways:
+
+| Aspect | FullScreen | Inline |
+|--------|-----------|--------|
+| Screen buffer | Alternate buffer (`CSI ?1049h`) | Primary (scrollback) buffer |
+| `ClearContents()` | All cells dirty | All cells clean |
+| Cursor positioning | Absolute terminal coordinates | Offset by `App.Screen.Y` |
+| Shutdown | Emit `CSI ?1049l` (restore) | Move cursor below inline region |
+
+**Startup gate** (`AnsiStartupGate`): In inline mode, `AnsiSizeMonitor` sends a CPR query (`ESC[6n`) to discover the cursor row. The startup gate defers the first `LayoutAndDraw` until both the CPR response and terminal size query complete. If the terminal never responds, the gate times out and rendering proceeds from row 0.
+
+**`AnsiOutput` changes**: `SetCursorPositionImpl` adds `App.Screen.Y` to all row coordinates so output lands at the correct terminal rows. On init, `CSI ?1049h` and `CSI 2J` are skipped. On shutdown, `CSI ?1049l` is skipped and the cursor is positioned at the bottom of the inline region.
 
 #### Drawing and Rendering
 - `Col`, `Row`, `CurrentAttribute` - Drawing state

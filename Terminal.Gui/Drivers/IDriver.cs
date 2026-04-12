@@ -74,6 +74,10 @@ public interface IDriver : IDisposable
     ///     Gets the terminal progress indicator when direct terminal progress output is available.
     /// </summary>
     ProgressIndicator? ProgressIndicator { get; }
+    
+    ///     Gets the ANSI startup readiness gate, if enabled for this driver instance.
+    /// </summary>
+    IAnsiStartupGate? AnsiStartupGate { get; }
 
     #endregion Driver Components
 
@@ -106,6 +110,18 @@ public interface IDriver : IDisposable
 
     /// <summary>The topmost row in the terminal.</summary>
     int Top { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the inline-mode cursor position. Only meaningful when <see cref="AppModel"/>
+    ///     is <see cref="AppModel.Inline"/>. The <c>Y</c> component is the terminal row where
+    ///     the inline region starts; <c>X</c> is reserved for future use.
+    /// </summary>
+    Point InlinePosition { get; set; }
+
+    /// <summary>
+    ///     Gets or sets how the application using this driver interacts with the terminal buffer.
+    /// </summary>
+    AppModel AppModel { get; set; }
 
     #endregion Screen and Display
 
