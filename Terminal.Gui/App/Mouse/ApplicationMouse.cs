@@ -164,6 +164,10 @@ internal class ApplicationMouse : IMouse, IDisposable
                 _dismissedByMousePress = visiblePopover;
                 _isDismissRecursing = true;
 
+                // Restore original terminal-absolute coordinates before recursing so the
+                // recursive call performs its own inline offset subtraction correctly.
+                mouseEvent.ScreenPosition = originalScreenPosition;
+
                 // Recurse once so the event can be handled below the popover
                 RaiseMouseEvent (mouseEvent);
 
