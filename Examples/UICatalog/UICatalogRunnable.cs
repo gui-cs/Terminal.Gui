@@ -906,10 +906,19 @@ public sealed class UICatalogRunnable : Runnable
 
         Logo logo = new () { X = Pos.Center (), Y = Pos.Bottom (tagline) + 1 };
 
-        Link link = new () { Text = ABOUT_URL, Url = ABOUT_URL, X = Pos.Center (), Y = Pos.Bottom (logo) + 1 };
+        View version = new ()
+        {
+            Width = Dim.Auto (),
+            Height = Dim.Auto (),
+            Text = "v2 - Beta",
+            X = Pos.Center (),
+            Y = Pos.Bottom (logo) + 1
+        };
+
+        Link link = new () { Text = ABOUT_URL, Url = ABOUT_URL, X = Pos.Center (), Y = Pos.Bottom (version) + 1 };
         App?.ToolTips?.SetToolTip (link, () => link.Url);
 
-        dialog.Add (tagline, logo, link);
+        dialog.Add (tagline, logo, version, link);
         dialog.Buttons.ElementAt (0).SetFocus ();
         App?.Run (dialog);
         dialog.Dispose ();

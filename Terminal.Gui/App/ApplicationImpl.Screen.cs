@@ -219,6 +219,12 @@ internal partial class ApplicationImpl
                 if (newHeight != Screen.Height)
                 {
                     Screen = new Rectangle (0, newY, Screen.Width, newHeight);
+
+                    // Terminal scrolling moved existing content — the output buffer's
+                    // cached positions are stale. Force a full redraw so LineCanvas
+                    // and all view content is re-rendered at the correct positions.
+                    Driver.ClearContents ();
+                    forceRedraw = true;
                 }
             }
         }

@@ -12,7 +12,6 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
-using Terminal.Gui.Drivers;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 using UICatalog;
@@ -23,7 +22,6 @@ Application.AppModel = AppModel.Inline;
 //Application.ForceInlineCursorRow = 3;
 
 IApplication app = Application.Create ().Init ();
-
 
 app.Run<InlinePromptView> ();
 app.Dispose ();
@@ -61,16 +59,12 @@ public sealed class InlinePromptView : Window
         _screenShortcut = new Shortcut { Text = "Screen", MouseHighlightStates = MouseState.None, Enabled = false };
         _frameShortcut = new Shortcut { Text = "Frame", MouseHighlightStates = MouseState.None, Enabled = false };
 
-        Logo logo = new ()
-        {
-            X = Pos.Center (),
-            //Height = Dim.Auto (maximumContentDim: Dim.Func((_) => App?.Screen == App?.Driver?.Screen ? 1000 : 0))
-        };
+        Logo logo = new () { X = Pos.Center () };
 
         Label infoLabel = new ()
         {
             Text = "Demonstrates Inline Application Mode.\nType a message and press Enter. Press Esc to exit.",
-            Y = Pos.Bottom(logo),
+            Y = Pos.Bottom (logo),
             TextAlignment = Alignment.Center,
             Width = Dim.Fill (),
             Enabled = false
@@ -82,34 +76,38 @@ public sealed class InlinePromptView : Window
         ListView<string> outputList = null!;
         View inputIndicator = null!;
 
-        outputList = new ()
+        outputList = new ListView<string>
         {
             Y = Pos.Bottom (infoLabel),
             Width = Dim.Fill (),
-            Height = Dim.Auto (
-               minimumContentDim: 1,
-                maximumContentDim: Dim.Func (_ => getMaxListHeight ())),
+            Height = Dim.Auto (minimumContentDim: 1, maximumContentDim: Dim.Func (_ => GetMaxListHeight ())),
             BorderStyle = LineStyle.Dotted
         };
         outputList.Border.Thickness = new Thickness (0, 0, 0, 1);
 
-        outputList.ViewportChanged += (sender, args) =>
+        outputList.SubViewsLaidOut += (_, _) =>
                                       {
-                                          outputList.MoveEnd ();
+                                          if (outputList.Index is { })
+                                          {
+                                              outputList.Viewport = outputList.Viewport with { Y = outputList.Index.Value };
+                                          }
                                       };
+
         outputList.GettingAttributeForRole += (sender, args) =>
                                               {
-                                                  View? view = sender as View;
-                                                  if (args.Role == VisualRole.Active)
+                                                  var view = sender as View;
+
+                                                  if (args.Role != VisualRole.Active)
                                                   {
-                                                      args.Result = view?.GetAttributeForRole (VisualRole.Normal);
-                                                      args.Handled = true;
+                                                      return;
                                                   }
+                                                  args.Result = view?.GetAttributeForRole (VisualRole.Normal);
+                                                  args.Handled = true;
                                               };
 
         outputList.SetSource (items);
 
-        inputIndicator = new ()
+        inputIndicator = new View
         {
             Text = $"{Glyphs.RightArrow}",
             Y = Pos.Bottom (outputList),
@@ -128,20 +126,19 @@ public sealed class InlinePromptView : Window
 
         inputField.Accepted += (_, _) =>
                                {
-                                   string text = $"{Glyphs.BlackCircle} {inputField.Text}";
+                                   var text = $"{Glyphs.BlackCircle} {inputField.Text}";
 
                                    items.Add (text);
                                    outputList.MoveEnd ();
+
                                    inputField.Text = string.Empty;
                                    itemCountShortcut.Title = $"{items.Count}";
                                };
 
         statusBar.Add (_cursorShortcut, _driverShortcut, _screenShortcut, _frameShortcut, itemCountShortcut);
 
-
         Add (logo, infoLabel, outputList, inputIndicator, inputField, statusBar);
         inputField.SetFocus ();
-
 
         _cursorShortcut?.Title = $"{App?.Driver?.InlineState.InlineCursorRow}";
         _driverShortcut?.Title = $"{Format (App?.Driver?.Screen)}";
@@ -152,14 +149,12 @@ public sealed class InlinePromptView : Window
 
         // Returns the maximum content height for the outputList so it doesn't grow beyond what the
         // terminal can display. Subtracts all sibling and adornment heights from App.Screen.Height.
-        int getMaxListHeight ()
+        int GetMaxListHeight ()
         {
             int screenHeight = App?.Driver?.Screen.Height ?? 100;
 
             // Adornments of the containing InlinePromptView (this Window)
-            int windowAdornments = (Border?.Thickness.Vertical ?? 0)
-                                   + (Margin?.Thickness.Vertical ?? 0)
-                                   + (Padding?.Thickness.Vertical ?? 0);
+            int windowAdornments = (Border?.Thickness.Vertical ?? 0) + (Margin?.Thickness.Vertical ?? 0) + (Padding?.Thickness.Vertical ?? 0);
 
             // Heights of sibling views (everything except the list itself)
             int siblingHeight = (logo?.Frame.Height ?? 0)
@@ -193,7 +188,6 @@ public sealed class InlinePromptView : Window
             App?.ScreenChanged -= AppOnScreenChanged;
             App?.Driver?.SizeChanged -= DriverOnSizeChanged;
         }
-
     }
 
     private void AppOnScreenChanged (object? sender, EventArgs<Rectangle> e) => _screenShortcut?.Title = $"{Format (e.Value)}";

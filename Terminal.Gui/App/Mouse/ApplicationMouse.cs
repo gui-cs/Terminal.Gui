@@ -71,6 +71,17 @@ internal class ApplicationMouse : IMouse, IDisposable
     /// <inheritdoc/>
     public void RaiseMouseEvent (Mouse mouseEvent)
     {
+        // In inline mode, the driver reports terminal-absolute coordinates but views
+        // expect coordinates relative to App.Screen origin. Subtract the inline offset.
+        if (App?.AppModel == AppModel.Inline)
+        {
+            Rectangle appScreen = App.Screen;
+
+            mouseEvent.ScreenPosition = new Point (
+                                                   mouseEvent.ScreenPosition.X - appScreen.X,
+                                                   mouseEvent.ScreenPosition.Y - appScreen.Y);
+        }
+
         if (App?.Initialized is true)
         {
             // LastMousePosition is only set if the application is initialized.
