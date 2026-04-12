@@ -13,10 +13,16 @@ public class ProgressIndicator
         ArgumentNullException.ThrowIfNull (driver);
         _driver = driver;
     }
-
     /// <summary>
-    ///     Returns whether terminal progress output is worth attempting for the given output stream state.
+    ///     Gets whether terminal progress escape sequences should be written for the current output stream.
     /// </summary>
+    /// <param name="outputAttached"><see langword="true"/> if standard output is attached to a terminal device.</param>
+    /// <param name="outputRedirected"><see langword="true"/> if standard output is redirected away from the terminal.</param>
+    /// <param name="term">The <c>TERM</c> environment variable value for the current host, if any.</param>
+    /// <returns>
+    ///     <see langword="true"/> when output is attached, not redirected, and the host is not marked as
+    ///     <c>dumb</c>; otherwise, <see langword="false"/>.
+    /// </returns>
     internal static bool IsSupportedOutput (bool outputAttached, bool outputRedirected, string? term)
     {
         if (!outputAttached || outputRedirected)
