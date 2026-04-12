@@ -73,11 +73,20 @@ internal partial class ApplicationImpl
 
         if (AppModel == AppModel.Inline && _screen is { } screen)
         {
-            // In inline mode, the terminal resized but our inline region keeps its Y offset
-            // and height. Only the width needs to update to match the new terminal width.
-            _screen = screen with { Width = newSize.Width };
-            (Driver as DriverImpl)?.ResizeOutputBuffer (newSize.Width, screen.Height);
-            RaiseScreenChangedEvent (_screen.Value);
+            // On resize in inline mode, reset to row 0 and clear the screen.
+            // The next LayoutAndDraw will re-size the inline region from scratch.
+            _inlineScreenSized = false;
+
+            if (Driver is { } driver)
+            {
+                driver.InlineState = driver.InlineState with { InlineCursorRow = 0 };
+
+                // Clear the entire terminal
+                driver.WriteRaw ($"{EscSeqUtils.CSI}H{EscSeqUtils.CSI}2J");
+            }
+
+            Screen = new Rectangle (0, 0, newSize.Width, screen.Height);
+            ClearScreenNextIteration = true;
         }
         else
         {
