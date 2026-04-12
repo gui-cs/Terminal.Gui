@@ -162,6 +162,8 @@ internal class AnsiSizeMonitor : ISizeMonitor
 
         if (string.IsNullOrEmpty (response))
         {
+            CompleteStartupSizeQuery ();
+
             return;
         }
 
@@ -207,10 +209,11 @@ internal class AnsiSizeMonitor : ISizeMonitor
     {
         Trace.Lifecycle (nameof (AnsiSizeMonitor), "HandleCursorPositionResponse", $"Response: '{response ?? "<null>"}'");
         _cursorPositionReceived = true;
-        CompleteStartupCursorPositionQuery ();
 
         if (string.IsNullOrEmpty (response))
         {
+            CompleteStartupCursorPositionQuery ();
+
             return;
         }
 
@@ -224,6 +227,9 @@ internal class AnsiSizeMonitor : ISizeMonitor
             InitialCursorRow = Math.Max (0, row - 1);
             Trace.Lifecycle (nameof (AnsiSizeMonitor), "CursorPositionParsed", $"Row={InitialCursorRow} (1-indexed: {row})");
         }
+
+        // Complete AFTER parsing so the gate doesn't release with InitialCursorRow still 0
+        CompleteStartupCursorPositionQuery ();
     }
 
     private void CompleteStartupSizeQuery ()
