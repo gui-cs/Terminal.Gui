@@ -184,7 +184,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             return args.Context?.Binding switch
             {
                 { Source: { } weakSource } when weakSource.TryGetTarget (out View? src) && src == this => true,
-                MouseBinding mouseBinding when mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked) => !DoubleClickAccepts,
+                MouseBinding mouseBinding when mouseBinding.MouseEvent!.Flags.FastHasFlags (MouseFlags.LeftButtonDoubleClicked) => !DoubleClickAccepts,
                 KeyBinding { Key: { } } keyBinding when keyBinding.Key == Key.Enter => false,
                 null => false,
                 _ => true
@@ -204,7 +204,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         return args.Context?.Binding switch
         {
             { Source: { } weakSource } when weakSource.TryGetTarget (out View? src) && src == this => true,
-            MouseBinding mouseBinding when mouseBinding.MouseEvent!.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked) => !DoubleClickAccepts,
+            MouseBinding mouseBinding when mouseBinding.MouseEvent!.Flags.FastHasFlags (MouseFlags.LeftButtonDoubleClicked) => !DoubleClickAccepts,
             KeyBinding { Key: { } } keyBinding when keyBinding.Key == Key.Enter => false,
             null => false,
             _ => true

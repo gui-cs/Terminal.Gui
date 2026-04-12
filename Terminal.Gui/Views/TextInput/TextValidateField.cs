@@ -337,7 +337,7 @@ public class TextValidateField : View, IDesignable, IValue<string>
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (!mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+        if (!mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed))
         {
             return false;
         }

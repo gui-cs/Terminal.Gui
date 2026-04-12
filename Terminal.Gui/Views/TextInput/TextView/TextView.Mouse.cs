@@ -16,9 +16,9 @@ public partial class TextView
     protected override bool OnMouseEvent (Mouse mouse)
     {
         if (mouse is { IsSingleDoubleOrTripleClicked: false, IsPressed: false, IsReleased: false, IsWheel: false }
-            && !mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport)
-            && !mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.Shift)
-            && !mouse.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked | MouseFlags.Shift)
+            && !mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport)
+            && !mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed | MouseFlags.Shift)
+            && !mouse.Flags.FastHasFlags (MouseFlags.LeftButtonDoubleClicked | MouseFlags.Shift)
             && ContextMenu is { }
             && !mouse.Flags.HasFlag (ContextMenu.MouseFlags))
         {
@@ -95,7 +95,7 @@ public partial class TextView
             _columnTrack = CurrentColumn;
             ScrollTo (Viewport.X - 1, false);
         }
-        else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
+        else if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
         {
             ProcessMouseClick (mouse, out List<Cell> line);
             PositionCursor ();
@@ -140,7 +140,7 @@ public partial class TextView
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
         }
-        else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.Shift))
+        else if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed | MouseFlags.Shift))
         {
             if (!_shiftSelecting)
             {
@@ -153,7 +153,7 @@ public partial class TextView
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
         }
-        else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+        else if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed))
         {
             if (_shiftSelecting)
             {
@@ -177,14 +177,14 @@ public partial class TextView
                 App?.Mouse.GrabMouse (this);
             }
         }
-        else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased))
+        else if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonReleased))
         {
             _isButtonReleased = true;
             App?.Mouse.UngrabMouse ();
         }
-        else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked))
+        else if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonDoubleClicked))
         {
-            if (mouse.Flags.HasFlag (MouseFlags.Shift))
+            if (mouse.Flags.FastHasFlags (MouseFlags.Shift))
             {
                 if (!IsSelecting)
                 {
@@ -217,7 +217,7 @@ public partial class TextView
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
         }
-        else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonTripleClicked))
+        else if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonTripleClicked))
         {
             if (IsSelecting)
             {
