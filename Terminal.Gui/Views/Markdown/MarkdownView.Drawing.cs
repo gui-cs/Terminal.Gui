@@ -11,7 +11,7 @@ public partial class MarkdownView
         _linkRanges.Clear ();
 
         SetAttributeForRole (VisualRole.Normal);
-        ClearRegion (0, 0, Viewport.Width, Viewport.Height);
+        FillRect (Viewport with { X = 0, Y = 0 }, (Rune)' ');
 
         int startRow = Viewport.Y;
         int endRow = Math.Min (Viewport.Y + Viewport.Height, _renderedLines.Count);
@@ -112,11 +112,11 @@ public partial class MarkdownView
         case MarkdownStyleRole.Link:
             return normal with { Style = normal.Style | TextStyle.Underline };
         case MarkdownStyleRole.Quote:
-            return normal with { Style = normal.Style | TextStyle.Dim };
+            return normal with { Style = normal.Style | TextStyle.Faint };
         case MarkdownStyleRole.Table:
             return normal with { Style = normal.Style | TextStyle.Bold };
         case MarkdownStyleRole.ThematicBreak:
-            return normal with { Style = normal.Style | TextStyle.Dim };
+            return normal with { Style = normal.Style | TextStyle.Faint };
         case MarkdownStyleRole.ImageAlt:
             return normal with { Style = normal.Style | TextStyle.Italic };
         case MarkdownStyleRole.TaskDone:

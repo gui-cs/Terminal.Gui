@@ -16,25 +16,25 @@ public partial class MarkdownView
 
         if (mouse.Flags == MouseFlags.WheeledDown)
         {
-            ScrollVertical (1);
+            ScrollViewportVertical (1);
             return true;
         }
 
         if (mouse.Flags == MouseFlags.WheeledUp)
         {
-            ScrollVertical (-1);
+            ScrollViewportVertical (-1);
             return true;
         }
 
         if (mouse.Flags == MouseFlags.WheeledRight)
         {
-            ScrollHorizontal (1);
+            ScrollViewportHorizontal (1);
             return true;
         }
 
         if (mouse.Flags == MouseFlags.WheeledLeft)
         {
-            ScrollHorizontal (-1);
+            ScrollViewportHorizontal (-1);
             return true;
         }
 
@@ -83,16 +83,16 @@ public partial class MarkdownView
 
     private void SetupBindingsAndCommands ()
     {
-        AddCommand (Command.Up, () => ScrollVertical (-1));
-        AddCommand (Command.Down, () => ScrollVertical (1));
-        AddCommand (Command.PageUp, () => ScrollVertical (-Math.Max (Viewport.Height - 1, 1)));
-        AddCommand (Command.PageDown, () => ScrollVertical (Math.Max (Viewport.Height - 1, 1)));
-        AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
-        AddCommand (Command.ScrollDown, () => ScrollVertical (1));
-        AddCommand (Command.ScrollLeft, () => ScrollHorizontal (-1));
-        AddCommand (Command.ScrollRight, () => ScrollHorizontal (1));
-        AddCommand (Command.Start, ScrollTop);
-        AddCommand (Command.End, ScrollBottom);
+        AddCommand (Command.Up, () => ScrollViewportVertical (-1));
+        AddCommand (Command.Down, () => ScrollViewportVertical (1));
+        AddCommand (Command.PageUp, () => ScrollViewportVertical (-Math.Max (Viewport.Height - 1, 1)));
+        AddCommand (Command.PageDown, () => ScrollViewportVertical (Math.Max (Viewport.Height - 1, 1)));
+        AddCommand (Command.ScrollUp, () => ScrollViewportVertical (-1));
+        AddCommand (Command.ScrollDown, () => ScrollViewportVertical (1));
+        AddCommand (Command.ScrollLeft, () => ScrollViewportHorizontal (-1));
+        AddCommand (Command.ScrollRight, () => ScrollViewportHorizontal (1));
+        AddCommand (Command.Start, () => ScrollTop ());
+        AddCommand (Command.End, () => ScrollBottom ());
 
         KeyBindings.Add (Key.CursorUp, Command.Up);
         KeyBindings.Add (Key.CursorDown, Command.Down);
@@ -109,7 +109,7 @@ public partial class MarkdownView
         MouseBindings.ReplaceCommands (MouseFlags.WheeledLeft, Command.ScrollLeft);
     }
 
-    private bool ScrollVertical (int delta)
+    private bool ScrollViewportVertical (int delta)
     {
         Size content = GetContentSize ();
         int maxY = Math.Max (content.Height - Viewport.Height, 0);
@@ -126,7 +126,7 @@ public partial class MarkdownView
         return true;
     }
 
-    private bool ScrollHorizontal (int delta)
+    private bool ScrollViewportHorizontal (int delta)
     {
         Size content = GetContentSize ();
         int maxX = Math.Max (content.Width - Viewport.Width, 0);

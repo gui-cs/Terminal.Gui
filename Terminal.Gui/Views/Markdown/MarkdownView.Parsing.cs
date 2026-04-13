@@ -23,7 +23,7 @@ public partial class MarkdownView
 
         MarkdownPipeline pipeline = MarkdownPipeline ?? _defaultPipeline;
 
-        // Keep parse stage explicit (parse -> lower -> layout -> draw).
+        // Keep parse stage explicit (parse -> lower -> layout -> draw); parsed AST is intentionally unused in v1 lowering.
         _ = Markdig.Markdown.Parse (_markdown, pipeline);
 
         LowerFromSourceText ();
@@ -166,7 +166,7 @@ public partial class MarkdownView
     {
         string trimmed = line.Trim ();
 
-        return trimmed.StartsWith ('|') && trimmed.Contains ('|', 1);
+        return trimmed.StartsWith ('|') && trimmed.IndexOf ('|', 1) >= 0;
     }
 
     private static string NormalizeTableRow (string line)
@@ -187,9 +187,24 @@ public partial class MarkdownView
 
         foreach (string line in codeLines)
         {
-            IReadOnlyList<InlineRun> runs = SyntaxHighlighter is null
-                ? [new InlineRun (line, MarkdownStyleRole.CodeBlock)]
-                : SyntaxHighlighter.Highlight (line, null);
+            IReadOnlyList<InlineRun> runs;
+
+            if (SyntaxHighlighter is null)
+            {
+                runs = [new InlineRun (line, MarkdownStyleRole.CodeBlock)];
+            }
+            else
+            {
+                IReadOnlyList<StyledSegment> highlighted = SyntaxHighlighter.Highlight (line, null);
+                List<InlineRun> converted = [];
+
+                foreach (StyledSegment segment in highlighted)
+                {
+                    converted.Add (new InlineRun (segment.Text, segment.StyleRole, segment.Url, segment.ImageSource));
+                }
+
+                runs = converted;
+            }
 
             _blocks.Add (new IntermediateBlock (runs, false));
         }

@@ -1,6 +1,6 @@
 namespace Terminal.Gui.Views;
 
-internal enum MarkdownStyleRole
+public enum MarkdownStyleRole
 {
     Normal,
     Heading,
@@ -18,7 +18,7 @@ internal enum MarkdownStyleRole
     TaskTodo
 }
 
-internal sealed class StyledSegment
+public sealed class StyledSegment
 {
     public StyledSegment (string text, MarkdownStyleRole styleRole, string? url = null, string? imageSource = null)
     {
