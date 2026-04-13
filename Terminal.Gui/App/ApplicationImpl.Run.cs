@@ -167,7 +167,17 @@ internal partial class ApplicationImpl
         runnable.RaiseIsRunningChangedEvent (true);
         runnable.RaiseIsModalChangedEvent (true);
 
-        LayoutAndDraw ();
+        IDriver? driver = Driver;
+
+        if (driver?.AnsiStartupGate is { IsReady: false } startupGate)
+        {
+            string pending = string.Join (", ", startupGate.PendingQueries);
+            Trace.Lifecycle (MainThreadId.ToString (), "Begin", $"Deferring initial LayoutAndDraw until ANSI startup queries complete. Pending: {pending}");
+        }
+        else
+        {
+            LayoutAndDraw ();
+        }
 
         return token;
     }
@@ -227,15 +237,30 @@ internal partial class ApplicationImpl
             return null;
         }
 
-        try
+        // Loop to handle the case where End is cancelled by an IsRunningChanging handler.
+        // When End is cancelled, IsRunning remains true; we reset StopRequested and re-run the loop.
+        while (true)
         {
-            // All runnables block until RequestStop() is called
-            RunLoop (runnable, errorHandler);
-        }
-        finally
-        {
-            // End the session (raises IsRunningChanging/IsRunningChanged, pops from stack)
-            End (token);
+            try
+            {
+                // All runnables block until RequestStop() is called
+                RunLoop (runnable, errorHandler);
+            }
+            finally
+            {
+                // End the session (raises IsRunningChanging/IsRunningChanged, pops from stack)
+                End (token);
+            }
+
+            // If End succeeded IsRunning is now false — we are done
+            if (!runnable.IsRunning)
+            {
+                break;
+            }
+
+            // End was cancelled by an IsRunningChanging handler (e.g., "Are you sure?" veto).
+            // Reset StopRequested so RunLoop can re-enter its while condition correctly.
+            runnable.StopRequested = false;
         }
 
         return token.Result;

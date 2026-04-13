@@ -41,6 +41,12 @@ public interface IOutputBuffer
     void ClearContents ();
 
     /// <summary>
+    ///     Gets a value for each row indicating whether that row contains any dirty cells and should be rendered.
+    ///     Used by <see cref="IOutput"/> to skip rows with no pending changes, avoiding unnecessary cursor moves.
+    /// </summary>
+    bool [] DirtyLines { get; }
+
+    /// <summary>
     ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
     ///     to.
     /// </summary>
