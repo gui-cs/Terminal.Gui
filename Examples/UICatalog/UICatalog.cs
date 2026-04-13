@@ -171,12 +171,12 @@ public class UICatalog
                                     UICatalogCommandLineOptions options = new ()
                                     {
                                         Scenario = context.GetRequiredValue (scenarioArgument),
-                                        Driver = context.GetRequiredValue (driverOption) ?? string.Empty,
+                                        Driver = context.GetRequiredValue (driverOption),
                                         DontEnableConfigurationManagement = context.GetRequiredValue (disableConfigManagement),
                                         Benchmark = context.GetRequiredValue (benchmarkFlag),
                                         BenchmarkTimeout = context.GetRequiredValue (benchmarkTimeout),
                                         ResultsFile = context.GetRequiredValue (resultsFile) ?? string.Empty,
-                                        DebugLogLevel = context.GetRequiredValue (debugLogLevel) ?? "Warning",
+                                        DebugLogLevel = context.GetRequiredValue (debugLogLevel),
 
                                         // Only set Force16Colors if explicitly specified on command line
                                         Force16Colors = force16 ? true : null

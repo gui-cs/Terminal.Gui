@@ -272,12 +272,12 @@ public static class MessageBox
         buttonList.AddRange (buttons.Select (buttonText => new Button { Text = buttonText, }));
 
         using Dialog dialog = new ();
+        dialog.App = app;
         dialog.Title = title;
         dialog.ButtonAlignment = DefaultButtonAlignment;
         dialog.BorderStyle = DefaultBorderStyle;
         dialog.SchemeName = useErrorScheme ? SchemeManager.SchemesToSchemeName (Schemes.Error) : SchemeManager.SchemesToSchemeName (Schemes.Dialog);
-        //dialog.Width = Dim.Auto (minimumContentDim: 80);
-        dialog.HotKeySpecifier = new ('\xFFFF');
+        dialog.HotKeySpecifier = new Rune ('\xFFFF');
         dialog.Text = message;
         dialog.TextAlignment = Alignment.Center;
         dialog.VerticalTextAlignment = Alignment.Center;

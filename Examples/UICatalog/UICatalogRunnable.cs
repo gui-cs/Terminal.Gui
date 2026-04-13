@@ -25,6 +25,7 @@ public sealed class UICatalogRunnable : Runnable
 
     public UICatalogRunnable ()
     {
+        Title = "UICatalog";
         SchemeName = CachedRunnableScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
         ConfigurationManager.Applied += ConfigAppliedHandler;
     }
@@ -893,7 +894,10 @@ public sealed class UICatalogRunnable : Runnable
 
     private void ShowAboutDialog ()
     {
-        Dialog dialog = new () { Title = "", Buttons = [new Button { Title = Strings.btnOk, IsDefault = true }] };
+        Dialog dialog = new () { Title = "About UICatalog", Buttons = [new Button { Title = Strings.btnOk, IsDefault = true }] };
+
+        // Strip off Title flag from the default dialog border settings to demonstrate BorderSettings customization
+        dialog.Border.Settings &= ~BorderSettings.Title;
 
         Label tagline = new ()
         {

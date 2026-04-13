@@ -262,7 +262,7 @@ public class AnsiSizeMonitorTests
 
     /// <summary>
     ///     <see cref="AnsiSizeMonitor.InitialCursorRow"/> parses the row from the
-    ///     DECXCPR response and converts from 1-indexed to 0-indexed.
+    ///     CPR response and converts from 1-indexed to 0-indexed.
     /// </summary>
     [Fact]
     public void InlineMode_InitialCursorRow_ParsedFromCprResponse () // Copilot
@@ -281,9 +281,10 @@ public class AnsiSizeMonitorTests
 
         AnsiEscapeSequenceRequest? cprReq = captured.FirstOrDefault (r => r.Terminator == "R");
         Assert.NotNull (cprReq);
+        Assert.Equal ($"{EscSeqUtils.CSI}6n", cprReq!.Request);
 
         // Simulate terminal at row 15 (1-indexed), col 1
-        cprReq!.ResponseReceived! ("[?15;1R");
+        cprReq.ResponseReceived! ("[15;1R");
 
         Assert.Equal (14, monitor.InitialCursorRow); // 0-indexed
     }

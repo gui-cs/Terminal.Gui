@@ -127,10 +127,27 @@ public class GetViewsUnderLocationForRootTests
     }
 
     [Fact]
-    public void Returns_WhenPointIn_NotTransparentToMouseBorder_Top ()
+    public void Returns_WhenPointIn_Runnable_NotTransparentToMouseBorder_Top_And_BorderView ()
     {
         // Claude - Opus 4.6
         Runnable top = new () { Frame = new Rectangle (0, 0, 10, 10) };
+
+        top.Border.Thickness = new Thickness (1);
+        top.Border.ViewportSettings = ViewportSettingsFlags.None;
+        List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);
+        Assert.Contains (top, result);
+
+        // Runnable sets Border.Settings to include TerminalTitle, which causes the Border to create
+        // a BorderView.
+        Assert.Contains (top.Border.View, result);
+    }
+
+    [Fact]
+    public void Returns_WhenPointIn_NotTransparentToMouseBorder_Top_And_BorderView ()
+    {
+        // Claude - Opus 4.6
+        View top = new () { Frame = new Rectangle (0, 0, 10, 10) };
+
         top.Border.Thickness = new Thickness (1);
         top.Border.ViewportSettings = ViewportSettingsFlags.None;
         List<View?> result = View.GetViewsUnderLocation (top, new Point (0, 0), ViewportSettingsFlags.TransparentMouse);

@@ -184,6 +184,6 @@ public class EnumExtensionMethodsGeneratorTests
         Assert.True (default (BorderSettings).FastIsDefined (1));
         Assert.True (default (BorderSettings).FastIsDefined (2));
         Assert.True (default (BorderSettings).FastIsDefined (4));
-        Assert.False (default (BorderSettings).FastIsDefined (8));
+        Assert.True (default (BorderSettings).FastIsDefined (8));
     }
 }

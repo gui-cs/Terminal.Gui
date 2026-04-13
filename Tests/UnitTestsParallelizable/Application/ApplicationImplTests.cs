@@ -63,7 +63,8 @@ public class ApplicationImplTests
     #endregion
 
     /// <summary>
-    ///     Crates a new ApplicationImpl instance for testing. The input, output, and size monitor components are mocked.
+    ///     Creates a new ApplicationImpl instance for testing. The input and size monitor components are mocked.
+    ///     Output is AnsiOutput.
     /// </summary>
     private IApplication NewMockedApplicationImpl ()
     {
@@ -76,13 +77,10 @@ public class ApplicationImplTests
         inputProcessor.Setup (p => p.GetParser ()).Returns (Mock.Of<IAnsiResponseParser> ());
         m.Setup (f => f.CreateInputProcessor (It.IsAny<ConcurrentQueue<ConsoleKeyInfo>> (), It.IsAny<ITimeProvider?> ())).Returns (inputProcessor.Object);
 
-        Mock<IOutput> consoleOutput = new ();
-        var size = new Size (80, 25);
+        AnsiOutput consoleOutput = new ();
+        consoleOutput.SetSize (80, 25);
 
-        consoleOutput.Setup (o => o.SetSize (It.IsAny<int> (), It.IsAny<int> ())).Callback<int, int> ((w, h) => size = new Size (w, h));
-        consoleOutput.Setup (o => o.GetSize ()).Returns (() => size);
-        consoleOutput.Setup (o => o.GetCursor ()).Returns (() => new Cursor ());
-        m.Setup (f => f.CreateOutput ()).Returns (consoleOutput.Object);
+        m.Setup (f => f.CreateOutput ()).Returns (consoleOutput);
         m.Setup (f => f.CreateSizeMonitor (It.IsAny<IOutput> (), It.IsAny<IOutputBuffer> ())).Returns (Mock.Of<ISizeMonitor> ());
 
         return new ApplicationImpl (m.Object);

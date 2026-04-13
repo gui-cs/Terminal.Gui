@@ -27,5 +27,11 @@ public enum BorderSettings
     ///     <see cref="BorderView.TabSide"/>, <see cref="BorderView.TabOffset"/>,
     ///     <see cref="BorderView.TabLength"/>.
     /// </summary>
-    Tab = 4
+    Tab = 4,
+
+    /// <summary>
+    ///     If the View is a <see cref="IRunnable"/>, and <see cref="IRunnable.IsModal"/> is <see langword="true"/>,
+    ///     the Terminal's title will be updated using OSC 0..2 terminal title sequences to <see cref="View.Title"/>.
+    /// </summary>
+    TerminalTitle = 8
 }

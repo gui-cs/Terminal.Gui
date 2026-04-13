@@ -486,8 +486,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     internal TextFormatter TitleTextFormatter { get; init; } = new ();
 
     /// <summary>
-    ///     The title to be displayed for this <see cref="View"/>. The title will be displayed if <see cref="Border"/>.
-    ///     <see cref="Thickness.Top"/> is greater than 0. The title can be used to set the <see cref="HotKey"/>
+    ///     The title to be displayed for this <see cref="View"/>. The title can be used to set the <see cref="HotKey"/>
     ///     for the view by prefixing character with <see cref="HotKeySpecifier"/> (e.g. <c>"T_itle"</c>).
     /// </summary>
     /// <remarks>
@@ -501,6 +500,18 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///     <para>
     ///         To cause the hotkey to be rendered with <see cref="Text"/>,
     ///         set <c>View.</c><see cref="TextFormatter.HotKeySpecifier"/> to the desired character.
+    ///     </para>
+    ///     <para>
+    ///         When <see cref="Border"/> is configured with <see cref="BorderSettings.Title"/> and <see cref="Border.Thickness"/>.
+    ///     <see cref="Thickness.Top"/> is greater than 0 the Title will be displayed.
+    ///     </para>
+    ///     <para>
+    ///         When <see cref="Border"/> is configured with <see cref="BorderSettings.TerminalTitle"/>, and the View is a
+    ///         <see cref="Runnable"/>
+    ///         the Title will be rendered in the
+    ///         terminal's title bar using OSC 0..2 sequences when the View is Modal (see <see cref="IRunnable.IsModal"/>).
+    ///         In this case, hotkey specifiers will not be displayed in the terminal's title bar.
+    ///         See <see cref="IDriver.SetTerminalTitle"/> for more information.
     ///     </para>
     /// </remarks>
     /// <value>The title.</value>

@@ -31,6 +31,7 @@ public class Runnable : View, IRunnable
         Width = Dim.Fill ();
         Height = Dim.Fill ();
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Runnable);
+        Border.Settings |= BorderSettings.TerminalTitle;
     }
 
     /// <inheritdoc/>
