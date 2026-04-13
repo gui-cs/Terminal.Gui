@@ -1,0 +1,174 @@
+namespace Terminal.Gui.Views;
+
+public partial class MarkdownView
+{
+    private struct MarkdownLinkRange
+    {
+        public int Y { get; set; }
+        public int StartX { get; set; }
+        public int EndXExclusive { get; set; }
+        public string Url { get; set; }
+    }
+
+    protected override bool OnMouseEvent (Mouse mouse)
+    {
+        EnsureLayout ();
+
+        if (mouse.Flags == MouseFlags.WheeledDown)
+        {
+            ScrollVertical (1);
+            return true;
+        }
+
+        if (mouse.Flags == MouseFlags.WheeledUp)
+        {
+            ScrollVertical (-1);
+            return true;
+        }
+
+        if (mouse.Flags == MouseFlags.WheeledRight)
+        {
+            ScrollHorizontal (1);
+            return true;
+        }
+
+        if (mouse.Flags == MouseFlags.WheeledLeft)
+        {
+            ScrollHorizontal (-1);
+            return true;
+        }
+
+        if (mouse.Flags != MouseFlags.LeftButtonClicked && mouse.Flags != MouseFlags.LeftButtonReleased)
+        {
+            return base.OnMouseEvent (mouse);
+        }
+
+        if (CanFocus && !HasFocus)
+        {
+            SetFocus ();
+        }
+
+        if (mouse.Position is null)
+        {
+            return true;
+        }
+
+        int contentX = Viewport.X + mouse.Position.Value.X;
+        int contentY = Viewport.Y + mouse.Position.Value.Y;
+
+        foreach (MarkdownLinkRange range in _linkRanges)
+        {
+            if (range.Y != contentY)
+            {
+                continue;
+            }
+
+            if (contentX < range.StartX || contentX >= range.EndXExclusive)
+            {
+                continue;
+            }
+
+            bool handled = RaiseLinkClicked (range.Url);
+
+            if (!handled)
+            {
+                Link.OpenUrl (range.Url);
+            }
+
+            return true;
+        }
+
+        return true;
+    }
+
+    private void SetupBindingsAndCommands ()
+    {
+        AddCommand (Command.Up, () => ScrollVertical (-1));
+        AddCommand (Command.Down, () => ScrollVertical (1));
+        AddCommand (Command.PageUp, () => ScrollVertical (-Math.Max (Viewport.Height - 1, 1)));
+        AddCommand (Command.PageDown, () => ScrollVertical (Math.Max (Viewport.Height - 1, 1)));
+        AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
+        AddCommand (Command.ScrollDown, () => ScrollVertical (1));
+        AddCommand (Command.ScrollLeft, () => ScrollHorizontal (-1));
+        AddCommand (Command.ScrollRight, () => ScrollHorizontal (1));
+        AddCommand (Command.Start, ScrollTop);
+        AddCommand (Command.End, ScrollBottom);
+
+        KeyBindings.Add (Key.CursorUp, Command.Up);
+        KeyBindings.Add (Key.CursorDown, Command.Down);
+        KeyBindings.Add (Key.PageUp, Command.PageUp);
+        KeyBindings.Add (Key.PageDown, Command.PageDown);
+        KeyBindings.Add (Key.CursorLeft, Command.ScrollLeft);
+        KeyBindings.Add (Key.CursorRight, Command.ScrollRight);
+        KeyBindings.Add (Key.Home, Command.Start);
+        KeyBindings.Add (Key.End, Command.End);
+
+        MouseBindings.ReplaceCommands (MouseFlags.WheeledDown, Command.ScrollDown);
+        MouseBindings.ReplaceCommands (MouseFlags.WheeledUp, Command.ScrollUp);
+        MouseBindings.ReplaceCommands (MouseFlags.WheeledRight, Command.ScrollRight);
+        MouseBindings.ReplaceCommands (MouseFlags.WheeledLeft, Command.ScrollLeft);
+    }
+
+    private bool ScrollVertical (int delta)
+    {
+        Size content = GetContentSize ();
+        int maxY = Math.Max (content.Height - Viewport.Height, 0);
+        int newY = Math.Min (Math.Max (Viewport.Y + delta, 0), maxY);
+
+        if (newY == Viewport.Y)
+        {
+            return true;
+        }
+
+        Viewport = Viewport with { Y = newY };
+        SetNeedsDraw ();
+
+        return true;
+    }
+
+    private bool ScrollHorizontal (int delta)
+    {
+        Size content = GetContentSize ();
+        int maxX = Math.Max (content.Width - Viewport.Width, 0);
+        int newX = Math.Min (Math.Max (Viewport.X + delta, 0), maxX);
+
+        if (newX == Viewport.X)
+        {
+            return true;
+        }
+
+        Viewport = Viewport with { X = newX };
+        SetNeedsDraw ();
+
+        return true;
+    }
+
+    private bool ScrollTop ()
+    {
+        if (Viewport.Y == 0)
+        {
+            return true;
+        }
+
+        Viewport = Viewport with { Y = 0 };
+        SetNeedsDraw ();
+
+        return true;
+    }
+
+    private bool ScrollBottom ()
+    {
+        Size content = GetContentSize ();
+        int maxY = Math.Max (content.Height - Viewport.Height, 0);
+
+        if (Viewport.Y == maxY)
+        {
+            return true;
+        }
+
+        Viewport = Viewport with { Y = maxY };
+        SetNeedsDraw ();
+
+        return true;
+    }
+}

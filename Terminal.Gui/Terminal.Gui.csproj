@@ -60,6 +60,7 @@
     <ItemGroup>
         <PackageReference Include="ColorHelper" />
         <PackageReference Include="JetBrains.Annotations" />
+        <PackageReference Include="Markdig" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions " />
         <PackageReference Include="System.IO.Abstractions" />
         <PackageReference Include="Wcwidth" />
