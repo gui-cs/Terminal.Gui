@@ -1090,6 +1090,39 @@ public static class EscSeqUtils
         // Format: ESC ] 8 ; ; ST (empty URL ends hyperlink)
         $"{OSC}8;;{ST}";
 
+    /// <summary>
+    ///     Clears any terminal progress indicator using OSC 9;4 state 0.
+    /// </summary>
+    /// <returns>The OSC 9;4 clear-progress sequence.</returns>
+    public static string OSC_ClearProgress () => $"{OSC}9;4;0;0{ST}";
+
+    /// <summary>
+    ///     Sets terminal progress using OSC 9;4 state 1.
+    /// </summary>
+    /// <param name="progress">Progress percentage in the range 0-100.</param>
+    /// <returns>The OSC 9;4 determinate-progress sequence.</returns>
+    public static string OSC_SetProgressValue (int progress) => $"{OSC}9;4;1;{Math.Clamp (progress, 0, 100)}{ST}";
+
+    /// <summary>
+    ///     Sets terminal progress to the error state using OSC 9;4 state 2.
+    /// </summary>
+    /// <param name="progress">Progress percentage in the range 0-100.</param>
+    /// <returns>The OSC 9;4 error-progress sequence.</returns>
+    public static string OSC_SetProgressError (int progress = 0) => $"{OSC}9;4;2;{Math.Clamp (progress, 0, 100)}{ST}";
+
+    /// <summary>
+    ///     Sets terminal progress to the indeterminate state using OSC 9;4 state 3.
+    /// </summary>
+    /// <returns>The OSC 9;4 indeterminate-progress sequence.</returns>
+    public static string OSC_SetProgressIndeterminate () => $"{OSC}9;4;3;0{ST}";
+
+    /// <summary>
+    ///     Sets terminal progress to the paused state using OSC 9;4 state 4.
+    /// </summary>
+    /// <param name="progress">Progress percentage in the range 0-100.</param>
+    /// <returns>The OSC 9;4 paused-progress sequence.</returns>
+    public static string OSC_SetProgressPaused (int progress = 0) => $"{OSC}9;4;4;{Math.Clamp (progress, 0, 100)}{ST}";
+
     #region OSC Color Queries
 
     /// <summary>

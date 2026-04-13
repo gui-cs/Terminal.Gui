@@ -1,6 +1,8 @@
 using System.Text;
 using Terminal.Gui.Views;
 
+namespace AI;
+
 /// <summary>
 ///     Suggestion generator that provides slash command completions when the input starts with '/'.
 /// </summary>

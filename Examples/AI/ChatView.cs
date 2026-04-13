@@ -5,6 +5,8 @@ using Terminal.Gui.Input;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
+namespace AI;
+
 /// <summary>
 ///     An inline Window with conversation history, input field, status bar, and slash commands.
 /// </summary>
@@ -40,6 +42,7 @@ internal sealed class ChatView : Window
         {
             AutoSpin = false,
             Style = new SpinnerStyle.FingerDance (),
+            UseProgressIndicator = true,
             Height = 1,
             Width = 5,
             Visible = false

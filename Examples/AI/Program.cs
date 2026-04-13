@@ -4,6 +4,7 @@
 
 using System.CommandLine;
 using System.CommandLine.Help;
+using AI;
 using GitHub.Copilot.SDK;
 using Terminal.Gui.App;
 

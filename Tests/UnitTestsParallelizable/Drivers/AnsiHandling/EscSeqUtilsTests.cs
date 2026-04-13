@@ -90,6 +90,24 @@ public class EscSeqUtilsTests
     }
 
     [Theory]
+    [InlineData (-1, $"{EscSeqUtils.OSC}9;4;1;0{EscSeqUtils.ST}")]
+    [InlineData (50, $"{EscSeqUtils.OSC}9;4;1;50{EscSeqUtils.ST}")]
+    [InlineData (101, $"{EscSeqUtils.OSC}9;4;1;100{EscSeqUtils.ST}")]
+    public void OSC_SetProgressValue_Clamps_Progress (int progress, string expected)
+    {
+        Assert.Equal (expected, EscSeqUtils.OSC_SetProgressValue (progress));
+    }
+
+    [Fact]
+    public void OSC_ProgressHelpers_ReturnExpectedSequences ()
+    {
+        Assert.Equal ($"{EscSeqUtils.OSC}9;4;0;0{EscSeqUtils.ST}", EscSeqUtils.OSC_ClearProgress ());
+        Assert.Equal ($"{EscSeqUtils.OSC}9;4;2;10{EscSeqUtils.ST}", EscSeqUtils.OSC_SetProgressError (10));
+        Assert.Equal ($"{EscSeqUtils.OSC}9;4;3;0{EscSeqUtils.ST}", EscSeqUtils.OSC_SetProgressIndeterminate ());
+        Assert.Equal ($"{EscSeqUtils.OSC}9;4;4;25{EscSeqUtils.ST}", EscSeqUtils.OSC_SetProgressPaused (25));
+    }
+
+    [Theory]
     [InlineData ('\u001B', KeyCode.Esc)]
     [InlineData ('\r', KeyCode.Enter)]
     [InlineData ('1', KeyCode.D1)]
