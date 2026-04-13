@@ -223,13 +223,23 @@ public class BorderDrawTests (ITestOutputHelper output) : TestDriverBase
     [Fact]
     public void BorderSettings_TerminalTitle_When_Enabled_On_Focused_View_Writes_Osc ()
     {
-        IDriver driver = CreateTestDriver ();
-        driver.SetScreenSize (20, 5);
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (20, 5);
 
-        View view = new () { Driver = driver, CanFocus = true, Title = "Enable Later" };
-        view.HasFocus = true;
+        using Runnable superView = new ();
+        superView.Width = Dim.Fill ();
+        superView.Height = Dim.Fill ();
+        superView.CanFocus = true;
+
+        View view = new () { Title = "Enable Later", CanFocus = true, Width = 10, Height = 3 };
+        superView.Add (view);
+
+        app.Begin (superView);
+        app.LayoutAndDraw ();
+        view.SetFocus ();
         view.Border.Settings |= BorderSettings.TerminalTitle;
 
-        Assert.Contains (EscSeqUtils.OSC_SetWindowTitle ("Enable Later"), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
+        Assert.Contains (EscSeqUtils.OSC_SetWindowTitle ("Enable Later"), app.Driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
     }
 }

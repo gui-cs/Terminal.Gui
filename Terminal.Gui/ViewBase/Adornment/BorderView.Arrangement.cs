@@ -19,15 +19,5 @@ public partial class BorderView
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouseEvent) => Arranger.HandleMouseEvent (mouseEvent);
 
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        if (disposing)
-        {
-            DisposeBorderTitleHooks ();
-        }
-
-        _arranger?.Dispose ();
-        base.Dispose (disposing);
-    }
+    private void DisposeArranger () => _arranger?.Dispose ();
 }

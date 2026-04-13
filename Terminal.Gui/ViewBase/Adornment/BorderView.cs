@@ -63,8 +63,8 @@ public partial class BorderView : AdornmentView
         if (border.Parent is { })
         {
             Frame = border.Parent.Margin.Thickness.GetInside (border.Parent.Margin.GetFrame ());
-            border.Parent.TitleChanged += OnParentTitleChanged;
-            border.Parent.HasFocusChanged += OnParentHasFocusChanged;
+            border.Parent.TitleChanged += HandleParentTitleChanged;
+            border.Parent.HasFocusChanged += HandleParentHasFocusChanged;
         }
         border.ThicknessChanged += OnThicknessChanged;
         border.Parent?.Margin.ThicknessChanged += OnThicknessChanged;
@@ -133,13 +133,25 @@ public partial class BorderView : AdornmentView
         if (border.Parent is { } parent)
         {
             parent.Margin.ThicknessChanged -= OnThicknessChanged;
-            parent.TitleChanged -= OnParentTitleChanged;
-            parent.HasFocusChanged -= OnParentHasFocusChanged;
+            parent.TitleChanged -= HandleParentTitleChanged;
+            parent.HasFocusChanged -= HandleParentHasFocusChanged;
         }
     }
 
-    private void OnParentTitleChanged (object? sender, EventArgs<string> e) => TryUpdateTerminalTitle ();
-    private void OnParentHasFocusChanged (object? sender, HasFocusEventArgs e) => TryUpdateTerminalTitle ();
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            DisposeBorderTitleHooks ();
+            DisposeArranger ();
+        }
+
+        base.Dispose (disposing);
+    }
+
+    private void HandleParentTitleChanged (object? sender, EventArgs<string> e) => TryUpdateTerminalTitle ();
+    private void HandleParentHasFocusChanged (object? sender, HasFocusEventArgs e) => TryUpdateTerminalTitle ();
 
     /// <summary>
     ///     Emits an OSC terminal-title update when <see cref="BorderSettings.TerminalTitle"/> is enabled and the
