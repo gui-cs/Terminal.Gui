@@ -28,7 +28,6 @@ public class Window : Runnable
         TabStop = TabBehavior.TabGroup;
         Arrangement = ViewArrangement.Overlapped;
         SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
-        Border.Settings |= BorderSettings.TerminalTitle;
         BorderStyle = DefaultBorderStyle;
         base.ShadowStyle = DefaultShadow;
     }
