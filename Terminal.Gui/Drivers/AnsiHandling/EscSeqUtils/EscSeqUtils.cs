@@ -890,11 +890,10 @@ public static class EscSeqUtils
     #region Requests
 
     /// <summary>
-    ///     ESC [ ? 6 n - Request Cursor Position Report (?) (DECXCPR)
-    ///     https://terminalguide.namepad.de/seq/csi_sn__p-6/
-    ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) ; 1 R
+    ///     ESC [ 6 n - Request Cursor Position Report (CPR)
+    ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ (y) ; (x) R
     /// </summary>
-    public static readonly AnsiEscapeSequence CSI_RequestCursorPositionReport = new () { Request = CSI + "?6n", Terminator = "R" };
+    public static readonly AnsiEscapeSequence CSI_RequestCursorPositionReport = new () { Request = CSI + "6n", Terminator = "R" };
 
     /// <summary>
     ///     ESC [ ? u - Query kitty keyboard progressive enhancement flags.
@@ -927,7 +926,7 @@ public static class EscSeqUtils
     public static readonly string CSI_DisableKittyKeyboardFlags = CSI + "<u";
 
     /// <summary>
-    ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) R
+    ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ (y) ; (x) R
     /// </summary>
     public const string CSI_RequestCursorPositionReport_Terminator = "R";
 

@@ -20,6 +20,8 @@ public class EscSeqUtilsTests
         Assert.Equal ("\x1b[?1015l", EscSeqUtils.CSI_DisableUrxvtExtModeMouse);
         Assert.Equal ("\x1b[?1003h\x1b[?1015h\u001b[?1006h", EscSeqUtils.CSI_EnableMouseEvents);
         Assert.Equal ("\x1b[?1003l\x1b[?1015l\u001b[?1006l", EscSeqUtils.CSI_DisableMouseEvents);
+        Assert.Equal ($"{EscSeqUtils.CSI}6n", EscSeqUtils.CSI_RequestCursorPositionReport.Request);
+        Assert.Equal ("R", EscSeqUtils.CSI_RequestCursorPositionReport.Terminator);
     }
 
     [Fact]
