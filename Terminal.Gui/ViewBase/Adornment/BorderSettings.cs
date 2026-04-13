@@ -30,7 +30,8 @@ public enum BorderSettings
     Tab = 4,
 
     /// <summary>
-    ///     When the view is focused, emit OSC 0..2 terminal title sequences using <see cref="View.Title"/>.
+    ///     If the View is a <see cref="IRunnable"/>, and <see cref="IRunnable.IsModal"/> is <see langword="true"/>,
+    ///     the Terminal's title will be updated using OSC 0..2 terminal title sequences to <see cref="View.Title"/>.
     /// </summary>
     TerminalTitle = 8
 }

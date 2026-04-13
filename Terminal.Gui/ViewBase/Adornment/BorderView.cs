@@ -63,12 +63,21 @@ public partial class BorderView : AdornmentView
         if (border.Parent is { })
         {
             Frame = border.Parent.Margin.Thickness.GetInside (border.Parent.Margin.GetFrame ());
-            border.Parent.TitleChanged += HandleParentTitleChanged;
-            border.Parent.HasFocusChanged += HandleParentHasFocusChanged;
+
+            if (border.Parent is Runnable runnable)
+            {
+                runnable.TitleChanged += HandleParentTitleChanged;
+                runnable.IsModalChanged += RunnableOnIsModalChanged;
+            }
         }
         border.ThicknessChanged += OnThicknessChanged;
         border.Parent?.Margin.ThicknessChanged += OnThicknessChanged;
     }
+
+    private void RunnableOnIsModalChanged (object? sender, EventArgs<bool> e) => TryUpdateTerminalTitle ();
+
+    private void HandleParentTitleChanged (object? sender, EventArgs<string> e) => TryUpdateTerminalTitle ();
+
 
     /// <inheritdoc/>
     public override void BeginInit ()
@@ -135,8 +144,12 @@ public partial class BorderView : AdornmentView
             return;
         }
         parent.Margin.ThicknessChanged -= OnThicknessChanged;
-        parent.TitleChanged -= HandleParentTitleChanged;
-        parent.HasFocusChanged -= HandleParentHasFocusChanged;
+
+        if (parent is Runnable runnable)
+        {
+            runnable.TitleChanged -= HandleParentTitleChanged;
+            runnable.IsModalChanged -= RunnableOnIsModalChanged;
+        }
     }
 
     /// <inheritdoc/>
@@ -151,8 +164,6 @@ public partial class BorderView : AdornmentView
         base.Dispose (disposing);
     }
 
-    private void HandleParentTitleChanged (object? sender, EventArgs<string> e) => TryUpdateTerminalTitle ();
-    private void HandleParentHasFocusChanged (object? sender, HasFocusEventArgs e) => TryUpdateTerminalTitle ();
 
     /// <summary>
     ///     Emits an OSC terminal-title update when <see cref="BorderSettings.TerminalTitle"/> is enabled and the
@@ -167,19 +178,19 @@ public partial class BorderView : AdornmentView
 
         IDriver? driver = Driver;
 
-        if (driver is null || !border.Settings.FastHasFlags (BorderSettings.TerminalTitle))
+        if (driver is null || !border.Settings.FastHasFlags (BorderSettings.TerminalTitle) || parent is not Runnable { IsModal: true } runnable)
         {
             return;
         }
 
-        string strippedTitle = parent.Title;
+        string strippedTitle = runnable.Title;
 
-        if (parent.TitleTextFormatter.HotKeyPos >= 0)
+        if (runnable.TitleTextFormatter.HotKeyPos >= 0)
         {
-            strippedTitle = parent.Title.Remove (parent.TitleTextFormatter.HotKeyPos, 1);
+            strippedTitle = runnable.Title.Remove (runnable.TitleTextFormatter.HotKeyPos, 1);
         }
 
-        driver.SetTerminalTitle (parent.HasFocus ? strippedTitle : string.Empty);
+        driver.SetTerminalTitle (strippedTitle);
     }
 
     private Rectangle GetBorderBounds ()
