@@ -108,13 +108,13 @@ public class ProgressBarStyles : Scenario
         var button = new Button { X = Pos.Center (), Y = Pos.Align (Alignment.Start), Text = "Start timer" };
         container.Add (button);
 
-        CheckBox ckbMirrorToTerminal = new ()
+        CheckBox ckbUseProgressIndicator = new ()
         {
             X = Pos.Center (),
             Y = Pos.Align (Alignment.Start),
-            Text = "Mirror selected ProgressBar to terminal"
+            Text = "Use ProgressIndicator for selected ProgressBar"
         };
-        container.Add (ckbMirrorToTerminal);
+        container.Add (ckbUseProgressIndicator);
 
         CheckBox ckbHideSelectedProgressBar = new ()
         {
@@ -132,7 +132,7 @@ public class ProgressBarStyles : Scenario
             Width = Dim.Percent (50),
             BorderStyle = LineStyle.Single,
             CanFocus = true,
-            MirrorToTerminal = true
+            UseProgressIndicator = true
         };
         container.Add (blocksPB);
 
@@ -222,7 +222,7 @@ public class ProgressBarStyles : Scenario
                                      ProgressBar progressBar =
                                          (ProgressBar)container.SubViews.First (v => v.GetType () == typeof (ProgressBar) && v.Title == title);
                                      editor.ViewToEdit = progressBar;
-                                     ckbMirrorToTerminal.Value = progressBar.MirrorToTerminal ? CheckState.Checked : CheckState.UnChecked;
+                                     ckbUseProgressIndicator.Value = progressBar.UseProgressIndicator ? CheckState.Checked : CheckState.UnChecked;
                                      ckbHideSelectedProgressBar.Value = progressBar.Visible ? CheckState.UnChecked : CheckState.Checked;
                                  };
 
@@ -239,15 +239,15 @@ public class ProgressBarStyles : Scenario
                                         marqueesContinuousPB.ProgressBarFormat = e.Value.Value;
                                     };
 
-        ckbMirrorToTerminal.ValueChanging += (s, e) =>
-                                             {
-                                                 if (editor.ViewToEdit is not ProgressBar progressBar)
-                                                 {
-                                                     return;
-                                                 }
-
-                                                 progressBar.MirrorToTerminal = e.NewValue == CheckState.Checked;
-                                             };
+        ckbUseProgressIndicator.ValueChanging += (s, e) =>
+                                              {
+                                                  if (editor.ViewToEdit is not ProgressBar progressBar)
+                                                  {
+                                                      return;
+                                                  }
+ 
+                                                  progressBar.UseProgressIndicator = e.NewValue == CheckState.Checked;
+                                              };
 
         ckbHideSelectedProgressBar.ValueChanging += (s, e) =>
                                                     {

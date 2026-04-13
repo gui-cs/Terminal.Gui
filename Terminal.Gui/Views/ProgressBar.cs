@@ -43,7 +43,7 @@ public class ProgressBar : View, IDesignable
     private int _delta;
     private float _fraction;
     private bool _isActivity;
-    private bool _mirrorToTerminal;
+    private bool _useProgressIndicator;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProgressBar"/> class, starts in percentage mode and uses relative
@@ -78,24 +78,24 @@ public class ProgressBar : View, IDesignable
     }
 
     /// <summary>
-    ///     Gets or sets a value indicating whether this <see cref="ProgressBar"/> mirrors its state to the host terminal
-    ///     using OSC 9;4 progress sequences when OSC output is available.
+    ///     Gets or sets a value indicating whether this <see cref="ProgressBar"/> uses the driver's terminal
+    ///     <see cref="ProgressIndicator"/> to emit OSC 9;4 progress sequences when supported.
     /// </summary>
     /// <remarks>
-    ///     Mirroring is independent of <see cref="View.Visible"/> so the terminal progress indicator can continue to be
-    ///     used even when the on-screen <see cref="ProgressBar"/> is hidden.
+    ///     This is independent of <see cref="View.Visible"/> so the terminal progress indicator can continue to be used
+    ///     even when the on-screen <see cref="ProgressBar"/> is hidden.
     /// </remarks>
-    public bool MirrorToTerminal
+    public bool UseProgressIndicator
     {
-        get => _mirrorToTerminal;
+        get => _useProgressIndicator;
         set
         {
-            if (_mirrorToTerminal == value)
+            if (_useProgressIndicator == value)
             {
                 return;
             }
 
-            _mirrorToTerminal = value;
+            _useProgressIndicator = value;
 
             if (value)
             {
@@ -292,7 +292,7 @@ public class ProgressBar : View, IDesignable
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
-        if (disposing && _mirrorToTerminal)
+        if (disposing && _useProgressIndicator)
         {
             ClearTerminalProgress ();
         }
@@ -306,7 +306,7 @@ public class ProgressBar : View, IDesignable
 
     private void UpdateTerminalProgress ()
     {
-        if (!_mirrorToTerminal || Driver?.ProgressIndicator is not { } progressIndicator)
+        if (!_useProgressIndicator || Driver?.ProgressIndicator is not { } progressIndicator)
         {
             return;
         }
