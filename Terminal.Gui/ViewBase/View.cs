@@ -538,6 +538,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
             SetTitleTextFormatterSize ();
             SetHotKeyFromTitle ();
             SetNeedsDraw ();
+            TryUpdateTerminalTitle ();
 
             OnTitleChanged ();
             TitleChanged?.Invoke (this, new EventArgs<string> (in _title));
@@ -547,9 +548,21 @@ public partial class View : IDisposable, ISupportInitializeNotification
     private void SetTitleTextFormatterSize () =>
         TitleTextFormatter.ConstrainToSize = new Size (TextFormatter.GetWidestLineLength (TitleTextFormatter.Text)
                                                        - (TitleTextFormatter.Text.Contains ((char)HotKeySpecifier.Value)
-                                                              ? Math.Max (HotKeySpecifier.GetColumns (), 0)
-                                                              : 0),
+                                                               ? Math.Max (HotKeySpecifier.GetColumns (), 0)
+                                                               : 0),
                                                        1);
+
+    private void TryUpdateTerminalTitle ()
+    {
+        IDriver? driver = Driver;
+
+        if (driver is null || !Border.Settings.FastHasFlags (BorderSettings.TerminalTitle) || !HasFocus)
+        {
+            return;
+        }
+
+        driver.SetTerminalTitle (Title);
+    }
 
     /// <summary>
     ///     Called before the <see cref="View.Title"/> changes. Invokes the <see cref="TitleChanging"/> event, which can

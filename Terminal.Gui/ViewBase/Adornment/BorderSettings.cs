@@ -27,5 +27,10 @@ public enum BorderSettings
     ///     <see cref="BorderView.TabSide"/>, <see cref="BorderView.TabOffset"/>,
     ///     <see cref="BorderView.TabLength"/>.
     /// </summary>
-    Tab = 4
+    Tab = 4,
+
+    /// <summary>
+    ///     When the view is focused, emit OSC 0..2 terminal title sequences using <see cref="View.Title"/>.
+    /// </summary>
+    TerminalTitle = 8
 }

@@ -107,6 +107,18 @@ public class EscSeqUtilsTests
         Assert.Equal ($"{EscSeqUtils.OSC}9;4;4;25{EscSeqUtils.ST}", EscSeqUtils.OSC_SetProgressPaused (25));
     }
 
+    // Copilot
+    [Theory]
+    [InlineData (-1, "title", $"{EscSeqUtils.OSC}0;title{EscSeqUtils.ST}")]
+    [InlineData (1, "icon", $"{EscSeqUtils.OSC}1;icon{EscSeqUtils.ST}")]
+    [InlineData (2, "window", $"{EscSeqUtils.OSC}2;window{EscSeqUtils.ST}")]
+    [InlineData (99, "title", $"{EscSeqUtils.OSC}2;title{EscSeqUtils.ST}")]
+    [InlineData (0, "\u001bA\u0007B", $"{EscSeqUtils.OSC}0;AB{EscSeqUtils.ST}")]
+    public void OSC_SetWindowTitle_ReturnsExpectedSequence (int mode, string title, string expected)
+    {
+        Assert.Equal (expected, EscSeqUtils.OSC_SetWindowTitle (title, mode));
+    }
+
     [Theory]
     [InlineData ('\u001B', KeyCode.Esc)]
     [InlineData ('\r', KeyCode.Enter)]

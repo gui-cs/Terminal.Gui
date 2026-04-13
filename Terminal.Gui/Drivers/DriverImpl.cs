@@ -376,6 +376,17 @@ internal class DriverImpl : IDriver
     public void WriteRaw (string ansi) => _output.Write (ansi);
 
     /// <inheritdoc/>
+    public void SetTerminalTitle (string title, int mode = 0)
+    {
+        if (IsLegacyConsole)
+        {
+            return;
+        }
+
+        _output.Write (EscSeqUtils.OSC_SetWindowTitle (title, mode));
+    }
+
+    /// <inheritdoc/>
     public ConcurrentQueue<SixelToRender> GetSixels () => _output.GetSixels ();
 
     /// <inheritdoc/>
