@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-using Microsoft.Extensions.DependencyInjection;
 using UnitTests;
 // ReSharper disable AccessToDisposedClosure
 
