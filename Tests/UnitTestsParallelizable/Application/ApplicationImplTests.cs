@@ -63,7 +63,7 @@ public class ApplicationImplTests
     #endregion
 
     /// <summary>
-    ///     Crates a new ApplicationImpl instance for testing. The input and size monitor components are mocked.
+    ///     Creates a new ApplicationImpl instance for testing. The input and size monitor components are mocked.
     ///     Output is AnsiOutput.
     /// </summary>
     private IApplication NewMockedApplicationImpl ()
