@@ -949,11 +949,6 @@ public partial class View // Focus and cross-view navigation management (TabStop
         var args = new HasFocusEventArgs (newHasFocus, newHasFocus, previousFocusedView, focusedView);
         HasFocusChanged?.Invoke (this, args);
 
-        if (newHasFocus)
-        {
-            TryUpdateTerminalTitle ();
-        }
-
         if (newHasFocus || focusedView is null)
         {
             SuperView?.RaiseFocusedChanged (previousFocusedView, focusedView);

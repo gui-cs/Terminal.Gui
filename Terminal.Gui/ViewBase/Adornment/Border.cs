@@ -153,7 +153,7 @@ public class Border : AdornmentImpl
 
             field = value;
 
-            if (field.HasFlag (BorderSettings.Tab))
+            if (field.HasFlag (BorderSettings.Tab) || field.HasFlag (BorderSettings.TerminalTitle))
             {
                 GetOrCreateView ();
             }

@@ -63,6 +63,8 @@ public partial class BorderView : AdornmentView
         if (border.Parent is { })
         {
             Frame = border.Parent.Margin.Thickness.GetInside (border.Parent.Margin.GetFrame ());
+            border.Parent.TitleChanged += OnParentTitleChanged;
+            border.Parent.HasFocusChanged += OnParentHasFocusChanged;
         }
         border.ThicknessChanged += OnThicknessChanged;
         border.Parent?.Margin.ThicknessChanged += OnThicknessChanged;
@@ -113,7 +115,52 @@ public partial class BorderView : AdornmentView
     ///     Called by <see cref="Border.Settings"/> setter when settings change.
     ///     Reconfigures tab mode state.
     /// </summary>
-    internal void OnSettingsChanged () => ConfigureForTabMode ();
+    internal void OnSettingsChanged ()
+    {
+        ConfigureForTabMode ();
+        TryUpdateTerminalTitle ();
+    }
+
+    private void DisposeBorderTitleHooks ()
+    {
+        if (Adornment is not Border border)
+        {
+            return;
+        }
+
+        border.ThicknessChanged -= OnThicknessChanged;
+
+        if (border.Parent is { } parent)
+        {
+            parent.Margin.ThicknessChanged -= OnThicknessChanged;
+            parent.TitleChanged -= OnParentTitleChanged;
+            parent.HasFocusChanged -= OnParentHasFocusChanged;
+        }
+    }
+
+    private void OnParentTitleChanged (object? sender, EventArgs<string> e) => TryUpdateTerminalTitle ();
+    private void OnParentHasFocusChanged (object? sender, HasFocusEventArgs e) => TryUpdateTerminalTitle ();
+
+    /// <summary>
+    ///     Emits an OSC terminal-title update when <see cref="BorderSettings.TerminalTitle"/> is enabled and the
+    ///     parent view has focus.
+    /// </summary>
+    private void TryUpdateTerminalTitle ()
+    {
+        if (Adornment is not Border { Parent: { } parent } border)
+        {
+            return;
+        }
+
+        IDriver? driver = Driver;
+
+        if (driver is null || !border.Settings.FastHasFlags (BorderSettings.TerminalTitle) || !parent.HasFocus)
+        {
+            return;
+        }
+
+        driver.SetTerminalTitle (parent.Title);
+    }
 
     private Rectangle GetBorderBounds ()
     {

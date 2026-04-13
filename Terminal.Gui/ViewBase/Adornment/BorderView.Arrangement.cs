@@ -22,6 +22,11 @@ public partial class BorderView
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
+        if (disposing)
+        {
+            DisposeBorderTitleHooks ();
+        }
+
         _arranger?.Dispose ();
         base.Dispose (disposing);
     }

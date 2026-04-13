@@ -218,4 +218,18 @@ public class BorderDrawTests (ITestOutputHelper output) : TestDriverBase
 
         Assert.DoesNotContain (EscSeqUtils.OSC_SetWindowTitle ("No OSC"), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
     }
+
+    // Copilot
+    [Fact]
+    public void BorderSettings_TerminalTitle_When_Enabled_On_Focused_View_Writes_Osc ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.SetScreenSize (20, 5);
+
+        View view = new () { Driver = driver, CanFocus = true, Title = "Enable Later" };
+        view.HasFocus = true;
+        view.Border.Settings |= BorderSettings.TerminalTitle;
+
+        Assert.Contains (EscSeqUtils.OSC_SetWindowTitle ("Enable Later"), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
+    }
 }
