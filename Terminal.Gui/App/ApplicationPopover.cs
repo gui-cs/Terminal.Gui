@@ -215,8 +215,8 @@ public sealed class ApplicationPopover : IDisposable
                 newPopover.EndInit ();
             }
 
-            if (!(newPopover.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent)
-                  && newPopover.ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse)))
+            if (!(newPopover.ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent)
+                  && newPopover.ViewportSettings.FastHasFlags (ViewportSettingsFlags.TransparentMouse)))
             {
                 throw new InvalidOperationException ("Popovers must have ViewportSettings.Transparent and ViewportSettings.TransparentMouse set.");
             }
