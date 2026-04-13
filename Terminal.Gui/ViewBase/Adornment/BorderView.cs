@@ -255,7 +255,7 @@ public partial class BorderView : AdornmentView
             normalAttribute = Adornment.Parent.GetAttributeForRole (VisualRole.Normal);
         }
 
-        if (MouseState.HasFlag (MouseState.Pressed))
+        if (MouseState.FastHasFlags (MouseState.Pressed))
         {
             normalAttribute = GetAttributeForRole (VisualRole.Highlight);
         }
@@ -733,7 +733,7 @@ public partial class BorderView : AdornmentView
 
         Attribute normalAttribute = GetAttributeForRole (VisualRole.Normal);
 
-        if (MouseState.HasFlag (MouseState.Pressed))
+        if (MouseState.FastHasFlags (MouseState.Pressed))
         {
             normalAttribute = GetAttributeForRole (VisualRole.Highlight);
         }
