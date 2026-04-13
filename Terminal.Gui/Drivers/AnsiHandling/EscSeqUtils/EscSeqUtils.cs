@@ -1095,6 +1095,9 @@ public static class EscSeqUtils
         return $"{OSC}8;{parameters};{url}{ST}";
     }
 
+    /// <summary>
+    ///     Removes control characters from OSC text payloads to prevent escape-sequence injection.
+    /// </summary>
     private static string SanitizeOscText (string text)
     {
         if (string.IsNullOrEmpty (text))
