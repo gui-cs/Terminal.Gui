@@ -81,4 +81,27 @@ public class ProgressIndicatorTests : TestDriverBase
     {
         Assert.Equal (expected, ProgressIndicator.IsSupportedOutput (outputAttached, outputRedirected, term));
     }
+
+    // Copilot
+    [Fact]
+    public void SetTerminalTitle_WritesOscSequence ()
+    {
+        DriverImpl driver = (DriverImpl)CreateTestDriver ();
+
+        driver.SetTerminalTitle ("Test Title", 2);
+
+        Assert.Contains (EscSeqUtils.OSC_SetWindowTitle ("Test Title", 2), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
+    }
+
+    // Copilot
+    [Fact]
+    public void SetTerminalTitle_SkipsLegacyConsole ()
+    {
+        DriverImpl driver = (DriverImpl)CreateTestDriver ();
+        driver.IsLegacyConsole = true;
+
+        driver.SetTerminalTitle ("Test Title");
+
+        Assert.DoesNotContain (EscSeqUtils.OSC_SetWindowTitle ("Test Title"), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
+    }
 }

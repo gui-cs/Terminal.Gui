@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 
 // ReSharper disable UnusedMember.Global
 
@@ -1057,6 +1058,23 @@ public static class EscSeqUtils
     public const string ST = "\u001B\\";
 
     /// <summary>
+    ///     Sets the terminal window title using OSC 0..2.
+    /// </summary>
+    /// <param name="title">The title text to write.</param>
+    /// <param name="mode">
+    ///     The OSC title selector:
+    ///     0 = icon and window title, 1 = icon title, 2 = window title.
+    ///     Values outside 0..2 are clamped.
+    /// </param>
+    /// <returns>The OSC title sequence.</returns>
+    public static string OSC_SetWindowTitle (string title, int mode = 0)
+    {
+        string safeTitle = SanitizeOscText (title);
+
+        return $"{OSC}{Math.Clamp (mode, 0, 2)};{safeTitle}{ST}";
+    }
+
+    /// <summary>
     ///     Starts a hyperlink using OSC 8 escape sequence.
     /// </summary>
     /// <param name="url">The URL to link to (e.g., "https://github.com").</param>
@@ -1074,6 +1092,29 @@ public static class EscSeqUtils
         string parameters = string.IsNullOrEmpty (id) ? "" : $"id={id}";
 
         return $"{OSC}8;{parameters};{url}{ST}";
+    }
+
+    /// <summary>
+    ///     Removes control characters from OSC text payloads to prevent escape-sequence injection.
+    /// </summary>
+    private static string SanitizeOscText (string text)
+    {
+        if (string.IsNullOrEmpty (text))
+        {
+            return string.Empty;
+        }
+
+        StringBuilder sanitized = new (text.Length);
+
+        foreach (char ch in text)
+        {
+            if (!char.IsControl (ch))
+            {
+                sanitized.Append (ch);
+            }
+        }
+
+        return sanitized.ToString ();
     }
 
     /// <summary>
