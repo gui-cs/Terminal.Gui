@@ -5,6 +5,8 @@ using Terminal.Gui.Drawing;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
+namespace AI;
+
 /// <summary>
 ///     Handles single-turn mode: streams one answer inline, then exits.
 /// </summary>
