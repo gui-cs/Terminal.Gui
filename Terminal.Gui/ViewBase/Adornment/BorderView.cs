@@ -155,7 +155,7 @@ public partial class BorderView : AdornmentView
 
     /// <summary>
     ///     Emits an OSC terminal-title update when <see cref="BorderSettings.TerminalTitle"/> is enabled and the
-    ///     parent view has focus.
+    ///     parent Runnable becomes Modal.
     /// </summary>
     private void TryUpdateTerminalTitle ()
     {
