@@ -213,11 +213,17 @@ public class BorderDrawTests (ITestOutputHelper output) : TestDriverBase
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (20, 5);
 
-        View view = new () { Driver = driver, CanFocus = true };
-        view.HasFocus = true;
-        view.Title = "No OSC";
+        Runnable runnable = new () { Driver = driver };
+        runnable.Border.Settings &= ~BorderSettings.TerminalTitle;
+        runnable.Title = "No OSC";
+        runnable.SetIsModal (true);
+        runnable.RaiseIsModalChangedEvent (true);
 
         Assert.DoesNotContain (EscSeqUtils.OSC_SetWindowTitle ("No OSC"), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
+
+        runnable.Title = "Still No OSC";
+
+        Assert.DoesNotContain (EscSeqUtils.OSC_SetWindowTitle ("Still No OSC"), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
     }
 
     // Copilot
