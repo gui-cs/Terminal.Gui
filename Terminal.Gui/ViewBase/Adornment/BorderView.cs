@@ -145,25 +145,13 @@ public partial class BorderView : AdornmentView
         }
         parent.Margin.ThicknessChanged -= OnThicknessChanged;
 
-        if (parent is Runnable runnable)
+        if (parent is not Runnable runnable)
         {
-            runnable.TitleChanged -= HandleParentTitleChanged;
-            runnable.IsModalChanged -= RunnableOnIsModalChanged;
+            return;
         }
+        runnable.TitleChanged -= HandleParentTitleChanged;
+        runnable.IsModalChanged -= RunnableOnIsModalChanged;
     }
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        if (disposing)
-        {
-            DisposeBorderTitleHooks ();
-            DisposeArranger ();
-        }
-
-        base.Dispose (disposing);
-    }
-
 
     /// <summary>
     ///     Emits an OSC terminal-title update when <see cref="BorderSettings.TerminalTitle"/> is enabled and the
@@ -1224,4 +1212,18 @@ public partial class BorderView : AdornmentView
     }
 
     #endregion Gradient Support
+
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            DisposeBorderTitleHooks ();
+            DisposeArranger ();
+        }
+
+        base.Dispose (disposing);
+    }
+
 }
