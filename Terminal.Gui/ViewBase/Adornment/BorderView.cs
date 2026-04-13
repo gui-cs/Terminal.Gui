@@ -130,12 +130,13 @@ public partial class BorderView : AdornmentView
 
         border.ThicknessChanged -= OnThicknessChanged;
 
-        if (border.Parent is { } parent)
+        if (border.Parent is not { } parent)
         {
-            parent.Margin.ThicknessChanged -= OnThicknessChanged;
-            parent.TitleChanged -= HandleParentTitleChanged;
-            parent.HasFocusChanged -= HandleParentHasFocusChanged;
+            return;
         }
+        parent.Margin.ThicknessChanged -= OnThicknessChanged;
+        parent.TitleChanged -= HandleParentTitleChanged;
+        parent.HasFocusChanged -= HandleParentHasFocusChanged;
     }
 
     /// <inheritdoc/>
@@ -166,12 +167,19 @@ public partial class BorderView : AdornmentView
 
         IDriver? driver = Driver;
 
-        if (driver is null || !border.Settings.FastHasFlags (BorderSettings.TerminalTitle) || !parent.HasFocus)
+        if (driver is null || !border.Settings.FastHasFlags (BorderSettings.TerminalTitle))
         {
             return;
         }
 
-        driver.SetTerminalTitle (parent.Title);
+        string strippedTitle = parent.Title;
+
+        if (parent.TitleTextFormatter.HotKeyPos >= 0)
+        {
+            strippedTitle = parent.Title.Remove (parent.TitleTextFormatter.HotKeyPos, 1);
+        }
+
+        driver.SetTerminalTitle (parent.HasFocus ? strippedTitle : string.Empty);
     }
 
     private Rectangle GetBorderBounds ()

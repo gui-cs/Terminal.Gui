@@ -25,6 +25,8 @@ public sealed class UICatalogRunnable : Runnable
 
     public UICatalogRunnable ()
     {
+        Title = "UICatalog";
+        Border.Settings |= BorderSettings.TerminalTitle;
         SchemeName = CachedRunnableScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
         ConfigurationManager.Applied += ConfigAppliedHandler;
     }

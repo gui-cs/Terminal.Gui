@@ -383,7 +383,7 @@ internal class DriverImpl : IDriver
             return;
         }
 
-        _output.Write (EscSeqUtils.OSC_SetWindowTitle (title, mode));
+        WriteRaw (EscSeqUtils.OSC_SetWindowTitle (title, mode));
     }
 
     /// <inheritdoc/>

@@ -88,6 +88,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         ButtonAlignment = Dialog.DefaultButtonAlignment;
         ButtonAlignmentModes = Dialog.DefaultButtonAlignmentModes;
 
+        Border.Settings |= BorderSettings.TerminalTitle;
         BorderStyle = Dialog.DefaultBorderStyle;
         base.ShadowStyle = Dialog.DefaultShadow;
 
