@@ -27,6 +27,7 @@ public class SpinnerView : View, IDesignable
     private string [] _sequence = DEFAULT_STYLE.Sequence;
     private SpinnerStyle _style = DEFAULT_STYLE;
     private object? _timeout;
+    private bool _useProgressIndicator;
 
     /// <summary>Creates a new instance of the <see cref="SpinnerView"/> class.</summary>
     public SpinnerView ()
@@ -60,6 +61,27 @@ public class SpinnerView : View, IDesignable
             {
                 RemoveAutoSpinTimeout ();
             }
+
+            SyncProgressIndicator ();
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets whether <see cref="SpinnerView"/> should mirror <see cref="AutoSpin"/> to the driver's terminal
+    ///     <see cref="ProgressIndicator"/>.
+    /// </summary>
+    public bool UseProgressIndicator
+    {
+        get => _useProgressIndicator;
+        set
+        {
+            if (_useProgressIndicator == value)
+            {
+                return;
+            }
+
+            _useProgressIndicator = value;
+            SyncProgressIndicator ();
         }
     }
 
@@ -199,6 +221,11 @@ public class SpinnerView : View, IDesignable
     {
         RemoveAutoSpinTimeout ();
 
+        if (disposing)
+        {
+            ClearProgressIndicator ();
+        }
+
         base.Dispose (disposing);
     }
 
@@ -211,6 +238,8 @@ public class SpinnerView : View, IDesignable
         {
             AddAutoSpinTimeout ();
         }
+
+        SyncProgressIndicator ();
     }
 
     private void AddAutoSpinTimeout ()
@@ -285,6 +314,16 @@ public class SpinnerView : View, IDesignable
         }
     }
 
+    private void ClearProgressIndicator ()
+    {
+        if (!_useProgressIndicator)
+        {
+            return;
+        }
+
+        Driver?.ProgressIndicator?.Clear ();
+    }
+
     private void SetBounce (bool bounce) { _bounce = bounce; }
 
     private void SetDelay (int delay)
@@ -315,6 +354,23 @@ public class SpinnerView : View, IDesignable
             _bounce = style.SpinBounce;
             Width = GetSpinnerWidth ();
         }
+    }
+
+    private void SyncProgressIndicator ()
+    {
+        if (!_useProgressIndicator)
+        {
+            return;
+        }
+
+        if (_autoSpin)
+        {
+            Driver?.ProgressIndicator?.SetIndeterminate ();
+
+            return;
+        }
+
+        Driver?.ProgressIndicator?.Clear ();
     }
 
     bool IDesignable.EnableForDesign ()
