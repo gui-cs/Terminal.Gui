@@ -315,6 +315,16 @@ public interface IDriver : IDisposable
     void WriteRaw (string ansi);
 
     /// <summary>
+    ///     Sets the terminal title using OSC 0..2.
+    /// </summary>
+    /// <param name="title">The title text.</param>
+    /// <param name="mode">
+    ///     The OSC title selector:
+    ///     0 = icon and window title, 1 = icon title, 2 = window title.
+    /// </param>
+    void SetTerminalTitle (string title, int mode = 0);
+
+    /// <summary>
     ///     Gets the queue of sixel images to write out to screen when updating.
     ///     If the terminal does not support Sixel, adding to this queue has no effect.
     /// </summary>
