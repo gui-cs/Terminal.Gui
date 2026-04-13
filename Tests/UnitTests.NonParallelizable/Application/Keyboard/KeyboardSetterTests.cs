@@ -186,7 +186,6 @@ public class KeyboardSetterTests
     {
         // Arrange
         PlatformKeyBinding original = Application.DefaultKeyBindings! [Command.Quit];
-        var keyboard = new ApplicationKeyboard ();
         var eventFired = false;
         EventHandler handler = (_, _) => eventFired = true;
         Application.DefaultKeyBindingsChanged += handler;
@@ -206,7 +205,6 @@ public class KeyboardSetterTests
         {
             Application.DefaultKeyBindingsChanged -= handler;
             Application.SetDefaultKeyBinding (Command.Quit, original);
-            keyboard.Dispose ();
         }
     }
 
@@ -223,7 +221,7 @@ public class KeyboardSetterTests
 
     // Copilot
     [Fact]
-    public void SetDefaultKeyBinding_NullDictionary_CreatesDictionary ()
+    public void SetDefaultKeyBinding_NullDictionary_Throws ()
     {
         // Arrange
         Dictionary<Command, PlatformKeyBinding> original = Application.DefaultKeyBindings!;
@@ -233,11 +231,7 @@ public class KeyboardSetterTests
             Application.DefaultKeyBindings = null;
 
             // Act
-            Application.SetDefaultKeyBinding (Command.Quit, Bind.All (Key.Q.WithCtrl));
-
-            // Assert
-            Assert.NotNull (Application.DefaultKeyBindings);
-            Assert.Equal (Key.Q.WithCtrl, Application.GetDefaultKey (Command.Quit));
+            Assert.Throws<InvalidOperationException> (() => Application.SetDefaultKeyBinding (Command.Quit, Bind.All (Key.Q.WithCtrl)));
         }
         finally
         {

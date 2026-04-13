@@ -299,6 +299,11 @@ public static partial class Application
         get;
         set
         {
+            if (ReferenceEquals (field, value))
+            {
+                return;
+            }
+
             field = value;
             Trace.Configuration ("DefaultKeyBindings", "App Set", $"{string.Join (", ", value?.Select (kvp => $"{kvp.Key}=[{kvp.Value}]") ?? [])}");
             DefaultKeyBindingsChanged?.Invoke (null, EventArgs.Empty);
@@ -330,7 +335,11 @@ public static partial class Application
     /// <param name="binding">The platform key binding to associate with <paramref name="command"/>.</param>
     public static void SetDefaultKeyBinding (Command command, PlatformKeyBinding binding)
     {
-        DefaultKeyBindings ??= new ();
+        if (DefaultKeyBindings is null)
+        {
+            throw new InvalidOperationException ("DefaultKeyBindings dictionary is null. Initialize it before setting individual bindings.");
+        }
+
         DefaultKeyBindings [command] = binding;
         Trace.Configuration ("DefaultKeyBindings", "SetDefaultKeyBinding", $"{command}=[{binding}]");
         DefaultKeyBindingsChanged?.Invoke (null, EventArgs.Empty);
