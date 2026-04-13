@@ -44,13 +44,8 @@ internal class DriverImpl : IDriver
                        IOutputBuffer outputBuffer,
                        IOutput output,
                        AnsiRequestScheduler ansiRequestScheduler,
-                       ISizeMonitor sizeMonitor) : this (componentFactory,
-                                                         inputProcessor,
-                                                         outputBuffer,
-                                                         output,
-                                                         ansiRequestScheduler,
-                                                         sizeMonitor,
-                                                         null) { }
+                       ISizeMonitor sizeMonitor) : this (componentFactory, inputProcessor, outputBuffer, output, ansiRequestScheduler, sizeMonitor, null)
+    { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DriverImpl"/> class.
@@ -164,6 +159,9 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public IClipboard? Clipboard { get; set; } = new FakeClipboard ();
 
+    /// <inheritdoc/>
+    public ProgressIndicator? ProgressIndicator { get; internal set; }
+
     private void CreateClipboard ()
     {
         PlatformID p = Environment.OSVersion.Platform;
@@ -180,6 +178,27 @@ internal class DriverImpl : IDriver
         {
             Clipboard = new WSLClipboard ();
         }
+    }
+
+    internal void InitializeProgressIndicator ()
+    {
+        if (IsLegacyConsole)
+        {
+            ProgressIndicator = null;
+
+            return;
+        }
+
+        Driver.IsAttachedToTerminal (out _, out bool outputAttached);
+
+        if (!ProgressIndicator.IsSupportedOutput (outputAttached, Console.IsOutputRedirected, Environment.GetEnvironmentVariable ("TERM")))
+        {
+            ProgressIndicator = null;
+
+            return;
+        }
+
+        ProgressIndicator = new ProgressIndicator (this);
     }
 
     #endregion Driver Components
@@ -224,11 +243,10 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
-    private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e)
-    {
+    private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e) =>
+
         // Trace.Lifecycle (nameof (DriverImpl), "OnSizeMonitorOnSizeChanged", $"{e.Size?.Width}×{e.Size?.Height}");
         SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
-    }
 
     /// <inheritdoc/>
     public int Cols { get => _outputBuffer.Cols; set => _outputBuffer.Cols = value; }
