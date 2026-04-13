@@ -152,13 +152,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         }
         AnsiStartupGate? startupGate = app?.AnsiStartupGate;
 
-        _driver = new DriverImpl (_componentFactory,
-                                  _inputProcessor,
-                                  _loop.OutputBuffer,
-                                  _output,
-                                  _loop.AnsiRequestScheduler,
-                                  _loop.SizeMonitor,
-                                  startupGate);
+        _driver = new DriverImpl (_componentFactory, _inputProcessor, _loop.OutputBuffer, _output, _loop.AnsiRequestScheduler, _loop.SizeMonitor, startupGate);
 
         // Set the driver's AppModel from the application instance so it doesn't rely on the static.
         if (app is { })
