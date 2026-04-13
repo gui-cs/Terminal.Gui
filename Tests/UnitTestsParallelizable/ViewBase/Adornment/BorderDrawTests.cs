@@ -1,4 +1,7 @@
+using System.Runtime.InteropServices;
+using Microsoft.Extensions.DependencyInjection;
 using UnitTests;
+// ReSharper disable AccessToDisposedClosure
 
 namespace ViewBaseTests.Adornments;
 
@@ -189,19 +192,19 @@ public class BorderDrawTests (ITestOutputHelper output) : TestDriverBase
 
     // Copilot
     [Fact]
-    public void BorderSettings_TerminalTitle_Writes_Osc_On_Focus_And_Title_Change ()
+    public void BorderSettings_TerminalTitle_Writes_Osc_On_IsModal_And_Title_Change ()
     {
         IDriver driver = CreateTestDriver ();
         driver.SetScreenSize (20, 5);
 
-        View view = new () { Driver = driver, CanFocus = true };
-        view.Border.Settings |= BorderSettings.TerminalTitle;
-        view.HasFocus = true;
-        view.Title = "Before";
-        Assert.True (view.HasFocus);
+        Runnable runnable = new () { Driver = driver };
+        runnable.Border.Settings |= BorderSettings.TerminalTitle;
+        runnable.Title = "Before";
+        runnable.SetIsModal (true);
+        runnable.RaiseIsModalChangedEvent (true);
         Assert.Contains (EscSeqUtils.OSC_SetWindowTitle ("Before"), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
 
-        view.Title = "After";
+        runnable.Title = "After";
         Assert.Contains (EscSeqUtils.OSC_SetWindowTitle ("After"), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
     }
 
@@ -221,25 +224,25 @@ public class BorderDrawTests (ITestOutputHelper output) : TestDriverBase
 
     // Copilot
     [Fact]
-    public void BorderSettings_TerminalTitle_When_Enabled_On_Focused_View_Writes_Osc ()
+    public void BorderSettings_TerminalTitle_When_Enabled_On_Runnable_View_Writes_Osc ()
     {
         using IApplication app = Application.Create ();
+
+        // Use Inline app model to ensure prevent the initial LayoutAndDraw from clearing driver contents
+        app.AppModel = AppModel.Inline;
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (20, 5);
 
-        using Runnable superView = new ();
-        superView.Width = Dim.Fill ();
-        superView.Height = Dim.Fill ();
-        superView.CanFocus = true;
+        using Runnable runnable = new ();
+        runnable.Title = "Enable Later";
 
-        View view = new () { Title = "Enable Later", CanFocus = true, Width = 10, Height = 3 };
-        superView.Add (view);
+        app.StopAfterFirstIteration = true;
+        runnable.ClearingViewport += RunnableOnDrawComplete;
 
-        app.Begin (superView);
-        app.LayoutAndDraw ();
-        view.SetFocus ();
-        view.Border.Settings |= BorderSettings.TerminalTitle;
+        app.Run (runnable);
 
-        Assert.Contains (EscSeqUtils.OSC_SetWindowTitle ("Enable Later"), app.Driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
+        return;
+
+        void RunnableOnDrawComplete (object? sender, DrawEventArgs e) => Assert.Contains (EscSeqUtils.OSC_SetWindowTitle ("Enable Later"), app.Driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
     }
 }
