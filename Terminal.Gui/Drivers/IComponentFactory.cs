@@ -16,6 +16,13 @@ public interface IComponentFactory
     string? GetDriverName ();
 
     /// <summary>
+    ///     Gets or sets the application model. Set by <see cref="IApplication"/> before
+    ///     <see cref="CreateOutput"/> is called so output implementations know whether to
+    ///     use the alternate screen buffer.
+    /// </summary>
+    AppModel AppModel { get; set; }
+
+    /// <summary>
     ///     Create the <see cref="IOutput"/> class for the current driver implementation i.e. the class responsible for
     ///     rendering <see cref="IOutputBuffer"/> into the console.
     /// </summary>

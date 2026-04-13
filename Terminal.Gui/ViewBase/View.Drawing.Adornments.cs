@@ -6,7 +6,7 @@ public partial class View
     {
         // Only process Margin here if it is not Transparent. Transparent Margins are drawn in a separate pass in the static View.Draw
         // via Margin.DrawTransparentMargins.
-        if (Margin.View is { } marginView && !Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
+        if (Margin.View is { } marginView && !Margin.ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
         {
             marginView.SetNeedsDraw ();
 
@@ -164,7 +164,7 @@ public partial class View
         // Only draw Margin here if it is not Transparent. Transparent Margins are drawn in a separate pass
         // in the static View.Draw via MarginView.DrawMargins (designed for shadow compositing).
         // Non-shadow transparent margin rendering is not yet supported in the first pass.
-        if (!Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
+        if (!Margin.ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent) && Margin.Thickness != Thickness.Empty)
         {
             if (Margin.View is { } marginView)
             {

@@ -9,8 +9,8 @@ public partial class TableView
     ///<inheritdoc/>
     protected override bool OnMouseEvent (Mouse me)
     {
-        if (!me.Flags.HasFlag (MouseFlags.LeftButtonClicked)
-            && !me.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked)
+        if (!me.Flags.FastHasFlags (MouseFlags.LeftButtonClicked)
+            && !me.Flags.FastHasFlags (MouseFlags.LeftButtonDoubleClicked)
             && me.Flags != MouseFlags.WheeledDown
             && me.Flags != MouseFlags.WheeledUp
             && me.Flags != MouseFlags.WheeledLeft
@@ -64,7 +64,7 @@ public partial class TableView
         int boundsX = me.Position!.Value.X;
         int boundsY = me.Position!.Value.Y;
 
-        if (me.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+        if (me.Flags.FastHasFlags (MouseFlags.LeftButtonClicked))
         {
             Point? hit = ScreenToCell (boundsX, boundsY);
 
@@ -76,7 +76,7 @@ public partial class TableView
                 }
                 else
                 {
-                    SetSelection (hit.Value.X, hit.Value.Y, me.Flags.HasFlag (MouseFlags.Shift));
+                    SetSelection (hit.Value.X, hit.Value.Y, me.Flags.FastHasFlags (MouseFlags.Shift));
                 }
 
                 Update ();

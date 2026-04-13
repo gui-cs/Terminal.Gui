@@ -982,7 +982,7 @@ public class FileDialog : Dialog, IDesignable
 
         if (clickedCol is { })
         {
-            if (mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+            if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonClicked))
             {
                 // left click in a header
                 SortColumn (clickedCol.Value);

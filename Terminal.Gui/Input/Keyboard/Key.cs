@@ -547,7 +547,7 @@ public class Key : EventArgs, IEquatable<Key>
     /// <returns>The key converted to a Rune. <see langword="default"/> if conversion is not possible.</returns>
     public static Rune ToRune (KeyCode key)
     {
-        if (key is KeyCode.Null or KeyCode.SpecialMask || key.HasFlag (KeyCode.CtrlMask) || key.HasFlag (KeyCode.AltMask))
+        if (key is KeyCode.Null or KeyCode.SpecialMask || key.FastHasFlags (KeyCode.CtrlMask) || key.FastHasFlags (KeyCode.AltMask))
         {
             return default (Rune);
         }
@@ -555,17 +555,17 @@ public class Key : EventArgs, IEquatable<Key>
         // Extract the base key code
         KeyCode baseKey = key;
 
-        if (baseKey.HasFlag (KeyCode.ShiftMask))
+        if (baseKey.FastHasFlags (KeyCode.ShiftMask))
         {
             baseKey &= ~KeyCode.ShiftMask;
         }
 
         switch (baseKey)
         {
-            case >= KeyCode.A and <= KeyCode.Z when !key.HasFlag (KeyCode.ShiftMask):
+            case >= KeyCode.A and <= KeyCode.Z when !key.FastHasFlags (KeyCode.ShiftMask):
                 return new Rune ((uint)(baseKey + 32));
 
-            case >= KeyCode.A and <= KeyCode.Z when key.HasFlag (KeyCode.ShiftMask):
+            case >= KeyCode.A and <= KeyCode.Z when key.FastHasFlags (KeyCode.ShiftMask):
                 return new Rune ((uint)baseKey);
 
             case > KeyCode.Null and < KeyCode.A:
@@ -751,7 +751,7 @@ public class Key : EventArgs, IEquatable<Key>
         // Extract the base key (removing modifier flags)
         KeyCode baseKey = key & ~KeyCode.CtrlMask & ~KeyCode.AltMask & ~KeyCode.ShiftMask;
 
-        if (!key.HasFlag (KeyCode.ShiftMask) && baseKey is >= KeyCode.A and <= KeyCode.Z)
+        if (!key.FastHasFlags (KeyCode.ShiftMask) && baseKey is >= KeyCode.A and <= KeyCode.Z)
         {
             return ((Rune)(uint)(key + 32)).ToString ();
         }

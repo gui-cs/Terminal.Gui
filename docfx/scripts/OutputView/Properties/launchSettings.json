@@ -6,7 +6,7 @@
     },
     "OutputView ": {
       "commandName": "Project",
-      "commandLineArgs": "--view=GraphView"
+      "commandLineArgs": "--view=AttributePicker"
     },
     "OutputView --ansi": {
       "commandName": "Project",

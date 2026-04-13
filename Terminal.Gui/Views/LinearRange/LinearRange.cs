@@ -1493,19 +1493,19 @@ public class LinearRange<T> : View, IOrientation
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (!(mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked)
-              || mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed)
-              || mouse.Flags.HasFlag (MouseFlags.PositionReport)
-              || mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased)))
+        if (!(mouse.Flags.FastHasFlags (MouseFlags.LeftButtonClicked)
+              || mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed)
+              || mouse.Flags.FastHasFlags (MouseFlags.PositionReport)
+              || mouse.Flags.FastHasFlags (MouseFlags.LeftButtonReleased)))
         {
             return false;
         }
 
         SetFocus ();
 
-        if (!_dragPosition.HasValue && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+        if (!_dragPosition.HasValue && mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed))
         {
-            if (mouse.Flags.HasFlag (MouseFlags.PositionReport))
+            if (mouse.Flags.FastHasFlags (MouseFlags.PositionReport))
             {
                 _dragPosition = mouse.Position;
                 _moveRenderPosition = ClampMovePosition ((Point)_dragPosition!);
@@ -1520,7 +1520,7 @@ public class LinearRange<T> : View, IOrientation
         bool success;
         int option;
 
-        if (_dragPosition.HasValue && mouse.Flags.HasFlag (MouseFlags.PositionReport) && mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+        if (_dragPosition.HasValue && mouse.Flags.FastHasFlags (MouseFlags.PositionReport) && mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed))
         {
             // Continue Drag
             _dragPosition = mouse.Position;
@@ -1549,7 +1549,7 @@ public class LinearRange<T> : View, IOrientation
             return true;
         }
 
-        if ((_dragPosition.HasValue && mouse.Flags.HasFlag (MouseFlags.LeftButtonReleased)) || mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+        if ((_dragPosition.HasValue && mouse.Flags.FastHasFlags (MouseFlags.LeftButtonReleased)) || mouse.Flags.FastHasFlags (MouseFlags.LeftButtonClicked))
         {
             return mouse.Handled;
         }

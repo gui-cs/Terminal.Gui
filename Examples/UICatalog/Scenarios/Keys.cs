@@ -15,87 +15,70 @@ public class Keys : Scenario
         ObservableCollection<string> keyDownNotHandledList = [];
         ObservableCollection<string> swallowedList = [];
 
-        using Window win = new () { Title = GetQuitKeyAndName () };
+        using Window win = new ();
+        win.Title = GetQuitKeyAndName ();
+        win.BorderStyle = LineStyle.None;
 
-        Label label = new ()
+        Shortcut quitShortcut = new ()
         {
-            X = 0,
-            Y = 0,
-            Text = "_Type text here:"
+            // ReSharper disable once AccessToDisposedClosure
+            Title = "Quit", Key = Application.GetDefaultKey (Command.Quit), BindKeyToApplication = true, Action = app.RequestStop
         };
+
+        StatusBar statusBar = new ([quitShortcut, new Shortcut { Title = "Disable QuitKey", Action = () => { quitShortcut.Key = Key.Empty; } }]);
+
+        app.AddTimeout (TimeSpan.FromMilliseconds (100),
+                        () =>
+                        {
+                            // When the App is initialized, kitty detection is async, so we
+                            // create the shortcut in a timeout.
+                            statusBar.Add (new Shortcut
+                            {
+                                CommandView = new CheckBox
+                                {
+                                    Title = "Kitty Keyboard Protocol Enabled",
+
+                                    // ReSharper disable once AccessToDisposedClosure
+                                    Value = app.Driver?.KittyKeyboardCapabilities?.IsSupported is true ? CheckState.Checked : CheckState.UnChecked
+                                },
+                                Enabled = false
+                            });
+
+                            return false;
+                        });
+
+        Label label = new () { X = 0, Y = 0, Text = "_Type text here:" };
         win.Add (label);
 
-        TextField edit = new ()
-        {
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (label),
-            Width = Dim.Fill (2),
-            Height = 1,
-        };
+        TextField edit = new () { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = Dim.Fill (2), Height = 1 };
         win.Add (edit);
 
-        label = new ()
-        {
-            X = 0,
-            Y = Pos.Bottom (label),
-            Text = "Last _app.Keyboard.KeyDown:"
-        };
+        label = new Label { X = 0, Y = Pos.Bottom (label), Text = "Last _app.Keyboard.KeyDown:" };
         win.Add (label);
 
-        Label labelAppKeypress = new ()
-        {
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (label),
-            Width = Dim.Fill (2)
-        };
+        Label labelAppKeypress = new () { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = Dim.Fill (2) };
         win.Add (labelAppKeypress);
 
         app.Keyboard.KeyDown += (_, e) => labelAppKeypress.Text = FormatKeyEvent (e);
 
-        label = new ()
-        {
-            X = 0,
-            Y = Pos.Bottom (label),
-            Text = "Last app.Keyboard._KeyUp:"
-        };
+        label = new Label { X = 0, Y = Pos.Bottom (label), Text = "Last app.Keyboard._KeyUp:" };
         win.Add (label);
 
-        Label labelAppKeyUp = new ()
-        {
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (label),
-            Width = Dim.Fill (2)
-        };
+        Label labelAppKeyUp = new () { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = Dim.Fill (2) };
         win.Add (labelAppKeyUp);
 
         app.Keyboard.KeyUp += (_, e) => labelAppKeyUp.Text = FormatKeyEvent (e);
 
-        label = new ()
-        {
-            X = 0,
-            Y = Pos.Bottom (label),
-            Text = "_Last TextField.KeyDown:"
-        };
+        label = new Label { X = 0, Y = Pos.Bottom (label), Text = "_Last TextField.KeyDown:" };
         win.Add (label);
 
-        Label lastTextFieldKeyDownLabel = new ()
-        {
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (label),
-            Height = 1,
-            Width = Dim.Fill (2)
-        };
+        Label lastTextFieldKeyDownLabel = new () { X = Pos.Right (label) + 1, Y = Pos.Top (label), Height = 1, Width = Dim.Fill (2) };
         win.Add (lastTextFieldKeyDownLabel);
 
         edit.KeyDown += (_, e) => lastTextFieldKeyDownLabel.Text = FormatKeyEvent (e);
 
         // Application key event log:
-        label = new ()
-        {
-            X = 0,
-            Y = Pos.Bottom (label) + 1,
-            Text = "Application Key Events:"
-        };
+        label = new Label { X = 0, Y = Pos.Bottom (label) + 1, Text = "Application Key Events:" };
         win.Add (label);
         int maxKeyString = Key.CursorRight.WithAlt.WithCtrl.WithShift.ToString ().Length;
         int colWidth = maxKeyString + 12; // room for event type + modifier info
@@ -107,7 +90,7 @@ public class Keys : Scenario
             X = 0,
             Y = Pos.Bottom (label),
             Width = colWidth,
-            Height = Dim.Fill (),
+            Height = Dim.Fill (statusBar),
             Source = new ListWrapper<string> (keyList)
         };
         appKeyListView.SchemeName = "Runnable";
@@ -116,18 +99,10 @@ public class Keys : Scenario
         // View key events...
         edit.KeyDown += (_, a) => { keyDownList.Add (a.ToString ()); };
 
-        edit.KeyDownNotHandled += (_, a) =>
-                                  {
-                                      keyDownNotHandledList.Add ($"{a}");
-                                  };
+        edit.KeyDownNotHandled += (_, a) => { keyDownNotHandledList.Add ($"{a}"); };
 
         // KeyDown
-        label = new ()
-        {
-            X = Pos.Right (appKeyListView) + 1,
-            Y = Pos.Top (label),
-            Text = "TextView Key Down:"
-        };
+        label = new Label { X = Pos.Right (appKeyListView) + 1, Y = Pos.Top (label), Text = "TextView Key Down:" };
         win.Add (label);
 
         ListView onKeyDownListView = new ()
@@ -135,19 +110,14 @@ public class Keys : Scenario
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
             Width = maxKeyString,
-            Height = Dim.Fill (),
+            Height = Dim.Fill (statusBar),
             Source = new ListWrapper<string> (keyDownList)
         };
         appKeyListView.SchemeName = "Runnable";
         win.Add (onKeyDownListView);
 
         // KeyDownNotHandled
-        label = new ()
-        {
-            X = Pos.Right (onKeyDownListView) + 1,
-            Y = Pos.Top (label),
-            Text = "TextView KeyDownNotHandled:"
-        };
+        label = new Label { X = Pos.Right (onKeyDownListView) + 1, Y = Pos.Top (label), Text = "TextView KeyDownNotHandled:" };
         win.Add (label);
 
         ListView onKeyDownNotHandledListView = new ()
@@ -155,20 +125,14 @@ public class Keys : Scenario
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
             Width = maxKeyString,
-            Height = Dim.Fill (),
+            Height = Dim.Fill (statusBar),
             Source = new ListWrapper<string> (keyDownNotHandledList)
         };
         appKeyListView.SchemeName = "Runnable";
         win.Add (onKeyDownNotHandledListView);
 
-
         // Swallowed
-        label = new ()
-        {
-            X = Pos.Right (onKeyDownNotHandledListView) + 1,
-            Y = Pos.Top (label),
-            Text = "Swallowed:"
-        };
+        label = new Label { X = Pos.Right (onKeyDownNotHandledListView) + 1, Y = Pos.Top (label), Text = "Swallowed:" };
         win.Add (label);
 
         ListView onSwallowedListView = new ()
@@ -176,7 +140,7 @@ public class Keys : Scenario
             X = Pos.Left (label),
             Y = Pos.Bottom (label),
             Width = maxKeyString,
-            Height = Dim.Fill (),
+            Height = Dim.Fill (statusBar),
             Source = new ListWrapper<string> (swallowedList)
         };
         appKeyListView.SchemeName = "Runnable";
@@ -187,15 +151,18 @@ public class Keys : Scenario
         app.Keyboard.KeyDown += (_, a) => KeyDownPressUp (a, "Down");
         app.Keyboard.KeyUp += (_, a) => KeyDownPressUp (a, "Up");
 
+        win.Add (statusBar);
+        app.Run (win);
+
+        return;
+
         void KeyDownPressUp (Key args, string upDown)
         {
-            string msg = $"Key{upDown,-7}: {FormatKeyEvent (args)}";
+            var msg = $"Key{upDown,-7}: {FormatKeyEvent (args)}";
             keyList.Add (msg);
             appKeyListView.MoveDown ();
             onKeyDownNotHandledListView.MoveDown ();
         }
-
-        app.Run (win);
     }
 
     /// <summary>
@@ -204,14 +171,14 @@ public class Keys : Scenario
     private static string FormatKeyEvent (Key key)
     {
         string eventType = key.EventType switch
-        {
-            KeyEventType.Press => "press",
-            KeyEventType.Repeat => "repeat",
-            KeyEventType.Release => "release",
-            _ => "?"
-        };
+                           {
+                               KeyEventType.Press => "press",
+                               KeyEventType.Repeat => "repeat",
+                               KeyEventType.Release => "release",
+                               _ => "?"
+                           };
 
-        string text = $"{key} ({eventType})";
+        var text = $"{key} ({eventType})";
 
         if (key.IsModifierOnly)
         {

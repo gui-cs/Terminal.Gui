@@ -201,7 +201,7 @@ public abstract class AdornmentImpl : IAdornment
     /// </param>
     internal void UpdateCachedDrawnRegion (Region? lineCanvasRegion)
     {
-        if (!ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+        if (!ViewportSettings.FastHasFlags (ViewportSettingsFlags.TransparentMouse))
         {
             return;
         }

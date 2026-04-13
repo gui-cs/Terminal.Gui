@@ -219,10 +219,17 @@ public partial class BorderView : AdornmentView
         {
             Rectangle titleRect = new (borderBounds.X + 2, titleY, maxTitleWidth, 1);
 
+            bool hasFocus = Adornment.Parent.HasFocus;
+
+            if (Adornment.Parent.SuperView is null)
+            {
+                hasFocus = false;
+            }
+
             Adornment.Parent.TitleTextFormatter.Draw (Driver,
                                                       titleRect,
-                                                      GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.Focus : VisualRole.Normal),
-                                                      GetAttributeForRole (Adornment.Parent.HasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
+                                                      GetAttributeForRole (hasFocus ? VisualRole.Focus : VisualRole.Normal),
+                                                      GetAttributeForRole (hasFocus ? VisualRole.HotFocus : VisualRole.HotNormal));
 
             context?.AddDrawnRectangle (titleRect);
             Adornment.Parent?.LineCanvas.Exclude (new Region (titleRect));
@@ -248,7 +255,7 @@ public partial class BorderView : AdornmentView
             normalAttribute = Adornment.Parent.GetAttributeForRole (VisualRole.Normal);
         }
 
-        if (MouseState.HasFlag (MouseState.Pressed))
+        if (MouseState.FastHasFlags (MouseState.Pressed))
         {
             normalAttribute = GetAttributeForRole (VisualRole.Highlight);
         }
@@ -726,7 +733,7 @@ public partial class BorderView : AdornmentView
 
         Attribute normalAttribute = GetAttributeForRole (VisualRole.Normal);
 
-        if (MouseState.HasFlag (MouseState.Pressed))
+        if (MouseState.FastHasFlags (MouseState.Pressed))
         {
             normalAttribute = GetAttributeForRole (VisualRole.Highlight);
         }

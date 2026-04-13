@@ -11,6 +11,9 @@ public abstract class ComponentFactoryImpl<TInputRecord> : IComponentFactory<TIn
     public abstract string? GetDriverName ();
 
     /// <inheritdoc />
+    public AppModel AppModel { get; set; }
+
+    /// <inheritdoc />
     public abstract IInput<TInputRecord> CreateInput ();
 
     /// <inheritdoc />

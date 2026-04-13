@@ -1126,7 +1126,7 @@ public class TreeView<T> : View, ITreeView where T : class
             return true;
         }
 
-        if (me.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+        if (me.Flags.FastHasFlags (MouseFlags.LeftButtonClicked))
         {
             // The line they clicked on a branch
             Branch<T> clickedBranch = HitTest (me.Position!.Value.Y);

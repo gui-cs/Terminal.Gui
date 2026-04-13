@@ -9,6 +9,6 @@ jobs:
   check-duplicates:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Run Duplicate Test Check
       run: pwsh -File ./Scripts/FindDuplicateTestMethodsInSameFileName.ps1 -solutionPath "$PWD"

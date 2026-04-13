@@ -80,6 +80,14 @@ public abstract class OutputBase
         // Process each row
         for (int row = top; row < rows; row++)
         {
+            // Skip rows that have no dirty cells — avoids emitting cursor-move sequences
+            // for rows that were never drawn (important for inline mode where only the
+            // view's rows are dirty and the rest of the buffer is clean).
+            if (!buffer.DirtyLines [row])
+            {
+                continue;
+            }
+
             if (!SetCursorPositionImpl (0, row))
             {
                 return;

@@ -85,26 +85,26 @@ public static class AnsiMouseEncoder
         // Note: WheeledLeft = Ctrl | WheeledUp, WheeledRight = Ctrl | WheeledDown
         // So we need to check for these combinations first before checking individual flags
 
-        if (flags.HasFlag (MouseFlags.WheeledLeft))
+        if (flags.FastHasFlags (MouseFlags.WheeledLeft))
         {
             // WheeledLeft is defined as Ctrl | WheeledUp, which maps to button code 68
             // The ANSI parser also adds Shift flag for code 68, but we'll let that happen naturally
             return 68;
         }
 
-        if (flags.HasFlag (MouseFlags.WheeledRight))
+        if (flags.FastHasFlags (MouseFlags.WheeledRight))
         {
             // WheeledRight is defined as Ctrl | WheeledDown, which maps to button code 69
             // The ANSI parser also adds Shift flag for code 69, but we'll let that happen naturally
             return 69;
         }
 
-        if (flags.HasFlag (MouseFlags.WheeledUp))
+        if (flags.FastHasFlags (MouseFlags.WheeledUp))
         {
             return 64;
         }
 
-        if (flags.HasFlag (MouseFlags.WheeledDown))
+        if (flags.FastHasFlags (MouseFlags.WheeledDown))
         {
             return 65;
         }
@@ -112,19 +112,19 @@ public static class AnsiMouseEncoder
         // Determine base button (0, 1, 2)
         int baseButton;
 
-        if (flags.HasFlag (MouseFlags.LeftButtonPressed) || flags.HasFlag (MouseFlags.LeftButtonReleased))
+        if (flags.FastHasFlags (MouseFlags.LeftButtonPressed) || flags.FastHasFlags (MouseFlags.LeftButtonReleased))
         {
             baseButton = 0;
         }
-        else if (flags.HasFlag (MouseFlags.MiddleButtonPressed) || flags.HasFlag (MouseFlags.MiddleButtonReleased))
+        else if (flags.FastHasFlags (MouseFlags.MiddleButtonPressed) || flags.FastHasFlags (MouseFlags.MiddleButtonReleased))
         {
             baseButton = 1;
         }
-        else if (flags.HasFlag (MouseFlags.RightButtonPressed) || flags.HasFlag (MouseFlags.RightButtonReleased))
+        else if (flags.FastHasFlags (MouseFlags.RightButtonPressed) || flags.FastHasFlags (MouseFlags.RightButtonReleased))
         {
             baseButton = 2;
         }
-        else if (flags.HasFlag (MouseFlags.PositionReport))
+        else if (flags.FastHasFlags (MouseFlags.PositionReport))
         {
             // Motion without button
             baseButton = 35;
@@ -138,10 +138,10 @@ public static class AnsiMouseEncoder
         int buttonCode = baseButton;
 
         // Check if it's a drag event (position report with button pressed)
-        bool isDrag = flags.HasFlag (MouseFlags.PositionReport)
-                      && (flags.HasFlag (MouseFlags.LeftButtonPressed)
-                          || flags.HasFlag (MouseFlags.MiddleButtonPressed)
-                          || flags.HasFlag (MouseFlags.RightButtonPressed));
+        bool isDrag = flags.FastHasFlags (MouseFlags.PositionReport)
+                      && (flags.FastHasFlags (MouseFlags.LeftButtonPressed)
+                          || flags.FastHasFlags (MouseFlags.MiddleButtonPressed)
+                          || flags.FastHasFlags (MouseFlags.RightButtonPressed));
 
         if (isDrag)
         {
@@ -150,9 +150,9 @@ public static class AnsiMouseEncoder
         }
 
         // Add modifiers
-        bool hasAlt = flags.HasFlag (MouseFlags.Alt);
-        bool hasCtrl = flags.HasFlag (MouseFlags.Ctrl);
-        bool hasShift = flags.HasFlag (MouseFlags.Shift);
+        bool hasAlt = flags.FastHasFlags (MouseFlags.Alt);
+        bool hasCtrl = flags.FastHasFlags (MouseFlags.Ctrl);
+        bool hasShift = flags.FastHasFlags (MouseFlags.Shift);
 
         // Standard modifier encoding: Alt=+8, Ctrl=+16
         if (hasAlt)
@@ -174,7 +174,7 @@ public static class AnsiMouseEncoder
 
         if (hasShift)
         {
-            if (flags.HasFlag (MouseFlags.PositionReport))
+            if (flags.FastHasFlags (MouseFlags.PositionReport))
             {
                 // Position report with shift
                 buttonCode = 36 + baseButton; // Base for motion+shift
@@ -214,10 +214,10 @@ public static class AnsiMouseEncoder
     private static char GetTerminator (MouseFlags flags)
     {
         // Release events use 'm', press/wheel/motion use 'M'
-        if (flags.HasFlag (MouseFlags.LeftButtonReleased)
-            || flags.HasFlag (MouseFlags.MiddleButtonReleased)
-            || flags.HasFlag (MouseFlags.RightButtonReleased)
-            || flags.HasFlag (MouseFlags.Button4Released))
+        if (flags.FastHasFlags (MouseFlags.LeftButtonReleased)
+            || flags.FastHasFlags (MouseFlags.MiddleButtonReleased)
+            || flags.FastHasFlags (MouseFlags.RightButtonReleased)
+            || flags.FastHasFlags (MouseFlags.Button4Released))
         {
             return 'm';
         }

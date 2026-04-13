@@ -438,6 +438,21 @@ public interface IApplication : IDisposable
     IDriver? Driver { get; set; }
 
     /// <summary>
+    ///     Gets or sets the ANSI startup readiness gate.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When set, startup rendering can be deferred until required ANSI startup capability
+    ///         probes complete (or time out). When <see langword="null"/>, startup rendering proceeds
+    ///         immediately.
+    ///     </para>
+    ///     <para>
+    ///         Tests and inline app mode can assign a gate instance to opt into this behavior.
+    ///     </para>
+    /// </remarks>
+    AnsiStartupGate? AnsiStartupGate { get; set; }
+
+    /// <summary>
     ///     Gets the clipboard for this application instance.
     /// </summary>
     /// <remarks>
@@ -453,6 +468,21 @@ public interface IApplication : IDisposable
     ///     specified, the driver is selected based on the platform.
     /// </summary>
     string ForceDriver { get; set; }
+
+    /// <summary>
+    ///     Gets or sets how the application interacts with the terminal buffer.
+    ///     <see cref="AppModel.FullScreen"/> uses the alternate screen buffer (default).
+    ///     <see cref="AppModel.Inline"/> renders inline in the primary scrollback buffer.
+    /// </summary>
+    AppModel AppModel { get; set; }
+
+    /// <summary>
+    ///     Gets or sets an override for the initial cursor position used in <see cref="AppModel.Inline"/> mode.
+    ///     When set (non-null) before <see cref="Run{T}"/>, this value is used instead of
+    ///     querying the terminal via ANSI CPR. Useful for testing inline mode at specific cursor positions.
+    ///     The <c>Y</c> component specifies the terminal row; <c>X</c> is reserved for future use.
+    /// </summary>
+    Point? ForceInlinePosition { get; set; }
 
     /// <summary>
     ///     Gets or sets the size of the screen. By default, this is the size of the screen as reported by the

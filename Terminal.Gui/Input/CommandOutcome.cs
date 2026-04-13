@@ -25,7 +25,7 @@ public enum CommandOutcome
 /// <summary>
 ///     Provides extension methods for converting between <see cref="CommandOutcome"/> and <c>bool?</c>.
 /// </summary>
-public static class CommandOutcomeExtensions
+public static partial class CommandOutcomeExtensions
 {
     /// <summary>
     ///     Converts a <see cref="CommandOutcome"/> to a nullable boolean for backward compatibility.

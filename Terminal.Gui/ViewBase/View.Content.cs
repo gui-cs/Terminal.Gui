@@ -391,7 +391,7 @@ public partial class View
 
         void ApplySettings (ref Rectangle newViewport)
         {
-            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowXGreaterThanContentWidth))
+            if (!ViewportSettings.FastHasFlags (ViewportSettingsFlags.AllowXGreaterThanContentWidth))
             {
                 if (newViewport.X >= GetContentSize ().Width)
                 {
@@ -399,7 +399,7 @@ public partial class View
                 }
             }
 
-            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowXPlusWidthGreaterThanContentWidth))
+            if (!ViewportSettings.FastHasFlags (ViewportSettingsFlags.AllowXPlusWidthGreaterThanContentWidth))
             {
                 if (newViewport.X + newViewport.Width > GetContentSize ().Width)
                 {
@@ -408,7 +408,7 @@ public partial class View
             }
 
             // IMPORTANT: Check for negative location AFTER checking for location greater than content size
-            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeX))
+            if (!ViewportSettings.FastHasFlags (ViewportSettingsFlags.AllowNegativeX))
             {
                 if (newViewport.X < 0)
                 {
@@ -416,7 +416,7 @@ public partial class View
                 }
             }
 
-            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeXWhenWidthGreaterThanContentWidth))
+            if (!ViewportSettings.FastHasFlags (ViewportSettingsFlags.AllowNegativeXWhenWidthGreaterThanContentWidth))
             {
                 if (Viewport.Width > GetContentSize ().Width)
                 {
@@ -424,7 +424,7 @@ public partial class View
                 }
             }
 
-            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowYGreaterThanContentHeight))
+            if (!ViewportSettings.FastHasFlags (ViewportSettingsFlags.AllowYGreaterThanContentHeight))
             {
                 if (newViewport.Y >= GetContentSize ().Height)
                 {
@@ -432,7 +432,7 @@ public partial class View
                 }
             }
 
-            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowYPlusHeightGreaterThanContentHeight))
+            if (!ViewportSettings.FastHasFlags (ViewportSettingsFlags.AllowYPlusHeightGreaterThanContentHeight))
             {
                 if (newViewport.Y + newViewport.Height > GetContentSize ().Height)
                 {
@@ -441,7 +441,7 @@ public partial class View
             }
 
             // IMPORTANT: Check for negative location AFTER checking for location greater than content size
-            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeY))
+            if (!ViewportSettings.FastHasFlags (ViewportSettingsFlags.AllowNegativeY))
             {
                 if (newViewport.Y < 0)
                 {
@@ -449,7 +449,7 @@ public partial class View
                 }
             }
 
-            if (!ViewportSettings.HasFlag (ViewportSettingsFlags.AllowNegativeYWhenHeightGreaterThanContentHeight))
+            if (!ViewportSettings.FastHasFlags (ViewportSettingsFlags.AllowNegativeYWhenHeightGreaterThanContentHeight))
             {
                 if (Viewport.Height > GetContentSize ().Height)
                 {

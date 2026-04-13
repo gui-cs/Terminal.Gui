@@ -205,7 +205,7 @@ public partial class View // Drawing APIs
 
     internal void DoClearViewport (DrawContext? context = null)
     {
-        if (!NeedsDraw || ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent) || OnClearingViewport ())
+        if (!NeedsDraw || ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent) || OnClearingViewport ())
         {
             return;
         }
@@ -272,7 +272,7 @@ public partial class View // Drawing APIs
         // Get screen-relative coords
         Rectangle toClear = ViewportToScreen (Viewport with { Location = new Point (0, 0) });
 
-        if (ViewportSettings.HasFlag (ViewportSettingsFlags.ClearContentOnly))
+        if (ViewportSettings.FastHasFlags (ViewportSettingsFlags.ClearContentOnly))
         {
             Rectangle visibleContent = ViewportToScreen (new Rectangle (new Point (-Viewport.X, -Viewport.Y), GetContentSize ()));
             toClear = Rectangle.Intersect (toClear, visibleContent);
@@ -455,7 +455,7 @@ public partial class View // Drawing APIs
     ///             FillRect (rect2, Glyphs.BlackCircle);
     ///             
     ///             // Report drawn region in screen-relative coordinates for transparency
-    ///             if (ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent))
+    ///             if (ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent))
     ///             {
     ///                 Region drawnRegion = new Region (ViewportToScreen (rect1));
     ///                 drawnRegion.Union (ViewportToScreen (rect2));
@@ -576,7 +576,7 @@ public partial class View // Drawing APIs
                 continue;
             }
 
-            if (view.Arrangement.HasFlag (ViewArrangement.Overlapped))
+            if (view.Arrangement.FastHasFlags (ViewArrangement.Overlapped))
             {
                 // Overlapped views: resolve independently so their lines don't
                 // auto-join with other Z-levels. Deferred for painters' algorithm
@@ -688,10 +688,10 @@ public partial class View // Drawing APIs
         Margin.UpdateCachedDrawnRegion (null);
         Padding.UpdateCachedDrawnRegion (null);
 
-        bool marginTransparent = Margin.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
-        bool borderTransparent = Border.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
-        bool paddingTransparent = Padding.ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
-        bool viewTransparent = ViewportSettings.HasFlag (ViewportSettingsFlags.Transparent);
+        bool marginTransparent = Margin.ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent);
+        bool borderTransparent = Border.ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent);
+        bool paddingTransparent = Padding.ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent);
+        bool viewTransparent = ViewportSettings.FastHasFlags (ViewportSettingsFlags.Transparent);
 
         if (!marginTransparent && !borderTransparent && !paddingTransparent && !viewTransparent)
         {
@@ -702,7 +702,7 @@ public partial class View // Drawing APIs
             context?.AddDrawnRectangle (fullFrame);
 
             // Cache for TransparentMouse hit-testing (opaque = entire frame).
-            if (ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+            if (ViewportSettings.FastHasFlags (ViewportSettingsFlags.TransparentMouse))
             {
                 CachedDrawnRegion = new Region (fullFrame);
             }
@@ -765,7 +765,7 @@ public partial class View // Drawing APIs
         // Uses _localDrawContext (per-view) rather than the shared context, so that only
         // cells THIS view drew (text + content) are captured — not the SuperView's
         // ClearViewport fill or peer SubViews' content.
-        if (ViewportSettings.HasFlag (ViewportSettingsFlags.TransparentMouse))
+        if (ViewportSettings.FastHasFlags (ViewportSettingsFlags.TransparentMouse))
         {
             if (viewTransparent || borderTransparent)
             {

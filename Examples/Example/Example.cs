@@ -5,9 +5,9 @@
 
 using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
+using Terminal.Gui.Input;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
-using Terminal.Gui.Input;
 
 // Override the default configuration for the application to use the Amber Phosphor theme
 ConfigurationManager.RuntimeConfig = """{ "Theme": "Amber Phosphor" }""";

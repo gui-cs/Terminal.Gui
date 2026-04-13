@@ -666,7 +666,7 @@ public partial class TableView : View, IDesignable
         return colStyle is { } ? colStyle.GetRepresentation (value) : value.ToString () ?? string.Empty;
     }
 
-    private bool HasControlOrAlt (Mouse me) => me.Flags.HasFlag (MouseFlags.Alt) || me.Flags.HasFlag (MouseFlags.Ctrl);
+    private bool HasControlOrAlt (Mouse me) => me.Flags.FastHasFlags (MouseFlags.Alt) || me.Flags.FastHasFlags (MouseFlags.Ctrl);
 
     /// <summary>
     ///     Returns true if the given <paramref name="columnIndex"/> indexes a visible column otherwise false.  Returns
@@ -872,8 +872,8 @@ public partial class TableView : View, IDesignable
             && key != KeyBindings.GetFirstFromCommands (Command.Accept)
             && key != CellActivationKey
             && CollectionNavigator.Matcher.IsCompatibleKey (key)
-            && !key.KeyCode.HasFlag (KeyCode.CtrlMask)
-            && !key.KeyCode.HasFlag (KeyCode.AltMask)
+            && !key.KeyCode.FastHasFlags (KeyCode.CtrlMask)
+            && !key.KeyCode.FastHasFlags (KeyCode.AltMask)
             && Rune.IsLetterOrDigit ((Rune)key))
         {
             return CycleToNextTableEntryBeginningWith (key);

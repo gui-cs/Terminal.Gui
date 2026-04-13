@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Reflection;
+using Terminal.Gui;
 
 namespace UICatalog.Scenarios;
 
@@ -56,7 +57,7 @@ public sealed class KeyBindings : Scenario
         {
             Title = "All _View Types",
             BorderStyle = LineStyle.Double,
-            X = Pos.Func (_ => Math.Max (appBindingsListView.Frame.Width, viewBindingsListView.Frame.Width)),
+            X = Pos.Right (viewBindingsListView),
             Width = Dim.Auto (),
             Height = Dim.Fill (),
             CanFocus = true,
@@ -66,30 +67,28 @@ public sealed class KeyBindings : Scenario
 
         appWindow.Add (viewClassListView);
 
-        _focusedBindingsListView = new ()
+        _focusedBindingsListView = new ListView
         {
             Title = "View Bindings",
             BorderStyle = LineStyle.Single,
             Y = 0,
             X = Pos.Right (viewClassListView),
-            Width = Dim.Auto (),
-            Height = Dim.Percent (50),
+            Width = Dim.Fill (),
+            Height = Dim.Percent (70),
             CanFocus = true,
-            Source = new ListWrapper<string> (_focusedBindings),
-            ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar
+            Source = new ListWrapper<string> (_focusedBindings)
         };
 
-        _hotkeyBindingsListView = new ()
+        _hotkeyBindingsListView = new ListView
         {
             Title = "_HotKey Bindings",
             BorderStyle = LineStyle.Single,
-            X = Pos.Right (viewClassListView),
+            X = Pos.Left (_focusedBindingsListView),
             Y = Pos.Bottom (_focusedBindingsListView),
-            Width = Dim.Auto (),
+            Width = Dim.Fill (),
             Height = Dim.Fill (),
             CanFocus = true,
-            Source = new ListWrapper<string> (_hotkeyBindings),
-            ViewportSettings = ViewportSettingsFlags.HasVerticalScrollBar
+            Source = new ListWrapper<string> (_hotkeyBindings)
         };
 
         appWindow.Add (_focusedBindingsListView, _hotkeyBindingsListView);
@@ -105,12 +104,13 @@ public sealed class KeyBindings : Scenario
 
                                             string selectedName = viewClassNames [args.NewValue.Value];
 
-                                            if (viewClasses.TryGetValue (selectedName, out Type selectedType))
+                                            if (!viewClasses.TryGetValue (selectedName, out Type selectedType))
                                             {
-                                                _focusedBindingsListView.Title = $"{selectedName} Bindings";
-                                                _hotkeyBindingsListView.Title = $"{selectedName} HotKey Bindings";
-                                                PopulateBindingsForType (selectedType, selectedName);
+                                                return;
                                             }
+                                            _focusedBindingsListView.Title = $"{selectedName} Bindings";
+                                            _hotkeyBindingsListView.Title = $"{selectedName} HotKey Bindings";
+                                            PopulateBindingsForType (selectedType, selectedName);
                                         };
 
         // Select the first view type to populate bindings
@@ -137,7 +137,7 @@ public sealed class KeyBindings : Scenario
         _hotkeyBindings.Clear ();
         _focusedBindings.Clear ();
 
-        View view = null;
+        View view;
 
         try
         {
@@ -215,7 +215,7 @@ public sealed class KeyBindings : Scenario
     ///     Formats a <see cref="PlatformKeyBinding"/> dictionary for display, one line per key.
     ///     Each line: "CommandName   KeyString (Platform)"
     /// </summary>
-    private static ObservableCollection<string> FormatDefaultKeyBindings (Dictionary<Command, Terminal.Gui.PlatformKeyBinding> dict)
+    private static ObservableCollection<string> FormatDefaultKeyBindings (Dictionary<Command, PlatformKeyBinding> dict)
     {
         ObservableCollection<string> items = [];
 
@@ -224,10 +224,9 @@ public sealed class KeyBindings : Scenario
             return items;
         }
 
-        foreach (KeyValuePair<Command, Terminal.Gui.PlatformKeyBinding> entry in dict)
+        foreach ((Command command, PlatformKeyBinding pkb) in dict)
         {
-            string cmd = entry.Key.ToString ();
-            Terminal.Gui.PlatformKeyBinding pkb = entry.Value;
+            string cmd = command.ToString ();
 
             foreach (Key key in pkb.All ?? [])
             {
@@ -267,11 +266,11 @@ public sealed class KeyBindings : Scenario
         types.Add (typeof (View));
 
         return types
-               .Where (canSatisfyGenericConstraints)
-               .OrderBy (t => getFormattedTypeName (t))
-               .ToDictionary (t => getFormattedTypeName (t), t => t);
+               .Where (CanSatisfyGenericConstraints)
+               .OrderBy (GetFormattedTypeName)
+               .ToDictionary (GetFormattedTypeName, t => t);
 
-        static string getFormattedTypeName (Type type)
+        static string GetFormattedTypeName (Type type)
         {
             if (!type.IsGenericType)
             {
@@ -284,7 +283,7 @@ public sealed class KeyBindings : Scenario
             return $"{baseName}<{string.Join (", ", typeParams)}>";
         }
 
-        static bool canSatisfyGenericConstraints (Type type)
+        static bool CanSatisfyGenericConstraints (Type type)
         {
             if (!type.IsGenericType)
             {

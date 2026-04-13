@@ -206,8 +206,9 @@ public class OptionSelectorTests
         Assert.Equal (CheckState.UnChecked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option1").Value);
     }
 
+    // Copilot
     [Fact]
-    public void Key_Space_On_Activated_Cycles ()
+    public void Key_Space_On_Activated_Does_Nothing ()
     {
         OptionSelector optionSelector = new ();
         List<string> options = ["Option1", "Option2"];
@@ -219,11 +220,12 @@ public class OptionSelectorTests
         Assert.Equal (0, optionSelector.Value);
         Assert.Equal (CheckState.Checked, checkBox.Value);
 
+        // Space on an already-selected option is a no-op (no cycling)
         checkBox.NewKeyDownEvent (Key.Space);
 
-        Assert.Equal (1, optionSelector.Value);
-        Assert.Equal (CheckState.UnChecked, checkBox.Value);
-        Assert.Equal (CheckState.Checked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option2").Value);
+        Assert.Equal (0, optionSelector.Value);
+        Assert.Equal (CheckState.Checked, checkBox.Value);
+        Assert.Equal (CheckState.UnChecked, optionSelector.SubViews.OfType<CheckBox> ().First (cb => cb.Title == "Option2").Value);
     }
 
     [Fact]
@@ -482,8 +484,8 @@ public class OptionSelectorTests
         Assert.True (checkBoxes [1].HasFocus);
     }
 
-    // Claude - Opus 4.6
-    // Per OptionSelector spec: Space key cycles to next option
+    // Copilot
+    // Programmatic Activate on OptionSelector (no CheckBox source) cycles to next option
     [Fact]
     public void OptionSelector_Command_Activate_ForwardsToFocusedCheckBox ()
     {
@@ -495,7 +497,7 @@ public class OptionSelectorTests
 
         Assert.Equal (0, optionSelector.Value);
 
-        // Activate should DispatchDown to the focused CheckBox, triggering Cycle
+        // Activate without a CheckBox source cycles (same as HotKey)
         optionSelector.InvokeCommand (Command.Activate);
 
         Assert.Equal (1, optionSelector.Value);

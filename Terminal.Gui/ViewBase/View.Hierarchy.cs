@@ -722,7 +722,7 @@ public partial class View // SuperView/SubView hierarchy management (SuperView, 
     /// <param name="subview">The subview to move.</param>
     public void MoveSubViewToEnd (View subview)
     {
-        if (Arrangement.HasFlag (ViewArrangement.Overlapped))
+        if (Arrangement.FastHasFlags (ViewArrangement.Overlapped))
         {
             PerformActionForSubView (subview,
                                      x =>

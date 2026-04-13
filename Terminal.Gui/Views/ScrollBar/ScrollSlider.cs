@@ -284,7 +284,7 @@ public sealed class ScrollSlider : View, IOrientation, IDesignable
             return false;
         }
 
-        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed) && _lastLocation == -1)
+        if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed) && _lastLocation == -1)
         {
             if (App is { } && App.Mouse.IsGrabbed (this))
             {

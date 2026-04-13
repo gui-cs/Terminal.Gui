@@ -44,7 +44,31 @@ internal class DriverImpl : IDriver
                        IOutputBuffer outputBuffer,
                        IOutput output,
                        AnsiRequestScheduler ansiRequestScheduler,
-                       ISizeMonitor sizeMonitor)
+                       ISizeMonitor sizeMonitor) : this (componentFactory,
+                                                         inputProcessor,
+                                                         outputBuffer,
+                                                         output,
+                                                         ansiRequestScheduler,
+                                                         sizeMonitor,
+                                                         null) { }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="DriverImpl"/> class.
+    /// </summary>
+    /// <param name="componentFactory">The component factory that created the driver components.</param>
+    /// <param name="inputProcessor">The input processor for handling keyboard and mouse events.</param>
+    /// <param name="outputBuffer">The output buffer for managing screen state.</param>
+    /// <param name="output">The output interface for rendering to the console.</param>
+    /// <param name="ansiRequestScheduler">The scheduler for managing ANSI escape sequence requests.</param>
+    /// <param name="sizeMonitor">The monitor for tracking terminal size changes.</param>
+    /// <param name="ansiStartupGate">Optional startup-readiness gate for ANSI capability queries.</param>
+    public DriverImpl (IComponentFactory componentFactory,
+                       IInputProcessor inputProcessor,
+                       IOutputBuffer outputBuffer,
+                       IOutput output,
+                       AnsiRequestScheduler ansiRequestScheduler,
+                       ISizeMonitor sizeMonitor,
+                       IAnsiStartupGate? ansiStartupGate)
     {
         _componentFactory = componentFactory;
         _inputProcessor = inputProcessor;
@@ -56,6 +80,8 @@ internal class DriverImpl : IDriver
         _ansiRequestScheduler = ansiRequestScheduler;
         _sizeMonitor = sizeMonitor;
         _sizeMonitor.SizeChanged += OnSizeMonitorOnSizeChanged;
+        _terminalSize = new Size (outputBuffer.Cols, outputBuffer.Rows);
+        AnsiStartupGate = ansiStartupGate;
 
         CreateClipboard ();
 
@@ -86,14 +112,6 @@ internal class DriverImpl : IDriver
 
     /// <inheritdoc/>
     public string? GetName () => _componentFactory.GetDriverName ();
-
-    /// <inheritdoc/>
-    public virtual string GetVersionInfo ()
-    {
-        string? driverName = GetName ();
-
-        return $"{driverName} driver";
-    }
 
     /// <inheritdoc/>
     public void Suspend ()
@@ -141,6 +159,9 @@ internal class DriverImpl : IDriver
     private readonly ISizeMonitor _sizeMonitor;
 
     /// <inheritdoc/>
+    public IAnsiStartupGate? AnsiStartupGate { get; }
+
+    /// <inheritdoc/>
     public IClipboard? Clipboard { get; set; } = new FakeClipboard ();
 
     private void CreateClipboard ()
@@ -165,16 +186,39 @@ internal class DriverImpl : IDriver
 
     #region Screen and Display
 
+    private Size _terminalSize;
+
     /// <inheritdoc/>
-    public Rectangle Screen => new (0, 0, _outputBuffer.Cols, _outputBuffer.Rows);
+    public Rectangle Screen => new (0, 0, _terminalSize.Width, _terminalSize.Height);
 
     /// <inheritdoc/>
     public virtual void SetScreenSize (int width, int height)
     {
         Trace.Lifecycle (nameof (DriverImpl), "SetScreenSize", $"{width}×{height}");
-        _outputBuffer.SetSize (width, height);
+        _terminalSize = new Size (width, height);
+
+        // Always update the output's knowledge of terminal size
         _output.SetSize (width, height);
+
+        // In inline mode, the output buffer is sized to App.Screen (the inline region),
+        // not the full terminal. Only resize the buffer in fullscreen mode.
+        if (AppModel != AppModel.Inline)
+        {
+            _outputBuffer.SetSize (width, height);
+        }
+
         SizeChanged?.Invoke (this, new SizeChangedEventArgs (new Size (width, height)));
+    }
+
+    /// <summary>
+    ///     Resizes the output buffer independently of the terminal size.
+    ///     Used in inline mode where the buffer represents the inline rendering region
+    ///     (<see cref="IApplication.Screen"/>), not the full terminal.
+    /// </summary>
+    internal void ResizeOutputBuffer (int width, int height)
+    {
+        Trace.Lifecycle (nameof (DriverImpl), "ResizeOutputBuffer", $"{width}×{height}");
+        _outputBuffer.SetSize (width, height);
     }
 
     /// <inheritdoc/>
@@ -182,7 +226,7 @@ internal class DriverImpl : IDriver
 
     private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e)
     {
-        Trace.Lifecycle (nameof (DriverImpl), "OnSizeMonitorOnSizeChanged", $"{e.Size?.Width}×{e.Size?.Height}");
+        // Trace.Lifecycle (nameof (DriverImpl), "OnSizeMonitorOnSizeChanged", $"{e.Size?.Width}×{e.Size?.Height}");
         SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
     }
 
@@ -197,6 +241,12 @@ internal class DriverImpl : IDriver
 
     /// <inheritdoc/>
     public int Top { get => _outputBuffer.Top; set => _outputBuffer.Top = value; }
+
+    /// <inheritdoc/>
+    public Point InlinePosition { get; set; }
+
+    /// <inheritdoc/>
+    public AppModel AppModel { get; set; }
 
     #endregion Screen and Display
 
@@ -364,25 +414,14 @@ internal class DriverImpl : IDriver
 
     #region Input Events
 
-    /// <summary>
-    ///     Gets the detected kitty keyboard protocol state for the current driver instance.
-    /// </summary>
-    internal KittyKeyboardProtocolResult KittyKeyboardProtocol { get; private set; } = new ();
+    /// <inheritdoc/>
+    public KittyKeyboardCapabilities? KittyKeyboardCapabilities { get; private set; }
 
     /// <summary>
-    ///     Stores the latest kitty keyboard protocol detection result.
+    ///     Stores the detected kitty keyboard protocol capabilities.
     /// </summary>
-    /// <param name="result">The detected kitty keyboard protocol result.</param>
-    internal void SetKittyKeyboardProtocol (KittyKeyboardProtocolResult result) => KittyKeyboardProtocol = result;
-
-    /// <summary>
-    ///     Stores the kitty keyboard flags currently enabled on the terminal.
-    /// </summary>
-    /// <param name="enabledFlags">The kitty keyboard flags currently enabled.</param>
-    internal void SetKittyKeyboardEnabledFlags (KittyKeyboardFlags enabledFlags)
-    {
-        KittyKeyboardProtocol.EnabledFlags = enabledFlags;
-    }
+    /// <param name="capabilities">The detected kitty keyboard capabilities.</param>
+    internal void SetKittyKeyboardCapabilities (KittyKeyboardCapabilities capabilities) => KittyKeyboardCapabilities = capabilities;
 
     /// <summary>Event fired when a key is pressed down.</summary>
     public event EventHandler<Key>? KeyDown;

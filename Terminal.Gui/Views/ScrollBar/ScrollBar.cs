@@ -604,24 +604,24 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
         if (Orientation == Orientation.Vertical)
         {
-            if (mouse.Flags.HasFlag (MouseFlags.WheeledDown))
+            if (mouse.Flags.FastHasFlags (MouseFlags.WheeledDown))
             {
                 Value += Increment;
             }
 
-            if (mouse.Flags.HasFlag (MouseFlags.WheeledUp))
+            if (mouse.Flags.FastHasFlags (MouseFlags.WheeledUp))
             {
                 Value -= Increment;
             }
         }
         else
         {
-            if (mouse.Flags.HasFlag (MouseFlags.WheeledRight))
+            if (mouse.Flags.FastHasFlags (MouseFlags.WheeledRight))
             {
                 Value += Increment;
             }
 
-            if (mouse.Flags.HasFlag (MouseFlags.WheeledLeft))
+            if (mouse.Flags.FastHasFlags (MouseFlags.WheeledLeft))
             {
                 Value -= Increment;
             }

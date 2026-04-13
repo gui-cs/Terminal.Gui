@@ -1,4 +1,5 @@
-﻿#nullable enable
+﻿// ReSharper disable AccessToDisposedClosure
+#nullable enable
 
 namespace UICatalog.Scenarios;
 
@@ -157,7 +158,7 @@ public sealed class Selectors : Scenario
         flagSelectorsFrame.Add (label, flagSelectorT);
         flagSelectorT.ValueChanged += (_, a) => { View.Diagnostics = (ViewDiagnosticFlags)a.Value!; };
 
-        optionSelectorsFrame.Width = Dim.Func (view => (appWindow.Viewport.Width - eventLog.Frame.Width) / 2);
+        optionSelectorsFrame.Width = Dim.Func (_ => (appWindow.Viewport.Width - eventLog.Frame.Width) / 2);
 
         appWindow.Add (orientationSelector,
                        stylesSelector,

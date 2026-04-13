@@ -227,56 +227,56 @@ internal class WindowsInputProcessor : InputProcessorImpl<InputRecord>
         var controlKeyState = WindowsConsole.ControlKeyState.NoControlKeyPressed;
 
         // Convert button states
-        if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+        if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed))
         {
             buttonState |= WindowsConsole.ButtonState.Button1Pressed;
         }
 
-        if (mouse.Flags.HasFlag (MouseFlags.MiddleButtonPressed))
+        if (mouse.Flags.FastHasFlags (MouseFlags.MiddleButtonPressed))
         {
             buttonState |= WindowsConsole.ButtonState.Button2Pressed;
         }
 
-        if (mouse.Flags.HasFlag (MouseFlags.RightButtonPressed))
+        if (mouse.Flags.FastHasFlags (MouseFlags.RightButtonPressed))
         {
             buttonState |= WindowsConsole.ButtonState.Button3Pressed;
         }
 
-        if (mouse.Flags.HasFlag (MouseFlags.Button4Pressed))
+        if (mouse.Flags.FastHasFlags (MouseFlags.Button4Pressed))
         {
             buttonState |= WindowsConsole.ButtonState.Button4Pressed;
         }
 
         // Convert mouse wheel events
-        if (mouse.Flags.HasFlag (MouseFlags.WheeledUp))
+        if (mouse.Flags.FastHasFlags (MouseFlags.WheeledUp))
         {
             eventFlags = WindowsConsole.EventFlags.MouseWheeled;
             buttonState = (WindowsConsole.ButtonState)0x00780000; // Positive value for wheel up
         }
-        else if (mouse.Flags.HasFlag (MouseFlags.WheeledDown))
+        else if (mouse.Flags.FastHasFlags (MouseFlags.WheeledDown))
         {
             eventFlags = WindowsConsole.EventFlags.MouseWheeled;
             buttonState = (WindowsConsole.ButtonState)unchecked((int)0xFF880000); // Negative value for wheel down
         }
 
         // Convert movement flag
-        if (mouse.Flags.HasFlag (MouseFlags.PositionReport))
+        if (mouse.Flags.FastHasFlags (MouseFlags.PositionReport))
         {
             eventFlags |= WindowsConsole.EventFlags.MouseMoved;
         }
 
         // Convert modifier keys
-        if (mouse.Flags.HasFlag (MouseFlags.Alt))
+        if (mouse.Flags.FastHasFlags (MouseFlags.Alt))
         {
             controlKeyState |= WindowsConsole.ControlKeyState.LeftAltPressed;
         }
 
-        if (mouse.Flags.HasFlag (MouseFlags.Ctrl))
+        if (mouse.Flags.FastHasFlags (MouseFlags.Ctrl))
         {
             controlKeyState |= WindowsConsole.ControlKeyState.LeftControlPressed;
         }
 
-        if (mouse.Flags.HasFlag (MouseFlags.Shift))
+        if (mouse.Flags.FastHasFlags (MouseFlags.Shift))
         {
             controlKeyState |= WindowsConsole.ControlKeyState.ShiftPressed;
         }

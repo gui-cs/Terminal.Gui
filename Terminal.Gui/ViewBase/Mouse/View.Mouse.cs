@@ -737,7 +737,7 @@ public partial class View // Mouse APIs
         if (position is { } pos && Viewport.Contains (pos))
         {
             // The mouse is inside the viewport
-            if (MouseHighlightStates.HasFlag (MouseState.Pressed))
+            if (MouseHighlightStates.FastHasFlags (MouseState.Pressed))
             {
                 MouseState |= MouseState.Pressed;
             }
@@ -750,7 +750,7 @@ public partial class View // Mouse APIs
             // The mouse is outside the viewport
             // When MouseHoldRepeat is set we want to keep the mouse state as pressed (e.g., a repeating button).
             // This shows the user that the button is doing something, even if the mouse is outside the Viewport.
-            if (MouseHighlightStates.HasFlag (MouseState.PressedOutside) && !MouseHoldRepeat.HasValue)
+            if (MouseHighlightStates.FastHasFlags (MouseState.PressedOutside) && !MouseHoldRepeat.HasValue)
             {
                 MouseState |= MouseState.PressedOutside;
             }

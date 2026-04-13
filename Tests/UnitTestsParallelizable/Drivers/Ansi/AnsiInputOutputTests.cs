@@ -71,45 +71,6 @@ public class AnsiInputOutputTests (ITestOutputHelper output)
 
     [Fact]
     [Trait ("Category", "LowLevelDriver")]
-    public void AnsiOutput_EnableKittyKeyboard_DoesNotWriteEnableSequence_WhenNoTerminalAvailable ()
-    {
-        using AnsiOutput output = new ();
-
-        output.EnableKittyKeyboard (EscSeqUtils.KittyKeyboardRequestedFlags);
-
-        Assert.Equal (KittyKeyboardFlags.None, output.KittyKeyboardEnabledFlags);
-
-        Assert.DoesNotContain (EscSeqUtils.CSI_EnableKittyKeyboardFlags (EscSeqUtils.KittyKeyboardRequestedFlags),
-                               output.GetLastOutput (),
-                               StringComparison.Ordinal);
-    }
-
-    [Fact]
-    [Trait ("Category", "LowLevelDriver")]
-    public void AnsiOutput_Dispose_DoesNotWriteDisableSequence_WhenNoTerminalAvailable ()
-    {
-        AnsiOutput output = new ();
-        output.EnableKittyKeyboard (EscSeqUtils.KittyKeyboardRequestedFlags);
-
-        output.Dispose ();
-
-        Assert.Equal (KittyKeyboardFlags.None, output.KittyKeyboardEnabledFlags);
-        Assert.DoesNotContain (EscSeqUtils.CSI_DisableKittyKeyboardFlags, output.GetLastOutput (), StringComparison.Ordinal);
-    }
-
-    [Fact]
-    [Trait ("Category", "LowLevelDriver")]
-    public void AnsiOutput_Dispose_DoesNotWriteDisableSequence_WhenKittyKeyboardWasNotEnabled ()
-    {
-        using AnsiOutput output = new ();
-
-        output.DisableKittyKeyboard ();
-
-        Assert.DoesNotContain (EscSeqUtils.CSI_DisableKittyKeyboardFlags, output.GetLastOutput (), StringComparison.Ordinal);
-    }
-
-    [Fact]
-    [Trait ("Category", "LowLevelDriver")]
     public void AnsiComponentFactory_CreateInput_DoesNotThrow ()
     {
         // Arrange

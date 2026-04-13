@@ -74,7 +74,7 @@ public class PaddingView : AdornmentView
             return false;
         }
 
-        if (!mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+        if (!mouse.Flags.FastHasFlags (MouseFlags.LeftButtonClicked))
         {
             return false;
         }

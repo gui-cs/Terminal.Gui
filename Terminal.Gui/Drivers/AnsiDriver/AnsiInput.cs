@@ -285,20 +285,21 @@ public class AnsiInput : InputImpl<char>, ITestableInput<char>
     /// </summary>
     private void FlushInput ()
     {
-        // Flush any pending input (Unix only - Windows handles this automatically)
+        // Flush any pending input to prevent protocol sequences from leaking to the shell
 
         try
         {
             switch (_platform)
             {
                 case AnsiPlatform.WindowsVT:
+                    // Flush the Windows console input buffer to prevent Kitty keyboard
+                    // key-release events from leaking into the shell after exit.
+                    _windowsVTInput?.Flush ();
+
                     break;
 
                 case AnsiPlatform.UnixRaw:
                     // On Unix, read with poll until no more data
-                    // Note: On Windows, we skip flushing because the console handles it automatically
-                    // when we restore the console mode, and attempting to flush while shutting down
-                    // can cause ReadFile to block indefinitely.
                     if (_pollMap == null)
                     {
                         return;

@@ -673,7 +673,7 @@ public partial class View // Focus and cross-view navigation management (TabStop
             PreviouslyFocused = null;
         }
 
-        if (Arrangement.HasFlag (ViewArrangement.Overlapped))
+        if (Arrangement.FastHasFlags (ViewArrangement.Overlapped))
         {
             SuperView?.MoveSubViewToEnd (this);
         }
