@@ -1,9 +1,7 @@
 #nullable enable
-using System.Threading;
-
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("OSC 9;4 Progress Indicator", "Demonstrates standalone terminal progress using OSC 9;4 without ProgressBar.")]
+[ScenarioMetadata ("OSC 9;4 Progress Indicator", "Demonstrates standalone terminal progress using OSC 9;4.")]
 [ScenarioCategory ("Progress")]
 public sealed class Osc94ProgressIndicator : Scenario
 {
@@ -22,123 +20,59 @@ public sealed class Osc94ProgressIndicator : Scenario
         app.Init ();
         _app = app;
 
-        using Window appWindow = new ()
-        {
-            Title = GetQuitKeyAndName (),
-            AssignHotKeys = true
-        };
+        using Window appWindow = new ();
+        appWindow.Title = GetQuitKeyAndName ();
+        appWindow.AssignHotKeys = true;
 
         appWindow.IsRunningChanged += Win_IsRunningChanged;
 
-        Label summaryLabel = new ()
-        {
-            X = 1,
-            Y = 1,
-            Text = "Standalone terminal progress demo. No ProgressBar view here."
-        };
+        Label summaryLabel = new () { X = 1, Y = 1, Text = "Standalone terminal progress demo. No ProgressBar view here." };
         appWindow.Add (summaryLabel);
 
         Label terminalLabel = new ()
         {
-            X = 1,
-            Y = Pos.Bottom (summaryLabel),
-            Text = "Use buttons below and watch terminal tab/taskbar progress if host supports OSC 9;4."
+            X = 1, Y = Pos.Bottom (summaryLabel), Text = "Use buttons below and watch terminal tab/taskbar progress if host supports OSC 9;4."
         };
         appWindow.Add (terminalLabel);
 
-        _availabilityLabel = new Label
-        {
-            X = 1,
-            Y = Pos.Bottom (terminalLabel) + 1,
-            Text = BuildAvailabilityText ()
-        };
+        _availabilityLabel = new Label { X = 1, Y = Pos.Bottom (terminalLabel) + 1, Text = BuildAvailabilityText () };
         appWindow.Add (_availabilityLabel);
 
-        _stateLabel = new Label
-        {
-            X = 1,
-            Y = Pos.Bottom (_availabilityLabel) + 1,
-            Text = "State: Cleared"
-        };
+        _stateLabel = new Label { X = 1, Y = Pos.Bottom (_availabilityLabel) + 1, Text = "State: Cleared" };
         appWindow.Add (_stateLabel);
 
-        _valueLabel = new Label
-        {
-            X = 1,
-            Y = Pos.Bottom (_stateLabel),
-            Text = "Value: 0%"
-        };
+        _valueLabel = new Label { X = 1, Y = Pos.Bottom (_stateLabel), Text = "Value: 0%" };
         appWindow.Add (_valueLabel);
 
-        Button startDeterminateButton = new ()
-        {
-            X = 1,
-            Y = Pos.Bottom (_valueLabel) + 2,
-            Text = "Start _Determinate Timer"
-        };
+        Button startDeterminateButton = new () { X = 1, Y = Pos.Bottom (_valueLabel) + 2, Text = "Start _Determinate Timer" };
         startDeterminateButton.Accepting += (_, _) => StartDeterminateTimer ();
         appWindow.Add (startDeterminateButton);
 
-        Button set25Button = new ()
-        {
-            X = Pos.Right (startDeterminateButton) + 2,
-            Y = Pos.Top (startDeterminateButton),
-            Text = "Set _25%"
-        };
+        Button set25Button = new () { X = Pos.Right (startDeterminateButton) + 2, Y = Pos.Top (startDeterminateButton), Text = "Set _25%" };
         set25Button.Accepting += (_, _) => SetDeterminateValue (25);
         appWindow.Add (set25Button);
 
-        Button set50Button = new ()
-        {
-            X = Pos.Right (set25Button) + 2,
-            Y = Pos.Top (set25Button),
-            Text = "Set _50%"
-        };
+        Button set50Button = new () { X = Pos.Right (set25Button) + 2, Y = Pos.Top (set25Button), Text = "Set _50%" };
         set50Button.Accepting += (_, _) => SetDeterminateValue (50);
         appWindow.Add (set50Button);
 
-        Button set75Button = new ()
-        {
-            X = Pos.Right (set50Button) + 2,
-            Y = Pos.Top (set50Button),
-            Text = "Set _75%"
-        };
+        Button set75Button = new () { X = Pos.Right (set50Button) + 2, Y = Pos.Top (set50Button), Text = "Set _75%" };
         set75Button.Accepting += (_, _) => SetDeterminateValue (75);
         appWindow.Add (set75Button);
 
-        Button indeterminateButton = new ()
-        {
-            X = 1,
-            Y = Pos.Bottom (startDeterminateButton) + 1,
-            Text = "Set _Indeterminate"
-        };
+        Button indeterminateButton = new () { X = 1, Y = Pos.Bottom (startDeterminateButton) + 1, Text = "Set _Indeterminate" };
         indeterminateButton.Accepting += (_, _) => SetIndeterminate ();
         appWindow.Add (indeterminateButton);
 
-        Button pausedButton = new ()
-        {
-            X = Pos.Right (indeterminateButton) + 2,
-            Y = Pos.Top (indeterminateButton),
-            Text = "Set _Paused"
-        };
+        Button pausedButton = new () { X = Pos.Right (indeterminateButton) + 2, Y = Pos.Top (indeterminateButton), Text = "Set _Paused" };
         pausedButton.Accepting += (_, _) => SetPaused ();
         appWindow.Add (pausedButton);
 
-        Button errorButton = new ()
-        {
-            X = Pos.Right (pausedButton) + 2,
-            Y = Pos.Top (indeterminateButton),
-            Text = "Set _Error"
-        };
+        Button errorButton = new () { X = Pos.Right (pausedButton) + 2, Y = Pos.Top (indeterminateButton), Text = "Set _Error" };
         errorButton.Accepting += (_, _) => SetError ();
         appWindow.Add (errorButton);
 
-        Button clearButton = new ()
-        {
-            X = Pos.Right (errorButton) + 2,
-            Y = Pos.Top (indeterminateButton),
-            Text = "_Clear"
-        };
+        Button clearButton = new () { X = Pos.Right (errorButton) + 2, Y = Pos.Top (indeterminateButton), Text = "_Clear" };
         clearButton.Accepting += (_, _) => ClearIndicator ();
         appWindow.Add (clearButton);
 
@@ -161,11 +95,12 @@ public sealed class Osc94ProgressIndicator : Scenario
         _progressValue = Math.Min (_progressValue + 5, 100);
         ApplyDeterminateValue ("Determinate timer running");
 
-        if (_progressValue >= 100)
+        if (_progressValue < 100)
         {
-            StopProgressTimer ();
-            UpdateStatus ("Determinate complete");
+            return;
         }
+        StopProgressTimer ();
+        UpdateStatus ("Determinate complete");
     }
 
     private void SetDeterminateValue (int value)
@@ -225,20 +160,11 @@ public sealed class Osc94ProgressIndicator : Scenario
 
     private void UpdateStatus (string state)
     {
-        if (_availabilityLabel is not null)
-        {
-            _availabilityLabel.Text = BuildAvailabilityText ();
-        }
+        _availabilityLabel?.Text = BuildAvailabilityText ();
 
-        if (_stateLabel is not null)
-        {
-            _stateLabel.Text = $"State: {state}";
-        }
+        _stateLabel?.Text = $"State: {state}";
 
-        if (_valueLabel is not null)
-        {
-            _valueLabel.Text = $"Value: {_progressValue}%";
-        }
+        _valueLabel?.Text = $"Value: {_progressValue}%";
     }
 
     private void Win_IsRunningChanged (object? sender, EventArgs<bool> args)
