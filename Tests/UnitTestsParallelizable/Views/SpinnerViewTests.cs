@@ -127,6 +127,20 @@ public class SpinnerViewTests : TestDriverBase
     }
 
     [Fact]
+    public void UseProgressIndicator_SetFalse_WhileAutoSpinTrue_Clears_Indicator ()
+    {
+        DriverImpl driver = (DriverImpl)CreateTestDriver ();
+        driver.ProgressIndicator = new ProgressIndicator (driver);
+        SpinnerView spinner = new () { Driver = driver, UseProgressIndicator = true, AutoSpin = true };
+
+        spinner.UseProgressIndicator = false;
+
+        string output = driver.GetOutput ().GetLastOutput ();
+        Assert.Contains (EscSeqUtils.OSC_SetProgressIndeterminate (), output, StringComparison.Ordinal);
+        Assert.Contains (EscSeqUtils.OSC_ClearProgress (), output, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void EndInit_Syncs_ProgressIndicator_WhenAutoSpin_Already_True ()
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver ();

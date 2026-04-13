@@ -80,6 +80,14 @@ public class SpinnerView : View, IDesignable
                 return;
             }
 
+            if (!value)
+            {
+                ClearProgressIndicator ();
+                _useProgressIndicator = value;
+
+                return;
+            }
+
             _useProgressIndicator = value;
             SyncProgressIndicator ();
         }
