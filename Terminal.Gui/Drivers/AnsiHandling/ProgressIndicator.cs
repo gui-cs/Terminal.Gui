@@ -13,6 +13,7 @@ public class ProgressIndicator
         ArgumentNullException.ThrowIfNull (driver);
         _driver = driver;
     }
+
     /// <summary>
     ///     Gets whether terminal progress escape sequences should be written for the current output stream.
     /// </summary>

@@ -74,8 +74,9 @@ public interface IDriver : IDisposable
     ///     Gets the terminal progress indicator when direct terminal progress output is available.
     /// </summary>
     ProgressIndicator? ProgressIndicator { get; }
-    
-    ///     Gets the ANSI startup readiness gate, if enabled for this driver instance.
+
+    /// <summary>
+    /// Gets the ANSI startup readiness gate, if enabled for this driver instance.
     /// </summary>
     IAnsiStartupGate? AnsiStartupGate { get; }
 
@@ -205,7 +206,8 @@ public interface IDriver : IDisposable
     Attribute CurrentAttribute { get; set; }
 
     /// <summary>
-    ///     Gets or sets the URL that will be associated with cells added via <see cref="AddRune(Rune)"/> or <see cref="AddStr(string)"/>.
+    ///     Gets or sets the URL that will be associated with cells added via <see cref="AddRune(Rune)"/> or
+    ///     <see cref="AddStr(string)"/>.
     ///     When set, subsequent cells will include this URL for OSC 8 hyperlink rendering.
     ///     Set to <see langword="null"/> to stop associating URLs with cells.
     /// </summary>

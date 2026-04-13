@@ -44,13 +44,8 @@ internal class DriverImpl : IDriver
                        IOutputBuffer outputBuffer,
                        IOutput output,
                        AnsiRequestScheduler ansiRequestScheduler,
-                       ISizeMonitor sizeMonitor) : this (componentFactory,
-                                                         inputProcessor,
-                                                         outputBuffer,
-                                                         output,
-                                                         ansiRequestScheduler,
-                                                         sizeMonitor,
-                                                         null) { }
+                       ISizeMonitor sizeMonitor) : this (componentFactory, inputProcessor, outputBuffer, output, ansiRequestScheduler, sizeMonitor, null)
+    { }
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="DriverImpl"/> class.
@@ -196,9 +191,7 @@ internal class DriverImpl : IDriver
 
         Driver.IsAttachedToTerminal (out _, out bool outputAttached);
 
-        if (!ProgressIndicator.IsSupportedOutput (outputAttached,
-                                                  Console.IsOutputRedirected,
-                                                  Environment.GetEnvironmentVariable ("TERM")))
+        if (!ProgressIndicator.IsSupportedOutput (outputAttached, Console.IsOutputRedirected, Environment.GetEnvironmentVariable ("TERM")))
         {
             ProgressIndicator = null;
 
@@ -250,11 +243,10 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public event EventHandler<SizeChangedEventArgs>? SizeChanged;
 
-    private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e)
-    {
+    private void OnSizeMonitorOnSizeChanged (object? _, SizeChangedEventArgs e) =>
+
         // Trace.Lifecycle (nameof (DriverImpl), "OnSizeMonitorOnSizeChanged", $"{e.Size?.Width}×{e.Size?.Height}");
         SetScreenSize (e.Size!.Value.Width, e.Size.Value.Height);
-    }
 
     /// <inheritdoc/>
     public int Cols { get => _outputBuffer.Cols; set => _outputBuffer.Cols = value; }
