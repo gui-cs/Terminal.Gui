@@ -192,12 +192,12 @@ public partial class View
             return;
         }
 
-        SyncOneScrollBar (oldFlags.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar),
-                          newFlags.HasFlag (ViewportSettingsFlags.HasVerticalScrollBar),
+        SyncOneScrollBar (oldFlags.FastHasFlags (ViewportSettingsFlags.HasVerticalScrollBar),
+                          newFlags.FastHasFlags (ViewportSettingsFlags.HasVerticalScrollBar),
                           Orientation.Vertical);
 
-        SyncOneScrollBar (oldFlags.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar),
-                          newFlags.HasFlag (ViewportSettingsFlags.HasHorizontalScrollBar),
+        SyncOneScrollBar (oldFlags.FastHasFlags (ViewportSettingsFlags.HasHorizontalScrollBar),
+                          newFlags.FastHasFlags (ViewportSettingsFlags.HasHorizontalScrollBar),
                           Orientation.Horizontal);
     }
 

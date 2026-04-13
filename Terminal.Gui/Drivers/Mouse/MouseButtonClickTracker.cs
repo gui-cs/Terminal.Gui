@@ -232,10 +232,10 @@ internal class MouseButtonClickTracker (ITimeProvider _timeProvider, TimeSpan _r
     private bool IsPressed (int btn, MouseFlags eFlags) =>
         btn switch
         {
-            0 => eFlags.HasFlag (MouseFlags.LeftButtonPressed),
-            1 => eFlags.HasFlag (MouseFlags.MiddleButtonPressed),
-            2 => eFlags.HasFlag (MouseFlags.RightButtonPressed),
-            3 => eFlags.HasFlag (MouseFlags.Button4Pressed),
+            0 => eFlags.FastHasFlags (MouseFlags.LeftButtonPressed),
+            1 => eFlags.FastHasFlags (MouseFlags.MiddleButtonPressed),
+            2 => eFlags.FastHasFlags (MouseFlags.RightButtonPressed),
+            3 => eFlags.FastHasFlags (MouseFlags.Button4Pressed),
             _ => throw new ArgumentOutOfRangeException (nameof (btn))
         };
 }
