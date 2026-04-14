@@ -2,6 +2,7 @@
 
 using System.Collections.ObjectModel;
 using System.Text.Json;
+// ReSharper disable AccessToDisposedClosure
 
 namespace UICatalog.Scenarios;
 
@@ -20,6 +21,8 @@ public class Markdown : Scenario
     private FrameView? _viewerFrame;
     private Shortcut? _statusShortcut;
     private SpinnerView? _spinner;
+    private NumericUpDown? _contentWidthUpDown;
+    private bool _updatingContentWidth;
 
     private List<DocEntry> _docs = [];
 
@@ -28,12 +31,7 @@ public class Markdown : Scenario
         _app = Application.Create ();
         _app.Init ();
 
-        Window window = new ()
-        {
-            Title = GetName (),
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        Window window = new () { Title = GetName (), Width = Dim.Fill (), Height = Dim.Fill () };
 
         FrameView listFrame = new ()
         {
@@ -44,16 +42,12 @@ public class Markdown : Scenario
             Height = Dim.Fill (1)
         };
 
-        _docList = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        _docList = new ListView { Width = Dim.Fill (), Height = Dim.Fill () };
 
         _docList.ValueChanged += OnDocListValueChanged;
         listFrame.Add (_docList);
 
-        _viewerFrame = new ()
+        _viewerFrame = new FrameView
         {
             Title = "MarkdownView",
             X = Pos.Right (listFrame),
@@ -62,51 +56,84 @@ public class Markdown : Scenario
             Height = Dim.Fill (1)
         };
 
-        _markdownView = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        _markdownView = new MarkdownView { Width = Dim.Fill (), Height = Dim.Fill () };
 
         _markdownView.LinkClicked += (_, e) =>
                                      {
-                                         if (_statusShortcut is { })
-                                         {
-                                             _statusShortcut.Title = e.Url;
-                                         }
+                                         _statusShortcut?.Title = e.Url;
 
                                          e.Handled = true;
                                      };
 
+        // Reset the content width control when the viewport changes
+        _markdownView.ViewportChanged += (_, _) => SyncContentWidthToViewport ();
+
         _viewerFrame.Add (_markdownView);
 
-        _spinner = new ()
-        {
-            AutoSpin = false,
-            Visible = false
-        };
+        _spinner = new SpinnerView { AutoSpin = false, Visible = false };
 
         _spinner.Initialized += (_, _) => _spinner.AutoSpin = true;
 
-        _statusShortcut = new (Key.Empty, "Ready", null);
+        _statusShortcut = new Shortcut (Key.Empty, "Ready", null);
 
         Shortcut spinnerShortcut = new () { CommandView = _spinner, Title = "" };
 
-        StatusBar statusBar = new (
-                                   [
-                                       new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", () => window.RequestStop ()),
+        _contentWidthUpDown = new NumericUpDown { Value = 0 };
+
+        _contentWidthUpDown.ValueChanging += (_, args) =>
+                                             {
+                                                 if (_markdownView is null || _updatingContentWidth)
+                                                 {
+                                                     return;
+                                                 }
+
+                                                 int newWidth = args.NewValue;
+
+                                                 if (newWidth < 1)
+                                                 {
+                                                     args.Handled = true;
+
+                                                     return;
+                                                 }
+
+                                                 Size currentContentSize = _markdownView.GetContentSize ();
+                                                 _markdownView.SetContentSize (currentContentSize with { Width = newWidth });
+                                             };
+
+        Shortcut contentWidthShortcut = new () { CommandView = _contentWidthUpDown, HelpText = "Content Width" };
+
+        StatusBar statusBar = new ([
+                                       new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", window.RequestStop),
                                        _statusShortcut,
+                                       contentWidthShortcut,
                                        spinnerShortcut
                                    ]);
 
         window.Add (listFrame, _viewerFrame, statusBar);
 
-        window.Initialized += (_, _) => _ = LoadDocListAsync ();
+        // Set initial content width value after layout
+        window.Initialized += (_, _) =>
+                              {
+                                  _ = LoadDocListAsync ();
+                                  SyncContentWidthToViewport ();
+                              };
 
         _app.Run (window);
 
         window.Dispose ();
         _app.Dispose ();
+    }
+
+    private void SyncContentWidthToViewport ()
+    {
+        if (_markdownView is null || _contentWidthUpDown is null)
+        {
+            return;
+        }
+
+        _updatingContentWidth = true;
+        _contentWidthUpDown.Value = _markdownView.Viewport.Width;
+        _updatingContentWidth = false;
     }
 
     private async Task LoadDocListAsync ()
@@ -128,7 +155,7 @@ public class Markdown : Scenario
                 string? name = element.GetProperty ("name").GetString ();
                 string? downloadUrl = element.GetProperty ("download_url").GetString ();
 
-                if (name is not null && downloadUrl is not null && name.EndsWith (".md", StringComparison.OrdinalIgnoreCase))
+                if (name is { } && downloadUrl is { } && name.EndsWith (".md", StringComparison.OrdinalIgnoreCase))
                 {
                     entries.Add (new DocEntry (name, downloadUrl));
                 }
@@ -150,10 +177,7 @@ public class Markdown : Scenario
                           {
                               HideSpinner ("Error loading doc list");
 
-                              if (_markdownView is { })
-                              {
-                                  _markdownView.Markdown = $"# Error\n\nFailed to load doc list:\n\n`{ex.Message}`";
-                              }
+                              _markdownView?.Markdown = $"# Error\n\nFailed to load doc list:\n\n`{ex.Message}`";
                           });
         }
     }
@@ -179,15 +203,9 @@ public class Markdown : Scenario
 
             _app?.Invoke (() =>
                           {
-                              if (_markdownView is { })
-                              {
-                                  _markdownView.Markdown = content;
-                              }
+                              _markdownView?.Markdown = content;
 
-                              if (_viewerFrame is { })
-                              {
-                                  _viewerFrame.Title = entry.Name;
-                              }
+                              _viewerFrame?.Title = entry.Name;
 
                               HideSpinner (entry.Name);
                           });
@@ -198,41 +216,24 @@ public class Markdown : Scenario
                           {
                               HideSpinner ("Error");
 
-                              if (_markdownView is { })
-                              {
-                                  _markdownView.Markdown = $"# Error\n\nFailed to load `{entry.Name}`:\n\n`{ex.Message}`";
-                              }
+                              _markdownView?.Markdown = $"# Error\n\nFailed to load `{entry.Name}`:\n\n`{ex.Message}`";
                           });
         }
     }
 
-    private void ShowSpinner (string message)
-    {
+    private void ShowSpinner (string message) =>
         _app?.Invoke (() =>
                       {
-                          if (_spinner is { })
-                          {
-                              _spinner.Visible = true;
-                          }
+                          _spinner?.Visible = true;
 
-                          if (_statusShortcut is { })
-                          {
-                              _statusShortcut.Title = message;
-                          }
+                          _statusShortcut?.Title = message;
                       });
-    }
 
     private void HideSpinner (string message)
     {
-        if (_spinner is { })
-        {
-            _spinner.Visible = false;
-        }
+        _spinner?.Visible = false;
 
-        if (_statusShortcut is { })
-        {
-            _statusShortcut.Title = message;
-        }
+        _statusShortcut?.Title = message;
     }
 
     private sealed record DocEntry (string Name, string DownloadUrl);

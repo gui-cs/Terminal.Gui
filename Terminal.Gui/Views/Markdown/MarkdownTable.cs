@@ -151,46 +151,51 @@ internal sealed class MarkdownTable : View
                 }
 
                 // Draw this line's content (if we have it)
-                if (lineInRow < wrappedLines.Count)
+                if (lineInRow >= wrappedLines.Count)
                 {
-                    List<StyledSegment> lineSegs = wrappedLines [lineInRow];
+                    // Advance past column width + separator character
+                    x += colWidth + 1;
 
-                    // Calculate text width for alignment
-                    var textWidth = 0;
+                    continue;
+                }
 
-                    foreach (StyledSegment seg in lineSegs)
+                List<StyledSegment> lineSegs = wrappedLines [lineInRow];
+
+                // Calculate text width for alignment
+                var textWidth = 0;
+
+                foreach (StyledSegment seg in lineSegs)
+                {
+                    textWidth += seg.Text.GetColumns ();
+                }
+
+                Alignment alignment = col < alignments.Length ? alignments [col] : Alignment.Start;
+                int padLeft = CalculateLeftPadding (colWidth, Math.Min (textWidth, innerWidth), alignment);
+
+                int drawX = x + padLeft;
+
+                foreach (StyledSegment seg in lineSegs)
+                {
+                    Attribute attr = MarkdownAttributeHelper.GetAttributeForSegment (this, seg);
+
+                    if (isHeader)
                     {
-                        textWidth += seg.Text.GetColumns ();
+                        attr = attr with { Style = attr.Style | TextStyle.Bold };
                     }
 
-                    Alignment alignment = col < alignments.Length ? alignments [col] : Alignment.Start;
-                    int padLeft = CalculateLeftPadding (colWidth, Math.Min (textWidth, innerWidth), alignment);
+                    SetAttribute (attr);
 
-                    int drawX = x + padLeft;
-
-                    foreach (StyledSegment seg in lineSegs)
+                    foreach (string grapheme in GraphemeHelper.GetGraphemes (seg.Text))
                     {
-                        Attribute attr = MarkdownAttributeHelper.GetAttributeForSegment (this, seg);
+                        int gw = Math.Max (grapheme.GetColumns (), 1);
 
-                        if (isHeader)
+                        if (drawX - x >= colWidth - 1)
                         {
-                            attr = attr with { Style = attr.Style | TextStyle.Bold };
+                            break;
                         }
 
-                        SetAttribute (attr);
-
-                        foreach (string grapheme in GraphemeHelper.GetGraphemes (seg.Text))
-                        {
-                            int gw = Math.Max (grapheme.GetColumns (), 1);
-
-                            if (drawX - x >= colWidth - 1)
-                            {
-                                break;
-                            }
-
-                            AddStr (drawX, y, grapheme);
-                            drawX += gw;
-                        }
+                        AddStr (drawX, y, grapheme);
+                        drawX += gw;
                     }
                 }
 
@@ -366,63 +371,253 @@ internal sealed class MarkdownTable : View
         return total;
     }
 
-    private static int [] ComputeColumnWidths (TableData data, int maxWidth)
+    /// <summary>
+    ///     Computes column widths using a Rich-style collapse algorithm:
+    ///     <list type="number">
+    ///         <item>Measure each column's min (longest word + padding) and max (full content + padding) widths.</item>
+    ///         <item>If total max fits within <paramref name="maxWidth"/>, use max widths.</item>
+    ///         <item>
+    ///             Otherwise, iteratively collapse the widest column toward the second-widest.
+    ///             Left columns win ties (preserving their width).
+    ///         </item>
+    ///         <item>Never shrink below min width (longest word) if possible.</item>
+    ///         <item>Last resort: reduce all columns evenly if still over budget.</item>
+    ///     </list>
+    /// </summary>
+    internal static int [] ComputeColumnWidths (TableData data, int maxWidth)
     {
-        var widths = new int [data.ColumnCount];
+        int cols = data.ColumnCount;
+        var maxWidths = new int [cols];
+        var minWidths = new int [cols];
 
-        // Start with header widths (strip markdown formatting for measurement)
-        for (var c = 0; c < data.ColumnCount; c++)
+        // Measure max (full content) and min (longest word) for each column
+        for (var c = 0; c < cols; c++)
         {
-            List<InlineRun> runs = MarkdownInlineParser.ParseInlines (data.Headers [c], MarkdownStyleRole.Normal);
-            var textWidth = 0;
-
-            foreach (InlineRun run in runs)
-            {
-                textWidth += run.Text.GetColumns ();
-            }
-
-            widths [c] = Math.Max (textWidth, 1);
+            int headerMax = MeasureRenderedWidth (data.Headers [c]);
+            int headerMin = MeasureLongestWord (data.Headers [c]);
+            maxWidths [c] = headerMax;
+            minWidths [c] = headerMin;
         }
 
-        // Expand to fit body cell content (strip markdown for measurement)
         foreach (string [] row in data.Rows)
         {
-            for (var c = 0; c < data.ColumnCount && c < row.Length; c++)
+            for (var c = 0; c < cols && c < row.Length; c++)
             {
-                List<InlineRun> runs = MarkdownInlineParser.ParseInlines (row [c], MarkdownStyleRole.Normal);
-                var textWidth = 0;
-
-                foreach (InlineRun run in runs)
-                {
-                    textWidth += run.Text.GetColumns ();
-                }
-
-                widths [c] = Math.Max (widths [c], textWidth);
+                int cellMax = MeasureRenderedWidth (row [c]);
+                int cellMin = MeasureLongestWord (row [c]);
+                maxWidths [c] = Math.Max (maxWidths [c], cellMax);
+                minWidths [c] = Math.Max (minWidths [c], cellMin);
             }
         }
 
-        // Add 2 for cell padding (1 space each side)
-        for (var c = 0; c < widths.Length; c++)
+        // Add padding (1 space each side)
+        for (var c = 0; c < cols; c++)
         {
-            widths [c] += 2;
+            maxWidths [c] = Math.Max (maxWidths [c] + 2, 3);
+            minWidths [c] = Math.Max (minWidths [c] + 2, 3);
         }
 
-        // Check if total exceeds maxWidth; if so, shrink proportionally
-        int totalWidth = CalculateTableWidth (widths);
+        // If total max fits, use max widths
+        var widths = (int [])maxWidths.Clone ();
+        int borderChars = cols + 1; // left border + separators + right border
 
-        if (totalWidth > maxWidth && maxWidth > data.ColumnCount * 3 + data.ColumnCount + 1)
+        if (widths.Sum () + borderChars <= maxWidth)
         {
-            int available = maxWidth - data.ColumnCount - 1; // subtract border chars
-            int currentContent = widths.Sum ();
-            double ratio = (double)available / currentContent;
+            return widths;
+        }
+
+        // Iteratively collapse the widest column toward the second-widest (Rich-style).
+        // Left columns win ties: when multiple columns share the max width,
+        // we shrink the rightmost one first.
+        int available = maxWidth - borderChars;
+
+        if (available < cols * 3)
+        {
+            // Not enough room even for minimum columns — give each 3
+            for (var c = 0; c < cols; c++)
+            {
+                widths [c] = 3;
+            }
+
+            return widths;
+        }
+
+        CollapseWidths (widths, minWidths, available);
+
+        // Last resort: if still over budget, reduce all evenly
+        int total = widths.Sum ();
+
+        if (total <= available)
+        {
+            return widths;
+        }
+
+        int excess = total - available;
+        ReduceEvenly (widths, minWidths, excess);
+
+        return widths;
+    }
+
+    /// <summary>
+    ///     Iteratively collapses the widest wrappable column toward the second-widest.
+    ///     When multiple columns tie for widest, the rightmost is reduced first (left-wins).
+    /// </summary>
+    internal static void CollapseWidths (int [] widths, int [] minWidths, int available)
+    {
+        while (widths.Sum () > available)
+        {
+            // Find the widest column (rightmost if tied — left-wins means we shrink right first)
+            var maxVal = 0;
+            int maxIdx = -1;
 
             for (var c = 0; c < widths.Length; c++)
             {
-                widths [c] = Math.Max ((int)(widths [c] * ratio), 3);
+                if (widths [c] < maxVal)
+                {
+                    continue;
+                }
+                maxVal = widths [c];
+                maxIdx = c;
+            }
+
+            if (maxIdx < 0)
+            {
+                break;
+            }
+
+            // Find the second-widest value (excluding columns at maxVal)
+            var secondMax = 0;
+
+            foreach (int t in widths)
+            {
+                if (t < maxVal && t > secondMax)
+                {
+                    secondMax = t;
+                }
+            }
+
+            // Can't reduce below min width
+            int floor = Math.Max (minWidths [maxIdx], secondMax);
+
+            if (floor >= maxVal)
+            {
+                // This column is already at its minimum or can't shrink further.
+                // Try the next widest non-minimum column (scan right-to-left for left-wins).
+                var shrank = false;
+
+                for (int c = widths.Length - 1; c >= 0; c--)
+                {
+                    if (widths [c] <= minWidths [c])
+                    {
+                        continue;
+                    }
+                    widths [c]--;
+                    shrank = true;
+
+                    break;
+                }
+
+                if (!shrank)
+                {
+                    break;
+                }
+
+                continue;
+            }
+
+            // Reduce to the greater of secondMax and min width, but don't overshoot available
+            int excess = widths.Sum () - available;
+            int reduction = Math.Min (maxVal - floor, excess);
+            widths [maxIdx] = maxVal - reduction;
+        }
+    }
+
+    /// <summary>
+    ///     Reduces all columns evenly as a last resort, respecting minimum widths first,
+    ///     then going below minimum (floor at 3) if necessary.
+    /// </summary>
+    private static void ReduceEvenly (int [] widths, int [] minWidths, int excess)
+    {
+        // First pass: reduce above min widths (right-to-left for left-wins)
+        while (excess > 0)
+        {
+            var reduced = false;
+
+            for (int c = widths.Length - 1; c >= 0 && excess > 0; c--)
+            {
+                if (widths [c] <= minWidths [c])
+                {
+                    continue;
+                }
+                widths [c]--;
+                excess--;
+                reduced = true;
+            }
+
+            if (!reduced)
+            {
+                break;
             }
         }
 
-        return widths;
+        // Second pass: reduce below min (absolute last resort, floor at 3)
+        while (excess > 0)
+        {
+            var reduced = false;
+
+            for (int c = widths.Length - 1; c >= 0 && excess > 0; c--)
+            {
+                if (widths [c] <= 3)
+                {
+                    continue;
+                }
+                widths [c]--;
+                excess--;
+                reduced = true;
+            }
+
+            if (!reduced)
+            {
+                break;
+            }
+        }
+    }
+
+    /// <summary>Measures the display width of a cell's rendered text (stripping markdown formatting).</summary>
+    internal static int MeasureRenderedWidth (string cellText)
+    {
+        List<InlineRun> runs = MarkdownInlineParser.ParseInlines (cellText, MarkdownStyleRole.Normal);
+        var width = 0;
+
+        foreach (InlineRun run in runs)
+        {
+            width += run.Text.GetColumns ();
+        }
+
+        return Math.Max (width, 1);
+    }
+
+    /// <summary>
+    ///     Measures the display width of the longest single word in a cell's rendered text.
+    ///     This determines the minimum column width (below which words would be hard-broken).
+    /// </summary>
+    internal static int MeasureLongestWord (string cellText)
+    {
+        List<InlineRun> runs = MarkdownInlineParser.ParseInlines (cellText, MarkdownStyleRole.Normal);
+        var longest = 1;
+
+        foreach (InlineRun run in runs)
+        {
+            string [] words = run.Text.Split (' ', StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (string word in words)
+            {
+                int w = word.GetColumns ();
+                longest = Math.Max (longest, w);
+            }
+        }
+
+        return longest;
     }
 
     /// <summary>Calculates the total table width including all borders.</summary>

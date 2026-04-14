@@ -215,7 +215,7 @@ public class MarkdownTableTests
         app.Begin (window);
         app.LayoutAndDraw ();
 
-        string? screenContents = app.Driver.ToString ();
+        var screenContents = app.Driver.ToString ();
         Assert.NotNull (screenContents);
 
         // The word "bold" should appear (without ** delimiters)
@@ -248,7 +248,7 @@ public class MarkdownTableTests
         app.Begin (window);
         app.LayoutAndDraw ();
 
-        string? screenContents = app.Driver.ToString ();
+        var screenContents = app.Driver.ToString ();
         Assert.NotNull (screenContents);
 
         // "code" should be visible
@@ -277,10 +277,7 @@ public class MarkdownTableTests
     public void WrapSegments_Wraps_Long_Text ()
     {
         // Copilot — Verify WrapSegments splits text that exceeds maxWidth
-        List<StyledSegment> segments =
-        [
-            new ("hello world foo", MarkdownStyleRole.Normal, null, null)
-        ];
+        List<StyledSegment> segments = [new ("hello world foo", MarkdownStyleRole.Normal)];
 
         List<List<StyledSegment>> wrapped = MarkdownTable.WrapSegments (segments, 8);
 
@@ -293,10 +290,7 @@ public class MarkdownTableTests
     public void WrapSegments_Returns_Single_Line_When_Fits ()
     {
         // Copilot — Short text should not wrap
-        List<StyledSegment> segments =
-        [
-            new ("hi", MarkdownStyleRole.Normal, null, null)
-        ];
+        List<StyledSegment> segments = [new ("hi", MarkdownStyleRole.Normal)];
 
         List<List<StyledSegment>> wrapped = MarkdownTable.WrapSegments (segments, 20);
 
@@ -314,10 +308,7 @@ public class MarkdownTableTests
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
         // Long cell text in a narrow viewport will force wrapping
-        MarkdownView mv = new ("| Header |\n|--------|\n| This is a very long cell that should wrap |")
-        {
-            Width = Dim.Fill (), Height = Dim.Fill ()
-        };
+        MarkdownView mv = new ("| Header |\n|--------|\n| This is a very long cell that should wrap |") { Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -348,4 +339,174 @@ public class MarkdownTableTests
         Assert.True (table.Frame.Width < 17 + 8 + 3, // narrower than if ** were counted
                      $"Table width {table.Frame.Width} suggests markdown delimiters were measured");
     }
+
+    #region Column Width Algorithm Tests
+
+    [Fact]
+    public void ComputeColumnWidths_Natural_Fit_Uses_Max_Widths ()
+    {
+        // Copilot — When total content fits within maxWidth, use natural (max) widths
+        List<string> lines = ["| A | B |", "|---|---|", "| x | y |"];
+        TableData data = TableData.TryParse (lines)!;
+
+        // maxWidth = 100 is plenty of room
+        int [] widths = MarkdownTable.ComputeColumnWidths (data, 100);
+
+        // "A"/"x" = 1 col + 2 padding = 3; "B"/"y" = 1 col + 2 padding = 3
+        Assert.Equal (3, widths [0]);
+        Assert.Equal (3, widths [1]);
+    }
+
+    [Fact]
+    public void ComputeColumnWidths_Collapse_Shrinks_Widest_First ()
+    {
+        // Copilot — The widest column should shrink before narrower ones
+        List<string> lines = ["| Cat | A long cell description here |", "|-----|------------------------------|", "| X   | More long text in this cell  |"];
+        TableData data = TableData.TryParse (lines)!;
+
+        // Natural: col0 = max("Cat","X") = 3+2=5, col1 = ~28+2=30
+        // Force into 25 cols — col1 (wider) should shrink, col0 should be preserved
+        int [] widths = MarkdownTable.ComputeColumnWidths (data, 25);
+
+        // col0 should be at or near its natural width (5)
+        Assert.True (widths [0] >= 4, $"Left column {widths [0]} was shrunk too much");
+
+        // col1 should be smaller than its natural width
+        Assert.True (widths [1] < 30, $"Right column {widths [1]} should have been collapsed");
+
+        // Total should fit
+        int total = widths.Sum () + widths.Length + 1;
+        Assert.True (total <= 25, $"Total {total} exceeds maxWidth 25");
+    }
+
+    [Fact]
+    public void ComputeColumnWidths_Left_Wins_Tiebreak ()
+    {
+        // Copilot — When columns have equal width, rightmost shrinks first
+        List<string> lines = ["| ABCDE | ABCDE |", "|-------|-------|", "| 12345 | 12345 |"];
+        TableData data = TableData.TryParse (lines)!;
+
+        // Natural: both cols = 5+2=7, total = 7+7+3 = 17
+        // Force into 15 — need to lose 2 from column content
+        int [] widths = MarkdownTable.ComputeColumnWidths (data, 15);
+
+        // Left column should be >= right column (left wins)
+        Assert.True (widths [0] >= widths [1], $"Left ({widths [0]}) should be >= right ({widths [1]}) when tied");
+    }
+
+    [Fact]
+    public void ComputeColumnWidths_Min_Width_Is_Longest_Word ()
+    {
+        // Copilot — Columns should not shrink below their longest word + padding
+        List<string> lines =
+        [
+            "| Lifecycle | Purpose of this column is very long |",
+            "|-----------|--------------------------------------|",
+            "| Navigation | Focus movement between views        |"
+        ];
+        TableData data = TableData.TryParse (lines)!;
+
+        // "Navigation" is 10 chars — min should be 10+2=12
+        int [] widths = MarkdownTable.ComputeColumnWidths (data, 30);
+
+        // col0 min = "Navigation" (10) + 2 = 12
+        Assert.True (widths [0] >= 12, $"Column 0 width {widths [0]} is below longest word 'Navigation' (need >=12)");
+    }
+
+    [Fact]
+    public void ComputeColumnWidths_Last_Resort_Even_Reduction ()
+    {
+        // Copilot — When all columns are at min, reduce evenly as last resort
+        List<string> lines = ["| AAAAAAAAA | BBBBBBBBB |", "|-----------|-----------|", "| CCCCCCCCC | DDDDDDDDD |"];
+        TableData data = TableData.TryParse (lines)!;
+
+        // Both cols: longest word = 9 chars, min = 9+2=11
+        // Total min = 11+11+3 = 25. Force into 15 — must go below min.
+        int [] widths = MarkdownTable.ComputeColumnWidths (data, 15);
+
+        // Should still fit within maxWidth
+        int total = widths.Sum () + widths.Length + 1;
+        Assert.True (total <= 15, $"Total {total} exceeds maxWidth 15");
+
+        // Both should have been reduced (neither stuck at full natural)
+        Assert.True (widths [0] < 11 || widths [1] < 11, "At least one column should be below its min in last resort");
+    }
+
+    [Fact]
+    public void ComputeColumnWidths_Single_Column ()
+    {
+        // Copilot — Single-column table should use full available width or natural
+        List<string> lines = ["| Header |", "|--------|", "| Cell |"];
+        TableData data = TableData.TryParse (lines)!;
+
+        int [] widths = MarkdownTable.ComputeColumnWidths (data, 50);
+
+        // "Header" = 6+2=8
+        Assert.Equal (8, widths [0]);
+    }
+
+    [Fact]
+    public void ComputeColumnWidths_Empty_Cells_Get_Minimum ()
+    {
+        // Copilot — Columns with empty body cells should still get at least 3 (1 char + 2 padding)
+        List<string> lines = ["| H | Long Header |", "|---|-------------|", "|   | content     |"];
+        TableData data = TableData.TryParse (lines)!;
+
+        int [] widths = MarkdownTable.ComputeColumnWidths (data, 80);
+
+        Assert.True (widths [0] >= 3, $"Empty column width {widths [0]} should be at least 3");
+    }
+
+    [Fact]
+    public void MeasureRenderedWidth_Strips_Markdown ()
+    {
+        // Copilot — Rendered width should not include markdown delimiters
+        Assert.Equal (4, MarkdownTable.MeasureRenderedWidth ("**bold**"));
+        Assert.Equal (6, MarkdownTable.MeasureRenderedWidth ("*italic*"));
+        Assert.Equal (4, MarkdownTable.MeasureRenderedWidth ("`code`"));
+        Assert.Equal (5, MarkdownTable.MeasureRenderedWidth ("plain"));
+    }
+
+    [Fact]
+    public void MeasureLongestWord_Finds_Longest ()
+    {
+        // Copilot — Should find the longest individual word
+        Assert.Equal (5, MarkdownTable.MeasureLongestWord ("hi there world"));
+        Assert.Equal (10, MarkdownTable.MeasureLongestWord ("Navigation"));
+        Assert.Equal (4, MarkdownTable.MeasureLongestWord ("**bold** text"));
+    }
+
+    [Fact]
+    public void CollapseWidths_Preserves_Left_Column ()
+    {
+        // Copilot — Direct test of CollapseWidths: left col should be preserved when right is wider
+        int [] widths = [5, 20];
+        int [] mins = [3, 3];
+
+        MarkdownTable.CollapseWidths (widths, mins, 15);
+
+        // Total should be <= 15
+        Assert.True (widths.Sum () <= 15, $"Total {widths.Sum ()} exceeds available 15");
+
+        // Left column should be at or near its natural width
+        Assert.Equal (5, widths [0]);
+    }
+
+    [Fact]
+    public void CollapseWidths_Three_Columns_Shrinks_Widest ()
+    {
+        // Copilot — With 3 columns, the widest shrinks to the second-widest level first
+        int [] widths = [5, 10, 20];
+        int [] mins = [3, 3, 3];
+
+        // Available = 20, total = 35, need to lose 15
+        MarkdownTable.CollapseWidths (widths, mins, 20);
+
+        Assert.True (widths.Sum () <= 20, $"Total {widths.Sum ()} exceeds available 20");
+
+        // Column 0 (narrowest) should be mostly preserved
+        Assert.True (widths [0] >= 4, $"Narrowest column {widths [0]} was shrunk too aggressively");
+    }
+
+    #endregion
 }

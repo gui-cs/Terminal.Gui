@@ -94,27 +94,35 @@ public partial class MarkdownView
                 int graphemeWidth = Math.Max (grapheme.GetColumns (), 1);
                 bool visible = contentX + graphemeWidth > Viewport.X && contentX < Viewport.X + Viewport.Width;
 
-                if (visible)
+                if (!visible)
                 {
-                    int drawCol = contentX - Viewport.X;
+                    contentX += graphemeWidth;
 
-                    if (drawCol >= 0 && drawCol < Viewport.Width)
+                    continue;
+                }
+
+                int drawCol = contentX - Viewport.X;
+
+                if (drawCol < 0 || drawCol >= Viewport.Width)
+                {
+                    contentX += graphemeWidth;
+
+                    continue;
+                }
+
+                DrawGrapheme (segment, grapheme, drawCol, drawRow);
+
+                if (!string.IsNullOrWhiteSpace (segment.Url))
+                {
+                    _linkRanges.Add (new MarkdownLinkRange
                     {
-                        DrawGrapheme (segment, grapheme, drawCol, drawRow);
+                        Y = contentRow, StartX = contentX, EndXExclusive = contentX + graphemeWidth, Url = segment.Url!
+                    });
+                }
 
-                        if (!string.IsNullOrWhiteSpace (segment.Url))
-                        {
-                            _linkRanges.Add (new MarkdownLinkRange
-                            {
-                                Y = contentRow, StartX = contentX, EndXExclusive = contentX + graphemeWidth, Url = segment.Url!
-                            });
-                        }
-
-                        if (!string.IsNullOrWhiteSpace (segment.ImageSource))
-                        {
-                            TryQueueSixel (segment.ImageSource!, new Point (drawCol, drawRow));
-                        }
-                    }
+                if (!string.IsNullOrWhiteSpace (segment.ImageSource))
+                {
+                    TryQueueSixel (segment.ImageSource!, new Point (drawCol, drawRow));
                 }
 
                 contentX += graphemeWidth;
