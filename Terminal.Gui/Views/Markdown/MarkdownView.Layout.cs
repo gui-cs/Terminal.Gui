@@ -93,6 +93,7 @@ public partial class MarkdownView
         }
 
         BuildCodeBlockRegions ();
+        BuildLinkRegions ();
         SyncCopyButtons ();
     }
 

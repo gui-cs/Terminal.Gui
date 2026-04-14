@@ -2,111 +2,31 @@ namespace Terminal.Gui.Views;
 
 public partial class MarkdownView
 {
-    private struct MarkdownLinkRange
+    /// <summary>A contiguous link span on a single rendered line, built during layout.</summary>
+    internal sealed class MarkdownLinkRegion
     {
-        public int Y { get; init; }
+        public int Line { get; init; }
         public int StartX { get; init; }
-        public int EndXExclusive { get; init; }
-        public string Url { get; init; }
-    }
-
-    /// <inheritdoc />
-    protected override bool OnMouseEvent (Mouse mouse)
-    {
-        EnsureLayout ();
-
-        if (mouse.Flags == MouseFlags.WheeledDown)
-        {
-            ScrollViewportVertical (1);
-
-            return true;
-        }
-
-        if (mouse.Flags == MouseFlags.WheeledUp)
-        {
-            ScrollViewportVertical (-1);
-
-            return true;
-        }
-
-        if (mouse.Flags == MouseFlags.WheeledRight)
-        {
-            ScrollViewportHorizontal (1);
-
-            return true;
-        }
-
-        if (mouse.Flags == MouseFlags.WheeledLeft)
-        {
-            ScrollViewportHorizontal (-1);
-
-            return true;
-        }
-
-        if (mouse.Flags != MouseFlags.LeftButtonClicked && mouse.Flags != MouseFlags.LeftButtonReleased)
-        {
-            return base.OnMouseEvent (mouse);
-        }
-
-        if (CanFocus && !HasFocus)
-        {
-            SetFocus ();
-        }
-
-        if (mouse.Position is null)
-        {
-            return true;
-        }
-
-        int contentX = Viewport.X + mouse.Position.Value.X;
-        int contentY = Viewport.Y + mouse.Position.Value.Y;
-
-        foreach (MarkdownLinkRange range in _linkRanges)
-        {
-            if (range.Y != contentY)
-            {
-                continue;
-            }
-
-            if (contentX < range.StartX || contentX >= range.EndXExclusive)
-            {
-                continue;
-            }
-
-            // Anchor links scroll to the matching heading first, then notify
-            if (range.Url.StartsWith ('#'))
-            {
-                ScrollToAnchor (range.Url);
-                RaiseLinkClicked (range.Url);
-
-                return true;
-            }
-
-            bool handled = RaiseLinkClicked (range.Url);
-
-            if (!handled)
-            {
-                Link.OpenUrl (range.Url);
-            }
-
-            return true;
-        }
-
-        return true;
+        public int EndXExclusive { get; set; }
+        public string Url { get; init; } = "";
     }
 
     private void SetupBindingsAndCommands ()
     {
-        AddCommand (Command.Up, () => ScrollViewportVertical (-1));
-        AddCommand (Command.Down, () => ScrollViewportVertical (1));
-        AddCommand (Command.PageUp, () => ScrollViewportVertical (-Math.Max (Viewport.Height - 1, 1)));
-        AddCommand (Command.PageDown, () => ScrollViewportVertical (Math.Max (Viewport.Height - 1, 1)));
-        AddCommand (Command.ScrollUp, () => ScrollViewportVertical (-1));
-        AddCommand (Command.ScrollDown, () => ScrollViewportVertical (1));
-        AddCommand (Command.ScrollLeft, () => ScrollViewportHorizontal (-1));
-        AddCommand (Command.ScrollRight, () => ScrollViewportHorizontal (1));
-        AddCommand (Command.Start, () => ScrollTop ());
-        AddCommand (Command.End, () => ScrollBottom ());
+        AddCommand (Command.Up, () => ScrollVertical (-1));
+        AddCommand (Command.Down, () => ScrollVertical (1));
+        AddCommand (Command.PageUp, () => ScrollVertical (-Math.Max (Viewport.Height - 1, 1)));
+        AddCommand (Command.PageDown, () => ScrollVertical (Math.Max (Viewport.Height - 1, 1)));
+        AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
+        AddCommand (Command.ScrollDown, () => ScrollVertical (1));
+        AddCommand (Command.ScrollLeft, () => ScrollHorizontal (-1));
+        AddCommand (Command.ScrollRight, () => ScrollHorizontal (1));
+        AddCommand (Command.Start, () => { Viewport = Viewport with { Y = 0 }; return true; });
+        AddCommand (Command.End, () => { Viewport = Viewport with { Y = Math.Max (GetContentSize ().Height - Viewport.Height, 0) }; return true; });
+        AddCommand (Command.Accept, () => ActivateCurrentLink ());
+        AddCommand (Command.NextTabStop, () => NavigateLink (1));
+        AddCommand (Command.PreviousTabStop, () => NavigateLink (-1));
+        AddCommand (Command.Activate, HandleActivateCommand);
 
         KeyBindings.Add (Key.CursorUp, Command.Up);
         KeyBindings.Add (Key.CursorDown, Command.Down);
@@ -116,73 +36,203 @@ public partial class MarkdownView
         KeyBindings.Add (Key.CursorRight, Command.ScrollRight);
         KeyBindings.Add (Key.Home, Command.Start);
         KeyBindings.Add (Key.End, Command.End);
+        KeyBindings.ReplaceCommands (Key.Enter, Command.Accept);
+        KeyBindings.ReplaceCommands (Key.Tab, Command.NextTabStop);
+        KeyBindings.ReplaceCommands (Key.Tab.WithShift, Command.PreviousTabStop);
 
         MouseBindings.ReplaceCommands (MouseFlags.WheeledDown, Command.ScrollDown);
         MouseBindings.ReplaceCommands (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.ReplaceCommands (MouseFlags.WheeledRight, Command.ScrollRight);
         MouseBindings.ReplaceCommands (MouseFlags.WheeledLeft, Command.ScrollLeft);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
     }
 
-    private bool ScrollViewportVertical (int delta)
+    /// <summary>Handles the <see cref="Command.Activate"/> command, dispatched by mouse click bindings.</summary>
+    private bool? HandleActivateCommand (ICommandContext? ctx)
     {
-        Size content = GetContentSize ();
-        int maxY = Math.Max (content.Height - Viewport.Height, 0);
-        int newY = Math.Min (Math.Max (Viewport.Y + delta, 0), maxY);
+        EnsureLayout ();
 
-        if (newY == Viewport.Y)
+        if (!HasFocus && CanFocus)
+        {
+            SetFocus ();
+        }
+
+        if (ctx?.Binding is not MouseBinding { MouseEvent: { Position: { } pos } })
         {
             return true;
         }
 
-        Viewport = Viewport with { Y = newY };
+        int contentX = Viewport.X + pos.X;
+        int contentY = Viewport.Y + pos.Y;
+
+        for (var i = 0; i < _linkRegions.Count; i++)
+        {
+            MarkdownLinkRegion region = _linkRegions [i];
+
+            if (region.Line != contentY)
+            {
+                continue;
+            }
+
+            if (contentX < region.StartX || contentX >= region.EndXExclusive)
+            {
+                continue;
+            }
+
+            _activeLinkIndex = i;
+            ActivateLink (region);
+
+            return true;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Builds the deduplicated list of link regions by scanning rendered lines.
+    ///     Called at the end of <see cref="BuildRenderedLines"/>.
+    /// </summary>
+    private void BuildLinkRegions ()
+    {
+        _linkRegions.Clear ();
+        _activeLinkIndex = -1;
+
+        for (var lineIdx = 0; lineIdx < _renderedLines.Count; lineIdx++)
+        {
+            RenderedLine line = _renderedLines [lineIdx];
+            var x = 0;
+            string? currentUrl = null;
+            MarkdownLinkRegion? currentRegion = null;
+
+            foreach (StyledSegment segment in line.Segments)
+            {
+                int segWidth = segment.Text.GetColumns ();
+
+                if (!string.IsNullOrWhiteSpace (segment.Url))
+                {
+                    if (currentUrl == segment.Url && currentRegion is { })
+                    {
+                        currentRegion.EndXExclusive = x + segWidth;
+                    }
+                    else
+                    {
+                        currentRegion = new MarkdownLinkRegion
+                        {
+                            Line = lineIdx,
+                            StartX = x,
+                            EndXExclusive = x + segWidth,
+                            Url = segment.Url!
+                        };
+
+                        _linkRegions.Add (currentRegion);
+                        currentUrl = segment.Url;
+                    }
+                }
+                else
+                {
+                    currentUrl = null;
+                    currentRegion = null;
+                }
+
+                x += segWidth;
+            }
+        }
+    }
+
+    /// <summary>Moves the active link index by <paramref name="delta"/> and scrolls to show it.</summary>
+    private bool NavigateLink (int delta)
+    {
+        EnsureLayout ();
+
+        if (_linkRegions.Count == 0)
+        {
+            return false;
+        }
+
+        if (_activeLinkIndex < 0)
+        {
+            _activeLinkIndex = delta > 0 ? 0 : _linkRegions.Count - 1;
+        }
+        else
+        {
+            _activeLinkIndex += delta;
+        }
+
+        if (_activeLinkIndex >= _linkRegions.Count)
+        {
+            _activeLinkIndex = 0;
+        }
+        else if (_activeLinkIndex < 0)
+        {
+            _activeLinkIndex = _linkRegions.Count - 1;
+        }
+
+        ScrollToLinkRegion (_linkRegions [_activeLinkIndex]);
         SetNeedsDraw ();
 
         return true;
     }
 
-    private bool ScrollViewportHorizontal (int delta)
+    /// <summary>Activates the currently highlighted link (Enter key).</summary>
+    private bool ActivateCurrentLink ()
     {
-        Size content = GetContentSize ();
-        int maxX = Math.Max (content.Width - Viewport.Width, 0);
-        int newX = Math.Min (Math.Max (Viewport.X + delta, 0), maxX);
-
-        if (newX == Viewport.X)
+        if (_activeLinkIndex < 0 || _activeLinkIndex >= _linkRegions.Count)
         {
-            return true;
+            return false;
         }
 
-        Viewport = Viewport with { X = newX };
-        SetNeedsDraw ();
+        ActivateLink (_linkRegions [_activeLinkIndex]);
 
         return true;
     }
 
-    private bool ScrollTop ()
+    /// <summary>Activates a link region: scrolls for anchors, opens URL otherwise.</summary>
+    private void ActivateLink (MarkdownLinkRegion region)
     {
-        if (Viewport.Y == 0)
+        if (region.Url.StartsWith ('#'))
         {
-            return true;
+            ScrollToAnchor (region.Url);
+            RaiseLinkClicked (region.Url);
+
+            return;
         }
 
-        Viewport = Viewport with { Y = 0 };
-        SetNeedsDraw ();
+        bool handled = RaiseLinkClicked (region.Url);
 
-        return true;
+        if (!handled)
+        {
+            Link.OpenUrl (region.Url);
+        }
     }
 
-    private bool ScrollBottom ()
+    /// <summary>Scrolls the viewport so that the given link region is visible.</summary>
+    private void ScrollToLinkRegion (MarkdownLinkRegion region)
     {
-        Size content = GetContentSize ();
-        int maxY = Math.Max (content.Height - Viewport.Height, 0);
+        int lineY = region.Line;
 
-        if (Viewport.Y == maxY)
+        if (lineY < Viewport.Y)
         {
-            return true;
+            Viewport = Viewport with { Y = lineY };
+        }
+        else if (lineY >= Viewport.Y + Viewport.Height)
+        {
+            Viewport = Viewport with { Y = lineY - Viewport.Height + 1 };
+        }
+    }
+
+    /// <summary>
+    ///     Returns <see langword="true"/> if the segment at position (<paramref name="contentX"/>,
+    ///     <paramref name="lineIdx"/>) belongs to the currently active (focused) link.
+    /// </summary>
+    internal bool IsActiveLinkAt (int lineIdx, int contentX)
+    {
+        if (_activeLinkIndex < 0 || _activeLinkIndex >= _linkRegions.Count)
+        {
+            return false;
         }
 
-        Viewport = Viewport with { Y = maxY };
-        SetNeedsDraw ();
+        MarkdownLinkRegion active = _linkRegions [_activeLinkIndex];
 
-        return true;
+        return active.Line == lineIdx && contentX >= active.StartX && contentX < active.EndXExclusive;
     }
 }

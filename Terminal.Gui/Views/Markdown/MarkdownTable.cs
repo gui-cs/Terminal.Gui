@@ -27,15 +27,18 @@ namespace Terminal.Gui.Views;
 internal sealed class MarkdownTable : View
 {
     private readonly TableData _data;
-    private readonly int [] _columnWidths;
+    private int [] _columnWidths;
 
     // Pre-parsed inline segments for each cell
     private readonly List<StyledSegment> [] _headerSegments;
     private readonly List<StyledSegment> [] [] _rowSegments;
 
     // Pre-computed wrapped line counts per row
-    private readonly int _headerRowHeight;
-    private readonly int [] _bodyRowHeights;
+    private int _headerRowHeight;
+    private int [] _bodyRowHeights;
+
+    // Last width used for column computation — tracks when recalculation is needed
+    private int _lastComputedWidth;
 
     /// <summary>Initializes a new <see cref="MarkdownTable"/> for the given parsed table data.</summary>
     /// <param name="data">The parsed table structure.</param>
@@ -62,6 +65,7 @@ internal sealed class MarkdownTable : View
         }
 
         _columnWidths = ComputeColumnWidths (data, maxWidth);
+        _lastComputedWidth = maxWidth;
 
         // Compute row heights based on word-wrapped cell content
         _headerRowHeight = ComputeRowHeight (_headerSegments, _columnWidths);
@@ -72,17 +76,34 @@ internal sealed class MarkdownTable : View
             _bodyRowHeights [r] = ComputeRowHeight (_rowSegments [r], _columnWidths);
         }
 
-        int tableWidth = CalculateTableWidth (_columnWidths);
-        int tableHeight = CalculateTableHeightWrapped (_headerRowHeight, _bodyRowHeights);
-
-        Width = tableWidth;
-        Height = tableHeight;
+        Height = CalculateTableHeightWrapped (_headerRowHeight, _bodyRowHeights);
 
         // No adornments — we draw everything ourselves
         BorderStyle = LineStyle.None;
         Border.Thickness = new Thickness (0);
         Padding.Thickness = new Thickness (0);
         Margin.Thickness = new Thickness (0);
+    }
+
+    /// <summary>Recalculates column widths and row heights for the given available width.</summary>
+    private void Recalculate (int maxWidth)
+    {
+        if (maxWidth == _lastComputedWidth)
+        {
+            return;
+        }
+
+        _lastComputedWidth = maxWidth;
+        _columnWidths = ComputeColumnWidths (_data, maxWidth);
+
+        _headerRowHeight = ComputeRowHeight (_headerSegments, _columnWidths);
+
+        for (var r = 0; r < _rowSegments.Length; r++)
+        {
+            _bodyRowHeights [r] = ComputeRowHeight (_rowSegments [r], _columnWidths);
+        }
+
+        Height = CalculateTableHeightWrapped (_headerRowHeight, _bodyRowHeights);
     }
 
     /// <summary>Gets the total rendered height of this table in lines (simple estimate).</summary>
@@ -98,6 +119,7 @@ internal sealed class MarkdownTable : View
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
+        Recalculate (Frame.Width);
         DrawBorders ();
         DrawCellContents ();
 
@@ -211,7 +233,7 @@ internal sealed class MarkdownTable : View
     /// </summary>
     private void DrawBorders ()
     {
-        int tableWidth = CalculateTableWidth (_columnWidths);
+        int tableWidth = Frame.Width;
         int tableHeight = CalculateTableHeightWrapped (_headerRowHeight, _bodyRowHeights);
 
         Point screenOrigin = ViewportToScreen (Viewport).Location;

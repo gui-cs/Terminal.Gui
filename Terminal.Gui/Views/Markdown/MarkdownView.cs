@@ -29,7 +29,7 @@ public partial class MarkdownView : View, IDesignable
 
     private readonly List<IntermediateBlock> _blocks = [];
     private readonly List<RenderedLine> _renderedLines = [];
-    private readonly List<MarkdownLinkRange> _linkRanges = [];
+    private readonly List<MarkdownLinkRegion> _linkRegions = [];
     private readonly HashSet<string> _queuedSixelIds = [];
     private readonly Dictionary<string, int> _headingAnchors = new (StringComparer.OrdinalIgnoreCase);
     private readonly List<CodeBlockRegion> _codeBlockRegions = [];
@@ -41,6 +41,7 @@ public partial class MarkdownView : View, IDesignable
     private bool _parsed;
     private int _layoutWidth = -1;
     private int _maxLineWidth;
+    private int _activeLinkIndex = -1;
 
     /// <summary>Initializes a new instance of the <see cref="MarkdownView"/> class with no content.</summary>
     public MarkdownView ()
@@ -117,10 +118,29 @@ public partial class MarkdownView : View, IDesignable
     {
         base.OnViewportChanged (e);
 
-        if (_layoutWidth == Viewport.Width)
+        if (_layoutWidth == GetEffectiveLayoutWidth ())
         {
             return;
         }
+
+        EnsureLayout ();
+        SetNeedsDraw ();
+    }
+
+    /// <inheritdoc/>
+    protected override void OnContentSizeChanged (ValueChangedEventArgs<Size?> args)
+    {
+        base.OnContentSizeChanged (args);
+
+        int effectiveWidth = GetEffectiveLayoutWidth ();
+
+        if (_layoutWidth == effectiveWidth)
+        {
+            return;
+        }
+
+        // Content width changed externally (e.g. NumericUpDown) — force re-layout
+        InvalidateParsedAndLayout ();
         EnsureLayout ();
         SetNeedsDraw ();
     }
@@ -186,7 +206,8 @@ public partial class MarkdownView : View, IDesignable
         _layoutWidth = -1;
         _blocks.Clear ();
         _renderedLines.Clear ();
-        _linkRanges.Clear ();
+        _linkRegions.Clear ();
+        _activeLinkIndex = -1;
         _headingAnchors.Clear ();
         _codeBlockRegions.Clear ();
         RemoveCopyButtons ();
@@ -198,19 +219,29 @@ public partial class MarkdownView : View, IDesignable
         SetNeedsDraw ();
     }
 
+    /// <summary>Returns the effective width used for text wrapping and table layout.</summary>
+    /// <remarks>
+    ///     When <see cref="View.SetContentSize"/> has been called to widen content beyond the
+    ///     viewport (e.g. via a NumericUpDown), the content width is used so tables and text
+    ///     fill the wider area. Otherwise <see cref="View.Viewport"/> width is used.
+    /// </remarks>
+    private int GetEffectiveLayoutWidth () => Math.Max (GetContentSize ().Width, Viewport.Width);
+
     private void EnsureLayout ()
     {
         EnsureParsed ();
 
-        if (_layoutWidth == Viewport.Width)
+        int effectiveWidth = GetEffectiveLayoutWidth ();
+
+        if (_layoutWidth == effectiveWidth)
         {
             return;
         }
 
         BuildRenderedLines ();
-        _layoutWidth = Viewport.Width;
+        _layoutWidth = effectiveWidth;
 
-        SetContentSize (new Size (Viewport.Width, Math.Max (_renderedLines.Count, Viewport.Height)));
+        SetContentSize (new Size (effectiveWidth, Math.Max (_renderedLines.Count, Viewport.Height)));
 
         ClampViewport ();
     }
@@ -244,8 +275,8 @@ public partial class MarkdownView : View, IDesignable
             {
                 X = Pos.AnchorEnd (),
                 Y = region.StartLine,
-                CanFocus = false,
-                TabStop = TabBehavior.NoStop,
+                CanFocus = true,
+                TabStop = TabBehavior.TabStop,
                 ShadowStyle = ShadowStyles.None,
                 NoPadding = true,
                 NoDecorations = true

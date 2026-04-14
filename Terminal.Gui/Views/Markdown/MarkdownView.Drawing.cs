@@ -11,8 +11,6 @@ public partial class MarkdownView
     {
         EnsureLayout ();
 
-        _linkRanges.Clear ();
-
         SetAttributeForRole (VisualRole.Normal);
         FillRect (Viewport with { X = 0, Y = 0 }, (Rune)' ');
 
@@ -40,7 +38,7 @@ public partial class MarkdownView
 
     private void DrawRenderedLine (RenderedLine line, int contentRow, int drawRow)
     {
-        // Thematic breaks are drawn via LineCanvas in OnRenderingLineCanvas
+        // Thematic breaks are drawn by Line SubViews
         if (line.IsThematicBreak)
         {
             return;
@@ -86,14 +84,16 @@ public partial class MarkdownView
                     continue;
                 }
 
-                DrawGrapheme (segment, grapheme, drawCol, drawRow);
-
-                if (!string.IsNullOrWhiteSpace (segment.Url))
+                // If this grapheme is in the active link, use reversed highlight
+                if (IsActiveLinkAt (contentRow, contentX))
                 {
-                    _linkRanges.Add (new MarkdownLinkRange
-                    {
-                        Y = contentRow, StartX = contentX, EndXExclusive = contentX + graphemeWidth, Url = segment.Url!
-                    });
+                    Attribute linkAttr = GetAttributeForSegment (segment);
+                    SetAttribute (new Attribute (linkAttr.Background, linkAttr.Foreground, linkAttr.Style));
+                    AddStr (drawCol, drawRow, grapheme);
+                }
+                else
+                {
+                    DrawGrapheme (segment, grapheme, drawCol, drawRow);
                 }
 
                 if (!string.IsNullOrWhiteSpace (segment.ImageSource))

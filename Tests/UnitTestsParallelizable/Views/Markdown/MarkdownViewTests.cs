@@ -650,4 +650,61 @@ public class MarkdownViewTests (ITestOutputHelper output)
         window.Dispose ();
         app.Dispose ();
     }
+
+    // Copilot
+    [Fact]
+    public void Table_Height_Change_Reflows_Subsequent_Elements ()
+    {
+        // Markdown: paragraph, small table, then a heading below
+        string md = """
+                    Above
+
+                    | A | B |
+                    |---|---|
+                    | Long cell content here | x |
+
+                    # Below
+                    """;
+
+        MarkdownView view = new (md)
+        {
+            Width = 40,
+            Height = 20
+        };
+
+        View host = new () { Width = 40, Height = 20 };
+        host.Add (view);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        // Record initial line count
+        int initialLineCount = view.LineCount;
+
+        // The "# Below" heading should have an anchor
+        Assert.True (view.ScrollToAnchor ("below"));
+        int initialAnchorY = view.Viewport.Y;
+
+        // Reset viewport
+        view.Viewport = view.Viewport with { Y = 0 };
+
+        // Now shrink ContentSize.Width so the table columns wrap, making the table taller
+        view.SetContentSize (new Size (20, view.GetContentSize ().Height));
+        host.Layout ();
+
+        int newLineCount = view.LineCount;
+
+        // The narrower width should cause text and table to reflow
+        // Line count should change (table wraps → more lines)
+        Assert.NotEqual (initialLineCount, newLineCount);
+
+        // The "# Below" anchor should still be reachable and at a different position
+        Assert.True (view.ScrollToAnchor ("below"));
+        int newAnchorY = view.Viewport.Y;
+
+        // The anchor should have moved because the table height changed
+        Assert.NotEqual (initialAnchorY, newAnchorY);
+
+        host.Dispose ();
+    }
 }
