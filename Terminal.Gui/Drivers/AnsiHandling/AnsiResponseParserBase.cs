@@ -330,24 +330,13 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
                 return false;
             }
 
-            if (HandleKeyboard)
-            {
-                AnsiKeyboardParserPattern? pattern = _keyboardParser.IsKeyboard (cur);
-
-                if (pattern != null)
-                {
-                    // See https://github.com/gui-cs/Terminal.Gui/issues/4587#issuecomment-3770132337 for why
-                    // we call ResetState first
-                    ResetState ();
-                    RaiseKeyboardEvent (pattern, cur);
-
-                    return false;
-                }
-            }
-
             lock (_lockExpectedResponses)
             {
-                // Look for an expected response for what is accumulated so far (since Esc)
+                // Expected responses take priority over keyboard pattern matching.
+                // A registered expectation is an explicit request from the app, and its
+                // response may collide with a keyboard pattern — e.g. a CPR reply
+                // "ESC[1;1R" looks identical to xterm's Shift/modifier F3 sequence
+                // "ESC[1;<n>R" and would otherwise be misdelivered as Key.F3 (#4956).
                 if (MatchResponse (cur, _expectedResponses, true, true))
                 {
                     return false;
@@ -362,6 +351,21 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
                 // Look for persistent requests
                 if (MatchResponse (cur, _persistentExpectations, true, false))
                 {
+                    return false;
+                }
+            }
+
+            if (HandleKeyboard)
+            {
+                AnsiKeyboardParserPattern? pattern = _keyboardParser.IsKeyboard (cur);
+
+                if (pattern != null)
+                {
+                    // See https://github.com/gui-cs/Terminal.Gui/issues/4587#issuecomment-3770132337 for why
+                    // we call ResetState first
+                    ResetState ();
+                    RaiseKeyboardEvent (pattern, cur);
+
                     return false;
                 }
             }
