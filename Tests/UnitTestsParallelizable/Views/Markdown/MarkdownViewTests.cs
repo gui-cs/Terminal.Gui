@@ -669,41 +669,39 @@ public class MarkdownViewTests (ITestOutputHelper output)
         MarkdownView view = new (md)
         {
             Width = 40,
-            Height = 20
+            Height = 5 // Small viewport so scrolling is required
         };
 
-        View host = new () { Width = 40, Height = 20 };
+        View host = new () { Width = 40, Height = 5 };
         host.Add (view);
         host.BeginInit ();
         host.EndInit ();
         host.Layout ();
 
-        // Record initial line count
+        // Record initial line count and anchor position
         int initialLineCount = view.LineCount;
 
-        // The "# Below" heading should have an anchor
         Assert.True (view.ScrollToAnchor ("below"));
         int initialAnchorY = view.Viewport.Y;
 
         // Reset viewport
         view.Viewport = view.Viewport with { Y = 0 };
 
-        // Now shrink ContentSize.Width so the table columns wrap, making the table taller
+        // Shrink ContentSize.Width so the table columns wrap, making the table taller
         view.SetContentSize (new Size (20, view.GetContentSize ().Height));
         host.Layout ();
 
         int newLineCount = view.LineCount;
 
-        // The narrower width should cause text and table to reflow
-        // Line count should change (table wraps → more lines)
-        Assert.NotEqual (initialLineCount, newLineCount);
+        // The narrower width should cause text and table to reflow — more lines
+        Assert.True (newLineCount > initialLineCount, $"Expected more lines after narrowing: initial={initialLineCount}, new={newLineCount}");
 
-        // The "# Below" anchor should still be reachable and at a different position
+        // The "# Below" anchor should still be reachable
         Assert.True (view.ScrollToAnchor ("below"));
         int newAnchorY = view.Viewport.Y;
 
-        // The anchor should have moved because the table height changed
-        Assert.NotEqual (initialAnchorY, newAnchorY);
+        // The anchor should have moved down because the table grew taller
+        Assert.True (newAnchorY > initialAnchorY, $"Expected anchor to move down: initial={initialAnchorY}, new={newAnchorY}");
 
         host.Dispose ();
     }

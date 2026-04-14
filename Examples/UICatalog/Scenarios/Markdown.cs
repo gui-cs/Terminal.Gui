@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Deepdives", "Demonstrates MarkdownView by providing a deep dive reader.")]
+[ScenarioMetadata ("Deepdives", "Use MarkDownView to provide a TG Deep Dive browser.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Text and Formatting")]
 public class Markdown : Scenario
@@ -178,6 +178,7 @@ public class Markdown : Scenario
                               _docs = entries;
                               ObservableCollection<string> names = new (_docs.Select (d => d.Name));
                               _docList?.SetSource (names);
+                              _docList?.SelectedItem = 0;
                               HideSpinner ("Ready");
                           });
         }

@@ -42,6 +42,8 @@ public partial class MarkdownView : View, IDesignable
     private int _layoutWidth = -1;
     private int _maxLineWidth;
     private int _activeLinkIndex = -1;
+    private bool _inLayout;
+    private int _externalContentWidth;
 
     /// <summary>Initializes a new instance of the <see cref="MarkdownView"/> class with no content.</summary>
     public MarkdownView ()
@@ -132,6 +134,14 @@ public partial class MarkdownView : View, IDesignable
     {
         base.OnContentSizeChanged (args);
 
+        if (_inLayout)
+        {
+            return;
+        }
+
+        // External caller set ContentSize — use that width for layout
+        _externalContentWidth = args.NewValue?.Width ?? 0;
+
         int effectiveWidth = GetEffectiveLayoutWidth ();
 
         if (_layoutWidth == effectiveWidth)
@@ -139,8 +149,7 @@ public partial class MarkdownView : View, IDesignable
             return;
         }
 
-        // Content width changed externally (e.g. NumericUpDown) — force re-layout
-        InvalidateParsedAndLayout ();
+        _layoutWidth = -1;
         EnsureLayout ();
         SetNeedsDraw ();
     }
@@ -221,11 +230,11 @@ public partial class MarkdownView : View, IDesignable
 
     /// <summary>Returns the effective width used for text wrapping and table layout.</summary>
     /// <remarks>
-    ///     When <see cref="View.SetContentSize"/> has been called to widen content beyond the
-    ///     viewport (e.g. via a NumericUpDown), the content width is used so tables and text
-    ///     fill the wider area. Otherwise <see cref="View.Viewport"/> width is used.
+    ///     When <see cref="View.SetContentSize"/> has been called externally to set a specific
+    ///     content width (e.g. via a NumericUpDown), that width is used. Otherwise
+    ///     <see cref="View.Viewport"/> width is used.
     /// </remarks>
-    private int GetEffectiveLayoutWidth () => Math.Max (GetContentSize ().Width, Viewport.Width);
+    private int GetEffectiveLayoutWidth () => _externalContentWidth > 0 ? _externalContentWidth : Viewport.Width;
 
     private void EnsureLayout ()
     {
@@ -238,12 +247,21 @@ public partial class MarkdownView : View, IDesignable
             return;
         }
 
-        BuildRenderedLines ();
-        _layoutWidth = effectiveWidth;
+        _inLayout = true;
 
-        SetContentSize (new Size (effectiveWidth, Math.Max (_renderedLines.Count, Viewport.Height)));
+        try
+        {
+            BuildRenderedLines ();
+            _layoutWidth = effectiveWidth;
 
-        ClampViewport ();
+            SetContentSize (new Size (effectiveWidth, Math.Max (_renderedLines.Count, Viewport.Height)));
+
+            ClampViewport ();
+        }
+        finally
+        {
+            _inLayout = false;
+        }
     }
 
     private void ClampViewport ()

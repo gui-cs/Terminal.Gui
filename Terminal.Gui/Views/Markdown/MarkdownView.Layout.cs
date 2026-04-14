@@ -9,7 +9,7 @@ public partial class MarkdownView
         _codeBlockRegions.Clear ();
         _maxLineWidth = 0;
 
-        int viewportWidth = Math.Max (Viewport.Width, MIN_WRAP_WIDTH);
+        int viewportWidth = Math.Max (GetEffectiveLayoutWidth (), MIN_WRAP_WIDTH);
 
         foreach (IntermediateBlock block in _blocks)
         {
