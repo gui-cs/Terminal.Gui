@@ -26,6 +26,7 @@ public partial class MarkdownView : View, IDesignable
     public MarkdownView ()
     {
         CanFocus = true;
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
         ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
 
         SetupBindingsAndCommands ();

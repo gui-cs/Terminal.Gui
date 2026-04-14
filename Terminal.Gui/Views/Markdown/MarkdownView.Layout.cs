@@ -78,21 +78,55 @@ public partial class MarkdownView
 
                 if (currentWidth + graphemeWidth > viewportWidth && currentSegments.Count > 0)
                 {
-                    lines.Add (new RenderedLine ([.. currentSegments], true, currentWidth));
+                    // Find last whitespace for word-boundary wrap (skip prefix segments)
+                    int breakIdx = -1;
 
-                    currentSegments.Clear ();
-                    currentWidth = 0;
+                    for (int s = currentSegments.Count - 1; s >= 0; s--)
+                    {
+                        if (currentSegments [s].StyleRole == MarkdownStyleRole.ListMarker)
+                        {
+                            break;
+                        }
+
+                        if (string.IsNullOrWhiteSpace (currentSegments [s].Text))
+                        {
+                            breakIdx = s;
+
+                            break;
+                        }
+                    }
+
+                    if (breakIdx >= 0)
+                    {
+                        // Word wrap: emit up to and including the space
+                        List<StyledSegment> lineSegments = currentSegments.GetRange (0, breakIdx + 1);
+                        List<StyledSegment> overflow = currentSegments.GetRange (breakIdx + 1, currentSegments.Count - breakIdx - 1);
+
+                        lines.Add (new RenderedLine ([.. lineSegments], true, CalculateWidth (lineSegments)));
+
+                        currentSegments = [.. overflow];
+                        currentWidth = CalculateWidth (currentSegments);
+                    }
+                    else
+                    {
+                        // No word boundary found — hard break at current position
+                        lines.Add (new RenderedLine ([.. currentSegments], true, currentWidth));
+                        currentSegments.Clear ();
+                        currentWidth = 0;
+                    }
+
                     firstLine = false;
 
                     if (!string.IsNullOrEmpty (continuationPrefix))
                     {
-                        currentSegments.Add (new StyledSegment (continuationPrefix, MarkdownStyleRole.ListMarker));
-                        currentWidth = continuationPrefix.GetColumns ();
+                        currentSegments.Insert (0, new StyledSegment (continuationPrefix, MarkdownStyleRole.ListMarker));
+                        currentWidth += continuationPrefix.GetColumns ();
                     }
                 }
 
                 currentSegments.Add (new StyledSegment (grapheme, run.StyleRole, run.Url, run.ImageSource));
                 currentWidth += graphemeWidth;
+
             }
         }
 

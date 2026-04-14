@@ -4,7 +4,7 @@ using UnitTests;
 namespace ViewsTests.Markdown;
 
 [TestSubject (typeof (MarkdownView))]
-public class MarkdownViewTests
+public class MarkdownViewTests (ITestOutputHelper output)
 {
     // Copilot
 
@@ -177,5 +177,248 @@ public class MarkdownViewTests
         Assert.True (markdownView.LineCount >= 1);
 
         host.Dispose ();
+    }
+
+    [Fact]
+    // Copilot
+    public void WordWrap_Breaks_At_Word_Boundaries ()
+    {
+        // "Hello world" at width 8 should wrap between "Hello" and "world", not mid-word
+        MarkdownView markdownView = new ("Hello world");
+        markdownView.Width = 8;
+        markdownView.Height = 5;
+
+        View host = new () { Width = 8, Height = 5 };
+        host.Add (markdownView);
+
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        // Should produce 2 lines: "Hello " and "world"
+        Assert.Equal (2, markdownView.LineCount);
+
+        host.Dispose ();
+    }
+
+    [Fact]
+    // Copilot
+    public void WordWrap_Long_Word_Falls_Back_To_Hard_Break ()
+    {
+        // "Abcdefghij" (10 chars, no spaces) at width 5 should hard-break
+        MarkdownView markdownView = new ("Abcdefghij");
+        markdownView.Width = 5;
+        markdownView.Height = 5;
+
+        View host = new () { Width = 5, Height = 5 };
+        host.Add (markdownView);
+
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        // 10 chars at width 5 = 2 lines via hard break
+        Assert.Equal (2, markdownView.LineCount);
+
+        host.Dispose ();
+    }
+
+    // ---- Style rendering tests (AssertDriverOutputIs pattern) ----
+    // Copilot
+    // Each test verifies the correct ANSI TextStyle escape codes are emitted
+    // for a specific MarkdownStyleRole. Uses ANSI driver with Force16Colors
+    // and scheme Color.Black (SGR 30) on Color.White (SGR 107).
+
+    [Fact]
+    public void Style_Heading_Renders_Bold ()
+    {
+        (IApplication app, Runnable window) = SetupStyleTest ("# H");
+
+        DriverAssert.AssertDriverOutputIs (
+            @"\x1b[30m\x1b[107m\x1b[1mH\x1b[30m\x1b[107m\x1b[22m",
+            output,
+            app.Driver);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Style_Emphasis_Renders_Italic ()
+    {
+        (IApplication app, Runnable window) = SetupStyleTest ("*E*");
+
+        DriverAssert.AssertDriverOutputIs (
+            @"\x1b[30m\x1b[107m\x1b[3mE\x1b[30m\x1b[107m\x1b[23m",
+            output,
+            app.Driver);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Style_Strong_Renders_Bold ()
+    {
+        (IApplication app, Runnable window) = SetupStyleTest ("**S**");
+
+        DriverAssert.AssertDriverOutputIs (
+            @"\x1b[30m\x1b[107m\x1b[1mS\x1b[30m\x1b[107m\x1b[22m",
+            output,
+            app.Driver);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Style_InlineCode_Renders_Bold_With_Dimmed_Background ()
+    {
+        (IApplication app, Runnable window) = SetupStyleTest ("`C`");
+
+        // Code gets a dimmed background (\x1b[103m = bright yellow in 16-color, dimmed from white)
+        DriverAssert.AssertDriverOutputIs (
+            @"\x1b[30m\x1b[103m\x1b[1mC\x1b[30m\x1b[107m\x1b[22m",
+            output,
+            app.Driver);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Style_Quote_Marker_Bold_Text_Faint ()
+    {
+        (IApplication app, Runnable window) = SetupStyleTest ("> Q");
+
+        DriverAssert.AssertDriverOutputIs (
+            @"\x1b[30m\x1b[107m\x1b[1m> \x1b[30m\x1b[107m\x1b[22;2mQ\x1b[30m\x1b[107m\x1b[22m",
+            output,
+            app.Driver);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Style_ThematicBreak_Renders_Faint ()
+    {
+        const int width = 5;
+        (IApplication app, Runnable window) = SetupStyleTest ("---", width);
+
+        DriverAssert.AssertDriverOutputIs (
+            @"\x1b[30m\x1b[107m\x1b[2m" + new string ('\u2500', width),
+            output,
+            app.Driver);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Style_ListMarker_Bold_Text_Normal ()
+    {
+        (IApplication app, Runnable window) = SetupStyleTest ("- L");
+
+        DriverAssert.AssertDriverOutputIs (
+            @"\x1b[30m\x1b[107m\x1b[1m" + "• " + @"\x1b[30m\x1b[107m\x1b[22mL",
+            output,
+            app.Driver);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Style_TaskDone_Renders_Strikethrough ()
+    {
+        (IApplication app, Runnable window) = SetupStyleTest ("- [x] D");
+
+        DriverAssert.AssertDriverOutputIs (
+            @"\x1b[30m\x1b[107m\x1b[1m" + "• [x] " + @"\x1b[30m\x1b[107m\x1b[22;9mD\x1b[30m\x1b[107m\x1b[29m",
+            output,
+            app.Driver);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Style_TaskTodo_Renders_Bold ()
+    {
+        (IApplication app, Runnable window) = SetupStyleTest ("- [ ] T");
+
+        DriverAssert.AssertDriverOutputIs (
+            @"\x1b[30m\x1b[107m\x1b[1m" + "• [ ] T" + @"\x1b[30m\x1b[107m\x1b[22m",
+            output,
+            app.Driver);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Style_Normal_No_TextStyle ()
+    {
+        (IApplication app, Runnable window) = SetupStyleTest ("Hi");
+
+        DriverAssert.AssertDriverOutputIs (
+            @"\x1b[30m\x1b[107mHi",
+            output,
+            app.Driver);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Style_Link_Absolute_Underline_With_OSC8 ()
+    {
+        (IApplication app, Runnable window) = SetupStyleTest ("[Go](https://x)");
+
+        DriverAssert.AssertDriverOutputIs (
+            @"\x1b]8;;https://x\x1b\\\x1b[30m\x1b[107m\x1b[4mGo\x1b]8;;\x1b\\\x1b[30m\x1b[107m\x1b[24m",
+            output,
+            app.Driver);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Style_Link_Relative_No_Underline_No_OSC8 ()
+    {
+        (IApplication app, Runnable window) = SetupStyleTest ("[Go](foo.md)");
+
+        DriverAssert.AssertDriverOutputIs (
+            @"\x1b[30m\x1b[107mGo",
+            output,
+            app.Driver);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    /// <summary>Sets up a 1-row ANSI screen with Force16Colors and a Black-on-White scheme.</summary>
+    private static (IApplication app, Runnable window) SetupStyleTest (string markdown, int width = 20)
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (width, 1);
+        app.Driver.Force16Colors = true;
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+
+        MarkdownView mv = new (markdown) { Width = Dim.Fill (), Height = Dim.Fill () };
+        mv.SchemeName = null;
+        mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+        app.Driver.Refresh ();
+
+        return (app, window);
     }
 }

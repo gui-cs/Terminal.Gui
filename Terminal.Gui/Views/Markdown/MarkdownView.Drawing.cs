@@ -1,5 +1,3 @@
-using Terminal.Gui.Drawing;
-
 namespace Terminal.Gui.Views;
 
 public partial class MarkdownView
@@ -27,7 +25,7 @@ public partial class MarkdownView
 
     private void DrawRenderedLine (RenderedLine line, int contentRow, int drawRow, DrawContext? context)
     {
-        int contentX = 0;
+        var contentX = 0;
 
         foreach (StyledSegment segment in line.Segments)
         {
@@ -48,10 +46,7 @@ public partial class MarkdownView
                         {
                             _linkRanges.Add (new MarkdownLinkRange
                             {
-                                Y = contentRow,
-                                StartX = contentX,
-                                EndXExclusive = contentX + graphemeWidth,
-                                Url = segment.Url!
+                                Y = contentRow, StartX = contentX, EndXExclusive = contentX + graphemeWidth, Url = segment.Url!
                             });
                         }
 
@@ -71,7 +66,7 @@ public partial class MarkdownView
 
     private void DrawGrapheme (StyledSegment segment, string grapheme, int x, int y)
     {
-        Attribute attr = GetAttributeForSegment (segment.StyleRole);
+        Attribute attr = GetAttributeForSegment (segment);
 
         if (!string.IsNullOrWhiteSpace (segment.Url) && Uri.IsWellFormedUriString (segment.Url, UriKind.Absolute) && Driver is { })
         {
@@ -94,39 +89,58 @@ public partial class MarkdownView
         AddStr (x, y, grapheme);
     }
 
-    private Attribute GetAttributeForSegment (MarkdownStyleRole role)
+    private Attribute GetAttributeForSegment (StyledSegment segment)
     {
         Attribute normal = GetAttributeForRole (VisualRole.Normal);
 
-        switch (role)
+        switch (segment.StyleRole)
         {
-        case MarkdownStyleRole.Heading:
-            return normal with { Style = normal.Style | TextStyle.Bold };
-        case MarkdownStyleRole.Emphasis:
-            return normal with { Style = normal.Style | TextStyle.Italic };
-        case MarkdownStyleRole.Strong:
-            return normal with { Style = normal.Style | TextStyle.Bold };
-        case MarkdownStyleRole.InlineCode:
-        case MarkdownStyleRole.CodeBlock:
-            return GetAttributeForRole (VisualRole.HotNormal);
-        case MarkdownStyleRole.Link:
-            return normal with { Style = normal.Style | TextStyle.Underline };
-        case MarkdownStyleRole.Quote:
-            return normal with { Style = normal.Style | TextStyle.Faint };
-        case MarkdownStyleRole.Table:
-            return normal with { Style = normal.Style | TextStyle.Bold };
-        case MarkdownStyleRole.ThematicBreak:
-            return normal with { Style = normal.Style | TextStyle.Faint };
-        case MarkdownStyleRole.ImageAlt:
-            return normal with { Style = normal.Style | TextStyle.Italic };
-        case MarkdownStyleRole.TaskDone:
-            return normal with { Style = normal.Style | TextStyle.Strikethrough };
-        case MarkdownStyleRole.TaskTodo:
-            return normal with { Style = normal.Style | TextStyle.Bold };
-        case MarkdownStyleRole.ListMarker:
-            return GetAttributeForRole (VisualRole.HotNormal);
-        default:
-            return normal;
+            case MarkdownStyleRole.Heading:
+                return normal with { Style = normal.Style | TextStyle.Bold };
+
+            case MarkdownStyleRole.Emphasis:
+                return normal with { Style = normal.Style | TextStyle.Italic };
+
+            case MarkdownStyleRole.Strong:
+                return normal with { Style = normal.Style | TextStyle.Bold };
+
+            case MarkdownStyleRole.InlineCode:
+            case MarkdownStyleRole.CodeBlock:
+                Attribute codeAttr = GetAttributeForRole (VisualRole.Normal);
+                Color codeBg = codeAttr.Background.GetDimmerColor ();
+
+                return new Attribute (codeAttr.Foreground, codeBg) { Style = codeAttr.Style | TextStyle.Bold };
+
+            case MarkdownStyleRole.Link:
+                bool isAbsoluteUrl = !string.IsNullOrWhiteSpace (segment.Url) && Uri.IsWellFormedUriString (segment.Url, UriKind.Absolute);
+
+                return isAbsoluteUrl ? normal with { Style = normal.Style | TextStyle.Underline } : normal;
+
+            case MarkdownStyleRole.Quote:
+                return normal with { Style = normal.Style | TextStyle.Faint };
+
+            case MarkdownStyleRole.Table:
+                return normal with { Style = normal.Style | TextStyle.Bold };
+
+            case MarkdownStyleRole.ThematicBreak:
+                return normal with { Style = normal.Style | TextStyle.Faint };
+
+            case MarkdownStyleRole.ImageAlt:
+                return normal with { Style = normal.Style | TextStyle.Italic };
+
+            case MarkdownStyleRole.TaskDone:
+                return normal with { Style = normal.Style | TextStyle.Strikethrough };
+
+            case MarkdownStyleRole.TaskTodo:
+                return normal with { Style = normal.Style | TextStyle.Bold };
+
+            case MarkdownStyleRole.ListMarker:
+                Attribute markerAttr = GetAttributeForRole (VisualRole.Normal);
+
+                return markerAttr with { Style = markerAttr.Style | TextStyle.Bold };
+
+            default:
+                return normal;
         }
     }
 
@@ -142,7 +156,7 @@ public partial class MarkdownView
             return;
         }
 
-        string queueId = $"{imageSource}:{screenPosition.X}:{screenPosition.Y}";
+        var queueId = $"{imageSource}:{screenPosition.X}:{screenPosition.Y}";
 
         if (!_queuedSixelIds.Add (queueId))
         {
