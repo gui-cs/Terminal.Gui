@@ -611,4 +611,41 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
     #endregion
 
+    // Copilot
+    [Fact]
+    public void Bullet_With_Parentheses_In_Link_Text_Renders_Correctly ()
+    {
+        // Exact pattern from layout.md TOC — indented sub-items with parens in link text
+        // Narrow viewport forces word-wrap which exposed the bug
+        const string MARKDOWN =
+            "- [How To](#how-to)\n" +
+            "  - [Stretch a View Between Fixed Elements](#stretch-a-view-between-fixed-elements)\n" +
+            "  - [Align Multiple Views (Like Dialog Buttons)](#align-multiple-views-like-dialog-buttons)\n" +
+            "  - [Center with Auto-Sizing and Constraints (Like Dialog)](#center-with-auto-sizing-and-constraints-like-dialog)";
+
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (50, 10);
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        MarkdownView mv = new (MARKDOWN) { Width = Dim.Fill (), Height = Dim.Fill () };
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        string screenContents = app.Driver.ToString ();
+        Assert.NotNull (screenContents);
+
+        // Should contain the full link text including "(Like Dialog)"
+        Assert.Contains ("Like Dialog", screenContents);
+
+        // "Dialog)" should NOT appear as orphaned text on its own line
+        string [] lines = screenContents.Split ('\n');
+        Assert.DoesNotContain (lines, l => l.TrimStart ().StartsWith ("Dialog)", StringComparison.Ordinal));
+
+        window.Dispose ();
+        app.Dispose ();
+    }
 }

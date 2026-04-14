@@ -105,4 +105,19 @@ public class MarkdownInlineParserTests
 
         Assert.Empty (runs);
     }
+
+    // Copilot
+    [Fact]
+    public void ParseInlines_Link_With_Parentheses_In_Text ()
+    {
+        // This is the exact pattern from the layout.md TOC that was broken
+        List<InlineRun> runs = MarkdownInlineParser.ParseInlines (
+            "[Center with Auto-Sizing and Constraints (Like Dialog)](#center-with-auto-sizing-and-constraints-like-dialog)",
+            MarkdownStyleRole.Normal);
+
+        Assert.Single (runs);
+        Assert.Equal ("Center with Auto-Sizing and Constraints (Like Dialog)", runs [0].Text);
+        Assert.Equal (MarkdownStyleRole.Link, runs [0].StyleRole);
+        Assert.Equal ("#center-with-auto-sizing-and-constraints-like-dialog", runs [0].Url);
+    }
 }

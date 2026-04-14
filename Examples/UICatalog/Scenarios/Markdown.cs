@@ -57,6 +57,7 @@ public class Markdown : Scenario
         };
 
         _markdownView = new MarkdownView { Width = Dim.Fill (), Height = Dim.Fill () };
+        _markdownView.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 
         _markdownView.LinkClicked += (_, e) =>
                                      {
@@ -65,8 +66,16 @@ public class Markdown : Scenario
                                          e.Handled = true;
                                      };
 
-        // Reset the content width control when the viewport changes
-        _markdownView.ViewportChanged += (_, _) => SyncContentWidthToViewport ();
+        // Reset the content width control only when viewport SIZE changes (not scroll position)
+        _markdownView.ViewportChanged += (_, e) =>
+                                          {
+                                              if (e.NewViewport.Size == e.OldViewport.Size)
+                                              {
+                                                  return;
+                                              }
+
+                                              SyncContentWidthToViewport ();
+                                          };
 
         _viewerFrame.Add (_markdownView);
 
@@ -78,7 +87,7 @@ public class Markdown : Scenario
 
         Shortcut spinnerShortcut = new () { CommandView = _spinner, Title = "" };
 
-        _contentWidthUpDown = new NumericUpDown { Value = 0 };
+        _contentWidthUpDown = new NumericUpDown { Value = 80 };
 
         _contentWidthUpDown.ValueChanging += (_, args) =>
                                              {

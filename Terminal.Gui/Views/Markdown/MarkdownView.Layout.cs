@@ -142,7 +142,9 @@ public partial class MarkdownView
 
                 if (currentWidth + graphemeWidth > viewportWidth && currentSegments.Count > 0)
                 {
-                    // Find last whitespace for word-boundary wrap (skip prefix segments)
+                    // Find last whitespace for word-boundary wrap (skip prefix segments).
+                    // Avoid breaking inside parentheses — for each candidate space, verify
+                    // it is not inside unclosed parens by forward-scanning from the start.
                     int breakIdx = -1;
 
                     for (int s = currentSegments.Count - 1; s >= 0; s--)
@@ -156,6 +158,27 @@ public partial class MarkdownView
                         {
                             continue;
                         }
+
+                        // Check paren depth at this position via forward scan
+                        var depth = 0;
+
+                        for (var j = 0; j <= s; j++)
+                        {
+                            if (currentSegments [j].Text == "(")
+                            {
+                                depth++;
+                            }
+                            else if (currentSegments [j].Text == ")")
+                            {
+                                depth--;
+                            }
+                        }
+
+                        if (depth > 0)
+                        {
+                            continue;
+                        }
+
                         breakIdx = s;
 
                         break;
