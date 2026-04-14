@@ -152,4 +152,30 @@ public class MarkdownViewTests
 
         host.Dispose ();
     }
+
+    [Theory]
+    [InlineData ("Hello * world")]
+    [InlineData ("A stray ! in text")]
+    [InlineData ("Unclosed [bracket")]
+    [InlineData ("Lone ` backtick")]
+    [InlineData ("Mixed **unclosed bold")]
+    [InlineData ("Edge *")]
+    // Copilot
+    public void Stray_Special_Characters_Do_Not_Cause_Infinite_Loop (string markdown)
+    {
+        MarkdownView markdownView = new (markdown);
+        markdownView.Width = 40;
+        markdownView.Height = 5;
+
+        View host = new () { Width = 40, Height = 5 };
+        host.Add (markdownView);
+
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        Assert.True (markdownView.LineCount >= 1);
+
+        host.Dispose ();
+    }
 }
