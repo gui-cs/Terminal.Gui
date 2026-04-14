@@ -96,7 +96,7 @@ public partial class MarkdownView
 
     private Attribute GetAttributeForSegment (MarkdownStyleRole role)
     {
-        Attribute normal = HasFocus ? GetAttributeForRole (VisualRole.Focus) : GetAttributeForRole (VisualRole.Normal);
+        Attribute normal = GetAttributeForRole (VisualRole.Normal);
 
         switch (role)
         {
@@ -124,7 +124,7 @@ public partial class MarkdownView
         case MarkdownStyleRole.TaskTodo:
             return normal with { Style = normal.Style | TextStyle.Bold };
         case MarkdownStyleRole.ListMarker:
-            return HasFocus ? GetAttributeForRole (VisualRole.HotFocus) : GetAttributeForRole (VisualRole.HotNormal);
+            return GetAttributeForRole (VisualRole.HotNormal);
         default:
             return normal;
         }

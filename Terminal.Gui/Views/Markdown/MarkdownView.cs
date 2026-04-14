@@ -26,6 +26,7 @@ public partial class MarkdownView : View, IDesignable
     public MarkdownView ()
     {
         CanFocus = true;
+        ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
 
         SetupBindingsAndCommands ();
     }

@@ -5,14 +5,14 @@ using System.Text.Json;
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Markdown", "Demonstrates MarkdownView by browsing Terminal.Gui docs from GitHub.")]
+[ScenarioMetadata ("Deepdives", "Demonstrates MarkdownView by providing a deep dive reader.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Text and Formatting")]
 public class Markdown : Scenario
 {
     private static readonly HttpClient _httpClient = new ();
 
-    private const string _docsApiUrl = "https://api.github.com/repos/gui-cs/Terminal.Gui/contents/docfx/docs?ref=develop";
+    private const string DOCS_API_URL = "https://api.github.com/repos/gui-cs/Terminal.Gui/contents/docfx/docs?ref=develop";
 
     private IApplication? _app;
     private ListView? _docList;
@@ -82,9 +82,11 @@ public class Markdown : Scenario
 
         _spinner = new ()
         {
-            AutoSpin = true,
+            AutoSpin = false,
             Visible = false
         };
+
+        _spinner.Initialized += (_, _) => _spinner.AutoSpin = true;
 
         _statusShortcut = new (Key.Empty, "Ready", null);
 
@@ -116,7 +118,7 @@ public class Markdown : Scenario
             _httpClient.DefaultRequestHeaders.UserAgent.Clear ();
             _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd ("Terminal.Gui-UICatalog/1.0");
 
-            string json = await _httpClient.GetStringAsync (_docsApiUrl).ConfigureAwait (false);
+            string json = await _httpClient.GetStringAsync (DOCS_API_URL).ConfigureAwait (false);
 
             using JsonDocument doc = JsonDocument.Parse (json);
             List<DocEntry> entries = [];

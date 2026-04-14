@@ -271,6 +271,17 @@ public partial class MarkdownView
             }
 
             int nextSpecial = FindNextSpecialToken (text, idx);
+
+            // If the next special token is at the current position, no TryParse could consume it.
+            // Emit the character as plain text and advance past it to avoid an infinite loop.
+            if (nextSpecial == idx)
+            {
+                runs.Add (new InlineRun (text [idx].ToString (), defaultRole));
+                idx++;
+
+                continue;
+            }
+
             string plainText = nextSpecial == -1 ? text [idx..] : text.Substring (idx, nextSpecial - idx);
 
             runs.Add (new InlineRun (plainText, defaultRole));
