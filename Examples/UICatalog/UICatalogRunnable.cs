@@ -154,7 +154,8 @@ public sealed class UICatalogRunnable : Runnable
                                                              Title = Strings.cmdQuit,
                                                              HelpText = "Quit UI Catalog",
                                                              Key = Application.GetDefaultKey (Command.Quit),
-                                                             Action = RequestStop
+                                                             Action = RequestStop,
+                                                             Command = Command.Quit
                                                          }
                                                      ]),
                                    new MenuBarItem ("_Themes", CreateThemeMenuItems ()),
