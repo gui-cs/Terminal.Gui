@@ -35,7 +35,7 @@ public class MinimalSpinnerDemo : Scenario
             Y = Pos.Bottom (chkAutoSpin) + 1,
             Value = CheckState.UnChecked
         };
-        chkUseProgressIndicator.ValueChanged += (_, e) => spinner.UseProgressIndicator = e.NewValue == CheckState.Checked;
+        chkUseProgressIndicator.ValueChanged += (_, e) => spinner.SyncWithTerminal = e.NewValue == CheckState.Checked;
 
         Label lblSequence = new ()
         {

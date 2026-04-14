@@ -132,7 +132,7 @@ public class ProgressBarStyles : Scenario
             Width = Dim.Percent (50),
             BorderStyle = LineStyle.Single,
             CanFocus = true,
-            UseProgressIndicator = true
+            SyncWithTerminal = true
         };
         container.Add (blocksPb);
 
@@ -221,7 +221,7 @@ public class ProgressBarStyles : Scenario
                                     var title = (string)_pbList.Source!.ToList () [e.NewValue.Value]!;
                                     var progressBar = (ProgressBar)container.SubViews.First (v => v.GetType () == typeof (ProgressBar) && v.Title == title);
                                     editor.ViewToEdit = progressBar;
-                                    ckbUseProgressIndicator.Value = progressBar.UseProgressIndicator ? CheckState.Checked : CheckState.UnChecked;
+                                    ckbUseProgressIndicator.Value = progressBar.SyncWithTerminal ? CheckState.Checked : CheckState.UnChecked;
                                     ckbHideSelectedProgressBar.Value = progressBar.Visible ? CheckState.UnChecked : CheckState.Checked;
                                 };
 
@@ -245,7 +245,7 @@ public class ProgressBarStyles : Scenario
                                                          return;
                                                      }
 
-                                                     progressBar.UseProgressIndicator = e.NewValue == CheckState.Checked;
+                                                     progressBar.SyncWithTerminal = e.NewValue == CheckState.Checked;
                                                  };
 
         ckbHideSelectedProgressBar.ValueChanging += (_, e) =>
