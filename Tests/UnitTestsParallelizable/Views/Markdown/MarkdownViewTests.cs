@@ -441,6 +441,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     [InlineData ("multiple---hyphens", "multiple---hyphens")]
     [InlineData ("ALL CAPS", "all-caps")]
     [InlineData ("dots.and", "dotsand")]
+    [InlineData ("Lexicon & Taxonomy", "lexicon--taxonomy")]
     public void GenerateAnchorSlug_Produces_Expected_Slug (string input, string expected)
     {
         string slug = MarkdownView.GenerateAnchorSlug (input);

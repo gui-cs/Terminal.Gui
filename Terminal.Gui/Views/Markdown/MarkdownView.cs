@@ -238,23 +238,11 @@ public partial class MarkdownView : View, IDesignable
     {
         RemoveCopyButtons ();
 
-        int glyphWidth = Glyphs.Copy.GetColumns ();
-
-        // Button with NoPadding renders as [⧉] → width = glyphWidth + 2 (brackets)
-        int buttonWidth = glyphWidth + 2;
-        int viewportWidth = Math.Max (Viewport.Width, MIN_WRAP_WIDTH);
-        int buttonX = viewportWidth - buttonWidth;
-
-        if (buttonX < 0)
-        {
-            return;
-        }
-
         foreach (CodeBlockRegion region in _codeBlockRegions)
         {
             Button btn = new ()
             {
-                X = buttonX,
+                X = Pos.AnchorEnd (),
                 Y = region.StartLine,
                 CanFocus = false,
                 TabStop = TabBehavior.NoStop,
@@ -339,8 +327,8 @@ public partial class MarkdownView : View, IDesignable
         // Remove non-alphanumeric, non-hyphen, non-space, non-underscore chars
         string slug = Regex.Replace (lower, @"[^\w\s-]", "", RegexOptions.None);
 
-        // Replace whitespace runs with a single hyphen
-        slug = Regex.Replace (slug, @"\s+", "-");
+        // Replace each space with a hyphen individually (GitHub does NOT collapse runs)
+        slug = slug.Replace (' ', '-');
 
         return slug.Trim ('-');
     }
