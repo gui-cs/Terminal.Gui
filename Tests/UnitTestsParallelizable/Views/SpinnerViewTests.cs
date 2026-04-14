@@ -87,11 +87,11 @@ public class SpinnerViewTests : TestDriverBase
     }
 
     [Fact]
-    public void AutoSpin_WithUseProgressIndicator_True_Writes_Indeterminate ()
+    public void AutoSpin_WithSyncWithTerminal_True_Writes_Indeterminate ()
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver ();
         driver.ProgressIndicator = new ProgressIndicator (driver);
-        SpinnerView spinner = new () { Driver = driver, UseProgressIndicator = true };
+        SpinnerView spinner = new () { Driver = driver, SyncWithTerminal = true };
 
         spinner.AutoSpin = true;
 
@@ -99,11 +99,11 @@ public class SpinnerViewTests : TestDriverBase
     }
 
     [Fact]
-    public void AutoSpin_WithUseProgressIndicator_False_Clears_Indicator ()
+    public void AutoSpin_WithSyncWithTerminal_False_Clears_Indicator ()
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver ();
         driver.ProgressIndicator = new ProgressIndicator (driver);
-        SpinnerView spinner = new () { Driver = driver, UseProgressIndicator = true };
+        SpinnerView spinner = new () { Driver = driver, SyncWithTerminal = true };
 
         spinner.AutoSpin = true;
         spinner.AutoSpin = false;
@@ -112,7 +112,7 @@ public class SpinnerViewTests : TestDriverBase
     }
 
     [Fact]
-    public void AutoSpin_WithoutUseProgressIndicator_DoesNotWrite_Indicator ()
+    public void AutoSpin_WithoutSyncWithTerminal_DoesNotWrite_Indicator ()
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver ();
         driver.ProgressIndicator = new ProgressIndicator (driver);
@@ -127,13 +127,13 @@ public class SpinnerViewTests : TestDriverBase
     }
 
     [Fact]
-    public void UseProgressIndicator_SetFalse_WhileAutoSpinTrue_Clears_Indicator ()
+    public void SyncWithTerminal_SetFalse_WhileAutoSpinTrue_Clears_Indicator ()
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver ();
         driver.ProgressIndicator = new ProgressIndicator (driver);
-        SpinnerView spinner = new () { Driver = driver, UseProgressIndicator = true, AutoSpin = true };
+        SpinnerView spinner = new () { Driver = driver, SyncWithTerminal = true, AutoSpin = true };
 
-        spinner.UseProgressIndicator = false;
+        spinner.SyncWithTerminal = false;
 
         string output = driver.GetOutput ().GetLastOutput ();
         Assert.Contains (EscSeqUtils.OSC_SetProgressIndeterminate (), output, StringComparison.Ordinal);
@@ -145,7 +145,7 @@ public class SpinnerViewTests : TestDriverBase
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver ();
         driver.ProgressIndicator = new ProgressIndicator (driver);
-        SpinnerView spinner = new () { UseProgressIndicator = true, AutoSpin = true };
+        SpinnerView spinner = new () { SyncWithTerminal = true, AutoSpin = true };
         spinner.Driver = driver;
 
         spinner.BeginInit ();
@@ -159,7 +159,7 @@ public class SpinnerViewTests : TestDriverBase
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver ();
         driver.ProgressIndicator = new ProgressIndicator (driver);
-        SpinnerView spinner = new () { Driver = driver, UseProgressIndicator = true, AutoSpin = true };
+        SpinnerView spinner = new () { Driver = driver, SyncWithTerminal = true, AutoSpin = true };
 
         spinner.Dispose ();
 
