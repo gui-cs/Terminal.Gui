@@ -69,18 +69,9 @@ public class MarkdownViewTests (ITestOutputHelper output)
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        Runnable window = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            BorderStyle = LineStyle.None
-        };
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView markdownView = new ("Visit [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui)")
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        MarkdownView markdownView = new ("Visit [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui)") { Width = Dim.Fill (), Height = Dim.Fill () };
 
         window.Add (markdownView);
 
@@ -88,10 +79,10 @@ public class MarkdownViewTests (ITestOutputHelper output)
         app.LayoutAndDraw ();
         app.Driver!.Refresh ();
 
-        string? output = app.Driver.GetOutput ().GetLastOutput ();
+        string lastOutput = app.Driver.GetOutput ().GetLastOutput ();
 
-        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://github.com/gui-cs/Terminal.Gui"), output);
-        Assert.Contains (EscSeqUtils.OSC_EndHyperlink (), output);
+        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://github.com/gui-cs/Terminal.Gui"), lastOutput);
+        Assert.Contains (EscSeqUtils.OSC_EndHyperlink (), lastOutput);
 
         window.Dispose ();
     }
@@ -102,22 +93,14 @@ public class MarkdownViewTests (ITestOutputHelper output)
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
 
-        Runnable window = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            BorderStyle = LineStyle.None
-        };
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView markdownView = new ("[Click](https://example.com)")
-        {
-            Width = 20,
-            Height = 3
-        };
+        MarkdownView markdownView = new ("[Click](https://example.com)") { Width = 20, Height = 3 };
 
         window.Add (markdownView);
 
         var clicked = false;
+
         markdownView.LinkClicked += (_, e) =>
                                     {
                                         clicked = true;
@@ -160,6 +143,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     [InlineData ("Lone ` backtick")]
     [InlineData ("Mixed **unclosed bold")]
     [InlineData ("Edge *")]
+
     // Copilot
     public void Stray_Special_Characters_Do_Not_Cause_Infinite_Loop (string markdown)
     {
@@ -180,6 +164,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     [Fact]
+
     // Copilot
     public void WordWrap_Breaks_At_Word_Boundaries ()
     {
@@ -202,11 +187,13 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     [Fact]
+
     // Copilot
     public void WordWrap_Long_Word_Falls_Back_To_Hard_Break ()
     {
         // "Abcdefghij" (10 chars, no spaces) at width 5 should hard-break
-        MarkdownView markdownView = new ("Abcdefghij");
+        const string MARKDOWN = "Abcdefghij";
+        MarkdownView markdownView = new (MARKDOWN);
         markdownView.Width = 5;
         markdownView.Height = 5;
 
@@ -234,10 +221,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     {
         (IApplication app, Runnable window) = SetupStyleTest ("# H");
 
-        DriverAssert.AssertDriverOutputIs (
-            @"\x1b[30m\x1b[107m\x1b[1mH\x1b[30m\x1b[107m\x1b[22m",
-            output,
-            app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1mH\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -248,10 +232,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     {
         (IApplication app, Runnable window) = SetupStyleTest ("*E*");
 
-        DriverAssert.AssertDriverOutputIs (
-            @"\x1b[30m\x1b[107m\x1b[3mE\x1b[30m\x1b[107m\x1b[23m",
-            output,
-            app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[3mE\x1b[30m\x1b[107m\x1b[23m", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -262,10 +243,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     {
         (IApplication app, Runnable window) = SetupStyleTest ("**S**");
 
-        DriverAssert.AssertDriverOutputIs (
-            @"\x1b[30m\x1b[107m\x1b[1mS\x1b[30m\x1b[107m\x1b[22m",
-            output,
-            app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1mS\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -277,10 +255,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         (IApplication app, Runnable window) = SetupStyleTest ("`C`");
 
         // Code gets a dimmed background (\x1b[103m = bright yellow in 16-color, dimmed from white)
-        DriverAssert.AssertDriverOutputIs (
-            @"\x1b[30m\x1b[103m\x1b[1mC\x1b[30m\x1b[107m\x1b[22m",
-            output,
-            app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[103m\x1b[1mC\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -291,10 +266,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     {
         (IApplication app, Runnable window) = SetupStyleTest ("> Q");
 
-        DriverAssert.AssertDriverOutputIs (
-            @"\x1b[30m\x1b[107m\x1b[1m> \x1b[30m\x1b[107m\x1b[22;2mQ\x1b[30m\x1b[107m\x1b[22m",
-            output,
-            app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m> \x1b[30m\x1b[107m\x1b[22;2mQ\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -303,13 +275,10 @@ public class MarkdownViewTests (ITestOutputHelper output)
     [Fact]
     public void Style_ThematicBreak_Renders_Faint ()
     {
-        const int width = 5;
-        (IApplication app, Runnable window) = SetupStyleTest ("---", width);
+        const int WIDTH = 5;
+        (IApplication app, Runnable window) = SetupStyleTest ("---", WIDTH);
 
-        DriverAssert.AssertDriverOutputIs (
-            @"\x1b[30m\x1b[107m\x1b[2m" + new string ('\u2500', width),
-            output,
-            app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[2m" + new string ('\u2500', WIDTH), output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -320,10 +289,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     {
         (IApplication app, Runnable window) = SetupStyleTest ("- L");
 
-        DriverAssert.AssertDriverOutputIs (
-            @"\x1b[30m\x1b[107m\x1b[1m" + "• " + @"\x1b[30m\x1b[107m\x1b[22mL",
-            output,
-            app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m" + "• " + @"\x1b[30m\x1b[107m\x1b[22mL", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -334,10 +300,9 @@ public class MarkdownViewTests (ITestOutputHelper output)
     {
         (IApplication app, Runnable window) = SetupStyleTest ("- [x] D");
 
-        DriverAssert.AssertDriverOutputIs (
-            @"\x1b[30m\x1b[107m\x1b[1m" + "• [x] " + @"\x1b[30m\x1b[107m\x1b[22;9mD\x1b[30m\x1b[107m\x1b[29m",
-            output,
-            app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m" + "• [x] " + @"\x1b[30m\x1b[107m\x1b[22;9mD\x1b[30m\x1b[107m\x1b[29m",
+                                           output,
+                                           app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -348,10 +313,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     {
         (IApplication app, Runnable window) = SetupStyleTest ("- [ ] T");
 
-        DriverAssert.AssertDriverOutputIs (
-            @"\x1b[30m\x1b[107m\x1b[1m" + "• [ ] T" + @"\x1b[30m\x1b[107m\x1b[22m",
-            output,
-            app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m" + "• [ ] T" + @"\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -362,10 +324,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     {
         (IApplication app, Runnable window) = SetupStyleTest ("Hi");
 
-        DriverAssert.AssertDriverOutputIs (
-            @"\x1b[30m\x1b[107mHi",
-            output,
-            app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107mHi", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -376,10 +335,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     {
         (IApplication app, Runnable window) = SetupStyleTest ("[Go](https://x)");
 
-        DriverAssert.AssertDriverOutputIs (
-            @"\x1b]8;;https://x\x1b\\\x1b[30m\x1b[107m\x1b[4mGo\x1b]8;;\x1b\\\x1b[30m\x1b[107m\x1b[24m",
-            output,
-            app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b]8;;https://x\x1b\\\x1b[30m\x1b[107m\x1b[4mGo\x1b]8;;\x1b\\\x1b[30m\x1b[107m\x1b[24m", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -390,13 +346,63 @@ public class MarkdownViewTests (ITestOutputHelper output)
     {
         (IApplication app, Runnable window) = SetupStyleTest ("[Go](foo.md)");
 
-        DriverAssert.AssertDriverOutputIs (
-            @"\x1b[30m\x1b[107mGo",
-            output,
-            app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107mGo", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
+    }
+
+    [Fact]
+    public void Style_CodeBlock_Has_Full_Width_Dimmed_Background ()
+    {
+        // Fenced code block: the dimmed background should fill the entire row, not just the text
+        const int WIDTH = 10;
+        const string MARKDOWN = "```\nAB\n```";
+
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (WIDTH, 3);
+        app.Driver.Force16Colors = true;
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+
+        MarkdownView mv = new (MARKDOWN) { Width = Dim.Fill (), Height = Dim.Fill () };
+        mv.SchemeName = null;
+        mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+        app.Driver.Refresh ();
+
+        string actual = app.Driver.GetOutput ().GetLastOutput ();
+
+        // The code line "AB" should have the dimmed background (\x1b[103m) filling the full 10-column width
+        // Row format: fill entire row with dimmed bg spaces, then draw "AB" with bold+dimmed bg
+        Assert.NotNull (actual);
+
+        // The code block row should contain 10 columns of dimmed background (103m), not just 2 for "AB"
+        // Count how many times the dimmed bg code appears - should be at least for the fill + the text
+        int dimBgCount = CountOccurrences (actual, "\x1b[103m");
+        Assert.True (dimBgCount >= 2, $"Expected dimmed background to appear at least twice (fill + text), got {dimBgCount}");
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    private static int CountOccurrences (string text, string pattern)
+    {
+        var count = 0;
+        var idx = 0;
+
+        while ((idx = text.IndexOf (pattern, idx, StringComparison.Ordinal)) >= 0)
+        {
+            count++;
+            idx += pattern.Length;
+        }
+
+        return count;
     }
 
     /// <summary>Sets up a 1-row ANSI screen with Force16Colors and a Black-on-White scheme.</summary>

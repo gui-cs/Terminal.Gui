@@ -1,15 +1,9 @@
 namespace Terminal.Gui.Views;
 
-internal sealed class RenderedLine
+internal sealed class RenderedLine (IReadOnlyList<StyledSegment> segments, bool wrapEligible, int width, bool isCodeBlock = false)
 {
-    public RenderedLine (IReadOnlyList<StyledSegment> segments, bool wrapEligible, int width)
-    {
-        Segments = segments;
-        WrapEligible = wrapEligible;
-        Width = width;
-    }
-
-    public IReadOnlyList<StyledSegment> Segments { get; }
-    public bool WrapEligible { get; }
-    public int Width { get; }
+    public IReadOnlyList<StyledSegment> Segments { get; } = segments;
+    public bool WrapEligible { get; } = wrapEligible;
+    public int Width { get; } = width;
+    public bool IsCodeBlock { get; } = isCodeBlock;
 }

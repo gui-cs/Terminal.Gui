@@ -39,10 +39,8 @@ public partial class MarkdownView
         var inCodeFence = false;
         List<string> codeLines = [];
 
-        for (var i = 0; i < lines.Length; i++)
+        foreach (string line in lines)
         {
-            string line = lines [i];
-
             if (IsFenceDelimiter (line))
             {
                 if (!inCodeFence)
@@ -159,7 +157,7 @@ public partial class MarkdownView
     {
         string trimmed = line.Trim ();
 
-        return trimmed.StartsWith ("```") || trimmed.StartsWith ("~~~");
+        return trimmed.StartsWith ("```", StringComparison.Ordinal) || trimmed.StartsWith ("~~~", StringComparison.Ordinal);
     }
 
     private static bool IsThematicBreak (string line)
@@ -171,7 +169,7 @@ public partial class MarkdownView
             return false;
         }
 
-        return trimmed.All (c => c == '-' || c == '*' || c == '_');
+        return trimmed.All (c => c is '-' or '*' or '_');
     }
 
     private static bool LooksLikeTableRow (string line)
@@ -193,7 +191,7 @@ public partial class MarkdownView
     {
         if (codeLines.Count == 0)
         {
-            _blocks.Add (new IntermediateBlock ([new InlineRun ("", MarkdownStyleRole.CodeBlock)], false));
+            _blocks.Add (new IntermediateBlock ([new InlineRun ("", MarkdownStyleRole.CodeBlock)], false, isCodeBlock: true));
 
             return;
         }
@@ -219,7 +217,7 @@ public partial class MarkdownView
                 runs = converted;
             }
 
-            _blocks.Add (new IntermediateBlock (runs, false));
+            _blocks.Add (new IntermediateBlock (runs, false, isCodeBlock: true));
         }
     }
 

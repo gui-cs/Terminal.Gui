@@ -25,6 +25,15 @@ public partial class MarkdownView
 
     private void DrawRenderedLine (RenderedLine line, int contentRow, int drawRow, DrawContext? context)
     {
+        // Fill code block lines with the dimmed background across the full viewport width
+        if (line.IsCodeBlock)
+        {
+            Attribute normal = GetAttributeForRole (VisualRole.Normal);
+            Color codeBg = normal.Background.GetDimmerColor ();
+            SetAttribute (new Attribute (normal.Foreground, codeBg));
+            FillRect (new Rectangle (0, drawRow, Viewport.Width, 1), (Rune)' ');
+        }
+
         var contentX = 0;
 
         foreach (StyledSegment segment in line.Segments)

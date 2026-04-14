@@ -1,17 +1,10 @@
 namespace Terminal.Gui.Views;
 
-internal sealed class IntermediateBlock
+internal sealed class IntermediateBlock (IReadOnlyList<InlineRun> runs, bool wrap, string prefix = "", string continuationPrefix = "", bool isCodeBlock = false)
 {
-    public IntermediateBlock (IReadOnlyList<InlineRun> runs, bool wrap, string prefix = "", string continuationPrefix = "")
-    {
-        Runs = runs;
-        Wrap = wrap;
-        Prefix = prefix;
-        ContinuationPrefix = continuationPrefix;
-    }
-
-    public IReadOnlyList<InlineRun> Runs { get; }
-    public bool Wrap { get; }
-    public string Prefix { get; }
-    public string ContinuationPrefix { get; }
+    public IReadOnlyList<InlineRun> Runs { get; } = runs;
+    public bool Wrap { get; } = wrap;
+    public string Prefix { get; } = prefix;
+    public string ContinuationPrefix { get; } = continuationPrefix;
+    public bool IsCodeBlock { get; } = isCodeBlock;
 }

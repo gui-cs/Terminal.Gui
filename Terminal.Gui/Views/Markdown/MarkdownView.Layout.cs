@@ -16,6 +16,7 @@ public partial class MarkdownView
                 RenderedLine unwrapped = CreateUnwrappedLine (block);
                 _renderedLines.Add (unwrapped);
                 _maxLineWidth = Math.Max (_maxLineWidth, unwrapped.Width);
+
                 continue;
             }
 
@@ -50,7 +51,7 @@ public partial class MarkdownView
 
         int width = CalculateWidth (segments);
 
-        return new RenderedLine (segments, false, width);
+        return new RenderedLine (segments, false, width, block.IsCodeBlock);
     }
 
     private static List<RenderedLine> WrapBlock (IntermediateBlock block, int viewportWidth)
@@ -61,8 +62,8 @@ public partial class MarkdownView
         string continuationPrefix = string.IsNullOrEmpty (block.ContinuationPrefix) ? firstPrefix : block.ContinuationPrefix;
 
         List<StyledSegment> currentSegments = [];
-        int currentWidth = 0;
-        bool firstLine = true;
+        var currentWidth = 0;
+        var firstLine = true;
 
         if (!string.IsNullOrEmpty (firstPrefix))
         {
@@ -88,12 +89,13 @@ public partial class MarkdownView
                             break;
                         }
 
-                        if (string.IsNullOrWhiteSpace (currentSegments [s].Text))
+                        if (!string.IsNullOrWhiteSpace (currentSegments [s].Text))
                         {
-                            breakIdx = s;
-
-                            break;
+                            continue;
                         }
+                        breakIdx = s;
+
+                        break;
                     }
 
                     if (breakIdx >= 0)
@@ -126,16 +128,16 @@ public partial class MarkdownView
 
                 currentSegments.Add (new StyledSegment (grapheme, run.StyleRole, run.Url, run.ImageSource));
                 currentWidth += graphemeWidth;
-
             }
         }
 
         if (currentSegments.Count == 0)
         {
             string prefix = firstLine ? firstPrefix : continuationPrefix;
+
             List<StyledSegment> emptySegments = string.IsNullOrEmpty (prefix)
-                ? [new StyledSegment ("", MarkdownStyleRole.Normal)]
-                : [new StyledSegment (prefix, MarkdownStyleRole.ListMarker)];
+                                                    ? [new StyledSegment ("", MarkdownStyleRole.Normal)]
+                                                    : [new StyledSegment (prefix, MarkdownStyleRole.ListMarker)];
             int width = string.IsNullOrEmpty (prefix) ? 0 : prefix.GetColumns ();
             lines.Add (new RenderedLine (emptySegments, true, width));
 
@@ -149,7 +151,7 @@ public partial class MarkdownView
 
     private static int CalculateWidth (IReadOnlyList<StyledSegment> segments)
     {
-        int width = 0;
+        var width = 0;
 
         foreach (StyledSegment segment in segments)
         {
