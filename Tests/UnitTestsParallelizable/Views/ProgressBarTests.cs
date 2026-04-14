@@ -93,7 +93,7 @@ public class ProgressBarTests : TestDriverBase
     }
 
     [Fact]
-    public void UseProgressIndicator_Fraction_Writes_Osc_Progress ()
+    public void SyncWithTerminal_Fraction_Writes_Osc_Progress ()
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver ();
         driver.ProgressIndicator = new ProgressIndicator (driver);
@@ -105,7 +105,7 @@ public class ProgressBarTests : TestDriverBase
     }
 
     [Fact]
-    public void UseProgressIndicator_Pulse_Writes_Indeterminate_Osc_Progress ()
+    public void SyncWithTerminal_Pulse_Writes_Indeterminate_Osc_Progress ()
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver (5, 1);
         driver.ProgressIndicator = new ProgressIndicator (driver);
@@ -123,7 +123,7 @@ public class ProgressBarTests : TestDriverBase
     }
 
     [Fact]
-    public void UseProgressIndicator_Hidden_ProgressBar_Still_Writes_Osc_Progress ()
+    public void SyncWithTerminal_Hidden_ProgressBar_Still_Writes_Osc_Progress ()
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver ();
         driver.ProgressIndicator = new ProgressIndicator (driver);
@@ -135,7 +135,7 @@ public class ProgressBarTests : TestDriverBase
     }
 
     [Fact]
-    public void UseProgressIndicator_LegacyConsole_Does_Not_Write_Osc_Progress ()
+    public void SyncWithTerminal_LegacyConsole_Does_Not_Write_Osc_Progress ()
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver ();
         driver.ProgressIndicator = new ProgressIndicator (driver);
@@ -148,7 +148,7 @@ public class ProgressBarTests : TestDriverBase
     }
 
     [Fact]
-    public void UseProgressIndicator_Disabling_Clears_Terminal_Progress ()
+    public void SyncWithTerminal_Disabling_Clears_Terminal_Progress ()
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver ();
         driver.ProgressIndicator = new ProgressIndicator (driver);
@@ -161,7 +161,7 @@ public class ProgressBarTests : TestDriverBase
     }
 
     [Fact]
-    public void Dispose_Without_UseProgressIndicator_Does_Not_Write_Clear_Progress ()
+    public void Dispose_Without_SyncWithTerminal_Does_Not_Write_Clear_Progress ()
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver ();
         driver.ProgressIndicator = new ProgressIndicator (driver);

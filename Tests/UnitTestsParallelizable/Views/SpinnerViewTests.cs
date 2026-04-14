@@ -87,7 +87,7 @@ public class SpinnerViewTests : TestDriverBase
     }
 
     [Fact]
-    public void AutoSpin_WithUseProgressIndicator_True_Writes_Indeterminate ()
+    public void AutoSpin_WithSyncWithTerminal_True_Writes_Indeterminate ()
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver ();
         driver.ProgressIndicator = new ProgressIndicator (driver);
@@ -99,7 +99,7 @@ public class SpinnerViewTests : TestDriverBase
     }
 
     [Fact]
-    public void AutoSpin_WithUseProgressIndicator_False_Clears_Indicator ()
+    public void AutoSpin_WithSyncWithTerminal_False_Clears_Indicator ()
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver ();
         driver.ProgressIndicator = new ProgressIndicator (driver);
@@ -112,7 +112,7 @@ public class SpinnerViewTests : TestDriverBase
     }
 
     [Fact]
-    public void AutoSpin_WithoutUseProgressIndicator_DoesNotWrite_Indicator ()
+    public void AutoSpin_WithoutSyncWithTerminal_DoesNotWrite_Indicator ()
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver ();
         driver.ProgressIndicator = new ProgressIndicator (driver);
@@ -127,7 +127,7 @@ public class SpinnerViewTests : TestDriverBase
     }
 
     [Fact]
-    public void UseProgressIndicator_SetFalse_WhileAutoSpinTrue_Clears_Indicator ()
+    public void SyncWithTerminal_SetFalse_WhileAutoSpinTrue_Clears_Indicator ()
     {
         DriverImpl driver = (DriverImpl)CreateTestDriver ();
         driver.ProgressIndicator = new ProgressIndicator (driver);

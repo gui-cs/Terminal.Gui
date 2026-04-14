@@ -115,11 +115,11 @@ public class ProgressBarStyles : Scenario
         var button = new Button { X = Pos.Center (), Y = Pos.Align (Alignment.Start), Text = "Start timer" };
         container.Add (button);
 
-        CheckBox ckbUseProgressIndicator = new ()
+        CheckBox ckbSyncWithTerminal = new ()
         {
-            X = Pos.Center (), Y = Pos.Align (Alignment.Start), Text = "Use ProgressIndicator for selected ProgressBar"
+            X = Pos.Center (), Y = Pos.Align (Alignment.Start), Text = "SyncWithTerminal for selected ProgressBar"
         };
-        container.Add (ckbUseProgressIndicator);
+        container.Add (ckbSyncWithTerminal);
 
         CheckBox ckbHideSelectedProgressBar = new () { X = Pos.Center (), Y = Pos.Align (Alignment.Start), Text = "Hide selected ProgressBar" };
         container.Add (ckbHideSelectedProgressBar);
@@ -221,7 +221,7 @@ public class ProgressBarStyles : Scenario
                                     var title = (string)_pbList.Source!.ToList () [e.NewValue.Value]!;
                                     var progressBar = (ProgressBar)container.SubViews.First (v => v.GetType () == typeof (ProgressBar) && v.Title == title);
                                     editor.ViewToEdit = progressBar;
-                                    ckbUseProgressIndicator.Value = progressBar.SyncWithTerminal ? CheckState.Checked : CheckState.UnChecked;
+                                     ckbSyncWithTerminal.Value = progressBar.SyncWithTerminal ? CheckState.Checked : CheckState.UnChecked;
                                     ckbHideSelectedProgressBar.Value = progressBar.Visible ? CheckState.UnChecked : CheckState.Checked;
                                 };
 
@@ -238,15 +238,15 @@ public class ProgressBarStyles : Scenario
                                        marqueesContinuousPb.ProgressBarFormat = e.Value.Value;
                                    };
 
-        ckbUseProgressIndicator.ValueChanging += (_, e) =>
+        ckbSyncWithTerminal.ValueChanging += (_, e) =>
+                                             {
+                                                 if (editor.ViewToEdit is not ProgressBar progressBar)
                                                  {
-                                                     if (editor.ViewToEdit is not ProgressBar progressBar)
-                                                     {
-                                                         return;
-                                                     }
+                                                     return;
+                                                 }
 
-                                                     progressBar.SyncWithTerminal = e.NewValue == CheckState.Checked;
-                                                 };
+                                                 progressBar.SyncWithTerminal = e.NewValue == CheckState.Checked;
+                                             };
 
         ckbHideSelectedProgressBar.ValueChanging += (_, e) =>
                                                     {
