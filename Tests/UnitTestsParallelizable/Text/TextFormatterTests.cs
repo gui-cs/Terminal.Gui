@@ -2488,7 +2488,7 @@ public class TextFormatterTests (ITestOutputHelper output) : TestDriverBase
                     "A sentence\t\t\t has words.",
                     3,
                     -21,
-                    new [] { "A ", "sen", "ten", "ce", "\t", "\t", "\t", " ", "has", " ", "wor", "ds." }
+                    new [] { "A ", "sen", "ten", "ce\t", "\t", "\t", " ", "has", " ", "wor", "ds." }
                 )]
     [InlineData (
                     "A sentence\t\t\t has words.",
@@ -2540,7 +2540,7 @@ public class TextFormatterTests (ITestOutputHelper output) : TestDriverBase
 
         Assert.Equal (maxWidth, text.GetRuneCount () + widthOffset);
         int expectedClippedWidth = Math.Min (text.GetRuneCount (), maxWidth);
-        wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true, tabWidth);
+        wrappedLines = TextFormatter.WordWrapText (text, maxWidth, true, tabWidth, preserveTabs: true);
         Assert.Equal (wrappedLines.Count, resultLines.Count ());
 
         Assert.True (
@@ -3114,8 +3114,8 @@ ssb
     }
 
     [Theory]
-    [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
-    [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
+    [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a   Tab")]
+    [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \nT\na\nb")]
     [InlineData (13, 1, TextDirection.LeftRight_TopBottom, 0, "This is a Tab")]
     [InlineData (1, 13, TextDirection.TopBottom_LeftRight, 0, "T\nh\ni\ns\n \ni\ns\n \na\n \nT\na\nb")]
     public void TabWith_PreserveTrailingSpaces_True (
@@ -3151,8 +3151,8 @@ ssb
     }
 
     [Theory]
-    [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
-    [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
+    [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a   Tab")]
+    [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \nT\na\nb")]
     [InlineData (13, 1, TextDirection.LeftRight_TopBottom, 0, "This is a Tab")]
     [InlineData (1, 13, TextDirection.TopBottom_LeftRight, 0, "T\nh\ni\ns\n \ni\ns\n \na\n \nT\na\nb")]
     public void TabWith_WordWrap_True (
@@ -3189,8 +3189,8 @@ ssb
     }
 
     [Theory]
-    [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a     Tab")]
-    [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \n \n \nT\na\nb")]
+    [InlineData (17, 1, TextDirection.LeftRight_TopBottom, 4, "This is a   Tab")]
+    [InlineData (1, 17, TextDirection.TopBottom_LeftRight, 4, "T\nh\ni\ns\n \ni\ns\n \na\n \n \n \nT\na\nb")]
     [InlineData (13, 1, TextDirection.LeftRight_TopBottom, 0, "This is a Tab")]
     [InlineData (1, 13, TextDirection.TopBottom_LeftRight, 0, "T\nh\ni\ns\n \ni\ns\n \na\n \nT\na\nb")]
     public void TabWith_PreserveTrailingSpaces_False (
@@ -3233,7 +3233,7 @@ ssb
         string formatted = tf.Format ();
 
         Assert.DoesNotContain ('\t', formatted);
-        Assert.Equal ("A    B    C", formatted);
+        Assert.Equal ("A   B   C", formatted);
     }
 
     [Fact]
