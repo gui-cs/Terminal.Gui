@@ -117,7 +117,7 @@ public class ProgressBarStyles : Scenario
 
         CheckBox ckbSyncWithTerminal = new ()
         {
-            X = Pos.Center (), Y = Pos.Align (Alignment.Start), Text = "SyncWithTerminal for selected ProgressBar"
+            X = Pos.Center (), Y = Pos.Align (Alignment.Start), Text = "Sync with terminal progress indicator"
         };
         container.Add (ckbSyncWithTerminal);
 
