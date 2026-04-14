@@ -188,11 +188,51 @@ public partial class MarkdownView : View, IDesignable
     /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
-        Markdown =
-            "# MarkdownView\n\nVisit [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui).\n\n- [x] Task\n- [ ] Todo\n\n```csharp\nConsole.WriteLine (\"Hello\");\n```";
+        Markdown = DefaultMarkdownSample;
 
         return true;
     }
+
+    /// <summary>Gets a short but comprehensive Markdown sample covering common features.</summary>
+    public static string DefaultMarkdownSample { get; } =
+        """
+        # Markdown Sample 🚀
+
+        Rich text with **bold**, *italic*, `inline code`, and ~~strikethrough~~.
+
+        ## Links & Images
+
+        Visit [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui) for more info.
+
+        ## Checklist
+
+        - [x] Bold & italic ✅
+        - [x] Code blocks 🔧
+        - [ ] Tables 📊
+        - [ ] Emojis 🎉
+
+        ## Code Block
+
+        ```csharp
+        Console.WriteLine ("Hello, Terminal.Gui! 🌍");
+        var x = 42;
+        ```
+
+        ## Table
+
+        | Feature       | Status  |
+        |---------------|:-------:|
+        | Markdown      | ✅      |
+        | Tables        | ✅      |
+        | Code blocks   | ✅      |
+        | Emojis 🎉    | ✅      |
+
+        ---
+
+        > **Tip:** This is a block quote with *inline formatting*.
+
+        That's all folks! 👋
+        """;
 
     private void SetMarkdown (string value)
     {

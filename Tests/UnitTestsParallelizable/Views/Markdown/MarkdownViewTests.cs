@@ -40,7 +40,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         bool result = designable.EnableForDesign ();
 
         Assert.True (result);
-        Assert.Contains ("MarkdownView", markdownView.Markdown);
+        Assert.Contains ("Markdown Sample", markdownView.Markdown);
     }
 
     [Fact]

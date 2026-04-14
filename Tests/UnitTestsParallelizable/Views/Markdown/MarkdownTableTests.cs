@@ -8,6 +8,48 @@ public class MarkdownTableTests
     // Copilot
 
     [Fact]
+    public void Parameterless_Constructor_Creates_Empty_Table ()
+    {
+        // Copilot
+        MarkdownTable table = new ();
+
+        Assert.NotNull (table);
+        Assert.Equal (0, table.Data.ColumnCount);
+    }
+
+    [Fact]
+    public void IDesignable_EnableForDesign_Returns_True ()
+    {
+        // Copilot
+        MarkdownTable table = new ();
+        IDesignable designable = table;
+
+        bool result = designable.EnableForDesign ();
+
+        Assert.True (result);
+        Assert.True (table.Data.ColumnCount > 0);
+        Assert.True (table.Data.Rows.Length > 0);
+    }
+
+    [Fact]
+    public void Data_Property_Setter_Recomputes_Table ()
+    {
+        // Copilot
+        MarkdownTable table = new ();
+
+        TableData newData = new (
+            ["A", "B"],
+            [Alignment.Start, Alignment.End],
+            [["1", "2"], ["3", "4"]]
+        );
+
+        table.Data = newData;
+
+        Assert.Equal (2, table.Data.ColumnCount);
+        Assert.Equal (2, table.Data.Rows.Length);
+    }
+
+    [Fact]
     public void CalculateTableHeight_Correct ()
     {
         List<string> lines = ["| H1 | H2 |", "|-----|-----|", "| A  | B  |", "| C  | D  |"];

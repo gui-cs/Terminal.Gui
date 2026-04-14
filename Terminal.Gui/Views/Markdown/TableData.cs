@@ -1,7 +1,7 @@
 namespace Terminal.Gui.Views;
 
 /// <summary>Represents the parsed structure of a Markdown table.</summary>
-internal sealed class TableData
+public sealed class TableData
 {
     /// <summary>Initializes a new <see cref="TableData"/> from parsed table rows.</summary>
     /// <param name="headers">The header cell texts.</param>

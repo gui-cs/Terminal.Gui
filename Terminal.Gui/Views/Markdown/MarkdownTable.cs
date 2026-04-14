@@ -6,8 +6,8 @@ namespace Terminal.Gui.Views;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         This view is created and managed internally by <see cref="MarkdownView"/> during layout.
-///         It is positioned as a SubView at the correct content coordinate so that it scrolls
+///         When used inside a <see cref="MarkdownView"/>, instances are created automatically during
+///         layout and positioned as SubViews at the correct content coordinate so that they scroll
 ///         naturally with the parent's viewport.
 ///     </para>
 ///     <para>
@@ -23,22 +23,55 @@ namespace Terminal.Gui.Views;
 ///         parsed from the Markdown separator row is respected. Cells that exceed their column width
 ///         are word-wrapped, and row heights expand to accommodate wrapped content.
 ///     </para>
+///     <para>
+///         This view can also be used standalone. Use the parameterless constructor and set
+///         <see cref="Data"/> to provide table content.
+///     </para>
 /// </remarks>
-internal sealed class MarkdownTable : View
+public sealed class MarkdownTable : View, IDesignable
 {
-    private readonly TableData _data;
+    private TableData _data;
     private int [] _columnWidths;
 
     // Pre-parsed inline segments for each cell
-    private readonly List<StyledSegment> [] _headerSegments;
-    private readonly List<StyledSegment> [] [] _rowSegments;
+    private List<StyledSegment> [] _headerSegments;
+    private List<StyledSegment> [] [] _rowSegments;
 
     // Pre-computed wrapped line counts per row
     private int _headerRowHeight;
-    private int [] _bodyRowHeights;
+    private int [] _bodyRowHeights = [];
 
     // Last width used for column computation — tracks when recalculation is needed
     private int _lastComputedWidth;
+
+    private static readonly TableData _emptyData = new ([], [], []);
+
+    /// <summary>Initializes a new empty <see cref="MarkdownTable"/>.</summary>
+    public MarkdownTable () : this (_emptyData, 80) { }
+
+    /// <summary>
+    ///     Gets or sets the <see cref="Views.TableData"/> that defines the table content. Setting this
+    ///     recomputes column widths, row heights, and redraws the table.
+    /// </summary>
+    public new TableData Data
+    {
+        get => _data;
+        set
+        {
+            _data = value;
+            _headerSegments = ParseCellSegments (value.Headers, MarkdownStyleRole.Heading);
+            _rowSegments = new List<StyledSegment> [value.Rows.Length] [];
+
+            for (var r = 0; r < value.Rows.Length; r++)
+            {
+                _rowSegments [r] = ParseCellSegments (value.Rows [r], MarkdownStyleRole.Normal);
+            }
+
+            _lastComputedWidth = -1;
+            Recalculate (Frame.Width > 0 ? Frame.Width : 80);
+            SetNeedsDraw ();
+        }
+    }
 
     /// <summary>Initializes a new <see cref="MarkdownTable"/> for the given parsed table data.</summary>
     /// <param name="data">The parsed table structure.</param>
@@ -97,6 +130,11 @@ internal sealed class MarkdownTable : View
         _columnWidths = ComputeColumnWidths (_data, maxWidth);
 
         _headerRowHeight = ComputeRowHeight (_headerSegments, _columnWidths);
+
+        if (_bodyRowHeights.Length != _rowSegments.Length)
+        {
+            _bodyRowHeights = new int [_rowSegments.Length];
+        }
 
         for (var r = 0; r < _rowSegments.Length; r++)
         {
@@ -682,5 +720,15 @@ internal sealed class MarkdownTable : View
         }
 
         return text [..charCount];
+    }
+
+    /// <inheritdoc/>
+    bool IDesignable.EnableForDesign ()
+    {
+        Data = new TableData (["Feature", "Status"], [Alignment.Start, Alignment.Center], [["Markdown", "✅ Very"], ["Tables", "✅ Amaze"]]);
+
+        Width = 40;
+
+        return true;
     }
 }

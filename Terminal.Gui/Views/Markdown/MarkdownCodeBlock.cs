@@ -6,19 +6,25 @@ namespace Terminal.Gui.Views;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         This view is created and managed internally by <see cref="MarkdownView"/> during layout.
-///         It is positioned as a SubView at the correct content coordinate so that it scrolls
+///         When used inside a <see cref="MarkdownView"/>, instances are created automatically during
+///         layout and positioned as SubViews at the correct content coordinate so that they scroll
 ///         naturally with the parent's viewport.
 ///     </para>
 ///     <para>
 ///         The dimmed background fills the full width of the view (via <c>Width = Dim.Fill()</c>),
-///         so it automatically resizes when <see cref="View.SetContentSize"/> changes the parent's
-///         content area width.
+///         so it automatically resizes when the content area width changes.
+///     </para>
+///     <para>
+///         This view can also be used standalone. Use the parameterless constructor and set
+///         <see cref="CodeLines"/> to provide plain-text code content.
 ///     </para>
 /// </remarks>
-internal sealed class MarkdownCodeBlock : View
+public class MarkdownCodeBlock : View, IDesignable
 {
-    private readonly IReadOnlyList<IReadOnlyList<StyledSegment>> _lines;
+    private IReadOnlyList<IReadOnlyList<StyledSegment>> _lines;
+
+    /// <summary>Initializes a new <see cref="MarkdownCodeBlock"/> with no content.</summary>
+    public MarkdownCodeBlock () : this ([]) { }
 
     /// <summary>Initializes a new <see cref="MarkdownCodeBlock"/>.</summary>
     /// <param name="lines">
@@ -31,13 +37,6 @@ internal sealed class MarkdownCodeBlock : View
 
         CanFocus = false;
         TabStop = TabBehavior.NoStop;
-
-        // No adornments — we draw everything ourselves
-        BorderStyle = LineStyle.None;
-        Border.Thickness = new Thickness (0);
-        Padding.Thickness = new Thickness (0);
-        Margin.Thickness = new Thickness (0);
-
         Height = lines.Count;
 
         // Copy button
@@ -60,6 +59,30 @@ internal sealed class MarkdownCodeBlock : View
                             };
 
         Add (copyBtn);
+    }
+
+    /// <summary>
+    ///     Gets or sets the plain-text code lines. Setting this re-creates the internal styled
+    ///     segments with <see cref="MarkdownStyleRole.CodeBlock"/> styling and updates <see cref="View.Height"/>.
+    /// </summary>
+    public IReadOnlyList<string> CodeLines
+    {
+        get
+        {
+            List<string> result = [];
+            result.AddRange (_lines.Select (segments => string.Concat (segments.Select (s => s.Text))));
+
+            return result;
+        }
+        set
+        {
+            List<IReadOnlyList<StyledSegment>> segments = [];
+            segments.AddRange (value.Select (line => (IReadOnlyList<StyledSegment>)[new StyledSegment (line, MarkdownStyleRole.CodeBlock)]));
+
+            _lines = segments;
+            Height = _lines.Count;
+            SetNeedsDraw ();
+        }
     }
 
     /// <inheritdoc/>
@@ -102,15 +125,23 @@ internal sealed class MarkdownCodeBlock : View
     }
 
     /// <summary>Extracts the plain text of this code block.</summary>
-    internal string ExtractText ()
+    public string ExtractText ()
     {
         List<string> lineTexts = [];
-
-        foreach (IReadOnlyList<StyledSegment> segments in _lines)
-        {
-            lineTexts.Add (string.Concat (segments.Select (s => s.Text)));
-        }
+        lineTexts.AddRange (_lines.Select (segments => string.Concat (segments.Select (s => s.Text))));
 
         return string.Join (Environment.NewLine, lineTexts);
+    }
+
+    /// <inheritdoc/>
+    bool IDesignable.EnableForDesign ()
+    {
+        CodeLines =
+        [
+            "using IApplication app = Application.Create ();", "app.Init ();", "using ExampleWindow exampleWindow = new ();", "app.Run (exampleWindow)"
+        ];
+        Width = Dim.Auto ();
+
+        return true;
     }
 }
