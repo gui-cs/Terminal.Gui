@@ -2,6 +2,7 @@ namespace Terminal.Gui.Views;
 
 public partial class MarkdownView
 {
+    /// <inheritdoc />
     protected override bool OnDrawingContent (DrawContext? context)
     {
         EnsureLayout ();
@@ -121,9 +122,10 @@ public partial class MarkdownView
                 return new Attribute (codeAttr.Foreground, codeBg) { Style = codeAttr.Style | TextStyle.Bold };
 
             case MarkdownStyleRole.Link:
-                bool isAbsoluteUrl = !string.IsNullOrWhiteSpace (segment.Url) && Uri.IsWellFormedUriString (segment.Url, UriKind.Absolute);
+                bool isClickableLink = !string.IsNullOrWhiteSpace (segment.Url)
+                                       && (Uri.IsWellFormedUriString (segment.Url, UriKind.Absolute) || segment.Url.StartsWith ('#'));
 
-                return isAbsoluteUrl ? normal with { Style = normal.Style | TextStyle.Underline } : normal;
+                return isClickableLink ? normal with { Style = normal.Style | TextStyle.Underline } : normal;
 
             case MarkdownStyleRole.Quote:
                 return normal with { Style = normal.Style | TextStyle.Faint };

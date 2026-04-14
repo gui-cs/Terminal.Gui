@@ -4,10 +4,10 @@ public partial class MarkdownView
 {
     private struct MarkdownLinkRange
     {
-        public int Y { get; set; }
-        public int StartX { get; set; }
-        public int EndXExclusive { get; set; }
-        public string Url { get; set; }
+        public int Y { get; init; }
+        public int StartX { get; init; }
+        public int EndXExclusive { get; init; }
+        public string Url { get; init; }
     }
 
     protected override bool OnMouseEvent (Mouse mouse)
@@ -17,24 +17,28 @@ public partial class MarkdownView
         if (mouse.Flags == MouseFlags.WheeledDown)
         {
             ScrollViewportVertical (1);
+
             return true;
         }
 
         if (mouse.Flags == MouseFlags.WheeledUp)
         {
             ScrollViewportVertical (-1);
+
             return true;
         }
 
         if (mouse.Flags == MouseFlags.WheeledRight)
         {
             ScrollViewportHorizontal (1);
+
             return true;
         }
 
         if (mouse.Flags == MouseFlags.WheeledLeft)
         {
             ScrollViewportHorizontal (-1);
+
             return true;
         }
 
@@ -70,7 +74,17 @@ public partial class MarkdownView
 
             bool handled = RaiseLinkClicked (range.Url);
 
-            if (!handled)
+            if (handled)
+            {
+                return true;
+            }
+
+            // Anchor links scroll to the matching heading
+            if (range.Url.StartsWith ('#'))
+            {
+                ScrollToAnchor (range.Url);
+            }
+            else
             {
                 Link.OpenUrl (range.Url);
             }

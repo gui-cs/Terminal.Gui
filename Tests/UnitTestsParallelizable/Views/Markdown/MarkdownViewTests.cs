@@ -427,4 +427,130 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         return (app, window);
     }
+
+    #region Anchor Navigation Tests
+
+    // Copilot
+
+    [Theory]
+    [InlineData ("Hello World", "hello-world")]
+    [InlineData ("Getting Started", "getting-started")]
+    [InlineData ("C# Code Examples!", "c-code-examples")]
+    [InlineData ("  Spaces  ", "spaces")]
+    [InlineData ("multiple---hyphens", "multiple---hyphens")]
+    [InlineData ("ALL CAPS", "all-caps")]
+    [InlineData ("dots.and" , "dotsand")]
+    public void GenerateAnchorSlug_Produces_Expected_Slug (string input, string expected)
+    {
+        string slug = MarkdownView.GenerateAnchorSlug (input);
+        Assert.Equal (expected, slug);
+    }
+
+    [Fact]
+    public void ScrollToAnchor_Scrolls_To_Heading ()
+    {
+        // Copilot
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (40, 5);
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        MarkdownView mv = new ("# First\n\nParagraph 1\n\n# Second\n\nParagraph 2\n\n# Third\n\nParagraph 3")
+        {
+            Width = Dim.Fill (), Height = Dim.Fill ()
+        };
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Initially at the top
+        Assert.Equal (0, mv.Viewport.Y);
+
+        // Scroll to "Third" heading
+        bool found = mv.ScrollToAnchor ("third");
+        Assert.True (found);
+        Assert.True (mv.Viewport.Y > 0, "Should have scrolled down");
+
+        // Scroll to "First" heading — should go back to top
+        found = mv.ScrollToAnchor ("first");
+        Assert.True (found);
+        Assert.Equal (0, mv.Viewport.Y);
+
+        // With leading # should also work
+        found = mv.ScrollToAnchor ("#second");
+        Assert.True (found);
+        Assert.True (mv.Viewport.Y > 0);
+
+        // Non-existent anchor returns false
+        found = mv.ScrollToAnchor ("nonexistent");
+        Assert.False (found);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void ScrollToAnchor_Duplicate_Headings_Get_Suffixed_Slugs ()
+    {
+        // Copilot
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (40, 3);
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        MarkdownView mv = new ("# Overview\n\nFirst\n\n# Overview\n\nSecond\n\n# Overview\n\nThird")
+        {
+            Width = Dim.Fill (), Height = Dim.Fill ()
+        };
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // First "Overview" → slug "overview"
+        bool found = mv.ScrollToAnchor ("overview");
+        Assert.True (found);
+        Assert.Equal (0, mv.Viewport.Y);
+
+        // Second "Overview" → slug "overview-1"
+        found = mv.ScrollToAnchor ("overview-1");
+        Assert.True (found);
+        Assert.True (mv.Viewport.Y > 0);
+
+        int secondY = mv.Viewport.Y;
+
+        // Third "Overview" → slug "overview-2"
+        found = mv.ScrollToAnchor ("overview-2");
+        Assert.True (found);
+        Assert.True (mv.Viewport.Y > secondY);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Anchor_Links_Are_Rendered_With_Underline ()
+    {
+        // Copilot
+        // Anchor links like [Section](#section) should be underlined
+        (IApplication app, Runnable window) = SetupStyleTest ("[Go](#sec)", 10);
+
+        // Anchor link should render with underline SGR (4m) like absolute links
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[4mGo\x1b[30m\x1b[107m\x1b[24m", output, app.Driver);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void ScrollToAnchor_With_Empty_String_Returns_False ()
+    {
+        // Copilot
+        MarkdownView mv = new ("# Test");
+        Assert.False (mv.ScrollToAnchor (""));
+        Assert.False (mv.ScrollToAnchor (null!));
+    }
+
+    #endregion
 }

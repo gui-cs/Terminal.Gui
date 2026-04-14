@@ -5,12 +5,19 @@ public partial class MarkdownView
     private void BuildRenderedLines ()
     {
         _renderedLines.Clear ();
+        _headingAnchors.Clear ();
         _maxLineWidth = 0;
 
         int viewportWidth = Math.Max (Viewport.Width, MIN_WRAP_WIDTH);
 
         foreach (IntermediateBlock block in _blocks)
         {
+            // Record heading anchor → rendered-line index before adding lines
+            if (!string.IsNullOrEmpty (block.Anchor))
+            {
+                _headingAnchors [block.Anchor!] = _renderedLines.Count;
+            }
+
             if (!block.Wrap)
             {
                 RenderedLine unwrapped = CreateUnwrappedLine (block);

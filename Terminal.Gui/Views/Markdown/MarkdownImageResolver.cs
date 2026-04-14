@@ -1,20 +1,10 @@
-using System.Text;
-
 namespace Terminal.Gui.Views;
 
 internal static class MarkdownImageResolver
 {
-    public static string GetFallbackText (string? altText)
-    {
-        if (string.IsNullOrWhiteSpace (altText))
-        {
-            return "[image]";
-        }
+    public static string GetFallbackText (string? altText) => string.IsNullOrWhiteSpace (altText) ? "[image]" : $"[{altText}]";
 
-        return $"[{altText}]";
-    }
-
-    public static bool TryGetSixelData (Func<string, byte[]?>? imageLoader, string imageSource, out string sixelData)
+    public static bool TryGetSixelData (Func<string, byte []?>? imageLoader, string imageSource, out string sixelData)
     {
         sixelData = string.Empty;
 
@@ -23,7 +13,7 @@ internal static class MarkdownImageResolver
             return false;
         }
 
-        byte[]? raw = imageLoader (imageSource);
+        byte []? raw = imageLoader (imageSource);
 
         if (raw is null || raw.Length == 0)
         {

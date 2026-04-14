@@ -38,6 +38,7 @@ public partial class MarkdownView
 
         var inCodeFence = false;
         List<string> codeLines = [];
+        Dictionary<string, int> slugCounts = new (StringComparer.OrdinalIgnoreCase);
 
         foreach (string line in lines)
         {
@@ -77,7 +78,10 @@ public partial class MarkdownView
             {
                 string headingText = headingMatch.Groups [2].Value;
                 List<InlineRun> headingRuns = ParseInlines (headingText, MarkdownStyleRole.Heading);
-                _blocks.Add (new IntermediateBlock (headingRuns, true));
+
+                string baseSlug = GenerateAnchorSlug (headingText);
+                string anchor = DeduplicateSlug (baseSlug, slugCounts);
+                _blocks.Add (new IntermediateBlock (headingRuns, true, anchor: anchor));
 
                 continue;
             }
@@ -405,5 +409,23 @@ public partial class MarkdownView
         }
 
         return next;
+    }
+
+    private static string DeduplicateSlug (string baseSlug, Dictionary<string, int> slugCounts)
+    {
+        if (!slugCounts.TryGetValue (baseSlug, out int count))
+        {
+            slugCounts [baseSlug] = 1;
+
+            return baseSlug;
+        }
+
+        slugCounts [baseSlug] = count + 1;
+        var deduped = $"{baseSlug}-{count}";
+
+        // Ensure the deduped slug itself is tracked
+        slugCounts [deduped] = 1;
+
+        return deduped;
     }
 }
