@@ -11,7 +11,7 @@ public enum AnsiStartupQuery
     TerminalSize,
 
     /// <summary>
-    ///     Cursor position query (<c>CSI ?6n</c>).
+    ///     Cursor position query (<c>CSI 6n</c>).
     /// </summary>
     CursorPosition,
 
