@@ -26,12 +26,15 @@ namespace Terminal.Gui.Views;
 public partial class MarkdownView : View, IDesignable
 {
     private const int MIN_WRAP_WIDTH = 4;
+    private const string COPY_BUTTON_GLYPH = "⧉";
 
     private readonly List<IntermediateBlock> _blocks = [];
     private readonly List<RenderedLine> _renderedLines = [];
     private readonly List<MarkdownLinkRange> _linkRanges = [];
     private readonly HashSet<string> _queuedSixelIds = [];
     private readonly Dictionary<string, int> _headingAnchors = new (StringComparer.OrdinalIgnoreCase);
+    private readonly List<CodeBlockRegion> _codeBlockRegions = [];
+    private readonly List<CopyButtonHitTarget> _copyButtonTargets = [];
 
     private string _markdown = string.Empty;
     private bool _parsed;
@@ -184,6 +187,8 @@ public partial class MarkdownView : View, IDesignable
         _renderedLines.Clear ();
         _linkRanges.Clear ();
         _headingAnchors.Clear ();
+        _codeBlockRegions.Clear ();
+        _copyButtonTargets.Clear ();
         _maxLineWidth = 0;
 
         SetNeedsLayout ();

@@ -10,6 +10,7 @@ public partial class MarkdownView
         public string Url { get; init; }
     }
 
+    /// <inheritdoc />
     protected override bool OnMouseEvent (Mouse mouse)
     {
         EnsureLayout ();
@@ -59,6 +60,25 @@ public partial class MarkdownView
 
         int contentX = Viewport.X + mouse.Position.Value.X;
         int contentY = Viewport.Y + mouse.Position.Value.Y;
+
+        // Check copy button targets first
+        foreach (CopyButtonHitTarget target in _copyButtonTargets)
+        {
+            if (target.ContentRow != contentY)
+            {
+                continue;
+            }
+
+            if (contentX < target.ContentX || contentX >= target.ContentX + target.Width)
+            {
+                continue;
+            }
+
+            string codeText = target.Region.ExtractText (_renderedLines);
+            Clipboard.TrySetClipboardData (codeText);
+
+            return true;
+        }
 
         foreach (MarkdownLinkRange range in _linkRanges)
         {

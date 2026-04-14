@@ -1,3 +1,4 @@
+using System.Text;
 using GitHub.Copilot.SDK;
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
@@ -15,7 +16,8 @@ internal sealed class ChatView : Window
     private readonly IApplication _app;
     private readonly CopilotClient _client;
     private string _model;
-    private readonly TextView _conversationView;
+    private readonly MarkdownView _conversationView;
+    private readonly StringBuilder _conversationText = new ();
     private readonly TextField _inputField;
     private readonly View _inputIndicator;
     private readonly SpinnerView _spinner;
@@ -47,31 +49,17 @@ internal sealed class ChatView : Window
             Width = 5,
             Visible = false
         };
-        var spinnerShortcut = new Shortcut { CommandView = _spinner, MouseHighlightStates = MouseState.None, Enabled = false };
+        Shortcut spinnerShortcut = new () { CommandView = _spinner, MouseHighlightStates = MouseState.None, Enabled = false };
         Shortcut quitShortcut = new (Application.GetDefaultKey (Command.Quit), "Quit", RequestStop);
 
         _statusBar = new StatusBar { AlignmentModes = AlignmentModes.IgnoreFirstOrLast, SchemeName = SchemeName, BorderStyle = LineStyle.None };
         _statusBar.Add (spinnerShortcut, quitShortcut);
 
-        _conversationView = new TextView
+        _conversationView = new MarkdownView
         {
             Width = Dim.Fill (),
-            Height = Dim.Auto (minimumContentDim: 1, maximumContentDim: Dim.Func (_ => GetMaxConversationHeight ())),
-            ReadOnly = true,
-            WordWrap = true
+            Height = Dim.Auto (minimumContentDim: 1, maximumContentDim: Dim.Func (_ => GetMaxConversationHeight ()))
         };
-
-        _conversationView.GettingAttributeForRole += (sender, args) =>
-                                                     {
-                                                         var view = sender as View;
-
-                                                         if (args.Role != VisualRole.ReadOnly)
-                                                         {
-                                                             return;
-                                                         }
-                                                         args.Result = view?.GetAttributeForRole (VisualRole.Normal);
-                                                         args.Handled = true;
-                                                     };
 
         _inputIndicator = new View
         {
@@ -222,8 +210,8 @@ internal sealed class ChatView : Window
 
     private void AppendToConversation (string text)
     {
-        _conversationView.Text += text;
-        _conversationView.MoveEnd ();
+        _conversationText.Append (text);
+        _conversationView.Markdown = _conversationText.ToString ();
     }
 
     private void HandleSlashCommand (string command)
@@ -239,7 +227,8 @@ internal sealed class ChatView : Window
                 break;
 
             case "clear":
-                _conversationView.Text = string.Empty;
+                _conversationText.Clear ();
+                _conversationView.Markdown = string.Empty;
                 AppendToConversation ($"{Glyphs.Diamond} Conversation cleared.\n");
 
                 break;

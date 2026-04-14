@@ -8,6 +8,7 @@ public partial class MarkdownView
         EnsureLayout ();
 
         _linkRanges.Clear ();
+        _copyButtonTargets.Clear ();
 
         SetAttributeForRole (VisualRole.Normal);
         FillRect (Viewport with { X = 0, Y = 0 }, (Rune)' ');
@@ -21,7 +22,45 @@ public partial class MarkdownView
             DrawRenderedLine (_renderedLines [contentRow], contentRow, drawRow, context);
         }
 
+        // Draw copy buttons on first visible line of each code block region
+        DrawCopyButtons (startRow, endRow);
+
         return true;
+    }
+
+    private void DrawCopyButtons (int startRow, int endRow)
+    {
+        int glyphWidth = COPY_BUTTON_GLYPH.GetColumns ();
+
+        foreach (CodeBlockRegion region in _codeBlockRegions)
+        {
+            // Find the first visible row of this code block
+            int firstVisible = Math.Max (region.StartLine, startRow);
+
+            if (firstVisible >= endRow || firstVisible >= region.EndLineExclusive)
+            {
+                continue;
+            }
+
+            int drawRow = firstVisible - Viewport.Y;
+            int drawCol = Viewport.Width - glyphWidth;
+
+            if (drawCol < 0)
+            {
+                continue;
+            }
+
+            // Draw with inverted/highlighted attribute to stand out
+            Attribute normal = GetAttributeForRole (VisualRole.Normal);
+            Color codeBg = normal.Background.GetDimmerColor ();
+            SetAttribute (new Attribute (codeBg, normal.Foreground));
+            AddStr (drawCol, drawRow, COPY_BUTTON_GLYPH);
+
+            // Track hit target in content-space coordinates
+            int contentX = Viewport.X + drawCol;
+
+            _copyButtonTargets.Add (new CopyButtonHitTarget (firstVisible, contentX, glyphWidth, region));
+        }
     }
 
     private void DrawRenderedLine (RenderedLine line, int contentRow, int drawRow, DrawContext? context)

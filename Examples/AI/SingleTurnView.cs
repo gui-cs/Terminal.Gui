@@ -16,7 +16,7 @@ internal sealed class SingleTurnView : Window
     private readonly CopilotClient _client;
     private readonly string _model;
     private readonly string _prompt;
-    private readonly Label _responseLabel;
+    private readonly MarkdownView _responseView;
 
     public SingleTurnView (IApplication app, CopilotClient client, string model, string prompt)
     {
@@ -30,9 +30,9 @@ internal sealed class SingleTurnView : Window
         Height = Dim.Auto ();
         Border.LineStyle = LineStyle.Rounded;
 
-        _responseLabel = new Label { Width = Dim.Fill (), Height = Dim.Auto () };
+        _responseView = new MarkdownView { Width = Dim.Fill (), Height = Dim.Auto () };
 
-        Add (_responseLabel);
+        Add (_responseView);
     }
 
     /// <inheritdoc/>
@@ -67,7 +67,7 @@ internal sealed class SingleTurnView : Window
                                 case AssistantMessageDeltaEvent delta:
                                     responseText.Append (delta.Data.DeltaContent);
 
-                                    _app.Invoke (() => { _responseLabel.Text = responseText.ToString (); });
+                                    _app.Invoke (() => { _responseView.Markdown = responseText.ToString (); });
 
                                     break;
 
@@ -77,7 +77,7 @@ internal sealed class SingleTurnView : Window
                                     break;
 
                                 case SessionErrorEvent err:
-                                    _app.Invoke (() => { _responseLabel.Text = $"Error: {err.Data.Message}"; });
+                                    _app.Invoke (() => { _responseView.Markdown = $"Error: {err.Data.Message}"; });
                                     done.TrySetResult ();
 
                                     break;
@@ -89,7 +89,7 @@ internal sealed class SingleTurnView : Window
         }
         catch (Exception ex)
         {
-            _app.Invoke (() => _responseLabel.Text = $"Error: {ex.Message}");
+            _app.Invoke (() => _responseView.Markdown = $"Error: {ex.Message}");
         }
 
         // Give the UI a moment to render the final update, then exit

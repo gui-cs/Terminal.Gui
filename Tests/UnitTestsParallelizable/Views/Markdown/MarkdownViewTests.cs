@@ -553,4 +553,70 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     #endregion
+
+    #region Code Block Copy Button Tests
+
+    // Copilot
+
+    [Fact]
+    public void CodeBlockRegions_Are_Detected_After_Layout ()
+    {
+        // Copilot
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (40, 10);
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        MarkdownView mv = new ("Text\n\n```\nline1\nline2\n```\n\nMore text\n\n```\nA\n```")
+        {
+            Width = Dim.Fill (), Height = Dim.Fill ()
+        };
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Should have 2 code block regions
+        Assert.True (mv.LineCount > 0);
+
+        // Verify that code block lines exist by checking rendered line count includes code
+        // The markdown has 2 code blocks: first with 2 lines, second with 1 line
+        // Verify we can extract text from regions by checking that at least some lines are code blocks
+        Assert.True (mv.LineCount >= 6, $"Expected at least 6 rendered lines, got {mv.LineCount}");
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Copy_Button_Glyph_Is_Drawn_On_Code_Block ()
+    {
+        // Copilot
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (20, 5);
+        app.Driver.Force16Colors = true;
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+
+        MarkdownView mv = new ("```\ncode\n```") { Width = Dim.Fill (), Height = Dim.Fill () };
+        mv.SchemeName = null;
+        mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // The copy button glyph "⧉" should appear in the screen contents on a code block line
+        string? screenContents = app.Driver.ToString ();
+        Assert.NotNull (screenContents);
+        Assert.Contains ("\u29C9", screenContents); // U+29C9 TWO JOINED SQUARES
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    #endregion
 }

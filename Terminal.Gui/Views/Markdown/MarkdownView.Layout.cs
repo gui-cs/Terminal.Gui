@@ -6,6 +6,7 @@ public partial class MarkdownView
     {
         _renderedLines.Clear ();
         _headingAnchors.Clear ();
+        _codeBlockRegions.Clear ();
         _maxLineWidth = 0;
 
         int viewportWidth = Math.Max (Viewport.Width, MIN_WRAP_WIDTH);
@@ -39,6 +40,32 @@ public partial class MarkdownView
         if (_renderedLines.Count == 0)
         {
             _renderedLines.Add (new RenderedLine ([new StyledSegment ("", MarkdownStyleRole.Normal)], true, 0));
+        }
+
+        BuildCodeBlockRegions ();
+    }
+
+    private void BuildCodeBlockRegions ()
+    {
+        var i = 0;
+
+        while (i < _renderedLines.Count)
+        {
+            if (!_renderedLines [i].IsCodeBlock)
+            {
+                i++;
+
+                continue;
+            }
+
+            int start = i;
+
+            while (i < _renderedLines.Count && _renderedLines [i].IsCodeBlock)
+            {
+                i++;
+            }
+
+            _codeBlockRegions.Add (new CodeBlockRegion (start, i));
         }
     }
 
