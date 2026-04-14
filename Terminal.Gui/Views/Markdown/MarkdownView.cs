@@ -208,7 +208,7 @@ public partial class MarkdownView : View, IDesignable
         BuildRenderedLines ();
         _layoutWidth = Viewport.Width;
 
-        SetContentSize (new Size (Math.Max (_maxLineWidth, Viewport.Width), Math.Max (_renderedLines.Count, Viewport.Height)));
+        SetContentSize (new Size (Viewport.Width, Math.Max (_renderedLines.Count, Viewport.Height)));
 
         ClampViewport ();
     }
