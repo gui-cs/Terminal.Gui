@@ -597,10 +597,10 @@ internal class TextModel
 
         // 1. Calculate absolute cursor position and store each glyph width
         int cursorColumn = CursorColumn (t, end, tabWidth, out List<int> glyphWidths, out List<int> excludedGlyphWidths);
-        int startWidth = GetColumnWidthsBeforeStart (glyphWidths, Math.Max (start, 0), out _, out int startIndex);
+        _ = GetColumnWidthsBeforeStart (glyphWidths, Math.Max (start, 0), out _, out int startIndex);
 
         // 2. LEFT NAVIGATION (Location 0 jump)
-        if (Math.Min (end, t.Count) > 0 && (Math.Min (end, t.Count) <= startIndex || Math.Max (width, 0) > t.Count))
+        if (Math.Min (end, t.Count) > 0 && (Math.Min (end, t.Count) <= startIndex || Math.Max (width, 0) > cursorColumn))
         {
             int maxGlyphWith = MaxGlyphWith (Math.Max (startIndex - 1, 0), -1);
 
@@ -625,7 +625,7 @@ internal class TextModel
                 return 0;
             }
 
-            startWidth = GetColumnWidthsBeforeStart (glyphWidths, startCol, out int clipOffset, out startIndex);
+            _ = GetColumnWidthsBeforeStart (glyphWidths, startCol, out int clipOffset, out startIndex);
             int maxGlyphWith = MaxGlyphWith (startIndex - clipOffset, 1);
 
             if (cursorColumn + maxGlyphWith < startCol + Math.Max (width, 0))
@@ -638,7 +638,7 @@ internal class TextModel
                 return Math.Max (0, Math.Max (startCol, 0) + maxGlyphWith + clipOffset);
             }
 
-            return startCol + 1;;
+            return startCol + 1;
         }
 
         return Math.Max (start, 0);
