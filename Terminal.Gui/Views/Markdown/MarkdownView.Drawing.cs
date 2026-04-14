@@ -147,61 +147,7 @@ public partial class MarkdownView
         AddStr (x, y, grapheme);
     }
 
-    private Attribute GetAttributeForSegment (StyledSegment segment)
-    {
-        Attribute normal = GetAttributeForRole (VisualRole.Normal);
-
-        switch (segment.StyleRole)
-        {
-            case MarkdownStyleRole.Heading:
-                return normal with { Style = normal.Style | TextStyle.Bold };
-
-            case MarkdownStyleRole.Emphasis:
-                return normal with { Style = normal.Style | TextStyle.Italic };
-
-            case MarkdownStyleRole.Strong:
-                return normal with { Style = normal.Style | TextStyle.Bold };
-
-            case MarkdownStyleRole.InlineCode:
-            case MarkdownStyleRole.CodeBlock:
-                Attribute codeAttr = GetAttributeForRole (VisualRole.Normal);
-                Color codeBg = codeAttr.Background.GetDimmerColor ();
-
-                return new Attribute (codeAttr.Foreground, codeBg) { Style = codeAttr.Style | TextStyle.Bold };
-
-            case MarkdownStyleRole.Link:
-                bool isClickableLink = !string.IsNullOrWhiteSpace (segment.Url)
-                                       && (Uri.IsWellFormedUriString (segment.Url, UriKind.Absolute) || segment.Url.StartsWith ('#'));
-
-                return isClickableLink ? normal with { Style = normal.Style | TextStyle.Underline } : normal;
-
-            case MarkdownStyleRole.Quote:
-                return normal with { Style = normal.Style | TextStyle.Faint };
-
-            case MarkdownStyleRole.Table:
-                return normal with { Style = normal.Style | TextStyle.Bold };
-
-            case MarkdownStyleRole.ThematicBreak:
-                return normal with { Style = normal.Style | TextStyle.Faint };
-
-            case MarkdownStyleRole.ImageAlt:
-                return normal with { Style = normal.Style | TextStyle.Italic };
-
-            case MarkdownStyleRole.TaskDone:
-                return normal with { Style = normal.Style | TextStyle.Strikethrough };
-
-            case MarkdownStyleRole.TaskTodo:
-                return normal with { Style = normal.Style | TextStyle.Bold };
-
-            case MarkdownStyleRole.ListMarker:
-                Attribute markerAttr = GetAttributeForRole (VisualRole.Normal);
-
-                return markerAttr with { Style = markerAttr.Style | TextStyle.Bold };
-
-            default:
-                return normal;
-        }
-    }
+    private Attribute GetAttributeForSegment (StyledSegment segment) => MarkdownAttributeHelper.GetAttributeForSegment (this, segment);
 
     private void TryQueueSixel (string imageSource, Point screenPosition)
     {

@@ -194,4 +194,70 @@ public class MarkdownTableTests
         window.Dispose ();
         app.Dispose ();
     }
+
+    [Fact]
+    public void Table_Cells_With_Inline_Bold_Render_Bold ()
+    {
+        // Copilot — Verify that **bold** within table cells is rendered with Bold style
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (40, 10);
+        app.Driver.Force16Colors = true;
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+
+        MarkdownView mv = new ("| Header |\n|--------|\n| **bold** |") { Width = Dim.Fill (), Height = Dim.Fill () };
+        mv.SchemeName = null;
+        mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        string? screenContents = app.Driver.ToString ();
+        Assert.NotNull (screenContents);
+
+        // The word "bold" should appear (without ** delimiters)
+        Assert.Contains ("bold", screenContents);
+
+        // The literal ** should NOT appear in the output
+        Assert.DoesNotContain ("**bold**", screenContents);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Table_Cells_With_Inline_Code_Render_Without_Backticks ()
+    {
+        // Copilot — Verify that `code` within table cells renders without backtick delimiters
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (40, 10);
+        app.Driver.Force16Colors = true;
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+
+        MarkdownView mv = new ("| Col |\n|-----|\n| `code` |") { Width = Dim.Fill (), Height = Dim.Fill () };
+        mv.SchemeName = null;
+        mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        string? screenContents = app.Driver.ToString ();
+        Assert.NotNull (screenContents);
+
+        // "code" should be visible
+        Assert.Contains ("code", screenContents);
+
+        // Backtick delimiters should not appear around "code"
+        Assert.DoesNotContain ("`code`", screenContents);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
 }

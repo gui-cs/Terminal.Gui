@@ -2,7 +2,7 @@ namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     A read-only view that renders a single Markdown table with box-drawing borders via
-///     <see cref="LineCanvas"/> and styled header/body text.
+///     <see cref="LineCanvas"/> and styled header/body text with inline Markdown formatting.
 /// </summary>
 /// <remarks>
 ///     <para>
@@ -12,7 +12,8 @@ namespace Terminal.Gui.Views;
 ///     </para>
 ///     <para>
 ///         Borders are rendered using <see cref="LineStyle.Single"/> via the view's
-///         <see cref="View.LineCanvas"/>. Header cells are bold; body cells use the normal attribute.
+///         <see cref="View.LineCanvas"/>. Header cells are bold; body cells support inline
+///         Markdown formatting (bold, italic, code, links) via <see cref="MarkdownInlineParser"/>.
 ///         Column alignment (left, center, right) parsed from the Markdown separator row is respected.
 ///     </para>
 /// </remarks>
@@ -20,6 +21,10 @@ internal sealed class MarkdownTable : View
 {
     private readonly TableData _data;
     private readonly int [] _columnWidths;
+
+    // Pre-parsed inline segments for each cell
+    private readonly List<StyledSegment> [] _headerSegments;
+    private readonly List<StyledSegment> [] [] _rowSegments;
 
     /// <summary>Initializes a new <see cref="MarkdownTable"/> for the given parsed table data.</summary>
     /// <param name="data">The parsed table structure.</param>
@@ -32,6 +37,15 @@ internal sealed class MarkdownTable : View
         _data = data;
         CanFocus = false;
         TabStop = TabBehavior.NoStop;
+
+        // Parse inline markdown for all cells upfront
+        _headerSegments = ParseCellSegments (data.Headers, MarkdownStyleRole.Heading);
+        _rowSegments = new List<StyledSegment> [data.Rows.Length] [];
+
+        for (var r = 0; r < data.Rows.Length; r++)
+        {
+            _rowSegments [r] = ParseCellSegments (data.Rows [r], MarkdownStyleRole.Normal);
+        }
 
         _columnWidths = ComputeColumnWidths (data, maxWidth);
 
@@ -71,53 +85,84 @@ internal sealed class MarkdownTable : View
 
     private void DrawCellContents ()
     {
-        Attribute normal = GetAttributeForRole (VisualRole.Normal);
-        Attribute bold = normal with { Style = normal.Style | TextStyle.Bold };
-
         // Header row at Y=1 (below top border)
-        DrawRow (_data.Headers, _data.ColumnAlignments, 1, bold);
+        DrawRow (_headerSegments, _data.ColumnAlignments, 1, isHeader: true);
 
         // Body rows starting at Y=3 (below header separator)
-        for (var r = 0; r < _data.Rows.Length; r++)
+        for (var r = 0; r < _rowSegments.Length; r++)
         {
-            DrawRow (_data.Rows [r], _data.ColumnAlignments, r + 3, normal);
+            DrawRow (_rowSegments [r], _data.ColumnAlignments, r + 3, isHeader: false);
         }
     }
 
-    private void DrawRow (string [] cells, Alignment [] alignments, int y, Attribute attr)
+    private void DrawRow (List<StyledSegment> [] cellSegments, Alignment [] alignments, int y, bool isHeader)
     {
+        Attribute normal = GetAttributeForRole (VisualRole.Normal);
+        Attribute headerBold = normal with { Style = normal.Style | TextStyle.Bold };
+
         // Column content starts after the left border character
         var x = 1;
 
         for (var col = 0; col < _columnWidths.Length; col++)
         {
             int colWidth = _columnWidths [col];
-            string cellText = col < cells.Length ? cells [col] : string.Empty;
-            int textWidth = cellText.GetColumns ();
+            List<StyledSegment> segments = col < cellSegments.Length ? cellSegments [col] : [];
 
-            // Truncate if necessary
-            if (textWidth > colWidth)
+            // Calculate total display width of all segments
+            int textWidth = 0;
+
+            foreach (StyledSegment seg in segments)
             {
-                cellText = TruncateToWidth (cellText, colWidth);
-                textWidth = cellText.GetColumns ();
+                textWidth += seg.Text.GetColumns ();
             }
 
             // Calculate padding based on alignment
             Alignment alignment = col < alignments.Length ? alignments [col] : Alignment.Start;
-            int padLeft = CalculateLeftPadding (colWidth, textWidth, alignment);
+            int padLeft = CalculateLeftPadding (colWidth, Math.Min (textWidth, colWidth - 2), alignment);
 
-            SetAttribute (attr);
+            // Fill the cell with spaces first (using normal attribute)
+            SetAttribute (normal);
 
-            // Fill the cell with spaces first
             for (var i = 0; i < colWidth; i++)
             {
                 AddStr (x + i, y, " ");
             }
 
-            // Draw the text at the padded position
-            if (!string.IsNullOrEmpty (cellText))
+            // Draw styled segments at the padded position
+            int drawX = x + padLeft;
+            int available = colWidth - 2; // padding on each side
+            var drawn = 0;
+
+            foreach (StyledSegment seg in segments)
             {
-                AddStr (x + padLeft, y, cellText);
+                if (drawn >= available)
+                {
+                    break;
+                }
+
+                // Resolve attribute: for headers, force bold on top of any inline style
+                Attribute attr = MarkdownAttributeHelper.GetAttributeForSegment (this, seg);
+
+                if (isHeader)
+                {
+                    attr = attr with { Style = attr.Style | TextStyle.Bold };
+                }
+
+                SetAttribute (attr);
+
+                foreach (string grapheme in GraphemeHelper.GetGraphemes (seg.Text))
+                {
+                    int gw = Math.Max (grapheme.GetColumns (), 1);
+
+                    if (drawn + gw > available)
+                    {
+                        break;
+                    }
+
+                    AddStr (drawX, y, grapheme);
+                    drawX += gw;
+                    drawn += gw;
+                }
             }
 
             // Advance past column width + separator character
@@ -159,6 +204,19 @@ internal sealed class MarkdownTable : View
                 LineCanvas.AddLine (new Point (x, 0), tableHeight, Orientation.Vertical, LineStyle.Single, borderAttr);
             }
         }
+    }
+
+    private static List<StyledSegment> [] ParseCellSegments (string [] cells, MarkdownStyleRole defaultRole)
+    {
+        List<StyledSegment> [] result = new List<StyledSegment> [cells.Length];
+
+        for (var i = 0; i < cells.Length; i++)
+        {
+            List<InlineRun> runs = MarkdownInlineParser.ParseInlines (cells [i], defaultRole);
+            result [i] = MarkdownAttributeHelper.ToStyledSegments (runs);
+        }
+
+        return result;
     }
 
     private static int [] ComputeColumnWidths (TableData data, int maxWidth)
@@ -225,34 +283,5 @@ internal sealed class MarkdownTable : View
             Alignment.End => 1 + Math.Max (innerWidth - usableTextWidth, 0),
             _ => 1 // Start — 1 char left padding
         };
-    }
-
-    private static string TruncateToWidth (string text, int maxWidth)
-    {
-        // Account for padding
-        int available = maxWidth - 2;
-
-        if (available <= 0)
-        {
-            return string.Empty;
-        }
-
-        var width = 0;
-        var charCount = 0;
-
-        foreach (string grapheme in GraphemeHelper.GetGraphemes (text))
-        {
-            int gw = Math.Max (grapheme.GetColumns (), 1);
-
-            if (width + gw > available)
-            {
-                break;
-            }
-
-            width += gw;
-            charCount += grapheme.Length;
-        }
-
-        return text [..charCount];
     }
 }
