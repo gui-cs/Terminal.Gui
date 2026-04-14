@@ -38,12 +38,17 @@ public partial class MarkdownView
 
         var inCodeFence = false;
         List<string> codeLines = [];
+        List<string> tableLines = [];
         Dictionary<string, int> slugCounts = new (StringComparer.OrdinalIgnoreCase);
 
-        foreach (string line in lines)
+        for (var lineIdx = 0; lineIdx < lines.Length; lineIdx++)
         {
+            string line = lines [lineIdx];
+
             if (IsFenceDelimiter (line))
             {
+                FlushTableLines (tableLines);
+
                 if (!inCodeFence)
                 {
                     inCodeFence = true;
@@ -64,6 +69,17 @@ public partial class MarkdownView
 
                 continue;
             }
+
+            // Accumulate consecutive table rows
+            if (LooksLikeTableRow (line))
+            {
+                tableLines.Add (line);
+
+                continue;
+            }
+
+            // Non-table line encountered — flush any accumulated table rows
+            FlushTableLines (tableLines);
 
             if (string.IsNullOrWhiteSpace (line))
             {
@@ -121,21 +137,43 @@ public partial class MarkdownView
                 continue;
             }
 
-            if (LooksLikeTableRow (line))
-            {
-                _blocks.Add (new IntermediateBlock ([new InlineRun (NormalizeTableRow (line), MarkdownStyleRole.Table)], false));
-
-                continue;
-            }
-
             List<InlineRun> paragraphRuns = ParseInlines (line, MarkdownStyleRole.Normal);
             _blocks.Add (new IntermediateBlock (paragraphRuns, true));
         }
+
+        // Flush any remaining accumulated lines
+        FlushTableLines (tableLines);
 
         if (inCodeFence)
         {
             AddCodeBlockLines (codeLines);
         }
+    }
+
+    private void FlushTableLines (List<string> tableLines)
+    {
+        if (tableLines.Count == 0)
+        {
+            return;
+        }
+
+        TableData? tableData = TableData.TryParse (tableLines);
+
+        if (tableData is not null)
+        {
+            _blocks.Add (new IntermediateBlock ([new InlineRun ("", MarkdownStyleRole.Table)], false, tableData: tableData));
+        }
+        else
+        {
+            // Not a valid table — emit as plain text lines
+            foreach (string line in tableLines)
+            {
+                List<InlineRun> runs = ParseInlines (line, MarkdownStyleRole.Normal);
+                _blocks.Add (new IntermediateBlock (runs, true));
+            }
+        }
+
+        tableLines.Clear ();
     }
 
     private void AddListLine (string listText, string marker)
@@ -182,14 +220,6 @@ public partial class MarkdownView
         string trimmed = line.Trim ();
 
         return trimmed.StartsWith ('|') && trimmed.IndexOf ('|', 1) >= 0;
-    }
-
-    private static string NormalizeTableRow (string line)
-    {
-        string trimmed = line.Trim ();
-        string [] cells = trimmed.Trim ('|').Split ('|', StringSplitOptions.TrimEntries);
-
-        return $"| {string.Join (" | ", cells)} |";
     }
 
     private void AddCodeBlockLines (IReadOnlyList<string> codeLines)

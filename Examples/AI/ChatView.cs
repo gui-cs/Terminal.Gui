@@ -57,8 +57,7 @@ internal sealed class ChatView : Window
 
         _conversationView = new MarkdownView
         {
-            Width = Dim.Fill (),
-            Height = Dim.Auto (minimumContentDim: 1, maximumContentDim: Dim.Func (_ => GetMaxConversationHeight ()))
+            Width = Dim.Fill (), Height = Dim.Auto (minimumContentDim: 1, maximumContentDim: Dim.Func (_ => GetMaxConversationHeight ()))
         };
 
         _inputIndicator = new View

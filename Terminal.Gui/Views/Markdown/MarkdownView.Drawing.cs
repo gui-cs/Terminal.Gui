@@ -70,6 +70,12 @@ public partial class MarkdownView
             return;
         }
 
+        // Table lines are drawn by MarkdownTable SubViews
+        if (line.IsTable)
+        {
+            return;
+        }
+
         // Fill code block lines with the dimmed background across the full viewport width
         if (line.IsCodeBlock)
         {

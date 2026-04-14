@@ -19,6 +19,33 @@ public partial class MarkdownView
                 _headingAnchors [block.Anchor!] = _renderedLines.Count;
             }
 
+            // Table blocks get a MarkdownTable SubView and placeholder lines
+            if (block is { IsTable: true, TableData: { } tableData })
+            {
+                int tableHeight = MarkdownTable.CalculateTableHeight (tableData);
+                int startLine = _renderedLines.Count;
+
+                MarkdownTable tableView = new (tableData, viewportWidth)
+                {
+                    X = 0,
+                    Y = startLine,
+                };
+
+                _tableViews.Add (tableView);
+                Add (tableView);
+
+                int tableWidth = tableView.Frame.Width;
+                _maxLineWidth = Math.Max (_maxLineWidth, tableWidth);
+
+                // Reserve placeholder lines so content height is correct
+                for (var i = 0; i < tableHeight; i++)
+                {
+                    _renderedLines.Add (new RenderedLine ([new StyledSegment ("", MarkdownStyleRole.Table)], false, 0, isTable: true));
+                }
+
+                continue;
+            }
+
             if (!block.Wrap)
             {
                 RenderedLine unwrapped = CreateUnwrappedLine (block);

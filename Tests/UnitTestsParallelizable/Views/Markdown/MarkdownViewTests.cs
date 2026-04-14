@@ -439,7 +439,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     [InlineData ("  Spaces  ", "spaces")]
     [InlineData ("multiple---hyphens", "multiple---hyphens")]
     [InlineData ("ALL CAPS", "all-caps")]
-    [InlineData ("dots.and" , "dotsand")]
+    [InlineData ("dots.and", "dotsand")]
     public void GenerateAnchorSlug_Produces_Expected_Slug (string input, string expected)
     {
         string slug = MarkdownView.GenerateAnchorSlug (input);
@@ -455,10 +455,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         app.Driver!.SetScreenSize (40, 5);
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
-        MarkdownView mv = new ("# First\n\nParagraph 1\n\n# Second\n\nParagraph 2\n\n# Third\n\nParagraph 3")
-        {
-            Width = Dim.Fill (), Height = Dim.Fill ()
-        };
+        MarkdownView mv = new ("# First\n\nParagraph 1\n\n# Second\n\nParagraph 2\n\n# Third\n\nParagraph 3") { Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -499,10 +496,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         app.Driver!.SetScreenSize (40, 3);
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
-        MarkdownView mv = new ("# Overview\n\nFirst\n\n# Overview\n\nSecond\n\n# Overview\n\nThird")
-        {
-            Width = Dim.Fill (), Height = Dim.Fill ()
-        };
+        MarkdownView mv = new ("# Overview\n\nFirst\n\n# Overview\n\nSecond\n\n# Overview\n\nThird") { Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -568,10 +562,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView mv = new ("Text\n\n```\nline1\nline2\n```\n\nMore text\n\n```\nA\n```")
-        {
-            Width = Dim.Fill (), Height = Dim.Fill ()
-        };
+        MarkdownView mv = new ("Text\n\n```\nline1\nline2\n```\n\nMore text\n\n```\nA\n```") { Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -610,7 +601,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         app.LayoutAndDraw ();
 
         // The copy button glyph "⧉" should appear in the screen contents on a code block line
-        string? screenContents = app.Driver.ToString ();
+        var screenContents = app.Driver.ToString ();
         Assert.NotNull (screenContents);
         Assert.Contains ("\u29C9", screenContents); // U+29C9 TWO JOINED SQUARES
 
@@ -619,4 +610,5 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     #endregion
+
 }

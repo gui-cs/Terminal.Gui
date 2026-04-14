@@ -34,6 +34,7 @@ public partial class MarkdownView : View, IDesignable
     private readonly Dictionary<string, int> _headingAnchors = new (StringComparer.OrdinalIgnoreCase);
     private readonly List<CodeBlockRegion> _codeBlockRegions = [];
     private readonly List<Button> _copyButtons = [];
+    private readonly List<MarkdownTable> _tableViews = [];
 
     private string _markdown = string.Empty;
     private bool _parsed;
@@ -188,6 +189,7 @@ public partial class MarkdownView : View, IDesignable
         _headingAnchors.Clear ();
         _codeBlockRegions.Clear ();
         RemoveCopyButtons ();
+        RemoveTableViews ();
         _maxLineWidth = 0;
 
         SetNeedsLayout ();
@@ -269,7 +271,7 @@ public partial class MarkdownView : View, IDesignable
 
             CodeBlockRegion capturedRegion = region;
 
-            btn.Accepted += (_, e) =>
+            btn.Accepted += (_, _) =>
             {
                 string codeText = capturedRegion.ExtractText (_renderedLines);
                 App?.Clipboard?.TrySetClipboardData (codeText);
@@ -289,6 +291,17 @@ public partial class MarkdownView : View, IDesignable
         }
 
         _copyButtons.Clear ();
+    }
+
+    private void RemoveTableViews ()
+    {
+        foreach (MarkdownTable table in _tableViews)
+        {
+            Remove (table);
+            table.Dispose ();
+        }
+
+        _tableViews.Clear ();
     }
 
     private bool RaiseLinkClicked (string url)
