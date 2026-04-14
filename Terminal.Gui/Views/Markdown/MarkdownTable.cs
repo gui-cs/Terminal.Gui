@@ -39,7 +39,7 @@ public sealed class MarkdownTable : View, IDesignable
 
     // Pre-computed wrapped line counts per row
     private int _headerRowHeight;
-    private int [] _bodyRowHeights = [];
+    private int [] _bodyRowHeights;
 
     // Last width used for column computation — tracks when recalculation is needed
     private int _lastComputedWidth;
@@ -68,7 +68,7 @@ public sealed class MarkdownTable : View, IDesignable
             }
 
             _lastComputedWidth = -1;
-            Recalculate (Frame.Width > 0 ? Frame.Width : 80);
+            SetNeedsLayout ();
             SetNeedsDraw ();
         }
     }
@@ -81,30 +81,31 @@ public sealed class MarkdownTable : View, IDesignable
     /// </param>
     public MarkdownTable (TableData data, int maxWidth)
     {
-        _data = data;
+        // data is non-nullable but reflection-based AllViews tests may pass null!
+        _data = data ?? _emptyData;
         CanFocus = false;
         TabStop = TabBehavior.NoStop;
 
         // Let the parent (MarkdownView) merge and render our LineCanvas borders
-        SuperViewRendersLineCanvas = true;
+       // SuperViewRendersLineCanvas = true;
 
         // Parse inline markdown for all cells upfront
-        _headerSegments = ParseCellSegments (data.Headers, MarkdownStyleRole.Heading);
-        _rowSegments = new List<StyledSegment> [data.Rows.Length] [];
+        _headerSegments = ParseCellSegments (_data.Headers, MarkdownStyleRole.Heading);
+        _rowSegments = new List<StyledSegment> [_data.Rows.Length] [];
 
-        for (var r = 0; r < data.Rows.Length; r++)
+        for (var r = 0; r < _data.Rows.Length; r++)
         {
-            _rowSegments [r] = ParseCellSegments (data.Rows [r], MarkdownStyleRole.Normal);
+            _rowSegments [r] = ParseCellSegments (_data.Rows [r], MarkdownStyleRole.Normal);
         }
 
-        _columnWidths = ComputeColumnWidths (data, maxWidth);
+        _columnWidths = ComputeColumnWidths (_data, maxWidth);
         _lastComputedWidth = maxWidth;
 
         // Compute row heights based on word-wrapped cell content
         _headerRowHeight = ComputeRowHeight (_headerSegments, _columnWidths);
-        _bodyRowHeights = new int [data.Rows.Length];
+        _bodyRowHeights = new int [_data.Rows.Length];
 
-        for (var r = 0; r < data.Rows.Length; r++)
+        for (var r = 0; r < _data.Rows.Length; r++)
         {
             _bodyRowHeights [r] = ComputeRowHeight (_rowSegments [r], _columnWidths);
         }
@@ -155,9 +156,16 @@ public sealed class MarkdownTable : View, IDesignable
         data.Rows.Length + 4;
 
     /// <inheritdoc/>
+    protected override void OnSubViewLayout (LayoutEventArgs args)
+    {
+        base.OnSubViewLayout (args);
+
+        Recalculate (Frame.Width);
+    }
+
+    /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
-        Recalculate (Frame.Width);
         DrawBorders ();
         DrawCellContents ();
 
@@ -360,6 +368,15 @@ public sealed class MarkdownTable : View, IDesignable
                 if (chunkWidth > maxWidth && currentWidth == 0)
                 {
                     string hardChunk = TruncateToWidth (chunk, maxWidth);
+
+                    // If maxWidth is too narrow for even one grapheme, take the first grapheme
+                    // to guarantee forward progress and avoid an infinite loop.
+                    if (hardChunk.Length == 0)
+                    {
+                        string firstGrapheme = GraphemeHelper.GetGraphemes (chunk).FirstOrDefault () ?? chunk [..1];
+                        hardChunk = firstGrapheme;
+                    }
+
                     currentLine.Add (new StyledSegment (hardChunk, segment.StyleRole, segment.Url, segment.ImageSource));
                     lines.Add (currentLine);
                     currentLine = [];

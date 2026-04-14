@@ -13,33 +13,40 @@ public partial class MarkdownView
 
     private void SetupBindingsAndCommands ()
     {
+        // Navigation commands — keys are bound via ApplyKeyBindings from DefaultKeyBindings
         AddCommand (Command.Up, () => ScrollVertical (-1));
         AddCommand (Command.Down, () => ScrollVertical (1));
+        AddCommand (Command.Left, () => ScrollHorizontal (-1));
+        AddCommand (Command.Right, () => ScrollHorizontal (1));
         AddCommand (Command.PageUp, () => ScrollVertical (-Math.Max (Viewport.Height - 1, 1)));
         AddCommand (Command.PageDown, () => ScrollVertical (Math.Max (Viewport.Height - 1, 1)));
         AddCommand (Command.ScrollUp, () => ScrollVertical (-1));
         AddCommand (Command.ScrollDown, () => ScrollVertical (1));
         AddCommand (Command.ScrollLeft, () => ScrollHorizontal (-1));
         AddCommand (Command.ScrollRight, () => ScrollHorizontal (1));
-        AddCommand (Command.Start, () => { Viewport = Viewport with { Y = 0 }; return true; });
-        AddCommand (Command.End, () => { Viewport = Viewport with { Y = Math.Max (GetContentSize ().Height - Viewport.Height, 0) }; return true; });
+
+        AddCommand (Command.Start,
+                    () =>
+                    {
+                        Viewport = Viewport with { Y = 0 };
+
+                        return true;
+                    });
+
+        AddCommand (Command.End,
+                    () =>
+                    {
+                        Viewport = Viewport with { Y = Math.Max (GetContentSize ().Height - Viewport.Height, 0) };
+
+                        return true;
+                    });
+
         AddCommand (Command.Accept, () => ActivateCurrentLink ());
-        AddCommand (Command.NextTabStop, () => NavigateLink (1));
-        AddCommand (Command.PreviousTabStop, () => NavigateLink (-1));
-        AddCommand (Command.Activate, HandleActivateCommand);
 
-        KeyBindings.Add (Key.CursorUp, Command.Up);
-        KeyBindings.Add (Key.CursorDown, Command.Down);
-        KeyBindings.Add (Key.PageUp, Command.PageUp);
-        KeyBindings.Add (Key.PageDown, Command.PageDown);
-        KeyBindings.Add (Key.CursorLeft, Command.ScrollLeft);
-        KeyBindings.Add (Key.CursorRight, Command.ScrollRight);
-        KeyBindings.Add (Key.Home, Command.Start);
-        KeyBindings.Add (Key.End, Command.End);
-        KeyBindings.ReplaceCommands (Key.Enter, Command.Accept);
-        KeyBindings.ReplaceCommands (Key.Tab, Command.NextTabStop);
-        KeyBindings.ReplaceCommands (Key.Tab.WithShift, Command.PreviousTabStop);
+        // Apply default key bindings (maps CursorUp→Up, CursorDown→Down, etc.)
+        ApplyKeyBindings (DefaultKeyBindings, DefaultKeyBindings);
 
+        // Mouse wheel and click bindings
         MouseBindings.ReplaceCommands (MouseFlags.WheeledDown, Command.ScrollDown);
         MouseBindings.ReplaceCommands (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.ReplaceCommands (MouseFlags.WheeledRight, Command.ScrollRight);
@@ -47,19 +54,80 @@ public partial class MarkdownView
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
     }
 
-    /// <summary>Handles the <see cref="Command.Activate"/> command, dispatched by mouse click bindings.</summary>
-    private bool? HandleActivateCommand (ICommandContext? ctx)
+    /// <inheritdoc/>
+    protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
-        EnsureLayout ();
+        if (!newHasFocus)
+        {
+            _activeLinkIndex = -1;
+            SetNeedsDraw ();
+        }
+
+        base.OnHasFocusChanged (newHasFocus, previousFocusedView, focusedView);
+    }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Cycles through link regions on Tab / Shift+Tab. Returns <see langword="false"/>
+    ///     when there are no more links in that direction, allowing focus to leave the view.
+    /// </remarks>
+    protected override bool OnAdvancingFocus (NavigationDirection direction, TabBehavior? behavior)
+    {
+        if (behavior is { } && behavior != TabStop)
+        {
+            return false;
+        }
+
+        // Do NOT do layout here — SubView Add/Remove re-enters focus navigation.
+        // _linkRegions is populated during OnSubViewLayout and is safe to read here.
+
+        if (_linkRegions.Count == 0)
+        {
+            return false;
+        }
+
+        int delta = direction == NavigationDirection.Forward ? 1 : -1;
+
+        if (_activeLinkIndex < 0)
+        {
+            // First entry — select first or last link
+            _activeLinkIndex = delta > 0 ? 0 : _linkRegions.Count - 1;
+            ScrollToLinkRegion (_linkRegions [_activeLinkIndex]);
+            SetNeedsDraw ();
+
+            return true;
+        }
+
+        int next = _activeLinkIndex + delta;
+
+        // If we've gone past either end, clear selection and let focus leave
+        if (next < 0 || next >= _linkRegions.Count)
+        {
+            _activeLinkIndex = -1;
+            SetNeedsDraw ();
+
+            return false;
+        }
+
+        _activeLinkIndex = next;
+        ScrollToLinkRegion (_linkRegions [_activeLinkIndex]);
+        SetNeedsDraw ();
+
+        return true;
+    }
+
+    /// <inheritdoc/>
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        // Only process mouse clicks — keyboard activation is handled via Command.Accept
+        if (ctx?.Binding is not MouseBinding { MouseEvent: { Position: { } pos } })
+        {
+            return;
+        }
 
         if (!HasFocus && CanFocus)
         {
             SetFocus ();
-        }
-
-        if (ctx?.Binding is not MouseBinding { MouseEvent: { Position: { } pos } })
-        {
-            return true;
         }
 
         int contentX = Viewport.X + pos.X;
@@ -82,10 +150,8 @@ public partial class MarkdownView
             _activeLinkIndex = i;
             ActivateLink (region);
 
-            return true;
+            return;
         }
-
-        return true;
     }
 
     /// <summary>
@@ -116,13 +182,7 @@ public partial class MarkdownView
                     }
                     else
                     {
-                        currentRegion = new MarkdownLinkRegion
-                        {
-                            Line = lineIdx,
-                            StartX = x,
-                            EndXExclusive = x + segWidth,
-                            Url = segment.Url!
-                        };
+                        currentRegion = new MarkdownLinkRegion { Line = lineIdx, StartX = x, EndXExclusive = x + segWidth, Url = segment.Url! };
 
                         _linkRegions.Add (currentRegion);
                         currentUrl = segment.Url;
@@ -137,40 +197,6 @@ public partial class MarkdownView
                 x += segWidth;
             }
         }
-    }
-
-    /// <summary>Moves the active link index by <paramref name="delta"/> and scrolls to show it.</summary>
-    private bool NavigateLink (int delta)
-    {
-        EnsureLayout ();
-
-        if (_linkRegions.Count == 0)
-        {
-            return false;
-        }
-
-        if (_activeLinkIndex < 0)
-        {
-            _activeLinkIndex = delta > 0 ? 0 : _linkRegions.Count - 1;
-        }
-        else
-        {
-            _activeLinkIndex += delta;
-        }
-
-        if (_activeLinkIndex >= _linkRegions.Count)
-        {
-            _activeLinkIndex = 0;
-        }
-        else if (_activeLinkIndex < 0)
-        {
-            _activeLinkIndex = _linkRegions.Count - 1;
-        }
-
-        ScrollToLinkRegion (_linkRegions [_activeLinkIndex]);
-        SetNeedsDraw ();
-
-        return true;
     }
 
     /// <summary>Activates the currently highlighted link (Enter key).</summary>

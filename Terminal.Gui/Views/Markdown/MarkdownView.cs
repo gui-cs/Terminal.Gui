@@ -115,20 +115,6 @@ public partial class MarkdownView : View, IDesignable
     protected virtual void OnMarkdownChanged () { }
 
     /// <inheritdoc/>
-    protected override void OnViewportChanged (DrawEventArgs e)
-    {
-        base.OnViewportChanged (e);
-
-        if (_layoutWidth == GetEffectiveLayoutWidth ())
-        {
-            return;
-        }
-
-        EnsureLayout ();
-        SetNeedsDraw ();
-    }
-
-    /// <inheritdoc/>
     protected override void OnContentSizeChanged (ValueChangedEventArgs<Size?> args)
     {
         base.OnContentSizeChanged (args);
@@ -148,9 +134,9 @@ public partial class MarkdownView : View, IDesignable
             return;
         }
 
+        // Width changed — mark stale so OnSubViewLayout rebuilds
         _layoutWidth = -1;
-        EnsureLayout ();
-        SetNeedsDraw ();
+        SetNeedsLayout ();
     }
 
     /// <summary>Scrolls the viewport so that the heading matching the given anchor slug is visible at the top.</summary>
@@ -170,8 +156,6 @@ public partial class MarkdownView : View, IDesignable
             return false;
         }
 
-        EnsureLayout ();
-
         string slug = anchor.StartsWith ('#') ? anchor [1..] : anchor;
 
         if (!_headingAnchors.TryGetValue (slug, out int lineIndex))
@@ -184,55 +168,6 @@ public partial class MarkdownView : View, IDesignable
 
         return true;
     }
-
-    /// <inheritdoc/>
-    bool IDesignable.EnableForDesign ()
-    {
-        Markdown = DefaultMarkdownSample;
-
-        return true;
-    }
-
-    /// <summary>Gets a short but comprehensive Markdown sample covering common features.</summary>
-    public static string DefaultMarkdownSample { get; } =
-        """
-        # Markdown Sample 🚀
-
-        Rich text with **bold**, *italic*, `inline code`, and ~~strikethrough~~.
-
-        ## Links & Images
-
-        Visit [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui) for more info.
-
-        ## Checklist
-
-        - [x] Bold & italic ✅
-        - [x] Code blocks 🔧
-        - [ ] Tables 📊
-        - [ ] Emojis 🎉
-
-        ## Code Block
-
-        ```csharp
-        Console.WriteLine ("Hello, Terminal.Gui! 🌍");
-        var x = 42;
-        ```
-
-        ## Table
-
-        | Feature       | Status  |
-        |---------------|:-------:|
-        | Markdown      | ✅      |
-        | Tables        | ✅      |
-        | Code blocks   | ✅      |
-        | Emojis 🎉    | ✅      |
-
-        ---
-
-        > **Tip:** This is a block quote with *inline formatting*.
-
-        That's all folks! 👋
-        """;
 
     private void SetMarkdown (string value)
     {
@@ -274,32 +209,38 @@ public partial class MarkdownView : View, IDesignable
     /// </remarks>
     private int GetEffectiveLayoutWidth () => _externalContentWidth > 0 ? _externalContentWidth : Viewport.Width;
 
-    private void EnsureLayout ()
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Performs the heavy lifting of markdown rendering: parses the document (if needed),
+    ///     builds the word-wrapped rendered lines, and creates/removes SubViews for tables,
+    ///     code blocks, and thematic breaks. This runs during the layout pass — never during draw.
+    /// </remarks>
+    protected override void OnSubViewLayout (LayoutEventArgs args)
     {
+        base.OnSubViewLayout (args);
+
         EnsureParsed ();
 
         int effectiveWidth = GetEffectiveLayoutWidth ();
 
-        if (_layoutWidth == effectiveWidth)
+        if (effectiveWidth < MIN_WRAP_WIDTH || _layoutWidth == effectiveWidth)
         {
             return;
         }
 
+        _layoutWidth = effectiveWidth;
+
+        RemoveCodeBlockViews ();
+        RemoveTableViews ();
+        RemoveThematicBreakViews ();
+
+        BuildRenderedLines ();
+
+        // Update content size so the viewport knows the scrollable extent
+        int contentWidth = Math.Max (effectiveWidth, _maxLineWidth);
         _inLayout = true;
-
-        try
-        {
-            BuildRenderedLines ();
-            _layoutWidth = effectiveWidth;
-
-            SetContentSize (new Size (effectiveWidth, Math.Max (_renderedLines.Count, Viewport.Height)));
-
-            ClampViewport ();
-        }
-        finally
-        {
-            _inLayout = false;
-        }
+        SetContentSize (new Size (contentWidth, _renderedLines.Count));
+        _inLayout = false;
     }
 
     private void ClampViewport ()
@@ -380,4 +321,56 @@ public partial class MarkdownView : View, IDesignable
 
         return slug.Trim ('-');
     }
+
+    /// <inheritdoc/>
+    bool IDesignable.EnableForDesign ()
+    {
+        Markdown = DefaultMarkdownSample;
+
+        return true;
+    }
+
+    /// <summary>Gets a short but comprehensive Markdown sample covering common features.</summary>
+    public static string DefaultMarkdownSample { get; } = """
+                                                          # Markdown Sample 🚀
+
+                                                          Rich text with **bold**, *italic*, `inline code`, and ~~strikethrough~~.
+
+                                                          ## Links & Images
+
+                                                          API Docs:
+
+                                                          * [MarkdownView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownView.html) for more info.
+                                                          * [MarkdownTableBlock](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTableBlock.html) for more info.
+                                                          * [MarkdownCodeBlock](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownCodeBlock.html) for more info.
+
+                                                          ## Checklist
+
+                                                          - [x] Bold & italic ✅
+                                                          - [x] Code blocks 🔧
+                                                          - [ ] Tables 📊
+                                                          - [ ] Emojis 🎉
+
+                                                          ## Code Block
+
+                                                          ```csharp
+                                                          Console.WriteLine ("Hello, Terminal.Gui! 🌍");
+                                                          var x = 42;
+                                                          ```
+
+                                                          ## Table
+
+                                                          | Feature       | Status        |
+                                                          |---------------|:-------------:|
+                                                          | Markdown      | ✅ Totally!   |
+                                                          | Tables        | ✅ For sure!  |
+                                                          | Code blocks   | ✅ Awesome!   |
+                                                          | Emojis 🎉    | ✅ Whoa!      |
+
+                                                          ---
+
+                                                          > **Tip:** This is a block quote with *inline formatting*.
+
+                                                          That's all folks! 👋
+                                                          """;
 }

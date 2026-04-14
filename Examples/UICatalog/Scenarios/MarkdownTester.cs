@@ -23,6 +23,7 @@ public class MarkdownTester : Scenario
         FrameView editorFrame = new ()
         {
             Title = "Markdown Source",
+            TabStop = TabBehavior.TabStop,
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
@@ -36,6 +37,7 @@ public class MarkdownTester : Scenario
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
+            TabKeyAddsTab = false,
             Text = MarkdownView.DefaultMarkdownSample
         };
 
@@ -45,6 +47,7 @@ public class MarkdownTester : Scenario
         FrameView previewFrame = new ()
         {
             Title = "Rendered Preview",
+            TabStop = TabBehavior.TabStop,
             X = 0,
             Y = Pos.Bottom (editorFrame),
             Width = Dim.Fill (),

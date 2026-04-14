@@ -29,7 +29,7 @@ public partial class MarkdownView
                     Y = lineY,
                     Width = Dim.Fill (1),
                     Height = 1,
-                    CanFocus = false,
+                    CanFocus = false
                 };
 
                 _thematicBreakViews.Add (lineView);
@@ -46,12 +46,7 @@ public partial class MarkdownView
             {
                 int startLine = _renderedLines.Count;
 
-                MarkdownTable tableView = new (tableData, viewportWidth)
-                {
-                    X = 0,
-                    Y = startLine,
-                    Width = Dim.Fill (),
-                };
+                MarkdownTable tableView = new (tableData, viewportWidth) { X = 0, Y = startLine, Width = Dim.Fill () };
 
                 _tableViews.Add (tableView);
                 Add (tableView);
@@ -129,12 +124,7 @@ public partial class MarkdownView
                 codeLines.Add (_renderedLines [j].Segments);
             }
 
-            MarkdownCodeBlock codeBlock = new (codeLines)
-            {
-                X = 0,
-                Y = start,
-                Width = Dim.Fill (),
-            };
+            MarkdownCodeBlock codeBlock = new (codeLines) { X = 0, Y = start, Width = Dim.Fill () };
 
             _codeBlockViews.Add (codeBlock);
             Add (codeBlock);
@@ -150,10 +140,7 @@ public partial class MarkdownView
             segments.Add (new StyledSegment (block.Prefix, MarkdownStyleRole.ListMarker));
         }
 
-        foreach (InlineRun run in block.Runs)
-        {
-            segments.Add (new StyledSegment (run.Text, run.StyleRole, run.Url, run.ImageSource));
-        }
+        segments.AddRange (block.Runs.Select (run => new StyledSegment (run.Text, run.StyleRole, run.Url, run.ImageSource)));
 
         int width = CalculateWidth (segments);
 
@@ -278,18 +265,6 @@ public partial class MarkdownView
         return lines;
     }
 
-    private static int CalculateWidth (IReadOnlyList<StyledSegment> segments)
-    {
-        var width = 0;
-
-        foreach (StyledSegment segment in segments)
-        {
-            foreach (string grapheme in GraphemeHelper.GetGraphemes (segment.Text))
-            {
-                width += Math.Max (grapheme.GetColumns (), 1);
-            }
-        }
-
-        return width;
-    }
+    private static int CalculateWidth (IReadOnlyList<StyledSegment> segments) =>
+        segments.SelectMany (segment => GraphemeHelper.GetGraphemes (segment.Text)).Sum (grapheme => Math.Max (grapheme.GetColumns (), 1));
 }

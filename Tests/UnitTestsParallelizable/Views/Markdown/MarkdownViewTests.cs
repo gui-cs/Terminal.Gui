@@ -63,6 +63,84 @@ public class MarkdownViewTests (ITestOutputHelper output)
         host.Dispose ();
     }
 
+    // Copilot — verifies AllViews_Center_Properly pattern with complex markdown (tables, code blocks)
+    [Fact]
+    public void Layout_Center_In_Host_Does_Not_Hang ()
+    {
+        MarkdownView view = new ();
+        ((IDesignable)view).EnableForDesign ();
+
+        view.X = Pos.Center ();
+        view.Y = Pos.Center ();
+        view.Width = 10;
+        view.Height = 10;
+
+        View frame = new () { X = 0, Y = 0, Width = 50, Height = 50 };
+        frame.Add (view);
+        frame.LayoutSubViews ();
+
+        Assert.Equal (20, view.Frame.Left);
+        Assert.Equal (20, view.Frame.Top);
+
+        frame.Dispose ();
+    }
+
+    // Copilot — verifies simple markdown (no compound SubViews) centers correctly
+    [Fact]
+    public void Layout_Center_Simple_Markdown_Does_Not_Hang ()
+    {
+        MarkdownView view = new () { Markdown = "# Hello" };
+        view.X = Pos.Center ();
+        view.Y = Pos.Center ();
+        view.Width = 10;
+        view.Height = 10;
+
+        View frame = new () { X = 0, Y = 0, Width = 50, Height = 50 };
+        frame.Add (view);
+        frame.LayoutSubViews ();
+
+        Assert.Equal (20, view.Frame.Left);
+        Assert.Equal (20, view.Frame.Top);
+
+        frame.Dispose ();
+    }
+
+    // Copilot — reproduces layout with table + code block SubViews
+    [Fact]
+    public void Layout_With_Table_And_CodeBlock_Does_Not_Hang ()
+    {
+        MarkdownView view = new (MarkdownView.DefaultMarkdownSample);
+        view.Width = 40;
+        view.Height = 20;
+
+        View host = new () { Width = 40, Height = 20 };
+        host.Add (view);
+        host.LayoutSubViews ();
+
+        Assert.True (view.LineCount > 0);
+
+        host.Dispose ();
+    }
+
+    // Copilot — tests that LayoutSubViews can be called multiple times safely
+    [Fact]
+    public void Layout_Multiple_Passes_Does_Not_Hang ()
+    {
+        MarkdownView view = new (MarkdownView.DefaultMarkdownSample);
+        view.Width = Dim.Fill ();
+        view.Height = Dim.Fill ();
+
+        View host = new () { Width = 30, Height = 15 };
+        host.Add (view);
+        host.LayoutSubViews ();
+        host.LayoutSubViews ();
+        host.LayoutSubViews ();
+
+        Assert.True (view.LineCount > 0);
+
+        host.Dispose ();
+    }
+
     [Fact]
     public void Draw_Emits_OSC8_For_Link ()
     {
@@ -417,7 +495,9 @@ public class MarkdownViewTests (ITestOutputHelper output)
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
-        MarkdownView mv = new (markdown) { Width = Dim.Fill (), Height = Dim.Fill () };
+        // Style tests verify unfocused rendering — disable focus so OnAdvancingFocus
+        // doesn't activate the first link with reversed highlight colors.
+        MarkdownView mv = new (markdown) { Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = false };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);

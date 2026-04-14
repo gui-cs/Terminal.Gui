@@ -33,11 +33,9 @@ public class MarkdownCodeBlock : View, IDesignable
     /// </param>
     public MarkdownCodeBlock (IReadOnlyList<IReadOnlyList<StyledSegment>> lines)
     {
-        _lines = lines;
+        _lines = lines ?? [];
 
-        CanFocus = false;
-        TabStop = TabBehavior.NoStop;
-        Height = lines.Count;
+        Height = _lines.Count;
 
         // Copy button
         Button copyBtn = new ()

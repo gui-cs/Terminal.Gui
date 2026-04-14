@@ -9,8 +9,6 @@ public partial class MarkdownView
     /// </remarks>
     protected override bool OnDrawingSubViews (DrawContext? context)
     {
-        EnsureLayout ();
-
         SetAttributeForRole (VisualRole.Normal);
         FillRect (Viewport with { X = 0, Y = 0 }, (Rune)' ');
 
@@ -81,12 +79,31 @@ public partial class MarkdownView
                     continue;
                 }
 
-                // If this grapheme is in the active link, use reversed highlight
-                if (IsActiveLinkAt (contentRow, contentX))
+                // If this grapheme is in the active link and the view has focus, use reversed highlight
+                if (HasFocus && IsActiveLinkAt (contentRow, contentX))
                 {
                     Attribute linkAttr = GetAttributeForSegment (segment);
-                    SetAttribute (new Attribute (linkAttr.Background, linkAttr.Foreground, linkAttr.Style));
-                    AddStr (drawCol, drawRow, grapheme);
+                    Attribute reversed = new (linkAttr.Background, linkAttr.Foreground, linkAttr.Style);
+
+                    if (!string.IsNullOrWhiteSpace (segment.Url) && Uri.IsWellFormedUriString (segment.Url, UriKind.Absolute) && Driver is { })
+                    {
+                        Driver.CurrentUrl = segment.Url;
+
+                        try
+                        {
+                            SetAttribute (reversed);
+                            AddStr (drawCol, drawRow, grapheme);
+                        }
+                        finally
+                        {
+                            Driver.CurrentUrl = null;
+                        }
+                    }
+                    else
+                    {
+                        SetAttribute (reversed);
+                        AddStr (drawCol, drawRow, grapheme);
+                    }
                 }
                 else
                 {
