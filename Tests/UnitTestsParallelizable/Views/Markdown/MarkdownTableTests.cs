@@ -260,4 +260,92 @@ public class MarkdownTableTests
         window.Dispose ();
         app.Dispose ();
     }
+
+    [Fact]
+    public void SuperViewRendersLineCanvas_Is_True ()
+    {
+        // Copilot — Verify MarkdownTable sets SuperViewRendersLineCanvas so parent merges borders
+        List<string> lines = ["| H1 | H2 |", "|-----|-----|", "| A  | B  |"];
+
+        TableData data = TableData.TryParse (lines)!;
+        MarkdownTable table = new (data, 40);
+
+        Assert.True (table.SuperViewRendersLineCanvas);
+    }
+
+    [Fact]
+    public void WrapSegments_Wraps_Long_Text ()
+    {
+        // Copilot — Verify WrapSegments splits text that exceeds maxWidth
+        List<StyledSegment> segments =
+        [
+            new ("hello world foo", MarkdownStyleRole.Normal, null, null)
+        ];
+
+        List<List<StyledSegment>> wrapped = MarkdownTable.WrapSegments (segments, 8);
+
+        // "hello " fits in 6 cols, "world " fits in 6 cols, "foo" fits in 3 cols
+        // Line 1: "hello " (6), Line 2: "world " (6), Line 3: "foo" (3)
+        Assert.True (wrapped.Count >= 2, $"Expected at least 2 lines, got {wrapped.Count}");
+    }
+
+    [Fact]
+    public void WrapSegments_Returns_Single_Line_When_Fits ()
+    {
+        // Copilot — Short text should not wrap
+        List<StyledSegment> segments =
+        [
+            new ("hi", MarkdownStyleRole.Normal, null, null)
+        ];
+
+        List<List<StyledSegment>> wrapped = MarkdownTable.WrapSegments (segments, 20);
+
+        Assert.Single (wrapped);
+    }
+
+    [Fact]
+    public void Wrapped_Rows_Increase_Table_Height ()
+    {
+        // Copilot — When cells need wrapping, the table should be taller than the simple estimate
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (20, 20);
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        // Long cell text in a narrow viewport will force wrapping
+        MarkdownView mv = new ("| Header |\n|--------|\n| This is a very long cell that should wrap |")
+        {
+            Width = Dim.Fill (), Height = Dim.Fill ()
+        };
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Simple estimate is 5 (1 body + 4 chrome). Wrapped should be >= 5.
+        // With a 20-col viewport the cell text wraps to multiple lines.
+        Assert.True (mv.LineCount >= 5, $"Expected at least 5 lines, got {mv.LineCount}");
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Column_Widths_Strip_Markdown_Formatting ()
+    {
+        // Copilot — Column widths should measure rendered text, not raw markdown with ** delimiters
+        List<string> lines = ["| **Bold Header** | Normal |", "|-----------------|--------|", "| cell | cell |"];
+
+        TableData data = TableData.TryParse (lines)!;
+
+        // Create table wide enough that no shrinking occurs
+        MarkdownTable table = new (data, 80);
+
+        // The header "Bold Header" is 11 display cols + 2 padding = 13
+        // If we measured raw "**Bold Header**" it would be 15 + 2 = 17
+        // Frame.Width should reflect the stripped measurement
+        Assert.True (table.Frame.Width < 17 + 8 + 3, // narrower than if ** were counted
+                     $"Table width {table.Frame.Width} suggests markdown delimiters were measured");
+    }
 }

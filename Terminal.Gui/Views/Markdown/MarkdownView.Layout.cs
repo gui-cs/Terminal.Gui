@@ -22,7 +22,6 @@ public partial class MarkdownView
             // Table blocks get a MarkdownTable SubView and placeholder lines
             if (block is { IsTable: true, TableData: { } tableData })
             {
-                int tableHeight = MarkdownTable.CalculateTableHeight (tableData);
                 int startLine = _renderedLines.Count;
 
                 MarkdownTable tableView = new (tableData, viewportWidth)
@@ -34,6 +33,8 @@ public partial class MarkdownView
                 _tableViews.Add (tableView);
                 Add (tableView);
 
+                // Use actual table height (accounts for word-wrapped rows)
+                int tableHeight = tableView.Frame.Height;
                 int tableWidth = tableView.Frame.Width;
                 _maxLineWidth = Math.Max (_maxLineWidth, tableWidth);
 
