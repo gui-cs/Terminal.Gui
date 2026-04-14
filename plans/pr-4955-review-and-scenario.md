@@ -56,6 +56,42 @@ edge cases the regex parser misses) or defer the dependency until it's actually 
 The project uses `CancelEventArgs<T>` for cancellable events. `MarkdownLinkEventArgs`
 uses a custom `Handled` property instead of inheriting from the standard base.
 
+### 🟡 `IsThematicBreak` accepts mixed break characters
+
+**File:** `MarkdownView.Parsing.cs:174`
+
+`trimmed.All(c => c == '-' || c == '*' || c == '_')` accepts `"-*_"` as a thematic break.
+Per CommonMark §4.1, a break must be 3+ of the **same** character. Also rejects valid
+breaks with spaces like `- - -`.
+
+### 🟡 `_queuedSixelIds` never cleared — sixel images vanish after scroll
+
+**File:** `MarkdownView.Drawing.cs:145-150`, `MarkdownView.cs:122`
+
+The `_queuedSixelIds` HashSet is populated but never cleared. After scroll-away and 
+scroll-back, same position IDs are already in the set so sixels are never re-queued.
+Also an unbounded memory leak since `InvalidateParsedAndLayout` doesn't clear it.
+
+### 🟡 Ordered list numbers always rendered as "1."
+
+**File:** `MarkdownView.Parsing.cs:116`
+
+The actual number from input is not captured. `3. Third item` renders as `1. Third item`.
+
+### 🟡 Link ranges built per-grapheme — O(n) entries per link
+
+**File:** `MarkdownView.Drawing.cs:47-55`
+
+Each grapheme of a link adds a separate `MarkdownLinkRange`. A 20-char link creates 20
+entries. Should coalesce per-segment.
+
+### 🟡 Duplicate mouse wheel handling
+
+**File:** `MarkdownView.Mouse.cs:17-39` and `106-109`
+
+`OnMouseEvent` manually intercepts wheel events AND `MouseBindings.ReplaceCommands` is
+registered for the same events. The bindings are dead code.
+
 ### 🟡 PR Title Format
 
 Should be `"Fixes #issue. Terse description."` per checklist — no linked issue number.
