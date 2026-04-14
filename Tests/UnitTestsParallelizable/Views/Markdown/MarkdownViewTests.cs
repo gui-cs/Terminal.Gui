@@ -705,4 +705,43 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         host.Dispose ();
     }
+
+    // Copilot
+    [Fact]
+    public void CodeBlock_Width_Respects_ContentSize_Not_Viewport ()
+    {
+        string md = """
+                    ```
+                    code line
+                    ```
+                    """;
+
+        MarkdownView view = new (md)
+        {
+            Width = 40,
+            Height = 10
+        };
+
+        View host = new () { Width = 40, Height = 10 };
+        host.Add (view);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        // Shrink content width to 20 (narrower than viewport)
+        view.SetContentSize (new Size (20, view.GetContentSize ().Height));
+        host.Layout ();
+
+        // Get code block SubViews — they should be MarkdownCodeBlock instances
+        List<View> codeBlocks = view.SubViews.Where (v => v.GetType ().Name == "MarkdownCodeBlock").ToList ();
+        Assert.NotEmpty (codeBlocks);
+
+        // Each code block should have Frame.Width == 20 (the content width), not 40 (viewport)
+        foreach (View cb in codeBlocks)
+        {
+            Assert.Equal (20, cb.Frame.Width);
+        }
+
+        host.Dispose ();
+    }
 }

@@ -50,13 +50,10 @@ public partial class MarkdownView
             return;
         }
 
-        // Fill code block lines with the dimmed background across the full viewport width
+        // Code block lines are drawn by MarkdownCodeBlock SubViews
         if (line.IsCodeBlock)
         {
-            Attribute normal = GetAttributeForRole (VisualRole.Normal);
-            Color codeBg = normal.Background.GetDimmerColor ();
-            SetAttribute (new Attribute (normal.Foreground, codeBg));
-            FillRect (new Rectangle (0, drawRow, Viewport.Width, 1), (Rune)' ');
+            return;
         }
 
         var contentX = 0;

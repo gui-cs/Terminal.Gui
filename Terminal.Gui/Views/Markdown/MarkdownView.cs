@@ -32,8 +32,7 @@ public partial class MarkdownView : View, IDesignable
     private readonly List<MarkdownLinkRegion> _linkRegions = [];
     private readonly HashSet<string> _queuedSixelIds = [];
     private readonly Dictionary<string, int> _headingAnchors = new (StringComparer.OrdinalIgnoreCase);
-    private readonly List<CodeBlockRegion> _codeBlockRegions = [];
-    private readonly List<Button> _copyButtons = [];
+    private readonly List<MarkdownCodeBlock> _codeBlockViews = [];
     private readonly List<MarkdownTable> _tableViews = [];
     private readonly List<Line> _thematicBreakViews = [];
 
@@ -218,8 +217,7 @@ public partial class MarkdownView : View, IDesignable
         _linkRegions.Clear ();
         _activeLinkIndex = -1;
         _headingAnchors.Clear ();
-        _codeBlockRegions.Clear ();
-        RemoveCopyButtons ();
+        RemoveCodeBlockViews ();
         RemoveTableViews ();
         RemoveThematicBreakViews ();
         _maxLineWidth = 0;
@@ -282,54 +280,15 @@ public partial class MarkdownView : View, IDesignable
         Viewport = Viewport with { Y = newY, X = newX };
     }
 
-    /// <summary>Creates copy <see cref="Button"/> SubViews for each code block region. Called during layout.</summary>
-    private void SyncCopyButtons ()
+    private void RemoveCodeBlockViews ()
     {
-        RemoveCopyButtons ();
-
-        foreach (CodeBlockRegion region in _codeBlockRegions)
+        foreach (MarkdownCodeBlock cb in _codeBlockViews)
         {
-            Button btn = new ()
-            {
-                X = Pos.AnchorEnd (),
-                Y = region.StartLine,
-                CanFocus = true,
-                TabStop = TabBehavior.TabStop,
-                ShadowStyle = ShadowStyles.None,
-                NoPadding = true,
-                NoDecorations = true
-            };
-
-            btn.Text = Glyphs.Copy.ToString ();
-
-            // Use code block colors: normal foreground on dimmed background
-            Attribute normal = GetAttributeForRole (VisualRole.Normal);
-            Color codeBg = normal.Background.GetDimmerColor ();
-            Scheme codeScheme = new () { Normal = new Attribute (normal.Foreground, codeBg) };
-            btn.SetScheme (codeScheme);
-
-            CodeBlockRegion capturedRegion = region;
-
-            btn.Accepted += (_, _) =>
-            {
-                string codeText = capturedRegion.ExtractText (_renderedLines);
-                App?.Clipboard?.TrySetClipboardData (codeText);
-            };
-
-            _copyButtons.Add (btn);
-            Add (btn);
-        }
-    }
-
-    private void RemoveCopyButtons ()
-    {
-        foreach (Button btn in _copyButtons)
-        {
-            Remove (btn);
-            btn.Dispose ();
+            Remove (cb);
+            cb.Dispose ();
         }
 
-        _copyButtons.Clear ();
+        _codeBlockViews.Clear ();
     }
 
     private void RemoveTableViews ()

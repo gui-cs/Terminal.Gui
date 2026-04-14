@@ -6,7 +6,6 @@ public partial class MarkdownView
     {
         _renderedLines.Clear ();
         _headingAnchors.Clear ();
-        _codeBlockRegions.Clear ();
         _maxLineWidth = 0;
 
         int viewportWidth = Math.Max (GetEffectiveLayoutWidth (), MIN_WRAP_WIDTH);
@@ -92,13 +91,18 @@ public partial class MarkdownView
             _renderedLines.Add (new RenderedLine ([new StyledSegment ("", MarkdownStyleRole.Normal)], true, 0));
         }
 
-        BuildCodeBlockRegions ();
+        SyncCodeBlockViews ();
         BuildLinkRegions ();
-        SyncCopyButtons ();
     }
 
-    private void BuildCodeBlockRegions ()
+    /// <summary>
+    ///     Scans rendered lines for contiguous code block runs and creates a
+    ///     <see cref="MarkdownCodeBlock"/> SubView for each.
+    /// </summary>
+    private void SyncCodeBlockViews ()
     {
+        RemoveCodeBlockViews ();
+
         var i = 0;
 
         while (i < _renderedLines.Count)
@@ -117,7 +121,23 @@ public partial class MarkdownView
                 i++;
             }
 
-            _codeBlockRegions.Add (new CodeBlockRegion (start, i));
+            // Gather segments per line for this code block
+            List<IReadOnlyList<StyledSegment>> codeLines = [];
+
+            for (int j = start; j < i; j++)
+            {
+                codeLines.Add (_renderedLines [j].Segments);
+            }
+
+            MarkdownCodeBlock codeBlock = new (codeLines)
+            {
+                X = 0,
+                Y = start,
+                Width = Dim.Fill (),
+            };
+
+            _codeBlockViews.Add (codeBlock);
+            Add (codeBlock);
         }
     }
 
