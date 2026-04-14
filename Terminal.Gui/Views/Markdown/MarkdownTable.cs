@@ -11,11 +11,7 @@ namespace Terminal.Gui.Views;
 ///         naturally with the parent's viewport.
 ///     </para>
 ///     <para>
-///         Borders are rendered using <see cref="LineStyle.Single"/> via the view's
-///         <see cref="LineCanvas"/> with <see cref="View.SuperViewRendersLineCanvas"/> set to
-///         <see langword="true"/>, so that the parent <see cref="MarkdownView"/> merges the table's
-///         border lines into its own <see cref="LineCanvas"/> and renders them. This ensures correct
-///         coordinate transformation for SubViews within scrolling parents.
+///         Borders are rendered using <see cref="LineStyle.Single"/>.
 ///     </para>
 ///     <para>
 ///         Header cells are bold; body cells support inline Markdown formatting (bold, italic, code,
@@ -47,7 +43,22 @@ public sealed class MarkdownTable : View, IDesignable
     private static readonly TableData _emptyData = new ([], [], []);
 
     /// <summary>Initializes a new empty <see cref="MarkdownTable"/>.</summary>
-    public MarkdownTable () : this (_emptyData, 80) { }
+    public MarkdownTable ()
+    {
+        _data = _emptyData;
+        _headerSegments = [];
+        _rowSegments = [];
+        _columnWidths = [];
+        _bodyRowHeights = [];
+        CanFocus = false;
+        TabStop = TabBehavior.NoStop;
+
+        // No adornments — we draw everything ourselves
+        BorderStyle = LineStyle.None;
+        Border.Thickness = new Thickness (0);
+        Padding.Thickness = new Thickness (0);
+        Margin.Thickness = new Thickness (0);
+    }
 
     /// <summary>
     ///     Gets or sets the <see cref="Views.TableData"/> that defines the table content. Setting this
@@ -67,60 +78,17 @@ public sealed class MarkdownTable : View, IDesignable
                 _rowSegments [r] = ParseCellSegments (value.Rows [r], MarkdownStyleRole.Normal);
             }
 
+            // Compute initial layout using current Frame width (or a default for standalone use)
+            int initialWidth = Frame.Width > 0 ? Frame.Width : 80;
             _lastComputedWidth = -1;
+            Recalculate (initialWidth);
             SetNeedsLayout ();
             SetNeedsDraw ();
         }
     }
 
-    /// <summary>Initializes a new <see cref="MarkdownTable"/> for the given parsed table data.</summary>
-    /// <param name="data">The parsed table structure.</param>
-    /// <param name="maxWidth">
-    ///     The maximum available width. Column widths are clamped so the total table width
-    ///     does not exceed this value when possible.
-    /// </param>
-    public MarkdownTable (TableData data, int maxWidth)
-    {
-        // data is non-nullable but reflection-based AllViews tests may pass null!
-        _data = data ?? _emptyData;
-        CanFocus = false;
-        TabStop = TabBehavior.NoStop;
-
-        // Let the parent (MarkdownView) merge and render our LineCanvas borders
-       // SuperViewRendersLineCanvas = true;
-
-        // Parse inline markdown for all cells upfront
-        _headerSegments = ParseCellSegments (_data.Headers, MarkdownStyleRole.Heading);
-        _rowSegments = new List<StyledSegment> [_data.Rows.Length] [];
-
-        for (var r = 0; r < _data.Rows.Length; r++)
-        {
-            _rowSegments [r] = ParseCellSegments (_data.Rows [r], MarkdownStyleRole.Normal);
-        }
-
-        _columnWidths = ComputeColumnWidths (_data, maxWidth);
-        _lastComputedWidth = maxWidth;
-
-        // Compute row heights based on word-wrapped cell content
-        _headerRowHeight = ComputeRowHeight (_headerSegments, _columnWidths);
-        _bodyRowHeights = new int [_data.Rows.Length];
-
-        for (var r = 0; r < _data.Rows.Length; r++)
-        {
-            _bodyRowHeights [r] = ComputeRowHeight (_rowSegments [r], _columnWidths);
-        }
-
-        Height = CalculateTableHeightWrapped (_headerRowHeight, _bodyRowHeights);
-
-        // No adornments — we draw everything ourselves
-        BorderStyle = LineStyle.None;
-        Border.Thickness = new Thickness (0);
-        Padding.Thickness = new Thickness (0);
-        Margin.Thickness = new Thickness (0);
-    }
-
     /// <summary>Recalculates column widths and row heights for the given available width.</summary>
-    private void Recalculate (int maxWidth)
+    internal void Recalculate (int maxWidth)
     {
         if (maxWidth == _lastComputedWidth)
         {

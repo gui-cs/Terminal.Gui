@@ -18,10 +18,6 @@ namespace Terminal.Gui.Views;
 ///         Hyperlinks raise the <see cref="LinkClicked"/> event. Anchor links (URLs beginning with
 ///         <c>#</c>) are handled automatically by scrolling to the matching heading.
 ///     </para>
-///     <para>
-///         By default, the view uses the <see cref="Schemes.Dialog"/> scheme so that it has a
-///         non-transparent background. A vertical scroll bar is enabled by default.
-///     </para>
 /// </remarks>
 public partial class MarkdownView : View, IDesignable
 {
@@ -44,19 +40,14 @@ public partial class MarkdownView : View, IDesignable
     private bool _inLayout;
     private int _externalContentWidth;
 
-    /// <summary>Initializes a new instance of the <see cref="MarkdownView"/> class with no content.</summary>
+    /// <summary>Initializes a new instance of the <see cref="MarkdownView"/> class.</summary>
     public MarkdownView ()
     {
         CanFocus = true;
-        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
         ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;
 
         SetupBindingsAndCommands ();
     }
-
-    /// <summary>Initializes a new instance of the <see cref="MarkdownView"/> class with the specified Markdown text.</summary>
-    /// <param name="markdown">The Markdown-formatted string to render.</param>
-    public MarkdownView (string markdown) : this () => Markdown = markdown;
 
     /// <summary>Gets or sets the Markdown-formatted text displayed by this view.</summary>
     /// <value>The raw Markdown string. Setting this property triggers reparsing, re-layout, and a redraw.</value>

@@ -21,47 +21,32 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public class MarkdownCodeBlock : View, IDesignable
 {
-    private IReadOnlyList<IReadOnlyList<StyledSegment>> _lines;
-
-    /// <summary>Initializes a new <see cref="MarkdownCodeBlock"/> with no content.</summary>
-    public MarkdownCodeBlock () : this ([]) { }
+    private IReadOnlyList<IReadOnlyList<StyledSegment>> _lines = [];
 
     /// <summary>Initializes a new <see cref="MarkdownCodeBlock"/>.</summary>
-    /// <param name="lines">
-    ///     The rendered segments for each line of the code block. Each entry is a list of
-    ///     <see cref="StyledSegment"/> values for one code-block line.
-    /// </param>
-    public MarkdownCodeBlock (IReadOnlyList<IReadOnlyList<StyledSegment>> lines)
+    public MarkdownCodeBlock ()
     {
-        _lines = lines ?? [];
+        Width = Dim.Auto (DimAutoStyle.Content);
+        Height = Dim.Auto (DimAutoStyle.Content);
+    }
 
-        Height = _lines.Count;
-
-        // Copy button
-        Button copyBtn = new ()
+    /// <summary>
+    ///     Gets or sets the styled line segments. Used internally by <see cref="MarkdownView"/> to set
+    ///     pre-parsed styled content directly.
+    /// </summary>
+    internal IReadOnlyList<IReadOnlyList<StyledSegment>> StyledLines
+    {
+        get => _lines;
+        set
         {
-            X = Pos.AnchorEnd (),
-            Y = 0,
-            CanFocus = true,
-            TabStop = TabBehavior.TabStop,
-            ShadowStyle = ShadowStyles.None,
-            NoPadding = true,
-            NoDecorations = true,
-            Text = Glyphs.Copy.ToString ()
-        };
-
-        copyBtn.Accepted += (_, _) =>
-                            {
-                                string codeText = ExtractText ();
-                                copyBtn.App?.Clipboard?.TrySetClipboardData (codeText);
-                            };
-
-        Add (copyBtn);
+            _lines = value;
+            UpdateContentSize ();
+        }
     }
 
     /// <summary>
     ///     Gets or sets the plain-text code lines. Setting this re-creates the internal styled
-    ///     segments with <see cref="MarkdownStyleRole.CodeBlock"/> styling and updates <see cref="View.Height"/>.
+    ///     segments with <see cref="MarkdownStyleRole.CodeBlock"/> styling.
     /// </summary>
     public IReadOnlyList<string> CodeLines
     {
@@ -78,18 +63,73 @@ public class MarkdownCodeBlock : View, IDesignable
             segments.AddRange (value.Select (line => (IReadOnlyList<StyledSegment>)[new StyledSegment (line, MarkdownStyleRole.CodeBlock)]));
 
             _lines = segments;
-            Height = _lines.Count;
-            SetNeedsDraw ();
+            UpdateContentSize ();
         }
+    }
+
+    private void UpdateContentSize ()
+    {
+        var maxWidth = 0;
+
+        foreach (IReadOnlyList<StyledSegment> line in _lines)
+        {
+            int lineWidth = line.Sum (s => s.Text.GetColumns ());
+            maxWidth = Math.Max (maxWidth, lineWidth);
+        }
+
+        // Set explicit dimensions based on content.
+        // We avoid SetContentSize because it sets ContentSizeTracksViewport = false,
+        // which restricts Viewport width when Width = Dim.Fill() (embedded in MarkdownView).
+        if (Width is DimAuto)
+        {
+            Width = maxWidth;
+        }
+
+        if (Height is DimAuto)
+        {
+            Height = _lines.Count;
+        }
+
+        SetNeedsLayout ();
+        SetNeedsDraw ();
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnMouseEvent (Mouse mouse)
+    {
+        if (!mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+        {
+            return false;
+        }
+
+        if (mouse.Position is not { } pos)
+        {
+            return false;
+        }
+
+        int copyGlyphX = Viewport.Width - 1;
+
+        if (pos.X != copyGlyphX || pos.Y != 0)
+        {
+            return false;
+        }
+
+        string codeText = ExtractText ();
+        App?.Clipboard?.TrySetClipboardData (codeText);
+
+        return true;
     }
 
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
+        // TODO: We should ideally be using the "code" role here, but it doesn't exist yet.
+        // TODO: For now, we'll just use ReadOnly with a dimmed background.
         Attribute normal = GetAttributeForRole (VisualRole.Normal);
         Color codeBg = normal.Background.GetDimmerColor ();
         Attribute codeAttr = new (normal.Foreground, codeBg);
 
+        // TODO: Move this to OnClearingViewport where it belongs.
         // Fill entire area with dimmed background
         SetAttribute (codeAttr);
         FillRect (Viewport with { X = 0, Y = 0 }, (Rune)' ');
@@ -119,6 +159,14 @@ public class MarkdownCodeBlock : View, IDesignable
             }
         }
 
+        // Draw the copy glyph in the top-right corner
+        if (Viewport.Width <= 0 || Viewport.Height <= 0)
+        {
+            return true;
+        }
+        SetAttribute (codeAttr);
+        AddStr (Viewport.Width - 1, 0, Glyphs.Copy.ToString ());
+
         return true;
     }
 
@@ -138,7 +186,6 @@ public class MarkdownCodeBlock : View, IDesignable
         [
             "using IApplication app = Application.Create ();", "app.Init ();", "using ExampleWindow exampleWindow = new ();", "app.Run (exampleWindow)"
         ];
-        Width = Dim.Auto ();
 
         return true;
     }

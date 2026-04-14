@@ -72,8 +72,8 @@ public class MarkdownCodeBlockTests
         host.EndInit ();
         host.Layout ();
 
-        // Initially zero code lines — but copy button occupies 1 row
-        Assert.True (codeBlock.Frame.Height <= 1);
+        // Initially zero code lines, zero height
+        Assert.Equal (0, codeBlock.Frame.Height);
 
         codeBlock.CodeLines = ["a", "b", "c"];
         host.Layout ();

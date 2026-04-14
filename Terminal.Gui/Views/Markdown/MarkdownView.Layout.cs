@@ -46,7 +46,8 @@ public partial class MarkdownView
             {
                 int startLine = _renderedLines.Count;
 
-                MarkdownTable tableView = new (tableData, viewportWidth) { X = 0, Y = startLine, Width = Dim.Fill () };
+                MarkdownTable tableView = new () { Data = tableData, X = 0, Y = startLine, Width = Dim.Fill () };
+                tableView.Recalculate (viewportWidth);
 
                 _tableViews.Add (tableView);
                 Add (tableView);
@@ -124,7 +125,7 @@ public partial class MarkdownView
                 codeLines.Add (_renderedLines [j].Segments);
             }
 
-            MarkdownCodeBlock codeBlock = new (codeLines) { X = 0, Y = start, Width = Dim.Fill () };
+            MarkdownCodeBlock codeBlock = new () { StyledLines = codeLines, X = 0, Y = start, Width = Dim.Fill () };
 
             _codeBlockViews.Add (codeBlock);
             Add (codeBlock);

@@ -46,7 +46,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     [Fact]
     public void Layout_Computes_Lines_And_ContentSize ()
     {
-        MarkdownView view = new ("# Header\n\nParagraph text");
+        MarkdownView view = new () { Markdown = "# Header\n\nParagraph text" };
         view.Width = 20;
         view.Height = 5;
 
@@ -109,7 +109,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     [Fact]
     public void Layout_With_Table_And_CodeBlock_Does_Not_Hang ()
     {
-        MarkdownView view = new (MarkdownView.DefaultMarkdownSample);
+        MarkdownView view = new () { Markdown = MarkdownView.DefaultMarkdownSample };
         view.Width = 40;
         view.Height = 20;
 
@@ -126,7 +126,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     [Fact]
     public void Layout_Multiple_Passes_Does_Not_Hang ()
     {
-        MarkdownView view = new (MarkdownView.DefaultMarkdownSample);
+        MarkdownView view = new () { Markdown = MarkdownView.DefaultMarkdownSample };
         view.Width = Dim.Fill ();
         view.Height = Dim.Fill ();
 
@@ -149,7 +149,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView markdownView = new ("Visit [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui)") { Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView markdownView = new () { Markdown = "Visit [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui)", Width = Dim.Fill (), Height = Dim.Fill () };
 
         window.Add (markdownView);
 
@@ -173,7 +173,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView markdownView = new ("[Click](https://example.com)") { Width = 20, Height = 3 };
+        MarkdownView markdownView = new () { Markdown = "[Click](https://example.com)", Width = 20, Height = 3 };
 
         window.Add (markdownView);
 
@@ -198,7 +198,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     [Fact]
     public void Image_Fallback_Text_Renders ()
     {
-        MarkdownView markdownView = new ("![logo](asset://logo)");
+        MarkdownView markdownView = new () { Markdown = "![logo](asset://logo)" };
         markdownView.Width = 40;
         markdownView.Height = 5;
 
@@ -225,7 +225,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     // Copilot
     public void Stray_Special_Characters_Do_Not_Cause_Infinite_Loop (string markdown)
     {
-        MarkdownView markdownView = new (markdown);
+        MarkdownView markdownView = new () { Markdown = markdown };
         markdownView.Width = 40;
         markdownView.Height = 5;
 
@@ -247,7 +247,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     public void WordWrap_Breaks_At_Word_Boundaries ()
     {
         // "Hello world" at width 8 should wrap between "Hello" and "world", not mid-word
-        MarkdownView markdownView = new ("Hello world");
+        MarkdownView markdownView = new () { Markdown = "Hello world" };
         markdownView.Width = 8;
         markdownView.Height = 5;
 
@@ -271,7 +271,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     {
         // "Abcdefghij" (10 chars, no spaces) at width 5 should hard-break
         const string MARKDOWN = "Abcdefghij";
-        MarkdownView markdownView = new (MARKDOWN);
+        MarkdownView markdownView = new () { Markdown = MARKDOWN };
         markdownView.Width = 5;
         markdownView.Height = 5;
 
@@ -446,7 +446,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
-        MarkdownView mv = new (MARKDOWN) { Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Markdown = MARKDOWN, Width = Dim.Fill (), Height = Dim.Fill () };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);
@@ -497,7 +497,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         // Style tests verify unfocused rendering — disable focus so OnAdvancingFocus
         // doesn't activate the first link with reversed highlight colors.
-        MarkdownView mv = new (markdown) { Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = false };
+        MarkdownView mv = new () { Markdown = markdown, Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = false };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);
@@ -537,7 +537,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         app.Driver!.SetScreenSize (40, 5);
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
-        MarkdownView mv = new ("# First\n\nParagraph 1\n\n# Second\n\nParagraph 2\n\n# Third\n\nParagraph 3") { Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Markdown = "# First\n\nParagraph 1\n\n# Second\n\nParagraph 2\n\n# Third\n\nParagraph 3", Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -578,7 +578,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         app.Driver!.SetScreenSize (40, 3);
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
-        MarkdownView mv = new ("# Overview\n\nFirst\n\n# Overview\n\nSecond\n\n# Overview\n\nThird") { Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Markdown = "# Overview\n\nFirst\n\n# Overview\n\nSecond\n\n# Overview\n\nThird", Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -623,7 +623,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     public void ScrollToAnchor_With_Empty_String_Returns_False ()
     {
         // Copilot
-        MarkdownView mv = new ("# Test");
+        MarkdownView mv = new () { Markdown = "# Test" };
         Assert.False (mv.ScrollToAnchor (""));
         Assert.False (mv.ScrollToAnchor (null!));
     }
@@ -644,7 +644,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView mv = new ("Text\n\n```\nline1\nline2\n```\n\nMore text\n\n```\nA\n```") { Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Markdown = "Text\n\n```\nline1\nline2\n```\n\nMore text\n\n```\nA\n```", Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -674,7 +674,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
-        MarkdownView mv = new ("```\ncode\n```") { Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Markdown = "```\ncode\n```", Width = Dim.Fill (), Height = Dim.Fill () };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);
@@ -711,7 +711,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView mv = new (MARKDOWN) { Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Markdown = MARKDOWN, Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -746,8 +746,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
                     # Below
                     """;
 
-        MarkdownView view = new (md)
-        {
+        MarkdownView view = new () { Markdown = md,
             Width = 40,
             Height = 5 // Small viewport so scrolling is required
         };
@@ -796,8 +795,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
                     ```
                     """;
 
-        MarkdownView view = new (md)
-        {
+        MarkdownView view = new () { Markdown = md,
             Width = 40,
             Height = 10
         };
