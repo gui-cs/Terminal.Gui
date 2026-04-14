@@ -519,6 +519,31 @@ public class AnsiResponseParserTests (ITestOutputHelper output)
         Assert.Equal (Key.CursorUp.WithShift, keys [1]);
     }
 
+    // Claude - Opus 4.6
+    // Regression #4952 follow-up: A pending CPR request (terminator R) must not be
+    // stolen by CsiCursorPattern, which happens to match ESC[1;<col>R as "F3 with modifier".
+    // Before the fix, when the cursor was on row 1 the standard CPR response
+    // ESC[1;1R was dispatched as Key.F3 instead of routed to the expectation.
+    [Fact]
+    public void ExpectedCprResponse_IsNotMisinterpretedAsF3 ()
+    {
+        AnsiResponseParser parser = new (new SystemTimeProvider ());
+        parser.HandleKeyboard = true;
+
+        string? cprResponse = null;
+        List<Key> keys = [];
+
+        parser.Keyboard += (_, e) => keys.Add (e);
+        parser.ExpectResponse ("R", null, s => cprResponse = s, null, false);
+
+        // Standard CPR response when cursor is at row 1, col 1.
+        string released = parser.ProcessInput ("\u001b[1;1R");
+
+        Assert.Equal ("\u001b[1;1R", cprResponse);
+        Assert.Empty (keys);
+        Assert.Equal (string.Empty, released);
+    }
+
     public static IEnumerable<object []> ParserDetects_FunctionKeys_Cases ()
     {
         // These are VT100 escape codes for F1-4
