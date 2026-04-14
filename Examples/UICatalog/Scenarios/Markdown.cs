@@ -12,12 +12,10 @@ public class Markdown : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        Window window = new ()
-        {
-            Title = GetName (),
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        using Window window = new ();
+        window.Title = GetName ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
 
         MarkdownView markdownView = new ()
         {

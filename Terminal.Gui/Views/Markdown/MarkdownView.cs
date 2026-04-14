@@ -2,6 +2,9 @@ using Markdig;
 
 namespace Terminal.Gui.Views;
 
+/// <summary>
+/// 
+/// </summary>
 public partial class MarkdownView : View, IDesignable
 {
     private const int MIN_WRAP_WIDTH = 4;
@@ -17,6 +20,9 @@ public partial class MarkdownView : View, IDesignable
     private int _layoutWidth = -1;
     private int _maxLineWidth;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public MarkdownView ()
     {
         CanFocus = true;
@@ -24,17 +30,24 @@ public partial class MarkdownView : View, IDesignable
         SetupBindingsAndCommands ();
     }
 
-    public MarkdownView (string markdown) : this ()
-    {
-        Markdown = markdown;
-    }
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="markdown"></param>
+    public MarkdownView (string markdown) : this () => Markdown = markdown;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public string Markdown
     {
         get => _markdown;
         set => SetMarkdown (value ?? string.Empty);
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
     public MarkdownPipeline? MarkdownPipeline
     {
         get => _markdownPipeline;

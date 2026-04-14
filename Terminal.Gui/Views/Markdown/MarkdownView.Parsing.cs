@@ -34,12 +34,12 @@ public partial class MarkdownView
     private void LowerFromSourceText ()
     {
         string normalized = _markdown.Replace ("\r\n", "\n");
-        string[] lines = normalized.Split ('\n');
+        string [] lines = normalized.Split ('\n');
 
-        bool inCodeFence = false;
+        var inCodeFence = false;
         List<string> codeLines = [];
 
-        for (int i = 0; i < lines.Length; i++)
+        for (var i = 0; i < lines.Length; i++)
         {
             string line = lines [i];
 
@@ -49,23 +49,27 @@ public partial class MarkdownView
                 {
                     inCodeFence = true;
                     codeLines.Clear ();
+
                     continue;
                 }
 
                 AddCodeBlockLines (codeLines);
                 inCodeFence = false;
+
                 continue;
             }
 
             if (inCodeFence)
             {
                 codeLines.Add (line);
+
                 continue;
             }
 
             if (string.IsNullOrWhiteSpace (line))
             {
                 _blocks.Add (new IntermediateBlock ([new InlineRun ("", MarkdownStyleRole.Normal)], true));
+
                 continue;
             }
 
@@ -76,12 +80,14 @@ public partial class MarkdownView
                 string headingText = headingMatch.Groups [2].Value;
                 List<InlineRun> headingRuns = ParseInlines (headingText, MarkdownStyleRole.Heading);
                 _blocks.Add (new IntermediateBlock (headingRuns, true));
+
                 continue;
             }
 
             if (IsThematicBreak (line))
             {
                 _blocks.Add (new IntermediateBlock ([new InlineRun ("────────────────────────", MarkdownStyleRole.ThematicBreak)], false));
+
                 continue;
             }
 
@@ -90,6 +96,7 @@ public partial class MarkdownView
                 string quoteText = line.TrimStart ().TrimStart ('>').TrimStart ();
                 List<InlineRun> quoteRuns = ParseInlines (quoteText, MarkdownStyleRole.Quote);
                 _blocks.Add (new IntermediateBlock (quoteRuns, true, "> ", "> "));
+
                 continue;
             }
 
@@ -98,6 +105,7 @@ public partial class MarkdownView
             if (unordered.Success)
             {
                 AddListLine (unordered.Groups [1].Value, "• ");
+
                 continue;
             }
 
@@ -106,12 +114,14 @@ public partial class MarkdownView
             if (ordered.Success)
             {
                 AddListLine (ordered.Groups [1].Value, "1. ");
+
                 continue;
             }
 
             if (LooksLikeTableRow (line))
             {
                 _blocks.Add (new IntermediateBlock ([new InlineRun (NormalizeTableRow (line), MarkdownStyleRole.Table)], false));
+
                 continue;
             }
 
@@ -133,6 +143,7 @@ public partial class MarkdownView
         {
             List<InlineRun> runs = ParseInlines (listText, MarkdownStyleRole.Normal);
             _blocks.Add (new IntermediateBlock (runs, true, marker, new string (' ', marker.Length)));
+
             return;
         }
 
@@ -147,6 +158,7 @@ public partial class MarkdownView
     private static bool IsFenceDelimiter (string line)
     {
         string trimmed = line.Trim ();
+
         return trimmed.StartsWith ("```") || trimmed.StartsWith ("~~~");
     }
 
@@ -172,7 +184,7 @@ public partial class MarkdownView
     private static string NormalizeTableRow (string line)
     {
         string trimmed = line.Trim ();
-        string[] cells = trimmed.Trim ('|').Split ('|', StringSplitOptions.TrimEntries);
+        string [] cells = trimmed.Trim ('|').Split ('|', StringSplitOptions.TrimEntries);
 
         return $"| {string.Join (" | ", cells)} |";
     }
@@ -182,6 +194,7 @@ public partial class MarkdownView
         if (codeLines.Count == 0)
         {
             _blocks.Add (new IntermediateBlock ([new InlineRun ("", MarkdownStyleRole.CodeBlock)], false));
+
             return;
         }
 
@@ -213,7 +226,7 @@ public partial class MarkdownView
     private List<InlineRun> ParseInlines (string text, MarkdownStyleRole defaultRole)
     {
         List<InlineRun> runs = [];
-        int idx = 0;
+        var idx = 0;
 
         while (idx < text.Length)
         {
@@ -221,6 +234,7 @@ public partial class MarkdownView
             {
                 runs.Add (imageRun!);
                 idx += imageLen;
+
                 continue;
             }
 
@@ -228,6 +242,7 @@ public partial class MarkdownView
             {
                 runs.Add (linkRun!);
                 idx += linkLen;
+
                 continue;
             }
 
@@ -235,6 +250,7 @@ public partial class MarkdownView
             {
                 runs.Add (codeRun!);
                 idx += codeLen;
+
                 continue;
             }
 
@@ -242,6 +258,7 @@ public partial class MarkdownView
             {
                 runs.Add (strongRun!);
                 idx += strongLen;
+
                 continue;
             }
 
@@ -249,6 +266,7 @@ public partial class MarkdownView
             {
                 runs.Add (emRun!);
                 idx += emLen;
+
                 continue;
             }
 
@@ -268,12 +286,7 @@ public partial class MarkdownView
         return runs;
     }
 
-    private static bool TryParseDelimited (string text,
-                                           int start,
-                                           string delimiter,
-                                           MarkdownStyleRole role,
-                                           out InlineRun? run,
-                                           out int tokenLength)
+    private static bool TryParseDelimited (string text, int start, string delimiter, MarkdownStyleRole role, out InlineRun? run, out int tokenLength)
     {
         run = null;
         tokenLength = 0;
@@ -365,13 +378,7 @@ public partial class MarkdownView
 
     private static int FindNextSpecialToken (string text, int start)
     {
-        int[] indexes =
-        [
-            text.IndexOf ('!', start),
-            text.IndexOf ('[', start),
-            text.IndexOf ('`', start),
-            text.IndexOf ('*', start)
-        ];
+        int [] indexes = [text.IndexOf ('!', start), text.IndexOf ('[', start), text.IndexOf ('`', start), text.IndexOf ('*', start)];
 
         int next = -1;
 
