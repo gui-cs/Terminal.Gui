@@ -26,9 +26,9 @@ public partial class MarkdownView
 
                 Line lineView = new ()
                 {
-                    X = 0,
+                    X = 1,
                     Y = lineY,
-                    Width = Dim.Fill (),
+                    Width = Dim.Fill (1),
                     Height = 1,
                     CanFocus = false,
                 };

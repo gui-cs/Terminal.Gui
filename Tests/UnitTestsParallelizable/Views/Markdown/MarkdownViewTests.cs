@@ -278,7 +278,8 @@ public class MarkdownViewTests (ITestOutputHelper output)
         const int WIDTH = 5;
         (IApplication app, Runnable window) = SetupStyleTest ("---", WIDTH);
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m" + new string ('\u2500', WIDTH), output, app.Driver);
+        // Line is inset: X=1, Width=Dim.Fill(1), so at WIDTH=5 it spans columns 1–3 (3 chars)
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m " + new string ('\u2500', WIDTH - 2), output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();

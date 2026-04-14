@@ -73,19 +73,18 @@ public partial class MarkdownView
                 continue;
             }
 
-            bool handled = RaiseLinkClicked (range.Url);
-
-            if (handled)
-            {
-                return true;
-            }
-
-            // Anchor links scroll to the matching heading
+            // Anchor links scroll to the matching heading first, then notify
             if (range.Url.StartsWith ('#'))
             {
                 ScrollToAnchor (range.Url);
+                RaiseLinkClicked (range.Url);
+
+                return true;
             }
-            else
+
+            bool handled = RaiseLinkClicked (range.Url);
+
+            if (!handled)
             {
                 Link.OpenUrl (range.Url);
             }

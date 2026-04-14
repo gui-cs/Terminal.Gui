@@ -44,9 +44,7 @@ namespace Terminal.Gui.Views;
 public class Line : View, IOrientation
 {
     private readonly OrientationHelper _orientationHelper;
-    private LineStyle _style = LineStyle.Single;
     private Dim _length;
-    private Attribute? _lineAttribute;
 
     /// <summary>
     ///     Constructs a new instance of the <see cref="Line"/> class with horizontal orientation.
@@ -120,17 +118,17 @@ public class Line : View, IOrientation
     /// </remarks>
     public LineStyle Style
     {
-        get => _style;
+        get;
         set
         {
-            if (_style == value)
+            if (field == value)
             {
                 return;
             }
-            _style = value;
+            field = value;
             SetNeedsDraw ();
         }
-    }
+    } = LineStyle.Single;
 
     /// <summary>
     ///     Gets or sets an optional <see cref="Attribute"/> used to render the line.
@@ -142,10 +140,10 @@ public class Line : View, IOrientation
     /// </remarks>
     public Attribute? LineAttribute
     {
-        get => _lineAttribute;
+        get;
         set
         {
-            _lineAttribute = value;
+            field = value;
             SetNeedsDraw ();
         }
     }
@@ -168,11 +166,7 @@ public class Line : View, IOrientation
     ///         resulting in the expected Width=1, Height=9.
     ///     </para>
     /// </remarks>
-    public Orientation Orientation
-    {
-        get => _orientationHelper.Orientation;
-        set => _orientationHelper.Orientation = value;
-    }
+    public Orientation Orientation { get => _orientationHelper.Orientation; set => _orientationHelper.Orientation = value; }
 
 #pragma warning disable CS0067 // The event is never used
     /// <inheritdoc/>
@@ -264,13 +258,7 @@ public class Line : View, IOrientation
         Point pos = ViewportToScreen (Viewport).Location;
         int length = Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height;
 
-        LineCanvas.AddLine (
-                            pos,
-                            length,
-                            Orientation,
-                            Style,
-                            _lineAttribute ?? GetAttributeForRole (VisualRole.Normal)
-                           );
+        LineCanvas.AddLine (pos, length, Orientation, Style, LineAttribute ?? GetAttributeForRole (VisualRole.Normal));
 
         return true;
     }

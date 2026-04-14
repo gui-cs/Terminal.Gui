@@ -79,9 +79,7 @@ public class Markdown : Scenario
 
         _viewerFrame.Add (_markdownView);
 
-        _spinner = new SpinnerView { AutoSpin = false, Visible = false };
-
-        _spinner.Initialized += (_, _) => _spinner.AutoSpin = true;
+        _spinner = new SpinnerView { Style = new SpinnerStyle.Aesthetic (), Width = 8, AutoSpin = false, Visible = false };
 
         _statusShortcut = new Shortcut (Key.Empty, "Ready", null);
 
@@ -113,10 +111,13 @@ public class Markdown : Scenario
 
         StatusBar statusBar = new ([
                                        new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", window.RequestStop),
-                                       _statusShortcut,
                                        contentWidthShortcut,
+                                       _statusShortcut,
                                        spinnerShortcut
-                                   ]);
+                                   ])
+        {
+            AlignmentModes = AlignmentModes.IgnoreFirstOrLast
+        };
 
         window.Add (listFrame, _viewerFrame, statusBar);
 
@@ -239,12 +240,14 @@ public class Markdown : Scenario
         _app?.Invoke (() =>
                       {
                           _spinner?.Visible = true;
+                          _spinner?.AutoSpin = true;
 
                           _statusShortcut?.Title = message;
                       });
 
     private void HideSpinner (string message)
     {
+        _spinner?.AutoSpin = false;
         _spinner?.Visible = false;
 
         _statusShortcut?.Title = message;
