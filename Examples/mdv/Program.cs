@@ -7,6 +7,7 @@
 using System.Collections.ObjectModel;
 using System.Drawing;
 using Terminal.Gui.App;
+using Terminal.Gui.Configuration;
 using Terminal.Gui.Drawing;
 using Terminal.Gui.Input;
 using Terminal.Gui.ViewBase;
@@ -134,6 +135,12 @@ static int RunInline (List<string> files)
 
 static int RunFullScreen (List<string> files)
 {
+    ConfigurationManager.RuntimeConfig = """
+                                         {
+                                             "Theme": "Anders"
+                                         }
+                                         """;
+    ConfigurationManager.Enable (ConfigLocations.All);
     IApplication app = Application.Create ().Init ();
 
     Window window = new ()

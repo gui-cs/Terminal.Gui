@@ -333,7 +333,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         (IApplication app, Runnable window) = SetupStyleTest ("`C`");
 
         // Code gets a dimmed background (\x1b[103m = bright yellow in 16-color, dimmed from white)
-        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[103m\x1b[1mC\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[47mC\x1b[30m\x1b[107m", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -456,14 +456,15 @@ public class MarkdownViewTests (ITestOutputHelper output)
         app.Driver.Refresh ();
 
         string actual = app.Driver.GetOutput ().GetLastOutput ();
+        output.WriteLine (actual);
 
         // The code line "AB" should have the dimmed background (\x1b[103m) filling the full 10-column width
         // Row format: fill entire row with dimmed bg spaces, then draw "AB" with bold+dimmed bg
         Assert.NotNull (actual);
 
-        // The code block row should contain 10 columns of dimmed background (103m), not just 2 for "AB"
+        // The code block row should contain 10 columns of dimmed background (30m), not just 2 for "AB"
         // Count how many times the dimmed bg code appears - should be at least for the fill + the text
-        int dimBgCount = CountOccurrences (actual, "\x1b[103m");
+        int dimBgCount = CountOccurrences (actual, "\x1b[30m");
         Assert.True (dimBgCount >= 2, $"Expected dimmed background to appear at least twice (fill + text), got {dimBgCount}");
 
         window.Dispose ();

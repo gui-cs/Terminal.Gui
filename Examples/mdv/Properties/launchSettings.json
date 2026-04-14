@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "mdv": {
+      "commandName": "Project",
+      "commandLineArgs": "-f ../../../README.md"
+    }
+  }
+}
