@@ -26,7 +26,6 @@ namespace Terminal.Gui.Views;
 public partial class MarkdownView : View, IDesignable
 {
     private const int MIN_WRAP_WIDTH = 4;
-    private const string COPY_BUTTON_GLYPH = "⧉";
 
     private readonly List<IntermediateBlock> _blocks = [];
     private readonly List<RenderedLine> _renderedLines = [];
@@ -34,7 +33,7 @@ public partial class MarkdownView : View, IDesignable
     private readonly HashSet<string> _queuedSixelIds = [];
     private readonly Dictionary<string, int> _headingAnchors = new (StringComparer.OrdinalIgnoreCase);
     private readonly List<CodeBlockRegion> _codeBlockRegions = [];
-    private readonly List<CopyButtonHitTarget> _copyButtonTargets = [];
+    private readonly List<Button> _copyButtons = [];
 
     private string _markdown = string.Empty;
     private bool _parsed;
@@ -188,7 +187,7 @@ public partial class MarkdownView : View, IDesignable
         _linkRanges.Clear ();
         _headingAnchors.Clear ();
         _codeBlockRegions.Clear ();
-        _copyButtonTargets.Clear ();
+        RemoveCopyButtons ();
         _maxLineWidth = 0;
 
         SetNeedsLayout ();
@@ -228,6 +227,68 @@ public partial class MarkdownView : View, IDesignable
         }
 
         Viewport = Viewport with { Y = newY, X = newX };
+    }
+
+    /// <summary>Creates copy <see cref="Button"/> SubViews for each code block region. Called during layout.</summary>
+    private void SyncCopyButtons ()
+    {
+        RemoveCopyButtons ();
+
+        int glyphWidth = Glyphs.Copy.GetColumns ();
+
+        // Button with NoPadding renders as [⧉] → width = glyphWidth + 2 (brackets)
+        int buttonWidth = glyphWidth + 2;
+        int viewportWidth = Math.Max (Viewport.Width, MIN_WRAP_WIDTH);
+        int buttonX = viewportWidth - buttonWidth;
+
+        if (buttonX < 0)
+        {
+            return;
+        }
+
+        foreach (CodeBlockRegion region in _codeBlockRegions)
+        {
+            Button btn = new ()
+            {
+                X = buttonX,
+                Y = region.StartLine,
+                CanFocus = false,
+                TabStop = TabBehavior.NoStop,
+                ShadowStyle = ShadowStyles.None,
+                NoPadding = true,
+                NoDecorations = true
+            };
+
+            btn.Text = Glyphs.Copy.ToString ();
+
+            // Use code block colors: normal foreground on dimmed background
+            Attribute normal = GetAttributeForRole (VisualRole.Normal);
+            Color codeBg = normal.Background.GetDimmerColor ();
+            Scheme codeScheme = new () { Normal = new Attribute (normal.Foreground, codeBg) };
+            btn.SetScheme (codeScheme);
+
+            CodeBlockRegion capturedRegion = region;
+
+            btn.Accepted += (_, e) =>
+            {
+                string codeText = capturedRegion.ExtractText (_renderedLines);
+                App?.Clipboard?.TrySetClipboardData (codeText);
+            };
+
+            _copyButtons.Add (btn);
+            Add (btn);
+        }
+    }
+
+    private void RemoveCopyButtons ()
+    {
+        foreach (Button btn in _copyButtons)
+        {
+            Remove (btn);
+            btn.Dispose ();
+        }
+
+        _copyButtons.Clear ();
     }
 
     private bool RaiseLinkClicked (string url)

@@ -88,7 +88,8 @@ public partial class MarkdownView
 
             if (IsThematicBreak (line))
             {
-                _blocks.Add (new IntermediateBlock ([new InlineRun ("────────────────────────", MarkdownStyleRole.ThematicBreak)], false));
+                // Thematic breaks are rendered via LineCanvas during drawing; no text content needed.
+                _blocks.Add (new IntermediateBlock ([new InlineRun ("", MarkdownStyleRole.ThematicBreak)], false, isThematicBreak: true));
 
                 continue;
             }

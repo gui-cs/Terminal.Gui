@@ -3,12 +3,15 @@ namespace Terminal.Gui.Views;
 public partial class MarkdownView
 {
     /// <inheritdoc />
-    protected override bool OnDrawingContent (DrawContext? context)
+    /// <remarks>
+    ///     Draws all markdown content (backgrounds, text, styles) before SubViews are drawn.
+    ///     This ensures copy <see cref="Button"/> SubViews render on top of code block backgrounds.
+    /// </remarks>
+    protected override bool OnDrawingSubViews (DrawContext? context)
     {
         EnsureLayout ();
 
         _linkRanges.Clear ();
-        _copyButtonTargets.Clear ();
 
         SetAttributeForRole (VisualRole.Normal);
         FillRect (Viewport with { X = 0, Y = 0 }, (Rune)' ');
@@ -19,52 +22,54 @@ public partial class MarkdownView
         for (int contentRow = startRow; contentRow < endRow; contentRow++)
         {
             int drawRow = contentRow - Viewport.Y;
-            DrawRenderedLine (_renderedLines [contentRow], contentRow, drawRow, context);
+            DrawRenderedLine (_renderedLines [contentRow], contentRow, drawRow);
         }
 
-        // Draw copy buttons on first visible line of each code block region
-        DrawCopyButtons (startRow, endRow);
+        // Return false so SubViews (copy buttons) still draw on top
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected override bool OnDrawingContent (DrawContext? context)
+    {
+        // All visible content was drawn in OnDrawingSubViews; just register the drawn region.
+        context?.AddDrawnRegion (new Region (new Rectangle (ContentToScreen (Point.Empty), Viewport.Size)));
 
         return true;
     }
 
-    private void DrawCopyButtons (int startRow, int endRow)
+    /// <inheritdoc />
+    /// <remarks>Adds horizontal lines for thematic breaks visible in the current viewport.</remarks>
+    protected override bool OnRenderingLineCanvas ()
     {
-        int glyphWidth = COPY_BUTTON_GLYPH.GetColumns ();
+        int startRow = Viewport.Y;
+        int endRow = Math.Min (Viewport.Y + Viewport.Height, _renderedLines.Count);
 
-        foreach (CodeBlockRegion region in _codeBlockRegions)
+        Attribute normal = GetAttributeForRole (VisualRole.Normal);
+        Attribute faintAttr = normal with { Style = normal.Style | TextStyle.Faint };
+
+        for (int contentRow = startRow; contentRow < endRow; contentRow++)
         {
-            // Find the first visible row of this code block
-            int firstVisible = Math.Max (region.StartLine, startRow);
-
-            if (firstVisible >= endRow || firstVisible >= region.EndLineExclusive)
+            if (!_renderedLines [contentRow].IsThematicBreak)
             {
                 continue;
             }
 
-            int drawRow = firstVisible - Viewport.Y;
-            int drawCol = Viewport.Width - glyphWidth;
-
-            if (drawCol < 0)
-            {
-                continue;
-            }
-
-            // Draw with inverted/highlighted attribute to stand out
-            Attribute normal = GetAttributeForRole (VisualRole.Normal);
-            Color codeBg = normal.Background.GetDimmerColor ();
-            SetAttribute (new Attribute (codeBg, normal.Foreground));
-            AddStr (drawCol, drawRow, COPY_BUTTON_GLYPH);
-
-            // Track hit target in content-space coordinates
-            int contentX = Viewport.X + drawCol;
-
-            _copyButtonTargets.Add (new CopyButtonHitTarget (firstVisible, contentX, glyphWidth, region));
+            int drawRow = contentRow - Viewport.Y;
+            LineCanvas.AddLine (new Point (0, drawRow), Viewport.Width, Orientation.Horizontal, LineStyle.Single, faintAttr);
         }
+
+        return false;
     }
 
-    private void DrawRenderedLine (RenderedLine line, int contentRow, int drawRow, DrawContext? context)
+    private void DrawRenderedLine (RenderedLine line, int contentRow, int drawRow)
     {
+        // Thematic breaks are drawn via LineCanvas in OnRenderingLineCanvas
+        if (line.IsThematicBreak)
+        {
+            return;
+        }
+
         // Fill code block lines with the dimmed background across the full viewport width
         if (line.IsCodeBlock)
         {
@@ -109,8 +114,6 @@ public partial class MarkdownView
                 contentX += graphemeWidth;
             }
         }
-
-        context?.AddDrawnRegion (new Region (new Rectangle (ContentToScreen (new Point (0, drawRow)), new Size (Viewport.Width, 1))));
     }
 
     private void DrawGrapheme (StyledSegment segment, string grapheme, int x, int y)

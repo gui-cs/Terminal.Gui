@@ -43,6 +43,7 @@ public partial class MarkdownView
         }
 
         BuildCodeBlockRegions ();
+        SyncCopyButtons ();
     }
 
     private void BuildCodeBlockRegions ()
@@ -85,7 +86,7 @@ public partial class MarkdownView
 
         int width = CalculateWidth (segments);
 
-        return new RenderedLine (segments, false, width, block.IsCodeBlock);
+        return new RenderedLine (segments, false, width, block.IsCodeBlock, block.IsThematicBreak);
     }
 
     private static List<RenderedLine> WrapBlock (IntermediateBlock block, int viewportWidth)
