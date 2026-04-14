@@ -46,6 +46,7 @@ public class Line : View, IOrientation
     private readonly OrientationHelper _orientationHelper;
     private LineStyle _style = LineStyle.Single;
     private Dim _length;
+    private Attribute? _lineAttribute;
 
     /// <summary>
     ///     Constructs a new instance of the <see cref="Line"/> class with horizontal orientation.
@@ -60,7 +61,7 @@ public class Line : View, IOrientation
         base.SuperViewRendersLineCanvas = true;
 
         // ReSharper disable once UseObjectOrCollectionInitializer
-        _orientationHelper = new (this);
+        _orientationHelper = new OrientationHelper (this);
         _orientationHelper.Orientation = Orientation.Horizontal;
 
         // Set default dimensions for horizontal orientation
@@ -122,11 +123,30 @@ public class Line : View, IOrientation
         get => _style;
         set
         {
-            if (_style != value)
+            if (_style == value)
             {
-                _style = value;
-                SetNeedsDraw ();
+                return;
             }
+            _style = value;
+            SetNeedsDraw ();
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets an optional <see cref="Attribute"/> used to render the line.
+    /// </summary>
+    /// <remarks>
+    ///     When <see langword="null"/> (the default), the line is drawn using
+    ///     <see cref="View.GetAttributeForRole"/> with <see cref="VisualRole.Normal"/>.
+    ///     Set this to override the scheme-derived colors and text style.
+    /// </remarks>
+    public Attribute? LineAttribute
+    {
+        get => _lineAttribute;
+        set
+        {
+            _lineAttribute = value;
+            SetNeedsDraw ();
         }
     }
 
@@ -249,7 +269,7 @@ public class Line : View, IOrientation
                             length,
                             Orientation,
                             Style,
-                            GetAttributeForRole(VisualRole.Normal)
+                            _lineAttribute ?? GetAttributeForRole (VisualRole.Normal)
                            );
 
         return true;

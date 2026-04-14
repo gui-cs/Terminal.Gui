@@ -19,6 +19,29 @@ public partial class MarkdownView
                 _headingAnchors [block.Anchor!] = _renderedLines.Count;
             }
 
+            // Thematic breaks get a Line SubView
+            if (block.IsThematicBreak)
+            {
+                int lineY = _renderedLines.Count;
+
+                Line lineView = new ()
+                {
+                    X = 0,
+                    Y = lineY,
+                    Width = Dim.Fill (),
+                    Height = 1,
+                    CanFocus = false,
+                };
+
+                _thematicBreakViews.Add (lineView);
+                Add (lineView);
+
+                // Reserve a placeholder line
+                _renderedLines.Add (new RenderedLine ([new StyledSegment ("", MarkdownStyleRole.ThematicBreak)], false, 0, isThematicBreak: true));
+
+                continue;
+            }
+
             // Table blocks get a MarkdownTable SubView and placeholder lines
             if (block is { IsTable: true, TableData: { } tableData })
             {
@@ -28,6 +51,7 @@ public partial class MarkdownView
                 {
                     X = 0,
                     Y = startLine,
+                    Width = Dim.Fill (),
                 };
 
                 _tableViews.Add (tableView);
@@ -35,8 +59,6 @@ public partial class MarkdownView
 
                 // Use actual table height (accounts for word-wrapped rows)
                 int tableHeight = tableView.Frame.Height;
-                int tableWidth = tableView.Frame.Width;
-                _maxLineWidth = Math.Max (_maxLineWidth, tableWidth);
 
                 // Reserve placeholder lines so content height is correct
                 for (var i = 0; i < tableHeight; i++)

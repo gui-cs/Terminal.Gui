@@ -273,12 +273,12 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void Style_ThematicBreak_Renders_Faint ()
+    public void Style_ThematicBreak_Renders_Line ()
     {
         const int WIDTH = 5;
         (IApplication app, Runnable window) = SetupStyleTest ("---", WIDTH);
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[2m" + new string ('\u2500', WIDTH), output, app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m" + new string ('\u2500', WIDTH), output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();

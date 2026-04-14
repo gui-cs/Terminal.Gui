@@ -38,30 +38,6 @@ public partial class MarkdownView
         return true;
     }
 
-    /// <inheritdoc />
-    /// <remarks>Adds horizontal lines for thematic breaks visible in the current viewport.</remarks>
-    protected override bool OnRenderingLineCanvas ()
-    {
-        int startRow = Viewport.Y;
-        int endRow = Math.Min (Viewport.Y + Viewport.Height, _renderedLines.Count);
-
-        Attribute normal = GetAttributeForRole (VisualRole.Normal);
-        Attribute faintAttr = normal with { Style = normal.Style | TextStyle.Faint };
-
-        for (int contentRow = startRow; contentRow < endRow; contentRow++)
-        {
-            if (!_renderedLines [contentRow].IsThematicBreak)
-            {
-                continue;
-            }
-
-            int drawRow = contentRow - Viewport.Y;
-            LineCanvas.AddLine (new Point (0, drawRow), Viewport.Width, Orientation.Horizontal, LineStyle.Single, faintAttr);
-        }
-
-        return false;
-    }
-
     private void DrawRenderedLine (RenderedLine line, int contentRow, int drawRow)
     {
         // Thematic breaks are drawn via LineCanvas in OnRenderingLineCanvas

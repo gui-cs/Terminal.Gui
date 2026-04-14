@@ -214,6 +214,11 @@ public class Markdown : Scenario
                           {
                               _markdownView?.Markdown = content;
 
+                              if (_markdownView is { })
+                              {
+                                  _markdownView.Viewport = _markdownView.Viewport with { X = 0, Y = 0 };
+                              }
+
                               _viewerFrame?.Title = entry.Name;
 
                               HideSpinner (entry.Name);

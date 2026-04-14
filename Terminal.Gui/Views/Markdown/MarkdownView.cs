@@ -35,6 +35,7 @@ public partial class MarkdownView : View, IDesignable
     private readonly List<CodeBlockRegion> _codeBlockRegions = [];
     private readonly List<Button> _copyButtons = [];
     private readonly List<MarkdownTable> _tableViews = [];
+    private readonly List<Line> _thematicBreakViews = [];
 
     private string _markdown = string.Empty;
     private bool _parsed;
@@ -190,6 +191,7 @@ public partial class MarkdownView : View, IDesignable
         _codeBlockRegions.Clear ();
         RemoveCopyButtons ();
         RemoveTableViews ();
+        RemoveThematicBreakViews ();
         _maxLineWidth = 0;
 
         SetNeedsLayout ();
@@ -302,6 +304,17 @@ public partial class MarkdownView : View, IDesignable
         }
 
         _tableViews.Clear ();
+    }
+
+    private void RemoveThematicBreakViews ()
+    {
+        foreach (Line line in _thematicBreakViews)
+        {
+            Remove (line);
+            line.Dispose ();
+        }
+
+        _thematicBreakViews.Clear ();
     }
 
     private bool RaiseLinkClicked (string url)
