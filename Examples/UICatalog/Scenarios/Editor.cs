@@ -22,6 +22,7 @@ public class Editor : Scenario
     private List<CultureInfo>? _cultureInfos;
     private string _fileName = "demo.txt";
     private bool _forceMinimumPosToZero = true;
+    private string? _lastDirectory;
     private bool _matchCase;
     private bool _matchWholeWord;
     private CheckBox? _miForceMinimumPosToZeroCheckBox;
@@ -39,7 +40,22 @@ public class Editor : Scenario
         app.Init ();
         _app = app;
 
-        _appWindow = new Window { Title = _fileName ?? "Untitled", BorderStyle = LineStyle.None };
+        // Find the repository root by walking up from the current directory looking for README.md
+        string repoRoot = FindRepoRoot () ?? Environment.CurrentDirectory;
+        string readmePath = Path.Combine (repoRoot, "README.md");
+
+        if (File.Exists (readmePath))
+        {
+            _fileName = readmePath;
+        }
+        else
+        {
+            CreateDemoFile (_fileName!);
+        }
+
+        _lastDirectory = Path.GetDirectoryName (Path.GetFullPath (_fileName!));
+
+        _appWindow = new Window { Title = Path.GetFileName (_fileName) ?? "Untitled", BorderStyle = LineStyle.None };
 
         _cultureInfos = Application.SupportedCultures?.ToList ();
 
@@ -51,8 +67,6 @@ public class Editor : Scenario
             Height = Dim.Fill (1),
             ScrollBars = true
         };
-
-        CreateDemoFile (_fileName!);
 
         LoadFile ();
 
@@ -107,15 +121,15 @@ public class Editor : Scenario
         };
 
         _miForceMinimumPosToZeroCheckBox.ValueChanged += (s, e) =>
-                                                          {
-                                                              _forceMinimumPosToZero = e.NewValue == CheckState.Checked;
+                                                         {
+                                                             _forceMinimumPosToZero = e.NewValue == CheckState.Checked;
 
-                                                              // Note: PopoverMenu.ForceMinimumPosToZero property doesn't exist in v2
-                                                              // if (_textView?.ContextMenu is not null)
-                                                              // {
-                                                              //     _textView.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-                                                              // }
-                                                          };
+                                                             // Note: PopoverMenu.ForceMinimumPosToZero property doesn't exist in v2
+                                                             // if (_textView?.ContextMenu is not null)
+                                                             // {
+                                                             //     _textView.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+                                                             // }
+                                                         };
 
         menu.Add (new MenuBarItem ("Conte_xtMenu",
                                    [new MenuItem { CommandView = _miForceMinimumPosToZeroCheckBox }, new MenuBarItem ("_Languages", GetSupportedCultures ())]));
@@ -124,15 +138,14 @@ public class Editor : Scenario
 
         Shortcut siCursorPosition = new (Key.Empty, "", null);
 
-        StatusBar statusBar =
-            new ([
-                     new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", Quit),
-                     new Shortcut (Key.F2, "Open", Open),
-                     new Shortcut (Key.F3, "Save", () => Save ()),
-                     new Shortcut (Key.F4, "Save As", () => SaveAs ()),
-                     new Shortcut (Key.Empty, $"OS Clipboard IsSupported : {app.Clipboard!.IsSupported}", null),
-                     siCursorPosition
-                 ]) { AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast };
+        StatusBar statusBar = new ([
+                                       new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", Quit),
+                                       new Shortcut (Key.F2, "Open", Open),
+                                       new Shortcut (Key.F3, "Save", () => Save ()),
+                                       new Shortcut (Key.F4, "Save As", () => SaveAs ()),
+                                       new Shortcut (Key.Empty, $"OS Clipboard IsSupported : {app.Clipboard!.IsSupported}", null),
+                                       siCursorPosition
+                                   ]) { AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast };
 
         _textView.UnwrappedCursorPositionChanged += (s, e) =>
                                                     {
@@ -308,17 +321,17 @@ public class Editor : Scenario
             allCheckBoxes.Add (checkBox);
 
             checkBox.ValueChanged += (s, e) =>
-                                      {
-                                          if (e.NewValue == CheckState.Checked)
-                                          {
-                                              Thread.CurrentThread.CurrentUICulture = new CultureInfo (cultureName);
+                                     {
+                                         if (e.NewValue == CheckState.Checked)
+                                         {
+                                             Thread.CurrentThread.CurrentUICulture = new CultureInfo (cultureName);
 
-                                              foreach (CheckBox cb in allCheckBoxes)
-                                              {
-                                                  cb.Value = cb == checkBox ? CheckState.Checked : CheckState.UnChecked;
-                                              }
-                                          }
-                                      };
+                                             foreach (CheckBox cb in allCheckBoxes)
+                                             {
+                                                 cb.Value = cb == checkBox ? CheckState.Checked : CheckState.UnChecked;
+                                             }
+                                         }
+                                     };
 
             MenuItem item = new () { CommandView = checkBox };
 
@@ -601,6 +614,27 @@ public class Editor : Scenario
         sw.Close ();
     }
 
+    /// <summary>
+    ///     Walks up the directory tree from the current directory looking for the repository root
+    ///     (identified by Terminal.sln).
+    /// </summary>
+    private static string? FindRepoRoot ()
+    {
+        DirectoryInfo? dir = new (Environment.CurrentDirectory);
+
+        while (dir is { })
+        {
+            if (File.Exists (Path.Combine (dir.FullName, "Terminal.sln")))
+            {
+                return dir.FullName;
+            }
+
+            dir = dir.Parent;
+        }
+
+        return null;
+    }
+
     private void LoadFile ()
     {
         if (_fileName is null || _textView is null || _appWindow is null)
@@ -639,14 +673,21 @@ public class Editor : Scenario
             return;
         }
 
-        List<IAllowedType> aTypes = [new AllowedType ("Text", ".txt;.bin;.xml;.json", ".txt", ".bin", ".xml", ".json"), new AllowedTypeAny ()];
+        List<IAllowedType> aTypes = [new AllowedType ("Text", ".txt;.bin;.xml;.json", ".txt", ".bin", ".xml", ".json", ".md"), new AllowedTypeAny ()];
 
         OpenDialog d = new () { Title = "Open", AllowedTypes = aTypes, AllowsMultipleSelection = false };
+
+        if (_lastDirectory is { })
+        {
+            d.Path = _lastDirectory;
+        }
+
         _app?.Run (d);
 
         if (!d.Canceled && d.FilePaths.Count > 0)
         {
             _fileName = d.FilePaths [0];
+            _lastDirectory = Path.GetDirectoryName (Path.GetFullPath (_fileName));
             LoadFile ();
         }
 
@@ -861,7 +902,15 @@ public class Editor : Scenario
 
         SaveDialog sd = new () { Title = "Save file", AllowedTypes = aTypes };
 
-        sd.Path = _appWindow.Title;
+        if (_lastDirectory is { })
+        {
+            sd.Path = _lastDirectory;
+        }
+        else
+        {
+            sd.Path = _appWindow.Title;
+        }
+
         _app?.Run (sd);
         bool canceled = sd.Canceled;
         string path = sd.Path;
@@ -870,6 +919,8 @@ public class Editor : Scenario
 
         if (!canceled)
         {
+            _lastDirectory = Path.GetDirectoryName (Path.GetFullPath (path));
+
             if (File.Exists (path))
             {
                 if (MessageBox.Query (_app!, "Save File", "File already exists. Overwrite any way?", Strings.btnNo, Strings.btnYes) == 1)
@@ -959,11 +1010,7 @@ public class Editor : Scenario
         _findReplaceWindow = new FindReplaceWindow (_textView);
 
         // Restored: Tabs with Find and Replace tabs (#4183)
-        Tabs tabs = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
+        Tabs tabs = new () { Width = Dim.Fill (), Height = Dim.Fill () };
 
         View findTab = new () { Title = "_Find" };
         View findView = CreateFindTab ();

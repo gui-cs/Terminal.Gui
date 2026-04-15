@@ -43,7 +43,8 @@ namespace Terminal.Gui.Views;
 ///             <term>PageUp / PageDown</term> <description>Moves one page up or down.</description>
 ///         </item>
 ///         <item>
-///             <term>Shift+&lt;movement&gt;</term> <description>Extends the selection in the given direction.</description>
+///             <term>Shift+&lt;movement&gt;</term>
+///             <description>Extends the selection in the given direction.</description>
 ///         </item>
 ///         <item>
 ///             <term>Delete, Ctrl+D</term> <description>Deletes the character in front of the cursor.</description>
@@ -52,10 +53,12 @@ namespace Terminal.Gui.Views;
 ///             <term>Backspace</term> <description>Deletes the character behind the cursor.</description>
 ///         </item>
 ///         <item>
-///             <term>Ctrl+K</term> <description>Cuts text from the cursor to the end of the line (kill-to-end).</description>
+///             <term>Ctrl+K</term>
+///             <description>Cuts text from the cursor to the end of the line (kill-to-end).</description>
 ///         </item>
 ///         <item>
-///             <term>Ctrl+Shift+Backspace</term> <description>Cuts text from the cursor to the start of the line (kill-to-start).</description>
+///             <term>Ctrl+Shift+Backspace</term>
+///             <description>Cuts text from the cursor to the start of the line (kill-to-start).</description>
 ///         </item>
 ///         <item>
 ///             <term>Ctrl+Delete</term> <description>Deletes the word to the right of the cursor.</description>
@@ -157,7 +160,13 @@ public partial class TextView : View, IDesignable
     protected override void OnSubViewsLaidOut (LayoutEventArgs args)
     {
         base.OnSubViewsLaidOut (args);
-        WrapTextModel ();
+
+        // Only rewrap when viewport width actually changes to avoid O(N×L) rescans on every layout pass.
+        if (_wordWrap && Viewport.Width != _lastWrapWidth)
+        {
+            WrapTextModel ();
+            _lastWrapWidth = Viewport.Width;
+        }
 
         // Don't call AdjustViewport() here - it resets viewport to cursor position,
         // undoing any user scrolling via scrollbar. AdjustViewport() is called when
@@ -179,6 +188,8 @@ public partial class TextView : View, IDesignable
     /// </summary>
     public virtual void OnContentsChanged ()
     {
+        _model.InvalidateMaxWidthCache ();
+
         ContentsChanged?.Invoke (this, new ContentsChangedEventArgs (CurrentRow, CurrentColumn));
 
         ProcessInheritsPreviousScheme (CurrentRow, CurrentColumn);
@@ -227,12 +238,12 @@ public partial class TextView : View, IDesignable
         List<Cell> line = _model.GetLine (CurrentRow);
 
         // Calculate absolute cursor position and store each glyph width
-        int cursorColumn = TextModel.CursorColumn (TextModel.CellsToStringList (line), CurrentColumn, TabWidth, out List<int> glyphWidths, out _);
+        TextModel.CursorColumn (TextModel.CellsToStringList (line), CurrentColumn, TabWidth, out List<int> glyphWidths, out _);
         var colsWidth = 0;
 
         if (glyphWidths.Count > 0)
         {
-            for (int i = 0; i < Viewport.X; i++)
+            for (var i = 0; i < Viewport.X; i++)
             {
                 if (i == glyphWidths.Count)
                 {

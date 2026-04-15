@@ -168,7 +168,11 @@ public class ConfigurationEditor : Scenario
 
     private class ConfigTextView : TextView
     {
-        internal ConfigTextView () => TabStop = TabBehavior.TabGroup;
+        internal ConfigTextView ()
+        {
+            TabStop = TabBehavior.TabGroup;
+            ScrollBars = true;
+        }
 
         internal FileInfo? FileInfo { get; init; }
 

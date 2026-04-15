@@ -185,6 +185,7 @@ public partial class TextView
             {
                 _wrapManager = new WordWrapManager (_model);
                 _model = _wrapManager.WrapModel (Viewport.Width, out _, out _, out _, out _);
+                _lastWrapWidth = Viewport.Width;
             }
 
             OnTextChanged ();

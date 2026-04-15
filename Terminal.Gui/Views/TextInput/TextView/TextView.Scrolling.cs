@@ -2,6 +2,9 @@ namespace Terminal.Gui.Views;
 
 public partial class TextView
 {
+    // Tracks the last viewport width used for word wrapping to avoid redundant rewraps.
+    private int _lastWrapWidth = -1;
+
     /// <summary>
     ///     Gets or sets a value indicating whether scroll bars are enabled.
     /// </summary>

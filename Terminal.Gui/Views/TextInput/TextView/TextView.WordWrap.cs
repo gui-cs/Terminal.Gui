@@ -164,6 +164,7 @@ public partial class TextView
 
             _wordWrap = value;
             ResetPosition ();
+            _lastWrapWidth = -1; // Force rewrap on next layout
 
             if (_wordWrap)
             {

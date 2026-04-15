@@ -102,7 +102,7 @@ public partial class TextView
                 StartSelecting ();
             }
 
-            ProcessMouseClick (mouse, out List<Cell> line);
+            ProcessMouseClick (mouse, out List<Cell> _);
             PositionCursor ();
 
             _lastWasKill = false;
