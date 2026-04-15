@@ -61,7 +61,8 @@ public class MarkdownTester : Scenario
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            Markdown = MarkdownView.DefaultMarkdownSample
+            Markdown = MarkdownView.DefaultMarkdownSample,
+            SyntaxHighlighter = new Terminal.Gui.SyntaxHighlighting.TextMateSyntaxHighlighter (TextMateSharp.Grammars.ThemeName.DarkPlus)
         };
 
         previewFrame.Add (preview);

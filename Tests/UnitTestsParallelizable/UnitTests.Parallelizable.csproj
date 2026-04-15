@@ -56,6 +56,7 @@
     <ProjectReference Include="..\..\Examples\UICatalog\UICatalog.csproj" />
     <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj">
     </ProjectReference>
+    <ProjectReference Include="..\..\Terminal.Gui.SyntaxHighlighting\Terminal.Gui.SyntaxHighlighting.csproj" />
     <ProjectReference Include="..\AppTestHelpers\AppTestHelpers.csproj" />
     <ProjectReference Include="..\UnitTests.Legacy\UnitTests.Legacy.csproj" />
   </ItemGroup>

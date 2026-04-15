@@ -19,24 +19,29 @@ internal static class MarkdownAttributeHelper
     /// <returns>A fully resolved <see cref="Attribute"/> ready for drawing.</returns>
     public static Attribute GetAttributeForSegment (View view, StyledSegment segment)
     {
+        if (segment.Attribute is { } explicitAttr)
+        {
+            return explicitAttr;
+        }
+
         Attribute normal = view.GetAttributeForRole (VisualRole.Normal);
 
         return segment.StyleRole switch
-        {
-            MarkdownStyleRole.Heading => normal with { Style = normal.Style | TextStyle.Bold },
-            MarkdownStyleRole.Emphasis => normal with { Style = normal.Style | TextStyle.Italic },
-            MarkdownStyleRole.Strong => normal with { Style = normal.Style | TextStyle.Bold },
-            MarkdownStyleRole.InlineCode or MarkdownStyleRole.CodeBlock => MakeCodeAttribute (view.GetAttributeForRole (VisualRole.Editable)),
-            MarkdownStyleRole.Link => MakeLinkAttribute (normal, segment),
-            MarkdownStyleRole.Quote => normal with { Style = normal.Style | TextStyle.Faint },
-            MarkdownStyleRole.Table => normal with { Style = normal.Style | TextStyle.Bold },
-            MarkdownStyleRole.ThematicBreak => normal with { Style = normal.Style | TextStyle.Faint },
-            MarkdownStyleRole.ImageAlt => normal with { Style = normal.Style | TextStyle.Italic },
-            MarkdownStyleRole.TaskDone => normal with { Style = normal.Style | TextStyle.Strikethrough },
-            MarkdownStyleRole.TaskTodo => normal with { Style = normal.Style | TextStyle.Bold },
-            MarkdownStyleRole.ListMarker => normal with { Style = normal.Style | TextStyle.Bold },
-            _ => normal
-        };
+               {
+                   MarkdownStyleRole.Heading => normal with { Style = normal.Style | TextStyle.Bold },
+                   MarkdownStyleRole.Emphasis => normal with { Style = normal.Style | TextStyle.Italic },
+                   MarkdownStyleRole.Strong => normal with { Style = normal.Style | TextStyle.Bold },
+                   MarkdownStyleRole.InlineCode or MarkdownStyleRole.CodeBlock => MakeCodeAttribute (view.GetAttributeForRole (VisualRole.Code)),
+                   MarkdownStyleRole.Link => MakeLinkAttribute (normal, segment),
+                   MarkdownStyleRole.Quote => normal with { Style = normal.Style | TextStyle.Faint },
+                   MarkdownStyleRole.Table => normal with { Style = normal.Style | TextStyle.Bold },
+                   MarkdownStyleRole.ThematicBreak => normal with { Style = normal.Style | TextStyle.Faint },
+                   MarkdownStyleRole.ImageAlt => normal with { Style = normal.Style | TextStyle.Italic },
+                   MarkdownStyleRole.TaskDone => normal with { Style = normal.Style | TextStyle.Strikethrough },
+                   MarkdownStyleRole.TaskTodo => normal with { Style = normal.Style | TextStyle.Bold },
+                   MarkdownStyleRole.ListMarker => normal with { Style = normal.Style | TextStyle.Bold },
+                   _ => normal
+               };
     }
 
     /// <summary>
@@ -49,7 +54,7 @@ internal static class MarkdownAttributeHelper
 
         foreach (InlineRun run in runs)
         {
-            segments.Add (new StyledSegment (run.Text, run.StyleRole, run.Url, run.ImageSource));
+            segments.Add (new StyledSegment (run.Text, run.StyleRole, run.Url, run.ImageSource, run.Attribute));
         }
 
         return segments;
@@ -59,7 +64,7 @@ internal static class MarkdownAttributeHelper
     {
         Color codeBg = normal.Background.GetDimmerColor ();
 
-        return normal;// new Attribute (normal.Foreground, codeBg) { Style = normal.Style | TextStyle.Bold };
+        return normal; // new Attribute (normal.Foreground, codeBg) { Style = normal.Style | TextStyle.Bold };
     }
 
     private static Attribute MakeLinkAttribute (Attribute normal, StyledSegment segment)

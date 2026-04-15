@@ -9,7 +9,16 @@ public interface ISyntaxHighlighter
 {
     /// <summary>Highlights a single line of code and returns styled segments.</summary>
     /// <param name="code">The source code line to highlight.</param>
-    /// <param name="language">The language identifier from the fence (e.g. <c>csharp</c>), or <see langword="null"/> if not specified.</param>
+    /// <param name="language">
+    ///     The language identifier from the fence (e.g. <c>csharp</c>), or <see langword="null"/> if not
+    ///     specified.
+    /// </param>
     /// <returns>A list of <see cref="StyledSegment"/> instances representing the highlighted tokens.</returns>
     IReadOnlyList<StyledSegment> Highlight (string code, string? language);
+
+    /// <summary>
+    ///     Resets internal tokenizer state. Called by <see cref="MarkdownView"/> at the start
+    ///     of each new code block so that stateful tokenizers (e.g., TextMate) begin fresh.
+    /// </summary>
+    void ResetState ();
 }

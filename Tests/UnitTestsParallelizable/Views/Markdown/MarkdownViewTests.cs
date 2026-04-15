@@ -149,7 +149,10 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView markdownView = new () { Markdown = "Visit [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui)", Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView markdownView = new ()
+        {
+            Markdown = "Visit [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui)", Width = Dim.Fill (), Height = Dim.Fill ()
+        };
 
         window.Add (markdownView);
 
@@ -332,8 +335,8 @@ public class MarkdownViewTests (ITestOutputHelper output)
     {
         (IApplication app, Runnable window) = SetupStyleTest ("`C`");
 
-        // Code gets a dimmed background (\x1b[103m = bright yellow in 16-color, dimmed from white)
-        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[47mC\x1b[30m\x1b[107m", output, app.Driver);
+        // Code uses VisualRole.Code which derives from Editable with bold style
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[47m\x1b[1mC\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -538,7 +541,11 @@ public class MarkdownViewTests (ITestOutputHelper output)
         app.Driver!.SetScreenSize (40, 5);
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
-        MarkdownView mv = new () { Markdown = "# First\n\nParagraph 1\n\n# Second\n\nParagraph 2\n\n# Third\n\nParagraph 3", Width = Dim.Fill (), Height = Dim.Fill () };
+
+        MarkdownView mv = new ()
+        {
+            Markdown = "# First\n\nParagraph 1\n\n# Second\n\nParagraph 2\n\n# Third\n\nParagraph 3", Width = Dim.Fill (), Height = Dim.Fill ()
+        };
         window.Add (mv);
 
         app.Begin (window);
@@ -700,11 +707,10 @@ public class MarkdownViewTests (ITestOutputHelper output)
     {
         // Exact pattern from layout.md TOC — indented sub-items with parens in link text
         // Narrow viewport forces word-wrap which exposed the bug
-        const string MARKDOWN =
-            "- [How To](#how-to)\n" +
-            "  - [Stretch a View Between Fixed Elements](#stretch-a-view-between-fixed-elements)\n" +
-            "  - [Align Multiple Views (Like Dialog Buttons)](#align-multiple-views-like-dialog-buttons)\n" +
-            "  - [Center with Auto-Sizing and Constraints (Like Dialog)](#center-with-auto-sizing-and-constraints-like-dialog)";
+        const string MARKDOWN = "- [How To](#how-to)\n"
+                                + "  - [Stretch a View Between Fixed Elements](#stretch-a-view-between-fixed-elements)\n"
+                                + "  - [Align Multiple Views (Like Dialog Buttons)](#align-multiple-views-like-dialog-buttons)\n"
+                                + "  - [Center with Auto-Sizing and Constraints (Like Dialog)](#center-with-auto-sizing-and-constraints-like-dialog)";
 
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -718,7 +724,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         app.Begin (window);
         app.LayoutAndDraw ();
 
-        string screenContents = app.Driver.ToString ();
+        var screenContents = app.Driver.ToString ();
         Assert.NotNull (screenContents);
 
         // Should contain the full link text including "(Like Dialog)"
@@ -737,19 +743,19 @@ public class MarkdownViewTests (ITestOutputHelper output)
     public void Table_Height_Change_Reflows_Subsequent_Elements ()
     {
         // Markdown: paragraph, small table, then a heading below
-        string md = """
-                    Above
+        var md = """
+                 Above
 
-                    | A | B |
-                    |---|---|
-                    | Long cell content here | x |
+                 | A | B |
+                 |---|---|
+                 | Long cell content here | x |
 
-                    # Below
-                    """;
+                 # Below
+                 """;
 
-        MarkdownView view = new () { Markdown = md,
-            Width = 40,
-            Height = 5 // Small viewport so scrolling is required
+        MarkdownView view = new ()
+        {
+            Markdown = md, Width = 40, Height = 5 // Small viewport so scrolling is required
         };
 
         View host = new () { Width = 40, Height = 5 };
@@ -790,16 +796,13 @@ public class MarkdownViewTests (ITestOutputHelper output)
     [Fact]
     public void CodeBlock_Width_Respects_ContentSize_Not_Viewport ()
     {
-        string md = """
-                    ```
-                    code line
-                    ```
-                    """;
+        var md = """
+                 ```
+                 code line
+                 ```
+                 """;
 
-        MarkdownView view = new () { Markdown = md,
-            Width = 40,
-            Height = 10
-        };
+        MarkdownView view = new () { Markdown = md, Width = 40, Height = 10 };
 
         View host = new () { Width = 40, Height = 10 };
         host.Add (view);

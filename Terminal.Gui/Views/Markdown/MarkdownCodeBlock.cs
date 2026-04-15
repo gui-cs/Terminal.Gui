@@ -123,9 +123,9 @@ public class MarkdownCodeBlock : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
-        // TODO: We should ideally be using the "code" role here, but it doesn't exist yet.
-        // TODO: For now, we'll just use ReadOnly with a dimmed background.
-        Attribute normal = GetAttributeForRole (VisualRole.Editable);
+        // TODO: Move this to OnClearingViewport where it belongs.
+        // Fill entire area with dimmed background
+        Attribute normal = GetAttributeForRole (VisualRole.Code);
         Color codeBg = normal.Background;
         Attribute codeAttr = new (normal.Foreground, codeBg);
 

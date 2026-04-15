@@ -8,8 +8,8 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
-using Terminal.Gui.Drawing;
 using Terminal.Gui.Input;
+using Terminal.Gui.SyntaxHighlighting;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
@@ -20,7 +20,7 @@ ConfigurationManager.RuntimeConfig = """
                                      """;
 ConfigurationManager.Enable (ConfigLocations.All);
 
-bool fullScreen = false;
+var fullScreen = false;
 List<string> filePatterns = [];
 
 foreach (string arg in args)
@@ -105,19 +105,9 @@ static int RunInline (List<string> files)
     Application.AppModel = AppModel.Inline;
     IApplication app = Application.Create ().Init ();
 
-    Runnable window = new ()
-    {
-        Title = "TUI Markdown Viewer",
-        Width = Dim.Fill (),
-        Height = Dim.Auto ()
-    };
+    Runnable window = new () { Title = "TUI Markdown Viewer", Width = Dim.Fill (), Height = Dim.Auto () };
 
-    MarkdownView markdownView = new ()
-    {
-        Width = Dim.Fill (),
-        Height = Dim.Auto (),
-        Markdown = markdown
-    };
+    MarkdownView markdownView = new () { Width = Dim.Fill (), Height = Dim.Auto (), Markdown = markdown, SyntaxHighlighter = new TextMateSyntaxHighlighter () };
 
     // No scrollbar in inline mode — content should be fully visible
     markdownView.ViewportSettings &= ~ViewportSettingsFlags.HasVerticalScrollBar;
@@ -142,17 +132,13 @@ static int RunFullScreen (List<string> files)
 {
     IApplication app = Application.Create ().Init ();
 
-    Runnable window = new ()
-    {
-        Title = "TUI Markdown Viewer",
-        Width = Dim.Fill (),
-        Height = Dim.Fill ()
-    };
+    Runnable window = new () { Title = "TUI Markdown Viewer", Width = Dim.Fill (), Height = Dim.Fill () };
 
     MarkdownView markdownView = new ()
     {
         Width = Dim.Fill (),
-        Height = Dim.Fill (1) // leave room for StatusBar
+        Height = Dim.Fill (1), // leave room for StatusBar
+        SyntaxHighlighter = new TextMateSyntaxHighlighter ()
     };
 
     // Vertical scrollbar is already enabled by MarkdownView constructor
@@ -162,7 +148,7 @@ static int RunFullScreen (List<string> files)
     // StatusBar items (mirrors the Deepdives scenario)
     // -----------------------------------------------------------------------
 
-    bool updatingContentWidth = false;
+    var updatingContentWidth = false;
 
     NumericUpDown contentWidthUpDown = new () { Value = 80 };
 
@@ -188,29 +174,13 @@ static int RunFullScreen (List<string> files)
 
     Shortcut contentWidthShortcut = new () { CommandView = contentWidthUpDown, HelpText = "Content Width" };
 
-    Shortcut lineCountShortcut = new ()
-    {
-        Title = "0 lines",
-        MouseHighlightStates = MouseState.None,
-        Enabled = false
-    };
+    Shortcut lineCountShortcut = new () { Title = "0 lines", MouseHighlightStates = MouseState.None, Enabled = false };
 
-    Shortcut fileSizeShortcut = new ()
-    {
-        Title = "0 B",
-        MouseHighlightStates = MouseState.None,
-        Enabled = false
-    };
+    Shortcut fileSizeShortcut = new () { Title = "0 B", MouseHighlightStates = MouseState.None, Enabled = false };
 
     Shortcut statusShortcut = new (Key.Empty, "Ready", null);
 
-    SpinnerView spinner = new ()
-    {
-        Style = new SpinnerStyle.Aesthetic (),
-        Width = 8,
-        AutoSpin = false,
-        Visible = false
-    };
+    SpinnerView spinner = new () { Style = new SpinnerStyle.Aesthetic (), Width = 8, AutoSpin = false, Visible = false };
 
     Shortcut spinnerShortcut = new () { CommandView = spinner, Title = "" };
 
@@ -224,10 +194,7 @@ static int RunFullScreen (List<string> files)
                                     e.Handled = true;
                                 };
 
-    markdownView.SubViewsLaidOut += (_, _) =>
-                                    {
-                                        lineCountShortcut.Title = $"{markdownView.LineCount} lines";
-                                    };
+    markdownView.SubViewsLaidOut += (_, _) => { lineCountShortcut.Title = $"{markdownView.LineCount} lines"; };
 
     markdownView.ViewportChanged += (_, e) =>
                                     {
@@ -247,7 +214,7 @@ static int RunFullScreen (List<string> files)
 
     List<Shortcut> statusItems =
     [
-        new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", window.RequestStop),
+        new (Application.GetDefaultKey (Command.Quit), "Quit", window.RequestStop),
         contentWidthShortcut,
         lineCountShortcut,
         fileSizeShortcut,
@@ -261,13 +228,7 @@ static int RunFullScreen (List<string> files)
         List<string> fileNames = [.. files.Select (f => Path.GetFileName (f)!)];
         ObservableCollection<string> fileNamesOc = new (fileNames);
 
-        DropDownList fileSelector = new ()
-        {
-            Source = new ListWrapper<string> (fileNamesOc),
-            ReadOnly = true,
-            Text = fileNames [0],
-            Width = 30
-        };
+        DropDownList fileSelector = new () { Source = new ListWrapper<string> (fileNamesOc), ReadOnly = true, Text = fileNames [0], Width = 30 };
 
         fileSelector.ValueChanged += (_, _) =>
                                      {
@@ -286,10 +247,7 @@ static int RunFullScreen (List<string> files)
         statusItems.Insert (1, fileSelectorShortcut);
     }
 
-    StatusBar statusBar = new (statusItems)
-    {
-        AlignmentModes = AlignmentModes.IgnoreFirstOrLast
-    };
+    StatusBar statusBar = new (statusItems) { AlignmentModes = AlignmentModes.IgnoreFirstOrLast };
 
     window.Add (markdownView, statusBar);
 
@@ -298,11 +256,11 @@ static int RunFullScreen (List<string> files)
 
     // Sync content-width control after initial layout
     window.Initialized += (_, _) =>
-                           {
-                               updatingContentWidth = true;
-                               contentWidthUpDown.Value = markdownView.Viewport.Width;
-                               updatingContentWidth = false;
-                           };
+                          {
+                              updatingContentWidth = true;
+                              contentWidthUpDown.Value = markdownView.Viewport.Width;
+                              updatingContentWidth = false;
+                          };
 
     app.Run (window);
     window.Dispose ();

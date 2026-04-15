@@ -7,10 +7,10 @@ public partial class MarkdownView
 {
     private static readonly MarkdownPipeline _defaultPipeline = new MarkdownPipelineBuilder ().UseAdvancedExtensions ().Build ();
 
-    private static readonly Regex _headingPattern = new ("^(#{1,6})\\s+(.+)$", RegexOptions.Compiled);
-    private static readonly Regex _unorderedListPattern = new ("^\\s*[-*+]\\s+(.*)$", RegexOptions.Compiled);
-    private static readonly Regex _orderedListPattern = new ("^\\s*\\d+\\.\\s+(.*)$", RegexOptions.Compiled);
-    private static readonly Regex _taskPattern = new ("^\\[(?<state>[ xX])\\]\\s+(?<text>.*)$", RegexOptions.Compiled);
+    private static readonly Regex _headingPattern = new Regex ("^(#{1,6})\\s+(.+)$", RegexOptions.Compiled);
+    private static readonly Regex _unorderedListPattern = new Regex ("^\\s*[-*+]\\s+(.*)$", RegexOptions.Compiled);
+    private static readonly Regex _orderedListPattern = new Regex ("^\\s*\\d+\\.\\s+(.*)$", RegexOptions.Compiled);
+    private static readonly Regex _taskPattern = new Regex ("^\\[(?<state>[ xX])\\]\\s+(?<text>.*)$", RegexOptions.Compiled);
 
     private void EnsureParsed ()
     {
@@ -37,6 +37,7 @@ public partial class MarkdownView
         string [] lines = normalized.Split ('\n');
 
         var inCodeFence = false;
+        string? fenceLanguage = null;
         List<string> codeLines = [];
         List<string> tableLines = [];
         Dictionary<string, int> slugCounts = new (StringComparer.OrdinalIgnoreCase);
@@ -51,12 +52,14 @@ public partial class MarkdownView
                 {
                     inCodeFence = true;
                     codeLines.Clear ();
+                    fenceLanguage = ExtractFenceLanguage (line);
 
                     continue;
                 }
 
-                AddCodeBlockLines (codeLines);
+                AddCodeBlockLines (codeLines, fenceLanguage);
                 inCodeFence = false;
+                fenceLanguage = null;
 
                 continue;
             }
@@ -144,7 +147,7 @@ public partial class MarkdownView
 
         if (inCodeFence)
         {
-            AddCodeBlockLines (codeLines);
+            AddCodeBlockLines (codeLines, fenceLanguage);
         }
     }
 
@@ -157,7 +160,7 @@ public partial class MarkdownView
 
         TableData? tableData = TableData.TryParse (tableLines);
 
-        if (tableData is not null)
+        if (tableData is { })
         {
             _blocks.Add (new IntermediateBlock ([new InlineRun ("", MarkdownStyleRole.Table)], false, tableData: tableData));
         }
@@ -201,6 +204,24 @@ public partial class MarkdownView
         return trimmed.StartsWith ("```", StringComparison.Ordinal) || trimmed.StartsWith ("~~~", StringComparison.Ordinal);
     }
 
+    private static string? ExtractFenceLanguage (string line)
+    {
+        string trimmed = line.Trim ();
+
+        // Skip the fence characters (``` or ~~~)
+        char fenceChar = trimmed [0];
+        var i = 0;
+
+        while (i < trimmed.Length && trimmed [i] == fenceChar)
+        {
+            i++;
+        }
+
+        string language = trimmed [i..].Trim ();
+
+        return string.IsNullOrEmpty (language) ? null : language;
+    }
+
     private static bool IsThematicBreak (string line)
     {
         string trimmed = line.Trim ();
@@ -220,7 +241,7 @@ public partial class MarkdownView
         return trimmed.StartsWith ('|') && trimmed.IndexOf ('|', 1) >= 0;
     }
 
-    private void AddCodeBlockLines (IReadOnlyList<string> codeLines)
+    private void AddCodeBlockLines (IReadOnlyList<string> codeLines, string? language)
     {
         if (codeLines.Count == 0)
         {
@@ -228,6 +249,8 @@ public partial class MarkdownView
 
             return;
         }
+
+        SyntaxHighlighter?.ResetState ();
 
         foreach (string line in codeLines)
         {
@@ -239,12 +262,12 @@ public partial class MarkdownView
             }
             else
             {
-                IReadOnlyList<StyledSegment> highlighted = SyntaxHighlighter.Highlight (line, null);
+                IReadOnlyList<StyledSegment> highlighted = SyntaxHighlighter.Highlight (line, language);
                 List<InlineRun> converted = [];
 
                 foreach (StyledSegment segment in highlighted)
                 {
-                    converted.Add (new InlineRun (segment.Text, segment.StyleRole, segment.Url, segment.ImageSource));
+                    converted.Add (new InlineRun (segment.Text, segment.StyleRole, segment.Url, segment.ImageSource, segment.Attribute));
                 }
 
                 runs = converted;

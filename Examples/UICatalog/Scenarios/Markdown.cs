@@ -56,7 +56,12 @@ public class Markdown : Scenario
             Height = Dim.Fill (1)
         };
 
-        _markdownView = new MarkdownView { Width = Dim.Fill (), Height = Dim.Fill () };
+        _markdownView = new MarkdownView
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            SyntaxHighlighter = new Terminal.Gui.SyntaxHighlighting.TextMateSyntaxHighlighter (TextMateSharp.Grammars.ThemeName.DarkPlus)
+        };
         _markdownView.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 
         _markdownView.LinkClicked += (_, e) =>

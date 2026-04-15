@@ -12,12 +12,18 @@ public sealed class StyledSegment
     /// <param name="styleRole">The semantic role that controls rendering style.</param>
     /// <param name="url">Optional hyperlink URL. <see langword="null"/> for non-link segments.</param>
     /// <param name="imageSource">Optional image source path. <see langword="null"/> for non-image segments.</param>
-    public StyledSegment (string text, MarkdownStyleRole styleRole, string? url = null, string? imageSource = null)
+    /// <param name="attribute">
+    ///     Optional explicit <see cref="Drawing.Attribute"/>. When non-null, this attribute is used directly
+    ///     for rendering, bypassing the <see cref="StyleRole"/>-based resolution in
+    ///     <see cref="MarkdownAttributeHelper.GetAttributeForSegment"/>.
+    /// </param>
+    public StyledSegment (string text, MarkdownStyleRole styleRole, string? url = null, string? imageSource = null, Attribute? attribute = null)
     {
         Text = text;
         StyleRole = styleRole;
         Url = url;
         ImageSource = imageSource;
+        Attribute = attribute;
     }
 
     /// <summary>Gets the display text of this segment.</summary>
@@ -31,4 +37,14 @@ public sealed class StyledSegment
 
     /// <summary>Gets the image source path, or <see langword="null"/> if this is not an image segment.</summary>
     public string? ImageSource { get; }
+
+    /// <summary>
+    ///     Gets the explicit <see cref="Drawing.Attribute"/> for this segment, or <see langword="null"/>
+    ///     if the attribute should be resolved from <see cref="StyleRole"/>.
+    /// </summary>
+    /// <remarks>
+    ///     When set (e.g., by a syntax highlighter), this attribute is used directly for rendering,
+    ///     bypassing the normal <see cref="MarkdownStyleRole"/>-based resolution.
+    /// </remarks>
+    public Attribute? Attribute { get; }
 }

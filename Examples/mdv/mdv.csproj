@@ -13,5 +13,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
+    <ProjectReference Include="..\..\Terminal.Gui.SyntaxHighlighting\Terminal.Gui.SyntaxHighlighting.csproj" />
   </ItemGroup>
 </Project>

@@ -141,7 +141,7 @@ public partial class MarkdownView
             segments.Add (new StyledSegment (block.Prefix, MarkdownStyleRole.ListMarker));
         }
 
-        segments.AddRange (block.Runs.Select (run => new StyledSegment (run.Text, run.StyleRole, run.Url, run.ImageSource)));
+        segments.AddRange (block.Runs.Select (run => new StyledSegment (run.Text, run.StyleRole, run.Url, run.ImageSource, run.Attribute)));
 
         int width = CalculateWidth (segments);
 
