@@ -1,6 +1,6 @@
 namespace Terminal.Gui.Drawing;
 
-/// <summary>A segment of styled text produced by <see cref="MarkdownView"/> during layout.</summary>
+/// <summary>A segment of styled text produced by <see cref="Markdown"/> during layout.</summary>
 /// <remarks>
 ///     Each segment carries the display text, a <see cref="MarkdownStyleRole"/> that controls
 ///     visual rendering, and optional URL / image-source metadata for hyperlinks and images.

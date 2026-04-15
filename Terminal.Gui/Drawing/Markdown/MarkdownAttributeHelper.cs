@@ -2,7 +2,7 @@ namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Resolves <see cref="MarkdownStyleRole"/> values to <see cref="Attribute"/> instances
-///     for rendering styled Markdown content. Used by both <see cref="MarkdownView"/> and
+///     for rendering styled Markdown content. Used by both <see cref="Markdown"/> and
 ///     <see cref="MarkdownTable"/> to ensure consistent visual treatment of inline styles.
 /// </summary>
 internal static class MarkdownAttributeHelper
@@ -30,7 +30,11 @@ internal static class MarkdownAttributeHelper
 
         if (highlighter?.GetAttributeForScope (segment.StyleRole) is { } scopeAttr)
         {
-            return scopeAttr;
+            // Use the theme's foreground and style, but keep the view's background
+            // so inline elements (headings, links, etc.) don't get the code-theme background.
+            Attribute viewNormal = view.GetAttributeForRole (VisualRole.Normal);
+
+            return scopeAttr with { Background = viewNormal.Background };
         }
 
         Attribute normal = view.GetAttributeForRole (VisualRole.Normal);

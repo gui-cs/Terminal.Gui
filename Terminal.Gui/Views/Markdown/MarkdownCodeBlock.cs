@@ -8,7 +8,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         When used inside a <see cref="MarkdownView"/>, instances are created automatically during
+///         When used inside a <see cref="Markdown"/>, instances are created automatically during
 ///         layout and positioned as SubViews at the correct content coordinate so that they scroll
 ///         naturally with the parent's viewport.
 ///     </para>
@@ -73,7 +73,7 @@ public class MarkdownCodeBlock : View, IDesignable
     public string? Language { get; set; }
 
     /// <summary>
-    ///     Gets or sets the styled line segments. Used internally by <see cref="MarkdownView"/> to set
+    ///     Gets or sets the styled line segments. Used internally by <see cref="Markdown"/> to set
     ///     pre-parsed styled content directly.
     /// </summary>
     internal IReadOnlyList<IReadOnlyList<StyledSegment>> StyledLines
@@ -169,7 +169,7 @@ public class MarkdownCodeBlock : View, IDesignable
             return;
         }
 
-        string [] allLines = text.Split ('\n');
+        string [] allLines = text.ReplaceLineEndings ("\n").Split ('\n');
 
         // Check if the first line is a fence opener (``` or ```lang)
         if (allLines.Length >= 2 && allLines [0].TrimStart ().StartsWith ("```", StringComparison.Ordinal))

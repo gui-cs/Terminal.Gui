@@ -1,9 +1,9 @@
 namespace Terminal.Gui.Drawing;
 
-/// <summary>Identifies the semantic role of a styled text segment within a <see cref="MarkdownView"/>.</summary>
+/// <summary>Identifies the semantic role of a styled text segment within a <see cref="Markdown"/>.</summary>
 /// <remarks>
 ///     The role determines how the segment is rendered (font style, color, background).
-///     See <see cref="MarkdownView"/> for the mapping of roles to visual attributes.
+///     See <see cref="Markdown"/> for the mapping of roles to visual attributes.
 /// </remarks>
 public enum MarkdownStyleRole
 {

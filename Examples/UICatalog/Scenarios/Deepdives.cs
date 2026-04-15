@@ -18,7 +18,7 @@ public class Deepdives : Scenario
 
     private IApplication? _app;
     private ListView? _docList;
-    private MarkdownView? _markdownView;
+    private Markdown? _markdownView;
     private FrameView? _viewerFrame;
     private Shortcut? _statusShortcut;
     private SpinnerView? _spinner;
@@ -57,7 +57,7 @@ public class Deepdives : Scenario
             Height = Dim.Fill (1)
         };
 
-        _markdownView = new MarkdownView
+        _markdownView = new Markdown
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),

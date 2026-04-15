@@ -2,7 +2,7 @@ namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     Stateless parser for inline Markdown formatting (bold, italic, code, links, images).
-///     Used by both <see cref="MarkdownView"/> and <see cref="MarkdownTable"/> to parse
+///     Used by both <see cref="Markdown"/> and <see cref="MarkdownTable"/> to parse
 ///     inline content from raw Markdown text.
 /// </summary>
 internal static class MarkdownInlineParser

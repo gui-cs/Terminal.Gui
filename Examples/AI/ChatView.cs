@@ -16,7 +16,7 @@ internal sealed class ChatView : Window
     private readonly IApplication _app;
     private readonly CopilotClient _client;
     private string _model;
-    private readonly MarkdownView _conversationView;
+    private readonly Markdown _conversationView;
     private readonly StringBuilder _conversationText = new ();
     private readonly TextField _inputField;
     private readonly View _inputIndicator;
@@ -55,7 +55,7 @@ internal sealed class ChatView : Window
         _statusBar = new StatusBar { AlignmentModes = AlignmentModes.IgnoreFirstOrLast, SchemeName = SchemeName, BorderStyle = LineStyle.None };
         _statusBar.Add (spinnerShortcut, quitShortcut);
 
-        _conversationView = new MarkdownView
+        _conversationView = new Markdown
         {
             Width = Dim.Fill (), Height = Dim.Auto (minimumContentDim: 1, maximumContentDim: Dim.Func (_ => GetMaxConversationHeight ()))
         };

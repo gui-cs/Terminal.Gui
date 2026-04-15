@@ -3,7 +3,7 @@ using Markdig;
 
 namespace Terminal.Gui.Views;
 
-public partial class MarkdownView
+public partial class Markdown
 {
     private static readonly MarkdownPipeline _defaultPipeline = new MarkdownPipelineBuilder ().UseAdvancedExtensions ().Build ();
 
@@ -24,7 +24,7 @@ public partial class MarkdownView
         MarkdownPipeline pipeline = MarkdownPipeline ?? _defaultPipeline;
 
         // Keep parse stage explicit (parse -> lower -> layout -> draw); parsed AST is intentionally unused in v1 lowering.
-        _ = Markdown.Parse (_markdown, pipeline);
+        _ = Markdig.Markdown.Parse (_markdown, pipeline);
 
         LowerFromSourceText ();
 

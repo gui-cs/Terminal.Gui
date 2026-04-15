@@ -1,6 +1,6 @@
 namespace Terminal.Gui.Views;
 
-/// <summary>Provides data for the <see cref="MarkdownView.LinkClicked"/> event.</summary>
+/// <summary>Provides data for the <see cref="Markdown.LinkClicked"/> event.</summary>
 public class MarkdownLinkEventArgs : EventArgs
 {
     /// <summary>Initializes a new <see cref="MarkdownLinkEventArgs"/>.</summary>

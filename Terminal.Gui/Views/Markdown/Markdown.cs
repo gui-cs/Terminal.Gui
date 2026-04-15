@@ -19,7 +19,7 @@ namespace Terminal.Gui.Views;
 ///         <c>#</c>) are handled automatically by scrolling to the matching heading.
 ///     </para>
 /// </remarks>
-public partial class MarkdownView : View, IDesignable
+public partial class Markdown : View, IDesignable
 {
     private const int MIN_WRAP_WIDTH = 4;
 
@@ -40,8 +40,8 @@ public partial class MarkdownView : View, IDesignable
     private bool _inLayout;
     private int _externalContentWidth;
 
-    /// <summary>Initializes a new instance of the <see cref="MarkdownView"/> class.</summary>
-    public MarkdownView ()
+    /// <summary>Initializes a new instance of the <see cref="Markdown"/> class.</summary>
+    public Markdown ()
     {
         CanFocus = true;
         ViewportSettings |= ViewportSettingsFlags.HasVerticalScrollBar;

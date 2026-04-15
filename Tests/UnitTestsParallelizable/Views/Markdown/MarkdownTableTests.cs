@@ -68,7 +68,7 @@ public class MarkdownTableTests
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
-        MarkdownView mv = new () { Text = "| H1 | H2 |\n|-----|-----|\n| A  | B  |", Width = Dim.Fill (), Height = Dim.Fill () };
+        Terminal.Gui.Views.Markdown mv = new () { Text = "| H1 | H2 |\n|-----|-----|\n| A  | B  |", Width = Dim.Fill (), Height = Dim.Fill () };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);
@@ -109,7 +109,7 @@ public class MarkdownTableTests
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView mv = new () { Text = "text\n\n| H1 | H2 |\n|-----|-----|\n| A  | B  |\n| C  | D  |\n\nmore", Width = Dim.Fill (), Height = Dim.Fill () };
+        Terminal.Gui.Views.Markdown mv = new () { Text = "text\n\n| H1 | H2 |\n|-----|-----|\n| A  | B  |\n| C  | D  |\n\nmore", Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -135,7 +135,7 @@ public class MarkdownTableTests
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
-        MarkdownView mv = new () { Text = "| A | B | C |\n|---|---|---|\n| 1 | 2 | 3 |", Width = Dim.Fill (), Height = Dim.Fill () };
+        Terminal.Gui.Views.Markdown mv = new () { Text = "| A | B | C |\n|---|---|---|\n| 1 | 2 | 3 |", Width = Dim.Fill (), Height = Dim.Fill () };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);
@@ -167,7 +167,7 @@ public class MarkdownTableTests
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
-        MarkdownView mv = new () { Text = "| H1 | H2 |\n|-----|-----|", Width = Dim.Fill (), Height = Dim.Fill () };
+        Terminal.Gui.Views.Markdown mv = new () { Text = "| H1 | H2 |\n|-----|-----|", Width = Dim.Fill (), Height = Dim.Fill () };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);
@@ -197,7 +197,7 @@ public class MarkdownTableTests
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView mv = new () { Text = "| H |\n|---|\n| A |\n\nafter", Width = Dim.Fill (), Height = Dim.Fill () };
+        Terminal.Gui.Views.Markdown mv = new () { Text = "| H |\n|---|\n| A |\n\nafter", Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -220,7 +220,7 @@ public class MarkdownTableTests
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView mv = new () { Text = "| H1 | H2 |\n| not sep |\n| body |", Width = Dim.Fill (), Height = Dim.Fill () };
+        Terminal.Gui.Views.Markdown mv = new () { Text = "| H1 | H2 |\n| not sep |\n| body |", Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -245,7 +245,7 @@ public class MarkdownTableTests
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
-        MarkdownView mv = new () { Text = "| Header |\n|--------|\n| **bold** |", Width = Dim.Fill (), Height = Dim.Fill () };
+        Terminal.Gui.Views.Markdown mv = new () { Text = "| Header |\n|--------|\n| **bold** |", Width = Dim.Fill (), Height = Dim.Fill () };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);
@@ -278,7 +278,7 @@ public class MarkdownTableTests
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
-        MarkdownView mv = new () { Text = "| Col |\n|-----|\n| `code` |", Width = Dim.Fill (), Height = Dim.Fill () };
+        Terminal.Gui.Views.Markdown mv = new () { Text = "| Col |\n|-----|\n| `code` |", Width = Dim.Fill (), Height = Dim.Fill () };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);
@@ -344,7 +344,7 @@ public class MarkdownTableTests
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
         // Long cell text in a narrow viewport will force wrapping
-        MarkdownView mv = new () { Text = "| Header |\n|--------|\n| This is a very long cell that should wrap |", Width = Dim.Fill (), Height = Dim.Fill () };
+        Terminal.Gui.Views.Markdown mv = new () { Text = "| Header |\n|--------|\n| This is a very long cell that should wrap |", Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);

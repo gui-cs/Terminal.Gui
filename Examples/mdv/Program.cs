@@ -127,7 +127,7 @@ static int RunInline (List<string> files, ThemeName syntaxTheme)
 
     Runnable window = new () { Title = "TUI Markdown Viewer", Width = Dim.Fill (), Height = Dim.Auto () };
 
-    MarkdownView markdownView = new () { Width = Dim.Fill (), Height = Dim.Auto (), Text = markdown, SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme) };
+    Markdown markdownView = new () { Width = Dim.Fill (), Height = Dim.Auto (), Text = markdown, SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme) };
 
     // No scrollbar in inline mode — content should be fully visible
     markdownView.ViewportSettings &= ~ViewportSettingsFlags.HasVerticalScrollBar;
@@ -154,7 +154,7 @@ static int RunFullScreen (List<string> files, ThemeName syntaxTheme)
 
     Runnable window = new () { Title = "TUI Markdown Viewer", Width = Dim.Fill (), Height = Dim.Fill () };
 
-    MarkdownView markdownView = new ()
+    Markdown markdownView = new ()
     {
         Width = Dim.Fill (),
         Height = Dim.Fill (1), // leave room for StatusBar

@@ -1,6 +1,6 @@
 namespace Terminal.Gui.Views;
 
-public partial class MarkdownView
+public partial class Markdown
 {
     private void BuildRenderedLines ()
     {

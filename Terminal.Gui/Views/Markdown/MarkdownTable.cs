@@ -6,7 +6,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         When used inside a <see cref="MarkdownView"/>, instances are created automatically during
+///         When used inside a <see cref="Markdown"/>, instances are created automatically during
 ///         layout and positioned as SubViews at the correct content coordinate so that they scroll
 ///         naturally with the parent's viewport.
 ///     </para>

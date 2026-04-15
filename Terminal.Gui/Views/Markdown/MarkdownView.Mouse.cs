@@ -1,6 +1,6 @@
 namespace Terminal.Gui.Views;
 
-public partial class MarkdownView
+public partial class Markdown
 {
     /// <summary>A contiguous link span on a single rendered line, built during layout.</summary>
     internal sealed class MarkdownLinkRegion

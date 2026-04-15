@@ -38,7 +38,7 @@ public class MarkdownTester : Scenario
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             TabKeyAddsTab = false,
-            Text = MarkdownView.DefaultMarkdownSample
+            Text = Markdown.DefaultMarkdownSample
         };
 
         editorFrame.Add (editor);
@@ -55,13 +55,13 @@ public class MarkdownTester : Scenario
         };
         previewFrame.Border.Thickness = new Thickness (0, 2, 0, 0);
 
-        MarkdownView preview = new ()
+        Markdown preview = new ()
         {
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            Text = MarkdownView.DefaultMarkdownSample,
+            Text = Markdown.DefaultMarkdownSample,
             SyntaxHighlighter = new TextMateSyntaxHighlighter (TextMateSharp.Grammars.ThemeName.DarkPlus)
         };
 

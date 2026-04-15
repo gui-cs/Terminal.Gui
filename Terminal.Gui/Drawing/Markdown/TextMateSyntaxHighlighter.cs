@@ -11,14 +11,14 @@ namespace Terminal.Gui.Drawing;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Assign an instance to <see cref="MarkdownView.SyntaxHighlighter"/> to enable
+///         Assign an instance to <see cref="Markdown.SyntaxHighlighter"/> to enable
 ///         colorized code blocks in Markdown rendering:
 ///     </para>
 ///     <code>
 ///         markdownView.SyntaxHighlighter = new TextMateSyntaxHighlighter (ThemeName.DarkPlus);
 ///     </code>
 ///     <para>
-///         The highlighter maintains per-line tokenizer state internally. <see cref="MarkdownView"/>
+///         The highlighter maintains per-line tokenizer state internally. <see cref="Markdown"/>
 ///         calls <see cref="ResetState"/> at the start of each code block so that multi-line
 ///         constructs (strings, comments) don't leak across blocks.
 ///     </para>

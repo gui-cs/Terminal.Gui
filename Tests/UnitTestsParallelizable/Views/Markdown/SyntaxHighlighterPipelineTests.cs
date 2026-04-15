@@ -23,7 +23,7 @@ public class SyntaxHighlighterPipelineTests
     {
         MockSyntaxHighlighter highlighter = new ();
 
-        MarkdownView view = new () { SyntaxHighlighter = highlighter, Text = "```csharp\nvar x = 1;\n```\n\ntext\n\n```python\nprint('hi')\n```" };
+        Terminal.Gui.Views.Markdown view = new () { SyntaxHighlighter = highlighter, Text = "```csharp\nvar x = 1;\n```\n\ntext\n\n```python\nprint('hi')\n```" };
 
         // Force layout to trigger parsing
         view.Width = 40;
@@ -41,7 +41,7 @@ public class SyntaxHighlighterPipelineTests
     {
         MockSyntaxHighlighter highlighter = new ();
 
-        MarkdownView view = new () { SyntaxHighlighter = highlighter, Text = "```csharp\nvar x = 1;\n```" };
+        Terminal.Gui.Views.Markdown view = new () { SyntaxHighlighter = highlighter, Text = "```csharp\nvar x = 1;\n```" };
 
         view.Width = 40;
         view.Height = 20;
@@ -55,7 +55,7 @@ public class SyntaxHighlighterPipelineTests
     {
         MockSyntaxHighlighter highlighter = new ();
 
-        MarkdownView view = new () { SyntaxHighlighter = highlighter, Text = "```\nvar x = 1;\n```" };
+        Terminal.Gui.Views.Markdown view = new () { SyntaxHighlighter = highlighter, Text = "```\nvar x = 1;\n```" };
 
         view.Width = 40;
         view.Height = 20;
@@ -69,7 +69,7 @@ public class SyntaxHighlighterPipelineTests
     {
         MockSyntaxHighlighter highlighter = new ();
 
-        MarkdownView view = new () { SyntaxHighlighter = highlighter, Text = "~~~python\nprint('hi')\n~~~" };
+        Terminal.Gui.Views.Markdown view = new () { SyntaxHighlighter = highlighter, Text = "~~~python\nprint('hi')\n~~~" };
 
         view.Width = 40;
         view.Height = 20;
@@ -83,7 +83,7 @@ public class SyntaxHighlighterPipelineTests
     {
         MockSyntaxHighlighter highlighter = new ();
 
-        MarkdownView view = new () { SyntaxHighlighter = highlighter, Text = "```csharp\nvar x = 1;\n```\n\n```python\nprint('hi')\n```" };
+        Terminal.Gui.Views.Markdown view = new () { SyntaxHighlighter = highlighter, Text = "```csharp\nvar x = 1;\n```\n\n```python\nprint('hi')\n```" };
 
         view.Width = 40;
         view.Height = 20;
@@ -156,7 +156,7 @@ public class SyntaxHighlighterPipelineTests
         Attribute keywordAttr = new ("Blue", "Black", TextStyle.Bold);
         ExplicitAttributeHighlighter highlighter = new (keywordAttr);
 
-        MarkdownView view = new () { SyntaxHighlighter = highlighter, Text = "```csharp\nvar x = 1;\n```" };
+        Terminal.Gui.Views.Markdown view = new () { SyntaxHighlighter = highlighter, Text = "```csharp\nvar x = 1;\n```" };
 
         view.Width = 40;
         view.Height = 20;
@@ -214,7 +214,7 @@ public class SyntaxHighlighterPipelineTests
         Attribute headingAttr = new (Color.Cyan, Color.Black, TextStyle.Bold);
         ScopeAwareHighlighter highlighter = new (MarkdownStyleRole.Heading, headingAttr);
 
-        MarkdownView mv = new () { SyntaxHighlighter = highlighter };
+        Terminal.Gui.Views.Markdown mv = new () { SyntaxHighlighter = highlighter };
         mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Black)));
 
         StyledSegment segment = new ("Hello", MarkdownStyleRole.Heading);
@@ -226,7 +226,7 @@ public class SyntaxHighlighterPipelineTests
     [Fact]
     public void MarkdownAttributeHelper_Falls_Back_To_TextStyle_Without_Highlighter ()
     {
-        MarkdownView mv = new ();
+        Terminal.Gui.Views.Markdown mv = new ();
         mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Black)));
 
         StyledSegment segment = new ("Hello", MarkdownStyleRole.Heading);
@@ -242,7 +242,7 @@ public class SyntaxHighlighterPipelineTests
         // Highlighter returns null for Normal role
         ScopeAwareHighlighter highlighter = new (MarkdownStyleRole.Heading, new Attribute (Color.Cyan, Color.Black));
 
-        MarkdownView mv = new ();
+        Terminal.Gui.Views.Markdown mv = new ();
         mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Black)));
 
         StyledSegment segment = new ("Hello", MarkdownStyleRole.Emphasis);
@@ -259,7 +259,7 @@ public class SyntaxHighlighterPipelineTests
         Attribute headingAttr = new (Color.Cyan, Color.Black);
         ScopeAwareHighlighter highlighter = new (MarkdownStyleRole.Heading, headingAttr);
 
-        MarkdownView mv = new ();
+        Terminal.Gui.Views.Markdown mv = new ();
         mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Black)));
 
         StyledSegment segment = new ("Hello", MarkdownStyleRole.Heading, attribute: explicitAttr);

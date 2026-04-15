@@ -16,7 +16,7 @@ internal sealed class SingleTurnView : Window
     private readonly CopilotClient _client;
     private readonly string _model;
     private readonly string _prompt;
-    private readonly MarkdownView _responseView;
+    private readonly Markdown _responseView;
 
     public SingleTurnView (IApplication app, CopilotClient client, string model, string prompt)
     {
@@ -30,7 +30,7 @@ internal sealed class SingleTurnView : Window
         Height = Dim.Auto ();
         Border.LineStyle = LineStyle.Rounded;
 
-        _responseView = new MarkdownView { Width = Dim.Fill (), Height = Dim.Auto () };
+        _responseView = new Markdown { Width = Dim.Fill (), Height = Dim.Auto () };
 
         Add (_responseView);
     }

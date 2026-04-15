@@ -1,8 +1,8 @@
 namespace Terminal.Gui.Drawing;
 
-/// <summary>Provides syntax highlighting for fenced code blocks in <see cref="MarkdownView"/>.</summary>
+/// <summary>Provides syntax highlighting for fenced code blocks in <see cref="Markdown"/>.</summary>
 /// <remarks>
-///     Assign an implementation to <see cref="MarkdownView.SyntaxHighlighter"/> to colorize
+///     Assign an implementation to <see cref="Markdown.SyntaxHighlighter"/> to colorize
 ///     code blocks. Each line of the code block is passed individually to <see cref="Highlight"/>.
 /// </remarks>
 public interface ISyntaxHighlighter
@@ -17,7 +17,7 @@ public interface ISyntaxHighlighter
     IReadOnlyList<StyledSegment> Highlight (string code, string? language);
 
     /// <summary>
-    ///     Resets internal tokenizer state. Called by <see cref="MarkdownView"/> at the start
+    ///     Resets internal tokenizer state. Called by <see cref="Markdown"/> at the start
     ///     of each new code block so that stateful tokenizers (e.g., TextMate) begin fresh.
     /// </summary>
     void ResetState ();
