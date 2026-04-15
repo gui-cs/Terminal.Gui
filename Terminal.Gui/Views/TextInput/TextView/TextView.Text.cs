@@ -130,7 +130,6 @@ public partial class TextView
                 return;
             }
             _isReadOnly = value;
-            CanFocus = !_isReadOnly;
 
             SetNeedsDraw ();
 

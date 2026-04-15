@@ -199,7 +199,6 @@ public class ConfigurationEditor : Scenario
                 using var reader = new StreamReader (stream!);
                 Text = reader.ReadToEnd ();
                 ReadOnly = true;
-                Enabled = true;
 
                 return;
             }
@@ -208,7 +207,6 @@ public class ConfigurationEditor : Scenario
             {
                 Text = ConfigurationManager.GetHardCodedConfig ();
                 ReadOnly = true;
-                Enabled = true;
             }
             else if (FileInfo!.FullName.Contains ("RuntimeConfig"))
             {

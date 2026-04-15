@@ -141,14 +141,15 @@ public partial class TextView : View, IDesignable
         UpdateContentSize ();
         PositionCursor ();
 
-        if (HasFocus)
+        if (!HasFocus)
         {
-            App?.Popovers?.Register (ContextMenu);
+            return;
+        }
+        App?.Popovers?.Register (ContextMenu);
 
-            if (ContextMenu?.Key is { } key && !KeyBindings.TryGet (key, out _))
-            {
-                KeyBindings.Add (key, Command.Context);
-            }
+        if (ContextMenu?.Key is { } key && !KeyBindings.TryGet (key, out _))
+        {
+            KeyBindings.Add (key, Command.Context);
         }
     }
 
