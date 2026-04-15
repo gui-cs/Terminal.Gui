@@ -240,12 +240,21 @@ public partial class TextField
     /// </remarks>
     private void Adjust ()
     {
-        bool need = NeedsDraw || !Used;
+        bool need = false;
         _ = TextModel.CursorColumn (_text, InsertionPoint, 0, out List<int> glyphWidths, out _);
         _ = TextModel.GetColumnWidthsBeforeStart (glyphWidths, ScrollOffset, out _, out int startIndex);
+        int tSize = TextModel.DisplaySize (_text, 0, _text.Count).size;
+        int pSize = TextModel.DisplaySize (_text, ScrollOffset, InsertionPoint).size;
+
+        // If text is shorter than the viewport, reset scroll to 0
+        if (ScrollOffset > 0 && tSize + 1 < Viewport.Width)
+        {
+            ScrollOffset = 0;
+            need = true;
+        }
 
         // If cursor is before the visible area, scroll left to show it
-        if ((InsertionPoint == 0 && ScrollOffset > 0) || InsertionPoint < startIndex)
+        else if ((InsertionPoint == 0 && ScrollOffset > 0) || InsertionPoint < startIndex)
         {
             ScrollOffset = InsertionPoint;
             need = true;
@@ -259,13 +268,14 @@ public partial class TextField
         }
 
         // If cursor is beyond the visible area, scroll right to show it
-        else if (Viewport.Width > 0 && (InsertionPoint - ScrollOffset >= Viewport.Width || TextModel.DisplaySize (_text, ScrollOffset, InsertionPoint).size >= Viewport.Width))
+        else if (Viewport.Width > 0 && (InsertionPoint - ScrollOffset >= Viewport.Width || pSize >= Viewport.Width))
         {
             ScrollOffset = Math.Max (TextModel.CalculateLeftColumn (_text, ScrollOffset, InsertionPoint, Viewport.Width), 0);
             need = true;
         }
 
-        else if (ScrollOffset > 0 && ((InsertionPoint == _text.Count && TextModel.DisplaySize (_text, ScrollOffset, InsertionPoint).size < Viewport.Width) || InsertionPoint - startIndex >= Viewport.Width - 1))
+        // If cursor is exactly at the right edge of the visible area, adjust to ensure it remains visible (handles wide chars)
+        else if (ScrollOffset > 0 && ((InsertionPoint == _text.Count && pSize < Viewport.Width) || InsertionPoint - startIndex >= Viewport.Width - 1))
         {
             ScrollOffset = Math.Max (TextModel.CalculateLeftColumn (_text, ScrollOffset, InsertionPoint, Viewport.Width), 0);
             need = true;
