@@ -2186,7 +2186,7 @@ public class TextViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void ContentSize_Updates_When_Text_Is_Delected ()
+    public void ContentSize_Updates_When_Text_Is_Deleted ()
     {
         // Arrange: Create a small TextView with ScrollBars enabled
         TextView tv = new () { Width = 10, Height = 3, ScrollBars = true, Text = "A\nB\nC\nD" };
@@ -2983,7 +2983,7 @@ public class TextViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void InvokeCommand_PageDown_PageUp_With_ViewportHeight_GraterThanOne_Draws_Cursor_Correctly ()
+    public void InvokeCommand_PageDown_PageUp_With_ViewportHeight_GreaterThanOne_Draws_Cursor_Correctly ()
     {
         using IApplication app = Application.Create ().Init ();
 

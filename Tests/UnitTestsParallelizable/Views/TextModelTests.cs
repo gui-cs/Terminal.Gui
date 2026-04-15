@@ -887,7 +887,7 @@ public class TextModelTests (ITestOutputHelper output)
     {
         // Setup: "hello\tworld" 
         // Visual columns: h(0), e(1), l(2), l(3), o(4), \t(switches to 8), w(8), o(9), r(10), l(11), d(12)
-        var text = "hello\\tworld";
+        var text = "hello\tworld";
         List<string> list = [];
 
         foreach (string s in GraphemeHelper.GetGraphemes (text))

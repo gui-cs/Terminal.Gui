@@ -1440,4 +1440,28 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.True (tf.NewKeyDownEvent (Key.Z.WithCtrl.WithShift));
         Assert.Equal ("hell", tf.Text);
     }
+
+    [Fact]
+    public void Text_Shorter_Than_Width_Should_Not_Scroll ()
+    {
+        using IApplication app = Application.Create ().Init ();
+        Runnable container = new () { Id = "container", Width = 20, Height = 1 };
+        container.App = app;
+        TextField tf = new () { Width = Dim.Percent (50), Text = "hello world" };
+        container.Add (tf);
+        container.BeginInit ();
+        container.EndInit ();
+
+        tf.SetFocus ();
+        Assert.True (tf.HasFocus);
+        Assert.Equal ("hello world", tf.SelectedText);
+        Assert.Equal (2, tf.ScrollOffset);
+        Assert.Equal (11, tf.Text.GetColumns ());
+        Assert.Equal (10, tf.Viewport.Width);
+;
+        // Resize container to be greater than text length
+        container.Width = 30;
+        Assert.Equal (0, tf.ScrollOffset);
+        Assert.Equal (15, tf.Viewport.Width);
+    }
 }
