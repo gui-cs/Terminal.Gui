@@ -63,15 +63,15 @@
         <PackageReference Include="Markdig" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions " />
         <PackageReference Include="System.IO.Abstractions" />
+        <PackageReference Include="TextMateSharp" />
+        <PackageReference Include="TextMateSharp.Grammars" />
         <PackageReference Include="Wcwidth" />
     </ItemGroup>
     <!-- =================================================================== -->
     <!-- Source Generators -->
     <!-- =================================================================== -->
     <ItemGroup>
-        <ProjectReference Include="..\Terminal.Gui.Analyzers.Internal\Terminal.Gui.Analyzers.Internal.csproj"
-                          OutputItemType="Analyzer"
-                          ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\Terminal.Gui.Analyzers.Internal\Terminal.Gui.Analyzers.Internal.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
     <ItemGroup>
       <!-- Enable Nuget Source Link for github -->

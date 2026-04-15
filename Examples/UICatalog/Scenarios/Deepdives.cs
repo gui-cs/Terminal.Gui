@@ -2,7 +2,6 @@
 
 using System.Collections.ObjectModel;
 using System.Text.Json;
-using Terminal.Gui.SyntaxHighlighting;
 
 // ReSharper disable AccessToDisposedClosure
 

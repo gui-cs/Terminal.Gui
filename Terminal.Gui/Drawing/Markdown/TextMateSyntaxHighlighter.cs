@@ -1,11 +1,9 @@
-using Terminal.Gui.Drawing;
 using Terminal.Gui.Views;
 using TextMateSharp.Grammars;
 using TextMateSharp.Registry;
 using TextMateSharp.Themes;
-using Attribute = Terminal.Gui.Drawing.Attribute;
 
-namespace Terminal.Gui.SyntaxHighlighting;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     An <see cref="ISyntaxHighlighter"/> implementation powered by TextMateSharp.

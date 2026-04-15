@@ -1,7 +1,6 @@
 // Copilot - Opus 4.6
 // Tests for TextMateSyntaxHighlighter — the TextMateSharp-based ISyntaxHighlighter implementation.
 
-using Terminal.Gui.SyntaxHighlighting;
 using TextMateSharp.Grammars;
 
 namespace ViewTests.Markdown;

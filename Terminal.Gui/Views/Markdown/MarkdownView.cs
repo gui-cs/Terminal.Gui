@@ -316,6 +316,7 @@ public partial class MarkdownView : View, IDesignable
     /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
+        SyntaxHighlighter = new TextMateSyntaxHighlighter (TextMateSharp.Grammars.ThemeName.DarkPlus);
         Markdown = DefaultMarkdownSample;
 
         return true;
@@ -342,11 +343,33 @@ public partial class MarkdownView : View, IDesignable
                                                           - [ ] Tables 📊
                                                           - [ ] Emojis 🎉
 
-                                                          ## Code Block
+                                                          ## Code Block (csharp)
 
                                                           ```csharp
                                                           Console.WriteLine ("Hello, Terminal.Gui! 🌍");
                                                           var x = 42;
+                                                          ```
+                                                          
+                                                          ## Code Block (markdown)
+                                                          
+                                                          ```md
+                                                          # Heading 1
+                                                          
+                                                          Text
+                                                          
+                                                          ## Heading 2
+                                                          
+                                                          Link:  [SyntaxHighlighting](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.SyntaxHighlighting.html).
+                                                          
+                                                          ### Heading 3
+                                                          
+                                                          - [x] Checked
+                                                          - [ ] Not Checked
+
+                                                          | Col1       | Col2        |
+                                                          |---------------|:-------------:|
+                                                          | A      | One   |
+                                                          | B        | Two  |
                                                           ```
 
                                                           ## Table

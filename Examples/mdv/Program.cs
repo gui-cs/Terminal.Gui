@@ -10,7 +10,6 @@ using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Drawing;
 using Terminal.Gui.Input;
-using Terminal.Gui.SyntaxHighlighting;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 using TextMateSharp.Grammars;
