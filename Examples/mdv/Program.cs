@@ -13,6 +13,13 @@ using Terminal.Gui.Input;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 
+ConfigurationManager.RuntimeConfig = """
+                                     {
+                                         "Theme": "Anders"
+                                     }
+                                     """;
+ConfigurationManager.Enable (ConfigLocations.All);
+
 bool fullScreen = false;
 List<string> filePatterns = [];
 
@@ -98,14 +105,12 @@ static int RunInline (List<string> files)
     Application.AppModel = AppModel.Inline;
     IApplication app = Application.Create ().Init ();
 
-    Window window = new ()
+    Runnable window = new ()
     {
+        Title = "TUI Markdown Viewer",
         Width = Dim.Fill (),
         Height = Dim.Auto ()
     };
-    window.Border!.Thickness = new Thickness (0);
-    window.Margin!.Thickness = new Thickness (0);
-    window.Padding!.Thickness = new Thickness (0);
 
     MarkdownView markdownView = new ()
     {
@@ -135,22 +140,14 @@ static int RunInline (List<string> files)
 
 static int RunFullScreen (List<string> files)
 {
-    ConfigurationManager.RuntimeConfig = """
-                                         {
-                                             "Theme": "Anders"
-                                         }
-                                         """;
-    ConfigurationManager.Enable (ConfigLocations.All);
     IApplication app = Application.Create ().Init ();
 
-    Window window = new ()
+    Runnable window = new ()
     {
+        Title = "TUI Markdown Viewer",
         Width = Dim.Fill (),
         Height = Dim.Fill ()
     };
-    window.Border!.Thickness = new Thickness (0);
-    window.Margin!.Thickness = new Thickness (0);
-    window.Padding!.Thickness = new Thickness (0);
 
     MarkdownView markdownView = new ()
     {
