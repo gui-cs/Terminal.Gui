@@ -226,7 +226,7 @@ public partial class TextView : View, IDesignable
         List<Cell> line = _model.GetLine (CurrentRow);
 
         // Calculate absolute cursor position and store each glyph width
-        int cursorColumn = TextModel.CursorColumn (TextModel.CellsToStringList (line), CurrentColumn, TabWidth, out List<int> glyphWidths, out _);
+        _ = TextModel.CursorColumn (TextModel.CellsToStringList (line), CurrentColumn, TabWidth, out List<int> glyphWidths, out _);
         var colsWidth = 0;
 
         if (glyphWidths.Count > 0)
