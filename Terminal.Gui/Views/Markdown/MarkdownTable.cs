@@ -732,9 +732,6 @@ public sealed class MarkdownTable : View, IDesignable
         return longest;
     }
 
-    /// <summary>Calculates the total table width including all borders.</summary>
-    private static int CalculateTableWidth (int [] columnWidths) => columnWidths.Sum () + columnWidths.Length + 1;
-
     private static int CalculateLeftPadding (int cellWidth, int textWidth, Alignment alignment)
     {
         int innerWidth = cellWidth - 2;
@@ -780,11 +777,11 @@ public sealed class MarkdownTable : View, IDesignable
         SyntaxHighlighter = new TextMateSyntaxHighlighter ();
 
         Text = """
-               | Feature       | Status        |
-               |---------------|:-------------:|
-               | **Markdown**  | ✅ Totally!   |
-               | *Tables*      | ✅ For sure!  |
-               | `Code blocks` | ✅ Awesome!   |
+               | Feature | Status |
+               |---------|:------:|
+               | **Markdown** | ✅ Totally! |
+               | *Tables* | ✅ For sure! |
+               | `Code` | ✅ `printf ("Awesome!");` |
                """;
 
         Width = 40;
