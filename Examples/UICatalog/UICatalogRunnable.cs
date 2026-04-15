@@ -150,15 +150,14 @@ public sealed class UICatalogRunnable : Runnable
                                    new MenuBarItem (Strings.menuFile,
                                                     [
                                                         new MenuItem
-                                                        {
-                                                            Title = Strings.cmdQuit,
-                                                            HelpText = "Quit UI Catalog",
-                                                            Key = Application.GetDefaultKey (Command.Quit),
-
-                                                            // By not specifying TargetView the Key Binding will be Application-level
-                                                            Command = Command.Quit
-                                                        }
-                                                    ]),
+                                                         {
+                                                             Title = Strings.cmdQuit,
+                                                             HelpText = "Quit UI Catalog",
+                                                             Key = Application.GetDefaultKey (Command.Quit),
+                                                             Action = RequestStop,
+                                                             Command = Command.Quit
+                                                         }
+                                                     ]),
                                    new MenuBarItem ("_Themes", CreateThemeMenuItems ()),
                                    new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems ()),
                                    new MenuBarItem ("_Logging", CreateLoggingMenuItems ()!),
