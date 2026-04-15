@@ -126,7 +126,7 @@ public partial class TextView
             Viewport = Viewport with { Y = Math.Min (Math.Max (CurrentRow - Viewport.Height + 1, 0), CurrentRow) };
             need = true;
         }
-        else if (Viewport.Y > 0 && CurrentRow - Viewport.Height + 1 < Viewport.Y)
+        else if (!WordWrap && Viewport.Y > 0 && CurrentRow - Viewport.Height + 1 < Viewport.Y)
         {
             Viewport = Viewport with { Y = Math.Max (Viewport.Y - 1, 0) };
             need = true;
