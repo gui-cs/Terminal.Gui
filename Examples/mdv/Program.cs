@@ -8,10 +8,12 @@ using System.Collections.ObjectModel;
 using System.Drawing;
 using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
+using Terminal.Gui.Drawing;
 using Terminal.Gui.Input;
 using Terminal.Gui.SyntaxHighlighting;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
+using TextMateSharp.Grammars;
 
 ConfigurationManager.RuntimeConfig = """
                                      {
@@ -21,13 +23,31 @@ ConfigurationManager.RuntimeConfig = """
 ConfigurationManager.Enable (ConfigLocations.All);
 
 var fullScreen = false;
+ThemeName syntaxTheme = ThemeName.DarkPlus;
 List<string> filePatterns = [];
 
-foreach (string arg in args)
+for (var i = 0; i < args.Length; i++)
 {
+    string arg = args [i];
+
     if (arg is "--full-screen" or "-f")
     {
         fullScreen = true;
+    }
+    else if (arg is "--theme" or "-t" && i + 1 < args.Length)
+    {
+        i++;
+
+        if (Enum.TryParse (args [i], true, out ThemeName parsed))
+        {
+            syntaxTheme = parsed;
+        }
+        else
+        {
+            Console.Error.WriteLine ($"Unknown theme '{args [i]}'. Available: {string.Join (", ", Enum.GetNames<ThemeName> ())}");
+
+            return 1;
+        }
     }
     else
     {
@@ -39,12 +59,12 @@ List<string> files = ExpandFiles (filePatterns);
 
 if (files.Count == 0)
 {
-    Console.Error.WriteLine ("Usage: mdv [--full-screen] <file.md> [file2.md ...]");
+    Console.Error.WriteLine ("Usage: mdv [--full-screen] [--theme <ThemeName>] <file.md> [file2.md ...]");
 
     return 1;
 }
 
-return fullScreen ? RunFullScreen (files) : RunInline (files);
+return fullScreen ? RunFullScreen (files, syntaxTheme) : RunInline (files, syntaxTheme);
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -98,7 +118,7 @@ static string FormatFileSize (long bytes)
 // Inline mode — render markdown into the scrollback buffer, then exit
 // ---------------------------------------------------------------------------
 
-static int RunInline (List<string> files)
+static int RunInline (List<string> files, ThemeName syntaxTheme)
 {
     string markdown = string.Join ("\n\n---\n\n", files.Select (f => File.ReadAllText (f)));
 
@@ -107,7 +127,7 @@ static int RunInline (List<string> files)
 
     Runnable window = new () { Title = "TUI Markdown Viewer", Width = Dim.Fill (), Height = Dim.Auto () };
 
-    MarkdownView markdownView = new () { Width = Dim.Fill (), Height = Dim.Auto (), Markdown = markdown, SyntaxHighlighter = new TextMateSyntaxHighlighter () };
+    MarkdownView markdownView = new () { Width = Dim.Fill (), Height = Dim.Auto (), Markdown = markdown, SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme) };
 
     // No scrollbar in inline mode — content should be fully visible
     markdownView.ViewportSettings &= ~ViewportSettingsFlags.HasVerticalScrollBar;
@@ -128,7 +148,7 @@ static int RunInline (List<string> files)
 // Full-screen mode — interactive viewer with StatusBar
 // ---------------------------------------------------------------------------
 
-static int RunFullScreen (List<string> files)
+static int RunFullScreen (List<string> files, ThemeName syntaxTheme)
 {
     IApplication app = Application.Create ().Init ();
 
@@ -138,7 +158,7 @@ static int RunFullScreen (List<string> files)
     {
         Width = Dim.Fill (),
         Height = Dim.Fill (1), // leave room for StatusBar
-        SyntaxHighlighter = new TextMateSyntaxHighlighter ()
+        SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme)
     };
 
     // Vertical scrollbar is already enabled by MarkdownView constructor

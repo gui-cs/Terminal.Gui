@@ -125,7 +125,14 @@ public partial class MarkdownView
                 codeLines.Add (_renderedLines [j].Segments);
             }
 
-            MarkdownCodeBlock codeBlock = new () { StyledLines = codeLines, X = 0, Y = start, Width = Dim.Fill () };
+            MarkdownCodeBlock codeBlock = new ()
+            {
+                StyledLines = codeLines,
+                X = 0,
+                Y = start,
+                Width = Dim.Fill (),
+                ThemeBackground = SyntaxHighlighter?.DefaultBackground
+            };
 
             _codeBlockViews.Add (codeBlock);
             Add (codeBlock);

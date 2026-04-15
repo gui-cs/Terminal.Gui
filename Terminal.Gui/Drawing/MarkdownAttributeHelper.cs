@@ -1,4 +1,4 @@
-namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>
 ///     Resolves <see cref="MarkdownStyleRole"/> values to <see cref="Attribute"/> instances
@@ -31,7 +31,7 @@ internal static class MarkdownAttributeHelper
                    MarkdownStyleRole.Heading => normal with { Style = normal.Style | TextStyle.Bold },
                    MarkdownStyleRole.Emphasis => normal with { Style = normal.Style | TextStyle.Italic },
                    MarkdownStyleRole.Strong => normal with { Style = normal.Style | TextStyle.Bold },
-                   MarkdownStyleRole.InlineCode or MarkdownStyleRole.CodeBlock => MakeCodeAttribute (view.GetAttributeForRole (VisualRole.Code)),
+                   MarkdownStyleRole.InlineCode or MarkdownStyleRole.CodeBlock => view.GetAttributeForRole (VisualRole.Code),
                    MarkdownStyleRole.Link => MakeLinkAttribute (normal, segment),
                    MarkdownStyleRole.Quote => normal with { Style = normal.Style | TextStyle.Faint },
                    MarkdownStyleRole.Table => normal with { Style = normal.Style | TextStyle.Bold },
@@ -58,13 +58,6 @@ internal static class MarkdownAttributeHelper
         }
 
         return segments;
-    }
-
-    private static Attribute MakeCodeAttribute (Attribute normal)
-    {
-        Color codeBg = normal.Background.GetDimmerColor ();
-
-        return normal; // new Attribute (normal.Foreground, codeBg) { Style = normal.Style | TextStyle.Bold };
     }
 
     private static Attribute MakeLinkAttribute (Attribute normal, StyledSegment segment)

@@ -126,6 +126,7 @@ public class SyntaxHighlighterPipelineTests
     [Fact]
     public void GetAttributeForSegment_Returns_Explicit_Attribute_When_Set ()
     {
+        // Copilot
         Attribute explicitAttr = new ("Green", "Yellow", TextStyle.Bold);
 
         StyledSegment segment = new ("keyword", MarkdownStyleRole.CodeBlock, attribute: explicitAttr);
@@ -187,6 +188,8 @@ public class SyntaxHighlighterPipelineTests
             ResetStateCalled = true;
             ResetStateCallCount++;
         }
+
+        public Color? DefaultBackground => null;
     }
 
     private sealed class ExplicitAttributeHighlighter (Attribute attr) : ISyntaxHighlighter
@@ -194,5 +197,7 @@ public class SyntaxHighlighterPipelineTests
         public IReadOnlyList<StyledSegment> Highlight (string code, string? language) => [new (code, MarkdownStyleRole.CodeBlock, attribute: attr)];
 
         public void ResetState () { }
+
+        public Color? DefaultBackground => null;
     }
 }

@@ -1,4 +1,4 @@
-namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>A segment of styled text produced by <see cref="MarkdownView"/> during layout.</summary>
 /// <remarks>

@@ -1,4 +1,4 @@
-namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>Provides syntax highlighting for fenced code blocks in <see cref="MarkdownView"/>.</summary>
 /// <remarks>
@@ -21,4 +21,11 @@ public interface ISyntaxHighlighter
     ///     of each new code block so that stateful tokenizers (e.g., TextMate) begin fresh.
     /// </summary>
     void ResetState ();
+
+    /// <summary>
+    ///     Gets the default background color from the active syntax highlighting theme.
+    ///     Used by code block views to fill their viewport background consistently with
+    ///     per-token backgrounds. Returns <see langword="null"/> if no theme background is available.
+    /// </summary>
+    Color? DefaultBackground { get; }
 }

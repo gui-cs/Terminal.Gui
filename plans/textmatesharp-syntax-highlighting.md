@@ -274,6 +274,10 @@ This plan **depends on** the `VisualRole.Code` addition (see `plans/add-visualro
 
 9. **Intermediate representations must propagate all data**: The `StyledSegment → InlineRun → StyledSegment` round-trip silently dropped the `Attribute` property because `InlineRun` didn't have one. Every intermediate type in a pipeline must carry all fields, or data will be silently lost. This is a classic "lossy conversion" bug — caught by tracing the pipeline end-to-end.
 
+10. **FontStyle.NotSet is -1 (all bits set)**: TextMateSharp's `FontStyle.NotSet` is `-1`, which passes every bitwise AND check. Must guard with `rule.fontStyle >= 0` before checking individual style flags. Without this, every token gets Bold+Italic+Underline+Strikethrough.
+
+11. **Theme defaults should come from the theme, not hardcoded**: `ResolveAttribute` originally hardcoded `Color.Black` as background for all tokens. The correct approach is to read the theme's default foreground/background via `theme.Match(["source"])` and cache them. This ensures DarkPlus gets dark bg and LightPlus gets light bg.
+
 ## Files Changed (Complete List)
 
 ### New Files
@@ -283,16 +287,24 @@ This plan **depends on** the `VisualRole.Code` addition (see `plans/add-visualro
 - `Tests/UnitTestsParallelizable/Views/Markdown/SyntaxHighlighterPipelineTests.cs`
 - `Tests/UnitTestsParallelizable/Views/Markdown/TextMateSyntaxHighlighterTests.cs`
 
+### Moved Files (namespace `Terminal.Gui.Views` → `Terminal.Gui.Drawing`)
+- `Terminal.Gui/Drawing/ISyntaxHighlighter.cs` — was Views/Markdown/
+- `Terminal.Gui/Drawing/StyledSegment.cs` — was Views/Markdown/
+- `Terminal.Gui/Drawing/MarkdownStyleRole.cs` — was Views/Markdown/
+- `Terminal.Gui/Drawing/MarkdownAttributeHelper.cs` — was Views/Markdown/
+
+### Renamed Files
+- `Examples/UICatalog/Scenarios/Deepdives.cs` — was Markdown.cs (class Markdown → Deepdives)
+
 ### Modified Files
-- `Directory.Packages.props` — TextMateSharp.Grammars 1.0.52
+- `Directory.Packages.props` — TextMateSharp.Grammars 2.0.3 (upgraded from 1.0.52 for ARM64 support)
 - `Terminal.sln` — Added SyntaxHighlighting project
 - `Terminal.Gui/Drawing/VisualRole.cs` — Code enum member
 - `Terminal.Gui/Drawing/Scheme.cs` — Code property, derivation, equality
 - `Terminal.Gui/Configuration/SchemeJsonConverter.cs` — "code" case
-- `Terminal.Gui/Views/Markdown/ISyntaxHighlighter.cs` — ResetState()
-- `Terminal.Gui/Views/Markdown/StyledSegment.cs` — Attribute property
-- `Terminal.Gui/Views/Markdown/MarkdownAttributeHelper.cs` — explicit Attribute guard
-- `Terminal.Gui/Views/Markdown/MarkdownView.Parsing.cs` — fence language extraction
+- `Terminal.Gui/Views/Markdown/InlineRun.cs` — Added Attribute property
+- `Terminal.Gui/Views/Markdown/MarkdownView.Parsing.cs` — fence language extraction, Attribute propagation
+- `Terminal.Gui/Views/Markdown/MarkdownView.Layout.cs` — Attribute propagation
 - `Terminal.Gui/Views/Markdown/MarkdownCodeBlock.cs` — VisualRole.Code
 - `Tests/UnitTestsParallelizable/UnitTests.Parallelizable.csproj` — SyntaxHighlighting ref
 - `Tests/UnitTestsParallelizable/Drawing/SchemeTests.cs` — Code assertion
@@ -300,5 +312,4 @@ This plan **depends on** the `VisualRole.Code` addition (see `plans/add-visualro
 - `Examples/mdv/mdv.csproj` — SyntaxHighlighting reference
 - `Examples/mdv/Program.cs` — TextMateSyntaxHighlighter wiring
 - `Examples/UICatalog/UICatalog.csproj` — SyntaxHighlighting reference
-- `Examples/UICatalog/Scenarios/Markdown.cs` — TextMateSyntaxHighlighter
 - `Examples/UICatalog/Scenarios/MarkdownTester.cs` — TextMateSyntaxHighlighter

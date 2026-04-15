@@ -1,4 +1,4 @@
-namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Drawing;
 
 /// <summary>Identifies the semantic role of a styled text segment within a <see cref="MarkdownView"/>.</summary>
 /// <remarks>

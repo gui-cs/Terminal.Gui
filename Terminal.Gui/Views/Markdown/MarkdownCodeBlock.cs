@@ -31,6 +31,12 @@ public class MarkdownCodeBlock : View, IDesignable
     }
 
     /// <summary>
+    ///     Gets or sets an override background color from the syntax highlighting theme.
+    ///     When set, the code block viewport uses this instead of <see cref="VisualRole.Code"/>.
+    /// </summary>
+    internal Color? ThemeBackground { get; set; }
+
+    /// <summary>
     ///     Gets or sets the styled line segments. Used internally by <see cref="MarkdownView"/> to set
     ///     pre-parsed styled content directly.
     /// </summary>
@@ -123,14 +129,13 @@ public class MarkdownCodeBlock : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
-        // TODO: Move this to OnClearingViewport where it belongs.
-        // Fill entire area with dimmed background
+        // Fill entire area with code block background
         Attribute normal = GetAttributeForRole (VisualRole.Code);
-        Color codeBg = normal.Background;
+        Color codeBg = ThemeBackground ?? normal.Background;
         Attribute codeAttr = new (normal.Foreground, codeBg);
 
         // TODO: Move this to OnClearingViewport where it belongs.
-        // Fill entire area with dimmed background
+        // Fill entire area with code block background
         SetAttribute (codeAttr);
         FillRect (Viewport with { X = 0, Y = 0 }, (Rune)' ');
 

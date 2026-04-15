@@ -2,6 +2,8 @@
 
 using System.Collections.ObjectModel;
 using System.Text.Json;
+using Terminal.Gui.SyntaxHighlighting;
+
 // ReSharper disable AccessToDisposedClosure
 
 namespace UICatalog.Scenarios;
@@ -9,7 +11,7 @@ namespace UICatalog.Scenarios;
 [ScenarioMetadata ("Deepdives", "Use MarkDownView to provide a TG Deep Dive browser.")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Text and Formatting")]
-public class Markdown : Scenario
+public class Deepdives : Scenario
 {
     private static readonly HttpClient _httpClient = new ();
 
@@ -60,7 +62,9 @@ public class Markdown : Scenario
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            SyntaxHighlighter = new Terminal.Gui.SyntaxHighlighting.TextMateSyntaxHighlighter (TextMateSharp.Grammars.ThemeName.DarkPlus)
+
+            // Default is TextMateSharp.Grammars.ThemeName.DarkPlus
+            SyntaxHighlighter = new TextMateSyntaxHighlighter ()
         };
         _markdownView.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 
@@ -73,14 +77,14 @@ public class Markdown : Scenario
 
         // Reset the content width control only when viewport SIZE changes (not scroll position)
         _markdownView.ViewportChanged += (_, e) =>
-                                          {
-                                              if (e.NewViewport.Size == e.OldViewport.Size)
-                                              {
-                                                  return;
-                                              }
+                                         {
+                                             if (e.NewViewport.Size == e.OldViewport.Size)
+                                             {
+                                                 return;
+                                             }
 
-                                              SyncContentWidthToViewport ();
-                                          };
+                                             SyncContentWidthToViewport ();
+                                         };
 
         _viewerFrame.Add (_markdownView);
 
@@ -119,10 +123,7 @@ public class Markdown : Scenario
                                        contentWidthShortcut,
                                        _statusShortcut,
                                        spinnerShortcut
-                                   ])
-        {
-            AlignmentModes = AlignmentModes.IgnoreFirstOrLast
-        };
+                                   ]) { AlignmentModes = AlignmentModes.IgnoreFirstOrLast };
 
         window.Add (listFrame, _viewerFrame, statusBar);
 

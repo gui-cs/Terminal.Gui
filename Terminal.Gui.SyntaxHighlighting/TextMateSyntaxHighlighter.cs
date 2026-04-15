@@ -31,6 +31,8 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     private Registry _registry;
     private IStateStack? _ruleStack;
     private bool _nativeLibUnavailable;
+    private Color _defaultForeground;
+    private Color _defaultBackground;
 
     private readonly Dictionary<string, IGrammar?> _grammarCache = new (StringComparer.OrdinalIgnoreCase);
 
@@ -42,6 +44,7 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     {
         _registryOptions = new RegistryOptions (theme);
         _registry = new Registry (_registryOptions);
+        CacheThemeDefaults ();
     }
 
     /// <inheritdoc/>
@@ -105,6 +108,9 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     /// <inheritdoc/>
     public void ResetState () => _ruleStack = null;
 
+    /// <inheritdoc/>
+    public Color? DefaultBackground => _defaultBackground;
+
     /// <summary>
     ///     Switches the active theme used for colorization. Clears the grammar cache
     ///     since theme changes may affect tokenization colors.
@@ -116,6 +122,26 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
         _registry = new Registry (_registryOptions);
         _grammarCache.Clear ();
         _ruleStack = null;
+        CacheThemeDefaults ();
+    }
+
+    private void CacheThemeDefaults ()
+    {
+        Theme t = _registry.GetTheme ();
+        List<ThemeTrieElementRule> defaultRules = t.Match (["source"]);
+
+        if (defaultRules.Count > 0)
+        {
+            string? fgHex = t.GetColor (defaultRules [0].foreground);
+            string? bgHex = t.GetColor (defaultRules [0].background);
+            _defaultForeground = !string.IsNullOrEmpty (fgHex) ? Color.Parse (fgHex) : Color.White;
+            _defaultBackground = !string.IsNullOrEmpty (bgHex) ? Color.Parse (bgHex) : Color.Black;
+        }
+        else
+        {
+            _defaultForeground = Color.White;
+            _defaultBackground = Color.Black;
+        }
     }
 
     private Attribute ResolveAttribute (Theme theme, List<string> scopes)
@@ -124,14 +150,20 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
 
         if (rules.Count == 0)
         {
-            return new Attribute (Color.White, Color.Black);
+            return new Attribute (_defaultForeground, _defaultBackground);
         }
 
         ThemeTrieElementRule rule = rules [0];
         string? fgHex = theme.GetColor (rule.foreground);
-        Color fg = !string.IsNullOrEmpty (fgHex) ? Color.Parse (fgHex) : Color.White;
+        Color fg = !string.IsNullOrEmpty (fgHex) ? Color.Parse (fgHex) : _defaultForeground;
 
         TextStyle style = TextStyle.None;
+
+        // FontStyle.NotSet is -1 (all bits set) — guard against it
+        if (rule.fontStyle < 0)
+        {
+            return new Attribute (fg, _defaultBackground, style);
+        }
 
         if ((rule.fontStyle & FontStyle.Bold) != 0)
         {
@@ -153,7 +185,7 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
             style |= TextStyle.Strikethrough;
         }
 
-        return new Attribute (fg, Color.Black, style);
+        return new Attribute (fg, _defaultBackground, style);
     }
 
     private IGrammar? ResolveGrammar (string? language)
