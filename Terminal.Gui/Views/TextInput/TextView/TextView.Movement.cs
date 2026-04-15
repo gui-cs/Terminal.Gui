@@ -7,9 +7,9 @@ public partial class TextView
     {
         CurrentRow = _model.Count - 1;
         List<Cell> line = GetCurrentLine ();
-        CurrentColumn = line.Count + 1;
+        CurrentColumn = line.Count;
 
-        if (CurrentRow >= Viewport.Y + Viewport.Height || CurrentColumn > Viewport.X + Viewport.Width)
+        if (CurrentRow >= Viewport.Y + Viewport.Height || CurrentColumn >= Viewport.X + Viewport.Width)
         {
             SetNeedsDraw ();
         }
