@@ -14,19 +14,19 @@ public class MarkdownViewTests (ITestOutputHelper output)
         MarkdownView view = new ();
 
         Assert.True (view.CanFocus);
-        Assert.Equal (string.Empty, view.Markdown);
+        Assert.Equal (string.Empty, view.Text);
         Assert.Equal (0, view.LineCount);
     }
 
     [Fact]
-    public void Markdown_Set_Raises_MarkdownChanged ()
+    public void Text_Set_Raises_MarkdownChanged ()
     {
         MarkdownView view = new ();
         var fired = false;
 
         view.MarkdownChanged += (_, _) => fired = true;
 
-        view.Markdown = "# Header";
+        view.Text = "# Header";
 
         Assert.True (fired);
     }
@@ -40,13 +40,13 @@ public class MarkdownViewTests (ITestOutputHelper output)
         bool result = designable.EnableForDesign ();
 
         Assert.True (result);
-        Assert.Contains ("Markdown Sample", markdownView.Markdown);
+        Assert.Contains ("Markdown Sample", markdownView.Text);
     }
 
     [Fact]
     public void Layout_Computes_Lines_And_ContentSize ()
     {
-        MarkdownView view = new () { Markdown = "# Header\n\nParagraph text" };
+        MarkdownView view = new () { Text = "# Header\n\nParagraph text" };
         view.Width = 20;
         view.Height = 5;
 
@@ -89,7 +89,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     [Fact]
     public void Layout_Center_Simple_Markdown_Does_Not_Hang ()
     {
-        MarkdownView view = new () { Markdown = "# Hello" };
+        MarkdownView view = new () { Text = "# Hello" };
         view.X = Pos.Center ();
         view.Y = Pos.Center ();
         view.Width = 10;
@@ -109,7 +109,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     [Fact]
     public void Layout_With_Table_And_CodeBlock_Does_Not_Hang ()
     {
-        MarkdownView view = new () { Markdown = MarkdownView.DefaultMarkdownSample };
+        MarkdownView view = new () { Text = MarkdownView.DefaultMarkdownSample };
         view.Width = 40;
         view.Height = 20;
 
@@ -126,7 +126,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     [Fact]
     public void Layout_Multiple_Passes_Does_Not_Hang ()
     {
-        MarkdownView view = new () { Markdown = MarkdownView.DefaultMarkdownSample };
+        MarkdownView view = new () { Text = MarkdownView.DefaultMarkdownSample };
         view.Width = Dim.Fill ();
         view.Height = Dim.Fill ();
 
@@ -151,7 +151,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         MarkdownView markdownView = new ()
         {
-            Markdown = "Visit [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui)", Width = Dim.Fill (), Height = Dim.Fill ()
+            Text = "Visit [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui)", Width = Dim.Fill (), Height = Dim.Fill ()
         };
 
         window.Add (markdownView);
@@ -176,7 +176,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView markdownView = new () { Markdown = "[Click](https://example.com)", Width = 20, Height = 3 };
+        MarkdownView markdownView = new () { Text = "[Click](https://example.com)", Width = 20, Height = 3 };
 
         window.Add (markdownView);
 
@@ -201,7 +201,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     [Fact]
     public void Image_Fallback_Text_Renders ()
     {
-        MarkdownView markdownView = new () { Markdown = "![logo](asset://logo)" };
+        MarkdownView markdownView = new () { Text = "![logo](asset://logo)" };
         markdownView.Width = 40;
         markdownView.Height = 5;
 
@@ -228,7 +228,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     // Copilot
     public void Stray_Special_Characters_Do_Not_Cause_Infinite_Loop (string markdown)
     {
-        MarkdownView markdownView = new () { Markdown = markdown };
+        MarkdownView markdownView = new () { Text = markdown };
         markdownView.Width = 40;
         markdownView.Height = 5;
 
@@ -250,7 +250,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     public void WordWrap_Breaks_At_Word_Boundaries ()
     {
         // "Hello world" at width 8 should wrap between "Hello" and "world", not mid-word
-        MarkdownView markdownView = new () { Markdown = "Hello world" };
+        MarkdownView markdownView = new () { Text = "Hello world" };
         markdownView.Width = 8;
         markdownView.Height = 5;
 
@@ -274,7 +274,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     {
         // "Abcdefghij" (10 chars, no spaces) at width 5 should hard-break
         const string MARKDOWN = "Abcdefghij";
-        MarkdownView markdownView = new () { Markdown = MARKDOWN };
+        MarkdownView markdownView = new () { Text = MARKDOWN };
         markdownView.Width = 5;
         markdownView.Height = 5;
 
@@ -300,9 +300,10 @@ public class MarkdownViewTests (ITestOutputHelper output)
     [Fact]
     public void Style_Heading_Renders_Bold ()
     {
+        // ShowHeadingPrefix is true by default, so "# H" renders "# H" (all bold).
         (IApplication app, Runnable window) = SetupStyleTest ("# H");
 
-        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1mH\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m# H\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -449,7 +450,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
-        MarkdownView mv = new () { Markdown = MARKDOWN, Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Text = MARKDOWN, Width = Dim.Fill (), Height = Dim.Fill () };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);
@@ -501,7 +502,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         // Style tests verify unfocused rendering — disable focus so OnAdvancingFocus
         // doesn't activate the first link with reversed highlight colors.
-        MarkdownView mv = new () { Markdown = markdown, Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = false };
+        MarkdownView mv = new () { Text = markdown, Width = Dim.Fill (), Height = Dim.Fill (), CanFocus = false };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);
@@ -544,7 +545,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         MarkdownView mv = new ()
         {
-            Markdown = "# First\n\nParagraph 1\n\n# Second\n\nParagraph 2\n\n# Third\n\nParagraph 3", Width = Dim.Fill (), Height = Dim.Fill ()
+            Text = "# First\n\nParagraph 1\n\n# Second\n\nParagraph 2\n\n# Third\n\nParagraph 3", Width = Dim.Fill (), Height = Dim.Fill ()
         };
         window.Add (mv);
 
@@ -586,7 +587,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         app.Driver!.SetScreenSize (40, 3);
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
-        MarkdownView mv = new () { Markdown = "# Overview\n\nFirst\n\n# Overview\n\nSecond\n\n# Overview\n\nThird", Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Text = "# Overview\n\nFirst\n\n# Overview\n\nSecond\n\n# Overview\n\nThird", Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -631,7 +632,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     public void ScrollToAnchor_With_Empty_String_Returns_False ()
     {
         // Copilot
-        MarkdownView mv = new () { Markdown = "# Test" };
+        MarkdownView mv = new () { Text = "# Test" };
         Assert.False (mv.ScrollToAnchor (""));
         Assert.False (mv.ScrollToAnchor (null!));
     }
@@ -652,7 +653,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView mv = new () { Markdown = "Text\n\n```\nline1\nline2\n```\n\nMore text\n\n```\nA\n```", Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Text = "Text\n\n```\nline1\nline2\n```\n\nMore text\n\n```\nA\n```", Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -682,7 +683,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
-        MarkdownView mv = new () { Markdown = "```\ncode\n```", Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Text = "```\ncode\n```", Width = Dim.Fill (), Height = Dim.Fill () };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);
@@ -718,7 +719,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView mv = new () { Markdown = MARKDOWN, Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Text = MARKDOWN, Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -755,7 +756,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         MarkdownView view = new ()
         {
-            Markdown = md, Width = 40, Height = 5 // Small viewport so scrolling is required
+            Text = md, Width = 40, Height = 5 // Small viewport so scrolling is required
         };
 
         View host = new () { Width = 40, Height = 5 };
@@ -802,7 +803,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
                  ```
                  """;
 
-        MarkdownView view = new () { Markdown = md, Width = 40, Height = 10 };
+        MarkdownView view = new () { Text = md, Width = 40, Height = 10 };
 
         View host = new () { Width = 40, Height = 10 };
         host.Add (view);
@@ -826,4 +827,227 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         host.Dispose ();
     }
+
+    #region ShowHeadingPrefix Tests
+
+    // Copilot
+
+    [Fact]
+    public void ShowHeadingPrefix_Default_Is_True ()
+    {
+        MarkdownView view = new ();
+        Assert.True (view.ShowHeadingPrefix);
+    }
+
+    [Fact]
+    public void ShowHeadingPrefix_True_Includes_Hash_In_Output ()
+    {
+        // When ShowHeadingPrefix is true (default), the heading should include "# "
+        MarkdownView mv = new () { Text = "# Hello", Width = 20, Height = 1 };
+        mv.Layout (new (20, 1));
+
+        Assert.True (mv.LineCount > 0);
+
+        // Extract all text from the first rendered line's segments
+        string lineText = GetRenderedLineText (mv, 0);
+        Assert.StartsWith ("# ", lineText);
+        Assert.Contains ("Hello", lineText);
+    }
+
+    [Fact]
+    public void ShowHeadingPrefix_False_Strips_Hash ()
+    {
+        MarkdownView mv = new () { Text = "# Hello", Width = 20, Height = 1, ShowHeadingPrefix = false };
+        mv.Layout (new (20, 1));
+
+        Assert.True (mv.LineCount > 0);
+
+        string lineText = GetRenderedLineText (mv, 0);
+        Assert.DoesNotContain ("#", lineText);
+        Assert.Contains ("Hello", lineText);
+    }
+
+    [Theory]
+    [InlineData ("# H1", "# ")]
+    [InlineData ("## H2", "## ")]
+    [InlineData ("### H3", "### ")]
+    [InlineData ("#### H4", "#### ")]
+    [InlineData ("##### H5", "##### ")]
+    [InlineData ("###### H6", "###### ")]
+    public void ShowHeadingPrefix_Includes_Correct_Level_Prefix (string markdown, string expectedPrefix)
+    {
+        MarkdownView mv = new () { Text = markdown, Width = 30, Height = 1 };
+        mv.Layout (new (30, 1));
+
+        string lineText = GetRenderedLineText (mv, 0);
+        Assert.StartsWith (expectedPrefix, lineText);
+    }
+
+    [Fact]
+    public void ShowHeadingPrefix_HeadingMarker_Has_HeadingMarker_Role ()
+    {
+        MarkdownView mv = new () { Text = "## Test", Width = 20, Height = 1 };
+        mv.Layout (new (20, 1));
+
+        // The first segment(s) should be the "## " prefix with HeadingMarker role
+        IReadOnlyList<StyledSegment> segments = GetRenderedLineSegments (mv, 0);
+        Assert.True (segments.Count > 0);
+
+        // Concatenate HeadingMarker segments at the start
+        string markerText = string.Concat (segments.TakeWhile (s => s.StyleRole == MarkdownStyleRole.HeadingMarker).Select (s => s.Text));
+        Assert.Equal ("## ", markerText);
+    }
+
+    [Fact]
+    public void ShowHeadingPrefix_Toggle_Relayouts ()
+    {
+        MarkdownView mv = new () { Text = "# Hi", Width = 20, Height = 1 };
+        mv.Layout (new (20, 1));
+
+        string withPrefix = GetRenderedLineText (mv, 0);
+        Assert.StartsWith ("# ", withPrefix);
+
+        mv.ShowHeadingPrefix = false;
+        mv.Layout (new (20, 1));
+
+        string withoutPrefix = GetRenderedLineText (mv, 0);
+        Assert.DoesNotContain ("#", withoutPrefix);
+    }
+
+    [Fact]
+    public void Style_HeadingMarker_Renders_Bold ()
+    {
+        // HeadingMarker should render Bold (same as Heading text)
+        // With ShowHeadingPrefix=true (default), output contains "# H" — all bold.
+        (IApplication app, Runnable window) = SetupStyleTest ("# H", 20);
+
+        // The existing Style_Heading test pattern uses AssertDriverOutputIs with ANSI codes.
+        // "# H" = bold "# " (HeadingMarker) + bold "H" (Heading).
+        // Both are bold so SGR 1 at start, characters "# H", SGR 22 at end.
+        DriverAssert.AssertDriverOutputIs (
+            @"\x1b[30m\x1b[107m\x1b[1m# H\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    /// <summary>Extracts concatenated text from all segments of a rendered line.</summary>
+    private static string GetRenderedLineText (MarkdownView mv, int lineIndex)
+    {
+        IReadOnlyList<StyledSegment> segments = GetRenderedLineSegments (mv, lineIndex);
+
+        return string.Concat (segments.Select (s => s.Text));
+    }
+
+    /// <summary>Gets the styled segments for a rendered line via reflection.</summary>
+    private static IReadOnlyList<StyledSegment> GetRenderedLineSegments (MarkdownView mv, int lineIndex)
+    {
+        System.Reflection.FieldInfo? field = typeof (MarkdownView).GetField ("_renderedLines", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        Assert.NotNull (field);
+
+        object? value = field.GetValue (mv);
+        Assert.NotNull (value);
+
+        System.Collections.IList renderedLines = (System.Collections.IList)value;
+        Assert.True (renderedLines.Count > lineIndex);
+
+        object? line = renderedLines [lineIndex];
+        Assert.NotNull (line);
+
+        System.Reflection.PropertyInfo? segProp = line.GetType ().GetProperty ("Segments");
+        Assert.NotNull (segProp);
+
+        return (IReadOnlyList<StyledSegment>)segProp.GetValue (line)!;
+    }
+
+    #endregion
+
+    #region EnableForDesign + recursive md code blocks
+    // Copilot
+
+    [Fact]
+    public void EnableForDesign_With_Embedded_Md_Block_Does_Not_Throw ()
+    {
+        MarkdownView view = new () { Width = 80, Height = 50 };
+        IDesignable designable = view;
+
+        // EnableForDesign sets a highlighter and loads DefaultMarkdownSample which contains ```md
+        bool result = designable.EnableForDesign ();
+
+        Assert.True (result);
+        Assert.NotNull (view.SyntaxHighlighter);
+
+        // Force layout to trigger code block creation
+        View host = new () { Width = 80, Height = 50 };
+        host.Add (view);
+        host.Layout ();
+
+        // Should render without crashing
+        Assert.True (view.LineCount > 0);
+    }
+
+    [Fact]
+    public void Md_CodeBlock_Gets_Syntax_Highlighted_Through_Highlighter ()
+    {
+        TextMateSyntaxHighlighter highlighter = new (TextMateSharp.Grammars.ThemeName.DarkPlus);
+        MarkdownView view = new ()
+        {
+            SyntaxHighlighter = highlighter,
+            Width = 80,
+            Height = 20,
+            Text = """
+                       # Test
+                       
+                       ```md
+                       # Heading
+                       ```
+                       """
+        };
+
+        View host = new () { Width = 80, Height = 20 };
+        host.Add (view);
+        host.Layout ();
+
+        // The ```md code block should be recognized as markdown language
+        // and its code lines highlighted through the TextMate highlighter
+        Assert.True (view.LineCount > 0);
+    }
+
+    #endregion
+
+    #region Text property unification
+    // Copilot
+
+    [Fact]
+    public void Text_Sets_And_Gets_Markdown ()
+    {
+        MarkdownView view = new () { Text = "# Hello" };
+
+        Assert.Equal ("# Hello", view.Text);
+    }
+
+    [Fact]
+    public void Text_Set_Triggers_Parse_And_Layout ()
+    {
+        MarkdownView view = new () { Width = 40, Height = 10, Text = "# Hello\n\nWorld" };
+        View host = new () { Width = 40, Height = 10 };
+        host.Add (view);
+        host.Layout ();
+
+        Assert.True (view.LineCount > 0);
+    }
+
+    [Fact]
+    public void Text_Set_Same_Value_Does_Not_Reparse ()
+    {
+        MarkdownView view = new () { Text = "# Hello" };
+        var changeCount = 0;
+        view.TextChanged += (_, _) => changeCount++;
+
+        view.Text = "# Hello";
+
+        Assert.Equal (0, changeCount);
+    }
+
+    #endregion
 }

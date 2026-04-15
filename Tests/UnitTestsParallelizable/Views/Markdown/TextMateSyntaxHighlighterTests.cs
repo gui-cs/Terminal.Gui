@@ -236,4 +236,95 @@ public class TextMateSyntaxHighlighterTests
         // All aliases should resolve to the same grammar and produce multi-token output
         Assert.True (segments.Count > 1, $"Language '{languageId}' should produce tokenized output");
     }
+
+    // --- GetAttributeForScope ---
+    // Copilot
+
+    [Theory]
+    [InlineData (MarkdownStyleRole.Heading)]
+    [InlineData (MarkdownStyleRole.HeadingMarker)]
+    [InlineData (MarkdownStyleRole.Emphasis)]
+    [InlineData (MarkdownStyleRole.Strong)]
+    [InlineData (MarkdownStyleRole.InlineCode)]
+    [InlineData (MarkdownStyleRole.Link)]
+    [InlineData (MarkdownStyleRole.Quote)]
+    [InlineData (MarkdownStyleRole.ListMarker)]
+    public void GetAttributeForScope_Returns_NonNull_For_Known_Roles (MarkdownStyleRole role)
+    {
+        TextMateSyntaxHighlighter highlighter = new ();
+        Attribute? result = highlighter.GetAttributeForScope (role);
+        Assert.NotNull (result);
+    }
+
+    [Fact]
+    public void GetAttributeForScope_Returns_Null_For_Normal ()
+    {
+        // Normal has no special scope — should return null (use default Attribute)
+        TextMateSyntaxHighlighter highlighter = new ();
+        Attribute? result = highlighter.GetAttributeForScope (MarkdownStyleRole.Normal);
+        Assert.Null (result);
+    }
+
+    [Fact]
+    public void GetAttributeForScope_Heading_Has_Theme_Color ()
+    {
+        TextMateSyntaxHighlighter highlighter = new ();
+        Attribute? attr = highlighter.GetAttributeForScope (MarkdownStyleRole.Heading);
+        Assert.NotNull (attr);
+
+        // DarkPlus theme should give headings a non-black, non-white foreground color
+        Assert.NotEqual (Color.Black, attr.Value.Foreground);
+    }
+
+    [Fact]
+    public void GetAttributeForScope_Caches_Results ()
+    {
+        TextMateSyntaxHighlighter highlighter = new ();
+        Attribute? first = highlighter.GetAttributeForScope (MarkdownStyleRole.Heading);
+        Attribute? second = highlighter.GetAttributeForScope (MarkdownStyleRole.Heading);
+        Assert.Equal (first, second);
+    }
+
+    [Fact]
+    public void SetTheme_Clears_Scope_Cache ()
+    {
+        TextMateSyntaxHighlighter highlighter = new ();
+        Attribute? dark = highlighter.GetAttributeForScope (MarkdownStyleRole.Heading);
+        Assert.NotNull (dark);
+
+        highlighter.SetTheme (ThemeName.Light);
+        Attribute? light = highlighter.GetAttributeForScope (MarkdownStyleRole.Heading);
+        Assert.NotNull (light);
+
+        // Different themes should produce different colors (DarkPlus vs Light)
+        Assert.NotEqual (dark.Value.Foreground, light.Value.Foreground);
+    }
+
+    // --- Auto theme detection ---
+    // Copilot
+
+    [Fact]
+    public void GetThemeForBackground_Dark_Returns_Dark_Theme ()
+    {
+        ThemeName theme = TextMateSyntaxHighlighter.GetThemeForBackground (Color.Black);
+        Assert.Equal (ThemeName.DarkPlus, theme);
+    }
+
+    [Fact]
+    public void GetThemeForBackground_Light_Returns_Light_Theme ()
+    {
+        ThemeName theme = TextMateSyntaxHighlighter.GetThemeForBackground (Color.White);
+        Assert.Equal (ThemeName.LightPlus, theme);
+    }
+
+    [Fact]
+    public void Parameterless_Constructor_Defaults_To_DarkPlus ()
+    {
+        // Without a driver, can't detect background, so default to DarkPlus
+        TextMateSyntaxHighlighter highlighter = new ();
+        Assert.NotNull (highlighter.DefaultBackground);
+
+        // DarkPlus has a dark default background
+        Assert.True (highlighter.DefaultBackground!.Value.IsDarkColor ());
+    }
 }

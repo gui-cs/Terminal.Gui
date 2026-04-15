@@ -16,12 +16,21 @@ internal static class MarkdownAttributeHelper
     ///     via <see cref="View.GetAttributeForRole"/>.
     /// </param>
     /// <param name="segment">The styled segment to resolve an attribute for.</param>
+    /// <param name="highlighter">
+    ///     Optional syntax highlighter. When non-null, the highlighter is queried first for
+    ///     a theme-derived attribute via <see cref="ISyntaxHighlighter.GetAttributeForScope"/>.
+    /// </param>
     /// <returns>A fully resolved <see cref="Attribute"/> ready for drawing.</returns>
-    public static Attribute GetAttributeForSegment (View view, StyledSegment segment)
+    public static Attribute GetAttributeForSegment (View view, StyledSegment segment, ISyntaxHighlighter? highlighter = null)
     {
         if (segment.Attribute is { } explicitAttr)
         {
             return explicitAttr;
+        }
+
+        if (highlighter?.GetAttributeForScope (segment.StyleRole) is { } scopeAttr)
+        {
+            return scopeAttr;
         }
 
         Attribute normal = view.GetAttributeForRole (VisualRole.Normal);
@@ -29,6 +38,7 @@ internal static class MarkdownAttributeHelper
         return segment.StyleRole switch
                {
                    MarkdownStyleRole.Heading => normal with { Style = normal.Style | TextStyle.Bold },
+                   MarkdownStyleRole.HeadingMarker => normal with { Style = normal.Style | TextStyle.Bold },
                    MarkdownStyleRole.Emphasis => normal with { Style = normal.Style | TextStyle.Italic },
                    MarkdownStyleRole.Strong => normal with { Style = normal.Style | TextStyle.Bold },
                    MarkdownStyleRole.InlineCode or MarkdownStyleRole.CodeBlock => view.GetAttributeForRole (VisualRole.Code),

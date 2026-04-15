@@ -61,6 +61,73 @@ public sealed class MarkdownTable : View, IDesignable
     }
 
     /// <summary>
+    ///     Gets or sets an optional syntax highlighter used to resolve theme-based attributes for
+    ///     inline styling roles (emphasis, code spans, links, etc.). When set, the table queries
+    ///     the highlighter for scope-derived colors before falling back to <see cref="TextStyle"/>-based defaults.
+    /// </summary>
+    public ISyntaxHighlighter? SyntaxHighlighter { get; set; }
+
+    /// <summary>
+    ///     Gets or sets the table content as a pipe-delimited Markdown table string.
+    ///     The setter parses the text via <see cref="TableData.TryParse"/> and updates <see cref="Data"/>.
+    ///     Invalid or empty text clears the table.
+    /// </summary>
+    public override string Text
+    {
+        get
+        {
+            if (_data.ColumnCount == 0)
+            {
+                return string.Empty;
+            }
+
+            // Reconstruct pipe-delimited table text
+            List<string> lines = [$"| {string.Join (" | ", _data.Headers)} |"];
+
+            // Separator row
+            string [] seps = new string [_data.ColumnCount];
+
+            for (var i = 0; i < _data.ColumnCount; i++)
+            {
+                seps [i] = _data.ColumnAlignments [i] switch
+                {
+                    Alignment.Center => ":---:",
+                    Alignment.End => "---:",
+                    _ => "---"
+                };
+            }
+
+            lines.Add ($"| {string.Join (" | ", seps)} |");
+
+            foreach (string [] row in _data.Rows)
+            {
+                lines.Add ($"| {string.Join (" | ", row)} |");
+            }
+
+            return string.Join ("\n", lines);
+        }
+        set
+        {
+            // Guard: View base constructor calls Text setter before MarkdownTable() initializes fields.
+            if (_data is null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace (value))
+            {
+                Data = _emptyData;
+
+                return;
+            }
+
+            string [] lines = value.Split ('\n', StringSplitOptions.RemoveEmptyEntries);
+            TableData? parsed = TableData.TryParse (lines);
+            Data = parsed ?? _emptyData;
+        }
+    }
+
+    /// <summary>
     ///     Gets or sets the <see cref="Views.TableData"/> that defines the table content. Setting this
     ///     recomputes column widths, row heights, and redraws the table.
     /// </summary>
@@ -212,7 +279,7 @@ public sealed class MarkdownTable : View, IDesignable
 
                 foreach (StyledSegment seg in lineSegs)
                 {
-                    Attribute attr = MarkdownAttributeHelper.GetAttributeForSegment (this, seg);
+                    Attribute attr = MarkdownAttributeHelper.GetAttributeForSegment (this, seg, SyntaxHighlighter);
 
                     if (isHeader)
                     {
@@ -710,7 +777,15 @@ public sealed class MarkdownTable : View, IDesignable
     /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
-        Data = new TableData (["Feature", "Status"], [Alignment.Start, Alignment.Center], [["Markdown", "✅ Very"], ["Tables", "✅ Amaze"]]);
+        SyntaxHighlighter = new TextMateSyntaxHighlighter ();
+
+        Text = """
+               | Feature       | Status        |
+               |---------------|:-------------:|
+               | **Markdown**  | ✅ Totally!   |
+               | *Tables*      | ✅ For sure!  |
+               | `Code blocks` | ✅ Awesome!   |
+               """;
 
         Width = 40;
 

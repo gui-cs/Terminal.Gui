@@ -67,7 +67,7 @@ internal sealed class SingleTurnView : Window
                                 case AssistantMessageDeltaEvent delta:
                                     responseText.Append (delta.Data.DeltaContent);
 
-                                    _app.Invoke (() => { _responseView.Markdown = responseText.ToString (); });
+                                    _app.Invoke (() => { _responseView.Text = responseText.ToString (); });
 
                                     break;
 
@@ -77,7 +77,7 @@ internal sealed class SingleTurnView : Window
                                     break;
 
                                 case SessionErrorEvent err:
-                                    _app.Invoke (() => { _responseView.Markdown = $"Error: {err.Data.Message}"; });
+                                    _app.Invoke (() => { _responseView.Text = $"Error: {err.Data.Message}"; });
                                     done.TrySetResult ();
 
                                     break;
@@ -89,7 +89,7 @@ internal sealed class SingleTurnView : Window
         }
         catch (Exception ex)
         {
-            _app.Invoke (() => _responseView.Markdown = $"Error: {ex.Message}");
+            _app.Invoke (() => _responseView.Text = $"Error: {ex.Message}");
         }
 
         // Give the UI a moment to render the final update, then exit

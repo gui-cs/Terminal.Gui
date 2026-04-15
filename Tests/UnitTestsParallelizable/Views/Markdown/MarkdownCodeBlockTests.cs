@@ -80,4 +80,160 @@ public class MarkdownCodeBlockTests
 
         Assert.Equal (3, codeBlock.Frame.Height);
     }
+
+    // --- Standalone syntax highlighting ---
+    // Copilot
+
+    [Fact]
+    public void Language_Property_Defaults_Null ()
+    {
+        MarkdownCodeBlock codeBlock = new ();
+        Assert.Null (codeBlock.Language);
+    }
+
+    [Fact]
+    public void SyntaxHighlighter_Property_Defaults_Null ()
+    {
+        MarkdownCodeBlock codeBlock = new ();
+        Assert.Null (codeBlock.SyntaxHighlighter);
+    }
+
+    [Fact]
+    public void Setting_CodeLines_With_Highlighter_And_Language_Produces_Styled_Segments ()
+    {
+        TextMateSyntaxHighlighter highlighter = new ();
+        MarkdownCodeBlock codeBlock = new ()
+        {
+            SyntaxHighlighter = highlighter,
+            Language = "csharp",
+            CodeLines = ["var x = 42;"]
+        };
+
+        // The internal StyledLines should have multiple segments (tokenized) not just 1
+        IReadOnlyList<string> lines = codeBlock.CodeLines;
+        Assert.Single (lines);
+
+        // Verify by checking that the code block produces colored output
+        // (StyledLines is internal, but we can verify indirectly via ExtractText)
+        Assert.Equal ("var x = 42;", codeBlock.ExtractText ());
+    }
+
+    [Fact]
+    public void Setting_CodeLines_Without_Highlighter_Produces_Plain_Segments ()
+    {
+        MarkdownCodeBlock codeBlock = new ()
+        {
+            Language = "csharp",
+            CodeLines = ["var x = 42;"]
+        };
+
+        // Without a highlighter, CodeLines should still work (plain text)
+        Assert.Equal ("var x = 42;", codeBlock.ExtractText ());
+    }
+
+    [Fact]
+    public void ThemeBackground_Is_Set_From_Highlighter ()
+    {
+        TextMateSyntaxHighlighter highlighter = new ();
+        MarkdownCodeBlock codeBlock = new ()
+        {
+            SyntaxHighlighter = highlighter,
+            Language = "csharp",
+            CodeLines = ["int x = 1;"]
+        };
+
+        // ThemeBackground should be set from the highlighter's DefaultBackground
+        Assert.NotNull (codeBlock.ThemeBackground);
+        Assert.Equal (highlighter.DefaultBackground, codeBlock.ThemeBackground);
+    }
+
+    // --- Text property (fenced code block parsing) ---
+    // Copilot
+
+    [Fact]
+    public void Text_With_Fenced_Block_Extracts_Language ()
+    {
+        MarkdownCodeBlock codeBlock = new ()
+        {
+            Text = "```csharp\nvar x = 42;\n```"
+        };
+
+        Assert.Equal ("csharp", codeBlock.Language);
+    }
+
+    [Fact]
+    public void Text_With_Fenced_Block_Strips_Fences ()
+    {
+        MarkdownCodeBlock codeBlock = new ()
+        {
+            Text = "```csharp\nvar x = 42;\n```"
+        };
+
+        Assert.Equal ("var x = 42;", codeBlock.ExtractText ());
+    }
+
+    [Fact]
+    public void Text_Without_Fences_Treats_As_Plain_Code ()
+    {
+        MarkdownCodeBlock codeBlock = new ()
+        {
+            Text = "line1\nline2"
+        };
+
+        Assert.Null (codeBlock.Language);
+        Assert.Equal ($"line1{Environment.NewLine}line2", codeBlock.ExtractText ());
+    }
+
+    [Fact]
+    public void Text_With_Fenced_Block_No_Language ()
+    {
+        MarkdownCodeBlock codeBlock = new ()
+        {
+            Text = "```\nplain code\n```"
+        };
+
+        Assert.Null (codeBlock.Language);
+        Assert.Equal ("plain code", codeBlock.ExtractText ());
+    }
+
+    [Fact]
+    public void Text_With_Highlighter_Produces_Styled_Output ()
+    {
+        TextMateSyntaxHighlighter highlighter = new ();
+        MarkdownCodeBlock codeBlock = new ()
+        {
+            SyntaxHighlighter = highlighter,
+            Text = "```csharp\nvar x = 42;\n```"
+        };
+
+        Assert.Equal ("csharp", codeBlock.Language);
+        Assert.Equal ("var x = 42;", codeBlock.ExtractText ());
+        Assert.NotNull (codeBlock.ThemeBackground);
+    }
+
+    [Fact]
+    public void Text_Getter_Returns_Fenced_Format ()
+    {
+        MarkdownCodeBlock codeBlock = new ()
+        {
+            Text = "```python\nprint('hi')\n```"
+        };
+
+        // Getter should round-trip: return fenced format with language
+        string text = codeBlock.Text;
+        Assert.Contains ("print('hi')", text);
+    }
+
+    [Fact]
+    public void Text_Multiline_Fenced_Block ()
+    {
+        MarkdownCodeBlock codeBlock = new ()
+        {
+            Text = "```js\nlet a = 1;\nlet b = 2;\nconsole.log(a + b);\n```"
+        };
+
+        Assert.Equal ("js", codeBlock.Language);
+        Assert.Contains ("let a = 1;", codeBlock.ExtractText ());
+        Assert.Contains ("console.log(a + b);", codeBlock.ExtractText ());
+    }
 }

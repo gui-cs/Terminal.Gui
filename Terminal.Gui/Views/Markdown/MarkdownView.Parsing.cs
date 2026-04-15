@@ -24,7 +24,7 @@ public partial class MarkdownView
         MarkdownPipeline pipeline = MarkdownPipeline ?? _defaultPipeline;
 
         // Keep parse stage explicit (parse -> lower -> layout -> draw); parsed AST is intentionally unused in v1 lowering.
-        _ = Markdig.Markdown.Parse (_markdown, pipeline);
+        _ = Markdown.Parse (_markdown, pipeline);
 
         LowerFromSourceText ();
 
@@ -93,8 +93,14 @@ public partial class MarkdownView
 
             if (headingMatch.Success)
             {
+                string hashes = headingMatch.Groups [1].Value;
                 string headingText = headingMatch.Groups [2].Value;
                 List<InlineRun> headingRuns = MarkdownInlineParser.ParseInlines (headingText, MarkdownStyleRole.Heading);
+
+                if (ShowHeadingPrefix)
+                {
+                    headingRuns.Insert (0, new InlineRun ($"{hashes} ", MarkdownStyleRole.HeadingMarker));
+                }
 
                 string baseSlug = GenerateAnchorSlug (headingText);
                 string anchor = DeduplicateSlug (baseSlug, slugCounts);
@@ -264,11 +270,7 @@ public partial class MarkdownView
             {
                 IReadOnlyList<StyledSegment> highlighted = SyntaxHighlighter.Highlight (line, language);
                 List<InlineRun> converted = [];
-
-                foreach (StyledSegment segment in highlighted)
-                {
-                    converted.Add (new InlineRun (segment.Text, segment.StyleRole, segment.Url, segment.ImageSource, segment.Attribute));
-                }
+                converted.AddRange (highlighted.Select (segment => new InlineRun (segment.Text, segment.StyleRole, segment.Url, segment.ImageSource, segment.Attribute)));
 
                 runs = converted;
             }

@@ -120,7 +120,7 @@ public partial class MarkdownView
     protected override void OnActivated (ICommandContext? ctx)
     {
         // Only process mouse clicks — keyboard activation is handled via Command.Accept
-        if (ctx?.Binding is not MouseBinding { MouseEvent: { Position: { } pos } })
+        if (ctx?.Binding is not MouseBinding { MouseEvent.Position: { } pos })
         {
             return;
         }

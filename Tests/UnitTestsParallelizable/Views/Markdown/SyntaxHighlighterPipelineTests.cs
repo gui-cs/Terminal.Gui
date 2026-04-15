@@ -23,7 +23,7 @@ public class SyntaxHighlighterPipelineTests
     {
         MockSyntaxHighlighter highlighter = new ();
 
-        MarkdownView view = new () { SyntaxHighlighter = highlighter, Markdown = "```csharp\nvar x = 1;\n```\n\ntext\n\n```python\nprint('hi')\n```" };
+        MarkdownView view = new () { SyntaxHighlighter = highlighter, Text = "```csharp\nvar x = 1;\n```\n\ntext\n\n```python\nprint('hi')\n```" };
 
         // Force layout to trigger parsing
         view.Width = 40;
@@ -41,7 +41,7 @@ public class SyntaxHighlighterPipelineTests
     {
         MockSyntaxHighlighter highlighter = new ();
 
-        MarkdownView view = new () { SyntaxHighlighter = highlighter, Markdown = "```csharp\nvar x = 1;\n```" };
+        MarkdownView view = new () { SyntaxHighlighter = highlighter, Text = "```csharp\nvar x = 1;\n```" };
 
         view.Width = 40;
         view.Height = 20;
@@ -55,7 +55,7 @@ public class SyntaxHighlighterPipelineTests
     {
         MockSyntaxHighlighter highlighter = new ();
 
-        MarkdownView view = new () { SyntaxHighlighter = highlighter, Markdown = "```\nvar x = 1;\n```" };
+        MarkdownView view = new () { SyntaxHighlighter = highlighter, Text = "```\nvar x = 1;\n```" };
 
         view.Width = 40;
         view.Height = 20;
@@ -69,7 +69,7 @@ public class SyntaxHighlighterPipelineTests
     {
         MockSyntaxHighlighter highlighter = new ();
 
-        MarkdownView view = new () { SyntaxHighlighter = highlighter, Markdown = "~~~python\nprint('hi')\n~~~" };
+        MarkdownView view = new () { SyntaxHighlighter = highlighter, Text = "~~~python\nprint('hi')\n~~~" };
 
         view.Width = 40;
         view.Height = 20;
@@ -83,7 +83,7 @@ public class SyntaxHighlighterPipelineTests
     {
         MockSyntaxHighlighter highlighter = new ();
 
-        MarkdownView view = new () { SyntaxHighlighter = highlighter, Markdown = "```csharp\nvar x = 1;\n```\n\n```python\nprint('hi')\n```" };
+        MarkdownView view = new () { SyntaxHighlighter = highlighter, Text = "```csharp\nvar x = 1;\n```\n\n```python\nprint('hi')\n```" };
 
         view.Width = 40;
         view.Height = 20;
@@ -156,7 +156,7 @@ public class SyntaxHighlighterPipelineTests
         Attribute keywordAttr = new ("Blue", "Black", TextStyle.Bold);
         ExplicitAttributeHighlighter highlighter = new (keywordAttr);
 
-        MarkdownView view = new () { SyntaxHighlighter = highlighter, Markdown = "```csharp\nvar x = 1;\n```" };
+        MarkdownView view = new () { SyntaxHighlighter = highlighter, Text = "```csharp\nvar x = 1;\n```" };
 
         view.Width = 40;
         view.Height = 20;
@@ -190,6 +190,8 @@ public class SyntaxHighlighterPipelineTests
         }
 
         public Color? DefaultBackground => null;
+
+        public Attribute? GetAttributeForScope (MarkdownStyleRole role) => null;
     }
 
     private sealed class ExplicitAttributeHighlighter (Attribute attr) : ISyntaxHighlighter
@@ -199,5 +201,82 @@ public class SyntaxHighlighterPipelineTests
         public void ResetState () { }
 
         public Color? DefaultBackground => null;
+
+        public Attribute? GetAttributeForScope (MarkdownStyleRole role) => null;
+    }
+
+    // --- GetAttributeForScope pipeline tests ---
+    // Copilot
+
+    [Fact]
+    public void MarkdownAttributeHelper_Uses_Highlighter_Scope_When_Available ()
+    {
+        Attribute headingAttr = new (Color.Cyan, Color.Black, TextStyle.Bold);
+        ScopeAwareHighlighter highlighter = new (MarkdownStyleRole.Heading, headingAttr);
+
+        MarkdownView mv = new () { SyntaxHighlighter = highlighter };
+        mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Black)));
+
+        StyledSegment segment = new ("Hello", MarkdownStyleRole.Heading);
+        Attribute result = MarkdownAttributeHelper.GetAttributeForSegment (mv, segment, highlighter);
+
+        Assert.Equal (headingAttr, result);
+    }
+
+    [Fact]
+    public void MarkdownAttributeHelper_Falls_Back_To_TextStyle_Without_Highlighter ()
+    {
+        MarkdownView mv = new ();
+        mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Black)));
+
+        StyledSegment segment = new ("Hello", MarkdownStyleRole.Heading);
+        Attribute result = MarkdownAttributeHelper.GetAttributeForSegment (mv, segment);
+
+        // Without highlighter, heading should be Bold
+        Assert.True (result.Style.HasFlag (TextStyle.Bold));
+    }
+
+    [Fact]
+    public void MarkdownAttributeHelper_Falls_Back_When_Highlighter_Returns_Null ()
+    {
+        // Highlighter returns null for Normal role
+        ScopeAwareHighlighter highlighter = new (MarkdownStyleRole.Heading, new Attribute (Color.Cyan, Color.Black));
+
+        MarkdownView mv = new ();
+        mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Black)));
+
+        StyledSegment segment = new ("Hello", MarkdownStyleRole.Emphasis);
+        Attribute result = MarkdownAttributeHelper.GetAttributeForSegment (mv, segment, highlighter);
+
+        // Not Heading, so highlighter returns null → falls back to TextStyle.Italic
+        Assert.True (result.Style.HasFlag (TextStyle.Italic));
+    }
+
+    [Fact]
+    public void MarkdownAttributeHelper_Explicit_Attribute_Takes_Priority_Over_Highlighter ()
+    {
+        Attribute explicitAttr = new (Color.Red, Color.Blue);
+        Attribute headingAttr = new (Color.Cyan, Color.Black);
+        ScopeAwareHighlighter highlighter = new (MarkdownStyleRole.Heading, headingAttr);
+
+        MarkdownView mv = new ();
+        mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Black)));
+
+        StyledSegment segment = new ("Hello", MarkdownStyleRole.Heading, attribute: explicitAttr);
+        Attribute result = MarkdownAttributeHelper.GetAttributeForSegment (mv, segment, highlighter);
+
+        // Explicit attribute takes priority
+        Assert.Equal (explicitAttr, result);
+    }
+
+    private sealed class ScopeAwareHighlighter (MarkdownStyleRole targetRole, Attribute attr) : ISyntaxHighlighter
+    {
+        public IReadOnlyList<StyledSegment> Highlight (string code, string? language) => [new (code, MarkdownStyleRole.CodeBlock)];
+
+        public void ResetState () { }
+
+        public Color? DefaultBackground => null;
+
+        public Attribute? GetAttributeForScope (MarkdownStyleRole role) => role == targetRole ? attr : null;
     }
 }

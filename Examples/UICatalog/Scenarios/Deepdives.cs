@@ -193,7 +193,7 @@ public class Deepdives : Scenario
                           {
                               HideSpinner ("Error loading doc list");
 
-                              _markdownView?.Markdown = $"# Error\n\nFailed to load doc list:\n\n`{ex.Message}`";
+                              _markdownView?.Text = $"# Error\n\nFailed to load doc list:\n\n`{ex.Message}`";
                           });
         }
     }
@@ -219,7 +219,7 @@ public class Deepdives : Scenario
 
             _app?.Invoke (() =>
                           {
-                              _markdownView?.Markdown = content;
+                              _markdownView?.Text = content;
 
                               _markdownView?.Viewport = _markdownView.Viewport with { X = 0, Y = 0 };
 
@@ -234,7 +234,7 @@ public class Deepdives : Scenario
                           {
                               HideSpinner ("Error");
 
-                              _markdownView?.Markdown = $"# Error\n\nFailed to load `{entry.Name}`:\n\n`{ex.Message}`";
+                              _markdownView?.Text = $"# Error\n\nFailed to load `{entry.Name}`:\n\n`{ex.Message}`";
                           });
         }
     }

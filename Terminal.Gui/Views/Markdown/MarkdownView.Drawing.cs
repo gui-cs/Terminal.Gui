@@ -145,7 +145,7 @@ public partial class MarkdownView
         AddStr (x, y, grapheme);
     }
 
-    private Attribute GetAttributeForSegment (StyledSegment segment) => MarkdownAttributeHelper.GetAttributeForSegment (this, segment);
+    private Attribute GetAttributeForSegment (StyledSegment segment) => MarkdownAttributeHelper.GetAttributeForSegment (this, segment, SyntaxHighlighter);
 
     private void TryQueueSixel (string imageSource, Point screenPosition)
     {

@@ -33,6 +33,28 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     private Color _defaultBackground;
 
     private readonly Dictionary<string, IGrammar?> _grammarCache = new (StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<MarkdownStyleRole, Attribute?> _scopeAttributeCache = [];
+
+    /// <summary>
+    ///     Maps <see cref="MarkdownStyleRole"/> values to candidate TextMate scope arrays.
+    ///     Each role has one or more candidate scope lists, tried in order until one returns
+    ///     rules from the active theme.
+    /// </summary>
+    private static readonly Dictionary<MarkdownStyleRole, string [] []> _scopeMap = new ()
+    {
+        [MarkdownStyleRole.Heading] = [["entity.name.section"], ["markup.heading"]],
+        [MarkdownStyleRole.HeadingMarker] = [["entity.name.section"], ["markup.heading"]],
+        [MarkdownStyleRole.Emphasis] = [["markup.italic"]],
+        [MarkdownStyleRole.Strong] = [["markup.bold"]],
+        [MarkdownStyleRole.InlineCode] = [["markup.inline.raw"], ["markup.raw"]],
+        [MarkdownStyleRole.CodeBlock] = [["markup.fenced_code.block.markdown"], ["markup.raw"]],
+        [MarkdownStyleRole.Link] = [["markup.underline.link"], ["string.other.link"], ["markup.underline"]],
+        [MarkdownStyleRole.Quote] = [["markup.quote"], ["markup.changed"]],
+        [MarkdownStyleRole.ListMarker] = [["punctuation.definition.list.begin.markdown"], ["keyword.control"]],
+        [MarkdownStyleRole.ImageAlt] = [["markup.italic"]],
+        [MarkdownStyleRole.TaskDone] = [["markup.strikethrough"], ["markup.deleted"]],
+        [MarkdownStyleRole.ThematicBreak] = [["meta.separator.markdown"], ["comment"]]
+    };
 
     /// <summary>Initializes a new <see cref="TextMateSyntaxHighlighter"/> with the specified theme.</summary>
     /// <param name="theme">
@@ -106,8 +128,55 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     /// <inheritdoc/>
     public void ResetState () => _ruleStack = null;
 
+    /// <summary>
+    ///     Returns a <see cref="ThemeName"/> appropriate for the given terminal background color.
+    ///     Returns <see cref="ThemeName.DarkPlus"/> for dark backgrounds and
+    ///     <see cref="ThemeName.LightPlus"/> for light backgrounds.
+    /// </summary>
+    /// <param name="background">The terminal background color to evaluate.</param>
+    /// <returns>A theme appropriate for the background luminance.</returns>
+    public static ThemeName GetThemeForBackground (Color background) =>
+        background.IsDarkColor () ? ThemeName.DarkPlus : ThemeName.LightPlus;
+
     /// <inheritdoc/>
     public Color? DefaultBackground => _defaultBackground;
+
+    /// <inheritdoc/>
+    public Attribute? GetAttributeForScope (MarkdownStyleRole role)
+    {
+        if (_scopeAttributeCache.TryGetValue (role, out Attribute? cached))
+        {
+            return cached;
+        }
+
+        if (!_scopeMap.TryGetValue (role, out string [] []? candidateScopes))
+        {
+            _scopeAttributeCache [role] = null;
+
+            return null;
+        }
+
+        Theme theme = _registry.GetTheme ();
+
+        foreach (string [] scopes in candidateScopes)
+        {
+            List<ThemeTrieElementRule> rules = theme.Match (scopes.ToList ());
+
+            if (rules.Count == 0)
+            {
+                continue;
+            }
+
+            Attribute attr = ResolveAttribute (theme, scopes.ToList ());
+            _scopeAttributeCache [role] = attr;
+
+            return attr;
+        }
+
+        _scopeAttributeCache [role] = null;
+
+        return null;
+    }
 
     /// <summary>
     ///     Switches the active theme used for colorization. Clears the grammar cache
@@ -119,6 +188,7 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
         _registryOptions = new RegistryOptions (theme);
         _registry = new Registry (_registryOptions);
         _grammarCache.Clear ();
+        _scopeAttributeCache.Clear ();
         _ruleStack = null;
         CacheThemeDefaults ();
     }

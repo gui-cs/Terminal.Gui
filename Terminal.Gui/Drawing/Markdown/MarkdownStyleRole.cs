@@ -13,6 +13,9 @@ public enum MarkdownStyleRole
     /// <summary>Heading text (<c># … ######</c>). Rendered bold.</summary>
     Heading,
 
+    /// <summary>Heading marker characters (<c>#</c>, <c>##</c>, etc.). Rendered bold.</summary>
+    HeadingMarker,
+
     /// <summary>Emphasized text (<c>*italic*</c>). Rendered italic.</summary>
     Emphasis,
 

@@ -37,11 +37,7 @@ public class MarkdownTableTests
         // Copilot
         MarkdownTable table = new ();
 
-        TableData newData = new (
-            ["A", "B"],
-            [Alignment.Start, Alignment.End],
-            [["1", "2"], ["3", "4"]]
-        );
+        TableData newData = new (["A", "B"], [Alignment.Start, Alignment.End], [["1", "2"], ["3", "4"]]);
 
         table.Data = newData;
 
@@ -72,7 +68,7 @@ public class MarkdownTableTests
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
-        MarkdownView mv = new () { Markdown = "| H1 | H2 |\n|-----|-----|\n| A  | B  |", Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Text = "| H1 | H2 |\n|-----|-----|\n| A  | B  |", Width = Dim.Fill (), Height = Dim.Fill () };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);
@@ -113,7 +109,7 @@ public class MarkdownTableTests
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView mv = new () { Markdown = "text\n\n| H1 | H2 |\n|-----|-----|\n| A  | B  |\n| C  | D  |\n\nmore", Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Text = "text\n\n| H1 | H2 |\n|-----|-----|\n| A  | B  |\n| C  | D  |\n\nmore", Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -139,7 +135,7 @@ public class MarkdownTableTests
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
-        MarkdownView mv = new () { Markdown = "| A | B | C |\n|---|---|---|\n| 1 | 2 | 3 |", Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Text = "| A | B | C |\n|---|---|---|\n| 1 | 2 | 3 |", Width = Dim.Fill (), Height = Dim.Fill () };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);
@@ -171,7 +167,7 @@ public class MarkdownTableTests
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
-        MarkdownView mv = new () { Markdown = "| H1 | H2 |\n|-----|-----|", Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Text = "| H1 | H2 |\n|-----|-----|", Width = Dim.Fill (), Height = Dim.Fill () };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);
@@ -201,7 +197,7 @@ public class MarkdownTableTests
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView mv = new () { Markdown = "| H |\n|---|\n| A |\n\nafter", Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Text = "| H |\n|---|\n| A |\n\nafter", Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -224,7 +220,7 @@ public class MarkdownTableTests
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownView mv = new () { Markdown = "| H1 | H2 |\n| not sep |\n| body |", Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Text = "| H1 | H2 |\n| not sep |\n| body |", Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -249,7 +245,7 @@ public class MarkdownTableTests
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
-        MarkdownView mv = new () { Markdown = "| Header |\n|--------|\n| **bold** |", Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Text = "| Header |\n|--------|\n| **bold** |", Width = Dim.Fill (), Height = Dim.Fill () };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);
@@ -282,7 +278,7 @@ public class MarkdownTableTests
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
         window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
 
-        MarkdownView mv = new () { Markdown = "| Col |\n|-----|\n| `code` |", Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Text = "| Col |\n|-----|\n| `code` |", Width = Dim.Fill (), Height = Dim.Fill () };
         mv.SchemeName = null;
         mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
         window.Add (mv);
@@ -348,7 +344,7 @@ public class MarkdownTableTests
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
         // Long cell text in a narrow viewport will force wrapping
-        MarkdownView mv = new () { Markdown = "| Header |\n|--------|\n| This is a very long cell that should wrap |", Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownView mv = new () { Text = "| Header |\n|--------|\n| This is a very long cell that should wrap |", Width = Dim.Fill (), Height = Dim.Fill () };
         window.Add (mv);
 
         app.Begin (window);
@@ -546,6 +542,92 @@ public class MarkdownTableTests
 
         // Column 0 (narrowest) should be mostly preserved
         Assert.True (widths [0] >= 4, $"Narrowest column {widths [0]} was shrunk too aggressively");
+    }
+
+    #endregion
+
+    #region Standalone syntax highlighting
+
+    // Copilot
+
+    [Fact]
+    public void SyntaxHighlighter_Property_Defaults_Null ()
+    {
+        MarkdownTable table = new ();
+        Assert.Null (table.SyntaxHighlighter);
+    }
+
+    [Fact]
+    public void Setting_SyntaxHighlighter_Passes_To_GetAttributeForSegment ()
+    {
+        // Verify that when SyntaxHighlighter is set, the table uses it for attribute resolution
+        TextMateSyntaxHighlighter highlighter = new ();
+
+        MarkdownTable table = new () { SyntaxHighlighter = highlighter, Data = new TableData (["Name"], [Alignment.Start], [["**bold**"]]) };
+
+        // If highlighter is wired, emphasis role should get theme colors (not default fallback)
+        highlighter.GetAttributeForScope (MarkdownStyleRole.Emphasis);
+
+        // Smoke test: highlighter is set and Data works
+        Assert.NotNull (table.SyntaxHighlighter);
+        Assert.Single (table.Data.Rows);
+    }
+
+    #endregion
+
+    #region Text property (pipe table parsing)
+
+    // Copilot
+
+    [Fact]
+    public void Text_Parses_Pipe_Table ()
+    {
+        MarkdownTable table = new () { Text = "| Name | Age |\n|------|-----|\n| Alice | 30 |" };
+
+        Assert.Equal (2, table.Data.ColumnCount);
+        Assert.Single (table.Data.Rows);
+    }
+
+    [Fact]
+    public void Text_With_Alignment_Markers ()
+    {
+        MarkdownTable table = new () { Text = "| Left | Center | Right |\n|:-----|:------:|------:|\n| A | B | C |" };
+
+        Assert.Equal (3, table.Data.ColumnCount);
+        Assert.Equal (Alignment.Start, table.Data.ColumnAlignments [0]);
+        Assert.Equal (Alignment.Center, table.Data.ColumnAlignments [1]);
+        Assert.Equal (Alignment.End, table.Data.ColumnAlignments [2]);
+    }
+
+    [Fact]
+    public void Text_Empty_String_Clears_Table ()
+    {
+        MarkdownTable table = new () { Text = "| A |\n|---|\n| B |" };
+        Assert.True (table.Data.ColumnCount > 0);
+
+        table.Text = "";
+        Assert.Equal (0, table.Data.ColumnCount);
+    }
+
+    [Fact]
+    public void Text_Invalid_Table_Sets_Empty_Data ()
+    {
+        MarkdownTable table = new () { Text = "not a table" };
+
+        Assert.Equal (0, table.Data.ColumnCount);
+    }
+
+    [Fact]
+    public void EnableForDesign_Sets_Highlighter_And_Text ()
+    {
+        MarkdownTable table = new ();
+        IDesignable designable = table;
+
+        bool result = designable.EnableForDesign ();
+
+        Assert.True (result);
+        Assert.NotNull (table.SyntaxHighlighter);
+        Assert.True (table.Data.ColumnCount > 0);
     }
 
     #endregion

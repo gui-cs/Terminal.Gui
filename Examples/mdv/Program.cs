@@ -13,6 +13,7 @@ using Terminal.Gui.Input;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 using TextMateSharp.Grammars;
+// ReSharper disable AccessToDisposedClosure
 
 ConfigurationManager.RuntimeConfig = """
                                      {
@@ -119,14 +120,14 @@ static string FormatFileSize (long bytes)
 
 static int RunInline (List<string> files, ThemeName syntaxTheme)
 {
-    string markdown = string.Join ("\n\n---\n\n", files.Select (f => File.ReadAllText (f)));
+    string markdown = string.Join ("\n\n---\n\n", files.Select (File.ReadAllText));
 
     Application.AppModel = AppModel.Inline;
     IApplication app = Application.Create ().Init ();
 
     Runnable window = new () { Title = "TUI Markdown Viewer", Width = Dim.Fill (), Height = Dim.Auto () };
 
-    MarkdownView markdownView = new () { Width = Dim.Fill (), Height = Dim.Auto (), Markdown = markdown, SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme) };
+    MarkdownView markdownView = new () { Width = Dim.Fill (), Height = Dim.Auto (), Text = markdown, SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme) };
 
     // No scrollbar in inline mode — content should be fully visible
     markdownView.ViewportSettings &= ~ViewportSettingsFlags.HasVerticalScrollBar;
@@ -134,7 +135,7 @@ static int RunInline (List<string> files, ThemeName syntaxTheme)
     window.Add (markdownView);
 
     // Quit after the first render so the content stays in scrollback
-    window.Initialized += (_, _) => app.Invoke (() => window.RequestStop ());
+    window.Initialized += (_, _) => app.Invoke (window.RequestStop);
 
     app.Run (window);
     window.Dispose ();
@@ -244,7 +245,7 @@ static int RunFullScreen (List<string> files, ThemeName syntaxTheme)
     // File selector when multiple files are provided
     if (files.Count > 1)
     {
-        List<string> fileNames = [.. files.Select (f => Path.GetFileName (f)!)];
+        List<string> fileNames = [.. files.Select (f => Path.GetFileName (f))];
         ObservableCollection<string> fileNamesOc = new (fileNames);
 
         DropDownList fileSelector = new () { Source = new ListWrapper<string> (fileNamesOc), ReadOnly = true, Text = fileNames [0], Width = 30 };
@@ -291,7 +292,7 @@ static int RunFullScreen (List<string> files, ThemeName syntaxTheme)
     void LoadFile (string filePath)
     {
         string content = File.ReadAllText (filePath);
-        markdownView.Markdown = content;
+        markdownView.Text = content;
         markdownView.Viewport = markdownView.Viewport with { X = 0, Y = 0 };
 
         FileInfo fileInfo = new (filePath);

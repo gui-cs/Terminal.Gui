@@ -28,4 +28,15 @@ public interface ISyntaxHighlighter
     ///     per-token backgrounds. Returns <see langword="null"/> if no theme background is available.
     /// </summary>
     Color? DefaultBackground { get; }
+
+    /// <summary>
+    ///     Returns a theme-derived <see cref="Attribute"/> for the given markdown style role,
+    ///     or <see langword="null"/> if this highlighter has no specific styling for that role.
+    /// </summary>
+    /// <param name="role">The markdown style role to resolve.</param>
+    /// <returns>
+    ///     An <see cref="Attribute"/> with colors from the active syntax theme, or <see langword="null"/>
+    ///     to fall back to the default <see cref="MarkdownStyleRole"/>-based text style.
+    /// </returns>
+    Attribute? GetAttributeForScope (MarkdownStyleRole role);
 }

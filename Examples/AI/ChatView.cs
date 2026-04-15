@@ -210,7 +210,7 @@ internal sealed class ChatView : Window
     private void AppendToConversation (string text)
     {
         _conversationText.Append (text);
-        _conversationView.Markdown = _conversationText.ToString ();
+        _conversationView.Text = _conversationText.ToString ();
     }
 
     private void HandleSlashCommand (string command)
@@ -227,7 +227,7 @@ internal sealed class ChatView : Window
 
             case "clear":
                 _conversationText.Clear ();
-                _conversationView.Markdown = string.Empty;
+                _conversationView.Text = string.Empty;
                 AppendToConversation ($"{Glyphs.Diamond} Conversation cleared.\n");
 
                 break;

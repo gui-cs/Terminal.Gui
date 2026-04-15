@@ -61,7 +61,7 @@ public class MarkdownTester : Scenario
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            Markdown = MarkdownView.DefaultMarkdownSample,
+            Text = MarkdownView.DefaultMarkdownSample,
             SyntaxHighlighter = new TextMateSyntaxHighlighter (TextMateSharp.Grammars.ThemeName.DarkPlus)
         };
 
@@ -70,7 +70,7 @@ public class MarkdownTester : Scenario
         // Update preview when editor text changes
         editor.ContentsChanged += (_, _) =>
                                   {
-                                      preview.Markdown = editor.Text;
+                                      preview.Text = editor.Text;
                                   };
 
         window.Add (editorFrame, previewFrame);

@@ -46,7 +46,14 @@ public partial class MarkdownView
             {
                 int startLine = _renderedLines.Count;
 
-                MarkdownTable tableView = new () { Data = tableData, X = 0, Y = startLine, Width = Dim.Fill () };
+                MarkdownTable tableView = new ()
+                {
+                    SyntaxHighlighter = SyntaxHighlighter,
+                    Data = tableData,
+                    X = 0,
+                    Y = startLine,
+                    Width = Dim.Fill ()
+                };
                 tableView.Recalculate (viewportWidth);
 
                 _tableViews.Add (tableView);

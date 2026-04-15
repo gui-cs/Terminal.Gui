@@ -136,3 +136,46 @@ This allows the highlighter to resolve a markdown style role to a theme-derived 
 - Moving types between `Terminal.Gui.Views` and `Terminal.Gui.Drawing` namespaces requires no consumer changes due to global usings
 - `Attribute?` on `InlineRun`/`StyledSegment` is the established pattern for explicit styling that bypasses role-based resolution
 - TextMateSharp 2.0.3 + Onigwrap 1.0.11 provides all platform RIDs including ARM64
+
+## Progress
+
+### Phase 1: ShowHeadingPrefix + heading level ✅
+- Added `ShowHeadingPrefix` property (default: true) to MarkdownView
+- Added `MarkdownStyleRole.HeadingMarker` enum value
+- Heading `#` prefix rendered as InlineRun with HeadingMarker role
+- 8 new tests, all passing
+
+### Phase 2: ISyntaxHighlighter.GetAttributeForScope ✅
+- Added `GetAttributeForScope(MarkdownStyleRole)` to ISyntaxHighlighter
+- Implemented multi-candidate scope mapping with lazy caching in TextMateSyntaxHighlighter
+- Updated MarkdownAttributeHelper for 3-tier priority: explicit Attribute > scope-derived > TextStyle fallback
+- 11 new tests, all passing
+
+### Theme Auto-Detection ✅ (unplanned addition)
+- Added `GetThemeForBackground(Color)` static method
+- Dark terminals → DarkPlus, light terminals → LightPlus
+
+### Phase 3: Standalone MarkdownCodeBlock ✅
+- Made `ThemeBackground` public
+- Added `SyntaxHighlighter` and `Language` public properties
+- `CodeLines` setter now highlights through the highlighter when both are set
+- Wired `SyntaxHighlighter` into code block draw path
+- 5 new tests, all passing
+
+### Phase 4: Standalone MarkdownTable + EnableForDesign ✅
+- Added `SyntaxHighlighter` property to MarkdownTable
+- Wired highlighter into table cell rendering
+- MarkdownView.Layout.cs propagates highlighter to tables
+- Verified EnableForDesign with embedded `md` code block works
+- 4 new tests (2 table, 2 EnableForDesign/recursive), all passing
+
+**All phases complete.** Full test suite: all tests pass (0 failures).
+
+### Phase 5: Text Property Unification ✅
+Unified content-setting API across all three markdown views to use `View.Text`:
+
+- **MarkdownView**: Overrode `Text` (virtual on View) to route through `SetMarkdown` logic. Removed the `Markdown` property entirely. Updated all callers (6 example files, 3 test files).
+- **MarkdownCodeBlock**: Overrode `Text` to accept fenced code block format (` ```lang\ncode\n``` `). The setter extracts `Language` from the opening fence, strips fences, and feeds code lines through `CodeLines` (which uses highlighter if set). Plain text (no fences) also works. The getter round-trips in fenced format.
+- **MarkdownTable**: Overrode `Text` to accept pipe-delimited markdown table text. Parses via `TableData.TryParse()`, sets `Data` internally. Invalid/empty text clears the table. Getter reconstructs pipe format. Added constructor guard for `View()` base calling `Text = ""` before fields initialize.
+- **EnableForDesign**: Both MarkdownCodeBlock and MarkdownTable now use `Text` + `SyntaxHighlighter` in EnableForDesign. MarkdownTable sample includes inline formatting (`**bold**`, `*italic*`, `` `code` ``).
+- 10 new tests + all existing tests updated from `.Markdown` → `.Text`.

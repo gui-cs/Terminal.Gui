@@ -9,7 +9,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Set the <see cref="Markdown"/> property to supply content. The view parses the Markdown,
+///         Set the <see cref="Text"/> property to supply content. The view parses the Markdown,
 ///         performs word-wrap layout, and draws styled output. Fenced code blocks receive a
 ///         full-width dimmed background; inline code, emphasis, strong, and other elements are
 ///         rendered with appropriate text styles and colors.
@@ -51,7 +51,11 @@ public partial class MarkdownView : View, IDesignable
 
     /// <summary>Gets or sets the Markdown-formatted text displayed by this view.</summary>
     /// <value>The raw Markdown string. Setting this property triggers reparsing, re-layout, and a redraw.</value>
-    public string Markdown { get => _markdown; set => SetMarkdown (value); }
+    public override string Text
+    {
+        get => _markdown;
+        set => SetMarkdown (value);
+    }
 
     /// <summary>Gets or sets the Markdig <see cref="Markdig.MarkdownPipeline"/> used for parsing.</summary>
     /// <value>
@@ -77,6 +81,26 @@ public partial class MarkdownView : View, IDesignable
     /// <value>An <see cref="ISyntaxHighlighter"/> implementation, or <see langword="null"/> for plain-text code blocks.</value>
     public ISyntaxHighlighter? SyntaxHighlighter { get; set; }
 
+    /// <summary>
+    ///     Gets or sets whether heading lines include the <c>#</c> prefix (e.g. <c># </c>, <c>## </c>).
+    ///     When <see langword="true"/> (default), the hash markers are displayed so that heading levels
+    ///     are visually distinguishable. When <see langword="false"/>, only the heading text is shown.
+    /// </summary>
+    public bool ShowHeadingPrefix
+    {
+        get;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+
+            field = value;
+            InvalidateParsedAndLayout ();
+        }
+    } = true;
+
     /// <summary>Gets or sets an optional callback that loads image data as UTF-8 encoded sixel payloads.</summary>
     /// <value>A function that accepts an image source path and returns sixel bytes, or <see langword="null"/>.</value>
     public Func<string, byte []?>? ImageLoader { get; set; }
@@ -94,7 +118,7 @@ public partial class MarkdownView : View, IDesignable
     /// </summary>
     public event EventHandler<MarkdownLinkEventArgs>? LinkClicked;
 
-    /// <summary>Raised after the <see cref="Markdown"/> property changes and the content has been reparsed.</summary>
+    /// <summary>Raised after the <see cref="Text"/> property changes and the content has been reparsed.</summary>
     public event EventHandler<EventArgs>? MarkdownChanged;
 
     /// <summary>Called when a hyperlink is clicked, before the <see cref="LinkClicked"/> event is raised.</summary>
@@ -102,7 +126,7 @@ public partial class MarkdownView : View, IDesignable
     /// <returns><see langword="true"/> if the link click was handled and no further processing should occur.</returns>
     protected virtual bool OnLinkClicked (MarkdownLinkEventArgs args) => false;
 
-    /// <summary>Called after the <see cref="Markdown"/> property changes, before <see cref="MarkdownChanged"/> is raised.</summary>
+    /// <summary>Called after the <see cref="Text"/> property changes, before <see cref="MarkdownChanged"/> is raised.</summary>
     protected virtual void OnMarkdownChanged () { }
 
     /// <inheritdoc/>
@@ -234,24 +258,6 @@ public partial class MarkdownView : View, IDesignable
         _inLayout = false;
     }
 
-    private void ClampViewport ()
-    {
-        Size contentSize = GetContentSize ();
-
-        int maxY = Math.Max (contentSize.Height - Viewport.Height, 0);
-        int maxX = Math.Max (contentSize.Width - Viewport.Width, 0);
-
-        int newY = Math.Min (Math.Max (Viewport.Y, 0), maxY);
-        int newX = Math.Min (Math.Max (Viewport.X, 0), maxX);
-
-        if (newY == Viewport.Y && newX == Viewport.X)
-        {
-            return;
-        }
-
-        Viewport = Viewport with { Y = newY, X = newX };
-    }
-
     private void RemoveCodeBlockViews ()
     {
         foreach (MarkdownCodeBlock cb in _codeBlockViews)
@@ -316,8 +322,8 @@ public partial class MarkdownView : View, IDesignable
     /// <inheritdoc/>
     bool IDesignable.EnableForDesign ()
     {
-        SyntaxHighlighter = new TextMateSyntaxHighlighter (TextMateSharp.Grammars.ThemeName.DarkPlus);
-        Markdown = DefaultMarkdownSample;
+        SyntaxHighlighter = new TextMateSyntaxHighlighter ();
+        Text = DefaultMarkdownSample;
 
         return true;
     }
