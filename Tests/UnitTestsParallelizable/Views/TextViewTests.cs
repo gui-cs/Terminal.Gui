@@ -2983,7 +2983,7 @@ public class TextViewTests (ITestOutputHelper output)
     }
 
     [Fact]
-    public void InvokeCommand_PageDown_PageUp_With_ViewportHeight_GraterThanOne_Draws_Cursor_Correctly ()
+    public void InvokeCommand_PageDown_PageUp_With_ViewportHeight_GreaterThanOne_Draws_Cursor_Correctly ()
     {
         using IApplication app = Application.Create ().Init ();
 
