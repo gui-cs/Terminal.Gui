@@ -357,8 +357,8 @@ public partial class Markdown : View, IDesignable
 
                                                           API Docs:
 
-                                                          * [MarkdownView](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownView.html) for more info.
-                                                          * [MarkdownTableBlock](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTableBlock.html) for more info.
+                                                          * [Markdown](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.Markdown.html) for more info.
+                                                          * [MarkdownTable](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) for more info.
                                                           * [MarkdownCodeBlock](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownCodeBlock.html) for more info.
 
                                                           ## Checklist

@@ -14,7 +14,7 @@ public class MarkdownTableTests
         MarkdownTable table = new ();
 
         Assert.NotNull (table);
-        Assert.Equal (0, table.Data.ColumnCount);
+        Assert.Equal (0, table.TableData.ColumnCount);
     }
 
     [Fact]
@@ -27,8 +27,8 @@ public class MarkdownTableTests
         bool result = designable.EnableForDesign ();
 
         Assert.True (result);
-        Assert.True (table.Data.ColumnCount > 0);
-        Assert.True (table.Data.Rows.Length > 0);
+        Assert.True (table.TableData.ColumnCount > 0);
+        Assert.True (table.TableData.Rows.Length > 0);
     }
 
     [Fact]
@@ -39,10 +39,10 @@ public class MarkdownTableTests
 
         TableData newData = new (["A", "B"], [Alignment.Start, Alignment.End], [["1", "2"], ["3", "4"]]);
 
-        table.Data = newData;
+        table.TableData = newData;
 
-        Assert.Equal (2, table.Data.ColumnCount);
-        Assert.Equal (2, table.Data.Rows.Length);
+        Assert.Equal (2, table.TableData.ColumnCount);
+        Assert.Equal (2, table.TableData.Rows.Length);
     }
 
     [Fact]
@@ -367,7 +367,7 @@ public class MarkdownTableTests
         TableData data = TableData.TryParse (lines)!;
 
         // Create table wide enough that no shrinking occurs
-        MarkdownTable table = new () { Data = data };
+        MarkdownTable table = new () { TableData = data };
 
         // The header "Bold Header" is 11 display cols + 2 padding = 13
         // If we measured raw "**Bold Header**" it would be 15 + 2 = 17
@@ -563,14 +563,14 @@ public class MarkdownTableTests
         // Verify that when SyntaxHighlighter is set, the table uses it for attribute resolution
         TextMateSyntaxHighlighter highlighter = new ();
 
-        MarkdownTable table = new () { SyntaxHighlighter = highlighter, Data = new TableData (["Name"], [Alignment.Start], [["**bold**"]]) };
+        MarkdownTable table = new () { SyntaxHighlighter = highlighter, TableData = new TableData (["Name"], [Alignment.Start], [["**bold**"]]) };
 
         // If highlighter is wired, emphasis role should get theme colors (not default fallback)
         highlighter.GetAttributeForScope (MarkdownStyleRole.Emphasis);
 
         // Smoke test: highlighter is set and Data works
         Assert.NotNull (table.SyntaxHighlighter);
-        Assert.Single (table.Data.Rows);
+        Assert.Single (table.TableData.Rows);
     }
 
     #endregion
@@ -584,8 +584,8 @@ public class MarkdownTableTests
     {
         MarkdownTable table = new () { Text = "| Name | Age |\n|------|-----|\n| Alice | 30 |" };
 
-        Assert.Equal (2, table.Data.ColumnCount);
-        Assert.Single (table.Data.Rows);
+        Assert.Equal (2, table.TableData.ColumnCount);
+        Assert.Single (table.TableData.Rows);
     }
 
     [Fact]
@@ -593,20 +593,20 @@ public class MarkdownTableTests
     {
         MarkdownTable table = new () { Text = "| Left | Center | Right |\n|:-----|:------:|------:|\n| A | B | C |" };
 
-        Assert.Equal (3, table.Data.ColumnCount);
-        Assert.Equal (Alignment.Start, table.Data.ColumnAlignments [0]);
-        Assert.Equal (Alignment.Center, table.Data.ColumnAlignments [1]);
-        Assert.Equal (Alignment.End, table.Data.ColumnAlignments [2]);
+        Assert.Equal (3, table.TableData.ColumnCount);
+        Assert.Equal (Alignment.Start, table.TableData.ColumnAlignments [0]);
+        Assert.Equal (Alignment.Center, table.TableData.ColumnAlignments [1]);
+        Assert.Equal (Alignment.End, table.TableData.ColumnAlignments [2]);
     }
 
     [Fact]
     public void Text_Empty_String_Clears_Table ()
     {
         MarkdownTable table = new () { Text = "| A |\n|---|\n| B |" };
-        Assert.True (table.Data.ColumnCount > 0);
+        Assert.True (table.TableData.ColumnCount > 0);
 
         table.Text = "";
-        Assert.Equal (0, table.Data.ColumnCount);
+        Assert.Equal (0, table.TableData.ColumnCount);
     }
 
     [Fact]
@@ -614,7 +614,7 @@ public class MarkdownTableTests
     {
         MarkdownTable table = new () { Text = "not a table" };
 
-        Assert.Equal (0, table.Data.ColumnCount);
+        Assert.Equal (0, table.TableData.ColumnCount);
     }
 
     [Fact]
@@ -627,7 +627,7 @@ public class MarkdownTableTests
 
         Assert.True (result);
         Assert.NotNull (table.SyntaxHighlighter);
-        Assert.True (table.Data.ColumnCount > 0);
+        Assert.True (table.TableData.ColumnCount > 0);
     }
 
     #endregion
@@ -660,7 +660,7 @@ public class MarkdownTableTests
             UseThemeBackground = true,
             Width = Dim.Fill (),
             Height = 5,
-            Data = new TableData (["A", "B"], [Alignment.Start, Alignment.Start], [["x", "y"]])
+            TableData = new TableData (["A", "B"], [Alignment.Start, Alignment.Start], [["x", "y"]])
         };
         table.SetScheme (new Scheme (new Attribute (Color.White, schemeBg)));
         window.Add (table);
