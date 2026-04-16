@@ -81,6 +81,30 @@ public class MarkdownCodeBlockTests
         Assert.Equal (3, codeBlock.Frame.Height);
     }
 
+    [Fact]
+    public void Height_Updates_On_Subsequent_CodeLines_Changes ()
+    {
+        // Copilot
+        MarkdownCodeBlock codeBlock = new ()
+        {
+            Width = 40,
+        };
+
+        View host = new () { Width = 40, Height = 10 };
+        host.Add (codeBlock);
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        codeBlock.CodeLines = ["a", "b", "c"];
+        host.Layout ();
+        Assert.Equal (3, codeBlock.Frame.Height);
+
+        codeBlock.CodeLines = ["a"];
+        host.Layout ();
+        Assert.Equal (1, codeBlock.Frame.Height);
+    }
+
     // --- Standalone syntax highlighting ---
     // Copilot
 

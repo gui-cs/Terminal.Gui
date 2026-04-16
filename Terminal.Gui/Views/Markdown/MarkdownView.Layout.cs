@@ -57,7 +57,7 @@ public partial class Markdown
                 {
                     SyntaxHighlighter = SyntaxHighlighter,
                     UseThemeBackground = UseThemeBackground,
-                    Data = tableData,
+                    TableData = tableData,
                     X = 0,
                     Y = startLine,
                     Width = Dim.Fill ()

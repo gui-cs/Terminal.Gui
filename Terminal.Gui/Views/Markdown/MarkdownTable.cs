@@ -21,7 +21,7 @@ namespace Terminal.Gui.Views;
 ///     </para>
 ///     <para>
 ///         This view can also be used standalone. Use the parameterless constructor and set
-///         <see cref="Data"/> to provide table content.
+///         <see cref="TableData"/> to provide table content.
 ///     </para>
 /// </remarks>
 public sealed class MarkdownTable : View, IDesignable
@@ -70,7 +70,7 @@ public sealed class MarkdownTable : View, IDesignable
 
     /// <summary>
     ///     Gets or sets the table content as a pipe-delimited Markdown table string.
-    ///     The setter parses the text via <see cref="TableData.TryParse"/> and updates <see cref="Data"/>.
+    ///     The setter parses the text via <see cref="TableData.TryParse"/> and updates <see cref="TableData"/>.
     ///     Invalid or empty text clears the table.
     /// </summary>
     public override string Text
@@ -113,14 +113,14 @@ public sealed class MarkdownTable : View, IDesignable
 
             if (string.IsNullOrWhiteSpace (value))
             {
-                Data = _emptyData;
+                TableData = _emptyData;
 
                 return;
             }
 
             string [] lines = value.Split ('\n', StringSplitOptions.RemoveEmptyEntries);
             TableData? parsed = TableData.TryParse (lines);
-            Data = parsed ?? _emptyData;
+            TableData = parsed ?? _emptyData;
         }
     }
 
@@ -128,7 +128,7 @@ public sealed class MarkdownTable : View, IDesignable
     ///     Gets or sets the <see cref="Views.TableData"/> that defines the table content. Setting this
     ///     recomputes column widths, row heights, and redraws the table.
     /// </summary>
-    public new TableData Data
+    public TableData TableData
     {
         get => _data;
         set

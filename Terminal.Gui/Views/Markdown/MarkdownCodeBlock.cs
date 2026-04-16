@@ -25,6 +25,8 @@ namespace Terminal.Gui.Views;
 public class MarkdownCodeBlock : View, IDesignable
 {
     private IReadOnlyList<IReadOnlyList<StyledSegment>> _lines = [];
+    private Dim? _heightAssignedByContent;
+    private Dim? _widthAssignedByContent;
 
     /// <summary>Initializes a new <see cref="MarkdownCodeBlock"/>.</summary>
     public MarkdownCodeBlock ()
@@ -137,14 +139,24 @@ public class MarkdownCodeBlock : View, IDesignable
         // Set explicit dimensions based on content.
         // We avoid SetContentSize because it sets ContentSizeTracksViewport = false,
         // which restricts Viewport width when Width = Dim.Fill() (embedded in MarkdownView).
-        if (Width is DimAuto)
+        if (Width is DimAuto || ReferenceEquals (Width, _widthAssignedByContent))
         {
             Width = maxWidth;
+            _widthAssignedByContent = Width;
+        }
+        else
+        {
+            _widthAssignedByContent = null;
         }
 
-        if (Height is DimAuto)
+        if (Height is DimAuto || ReferenceEquals (Height, _heightAssignedByContent))
         {
             Height = _lines.Count;
+            _heightAssignedByContent = Height;
+        }
+        else
+        {
+            _heightAssignedByContent = null;
         }
 
         SetNeedsLayout ();
