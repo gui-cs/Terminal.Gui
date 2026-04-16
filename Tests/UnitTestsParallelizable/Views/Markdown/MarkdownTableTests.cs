@@ -214,7 +214,9 @@ public class MarkdownTableTests
     [Fact]
     public void Invalid_Table_Lines_Rendered_As_Text ()
     {
-        // Copilot — Lines that look like table rows but have no valid separator
+        // Copilot — Lines that look like table rows but have no valid separator.
+        // With AST-based lowering, Markdig treats the input as a paragraph (not a table).
+        // The pipe characters render as plain text rather than as a MarkdownTable SubView.
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (30, 10);
@@ -227,8 +229,9 @@ public class MarkdownTableTests
         app.Begin (window);
         app.LayoutAndDraw ();
 
-        // All 3 lines should be treated as regular text (not a table)
-        Assert.True (mv.LineCount >= 3);
+        // Content renders as plain text (not swallowed) — at least 1 line expected.
+        // Markdig parses pipe-delimited lines without a valid separator as a paragraph.
+        Assert.True (mv.LineCount >= 1);
 
         window.Dispose ();
         app.Dispose ();

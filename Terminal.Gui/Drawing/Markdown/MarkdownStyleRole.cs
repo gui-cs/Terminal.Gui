@@ -50,5 +50,8 @@ public enum MarkdownStyleRole
     TaskDone,
 
     /// <summary>Incomplete task-list item (<c>[ ]</c>). Rendered bold.</summary>
-    TaskTodo
+    TaskTodo,
+
+    /// <summary>Strikethrough text (<c>~~text~~</c>). Rendered with strikethrough style.</summary>
+    Strikethrough
 }
