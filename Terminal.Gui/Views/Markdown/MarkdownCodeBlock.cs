@@ -25,6 +25,9 @@ namespace Terminal.Gui.Views;
 public class MarkdownCodeBlock : View, IDesignable
 {
     private IReadOnlyList<IReadOnlyList<StyledSegment>> _lines = [];
+
+    // Tracks the last Height/Width Dim instances assigned by UpdateContentSize () so
+    // content-driven resizing can continue until the user explicitly assigns dimensions.
     private Dim? _heightAssignedByContent;
     private Dim? _widthAssignedByContent;
 
