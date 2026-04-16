@@ -83,8 +83,6 @@ public class AnsiInputProcessor : InputProcessorImpl<char>
     {
         if (string.IsNullOrEmpty (_pendingPrintableSuppression))
         {
-            _pendingPrintableSuppression = key.GetPrintableText ();
-
             return false;
         }
 

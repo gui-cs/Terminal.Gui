@@ -251,6 +251,17 @@ public class KittyKeyboardPipelineTests
         Assert.Empty (up);
     }
 
+    // Copilot
+    [Fact]
+    public void Pipeline_RepeatedLegacyPrintableInput_DoesNotDropRepeatedCharacters ()
+    {
+        (List<Key> down, List<Key> up) = InjectRawSequence ("111222333444");
+
+        Assert.Equal (12, down.Count);
+        Assert.Equal ("111222333444", string.Concat (down.Select (key => key.GetPrintableText ())));
+        Assert.Empty (up);
+    }
+
     #endregion
 
     #region Standalone Modifier Key Events
