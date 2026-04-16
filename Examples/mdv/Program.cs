@@ -22,6 +22,10 @@ using Command = Terminal.Gui.Input.Command;
 
 // ReSharper disable AccessToDisposedClosure
 
+// Capture the terminal dimensions before any driver or output can change them
+int terminalWidth = Console.WindowWidth;
+int terminalHeight = Console.WindowHeight;
+
 Option<bool> printOption = new ("--print") { Description = "Print mode: renders markdown to the terminal and exits." };
 printOption.Aliases.Add ("-p");
 
@@ -41,7 +45,7 @@ RootCommand rootCommand = new ("mdv — A Terminal.Gui Markdown viewer") { print
 
 // Override --help to render the embedded README.md in print mode
 HelpOption helpOption = rootCommand.Options.OfType<HelpOption> ().First ();
-helpOption.Action = new MarkdownHelpAction (() => RenderMarkdown (ReadEmbeddedReadme (), ThemeName.DarkPlus));
+helpOption.Action = new MarkdownHelpAction (() => RenderMarkdown (ReadEmbeddedReadme (), ThemeName.DarkPlus, terminalWidth, terminalHeight));
 
 rootCommand.SetAction (parseResult =>
                        {
@@ -62,7 +66,7 @@ rootCommand.SetAction (parseResult =>
 
                            if (print)
                            {
-                               RenderMarkdown (string.Join ("\n\n---\n\n", files.Select (File.ReadAllText)), syntaxTheme);
+                               RenderMarkdown (string.Join ("\n\n---\n\n", files.Select (File.ReadAllText)), syntaxTheme, terminalWidth, terminalHeight);
                            }
                            else
                            {
@@ -70,7 +74,22 @@ rootCommand.SetAction (parseResult =>
                            }
                        });
 
-return rootCommand.Parse (args).Invoke ();
+System.CommandLine.ParseResult parsed = rootCommand.Parse (args);
+
+// If there are errors, show README first, then print diagnostics underneath.
+if (parsed.Errors.Count > 0)
+{
+    RenderMarkdown (ReadEmbeddedReadme (), ThemeName.DarkPlus, terminalWidth, terminalHeight);
+
+    foreach (System.CommandLine.Parsing.ParseError error in parsed.Errors)
+    {
+        Console.Error.WriteLine (error.Message);
+    }
+
+    return 1;
+}
+
+return parsed.Invoke ();
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -124,7 +143,7 @@ static string FormatFileSize (long bytes)
 // Print mode — render markdown content into the scrollback buffer, then exit
 // ---------------------------------------------------------------------------
 
-static void RenderMarkdown (string markdown, ThemeName syntaxTheme)
+static void RenderMarkdown (string markdown, ThemeName syntaxTheme, int width, int height)
 {
     // Prevent the ANSI driver from trying to read/write real terminal size or capabilities,
     // since we're just emitting ANSI and exiting immediately.
@@ -132,25 +151,27 @@ static void RenderMarkdown (string markdown, ThemeName syntaxTheme)
     IApplication app = Application.Create ();
     app.Init (DriverRegistry.Names.ANSI);
 
-    // Set the screen size to the current size
-    app.Driver?.SetScreenSize (Console.WindowWidth-1, Console.WindowHeight);
+    // Use the actual terminal width (no -1 fudge factor)
+    app.Driver?.SetScreenSize (width, height);
 
     Markdown markdownView = new ()
     {
         App = app,
         SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme),
         UseThemeBackground = true,
+        ShowCopyButtons = false,
         Width = Dim.Fill (),
         Height = Dim.Fill (),
         Text = markdown
     };
 
-    // Layout to get natural size
+    // Layout to get natural content height
     markdownView.SetRelativeLayout (app.Screen.Size);
     markdownView.Layout ();
 
-    // Set the screen size to the natural size of the formatted markdown
-    app.Driver?.SetScreenSize (markdownView.GetContentSize ().Width, markdownView.GetContentSize ().Height);
+    // Resize to the full content height but keep the terminal width
+    int contentHeight = markdownView.GetContentSize ().Height;
+    app.Driver?.SetScreenSize (width, contentHeight);
     markdownView.SetRelativeLayout (app.Screen.Size);
 
     markdownView.Frame = app.Screen with { X = 0, Y = 0 };

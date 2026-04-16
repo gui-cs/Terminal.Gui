@@ -55,6 +55,12 @@ public class MarkdownCodeBlock : View, IDesignable
     }
 
     /// <summary>
+    ///     Gets or sets whether the copy button is shown in the top-right corner.
+    ///     Defaults to <see langword="true"/>.
+    /// </summary>
+    public bool ShowCopyButton { get; set; } = true;
+
+    /// <summary>
     ///     Gets or sets an override background color from the syntax highlighting theme.
     ///     When set, the code block viewport uses this instead of <see cref="VisualRole.Code"/>.
     /// </summary>
@@ -217,6 +223,11 @@ public class MarkdownCodeBlock : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouse)
     {
+        if (!ShowCopyButton)
+        {
+            return false;
+        }
+
         if (!mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
         {
             return false;
@@ -292,10 +303,11 @@ public class MarkdownCodeBlock : View, IDesignable
         }
 
         // Draw the copy glyph in the top-right corner
-        if (Viewport.Width <= 0 || Viewport.Height <= 0)
+        if (!ShowCopyButton || Viewport.Width <= 0 || Viewport.Height <= 0)
         {
             return true;
         }
+
         SetAttribute (codeAttr);
         AddStr (Viewport.Width - 2, 0, Glyphs.Copy.ToString ());
 

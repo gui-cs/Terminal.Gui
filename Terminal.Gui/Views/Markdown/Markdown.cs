@@ -110,6 +110,12 @@ public partial class Markdown : View, IDesignable
     /// <value>A function that accepts an image source path and returns sixel bytes, or <see langword="null"/>.</value>
     public Func<string, byte []?>? ImageLoader { get; set; }
 
+    /// <summary>
+    ///     Gets or sets whether code blocks display a copy button in the top-right corner.
+    ///     Defaults to <see langword="true"/>.
+    /// </summary>
+    public bool ShowCopyButtons { get; set; } = true;
+
     /// <summary>Gets or sets whether sixel image rendering is enabled.</summary>
     /// <value><see langword="true"/> to attempt sixel rendering for images; otherwise <see langword="false"/>.</value>
     public bool EnableSixelImages { get; set; }

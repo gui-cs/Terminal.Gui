@@ -146,7 +146,8 @@ public partial class Markdown
                 X = 0,
                 Y = start,
                 Width = Dim.Fill (),
-                ThemeBackground = UseThemeBackground ? SyntaxHighlighter?.DefaultBackground : null
+                ThemeBackground = UseThemeBackground ? SyntaxHighlighter?.DefaultBackground : null,
+                ShowCopyButton = ShowCopyButtons
             };
 
             _codeBlockViews.Add (codeBlock);
