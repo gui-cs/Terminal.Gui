@@ -1027,6 +1027,28 @@ public class TextModelTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void DisplaySize_With_Negative_Start_Greater_Than_Minus_One_Returns_From_Beginning ()
+    {
+        List<Cell> cells = Cell.StringToCells ("hello");
+
+        (int size, int length) result = TextModel.DisplaySize (cells, -2, 5);
+
+        Assert.Equal (5, result.size);
+        Assert.Equal (5, result.length);
+    }
+
+        [Fact]
+    public void DisplaySize_With_Negative_End_Greater_Than_Minus_One_Returns_Until_Text_End ()
+    {
+        List<Cell> cells = Cell.StringToCells ("hello");
+
+        (int size, int length) result = TextModel.DisplaySize (cells, -2, -2);
+
+        Assert.Equal (5, result.size);
+        Assert.Equal (5, result.length);
+    }
+
+    [Fact]
     public void GetColFromX_ReturnsCorrectColumn ()
     {
         List<Cell> cells = Cell.StringToCells ("hello world");

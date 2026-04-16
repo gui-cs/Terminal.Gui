@@ -817,8 +817,8 @@ internal class TextModel
         var size = 0;
         var len = 0;
 
-        int tCount = end == -1 ? t.Count : end > t.Count ? t.Count : end;
-        int i = start == -1 ? 0 : start;
+        int tCount = end <= -1 ? t.Count : end > t.Count ? t.Count : end;
+        int i = start <= -1 ? 0 : start;
 
         for (; i < tCount; i++)
         {
