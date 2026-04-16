@@ -28,7 +28,7 @@ public class TextFormatterDemo : Scenario
 
         Label blockText = new ()
         {
-            SchemeName = "Runnable",
+            SchemeName = "Accent",
             X = 0,
             Y = 0,
 

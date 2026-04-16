@@ -86,7 +86,7 @@ public class ListViewWithSelection : Scenario
             Height = Dim.Fill (),
             Source = new ListWrapper<string> (_eventList)
         };
-        _eventListView.SchemeName = "Runnable";
+        _eventListView.SchemeName = "Accent";
         _appWindow.Add (_eventListView);
 
         _listView?.ValueChanged += (_, a) => LogEvent ($"ValueChanged: {a.OldValue} -> {a.NewValue}");

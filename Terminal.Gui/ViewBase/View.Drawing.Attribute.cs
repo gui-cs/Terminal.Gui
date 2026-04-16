@@ -48,7 +48,20 @@ public partial class View
         }
         else
         {
-            schemeAttribute = GetScheme ().GetAttributeForRole (role, App?.Driver?.DefaultAttribute);
+            Scheme scheme = GetScheme ();
+            Attribute? defaultAttr = App?.Driver?.DefaultAttribute;
+
+            // If this view uses the Accent scheme and its Normal still has Color.None (the sentinel),
+            // derive an opaque Accent scheme from Base at draw time.
+            if (SchemeName == SchemeManager.SchemesToSchemeName (Schemes.Accent)
+                && scheme.Normal.Foreground == Color.None
+                && scheme.Normal.Background == Color.None
+                && SchemeManager.TryGetScheme (SchemeManager.SchemesToSchemeName (Schemes.Base)!, out Scheme? baseScheme))
+            {
+                scheme = Scheme.DeriveAccent (baseScheme, defaultAttr);
+            }
+
+            schemeAttribute = scheme.GetAttributeForRole (role, defaultAttr);
         }
 
         if (OnGettingAttributeForRole (role, ref schemeAttribute))

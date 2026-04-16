@@ -23,9 +23,11 @@ public enum Schemes
     Dialog,
 
     /// <summary>
-    ///     The scheme used for views that support <see cref="IRunnable"/>.
+    ///     The accent scheme; a secondary/alternate scheme for visual distinction.
+    ///     Used for panels, event logs, secondary content areas, or any view that needs visual separation.
+    ///     Colors are algorithmically derived from <see cref="Base"/> at draw time with an opaque background.
     /// </summary>
-    Runnable,
+    Accent,
 
     /// <summary>
     ///     The scheme for showing errors.

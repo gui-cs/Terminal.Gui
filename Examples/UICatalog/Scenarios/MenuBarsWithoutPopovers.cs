@@ -24,7 +24,7 @@ public class MenuBarsWithoutPopovers : Scenario
             Id = "eventLog",
             X = Pos.AnchorEnd (),
             Height = Dim.Fill (),
-            SchemeName = "Runnable",
+            SchemeName = "Accent",
             BorderStyle = LineStyle.Double,
             Title = "E_vents",
             Arrangement = ViewArrangement.LeftResizable

@@ -280,7 +280,7 @@ public class Buttons : Scenario
             X = 2,
             Y = Pos.Bottom (osAlignment),
             Width = Dim.Width (computedFrame) - 2,
-            SchemeName = "Runnable",
+            SchemeName = "Accent",
             Text = "Click to Change th_is Button's Hotkey"
         };
 
@@ -296,7 +296,7 @@ public class Buttons : Scenario
             X = Pos.Left (absoluteFrame) + 1,
             Y = Pos.Bottom (osAlignment),
             Width = Dim.Width (absoluteFrame) - 2,
-            SchemeName = "Runnable",
+            SchemeName = "Accent",
             Text = " ~  s  gui.cs   main ↑10 = Сохранить"
         };
 

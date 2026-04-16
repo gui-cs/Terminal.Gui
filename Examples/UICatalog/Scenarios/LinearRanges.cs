@@ -268,7 +268,7 @@ public class LinearRanges : Scenario
             Y = Pos.Bottom (spacingOptions),
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            SchemeName = "Runnable",
+            SchemeName = "Accent",
             Source = new ListWrapper<string> (eventSource)
         };
         configView.Add (eventLog);
