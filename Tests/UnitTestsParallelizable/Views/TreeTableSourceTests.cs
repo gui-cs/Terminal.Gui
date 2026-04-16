@@ -108,7 +108,7 @@ public class TreeTableSourceTests : TestDriverBase
             X = 0,
             Y = 0
         };
-        tableView.SchemeName = "Runnable";
+        tableView.SchemeName = "Accent";
         tableView.Viewport = new Rectangle (0, 0, 40, 6);
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.ShowHorizontalHeaderOverline = false;

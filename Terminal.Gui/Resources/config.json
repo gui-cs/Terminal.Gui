@@ -47,7 +47,7 @@
       "TurboPascal 5": {
         "Schemes": [
           {
-            "Runnable": {
+            "Accent": {
               "Normal": {
                 "Foreground": "White",
                 "Background": "Blue"
@@ -120,7 +120,7 @@
       "Anders": {
         "Schemes": [
           {
-            "Runnable": {
+            "Accent": {
               "Normal": {
                 "Foreground": "WhiteSmoke",
                 "Background": "DimGray"
@@ -182,7 +182,7 @@
         "Button.DefaultShadow": "Opaque",
         "Schemes": [
           {
-            "Runnable": {
+            "Accent": {
               "Normal": {
                 "Foreground": "LightGray",
                 "Background": "None",
@@ -466,7 +466,7 @@
         "Button.DefaultShadow": "Opaque",
         "Schemes": [
           {
-            "Runnable": {
+            "Accent": {
               "Normal": {
                 "Foreground": "DimGray",
                 "Background": "None",
@@ -748,7 +748,7 @@
         "Menu.DefaultBorderStyle": "Single",
         "Schemes": [
           {
-            "Runnable": {
+            "Accent": {
               "Normal": {
                 "Foreground": "GreenPhosphor",
                 "Background": "None",
@@ -885,7 +885,7 @@
         "Menu.DefaultBorderStyle": "Single",
         "Schemes": [
           {
-            "Runnable": {
+            "Accent": {
               "Normal": {
                 "Foreground": "AmberPhosphor",
                 "Background": "None",
@@ -1159,7 +1159,7 @@
         "Glyphs.ShadowHorizontalEnd": "-",
         "Schemes": [
           {
-            "Runnable": {
+            "Accent": {
               "Normal": {
                 "Foreground": "White",
                 "Background": "Black"
