@@ -62,6 +62,7 @@ internal static class MarkdownAttributeHelper
                    MarkdownStyleRole.TaskDone => baseAttr with { Style = baseAttr.Style | TextStyle.Strikethrough },
                    MarkdownStyleRole.TaskTodo => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
                    MarkdownStyleRole.ListMarker => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
+                   MarkdownStyleRole.Strikethrough => baseAttr with { Style = baseAttr.Style | TextStyle.Strikethrough },
                    _ => baseAttr
                };
     }
