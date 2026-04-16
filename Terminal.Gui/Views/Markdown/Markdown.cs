@@ -52,11 +52,7 @@ public partial class Markdown : View, IDesignable
 
     /// <summary>Gets or sets the Markdown-formatted text displayed by this view.</summary>
     /// <value>The raw Markdown string. Setting this property triggers reparsing, re-layout, and a redraw.</value>
-    public override string Text
-    {
-        get => _markdown;
-        set => SetMarkdown (value);
-    }
+    public override string Text { get => _markdown; set => SetMarkdown (value); }
 
     /// <summary>Gets or sets the Markdig <see cref="Markdig.MarkdownPipeline"/> used for parsing.</summary>
     /// <value>
@@ -270,11 +266,12 @@ public partial class Markdown : View, IDesignable
         // After rebuilding for new content, reset scroll position to the top.
         // This must happen AFTER SetContentSize so the viewport clamp logic sees
         // the correct content height and doesn't re-adjust the position.
-        if (_scrollToTopPending)
+        if (!_scrollToTopPending)
         {
-            _scrollToTopPending = false;
-            Viewport = Viewport with { X = 0, Y = 0 };
+            return;
         }
+        _scrollToTopPending = false;
+        Viewport = Viewport with { X = 0, Y = 0 };
     }
 
     private void RemoveCodeBlockViews ()
@@ -373,18 +370,18 @@ public partial class Markdown : View, IDesignable
                                                           Console.WriteLine ("Hello, Terminal.Gui! 🌍");
                                                           var x = 42;
                                                           ```
-                                                          
+
                                                           ## Code Block (markdown)
-                                                          
+
                                                           ```md
                                                           # Heading 1
-                                                          
+
                                                           Text
-                                                          
+
                                                           ## Heading 2
-                                                          
+
                                                           Link:  [SyntaxHighlighting](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.SyntaxHighlighting.html).
-                                                          
+
                                                           - [x] Checked
                                                           - [ ] Not Checked
 
@@ -404,27 +401,27 @@ public partial class Markdown : View, IDesignable
                                                           | Emojis 🎉    | ✅ Whoa!      |
 
                                                           ### Table (centered column 2)
-                                                          
+
                                                           ## Table
-                                                          
+
                                                           | First         | Second |
                                                           |---------------|:------:|
                                                           | Row 1         | Czech: ✅ me out. I'm long. |
                                                           | Row 2 👋      | ✅ Shorter  |
-                                                          
+
                                                           ---
 
                                                           ## Block Quotes
-                                                          
+
                                                           > **Tip:** This is a block quote with *inline formatting*.
-                                                          
+
                                                           Here's a multi-line block quote with a link, code, and more:
-                                                          
+
                                                           > **Tip:** Block quotes can contain *inline formatting*, **bold text**,
                                                           > `inline code`, and [links](https://example.com).
                                                           >
                                                           > They can also span multiple lines with blank quote lines between paragraphs.
-                                                          
+
                                                           That's all folks! 👋
                                                           """;
 }

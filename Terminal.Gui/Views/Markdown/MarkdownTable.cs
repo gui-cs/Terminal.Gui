@@ -86,16 +86,16 @@ public sealed class MarkdownTable : View, IDesignable
             List<string> lines = [$"| {string.Join (" | ", _data.Headers)} |"];
 
             // Separator row
-            string [] seps = new string [_data.ColumnCount];
+            var seps = new string [_data.ColumnCount];
 
             for (var i = 0; i < _data.ColumnCount; i++)
             {
                 seps [i] = _data.ColumnAlignments [i] switch
-                {
-                    Alignment.Center => ":---:",
-                    Alignment.End => "---:",
-                    _ => "---"
-                };
+                           {
+                               Alignment.Center => ":---:",
+                               Alignment.End => "---:",
+                               _ => "---"
+                           };
             }
 
             lines.Add ($"| {string.Join (" | ", seps)} |");
@@ -801,8 +801,6 @@ public sealed class MarkdownTable : View, IDesignable
                | *Tables*     | ✅ For **sure!** | [tig](https://github.com/tig) |
                | `Code`       | ✅ `printf ("Awesome!");` | ??? |
                """;
-
-        //Width = 40;
 
         return true;
     }

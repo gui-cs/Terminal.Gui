@@ -2,7 +2,6 @@
 
 using System.Collections.ObjectModel;
 using System.Text.Json;
-using Terminal.Gui.Drawing;
 using TextMateSharp.Grammars;
 
 // ReSharper disable AccessToDisposedClosure
@@ -61,11 +60,7 @@ public class Deepdives : Scenario
 
         _markdownView = new Markdown
         {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-
-            SyntaxHighlighter = new TextMateSyntaxHighlighter (ThemeName.Abbys),
-            UseThemeBackground = true
+            Width = Dim.Fill (), Height = Dim.Fill (), SyntaxHighlighter = new TextMateSyntaxHighlighter (ThemeName.Abbys), UseThemeBackground = true
         };
 
         _markdownView.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
@@ -120,13 +115,7 @@ public class Deepdives : Scenario
 
         Shortcut contentWidthShortcut = new () { CommandView = _contentWidthUpDown, Text = "Content Width" };
 
-        DropDownList<ThemeName> themeDropDown = new ()
-        {
-            ReadOnly = true,
-            CanFocus = false,
-            Value = ThemeName.Abbys,
-            Autocomplete = null
-        };
+        DropDownList<ThemeName> themeDropDown = new () { ReadOnly = true, CanFocus = false, Value = ThemeName.Abbys, Autocomplete = null };
 
         themeDropDown.ValueChanged += (_, e) =>
                                       {
@@ -144,33 +133,24 @@ public class Deepdives : Scenario
                                           _markdownView.Text = text;
                                       };
 
-        Shortcut themeShortcut = new ()
-        {
-            Text = "_Theme:",
-            CommandView = themeDropDown,
-            MouseHighlightStates = MouseState.None
-        };
+        Shortcut themeShortcut = new () { Text = "_Theme:", CommandView = themeDropDown, MouseHighlightStates = MouseState.None };
 
-        CheckBox themeBgCheckBox = new ()
-        {
-            Text = "Theme _BG",
-            Value = CheckState.UnChecked
-        };
+        CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = CheckState.UnChecked };
 
         themeBgCheckBox.ValueChanged += (_, e) =>
-                                               {
-                                                   if (_markdownView is null)
-                                                   {
-                                                       return;
-                                                   }
+                                        {
+                                            if (_markdownView is null)
+                                            {
+                                                return;
+                                            }
 
-                                                   _markdownView.UseThemeBackground = e.NewValue == CheckState.Checked;
+                                            _markdownView.UseThemeBackground = e.NewValue == CheckState.Checked;
 
-                                                   // Force re-layout
-                                                   string text = _markdownView.Text;
-                                                   _markdownView.Text = string.Empty;
-                                                   _markdownView.Text = text;
-                                               };
+                                            // Force re-layout
+                                            string text = _markdownView.Text;
+                                            _markdownView.Text = string.Empty;
+                                            _markdownView.Text = text;
+                                        };
 
         Shortcut themeBgShortcut = new () { CommandView = themeBgCheckBox };
 
@@ -181,10 +161,7 @@ public class Deepdives : Scenario
                                        themeBgShortcut,
                                        _statusShortcut,
                                        spinnerShortcut
-                                   ])
-        {
-            AlignmentModes = AlignmentModes.IgnoreFirstOrLast
-        };
+                                   ]) { AlignmentModes = AlignmentModes.IgnoreFirstOrLast };
 
         window.Add (listFrame, _viewerFrame, statusBar);
 

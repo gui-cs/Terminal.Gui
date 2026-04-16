@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using Terminal.Gui.Views;
 using TextMateSharp.Grammars;
 using TextMateSharp.Registry;
 using TextMateSharp.Themes;
@@ -92,7 +91,7 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
         }
         catch (Exception ex) when (ex is DllNotFoundException or TypeInitializationException)
         {
-            // Native onigwrap library not available on this platform (e.g., win-arm64).
+            // Native "onigwrap" library not available on this platform (e.g., win-arm64).
             // Degrade gracefully to unstyled code blocks for the rest of this session.
             _nativeLibUnavailable = true;
 
@@ -137,8 +136,7 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     /// </summary>
     /// <param name="background">The terminal background color to evaluate.</param>
     /// <returns>A theme appropriate for the background luminance.</returns>
-    public static ThemeName GetThemeForBackground (Color background) =>
-        background.IsDarkColor () ? ThemeName.DarkPlus : ThemeName.LightPlus;
+    public static ThemeName GetThemeForBackground (Color background) => background.IsDarkColor () ? ThemeName.DarkPlus : ThemeName.LightPlus;
 
     /// <summary>Gets the <see cref="ThemeName"/> that is currently active.</summary>
     public ThemeName CurrentThemeName { get; private set; }
@@ -261,7 +259,7 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
         string? fgHex = theme.GetColor (rule.foreground);
         Color fg = !string.IsNullOrEmpty (fgHex) ? Color.Parse (fgHex) : _defaultForeground;
 
-        TextStyle style = TextStyle.None;
+        var style = TextStyle.None;
 
         // FontStyle.NotSet is -1 (all bits set) — guard against it
         if (rule.fontStyle < 0)

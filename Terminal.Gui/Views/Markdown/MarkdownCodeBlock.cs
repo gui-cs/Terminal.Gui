@@ -191,7 +191,7 @@ public class MarkdownCodeBlock : View, IDesignable
             // Find the closing fence
             int endIndex = allLines.Length;
 
-            for (var i = allLines.Length - 1; i >= 1; i--)
+            for (int i = allLines.Length - 1; i >= 1; i--)
             {
                 if (!allLines [i].TrimStart ().StartsWith ("```", StringComparison.Ordinal))
                 {
@@ -240,7 +240,7 @@ public class MarkdownCodeBlock : View, IDesignable
         return true;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnClearingViewport ()
     {
         if (base.OnClearingViewport ())
@@ -297,7 +297,7 @@ public class MarkdownCodeBlock : View, IDesignable
             return true;
         }
         SetAttribute (codeAttr);
-        AddStr (Viewport.Width - 1, 0, Glyphs.Copy.ToString ());
+        AddStr (Viewport.Width - 2, 0, Glyphs.Copy.ToString ());
 
         return true;
     }

@@ -383,7 +383,7 @@ public class TextMateSyntaxHighlighterTests
     public void SetTheme_Updates_CurrentThemeName ()
     {
         // Copilot
-        TextMateSyntaxHighlighter highlighter = new (ThemeName.DarkPlus);
+        TextMateSyntaxHighlighter highlighter = new ();
         Assert.Equal (ThemeName.DarkPlus, highlighter.CurrentThemeName);
 
         highlighter.SetTheme (ThemeName.SolarizedLight);

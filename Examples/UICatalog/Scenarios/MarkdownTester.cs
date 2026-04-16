@@ -1,4 +1,7 @@
 // ReSharper disable AccessToDisposedClosure
+
+using TextMateSharp.Grammars;
+
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("Markdown Tester", "Edit Markdown in a TextView and see it rendered in a MarkdownView.")]
@@ -11,13 +14,7 @@ public class MarkdownTester : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        Window window = new ()
-        {
-            Title = "Markdown Tester",
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            BorderStyle = LineStyle.None
-        };
+        Window window = new () { Title = "Markdown Tester", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
         // --- Source editor (top half) ---
         FrameView editorFrame = new ()
@@ -27,7 +24,7 @@ public class MarkdownTester : Scenario
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
-            Height = Dim.Percent (40),
+            Height = Dim.Percent (40)
         };
         editorFrame.Border.Thickness = new Thickness (0, 2, 0, 0);
 
@@ -69,28 +66,15 @@ public class MarkdownTester : Scenario
         previewFrame.Add (preview);
 
         // Update preview when editor text changes
-        editor.ContentsChanged += (_, _) =>
-                                  {
-                                      preview.Text = editor.Text;
-                                  };
+        editor.ContentsChanged += (_, _) => { preview.Text = editor.Text; };
 
         window.Add (editorFrame, previewFrame);
 
         StatusBar statusBar = new ();
 
-        Shortcut quitShortcut = new ()
-        {
-            Title = "Quit",
-            Key = Key.Esc,
-            Action = app.RequestStop
-        };
+        Shortcut quitShortcut = new () { Title = "Quit", Key = Key.Esc, Action = app.RequestStop };
 
-        DropDownList<TextMateSharp.Grammars.ThemeName> themeDropDown = new ()
-        {
-            Value = TextMateSharp.Grammars.ThemeName.DarkPlus,
-            ReadOnly = true,
-            CanFocus = false
-        };
+        DropDownList<ThemeName> themeDropDown = new () { Value = ThemeName.DarkPlus, ReadOnly = true, CanFocus = false };
 
         themeDropDown.ValueChanged += (_, e) =>
                                       {
@@ -102,28 +86,17 @@ public class MarkdownTester : Scenario
                                           }
                                       };
 
-        Shortcut themeShortcut = new ()
-        {
-            Title = "Theme",
-            CommandView = themeDropDown
-        };
+        Shortcut themeShortcut = new () { Title = "Theme", CommandView = themeDropDown };
 
-        CheckBox themeBgCheckBox = new ()
-        {
-            Text = "Theme _BG",
-            Value = CheckState.UnChecked
-        };
+        CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = CheckState.UnChecked };
 
         themeBgCheckBox.ValueChanged += (_, e) =>
-                                               {
-                                                   preview.UseThemeBackground = e.NewValue == CheckState.Checked;
-                                                   preview.Text = editor.Text;
-                                               };
+                                        {
+                                            preview.UseThemeBackground = e.NewValue == CheckState.Checked;
+                                            preview.Text = editor.Text;
+                                        };
 
-        Shortcut themeBgShortcut = new ()
-        {
-            CommandView = themeBgCheckBox
-        };
+        Shortcut themeBgShortcut = new () { CommandView = themeBgCheckBox };
 
         statusBar.Add (themeShortcut, themeBgShortcut, quitShortcut);
         window.Add (statusBar);

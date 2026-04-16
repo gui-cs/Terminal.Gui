@@ -133,12 +133,13 @@ static void RenderMarkdown (string markdown, ThemeName syntaxTheme)
     app.Init (DriverRegistry.Names.ANSI);
 
     // Set the screen size to the current size
-    app.Driver?.SetScreenSize (Console.WindowWidth, Console.WindowHeight);
+    app.Driver?.SetScreenSize (Console.WindowWidth-1, Console.WindowHeight);
 
     Markdown markdownView = new ()
     {
         App = app,
         SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme),
+        UseThemeBackground = true,
         Width = Dim.Fill (),
         Height = Dim.Fill (),
         Text = markdown
@@ -306,7 +307,8 @@ static void RunFullScreen (List<string> files, ThemeName syntaxTheme)
         List<string?> fileNames = [.. files.Select (Path.GetFileName)];
         ObservableCollection<string> fileNamesOc = new (fileNames!);
 
-        DropDownList fileSelector = new () { Source = new ListWrapper<string> (fileNamesOc), ReadOnly = true, Text = fileNames [0] ?? string.Empty, Width = 30 };
+        DropDownList fileSelector =
+            new () { Source = new ListWrapper<string> (fileNamesOc), ReadOnly = true, Text = fileNames [0] ?? string.Empty, Width = 30 };
 
         fileSelector.ValueChanged += (_, _) =>
                                      {

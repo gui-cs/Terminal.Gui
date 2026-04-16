@@ -50,10 +50,9 @@ internal static class MarkdownAttributeHelper
                    MarkdownStyleRole.HeadingMarker => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
                    MarkdownStyleRole.Emphasis => baseAttr with { Style = baseAttr.Style | TextStyle.Italic },
                    MarkdownStyleRole.Strong => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
-                   MarkdownStyleRole.InlineCode or MarkdownStyleRole.CodeBlock =>
-                       themeBackground is { } codeBg
-                           ? view.GetAttributeForRole (VisualRole.Code) with { Background = codeBg }
-                           : view.GetAttributeForRole (VisualRole.Code),
+                   MarkdownStyleRole.InlineCode or MarkdownStyleRole.CodeBlock => themeBackground is { } codeBg
+                                                                                      ? view.GetAttributeForRole (VisualRole.Code) with { Background = codeBg }
+                                                                                      : view.GetAttributeForRole (VisualRole.Code),
                    MarkdownStyleRole.Link => MakeLinkAttribute (baseAttr, segment),
                    MarkdownStyleRole.Quote => baseAttr with { Style = baseAttr.Style | TextStyle.Faint },
                    MarkdownStyleRole.Table => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },

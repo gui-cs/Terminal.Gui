@@ -2,7 +2,7 @@ namespace Terminal.Gui.Views;
 
 public partial class Markdown
 {
-    /// <inheritdoc />
+    /// <inheritdoc/>
     /// <remarks>
     ///     Draws all markdown content (backgrounds, text, styles) before SubViews are drawn.
     ///     This ensures copy <see cref="Button"/> SubViews render on top of code block backgrounds.
@@ -32,7 +32,7 @@ public partial class Markdown
         return false;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
         // All visible content was drawn in OnDrawingSubViews; just register the drawn region.
@@ -153,11 +153,7 @@ public partial class Markdown
     }
 
     private Attribute GetAttributeForSegment (StyledSegment segment) =>
-        MarkdownAttributeHelper.GetAttributeForSegment (
-            this,
-            segment,
-            SyntaxHighlighter,
-            UseThemeBackground ? SyntaxHighlighter?.DefaultBackground : null);
+        MarkdownAttributeHelper.GetAttributeForSegment (this, segment, SyntaxHighlighter, UseThemeBackground ? SyntaxHighlighter?.DefaultBackground : null);
 
     private void TryQueueSixel (string imageSource, Point screenPosition)
     {

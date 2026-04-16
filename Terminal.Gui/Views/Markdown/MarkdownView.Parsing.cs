@@ -11,7 +11,7 @@ namespace Terminal.Gui.Views;
 public partial class Markdown
 {
     private static readonly MarkdownPipeline _defaultPipeline = new MarkdownPipelineBuilder ().UseAdvancedExtensions ().Build ();
-    private static readonly Regex _htmlTagPattern = new Regex ("<[^>]+>", RegexOptions.Compiled);
+    private static readonly Regex _htmlTagPattern = new ("<[^>]+>", RegexOptions.Compiled);
 
     private Dictionary<string, int> _slugCounts = new (StringComparer.OrdinalIgnoreCase);
 
@@ -47,7 +47,7 @@ public partial class Markdown
                 continue;
             }
 
-            if (prevBlock is not null and not LinkReferenceDefinitionGroup)
+            if (prevBlock is { } and not LinkReferenceDefinitionGroup)
             {
                 int prevEndLine = GetBlockEndLine (prevBlock);
                 int thisStartLine = block.Line;
@@ -132,7 +132,7 @@ public partial class Markdown
 
         if (ShowHeadingPrefix)
         {
-            string hashes = new string ('#', heading.Level);
+            var hashes = new string ('#', heading.Level);
             runs.Insert (0, new InlineRun ($"{prefix}{hashes} ", MarkdownStyleRole.HeadingMarker));
         }
         else if (!string.IsNullOrEmpty (prefix))
@@ -182,7 +182,7 @@ public partial class Markdown
             string itemPrefix = prefix + marker;
             string itemCont = contPrefix + new string (' ', marker.Length);
 
-            bool isFirst = true;
+            var isFirst = true;
 
             foreach (Block child in listItem)
             {
@@ -224,7 +224,7 @@ public partial class Markdown
         List<string> headers = [];
         Alignment [] alignments = [];
         List<string []> rows = [];
-        bool headerParsed = false;
+        var headerParsed = false;
 
         foreach (Block tableRow in table)
         {
@@ -238,8 +238,8 @@ public partial class Markdown
             if (!headerParsed)
             {
                 headers.AddRange (cells);
-                alignments = table.ColumnDefinitions
-                                  .Take (headers.Count)
+
+                alignments = table.ColumnDefinitions.Take (headers.Count)
                                   .Select (col => col.Alignment switch
                                                   {
                                                       TableColumnAlign.Center => Alignment.Center,
@@ -276,7 +276,7 @@ public partial class Markdown
     {
         // Option A: reconstruct raw markdown-like text from the AST so MarkdownTable
         // can re-parse inline formatting with its existing MarkdownInlineParser path.
-        System.Text.StringBuilder sb = new ();
+        StringBuilder sb = new ();
 
         foreach (Block child in cell)
         {
@@ -289,9 +289,9 @@ public partial class Markdown
         return sb.ToString ().Trim ();
     }
 
-    private static void AppendInlineText (Inline? inline, System.Text.StringBuilder sb)
+    private static void AppendInlineText (Inline? inline, StringBuilder sb)
     {
-        while (inline is not null)
+        while (inline is { })
         {
             switch (inline)
             {
@@ -301,7 +301,7 @@ public partial class Markdown
                     break;
 
                 case EmphasisInline em:
-                    string delim = new string (em.DelimiterChar, em.DelimiterCount);
+                    var delim = new string (em.DelimiterChar, em.DelimiterCount);
                     sb.Append (delim);
                     AppendInlineText (em.FirstChild, sb);
                     sb.Append (delim);
@@ -315,7 +315,7 @@ public partial class Markdown
 
                     break;
 
-                case LinkInline link when link.IsImage:
+                case LinkInline { IsImage: true } link:
                     sb.Append ("![");
                     AppendInlineText (link.FirstChild, sb);
                     sb.Append ("](");
@@ -379,9 +379,9 @@ public partial class Markdown
     private void HandleUnknownBlock (Block block, string prefix, string contPrefix, MarkdownStyleRole defaultRole)
     {
         // For unrecognized block types: extract text from leaf blocks or recurse containers.
-        if (block is LeafBlock leaf && leaf.Lines.Count > 0)
+        if (block is LeafBlock { Lines.Count: > 0 } leaf)
         {
-            System.Text.StringBuilder sb = new ();
+            StringBuilder sb = new ();
 
             foreach (StringLine line in leaf.Lines)
             {
@@ -413,12 +413,12 @@ public partial class Markdown
     {
         List<InlineRun> runs = [];
 
-        while (inline is not null)
+        while (inline is { })
         {
             switch (inline)
             {
                 case LiteralInline lit:
-                    string litText = lit.Content.ToString ();
+                    var litText = lit.Content.ToString ();
 
                     if (!string.IsNullOrEmpty (litText))
                     {
@@ -428,11 +428,8 @@ public partial class Markdown
                     break;
 
                 case EmphasisInline em:
-                    MarkdownStyleRole emRole = em.DelimiterChar == '~' && em.DelimiterCount >= 2
-                                                  ? MarkdownStyleRole.Strikethrough
-                                                  : em.DelimiterCount >= 2
-                                                      ? MarkdownStyleRole.Strong
-                                                      : MarkdownStyleRole.Emphasis;
+                    MarkdownStyleRole emRole = em is { DelimiterChar: '~', DelimiterCount: >= 2 } ? MarkdownStyleRole.Strikethrough :
+                                               em.DelimiterCount >= 2 ? MarkdownStyleRole.Strong : MarkdownStyleRole.Emphasis;
                     runs.AddRange (WalkInlines (em.FirstChild, emRole));
 
                     break;
@@ -442,7 +439,7 @@ public partial class Markdown
 
                     break;
 
-                case LinkInline link when link.IsImage:
+                case LinkInline { IsImage: true } link:
                     List<InlineRun> altRuns = WalkInlines (link.FirstChild, MarkdownStyleRole.ImageAlt);
                     string altText = string.Concat (altRuns.Select (r => r.Text));
                     string fallback = MarkdownImageResolver.GetFallbackText (altText);
@@ -468,7 +465,7 @@ public partial class Markdown
                     break;
 
                 case HtmlEntityInline entity:
-                    string entityText = entity.Transcoded.ToString ();
+                    var entityText = entity.Transcoded.ToString ();
 
                     if (!string.IsNullOrEmpty (entityText))
                     {
@@ -521,19 +518,17 @@ public partial class Markdown
         }
     }
 
-    private static int GetBlockEndLine (Block block)
-    {
-        return block switch
-               {
-                   FencedCodeBlock fcb => fcb.Line + fcb.Lines.Count + 1, // opening fence + content + closing fence
-                   CodeBlock cb => cb.Line + Math.Max (cb.Lines.Count - 1, 0),
-                   QuoteBlock qb => qb.Count > 0 ? GetBlockEndLine (qb [qb.Count - 1]) : qb.Line,
-                   ListBlock lb => lb.Count > 0 ? GetBlockEndLine (lb [lb.Count - 1]) : lb.Line,
-                   ListItemBlock lib => lib.Count > 0 ? GetBlockEndLine (lib [lib.Count - 1]) : lib.Line,
-                   Table t => t.Count > 0 ? GetBlockEndLine (t [t.Count - 1]) : t.Line,
-                   _ => block.Line
-               };
-    }
+    private static int GetBlockEndLine (Block block) =>
+        block switch
+        {
+            FencedCodeBlock fcb => fcb.Line + fcb.Lines.Count + 1, // opening fence + content + closing fence
+            CodeBlock cb => cb.Line + Math.Max (cb.Lines.Count - 1, 0),
+            QuoteBlock qb => qb.Count > 0 ? GetBlockEndLine (qb [^1]) : qb.Line,
+            ListBlock lb => lb.Count > 0 ? GetBlockEndLine (lb [^1]) : lb.Line,
+            ListItemBlock lib => lib.Count > 0 ? GetBlockEndLine (lib [^1]) : lib.Line,
+            Table t => t.Count > 0 ? GetBlockEndLine (t [^1]) : t.Line,
+            _ => block.Line
+        };
 
     private void AddCodeBlockLines (IReadOnlyList<string> codeLines, string? language)
     {
@@ -558,7 +553,12 @@ public partial class Markdown
             {
                 IReadOnlyList<StyledSegment> highlighted = SyntaxHighlighter.Highlight (line, language);
                 List<InlineRun> converted = [];
-                converted.AddRange (highlighted.Select (segment => new InlineRun (segment.Text, segment.StyleRole, segment.Url, segment.ImageSource, segment.Attribute)));
+
+                converted.AddRange (highlighted.Select (segment => new InlineRun (segment.Text,
+                                                                                  segment.StyleRole,
+                                                                                  segment.Url,
+                                                                                  segment.ImageSource,
+                                                                                  segment.Attribute)));
 
                 runs = converted;
             }
