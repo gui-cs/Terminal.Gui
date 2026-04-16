@@ -1,5 +1,3 @@
-using TextMateSharp.Grammars;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>

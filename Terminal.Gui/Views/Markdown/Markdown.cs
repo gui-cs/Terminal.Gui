@@ -349,7 +349,7 @@ public partial class Markdown : View, IDesignable
 
     /// <summary>Gets a short but comprehensive Markdown sample covering common features.</summary>
     public static string DefaultMarkdownSample { get; } = """
-                                                          # Markdown Sample 🚀
+                                                          # Terminal.GuiMarkdown Sample 🚀
 
                                                           Rich text with **bold**, *italic*, `inline code`, and ~~strikethrough~~.
 
@@ -365,7 +365,6 @@ public partial class Markdown : View, IDesignable
 
                                                           - [x] Bold & italic ✅
                                                           - [x] Code blocks 🔧
-                                                          - [ ] Tables 📊
                                                           - [ ] Emojis 🎉
 
                                                           ## Code Block (csharp)
@@ -386,15 +385,13 @@ public partial class Markdown : View, IDesignable
                                                           
                                                           Link:  [SyntaxHighlighting](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.SyntaxHighlighting.html).
                                                           
-                                                          ### Heading 3
-                                                          
                                                           - [x] Checked
                                                           - [ ] Not Checked
 
-                                                          | Col1       | Col2        |
-                                                          |---------------|:-------------:|
-                                                          | A      | One   |
-                                                          | B        | Two  |
+                                                          | Col | Col2 |
+                                                          |-----|:----:|
+                                                          | A   | One  |
+                                                          | B   | Two  |
                                                           ```
 
                                                           ## Table
@@ -408,8 +405,17 @@ public partial class Markdown : View, IDesignable
 
                                                           ---
 
+                                                          ## Block Quotes
+                                                          
                                                           > **Tip:** This is a block quote with *inline formatting*.
-
+                                                          
+                                                          Here's a multi-line block quote with a link, code, and more:
+                                                          
+                                                          > **Tip:** Block quotes can contain *inline formatting*, **bold text**,
+                                                          > `inline code`, and [links](https://example.com).
+                                                          >
+                                                          > They can also span multiple lines with blank quote lines between paragraphs.
+                                                          
                                                           That's all folks! 👋
                                                           """;
 }

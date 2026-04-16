@@ -41,6 +41,16 @@ public sealed class Themes : Scenario
         themeOptionSelector.Border.Thickness = new Thickness (0, 1, 0, 0);
         themeOptionSelector.Margin.Thickness = new Thickness (0, 0, 1, 0);
 
+        AttributeViewer defaultAttributeView = new ()
+        {
+            Title = "Default Attribute",
+            BorderStyle = LineStyle.Rounded,
+            Y = Pos.Bottom (themeOptionSelector),
+            Width = Dim.Width (themeOptionSelector),
+            Height = Dim.Auto ()
+        };
+        defaultAttributeView.Border.Thickness = new Thickness (0, 1, 0, 0);
+
         themeOptionSelector.ValueChanged += (sender, args) =>
                                             {
                                                 if (sender is not OptionSelector optionSelector)
@@ -118,7 +128,7 @@ public sealed class Themes : Scenario
                                          viewPropertiesEditor.ViewToEdit = _view;
                                      };
 
-        appWindow.Add (themeOptionSelector, themeViewer, allViewsCheckBox, viewListView, viewPropertiesEditor, viewFrame);
+        appWindow.Add (themeOptionSelector, defaultAttributeView, themeViewer, allViewsCheckBox, viewListView, viewPropertiesEditor, viewFrame);
 
         viewListView.SelectedItem = 0;
 
@@ -250,10 +260,9 @@ public sealed class Themes : Scenario
         Type [] constraints = genericParam.GetGenericParameterConstraints ();
 
         // Find the most derived base class constraint (ignore interfaces)
-        Type? baseConstraint = constraints
-            .Where (c => c.IsClass)
-            .OrderByDescending (c => c.GetInterfaces ().Length) // rough heuristic for "most derived"
-            .FirstOrDefault ();
+        Type? baseConstraint = constraints.Where (c => c.IsClass)
+                                          .OrderByDescending (c => c.GetInterfaces ().Length) // rough heuristic for "most derived"
+                                          .FirstOrDefault ();
 
         if (baseConstraint != null)
         {
