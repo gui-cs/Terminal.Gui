@@ -3593,6 +3593,27 @@ public class TextViewTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void Mouse_Click_At_Position_GreaterThanZero_On_Empty_TextView_Should_Set_ViewportX_To_Zero ()
+    {
+        // Create a TextView with empty text
+        TextView tv = new () { Width = 5, Height = 1 };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Verify initial state
+        Assert.Equal (new Point (0, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (0, 0), tv.Viewport.Location);
+
+        // Simulate mouse click
+        Mouse ev = new () { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonClicked };
+        tv.NewMouseEvent (ev);
+
+        // Verify Viewport.X remains at zero
+        Assert.Equal (new Point (0, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (0, 0), tv.Viewport.Location);
+    }
+
+    [Fact]
     public void MoveEnd_AdjustsViewportToShowInsertionPoint_When_InsertionPointIsBeyondViewport ()
     {
         using IApplication app = Application.Create ().Init ();
