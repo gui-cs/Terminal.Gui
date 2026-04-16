@@ -1299,6 +1299,27 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal ("Hello World👨‍👩‍👧", tf.SelectedText);
     }
 
+    [Fact]
+    public void Mouse_Click_At_Position_GreaterThanZero_On_Empty_TextField_Should_Set_ScrollOffset_To_Zero ()
+    {
+        // Create a TextField with empty text
+        TextField tf = new () { Width = 5, Height = 1 };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Verify initial state
+        Assert.Equal (0, tf.InsertionPoint);
+        Assert.Equal (0, tf.ScrollOffset);
+
+        // Simulate mouse click
+        Mouse ev = new () { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonClicked };
+        tf.NewMouseEvent (ev);
+
+        // Verify ScrollOffset remains at zero
+        Assert.Equal (0, tf.InsertionPoint);
+        Assert.Equal (0, tf.ScrollOffset);
+    }
+
     // Claude - Opus 4.5
     [Fact]
     public void Text_Polymorphism_Works ()

@@ -22,7 +22,7 @@ public partial class TextField
         // Convert relative position to absolute and clamp to valid range
         if (ScrollOffset + pX > _text.Count || (SelectedLength > 0 && pX >= Math.Max (Viewport.Width - 1, 0)))
         {
-            ScrollOffset = colsWidth - Viewport.Width + 1;
+            ScrollOffset = Math.Max (colsWidth - Viewport.Width + 1, 0);
             InsertionPoint = _text.Count;
         }
         else if (ScrollOffset + pX == 0 || (SelectedLength > 0 && pX == 0))
