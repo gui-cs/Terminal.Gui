@@ -11,6 +11,7 @@ namespace Terminal.Gui.Views;
 public partial class Markdown
 {
     private static readonly MarkdownPipeline _defaultPipeline = new MarkdownPipelineBuilder ().UseAdvancedExtensions ().Build ();
+    private static readonly Regex _htmlTagPattern = new Regex ("<[^>]+>", RegexOptions.Compiled);
 
     private Dictionary<string, int> _slugCounts = new (StringComparer.OrdinalIgnoreCase);
 
@@ -364,7 +365,7 @@ public partial class Markdown
             }
 
             // Strip HTML tags for plain-text terminal rendering
-            string stripped = Regex.Replace (text, "<[^>]+>", string.Empty, RegexOptions.None).Trim ();
+            string stripped = _htmlTagPattern.Replace (text, string.Empty).Trim ();
 
             if (string.IsNullOrEmpty (stripped))
             {
