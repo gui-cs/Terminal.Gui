@@ -1174,4 +1174,100 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     #endregion
+
+    #region Viewport scroll position
+
+    // Copilot — regression test: viewport should start at top after setting Text with code blocks
+    [Fact]
+    public void Setting_Text_With_CodeBlocks_Viewport_Starts_At_Top ()
+    {
+        // Markdown with code blocks that triggers SubView creation during layout.
+        // The bug: MarkdownCodeBlock (CanFocus=true by default) would steal focus
+        // when Add()'d, causing the viewport to scroll to the last code block.
+        string mdWithCodeBlocks = """
+                                  # Header
+
+                                  Some text before.
+
+                                  ```csharp
+                                  var x = 1;
+                                  var y = 2;
+                                  ```
+
+                                  More text.
+
+                                  ```csharp
+                                  Console.WriteLine("hello");
+                                  ```
+
+                                  """ + string.Join ("\n\n", Enumerable.Range (1, 50).Select (i => $"Paragraph {i}."));
+
+        Terminal.Gui.Views.Markdown mv = new ()
+        {
+            Width = 40,
+            Height = 10,
+            Text = mdWithCodeBlocks
+        };
+
+        View host = new () { Width = 40, Height = 10 };
+        host.Add (mv);
+
+        host.BeginInit ();
+        host.EndInit ();
+        host.Layout ();
+
+        // Content should be taller than viewport
+        Assert.True (mv.GetContentSize ().Height > mv.Viewport.Height, "Content should exceed viewport height");
+
+        // Viewport should start at the top — not scrolled to the last code block
+        Assert.Equal (0, mv.Viewport.Y);
+
+        host.Dispose ();
+    }
+
+    // Copilot — regression: full lifecycle with code blocks should start at top
+    [Fact]
+    public void Full_Lifecycle_With_CodeBlocks_Viewport_Starts_At_Top ()
+    {
+        string mdWithCodeBlocks = """
+                                  # Title
+
+                                  Intro paragraph.
+
+                                  ```csharp
+                                  int a = 42;
+                                  ```
+
+                                  Middle text.
+
+                                  | Col1 | Col2 |
+                                  |------|------|
+                                  | A    | B    |
+
+                                  ```python
+                                  print("end")
+                                  ```
+
+                                  """ + string.Join ("\n\n", Enumerable.Range (1, 80).Select (i => $"Line {i} of filler."));
+
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        Terminal.Gui.Views.Markdown mv = new () { Width = Dim.Fill (), Height = Dim.Fill (), Text = mdWithCodeBlocks };
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Content should be taller than viewport
+        Assert.True (mv.GetContentSize ().Height > mv.Viewport.Height, "Content should exceed viewport height");
+
+        // Viewport should start at the top
+        Assert.Equal (0, mv.Viewport.Y);
+
+        window.Dispose ();
+    }
+
+    #endregion
 }

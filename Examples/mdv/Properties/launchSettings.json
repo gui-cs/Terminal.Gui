@@ -2,7 +2,7 @@
   "profiles": {
     "mdv": {
       "commandName": "Project",
-      "commandLineArgs": "-f ../../../README.md"
+      "commandLineArgs": "../../../../../docfx/docs/cursor.md"
     }
   }
 }

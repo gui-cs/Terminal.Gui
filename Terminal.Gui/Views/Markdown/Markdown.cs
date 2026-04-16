@@ -38,6 +38,7 @@ public partial class Markdown : View, IDesignable
     private int _maxLineWidth;
     private int _activeLinkIndex = -1;
     private bool _inLayout;
+    private bool _scrollToTopPending;
     private int _externalContentWidth;
 
     /// <summary>Initializes a new instance of the <see cref="Markdown"/> class.</summary>
@@ -200,6 +201,7 @@ public partial class Markdown : View, IDesignable
         }
 
         _markdown = value;
+        _scrollToTopPending = true;
         InvalidateParsedAndLayout ();
 
         OnMarkdownChanged ();
@@ -264,6 +266,15 @@ public partial class Markdown : View, IDesignable
         _inLayout = true;
         SetContentSize (new Size (contentWidth, _renderedLines.Count));
         _inLayout = false;
+
+        // After rebuilding for new content, reset scroll position to the top.
+        // This must happen AFTER SetContentSize so the viewport clamp logic sees
+        // the correct content height and doesn't re-adjust the position.
+        if (_scrollToTopPending)
+        {
+            _scrollToTopPending = false;
+            Viewport = Viewport with { X = 0, Y = 0 };
+        }
     }
 
     private void RemoveCodeBlockViews ()

@@ -116,12 +116,14 @@ public class Deepdives : Scenario
                                                  _markdownView.SetContentSize (currentContentSize with { Width = newWidth });
                                              };
 
-        Shortcut contentWidthShortcut = new () { CommandView = _contentWidthUpDown, HelpText = "Content Width" };
+        Shortcut contentWidthShortcut = new () { CommandView = _contentWidthUpDown, Text = "Content Width" };
 
         DropDownList<ThemeName> themeDropDown = new ()
         {
             ReadOnly = true,
-            Value = ThemeName.Abbys
+            CanFocus = false,
+            Value = ThemeName.Abbys,
+            Autocomplete = null
         };
 
         themeDropDown.ValueChanged += (_, e) =>
@@ -140,7 +142,12 @@ public class Deepdives : Scenario
                                           _markdownView.Text = text;
                                       };
 
-        Shortcut themeShortcut = new () { Title = "Theme", CommandView = themeDropDown };
+        Shortcut themeShortcut = new ()
+        {
+            Text = "_Theme:",
+            CommandView = themeDropDown,
+            MouseHighlightStates = MouseState.None
+        };
 
         CheckBox themeBgCheckBox = new ()
         {
@@ -172,7 +179,10 @@ public class Deepdives : Scenario
                                        themeBgShortcut,
                                        _statusShortcut,
                                        spinnerShortcut
-                                   ]) { AlignmentModes = AlignmentModes.IgnoreFirstOrLast };
+                                   ])
+        {
+            AlignmentModes = AlignmentModes.IgnoreFirstOrLast
+        };
 
         window.Add (listFrame, _viewerFrame, statusBar);
 

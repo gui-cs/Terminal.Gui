@@ -127,20 +127,31 @@ static int RunInline (List<string> files, ThemeName syntaxTheme)
 
     Runnable window = new () { Title = "TUI Markdown Viewer", Width = Dim.Fill (), Height = Dim.Auto () };
 
-    Markdown markdownView = new () { Width = Dim.Fill (), Height = Dim.Auto (), Text = markdown, SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme) };
+    Markdown markdownView = new () { Width = Dim.Fill (), Height = Dim.Auto (), SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme) };
+    markdownView.Text = markdown;
 
     // No scrollbar in inline mode — content should be fully visible
     markdownView.ViewportSettings &= ~ViewportSettingsFlags.HasVerticalScrollBar;
 
     window.Add (markdownView);
 
-    // Quit after the first render so the content stays in scrollback
-    window.Initialized += (_, _) => app.Invoke (window.RequestStop);
+    //// Quit after the first render so the content stays in scrollback
+    //window.Initialized += (_, _) =>
+    //                      {
+    //                          app.Invoke (window.RequestStop);
+    //                      };
 
-    app.Run (window);
+    app.StopAfterFirstIteration = true;
+
+    // Set the screen size to 1000 x number of lines in the markdown to ensure it all fits without wrapping
+    app.Driver?.SetScreenSize (1000, markdown.Split ('\n').Length);
+    app.Begin (window);
+
+    string formatted = app?.Driver?.ToAnsi ();
     window.Dispose ();
     app.Dispose ();
 
+    Console.WriteLine (formatted);
     return 0;
 }
 
@@ -240,7 +251,7 @@ static int RunFullScreen (List<string> files, ThemeName syntaxTheme)
     ];
 
     // Theme selector
-    DropDownList<ThemeName> themeDropDown = new () { Value = syntaxTheme };
+    DropDownList<ThemeName> themeDropDown = new () { Value = syntaxTheme, CanFocus = false };
 
     themeDropDown.ValueChanged += (_, e) =>
                                   {
@@ -304,16 +315,14 @@ static int RunFullScreen (List<string> files, ThemeName syntaxTheme)
 
     window.Add (markdownView, statusBar);
 
-    // Load the first file
-    LoadFile (files [0]);
-
-    // Sync content-width control after initial layout and scroll to top
+    //Load & Sync content-width control after initial layout
     window.Initialized += (_, _) =>
                           {
+                              // Load the first file
+                              LoadFile (files [0]);
                               updatingContentWidth = true;
                               contentWidthUpDown.Value = markdownView.Viewport.Width;
                               updatingContentWidth = false;
-                              markdownView.Viewport = markdownView.Viewport with { X = 0, Y = 0 };
                           };
 
     app.Run (window);
@@ -327,7 +336,6 @@ static int RunFullScreen (List<string> files, ThemeName syntaxTheme)
     {
         string content = File.ReadAllText (filePath);
         markdownView.Text = content;
-        markdownView.Viewport = markdownView.Viewport with { X = 0, Y = 0 };
 
         FileInfo fileInfo = new (filePath);
         fileSizeShortcut.Title = FormatFileSize (fileInfo.Length);

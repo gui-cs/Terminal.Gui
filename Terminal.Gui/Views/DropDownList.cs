@@ -188,7 +188,7 @@ public class DropDownList : TextField
         // Apply layered key bindings (base View layer + DropDownList-specific layer)
         ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
 
-        MouseBindings.Add (MouseFlags.LeftButtonClicked, Command.Activate);
+        MouseBindings.Add (MouseFlags.LeftButtonPressed, Command.Activate);
     }
 
     /// <inheritdoc/>

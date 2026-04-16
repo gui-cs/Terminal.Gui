@@ -29,6 +29,8 @@ public class MarkdownCodeBlock : View, IDesignable
     /// <summary>Initializes a new <see cref="MarkdownCodeBlock"/>.</summary>
     public MarkdownCodeBlock ()
     {
+        CanFocus = false;
+        TabStop = TabBehavior.NoStop;
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);
     }
