@@ -28,7 +28,7 @@ public class TextFormatterDemo : Scenario
 
         Label blockText = new ()
         {
-            SchemeName = "Accent",
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent),
             X = 0,
             Y = 0,
 

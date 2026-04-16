@@ -34,7 +34,7 @@ public class Bars : Scenario
             Id = "eventLog",
             X = Pos.AnchorEnd (),
             Height = Dim.Fill (),
-            SchemeName = "Accent",
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent),
             BorderStyle = LineStyle.Double,
             Title = "E_vents",
             Arrangement = ViewArrangement.LeftResizable

@@ -282,7 +282,7 @@ public class ComputedLayout : Scenario
             Y = Pos.Percent (50),
             Width = Dim.Percent (80),
             Height = Dim.Percent (10),
-            SchemeName = "Accent"
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent)
         };
 
         textView.Text =

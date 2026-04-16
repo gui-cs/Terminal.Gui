@@ -164,7 +164,7 @@ public class Navigation : Scenario
             X = 1,
             Y = 7,
             Id = "datePicker",
-            SchemeName = "Accent",
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent),
             ShadowStyle = ShadowStyles.Transparent,
             BorderStyle = LineStyle.Double,
             CanFocus = true, // Can't drag without this? BUGBUG
@@ -216,7 +216,7 @@ public class Navigation : Scenario
             Height = Dim.Auto (),
             Width = Dim.Auto (),
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
-            SchemeName = "Accent",
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent),
             Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyles.Transparent,
             BorderStyle = LineStyle.Double,

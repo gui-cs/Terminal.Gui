@@ -41,7 +41,7 @@ public class Shortcuts : Scenario
             X = Pos.AnchorEnd (),
             Y = 1,
             Height = Dim.Fill (4),
-            SchemeName = "Accent",
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent),
             BorderStyle = LineStyle.Double,
             Title = "E_vents"
         };

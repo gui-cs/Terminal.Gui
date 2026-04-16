@@ -32,7 +32,7 @@ public class PopoverMenus : Scenario
         _appWindow = new Window ();
         _appWindow.Title = GetQuitKeyAndName ();
         _appWindow.Arrangement = ViewArrangement.Fixed;
-        _appWindow.SchemeName = "Accent";
+        _appWindow.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
 
         // Changing the key-bindings of a View is not allowed, however,
         // by default, Window doesn't bind to Command.Context, so
@@ -68,7 +68,7 @@ public class PopoverMenus : Scenario
                 X = Pos.AnchorEnd (),
                 Y = 3,
                 Height = Dim.Fill (3),
-                SchemeName = "Accent",
+                SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent),
                 BorderStyle = LineStyle.Double,
                 Title = "E_vents",
                 Arrangement = ViewArrangement.LeftResizable

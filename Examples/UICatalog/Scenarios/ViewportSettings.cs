@@ -16,7 +16,7 @@ public class ViewportSettings : Scenario
 
         using Window mainWindow = new ();
         mainWindow.Title = GetQuitKeyAndName (); // Use a different colorscheme so ViewSettings.ClearContentOnly is obvious
-        mainWindow.SchemeName = "Accent";
+        mainWindow.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
         mainWindow.BorderStyle = LineStyle.None;
 
         AdornmentsEditor adornmentsEditor = new ()
