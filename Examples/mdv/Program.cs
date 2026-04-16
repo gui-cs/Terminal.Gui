@@ -9,17 +9,19 @@ using System.Drawing;
 using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Drawing;
+using Terminal.Gui.Drivers;
 using Terminal.Gui.Input;
+using Terminal.Gui.Time;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 using TextMateSharp.Grammars;
 // ReSharper disable AccessToDisposedClosure
 
-ConfigurationManager.RuntimeConfig = """
-                                     {
-                                         "Theme": "Anders"
-                                     }
-                                     """;
+//ConfigurationManager.RuntimeConfig = """
+//                                     {
+//                                         "Theme": "Anders"
+//                                     }
+//                                     """;
 ConfigurationManager.Enable (ConfigLocations.All);
 
 var fullScreen = false;
@@ -122,37 +124,48 @@ static int RunInline (List<string> files, ThemeName syntaxTheme)
 {
     string markdown = string.Join ("\n\n---\n\n", files.Select (File.ReadAllText));
 
-    Application.AppModel = AppModel.Inline;
-    IApplication app = Application.Create ().Init ();
+    // Prevent the ANSI driver from trying to read/write real terminal size or capabilities,
+    // since we're just emitting ANSI and exiting immediately.
+    Environment.SetEnvironmentVariable ("DisableRealDriverIO", "1");
+    IApplication app = Application.Create ();
+    app.Init (DriverRegistry.Names.ANSI);
 
-    Runnable window = new () { Title = "TUI Markdown Viewer", Width = Dim.Fill (), Height = Dim.Auto () };
+    // Set the screen size to the current size
+    app.Driver?.SetScreenSize (Console.WindowWidth, Console.WindowHeight);
 
-    Markdown markdownView = new () { Width = Dim.Fill (), Height = Dim.Auto (), SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme) };
-    markdownView.Text = markdown;
+    Markdown markdownView = new ()
+    {
+        App = app,
+        SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme),
+        Width = Dim.Fill (),
+        Height = Dim.Fill (),
+        Text = markdown
+    };
 
-    // No scrollbar in inline mode — content should be fully visible
-    markdownView.ViewportSettings &= ~ViewportSettingsFlags.HasVerticalScrollBar;
+    // Layout to get natural size
+    markdownView.SetRelativeLayout (app!.Screen.Size);
+    markdownView.Layout ();
 
-    window.Add (markdownView);
+    // Set the screen size to the natural size of the formatted markdown
+    app.Driver?.SetScreenSize (markdownView.GetContentSize ().Width, markdownView.GetContentSize ().Height);
+    markdownView.SetRelativeLayout (app!.Screen.Size);
 
-    //// Quit after the first render so the content stays in scrollback
-    //window.Initialized += (_, _) =>
-    //                      {
-    //                          app.Invoke (window.RequestStop);
-    //                      };
+    markdownView.Frame = app.Screen with { X = 0, Y = 0 };
+    markdownView.Layout ();
 
-    app.StopAfterFirstIteration = true;
+    // Ensure the contents are clear
+    app.Driver?.ClearContents ();
 
-    // Set the screen size to 1000 x number of lines in the markdown to ensure it all fits without wrapping
-    app.Driver?.SetScreenSize (1000, markdown.Split ('\n').Length);
-    app.Begin (window);
+    markdownView.Draw ();
+    Console.WriteLine (app.Driver?.ToAnsi ());
 
-    string formatted = app?.Driver?.ToAnsi ();
-    window.Dispose ();
-    app.Dispose ();
-
-    Console.WriteLine (formatted);
     return 0;
+}
+
+static IDriver? CreateDriver ()
+{
+    Environment.SetEnvironmentVariable ("DisableRealDriverIO", "1");
+    return Application.Create ().Init (DriverRegistry.Names.ANSI).Driver;
 }
 
 // ---------------------------------------------------------------------------

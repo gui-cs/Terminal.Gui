@@ -1,6 +1,4 @@
-# mdv
-
-A Terminal.Gui-based Markdown viewer for the terminal.
+# mdv - A Terminal.Gui-based Markdown viewer
 
 ## Usage
 

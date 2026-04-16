@@ -46,12 +46,7 @@ public class MarkdownCodeBlock : View, IDesignable
         {
             string body = string.Join ("\n", CodeLines);
 
-            if (!string.IsNullOrEmpty (Language))
-            {
-                return $"```{Language}\n{body}\n```";
-            }
-
-            return body;
+            return !string.IsNullOrEmpty (Language) ? $"```{Language}\n{body}\n```" : body;
         }
         set => ParseFencedText (value);
     }
@@ -239,11 +234,6 @@ public class MarkdownCodeBlock : View, IDesignable
         Attribute normal = GetAttributeForRole (VisualRole.Code);
         Color codeBg = ThemeBackground ?? normal.Background;
         Attribute codeAttr = new (normal.Foreground, codeBg);
-
-        // TODO: Move this to OnClearingViewport where it belongs.
-        // Fill entire area with code block background
-        SetAttribute (codeAttr);
-        FillRect (Viewport with { X = 0, Y = 0 }, (Rune)' ');
 
         for (var y = 0; y < _lines.Count && y < Viewport.Height; y++)
         {
