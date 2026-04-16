@@ -328,7 +328,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                 result = focus with
                 {
                     Foreground = ResolveNone (focus.Foreground, defaultTerminalColors, true).GetBrighterColor (0.2, isDark),
-                    Background = focusBg.GetDimmerColor (0.2, isDark),
+                    Background = focusBg.GetDimmerColor (0.2, !isDark),
                     Style = focus.Style | TextStyle.Bold
                 };
 

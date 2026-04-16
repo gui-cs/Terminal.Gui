@@ -152,11 +152,19 @@ public class DropDownList : TextField
         // Create popover
         _listPopover = new Popover<ListView, string?> (listView) { Anchor = GetAnchor };
 
-        // Ensure the background of the listview is not None, so it stands out
-        Scheme scheme = GetScheme () with { Normal = GetScheme ().Normal with { Background = GetScheme ().Focus.Foreground } };
+        // This ensures the Normal attribute is always that of the host
+        _listPopover.GettingAttributeForRole += (sender, args) =>
+                                                {
+                                                    if (sender is not View view || args.Role != VisualRole.Normal)
+                                                    {
+                                                        return;
+                                                    }
 
-        // Use the TextField's scheme for the ListView to ensure consistent styling
-        _listPopover.ContentView?.SetScheme (scheme);
+                                                    Attribute? res = App?.TopRunnableView?.MostFocused?.GetAttributeForRole (VisualRole.Normal);
+                                                    args.Handled = true;
+
+                                                    args.Result = res;
+                                                };
 
 #if DEBUG
         _listPopover.Id = "dropDownListPopover";
@@ -296,18 +304,18 @@ public class DropDownList : TextField
             case VisualRole.ReadOnly when ReadOnly:
 
             case VisualRole.Active when ReadOnly:
-            {
-                currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+                {
+                    currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
 
-                return true;
-            }
+                    return true;
+                }
 
             case VisualRole.Editable when ReadOnly:
-            {
-                currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
+                {
+                    currentAttribute = GetAttributeForRole (HasFocus ? VisualRole.Focus : VisualRole.Normal);
 
-                break;
-            }
+                    break;
+                }
         }
 
         return false;

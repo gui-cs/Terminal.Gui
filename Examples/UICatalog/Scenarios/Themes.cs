@@ -23,7 +23,7 @@ public sealed class Themes : Scenario
         _app = app;
 
         // Setup - Create a top-level application window and configure it.
-        using Window appWindow = new ();
+        using Runnable appWindow = new ();
         appWindow.Title = GetQuitKeyAndName ();
         appWindow.BorderStyle = LineStyle.None;
 

@@ -84,7 +84,28 @@ public class MarkdownTester : Scenario
             Action = app.RequestStop
         };
 
-        statusBar.Add (quitShortcut);
+        DropDownList<TextMateSharp.Grammars.ThemeName> themeDropDown = new ()
+        {
+            Value = TextMateSharp.Grammars.ThemeName.DarkPlus
+        };
+
+        themeDropDown.ValueChanged += (_, e) =>
+                                      {
+                                          if (e.Value is { } themeName)
+                                          {
+                                              TextMateSyntaxHighlighter highlighter = new (themeName);
+                                              preview.SyntaxHighlighter = highlighter;
+                                              preview.Text = editor.Text;
+                                          }
+                                      };
+
+        Shortcut themeShortcut = new ()
+        {
+            Title = "Theme",
+            CommandView = themeDropDown
+        };
+
+        statusBar.Add (themeShortcut, quitShortcut);
         window.Add (statusBar);
 
         app.Run (window);
