@@ -397,12 +397,21 @@ public partial class Markdown : View, IDesignable
                                                           ## Table
 
                                                           | Feature       | Status        |
-                                                          |---------------|:-------------:|
+                                                          |---------------|---------------|
                                                           | Markdown      | ✅ Totally!   |
                                                           | Tables        | ✅ For sure!  |
                                                           | Code blocks   | ✅ Awesome!   |
                                                           | Emojis 🎉    | ✅ Whoa!      |
 
+                                                          ### Table (centered column 2)
+                                                          
+                                                          ## Table
+                                                          
+                                                          | First         | Second |
+                                                          |---------------|:------:|
+                                                          | Row 1         | Czech: ✅ me out. I'm long. |
+                                                          | Row 2 👋      | ✅ Shorter  |
+                                                          
                                                           ---
 
                                                           ## Block Quotes

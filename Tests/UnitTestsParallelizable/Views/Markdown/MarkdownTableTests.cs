@@ -1,3 +1,4 @@
+using System.Text;
 using JetBrains.Annotations;
 
 namespace ViewsTests.Markdown;
@@ -713,4 +714,145 @@ public class MarkdownTableTests
     }
 
     #endregion
+
+    [Fact]
+    public void Wide_Glyph_In_Column_Does_Not_Shift_Next_Column ()
+    {
+        // Copilot
+        // Regression: a wide glyph (emoji) in column 0 caused misalignment in column 1.
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (50, 12);
+        app.Driver.Force16Colors = true;
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+
+        // Left-aligned columns, same column 1 text in both rows.
+        string tableText = "| Feature | Status |\n|---------|--------|\n| Code blocks | ✅ Yes |\n| Emojis 🎉 | ✅ Yes |";
+        Terminal.Gui.Views.Markdown mv = new () { Text = tableText, Width = Dim.Fill (), Height = Dim.Fill () };
+        mv.SchemeName = null;
+        mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        Cell [,]? contents = app.Driver.Contents;
+        Assert.NotNull (contents);
+
+        // Check buffer directly: column 1 content must be identical for both rows
+        int separatorCol = -1;
+
+        for (var c = 0; c < app.Driver.Cols; c++)
+        {
+            if (contents! [0, c].Grapheme == "┬")
+            {
+                separatorCol = c;
+
+                break;
+            }
+        }
+
+        int col1ContentStart = separatorCol + 1;
+        int firstContentCol3 = FindFirstNonSpace (contents!, 3, col1ContentStart, app.Driver.Cols);
+        int firstContentCol4 = FindFirstNonSpace (contents!, 4, col1ContentStart, app.Driver.Cols);
+
+        // Buffer cells must match
+        Assert.Equal (firstContentCol3, firstContentCol4);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    private static int FindFirstNonSpace (Cell [,] contents, int row, int startCol, int maxCol)
+    {
+        for (int c = startCol; c < maxCol; c++)
+        {
+            string g = contents [row, c].Grapheme;
+
+            if (g != " " && g != "\0" && g != "│")
+            {
+                return c;
+            }
+        }
+
+        return -1;
+    }
+
+    [Fact]
+    public void Wide_Glyph_Center_Aligned_Does_Not_Shift_Next_Column ()
+    {
+        // Copilot
+        // Regression: a wide glyph (emoji) in column 0 with center alignment caused misalignment.
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (50, 12);
+        app.Driver.Force16Colors = true;
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+
+        // Center-aligned columns with different content widths
+        string tableText = "| Feature | Status |\n|:-------:|:------:|\n| Code blocks | ✅ Yes |\n| Emojis 🎉 | ✅ Yes |";
+        Terminal.Gui.Views.Markdown mv = new () { Text = tableText, Width = Dim.Fill (), Height = Dim.Fill () };
+        mv.SchemeName = null;
+        mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        Cell [,]? contents = app.Driver.Contents;
+        Assert.NotNull (contents);
+
+        // Build display strings for rows 3 and 4
+        StringBuilder dump = new ();
+
+        for (var row = 0; row < 8; row++)
+        {
+            dump.Append ($"Row {row}: [");
+
+            for (var col = 0; col < 30; col++)
+            {
+                string g = contents! [row, col].Grapheme ?? " ";
+                int gw = g.GetColumns ();
+                dump.Append (g);
+
+                if (gw > 1 && col + 1 < 30)
+                {
+                    col++;
+                }
+            }
+
+            dump.AppendLine ("]");
+        }
+
+        // Find separator column
+        int separatorCol = -1;
+
+        for (var c = 0; c < app.Driver.Cols; c++)
+        {
+            if (contents! [0, c].Grapheme == "┬")
+            {
+                separatorCol = c;
+
+                break;
+            }
+        }
+
+        int col1ContentStart = separatorCol + 1;
+
+        // For center-aligned columns, ✅ should start at the same display column in both rows
+        // because the column 1 text is the same in both rows
+        int firstContentCol3 = FindFirstNonSpace (contents!, 3, col1ContentStart, app.Driver.Cols);
+        int firstContentCol4 = FindFirstNonSpace (contents!, 4, col1ContentStart, app.Driver.Cols);
+
+        Assert.True (
+            firstContentCol3 == firstContentCol4,
+            $"Column 1 content misaligned: row3 starts at {firstContentCol3}, row4 starts at {firstContentCol4}\n{dump}");
+
+        window.Dispose ();
+        app.Dispose ();
+    }
 }

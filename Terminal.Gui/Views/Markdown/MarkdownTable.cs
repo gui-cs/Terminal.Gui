@@ -795,14 +795,14 @@ public sealed class MarkdownTable : View, IDesignable
         SyntaxHighlighter = new TextMateSyntaxHighlighter ();
 
         Text = """
-               | Feature | Status |
-               |---------|:------:|
-               | **Markdown** | ✅ Totally! |
-               | *Tables* | ✅ For sure! |
-               | `Code` | ✅ `printf ("Awesome!");` |
+               | Feature | *Status (centered)* | **Owner** |
+               |---------|:-----------------:|-------|
+               | **Markdown** | ✅ Totally! | @tig |
+               | *Tables*     | ✅ For **sure!** | [tig](https://github.com/tig) |
+               | `Code`       | ✅ `printf ("Awesome!");` | ??? |
                """;
 
-        Width = 40;
+        //Width = 40;
 
         return true;
     }
