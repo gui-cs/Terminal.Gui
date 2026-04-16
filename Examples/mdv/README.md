@@ -21,6 +21,7 @@ Wildcards are supported: `mdv *.md`, `mdv docs/*.md`.
 |--------|-------|-------------|
 | `--print` | `-p` | Print mode: renders to terminal and exits |
 | `--theme <ThemeName>` | `-t` | Syntax-highlighting theme (default: `DarkPlus`) |
+| `--help` | `-h`, `-?` | Renders this README as formatted markdown |
 
 ### Examples
 

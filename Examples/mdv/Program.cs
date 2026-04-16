@@ -6,16 +6,20 @@
 
 using System.Collections.ObjectModel;
 using System.CommandLine;
+using System.CommandLine.Help;
+using System.CommandLine.Invocation;
 using System.Drawing;
+using System.Reflection;
 using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
 using Terminal.Gui.Drawing;
 using Terminal.Gui.Drivers;
 using Terminal.Gui.Input;
-using Terminal.Gui.Time;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 using TextMateSharp.Grammars;
+using Command = Terminal.Gui.Input.Command;
+
 // ReSharper disable AccessToDisposedClosure
 
 Option<bool> printOption = new ("--print") { Description = "Print mode: renders markdown to the terminal and exits." };
@@ -30,16 +34,14 @@ themeOption.Aliases.Add ("-t");
 
 Argument<string []> filesArgument = new ("files")
 {
-    Description = "One or more markdown file paths (glob patterns supported).",
-    Arity = ArgumentArity.OneOrMore
+    Description = "One or more markdown file paths (glob patterns supported).", Arity = ArgumentArity.OneOrMore
 };
 
-RootCommand rootCommand = new ("mdv — A Terminal.Gui Markdown viewer")
-{
-    printOption,
-    themeOption,
-    filesArgument
-};
+RootCommand rootCommand = new ("mdv — A Terminal.Gui Markdown viewer") { printOption, themeOption, filesArgument };
+
+// Override --help to render the embedded README.md in print mode
+HelpOption helpOption = rootCommand.Options.OfType<HelpOption> ().First ();
+helpOption.Action = new MarkdownHelpAction (() => RenderMarkdown (ReadEmbeddedReadme (), ThemeName.DarkPlus));
 
 rootCommand.SetAction (parseResult =>
                        {
@@ -60,7 +62,7 @@ rootCommand.SetAction (parseResult =>
 
                            if (print)
                            {
-                               RunInline (files, syntaxTheme);
+                               RenderMarkdown (string.Join ("\n\n---\n\n", files.Select (File.ReadAllText)), syntaxTheme);
                            }
                            else
                            {
@@ -119,13 +121,11 @@ static string FormatFileSize (long bytes)
 }
 
 // ---------------------------------------------------------------------------
-// Print mode — render markdown into the scrollback buffer, then exit
+// Print mode — render markdown content into the scrollback buffer, then exit
 // ---------------------------------------------------------------------------
 
-static void RunInline (List<string> files, ThemeName syntaxTheme)
+static void RenderMarkdown (string markdown, ThemeName syntaxTheme)
 {
-    string markdown = string.Join ("\n\n---\n\n", files.Select (File.ReadAllText));
-
     // Prevent the ANSI driver from trying to read/write real terminal size or capabilities,
     // since we're just emitting ANSI and exiting immediately.
     Environment.SetEnvironmentVariable ("DisableRealDriverIO", "1");
@@ -145,12 +145,12 @@ static void RunInline (List<string> files, ThemeName syntaxTheme)
     };
 
     // Layout to get natural size
-    markdownView.SetRelativeLayout (app!.Screen.Size);
+    markdownView.SetRelativeLayout (app.Screen.Size);
     markdownView.Layout ();
 
     // Set the screen size to the natural size of the formatted markdown
     app.Driver?.SetScreenSize (markdownView.GetContentSize ().Width, markdownView.GetContentSize ().Height);
-    markdownView.SetRelativeLayout (app!.Screen.Size);
+    markdownView.SetRelativeLayout (app.Screen.Size);
 
     markdownView.Frame = app.Screen with { X = 0, Y = 0 };
     markdownView.Layout ();
@@ -162,10 +162,15 @@ static void RunInline (List<string> files, ThemeName syntaxTheme)
     Console.WriteLine (app.Driver?.ToAnsi ());
 }
 
-static IDriver? CreateDriver ()
+static string ReadEmbeddedReadme ()
 {
-    Environment.SetEnvironmentVariable ("DisableRealDriverIO", "1");
-    return Application.Create ().Init (DriverRegistry.Names.ANSI).Driver;
+    var assembly = Assembly.GetExecutingAssembly ();
+    string resourceName = assembly.GetManifestResourceNames ().First (n => n.EndsWith ("README.md", StringComparison.Ordinal));
+
+    using Stream stream = assembly.GetManifestResourceStream (resourceName)!;
+    using StreamReader reader = new (stream);
+
+    return reader.ReadToEnd ();
 }
 
 // ---------------------------------------------------------------------------
@@ -257,11 +262,7 @@ static void RunFullScreen (List<string> files, ThemeName syntaxTheme)
     // Build the StatusBar
     // -----------------------------------------------------------------------
 
-    List<Shortcut> statusItems =
-    [
-        new (Application.GetDefaultKey (Terminal.Gui.Input.Command.Quit), "Quit", window.RequestStop),
-        contentWidthShortcut
-    ];
+    List<Shortcut> statusItems = [new (Application.GetDefaultKey (Command.Quit), "Quit", window.RequestStop), contentWidthShortcut];
 
     // Theme selector
     DropDownList<ThemeName> themeDropDown = new () { Value = syntaxTheme, CanFocus = false };
@@ -287,13 +288,13 @@ static void RunFullScreen (List<string> files, ThemeName syntaxTheme)
     CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = CheckState.Checked };
 
     themeBgCheckBox.ValueChanged += (_, e) =>
-                                           {
-                                               markdownView.UseThemeBackground = e.NewValue == CheckState.Checked;
+                                    {
+                                        markdownView.UseThemeBackground = e.NewValue == CheckState.Checked;
 
-                                               string text = markdownView.Text;
-                                               markdownView.Text = string.Empty;
-                                               markdownView.Text = text;
-                                           };
+                                        string text = markdownView.Text;
+                                        markdownView.Text = string.Empty;
+                                        markdownView.Text = text;
+                                    };
 
     statusItems.Add (new Shortcut { CommandView = themeBgCheckBox });
 
@@ -302,7 +303,7 @@ static void RunFullScreen (List<string> files, ThemeName syntaxTheme)
     // File selector when multiple files are provided
     if (files.Count > 1)
     {
-        List<string> fileNames = [.. files.Select (f => Path.GetFileName (f))];
+        List<string> fileNames = [.. files.Select (Path.GetFileName)!];
         ObservableCollection<string> fileNamesOc = new (fileNames);
 
         DropDownList fileSelector = new () { Source = new ListWrapper<string> (fileNamesOc), ReadOnly = true, Text = fileNames [0], Width = 30 };
@@ -352,5 +353,19 @@ static void RunFullScreen (List<string> files, ThemeName syntaxTheme)
         FileInfo fileInfo = new (filePath);
         fileSizeShortcut.Title = FormatFileSize (fileInfo.Length);
         statusShortcut.Title = Path.GetFileName (filePath);
+    }
+}
+
+// ---------------------------------------------------------------------------
+// Custom help action — renders the embedded README.md via the print pipeline
+// ---------------------------------------------------------------------------
+
+internal sealed class MarkdownHelpAction (Action renderHelp) : SynchronousCommandLineAction
+{
+    public override int Invoke (ParseResult parseResult)
+    {
+        renderHelp ();
+
+        return 0;
     }
 }
