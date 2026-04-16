@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Reflection;
 using JetBrains.Annotations;
 using UnitTests;
 
@@ -588,7 +590,11 @@ public class MarkdownViewTests (ITestOutputHelper output)
         app.Driver!.SetScreenSize (40, 3);
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
-        Terminal.Gui.Views.Markdown mv = new () { Text = "# Overview\n\nFirst\n\n# Overview\n\nSecond\n\n# Overview\n\nThird", Width = Dim.Fill (), Height = Dim.Fill () };
+
+        Terminal.Gui.Views.Markdown mv = new ()
+        {
+            Text = "# Overview\n\nFirst\n\n# Overview\n\nSecond\n\n# Overview\n\nThird", Width = Dim.Fill (), Height = Dim.Fill ()
+        };
         window.Add (mv);
 
         app.Begin (window);
@@ -654,7 +660,10 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        Terminal.Gui.Views.Markdown mv = new () { Text = "Text\n\n```\nline1\nline2\n```\n\nMore text\n\n```\nA\n```", Width = Dim.Fill (), Height = Dim.Fill () };
+        Terminal.Gui.Views.Markdown mv = new ()
+        {
+            Text = "Text\n\n```\nline1\nline2\n```\n\nMore text\n\n```\nA\n```", Width = Dim.Fill (), Height = Dim.Fill ()
+        };
         window.Add (mv);
 
         app.Begin (window);
@@ -702,6 +711,70 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     #endregion
+
+    [Fact]
+    public void ShowCopyButtons_False_Hides_Glyph_On_Code_Block ()
+    {
+        // Copilot
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (20, 5);
+        app.Driver.Force16Colors = true;
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+
+        Terminal.Gui.Views.Markdown mv = new () { Text = "```\ncode\n```", ShowCopyButtons = false, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        mv.SchemeName = null;
+        mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // The copy glyph should NOT appear when ShowCopyButtons is false
+        var screenContents = app.Driver.ToString ();
+        Assert.NotNull (screenContents);
+        Assert.DoesNotContain ("\u29C9", screenContents);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void ShowCopyButtons_False_Prevents_Copy_On_Click ()
+    {
+        // Copilot
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (30, 5);
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        Terminal.Gui.Views.Markdown mv = new () { Text = "```\nhello world\n```", ShowCopyButtons = false, Width = Dim.Fill (), Height = Dim.Fill () };
+
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Set clipboard to sentinel
+        app.Clipboard!.TrySetClipboardData ("SENTINEL");
+
+        // Find the code block SubView and click its copy button position
+        MarkdownCodeBlock? codeBlock = mv.SubViews.OfType<MarkdownCodeBlock> ().FirstOrDefault ();
+        Assert.NotNull (codeBlock);
+
+        int copyX = codeBlock.Viewport.Width - 2;
+        codeBlock.NewMouseEvent (new Mouse { Position = new Point (copyX, 0), Flags = MouseFlags.LeftButtonClicked });
+
+        app.Clipboard.TryGetClipboardData (out string clipboardText);
+        Assert.Equal ("SENTINEL", clipboardText);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
 
     // Copilot
     [Fact]
@@ -845,7 +918,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     {
         // When ShowHeadingPrefix is true (default), the heading should include "# "
         Terminal.Gui.Views.Markdown mv = new () { Text = "# Hello", Width = 20, Height = 1 };
-        mv.Layout (new (20, 1));
+        mv.Layout (new Size (20, 1));
 
         Assert.True (mv.LineCount > 0);
 
@@ -859,7 +932,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     public void ShowHeadingPrefix_False_Strips_Hash ()
     {
         Terminal.Gui.Views.Markdown mv = new () { Text = "# Hello", Width = 20, Height = 1, ShowHeadingPrefix = false };
-        mv.Layout (new (20, 1));
+        mv.Layout (new Size (20, 1));
 
         Assert.True (mv.LineCount > 0);
 
@@ -878,7 +951,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     public void ShowHeadingPrefix_Includes_Correct_Level_Prefix (string markdown, string expectedPrefix)
     {
         Terminal.Gui.Views.Markdown mv = new () { Text = markdown, Width = 30, Height = 1 };
-        mv.Layout (new (30, 1));
+        mv.Layout (new Size (30, 1));
 
         string lineText = GetRenderedLineText (mv, 0);
         Assert.StartsWith (expectedPrefix, lineText);
@@ -888,7 +961,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     public void ShowHeadingPrefix_HeadingMarker_Has_HeadingMarker_Role ()
     {
         Terminal.Gui.Views.Markdown mv = new () { Text = "## Test", Width = 20, Height = 1 };
-        mv.Layout (new (20, 1));
+        mv.Layout (new Size (20, 1));
 
         // The first segment(s) should be the "## " prefix with HeadingMarker role
         IReadOnlyList<StyledSegment> segments = GetRenderedLineSegments (mv, 0);
@@ -903,13 +976,13 @@ public class MarkdownViewTests (ITestOutputHelper output)
     public void ShowHeadingPrefix_Toggle_Relayouts ()
     {
         Terminal.Gui.Views.Markdown mv = new () { Text = "# Hi", Width = 20, Height = 1 };
-        mv.Layout (new (20, 1));
+        mv.Layout (new Size (20, 1));
 
         string withPrefix = GetRenderedLineText (mv, 0);
         Assert.StartsWith ("# ", withPrefix);
 
         mv.ShowHeadingPrefix = false;
-        mv.Layout (new (20, 1));
+        mv.Layout (new Size (20, 1));
 
         string withoutPrefix = GetRenderedLineText (mv, 0);
         Assert.DoesNotContain ("#", withoutPrefix);
@@ -920,13 +993,12 @@ public class MarkdownViewTests (ITestOutputHelper output)
     {
         // HeadingMarker should render Bold (same as Heading text)
         // With ShowHeadingPrefix=true (default), output contains "# H" — all bold.
-        (IApplication app, Runnable window) = SetupStyleTest ("# H", 20);
+        (IApplication app, Runnable window) = SetupStyleTest ("# H");
 
         // The existing Style_Heading test pattern uses AssertDriverOutputIs with ANSI codes.
         // "# H" = bold "# " (HeadingMarker) + bold "H" (Heading).
         // Both are bold so SGR 1 at start, characters "# H", SGR 22 at end.
-        DriverAssert.AssertDriverOutputIs (
-            @"\x1b[30m\x1b[107m\x1b[1m# H\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
+        DriverAssert.AssertDriverOutputIs (@"\x1b[30m\x1b[107m\x1b[1m# H\x1b[30m\x1b[107m\x1b[22m", output, app.Driver);
 
         window.Dispose ();
         app.Dispose ();
@@ -943,19 +1015,19 @@ public class MarkdownViewTests (ITestOutputHelper output)
     /// <summary>Gets the styled segments for a rendered line via reflection.</summary>
     private static IReadOnlyList<StyledSegment> GetRenderedLineSegments (Terminal.Gui.Views.Markdown mv, int lineIndex)
     {
-        System.Reflection.FieldInfo? field = typeof (Terminal.Gui.Views.Markdown).GetField ("_renderedLines", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        FieldInfo? field = typeof (Terminal.Gui.Views.Markdown).GetField ("_renderedLines", BindingFlags.NonPublic | BindingFlags.Instance);
         Assert.NotNull (field);
 
         object? value = field.GetValue (mv);
         Assert.NotNull (value);
 
-        System.Collections.IList renderedLines = (System.Collections.IList)value;
+        var renderedLines = (IList)value;
         Assert.True (renderedLines.Count > lineIndex);
 
         object? line = renderedLines [lineIndex];
         Assert.NotNull (line);
 
-        System.Reflection.PropertyInfo? segProp = line.GetType ().GetProperty ("Segments");
+        PropertyInfo? segProp = line.GetType ().GetProperty ("Segments");
         Assert.NotNull (segProp);
 
         return (IReadOnlyList<StyledSegment>)segProp.GetValue (line)!;
@@ -964,6 +1036,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     #endregion
 
     #region EnableForDesign + recursive md code blocks
+
     // Copilot
 
     [Fact]
@@ -990,19 +1063,20 @@ public class MarkdownViewTests (ITestOutputHelper output)
     [Fact]
     public void Md_CodeBlock_Gets_Syntax_Highlighted_Through_Highlighter ()
     {
-        TextMateSyntaxHighlighter highlighter = new (TextMateSharp.Grammars.ThemeName.DarkPlus);
+        TextMateSyntaxHighlighter highlighter = new ();
+
         Terminal.Gui.Views.Markdown view = new ()
         {
             SyntaxHighlighter = highlighter,
             Width = 80,
             Height = 20,
             Text = """
-                       # Test
-                       
-                       ```md
-                       # Heading
-                       ```
-                       """
+                   # Test
+
+                   ```md
+                   # Heading
+                   ```
+                   """
         };
 
         View host = new () { Width = 80, Height = 20 };
@@ -1017,6 +1091,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
     #endregion
 
     #region Text property unification
+
     // Copilot
 
     [Fact]
@@ -1089,18 +1164,19 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         foreach (View sub in mv.SubViews)
         {
-            if (sub is Line line)
+            if (sub is not Line line)
             {
-                lineView = line;
-
-                break;
+                continue;
             }
+            lineView = line;
+
+            break;
         }
 
         Assert.NotNull (lineView);
 
         // The Line's ColorScheme normal background must match the theme background
-        Attribute lineNormal = lineView!.GetAttributeForRole (VisualRole.Normal);
+        Attribute lineNormal = lineView.GetAttributeForRole (VisualRole.Normal);
         Assert.Equal (themeBg, lineNormal.Background);
 
         window.Dispose ();
@@ -1141,12 +1217,13 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         foreach (View sub in mv.SubViews)
         {
-            if (sub is Line line)
+            if (sub is not Line line)
             {
-                lineView = line;
-
-                break;
+                continue;
             }
+            lineView = line;
+
+            break;
         }
 
         Assert.NotNull (lineView);
@@ -1200,14 +1277,10 @@ public class MarkdownViewTests (ITestOutputHelper output)
                                   Console.WriteLine("hello");
                                   ```
 
-                                  """ + string.Join ("\n\n", Enumerable.Range (1, 50).Select (i => $"Paragraph {i}."));
+                                  """
+                                  + string.Join ("\n\n", Enumerable.Range (1, 50).Select (i => $"Paragraph {i}."));
 
-        Terminal.Gui.Views.Markdown mv = new ()
-        {
-            Width = 40,
-            Height = 10,
-            Text = mdWithCodeBlocks
-        };
+        Terminal.Gui.Views.Markdown mv = new () { Width = 40, Height = 10, Text = mdWithCodeBlocks };
 
         View host = new () { Width = 40, Height = 10 };
         host.Add (mv);
@@ -1248,7 +1321,8 @@ public class MarkdownViewTests (ITestOutputHelper output)
                                   print("end")
                                   ```
 
-                                  """ + string.Join ("\n\n", Enumerable.Range (1, 80).Select (i => $"Line {i} of filler."));
+                                  """
+                                  + string.Join ("\n\n", Enumerable.Range (1, 80).Select (i => $"Line {i} of filler."));
 
         using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
