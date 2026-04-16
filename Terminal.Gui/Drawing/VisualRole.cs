@@ -60,5 +60,11 @@ public enum VisualRole
     /// <summary>
     ///     The visual role for elements that are normally editable but currently read-only.
     /// </summary>
-    ReadOnly
+    ReadOnly,
+
+    /// <summary>
+    ///     The visual role for preformatted or source code content (e.g., <see cref="MarkdownCodeBlock"/>, inline code).
+    ///     If not explicitly set, derived from <see cref="Editable"/> with a dimmed background and bold style.
+    /// </summary>
+    Code
 }
