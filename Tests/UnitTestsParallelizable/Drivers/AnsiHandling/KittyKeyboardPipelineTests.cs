@@ -15,6 +15,16 @@ public class KittyKeyboardPipelineTests
     /// </summary>
     private static (List<Key> KeyDown, List<Key> KeyUp) InjectRawSequence (params string [] sequences)
     {
+        return InjectRawSequenceCore (false, sequences);
+    }
+
+    private static (List<Key> KeyDown, List<Key> KeyUp) InjectRawSequenceWithKittyEnabled (params string [] sequences)
+    {
+        return InjectRawSequenceCore (true, sequences);
+    }
+
+    private static (List<Key> KeyDown, List<Key> KeyUp) InjectRawSequenceCore (bool kittyKeyboardEnabled, params string [] sequences)
+    {
         VirtualTimeProvider timeProvider = new ();
         timeProvider.SetTime (new DateTime (2025, 1, 1, 12, 0, 0));
 
@@ -27,6 +37,7 @@ public class KittyKeyboardPipelineTests
         app.Keyboard.KeyUp += (_, key) => keyUpEvents.Add (key);
 
         IInputProcessor processor = app.Driver?.GetInputProcessor ()!;
+        ((AnsiInputProcessor)processor).SetKittyKeyboardEnabled (kittyKeyboardEnabled);
         ConcurrentQueue<char> queue = ((AnsiInputProcessor)processor).InputQueue;
 
         foreach (string seq in sequences)
@@ -221,18 +232,18 @@ public class KittyKeyboardPipelineTests
 
     // Copilot
     [Theory]
-    [InlineData ("«", 171)]
-    [InlineData ("»", 187)]
-    [InlineData ("ç", 231)]
-    [InlineData ("Ç", 199)]
-    [InlineData ("º", 186)]
-    [InlineData ("ª", 170)]
-    public void Pipeline_MixedKittyAndLegacyPrintable_PortugueseKeys_WhenKittySequencePresent_DoesNotRaiseDuplicateKeyDown (string printable, int kittyCode)
+    [InlineData ("«")]
+    [InlineData ("»")]
+    [InlineData ("ç")]
+    [InlineData ("Ç")]
+    [InlineData ("º")]
+    [InlineData ("ª")]
+    public void Pipeline_LegacyPrintable_PortugueseKeys_WhenKittyEnabled_DoesNotRaiseDuplicateKeyDown (string printable)
     {
-        // Issue #4918 (PT keyboard): when kitty CSI-u and legacy printable input both arrive for the same keypress,
-        // the pipeline should raise only one KeyDown. This test is intentionally kitty-specific.
-        var kittySequence = $"\x1b[{kittyCode}u";
-        (List<Key> down, List<Key> up) = InjectRawSequence (kittySequence, printable);
+        // Issue #4918 (PT keyboard): some glyphs may still arrive as duplicated legacy printable input
+        // even when kitty is enabled. A single keypress should still produce one KeyDown.
+        string duplicatedInput = printable + printable;
+        (List<Key> down, List<Key> up) = InjectRawSequenceWithKittyEnabled (duplicatedInput);
 
         Assert.Single (down);
         Assert.Equal (printable, down [0].GetPrintableText ());
