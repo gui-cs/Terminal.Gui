@@ -288,7 +288,7 @@ public class KittyKeyboardPipelineTests
     [InlineData ("Ç")]
     [InlineData ("º")]
     [InlineData ("ª")]
-    public void Pipeline_RepeatedLegacyPrintable_PortugueseKeys_WithoutKittySequence_DoNotDropCharacters (string printable)
+    public void Pipeline_RepeatedLegacyPrintable_PortugueseKeys_WithoutKittySequence_DoesNotDropCharacters (string printable)
     {
         string input = printable + printable;
         (List<Key> down, List<Key> up) = InjectRawSequence (input);
