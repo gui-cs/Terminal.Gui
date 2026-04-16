@@ -32,6 +32,13 @@ public partial class Markdown
                     CanFocus = false
                 };
 
+                // Apply theme background to the Line SubView when enabled
+                if (UseThemeBackground && SyntaxHighlighter?.DefaultBackground is { } lineThemeBg)
+                {
+                    Attribute lineNormal = GetAttributeForRole (VisualRole.Normal) with { Background = lineThemeBg };
+                    lineView.SetScheme (new Scheme (lineNormal));
+                }
+
                 _thematicBreakViews.Add (lineView);
                 Add (lineView);
 

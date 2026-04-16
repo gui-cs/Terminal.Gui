@@ -639,61 +639,62 @@ public class MarkdownTableTests
     {
         // Copilot
         // When UseThemeBackground is true, MarkdownTable.OnDrawingContent should fill
-        // the entire viewport with the theme background BEFORE drawing borders/cells.
-        // This ensures undrawn space (right of last column, below last row) has the correct bg.
+        // its entire viewport with the theme background BEFORE drawing borders/cells.
+        // Test the table in ISOLATION (not inside a MarkdownView) to ensure the table
+        // itself handles the fill, not relying on the parent.
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
-        app.Driver!.SetScreenSize (50, 15);
+        app.Driver!.SetScreenSize (50, 10);
 
-        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
-        window.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
-
-        Color themeBg = new (30, 30, 30);
+        Color schemeBg = Color.Blue;
+        Color themeBg = new (123, 45, 67); // distinctive color
         ThemeBgHighlighter highlighter = new (themeBg);
 
-        // Create a narrow table in a wide viewport — there will be space to the right
-        Terminal.Gui.Views.Markdown mv = new ()
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.White, schemeBg)));
+
+        // Place a MarkdownTable directly (not via MarkdownView) with a wide viewport
+        MarkdownTable table = new ()
         {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
             SyntaxHighlighter = highlighter,
             UseThemeBackground = true,
-            Text = "| A | B |\n|---|---|\n| x | y |"
+            Width = Dim.Fill (),
+            Height = 5,
+            Data = new TableData (["A", "B"], [Alignment.Start, Alignment.Start], [["x", "y"]])
         };
-        mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
-        window.Add (mv);
+        table.SetScheme (new Scheme (new Attribute (Color.White, schemeBg)));
+        window.Add (table);
 
         app.Begin (window);
         app.LayoutAndDraw ();
 
-        // Find the MarkdownTable SubView
-        MarkdownTable? table = null;
+        Cell [,]? contents = app.Driver.Contents;
+        Assert.NotNull (contents);
 
-        foreach (View sub in mv.SubViews)
-        {
-            if (sub is MarkdownTable t)
-            {
-                table = t;
+        // The table content (columns + borders) is narrow (~11 cols).
+        // Col 30 is well past the columns but within the table's viewport (50 wide).
+        // Row 0 of the table is its top border.
+        int checkRow = 0; // table's first screen row
+        int checkCol = 30; // well past the table columns
 
-                break;
-            }
-        }
+        Cell cell = contents! [checkRow, checkCol];
 
-        Assert.NotNull (table);
+        // Table layout (Height=5):
+        //   Row 0: Top border (LineCanvas, full width with theme bg)
+        //   Row 1: Header content (DrawWrappedRow fills only column widths)
+        //   Row 2: Header separator (LineCanvas, full width)
+        //   Row 3: Body content (DrawWrappedRow fills only column widths)
+        //   Row 4: Bottom border (LineCanvas, full width)
+        // Check row 1 (header content) at col 30 — past the columns but within viewport.
+        // DrawWrappedRow only fills up to the last column width, so col 30 is NOT covered.
+        int cellContentRow = 1; // header row
+        Cell cellRowCell = contents! [cellContentRow, checkCol];
 
-        // The table's UseThemeBackground should be propagated
-        Assert.True (table!.UseThemeBackground);
-        Assert.NotNull (table.SyntaxHighlighter);
+        Color actualCellRowBg = cellRowCell.Attribute!.Value.Background;
 
-        // Verify the table's viewport: pick a cell in the right-of-table area
-        // If the table is narrower than the viewport, the undrawn area should have theme bg
-        // We check by examining the screen contents at a position beyond the table border
-        int tableWidth = table.Frame.Width;
-        int vpWidth = table.Viewport.Width;
-
-        // If table content area is less than viewport, there's undrawn space
-        // that should be filled with theme background
-        Assert.True (vpWidth > 0, "Table viewport width should be > 0");
+        // The cell content row at col 30 should have theme bg. Without the FillRect fix,
+        // it will have schemeBg (Blue) because View.ClearViewport fills with Normal attribute.
+        Assert.Equal (themeBg, actualCellRowBg);
 
         window.Dispose ();
         app.Dispose ();

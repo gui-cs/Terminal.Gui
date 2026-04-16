@@ -307,12 +307,13 @@ static int RunFullScreen (List<string> files, ThemeName syntaxTheme)
     // Load the first file
     LoadFile (files [0]);
 
-    // Sync content-width control after initial layout
+    // Sync content-width control after initial layout and scroll to top
     window.Initialized += (_, _) =>
                           {
                               updatingContentWidth = true;
                               contentWidthUpDown.Value = markdownView.Viewport.Width;
                               updatingContentWidth = false;
+                              markdownView.Viewport = markdownView.Viewport with { X = 0, Y = 0 };
                           };
 
     app.Run (window);

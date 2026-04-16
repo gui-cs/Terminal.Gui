@@ -47,6 +47,12 @@ public sealed class MarkdownTable : View, IDesignable
     {
         CanFocus = false;
         TabStop = TabBehavior.NoStop;
+
+        // No adornments — we draw everything ourselves
+        BorderStyle = LineStyle.None;
+        Border.Thickness = new Thickness (0);
+        Padding.Thickness = new Thickness (0);
+        Margin.Thickness = new Thickness (0);
     }
 
     /// <summary>
@@ -192,6 +198,16 @@ public sealed class MarkdownTable : View, IDesignable
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {
+        // Fill the entire viewport with theme background before drawing borders/cells.
+        // DrawWrappedRow only fills column widths, so trailing space (right of last column)
+        // on cell content rows would otherwise retain the ClearViewport bg (from the scheme).
+        if (UseThemeBackground && SyntaxHighlighter?.DefaultBackground is { } fillBg)
+        {
+            Attribute fillAttr = GetAttributeForRole (VisualRole.Normal) with { Background = fillBg };
+            SetAttribute (fillAttr);
+            FillRect (Viewport with { X = 0, Y = 0 }, (Rune)' ');
+        }
+
         DrawBorders ();
         DrawCellContents ();
 

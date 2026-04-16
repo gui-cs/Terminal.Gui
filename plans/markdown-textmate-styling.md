@@ -199,3 +199,26 @@ UI wiring:
 - **mdv**: `UseThemeBackground = true` by default; added theme picker + toggle in StatusBar
 
 4 new `SyntaxHighlighterPipelineTests` (theme background propagation), 2 new `TextMateSyntaxHighlighterTests` (per-theme defaults), all existing tests updated for new `GetAttributeForSegment` signature. Full suite: 0 failures.
+
+### Phase 7: Bug Fixes — Line/Table Theme Background + ThemeName Property ✅
+
+**Bugs fixed:**
+- **Line SubView (thematic break) ignored theme background**: `MarkdownView.Layout.cs` now creates a `Scheme` with theme bg and applies it to the `Line` SubView when `UseThemeBackground` is true. Previously the Line drew over the parent's theme bg fill with its own default scheme bg.
+- **MarkdownTable trailing space not filled**: `OnDrawingContent` now does a `FillRect` of the entire viewport with theme bg before drawing borders/cells. `DrawWrappedRow` only filled column widths — the area to the right of the last column on cell content rows was left with the `ClearViewport` scheme bg.
+- **`TextMateSyntaxHighlighter.CurrentThemeName` property**: Added `CurrentThemeName` (set in constructor and `SetTheme`), allowing consumers to query the active theme.
+
+**Root cause of MarkdownTable NRE regression** (from Phase 6):
+- Moving field initializations from constructor body to field declarations was correct, but the `BorderStyle`, `Border.Thickness`, `Padding.Thickness`, `Margin.Thickness` assignments were accidentally dropped from the constructor body. Restored them.
+
+**Tests added:**
+- `UseThemeBackground_ThematicBreak_Line_Gets_ThemeBackground` — verifies Line SubView gets theme bg ColorScheme
+- `UseThemeBackground_False_ThematicBreak_Line_Uses_Default_Background` — verifies Line uses default bg when off
+- `UseThemeBackground_OnDrawingContent_Fills_Viewport_With_ThemeBg` — verifies table fills cell content rows' trailing space
+- `Constructor_Sets_CurrentThemeName`, `Default_Constructor_Has_DarkPlus_ThemeName`, `SetTheme_Updates_CurrentThemeName`
+
+**Lessons learned:**
+- `DrawBorders` uses `LineCanvas.AddLine(width=Frame.Width)` which spans the full viewport — border rows are filled. But `DrawWrappedRow` only fills column widths, so cell content rows have unfilled trailing space.
+- When writing pixel-level tests, must check the RIGHT row type (cell content rows vs border rows).
+- View base class `ClearViewport` fills with the scheme Normal attribute BEFORE `OnDrawingContent` — so any area not explicitly drawn by `OnDrawingContent` retains the scheme bg, not the theme bg.
+
+Full suite: 0 failures.
