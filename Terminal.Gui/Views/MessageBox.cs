@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -12,13 +10,16 @@ namespace Terminal.Gui.Views;
 ///         All methods return <see langword="int?"/> where the value is the 0-based index of the button pressed,
 ///         or <see langword="null"/> if the user pressed <see cref="Application.GetDefaultKey"/> (typically Esc).
 ///     </para>
-///     <para>
-///         <see cref="Query(IApplication, string, string, string[])"/> uses the default Dialog color scheme.
-///         <see cref="ErrorQuery(IApplication, string, string, string[])"/> uses the Error color scheme.
-///     </para>
-///     <para>
-///         <b>Important:</b> All MessageBox methods require an <see cref="IApplication"/> instance to be passed.
-///         This enables proper modal dialog management and respects the application's lifecycle. Pass your
+    ///     <para>
+    ///         <see cref="Query(IApplication, string, string, string[])"/> uses the default Dialog color scheme.
+    ///         <see cref="ErrorQuery(IApplication, string, string, string[])"/> uses the Error color scheme.
+    ///     </para>
+    ///     <para>
+    ///         The last button provided is always the default button.
+    ///     </para>
+    ///     <para>
+    ///         <b>Important:</b> All MessageBox methods require an <see cref="IApplication"/> instance to be passed.
+    ///         This enables proper modal dialog management and respects the application's lifecycle. Pass your
 ///         application instance (from <see cref="Application.Create"/>) or use the legacy
 ///         <see cref="Application.Instance"/> if using the static Application pattern.
 ///     </para>
@@ -88,7 +89,8 @@ public static class MessageBox
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
-    ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
+    ///     The MessageBox is centered and auto-sized based on title, message, and buttons. The last button is the
+    ///     default button.
     /// </remarks>
     public static int? ErrorQuery (IApplication app, string title, string message, params string [] buttons)
     {
@@ -97,18 +99,16 @@ public static class MessageBox
                            true,
                            title,
                            message,
-                           null,
                            true,
                            buttons);
     }
 
     /// <summary>
-    ///     Displays an auto-sized error <see cref="MessageBox"/> with a default button and word-wrap control.
+    ///     Displays an auto-sized error <see cref="MessageBox"/> with word-wrap control.
     /// </summary>
     /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnableView"/>.</param>
     /// <param name="title">Title for the MessageBox.</param>
     /// <param name="message">Message to display. May contain multiple lines.</param>
-    /// <param name="defaultButton">Index of the default button (0-based).</param>
     /// <param name="wrapMessage">
     ///     If <see langword="true"/>, word-wraps the message; otherwise displays as-is with multi-line
     ///     support.
@@ -119,17 +119,14 @@ public static class MessageBox
     ///     <see cref="Application.GetDefaultKey"/>.
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///     Thrown if <paramref name="defaultButton"/> is outside valid button index range.
-    /// </exception>
     /// <remarks>
-    ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
+    ///     The MessageBox is centered and auto-sized based on title, message, and buttons. The last button is the
+    ///     default button.
     /// </remarks>
     public static int? ErrorQuery (
         IApplication app,
         string title,
         string message,
-        int defaultButton = 0,
         bool wrapMessage = true,
         params string [] buttons
     )
@@ -139,7 +136,6 @@ public static class MessageBox
                            true,
                            title,
                            message,
-                           defaultButton,
                            wrapMessage,
                            buttons);
     }
@@ -160,7 +156,7 @@ public static class MessageBox
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
     ///     Consider using <see cref="Query(IApplication, string, string, string[])"/> which automatically sizes the
-    ///     MessageBox.
+    ///     MessageBox. The last button is the default button.
     /// </remarks>
     public static int? Query (IApplication app, int width, int height, string title, string message, params string [] buttons)
     {
@@ -169,7 +165,6 @@ public static class MessageBox
                            false,
                            title,
                            message,
-                           null,
                            true,
                            buttons);
     }
@@ -187,7 +182,8 @@ public static class MessageBox
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
     /// <remarks>
-    ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
+    ///     The MessageBox is centered and auto-sized based on title, message, and buttons. The last button is the
+    ///     default button.
     /// </remarks>
     public static int? Query (IApplication app, string title, string message, params string [] buttons)
     {
@@ -196,49 +192,16 @@ public static class MessageBox
                            false,
                            title,
                            message,
-                           null,
                            true,
                            buttons);
     }
 
     /// <summary>
-    ///     Displays an auto-sized <see cref="MessageBox"/> with a default button.
-    /// </summary>
-    /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnableView"/>.</param>
-    /// <param name="title">Title for the MessageBox.</param>
-    /// <param name="message">Message to display. May contain multiple lines and will be word-wrapped.</param>
-    /// <param name="defaultButton">Index of the default button (0-based).</param>
-    /// <param name="buttons">Array of button labels.</param>
-    /// <returns>
-    ///     The index of the selected button, or <see langword="null"/> if the user pressed
-    ///     <see cref="Application.GetDefaultKey"/>.
-    /// </returns>
-    /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///     Thrown if <paramref name="defaultButton"/> is outside valid button index range.
-    /// </exception>
-    /// <remarks>
-    ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
-    /// </remarks>
-    public static int? Query (IApplication app, string title, string message, int defaultButton = 0, params string [] buttons)
-    {
-        return QueryFull (
-                           app,
-                           false,
-                           title,
-                           message,
-                           defaultButton,
-                           true,
-                           buttons);
-    }
-
-    /// <summary>
-    ///     Displays an auto-sized <see cref="MessageBox"/> with a default button and word-wrap control.
+    ///     Displays an auto-sized <see cref="MessageBox"/> with word-wrap control.
     /// </summary>
     /// <param name="app">The application instance. If <see langword="null"/>, uses <see cref="IApplication.TopRunnableView"/>.</param>
     /// <param name="title">Title for the MessageBox.</param>
     /// <param name="message">Message to display. May contain multiple lines.</param>
-    /// <param name="defaultButton">Index of the default button (0-based).</param>
     /// <param name="wrapMessage">
     ///     If <see langword="true"/>, word-wraps the message; otherwise displays as-is with multi-line
     ///     support.
@@ -249,17 +212,14 @@ public static class MessageBox
     ///     <see cref="Application.GetDefaultKey"/>.
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="app"/> is <see langword="null"/>.</exception>
-    /// <exception cref="ArgumentOutOfRangeException">
-    ///     Thrown if <paramref name="defaultButton"/> is outside valid button index range.
-    /// </exception>
     /// <remarks>
-    ///     The MessageBox is centered and auto-sized based on title, message, and buttons.
+    ///     The MessageBox is centered and auto-sized based on title, message, and buttons. The last button is the
+    ///     default button.
     /// </remarks>
     public static int? Query (
         IApplication app,
         string title,
         string message,
-        int defaultButton = 0,
         bool wrapMessage = true,
         params string [] buttons
     )
@@ -269,7 +229,6 @@ public static class MessageBox
                            false,
                            title,
                            message,
-                           defaultButton,
                            wrapMessage,
                            buttons);
     }
@@ -279,7 +238,6 @@ public static class MessageBox
         bool useErrorScheme,
         string title,
         string message,
-        int? defaultButton,
         bool wrapMessage = true,
         params string [] buttons
     )
@@ -301,7 +259,7 @@ public static class MessageBox
         dialog.TextFormatter.MultiLine = !wrapMessage;
 
         dialog.Buttons = buttonList.ToArray ();
-        SetDefaultButton (dialog, defaultButton);
+        dialog.Buttons.FirstOrDefault (b => b.IsDefault)?.SetFocus ();
 
         dialog.Accepting += (sender, args) =>
                             {
@@ -318,35 +276,5 @@ public static class MessageBox
         int? result = app.Run (dialog) as int?;
 
         return result;
-    }
-
-    private static void SetDefaultButton (Dialog dialog, int? defaultButton)
-    {
-        Button [] dialogButtons = dialog.Buttons;
-
-        if (!defaultButton.HasValue)
-        {
-            dialogButtons.FirstOrDefault (button => button.IsDefault)?.SetFocus ();
-
-            return;
-        }
-
-        ValidateDefaultButton (defaultButton.Value, dialogButtons.Length);
-
-        foreach (Button button in dialogButtons)
-        {
-            button.IsDefault = false;
-        }
-
-        Button defaultDialogButton = dialogButtons [defaultButton.Value];
-        defaultDialogButton.IsDefault = true;
-        dialog.DefaultAcceptView = defaultDialogButton;
-        defaultDialogButton.SetFocus ();
-    }
-
-    private static void ValidateDefaultButton (int defaultButton, int buttonCount)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegative (defaultButton, nameof (defaultButton));
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual (defaultButton, buttonCount, nameof (defaultButton));
     }
 }

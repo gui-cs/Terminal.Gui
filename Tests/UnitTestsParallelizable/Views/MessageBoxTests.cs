@@ -26,7 +26,7 @@ public class MessageBoxTests
                 switch (iteration)
                 {
                     case 1:
-                        result = MessageBox.Query (app, string.Empty, string.Empty, 0, false, "btn0", "btn1");
+                        result = MessageBox.Query (app, string.Empty, string.Empty, false, "btn0", "btn1");
                         app.RequestStop ();
 
                         break;
@@ -102,7 +102,7 @@ public class MessageBoxTests
 
     // Copilot
     [Fact]
-    public void Query_With_Default_Button_Index_Sets_Default_Button_And_Focus ()
+    public void Query_Uses_Last_Button_As_Default ()
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -113,7 +113,7 @@ public class MessageBoxTests
             var iteration = 0;
 
             app.Iteration += OnApplicationOnIteration;
-            result = MessageBox.Query (app, "hey", "IsDefault", 0, Strings.btnNo, Strings.btnYes);
+            result = MessageBox.Query (app, "hey", "IsDefault", Strings.btnNo, Strings.btnYes);
             app.Iteration -= OnApplicationOnIteration;
 
             Assert.Null (result);
@@ -130,10 +130,10 @@ public class MessageBoxTests
                 Dialog dialog = (Dialog)app.TopRunnableView!;
                 Button [] buttons = dialog.Buttons;
 
-                Assert.True (buttons [0].IsDefault);
-                Assert.False (buttons [1].IsDefault);
-                Assert.Same (buttons [0], dialog.DefaultAcceptView);
-                Assert.True (buttons [0].HasFocus);
+                Assert.False (buttons [0].IsDefault);
+                Assert.True (buttons [1].IsDefault);
+                Assert.Same (buttons [1], dialog.DefaultAcceptView);
+                Assert.True (buttons [1].HasFocus);
 
                 app.RequestStop ();
             }
@@ -146,7 +146,7 @@ public class MessageBoxTests
 
     // Copilot
     [Fact]
-    public void ErrorQuery_With_Default_Button_Index_Sets_Default_Button_And_Focus ()
+    public void ErrorQuery_Uses_Last_Button_As_Default ()
     {
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
@@ -157,7 +157,7 @@ public class MessageBoxTests
             var iteration = 0;
 
             app.Iteration += OnApplicationOnIteration;
-            result = MessageBox.ErrorQuery (app, "Error", "Message", 0, true, Strings.btnNo, Strings.btnYes);
+            result = MessageBox.ErrorQuery (app, "Error", "Message", Strings.btnNo, Strings.btnYes);
             app.Iteration -= OnApplicationOnIteration;
 
             Assert.Null (result);
@@ -174,54 +174,13 @@ public class MessageBoxTests
                 Dialog dialog = (Dialog)app.TopRunnableView!;
                 Button [] buttons = dialog.Buttons;
 
-                Assert.True (buttons [0].IsDefault);
-                Assert.False (buttons [1].IsDefault);
-                Assert.Same (buttons [0], dialog.DefaultAcceptView);
-                Assert.True (buttons [0].HasFocus);
+                Assert.False (buttons [0].IsDefault);
+                Assert.True (buttons [1].IsDefault);
+                Assert.Same (buttons [1], dialog.DefaultAcceptView);
+                Assert.True (buttons [1].HasFocus);
 
                 app.RequestStop ();
             }
-        }
-        finally
-        {
-            app.Dispose ();
-        }
-    }
-
-    // Copilot
-    [Theory]
-    [MemberData (nameof (AcceptingKeys))]
-    public void Enter_Or_Space_Returns_Explicit_Default_Button_Index (Key key)
-    {
-        IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
-        try
-        {
-            app.Iteration += OnApplicationOnIteration;
-            int? result = MessageBox.Query (app, "hey", "IsDefault", 0, Strings.btnNo, Strings.btnYes);
-            app.Iteration -= OnApplicationOnIteration;
-
-            Assert.Equal (0, result);
-
-            void OnApplicationOnIteration (object? sender, EventArgs<IApplication?> args) => Assert.True (app.Keyboard.RaiseKeyDownEvent (key));
-        }
-        finally
-        {
-            app.Dispose ();
-        }
-    }
-
-    // Copilot
-    [Fact]
-    public void Query_With_Out_Of_Range_Default_Button_Throws ()
-    {
-        IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-
-        try
-        {
-            Assert.Throws<ArgumentOutOfRangeException> (() => MessageBox.Query (app, "hey", "IsDefault", 2, Strings.btnNo, Strings.btnYes));
         }
         finally
         {
