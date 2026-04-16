@@ -34,7 +34,7 @@ public enum MarkdownStyleRole
     /// <summary>The bullet or number prefix of a list item (e.g. <c>•</c>). Rendered bold.</summary>
     ListMarker,
 
-    /// <summary>Hyperlink text (<c>[text](url)</c>). Absolute URLs are underlined; anchor links are plain.</summary>
+    /// <summary>Hyperlink text (<c>[text](url)</c>). Absolute URLs and anchor links are underlined.</summary>
     Link,
 
     /// <summary>Table row text. Rendered bold.</summary>
