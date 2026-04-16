@@ -251,7 +251,7 @@ ThemeManager.ThemeChanged += (sender, e) =>
 
 ### Scheme System
 
-A **Scheme** defines the colors and text styles for a specific UI context (e.g., Dialog, Menu, Runnable).
+A **Scheme** defines the colors and text styles for a specific UI context (e.g., Dialog, Menu, Accent).
 
 See the [Scheme Deep Dive](scheme.md) for complete details on the scheme system.
 
