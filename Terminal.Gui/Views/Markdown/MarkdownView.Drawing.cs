@@ -9,7 +9,14 @@ public partial class Markdown
     /// </remarks>
     protected override bool OnDrawingSubViews (DrawContext? context)
     {
-        SetAttributeForRole (VisualRole.Normal);
+        Attribute fillAttr = GetAttributeForRole (VisualRole.Normal);
+
+        if (UseThemeBackground && SyntaxHighlighter?.DefaultBackground is { } themeBg)
+        {
+            fillAttr = fillAttr with { Background = themeBg };
+        }
+
+        SetAttribute (fillAttr);
         FillRect (Viewport with { X = 0, Y = 0 }, (Rune)' ');
 
         int startRow = Viewport.Y;
@@ -145,7 +152,12 @@ public partial class Markdown
         AddStr (x, y, grapheme);
     }
 
-    private Attribute GetAttributeForSegment (StyledSegment segment) => MarkdownAttributeHelper.GetAttributeForSegment (this, segment, SyntaxHighlighter);
+    private Attribute GetAttributeForSegment (StyledSegment segment) =>
+        MarkdownAttributeHelper.GetAttributeForSegment (
+            this,
+            segment,
+            SyntaxHighlighter,
+            UseThemeBackground ? SyntaxHighlighter?.DefaultBackground : null);
 
     private void TryQueueSixel (string imageSource, Point screenPosition)
     {

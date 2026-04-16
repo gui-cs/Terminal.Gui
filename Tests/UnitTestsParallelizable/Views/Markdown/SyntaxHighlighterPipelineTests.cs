@@ -279,4 +279,85 @@ public class SyntaxHighlighterPipelineTests
 
         public Attribute? GetAttributeForScope (MarkdownStyleRole role) => role == targetRole ? attr : null;
     }
+
+    /// <summary>A highlighter mock that reports a <see cref="DefaultBackground"/>.</summary>
+    private sealed class ThemeBackgroundHighlighter (MarkdownStyleRole targetRole, Attribute attr, Color themeBg) : ISyntaxHighlighter
+    {
+        public IReadOnlyList<StyledSegment> Highlight (string code, string? language) => [new (code, MarkdownStyleRole.CodeBlock)];
+
+        public void ResetState () { }
+
+        public Color? DefaultBackground { get; } = themeBg;
+
+        public Attribute? GetAttributeForScope (MarkdownStyleRole role) => role == targetRole ? attr : null;
+    }
+
+    // --- Theme background propagation --- Copilot
+
+    [Fact]
+    public void MarkdownAttributeHelper_Scope_Attribute_Uses_Theme_Background ()
+    {
+        // Scope-derived attribute has foreground Cyan, but we want theme background (dark gray) not view bg (Blue)
+        Attribute headingAttr = new (Color.Cyan, Color.Black, TextStyle.Bold);
+        Color themeBg = new (30, 30, 30);
+        ThemeBackgroundHighlighter highlighter = new (MarkdownStyleRole.Heading, headingAttr, themeBg);
+
+        Terminal.Gui.Views.Markdown mv = new ();
+        mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
+
+        StyledSegment segment = new ("Hello", MarkdownStyleRole.Heading);
+        Attribute result = MarkdownAttributeHelper.GetAttributeForSegment (mv, segment, highlighter, themeBg);
+
+        // Should use theme background, NOT view background (Blue)
+        Assert.Equal (themeBg, result.Background);
+        Assert.Equal (Color.Cyan, result.Foreground);
+    }
+
+    [Fact]
+    public void MarkdownAttributeHelper_Fallback_Uses_Theme_Background ()
+    {
+        Color themeBg = new (30, 30, 30);
+
+        // Highlighter has no scope for Emphasis, but does have a DefaultBackground
+        ThemeBackgroundHighlighter highlighter = new (MarkdownStyleRole.Heading, new Attribute (Color.Cyan, Color.Black), themeBg);
+
+        Terminal.Gui.Views.Markdown mv = new ();
+        mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
+
+        StyledSegment segment = new ("Hello", MarkdownStyleRole.Emphasis);
+        Attribute result = MarkdownAttributeHelper.GetAttributeForSegment (mv, segment, highlighter, themeBg);
+
+        // Theme background used even for fallback role-based styling
+        Assert.Equal (themeBg, result.Background);
+        Assert.True (result.Style.HasFlag (TextStyle.Italic));
+    }
+
+    [Fact]
+    public void MarkdownAttributeHelper_No_ThemeBackground_Uses_View_Background ()
+    {
+        Terminal.Gui.Views.Markdown mv = new ();
+        mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
+
+        StyledSegment segment = new ("Hello", MarkdownStyleRole.Heading);
+        Attribute result = MarkdownAttributeHelper.GetAttributeForSegment (mv, segment);
+
+        // Without a highlighter, falls back to view's normal background
+        Assert.Equal (Color.Blue, result.Background);
+    }
+
+    [Fact]
+    public void MarkdownAttributeHelper_Null_DefaultBackground_Uses_View_Background ()
+    {
+        // Highlighter returns null DefaultBackground
+        ScopeAwareHighlighter highlighter = new (MarkdownStyleRole.Heading, new Attribute (Color.Cyan, Color.Black));
+
+        Terminal.Gui.Views.Markdown mv = new ();
+        mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
+
+        StyledSegment segment = new ("Hello", MarkdownStyleRole.Emphasis);
+        Attribute result = MarkdownAttributeHelper.GetAttributeForSegment (mv, segment, highlighter);
+
+        // DefaultBackground is null → uses view's background
+        Assert.Equal (Color.Blue, result.Background);
+    }
 }

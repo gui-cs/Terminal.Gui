@@ -49,6 +49,7 @@ public partial class Markdown
                 MarkdownTable tableView = new ()
                 {
                     SyntaxHighlighter = SyntaxHighlighter,
+                    UseThemeBackground = UseThemeBackground,
                     Data = tableData,
                     X = 0,
                     Y = startLine,
@@ -138,7 +139,7 @@ public partial class Markdown
                 X = 0,
                 Y = start,
                 Width = Dim.Fill (),
-                ThemeBackground = SyntaxHighlighter?.DefaultBackground
+                ThemeBackground = UseThemeBackground ? SyntaxHighlighter?.DefaultBackground : null
             };
 
             _codeBlockViews.Add (codeBlock);

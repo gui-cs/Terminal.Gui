@@ -2,6 +2,8 @@
 
 using System.Collections.ObjectModel;
 using System.Text.Json;
+using Terminal.Gui.Drawing;
+using TextMateSharp.Grammars;
 
 // ReSharper disable AccessToDisposedClosure
 
@@ -62,8 +64,7 @@ public class Deepdives : Scenario
             Width = Dim.Fill (),
             Height = Dim.Fill (),
 
-            // Default is TextMateSharp.Grammars.ThemeName.DarkPlus
-            SyntaxHighlighter = new TextMateSyntaxHighlighter ()
+            SyntaxHighlighter = new TextMateSyntaxHighlighter (ThemeName.Abbys)
         };
         _markdownView.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 
@@ -117,9 +118,58 @@ public class Deepdives : Scenario
 
         Shortcut contentWidthShortcut = new () { CommandView = _contentWidthUpDown, HelpText = "Content Width" };
 
+        DropDownList<ThemeName> themeDropDown = new ()
+        {
+            ReadOnly = true,
+            Value = ThemeName.Abbys
+        };
+
+        themeDropDown.ValueChanged += (_, e) =>
+                                      {
+                                          if (_markdownView is null || e.Value is not { } themeName)
+                                          {
+                                              return;
+                                          }
+
+                                          TextMateSyntaxHighlighter highlighter = new (themeName);
+                                          _markdownView.SyntaxHighlighter = highlighter;
+
+                                          // Force re-layout so code blocks pick up new theme
+                                          string text = _markdownView.Text;
+                                          _markdownView.Text = string.Empty;
+                                          _markdownView.Text = text;
+                                      };
+
+        Shortcut themeShortcut = new () { Title = "Theme", CommandView = themeDropDown };
+
+        CheckBox themeBgCheckBox = new ()
+        {
+            Text = "Theme _BG",
+            Value = CheckState.UnChecked
+        };
+
+        themeBgCheckBox.ValueChanged += (_, e) =>
+                                               {
+                                                   if (_markdownView is null)
+                                                   {
+                                                       return;
+                                                   }
+
+                                                   _markdownView.UseThemeBackground = e.NewValue == CheckState.Checked;
+
+                                                   // Force re-layout
+                                                   string text = _markdownView.Text;
+                                                   _markdownView.Text = string.Empty;
+                                                   _markdownView.Text = text;
+                                               };
+
+        Shortcut themeBgShortcut = new () { CommandView = themeBgCheckBox };
+
         StatusBar statusBar = new ([
                                        new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", window.RequestStop),
                                        contentWidthShortcut,
+                                       themeShortcut,
+                                       themeBgShortcut,
                                        _statusShortcut,
                                        spinnerShortcut
                                    ]) { AlignmentModes = AlignmentModes.IgnoreFirstOrLast };

@@ -158,7 +158,8 @@ static int RunFullScreen (List<string> files, ThemeName syntaxTheme)
     {
         Width = Dim.Fill (),
         Height = Dim.Fill (1), // leave room for StatusBar
-        SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme)
+        SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme),
+        UseThemeBackground = true
     };
 
     // Vertical scrollbar is already enabled by MarkdownView constructor
@@ -235,12 +236,44 @@ static int RunFullScreen (List<string> files, ThemeName syntaxTheme)
     List<Shortcut> statusItems =
     [
         new (Application.GetDefaultKey (Command.Quit), "Quit", window.RequestStop),
-        contentWidthShortcut,
-        lineCountShortcut,
-        fileSizeShortcut,
-        statusShortcut,
-        spinnerShortcut
+        contentWidthShortcut
     ];
+
+    // Theme selector
+    DropDownList<ThemeName> themeDropDown = new () { Value = syntaxTheme };
+
+    themeDropDown.ValueChanged += (_, e) =>
+                                  {
+                                      if (e.Value is not { } themeName)
+                                      {
+                                          return;
+                                      }
+
+                                      TextMateSyntaxHighlighter highlighter = new (themeName);
+                                      markdownView.SyntaxHighlighter = highlighter;
+
+                                      string text = markdownView.Text;
+                                      markdownView.Text = string.Empty;
+                                      markdownView.Text = text;
+                                  };
+
+    statusItems.Add (new Shortcut { Title = "Theme", CommandView = themeDropDown });
+
+    // Theme background toggle
+    CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = CheckState.Checked };
+
+    themeBgCheckBox.ValueChanged += (_, e) =>
+                                           {
+                                               markdownView.UseThemeBackground = e.NewValue == CheckState.Checked;
+
+                                               string text = markdownView.Text;
+                                               markdownView.Text = string.Empty;
+                                               markdownView.Text = text;
+                                           };
+
+    statusItems.Add (new Shortcut { CommandView = themeBgCheckBox });
+
+    statusItems.AddRange ([lineCountShortcut, fileSizeShortcut, statusShortcut, spinnerShortcut]);
 
     // File selector when multiple files are provided
     if (files.Count > 1)

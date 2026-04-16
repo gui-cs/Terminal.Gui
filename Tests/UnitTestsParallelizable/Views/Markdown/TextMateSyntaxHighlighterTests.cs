@@ -180,12 +180,13 @@ public class TextMateSyntaxHighlighterTests
 
         for (var i = 0; i < Math.Min (darkSegments.Count, lightSegments.Count); i++)
         {
-            if (darkSegments [i].Attribute?.Foreground != lightSegments [i].Attribute?.Foreground)
+            if (darkSegments [i].Attribute?.Foreground == lightSegments [i].Attribute?.Foreground)
             {
-                anyDifferent = true;
-
-                break;
+                continue;
             }
+            anyDifferent = true;
+
+            break;
         }
 
         Assert.True (anyDifferent, "Dark and Light themes should produce different colors");
@@ -326,5 +327,66 @@ public class TextMateSyntaxHighlighterTests
 
         // DarkPlus has a dark default background
         Assert.True (highlighter.DefaultBackground!.Value.IsDarkColor ());
+    }
+
+    // --- Theme background verification --- Copilot
+
+    [Theory]
+    [InlineData (ThemeName.DarkPlus)]
+    [InlineData (ThemeName.LightPlus)]
+    [InlineData (ThemeName.Monokai)]
+    [InlineData (ThemeName.SolarizedDark)]
+    [InlineData (ThemeName.SolarizedLight)]
+    [InlineData (ThemeName.Dracula)]
+    [InlineData (ThemeName.VisualStudioDark)]
+    [InlineData (ThemeName.VisualStudioLight)]
+    public void All_Major_Themes_Have_NonNull_DefaultBackground (ThemeName theme)
+    {
+        TextMateSyntaxHighlighter highlighter = new (theme);
+        Assert.NotNull (highlighter.DefaultBackground);
+    }
+
+    [Fact]
+    public void SetTheme_Updates_DefaultBackground ()
+    {
+        TextMateSyntaxHighlighter highlighter = new ();
+        Color? darkBg = highlighter.DefaultBackground;
+        Assert.NotNull (darkBg);
+
+        highlighter.SetTheme (ThemeName.Monokai);
+        Color? monoBg = highlighter.DefaultBackground;
+        Assert.NotNull (monoBg);
+
+        // DarkPlus and Monokai have different backgrounds
+        Assert.NotEqual (darkBg, monoBg);
+    }
+
+    // --- ThemeName property --- Copilot
+
+    [Fact]
+    public void Constructor_Sets_CurrentThemeName ()
+    {
+        // Copilot
+        TextMateSyntaxHighlighter highlighter = new (ThemeName.Monokai);
+        Assert.Equal (ThemeName.Monokai, highlighter.CurrentThemeName);
+    }
+
+    [Fact]
+    public void Default_Constructor_Has_DarkPlus_ThemeName ()
+    {
+        // Copilot
+        TextMateSyntaxHighlighter highlighter = new ();
+        Assert.Equal (ThemeName.DarkPlus, highlighter.CurrentThemeName);
+    }
+
+    [Fact]
+    public void SetTheme_Updates_CurrentThemeName ()
+    {
+        // Copilot
+        TextMateSyntaxHighlighter highlighter = new (ThemeName.DarkPlus);
+        Assert.Equal (ThemeName.DarkPlus, highlighter.CurrentThemeName);
+
+        highlighter.SetTheme (ThemeName.SolarizedLight);
+        Assert.Equal (ThemeName.SolarizedLight, highlighter.CurrentThemeName);
     }
 }

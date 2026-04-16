@@ -179,3 +179,23 @@ Unified content-setting API across all three markdown views to use `View.Text`:
 - **MarkdownTable**: Overrode `Text` to accept pipe-delimited markdown table text. Parses via `TableData.TryParse()`, sets `Data` internally. Invalid/empty text clears the table. Getter reconstructs pipe format. Added constructor guard for `View()` base calling `Text = ""` before fields initialize.
 - **EnableForDesign**: Both MarkdownCodeBlock and MarkdownTable now use `Text` + `SyntaxHighlighter` in EnableForDesign. MarkdownTable sample includes inline formatting (`**bold**`, `*italic*`, `` `code` ``).
 - 10 new tests + all existing tests updated from `.Markdown` → `.Text`.
+
+### Phase 6: UseThemeBackground + Theme Selectors ✅
+
+Added `UseThemeBackground` property to `Markdown` and `MarkdownTable`:
+- Default: `false` — no change to existing rendering
+- When `true`, the view's background fills with the TextMate theme's `editor.background` color
+- Rewrote `TextMateSyntaxHighlighter.CacheThemeDefaults()` to use `Theme.GetGuiColorDictionary()` for accurate per-theme backgrounds (previously `["source"]` scope match returned identical values for many themes)
+- `MarkdownAttributeHelper.GetAttributeForSegment()` now accepts `Color? themeBackground` parameter — uses it for background instead of view's normal attribute when non-null
+- `InlineCode`/`CodeBlock` segments only override background when `themeBackground` is non-null; without it, `VisualRole.Code` background is preserved
+- `MarkdownView.Layout.cs` propagates `UseThemeBackground` to table views and code blocks
+
+Fixed MarkdownTable constructor NRE:
+- Fields (`_data`, `_columnWidths`, `_headerSegments`, `_rowSegments`, `_bodyRowHeights`) moved from constructor body to field initializers — prevents null reference during `View()` base constructor → `SetupText()` → `Text = ""` → `Recalculate()` call chain
+
+UI wiring:
+- **MarkdownTester**: Added `UseThemeBackground` toggle (CheckBox in StatusBar) + existing theme picker
+- **Deepdives**: Added theme picker (`DropDownList<ThemeName>`) + `UseThemeBackground` toggle in StatusBar
+- **mdv**: `UseThemeBackground = true` by default; added theme picker + toggle in StatusBar
+
+4 new `SyntaxHighlighterPipelineTests` (theme background propagation), 2 new `TextMateSyntaxHighlighterTests` (per-theme defaults), all existing tests updated for new `GetAttributeForSegment` signature. Full suite: 0 failures.

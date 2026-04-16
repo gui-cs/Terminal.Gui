@@ -105,7 +105,24 @@ public class MarkdownTester : Scenario
             CommandView = themeDropDown
         };
 
-        statusBar.Add (themeShortcut, quitShortcut);
+        CheckBox themeBgCheckBox = new ()
+        {
+            Text = "Theme _BG",
+            Value = CheckState.UnChecked
+        };
+
+        themeBgCheckBox.ValueChanged += (_, e) =>
+                                               {
+                                                   preview.UseThemeBackground = e.NewValue == CheckState.Checked;
+                                                   preview.Text = editor.Text;
+                                               };
+
+        Shortcut themeBgShortcut = new ()
+        {
+            CommandView = themeBgCheckBox
+        };
+
+        statusBar.Add (themeShortcut, themeBgShortcut, quitShortcut);
         window.Add (statusBar);
 
         app.Run (window);

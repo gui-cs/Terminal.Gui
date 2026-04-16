@@ -16,6 +16,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         Assert.True (view.CanFocus);
         Assert.Equal (string.Empty, view.Text);
         Assert.Equal (0, view.LineCount);
+        Assert.False (view.UseThemeBackground);
     }
 
     [Fact]
@@ -1047,6 +1048,129 @@ public class MarkdownViewTests (ITestOutputHelper output)
         view.Text = "# Hello";
 
         Assert.Equal (0, changeCount);
+    }
+
+    #endregion
+
+    #region UseThemeBackground with Line and Table views
+
+    [Fact]
+    public void UseThemeBackground_ThematicBreak_Line_Gets_ThemeBackground ()
+    {
+        // Copilot
+        // When UseThemeBackground is true, the Line SubView for thematic breaks
+        // must have its ColorScheme background set to the theme background.
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (40, 10);
+
+        Color themeBg = new (30, 30, 30);
+        ThemeBackgroundHighlighter highlighter = new (themeBg);
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
+
+        Terminal.Gui.Views.Markdown mv = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            SyntaxHighlighter = highlighter,
+            UseThemeBackground = true,
+            Text = "# Title\n\n---\n\nParagraph"
+        };
+        mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Find the Line SubView
+        Line? lineView = null;
+
+        foreach (View sub in mv.SubViews)
+        {
+            if (sub is Line line)
+            {
+                lineView = line;
+
+                break;
+            }
+        }
+
+        Assert.NotNull (lineView);
+
+        // The Line's ColorScheme normal background must match the theme background
+        Attribute lineNormal = lineView!.GetAttributeForRole (VisualRole.Normal);
+        Assert.Equal (themeBg, lineNormal.Background);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void UseThemeBackground_False_ThematicBreak_Line_Uses_Default_Background ()
+    {
+        // Copilot
+        // When UseThemeBackground is false, the Line SubView should NOT get theme background
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (40, 10);
+
+        Color themeBg = new (30, 30, 30);
+        ThemeBackgroundHighlighter highlighter = new (themeBg);
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
+
+        Terminal.Gui.Views.Markdown mv = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            SyntaxHighlighter = highlighter,
+            UseThemeBackground = false,
+            Text = "# Title\n\n---\n\nParagraph"
+        };
+        mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Find the Line SubView
+        Line? lineView = null;
+
+        foreach (View sub in mv.SubViews)
+        {
+            if (sub is Line line)
+            {
+                lineView = line;
+
+                break;
+            }
+        }
+
+        Assert.NotNull (lineView);
+
+        // The Line's background should NOT be the theme background
+        Attribute lineNormal = lineView!.GetAttributeForRole (VisualRole.Normal);
+        Assert.NotEqual (themeBg, lineNormal.Background);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    /// <summary>
+    ///     Mock highlighter that exposes a theme background but doesn't style scopes.
+    /// </summary>
+    private sealed class ThemeBackgroundHighlighter (Color themeBg) : ISyntaxHighlighter
+    {
+        public IReadOnlyList<StyledSegment> Highlight (string code, string? language) => [new (code, MarkdownStyleRole.CodeBlock)];
+
+        public void ResetState () { }
+
+        public Color? DefaultBackground { get; } = themeBg;
+
+        public Attribute? GetAttributeForScope (MarkdownStyleRole role) => null;
     }
 
     #endregion

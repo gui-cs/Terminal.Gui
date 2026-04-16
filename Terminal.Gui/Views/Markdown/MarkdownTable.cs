@@ -26,16 +26,16 @@ namespace Terminal.Gui.Views;
 /// </remarks>
 public sealed class MarkdownTable : View, IDesignable
 {
-    private TableData _data;
-    private int [] _columnWidths;
+    private TableData _data = _emptyData;
+    private int [] _columnWidths = [];
 
     // Pre-parsed inline segments for each cell
-    private List<StyledSegment> [] _headerSegments;
-    private List<StyledSegment> [] [] _rowSegments;
+    private List<StyledSegment> [] _headerSegments = [];
+    private List<StyledSegment> [] [] _rowSegments = [];
 
     // Pre-computed wrapped line counts per row
     private int _headerRowHeight;
-    private int [] _bodyRowHeights;
+    private int [] _bodyRowHeights = [];
 
     // Last width used for column computation — tracks when recalculation is needed
     private int _lastComputedWidth;
@@ -45,19 +45,8 @@ public sealed class MarkdownTable : View, IDesignable
     /// <summary>Initializes a new empty <see cref="MarkdownTable"/>.</summary>
     public MarkdownTable ()
     {
-        _data = _emptyData;
-        _headerSegments = [];
-        _rowSegments = [];
-        _columnWidths = [];
-        _bodyRowHeights = [];
         CanFocus = false;
         TabStop = TabBehavior.NoStop;
-
-        // No adornments — we draw everything ourselves
-        BorderStyle = LineStyle.None;
-        Border.Thickness = new Thickness (0);
-        Padding.Thickness = new Thickness (0);
-        Margin.Thickness = new Thickness (0);
     }
 
     /// <summary>
@@ -66,6 +55,12 @@ public sealed class MarkdownTable : View, IDesignable
     ///     the highlighter for scope-derived colors before falling back to <see cref="TextStyle"/>-based defaults.
     /// </summary>
     public ISyntaxHighlighter? SyntaxHighlighter { get; set; }
+
+    /// <summary>
+    ///     Gets or sets whether the table uses the syntax highlighting theme's background color
+    ///     for cell and border fills. Defaults to <see langword="false"/>.
+    /// </summary>
+    public bool UseThemeBackground { get; set; }
 
     /// <summary>
     ///     Gets or sets the table content as a pipe-delimited Markdown table string.
@@ -109,10 +104,6 @@ public sealed class MarkdownTable : View, IDesignable
         set
         {
             // Guard: View base constructor calls Text setter before MarkdownTable() initializes fields.
-            if (_data is null)
-            {
-                return;
-            }
 
             if (string.IsNullOrWhiteSpace (value))
             {
@@ -229,6 +220,12 @@ public sealed class MarkdownTable : View, IDesignable
     private void DrawWrappedRow (List<StyledSegment> [] cellSegments, Alignment [] alignments, int startY, int rowHeight, bool isHeader)
     {
         Attribute normal = GetAttributeForRole (VisualRole.Normal);
+        Color? themeBg = UseThemeBackground ? SyntaxHighlighter?.DefaultBackground : null;
+
+        if (themeBg is { } bg)
+        {
+            normal = normal with { Background = bg };
+        }
 
         for (var lineInRow = 0; lineInRow < rowHeight; lineInRow++)
         {
@@ -279,7 +276,7 @@ public sealed class MarkdownTable : View, IDesignable
 
                 foreach (StyledSegment seg in lineSegs)
                 {
-                    Attribute attr = MarkdownAttributeHelper.GetAttributeForSegment (this, seg, SyntaxHighlighter);
+                    Attribute attr = MarkdownAttributeHelper.GetAttributeForSegment (this, seg, SyntaxHighlighter, themeBg);
 
                     if (isHeader)
                     {
@@ -319,6 +316,11 @@ public sealed class MarkdownTable : View, IDesignable
 
         Point screenOrigin = ViewportToScreen (Viewport).Location;
         Attribute borderAttr = GetAttributeForRole (VisualRole.Normal);
+
+        if (UseThemeBackground && SyntaxHighlighter?.DefaultBackground is { } themeBg)
+        {
+            borderAttr = borderAttr with { Background = themeBg };
+        }
 
         // Top border (row 0)
         LineCanvas.AddLine (screenOrigin, tableWidth, Orientation.Horizontal, LineStyle.Single, borderAttr);

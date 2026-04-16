@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using Terminal.Gui.Views;
 using TextMateSharp.Grammars;
 using TextMateSharp.Registry;
@@ -62,6 +63,7 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     /// </param>
     public TextMateSyntaxHighlighter (ThemeName theme = ThemeName.DarkPlus)
     {
+        CurrentThemeName = theme;
         _registryOptions = new RegistryOptions (theme);
         _registry = new Registry (_registryOptions);
         CacheThemeDefaults ();
@@ -138,6 +140,9 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     public static ThemeName GetThemeForBackground (Color background) =>
         background.IsDarkColor () ? ThemeName.DarkPlus : ThemeName.LightPlus;
 
+    /// <summary>Gets the <see cref="ThemeName"/> that is currently active.</summary>
+    public ThemeName CurrentThemeName { get; private set; }
+
     /// <inheritdoc/>
     public Color? DefaultBackground => _defaultBackground;
 
@@ -185,6 +190,7 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     /// <param name="theme">The new VS Code theme to use.</param>
     public void SetTheme (ThemeName theme)
     {
+        CurrentThemeName = theme;
         _registryOptions = new RegistryOptions (theme);
         _registry = new Registry (_registryOptions);
         _grammarCache.Clear ();
@@ -196,19 +202,49 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     private void CacheThemeDefaults ()
     {
         Theme t = _registry.GetTheme ();
-        List<ThemeTrieElementRule> defaultRules = t.Match (["source"]);
 
-        if (defaultRules.Count > 0)
+        // Prefer the VS Code GUI color dictionary for the true editor background/foreground.
+        // This gives us "editor.background" and "editor.foreground" which are the actual
+        // theme colors, unlike scope-based matching which may not differentiate themes.
+        ReadOnlyDictionary<string, string> guiColors = t.GetGuiColorDictionary ();
+
+        if (guiColors.TryGetValue ("editor.background", out string? bgHex) && !string.IsNullOrEmpty (bgHex))
         {
-            string? fgHex = t.GetColor (defaultRules [0].foreground);
-            string? bgHex = t.GetColor (defaultRules [0].background);
-            _defaultForeground = !string.IsNullOrEmpty (fgHex) ? Color.Parse (fgHex) : Color.White;
-            _defaultBackground = !string.IsNullOrEmpty (bgHex) ? Color.Parse (bgHex) : Color.Black;
+            _defaultBackground = Color.Parse (bgHex);
         }
         else
         {
-            _defaultForeground = Color.White;
-            _defaultBackground = Color.Black;
+            // Fallback: match the "source" scope for themes that don't specify GUI colors
+            List<ThemeTrieElementRule> defaultRules = t.Match (["source"]);
+
+            if (defaultRules.Count > 0)
+            {
+                string? scopeBgHex = t.GetColor (defaultRules [0].background);
+                _defaultBackground = !string.IsNullOrEmpty (scopeBgHex) ? Color.Parse (scopeBgHex) : Color.Black;
+            }
+            else
+            {
+                _defaultBackground = Color.Black;
+            }
+        }
+
+        if (guiColors.TryGetValue ("editor.foreground", out string? fgHex) && !string.IsNullOrEmpty (fgHex))
+        {
+            _defaultForeground = Color.Parse (fgHex);
+        }
+        else
+        {
+            List<ThemeTrieElementRule> defaultRules = t.Match (["source"]);
+
+            if (defaultRules.Count > 0)
+            {
+                string? scopeFgHex = t.GetColor (defaultRules [0].foreground);
+                _defaultForeground = !string.IsNullOrEmpty (scopeFgHex) ? Color.Parse (scopeFgHex) : Color.White;
+            }
+            else
+            {
+                _defaultForeground = Color.White;
+            }
         }
     }
 

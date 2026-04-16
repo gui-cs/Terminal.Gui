@@ -20,41 +20,49 @@ internal static class MarkdownAttributeHelper
     ///     Optional syntax highlighter. When non-null, the highlighter is queried first for
     ///     a theme-derived attribute via <see cref="ISyntaxHighlighter.GetAttributeForScope"/>.
     /// </param>
+    /// <param name="themeBackground">
+    ///     When non-null, overrides the view's normal background with the given color.
+    ///     Typically set to <see cref="ISyntaxHighlighter.DefaultBackground"/> when
+    ///     <see cref="Markdown.UseThemeBackground"/> is <see langword="true"/>.
+    /// </param>
     /// <returns>A fully resolved <see cref="Attribute"/> ready for drawing.</returns>
-    public static Attribute GetAttributeForSegment (View view, StyledSegment segment, ISyntaxHighlighter? highlighter = null)
+    public static Attribute GetAttributeForSegment (View view, StyledSegment segment, ISyntaxHighlighter? highlighter = null, Color? themeBackground = null)
     {
         if (segment.Attribute is { } explicitAttr)
         {
             return explicitAttr;
         }
 
+        // Use the provided theme background, or fall back to the view's normal background.
+        Attribute viewNormal = view.GetAttributeForRole (VisualRole.Normal);
+        Color bg = themeBackground ?? viewNormal.Background;
+
         if (highlighter?.GetAttributeForScope (segment.StyleRole) is { } scopeAttr)
         {
-            // Use the theme's foreground and style, but keep the view's background
-            // so inline elements (headings, links, etc.) don't get the code-theme background.
-            Attribute viewNormal = view.GetAttributeForRole (VisualRole.Normal);
-
-            return scopeAttr with { Background = viewNormal.Background };
+            return scopeAttr with { Background = bg };
         }
 
-        Attribute normal = view.GetAttributeForRole (VisualRole.Normal);
+        Attribute baseAttr = viewNormal with { Background = bg };
 
         return segment.StyleRole switch
                {
-                   MarkdownStyleRole.Heading => normal with { Style = normal.Style | TextStyle.Bold },
-                   MarkdownStyleRole.HeadingMarker => normal with { Style = normal.Style | TextStyle.Bold },
-                   MarkdownStyleRole.Emphasis => normal with { Style = normal.Style | TextStyle.Italic },
-                   MarkdownStyleRole.Strong => normal with { Style = normal.Style | TextStyle.Bold },
-                   MarkdownStyleRole.InlineCode or MarkdownStyleRole.CodeBlock => view.GetAttributeForRole (VisualRole.Code),
-                   MarkdownStyleRole.Link => MakeLinkAttribute (normal, segment),
-                   MarkdownStyleRole.Quote => normal with { Style = normal.Style | TextStyle.Faint },
-                   MarkdownStyleRole.Table => normal with { Style = normal.Style | TextStyle.Bold },
-                   MarkdownStyleRole.ThematicBreak => normal with { Style = normal.Style | TextStyle.Faint },
-                   MarkdownStyleRole.ImageAlt => normal with { Style = normal.Style | TextStyle.Italic },
-                   MarkdownStyleRole.TaskDone => normal with { Style = normal.Style | TextStyle.Strikethrough },
-                   MarkdownStyleRole.TaskTodo => normal with { Style = normal.Style | TextStyle.Bold },
-                   MarkdownStyleRole.ListMarker => normal with { Style = normal.Style | TextStyle.Bold },
-                   _ => normal
+                   MarkdownStyleRole.Heading => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
+                   MarkdownStyleRole.HeadingMarker => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
+                   MarkdownStyleRole.Emphasis => baseAttr with { Style = baseAttr.Style | TextStyle.Italic },
+                   MarkdownStyleRole.Strong => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
+                   MarkdownStyleRole.InlineCode or MarkdownStyleRole.CodeBlock =>
+                       themeBackground is { } codeBg
+                           ? view.GetAttributeForRole (VisualRole.Code) with { Background = codeBg }
+                           : view.GetAttributeForRole (VisualRole.Code),
+                   MarkdownStyleRole.Link => MakeLinkAttribute (baseAttr, segment),
+                   MarkdownStyleRole.Quote => baseAttr with { Style = baseAttr.Style | TextStyle.Faint },
+                   MarkdownStyleRole.Table => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
+                   MarkdownStyleRole.ThematicBreak => baseAttr with { Style = baseAttr.Style | TextStyle.Faint },
+                   MarkdownStyleRole.ImageAlt => baseAttr with { Style = baseAttr.Style | TextStyle.Italic },
+                   MarkdownStyleRole.TaskDone => baseAttr with { Style = baseAttr.Style | TextStyle.Strikethrough },
+                   MarkdownStyleRole.TaskTodo => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
+                   MarkdownStyleRole.ListMarker => baseAttr with { Style = baseAttr.Style | TextStyle.Bold },
+                   _ => baseAttr
                };
     }
 

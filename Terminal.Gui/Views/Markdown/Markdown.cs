@@ -82,6 +82,14 @@ public partial class Markdown : View, IDesignable
     public ISyntaxHighlighter? SyntaxHighlighter { get; set; }
 
     /// <summary>
+    ///     Gets or sets whether the view fills its background with the syntax highlighting theme's
+    ///     editor background color. When <see langword="true"/> and a <see cref="SyntaxHighlighter"/>
+    ///     is set, the theme's <see cref="ISyntaxHighlighter.DefaultBackground"/> is used for the
+    ///     entire viewport, headings, body text, and table cells. Defaults to <see langword="false"/>.
+    /// </summary>
+    public bool UseThemeBackground { get; set; }
+
+    /// <summary>
     ///     Gets or sets whether heading lines include the <c>#</c> prefix (e.g. <c># </c>, <c>## </c>).
     ///     When <see langword="true"/> (default), the hash markers are displayed so that heading levels
     ///     are visually distinguishable. When <see langword="false"/>, only the heading text is shown.
