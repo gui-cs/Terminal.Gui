@@ -227,6 +227,24 @@ public class MarkdownCodeBlock : View, IDesignable
         return true;
     }
 
+    /// <inheritdoc />
+    protected override bool OnClearingViewport ()
+    {
+        if (base.OnClearingViewport ())
+        {
+            return true;
+        }
+
+        // Fill entire area with code block background
+        Attribute normal = GetAttributeForRole (VisualRole.Code);
+        Color codeBg = ThemeBackground ?? normal.Background;
+        Attribute codeAttr = new (normal.Foreground, codeBg);
+        SetAttribute (codeAttr);
+        ClearViewport ();
+
+        return true;
+    }
+
     /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
     {

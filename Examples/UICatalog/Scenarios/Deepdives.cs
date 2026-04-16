@@ -64,8 +64,10 @@ public class Deepdives : Scenario
             Width = Dim.Fill (),
             Height = Dim.Fill (),
 
-            SyntaxHighlighter = new TextMateSyntaxHighlighter (ThemeName.Abbys)
+            SyntaxHighlighter = new TextMateSyntaxHighlighter (ThemeName.Abbys),
+            UseThemeBackground = true
         };
+
         _markdownView.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 
         _markdownView.LinkClicked += (_, e) =>

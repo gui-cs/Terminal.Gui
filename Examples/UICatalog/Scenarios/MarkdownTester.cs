@@ -62,7 +62,8 @@ public class MarkdownTester : Scenario
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             Text = Markdown.DefaultMarkdownSample,
-            SyntaxHighlighter = new TextMateSyntaxHighlighter (TextMateSharp.Grammars.ThemeName.DarkPlus)
+            SyntaxHighlighter = new TextMateSyntaxHighlighter (),
+            UseThemeBackground = true
         };
 
         previewFrame.Add (preview);
@@ -86,7 +87,9 @@ public class MarkdownTester : Scenario
 
         DropDownList<TextMateSharp.Grammars.ThemeName> themeDropDown = new ()
         {
-            Value = TextMateSharp.Grammars.ThemeName.DarkPlus
+            Value = TextMateSharp.Grammars.ThemeName.DarkPlus,
+            ReadOnly = true,
+            CanFocus = false
         };
 
         themeDropDown.ValueChanged += (_, e) =>

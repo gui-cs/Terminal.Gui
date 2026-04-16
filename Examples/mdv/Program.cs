@@ -1,10 +1,11 @@
 // mdv — A Terminal.Gui Markdown viewer
 //
 // Usage:
-//   mdv <file.md> [file2.md ...]               Inline mode: renders and exits
-//   mdv --full-screen <file.md> [file2.md ...]  Full-screen interactive mode
+//   mdv <file.md> [file2.md ...]               Full-screen interactive mode (default)
+//   mdv --print <file.md> [file2.md ...]        Print mode: renders to terminal and exits
 
 using System.Collections.ObjectModel;
+using System.CommandLine;
 using System.Drawing;
 using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
@@ -17,56 +18,57 @@ using Terminal.Gui.Views;
 using TextMateSharp.Grammars;
 // ReSharper disable AccessToDisposedClosure
 
-//ConfigurationManager.RuntimeConfig = """
-//                                     {
-//                                         "Theme": "Anders"
-//                                     }
-//                                     """;
-ConfigurationManager.Enable (ConfigLocations.All);
+Option<bool> printOption = new ("--print") { Description = "Print mode: renders markdown to the terminal and exits." };
+printOption.Aliases.Add ("-p");
 
-var fullScreen = false;
-ThemeName syntaxTheme = ThemeName.DarkPlus;
-List<string> filePatterns = [];
-
-for (var i = 0; i < args.Length; i++)
+Option<ThemeName> themeOption = new ("--theme")
 {
-    string arg = args [i];
+    Description = $"The syntax-highlighting theme to use. Available: {string.Join (", ", Enum.GetNames<ThemeName> ())}",
+    DefaultValueFactory = _ => ThemeName.DarkPlus
+};
+themeOption.Aliases.Add ("-t");
 
-    if (arg is "--full-screen" or "-f")
-    {
-        fullScreen = true;
-    }
-    else if (arg is "--theme" or "-t" && i + 1 < args.Length)
-    {
-        i++;
-
-        if (Enum.TryParse (args [i], true, out ThemeName parsed))
-        {
-            syntaxTheme = parsed;
-        }
-        else
-        {
-            Console.Error.WriteLine ($"Unknown theme '{args [i]}'. Available: {string.Join (", ", Enum.GetNames<ThemeName> ())}");
-
-            return 1;
-        }
-    }
-    else
-    {
-        filePatterns.Add (arg);
-    }
-}
-
-List<string> files = ExpandFiles (filePatterns);
-
-if (files.Count == 0)
+Argument<string []> filesArgument = new ("files")
 {
-    Console.Error.WriteLine ("Usage: mdv [--full-screen] [--theme <ThemeName>] <file.md> [file2.md ...]");
+    Description = "One or more markdown file paths (glob patterns supported).",
+    Arity = ArgumentArity.OneOrMore
+};
 
-    return 1;
-}
+RootCommand rootCommand = new ("mdv — A Terminal.Gui Markdown viewer")
+{
+    printOption,
+    themeOption,
+    filesArgument
+};
 
-return fullScreen ? RunFullScreen (files, syntaxTheme) : RunInline (files, syntaxTheme);
+rootCommand.SetAction (parseResult =>
+                       {
+                           bool print = parseResult.GetValue (printOption);
+                           ThemeName syntaxTheme = parseResult.GetValue (themeOption);
+                           string [] filePatterns = parseResult.GetValue (filesArgument) ?? [];
+
+                           List<string> files = ExpandFiles ([.. filePatterns]);
+
+                           if (files.Count == 0)
+                           {
+                               Console.Error.WriteLine ("No matching files found.");
+
+                               return;
+                           }
+
+                           ConfigurationManager.Enable (ConfigLocations.All);
+
+                           if (print)
+                           {
+                               RunInline (files, syntaxTheme);
+                           }
+                           else
+                           {
+                               RunFullScreen (files, syntaxTheme);
+                           }
+                       });
+
+return rootCommand.Parse (args).Invoke ();
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -117,10 +119,10 @@ static string FormatFileSize (long bytes)
 }
 
 // ---------------------------------------------------------------------------
-// Inline mode — render markdown into the scrollback buffer, then exit
+// Print mode — render markdown into the scrollback buffer, then exit
 // ---------------------------------------------------------------------------
 
-static int RunInline (List<string> files, ThemeName syntaxTheme)
+static void RunInline (List<string> files, ThemeName syntaxTheme)
 {
     string markdown = string.Join ("\n\n---\n\n", files.Select (File.ReadAllText));
 
@@ -158,8 +160,6 @@ static int RunInline (List<string> files, ThemeName syntaxTheme)
 
     markdownView.Draw ();
     Console.WriteLine (app.Driver?.ToAnsi ());
-
-    return 0;
 }
 
 static IDriver? CreateDriver ()
@@ -172,7 +172,7 @@ static IDriver? CreateDriver ()
 // Full-screen mode — interactive viewer with StatusBar
 // ---------------------------------------------------------------------------
 
-static int RunFullScreen (List<string> files, ThemeName syntaxTheme)
+static void RunFullScreen (List<string> files, ThemeName syntaxTheme)
 {
     IApplication app = Application.Create ().Init ();
 
@@ -259,7 +259,7 @@ static int RunFullScreen (List<string> files, ThemeName syntaxTheme)
 
     List<Shortcut> statusItems =
     [
-        new (Application.GetDefaultKey (Command.Quit), "Quit", window.RequestStop),
+        new (Application.GetDefaultKey (Terminal.Gui.Input.Command.Quit), "Quit", window.RequestStop),
         contentWidthShortcut
     ];
 
@@ -342,9 +342,8 @@ static int RunFullScreen (List<string> files, ThemeName syntaxTheme)
     window.Dispose ();
     app.Dispose ();
 
-    return 0;
+    return;
 
-    // -- local helper -------------------------------------------------------
     void LoadFile (string filePath)
     {
         string content = File.ReadAllText (filePath);
