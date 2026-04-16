@@ -303,10 +303,10 @@ static void RunFullScreen (List<string> files, ThemeName syntaxTheme)
     // File selector when multiple files are provided
     if (files.Count > 1)
     {
-        List<string> fileNames = [.. files.Select (Path.GetFileName)!];
-        ObservableCollection<string> fileNamesOc = new (fileNames);
+        List<string?> fileNames = [.. files.Select (Path.GetFileName)];
+        ObservableCollection<string> fileNamesOc = new (fileNames!);
 
-        DropDownList fileSelector = new () { Source = new ListWrapper<string> (fileNamesOc), ReadOnly = true, Text = fileNames [0], Width = 30 };
+        DropDownList fileSelector = new () { Source = new ListWrapper<string> (fileNamesOc), ReadOnly = true, Text = fileNames [0] ?? string.Empty, Width = 30 };
 
         fileSelector.ValueChanged += (_, _) =>
                                      {

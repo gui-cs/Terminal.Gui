@@ -75,7 +75,7 @@ internal sealed class ChatView : Window
         _inputField.Border.LineStyle = _inputIndicator.Border.LineStyle;
         _inputField.Border.Thickness = new Thickness (0, 1, 0, 1);
 
-        _inputField.Autocomplete.SuggestionGenerator = new SlashCommandSuggestionGenerator ();
+        _inputField.Autocomplete?.SuggestionGenerator = new SlashCommandSuggestionGenerator ();
         _inputField.Accepted += OnInputAccepted;
 
         Add (_conversationView, _inputIndicator, _inputField, _statusBar);
