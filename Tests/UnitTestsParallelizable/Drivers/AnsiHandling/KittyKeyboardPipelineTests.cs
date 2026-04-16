@@ -227,9 +227,10 @@ public class KittyKeyboardPipelineTests
     [InlineData ("Ç", 199)]
     [InlineData ("º", 186)]
     [InlineData ("ª", 170)]
-    public void Pipeline_MixedKittyAndLegacyPrintable_PortugueseKeys_DoesNotRaiseDuplicateKeyDown (string printable, int kittyCode)
+    public void Pipeline_MixedKittyAndLegacyPrintable_PortugueseKeys_WhenKittySequencePresent_DoesNotRaiseDuplicateKeyDown (string printable, int kittyCode)
     {
-        // Issue #4918 (PT keyboard): kitty CSI-u plus legacy printable input for the same key should produce one KeyDown.
+        // Issue #4918 (PT keyboard): when kitty CSI-u and legacy printable input both arrive for the same keypress,
+        // the pipeline should raise only one KeyDown. This test is intentionally kitty-specific.
         var kittySequence = $"\x1b[{kittyCode}u";
         (List<Key> down, List<Key> up) = InjectRawSequence (kittySequence, printable);
 
@@ -252,6 +253,23 @@ public class KittyKeyboardPipelineTests
     }
 
     // Copilot
+    [Theory]
+    [InlineData ("«")]
+    [InlineData ("»")]
+    [InlineData ("ç")]
+    [InlineData ("Ç")]
+    [InlineData ("º")]
+    [InlineData ("ª")]
+    public void Pipeline_LegacyPrintable_PortugueseKeys_WhenKittySequenceNotPresent_DoesNotRaiseDuplicateKeyDown (string printable)
+    {
+        (List<Key> down, List<Key> up) = InjectRawSequence (printable);
+
+        Assert.Single (down);
+        Assert.Equal (printable, down [0].GetPrintableText ());
+        Assert.Empty (up);
+    }
+
+    // Copilot
     [Fact]
     public void Pipeline_RepeatedLegacyPrintableInput_DoesNotDropRepeatedCharacters ()
     {
@@ -259,6 +277,24 @@ public class KittyKeyboardPipelineTests
 
         Assert.Equal (12, down.Count);
         Assert.Equal ("111222333444", string.Concat (down.Select (key => key.GetPrintableText ())));
+        Assert.Empty (up);
+    }
+
+    // Copilot
+    [Theory]
+    [InlineData ("«")]
+    [InlineData ("»")]
+    [InlineData ("ç")]
+    [InlineData ("Ç")]
+    [InlineData ("º")]
+    [InlineData ("ª")]
+    public void Pipeline_RepeatedLegacyPrintable_PortugueseKeys_WithoutKittySequence_DoNotDropCharacters (string printable)
+    {
+        string input = printable + printable;
+        (List<Key> down, List<Key> up) = InjectRawSequence (input);
+
+        Assert.Equal (2, down.Count);
+        Assert.Equal (input, string.Concat (down.Select (key => key.GetPrintableText ())));
         Assert.Empty (up);
     }
 
