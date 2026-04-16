@@ -42,7 +42,10 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
         Height = Dim.Auto (DimAutoStyle.Content, Dim.Func (_ => Orientation == Orientation.Vertical ? SuperView?.Viewport.Height ?? 0 : 1));
 
-        _decreaseButton = new ScrollButton ();
+        _decreaseButton = new ScrollButton ()
+        {
+            Direction = NavigationDirection.Backward
+        };
         _decreaseButton.Accepting += OnDecreaseButtonOnAccept;
 
         Slider = new ScrollSlider
@@ -52,7 +55,10 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         Slider.Scrolled += SliderOnScroll;
         Slider.PositionChanged += SliderOnPositionChanged;
 
-        _increaseButton = new ScrollButton ();
+        _increaseButton = new ScrollButton ()
+        {
+            Direction = NavigationDirection.Forward
+        };
         _increaseButton.Accepting += OnIncreaseButtonOnAccept;
         Add (_decreaseButton, Slider, _increaseButton);
 

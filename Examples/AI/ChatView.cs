@@ -42,7 +42,7 @@ internal sealed class ChatView : Window
         {
             AutoSpin = false,
             Style = new SpinnerStyle.FingerDance (),
-            UseProgressIndicator = true,
+            SyncWithTerminal = true,
             Height = 1,
             Width = 5,
             Visible = false

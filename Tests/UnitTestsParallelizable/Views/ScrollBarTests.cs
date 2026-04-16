@@ -271,6 +271,33 @@ public class ScrollBarTests
         Assert.Equal (0, scrollBar.GetSliderPosition ());
     }
 
+    // Copilot
+    [Fact]
+    public void Horizontal_ScrollBar_Buttons_Use_Left_And_Right_Arrows ()
+    {
+        ScrollBar scrollBar = new ()
+        {
+            Orientation = Orientation.Horizontal
+        };
+        ScrollButton decreaseButton = scrollBar.SubViews.OfType<ScrollButton> ().Single (button => button.Direction == NavigationDirection.Backward);
+        ScrollButton increaseButton = scrollBar.SubViews.OfType<ScrollButton> ().Single (button => button.Direction == NavigationDirection.Forward);
+
+        Assert.Equal (Glyphs.LeftArrow.ToString (), decreaseButton.Title);
+        Assert.Equal (Glyphs.RightArrow.ToString (), increaseButton.Title);
+    }
+
+    // Copilot
+    [Fact]
+    public void Vertical_ScrollBar_Buttons_Use_Up_And_Down_Arrows ()
+    {
+        ScrollBar scrollBar = new ();
+        ScrollButton decreaseButton = scrollBar.SubViews.OfType<ScrollButton> ().Single (button => button.Direction == NavigationDirection.Backward);
+        ScrollButton increaseButton = scrollBar.SubViews.OfType<ScrollButton> ().Single (button => button.Direction == NavigationDirection.Forward);
+
+        Assert.Equal (Glyphs.UpArrow.ToString (), decreaseButton.Title);
+        Assert.Equal (Glyphs.DownArrow.ToString (), increaseButton.Title);
+    }
+
     #endregion Orientation
 
     #region Size
