@@ -39,6 +39,7 @@ namespace Terminal.Gui.Drivers;
 /// </summary>
 public class AnsiInputProcessor : InputProcessorImpl<char>
 {
+    private bool _isKittyKeyboardEnabled;
     private string _pendingPrintableSuppression = string.Empty;
 
     /// <inheritdoc/>
@@ -83,7 +84,15 @@ public class AnsiInputProcessor : InputProcessorImpl<char>
     {
         if (string.IsNullOrEmpty (_pendingPrintableSuppression))
         {
-            _pendingPrintableSuppression = key.GetPrintableText ();
+            if (_isKittyKeyboardEnabled)
+            {
+                string fallbackPrintableText = key.GetPrintableText ();
+
+                if (!string.IsNullOrEmpty (fallbackPrintableText))
+                {
+                    _pendingPrintableSuppression = fallbackPrintableText;
+                }
+            }
 
             return false;
         }
@@ -94,6 +103,8 @@ public class AnsiInputProcessor : InputProcessorImpl<char>
 
         return suppress;
     }
+
+    internal void SetKittyKeyboardEnabled (bool enabled) => _isKittyKeyboardEnabled = enabled;
 
     /// <inheritdoc/>
     public override void InjectKeyDownEvent (Key key)
