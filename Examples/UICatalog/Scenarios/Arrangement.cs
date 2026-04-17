@@ -151,9 +151,9 @@ public class Arrangement : Scenario
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped
         };
 
-        datePicker.SetScheme (new Scheme (new Attribute (SchemeManager.GetScheme (Schemes.Runnable).Normal.Foreground.GetBrighterColor (),
-                                                         SchemeManager.GetScheme (Schemes.Runnable).Normal.Background.GetBrighterColor (),
-                                                         SchemeManager.GetScheme (Schemes.Runnable).Normal.Style)));
+        datePicker.SetScheme (new Scheme (new Attribute (SchemeManager.GetScheme (Schemes.Accent).Normal.Foreground.GetBrighterColor (),
+                                                         SchemeManager.GetScheme (Schemes.Accent).Normal.Background.GetBrighterColor (),
+                                                         SchemeManager.GetScheme (Schemes.Accent).Normal.Style)));
 
         TransparentView transparentView = new ()
         {
@@ -212,7 +212,7 @@ public class Arrangement : Scenario
             Width = Dim.Auto (minimumContentDim: 20),
             Height = Dim.Auto (minimumContentDim: 3),
             Title = $"Overlapped{id} _{GetNextHotKey ()}",
-            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Runnable),
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent),
             Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyles.Transparent,
             BorderStyle = LineStyle.Double,

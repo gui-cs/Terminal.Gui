@@ -21,7 +21,7 @@ public sealed class PosAlignDemo : Scenario
         using Window appWindow = new ();
         appWindow.Title = $"{Application.GetDefaultKey (Command.Quit)} to Quit - Scenario: {GetName ()} - {GetDescription ()}";
 
-        SetupControls (appWindow, Dimension.Width, Schemes.Runnable);
+        SetupControls (appWindow, Dimension.Width, Schemes.Accent);
 
         SetupControls (appWindow, Dimension.Height, Schemes.Error);
 

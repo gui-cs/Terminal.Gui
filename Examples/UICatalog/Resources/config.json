@@ -12,7 +12,7 @@
         "Glyphs.WideGlyphReplacement": "①",
         "Schemes": [
           {
-            "Runnable": {
+            "Accent": {
               "Normal": {
                 "Foreground": "Black",
                 "Background": "#FFFF00"
@@ -175,7 +175,7 @@
             }
           },
           {
-            "Runnable": {
+            "Accent": {
               "Normal": {
                 "Foreground": "DarkGray",
                 "Background": "White"
