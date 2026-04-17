@@ -104,7 +104,7 @@ public partial class TextView
             }
             need = true;
         }
-        else if (!_wordWrap && (CurrentColumn - Viewport.X + 1 > Viewport.Width || dSize.size + 1 >= Viewport.Width))
+        else if (!_wordWrap && (CurrentColumn - Viewport.X + 1 > Viewport.Width || dSize.size - Viewport.X + 1 >= Viewport.Width))
         {
             Viewport = Viewport with { X = TextModel.CalculateLeftColumn (line, Viewport.X, CurrentColumn, Viewport.Width, TabWidth) };
             need = true;

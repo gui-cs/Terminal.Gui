@@ -322,7 +322,7 @@ public class TextViewNavigationTests
     [Fact]
     public void CursorRight_At_NearTheEndOfLine_With_ViewportY_Greater_Than_Zero_Does_Not_Scroll_Up ()
     {
-        // Test that pressing CursorRight at end of line does not scroll up if Viewport.Y > 0
+        // Test that pressing CursorRight at near the end of line does not scroll up if Viewport.Y > 0
         TextView tv = new ()
         {
             Width = 10,
@@ -343,5 +343,36 @@ public class TextViewNavigationTests
         Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
         Assert.Equal (new Point (0, 1), tv.Viewport.Location);
         Assert.Equal (new Point (6, 1), tv.InsertionPoint);
+    }
+
+    [Fact]
+    public void CursorRight_At_BeforeNearTheEndOfLine_With_ViewportX_Greater_Than_Zero_Does_Not_Scroll_Left ()
+    {
+        // Test that pressing CursorRight at neat the end of line does not scroll left if Viewport.X > 0
+        TextView tv = new ()
+        {
+            Width = 10, Height = 3,
+            Text = "Line1 with more long text.\nLine2.\nLine3.\nLine4."
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Scroll to the column 10 and set insertion point at before near the end of line
+        tv.Viewport = tv.Viewport with { X = 10 };
+        tv.InsertionPoint = new Point (17, 0);
+        Assert.Equal (new Point (10, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (17, 0), tv.InsertionPoint);
+        Assert.False (tv.WordWrap);
+        Assert.True (tv.NeedsDraw);
+
+        // Clear NeedsDraw to isolate the effect of CursorRight key press
+        tv.ClearNeedsDraw ();
+        Assert.False (tv.NeedsDraw);
+
+        // Press CursorRight - should not scroll left since we aren't already at the end of the line
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (new Point (10, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (18, 0), tv.InsertionPoint);
+        Assert.False (tv.NeedsDraw);
     }
 }

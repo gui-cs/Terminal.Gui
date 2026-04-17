@@ -296,7 +296,7 @@ public partial class TextView
         {
             CurrentColumn++;
 
-            if (CurrentColumn >= currentLine.Count || TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _) >= Viewport.Width)
+            if (CurrentColumn >= currentLine.Count || TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _) >= Viewport.X + Viewport.Width)
             {
                 SetNeedsDraw ();
             }
