@@ -318,4 +318,30 @@ public class TextViewNavigationTests
         Assert.Equal (Point.Empty, tv.InsertionPoint);
         Assert.False (tv.IsSelecting);
     }
+
+    [Fact]
+    public void CursorRight_At_NearTheEndOfLine_With_ViewportY_Greater_Than_Zero_Does_Not_Scroll_Up ()
+    {
+        // Test that pressing CursorRight at end of line does not scroll up if Viewport.Y > 0
+        TextView tv = new ()
+        {
+            Width = 10,
+            Height = 3,
+            Text = "Line1.\nLine2.\nLine3.\nLine4.\nLine5."
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Scroll to second line and set insertion point at near the end of line
+        tv.Viewport = tv.Viewport with { Y = 1 };
+        tv.InsertionPoint = new Point (5, 1);
+        Assert.Equal (new Point (0, 1), tv.Viewport.Location);
+        Assert.Equal (new Point (5, 1), tv.InsertionPoint);
+        Assert.False (tv.WordWrap);
+
+        // Press CursorRight - should not scroll up since we aren't already at first line
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (new Point (0, 1), tv.Viewport.Location);
+        Assert.Equal (new Point (6, 1), tv.InsertionPoint);
+    }
 }
