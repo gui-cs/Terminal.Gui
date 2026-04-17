@@ -393,6 +393,11 @@ public partial class TextView
             CurrentRow = newPos.Value.row;
         }
 
+        if (CurrentRow < Viewport.Y || CurrentColumn < Viewport.X || CurrentColumn >= Viewport.X + Viewport.Width)
+        {
+            SetNeedsDraw ();
+        }
+
         DoNeededAction ();
 
         return true;
@@ -406,6 +411,11 @@ public partial class TextView
         {
             CurrentColumn = newPos.Value.col;
             CurrentRow = newPos.Value.row;
+        }
+
+        if (CurrentRow >= Viewport.Y + Viewport.Height || CurrentColumn >= Viewport.X + Viewport.Width || CurrentColumn < Viewport.X)
+        {
+            SetNeedsDraw ();
         }
 
         DoNeededAction ();

@@ -375,4 +375,108 @@ public class TextViewNavigationTests
         Assert.Equal (new Point (18, 0), tv.InsertionPoint);
         Assert.False (tv.NeedsDraw);
     }
+
+    [Fact]
+    public void CursorRight_With_CtrlKey_Pressed_At_BeforeNearTheEndOfLine_Scrolls_Right_Next_Word ()
+    {
+        // Test that pressing Ctrl+CursorRight at neat the end of line scrolls right to next word
+        TextView tv = new () { Width = 10, Height = 3, Text = "Line1 with more long text.\nLine2.\nLine3.\nLine4." };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Scroll to the column 10 and set insertion point at before near the end of line
+        tv.Viewport = tv.Viewport with { X = 10 };
+        tv.InsertionPoint = new Point (17, 0);
+        Assert.Equal (new Point (10, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (17, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+
+        // Clear NeedsDraw to isolate the effect of Ctrl+CursorRight key press
+        tv.ClearNeedsDraw ();
+        Assert.False (tv.NeedsDraw);
+
+        // Press Ctrl+CursorRight - should scroll right to next word
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight.WithCtrl));
+        Assert.Equal (new Point (12, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (21, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+    }
+
+    [Fact]
+    public void CursorRight_With_CtrlKey_Pressed_At_TheEndOfLine_Scrolls_Left_To_StartOfNextLine ()
+    {
+        // Test that pressing Ctrl+CursorRight at the end of line scrolls right to start of next line
+        TextView tv = new () { Width = 10, Height = 3, Text = "Line1 with more long text.\nLine2.\nLine3.\nLine4." };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Scroll to the column 17 and set insertion point at the end of line
+        tv.Viewport = tv.Viewport with { X = 17 };
+        tv.InsertionPoint = new Point (26, 0);
+        Assert.Equal (new Point (17, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (26, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+
+        // Clear NeedsDraw to isolate the effect of Ctrl+CursorRight key press
+        tv.ClearNeedsDraw ();
+        Assert.False (tv.NeedsDraw);
+
+        // Press Ctrl+CursorRight - should scroll right to start of next line
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight.WithCtrl));
+        Assert.Equal (new Point (0, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+    }
+
+    [Fact]
+    public void CursorLeft_With_CtrlKey_Pressed_At_BeforeNearTheStartOfLine_Scrolls_Left_Previous_Word ()
+    {
+        // Test that pressing Ctrl+CursorLeft at neat the start of line scrolls left to previous word
+        TextView tv = new () { Width = 10, Height = 3, Text = "Line1 with more long text.\nLine2.\nLine3.\nLine4." };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Scroll to the column 2 and set insertion point at before near the start of line
+        tv.Viewport = tv.Viewport with { X = 2 };
+        tv.InsertionPoint = new Point (4, 0);
+        Assert.Equal (new Point (2, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (4, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+
+        // Clear NeedsDraw to isolate the effect of Ctrl+CursorLeft key press
+        tv.ClearNeedsDraw ();
+        Assert.False (tv.NeedsDraw);
+
+        // Press Ctrl+CursorLeft - should scroll left to previous word
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft.WithCtrl));
+        Assert.Equal (new Point (0, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (0, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+    }
+
+    [Fact]
+    public void CursorLeft_With_CtrlKey_Pressed_At_TheStartOfLine_Scrolls_Right_To_EndOfPreviousLine ()
+    {
+        // Test that pressing Ctrl+CursorLeft at the start of line scrolls left to end of previous line
+        TextView tv = new () { Width = 10, Height = 3, Text = "Line1 with more long text.\nLine2.\nLine3.\nLine4." };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Scroll to the column 0 and set insertion point at the start of line
+        tv.Viewport = tv.Viewport with { X = 0, Y = 1 };
+        tv.InsertionPoint = new Point (0, 1);
+        Assert.Equal (new Point (0, 1), tv.Viewport.Location);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+
+        // Clear NeedsDraw to isolate the effect of Ctrl+CursorLeft key press
+        tv.ClearNeedsDraw ();
+        Assert.False (tv.NeedsDraw);
+
+        // Press Ctrl+CursorLeft - should scroll left to end of previous line
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft.WithCtrl));
+        Assert.Equal (new Point (17, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (26, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+    }
 }
