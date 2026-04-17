@@ -43,7 +43,7 @@ public class ProgressBar : View, IDesignable
     private int _delta;
     private float _fraction;
     private bool _isActivity;
-    private bool _useProgressIndicator;
+    private bool _syncWithTerminal;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProgressBar"/> class, starts in percentage mode and uses relative
@@ -85,17 +85,17 @@ public class ProgressBar : View, IDesignable
     ///     This is independent of <see cref="View.Visible"/> so the terminal progress indicator can continue to be used
     ///     even when the on-screen <see cref="ProgressBar"/> is hidden.
     /// </remarks>
-    public bool UseProgressIndicator
+    public bool SyncWithTerminal
     {
-        get => _useProgressIndicator;
+        get => _syncWithTerminal;
         set
         {
-            if (_useProgressIndicator == value)
+            if (_syncWithTerminal == value)
             {
                 return;
             }
 
-            _useProgressIndicator = value;
+            _syncWithTerminal = value;
 
             if (value)
             {
@@ -292,7 +292,7 @@ public class ProgressBar : View, IDesignable
     /// <inheritdoc/>
     protected override void Dispose (bool disposing)
     {
-        if (disposing && _useProgressIndicator)
+        if (disposing && _syncWithTerminal)
         {
             ClearTerminalProgress ();
         }
@@ -306,7 +306,7 @@ public class ProgressBar : View, IDesignable
 
     private void UpdateTerminalProgress ()
     {
-        if (!_useProgressIndicator || Driver?.ProgressIndicator is not { } progressIndicator)
+        if (!_syncWithTerminal || Driver?.ProgressIndicator is not { } progressIndicator)
         {
             return;
         }

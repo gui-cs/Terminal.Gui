@@ -155,7 +155,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///         of the View hierarchy (the top-most SuperView).
     ///     </para>
     /// </remarks>
-    public IApplication? App { get => GetApp (); internal set => _app = value; }
+    public IApplication? App { get => GetApp (); set => _app = value; }
 
     /// <summary>
     ///     Gets the <see cref="IApplication"/> instance this view is running in. Used internally to allow overrides by
@@ -302,6 +302,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
         UpdateTextDirection (TextDirection);
         UpdateTextFormatterText ();
 
+        // Force a layout each time a View is initialized
+        Layout ();
+
         foreach (View view in InternalSubViews)
         {
             if (!view.IsInitialized)
@@ -309,9 +312,6 @@ public partial class View : IDisposable, ISupportInitializeNotification
                 view.EndInit ();
             }
         }
-
-        // Force a layout each time a View is initialized
-        Layout ();
 
         // Complex layout scenarios (e.g. DimAuto and PosAlign) may require multiple layouts to be performed.
         // Thus, we call SetNeedsLayout() to ensure that the layout is performed at least once.
@@ -486,8 +486,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     internal TextFormatter TitleTextFormatter { get; init; } = new ();
 
     /// <summary>
-    ///     The title to be displayed for this <see cref="View"/>. The title will be displayed if <see cref="Border"/>.
-    ///     <see cref="Thickness.Top"/> is greater than 0. The title can be used to set the <see cref="HotKey"/>
+    ///     The title to be displayed for this <see cref="View"/>. The title can be used to set the <see cref="HotKey"/>
     ///     for the view by prefixing character with <see cref="HotKeySpecifier"/> (e.g. <c>"T_itle"</c>).
     /// </summary>
     /// <remarks>
@@ -501,6 +500,19 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///     <para>
     ///         To cause the hotkey to be rendered with <see cref="Text"/>,
     ///         set <c>View.</c><see cref="TextFormatter.HotKeySpecifier"/> to the desired character.
+    ///     </para>
+    ///     <para>
+    ///         When <see cref="Border"/> is configured with <see cref="BorderSettings.Title"/> and
+    ///         <see cref="IAdornment.Thickness"/>.
+    ///         <see cref="Thickness.Top"/> is greater than 0 the Title will be displayed.
+    ///     </para>
+    ///     <para>
+    ///         When <see cref="Border"/> is configured with <see cref="BorderSettings.TerminalTitle"/>, and the View is a
+    ///         <see cref="Runnable"/>
+    ///         the Title will be rendered in the
+    ///         terminal's title bar using OSC 0..2 sequences when the View is Modal (see <see cref="IRunnable.IsModal"/>).
+    ///         In this case, hotkey specifiers will not be displayed in the terminal's title bar.
+    ///         See <see cref="IDriver.SetTerminalTitle"/> for more information.
     ///     </para>
     /// </remarks>
     /// <value>The title.</value>

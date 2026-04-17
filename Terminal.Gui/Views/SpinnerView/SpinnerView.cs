@@ -19,7 +19,7 @@ public class SpinnerView : View, IDesignable
     private string [] _sequence = _defaultStyle.Sequence;
     private SpinnerStyle _style = _defaultStyle;
     private object? _timeout;
-    private bool _useProgressIndicator;
+    private bool _syncWithTerminal;
 
     /// <summary>Creates a new instance of the <see cref="SpinnerView"/> class.</summary>
     public SpinnerView ()
@@ -62,12 +62,12 @@ public class SpinnerView : View, IDesignable
     ///     Gets or sets whether <see cref="SpinnerView"/> should mirror <see cref="AutoSpin"/> to the driver's terminal
     ///     <see cref="ProgressIndicator"/>.
     /// </summary>
-    public bool UseProgressIndicator
+    public bool SyncWithTerminal
     {
-        get => _useProgressIndicator;
+        get => _syncWithTerminal;
         set
         {
-            if (_useProgressIndicator == value)
+            if (_syncWithTerminal == value)
             {
                 return;
             }
@@ -75,12 +75,12 @@ public class SpinnerView : View, IDesignable
             if (!value)
             {
                 ClearProgressIndicator ();
-                _useProgressIndicator = value;
+                _syncWithTerminal = value;
 
                 return;
             }
 
-            _useProgressIndicator = value;
+            _syncWithTerminal = value;
             SyncProgressIndicator ();
         }
     }
@@ -240,7 +240,7 @@ public class SpinnerView : View, IDesignable
         _timeout = App?.AddTimeout (TimeSpan.FromMilliseconds (SpinDelay),
                                     () =>
                                     {
-                                        App.Invoke (_ => AdvanceAnimation ());
+                                        App?.Invoke (_ => AdvanceAnimation ());
 
                                         return true;
                                     });
@@ -288,7 +288,7 @@ public class SpinnerView : View, IDesignable
 
     private void ClearProgressIndicator ()
     {
-        if (!_useProgressIndicator)
+        if (!_syncWithTerminal)
         {
             return;
         }
@@ -332,7 +332,7 @@ public class SpinnerView : View, IDesignable
 
     private void SyncProgressIndicator ()
     {
-        if (!_useProgressIndicator)
+        if (!_syncWithTerminal)
         {
             return;
         }

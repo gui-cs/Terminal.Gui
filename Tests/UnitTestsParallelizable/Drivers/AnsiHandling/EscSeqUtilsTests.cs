@@ -20,6 +20,8 @@ public class EscSeqUtilsTests
         Assert.Equal ("\x1b[?1015l", EscSeqUtils.CSI_DisableUrxvtExtModeMouse);
         Assert.Equal ("\x1b[?1003h\x1b[?1015h\u001b[?1006h", EscSeqUtils.CSI_EnableMouseEvents);
         Assert.Equal ("\x1b[?1003l\x1b[?1015l\u001b[?1006l", EscSeqUtils.CSI_DisableMouseEvents);
+        Assert.Equal ($"{EscSeqUtils.CSI}6n", EscSeqUtils.CSI_RequestCursorPositionReport.Request);
+        Assert.Equal ("R", EscSeqUtils.CSI_RequestCursorPositionReport.Terminator);
     }
 
     [Fact]
@@ -105,6 +107,18 @@ public class EscSeqUtilsTests
         Assert.Equal ($"{EscSeqUtils.OSC}9;4;2;10{EscSeqUtils.ST}", EscSeqUtils.OSC_SetProgressError (10));
         Assert.Equal ($"{EscSeqUtils.OSC}9;4;3;0{EscSeqUtils.ST}", EscSeqUtils.OSC_SetProgressIndeterminate ());
         Assert.Equal ($"{EscSeqUtils.OSC}9;4;4;25{EscSeqUtils.ST}", EscSeqUtils.OSC_SetProgressPaused (25));
+    }
+
+    // Copilot
+    [Theory]
+    [InlineData (-1, "title", $"{EscSeqUtils.OSC}0;title{EscSeqUtils.ST}")]
+    [InlineData (1, "icon", $"{EscSeqUtils.OSC}1;icon{EscSeqUtils.ST}")]
+    [InlineData (2, "window", $"{EscSeqUtils.OSC}2;window{EscSeqUtils.ST}")]
+    [InlineData (99, "title", $"{EscSeqUtils.OSC}2;title{EscSeqUtils.ST}")]
+    [InlineData (0, "\u001bA\u0007B", $"{EscSeqUtils.OSC}0;AB{EscSeqUtils.ST}")]
+    public void OSC_SetWindowTitle_ReturnsExpectedSequence (int mode, string title, string expected)
+    {
+        Assert.Equal (expected, EscSeqUtils.OSC_SetWindowTitle (title, mode));
     }
 
     [Theory]

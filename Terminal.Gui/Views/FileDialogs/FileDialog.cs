@@ -443,7 +443,7 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.Title = Style.PathCaption;
         _tbFind.Title = Style.SearchCaption;
 
-        _tbPath.Autocomplete.Scheme = new Scheme (_tbPath.GetScheme ())
+        _tbPath.Autocomplete?.Scheme = new Scheme (_tbPath.GetScheme ())
         {
             Normal = new Attribute (Color.Black, _tbPath.GetAttributeForRole (VisualRole.Normal).Background)
         };
@@ -1016,7 +1016,7 @@ public class FileDialog : Dialog, IDesignable
             PushState (dir.Parent, true, false);
         }
 
-        _tbPath.Autocomplete.GenerateSuggestions (new AutocompleteFilepathContext (_tbPath.Text, _tbPath.InsertionPoint, State));
+        _tbPath.Autocomplete?.GenerateSuggestions (new AutocompleteFilepathContext (_tbPath.Text, _tbPath.InsertionPoint, State));
     }
 
     private void PushState (FileDialogState newState, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true, string? pathText = null)
@@ -1036,7 +1036,7 @@ public class FileDialog : Dialog, IDesignable
                 _history.Push (State, clearForward);
             }
 
-            _tbPath.Autocomplete.ClearSuggestions ();
+            _tbPath.Autocomplete?.ClearSuggestions ();
 
             if (pathText is { })
             {
@@ -1268,7 +1268,7 @@ public class FileDialog : Dialog, IDesignable
 
             SetPathToSelectedObject (dest);
             State!.Selected = stats;
-            _tbPath.Autocomplete.ClearSuggestions ();
+            _tbPath.Autocomplete?.ClearSuggestions ();
         }
         finally
         {
@@ -1505,7 +1505,7 @@ public class FileDialog : Dialog, IDesignable
 
             Parent.App?.Invoke (_ =>
                                 {
-                                    Parent._tbPath.Autocomplete.GenerateSuggestions (new AutocompleteFilepathContext (Parent._tbPath.Text,
+                                    Parent._tbPath.Autocomplete?.GenerateSuggestions (new AutocompleteFilepathContext (Parent._tbPath.Text,
                                                                                          Parent._tbPath.InsertionPoint,
                                                                                          this));
                                     Parent.WriteStateToTableView ();

@@ -137,6 +137,10 @@ public class Border : AdornmentImpl
     ///     <para>
     ///         <see cref="BorderSettings.Gradient"/> enables gradient-filled borders using <see cref="GradientFill"/>.
     ///     </para>
+    ///     <para>
+    ///         <see cref="BorderSettings.TerminalTitle"/> writes OSC 0..2 terminal title sequences when the view is
+    ///         modal and at the top of the runnable stack.
+    ///     </para>
     /// </remarks>
     public BorderSettings Settings
     {
@@ -150,7 +154,7 @@ public class Border : AdornmentImpl
 
             field = value;
 
-            if (field.HasFlag (BorderSettings.Tab))
+            if (field.HasFlag (BorderSettings.Tab) || field.HasFlag (BorderSettings.TerminalTitle))
             {
                 GetOrCreateView ();
             }
