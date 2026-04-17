@@ -3,7 +3,6 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace UICatalog.Scenarios;
 
@@ -15,13 +14,14 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Files and IO")]
 [ScenarioCategory ("TextView")]
 [ScenarioCategory ("Menus")]
-public class Editor : Scenario
+public partial class Editor : Scenario
 {
     private IApplication? _app;
     private Window? _appWindow;
     private List<CultureInfo>? _cultureInfos;
-    private string _fileName = "demo.txt";
+    private string? _fileName = "demo.txt";
     private bool _forceMinimumPosToZero = true;
+    private string? _lastDirectory;
     private bool _matchCase;
     private bool _matchWholeWord;
     private CheckBox? _miForceMinimumPosToZeroCheckBox;
@@ -39,7 +39,22 @@ public class Editor : Scenario
         app.Init ();
         _app = app;
 
-        _appWindow = new Window { Title = _fileName ?? "Untitled", BorderStyle = LineStyle.None };
+        // Find the repository root by walking up from the current directory looking for README.md
+        string repoRoot = FindRepoRoot () ?? Environment.CurrentDirectory;
+        string readmePath = Path.Combine (repoRoot, "README.md");
+
+        if (File.Exists (readmePath))
+        {
+            _fileName = readmePath;
+        }
+        else
+        {
+            CreateDemoFile (_fileName!);
+        }
+
+        _lastDirectory = Path.GetDirectoryName (Path.GetFullPath (_fileName!));
+
+        _appWindow = new Window { Title = Path.GetFileName (_fileName) ?? "Untitled", BorderStyle = LineStyle.None };
 
         _cultureInfos = Application.SupportedCultures?.ToList ();
 
@@ -51,8 +66,6 @@ public class Editor : Scenario
             Height = Dim.Fill (1),
             ScrollBars = true
         };
-
-        CreateDemoFile (_fileName!);
 
         LoadFile ();
 
@@ -106,16 +119,16 @@ public class Editor : Scenario
             Title = "ForceMinimumPosTo_Zero", Value = _forceMinimumPosToZero ? CheckState.Checked : CheckState.UnChecked
         };
 
-        _miForceMinimumPosToZeroCheckBox.ValueChanged += (s, e) =>
-                                                          {
-                                                              _forceMinimumPosToZero = e.NewValue == CheckState.Checked;
+        _miForceMinimumPosToZeroCheckBox.ValueChanged += (_, e) =>
+                                                         {
+                                                             _forceMinimumPosToZero = e.NewValue == CheckState.Checked;
 
-                                                              // Note: PopoverMenu.ForceMinimumPosToZero property doesn't exist in v2
-                                                              // if (_textView?.ContextMenu is not null)
-                                                              // {
-                                                              //     _textView.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
-                                                              // }
-                                                          };
+                                                             // Note: PopoverMenu.ForceMinimumPosToZero property doesn't exist in v2
+                                                             // if (_textView?.ContextMenu is not null)
+                                                             // {
+                                                             //     _textView.ContextMenu.ForceMinimumPosToZero = _forceMinimumPosToZero;
+                                                             // }
+                                                         };
 
         menu.Add (new MenuBarItem ("Conte_xtMenu",
                                    [new MenuItem { CommandView = _miForceMinimumPosToZeroCheckBox }, new MenuBarItem ("_Languages", GetSupportedCultures ())]));
@@ -124,21 +137,25 @@ public class Editor : Scenario
 
         Shortcut siCursorPosition = new (Key.Empty, "", null);
 
-        StatusBar statusBar =
-            new ([
-                     new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", Quit),
-                     new Shortcut (Key.F2, "Open", Open),
-                     new Shortcut (Key.F3, "Save", () => Save ()),
-                     new Shortcut (Key.F4, "Save As", () => SaveAs ()),
-                     new Shortcut (Key.Empty, $"OS Clipboard IsSupported : {app.Clipboard!.IsSupported}", null),
-                     siCursorPosition
-                 ]) { AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast };
+        StatusBar statusBar = new ([
+                                       new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", Quit),
+                                       new Shortcut (Key.F2, "Open", Open),
+                                       new Shortcut (Key.F3, "Save", () => Save ()),
+                                       new Shortcut (Key.F4, "Save As", () => SaveAs ()),
+                                       new Shortcut (Key.Empty, $"OS Clipboard IsSupported : {app.Clipboard!.IsSupported}", null),
+                                       siCursorPosition
+                                   ]) { AlignmentModes = AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast };
 
-        _textView.UnwrappedCursorPositionChanged += (s, e) => { siCursorPosition.Title = $"Ln {e.Y + 1}, Col {e.X + 1}"; };
+        _textView.UnwrappedCursorPositionChanged += (_, e) =>
+                                                    {
+                                                        List<Cell> line = _textView.GetLine (e.Y).Take (e.X).ToList ();
+                                                        int colsWidth = _textView.GetColumnsWidth (line);
+                                                        siCursorPosition.Title = $"Ln {e.Y + 1}, Cc {e.X + 1}, Col {colsWidth + 1}";
+                                                    };
 
         _appWindow.Add (statusBar);
 
-        _appWindow.IsRunningChanged += (s, e) =>
+        _appWindow.IsRunningChanged += (_, e) =>
                                        {
                                            if (!e.Value)
                                            {
@@ -200,384 +217,11 @@ public class Editor : Scenario
         }
     }
 
-    private void ContinueFind (bool next = true, bool replace = false)
-    {
-        if (_textView is null)
-        {
-            return;
-        }
-
-        if (!replace && string.IsNullOrEmpty (_textToFind))
-        {
-            Find ();
-
-            return;
-        }
-
-        if (replace && (string.IsNullOrEmpty (_textToFind) || (_findReplaceWindow is null && string.IsNullOrEmpty (_textToReplace))))
-        {
-            Replace ();
-
-            return;
-        }
-
-        bool found;
-        bool gaveFullTurn;
-
-        if (next)
-        {
-            if (!replace)
-            {
-                found = _textView.FindNextText (_textToFind, out gaveFullTurn, _matchCase, _matchWholeWord);
-            }
-            else
-            {
-                found = _textView.FindNextText (_textToFind, out gaveFullTurn, _matchCase, _matchWholeWord, _textToReplace, true);
-            }
-        }
-        else
-        {
-            if (!replace)
-            {
-                found = _textView.FindPreviousText (_textToFind, out gaveFullTurn, _matchCase, _matchWholeWord);
-            }
-            else
-            {
-                found = _textView.FindPreviousText (_textToFind, out gaveFullTurn, _matchCase, _matchWholeWord, _textToReplace, true);
-            }
-        }
-
-        if (!found)
-        {
-            MessageBox.Query (_appWindow!.App!, "Find", $"The following specified text was not found: '{_textToFind}'", Strings.btnOk);
-        }
-        else if (gaveFullTurn)
-        {
-            MessageBox.Query (_appWindow!.App!, "Find", $"No more occurrences were found for the following specified text: '{_textToFind}'", Strings.btnOk);
-        }
-    }
-
     private void Copy () => _textView?.Copy ();
 
-    private MenuItem [] CreateScrollBarsMenu ()
-    {
-        if (_textView is null)
-        {
-            return [];
-        }
+    private void Cut () => _textView?.Cut ();
 
-        List<MenuItem> menuItems = [];
-
-        CheckBox scrollBarCheckBox = new () { Title = "_Scroll Bars", Value = _textView.ScrollBars ? CheckState.Checked : CheckState.UnChecked };
-
-        scrollBarCheckBox.ValueChanged += (s, e) => { _textView.ScrollBars = scrollBarCheckBox.Value == CheckState.Checked; };
-
-        MenuItem verticalItem = new () { CommandView = scrollBarCheckBox };
-
-        verticalItem.Accepting += (s, e) =>
-                                  {
-                                      scrollBarCheckBox.AdvanceCheckState ();
-                                      e.Handled = true;
-                                  };
-
-        menuItems.Add (verticalItem);
-
-        return [.. menuItems];
-    }
-
-    private MenuItem [] GetSupportedCultures ()
-    {
-        if (_cultureInfos is null)
-        {
-            return [];
-        }
-
-        List<MenuItem> supportedCultures = [];
-        List<CheckBox> allCheckBoxes = [];
-        int index = -1;
-
-        void CreateCultureMenuItem (string title, string cultureName, bool isChecked)
-        {
-            CheckBox checkBox = new () { Title = title, Value = isChecked ? CheckState.Checked : CheckState.UnChecked };
-
-            allCheckBoxes.Add (checkBox);
-
-            checkBox.ValueChanged += (s, e) =>
-                                      {
-                                          if (e.NewValue == CheckState.Checked)
-                                          {
-                                              Thread.CurrentThread.CurrentUICulture = new CultureInfo (cultureName);
-
-                                              foreach (CheckBox cb in allCheckBoxes)
-                                              {
-                                                  cb.Value = cb == checkBox ? CheckState.Checked : CheckState.UnChecked;
-                                              }
-                                          }
-                                      };
-
-            MenuItem item = new () { CommandView = checkBox };
-
-            item.Accepting += (s, e) =>
-                              {
-                                  checkBox.AdvanceCheckState ();
-                                  e.Handled = true;
-                              };
-
-            supportedCultures.Add (item);
-        }
-
-        foreach (CultureInfo c in _cultureInfos)
-        {
-            if (index == -1)
-            {
-                CreateCultureMenuItem ("_English", "en-US", Thread.CurrentThread.CurrentUICulture.Name == "en-US");
-                index++;
-            }
-
-            CreateCultureMenuItem ($"_{c.Parent.EnglishName}", c.Name, Thread.CurrentThread.CurrentUICulture.Name == c.Name);
-        }
-
-        return [.. supportedCultures];
-    }
-
-    private MenuItem CreateWrapChecked ()
-    {
-        if (_textView is null)
-        {
-            return new MenuItem { Title = "Word Wrap" };
-        }
-
-        CheckBox checkBox = new () { Title = "_Word Wrap", Value = _textView.WordWrap ? CheckState.Checked : CheckState.UnChecked };
-
-        checkBox.ValueChanged += (s, e) => { _textView.WordWrap = checkBox.Value == CheckState.Checked; };
-
-        MenuItem item = new () { CommandView = checkBox };
-
-        item.Accepting += (s, e) =>
-                          {
-                              checkBox.AdvanceCheckState ();
-                              e.Handled = true;
-                          };
-
-        return item;
-    }
-
-    private MenuItem CreateAutocomplete ()
-    {
-        if (_textView is null)
-        {
-            return new MenuItem { Title = "Autocomplete" };
-        }
-
-        SingleWordSuggestionGenerator singleWordGenerator = new ();
-        _textView.Autocomplete.SuggestionGenerator = singleWordGenerator;
-
-        CheckBox checkBox = new () { Title = "Autocomplete", Value = CheckState.UnChecked };
-
-        checkBox.ValueChanged += (s, e) =>
-                                 {
-                                     if (checkBox.Value == CheckState.Checked)
-                                     {
-                                         singleWordGenerator.AllSuggestions =
-                                             Regex.Matches (_textView.Text, "\\w+").Select (s => s.Value).Distinct ().ToList ();
-                                     }
-                                     else
-                                     {
-                                         singleWordGenerator.AllSuggestions.Clear ();
-                                     }
-                                 };
-
-        MenuItem item = new () { CommandView = checkBox };
-
-        item.Accepting += (s, e) =>
-                          {
-                              checkBox.AdvanceCheckState ();
-                              e.Handled = true;
-                          };
-
-        return item;
-    }
-
-    private MenuItem CreateAllowsTabChecked ()
-    {
-        if (_textView is null)
-        {
-            return new MenuItem { Title = "Tab Enters Tab" };
-        }
-
-        CheckBox checkBox = new () { Title = "Tab Enters Tab", Value = _textView.TabKeyAddsTab ? CheckState.Checked : CheckState.UnChecked };
-
-        checkBox.ValueChanged += (s, e) => { _textView.TabKeyAddsTab = checkBox.Value == CheckState.Checked; };
-
-        MenuItem item = new () { CommandView = checkBox };
-
-        item.Accepting += (s, e) =>
-                          {
-                              checkBox.AdvanceCheckState ();
-                              e.Handled = true;
-                          };
-
-        return item;
-    }
-
-    private MenuItem CreateReadOnlyChecked ()
-    {
-        if (_textView is null)
-        {
-            return new MenuItem { Title = "Read Only" };
-        }
-
-        CheckBox checkBox = new () { Title = "Read Only", Value = _textView.ReadOnly ? CheckState.Checked : CheckState.UnChecked };
-
-        checkBox.ValueChanged += (s, e) => { _textView.ReadOnly = checkBox.Value == CheckState.Checked; };
-
-        MenuItem item = new () { CommandView = checkBox };
-
-        item.Accepting += (s, e) =>
-                          {
-                              checkBox.AdvanceCheckState ();
-                              e.Handled = true;
-                          };
-
-        return item;
-    }
-
-    private MenuItem CreateUseSameRuneTypeForWords ()
-    {
-        if (_textView is null)
-        {
-            return new MenuItem { Title = "UseSameRuneTypeForWords" };
-        }
-
-        CheckBox checkBox = new () { Title = "UseSameRuneTypeForWords", Value = _textView.UseSameRuneTypeForWords ? CheckState.Checked : CheckState.UnChecked };
-
-        checkBox.ValueChanged += (s, e) => { _textView.UseSameRuneTypeForWords = checkBox.Value == CheckState.Checked; };
-
-        MenuItem item = new () { CommandView = checkBox };
-
-        item.Accepting += (s, e) =>
-                          {
-                              checkBox.AdvanceCheckState ();
-                              e.Handled = true;
-                          };
-
-        return item;
-    }
-
-    private MenuItem CreateSelectWordOnlyOnDoubleClick ()
-    {
-        if (_textView is null)
-        {
-            return new MenuItem { Title = "SelectWordOnlyOnDoubleClick" };
-        }
-
-        CheckBox checkBox = new ()
-        {
-            Title = "SelectWordOnlyOnDoubleClick", Value = _textView.SelectWordOnlyOnDoubleClick ? CheckState.Checked : CheckState.UnChecked
-        };
-
-        checkBox.ValueChanged += (s, e) => { _textView.SelectWordOnlyOnDoubleClick = checkBox.Value == CheckState.Checked; };
-
-        MenuItem item = new () { CommandView = checkBox };
-
-        item.Accepting += (s, e) =>
-                          {
-                              checkBox.AdvanceCheckState ();
-                              e.Handled = true;
-                          };
-
-        return item;
-    }
-
-    private MenuItem CreateCanFocusChecked ()
-    {
-        if (_textView is null)
-        {
-            return new MenuItem { Title = "CanFocus" };
-        }
-
-        CheckBox checkBox = new () { Title = "CanFocus", Value = _textView.CanFocus ? CheckState.Checked : CheckState.UnChecked };
-
-        checkBox.ValueChanged += (s, e) =>
-                                 {
-                                     _textView.CanFocus = checkBox.Value == CheckState.Checked;
-
-                                     if (_textView.CanFocus)
-                                     {
-                                         _textView.SetFocus ();
-                                     }
-                                 };
-
-        MenuItem item = new () { CommandView = checkBox };
-
-        item.Accepting += (s, e) =>
-                          {
-                              checkBox.AdvanceCheckState ();
-                              e.Handled = true;
-                          };
-
-        return item;
-    }
-
-    private MenuItem CreateEnabledChecked ()
-    {
-        if (_textView is null)
-        {
-            return new MenuItem { Title = "Enabled" };
-        }
-
-        CheckBox checkBox = new () { Title = "Enabled", Value = _textView.Enabled ? CheckState.Checked : CheckState.UnChecked };
-
-        checkBox.ValueChanged += (s, e) =>
-                                 {
-                                     _textView.Enabled = checkBox.Value == CheckState.Checked;
-
-                                     if (_textView.Enabled)
-                                     {
-                                         _textView.SetFocus ();
-                                     }
-                                 };
-
-        MenuItem item = new () { CommandView = checkBox };
-
-        item.Accepting += (s, e) =>
-                          {
-                              checkBox.AdvanceCheckState ();
-                              e.Handled = true;
-                          };
-
-        return item;
-    }
-
-    private MenuItem CreateVisibleChecked ()
-    {
-        if (_textView is null)
-        {
-            return new MenuItem { Title = "Visible" };
-        }
-
-        CheckBox checkBox = new () { Title = "Visible", Value = _textView.Visible ? CheckState.Checked : CheckState.UnChecked };
-
-        checkBox.ValueChanged += (s, e) =>
-                                 {
-                                     _textView.Visible = checkBox.Value == CheckState.Checked;
-
-                                     if (_textView.Visible)
-                                     {
-                                         _textView.SetFocus ();
-                                     }
-                                 };
-
-        MenuItem item = new () { CommandView = checkBox };
-
-        item.Accepting += (s, e) =>
-                          {
-                              checkBox.AdvanceCheckState ();
-                              e.Handled = true;
-                          };
-
-        return item;
-    }
+    private void SelectAll () => _textView?.SelectAll ();
 
     private void CreateDemoFile (string fileName)
     {
@@ -594,6 +238,27 @@ public class Editor : Scenario
         StreamWriter sw = File.CreateText (fileName);
         sw.Write (sb.ToString ());
         sw.Close ();
+    }
+
+    /// <summary>
+    ///     Walks up the directory tree from the current directory looking for the repository root
+    ///     (identified by Terminal.sln).
+    /// </summary>
+    private static string? FindRepoRoot ()
+    {
+        DirectoryInfo? dir = new (Environment.CurrentDirectory);
+
+        while (dir is { })
+        {
+            if (File.Exists (Path.Combine (dir.FullName, "Terminal.sln")))
+            {
+                return dir.FullName;
+            }
+
+            dir = dir.Parent;
+        }
+
+        return null;
     }
 
     private void LoadFile ()
@@ -622,7 +287,7 @@ public class Editor : Scenario
         }
 
         _appWindow.Title = "Untitled.txt";
-        _fileName = null!;
+        _fileName = null;
         _originalText = new MemoryStream ().ToArray ();
         _textView.Text = Encoding.Unicode.GetString (_originalText);
     }
@@ -634,14 +299,21 @@ public class Editor : Scenario
             return;
         }
 
-        List<IAllowedType> aTypes = [new AllowedType ("Text", ".txt;.bin;.xml;.json", ".txt", ".bin", ".xml", ".json"), new AllowedTypeAny ()];
+        List<IAllowedType> aTypes = [new AllowedType ("Text", ".txt;.bin;.xml;.json", ".txt", ".bin", ".xml", ".json", ".md"), new AllowedTypeAny ()];
 
         OpenDialog d = new () { Title = "Open", AllowedTypes = aTypes, AllowsMultipleSelection = false };
+
+        if (_lastDirectory is { })
+        {
+            d.Path = _lastDirectory;
+        }
+
         _app?.Run (d);
 
         if (!d.Canceled && d.FilePaths.Count > 0)
         {
             _fileName = d.FilePaths [0];
+            _lastDirectory = Path.GetDirectoryName (Path.GetFullPath (_fileName));
             LoadFile ();
         }
 
@@ -658,181 +330,6 @@ public class Editor : Scenario
         }
 
         _appWindow?.RequestStop ();
-    }
-
-    private void Replace () => ShowFindReplace (false);
-
-    private void ReplaceAll ()
-    {
-        if (_textView is null)
-        {
-            return;
-        }
-
-        if (string.IsNullOrEmpty (_textToFind) || (string.IsNullOrEmpty (_textToReplace) && _findReplaceWindow is null))
-        {
-            Replace ();
-
-            return;
-        }
-
-        if (_textView.ReplaceAllText (_textToFind, _matchCase, _matchWholeWord, _textToReplace))
-        {
-            MessageBox.Query (_appWindow!.App!,
-                              "Replace All",
-                              $"All occurrences were replaced for the following specified text: '{_textToReplace}'",
-                              Strings.btnOk);
-        }
-        else
-        {
-            MessageBox.Query (_appWindow!.App!, "Replace All", $"None of the following specified text was found: '{_textToFind}'", Strings.btnOk);
-        }
-    }
-
-    private void ReplaceNext () => ContinueFind (true, true);
-    private void ReplacePrevious () => ContinueFind (false, true);
-
-    private View CreateFindTab ()
-    {
-        if (_textView is null)
-        {
-            return new View ();
-        }
-
-        View d = new () { Width = Dim.Fill (), Height = Dim.Fill () };
-
-        int lblWidth = "Replace:".Length;
-
-        Label label = new () { Width = lblWidth, TextAlignment = Alignment.End, Text = "Find:" };
-        d.Add (label);
-
-        SetFindText ();
-
-        TextField txtToFind = new () { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = Dim.Fill (1), Text = _textToFind };
-        txtToFind.HasFocusChanging += (s, e) => { txtToFind.Text = _textToFind; };
-        d.Add (txtToFind);
-
-        Button btnFindNext = new ()
-        {
-            X = Pos.Align (Alignment.Center),
-            Y = Pos.AnchorEnd (),
-            Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-            IsDefault = true,
-            Text = "Find _Next"
-        };
-        btnFindNext.Accepting += (s, e) => { FindNext (); };
-        d.Add (btnFindNext);
-
-        Button btnFindPrevious = new ()
-        {
-            X = Pos.Align (Alignment.Center), Y = Pos.AnchorEnd (), Enabled = !string.IsNullOrEmpty (txtToFind.Text), Text = "Find _Previous"
-        };
-        btnFindPrevious.Accepting += (s, e) => { FindPrevious (); };
-        d.Add (btnFindPrevious);
-
-        txtToFind.TextChanged += (s, e) =>
-                                 {
-                                     _textToFind = txtToFind.Text;
-                                     _textView.FindTextChanged ();
-                                     btnFindNext.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
-                                     btnFindPrevious.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
-                                 };
-
-        CheckBox ckbMatchCase = new ()
-        {
-            X = 0, Y = Pos.Top (txtToFind) + 2, Value = _matchCase ? CheckState.Checked : CheckState.UnChecked, Text = "Match c_ase"
-        };
-        ckbMatchCase.ValueChanged += (s, e) => { _matchCase = e.NewValue == CheckState.Checked; };
-        d.Add (ckbMatchCase);
-
-        CheckBox ckbMatchWholeWord = new ()
-        {
-            X = 0, Y = Pos.Top (ckbMatchCase) + 1, Value = _matchWholeWord ? CheckState.Checked : CheckState.UnChecked, Text = "Match _whole word"
-        };
-        ckbMatchWholeWord.ValueChanged += (s, e) => { _matchWholeWord = e.NewValue == CheckState.Checked; };
-        d.Add (ckbMatchWholeWord);
-
-        return d;
-    }
-
-    private View CreateReplaceTab ()
-    {
-        if (_textView is null)
-        {
-            return new View ();
-        }
-
-        View d = new () { Width = Dim.Fill (), Height = Dim.Fill () };
-
-        int lblWidth = "Replace:".Length;
-
-        Label label = new () { Width = lblWidth, TextAlignment = Alignment.End, Text = "Find:" };
-        d.Add (label);
-
-        SetFindText ();
-
-        TextField txtToFind = new () { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = Dim.Fill (1), Text = _textToFind };
-        txtToFind.HasFocusChanging += (s, e) => { txtToFind.Text = _textToFind; };
-        d.Add (txtToFind);
-
-        Button btnFindNext = new ()
-        {
-            X = Pos.Align (Alignment.Center),
-            Y = Pos.AnchorEnd (),
-            Enabled = !string.IsNullOrEmpty (txtToFind.Text),
-            IsDefault = true,
-            Text = "Replace _Next"
-        };
-        btnFindNext.Accepting += (s, e) => { ReplaceNext (); };
-        d.Add (btnFindNext);
-
-        label = new Label { X = Pos.Left (label), Y = Pos.Top (label) + 1, Text = "Replace:" };
-        d.Add (label);
-
-        SetFindText ();
-
-        TextField txtToReplace = new () { X = Pos.Right (label) + 1, Y = Pos.Top (label), Width = Dim.Fill (1), Text = _textToReplace };
-        txtToReplace.TextChanged += (s, e) => { _textToReplace = txtToReplace.Text; };
-        d.Add (txtToReplace);
-
-        Button btnFindPrevious = new ()
-        {
-            X = Pos.Align (Alignment.Center), Y = Pos.AnchorEnd (), Enabled = !string.IsNullOrEmpty (txtToFind.Text), Text = "Replace _Previous"
-        };
-        btnFindPrevious.Accepting += (s, e) => { ReplacePrevious (); };
-        d.Add (btnFindPrevious);
-
-        Button btnReplaceAll = new ()
-        {
-            X = Pos.Align (Alignment.Center), Y = Pos.AnchorEnd (), Enabled = !string.IsNullOrEmpty (txtToFind.Text), Text = "Replace _All"
-        };
-        btnReplaceAll.Accepting += (s, e) => { ReplaceAll (); };
-        d.Add (btnReplaceAll);
-
-        txtToFind.TextChanged += (s, e) =>
-                                 {
-                                     _textToFind = txtToFind.Text;
-                                     _textView.FindTextChanged ();
-                                     btnFindNext.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
-                                     btnFindPrevious.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
-                                     btnReplaceAll.Enabled = !string.IsNullOrEmpty (txtToFind.Text);
-                                 };
-
-        CheckBox ckbMatchCase = new ()
-        {
-            X = 0, Y = Pos.Top (txtToFind) + 2, Value = _matchCase ? CheckState.Checked : CheckState.UnChecked, Text = "Match c_ase"
-        };
-        ckbMatchCase.ValueChanged += (s, e) => { _matchCase = e.NewValue == CheckState.Checked; };
-        d.Add (ckbMatchCase);
-
-        CheckBox ckbMatchWholeWord = new ()
-        {
-            X = 0, Y = Pos.Top (ckbMatchCase) + 1, Value = _matchWholeWord ? CheckState.Checked : CheckState.UnChecked, Text = "Match _whole word"
-        };
-        ckbMatchWholeWord.ValueChanged += (s, e) => { _matchWholeWord = e.NewValue == CheckState.Checked; };
-        d.Add (ckbMatchWholeWord);
-
-        return d;
     }
 
     private bool Save ()
@@ -856,27 +353,32 @@ public class Editor : Scenario
 
         SaveDialog sd = new () { Title = "Save file", AllowedTypes = aTypes };
 
-        sd.Path = _appWindow.Title;
+        if (_lastDirectory is { })
+        {
+            sd.Path = _lastDirectory;
+        }
+        else
+        {
+            sd.Path = _appWindow.Title;
+        }
+
         _app?.Run (sd);
         bool canceled = sd.Canceled;
         string path = sd.Path;
         string fileName = sd.FileName;
         sd.Dispose ();
 
-        if (!canceled)
+        if (canceled)
         {
-            if (File.Exists (path))
-            {
-                if (MessageBox.Query (_app!, "Save File", "File already exists. Overwrite any way?", Strings.btnNo, Strings.btnYes) == 1)
-                {
-                    return SaveFile (fileName, path);
-                }
+            _saved = false;
 
-                _saved = false;
+            return _saved;
+        }
 
-                return _saved;
-            }
+        _lastDirectory = Path.GetDirectoryName (Path.GetFullPath (path));
 
+        if (!File.Exists (path) || MessageBox.Query (_app!, "Save File", "File already exists. Overwrite any way?", Strings.btnNo, Strings.btnYes) == 1)
+        {
             return SaveFile (fileName, path);
         }
 
@@ -910,124 +412,5 @@ public class Editor : Scenario
         }
 
         return true;
-    }
-
-    private void SelectAll () => _textView?.SelectAll ();
-
-    private void SetFindText ()
-    {
-        if (_textView is null)
-        {
-            return;
-        }
-
-        _textToFind = !string.IsNullOrEmpty (_textView.SelectedText) ? _textView.SelectedText : string.IsNullOrEmpty (_textToFind) ? "" : _textToFind;
-
-        _textToReplace = string.IsNullOrEmpty (_textToReplace) ? "" : _textToReplace;
-    }
-
-    private void Cut () => _textView?.Cut ();
-
-    private void Find () => ShowFindReplace ();
-    private void FindNext () => ContinueFind ();
-    private void FindPrevious () => ContinueFind (false);
-
-    private void ShowFindReplace (bool isFind = true)
-    {
-        if (_findReplaceWindow is null)
-        {
-            return;
-        }
-
-        _findReplaceWindow.Visible = true;
-        _findReplaceWindow.SuperView?.MoveSubViewToStart (_findReplaceWindow);
-        _findReplaceWindow.FocusDeepest (NavigationDirection.Forward, null);
-    }
-
-    private void CreateFindReplace ()
-    {
-        if (_textView is null || _appWindow is null)
-        {
-            return;
-        }
-
-        _findReplaceWindow = new FindReplaceWindow (_textView);
-
-        // Restored: Tabs with Find and Replace tabs (#4183)
-        Tabs tabs = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill ()
-        };
-
-        View findTab = new () { Title = "_Find" };
-        View findView = CreateFindTab ();
-        findView.Width = Dim.Fill ();
-        findView.Height = Dim.Fill ();
-        findTab.Add (findView);
-
-        View replaceTab = new () { Title = "_Replace" };
-        View replaceView = CreateReplaceTab ();
-        replaceView.Width = Dim.Fill ();
-        replaceView.Height = Dim.Fill ();
-        replaceTab.Add (replaceView);
-
-        tabs.Add (findTab, replaceTab);
-        tabs.Value = findTab;
-
-        _findReplaceWindow.Add (tabs);
-        _findReplaceWindow.Visible = false;
-        _appWindow.Add (_findReplaceWindow);
-    }
-
-    private class FindReplaceWindow : Window
-    {
-        private readonly TextView _textView;
-
-        public FindReplaceWindow (TextView textView)
-        {
-            Title = "Find and Replace";
-
-            _textView = textView;
-            X = Pos.AnchorEnd () - 1;
-            Y = 2;
-            Width = 57;
-            Height = 11;
-            Arrangement = ViewArrangement.Movable;
-
-            KeyBindings.Add (Key.Esc, Command.Cancel);
-
-            AddCommand (Command.Cancel,
-                        () =>
-                        {
-                            Visible = false;
-
-                            return true;
-                        });
-
-            VisibleChanged += FindReplaceWindow_VisibleChanged;
-            Initialized += FindReplaceWindow_Initialized;
-        }
-
-        private void FindReplaceWindow_Initialized (object? sender, EventArgs e)
-        {
-            if (Border is { })
-            {
-                Border.LineStyle = LineStyle.Dashed;
-                Border.Thickness = new Thickness (0, 1, 0, 0);
-            }
-        }
-
-        private void FindReplaceWindow_VisibleChanged (object? sender, EventArgs e)
-        {
-            if (!Visible)
-            {
-                _textView.SetFocus ();
-            }
-            else
-            {
-                FocusDeepest (NavigationDirection.Forward, null);
-            }
-        }
     }
 }

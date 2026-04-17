@@ -38,7 +38,7 @@ public class TextInputControls : Scenario
         };
 
         SingleWordSuggestionGenerator textFieldWordGenerator = new ();
-        textField.Autocomplete.SuggestionGenerator = textFieldWordGenerator;
+        textField.Autocomplete?.SuggestionGenerator = textFieldWordGenerator;
         textField.TextChanging += TextFieldTextChanging;
 
         void TextFieldTextChanging (object? sender, ResultEventArgs<string> e) =>

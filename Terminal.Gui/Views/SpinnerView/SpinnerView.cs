@@ -240,7 +240,7 @@ public class SpinnerView : View, IDesignable
         _timeout = App?.AddTimeout (TimeSpan.FromMilliseconds (SpinDelay),
                                     () =>
                                     {
-                                        App.Invoke (_ => AdvanceAnimation ());
+                                        App?.Invoke (_ => AdvanceAnimation ());
 
                                         return true;
                                     });
