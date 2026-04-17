@@ -241,6 +241,7 @@ public partial class FileDialog
         {
             // When visible, the table view's left edge is a splitter next to the tree
             _treeView.Width = Dim.Fill (_tableViewContainer);
+            _treeView.Height = Dim.Height (_tableViewContainer);
             _tableViewContainer.X = 30;
             _tableViewContainer.Arrangement = ViewArrangement.LeftResizable;
             _tableViewContainer.Border.Thickness = new Thickness (1, 0, 0, 0);
@@ -249,6 +250,7 @@ public partial class FileDialog
         {
             // When hidden, table occupies full width and splitter is hidden/disabled
             _treeView.Width = 0;
+            _treeView.Height = 0;
             _tableViewContainer.X = 0;
             _tableViewContainer.Width = Dim.Fill ();
             _tableViewContainer.Arrangement = ViewArrangement.Fixed;

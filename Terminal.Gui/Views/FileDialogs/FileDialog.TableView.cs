@@ -32,7 +32,7 @@ public partial class FileDialog
             return;
         }
 
-        PopoverMenu? contextMenu = new ([
+        PopoverMenu contextMenu = new ([
                                             new MenuItem (Strings.fdCtxNew, string.Empty, New),
                                             new MenuItem (Strings.fdCtxRename, string.Empty, () => Rename (App)),
                                             new MenuItem (Strings.fdCtxDelete, string.Empty, Delete)
@@ -43,7 +43,7 @@ public partial class FileDialog
         App!.Popovers?.Register (contextMenu);
 
         Point pos = new (_tableView.FrameToScreen ().X + 15, _tableView.FrameToScreen ().Y + _tableView.SelectedRow + _tableView.GetHeaderHeight ());
-        contextMenu?.MakeVisible (pos);
+        contextMenu.MakeVisible (pos);
     }
 
     /// <inheritdoc/>
@@ -127,10 +127,10 @@ public partial class FileDialog
     {
         var fsi = (IFileSystemInfo)o;
 
-        if (o is IDirectoryInfo dir && _treeRoots.ContainsKey (dir))
+        if (o is IDirectoryInfo dir && _treeRoots.TryGetValue (dir, out string? getter))
         {
             // Directory has a special name e.g. 'Pictures'
-            return _treeRoots [dir];
+            return getter;
         }
 
         return (Style.IconProvider.GetIconWithOptionalSpace (fsi) + fsi.Name).Trim ();
@@ -237,7 +237,7 @@ public partial class FileDialog
             return;
         }
 
-        PopoverMenu? contextMenu = new ([
+        PopoverMenu contextMenu = new ([
                                             new MenuItem (Strings.fdCtxNew, string.Empty, New),
                                             new MenuItem (Strings.fdCtxRename, string.Empty, () => Rename (App)),
                                             new MenuItem (Strings.fdCtxDelete, string.Empty, Delete)
@@ -249,14 +249,14 @@ public partial class FileDialog
         // and the context menu is disposed when it is closed.
         App!.Popovers?.Register (contextMenu);
 
-        contextMenu?.MakeVisible (e.ScreenPosition);
+        contextMenu.MakeVisible (e.ScreenPosition);
     }
 
     private void ShowHeaderContextMenu (int clickedCol, Mouse e)
     {
         string sort = GetProposedNewSortOrder (clickedCol, out bool isAsc);
 
-        PopoverMenu? contextMenu = new ([
+        PopoverMenu contextMenu = new ([
                                             new MenuItem (string.Format (Strings.fdCtxHide, StripArrows (_tableView.Table!.ColumnNames [clickedCol])),
                                                           string.Empty,
                                                           () => HideColumn (clickedCol)),
@@ -267,7 +267,7 @@ public partial class FileDialog
         // and the context menu is disposed when it is closed.
         App!.Popovers?.Register (contextMenu);
 
-        contextMenu?.MakeVisible (e.ScreenPosition);
+        contextMenu.MakeVisible (e.ScreenPosition);
     }
 
     private void SortColumn (int clickedCol)
@@ -282,38 +282,29 @@ public partial class FileDialog
 
     private bool TableView_KeyDown (Key keyEvent)
     {
-        if (keyEvent.KeyCode == KeyCode.Backspace)
+        switch (keyEvent.KeyCode)
         {
-            return _history.Back ();
+            case KeyCode.Backspace: return _history.Back ();
+
+            case KeyCode.ShiftMask | KeyCode.Backspace: return _history.Forward ();
+
+            case KeyCode.Delete:
+                Delete ();
+
+                return true;
+
+            case KeyCode.CtrlMask | KeyCode.R:
+                Rename (App);
+
+                return true;
+
+            case KeyCode.CtrlMask | KeyCode.N:
+                New ();
+
+                return true;
+
+            default: return false;
         }
-
-        if (keyEvent.KeyCode == (KeyCode.ShiftMask | KeyCode.Backspace))
-        {
-            return _history.Forward ();
-        }
-
-        if (keyEvent.KeyCode == KeyCode.Delete)
-        {
-            Delete ();
-
-            return true;
-        }
-
-        if (keyEvent.KeyCode == (KeyCode.CtrlMask | KeyCode.R))
-        {
-            Rename (App);
-
-            return true;
-        }
-
-        if (keyEvent.KeyCode == (KeyCode.CtrlMask | KeyCode.N))
-        {
-            New ();
-
-            return true;
-        }
-
-        return false;
     }
 
     private void TableView_SelectedCellChanged (object? sender, SelectedCellChangedEventArgs obj)

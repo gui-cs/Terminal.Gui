@@ -62,6 +62,9 @@ public partial class FileDialog : Dialog, IDesignable
         ButtonAlignment = Alignment.End;
         ButtonAlignmentModes = AlignmentModes.IgnoreFirstOrLast;
 
+        // Ensure we get Accept for any subviews; esp TreeView
+        CommandsToBubbleUp = [Command.Accept];
+
         _btnCancel = new Button { Text = Strings.btnCancel };
 
         _btnOk = new Button { Text = Style.OkButtonText };

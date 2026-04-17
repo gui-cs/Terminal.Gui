@@ -10,16 +10,7 @@ public partial class FileDialog
     /// </summary>
     /// <param name="file"></param>
     /// <returns></returns>
-    public bool IsCompatibleWithAllowedExtensions (IFileInfo file)
-    {
-        // no restrictions
-        if (!AllowedTypes.Any ())
-        {
-            return true;
-        }
-
-        return MatchesAllowedTypes (file);
-    }
+    public bool IsCompatibleWithAllowedExtensions (IFileInfo file) => !AllowedTypes.Any () || MatchesAllowedTypes (file);
 
     /// <inheritdoc/>
     protected override bool OnAccepting (CommandEventArgs args)
@@ -74,15 +65,14 @@ public partial class FileDialog
             return false;
         }
 
-        if (!IsCompatibleWithOpenMode (_tbPath.Text, out string reason))
+        if (IsCompatibleWithOpenMode (_tbPath.Text, out string reason))
         {
-            _feedback = reason;
-            SetNeedsDraw ();
-
-            return false;
+            return FinishAccept ();
         }
+        _feedback = reason;
+        SetNeedsDraw ();
 
-        return FinishAccept ();
+        return false;
     }
 
     private void AcceptIf (Key key, KeyCode isKey)
@@ -202,14 +192,13 @@ public partial class FileDialog
                     return false;
                 }
 
-                if (File.Exists (s))
+                if (!File.Exists (s))
                 {
-                    reason = Style.FileAlreadyExistsFeedback;
-
-                    return false;
+                    return true;
                 }
+                reason = Style.FileAlreadyExistsFeedback;
 
-                return true;
+                return false;
 
             case OpenMode.File:
 
@@ -220,24 +209,22 @@ public partial class FileDialog
                     return false;
                 }
 
-                if (Directory.Exists (s))
+                if (!Directory.Exists (s))
                 {
-                    reason = Style.DirectoryAlreadyExistsFeedback;
-
-                    return false;
+                    return true;
                 }
+                reason = Style.DirectoryAlreadyExistsFeedback;
 
-                return true;
+                return false;
 
             case OpenMode.Mixed:
-                if (MustExist && !File.Exists (s) && !Directory.Exists (s))
+                if (!MustExist || File.Exists (s) || Directory.Exists (s))
                 {
-                    reason = Style.FileOrDirectoryMustExistFeedback;
-
-                    return false;
+                    return true;
                 }
+                reason = Style.FileOrDirectoryMustExistFeedback;
 
-                return true;
+                return false;
 
             default: throw new ArgumentOutOfRangeException (nameof (OpenMode));
         }
@@ -309,11 +296,12 @@ public partial class FileDialog
 
         if (!fileSystemInfoStatsEnumerable.All (m => m.FileSystemInfo is { } && IsCompatibleWithOpenMode (m.FileSystemInfo.FullName, out reason)))
         {
-            if (reason is { })
+            if (reason is null)
             {
-                _feedback = reason;
-                SetNeedsDraw ();
+                return false;
             }
+            _feedback = reason;
+            SetNeedsDraw ();
 
             return false;
         }

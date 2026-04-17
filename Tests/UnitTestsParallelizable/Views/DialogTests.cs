@@ -285,20 +285,20 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         Button okButton = new () { Text = "OK" };
         dialog.AddButton (okButton);
 
-        int dialogAcceptedFired = 0;
+        var dialogAcceptedFired = 0;
 
         dialog.Accepted += (_, e) => { dialogAcceptedFired++; };
 
-        int cancelAcceptingFired = 0;
+        var cancelAcceptingFired = 0;
         cancelButton.Accepting += (_, e) => { cancelAcceptingFired++; };
 
-        int cancelAcceptedFired = 0;
+        var cancelAcceptedFired = 0;
         cancelButton.Accepted += (_, e) => { cancelAcceptedFired++; };
 
-        int okAcceptingFired = 0;
+        var okAcceptingFired = 0;
         okButton.Accepting += (_, e) => { okAcceptingFired++; };
 
-        int okAcceptedFired = 0;
+        var okAcceptedFired = 0;
         okButton.Accepted += (_, e) => { okAcceptedFired++; };
 
         app.Iteration += AppOnIteration;
@@ -337,20 +337,20 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         Button okButton = new () { Text = "OK" };
         dialog.AddButton (okButton);
 
-        int dialogAcceptedFired = 0;
+        var dialogAcceptedFired = 0;
 
         dialog.Accepted += (_, e) => { dialogAcceptedFired++; };
 
-        int cancelAcceptingFired = 0;
+        var cancelAcceptingFired = 0;
         cancelButton.Accepting += (_, e) => { cancelAcceptingFired++; };
 
-        int cancelAcceptedFired = 0;
+        var cancelAcceptedFired = 0;
         cancelButton.Accepted += (_, e) => { cancelAcceptedFired++; };
 
-        int okAcceptingFired = 0;
+        var okAcceptingFired = 0;
         okButton.Accepting += (_, e) => { okAcceptingFired++; };
 
-        int okAcceptedFired = 0;
+        var okAcceptedFired = 0;
         okButton.Accepted += (_, e) => { okAcceptedFired++; };
 
         app.Iteration += AppOnIteration;
@@ -1577,7 +1577,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
                 │  │v│     │
                 │  └─┘     │
                 └──────────┘
-                
+
                 """
             },
             {
@@ -1701,11 +1701,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
             Result = SelectedDate;
         }
 
-        public DateTime SelectedDate
-        {
-            get => _datePicker.Value;
-            set => _datePicker.Value = value;
-        }
+        public DateTime SelectedDate { get => _datePicker.Value; set => _datePicker.Value = value; }
     }
 
     [Fact]
@@ -1745,20 +1741,20 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         Button okButton = new () { Text = "OK" };
         dialog.AddButton (okButton);
 
-        int dialogAcceptedFired = 0;
+        var dialogAcceptedFired = 0;
 
         dialog.Accepted += (_, e) => { dialogAcceptedFired++; };
 
-        int cancelAcceptingFired = 0;
+        var cancelAcceptingFired = 0;
         cancelButton.Accepting += (_, e) => { cancelAcceptingFired++; };
 
-        int cancelAcceptedFired = 0;
+        var cancelAcceptedFired = 0;
         cancelButton.Accepted += (_, e) => { cancelAcceptedFired++; };
 
-        int okAcceptingFired = 0;
+        var okAcceptingFired = 0;
         okButton.Accepting += (_, e) => { okAcceptingFired++; };
 
-        int okAcceptedFired = 0;
+        var okAcceptedFired = 0;
         okButton.Accepted += (_, e) => { okAcceptedFired++; };
 
         app.Iteration += AppOnIteration;
@@ -1792,7 +1788,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
 
         using TestStringDialog dialog = new ();
         dialog.Title = "Test";
-        string newString = "new";
+        var newString = "new";
 
         dialog.InputText = newString;
 
@@ -1801,20 +1797,20 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         Button okButton = new () { Text = "OK" };
         dialog.AddButton (okButton);
 
-        int dialogAcceptedFired = 0;
+        var dialogAcceptedFired = 0;
 
         dialog.Accepted += (_, e) => { dialogAcceptedFired++; };
 
-        int cancelAcceptingFired = 0;
+        var cancelAcceptingFired = 0;
         cancelButton.Accepting += (_, e) => { cancelAcceptingFired++; };
 
-        int cancelAcceptedFired = 0;
+        var cancelAcceptedFired = 0;
         cancelButton.Accepted += (_, e) => { cancelAcceptedFired++; };
 
-        int okAcceptingFired = 0;
+        var okAcceptingFired = 0;
         okButton.Accepting += (_, e) => { okAcceptingFired++; };
 
-        int okAcceptedFired = 0;
+        var okAcceptedFired = 0;
         okButton.Accepted += (_, e) => { okAcceptedFired++; };
 
         app.Iteration += AppOnIteration;
@@ -1857,20 +1853,20 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         Button okButton = new () { Text = "OK" };
         dialog.AddButton (okButton);
 
-        int dialogAcceptedFired = 0;
+        var dialogAcceptedFired = 0;
 
         dialog.Accepted += (_, e) => { dialogAcceptedFired++; };
 
-        int cancelAcceptingFired = 0;
+        var cancelAcceptingFired = 0;
         cancelButton.Accepting += (_, e) => { cancelAcceptingFired++; };
 
-        int cancelAcceptedFired = 0;
+        var cancelAcceptedFired = 0;
         cancelButton.Accepted += (_, e) => { cancelAcceptedFired++; };
 
-        int okAcceptingFired = 0;
+        var okAcceptingFired = 0;
         okButton.Accepting += (_, e) => { okAcceptingFired++; };
 
-        int okAcceptedFired = 0;
+        var okAcceptedFired = 0;
         okButton.Accepted += (_, e) => { okAcceptedFired++; };
 
         app.Iteration += AppOnIteration;
@@ -1893,11 +1889,9 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
             // Just in case
             app.Iteration -= AppOnIteration;
 
-
             Assert.True (dialog.StopRequested);
         }
     }
-
 
     [Fact]
     public void Generic_Modal_Dialog_DatePicker_Accept_BubblesUp_TestDateDialog ()
@@ -1906,7 +1900,9 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         app.Init (DriverRegistry.Names.ANSI);
 
         using TestDateDialog dialog = new ();
-        DatePicker datePicker = dialog.SubViews.OfType<DatePicker> ().FirstOrDefault () ?? throw new InvalidOperationException ("DatePicker not found in dialog.");
+
+        DatePicker datePicker = dialog.SubViews.OfType<DatePicker> ().FirstOrDefault ()
+                                ?? throw new InvalidOperationException ("DatePicker not found in dialog.");
         dialog.Title = "Test";
         DateTime newDateTime = dialog.SelectedDate.AddYears (1);
 
@@ -1917,20 +1913,20 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         Button okButton = new () { Text = "OK" };
         dialog.AddButton (okButton);
 
-        int dialogAcceptedFired = 0;
+        var dialogAcceptedFired = 0;
 
         dialog.Accepted += (_, e) => { dialogAcceptedFired++; };
 
-        int cancelAcceptingFired = 0;
+        var cancelAcceptingFired = 0;
         cancelButton.Accepting += (_, e) => { cancelAcceptingFired++; };
 
-        int cancelAcceptedFired = 0;
+        var cancelAcceptedFired = 0;
         cancelButton.Accepted += (_, e) => { cancelAcceptedFired++; };
 
-        int okAcceptingFired = 0;
+        var okAcceptingFired = 0;
         okButton.Accepting += (_, e) => { okAcceptingFired++; };
 
-        int okAcceptedFired = 0;
+        var okAcceptedFired = 0;
         okButton.Accepted += (_, e) => { okAcceptedFired++; };
 
         app.Iteration += AppOnIteration;
@@ -1952,7 +1948,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
 
             // Just in case
             app.Iteration -= AppOnIteration;
-            
+
             Assert.True (dialog.StopRequested);
         }
     }
@@ -1971,22 +1967,22 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         Button okButton = new () { Text = "OK" };
         dialog.AddButton (okButton);
 
-        int dialogAcceptingFired = 0;
+        var dialogAcceptingFired = 0;
         dialog.Accepting += (_, e) => { dialogAcceptingFired++; };
 
-        int dialogAcceptedFired = 0;
+        var dialogAcceptedFired = 0;
         dialog.Accepted += (_, e) => { dialogAcceptedFired++; };
 
-        int cancelAcceptingFired = 0;
+        var cancelAcceptingFired = 0;
         cancelButton.Accepting += (_, e) => { cancelAcceptingFired++; };
 
-        int cancelAcceptedFired = 0;
+        var cancelAcceptedFired = 0;
         cancelButton.Accepted += (_, e) => { cancelAcceptedFired++; };
 
-        int okAcceptingFired = 0;
+        var okAcceptingFired = 0;
         okButton.Accepting += (_, e) => { okAcceptingFired++; };
 
-        int okAcceptedFired = 0;
+        var okAcceptedFired = 0;
         okButton.Accepted += (_, e) => { okAcceptedFired++; };
 
         app.Iteration += AppOnIteration;
@@ -2026,7 +2022,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
 
         dialog.SelectedDate = newDateTime;
 
-        int dialogAcceptedFired = 0;
+        var dialogAcceptedFired = 0;
 
         dialog.Accepted += (_, _) => { dialogAcceptedFired++; };
 
@@ -2054,7 +2050,15 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
 
                 dialog.RequestStop ();
 
-                Assert.Fail ($"Enter key did not accept dialog. Focused={focused?.GetType ().Name ?? "null"} ({focused?.Id}), MostFocused={deepFocused?.GetType ().Name ?? "null"} ({deepFocused?.Id})");
+                Assert.Fail ($"Enter key did not accept dialog. Focused={
+                    focused?.GetType ().Name ?? "null"
+                } ({
+                    focused?.Id
+                }), MostFocused={
+                    deepFocused?.GetType ().Name ?? "null"
+                } ({
+                    deepFocused?.Id
+                })");
             }
         }
     }
@@ -2185,7 +2189,6 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         dialog.Dispose ();
     }
 
-
     [Fact]
     public void GenericString_Command_Accept_BubblesUp ()
     {
@@ -2194,7 +2197,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
 
         using TestStringDialog dialog = new ();
         dialog.Title = "Test";
-        string newString = "new";
+        var newString = "new";
 
         dialog.InputText = newString;
 
@@ -2203,20 +2206,20 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         Button okButton = new () { Text = "OK" };
         dialog.AddButton (okButton);
 
-        int dialogAcceptedFired = 0;
+        var dialogAcceptedFired = 0;
 
         dialog.Accepted += (_, e) => { dialogAcceptedFired++; };
 
-        int cancelAcceptingFired = 0;
+        var cancelAcceptingFired = 0;
         cancelButton.Accepting += (_, e) => { cancelAcceptingFired++; };
 
-        int cancelAcceptedFired = 0;
+        var cancelAcceptedFired = 0;
         cancelButton.Accepted += (_, e) => { cancelAcceptedFired++; };
 
-        int okAcceptingFired = 0;
+        var okAcceptingFired = 0;
         okButton.Accepting += (_, e) => { okAcceptingFired++; };
 
-        int okAcceptedFired = 0;
+        var okAcceptedFired = 0;
         okButton.Accepted += (_, e) => { okAcceptedFired++; };
 
         dialog.InvokeCommand (Command.Accept);
@@ -2226,6 +2229,7 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (0, cancelAcceptingFired);
         Assert.Equal (0, cancelAcceptedFired);
         Assert.Equal (1, okAcceptingFired);
+
         //Assert.Equal (0, okAcceptedFired);
     }
 
@@ -2242,8 +2246,6 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
 
         dialog.Dispose ();
     }
-
-
 
     [Fact]
     public void Generic_Ok_Command_Accept_Sets_Result ()
@@ -2489,7 +2491,6 @@ public class DialogTests (ITestOutputHelper output) : TestDriverBase
 
         dialog.Dispose ();
     }
-
 
     [Fact]
     public void Generic_With_Buttons_Draws_Correctly ()
