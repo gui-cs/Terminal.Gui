@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Reflection;
+﻿using System.Reflection;
 using UnitTests;
 
 namespace ViewsTests;
@@ -55,6 +54,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         if (view is null)
         {
             output.WriteLine ($"Ignoring {viewType} - It's a Generic");
+
             return;
         }
 
@@ -79,15 +79,9 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
         int expectedX = (frame.Frame.Width - view.Frame.Width) / 2;
         int expectedY = (frame.Frame.Height - view.Frame.Height) / 2;
 
-        Assert.True (
-                     view.Frame.Left == expectedX,
-                     $"{view} did not center horizontally. Expected: {expectedX}. Actual: {view.Frame.Left}"
-                    );
+        Assert.True (view.Frame.Left == expectedX, $"{view} did not center horizontally. Expected: {expectedX}. Actual: {view.Frame.Left}");
 
-        Assert.True (
-                     view.Frame.Top == expectedY,
-                     $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}"
-                    );
+        Assert.True (view.Frame.Top == expectedY, $"{view} did not center vertically. Expected: {expectedY}. Actual: {view.Frame.Top}");
     }
 
     [Theory]
@@ -95,6 +89,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     public void AllViews_Tests_All_Constructors (Type viewType)
     {
         Assert.True (TestAllConstructorsOfType (viewType));
+
         return;
 
         bool TestAllConstructorsOfType (Type type)
@@ -131,7 +126,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Command_Activate_Raises_Activating (Type viewType)
     {
-        var view = CreateInstanceIfNotGeneric (viewType);
+        View? view = CreateInstanceIfNotGeneric (viewType);
 
         if (view == null)
         {
@@ -163,7 +158,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Command_Accept_Raises_Accepting (Type viewType)
     {
-        var view = CreateInstanceIfNotGeneric (viewType);
+        View? view = CreateInstanceIfNotGeneric (viewType);
 
         if (view == null)
         {
@@ -191,7 +186,7 @@ public class AllViewsTests (ITestOutputHelper output) : TestsAllViews
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_Command_HotKey_Raises_HandlingHotKey (Type viewType)
     {
-        var view = CreateInstanceIfNotGeneric (viewType);
+        View? view = CreateInstanceIfNotGeneric (viewType);
 
         if (view == null)
         {

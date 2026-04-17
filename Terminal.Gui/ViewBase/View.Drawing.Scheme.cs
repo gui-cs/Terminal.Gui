@@ -130,7 +130,8 @@ public partial class View
                                                     },
                                                     GettingScheme,
                                                     args,
-                                                    DefaultAction)!;
+                                                    DefaultAction,
+                                                    this)!;
 
         Scheme DefaultAction ()
         {
