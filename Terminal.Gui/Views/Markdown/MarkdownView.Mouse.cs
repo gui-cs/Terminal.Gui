@@ -36,7 +36,7 @@ public partial class Markdown
         AddCommand (Command.End,
                     () =>
                     {
-                        Viewport = Viewport with { Y = Math.Max (GetContentSize ().Height - Viewport.Height, 0) };
+                        Viewport = Viewport with { Y = Math.Max (GetContentHeight () - Viewport.Height, 0) };
 
                         return true;
                     });
