@@ -565,31 +565,150 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     {
         var text = "Les Misérables movie.";
         var tf = new TextField { Width = 30, Text = text };
+        tf.BeginInit ();
+        tf.EndInit ();
 
         Assert.Equal (21, text.Length);
         Assert.Equal (21, tf.Text.GetRuneCount ());
         Assert.Equal (21, tf.Text.GetColumns ());
+        Assert.Equal (21, GraphemeHelper.GetGraphemeCount (tf.Text));
 
         List<Rune> runes = tf.Text.ToRuneList ();
+        List<string> graphemes = GraphemeHelper.GetGraphemes (tf.Text).ToList ();
         Assert.Equal (21, runes.Count);
         Assert.Equal (21, tf.Text.Length);
+        Assert.Equal (21, graphemes.Count);
 
         for (var i = 0; i < runes.Count; i++)
         {
-            char cs = text [i];
-            var cus = (char)runes [i].Value;
-            Assert.Equal (cs, cus);
+            char c = text [i];
+            var rune = (char)runes [i].Value;
+            Assert.Equal (c, rune);
+        }
+
+        for (var i = 0; i < graphemes.Count; i++)
+        {
+            string grapheme = graphemes [i];
+            var rune = runes [i].ToString ();
+            Assert.Equal (grapheme, rune);
         }
 
         var idx = 15;
         Assert.Equal ('m', text [idx]);
         Assert.Equal ('m', (char)runes [idx].Value);
         Assert.Equal ("m", runes [idx].ToString ());
+        Assert.Equal ("m", graphemes [idx]);
 
         Assert.True (tf.NewMouseEvent (new Mouse { Position = new Point (idx, 1), Flags = MouseFlags.LeftButtonDoubleClicked, View = tf }));
         Assert.Equal ("movie", tf.SelectedText);
 
         Assert.True (tf.NewMouseEvent (new Mouse { Position = new Point (idx + 1, 1), Flags = MouseFlags.LeftButtonDoubleClicked, View = tf }));
+        Assert.Equal ("movie", tf.SelectedText);
+    }
+
+    [Fact]
+    public void WordBackward_WordForward_SelectedText_With_SurrogatePair ()
+    {
+        var text = "Les Mis🍎rables movie.";
+        var tf = new TextField { Width = 30, Text = text };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        Assert.Equal (22, text.Length);
+        Assert.Equal (21, tf.Text.GetRuneCount ());
+        Assert.Equal (22, tf.Text.GetColumns ());
+        Assert.Equal (21, GraphemeHelper.GetGraphemeCount (tf.Text));
+
+        List<Rune> runes = tf.Text.ToRuneList ();
+        List<string> graphemes = GraphemeHelper.GetGraphemes (tf.Text).ToList ();
+        Assert.Equal (21, runes.Count);
+        Assert.Equal (22, tf.Text.Length);
+        Assert.Equal (21, graphemes.Count);
+
+        Exception? exception = Record.Exception (() =>
+                                                 {
+                                                     for (var i = 0; i < runes.Count; i++)
+                                                     {
+                                                         char c = text [i];
+                                                         var rune = (char)runes [i].Value;
+                                                         Assert.Equal (c, rune);
+                                                     }
+                                                 });
+        Assert.NotNull (exception);
+
+        for (var i = 0; i < graphemes.Count; i++)
+        {
+            string grapheme = graphemes [i];
+            var rune = runes [i].ToString ();
+            Assert.Equal (grapheme, rune);
+        }
+
+        var idx = 15;
+        Assert.Equal (' ', text [idx]);
+        Assert.Equal ('m', (char)runes [idx].Value);
+        Assert.Equal ("m", runes [idx].ToString ());
+        Assert.Equal ("m", graphemes [idx]);
+
+        // There is a wide glyph, so it's needed to add +1 to the index to select the word with double click
+        Assert.True (tf.NewMouseEvent (new Mouse { Position = new Point (idx + 1, 1), Flags = MouseFlags.LeftButtonDoubleClicked, View = tf }));
+        Assert.Equal ("movie", tf.SelectedText);
+
+        Assert.True (tf.NewMouseEvent (new Mouse { Position = new Point (idx + 2, 1), Flags = MouseFlags.LeftButtonDoubleClicked, View = tf }));
+        Assert.Equal ("movie", tf.SelectedText);
+    }
+
+    [Fact]
+    public void WordBackward_WordForward_SelectedText_With_SurrogatePairsAndZWJ ()
+    {
+        var text = "Les Mis👨‍👩‍👧rables movie.";
+        var tf = new TextField { Width = 30, Text = text };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        Assert.Equal (28, text.Length);
+        Assert.Equal (25, tf.Text.GetRuneCount ());
+        Assert.Equal (22, tf.Text.GetColumns ());
+        Assert.Equal (21, GraphemeHelper.GetGraphemeCount (tf.Text));
+
+        List<Rune> runes = tf.Text.ToRuneList ();
+        List<string> graphemes = GraphemeHelper.GetGraphemes (tf.Text).ToList ();
+        Assert.Equal (25, runes.Count);
+        Assert.Equal (28, tf.Text.Length);
+        Assert.Equal (21, graphemes.Count);
+
+        Exception? exception = Record.Exception (() =>
+                                                 {
+                                                     for (var i = 0; i < runes.Count; i++)
+                                                     {
+                                                         char c = text [i];
+                                                         var rune = (char)runes [i].Value;
+                                                         Assert.Equal (c, rune);
+                                                     }
+                                                 });
+        Assert.NotNull (exception);
+
+        exception = Record.Exception (() =>
+                                      {
+                                          for (var i = 0; i < graphemes.Count; i++)
+                                          {
+                                              string grapheme = graphemes [i];
+                                              var rune = runes [i].ToString ();
+                                              Assert.Equal (grapheme, rune);
+                                          }
+                                      });
+        Assert.NotNull (exception);
+
+        var idx = 15;
+        Assert.Equal ('r', text [idx]);
+        Assert.Equal ('l', (char)runes [idx].Value);
+        Assert.Equal ("l", runes [idx].ToString ());
+        Assert.Equal ("m", graphemes [idx]);
+
+        // There is a wide glyph, so it's needed to add +1 to the index to select the word with double click
+        Assert.True (tf.NewMouseEvent (new Mouse { Position = new Point (idx + 1, 1), Flags = MouseFlags.LeftButtonDoubleClicked, View = tf }));
+        Assert.Equal ("movie", tf.SelectedText);
+
+        Assert.True (tf.NewMouseEvent (new Mouse { Position = new Point (idx + 2, 1), Flags = MouseFlags.LeftButtonDoubleClicked, View = tf }));
         Assert.Equal ("movie", tf.SelectedText);
     }
 
@@ -821,7 +940,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
-    public void ScrollOffset_Treat_Negative_Width_As_One_Column ()
+    public void ScrollOffset_Treat_Negative_Width_Glyph_As_One_Column ()
     {
         View view = new () { Width = 10, Height = 1 };
         TextField tf = new () { Width = 2, Text = "\u001B[" };
@@ -1012,6 +1131,195 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (11, tf.SelectedLength);
     }
 
+    [Fact]
+    public void Mouse_Left_Clicked_At_Start_And_End_Viewport_Change_ScrollOffset ()
+    {
+        // Create a TextField with text
+        TextField tf = new () { Text = "Hello World", Width = 5, Height = 1 };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Verify initial state with text longer than width
+        Assert.Equal (11, tf.InsertionPoint);
+        Assert.Equal (7, tf.ScrollOffset);
+
+        // Mouse button clicked at the start of the viewport should move the cursor and adjust decreasing ScrollOffset
+        Mouse ev = new () { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked };
+        tf.NewMouseEvent (ev);
+
+        // Verify cursor is positioned at pressed location
+        Assert.Equal (7, tf.InsertionPoint);
+        Assert.Equal (6, tf.ScrollOffset);
+
+        // Mouse button clicked at the end of the viewport should move the cursor and adjust incrementing ScrollOffset
+        ev = new Mouse { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonClicked };
+        tf.NewMouseEvent (ev);
+
+        // Verify cursor is positioned at pressed location
+        Assert.Equal (10, tf.InsertionPoint);
+        Assert.Equal (7, tf.ScrollOffset);
+    }
+
+    [Fact]
+    public void Mouse_Left_Clicked_At_Start_And_End_Viewport_Change_ScrollOffset_Wide_Glyphs ()
+    {
+        // Create a TextField with text
+        TextField tf = new () { Text = "Hello World👨‍👩‍👧", Width = 5, Height = 1 };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Verify initial state with text longer than width
+        Assert.Equal (12, tf.InsertionPoint);
+        Assert.Equal (9, tf.ScrollOffset);
+
+        // Mouse button clicked at the start of the viewport should move the cursor and adjust decreasing ScrollOffset
+        Mouse ev = new () { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked };
+        tf.NewMouseEvent (ev);
+
+        // Verify cursor is positioned at pressed location
+        Assert.Equal (9, tf.InsertionPoint);
+        Assert.Equal (8, tf.ScrollOffset);
+
+        // Mouse button clicked at the end of the viewport should move the cursor and adjust incrementing ScrollOffset
+        ev = new Mouse { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonClicked };
+        tf.NewMouseEvent (ev);
+
+        // Verify cursor is positioned at pressed location
+        Assert.Equal (12, tf.InsertionPoint);
+        Assert.Equal (9, tf.ScrollOffset);
+    }
+
+    [Fact]
+    public void Mouse_Selecting_From_Start_And_From_End_Viewport_SelectsCorrectly ()
+    {
+        // Create a TextField with text
+        TextField tf = new () { Text = "Hello World", Width = 5, Height = 1 };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Verify initial state with text longer than width
+        Assert.Equal (11, tf.InsertionPoint);
+        Assert.Equal (7, tf.ScrollOffset);
+
+        // Mouse button pressed at the start of the viewport should move the cursor and adjust decreasing ScrollOffset
+        Mouse ev = new () { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed };
+        tf.NewMouseEvent (ev);
+
+        // Start selecting text by moving mouse to the right while pressing
+        ev = new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tf.NewMouseEvent (ev);
+
+        // Mouse move to right while pressing should select text and adjust ScrollOffset
+        ev = new Mouse { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tf.NewMouseEvent (ev);
+
+        // Verify cursor is positioned at pressed location
+        Assert.Equal (11, tf.InsertionPoint);
+        Assert.Equal (7, tf.ScrollOffset);
+        Assert.Equal ("orld", tf.SelectedText);
+
+        // Release mouse button
+        ev = new Mouse { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonReleased };
+        tf.NewMouseEvent (ev);
+
+        // Mouse button pressed at the end of the viewport should move the cursor and adjust incrementing ScrollOffset
+        ev = new Mouse { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonPressed };
+        tf.NewMouseEvent (ev);
+
+        // Start selecting text by moving mouse to the left while pressing
+        ev = new Mouse { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tf.NewMouseEvent (ev);
+
+        // Continue selecting text by moving mouse to the left while pressing forcing SelectedLength to be greater than 0
+        ev = new Mouse { Position = new Point (3, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tf.NewMouseEvent (ev);
+
+        // Mouse move to left while pressing should select text and adjust ScrollOffset
+        ev = new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tf.NewMouseEvent (ev);
+
+        // Verify cursor is positioned at pressed location
+        Assert.Equal (0, tf.InsertionPoint);
+        Assert.Equal (0, tf.ScrollOffset);
+        Assert.Equal ("Hello World", tf.SelectedText);
+    }
+
+    [Fact]
+    public void Mouse_Selecting_From_Start_And_From_End_Viewport_SelectsCorrectly_Wide_Glyphs ()
+    {
+        // Create a TextField with text
+        TextField tf = new () { Text = "Hello World👨‍👩‍👧", Width = 5, Height = 1 };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Verify initial state with text longer than width
+        Assert.Equal (12, tf.InsertionPoint);
+        Assert.Equal (9, tf.ScrollOffset);
+
+        // Mouse button pressed at the start of the viewport should move the cursor and adjust decreasing ScrollOffset
+        Mouse ev = new () { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed };
+        tf.NewMouseEvent (ev);
+
+        // Start selecting text by moving mouse to the right while pressing
+        ev = new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tf.NewMouseEvent (ev);
+
+        // Mouse move to right while pressing should select text and adjust ScrollOffset
+        ev = new Mouse { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tf.NewMouseEvent (ev);
+
+        // Verify cursor is positioned at pressed location
+        Assert.Equal (12, tf.InsertionPoint);
+        Assert.Equal (9, tf.ScrollOffset);
+        Assert.Equal ("ld👨‍👩‍👧", tf.SelectedText);
+
+        // Release mouse button
+        ev = new Mouse { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonReleased };
+        tf.NewMouseEvent (ev);
+
+        // Mouse button pressed at the end of the viewport should move the cursor and adjust incrementing ScrollOffset
+        ev = new Mouse { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonPressed };
+        tf.NewMouseEvent (ev);
+
+        // Start selecting text by moving mouse to the left while pressing
+        ev = new Mouse { Position = new Point (4, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tf.NewMouseEvent (ev);
+
+        // Continue selecting text by moving mouse to the left while pressing forcing SelectedLength to be greater than 0
+        ev = new Mouse { Position = new Point (3, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tf.NewMouseEvent (ev);
+
+        // Mouse move to left while pressing should select text and adjust ScrollOffset
+        ev = new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport };
+        tf.NewMouseEvent (ev);
+
+        // Verify cursor is positioned at pressed location
+        Assert.Equal (0, tf.InsertionPoint);
+        Assert.Equal (0, tf.ScrollOffset);
+        Assert.Equal ("Hello World👨‍👩‍👧", tf.SelectedText);
+    }
+
+    [Fact]
+    public void Mouse_Click_At_Position_GreaterThanZero_On_Empty_TextField_Should_Set_ScrollOffset_To_Zero ()
+    {
+        // Create a TextField with empty text
+        TextField tf = new () { Width = 5, Height = 1 };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        // Verify initial state
+        Assert.Equal (0, tf.InsertionPoint);
+        Assert.Equal (0, tf.ScrollOffset);
+
+        // Simulate mouse click
+        Mouse ev = new () { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonClicked };
+        tf.NewMouseEvent (ev);
+
+        // Verify ScrollOffset remains at zero
+        Assert.Equal (0, tf.InsertionPoint);
+        Assert.Equal (0, tf.ScrollOffset);
+    }
+
     // Claude - Opus 4.5
     [Fact]
     public void Text_Polymorphism_Works ()
@@ -1152,5 +1460,29 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         // Ctrl+Shift+Z → Redo
         Assert.True (tf.NewKeyDownEvent (Key.Z.WithCtrl.WithShift));
         Assert.Equal ("hell", tf.Text);
+    }
+
+    [Fact]
+    public void Text_Shorter_Than_Width_Should_Not_Scroll ()
+    {
+        using IApplication app = Application.Create ().Init ();
+        Runnable container = new () { Id = "container", Width = 20, Height = 1 };
+        container.App = app;
+        TextField tf = new () { Width = Dim.Percent (50), Text = "hello world" };
+        container.Add (tf);
+        container.BeginInit ();
+        container.EndInit ();
+
+        tf.SetFocus ();
+        Assert.True (tf.HasFocus);
+        Assert.Equal ("hello world", tf.SelectedText);
+        Assert.Equal (2, tf.ScrollOffset);
+        Assert.Equal (11, tf.Text.GetColumns ());
+        Assert.Equal (10, tf.Viewport.Width);
+;
+        // Resize container to be greater than text length
+        container.Width = 30;
+        Assert.Equal (0, tf.ScrollOffset);
+        Assert.Equal (15, tf.Viewport.Width);
     }
 }

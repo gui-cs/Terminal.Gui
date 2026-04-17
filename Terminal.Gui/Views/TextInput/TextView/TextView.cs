@@ -43,7 +43,8 @@ namespace Terminal.Gui.Views;
 ///             <term>PageUp / PageDown</term> <description>Moves one page up or down.</description>
 ///         </item>
 ///         <item>
-///             <term>Shift+&lt;movement&gt;</term> <description>Extends the selection in the given direction.</description>
+///             <term>Shift+&lt;movement&gt;</term>
+///             <description>Extends the selection in the given direction.</description>
 ///         </item>
 ///         <item>
 ///             <term>Delete, Ctrl+D</term> <description>Deletes the character in front of the cursor.</description>
@@ -52,10 +53,12 @@ namespace Terminal.Gui.Views;
 ///             <term>Backspace</term> <description>Deletes the character behind the cursor.</description>
 ///         </item>
 ///         <item>
-///             <term>Ctrl+K</term> <description>Cuts text from the cursor to the end of the line (kill-to-end).</description>
+///             <term>Ctrl+K</term>
+///             <description>Cuts text from the cursor to the end of the line (kill-to-end).</description>
 ///         </item>
 ///         <item>
-///             <term>Ctrl+Shift+Backspace</term> <description>Cuts text from the cursor to the start of the line (kill-to-start).</description>
+///             <term>Ctrl+Shift+Backspace</term>
+///             <description>Cuts text from the cursor to the start of the line (kill-to-start).</description>
 ///         </item>
 ///         <item>
 ///             <term>Ctrl+Delete</term> <description>Deletes the word to the right of the cursor.</description>
@@ -131,6 +134,8 @@ public partial class TextView : View, IDesignable
     /// <inheritdoc/>
     public override void EndInit ()
     {
+        base.EndInit ();
+
         Autocomplete.HostControl ??= this;
 
         ContextMenu = CreateContextMenu ();
@@ -139,24 +144,29 @@ public partial class TextView : View, IDesignable
         UpdateContentSize ();
         PositionCursor ();
 
-        if (HasFocus)
+        if (!HasFocus)
         {
-            App?.Popovers?.Register (ContextMenu);
-
-            if (ContextMenu?.Key is { } key && !KeyBindings.TryGet (key, out _))
-            {
-                KeyBindings.Add (key, Command.Context);
-            }
+            return;
         }
+        App?.Popovers?.Register (ContextMenu);
 
-        base.EndInit ();
+        if (ContextMenu?.Key is { } key && !KeyBindings.TryGet (key, out _))
+        {
+            KeyBindings.Add (key, Command.Context);
+        }
     }
 
     /// <inheritdoc/>
     protected override void OnSubViewsLaidOut (LayoutEventArgs args)
     {
         base.OnSubViewsLaidOut (args);
-        WrapTextModel ();
+
+        // Only rewrap when viewport width actually changes to avoid O(N×L) rescans on every layout pass.
+        if (_wordWrap && Viewport.Width != _lastWrapWidth)
+        {
+            WrapTextModel ();
+            _lastWrapWidth = Viewport.Width;
+        }
 
         // Don't call AdjustViewport() here - it resets viewport to cursor position,
         // undoing any user scrolling via scrollbar. AdjustViewport() is called when
@@ -178,6 +188,8 @@ public partial class TextView : View, IDesignable
     /// </summary>
     public virtual void OnContentsChanged ()
     {
+        _model.InvalidateMaxWidthCache ();
+
         ContentsChanged?.Invoke (this, new ContentsChangedEventArgs (CurrentRow, CurrentColumn));
 
         ProcessInheritsPreviousScheme (CurrentRow, CurrentColumn);
@@ -224,56 +236,52 @@ public partial class TextView : View, IDesignable
         }
 
         List<Cell> line = _model.GetLine (CurrentRow);
-        var col = 0;
 
-        if (line.Count > 0)
+        // Calculate absolute cursor position and store each glyph width
+        _ = TextModel.CursorColumn (TextModel.CellsToStringList (line), CurrentColumn, TabWidth, out List<int> glyphWidths, out _);
+        var colsWidth = 0;
+
+        if (glyphWidths.Count > 0)
         {
-            for (int idx = Viewport.X; idx < line.Count; idx++)
+            for (var i = 0; i < Viewport.X; i++)
             {
-                if (idx >= CurrentColumn)
+                if (i == glyphWidths.Count)
                 {
                     break;
                 }
-
-                int cols = line [idx].Grapheme.GetColumns ();
-
-                if (line [idx].Grapheme == "\t")
-                {
-                    if (TabWidth > 0)
-                    {
-                        // Calculate columns to next tab stop
-                        // Tab stops are at multiples of TabWidth (0, 4, 8, 12, ...)
-                        // If we're at visual column col, advance to next tab stop
-                        cols = TabWidth - col % TabWidth;
-                    }
-                    else
-                    {
-                        // When TabWidth is 0, tabs are invisible (0 columns)
-                        cols = 0;
-                    }
-                }
-                else
-                {
-                    // Ensures that cols less than 0 to be 1 because it will be converted to a printable rune
-                    cols = Math.Max (cols, 1);
-                }
-
-                if (TextModel.SetCol (ref col, Viewport.Width, cols))
-                {
-                    continue;
-                }
-                col = CurrentColumn;
-
-                break;
+                colsWidth += glyphWidths [i];
             }
         }
 
-        int posX = CurrentColumn - Viewport.X;
+        if (line.Count > 0)
+        {
+            if (line.Count > Viewport.X)
+            {
+                for (int idx = Viewport.X; idx < line.Count; idx++)
+                {
+                    if (idx >= CurrentColumn)
+                    {
+                        break;
+                    }
+
+                    int cols = glyphWidths [idx];
+
+                    if (TextModel.SetCol (ref colsWidth, Viewport.Width, cols, Viewport.X))
+                    {
+                        continue;
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        int posX = colsWidth - Viewport.X;
         int posY = CurrentRow - Viewport.Y;
 
-        if (posX > -1 && col >= posX && posX < Viewport.Width && Viewport.Y <= CurrentRow && posY < Viewport.Height)
+        if (posX > -1 && colsWidth >= posX && posX < Viewport.Width && Viewport.Y <= CurrentRow && posY < Viewport.Height)
         {
-            Cursor = Cursor with { Position = ViewportToScreen (new Point (col, CurrentRow - Viewport.Y)) };
+            Cursor = Cursor with { Position = ViewportToScreen (new Point (colsWidth - Viewport.X, CurrentRow - Viewport.Y)) };
         }
         else
         {

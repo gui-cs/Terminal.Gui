@@ -189,10 +189,6 @@ public partial class TextField
                                                                                  SelectedLength > _text.Count ? _text.Count : SelectedLength))
                                     : "";
 
-                if (ScrollOffset > _selectionStart)
-                {
-                    ScrollOffset = _selectionStart;
-                }
             }
             else if (_selectionStart > -1 && SelectedLength == 0)
             {
@@ -206,7 +202,14 @@ public partial class TextField
             ClearAllSelection ();
         }
 
-        Adjust ();
+        if (!_selectingByMouse)
+        {
+            Adjust ();
+        }
+        else
+        {
+            UpdateCursor ();
+        }
     }
 
     /// <summary>Clear the selected text.</summary>
