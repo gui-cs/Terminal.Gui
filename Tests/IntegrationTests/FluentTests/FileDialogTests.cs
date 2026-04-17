@@ -279,17 +279,17 @@ public class FileDialogTests : TestsAllDrivers
         OpenDialog? od = null;
         Button? cancelBtn = null;
 
-        AppTestHelper c = With.A (() =>
-                                  {
-                                      od = new OpenDialog ();
+        using AppTestHelper c = With.A (() =>
+                                        {
+                                            od = new OpenDialog ();
 
-                                      return od;
-                                  },
-                                  100,
-                                  50,
-                                  d,
-                                  _out)
-                              .ScreenShot ("Open dialog initial", _out);
+                                            return od;
+                                        },
+                                        100,
+                                        50,
+                                        d,
+                                        _out)
+                                    .ScreenShot ("Open dialog initial", _out);
 
         // Focus the Cancel button and grab a reference via MostFocused
         c.Focus<Button> (b => b.Text == Strings.btnCancel)
