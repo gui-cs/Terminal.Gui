@@ -528,6 +528,50 @@ public class TreeViewTests : TestDriverBase
         Assert.Empty (tree.GetAllSelectedObjects ());
     }
 
+    // Copilot
+    [Fact]
+    public void EnterKey_Raises_Accepting ()
+    {
+        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
+
+        var acceptingFired = false;
+
+        tree.Accepting += (_, e) =>
+                          {
+                              acceptingFired = true;
+                              e.Handled = true;
+                          };
+
+        // Enter key should raise Accepting via Command.Accept
+        tree.NewKeyDownEvent (Key.Enter);
+
+        Assert.True (acceptingFired);
+
+        tree.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void DoubleClick_Raises_Accepting ()
+    {
+        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
+
+        var acceptingFired = false;
+
+        tree.Accepting += (_, e) =>
+                          {
+                              acceptingFired = true;
+                              e.Handled = true;
+                          };
+
+        // Double-click should raise Accepting via Command.Accept
+        tree.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonDoubleClicked });
+
+        Assert.True (acceptingFired);
+
+        tree.Dispose ();
+    }
+
     [Fact]
     public void ObjectActivated_Called ()
     {
