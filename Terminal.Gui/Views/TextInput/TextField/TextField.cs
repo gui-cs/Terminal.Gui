@@ -112,19 +112,20 @@ public partial class TextField : View, IDesignable, IValue<string>
 
     private void TextField_Initialized (object? sender, EventArgs e)
     {
-        _insertionPoint = Text.GetRuneCount ();
+        _insertionPoint = GraphemeHelper.GetGraphemeCount (Text);
 
         if (Viewport.Width > 0)
         {
-            ScrollOffset = _insertionPoint > Viewport.Width + 1 ? _insertionPoint - Viewport.Width + 1 : 0;
+            int colsWidth = Text.GetColumns ();
+            ScrollOffset = colsWidth > Viewport.Width + 1 ? colsWidth - Viewport.Width + 1 : 0;
         }
 
-        if (Autocomplete.HostControl is { })
+        if (Autocomplete?.HostControl is { })
         {
             return;
         }
-        Autocomplete.HostControl = this;
-        Autocomplete.PopupInsideContainer = false;
+        Autocomplete?.HostControl = this;
+        Autocomplete?.PopupInsideContainer = false;
     }
 
     /// <summary>Gets or sets whether the text field is read-only.</summary>
@@ -174,11 +175,11 @@ public partial class TextField : View, IDesignable, IValue<string>
         }
     }
 
-    /// <inheritdoc/>
-    protected override void OnSubViewsLaidOut (LayoutEventArgs args)
+    /// <inheritdoc />
+    protected override void OnViewportChanged (DrawEventArgs e)
     {
-        base.OnSubViewsLaidOut (args);
-        UpdateCursor ();
+        base.OnViewportChanged (e);
+        Adjust ();
     }
 
     /// <summary>Get the Context Menu for this view.</summary>

@@ -245,6 +245,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         _editable = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Editable, out Attribute? editable) ? editable : null;
         _readOnly = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.ReadOnly, out Attribute? readOnly) ? readOnly : null;
         _disabled = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Disabled, out Attribute? disabled) ? disabled : null;
+        _code = scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Code, out Attribute? code) ? code : null;
     }
 
     /// <summary>Creates a new instance, initialized with the values from <paramref name="attribute"/>.</summary>
@@ -294,6 +295,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                         VisualRole.Editable => _editable,
                         VisualRole.ReadOnly => _readOnly,
                         VisualRole.Disabled => _disabled,
+                        VisualRole.Code => _code,
                         _ => null
                     };
 
@@ -350,7 +352,7 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                 result = focus with
                 {
                     Foreground = ResolveNone (focus.Foreground, defaultTerminalColors, true).GetBrighterColor (0.2, isDark),
-                    Background = focusBg.GetDimmerColor (0.2, isDark),
+                    Background = focusBg.GetDimmerColor (0.2, !isDark),
                     Style = focus.Style | TextStyle.Bold
                 };
 
@@ -391,6 +393,16 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                 bool isDark = ResolveNone (editable.Background, defaultTerminalColors).IsDarkColor ();
 
                 result = editable with { Foreground = editable.Foreground.GetDimmerColor (0.05, isDark) };
+
+                break;
+            }
+
+            case VisualRole.Code:
+            {
+                Attribute editable = GetAttributeForRoleCore (VisualRole.Editable, stack, defaultTerminalColors);
+                bool isDark = ResolveNone (editable.Background, defaultTerminalColors).IsDarkColor ();
+
+                result = editable with { Background = editable.Background.GetDimmerColor (0.2, isDark), Style = editable.Style | TextStyle.Bold };
 
                 break;
             }
@@ -595,6 +607,15 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         init => _disabled = SetAttributeForRoleProperty (value, VisualRole.Disabled);
     }
 
+    private readonly Attribute? _code;
+
+    /// <summary>
+    ///     The visual role for preformatted or source code content (e.g., <see cref="MarkdownCodeBlock"/>, inline code).
+    ///     If not explicitly set, derived from <see cref="Editable"/> with a dimmed background and
+    ///     <see cref="TextStyle.Bold"/>.
+    /// </summary>
+    public Attribute Code { get => GetAttributeForRoleProperty (_code, VisualRole.Code); init => _code = SetAttributeForRoleProperty (value, VisualRole.Code); }
+
     /// <inheritdoc/>
     public virtual bool Equals (Scheme? other) =>
         other is { }
@@ -607,17 +628,19 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
         && EqualityComparer<Attribute>.Default.Equals (Highlight, other.Highlight)
         && EqualityComparer<Attribute>.Default.Equals (Editable, other.Editable)
         && EqualityComparer<Attribute>.Default.Equals (ReadOnly, other.ReadOnly)
-        && EqualityComparer<Attribute>.Default.Equals (Disabled, other.Disabled);
+        && EqualityComparer<Attribute>.Default.Equals (Disabled, other.Disabled)
+        && EqualityComparer<Attribute>.Default.Equals (Code, other.Code);
 
     /// <inheritdoc/>
     public override int GetHashCode () =>
-        HashCode.Combine (HashCode.Combine (Normal, HotNormal, Focus, HotFocus, Active, HotActive, Highlight, Editable), HashCode.Combine (ReadOnly, Disabled));
+        HashCode.Combine (HashCode.Combine (Normal, HotNormal, Focus, HotFocus, Active, HotActive, Highlight, Editable),
+                          HashCode.Combine (ReadOnly, Disabled, Code));
 
     /// <inheritdoc/>
     public override string ToString () =>
         $"Normal: {Normal}; HotNormal: {HotNormal}; Focus: {Focus}; HotFocus: {HotFocus}; "
         + $"Active: {Active}; HotActive: {HotActive}; Highlight: {Highlight}; Editable: {Editable}; "
-        + $"ReadOnly: {ReadOnly}; Disabled: {Disabled}";
+        + $"ReadOnly: {ReadOnly}; Disabled: {Disabled}; Code: {Code}";
 
     /// <summary>
     ///     Resolves <see cref="Color.None"/> to a concrete color for use in color math (brighten, dim, invert).
