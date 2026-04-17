@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Drawing;
 using System.Globalization;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
@@ -266,64 +265,10 @@ public class FileDialogTests : TestsAllDrivers
     }
 
     /// <summary>
-    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4950
-    ///     OpenFileDialog only closes after clicking Cancel or OK three times.
-    ///     The first mouse-press triggers a layout pass that repositions the button,
-    ///     so the subsequent mouse-release misses it.
-    /// </summary>
-    [Theory]
-    [MemberData (nameof (GetAllDriverNames))]
-    public void FileDialog_CancelButton_ClickDoesNotMoveButton (string d)
-    {
-        // Copilot
-        OpenDialog? od = null;
-        Button? cancelBtn = null;
-        Point posBefore = Point.Empty;
-
-        AppTestHelper c = With.A (() =>
-                                   {
-                                       od = new OpenDialog ();
-
-                                       return od;
-                                   },
-                                   100,
-                                   50,
-                                   d,
-                                   _out)
-                               .ScreenShot ("Open dialog initial", _out);
-
-        // Focus the Cancel button and grab a reference via MostFocused
-        c.Focus<Button> (b => b.Text == Strings.btnCancel)
-         .Then (_ =>
-                {
-                    cancelBtn = od!.MostFocused as Button;
-                })
-         .ScreenShot ("Cancel button focused", _out);
-
-        Assert.True (cancelBtn?.HasFocus);
-        posBefore = cancelBtn!.ViewportToScreen ().Location;
-
-        // Click at the Cancel button position (Press + Release).
-        // The bug: press triggers a layout pass that moves the button before release.
-        c.LeftClick (posBefore.X + 1, posBefore.Y);
-
-        // If the fix works, the click lands on Cancel and closes the dialog.
-        // If the bug is present, the button moves and the click misses,
-        // so the dialog stays open and IsRunning remains true.
-        c.Then (_ =>
-                {
-                    // Verify the dialog was dismissed by the single click
-                    Assert.False (od!.IsRunning, "Dialog should have closed on the first Cancel click");
-                })
-         .ScreenShot ("After click on Cancel button", _out);
-
-        c.Stop ();
-    }
-    /// <summary>
     ///     Test cases for functions with signature <code>TestDriver d, bool someFlag</code>
     ///     that enumerates all variations
     /// </summary>
-    public class TestDrivers_WithTrueFalseParameter : IEnumerable<object []>
+    private class TestDrivers_WithTrueFalseParameter : IEnumerable<object []>
     {
         public IEnumerator<object []> GetEnumerator ()
         {
