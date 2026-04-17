@@ -35,7 +35,7 @@ public class PopoverMenus : Scenario
         _appWindow.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
 
         // Changing the key-bindings of a View is not allowed, however,
-        // by default, Window doesn't bind to Command.Context, so
+        // by default, Runnable doesn't bind to Command.Context, so
         // we can take advantage of the CommandNotBound event to handle it
         //
         // An alternative implementation would be to create a Runnable subclass that
