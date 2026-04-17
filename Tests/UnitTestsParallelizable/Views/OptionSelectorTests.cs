@@ -1071,4 +1071,103 @@ public class OptionSelectorTests
     }
 
     #endregion
+
+    #region OptionSelector<TEnum> Tests
+
+    private enum TestEnumZero
+    {
+        Alpha,
+        Beta,
+        Gamma
+    }
+
+    private enum TestEnumNonZero
+    {
+        Alpha = 1,
+        Beta = 2,
+        Gamma = 3
+    }
+
+    private enum TestEnumSparse
+    {
+        Low = 5,
+        Mid = 10,
+        High = 20
+    }
+
+    [Fact]
+    // Copilot
+    public void Generic_Initialization_ZeroBased_FirstCheckBoxIsChecked ()
+    {
+        OptionSelector<TestEnumZero> selector = new ();
+
+        Assert.Equal (TestEnumZero.Alpha, selector.Value);
+        Assert.Equal (0, ((OptionSelector)selector).Value);
+
+        List<int> expectedValues = [0, 1, 2];
+        Assert.Equal (expectedValues, selector.Values);
+
+        CheckBox first = selector.SubViews.OfType<CheckBox> ().First (cb => selector.GetCheckBoxValue (cb) == 0);
+        Assert.Equal (CheckState.Checked, first.Value);
+    }
+
+    [Fact]
+    // Copilot
+    public void Generic_Initialization_NonZeroBased_FirstCheckBoxIsChecked ()
+    {
+        OptionSelector<TestEnumNonZero> selector = new ();
+
+        Assert.Equal (TestEnumNonZero.Alpha, selector.Value);
+        Assert.Equal (1, ((OptionSelector)selector).Value);
+
+        List<int> expectedValues = [1, 2, 3];
+        Assert.Equal (expectedValues, selector.Values);
+
+        CheckBox first = selector.SubViews.OfType<CheckBox> ().First (cb => selector.GetCheckBoxValue (cb) == 1);
+        Assert.Equal (CheckState.Checked, first.Value);
+
+        // Other checkboxes should be unchecked
+        foreach (CheckBox cb in selector.SubViews.OfType<CheckBox> ().Where (cb => selector.GetCheckBoxValue (cb) != 1))
+        {
+            Assert.Equal (CheckState.UnChecked, cb.Value);
+        }
+    }
+
+    [Fact]
+    // Copilot
+    public void Generic_Initialization_SparseEnum_FirstCheckBoxIsChecked ()
+    {
+        OptionSelector<TestEnumSparse> selector = new ();
+
+        Assert.Equal (TestEnumSparse.Low, selector.Value);
+        Assert.Equal (5, ((OptionSelector)selector).Value);
+
+        List<int> expectedValues = [5, 10, 20];
+        Assert.Equal (expectedValues, selector.Values);
+
+        CheckBox first = selector.SubViews.OfType<CheckBox> ().First (cb => selector.GetCheckBoxValue (cb) == 5);
+        Assert.Equal (CheckState.Checked, first.Value);
+    }
+
+    [Fact]
+    // Copilot
+    public void Generic_Initialization_HasCorrectLabels ()
+    {
+        OptionSelector<TestEnumZero> selector = new ();
+
+        List<string> expectedLabels = ["Alpha", "Beta", "Gamma"];
+        Assert.Equal (expectedLabels, selector.Labels);
+        Assert.Equal (3, selector.SubViews.OfType<CheckBox> ().Count ());
+    }
+
+    [Fact]
+    // Copilot
+    public void Generic_Values_Set_Throws ()
+    {
+        OptionSelector<TestEnumZero> selector = new ();
+
+        Assert.Throws<InvalidOperationException> (() => selector.Values = [1, 2]);
+    }
+
+    #endregion
 }

@@ -73,8 +73,19 @@ public partial class TextView
             return;
         }
 
-        HorizontalScrollBar.Visible = ScrollBars && !WordWrap && Viewport.Width < GetContentWidth ();
-        VerticalScrollBar.Visible = ScrollBars && Viewport.Height < GetContentHeight ();
+        // Only directly manage Visible when VisibilityMode is Manual.
+        // When Auto/Always/None, ScrollBar.ShowHide() is the sole authority;
+        // setting Visible here would fight with it and cause Padding.Thickness
+        // to drift (issue #4890).
+        if (HorizontalScrollBar.VisibilityMode == ScrollBarVisibilityMode.Manual)
+        {
+            HorizontalScrollBar.Visible = ScrollBars && !WordWrap && Viewport.Width < GetContentSize ().Width;
+        }
+
+        if (VerticalScrollBar.VisibilityMode == ScrollBarVisibilityMode.Manual)
+        {
+            VerticalScrollBar.Visible = ScrollBars && Viewport.Height < GetContentSize ().Height;
+        }
     }
 
     private void AdjustViewport ()
