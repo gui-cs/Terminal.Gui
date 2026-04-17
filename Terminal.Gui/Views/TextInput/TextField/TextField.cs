@@ -120,12 +120,12 @@ public partial class TextField : View, IDesignable, IValue<string>
             ScrollOffset = colsWidth > Viewport.Width + 1 ? colsWidth - Viewport.Width + 1 : 0;
         }
 
-        if (Autocomplete.HostControl is { })
+        if (Autocomplete?.HostControl is { })
         {
             return;
         }
-        Autocomplete.HostControl = this;
-        Autocomplete.PopupInsideContainer = false;
+        Autocomplete?.HostControl = this;
+        Autocomplete?.PopupInsideContainer = false;
     }
 
     /// <summary>Gets or sets whether the text field is read-only.</summary>

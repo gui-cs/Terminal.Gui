@@ -143,6 +143,7 @@ public partial class TextField
         set
         {
             // Guard against base constructor calling before _text is initialized
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (_text is null)
             {
                 return;

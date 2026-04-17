@@ -56,6 +56,7 @@ internal class SchemeJsonConverter : JsonConverter<Scheme>
                              "editable" => scheme with { Editable = attribute },
                              "readonly" => scheme with { ReadOnly = attribute },
                              "disabled" => scheme with { Disabled = attribute },
+                             "code" => scheme with { Code = attribute },
                              _ => throw new JsonException ($"{propertyName}: Unrecognized Scheme Attribute name.")
                          };
             }

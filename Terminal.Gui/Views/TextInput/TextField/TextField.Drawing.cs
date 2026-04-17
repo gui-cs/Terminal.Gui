@@ -106,7 +106,7 @@ public partial class TextField
             return;
         }
 
-        if (Autocomplete.Context == null)
+        if (Autocomplete?.Context is null)
         {
             return;
         }
