@@ -214,7 +214,7 @@ public class Shortcut : View, IOrientation, IDesignable
         }
 
         // Frame.Width is smaller than the natural width. Reduce width of HelpView.
-        _maxHelpWidth = int.Max (0, GetContentSize ().Width - CommandView.Frame.Width - KeyView.Frame.Width);
+        _maxHelpWidth = int.Max (0, GetContentWidth () - CommandView.Frame.Width - KeyView.Frame.Width);
 
         if (_maxHelpWidth < 3)
         {

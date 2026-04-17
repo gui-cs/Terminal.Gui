@@ -290,7 +290,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
                 return _scrollableContentSize.Value;
             }
 
-            return Orientation == Orientation.Vertical ? SuperView?.GetContentSize ().Height ?? 0 : SuperView?.GetContentSize ().Width ?? 0;
+            return Orientation == Orientation.Vertical ? SuperView?.GetContentHeight () ?? 0 : SuperView?.GetContentWidth () ?? 0;
         }
         set
         {

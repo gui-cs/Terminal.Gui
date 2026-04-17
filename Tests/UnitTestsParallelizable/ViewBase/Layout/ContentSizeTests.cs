@@ -524,4 +524,404 @@ public class ContentSizeTests (ITestOutputHelper output)
     }
 
     #endregion
+
+    #region Independent Width/Height Tests - Copilot
+
+    [Theory]
+    [InlineData (0)]
+    [InlineData (1)]
+    [InlineData (10)]
+    [InlineData (100)]
+    public void SetContentWidth_ValidWidth_SetsContentWidth (int width)
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        view.SetContentWidth (width);
+
+        Assert.Equal (width, view.GetContentWidth ());
+        Assert.False (view.ContentSizeTracksViewport);
+    }
+
+    [Theory]
+    [InlineData (0)]
+    [InlineData (1)]
+    [InlineData (10)]
+    [InlineData (100)]
+    public void SetContentHeight_ValidHeight_SetsContentHeight (int height)
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        view.SetContentHeight (height);
+
+        Assert.Equal (height, view.GetContentHeight ());
+        Assert.False (view.ContentSizeTracksViewport);
+    }
+
+    [Fact]
+    public void SetContentWidth_Null_TracksViewportWidth ()
+    {
+        View view = new ()
+        {
+            Width = 20,
+            Height = 15
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        view.SetContentWidth (100);
+        Assert.Equal (100, view.GetContentWidth ());
+
+        view.SetContentWidth (null);
+        Assert.Equal (view.Viewport.Width, view.GetContentWidth ());
+    }
+
+    [Fact]
+    public void SetContentHeight_Null_TracksViewportHeight ()
+    {
+        View view = new ()
+        {
+            Width = 20,
+            Height = 15
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        view.SetContentHeight (100);
+        Assert.Equal (100, view.GetContentHeight ());
+
+        view.SetContentHeight (null);
+        Assert.Equal (view.Viewport.Height, view.GetContentHeight ());
+    }
+
+    [Theory]
+    [InlineData (-1)]
+    [InlineData (-10)]
+    public void SetContentWidth_Negative_ThrowsArgumentException (int width)
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        Assert.Throws<ArgumentException> (() => view.SetContentWidth (width));
+    }
+
+    [Theory]
+    [InlineData (-1)]
+    [InlineData (-10)]
+    public void SetContentHeight_Negative_ThrowsArgumentException (int height)
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        Assert.Throws<ArgumentException> (() => view.SetContentHeight (height));
+    }
+
+    [Fact]
+    public void SetContentWidth_Only_HeightTracksViewport ()
+    {
+        View view = new ()
+        {
+            Width = 20,
+            Height = 15
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        view.SetContentWidth (100);
+
+        Assert.Equal (100, view.GetContentWidth ());
+        Assert.Equal (view.Viewport.Height, view.GetContentHeight ());
+        Assert.Equal (new Size (100, view.Viewport.Height), view.GetContentSize ());
+        Assert.False (view.ContentSizeTracksViewport);
+    }
+
+    [Fact]
+    public void SetContentHeight_Only_WidthTracksViewport ()
+    {
+        View view = new ()
+        {
+            Width = 20,
+            Height = 15
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        view.SetContentHeight (100);
+
+        Assert.Equal (view.Viewport.Width, view.GetContentWidth ());
+        Assert.Equal (100, view.GetContentHeight ());
+        Assert.Equal (new Size (view.Viewport.Width, 100), view.GetContentSize ());
+        Assert.False (view.ContentSizeTracksViewport);
+    }
+
+    [Fact]
+    public void SetContentWidth_ThenHeight_BothIndependent ()
+    {
+        View view = new ()
+        {
+            Width = 20,
+            Height = 15
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        view.SetContentWidth (100);
+        view.SetContentHeight (200);
+
+        Assert.Equal (100, view.GetContentWidth ());
+        Assert.Equal (200, view.GetContentHeight ());
+        Assert.Equal (new Size (100, 200), view.GetContentSize ());
+        Assert.False (view.ContentSizeTracksViewport);
+    }
+
+    [Fact]
+    public void SetContentWidth_DoesNotResetHeight ()
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        view.SetContentHeight (50);
+        view.SetContentWidth (100);
+
+        Assert.Equal (100, view.GetContentWidth ());
+        Assert.Equal (50, view.GetContentHeight ());
+    }
+
+    [Fact]
+    public void SetContentHeight_DoesNotResetWidth ()
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        view.SetContentWidth (100);
+        view.SetContentHeight (50);
+
+        Assert.Equal (100, view.GetContentWidth ());
+        Assert.Equal (50, view.GetContentHeight ());
+    }
+
+    [Fact]
+    public void SetContentSize_Null_ClearsBothDimensions ()
+    {
+        View view = new ()
+        {
+            Width = 20,
+            Height = 15
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        view.SetContentWidth (100);
+        view.SetContentHeight (200);
+
+        view.SetContentSize (null);
+
+        Assert.True (view.ContentSizeTracksViewport);
+        Assert.Equal (view.Viewport.Width, view.GetContentWidth ());
+        Assert.Equal (view.Viewport.Height, view.GetContentHeight ());
+    }
+
+    [Fact]
+    public void ContentSizeTracksViewport_SetToTrue_ClearsBothDimensions ()
+    {
+        View view = new ()
+        {
+            Width = 20,
+            Height = 15
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        view.SetContentWidth (100);
+        view.SetContentHeight (200);
+        Assert.False (view.ContentSizeTracksViewport);
+
+        view.ContentSizeTracksViewport = true;
+
+        Assert.True (view.ContentSizeTracksViewport);
+        Assert.Equal (view.Viewport.Width, view.GetContentWidth ());
+        Assert.Equal (view.Viewport.Height, view.GetContentHeight ());
+    }
+
+    [Fact]
+    public void SetContentWidth_RaisesContentSizeChangedEvent ()
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        int eventCount = 0;
+
+        view.ContentSizeChanged += (_, _) => eventCount++;
+
+        view.SetContentWidth (100);
+
+        Assert.Equal (1, eventCount);
+    }
+
+    [Fact]
+    public void SetContentHeight_RaisesContentSizeChangedEvent ()
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        int eventCount = 0;
+
+        view.ContentSizeChanged += (_, _) => eventCount++;
+
+        view.SetContentHeight (100);
+
+        Assert.Equal (1, eventCount);
+    }
+
+    [Fact]
+    public void SetContentWidth_SameValue_DoesNotRaiseEvent ()
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        view.SetContentWidth (100);
+
+        int eventCount = 0;
+        view.ContentSizeChanged += (_, _) => eventCount++;
+
+        view.SetContentWidth (100);
+
+        Assert.Equal (0, eventCount);
+    }
+
+    [Fact]
+    public void SetContentHeight_SameValue_DoesNotRaiseEvent ()
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        view.SetContentHeight (100);
+
+        int eventCount = 0;
+        view.ContentSizeChanged += (_, _) => eventCount++;
+
+        view.SetContentHeight (100);
+
+        Assert.Equal (0, eventCount);
+    }
+
+    [Fact]
+    public void GetContentWidth_NotSet_ReturnsViewportWidth ()
+    {
+        View view = new ()
+        {
+            Width = 20,
+            Height = 15
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        Assert.Equal (view.Viewport.Width, view.GetContentWidth ());
+    }
+
+    [Fact]
+    public void GetContentHeight_NotSet_ReturnsViewportHeight ()
+    {
+        View view = new ()
+        {
+            Width = 20,
+            Height = 15
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        Assert.Equal (view.Viewport.Height, view.GetContentHeight ());
+    }
+
+    [Fact]
+    public void SetContentWidth_Cancellable_ViaChangingEvent ()
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        Size? originalSize = view.GetContentSize ();
+
+        view.ContentSizeChanging += (_, e) =>
+        {
+            e.Handled = true;
+        };
+
+        view.SetContentWidth (100);
+
+        // Change should be cancelled
+        Assert.Equal (originalSize, view.GetContentSize ());
+    }
+
+    [Fact]
+    public void SetContentHeight_Cancellable_ViaChangingEvent ()
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        Size? originalSize = view.GetContentSize ();
+
+        view.ContentSizeChanging += (_, e) =>
+        {
+            e.Handled = true;
+        };
+
+        view.SetContentHeight (100);
+
+        // Change should be cancelled
+        Assert.Equal (originalSize, view.GetContentSize ());
+    }
+
+    [Fact]
+    public void SetContentWidth_NullToNull_DoesNotRaiseEvent ()
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        int eventCount = 0;
+        view.ContentSizeChanged += (_, _) => eventCount++;
+
+        view.SetContentWidth (null);
+
+        Assert.Equal (0, eventCount);
+    }
+
+    [Fact]
+    public void SetContentHeight_NullToNull_DoesNotRaiseEvent ()
+    {
+        View view = new ();
+        view.BeginInit ();
+        view.EndInit ();
+
+        int eventCount = 0;
+        view.ContentSizeChanged += (_, _) => eventCount++;
+
+        view.SetContentHeight (null);
+
+        Assert.Equal (0, eventCount);
+    }
+
+    #endregion
 }

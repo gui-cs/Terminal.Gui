@@ -73,8 +73,8 @@ public partial class TextView
             return;
         }
 
-        HorizontalScrollBar.Visible = ScrollBars && !WordWrap && Viewport.Width < GetContentSize ().Width;
-        VerticalScrollBar.Visible = ScrollBars && Viewport.Height < GetContentSize ().Height;
+        HorizontalScrollBar.Visible = ScrollBars && !WordWrap && Viewport.Width < GetContentWidth ();
+        VerticalScrollBar.Visible = ScrollBars && Viewport.Height < GetContentHeight ();
     }
 
     private void AdjustViewport ()

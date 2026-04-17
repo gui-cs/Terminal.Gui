@@ -39,7 +39,7 @@ public partial class TableView
         AddStr (new string (' ', Viewport.Width));
         var line = 0;
         var headerLinesHandled = 0;
-        int availableWidth = GetContentSize ().Width;
+        int availableWidth = GetContentWidth ();
 
         if (ShouldRenderHeaders ())
         {
