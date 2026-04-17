@@ -683,12 +683,12 @@ public partial class View // Layout APIs
 
         if (TextFormatter.ConstrainToWidth is null)
         {
-            TextFormatter.ConstrainToWidth = GetContentSize ().Width;
+            TextFormatter.ConstrainToWidth = GetContentWidth ();
         }
 
         if (TextFormatter.ConstrainToHeight is null)
         {
-            TextFormatter.ConstrainToHeight = GetContentSize ().Height;
+            TextFormatter.ConstrainToHeight = GetContentHeight ();
         }
 
         return true;

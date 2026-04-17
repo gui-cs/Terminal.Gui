@@ -215,7 +215,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
             if (us is { ContentSizeTracksViewport: false, InternalSubViews.Count: 0 })
             {
                 // ContentSize was explicitly set. Use `us.ContentSize` to determine size.
-                maxCalculatedSize = dimension == Dimension.Width ? us.GetContentSize ().Width : us.GetContentSize ().Height;
+                maxCalculatedSize = dimension == Dimension.Width ? us.GetContentWidth () : us.GetContentHeight ();
             }
             else
             {

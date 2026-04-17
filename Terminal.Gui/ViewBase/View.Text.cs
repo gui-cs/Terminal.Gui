@@ -168,9 +168,6 @@ public partial class View // Text Property APIs
         // We need to ensure TextFormatter is accurate by calling it here.
         UpdateTextFormatterText ();
 
-        // Default is to use GetContentSize ().
-        Size? size = _contentSize;
-
         // Use _width & _height instead of Width & Height to avoid debug spew
 
         if (_width.Has (out DimAuto widthAuto) && widthAuto.Style.FastHasFlags (DimAutoStyle.Text))
@@ -179,9 +176,9 @@ public partial class View // Text Property APIs
         }
         else
         {
-            if (size is { })
+            if (_contentWidth is { } w)
             {
-                TextFormatter.ConstrainToWidth = size.Value.Width;
+                TextFormatter.ConstrainToWidth = w;
             }
         }
 
@@ -193,9 +190,9 @@ public partial class View // Text Property APIs
         }
         else
         {
-            if (size is { })
+            if (_contentHeight is { } h)
             {
-                TextFormatter.ConstrainToHeight = size.Value.Height;
+                TextFormatter.ConstrainToHeight = h;
             }
         }
     }

@@ -109,8 +109,7 @@ public class Deepdives : Scenario
                                                      return;
                                                  }
 
-                                                 Size currentContentSize = _markdownView.GetContentSize ();
-                                                 _markdownView.SetContentSize (currentContentSize with { Width = newWidth });
+                                                 _markdownView.SetContentWidth (newWidth);
                                              };
 
         Shortcut contentWidthShortcut = new () { CommandView = _contentWidthUpDown, Text = "Content Width" };
