@@ -302,6 +302,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
         UpdateTextDirection (TextDirection);
         UpdateTextFormatterText ();
 
+        // Force a layout each time a View is initialized
+        Layout ();
+
         foreach (View view in InternalSubViews)
         {
             if (!view.IsInitialized)
@@ -309,9 +312,6 @@ public partial class View : IDisposable, ISupportInitializeNotification
                 view.EndInit ();
             }
         }
-
-        // Force a layout each time a View is initialized
-        Layout ();
 
         // Complex layout scenarios (e.g. DimAuto and PosAlign) may require multiple layouts to be performed.
         // Thus, we call SetNeedsLayout() to ensure that the layout is performed at least once.
