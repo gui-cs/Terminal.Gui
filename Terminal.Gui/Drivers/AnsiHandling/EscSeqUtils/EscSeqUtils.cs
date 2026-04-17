@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 
 // ReSharper disable UnusedMember.Global
 
@@ -889,11 +890,10 @@ public static class EscSeqUtils
     #region Requests
 
     /// <summary>
-    ///     ESC [ ? 6 n - Request Cursor Position Report (?) (DECXCPR)
-    ///     https://terminalguide.namepad.de/seq/csi_sn__p-6/
-    ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) ; 1 R
+    ///     ESC [ 6 n - Request Cursor Position Report (CPR)
+    ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ (y) ; (x) R
     /// </summary>
-    public static readonly AnsiEscapeSequence CSI_RequestCursorPositionReport = new () { Request = CSI + "?6n", Terminator = "R" };
+    public static readonly AnsiEscapeSequence CSI_RequestCursorPositionReport = new () { Request = CSI + "6n", Terminator = "R" };
 
     /// <summary>
     ///     ESC [ ? u - Query kitty keyboard progressive enhancement flags.
@@ -926,7 +926,7 @@ public static class EscSeqUtils
     public static readonly string CSI_DisableKittyKeyboardFlags = CSI + "<u";
 
     /// <summary>
-    ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ ? (y) ; (x) R
+    ///     The terminal reply to <see cref="CSI_RequestCursorPositionReport"/>. ESC [ (y) ; (x) R
     /// </summary>
     public const string CSI_RequestCursorPositionReport_Terminator = "R";
 
@@ -1058,6 +1058,23 @@ public static class EscSeqUtils
     public const string ST = "\u001B\\";
 
     /// <summary>
+    ///     Sets the terminal window title using OSC 0..2.
+    /// </summary>
+    /// <param name="title">The title text to write.</param>
+    /// <param name="mode">
+    ///     The OSC title selector:
+    ///     0 = icon and window title, 1 = icon title, 2 = window title.
+    ///     Values outside 0..2 are clamped.
+    /// </param>
+    /// <returns>The OSC title sequence.</returns>
+    public static string OSC_SetWindowTitle (string title, int mode = 0)
+    {
+        string safeTitle = SanitizeOscText (title);
+
+        return $"{OSC}{Math.Clamp (mode, 0, 2)};{safeTitle}{ST}";
+    }
+
+    /// <summary>
     ///     Starts a hyperlink using OSC 8 escape sequence.
     /// </summary>
     /// <param name="url">The URL to link to (e.g., "https://github.com").</param>
@@ -1078,6 +1095,29 @@ public static class EscSeqUtils
     }
 
     /// <summary>
+    ///     Removes control characters from OSC text payloads to prevent escape-sequence injection.
+    /// </summary>
+    private static string SanitizeOscText (string text)
+    {
+        if (string.IsNullOrEmpty (text))
+        {
+            return string.Empty;
+        }
+
+        StringBuilder sanitized = new (text.Length);
+
+        foreach (char ch in text)
+        {
+            if (!char.IsControl (ch))
+            {
+                sanitized.Append (ch);
+            }
+        }
+
+        return sanitized.ToString ();
+    }
+
+    /// <summary>
     ///     Ends a hyperlink using OSC 8 escape sequence.
     /// </summary>
     /// <returns>The OSC 8 end sequence.</returns>
@@ -1089,6 +1129,39 @@ public static class EscSeqUtils
 
         // Format: ESC ] 8 ; ; ST (empty URL ends hyperlink)
         $"{OSC}8;;{ST}";
+
+    /// <summary>
+    ///     Clears any terminal progress indicator using OSC 9;4 state 0.
+    /// </summary>
+    /// <returns>The OSC 9;4 clear-progress sequence.</returns>
+    public static string OSC_ClearProgress () => $"{OSC}9;4;0;0{ST}";
+
+    /// <summary>
+    ///     Sets terminal progress using OSC 9;4 state 1.
+    /// </summary>
+    /// <param name="progress">Progress percentage in the range 0-100.</param>
+    /// <returns>The OSC 9;4 determinate-progress sequence.</returns>
+    public static string OSC_SetProgressValue (int progress) => $"{OSC}9;4;1;{Math.Clamp (progress, 0, 100)}{ST}";
+
+    /// <summary>
+    ///     Sets terminal progress to the error state using OSC 9;4 state 2.
+    /// </summary>
+    /// <param name="progress">Progress percentage in the range 0-100.</param>
+    /// <returns>The OSC 9;4 error-progress sequence.</returns>
+    public static string OSC_SetProgressError (int progress = 0) => $"{OSC}9;4;2;{Math.Clamp (progress, 0, 100)}{ST}";
+
+    /// <summary>
+    ///     Sets terminal progress to the indeterminate state using OSC 9;4 state 3.
+    /// </summary>
+    /// <returns>The OSC 9;4 indeterminate-progress sequence.</returns>
+    public static string OSC_SetProgressIndeterminate () => $"{OSC}9;4;3;0{ST}";
+
+    /// <summary>
+    ///     Sets terminal progress to the paused state using OSC 9;4 state 4.
+    /// </summary>
+    /// <param name="progress">Progress percentage in the range 0-100.</param>
+    /// <returns>The OSC 9;4 paused-progress sequence.</returns>
+    public static string OSC_SetProgressPaused (int progress = 0) => $"{OSC}9;4;4;{Math.Clamp (progress, 0, 100)}{ST}";
 
     #region OSC Color Queries
 

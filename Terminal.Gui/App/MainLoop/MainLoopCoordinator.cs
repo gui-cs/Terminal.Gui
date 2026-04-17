@@ -152,13 +152,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         }
         AnsiStartupGate? startupGate = app?.AnsiStartupGate;
 
-        _driver = new DriverImpl (_componentFactory,
-                                  _inputProcessor,
-                                  _loop.OutputBuffer,
-                                  _output,
-                                  _loop.AnsiRequestScheduler,
-                                  _loop.SizeMonitor,
-                                  startupGate);
+        _driver = new DriverImpl (_componentFactory, _inputProcessor, _loop.OutputBuffer, _output, _loop.AnsiRequestScheduler, _loop.SizeMonitor, startupGate);
 
         // Set the driver's AppModel from the application instance so it doesn't rely on the static.
         if (app is { })
@@ -187,6 +181,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
         TerminalColorCapabilities caps = TerminalEnvironmentDetector.DetectColorCapabilities ();
 
         _driver.SetColorCapabilities (caps);
+        _driver.InitializeProgressIndicator ();
 
         if (caps.Capability is ColorCapabilityLevel.NoColor or ColorCapabilityLevel.Colors16)
         {
@@ -228,16 +223,27 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
 
             kittyKeyboardDetector.Detect (result =>
                                           {
-                                              if (!result.IsSupported)
-                                              {
-                                                  Trace.Lifecycle (app?.MainThreadId?.ToString (), "KittyKeyboard", "Kitty keyboard mode not enabled");
+                                               if (!result.IsSupported)
+                                               {
+                                                   if (_inputProcessor is AnsiInputProcessor unsupportedAnsiInputProcessor)
+                                                   {
+                                                       unsupportedAnsiInputProcessor.SetKittyKeyboardEnabled (false);
+                                                   }
 
-                                                  return;
-                                              }
+                                                   Trace.Lifecycle (app?.MainThreadId?.ToString (), "KittyKeyboard", "Kitty keyboard mode not enabled");
 
-                                              // Kitty is supported. Store the capabilities and set the flags we care about.
-                                              _driver?.SetKittyKeyboardCapabilities (result);
-                                              kittyKeyboardDetector.Enable (EscSeqUtils.KittyKeyboardRequestedFlags);
+                                                   return;
+                                               }
+
+                                               // Kitty is supported. Store the capabilities and set the flags we care about.
+                                               _driver?.SetKittyKeyboardCapabilities (result);
+
+                                               if (_inputProcessor is AnsiInputProcessor supportedAnsiInputProcessor)
+                                               {
+                                                   supportedAnsiInputProcessor.SetKittyKeyboardEnabled (true);
+                                               }
+
+                                               kittyKeyboardDetector.Enable (EscSeqUtils.KittyKeyboardRequestedFlags);
 
                                               Trace.Lifecycle (app?.MainThreadId?.ToString (),
                                                                "KittyKeyboard",

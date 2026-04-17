@@ -164,6 +164,7 @@ public partial class TextView
 
             _wordWrap = value;
             ResetPosition ();
+            _lastWrapWidth = -1; // Force rewrap on next layout
 
             if (_wordWrap)
             {
@@ -370,6 +371,7 @@ public partial class TextView
                                        CurrentColumn,
                                        _selectionStartRow,
                                        _selectionStartColumn,
+                                       _tabWidth,
                                        true);
             CurrentRow = nRow;
             CurrentColumn = nCol;

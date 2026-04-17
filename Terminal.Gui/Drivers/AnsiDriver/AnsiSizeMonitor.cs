@@ -187,7 +187,7 @@ internal class AnsiSizeMonitor : ISizeMonitor
             return;
         }
 
-        Trace.Lifecycle (nameof (AnsiSizeMonitor), "SendCursorPositionQuery", "Queuing CSI ?6n cursor position query");
+        Trace.Lifecycle (nameof (AnsiSizeMonitor), "SendCursorPositionQuery", "Queuing CSI 6n cursor position query");
 
         AnsiEscapeSequenceRequest request = new ()
         {
@@ -217,7 +217,6 @@ internal class AnsiSizeMonitor : ISizeMonitor
             return;
         }
 
-        // Response format for DECXCPR: ESC [ ? row ; col R  or  ESC [ ? row ; col ; 1 R
         // Response format for standard CPR: ESC [ row ; col R
         Match match = Regex.Match (response, @"\[?\??(\d+);(\d+)");
 

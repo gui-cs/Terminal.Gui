@@ -1,3 +1,5 @@
+using Terminal.Gui.Drivers;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>Specifies the style that a <see cref="ProgressBar"/> uses to indicate the progress of an operation.</summary>
@@ -41,6 +43,7 @@ public class ProgressBar : View, IDesignable
     private int _delta;
     private float _fraction;
     private bool _isActivity;
+    private bool _syncWithTerminal;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="ProgressBar"/> class, starts in percentage mode and uses relative
@@ -69,7 +72,39 @@ public class ProgressBar : View, IDesignable
         {
             _fraction = Math.Min (value, 1);
             _isActivity = false;
+            UpdateTerminalProgress ();
             SetNeedsDraw ();
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether this <see cref="ProgressBar"/> uses the driver's terminal
+    ///     <see cref="ProgressIndicator"/> to emit OSC 9;4 progress sequences when supported.
+    /// </summary>
+    /// <remarks>
+    ///     This is independent of <see cref="View.Visible"/> so the terminal progress indicator can continue to be used
+    ///     even when the on-screen <see cref="ProgressBar"/> is hidden.
+    /// </remarks>
+    public bool SyncWithTerminal
+    {
+        get => _syncWithTerminal;
+        set
+        {
+            if (_syncWithTerminal == value)
+            {
+                return;
+            }
+
+            _syncWithTerminal = value;
+
+            if (value)
+            {
+                UpdateTerminalProgress ();
+            }
+            else
+            {
+                ClearTerminalProgress ();
+            }
         }
     }
 
@@ -250,7 +285,40 @@ public class ProgressBar : View, IDesignable
             }
         }
 
+        UpdateTerminalProgress ();
         SetNeedsDraw ();
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing && _syncWithTerminal)
+        {
+            ClearTerminalProgress ();
+        }
+
+        base.Dispose (disposing);
+    }
+
+    private void ClearTerminalProgress () => Driver?.ProgressIndicator?.Clear ();
+
+    private int GetProgressPercentage () => Math.Clamp ((int)Math.Round (_fraction * 100), 0, 100);
+
+    private void UpdateTerminalProgress ()
+    {
+        if (!_syncWithTerminal || Driver?.ProgressIndicator is not { } progressIndicator)
+        {
+            return;
+        }
+
+        if (_isActivity)
+        {
+            progressIndicator.SetIndeterminate ();
+
+            return;
+        }
+
+        progressIndicator.SetValue (GetProgressPercentage ());
     }
 
     private void PopulateActivityPos ()

@@ -85,4 +85,84 @@ public class SpinnerViewTests : TestDriverBase
 
         Assert.Equal ("|", driver.Contents! [0, 0].Grapheme);
     }
+
+    [Fact]
+    public void AutoSpin_WithSyncWithTerminal_True_Writes_Indeterminate ()
+    {
+        DriverImpl driver = (DriverImpl)CreateTestDriver ();
+        driver.ProgressIndicator = new ProgressIndicator (driver);
+        SpinnerView spinner = new () { Driver = driver, SyncWithTerminal = true };
+
+        spinner.AutoSpin = true;
+
+        Assert.Contains (EscSeqUtils.OSC_SetProgressIndeterminate (), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AutoSpin_WithSyncWithTerminal_False_Clears_Indicator ()
+    {
+        DriverImpl driver = (DriverImpl)CreateTestDriver ();
+        driver.ProgressIndicator = new ProgressIndicator (driver);
+        SpinnerView spinner = new () { Driver = driver, SyncWithTerminal = true };
+
+        spinner.AutoSpin = true;
+        spinner.AutoSpin = false;
+
+        Assert.Contains (EscSeqUtils.OSC_ClearProgress (), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void AutoSpin_WithoutSyncWithTerminal_DoesNotWrite_Indicator ()
+    {
+        DriverImpl driver = (DriverImpl)CreateTestDriver ();
+        driver.ProgressIndicator = new ProgressIndicator (driver);
+        SpinnerView spinner = new () { Driver = driver };
+
+        spinner.AutoSpin = true;
+        spinner.AutoSpin = false;
+
+        string output = driver.GetOutput ().GetLastOutput ();
+        Assert.DoesNotContain (EscSeqUtils.OSC_SetProgressIndeterminate (), output, StringComparison.Ordinal);
+        Assert.DoesNotContain (EscSeqUtils.OSC_ClearProgress (), output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void SyncWithTerminal_SetFalse_WhileAutoSpinTrue_Clears_Indicator ()
+    {
+        DriverImpl driver = (DriverImpl)CreateTestDriver ();
+        driver.ProgressIndicator = new ProgressIndicator (driver);
+        SpinnerView spinner = new () { Driver = driver, SyncWithTerminal = true, AutoSpin = true };
+
+        spinner.SyncWithTerminal = false;
+
+        string output = driver.GetOutput ().GetLastOutput ();
+        Assert.Contains (EscSeqUtils.OSC_SetProgressIndeterminate (), output, StringComparison.Ordinal);
+        Assert.Contains (EscSeqUtils.OSC_ClearProgress (), output, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void EndInit_Syncs_ProgressIndicator_WhenAutoSpin_Already_True ()
+    {
+        DriverImpl driver = (DriverImpl)CreateTestDriver ();
+        driver.ProgressIndicator = new ProgressIndicator (driver);
+        SpinnerView spinner = new () { SyncWithTerminal = true, AutoSpin = true };
+        spinner.Driver = driver;
+
+        spinner.BeginInit ();
+        spinner.EndInit ();
+
+        Assert.Contains (EscSeqUtils.OSC_SetProgressIndeterminate (), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Dispose_Clears_ProgressIndicator_WhenEnabled ()
+    {
+        DriverImpl driver = (DriverImpl)CreateTestDriver ();
+        driver.ProgressIndicator = new ProgressIndicator (driver);
+        SpinnerView spinner = new () { Driver = driver, SyncWithTerminal = true, AutoSpin = true };
+
+        spinner.Dispose ();
+
+        Assert.Contains (EscSeqUtils.OSC_ClearProgress (), driver.GetOutput ().GetLastOutput (), StringComparison.Ordinal);
+    }
 }

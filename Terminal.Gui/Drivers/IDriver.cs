@@ -71,7 +71,12 @@ public interface IDriver : IDisposable
     IClipboard? Clipboard { get; set; }
 
     /// <summary>
-    ///     Gets the ANSI startup readiness gate, if enabled for this driver instance.
+    ///     Gets the terminal progress indicator when direct terminal progress output is available.
+    /// </summary>
+    ProgressIndicator? ProgressIndicator { get; }
+
+    /// <summary>
+    /// Gets the ANSI startup readiness gate, if enabled for this driver instance.
     /// </summary>
     IAnsiStartupGate? AnsiStartupGate { get; }
 
@@ -201,7 +206,8 @@ public interface IDriver : IDisposable
     Attribute CurrentAttribute { get; set; }
 
     /// <summary>
-    ///     Gets or sets the URL that will be associated with cells added via <see cref="AddRune(Rune)"/> or <see cref="AddStr(string)"/>.
+    ///     Gets or sets the URL that will be associated with cells added via <see cref="AddRune(Rune)"/> or
+    ///     <see cref="AddStr(string)"/>.
     ///     When set, subsequent cells will include this URL for OSC 8 hyperlink rendering.
     ///     Set to <see langword="null"/> to stop associating URLs with cells.
     /// </summary>
@@ -307,6 +313,16 @@ public interface IDriver : IDisposable
     /// </summary>
     /// <param name="ansi"></param>
     void WriteRaw (string ansi);
+
+    /// <summary>
+    ///     Sets the terminal title using OSC 0..2.
+    /// </summary>
+    /// <param name="title">The title text.</param>
+    /// <param name="mode">
+    ///     The OSC title selector:
+    ///     0 = icon and window title, 1 = icon title, 2 = window title.
+    /// </param>
+    void SetTerminalTitle (string title, int mode = 0);
 
     /// <summary>
     ///     Gets the queue of sixel images to write out to screen when updating.

@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+// ReSharper disable AccessToDisposedClosure
 
 namespace UICatalog.Scenarios;
 
@@ -8,7 +9,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Threading")]
 
 // TODO: Add enable/disable to show that that is working
-// TODO: Clean up how FramesEditor works 
+// TODO: Clean up how FramesEditor works
 // TODO: Better align rpPBFormat
 public class ProgressBarStyles : Scenario
 {
@@ -24,7 +25,9 @@ public class ProgressBarStyles : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Window win = new () { Title = GetQuitKeyAndName (), BorderStyle = LineStyle.Single };
+        using Window win = new ();
+        win.Title = GetQuitKeyAndName ();
+        win.BorderStyle = LineStyle.Single;
 
         var editor = new AdornmentsEditor { AutoSelectViewToEdit = false, ShowViewIdentifier = true };
         win.Add (editor);
@@ -32,7 +35,7 @@ public class ProgressBarStyles : Scenario
         View container = new () { X = Pos.Right (editor), Y = 0, Width = Dim.Fill (), Height = Dim.Fill () };
         win.Add (container);
 
-        const float fractionStep = 0.01F;
+        const float FRACTION_STEP = 0.01F;
 
         _pbList = new ListView
         {
@@ -50,45 +53,49 @@ public class ProgressBarStyles : Scenario
         var fgColorPickerBtn = new Button { Text = "Foreground HotNormal Color", X = Pos.Center (), Y = Pos.Align (Alignment.Start) };
         container.Add (fgColorPickerBtn);
 
-        fgColorPickerBtn.Accepting += (s, e) =>
+        fgColorPickerBtn.Accepting += (_, _) =>
                                       {
                                           Color? result =
                                               app.TopRunnable?.Prompt<ColorPicker, Color?> (input: editor.ViewToEdit!.GetAttributeForRole (VisualRole.Normal)
                                                                                                          .Foreground,
                                                                                             beginInitHandler: prompt => { prompt.Title = "Foreground Color"; });
 
-                                          if (result is { } selectedColor)
+                                          if (result is not { } selectedColor)
                                           {
-                                              var cs = new Scheme (editor.ViewToEdit.GetScheme ())
-                                              {
-                                                  Active = new Attribute (selectedColor,
-                                                                          editor.ViewToEdit.GetAttributeForRole (VisualRole.Active).Background,
-                                                                          editor.ViewToEdit.GetAttributeForRole (VisualRole.Active).Style)
-                                              };
-                                              editor.ViewToEdit.SetScheme (cs);
+                                              return;
                                           }
+
+                                          Scheme cs = new (editor.ViewToEdit.GetScheme ())
+                                          {
+                                              Active = new Attribute (selectedColor,
+                                                                      editor.ViewToEdit.GetAttributeForRole (VisualRole.Active).Background,
+                                                                      editor.ViewToEdit.GetAttributeForRole (VisualRole.Active).Style)
+                                          };
+                                          editor.ViewToEdit.SetScheme (cs);
                                       };
 
         var bgColorPickerBtn = new Button { X = Pos.Center (), Y = Pos.Align (Alignment.Start), Text = "Background HotNormal Color" };
         container.Add (bgColorPickerBtn);
 
-        bgColorPickerBtn.Accepting += (s, e) =>
+        bgColorPickerBtn.Accepting += (_, _) =>
                                       {
                                           Color? result =
                                               app.TopRunnable?.Prompt<ColorPicker, Color?> (input: editor.ViewToEdit!.GetAttributeForRole (VisualRole.Normal)
                                                                                                          .Background,
                                                                                             beginInitHandler: prompt => { prompt.Title = "Background Color"; });
 
-                                          if (result is { } selectedColor)
+                                          if (result is not { } selectedColor)
                                           {
-                                              var cs = new Scheme (editor.ViewToEdit.GetScheme ())
-                                              {
-                                                  Active = new Attribute (editor.ViewToEdit.GetAttributeForRole (VisualRole.Active).Foreground,
-                                                                          selectedColor,
-                                                                          editor.ViewToEdit.GetAttributeForRole (VisualRole.Active).Style)
-                                              };
-                                              editor.ViewToEdit.SetScheme (cs);
+                                              return;
                                           }
+
+                                          var cs = new Scheme (editor.ViewToEdit.GetScheme ())
+                                          {
+                                              Active = new Attribute (editor.ViewToEdit.GetAttributeForRole (VisualRole.Active).Foreground,
+                                                                      selectedColor,
+                                                                      editor.ViewToEdit.GetAttributeForRole (VisualRole.Active).Style)
+                                          };
+                                          editor.ViewToEdit.SetScheme (cs);
                                       };
 
         #endregion
@@ -108,20 +115,30 @@ public class ProgressBarStyles : Scenario
         var button = new Button { X = Pos.Center (), Y = Pos.Align (Alignment.Start), Text = "Start timer" };
         container.Add (button);
 
-        var blocksPB = new ProgressBar
+        CheckBox ckbSyncWithTerminal = new ()
+        {
+            X = Pos.Center (), Y = Pos.Align (Alignment.Start), Text = "Sync with terminal progress indicator"
+        };
+        container.Add (ckbSyncWithTerminal);
+
+        CheckBox ckbHideSelectedProgressBar = new () { X = Pos.Center (), Y = Pos.Align (Alignment.Start), Text = "Hide selected ProgressBar" };
+        container.Add (ckbHideSelectedProgressBar);
+
+        ProgressBar blocksPb = new ()
         {
             Title = "Blocks",
             X = Pos.Center (),
             Y = Pos.Align (Alignment.Start),
             Width = Dim.Percent (50),
             BorderStyle = LineStyle.Single,
-            CanFocus = true
+            CanFocus = true,
+            SyncWithTerminal = true
         };
-        container.Add (blocksPB);
+        container.Add (blocksPb);
 
-        osPbFormat.Value = blocksPB.ProgressBarFormat;
+        osPbFormat.Value = blocksPb.ProgressBarFormat;
 
-        var continuousPB = new ProgressBar
+        ProgressBar continuousPb = new ()
         {
             Title = "Continuous",
             X = Pos.Center (),
@@ -131,43 +148,43 @@ public class ProgressBarStyles : Scenario
             BorderStyle = LineStyle.Single,
             CanFocus = true
         };
-        container.Add (continuousPB);
+        container.Add (continuousPb);
 
-        button.Accepting += (s, e) =>
+        button.Accepting += (_, _) =>
                             {
-                                if (_fractionTimer == null)
+                                if (_fractionTimer != null)
                                 {
-                                    //blocksPB.Enabled = false;
-                                    blocksPB.Fraction = 0;
-                                    continuousPB.Fraction = 0;
-                                    float fractionSum = 0;
-
-                                    _fractionTimer = new Timer (_ =>
-                                                                {
-                                                                    fractionSum += fractionStep;
-                                                                    blocksPB.Fraction = fractionSum;
-                                                                    continuousPB.Fraction = fractionSum;
-
-                                                                    if (fractionSum > 1)
-                                                                    {
-                                                                        _fractionTimer.Dispose ();
-                                                                        _fractionTimer = null;
-                                                                        button.Enabled = true;
-                                                                    }
-                                                                },
-                                                                null,
-                                                                0,
-                                                                TIMER_TICK);
+                                    return;
                                 }
+
+                                //blocksPB.Enabled = false;
+                                blocksPb.Fraction = 0;
+                                continuousPb.Fraction = 0;
+                                float fractionSum = 0;
+
+                                _fractionTimer = new Timer (_ =>
+                                                            {
+                                                                fractionSum += FRACTION_STEP;
+                                                                blocksPb.Fraction = fractionSum;
+                                                                continuousPb.Fraction = fractionSum;
+
+                                                                if (!(fractionSum > 1))
+                                                                {
+                                                                    return;
+                                                                }
+                                                                _fractionTimer?.Dispose ();
+                                                                _fractionTimer = null;
+                                                                button.Enabled = true;
+                                                            },
+                                                            null,
+                                                            0,
+                                                            TIMER_TICK);
                             };
 
-        var ckbBidirectional = new CheckBox
-        {
-            X = Pos.Center (), Y = Pos.Bottom (continuousPB), Text = "BidirectionalMarquee", Value = CheckState.Checked
-        };
+        var ckbBidirectional = new CheckBox { X = Pos.Center (), Y = Pos.Bottom (continuousPb), Text = "BidirectionalMarquee", Value = CheckState.Checked };
         container.Add (ckbBidirectional);
 
-        var marqueesBlocksPB = new ProgressBar
+        ProgressBar marqueesBlocksPb = new ()
         {
             Title = "Marquee Blocks",
             X = Pos.Center (),
@@ -177,9 +194,9 @@ public class ProgressBarStyles : Scenario
             BorderStyle = LineStyle.Single,
             CanFocus = true
         };
-        container.Add (marqueesBlocksPB);
+        container.Add (marqueesBlocksPb);
 
-        var marqueesContinuousPB = new ProgressBar
+        ProgressBar marqueesContinuousPb = new ()
         {
             Title = "Marquee Continuous",
             X = Pos.Center (),
@@ -189,50 +206,72 @@ public class ProgressBarStyles : Scenario
             BorderStyle = LineStyle.Single,
             CanFocus = true
         };
-        container.Add (marqueesContinuousPB);
+        container.Add (marqueesContinuousPb);
 
         _pbList.SetSource (new ObservableCollection<string> (container.SubViews.Where (v => v.GetType () == typeof (ProgressBar))
                                                                       .Select (v => v.Title)
                                                                       .ToList ()));
 
-        _pbList.ValueChanged += (sender, e) =>
+        _pbList.ValueChanged += (_, e) =>
                                 {
                                     if (e.NewValue is null)
                                     {
                                         return;
                                     }
-                                    string title = (string)_pbList.Source!.ToList () [e.NewValue.Value]!;
-                                    editor.ViewToEdit =
-                                        container.SubViews.First (v => v.GetType () == typeof (ProgressBar) && v.Title == title);
+                                    var title = (string)_pbList.Source!.ToList () [e.NewValue.Value]!;
+                                    var progressBar = (ProgressBar)container.SubViews.First (v => v.GetType () == typeof (ProgressBar) && v.Title == title);
+                                    editor.ViewToEdit = progressBar;
+                                     ckbSyncWithTerminal.Value = progressBar.SyncWithTerminal ? CheckState.Checked : CheckState.UnChecked;
+                                    ckbHideSelectedProgressBar.Value = progressBar.Visible ? CheckState.UnChecked : CheckState.Checked;
                                 };
 
-        osPbFormat.ValueChanged += (s, e) =>
+        osPbFormat.ValueChanged += (_, e) =>
                                    {
                                        if (e.Value is null)
                                        {
                                            return;
                                        }
 
-                                       blocksPB.ProgressBarFormat = e.Value.Value;
-                                       continuousPB.ProgressBarFormat = e.Value.Value;
-                                       marqueesBlocksPB.ProgressBarFormat = e.Value.Value;
-                                       marqueesContinuousPB.ProgressBarFormat = e.Value.Value;
+                                       blocksPb.ProgressBarFormat = e.Value.Value;
+                                       continuousPb.ProgressBarFormat = e.Value.Value;
+                                       marqueesBlocksPb.ProgressBarFormat = e.Value.Value;
+                                       marqueesContinuousPb.ProgressBarFormat = e.Value.Value;
                                    };
 
-        ckbBidirectional.ValueChanging += (s, e) =>
+        ckbSyncWithTerminal.ValueChanging += (_, e) =>
+                                             {
+                                                 if (editor.ViewToEdit is not ProgressBar progressBar)
                                                  {
-                                                     marqueesBlocksPB.BidirectionalMarquee =
-                                                         marqueesContinuousPB.BidirectionalMarquee = e.NewValue == CheckState.Checked;
-                                                 };
+                                                     return;
+                                                 }
+
+                                                 progressBar.SyncWithTerminal = e.NewValue == CheckState.Checked;
+                                             };
+
+        ckbHideSelectedProgressBar.ValueChanging += (_, e) =>
+                                                    {
+                                                        if (editor.ViewToEdit is not ProgressBar progressBar)
+                                                        {
+                                                            return;
+                                                        }
+
+                                                        progressBar.Visible = e.NewValue != CheckState.Checked;
+                                                    };
+
+        ckbBidirectional.ValueChanging += (_, e) =>
+                                          {
+                                              marqueesBlocksPb.BidirectionalMarquee =
+                                                  marqueesContinuousPb.BidirectionalMarquee = e.NewValue == CheckState.Checked;
+                                          };
 
         win.Initialized += Win_Initialized;
-        win.IsRunningChanged += Win_IsRunningChanged;
+        win.IsRunningChanged += WinIsRunningChanged;
 
         _pulseTimer = new Timer (_ =>
                                  {
-                                     marqueesBlocksPB.Text = marqueesContinuousPB.Text = DateTime.Now.TimeOfDay.ToString ();
-                                     marqueesBlocksPB.Pulse ();
-                                     marqueesContinuousPB.Pulse ();
+                                     marqueesBlocksPb.Text = marqueesContinuousPb.Text = DateTime.Now.TimeOfDay.ToString ();
+                                     marqueesBlocksPb.Pulse ();
+                                     marqueesContinuousPb.Pulse ();
                                  },
                                  null,
                                  0,
@@ -241,7 +280,7 @@ public class ProgressBarStyles : Scenario
 
         return;
 
-        void Win_IsRunningChanged (object sender, EventArgs<bool> args)
+        void WinIsRunningChanged (object sender, EventArgs<bool> args)
         {
             if (args.Value)
             {
@@ -260,7 +299,7 @@ public class ProgressBarStyles : Scenario
                 _pulseTimer = null;
             }
 
-            win.IsRunningChanged -= Win_IsRunningChanged;
+            win.IsRunningChanged -= WinIsRunningChanged;
         }
     }
 

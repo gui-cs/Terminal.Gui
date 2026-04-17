@@ -149,7 +149,7 @@ public partial class View
         Rectangle viewport = ViewportToScreen (new Rectangle (Point.Empty, Viewport.Size));
         viewportRegion.Intersect (viewport);
 
-        if (ViewportSettings.HasFlag (ViewportSettingsFlags.ClipContentOnly))
+        if (ViewportSettings.FastHasFlags (ViewportSettingsFlags.ClipContentOnly))
         {
             // Clamp the Clip to the just content area that is within the viewport
             Rectangle visibleContent = ViewportToScreen (new Rectangle (new Point (-Viewport.X, -Viewport.Y), GetContentSize ()));

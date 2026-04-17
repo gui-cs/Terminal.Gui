@@ -124,10 +124,10 @@ public partial class ListView
         {
             return;
         }
-        bool shift = mouse.Flags.HasFlag (MouseFlags.Shift);
-        bool ctrl = mouse.Flags.HasFlag (MouseFlags.Ctrl);
-        bool leftButton = mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked);
-        bool rightButton = mouse.Flags.HasFlag (MouseFlags.RightButtonClicked);
+        bool shift = mouse.Flags.FastHasFlags (MouseFlags.Shift);
+        bool ctrl = mouse.Flags.FastHasFlags (MouseFlags.Ctrl);
+        bool leftButton = mouse.Flags.FastHasFlags (MouseFlags.LeftButtonClicked);
+        bool rightButton = mouse.Flags.FastHasFlags (MouseFlags.RightButtonClicked);
 
         // Allow marking if: ShowMarks=true OR MarkMultiple=true
         bool allowMarking = ShowMarks || MarkMultiple;
@@ -154,7 +154,7 @@ public partial class ListView
             // In checkbox/hidden marks mode, toggle the mark for the clicked item
             // In radio button mode, SetSelection already marked it, so skip MarkUnmarkSelectedItem
             // Mark item only on Clicked (not Pressed) to avoid double-toggle
-            if (allowMarking && MarkMultiple && mouse.Flags.HasFlag (MouseFlags.LeftButtonClicked))
+            if (allowMarking && MarkMultiple && mouse.Flags.FastHasFlags (MouseFlags.LeftButtonClicked))
             {
                 MarkUnmarkSelectedItem ();
             }

@@ -182,11 +182,11 @@ internal sealed class Arranger : IDisposable
             return false;
         }
 
-        return parent.Arrangement.HasFlag (ViewArrangement.Movable)
-               || parent.Arrangement.HasFlag (ViewArrangement.BottomResizable)
-               || parent.Arrangement.HasFlag (ViewArrangement.TopResizable)
-               || parent.Arrangement.HasFlag (ViewArrangement.LeftResizable)
-               || parent.Arrangement.HasFlag (ViewArrangement.RightResizable);
+        return parent.Arrangement.FastHasFlags (ViewArrangement.Movable)
+               || parent.Arrangement.FastHasFlags (ViewArrangement.BottomResizable)
+               || parent.Arrangement.FastHasFlags (ViewArrangement.TopResizable)
+               || parent.Arrangement.FastHasFlags (ViewArrangement.LeftResizable)
+               || parent.Arrangement.FastHasFlags (ViewArrangement.RightResizable);
     }
 
     #region Button Management
@@ -205,35 +205,35 @@ internal sealed class Arranger : IDisposable
     {
         ViewArrangement parentArrangement = _border.Adornment?.Parent?.Arrangement ?? ViewArrangement.Fixed;
 
-        if (parentArrangement.HasFlag (ViewArrangement.Movable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.Movable))
         {
             _moveButton = CreateArrangerButton (ArrangeButtons.Move, 0, 0);
         }
 
-        if (parentArrangement.HasFlag (ViewArrangement.Resizable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.Resizable))
         {
             _allSizeButton = CreateArrangerButton (ArrangeButtons.AllSize, Pos.AnchorEnd (), Pos.AnchorEnd ());
         }
 
-        if (parentArrangement.HasFlag (ViewArrangement.TopResizable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.TopResizable))
         {
             _topSizeButton = CreateArrangerButton (ArrangeButtons.TopSize, Pos.Center () + (_border.Adornment?.Parent?.Margin.Thickness.Horizontal ?? 0), 0);
         }
 
-        if (parentArrangement.HasFlag (ViewArrangement.RightResizable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.RightResizable))
         {
             _rightSizeButton = CreateArrangerButton (ArrangeButtons.RightSize,
                                                      Pos.AnchorEnd (),
                                                      Pos.Center () + (_border.Adornment?.Parent?.Margin.Thickness.Vertical ?? 0) / 2);
         }
 
-        if (parentArrangement.HasFlag (ViewArrangement.LeftResizable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.LeftResizable))
         {
             _leftSizeButton =
                 CreateArrangerButton (ArrangeButtons.LeftSize, 0, Pos.Center () + (_border.Adornment?.Parent?.Margin.Thickness.Vertical ?? 0) / 2);
         }
 
-        if (parentArrangement.HasFlag (ViewArrangement.BottomResizable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.BottomResizable))
         {
             _bottomSizeButton = CreateArrangerButton (ArrangeButtons.BottomSize,
                                                       Pos.Center () + (_border.Adornment?.Parent?.Margin.Thickness.Horizontal ?? 0) / 2,
@@ -304,20 +304,20 @@ internal sealed class Arranger : IDisposable
     {
         ViewArrangement parentArrangement = _border.Adornment?.Parent?.Arrangement ?? ViewArrangement.Fixed;
 
-        if (parentArrangement.HasFlag (ViewArrangement.Movable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.Movable))
         {
             SetVisibleButton (_moveButton);
         }
 
-        if (parentArrangement.HasFlag (ViewArrangement.Resizable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.Resizable))
         {
             SetVisibleButton (_allSizeButton);
         }
 
-        ShowResizableButtons (parentArrangement.HasFlag (ViewArrangement.LeftResizable),
-                              parentArrangement.HasFlag (ViewArrangement.RightResizable),
-                              parentArrangement.HasFlag (ViewArrangement.TopResizable),
-                              parentArrangement.HasFlag (ViewArrangement.BottomResizable));
+        ShowResizableButtons (parentArrangement.FastHasFlags (ViewArrangement.LeftResizable),
+                              parentArrangement.FastHasFlags (ViewArrangement.RightResizable),
+                              parentArrangement.FastHasFlags (ViewArrangement.TopResizable),
+                              parentArrangement.FastHasFlags (ViewArrangement.BottomResizable));
     }
 
     /// <summary>
@@ -487,13 +487,13 @@ internal sealed class Arranger : IDisposable
         ViewManipulator manipulator = new (parent, minWidth, minHeight);
         var handled = false;
 
-        if (Arranging.HasFlag (ViewArrangement.Movable))
+        if (Arranging.FastHasFlags (ViewArrangement.Movable))
         {
             manipulator.AdjustY (-1);
             handled = true;
         }
 
-        if (Arranging == ViewArrangement.Resizable || GetFocusedArrangement ().HasFlag (ViewArrangement.BottomResizable))
+        if (Arranging == ViewArrangement.Resizable || GetFocusedArrangement ().FastHasFlags (ViewArrangement.BottomResizable))
         {
             handled |= manipulator.AdjustHeight (-1);
         }
@@ -523,13 +523,13 @@ internal sealed class Arranger : IDisposable
         ViewManipulator manipulator = new (parent, minWidth, minHeight);
         var handled = false;
 
-        if (Arranging.HasFlag (ViewArrangement.Movable))
+        if (Arranging.FastHasFlags (ViewArrangement.Movable))
         {
             manipulator.AdjustY (1);
             handled = true;
         }
 
-        if (Arranging == ViewArrangement.Resizable || GetFocusedArrangement ().HasFlag (ViewArrangement.BottomResizable))
+        if (Arranging == ViewArrangement.Resizable || GetFocusedArrangement ().FastHasFlags (ViewArrangement.BottomResizable))
         {
             handled |= manipulator.AdjustHeight (1);
         }
@@ -559,13 +559,13 @@ internal sealed class Arranger : IDisposable
         ViewManipulator manipulator = new (parent, minWidth, minHeight);
         var handled = false;
 
-        if (Arranging.HasFlag (ViewArrangement.Movable))
+        if (Arranging.FastHasFlags (ViewArrangement.Movable))
         {
             manipulator.AdjustX (-1);
             handled = true;
         }
 
-        if (Arranging == ViewArrangement.Resizable || GetFocusedArrangement ().HasFlag (ViewArrangement.RightResizable))
+        if (Arranging == ViewArrangement.Resizable || GetFocusedArrangement ().FastHasFlags (ViewArrangement.RightResizable))
         {
             handled |= manipulator.AdjustWidth (-1);
         }
@@ -595,13 +595,13 @@ internal sealed class Arranger : IDisposable
         ViewManipulator manipulator = new (parent, minWidth, minHeight);
         var handled = false;
 
-        if (Arranging.HasFlag (ViewArrangement.Movable))
+        if (Arranging.FastHasFlags (ViewArrangement.Movable))
         {
             manipulator.AdjustX (1);
             handled = true;
         }
 
-        if (Arranging == ViewArrangement.Resizable || GetFocusedArrangement ().HasFlag (ViewArrangement.RightResizable))
+        if (Arranging == ViewArrangement.Resizable || GetFocusedArrangement ().FastHasFlags (ViewArrangement.RightResizable))
         {
             handled |= manipulator.AdjustWidth (1);
         }
@@ -647,7 +647,7 @@ internal sealed class Arranger : IDisposable
     internal bool HandleMouseEvent (Mouse mouseEvent)
     {
         // Button pressed - start potential drag
-        if (!_dragPosition.HasValue && mouseEvent.Flags.HasFlag (MouseFlags.LeftButtonPressed))
+        if (!_dragPosition.HasValue && mouseEvent.Flags.FastHasFlags (MouseFlags.LeftButtonPressed))
         {
             return HandleMousePressed (mouseEvent);
         }
@@ -664,7 +664,7 @@ internal sealed class Arranger : IDisposable
         }
 
         // Button released - end drag
-        if (mouseEvent.Flags.HasFlag (MouseFlags.LeftButtonReleased) && _dragPosition.HasValue)
+        if (mouseEvent.Flags.FastHasFlags (MouseFlags.LeftButtonReleased) && _dragPosition.HasValue)
         {
             return ExitArrangeMode () is true;
         }
@@ -780,7 +780,7 @@ internal sealed class Arranger : IDisposable
 
         // Check edges first (larger hit areas)
         // Left edge
-        if (parentArrangement.HasFlag (ViewArrangement.LeftResizable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.LeftResizable))
         {
             Rectangle leftRect = new (frame.X, frame.Y + thickness.Top, thickness.Left, frame.Height - thickness.Top - thickness.Bottom);
 
@@ -791,7 +791,7 @@ internal sealed class Arranger : IDisposable
         }
 
         // Right edge
-        if (parentArrangement.HasFlag (ViewArrangement.RightResizable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.RightResizable))
         {
             Rectangle rightRect = new (frame.X + frame.Width - thickness.Right,
                                        frame.Y + thickness.Top,
@@ -805,7 +805,7 @@ internal sealed class Arranger : IDisposable
         }
 
         // Top edge (only if not movable)
-        if (parentArrangement.HasFlag (ViewArrangement.TopResizable) && !parentArrangement.HasFlag (ViewArrangement.Movable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.TopResizable) && !parentArrangement.FastHasFlags (ViewArrangement.Movable))
         {
             Rectangle topRect = new (frame.X + thickness.Left, frame.Y, frame.Width - thickness.Left - thickness.Right, thickness.Top);
 
@@ -816,7 +816,7 @@ internal sealed class Arranger : IDisposable
         }
 
         // Bottom edge
-        if (parentArrangement.HasFlag (ViewArrangement.BottomResizable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.BottomResizable))
         {
             Rectangle bottomRect = new (frame.X + thickness.Left,
                                         frame.Y + frame.Height - thickness.Bottom,
@@ -831,7 +831,7 @@ internal sealed class Arranger : IDisposable
 
         // Check corners
         // Bottom-left
-        if (parentArrangement.HasFlag (ViewArrangement.BottomResizable) && parentArrangement.HasFlag (ViewArrangement.LeftResizable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.BottomResizable) && parentArrangement.FastHasFlags (ViewArrangement.LeftResizable))
         {
             Rectangle corner = new (frame.X, frame.Height - thickness.Top, thickness.Left, thickness.Bottom);
 
@@ -842,7 +842,7 @@ internal sealed class Arranger : IDisposable
         }
 
         // Bottom-right
-        if (parentArrangement.HasFlag (ViewArrangement.BottomResizable) && parentArrangement.HasFlag (ViewArrangement.RightResizable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.BottomResizable) && parentArrangement.FastHasFlags (ViewArrangement.RightResizable))
         {
             Rectangle corner = new (frame.X + frame.Width - thickness.Right, frame.Height - thickness.Top, thickness.Right, thickness.Bottom);
 
@@ -853,7 +853,7 @@ internal sealed class Arranger : IDisposable
         }
 
         // Top-right
-        if (parentArrangement.HasFlag (ViewArrangement.TopResizable) && parentArrangement.HasFlag (ViewArrangement.RightResizable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.TopResizable) && parentArrangement.FastHasFlags (ViewArrangement.RightResizable))
         {
             Rectangle corner = new (frame.X + frame.Width - thickness.Right, frame.Y, thickness.Right, thickness.Top);
 
@@ -864,7 +864,7 @@ internal sealed class Arranger : IDisposable
         }
 
         // Top-left
-        if (parentArrangement.HasFlag (ViewArrangement.TopResizable) && parentArrangement.HasFlag (ViewArrangement.LeftResizable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.TopResizable) && parentArrangement.FastHasFlags (ViewArrangement.LeftResizable))
         {
             Rectangle corner = frame with { Width = thickness.Left, Height = thickness.Top };
 
@@ -875,7 +875,7 @@ internal sealed class Arranger : IDisposable
         }
 
         // Default to movable if enabled
-        if (parentArrangement.HasFlag (ViewArrangement.Movable))
+        if (parentArrangement.FastHasFlags (ViewArrangement.Movable))
         {
             return ViewArrangement.Movable;
         }

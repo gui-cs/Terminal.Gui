@@ -25,6 +25,7 @@ public sealed class UICatalogRunnable : Runnable
 
     public UICatalogRunnable ()
     {
+        Title = "UICatalog";
         SchemeName = CachedRunnableScheme = SchemeManager.SchemesToSchemeName (Schemes.Base);
         ConfigurationManager.Applied += ConfigAppliedHandler;
     }
@@ -149,15 +150,14 @@ public sealed class UICatalogRunnable : Runnable
                                    new MenuBarItem (Strings.menuFile,
                                                     [
                                                         new MenuItem
-                                                        {
-                                                            Title = Strings.cmdQuit,
-                                                            HelpText = "Quit UI Catalog",
-                                                            Key = Application.GetDefaultKey (Command.Quit),
-
-                                                            // By not specifying TargetView the Key Binding will be Application-level
-                                                            Command = Command.Quit
-                                                        }
-                                                    ]),
+                                                         {
+                                                             Title = Strings.cmdQuit,
+                                                             HelpText = "Quit UI Catalog",
+                                                             Key = Application.GetDefaultKey (Command.Quit),
+                                                             Action = RequestStop,
+                                                             Command = Command.Quit
+                                                         }
+                                                     ]),
                                    new MenuBarItem ("_Themes", CreateThemeMenuItems ()),
                                    new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems ()),
                                    new MenuBarItem ("_Logging", CreateLoggingMenuItems ()!),
@@ -893,7 +893,10 @@ public sealed class UICatalogRunnable : Runnable
 
     private void ShowAboutDialog ()
     {
-        Dialog dialog = new () { Title = "", Buttons = [new Button { Title = Strings.btnOk, IsDefault = true }] };
+        Dialog dialog = new () { Title = "About UICatalog", Buttons = [new Button { Title = Strings.btnOk, IsDefault = true }] };
+
+        // Strip off Title flag from the default dialog border settings to demonstrate BorderSettings customization
+        dialog.Border.Settings &= ~BorderSettings.Title;
 
         Label tagline = new ()
         {

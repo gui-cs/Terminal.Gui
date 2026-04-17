@@ -63,10 +63,21 @@ public partial class BorderView : AdornmentView
         if (border.Parent is { })
         {
             Frame = border.Parent.Margin.Thickness.GetInside (border.Parent.Margin.GetFrame ());
+
+            if (border.Parent is Runnable runnable)
+            {
+                runnable.TitleChanged += HandleParentTitleChanged;
+                runnable.IsModalChanged += RunnableOnIsModalChanged;
+            }
         }
         border.ThicknessChanged += OnThicknessChanged;
         border.Parent?.Margin.ThicknessChanged += OnThicknessChanged;
     }
+
+    private void RunnableOnIsModalChanged (object? sender, EventArgs<bool> e) => TryUpdateTerminalTitle ();
+
+    private void HandleParentTitleChanged (object? sender, EventArgs<string> e) => TryUpdateTerminalTitle ();
+
 
     /// <inheritdoc/>
     public override void BeginInit ()
@@ -113,7 +124,62 @@ public partial class BorderView : AdornmentView
     ///     Called by <see cref="Border.Settings"/> setter when settings change.
     ///     Reconfigures tab mode state.
     /// </summary>
-    internal void OnSettingsChanged () => ConfigureForTabMode ();
+    internal void OnSettingsChanged ()
+    {
+        ConfigureForTabMode ();
+        TryUpdateTerminalTitle ();
+    }
+
+    private void DisposeBorderTitleHooks ()
+    {
+        if (Adornment is not Border border)
+        {
+            return;
+        }
+
+        border.ThicknessChanged -= OnThicknessChanged;
+
+        if (border.Parent is not { } parent)
+        {
+            return;
+        }
+        parent.Margin.ThicknessChanged -= OnThicknessChanged;
+
+        if (parent is not Runnable runnable)
+        {
+            return;
+        }
+        runnable.TitleChanged -= HandleParentTitleChanged;
+        runnable.IsModalChanged -= RunnableOnIsModalChanged;
+    }
+
+    /// <summary>
+    ///     Emits an OSC terminal-title update when <see cref="BorderSettings.TerminalTitle"/> is enabled and the
+    ///     parent Runnable becomes Modal.
+    /// </summary>
+    private void TryUpdateTerminalTitle ()
+    {
+        if (Adornment is not Border { Parent: { } parent } border)
+        {
+            return;
+        }
+
+        IDriver? driver = Driver;
+
+        if (driver is null || !border.Settings.FastHasFlags (BorderSettings.TerminalTitle) || parent is not Runnable { IsModal: true } runnable)
+        {
+            return;
+        }
+
+        string strippedTitle = runnable.Title;
+
+        if (runnable.TitleTextFormatter.HotKeyPos >= 0)
+        {
+            strippedTitle = runnable.Title.Remove (runnable.TitleTextFormatter.HotKeyPos, 1);
+        }
+
+        driver.SetTerminalTitle (strippedTitle);
+    }
 
     private Rectangle GetBorderBounds ()
     {
@@ -255,7 +321,7 @@ public partial class BorderView : AdornmentView
             normalAttribute = Adornment.Parent.GetAttributeForRole (VisualRole.Normal);
         }
 
-        if (MouseState.HasFlag (MouseState.Pressed))
+        if (MouseState.FastHasFlags (MouseState.Pressed))
         {
             normalAttribute = GetAttributeForRole (VisualRole.Highlight);
         }
@@ -733,7 +799,7 @@ public partial class BorderView : AdornmentView
 
         Attribute normalAttribute = GetAttributeForRole (VisualRole.Normal);
 
-        if (MouseState.HasFlag (MouseState.Pressed))
+        if (MouseState.FastHasFlags (MouseState.Pressed))
         {
             normalAttribute = GetAttributeForRole (VisualRole.Highlight);
         }
@@ -1146,4 +1212,18 @@ public partial class BorderView : AdornmentView
     }
 
     #endregion Gradient Support
+
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        if (disposing)
+        {
+            DisposeBorderTitleHooks ();
+            DisposeArranger ();
+        }
+
+        base.Dispose (disposing);
+    }
+
 }

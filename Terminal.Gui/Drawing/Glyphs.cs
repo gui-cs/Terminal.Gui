@@ -193,6 +193,10 @@ public class Glyphs
     [ConfigurationProperty (Scope = typeof (ThemeScope))]
     public static Rune AppleBMP { get; set; } = (Rune)'❦';
 
+    /// <summary>Copy indicator. Two Joined Squares - ⧉ U+29C9. Used for code block copy buttons.</summary>
+    [ConfigurationProperty (Scope = typeof (ThemeScope))]
+    public static Rune Copy { get; set; } = (Rune)'⧉';
+
     #endregion
 
     #region ----------------- Lines -----------------
