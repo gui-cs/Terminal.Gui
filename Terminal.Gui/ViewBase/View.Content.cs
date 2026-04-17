@@ -160,9 +160,18 @@ public partial class View
         // Apply potentially modified new value
         Size? finalComposite = changingArgs.NewValue;
 
-        // Update backing fields
-        _contentWidth = finalComposite?.Width;
-        _contentHeight = finalComposite?.Height;
+        // Update backing fields while preserving null semantics for dimensions
+        // that should continue tracking the Viewport size.
+        if (finalComposite is null)
+        {
+            _contentWidth = null;
+            _contentHeight = null;
+        }
+        else
+        {
+            _contentWidth = newWidth is null ? null : finalComposite.Value.Width;
+            _contentHeight = newHeight is null ? null : finalComposite.Value.Height;
+        }
 
         // Do the work
         SetNeedsLayout ();

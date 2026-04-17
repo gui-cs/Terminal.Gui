@@ -923,5 +923,148 @@ public class ContentSizeTests (ITestOutputHelper output)
         Assert.Equal (0, eventCount);
     }
 
+    [Fact]
+    public void SetContentWidth_DoesNotConvertNullHeightToExplicit () // Copilot
+    {
+        // Proves that setting width doesn't convert the null (viewport-tracking) height
+        // into an explicit value.
+        View view = new ()
+        {
+            Width = 20,
+            Height = 15
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        // Height is null (tracking viewport)
+        Assert.True (view.ContentSizeTracksViewport);
+
+        // Set only the width
+        view.SetContentWidth (100);
+
+        Assert.Equal (100, view.GetContentWidth ());
+
+        // Resize the view — height should follow the new viewport, not stay at 15
+        view.Width = 30;
+        view.Height = 25;
+        view.LayoutSubViews ();
+
+        Assert.Equal (100, view.GetContentWidth ());
+        Assert.Equal (view.Viewport.Height, view.GetContentHeight ());
+        Assert.Equal (25, view.GetContentHeight ());
+    }
+
+    [Fact]
+    public void SetContentHeight_DoesNotConvertNullWidthToExplicit () // Copilot
+    {
+        // Proves that setting height doesn't convert the null (viewport-tracking) width
+        // into an explicit value.
+        View view = new ()
+        {
+            Width = 20,
+            Height = 15
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        // Width is null (tracking viewport)
+        Assert.True (view.ContentSizeTracksViewport);
+
+        // Set only the height
+        view.SetContentHeight (100);
+
+        Assert.Equal (100, view.GetContentHeight ());
+
+        // Resize the view — width should follow the new viewport, not stay at 20
+        view.Width = 30;
+        view.Height = 25;
+        view.LayoutSubViews ();
+
+        Assert.Equal (view.Viewport.Width, view.GetContentWidth ());
+        Assert.Equal (30, view.GetContentWidth ());
+        Assert.Equal (100, view.GetContentHeight ());
+    }
+
+    [Fact]
+    public void SetContentWidth_Null_ContinuesToTrackAfterResize () // Copilot
+    {
+        // Verifies that after clearing width back to null, it continues to track
+        // the viewport as it resizes.
+        View view = new ()
+        {
+            Width = 20,
+            Height = 15
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        view.SetContentWidth (100);
+        view.SetContentWidth (null);
+
+        // Resize the view
+        view.Width = 40;
+        view.LayoutSubViews ();
+
+        Assert.Equal (view.Viewport.Width, view.GetContentWidth ());
+        Assert.Equal (40, view.GetContentWidth ());
+    }
+
+    [Fact]
+    public void SetContentHeight_Null_ContinuesToTrackAfterResize () // Copilot
+    {
+        // Verifies that after clearing height back to null, it continues to track
+        // the viewport as it resizes.
+        View view = new ()
+        {
+            Width = 20,
+            Height = 15
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        view.SetContentHeight (100);
+        view.SetContentHeight (null);
+
+        // Resize the view
+        view.Height = 40;
+        view.LayoutSubViews ();
+
+        Assert.Equal (view.Viewport.Height, view.GetContentHeight ());
+        Assert.Equal (40, view.GetContentHeight ());
+    }
+
+    [Fact]
+    public void SetContentSize_Null_ContinuesToTrackAfterResize () // Copilot
+    {
+        // Verifies that after clearing both dimensions via SetContentSize(null),
+        // both continue to track as viewport resizes.
+        View view = new ()
+        {
+            Width = 20,
+            Height = 15
+        };
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        view.SetContentSize (new Size (100, 200));
+        view.SetContentSize (null);
+
+        // Resize the view
+        view.Width = 40;
+        view.Height = 35;
+        view.LayoutSubViews ();
+
+        Assert.True (view.ContentSizeTracksViewport);
+        Assert.Equal (view.Viewport.Width, view.GetContentWidth ());
+        Assert.Equal (view.Viewport.Height, view.GetContentHeight ());
+        Assert.Equal (40, view.GetContentWidth ());
+        Assert.Equal (35, view.GetContentHeight ());
+    }
+
     #endregion
 }
