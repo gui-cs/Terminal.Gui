@@ -226,6 +226,7 @@ public class MarkdownCodeBlockTests
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (30, 5);
+        app.Driver.Clipboard = new FakeClipboard ();
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
@@ -288,7 +289,7 @@ public class MarkdownCodeBlockTests
         app.Clipboard.TryGetClipboardData (out string after);
 
         // Clipboard should not contain the code block text
-        Assert.DoesNotContain ("SHOULD_NOT_BE_COPIED", after ?? string.Empty);
+        Assert.DoesNotContain ("SHOULD_NOT_BE_COPIED", after);
 
         // Clipboard should be unchanged by the click
         Assert.Equal (before, after);
