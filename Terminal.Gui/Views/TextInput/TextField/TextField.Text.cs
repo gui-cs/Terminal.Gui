@@ -60,7 +60,7 @@ public partial class TextField
                          + StringExtensions.ToString (_text.GetRange (selStart + SelectedLength, _text.Count - (selStart + SelectedLength)));
 
         ClearAllSelection ();
-        InsertionPoint = selStart >= newText.GetRuneCount () ? newText.GetRuneCount () : selStart;
+        InsertionPoint = selStart >= GraphemeHelper.GetGraphemeCount (newText) ? GraphemeHelper.GetGraphemeCount (newText) : selStart;
 
         return newText.ToStringList ();
     }
@@ -241,18 +241,42 @@ public partial class TextField
     /// </remarks>
     private void Adjust ()
     {
-        bool need = NeedsDraw || !Used;
+        bool need = false;
+        _ = TextModel.CursorColumn (_text, InsertionPoint, 0, out List<int> glyphWidths, out _);
+        _ = TextModel.GetColumnWidthsBeforeStart (glyphWidths, ScrollOffset, out _, out int startIndex);
+        int tSize = TextModel.DisplaySize (_text, 0, _text.Count).size;
+        int pSize = TextModel.DisplaySize (_text, ScrollOffset, InsertionPoint).size;
+
+        // If text is shorter than the viewport, reset scroll to 0
+        if (ScrollOffset > 0 && tSize + 1 < Viewport.Width)
+        {
+            ScrollOffset = 0;
+            need = true;
+        }
 
         // If cursor is before the visible area, scroll left to show it
-        if (InsertionPoint < ScrollOffset)
+        else if ((InsertionPoint == 0 && ScrollOffset > 0) || InsertionPoint < startIndex)
         {
             ScrollOffset = InsertionPoint;
             need = true;
         }
 
+        // If cursor is exactly at the left edge of the visible area, adjust to ensure it remains visible (handles wide chars)
+        else if (ScrollOffset > 0 && InsertionPoint == startIndex)
+        {
+            ScrollOffset = TextModel.CalculateLeftColumn (_text, ScrollOffset, InsertionPoint, Viewport.Width);
+            need = true;
+        }
+
         // If cursor is beyond the visible area, scroll right to show it
-        else if (Viewport.Width > 0
-                 && (ScrollOffset + InsertionPoint - Viewport.Width == 0 || TextModel.DisplaySize (_text, ScrollOffset, InsertionPoint).size >= Viewport.Width))
+        else if (Viewport.Width > 0 && (InsertionPoint - ScrollOffset >= Viewport.Width || pSize >= Viewport.Width))
+        {
+            ScrollOffset = Math.Max (TextModel.CalculateLeftColumn (_text, ScrollOffset, InsertionPoint, Viewport.Width), 0);
+            need = true;
+        }
+
+        // If cursor is exactly at the right edge of the visible area, adjust to ensure it remains visible (handles wide chars)
+        else if (ScrollOffset > 0 && ((InsertionPoint == _text.Count && pSize < Viewport.Width) || InsertionPoint - startIndex >= Viewport.Width - 1))
         {
             ScrollOffset = Math.Max (TextModel.CalculateLeftColumn (_text, ScrollOffset, InsertionPoint, Viewport.Width), 0);
             need = true;
@@ -263,64 +287,6 @@ public partial class TextField
             SetNeedsDraw ();
         }
         UpdateCursor ();
-    }
-
-    /// <summary>
-    ///     Positions the cursor based on a screen column or text index.
-    /// </summary>
-    /// <param name="x">
-    ///     Either a screen column (if <paramref name="getX"/> is true) or a text index
-    ///     (if <paramref name="getX"/> is false).
-    /// </param>
-    /// <param name="getX">
-    ///     If true, <paramref name="x"/> is treated as a screen column and converted to a text index.
-    ///     If false, <paramref name="x"/> is used directly as a text index offset from <see cref="ScrollOffset"/>.
-    /// </param>
-    /// <returns>The resulting <see cref="InsertionPoint"/> after positioning.</returns>
-    /// <remarks>
-    ///     <para>
-    ///         This method handles the conversion from screen coordinates to logical text position:
-    ///         <list type="number">
-    ///             <item>
-    ///                 <description>
-    ///                     If <paramref name="getX"/> is true, converts screen column to text index using
-    ///                     <see cref="TextModel.GetColFromX(List{string},int,int,int)"/>
-    ///                 </description>
-    ///             </item>
-    ///             <item>
-    ///                 <description>Adds <see cref="ScrollOffset"/> to get the absolute text position</description>
-    ///             </item>
-    ///             <item>
-    ///                 <description>Clamps the result to valid bounds [0, text length]</description>
-    ///             </item>
-    ///         </list>
-    ///     </para>
-    /// </remarks>
-    private int SetInsertionPointFromScreen (int x, bool getX = true)
-    {
-        int pX = x;
-
-        if (getX)
-        {
-            // Convert screen column to text index (relative to ScrollOffset)
-            pX = TextModel.GetColFromX (_text, ScrollOffset, x);
-        }
-
-        // Convert relative position to absolute and clamp to valid range
-        if (ScrollOffset + pX > _text.Count)
-        {
-            InsertionPoint = _text.Count;
-        }
-        else if (ScrollOffset + pX < ScrollOffset)
-        {
-            InsertionPoint = 0;
-        }
-        else
-        {
-            InsertionPoint = ScrollOffset + pX;
-        }
-
-        return InsertionPoint;
     }
 
     private int _insertionPoint;
@@ -416,21 +382,40 @@ public partial class TextField
             return;
         }
 
-        var col = 0;
+        // Calculate absolute cursor position and store each glyph width
+        int cursorColumn = TextModel.CursorColumn (_text, InsertionPoint, 0, out List<int> glyphWidths, out _);
+        _ = TextModel.GetColumnWidthsBeforeStart (glyphWidths, ScrollOffset, out int colOffset, out int viewportX);
+        var colsWidth = 0;
 
-        for (int idx = ScrollOffset < 0 ? 0 : ScrollOffset; idx < _text.Count; idx++)
+        if (glyphWidths.Count > 0)
+        {
+            for (int i = 0; i < Viewport.X; i++)
+            {
+                if (i == glyphWidths.Count)
+                {
+                    break;
+                }
+                colsWidth += glyphWidths [i];
+            }
+        }
+
+        for (int idx = viewportX; idx < _text.Count; idx++)
         {
             if (idx == InsertionPoint)
             {
                 break;
             }
 
-            int cols = Math.Max (_text [idx].GetColumns (), 1);
+            int cols = glyphWidths [idx];
 
-            TextModel.SetCol (ref col, Viewport.Width - 1, cols);
+            // Viewport.Width is 1 based size, not 0 based index, so it must be used directly here without -1
+            if (!TextModel.SetCol (ref colsWidth, Viewport.Width, cols))
+            {
+                break;
+            }
         }
 
-        int pos = col + Math.Min (Viewport.X, 0);
+        int pos = colsWidth + Math.Min (Viewport.X, 0);
 
         Cursor = Cursor with { Position = ViewportToScreen (new Point (pos, 0)) };
     }
