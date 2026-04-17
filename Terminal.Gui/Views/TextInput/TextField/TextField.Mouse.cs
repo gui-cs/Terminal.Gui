@@ -29,7 +29,7 @@ public partial class TextField
 
         if (!CanFocus)
         {
-            return true;
+            return false;
         }
 
         if (!HasFocus && ev.Flags != MouseFlags.PositionReport)
@@ -39,7 +39,7 @@ public partial class TextField
         }
 
         // Give autocomplete first opportunity to respond to mouse clicks
-        if (SelectedLength == 0 && Autocomplete.OnMouseEvent (ev, true))
+        if (SelectedLength == 0 && Autocomplete is { } && Autocomplete.OnMouseEvent (ev, true))
         {
             return true;
         }
@@ -104,11 +104,12 @@ public partial class TextField
 
         void EnsureHasFocus ()
         {
-            if (!HasFocus)
+            if (HasFocus)
             {
-                _focusSetByMouse = true;
-                SetFocus ();
+                return;
             }
+            _focusSetByMouse = true;
+            SetFocus ();
         }
     }
 }

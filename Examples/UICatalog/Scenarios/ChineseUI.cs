@@ -35,16 +35,15 @@ public class ChineseUI : Scenario
 
         btn.Accepting += (s, _) =>
                       {
-                          int? result = MessageBox.Query (
-                                                          (s as View)?.App!,
-                                                          "Confirm",
-                                                         "Are you sure you want to quit ui?",
-                                                         0,
-                                                         "Yes",
-                                                         "No"
-                                                        );
+                           int? result = MessageBox.Query (
+                                                           (s as View)?.App!,
+                                                           "Confirm",
+                                                           "Are you sure you want to quit ui?",
+                                                           "No",
+                                                           "Yes"
+                                                         );
 
-                          if (result == 0)
+                          if (result == 1)
                           {
                               win.RequestStop ();
                           }
