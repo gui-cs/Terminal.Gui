@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Drawing;
 using System.Globalization;
 using System.IO.Abstractions;
 using System.IO.Abstractions.TestingHelpers;
@@ -29,11 +30,11 @@ public class FileDialogTests : TestsAllDrivers
         var emptyDir = "empty-dir";
 
         // Add files
-        mockFileSystem.AddFile (mockFileSystem.Path.Combine (testDir, "file1.txt"), new ("Hello, this is file 1."));
-        mockFileSystem.AddFile (mockFileSystem.Path.Combine (testDir, "file2.txt"), new ("Hello, this is file 2."));
-        mockFileSystem.AddFile (mockFileSystem.Path.Combine (subDir, "nested-file.txt"), new ("This is a nested file."));
-        mockFileSystem.AddFile (mockFileSystem.Path.Combine (logsDir, "log1.log"), new ("Log entry 1"));
-        mockFileSystem.AddFile (mockFileSystem.Path.Combine (logsDir, "log2.log"), new ("Log entry 2"));
+        mockFileSystem.AddFile (mockFileSystem.Path.Combine (testDir, "file1.txt"), new MockFileData ("Hello, this is file 1."));
+        mockFileSystem.AddFile (mockFileSystem.Path.Combine (testDir, "file2.txt"), new MockFileData ("Hello, this is file 2."));
+        mockFileSystem.AddFile (mockFileSystem.Path.Combine (subDir, "nested-file.txt"), new MockFileData ("This is a nested file."));
+        mockFileSystem.AddFile (mockFileSystem.Path.Combine (logsDir, "log1.log"), new MockFileData ("Log entry 1"));
+        mockFileSystem.AddFile (mockFileSystem.Path.Combine (logsDir, "log2.log"), new MockFileData ("Log entry 2"));
 
         // Create an empty directory
         mockFileSystem.AddDirectory (emptyDir);
@@ -41,12 +42,12 @@ public class FileDialogTests : TestsAllDrivers
         return mockFileSystem;
     }
 
-    private IRunnable NewSaveDialog (out SaveDialog sd) { return NewSaveDialog (out sd, out _); }
+    private IRunnable NewSaveDialog (out SaveDialog sd) => NewSaveDialog (out sd, out _);
 
     private IRunnable NewSaveDialog (out SaveDialog sd, out MockFileSystem fs)
     {
         fs = CreateExampleFileSystem ();
-        sd = new (fs);
+        sd = new SaveDialog (fs);
 
         return sd;
     }
@@ -58,9 +59,9 @@ public class FileDialogTests : TestsAllDrivers
         SaveDialog? sd = null;
 
         using AppTestHelper c = With.A (() => NewSaveDialog (out sd), 100, 20, d, _out)
-                                  .ScreenShot ("Save dialog", _out)
-                                  .KeyDown (Application.GetDefaultKey (Command.Quit))
-                                  .AssertTrue (sd!.Canceled);
+                                    .ScreenShot ("Save dialog", _out)
+                                    .KeyDown (Application.GetDefaultKey (Command.Quit))
+                                    .AssertTrue (sd!.Canceled);
     }
 
     [Theory]
@@ -70,10 +71,10 @@ public class FileDialogTests : TestsAllDrivers
         SaveDialog? sd = null;
 
         using AppTestHelper c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
-                                  .ScreenShot ("Save dialog", _out)
-                                  .Focus<Button> (b => b.Text == Strings.btnCancel)
-                                  .AssertTrue (sd!.Canceled)
-                                  .KeyDown (Key.Enter);
+                                    .ScreenShot ("Save dialog", _out)
+                                    .Focus<Button> (b => b.Text == Strings.btnCancel)
+                                    .AssertTrue (sd!.Canceled)
+                                    .KeyDown (Key.Enter);
     }
 
     [Theory]
@@ -83,9 +84,9 @@ public class FileDialogTests : TestsAllDrivers
         SaveDialog? sd = null;
 
         using AppTestHelper c = With.A (() => NewSaveDialog (out sd), 100, 20, d)
-                                  .ScreenShot ("Save dialog", _out)
-                                  .LeftClick<Button> (b => b.Text == Strings.btnCancel)
-                                  .AssertTrue (sd!.Canceled);
+                                    .ScreenShot ("Save dialog", _out)
+                                    .LeftClick<Button> (b => b.Text == Strings.btnCancel)
+                                    .AssertTrue (sd!.Canceled);
     }
 
     [Theory]
@@ -95,9 +96,9 @@ public class FileDialogTests : TestsAllDrivers
         SaveDialog? sd = null;
 
         using AppTestHelper c = With.A (() => NewSaveDialog (out sd), 100, 20, d, _out)
-                                  .ScreenShot ("Save dialog", _out)
-                                  .KeyDown (Key.C.WithAlt)
-                                  .AssertTrue (sd!.Canceled);
+                                    .ScreenShot ("Save dialog", _out)
+                                    .KeyDown (Key.C.WithAlt)
+                                    .AssertTrue (sd!.Canceled);
     }
 
     [Theory]
@@ -108,10 +109,10 @@ public class FileDialogTests : TestsAllDrivers
         MockFileSystem? fs = null;
 
         using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
-                                  .ScreenShot ("Save dialog", _out)
-                                  .LeftClick<Button> (b => b.Text == Strings.cmdSave)
-                                  .AssertFalse (sd!.Canceled)
-                                  .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName);
+                                    .ScreenShot ("Save dialog", _out)
+                                    .LeftClick<Button> (b => b.Text == Strings.cmdSave)
+                                    .AssertFalse (sd!.Canceled)
+                                    .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName);
     }
 
     [Theory]
@@ -122,10 +123,10 @@ public class FileDialogTests : TestsAllDrivers
         MockFileSystem? fs = null;
 
         using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
-                                  .ScreenShot ("Save dialog", _out)
-                                  .KeyDown (Key.S.WithAlt)
-                                  .AssertFalse (sd!.Canceled)
-                                  .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName);
+                                    .ScreenShot ("Save dialog", _out)
+                                    .KeyDown (Key.S.WithAlt)
+                                    .AssertFalse (sd!.Canceled)
+                                    .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName);
     }
 
     [Theory]
@@ -136,18 +137,14 @@ public class FileDialogTests : TestsAllDrivers
         MockFileSystem? fs = null;
 
         using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out fs), 100, 20, d)
-                                  .ScreenShot ("Save dialog", _out)
-                                  .Focus<Button> (b => b.Text == Strings.cmdSave)
-                                  .KeyDown (Key.Enter)
-                                  .AssertFalse (sd!.Canceled)
-                                  .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName)
-            ;
+                                    .ScreenShot ("Save dialog", _out)
+                                    .Focus<Button> (b => b.Text == Strings.cmdSave)
+                                    .KeyDown (Key.Enter)
+                                    .AssertFalse (sd!.Canceled)
+                                    .AssertEqual (GetFileSystemRoot (fs!), sd!.FileName);
     }
 
-    private string GetFileSystemRoot (IFileSystem fs)
-    {
-        return RuntimeInformation.IsOSPlatform (OSPlatform.Windows) ? $@"C:{fs.Path.DirectorySeparatorChar}" : "/";
-    }
+    private string GetFileSystemRoot (IFileSystem fs) => RuntimeInformation.IsOSPlatform (OSPlatform.Windows) ? $@"C:{fs.Path.DirectorySeparatorChar}" : "/";
 
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
@@ -156,12 +153,12 @@ public class FileDialogTests : TestsAllDrivers
         SaveDialog? sd = null;
 
         using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out MockFileSystem _), 100, 20, d)
-                                  .ScreenShot ("Save dialog", _out)
-                                  .AssertTrue (sd!.Canceled)
-                                  .Focus<Button> (b => b.Text == "►_Tree")
-                                  .KeyDown (Key.Enter)
-                                  .ScreenShot ("After pop tree", _out)
-                                  .AssertTrue (sd!.Canceled);
+                                    .ScreenShot ("Save dialog", _out)
+                                    .AssertTrue (sd!.Canceled)
+                                    .Focus<Button> (b => b.Text == "►_Tree")
+                                    .KeyDown (Key.Enter)
+                                    .ScreenShot ("After pop tree", _out)
+                                    .AssertTrue (sd!.Canceled);
     }
 
     [Theory]
@@ -171,18 +168,18 @@ public class FileDialogTests : TestsAllDrivers
         SaveDialog? sd = null;
 
         using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out MockFileSystem _), 100, 20, d)
-                                  .ScreenShot ("Save dialog", _out)
-                                  .AssertTrue (sd!.Canceled)
-                                  .LeftClick<Button> (b => b.Text == "►_Tree")
-                                  .ScreenShot ("After pop tree", _out)
-                                  .Focus<TreeView<IFileSystemInfo>> (_ => true)
-                                  .KeyDown (Key.CursorRight)
-                                  .ScreenShot ("After expand tree", _out)
-                                  .KeyDown (Key.CursorDown)
-                                  .ScreenShot ("After navigate down in tree", _out)
-                                  .KeyDown (Key.Enter)
-                                  .AssertFalse (sd!.Canceled)
-                                  .AssertContains ("empty-dir", sd!.FileName);
+                                    .ScreenShot ("Save dialog", _out)
+                                    .AssertTrue (sd!.Canceled)
+                                    .LeftClick<Button> (b => b.Text == "►_Tree")
+                                    .ScreenShot ("After pop tree", _out)
+                                    .Focus<TreeView<IFileSystemInfo>> (_ => true)
+                                    .KeyDown (Key.CursorRight)
+                                    .ScreenShot ("After expand tree", _out)
+                                    .KeyDown (Key.CursorDown)
+                                    .ScreenShot ("After navigate down in tree", _out)
+                                    .KeyDown (Key.Enter)
+                                    .AssertFalse (sd!.Canceled)
+                                    .AssertContains ("empty-dir", sd!.FileName);
     }
 
     [Theory]
@@ -192,40 +189,40 @@ public class FileDialogTests : TestsAllDrivers
         SaveDialog? sd = null;
 
         using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out MockFileSystem _), 100, 20, d)
-                                  .Then (_ => sd!.Style.PreserveFilenameOnDirectoryChanges = true)
-                                  .ScreenShot ("Save dialog", _out)
-                                  .AssertTrue (sd!.Canceled)
-                                  .Focus<TextField> (_ => true)
+                                    .Then (_ => sd!.Style.PreserveFilenameOnDirectoryChanges = true)
+                                    .ScreenShot ("Save dialog", _out)
+                                    .AssertTrue (sd!.Canceled)
+                                    .Focus<TextField> (_ => true)
 
-                                  // Clear selection by pressing right in 'file path' text box
-                                  .KeyDown (Key.CursorRight)
-                                  .AssertIsType<TextField> (sd!.Focused)
+                                    // Clear selection by pressing right in 'file path' text box
+                                    .KeyDown (Key.CursorRight)
+                                    .AssertIsType<TextField> (sd!.Focused)
 
-                                  // Type a filename into the dialog
-                                  .KeyDown (Key.H)
-                                  .KeyDown (Key.E)
-                                  .KeyDown (Key.L)
-                                  .KeyDown (Key.L)
-                                  .KeyDown (Key.O)
-                                  .ScreenShot ("After typing filename 'hello'", _out)
-                                  .AssertEndsWith ("hello", sd!.Path)
-                                  .LeftClick<Button> (b => b.Text == "►_Tree")
-                                  .ScreenShot ("After pop tree", _out)
-                                  .Focus<TreeView<IFileSystemInfo>> (_ => true)
-                                  .KeyDown (Key.CursorRight)
-                                  .ScreenShot ("After expand tree", _out)
+                                    // Type a filename into the dialog
+                                    .KeyDown (Key.H)
+                                    .KeyDown (Key.E)
+                                    .KeyDown (Key.L)
+                                    .KeyDown (Key.L)
+                                    .KeyDown (Key.O)
+                                    .ScreenShot ("After typing filename 'hello'", _out)
+                                    .AssertEndsWith ("hello", sd!.Path)
+                                    .LeftClick<Button> (b => b.Text == "►_Tree")
+                                    .ScreenShot ("After pop tree", _out)
+                                    .Focus<TreeView<IFileSystemInfo>> (_ => true)
+                                    .KeyDown (Key.CursorRight)
+                                    .ScreenShot ("After expand tree", _out)
 
-                                  // Because of PreserveFilenameOnDirectoryChanges we should select the new dir but keep the filename
-                                  .AssertEndsWith ("hello", sd!.Path)
-                                  .KeyDown (Key.CursorDown)
-                                  .ScreenShot ("After navigate down in tree", _out)
+                                    // Because of PreserveFilenameOnDirectoryChanges we should select the new dir but keep the filename
+                                    .AssertEndsWith ("hello", sd!.Path)
+                                    .KeyDown (Key.CursorDown)
+                                    .ScreenShot ("After navigate down in tree", _out)
 
-                                  // Because of PreserveFilenameOnDirectoryChanges we should select the new dir but keep the filename
-                                  .AssertContains ("empty-dir", sd!.Path)
-                                  .AssertEndsWith ("hello", sd!.Path)
-                                  .KeyDown (Key.Enter)
-                                  .AssertFalse (sd!.Canceled)
-                                  .AssertContains ("empty-dir", sd!.FileName);
+                                    // Because of PreserveFilenameOnDirectoryChanges we should select the new dir but keep the filename
+                                    .AssertContains ("empty-dir", sd!.Path)
+                                    .AssertEndsWith ("hello", sd!.Path)
+                                    .KeyDown (Key.Enter)
+                                    .AssertFalse (sd!.Canceled)
+                                    .AssertContains ("empty-dir", sd!.FileName);
     }
 
     [Theory]
@@ -235,41 +232,93 @@ public class FileDialogTests : TestsAllDrivers
         SaveDialog? sd = null;
 
         using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out MockFileSystem _), 100, 20, d)
-                                  .Then (_ => sd!.Style.PreserveFilenameOnDirectoryChanges = false)
-                                  .ScreenShot ("Save dialog", _out)
-                                  .AssertTrue (sd!.Canceled)
-                                  .Focus<TextField> (_ => true)
+                                    .Then (_ => sd!.Style.PreserveFilenameOnDirectoryChanges = false)
+                                    .ScreenShot ("Save dialog", _out)
+                                    .AssertTrue (sd!.Canceled)
+                                    .Focus<TextField> (_ => true)
 
-                                  // Clear selection by pressing right in 'file path' text box
-                                  .KeyDown (Key.CursorRight)
-                                  .AssertIsType<TextField> (sd!.Focused)
+                                    // Clear selection by pressing right in 'file path' text box
+                                    .KeyDown (Key.CursorRight)
+                                    .AssertIsType<TextField> (sd!.Focused)
 
-                                  // Type a filename into the dialog
-                                  .KeyDown (Key.H)
-                                  .KeyDown (Key.E)
-                                  .KeyDown (Key.L)
-                                  .KeyDown (Key.L)
-                                  .KeyDown (Key.O)
-                                  .ScreenShot ("After typing filename 'hello'", _out)
-                                  .AssertEndsWith ("hello", sd!.Path)
-                                  .LeftClick<Button> (b => b.Text == "►_Tree")
-                                  .ScreenShot ("After pop tree", _out)
-                                  .Focus<TreeView<IFileSystemInfo>> (_ => true)
-                                  .KeyDown (Key.CursorRight)
-                                  .ScreenShot ("After expand tree", _out)
-                                  .KeyDown (Key.CursorDown)
-                                  .ScreenShot ("After navigate down in tree", _out)
+                                    // Type a filename into the dialog
+                                    .KeyDown (Key.H)
+                                    .KeyDown (Key.E)
+                                    .KeyDown (Key.L)
+                                    .KeyDown (Key.L)
+                                    .KeyDown (Key.O)
+                                    .ScreenShot ("After typing filename 'hello'", _out)
+                                    .AssertEndsWith ("hello", sd!.Path)
+                                    .LeftClick<Button> (b => b.Text == "►_Tree")
+                                    .ScreenShot ("After pop tree", _out)
+                                    .Focus<TreeView<IFileSystemInfo>> (_ => true)
+                                    .KeyDown (Key.CursorRight)
+                                    .ScreenShot ("After expand tree", _out)
+                                    .KeyDown (Key.CursorDown)
+                                    .ScreenShot ("After navigate down in tree", _out)
 
-                                  // PreserveFilenameOnDirectoryChanges is false so just select new path
-                                  .AssertEndsWith ("empty-dir", sd!.Path)
-                                  .AssertDoesNotContain ("hello", sd!.Path)
-                                  .KeyDown (Key.Enter)
-                                  .AssertFalse (sd!.Canceled)
-                                  .AssertContains ("empty-dir", sd!.FileName)
-                                  ;
+                                    // PreserveFilenameOnDirectoryChanges is false so just select new path
+                                    .AssertEndsWith ("empty-dir", sd!.Path)
+                                    .AssertDoesNotContain ("hello", sd!.Path)
+                                    .KeyDown (Key.Enter)
+                                    .AssertFalse (sd!.Canceled)
+                                    .AssertContains ("empty-dir", sd!.FileName);
     }
 
+    /// <summary>
+    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4950
+    ///     OpenFileDialog only closes after clicking Cancel or OK three times.
+    ///     The first mouse-press triggers a layout pass that repositions the button,
+    ///     so the subsequent mouse-release misses it.
+    /// </summary>
+    [Theory]
+    [MemberData (nameof (GetAllDriverNames))]
+    public void FileDialog_CancelButton_ClickDoesNotMoveButton (string d)
+    {
+        // Copilot
+        OpenDialog? od = null;
+        Button? cancelBtn = null;
+        Point posBefore = Point.Empty;
 
+        AppTestHelper c = With.A (() =>
+                                   {
+                                       od = new OpenDialog ();
+
+                                       return od;
+                                   },
+                                   100,
+                                   50,
+                                   d,
+                                   _out)
+                               .ScreenShot ("Open dialog initial", _out);
+
+        // Focus the Cancel button and grab a reference via MostFocused
+        c.Focus<Button> (b => b.Text == Strings.btnCancel)
+         .Then (_ =>
+                {
+                    cancelBtn = od!.MostFocused as Button;
+                })
+         .ScreenShot ("Cancel button focused", _out);
+
+        Assert.True (cancelBtn?.HasFocus);
+        posBefore = cancelBtn!.ViewportToScreen ().Location;
+
+        // Click at the Cancel button position (Press + Release).
+        // The bug: press triggers a layout pass that moves the button before release.
+        c.LeftClick (posBefore.X + 1, posBefore.Y);
+
+        // If the fix works, the click lands on Cancel and closes the dialog.
+        // If the bug is present, the button moves and the click misses,
+        // so the dialog stays open and IsRunning remains true.
+        c.Then (_ =>
+                {
+                    // Verify the dialog was dismissed by the single click
+                    Assert.False (od!.IsRunning, "Dialog should have closed on the first Cancel click");
+                })
+         .ScreenShot ("After click on Cancel button", _out);
+
+        c.Stop ();
+    }
     /// <summary>
     ///     Test cases for functions with signature <code>TestDriver d, bool someFlag</code>
     ///     that enumerates all variations
@@ -283,7 +332,7 @@ public class FileDialogTests : TestsAllDrivers
             yield return [DriverRegistry.Names.ANSI, true];
         }
 
-        IEnumerator IEnumerable.GetEnumerator () { return GetEnumerator (); }
+        IEnumerator IEnumerable.GetEnumerator () => GetEnumerator ();
     }
 
     [Theory]
@@ -293,64 +342,57 @@ public class FileDialogTests : TestsAllDrivers
         SaveDialog? sd = null;
 
         using AppTestHelper c = With.A (() => NewSaveDialog (out sd, out MockFileSystem _), 100, 20, d)
-                                  .Then (_ => sd!.Style.PreserveFilenameOnDirectoryChanges = preserve)
-                                  .ScreenShot ("Save dialog", _out)
-                                  .AssertTrue (sd!.Canceled)
-                                  .Focus<TextField> (_ => true)
+                                    .Then (_ => sd!.Style.PreserveFilenameOnDirectoryChanges = preserve)
+                                    .ScreenShot ("Save dialog", _out)
+                                    .AssertTrue (sd!.Canceled)
+                                    .Focus<TextField> (_ => true)
 
-                                  // Clear selection by pressing right in 'file path' text box
-                                  .KeyDown (Key.CursorRight)
-                                  .AssertIsType<TextField> (sd!.Focused)
+                                    // Clear selection by pressing right in 'file path' text box
+                                    .KeyDown (Key.CursorRight)
+                                    .AssertIsType<TextField> (sd!.Focused)
 
-                                  // Type a filename into the dialog
-                                  .KeyDown (Key.H)
-                                  .KeyDown (Key.E)
-                                  .KeyDown (Key.L)
-                                  .KeyDown (Key.L)
-                                  .KeyDown (Key.O)
-                                  .ScreenShot ("After typing filename 'hello'", _out)
-                                  .AssertEndsWith ("hello", sd!.Path)
-                                  .Focus<TableView> (_ => true)
-                                  .ScreenShot ("After focus table", _out)
-                                  .KeyDown (Key.CursorDown)
-                                  .ScreenShot ("After down in table", _out);
+                                    // Type a filename into the dialog
+                                    .KeyDown (Key.H)
+                                    .KeyDown (Key.E)
+                                    .KeyDown (Key.L)
+                                    .KeyDown (Key.L)
+                                    .KeyDown (Key.O)
+                                    .ScreenShot ("After typing filename 'hello'", _out)
+                                    .AssertEndsWith ("hello", sd!.Path)
+                                    .Focus<TableView> (_ => true)
+                                    .ScreenShot ("After focus table", _out)
+                                    .KeyDown (Key.CursorDown)
+                                    .ScreenShot ("After down in table", _out);
 
         if (preserve)
         {
-            c.AssertContains ("logs", sd!.Path)
-             .AssertEndsWith ("hello", sd!.Path);
+            c.AssertContains ("logs", sd!.Path).AssertEndsWith ("hello", sd!.Path);
         }
         else
         {
-            c.AssertContains ("logs", sd!.Path)
-             .AssertDoesNotContain ("hello", sd!.Path);
+            c.AssertContains ("logs", sd!.Path).AssertDoesNotContain ("hello", sd!.Path);
         }
 
         c.KeyDown (Key.CursorUp).ScreenShot ("After up in table", _out);
 
         if (preserve)
         {
-            c.AssertContains ("empty-dir", sd!.Path)
-             .AssertEndsWith ("hello", sd!.Path);
+            c.AssertContains ("empty-dir", sd!.Path).AssertEndsWith ("hello", sd!.Path);
         }
         else
         {
-            c.AssertContains ("empty-dir", sd!.Path)
-             .AssertDoesNotContain ("hello", sd!.Path);
+            c.AssertContains ("empty-dir", sd!.Path).AssertDoesNotContain ("hello", sd!.Path);
         }
 
-        c.KeyDown (Key.Enter)
-         .ScreenShot ("After enter in table", _out);
+        c.KeyDown (Key.Enter).ScreenShot ("After enter in table", _out);
 
         if (preserve)
         {
-            c.AssertContains ("empty-dir", sd!.Path)
-             .AssertEndsWith ("hello", sd!.Path);
+            c.AssertContains ("empty-dir", sd!.Path).AssertEndsWith ("hello", sd!.Path);
         }
         else
         {
-            c.AssertContains ("empty-dir", sd!.Path)
-             .AssertDoesNotContain ("hello", sd!.Path);
+            c.AssertContains ("empty-dir", sd!.Path).AssertDoesNotContain ("hello", sd!.Path);
         }
 
         c.LeftClick<Button> (b => b.Text == Strings.cmdSave);
@@ -358,13 +400,11 @@ public class FileDialogTests : TestsAllDrivers
 
         if (preserve)
         {
-            c.AssertContains ("empty-dir", sd!.Path)
-             .AssertEndsWith ("hello", sd!.Path);
+            c.AssertContains ("empty-dir", sd!.Path).AssertEndsWith ("hello", sd!.Path);
         }
         else
         {
-            c.AssertContains ("empty-dir", sd!.Path)
-             .AssertDoesNotContain ("hello", sd!.Path);
+            c.AssertContains ("empty-dir", sd!.Path).AssertDoesNotContain ("hello", sd!.Path);
         }
 
         c.Stop ();

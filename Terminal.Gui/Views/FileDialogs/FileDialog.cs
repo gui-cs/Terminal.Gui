@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
 
@@ -62,6 +62,9 @@ public class FileDialog : Dialog, IDesignable
 
         ButtonAlignment = Alignment.End;
         ButtonAlignmentModes = AlignmentModes.IgnoreFirstOrLast;
+
+        // Ensure we get Accept for any subviews; esp TreeView
+        CommandsToBubbleUp = [Command.Accept];
 
         _btnCancel = new Button { Text = Strings.btnCancel };
 
@@ -544,10 +547,7 @@ public class FileDialog : Dialog, IDesignable
                                                               : forcedOrder.ThenByDescending (f => FileDialogTableSource.GetRawColumnValue (_currentSortColumn,
                                                                                                   f));
 
-        if (State is { })
-        {
-            State.Children = ordered.ToArray ();
-        }
+        State?.Children = ordered.ToArray ();
 
         _tableView.Update ();
     }
@@ -1359,6 +1359,7 @@ public class FileDialog : Dialog, IDesignable
         {
             // When visible, the table view's left edge is a splitter next to the tree
             _treeView.Width = Dim.Fill (_tableViewContainer);
+            _treeView.Height = Dim.Height (_tableViewContainer);
             _tableViewContainer.X = 30;
             _tableViewContainer.Arrangement = ViewArrangement.LeftResizable;
             _tableViewContainer.Border.Thickness = new Thickness (1, 0, 0, 0);
@@ -1367,6 +1368,7 @@ public class FileDialog : Dialog, IDesignable
         {
             // When hidden, table occupies full width and splitter is hidden/disabled
             _treeView.Width = 0;
+            _treeView.Height = 0;
             _tableViewContainer.X = 0;
             _tableViewContainer.Width = Dim.Fill ();
             _tableViewContainer.Arrangement = ViewArrangement.Fixed;
@@ -1385,7 +1387,7 @@ public class FileDialog : Dialog, IDesignable
     {
         // TODO: Add thread safe child adding
         private readonly List<FileSystemInfoStats> _found = [];
-        private readonly object _oLockFound = new ();
+        private readonly Lock _oLockFound = new ();
         private readonly CancellationTokenSource _token = new ();
         private bool _cancel;
         private bool _finished;
