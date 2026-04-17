@@ -11,14 +11,16 @@ public partial class TextView
 
     private bool _isButtonShift;
     private bool _isButtonReleased;
+    private int _lastMouseInsertionPointY;
+    private int _lastMouseInsertionPointX;
 
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouse)
     {
         if (mouse is { IsSingleDoubleOrTripleClicked: false, IsPressed: false, IsReleased: false, IsWheel: false }
-            && !mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport)
-            && !mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed | MouseFlags.Shift)
-            && !mouse.Flags.FastHasFlags (MouseFlags.LeftButtonDoubleClicked | MouseFlags.Shift)
+            && !mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport)
+            && !mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.Alt)
+            && !mouse.Flags.HasFlag (MouseFlags.LeftButtonDoubleClicked | MouseFlags.Alt)
             && ContextMenu is { }
             && !mouse.Flags.HasFlag (ContextMenu.MouseFlags))
         {
@@ -44,12 +46,10 @@ public partial class TextView
             {
                 _isButtonReleased = false;
 
-                if (SelectedLength == 0)
+                if (IsSelecting)
                 {
-                    StopSelecting ();
+                    return true;
                 }
-
-                return true;
             }
 
             if (_shiftSelecting && !_isButtonShift)
@@ -75,72 +75,40 @@ public partial class TextView
         {
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
-            ScrollTo (Viewport.Y + 1);
+            ScrollTo (new Point (Viewport.X, Viewport.Y + 1));
         }
         else if (mouse.Flags == MouseFlags.WheeledUp)
         {
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
-            ScrollTo (Viewport.Y - 1);
+            ScrollTo (new Point (Viewport.X, Viewport.Y - 1));
         }
         else if (mouse.Flags == MouseFlags.WheeledRight)
         {
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
-            ScrollTo (Viewport.X + 1, false);
+            ScrollTo (new Point (Viewport.X + 1, Viewport.Y));
         }
         else if (mouse.Flags == MouseFlags.WheeledLeft)
         {
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
-            ScrollTo (Viewport.X - 1, false);
+            ScrollTo (new Point (Viewport.X - 1, Viewport.Y));
         }
         else if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
         {
-            ProcessMouseClick (mouse, out List<Cell> line);
-            PositionCursor ();
-
-            if (_model.Count > 0 && _shiftSelecting && IsSelecting)
+            if (!IsSelecting)
             {
-                if (CurrentRow - Viewport.Y >= Viewport.Height - 1 && _model.Count > Viewport.Y + CurrentRow)
-                {
-                    ScrollTo (Viewport.Y + Viewport.Height);
-                }
-                else if (Viewport.Y > 0 && CurrentRow <= Viewport.Y)
-                {
-                    ScrollTo (Viewport.Y - Viewport.Height);
-                }
-                else if (mouse.Position!.Value.Y >= Viewport.Height)
-                {
-                    ScrollTo (_model.Count);
-                }
-                else if (mouse.Position!.Value.Y < 0 && Viewport.Y > 0)
-                {
-                    ScrollTo (0);
-                }
-
-                if (CurrentColumn - Viewport.X >= Viewport.Width - 1 && line.Count > Viewport.X + CurrentColumn)
-                {
-                    ScrollTo (Viewport.X + Viewport.Width, false);
-                }
-                else if (Viewport.X > 0 && CurrentColumn <= Viewport.X)
-                {
-                    ScrollTo (Viewport.X - Viewport.Width, false);
-                }
-                else if (mouse.Position!.Value.X >= Viewport.Width)
-                {
-                    ScrollTo (line.Count, false);
-                }
-                else if (mouse.Position!.Value.X < 0 && Viewport.X > 0)
-                {
-                    ScrollTo (0, false);
-                }
+                StartSelecting ();
             }
+
+            ProcessMouseClick (mouse, out List<Cell> _);
+            PositionCursor ();
 
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
         }
-        else if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed | MouseFlags.Shift))
+        else if (mouse.Flags.HasFlag (MouseFlags.LeftButtonPressed | MouseFlags.Alt))
         {
             if (!_shiftSelecting)
             {
@@ -164,11 +132,6 @@ public partial class TextView
             ProcessMouseClick (mouse, out _);
             PositionCursor ();
 
-            if (!IsSelecting)
-            {
-                StartSelecting ();
-            }
-
             _lastWasKill = false;
             _columnTrack = CurrentColumn;
 
@@ -184,7 +147,7 @@ public partial class TextView
         }
         else if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonDoubleClicked))
         {
-            if (mouse.Flags.FastHasFlags (MouseFlags.Shift))
+            if (mouse.Flags.HasFlag (MouseFlags.Alt))
             {
                 if (!IsSelecting)
                 {
@@ -254,27 +217,104 @@ public partial class TextView
 
         if (_model.Count > 0)
         {
-            int maxCursorPositionableLine = Math.Max (_model.Count - 1 - Viewport.Y, 0);
+            // Clamp mouse inside viewport -> Viewport.Width - 1 and Viewport.Height - 1 is used because they are a 0 based index
+            Point p = new (Math.Clamp (mouse.Position!.Value.X, 0, Math.Max (Viewport.Width - 1, 0)),
+                           Math.Clamp (mouse.Position!.Value.Y, 0, Math.Max (Viewport.Height - 1, 0)));
+            int middleHeight = Viewport.Height / 2;
+            int desiredInsertionY = Math.Clamp (Viewport.Y + p.Y, 0, _model.Count);
+            int movementY = desiredInsertionY - _lastMouseInsertionPointY;
 
-            if (Math.Max (mouse.Position!.Value.Y, 0) > maxCursorPositionableLine)
+            if (Viewport.Y + p.Y > _model.Count || (IsSelecting && p.Y >= Math.Max (Viewport.Height - 1, 0)))
             {
-                CurrentRow = maxCursorPositionableLine + Viewport.Y;
+                CurrentRow = _model.Count - 1;
+            }
+            else if (Viewport.Y + p.Y == 0 || (IsSelecting && p.Y == 0))
+            {
+                Viewport = Viewport with { Y = CurrentRow = 0 };
+            }
+            else if (IsSelecting && p.Y > middleHeight && movementY > 0)
+            {
+                // Scroll down
+                int delta = p.Y - middleHeight;
+                Viewport = Viewport with { Y = Math.Max (Math.Min (Viewport.Y + delta, Math.Max (0, _model.Count - Viewport.Height)), Viewport.Y) };
+                _lastMouseInsertionPointY = CurrentRow = Math.Clamp (Viewport.Y + p.Y, 0, _model.Count);
+            }
+            else if (IsSelecting && p.Y < middleHeight && movementY < 0)
+            {
+                // Scroll up
+                int delta = middleHeight - p.Y;
+                Viewport = Viewport with { Y = Math.Min (Math.Max (0, Viewport.Y - delta), Viewport.Y) };
+                _lastMouseInsertionPointY = CurrentRow = Math.Clamp (Viewport.Y + p.Y, 0, _model.Count);
+            }
+            else if (IsSelecting)
+            {
+                _lastMouseInsertionPointY = CurrentRow = Viewport.Y + p.Y;
             }
             else
             {
-                CurrentRow = Math.Max (mouse.Position!.Value.Y + Viewport.Y, 0);
+                CurrentRow = Viewport.Y + p.Y;
             }
 
             r = GetCurrentLine ();
-            int idx = TextModel.GetColFromX (r, Viewport.X, Math.Max (mouse.Position!.Value.X, 0), TabWidth);
+            int colsWidth = TextModel.CursorColumn (TextModel.CellsToStringList (r), r.Count, TabWidth, out List<int> glyphWidths, out _);
+            _ = TextModel.GetColumnWidthsBeforeStart (glyphWidths, Viewport.X, out _, out int startIndex);
+            int middleWidth = Viewport.Width / 2;
+            int desiredInsertionX = Math.Clamp (Viewport.X + p.X, 0, r.Count);
+            int movementX = desiredInsertionX - _lastMouseInsertionPointX;
 
-            if (idx - Viewport.X >= r.Count)
+            _ = TextModel.GetColumnWidthsBeforeStart (glyphWidths, Viewport.X + p.X, out int clipOffset, out int newInsertionIndex);
+
+            if (newInsertionIndex < glyphWidths.Count
+                && glyphWidths [newInsertionIndex] > 2
+                && glyphWidths [newInsertionIndex] + clipOffset <= glyphWidths [newInsertionIndex] / 2)
             {
-                CurrentColumn = Math.Max (r.Count - Viewport.X - (ReadOnly ? 1 : 0), 0);
+                newInsertionIndex++;
+            }
+
+            if (newInsertionIndex >= r.Count || (IsSelecting && p.X >= Math.Max (Viewport.Width - 1, 0)))
+            {
+                Viewport = Viewport with { X = Math.Max (0, colsWidth - Viewport.Width + 1) };
+                CurrentColumn = Math.Max (r.Count - (ReadOnly ? 1 : 0), 0);
+            }
+            else if (Viewport.X + p.X == 0 || (IsSelecting && p.X == 0))
+            {
+                Viewport = Viewport with { X = CurrentColumn = 0 };
+            }
+            else if (IsSelecting && p.X > middleWidth && movementX > 0)
+            {
+                // Scroll right
+                int delta = p.X - middleWidth;
+                Viewport = Viewport with { X = Math.Max (Math.Min (Viewport.X + delta, Math.Max (0, colsWidth - Viewport.Width + 1)), Viewport.X) };
+                _lastMouseInsertionPointX = CurrentColumn = Math.Clamp (Viewport.X + p.X, 0, r.Count);
+            }
+            else if (IsSelecting && p.X < middleWidth && movementX < 0)
+            {
+                // Scroll left
+                int delta = middleWidth - p.X;
+                Viewport = Viewport with { X = Math.Min (Math.Max (0, Viewport.X - delta), Viewport.X) };
+                _lastMouseInsertionPointX = CurrentColumn = Math.Clamp (Viewport.X + p.X, 0, r.Count);
+            }
+            else if (IsSelecting)
+            {
+                _lastMouseInsertionPointX = CurrentColumn = Math.Min (Viewport.X + p.X, r.Count);
+            }
+            else if (mouse.Flags == MouseFlags.LeftButtonClicked && (p.X == 0 || (p.X == 1 && glyphWidths [startIndex] > 1)) && Viewport.X > 0)
+            {
+                CurrentColumn = startIndex;
+                Viewport = Viewport with { X = TextModel.CalculateLeftColumn (r, Viewport.X, CurrentColumn, Viewport.Width, TabWidth) };
+                SetNeedsDraw ();
+            }
+            else if (mouse.Flags == MouseFlags.LeftButtonClicked
+                     && (p.X == Math.Max (Viewport.Width - 1, 0) || (p.X == Math.Max (Viewport.Width - 2, 0) && glyphWidths [startIndex + Math.Max (Viewport.Width - 2, 0)] > 1))
+                     && startIndex + p.X <= r.Count)
+            {
+                CurrentColumn = Math.Min (startIndex + p.X, r.Count);
+                Viewport = Viewport with { X = TextModel.CalculateLeftColumn (r, Viewport.X, CurrentColumn + 1, Viewport.Width, TabWidth) };
+                SetNeedsDraw ();
             }
             else
             {
-                CurrentColumn = idx + Viewport.X;
+                CurrentColumn = newInsertionIndex;
             }
         }
 

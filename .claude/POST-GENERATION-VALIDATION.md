@@ -115,7 +115,71 @@ public class MyClass
 
 **Rule:** 4 spaces per indentation level. NO tabs.
 
-## Part 2: Code Style Violations
+## Part 2: Control Flow Violations
+
+### Early Return / Guard Clauses ⚠️ COMMONLY VIOLATED
+
+```csharp
+// CORRECT ✓ — guard clause, return early
+if (view is null)
+{
+    return;
+}
+
+DoWork (view);
+
+// WRONG ✗ — happy path wrapped in conditional
+if (view is not null)
+{
+    DoWork (view);
+}
+
+// CORRECT ✓ — early return in lambda
+button.Accepting += (_, args) =>
+                    {
+                        if (_target is null)
+                        {
+                            return;
+                        }
+
+                        _target.DoWork ();
+                    };
+
+// WRONG ✗ — lambda body wrapped in conditional
+button.Accepting += (_, args) =>
+                    {
+                        if (_target is not null)
+                        {
+                            _target.DoWork ();
+                        }
+                    };
+
+// CORRECT ✓ — continue in loop
+foreach (View subView in SubViews)
+{
+    if (!subView.Visible)
+    {
+        continue;
+    }
+
+    subView.Draw ();
+}
+
+// WRONG ✗ — loop body wrapped in conditional
+foreach (View subView in SubViews)
+{
+    if (subView.Visible)
+    {
+        subView.Draw ();
+    }
+}
+```
+
+**Scan pattern:** Look for `if (condition) { ... } return` — the `if` block likely wraps happy-path code and should be inverted into a guard clause.
+
+**Rule:** ALWAYS invert conditions and return/continue early. NEVER wrap the happy path in a conditional. See `.claude/rules/early-return.md` for full guidance.
+
+## Part 3: Code Style Violations
 
 ### No `var` for Non-Built-In Types
 ```csharp

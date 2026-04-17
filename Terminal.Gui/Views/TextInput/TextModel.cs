@@ -13,15 +13,35 @@ internal class TextModel
     private List<List<Cell>> _lines = [];
     private (Point startPointToFind, Point currentPointToFind, bool found) _toFind;
 
+    // Cached max visible line width to avoid O(N×L) rescans on every layout/scroll.
+    private int _cachedMaxWidth = -1;
+    private int _cachedMaxWidthTabWidth = -1;
+
+    /// <summary>
+    ///     Gets the number of times <see cref="GetMaxVisibleLine"/> performed a full line scan.
+    ///     Used for performance testing. Reset via <see cref="ResetMaxVisibleLineCallCount"/>.
+    /// </summary>
+    internal int MaxVisibleLineScanCount { get; private set; }
+
     /// <summary>The number of text lines in the model</summary>
     public int Count => _lines.Count;
 
     public string? FilePath { get; set; }
 
+    /// <summary>Resets the <see cref="MaxVisibleLineScanCount"/> counter to zero.</summary>
+    internal void ResetMaxVisibleLineCallCount () => MaxVisibleLineScanCount = 0;
+
+    /// <summary>Invalidates the cached max line width so the next call to <see cref="GetMaxVisibleLine"/> will rescan.</summary>
+    internal void InvalidateMaxWidthCache () => _cachedMaxWidth = -1;
+
     /// <summary>Adds a line to the model at the specified position.</summary>
     /// <param name="pos">Line number where the line will be inserted.</param>
     /// <param name="cells">The line of text and color, as a List of Cell.</param>
-    public void AddLine (int pos, List<Cell> cells) { _lines.Insert (pos, cells); }
+    public void AddLine (int pos, List<Cell> cells)
+    {
+        _lines.Insert (pos, cells);
+        InvalidateMaxWidthCache ();
+    }
 
     public bool CloseFile ()
     {
@@ -32,11 +52,12 @@ internal class TextModel
 
         FilePath = null;
         _lines = [];
+        InvalidateMaxWidthCache ();
 
         return true;
     }
 
-    public List<List<Cell>> GetAllLines () { return _lines; }
+    public List<List<Cell>> GetAllLines () => _lines;
 
     /// <summary>Returns the specified line as a List of Rune</summary>
     /// <returns>The line.</returns>
@@ -64,19 +85,33 @@ internal class TextModel
     /// <param name="tabWidth">The tab width.</param>
     public int GetMaxVisibleLine (int first, int last, int tabWidth)
     {
+        // Return cached value if scanning the full range and cache is valid
+        if (first == 0 && last >= _lines.Count && _cachedMaxWidth >= 0 && _cachedMaxWidthTabWidth == tabWidth)
+        {
+            return _cachedMaxWidth;
+        }
+
+        MaxVisibleLineScanCount++;
+
         var maxLength = 0;
         last = last < _lines.Count ? last : _lines.Count;
 
         for (int i = first; i < last; i++)
         {
             List<Cell> line = GetLine (i);
-            int tabSum = line.Sum (c => c.Grapheme == "\t" ? Math.Max (tabWidth - 1, 0) : 0);
-            int l = line.Count + tabSum;
+            int colsWidth = CursorColumn (CellsToStringList (line), line.Count, tabWidth, out _, out _);
 
-            if (l > maxLength)
+            if (colsWidth > maxLength)
             {
-                maxLength = l;
+                maxLength = colsWidth;
             }
+        }
+
+        // Cache the result when scanning the full range
+        if (first == 0 && last >= _lines.Count)
+        {
+            _cachedMaxWidth = maxLength;
+            _cachedMaxWidthTabWidth = tabWidth;
         }
 
         return maxLength;
@@ -99,6 +134,7 @@ internal class TextModel
     {
         _lines = cellsList;
         SetAttributes (attribute);
+        InvalidateMaxWidthCache ();
         OnLinesLoaded ();
     }
 
@@ -106,6 +142,7 @@ internal class TextModel
     {
         _lines = Cell.ToCells (cells);
         SetAttributes (attribute);
+        InvalidateMaxWidthCache ();
         OnLinesLoaded ();
     }
 
@@ -146,12 +183,14 @@ internal class TextModel
 
         buff.Dispose ();
 
+        InvalidateMaxWidthCache ();
         OnLinesLoaded ();
     }
 
     public void LoadString (string content)
     {
         _lines = Cell.StringToLinesOfCells (content);
+        InvalidateMaxWidthCache ();
 
         OnLinesLoaded ();
     }
@@ -170,7 +209,7 @@ internal class TextModel
             }
         }
 
-        return new Key () { AssociatedText = grapheme };
+        return new Key { AssociatedText = grapheme };
     }
 
     internal static IEnumerable<string> GetInsertableGraphemes (string text)
@@ -193,6 +232,7 @@ internal class TextModel
             }
 
             _lines.RemoveAt (pos);
+            InvalidateMaxWidthCache ();
         }
     }
 
@@ -206,6 +246,8 @@ internal class TextModel
         {
             _lines.Add (runes);
         }
+
+        InvalidateMaxWidthCache ();
     }
 
     public override string ToString ()
@@ -227,7 +269,7 @@ internal class TextModel
 
     private static bool ContainsInvalidSurrogate (string text)
     {
-        for (int i = 0; i < text.Length; i++)
+        for (var i = 0; i < text.Length; i++)
         {
             char current = text [i];
 
@@ -335,8 +377,7 @@ internal class TextModel
                         nRow = fromRow;
                     }
 
-                    if ((!Rune.IsWhiteSpace (nRune) && Rune.IsWhiteSpace (rune))
-                        || (Rune.IsWhiteSpace (nRune) && !Rune.IsWhiteSpace (rune)))
+                    if ((!Rune.IsWhiteSpace (nRune) && Rune.IsWhiteSpace (rune)) || (Rune.IsWhiteSpace (nRune) && !Rune.IsWhiteSpace (rune)))
                     {
                         return;
                     }
@@ -369,19 +410,16 @@ internal class TextModel
                     List<Cell> line = GetLine (nRow);
                     var firstRune = Rune.GetRuneAt (line [0].Grapheme, 0);
 
-                    if (nCol == 0
-                        && nRow == fromRow
-                        && (Rune.IsLetterOrDigit (firstRune) || Rune.IsPunctuation (firstRune) || Rune.IsSymbol (firstRune)))
+                    if (nCol == 0 && nRow == fromRow && (Rune.IsLetterOrDigit (firstRune) || Rune.IsPunctuation (firstRune) || Rune.IsSymbol (firstRune)))
                     {
                         return;
                     }
 
-                    lastValidCol =
-                        (IsSameRuneType (nRune, runeType, useSameRuneType) && Rune.IsLetterOrDigit (nRune))
-                        || Rune.IsPunctuation (nRune)
-                        || Rune.IsSymbol (nRune)
-                            ? nCol
-                            : lastValidCol;
+                    lastValidCol = (IsSameRuneType (nRune, runeType, useSameRuneType) && Rune.IsLetterOrDigit (nRune))
+                                   || Rune.IsPunctuation (nRune)
+                                   || Rune.IsSymbol (nRune)
+                                       ? nCol
+                                       : lastValidCol;
 
                     if (lastValidCol > -1 && Rune.IsWhiteSpace (nRune))
                     {
@@ -527,7 +565,7 @@ internal class TextModel
         }
 
         if (startCol > 0
-            && StringExtensions.ToString (line.GetRange (startCol, col - startCol).Select (c => c.Grapheme).ToList ()).Trim () == ""
+            && StringExtensions.ToString (line.GetRange (startCol, Math.Max (col - startCol, 0)).Select (c => c.Grapheme).ToList ()).Trim () == ""
             && (col - startCol > 1 || (col - startCol > 0 && line [startCol - 1].Grapheme == " ")))
         {
             while (startCol > 0 && line [startCol - 1].Grapheme == " ")
@@ -571,6 +609,13 @@ internal class TextModel
 
     internal static int CalculateLeftColumn (List<Cell> t, int start, int end, int width, int tabWidth = 0)
     {
+        List<string> strings = CellsToStringList (t);
+
+        return CalculateLeftColumn (strings, start, end, width, tabWidth);
+    }
+
+    internal static List<string> CellsToStringList (List<Cell> t)
+    {
         List<string> strings = [];
 
         foreach (Cell cell in t)
@@ -578,7 +623,7 @@ internal class TextModel
             strings.Add (cell.Grapheme);
         }
 
-        return CalculateLeftColumn (strings, start, end, width, tabWidth);
+        return strings;
     }
 
     // Returns the left column in a range of the string.
@@ -589,48 +634,167 @@ internal class TextModel
             return 0;
         }
 
-        var size = 0;
-        int tCount = end > t.Count - 1 ? t.Count - 1 : end;
-        var col = 0;
+        // 1. Calculate absolute cursor position and store each glyph width
+        int cursorColumn = CursorColumn (t, end, tabWidth, out List<int> glyphWidths, out List<int> excludedGlyphWidths);
+        _ = GetColumnWidthsBeforeStart (glyphWidths, Math.Max (start, 0), out _, out int startIndex);
 
-        for (int i = tCount; i >= 0; i--)
+        // 2. LEFT NAVIGATION (Location 0 jump)
+        if (Math.Min (end, t.Count) > 0 && (Math.Min (end, t.Count) <= startIndex || Math.Max (width, 0) > cursorColumn))
         {
-            string text = t [i];
-            size += text.GetColumns (false);
+            int maxGlyphWith = MaxGlyphWith (Math.Max (startIndex - 1, 0), -1);
 
-            if (text == "\t")
+            if (cursorColumn - 1 > Math.Max (start, 0) - maxGlyphWith)
             {
-                size += tabWidth + 1;
+                return Math.Max (Math.Max (start, 0) - maxGlyphWith, 0);
             }
 
-            if (size > width)
-            {
-                if (col + width == end)
-                {
-                    col++;
-                }
-
-                break;
-            }
-
-            if ((end < t.Count && col > 0 && start < end && col == start) || end - col == width - 1)
-            {
-                break;
-            }
-
-            col = i;
+            return Math.Max (cursorColumn - 1, 0);
         }
 
-        return col;
+        // 3. RIGHT NAVIGATION / END KEY
+        if (cursorColumn >= Math.Max (start, 0) + Math.Max (width, 0)
+            || cursorColumn - Math.Max (width, 0) >= 0
+            || cursorColumn < Math.Max (start, 0) + Math.Max (width, 0))
+        {
+            // Standard right-line navigation
+            int startCol = cursorColumn - Math.Max (width, 0);
+
+            if (startCol < 0)
+            {
+                return 0;
+            }
+
+            _ = GetColumnWidthsBeforeStart (glyphWidths, startCol, out int clipOffset, out startIndex);
+            int maxGlyphWith = MaxGlyphWith (startIndex - clipOffset, 1);
+
+            if (cursorColumn + maxGlyphWith < startCol + Math.Max (width, 0))
+            {
+                return startCol;
+            }
+
+            if (cursorColumn + 1 <= Math.Min (end, t.Count) + maxGlyphWith)
+            {
+                return Math.Max (0, Math.Max (startCol, 0) + maxGlyphWith + clipOffset);
+            }
+
+            return startCol + 1;
+        }
+
+        return Math.Max (start, 0);
+
+        int MaxGlyphWith (int startIdx, int direction)
+        {
+            int glyphIdx = startIdx;
+            var startGlyphWith = 1;
+            var lastGlyphWith = 1;
+
+            if (direction == -1)
+            {
+                startGlyphWith = glyphIdx < glyphWidths.Count ? glyphWidths [glyphIdx] : 1;
+            }
+            else if (startIdx > 0)
+            {
+                startGlyphWith = glyphIdx < glyphWidths.Count ? glyphWidths [glyphIdx] : 1;
+            }
+
+            glyphIdx = startIndex + direction + Math.Max (width, 0);
+
+            if (glyphIdx < glyphWidths.Count)
+            {
+                lastGlyphWith = glyphWidths [glyphIdx];
+            }
+            else if (excludedGlyphWidths.Count > 0)
+            {
+                if (direction == -1)
+                {
+                    glyphIdx -= glyphWidths.Count - direction;
+                }
+                else
+                {
+                    glyphIdx -= glyphWidths.Count + direction;
+                }
+                lastGlyphWith = glyphIdx > -1 && glyphIdx < excludedGlyphWidths.Count ? excludedGlyphWidths [glyphIdx] : 1;
+            }
+
+            int maxGlyphWith = Math.Max (startGlyphWith, lastGlyphWith);
+
+            return maxGlyphWith;
+        }
     }
 
-    internal static (int size, int length) DisplaySize (
-        List<Cell> t,
-        int start = -1,
-        int end = -1,
-        bool checkNextText = true,
-        int tabWidth = 0
-    )
+    internal static int CursorColumn (List<string> t, int end, int tabWidth, out List<int> glyphWidths, out List<int> excludedGlyphWidths)
+    {
+        var cursorColumn = 0;
+        glyphWidths = [];
+        excludedGlyphWidths = [];
+
+        // Calculate absolute cursor position and store each glyph width
+        for (var i = 0; i < t.Count; i++)
+        {
+            int gWidth = t [i] == "\t"
+
+                             // Calculate columns to next tab stop
+                             // Tab stops are at multiples of TabWidth (0, 4, 8, 12, ...)
+                             // If we're at visual column col, advance to next tab stop
+                             ? tabWidth > 0
+                                   ? Math.Max (tabWidth, 0) - cursorColumn % Math.Max (tabWidth, 0)
+
+                                   // When TabWidth is 0, tabs are invisible (0 columns)
+                                   : 0
+
+                             // Ensures that cols less than 0 to be 1 because it will be converted to a printable rune
+                             : Math.Max (t [i].GetColumns (), 1);
+
+            if (i >= Math.Min (end, t.Count))
+            {
+                excludedGlyphWidths.Add (gWidth);
+
+                continue;
+            }
+
+            glyphWidths.Add (gWidth);
+            cursorColumn += gWidth;
+        }
+
+        return cursorColumn;
+    }
+
+    internal static int GetColumnWidthsBeforeStart (List<int>? glyphsWidths, int start, out int clipOffset, out int startIndex)
+    {
+        clipOffset = 0;
+        startIndex = 0;
+
+        if (glyphsWidths == null || glyphsWidths.Count == 0 || start <= 0)
+        {
+            return 0;
+        }
+
+        var sum = 0;
+        var prev = 0;
+
+        for (var i = 0; i < glyphsWidths.Count; i++)
+        {
+            sum += glyphsWidths [i];
+
+            if (sum > start)
+            {
+                clipOffset = prev - start;
+                startIndex = i;
+
+                return prev;
+            }
+
+            prev = sum;
+        }
+
+        // If start is beyond the line
+        clipOffset = sum - start;
+        startIndex = glyphsWidths.Count;
+
+        return sum;
+    }
+
+    internal static (int size, int length) DisplaySize (List<Cell> t, int start = -1, int end = -1, bool checkNextText = true, int tabWidth = 0)
     {
         List<string> strings = new ();
 
@@ -643,13 +807,7 @@ internal class TextModel
     }
 
     // Returns the size and length in a range of the string.
-    internal static (int size, int length) DisplaySize (
-        List<string> t,
-        int start = -1,
-        int end = -1,
-        bool checkNextRune = true,
-        int tabWidth = 0
-    )
+    internal static (int size, int length) DisplaySize (List<string> t, int start = -1, int end = -1, bool checkNextRune = true, int tabWidth = 0)
     {
         if (t.Count == 0)
         {
@@ -659,25 +817,24 @@ internal class TextModel
         var size = 0;
         var len = 0;
 
-        int tCount = end == -1 ? t.Count :
-                     end > t.Count ? t.Count : end;
-        int i = start == -1 ? 0 : start;
+        int tCount = end <= -1 ? t.Count : end > t.Count ? t.Count : end;
+        int i = start <= -1 ? 0 : start;
 
         for (; i < tCount; i++)
         {
             string text = t [i];
-            int colWidth = text.GetColumns (false);
+            int colWidth = text.GetColumns ();
             size += colWidth;
             len += text.Length;
 
-            if (text == "\t")
+            if (text == "\t" && tabWidth > 0)
             {
-                size += tabWidth + 1;
+                size += tabWidth - size % tabWidth;
                 len += tabWidth - 1;
             }
-            else if (colWidth == -1)
+            else if (colWidth < 1)
             {
-                size += 2; // -1+2=1
+                size += 1;
             }
 
             if (checkNextRune && i == tCount - 1 && t.Count > tCount && IsWideText (t [i + 1], tabWidth, out int s, out int l))
@@ -687,6 +844,8 @@ internal class TextModel
             }
         }
 
+        return (size, len);
+
         bool IsWideText (string s1, int tWidth, out int s, out int l)
         {
             s = s1.GetColumns ();
@@ -694,29 +853,15 @@ internal class TextModel
 
             if (s1 == "\t")
             {
-                s += tWidth + 1;
+                s += tabWidth - s % tabWidth;
                 l += tWidth - 1;
             }
 
             return s > 1;
         }
-
-        return (size, len);
     }
 
-    internal Size GetDisplaySize ()
-    {
-        var size = Size.Empty;
-
-        return size;
-    }
-
-    internal (Point current, bool found) FindNextText (
-        string text,
-        out bool gaveFullTurn,
-        bool matchCase = false,
-        bool matchWholeWord = false
-    )
+    internal (Point current, bool found) FindNextText (string text, out bool gaveFullTurn, bool matchCase = false, bool matchWholeWord = false)
     {
         if (string.IsNullOrEmpty (text) || _lines.Count == 0)
         {
@@ -730,23 +875,11 @@ internal class TextModel
             _toFind.currentPointToFind.X++;
         }
 
-        (Point current, bool found) foundPos = GetFoundNextTextPoint (
-                                                                      text,
-                                                                      _lines.Count,
-                                                                      matchCase,
-                                                                      matchWholeWord,
-                                                                      _toFind.currentPointToFind
-                                                                     );
+        (Point current, bool found) foundPos = GetFoundNextTextPoint (text, _lines.Count, matchCase, matchWholeWord, _toFind.currentPointToFind);
 
         if (!foundPos.found && _toFind.currentPointToFind != _toFind.startPointToFind)
         {
-            foundPos = GetFoundNextTextPoint (
-                                              text,
-                                              _toFind.startPointToFind.Y + 1,
-                                              matchCase,
-                                              matchWholeWord,
-                                              Point.Empty
-                                             );
+            foundPos = GetFoundNextTextPoint (text, _toFind.startPointToFind.Y + 1, matchCase, matchWholeWord, Point.Empty);
         }
 
         gaveFullTurn = ApplyToFind (foundPos);
@@ -754,12 +887,7 @@ internal class TextModel
         return foundPos;
     }
 
-    internal (Point current, bool found) FindPreviousText (
-        string text,
-        out bool gaveFullTurn,
-        bool matchCase = false,
-        bool matchWholeWord = false
-    )
+    internal (Point current, bool found) FindPreviousText (string text, out bool gaveFullTurn, bool matchCase = false, bool matchWholeWord = false)
     {
         if (string.IsNullOrEmpty (text) || _lines.Count == 0)
         {
@@ -775,23 +903,11 @@ internal class TextModel
 
         int linesCount = _toFind.currentPointToFind.IsEmpty ? _lines.Count - 1 : _toFind.currentPointToFind.Y;
 
-        (Point current, bool found) foundPos = GetFoundPreviousTextPoint (
-                                                                          text,
-                                                                          linesCount,
-                                                                          matchCase,
-                                                                          matchWholeWord,
-                                                                          _toFind.currentPointToFind
-                                                                         );
+        (Point current, bool found) foundPos = GetFoundPreviousTextPoint (text, linesCount, matchCase, matchWholeWord, _toFind.currentPointToFind);
 
         if (!foundPos.found && _toFind.currentPointToFind != _toFind.startPointToFind)
         {
-            foundPos = GetFoundPreviousTextPoint (
-                                                  text,
-                                                  _lines.Count - 1,
-                                                  matchCase,
-                                                  matchWholeWord,
-                                                  new (_lines [^1].Count, _lines.Count)
-                                                 );
+            foundPos = GetFoundPreviousTextPoint (text, _lines.Count - 1, matchCase, matchWholeWord, new Point (_lines [^1].Count, _lines.Count));
         }
 
         gaveFullTurn = ApplyToFind (foundPos);
@@ -820,32 +936,29 @@ internal class TextModel
 
         int size = start;
         int pX = x + start;
+        _ = CursorColumn (t, t.Count, tabWidth, out List<int> glyphWidths, out _);
+        _ = GetColumnWidthsBeforeStart (glyphWidths, start, out _, out int startIndex);
 
-        for (int i = start; i < t.Count; i++)
+        for (int i = startIndex; i < t.Count; i++)
         {
             string s = t [i];
             size += s.GetColumns ();
 
             if (s == "\t")
             {
-                size += tabWidth + 1;
+                size += tabWidth - size % tabWidth;
             }
 
-            if (i == pX || size > pX)
+            if (i == pX)
             {
-                return i - start;
+                return i - startIndex;
             }
         }
 
-        return t.Count - start;
+        return t.Count - startIndex;
     }
 
-    internal (Point current, bool found) ReplaceAllText (
-        string text,
-        bool matchCase = false,
-        bool matchWholeWord = false,
-        string? textToReplace = null
-    )
+    internal (Point current, bool found) ReplaceAllText (string text, bool matchCase = false, bool matchWholeWord = false, string? textToReplace = null)
     {
         var found = false;
         var pos = Point.Empty;
@@ -879,7 +992,7 @@ internal class TextModel
                 _lines [i] = Cell.ToCellList (ReplaceText (x, textToReplace!, matchText, col));
                 x = _lines [i];
                 txt = GetText (x);
-                pos = new (col, i);
+                pos = new Point (col, i);
                 col += textToReplace!.Length - matchText.Length;
 
                 if (col < 0 || col + 1 > txt.Length)
@@ -914,9 +1027,9 @@ internal class TextModel
         _toFind.found = false;
     }
 
-    internal static bool SetCol (ref int col, int width, int cols)
+    internal static bool SetCol (ref int col, int width, int cols, int viewportX = 0)
     {
-        if (col + cols > width)
+        if (col + cols - viewportX > width)
         {
             return false;
         }
@@ -949,6 +1062,7 @@ internal class TextModel
                 gaveFullTurn = true;
 
                 break;
+
             case false:
                 _toFind.startPointToFind = _toFind.currentPointToFind = foundPos.current;
                 _toFind.found = foundPos.found;
@@ -959,13 +1073,7 @@ internal class TextModel
         return gaveFullTurn;
     }
 
-    internal (Point current, bool found) GetFoundNextTextPoint (
-        string text,
-        int linesCount,
-        bool matchCase,
-        bool matchWholeWord,
-        Point start
-    )
+    internal (Point current, bool found) GetFoundNextTextPoint (string text, int linesCount, bool matchCase, bool matchWholeWord, Point start)
     {
         for (int i = start.Y; i < linesCount; i++)
         {
@@ -987,7 +1095,7 @@ internal class TextModel
 
             if (col > -1 && ((i == start.Y && col >= start.X) || i > start.Y) && txt.Contains (matchText))
             {
-                return (new (col, i), true);
+                return (new Point (col, i), true);
             }
 
             if (col == -1 && start.X > 0)
@@ -999,13 +1107,7 @@ internal class TextModel
         return (Point.Empty, false);
     }
 
-    internal (Point current, bool found) GetFoundPreviousTextPoint (
-        string text,
-        int linesCount,
-        bool matchCase,
-        bool matchWholeWord,
-        Point start
-    )
+    internal (Point current, bool found) GetFoundPreviousTextPoint (string text, int linesCount, bool matchCase, bool matchWholeWord, Point start)
     {
         for (int i = linesCount; i >= 0; i--)
         {
@@ -1029,8 +1131,9 @@ internal class TextModel
             {
                 case > -1 when matchWholeWord && !MatchWholeWord (txt, matchText, col):
                     continue;
+
                 case > -1 when ((i <= linesCount && col <= start.X) || i < start.Y) && txt.Contains (matchText):
-                    return (new (col, i), true);
+                    return (new Point (col, i), true);
             }
         }
 
@@ -1072,11 +1175,11 @@ internal class TextModel
         }
 
         return runeType switch
-        {
-            RuneType.IsSymbol or RuneType.IsPunctuation => rt is RuneType.IsSymbol or RuneType.IsPunctuation,
-            RuneType.IsWhiteSpace or RuneType.IsLetterOrDigit or RuneType.IsUnknown => rt == runeType,
-            _ => throw new ArgumentOutOfRangeException (nameof (runeType), runeType, null)
-        };
+               {
+                   RuneType.IsSymbol or RuneType.IsPunctuation => rt is RuneType.IsSymbol or RuneType.IsPunctuation,
+                   RuneType.IsWhiteSpace or RuneType.IsLetterOrDigit or RuneType.IsUnknown => rt == runeType,
+                   _ => throw new ArgumentOutOfRangeException (nameof (runeType), runeType, null)
+               };
     }
 
     internal static bool MatchWholeWord (string source, string matchText, int index = 0)
@@ -1113,8 +1216,7 @@ internal class TextModel
 
             prevRune = Rune.GetRuneAt (line [col - 1].Grapheme, 0);
 
-            if (!Rune.IsWhiteSpace (rune)
-                && (Rune.IsWhiteSpace (prevRune) || !IsSameRuneType (prevRune, GetRuneType (rune), useSameRuneType)))
+            if (!Rune.IsWhiteSpace (rune) && (Rune.IsWhiteSpace (prevRune) || !IsSameRuneType (prevRune, GetRuneType (rune), useSameRuneType)))
             {
                 return false;
             }
@@ -1148,9 +1250,7 @@ internal class TextModel
             rune = Rune.GetRuneAt (line [col].Grapheme, 0);
             var nextRune = Rune.GetRuneAt (line [col + 1].Grapheme, 0);
 
-            return (Rune.IsWhiteSpace (rune)
-                    || Rune.IsWhiteSpace (nextRune)
-                    || IsSameRuneType (nextRune, GetRuneType (rune), useSameRuneType))
+            return (Rune.IsWhiteSpace (rune) || Rune.IsWhiteSpace (nextRune) || IsSameRuneType (nextRune, GetRuneType (rune), useSameRuneType))
                    && (!Rune.IsWhiteSpace (rune) || Rune.IsWhiteSpace (nextRune));
         }
 
@@ -1159,14 +1259,14 @@ internal class TextModel
         return false;
     }
 
-    internal void OnLinesLoaded () { LinesLoaded?.Invoke (this, EventArgs.Empty); }
+    internal void OnLinesLoaded () => LinesLoaded?.Invoke (this, EventArgs.Empty);
 
     internal static string ReplaceText (List<Cell> source, string textToReplace, string matchText, int col)
     {
         var origTxt = Cell.ToString (source);
         (_, int len) = DisplaySize (source, 0, col, false);
         (_, int len2) = DisplaySize (source, col, col + matchText.Length, false);
-        (_, int len3) = DisplaySize (source, col + matchText.Length, origTxt.GetRuneCount (), false);
+        (_, int len3) = DisplaySize (source, col + matchText.Length, GraphemeHelper.GetGraphemeCount (origTxt), false);
 
         return string.Concat (origTxt.AsSpan () [..len], textToReplace, origTxt.AsSpan (len + len2, len3));
     }

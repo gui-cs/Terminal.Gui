@@ -26,7 +26,7 @@ public class MessageBoxTests
                 switch (iteration)
                 {
                     case 1:
-                        result = MessageBox.Query (app, string.Empty, string.Empty, 0, false, "btn0", "btn1");
+                        result = MessageBox.Query (app, string.Empty, string.Empty, false, "btn0", "btn1");
                         app.RequestStop ();
 
                         break;
@@ -98,6 +98,94 @@ public class MessageBoxTests
     {
         yield return [Key.Enter];
         yield return [Key.Space];
+    }
+
+    // Copilot
+    [Fact]
+    public void Query_Uses_Last_Button_As_Default ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        try
+        {
+            int? result = null;
+            var iteration = 0;
+
+            app.Iteration += OnApplicationOnIteration;
+            result = MessageBox.Query (app, "hey", "IsDefault", Strings.btnNo, Strings.btnYes);
+            app.Iteration -= OnApplicationOnIteration;
+
+            Assert.Null (result);
+
+            void OnApplicationOnIteration (object? sender, EventArgs<IApplication?> args)
+            {
+                iteration++;
+
+                if (iteration != 1)
+                {
+                    return;
+                }
+
+                Dialog dialog = (Dialog)app.TopRunnableView!;
+                Button [] buttons = dialog.Buttons;
+
+                Assert.False (buttons [0].IsDefault);
+                Assert.True (buttons [1].IsDefault);
+                Assert.Same (buttons [1], dialog.DefaultAcceptView);
+                Assert.True (buttons [1].HasFocus);
+
+                app.RequestStop ();
+            }
+        }
+        finally
+        {
+            app.Dispose ();
+        }
+    }
+
+    // Copilot
+    [Fact]
+    public void ErrorQuery_Uses_Last_Button_As_Default ()
+    {
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        try
+        {
+            int? result = null;
+            var iteration = 0;
+
+            app.Iteration += OnApplicationOnIteration;
+            result = MessageBox.ErrorQuery (app, "Error", "Message", Strings.btnNo, Strings.btnYes);
+            app.Iteration -= OnApplicationOnIteration;
+
+            Assert.Null (result);
+
+            void OnApplicationOnIteration (object? sender, EventArgs<IApplication?> args)
+            {
+                iteration++;
+
+                if (iteration != 1)
+                {
+                    return;
+                }
+
+                Dialog dialog = (Dialog)app.TopRunnableView!;
+                Button [] buttons = dialog.Buttons;
+
+                Assert.False (buttons [0].IsDefault);
+                Assert.True (buttons [1].IsDefault);
+                Assert.Same (buttons [1], dialog.DefaultAcceptView);
+                Assert.True (buttons [1].HasFocus);
+
+                app.RequestStop ();
+            }
+        }
+        finally
+        {
+            app.Dispose ();
+        }
     }
 
     // Claude - Opus 4.5

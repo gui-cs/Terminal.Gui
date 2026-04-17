@@ -50,7 +50,7 @@ public class DropDownListTests (ITestOutputHelper output)
         // Claude - Opus 4.6
         DropDownList dropdown = new ();
 
-        Assert.True (dropdown.MouseBindings.TryGet (MouseFlags.LeftButtonClicked, out _));
+        Assert.True (dropdown.MouseBindings.TryGet (MouseFlags.LeftButtonPressed, out _));
     }
 
     [Fact]

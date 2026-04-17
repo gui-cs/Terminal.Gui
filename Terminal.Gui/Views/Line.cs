@@ -44,7 +44,6 @@ namespace Terminal.Gui.Views;
 public class Line : View, IOrientation
 {
     private readonly OrientationHelper _orientationHelper;
-    private LineStyle _style = LineStyle.Single;
     private Dim _length;
 
     /// <summary>
@@ -60,7 +59,7 @@ public class Line : View, IOrientation
         base.SuperViewRendersLineCanvas = true;
 
         // ReSharper disable once UseObjectOrCollectionInitializer
-        _orientationHelper = new (this);
+        _orientationHelper = new OrientationHelper (this);
         _orientationHelper.Orientation = Orientation.Horizontal;
 
         // Set default dimensions for horizontal orientation
@@ -119,14 +118,33 @@ public class Line : View, IOrientation
     /// </remarks>
     public LineStyle Style
     {
-        get => _style;
+        get;
         set
         {
-            if (_style != value)
+            if (field == value)
             {
-                _style = value;
-                SetNeedsDraw ();
+                return;
             }
+            field = value;
+            SetNeedsDraw ();
+        }
+    } = LineStyle.Single;
+
+    /// <summary>
+    ///     Gets or sets an optional <see cref="Attribute"/> used to render the line.
+    /// </summary>
+    /// <remarks>
+    ///     When <see langword="null"/> (the default), the line is drawn using
+    ///     <see cref="View.GetAttributeForRole"/> with <see cref="VisualRole.Normal"/>.
+    ///     Set this to override the scheme-derived colors and text style.
+    /// </remarks>
+    public Attribute? LineAttribute
+    {
+        get;
+        set
+        {
+            field = value;
+            SetNeedsDraw ();
         }
     }
 
@@ -148,11 +166,7 @@ public class Line : View, IOrientation
     ///         resulting in the expected Width=1, Height=9.
     ///     </para>
     /// </remarks>
-    public Orientation Orientation
-    {
-        get => _orientationHelper.Orientation;
-        set => _orientationHelper.Orientation = value;
-    }
+    public Orientation Orientation { get => _orientationHelper.Orientation; set => _orientationHelper.Orientation = value; }
 
 #pragma warning disable CS0067 // The event is never used
     /// <inheritdoc/>
@@ -244,13 +258,7 @@ public class Line : View, IOrientation
         Point pos = ViewportToScreen (Viewport).Location;
         int length = Orientation == Orientation.Horizontal ? Frame.Width : Frame.Height;
 
-        LineCanvas.AddLine (
-                            pos,
-                            length,
-                            Orientation,
-                            Style,
-                            GetAttributeForRole(VisualRole.Normal)
-                           );
+        LineCanvas.AddLine (pos, length, Orientation, Style, LineAttribute ?? GetAttributeForRole (VisualRole.Normal));
 
         return true;
     }

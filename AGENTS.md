@@ -88,9 +88,8 @@ dotnet test --project Tests/UnitTestsParallelizable --no-build --filter-method "
 5. **Unused lambda params** - Use `_` discard: `(_, _) => { }`
 6. **Local functions** - Use PascalCase: `void MyLocalFunc ()`
 7. **Backing fields** - Place immediately before their property
-8. **Early return** - Prefer guard clauses over nested `if`/`else`
+8. **Early return / guard clauses (CRITICAL)** - ALWAYS prefer guard clauses over nested `if`/`else`. Invert the condition, return/continue early, keep happy path at lowest indentation. This applies to methods, lambdas, loops — everywhere. See [early-return.md](/.claude/rules/early-return.md) for detailed examples.
 9. **One type per file** - Public and internal types each get their own file
-10. **Prefer early exit `if`** - Reduce nesting and return early when using `if`
 
 ## Detailed Coding Rules
 
@@ -101,6 +100,7 @@ Consult these files in `.claude/rules/` before editing code:
 - [Collection Expressions](/.claude/rules/collection-expressions.md) - `[...]` syntax
 - [Terminology](/.claude/rules/terminology.md) - SubView/SuperView terms
 - [Event Patterns](/.claude/rules/event-patterns.md) - Lambdas, handlers, closures
+- [Early Return](/.claude/rules/early-return.md) - **Guard clauses, minimal nesting** (commonly violated!)
 - [CWP Pattern](/.claude/rules/cwp-pattern.md) - Cancellable Workflow Pattern
 - [Code Layout](/.claude/rules/code-layout.md) - Member ordering, backing fields
 - [Testing Patterns](/.claude/rules/testing-patterns.md) - Test writing conventions

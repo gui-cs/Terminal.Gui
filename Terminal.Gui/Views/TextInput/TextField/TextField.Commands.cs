@@ -172,7 +172,7 @@ public partial class TextField
                + cbTxt
                + StringExtensions.ToString (_text.GetRange (selStart + SelectedLength, _text.Count - (selStart + SelectedLength)));
 
-        _insertionPoint = Math.Min (selStart + cbTxt.GetRuneCount (), _text.Count);
+        _insertionPoint = Math.Min (selStart + GraphemeHelper.GetGraphemeCount (cbTxt), _text.Count);
         ClearAllSelection ();
         SetNeedsDraw ();
         Adjust ();

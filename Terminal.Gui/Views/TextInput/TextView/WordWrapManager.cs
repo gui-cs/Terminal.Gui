@@ -127,6 +127,7 @@ internal class WordWrapManager (TextModel model)
                              int col,
                              int startRow,
                              int startCol,
+                             int tabWidth,
                              bool preserveTrailingSpaces)
     {
         _isWrapModelRefreshing = true;
@@ -141,7 +142,7 @@ internal class WordWrapManager (TextModel model)
                    col,
                    startRow,
                    startCol,
-                   0,
+                   tabWidth,
                    preserveTrailingSpaces);
         _isWrapModelRefreshing = false;
     }
@@ -163,7 +164,6 @@ internal class WordWrapManager (TextModel model)
         int modelRow = _isWrapModelRefreshing ? row : GetModelLineFromWrappedLines (row);
         int modelCol = _isWrapModelRefreshing ? col : GetModelColFromWrappedLines (row, col);
         int modelStartRow = _isWrapModelRefreshing ? startRow : GetModelLineFromWrappedLines (startRow);
-
         int modelStartCol = _isWrapModelRefreshing ? startCol : GetModelColFromWrappedLines (startRow, startCol);
         var wrappedModel = new TextModel ();
         var lines = 0;
@@ -180,7 +180,7 @@ internal class WordWrapManager (TextModel model)
             List<Cell> line = Model.GetLine (i);
 
             List<List<Cell>> wrappedLines =
-                ToListRune (TextFormatter.Format (Cell.ToString (line), width, Alignment.Start, true, preserveTrailingSpaces, tabWidth));
+                ToListRune (TextFormatter.Format (Cell.ToString (line), width, Alignment.Start, true, preserveTrailingSpaces, tabWidth, preserveTabs: true));
 
             for (var j = 0; j < wrappedLines.Count; j++)
             {

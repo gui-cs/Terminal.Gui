@@ -344,4 +344,37 @@ public class LineTests : TestDriverBase
         Assert.Equal (9, line.Height.GetAnchor (0));
         Assert.Equal (line.Length, line.Height); // Length should be Height for vertical
     }
+
+    // Copilot
+    [Fact]
+    public void LineAttribute_Null_By_Default ()
+    {
+        Line line = new ();
+
+        Assert.Null (line.LineAttribute);
+    }
+
+    // Copilot
+    [Fact]
+    public void LineAttribute_Overrides_Scheme_Attribute ()
+    {
+        Attribute custom = new (Color.Red, Color.Blue);
+        Line line = new () { LineAttribute = custom };
+
+        Assert.Equal (custom, line.LineAttribute);
+    }
+
+    // Copilot
+    [Fact]
+    public void LineAttribute_Set_To_Null_Reverts_To_Scheme ()
+    {
+        Attribute custom = new (Color.Red, Color.Blue);
+        Line line = new () { LineAttribute = custom };
+
+        Assert.NotNull (line.LineAttribute);
+
+        line.LineAttribute = null;
+
+        Assert.Null (line.LineAttribute);
+    }
 }

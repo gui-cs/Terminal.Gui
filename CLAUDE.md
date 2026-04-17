@@ -45,6 +45,7 @@ See `.claude/rules/` for detailed guidance:
 - `target-typed-new.md` - Use `new ()` not `new TypeName()`
 - `terminology.md` - **SubView/SuperView**, never "child/parent"
 - `event-patterns.md` - Lambdas, closures, handlers
+- `early-return.md` - **Guard clauses, minimal nesting** (commonly violated!)
 - `collection-expressions.md` - Use `[...]` syntax
 - `cwp-pattern.md` - Cancellable Workflow Pattern
 - `code-layout.md` - Backing fields, member ordering
@@ -105,7 +106,7 @@ dotnet test --project Tests/UnitTests --no-build
 6. **Use `[...]`** not `new () { ... }` for collections
 7. **SubView/SuperView** for containment (Parent/Child only for non-containment refs)
 8. **Unused lambda params** - use `_`: `(_, _) => { }`
-9. **Early return** - Prefer guard clauses over nested `if`/`else`
+9. **Early return / guard clauses** - ALWAYS invert conditions and return/continue early. Never wrap the happy path in a conditional. Applies to methods, lambdas, and loops. See `.claude/rules/early-return.md`.
 10. **One type per file** - Public and internal types each get their own file
 
 ## Testing
@@ -133,6 +134,7 @@ dotnet test --project Tests/UnitTests --no-build
 - Don't use `var` for non-built-in types
 - Don't use redundant type names with `new`
 - Don't say "child/parent" for containment (use SubView/SuperView)
+- Don't wrap the happy path in a conditional — use guard clauses and return early
 - Don't modify unrelated code
 - Don't introduce new warnings
 - Don't skip POST-GENERATION-VALIDATION.md after writing code

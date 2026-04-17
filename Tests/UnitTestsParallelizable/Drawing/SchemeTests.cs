@@ -157,6 +157,7 @@ public class SchemeTests
         Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Editable, out _));
         Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.ReadOnly, out _));
         Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Disabled, out _));
+        Assert.False (scheme.TryGetExplicitlySetAttributeForRole (VisualRole.Code, out _));
     }
 
     [Fact]

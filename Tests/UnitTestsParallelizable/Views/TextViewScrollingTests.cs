@@ -413,4 +413,36 @@ public class TextViewScrollingTests
         Assert.True (wrappedHeight >= 3,
             $"Expected at least 3 wrapped lines for 50 chars in 20-width viewport, got {wrappedHeight}");
     }
+
+    [Fact]
+    public void WorldWrap_Typing_At_Middle_Of_Viewport_Y_Does_Not_Cause_Scroll_Up ()
+    {
+        // Arrange: TextView with content exceeding viewport height, WordWrap on
+        TextView tv = new ()
+        {
+            Width = 20,
+            Height = 5,
+            ScrollBars = true,
+            WordWrap = true,
+            Text = "Line 1\nLine 2\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10"
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.LayoutSubViews ();
+
+        // Scroll down to middle of content
+        tv.VerticalScrollBar.Value = 5;
+
+        // Move cursor to middle of viewport (simulate user clicking or navigating there)
+        tv.InsertionPoint = new Point (6, 7); // Column 6, Row 7 (middle of viewport)
+
+        Assert.Equal (5, tv.Viewport.Y);
+
+        // Act: Simulate typing at current cursor position (which is at the end of the line)
+        tv.NewKeyDownEvent (Key.A);
+
+        // Assert: Viewport should not scroll up - it should remain at the same Y position
+        Assert.Equal (5, tv.Viewport.Y);
+        Assert.Equal (new Point (7, 7), tv.InsertionPoint); // Cursor should move right by 1
+    }
 }

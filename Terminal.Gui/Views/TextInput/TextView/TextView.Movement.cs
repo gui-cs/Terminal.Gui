@@ -8,6 +8,11 @@ public partial class TextView
         CurrentRow = _model.Count - 1;
         List<Cell> line = GetCurrentLine ();
         CurrentColumn = line.Count;
+
+        if (CurrentRow >= Viewport.Y + Viewport.Height || CurrentColumn >= Viewport.X + Viewport.Width)
+        {
+            SetNeedsDraw ();
+        }
         TrackColumn ();
         DoNeededAction ();
 
@@ -18,9 +23,12 @@ public partial class TextView
     public bool MoveHome ()
     {
         CurrentRow = 0;
-        Viewport = Viewport with { Y = 0 };
         CurrentColumn = 0;
-        Viewport = Viewport with { X = 0 };
+
+        if (Viewport.Y > 0 || Viewport.X > 0)
+        {
+            SetNeedsDraw ();
+        }
         TrackColumn ();
         DoNeededAction ();
 
@@ -28,32 +36,41 @@ public partial class TextView
     }
 
     /// <summary>
-    ///     Will scroll the <see cref="TextView"/> to display the specified row at the top if <paramref name="isRow"/> is
-    ///     true or will scroll the <see cref="TextView"/> to display the specified column at the left if
-    ///     <paramref name="isRow"/> is false.
+    ///     Will scroll the <see cref="TextView"/> to display the specified row at the top by the <paramref name="position.Y"/>
+    ///     and will scroll the <see cref="TextView"/> to display the specified column at the left by the
+    ///     <paramref name="position.X"/>.
     /// </summary>
-    /// <param name="idx">
-    ///     Row that should be displayed at the top or Column that should be displayed at the left, if the value
+    /// <param name="position">
+    ///     The row that should be displayed at the top and the column that should be displayed at the left, if the value
     ///     is negative it will be reset to zero
     /// </param>
-    /// <param name="isRow">If true (default) the <paramref name="idx"/> is a row, column otherwise.</param>
-    public void ScrollTo (int idx, bool isRow = true)
+    /// <remarks>
+    ///     The <see cref="CurrentRow"/> and <see cref="CurrentColumn"/> will not be changed by this method.
+    /// </remarks>
+    public void ScrollTo (Point position)
     {
-        if (idx < 0)
+        if (position.X < 0)
         {
-            idx = 0;
+            position.X = 0;
         }
 
-        if (isRow)
+        if (position.Y < 0)
         {
-            Viewport = Viewport with { Y = Math.Max (idx > _model.Count - 1 ? _model.Count - 1 : idx, 0) };
+            position.Y = 0;
         }
-        else if (!_wordWrap)
+
+        int newPositionX = position.X;
+
+        if (!_wordWrap)
         {
             int maxlength = _model.GetMaxVisibleLine (Viewport.Y, Viewport.Y + Viewport.Height, TabWidth);
-            Viewport = Viewport with { X = Math.Max (!_wordWrap && idx > maxlength - 1 ? maxlength - 1 : idx, 0) };
+            newPositionX = Math.Max (position.X > maxlength - Viewport.Width ? maxlength - Viewport.Width + 1 : position.X, 0);
         }
 
+        Viewport = Viewport with
+        {
+            X = newPositionX, Y = Math.Max (position.Y > _model.Count - 1 - Viewport.Height ? _model.Count - Viewport.Height : position.Y, 0)
+        };
         PositionCursor ();
         SetNeedsDraw ();
     }
@@ -80,6 +97,8 @@ public partial class TextView
 
     private bool MoveDown ()
     {
+        List<Cell> line = GetCurrentLine ();
+
         if (CurrentRow + 1 < _model.Count)
         {
             if (_columnTrack == -1)
@@ -91,20 +110,29 @@ public partial class TextView
 
             if (CurrentRow >= Viewport.Y + Viewport.Height)
             {
-                Viewport = Viewport with { Y = Viewport.Y + 1 };
                 SetNeedsDraw ();
             }
 
             TrackColumn ();
-            PositionCursor ();
         }
         else if (CurrentRow > Viewport.Height)
         {
-            AdjustViewport ();
+            SetNeedsDraw ();
+        }
+        else if (CurrentRow == _model.Count - 1 && CurrentColumn < line.Count)
+        {
+            // Move to the last column of the last row
+            CurrentColumn = line.Count;
+
+            if (CurrentColumn > Viewport.X + Viewport.Width)
+            {
+                SetNeedsDraw ();
+            }
         }
         else
         {
-            return true;
+            // Let bubbled to the up hierarchy
+            return false;
         }
 
         DoNeededAction ();
@@ -116,6 +144,11 @@ public partial class TextView
     {
         List<Cell> currentLine = GetCurrentLine ();
         CurrentColumn = currentLine.Count;
+
+        if (CurrentColumn >= Viewport.X + Viewport.Width || TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _) - Viewport.X >= Viewport.Width)
+{
+            SetNeedsDraw ();
+        }
         DoNeededAction ();
 
         return true;
@@ -126,6 +159,11 @@ public partial class TextView
         if (CurrentColumn > 0)
         {
             CurrentColumn--;
+
+            if (Viewport.X > 0 && CurrentColumn <= Viewport.X)
+            {
+                SetNeedsDraw ();
+            }
         }
         else
         {
@@ -133,14 +171,13 @@ public partial class TextView
             {
                 CurrentRow--;
 
-                if (CurrentRow < Viewport.Y)
-                {
-                    Viewport = Viewport with { Y = Viewport.Y - 1 };
-                    SetNeedsDraw ();
-                }
-
                 List<Cell> currentLine = GetCurrentLine ();
                 CurrentColumn = Math.Max (currentLine.Count - (ReadOnly ? 1 : 0), 0);
+
+                if (CurrentRow < Viewport.Y || CurrentColumn > Viewport.Width)
+                {
+                    SetNeedsDraw ();
+                }
             }
             else
             {
@@ -161,15 +198,28 @@ public partial class TextView
         }
 
         CurrentColumn = 0;
-        Viewport = Viewport with { X = 0 };
         DoNeededAction ();
 
         return true;
     }
 
+    // MovePageDown and MovePageUp are a bit more complex than the other movement methods because they need to move the viewport as well as the cursor. The logic is as follows:
+    // 1. Determine the number of lines to move (nPageDnShift or nPageUpShift) based on the height of the viewport.
+    // 2. If the current row is within the bounds of the model, check if the column track is set. If not, set it to the current column.
+    // 3. For MovePageDown, check if the viewport can be moved down by nPageDnShift lines without exceeding the model count. If so, move the viewport down and set needs draw.
+    // 4. For MovePageUp, check if the viewport can be moved up by nPageUpShift lines without going below zero. If so, move the viewport up and set needs draw.
+    // 5. For MovePageDown, check if the current row can be moved down by nPageDnShift lines without exceeding the model count. If so, move the current row down. If not, move it to the last line of the model.
+    // 6. For MovePageUp, check if the current row can be moved up by nPageUpShift lines without going below zero. If so, move the current row up. If not, move it to the first line of the model.
+    // 7. Track the column and position the cursor.
+    // 8. Return true to indicate that the movement was handled.
+    // The logic for moving the viewport and the cursor is intertwined because when moving a page up or down, we want to ensure that the cursor remains visible within the viewport. Therefore, we need to adjust the viewport position accordingly when the cursor moves beyond the current viewport bounds.
+    // The use of the _columnTrack variable is to remember the column position when moving up or down, so that when we move back up or down, we can try to maintain the same column position if possible. This is a common behavior in text editors where moving up or down tries to keep the cursor in the same column if it can.
+    // The checks for whether to set needs draw are based on whether the viewport has actually changed. If the viewport position changes, we need to redraw the view to reflect the new visible lines. If the cursor moves outside the current viewport, we also need to redraw to ensure the cursor is visible.
+    // MovePageDown and MovePageUp are the only movement methods that does shouldn't call the DoNeededAction method because the AdjustViewport method may cause the viewport location to change with wrongly calculated values.
+
     private bool MovePageDown ()
     {
-        int nPageDnShift = Viewport.Height - 1;
+        int nPageDnShift = Viewport.Height;
 
         if (CurrentRow >= 0 && CurrentRow < _model.Count)
         {
@@ -178,26 +228,36 @@ public partial class TextView
                 _columnTrack = CurrentColumn;
             }
 
-            CurrentRow = CurrentRow + nPageDnShift > _model.Count ? _model.Count > 0 ? _model.Count - 1 : 0 : CurrentRow + nPageDnShift;
-
-            if (Viewport.Y < CurrentRow - nPageDnShift)
+            if (Viewport.Y < Viewport.Y + nPageDnShift && Viewport.Y < _model.Count - nPageDnShift)
             {
-                Viewport = Viewport with { Y = CurrentRow >= _model.Count ? CurrentRow - nPageDnShift : Viewport.Y + nPageDnShift };
+                Viewport = Viewport with
+                {
+                    Y = Viewport.Y + nPageDnShift >= _model.Count
+                            ? _model.Count - nPageDnShift
+                            : Math.Min (Viewport.Y + nPageDnShift - (nPageDnShift > 1 ? 1 : 0), _model.Count - nPageDnShift)
+                };
                 SetNeedsDraw ();
             }
 
+            if (CurrentRow + nPageDnShift < _model.Count)
+            {
+                CurrentRow = CurrentRow + nPageDnShift - (nPageDnShift > 1 ? 1 : 0);
+                SetNeedsDraw ();
+            }
+            else if (CurrentRow < _model.Count)
+            {
+                CurrentRow = _model.Count - 1;
+            }
             TrackColumn ();
             PositionCursor ();
         }
-
-        DoNeededAction ();
 
         return true;
     }
 
     private bool MovePageUp ()
     {
-        int nPageUpShift = Viewport.Height - 1;
+        int nPageUpShift = Viewport.Height;
 
         if (CurrentRow > 0)
         {
@@ -206,19 +266,24 @@ public partial class TextView
                 _columnTrack = CurrentColumn;
             }
 
-            CurrentRow = CurrentRow - nPageUpShift < 0 ? 0 : CurrentRow - nPageUpShift;
-
-            if (CurrentRow < Viewport.Y)
+            if (Viewport.Y > Viewport.Y - nPageUpShift)
             {
-                Viewport = Viewport with { Y = Viewport.Y - nPageUpShift < 0 ? 0 : Viewport.Y - nPageUpShift };
+                Viewport = Viewport with { Y = Viewport.Y - nPageUpShift < 0 ? 0 : Viewport.Y - nPageUpShift + (nPageUpShift > 1 ? 1 : 0) };
                 SetNeedsDraw ();
             }
 
+            if (CurrentRow - nPageUpShift >= 0)
+            {
+                CurrentRow = CurrentRow - nPageUpShift + (nPageUpShift > 1 ? 1 : 0);
+                SetNeedsDraw ();
+            }
+            else if (CurrentRow > 0)
+            {
+                CurrentRow = 0;
+            }
             TrackColumn ();
             PositionCursor ();
         }
-
-        DoNeededAction ();
 
         return true;
     }
@@ -230,6 +295,11 @@ public partial class TextView
         if (CurrentColumn < currentLine.Count)
         {
             CurrentColumn++;
+
+            if (CurrentColumn >= currentLine.Count || TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _) >= Viewport.Width)
+            {
+                SetNeedsDraw ();
+            }
         }
         else
         {
@@ -238,9 +308,8 @@ public partial class TextView
                 CurrentRow++;
                 CurrentColumn = 0;
 
-                if (CurrentRow >= Viewport.Y + Viewport.Height)
+                if (CurrentRow >= Viewport.Y + Viewport.Height || CurrentColumn < Viewport.X)
                 {
-                    Viewport = Viewport with { Y = Viewport.Y + 1 };
                     SetNeedsDraw ();
                 }
             }
@@ -288,16 +357,25 @@ public partial class TextView
 
             if (CurrentRow < Viewport.Y)
             {
-                Viewport = Viewport with { Y = Viewport.Y - 1 };
                 SetNeedsDraw ();
             }
 
             TrackColumn ();
-            PositionCursor ();
+        }
+        else if (CurrentRow == 0 && CurrentColumn > 0)
+        {
+            // Move to the first column of the first row
+            CurrentColumn = 0;
+
+            if (Viewport.X > 0)
+            {
+                SetNeedsDraw ();
+            }
         }
         else
         {
-            return true;
+            // Let bubbled to the up hierarchy
+            return false;
         }
 
         DoNeededAction ();
@@ -534,7 +612,6 @@ public partial class TextView
 
     private bool ProcessPageDown ()
     {
-        ResetColumnTrack ();
 
         if (_shiftSelecting && IsSelecting)
         {
@@ -546,7 +623,6 @@ public partial class TextView
 
     private bool ProcessPageDownExtend ()
     {
-        ResetColumnTrack ();
         StartSelecting ();
 
         return MovePageDown ();
@@ -554,7 +630,6 @@ public partial class TextView
 
     private bool ProcessPageUp ()
     {
-        ResetColumnTrack ();
 
         if (_shiftSelecting && IsSelecting)
         {
@@ -566,7 +641,6 @@ public partial class TextView
 
     private bool ProcessPageUpExtend ()
     {
-        ResetColumnTrack ();
         StartSelecting ();
 
         return MovePageUp ();

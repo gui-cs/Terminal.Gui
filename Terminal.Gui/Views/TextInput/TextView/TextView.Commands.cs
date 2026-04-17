@@ -108,7 +108,8 @@ public partial class TextView
         AddCommand (Command.Undo, () => Undo ());
         AddCommand (Command.Redo, () => Redo ());
 
-        AddCommand (Command.NextTabStop, () => ProcessTab ());
+        AddCommand (Command.NextTabStop, () => ProcessTab (true));
+        AddCommand (Command.PreviousTabStop, () => ProcessTab (false));
         AddCommand (Command.ToggleOverwrite, () => ProcessSetOverwrite ());
         AddCommand (Command.EnableOverwrite, () => SetOverwrite (true));
         AddCommand (Command.DisableOverwrite, () => SetOverwrite (false));
@@ -309,6 +310,8 @@ public partial class TextView
         }
 
         _historyText.Undo ();
+        SetNeedsDraw ();
+        AdjustViewport ();
 
         return true;
     }
@@ -431,7 +434,6 @@ public partial class TextView
             _historyText.Add ([[.. currentLine]], InsertionPoint);
 
             currentLine.RemoveAt (CurrentColumn - 1);
-            SetNeedsDraw ();
 
             if (_wordWrap)
             {
@@ -441,12 +443,6 @@ public partial class TextView
             CurrentColumn--;
 
             _historyText.Add ([[.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
-
-            if (CurrentColumn < Viewport.X)
-            {
-                Viewport = Viewport with { X = Viewport.X - 1 };
-            }
-            UpdateWrapModel ();
         }
         else
         {
@@ -469,7 +465,6 @@ public partial class TextView
             int prevCount = prevRow.Count;
             _model.GetLine (prowIdx).AddRange (GetCurrentLine ());
             _model.RemoveLine (CurrentRow);
-            SetNeedsDraw ();
 
             if (_wordWrap)
             {
@@ -481,8 +476,14 @@ public partial class TextView
             _historyText.Add ([GetCurrentLine ()], new Point (CurrentColumn, prowIdx), TextEditingLineStatus.Replaced);
 
             CurrentColumn = prevCount;
-            UpdateWrapModel ();
         }
+
+        // Always redraw and update content size because a glyph was deleted
+        SetNeedsDraw ();
+        UpdateContentSize ();
+
+        UpdateWrapModel ();
+        OnContentsChanged ();
 
         return true;
     }
@@ -945,7 +946,7 @@ public partial class TextView
 
         if (CurrentRow >= Viewport.Y + Viewport.Height)
         {
-            Viewport = Viewport with { Y = Viewport.Y + 1 };
+            SetNeedsDraw ();
         }
 
         CurrentColumn = 0;
@@ -954,7 +955,7 @@ public partial class TextView
 
         if (!_wordWrap && CurrentColumn < Viewport.X)
         {
-            Viewport = Viewport with { X = 0 };
+            SetNeedsDraw ();
         }
 
         SetNeedsDraw ();
@@ -989,7 +990,7 @@ public partial class TextView
         return SetOverwrite (!Used);
     }
 
-    private bool ProcessTab ()
+    private bool ProcessTab (bool addTab)
     {
         ResetColumnTrack ();
 
@@ -998,7 +999,23 @@ public partial class TextView
             return false;
         }
 
-        InsertText (new Key ((KeyCode)'\t'));
+        if (addTab)
+        {
+            InsertText (new Key ((KeyCode)'\t'));
+        }
+        else
+        {
+            List<Cell> line = GetCurrentLine ();
+
+            if (CurrentColumn - 1 > -1 && CurrentColumn - 1 < line.Count && line [CurrentColumn - 1].Grapheme == "\t")
+            {
+                DeleteTextLeft ();
+            }
+            else
+            {
+                return true;
+            }
+        }
         DoNeededAction ();
 
         return true;

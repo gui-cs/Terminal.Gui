@@ -130,7 +130,6 @@ public partial class TextView
                 return;
             }
             _isReadOnly = value;
-            CanFocus = !_isReadOnly;
 
             SetNeedsDraw ();
 
@@ -186,6 +185,7 @@ public partial class TextView
             {
                 _wrapManager = new WordWrapManager (_model);
                 _model = _wrapManager.WrapModel (Viewport.Width, out _, out _, out _, out _);
+                _lastWrapWidth = Viewport.Width;
             }
 
             OnTextChanged ();
@@ -222,6 +222,13 @@ public partial class TextView
     /// <param name="line">The intended line.</param>
     /// <returns></returns>
     public List<Cell> GetLine (int line) => _model.GetLine (line);
+
+    /// <summary>
+    ///     Gets the width in columns of the given <paramref name="line"/>.
+    /// </summary>
+    /// <param name="line">The intended line.</param>
+    /// <returns></returns>
+    public int GetColumnsWidth (List<Cell> line) => TextModel.CursorColumn (TextModel.CellsToStringList (line), line.Count, TabWidth, out _, out _);
 
     /// <summary>
     ///     Inserts the given <paramref name="toAdd"/> text at the current cursor position exactly as if the user had just
@@ -555,16 +562,19 @@ public partial class TextView
             {
                 Insert (new Cell { Grapheme = grapheme, Attribute = attribute });
                 CurrentColumn++;
-
-                if (CurrentColumn >= Viewport.X + Viewport.Width)
-                {
-                    Viewport = Viewport with { X = Viewport.X + 1 };
-                }
             }
             else
             {
                 Insert (new Cell { Grapheme = grapheme, Attribute = attribute });
                 CurrentColumn++;
+            }
+            UpdateContentSize ();
+            List<Cell> line = GetCurrentLine ();
+            (int size, int length) dSize = TextModel.DisplaySize (line, 0, CurrentColumn, true, TabWidth);
+
+            if (dSize.size + 1 - Viewport.X >= Viewport.Width)
+            {
+                SetNeedsDraw ();
             }
         }
 
@@ -585,7 +595,7 @@ public partial class TextView
 
         if (!_multiline && !IsInitialized)
         {
-            CurrentColumn = Text.GetRuneCount ();
+            CurrentColumn = GraphemeHelper.GetGraphemeCount (Text);
             Viewport = Viewport with { X = CurrentColumn > Viewport.Width + 1 ? CurrentColumn - Viewport.Width + 1 : 0 };
         }
 
@@ -653,11 +663,11 @@ public partial class TextView
 
             if (!replaceAll)
             {
-                CurrentColumn = _selectionStartColumn + text.GetRuneCount ();
+                CurrentColumn = _selectionStartColumn + GraphemeHelper.GetGraphemeCount (text);
             }
             else
             {
-                CurrentColumn = _selectionStartColumn + textToReplace!.GetRuneCount ();
+                CurrentColumn = _selectionStartColumn + GraphemeHelper.GetGraphemeCount (textToReplace!);
             }
 
             CurrentRow = foundPos.current.Y;
@@ -668,7 +678,7 @@ public partial class TextView
                 ClearSelectedRegion ();
                 InsertAllText (textToReplace!);
                 StartSelecting ();
-                _selectionStartColumn = CurrentColumn - textToReplace!.GetRuneCount ();
+                _selectionStartColumn = CurrentColumn - GraphemeHelper.GetGraphemeCount (textToReplace!);
             }
             else
             {
@@ -724,13 +734,17 @@ public partial class TextView
         }
         else if (_columnTrack != -1)
         {
-            CurrentColumn = _columnTrack;
+            System.Diagnostics.Debug.Assert (!(_columnTrack > line.Count));
+            CurrentColumn = _columnTrack > line.Count ? line.Count : _columnTrack;
         }
         else if (CurrentColumn > line.Count)
         {
             CurrentColumn = line.Count;
         }
 
-        AdjustViewport ();
+        if (CurrentColumn < Viewport.X || CurrentColumn > Viewport.Width + Viewport.X)
+        {
+            SetNeedsDraw ();
+        }
     }
 }

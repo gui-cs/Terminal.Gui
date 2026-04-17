@@ -6,7 +6,7 @@ public partial class TextField
     ///     Provides autocomplete context menu based on suggestions at the current cursor position. Configure
     ///     <see cref="ISuggestionGenerator"/> to enable this feature.
     /// </summary>
-    public IAutocomplete Autocomplete { get; set; }
+    public IAutocomplete? Autocomplete { get; set; }
 
     private void ProcessAutocomplete ()
     {
@@ -30,9 +30,9 @@ public partial class TextField
         List<Cell> currentLine = Cell.ToCellList (Text);
         int cursorPosition = Math.Min (InsertionPoint, currentLine.Count);
 
-        Autocomplete.Context = new AutocompleteContext (currentLine, cursorPosition, Autocomplete.Context?.Canceled ?? false);
+        Autocomplete?.Context = new AutocompleteContext (currentLine, cursorPosition, Autocomplete.Context?.Canceled ?? false);
 
-        Autocomplete.GenerateSuggestions (Autocomplete.Context);
+        Autocomplete?.GenerateSuggestions (Autocomplete.Context);
     }
 
     /// <inheritdoc/>
@@ -52,7 +52,7 @@ public partial class TextField
     protected override bool OnKeyDown (Key key)
     {
         // Give autocomplete first opportunity to respond to key presses
-        if (SelectedLength == 0 && Autocomplete.Suggestions.Count > 0 && Autocomplete.ProcessKey (key))
+        if (SelectedLength == 0 && Autocomplete?.Suggestions.Count > 0 && Autocomplete.ProcessKey (key))
         {
             return true;
         }
@@ -96,16 +96,16 @@ public partial class TextField
 
         if (SuperView is { })
         {
-            if (Autocomplete.HostControl is { })
+            if (Autocomplete?.HostControl is { })
             {
                 return;
             }
-            Autocomplete.HostControl = this;
-            Autocomplete.PopupInsideContainer = false;
+            Autocomplete?.HostControl = this;
+            Autocomplete?.PopupInsideContainer = false;
         }
         else
         {
-            Autocomplete.HostControl = null;
+            Autocomplete?.HostControl = null;
         }
     }
 }

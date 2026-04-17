@@ -155,7 +155,7 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///         of the View hierarchy (the top-most SuperView).
     ///     </para>
     /// </remarks>
-    public IApplication? App { get => GetApp (); internal set => _app = value; }
+    public IApplication? App { get => GetApp (); set => _app = value; }
 
     /// <summary>
     ///     Gets the <see cref="IApplication"/> instance this view is running in. Used internally to allow overrides by
@@ -302,6 +302,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
         UpdateTextDirection (TextDirection);
         UpdateTextFormatterText ();
 
+        // Force a layout each time a View is initialized
+        Layout ();
+
         foreach (View view in InternalSubViews)
         {
             if (!view.IsInitialized)
@@ -309,9 +312,6 @@ public partial class View : IDisposable, ISupportInitializeNotification
                 view.EndInit ();
             }
         }
-
-        // Force a layout each time a View is initialized
-        Layout ();
 
         // Complex layout scenarios (e.g. DimAuto and PosAlign) may require multiple layouts to be performed.
         // Thus, we call SetNeedsLayout() to ensure that the layout is performed at least once.
@@ -502,8 +502,9 @@ public partial class View : IDisposable, ISupportInitializeNotification
     ///         set <c>View.</c><see cref="TextFormatter.HotKeySpecifier"/> to the desired character.
     ///     </para>
     ///     <para>
-    ///         When <see cref="Border"/> is configured with <see cref="BorderSettings.Title"/> and <see cref="Border.Thickness"/>.
-    ///     <see cref="Thickness.Top"/> is greater than 0 the Title will be displayed.
+    ///         When <see cref="Border"/> is configured with <see cref="BorderSettings.Title"/> and
+    ///         <see cref="IAdornment.Thickness"/>.
+    ///         <see cref="Thickness.Top"/> is greater than 0 the Title will be displayed.
     ///     </para>
     ///     <para>
     ///         When <see cref="Border"/> is configured with <see cref="BorderSettings.TerminalTitle"/>, and the View is a

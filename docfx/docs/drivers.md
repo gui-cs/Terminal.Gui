@@ -267,7 +267,7 @@ The driver architecture employs a **multi-threaded design** for optimal responsi
 
 ```
 ┌─────────────────────────────────────────────┐
-│         IApplication.Init()              │
+│         IApplication.Init()                 │
 │  Creates MainLoopCoordinator<T> with        │
 │  ComponentFactory<T>                        │
 └────────────────┬────────────────────────────┘
@@ -276,8 +276,8 @@ The driver architecture employs a **multi-threaded design** for optimal responsi
                  │                  │                   │
         ┌────────▼────────┐ ┌──────▼─────────┐ ┌──────▼──────────┐
         │  Input Thread   │ │  Main UI Thread│ │ Driver          │
-        │                 │ │                 │ │   Facade        │
-        │ IInput   │ │ ApplicationMain│ │                 │
+        │                 │ │                │ │   Facade        │
+        │ IInput          │ │ ApplicationMain│ │                 │
         │ reads console   │ │ Loop processes │ │ Coordinates all │
         │ input async     │ │ events, layout,│ │ components      │
         │ into queue      │ │ and rendering  │ │                 │

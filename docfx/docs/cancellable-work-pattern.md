@@ -67,13 +67,13 @@ This flow repeats for each phase, allowing granular control over complex operati
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  ┌──────────────────────┐                                   │
-│  │ 1. Call Virtual      │──► returns true? ──► CANCELLED   │
+│  │ 1. Call Virtual      │──► returns true? ──► CANCELLED    │
 │  │    OnXxxExecuting()  │                                   │
 │  └──────────┬───────────┘                                   │
 │             │ returns false                                 │
 │             ▼                                               │
 │  ┌──────────────────────┐                                   │
-│  │ 2. Raise Event       │──► args.Cancel? ──► CANCELLED    │
+│  │ 2. Raise Event       │──► args.Cancel? ──► CANCELLED     │
 │  │    XxxExecuting      │                                   │
 │  └──────────┬───────────┘                                   │
 │             │ not cancelled                                 │

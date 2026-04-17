@@ -47,6 +47,11 @@ public class ConfigurationEditor : Scenario
 
         ConfigurationManager.Applied += ConfigurationManagerOnApplied;
         Open ();
+
+        _tabs.Disposing += (_, _) =>
+                         {
+                             _tabs?.ValueChanged -= OnTabsOnValueChanged;
+                         };
         app.Run (win);
 
         return;
@@ -89,20 +94,26 @@ public class ConfigurationEditor : Scenario
 
             editor.Read ();
 
-            //editor.ContentsChanged += OnEditorOnContentsChanged;
+            editor.Disposing += (_, _) =>
+                                {
+                                    editor.ContentsChanged -= OnEditorOnContentsChanged;
+                                };
+            editor.ContentsChanged += OnEditorOnContentsChanged;
 
             _lenShortcut?.Title = $"{editor.Title}";
         }
 
-        _tabs?.ValueChanged += (_, args) =>
-                               {
-                                   ConfigTextView? editor = args.NewValue?.SubViews.OfType<ConfigTextView> ().FirstOrDefault ();
+        _tabs?.ValueChanged += OnTabsOnValueChanged;
+    }
 
-                                   if (editor is { })
-                                   {
-                                       _lenShortcut!.Title = $"{editor.Title}";
-                                   }
-                               };
+    private void OnTabsOnValueChanged (object? _, ValueChangedEventArgs<View?> args)
+    {
+        ConfigTextView? editor = args.NewValue?.SubViews.OfType<ConfigTextView> ().FirstOrDefault ();
+
+        if (editor is { })
+        {
+            _lenShortcut!.Title = $"{editor.Title}";
+        }
     }
 
     private void OnEditorOnContentsChanged (object? o, ContentsChangedEventArgs contentsChangedEventArgs)
@@ -125,17 +136,21 @@ public class ConfigurationEditor : Scenario
                 continue;
             }
 
-            int? result = MessageBox.Query (editor.App!, "Save Changes", $"Save changes to {editor.FileInfo!.Name}", Strings.btnNo, Strings.btnYes);
+            int? result = MessageBox.Query (editor.App!, "Save Changes", $"Save changes to {editor.FileInfo!.Name}", Strings.btnCancel, Strings.btnNo, Strings.btnYes);
 
             switch (result)
             {
-                case 1:
+                case 2:
                     editor.Save ();
 
                     break;
 
-                case 0:
+                case 1:
                     // user decided not save changes
+                    break;
+
+                case 0:
+                    // Cancel
                     return;
             }
         }
@@ -153,7 +168,11 @@ public class ConfigurationEditor : Scenario
 
     private class ConfigTextView : TextView
     {
-        internal ConfigTextView () => TabStop = TabBehavior.TabGroup;
+        internal ConfigTextView ()
+        {
+            TabStop = TabBehavior.TabGroup;
+            ScrollBars = true;
+        }
 
         internal FileInfo? FileInfo { get; init; }
 
@@ -184,7 +203,6 @@ public class ConfigurationEditor : Scenario
                 using var reader = new StreamReader (stream!);
                 Text = reader.ReadToEnd ();
                 ReadOnly = true;
-                Enabled = true;
 
                 return;
             }
@@ -193,7 +211,6 @@ public class ConfigurationEditor : Scenario
             {
                 Text = ConfigurationManager.GetHardCodedConfig ();
                 ReadOnly = true;
-                Enabled = true;
             }
             else if (FileInfo!.FullName.Contains ("RuntimeConfig"))
             {

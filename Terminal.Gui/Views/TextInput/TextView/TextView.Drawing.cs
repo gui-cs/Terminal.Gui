@@ -26,11 +26,13 @@ public partial class TextView
         {
             List<Cell> line = _model.GetLine (idxRow);
             int lineRuneCount = line.Count;
-            var col = 0;
+            _ = TextModel.CursorColumn (TextModel.CellsToStringList (line), Viewport.X, TabWidth, out List<int> glyphWidths, out _);
+            int colWidths = TextModel.GetColumnWidthsBeforeStart (glyphWidths, Viewport.X, out int col, out int viewportX);
+            bool wasPreviousWideGlyphNegativeCol = false;
 
             Move (0, row);
 
-            for (int idxCol = Viewport.X; idxCol < lineRuneCount; idxCol++)
+            for (int idxCol = viewportX; idxCol < lineRuneCount; idxCol++)
             {
                 string text = idxCol >= lineRuneCount ? " " : line [idxCol].Grapheme;
                 int cols = text.GetColumns (false);
@@ -58,7 +60,7 @@ public partial class TextView
                     {
                         // Calculate columns to next tab stop
                         // Tab stops are at multiples of TabWidth (0, 4, 8, 12, ...)
-                        cols = TabWidth - col % TabWidth;
+                        cols = TabWidth - colWidths % TabWidth;
                     }
                     else
                     {
@@ -81,7 +83,14 @@ public partial class TextView
                 }
                 else
                 {
-                    AddStr (col, row, text);
+                    if (col < 0 && cols > 1)
+                    {
+                        wasPreviousWideGlyphNegativeCol = true;
+                    }
+                    else
+                    {
+                        AddStr (col, row, text);
+                    }
 
                     // Ensures that cols less than 0 to be 1 because it will be converted to a printable rune
                     cols = Math.Max (cols, 1);
@@ -92,10 +101,17 @@ public partial class TextView
                     break;
                 }
 
+                colWidths += cols;
+
                 if (idxCol + 1 < lineRuneCount && col + line [idxCol + 1].Grapheme.GetColumns () > right)
                 {
                     break;
                 }
+            }
+
+            if (wasPreviousWideGlyphNegativeCol)
+            {
+                AddStr (0, row, " ");
             }
 
             if (col < right)
@@ -110,7 +126,7 @@ public partial class TextView
         if (row < bottom)
         {
             SetAttributeForRole (ReadOnly ? VisualRole.ReadOnly : VisualRole.Editable);
-            ClearRegion (Viewport.Left, row, right, bottom);
+            ClearRegion (0, row, right, bottom);
         }
 
         _isDrawing = false;
@@ -478,3 +494,4 @@ public partial class TextView
         return GetAttributeForRole (VisualRole.Active);
     }
 }
+

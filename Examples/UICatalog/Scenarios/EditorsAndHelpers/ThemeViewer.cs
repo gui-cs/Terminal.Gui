@@ -7,8 +7,8 @@ public sealed class ThemeViewer : FrameView
     public ThemeViewer ()
     {
         BorderStyle = LineStyle.Rounded;
-        Border.Thickness = new (0, 1, 0, 0);
-        Margin.Thickness = new (0, 0, 1, 0);
+        Border.Thickness = new Thickness (0, 1, 0, 0);
+        Margin.Thickness = new Thickness (0, 0, 1, 0);
         TabStop = TabBehavior.TabStop;
         CanFocus = true;
         Height = Dim.Fill ();
@@ -72,7 +72,22 @@ public sealed class ThemeViewer : FrameView
 
         SchemeViewer? prevSchemeViewer = null;
 
-        foreach (KeyValuePair<string, Scheme?> kvp in SchemeManager.GetSchemesForCurrentTheme ())
+        // Order schemes: built-in Schemes enum order first, then any custom schemes alphabetically
+        string [] builtInOrder = Enum.GetNames<Schemes> ();
+
+        IEnumerable<KeyValuePair<string, Scheme?>> orderedSchemes = SchemeManager.GetSchemesForCurrentTheme ()
+                                                                                 .OrderBy (kvp =>
+                                                                                           {
+                                                                                               int idx = Array.FindIndex (builtInOrder,
+                                                                                                   n => string.Equals (n,
+                                                                                                       kvp.Key,
+                                                                                                       StringComparison.OrdinalIgnoreCase));
+
+                                                                                               return idx >= 0 ? idx : builtInOrder.Length;
+                                                                                           })
+                                                                                 .ThenBy (kvp => kvp.Key, StringComparer.OrdinalIgnoreCase);
+
+        foreach (KeyValuePair<string, Scheme?> kvp in orderedSchemes)
         {
             var schemeViewer = new SchemeViewer { Id = $"schemeViewer for {kvp.Key}", SchemeName = kvp.Key };
 

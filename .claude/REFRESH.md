@@ -14,6 +14,7 @@
 8. **SPACE BEFORE PARENTHESES** - `Method ()` not `Method()`, `array [i]` not `array[i]` (see `formatting.md`)
 9. **Braces on next line** - ALL opening braces on next line (Allman style)
 10. **Blank lines** - before `return`/`break`/`continue`/`throw`, after control blocks
+11. **Early return / guard clauses** - ALWAYS invert conditions and return/continue early. NEVER wrap the happy path in a conditional. This applies in methods, lambdas, loops — everywhere. (see `early-return.md`)
 
 ## Before Each File Edit
 
@@ -26,6 +27,7 @@ Ask yourself:
 - [ ] **Did I add space BEFORE parentheses and brackets?**
 - [ ] **Are ALL braces on the next line?**
 - [ ] **Did I add blank lines before returns and after control blocks?**
+- [ ] **Am I using guard clauses / early return instead of nesting?**
 
 ## If Unsure
 
