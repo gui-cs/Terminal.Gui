@@ -13,9 +13,11 @@ public enum Schemes
     Base,
 
     /// <summary>
-    ///     The menu scheme, used for Terminal.Gui.Menu, MenuBar, and StatusBar.
+    ///     The accent scheme; a secondary/alternate scheme for visual distinction.
+    ///     Used for panels, event logs, secondary content areas, or any view that needs visual separation.
+    ///     Colors are algorithmically derived from <see cref="Base"/> at draw time with an opaque background.
     /// </summary>
-    Menu,
+    Accent,
 
     /// <summary>
     ///     The dialog scheme, used for Dialog, MessageBox, and other views dialog-like views.
@@ -23,11 +25,9 @@ public enum Schemes
     Dialog,
 
     /// <summary>
-    ///     The accent scheme; a secondary/alternate scheme for visual distinction.
-    ///     Used for panels, event logs, secondary content areas, or any view that needs visual separation.
-    ///     Colors are algorithmically derived from <see cref="Base"/> at draw time with an opaque background.
+    ///     The menu scheme, used for Terminal.Gui.Menu, MenuBar, and StatusBar.
     /// </summary>
-    Accent,
+    Menu,
 
     /// <summary>
     ///     The scheme for showing errors.

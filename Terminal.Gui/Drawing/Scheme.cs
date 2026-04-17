@@ -10,6 +10,11 @@ namespace Terminal.Gui.Drawing;
 ///     <see cref="VisualRole.Disabled"/>, etc.)
 ///     to an <see cref="Attribute"/> describing its foreground color, background color, and text style.
 ///     <para>
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/drawing.html"/> for more information.
+///     </para>
+/// </summary>
+/// <remarks>
+///     <para>
 ///         A <see cref="Scheme"/> enables consistent, semantic theming of UI elements by associating each visual state
 ///         with a specific style.
 ///         Each property (e.g., <see cref="Normal"/>, <see cref="Focus"/>, <see cref="Disabled"/>) is an
@@ -21,11 +26,6 @@ namespace Terminal.Gui.Drawing;
 ///         <see cref="Scheme"/> objects are immutable. To update a scheme, create a new instance with the desired values.
 ///         Use <see cref="SchemeManager"/> to manage available schemes and apply them to views.
 ///     </para>
-///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/drawing.html"/> for more information.
-///     </para>
-/// </summary>
-/// <remarks>
 ///     <para>
 ///         <b>Immutability:</b> Scheme objects are immutable. Once constructed, their properties cannot be changed. To
 ///         modify a Scheme,

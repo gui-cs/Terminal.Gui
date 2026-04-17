@@ -185,7 +185,7 @@
             "Accent": {
               "Normal": {
                 "Foreground": "LightGray",
-                "Background": "None",
+                "Background": "Onyx",
                 "Style": "None"
               },
               "Focus": {
@@ -195,12 +195,12 @@
               },
               "HotNormal": {
                 "Foreground": "Silver",
-                "Background": "None",
+                "Background": "Onyx",
                 "Style": "Underline"
               },
               "Disabled": {
                 "Foreground": "DarkGray",
-                "Background": "None",
+                "Background": "Onyx",
                 "Style": "Faint"
               },
               "HotFocus": {
@@ -225,12 +225,12 @@
               },
               "Editable": {
                 "Foreground": "LightYellow",
-                "Background": "None",
+                "Background": "Onyx",
                 "Style": "None"
               },
               "ReadOnly": {
                 "Foreground": "Gray",
-                "Background": "None",
+                "Background": "Onyx",
                 "Style": "Italic"
               }
             }
@@ -469,7 +469,7 @@
             "Accent": {
               "Normal": {
                 "Foreground": "DimGray",
-                "Background": "None",
+                "Background": "WhiteSmoke",
                 "Style": "None"
               },
               "Focus": {
@@ -479,12 +479,12 @@
               },
               "HotNormal": {
                 "Foreground": "Gray",
-                "Background": "None",
+                "Background": "WhiteSmoke",
                 "Style": "Underline"
               },
               "Disabled": {
                 "Foreground": "LightGray",
-                "Background": "None",
+                "Background": "WhiteSmoke",
                 "Style": "Faint"
               },
               "HotFocus": {
@@ -514,7 +514,7 @@
               },
               "ReadOnly": {
                 "Foreground": "Gray",
-                "Background": "None",
+                "Background": "WhiteSmoke",
                 "Style": "Italic"
               }
             }
@@ -751,8 +751,28 @@
             "Accent": {
               "Normal": {
                 "Foreground": "GreenPhosphor",
-                "Background": "None",
+                "Background": "Charcoal",
                 "Style": "None"
+              },
+              "Active": {
+                "Foreground": "GreenPhosphor",
+                "Background": "Charcoal",
+                "Style": "Bold"
+              },
+              "Highlight": {
+                "Foreground": "GreenPhosphor",
+                "Background": "Charcoal",
+                "Style": "Italic"
+              },
+              "Editable": {
+                "Foreground": "GreenPhosphor",
+                "Background": "Onyx",
+                "Style": "None"
+              },
+              "ReadOnly": {
+                "Foreground": "GreenPhosphor",
+                "Background": "Onyx",
+                "Style": "Faint"
               }
             }
           },
@@ -888,8 +908,28 @@
             "Accent": {
               "Normal": {
                 "Foreground": "AmberPhosphor",
-                "Background": "None",
+                "Background": "Charcoal",
                 "Style": "None"
+              },
+              "Active": {
+                "Foreground": "AmberPhosphor",
+                "Background": "Charcoal",
+                "Style": "Bold"
+              },
+              "Highlight": {
+                "Foreground": "AmberPhosphor",
+                "Background": "Charcoal",
+                "Style": "Italic"
+              },
+              "Editable": {
+                "Foreground": "AmberPhosphor",
+                "Background": "Onyx",
+                "Style": "None"
+              },
+              "ReadOnly": {
+                "Foreground": "AmberPhosphor",
+                "Background": "Onyx",
+                "Style": "Faint"
               }
             }
           },
