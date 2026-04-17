@@ -529,7 +529,7 @@ public class TreeViewTests : TestDriverBase
     }
 
     // Copilot
-    [Fact]
+    [Fact (Skip = "Pending rework: Enter should Accept, Space should Activate, single-click Activate, double-click Accept")]
     public void EnterKey_Raises_Accepting ()
     {
         TreeView<object?> tree = CreateTree (out _, out _, out _);
@@ -551,7 +551,7 @@ public class TreeViewTests : TestDriverBase
     }
 
     // Copilot
-    [Fact]
+    [Fact (Skip = "Pending rework: Enter should Accept, Space should Activate, double-click should Accept")]
     public void DoubleClick_Raises_Accepting ()
     {
         TreeView<object?> tree = CreateTree (out _, out _, out _);

@@ -188,20 +188,6 @@ public class TreeView<T> : View, ITreeView where T : class
     {
         CanFocus = true;
 
-        // Override the default Accept handler to ensure focus (and implicit first-object selection)
-        // before running the standard Accept flow. This mirrors the SetFocus behavior of
-        // DefaultActivateHandler, ensuring ObjectActivated fires even when no object is explicitly selected.
-        AddCommand (Command.Accept,
-                    ctx =>
-                    {
-                        if (CanFocus)
-                        {
-                            SetFocus ();
-                        }
-
-                        return DefaultAcceptHandler (ctx);
-                    });
-
         // Things this view knows how to do
         AddCommand (Command.PageUp,
                     () =>
@@ -359,10 +345,8 @@ public class TreeView<T> : View, ITreeView where T : class
         ApplyKeyBindings (DefaultKeyBindings, View.DefaultKeyBindings);
 
         // Instance-dependent activation key binding (not part of DefaultKeyBindings)
-        // Use Command.Accept so that pressing the activation key raises Accepting/Accepted (CWP pattern).
-        // ObjectActivated is fired from OnAccepted for backward compatibility.
         KeyBindings.Remove (ObjectActivationKey);
-        KeyBindings.Add (ObjectActivationKey, Command.Accept);
+        KeyBindings.Add (ObjectActivationKey, Command.Activate);
 
         KeystrokeNavigator.Matcher = new TreeViewCollectionNavigatorMatcher<T> (this);
     }
@@ -1207,9 +1191,8 @@ public class TreeView<T> : View, ITreeView where T : class
             SelectedObject = clickedBranch.Model;
             SetNeedsDraw ();
 
-            // Invoke Command.Accept so the standard Accepting/Accepted CWP flow fires.
-            // ObjectActivated is raised from OnAccepted for backward compatibility.
-            InvokeCommand (Command.Accept);
+            // trigger activation event
+            OnObjectActivated (new ObjectActivatedEventArgs<T> (this, clickedBranch.Model));
 
             // mouse event is handled.
             return true;
