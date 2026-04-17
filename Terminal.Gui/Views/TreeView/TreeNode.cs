@@ -1,11 +1,11 @@
 #nullable disable
 ﻿namespace Terminal.Gui.Views;
 
-/// <summary>
-///     Interface to implement when you want the regular (non-generic) <see cref="TreeView"/> to automatically
-///     determine children for your class (without having to specify an <see cref="ITreeBuilder{T}"/>)
-/// </summary>
-public interface ITreeNode
+ /// <summary>
+ ///     Interface to implement when you want the regular (non-generic) <see cref="TreeView"/> to automatically
+ ///     determine children for your class (without having to specify an <see cref="ITreeBuilder{T}"/>)
+ /// </summary>
+ public interface ITreeNode
 {
     /// <summary>The children of your class which should be rendered underneath it when expanded</summary>
     /// <value></value>
@@ -25,7 +25,7 @@ public class TreeNode : ITreeNode
     public TreeNode () { }
 
     /// <summary>Initialises a new instance and sets starting <see cref="Text"/></summary>
-    public TreeNode (string text) { Text = text; }
+    public TreeNode (string text) => Text = text;
 
     /// <summary>Children of the current node</summary>
     /// <returns></returns>
@@ -40,5 +40,5 @@ public class TreeNode : ITreeNode
 
     /// <summary>returns <see cref="Text"/></summary>
     /// <returns></returns>
-    public override string ToString () { return Text ?? "Unnamed Node"; }
+    public override string ToString () => Text ?? "Unnamed Node";
 }

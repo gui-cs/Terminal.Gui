@@ -9,7 +9,7 @@ namespace Terminal.Gui.Views;
 public class TreeViewTextFilter<T> : ITreeViewFilter<T> where T : class
 {
     private readonly TreeView<T> _forTree;
-    private string text;
+    private string _text;
 
     /// <summary>
     ///     Creates a new instance of the filter for use with <paramref name="forTree"/>. Set <see cref="Text"/> to begin
@@ -17,7 +17,7 @@ public class TreeViewTextFilter<T> : ITreeViewFilter<T> where T : class
     /// </summary>
     /// <param name="forTree"></param>
     /// <exception cref="ArgumentNullException"></exception>
-    public TreeViewTextFilter (TreeView<T> forTree) { _forTree = forTree ?? throw new ArgumentNullException (nameof (forTree)); }
+    public TreeViewTextFilter (TreeView<T> forTree) => _forTree = forTree ?? throw new ArgumentNullException (nameof (forTree));
 
     /// <summary>The case sensitivity of the search match. Defaults to <see cref="StringComparison.OrdinalIgnoreCase"/>.</summary>
     public StringComparison Comparer { get; set; } = StringComparison.OrdinalIgnoreCase;
@@ -25,10 +25,10 @@ public class TreeViewTextFilter<T> : ITreeViewFilter<T> where T : class
     /// <summary>The text that will be searched for in the <see cref="TreeView{T}"/></summary>
     public string Text
     {
-        get => text;
+        get => _text;
         set
         {
-            text = value;
+            _text = value;
             RefreshTreeView ();
         }
     }

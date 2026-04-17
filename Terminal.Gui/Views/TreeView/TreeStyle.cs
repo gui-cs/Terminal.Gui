@@ -1,5 +1,5 @@
 #nullable disable
-﻿
+
 namespace Terminal.Gui.Views;
 
 /// <summary>Defines rendering options that affect how the tree is displayed.</summary>
@@ -25,7 +25,7 @@ public class TreeStyle
     ///     <see cref="Branch{T}.Model"/> text to be highlighted. If <see langword="false"/> (the default), the entire row will
     ///     be highlighted.
     /// </summary>
-    public bool HighlightModelTextOnly { get; set; } = false;
+    public bool HighlightModelTextOnly { get; set; }
 
     /// <summary>Invert console colours used to render the expand symbol.</summary>
     public bool InvertExpandSymbolColors { get; set; }

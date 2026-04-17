@@ -1,9 +1,9 @@
 #nullable disable
 ﻿namespace Terminal.Gui.Views;
 
-/// <summary>Event args for the <see cref="TreeView{T}.ObjectActivated"/> event</summary>
-/// <typeparam name="T"></typeparam>
-public class ObjectActivatedEventArgs<T> where T : class
+ /// <summary>Event args for the <see cref="TreeView{T}.ObjectActivated"/> event</summary>
+ /// <typeparam name="T"></typeparam>
+ public class ObjectActivatedEventArgs<T> where T : class
 {
     /// <summary>Creates a new instance documenting activation of the <paramref name="activated"/> object</summary>
     /// <param name="tree">Tree in which the activation is happening</param>
