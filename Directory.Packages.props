@@ -38,7 +38,7 @@
     <PackageVersion Include="ReactiveUI.SourceGenerators" Version="2.6.1" />
     <PackageVersion Include="GitHub.Copilot.SDK" Version="0.2.2" />
     <PackageVersion Include="Moq" Version="4.20.72" />
-    <PackageVersion Include="Markdig" Version="0.39.0" />
+    <PackageVersion Include="Markdig" Version="1.1.2" />
     <PackageVersion Include="TextMateSharp.Grammars" Version="2.0.3" />
     <PackageVersion Include="ReportGenerator" Version="5.5.5" />
     <PackageVersion Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="22.1.1" />
