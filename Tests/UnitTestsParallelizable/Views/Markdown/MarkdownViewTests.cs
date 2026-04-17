@@ -749,6 +749,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (30, 5);
+        app.Driver.Clipboard = new FakeClipboard ();
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
@@ -759,8 +760,8 @@ public class MarkdownViewTests (ITestOutputHelper output)
         app.Begin (window);
         app.LayoutAndDraw ();
 
-        // Set clipboard to sentinel
-        app.Clipboard!.TrySetClipboardData ("SENTINEL");
+        // Record clipboard state before click
+        app.Clipboard!.TryGetClipboardData (out string before);
 
         // Find the code block SubView and click its copy button position
         MarkdownCodeBlock? codeBlock = mv.SubViews.OfType<MarkdownCodeBlock> ().FirstOrDefault ();
@@ -769,8 +770,13 @@ public class MarkdownViewTests (ITestOutputHelper output)
         int copyX = codeBlock.Viewport.Width - 2;
         codeBlock.NewMouseEvent (new Mouse { Position = new Point (copyX, 0), Flags = MouseFlags.LeftButtonClicked });
 
-        app.Clipboard.TryGetClipboardData (out string clipboardText);
-        Assert.Equal ("SENTINEL", clipboardText);
+        app.Clipboard.TryGetClipboardData (out string after);
+
+        // Clipboard should not contain the code block text
+        Assert.DoesNotContain ("hello world", after);
+
+        // Clipboard should be unchanged by the click
+        Assert.Equal (before, after);
 
         window.Dispose ();
         app.Dispose ();
@@ -1229,7 +1235,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         Assert.NotNull (lineView);
 
         // The Line's background should NOT be the theme background
-        Attribute lineNormal = lineView!.GetAttributeForRole (VisualRole.Normal);
+        Attribute lineNormal = lineView.GetAttributeForRole (VisualRole.Normal);
         Assert.NotEqual (themeBg, lineNormal.Background);
 
         window.Dispose ();

@@ -256,10 +256,17 @@ public class MarkdownCodeBlockTests
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (30, 5);
+        app.Driver.Clipboard = new FakeClipboard ();
 
         Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
-        MarkdownCodeBlock codeBlock = new () { Text = "```csharp\nvar x = 42;\n```", ShowCopyButton = false, Width = Dim.Fill (), Height = Dim.Fill () };
+        MarkdownCodeBlock codeBlock = new ()
+        {
+            Text = "```csharp\nSHOULD_NOT_BE_COPIED\n```",
+            ShowCopyButton = false,
+            Width = Dim.Fill (),
+            Height = Dim.Fill ()
+        };
 
         window.Add (codeBlock);
 
@@ -271,17 +278,20 @@ public class MarkdownCodeBlockTests
         Assert.NotNull (screenContents);
         Assert.DoesNotContain ("\u29C9", screenContents);
 
-        // Clear the system clipboard to a known sentinel value before clicking
-        app.Clipboard!.TrySetClipboardData ("SENTINEL");
+        // Record clipboard state before clicking
+        app.Clipboard!.TryGetClipboardData (out string before);
 
         // Click where the copy button would be — should NOT copy
         int copyX = codeBlock.Viewport.Width - 2;
         codeBlock.NewMouseEvent (new Mouse { Position = new Point (copyX, 0), Flags = MouseFlags.LeftButtonClicked });
 
-        app.Clipboard.TryGetClipboardData (out string clipboardText);
+        app.Clipboard.TryGetClipboardData (out string after);
 
-        // Clipboard should still contain the sentinel, NOT the code
-        Assert.Equal ("SENTINEL", clipboardText);
+        // Clipboard should not contain the code block text
+        Assert.DoesNotContain ("SHOULD_NOT_BE_COPIED", after ?? string.Empty);
+
+        // Clipboard should be unchanged by the click
+        Assert.Equal (before, after);
 
         window.Dispose ();
         app.Dispose ();
