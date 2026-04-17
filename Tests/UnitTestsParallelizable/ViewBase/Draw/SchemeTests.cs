@@ -196,7 +196,7 @@ public class SchemeTests : TestDriverBase
         Assert.Contains ("Dialog", schemes.Keys);
         Assert.Contains ("Error", schemes.Keys);
         Assert.Contains ("Menu", schemes.Keys);
-        Assert.Contains ("Runnable", schemes.Keys);
+        Assert.Contains ("Accent", schemes.Keys);
     }
 
     [Fact]
