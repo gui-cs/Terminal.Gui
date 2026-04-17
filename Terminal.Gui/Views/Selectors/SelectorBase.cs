@@ -535,7 +535,7 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         // total width via PosAlign.CalculateMinDimension, which reads Frame.Width.
         // Without this, newly-created subviews have Frame.Width == 0 on the first
         // layout pass, causing the selector to be sized too narrow.
-        if (Orientation != Orientation.Horizontal || SubViews.Count <= 0)
+        if (Orientation != Orientation.Horizontal || SubViews.Count == 0)
         {
             return;
         }
