@@ -346,7 +346,7 @@ public class TableViewTests : TestDriverBase
         var tableView = new TableView { Driver = driver };
         tableView.BeginInit ();
         tableView.EndInit ();
-        tableView.SchemeName = "Runnable";
+        tableView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
         tableView.Viewport = new (0, 0, 25, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.ShowHorizontalHeaderOverline = false;

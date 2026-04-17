@@ -10,6 +10,11 @@ namespace Terminal.Gui.Drawing;
 ///     <see cref="VisualRole.Disabled"/>, etc.)
 ///     to an <see cref="Attribute"/> describing its foreground color, background color, and text style.
 ///     <para>
+///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/drawing.html"/> for more information.
+///     </para>
+/// </summary>
+/// <remarks>
+///     <para>
 ///         A <see cref="Scheme"/> enables consistent, semantic theming of UI elements by associating each visual state
 ///         with a specific style.
 ///         Each property (e.g., <see cref="Normal"/>, <see cref="Focus"/>, <see cref="Disabled"/>) is an
@@ -21,11 +26,6 @@ namespace Terminal.Gui.Drawing;
 ///         <see cref="Scheme"/> objects are immutable. To update a scheme, create a new instance with the desired values.
 ///         Use <see cref="SchemeManager"/> to manage available schemes and apply them to views.
 ///     </para>
-///     <para>
-///         See <see href="https://gui-cs.github.io/Terminal.Gui/docs/drawing.html"/> for more information.
-///     </para>
-/// </summary>
-/// <remarks>
 ///     <para>
 ///         <b>Immutability:</b> Scheme objects are immutable. Once constructed, their properties cannot be changed. To
 ///         modify a Scheme,
@@ -186,8 +186,8 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
                                                                                             CreateDialog ()),
                                                           new KeyValuePair<string, Scheme> (SchemeManager.SchemesToSchemeName (Schemes.Error)!, CreateError ()),
                                                           new KeyValuePair<string, Scheme> (SchemeManager.SchemesToSchemeName (Schemes.Menu)!, CreateMenu ()),
-                                                          new KeyValuePair<string, Scheme> (SchemeManager.SchemesToSchemeName (Schemes.Runnable)!,
-                                                                                            CreateRunnable ())
+                                                          new KeyValuePair<string, Scheme> (SchemeManager.SchemesToSchemeName (Schemes.Accent)!,
+                                                                                            CreateAccent ())
                                                       ]);
 
         Scheme CreateBase () => new () { Normal = new Attribute (Color.None, Color.None) };
@@ -198,7 +198,31 @@ public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 
         Scheme CreateMenu () => new () { Normal = new Attribute (StandardColor.Charcoal, StandardColor.LightBlue, TextStyle.Bold) };
 
-        Scheme CreateRunnable () => new () { Normal = new Attribute (Color.None, Color.None) };
+        Scheme CreateAccent () => new () { Normal = new Attribute (Color.None, Color.None) };
+    }
+
+    /// <summary>
+    ///     Derives an opaque Accent <see cref="Scheme"/> from the specified Base scheme at draw time.
+    ///     The background is shifted slightly brighter (on dark) or dimmer (on light) relative to Base,
+    ///     and forced to be opaque (A=255). The foreground is resolved from Base.
+    /// </summary>
+    /// <param name="baseScheme">The Base scheme to derive Accent colors from.</param>
+    /// <param name="defaultTerminalColors">
+    ///     The terminal's actual default foreground/background colors (queried via OSC 10/11), used to resolve
+    ///     <see cref="Color.None"/>. If <see langword="null"/>, falls back to White/Black.
+    /// </param>
+    /// <returns>A new <see cref="Scheme"/> with an opaque Normal attribute derived from <paramref name="baseScheme"/>.</returns>
+    public static Scheme DeriveAccent (Scheme baseScheme, Attribute? defaultTerminalColors)
+    {
+        Color resolvedBg = ResolveNone (baseScheme.Normal.Background, defaultTerminalColors);
+        Color resolvedFg = ResolveNone (baseScheme.Normal.Foreground, defaultTerminalColors, true);
+        bool isDark = resolvedBg.IsDarkColor ();
+        Color accentBg = isDark ? resolvedBg.GetBrighterColor (0.1, isDark) : resolvedBg.GetDimmerColor (0.1, isDark);
+
+        // Force opaque
+        accentBg = new Color (accentBg.R, accentBg.G, accentBg.B, 255);
+
+        return new Scheme { Normal = new Attribute (resolvedFg, accentBg) };
     }
 
     /// <summary>Creates a new instance set to the default attributes (see <see cref="Attribute.Default"/>).</summary>

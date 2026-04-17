@@ -14,7 +14,7 @@ See [Drawing](drawing.md) for an overview of the drawing system and [Configurati
 
 ### Color.None Resolution and Dark/Light Awareness
 
-When a <xref:Terminal.Gui.Drawing.Scheme> uses `Color.None` for foreground or background (e.g., the default Base and Runnable schemes), the derivation algorithm resolves these to concrete colors before performing any color math. The resolution uses:
+When a <xref:Terminal.Gui.Drawing.Scheme> uses `Color.None` for foreground or background (e.g., the default Base scheme), the derivation algorithm resolves these to concrete colors before performing any color math. The Accent scheme uses `Color.None` as a sentinel but is derived to opaque colors at draw time via `Scheme.DeriveAccent`. The resolution uses:
 
 1. **Terminal default colors** — Detected at startup via OSC 10/11 ANSI queries. The driver stores the terminal's actual default foreground and background colors in `IDriver.DefaultAttribute`.
 2. **Fallback** — If the terminal doesn't respond to OSC queries (e.g., legacy consoles), falls back to White (foreground) and Black (background).
