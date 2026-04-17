@@ -36,7 +36,7 @@ public class SchemeTests
         Assert.True (schemes.ContainsKey ("Dialog"));
         Assert.True (schemes.ContainsKey ("Error"));
         Assert.True (schemes.ContainsKey ("Menu"));
-        Assert.True (schemes.ContainsKey ("Runnable"));
+        Assert.True (schemes.ContainsKey ("Accent"));
     }
 
     [Fact]
@@ -65,10 +65,62 @@ public class SchemeTests
         Assert.NotNull (menuScheme);
         Assert.Equal (new Attribute (StandardColor.Charcoal, StandardColor.LightBlue, TextStyle.Bold), menuScheme.Normal);
 
-        // Runnable (uses Color.None for transparent background)
-        Scheme runnableScheme = schemes ["Runnable"];
-        Assert.NotNull (runnableScheme);
-        Assert.Equal (new Attribute (Color.None, Color.None), runnableScheme.Normal);
+        // Accent (uses Color.None for transparent background, derived to opaque at draw time)
+        Scheme accentScheme = schemes ["Accent"];
+        Assert.NotNull (accentScheme);
+        Assert.Equal (new Attribute (Color.None, Color.None), accentScheme.Normal);
+    }
+
+    // Copilot
+    [Fact]
+    public void DeriveAccent_Returns_Opaque_Scheme_From_Base ()
+    {
+        // Base scheme with Color.None (transparent)
+        Scheme baseScheme = new () { Normal = new Attribute (Color.None, Color.None) };
+
+        // Simulate terminal with white-on-black
+        Attribute terminalDefault = new (new Color (255, 255, 255), new Color (0, 0, 0));
+
+        Scheme accent = Scheme.DeriveAccent (baseScheme, terminalDefault);
+
+        // Background should be opaque (A=255) and shifted from black
+        Assert.Equal (255, accent.Normal.Background.A);
+
+        // Foreground should be resolved white
+        Assert.Equal (new Color (255, 255, 255), accent.Normal.Foreground);
+
+        // Background should NOT be Color.None
+        Assert.NotEqual (Color.None, accent.Normal.Background);
+    }
+
+    // Copilot
+    [Fact]
+    public void DeriveAccent_With_Light_Background_Dims ()
+    {
+        // Base scheme with explicit light background
+        Scheme baseScheme = new () { Normal = new Attribute (new Color (0, 0, 0), new Color (240, 240, 240)) };
+
+        Scheme accent = Scheme.DeriveAccent (baseScheme, null);
+
+        // Background should be dimmed (darker than original 240)
+        Assert.Equal (255, accent.Normal.Background.A);
+        Assert.True (accent.Normal.Background.R < 240 || accent.Normal.Background.G < 240 || accent.Normal.Background.B < 240);
+    }
+
+    // Copilot
+    [Fact]
+    public void DeriveAccent_Without_Terminal_Colors_Falls_Back ()
+    {
+        // Base scheme with Color.None
+        Scheme baseScheme = new () { Normal = new Attribute (Color.None, Color.None) };
+
+        // No terminal colors available
+        Scheme accent = Scheme.DeriveAccent (baseScheme, null);
+
+        // Should fall back to White/Black and still produce opaque result
+        Assert.Equal (255, accent.Normal.Background.A);
+        Assert.NotEqual (Color.None, accent.Normal.Background);
+        Assert.NotEqual (Color.None, accent.Normal.Foreground);
     }
 
     [Fact]

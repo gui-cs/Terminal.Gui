@@ -41,7 +41,7 @@ public class Shortcuts : Scenario
             X = Pos.AnchorEnd (),
             Y = 1,
             Height = Dim.Fill (4),
-            SchemeName = "Runnable",
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent),
             BorderStyle = LineStyle.Double,
             Title = "E_vents"
         };
@@ -342,7 +342,7 @@ public class Shortcuts : Scenario
             framedShortcut.KeyView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
         }
 
-        framedShortcut.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Runnable);
+        framedShortcut.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
         _window.Add (framedShortcut);
 
         if (ConfigurationManager.IsEnabled)

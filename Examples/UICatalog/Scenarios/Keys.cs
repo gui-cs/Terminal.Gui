@@ -93,7 +93,7 @@ public class Keys : Scenario
             Height = Dim.Fill (statusBar),
             Source = new ListWrapper<string> (keyList)
         };
-        appKeyListView.SchemeName = "Runnable";
+        appKeyListView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
         win.Add (appKeyListView);
 
         // View key events...
@@ -113,7 +113,7 @@ public class Keys : Scenario
             Height = Dim.Fill (statusBar),
             Source = new ListWrapper<string> (keyDownList)
         };
-        appKeyListView.SchemeName = "Runnable";
+        appKeyListView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
         win.Add (onKeyDownListView);
 
         // KeyDownNotHandled
@@ -128,7 +128,7 @@ public class Keys : Scenario
             Height = Dim.Fill (statusBar),
             Source = new ListWrapper<string> (keyDownNotHandledList)
         };
-        appKeyListView.SchemeName = "Runnable";
+        appKeyListView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
         win.Add (onKeyDownNotHandledListView);
 
         // Swallowed
@@ -143,7 +143,7 @@ public class Keys : Scenario
             Height = Dim.Fill (statusBar),
             Source = new ListWrapper<string> (swallowedList)
         };
-        appKeyListView.SchemeName = "Runnable";
+        appKeyListView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
         win.Add (onSwallowedListView);
 
         app.Driver!.GetInputProcessor ().AnsiSequenceSwallowed += (_, e) => { swallowedList.Add (e.Replace ("\x1b", "Esc")); };
