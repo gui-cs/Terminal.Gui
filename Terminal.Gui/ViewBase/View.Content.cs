@@ -37,7 +37,7 @@ public partial class View
     /// <seealso cref="SetContentSize"/>
     public void SetContentWidth (int? contentWidth)
     {
-        if (contentWidth is { } w && w < 0)
+        if (contentWidth is < 0)
         {
             throw new ArgumentException (@"Content width cannot be negative.", nameof (contentWidth));
         }
@@ -74,7 +74,7 @@ public partial class View
     /// <seealso cref="SetContentSize"/>
     public void SetContentHeight (int? contentHeight)
     {
-        if (contentHeight is { } h && h < 0)
+        if (contentHeight is < 0)
         {
             throw new ArgumentException (@"Content height cannot be negative.", nameof (contentHeight));
         }
@@ -135,9 +135,7 @@ public partial class View
                                  ? null
                                  : new Size (_contentWidth ?? Viewport.Size.Width, _contentHeight ?? Viewport.Size.Height);
 
-        Size? newComposite = newWidth is null && newHeight is null
-                                 ? null
-                                 : new Size (newWidth ?? Viewport.Size.Width, newHeight ?? Viewport.Size.Height);
+        Size? newComposite = newWidth is null && newHeight is null ? null : new Size (newWidth ?? Viewport.Size.Width, newHeight ?? Viewport.Size.Height);
 
         if (EqualityComparer<Size?>.Default.Equals (oldComposite, newComposite))
         {
@@ -330,11 +328,12 @@ public partial class View
         get => _contentWidth is null && _contentHeight is null;
         set
         {
-            if (value)
+            if (!value)
             {
-                _contentWidth = null;
-                _contentHeight = null;
+                return;
             }
+            _contentWidth = null;
+            _contentHeight = null;
         }
     }
 
