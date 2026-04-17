@@ -532,7 +532,7 @@ public class TreeViewTests : TestDriverBase
     [Fact]
     public void EnterKey_Raises_Accepting ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
+        TreeView<object?> tree = CreateTree (out _, out _, out _);
 
         var acceptingFired = false;
 
@@ -554,7 +554,7 @@ public class TreeViewTests : TestDriverBase
     [Fact]
     public void DoubleClick_Raises_Accepting ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
+        TreeView<object?> tree = CreateTree (out _, out _, out _);
 
         var acceptingFired = false;
 
