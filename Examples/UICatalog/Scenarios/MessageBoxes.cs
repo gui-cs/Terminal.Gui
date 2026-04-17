@@ -94,27 +94,6 @@ public class MessageBoxes : Scenario
             Width = Dim.Width (label),
             Height = 1,
             TextAlignment = Alignment.End,
-            Text = "_Default Button:"
-        };
-        frame.Add (label);
-
-        TextField defaultButtonEdit = new ()
-        {
-            X = Pos.Right (label) + 1,
-            Y = Pos.Top (label),
-            Width = 5,
-            Height = 1,
-            Text = "0"
-        };
-        frame.Add (defaultButtonEdit);
-
-        label = new Label
-        {
-            X = 0,
-            Y = Pos.Bottom (label),
-            Width = Dim.Width (label),
-            Height = 1,
-            TextAlignment = Alignment.End,
             Text = "St_yle:"
         };
         frame.Add (label);
@@ -162,7 +141,6 @@ public class MessageBoxes : Scenario
                                 try
                                 {
                                     int numButtons = int.Parse (numButtonsEdit.Text);
-                                    int defaultButton = int.Parse (defaultButtonEdit.Text);
 
                                     List<string> messageBoxButtons = [];
 
@@ -178,7 +156,6 @@ public class MessageBoxes : Scenario
                                                 MessageBox.Query (app,
                                                                   titleEdit.Text,
                                                                   messageEdit.Text,
-                                                                  defaultButton,
                                                                   ckbWrapMessage.Value == CheckState.Checked,
                                                                   messageBoxButtons.ToArray ())
                                             }";
@@ -190,7 +167,6 @@ public class MessageBoxes : Scenario
                                                 MessageBox.ErrorQuery (app,
                                                                        titleEdit.Text,
                                                                        messageEdit.Text,
-                                                                       defaultButton,
                                                                        ckbWrapMessage.Value == CheckState.Checked,
                                                                        messageBoxButtons.ToArray ())
                                             }";
