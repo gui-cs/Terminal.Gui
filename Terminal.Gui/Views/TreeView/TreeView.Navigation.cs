@@ -310,7 +310,7 @@ public partial class TreeView<T>
     {
         IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
 
-        // To determine multi selected objects, start with the line map, that avoids yielding 
+        // To determine multi selected objects, start with the line map, that avoids yielding
         // hidden nodes that were selected then the parent collapsed e.g. programmatically or
         // with mouse click
         if (MultiSelect)
@@ -477,12 +477,12 @@ public partial class TreeView<T>
 
         int? newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)key);
 
-        if (newIndex is not int || newIndex == -1)
+        if (newIndex is not int idx || idx == -1)
         {
             return false;
         }
 
-        SelectedObject = map.ElementAt ((int)newIndex).Model;
+        SelectedObject = map.ElementAt (idx).Model;
         EnsureVisible (_selectedObject);
         SetNeedsDraw ();
 
@@ -492,21 +492,25 @@ public partial class TreeView<T>
     /// <summary>Scrolls the view area down a single line without changing the current selection.</summary>
     public void ScrollDown ()
     {
-        if (ScrollOffsetVertical <= ContentHeight - 2)
+        if (ScrollOffsetVertical > ContentHeight - 2)
         {
-            ScrollOffsetVertical++;
-            SetNeedsDraw ();
+            return;
         }
+
+        ScrollOffsetVertical++;
+        SetNeedsDraw ();
     }
 
     /// <summary>Scrolls the view area up a single line without changing the current selection.</summary>
     public void ScrollUp ()
     {
-        if (_scrollOffsetVertical > 0)
+        if (_scrollOffsetVertical <= 0)
         {
-            ScrollOffsetVertical--;
-            SetNeedsDraw ();
+            return;
         }
+
+        ScrollOffsetVertical--;
+        SetNeedsDraw ();
     }
 
     /// <summary>Selects all objects in the tree when <see cref="MultiSelect"/> is enabled otherwise does nothing.</summary>
@@ -633,7 +637,7 @@ public partial class TreeView<T>
         var idxStart = 0;
 
         // or the current selected branch
-        if (SelectedObject is not null)
+        if (SelectedObject is { })
         {
             idxStart = map.IndexOf (b => Equals (b.Model, SelectedObject));
         }

@@ -51,7 +51,7 @@ internal class Branch<T> where T : class
     public bool CanExpand ()
     {
         // if we do not know the children yet
-        if (ChildBranches is not null)
+        if (ChildBranches is { })
         {
             //we fetched or already know the children, so return whether we have any
             return ChildBranches.Any ();

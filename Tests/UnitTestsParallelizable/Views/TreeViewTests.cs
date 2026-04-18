@@ -617,7 +617,6 @@ public class TreeViewTests : TestDriverBase
         // no object is selected yet so no event should happen
         tree.NewKeyDownEvent (Key.Enter);
 
-
         // Enter is not the activation key in this unit test
         Assert.Null (activated);
         Assert.False (called);
@@ -744,12 +743,12 @@ public class TreeViewTests : TestDriverBase
         // change the children getter so that now cars can have wheels
         tree.TreeBuilder = new DelegateTreeBuilder<object?> (o =>
 
-                                                                // factories have cars
-                                                                o is Factory
-                                                                    ? new object [] { c1, c2 }
+                                                                 // factories have cars
+                                                                 o is Factory
+                                                                     ? new object [] { c1, c2 }
 
-                                                                    // cars have wheels
-                                                                    : new object [] { wheel });
+                                                                     // cars have wheels
+                                                                     : new object [] { wheel });
 
         // still cannot expand
         tree.Expand (c1);
@@ -790,12 +789,12 @@ public class TreeViewTests : TestDriverBase
         // change the children getter so that now cars can have wheels
         tree.TreeBuilder = new DelegateTreeBuilder<object?> (o =>
 
-                                                                // factories have cars
-                                                                o is Factory
-                                                                    ? new object [] { c1, c2 }
+                                                                 // factories have cars
+                                                                 o is Factory
+                                                                     ? new object [] { c1, c2 }
 
-                                                                    // cars have wheels
-                                                                    : new object [] { wheel });
+                                                                     // cars have wheels
+                                                                     : new object [] { wheel });
 
         // still cannot expand
         tree.Expand (c1);
@@ -953,7 +952,7 @@ public class TreeViewTests : TestDriverBase
     #endregion
 
     /// <summary>
-    ///     Verifies that <see cref="TreeView{T}" /> measures branch text width using grapheme-aware
+    ///     Verifies that <see cref="TreeView{T}"/> measures branch text width using grapheme-aware
     ///     <c>string.GetColumns()</c> rather than <c>string.Length</c>.
     ///     Wide CJK characters occupy 2 terminal cells each but have <c>string.Length</c> of 1,
     ///     so <c>.Length</c> under-counts the display width while <c>.GetColumns()</c> is correct.
@@ -963,7 +962,7 @@ public class TreeViewTests : TestDriverBase
     {
         // setup
         IDriver driver = CreateTestDriver ();
-        string cjkText = "\u4F60\u597D"; // 你好
+        var cjkText = "\u4F60\u597D"; // 你好
         Assert.Equal (2, cjkText.Length);
         Assert.Equal (4, cjkText.GetColumns ());
 
@@ -979,7 +978,7 @@ public class TreeViewTests : TestDriverBase
         tv.Draw ();
 
         // verify
-        string actual = driver.ToString ()!;
+        var actual = driver.ToString ()!;
         string [] lines = actual.Replace ("\r\n", "\n").Split ('\n');
         string firstLine = lines [0];
         Assert.Contains (cjkText, firstLine);

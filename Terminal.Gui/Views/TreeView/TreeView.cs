@@ -698,7 +698,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
         List<Branch<T>> toReturn = new ();
         List<Branch<T>> children = new ();
 
-        if (currentBranch.IsExpanded)
+        if (currentBranch.IsExpanded && currentBranch.ChildBranches is not null)
         {
             foreach (Branch<T> subBranch in currentBranch.ChildBranches)
             {
