@@ -14,12 +14,7 @@ public class TextViewNavigationTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "This is the first line.\nThis is the second line.\nThis is the third line.first"
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "This is the first line.\nThis is the second line.\nThis is the third line.first" };
 
         runnable.Add (tv);
         app.Begin (runnable);
@@ -47,12 +42,7 @@ public class TextViewNavigationTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "This is the first line.\nThis is the second line.\nThis is the third line.first"
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "This is the first line.\nThis is the second line.\nThis is the third line.first" };
 
         runnable.Add (tv);
         app.Begin (runnable);
@@ -79,12 +69,7 @@ public class TextViewNavigationTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "This is the first line.\nThis is the second line.\nThis is the third line." };
 
         runnable.Add (tv);
         app.Begin (runnable);
@@ -107,12 +92,7 @@ public class TextViewNavigationTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "This is the first line.\nThis is the second line.\nThis is the third line." };
 
         runnable.Add (tv);
         app.Begin (runnable);
@@ -134,12 +114,7 @@ public class TextViewNavigationTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "This is the first line.\nThis is the second line.\nThis is the third line." };
 
         runnable.Add (tv);
         app.Begin (runnable);
@@ -162,12 +137,7 @@ public class TextViewNavigationTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "This is the first line.\nThis is the second line.\nThis is the third line." };
 
         runnable.Add (tv);
         app.Begin (runnable);
@@ -193,12 +163,7 @@ public class TextViewNavigationTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "is is the first line\nThis is the second line.\nThis is the third line.first"
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "is is the first line\nThis is the second line.\nThis is the third line.first" };
 
         runnable.Add (tv);
         app.Begin (runnable);
@@ -219,12 +184,7 @@ public class TextViewNavigationTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "is is the first lin\nThis is the second line.\nThis is the third line.first"
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "is is the first lin\nThis is the second line.\nThis is the third line.first" };
 
         runnable.Add (tv);
         app.Begin (runnable);
@@ -247,12 +207,7 @@ public class TextViewNavigationTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "is is the first lin\nThis is the second line.\nThis is the third line.first"
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "is is the first lin\nThis is the second line.\nThis is the third line.first" };
 
         runnable.Add (tv);
         app.Begin (runnable);
@@ -273,12 +228,7 @@ public class TextViewNavigationTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "This is the first line.\nThis is the second line.\nThis is the third line." };
 
         runnable.Add (tv);
         app.Begin (runnable);
@@ -299,12 +249,7 @@ public class TextViewNavigationTests
         using IApplication app = Application.Create ();
         using Runnable<bool> runnable = new ();
 
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 2,
-            Text = "This is the first line.\nThis is the second line.\nThis is the third line."
-        };
+        TextView tv = new () { Width = 10, Height = 2, Text = "This is the first line.\nThis is the second line.\nThis is the third line." };
 
         runnable.Add (tv);
         app.Begin (runnable);
@@ -323,12 +268,7 @@ public class TextViewNavigationTests
     public void CursorRight_At_NearTheEndOfLine_With_ViewportY_Greater_Than_Zero_Does_Not_Scroll_Up ()
     {
         // Test that pressing CursorRight at near the end of line does not scroll up if Viewport.Y > 0
-        TextView tv = new ()
-        {
-            Width = 10,
-            Height = 3,
-            Text = "Line1.\nLine2.\nLine3.\nLine4.\nLine5."
-        };
+        TextView tv = new () { Width = 10, Height = 3, Text = "Line1.\nLine2.\nLine3.\nLine4.\nLine5." };
         tv.BeginInit ();
         tv.EndInit ();
 
@@ -349,11 +289,7 @@ public class TextViewNavigationTests
     public void CursorRight_At_BeforeNearTheEndOfLine_With_ViewportX_Greater_Than_Zero_Does_Not_Scroll_Left ()
     {
         // Test that pressing CursorRight at neat the end of line does not scroll left if Viewport.X > 0
-        TextView tv = new ()
-        {
-            Width = 10, Height = 3,
-            Text = "Line1 with more long text.\nLine2.\nLine3.\nLine4."
-        };
+        TextView tv = new () { Width = 10, Height = 3, Text = "Line1 with more long text.\nLine2.\nLine3.\nLine4." };
         tv.BeginInit ();
         tv.EndInit ();
 
@@ -477,6 +413,108 @@ public class TextViewNavigationTests
         Assert.True (tv.NewKeyDownEvent (Key.CursorLeft.WithCtrl));
         Assert.Equal (new Point (17, 0), tv.Viewport.Location);
         Assert.Equal (new Point (26, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+    }
+
+    [Fact]
+    public void CursorRight_At_Text_Hidden_By_Scroll_Move_Cursor_Adjusts_Scroll_To_Make_Cursor_Visible ()
+    {
+        // Test that pressing CursorRight at text hidden by scroll moves cursor and adjusts scroll to make cursor visible
+        TextView tv = new () { Width = 10, Height = 3, Text = "Line1 with more long text.\nLine2.\nLine3.\nLine4." };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Scroll to the column 10 and insertion point stays at the column 0
+        tv.Viewport = tv.Viewport with { X = 10 };
+        Assert.Equal (new Point (10, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (0, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+
+        // Clear NeedsDraw to isolate the effect of CursorRight key press
+        tv.ClearNeedsDraw ();
+        Assert.False (tv.NeedsDraw);
+
+        // Press CursorRight - should move cursor right and scroll to make it visible
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight));
+        Assert.Equal (new Point (0, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (1, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+    }
+
+    [Fact]
+    public void CursorLeft_At_Text_Hidden_By_Scroll_Move_Cursor_Adjusts_Scroll_To_Make_Cursor_Visible ()
+    {
+        // Test that pressing CursorLeft at text hidden by scroll moves cursor and adjusts scroll to make cursor visible
+        TextView tv = new () { Width = 10, Height = 3, Text = "Line1 with more long text.\nLine2.\nLine3.\nLine4." };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Set insertion point at the last column and then scroll to the column 0
+        tv.InsertionPoint = new Point (26, 0);
+        tv.Viewport = tv.Viewport with { X = 0 };
+        Assert.Equal (new Point (0, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (26, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+
+        // Clear NeedsDraw to isolate the effect of CursorLeft key press
+        tv.ClearNeedsDraw ();
+        Assert.False (tv.NeedsDraw);
+
+        // Press CursorLeft - should move cursor left and scroll to make it visible
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
+        Assert.Equal (new Point (16, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (25, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+    }
+
+    [Fact]
+    public void CursorDown_At_Text_Hidden_By_Scroll_Move_Cursor_Adjusts_Scroll_To_Make_Cursor_Visible ()
+    {
+        // Test that pressing CursorDown at text hidden by scroll moves cursor and adjusts scroll to make cursor visible
+        TextView tv = new () { Width = 10, Height = 3, Text = "Line1.\nLine2.\nLine3.\nLine4.\nLine5." };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Scroll to the line 2 and insertion point stays at the line 0
+        tv.Viewport = tv.Viewport with { Y = 2 };
+        Assert.Equal (new Point (0, 2), tv.Viewport.Location);
+        Assert.Equal (new Point (0, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+
+        // Clear NeedsDraw to isolate the effect of CursorDown key press
+        tv.ClearNeedsDraw ();
+        Assert.False (tv.NeedsDraw);
+
+        // Press CursorDown - should move cursor down and scroll to make it visible
+        Assert.True (tv.NewKeyDownEvent (Key.CursorDown));
+        Assert.Equal (new Point (0, 1), tv.Viewport.Location);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+    }
+
+    [Fact]
+    public void CursorUp_At_Text_Hidden_By_Scroll_Move_Cursor_Adjusts_Scroll_To_Make_Cursor_Visible ()
+    {
+        // Test that pressing CursorUp at text hidden by scroll moves cursor and adjusts scroll to make cursor visible
+        TextView tv = new () { Width = 10, Height = 3, Text = "Line1.\nLine2.\nLine3.\nLine4.\nLine5." };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Set insertion point at the line 4 and then scroll to the line 0
+        tv.InsertionPoint = new Point (0, 4);
+        tv.Viewport = tv.Viewport with { Y = 0 };
+        Assert.Equal (new Point (0, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (0, 4), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+
+        // Clear NeedsDraw to isolate the effect of CursorUp key press
+        tv.ClearNeedsDraw ();
+        Assert.False (tv.NeedsDraw);
+
+        // Press CursorUp - should move cursor up and scroll to make it visible
+        Assert.True (tv.NewKeyDownEvent (Key.CursorUp));
+        Assert.Equal (new Point (0, 1), tv.Viewport.Location);
+        Assert.Equal (new Point (0, 3), tv.InsertionPoint);
         Assert.True (tv.NeedsDraw);
     }
 }
