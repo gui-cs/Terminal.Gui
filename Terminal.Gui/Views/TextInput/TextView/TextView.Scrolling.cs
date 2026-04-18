@@ -120,6 +120,11 @@ public partial class TextView
             Viewport = Viewport with { X = TextModel.CalculateLeftColumn (line, Viewport.X, CurrentColumn, Viewport.Width, TabWidth) };
             need = true;
         }
+        else if (tSize.size - Viewport.X + 1 <= Viewport.Width)
+        {
+            Viewport = Viewport with { X = Math.Max (0, tSize.size - Viewport.Width + 1) };
+            need = true;
+        }
         else if ((_wordWrap && Viewport.X > 0) || (dSize.size < Viewport.Width && tSize.size < Viewport.Width))
         {
             if (Viewport.X > 0)

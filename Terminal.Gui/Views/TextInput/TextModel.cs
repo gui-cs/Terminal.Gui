@@ -16,6 +16,7 @@ internal class TextModel
     // Cached max visible line width to avoid O(N×L) rescans on every layout/scroll.
     private int _cachedMaxWidth = -1;
     private int _cachedMaxWidthTabWidth = -1;
+    private Dictionary<int, int> _cachedMaxWidthPerLine = [];
 
     /// <summary>
     ///     Gets the number of times <see cref="GetMaxVisibleLine"/> performed a full line scan.
@@ -33,6 +34,38 @@ internal class TextModel
 
     /// <summary>Invalidates the cached max line width so the next call to <see cref="GetMaxVisibleLine"/> will rescan.</summary>
     internal void InvalidateMaxWidthCache () => _cachedMaxWidth = -1;
+
+    /// <summary>
+    ///   Determines whether the max width cache should be invalidated based on the line being modified, the column width of the modification, and whether it's an insert or delete operation.
+    /// </summary>
+    /// <param name="line">The line number being modified.</param>
+    /// <param name="isInsert">Indicates whether the operation is an insert. Defaults to true.</param>
+    /// <param name="columnWidth">The width of the column being modified. Defaults to -1 on delete.</param>
+    /// <returns><see langword="true"/> if the cache should be invalidated; otherwise, <see langword="false"/>.</returns>
+    internal bool ShouldInvalidateMaxWidthCache (int line, bool isInsert = true, int columnWidth = -1)
+    {
+        if (_cachedMaxWidth < 0)
+        {
+            return true;
+        }
+
+        if (isInsert)
+        {
+            if (_cachedMaxWidthPerLine.TryGetValue (line, out int cachedLineWidth) && columnWidth > cachedLineWidth)
+            {
+                return true;
+            }
+        }
+        else
+        {
+            if (_cachedMaxWidthPerLine.Count == 1 && _cachedMaxWidthPerLine.ContainsKey (line))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     /// <summary>Adds a line to the model at the specified position.</summary>
     /// <param name="pos">Line number where the line will be inserted.</param>
@@ -96,6 +129,12 @@ internal class TextModel
         var maxLength = 0;
         last = last < _lines.Count ? last : _lines.Count;
 
+        // When scanning the full range, reset cached max width per line
+        if (first == 0 && last >= _lines.Count)
+        {
+            _cachedMaxWidthPerLine = [];
+        }
+
         for (int i = first; i < last; i++)
         {
             List<Cell> line = GetLine (i);
@@ -104,6 +143,19 @@ internal class TextModel
             if (colsWidth > maxLength)
             {
                 maxLength = colsWidth;
+
+                // Cache max width per line when scanning the full range, and remove cached widths for lines that are no longer the max
+                if (first != 0 || last < _lines.Count)
+                {
+                    continue;
+                }
+                int length = maxLength;
+                _cachedMaxWidthPerLine = _cachedMaxWidthPerLine.Where (kvp => kvp.Value > length).ToDictionary (kvp => kvp.Key, kvp => kvp.Value);
+                _cachedMaxWidthPerLine.Add (i, maxLength);
+            }
+            else if (maxLength == colsWidth)
+            {
+                _cachedMaxWidthPerLine [i] = colsWidth;
             }
         }
 

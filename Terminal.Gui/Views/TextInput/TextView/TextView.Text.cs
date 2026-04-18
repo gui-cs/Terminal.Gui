@@ -558,23 +558,19 @@ public partial class TextView
                 return;
             }
 
-            if (Used)
-            {
-                Insert (new Cell { Grapheme = grapheme, Attribute = attribute });
-                CurrentColumn++;
-            }
-            else
-            {
-                Insert (new Cell { Grapheme = grapheme, Attribute = attribute });
-                CurrentColumn++;
-            }
-            UpdateContentSize ();
+            Insert (new Cell { Grapheme = grapheme, Attribute = attribute });
+            CurrentColumn++;
+
+            // Text was inserted, so it's always needed to redraw and update content size if needed
+            SetNeedsDraw ();
+
             List<Cell> line = GetCurrentLine ();
             (int size, int length) dSize = TextModel.DisplaySize (line, 0, CurrentColumn, true, TabWidth);
 
-            if (dSize.size + 1 - Viewport.X >= Viewport.Width)
+            if (_model.ShouldInvalidateMaxWidthCache (CurrentRow, true, dSize.size))
             {
-                SetNeedsDraw ();
+                _model.InvalidateMaxWidthCache ();
+                UpdateContentSize ();
             }
         }
 

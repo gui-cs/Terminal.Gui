@@ -480,7 +480,12 @@ public partial class TextView
 
         // Always redraw and update content size because a glyph was deleted
         SetNeedsDraw ();
-        UpdateContentSize ();
+
+        if (_model.ShouldInvalidateMaxWidthCache (CurrentRow, false))
+        {
+            _model.InvalidateMaxWidthCache ();
+            UpdateContentSize ();
+        }
 
         UpdateWrapModel ();
         OnContentsChanged ();
@@ -513,7 +518,12 @@ public partial class TextView
             _historyText.Add (removedLines, InsertionPoint, TextEditingLineStatus.Removed);
             currentLine.AddRange (nextLine);
             _model.RemoveLine (CurrentRow + 1);
+
+            // Text was deleted, so it's always needed to redraw and update content size if needed
             SetNeedsDraw ();
+
+            // _model.RemoveLine already invalidates the max width cache for the removed line, but we also need to check if the merged line's width changed
+            UpdateContentSize ();
 
             _historyText.Add ([[.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
 
@@ -531,7 +541,15 @@ public partial class TextView
         _historyText.Add ([[.. currentLine]], InsertionPoint);
 
         currentLine.RemoveAt (CurrentColumn);
+
+        // Text was deleted, so it's always needed to redraw and update content size if needed
         SetNeedsDraw ();
+
+        if (_model.ShouldInvalidateMaxWidthCache (CurrentRow, false))
+        {
+            _model.InvalidateMaxWidthCache ();
+            UpdateContentSize ();
+        }
 
         _historyText.Add ([[.. currentLine]], InsertionPoint, TextEditingLineStatus.Replaced);
 
