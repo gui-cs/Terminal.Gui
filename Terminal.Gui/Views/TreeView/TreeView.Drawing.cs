@@ -18,7 +18,7 @@ public partial class TreeView<T>
     ///<inheritdoc/>
     protected override bool OnDrawingContent (DrawContext context)
     {
-        if (roots is null)
+        if (Roots is null)
         {
             return true;
         }
@@ -26,7 +26,7 @@ public partial class TreeView<T>
         if (TreeBuilder is null)
         {
             Move (0, 0);
-            AddStr (NoBuilderError);
+            AddStr (NO_BUILDER_ERROR);
 
             return true;
         }

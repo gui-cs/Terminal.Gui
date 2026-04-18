@@ -169,23 +169,29 @@ public class TreeViewTests : TestDriverBase
 
         var accepted = false;
         var activated = false;
-        object? selectedObject = null;
 
         treeView.Accepting += Accept;
         treeView.ObjectActivated += ObjectActivated;
 
+        // Accept should raise Accepting but NOT fire ObjectActivated
+        // (ObjectActivated fires from Activate, not Accept)
         treeView.InvokeCommand (Command.Accept);
 
         Assert.True (accepted);
+        Assert.False (activated);
+
+        // Activate should fire ObjectActivated but NOT Accepting
+        accepted = false;
+        treeView.InvokeCommand (Command.Activate);
+
+        Assert.False (accepted);
         Assert.True (activated);
-        Assert.Equal (car1, selectedObject);
 
         return;
 
         void ObjectActivated (object? sender, ObjectActivatedEventArgs<object?> e)
         {
             activated = true;
-            selectedObject = e.ActivatedObject;
         }
 
         void Accept (object? sender, CommandEventArgs e) => accepted = true;
@@ -528,8 +534,8 @@ public class TreeViewTests : TestDriverBase
         Assert.Empty (tree.GetAllSelectedObjects ());
     }
 
-    // Copilot
-    [Fact (Skip = "Pending rework: Enter should Accept, Space should Activate, single-click Activate, double-click Accept")]
+    // Copilot - Opus 4.6
+    [Fact]
     public void EnterKey_Raises_Accepting ()
     {
         TreeView<object?> tree = CreateTree (out _, out _, out _);
@@ -550,8 +556,8 @@ public class TreeViewTests : TestDriverBase
         tree.Dispose ();
     }
 
-    // Copilot
-    [Fact (Skip = "Pending rework: Enter should Accept, Space should Activate, double-click should Accept")]
+    // Copilot - Opus 4.6
+    [Fact]
     public void DoubleClick_Raises_Accepting ()
     {
         TreeView<object?> tree = CreateTree (out _, out _, out _);
@@ -573,6 +579,103 @@ public class TreeViewTests : TestDriverBase
     }
 
     [Fact]
+    public void Command_Toggle_ExpandCollapse ()
+    {
+        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
+
+        // Factory is the root and is initially collapsed
+        Assert.False (tree.IsExpanded (f));
+
+        // Select the factory node
+        tree.SelectedObject = f;
+
+        // Space should expand the selected node via Command.Activate
+        tree.InvokeCommand (Command.Toggle);
+
+        Assert.True (tree.IsExpanded (f));
+
+        // Space again should collapse it
+        tree.InvokeCommand (Command.Toggle);
+
+        Assert.False (tree.IsExpanded (f));
+
+        tree.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void SpaceKey_Toggles_ExpandCollapse ()
+    {
+        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
+
+        // Factory is the root and is initially collapsed
+        Assert.False (tree.IsExpanded (f));
+
+        // Select the factory node
+        tree.SelectedObject = f;
+
+        // Space should expand the selected node via Command.Activate
+        tree.NewKeyDownEvent (Key.Space);
+
+        Assert.True (tree.IsExpanded (f));
+
+        // Space again should collapse it
+        tree.NewKeyDownEvent (Key.Space);
+
+        Assert.False (tree.IsExpanded (f));
+
+        tree.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void SpaceKey_Fires_ObjectActivated ()
+    {
+        TreeView<object?> tree = CreateTree (out Factory f, out _, out _);
+
+        var objectActivatedFired = false;
+        object? activatedObject = null;
+
+        tree.ObjectActivated += (_, e) =>
+                                {
+                                    objectActivatedFired = true;
+                                    activatedObject = e.ActivatedObject;
+                                };
+
+        // Select the factory node
+        tree.SelectedObject = f;
+
+        // Space should fire ObjectActivated via the Activate handler
+        tree.NewKeyDownEvent (Key.Space);
+
+        Assert.True (objectActivatedFired);
+        Assert.Same (f, activatedObject);
+
+        tree.Dispose ();
+    }
+
+    // Copilot - Opus 4.6
+    [Fact]
+    public void EnterKey_Does_Not_Fire_ObjectActivated ()
+    {
+        TreeView<object?> tree = CreateTree (out Factory f, out _, out _);
+
+        var objectActivatedFired = false;
+
+        tree.ObjectActivated += (_, _) => { objectActivatedFired = true; };
+
+        // Select the factory node
+        tree.SelectedObject = f;
+
+        // Enter should fire Accept (Accepting/Accepted), NOT Activate (ObjectActivated)
+        tree.NewKeyDownEvent (Key.Enter);
+
+        Assert.False (objectActivatedFired);
+
+        tree.Dispose ();
+    }
+
+    [Fact]
     public void ObjectActivated_Called ()
     {
         TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
@@ -589,134 +692,39 @@ public class TreeViewTests : TestDriverBase
 
         Assert.False (called);
 
-        // NOTE: Activation causes implicit focusing so the first object gets selected
-        tree.NewKeyDownEvent (Key.Enter);
+        // Space triggers Activate which fires ObjectActivated
+        // (Enter now triggers Accept, which does NOT fire ObjectActivated)
+        tree.SelectedObject = f;
+        tree.NewKeyDownEvent (Key.Space);
 
         Assert.True (called);
         Assert.Same (f, activated);
     }
 
     [Fact]
-    public void ObjectActivated_CustomKey ()
+    public void DoubleClick_SelectsObject_And_Accepts ()
     {
         TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
 
-        tree.ObjectActivationKey = KeyCode.Delete;
-        object? activated = null;
-        var called = false;
+        Assert.NotSame (f, tree.SelectedObject);
 
-        // register for the event
-        tree.ObjectActivated += (s, e) =>
-                                {
-                                    activated = e.ActivatedObject;
-                                    called = true;
-                                };
+        var acceptingFired = false;
 
-        Assert.False (called);
+        // Double-click now routes through Command.Accept (CWP flow)
+        tree.Accepted += (_, e) =>
+                          {
+                              acceptingFired = true;
+                          };
 
-        // no object is selected yet so no event should happen
-        tree.NewKeyDownEvent (Key.Enter);
+        Assert.False (acceptingFired);
 
-        // Enter is not the activation key in this unit test
-        Assert.Null (activated);
-        Assert.False (called);
-
-        // Delete is the activation key in this test so should result in activation occurring
-        tree.NewKeyDownEvent (Key.Delete);
-
-        Assert.True (called);
-        Assert.Same (f, activated);
-    }
-
-    [Fact]
-    public void ObjectActivationButton_DoubleClick ()
-    {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
-
-        object? activated = null;
-        var called = false;
-
-        // register for the event
-        tree.ObjectActivated += (s, e) =>
-                                {
-                                    activated = e.ActivatedObject;
-                                    called = true;
-                                };
-
-        Assert.False (called);
-
-        // double click triggers activation
+        tree.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonPressed });
+        tree.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonReleased });
+        tree.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonClicked });
         tree.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonDoubleClicked });
 
-        Assert.True (called);
-        Assert.Same (f, activated);
+        Assert.True (acceptingFired);
         Assert.Same (f, tree.SelectedObject);
-    }
-
-    [Fact]
-    public void ObjectActivationButton_RightClick ()
-    {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
-
-        tree.ObjectActivationButton = MouseFlags.MiddleButtonClicked;
-        tree.ExpandAll ();
-
-        object? activated = null;
-        var called = false;
-
-        // register for the event
-        tree.ObjectActivated += (s, e) =>
-                                {
-                                    activated = e.ActivatedObject;
-                                    called = true;
-                                };
-
-        Assert.False (called);
-
-        // double click does nothing because we changed button binding to right click
-        tree.NewMouseEvent (new Mouse { Position = new Point (0, 1), Flags = MouseFlags.LeftButtonDoubleClicked });
-
-        Assert.Null (activated);
-        Assert.False (called);
-
-        tree.NewMouseEvent (new Mouse { Position = new Point (0, 1), Flags = MouseFlags.MiddleButtonClicked });
-
-        Assert.True (called);
-        Assert.Same (car1, activated);
-        Assert.Same (car1, tree.SelectedObject);
-    }
-
-    [Fact]
-    public void ObjectActivationButton_SetToNull ()
-    {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
-        Assert.Null (tree.SelectedObject);
-
-        Assert.True (tree.SetFocus ());
-        tree.SelectedObject = null;
-        Assert.Null (tree.SelectedObject);
-
-        // disable activation
-        tree.ObjectActivationButton = null;
-
-        object? activated = null;
-        var called = false;
-
-        // register for the event
-        tree.ObjectActivated += (s, e) =>
-                                {
-                                    activated = e.ActivatedObject;
-                                    called = true;
-                                };
-
-        Assert.False (called);
-
-        // double click does nothing because we changed button to null
-        tree.NewMouseEvent (new Mouse { Flags = MouseFlags.LeftButtonDoubleClicked });
-
-        Assert.False (called);
-        Assert.Null (activated);
-        Assert.Null (tree.SelectedObject);
     }
 
     /// <summary>

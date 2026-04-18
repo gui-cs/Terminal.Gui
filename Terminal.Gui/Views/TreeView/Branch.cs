@@ -520,7 +520,7 @@ internal class Branch<T> where T : class
     {
         if (Parent is null)
         {
-            return this == _tree.roots.Values.LastOrDefault ();
+            return this == _tree.Roots.Values.LastOrDefault ();
         }
 
         Parent.ChildBranches ??= Parent.FetchChildren ();

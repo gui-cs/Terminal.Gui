@@ -9,8 +9,8 @@ namespace Terminal.Gui.Views;
 public partial class TreeView<T>
 {
     /// <summary>
-    ///     This event is raised when an object is activated e.g. by double clicking or pressing
-    ///     <see cref="ObjectActivationKey"/>.
+    ///     This event is raised when an object is activated e.g. by single-clicking or pressing
+    ///     the key bound to <see cref="Command.Activate"/> (default is Space).
     /// </summary>
 
     // TODO: Refactor to use CWP
@@ -44,7 +44,7 @@ public partial class TreeView<T>
 
         if (SelectedObject is null)
         {
-            SelectedObject = roots.Keys.FirstOrDefault ();
+            SelectedObject = Roots.Keys.FirstOrDefault ();
         }
         else
         {
@@ -55,7 +55,7 @@ public partial class TreeView<T>
             if (idx == -1)
             {
                 // The current selection has disappeared!
-                SelectedObject = roots.Keys.FirstOrDefault ();
+                SelectedObject = Roots.Keys.FirstOrDefault ();
             }
             else
             {
@@ -176,19 +176,6 @@ public partial class TreeView<T>
     }
 
     /// <summary>
-    ///     <para>Moves the <see cref="SelectedObject"/> to the next item that begins with <paramref name="character"/>.</para>
-    ///     <para>This method will loop back to the start of the tree if reaching the end without finding a match.</para>
-    /// </summary>
-    /// <param name="character">The first character of the next item you want selected.</param>
-    /// <param name="caseSensitivity">Case sensitivity of the search.</param>
-    public void AdjustSelectionToNextItemBeginningWith (char character, StringComparison caseSensitivity = StringComparison.CurrentCultureIgnoreCase)
-    {
-        // search for next branch that begins with that letter
-        var characterAsStr = character.ToString ();
-        AdjustSelectionToNext (b => AspectGetter (b.Model).StartsWith (characterAsStr, caseSensitivity));
-    }
-
-    /// <summary>
     ///     Returns true if the given object <paramref name="o"/> is exposed in the tree and can be expanded otherwise
     ///     false.
     /// </summary>
@@ -213,7 +200,7 @@ public partial class TreeView<T>
     /// <summary>Collapses all root nodes in the tree.</summary>
     public void CollapseAll ()
     {
-        foreach (KeyValuePair<T, Branch<T>> item in roots)
+        foreach (KeyValuePair<T, Branch<T>> item in Roots)
         {
             item.Value.Collapse ();
         }
@@ -272,6 +259,38 @@ public partial class TreeView<T>
         SetNeedsDraw ();
     }
 
+    /// <summary>
+    ///    Toggles the expansion of the supplied object if it is contained in the tree (either as a root object or as an exposed branch
+    ///    object).
+    /// </summary>
+    /// <param name="toToggle"></param>
+    public void Toggle (T toToggle)
+    {
+        if (toToggle is null)
+        {
+            return;
+        }
+
+        Branch<T> branch = ObjectToBranch (toToggle);
+
+        if (branch is null)
+        {
+            return;
+        }
+
+        if (branch.IsExpanded)
+        {
+            branch.Collapse ();
+        }
+        else
+        {
+            branch.Expand ();
+        }
+
+        InvalidateLineMap ();
+        SetNeedsDraw ();
+    }
+
     /// <summary>Expands the supplied object and all child objects.</summary>
     /// <param name="toExpand">The object to expand.</param>
     public void ExpandAll (T toExpand)
@@ -292,7 +311,7 @@ public partial class TreeView<T>
     /// </summary>
     public void ExpandAll ()
     {
-        foreach (KeyValuePair<T, Branch<T>> item in roots)
+        foreach (KeyValuePair<T, Branch<T>> item in Roots)
         {
             item.Value.ExpandAll ();
         }
@@ -341,10 +360,10 @@ public partial class TreeView<T>
 
         if (branch is null || !branch.IsExpanded)
         {
-            return new T [0];
+            return [];
         }
 
-        return branch.ChildBranches?.Select (b => b.Model).ToArray () ?? new T [0];
+        return branch.ChildBranches?.Select (b => b.Model).ToArray () ?? [];
     }
 
     /// <summary>
@@ -413,7 +432,7 @@ public partial class TreeView<T>
     public void GoToFirst ()
     {
         ScrollOffsetVertical = 0;
-        SelectedObject = roots.Keys.FirstOrDefault ();
+        SelectedObject = Roots.Keys.FirstOrDefault ();
 
         SetNeedsDraw ();
     }
@@ -477,7 +496,7 @@ public partial class TreeView<T>
 
         int? newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)key);
 
-        if (newIndex is not int idx || idx == -1)
+        if (newIndex is not { } idx || idx == -1)
         {
             return false;
         }
@@ -609,6 +628,19 @@ public partial class TreeView<T>
         }
     }
 
+    /// <summary>
+    ///     Determines systems behaviour when the space key is pressed. Default behaviour is to toggle the expansion of the
+    ///    currently selected node if it has children.
+    /// </summary>
+    protected virtual void Space ()
+    {
+        if (SelectedObject is null)
+        {
+            return;
+        }
+        Toggle (SelectedObject);
+    }
+
     /// <summary>Raises the <see cref="ObjectActivated"/> event.</summary>
     /// <param name="e"></param>
 
@@ -620,47 +652,4 @@ public partial class TreeView<T>
 
     // TODO: Refactor to use CWP
     protected virtual void OnSelectionChanged (SelectionChangedEventArgs<T> e) => SelectionChanged?.Invoke (this, e);
-
-    /// <summary>Sets the selection to the next branch that matches the <paramref name="predicate"/>.</summary>
-    /// <param name="predicate"></param>
-    private void AdjustSelectionToNext (Func<Branch<T>, bool> predicate)
-    {
-        IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
-
-        // empty map means we can't select anything anyway
-        if (map.Count == 0)
-        {
-            return;
-        }
-
-        // Start searching from the first element in the map
-        var idxStart = 0;
-
-        // or the current selected branch
-        if (SelectedObject is { })
-        {
-            idxStart = map.IndexOf (b => Equals (b.Model, SelectedObject));
-        }
-
-        // if currently selected object mysteriously vanished, search from beginning
-        if (idxStart == -1)
-        {
-            idxStart = 0;
-        }
-
-        // loop around all indexes and back to first index
-        for (int idxCur = (idxStart + 1) % map.Count; idxCur != idxStart; idxCur = (idxCur + 1) % map.Count)
-        {
-            if (!predicate (map.ElementAt (idxCur)))
-            {
-                continue;
-            }
-
-            SelectedObject = map.ElementAt (idxCur).Model;
-            EnsureVisible (map.ElementAt (idxCur).Model);
-            SetNeedsDraw ();
-
-            return;
-        }
-    }
 }
