@@ -21,7 +21,7 @@ public sealed class ThemeViewer : FrameView
                            {
                                if (sender is View sendingView)
                                {
-                                   sendingView.SetContentSize (new Size (sendingView.GetContentSize ().Width, sendingView.GetHeightRequiredForSubViews ()));
+                                   sendingView.SetContentHeight (sendingView.GetHeightRequiredForSubViews ());
                                }
                            };
 
@@ -42,7 +42,7 @@ public sealed class ThemeViewer : FrameView
         AddCommand (Command.End,
                     () =>
                     {
-                        Viewport = Viewport with { Y = GetContentSize ().Height };
+                        Viewport = Viewport with { Y = GetContentHeight () };
 
                         return true;
                     });

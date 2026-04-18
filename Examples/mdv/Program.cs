@@ -170,7 +170,7 @@ static void RenderMarkdown (string markdown, ThemeName syntaxTheme, int width, i
     markdownView.Layout ();
 
     // Resize to the full content height but keep the terminal width
-    int contentHeight = markdownView.GetContentSize ().Height;
+    int contentHeight = markdownView.GetContentHeight ();
     app.Driver?.SetScreenSize (width, contentHeight);
     markdownView.SetRelativeLayout (app.Screen.Size);
 
@@ -240,8 +240,7 @@ static void RunFullScreen (List<string> files, ThemeName syntaxTheme)
                                                 return;
                                             }
 
-                                            Size currentContentSize = markdownView.GetContentSize ();
-                                            markdownView.SetContentSize (currentContentSize with { Width = newWidth });
+                                            markdownView.SetContentWidth (newWidth);
                                         };
 
     Shortcut contentWidthShortcut = new () { CommandView = contentWidthUpDown, HelpText = "Content Width" };

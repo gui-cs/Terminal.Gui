@@ -16,7 +16,7 @@ public class AllViewsView : View
                            {
                                if (sender is View sendingView)
                                {
-                                   sendingView.SetContentSize (new Size (sendingView.Viewport.Width, sendingView.GetHeightRequiredForSubViews ()));
+                                   sendingView.SetContentHeight (sendingView.GetHeightRequiredForSubViews ());
                                }
                            };
 
@@ -36,7 +36,7 @@ public class AllViewsView : View
         AddCommand (Command.End,
                     () =>
                     {
-                        Viewport = Viewport with { Y = GetContentSize ().Height };
+                        Viewport = Viewport with { Y = GetContentHeight () };
 
                         return true;
                     });

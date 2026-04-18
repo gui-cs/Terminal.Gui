@@ -29,8 +29,7 @@ public sealed class TextStyles : Scenario
                                      {
                                          if (sender is View sendingView)
                                          {
-                                             sendingView.SetContentSize (new Size (sendingView.GetContentSize ().Width,
-                                                                                   sendingView.GetHeightRequiredForSubViews ()));
+                                             sendingView.SetContentHeight (sendingView.GetHeightRequiredForSubViews ());
                                          }
                                      };
 
