@@ -24,7 +24,7 @@ public class TreeViewTests : TestDriverBase
 
         tree.KeyBindings.Add (Key.B, Command.Down);
 
-        Assert.Equal ("apricot", tree.SelectedObject.Text);
+        Assert.Equal ("apricot", tree.SelectedObject?.Text);
 
         // Keys should be consumed to move down the navigation i.e. to apricot
         Assert.True (tree.NewKeyDownEvent (Key.B));
@@ -67,26 +67,6 @@ public class TreeViewTests : TestDriverBase
         // Activate should not trigger Accepting; Accept should
         Assert.Equal (0, afterActivate);
         Assert.Equal (1, afterAccept);
-
-        treeView.Dispose ();
-    }
-
-    // Copilot
-    [Fact]
-    public void Command_Activate_Fires_ObjectActivated ()
-    {
-        TreeView treeView = new ();
-        TreeNode root = new () { Text = "Root" };
-        treeView.AddObject (root);
-        treeView.SelectedObject = root;
-
-        var activatedFired = false;
-
-        treeView.ObjectActivated += (_, _) => activatedFired = true;
-
-        treeView.InvokeCommand (Command.Activate);
-
-        Assert.True (activatedFired);
 
         treeView.Dispose ();
     }
@@ -158,76 +138,6 @@ public class TreeViewTests : TestDriverBase
         return;
 
         void OnAccept (object? sender, CommandEventArgs e) => accepted = true;
-    }
-
-    [Fact]
-    public void Accept_Command_Accepts_and_ActivatesObject ()
-    {
-        TreeView<object?> treeView = CreateTree (out Factory f, out Car car1, out _);
-        Assert.NotNull (car1);
-        treeView.SelectedObject = car1;
-
-        var accepted = false;
-        var activated = false;
-
-        treeView.Accepting += Accept;
-        treeView.ObjectActivated += ObjectActivated;
-
-        // Accept should raise Accepting but NOT fire ObjectActivated
-        // (ObjectActivated fires from Activate, not Accept)
-        treeView.InvokeCommand (Command.Accept);
-
-        Assert.True (accepted);
-        Assert.False (activated);
-
-        // Activate should fire ObjectActivated but NOT Accepting
-        accepted = false;
-        treeView.InvokeCommand (Command.Activate);
-
-        Assert.False (accepted);
-        Assert.True (activated);
-
-        return;
-
-        void ObjectActivated (object? sender, ObjectActivatedEventArgs<object?> e)
-        {
-            activated = true;
-        }
-
-        void Accept (object? sender, CommandEventArgs e) => accepted = true;
-    }
-
-    [Fact]
-    public void Accept_Cancel_Event_Prevents_ObjectActivated ()
-    {
-        TreeView<object?> treeView = CreateTree (out Factory f, out Car car1, out _);
-        treeView.SelectedObject = car1;
-        var accepted = false;
-        var activated = false;
-        object? selectedObject = null;
-
-        treeView.Accepting += Accept;
-        treeView.ObjectActivated += ObjectActivated;
-
-        treeView.InvokeCommand (Command.Accept);
-
-        Assert.True (accepted);
-        Assert.False (activated);
-        Assert.Null (selectedObject);
-
-        return;
-
-        void ObjectActivated (object? sender, ObjectActivatedEventArgs<object?> e)
-        {
-            activated = true;
-            selectedObject = e.ActivatedObject;
-        }
-
-        void Accept (object? sender, CommandEventArgs e)
-        {
-            accepted = true;
-            e.Handled = true;
-        }
     }
 
     /// <summary>Tests that TreeView.Expand(object) results in a correct content height</summary>
@@ -625,80 +535,6 @@ public class TreeViewTests : TestDriverBase
         Assert.False (tree.IsExpanded (f));
 
         tree.Dispose ();
-    }
-
-    // Copilot - Opus 4.6
-    [Fact]
-    public void SpaceKey_Fires_ObjectActivated ()
-    {
-        TreeView<object?> tree = CreateTree (out Factory f, out _, out _);
-
-        var objectActivatedFired = false;
-        object? activatedObject = null;
-
-        tree.ObjectActivated += (_, e) =>
-                                {
-                                    objectActivatedFired = true;
-                                    activatedObject = e.ActivatedObject;
-                                };
-
-        // Select the factory node
-        tree.SelectedObject = f;
-
-        // Space should fire ObjectActivated via the Activate handler
-        tree.NewKeyDownEvent (Key.Space);
-
-        Assert.True (objectActivatedFired);
-        Assert.Same (f, activatedObject);
-
-        tree.Dispose ();
-    }
-
-    // Copilot - Opus 4.6
-    [Fact]
-    public void EnterKey_Does_Not_Fire_ObjectActivated ()
-    {
-        TreeView<object?> tree = CreateTree (out Factory f, out _, out _);
-
-        var objectActivatedFired = false;
-
-        tree.ObjectActivated += (_, _) => { objectActivatedFired = true; };
-
-        // Select the factory node
-        tree.SelectedObject = f;
-
-        // Enter should fire Accept (Accepting/Accepted), NOT Activate (ObjectActivated)
-        tree.NewKeyDownEvent (Key.Enter);
-
-        Assert.False (objectActivatedFired);
-
-        tree.Dispose ();
-    }
-
-    [Fact]
-    public void ObjectActivated_Called ()
-    {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
-
-        object? activated = null;
-        var called = false;
-
-        // register for the event
-        tree.ObjectActivated += (s, e) =>
-                                {
-                                    activated = e.ActivatedObject;
-                                    called = true;
-                                };
-
-        Assert.False (called);
-
-        // Space triggers Activate which fires ObjectActivated
-        // (Enter now triggers Accept, which does NOT fire ObjectActivated)
-        tree.SelectedObject = f;
-        tree.NewKeyDownEvent (Key.Space);
-
-        Assert.True (called);
-        Assert.Same (f, activated);
     }
 
     [Fact]

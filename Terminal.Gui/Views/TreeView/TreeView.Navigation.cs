@@ -2,24 +2,13 @@
 // by phillip.piper@gmail.com). Phillip has explicitly granted permission for his design
 // and code to be used in this library under the MIT license.
 
-#nullable disable
-
 namespace Terminal.Gui.Views;
 
 public partial class TreeView<T>
 {
-    /// <summary>
-    ///     This event is raised when an object is activated e.g. by single-clicking or pressing
-    ///     the key bound to <see cref="Command.Activate"/> (default is Space).
-    /// </summary>
-
     // TODO: Refactor to use CWP
-    public event EventHandler<ObjectActivatedEventArgs<T>> ObjectActivated;
-
     /// <summary>Called when the <see cref="SelectedObject"/> changes.</summary>
-
-    // TODO: Refactor to use CWP
-    public event EventHandler<SelectionChangedEventArgs<T>> SelectionChanged;
+    public event EventHandler<SelectionChangedEventArgs<T>>? SelectionChanged;
 
     /// <summary>
     ///     The number of screen lines to move the currently selected object by. Supports negative values.
@@ -93,7 +82,7 @@ public partial class TreeView<T>
     /// <summary>Moves the selection to the last child in the currently selected level.</summary>
     public void AdjustSelectionToBranchEnd ()
     {
-        T o = SelectedObject;
+        T? o = SelectedObject;
 
         if (o is null)
         {
@@ -135,7 +124,7 @@ public partial class TreeView<T>
     /// <summary>Moves the selection to the first child in the currently selected level.</summary>
     public void AdjustSelectionToBranchStart ()
     {
-        T o = SelectedObject;
+        T? o = SelectedObject;
 
         if (o is null)
         {
@@ -188,14 +177,14 @@ public partial class TreeView<T>
 
     /// <summary>Collapses the supplied object if it is currently expanded .</summary>
     /// <param name="toCollapse">The object to collapse.</param>
-    public void Collapse (T toCollapse) => CollapseImpl (toCollapse, false);
+    public void Collapse (T? toCollapse) => CollapseImpl (toCollapse, false);
 
     /// <summary>
     ///     Collapses the supplied object if it is currently expanded. Also collapses all children branches (this will
     ///     only become apparent when/if the user expands it again).
     /// </summary>
     /// <param name="toCollapse">The object to collapse.</param>
-    public void CollapseAll (T toCollapse) => CollapseImpl (toCollapse, true);
+    public void CollapseAll (T? toCollapse) => CollapseImpl (toCollapse, true);
 
     /// <summary>Collapses all root nodes in the tree.</summary>
     public void CollapseAll ()
@@ -213,8 +202,13 @@ public partial class TreeView<T>
     ///     Adjusts the <see cref="ScrollOffsetVertical"/> to ensure the given <paramref name="model"/> is visible. Has no
     ///     effect if already visible.
     /// </summary>
-    public void EnsureVisible (T model)
+    public void EnsureVisible (T? model)
     {
+        if (model is null)
+        {
+            return;
+        }
+
         IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
 
         int idx = map.IndexOf (b => Equals (b.Model, model));
@@ -247,7 +241,7 @@ public partial class TreeView<T>
     ///     object).
     /// </summary>
     /// <param name="toExpand">The object to expand.</param>
-    public void Expand (T toExpand)
+    public void Expand (T? toExpand)
     {
         if (toExpand is null)
         {
@@ -260,18 +254,19 @@ public partial class TreeView<T>
     }
 
     /// <summary>
-    ///    Toggles the expansion of the supplied object if it is contained in the tree (either as a root object or as an exposed branch
-    ///    object).
+    ///     Toggles the expansion of the supplied object if it is contained in the tree (either as a root object or as an
+    ///     exposed branch
+    ///     object).
     /// </summary>
     /// <param name="toToggle"></param>
-    public void Toggle (T toToggle)
+    public void Toggle (T? toToggle)
     {
         if (toToggle is null)
         {
             return;
         }
 
-        Branch<T> branch = ObjectToBranch (toToggle);
+        Branch<T>? branch = ObjectToBranch (toToggle);
 
         if (branch is null)
         {
@@ -293,7 +288,7 @@ public partial class TreeView<T>
 
     /// <summary>Expands the supplied object and all child objects.</summary>
     /// <param name="toExpand">The object to expand.</param>
-    public void ExpandAll (T toExpand)
+    public void ExpandAll (T? toExpand)
     {
         if (toExpand is null)
         {
@@ -354,9 +349,9 @@ public partial class TreeView<T>
     /// </summary>
     /// <param name="o">An object in the tree.</param>
     /// <returns></returns>
-    public IEnumerable<T> GetChildren (T o)
+    public IEnumerable<T> GetChildren (T? o)
     {
-        Branch<T> branch = ObjectToBranch (o);
+        Branch<T>? branch = ObjectToBranch (o);
 
         if (branch is null || !branch.IsExpanded)
         {
@@ -372,7 +367,7 @@ public partial class TreeView<T>
     /// </summary>
     /// <param name="o">An object in the tree.</param>
     /// <returns></returns>
-    public T GetParent (T o) => ObjectToBranch (o)?.Parent?.Model;
+    public T? GetParent (T? o) => ObjectToBranch (o)?.Parent?.Model;
 
     /// <summary>
     ///     Returns the index of the object <paramref name="o"/> if it is currently exposed (it's parent(s) have been
@@ -440,7 +435,7 @@ public partial class TreeView<T>
     /// <summary>Returns true if the given object <paramref name="o"/> is exposed in the tree and expanded otherwise false.</summary>
     /// <param name="o"></param>
     /// <returns></returns>
-    public bool IsExpanded (T o) => ObjectToBranch (o)?.IsExpanded ?? false;
+    public bool IsExpanded (T? o) => ObjectToBranch (o)?.IsExpanded ?? false;
 
     /// <summary>
     ///     Returns true if the <paramref name="model"/> is either the <see cref="SelectedObject"/> or part of a
@@ -448,7 +443,7 @@ public partial class TreeView<T>
     /// </summary>
     /// <param name="model"></param>
     /// <returns></returns>
-    public bool IsSelected (T model) => Equals (SelectedObject, model) || (MultiSelect && _multiSelectedRegions.Any (s => s.Contains (model)));
+    public bool IsSelected (T? model) => Equals (SelectedObject, model) || (MultiSelect && _multiSelectedRegions.Any (s => model is { } && s.Contains (model)));
 
     /// <summary>Moves the selection down by the height of the control (1 page).</summary>
     /// <param name="expandSelection">True if the navigation should add the covered nodes to the selected current selection.</param>
@@ -494,7 +489,7 @@ public partial class TreeView<T>
             return false;
         }
 
-        int? newIndex = KeystrokeNavigator?.GetNextMatchingItem (current, (char)key);
+        int? newIndex = KeystrokeNavigator.GetNextMatchingItem (current, (char)key);
 
         if (newIndex is not { } idx || idx == -1)
         {
@@ -562,14 +557,14 @@ public partial class TreeView<T>
     /// </summary>
     /// <param name="toCollapse"></param>
     /// <param name="all"></param>
-    protected void CollapseImpl (T toCollapse, bool all)
+    protected void CollapseImpl (T? toCollapse, bool all)
     {
         if (toCollapse is null)
         {
             return;
         }
 
-        Branch<T> branch = ObjectToBranch (toCollapse);
+        Branch<T>? branch = ObjectToBranch (toCollapse);
 
         // Nothing to collapse
         if (branch is null)
@@ -604,7 +599,7 @@ public partial class TreeView<T>
     {
         if (!IsExpanded (SelectedObject))
         {
-            T parent = GetParent (SelectedObject);
+            T? parent = GetParent (SelectedObject);
 
             if (parent is null)
             {
@@ -630,7 +625,7 @@ public partial class TreeView<T>
 
     /// <summary>
     ///     Determines systems behaviour when the space key is pressed. Default behaviour is to toggle the expansion of the
-    ///    currently selected node if it has children.
+    ///     currently selected node if it has children.
     /// </summary>
     protected virtual void Space ()
     {
@@ -640,12 +635,6 @@ public partial class TreeView<T>
         }
         Toggle (SelectedObject);
     }
-
-    /// <summary>Raises the <see cref="ObjectActivated"/> event.</summary>
-    /// <param name="e"></param>
-
-    // TODO: Refactor to use CWP
-    protected virtual void OnObjectActivated (ObjectActivatedEventArgs<T> e) => ObjectActivated?.Invoke (this, e);
 
     /// <summary>Raises the SelectionChanged event.</summary>
     /// <param name="e"></param>

@@ -58,7 +58,7 @@ internal class Branch<T> where T : class
         }
 
         //if there is a rapid method for determining whether there are children
-        if (_tree.TreeBuilder.SupportsCanExpand)
+        if (_tree.TreeBuilder is { SupportsCanExpand: true })
         {
             return _tree.TreeBuilder.CanExpand (Model);
         }
@@ -197,7 +197,7 @@ internal class Branch<T> where T : class
         // if custom color delegate invoke it
         if (_tree.ColorGetter is { })
         {
-            Scheme modelScheme = _tree.ColorGetter (Model);
+            Scheme? modelScheme = _tree.ColorGetter (Model);
 
             // if custom scheme is defined for this Model
             if (modelScheme is { })

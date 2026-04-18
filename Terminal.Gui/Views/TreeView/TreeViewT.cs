@@ -2,7 +2,6 @@
 // by phillip.piper@gmail.com). Phillip has explicitly granted permission for his design
 // and code to be used in this library under the MIT license.
 
-#nullable disable
 using System.Collections.ObjectModel;
 
 namespace Terminal.Gui.Views;
@@ -107,18 +106,18 @@ public partial class TreeView<T> : View, ITreeView where T : class
     ///     Interface for filtering which lines of the tree are displayed e.g. to provide text searching.  Defaults to
     ///     <see langword="null"/> (no filtering).
     /// </summary>
-    public ITreeViewFilter<T> Filter { get; set; } = null;
+    public ITreeViewFilter<T>? Filter { get; set; } = null;
 
     /// <summary>Secondary selected regions of tree when <see cref="MultiSelect"/> is true.</summary>
     private readonly Stack<TreeSelection<T>> _multiSelectedRegions = new ();
 
     /// <summary>Cached result of <see cref="BuildLineMap"/></summary>
-    private IReadOnlyCollection<Branch<T>> _cachedLineMap;
+    private IReadOnlyCollection<Branch<T>>? _cachedLineMap;
 
     private int _scrollOffsetVertical;
 
     /// <summary>private variable for <see cref="SelectedObject"/></summary>
-    private T _selectedObject;
+    private T? _selectedObject;
 
     /// <summary>
     ///     Creates a new tree view with absolute positioning. Use <see cref="AddObjects(IEnumerable{T})"/> to set
@@ -318,7 +317,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
     ///     Delegate for multi-colored tree views. Return the <see cref="Scheme"/> to use for each passed object or
     ///     null to use the default.
     /// </summary>
-    public Func<T, Scheme> ColorGetter { get; set; }
+    public Func<T, Scheme?>? ColorGetter { get; set; }
 
     /// <summary>The current number of rows in the tree (ignoring the controls bounds).</summary>
     public int ContentHeight => BuildLineMap ().Count;
@@ -373,12 +372,17 @@ public partial class TreeView<T> : View, ITreeView where T : class
     ///     The currently selected object in the tree. When <see cref="MultiSelect"/> is true this is the object at which
     ///     the cursor is at.
     /// </summary>
-    public T SelectedObject
+    public T? SelectedObject
     {
         get => _selectedObject;
         set
         {
-            T oldValue = _selectedObject;
+            if (ReferenceEquals (_selectedObject, value))
+            {
+                return;
+            }
+
+            T? oldValue = _selectedObject;
             _selectedObject = value;
 
             if (!ReferenceEquals (oldValue, value))
@@ -390,7 +394,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
 
     /// <summary>Determines how sub-branches of the tree are dynamically built at runtime as the user expands root nodes.</summary>
     /// <value></value>
-    public ITreeBuilder<T> TreeBuilder { get; set; }
+    public ITreeBuilder<T>? TreeBuilder { get; set; }
 
     /// <summary>
     ///     Map of root objects to the branches under them. All objects have a <see cref="Branch{T}"/> even if that branch
@@ -411,23 +415,23 @@ public partial class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <inheritdoc/>
-    protected override void OnActivated (ICommandContext ctx)
+    protected override void OnActivated (ICommandContext? ctx)
     {
         base.OnActivated (ctx);
 
-        T o = SelectedObject;
+        T? o = SelectedObject;
 
         if (o is null)
         {
             return;
         }
 
-        bool isExpandToggleAttempt = true;
+        var isExpandToggleAttempt = true;
 
         if (ctx?.Binding is MouseBinding { MouseEvent: { } } mouseBinding)
         {
             // The line they clicked on a branch
-            Branch<T> clickedBranch = HitTest (mouseBinding.MouseEvent.Position!.Value.Y);
+            Branch<T>? clickedBranch = HitTest (mouseBinding.MouseEvent.Position!.Value.Y);
 
             if (clickedBranch is null)
             {
@@ -443,17 +447,14 @@ public partial class TreeView<T> : View, ITreeView where T : class
         {
             Toggle (SelectedObject);
         }
-
-        ObjectActivatedEventArgs<T> e = new (this, o);
-        OnObjectActivated (e);
     }
 
-    /// <inheritdoc />
-    protected override void OnAccepted (ICommandContext ctx)
+    /// <inheritdoc/>
+    protected override void OnAccepted (ICommandContext? ctx)
     {
         base.OnAccepted (ctx);
 
-        T o = SelectedObject;
+        T? o = SelectedObject;
 
         if (o is null)
         {
@@ -467,7 +468,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
         }
 
         // The line they clicked on a branch
-        Branch<T> clickedBranch = HitTest (mouseBinding.MouseEvent.Position!.Value.Y);
+        Branch<T>? clickedBranch = HitTest (mouseBinding.MouseEvent.Position!.Value.Y);
 
         if (clickedBranch is null)
         {
@@ -477,11 +478,15 @@ public partial class TreeView<T> : View, ITreeView where T : class
         Toggle (SelectedObject);
     }
 
-
     /// <summary>Adds a new root level object unless it is already a root of the tree.</summary>
     /// <param name="o"></param>
-    public void AddObject (T o)
+    public void AddObject (T? o)
     {
+        if (o is null)
+        {
+            return;
+        }
+
         if (Roots.ContainsKey (o))
         {
             return;
@@ -545,16 +550,11 @@ public partial class TreeView<T> : View, ITreeView where T : class
     ///     True to also refresh all ancestors of the objects branch (starting with the root). False to
     ///     refresh only the passed node.
     /// </param>
-    public void RefreshObject (T o, bool startAtTop = false)
+    public void RefreshObject (T? o, bool startAtTop = false)
     {
-        Branch<T> branch = ObjectToBranch (o);
+        Branch<T>? branch = ObjectToBranch (o);
 
-        if (branch is null)
-        {
-            return;
-        }
-
-        branch.Refresh (startAtTop);
+        branch?.Refresh (startAtTop);
         InvalidateLineMap ();
         SetNeedsDraw ();
     }
@@ -636,7 +636,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
         List<Branch<T>> toReturn = new ();
         List<Branch<T>> children = new ();
 
-        if (currentBranch.IsExpanded && currentBranch.ChildBranches is { })
+        if (currentBranch is { IsExpanded: true, ChildBranches: { } })
         {
             foreach (Branch<T> subBranch in currentBranch.ChildBranches)
             {
@@ -676,5 +676,5 @@ public partial class TreeView<T> : View, ITreeView where T : class
     /// </summary>
     /// <param name="toFind"></param>
     /// <returns>The branch for <paramref name="toFind"/> or null if it is not currently exposed in the tree.</returns>
-    private Branch<T> ObjectToBranch (T toFind) => BuildLineMap ().FirstOrDefault (o => o.Model.Equals (toFind));
+    private Branch<T>? ObjectToBranch (T? toFind) => BuildLineMap ().FirstOrDefault (o => o.Model.Equals (toFind));
 }

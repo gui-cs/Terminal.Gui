@@ -2,8 +2,6 @@
 // by phillip.piper@gmail.com). Phillip has explicitly granted permission for his design
 // and code to be used in this library under the MIT license.
 
-#nullable disable
-
 namespace Terminal.Gui.Views;
 
 public partial class TreeView<T>
@@ -59,7 +57,7 @@ public partial class TreeView<T>
     /// <summary>Returns the branch at the given <paramref name="y"/> client coordinate e.g. following a click event.</summary>
     /// <param name="y">Client Y position in the controls bounds.</param>
     /// <returns>The clicked branch or null if outside of tree region.</returns>
-    private Branch<T> HitTest (int y)
+    private Branch<T>? HitTest (int y)
     {
         IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
 
