@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.ObjectModel;
 
 namespace UICatalog.Scenarios;
 
@@ -13,7 +14,7 @@ public sealed class TreeViewEditor : EditorBase
     private CheckBox? _cbInvertExpandSymbolColors;
     private CheckBox? _cbHighlightModelTextOnly;
     private CheckBox? _cbAllowLetterBasedNavigation;
-    private NumericUpDown<int>? _nudMaxDepth;
+    private DropDownList? _ddlSchemeName;
 
     public TreeViewEditor ()
     {
@@ -70,7 +71,7 @@ public sealed class TreeViewEditor : EditorBase
         _cbInvertExpandSymbolColors!.Value = treeView.Style.InvertExpandSymbolColors ? CheckState.Checked : CheckState.UnChecked;
         _cbHighlightModelTextOnly!.Value = treeView.Style.HighlightModelTextOnly ? CheckState.Checked : CheckState.UnChecked;
         _cbAllowLetterBasedNavigation!.Value = treeView.AllowLetterBasedNavigation ? CheckState.Checked : CheckState.UnChecked;
-        _nudMaxDepth!.Value = treeView.MaxDepth;
+        _ddlSchemeName!.Value = ViewToEdit.SchemeName ?? "";
     }
 
     private void TreeViewEditor_Initialized (object? s, EventArgs e)
@@ -88,10 +89,7 @@ public sealed class TreeViewEditor : EditorBase
 
         _cbInvertExpandSymbolColors = new CheckBox
         {
-            X = Pos.Right (_cbShowBranchLines) + 1,
-            Y = Pos.Top (_cbShowBranchLines),
-            Title = "InvertExpandSymbolColors",
-            CanFocus = true
+            X = Pos.Right (_cbShowBranchLines) + 1, Y = Pos.Top (_cbShowBranchLines), Title = "InvertExpandSymbolColors", CanFocus = true
         };
         _cbInvertExpandSymbolColors.ValueChanging += (_, args) => SetStyleBool (args, (style, v) => style.InvertExpandSymbolColors = v);
 
@@ -100,32 +98,67 @@ public sealed class TreeViewEditor : EditorBase
 
         _cbAllowLetterBasedNavigation = new CheckBox
         {
-            X = Pos.Right (_cbHighlightModelTextOnly) + 1,
-            Y = Pos.Top (_cbHighlightModelTextOnly),
-            Title = "AllowLetterBasedNavigation",
-            CanFocus = true
+            X = Pos.Right (_cbHighlightModelTextOnly) + 1, Y = Pos.Top (_cbHighlightModelTextOnly), Title = "AllowLetterBasedNavigation", CanFocus = true
         };
         _cbAllowLetterBasedNavigation.ValueChanging += (_, args) => SetBool (args, (tv, v) => tv.AllowLetterBasedNavigation = v);
 
-        // ── MaxDepth ──
+        // ── SchemeName dropdown ──
 
-        Label lblMaxDepth = new () { Y = Pos.Bottom (_cbHighlightModelTextOnly), Title = "MaxDepth:" };
+        Label lblScheme = new () { Y = Pos.Bottom (_cbHighlightModelTextOnly), Title = "Scheme:" };
 
-        _nudMaxDepth = new NumericUpDown<int> { X = Pos.Right (lblMaxDepth) + 1, Y = Pos.Top (lblMaxDepth), Value = 100 };
+        ObservableCollection<string> schemeNames = new (SchemeManager.GetSchemeNames ());
 
-        _nudMaxDepth.ValueChanged += (_, args) =>
+        _ddlSchemeName = new DropDownList
+        {
+            X = Pos.Right (lblScheme) + 1,
+            Y = Pos.Top (lblScheme),
+            Width = 20,
+            Source = new ListWrapper<string> (schemeNames),
+            ReadOnly = true
+        };
+
+        _ddlSchemeName.ValueChanged += (_, args) =>
+                                       {
+                                           if (UpdatingLayoutSettings || ViewToEdit is null)
+                                           {
+                                               return;
+                                           }
+
+                                           if (!string.IsNullOrEmpty (args.NewValue))
+                                           {
+                                               ViewToEdit.SchemeName = args.NewValue;
+                                           }
+                                       };
+
+        // ── Action buttons (selected item) ──
+
+        Button btnExpand = new () { Y = Pos.Bottom (lblScheme) + 1, Text = "Expand" };
+
+        btnExpand.Accepting += (_, _) =>
+                               {
+                                   if (ViewToEdit is ITreeView treeView)
+                                   {
+                                       treeView.Expand ();
+                                   }
+                               };
+
+        Button btnCollapse = new () { X = Pos.Right (btnExpand) + 1, Y = Pos.Top (btnExpand), Text = "Collapse" };
+
+        btnCollapse.Accepting += (_, _) =>
+                                 {
+                                     if (ViewToEdit is ITreeView treeView)
                                      {
-                                         if (UpdatingLayoutSettings || ViewToEdit is not ITreeView treeView)
-                                         {
-                                             return;
-                                         }
+                                         treeView.Collapse ();
+                                     }
+                                 };
 
-                                         treeView.MaxDepth = (int)args.NewValue!;
-                                     };
+        Button btnToggle = new () { X = Pos.Right (btnCollapse) + 1, Y = Pos.Top (btnExpand), Text = "Toggle" };
 
-        // ── Action buttons ──
+        btnToggle.Accepting += (_, _) => ViewToEdit?.InvokeCommand (Command.Toggle);
 
-        Button btnExpandAll = new () { Y = Pos.Bottom (lblMaxDepth) + 1, Text = "Expand All" };
+        // ── Action buttons (all) ──
+
+        Button btnExpandAll = new () { X = Pos.Right (btnToggle) + 1, Y = Pos.Top (btnExpand), Text = "Expand All" };
 
         btnExpandAll.Accepting += (_, _) =>
                                   {
@@ -135,7 +168,7 @@ public sealed class TreeViewEditor : EditorBase
                                       }
                                   };
 
-        Button btnCollapseAll = new () { X = Pos.Right (btnExpandAll) + 1, Y = Pos.Top (btnExpandAll), Text = "Collapse All" };
+        Button btnCollapseAll = new () { X = Pos.Right (btnExpandAll) + 1, Y = Pos.Top (btnExpand), Text = "Collapse All" };
 
         btnCollapseAll.Accepting += (_, _) =>
                                     {
@@ -145,7 +178,7 @@ public sealed class TreeViewEditor : EditorBase
                                         }
                                     };
 
-        Button btnRebuild = new () { X = Pos.Right (btnCollapseAll) + 1, Y = Pos.Top (btnExpandAll), Text = "Rebuild" };
+        Button btnRebuild = new () { X = Pos.Right (btnCollapseAll) + 1, Y = Pos.Top (btnExpand), Text = "Rebuild" };
 
         btnRebuild.Accepting += (_, _) =>
                                 {
@@ -161,8 +194,11 @@ public sealed class TreeViewEditor : EditorBase
              _cbInvertExpandSymbolColors,
              _cbHighlightModelTextOnly,
              _cbAllowLetterBasedNavigation,
-             lblMaxDepth,
-             _nudMaxDepth,
+             lblScheme,
+             _ddlSchemeName,
+             btnExpand,
+             btnCollapse,
+             btnToggle,
              btnExpandAll,
              btnCollapseAll,
              btnRebuild);

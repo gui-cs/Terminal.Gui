@@ -21,7 +21,6 @@ public class TreeViewFileSystem : Scenario
     private CheckBox? _miFullPathsCheckBox;
     private CheckBox? _miHighlightModelTextOnlyCheckBox;
     private CheckBox? _miInvertSymbolsCheckBox;
-    private CheckBox? _miLeaveLastRowCheckBox;
     private CheckBox? _miMultiSelectCheckBox;
     private CheckBox? _miNerdIconsCheckBox;
     private CheckBox? _miNoSymbolsCheckBox;
@@ -103,9 +102,6 @@ public class TreeViewFileSystem : Scenario
         _miNerdIconsCheckBox = new CheckBox { Title = "_Nerd Icons" };
         _miNerdIconsCheckBox.ValueChanged += (_, _) => SetNerdIcons ();
 
-        _miLeaveLastRowCheckBox = new CheckBox { Title = "_Leave Last Row", Value = CheckState.Checked };
-        _miLeaveLastRowCheckBox.ValueChanged += (_, _) => SetLeaveLastRow ();
-
         _miHighlightModelTextOnlyCheckBox = new CheckBox { Title = "_Highlight Model Text Only", Value = CheckState.Checked };
         SetCheckHighlightModelTextOnly ();
         _miHighlightModelTextOnlyCheckBox.ValueChanged += (_, _) => SetCheckHighlightModelTextOnly ();
@@ -138,7 +134,6 @@ public class TreeViewFileSystem : Scenario
                                        new MenuItem { CommandView = _miBasicIconsCheckBox },
                                        new MenuItem { CommandView = _miUnicodeIconsCheckBox },
                                        new MenuItem { CommandView = _miNerdIconsCheckBox },
-                                       new MenuItem { CommandView = _miLeaveLastRowCheckBox },
                                        new MenuItem { CommandView = _miHighlightModelTextOnlyCheckBox },
                                        new MenuItem { CommandView = _miCustomColorsCheckBox },
                                        new MenuItem { CommandView = _miCursorCheckBox }
@@ -270,16 +265,6 @@ public class TreeViewFileSystem : Scenario
         }
 
         _treeViewFiles.SetNeedsDraw ();
-    }
-
-    private void SetLeaveLastRow ()
-    {
-        if (_treeViewFiles is null || _miLeaveLastRowCheckBox is null)
-        {
-            return;
-        }
-
-        _treeViewFiles.Style.LeaveLastRow = _miLeaveLastRowCheckBox.Value == CheckState.Checked;
     }
 
     private void SetMultiSelect ()

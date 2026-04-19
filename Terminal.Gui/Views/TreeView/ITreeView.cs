@@ -18,8 +18,11 @@ public interface ITreeView
     /// <summary>Contains options for changing how the tree is rendered.</summary>
     TreeStyle Style { get; set; }
 
-    /// <summary>Removes all objects from the tree and clears selection.</summary>
-    void ClearObjects ();
+    /// <summary>Expands the currently selected object.</summary>
+    void Expand ();
+
+    /// <summary>Collapses the currently selected object.</summary>
+    void Collapse ();
 
     /// <summary>Fully expands all nodes in the tree.</summary>
     void ExpandAll ();
@@ -29,7 +32,4 @@ public interface ITreeView
 
     /// <summary>Rebuilds the tree structure from the data source.</summary>
     void RebuildTree ();
-
-    /// <summary>Sets a flag indicating this view needs to be drawn because its state has changed.</summary>
-    void SetNeedsDraw ();
 }

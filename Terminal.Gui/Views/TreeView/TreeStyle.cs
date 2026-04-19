@@ -9,7 +9,7 @@ public class TreeStyle
     /// </summary>
     public Rune? CollapseableSymbol { get; set; } = Glyphs.Collapse;
 
-    /// <summary>Set to <see langword="true"/> to highlight expand/collapse symbols in hot key color.</summary>
+    /// <summary>Set to <see langword="true"/> to highlight expand/collapse symbols in the highlight attribute.</summary>
     public bool ColorExpandSymbol { get; set; }
 
     /// <summary>
@@ -27,14 +27,6 @@ public class TreeStyle
 
     /// <summary>Invert console colours used to render the expand symbol.</summary>
     public bool InvertExpandSymbolColors { get; set; }
-
-    /// <summary>
-    ///     <see langword="true"/> to leave the last row of the control free for overwriting (e.g. by a scrollbar) When
-    ///     <see langword="true"/> scrolling will be triggered on the second last row of the control rather than. the last.
-    /// </summary>
-    /// <value></value>
-    [Obsolete ("This property is no longer used. The built-in scroll bar system handles row reservation automatically.")]
-    public bool LeaveLastRow { get; set; }
 
     /// <summary>
     ///     <see langword="true"/> to render vertical lines under expanded nodes to show which node belongs to which

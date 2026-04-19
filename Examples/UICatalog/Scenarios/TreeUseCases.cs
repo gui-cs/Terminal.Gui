@@ -119,8 +119,10 @@ public partial class TreeUseCases : Scenario
             field.BorderStyle = LineStyle.Single;
             field.Arrangement = ViewArrangement.Resizable | ViewArrangement.Movable;
             field.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
+            field.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
 
             _appWindow?.Add (field);
+
             // Gets added to end; move so that it's 2nd item (after menu)
             _appWindow?.MoveSubViewToStart (field);
             _appWindow?.MoveSubViewTowardsEnd (field);
