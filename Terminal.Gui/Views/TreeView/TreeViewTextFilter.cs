@@ -13,7 +13,7 @@ public class TreeViewTextFilter<T> : ITreeViewFilter<T> where T : class
     ///     Creates a new instance of the filter for use with <paramref name="forTree"/>. Set <see cref="Text"/> to begin
     ///     filtering.
     /// </summary>
-    /// <param name="forTree"></param>
+    /// <param name="forTree">The tree view this filter applies to.</param>
     /// <exception cref="ArgumentNullException"></exception>
     public TreeViewTextFilter (TreeView<T> forTree) => _forTree = forTree ?? throw new ArgumentNullException (nameof (forTree));
 
@@ -32,11 +32,11 @@ public class TreeViewTextFilter<T> : ITreeViewFilter<T> where T : class
     } = string.Empty;
 
     /// <summary>
-    ///     Returns <typeparamref name="T"/> if there is no <see cref="Text"/> or the text matches the
+    ///     Returns <see langword="true"/> if there is no <see cref="Text"/> or the text matches the
     ///     <see cref="TreeView{T}.AspectGetter"/> of the <paramref name="model"/>.
     /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
+    /// <param name="model">The object to test for a match.</param>
+    /// <returns>True if the model matches the filter or no filter text is set.</returns>
     public bool IsMatch (T model)
     {
         if (string.IsNullOrWhiteSpace (Text))

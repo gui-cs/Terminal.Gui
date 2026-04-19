@@ -9,7 +9,10 @@ public class TreeStyle
     /// </summary>
     public Rune? CollapseableSymbol { get; set; } = Glyphs.Collapse;
 
-    /// <summary>Set to <see langword="true"/> to highlight expand/collapse symbols in the highlight attribute.</summary>
+    /// <summary>
+    ///     Set to <see langword="true"/> to highlight expand/collapse symbols using the
+    ///     <see cref="VisualRole.Highlight"/> color.
+    /// </summary>
     public bool ColorExpandSymbol { get; set; }
 
     /// <summary>
@@ -20,18 +23,17 @@ public class TreeStyle
 
     /// <summary>
     ///     Set to <see langword="true"/> to cause the selected item to be rendered with only the
-    ///     <see cref="Branch{T}.Model"/> text to be highlighted. If <see langword="false"/> (the default), the entire row will
+    ///     model text highlighted. If <see langword="false"/> (the default), the entire row will
     ///     be highlighted.
     /// </summary>
     public bool HighlightModelTextOnly { get; set; }
 
-    /// <summary>Invert console colours used to render the expand symbol.</summary>
+    /// <summary>Invert foreground and background colors used to render the expand symbol.</summary>
     public bool InvertExpandSymbolColors { get; set; }
 
     /// <summary>
     ///     <see langword="true"/> to render vertical lines under expanded nodes to show which node belongs to which
     ///     parent. <see langword="false"/> to use only whitespace.
     /// </summary>
-    /// <value></value>
     public bool ShowBranchLines { get; set; } = true;
 }

@@ -105,12 +105,13 @@ public partial class TreeView<T>
     }
 
     /// <summary>
-    ///     Returns the object in the tree list that is currently visible. at the provided row. Returns null if no object
+    ///     Returns the object in the tree list that is currently visible at the provided row. Returns null if no object
     ///     is at that location.
-    ///     <remarks></remarks>
+    /// </summary>
+    /// <remarks>
     ///     If you have screen coordinates then use <see cref="View.ScreenToFrame"/> to translate these into the client area of
     ///     the <see cref="TreeView{T}"/>.
-    /// </summary>
+    /// </remarks>
     /// <param name="row">The row of the <see cref="View.Viewport"/> of the <see cref="TreeView{T}"/>.</param>
     /// <returns>The object currently displayed on this row or null.</returns>
     public T? GetObjectOnRow (int row) => HitTest (row)?.Model;

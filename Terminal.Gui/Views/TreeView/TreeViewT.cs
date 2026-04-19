@@ -251,7 +251,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <summary>
-    ///     Initialises <see cref="TreeBuilder"/>.Creates a new tree view with absolute positioning. Use
+    ///     Initialises <see cref="TreeBuilder"/>. Creates a new tree view with absolute positioning. Use
     ///     <see cref="AddObjects(IEnumerable{T})"/> to set root objects for the tree.
     /// </summary>
     public TreeView (ITreeBuilder<T> builder) : this () => TreeBuilder = builder;
@@ -297,14 +297,12 @@ public partial class TreeView<T> : View, ITreeView where T : class
     public ITreeViewFilter<T>? Filter { get; set; } = null;
 
     /// <summary>True makes a letter key press navigate to the next visible branch that begins with that letter/digit.</summary>
-    /// <value></value>
     public bool AllowLetterBasedNavigation { get; set; } = true;
 
     /// <summary>
     ///     Returns the string representation of model objects hosted in the tree. Default implementation is to call
     ///     <see cref="object.ToString"/>.
     /// </summary>
-    /// <value></value>
     public AspectGetterDelegate<T> AspectGetter { get; set; } = o => o.ToString () ?? "";
 
     /// <summary>
@@ -323,7 +321,6 @@ public partial class TreeView<T> : View, ITreeView where T : class
     public int MaxDepth { get; set; } = 100;
 
     /// <summary>True to allow multiple objects to be selected at once.</summary>
-    /// <value></value>
     public bool MultiSelect { get; set; } = true;
 
     /// <summary>The root objects in the tree, note that this collection is of root objects only.</summary>
@@ -382,7 +379,6 @@ public partial class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <summary>Determines how sub-branches of the tree are dynamically built at runtime as the user expands root nodes.</summary>
-    /// <value></value>
     public ITreeBuilder<T>? TreeBuilder { get; set; }
 
     /// <summary>
@@ -472,7 +468,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <summary>Adds a new root level object unless it is already a root of the tree.</summary>
-    /// <param name="o"></param>
+    /// <param name="o">The object to add as a root node.</param>
     public void AddObject (T? o)
     {
         if (o is null)
@@ -492,7 +488,6 @@ public partial class TreeView<T> : View, ITreeView where T : class
 
     /// <summary>Adds many new root level objects. Objects that are already root objects are ignored.</summary>
     /// <param name="collection">Objects to add as new root level objects.</param>
-    /// .\
     public void AddObjects (IEnumerable<T> collection)
     {
         var objectsAdded = false;
@@ -541,7 +536,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
     ///     representation etc.
     /// </summary>
     /// <remarks>This has no effect if the object is not exposed in the tree.</remarks>
-    /// <param name="o"></param>
+    /// <param name="o">The object to refresh.</param>
     /// <param name="startAtTop">
     ///     True to also refresh all ancestors of the objects branch (starting with the root). False to
     ///     refresh only the passed node.
@@ -555,10 +550,9 @@ public partial class TreeView<T> : View, ITreeView where T : class
         SetNeedsDraw ();
     }
 
-    /// <summary>Removes the given root object from the tree</summary>
-    /// <remarks>If <paramref name="o"/> is the currently <see cref="SelectedObject"/> then the selection is cleared</remarks>
-    /// .
-    /// <param name="o"></param>
+    /// <summary>Removes the given root object from the tree.</summary>
+    /// <remarks>If <paramref name="o"/> is the currently <see cref="SelectedObject"/> then the selection is cleared.</remarks>
+    /// <param name="o">The root object to remove.</param>
     public void Remove (T o)
     {
         // ReSharper disable once CanSimplifyDictionaryRemovingWithSingleCall

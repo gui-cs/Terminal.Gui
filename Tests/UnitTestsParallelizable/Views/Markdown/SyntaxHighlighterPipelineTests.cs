@@ -2,7 +2,7 @@
 // Tests for ISyntaxHighlighter.ResetState(), fence language extraction,
 // StyledSegment.Attribute, and MarkdownAttributeHelper explicit Attribute support.
 
-namespace ViewTests.Markdown;
+namespace ViewsTests;
 
 /// <summary>Tests for the syntax highlighting pipeline in MarkdownView.</summary>
 public class SyntaxHighlighterPipelineTests

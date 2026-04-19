@@ -11,8 +11,8 @@ public partial class TreeView<T>
     public event EventHandler<SelectionChangedEventArgs<T>>? SelectionChanged;
 
     /// <summary>
-    ///     The number of screen lines to move the currently selected object by. Supports negative values.
-    ///     <paramref name="offset"/>. Each branch occupies 1 line on screen.
+    ///     Moves the currently selected object by the given number of screen lines.
+    ///     Each branch occupies 1 line on screen. Supports negative values.
     /// </summary>
     /// <remarks>
     ///     If nothing is currently selected or the selected object is no longer in the tree then the first object in the
@@ -168,14 +168,14 @@ public partial class TreeView<T>
     ///     Returns true if the given object <paramref name="o"/> is exposed in the tree and can be expanded otherwise
     ///     false.
     /// </summary>
-    /// <param name="o"></param>
-    /// <returns></returns>
+    /// <param name="o">An object in the tree to check.</param>
+    /// <returns>True if the object is visible and expandable.</returns>
     public bool CanExpand (T o) => ObjectToBranch (o)?.CanExpand () ?? false;
 
-    /// <summary>Collapses the <see cref="SelectedObject"/></summary>
+    /// <summary>Collapses the <see cref="SelectedObject"/>.</summary>
     public void Collapse () => Collapse (SelectedObject);
 
-    /// <summary>Collapses the supplied object if it is currently expanded .</summary>
+    /// <summary>Collapses the supplied object if it is currently expanded.</summary>
     /// <param name="toCollapse">The object to collapse.</param>
     public void Collapse (T? toCollapse) => CollapseImpl (toCollapse, false);
 
@@ -260,7 +260,7 @@ public partial class TreeView<T>
     ///     exposed branch
     ///     object).
     /// </summary>
-    /// <param name="toToggle"></param>
+    /// <param name="toToggle">The object to toggle expand/collapse state.</param>
     public void Toggle (T? toToggle)
     {
         if (toToggle is null)
@@ -324,9 +324,9 @@ public partial class TreeView<T>
 
     /// <summary>
     ///     Returns <see cref="SelectedObject"/> (if not null) and all multi selected objects if <see cref="MultiSelect"/>
-    ///     is true
+    ///     is true.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>All selected objects in the tree.</returns>
     public IEnumerable<T> GetAllSelectedObjects ()
     {
         IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
@@ -355,7 +355,7 @@ public partial class TreeView<T>
     ///     exposed or not expanded.
     /// </summary>
     /// <param name="o">An object in the tree.</param>
-    /// <returns></returns>
+    /// <returns>The child objects, or an empty collection if not expanded.</returns>
     public IEnumerable<T> GetChildren (T? o)
     {
         Branch<T>? branch = ObjectToBranch (o);
@@ -373,7 +373,7 @@ public partial class TreeView<T>
     ///     the tree.
     /// </summary>
     /// <param name="o">An object in the tree.</param>
-    /// <returns></returns>
+    /// <returns>The parent object, or null if the object is a root or not exposed.</returns>
     public T? GetParent (T? o) => ObjectToBranch (o)?.Parent?.Model;
 
     /// <summary>
@@ -404,7 +404,7 @@ public partial class TreeView<T>
     ///     Changes the <see cref="SelectedObject"/> to <paramref name="toSelect"/> and scrolls to ensure it is visible.
     ///     Has no effect if <paramref name="toSelect"/> is not exposed in the tree (e.g. its parents are collapsed).
     /// </summary>
-    /// <param name="toSelect"></param>
+    /// <param name="toSelect">The object to select and scroll to.</param>
     public void GoTo (T toSelect)
     {
         if (ObjectToBranch (toSelect) is null)
@@ -440,26 +440,24 @@ public partial class TreeView<T>
     }
 
     /// <summary>Returns true if the given object <paramref name="o"/> is exposed in the tree and expanded otherwise false.</summary>
-    /// <param name="o"></param>
-    /// <returns></returns>
+    /// <param name="o">An object in the tree to check.</param>
+    /// <returns>True if the object is visible and expanded.</returns>
     public bool IsExpanded (T? o) => ObjectToBranch (o)?.IsExpanded ?? false;
 
     /// <summary>
     ///     Returns true if the <paramref name="model"/> is either the <see cref="SelectedObject"/> or part of a
     ///     <see cref="MultiSelect"/>.
     /// </summary>
-    /// <param name="model"></param>
-    /// <returns></returns>
+    /// <param name="model">An object in the tree to check.</param>
+    /// <returns>True if the object is selected.</returns>
     public bool IsSelected (T? model) => Equals (SelectedObject, model) || (MultiSelect && _multiSelectedRegions.Any (s => model is { } && s.Contains (model)));
 
     /// <summary>Moves the selection down by the height of the control (1 page).</summary>
     /// <param name="expandSelection">True if the navigation should add the covered nodes to the selected current selection.</param>
-    /// <exception cref="NotImplementedException"></exception>
     public void MovePageDown (bool expandSelection = false) => AdjustSelection (Viewport.Height, expandSelection);
 
     /// <summary>Moves the selection up by the height of the control (1 page).</summary>
     /// <param name="expandSelection">True if the navigation should add the covered nodes to the selected current selection.</param>
-    /// <exception cref="NotImplementedException"></exception>
     public void MovePageUp (bool expandSelection = false) => AdjustSelection (-Viewport.Height, expandSelection);
 
     /// <inheritdoc/>
@@ -564,8 +562,8 @@ public partial class TreeView<T>
     ///     Implementation of <see cref="Collapse(T)"/> and <see cref="CollapseAll(T)"/>. Performs operation and updates
     ///     selection if disappeared.
     /// </summary>
-    /// <param name="toCollapse"></param>
-    /// <param name="all"></param>
+    /// <param name="toCollapse">The object to collapse.</param>
+    /// <param name="all">True to also collapse all children recursively.</param>
     protected void CollapseImpl (T? toCollapse, bool all)
     {
         if (toCollapse is null)
@@ -646,7 +644,7 @@ public partial class TreeView<T>
     }
 
     /// <summary>Raises the SelectionChanged event.</summary>
-    /// <param name="e"></param>
+    /// <param name="e">Event args describing the selection change.</param>
 
     // TODO: Refactor to use CWP
     protected virtual void OnSelectionChanged (SelectionChangedEventArgs<T> e) => SelectionChanged?.Invoke (this, e);
