@@ -78,6 +78,9 @@ public partial class TreeView<T> : View, ITreeView where T : class
     {
         CanFocus = true;
 
+        // Enable built-in scroll bars via the View content-area system.
+        ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
+
         // Things this view knows how to do
         AddCommand (Command.PageUp,
                     () =>
@@ -311,6 +314,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
     public Func<T, Scheme?>? ColorGetter { get; set; }
 
     /// <summary>The current number of rows in the tree (ignoring the controls bounds).</summary>
+    [Obsolete ("Use GetContentHeight () instead.")]
     public int ContentHeight => BuildLineMap ().Count;
 
     /// <summary>
@@ -332,14 +336,15 @@ public partial class TreeView<T> : View, ITreeView where T : class
     /// <summary>The amount of tree view that has been scrolled to the right (horizontally).</summary>
     /// <remarks>
     ///     Setting a value of less than 0 will result in an offset of 0. To see changes in the UI call
-    ///     <see cref="View.SetNeedsDraw()"/>.
+    ///     <see cref="View.SetNeedsDraw()"/>. This property delegates to <see cref="View.Viewport"/><c>.X</c>.
     /// </remarks>
     public int ScrollOffsetHorizontal
     {
-        get;
+        get => Viewport.X;
         set
         {
-            field = Math.Max (0, value);
+            Rectangle vp = Viewport;
+            Viewport = vp with { X = Math.Max (0, value) };
             SetNeedsDraw ();
         }
     }
@@ -347,14 +352,15 @@ public partial class TreeView<T> : View, ITreeView where T : class
     /// <summary>The amount of tree view that has been scrolled off the top of the screen (by the user scrolling down).</summary>
     /// <remarks>
     ///     Setting a value of less than 0 will result in an offset of 0. To see changes in the UI call
-    ///     <see cref="View.SetNeedsDraw()"/>.
+    ///     <see cref="View.SetNeedsDraw()"/>. This property delegates to <see cref="View.Viewport"/><c>.Y</c>.
     /// </remarks>
     public int ScrollOffsetVertical
     {
-        get;
+        get => Viewport.Y;
         set
         {
-            field = Math.Max (0, value);
+            Rectangle vp = Viewport;
+            Viewport = vp with { Y = Math.Max (0, value) };
             SetNeedsDraw ();
         }
     }
@@ -580,8 +586,21 @@ public partial class TreeView<T> : View, ITreeView where T : class
     /// <summary>Cached result of <see cref="BuildLineMap"/></summary>
     private IReadOnlyCollection<Branch<T>>? _cachedLineMap;
 
+    /// <summary>Reentrancy guard for <see cref="UpdateContentSize"/>.</summary>
+    private bool _updatingContentSize;
+
     /// <summary>Clears any cached results of the tree state.</summary>
-    public void InvalidateLineMap () => _cachedLineMap = null;
+    public void InvalidateLineMap ()
+    {
+        _cachedLineMap = null;
+
+        // Eagerly update the content size so the View's content-area system stays in
+        // sync (e.g. so scroll offset clamping is correct after expand/collapse).
+        if (!_updatingContentSize)
+        {
+            UpdateContentSize ();
+        }
+    }
 
     /// <summary>
     ///     Calculates all currently visible/expanded branches (including leafs) and outputs them by index from the top of
@@ -663,6 +682,39 @@ public partial class TreeView<T> : View, ITreeView where T : class
     }
 
     private bool IsFilterMatch (Branch<T> branch) => Filter?.IsMatch (branch.Model) ?? true;
+
+    /// <summary>
+    ///     Keeps the View content-area in sync with the tree's logical dimensions. Called from
+    ///     <see cref="InvalidateLineMap"/> and <see cref="OnViewportChanged"/>.
+    /// </summary>
+    private void UpdateContentSize ()
+    {
+        if (_updatingContentSize)
+        {
+            return;
+        }
+
+        _updatingContentSize = true;
+
+        try
+        {
+            IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
+            int height = map.Count;
+            int width = height > 0 ? map.Max (b => b.GetWidth ()) : 0;
+
+            SetContentSize (new Size (width, height));
+        }
+        finally
+        {
+            _updatingContentSize = false;
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnViewportChanged (DrawEventArgs e)
+    {
+        UpdateContentSize ();
+    }
 
     /// <summary>
     ///     Returns the corresponding <see cref="Branch{T}"/> in the tree for <paramref name="toFind"/>. This will not

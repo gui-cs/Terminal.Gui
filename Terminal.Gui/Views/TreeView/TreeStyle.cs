@@ -33,6 +33,7 @@ public class TreeStyle
     ///     <see langword="true"/> scrolling will be triggered on the second last row of the control rather than. the last.
     /// </summary>
     /// <value></value>
+    [Obsolete ("This property is no longer used. The built-in scroll bar system handles row reservation automatically.")]
     public bool LeaveLastRow { get; set; }
 
     /// <summary>

@@ -223,18 +223,15 @@ public partial class TreeView<T>
             return;
         }
 
-        /*this -1 allows for possible horizontal scroll bar in the last row of the control*/
-        int leaveSpace = Style.LeaveLastRow ? 1 : 0;
-
         if (idx < ScrollOffsetVertical)
         {
             //if user has scrolled up too far to see their selection
             ScrollOffsetVertical = idx;
         }
-        else if (idx >= ScrollOffsetVertical + Viewport.Height - leaveSpace)
+        else if (idx >= ScrollOffsetVertical + Viewport.Height)
         {
             //if user has scrolled off bottom of visible tree
-            ScrollOffsetVertical = Math.Max (0, idx + 1 - (Viewport.Height - leaveSpace));
+            ScrollOffsetVertical = Math.Max (0, idx + 1 - Viewport.Height);
         }
     }
 
@@ -424,7 +421,7 @@ public partial class TreeView<T>
     public void GoToEnd ()
     {
         IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
-        ScrollOffsetVertical = Math.Max (0, map.Count - Viewport.Height + 1);
+        ScrollOffsetVertical = Math.Max (0, map.Count - Viewport.Height);
         SelectedObject = map.LastOrDefault ()?.Model;
 
         SetNeedsDraw ();
@@ -515,8 +512,10 @@ public partial class TreeView<T>
     /// <summary>Scrolls the view area down a single line without changing the current selection.</summary>
     public void ScrollDown ()
     {
-        // BUGBUG: What is the -2 for and why is this not just GetContentHeight?
-        if (ScrollOffsetVertical > ContentHeight - 2)
+        IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
+        int lineCount = map.Count;
+
+        if (ScrollOffsetVertical >= lineCount - Viewport.Height)
         {
             return;
         }

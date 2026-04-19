@@ -158,7 +158,7 @@ public class TreeViewTests : TestDriverBase
         tree.BeginInit ();
         tree.EndInit ();
 
-        tree.Viewport = new Rectangle (0, 0, 10, 10);
+        tree.Frame = new Rectangle (0, 0, 10, 10);
 
         //-+Factory
         Assert.Equal (9, tree.GetContentWidth (true));
@@ -184,7 +184,7 @@ public class TreeViewTests : TestDriverBase
         tree.EndInit ();
 
         // control only allows 1 row to be viewed at once
-        tree.Viewport = new Rectangle (0, 0, 20, 1);
+        tree.Frame = new Rectangle (0, 0, 20, 1);
 
         //-+Factory
         Assert.Equal (9, tree.GetContentWidth (true));
@@ -205,14 +205,15 @@ public class TreeViewTests : TestDriverBase
         Assert.Equal (13, tree.GetContentWidth (true));
         Assert.Equal (13, tree.GetContentWidth (false));
 
-        // Scroll down so only car2 is visible
+        // Scroll down so only car2 is visible (3 items - 1 viewport = max offset 2)
         tree.ScrollOffsetVertical = 2;
         Assert.Equal (12, tree.GetContentWidth (true));
         Assert.Equal (13, tree.GetContentWidth (false));
 
-        // Scroll way down (off bottom of control even)
+        // With content-area clamping, offset 5 is clamped to 2 (3 items - 1 viewport height)
         tree.ScrollOffsetVertical = 5;
-        Assert.Equal (0, tree.GetContentWidth (true));
+        Assert.Equal (2, tree.ScrollOffsetVertical);
+        Assert.Equal (12, tree.GetContentWidth (true));
         Assert.Equal (13, tree.GetContentWidth (false));
     }
 
@@ -384,6 +385,7 @@ public class TreeViewTests : TestDriverBase
         Assert.Equal (-1, tree.GetScrollOffsetOf (c2));
     }
 
+    // Copilot
     [Fact]
     public void GoTo_OnlyAppliesToExposedObjects ()
     {
@@ -392,7 +394,7 @@ public class TreeViewTests : TestDriverBase
         tree.EndInit ();
 
         // Make tree bounds 1 in height so that EnsureVisible always requires updating scroll offset
-        tree.Viewport = new Rectangle (0, 0, 50, 1);
+        tree.Frame = new Rectangle (0, 0, 50, 1);
 
         Assert.Null (tree.SelectedObject);
         Assert.Equal (0, tree.ScrollOffsetVertical);
@@ -409,7 +411,7 @@ public class TreeViewTests : TestDriverBase
         tree.GoTo (car1);
 
         Assert.Equal (car1, tree.SelectedObject);
-        Assert.Equal (1, tree.ScrollOffsetVertical);
+        Assert.Equal (1, tree.Viewport.Y);
     }
 
     [Fact]
@@ -701,15 +703,22 @@ public class TreeViewTests : TestDriverBase
     [Fact]
     public void ScrollOffset_CannotBeNegative ()
     {
-        TreeView<object> tree = CreateTree ();
+        TreeView<object> tree = CreateTree (out Factory f, out _, out _);
+
+        // Expand so there are 3 visible lines, then give the tree a small viewport
+        tree.Expand (f);
+        tree.BeginInit ();
+        tree.EndInit ();
+        tree.Frame = new Rectangle (0, 0, 20, 1);
 
         Assert.Equal (0, tree.ScrollOffsetVertical);
 
         tree.ScrollOffsetVertical = -100;
         Assert.Equal (0, tree.ScrollOffsetVertical);
 
+        // With 3 items and viewport height 1, the content-area system clamps to max 2 (3 - 1).
         tree.ScrollOffsetVertical = 10;
-        Assert.Equal (10, tree.ScrollOffsetVertical);
+        Assert.Equal (2, tree.ScrollOffsetVertical);
     }
 
     // Copilot - Opus 4.6
