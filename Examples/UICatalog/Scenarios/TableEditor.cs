@@ -885,7 +885,7 @@ public class TableEditor : Scenario
     {
         _tableView!.Style.ColumnStyles.Clear ();
 
-        TreeView<FileSystemInfo> tree = new () { AspectGetter = f => f.Name, TreeBuilder = new DelegateTreeBuilder<FileSystemInfo> (GetChildren) };
+        TreeView<FileSystemInfo> tree = new () { AspectGetter = f => f.Name, TreeBuilder = new DelegateTreeBuilder<FileSystemInfo> (GetChildren, f => false) };
 
         TreeTableSource<FileSystemInfo> source = new (_tableView,
                                                       "Name",
