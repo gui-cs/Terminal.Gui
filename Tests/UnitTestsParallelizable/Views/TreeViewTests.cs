@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using UnitTests;
 
 namespace ViewsTests;
@@ -116,7 +116,7 @@ public class TreeViewTests : TestDriverBase
     [Fact]
     public void Command_Toggle_ExpandCollapse ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
+        TreeView<object> tree = CreateTree (out Factory f, out _, out _);
 
         // Factory is the root and is initially collapsed
         Assert.False (tree.IsExpanded (f));
@@ -141,7 +141,7 @@ public class TreeViewTests : TestDriverBase
     [Fact]
     public void ContentHeight_BiggerAfterExpand ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out _, out _);
+        TreeView<object> tree = CreateTree (out Factory f, out _, out _);
         Assert.Equal (1, tree.ContentHeight);
 
         tree.Expand (f);
@@ -154,7 +154,7 @@ public class TreeViewTests : TestDriverBase
     [Fact]
     public void ContentWidth_BiggerAfterExpand ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
+        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
         tree.BeginInit ();
         tree.EndInit ();
 
@@ -179,7 +179,7 @@ public class TreeViewTests : TestDriverBase
     [Fact]
     public void ContentWidth_VisibleVsAll ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out Car car2);
+        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out Car car2);
         tree.BeginInit ();
         tree.EndInit ();
 
@@ -220,7 +220,7 @@ public class TreeViewTests : TestDriverBase
     [Fact]
     public void DoubleClick_Raises_Accepting ()
     {
-        TreeView<object?> tree = CreateTree (out _, out _, out _);
+        TreeView<object> tree = CreateTree (out _, out _, out _);
 
         var acceptingFired = false;
 
@@ -241,14 +241,14 @@ public class TreeViewTests : TestDriverBase
     [Fact]
     public void DoubleClick_SelectsObject_And_Accepts ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
+        TreeView<object> tree = CreateTree (out Factory f, out _, out _);
 
         Assert.NotSame (f, tree.SelectedObject);
 
         var acceptingFired = false;
 
         // Double-click now routes through Command.Accept (CWP flow)
-        tree.Accepted += (_, e) => { acceptingFired = true; };
+        tree.Accepted += (_, _) => { acceptingFired = true; };
 
         Assert.False (acceptingFired);
 
@@ -283,7 +283,7 @@ public class TreeViewTests : TestDriverBase
     [Fact]
     public void EnterKey_Raises_Accepting ()
     {
-        TreeView<object?> tree = CreateTree (out _, out _, out _);
+        TreeView<object> tree = CreateTree (out _, out _, out _);
 
         var acceptingFired = false;
 
@@ -302,13 +302,13 @@ public class TreeViewTests : TestDriverBase
     }
 
     /// <summary>
-    ///     Tests that <see cref="TreeView.GetChildren(object)"/> returns the child objects for the factory.  Note that
+    ///     Tests that <see cref="TreeView{T}.GetChildren"/> returns the child objects for the factory.  Note that
     ///     the method only works once the parent branch (Factory) is expanded to expose the child (Car)
     /// </summary>
     [Fact]
     public void GetChildren_ReturnsChildrenOnlyWhenExpanded ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car c1, out Car c2);
+        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         Assert.Empty (tree.GetChildren (f));
         Assert.Empty (tree.GetChildren (c1));
@@ -330,13 +330,13 @@ public class TreeViewTests : TestDriverBase
     }
 
     /// <summary>
-    ///     Tests that <see cref="TreeView.GetParent(object)"/> returns the parent object for Cars (Factories).  Note that
+    ///     Tests that <see cref="TreeView{T}.GetParent"/> returns the parent object for Cars (Factories).  Note that
     ///     the method only works once the parent branch (Factory) is expanded to expose the child (Car)
     /// </summary>
     [Fact]
     public void GetParent_ReturnsParentOnlyWhenExpanded ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car c1, out Car c2);
+        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         Assert.Null (tree.GetParent (f));
         Assert.Null (tree.GetParent (c1));
@@ -356,11 +356,11 @@ public class TreeViewTests : TestDriverBase
         Assert.Null (tree.GetParent (c2));
     }
 
-    /// <summary>Tests <see cref="TreeView.GetScrollOffsetOf(object)"/> for objects that are as yet undiscovered by the tree</summary>
+    /// <summary>Tests <see cref="TreeView{T}.GetScrollOffsetOf"/> for objects that are as yet undiscovered by the tree</summary>
     [Fact]
     public void GetScrollOffsetOf_MinusOneForUnRevealed ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car c1, out Car c2);
+        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         // to start with the tree is collapsed and only knows about the root object
         Assert.Equal (0, tree.GetScrollOffsetOf (f));
@@ -387,7 +387,7 @@ public class TreeViewTests : TestDriverBase
     [Fact]
     public void GoTo_OnlyAppliesToExposedObjects ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
+        TreeView<object> tree = CreateTree (out Factory f, out Car car1, out _);
         tree.BeginInit ();
         tree.EndInit ();
 
@@ -450,13 +450,13 @@ public class TreeViewTests : TestDriverBase
     }
 
     /// <summary>
-    ///     Tests that <see cref="TreeView.IsExpanded(object)"/> and <see cref="TreeView.Expand(object)"/> behaves
+    ///     Tests that <see cref="TreeView{T}.IsExpanded"/> and <see cref="TreeView{T}.Expand()"/> behaves
     ///     correctly when an object cannot be expanded (because it has no children)
     /// </summary>
     [Fact]
     public void IsExpanded_FalseIfCannotExpand ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car c, out _);
+        TreeView<object> tree = CreateTree (out Factory f, out Car c, out _);
 
         // expose the car by expanding the factory
         tree.Expand (f);
@@ -475,11 +475,11 @@ public class TreeViewTests : TestDriverBase
         Assert.False (tree.IsExpanded (c));
     }
 
-    /// <summary>Tests that <see cref="TreeView.Expand(object)"/> and <see cref="TreeView.IsExpanded(object)"/> are consistent</summary>
+    /// <summary>Tests that <see cref="TreeView{T}.Expand()"/> and <see cref="TreeView{T}.IsExpanded"/> are consistent</summary>
     [Fact]
     public void IsExpanded_TrueAfterExpand ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out _, out _);
+        TreeView<object> tree = CreateTree (out Factory f, out _, out _);
         Assert.False (tree.IsExpanded (f));
 
         tree.Expand (f);
@@ -497,13 +497,12 @@ public class TreeViewTests : TestDriverBase
         TreeNode l1;
         TreeNode l2;
         TreeNode l3;
-        TreeNode l4;
 
         var root = new TreeNode { Text = "Root" };
         root.Children.Add (l1 = new TreeNode { Text = "Leaf1" });
         root.Children.Add (l2 = new TreeNode { Text = "Leaf2" });
         root.Children.Add (l3 = new TreeNode { Text = "Leaf3" });
-        root.Children.Add (l4 = new TreeNode { Text = "Leaf4" });
+        root.Children.Add (new TreeNode { Text = "Leaf4" });
 
         tree.AddObject (root);
         tree.MultiSelect = true;
@@ -537,12 +536,12 @@ public class TreeViewTests : TestDriverBase
 
     /// <summary>
     ///     Same as <see cref="RefreshObject_AfterChangingChildrenGetterDuringRuntime"/> but uses
-    ///     <see cref="TreeView.RebuildTree()"/> instead of <see cref="TreeView.RefreshObject(object, bool)"/>
+    ///     <see cref="TreeView{T}.RebuildTree"/> instead of <see cref="TreeView{T}.RefreshObject"/>
     /// </summary>
     [Fact]
     public void RebuildTree_AfterChangingChildrenGetterDuringRuntime ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car c1, out Car c2);
+        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         var wheel = "Shiny Wheel";
 
@@ -557,15 +556,15 @@ public class TreeViewTests : TestDriverBase
         Assert.False (tree.IsExpanded (c1));
 
         // change the children getter so that now cars can have wheels
-        tree.TreeBuilder = new DelegateTreeBuilder<object?> (o =>
+        tree.TreeBuilder = new DelegateTreeBuilder<object> (o =>
 
-                                                                 // factories have cars
-                                                                 o is Factory
-                                                                     ? new object [] { c1, c2 }
+                                                                // factories have cars
+                                                                o is Factory
+                                                                    ? new object [] { c1, c2 }
 
-                                                                     // cars have wheels
-                                                                     : new object [] { wheel },
-                                                             o => true);
+                                                                    // cars have wheels
+                                                                    : new object [] { wheel },
+                                                            _ => true);
 
         // still cannot expand
         tree.Expand (c1);
@@ -589,7 +588,7 @@ public class TreeViewTests : TestDriverBase
     [Fact]
     public void RefreshObject_AfterChangingChildrenGetterDuringRuntime ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car c1, out Car c2);
+        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         var wheel = "Shiny Wheel";
 
@@ -604,15 +603,15 @@ public class TreeViewTests : TestDriverBase
         Assert.False (tree.IsExpanded (c1));
 
         // change the children getter so that now cars can have wheels
-        tree.TreeBuilder = new DelegateTreeBuilder<object?> (o =>
+        tree.TreeBuilder = new DelegateTreeBuilder<object> (o =>
 
-                                                                 // factories have cars
-                                                                 o is Factory
-                                                                     ? new object [] { c1, c2 }
+                                                                // factories have cars
+                                                                o is Factory
+                                                                    ? new object [] { c1, c2 }
 
-                                                                     // cars have wheels
-                                                                     : new object [] { wheel },
-                                                             o => true);
+                                                                    // cars have wheels
+                                                                    : new object [] { wheel },
+                                                            _ => true);
 
         // still cannot expand
         tree.Expand (c1);
@@ -626,12 +625,12 @@ public class TreeViewTests : TestDriverBase
 
     /// <summary>
     ///     Simulates behind the scenes changes to an object (which children it has) and how to sync that into the tree
-    ///     using <see cref="TreeView.RefreshObject(object, bool)"/>
+    ///     using <see cref="TreeView{T}.RefreshObject"/>
     /// </summary>
     [Fact]
     public void RefreshObject_ChildRemoved ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car c1, out Car c2);
+        TreeView<object> tree = CreateTree (out Factory f, out Car c1, out Car c2);
 
         //reveal it by expanding the root object
         tree.Expand (f);
@@ -665,20 +664,19 @@ public class TreeViewTests : TestDriverBase
 
     /// <summary>
     ///     Simulates behind the scenes changes to an object (which children it has) and how to sync that into the tree
-    ///     using <see cref="TreeView.RefreshObject(object, bool)"/>
+    ///     using <see cref="TreeView{T}.RefreshObject"/>
     /// </summary>
     [Fact]
     public void RefreshObject_EqualityTest ()
     {
         var obj1 = new EqualityTestObject { Name = "Bob", Age = 1 };
         var obj2 = new EqualityTestObject { Name = "Bob", Age = 2 };
-        ;
 
         var root = "root";
 
         TreeView<object> tree = new ();
 
-        tree.TreeBuilder = new DelegateTreeBuilder<object> (s => ReferenceEquals (s, root) ? new object [] { obj1 } : null, o => true);
+        tree.TreeBuilder = new DelegateTreeBuilder<object> (s => ReferenceEquals (s, root) ? new object [] { obj1 } : Array.Empty<object> (), _ => true);
         tree.AddObject (root);
 
         // Tree is not expanded so the root has no children yet
@@ -690,7 +688,7 @@ public class TreeViewTests : TestDriverBase
         Assert.Equal (1, tree.GetChildren (root).Count (child => ReferenceEquals (obj1, child)));
 
         // change the getter to return an Equal object (but not the same reference - obj2)
-        tree.TreeBuilder = new DelegateTreeBuilder<object> (s => ReferenceEquals (s, root) ? new object [] { obj2 } : null, o => true);
+        tree.TreeBuilder = new DelegateTreeBuilder<object> (s => ReferenceEquals (s, root) ? new object [] { obj2 } : Array.Empty<object> (), _ => true);
 
         // tree has cached the knowledge of what children the root has so won't know about the change (we still get obj1)
         Assert.Equal (1, tree.GetChildren (root).Count (child => ReferenceEquals (obj1, child)));
@@ -703,7 +701,7 @@ public class TreeViewTests : TestDriverBase
     [Fact]
     public void ScrollOffset_CannotBeNegative ()
     {
-        TreeView<object?> tree = CreateTree ();
+        TreeView<object> tree = CreateTree ();
 
         Assert.Equal (0, tree.ScrollOffsetVertical);
 
@@ -718,7 +716,7 @@ public class TreeViewTests : TestDriverBase
     [Fact]
     public void SpaceKey_Toggles_ExpandCollapse ()
     {
-        TreeView<object?> tree = CreateTree (out Factory f, out Car car1, out _);
+        TreeView<object> tree = CreateTree (out Factory f, out _, out _);
 
         // Factory is the root and is initially collapsed
         Assert.False (tree.IsExpanded (f));
@@ -766,7 +764,7 @@ public class TreeViewTests : TestDriverBase
         tv.Draw ();
 
         // verify
-        var actual = driver.ToString ()!;
+        var actual = driver.ToString ();
         string [] lines = actual.Replace ("\r\n", "\n").Split ('\n');
         string firstLine = lines [0];
         Assert.Contains (cjkText, firstLine);
@@ -790,9 +788,11 @@ public class TreeViewTests : TestDriverBase
     /// <summary>Test object which considers for equality only <see cref="Name"/></summary>
     private class EqualityTestObject
     {
+        [UsedImplicitly]
         public int Age { get; set; }
+
         public override bool Equals (object? obj) => obj is EqualityTestObject eto && Equals (Name, eto.Name);
-        public override int GetHashCode () => Name?.GetHashCode () ?? base.GetHashCode ();
+        public override int GetHashCode () => Name.GetHashCode ();
         public required string Name { get; init; }
     }
 
@@ -810,19 +810,19 @@ public class TreeViewTests : TestDriverBase
         public override string ToString () => Name;
     }
 
-    private TreeView<object?> CreateTree () => CreateTree (out _, out _, out _);
+    private TreeView<object> CreateTree () => CreateTree (out _, out _, out _);
 
-    private TreeView<object?> CreateTree (out Factory factory1, out Car car1, out Car car2)
+    private TreeView<object> CreateTree (out Factory factory1, out Car car1, out Car car2)
     {
         car1 = new Car { Name = string.Empty };
         car2 = new Car { Name = string.Empty };
 
         factory1 = new Factory { Cars = [car1, car2] };
 
-        TreeView<object> tree = new (new DelegateTreeBuilder<object> (s => s is Factory f ? f.Cars : null, o => false));
+        TreeView<object> tree = new (new DelegateTreeBuilder<object> (s => s is Factory f ? f.Cars : Array.Empty<object> (), _ => false));
         tree.AddObject (factory1);
 
-        return tree!;
+        return tree;
     }
 
     #endregion

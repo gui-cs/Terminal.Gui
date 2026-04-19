@@ -58,7 +58,7 @@ public class TreeUseCases : Scenario
                 return;
             }
 
-            if (value is { })
+            if (field is { })
             {
                 field?.Dispose ();
                 _appWindow?.Remove (field);
