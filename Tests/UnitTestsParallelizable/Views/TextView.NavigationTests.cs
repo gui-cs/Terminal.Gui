@@ -417,6 +417,32 @@ public class TextViewNavigationTests
     }
 
     [Fact]
+    public void CursorLeft_With_Mixed_Graphemes_Only_Scrolls_Left_When_Needed ()
+    {
+        // Test that pressing CursorLeft with mixed graphemes only scrolls left when needed
+        TextView tv = new () { Width = 10, Height = 3, Text = "Line1\t with more long 🍎 text.\nLine2.\nLine3.\nLine4." };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Set insertion point at column 10 and then scroll to the column 10 so that the insertion point is near at the start of the Viewport
+        tv.InsertionPoint = new Point (10, 0);
+        tv.Viewport = tv.Viewport with { X = 10 };
+        Assert.Equal (new Point (10, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (10, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+
+        // Clear NeedsDraw to isolate the effect of CursorLeft key press
+        tv.ClearNeedsDraw ();
+        Assert.False (tv.NeedsDraw);
+
+        // Press CursorLeft - should move left but not scroll since we aren't already near at the start of the Viewport.X
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft));
+        Assert.Equal (new Point (10, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (9, 0), tv.InsertionPoint);
+        Assert.False (tv.NeedsDraw);
+    }
+
+    [Fact]
     public void CursorRight_At_Text_Hidden_By_Scroll_Move_Cursor_Adjusts_Scroll_To_Make_Cursor_Visible ()
     {
         // Test that pressing CursorRight at text hidden by scroll moves cursor and adjusts scroll to make cursor visible

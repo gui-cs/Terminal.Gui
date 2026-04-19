@@ -161,7 +161,10 @@ public partial class TextView
         {
             CurrentColumn--;
 
-            if ((Viewport.X > 0 && CurrentColumn <= Viewport.X) || CurrentColumn >= Viewport.X + Viewport.Width)
+            List<Cell> currentLine = GetCurrentLine ();
+            int cursorColumn = TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _);
+
+            if ((Viewport.X > 0 && cursorColumn <= Viewport.X) || cursorColumn - Viewport.X >= Viewport.Width)
             {
                 SetNeedsDraw ();
             }
