@@ -9,6 +9,7 @@ public partial class TreeUseCases : Scenario
 {
     private EventLog? _eventLog;
     private Runnable? _appWindow;
+    private TreeViewEditor? _treeViewEditor;
     private ViewportSettingsEditor? _viewportSettingsEditor;
 
     public override void Main ()
@@ -33,9 +34,6 @@ public partial class TreeUseCases : Scenario
                                        new MenuItem { Title = "Armies With _Delegate", Action = () => LoadArmies (true) }
                                    ]));
 
-        // StatusBar
-        StatusBar statusBar = new ([new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", Quit)]);
-
         // EventLog on the right
         _eventLog = new EventLog
         {
@@ -45,6 +43,21 @@ public partial class TreeUseCases : Scenario
             Height = Dim.Fill (),
             Arrangement = ViewArrangement.LeftResizable,
             BorderStyle = LineStyle.Double
+        };
+
+        // TreeViewEditor above the ViewportSettingsEditor
+        _treeViewEditor = new TreeViewEditor
+        {
+            Title = "TreeViewSettings",
+            X = 0,
+            Y = Pos.Bottom (menu),
+            Width = Dim.Fill (_eventLog),
+            Height = Dim.Auto (),
+            CanFocus = true,
+            AutoSelectViewToEdit = false,
+            AutoSelectAdornments = false,
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped,
+            BorderStyle = LineStyle.Single
         };
 
         // ViewportSettingsEditor at the bottom-left (below tree area)
@@ -62,7 +75,7 @@ public partial class TreeUseCases : Scenario
             BorderStyle = LineStyle.Single
         };
 
-        _appWindow?.Add (menu, statusBar, _eventLog, _viewportSettingsEditor);
+        _appWindow?.Add (menu, _treeViewEditor, _eventLog, _viewportSettingsEditor);
 
         _appWindow?.IsModalChanged += (_, args) =>
                                       {
@@ -100,7 +113,7 @@ public partial class TreeUseCases : Scenario
             }
 
             field.X = 0;
-            field.Y = 1;
+            field.Y = Pos.Bottom (_treeViewEditor!);
             field.Width = Dim.Fill (_eventLog!);
             field.Height = Dim.Fill (_viewportSettingsEditor!);
             field.BorderStyle = LineStyle.Single;
@@ -108,9 +121,12 @@ public partial class TreeUseCases : Scenario
             field.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
 
             _appWindow?.Add (field);
-            _appWindow?.MoveSubViewTowardsStart (field);
+            // Gets added to end; move so that it's 2nd item (after menu)
+            _appWindow?.MoveSubViewToStart (field);
+            _appWindow?.MoveSubViewTowardsEnd (field);
 
             _eventLog!.ViewToLog = field;
+            _treeViewEditor!.ViewToEdit = field;
             _viewportSettingsEditor!.ViewToEdit = field;
 
             field?.SetFocus ();
@@ -131,7 +147,7 @@ public partial class TreeUseCases : Scenario
         else
         {
             tree.TreeBuilder = new GameObjectTreeBuilder ();
-            tree.Title = "Armies With_ Delegate";
+            tree.Title = "Armies With _Delegate";
         }
 
         tree.AddObject (army);
