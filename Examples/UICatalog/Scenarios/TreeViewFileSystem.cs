@@ -58,7 +58,7 @@ public class TreeViewFileSystem : Scenario
         };
 
         win.Add (_detailsFrame);
-        _treeViewFiles.Activating += TreeViewFiles_Selecting;
+        _treeViewFiles.Activating += TreeViewFiles_Activating;
         _treeViewFiles.KeyDown += TreeViewFiles_KeyPress;
         _treeViewFiles.SelectionChanged += TreeViewFiles_SelectionChanged;
 
@@ -232,18 +232,20 @@ public class TreeViewFileSystem : Scenario
         _treeViewFiles.SetNeedsDraw ();
     }
 
+    private bool _settingExpandableSymbols;
+
     private void SetExpandableSymbols (Rune expand, Rune? collapse)
     {
-        if (_treeViewFiles is null)
+        if (_treeViewFiles is null || _settingExpandableSymbols)
         {
             return;
         }
 
+        _settingExpandableSymbols = true;
         _miPlusMinusCheckBox?.Value = expand.Value == '+' ? CheckState.Checked : CheckState.UnChecked;
-
         _miArrowSymbolsCheckBox?.Value = expand.Value == '>' ? CheckState.Checked : CheckState.UnChecked;
-
         _miNoSymbolsCheckBox?.Value = expand.Value == 0 ? CheckState.Checked : CheckState.UnChecked;
+        _settingExpandableSymbols = false;
 
         _treeViewFiles.Style.ExpandableSymbol = expand;
         _treeViewFiles.Style.CollapseableSymbol = collapse;
@@ -289,23 +291,45 @@ public class TreeViewFileSystem : Scenario
         _treeViewFiles.MultiSelect = _miMultiSelectCheckBox.Value == CheckState.Checked;
     }
 
+    private bool _settingIcons;
+
     private void SetNerdIcons ()
     {
+        if (_settingIcons)
+        {
+            return;
+        }
         _iconProvider.UseNerdIcons = true;
+        _settingIcons = true;
         UpdateIconCheckState ();
+        _settingIcons = false;
     }
 
     private void SetNoIcons ()
     {
+        if (_settingIcons)
+        {
+            return;
+        }
+
         _iconProvider.UseUnicodeCharacters = false;
         _iconProvider.UseNerdIcons = false;
+        _settingIcons = true;
         UpdateIconCheckState ();
+        _settingIcons = false;
     }
 
     private void SetUnicodeIcons ()
     {
+        if (_settingIcons)
+        {
+            return;
+        }
+
         _iconProvider.UseUnicodeCharacters = true;
+        _settingIcons = true;
         UpdateIconCheckState ();
+        _settingIcons = false;
     }
 
     private void SetupFileTree ()
@@ -423,7 +447,7 @@ public class TreeViewFileSystem : Scenario
         ShowContextMenu (new Point (5 + _treeViewFiles.Frame.X, location.Value + _treeViewFiles.Frame.Y + 2), selected);
     }
 
-    private void TreeViewFiles_Selecting (object? sender, CommandEventArgs e)
+    private void TreeViewFiles_Activating (object? sender, CommandEventArgs e)
     {
         if (_treeViewFiles is null)
         {
@@ -486,23 +510,26 @@ public class TreeViewFileSystem : Scenario
 
                 try
                 {
-                    if (field is IFileInfo f)
+                    switch (field)
                     {
-                        Title = $"{_iconProvider.GetIconWithOptionalSpace (f)}{f.Name}".Trim ();
-                        sb = new StringBuilder ();
-                        sb.AppendLine ($"Path:\n {f.FullName}\n");
-                        sb.AppendLine ($"Size:\n {f.Length:N0} bytes\n");
-                        sb.AppendLine ($"Modified:\n {f.LastWriteTime}\n");
-                        sb.AppendLine ($"Created:\n {f.CreationTime}");
-                    }
+                        case IFileInfo f:
+                            Title = $"{_iconProvider.GetIconWithOptionalSpace (f)}{f.Name}".Trim ();
+                            sb = new StringBuilder ();
+                            sb.AppendLine ($"Path:\n {f.FullName}\n");
+                            sb.AppendLine ($"Size:\n {f.Length:N0} bytes\n");
+                            sb.AppendLine ($"Modified:\n {f.LastWriteTime}\n");
+                            sb.AppendLine ($"Created:\n {f.CreationTime}");
 
-                    if (field is IDirectoryInfo dir)
-                    {
-                        Title = $"{_iconProvider.GetIconWithOptionalSpace (dir)}{dir.Name}".Trim ();
-                        sb = new StringBuilder ();
-                        sb.AppendLine ($"Path:\n {dir.FullName}\n");
-                        sb.AppendLine ($"Modified:\n {dir.LastWriteTime}\n");
-                        sb.AppendLine ($"Created:\n {dir.CreationTime}\n");
+                            break;
+
+                        case IDirectoryInfo dir:
+                            Title = $"{_iconProvider.GetIconWithOptionalSpace (dir)}{dir.Name}".Trim ();
+                            sb = new StringBuilder ();
+                            sb.AppendLine ($"Path:\n {dir.FullName}\n");
+                            sb.AppendLine ($"Modified:\n {dir.LastWriteTime}\n");
+                            sb.AppendLine ($"Created:\n {dir.CreationTime}\n");
+
+                            break;
                     }
                 }
                 catch (IOException ioe)
