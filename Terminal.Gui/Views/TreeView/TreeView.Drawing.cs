@@ -2,7 +2,6 @@
 // by phillip.piper@gmail.com). Phillip has explicitly granted permission for his design
 // and code to be used in this library under the MIT license.
 
-#nullable disable
 namespace Terminal.Gui.Views;
 
 public partial class TreeView<T>
@@ -13,10 +12,10 @@ public partial class TreeView<T>
     /// </summary>
 
     // TODO: Refactor to use CWP
-    public event EventHandler<DrawTreeViewLineEventArgs<T>> DrawLine;
+    public event EventHandler<DrawTreeViewLineEventArgs<T>>? DrawLine;
 
     ///<inheritdoc/>
-    protected override bool OnDrawingContent (DrawContext context)
+    protected override bool OnDrawingContent (DrawContext? context)
     {
         if (Roots is null)
         {
@@ -56,7 +55,7 @@ public partial class TreeView<T>
     }
 
     ///<inheritdoc/>
-    protected override void OnHasFocusChanged (bool newHasFocus, View currentFocused, View newFocused)
+    protected override void OnHasFocusChanged (bool newHasFocus, View? currentFocused, View? newFocused)
     {
         if (!newHasFocus)
         {
@@ -64,7 +63,7 @@ public partial class TreeView<T>
         }
 
         // If there is no selected object and there are objects in the tree, select the first one
-        if (SelectedObject is null && Objects.Any ())
+        if (SelectedObject is null && Objects is { } && Objects.Any ())
         {
             SelectedObject = Objects.First ();
         }
@@ -73,7 +72,7 @@ public partial class TreeView<T>
     /// <summary>Returns the maximum width line in the tree including prefix and expansion symbols.</summary>
     /// <param name="visible">
     ///     True to consider only rows currently visible (based on window bounds and
-    ///     <see cref="ScrollOffsetVertical"/>. False to calculate the width of every exposed branch in the tree.
+    ///     <see cref="ScrollOffsetVertical"/>). False to calculate the width of every exposed branch in the tree.
     /// </param>
     /// <returns></returns>
     public int GetContentWidth (bool visible)
@@ -114,7 +113,7 @@ public partial class TreeView<T>
     /// </summary>
     /// <param name="row">The row of the <see cref="View.Viewport"/> of the <see cref="TreeView{T}"/>.</param>
     /// <returns>The object currently displayed on this row or null.</returns>
-    public T GetObjectOnRow (int row) => HitTest (row)?.Model;
+    public T? GetObjectOnRow (int row) => HitTest (row)?.Model;
 
     /// <summary>
     ///     <para>

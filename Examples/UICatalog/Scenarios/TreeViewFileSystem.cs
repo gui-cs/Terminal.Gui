@@ -376,13 +376,21 @@ public class TreeViewFileSystem : Scenario
             return;
         }
 
-        if (e.IndexOfModelText <= 0 || e.IndexOfModelText >= e.Cells.Count)
+        switch (e.Cells)
         {
-            return;
-        }
-        Cell cell = e.Cells [e.IndexOfModelText];
+            case { } when e.IndexOfModelText <= 0:
+            case { } when e.IndexOfModelText >= e.Cells.Count:
+                return;
 
-        cell.Attribute = new Attribute (Color.BrightYellow, cell.Attribute!.Value.Background, cell.Attribute!.Value.Style);
+            case { }:
+            {
+                Cell cell = e.Cells [e.IndexOfModelText];
+
+                cell.Attribute = new Attribute (Color.BrightYellow, cell.Attribute!.Value.Background, cell.Attribute!.Value.Style);
+
+                break;
+            }
+        }
     }
 
     private void TreeViewFiles_KeyPress (object? sender, Key obj)
@@ -460,7 +468,6 @@ public class TreeViewFileSystem : Scenario
     private class DetailsFrame : FrameView
     {
         private readonly FileSystemIconProvider _iconProvider;
-        private IFileSystemInfo? _fileInfo;
 
         public DetailsFrame (FileSystemIconProvider iconProvider)
         {
@@ -474,12 +481,12 @@ public class TreeViewFileSystem : Scenario
         {
             set
             {
-                _fileInfo = value;
+                field = value;
                 StringBuilder? sb = null;
 
                 try
                 {
-                    if (_fileInfo is IFileInfo f)
+                    if (field is IFileInfo f)
                     {
                         Title = $"{_iconProvider.GetIconWithOptionalSpace (f)}{f.Name}".Trim ();
                         sb = new StringBuilder ();
@@ -489,7 +496,7 @@ public class TreeViewFileSystem : Scenario
                         sb.AppendLine ($"Created:\n {f.CreationTime}");
                     }
 
-                    if (_fileInfo is IDirectoryInfo dir)
+                    if (field is IDirectoryInfo dir)
                     {
                         Title = $"{_iconProvider.GetIconWithOptionalSpace (dir)}{dir.Name}".Trim ();
                         sb = new StringBuilder ();
@@ -500,18 +507,18 @@ public class TreeViewFileSystem : Scenario
                 }
                 catch (IOException ioe)
                 {
-                    if (_fileInfo is IFileInfo f)
+                    if (field is IFileInfo f)
                     {
                         Title = $"{_iconProvider.GetIconWithOptionalSpace (f)}{f.Name}".Trim ();
                     }
 
-                    if (_fileInfo is IDirectoryInfo dir)
+                    if (field is IDirectoryInfo dir)
                     {
                         Title = $"{_iconProvider.GetIconWithOptionalSpace (dir)}{dir.Name}".Trim ();
                     }
 
                     sb = new StringBuilder ();
-                    sb.AppendLine ($"Path:\n {_fileInfo?.FullName}\n");
+                    sb.AppendLine ($"Path:\n {field?.FullName}\n");
                     sb.AppendLine ($"Exception:\n {ioe.Message}");
                 }
 

@@ -19,18 +19,18 @@ public class TreeView : TreeView<ITreeNode>, IDesignable
         CanFocus = true;
 
         TreeBuilder = new TreeNodeBuilder ();
-        AspectGetter = o => o is null ? "Null" : o.Text ?? o.ToString () ?? "Unnamed Node";
+        AspectGetter = o => o is null ? "Null" : o.Text;
     }
 
     bool IDesignable.EnableForDesign ()
     {
-        var root1 = new TreeNode ("Root1");
-        root1.Children.Add (new TreeNode ("Child1.1"));
-        root1.Children.Add (new TreeNode ("Child1.2"));
+        var root1 = new TreeNode () { Text = "Root1" };
+        root1.Children.Add (new TreeNode () { Text = "Child1.1" });
+        root1.Children.Add (new TreeNode () { Text = "Child1.2" });
 
-        var root2 = new TreeNode ("Root2");
-        root2.Children.Add (new TreeNode ("Child2.1"));
-        root2.Children.Add (new TreeNode ("Child2.2"));
+        var root2 = new TreeNode () { Text = "Root2" };
+        root2.Children.Add (new TreeNode () { Text = "Child2.1" });
+        root2.Children.Add (new TreeNode () { Text = "Child2.2" });
 
         AddObject (root1);
         AddObject (root2);

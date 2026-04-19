@@ -78,7 +78,7 @@ public class InteractiveTree : Scenario
         {
             if (GetText ("Text", "Enter text for node:", "", out string entered))
             {
-                node.Children.Add (new TreeNode (entered));
+                node.Children.Add (new TreeNode () { Text = entered });
                 _treeView.RefreshObject (node);
             }
         }
@@ -93,7 +93,7 @@ public class InteractiveTree : Scenario
 
         if (GetText ("Text", "Enter text for node:", "", out string entered))
         {
-            _treeView.AddObject (new TreeNode (entered));
+            _treeView.AddObject (new TreeNode () { Text = entered });
         }
     }
 

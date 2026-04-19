@@ -85,6 +85,8 @@ public partial class TreeView<T> : View, ITreeView where T : class
     ///         override key bindings for TreeView via configuration.
     ///     </para>
     /// </remarks>
+
+    // ReSharper disable once StaticMemberInGenericType
     public new static Dictionary<Command, PlatformKeyBinding> DefaultKeyBindings { get; set; } = new ()
     {
         // Tree-specific expand/collapse
@@ -336,7 +338,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
     public bool MultiSelect { get; set; } = true;
 
     /// <summary>The root objects in the tree, note that this collection is of root objects only.</summary>
-    public IEnumerable<T> Objects => Roots.Keys;
+    public IEnumerable<T>? Objects => Roots?.Keys;
 
     /// <summary>The amount of tree view that has been scrolled to the right (horizontally).</summary>
     /// <remarks>
@@ -385,10 +387,8 @@ public partial class TreeView<T> : View, ITreeView where T : class
             T? oldValue = _selectedObject;
             _selectedObject = value;
 
-            if (!ReferenceEquals (oldValue, value))
-            {
-                OnSelectionChanged (new SelectionChangedEventArgs<T> (this, oldValue, value));
-            }
+            OnSelectionChanged (new SelectionChangedEventArgs<T> (this, oldValue, value));
+            SetNeedsDraw ();
         }
     }
 
@@ -400,7 +400,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
     ///     Map of root objects to the branches under them. All objects have a <see cref="Branch{T}"/> even if that branch
     ///     has no children.
     /// </summary>
-    internal Dictionary<T, Branch<T>> Roots { get; set; } = new ();
+    internal Dictionary<T, Branch<T>>? Roots { get; set; } = new ();
 
     /// <summary>Contains options for changing how the tree is rendered.</summary>
     public TreeStyle Style { get; set; } = new ();
@@ -487,7 +487,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
             return;
         }
 
-        if (Roots.ContainsKey (o))
+        if (Roots is null || Roots.ContainsKey (o))
         {
             return;
         }
@@ -506,7 +506,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
 
         foreach (T o in collection)
         {
-            if (Roots.ContainsKey (o))
+            if (Roots is null || Roots.ContainsKey (o))
             {
                 continue;
             }
@@ -531,9 +531,12 @@ public partial class TreeView<T> : View, ITreeView where T : class
     /// </summary>
     public void RebuildTree ()
     {
-        foreach (Branch<T> branch in Roots.Values)
+        if (Roots is { })
         {
-            branch.Rebuild ();
+            foreach (Branch<T> branch in Roots.Values)
+            {
+                branch.Rebuild ();
+            }
         }
 
         InvalidateLineMap ();
@@ -566,7 +569,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
     public void Remove (T o)
     {
         // ReSharper disable once CanSimplifyDictionaryRemovingWithSingleCall
-        if (!Roots.ContainsKey (o))
+        if (Roots is null || !Roots.ContainsKey (o))
         {
             return;
         }
@@ -608,15 +611,18 @@ public partial class TreeView<T> : View, ITreeView where T : class
             return _cachedLineMap;
         }
 
-        List<Branch<T>> toReturn = new ();
+        List<Branch<T>> toReturn = [];
 
-        foreach (Branch<T> root in Roots.Values)
+        if (Roots is { })
         {
-            IEnumerable<Branch<T>> toAdd = AddToLineMap (root, false, out bool isMatch);
-
-            if (isMatch)
+            foreach (Branch<T> root in Roots.Values)
             {
-                toReturn.AddRange (toAdd);
+                IEnumerable<Branch<T>> toAdd = AddToLineMap (root, false, out bool isMatch);
+
+                if (isMatch)
+                {
+                    toReturn.AddRange (toAdd);
+                }
             }
         }
 

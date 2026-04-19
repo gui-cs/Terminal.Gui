@@ -33,7 +33,7 @@ public partial class TreeView<T>
 
         if (SelectedObject is null)
         {
-            SelectedObject = Roots.Keys.FirstOrDefault ();
+            SelectedObject = Roots?.Keys.FirstOrDefault ();
         }
         else
         {
@@ -44,7 +44,7 @@ public partial class TreeView<T>
             if (idx == -1)
             {
                 // The current selection has disappeared!
-                SelectedObject = Roots.Keys.FirstOrDefault ();
+                SelectedObject = Roots?.Keys.FirstOrDefault ();
             }
             else
             {
@@ -189,6 +189,11 @@ public partial class TreeView<T>
     /// <summary>Collapses all root nodes in the tree.</summary>
     public void CollapseAll ()
     {
+        if (Roots is null)
+        {
+            return;
+        }
+
         foreach (KeyValuePair<T, Branch<T>> item in Roots)
         {
             item.Value.Collapse ();
@@ -306,6 +311,11 @@ public partial class TreeView<T>
     /// </summary>
     public void ExpandAll ()
     {
+        if (Roots is null)
+        {
+            return;
+        }
+
         foreach (KeyValuePair<T, Branch<T>> item in Roots)
         {
             item.Value.ExpandAll ();
@@ -427,7 +437,7 @@ public partial class TreeView<T>
     public void GoToFirst ()
     {
         ScrollOffsetVertical = 0;
-        SelectedObject = Roots.Keys.FirstOrDefault ();
+        SelectedObject = Roots?.Keys.FirstOrDefault ();
 
         SetNeedsDraw ();
     }

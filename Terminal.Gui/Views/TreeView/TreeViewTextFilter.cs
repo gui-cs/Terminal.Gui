@@ -1,4 +1,3 @@
-#nullable disable
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -9,7 +8,6 @@ namespace Terminal.Gui.Views;
 public class TreeViewTextFilter<T> : ITreeViewFilter<T> where T : class
 {
     private readonly TreeView<T> _forTree;
-    private string _text;
 
     /// <summary>
     ///     Creates a new instance of the filter for use with <paramref name="forTree"/>. Set <see cref="Text"/> to begin
@@ -25,13 +23,13 @@ public class TreeViewTextFilter<T> : ITreeViewFilter<T> where T : class
     /// <summary>The text that will be searched for in the <see cref="TreeView{T}"/></summary>
     public string Text
     {
-        get => _text;
+        get;
         set
         {
-            _text = value;
+            field = value;
             RefreshTreeView ();
         }
-    }
+    } = string.Empty;
 
     /// <summary>
     ///     Returns <typeparamref name="T"/> if there is no <see cref="Text"/> or the text matches the

@@ -93,7 +93,7 @@ internal class Branch<T> where T : class
         // Everything on the line before the expansion run and branch text
         string [] prefix = GetLinePrefix ().ToArray ();
         string expansion = GetExpandableSymbol ();
-        string lineBody = _tree.AspectGetter (Model) ?? "";
+        string lineBody = _tree.AspectGetter (Model);
 
         _tree.Move (0, y);
 
@@ -263,18 +263,9 @@ internal class Branch<T> where T : class
             return [];
         }
 
-        IEnumerable<T> children;
+        IEnumerable<T>? children = Depth >= _tree.MaxDepth ? [] : _tree.TreeBuilder.GetChildren (Model);
 
-        if (Depth >= _tree.MaxDepth)
-        {
-            children = [];
-        }
-        else
-        {
-            children = _tree.TreeBuilder.GetChildren (Model) ?? [];
-        }
-
-        return children.Select (o => new Branch<T> (_tree, this, o)).ToList ();
+        return children?.Select (o => new Branch<T> (_tree, this, o)).ToList () ?? [];
     }
 
     /// <summary>
@@ -305,7 +296,7 @@ internal class Branch<T> where T : class
     /// </summary>
     /// <returns></returns>
     public virtual int GetWidth () =>
-        GetLinePrefix ().Sum (r => r.GetColumns ()) + GetExpandableSymbol ().GetColumns () + (_tree.AspectGetter (Model) ?? "").GetColumns ();
+        GetLinePrefix ().Sum (r => r.GetColumns ()) + GetExpandableSymbol ().GetColumns () + _tree.AspectGetter (Model).GetColumns ();
 
     /// <summary>Refreshes cached knowledge in this branch e.g. what children an object has.</summary>
     /// <param name="startAtTop">True to also refresh all <see cref="Parent"/> branches (starting with the root).</param>
@@ -457,13 +448,13 @@ internal class Branch<T> where T : class
         }
 
         // if we could theoretically expand
-        if (!IsExpanded && _tree.Style.ExpandableSymbol != default (Rune?))
+        if (!IsExpanded && _tree.Style.ExpandableSymbol != null)
         {
             return x == GetLinePrefix ().Count ();
         }
 
         // if we could theoretically collapse
-        if (IsExpanded && _tree.Style.CollapseableSymbol != default (Rune?))
+        if (IsExpanded && _tree.Style.CollapseableSymbol != null)
         {
             return x == GetLinePrefix ().Count ();
         }
@@ -520,7 +511,7 @@ internal class Branch<T> where T : class
     {
         if (Parent is null)
         {
-            return this == _tree.Roots.Values.LastOrDefault ();
+            return this == _tree.Roots?.Values.LastOrDefault ();
         }
 
         Parent.ChildBranches ??= Parent.FetchChildren ();
