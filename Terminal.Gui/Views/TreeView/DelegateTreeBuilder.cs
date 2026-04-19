@@ -13,7 +13,7 @@ public class DelegateTreeBuilder<T> : TreeBuilder<T>
     /// <param name="childGetter"></param>
     /// <param name="canExpand"></param>
     /// <returns></returns>
-    public DelegateTreeBuilder (Func<T, IEnumerable<T>> childGetter, Func<T, bool> canExpand) : base (false)
+    public DelegateTreeBuilder (Func<T, IEnumerable<T>> childGetter, Func<T, bool> canExpand) : base (true)
     {
         _childGetter = childGetter;
         _canExpand = canExpand;
