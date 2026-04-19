@@ -343,8 +343,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
         get => Viewport.X;
         set
         {
-            Rectangle vp = Viewport;
-            Viewport = vp with { X = Math.Max (0, value) };
+            Viewport = Viewport with { X = Math.Max (0, value) };
             SetNeedsDraw ();
         }
     }
@@ -359,8 +358,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
         get => Viewport.Y;
         set
         {
-            Rectangle vp = Viewport;
-            Viewport = vp with { Y = Math.Max (0, value) };
+            Viewport = Viewport with { Y = Math.Max (0, value) };
             SetNeedsDraw ();
         }
     }
@@ -699,8 +697,8 @@ public partial class TreeView<T> : View, ITreeView where T : class
         try
         {
             IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
+            int width = map.Count > 0 ? map.Max (b => b.GetWidth ()) : 0;
             int height = map.Count;
-            int width = height > 0 ? map.Max (b => b.GetWidth ()) : 0;
 
             SetContentSize (new Size (width, height));
 
