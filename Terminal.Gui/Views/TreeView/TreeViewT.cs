@@ -699,7 +699,15 @@ public partial class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <inheritdoc/>
-    protected override void OnViewportChanged (DrawEventArgs e) => UpdateContentSize ();
+    protected override void OnViewportChanged (DrawEventArgs e)
+    {
+        // Only update content size when viewport size changes (e.g. resize),
+        // not on every scroll (position change), to avoid O(n) recomputation.
+        if (e.OldViewport.Size != e.NewViewport.Size)
+        {
+            UpdateContentSize ();
+        }
+    }
 
     /// <summary>
     ///     Returns the corresponding <see cref="Branch{T}"/> in the tree for <paramref name="toFind"/>. This will not
