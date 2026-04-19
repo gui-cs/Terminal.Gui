@@ -85,8 +85,8 @@ TreeView<GameObject> tree = new ()
     Width = 40,
     Height = 20,
     TreeBuilder = new DelegateTreeBuilder<GameObject> (
-        o => o is Army a ? a.Units : Enumerable.Empty<GameObject> (),
-        o => o is Army)
+        childGetter: o => o is Army a ? a.Units : Enumerable.Empty<GameObject> (),
+        canExpand: o => o is Army)
 };
 
 tree.AddObject (new Army
@@ -105,7 +105,7 @@ tree.AddObject (new Army
 | Member | Type | Description |
 |--------|------|-------------|
 | `Text` | `string` | Display text |
-| `Children` | `IList<ITreeNode>` | SubView nodes |
+| `Children` | `IList<ITreeNode>` | Child nodes |
 | `Tag` | `object?` | User data |
 
 <xref:Terminal.Gui.TreeNode> is the default concrete implementation. `Children` is mutable — add or remove nodes at any time, then call `RefreshObject` to update the display.
@@ -141,11 +141,11 @@ class GameObjectTreeBuilder : ITreeBuilder<GameObject>
 
 ```csharp
 tree.TreeBuilder = new DelegateTreeBuilder<GameObject> (
-    o => o is Army a ? a.Units : Enumerable.Empty<GameObject> (),
-    o => o is Army);
+    childGetter: o => o is Army a ? a.Units : Enumerable.Empty<GameObject> (),
+    canExpand: o => o is Army);
 ```
 
-The first delegate returns children; the second (optional) is the `CanExpand` check.
+The first delegate returns children; the second is the `CanExpand` check (both are required).
 
 ### Custom ITreeNode Subclasses
 
@@ -190,7 +190,7 @@ TreeView integrates with the Terminal.Gui [command system](command.md). Input fl
 | **Space** | `Command.Activate` | Raises `Activating`/`Activated`; toggles expand/collapse |
 | **→** | `Command.Expand` | Expand selected node |
 | **Ctrl+→** | `Command.ExpandAll` | Expand node and all descendants |
-| **←** | `Command.Collapse` | Collapse selected node, or navigate to SuperView node |
+| **←** | `Command.Collapse` | Collapse selected node, or navigate to parent node |
 | **Ctrl+←** | `Command.CollapseAll` | Collapse node and all descendants |
 | **↑** | `Command.Up` | Move selection up one row |
 | **↓** | `Command.Down` | Move selection down one row |
@@ -274,7 +274,7 @@ tree.DrawLine += (sender, e) =>
                  {
                      // e.Model is the object being drawn
                      // e.IndexOfModelText is the column where text starts
-                     // e.RuneCells is the list of cells to render
+                     // e.Cells is the list of cells to render
                      // Set e.Handled = true to suppress default rendering
                  };
 ```
@@ -290,10 +290,9 @@ Control rendering via the <xref:Terminal.Gui.TreeStyle> property:
 | `ShowBranchLines` | `true` | Show `│`, `├`, `└` connector lines |
 | `ExpandableSymbol` | `+` | Symbol for collapsed expandable nodes |
 | `CollapseableSymbol` | `-` | Symbol for expanded nodes |
-| `ColorExpandSymbol` | `false` | Render expand symbol in hot key color |
+| `ColorExpandSymbol` | `false` | Render expand symbol in highlight color |
 | `InvertExpandSymbolColors` | `false` | Swap foreground/background on expand symbol |
 | `HighlightModelTextOnly` | `false` | Highlight only the text, not the full row |
-| `LeaveLastRow` | `false` | Reserve the last row (e.g. for a scrollbar) |
 
 Set symbols to `null` to hide them entirely.
 
@@ -337,8 +336,8 @@ tree.ColorGetter = node =>
 | `CollapseAll (T obj)` | Collapse a node and all its descendants |
 | `Toggle (T obj)` | Toggle expand/collapse |
 | `IsExpanded (T obj)` | Check if a node is expanded |
-| `GetParent (T obj)` | Get the SuperView node (only works for expanded branches) |
-| `GetChildren (T obj)` | Get the visible SubView nodes |
+| `GetParent (T obj)` | Get the parent node (only works for expanded branches) |
+| `GetChildren (T obj)` | Get the visible child nodes |
 | `GetObjectOnRow (int row)` | Get the object at a viewport row |
 
 ### Multi-Select
@@ -401,11 +400,11 @@ TreeView caches the expanded tree structure. After modifying nodes at runtime:
 | `RebuildTree ()` | After replacing the `TreeBuilder` or making sweeping changes |
 | `InvalidateLineMap ()` | After changes that affect which lines are visible |
 
-Example — adding a SubView node at runtime:
+Example — adding a child node at runtime:
 
 ```csharp
 TreeNode parent = (TreeNode)tree.SelectedObject!;
-parent.Children.Add (new TreeNode { Text = "New SubView" });
+parent.Children.Add (new TreeNode { Text = "New Child" });
 tree.RefreshObject (parent);
 ```
 
@@ -421,10 +420,10 @@ if (tree.Objects.Contains (toDelete))
 }
 else
 {
-    // It's a SubView node — remove from SuperView's children
-    ITreeNode? superView = tree.GetParent (toDelete);
-    superView?.Children.Remove (toDelete);
-    tree.RefreshObject (superView);
+    // It's a child node — remove from parent's children
+    ITreeNode? parent = tree.GetParent (toDelete);
+    parent?.Children.Remove (toDelete);
+    tree.RefreshObject (parent);
 }
 ```
 

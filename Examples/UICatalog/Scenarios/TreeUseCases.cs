@@ -1,13 +1,16 @@
-﻿#nullable enable
+#nullable enable
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Tree View", "Simple tree view examples.")]
+[ScenarioMetadata ("Tree View", "Demonstrates TreeView")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("TreeView")]
-public class TreeUseCases : Scenario
+public partial class TreeUseCases : Scenario
 {
+    private EventLog? _eventLog;
     private Runnable? _appWindow;
+    private TreeViewEditor? _treeViewEditor;
+    private ViewportSettingsEditor? _viewportSettingsEditor;
 
     public override void Main ()
     {
@@ -25,25 +28,63 @@ public class TreeUseCases : Scenario
 
         menu.Add (new MenuBarItem ("_Scenarios",
                                    [
-                                       new MenuItem { Title = "_Simple Nodes", Action = LoadSimpleNodes },
+                                       new MenuItem { Title = "_EnableForDesign", Action = LoadEnableForDesign },
                                        new MenuItem { Title = "_Rooms", Action = LoadRooms },
-                                       new MenuItem { Title = "_Armies With Builder", Action = () => LoadArmies (false) },
-                                       new MenuItem { Title = "_Armies With Delegate", Action = () => LoadArmies (true) }
+                                       new MenuItem { Title = "Armies With _Builder", Action = () => LoadArmies (false) },
+                                       new MenuItem { Title = "Armies With _Delegate", Action = () => LoadArmies (true) }
                                    ]));
 
-        // StatusBar
-        StatusBar statusBar = new ([new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", Quit)]);
+        // EventLog on the right
+        _eventLog = new EventLog
+        {
+            X = Pos.AnchorEnd (),
+            Y = 0,
+            Width = Dim.Percent (25),
+            Height = Dim.Fill (),
+            Arrangement = ViewArrangement.LeftResizable,
+            BorderStyle = LineStyle.Double
+        };
 
-        _appWindow?.Add (menu, statusBar);
+        // TreeViewEditor above the ViewportSettingsEditor
+        _treeViewEditor = new TreeViewEditor
+        {
+            Title = "TreeViewSettings",
+            X = 0,
+            Y = Pos.Bottom (menu),
+            Width = Dim.Fill (_eventLog),
+            Height = Dim.Auto (),
+            CanFocus = true,
+            AutoSelectViewToEdit = false,
+            AutoSelectAdornments = false,
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped,
+            BorderStyle = LineStyle.Single
+        };
+
+        // ViewportSettingsEditor at the bottom-left (below tree area)
+        _viewportSettingsEditor = new ViewportSettingsEditor
+        {
+            Title = "ViewportSettings",
+            X = 0,
+            Y = Pos.AnchorEnd (),
+            Width = Dim.Fill (_eventLog),
+            Height = Dim.Auto (),
+            CanFocus = true,
+            AutoSelectViewToEdit = false,
+            AutoSelectAdornments = false,
+            Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped,
+            BorderStyle = LineStyle.Single
+        };
+
+        _appWindow?.Add (menu, _treeViewEditor, _eventLog, _viewportSettingsEditor);
 
         _appWindow?.IsModalChanged += (_, args) =>
-                                     {
-                                         if (args.Value)
-                                         {
-                                             // Start with the most basic use case
-                                             LoadSimpleNodes ();
-                                         }
-                                     };
+                                      {
+                                          if (args.Value)
+                                          {
+                                              // Start with the most basic use case
+                                              LoadEnableForDesign ();
+                                          }
+                                      };
 
         app.Run (_appWindow!);
         _appWindow?.Dispose ();
@@ -63,14 +104,32 @@ public class TreeUseCases : Scenario
                 field?.Dispose ();
                 _appWindow?.Remove (field);
             }
+
             field = value;
 
             if (field is null)
             {
                 return;
             }
+
+            field.X = 0;
+            field.Y = Pos.Bottom (_treeViewEditor!);
+            field.Width = Dim.Fill (_eventLog!);
+            field.Height = Dim.Fill (_viewportSettingsEditor!);
+            field.BorderStyle = LineStyle.Single;
+            field.Arrangement = ViewArrangement.Resizable | ViewArrangement.Movable;
+            field.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
+            field.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
+
             _appWindow?.Add (field);
-            _appWindow?.MoveSubViewTowardsStart (field);
+
+            // Gets added to end; move so that it's 2nd item (after menu)
+            _appWindow?.MoveSubViewToStart (field);
+            _appWindow?.MoveSubViewTowardsEnd (field);
+
+            _eventLog!.ViewToLog = field;
+            _treeViewEditor!.ViewToEdit = field;
+            _viewportSettingsEditor!.ViewToEdit = field;
 
             field?.SetFocus ();
         }
@@ -78,20 +137,22 @@ public class TreeUseCases : Scenario
 
     private void LoadArmies (bool useDelegate)
     {
-        Army army1 = new () { Designation = "3rd Infantry", Units = [new Unit { Name = "Orc" }, new Unit { Name = "Troll" }, new Unit { Name = "Goblin" }] };
+        Army army = CreateMiddleEarthArmy ();
 
-        TreeView<GameObject> tree = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
+        TreeView<GameObject> tree = new ();
 
         if (useDelegate)
         {
-            tree.TreeBuilder = new DelegateTreeBuilder<GameObject> (o => o is Army a ? a.Units : Enumerable.Empty<GameObject> (), _ => true);
+            tree.TreeBuilder = new DelegateTreeBuilder<GameObject> (o => o.GetChildren (), o => o.GetChildren ().Any ());
+            tree.Title = "Armies With _Delegate";
         }
         else
         {
             tree.TreeBuilder = new GameObjectTreeBuilder ();
+            tree.Title = "Armies With _Builder";
         }
 
-        tree.AddObject (army1);
+        tree.AddObject (army);
 
         CurrentTree = tree;
     }
@@ -103,47 +164,26 @@ public class TreeUseCases : Scenario
             Address = "23 Nowhere Street", Rooms = [new Room { Name = "Ballroom" }, new Room { Name = "Bedroom 1" }, new Room { Name = "Bedroom 2" }]
         };
 
-        TreeView tree = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
+        TreeView tree = new ();
+        tree.Title = "_Rooms";
 
         tree.AddObject (myHouse);
 
         CurrentTree = tree;
     }
 
-    private void LoadSimpleNodes ()
+    private void LoadEnableForDesign ()
     {
-        TreeView tree = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
+        TreeView tree = new ();
         tree.EnableForDesign ();
+        tree.Title = "_EnableForDesign";
 
         CurrentTree = tree;
     }
 
     private void Quit () => _appWindow?.RequestStop ();
 
-    private class Army : GameObject
-    {
-        public string Designation { get; init; } = string.Empty;
-        public List<Unit> Units { get; init; } = [];
-        public override string ToString () => Designation;
-    }
-
-    private abstract class GameObject;
-
-    private class GameObjectTreeBuilder : ITreeBuilder<GameObject>
-    {
-        public bool SupportsCanExpand => true;
-        public bool CanExpand (GameObject model) => model is Army;
-
-        public IEnumerable<GameObject> GetChildren (GameObject model)
-        {
-            if (model is Army a)
-            {
-                return a.Units;
-            }
-
-            return Enumerable.Empty<GameObject> ();
-        }
-    }
+    // ── House / Room model (unchanged) ─────────────────────────────────────
 
     private class House : TreeNode
     {
@@ -160,11 +200,5 @@ public class TreeUseCases : Scenario
         public string Name { get; set; } = string.Empty;
 
         public override string Text { get => Name; set => Name = value; }
-    }
-
-    private class Unit : GameObject
-    {
-        public string Name { get; init; } = string.Empty;
-        public override string ToString () => Name;
     }
 }

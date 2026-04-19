@@ -28,10 +28,9 @@ public class DrawTreeViewLineEventArgs<T> where T : class
     public T? Model { get; init; }
 
     /// <summary>
-    ///     The rune and color of each symbol that will be rendered.  Note that only <see cref="Scheme.Normal"/> is
-    ///     respected.  You can modify these to change what is rendered.
+    ///     The content and color of each cell that will be rendered. You can modify these to change what is rendered.
     /// </summary>
-    /// <remarks>Changing the length of this collection may result in corrupt rendering</remarks>
+    /// <remarks>Changing the length of this collection may result in corrupt rendering.</remarks>
     public List<Cell>? Cells { get; init; }
 
     /// <summary>The <see cref="TreeView{T}"/> that is performing the rendering.</summary>

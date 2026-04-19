@@ -6,8 +6,7 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public interface ITreeNode
 {
-    /// <summary>The children of your class which should be rendered underneath it when expanded</summary>
-    /// <value></value>
+    /// <summary>The children of your class which should be rendered underneath it when expanded.</summary>
     IList<ITreeNode> Children { get; }
 
     /// <summary>Optionally allows you to store some custom data/class here.</summary>
