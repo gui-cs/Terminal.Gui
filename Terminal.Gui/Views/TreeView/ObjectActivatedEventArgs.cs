@@ -1,7 +1,6 @@
-#nullable disable
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
-/// <summary>Event args for the <see cref="TreeView{T}.ObjectActivated"/> event</summary>
+/// <summary>Event args for object activation in <see cref="TreeView{T}"/></summary>
 /// <typeparam name="T"></typeparam>
 public class ObjectActivatedEventArgs<T> where T : class
 {

@@ -1,8 +1,6 @@
-#nullable disable
-﻿// This code is based on http://objectlistview.sourceforge.net (GPLv3 tree/list controls 
+// This code is based on http://objectlistview.sourceforge.net (GPLv3 tree/list controls
 // by phillip.piper@gmail.com). Phillip has explicitly granted permission for his design
 // and code to be used in this library under the MIT license.
-
 
 namespace Terminal.Gui.Views;
 
@@ -27,17 +25,17 @@ public class DrawTreeViewLineEventArgs<T> where T : class
     public int IndexOfModelText { get; init; }
 
     /// <summary>The object at this line in the tree</summary>
-    public T Model { get; init; }
+    public T? Model { get; init; }
 
     /// <summary>
     ///     The rune and color of each symbol that will be rendered.  Note that only <see cref="Scheme.Normal"/> is
     ///     respected.  You can modify these to change what is rendered.
     /// </summary>
     /// <remarks>Changing the length of this collection may result in corrupt rendering</remarks>
-    public List<Cell> Cells { get; init; }
+    public List<Cell>? Cells { get; init; }
 
     /// <summary>The <see cref="TreeView{T}"/> that is performing the rendering.</summary>
-    public TreeView<T> Tree { get; init; }
+    public TreeView<T>? Tree { get; init; }
 
     /// <summary>The line within tree view bounds that is being rendered</summary>
     public int Y { get; init; }
