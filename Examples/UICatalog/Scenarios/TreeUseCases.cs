@@ -144,12 +144,12 @@ public partial class TreeUseCases : Scenario
         if (useDelegate)
         {
             tree.TreeBuilder = new DelegateTreeBuilder<GameObject> (o => o.GetChildren (), o => o.GetChildren ().Any ());
-            tree.Title = "Armies With _Builder";
+            tree.Title = "Armies With _Delegate";
         }
         else
         {
             tree.TreeBuilder = new GameObjectTreeBuilder ();
-            tree.Title = "Armies With _Delegate";
+            tree.Title = "Armies With _Builder";
         }
 
         tree.AddObject (army);

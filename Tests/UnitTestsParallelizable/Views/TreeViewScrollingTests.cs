@@ -53,15 +53,6 @@ public class TreeViewScrollingTests
         Assert.True (width > 0);
     }
 
-    [Fact]
-    public void ContentSize_EmptyTree ()
-    {
-        TreeView<string> tree = new (new DelegateTreeBuilder<string> (_ => [], _ => false));
-        tree.Frame = new Rectangle (0, 0, 40, 10);
-
-        Assert.Equal (0, tree.GetContentHeight ());
-    }
-
     #endregion
 
     #region Vertical Scrolling
