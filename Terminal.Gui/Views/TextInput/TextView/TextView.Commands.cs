@@ -478,7 +478,7 @@ public partial class TextView
             CurrentColumn = prevCount;
         }
 
-        // Always redraw and update content size because a glyph was deleted
+        // Text was deleted, so it's always needed to redraw and update content size if needed
         SetNeedsDraw ();
 
         if (_model.ShouldInvalidateMaxWidthCache (CurrentRow, false))
