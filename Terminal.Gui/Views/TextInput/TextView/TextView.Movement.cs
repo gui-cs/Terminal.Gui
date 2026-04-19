@@ -300,7 +300,9 @@ public partial class TextView
         {
             CurrentColumn++;
 
-            if (CurrentColumn >= currentLine.Count || (Viewport.X > 0 && CurrentColumn < Viewport.X) || TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _) >= Viewport.X + Viewport.Width)
+            int cursorColumn = TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _);
+
+            if (cursorColumn >= currentLine.Count || (Viewport.X > 0 && cursorColumn < Viewport.X) || cursorColumn >= Viewport.X + Viewport.Width)
             {
                 SetNeedsDraw ();
             }
