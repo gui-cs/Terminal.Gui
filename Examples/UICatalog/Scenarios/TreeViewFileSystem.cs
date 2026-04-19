@@ -79,7 +79,7 @@ public class TreeViewFileSystem : Scenario
         _miShowLinesCheckBox = new CheckBox { Title = "_Show Lines", Value = CheckState.Checked };
         _miShowLinesCheckBox.ValueChanged += (_, _) => ShowLines ();
 
-        _miPlusMinusCheckBox = new CheckBox { Title = "_Plus Minus Symbols", Value = CheckState.Checked };
+        _miPlusMinusCheckBox = new CheckBox { Title = "_Plus Minus Symbols", Value = CheckState.UnChecked };
         _miPlusMinusCheckBox.ValueChanged += (_, _) => SetExpandableSymbols ((Rune)'+', (Rune)'-');
 
         _miArrowSymbolsCheckBox = new CheckBox { Title = "_Arrow Symbols" };
@@ -144,6 +144,7 @@ public class TreeViewFileSystem : Scenario
                                        new MenuItem { CommandView = _miCursorCheckBox }
                                    ]));
 
+        SetNerdIcons ();
         win.Add (menu, _treeViewFiles);
         _treeViewFiles.GoToFirst ();
         _treeViewFiles.Expand ();
