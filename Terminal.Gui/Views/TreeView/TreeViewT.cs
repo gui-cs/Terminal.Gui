@@ -703,6 +703,10 @@ public partial class TreeView<T> : View, ITreeView where T : class
             int width = height > 0 ? map.Max (b => b.GetWidth ()) : 0;
 
             SetContentSize (new Size (width, height));
+
+            // Re-apply the current viewport position so the View clamping logic
+            // adjusts the scroll offset if the content shrank (e.g. after collapse).
+            Viewport = Viewport;
         }
         finally
         {
