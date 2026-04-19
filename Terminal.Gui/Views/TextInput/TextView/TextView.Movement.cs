@@ -347,16 +347,19 @@ public partial class TextView
 
     private bool MoveUp ()
     {
-        if (CurrentRow > 0)
+        if (CurrentRow > 0 || (CurrentRow == 0 && CurrentRow < Viewport.Y))
         {
             if (_columnTrack == -1)
             {
                 _columnTrack = CurrentColumn;
             }
 
-            CurrentRow--;
+            if (CurrentRow > 0)
+            {
+                CurrentRow--;
+            }
 
-            if (CurrentRow < Viewport.Y || CurrentRow > Viewport.Y)
+            if (CurrentRow < Viewport.Y || CurrentRow >= Viewport.Y + Viewport.Height)
             {
                 SetNeedsDraw ();
             }

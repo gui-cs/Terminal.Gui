@@ -517,4 +517,56 @@ public class TextViewNavigationTests
         Assert.Equal (new Point (0, 3), tv.InsertionPoint);
         Assert.True (tv.NeedsDraw);
     }
+
+    [Fact]
+    public void CursorUp_At_Text_Hidden_By_Scroll_OnlyOneLineBelow_Move_Cursor_ButDoesNotNeeded_Adjusts_Scroll_To_Make_Cursor_Visible ()
+    {
+        // Test that pressing CursorUp at text hidden by scroll moves cursor but does not adjust scroll if the text is only one line below the scroll
+        TextView tv = new () { Width = 10, Height = 3, Text = "Line1.\nLine2.\nLine3." };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Set insertion point at the line 2 and then scroll to the line 0
+        tv.InsertionPoint = new Point (0, 2);
+        tv.Viewport = tv.Viewport with { Y = 0 };
+        Assert.Equal (new Point (0, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (0, 2), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+
+        // Clear NeedsDraw to isolate the effect of CursorUp key press
+        tv.ClearNeedsDraw ();
+        Assert.False (tv.NeedsDraw);
+
+        // Press CursorUp - should move cursor up but does not adjust scroll since the line 1 is still visible
+        Assert.True (tv.NewKeyDownEvent (Key.CursorUp));
+        Assert.Equal (new Point (0, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (0, 1), tv.InsertionPoint);
+        Assert.False (tv.NeedsDraw);
+    }
+
+    [Fact]
+    public void CursorUp_At_Text_Hidden_By_Scroll_OnTheFirstLineAndColumn_DoesNotMove_Cursor_And_Adjusts_Scroll_To_Make_Cursor_Visible ()
+    {
+        // Test that pressing CursorUp at text hidden by scroll on the first line and column does not move cursor but adjusts scroll to make it visible
+        TextView tv = new () { Width = 10, Height = 3, Text = "Line1.\nLine2.\nLine3." };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Set insertion point at the line 0 and column 0 and then scroll to the line 1
+        tv.InsertionPoint = new Point (0, 0);
+        tv.Viewport = tv.Viewport with { Y = 1 };
+        Assert.Equal (new Point (0, 1), tv.Viewport.Location);
+        Assert.Equal (new Point (0, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+
+        // Clear NeedsDraw to isolate the effect of CursorUp key press
+        tv.ClearNeedsDraw ();
+        Assert.False (tv.NeedsDraw);
+
+        // Press CursorUp - should not move cursor since it's already at the top but should adjust scroll to make it visible
+        Assert.True (tv.NewKeyDownEvent (Key.CursorUp));
+        Assert.Equal (new Point (0, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (0, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+    }
 }
