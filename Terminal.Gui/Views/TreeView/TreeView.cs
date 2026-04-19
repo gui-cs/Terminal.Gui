@@ -11,7 +11,7 @@ namespace Terminal.Gui.Views;
 public class TreeView : TreeView<ITreeNode>, IDesignable
 {
     /// <summary>
-    ///     Creates a new instance of the tree control with absolute positioning and initialises
+    ///     Creates a new instance of the tree control and initialises
     ///     <see cref="TreeBuilder{T}"/> with default <see cref="ITreeNode"/> based builder.
     /// </summary>
     public TreeView ()
@@ -22,7 +22,7 @@ public class TreeView : TreeView<ITreeNode>, IDesignable
         AspectGetter = o => o.Text;
     }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool EnableForDesign ()
     {
         TreeNode root1 = new () { Text = "Root1" };

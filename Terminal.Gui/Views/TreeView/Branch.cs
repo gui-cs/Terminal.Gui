@@ -124,12 +124,12 @@ internal class Branch<T> where T : class
             {
                 if (isSelected)
                 {
-                    color = _tree.Style.HighlightModelTextOnly ? _tree.GetAttributeForRole (VisualRole.Normal) :
+                    color = _tree.Style.HighlightModelTextOnly ? _tree.GetAttributeForRole (VisualRole.Highlight) :
                             _tree.HasFocus ? _tree.GetAttributeForRole (VisualRole.Focus) : _tree.GetAttributeForRole (VisualRole.Active);
                 }
                 else
                 {
-                    color = _tree.GetAttributeForRole (VisualRole.Normal);
+                    color = _tree.GetAttributeForRole (VisualRole.Highlight);
                 }
             }
             else
@@ -263,9 +263,9 @@ internal class Branch<T> where T : class
             return [];
         }
 
-        IEnumerable<T>? children = Depth >= _tree.MaxDepth ? [] : _tree.TreeBuilder.GetChildren (Model);
+        IEnumerable<T> children = Depth >= _tree.MaxDepth ? [] : _tree.TreeBuilder.GetChildren (Model);
 
-        return children?.Select (o => new Branch<T> (_tree, this, o)).ToList () ?? [];
+        return children.Select (o => new Branch<T> (_tree, this, o)).ToList ();
     }
 
     /// <summary>

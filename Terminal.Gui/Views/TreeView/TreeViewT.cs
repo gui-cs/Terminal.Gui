@@ -78,6 +78,9 @@ public partial class TreeView<T> : View, ITreeView where T : class
     {
         CanFocus = true;
 
+        // Enable built-in scroll bars via the View content-area system.
+        ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
+
         // Things this view knows how to do
         AddCommand (Command.PageUp,
                     () =>
@@ -248,7 +251,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <summary>
-    ///     Initialises <see cref="TreeBuilder"/>.Creates a new tree view with absolute positioning. Use
+    ///     Initialises <see cref="TreeBuilder"/>. Creates a new tree view with absolute positioning. Use
     ///     <see cref="AddObjects(IEnumerable{T})"/> to set root objects for the tree.
     /// </summary>
     public TreeView (ITreeBuilder<T> builder) : this () => TreeBuilder = builder;
@@ -294,14 +297,12 @@ public partial class TreeView<T> : View, ITreeView where T : class
     public ITreeViewFilter<T>? Filter { get; set; } = null;
 
     /// <summary>True makes a letter key press navigate to the next visible branch that begins with that letter/digit.</summary>
-    /// <value></value>
     public bool AllowLetterBasedNavigation { get; set; } = true;
 
     /// <summary>
     ///     Returns the string representation of model objects hosted in the tree. Default implementation is to call
     ///     <see cref="object.ToString"/>.
     /// </summary>
-    /// <value></value>
     public AspectGetterDelegate<T> AspectGetter { get; set; } = o => o.ToString () ?? "";
 
     /// <summary>
@@ -309,9 +310,6 @@ public partial class TreeView<T> : View, ITreeView where T : class
     ///     null to use the default.
     /// </summary>
     public Func<T, Scheme?>? ColorGetter { get; set; }
-
-    /// <summary>The current number of rows in the tree (ignoring the controls bounds).</summary>
-    public int ContentHeight => BuildLineMap ().Count;
 
     /// <summary>
     ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="Objects"/> collection as the user
@@ -323,7 +321,6 @@ public partial class TreeView<T> : View, ITreeView where T : class
     public int MaxDepth { get; set; } = 100;
 
     /// <summary>True to allow multiple objects to be selected at once.</summary>
-    /// <value></value>
     public bool MultiSelect { get; set; } = true;
 
     /// <summary>The root objects in the tree, note that this collection is of root objects only.</summary>
@@ -332,14 +329,14 @@ public partial class TreeView<T> : View, ITreeView where T : class
     /// <summary>The amount of tree view that has been scrolled to the right (horizontally).</summary>
     /// <remarks>
     ///     Setting a value of less than 0 will result in an offset of 0. To see changes in the UI call
-    ///     <see cref="View.SetNeedsDraw()"/>.
+    ///     <see cref="View.SetNeedsDraw()"/>. This property delegates to <see cref="View.Viewport"/><c>.X</c>.
     /// </remarks>
     public int ScrollOffsetHorizontal
     {
-        get;
+        get => Viewport.X;
         set
         {
-            field = Math.Max (0, value);
+            Viewport = Viewport with { X = Math.Max (0, value) };
             SetNeedsDraw ();
         }
     }
@@ -347,14 +344,14 @@ public partial class TreeView<T> : View, ITreeView where T : class
     /// <summary>The amount of tree view that has been scrolled off the top of the screen (by the user scrolling down).</summary>
     /// <remarks>
     ///     Setting a value of less than 0 will result in an offset of 0. To see changes in the UI call
-    ///     <see cref="View.SetNeedsDraw()"/>.
+    ///     <see cref="View.SetNeedsDraw()"/>. This property delegates to <see cref="View.Viewport"/><c>.Y</c>.
     /// </remarks>
     public int ScrollOffsetVertical
     {
-        get;
+        get => Viewport.Y;
         set
         {
-            field = Math.Max (0, value);
+            Viewport = Viewport with { Y = Math.Max (0, value) };
             SetNeedsDraw ();
         }
     }
@@ -382,7 +379,6 @@ public partial class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <summary>Determines how sub-branches of the tree are dynamically built at runtime as the user expands root nodes.</summary>
-    /// <value></value>
     public ITreeBuilder<T>? TreeBuilder { get; set; }
 
     /// <summary>
@@ -472,7 +468,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <summary>Adds a new root level object unless it is already a root of the tree.</summary>
-    /// <param name="o"></param>
+    /// <param name="o">The object to add as a root node.</param>
     public void AddObject (T? o)
     {
         if (o is null)
@@ -492,7 +488,6 @@ public partial class TreeView<T> : View, ITreeView where T : class
 
     /// <summary>Adds many new root level objects. Objects that are already root objects are ignored.</summary>
     /// <param name="collection">Objects to add as new root level objects.</param>
-    /// .\
     public void AddObjects (IEnumerable<T> collection)
     {
         var objectsAdded = false;
@@ -541,7 +536,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
     ///     representation etc.
     /// </summary>
     /// <remarks>This has no effect if the object is not exposed in the tree.</remarks>
-    /// <param name="o"></param>
+    /// <param name="o">The object to refresh.</param>
     /// <param name="startAtTop">
     ///     True to also refresh all ancestors of the objects branch (starting with the root). False to
     ///     refresh only the passed node.
@@ -555,10 +550,9 @@ public partial class TreeView<T> : View, ITreeView where T : class
         SetNeedsDraw ();
     }
 
-    /// <summary>Removes the given root object from the tree</summary>
-    /// <remarks>If <paramref name="o"/> is the currently <see cref="SelectedObject"/> then the selection is cleared</remarks>
-    /// .
-    /// <param name="o"></param>
+    /// <summary>Removes the given root object from the tree.</summary>
+    /// <remarks>If <paramref name="o"/> is the currently <see cref="SelectedObject"/> then the selection is cleared.</remarks>
+    /// <param name="o">The root object to remove.</param>
     public void Remove (T o)
     {
         // ReSharper disable once CanSimplifyDictionaryRemovingWithSingleCall
@@ -580,8 +574,21 @@ public partial class TreeView<T> : View, ITreeView where T : class
     /// <summary>Cached result of <see cref="BuildLineMap"/></summary>
     private IReadOnlyCollection<Branch<T>>? _cachedLineMap;
 
+    /// <summary>Reentrancy guard for <see cref="UpdateContentSize"/>.</summary>
+    private bool _updatingContentSize;
+
     /// <summary>Clears any cached results of the tree state.</summary>
-    public void InvalidateLineMap () => _cachedLineMap = null;
+    public void InvalidateLineMap ()
+    {
+        _cachedLineMap = null;
+
+        // Eagerly update the content size so the View's content-area system stays in
+        // sync (e.g. so scroll offset clamping is correct after expand/collapse).
+        if (!_updatingContentSize)
+        {
+            UpdateContentSize ();
+        }
+    }
 
     /// <summary>
     ///     Calculates all currently visible/expanded branches (including leafs) and outputs them by index from the top of
@@ -663,6 +670,44 @@ public partial class TreeView<T> : View, ITreeView where T : class
     }
 
     private bool IsFilterMatch (Branch<T> branch) => Filter?.IsMatch (branch.Model) ?? true;
+
+    /// <summary>
+    ///     Keeps the View content-area in sync with the tree's logical dimensions. Called from
+    ///     <see cref="InvalidateLineMap"/> and <see cref="OnViewportChanged"/>.
+    /// </summary>
+    private void UpdateContentSize ()
+    {
+        if (_updatingContentSize)
+        {
+            return;
+        }
+
+        _updatingContentSize = true;
+
+        try
+        {
+            IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
+            int width = map.Count > 0 ? map.Max (b => b.GetWidth ()) : 0;
+            int height = map.Count;
+
+            SetContentSize (new Size (width, height));
+        }
+        finally
+        {
+            _updatingContentSize = false;
+        }
+    }
+
+    /// <inheritdoc/>
+    protected override void OnViewportChanged (DrawEventArgs e)
+    {
+        // Only update content size when viewport size changes (e.g. resize),
+        // not on every scroll (position change), to avoid O(n) recomputation.
+        if (e.OldViewport.Size != e.NewViewport.Size)
+        {
+            UpdateContentSize ();
+        }
+    }
 
     /// <summary>
     ///     Returns the corresponding <see cref="Branch{T}"/> in the tree for <paramref name="toFind"/>. This will not
