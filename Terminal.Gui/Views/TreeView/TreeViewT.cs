@@ -403,6 +403,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
         SelectedObject = null;
         _multiSelectedRegions.Clear ();
         Roots = new Dictionary<T, Branch<T>> ();
+        InvalidateLineMap ();
         SetNeedsDraw ();
     }
 
