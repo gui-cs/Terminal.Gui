@@ -164,7 +164,7 @@ public class InteractiveTree : Scenario
             obj.Handled = true;
 
             // if it is a root object remove it
-            if (_treeView.Objects.Contains (toDelete))
+            if (_treeView.Objects is { } && _treeView.Objects.Contains (toDelete))
             {
                 _treeView.Remove (toDelete);
             }
