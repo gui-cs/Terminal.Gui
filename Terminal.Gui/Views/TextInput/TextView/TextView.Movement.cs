@@ -423,7 +423,10 @@ public partial class TextView
             CurrentRow = newPos.Value.row;
         }
 
-        if (CurrentRow >= Viewport.Y + Viewport.Height || CurrentColumn >= Viewport.X + Viewport.Width || CurrentColumn < Viewport.X)
+        List<Cell> currentLine = GetCurrentLine ();
+        int cursorColumn = TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _);
+
+        if (CurrentRow >= Viewport.Y + Viewport.Height || cursorColumn >= Viewport.X + Viewport.Width || cursorColumn < Viewport.X)
         {
             SetNeedsDraw ();
         }

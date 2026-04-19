@@ -365,6 +365,32 @@ public class TextViewNavigationTests
     }
 
     [Fact]
+    public void CursorRight_With_CtrlKey_Pressed_With_Mixed_Graphemes_Should_Scrolls_Right_To_Make_Cursor_Visible ()
+    {
+        // Test that pressing Ctrl+CursorRight with mixed graphemes scrolls right to make cursor visible
+        TextView tv = new () { Width = 10, Height = 3, Text = "Line1\t with more long 🍎 text.\nLine2.\nLine3.\nLine4." };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Set insertion point at column 12 and then scroll to the column 9 so that the insertion point is near at the end of the Viewport
+        tv.InsertionPoint = new Point (12, 0);
+        tv.Viewport = tv.Viewport with { X = 9 };
+        Assert.Equal (new Point (9, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (12, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+
+        // Clear NeedsDraw to isolate the effect of Ctrl+CursorRight key press
+        tv.ClearNeedsDraw ();
+        Assert.False (tv.NeedsDraw);
+
+        // Press Ctrl+CursorRight - should move right and scroll since we are already at the end of the viewport
+        Assert.True (tv.NewKeyDownEvent (Key.CursorRight.WithCtrl));
+        Assert.Equal (new Point (10, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (17, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+    }
+
+    [Fact]
     public void CursorLeft_With_CtrlKey_Pressed_At_BeforeNearTheStartOfLine_Scrolls_Left_Previous_Word ()
     {
         // Test that pressing Ctrl+CursorLeft at neat the start of line scrolls left to previous word
