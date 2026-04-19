@@ -288,7 +288,7 @@ public class TextViewNavigationTests
     [Fact]
     public void CursorRight_At_BeforeNearTheEndOfLine_With_ViewportX_Greater_Than_Zero_Does_Not_Scroll_Left ()
     {
-        // Test that pressing CursorRight at neat the end of line does not scroll left if Viewport.X > 0
+        // Test that pressing CursorRight at near the end of line does not scroll left if Viewport.X > 0
         TextView tv = new () { Width = 10, Height = 3, Text = "Line1 with more long text.\nLine2.\nLine3.\nLine4." };
         tv.BeginInit ();
         tv.EndInit ();
