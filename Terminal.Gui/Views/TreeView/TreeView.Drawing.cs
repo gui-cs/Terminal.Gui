@@ -162,7 +162,7 @@ public partial class TreeView<T>
         }
 
         Branch<T> branch = map.ElementAt (idx);
-        int indent = branch.Depth + 2 + branch.Parent?.Depth ?? 1;
+        int indent = branch.Depth + 2 + (branch.Parent?.Depth ?? 1);
         Cursor = Cursor with { Position = ViewportToScreen (new Point (indent - ScrollOffsetHorizontal, idx - ScrollOffsetVertical)) };
     }
 }
