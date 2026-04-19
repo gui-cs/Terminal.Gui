@@ -83,7 +83,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
         // Everything on the line before the expansion run and branch text
         string [] prefix = branch.GetLinePrefix ().ToArray ();
         string expansion = branch.GetExpandableSymbol ();
-        string lineBody = _tree.AspectGetter (branch.Model) ?? "";
+        string lineBody = _tree.AspectGetter (branch.Model);
 
         var sb = new StringBuilder ();
 
@@ -128,7 +128,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
             return;
         }
 
-        T obj = _tree.GetObjectOnRow (_tableView.SelectedRow);
+        T? obj = _tree.GetObjectOnRow (_tableView.SelectedRow);
 
         if (obj is null)
         {

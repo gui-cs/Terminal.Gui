@@ -21,7 +21,6 @@ public class TreeViewFileSystem : Scenario
     private CheckBox? _miFullPathsCheckBox;
     private CheckBox? _miHighlightModelTextOnlyCheckBox;
     private CheckBox? _miInvertSymbolsCheckBox;
-    private CheckBox? _miLeaveLastRowCheckBox;
     private CheckBox? _miMultiSelectCheckBox;
     private CheckBox? _miNerdIconsCheckBox;
     private CheckBox? _miNoSymbolsCheckBox;
@@ -58,14 +57,14 @@ public class TreeViewFileSystem : Scenario
         };
 
         win.Add (_detailsFrame);
-        _treeViewFiles.Activating += TreeViewFiles_Selecting;
+        _treeViewFiles.Activating += TreeViewFiles_Activating;
         _treeViewFiles.KeyDown += TreeViewFiles_KeyPress;
         _treeViewFiles.SelectionChanged += TreeViewFiles_SelectionChanged;
 
         SetupFileTree ();
 
         // Setup menu checkboxes
-        _miFullPathsCheckBox = new () { Title = "_Full Paths" };
+        _miFullPathsCheckBox = new CheckBox { Title = "_Full Paths" };
         _miFullPathsCheckBox.ValueChanged += (_, _) => SetFullName ();
 
         _miMultiSelectCheckBox = new CheckBox
@@ -76,41 +75,38 @@ public class TreeViewFileSystem : Scenario
         };
         _miMultiSelectCheckBox.ValueChanged += (_, _) => SetMultiSelect ();
 
-        _miShowLinesCheckBox = new () { Title = "_Show Lines", Value = CheckState.Checked };
+        _miShowLinesCheckBox = new CheckBox { Title = "_Show Lines", Value = CheckState.Checked };
         _miShowLinesCheckBox.ValueChanged += (_, _) => ShowLines ();
 
-        _miPlusMinusCheckBox = new () { Title = "_Plus Minus Symbols", Value = CheckState.Checked };
+        _miPlusMinusCheckBox = new CheckBox { Title = "_Plus Minus Symbols", Value = CheckState.UnChecked };
         _miPlusMinusCheckBox.ValueChanged += (_, _) => SetExpandableSymbols ((Rune)'+', (Rune)'-');
 
-        _miArrowSymbolsCheckBox = new () { Title = "_Arrow Symbols" };
+        _miArrowSymbolsCheckBox = new CheckBox { Title = "_Arrow Symbols" };
         _miArrowSymbolsCheckBox.ValueChanged += (_, _) => SetExpandableSymbols ((Rune)'>', (Rune)'v');
 
-        _miNoSymbolsCheckBox = new () { Title = "_No Symbols" };
+        _miNoSymbolsCheckBox = new CheckBox { Title = "_No Symbols" };
         _miNoSymbolsCheckBox.ValueChanged += (_, _) => SetExpandableSymbols (default (Rune), null);
 
-        _miColoredSymbolsCheckBox = new () { Title = "_Colored Symbols" };
+        _miColoredSymbolsCheckBox = new CheckBox { Title = "_Colored Symbols" };
         _miColoredSymbolsCheckBox.ValueChanged += (_, _) => ShowColoredExpandableSymbols ();
 
-        _miInvertSymbolsCheckBox = new () { Title = "_Invert Symbols" };
+        _miInvertSymbolsCheckBox = new CheckBox { Title = "_Invert Symbols" };
         _miInvertSymbolsCheckBox.ValueChanged += (_, _) => InvertExpandableSymbols ();
 
-        _miBasicIconsCheckBox = new () { Title = "_Basic Icons" };
+        _miBasicIconsCheckBox = new CheckBox { Title = "_Basic Icons" };
         _miBasicIconsCheckBox.ValueChanged += (_, _) => SetNoIcons ();
 
-        _miUnicodeIconsCheckBox = new () { Title = "_Unicode Icons" };
+        _miUnicodeIconsCheckBox = new CheckBox { Title = "_Unicode Icons" };
         _miUnicodeIconsCheckBox.ValueChanged += (_, _) => SetUnicodeIcons ();
 
-        _miNerdIconsCheckBox = new () { Title = "_Nerd Icons" };
+        _miNerdIconsCheckBox = new CheckBox { Title = "_Nerd Icons" };
         _miNerdIconsCheckBox.ValueChanged += (_, _) => SetNerdIcons ();
 
-        _miLeaveLastRowCheckBox = new () { Title = "_Leave Last Row", Value = CheckState.Checked };
-        _miLeaveLastRowCheckBox.ValueChanged += (_, _) => SetLeaveLastRow ();
-
-        _miHighlightModelTextOnlyCheckBox = new () { Title = "_Highlight Model Text Only", Value = CheckState.Checked };
+        _miHighlightModelTextOnlyCheckBox = new CheckBox { Title = "_Highlight Model Text Only", Value = CheckState.Checked };
         SetCheckHighlightModelTextOnly ();
         _miHighlightModelTextOnlyCheckBox.ValueChanged += (_, _) => SetCheckHighlightModelTextOnly ();
 
-        _miCustomColorsCheckBox = new () { Title = "C_ustom Colors Hidden Files" };
+        _miCustomColorsCheckBox = new CheckBox { Title = "C_ustom Colors Hidden Files" };
         _miCustomColorsCheckBox.ValueChanged += (_, _) => SetCustomColors ();
 
         _miCursorCheckBox = new CheckBox
@@ -122,7 +118,8 @@ public class TreeViewFileSystem : Scenario
         SetCursor ();
         _miCursorCheckBox.ValueChanged += (_, _) => SetCursor ();
 
-        menu.Add (new MenuBarItem (Strings.menuFile, [new MenuItem { Title = Strings.cmdQuit, Key = Application.GetDefaultKey (Command.Quit), Action = Quit }]));
+        menu.Add (new MenuBarItem (Strings.menuFile,
+                                   [new MenuItem { Title = Strings.cmdQuit, Key = Application.GetDefaultKey (Command.Quit), Action = Quit }]));
 
         menu.Add (new MenuBarItem ("_View", [new MenuItem { CommandView = _miFullPathsCheckBox }, new MenuItem { CommandView = _miMultiSelectCheckBox }]));
 
@@ -137,19 +134,19 @@ public class TreeViewFileSystem : Scenario
                                        new MenuItem { CommandView = _miBasicIconsCheckBox },
                                        new MenuItem { CommandView = _miUnicodeIconsCheckBox },
                                        new MenuItem { CommandView = _miNerdIconsCheckBox },
-                                       new MenuItem { CommandView = _miLeaveLastRowCheckBox },
                                        new MenuItem { CommandView = _miHighlightModelTextOnlyCheckBox },
                                        new MenuItem { CommandView = _miCustomColorsCheckBox },
                                        new MenuItem { CommandView = _miCursorCheckBox }
                                    ]));
 
+        SetNerdIcons ();
         win.Add (menu, _treeViewFiles);
         _treeViewFiles.GoToFirst ();
         _treeViewFiles.Expand ();
 
         _treeViewFiles.SetFocus ();
 
-        UpdateIconCheckedness ();
+        UpdateIconCheckState ();
 
         app.Run (win);
     }
@@ -209,18 +206,7 @@ public class TreeViewFileSystem : Scenario
         {
             _treeViewFiles.ColorGetter = m =>
                                          {
-                                             if (m is IDirectoryInfo && m.Attributes.HasFlag (FileAttributes.Hidden))
-                                             {
-                                                 return new Scheme
-                                                 {
-                                                     Focus = new Attribute (Color.BrightRed,
-                                                                            _treeViewFiles.GetAttributeForRole (VisualRole.Focus).Background),
-                                                     Normal = new Attribute (Color.BrightYellow,
-                                                                             _treeViewFiles.GetAttributeForRole (VisualRole.Normal).Background)
-                                                 };
-                                             }
-
-                                             if (m is IFileInfo && m.Attributes.HasFlag (FileAttributes.Hidden))
+                                             if ((m is IDirectoryInfo && m.Attributes.HasFlag (FileAttributes.Hidden)) || (m is IFileInfo && m.Attributes.HasFlag (FileAttributes.Hidden)))
                                              {
                                                  return new Scheme
                                                  {
@@ -242,18 +228,20 @@ public class TreeViewFileSystem : Scenario
         _treeViewFiles.SetNeedsDraw ();
     }
 
+    private bool _settingExpandableSymbols;
+
     private void SetExpandableSymbols (Rune expand, Rune? collapse)
     {
-        if (_treeViewFiles is null)
+        if (_treeViewFiles is null || _settingExpandableSymbols)
         {
             return;
         }
 
+        _settingExpandableSymbols = true;
         _miPlusMinusCheckBox?.Value = expand.Value == '+' ? CheckState.Checked : CheckState.UnChecked;
-
         _miArrowSymbolsCheckBox?.Value = expand.Value == '>' ? CheckState.Checked : CheckState.UnChecked;
-
         _miNoSymbolsCheckBox?.Value = expand.Value == 0 ? CheckState.Checked : CheckState.UnChecked;
+        _settingExpandableSymbols = false;
 
         _treeViewFiles.Style.ExpandableSymbol = expand;
         _treeViewFiles.Style.CollapseableSymbol = collapse;
@@ -279,16 +267,6 @@ public class TreeViewFileSystem : Scenario
         _treeViewFiles.SetNeedsDraw ();
     }
 
-    private void SetLeaveLastRow ()
-    {
-        if (_treeViewFiles is null || _miLeaveLastRowCheckBox is null)
-        {
-            return;
-        }
-
-        _treeViewFiles.Style.LeaveLastRow = _miLeaveLastRowCheckBox.Value == CheckState.Checked;
-    }
-
     private void SetMultiSelect ()
     {
         if (_treeViewFiles is null || _miMultiSelectCheckBox is null)
@@ -299,23 +277,45 @@ public class TreeViewFileSystem : Scenario
         _treeViewFiles.MultiSelect = _miMultiSelectCheckBox.Value == CheckState.Checked;
     }
 
+    private bool _settingIcons;
+
     private void SetNerdIcons ()
     {
+        if (_settingIcons)
+        {
+            return;
+        }
         _iconProvider.UseNerdIcons = true;
-        UpdateIconCheckedness ();
+        _settingIcons = true;
+        UpdateIconCheckState ();
+        _settingIcons = false;
     }
 
     private void SetNoIcons ()
     {
+        if (_settingIcons)
+        {
+            return;
+        }
+
         _iconProvider.UseUnicodeCharacters = false;
         _iconProvider.UseNerdIcons = false;
-        UpdateIconCheckedness ();
+        _settingIcons = true;
+        UpdateIconCheckState ();
+        _settingIcons = false;
     }
 
     private void SetUnicodeIcons ()
     {
+        if (_settingIcons)
+        {
+            return;
+        }
+
         _iconProvider.UseUnicodeCharacters = true;
-        UpdateIconCheckedness ();
+        _settingIcons = true;
+        UpdateIconCheckState ();
+        _settingIcons = false;
     }
 
     private void SetupFileTree ()
@@ -371,10 +371,7 @@ public class TreeViewFileSystem : Scenario
         _treeViewFiles.SetNeedsDraw ();
     }
 
-    private void ShowPropertiesOf (IFileSystemInfo fileSystemInfo)
-    {
-        _detailsFrame?.FileInfo = fileSystemInfo;
-    }
+    private void ShowPropertiesOf (IFileSystemInfo? fileSystemInfo) => _detailsFrame?.FileInfo = fileSystemInfo;
 
     private void TreeViewFiles_DrawLine (object? sender, DrawTreeViewLineEventArgs<IFileSystemInfo> e)
     {
@@ -389,13 +386,21 @@ public class TreeViewFileSystem : Scenario
             return;
         }
 
-        if (e.IndexOfModelText <= 0 || e.IndexOfModelText >= e.Cells.Count)
+        switch (e.Cells)
         {
-            return;
-        }
-        Cell cell = e.Cells [e.IndexOfModelText];
+            case { } when e.IndexOfModelText <= 0:
+            case { } when e.IndexOfModelText >= e.Cells.Count:
+                return;
 
-        cell.Attribute = new Attribute (Color.BrightYellow, cell.Attribute!.Value.Background, cell.Attribute!.Value.Style);
+            case { }:
+            {
+                Cell cell = e.Cells [e.IndexOfModelText];
+
+                cell.Attribute = new Attribute (Color.BrightYellow, cell.Attribute!.Value.Background, cell.Attribute!.Value.Style);
+
+                break;
+            }
+        }
     }
 
     private void TreeViewFiles_KeyPress (object? sender, Key obj)
@@ -428,7 +433,7 @@ public class TreeViewFileSystem : Scenario
         ShowContextMenu (new Point (5 + _treeViewFiles.Frame.X, location.Value + _treeViewFiles.Frame.Y + 2), selected);
     }
 
-    private void TreeViewFiles_Selecting (object? sender, CommandEventArgs e)
+    private void TreeViewFiles_Activating (object? sender, CommandEventArgs e)
     {
         if (_treeViewFiles is null)
         {
@@ -459,7 +464,7 @@ public class TreeViewFileSystem : Scenario
 
     private void TreeViewFiles_SelectionChanged (object? sender, SelectionChangedEventArgs<IFileSystemInfo> e) => ShowPropertiesOf (e.NewValue);
 
-    private void UpdateIconCheckedness ()
+    private void UpdateIconCheckState ()
     {
         _miBasicIconsCheckBox?.Value = _iconProvider is { UseNerdIcons: false, UseUnicodeCharacters: false } ? CheckState.Checked : CheckState.UnChecked;
 
@@ -473,7 +478,6 @@ public class TreeViewFileSystem : Scenario
     private class DetailsFrame : FrameView
     {
         private readonly FileSystemIconProvider _iconProvider;
-        private IFileSystemInfo? _fileInfo;
 
         public DetailsFrame (FileSystemIconProvider iconProvider)
         {
@@ -487,44 +491,47 @@ public class TreeViewFileSystem : Scenario
         {
             set
             {
-                _fileInfo = value;
+                field = value;
                 StringBuilder? sb = null;
 
                 try
                 {
-                    if (_fileInfo is IFileInfo f)
+                    switch (field)
                     {
-                        Title = $"{_iconProvider.GetIconWithOptionalSpace (f)}{f.Name}".Trim ();
-                        sb = new StringBuilder ();
-                        sb.AppendLine ($"Path:\n {f.FullName}\n");
-                        sb.AppendLine ($"Size:\n {f.Length:N0} bytes\n");
-                        sb.AppendLine ($"Modified:\n {f.LastWriteTime}\n");
-                        sb.AppendLine ($"Created:\n {f.CreationTime}");
-                    }
+                        case IFileInfo f:
+                            Title = $"{_iconProvider.GetIconWithOptionalSpace (f)}{f.Name}".Trim ();
+                            sb = new StringBuilder ();
+                            sb.AppendLine ($"Path:\n {f.FullName}\n");
+                            sb.AppendLine ($"Size:\n {f.Length:N0} bytes\n");
+                            sb.AppendLine ($"Modified:\n {f.LastWriteTime}\n");
+                            sb.AppendLine ($"Created:\n {f.CreationTime}");
 
-                    if (_fileInfo is IDirectoryInfo dir)
-                    {
-                        Title = $"{_iconProvider.GetIconWithOptionalSpace (dir)}{dir.Name}".Trim ();
-                        sb = new StringBuilder ();
-                        sb.AppendLine ($"Path:\n {dir.FullName}\n");
-                        sb.AppendLine ($"Modified:\n {dir.LastWriteTime}\n");
-                        sb.AppendLine ($"Created:\n {dir.CreationTime}\n");
+                            break;
+
+                        case IDirectoryInfo dir:
+                            Title = $"{_iconProvider.GetIconWithOptionalSpace (dir)}{dir.Name}".Trim ();
+                            sb = new StringBuilder ();
+                            sb.AppendLine ($"Path:\n {dir.FullName}\n");
+                            sb.AppendLine ($"Modified:\n {dir.LastWriteTime}\n");
+                            sb.AppendLine ($"Created:\n {dir.CreationTime}\n");
+
+                            break;
                     }
                 }
                 catch (IOException ioe)
                 {
-                    if (_fileInfo is IFileInfo f)
+                    if (field is IFileInfo f)
                     {
                         Title = $"{_iconProvider.GetIconWithOptionalSpace (f)}{f.Name}".Trim ();
                     }
 
-                    if (_fileInfo is IDirectoryInfo dir)
+                    if (field is IDirectoryInfo dir)
                     {
                         Title = $"{_iconProvider.GetIconWithOptionalSpace (dir)}{dir.Name}".Trim ();
                     }
 
                     sb = new StringBuilder ();
-                    sb.AppendLine ($"Path:\n {_fileInfo?.FullName}\n");
+                    sb.AppendLine ($"Path:\n {field?.FullName}\n");
                     sb.AppendLine ($"Exception:\n {ioe.Message}");
                 }
 

@@ -3,7 +3,7 @@
 
 using TextMateSharp.Grammars;
 
-namespace ViewTests.Markdown;
+namespace ViewsTests.Markdown;
 
 /// <summary>Tests for <see cref="TextMateSyntaxHighlighter"/>.</summary>
 public class TextMateSyntaxHighlighterTests

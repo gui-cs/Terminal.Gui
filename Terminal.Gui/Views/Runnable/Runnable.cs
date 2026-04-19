@@ -30,7 +30,7 @@ public class Runnable : View, IRunnable
         Arrangement = ViewArrangement.Overlapped;
         Width = Dim.Fill ();
         Height = Dim.Fill ();
-        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Runnable);
+        SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
         Border.Settings |= BorderSettings.TerminalTitle;
     }
 

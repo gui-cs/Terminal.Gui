@@ -81,7 +81,7 @@ public class Threading : Scenario
             Y = Pos.Y (_btnActionCancel) + 6,
             Width = 10,
             Height = 10,
-            SchemeName = "Runnable"
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent)
         };
 
         win.Add (new Label { X = Pos.Right (_itemsList) + 10, Y = Pos.Y (_btnActionCancel) + 4, Text = "Task Logs:" });
@@ -92,7 +92,7 @@ public class Threading : Scenario
             Y = Pos.Y (_itemsList),
             Width = 50,
             Height = Dim.Fill (),
-            SchemeName = "Runnable",
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent),
             Source = new ListWrapper<string> (_log)
         };
 

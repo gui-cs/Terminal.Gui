@@ -561,7 +561,7 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
         ""MessageBox.DefaultButtonAlignment"": ""End"",
         ""Schemes"": [
           {
-            ""Runnable"": {
+            ""Accent"": {
               ""Normal"": {
                 ""Foreground"": ""BrightGreen"",
                 ""Background"": ""Black""
@@ -1263,7 +1263,7 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
         ""MessageBox.DefaultButtonAlignment"": ""End"",
         ""Schemes"": [
           {
-            ""Runnable"": {
+            ""Accent"": {
               ""Normal"": {
                 ""Foreground"": ""BrightGreen"",
                 ""Background"": ""Black""

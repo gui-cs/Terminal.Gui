@@ -1,5 +1,5 @@
 // Copilot
-#nullable enable
+
 using JetBrains.Annotations;
 using UnitTests;
 
@@ -99,16 +99,11 @@ public class TreeTableSourceTests : TestDriverBase
 
     private TableView GetTreeTableView (out TreeView<IDescribedThing> treeView)
     {
-        IDriver driver = CreateTestDriver (80, 25);
+        IDriver driver = CreateTestDriver ();
         driver.Clip = new Region (driver.Screen);
 
-        TableView tableView = new ()
-        {
-            Driver = driver,
-            X = 0,
-            Y = 0
-        };
-        tableView.SchemeName = "Runnable";
+        TableView tableView = new () { Driver = driver, X = 0, Y = 0 };
+        tableView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
         tableView.Viewport = new Rectangle (0, 0, 40, 6);
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.ShowHorizontalHeaderOverline = false;
@@ -117,44 +112,37 @@ public class TreeTableSourceTests : TestDriverBase
 
         treeView = new TreeView<IDescribedThing> ();
         treeView.AspectGetter = d => d.Name;
-        treeView.TreeBuilder = new DelegateTreeBuilder<IDescribedThing> (
-                                                                         d => d is Road r
-                                                                                  ? r.Traffic
-                                                                                  : Enumerable.Empty<IDescribedThing> ()
-                                                                        );
+        treeView.TreeBuilder = new DelegateTreeBuilder<IDescribedThing> (d => d is Road r ? r.Traffic : Enumerable.Empty<IDescribedThing> (), o => true);
 
-        treeView.AddObject (
-                            new Road
-                            {
-                                Name = "Lost Highway",
-                                Description = "Exciting night road",
-                                Traffic =
-                                [
-                                    new Car { Name = "Ford Trans-Am", Description = "Talking thunderbird car" },
-                                    new Car { Name = "DeLorean", Description = "Time travelling car" }
-                                ]
-                            }
-                           );
-        treeView.AddObject (
-                            new Road
-                            {
-                                Name = "Route 66",
-                                Description = "Great race course",
-                                Traffic =
-                                [
-                                    new Car { Name = "Pink Compact", Description = "Penelope Pitstop's car" },
-                                    new Car { Name = "Mean Machine", Description = "Dick Dastardly's car" }
-                                ]
-                            }
-                           );
+        treeView.AddObject (new Road
+        {
+            Name = "Lost Highway",
+            Description = "Exciting night road",
+            Traffic =
+            [
+                new Car { Name = "Ford Trans-Am", Description = "Talking thunderbird car" },
+                new Car { Name = "DeLorean", Description = "Time travelling car" }
+            ]
+        });
 
-        tableView.Table = new TreeTableSource<IDescribedThing> (
-                                                                tableView,
+        treeView.AddObject (new Road
+        {
+            Name = "Route 66",
+            Description = "Great race course",
+            Traffic =
+            [
+                new Car { Name = "Pink Compact", Description = "Penelope Pitstop's car" },
+                new Car { Name = "Mean Machine", Description = "Dick Dastardly's car" }
+            ]
+        });
+
+        tableView.Table = new TreeTableSource<IDescribedThing> (tableView,
                                                                 "Name",
                                                                 treeView,
                                                                 new Dictionary<string, Func<IDescribedThing, object>>
-                                                                    { { "Description", d => d.Description } }
-                                                               );
+                                                                {
+                                                                    { "Description", d => d.Description }
+                                                                });
 
         tableView.BeginInit ();
         tableView.EndInit ();

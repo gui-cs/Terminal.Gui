@@ -105,7 +105,7 @@ public partial class TableView
             return ChangeSelectionByOffsetWithReturn (0, 1);
         }
 
-        if (Viewport.Y >= GetContentSize ().Height - Viewport.Height)
+        if (Viewport.Y >= GetContentHeight () - Viewport.Height)
         {
             return false;
         }

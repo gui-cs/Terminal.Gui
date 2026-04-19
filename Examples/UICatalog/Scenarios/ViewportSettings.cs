@@ -16,7 +16,7 @@ public class ViewportSettings : Scenario
 
         using Window mainWindow = new ();
         mainWindow.Title = GetQuitKeyAndName (); // Use a different colorscheme so ViewSettings.ClearContentOnly is obvious
-        mainWindow.SchemeName = "Runnable";
+        mainWindow.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
         mainWindow.BorderStyle = LineStyle.None;
 
         AdornmentsEditor adornmentsEditor = new ()
@@ -63,7 +63,7 @@ public class ViewportSettings : Scenario
         {
             X = Pos.Center (),
             Y = 17,
-            Width = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Func (_ => view.GetContentSize ().Width)),
+            Width = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Func (_ => view.GetContentWidth ())),
             Height = Dim.Auto (DimAutoStyle.Content, maximumContentDim: Dim.Percent (20))
         };
 

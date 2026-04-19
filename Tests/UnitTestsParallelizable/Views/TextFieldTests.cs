@@ -804,7 +804,7 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (2, superView.SubViews.Count);
 
         Assert.True (t.Visible);
-        Assert.False (t.Autocomplete.Visible);
+        Assert.False (t.Autocomplete?.Visible);
     }
 
     [Fact]
