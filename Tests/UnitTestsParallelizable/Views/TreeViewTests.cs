@@ -217,20 +217,6 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
         tree.Dispose ();
     }
 
-    /// <summary>Tests that TreeView.Expand(object) results in a correct content height</summary>
-    [Fact]
-    public void ContentHeight_BiggerAfterExpand ()
-    {
-        TreeView<object> tree = CreateTree (out Factory f, out _, out _);
-        Assert.Equal (1, tree.ContentHeight);
-
-        tree.Expand (f);
-        Assert.Equal (3, tree.ContentHeight);
-
-        tree.Collapse (f);
-        Assert.Equal (1, tree.ContentHeight);
-    }
-
     [Fact]
     public void ContentWidth_BiggerAfterExpand ()
     {
@@ -346,7 +332,6 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
     public void EmptyTreeView_ContentSizes ()
     {
         var emptyTree = new TreeView ();
-        Assert.Equal (0, emptyTree.ContentHeight);
         Assert.Equal (0, emptyTree.GetContentWidth (true));
         Assert.Equal (0, emptyTree.GetContentWidth (false));
     }
@@ -355,7 +340,6 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
     public void EmptyTreeViewGeneric_ContentSizes ()
     {
         TreeView<string> emptyTree = new ();
-        Assert.Equal (0, emptyTree.ContentHeight);
         Assert.Equal (0, emptyTree.GetContentWidth (true));
         Assert.Equal (0, emptyTree.GetContentWidth (false));
     }
@@ -898,8 +882,6 @@ public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
         public required string Name { get; set; }
         public override string ToString () => Name;
     }
-
-    private TreeView<object> CreateTree () => CreateTree (out _, out _, out _);
 
     private TreeView<object> CreateTree (out Factory factory1, out Car car1, out Car car2)
     {

@@ -313,10 +313,6 @@ public partial class TreeView<T> : View, ITreeView where T : class
     /// </summary>
     public Func<T, Scheme?>? ColorGetter { get; set; }
 
-    /// <summary>The current number of rows in the tree (ignoring the controls bounds).</summary>
-    [Obsolete ("Use GetContentHeight () instead.")]
-    public int ContentHeight => BuildLineMap ().Count;
-
     /// <summary>
     ///     Gets the <see cref="CollectionNavigator"/> that searches the <see cref="Objects"/> collection as the user
     ///     types.

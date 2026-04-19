@@ -265,7 +265,7 @@ internal class Branch<T> where T : class
 
         IEnumerable<T> children = Depth >= _tree.MaxDepth ? [] : _tree.TreeBuilder.GetChildren (Model);
 
-        return children.Select (o => new Branch<T> (_tree, this, o)).ToList () ?? [];
+        return children.Select (o => new Branch<T> (_tree, this, o)).ToList ();
     }
 
     /// <summary>

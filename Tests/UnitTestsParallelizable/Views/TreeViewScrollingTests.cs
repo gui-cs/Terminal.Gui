@@ -15,7 +15,7 @@ public class TreeViewScrollingTests
     [Fact]
     public void ContentSize_UpdatesOnExpand ()
     {
-        TreeView<string> tree = CreateTree (out string root, out string child1, out string child2);
+        TreeView<string> tree = CreateTree (out string root, out string _, out string _);
         tree.Frame = new Rectangle (0, 0, 40, 10);
 
         // Before expand: only root visible
@@ -30,7 +30,7 @@ public class TreeViewScrollingTests
     [Fact]
     public void ContentSize_UpdatesOnCollapse ()
     {
-        TreeView<string> tree = CreateTree (out string root, out string child1, out string child2);
+        TreeView<string> tree = CreateTree (out string root, out string _, out string _);
         tree.Frame = new Rectangle (0, 0, 40, 10);
 
         tree.Expand (root);
@@ -43,7 +43,7 @@ public class TreeViewScrollingTests
     [Fact]
     public void ContentSize_ReflectsMaxWidth ()
     {
-        TreeView<string> tree = CreateTree (out string root, out string child1, out string child2);
+        TreeView<string> tree = CreateTree (out string root, out string _, out string _);
         tree.Frame = new Rectangle (0, 0, 40, 10);
 
         tree.Expand (root);
@@ -152,7 +152,7 @@ public class TreeViewScrollingTests
     [Fact]
     public void ScrollUp_StopsAtTop ()
     {
-        TreeView<string> tree = CreateTree (out string root, out _, out _);
+        TreeView<string> tree = CreateTree (out string _, out _, out _);
         tree.Frame = new Rectangle (0, 0, 40, 10);
 
         tree.ScrollUp ();
@@ -280,7 +280,7 @@ public class TreeViewScrollingTests
     [Fact]
     public void ExpandAll_UpdatesContentSize ()
     {
-        TreeView<string> tree = CreateDeepTree (out string root, out string child, out string grandchild);
+        TreeView<string> tree = CreateDeepTree (out string root);
         tree.Frame = new Rectangle (0, 0, 40, 10);
 
         Assert.Equal (1, tree.GetContentHeight ());
@@ -383,25 +383,6 @@ public class TreeViewScrollingTests
 
     #endregion
 
-    #region Obsolete Properties
-
-    [Fact]
-    public void ContentHeight_StillWorks ()
-    {
-        TreeView<string> tree = CreateTree (out string root, out _, out _);
-        tree.Frame = new Rectangle (0, 0, 40, 10);
-
-#pragma warning disable CS0618 // Obsolete
-        Assert.Equal (1, tree.ContentHeight);
-
-        tree.Expand (root);
-
-        Assert.Equal (3, tree.ContentHeight);
-#pragma warning restore CS0618
-    }
-
-    #endregion
-
     #region Test Setup
 
     private TreeView<string> CreateTree (out string root, out string child1, out string child2)
@@ -414,10 +395,7 @@ public class TreeViewScrollingTests
         string capturedChild1 = child1;
         string capturedChild2 = child2;
 
-        TreeView<string> tree = new (
-                                     new DelegateTreeBuilder<string> (
-                                                                     s => s == capturedRoot ? [capturedChild1, capturedChild2] : [],
-                                                                     s => s == capturedRoot));
+        TreeView<string> tree = new (new DelegateTreeBuilder<string> (s => s == capturedRoot ? [capturedChild1, capturedChild2] : [], s => s == capturedRoot));
         tree.AddObject (root);
         tree.BeginInit ();
         tree.EndInit ();
@@ -425,33 +403,29 @@ public class TreeViewScrollingTests
         return tree;
     }
 
-    private TreeView<string> CreateDeepTree (out string root, out string child, out string grandchild)
+    private TreeView<string> CreateDeepTree (out string root)
     {
         root = "Root";
-        child = "Child";
-        grandchild = "Grandchild";
+        var child = "Child";
+        var grandchild = "Grandchild";
 
         string capturedRoot = root;
-        string capturedChild = child;
-        string capturedGrandchild = grandchild;
 
-        TreeView<string> tree = new (
-                                     new DelegateTreeBuilder<string> (
-                                                                     s =>
-                                                                     {
-                                                                         if (s == capturedRoot)
-                                                                         {
-                                                                             return [capturedChild];
-                                                                         }
+        TreeView<string> tree = new (new DelegateTreeBuilder<string> (s =>
+                                                                      {
+                                                                          if (s == capturedRoot)
+                                                                          {
+                                                                              return [child];
+                                                                          }
 
-                                                                         if (s == capturedChild)
-                                                                         {
-                                                                             return [capturedGrandchild];
-                                                                         }
+                                                                          if (s == child)
+                                                                          {
+                                                                              return [grandchild];
+                                                                          }
 
-                                                                         return [];
-                                                                     },
-                                                                     s => s == capturedRoot || s == capturedChild));
+                                                                          return [];
+                                                                      },
+                                                                      s => s == capturedRoot || s == child));
         tree.AddObject (root);
         tree.BeginInit ();
         tree.EndInit ();
