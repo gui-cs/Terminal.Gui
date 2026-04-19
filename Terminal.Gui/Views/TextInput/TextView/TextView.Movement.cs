@@ -400,7 +400,10 @@ public partial class TextView
             CurrentRow = newPos.Value.row;
         }
 
-        if (CurrentRow < Viewport.Y || CurrentColumn < Viewport.X || CurrentColumn >= Viewport.X + Viewport.Width)
+        List<Cell> currentLine = GetCurrentLine ();
+        int cursorColumn = TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _);
+
+        if (CurrentRow < Viewport.Y || cursorColumn < Viewport.X || cursorColumn >= Viewport.X + Viewport.Width)
         {
             SetNeedsDraw ();
         }

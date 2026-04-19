@@ -417,6 +417,32 @@ public class TextViewNavigationTests
     }
 
     [Fact]
+    public void CursorLeft_With_CtrlKey_Pressed_With_Mixed_Graphemes_Only_Scrolls_Left_When_Needed ()
+    {
+        // Test that pressing Ctrl+CursorLeft with mixed graphemes only scrolls left when needed
+        TextView tv = new () { Width = 10, Height = 3, Text = "Line1\t with more long 🍎 text.\nLine2.\nLine3.\nLine4." };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Set insertion point at column 10 and then scroll to the column 8 so that the insertion point is near at the start of the Viewport
+        tv.InsertionPoint = new Point (10, 0);
+        tv.Viewport = tv.Viewport with { X = 8 };
+        Assert.Equal (new Point (8, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (10, 0), tv.InsertionPoint);
+        Assert.True (tv.NeedsDraw);
+
+        // Clear NeedsDraw to isolate the effect of Ctrl+CursorLeft key press
+        tv.ClearNeedsDraw ();
+        Assert.False (tv.NeedsDraw);
+
+        // Press Ctrl+CursorLeft - should move left but not scroll since we aren't already near at the start of the Viewport.X
+        Assert.True (tv.NewKeyDownEvent (Key.CursorLeft.WithCtrl));
+        Assert.Equal (new Point (8, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (7, 0), tv.InsertionPoint);
+        Assert.False (tv.NeedsDraw);
+    }
+
+    [Fact]
     public void CursorLeft_With_Mixed_Graphemes_Only_Scrolls_Left_When_Needed ()
     {
         // Test that pressing CursorLeft with mixed graphemes only scrolls left when needed
