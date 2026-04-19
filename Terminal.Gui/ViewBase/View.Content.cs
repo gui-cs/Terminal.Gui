@@ -4,9 +4,83 @@ public partial class View
 {
     #region Content Area
 
-    // nullable holder of developer specified Content Size. If null then the developer did not
-    // explicitly set it and the content size will be calculated dynamically.
-    private Size? _contentSize;
+    // Nullable holders of developer-specified content dimensions.
+    // When null the corresponding dimension tracks the Viewport size automatically.
+    private int? _contentWidth;
+    private int? _contentHeight;
+
+    /// <summary>
+    ///     Sets the width of the View's content area independently of the height.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         See the View Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
+    ///         Negative values are not supported.
+    ///     </para>
+    ///     <para>
+    ///         If set to <see langword="null"/>, <see cref="GetContentWidth ()"/> will track the <see cref="Viewport"/> width.
+    ///     </para>
+    ///     <para>
+    ///         If set to a non-<see langword="null"/> value, the content width is independent of the <see cref="Viewport"/>
+    ///         width, enabling horizontal scrolling.
+    ///     </para>
+    ///     <para>
+    ///         This method follows the Cancellable Work Pattern (CWP). The <see cref="ContentSizeChanging"/> event
+    ///         is raised before the change, and <see cref="ContentSizeChanged"/> is raised after.
+    ///     </para>
+    /// </remarks>
+    /// <param name="contentWidth">The new content width, or <see langword="null"/> to track the Viewport width.</param>
+    /// <seealso cref="SetContentHeight"/>
+    /// <seealso cref="SetContentSize"/>
+    public void SetContentWidth (int? contentWidth)
+    {
+        if (contentWidth is < 0)
+        {
+            throw new ArgumentException (@"Content width cannot be negative.", nameof (contentWidth));
+        }
+
+        ApplyContentDimensionChange (contentWidth, _contentHeight);
+    }
+
+    /// <summary>
+    ///     Sets the height of the View's content area independently of the width.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         See the View Layout Deep Dive for more information:
+    ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
+    ///         Negative values are not supported.
+    ///     </para>
+    ///     <para>
+    ///         If set to <see langword="null"/>, <see cref="GetContentHeight ()"/> will track the <see cref="Viewport"/>
+    ///         height.
+    ///     </para>
+    ///     <para>
+    ///         If set to a non-<see langword="null"/> value, the content height is independent of the <see cref="Viewport"/>
+    ///         height, enabling vertical scrolling.
+    ///     </para>
+    ///     <para>
+    ///         This method follows the Cancellable Work Pattern (CWP). The <see cref="ContentSizeChanging"/> event
+    ///         is raised before the change, and <see cref="ContentSizeChanged"/> is raised after.
+    ///     </para>
+    /// </remarks>
+    /// <param name="contentHeight">The new content height, or <see langword="null"/> to track the Viewport height.</param>
+    /// <seealso cref="SetContentWidth"/>
+    /// <seealso cref="SetContentSize"/>
+    public void SetContentHeight (int? contentHeight)
+    {
+        if (contentHeight is < 0)
+        {
+            throw new ArgumentException (@"Content height cannot be negative.", nameof (contentHeight));
+        }
+
+        ApplyContentDimensionChange (_contentWidth, contentHeight);
+    }
 
     /// <summary>
     ///     Sets the size of the View's content.
@@ -38,29 +112,100 @@ public partial class View
     /// </remarks>
     /// <seealso cref="ContentSizeChanging"/>
     /// <seealso cref="ContentSizeChanged"/>
+    /// <seealso cref="SetContentWidth"/>
+    /// <seealso cref="SetContentHeight"/>
     public void SetContentSize (Size? contentSize)
     {
-        if (contentSize is { } && (contentSize.Value.Width < 0 || contentSize.Value.Height < 0))
+        if (contentSize is { } s && (s.Width < 0 || s.Height < 0))
         {
             throw new ArgumentException (@"ContentSize cannot be negative.", nameof (contentSize));
         }
 
-        CWPPropertyHelper.ChangeProperty (this,
-                                          ref _contentSize,
-                                          contentSize,
-                                          OnContentSizeChanging,
-                                          ContentSizeChanging,
-                                          _ => SetNeedsLayout (),
-                                          OnContentSizeChanged,
-                                          ContentSizeChanged,
-                                          out Size? _);
+        ApplyContentDimensionChange (contentSize?.Width, contentSize?.Height);
     }
+
+    /// <summary>
+    ///     Internal helper that applies a content dimension change using the CWP pattern.
+    ///     Both dimensions are passed so the composite <see cref="Size"/>? events fire correctly.
+    /// </summary>
+    private void ApplyContentDimensionChange (int? newWidth, int? newHeight)
+    {
+        // Compute old and new composite sizes for CWP events.
+        Size? oldComposite = _contentWidth is null && _contentHeight is null
+                                 ? null
+                                 : new Size (_contentWidth ?? Viewport.Size.Width, _contentHeight ?? Viewport.Size.Height);
+
+        Size? newComposite = newWidth is null && newHeight is null ? null : new Size (newWidth ?? Viewport.Size.Width, newHeight ?? Viewport.Size.Height);
+
+        if (EqualityComparer<Size?>.Default.Equals (oldComposite, newComposite))
+        {
+            return;
+        }
+
+        // CWP: Fire OnChanging / ChangingEvent (can cancel)
+        ValueChangingEventArgs<Size?> changingArgs = new (oldComposite, newComposite);
+
+        if (OnContentSizeChanging (changingArgs) || changingArgs.Handled)
+        {
+            return;
+        }
+
+        ContentSizeChanging?.Invoke (this, changingArgs);
+
+        if (changingArgs.Handled)
+        {
+            return;
+        }
+
+        // Apply potentially modified new value
+        Size? finalComposite = changingArgs.NewValue;
+
+        // Update backing fields while preserving null semantics for dimensions
+        // that should continue tracking the Viewport size.
+        if (finalComposite is null)
+        {
+            _contentWidth = null;
+            _contentHeight = null;
+        }
+        else
+        {
+            _contentWidth = newWidth is null ? null : finalComposite.Value.Width;
+            _contentHeight = newHeight is null ? null : finalComposite.Value.Height;
+        }
+
+        // Do the work
+        SetNeedsLayout ();
+
+        // CWP: Fire OnChanged / ChangedEvent
+        ValueChangedEventArgs<Size?> changedArgs = new (oldComposite, finalComposite);
+        OnContentSizeChanged (changedArgs);
+        ContentSizeChanged?.Invoke (this, changedArgs);
+    }
+
+    /// <summary>
+    ///     Gets the width of the View's content area.
+    /// </summary>
+    /// <remarks>
+    ///     If the content width was not explicitly set by <see cref="SetContentWidth"/>,
+    ///     returns the <see cref="Viewport"/> width.
+    /// </remarks>
+    /// <returns>The content area width.</returns>
+    public int GetContentWidth () => _contentWidth ?? Viewport.Size.Width;
+
+    /// <summary>
+    ///     Gets the height of the View's content area.
+    /// </summary>
+    /// <remarks>
+    ///     If the content height was not explicitly set by <see cref="SetContentHeight"/>,
+    ///     returns the <see cref="Viewport"/> height.
+    /// </remarks>
+    /// <returns>The content area height.</returns>
+    public int GetContentHeight () => _contentHeight ?? Viewport.Size.Height;
 
     /// <summary>
     ///     Gets the size of the View's content.
     /// </summary>
     /// <remarks>
-    ///     a>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
@@ -89,7 +234,9 @@ public partial class View
     ///     return the size of the <see cref="Viewport"/> and <see cref="ContentSizeTracksViewport"/> will be
     ///     <see langword="true"/>.
     /// </returns>
-    public Size GetContentSize () => _contentSize ?? Viewport.Size;
+    /// <seealso cref="GetContentWidth"/>
+    /// <seealso cref="GetContentHeight"/>
+    public Size GetContentSize () => new (GetContentWidth (), GetContentHeight ());
 
     /// <summary>
     ///     Gets the minimum number of columns required for all the View's SubViews to fit in the content area.
@@ -185,7 +332,19 @@ public partial class View
     ///         </item>
     ///     </list>
     /// </remarks>
-    public bool ContentSizeTracksViewport { get => _contentSize is null; set => _contentSize = value ? null : _contentSize; }
+    public bool ContentSizeTracksViewport
+    {
+        get => _contentWidth is null && _contentHeight is null;
+        set
+        {
+            if (!value)
+            {
+                return;
+            }
+            _contentWidth = null;
+            _contentHeight = null;
+        }
+    }
 
     /// <summary>
     ///     Called before the content size changes, allowing subclasses to cancel or modify the change.
@@ -393,17 +552,17 @@ public partial class View
         {
             if (!ViewportSettings.FastHasFlags (ViewportSettingsFlags.AllowXGreaterThanContentWidth))
             {
-                if (newViewport.X >= GetContentSize ().Width)
+                if (newViewport.X >= GetContentWidth ())
                 {
-                    newViewport.X = GetContentSize ().Width - 1;
+                    newViewport.X = GetContentWidth () - 1;
                 }
             }
 
             if (!ViewportSettings.FastHasFlags (ViewportSettingsFlags.AllowXPlusWidthGreaterThanContentWidth))
             {
-                if (newViewport.X + newViewport.Width > GetContentSize ().Width)
+                if (newViewport.X + newViewport.Width > GetContentWidth ())
                 {
-                    newViewport.X = GetContentSize ().Width - newViewport.Width;
+                    newViewport.X = GetContentWidth () - newViewport.Width;
                 }
             }
 
@@ -418,7 +577,7 @@ public partial class View
 
             if (!ViewportSettings.FastHasFlags (ViewportSettingsFlags.AllowNegativeXWhenWidthGreaterThanContentWidth))
             {
-                if (Viewport.Width > GetContentSize ().Width)
+                if (Viewport.Width > GetContentWidth ())
                 {
                     newViewport.X = 0;
                 }
@@ -426,17 +585,17 @@ public partial class View
 
             if (!ViewportSettings.FastHasFlags (ViewportSettingsFlags.AllowYGreaterThanContentHeight))
             {
-                if (newViewport.Y >= GetContentSize ().Height)
+                if (newViewport.Y >= GetContentHeight ())
                 {
-                    newViewport.Y = GetContentSize ().Height - 1;
+                    newViewport.Y = GetContentHeight () - 1;
                 }
             }
 
             if (!ViewportSettings.FastHasFlags (ViewportSettingsFlags.AllowYPlusHeightGreaterThanContentHeight))
             {
-                if (newViewport.Y + newViewport.Height > GetContentSize ().Height)
+                if (newViewport.Y + newViewport.Height > GetContentHeight ())
                 {
-                    newViewport.Y = GetContentSize ().Height - newViewport.Height;
+                    newViewport.Y = GetContentHeight () - newViewport.Height;
                 }
             }
 
@@ -451,7 +610,7 @@ public partial class View
 
             if (!ViewportSettings.FastHasFlags (ViewportSettingsFlags.AllowNegativeYWhenHeightGreaterThanContentHeight))
             {
-                if (Viewport.Height > GetContentSize ().Height)
+                if (Viewport.Height > GetContentHeight ())
                 {
                     newViewport.Y = 0;
                 }
@@ -564,7 +723,7 @@ public partial class View
     /// <returns><see langword="true"/> if the <see cref="Viewport"/> was changed.</returns>
     public bool? ScrollVertical (int rows)
     {
-        if (GetContentSize () == Size.Empty || GetContentSize () == Viewport.Size)
+        if (GetContentSize () == Size.Empty || GetContentHeight () == Viewport.Size.Height)
         {
             return false;
         }
@@ -585,7 +744,7 @@ public partial class View
     /// <returns><see langword="true"/> if the <see cref="Viewport"/> was changed.</returns>
     public bool? ScrollHorizontal (int cols)
     {
-        if (GetContentSize () == Size.Empty || GetContentSize ().Width == Viewport.Size.Width)
+        if (GetContentSize () == Size.Empty || GetContentWidth () == Viewport.Size.Width)
         {
             return false;
         }

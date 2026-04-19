@@ -101,13 +101,13 @@ public partial class View
         scrollBar.Y = Pos.Func (_ => Padding.Thickness.Top);
 
         scrollBar.Height = Dim.Fill (Dim.Func (_ => Padding.Thickness.Bottom));
-        scrollBar.ScrollableContentSize = GetContentSize ().Height;
+        scrollBar.ScrollableContentSize = GetContentHeight ();
 
         ViewportChanged += (_, _) => { scrollBar.Value = Viewport.Y; };
 
-        ContentSizeChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Height; };
+        ContentSizeChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentHeight (); };
 
-        FrameChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Height; };
+        FrameChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentHeight (); };
     }
 
     private void ConfigureHorizontalScrollBar (ScrollBar scrollBar)
@@ -119,13 +119,13 @@ public partial class View
         scrollBar.Y = Pos.AnchorEnd () - Pos.Func (_ => Padding.Thickness.Bottom - 1);
 
         scrollBar.Width = Dim.Fill (Dim.Func (_ => Padding.Thickness.Right));
-        scrollBar.ScrollableContentSize = GetContentSize ().Width;
+        scrollBar.ScrollableContentSize = GetContentWidth ();
 
         ViewportChanged += (_, _) => { scrollBar.Value = Viewport.X; };
 
-        ContentSizeChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Width; };
+        ContentSizeChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentWidth (); };
 
-        FrameChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Width; };
+        FrameChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentWidth (); };
     }
 
     private void OnScrollBarInitialized (object? sender, EventArgs e)
