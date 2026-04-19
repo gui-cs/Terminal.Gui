@@ -19,18 +19,22 @@ public class TreeView : TreeView<ITreeNode>, IDesignable
         CanFocus = true;
 
         TreeBuilder = new TreeNodeBuilder ();
-        AspectGetter = o => o is null ? "Null" : o.Text;
+        AspectGetter = o => o.Text;
     }
 
-    bool IDesignable.EnableForDesign ()
+    /// <inheritdoc />
+    public bool EnableForDesign ()
     {
-        var root1 = new TreeNode () { Text = "Root1" };
-        root1.Children.Add (new TreeNode () { Text = "Child1.1" });
-        root1.Children.Add (new TreeNode () { Text = "Child1.2" });
+        TreeNode root1 = new () { Text = "Root1" };
+        root1.Children.Add (new TreeNode { Text = "Child1.1" });
+        root1.Children.Add (new TreeNode { Text = "Child1.2" });
 
-        var root2 = new TreeNode () { Text = "Root2" };
-        root2.Children.Add (new TreeNode () { Text = "Child2.1" });
-        root2.Children.Add (new TreeNode () { Text = "Child2.2" });
+        TreeNode root2 = new () { Text = "Root2" };
+        TreeNode child21 = new () { Text = "Child2.1" };
+        child21.Children.Add (new TreeNode { Text = "Child2.1.1" });
+        child21.Children.Add (new TreeNode { Text = "Child2.1.2" });
+        root2.Children.Add (child21);
+        root2.Children.Add (new TreeNode { Text = "Child2.2" });
 
         AddObject (root1);
         AddObject (root2);

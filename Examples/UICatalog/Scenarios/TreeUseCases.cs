@@ -7,8 +7,7 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("TreeView")]
 public class TreeUseCases : Scenario
 {
-    private IApplication? _app;
-    private View? _currentTree;
+    private Runnable? _appWindow;
 
     public override void Main ()
     {
@@ -16,9 +15,8 @@ public class TreeUseCases : Scenario
 
         using IApplication app = Application.Create ();
         app.Init ();
-        _app = app;
 
-        using Window appWindow = new ();
+        _appWindow = new Runnable ();
 
         // MenuBar
         MenuBar menu = new ();
@@ -36,47 +34,66 @@ public class TreeUseCases : Scenario
         // StatusBar
         StatusBar statusBar = new ([new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", Quit)]);
 
-        appWindow.Add (menu, statusBar);
+        _appWindow?.Add (menu, statusBar);
 
-        appWindow.IsModalChanged += (_, args) =>
-                                    {
-                                        if (args.Value)
-                                        {
-                                            // Start with the most basic use case
-                                            LoadSimpleNodes ();
-                                        }
-                                    };
+        _appWindow?.IsModalChanged += (_, args) =>
+                                     {
+                                         if (args.Value)
+                                         {
+                                             // Start with the most basic use case
+                                             LoadSimpleNodes ();
+                                         }
+                                     };
 
-        app.Run (appWindow);
+        app.Run (_appWindow!);
+        _appWindow?.Dispose ();
+    }
+
+    private View? CurrentTree
+    {
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+
+            if (value is { })
+            {
+                field?.Dispose ();
+                _appWindow?.Remove (field);
+            }
+            field = value;
+
+            if (field is null)
+            {
+                return;
+            }
+            _appWindow?.Add (field);
+            _appWindow?.MoveSubViewTowardsStart (field);
+
+            field?.SetFocus ();
+        }
     }
 
     private void LoadArmies (bool useDelegate)
     {
         Army army1 = new () { Designation = "3rd Infantry", Units = [new Unit { Name = "Orc" }, new Unit { Name = "Troll" }, new Unit { Name = "Goblin" }] };
 
-        if (_currentTree is { })
-        {
-            _app?.TopRunnableView?.Remove (_currentTree);
-
-            _currentTree.Dispose ();
-        }
-
         TreeView<GameObject> tree = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
 
         if (useDelegate)
         {
-            tree.TreeBuilder = new DelegateTreeBuilder<GameObject> (o => o is Army a ? a.Units : Enumerable.Empty<GameObject> (), o => true);
+            tree.TreeBuilder = new DelegateTreeBuilder<GameObject> (o => o is Army a ? a.Units : Enumerable.Empty<GameObject> (), _ => true);
         }
         else
         {
             tree.TreeBuilder = new GameObjectTreeBuilder ();
         }
 
-        _app?.TopRunnableView?.Add (tree);
-
         tree.AddObject (army1);
 
-        _currentTree = tree;
+        CurrentTree = tree;
     }
 
     private void LoadRooms ()
@@ -86,50 +103,22 @@ public class TreeUseCases : Scenario
             Address = "23 Nowhere Street", Rooms = [new Room { Name = "Ballroom" }, new Room { Name = "Bedroom 1" }, new Room { Name = "Bedroom 2" }]
         };
 
-        if (_currentTree is { })
-        {
-            _app?.TopRunnableView?.Remove (_currentTree);
-
-            _currentTree.Dispose ();
-        }
-
         TreeView tree = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
-
-        _app?.TopRunnableView?.Add (tree);
 
         tree.AddObject (myHouse);
 
-        _currentTree = tree;
+        CurrentTree = tree;
     }
 
     private void LoadSimpleNodes ()
     {
-        if (_currentTree is { })
-        {
-            _app?.TopRunnableView?.Remove (_currentTree);
-
-            _currentTree.Dispose ();
-        }
-
         TreeView tree = new () { X = 0, Y = 1, Width = Dim.Fill (), Height = Dim.Fill (1) };
+        tree.EnableForDesign ();
 
-        _app?.TopRunnableView?.Add (tree);
-
-        TreeNode root1 = new () { Text = "Root1" };
-        root1.Children.Add (new TreeNode { Text = "Child1.1" });
-        root1.Children.Add (new TreeNode { Text = "Child1.2" });
-
-        TreeNode root2 = new () { Text = "Root2" };
-        root2.Children.Add (new TreeNode { Text = "Child2.1" });
-        root2.Children.Add (new TreeNode { Text = "Child2.2" });
-
-        tree.AddObject (root1);
-        tree.AddObject (root2);
-
-        _currentTree = tree;
+        CurrentTree = tree;
     }
 
-    private void Quit () => (_app?.TopRunnableView as Runnable)?.RequestStop ();
+    private void Quit () => _appWindow?.RequestStop ();
 
     private class Army : GameObject
     {

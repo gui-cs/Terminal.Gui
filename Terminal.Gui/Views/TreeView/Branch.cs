@@ -86,7 +86,7 @@ internal class Branch<T> where T : class
         bool isSelected = _tree.IsSelected (Model);
 
         Attribute textColor = isSelected
-                                  ? _tree.HasFocus ? _tree.GetAttributeForRole (VisualRole.Focus) : _tree.GetAttributeForRole (VisualRole.HotNormal)
+                                  ? _tree.HasFocus ? _tree.GetAttributeForRole (VisualRole.Focus) : _tree.GetAttributeForRole (VisualRole.Active)
                                   : _tree.GetAttributeForRole (VisualRole.Normal);
         Attribute symbolColor = _tree.Style.HighlightModelTextOnly ? _tree.GetAttributeForRole (VisualRole.Normal) : textColor;
 
@@ -124,12 +124,12 @@ internal class Branch<T> where T : class
             {
                 if (isSelected)
                 {
-                    color = _tree.Style.HighlightModelTextOnly ? _tree.GetAttributeForRole (VisualRole.HotNormal) :
-                            _tree.HasFocus ? _tree.GetAttributeForRole (VisualRole.HotFocus) : _tree.GetAttributeForRole (VisualRole.HotNormal);
+                    color = _tree.Style.HighlightModelTextOnly ? _tree.GetAttributeForRole (VisualRole.Normal) :
+                            _tree.HasFocus ? _tree.GetAttributeForRole (VisualRole.Focus) : _tree.GetAttributeForRole (VisualRole.Active);
                 }
                 else
                 {
-                    color = _tree.GetAttributeForRole (VisualRole.HotNormal);
+                    color = _tree.GetAttributeForRole (VisualRole.Normal);
                 }
             }
             else

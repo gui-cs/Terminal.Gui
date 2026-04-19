@@ -173,7 +173,7 @@ public partial class TreeView<T>
     public bool CanExpand (T o) => ObjectToBranch (o)?.CanExpand () ?? false;
 
     /// <summary>Collapses the <see cref="SelectedObject"/></summary>
-    public void Collapse () => Collapse (_selectedObject);
+    public void Collapse () => Collapse (SelectedObject);
 
     /// <summary>Collapses the supplied object if it is currently expanded .</summary>
     /// <param name="toCollapse">The object to collapse.</param>
@@ -481,7 +481,7 @@ public partial class TreeView<T>
         }
 
         // If not a keybinding, is the key a searchable key press?
-        if (!KeystrokeNavigator.Matcher.IsCompatibleKey (key) || !AllowLetterBasedNavigation || _selectedObject is null)
+        if (!KeystrokeNavigator.Matcher.IsCompatibleKey (key) || !AllowLetterBasedNavigation || SelectedObject is null)
         {
             return false;
         }
@@ -507,8 +507,7 @@ public partial class TreeView<T>
         }
 
         SelectedObject = map.ElementAt (idx).Model;
-        EnsureVisible (_selectedObject);
-        SetNeedsDraw ();
+        EnsureVisible (SelectedObject);
 
         return true;
     }
@@ -516,6 +515,7 @@ public partial class TreeView<T>
     /// <summary>Scrolls the view area down a single line without changing the current selection.</summary>
     public void ScrollDown ()
     {
+        // BUGBUG: What is the -2 for and why is this not just GetContentHeight?
         if (ScrollOffsetVertical > ContentHeight - 2)
         {
             return;
@@ -528,7 +528,7 @@ public partial class TreeView<T>
     /// <summary>Scrolls the view area up a single line without changing the current selection.</summary>
     public void ScrollUp ()
     {
-        if (_scrollOffsetVertical <= 0)
+        if (ScrollOffsetVertical <= 0)
         {
             return;
         }

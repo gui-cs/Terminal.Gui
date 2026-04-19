@@ -71,57 +71,6 @@ public partial class TreeView<T> : View, ITreeView where T : class
     private const string NO_BUILDER_ERROR = "ERROR: TreeBuilder Not Set";
 
     /// <summary>
-    ///     Gets or sets the default key bindings for <see cref="TreeView{T}"/>. These are layered on top of
-    ///     <see cref="View.DefaultKeyBindings"/> when the view is created.
-    ///     <para>
-    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
-    ///         Do not set in parallelizable unit tests.
-    ///     </para>
-    /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         This property is not decorated with <see cref="ConfigurationPropertyAttribute"/> because
-    ///         <see cref="TreeView{T}"/> is a generic type. Use <see cref="View.ViewKeyBindings"/> to
-    ///         override key bindings for TreeView via configuration.
-    ///     </para>
-    /// </remarks>
-
-    // ReSharper disable once StaticMemberInGenericType
-    public new static Dictionary<Command, PlatformKeyBinding> DefaultKeyBindings { get; set; } = new ()
-    {
-        // Tree-specific expand/collapse
-        [Command.Expand] = Bind.All (Key.CursorRight),
-        [Command.ExpandAll] = Bind.All (Key.CursorRight.WithCtrl),
-        [Command.Collapse] = Bind.All (Key.CursorLeft),
-        [Command.CollapseAll] = Bind.All (Key.CursorLeft.WithCtrl),
-
-        // Branch navigation
-        [Command.LineUpToFirstBranch] = Bind.All (Key.CursorUp.WithCtrl),
-        [Command.LineDownToLastBranch] = Bind.All (Key.CursorDown.WithCtrl),
-
-        // TreeView adds Home/End as additional Start/End bindings (the base layer also provides Ctrl+Home/Ctrl+End)
-        [Command.Start] = Bind.All (Key.Home),
-        [Command.End] = Bind.All (Key.End)
-    };
-
-    /// <summary>
-    ///     Interface for filtering which lines of the tree are displayed e.g. to provide text searching.  Defaults to
-    ///     <see langword="null"/> (no filtering).
-    /// </summary>
-    public ITreeViewFilter<T>? Filter { get; set; } = null;
-
-    /// <summary>Secondary selected regions of tree when <see cref="MultiSelect"/> is true.</summary>
-    private readonly Stack<TreeSelection<T>> _multiSelectedRegions = new ();
-
-    /// <summary>Cached result of <see cref="BuildLineMap"/></summary>
-    private IReadOnlyCollection<Branch<T>>? _cachedLineMap;
-
-    private int _scrollOffsetVertical;
-
-    /// <summary>private variable for <see cref="SelectedObject"/></summary>
-    private T? _selectedObject;
-
-    /// <summary>
     ///     Creates a new tree view with absolute positioning. Use <see cref="AddObjects(IEnumerable{T})"/> to set
     ///     root objects for the tree. Children will not be rendered until you set <see cref="TreeBuilder"/>.
     /// </summary>
@@ -304,6 +253,46 @@ public partial class TreeView<T> : View, ITreeView where T : class
     /// </summary>
     public TreeView (ITreeBuilder<T> builder) : this () => TreeBuilder = builder;
 
+    /// <summary>
+    ///     Gets or sets the default key bindings for <see cref="TreeView{T}"/>. These are layered on top of
+    ///     <see cref="View.DefaultKeyBindings"/> when the view is created.
+    ///     <para>
+    ///         <b>IMPORTANT:</b> This is a process-wide static property. Change with care.
+    ///         Do not set in parallelizable unit tests.
+    ///     </para>
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         This property is not decorated with <see cref="ConfigurationPropertyAttribute"/> because
+    ///         <see cref="TreeView{T}"/> is a generic type. Use <see cref="View.ViewKeyBindings"/> to
+    ///         override key bindings for TreeView via configuration.
+    ///     </para>
+    /// </remarks>
+
+    // ReSharper disable once StaticMemberInGenericType
+    public new static Dictionary<Command, PlatformKeyBinding> DefaultKeyBindings { get; set; } = new ()
+    {
+        // Tree-specific expand/collapse
+        [Command.Expand] = Bind.All (Key.CursorRight),
+        [Command.ExpandAll] = Bind.All (Key.CursorRight.WithCtrl),
+        [Command.Collapse] = Bind.All (Key.CursorLeft),
+        [Command.CollapseAll] = Bind.All (Key.CursorLeft.WithCtrl),
+
+        // Branch navigation
+        [Command.LineUpToFirstBranch] = Bind.All (Key.CursorUp.WithCtrl),
+        [Command.LineDownToLastBranch] = Bind.All (Key.CursorDown.WithCtrl),
+
+        // TreeView adds Home/End as additional Start/End bindings (the base layer also provides Ctrl+Home/Ctrl+End)
+        [Command.Start] = Bind.All (Key.Home),
+        [Command.End] = Bind.All (Key.End)
+    };
+
+    /// <summary>
+    ///     Interface for filtering which lines of the tree are displayed e.g. to provide text searching.  Defaults to
+    ///     <see langword="null"/> (no filtering).
+    /// </summary>
+    public ITreeViewFilter<T>? Filter { get; set; } = null;
+
     /// <summary>True makes a letter key press navigate to the next visible branch that begins with that letter/digit.</summary>
     /// <value></value>
     public bool AllowLetterBasedNavigation { get; set; } = true;
@@ -362,10 +351,10 @@ public partial class TreeView<T> : View, ITreeView where T : class
     /// </remarks>
     public int ScrollOffsetVertical
     {
-        get => _scrollOffsetVertical;
+        get;
         set
         {
-            _scrollOffsetVertical = Math.Max (0, value);
+            field = Math.Max (0, value);
             SetNeedsDraw ();
         }
     }
@@ -376,16 +365,16 @@ public partial class TreeView<T> : View, ITreeView where T : class
     /// </summary>
     public T? SelectedObject
     {
-        get => _selectedObject;
+        get;
         set
         {
-            if (ReferenceEquals (_selectedObject, value))
+            if (ReferenceEquals (field, value))
             {
                 return;
             }
 
-            T? oldValue = _selectedObject;
-            _selectedObject = value;
+            T? oldValue = field;
+            field = value;
 
             OnSelectionChanged (new SelectionChangedEventArgs<T> (this, oldValue, value));
             SetNeedsDraw ();
@@ -404,6 +393,9 @@ public partial class TreeView<T> : View, ITreeView where T : class
 
     /// <summary>Contains options for changing how the tree is rendered.</summary>
     public TreeStyle Style { get; set; } = new ();
+
+    /// <summary>Secondary selected regions of tree when <see cref="MultiSelect"/> is true.</summary>
+    private readonly Stack<TreeSelection<T>> _multiSelectedRegions = new ();
 
     /// <summary>Removes all objects from the tree and clears <see cref="SelectedObject"/>.</summary>
     public void ClearObjects ()
@@ -584,16 +576,11 @@ public partial class TreeView<T> : View, ITreeView where T : class
         }
     }
 
+    /// <summary>Cached result of <see cref="BuildLineMap"/></summary>
+    private IReadOnlyCollection<Branch<T>>? _cachedLineMap;
+
     /// <summary>Clears any cached results of the tree state.</summary>
     public void InvalidateLineMap () => _cachedLineMap = null;
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        base.Dispose (disposing);
-
-        ColorGetter = null;
-    }
 
     /// <summary>
     ///     Calculates all currently visible/expanded branches (including leafs) and outputs them by index from the top of
@@ -683,4 +670,12 @@ public partial class TreeView<T> : View, ITreeView where T : class
     /// <param name="toFind"></param>
     /// <returns>The branch for <paramref name="toFind"/> or null if it is not currently exposed in the tree.</returns>
     private Branch<T>? ObjectToBranch (T? toFind) => BuildLineMap ().FirstOrDefault (o => o.Model.Equals (toFind));
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        base.Dispose (disposing);
+
+        ColorGetter = null;
+    }
 }
