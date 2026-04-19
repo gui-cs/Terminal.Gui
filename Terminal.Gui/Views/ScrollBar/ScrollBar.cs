@@ -42,10 +42,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
 
         Height = Dim.Auto (DimAutoStyle.Content, Dim.Func (_ => Orientation == Orientation.Vertical ? SuperView?.Viewport.Height ?? 0 : 1));
 
-        _decreaseButton = new ScrollButton ()
-        {
-            Direction = NavigationDirection.Backward
-        };
+        _decreaseButton = new ScrollButton { Direction = NavigationDirection.Backward };
         _decreaseButton.Accepting += OnDecreaseButtonOnAccept;
 
         Slider = new ScrollSlider
@@ -55,10 +52,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         Slider.Scrolled += SliderOnScroll;
         Slider.PositionChanged += SliderOnPositionChanged;
 
-        _increaseButton = new ScrollButton ()
-        {
-            Direction = NavigationDirection.Forward
-        };
+        _increaseButton = new ScrollButton { Direction = NavigationDirection.Forward };
         _increaseButton.Accepting += OnIncreaseButtonOnAccept;
         Add (_decreaseButton, Slider, _increaseButton);
 
@@ -96,23 +90,10 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         switch (VisibilityMode)
         {
             case ScrollBarVisibilityMode.Auto:
-                // If this scrollbar lives in a View's Padding, respect the View's
-                // ViewportSettings as the authority on whether it should be enabled.
-                if (SuperView is PaddingView { Adornment.Parent: { } ownerView }
-                    && (this == ownerView.VerticalScrollBar || this == ownerView.HorizontalScrollBar))
-                {
-                    ViewportSettingsFlags requiredFlag = Orientation == Orientation.Vertical
-                                                             ? ViewportSettingsFlags.HasVerticalScrollBar
-                                                             : ViewportSettingsFlags.HasHorizontalScrollBar;
-
-                    if (!ownerView.ViewportSettings.HasFlag (requiredFlag))
-                    {
-                        Visible = false;
-
-                        break;
-                    }
-                }
-
+                // VisibilityMode is the authority. ViewportSettings flags are a
+                // convenience that *sets* VisibilityMode via SyncOneScrollBar; they
+                // should not be re-checked here. When the flag is later removed,
+                // SyncOneScrollBar sets VisibilityMode = None, which is handled below.
                 Visible = VisibleContentSize < ScrollableContentSize;
 
                 break;
@@ -290,7 +271,7 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
                 return _scrollableContentSize.Value;
             }
 
-            return Orientation == Orientation.Vertical ? SuperView?.GetContentSize ().Height ?? 0 : SuperView?.GetContentSize ().Width ?? 0;
+            return Orientation == Orientation.Vertical ? SuperView?.GetContentHeight () ?? 0 : SuperView?.GetContentWidth () ?? 0;
         }
         set
         {
