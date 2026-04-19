@@ -78,7 +78,7 @@ public class InteractiveTree : Scenario
         {
             if (GetText ("Text", "Enter text for node:", "", out string entered))
             {
-                node.Children.Add (new TreeNode (entered));
+                node.Children.Add (new TreeNode () { Text = entered });
                 _treeView.RefreshObject (node);
             }
         }
@@ -93,7 +93,7 @@ public class InteractiveTree : Scenario
 
         if (GetText ("Text", "Enter text for node:", "", out string entered))
         {
-            _treeView.AddObject (new TreeNode (entered));
+            _treeView.AddObject (new TreeNode () { Text = entered });
         }
     }
 
@@ -164,7 +164,7 @@ public class InteractiveTree : Scenario
             obj.Handled = true;
 
             // if it is a root object remove it
-            if (_treeView.Objects.Contains (toDelete))
+            if (_treeView.Objects is { } && _treeView.Objects.Contains (toDelete))
             {
                 _treeView.Remove (toDelete);
             }

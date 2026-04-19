@@ -1,6 +1,8 @@
 using JetBrains.Annotations;
 using Markdig;
 using UnitTests;
+#pragma warning disable xUnit2013
+#pragma warning disable xUnit2012
 
 namespace ViewsTests.Markdown;
 
@@ -24,7 +26,7 @@ public class AstLoweringTests (ITestOutputHelper output)
     {
         Terminal.Gui.Views.Markdown view = new () { Text = markdown, Width = width, Height = 20 };
 
-        if (pipeline is not null)
+        if (pipeline is { })
         {
             view.MarkdownPipeline = pipeline;
         }
@@ -286,7 +288,7 @@ public class AstLoweringTests (ITestOutputHelper output)
     [Fact]
     public void LowerFromAst_ParagraphBlock_Creates_Wrappable_Block ()
     {
-        Terminal.Gui.Views.Markdown view = LayoutView ("Hello world", width: 5);
+        Terminal.Gui.Views.Markdown view = LayoutView ("Hello world", 5);
 
         // "Hello world" at width 5 wraps to 2 lines
         Assert.True (view.LineCount >= 2);
@@ -434,7 +436,7 @@ public class AstLoweringTests (ITestOutputHelper output)
         MarkdownTable? table = view.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
         Assert.NotNull (table);
 
-        TableData? data = table.TableData;
+        TableData data = table.TableData;
         Assert.NotNull (data);
         Assert.Equal (Alignment.Start, data.ColumnAlignments [0]);
         Assert.Equal (Alignment.Center, data.ColumnAlignments [1]);
@@ -449,7 +451,7 @@ public class AstLoweringTests (ITestOutputHelper output)
         MarkdownTable? table = view.SubViews.OfType<MarkdownTable> ().FirstOrDefault ();
         Assert.NotNull (table);
 
-        TableData? data = table.TableData;
+        TableData data = table.TableData;
         Assert.NotNull (data);
         Assert.Equal (3, data.Rows.Length);
     }
@@ -457,7 +459,7 @@ public class AstLoweringTests (ITestOutputHelper output)
     [Fact]
     public void LowerFromAst_Pipeline_Without_Tables_Renders_As_Text ()
     {
-        MarkdownPipeline noTablePipeline = new MarkdownPipelineBuilder ().Build ();
+        MarkdownPipeline noTablePipeline = new MarkdownPipelineBuilder ().UsePreciseSourceLocation ().Build ();
 
         Terminal.Gui.Views.Markdown view = LayoutView ("| A | B |\n|---|---|\n| 1 | 2 |", pipeline: noTablePipeline);
 
@@ -468,12 +470,7 @@ public class AstLoweringTests (ITestOutputHelper output)
     [Fact]
     public void Pipeline_Property_Change_Invalidates_And_Reparses ()
     {
-        Terminal.Gui.Views.Markdown view = new ()
-        {
-            Text = "| A | B |\n|---|---|\n| 1 | 2 |",
-            Width = 40,
-            Height = 20
-        };
+        Terminal.Gui.Views.Markdown view = new () { Text = "| A | B |\n|---|---|\n| 1 | 2 |", Width = 40, Height = 20 };
 
         View host = new () { Width = 40, Height = 20 };
         host.Add (view);
@@ -603,7 +600,7 @@ public class AstLoweringTests (ITestOutputHelper output)
     [Fact]
     public void DefaultMarkdownSample_Renders_Without_Exceptions ()
     {
-        Terminal.Gui.Views.Markdown view = LayoutView (Terminal.Gui.Views.Markdown.DefaultMarkdownSample, width: 80);
+        Terminal.Gui.Views.Markdown view = LayoutView (Terminal.Gui.Views.Markdown.DefaultMarkdownSample);
 
         Assert.True (view.LineCount > 0);
         Assert.True (view.GetContentSize ().Height > 0);
