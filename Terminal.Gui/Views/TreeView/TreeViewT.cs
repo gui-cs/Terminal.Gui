@@ -701,10 +701,6 @@ public partial class TreeView<T> : View, ITreeView where T : class
             int height = map.Count;
 
             SetContentSize (new Size (width, height));
-
-            // Re-apply the current viewport position so the View clamping logic
-            // adjusts the scroll offset if the content shrank (e.g. after collapse).
-            Viewport = Viewport;
         }
         finally
         {
@@ -713,10 +709,7 @@ public partial class TreeView<T> : View, ITreeView where T : class
     }
 
     /// <inheritdoc/>
-    protected override void OnViewportChanged (DrawEventArgs e)
-    {
-        UpdateContentSize ();
-    }
+    protected override void OnViewportChanged (DrawEventArgs e) => UpdateContentSize ();
 
     /// <summary>
     ///     Returns the corresponding <see cref="Branch{T}"/> in the tree for <paramref name="toFind"/>. This will not

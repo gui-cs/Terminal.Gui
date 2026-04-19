@@ -4,8 +4,88 @@ using UnitTests;
 namespace ViewsTests;
 
 [TestSubject (typeof (TreeView))]
-public class TreeViewTests : TestDriverBase
+public class TreeViewTests (ITestOutputHelper output) : TestDriverBase
 {
+    [Fact]
+    public void Draw_EnableForDesign_Size_Absolute_Draws_Correctly ()
+    {
+        IDriver driver = CreateTestDriver ();
+
+        TreeView tree = new () { Driver = driver };
+
+        tree.EnableForDesign ();
+        tree.Frame = driver.Screen;
+        tree.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ├-Root1
+                                              │ ├─Child1.1
+                                              │ └─Child1.2
+                                              └-Root2
+                                                ├-Child2.1
+                                                │ ├─Child2.1.1
+                                                │ └─Child2.1.2
+                                                └─Child2.2
+                                              """,
+                                              output,
+                                              driver);
+    }
+
+    [Fact]
+    public void Draw_EnableForDesign_Size_Fill_Draws_Correctly ()
+    {
+        IDriver driver = CreateTestDriver ();
+
+        TreeView tree = new () { Driver = driver };
+
+        tree.EnableForDesign ();
+        tree.Width = Dim.Fill ();
+        tree.Height = Dim.Fill ();
+        tree.SetRelativeLayout (driver.Screen.Size);
+        tree.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ├-Root1
+                                              │ ├─Child1.1
+                                              │ └─Child1.2
+                                              └-Root2
+                                                ├-Child2.1
+                                                │ ├─Child2.1.1
+                                                │ └─Child2.1.2
+                                                └─Child2.2
+                                              """,
+                                              output,
+                                              driver);
+    }
+
+
+    [Fact]
+    public void Draw_EnableForDesign_Size_Auto_Draws_Correctly ()
+    {
+        IDriver driver = CreateTestDriver ();
+
+        TreeView tree = new () { Driver = driver };
+
+        tree.EnableForDesign ();
+        tree.Width = Dim.Auto ();
+        tree.Height = Dim.Auto ();
+        tree.SetRelativeLayout (driver.Screen.Size);
+        tree.Layout ();
+        tree.Draw ();
+
+        DriverAssert.AssertDriverContentsAre ("""
+                                              ├-Root1
+                                              │ ├─Child1.1
+                                              │ └─Child1.2
+                                              └-Root2
+                                                ├-Child2.1
+                                                │ ├─Child2.1.1
+                                                │ └─Child2.1.2
+                                                └─Child2.2
+                                              """,
+                                              output,
+                                              driver);
+    }
     [Fact]
     public void CollectionNavigatorMatcher_KeybindingsOverrideNavigator ()
     {

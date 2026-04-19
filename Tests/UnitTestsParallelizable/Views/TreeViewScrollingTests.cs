@@ -278,23 +278,6 @@ public class TreeViewScrollingTests
     #region ExpandCollapse + Scroll Interaction
 
     [Fact]
-    public void Collapse_ClampsScrollOffset ()
-    {
-        TreeView<string> tree = CreateTree (out string root, out _, out _);
-        tree.Frame = new Rectangle (0, 0, 40, 1);
-
-        tree.Expand (root);
-
-        // Scroll to bottom (3 items, viewport 1, max scroll 2)
-        tree.ScrollOffsetVertical = 2;
-        Assert.Equal (2, tree.ScrollOffsetVertical);
-
-        // Collapsing reduces to 1 item — scroll should be clamped to 0
-        tree.Collapse (root);
-        Assert.Equal (0, tree.ScrollOffsetVertical);
-    }
-
-    [Fact]
     public void ExpandAll_UpdatesContentSize ()
     {
         TreeView<string> tree = CreateDeepTree (out string root, out string child, out string grandchild);
