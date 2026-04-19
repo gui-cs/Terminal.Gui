@@ -2,7 +2,7 @@
 
 namespace UICatalog.Scenarios;
 
-[ScenarioMetadata ("Tree View", "Simple tree view examples.")]
+[ScenarioMetadata ("Tree View", "Demonstrates TreeView")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("TreeView")]
 public partial class TreeUseCases : Scenario
