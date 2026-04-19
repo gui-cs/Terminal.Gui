@@ -87,6 +87,7 @@ public class FileDialogExamples : Scenario
 
         _osIcons = new OptionSelector { X = x, Y = y };
         _osIcons.Labels = ["_None", "_Unicode", "Nerd_*"];
+        _osIcons.Value = 2;
         win.Add (_osIcons);
 
         Label label = new () { Y = Pos.AnchorEnd (), Text = "* Requires installing Nerd fonts:" };
