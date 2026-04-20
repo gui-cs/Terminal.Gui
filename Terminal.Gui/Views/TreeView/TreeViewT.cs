@@ -686,16 +686,24 @@ public partial class TreeView<T> : View, ITreeView where T : class
 
         try
         {
-            IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
-            int width = map.Count > 0 ? map.Max (b => b.GetWidth ()) : 0;
-            int height = map.Count;
-
-            SetContentSize (new Size (width, height));
+            SetContentSize (GetSize ());
         }
         finally
         {
             _updatingContentSize = false;
         }
+    }
+
+    /// <summary>
+    ///     Gets the logical size of the tree based on currently visible branches. The width is the maximum width of any
+    ///     visible branch, and the height is the total number of visible branches.
+    /// </summary>
+    /// <returns></returns>
+    public Size GetSize ()
+    {
+        IReadOnlyCollection<Branch<T>> map = BuildLineMap ();
+
+        return new Size (map.Count > 0 ? map.Max (b => b.GetWidth ()) : 0, map.Count);
     }
 
     /// <inheritdoc/>
