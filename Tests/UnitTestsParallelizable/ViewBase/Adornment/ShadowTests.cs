@@ -572,7 +572,7 @@ public class ShadowTests (ITestOutputHelper output)
         output.WriteLine (output1);
 
         DriverAssert.AssertDriverOutputIs ("""
-                                           \x1b[30m\x1b[107m*\x1b[90m\x1b[107m \x1b[97m\x1b[40m \x1b[93m\x1b[100m \x1b[97m\x1b[40m🍎
+                                           \x1b[30m\x1b[107m*\x1b[90m\x1b[40m \x1b[97m\x1b[40m \x1b[93m\x1b[100m \x1b[97m\x1b[40m🍎
                                            """,
                                            output,
                                            app.Driver);

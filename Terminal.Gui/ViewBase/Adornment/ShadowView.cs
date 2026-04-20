@@ -184,7 +184,7 @@ internal class ShadowView : View
         Attribute attr = attribute.Value;
 
         var newAttribute = new Attribute (ShadowStyle == ShadowStyles.Opaque ? Color.Black : attr.Foreground.GetDimmerColor (),
-                                          ShadowStyle == ShadowStyles.Opaque ? attr.Background : attr.Background.GetDimmerColor (0.05),
+                                          ShadowStyle == ShadowStyles.Opaque ? attr.Background : attr.Background.GetDimmerColor (0.9),
                                           attr.Style);
 
         // If the BG is DarkGray, GetDimmerColor gave up. Instead of using the attribute in the Driver under the shadow,
@@ -198,7 +198,7 @@ internal class ShadowView : View
         attr = underView?.GetAttributeForRole (VisualRole.Normal) ?? Attribute.Default;
 
         newAttribute = new Attribute (ShadowStyle == ShadowStyles.Opaque ? Color.Black : attr.Background.GetDimmerColor (),
-                                      ShadowStyle == ShadowStyles.Opaque ? attr.Background : attr.Foreground.GetDimmerColor (0.25),
+                                      ShadowStyle == ShadowStyles.Opaque ? attr.Background : attr.Foreground.GetDimmerColor (0.9),
                                       attr.Style);
 
         return newAttribute;
