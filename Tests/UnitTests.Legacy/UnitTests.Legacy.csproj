@@ -1,8 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<!-- Version numbers are automatically set by GitVersion.MsBuild -->
-	</PropertyGroup>
-	<PropertyGroup>
 		<AssemblyName>UnitTests.Legacy</AssemblyName>
 		<OutputType>Exe</OutputType>
 		<UseAppHost>true</UseAppHost>
