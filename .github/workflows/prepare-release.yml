@@ -35,7 +35,7 @@ jobs:
         with:
           ref: develop
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.RELEASE_PAT }}
 
       - name: Configure Git
         run: |
@@ -131,7 +131,7 @@ jobs:
 
       - name: Create Pull Request
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASE_PAT }}
           SEMVER: ${{ steps.version.outputs.semver }}
           TAG: ${{ steps.version.outputs.tag }}
           RELEASE_TYPE: ${{ steps.version.outputs.release_type }}
