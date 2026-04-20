@@ -204,6 +204,34 @@ public class TextViewScrollingTests
     }
 
     /// <summary>
+    /// Tests that setting ReadOnly to true does not change viewport position but does set NeedsDraw.
+    /// </summary>>
+    [Fact]
+    public void ReadOnly_Set_True_Keeps_ViewportX_And_Sets_NeedDraw ()
+    {
+        TextView tv = new ()
+        {
+            Width = 20,
+            Height = 5,
+            ScrollBars = true,
+            WordWrap = false,
+            Text = "Short line"
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.LayoutSubViews ();
+        tv.ClearNeedsDraw ();
+
+        Rectangle initialViewport = tv.Viewport;
+
+        tv.ReadOnly = true;
+
+        Assert.Equal (initialViewport.X, tv.Viewport.X);
+        Assert.Equal (initialViewport.Y, tv.Viewport.Y);
+        Assert.True (tv.NeedsDraw);
+    }
+
+    /// <summary>
     /// Tests that horizontal scrollbar becomes visible when line length exceeds width (WordWrap=false).
     /// BUG: Same as vertical - visibility not updated when Text changes.
     /// </summary>
