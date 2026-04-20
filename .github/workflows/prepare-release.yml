@@ -1,0 +1,184 @@
+name: Prepare Release
+
+# Creates a release PR from develop → main.
+# Maintainers trigger this from Actions → Prepare Release → Run workflow.
+# After reviewing, merge the PR — the "Finalize Release" workflow handles the rest.
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type (controls the pre-release label on main)'
+        required: true
+        type: choice
+        options:
+          - beta
+          - rc
+          - stable
+        default: 'beta'
+      version_override:
+        description: 'Version override (optional, e.g., 2.0.0). Leave blank to let GitVersion calculate it.'
+        required: false
+        type: string
+
+jobs:
+  prepare-release:
+    name: Create Release PR
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout develop
+        uses: actions/checkout@v6
+        with:
+          ref: develop
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Install GitVersion
+        uses: gittools/actions/gitversion/setup@v4.5.0
+        with:
+          versionSpec: '6.x'
+
+      - name: Determine Version
+        uses: gittools/actions/gitversion/execute@v4.5.0
+        with:
+          useConfigFile: true
+        id: gitversion
+
+      - name: Compute release version
+        id: version
+        run: |
+          if [ -n "${{ github.event.inputs.version_override }}" ]; then
+            VERSION="${{ github.event.inputs.version_override }}"
+          else
+            VERSION="${{ steps.gitversion.outputs.MajorMinorPatch }}"
+          fi
+          
+          RELEASE_TYPE="${{ github.event.inputs.release_type }}"
+          
+          if [ "$RELEASE_TYPE" = "stable" ]; then
+            SEMVER="${VERSION}"
+            TAG="v${VERSION}"
+          else
+            SEMVER="${VERSION}-${RELEASE_TYPE}"
+            TAG="v${VERSION}-${RELEASE_TYPE}"
+          fi
+
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "semver=${SEMVER}" >> $GITHUB_OUTPUT
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "release_type=${RELEASE_TYPE}" >> $GITHUB_OUTPUT
+
+      - name: Check if tag already exists
+        run: |
+          if git rev-parse "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+            echo "::error::Tag ${{ steps.version.outputs.tag }} already exists."
+            echo "::error::Choose a different version or delete the existing tag first."
+            exit 1
+          fi
+
+      - name: Create release branch
+        run: |
+          BRANCH="release/${{ steps.version.outputs.tag }}"
+          git checkout -b "$BRANCH"
+          echo "$BRANCH" >> $GITHUB_OUTPUT
+        id: branch
+
+      - name: Update GitVersion.yml label for release type
+        run: |
+          RELEASE_TYPE="${{ steps.version.outputs.release_type }}"
+
+          if [ "$RELEASE_TYPE" = "stable" ]; then
+            NEW_LABEL="    label: ''"
+          else
+            NEW_LABEL="    label: ${RELEASE_TYPE}"
+          fi
+
+          # Update the label line that follows the main branch regex.
+          # The main section has 'regex: ^main$' followed by a comment then 'label: ...'
+          # Use sed to replace the label line after the main regex match.
+          sed -i "/regex: \^main/,/^  [a-z]/{s/^    label: .*/    label: ${RELEASE_TYPE}/}" GitVersion.yml
+
+          # For stable, label must be empty string
+          if [ "$RELEASE_TYPE" = "stable" ]; then
+            sed -i "/regex: \^main/,/^  [a-z]/{s/^    label: .*/    label: ''/}" GitVersion.yml
+          fi
+
+          echo "Updated GitVersion.yml main label to: '${RELEASE_TYPE}'"
+          grep -A 5 "^  main:" GitVersion.yml
+
+      - name: Commit label change
+        run: |
+          if git diff --quiet GitVersion.yml; then
+            echo "No label change needed"
+          else
+            git add GitVersion.yml
+            git commit -m "Set release label to '${{ steps.version.outputs.release_type }}' for ${{ steps.version.outputs.tag }}"
+          fi
+
+      - name: Push release branch
+        run: |
+          BRANCH="release/${{ steps.version.outputs.tag }}"
+          git push origin "$BRANCH"
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SEMVER: ${{ steps.version.outputs.semver }}
+          TAG: ${{ steps.version.outputs.tag }}
+          RELEASE_TYPE: ${{ steps.version.outputs.release_type }}
+        run: |
+          BRANCH="release/${TAG}"
+
+          if [ "$RELEASE_TYPE" = "stable" ]; then
+            PRERELEASE_NOTE=""
+          else
+            PRERELEASE_NOTE="This is a **${RELEASE_TYPE}** pre-release."
+          fi
+
+          cat > /tmp/pr_body.md << EOF
+          ## Release ${TAG}
+
+          ${PRERELEASE_NOTE}
+
+          **Version:** \`${SEMVER}\`
+          **NuGet Package:** \`Terminal.Gui ${SEMVER}\`
+
+          ### What happens when this PR is merged
+
+          1. ✅ The **Finalize Release** workflow will automatically create tag \`${TAG}\`
+          2. ✅ The **Publish** workflow will build and push to [NuGet.org](https://www.nuget.org/packages/Terminal.Gui)
+          3. ✅ A **GitHub Release** will be created with auto-generated notes
+          4. ✅ A **back-merge PR** from \`main\` → \`develop\` will be opened
+
+          ### Checklist
+
+          - [ ] CI passes on this PR
+          - [ ] Version looks correct: \`${SEMVER}\`
+          - [ ] Release notes reviewed (will be auto-generated on merge)
+          EOF
+
+          gh pr create \
+            --base main \
+            --head "$BRANCH" \
+            --title "Release ${TAG}" \
+            --body-file /tmp/pr_body.md
+
+      - name: Summary
+        run: |
+          echo "## Release PR Created :rocket:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Version:** ${{ steps.version.outputs.semver }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Tag:** ${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Type:** ${{ steps.version.outputs.release_type }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** release/${{ steps.version.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Review and merge the PR to trigger the release." >> $GITHUB_STEP_SUMMARY
