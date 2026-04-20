@@ -531,6 +531,10 @@ public partial class View
             {
                 _viewportLocation = viewport.Location;
                 SetNeedsLayout ();
+
+                // The viewport location changed (scrolling). Mark for redraw using origin-based
+                // coordinates to keep NeedsDrawRect viewport-relative (not shifted by scroll position).
+                SetNeedsDraw (new Rectangle (Point.Empty, Viewport.Size));
             }
 
             // QUESTION: Shouldn't this be inside the if statement above?

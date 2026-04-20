@@ -516,6 +516,7 @@ public partial class BorderView : AdornmentView
 
             field = value;
             Adornment?.Parent?.SetNeedsLayout ();
+            Adornment?.Parent?.SetNeedsDraw ();
         }
     }
 
