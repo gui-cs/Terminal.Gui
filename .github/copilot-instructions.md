@@ -1,6 +1,6 @@
 # Terminal.Gui — Copilot Instructions
 
-Cross-platform .NET console UI toolkit. C# 12 targeting net8.0.
+Cross-platform .NET console UI toolkit. C# 14 targeting net10.0.
 Full contribution guide: [CONTRIBUTING.md](../CONTRIBUTING.md).
 Architecture deep dives: `docfx/docs/`.
 

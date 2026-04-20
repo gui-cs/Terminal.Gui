@@ -81,7 +81,7 @@ dotnet run
 
 ### Project Essentials
 
-**Terminal.Gui** - Cross-platform console UI toolkit for .NET (C# 12, net8.0)
+**Terminal.Gui** - Cross-platform console UI toolkit for .NET (C# 14, net10.0)
 
 **Build:** `dotnet restore && dotnet build --no-restore`
 **Test:** `dotnet test --project Tests/UnitTests --no-build && dotnet test --project Tests/UnitTestsParallelizable --no-build`

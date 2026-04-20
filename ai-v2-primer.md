@@ -176,18 +176,26 @@ view.KeyBindings.Add (Key.F5, Command.Refresh);
 
 ## Gotchas for AI Agents
 
+### API Correctness (All Users)
+
+1. **`Accepting` not `Clicked`** — The `Clicked` event does not exist in v2.
+2. **`Runnable` not `Toplevel`** — `Toplevel` does not exist in v2. Use `Runnable` or `Window`.
+3. **Instance-based app** — Use `Application.Create ().Init ()` to get an `IApplication` instance.
+   Do not use the static `Application.Init ()` / `Application.Run ()` / `Application.Shutdown ()` pattern.
+4. **Always set `e.Handled = true`** in `Accepting` event handlers.
+5. **Use `App!.RequestStop ()`** to close a window from inside a `Runnable`, not `Application.RequestStop ()`.
+6. **SubView/SuperView** — Never say "child", "parent", or "container". Use SubView/SuperView.
+
+### Code Style (Library Contributors Only)
+
+> These rules apply only when contributing code to the Terminal.Gui library itself.
+> App developers using Terminal.Gui do NOT need to follow these conventions.
+
 1. **Space before `()` and `[]`** — This codebase uses `Method ()` not `Method()`,
    and `array [i]` not `array[i]`. This is the #1 formatting mistake agents make.
 2. **No `var`** — Use explicit types except for built-in types (`int`, `string`, `bool`, etc.).
 3. **Use `new ()`** — Target-typed new: `Button btn = new ()` not `Button btn = new Button ()`.
 4. **Collection expressions** — Use `[...]` not `new List<T> { ... }`.
-5. **SubView/SuperView** — Never say "child", "parent", or "container". Use SubView/SuperView.
-6. **`Accepting` not `Clicked`** — The `Clicked` event does not exist in v2.
-7. **`Runnable` not `Toplevel`** — `Toplevel` does not exist in v2. Use `Runnable` or `Window`.
-8. **Instance-based app** — Use `Application.Create ().Init ()` to get an `IApplication` instance.
-   Do not use the static `Application.Init ()` / `Application.Run ()` / `Application.Shutdown ()` pattern.
-9. **Always set `e.Handled = true`** in `Accepting` event handlers.
-10. **Use `App!.RequestStop ()`** to close a window from inside a `Runnable`, not `Application.RequestStop ()`.
 
 ---
 
