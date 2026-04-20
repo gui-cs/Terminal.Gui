@@ -13,11 +13,9 @@ public class ObjectActivatedEventArgs<T> where T : class
         ActivatedObject = activated;
     }
 
-    /// <summary>The object that was selected at the time of activation</summary>
-    /// <value></value>
+    /// <summary>The object that was selected at the time of activation.</summary>
     public T ActivatedObject { get; }
 
-    /// <summary>The tree in which the activation occurred</summary>
-    /// <value></value>
+    /// <summary>The tree in which the activation occurred.</summary>
     public TreeView<T> Tree { get; }
 }
