@@ -39,7 +39,7 @@ most of what you "know" about Terminal.Gui is **wrong**. The API has fundamental
 | `new RadioGroup (...)` | `new OptionSelector { ... }` |
 | `Colors.ColorSchemes ["name"]` | `Schemes.Resolve ("name")` or use `Scheme` directly |
 | `Application.RequestStop ()` | `App!.RequestStop ()` (from inside a `Runnable`) |
-| `Pos.At (n)` / `Pos.Left (v)` | Just use `n` (implicit) or `Pos.Left (v)` (unchanged) |
+| `Pos.At (n)` / `Pos.Left (v)` | Assign integers directly: `X = 5;` (implicit conversion) |
 
 ---
 

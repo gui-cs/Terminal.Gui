@@ -57,7 +57,10 @@ New tests go in `Tests/UnitTestsParallelizable` (no static state dependencies). 
 
 ### Application lifecycle
 
-`Application.Create ()` → `.Init ()` → `.Run<T> ()` → `.Dispose ()`. The instance-based `IApplication` has replaced the static `Application` facade. Do NOT use `Application.Init()`/`Run()`/`Shutdown()`. Tests should avoid `Application.Init` unless explicitly testing that path.
+`Application.Create ()` → `.Init ()` → `.Run<T> ()` → `.Dispose ()`.
+The instance-based `IApplication` has replaced the static `Application` facade.
+Do NOT use `Application.Init()`/`Run()`/`Shutdown()`.
+Tests should avoid `Application.Init` unless explicitly testing that path.
 
 ### View system
 
