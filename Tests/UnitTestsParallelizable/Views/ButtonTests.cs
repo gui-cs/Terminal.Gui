@@ -1009,15 +1009,15 @@ public class ButtonTests
     // Copilot
     /// <summary>
     ///     Verifies that a newly-constructed Button has shadow infrastructure allocated by default,
-    ///     because <see cref="Button.GetDefaultShadowStyle"/> returns <see cref="Button.DefaultShadow"/>
-    ///     and is called in the constructor.
+    ///     because <see cref="Button.RaiseInitializingShadowStyle"/> fires with
+    ///     <see cref="Button.DefaultShadow"/> and no handler suppresses it.
     /// </summary>
     [Fact]
     public void ShadowStyle_Applied_In_Constructor_By_Default ()
     {
         Button button = new ();
 
-        // Default shadow is applied in the constructor via GetDefaultShadowStyle().
+        // Default shadow is applied in the constructor via the InitializingShadowStyle CWP event.
         Assert.Equal (Button.DefaultShadow, button.ShadowStyle);
         Assert.NotNull (button.Margin.View); // MarginView was created.
 
@@ -1050,16 +1050,16 @@ public class ButtonTests
     // Copilot
     /// <summary>
     ///     Verifies that <see cref="ScrollButton"/> does not create shadow infrastructure during construction
-    ///     because <see cref="ScrollButton.GetDefaultShadowStyle"/> returns <see langword="null"/>,
-    ///     eliminating the create-then-destroy allocation pattern described in the issue.
+    ///     because its <see cref="Button.OnInitializingShadowStyle"/> override sets
+    ///     <c>args.NewValue = null</c>, eliminating the create-then-destroy allocation pattern.
     /// </summary>
     [Fact]
-    public void ScrollButton_GetDefaultShadowStyle_Returns_Null_No_MarginView ()
+    public void ScrollButton_OnInitializingShadowStyle_Suppresses_Shadow ()
     {
         ScrollButton btn = new ();
 
-        // GetDefaultShadowStyle() returns null → Button constructor sets ShadowStyle = null
-        // → no shadow infrastructure is ever created.
+        // OnInitializingShadowStyle sets args.NewValue = null
+        // → base.ShadowStyle = null is a no-op → no shadow infrastructure created.
         Assert.Null (btn.ShadowStyle);
         Assert.Null (btn.Margin.View);
 

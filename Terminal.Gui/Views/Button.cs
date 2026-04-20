@@ -84,24 +84,50 @@ public class Button : View, IDesignable, IAcceptTarget
 
         TitleChanged += Button_TitleChanged;
 
-        // Apply the initial shadow via a virtual method so that subclasses (e.g. ScrollButton)
-        // can override GetDefaultShadowStyle() to return null, completely avoiding the
-        // create-then-destroy allocation cycle that would otherwise occur.
-        base.ShadowStyle = GetDefaultShadowStyle ();
+        // Determine and apply the initial shadow via the CWP InitializingShadowStyle event, so that
+        // subclasses and external subscribers can change or suppress the default allocation
+        // before any shadow infrastructure is created.
+        RaiseInitializingShadowStyle ();
         MouseHighlightStates = DefaultMouseHighlightStates;
     }
 
     /// <summary>
-    ///     Returns the shadow style that should be applied during construction. Subclasses that
-    ///     never show a shadow (e.g. <see cref="ScrollButton"/> or internal buttons used by arrangement UI)
-    ///     should override this to return <see langword="null"/> to avoid the create-then-destroy
-    ///     allocation pattern.
+    ///     Called before the Button's initial <see cref="View.ShadowStyle"/> is applied during construction.
+    ///     Override to change or suppress the default shadow — set <see cref="ValueChangingEventArgs{T}.NewValue"/>
+    ///     to the desired style, or set <see cref="ValueChangingEventArgs{T}.Handled"/> to
+    ///     <see langword="true"/> to skip applying any shadow.
     /// </summary>
-    /// <returns>
-    ///     <see cref="DefaultShadow"/> by default. Return <see langword="null"/> to construct without
-    ///     any shadow infrastructure.
-    /// </returns>
-    protected virtual ShadowStyles? GetDefaultShadowStyle () => DefaultShadow;
+    /// <param name="args">
+    ///     Event args whose <see cref="ValueChangingEventArgs{T}.NewValue"/> is pre-set to
+    ///     <see cref="DefaultShadow"/>. Subclasses that never display a shadow
+    ///     (e.g. <see cref="ScrollButton"/> or internal buttons used by arrangement UI)
+    ///     should set <c>args.NewValue = null</c> to avoid the create-then-destroy allocation pattern.
+    /// </param>
+    protected virtual void OnInitializingShadowStyle (ValueChangingEventArgs<ShadowStyles?> args) { }
+
+    /// <summary>
+    ///     Fired before the Button's initial <see cref="View.ShadowStyle"/> is applied during construction.
+    ///     Subscribers can modify <see cref="ValueChangingEventArgs{T}.NewValue"/> or set
+    ///     <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/> to suppress the shadow.
+    /// </summary>
+    public event EventHandler<ValueChangingEventArgs<ShadowStyles?>>? InitializingShadowStyle;
+
+    private void RaiseInitializingShadowStyle ()
+    {
+        ValueChangingEventArgs<ShadowStyles?> args = new (null, DefaultShadow);
+
+        // 1. Virtual method — subclasses override to change/suppress the default shadow.
+        OnInitializingShadowStyle (args);
+
+        // 2. Event — external subscribers get a chance to customize.
+        InitializingShadowStyle?.Invoke (this, args);
+
+        // 3. Apply the (potentially modified) shadow style unless already handled.
+        if (!args.Handled)
+        {
+            base.ShadowStyle = args.NewValue;
+        }
+    }
 
     /// <inheritdoc/>
     protected override void OnMouseHoldRepeatChanged (ValueChangedEventArgs<MouseFlags?> args) => SetMouseBindings (args.NewValue);
