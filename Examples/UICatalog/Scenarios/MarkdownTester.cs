@@ -98,6 +98,19 @@ public class MarkdownTester : Scenario
 
         Shortcut themeShortcut = new () { Title = "Theme", CommandView = themeDropDown };
 
+        // Auto-select a light or dark syntax theme based on the terminal's actual background color.
+        app.Driver!.DefaultAttributeChanged += (_, e) =>
+                                                {
+                                                    if (e.NewValue is not { } attr)
+                                                    {
+                                                        return;
+                                                    }
+
+                                                    ThemeName autoTheme = TextMateSyntaxHighlighter.GetThemeForBackground (attr.Background);
+                                                    preview.SyntaxHighlighter = new TextMateSyntaxHighlighter (autoTheme);
+                                                    themeDropDown.Value = autoTheme;
+                                                };
+
         CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = preview.UseThemeBackground ? CheckState.Checked : CheckState.UnChecked };
 
         themeBgCheckBox.ValueChanged += (_, e) => { preview.UseThemeBackground = e.NewValue == CheckState.Checked; };

@@ -299,6 +299,19 @@ static void RunFullScreen (List<string> files, ThemeName syntaxTheme)
 
     statusItems.Add (new Shortcut { Title = "Theme", CommandView = themeDropDown });
 
+    // Auto-select a light or dark syntax theme based on the terminal's actual background color.
+    app.Driver!.DefaultAttributeChanged += (_, e) =>
+                                            {
+                                                if (e.NewValue is not { } attr)
+                                                {
+                                                    return;
+                                                }
+
+                                                ThemeName autoTheme = TextMateSyntaxHighlighter.GetThemeForBackground (attr.Background);
+                                                markdownView.SyntaxHighlighter = new TextMateSyntaxHighlighter (autoTheme);
+                                                themeDropDown.Value = autoTheme;
+                                            };
+
     // Theme background toggle
     CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = CheckState.Checked };
 

@@ -131,6 +131,19 @@ public class Deepdives : Scenario
 
         Shortcut themeShortcut = new () { Text = "_Theme:", CommandView = themeDropDown, MouseHighlightStates = MouseState.None };
 
+        // Auto-select a light or dark syntax theme based on the terminal's actual background color.
+        _app.Driver!.DefaultAttributeChanged += (_, e) =>
+                                                 {
+                                                     if (_markdownView is null || e.NewValue is not { } attr)
+                                                     {
+                                                         return;
+                                                     }
+
+                                                     ThemeName autoTheme = TextMateSyntaxHighlighter.GetThemeForBackground (attr.Background);
+                                                     _markdownView.SyntaxHighlighter = new TextMateSyntaxHighlighter (autoTheme);
+                                                     themeDropDown.Value = autoTheme;
+                                                 };
+
         CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = _markdownView.UseThemeBackground ? CheckState.Checked : CheckState.UnChecked };
 
         themeBgCheckBox.ValueChanged += (_, e) =>
