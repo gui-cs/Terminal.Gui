@@ -70,18 +70,15 @@ branches:
   #   source-branches: ['v1_develop']
 
   # Pull Request Branches
-  # Configures versioning for PRs (e.g., 2.0.0-pr.feature-123.1)
+  # Configures versioning for PRs (e.g., 2.0.0-PullRequest5009.1)
   pull-request:
-    # Matches typical PR branch names
-    regex: ^(pull|pull\-requests|pr)[/-]
-    # Uses 'pr' prefix with branch name in the label (e.g., pr.feature-123)
-    label: pr.{BranchName}
-    # Inherits increment strategy from source branch
+    regex: "^(pull|pull\\-requests|pr)[\\/-](?<Number>\\d+)"
+    label: "PullRequest{Number}"
     increment: Inherit
     source-branches:
       - develop
       - main
-    # High weight ensures PR versions sort after regular pre-releases
+      - feature
     pre-release-weight: 30000
 
   # Feature / Fix / Topic Branches
