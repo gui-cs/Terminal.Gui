@@ -84,6 +84,17 @@ branches:
     # High weight ensures PR versions sort after regular pre-releases
     pre-release-weight: 30000
 
+  # Feature / Fix / Topic Branches
+  # Matches branches like feature/*, fix/*, issue/*, etc.
+  # Inherits version from develop and uses the branch name as pre-release label.
+  # e.g., if develop is at 2.2.0, fix/foobar produces 2.2.0-fix-foobar.1
+  feature:
+    regex: "^(feature|fix|issue|dependabot|copilot)[\\/-](?<BranchName>.+)"
+    label: "{BranchName}"
+    increment: Inherit
+    source-branches:
+      - develop
+
 # Ignore specific commits if needed (currently empty)
 ignore:
   sha: []
