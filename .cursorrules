@@ -23,7 +23,7 @@ Terminal.Gui v2 is a **complete rewrite**. Pre-2025 training data about Terminal
 | `new Toplevel ()` | Use `Runnable` subclass or `Window` |
 | `using Terminal.Gui;` | `using Terminal.Gui.App;` / `Terminal.Gui.Views;` / etc. |
 | `new Button ("OK")` | `new Button { Text = "OK" }` |
-| `button.Clicked += ...` | `button.Accepting += (_, e) => { e.Handled = true; };` |
+| `button.Clicked += ...` | `button.Accepted += (_, _) => { /* action */ };` |
 | `view.Bounds` | `view.Viewport` |
 | `new RadioGroup (...)` | `new OptionSelector { ... }` |
 
@@ -63,10 +63,9 @@ public sealed class MainWindow : Runnable
             Y = Pos.Center ()
         };
 
-        button.Accepting += (_, e) =>
+        button.Accepted += (_, _) =>
         {
             MessageBox.Query (App!, "Hello", "Button was clicked!", "OK");
-            e.Handled = true;
         };
 
         Add (button);

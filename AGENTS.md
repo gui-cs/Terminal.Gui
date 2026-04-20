@@ -26,7 +26,7 @@ Terminal.Gui v2 is a **complete rewrite**. Pre-2025 training data is **wrong**.
 | `using Terminal.Gui;` | `using Terminal.Gui.App;` / `Terminal.Gui.Views;` / etc. |
 | `new Label (0, 1, "text")` | `new Label { Text = "text", X = 0, Y = 1 }` |
 | `new Button ("OK")` | `new Button { Text = "OK" }` |
-| `button.Clicked += ...` | `button.Accepting += (_, e) => { e.Handled = true; };` |
+| `button.Clicked += ...` | `button.Accepted += (_, _) => { /* action */ };` |
 | `view.Bounds` | `view.Viewport` |
 | `new RadioGroup (...)` | `new OptionSelector { ... }` |
 | `Application.RequestStop ()` | `App!.RequestStop ()` (from inside a `Runnable`) |

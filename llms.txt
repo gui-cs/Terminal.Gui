@@ -23,7 +23,7 @@
 | `using Terminal.Gui;` | `using Terminal.Gui.App;` / `Terminal.Gui.Views;` / etc. |
 | `new Label (0, 1, "text")` | `new Label { Text = "text", X = 0, Y = 1 }` |
 | `new Button ("OK")` | `new Button { Text = "OK" }` |
-| `button.Clicked += ...` | `button.Accepting += (_, e) => { e.Handled = true; };` |
+| `button.Clicked += ...` | `button.Accepted += (_, _) => { /* action */ };` |
 | `view.Bounds` | `view.Viewport` |
 | `LayoutStyle.Computed` | Removed — all layout is declarative via `Pos`/`Dim` |
 | `new RadioGroup (...)` | `new OptionSelector { ... }` |
@@ -83,10 +83,9 @@ public sealed class MainWindow : Runnable
             Y = Pos.Center ()
         };
 
-        button.Accepting += (_, e) =>
+        button.Accepted += (_, _) =>
         {
             MessageBox.Query (App!, "Hello", "Button was clicked!", "OK");
-            e.Handled = true;
         };
 
         Add (button);
@@ -127,7 +126,7 @@ Width = Dim.Percent (50);   // Percentage of SuperView
 | Control | Purpose | Notes |
 |---------|---------|-------|
 | `Label` | Display text | Use `Text` property |
-| `Button` | Clickable button | Use `Accepting` event, NOT `Clicked` |
+| `Button` | Clickable button | Use `Accepted` event, NOT `Clicked` |
 | `TextField` | Single-line text input | |
 | `TextView` | Multi-line text editor | |
 | `CheckBox` | Boolean toggle | `CheckedState` property |
@@ -148,11 +147,10 @@ Width = Dim.Percent (50);   // Percentage of SuperView
 ### Event Handling
 
 ```csharp
-// Button click — always use Accepting, never Clicked
-button.Accepting += (_, e) =>
+// Button click — always use Accepted (post-event), never Clicked
+button.Accepted += (_, _) =>
 {
-    // Handle button press
-    e.Handled = true;  // Always set Handled!
+    // Handle button press — no e.Handled needed for post-events
 };
 
 // List selection changed
@@ -189,11 +187,10 @@ public sealed class LoginDialog : Runnable<string?>
             IsDefault = true
         };
 
-        okButton.Accepting += (_, e) =>
+        okButton.Accepted += (_, _) =>
         {
             Result = userField.Text;
             App!.RequestStop ();
-            e.Handled = true;
         };
 
         Add (userLabel, userField, okButton);
@@ -317,20 +314,18 @@ public sealed class FormWindow : Runnable
             IsDefault = true
         };
 
-        submitButton.Accepting += (_, e) =>
+        submitButton.Accepted += (_, _) =>
         {
             if (string.IsNullOrWhiteSpace (nameField.Text))
             {
                 errorLabel.Text = "Name is required";
                 nameField.SetFocus ();
-                e.Handled = true;
 
                 return;
             }
 
             MessageBox.Query (App!, "Success", $"Welcome, {nameField.Text}!", "OK");
             App!.RequestStop ();
-            e.Handled = true;
         };
 
         Add (nameLabel, nameField, emailLabel, emailField, errorLabel, submitButton);
@@ -344,12 +339,11 @@ public sealed class FormWindow : Runnable
 
 ### API Correctness (All Users)
 
-1. **`Accepting` not `Clicked`** — `Clicked` does not exist in v2
+1. **`Accepted` not `Clicked`** — `Clicked` does not exist in v2. Use `Accepted` (post-event) for simple handlers. Use `Accepting` (pre-event, cancelable) only when you need to prevent the action.
 2. **`Runnable` not `Toplevel`** — `Toplevel` does not exist in v2
 3. **Instance-based app** — `Application.Create ().Init ()` returns `IApplication`
-4. **Always `e.Handled = true`** — In `Accepting` handlers
-5. **`App!.RequestStop ()`** — Not `Application.RequestStop ()`
-6. **SubView/SuperView** — Never "child"/"parent"/"container" in docs/discussion
+4. **`App!.RequestStop ()`** — Not `Application.RequestStop ()`
+5. **SubView/SuperView** — Never "child"/"parent"/"container" in docs/discussion
 
 ### Code Style (Library Contributors Only)
 

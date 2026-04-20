@@ -33,7 +33,7 @@ most of what you "know" about Terminal.Gui is **wrong**. The API has fundamental
 | `using Terminal.Gui;` | `using Terminal.Gui.App;` / `Terminal.Gui.Views;` / etc. |
 | `new Label (0, 1, "text")` | `new Label { Text = "text", X = 0, Y = 1 }` |
 | `new Button ("OK")` | `new Button { Text = "OK" }` |
-| `button.Clicked += ...` | `button.Accepting += (_, e) => { e.Handled = true; };` |
+| `button.Clicked += ...` | `button.Accepted += (_, _) => { /* action */ };` |
 | `view.Bounds` | `view.Viewport` |
 | `LayoutStyle.Computed` | Removed — all layout is declarative via `Pos`/`Dim` |
 | `new RadioGroup (...)` | `new OptionSelector { ... }` |
@@ -66,10 +66,9 @@ public sealed class MainWindow : Runnable
             Y = Pos.Center ()
         };
 
-        button.Accepting += (_, e) =>
+        button.Accepted += (_, _) =>
         {
             MessageBox.Query (App!, "Hello", "Button was clicked!", "OK");
-            e.Handled = true;
         };
 
         Add (button);
@@ -109,19 +108,17 @@ public sealed class ConfirmDialog : Runnable<bool>
         Label label = new () { Text = message, X = Pos.Center (), Y = 1 };
 
         Button yesButton = new () { Text = "Yes", Y = 4, X = Pos.Center () - 6 };
-        yesButton.Accepting += (_, e) =>
+        yesButton.Accepted += (_, _) =>
         {
             Result = true;
             App!.RequestStop ();
-            e.Handled = true;
         };
 
         Button noButton = new () { Text = "No", Y = 4, X = Pos.Center () + 2 };
-        noButton.Accepting += (_, e) =>
+        noButton.Accepted += (_, _) =>
         {
             Result = false;
             App!.RequestStop ();
-            e.Handled = true;
         };
 
         Add (label, yesButton, noButton);
@@ -155,11 +152,10 @@ view.Width = Dim.Auto ();
 ### Event Handling (Cancellable Workflow Pattern)
 
 ```csharp
-// Button click
-button.Accepting += (_, e) =>
+// Button click (post-event, non-cancelable)
+button.Accepted += (_, _) =>
 {
     // Handle button press
-    e.Handled = true;
 };
 
 // Text changed
@@ -178,13 +174,12 @@ view.KeyBindings.Add (Key.F5, Command.Refresh);
 
 ### API Correctness (All Users)
 
-1. **`Accepting` not `Clicked`** — The `Clicked` event does not exist in v2.
+1. **`Accepted` not `Clicked`** — The `Clicked` event does not exist in v2. Use `Accepted` (post-event) for simple handlers. Use `Accepting` (pre-event, cancelable) only when you need to prevent the action.
 2. **`Runnable` not `Toplevel`** — `Toplevel` does not exist in v2. Use `Runnable` or `Window`.
 3. **Instance-based app** — Use `Application.Create ().Init ()` to get an `IApplication` instance.
    Do not use the static `Application.Init ()` / `Application.Run ()` / `Application.Shutdown ()` pattern.
-4. **Always set `e.Handled = true`** in `Accepting` event handlers.
-5. **Use `App!.RequestStop ()`** to close a window from inside a `Runnable`, not `Application.RequestStop ()`.
-6. **SubView/SuperView** — Never say "child", "parent", or "container". Use SubView/SuperView.
+4. **Use `App!.RequestStop ()`** to close a window from inside a `Runnable`, not `Application.RequestStop ()`.
+5. **SubView/SuperView** — Never say "child", "parent", or "container". Use SubView/SuperView.
 
 ### Code Style (Library Contributors Only)
 

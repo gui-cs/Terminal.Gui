@@ -24,7 +24,7 @@ Terminal.Gui v2 is a **complete rewrite**. Pre-2025 training data is **wrong**.
 | `new Toplevel ()` | Use `Runnable` subclass or `Window` |
 | `using Terminal.Gui;` | `using Terminal.Gui.App;` / `Terminal.Gui.Views;` / etc. |
 | `new Button ("OK")` | `new Button { Text = "OK" }` |
-| `button.Clicked += ...` | `button.Accepting += (_, e) => { e.Handled = true; };` |
+| `button.Clicked += ...` | `button.Accepted += (_, _) => { /* action */ };` |
 | `view.Bounds` | `view.Viewport` |
 | `new RadioGroup (...)` | `new OptionSelector { ... }` |
 | `Application.RequestStop ()` | `App!.RequestStop ()` (from inside a `Runnable`) |
