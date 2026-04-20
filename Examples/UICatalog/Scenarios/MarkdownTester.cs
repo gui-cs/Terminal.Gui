@@ -14,7 +14,14 @@ public class MarkdownTester : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        Window window = new () { Title = "Markdown Tester", Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        Window window = new ()
+        {
+            Title = "Markdown Tester",
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            BorderStyle = LineStyle.None,
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent)
+        };
 
         // --- Source editor (top half) ---
         FrameView editorFrame = new ()
@@ -24,7 +31,7 @@ public class MarkdownTester : Scenario
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
-            Height = Dim.Percent (40)
+            Height = Dim.Percent (40),
         };
         editorFrame.Border.Thickness = new Thickness (0, 2, 0, 0);
 
@@ -59,8 +66,7 @@ public class MarkdownTester : Scenario
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             Text = Markdown.DefaultMarkdownSample,
-            SyntaxHighlighter = new TextMateSyntaxHighlighter (),
-            UseThemeBackground = true
+            SyntaxHighlighter = new TextMateSyntaxHighlighter ()
         };
 
         previewFrame.Add (preview);
@@ -88,7 +94,7 @@ public class MarkdownTester : Scenario
 
         Shortcut themeShortcut = new () { Title = "Theme", CommandView = themeDropDown };
 
-        CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = CheckState.UnChecked };
+        CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = preview.UseThemeBackground ? CheckState.Checked : CheckState.UnChecked };
 
         themeBgCheckBox.ValueChanged += (_, e) =>
                                         {

@@ -142,6 +142,8 @@ public partial class Markdown
 
             MarkdownCodeBlock codeBlock = new ()
             {
+                SyntaxHighlighter = SyntaxHighlighter,
+                ThemeBackground = SyntaxHighlighter?.DefaultBackground,
                 StyledLines = codeLines,
                 X = 0,
                 Y = start,

@@ -60,7 +60,7 @@ public class Deepdives : Scenario
 
         _markdownView = new Markdown
         {
-            Width = Dim.Fill (), Height = Dim.Fill (), SyntaxHighlighter = new TextMateSyntaxHighlighter (ThemeName.Abbys), UseThemeBackground = true
+            Width = Dim.Fill (), Height = Dim.Fill (), SyntaxHighlighter = new TextMateSyntaxHighlighter (ThemeName.Abbys)
         };
 
         _markdownView.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
@@ -134,7 +134,7 @@ public class Deepdives : Scenario
 
         Shortcut themeShortcut = new () { Text = "_Theme:", CommandView = themeDropDown, MouseHighlightStates = MouseState.None };
 
-        CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = CheckState.UnChecked };
+        CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = _markdownView.UseThemeBackground ? CheckState.Checked : CheckState.UnChecked };
 
         themeBgCheckBox.ValueChanged += (_, e) =>
                                         {

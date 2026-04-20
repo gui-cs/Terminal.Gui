@@ -1356,11 +1356,11 @@ public class MarkdownViewTests (ITestOutputHelper output)
     // Copilot
 
     [Fact]
-    public void UseThemeBackground_True_CodeBlock_Has_Distinct_Background ()
+    public void UseThemeBackground_True_CodeBlock_Uses_Theme_Background ()
     {
         // Copilot
-        // When UseThemeBackground is true, the code block should have a background
-        // distinct from the main content (Code role background, not theme background).
+        // When UseThemeBackground is true, the code block should use the highlighter's
+        // DefaultBackground — matching the theme, not the dark VisualRole.Code background.
         IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (20, 6);
@@ -1388,13 +1388,9 @@ public class MarkdownViewTests (ITestOutputHelper output)
         Cell [,]? contents = app.Driver.Contents;
         Assert.NotNull (contents);
 
-        // Row 0 = "Hello" (main content with theme bg)
-        Color mainBg = contents! [0, 0].Attribute!.Value.Background;
-
-        // Row 2 = code block line "code" (should have Code role background, distinct from main)
-        Color codeBg = contents [2, 0].Attribute!.Value.Background;
-
-        Assert.NotEqual (mainBg, codeBg);
+        // Row 2 = code block line "code" — should use theme background
+        Color codeBg = contents! [2, 0].Attribute!.Value.Background;
+        Assert.Equal (themeBg, codeBg);
 
         window.Dispose ();
         app.Dispose ();
@@ -1439,6 +1435,186 @@ public class MarkdownViewTests (ITestOutputHelper output)
         // The code block background should also differ from the main content background
         Color mainBg = contents [0, 0].Attribute!.Value.Background;
         Assert.NotEqual (mainBg, textBg);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void CodeBlock_Uses_Highlighter_DefaultBackground_When_UseThemeBackground_True ()
+    {
+        // Copilot
+        // When UseThemeBackground is true and a SyntaxHighlighter is set,
+        // the MarkdownCodeBlock SubViews must use the highlighter's DefaultBackground
+        // as their ThemeBackground — NOT the VisualRole.Code dark background.
+        // This is the bug: with a light theme (e.g., atomonelight), the code block
+        // background is dark because ThemeBackground is never set on the code block views.
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (30, 10);
+
+        Color themeBg = new (250, 250, 250); // Light theme background
+        ThemeBackgroundHighlighter highlighter = new (themeBg);
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+
+        Terminal.Gui.Views.Markdown mv = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            SyntaxHighlighter = highlighter,
+            UseThemeBackground = true,
+            Text = "Hello\n\n```csharp\nvar x = 1;\n```"
+        };
+        mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Find the MarkdownCodeBlock SubView
+        MarkdownCodeBlock? codeBlockView = null;
+
+        foreach (View sub in mv.SubViews)
+        {
+            if (sub is not MarkdownCodeBlock cb)
+            {
+                continue;
+            }
+            codeBlockView = cb;
+
+            break;
+        }
+
+        Assert.NotNull (codeBlockView);
+
+        // The code block's ThemeBackground must be set to the highlighter's DefaultBackground
+        Assert.Equal (themeBg, codeBlockView.ThemeBackground);
+
+        // Verify the rendered code block background matches the theme background
+        Cell [,]? contents = app.Driver.Contents;
+        Assert.NotNull (contents);
+
+        // Row 2 = code block line "var x = 1;"
+        Color codeBg = contents! [2, 0].Attribute!.Value.Background;
+        Assert.Equal (themeBg, codeBg);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void CodeBlock_Uses_Highlighter_DefaultBackground_When_UseThemeBackground_False ()
+    {
+        // Copilot
+        // Even when UseThemeBackground is false, if a SyntaxHighlighter is set,
+        // the MarkdownCodeBlock SubViews should use the highlighter's DefaultBackground
+        // for their code block background (just like standalone MarkdownCodeBlock does
+        // via the CodeLines setter). The code block should NOT use VisualRole.Code
+        // when a highlighter provides a DefaultBackground.
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (30, 10);
+
+        Color themeBg = new (250, 250, 250); // Light theme background
+        ThemeBackgroundHighlighter highlighter = new (themeBg);
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+
+        Terminal.Gui.Views.Markdown mv = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            SyntaxHighlighter = highlighter,
+            UseThemeBackground = false,
+            Text = "Hello\n\n```csharp\nvar x = 1;\n```"
+        };
+        mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Find the MarkdownCodeBlock SubView
+        MarkdownCodeBlock? codeBlockView = null;
+
+        foreach (View sub in mv.SubViews)
+        {
+            if (sub is not MarkdownCodeBlock cb)
+            {
+                continue;
+            }
+            codeBlockView = cb;
+
+            break;
+        }
+
+        Assert.NotNull (codeBlockView);
+
+        // The code block's ThemeBackground must be the highlighter's DefaultBackground
+        Assert.Equal (themeBg, codeBlockView.ThemeBackground);
+
+        // Verify the rendered code block background matches the theme background
+        Cell [,]? contents = app.Driver.Contents;
+        Assert.NotNull (contents);
+
+        // Row 2 = code block line
+        Color codeBg = contents! [2, 0].Attribute!.Value.Background;
+        Assert.Equal (themeBg, codeBg);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void CodeBlock_SyntaxHighlighter_Is_Passed_To_SubView ()
+    {
+        // Copilot
+        // The MarkdownCodeBlock SubViews created by SyncCodeBlockViews must receive
+        // the parent Markdown view's SyntaxHighlighter so that GetAttributeForSegment
+        // can query the highlighter for scope-specific attributes.
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (30, 10);
+
+        Color themeBg = new (250, 250, 250);
+        ThemeBackgroundHighlighter highlighter = new (themeBg);
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        Terminal.Gui.Views.Markdown mv = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            SyntaxHighlighter = highlighter,
+            UseThemeBackground = true,
+            Text = "```\ncode\n```"
+        };
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        // Find the MarkdownCodeBlock SubView
+        MarkdownCodeBlock? codeBlockView = null;
+
+        foreach (View sub in mv.SubViews)
+        {
+            if (sub is not MarkdownCodeBlock cb)
+            {
+                continue;
+            }
+            codeBlockView = cb;
+
+            break;
+        }
+
+        Assert.NotNull (codeBlockView);
+
+        // The code block must have the parent's SyntaxHighlighter set
+        Assert.Same (highlighter, codeBlockView.SyntaxHighlighter);
 
         window.Dispose ();
         app.Dispose ();
