@@ -18,7 +18,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
         Assert.True (view.CanFocus);
         Assert.Equal (string.Empty, view.Text);
         Assert.Equal (0, view.LineCount);
-        Assert.False (view.UseThemeBackground);
+        Assert.True (view.UseThemeBackground);
     }
 
     [Fact]

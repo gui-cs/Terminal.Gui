@@ -209,8 +209,7 @@ static void RunFullScreen (List<string> files, ThemeName syntaxTheme)
     {
         Width = Dim.Fill (),
         Height = Dim.Fill (1), // leave room for StatusBar
-        SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme),
-        UseThemeBackground = true
+        SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme)
     };
 
     // Vertical scrollbar is already enabled by MarkdownView constructor
