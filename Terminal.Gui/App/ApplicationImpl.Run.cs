@@ -7,7 +7,7 @@ namespace Terminal.Gui.App;
 internal partial class ApplicationImpl
 {
     // Lock object to protect session stack operations and cached state updates
-    private readonly object _sessionStackLock = new ();
+    private readonly Lock _sessionStackLock = new ();
 
     #region Session State - Stack and TopRunnable
 
@@ -225,10 +225,11 @@ internal partial class ApplicationImpl
         }
 
         // Begin the session (adds to stack, raises IsRunningChanging/IsRunningChanged)
-        SessionToken? token;
 
-        // Find it on the stack
-        token = runnable.IsRunning ? SessionStack?.FirstOrDefault (st => st.Runnable == runnable) : Begin (runnable);
+        SessionToken? token =
+
+            // Find it on the stack
+            runnable.IsRunning ? SessionStack?.FirstOrDefault (st => st.Runnable == runnable) : Begin (runnable);
 
         if (token is null)
         {

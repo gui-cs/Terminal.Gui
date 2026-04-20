@@ -592,6 +592,13 @@ public interface IApplication : IDisposable
     /// </remarks>
     public void LayoutAndDraw (bool forceRedraw = false);
 
+    /// <summary>Raised when the <see cref="LayoutAndDraw"/> has completed and one or more Views has been laid out or drawn.</summary>
+    /// <remarks>
+    ///     This is not raised every iteration; or call to LayoutAndDraw. It is only raised if View.Draw or View.Layout was called
+    ///     on at least one View in the app.
+    /// </remarks>
+    public event EventHandler<EventArgs>? LayoutAndDrawComplete;
+
     #endregion Layout and Drawing
 
     #region Navigation and Popover
@@ -672,4 +679,5 @@ public interface IApplication : IDisposable
     /// </summary>
     /// <returns>A string representation of the Application </returns>
     public string ToString ();
+
 }
