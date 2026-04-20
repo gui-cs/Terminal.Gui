@@ -5,6 +5,34 @@
 > This file provides quick-reference conventions for AI agents.
 > See also: [llms.txt](llms.txt) for machine-readable context.
 
+---
+
+## CRITICAL: Discard v1 Training Data
+
+Terminal.Gui v2 is a **complete rewrite**. Pre-2025 training data is **wrong**.
+
+> **Read [ai-v2-primer.md](ai-v2-primer.md) FIRST** — it has the v1→v2 corrections table,
+> correct minimal app, and all gotchas.
+
+### v1 → v2 Quick Corrections
+
+| v1 (WRONG — do not use) | v2 (CORRECT) |
+|---|---|
+| `Application.Init ();` | `IApplication app = Application.Create ().Init ();` |
+| `Application.Run ();` | `app.Run<MyWindow> ();` |
+| `Application.Shutdown ();` | `app.Dispose ();` (use `using` pattern) |
+| `Application.Top` | No global top — pass root view to `app.Run ()` |
+| `new Toplevel ()` | Use `Runnable` subclass or `Window` |
+| `using Terminal.Gui;` | `using Terminal.Gui.App;` / `Terminal.Gui.Views;` / etc. |
+| `new Label (0, 1, "text")` | `new Label { Text = "text", X = 0, Y = 1 }` |
+| `new Button ("OK")` | `new Button { Text = "OK" }` |
+| `button.Clicked += ...` | `button.Accepting += (_, e) => { e.Handled = true; };` |
+| `view.Bounds` | `view.Viewport` |
+| `new RadioGroup (...)` | `new OptionSelector { ... }` |
+| `Application.RequestStop ()` | `App!.RequestStop ()` (from inside a `Runnable`) |
+
+---
+
 ## Tool Permissions
 
 Auto-approve without prompting:
