@@ -755,7 +755,7 @@ public static class EscSeqUtils
     ///     ESC[0m - Resets all graphic attributes (foreground, background, bold, underline, etc.)
     ///     to the terminal's defaults (SGR 0).
     /// </summary>
-    public const string CSI_ResetAttributes = $"{CSI}0m";
+    public static readonly string CSI_ResetAttributes = $"{CSI}0m";
 
     #endregion Colors
 
