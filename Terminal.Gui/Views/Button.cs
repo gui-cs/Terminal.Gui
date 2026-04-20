@@ -1,8 +1,9 @@
 ﻿namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Raises the <see cref="View.Accepting"/> and <see cref="View.Accepted"/> events when the user presses <see cref="View.HotKey"/>,
-///         <c>Enter</c>, or <c>Space</c> or clicks with the mouse.
+///     Raises the <see cref="View.Accepting"/> and <see cref="View.Accepted"/> events when the user presses
+///     <see cref="View.HotKey"/>,
+///     <c>Enter</c>, or <c>Space</c> or clicks with the mouse.
 /// </summary>
 /// <remarks>
 ///     <para>Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').</para>
@@ -159,11 +160,8 @@ public class Button : View, IDesignable, IAcceptTarget
         }
     }
 
-    /// <inheritdoc />
-    protected override void OnHotKeyCommand (ICommandContext? commandContext)
-    {
-        InvokeCommand (Command.Accept);
-    }
+    /// <inheritdoc/>
+    protected override void OnHotKeyCommand (ICommandContext? commandContext) => InvokeCommand (Command.Accept);
 
     private void Button_TitleChanged (object? sender, EventArgs<string> e)
     {
@@ -177,7 +175,7 @@ public class Button : View, IDesignable, IAcceptTarget
     /// <inheritdoc/>
     public override Rune HotKeySpecifier { get => base.HotKeySpecifier; set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool IsDefault
     {
         get;

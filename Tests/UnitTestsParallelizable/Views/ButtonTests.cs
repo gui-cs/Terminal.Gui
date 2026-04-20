@@ -1047,7 +1047,6 @@ public class ButtonTests
         button.Dispose ();
     }
 
-    // Copilot
     /// <summary>
     ///     Verifies that <see cref="ScrollButton"/> does not create shadow infrastructure during construction
     ///     because its <see cref="Button.OnInitializingShadowStyle"/> override sets

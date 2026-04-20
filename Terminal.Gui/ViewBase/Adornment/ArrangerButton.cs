@@ -85,7 +85,10 @@ internal class ArrangerButton : Button, IOrientation
     }
 
     /// <inheritdoc/>
-    /// <remarks>Sets <see cref="ValueChangingEventArgs{T}.NewValue"/> to <see langword="null"/> so that no shadow infrastructure is allocated by default for arranger buttons.</remarks>
+    /// <remarks>
+    ///     Sets <see cref="ValueChangingEventArgs{T}.NewValue"/> to <see langword="null"/> so that no shadow infrastructure is
+    ///     allocated by default for arranger buttons.
+    /// </remarks>
     protected override void OnInitializingShadowStyle (ValueChangingEventArgs<ShadowStyles?> args) => args.NewValue = null;
 
     private ArrangeButtons _buttonType = (ArrangeButtons)(-1);
