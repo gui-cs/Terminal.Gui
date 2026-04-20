@@ -18,7 +18,7 @@
 # - develop: Develop branch for V2
 #
 # Package Naming:
-# - from develop: 2.1.0-develop.1 (minor version increments)
+# - from develop: 2.0.0-develop.1 (patch version increments)
 # - from main (pre-release): 2.0.0-prealpha.1 or 2.0.0-beta.1
 # - from main (release): 2.0.0 (patch version increments)
 #
@@ -46,8 +46,8 @@ branches:
     regex: develop
     # Adds 'develop' as pre-release label (e.g., 2.1.0-develop.1)
     label: develop
-    # Increments minor version (x.y+1.z) on commits
-    increment: Minor
+    # Increments patch version (x.y.z+1) on commits
+    increment: Patch
     # No source branches specified as this is the root of development
     source-branches: []
     # Indicates this branch feeds into release branches
