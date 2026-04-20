@@ -149,13 +149,11 @@ internal class TextModel
                 {
                     continue;
                 }
-                int length = maxLength;
-                _cachedMaxWidthPerLine = _cachedMaxWidthPerLine.Where (kvp => kvp.Value > length).ToDictionary (kvp => kvp.Key, kvp => kvp.Value);
-                _cachedMaxWidthPerLine.Add (i, maxLength);
+                _cachedMaxWidthPerLine = new Dictionary<int, int> { { i, maxLength } };
             }
             else if (maxLength == colsWidth)
             {
-                _cachedMaxWidthPerLine [i] = colsWidth;
+                _cachedMaxWidthPerLine [i] = maxLength;
             }
         }
 
