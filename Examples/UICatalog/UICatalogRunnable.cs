@@ -913,7 +913,7 @@ public sealed class UICatalogRunnable : Runnable
         {
             Width = Dim.Auto (),
             Height = Dim.Auto (),
-            Text = "v2 - Beta",
+            Text = $"Terminal.Gui {UICatalog.GetLibraryVersion ()}",
             X = Pos.Center (),
             Y = Pos.Bottom (logo) + 1
         };

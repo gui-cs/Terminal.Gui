@@ -34,7 +34,7 @@ branches:
     # Matches the main branch
     regex: ^main$
     # Uses 'alpha' as pre-release label before `beta`
-    label: beta
+    label: rc
     # Increments patch version (x.y.z+1) on commits
     increment: Patch
     # Specifies develop as the source branch
@@ -70,19 +70,27 @@ branches:
   #   source-branches: ['v1_develop']
 
   # Pull Request Branches
-  # Configures versioning for PRs (e.g., 2.0.0-pr.feature-123.1)
+  # Configures versioning for PRs (e.g., 2.0.0-PullRequest5009.1)
   pull-request:
-    # Matches typical PR branch names
-    regex: ^(pull|pull\-requests|pr)[/-]
-    # Uses 'pr' prefix with branch name in the label (e.g., pr.feature-123)
-    label: pr.{BranchName}
-    # Inherits increment strategy from source branch
+    regex: "^(pull|pull\\-requests|pr)[\\/-](?<Number>\\d+)"
+    label: "PullRequest{Number}"
     increment: Inherit
     source-branches:
       - develop
       - main
-    # High weight ensures PR versions sort after regular pre-releases
+      - feature
     pre-release-weight: 30000
+
+  # Feature / Fix / Topic Branches
+  # Matches branches like feature/*, fix/*, issue/*, etc.
+  # Inherits version from develop and uses the branch name as pre-release label.
+  # e.g., if develop is at 2.2.0, fix/foobar produces 2.2.0-fix-foobar.1
+  feature:
+    regex: "^(feature|fix|issue|dependabot|copilot)[\\/-](?<BranchName>.+)"
+    label: "{BranchName}"
+    increment: Inherit
+    source-branches:
+      - develop
 
 # Ignore specific commits if needed (currently empty)
 ignore:

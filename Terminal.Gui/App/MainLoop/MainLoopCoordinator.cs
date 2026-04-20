@@ -17,8 +17,6 @@ namespace Terminal.Gui.App;
 /// <typeparam name="TInputRecord">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
 internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TInputRecord : struct
 {
-    private static readonly TimeSpan DeviceAttributesStartupQueryTimeout = TimeSpan.FromSeconds (1);
-
     /// <summary>
     ///     Creates a new coordinator that will manage the main UI loop and input thread.
     /// </summary>
@@ -269,7 +267,7 @@ internal class MainLoopCoordinator<TInputRecord> : IMainLoopCoordinator where TI
     private void QueueDeviceAttributesProbe (IAnsiStartupGate startupGate)
     {
         IDisposable deviceAttributesQueryCompletionHandle = startupGate.RegisterQuery (AnsiStartupQuery.DeviceAttributesPrimary,
-                                                                                       DeviceAttributesStartupQueryTimeout);
+                                                                                       TimeSpan.FromSeconds (1));
 
         AnsiEscapeSequenceRequest request = new ()
         {
