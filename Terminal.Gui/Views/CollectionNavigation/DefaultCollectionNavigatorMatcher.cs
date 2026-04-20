@@ -1,6 +1,3 @@
-
-
-
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -14,10 +11,13 @@ internal class DefaultCollectionNavigatorMatcher : ICollectionNavigatorMatcher
     public StringComparison Comparer { get; set; } = StringComparison.InvariantCultureIgnoreCase;
 
     /// <inheritdoc/>
-    public virtual bool IsMatch (string search, object? value) { return value?.ToString ()?.StartsWith (search, Comparer) ?? false; }
+    public virtual bool IsMatch (string search, object? value)
+    {
+        return value?.ToString ()?.StartsWith (search, Comparer) ?? false;
+    }
 
     /// <summary>
-    ///     Returns true if <paramref name="key"/> is key searchable key (e.g. letters, numbers, etc) that are valid to pass
+    ///     Returns true if <paramref name="key"/> is key searchable key (e.g. letters, numbers, etc.) that are valid to pass
     ///     to this class for search filtering.
     /// </summary>
     /// <param name="key"></param>
@@ -26,6 +26,6 @@ internal class DefaultCollectionNavigatorMatcher : ICollectionNavigatorMatcher
     {
         Rune rune = key.AsRune;
 
-        return rune != default && !Rune.IsControl (rune);
+        return rune != default (Rune) && !Rune.IsControl (rune) && key is { IsAlt: false, IsCtrl: false };
     }
 }
