@@ -1350,4 +1350,99 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     #endregion
+
+    #region CodeBlock background attribute tests
+
+    // Copilot
+
+    [Fact]
+    public void UseThemeBackground_True_CodeBlock_Has_Distinct_Background ()
+    {
+        // Copilot
+        // When UseThemeBackground is true, the code block should have a background
+        // distinct from the main content (Code role background, not theme background).
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (20, 6);
+
+        Color themeBg = new (30, 30, 30);
+        ThemeBackgroundHighlighter highlighter = new (themeBg);
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
+
+        Terminal.Gui.Views.Markdown mv = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            SyntaxHighlighter = highlighter,
+            UseThemeBackground = true,
+            Text = "Hello\n\n```\ncode\n```"
+        };
+        mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        Cell [,]? contents = app.Driver.Contents;
+        Assert.NotNull (contents);
+
+        // Row 0 = "Hello" (main content with theme bg)
+        Color mainBg = contents! [0, 0].Attribute!.Value.Background;
+
+        // Row 2 = code block line "code" (should have Code role background, distinct from main)
+        Color codeBg = contents [2, 0].Attribute!.Value.Background;
+
+        Assert.NotEqual (mainBg, codeBg);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void UseThemeBackground_False_CodeBlock_Text_Matches_Fill_Background ()
+    {
+        // Copilot
+        // When UseThemeBackground is false, the code block text segments should use
+        // the same background as the code block fill (Code role background).
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (20, 6);
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
+
+        Terminal.Gui.Views.Markdown mv = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            UseThemeBackground = false,
+            Text = "Hello\n\n```\ncode\n```"
+        };
+        mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        Cell [,]? contents = app.Driver.Contents;
+        Assert.NotNull (contents);
+
+        // Row 2 = code block line "code"
+        // The text cell (col 0, 'c') background should match the fill cell (col 10, empty) background
+        Color textBg = contents! [2, 0].Attribute!.Value.Background;
+        Color fillBg = contents [2, 10].Attribute!.Value.Background;
+
+        Assert.Equal (textBg, fillBg);
+
+        // The code block background should also differ from the main content background
+        Color mainBg = contents [0, 0].Attribute!.Value.Background;
+        Assert.NotEqual (mainBg, textBg);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    #endregion
 }
