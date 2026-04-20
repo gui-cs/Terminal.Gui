@@ -565,7 +565,7 @@ public partial class TextView
             SetNeedsDraw ();
 
             List<Cell> line = GetCurrentLine ();
-            (int size, int length) dSize = TextModel.DisplaySize (line, 0, CurrentColumn, true, TabWidth);
+            (int size, int length) dSize = TextModel.DisplaySize (line, 0, line.Count, true, TabWidth);
 
             if (_model.ShouldInvalidateMaxWidthCache (CurrentRow, true, dSize.size))
             {

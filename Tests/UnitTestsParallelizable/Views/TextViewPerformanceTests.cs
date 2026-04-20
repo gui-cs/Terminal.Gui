@@ -354,6 +354,30 @@ public class TextViewPerformanceTests
         Assert.Equal (size3.Width, size4.Width);
     }
 
+    [Fact]
+    public void ContentSize_Width_Updates_Correctly_When_Text_Is_Inserted_At_Middle_Of_Longest_Line_Before_AdjustScroll ()
+    {
+        TextView tv = new () { Width = 80, Height = 10, Text = "Short line\nThis is the longest line in the document\nMedium line" };
+        tv.BeginInit ();
+        tv.EndInit ();
+        tv.LayoutSubViews ();
+
+        Size initialSize = tv.GetContentSize ();
+
+        tv.ContentsChanged += (_, _) =>
+        {
+            Size newSize = tv.GetContentSize ();
+            Assert.True (newSize.Width > initialSize.Width, $"Content width should not decrease after mutation. Initial: {initialSize.Width}, New: {newSize.Width}");
+        };
+
+        // Insert text in the middle of the longest line to make it even longer
+        tv.InsertionPoint = new Point (10, 1); // Position cursor in the middle of the longest line
+        tv.NewKeyDownEvent (Key.A); // Simulate typing 'A' to increase line length
+
+        Size afterInsertSize = tv.GetContentSize ();
+        Assert.True (afterInsertSize.Width > initialSize.Width, $"Width should increase after inserting longer text. Was {initialSize.Width}, now {afterInsertSize.Width}");
+    }
+
     #endregion
 
     #region Additional tests for TextModel.ShouldInvalidateMaxWidthCache logic
