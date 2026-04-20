@@ -58,10 +58,7 @@ public class Deepdives : Scenario
             Height = Dim.Fill (1)
         };
 
-        _markdownView = new Markdown
-        {
-            Width = Dim.Fill (), Height = Dim.Fill (), SyntaxHighlighter = new TextMateSyntaxHighlighter (ThemeName.Abbys)
-        };
+        _markdownView = new Markdown { Width = Dim.Fill (), Height = Dim.Fill (), SyntaxHighlighter = new TextMateSyntaxHighlighter (ThemeName.Abbys) };
 
         _markdownView.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 
@@ -123,13 +120,7 @@ public class Deepdives : Scenario
                                               return;
                                           }
 
-                                          TextMateSyntaxHighlighter highlighter = new (themeName);
-                                          _markdownView.SyntaxHighlighter = highlighter;
-
-                                          // Force re-layout so code blocks pick up new theme
-                                          string text = _markdownView.Text;
-                                          _markdownView.Text = string.Empty;
-                                          _markdownView.Text = text;
+                                          _markdownView.SyntaxHighlighter = new TextMateSyntaxHighlighter (themeName);
                                       };
 
         Shortcut themeShortcut = new () { Text = "_Theme:", CommandView = themeDropDown, MouseHighlightStates = MouseState.None };
@@ -144,11 +135,6 @@ public class Deepdives : Scenario
                                             }
 
                                             _markdownView.UseThemeBackground = e.NewValue == CheckState.Checked;
-
-                                            // Force re-layout
-                                            string text = _markdownView.Text;
-                                            _markdownView.Text = string.Empty;
-                                            _markdownView.Text = text;
                                         };
 
         Shortcut themeBgShortcut = new () { CommandView = themeBgCheckBox };

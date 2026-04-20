@@ -1256,6 +1256,22 @@ public class MarkdownViewTests (ITestOutputHelper output)
         public Attribute? GetAttributeForScope (MarkdownStyleRole role) => null;
     }
 
+    /// <summary>
+    ///     A mock highlighter that returns segments with explicit <see cref="Attribute"/> values,
+    ///     simulating real TextMate-style tokenization where each token carries its own colors.
+    /// </summary>
+    private sealed class ExplicitAttributeHighlighter (Color tokenFg, Color tokenBg) : ISyntaxHighlighter
+    {
+        public IReadOnlyList<StyledSegment> Highlight (string code, string? language)
+            => [new (code, MarkdownStyleRole.CodeBlock, attribute: new Attribute (tokenFg, tokenBg))];
+
+        public void ResetState () { }
+
+        public Color? DefaultBackground { get; } = tokenBg;
+
+        public Attribute? GetAttributeForScope (MarkdownStyleRole role) => null;
+    }
+
     #endregion
 
     #region Viewport scroll position
@@ -1356,19 +1372,23 @@ public class MarkdownViewTests (ITestOutputHelper output)
     // Copilot
 
     [Fact]
-    public void UseThemeBackground_True_CodeBlock_Uses_Theme_Background ()
+    public void UseThemeBackground_True_CodeBlock_Is_Distinct_From_Body ()
     {
         // Copilot
-        // When UseThemeBackground is true, the code block should use the highlighter's
-        // DefaultBackground — matching the theme, not the dark VisualRole.Code background.
-        IApplication app = Application.Create ();
+        // When UseThemeBackground is true and a SyntaxHighlighter is set, the code block
+        // must have a background that is DISTINCT from the body (which uses DefaultBackground)
+        // but still derived from the theme (so token colors remain readable).
+        using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (20, 6);
 
         Color themeBg = new (30, 30, 30);
         ThemeBackgroundHighlighter highlighter = new (themeBg);
 
-        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        using Runnable window = new ();
+        window.Width = Dim.Fill ();
+        window.Height = Dim.Fill ();
+        window.BorderStyle = LineStyle.None;
         window.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
 
         Terminal.Gui.Views.Markdown mv = new ()
@@ -1388,11 +1408,60 @@ public class MarkdownViewTests (ITestOutputHelper output)
         Cell [,]? contents = app.Driver.Contents;
         Assert.NotNull (contents);
 
-        // Row 2 = code block line "code" — should use theme background
-        Color codeBg = contents! [2, 0].Attribute!.Value.Background;
-        Assert.Equal (themeBg, codeBg);
+        // Row 0 = "Hello" (body text with theme bg)
+        Color mainBg = contents! [0, 0].Attribute!.Value.Background;
 
-        window.Dispose ();
+        // Row 2 = code block line "code" (should be distinct from body bg)
+        Color codeBg = contents [2, 0].Attribute!.Value.Background;
+
+        Assert.NotEqual (mainBg, codeBg);
+
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void UseThemeBackground_True_CodeBlock_Bg_Derives_From_Theme_Not_Scheme ()
+    {
+        // Copilot
+        // When UseThemeBackground is true with a light theme, the code block should NOT
+        // use the dark VisualRole.Code from the view's (possibly dark) scheme. Instead
+        // it should use a dimmed variant of the highlighter's DefaultBackground.
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (30, 10);
+
+        Color lightThemeBg = new (250, 250, 250); // Light theme bg
+        ThemeBackgroundHighlighter highlighter = new (lightThemeBg);
+
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.Black, new Color (0, 0, 128)))); // Dark scheme bg
+
+        Terminal.Gui.Views.Markdown mv = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            SyntaxHighlighter = highlighter,
+            UseThemeBackground = true,
+            Text = "Hello\n\n```csharp\nvar x = 1;\n```"
+        };
+        mv.SetScheme (new Scheme (new Attribute (Color.Black, new Color (0, 0, 128))));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        Cell [,]? contents = app.Driver.Contents;
+        Assert.NotNull (contents);
+
+        // Row 2 = code block line — bg should be light (derived from light theme), not dark
+        Color codeBg = contents! [2, 0].Attribute!.Value.Background;
+        Assert.False (codeBg.IsDarkColor (), $"Code block bg {codeBg} should be light (derived from light theme), not dark");
+
+        // Code block bg should be the dimmed variant of the theme bg
+        bool isDark = lightThemeBg.IsDarkColor ();
+        Color expectedDimmed = lightThemeBg.GetDimmerColor (0.2, isDark);
+        Assert.Equal (expectedDimmed, codeBg);
+
         app.Dispose ();
     }
 
@@ -1402,11 +1471,11 @@ public class MarkdownViewTests (ITestOutputHelper output)
         // Copilot
         // When UseThemeBackground is false, the code block text segments should use
         // the same background as the code block fill (Code role background).
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (20, 6);
 
-        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
         window.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
 
         Terminal.Gui.Views.Markdown mv = new ()
@@ -1436,135 +1505,52 @@ public class MarkdownViewTests (ITestOutputHelper output)
         Color mainBg = contents [0, 0].Attribute!.Value.Background;
         Assert.NotEqual (mainBg, textBg);
 
-        window.Dispose ();
         app.Dispose ();
     }
 
     [Fact]
-    public void CodeBlock_Uses_Highlighter_DefaultBackground_When_UseThemeBackground_True ()
+    public void CodeBlock_With_Highlighter_Bg_Derives_From_Theme_Regardless_Of_UseThemeBackground ()
     {
         // Copilot
-        // When UseThemeBackground is true and a SyntaxHighlighter is set,
-        // the MarkdownCodeBlock SubViews must use the highlighter's DefaultBackground
-        // as their ThemeBackground — NOT the VisualRole.Code dark background.
-        // This is the bug: with a light theme (e.g., atomonelight), the code block
-        // background is dark because ThemeBackground is never set on the code block views.
-        IApplication app = Application.Create ();
+        // When a SyntaxHighlighter is set (with DefaultBackground), the code block's scheme
+        // is overridden so VisualRole.Code derives from the highlighter bg, not the view's
+        // scheme bg. This ensures token colors remain readable on a compatible background.
+        // This applies regardless of UseThemeBackground.
+        using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (30, 10);
 
-        Color themeBg = new (250, 250, 250); // Light theme background
-        ThemeBackgroundHighlighter highlighter = new (themeBg);
+        Color lightThemeBg = new (250, 250, 250);
+        ThemeBackgroundHighlighter highlighter = new (lightThemeBg);
 
-        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
-        window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.Black, new Color (0, 0, 128)))); // Dark scheme
 
         Terminal.Gui.Views.Markdown mv = new ()
         {
             Width = Dim.Fill (),
             Height = Dim.Fill (),
             SyntaxHighlighter = highlighter,
-            UseThemeBackground = true,
+            UseThemeBackground = false, // Body uses scheme bg, but code block should still use theme-derived bg
             Text = "Hello\n\n```csharp\nvar x = 1;\n```"
         };
-        mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
+        mv.SetScheme (new Scheme (new Attribute (Color.Black, new Color (0, 0, 128))));
         window.Add (mv);
 
         app.Begin (window);
         app.LayoutAndDraw ();
 
-        // Find the MarkdownCodeBlock SubView
-        MarkdownCodeBlock? codeBlockView = null;
-
-        foreach (View sub in mv.SubViews)
-        {
-            if (sub is not MarkdownCodeBlock cb)
-            {
-                continue;
-            }
-            codeBlockView = cb;
-
-            break;
-        }
-
-        Assert.NotNull (codeBlockView);
-
-        // The code block's ThemeBackground must be set to the highlighter's DefaultBackground
-        Assert.Equal (themeBg, codeBlockView.ThemeBackground);
-
-        // Verify the rendered code block background matches the theme background
         Cell [,]? contents = app.Driver.Contents;
         Assert.NotNull (contents);
 
-        // Row 2 = code block line "var x = 1;"
+        // Row 2 = code block — bg should be light (derived from light theme), not the dark scheme bg
         Color codeBg = contents! [2, 0].Attribute!.Value.Background;
-        Assert.Equal (themeBg, codeBg);
+        Assert.False (codeBg.IsDarkColor (), $"Code block bg {codeBg} should be light (theme-derived), not dark (scheme-derived)");
 
-        window.Dispose ();
-        app.Dispose ();
-    }
+        // Code block fill and text should have matching bg
+        Color fillBg = contents [2, 15].Attribute!.Value.Background;
+        Assert.Equal (codeBg, fillBg);
 
-    [Fact]
-    public void CodeBlock_Uses_Highlighter_DefaultBackground_When_UseThemeBackground_False ()
-    {
-        // Copilot
-        // Even when UseThemeBackground is false, if a SyntaxHighlighter is set,
-        // the MarkdownCodeBlock SubViews should use the highlighter's DefaultBackground
-        // for their code block background (just like standalone MarkdownCodeBlock does
-        // via the CodeLines setter). The code block should NOT use VisualRole.Code
-        // when a highlighter provides a DefaultBackground.
-        IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-        app.Driver!.SetScreenSize (30, 10);
-
-        Color themeBg = new (250, 250, 250); // Light theme background
-        ThemeBackgroundHighlighter highlighter = new (themeBg);
-
-        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
-        window.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
-
-        Terminal.Gui.Views.Markdown mv = new ()
-        {
-            Width = Dim.Fill (),
-            Height = Dim.Fill (),
-            SyntaxHighlighter = highlighter,
-            UseThemeBackground = false,
-            Text = "Hello\n\n```csharp\nvar x = 1;\n```"
-        };
-        mv.SetScheme (new Scheme (new Attribute (Color.Black, Color.White)));
-        window.Add (mv);
-
-        app.Begin (window);
-        app.LayoutAndDraw ();
-
-        // Find the MarkdownCodeBlock SubView
-        MarkdownCodeBlock? codeBlockView = null;
-
-        foreach (View sub in mv.SubViews)
-        {
-            if (sub is not MarkdownCodeBlock cb)
-            {
-                continue;
-            }
-            codeBlockView = cb;
-
-            break;
-        }
-
-        Assert.NotNull (codeBlockView);
-
-        // The code block's ThemeBackground must be the highlighter's DefaultBackground
-        Assert.Equal (themeBg, codeBlockView.ThemeBackground);
-
-        // Verify the rendered code block background matches the theme background
-        Cell [,]? contents = app.Driver.Contents;
-        Assert.NotNull (contents);
-
-        // Row 2 = code block line
-        Color codeBg = contents! [2, 0].Attribute!.Value.Background;
-        Assert.Equal (themeBg, codeBg);
-
-        window.Dispose ();
         app.Dispose ();
     }
 
@@ -1575,14 +1561,14 @@ public class MarkdownViewTests (ITestOutputHelper output)
         // The MarkdownCodeBlock SubViews created by SyncCodeBlockViews must receive
         // the parent Markdown view's SyntaxHighlighter so that GetAttributeForSegment
         // can query the highlighter for scope-specific attributes.
-        IApplication app = Application.Create ();
+        using IApplication app = Application.Create ();
         app.Init (DriverRegistry.Names.ANSI);
         app.Driver!.SetScreenSize (30, 10);
 
         Color themeBg = new (250, 250, 250);
         ThemeBackgroundHighlighter highlighter = new (themeBg);
 
-        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
 
         Terminal.Gui.Views.Markdown mv = new ()
         {
@@ -1616,7 +1602,161 @@ public class MarkdownViewTests (ITestOutputHelper output)
         // The code block must have the parent's SyntaxHighlighter set
         Assert.Same (highlighter, codeBlockView.SyntaxHighlighter);
 
-        window.Dispose ();
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void CodeBlock_With_ExplicitAttribute_Highlighter_Fill_Matches_Text_Bg ()
+    {
+        // Copilot
+        // A real TextMate highlighter returns segments with explicit Attribute (tokenFg, tokenBg).
+        // The code block fill bg (from OnClearingViewport) is a dimmed variant of DefaultBackground.
+        // GetAttributeForSegment must override the explicit attribute's bg so text bg matches fill bg.
+        // Without the fix, text bg = raw theme bg, fill bg = dimmed theme bg → mismatch.
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (30, 8);
+
+        Color tokenFg = new (200, 200, 200);
+        Color tokenBg = new (30, 30, 30);
+        ExplicitAttributeHighlighter highlighter = new (tokenFg, tokenBg);
+
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
+
+        Terminal.Gui.Views.Markdown mv = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            SyntaxHighlighter = highlighter,
+            UseThemeBackground = true,
+            Text = "Hello\n\n```csharp\nvar x = 1;\n```"
+        };
+        mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        Cell [,]? contents = app.Driver.Contents;
+        Assert.NotNull (contents);
+
+        // Row 2 = code block line "var x = 1;"
+        // Text cell bg (col 0) must match fill cell bg (col 20, empty space)
+        Color textBg = contents! [2, 0].Attribute!.Value.Background;
+        Color fillBg = contents [2, 20].Attribute!.Value.Background;
+
+        Assert.Equal (fillBg, textBg);
+
+        // The bg should be the dimmed variant of the theme bg, NOT the raw theme bg
+        bool isDark = tokenBg.IsDarkColor ();
+        Color expectedDimmed = tokenBg.GetDimmerColor (0.2, isDark);
+        Assert.Equal (expectedDimmed, textBg);
+
+        // Token foreground should be preserved
+        Color actualFg = contents [2, 0].Attribute!.Value.Foreground;
+        Assert.Equal (tokenFg, actualFg);
+
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Setting_SyntaxHighlighter_After_Text_Updates_CodeBlock_Bg ()
+    {
+        // Copilot
+        // Setting SyntaxHighlighter on a MarkdownView that already has Text must
+        // invalidate layout so code blocks pick up the new highlighter's theme bg.
+        // This should NOT require re-setting Text (that was a hack).
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (30, 8);
+
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        Terminal.Gui.Views.Markdown mv = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            Text = "Hello\n\n```csharp\nvar x = 1;\n```"
+        };
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        Cell [,]? contents = app.Driver.Contents;
+        Assert.NotNull (contents);
+
+        // Before: code block bg uses VisualRole.Code from scheme
+        Color bgBefore = contents! [2, 0].Attribute!.Value.Background;
+
+        // Now set a highlighter with a light theme bg
+        Color lightThemeBg = new (250, 250, 250);
+        ThemeBackgroundHighlighter highlighter = new (lightThemeBg);
+        mv.SyntaxHighlighter = highlighter;
+
+        // Re-draw WITHOUT re-setting Text
+        app.LayoutAndDraw ();
+
+        contents = app.Driver.Contents;
+
+        // After: code block bg should be derived from the light theme
+        Color bgAfter = contents! [2, 0].Attribute!.Value.Background;
+
+        Assert.NotEqual (bgBefore, bgAfter);
+        Assert.False (bgAfter.IsDarkColor (), $"Code block bg {bgAfter} should be light (theme-derived) after setting highlighter");
+
+        app.Dispose ();
+    }
+
+    [Fact]
+    public void Setting_UseThemeBackground_After_Text_Updates_Without_ReSettingText ()
+    {
+        // Copilot
+        // Changing UseThemeBackground must invalidate layout so body and code blocks update.
+        // This should NOT require re-setting Text (that was a hack).
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (30, 8);
+
+        Color themeBg = new (30, 30, 30);
+        ThemeBackgroundHighlighter highlighter = new (themeBg);
+
+        using Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+        window.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
+
+        Terminal.Gui.Views.Markdown mv = new ()
+        {
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            SyntaxHighlighter = highlighter,
+            UseThemeBackground = false,
+            Text = "Hello\n\n```\ncode\n```"
+        };
+        mv.SetScheme (new Scheme (new Attribute (Color.White, Color.Blue)));
+        window.Add (mv);
+
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        Cell [,]? contents = app.Driver.Contents;
+        Assert.NotNull (contents);
+
+        // Body bg when UseThemeBackground = false → scheme bg (Blue)
+        Color bodyBgBefore = contents! [0, 0].Attribute!.Value.Background;
+        Assert.Equal (Color.Blue, bodyBgBefore);
+
+        // Now toggle UseThemeBackground to true WITHOUT re-setting Text
+        mv.UseThemeBackground = true;
+        app.LayoutAndDraw ();
+
+        contents = app.Driver.Contents;
+
+        // Body bg should now use the theme bg (dark, 30,30,30)
+        Color bodyBgAfter = contents! [0, 0].Attribute!.Value.Background;
+        Assert.NotEqual (bodyBgBefore, bodyBgAfter);
+        Assert.Equal (themeBg, bodyBgAfter);
+
         app.Dispose ();
     }
 

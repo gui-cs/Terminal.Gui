@@ -295,12 +295,7 @@ static void RunFullScreen (List<string> files, ThemeName syntaxTheme)
                                           return;
                                       }
 
-                                      TextMateSyntaxHighlighter highlighter = new (themeName);
-                                      markdownView.SyntaxHighlighter = highlighter;
-
-                                      string text = markdownView.Text;
-                                      markdownView.Text = string.Empty;
-                                      markdownView.Text = text;
+                                      markdownView.SyntaxHighlighter = new TextMateSyntaxHighlighter (themeName);
                                   };
 
     statusItems.Add (new Shortcut { Title = "Theme", CommandView = themeDropDown });
@@ -311,10 +306,6 @@ static void RunFullScreen (List<string> files, ThemeName syntaxTheme)
     themeBgCheckBox.ValueChanged += (_, e) =>
                                     {
                                         markdownView.UseThemeBackground = e.NewValue == CheckState.Checked;
-
-                                        string text = markdownView.Text;
-                                        markdownView.Text = string.Empty;
-                                        markdownView.Text = text;
                                     };
 
     statusItems.Add (new Shortcut { CommandView = themeBgCheckBox });

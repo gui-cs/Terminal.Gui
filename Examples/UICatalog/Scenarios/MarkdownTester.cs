@@ -31,7 +31,7 @@ public class MarkdownTester : Scenario
             X = 0,
             Y = 0,
             Width = Dim.Fill (),
-            Height = Dim.Percent (40),
+            Height = Dim.Percent (40)
         };
         editorFrame.Border.Thickness = new Thickness (0, 2, 0, 0);
 
@@ -65,8 +65,7 @@ public class MarkdownTester : Scenario
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            Text = Markdown.DefaultMarkdownSample,
-            SyntaxHighlighter = new TextMateSyntaxHighlighter ()
+            SyntaxHighlighter = new TextMateSyntaxHighlighter (ThemeName.Abbys)
         };
 
         previewFrame.Add (preview);
@@ -80,32 +79,30 @@ public class MarkdownTester : Scenario
 
         Shortcut quitShortcut = new () { Title = "Quit", Key = Key.Esc, Action = app.RequestStop };
 
-        DropDownList<ThemeName> themeDropDown = new () { Value = ThemeName.DarkPlus, ReadOnly = true, CanFocus = false };
+        DropDownList<ThemeName> themeDropDown = new () { Value = ThemeName.Abbys, ReadOnly = true, CanFocus = false };
 
         themeDropDown.ValueChanged += (_, e) =>
                                       {
-                                          if (e.Value is { } themeName)
+                                          if (e.Value is not { } themeName)
                                           {
-                                              TextMateSyntaxHighlighter highlighter = new (themeName);
-                                              preview.SyntaxHighlighter = highlighter;
-                                              preview.Text = editor.Text;
+                                              return;
                                           }
+                                          preview.SyntaxHighlighter = new TextMateSyntaxHighlighter (themeName);
+                                          preview.Text = editor.Text;
                                       };
 
         Shortcut themeShortcut = new () { Title = "Theme", CommandView = themeDropDown };
 
         CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = preview.UseThemeBackground ? CheckState.Checked : CheckState.UnChecked };
 
-        themeBgCheckBox.ValueChanged += (_, e) =>
-                                        {
-                                            preview.UseThemeBackground = e.NewValue == CheckState.Checked;
-                                            preview.Text = editor.Text;
-                                        };
+        themeBgCheckBox.ValueChanged += (_, e) => { preview.UseThemeBackground = e.NewValue == CheckState.Checked; };
 
         Shortcut themeBgShortcut = new () { CommandView = themeBgCheckBox };
 
         statusBar.Add (themeShortcut, themeBgShortcut, quitShortcut);
         window.Add (statusBar);
+
+        preview.Text = editor.Text;
 
         app.Run (window);
         window.Dispose ();
