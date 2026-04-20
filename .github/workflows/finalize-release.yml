@@ -24,7 +24,7 @@ jobs:
         with:
           ref: main
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.RELEASE_PAT }}
 
       - name: Configure Git
         run: |
@@ -66,7 +66,7 @@ jobs:
 
       - name: Create GitHub Release
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASE_PAT }}
           TAG: ${{ steps.release.outputs.tag }}
           SEMVER: ${{ steps.release.outputs.semver }}
           PRERELEASE: ${{ steps.release.outputs.prerelease }}
@@ -89,7 +89,7 @@ jobs:
 
       - name: Create back-merge PR (main → develop)
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.RELEASE_PAT }}
           TAG: ${{ steps.release.outputs.tag }}
         run: |
           BACKMERGE_BRANCH="backmerge/${TAG}"
