@@ -68,7 +68,7 @@ public class ScrollButton : Button, IOrientation
     }
 
     /// <inheritdoc/>
-    /// <remarks>Returns <see langword="null"/> so that no shadow infrastructure is ever allocated for scroll buttons.</remarks>
+    /// <remarks>Returns <see langword="null"/> so that, by default, no shadow infrastructure is allocated for scroll buttons.</remarks>
     protected override ShadowStyles? GetDefaultShadowStyle () => null;
 
     /// <summary>
