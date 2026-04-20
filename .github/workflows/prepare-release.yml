@@ -89,7 +89,7 @@ jobs:
         run: |
           BRANCH="release/${{ steps.version.outputs.tag }}"
           git checkout -b "$BRANCH"
-          echo "$BRANCH" >> $GITHUB_OUTPUT
+          echo "branch=${BRANCH}" >> $GITHUB_OUTPUT
         id: branch
 
       - name: Update GitVersion.yml label for release type
