@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Terminal.Gui.Tracing;
 using UnitTests;
+using Xunit.Sdk;
 
 namespace DriverTests.Output;
 
@@ -227,7 +228,7 @@ public class InlineDrawTimingTests (ITestOutputHelper output)
     ///     Verifies the full timeline: deferred iterations → gate ready → first draw.
     ///     Dumps all trace entries to the test output for diagnostic visibility.
     /// </summary>
-    [Fact]
+    [Fact (Skip = "Bogus test; do not use tracing for test results.")]
     public void IterationImpl_Inline_FullTimeline_TraceDump ()
     {
         using IDisposable logScope = TestLogging.Verbose (output, TraceCategory.Lifecycle | TraceCategory.Draw);

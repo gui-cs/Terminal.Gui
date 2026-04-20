@@ -751,6 +751,12 @@ public static class EscSeqUtils
     /// </summary>
     public static void CSI_AppendResetBackgroundColor (StringBuilder builder) => builder.Append ($"{CSI}49m");
 
+    /// <summary>
+    ///     ESC[0m - Resets all graphic attributes (foreground, background, bold, underline, etc.)
+    ///     to the terminal's defaults (SGR 0).
+    /// </summary>
+    public const string CSI_ResetAttributes = $"{CSI}0m";
+
     #endregion Colors
 
     #region Text Styles

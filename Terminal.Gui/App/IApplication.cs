@@ -592,6 +592,9 @@ public interface IApplication : IDisposable
     /// </remarks>
     public void LayoutAndDraw (bool forceRedraw = false);
 
+    /// <summary>Raised when the <see cref="LayoutAndDraw"/> has completed.</summary>
+    public event EventHandler<EventArgs>? LayoutAndDrawComplete;
+
     #endregion Layout and Drawing
 
     #region Navigation and Popover
@@ -672,4 +675,5 @@ public interface IApplication : IDisposable
     /// </summary>
     /// <returns>A string representation of the Application </returns>
     public string ToString ();
+
 }
