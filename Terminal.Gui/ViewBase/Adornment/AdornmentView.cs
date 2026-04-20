@@ -151,6 +151,8 @@ public class AdornmentView : View, IAdornmentView, IDesignable
             Adornment.Thickness.Draw (Driver, ViewportToScreen (Viewport), Diagnostics, ToString ());
         }
 
+        SetNeedsDraw ();
+
         return true;
     }
 

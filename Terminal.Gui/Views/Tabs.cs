@@ -155,7 +155,6 @@ public class Tabs : View, IValue<View?>, IDesignable
 
             UpdateTabBorderThickness ();
             SetNeedsLayout ();
-            SetNeedsDraw ();
         }
     }
 
@@ -790,7 +789,6 @@ public class Tabs : View, IValue<View?>, IDesignable
 
             //UpdateZOrder ();
             SetNeedsLayout ();
-            SetNeedsDraw ();
         }
     }
 

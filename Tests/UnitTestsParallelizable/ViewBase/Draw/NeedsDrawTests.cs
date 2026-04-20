@@ -75,9 +75,8 @@ public class NeedsDrawTests : TestDriverBase
 
         view.Layout ();
 
-        // Layout no longer unconditionally calls SetNeedsDraw — only when Frame changes.
-        // Since this view's Frame is unchanged, NeedsDraw remains false.
-        Assert.False (view.NeedsDraw);
+        // NeedsDraw is true after layout and NeedsLayout is false if SubViewsLaidOut doesn't call SetNeedsLayout
+        Assert.True (view.NeedsDraw);
         Assert.False (view.NeedsLayout);
     }
 
@@ -116,9 +115,7 @@ public class NeedsDrawTests : TestDriverBase
         Assert.True (view.NeedsLayout);
 
         view.Layout ();
-        // Layout no longer unconditionally calls SetNeedsDraw — only when Frame changes.
-        // Since this view's Frame is unchanged (Width=2, Height=2 with absolute dims), NeedsDraw remains false.
-        Assert.False (view.NeedsDraw);
+        Assert.True (view.NeedsDraw);
         Assert.False (view.NeedsLayout);
     }
 
@@ -145,8 +142,7 @@ public class NeedsDrawTests : TestDriverBase
         Assert.True (view.NeedsLayout);
 
         view.Layout ();
-        // Layout no longer unconditionally calls SetNeedsDraw — only when Frame changes.
-        Assert.False (view.NeedsDraw);
+        Assert.True (view.NeedsDraw);
         Assert.False (view.NeedsLayout);
 
         view.ClearNeedsDraw ();

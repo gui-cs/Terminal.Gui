@@ -133,14 +133,10 @@ public partial class View
         Padding.View?.SetNeedsDraw ();
         Margin.View?.SetNeedsDraw ();
 
-        // Ensure NeedsDrawRect stays valid for the rest of the draw pipeline (DoClearViewport,
-        // DoDrawText, DoDrawContent, DoRenderLineCanvas) ONLY when this view itself needs drawing.
-        // DrawAdornments() will call Draw() on each adornment view, which ClearNeedsDraw's them.
-        // Without this, NeedsDraw would become false after adornments draw, blocking downstream steps.
-        // We only set it when NeedsDraw is already true (the view needs drawing) — NOT when only
-        // SubViewNeedsDraw is true. This prevents the O(N) cascade where ClearViewport → SetNeedsDraw
-        // propagates to ALL overlapping siblings.
-        if (NeedsDrawRect == Rectangle.Empty && NeedsDraw)
+        // Ensure NeedsDraw is true for the rest of the draw pipeline (DoClearViewport, DoDrawText, etc.)
+        // When adornment Views are null (lightweight), their NeedsDraw doesn't contribute to the parent's
+        // NeedsDraw property. But if we're here, the parent IS drawing, so we must set NeedsDrawRect.
+        if (NeedsDrawRect == Rectangle.Empty)
         {
             NeedsDrawRect = Viewport;
         }

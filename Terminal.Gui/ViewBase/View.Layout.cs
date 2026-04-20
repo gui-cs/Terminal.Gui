@@ -523,22 +523,15 @@ public partial class View // Layout APIs
     /// <returns><see langword="false"/>If the view could not be laid out (typically because a dependencies was not ready). </returns>
     public bool Layout (Size contentSize)
     {
-        Rectangle oldFrame = Frame;
-
         if (!SetRelativeLayout (contentSize))
         {
             return false;
         }
         LayoutSubViews ();
 
-        // Only mark for redraw when the Frame actually changed.
-        // For pure scrolling (viewport location change only), the Frame stays the same and
-        // SetNeedsDraw is handled by SetViewport. Unconditionally calling SetNeedsDraw here
-        // would cascade to ALL subviews, causing unnecessary full redraws.
-        if (Frame != oldFrame)
-        {
-            SetNeedsDraw ();
-        }
+        // A layout was performed so a draw is needed
+        // NeedsLayout may still be true if a dependent View still needs layout after SubViewsLaidOut event
+        SetNeedsDraw ();
 
         return true;
     }
@@ -914,23 +907,9 @@ public partial class View // Layout APIs
 
         TextFormatter.NeedsFormat = true;
 
-        // Propagate UP to ancestors without cascading back DOWN to sibling subtrees.
-        // This prevents a single child's SetNeedsLayout from marking ALL sibling subtrees.
-        PropagateNeedsLayoutToAncestors ();
-    }
-
-    /// <summary>
-    ///     Propagates <see cref="NeedsLayout"/> = <see langword="true"/> up the view hierarchy to all ancestors
-    ///     without cascading back down to sibling subtrees. This is used by <see cref="SetNeedsLayout"/> to
-    ///     mark ancestors as needing layout without triggering O(N) cascading to unrelated views.
-    /// </summary>
-    private void PropagateNeedsLayoutToAncestors ()
-    {
         if (SuperView is { NeedsLayout: false })
         {
-            SuperView.NeedsLayout = true;
-            SuperView.TextFormatter.NeedsFormat = true;
-            SuperView.PropagateNeedsLayoutToAncestors ();
+            SuperView?.SetNeedsLayout ();
         }
 
         if (this is not AdornmentView adornment)
@@ -938,11 +917,9 @@ public partial class View // Layout APIs
             return;
         }
 
-        if (adornment.Adornment?.Parent is { NeedsLayout: false } parent)
+        if (adornment.Adornment?.Parent is { NeedsLayout: false })
         {
-            parent.NeedsLayout = true;
-            parent.TextFormatter.NeedsFormat = true;
-            parent.PropagateNeedsLayoutToAncestors ();
+            adornment.Adornment.Parent?.SetNeedsLayout ();
         }
     }
 
