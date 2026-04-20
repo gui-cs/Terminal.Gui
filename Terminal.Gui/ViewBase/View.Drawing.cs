@@ -746,7 +746,7 @@ public partial class View // Drawing APIs
 
         if (!viewTransparent)
         {
-            exclusion.Combine (ViewportToScreen (Viewport), RegionOp.Union);
+            exclusion.Combine (ViewportToScreen (new Rectangle (Point.Empty, Viewport.Size)), RegionOp.Union);
         }
 
         // For transparent layers, also include context drawn regions (text, content, subviews)

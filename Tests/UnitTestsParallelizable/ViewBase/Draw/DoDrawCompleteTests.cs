@@ -235,6 +235,45 @@ public class DoDrawCompleteTests : TestDriverBase
     }
 
     /// <summary>
+    ///     Verifies that the opaque viewport exclusion in the per-layer DoDrawComplete path uses
+    ///     an empty viewport location. A scrolled viewport must still exclude the on-screen viewport
+    ///     area rather than an offset content rectangle.
+    /// </summary>
+    [Fact]
+    public void OpaqueView_WithScrolledViewport_ExcludesOnScreenViewportArea ()
+    {
+        IDriver driver = CreateTestDriver ();
+        driver.Clip = new Region (driver.Screen);
+
+        View view = new ()
+        {
+            X = 5,
+            Y = 5,
+            Width = 12,
+            Height = 12,
+            BorderStyle = LineStyle.Single,
+            Driver = driver
+        };
+        view.Border.ViewportSettings |= ViewportSettingsFlags.Transparent;
+        view.SetContentSize (new Size (100, 100));
+        view.ClearingViewport += (_, e) => e.Cancel = true;
+        view.BeginInit ();
+        view.EndInit ();
+        view.LayoutSubViews ();
+
+        view.Viewport = view.Viewport with { Location = new Point (10, 10) };
+
+        Assert.NotEqual (Point.Empty, view.Viewport.Location);
+
+        view.Draw ();
+
+        Rectangle viewportScreen = view.ViewportToScreen (new Rectangle (Point.Empty, view.Viewport.Size));
+
+        Assert.False (driver.Clip!.Contains (viewportScreen.X + 1, viewportScreen.Y + 1),
+                      "Scrolled viewport interior should be excluded using an empty viewport location");
+    }
+
+    /// <summary>
     ///     Verifies that Adornment views (Margin, Border, Padding) do NOT modify Driver.Clip
     ///     in their own DoDrawComplete — their parent handles clip exclusion for them.
     /// </summary>
