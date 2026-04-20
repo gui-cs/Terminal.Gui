@@ -1005,4 +1005,73 @@ public class ButtonTests
 
         button.Dispose ();
     }
+
+    // Copilot
+    /// <summary>
+    ///     Verifies that a newly-constructed Button has shadow infrastructure allocated by default,
+    ///     because <see cref="Button.GetDefaultShadowStyle"/> returns <see cref="Button.DefaultShadow"/>
+    ///     and is called in the constructor.
+    /// </summary>
+    [Fact]
+    public void ShadowStyle_Applied_In_Constructor_By_Default ()
+    {
+        Button button = new ();
+
+        // Default shadow is applied in the constructor via GetDefaultShadowStyle().
+        Assert.Equal (Button.DefaultShadow, button.ShadowStyle);
+        Assert.NotNull (button.Margin.View); // MarginView was created.
+
+        button.Dispose ();
+    }
+
+    // Copilot
+    /// <summary>
+    ///     Verifies that setting <see cref="View.ShadowStyle"/> to <see langword="null"/> after construction
+    ///     removes the shadow infrastructure.
+    /// </summary>
+    [Fact]
+    public void ShadowStyle_Null_After_Construction_Removes_Shadow ()
+    {
+        Button button = new ();
+        button.ShadowStyle = null;
+
+        Assert.Null (button.ShadowStyle);
+
+        button.Dispose ();
+    }
+
+    // Copilot
+    /// <summary>
+    ///     Verifies that <see cref="ScrollButton"/> does not create shadow infrastructure during construction
+    ///     because <see cref="ScrollButton.GetDefaultShadowStyle"/> returns <see langword="null"/>,
+    ///     eliminating the create-then-destroy allocation pattern described in the issue.
+    /// </summary>
+    [Fact]
+    public void ScrollButton_GetDefaultShadowStyle_Returns_Null_No_MarginView ()
+    {
+        ScrollButton btn = new ();
+
+        // GetDefaultShadowStyle() returns null → Button constructor sets ShadowStyle = null
+        // → no shadow infrastructure is ever created.
+        Assert.Null (btn.ShadowStyle);
+        Assert.Null (btn.Margin.View);
+
+        btn.Dispose ();
+    }
+
+    // Copilot
+    /// <summary>
+    ///     Verifies that explicitly setting <see cref="View.ShadowStyle"/> to a non-default value
+    ///     after construction correctly replaces the initial default.
+    /// </summary>
+    [Fact]
+    public void ShadowStyle_ExplicitValue_After_Construction_IsApplied ()
+    {
+        Button button = new ();
+        button.ShadowStyle = ShadowStyles.Transparent;
+
+        Assert.Equal (ShadowStyles.Transparent, button.ShadowStyle);
+
+        button.Dispose ();
+    }
 }

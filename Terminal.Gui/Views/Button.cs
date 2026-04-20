@@ -84,9 +84,24 @@ public class Button : View, IDesignable, IAcceptTarget
 
         TitleChanged += Button_TitleChanged;
 
-        base.ShadowStyle = DefaultShadow;
+        // Apply the initial shadow via a virtual method so that subclasses (e.g. ScrollButton)
+        // can override GetDefaultShadowStyle() to return null, completely avoiding the
+        // create-then-destroy allocation cycle that would otherwise occur.
+        base.ShadowStyle = GetDefaultShadowStyle ();
         MouseHighlightStates = DefaultMouseHighlightStates;
     }
+
+    /// <summary>
+    ///     Returns the shadow style that should be applied during construction. Subclasses that
+    ///     never show a shadow (e.g. <see cref="ScrollButton"/>, <see cref="ArrangerButton"/>) should
+    ///     override this to return <see langword="null"/> to avoid the create-then-destroy allocation
+    ///     pattern.
+    /// </summary>
+    /// <returns>
+    ///     <see cref="DefaultShadow"/> by default. Return <see langword="null"/> to construct without
+    ///     any shadow infrastructure.
+    /// </returns>
+    protected virtual ShadowStyles? GetDefaultShadowStyle () => DefaultShadow;
 
     /// <inheritdoc/>
     protected override void OnMouseHoldRepeatChanged (ValueChangedEventArgs<MouseFlags?> args) => SetMouseBindings (args.NewValue);
