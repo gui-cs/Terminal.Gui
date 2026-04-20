@@ -383,8 +383,8 @@ public partial class TextView
 
         bool retValue = DeleteTextLeft ();
 
-        DoNeededAction ();
         OnContentsChanged ();
+        DoNeededAction ();
 
         return retValue;
     }
@@ -488,7 +488,6 @@ public partial class TextView
         }
 
         UpdateWrapModel ();
-        OnContentsChanged ();
 
         return true;
     }
@@ -678,6 +677,7 @@ public partial class TextView
             UpdateWrapModel ();
 
             DeleteTextLeft ();
+            OnContentsChanged ();
 
             return true;
         }
@@ -768,6 +768,7 @@ public partial class TextView
         if (CurrentColumn == 0)
         {
             DeleteTextLeft ();
+            OnContentsChanged ();
 
             _historyText.ReplaceLast ([[.. GetCurrentLine ()]], InsertionPoint, TextEditingLineStatus.Replaced);
 
@@ -1028,6 +1029,7 @@ public partial class TextView
             if (CurrentColumn - 1 > -1 && CurrentColumn - 1 < line.Count && line [CurrentColumn - 1].Grapheme == "\t")
             {
                 DeleteTextLeft ();
+                OnContentsChanged ();
             }
             else
             {

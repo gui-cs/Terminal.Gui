@@ -282,6 +282,27 @@ public class TextViewCommandTests
         Assert.False (tv.IsSelecting);
     }
 
+    [Fact]
+    public void DeleteCharLeft_Only_Raises_ContentsChanged_Once ()
+    {
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new () { Width = 40, Height = 10, Text = "Hello" };
+        runnable.Add (tv);
+        app.Begin (runnable);
+        tv.InsertionPoint = new Point (5, 0);
+
+        int contentsChangedCount = 0;
+        tv.ContentsChanged += (_, _) => contentsChangedCount++;
+
+        bool result = tv.DeleteCharLeft ();
+
+        Assert.True (result);
+        Assert.Equal ("Hell", tv.Text);
+        Assert.Equal (1, contentsChangedCount);
+    }
+
     #endregion
 
     #region DeleteCharRight
@@ -379,6 +400,27 @@ public class TextViewCommandTests
         Assert.True (result);
         Assert.Equal (" World", tv.Text);
         Assert.False (tv.IsSelecting);
+    }
+
+    [Fact]
+    public void DeleteCharRight_Only_Raises_ContentsChanged_Once ()
+    {
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new () { Width = 40, Height = 10, Text = "Hello" };
+        runnable.Add (tv);
+        app.Begin (runnable);
+        tv.InsertionPoint = new Point (0, 0);
+
+        int contentsChangedCount = 0;
+        tv.ContentsChanged += (_, _) => contentsChangedCount++;
+
+        bool result = tv.DeleteCharRight ();
+
+        Assert.True (result);
+        Assert.Equal ("ello", tv.Text);
+        Assert.Equal (1, contentsChangedCount);
     }
 
     #endregion
