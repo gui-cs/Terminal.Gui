@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Terminal.Gui.Tracing;
 using UnitTests;
-using Xunit.Sdk;
 
 namespace DriverTests.Output;
 
