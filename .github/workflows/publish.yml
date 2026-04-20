@@ -19,6 +19,9 @@ jobs:
       with:
         fetch-depth: 0 # fetch-depth is needed for GitVersion https://github.com/GitTools/actions/blob/main/docs/cloning.md
 
+    # GitVersion.MsBuild (in Terminal.Gui.csproj) automatically computes the version
+    # from git history + GitVersion.yml during build. We still run the CLI here to
+    # capture the SemVer for use in subsequent steps (push, template dispatch).
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v4.5.0
       with:
@@ -28,7 +31,6 @@ jobs:
       uses: gittools/actions/gitversion/execute@v4.5.0
       with:
         useConfigFile: true
-        updateAssemblyInfo: true
       id: gitversion # step id used as reference for output values
 
     - name: Setup dotnet
@@ -41,7 +43,7 @@ jobs:
       run: dotnet build Terminal.Gui/Terminal.Gui.csproj --no-incremental --nologo --force --configuration Release
 
     - name: Pack Release Terminal.Gui ${{ steps.gitversion.outputs.SemVer }} for Nuget
-      run: dotnet pack Terminal.Gui/Terminal.Gui.csproj -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 
+      run: dotnet pack Terminal.Gui/Terminal.Gui.csproj -c Release --include-symbols --no-build
 
     # - name: Test to generate Code Coverage Report
     #   run: |

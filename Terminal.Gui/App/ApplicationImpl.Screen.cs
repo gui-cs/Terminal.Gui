@@ -245,7 +245,7 @@ internal partial class ApplicationImpl
             Logging.Redraws.Add (1);
 
             // Clip uses the output buffer dimensions (0-indexed), not the terminal offset.
-            Rectangle clipRect = new (0, 0, Screen.Width, Screen.Height);
+            Rectangle clipRect = Screen with { X = 0, Y = 0 };
             Driver.Clip = new Region (clipRect);
 
             // Only force a complete redraw if needed (needsLayout or forceRedraw).
@@ -258,6 +258,13 @@ internal partial class ApplicationImpl
             Driver?.Refresh ();
         }
 
+        if (neededLayout || needsDraw)
+        {
+            LayoutAndDrawComplete?.Invoke (this, EventArgs.Empty);
+        }
         Trace.Draw ("ApplicationImpl", "End", $"neededLayout={neededLayout}, needsDraw={needsDraw}");
     }
+
+    /// <inheritdoc />
+    public event EventHandler<EventArgs>? LayoutAndDrawComplete;
 }
