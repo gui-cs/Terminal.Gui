@@ -303,6 +303,33 @@ public class TextViewCommandTests
         Assert.Equal (1, contentsChangedCount);
     }
 
+    [Fact]
+    public void DeleteCharLeft_With_WordWarp_True_And_Cursor_At_Start_Of_SecondLine_Wont_Return_Negative_LineIndex ()
+    {
+        using IApplication app = Application.Create ();
+        using Runnable<bool> runnable = new ();
+
+        TextView tv = new () { Width = 10, Height = 3, Text = "One line test", WordWrap = true };
+        runnable.Add (tv);
+        app.Begin (runnable);
+        tv.InsertionPoint = new Point (0, 1);
+
+        Assert.True (tv.WordWrap);
+        Assert.Equal (2, tv.Lines);
+        string line = tv.GetLine (0).Select (cell => cell.Grapheme).Aggregate (string.Empty, (current, next) => current + next);
+        Assert.Equal ("One line ", line);
+        line = tv.GetLine (1).Select (cell => cell.Grapheme).Aggregate (string.Empty, (current, next) => current + next);
+        Assert.Equal ("test", line);
+
+        tv.NewKeyDownEvent (Key.Backspace);
+        Assert.Equal (new Point (9, 0), tv.InsertionPoint);
+        Assert.Equal (2, tv.Lines);
+        line = tv.GetLine (0).Select (cell => cell.Grapheme).Aggregate (string.Empty, (current, next) => current + next);
+        Assert.Equal ("One line ", line);
+        line = tv.GetLine (1).Select (cell => cell.Grapheme).Aggregate (string.Empty, (current, next) => current + next);
+        Assert.Equal ("test", line);
+    }
+
     #endregion
 
     #region DeleteCharRight

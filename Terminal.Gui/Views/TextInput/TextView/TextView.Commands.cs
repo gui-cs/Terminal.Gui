@@ -453,29 +453,33 @@ public partial class TextView
             }
 
             SetWrapModel ();
-            int prowIdx = CurrentRow - 1;
-            List<Cell> prevRow = _model.GetLine (prowIdx);
 
-            _historyText.Add ([[.. prevRow]], InsertionPoint);
+            if (CurrentRow - 1 > -1)
+            {
+                int prowIdx = CurrentRow - 1;
+                List<Cell> prevRow = _model.GetLine (prowIdx);
 
-            List<List<Cell>> removedLines = [[.. prevRow], [.. GetCurrentLine ()]];
+                _historyText.Add ([[.. prevRow]], InsertionPoint);
 
-            _historyText.Add (removedLines, new Point (CurrentColumn, prowIdx), TextEditingLineStatus.Removed);
+                List<List<Cell>> removedLines = [[.. prevRow], [.. GetCurrentLine ()]];
 
-            int prevCount = prevRow.Count;
-            _model.GetLine (prowIdx).AddRange (GetCurrentLine ());
-            _model.RemoveLine (CurrentRow);
+                _historyText.Add (removedLines, new Point (CurrentColumn, prowIdx), TextEditingLineStatus.Removed);
+
+                int prevCount = prevRow.Count;
+                _model.GetLine (prowIdx).AddRange (GetCurrentLine ());
+                _model.RemoveLine (CurrentRow);
+
+                CurrentRow--;
+
+                _historyText.Add ([GetCurrentLine ()], new Point (CurrentColumn, prowIdx), TextEditingLineStatus.Replaced);
+
+                CurrentColumn = prevCount;
+            }
 
             if (_wordWrap)
             {
                 _wrapNeeded = true;
             }
-
-            CurrentRow--;
-
-            _historyText.Add ([GetCurrentLine ()], new Point (CurrentColumn, prowIdx), TextEditingLineStatus.Replaced);
-
-            CurrentColumn = prevCount;
         }
 
         // Text was deleted, so it's always needed to redraw and update content size if needed
