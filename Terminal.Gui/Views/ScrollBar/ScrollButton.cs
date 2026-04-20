@@ -60,13 +60,16 @@ public class ScrollButton : Button, IOrientation
         CanFocus = false;
         NoDecorations = true;
         NoPadding = true;
-        base.ShadowStyle = null;
         MouseHoldRepeat = MouseFlags.LeftButtonReleased;
 
         // ReSharper disable once UseObjectOrCollectionInitializer
         _orientationHelper = new OrientationHelper (this);
         SetGlyph ();
     }
+
+    /// <inheritdoc/>
+    /// <remarks>Sets <see cref="ValueChangingEventArgs{T}.NewValue"/> to <see langword="null"/> so that no shadow infrastructure is allocated by default for scroll buttons.</remarks>
+    protected override void OnInitializingShadowStyle (ValueChangingEventArgs<ShadowStyles?> args) => args.NewValue = null;
 
     /// <summary>
     ///     Gets or sets the direction this <see cref="ScrollButton"/> scrolls.

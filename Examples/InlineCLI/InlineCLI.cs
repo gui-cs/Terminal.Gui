@@ -15,6 +15,7 @@ using Terminal.Gui.Drawing;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 using UICatalog;
+// ReSharper disable AccessToModifiedClosure
 
 // Set Inline mode BEFORE Init
 Application.AppModel = AppModel.Inline;
