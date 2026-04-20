@@ -1027,15 +1027,22 @@ public class ButtonTests
     // Copilot
     /// <summary>
     ///     Verifies that setting <see cref="View.ShadowStyle"/> to <see langword="null"/> after construction
-    ///     removes the shadow infrastructure.
+    ///     clears the shadow views while keeping the existing <c>Margin.View</c> allocated.
     /// </summary>
     [Fact]
-    public void ShadowStyle_Null_After_Construction_Removes_Shadow ()
+    public void ShadowStyle_Null_After_Construction_Clears_ShadowViews_But_Keeps_MarginView ()
     {
         Button button = new ();
+        View marginView = button.Margin.View;
+
+        Assert.NotNull (marginView);
+        Assert.NotEmpty (marginView.SubViews);
+
         button.ShadowStyle = null;
 
         Assert.Null (button.ShadowStyle);
+        Assert.Same (marginView, button.Margin.View);
+        Assert.Empty (button.Margin.View.SubViews);
 
         button.Dispose ();
     }

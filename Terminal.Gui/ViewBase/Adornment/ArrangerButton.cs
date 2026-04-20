@@ -85,7 +85,7 @@ internal class ArrangerButton : Button, IOrientation
     }
 
     /// <inheritdoc/>
-    /// <remarks>Returns <see langword="null"/> so that no shadow infrastructure is ever allocated for arranger buttons.</remarks>
+    /// <remarks>Returns <see langword="null"/> so that no shadow infrastructure is allocated by default for arranger buttons.</remarks>
     protected override ShadowStyles? GetDefaultShadowStyle () => null;
 
     private ArrangeButtons _buttonType = (ArrangeButtons)(-1);

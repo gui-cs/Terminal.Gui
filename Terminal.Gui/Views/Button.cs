@@ -93,9 +93,9 @@ public class Button : View, IDesignable, IAcceptTarget
 
     /// <summary>
     ///     Returns the shadow style that should be applied during construction. Subclasses that
-    ///     never show a shadow (e.g. <see cref="ScrollButton"/>, <see cref="ArrangerButton"/>) should
-    ///     override this to return <see langword="null"/> to avoid the create-then-destroy allocation
-    ///     pattern.
+    ///     never show a shadow (e.g. <see cref="ScrollButton"/> or internal buttons used by arrangement UI)
+    ///     should override this to return <see langword="null"/> to avoid the create-then-destroy
+    ///     allocation pattern.
     /// </summary>
     /// <returns>
     ///     <see cref="DefaultShadow"/> by default. Return <see langword="null"/> to construct without
