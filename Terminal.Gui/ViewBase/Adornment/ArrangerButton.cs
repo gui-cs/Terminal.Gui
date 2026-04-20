@@ -74,7 +74,6 @@ internal class ArrangerButton : Button, IOrientation
         Height = 1;
         NoDecorations = true;
         NoPadding = true;
-        base.ShadowStyle = null;
         base.Visible = false;
 
         AddCommand (Command.Up, DefaultAcceptHandler);
@@ -84,6 +83,13 @@ internal class ArrangerButton : Button, IOrientation
 
         _orientationHelper = new OrientationHelper (this);
     }
+
+    /// <inheritdoc/>
+    /// <remarks>
+    ///     Sets <see cref="ValueChangingEventArgs{T}.NewValue"/> to <see langword="null"/> so that no shadow infrastructure is
+    ///     allocated by default for arranger buttons.
+    /// </remarks>
+    protected override void OnInitializingShadowStyle (ValueChangingEventArgs<ShadowStyles?> args) => args.NewValue = null;
 
     private ArrangeButtons _buttonType = (ArrangeButtons)(-1);
 
