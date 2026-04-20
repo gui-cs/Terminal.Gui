@@ -1,13 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <!-- =================================================================== -->
     <!-- Version numbers -->
-    <!-- Automatically updated by gitversion (run `dotnet-gitversion`)  -->
-    <!-- GitVersion.xml controls settings  -->
-    <!-- See ./README.md for more -->
+    <!-- Automatically set by GitVersion.MsBuild from git history + GitVersion.yml -->
     <!-- =================================================================== -->
-    <PropertyGroup>
-        <Version>2.0.0</Version>
-    </PropertyGroup>
     <!-- =================================================================== -->
     <!-- Assembly name. -->
     <!-- Referenced throughout this file for consistency. -->
@@ -45,7 +40,6 @@
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <Optimize>true</Optimize>
-        <VersionSuffix></VersionSuffix>
     </PropertyGroup>
     <!-- =================================================================== -->
     <!-- Configuration Manager -->
@@ -76,6 +70,9 @@
     <ItemGroup>
       <!-- Enable Nuget Source Link for github -->
       <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="All" />
+      <!-- GitVersion.MsBuild automatically sets Version, AssemblyVersion, FileVersion, -->
+      <!-- and InformationalVersion from git history + GitVersion.yml at build time. -->
+      <PackageReference Include="GitVersion.MsBuild" PrivateAssets="all" />
     </ItemGroup>
     <!-- =================================================================== -->
     <!-- Global Usings and Type Aliases -->
@@ -209,6 +206,6 @@
 
         <!-- Install NuGet Package to Global Cache -->
         <Exec Command="dotnet nuget push &quot;$(MSBuildThisFileDirectory)bin\$(Configuration)\Terminal.Gui.$(Version).nupkg&quot; --source &quot;$(UserProfile)\.nuget\packages&quot; --skip-duplicate" Condition=" '$(OS)' == 'Windows_NT' " />
-        <Exec Command="dotnet nuget push &quot;$(MSBuildThisFileDirectory)bin\$(Configuration)/Terminal.Gui.$(Version).nupkg&quot; --source ~/.nuget/packages" Condition=" '$(OS)' != 'Windows_NT' " />
+        <Exec Command="dotnet nuget push &quot;$(MSBuildThisFileDirectory)bin\$(Configuration)/Terminal.Gui.$(Version).nupkg&quot; --source ~/.nuget/packages --skip-duplicate" Condition=" '$(OS)' != 'Windows_NT' " />
     </Target>
 </Project>
