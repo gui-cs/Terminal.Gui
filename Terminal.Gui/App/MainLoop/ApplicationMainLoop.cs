@@ -178,7 +178,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         Trace.Draw (nameof (ApplicationMainLoop<TInputRecord>), "IterationDraw", $"Screen={App?.Screen}");
 
         // Layout and draw any views that need it
-        // This will raise App.FirstLayoutAndDrawCompleted
+        // This will raise IApplication.LayoutAndDrawComplete
         App?.LayoutAndDraw (false);
         _firstLayoutAndDrawComplete = true;
 
