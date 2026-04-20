@@ -58,7 +58,7 @@ public class Deepdives : Scenario
             Height = Dim.Fill (1)
         };
 
-        _markdownView = new Markdown { Width = Dim.Fill (), Height = Dim.Fill (), SyntaxHighlighter = new TextMateSyntaxHighlighter (ThemeName.Abbys) };
+        _markdownView = new Markdown { Width = Dim.Fill (), Height = Dim.Fill (), SyntaxHighlighter = new TextMateSyntaxHighlighter () };
 
         _markdownView.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 
@@ -111,7 +111,13 @@ public class Deepdives : Scenario
 
         Shortcut contentWidthShortcut = new () { CommandView = _contentWidthUpDown, Text = "Content Width" };
 
-        DropDownList<ThemeName> themeDropDown = new () { ReadOnly = true, CanFocus = false, Value = ThemeName.Abbys, Autocomplete = null };
+        DropDownList<ThemeName> themeDropDown = new ()
+        {
+            ReadOnly = true,
+            CanFocus = false,
+            Value = (Enum.TryParse (_markdownView.SyntaxHighlighter.ThemeName, out ThemeName theme) ? theme : ThemeName.DarkPlus),
+            Autocomplete = null
+        };
 
         themeDropDown.ValueChanged += (_, e) =>
                                       {

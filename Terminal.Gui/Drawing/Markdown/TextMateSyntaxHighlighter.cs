@@ -62,7 +62,7 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     /// </param>
     public TextMateSyntaxHighlighter (ThemeName theme = ThemeName.DarkPlus)
     {
-        CurrentThemeName = theme;
+        ThemeName = theme;
         _registryOptions = new RegistryOptions (theme);
         _registry = new Registry (_registryOptions);
         CacheThemeDefaults ();
@@ -138,8 +138,11 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     /// <returns>A theme appropriate for the background luminance.</returns>
     public static ThemeName GetThemeForBackground (Color background) => background.IsDarkColor () ? ThemeName.DarkPlus : ThemeName.LightPlus;
 
-    /// <summary>Gets the <see cref="ThemeName"/> that is currently active.</summary>
-    public ThemeName CurrentThemeName { get; private set; }
+    /// <summary>Gets the <see cref="TextMateSharp.Grammars.ThemeName"/> that is currently active.</summary>
+    public ThemeName ThemeName { get; private set; }
+
+    /// <inheritdoc/>
+    string ISyntaxHighlighter.ThemeName => ThemeName.ToString ();
 
     /// <inheritdoc/>
     public Color? DefaultBackground => _defaultBackground;
@@ -188,7 +191,7 @@ public class TextMateSyntaxHighlighter : ISyntaxHighlighter
     /// <param name="theme">The new VS Code theme to use.</param>
     public void SetTheme (ThemeName theme)
     {
-        CurrentThemeName = theme;
+        ThemeName = theme;
         _registryOptions = new RegistryOptions (theme);
         _registry = new Registry (_registryOptions);
         _grammarCache.Clear ();

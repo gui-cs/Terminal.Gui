@@ -1251,6 +1251,8 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         public void ResetState () { }
 
+        public string ThemeName => string.Empty;
+
         public Color? DefaultBackground { get; } = themeBg;
 
         public Attribute? GetAttributeForScope (MarkdownStyleRole role) => null;
@@ -1266,6 +1268,8 @@ public class MarkdownViewTests (ITestOutputHelper output)
             => [new (code, MarkdownStyleRole.CodeBlock, attribute: new Attribute (tokenFg, tokenBg))];
 
         public void ResetState () { }
+
+        public string ThemeName => string.Empty;
 
         public Color? DefaultBackground { get; } = tokenBg;
 

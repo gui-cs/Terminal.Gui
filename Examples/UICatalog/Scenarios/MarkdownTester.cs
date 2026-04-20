@@ -65,7 +65,7 @@ public class MarkdownTester : Scenario
             Y = 0,
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-            SyntaxHighlighter = new TextMateSyntaxHighlighter (ThemeName.Abbys)
+            SyntaxHighlighter = new TextMateSyntaxHighlighter ()
         };
 
         previewFrame.Add (preview);
@@ -79,7 +79,12 @@ public class MarkdownTester : Scenario
 
         Shortcut quitShortcut = new () { Title = "Quit", Key = Key.Esc, Action = app.RequestStop };
 
-        DropDownList<ThemeName> themeDropDown = new () { Value = ThemeName.Abbys, ReadOnly = true, CanFocus = false };
+        DropDownList<ThemeName> themeDropDown = new ()
+        {
+            Value = (preview.SyntaxHighlighter as TextMateSyntaxHighlighter)?.ThemeName ?? ThemeName.DarkPlus,
+            ReadOnly = true,
+            CanFocus = false
+        };
 
         themeDropDown.ValueChanged += (_, e) =>
                                       {
