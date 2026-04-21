@@ -1,23 +1,19 @@
-![v2 Release Status](https://img.shields.io/github/milestones/progress-percent/gui-cs/Terminal.Gui/7)
-![NuGet Version](https://img.shields.io/nuget/vpre/Terminal.Gui)
+![NuGet Version](https://img.shields.io/nuget/v/Terminal.Gui)
 ![Bugs](https://img.shields.io/github/issues/gui-cs/Terminal.Gui)
 [![codecov](https://codecov.io/gh/gui-cs/Terminal.Gui/graph/badge.svg?token=1Ac9gyGtrj)](https://codecov.io/gh/gui-cs/Terminal.Gui)
 [![Downloads](https://img.shields.io/nuget/dt/Terminal.Gui)](https://www.nuget.org/packages/Terminal.Gui)
 [![License](https://img.shields.io/github/license/gui-cs/gui.cs.svg)](LICENSE)
 
-# Terminal.Gui v2
+# Terminal.Gui
 
 Cross-platform UI toolkit for building sophisticated terminal UI (TUI) applications on Windows, macOS, and Linux/Unix.
 
 ![logo](docfx/images/logo.png)
 
-* **v2 Beta** (Current): ![NuGet Version](https://img.shields.io/nuget/vpre/Terminal.Gui) - Recommended for new projects
-* **v1 (Legacy)**: ![NuGet Version](https://img.shields.io/nuget/v/Terminal.Gui) - Maintenance mode only
+* **v2** (Current): ![NuGet Version](https://img.shields.io/nuget/v/Terminal.Gui) - Stable release
+* **v1 (Legacy)**: ![NuGet Version](https://img.shields.io/nuget/v/Terminal.Gui/1.19.0) - Maintenance mode only
 
-> **Important:**
-> - **v1** is in maintenance mode - only critical bug fixes accepted
-> - **v2 Beta** is recommended for new projects - The team is 100% Focused on v2.0.0 RELEASE!
-> - Breaking changes possible before Beta, but core architecture is solid
+> **Note:** v1 is in maintenance mode — only critical bug fixes accepted. v2 is recommended for all projects.
 
 ![Sample app](docfx/images/sample.gif)
 
@@ -26,7 +22,7 @@ Cross-platform UI toolkit for building sophisticated terminal UI (TUI) applicati
 Install the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates), create a new TUI app, and run it:
 
 ```powershell
-dotnet new install Terminal.Gui.Templates@2.0.0-beta.*
+dotnet new install Terminal.Gui.Templates
 dotnet new tui-simple -n myproj
 cd myproj
 dotnet run
@@ -102,22 +98,16 @@ See the [documentation index](https://gui-cs.github.io/Terminal.Gui/docs/index) 
 
 # Installing
 
-## v2 Beta (Recommended)
+## v2 (Recommended)
 
 ```powershell
-dotnet add package Terminal.Gui --version "2.0.0-beta.*"
-```
-
-## v2 Develop (Latest)
-
-```powershell
-dotnet add package Terminal.Gui --version "2.0.0-develop.*"
+dotnet add package Terminal.Gui
 ```
 
 Or use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates):
 
 ```powershell
-dotnet new install Terminal.Gui.Templates@2.0.0-beta.*
+dotnet new install Terminal.Gui.Templates
 ```
 
 ## v1 Legacy
