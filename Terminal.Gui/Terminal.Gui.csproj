@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <!-- =================================================================== -->
     <!-- Version numbers -->
     <!-- Automatically set by GitVersion.MsBuild from git history + GitVersion.yml -->
@@ -66,6 +66,7 @@
     <!-- =================================================================== -->
     <ItemGroup>
         <ProjectReference Include="..\Terminal.Gui.Analyzers.Internal\Terminal.Gui.Analyzers.Internal.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <PackageReference Include="Microsoft.Net.Compilers.Toolset" PrivateAssets="all" />
     </ItemGroup>
     <ItemGroup>
       <!-- Enable Nuget Source Link for github -->
