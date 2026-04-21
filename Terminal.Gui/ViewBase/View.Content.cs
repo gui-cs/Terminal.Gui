@@ -1,4 +1,6 @@
-﻿namespace Terminal.Gui.ViewBase;
+﻿using System.Diagnostics;
+
+namespace Terminal.Gui.ViewBase;
 
 public partial class View
 {
@@ -521,11 +523,9 @@ public partial class View
 
         Thickness thickness = GetAdornmentsThickness ();
 
-        Rectangle inside = thickness.GetInside (Viewport);
-
         Size newSize = new (viewport.Size.Width + thickness.Horizontal, viewport.Size.Height + thickness.Vertical);
 
-        if (newSize == Frame.Size || inside.Width < 0 || inside.Height < 0)
+        if (newSize == Frame.Size || viewport.Size.Width - thickness.Horizontal < 0 || viewport.Size.Height - thickness.Vertical < 0)
         {
             // The change is not changing the Frame, or it is invalid, so we don't need to update it.
             // Just call SetNeedsLayout to update the layout.
