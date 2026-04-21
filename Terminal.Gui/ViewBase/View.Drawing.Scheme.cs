@@ -147,7 +147,12 @@ public partial class View
 
             if (SchemeManager.TryGetScheme (SchemeName, out Scheme? namedScheme))
             {
-                return namedScheme;
+                if (SchemeName != "Accent")
+                {
+                    return namedScheme;
+                }
+
+                return SchemeManager.TryGetScheme ("Base", out Scheme? baseScheme) ? Scheme.DeriveAccent (baseScheme, Driver?.DefaultAttribute) : namedScheme;
             }
 
             Logging.Warning ($"SchemeName '{SchemeName}' not found in current theme. Falling back.");
