@@ -209,8 +209,7 @@ static void RunFullScreen (List<string> files, ThemeName syntaxTheme)
     {
         Width = Dim.Fill (),
         Height = Dim.Fill (1), // leave room for StatusBar
-        SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme),
-        UseThemeBackground = true
+        SyntaxHighlighter = new TextMateSyntaxHighlighter (syntaxTheme)
     };
 
     // Vertical scrollbar is already enabled by MarkdownView constructor
@@ -295,15 +294,23 @@ static void RunFullScreen (List<string> files, ThemeName syntaxTheme)
                                           return;
                                       }
 
-                                      TextMateSyntaxHighlighter highlighter = new (themeName);
-                                      markdownView.SyntaxHighlighter = highlighter;
-
-                                      string text = markdownView.Text;
-                                      markdownView.Text = string.Empty;
-                                      markdownView.Text = text;
+                                      markdownView.SyntaxHighlighter = new TextMateSyntaxHighlighter (themeName);
                                   };
 
     statusItems.Add (new Shortcut { Title = "Theme", CommandView = themeDropDown });
+
+    // Auto-select a light or dark syntax theme based on the terminal's actual background color.
+    app.Driver!.DefaultAttributeChanged += (_, e) =>
+                                            {
+                                                if (e.NewValue is not { } attr)
+                                                {
+                                                    return;
+                                                }
+
+                                                ThemeName autoTheme = TextMateSyntaxHighlighter.GetThemeForBackground (attr.Background);
+                                                markdownView.SyntaxHighlighter = new TextMateSyntaxHighlighter (autoTheme);
+                                                themeDropDown.Value = autoTheme;
+                                            };
 
     // Theme background toggle
     CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = CheckState.Checked };
@@ -311,10 +318,6 @@ static void RunFullScreen (List<string> files, ThemeName syntaxTheme)
     themeBgCheckBox.ValueChanged += (_, e) =>
                                     {
                                         markdownView.UseThemeBackground = e.NewValue == CheckState.Checked;
-
-                                        string text = markdownView.Text;
-                                        markdownView.Text = string.Empty;
-                                        markdownView.Text = text;
                                     };
 
     statusItems.Add (new Shortcut { CommandView = themeBgCheckBox });
