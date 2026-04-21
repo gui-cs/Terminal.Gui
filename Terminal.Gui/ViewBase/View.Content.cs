@@ -523,9 +523,12 @@ public partial class View
 
         Size newSize = new (viewport.Size.Width + thickness.Horizontal, viewport.Size.Height + thickness.Vertical);
 
-        if (newSize == Frame.Size || viewport.Size.Width - thickness.Horizontal < 0 || viewport.Size.Height - thickness.Vertical < 0)
+        // Detect the "adornments consume entire viewport" no-op: when the requested viewport size equals
+        // the current Viewport size (which may already be clamped to zero when Frame is smaller than adornments).
+        // In this case updating Frame would incorrectly grow it, so treat it as a no-op.
+        if (newSize == Frame.Size || viewport.Size == Viewport.Size)
         {
-            // The change is not changing the Frame, or it is invalid, so we don't need to update it.
+            // The change is not changing the Frame, or the adornments consume the entire Frame, so we don't need to update it.
             // Just call SetNeedsLayout to update the layout.
             if (_viewportLocation != viewport.Location)
             {
