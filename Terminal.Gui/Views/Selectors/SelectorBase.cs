@@ -156,7 +156,6 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             field = value;
 
             CreateSubViews ();
-            UpdateChecked ();
         }
     }
 
@@ -316,7 +315,6 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             }
 
             CreateSubViews ();
-            UpdateChecked ();
         }
     }
 
@@ -331,7 +329,6 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
             field = value;
 
             CreateSubViews ();
-            UpdateChecked ();
         }
     }
 
@@ -436,6 +433,9 @@ public abstract class SelectorBase : View, IOrientation, IValue<int?>
         // Note: Hotkey assignment is now handled automatically by the base class
         // when SubViews are added via Add(). No need to call AssignUniqueHotKeys() here.
         SetLayout ();
+
+        // Ensure the checked state of the checkboxes is correct after recreating subviews
+        UpdateChecked ();
     }
 
     /// <summary>

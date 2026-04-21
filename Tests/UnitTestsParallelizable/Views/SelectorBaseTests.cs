@@ -598,6 +598,25 @@ public class SelectorBaseTests
         Assert.True (checkBox.CanFocus);
     }
 
+    [Fact]
+    public void CreateSubViews_ResetsValueIfCurrentValueNotInNewValues_And_Call_UpdateChecked_Method ()
+    {
+        OptionSelector selector = new ();
+
+        selector.Labels = ["Option1", "Option2"];
+        selector.Values = [10, 20];
+
+        // Verify initial value is set to first value (10)
+        Assert.Equal (10, selector.Value);
+
+        // Change to new labels/values where current value (10) is not present
+        selector.Labels = ["New1", "New2"];
+        selector.Values = [30, 40];
+
+        // Value should reset to first value (30)
+        Assert.Equal (30, selector.Value);
+    }
+
     #endregion
 
     #region HotKey Command Tests

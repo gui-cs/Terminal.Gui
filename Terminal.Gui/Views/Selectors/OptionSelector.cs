@@ -137,11 +137,30 @@ public class OptionSelector : SelectorBase, IDesignable
     /// </summary>
     public override void UpdateChecked ()
     {
+        Dictionary<CheckBox, int> checkBoxValueMap = SubViews.OfType<CheckBox> ().ToDictionary (cb => cb, GetCheckBoxValue);
+
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
             int value = GetCheckBoxValue (cb);
 
             cb.Value = value == Value ? CheckState.Checked : CheckState.UnChecked;
+        }
+
+        // If Value doesn't exist in any checkbox, use the first checkbox's value
+        if (Value is not null && checkBoxValueMap.Count > 0 && Values!.All (v => v != Value) && checkBoxValueMap.Values.All (v => v != Value))
+        {
+            Value = checkBoxValueMap.Values.First ();
+
+            foreach (KeyValuePair<CheckBox, int> kvp in checkBoxValueMap)
+            {
+                if (kvp.Value != Value)
+                {
+                    continue;
+                }
+                kvp.Key.Value = CheckState.Checked;
+
+                break;
+            }
         }
 
         // Verify at most one is checked
