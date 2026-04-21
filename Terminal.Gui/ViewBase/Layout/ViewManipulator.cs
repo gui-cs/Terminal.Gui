@@ -59,8 +59,7 @@ public sealed class ViewManipulator
         {
             return;
         }
-        _view.Height = newHeight;
-        _view.Y = location.Y - _grabPoint.Y;
+        _view.Frame = _view.Frame with { Height = newHeight, Y = location.Y - _grabPoint.Y };
     }
 
     /// <summary>
@@ -82,15 +81,14 @@ public sealed class ViewManipulator
         {
             return;
         }
-        _view.Width = newWidth;
-        _view.X = location.X - _grabPoint.X;
+        _view.Frame = _view.Frame with { Width = newWidth, X = location.X - _grabPoint.X };
     }
 
     /// <summary>
     ///     Resizes view from the right edge, adjusting width only.
     /// </summary>
     /// <param name="location">Mouse position in view's coordinate space.</param>
-    public void ResizeRight (Point location) => _view.Width = Math.Max (_minWidth, location.X - _view.Frame.X + _view.Margin.Thickness.Right + 1);
+    public void ResizeRight (Point location) => _view.Frame = _view.Frame with { Width = Math.Max (_minWidth, location.X - _view.Frame.X + _view.Margin.Thickness.Right + 1) };
 
     #endregion
 
@@ -132,7 +130,8 @@ public sealed class ViewManipulator
         {
             return false;
         }
-        _view.Width = newWidth;
+
+        _view.Frame = _view.Frame with { Width = newWidth };
 
         return true;
     }
@@ -161,7 +160,8 @@ public sealed class ViewManipulator
         {
             return false;
         }
-        _view.Height = newHeight;
+
+        _view.Frame = _view.Frame with { Height = newHeight };
 
         return true;
     }
@@ -192,8 +192,8 @@ public sealed class ViewManipulator
             return false;
         }
         int actualDelta = currentFrameHeight - newHeight;
-        _view.Y += actualDelta;
-        _view.Height = newHeight;
+
+        _view.Frame = _view.Frame with { Y = +_view.Frame.Y + actualDelta, Height = newHeight };
 
         return true;
     }
@@ -224,8 +224,8 @@ public sealed class ViewManipulator
             return false;
         }
         int actualDelta = currentFrameWidth - newWidth;
-        _view.X += actualDelta;
-        _view.Width = newWidth;
+
+        _view.Frame = _view.Frame with { X = +_view.Frame.X + actualDelta, Width = newWidth };
 
         return true;
     }
