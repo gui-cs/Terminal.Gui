@@ -142,13 +142,33 @@ public partial class Markdown
 
             MarkdownCodeBlock codeBlock = new ()
             {
+                SyntaxHighlighter = SyntaxHighlighter,
                 StyledLines = codeLines,
                 X = 0,
                 Y = start,
                 Width = Dim.Fill (),
-                ThemeBackground = UseThemeBackground ? SyntaxHighlighter?.DefaultBackground : null,
                 ShowCopyButton = ShowCopyButtons
             };
+
+            // When a syntax highlighter provides a default background, compute a
+            // slightly shifted variant and set it as the code block's ThemeBackground.
+            // This ensures code blocks are visually distinct from body text AND
+            // compatible with the highlighter's token foreground colors.
+            //
+            // We pass !isDark to GetDimmerColor so the bg shifts *away* from the
+            // body background: dark themes get a slightly lighter code block bg,
+            // light themes get a slightly darker one. Passing isDark (the intuitive
+            // direction) caused light-theme code blocks to wash out to medium gray
+            // because white (L≥90) hit the fallback in GetDimmerColor.
+            //
+            // We compute the color directly rather than using Scheme/VisualRole.Code
+            // because scheme resolution depends on view tree init state, but this
+            // code runs during layout before the new SubView is fully initialised.
+            if (SyntaxHighlighter?.DefaultBackground is { } highlighterBg)
+            {
+                bool isDark = highlighterBg.IsDarkColor ();
+                codeBlock.ThemeBackground = highlighterBg.GetDimmerColor (0.2, !isDark);
+            }
 
             _codeBlockViews.Add (codeBlock);
             Add (codeBlock);

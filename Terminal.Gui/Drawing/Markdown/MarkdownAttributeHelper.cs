@@ -30,7 +30,11 @@ internal static class MarkdownAttributeHelper
     {
         if (segment.Attribute is { } explicitAttr)
         {
-            return explicitAttr;
+            // When a caller-provided background override is present, apply it even to
+            // segments that carry an explicit attribute from the highlighter. This keeps
+            // the token foreground colours but ensures the background matches the fill
+            // colour of the containing code block / viewport.
+            return themeBackground is { } overrideBg ? explicitAttr with { Background = overrideBg } : explicitAttr;
         }
 
         // Use the provided theme background, or fall back to the view's normal background.
