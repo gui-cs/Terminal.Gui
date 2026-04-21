@@ -279,10 +279,18 @@ internal class DriverImpl : IDriver
     /// <inheritdoc/>
     public Attribute? DefaultAttribute { get; private set; }
 
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<Attribute?>>? DefaultAttributeChanged;
+
     /// <summary>
     ///     Sets the terminal's default attribute (queried via OSC 10/11).
     /// </summary>
-    internal void SetDefaultAttribute (Attribute attr) => DefaultAttribute = attr;
+    internal void SetDefaultAttribute (Attribute attr)
+    {
+        Attribute? old = DefaultAttribute;
+        DefaultAttribute = attr;
+        DefaultAttributeChanged?.Invoke (this, new ValueChangedEventArgs<Attribute?> (old, attr));
+    }
 
     /// <inheritdoc/>
     public TerminalColorCapabilities? ColorCapabilities { get; private set; }

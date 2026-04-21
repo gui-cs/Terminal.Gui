@@ -711,6 +711,8 @@ public class MarkdownTableTests
 
         public void ResetState () { }
 
+        public string ThemeName => string.Empty;
+
         public Color? DefaultBackground { get; } = themeBg;
 
         public Attribute? GetAttributeForScope (MarkdownStyleRole role) => null;

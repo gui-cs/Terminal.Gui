@@ -689,6 +689,8 @@ public class AstLoweringTests (ITestOutputHelper output)
 
         public void ResetState () { }
 
+        public string ThemeName => string.Empty;
+
         public Color? DefaultBackground => null;
 
         public Attribute? GetAttributeForScope (MarkdownStyleRole role) => null;
