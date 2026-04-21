@@ -166,8 +166,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
         // 2048 x 2048 supports unit testing where no App is running.
         Size screenSize = us.App?.Screen.Size ?? new Size (2048, 2048);
         int autoMin = MinimumContentDim?.GetAnchor (superviewContentSize) ?? 0;
-        int screenX4 = dimension == Dimension.Width ? screenSize.Width * 4 : screenSize.Height * 4;
-        int autoMax = MaximumContentDim?.GetAnchor (superviewContentSize) ?? screenX4;
+        int autoMax = MaximumContentDim?.GetAnchor (superviewContentSize) ?? int.MaxValue;
 
         if (Style.FastHasFlags (DimAutoStyle.Text))
         {
@@ -177,7 +176,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 {
                     // Set BOTH width and height (by setting Size). We do this because we will be called again, next
                     // for Dimension.Height. We need to know the width to calculate the height.
-                    us.TextFormatter.ConstrainToSize = us.TextFormatter.FormatAndGetSize (new Size (int.Min (autoMax, screenX4), screenX4));
+                    us.TextFormatter.ConstrainToSize = us.TextFormatter.FormatAndGetSize (new Size (int.Min (autoMax, int.MaxValue), int.MaxValue));
                 }
 
                 textSize = us.TextFormatter.ConstrainToWidth ?? 0;
@@ -187,7 +186,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 // For height, we need to make sure width has been calculated.
                 if (us.TextFormatter.ConstrainToHeight is null)
                 {
-                    int width = int.Min (MaximumContentDim?.GetAnchor (superviewContentSize) ?? screenX4, screenSize.Width * 4);
+                    int width = int.Min (MaximumContentDim?.GetAnchor (superviewContentSize) ?? int.MaxValue, screenSize.Width * 4);
 
                     if (us.TextFormatter.ConstrainToWidth is null)
                     {
@@ -195,10 +194,10 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                         // the view hasn't been laid out yet (Viewport.Width == 0) to avoid
                         // constraining the text to zero width which produces height = 0.
                         int constrainWidth = us.Viewport.Width > 0 ? us.Viewport.Width : width;
-                        width = us.TextFormatter.FormatAndGetSize (new Size (constrainWidth, screenX4)).Width;
+                        width = us.TextFormatter.FormatAndGetSize (new Size (constrainWidth, int.MaxValue)).Width;
                     }
 
-                    textSize = us.TextFormatter.FormatAndGetSize (new Size (us.TextFormatter.ConstrainToWidth ?? width, screenX4)).Height;
+                    textSize = us.TextFormatter.FormatAndGetSize (new Size (us.TextFormatter.ConstrainToWidth ?? width, int.MaxValue)).Height;
                     us.TextFormatter.ConstrainToHeight = textSize;
                 }
                 else
@@ -248,8 +247,8 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 foreach (View v in categories.Centered)
                 {
                     maxCentered = dimension == Dimension.Width
-                                      ? v.X.GetAnchor (0) + v.Width.Calculate (0, screenX4, v, dimension)
-                                      : v.Y.GetAnchor (0) + v.Height.Calculate (0, screenX4, v, dimension);
+                                      ? v.X.GetAnchor (0) + v.Width.Calculate (0, int.MaxValue, v, dimension)
+                                      : v.Y.GetAnchor (0) + v.Height.Calculate (0, int.MaxValue, v, dimension);
                 }
 
                 maxCalculatedSize = int.Max (maxCalculatedSize, maxCentered);
@@ -272,8 +271,8 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 {
                     // Need to set the relative layout for PosAnchorEnd subviews to calculate the size
                     anchoredSubView.SetRelativeLayout (dimension == Dimension.Width
-                                                           ? new Size (maxCalculatedSize, screenX4)
-                                                           : new Size (screenX4, maxCalculatedSize));
+                                                           ? new Size (maxCalculatedSize, int.MaxValue)
+                                                           : new Size (int.MaxValue, maxCalculatedSize));
 
                     maxAnchorEnd = dimension == Dimension.Width
                                        ? anchoredSubView.X.GetAnchor (maxCalculatedSize + anchoredSubView.Frame.Width)
