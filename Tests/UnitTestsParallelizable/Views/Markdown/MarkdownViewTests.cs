@@ -1463,7 +1463,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         // Code block bg should be the dimmed variant of the theme bg
         bool isDark = lightThemeBg.IsDarkColor ();
-        Color expectedDimmed = lightThemeBg.GetDimmerColor (0.2, isDark);
+        Color expectedDimmed = lightThemeBg.GetDimmerColor (0.2, !isDark);
         Assert.Equal (expectedDimmed, codeBg);
 
         app.Dispose ();
@@ -1654,7 +1654,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         // The bg should be the dimmed variant of the theme bg, NOT the raw theme bg
         bool isDark = tokenBg.IsDarkColor ();
-        Color expectedDimmed = tokenBg.GetDimmerColor (0.2, isDark);
+        Color expectedDimmed = tokenBg.GetDimmerColor (0.2, !isDark);
         Assert.Equal (expectedDimmed, textBg);
 
         // Token foreground should be preserved
