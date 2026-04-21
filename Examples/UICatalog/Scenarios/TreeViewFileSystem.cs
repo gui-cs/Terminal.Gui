@@ -38,25 +38,29 @@ public class TreeViewFileSystem : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Window win = new ();
+        using Runnable win = new ();
         win.Title = GetName ();
-        win.Y = 1; // menu
-        win.Height = Dim.Fill ();
 
         // MenuBar
         MenuBar menu = new ();
 
-        _treeViewFiles = new TreeView<IFileSystemInfo> { X = 0, Y = Pos.Bottom (menu), Width = Dim.Percent (50), Height = Dim.Fill () };
+        _treeViewFiles = new TreeView<IFileSystemInfo>
+        {
+            Y = Pos.Bottom (menu),
+            Height = Dim.Fill ()
+        };
         _treeViewFiles.DrawLine += TreeViewFiles_DrawLine;
 
         // Scrollbars are disabled by default (VisibilityMode.Manual)
 
         _detailsFrame = new DetailsFrame (_iconProvider)
         {
-            X = Pos.Right (_treeViewFiles), Y = Pos.Top (_treeViewFiles), Width = Dim.Fill (), Height = Dim.Fill ()
+            X = Pos.AnchorEnd (), Y = Pos.Bottom (menu), Width = 50, Height = Dim.Fill ()
         };
+        _treeViewFiles.Width = Dim.Fill (_detailsFrame);
 
-        win.Add (_detailsFrame);
+        win.Add (menu, _treeViewFiles, _detailsFrame);
+
         _treeViewFiles.Activating += TreeViewFiles_Activating;
         _treeViewFiles.KeyDown += TreeViewFiles_KeyPress;
         _treeViewFiles.SelectionChanged += TreeViewFiles_SelectionChanged;
@@ -140,13 +144,12 @@ public class TreeViewFileSystem : Scenario
                                    ]));
 
         SetNerdIcons ();
-        win.Add (menu, _treeViewFiles);
-        _treeViewFiles.GoToFirst ();
-        _treeViewFiles.Expand ();
 
+        //_treeViewFiles.GoToFirst ();
+        _treeViewFiles.Expand ();
         _treeViewFiles.SetFocus ();
 
-        UpdateIconCheckState ();
+         UpdateIconCheckState ();
 
         app.Run (win);
     }
@@ -482,8 +485,7 @@ public class TreeViewFileSystem : Scenario
         public DetailsFrame (FileSystemIconProvider iconProvider)
         {
             Title = "Details";
-            base.Visible = true;
-            CanFocus = true;
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
             _iconProvider = iconProvider;
         }
 
