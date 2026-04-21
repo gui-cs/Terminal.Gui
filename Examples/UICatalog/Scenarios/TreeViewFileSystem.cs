@@ -47,11 +47,13 @@ public class TreeViewFileSystem : Scenario
         _treeViewFiles = new TreeView<IFileSystemInfo>
         {
             Y = Pos.Bottom (menu),
-            Height = Dim.Fill ()
+            Height = Dim.Fill (),
         };
         _treeViewFiles.DrawLine += TreeViewFiles_DrawLine;
 
-        // Scrollbars are disabled by default (VisibilityMode.Manual)
+        // HACK: If the view hasn't been laid out, and it has scrollbars enabled, setting
+        // HACK: Viewport (which GoToFirst does) is buggy.
+        _treeViewFiles.ViewportSettings &= ~ViewportSettingsFlags.HasScrollBars;
 
         _detailsFrame = new DetailsFrame (_iconProvider)
         {
@@ -145,11 +147,13 @@ public class TreeViewFileSystem : Scenario
 
         SetNerdIcons ();
 
-        //_treeViewFiles.GoToFirst ();
         _treeViewFiles.Expand ();
         _treeViewFiles.SetFocus ();
 
-         UpdateIconCheckState ();
+        _treeViewFiles.GoToFirst ();
+        _treeViewFiles.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
+
+        UpdateIconCheckState ();
 
         app.Run (win);
     }
