@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace Terminal.Gui.ViewBase;
+﻿namespace Terminal.Gui.ViewBase;
 
 public partial class View
 {

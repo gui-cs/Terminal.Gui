@@ -877,10 +877,10 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             TitleChanged -= Shortcut_TitleChanged;
 
-            if (CommandView?.SuperView is null)
+            if (_commandView?.SuperView is null)
             {
-                CommandView?.Dispose ();
-                CommandView = null;
+                _commandView?.Dispose ();
+                _commandView = null;
             }
 
             if (HelpView.SuperView is null)

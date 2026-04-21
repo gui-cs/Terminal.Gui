@@ -176,7 +176,7 @@ public record DimAuto (Dim? MaximumContentDim, Dim? MinimumContentDim, DimAutoSt
                 {
                     // Set BOTH width and height (by setting Size). We do this because we will be called again, next
                     // for Dimension.Height. We need to know the width to calculate the height.
-                    us.TextFormatter.ConstrainToSize = us.TextFormatter.FormatAndGetSize (new Size (int.Min (autoMax, int.MaxValue), int.MaxValue));
+                    us.TextFormatter.ConstrainToSize = us.TextFormatter.FormatAndGetSize (new Size (autoMax, int.MaxValue));
                 }
 
                 textSize = us.TextFormatter.ConstrainToWidth ?? 0;

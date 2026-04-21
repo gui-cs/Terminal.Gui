@@ -152,7 +152,15 @@ public partial class View
                     return namedScheme;
                 }
 
-                return SchemeManager.TryGetScheme ("Base", out Scheme? baseScheme) ? Scheme.DeriveAccent (baseScheme, Driver?.DefaultAttribute) : namedScheme;
+                // If the "Accent" scheme is requested but the theme's definition has no normal background color,
+                // derive it from the base scheme to ensure it has a valid background.
+                // There may be cases where a Theme defines an Accent like this; that should be a rare case.
+                if (namedScheme.Normal.Background == Color.None)
+                {
+                    return SchemeManager.TryGetScheme ("Base", out Scheme? baseScheme) ? Scheme.DeriveAccent (baseScheme, Driver?.DefaultAttribute) : namedScheme;
+                }
+
+                return namedScheme;
             }
 
             Logging.Warning ($"SchemeName '{SchemeName}' not found in current theme. Falling back.");
