@@ -122,9 +122,11 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         base.EndInit ();
         UpdateSizes ();
 
+#if DIALOG_SCROLLBARS
         // Don't enable scrollbars until after initialized; otherwise they get created before
         // our frame has dimensions.
         ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
+#endif
     }
 
     /// <inheritdoc/>
