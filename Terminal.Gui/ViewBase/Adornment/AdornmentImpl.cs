@@ -48,23 +48,6 @@ public abstract class AdornmentImpl : IAdornment
                 return;
             }
 
-            // this is a useful assert to enable to find places where Thickness is being set to an unreasonably
-            // large value that will cause layout issues, but it is noisy in debug since some adornments (e.g. Border)
-            // intentionally allow large thicknesses and assert would need to be disabled for those cases.
-            //#if DEBUG
-            //            // If the new thickness is larger than the Parent.Frame, throw as this is likely a mistake and will cause layout issues.
-            //            if (Parent is { } p)
-            //            {
-            //                int width = p.Frame.Size.Width - value.Horizontal;
-            //                int height = p.Frame.Size.Height - value.Vertical;
-            //
-            //                if (width < 0 || height < 0)
-            //                {
-            //                    throw new ArgumentException (@$"Thickness {value} is too large for the parent frame {p.Frame}.", nameof (value));
-            //                }
-            //            }
-            //#endif
-
             field = value;
 
             OnThicknessChanged ();
