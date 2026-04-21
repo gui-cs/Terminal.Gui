@@ -48,7 +48,7 @@ PowerShell script to delist old NuGet packages, keeping only the most recent ver
 
 **Usage**:
 ```powershell
-./delist-nuget.ps1 -ApiKey "your-nuget-api-key" [-JustPublishedVersion "2.0.0-alpha.1"]
+./delist-nuget.ps1 -ApiKey "your-nuget-api-key" [-JustPublishedVersion "2.0.1-rc.1"]
 ```
 
 **Parameters**:
@@ -56,9 +56,8 @@ PowerShell script to delist old NuGet packages, keeping only the most recent ver
 - `-JustPublishedVersion` (optional): Version that was just published (will be kept while others are delisted)
 
 **Behavior**:
-- **Develop packages** (`2.0.0-develop.*`): Keeps only the most recent, delists all others
-- **Alpha packages** (`2.0.0-alpha.*`): Keeps only the just-published version (or most recent if not specified)
-- **Beta packages** (`2.0.0-beta.*`): Keeps only the just-published version (or most recent if not specified)
+- **Develop packages** (`*-develop.*`): Keeps only the most recent, delists all others
+- **Pre-release packages** (`*-beta.*`, `*-rc.*`): Keeps only the just-published version (or most recent if not specified)
 
 This script is currently intended to be run manually when old NuGet packages need to be delisted; it is not currently run automatically by `publish.yml`.
 
