@@ -3614,6 +3614,45 @@ public class TextViewTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void Mouse_Click_At_Position_GreaterOrEqual_To_Lines_Count_Should_Set_InsertionPoint_To_Last_Line ()
+    {
+        // Create a TextView with 3 lines of text
+        TextView tv = new () { Width = 6, Height = 5 };
+        tv.Text = "Line1\nLine2\nLine3";
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        // Verify initial state
+        Assert.False (tv.WordWrap);
+        Assert.Equal (3, tv.Lines);
+        Assert.Equal (new Point (0, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (0, 0), tv.Viewport.Location);
+
+        // Simulate mouse click at Y position greater than or equal to LinesCount
+        Mouse ev = new () { Position = new Point (0, 3), Flags = MouseFlags.LeftButtonClicked };
+        tv.NewMouseEvent (ev);
+
+        // Verify InsertionPoint is set to the last line
+        Assert.Equal (new Point (0, 2), tv.InsertionPoint);
+
+        // Now test with WordWrap enabled
+        tv.WordWrap = true;
+
+        // Verify initial state with WordWrap enabled
+        Assert.True (tv.WordWrap);
+        Assert.Equal (3, tv.Lines);
+        Assert.Equal (new Point (0, 0), tv.InsertionPoint);
+        Assert.Equal (new Point (0, 0), tv.Viewport.Location);
+
+        // Simulate mouse click at Y position greater than or equal to LinesCount
+        ev = new Mouse { Position = new Point (0, 3), Flags = MouseFlags.LeftButtonClicked };
+        tv.NewMouseEvent (ev);
+
+        // Verify InsertionPoint is set to the last line
+        Assert.Equal (new Point (0, 2), tv.InsertionPoint);
+    }
+
+    [Fact]
     public void MoveEnd_AdjustsViewportToShowInsertionPoint_When_InsertionPointIsBeyondViewport ()
     {
         using IApplication app = Application.Create ().Init ();

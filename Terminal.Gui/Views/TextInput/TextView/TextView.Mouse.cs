@@ -224,7 +224,7 @@ public partial class TextView
             int desiredInsertionY = Math.Clamp (Viewport.Y + p.Y, 0, _model.Count);
             int movementY = desiredInsertionY - _lastMouseInsertionPointY;
 
-            if (Viewport.Y + p.Y > _model.Count || (IsSelecting && p.Y >= Math.Max (Viewport.Height - 1, 0)))
+            if (Viewport.Y + p.Y >= _model.Count || (IsSelecting && p.Y >= Math.Max (Viewport.Height - 1, 0)))
             {
                 CurrentRow = _model.Count - 1;
             }
