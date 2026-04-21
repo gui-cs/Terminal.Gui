@@ -364,11 +364,11 @@ public class TextMateSyntaxHighlighterTests
     // --- ThemeName property --- Copilot
 
     [Fact]
-    public void Constructor_Sets_CurrentThemeName ()
+    public void Constructor_Sets_ThemeName ()
     {
         // Copilot
         TextMateSyntaxHighlighter highlighter = new (ThemeName.Monokai);
-        Assert.Equal (ThemeName.Monokai, highlighter.CurrentThemeName);
+        Assert.Equal (ThemeName.Monokai, highlighter.ThemeName);
     }
 
     [Fact]
@@ -376,17 +376,17 @@ public class TextMateSyntaxHighlighterTests
     {
         // Copilot
         TextMateSyntaxHighlighter highlighter = new ();
-        Assert.Equal (ThemeName.DarkPlus, highlighter.CurrentThemeName);
+        Assert.Equal (ThemeName.DarkPlus, highlighter.ThemeName);
     }
 
     [Fact]
-    public void SetTheme_Updates_CurrentThemeName ()
+    public void SetTheme_Updates_ThemeName ()
     {
         // Copilot
         TextMateSyntaxHighlighter highlighter = new ();
-        Assert.Equal (ThemeName.DarkPlus, highlighter.CurrentThemeName);
+        Assert.Equal (ThemeName.DarkPlus, highlighter.ThemeName);
 
         highlighter.SetTheme (ThemeName.SolarizedLight);
-        Assert.Equal (ThemeName.SolarizedLight, highlighter.CurrentThemeName);
+        Assert.Equal (ThemeName.SolarizedLight, highlighter.ThemeName);
     }
 }

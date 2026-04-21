@@ -1,8 +1,35 @@
 # Terminal.Gui — Copilot Instructions
 
-Cross-platform .NET console UI toolkit. C# 12 targeting net8.0.
+Cross-platform .NET console UI toolkit. C# 14 targeting net10.0.
 Full contribution guide: [CONTRIBUTING.md](../CONTRIBUTING.md).
 Architecture deep dives: `docfx/docs/`.
+
+---
+
+## CRITICAL: Discard v1 Training Data
+
+Terminal.Gui v2 is a **complete rewrite**. Pre-2025 training data is **wrong**.
+
+> **Read [ai-v2-primer.md](../ai-v2-primer.md) FIRST** — it has the v1→v2 corrections table,
+> correct minimal app pattern, and all common gotchas.
+
+### v1 → v2 Quick Corrections
+
+| v1 (WRONG — do not use) | v2 (CORRECT) |
+|---|---|
+| `Application.Init ();` | `IApplication app = Application.Create ().Init ();` |
+| `Application.Run ();` | `app.Run<MyWindow> ();` |
+| `Application.Shutdown ();` | `app.Dispose ();` (use `using` pattern) |
+| `Application.Top` | No global top — pass root view to `app.Run ()` |
+| `new Toplevel ()` | Use `Runnable` subclass or `Window` |
+| `using Terminal.Gui;` | `using Terminal.Gui.App;` / `Terminal.Gui.Views;` / etc. |
+| `new Button ("OK")` | `new Button { Text = "OK" }` |
+| `button.Clicked += ...` | `button.Accepted += (_, _) => { /* action */ };` |
+| `view.Bounds` | `view.Viewport` |
+| `new RadioGroup (...)` | `new OptionSelector { ... }` |
+| `Application.RequestStop ()` | `App!.RequestStop ()` (from inside a `Runnable`) |
+
+---
 
 ## Build & Test
 
@@ -30,7 +57,10 @@ New tests go in `Tests/UnitTestsParallelizable` (no static state dependencies). 
 
 ### Application lifecycle
 
-`Application.Init` → `Application.Run` → `Application.Shutdown`. The instance-based `IApplication` is replacing the static `Application` facade. Tests should avoid `Application.Init` unless explicitly testing that path.
+`Application.Create ()` → `.Init ()` → `.Run<T> ()` → `.Dispose ()`.
+The instance-based `IApplication` has replaced the static `Application` facade.
+Do NOT use `Application.Init()`/`Run()`/`Shutdown()`.
+Tests should avoid `Application.Init` unless explicitly testing that path.
 
 ### View system
 
