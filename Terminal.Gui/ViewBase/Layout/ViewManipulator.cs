@@ -193,7 +193,7 @@ public sealed class ViewManipulator
         }
         int actualDelta = currentFrameHeight - newHeight;
 
-        _view.Frame = _view.Frame with { Y = +_view.Frame.Y + actualDelta, Height = newHeight };
+        _view.Frame = _view.Frame with { Y = _view.Frame.Y + actualDelta, Height = newHeight };
 
         return true;
     }
