@@ -225,7 +225,7 @@ public sealed class ViewManipulator
         }
         int actualDelta = currentFrameWidth - newWidth;
 
-        _view.Frame = _view.Frame with { X = +_view.Frame.X + actualDelta, Width = newWidth };
+        _view.Frame = _view.Frame with { X = _view.Frame.X + actualDelta, Width = newWidth };
 
         return true;
     }
