@@ -486,8 +486,6 @@ public class Shortcut : View, IOrientation, IDesignable
         get => _commandView;
         set
         {
-            ArgumentNullException.ThrowIfNull (value);
-
             // Clean up old
             _commandView?.GettingAttributeForRole -= SubViewOnGettingAttributeForRole;
             Remove (_commandView);
@@ -497,15 +495,15 @@ public class Shortcut : View, IOrientation, IDesignable
             _commandView = value;
 
 #if DEBUG
-            if (string.IsNullOrEmpty (_commandView.Id))
+            if (string.IsNullOrEmpty (_commandView?.Id))
             {
-                _commandView.Id = "_commandView";
+                _commandView?.Id = "_commandView";
             }
 #endif
-            _commandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
+            _commandView?.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
 
             // If the CommandView has a hotkey, we use that. Otherwise, we use '_' to indicate the hotkey is in the Title.
-            if (_commandView.HotKey != Key.Empty)
+            if (_commandView?.HotKey != Key.Empty)
             {
                 HotKeySpecifier = (Rune)'\xffff';
             }
@@ -513,7 +511,7 @@ public class Shortcut : View, IOrientation, IDesignable
             {
                 HotKeySpecifier = (Rune)'_';
             }
-            Title = _commandView.Text;
+            Title = _commandView?.Text ?? string.Empty;
 
             UpdateKeyBindings (Key.Empty);
             UpdateMouseBindings ();
