@@ -617,6 +617,23 @@ public class SelectorBaseTests
         Assert.Equal (30, selector.Value);
     }
 
+    [Fact]
+    public void Setting_TabBehavior_AfterSubViewsAreCreated_DoesNotLoseCheckedState ()
+    {
+        OptionSelector selector = new ()
+        {
+            Labels = ["Option1", "Option2"], Values = [10, 20], Orientation = Orientation.Vertical, TabBehavior = TabBehavior.NoStop
+        };
+
+        List<CheckBox> checkBoxes = [.. selector.SubViews.OfType<CheckBox> ()];
+
+        Assert.Equal (2, checkBoxes.Count);
+        Assert.Equal (CheckState.Checked, checkBoxes [0].Value);
+        Assert.Equal (CheckState.UnChecked, checkBoxes [1].Value);
+        Assert.Equal (10, selector.Value);
+        Assert.Equal (TabBehavior.NoStop, selector.TabBehavior);
+    }
+
     #endregion
 
     #region HotKey Command Tests
