@@ -144,6 +144,25 @@ public partial class View
                                       Viewport = Viewport with { Y = Math.Min (args.NewValue, scrollBar.ScrollableContentSize - scrollBar.VisibleContentSize) };
                                   };
 
+
+        scrollBar.VisibleChanging += (_, args) =>
+                                     {
+                                         if (!args.NewValue)
+                                         {
+                                             return;
+                                         }
+                                         int width = Frame.Size.Width - Padding.Thickness.Horizontal;
+                                         int height = Frame.Size.Height - Padding.Thickness.Vertical;
+
+                                         if (width < 2 || height < 3)
+                                         {
+                                             // Prevent scrollbar from becoming visible if it would cause negative available space for content
+                                             args.Cancel = true;
+
+                                             return;
+                                         }
+                                     };
+
         scrollBar.VisibleChanged += (_, _) =>
                                     {
                                         // Reset scrolling
@@ -165,6 +184,25 @@ public partial class View
                                   {
                                       Viewport = Viewport with { X = Math.Min (args.NewValue, scrollBar.ScrollableContentSize - scrollBar.VisibleContentSize) };
                                   };
+
+
+        scrollBar.VisibleChanging += (_, args) =>
+                                     {
+                                         if (!args.NewValue)
+                                         {
+                                             return;
+                                         }
+                                         int width = Frame.Size.Width - Padding.Thickness.Horizontal;
+                                         int height = Frame.Size.Height - Padding.Thickness.Vertical;
+
+                                         if (width < 3 || height < 2)
+                                         {
+                                             // Prevent scrollbar from becoming visible if it would cause negative available space for content
+                                             args.Cancel = true;
+
+                                             return;
+                                         }
+                                     };
 
         scrollBar.VisibleChanged += (_, _) =>
                                     {

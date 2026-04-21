@@ -46,7 +46,7 @@ public class TreeViewFileSystem : Scenario
         // MenuBar
         MenuBar menu = new ();
 
-        _treeViewFiles = new TreeView<IFileSystemInfo> { X = 0, Y = Pos.Bottom (menu), Width = Dim.Percent (50), Height = Dim.Fill () };
+        _treeViewFiles = new TreeView<IFileSystemInfo> { X = 0, Y = Pos.Bottom (menu), Width = Dim.Percent (50), Height = Dim.Fill (), BorderStyle = LineStyle.Dotted};
         _treeViewFiles.DrawLine += TreeViewFiles_DrawLine;
 
         // Scrollbars are disabled by default (VisibilityMode.Manual)

@@ -129,6 +129,7 @@ public class Shortcut : View, IOrientation, IDesignable
 #if DEBUG
             Id = "CommandView",
 #endif
+            Frame = new (0, 0, 2, 1),
             Width = Dim.Auto (),
             Height = Dim.Fill ()
         };
@@ -208,30 +209,30 @@ public class Shortcut : View, IOrientation, IDesignable
         ShowHide ();
         ForceCalculateNaturalWidth ();
 
-        if (Width.Has<DimAuto> (out _) || HelpView.Margin is null)
+        if (Width.Has<DimAuto> (out _))
         {
             return;
         }
 
         // Frame.Width is smaller than the natural width. Reduce width of HelpView.
-        _maxHelpWidth = int.Max (0, GetContentWidth () - CommandView.Frame.Width - KeyView.Frame.Width);
+        _maxHelpWidth = int.Max (0, GetContentWidth () - (CommandView?.Frame.Width ?? 0) - KeyView.Frame.Width);
 
         if (_maxHelpWidth < 3)
         {
             Thickness t = GetMarginThickness ();
 
             HelpView.Margin.Thickness = _maxHelpWidth switch
-                                         {
-                                             0 or 1 =>
+            {
+                0 or 1 =>
 
-                                                 // Scrunch it by removing both margins
-                                                 new Thickness (t.Right - 1, t.Top, t.Left - 1, t.Bottom),
-                                             2 =>
+                    // Scrunch it by removing both margins
+                    new Thickness (t.Right - 1, t.Top, t.Left - 1, t.Bottom),
+                2 =>
 
-                                                 // Scrunch just the right margin
-                                                 new Thickness (t.Right, t.Top, t.Left - 1, t.Bottom),
-                                             _ => HelpView.Margin.Thickness
-                                         };
+                    // Scrunch just the right margin
+                    new Thickness (t.Right, t.Top, t.Left - 1, t.Bottom),
+                _ => HelpView.Margin.Thickness
+            };
         }
         else
         {
@@ -251,7 +252,7 @@ public class Shortcut : View, IOrientation, IDesignable
     // so Pos.Align works correctly.
     internal void ShowHide ()
     {
-        if (CommandView.Visible)
+        if (CommandView?.Visible == true)
         {
             if (CommandView.SuperView is null)
             {
@@ -261,7 +262,7 @@ public class Shortcut : View, IOrientation, IDesignable
         }
         else
         {
-            if (CommandView.SuperView is { })
+            if (CommandView?.SuperView is { })
             {
                 Remove (CommandView);
             }
@@ -301,7 +302,11 @@ public class Shortcut : View, IOrientation, IDesignable
 
         MoveSubViewToStart (KeyView);
         MoveSubViewToStart (HelpView);
-        MoveSubViewToStart (CommandView);
+
+        if (CommandView is { })
+        {
+            MoveSubViewToStart (CommandView);
+        }
     }
 
     // Force Width to DimAuto to calculate natural width and then set it back
@@ -309,7 +314,7 @@ public class Shortcut : View, IOrientation, IDesignable
     {
         // Get the natural size of each subview
         Size screenSize = App?.Screen.Size ?? new Size (2048, 2048);
-        CommandView.SetRelativeLayout (screenSize);
+        CommandView?.SetRelativeLayout (screenSize);
         HelpView.SetRelativeLayout (screenSize);
         KeyView.SetRelativeLayout (screenSize);
 
@@ -331,7 +336,7 @@ public class Shortcut : View, IOrientation, IDesignable
     ///         <item>Programmatic guard (skip if no binding)</item>
     ///     </list>
     /// </summary>
-    protected override View GetDispatchTarget (ICommandContext? ctx) => CommandView;
+    protected override View? GetDispatchTarget (ICommandContext? ctx) => CommandView;
 
     // ConsumeDispatch defaults to false — CommandView completes its own activation
     // (e.g., CheckBox.OnActivated calls AdvanceCheckState).
@@ -432,7 +437,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
     #region Command
 
-    private View _commandView = new ();
+    private View? _commandView;
 
     /// <summary>
     ///     Gets or sets the View that displays the command text and hotkey.
@@ -476,7 +481,7 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     StatusBar.Add(force16ColorsShortcut);
     /// </code>
     /// </example>
-    public View CommandView
+    public View? CommandView
     {
         get => _commandView;
         set
@@ -484,9 +489,9 @@ public class Shortcut : View, IOrientation, IDesignable
             ArgumentNullException.ThrowIfNull (value);
 
             // Clean up old
-            _commandView.GettingAttributeForRole -= SubViewOnGettingAttributeForRole;
+            _commandView?.GettingAttributeForRole -= SubViewOnGettingAttributeForRole;
             Remove (_commandView);
-            _commandView.Dispose ();
+            _commandView?.Dispose ();
 
             // Set new
             _commandView = value;
@@ -527,7 +532,7 @@ public class Shortcut : View, IOrientation, IDesignable
 
         MouseBindings.Clear ();
 
-        foreach (KeyValuePair<MouseFlags, MouseBinding> mb in CommandView.MouseBindings.GetBindings ())
+        foreach (KeyValuePair<MouseFlags, MouseBinding> mb in CommandView?.MouseBindings.GetBindings () ?? [])
         {
             MouseBindings.Add (mb.Key, mb.Value);
         }
@@ -535,22 +540,19 @@ public class Shortcut : View, IOrientation, IDesignable
 
     private void SetCommandViewDefaultLayout ()
     {
-        if (CommandView.Margin is { })
-        {
-            CommandView.Margin.Thickness = GetMarginThickness ();
+        CommandView?.Margin.Thickness = GetMarginThickness ();
 
-            // Margin must be transparent to mouse, so clicks pass through to Shortcut
-            CommandView.Margin.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
-        }
+        // Margin must be transparent to mouse, so clicks pass through to Shortcut
+        CommandView?.Margin.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
 
-        CommandView.X = Pos.Align (Alignment.End, AlignmentModes);
+        CommandView?.X = Pos.Align (Alignment.End, AlignmentModes);
 
-        CommandView.VerticalTextAlignment = Alignment.Center;
-        CommandView.TextAlignment = Alignment.Start;
-        CommandView.TextFormatter.WordWrap = false;
+        CommandView?.VerticalTextAlignment = Alignment.Center;
+        CommandView?.TextAlignment = Alignment.Start;
+        CommandView?.TextFormatter.WordWrap = false;
 
-        CommandView.MouseHighlightStates = MouseState.None;
-        CommandView.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
+        CommandView?.MouseHighlightStates = MouseState.None;
+        CommandView?.GettingAttributeForRole += SubViewOnGettingAttributeForRole;
     }
 
     private void SubViewOnGettingAttributeForRole (object? sender, VisualRoleEventArgs e)
@@ -607,7 +609,7 @@ public class Shortcut : View, IOrientation, IDesignable
         // If the Title changes, update the CommandView Text.
         // This is a helper to make it easier to set the CommandView text.
         // CommandView is public and replaceable, but this is a convenience.
-        _commandView.Text = Title;
+        _commandView?.Text = Title;
 
     /// <summary>
     ///     Gets or sets the target <see cref="View"/> that the <see cref="Command"/> will be invoked on
@@ -654,17 +656,14 @@ public class Shortcut : View, IOrientation, IDesignable
     /// <summary>
     ///     The subview that displays the help text for the command. Internal for unit testing.
     /// </summary>
-    public View HelpView { get; } = new () { /*ViewportSettings = ViewportSettingsFlags.TransparentMouse*/ };
+    public View HelpView { get; } = new () { Frame = new Rectangle (0, 0, 2, 1) };
 
     private void SetHelpViewDefaultLayout ()
     {
-        if (HelpView.Margin is { })
-        {
-            HelpView.Margin.Thickness = GetMarginThickness ();
+        HelpView.Margin.Thickness = GetMarginThickness ();
 
-            // Margin must be transparent to mouse, so clicks pass through to Shortcut
-            HelpView.Margin.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
-        }
+        // Margin must be transparent to mouse, so clicks pass through to Shortcut
+        HelpView.Margin.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
 
         HelpView.X = Pos.Align (Alignment.End, AlignmentModes);
         _maxHelpWidth = HelpView.Text.GetColumns ();
@@ -760,7 +759,7 @@ public class Shortcut : View, IOrientation, IDesignable
     ///     Gets the subview that displays the key. Is drawn with Normal and HotNormal colors reversed.
     /// </summary>
 
-    public View KeyView { get; } = new () { /*ViewportSettings = ViewportSettingsFlags.TransparentMouse*/ };
+    public View KeyView { get; } = new () { Frame = new Rectangle (0, 0, 2, 1) };
 
     /// <summary>
     ///     Gets or sets the minimum size of the key text. Useful for aligning the key text with other <see cref="Shortcut"/>s.
@@ -782,13 +781,10 @@ public class Shortcut : View, IOrientation, IDesignable
 
     private void SetKeyViewDefaultLayout ()
     {
-        if (KeyView.Margin is { })
-        {
-            KeyView.Margin.Thickness = GetMarginThickness ();
+        KeyView.Margin.Thickness = GetMarginThickness ();
 
-            // Margin must be transparent to mouse, so clicks pass through to Shortcut
-            KeyView.Margin.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
-        }
+        // Margin must be transparent to mouse, so clicks pass through to Shortcut
+        KeyView.Margin.ViewportSettings |= ViewportSettingsFlags.TransparentMouse;
 
         KeyView.X = Pos.Align (Alignment.End, AlignmentModes);
         KeyView.Width = Dim.Auto (DimAutoStyle.Text, Dim.Func (_ => MinimumKeyTextSize));
@@ -883,9 +879,10 @@ public class Shortcut : View, IOrientation, IDesignable
         {
             TitleChanged -= Shortcut_TitleChanged;
 
-            if (CommandView.SuperView is null)
+            if (CommandView?.SuperView is null)
             {
-                CommandView.Dispose ();
+                CommandView?.Dispose ();
+                CommandView = null;
             }
 
             if (HelpView.SuperView is null)

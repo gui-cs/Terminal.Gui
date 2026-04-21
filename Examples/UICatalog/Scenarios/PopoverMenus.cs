@@ -400,8 +400,7 @@ public class PopoverMenus : Scenario
 
                                   foreach (MenuItem item in cultures)
                                   {
-                                      ((CheckBox)item.CommandView).Value =
-                                          Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;
+                                      (item.CommandView as CheckBox)?.Value = Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;
                                   }
                               };
     }
