@@ -189,6 +189,8 @@ public class SyntaxHighlighterPipelineTests
             ResetStateCallCount++;
         }
 
+        public string ThemeName => string.Empty;
+
         public Color? DefaultBackground => null;
 
         public Attribute? GetAttributeForScope (MarkdownStyleRole role) => null;
@@ -199,6 +201,8 @@ public class SyntaxHighlighterPipelineTests
         public IReadOnlyList<StyledSegment> Highlight (string code, string? language) => [new (code, MarkdownStyleRole.CodeBlock, attribute: attr)];
 
         public void ResetState () { }
+
+        public string ThemeName => string.Empty;
 
         public Color? DefaultBackground => null;
 
@@ -275,6 +279,8 @@ public class SyntaxHighlighterPipelineTests
 
         public void ResetState () { }
 
+        public string ThemeName => string.Empty;
+
         public Color? DefaultBackground => null;
 
         public Attribute? GetAttributeForScope (MarkdownStyleRole role) => role == targetRole ? attr : null;
@@ -286,6 +292,8 @@ public class SyntaxHighlighterPipelineTests
         public IReadOnlyList<StyledSegment> Highlight (string code, string? language) => [new (code, MarkdownStyleRole.CodeBlock)];
 
         public void ResetState () { }
+
+        public string ThemeName => string.Empty;
 
         public Color? DefaultBackground { get; } = themeBg;
 

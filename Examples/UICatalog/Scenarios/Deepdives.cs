@@ -58,10 +58,7 @@ public class Deepdives : Scenario
             Height = Dim.Fill (1)
         };
 
-        _markdownView = new Markdown
-        {
-            Width = Dim.Fill (), Height = Dim.Fill (), SyntaxHighlighter = new TextMateSyntaxHighlighter (ThemeName.Abbys), UseThemeBackground = true
-        };
+        _markdownView = new Markdown { Width = Dim.Fill (), Height = Dim.Fill (), SyntaxHighlighter = new TextMateSyntaxHighlighter () };
 
         _markdownView.ViewportSettings |= ViewportSettingsFlags.HasHorizontalScrollBar;
 
@@ -114,7 +111,13 @@ public class Deepdives : Scenario
 
         Shortcut contentWidthShortcut = new () { CommandView = _contentWidthUpDown, Text = "Content Width" };
 
-        DropDownList<ThemeName> themeDropDown = new () { ReadOnly = true, CanFocus = false, Value = ThemeName.Abbys, Autocomplete = null };
+        DropDownList<ThemeName> themeDropDown = new ()
+        {
+            ReadOnly = true,
+            CanFocus = false,
+            Value = (Enum.TryParse (_markdownView.SyntaxHighlighter.ThemeName, out ThemeName theme) ? theme : ThemeName.DarkPlus),
+            Autocomplete = null
+        };
 
         themeDropDown.ValueChanged += (_, e) =>
                                       {
@@ -123,18 +126,25 @@ public class Deepdives : Scenario
                                               return;
                                           }
 
-                                          TextMateSyntaxHighlighter highlighter = new (themeName);
-                                          _markdownView.SyntaxHighlighter = highlighter;
-
-                                          // Force re-layout so code blocks pick up new theme
-                                          string text = _markdownView.Text;
-                                          _markdownView.Text = string.Empty;
-                                          _markdownView.Text = text;
+                                          _markdownView.SyntaxHighlighter = new TextMateSyntaxHighlighter (themeName);
                                       };
 
         Shortcut themeShortcut = new () { Text = "_Theme:", CommandView = themeDropDown, MouseHighlightStates = MouseState.None };
 
-        CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = CheckState.UnChecked };
+        // Auto-select a light or dark syntax theme based on the terminal's actual background color.
+        _app.Driver!.DefaultAttributeChanged += (_, e) =>
+                                                 {
+                                                     if (_markdownView is null || e.NewValue is not { } attr)
+                                                     {
+                                                         return;
+                                                     }
+
+                                                     ThemeName autoTheme = TextMateSyntaxHighlighter.GetThemeForBackground (attr.Background);
+                                                     _markdownView.SyntaxHighlighter = new TextMateSyntaxHighlighter (autoTheme);
+                                                     themeDropDown.Value = autoTheme;
+                                                 };
+
+        CheckBox themeBgCheckBox = new () { Text = "Theme _BG", Value = _markdownView.UseThemeBackground ? CheckState.Checked : CheckState.UnChecked };
 
         themeBgCheckBox.ValueChanged += (_, e) =>
                                         {
@@ -144,11 +154,6 @@ public class Deepdives : Scenario
                                             }
 
                                             _markdownView.UseThemeBackground = e.NewValue == CheckState.Checked;
-
-                                            // Force re-layout
-                                            string text = _markdownView.Text;
-                                            _markdownView.Text = string.Empty;
-                                            _markdownView.Text = text;
                                         };
 
         Shortcut themeBgShortcut = new () { CommandView = themeBgCheckBox };

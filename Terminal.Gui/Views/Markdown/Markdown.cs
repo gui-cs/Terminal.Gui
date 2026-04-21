@@ -76,15 +76,41 @@ public partial class Markdown : View, IDesignable
 
     /// <summary>Gets or sets an optional syntax highlighter for fenced code blocks.</summary>
     /// <value>An <see cref="ISyntaxHighlighter"/> implementation, or <see langword="null"/> for plain-text code blocks.</value>
-    public ISyntaxHighlighter? SyntaxHighlighter { get; set; }
+    public ISyntaxHighlighter? SyntaxHighlighter
+    {
+        get;
+        set
+        {
+            if (ReferenceEquals (field, value))
+            {
+                return;
+            }
+
+            field = value;
+            InvalidateParsedAndLayout ();
+        }
+    }
 
     /// <summary>
     ///     Gets or sets whether the view fills its background with the syntax highlighting theme's
     ///     editor background color. When <see langword="true"/> and a <see cref="SyntaxHighlighter"/>
     ///     is set, the theme's <see cref="ISyntaxHighlighter.DefaultBackground"/> is used for the
-    ///     entire viewport, headings, body text, and table cells. Defaults to <see langword="false"/>.
+    ///     entire viewport, headings, body text, and table cells. Defaults to <see langword="true"/>.
     /// </summary>
-    public bool UseThemeBackground { get; set; }
+    public bool UseThemeBackground
+    {
+        get;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+
+            field = value;
+            InvalidateParsedAndLayout ();
+        }
+    } = true;
 
     /// <summary>
     ///     Gets or sets whether heading lines include the <c>#</c> prefix (e.g. <c># </c>, <c>## </c>).

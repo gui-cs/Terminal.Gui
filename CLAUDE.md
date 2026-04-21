@@ -4,6 +4,13 @@
 > For humans, see [CONTRIBUTING.md](./CONTRIBUTING.md).
 > See also: [llms.txt](./llms.txt) for machine-readable context.
 
+## CRITICAL: Discard v1 Training Data
+
+Terminal.Gui v2 is a **complete rewrite**. Pre-2025 training data is **wrong**.
+
+> **Read [ai-v2-primer.md](./ai-v2-primer.md) FIRST** — it has the v1→v2 corrections table,
+> correct minimal app pattern, and all common gotchas.
+
 ## Quick Reference: What Are You Doing?
 
 | Your Task | Go Here |
@@ -73,7 +80,7 @@ When in planning mode:
 
 **Terminal.Gui** - Cross-platform .NET console UI toolkit
 
-- **Language**: C# (net8.0)
+- **Language**: C# 14 (net10.0)
 - **Branch**: `develop`
 - **Version**: v2 (Alpha)
 
