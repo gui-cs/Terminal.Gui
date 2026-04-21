@@ -521,11 +521,13 @@ public partial class View
 
         Thickness thickness = GetAdornmentsThickness ();
 
+        Rectangle inside = thickness.GetInside (Viewport);
+
         Size newSize = new (viewport.Size.Width + thickness.Horizontal, viewport.Size.Height + thickness.Vertical);
 
-        if (newSize == Frame.Size)
+        if (newSize == Frame.Size || inside.Width < 0 || inside.Height < 0)
         {
-            // The change is not changing the Frame, so we don't need to update it.
+            // The change is not changing the Frame, or it is invalid, so we don't need to update it.
             // Just call SetNeedsLayout to update the layout.
             if (_viewportLocation != viewport.Location)
             {
