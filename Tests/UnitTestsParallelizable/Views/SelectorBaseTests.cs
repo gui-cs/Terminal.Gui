@@ -599,7 +599,7 @@ public class SelectorBaseTests
     }
 
     [Fact]
-    public void CreateSubViews_ResetsValueIfCurrentValueNotInNewValues_And_Call_UpdateChecked_Method ()
+    public void CreateSubViews_ResetsValue_WhenCurrentValueNotInNewValues ()
     {
         OptionSelector selector = new ();
 
