@@ -165,6 +165,10 @@ public class OptionSelector : SelectorBase, IDesignable
 
                 break;
             }
+
+            // Sanity checks to verify the assumptions above
+            Debug.Assert (checkBoxValueMap.Values.First () != (int)SubViews.OfType<CheckBox> ().First ().Value);
+            Debug.Assert (checkBoxValueMap.Values.First () == Values! [0]);
         }
 
         // Verify at most one is checked
