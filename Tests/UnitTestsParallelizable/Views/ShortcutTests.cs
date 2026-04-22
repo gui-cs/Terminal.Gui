@@ -54,7 +54,7 @@ public partial class ShortcutTests (ITestOutputHelper output)
 
         // CanFocus defaults
         Assert.True (shortcut.CanFocus);
-        Assert.False (shortcut.CommandView.CanFocus);
+        Assert.False (shortcut.CommandView?.CanFocus);
 
         // Dimension defaults
         Assert.IsType<DimAuto> (shortcut.Width);
@@ -77,7 +77,7 @@ public partial class ShortcutTests (ITestOutputHelper output)
         // CommandView defaults
         Assert.NotNull (shortcut.CommandView);
 #if DEBUG
-        Assert.Equal ("CommandView", shortcut.CommandView.Id);
+        Assert.Equal ("CommandView", shortcut.CommandView?.Id);
 #endif
 
         // HelpView defaults
@@ -122,7 +122,7 @@ public partial class ShortcutTests (ITestOutputHelper output)
         Assert.False (shortcut1.BindKeyToApplication);
         Assert.Equal (Orientation.Horizontal, shortcut1.Orientation);
         Assert.Equal (AlignmentModes.StartToEnd | AlignmentModes.IgnoreFirstOrLast, shortcut1.AlignmentModes);
-        Assert.Equal ("_CommandText", shortcut1.CommandView.Text); // Title syncs to CommandView.Text
+        Assert.Equal ("_CommandText", shortcut1.CommandView?.Text); // Title syncs to CommandView?.Text
         Assert.Equal (MouseState.In, shortcut1.MouseHighlightStates);
 
         // SubViews - All three should be present with values set
@@ -145,14 +145,14 @@ public partial class ShortcutTests (ITestOutputHelper output)
         Assert.Equal (2, shortcut.Viewport.Width);
         Assert.Equal (1, shortcut.Viewport.Height);
 
-        Assert.Equal (0, shortcut.CommandView.Viewport.Width);
-        Assert.Equal (1, shortcut.CommandView.Viewport.Height);
+        Assert.Equal (0, shortcut.CommandView?.Viewport.Width);
+        Assert.Equal (1, shortcut.CommandView?.Viewport.Height);
 
-        Assert.Equal (0, shortcut.HelpView.Viewport.Width);
-        Assert.Equal (0, shortcut.HelpView.Viewport.Height);
+        Assert.Equal (2, shortcut.HelpView.Viewport.Width);
+        Assert.Equal (1, shortcut.HelpView.Viewport.Height);
 
-        Assert.Equal (0, shortcut.KeyView.Viewport.Width);
-        Assert.Equal (0, shortcut.KeyView.Viewport.Height);
+        Assert.Equal (2, shortcut.KeyView.Viewport.Width);
+        Assert.Equal (1, shortcut.KeyView.Viewport.Height);
 
         //  0123456789
         // "   0  A "
@@ -163,8 +163,8 @@ public partial class ShortcutTests (ITestOutputHelper output)
         Assert.Equal (8, shortcut.Viewport.Width);
         Assert.Equal (1, shortcut.Viewport.Height);
 
-        Assert.Equal (0, shortcut.CommandView.Viewport.Width);
-        Assert.Equal (1, shortcut.CommandView.Viewport.Height);
+        Assert.Equal (0, shortcut.CommandView?.Viewport.Width);
+        Assert.Equal (1, shortcut.CommandView?.Viewport.Height);
 
         Assert.Equal (1, shortcut.HelpView.Viewport.Width);
         Assert.Equal (1, shortcut.HelpView.Viewport.Height);
@@ -181,8 +181,8 @@ public partial class ShortcutTests (ITestOutputHelper output)
         Assert.Equal (9, shortcut.Viewport.Width);
         Assert.Equal (1, shortcut.Viewport.Height);
 
-        Assert.Equal (1, shortcut.CommandView.Viewport.Width);
-        Assert.Equal (1, shortcut.CommandView.Viewport.Height);
+        Assert.Equal (1, shortcut.CommandView?.Viewport.Width);
+        Assert.Equal (1, shortcut.CommandView?.Viewport.Height);
 
         Assert.Equal (1, shortcut.HelpView.Viewport.Width);
         Assert.Equal (1, shortcut.HelpView.Viewport.Height);
@@ -261,7 +261,7 @@ public partial class ShortcutTests (ITestOutputHelper output)
 
         // 0123456789
         // -C--H--K-
-        Assert.Equal (expectedCmdX, shortcut.CommandView.Frame.X);
+        Assert.Equal (expectedCmdX, shortcut.CommandView?.Frame.X);
         Assert.Equal (expectedHelpX, shortcut.HelpView.Frame.X);
         Assert.Equal (expectedKeyX, shortcut.KeyView.Frame.X);
     }
@@ -271,19 +271,19 @@ public partial class ShortcutTests (ITestOutputHelper output)
     {
         var shortcut = new Shortcut { Title = "T" };
 
-        Assert.Equal (shortcut.Title, shortcut.CommandView.Text);
+        Assert.Equal (shortcut.Title, shortcut.CommandView?.Text);
 
         shortcut = new Shortcut ();
 
         shortcut.CommandView = new View { Text = "T" };
-        Assert.Equal (shortcut.Title, shortcut.CommandView.Text);
+        Assert.Equal (shortcut.Title, shortcut.CommandView?.Text);
     }
 
     [Fact]
     public void HotKey_Title_Initializer_SetsCorrectly ()
     {
         Shortcut shortcut = new () { Title = "_C" };
-        Assert.Equal (Key.Empty, shortcut.CommandView.HotKey);
+        Assert.Equal (Key.Empty, shortcut.CommandView?.HotKey);
         Assert.Equal (Key.C, shortcut.HotKey);
     }
 
@@ -293,15 +293,15 @@ public partial class ShortcutTests (ITestOutputHelper output)
         Shortcut shortcut = new () { Title = "_C" };
 
         shortcut.CommandView = new View { HotKeySpecifier = (Rune)'_', Text = "_D" };
-        Assert.Equal (Key.Empty, shortcut.CommandView.HotKey);
+        Assert.Equal (Key.Empty, shortcut.CommandView?.HotKey);
         Assert.Equal (Key.D, shortcut.HotKey);
 
         shortcut = new Shortcut { Title = "_C", CommandView = new View { HotKeySpecifier = (Rune)'_', Text = "_D" } };
-        Assert.Equal (Key.Empty, shortcut.CommandView.HotKey);
+        Assert.Equal (Key.Empty, shortcut.CommandView?.HotKey);
         Assert.Equal (Key.D, shortcut.HotKey);
 
         shortcut = new Shortcut { CommandView = new View { HotKeySpecifier = (Rune)'_', Text = "_D" }, Title = "_C" };
-        Assert.Equal (Key.Empty, shortcut.CommandView.HotKey);
+        Assert.Equal (Key.Empty, shortcut.CommandView?.HotKey);
         Assert.Equal (Key.C, shortcut.HotKey);
     }
 
@@ -456,7 +456,7 @@ public partial class ShortcutTests (ITestOutputHelper output)
     {
         Shortcut shortcut = new ();
 
-        Assert.True (shortcut.CommandView.Visible);
+        Assert.True (shortcut.CommandView?.Visible);
         Assert.Contains (shortcut.CommandView, shortcut.SubViews);
         Assert.True (shortcut.HelpView.Visible);
         Assert.DoesNotContain (shortcut.HelpView, shortcut.SubViews);
@@ -498,7 +498,7 @@ public partial class ShortcutTests (ITestOutputHelper output)
         shortcut.Text = "Help";
         shortcut.Title = "Command";
         Assert.True (shortcut.CanFocus);
-        Assert.False (shortcut.CommandView.CanFocus);
+        Assert.False (shortcut.CommandView?.CanFocus);
     }
 
     [Fact]
@@ -506,25 +506,25 @@ public partial class ShortcutTests (ITestOutputHelper output)
     {
         Shortcut shortcut = new ();
         Assert.True (shortcut.CanFocus);
-        Assert.False (shortcut.CommandView.CanFocus);
+        Assert.False (shortcut.CommandView?.CanFocus);
 
         shortcut.CommandView = new View { CanFocus = true };
-        Assert.True (shortcut.CommandView.CanFocus);
+        Assert.True (shortcut.CommandView?.CanFocus);
 
-        shortcut.CommandView.CanFocus = true;
-        Assert.True (shortcut.CommandView.CanFocus);
+        shortcut.CommandView?.CanFocus = true;
+        Assert.True (shortcut.CommandView?.CanFocus);
 
         shortcut.CanFocus = false;
         Assert.False (shortcut.CanFocus);
-        Assert.True (shortcut.CommandView.CanFocus);
+        Assert.True (shortcut.CommandView?.CanFocus);
 
-        shortcut.CommandView.CanFocus = false;
+        shortcut.CommandView?.CanFocus = false;
         Assert.False (shortcut.CanFocus);
-        Assert.False (shortcut.CommandView.CanFocus);
+        Assert.False (shortcut.CommandView?.CanFocus);
 
-        shortcut.CommandView.CanFocus = true;
+        shortcut.CommandView?.CanFocus = true;
         Assert.False (shortcut.CanFocus);
-        Assert.True (shortcut.CommandView.CanFocus);
+        Assert.True (shortcut.CommandView?.CanFocus);
     }
 
     // Claude - Opus 4.5

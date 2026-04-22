@@ -43,13 +43,12 @@ public abstract class AdornmentImpl : IAdornment
         get;
         set
         {
-            Thickness current = field;
-            field = value;
-
-            if (current == field)
+            if (value == field)
             {
                 return;
             }
+
+            field = value;
 
             OnThicknessChanged ();
             ThicknessChanged?.Invoke (this, EventArgs.Empty);

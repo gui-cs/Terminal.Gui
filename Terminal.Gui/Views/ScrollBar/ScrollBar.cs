@@ -90,6 +90,14 @@ public class ScrollBar : View, IOrientation, IDesignable, IValue<int>
         switch (VisibilityMode)
         {
             case ScrollBarVisibilityMode.Auto:
+                if (VisibleContentSize < 2)
+                {
+                    // Not enough room to show both buttons, so hide the scrollbar
+                    Visible = false;
+
+                    break;
+                }
+
                 // VisibilityMode is the authority. ViewportSettings flags are a
                 // convenience that *sets* VisibilityMode via SyncOneScrollBar; they
                 // should not be re-checked here. When the flag is later removed,

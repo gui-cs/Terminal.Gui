@@ -77,7 +77,7 @@ public class EnableForDesignEventTests
         // Find the Shortcut that has a CheckBox CommandView
         Shortcut checkBoxShortcut = bar.SubViews.OfType<Shortcut> ()
                                        .First (s => s.CommandView is CheckBox);
-        CheckBox checkBox = (CheckBox)checkBoxShortcut.CommandView;
+        CheckBox checkBox = (CheckBox)checkBoxShortcut.CommandView!;
 
         Assert.Equal (CheckState.UnChecked, checkBox.Value);
 
