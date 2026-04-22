@@ -42,7 +42,7 @@
     <PackageVersion Include="TextMateSharp.Grammars" Version="2.0.3" />
     <PackageVersion Include="ReportGenerator" Version="5.5.5" />
     <PackageVersion Include="TestableIO.System.IO.Abstractions.TestingHelpers" Version="22.1.1" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.4.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.5.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
     <PackageVersion Include="Xunit.Combinatorial" Version="2.0.24" />
