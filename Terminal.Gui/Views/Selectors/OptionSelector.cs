@@ -135,6 +135,10 @@ public class OptionSelector : SelectorBase, IDesignable
     ///     Updates the checked state of all checkbox subviews so that only the checkbox corresponding
     ///     to the current <see cref="SelectorBase.Value"/> is checked.
     /// </summary>
+    /// <remarks>
+    ///     If <see cref="SelectorBase.Value"/> doesn't exist in the list of checkbox values, then the first checkbox will be checked by default
+    ///     and will raise the <see cref="SelectorBase.ValueChanging"/>/<see cref="SelectorBase.ValueChanged"/> events.
+    /// </remarks>
     public override void UpdateChecked ()
     {
         Dictionary<CheckBox, int> checkBoxValueMap = SubViews.OfType<CheckBox> ().ToDictionary (cb => cb, GetCheckBoxValue);
