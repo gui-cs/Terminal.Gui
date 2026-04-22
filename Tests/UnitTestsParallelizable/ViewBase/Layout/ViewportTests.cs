@@ -227,7 +227,7 @@ public class ViewportTests (ITestOutputHelper output)
     {
         // Arrange
         var view = new View ();
-        view.SetContentSize (new (100, 100));
+        view.SetContentSize (new Size (100, 100));
         var newViewport = new Rectangle (0, 0, 200, 200);
         view.ViewportSettings = ViewportSettingsFlags.AllowLocationGreaterThanContentSize;
 
@@ -276,7 +276,7 @@ public class ViewportTests (ITestOutputHelper output)
         View view = new () { X = 1, Y = 1, Width = 10, Height = 10 };
         view.BeginInit ();
         view.EndInit ();
-        view.Margin.Thickness = new (adornmentThickness);
+        view.Margin.Thickness = new Thickness (adornmentThickness);
 
         Assert.Equal (expectedOffset, view.GetViewportOffsetFromFrame ().X);
     }
@@ -303,7 +303,7 @@ public class ViewportTests (ITestOutputHelper output)
     {
         View view = new () { Width = 1, Height = 1 };
         view.SetContentSize (new Size (5, 5));
-        view.Viewport = new (0, 0, 10, 10);
+        view.Viewport = new Rectangle (0, 0, 10, 10);
         view.ContentSizeTracksViewport = true;
         Assert.Equal (view.Viewport.Size, view.GetContentSize ());
     }
@@ -313,7 +313,7 @@ public class ViewportTests (ITestOutputHelper output)
     {
         View view = new () { Width = 1, Height = 1 };
         view.SetContentSize (new Size (5, 5));
-        view.Viewport = new (0, 0, 10, 10);
+        view.Viewport = new Rectangle (0, 0, 10, 10);
         view.ContentSizeTracksViewport = false;
         Assert.NotEqual (view.Viewport.Size, view.GetContentSize ());
     }
@@ -323,7 +323,7 @@ public class ViewportTests (ITestOutputHelper output)
         public int OnViewportChangedCallCount { get; private set; }
         public int ViewportChangedEventCallCount { get; private set; }
 
-        public TestViewportEventsView () => ViewportChanged += (sender, args) => ViewportChangedEventCallCount++;
+        public TestViewportEventsView () => ViewportChanged += (_, _) => ViewportChangedEventCallCount++;
 
         protected override void OnViewportChanged (DrawEventArgs e)
         {
@@ -409,7 +409,7 @@ public class ViewportTests (ITestOutputHelper output)
     {
         // Arrange - View with content that fits exactly in viewport
         var view = new View { Width = 10, Height = 10 };
-        view.SetContentSize (new (20, 20)); // Content larger than viewport
+        view.SetContentSize (new Size (20, 20)); // Content larger than viewport
         view.Layout ();
 
         // Act - Try to set viewport X such that X + Width > ContentSize.Width
@@ -425,7 +425,7 @@ public class ViewportTests (ITestOutputHelper output)
     {
         // Arrange - View with content that fits exactly in viewport
         var view = new View { Width = 10, Height = 10 };
-        view.SetContentSize (new (20, 20)); // Content larger than viewport
+        view.SetContentSize (new Size (20, 20)); // Content larger than viewport
         view.Layout ();
 
         // Act - Try to set viewport Y such that Y + Height > ContentSize.Height
@@ -441,7 +441,7 @@ public class ViewportTests (ITestOutputHelper output)
     {
         // Arrange
         var view = new View { Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.AllowXPlusWidthGreaterThanContentWidth };
-        view.SetContentSize (new (20, 20));
+        view.SetContentSize (new Size (20, 20));
         view.Layout ();
 
         // Act - Set viewport X such that X + Width > ContentSize.Width
@@ -456,7 +456,7 @@ public class ViewportTests (ITestOutputHelper output)
     {
         // Arrange
         var view = new View { Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.AllowYPlusHeightGreaterThanContentHeight };
-        view.SetContentSize (new (20, 20));
+        view.SetContentSize (new Size (20, 20));
         view.Layout ();
 
         // Act - Set viewport Y such that Y + Height > ContentSize.Height
@@ -471,7 +471,7 @@ public class ViewportTests (ITestOutputHelper output)
     {
         // Arrange
         var view = new View { Width = 10, Height = 10, ViewportSettings = ViewportSettingsFlags.AllowLocationPlusSizeGreaterThanContentSize };
-        view.SetContentSize (new (20, 20));
+        view.SetContentSize (new Size (20, 20));
         view.Layout ();
 
         // Act - Set viewport location such that X + Width and Y + Height exceed content size
@@ -491,7 +491,7 @@ public class ViewportTests (ITestOutputHelper output)
 
         // ContentSize = Viewport.Size = 10x10
 
-        // Act - Try to set positive viewport X 
+        // Act - Try to set positive viewport X
         // X=1, Width=10, ContentSize.Width=10 -> 1+10=11 > 10, should clamp to X=0
         view.Viewport = view.Viewport with { X = 1 };
 
@@ -525,7 +525,7 @@ public class ViewportTests (ITestOutputHelper output)
     {
         // Arrange - ContentSize larger than Viewport
         var view = new View { Width = 10, Height = 10 };
-        view.SetContentSize (new (20, 20)); // ContentSize.Width = 20, Viewport.Width = 10
+        view.SetContentSize (new Size (20, 20)); // ContentSize.Width = 20, Viewport.Width = 10
         view.Layout ();
 
         // Act
@@ -544,7 +544,7 @@ public class ViewportTests (ITestOutputHelper output)
     {
         // Arrange - ContentSize larger than Viewport
         var view = new View { Width = 10, Height = 10 };
-        view.SetContentSize (new (20, 20)); // ContentSize.Height = 20, Viewport.Height = 10
+        view.SetContentSize (new Size (20, 20)); // ContentSize.Height = 20, Viewport.Height = 10
         view.Layout ();
 
         // Act
@@ -552,6 +552,141 @@ public class ViewportTests (ITestOutputHelper output)
 
         // Assert - Max valid Y is ContentSize.Height - Viewport.Height = 20 - 10 = 10
         Assert.Equal (expectedY, view.Viewport.Y);
+    }
+
+    #endregion
+
+    #region SetViewport should not grow Frame when adornments consume entire Viewport (Issue #5043)
+
+    [Theory]
+    [InlineData (0, 1, 0)] // Padding right=1 → Horizontal=1, Frame.Width=0, Viewport.Width=0
+    [InlineData (1, 1, 0)] // Padding right=1 → Horizontal=1, Frame.Width=1, Viewport.Width=0
+    [InlineData (2, 1, 1)] // Padding right=1 → Horizontal=1, Frame.Width=2, Viewport.Width=1
+    [InlineData (2, 2, 0)] // Padding right=2 → Horizontal=2, Frame.Width=2, Viewport.Width=0
+    [InlineData (3, 2, 1)] // Padding right=2 → Horizontal=2, Frame.Width=3, Viewport.Width=1
+    [InlineData (2, 3, 0)] // Padding right=3 → Horizontal=3, Frame.Width=2, Viewport.Width=0
+    public void Set_Viewport_DoesNotGrowFrame_WhenPaddingThicknessConsumesViewport (int frameSize, int paddingRight, int expectedViewportWidth)
+    {
+        // Arrange - simulate scrollbar adding padding (right/bottom) that consumes the Viewport
+        var view = new View { Frame = new Rectangle (0, 0, frameSize, frameSize) };
+        view.Padding.Thickness = new Thickness (0, 0, paddingRight, paddingRight);
+
+        Rectangle originalFrame = view.Frame;
+
+        // Sanity: verify Viewport is as expected
+        Assert.Equal (expectedViewportWidth, view.Viewport.Width);
+        Assert.Equal (expectedViewportWidth, view.Viewport.Height);
+
+        // Act - setting Viewport to its current value should be a no-op
+        view.Viewport = view.Viewport;
+
+        // Assert - Frame must not have grown
+        Assert.Equal (originalFrame, view.Frame);
+    }
+
+    [Theory]
+    [InlineData (0, 1)] // Border=1 → Horizontal=2, Frame.Width=0, Viewport.Width=0
+    [InlineData (1, 1)] // Border=1 → Horizontal=2, Frame.Width=1, Viewport.Width=0
+    [InlineData (2, 1)] // Border=1 → Horizontal=2, Frame.Width=2, Viewport.Width=0
+    [InlineData (3, 1)] // Border=1 → Horizontal=2, Frame.Width=3, Viewport.Width=1
+    [InlineData (4, 2)] // Border=2 → Horizontal=4, Frame.Width=4, Viewport.Width=0
+    public void Set_Viewport_DoesNotGrowFrame_WhenBorderThicknessConsumesViewport (int frameSize, int borderThickness)
+    {
+        // Arrange
+        var view = new View { Frame = new Rectangle (0, 0, frameSize, frameSize) };
+        view.Border.Thickness = new Thickness (borderThickness);
+
+        Rectangle originalFrame = view.Frame;
+        int expectedViewportW = Math.Max (0, frameSize - borderThickness * 2);
+
+        // Sanity
+        Assert.Equal (expectedViewportW, view.Viewport.Width);
+
+        // Act
+        view.Viewport = view.Viewport;
+
+        // Assert
+        Assert.Equal (originalFrame, view.Frame);
+    }
+
+    [Theory]
+    [InlineData (0, 1)] // Margin=1 → Horizontal=2, Frame.Width=0, Viewport.Width=0
+    [InlineData (1, 1)] // Margin=1 → Horizontal=2, Frame.Width=1, Viewport.Width=0
+    [InlineData (2, 1)] // Margin=1 → Horizontal=2, Frame.Width=2, Viewport.Width=0
+    [InlineData (3, 1)] // Margin=1 → Horizontal=2, Frame.Width=3, Viewport.Width=1
+    public void Set_Viewport_DoesNotGrowFrame_WhenMarginThicknessConsumesViewport (int frameSize, int marginThickness)
+    {
+        // Arrange
+        var view = new View { Frame = new Rectangle (0, 0, frameSize, frameSize) };
+        view.Margin.Thickness = new Thickness (marginThickness);
+
+        Rectangle originalFrame = view.Frame;
+        int expectedViewportW = Math.Max (0, frameSize - marginThickness * 2);
+
+        // Sanity
+        Assert.Equal (expectedViewportW, view.Viewport.Width);
+
+        // Act
+        view.Viewport = view.Viewport;
+
+        // Assert
+        Assert.Equal (originalFrame, view.Frame);
+    }
+
+    [Theory]
+    [InlineData (4, 1, 1, 1)] // All adornments = 1 → total Horizontal=6 > Frame.Width=4 → Viewport.Width=0
+    [InlineData (6, 1, 1, 1)] // All = 1 → Horizontal=6, Frame.Width=6, Viewport.Width=0
+    [InlineData (7, 1, 1, 1)] // All = 1 → Horizontal=6, Frame.Width=7, Viewport.Width=1
+    [InlineData (3, 1, 0, 1)] // Margin=1, Padding=1 → Horizontal=4 > Frame.Width=3 → Viewport.Width=0
+    [InlineData (4, 1, 0, 1)] // Margin=1, Padding=1 → Horizontal=4, Frame.Width=4, Viewport.Width=0
+    [InlineData (5, 1, 0, 1)] // Margin=1, Padding=1 → Horizontal=4, Frame.Width=5, Viewport.Width=1
+    public void Set_Viewport_DoesNotGrowFrame_WhenCombinedAdornmentsConsumeViewport (int frameSize,
+                                                                                     int marginThickness,
+                                                                                     int borderThickness,
+                                                                                     int paddingThickness)
+    {
+        // Arrange
+        var view = new View { Frame = new Rectangle (0, 0, frameSize, frameSize) };
+        view.Margin.Thickness = new Thickness (marginThickness);
+        view.Border.Thickness = new Thickness (borderThickness);
+        view.Padding.Thickness = new Thickness (paddingThickness);
+
+        Rectangle originalFrame = view.Frame;
+        int totalThickness = (marginThickness + borderThickness + paddingThickness) * 2;
+        int expectedViewportW = Math.Max (0, frameSize - totalThickness);
+
+        // Sanity
+        Assert.Equal (expectedViewportW, view.Viewport.Width);
+
+        // Act
+        view.Viewport = view.Viewport;
+
+        // Assert
+        Assert.Equal (originalFrame, view.Frame);
+    }
+
+    [Theory]
+    [InlineData (2, 0, 0, 1, 0)] // Padding bottom=1, Frame.Height=2 → Viewport.Height=1, Viewport.Width=2 (only vertical affected)
+    [InlineData (2, 0, 0, 0, 1)] // Padding right=1, Frame.Width=2 → Viewport.Width=1, Viewport.Height=2 (only horizontal affected)
+    [InlineData (1, 0, 0, 1, 0)] // Padding bottom=1, Frame.Height=1 → Viewport.Height=0 (vertical consumed)
+    [InlineData (1, 0, 0, 0, 1)] // Padding right=1, Frame.Width=1 → Viewport.Width=0 (horizontal consumed)
+    public void Set_Viewport_DoesNotGrowFrame_WhenAsymmetricPaddingConsumesOneDimension (int frameSize,
+                                                                                         int paddingLeft,
+                                                                                         int paddingTop,
+                                                                                         int paddingBottom,
+                                                                                         int paddingRight)
+    {
+        // Arrange - simulates scrollbar adding thickness in only one direction
+        var view = new View { Frame = new Rectangle (0, 0, frameSize, frameSize) };
+        view.Padding.Thickness = new Thickness (paddingLeft, paddingTop, paddingRight, paddingBottom);
+
+        Rectangle originalFrame = view.Frame;
+
+        // Act
+        view.Viewport = view.Viewport;
+
+        // Assert
+        Assert.Equal (originalFrame, view.Frame);
     }
 
     #endregion

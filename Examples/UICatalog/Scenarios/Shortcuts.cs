@@ -263,7 +263,7 @@ public class Shortcuts : Scenario
             Command = Command.New
         };
 
-        _window.CommandNotBound += (o, args) =>
+        _window.CommandNotBound += (_, args) =>
                                    {
                                        if (args.Context?.Command != Command.New)
                                        {
@@ -329,13 +329,10 @@ public class Shortcuts : Scenario
 
         //framedShortcut.Orientation = Orientation.Horizontal;
 
-        if (framedShortcut.Padding is { })
-        {
-            framedShortcut.Padding.Thickness = new Thickness (0, 1, 0, 0);
-            framedShortcut.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
-        }
+        framedShortcut.Padding.Thickness = new Thickness (0, 1, 0, 0);
+        framedShortcut.Padding.Diagnostics = ViewDiagnosticFlags.Ruler;
 
-        if (framedShortcut.CommandView.Margin is { })
+        if (framedShortcut.CommandView?.Margin is { })
         {
             framedShortcut.CommandView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Dialog);
             framedShortcut.HelpView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Error);
@@ -537,7 +534,7 @@ public class Shortcuts : Scenario
             {
                 if (peer.CanFocus)
                 {
-                    peer.CommandView.CanFocus = canFocus;
+                    peer.CommandView?.CanFocus = canFocus;
                 }
             }
             focused?.SetFocus ();

@@ -135,13 +135,40 @@ public class OptionSelector : SelectorBase, IDesignable
     ///     Updates the checked state of all checkbox subviews so that only the checkbox corresponding
     ///     to the current <see cref="SelectorBase.Value"/> is checked.
     /// </summary>
+    /// <remarks>
+    ///     If <see cref="SelectorBase.Value"/> doesn't exist in the list of checkbox values, then the first checkbox will be checked by default
+    ///     and will raise the <see cref="SelectorBase.ValueChanging"/>/<see cref="SelectorBase.ValueChanged"/> events.
+    /// </remarks>
     public override void UpdateChecked ()
     {
+        Dictionary<CheckBox, int> checkBoxValueMap = SubViews.OfType<CheckBox> ().ToDictionary (cb => cb, GetCheckBoxValue);
+
         foreach (CheckBox cb in SubViews.OfType<CheckBox> ())
         {
             int value = GetCheckBoxValue (cb);
 
             cb.Value = value == Value ? CheckState.Checked : CheckState.UnChecked;
+        }
+
+        // If Value doesn't exist in any checkbox, use the first checkbox's value
+        if (Value is not null && checkBoxValueMap.Count > 0 && Values!.All (v => v != Value) && checkBoxValueMap.Values.All (v => v != Value))
+        {
+            Value = checkBoxValueMap.Values.First ();
+
+            foreach (KeyValuePair<CheckBox, int> kvp in checkBoxValueMap)
+            {
+                if (kvp.Value != Value)
+                {
+                    continue;
+                }
+                kvp.Key.Value = CheckState.Checked;
+
+                break;
+            }
+
+            // Sanity checks to verify the assumptions above
+            Debug.Assert (checkBoxValueMap.Values.First () != (int)SubViews.OfType<CheckBox> ().First ().Value);
+            Debug.Assert (checkBoxValueMap.Values.First () == Values! [0]);
         }
 
         // Verify at most one is checked

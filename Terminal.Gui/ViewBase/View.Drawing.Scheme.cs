@@ -147,6 +147,19 @@ public partial class View
 
             if (SchemeManager.TryGetScheme (SchemeName, out Scheme? namedScheme))
             {
+                if (SchemeName != "Accent")
+                {
+                    return namedScheme;
+                }
+
+                // If the "Accent" scheme is requested but the theme's definition has no normal background color,
+                // derive it from the base scheme to ensure it has a valid background.
+                // There may be cases where a Theme defines an Accent like this; that should be a rare case.
+                if (namedScheme.Normal.Background == Color.None)
+                {
+                    return SchemeManager.TryGetScheme ("Base", out Scheme? baseScheme) ? Scheme.DeriveAccent (baseScheme, Driver?.DefaultAttribute) : namedScheme;
+                }
+
                 return namedScheme;
             }
 

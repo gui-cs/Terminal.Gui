@@ -598,6 +598,61 @@ public class SelectorBaseTests
         Assert.True (checkBox.CanFocus);
     }
 
+    [Fact]
+    public void CreateSubViews_ResetsValue_WhenCurrentValueNotInNewValues ()
+    {
+        OptionSelector selector = new ();
+
+        selector.Labels = ["Option1", "Option2"];
+        selector.Values = [10, 20];
+
+        // Verify initial value is set to first value (10)
+        Assert.Equal (10, selector.Value);
+
+        // Change to new labels/values where current value (10) is not present
+        selector.Labels = ["New1", "New2"];
+        selector.Values = [30, 40];
+
+        // Value should reset to first value (30)
+        Assert.Equal (30, selector.Value);
+    }
+
+    [Fact]
+    public void Setting_TabBehavior_AfterSubViewsAreCreated_DoesNotLoseCheckedState ()
+    {
+        OptionSelector selector = new ()
+        {
+            Labels = ["Option1", "Option2"], Values = [10, 20], Orientation = Orientation.Vertical, TabBehavior = TabBehavior.NoStop
+        };
+
+        List<CheckBox> checkBoxes = [.. selector.SubViews.OfType<CheckBox> ()];
+
+        Assert.Equal (2, checkBoxes.Count);
+        Assert.Equal (CheckState.Checked, checkBoxes [0].Value);
+        Assert.Equal (CheckState.UnChecked, checkBoxes [1].Value);
+        Assert.Equal (10, selector.Value);
+        Assert.Equal (TabBehavior.NoStop, selector.TabBehavior);
+    }
+
+    [Fact]
+    public void Setting_TabBehavior_AfterSubViewsAreCreated_DoesNotLoseCheckedState_With_Enum ()
+    {
+        OptionSelector<Side> selector = new ()
+        {
+            Orientation = Orientation.Vertical, TabBehavior = TabBehavior.NoStop
+        };
+
+        List<CheckBox> checkBoxes = [.. selector.SubViews.OfType<CheckBox> ()];
+
+        Assert.Equal (4, checkBoxes.Count);
+        Assert.Equal (CheckState.Checked, checkBoxes [0].Value);
+        Assert.Equal (CheckState.UnChecked, checkBoxes [1].Value);
+        Assert.Equal (CheckState.UnChecked, checkBoxes [2].Value);
+        Assert.Equal (CheckState.UnChecked, checkBoxes [3].Value);
+        Assert.Equal (Side.Left, selector.Value);
+        Assert.Equal (TabBehavior.NoStop, selector.TabBehavior);
+    }
+
     #endregion
 
     #region HotKey Command Tests
