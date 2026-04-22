@@ -243,12 +243,9 @@ public class TableViewTests : TestDriverBase
         tableView.EndInit ();
 
         // Space toggles cell selection (Activate command)
-        // Note: Returns false because RaiseActivating has no subscribers
-        // but the selection is still toggled
         bool? result = tableView.InvokeCommand (Command.Activate);
 
-        // Command toggles selection but returns false (event not handled)
-        Assert.False (result);
+        Assert.True (result);
 
         tableView.Dispose ();
     }
@@ -290,12 +287,9 @@ public class TableViewTests : TestDriverBase
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        // Space triggers cell toggle (selection is toggled even though return value is false)
-        // This is because TableView.Activate returns false when no Activating handler sets Handled=true
         bool? result = tableView.NewKeyDownEvent (Key.Space);
 
-        // Returns false because there's no handler that sets Handled=true
-        Assert.False (result);
+        Assert.True (result);
 
         tableView.Dispose ();
     }

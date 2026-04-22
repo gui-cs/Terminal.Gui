@@ -316,8 +316,6 @@ public class TableEditor : Scenario
                                       }
                                   };
 
-        _tableView!.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
-
         // Run - Start the application.
         app.Run (appWindow);
     }

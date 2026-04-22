@@ -133,6 +133,7 @@ public partial class FileDialog : Dialog, IDesignable
             Arrangement = ViewArrangement.LeftResizable,
             BorderStyle = LineStyle.Dashed,
             SuperViewRendersLineCanvas = true,
+            TabStop = TabBehavior.TabStop,
             CanFocus = true,
             Id = "_tableViewContainer"
         };
@@ -147,7 +148,7 @@ public partial class FileDialog : Dialog, IDesignable
             Visible = false
         };
 
-        _tableView = new TableView { Width = Dim.Fill (), Height = Dim.Fill (), FullRowSelect = true, Id = "_tableView" };
+        _tableView = new TableView { Width = Dim.Fill (), Height = Dim.Fill (_tbFind!), FullRowSelect = true, Id = "_tableView" };
         _tableView.CollectionNavigator = new FileDialogCollectionNavigator (this, _tableView);
         _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
         _tableView.Activating += OnTableViewActivating;
@@ -205,7 +206,7 @@ public partial class FileDialog : Dialog, IDesignable
         _tableView.KeyBindings.Add (Key.Space.WithCtrl, Command.Context);
         _tableView.MouseBindings.Add (MouseFlags.RightButtonClicked, Command.Context);
 
-        _tbFind = new TextField { X = 0, Width = Dim.Width (_tableView), Y = Pos.Bottom (_tableView), Id = "_tbFind" };
+        _tbFind = new TextField { X = 0, Width = Dim.Width (_tableView), Y = Pos.AnchorEnd (), Id = "_tbFind" };
 
         _spinnerView = new SpinnerView
         {

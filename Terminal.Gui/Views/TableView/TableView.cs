@@ -38,7 +38,8 @@ public delegate Scheme? RowColorGetterDelegate (RowColorGetterArgs args);
 ///             <term>Ctrl+Home / Ctrl+End</term> <description>Moves to the first or last row.</description>
 ///         </item>
 ///         <item>
-///             <term>Shift+&lt;movement&gt;</term> <description>Extends the selection in the given direction.</description>
+///             <term>Shift+&lt;movement&gt;</term>
+///             <description>Extends the selection in the given direction.</description>
 ///         </item>
 ///         <item>
 ///             <term>Ctrl+A</term> <description>Selects all cells.</description>
@@ -76,7 +77,18 @@ public partial class TableView : View, IDesignable
     ///         and is added directly in the constructor.
     ///     </para>
     /// </remarks>
-    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ();
+    public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
+    {
+        // Emacs navigation
+        [Command.Up] = Bind.All (Key.P.WithCtrl),
+        [Command.Down] = Bind.All (Key.N.WithCtrl),
+        [Command.PageDown] = Bind.All (Key.V.WithCtrl),
+
+        // Add Home/End as additional Start/End bindings (the base layer also provides Ctrl+Home/Ctrl+End)
+        [Command.Start] = Bind.All (Key.Home),
+        [Command.End] = Bind.All (Key.End),
+        [Command.Toggle] = Bind.All (Key.Space)
+    };
 
     /// <summary>Initializes a <see cref="TableView"/> class.</summary>
     /// <param name="table">The table to display in the control</param>
@@ -238,8 +250,6 @@ public partial class TableView : View, IDesignable
         AddCommand (Command.Accept, () => OnCellActivated (new CellActivatedEventArgs (Table!, SelectedColumn, SelectedRow)));
 
         AddCommand (Command.Toggle, _ => ToggleCurrentCellSelection () is true);
-
-        AddCommand (Command.Activate, ctx => RaiseActivating (ctx) is true);
 
         // Apply configurable key bindings (base View layer + TableView-specific layer)
         ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
@@ -852,34 +862,38 @@ public partial class TableView : View, IDesignable
         }
     } = KeyCode.Enter;
 
+    /// <inheritdoc />
+    protected override void OnActivated (ICommandContext? ctx) => ToggleCurrentCellSelection ();
+
     /// <inheritdoc/>
-    protected override bool OnKeyDown (Key key)
+    protected override bool OnKeyDown (Key key) => TableIsNullOrInvisible () && false;
+
+    /// <inheritdoc/>
+    protected override bool OnKeyDownNotHandled (Key a)
     {
-        if (TableIsNullOrInvisible ())
+        if (a.AsRune is { } rune && rune != default (Rune) && Rune.IsControl (rune))
         {
             return false;
         }
 
-        // If the key was bound to key command, let normal KeyDown processing happen. This enables overriding the default handling.
-        // See: https://github.com/gui-cs/Terminal.Gui/issues/3950#issuecomment-2807350939
-        if (KeyBindings.TryGet (key, out _))
+        if (a.IsAlt || a.IsCtrl)
+        {
+            // Never insert modified keys
+            return false;
+        }
+
+        // Ignore other control characters.
+        if (string.IsNullOrEmpty (a.AsGrapheme) && a is { IsKeyCodeAtoZ: false, KeyCode: < KeyCode.Space or > KeyCode.CharMask })
         {
             return false;
         }
 
-        if (HasFocus
-            && Table?.Rows != 0
-            && key != KeyBindings.GetFirstFromCommands (Command.Accept)
-            && key != CellActivationKey
-            && CollectionNavigator.Matcher.IsCompatibleKey (key)
-            && !key.KeyCode.FastHasFlags (KeyCode.CtrlMask)
-            && !key.KeyCode.FastHasFlags (KeyCode.AltMask)
-            && Rune.IsLetterOrDigit ((Rune)key))
+        if (HasFocus && Table?.Rows != 0)
         {
-            return CycleToNextTableEntryBeginningWith (key);
+            return CycleToNextTableEntryBeginningWith (a);
         }
 
-        return false;
+        return true;
     }
 
     /// <summary>
