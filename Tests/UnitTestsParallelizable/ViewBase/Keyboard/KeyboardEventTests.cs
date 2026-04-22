@@ -5,18 +5,17 @@ using UnitTests;
 
 namespace ViewBaseTests.Keyboard;
 
-
 public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
 {
     /// <summary>
     ///     This tests that when a new key down event is sent to the view  will fire the key-down related
-    ///     events: KeyDown and KeyDownNotHandled. 
+    ///     events: KeyDown and KeyDownNotHandled.
     /// </summary>
     [Theory]
     [MemberData (nameof (AllViewTypes))]
     public void AllViews_NewKeyDownEvent_All_EventsFire (Type viewType)
     {
-        var view = CreateInstanceIfNotGeneric (viewType);
+        View view = CreateInstanceIfNotGeneric (viewType);
 
         if (view == null)
         {
@@ -38,10 +37,10 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         var keyDownNotHandled = false;
 
         view.KeyDownNotHandled += (s, a) =>
-                               {
-                                   a.Handled = true;
-                                   keyDownNotHandled = true;
-                               };
+                                  {
+                                      a.Handled = true;
+                                      keyDownNotHandled = true;
+                                  };
 
         // Key.Empty is invalid, but it's used here to test that the event is fired
         Assert.True (view.NewKeyDownEvent (Key.Empty)); // this will be true because the ProcessKeyDown event handled it
@@ -74,14 +73,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                         };
         view.KeyDownNotHandled += (s, e) => { keyDownNotHandled = true; };
 
-        view.NewKeyDownEvent (
-                              new (
-                                   KeyCode.Null
-                                   | (shift ? KeyCode.ShiftMask : 0)
-                                   | (alt ? KeyCode.AltMask : 0)
-                                   | (control ? KeyCode.CtrlMask : 0)
-                                  )
-                             );
+        view.NewKeyDownEvent (new Key (KeyCode.Null | (shift ? KeyCode.ShiftMask : 0) | (alt ? KeyCode.AltMask : 0) | (control ? KeyCode.CtrlMask : 0)));
         Assert.True (keyDownNotHandled);
         Assert.True (view.OnKeyDownCalled);
         Assert.True (view.OnProcessKeyDownCalled);
@@ -106,15 +98,14 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                             keyDown = true;
                         };
 
-
         view.KeyDownNotHandled += (s, e) =>
-                               {
-                                   Assert.Equal (KeyCode.A, e.KeyCode);
-                                   Assert.False (keyDownNotHandled);
-                                   Assert.False (view.OnProcessKeyDownCalled);
-                                   e.Handled = true;
-                                   keyDownNotHandled = true;
-                               };
+                                  {
+                                      Assert.Equal (KeyCode.A, e.KeyCode);
+                                      Assert.False (keyDownNotHandled);
+                                      Assert.False (view.OnProcessKeyDownCalled);
+                                      e.Handled = true;
+                                      keyDownNotHandled = true;
+                                  };
 
         view.NewKeyDownEvent (Key.A);
         Assert.True (keyDown);
@@ -139,11 +130,11 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                         };
 
         view.KeyDownNotHandled += (s, e) =>
-                               {
-                                   keyDownNotHandled = true;
-                                   Assert.False (e.Handled);
-                                   Assert.Equal (KeyCode.N, e.KeyCode);
-                               };
+                                  {
+                                      keyDownNotHandled = true;
+                                      Assert.False (e.Handled);
+                                      Assert.Equal (KeyCode.N, e.KeyCode);
+                                  };
 
         view.NewKeyDownEvent (Key.N);
         Assert.True (keyDownNotHandled);
@@ -174,13 +165,13 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
                         };
 
         view.KeyDownNotHandled += (s, e) =>
-                               {
-                                   Assert.Equal (KeyCode.A, e.KeyCode);
-                                   Assert.False (keyDownNotHandled);
-                                   Assert.True (view.OnProcessKeyDownCalled);
-                                   e.Handled = true;
-                                   keyDownNotHandled = true;
-                               };
+                                  {
+                                      Assert.Equal (KeyCode.A, e.KeyCode);
+                                      Assert.False (keyDownNotHandled);
+                                      Assert.True (view.OnProcessKeyDownCalled);
+                                      e.Handled = true;
+                                      keyDownNotHandled = true;
+                                  };
 
         view.NewKeyDownEvent (Key.A);
         Assert.True (keyDown);
@@ -216,10 +207,45 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
         public bool? CommandReturns { get; set; }
     }
 
+    /// <summary>
+    ///     Baseline: A view that does NOT subscribe to KeyDownNotHandled does not interfere
+    ///     with HotKey routing. Alt+T reaches the sibling Label's HotKey as expected.
+    /// </summary>
+    [Fact]
+    public void AltKey_Routed_To_Sibling_HotKey_When_FocusedView_Does_Not_Handle_KeyDownNotHandled ()
+    {
+        // Copilot
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        Window win = new ();
+
+        Label label = new () { Text = "_Type text here:" };
+        var hotKeyInvoked = false;
+        label.HandlingHotKey += (_, _) => hotKeyInvoked = true;
+
+        // A plain view that can focus but does NOT handle KeyDownNotHandled
+        View focusable = new () { CanFocus = true, Width = 20, Y = 1 };
+
+        win.Add (label, focusable);
+
+        SessionToken? token = app.Begin (win);
+        focusable.SetFocus ();
+        Assert.True (focusable.HasFocus);
+
+        Key altT = new (Key.T.WithAlt) { AssociatedText = "t" };
+        app.InjectKey (altT);
+
+        Assert.True (hotKeyInvoked, "Label's HotKey should fire when focused view ignores the key");
+
+        app.End (token!);
+        win.Dispose ();
+    }
+
     /// <summary>A view that overrides the OnKey* methods so we can test that they are called.</summary>
     public class OnNewKeyTestView : View
     {
-        public OnNewKeyTestView () { CanFocus = true; }
+        public OnNewKeyTestView () => CanFocus = true;
         public bool CancelVirtualMethods { set; private get; }
         public bool OnKeyDownCalled { get; set; }
         public bool OnProcessKeyDownCalled { get; set; }

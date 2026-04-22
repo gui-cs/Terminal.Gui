@@ -743,4 +743,48 @@ public class TextValidateField_Regex_Provider_Tests : TestDriverBase
         Assert.Equal ("1234", field.Text);
         Assert.Equal ("1234", field.Text); // Should be same due to polymorphism
     }
+
+    /// <summary>
+    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     Alt-modified keys must not be inserted as text input.
+    /// </summary>
+    [Fact]
+    public void AltKey_With_AssociatedText_Does_Not_Insert_Into_TextValidateField ()
+    {
+        // Copilot
+        TextValidateField field = new ()
+        {
+            Provider = new NetMaskedTextProvider ("AAAA"),
+            Width = 20
+        };
+        field.SetFocus ();
+
+        string before = field.Text;
+        Key altT = new (Key.T.WithAlt) { AssociatedText = "t" };
+        field.NewKeyDownEvent (altT);
+
+        Assert.Equal (before, field.Text);
+    }
+
+    /// <summary>
+    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     Ctrl-modified keys must not be inserted as text input.
+    /// </summary>
+    [Fact]
+    public void CtrlKey_With_AssociatedText_Does_Not_Insert_Into_TextValidateField ()
+    {
+        // Copilot
+        TextValidateField field = new ()
+        {
+            Provider = new NetMaskedTextProvider ("AAAA"),
+            Width = 20
+        };
+        field.SetFocus ();
+
+        string before = field.Text;
+        Key ctrlT = new (Key.T.WithCtrl) { AssociatedText = "t" };
+        field.NewKeyDownEvent (ctrlT);
+
+        Assert.Equal (before, field.Text);
+    }
 }
