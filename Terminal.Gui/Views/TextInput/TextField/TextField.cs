@@ -114,7 +114,7 @@ public partial class TextField : View, IDesignable, IValue<string>
     {
         _insertionPoint = GraphemeHelper.GetGraphemeCount (Text);
 
-        if (Viewport.Width > 0)
+        if (!ReadOnly && Viewport.Width > 0)
         {
             int colsWidth = Text.GetColumns ();
             ScrollOffset = colsWidth > Viewport.Width + 1 ? colsWidth - Viewport.Width + 1 : 0;
@@ -128,8 +128,30 @@ public partial class TextField : View, IDesignable, IValue<string>
         Autocomplete?.PopupInsideContainer = false;
     }
 
+    private bool _readOnly;
+
     /// <summary>Gets or sets whether the text field is read-only.</summary>
-    public bool ReadOnly { get; set; }
+    public bool ReadOnly
+    {
+        get => _readOnly;
+        set
+        {
+            if (_readOnly == value)
+            {
+                return;
+            }
+
+            _readOnly = value;
+
+            if (_readOnly)
+            {
+                ScrollOffset = 0;
+            }
+
+            Adjust ();
+            SetNeedsDraw ();
+        }
+    }
 
     /// <summary>
     ///     Gets or sets whether the text entered is treated as secret (e.g., for passwords).

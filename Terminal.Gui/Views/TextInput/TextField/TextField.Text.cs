@@ -241,6 +241,19 @@ public partial class TextField
     /// </remarks>
     private void Adjust ()
     {
+        if (ReadOnly)
+        {
+            if (ScrollOffset != 0)
+            {
+                ScrollOffset = 0;
+                SetNeedsDraw ();
+            }
+
+            UpdateCursor ();
+
+            return;
+        }
+
         bool need = false;
         _ = TextModel.CursorColumn (_text, InsertionPoint, 0, out List<int> glyphWidths, out _);
         _ = TextModel.GetColumnWidthsBeforeStart (glyphWidths, ScrollOffset, out _, out int startIndex);

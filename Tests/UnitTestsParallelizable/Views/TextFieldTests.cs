@@ -1485,4 +1485,34 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (0, tf.ScrollOffset);
         Assert.Equal (15, tf.Viewport.Width);
     }
+
+    // Copilot
+    [Fact]
+    public void ReadOnly_Does_Not_Scroll_On_Init_Or_Text_Change ()
+    {
+        TextField tf = new () { Text = "Hello World", Width = 5, Height = 1, ReadOnly = true };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        Assert.Equal (0, tf.ScrollOffset);
+
+        tf.Text = "Hello World Again";
+
+        Assert.Equal (0, tf.ScrollOffset);
+    }
+
+    // Copilot
+    [Fact]
+    public void ReadOnly_Set_True_Resets_ScrollOffset ()
+    {
+        TextField tf = new () { Text = "Hello World", Width = 5, Height = 1 };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        Assert.Equal (7, tf.ScrollOffset);
+
+        tf.ReadOnly = true;
+
+        Assert.Equal (0, tf.ScrollOffset);
+    }
 }
