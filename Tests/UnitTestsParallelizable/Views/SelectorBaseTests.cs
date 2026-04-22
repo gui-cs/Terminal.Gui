@@ -634,6 +634,25 @@ public class SelectorBaseTests
         Assert.Equal (TabBehavior.NoStop, selector.TabBehavior);
     }
 
+    [Fact]
+    public void Setting_TabBehavior_AfterSubViewsAreCreated_DoesNotLoseCheckedState_With_Enum ()
+    {
+        OptionSelector<Side> selector = new ()
+        {
+            Orientation = Orientation.Vertical, TabBehavior = TabBehavior.NoStop
+        };
+
+        List<CheckBox> checkBoxes = [.. selector.SubViews.OfType<CheckBox> ()];
+
+        Assert.Equal (4, checkBoxes.Count);
+        Assert.Equal (CheckState.Checked, checkBoxes [0].Value);
+        Assert.Equal (CheckState.UnChecked, checkBoxes [1].Value);
+        Assert.Equal (CheckState.UnChecked, checkBoxes [2].Value);
+        Assert.Equal (CheckState.UnChecked, checkBoxes [3].Value);
+        Assert.Equal (Side.Left, selector.Value);
+        Assert.Equal (TabBehavior.NoStop, selector.TabBehavior);
+    }
+
     #endregion
 
     #region HotKey Command Tests
