@@ -500,6 +500,19 @@ public class KittyKeyboardParsingTests
     }
 
     [Fact]
+    public void KittyPattern_AssociatedText_AltModifiedPrintableKey_IsSuppressed ()
+    {
+        // ESC[116;3;116u = Alt+t with associated text 't'
+        Key? key = _pattern.GetKey ("\u001b[116;3;116u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsAlt);
+        Assert.Equal (Key.T.WithAlt.KeyCode, key.KeyCode);
+        Assert.Equal (string.Empty, key.AssociatedText);
+        Assert.Equal (string.Empty, key.GetPrintableText ());
+    }
+
+    [Fact]
     public void KittyPattern_AssociatedText_MultipleCodePoints ()
     {
         // ESC[97;1;769:97u = associated text composed of combining acute accent + 'a'
