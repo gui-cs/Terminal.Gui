@@ -356,6 +356,25 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void KittyAltModifiedPrintableKey_DoesNotInsertAssociatedText ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 10 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        Key? key = new KittyKeyboardPattern ().GetKey ("\u001b[116;3;116u");
+
+        Assert.NotNull (key);
+        Assert.False (top.NewKeyDownEvent (key));
+        Assert.Equal (string.Empty, tf.Text);
+
+        top.Dispose ();
+    }
+
+    [Fact]
     public void ShiftedDigitKey_WithoutKittyMetadata_InsertsBaseDigit ()
     {
         Runnable top = new ();
