@@ -123,7 +123,7 @@ public partial class TableView
 
     /// <summary>
     ///     Override to provide custom multi-coloring to cells. Use methods like <see cref="View.AddStr(string)"/>.
-    ///     The cursor will already be in the correct position when rendering. You must render the full
+    ///     The terminal cursor will already be in the correct position when rendering. You must render the full
     ///     <paramref name="render"/> or the view will not look right. For simpler color provision use
     ///     <see cref="ColumnStyle.ColorGetter"/>. For changing the content that is rendered use
     ///     <see cref="ColumnStyle.RepresentationGetter"/>.
@@ -380,7 +380,7 @@ public partial class TableView
             string render = TruncateOrPad (val, representation, current.Width, colStyle);
 
             // While many cells can be selected (see MultiSelectedRegions) only one cell is the primary (drives navigation etc)
-            bool isPrimaryCell = current.Column == _selectedColumn && rowToRender == _selectedRow;
+            bool isPrimaryCell = current.Column == SelectedColumn && rowToRender == SelectedRow;
             Move (current.X - Viewport.X, row);
             RenderCell (cellColor, render, isPrimaryCell);
 

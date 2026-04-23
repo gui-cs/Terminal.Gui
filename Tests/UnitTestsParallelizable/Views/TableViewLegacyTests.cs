@@ -59,7 +59,7 @@ public class TableViewLegacyTests : TestDriverBase
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        tableView.ChangeSelectionToEndOfTable (false);
+        tableView.ChangeSelectionToEndOfTable (false, null);
         tableView.MultiSelectedRegions.Clear ();
         tableView.MultiSelectedRegions.Push (new (new (0, 3), new (0, 3, 4, 1)));
 

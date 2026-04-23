@@ -21,6 +21,8 @@ public partial class TableView
         set
         {
             _table = value;
+            SetSelection (0, 0, false, null);
+            Value = new Point (0, 0);
             RefreshContentSize ();
             Update ();
         }
@@ -66,11 +68,11 @@ public partial class TableView
         }
     }
 
-    private bool? HandleRight (ICommandContext? _)
+    private bool? HandleRight (ICommandContext? ctx)
     {
         int oldSelectedCol = SelectedColumn;
         int oldViewportX = Viewport.X;
-        bool result = ChangeSelectionByOffsetWithReturn (1, 0);
+        bool result = ChangeSelectionByOffsetWithReturn (1, 0, ctx);
 
         if (oldSelectedCol != SelectedColumn || Viewport.X >= MaxViewPort ().X)
         {
@@ -82,11 +84,11 @@ public partial class TableView
         return result;
     }
 
-    private bool? HandleUp (ICommandContext? _)
+    private bool? HandleUp (ICommandContext? ctx)
     {
         if (SelectedRow != 0)
         {
-            return ChangeSelectionByOffsetWithReturn (0, -1);
+            return ChangeSelectionByOffsetWithReturn (0, -1, ctx);
         }
 
         if (Viewport.Y <= 0)
@@ -98,11 +100,11 @@ public partial class TableView
         return true;
     }
 
-    private bool? HandleDown (ICommandContext? _)
+    private bool? HandleDown (ICommandContext? ctx)
     {
         if (Table == null || SelectedRow < Table.Rows - 1)
         {
-            return ChangeSelectionByOffsetWithReturn (0, 1);
+            return ChangeSelectionByOffsetWithReturn (0, 1, ctx);
         }
 
         if (Viewport.Y >= GetContentHeight () - Viewport.Height)
@@ -117,10 +119,11 @@ public partial class TableView
 
     /// <summary>Moves the selection down by one page</summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
-    public void PageDown (bool extend)
+    /// <param name="ctx">The command context</param>
+    public void PageDown (bool extend, ICommandContext? ctx)
     {
         int oldSelectedRow = SelectedRow;
-        ChangeSelectionByOffset (0, Viewport.Height /* - CurrentHeaderHeightVisible ()*/, extend);
+        ChangeSelectionByOffset (0, Viewport.Height /* - CurrentHeaderHeightVisible ()*/, extend, ctx);
 
         //after scrolling the cells, also scroll to lower line
         int remainingJump = Viewport.Height - (SelectedRow - oldSelectedRow);
@@ -136,10 +139,11 @@ public partial class TableView
 
     /// <summary>Moves the selection up by one page</summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
-    public void PageUp (bool extend)
+    /// <param name="ctx">The command context</param>
+    public void PageUp (bool extend, ICommandContext? ctx)
     {
         int oldSelectedRow = SelectedRow;
-        ChangeSelectionByOffset (0, -Viewport.Height /* - CurrentHeaderHeightVisible ()*/, extend);
+        ChangeSelectionByOffset (0, -Viewport.Height /* - CurrentHeaderHeightVisible ()*/, extend, ctx);
 
         //after scrolling the cells, also scroll to header
         int remainingJump = Viewport.Height - (oldSelectedRow - SelectedRow);
@@ -157,10 +161,11 @@ public partial class TableView
     ///     enabled then selection instead moves to ( <see cref="SelectedColumn"/>,nY) i.e. no horizontal scrolling.
     /// </summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
-    public void ChangeSelectionToEndOfTable (bool extend)
+    /// <param name="ctx">The command context</param>
+    public void ChangeSelectionToEndOfTable (bool extend, ICommandContext? ctx)
     {
         int finalColumn = Table!.Columns - 1;
-        SetSelection (FullRowSelect ? SelectedColumn : finalColumn, Table.Rows - 1, extend);
+        SetSelection (FullRowSelect ? SelectedColumn : finalColumn, Table.Rows - 1, extend,ctx);
         Update ();
     }
 
@@ -169,9 +174,10 @@ public partial class TableView
     ///     then selection instead moves to ( <see cref="SelectedColumn"/>,0) i.e. no horizontal scrolling.
     /// </summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
-    public void ChangeSelectionToStartOfTable (bool extend)
+    /// <param name="ctx">The command context</param>
+    public void ChangeSelectionToStartOfTable (bool extend, ICommandContext? ctx)
     {
-        SetSelection (FullRowSelect ? SelectedColumn : 0, 0, extend);
+        SetSelection (FullRowSelect ? SelectedColumn : 0, 0, extend, ctx);
         Update ();
     }
 

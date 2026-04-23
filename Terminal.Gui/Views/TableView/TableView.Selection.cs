@@ -8,6 +8,73 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public partial class TableView
 {
+    #region IValue<Point?> Implementation
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
+
+    /// <summary>
+    ///     Raises the <see cref="ValueChanging"/> event.
+    /// </summary>
+    /// <returns><see langword="true"/> if the change was cancelled.</returns>
+    protected bool RaiseValueChanging (Point? currentValue, Point? newValue)
+    {
+        ValueChangingEventArgs<Point?> args = new (currentValue, newValue);
+        ValueChanging?.Invoke (this, args);
+
+        return args.Handled;
+    }
+
+    /// <summary>
+    ///     Raises the <see cref="ValueChanged"/> event.
+    /// </summary>
+    /// <param name="previousValue">The value before the change.</param>
+    /// <param name="newValue">The value after the change.</param>
+    protected void RaiseValueChanged (Point? previousValue, Point? newValue)
+    {
+        //_value = newValue;
+
+        OnValueChanged (newValue, previousValue);
+        ValueChanged?.Invoke (this, new ValueChangedEventArgs<Point?> (previousValue, newValue));
+        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (previousValue, newValue));
+    }
+
+    /// <summary>
+    ///     Called when <see cref="Value"/> has changed.
+    /// </summary>
+    protected virtual void OnValueChanged (Point? value, Point? previousValue) { }
+
+    /// <inheritdoc />
+    public Point? Value
+    {
+        get;
+        set
+        {
+            if (field == value)
+            {
+                return;
+            }
+
+            Point? previousValue = field;
+
+            if (RaiseValueChanging (field, value))
+            {
+                return;
+            }
+
+            field = value;
+            RaiseValueChanged (previousValue, field);
+        }
+    } = new Point (-1, -1);
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<Point?>>? ValueChanging;
+
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<Point?>>? ValueChanged;
+
+    #endregion
+
     /// <summary>True to select the entire row at once.  False to select individual cells.  Defaults to false</summary>
     public bool FullRowSelect { get; set; }
 
@@ -22,43 +89,48 @@ public partial class TableView
     /// <returns></returns>
     public Stack<TableSelection> MultiSelectedRegions { get; } = new ();
 
-    private int _selectedColumn;
-
-    /// <summary>The index of <see cref="DataTable.Columns"/> in <see cref="Table"/> that the user has currently selected</summary>
+    /// <summary>The index of <see cref="DataTable.Columns"/> in <see cref="Table"/> that the user has currently selected. This is the cursor.</summary>
     public int SelectedColumn
     {
-        get => _selectedColumn;
+        get;
         set
         {
-            int oldValue = _selectedColumn;
+            if (field == value)
+            {
+                return;
+            }
+            int oldValue = field;
 
             // try to prevent this being set to an out-of-bounds column
-            _selectedColumn = TableIsNullOrInvisible () ? 0 : Math.Min (Table!.Columns - 1, Math.Max (0, value));
+            field = TableIsNullOrInvisible () ? 0 : Math.Min (Table!.Columns - 1, Math.Max (0, value));
 
-            if (oldValue != _selectedColumn)
+            if (oldValue != field)
             {
                 RaiseSelectedCellChanged (new SelectedCellChangedEventArgs (Table!, oldValue, SelectedColumn, SelectedRow, SelectedRow));
             }
         }
-    }
+    } = -1;
 
-    private int _selectedRow;
-
-    /// <summary>The index of <see cref="DataTable.Rows"/> in <see cref="Table"/> that the user has currently selected</summary>
+    /// <summary>The index of <see cref="DataTable.Rows"/> in <see cref="Table"/> that the user has currently selected. This is the cursor.</summary>
     public int SelectedRow
     {
-        get => _selectedRow;
+        get;
         set
         {
-            int oldValue = _selectedRow;
-            _selectedRow = TableIsNullOrInvisible () ? 0 : Math.Min (Table!.Rows - 1, Math.Max (0, value));
-
-            if (oldValue != _selectedRow)
+            if (value == field)
             {
-                RaiseSelectedCellChanged (new SelectedCellChangedEventArgs (Table!, SelectedColumn, SelectedColumn, oldValue, _selectedRow));
+                return;
+            }
+
+            int oldValue = field;
+            field = TableIsNullOrInvisible () ? 0 : Math.Min (Table!.Rows - 1, Math.Max (0, value));
+
+            if (oldValue != field)
+            {
+                RaiseSelectedCellChanged (new SelectedCellChangedEventArgs (Table!, SelectedColumn, SelectedColumn, oldValue, field));
             }
         }
-    }
+    } = -1;
 
     /// <summary>
     ///     Private override of <see cref="ChangeSelectionByOffset"/> that returns true if the selection has
@@ -68,10 +140,10 @@ public partial class TableView
     /// <param name="offsetX"></param>
     /// <param name="offsetY"></param>
     /// <returns></returns>
-    private bool ChangeSelectionByOffsetWithReturn (int offsetX, int offsetY)
+    private bool ChangeSelectionByOffsetWithReturn (int offsetX, int offsetY, ICommandContext? ctx)
     {
         TableViewSelectionSnapshot oldSelection = GetSelectionSnapshot ();
-        SetSelection (SelectedColumn + offsetX, SelectedRow + offsetY, false);
+        SetSelection (SelectedColumn + offsetX, SelectedRow + offsetY, false, ctx);
         Update ();
 
         return !SelectionIsSame (oldSelection);
@@ -95,25 +167,27 @@ public partial class TableView
     /// <param name="offsetX">Offset in number of columns</param>
     /// <param name="offsetY">Offset in number of rows</param>
     /// <param name="extendExistingSelection">True to create a multi cell selection or adjust an existing one</param>
-    public void ChangeSelectionByOffset (int offsetX, int offsetY, bool extendExistingSelection)
+    public void ChangeSelectionByOffset (int offsetX, int offsetY, bool extendExistingSelection, ICommandContext? ctx)
     {
-        SetSelection (SelectedColumn + offsetX, SelectedRow + offsetY, extendExistingSelection);
+        SetSelection (SelectedColumn + offsetX, SelectedRow + offsetY, extendExistingSelection, ctx);
         Update ();
     }
 
     /// <summary>Moves or extends the selection to the last cell in the current row</summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
-    public void ChangeSelectionToEndOfRow (bool extend)
+    /// <param name="ctx">The command context</param>
+    public void ChangeSelectionToEndOfRow (bool extend, ICommandContext? ctx)
     {
-        SetSelection (Table!.Columns - 1, SelectedRow, extend);
+        SetSelection (Table!.Columns - 1, SelectedRow, extend, ctx);
         Update ();
     }
 
     /// <summary>Moves or extends the selection to the first cell in the current row</summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
-    public void ChangeSelectionToStartOfRow (bool extend)
+    /// <param name="ctx">The command context</param>
+    public void ChangeSelectionToStartOfRow (bool extend, ICommandContext? ctx)
     {
-        SetSelection (0, SelectedRow, extend);
+        SetSelection (0, SelectedRow, extend, ctx);
         Update ();
     }
 
@@ -367,11 +441,11 @@ public partial class TableView
     /// <param name="col"></param>
     /// <param name="row"></param>
     /// <param name="extendExistingSelection">True to create a multi cell selection or adjust an existing one</param>
-    public void SetSelection (int col, int row, bool extendExistingSelection)
+    public void SetSelection (int col, int row, bool extendExistingSelection, ICommandContext? ctx = null)
     {
         // if we are trying to increase the column index then
         // we are moving right otherwise we are moving left
-        bool lookRight = col > _selectedColumn;
+        bool lookRight = col > SelectedColumn;
         col = GetNearestVisibleColumn (col, lookRight, true);
 
         if (!MultiSelect || !extendExistingSelection)
@@ -403,7 +477,13 @@ public partial class TableView
 
     // TODO: Refactor to use CWP
     /// <summary>Invokes the <see cref="SelectedCellChanged"/> event</summary>
-    private void RaiseSelectedCellChanged (SelectedCellChangedEventArgs args) => SelectedCellChanged?.Invoke (this, args);
+    private void RaiseSelectedCellChanged (SelectedCellChangedEventArgs args)
+    {
+        // Legacy
+        SelectedCellChanged?.Invoke (this, args);
+
+        Value = new Point (SelectedColumn, SelectedRow);
+    }
 
     private void ClearMultiSelectedRegions (bool keepToggledSelections)
     {
@@ -443,7 +523,7 @@ public partial class TableView
 
     private bool? ToggleCurrentCellSelection ()
     {
-        var e = new CellToggledEventArgs (Table!, _selectedColumn, _selectedRow);
+        var e = new CellToggledEventArgs (Table!, SelectedColumn, SelectedRow);
         OnCellToggled (e);
 
         if (e.Cancel)
@@ -456,7 +536,7 @@ public partial class TableView
             return null;
         }
 
-        TableSelection [] regions = GetMultiSelectedRegionsContaining (_selectedColumn, _selectedRow).ToArray ();
+        TableSelection [] regions = GetMultiSelectedRegionsContaining (SelectedColumn, SelectedRow).ToArray ();
         TableSelection [] toggles = regions.Where (s => s.IsToggled).ToArray ();
 
         // Toggle it off
@@ -487,7 +567,7 @@ public partial class TableView
             else
             {
                 // Toggle on a single cell selection
-                MultiSelectedRegions.Push (CreateTableSelection (_selectedColumn, SelectedRow, _selectedColumn, _selectedRow, true));
+                MultiSelectedRegions.Push (CreateTableSelection (SelectedColumn, SelectedRow, SelectedColumn, SelectedRow, true));
             }
         }
 
@@ -519,5 +599,38 @@ public partial class TableView
         {
             MultiSelectedRegions.Push (CreateTableSelection (oldColumn, oldRow));
         }
+    }
+
+    private bool? ExtendSelection (ICommandContext? ctx)
+    {
+        if (ctx?.Binding is not MouseBinding mouseBinding || mouseBinding.MouseEvent is null)
+        {
+            return false;
+        }
+        int boundsX = mouseBinding.MouseEvent.Position!.Value.X;
+        int boundsY = mouseBinding.MouseEvent.Position!.Value.Y;
+        Point? hit = ScreenToCell (boundsX, boundsY);
+
+        if (hit is null || !MultiSelect)
+        {
+            return false;
+        }
+
+        if (mouseBinding.MouseEvent.Flags.FastHasFlags (MouseFlags.Ctrl))
+        {
+            UnionSelection (hit.Value.X, hit.Value.Y);
+            Update ();
+
+            return true;
+        }
+
+        if (!mouseBinding.MouseEvent.Flags.FastHasFlags (MouseFlags.Alt))
+        {
+            return false;
+        }
+        SetSelection (hit.Value.X, hit.Value.Y, mouseBinding.MouseEvent.Flags.FastHasFlags (MouseFlags.Alt), ctx);
+        Update ();
+
+        return false;
     }
 }

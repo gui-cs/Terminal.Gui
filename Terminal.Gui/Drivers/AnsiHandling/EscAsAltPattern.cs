@@ -4,7 +4,7 @@ namespace Terminal.Gui.Drivers;
 
 internal class EscAsAltPattern : AnsiKeyboardParserPattern
 {
-    public EscAsAltPattern () { IsLastMinute = true; }
+    public EscAsAltPattern () => IsLastMinute = true;
 
 #pragma warning disable IDE1006 // Naming Styles
     private static readonly Regex _pattern = new (@"^\u001b([\u0001-\u001a\u001fa-zA-Z0-9_])$");

@@ -55,7 +55,7 @@ public delegate Scheme? RowColorGetterDelegate (RowColorGetterArgs args);
 ///         </item>
 ///     </list>
 /// </remarks>
-public partial class TableView : View, IDesignable
+public partial class TableView : View, IValue<Point?>, IDesignable
 {
     /// <summary>
     ///     The default maximum cell width for <see cref="TableView.MaxCellWidth"/> and <see cref="ColumnStyle.MaxWidth"/>
@@ -106,139 +106,141 @@ public partial class TableView : View, IDesignable
         // Things this view knows how to do
         AddCommand (Command.Right, HandleRight);
 
-        AddCommand (Command.Left, () => ChangeSelectionByOffsetWithReturn (-1, 0));
+        AddCommand (Command.Left, (ctx) => ChangeSelectionByOffsetWithReturn (-1, 0, ctx));
 
         AddCommand (Command.Up, HandleUp);
 
         AddCommand (Command.Down, HandleDown);
 
         AddCommand (Command.PageUp,
-                    () =>
+                    (ctx) =>
                     {
-                        PageUp (false);
+                        PageUp (false, ctx);
 
                         return true;
                     });
 
         AddCommand (Command.PageDown,
-                    () =>
+                    (ctx) =>
                     {
-                        PageDown (false);
+                        PageDown (false, ctx);
 
                         return true;
                     });
 
         AddCommand (Command.LeftStart,
-                    () =>
+                    (ctx) =>
                     {
-                        ChangeSelectionToStartOfRow (false);
+                        ChangeSelectionToStartOfRow (false, ctx);
 
                         return true;
                     });
 
         AddCommand (Command.RightEnd,
-                    () =>
+                    (ctx) =>
                     {
-                        ChangeSelectionToEndOfRow (false);
+                        ChangeSelectionToEndOfRow (false, ctx);
 
                         return true;
                     });
 
         AddCommand (Command.Start,
-                    () =>
+                    (ctx) =>
                     {
-                        ChangeSelectionToStartOfTable (false);
+                        ChangeSelectionToStartOfTable (false, ctx);
 
                         return true;
                     });
 
         AddCommand (Command.End,
-                    () =>
+                    (ctx) =>
                     {
-                        ChangeSelectionToEndOfTable (false);
+                        ChangeSelectionToEndOfTable (false, ctx);
 
                         return true;
                     });
 
         AddCommand (Command.RightExtend,
-                    () =>
+                    (ctx) =>
                     {
-                        ChangeSelectionByOffset (1, 0, true);
+                        ChangeSelectionByOffset (1, 0, true, ctx);
 
                         return true;
                     });
 
         AddCommand (Command.LeftExtend,
-                    () =>
+                    (ctx) =>
                     {
-                        ChangeSelectionByOffset (-1, 0, true);
+                        ChangeSelectionByOffset (-1, 0, true, ctx);
 
                         return true;
                     });
 
         AddCommand (Command.UpExtend,
-                    () =>
+                    (ctx) =>
                     {
-                        ChangeSelectionByOffset (0, -1, true);
+                        ChangeSelectionByOffset (0, -1, true, ctx);
 
                         return true;
                     });
 
         AddCommand (Command.DownExtend,
-                    () =>
+                    (ctx) =>
                     {
-                        ChangeSelectionByOffset (0, 1, true);
+                        ChangeSelectionByOffset (0, 1, true, ctx);
 
                         return true;
                     });
 
         AddCommand (Command.PageUpExtend,
-                    () =>
+                    (ctx) =>
                     {
-                        PageUp (true);
+                        PageUp (true, ctx);
 
                         return true;
                     });
 
         AddCommand (Command.PageDownExtend,
-                    () =>
+                    (ctx) =>
                     {
-                        PageDown (true);
+                        PageDown (true, ctx);
 
                         return true;
                     });
 
         AddCommand (Command.LeftStartExtend,
-                    () =>
+                    (ctx) =>
                     {
-                        ChangeSelectionToStartOfRow (true);
+                        ChangeSelectionToStartOfRow (true, ctx);
 
                         return true;
                     });
 
         AddCommand (Command.RightEndExtend,
-                    () =>
+                    (ctx) =>
                     {
-                        ChangeSelectionToEndOfRow (true);
+                        ChangeSelectionToEndOfRow (true, ctx);
 
                         return true;
                     });
 
         AddCommand (Command.StartExtend,
-                    () =>
+                    (ctx) =>
                     {
-                        ChangeSelectionToStartOfTable (true);
+                        ChangeSelectionToStartOfTable (true, ctx);
 
                         return true;
                     });
 
         AddCommand (Command.EndExtend,
-                    () =>
+                    (ctx) =>
                     {
-                        ChangeSelectionToEndOfTable (true);
+                        ChangeSelectionToEndOfTable (true, ctx);
 
                         return true;
                     });
+
+        AddCommand (Command.ToggleExtend, ExtendSelection);
 
         AddCommand (Command.SelectAll,
                     () =>
@@ -247,7 +249,8 @@ public partial class TableView : View, IDesignable
 
                         return true;
                     });
-        AddCommand (Command.Accept, () => OnCellActivated (new CellActivatedEventArgs (Table!, SelectedColumn, SelectedRow)));
+
+        //AddCommand (Command.Accept, () => OnCellActivated (new CellActivatedEventArgs (Table!, SelectedColumn, SelectedRow)));
 
         AddCommand (Command.Toggle, _ => ToggleCurrentCellSelection () is true);
 
@@ -257,7 +260,15 @@ public partial class TableView : View, IDesignable
         // CellActivationKey is instance-dependent, so it stays as a direct binding
         KeyBindings.Remove (CellActivationKey);
         KeyBindings.Add (CellActivationKey, Command.Accept);
+        MouseBindings.ReplaceCommands (MouseFlags.WheeledRight, Command.Right);
+        MouseBindings.ReplaceCommands (MouseFlags.WheeledLeft, Command.Left);
+        MouseBindings.ReplaceCommands (MouseFlags.WheeledDown, Command.Down);
+        MouseBindings.ReplaceCommands (MouseFlags.WheeledUp, Command.Up);
+
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.ToggleExtend);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Alt, Command.ToggleExtend);
+        MouseBindings.ReplaceCommands (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
     }
 
     /// <summary>Navigator for cycling the selected item in the table by typing. Set to null to disable this feature.</summary>
@@ -353,17 +364,20 @@ public partial class TableView : View, IDesignable
     private bool _inCalculatingContentSize;
 
     /// <summary>
-    ///     This event is raised when a cell is activated e.g. by double-clicking or pressing
+    ///     This event is raised when a cell is accepted e.g. by double-clicking or pressing
     ///     <see cref="CellActivationKey"/>
     /// </summary>
+    [Obsolete ("Use OnAccepted instead.")]
     public event EventHandler<CellActivatedEventArgs>? CellActivated;
 
-    /// <summary>This event is raised when a cell is toggled (see <see cref="Command.Activate"/></summary>
+    /// <summary>This event is raised when a cell's selection state changes.</summary>
+    [Obsolete ("Use Activated instead.")]
     public event EventHandler<CellToggledEventArgs>? CellToggled;
 
     private record TableViewSelectionSnapshot (int SelectedColumn, int SelectedRow, Rectangle [] MultiSelection);
 
     /// <summary>This event is raised when the selected cell in the table changes.</summary>
+    [Obsolete ("Use OnValueChanged instead.")]
     public event EventHandler<SelectedCellChangedEventArgs>? SelectedCellChanged;
 
     /// <summary>
@@ -388,10 +402,10 @@ public partial class TableView : View, IDesignable
         SetNeedsDraw ();
     }
 
-    // TODO: Refactor to use CWP
     /// <summary>Invokes the <see cref="CellActivated"/> event</summary>
     /// <param name="args"></param>
     /// <returns><see langword="true"/> if the CellActivated event was raised.</returns>
+    [Obsolete ("Use OnAccepted instead.")]
     protected virtual bool OnCellActivated (CellActivatedEventArgs args)
     {
         CellActivated?.Invoke (this, args);
@@ -399,9 +413,9 @@ public partial class TableView : View, IDesignable
         return CellActivated is { };
     }
 
-    // TODO: Refactor to use CWP
     /// <summary>Invokes the <see cref="CellToggled"/> event</summary>
     /// <param name="args"></param>
+    [Obsolete ("Use OnActivated instead.")]
     protected virtual void OnCellToggled (CellToggledEventArgs args) => CellToggled?.Invoke (this, args);
 
     /// <summary>Returns the amount of vertical space required to display the header</summary>
@@ -676,8 +690,6 @@ public partial class TableView : View, IDesignable
         return colStyle is { } ? colStyle.GetRepresentation (value) : value.ToString () ?? string.Empty;
     }
 
-    private bool HasControlOrAlt (Mouse me) => me.Flags.FastHasFlags (MouseFlags.Alt) || me.Flags.FastHasFlags (MouseFlags.Ctrl);
-
     /// <summary>
     ///     Returns true if the given <paramref name="columnIndex"/> indexes a visible column otherwise false.  Returns
     ///     false for indexes that are out of bounds.
@@ -722,17 +734,17 @@ public partial class TableView : View, IDesignable
         int toPad = availableHorizontalSpace - (representation.GetColumns () + 1 /*leave 1 space for cell boundary*/);
 
         return (colStyle?.GetAlignment (originalCellValue) ?? Alignment.Start) switch
-               {
-                   Alignment.Start => representation + new string (' ', toPad),
-                   Alignment.End => new string (' ', toPad) + representation,
+        {
+            Alignment.Start => representation + new string (' ', toPad),
+            Alignment.End => new string (' ', toPad) + representation,
 
-                   // TODO: With single line cells, centered and justified are the same right?
-                   Alignment.Center or Alignment.Fill => new string (' ', (int)Math.Floor (toPad / 2.0))
-                                                         + // round down
-                                                         representation
-                                                         + new string (' ', (int)Math.Ceiling (toPad / 2.0)), // round up
-                   _ => representation + new string (' ', toPad)
-               };
+            // TODO: With single line cells, centered and justified are the same right?
+            Alignment.Center or Alignment.Fill => new string (' ', (int)Math.Floor (toPad / 2.0))
+                                                  + // round down
+                                                  representation
+                                                  + new string (' ', (int)Math.Ceiling (toPad / 2.0)), // round up
+            _ => representation + new string (' ', toPad)
+        };
     }
 
     private bool TryGetNearestVisibleColumn (int columnIndex, bool lookRight, bool allowBumpingInOppositeDirection, out int idx)
@@ -837,8 +849,8 @@ public partial class TableView : View, IDesignable
         return true;
     }
 
-    // TODO: Update to use Key instead of KeyCode
     /// <summary>The key which when pressed should trigger <see cref="CellActivated"/> event.  Defaults to Enter.</summary>
+    [Obsolete ("Use DefaultKeyBindings instead.")]
     public KeyCode CellActivationKey
     {
         get;
@@ -863,34 +875,96 @@ public partial class TableView : View, IDesignable
     } = KeyCode.Enter;
 
     /// <inheritdoc />
-    protected override void OnActivated (ICommandContext? ctx) => ToggleCurrentCellSelection ();
-
-    /// <inheritdoc/>
-    protected override bool OnKeyDown (Key key) => TableIsNullOrInvisible () && false;
-
-    /// <inheritdoc/>
-    protected override bool OnKeyDownNotHandled (Key a)
+    protected override void OnAccepted (ICommandContext? ctx)
     {
-        if (a.AsRune is { } rune && rune != default (Rune) && Rune.IsControl (rune))
+        base.OnAccepted (ctx);
+
+        // Legacy support for CellActivated event via Command.Accept.
+        OnCellActivated (new CellActivatedEventArgs (Table!, SelectedColumn, SelectedRow));
+    }
+
+    /// <inheritdoc />
+    protected override bool OnActivating (CommandEventArgs args)
+    {
+        if (base.OnActivating (args))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected override void OnActivated (ICommandContext? ctx)
+    {
+        if (ctx?.Binding is KeyBinding { Key: { } } keyBinding && keyBinding.Key == Key.Space)
+        {
+            ToggleCurrentCellSelection ();
+
+            return;
+        }
+
+        if (ctx?.Binding is not MouseBinding mouseBinding || mouseBinding.MouseEvent is null)
+        {
+            return;
+        }
+        int boundsX = mouseBinding.MouseEvent.Position!.Value.X;
+        int boundsY = mouseBinding.MouseEvent.Position!.Value.Y;
+
+        if (!mouseBinding.MouseEvent.Flags.FastHasFlags (MouseFlags.LeftButtonClicked))
+        {
+            return;
+        }
+        Point? hit = ScreenToCell (boundsX, boundsY);
+
+        if (hit is null)
+        {
+            return;
+        }
+        SetSelection (hit.Value.X, hit.Value.Y, mouseBinding.MouseEvent.Flags.FastHasFlags (MouseFlags.Shift));
+
+        Update ();
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnKeyDown (Key key)
+    {
+        if (TableIsNullOrInvisible ())
         {
             return false;
         }
 
-        if (a.IsAlt || a.IsCtrl)
+        if (key == HotKey)
+        {
+            return CycleToNextTableEntryBeginningWith (key);
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnKeyDownNotHandled (Key key)
+    {
+        if (key.AsRune is var rune && rune != default (Rune) && Rune.IsControl (rune))
+        {
+            return false;
+        }
+
+        if (key.IsAlt || key.IsCtrl)
         {
             // Never insert modified keys
             return false;
         }
 
         // Ignore other control characters.
-        if (string.IsNullOrEmpty (a.AsGrapheme) && a is { IsKeyCodeAtoZ: false, KeyCode: < KeyCode.Space or > KeyCode.CharMask })
+        if (string.IsNullOrEmpty (key.AsGrapheme) && key is { IsKeyCodeAtoZ: false, KeyCode: < KeyCode.Space or > KeyCode.CharMask })
         {
             return false;
         }
 
         if (HasFocus && Table?.Rows != 0)
         {
-            return CycleToNextTableEntryBeginningWith (a);
+            return CycleToNextTableEntryBeginningWith (key);
         }
 
         return true;

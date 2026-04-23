@@ -948,6 +948,9 @@ public partial class View // Command APIs
         // can distinguish a user-initiated HotKey activation from a programmatic one.
         InvokeCommand (Command.Activate, ctx?.Binding);
 
+        // QUESTION: Why do we return true here, indicating the hotkey was handled,
+        // QUESTION: when we still want the key event to propagate for text input scenarios?
+        // QUESTION: Should we return false to allow further processing?
         return true;
     }
 

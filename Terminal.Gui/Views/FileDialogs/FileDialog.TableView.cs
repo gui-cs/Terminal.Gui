@@ -33,10 +33,10 @@ public partial class FileDialog
         }
 
         PopoverMenu contextMenu = new ([
-                                            new MenuItem (Strings.fdCtxNew, string.Empty, New),
-                                            new MenuItem (Strings.fdCtxRename, string.Empty, () => Rename (App)),
-                                            new MenuItem (Strings.fdCtxDelete, string.Empty, Delete)
-                                        ]);
+                                           new MenuItem (Strings.fdCtxNew, string.Empty, New),
+                                           new MenuItem (Strings.fdCtxRename, string.Empty, () => Rename (App)),
+                                           new MenuItem (Strings.fdCtxDelete, string.Empty, Delete)
+                                       ]);
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
@@ -101,28 +101,6 @@ public partial class FileDialog
         ApplySort ();
     }
 
-#if MENU_V1
-    private void AllowedTypeMenuClicked (int idx)
-    {
-        IAllowedType allow = AllowedTypes [idx];
-
-        for (var i = 0; i < AllowedTypes.Count; i++)
-        {
-            _allowedTypeMenuItems! [i].Checked = i == idx;
-        }
-
-        _allowedTypeMenu!.Title = allow.ToString ()!;
-
-        CurrentFilter = allow;
-
-        _tbPath.ClearAllSelection ();
-        _tbPath.Autocomplete.ClearSuggestions ();
-
-        State?.RefreshChildren ();
-        WriteStateToTableView ();
-    }
-#endif
-
     private string AspectGetter (object o)
     {
         var fsi = (IFileSystemInfo)o;
@@ -136,14 +114,14 @@ public partial class FileDialog
         return (Style.IconProvider.GetIconWithOptionalSpace (fsi) + fsi.Name).Trim ();
     }
 
-    private void CellActivate (object? sender, CellActivatedEventArgs obj)
+    private void TableViewOnAccepted (object? sender, CommandEventArgs e)
     {
         if (TryAcceptMulti ())
         {
             return;
         }
 
-        FileSystemInfoStats stats = RowToStats (obj.Row);
+        FileSystemInfoStats stats = RowToStats (_tableView.SelectedRow);
 
         if (stats.FileSystemInfo is IDirectoryInfo d)
         {
@@ -238,10 +216,10 @@ public partial class FileDialog
         }
 
         PopoverMenu contextMenu = new ([
-                                            new MenuItem (Strings.fdCtxNew, string.Empty, New),
-                                            new MenuItem (Strings.fdCtxRename, string.Empty, () => Rename (App)),
-                                            new MenuItem (Strings.fdCtxDelete, string.Empty, Delete)
-                                        ]);
+                                           new MenuItem (Strings.fdCtxNew, string.Empty, New),
+                                           new MenuItem (Strings.fdCtxRename, string.Empty, () => Rename (App)),
+                                           new MenuItem (Strings.fdCtxDelete, string.Empty, Delete)
+                                       ]);
 
         _tableView.SetSelection (clickedCell.Value.X, clickedCell.Value.Y, false);
 
@@ -257,11 +235,11 @@ public partial class FileDialog
         string sort = GetProposedNewSortOrder (clickedCol, out bool isAsc);
 
         PopoverMenu contextMenu = new ([
-                                            new MenuItem (string.Format (Strings.fdCtxHide, StripArrows (_tableView.Table!.ColumnNames [clickedCol])),
-                                                          string.Empty,
-                                                          () => HideColumn (clickedCol)),
-                                            new MenuItem (StripArrows (sort), string.Empty, () => SortColumn (clickedCol, isAsc))
-                                        ]);
+                                           new MenuItem (string.Format (Strings.fdCtxHide, StripArrows (_tableView.Table!.ColumnNames [clickedCol])),
+                                                         string.Empty,
+                                                         () => HideColumn (clickedCol)),
+                                           new MenuItem (StripArrows (sort), string.Empty, () => SortColumn (clickedCol, isAsc))
+                                       ]);
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
@@ -307,9 +285,10 @@ public partial class FileDialog
         }
     }
 
-    private void TableView_SelectedCellChanged (object? sender, SelectedCellChangedEventArgs obj)
+    //    private void TableViewOnActivated (object? sender, EventArgs<ICommandContext?> e)
+    private void TableViewOnSelectedCellChanged (object? sender, SelectedCellChangedEventArgs e)
     {
-        if (!_tableView.HasFocus || obj.NewRow == -1 || obj.Table.Rows == 0)
+        if (!_tableView.HasFocus || _tableView.SelectedRow == -1 || _tableView.Table?.Rows == 0)
         {
             return;
         }
@@ -319,7 +298,7 @@ public partial class FileDialog
             return;
         }
 
-        FileSystemInfoStats stats = RowToStats (obj.NewRow);
+        FileSystemInfoStats stats = RowToStats (_tableView.SelectedRow);
 
         IFileSystemInfo? dest = stats.IsParent ? State!.Directory : stats.FileSystemInfo;
 

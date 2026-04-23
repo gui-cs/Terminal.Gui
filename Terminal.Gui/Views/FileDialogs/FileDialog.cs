@@ -190,9 +190,9 @@ public partial class FileDialog : Dialog, IDesignable
 
         _tbPath.TextChanged += (_, _) => PathChanged ();
 
-        _tableView.CellActivated += CellActivate;
+        _tableView.Accepted += TableViewOnAccepted;
         _tableView.KeyDown += (_, k) => k.Handled = TableView_KeyDown (k);
-        _tableView.SelectedCellChanged += TableView_SelectedCellChanged;
+        _tableView.SelectedCellChanged += TableViewOnSelectedCellChanged;
 
         _tableView.KeyBindings.ReplaceCommands (Key.Home, Command.Start);
         _tableView.KeyBindings.ReplaceCommands (Key.End, Command.End);
@@ -211,7 +211,12 @@ public partial class FileDialog : Dialog, IDesignable
         _spinnerView = new SpinnerView
         {
             // The spinner view is positioned over the last column of _tbFind
-            X = Pos.Right (_tbFind) - 1, Y = Pos.Top (_tbFind), Visible = false
+            X = Pos.AnchorEnd (),
+            Y = Pos.Top (_tbFind),
+            Width = Dim.Auto(),
+            Visible = false,
+            Style = new SpinnerStyle.Aesthetic (),
+            Arrangement = ViewArrangement.Overlapped
         };
 
         _tbFind.TextChanged += (_, _) => RestartSearch ();
@@ -336,6 +341,7 @@ public partial class FileDialog : Dialog, IDesignable
     ///     Event fired when user attempts to confirm a selection (or multi selection). Allows you to cancel the selection
     ///     or undertake alternative behavior e.g. open a dialog "File already exists, Overwrite? yes/no".
     /// </summary>
+
     // TODO: Refactor to use CWP
     public event EventHandler<FilesSelectedEventArgs>? FilesSelected;
 
@@ -578,7 +584,7 @@ public partial class FileDialog : Dialog, IDesignable
                                                                                           Parent._tbPath.InsertionPoint,
                                                                                           this));
                                     Parent.WriteStateToTableView ();
-
+                                    Parent._spinnerView.AutoSpin = true;
                                     Parent._spinnerView.Visible = true;
                                     Parent._spinnerView.SetNeedsDraw ();
                                 });

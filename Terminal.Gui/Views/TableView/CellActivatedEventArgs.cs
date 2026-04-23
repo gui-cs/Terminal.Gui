@@ -1,8 +1,8 @@
 #nullable enable
 ﻿namespace Terminal.Gui.Views;
 
-// TOOD: SHould support Handled
 /// <summary>Defines the event arguments for <see cref="TableView.CellActivated"/> event</summary>
+[Obsolete ("This event is obsolete and will be removed in a future version.")]
 public class CellActivatedEventArgs : EventArgs
 {
     /// <summary>Creates a new instance of arguments describing a cell being activated in <see cref="TableView"/></summary>
