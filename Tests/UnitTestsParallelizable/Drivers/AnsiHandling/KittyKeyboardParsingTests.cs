@@ -507,9 +507,12 @@ public class KittyKeyboardParsingTests
 
         Assert.NotNull (key);
         Assert.True (key.IsAlt);
+        Assert.Equal (Key.T.WithAlt, key);
         Assert.Equal (Key.T.WithAlt.KeyCode, key.KeyCode);
         Assert.Equal (string.Empty, key.AssociatedText);
         Assert.Equal (string.Empty, key.GetPrintableText ());
+        Assert.Equal (string.Empty, key.AsGrapheme);
+        Assert.Equal (0, key.AsRune.Value);
     }
 
     [Fact]
