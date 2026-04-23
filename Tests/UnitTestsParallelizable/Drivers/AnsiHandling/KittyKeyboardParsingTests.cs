@@ -516,6 +516,24 @@ public class KittyKeyboardParsingTests
     }
 
     [Fact]
+    public void KittyPattern_AssociatedText_ShiftAltModifiedPrintableKey_IsSuppressed ()
+    {
+        // ESC[116:84;4;84u = Shift+Alt+T with shifted key 'T' and associated text 'T'
+        Key? key = _pattern.GetKey ("\u001b[116:84;4;84u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsShift);
+        Assert.True (key.IsAlt);
+        Assert.Equal (Key.T.WithShift.WithAlt, key);
+        Assert.Equal (Key.T.WithShift.WithAlt.KeyCode, key.KeyCode);
+        Assert.Equal ((KeyCode)'T', key.ShiftedKeyCode);
+        Assert.Equal (string.Empty, key.AssociatedText);
+        Assert.Equal (string.Empty, key.GetPrintableText ());
+        Assert.Equal (string.Empty, key.AsGrapheme);
+        Assert.Equal (0, key.AsRune.Value);
+    }
+
+    [Fact]
     public void KittyPattern_AssociatedText_MultipleCodePoints ()
     {
         // ESC[97;1;769:97u = associated text composed of combining acute accent + 'a'
