@@ -128,7 +128,17 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
             (key, modifierField) = NormalizeShiftedPrintableKey (key, modifierField);
         }
 
-        return string.IsNullOrEmpty (modifierField) ? key : ApplyModifiersAndEventType (modifierField, key);
+        if (!string.IsNullOrEmpty (modifierField))
+        {
+            key = ApplyModifiersAndEventType (modifierField, key);
+        }
+
+        if ((key.IsAlt || key.IsCtrl) && !string.IsNullOrEmpty (key.AssociatedText))
+        {
+            key = new Key (key) { AssociatedText = string.Empty };
+        }
+
+        return key;
     }
 
     private static string ParseAssociatedText (string textField)
