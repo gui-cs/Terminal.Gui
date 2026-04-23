@@ -147,11 +147,11 @@ public class TableViewTests : TestDriverBase
         Runnable<bool>? runnable = new ();
         app.Begin (runnable);
 
-        tableView = new ();
-        tableView.Viewport = new (0, 0, 25, 10);
+        tableView = new TableView ();
+        tableView.Viewport = new Rectangle (0, 0, 25, 10);
 
-        tf1 = new ();
-        tf2 = new ();
+        tf1 = new TextField ();
+        tf2 = new TextField ();
         runnable.Add (tf1);
         runnable.Add (tableView);
         runnable.Add (tf2);
@@ -173,7 +173,7 @@ public class TableViewTests : TestDriverBase
     /// <returns></returns>
     public static DataTableSource BuildTable (int cols, int rows, out DataTable dt)
     {
-        dt = new ();
+        dt = new DataTable ();
 
         for (var c = 0; c < cols; c++)
         {
@@ -192,7 +192,7 @@ public class TableViewTests : TestDriverBase
             dt.Rows.Add (newRow);
         }
 
-        return new (dt);
+        return new DataTableSource (dt);
     }
 
     [Fact]
@@ -242,10 +242,13 @@ public class TableViewTests : TestDriverBase
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        // Space toggles cell selection (Activate command)
-        bool? result = tableView.InvokeCommand (Command.Activate);
+        var cellToggledCount = 0;
+        tableView.CellToggled += (_, _) => { cellToggledCount++; };
 
-        Assert.True (result);
+        // Space toggles cell selection (Activate command)
+        tableView.InvokeCommand (Command.Activate);
+
+        Assert.Equal (1, cellToggledCount);
 
         tableView.Dispose ();
     }
@@ -287,9 +290,12 @@ public class TableViewTests : TestDriverBase
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        bool? result = tableView.NewKeyDownEvent (Key.Space);
+        var cellToggledCount = 0;
+        tableView.CellToggled += (_, _) => { cellToggledCount++; };
 
-        Assert.True (result);
+        tableView.NewKeyDownEvent (Key.Space);
+
+        Assert.Equal (1, cellToggledCount);
 
         tableView.Dispose ();
     }
@@ -321,11 +327,11 @@ public class TableViewTests : TestDriverBase
     [Fact]
     public void Test_SumColumnWidth_GraphemeClusters ()
     {
-        string family = "\U0001F468\u200D\U0001F469\u200D\U0001F466\u200D\U0001F466"; // 👨‍👩‍👦‍👦
+        var family = "\U0001F468\u200D\U0001F469\u200D\U0001F466\u200D\U0001F466"; // 👨‍👩‍👦‍👦
         Assert.Equal (8, family.EnumerateRunes ().Sum (c => c.GetColumns ()));
         Assert.Equal (2, family.GetColumns ());
 
-        string technologist = "\U0001F469\u200D\U0001F4BB"; // 👩‍💻
+        var technologist = "\U0001F469\u200D\U0001F4BB"; // 👩‍💻
         Assert.Equal (4, technologist.EnumerateRunes ().Sum (c => c.GetColumns ()));
         Assert.Equal (2, technologist.GetColumns ());
     }
@@ -335,13 +341,13 @@ public class TableViewTests : TestDriverBase
     {
         // setup
         IDriver driver = CreateTestDriver ();
-        string family = "\U0001F468\u200D\U0001F469\u200D\U0001F466\u200D\U0001F466"; // 👨‍👩‍👦‍👦
+        var family = "\U0001F468\u200D\U0001F469\u200D\U0001F466\u200D\U0001F466"; // 👨‍👩‍👦‍👦
 
         var tableView = new TableView { Driver = driver };
         tableView.BeginInit ();
         tableView.EndInit ();
         tableView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
-        tableView.Viewport = new (0, 0, 25, 5);
+        tableView.Viewport = new Rectangle (0, 0, 25, 5);
         tableView.Style.ShowHorizontalHeaderUnderline = true;
         tableView.Style.ShowHorizontalHeaderOverline = false;
         tableView.Style.AlwaysShowHeaders = true;
@@ -358,15 +364,17 @@ public class TableViewTests : TestDriverBase
         tableView.Draw ();
 
         // verify
-        string actual = driver.ToString ()!;
+        var actual = driver.ToString ()!;
         string [] lines = actual.Replace ("\r\n", "\n").Split ('\n');
         string headerRow = lines.First (l => l.Contains ('A') && l.Contains ('B'));
         int separatorIndex = headerRow.IndexOf ('│', 1);
         int separatorColumn = headerRow [..separatorIndex].GetColumns ();
 
-        Assert.True (
-                     separatorColumn <= 5,
-                     $"Column A should be narrow (grapheme width 2), but separator at column {separatorColumn} suggests over-sized column. Header: '{headerRow}'"
-                    );
+        Assert.True (separatorColumn <= 5,
+                     $"Column A should be narrow (grapheme width 2), but separator at column {
+                         separatorColumn
+                     } suggests over-sized column. Header: '{
+                         headerRow
+                     }'");
     }
 }
