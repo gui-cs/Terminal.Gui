@@ -2,6 +2,8 @@ namespace Terminal.Gui.Views;
 
 public partial class TableView
 {
+    #region Cursor
+
     private int _cursorColumn = -1;
     private int _cursorRow = -1;
 
@@ -52,7 +54,61 @@ public partial class TableView
         return true;
     }
 
-    #region Cursor
+    /// <summary>
+    ///     Private override of <see cref="MoveCursorByOffset"/> that returns <see langword="true"/> if the
+    ///     <see cref="Value"/> changed as a result of moving the cursor.
+    /// </summary>
+    /// <param name="offsetX"></param>
+    /// <param name="offsetY"></param>
+    /// <param name="ctx">The command context.</param>
+    /// <returns></returns>
+    private bool MoveCursorByOffsetWithReturn (int offsetX, int offsetY, ICommandContext? ctx)
+    {
+        TableSelection? oldValue = Value;
+        SetSelection (_cursorColumn + offsetX, _cursorRow + offsetY, false, ctx);
+        Update ();
+
+        return !Equals (oldValue, Value);
+    }
+
+    /// <summary>
+    ///     Moves the cursor (or extends the selection) to the final cell in the table (nX,nY). If
+    ///     <see cref="FullRowSelect"/> is enabled then the cursor instead moves to (cursor.X, nY) — no horizontal scrolling.
+    /// </summary>
+    /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
+    /// <param name="ctx">The command context</param>
+    public bool MoveCursorToEndOfTable (bool extend, ICommandContext? ctx)
+    {
+        if (TableIsNullOrInvisible ())
+        {
+            return false;
+        }
+
+        int finalColumn = Table!.Columns - 1;
+        SetSelection (FullRowSelect ? _cursorColumn : finalColumn, Table.Rows - 1, extend, ctx);
+        Update ();
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Moves the cursor (or extends the selection) to the first cell in the table (0,0). If
+    ///     <see cref="FullRowSelect"/> is enabled then the cursor instead moves to (cursor.X, 0) — no horizontal scrolling.
+    /// </summary>
+    /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
+    /// <param name="ctx">The command context</param>
+    public bool MoveCursorToStartOfTable (bool extend, ICommandContext? ctx)
+    {
+        if (TableIsNullOrInvisible ())
+        {
+            return false;
+        }
+
+        SetSelection (FullRowSelect ? _cursorColumn : 0, 0, extend, ctx);
+        Update ();
+
+        return true;
+    }
 
     /// <summary>
     ///     Updates scroll offsets to ensure that the cursor cell is visible.  Has no effect if <see cref="Table"/> has
@@ -160,6 +216,8 @@ public partial class TableView
     }
 
     #endregion Cursor
+
+    #region Selection
 
     /// <summary>
     ///     Updates the cursor position, the <see cref="MultiSelectedRegions"/>, and <see cref="Value"/> to ensure they are
@@ -374,21 +432,119 @@ public partial class TableView
     }
 
     /// <summary>
-    ///     Private override of <see cref="MoveCursorByOffset"/> that returns <see langword="true"/> if the
-    ///     <see cref="Value"/> changed as a result of moving the cursor.
+    ///     Returns <paramref name="columnIndex"/> unless the <see cref="ColumnStyle.Visible"/> is false for the indexed
+    ///     column.  If so then the index returned is nudged to the nearest visible column.
     /// </summary>
-    /// <param name="offsetX"></param>
-    /// <param name="offsetY"></param>
-    /// <param name="ctx">The command context.</param>
-    /// <returns></returns>
-    private bool MoveCursorByOffsetWithReturn (int offsetX, int offsetY, ICommandContext? ctx)
-    {
-        TableSelection? oldValue = Value;
-        SetSelection (_cursorColumn + offsetX, _cursorRow + offsetY, false, ctx);
-        Update ();
+    /// <remarks>Returns <paramref name="columnIndex"/> unchanged if it is invalid (e.g. out of bounds).</remarks>
+    /// <param name="columnIndex">The input column index.</param>
+    /// <param name="lookRight">
+    ///     When nudging invisible selections look right first. <see langword="true"/> to look right,
+    ///     <see langword="false"/> to look left.
+    /// </param>
+    /// <param name="allowBumpingInOppositeDirection">
+    ///     If we cannot find anything visible when looking in direction of
+    ///     <paramref name="lookRight"/> then should we look in the opposite direction instead? Use true if you want to push a
+    ///     selection to a valid index no matter what. Use false if you are primarily interested in learning about directional
+    ///     column visibility.
+    /// </param>
+    private int GetNearestVisibleColumn (int columnIndex, bool lookRight, bool allowBumpingInOppositeDirection) =>
+        TryGetNearestVisibleColumn (columnIndex, lookRight, allowBumpingInOppositeDirection, out int answer) ? answer : columnIndex;
 
-        return !Equals (oldValue, Value);
+    private bool TryGetNearestVisibleColumn (int columnIndex, bool lookRight, bool allowBumpingInOppositeDirection, out int idx)
+    {
+        // if the column index provided is out of bounds
+        if (_table is null || columnIndex < 0 || columnIndex >= _table.Columns)
+        {
+            idx = columnIndex;
+
+            return false;
+        }
+
+        // get the column visibility by index (if no style visible is true)
+        bool [] columnVisibility = Enumerable.Range (0, Table!.Columns).Select (c => Style.GetColumnStyleIfAny (c)?.Visible ?? true).ToArray ();
+
+        // column is visible
+        if (columnVisibility [columnIndex])
+        {
+            idx = columnIndex;
+
+            return true;
+        }
+
+        int increment = lookRight ? 1 : -1;
+
+        // move in that direction
+        for (int i = columnIndex; i >= 0 && i < columnVisibility.Length; i += increment)
+        {
+            // if we find a visible column
+            if (!columnVisibility [i])
+            {
+                continue;
+            }
+
+            idx = i;
+
+            return true;
+        }
+
+        // Caller only wants to look in one direction, and we did not find any
+        // visible columns in that direction
+        if (!allowBumpingInOppositeDirection)
+        {
+            idx = columnIndex;
+
+            return false;
+        }
+
+        // Caller will let us look in the other direction so
+        // now look other way
+        increment = -increment;
+
+        for (int i = columnIndex; i >= 0 && i < columnVisibility.Length; i += increment)
+        {
+            // if we find a visible column
+            if (!columnVisibility [i])
+            {
+                continue;
+            }
+
+            idx = i;
+
+            return true;
+        }
+
+        // nothing seems to be visible so just return input index
+        idx = columnIndex;
+
+        return false;
     }
+
+    /// <summary>
+    ///     Returns a new rectangle between the two points with positive width/height regardless of relative positioning
+    ///     of the points.  pt1 is always considered the <see cref="TableSelectionRegion.Origin"/> point
+    /// </summary>
+    /// <param name="pt1X">Origin point for the selection in X</param>
+    /// <param name="pt1Y">Origin point for the selection in Y</param>
+    /// <param name="pt2X">End point for the selection in X</param>
+    /// <param name="pt2Y">End point for the selection in Y</param>
+    /// <param name="toggle">True if selection is result of <see cref="Command.ToggleExtend"/></param>
+    /// <returns></returns>
+    private static TableSelectionRegion CreateTableSelectionRegion (int pt1X, int pt1Y, int pt2X, int pt2Y, bool toggle = false)
+    {
+        int top = Math.Max (Math.Min (pt1Y, pt2Y), 0);
+        int bot = Math.Max (Math.Max (pt1Y, pt2Y), 0);
+        int left = Math.Max (Math.Min (pt1X, pt2X), 0);
+        int right = Math.Max (Math.Max (pt1X, pt2X), 0);
+
+        // Rect class is inclusive of Top Left but exclusive of Bottom Right so extend by 1
+        return new TableSelectionRegion (new Point (pt1X, pt1Y), new Rectangle (left, top, right - left + 1, bot - top + 1)) { IsExtended = toggle };
+    }
+
+    /// <summary>Returns a single point as a <see cref="TableSelectionRegion"/></summary>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <returns></returns>
+    private static TableSelectionRegion CreateTableSelectionRegion (int x, int y) => CreateTableSelectionRegion (x, y, x, y);
 
     private void ClearMultiSelectedRegions (bool keepToggledSelections)
     {
@@ -548,6 +704,8 @@ public partial class TableView
 
         CommitSelectionState ();
     }
+
+    #endregion Selection
 
     #region IValue<TableSelection?> Implementation
 
