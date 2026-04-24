@@ -112,7 +112,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
     /// </summary>
     protected abstract void ToggleAllRows ();
 
-    /// <summary>Flips the checked state of the given <paramref name="row"/>/</summary>
+    /// <summary>Flips the checked state of the given <paramref name="row"/>.</summary>
     /// <param name="row"></param>
     protected abstract void ToggleRow (int row);
 

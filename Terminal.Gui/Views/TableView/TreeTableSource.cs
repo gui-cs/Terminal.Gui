@@ -114,7 +114,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
             return true;
         }
 
-        // we cannot just check that SelectedColumn is 0 because source may
+        // we cannot just check that the cursor column is 0 because source may
         // be wrapped e.g. with a CheckBoxTableSourceWrapperBase
         return colNames [column] == ColumnNames [0];
     }

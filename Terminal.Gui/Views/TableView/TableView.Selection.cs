@@ -119,27 +119,25 @@ public partial class TableView
 
     #endregion
 
-    /// <summary>True to select the entire row at once.  False to select individual cells.  Defaults to false</summary>
+    /// <summary>True to select the entire row at once. False to select individual cells. Defaults to <see langword="false"/>.</summary>
     public bool FullRowSelect { get; set; }
 
-    /// <summary>True to allow regions to be selected</summary>
-    /// <value></value>
+    /// <summary>True to allow multi-cell region selections. Defaults to <see langword="true"/>.</summary>
     public bool MultiSelect { get; set; } = true;
 
     /// <summary>
-    ///     When <see cref="MultiSelect"/> is enabled this property contain all rectangles of selected cells.  Rectangles
-    ///     describe column/rows selected in <see cref="Table"/> (not screen coordinates)
+    ///     When <see cref="MultiSelect"/> is enabled, contains all rectangles of selected cells.  Rectangles
+    ///     describe column/row regions selected in <see cref="Table"/> (not screen coordinates).
+    ///     Use <see cref="Value"/> to read the current selection state (cursor + regions).
     /// </summary>
-    /// <returns></returns>
     public Stack<TableSelectionRegion> MultiSelectedRegions { get; } = new ();
 
     private int _selectedColumn = -1;
     private int _selectedRow = -1;
 
     /// <summary>
-    ///     Private override of <see cref="ChangeSelectionByOffset"/> that returns true if the selection has
-    ///     changed as a result of moving the selection. Used by key handling logic to determine whether e.g.
-    ///     the cursor right resulted in a change or should be forwarded on to toggle logic handling.
+    ///     Private override of <see cref="ChangeSelectionByOffset"/> that returns <see langword="true"/> if the
+    ///     <see cref="Value"/> changed as a result of moving the selection.
     /// </summary>
     /// <param name="offsetX"></param>
     /// <param name="offsetY"></param>
@@ -155,8 +153,8 @@ public partial class TableView
     }
 
     /// <summary>
-    ///     Moves the <see cref="_selectedRow"/> and <see cref="_selectedColumn"/> by the provided offsets. Optionally
-    ///     starting a box selection (see <see cref="MultiSelect"/>)
+    ///     Moves the cursor by the provided offsets. Optionally
+    ///     starting a box selection (see <see cref="MultiSelect"/>).
     /// </summary>
     /// <param name="offsetX">Offset in number of columns</param>
     /// <param name="offsetY">Offset in number of rows</param>
@@ -287,8 +285,8 @@ public partial class TableView
     }
 
     /// <summary>
-    ///     Updates <see cref="_selectedColumn"/>, <see cref="_selectedRow"/> and <see cref="MultiSelectedRegions"/> where
-    ///     they are outside the bounds of the table (by adjusting them to the nearest existing cell).  Has no effect if
+    ///     Updates the cursor position, the <see cref="MultiSelectedRegions"/>, and <see cref="Value"/> to ensure they are
+    ///     within the bounds of the table (by adjusting them to the nearest existing cell).  Has no effect if
     ///     <see cref="Table"/> has not been set.
     /// </summary>
     /// <remarks>
@@ -441,11 +439,11 @@ public partial class TableView
     }
 
     /// <summary>
-    ///     Moves the <see cref="_selectedRow"/> and <see cref="_selectedColumn"/> to the given col/row in
-    ///     <see cref="Table"/>. Optionally starting a box selection (see <see cref="MultiSelect"/>)
+    ///     Moves the cursor to the given col/row in <see cref="Table"/>.
+    ///     Optionally starts a box selection (see <see cref="MultiSelect"/>).
     /// </summary>
-    /// <param name="col"></param>
-    /// <param name="row"></param>
+    /// <param name="col">Column index.</param>
+    /// <param name="row">Row index.</param>
     /// <param name="extendExistingSelection">True to create a multi cell selection or adjust an existing one</param>
     /// <param name="ctx">The command context.</param>
     public void SetSelection (int col, int row, bool extendExistingSelection, ICommandContext? ctx = null)

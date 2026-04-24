@@ -7,10 +7,10 @@ namespace Terminal.Gui.Views;
 public partial class TableView
 {
     /// <summary>
-    ///     calculates the current header height based on what is visible
-    ///     This respects the viewport Y position and the AlwaysShowHeaders style
+    ///     Calculates the current header height based on what is visible.
+    ///     This respects the viewport Y position and the <see cref="TableStyle.AlwaysShowHeaders"/> style.
     /// </summary>
-    /// <returns>height</returns>
+    /// <returns>Header height in rows.</returns>
     protected int CurrentHeaderHeightVisible ()
     {
         if (!ShouldRenderHeaders ())
@@ -128,9 +128,9 @@ public partial class TableView
     ///     <see cref="ColumnStyle.ColorGetter"/>. For changing the content that is rendered use
     ///     <see cref="ColumnStyle.RepresentationGetter"/>.
     /// </summary>
-    /// <param name="cellAttribute"></param>
+    /// <param name="cellAttribute">The <see cref="Attribute"/> to use for the cell.</param>
     /// <param name="render"></param>
-    /// <param name="isPrimaryCell"></param>
+    /// <param name="isPrimaryCell">True if this cell is the cursor cell (used for inversion).</param>
     protected virtual void RenderCell (Attribute cellAttribute, string render, bool isPrimaryCell)
     {
         // If the cell is the selected col/row then draw the first rune in inverted colors
@@ -448,11 +448,8 @@ public partial class TableView
     }
 
     /// <summary>
-    ///     This decides if we should render headers at all (no matter what the style settings are)
-    ///     This may be a candidate to remove in future
-    ///     (old implementation needed this logic to decide if the header is in current view (RowOffset))
+    ///     Determines whether headers should be rendered based on current viewport state.
     /// </summary>
-    /// <returns></returns>
     private bool ShouldRenderHeaders ()
     {
         if (TableIsNullOrInvisible ())

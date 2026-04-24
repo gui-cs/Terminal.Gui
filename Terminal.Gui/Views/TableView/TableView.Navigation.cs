@@ -166,7 +166,7 @@ public partial class TableView
 
     /// <summary>
     ///     Moves or extends the selection to the final cell in the table (nX,nY). If <see cref="FullRowSelect"/> is
-    ///     enabled then selection instead moves to ( <see cref="_selectedColumn"/>,nY) i.e. no horizontal scrolling.
+    ///     enabled then selection instead moves to (cursor.X, nY) — no horizontal scrolling.
     /// </summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     /// <param name="ctx">The command context</param>
@@ -184,7 +184,7 @@ public partial class TableView
 
     /// <summary>
     ///     Moves or extends the selection to the first cell in the table (0,0). If <see cref="FullRowSelect"/> is enabled
-    ///     then selection instead moves to ( <see cref="_selectedColumn"/>,0) i.e. no horizontal scrolling.
+    ///     then selection instead moves to (cursor.X, 0) — no horizontal scrolling.
     /// </summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     /// <param name="ctx">The command context</param>
@@ -207,7 +207,7 @@ public partial class TableView
     /// <param name="pt1Y">Origin point for the selection in Y</param>
     /// <param name="pt2X">End point for the selection in X</param>
     /// <param name="pt2Y">End point for the selection in Y</param>
-    /// <param name="toggle">True if selection is result of <see cref="Command.Activate"/></param>
+    /// <param name="toggle">True if selection is result of <see cref="Command.ToggleExtend"/></param>
     /// <returns></returns>
     private TableSelectionRegion CreateTableSelectionRegion (int pt1X, int pt1Y, int pt2X, int pt2Y, bool toggle = false)
     {
