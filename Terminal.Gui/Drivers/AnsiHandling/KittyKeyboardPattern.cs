@@ -201,10 +201,9 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
         }
 
         int explicitModifiers = encodedModifiers - 1;
-        int explicitKeyboardModifiers = explicitModifiers & 0b111;
         bool isRelease = parts.Length > 1 && parts [1] == "3";
 
-        if (explicitKeyboardModifiers != 0 || isRelease)
+        if (isRelease)
         {
             return modifierField;
         }

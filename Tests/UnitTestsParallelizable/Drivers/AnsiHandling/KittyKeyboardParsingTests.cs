@@ -253,13 +253,15 @@ public class KittyKeyboardParsingTests
     [Fact]
     public void KittyPattern_LeftAlt_WithCtrlModifier_PreservesBothStates ()
     {
+        // ESC[57443;5u = LeftAlt (implicit Alt) with Ctrl held (explicit Ctrl=5)
+        // After the fix, implicit Alt is combined with explicit Ctrl
         Key? key = _pattern.GetKey ("\u001b[57443;5u");
 
         Assert.NotNull (key);
         Assert.True (key.IsModifierOnly);
         Assert.Equal (ModifierKey.LeftAlt, key.ModifierKey);
         Assert.True (key.IsCtrl);
-        Assert.False (key.IsAlt);
+        Assert.True (key.IsAlt);
         Assert.Equal (KeyEventType.Press, key.EventType);
     }
 
@@ -314,6 +316,40 @@ public class KittyKeyboardParsingTests
         Assert.True (key.IsShift);
         Assert.False (key.IsAlt);
         Assert.False (key.IsCtrl);
+        Assert.Equal (KeyEventType.Press, key.EventType);
+    }
+
+    // Regression test for issue where modifier combinations weren't being combined correctly
+    [Fact]
+    public void KittyPattern_LeftCtrl_WithShiftModifier_CombinesImplicitAndExplicit ()
+    {
+        // ESC[57442;2u = LeftCtrl (implicit Ctrl) with Shift held (explicit Shift=2)
+        // Should combine to Ctrl+Shift, not just Shift
+        Key? key = _pattern.GetKey ("\u001b[57442;2u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftCtrl, key.ModifierKey);
+        Assert.True (key.IsCtrl);
+        Assert.True (key.IsShift);
+        Assert.False (key.IsAlt);
+        Assert.Equal (KeyEventType.Press, key.EventType);
+    }
+
+    // Regression test for issue where modifier combinations weren't being combined correctly
+    [Fact]
+    public void KittyPattern_LeftAlt_WithShiftAndCtrlModifiers_CombinesAllModifiers ()
+    {
+        // ESC[57443;6u = LeftAlt (implicit Alt) with Shift+Ctrl held (explicit Shift+Ctrl=6)
+        // Should combine to Alt+Shift+Ctrl, not just Shift+Ctrl
+        Key? key = _pattern.GetKey ("\u001b[57443;6u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftAlt, key.ModifierKey);
+        Assert.True (key.IsAlt);
+        Assert.True (key.IsShift);
+        Assert.True (key.IsCtrl);
         Assert.Equal (KeyEventType.Press, key.EventType);
     }
 
