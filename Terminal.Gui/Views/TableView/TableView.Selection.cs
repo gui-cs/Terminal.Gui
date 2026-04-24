@@ -678,7 +678,11 @@ public partial class TableView
         return false;
     }
 
-    /// <summary>Unions the current cursor cell (and/or regions) with the provided cell and makes it the cursor.</summary>
+    /// <summary>
+    ///     Toggles the provided cell in/out of the multi-selection. If the cell is already covered by a region,
+    ///     that region is removed (toggle off). Otherwise, a new single-cell region is added (toggle on) and the
+    ///     previous cursor position is preserved.
+    /// </summary>
     private void UnionSelection (int col, int row)
     {
         if (!MultiSelect || TableIsNullOrInvisible ())
@@ -687,19 +691,39 @@ public partial class TableView
         }
 
         EnsureValidSelection ();
-        int oldColumn = _cursorColumn;
-        int oldRow = _cursorRow;
 
-        // move cursor to the new cell
-        _cursorColumn = col;
-        _cursorRow = row;
-        MultiSelectedRegions.Push (CreateTableSelectionRegion (col, row));
+        // Check if the target cell is already covered by an existing region
+        TableSelectionRegion [] existingRegions = GetMultiSelectedRegionsContaining (col, row).ToArray ();
 
-        // if the old cell was not part of a rectangular select
-        // or otherwise selected we need to retain it in the selection
-        if (!IsSelected (oldColumn, oldRow))
+        if (existingRegions.Length > 0)
         {
-            MultiSelectedRegions.Push (CreateTableSelectionRegion (oldColumn, oldRow));
+            // Toggle OFF: remove all regions that contain the target cell
+            IEnumerable<TableSelectionRegion> oldRegions = MultiSelectedRegions.ToArray ().Reverse ();
+            MultiSelectedRegions.Clear ();
+
+            foreach (TableSelectionRegion region in oldRegions)
+            {
+                if (!existingRegions.Contains (region))
+                {
+                    MultiSelectedRegions.Push (region);
+                }
+            }
+        }
+        else
+        {
+            // Toggle ON: add a region for the new cell
+            int oldColumn = _cursorColumn;
+            int oldRow = _cursorRow;
+
+            _cursorColumn = col;
+            _cursorRow = row;
+            MultiSelectedRegions.Push (CreateTableSelectionRegion (col, row));
+
+            // Retain the old cursor position in the selection if it's not already covered
+            if (!IsSelected (oldColumn, oldRow))
+            {
+                MultiSelectedRegions.Push (CreateTableSelectionRegion (oldColumn, oldRow));
+            }
         }
 
         CommitSelectionState ();

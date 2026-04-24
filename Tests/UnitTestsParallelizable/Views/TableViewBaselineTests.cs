@@ -456,6 +456,60 @@ public class TableViewBaselineTests : TestDriverBase
 
     #endregion
 
+    #region D2. Ctrl+Click Toggle (Mouse-based ToggleExtend)
+
+    [Fact]
+    public void CtrlClick_AddsRegionAtClickedCell () // Copilot
+    {
+        // Test that Ctrl+Click (UnionSelection path) adds a region at the clicked cell.
+        TableView tv = CreateTableView (5, 10);
+        tv.SetSelection (0, 0, false);
+        tv.RefreshContentSize ();
+
+        // Find what cell position (1, 3) maps to
+        Point? cell = tv.ScreenToCell (1, 3);
+        Assert.NotNull (cell);
+
+        // Invoke ToggleExtend with a mouse binding context simulating Ctrl+Click
+        MouseBinding mouseBinding = new ([Command.ToggleExtend], new Mouse { Position = new Point (1, 3), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
+        CommandContext ctx = new () { Command = Command.ToggleExtend, Source = new WeakReference<View> (tv), Binding = mouseBinding };
+        tv.InvokeCommand (Command.ToggleExtend, ctx);
+
+        Assert.True (tv.IsSelected (cell.Value.X, cell.Value.Y), "Ctrl+Click should select the clicked cell");
+        Assert.True (tv.MultiSelectedRegions.Count > 0, "Ctrl+Click should add a region");
+    }
+
+    [Fact]
+    public void CtrlClick_TwiceOnSameCell_RemovesRegion () // Copilot
+    {
+        // Bug: UnionSelection (Ctrl+Click path) always adds regions but never removes them.
+        // Ctrl+Clicking the same cell twice should toggle it OFF (remove the region).
+        TableView tv = CreateTableView (5, 10);
+        tv.SetSelection (0, 0, false);
+        tv.RefreshContentSize ();
+
+        Point? cell = tv.ScreenToCell (1, 3);
+        Assert.NotNull (cell);
+        int clickedCol = cell.Value.X;
+        int clickedRow = cell.Value.Y;
+
+        // First Ctrl+Click — adds region
+        MouseBinding mouseBinding1 = new ([Command.ToggleExtend], new Mouse { Position = new Point (1, 3), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
+        CommandContext ctx1 = new () { Command = Command.ToggleExtend, Source = new WeakReference<View> (tv), Binding = mouseBinding1 };
+        tv.InvokeCommand (Command.ToggleExtend, ctx1);
+        Assert.Contains (tv.MultiSelectedRegions, r => r.Rectangle.Contains (clickedCol, clickedRow));
+
+        // Second Ctrl+Click on the same cell — should toggle OFF (remove the region)
+        MouseBinding mouseBinding2 = new ([Command.ToggleExtend], new Mouse { Position = new Point (1, 3), Flags = MouseFlags.LeftButtonClicked | MouseFlags.Ctrl });
+        CommandContext ctx2 = new () { Command = Command.ToggleExtend, Source = new WeakReference<View> (tv), Binding = mouseBinding2 };
+        tv.InvokeCommand (Command.ToggleExtend, ctx2);
+
+        // The region at the clicked cell should be removed (cursor may still be there, but no region)
+        Assert.DoesNotContain (tv.MultiSelectedRegions, r => r.Rectangle.Contains (clickedCol, clickedRow));
+    }
+
+    #endregion
+
     #region E. Edge Cases
 
     [Fact]
