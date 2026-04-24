@@ -1,9 +1,5 @@
 namespace Terminal.Gui.Views;
 
-/// <summary>
-///     Displays and enables infinite scrolling through tabular data based on a <see cref="ITableSource"/>.
-///     <a href="../docs/tableview.md">See the TableView Deep Dive for more</a>.
-/// </summary>
 public partial class TableView
 {
     /// <summary>

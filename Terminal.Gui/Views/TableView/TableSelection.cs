@@ -16,13 +16,13 @@ public class TableSelectionRegion : IEquatable<TableSelectionRegion>
     ///     <see langword="true"/> if the selection was made through <see cref="Command.ToggleExtend"/> (e.g. Ctrl+Click)
     ///     and therefore should persist even through keyboard navigation.
     /// </summary>
-    public bool IsExtended { get; set; }
+    public bool IsExtended { get; init; }
 
     /// <summary>Corner of the <see cref="Rectangle"/> where selection began.</summary>
-    public Point Origin { get; set; }
+    public Point Origin { get; init; }
 
     /// <summary>Area selected.</summary>
-    public Rectangle Rectangle { get; set; }
+    public Rectangle Rectangle { get; init; }
 
     /// <inheritdoc/>
     public bool Equals (TableSelectionRegion? other)
