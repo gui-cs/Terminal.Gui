@@ -229,7 +229,7 @@ public class KeyboardEventTests (ITestOutputHelper output) : TestsAllViews
 
         win.Add (label, focusable);
 
-        SessionToken? token = app.Begin (win);
+        SessionToken token = app.Begin (win);
         focusable.SetFocus ();
         Assert.True (focusable.HasFocus);
 

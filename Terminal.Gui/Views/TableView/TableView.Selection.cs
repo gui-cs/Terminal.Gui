@@ -31,7 +31,7 @@ public partial class TableView
 
     private TableSelection? _value;
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public TableSelection? Value
     {
         get => _value;
@@ -122,8 +122,11 @@ public partial class TableView
     /// <returns></returns>
     public Stack<TableSelectionRegion> MultiSelectedRegions { get; } = new ();
 
-    /// <summary>The index of <see cref="DataTable.Columns"/> in <see cref="Table"/> that the user has currently selected. This is the cursor.</summary>
-    public int SelectedColumn
+    /// <summary>
+    ///     The index of <see cref="DataTable.Columns"/> in <see cref="Table"/> that the user has currently selected. This is
+    ///     the cursor.
+    /// </summary>
+    internal int SelectedColumn
     {
         get => _selectedColumn;
         set
@@ -145,8 +148,11 @@ public partial class TableView
         }
     }
 
-    /// <summary>The index of <see cref="DataTable.Rows"/> in <see cref="Table"/> that the user has currently selected. This is the cursor.</summary>
-    public int SelectedRow
+    /// <summary>
+    ///     The index of <see cref="DataTable.Rows"/> in <see cref="Table"/> that the user has currently selected. This is the
+    ///     cursor.
+    /// </summary>
+    internal int SelectedRow
     {
         get => _selectedRow;
         set
@@ -580,7 +586,7 @@ public partial class TableView
     private bool? ToggleExtend (ICommandContext? ctx)
     {
         // Mouse-based extend (Ctrl+Click or Alt+Click)
-        if (ctx?.Binding is MouseBinding mouseBinding && mouseBinding.MouseEvent is not null)
+        if (ctx?.Binding is MouseBinding { MouseEvent: { } } mouseBinding)
         {
             return ToggleExtendMouse (mouseBinding);
         }
@@ -667,7 +673,7 @@ public partial class TableView
             return false;
         }
 
-        SetSelection (hit.Value.X, hit.Value.Y, true, null);
+        SetSelection (hit.Value.X, hit.Value.Y, true);
         Update ();
 
         return false;

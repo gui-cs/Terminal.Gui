@@ -42,7 +42,7 @@ public partial class FileDialog
         // and the context menu is disposed when it is closed.
         App!.Popovers?.Register (contextMenu);
 
-        Point pos = new (_tableView.FrameToScreen ().X + 15, _tableView.FrameToScreen ().Y + _tableView.SelectedRow + _tableView.GetHeaderHeight ());
+        Point pos = new (_tableView.FrameToScreen ().X + 15, _tableView.FrameToScreen ().Y + (_tableView.Value?.Cursor.Y ?? 0) + _tableView.GetHeaderHeight ());
         contextMenu.MakeVisible (pos);
     }
 
@@ -121,7 +121,7 @@ public partial class FileDialog
             return;
         }
 
-        FileSystemInfoStats stats = RowToStats (_tableView.SelectedRow);
+        FileSystemInfoStats stats = RowToStats (_tableView.Value!.Cursor.Y);
 
         if (stats.FileSystemInfo is IDirectoryInfo d)
         {
@@ -286,9 +286,9 @@ public partial class FileDialog
     }
 
     //    private void TableViewOnActivated (object? sender, EventArgs<ICommandContext?> e)
-    private void TableViewOnSelectedCellChanged (object? sender, SelectedCellChangedEventArgs e)
+    private void TableViewOnValueChanged (object? sender, ValueChangedEventArgs<TableSelection?> e)
     {
-        if (!_tableView.HasFocus || _tableView.SelectedRow == -1 || _tableView.Table?.Rows == 0)
+        if (!_tableView.HasFocus || _tableView.Value is null || _tableView.Table?.Rows == 0)
         {
             return;
         }
@@ -298,7 +298,7 @@ public partial class FileDialog
             return;
         }
 
-        FileSystemInfoStats stats = RowToStats (_tableView.SelectedRow);
+        FileSystemInfoStats stats = RowToStats (_tableView.Value.Cursor.Y);
 
         IFileSystemInfo? dest = stats.IsParent ? State!.Directory : stats.FileSystemInfo;
 

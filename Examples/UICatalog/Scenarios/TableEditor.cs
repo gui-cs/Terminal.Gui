@@ -253,7 +253,7 @@ public class TableEditor : Scenario
 
         appWindow.Add (_tableView);
 
-        _tableView!.SelectedCellChanged += (_, _) => { selectedCellLabel.Text = $"{_tableView!.SelectedRow},{_tableView!.SelectedColumn}"; };
+        _tableView!.ValueChanged += (_, _) => { selectedCellLabel.Text = $"{_tableView!.Value?.Cursor.Y ?? 0},{_tableView!.Value?.Cursor.X ?? 0}"; };
         _tableView!.CellActivated += EditCurrentCell;
         _tableView!.KeyDown += TableViewKeyPress;
 
@@ -790,12 +790,12 @@ public class TableEditor : Scenario
             return null;
         }
 
-        if (_tableView!.SelectedColumn < 0 || _tableView!.SelectedColumn > _tableView!.Table.Columns)
+        if (_tableView!.Value is null || _tableView!.Value.Cursor.X > _tableView!.Table.Columns)
         {
             return null;
         }
 
-        return _tableView!.SelectedColumn;
+        return _tableView!.Value.Cursor.X;
     }
 
     private string GetHumanReadableFileSize (FileSystemInfo fsi)

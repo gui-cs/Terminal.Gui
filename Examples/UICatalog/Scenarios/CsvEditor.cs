@@ -33,22 +33,23 @@ public class CsvEditor : Scenario
         app.Init ();
         _app = app;
 
-        using Window appWindow = new () { Title = GetName () };
+        using Window appWindow = new ();
+        appWindow.Title = GetName ();
 
         // MenuBar
         MenuBar menu = new ();
 
-        _tableView = new () { X = 0, Y = Pos.Bottom (menu), Width = Dim.Fill (), Height = Dim.Fill (1) };
+        _tableView = new TableView { X = 0, Y = Pos.Bottom (menu), Width = Dim.Fill (), Height = Dim.Fill (1) };
 
-        _selectedCellTextField = new () { Text = "0,0", Width = 10, Height = 1 };
+        _selectedCellTextField = new TextField { Text = "0,0", Width = 10, Height = 1 };
         _selectedCellTextField.TextChanged += SelectedCellLabel_TextChanged;
 
         // StatusBar
         StatusBar statusBar = new ([
-                                       new (Application.GetDefaultKey (Command.Quit), "Quit", Quit, "Quit!"),
-                                       new (Key.O.WithCtrl, "Open", Open, "Open a file."),
-                                       new (Key.S.WithCtrl, "Save", Save, "Save current."),
-                                       new ()
+                                       new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", Quit, "Quit!"),
+                                       new Shortcut (Key.O.WithCtrl, "Open", Open, "Open a file."),
+                                       new Shortcut (Key.S.WithCtrl, "Save", Save, "Save current."),
+                                       new Shortcut
                                        {
                                            HelpText = "Cell:",
                                            CommandView = _selectedCellTextField,
@@ -58,13 +59,13 @@ public class CsvEditor : Scenario
                                    ]) { AlignmentModes = AlignmentModes.IgnoreFirstOrLast };
 
         // Setup menu checkboxes for alignment
-        _miLeftCheckBox = new () { Title = "_Align Left" };
+        _miLeftCheckBox = new CheckBox { Title = "_Align Left" };
         _miLeftCheckBox.ValueChanged += (_, _) => Align (Alignment.Start);
 
-        _miRightCheckBox = new () { Title = "_Align Right" };
+        _miRightCheckBox = new CheckBox { Title = "_Align Right" };
         _miRightCheckBox.ValueChanged += (_, _) => Align (Alignment.End);
 
-        _miCenteredCheckBox = new () { Title = "_Align Centered" };
+        _miCenteredCheckBox = new CheckBox { Title = "_Align Centered" };
         _miCenteredCheckBox.ValueChanged += (_, _) => Align (Alignment.Center);
 
         MenuBarItem fileMenu = new (Strings.menuFile,
@@ -98,7 +99,7 @@ public class CsvEditor : Scenario
 
         appWindow.Add (menu, _tableView, statusBar);
 
-        _tableView.SelectedCellChanged += OnSelectedCellChanged;
+        _tableView.ValueChanged += OnValueChanged;
         _tableView.CellActivated += EditCurrentCell;
         _tableView.KeyDown += TableViewKeyPress;
 
@@ -116,7 +117,7 @@ public class CsvEditor : Scenario
         {
             DataColumn col = new (colName);
 
-            int newColIdx = Math.Min (Math.Max (0, _tableView.SelectedColumn + 1), _tableView.Table!.Columns);
+            int newColIdx = Math.Min (Math.Max (0, (_tableView.Value?.Cursor.X ?? 0) + 1), _tableView.Table!.Columns);
 
             int? result = MessageBox.Query (_tableView.App!, "Column Type", "Pick a data type for the column", "Date", "Integer", "Double", "Text", "Cancel");
 
@@ -163,7 +164,7 @@ public class CsvEditor : Scenario
 
         DataRow newRow = _currentTable.NewRow ();
 
-        int newRowIdx = Math.Min (Math.Max (0, _tableView.SelectedRow + 1), _tableView.Table!.Rows);
+        int newRowIdx = Math.Min (Math.Max (0, (_tableView.Value?.Cursor.Y ?? 0) + 1), _tableView.Table!.Rows);
 
         _currentTable.Rows.InsertAt (newRow, newRowIdx);
         _tableView.Update ();
@@ -176,7 +177,7 @@ public class CsvEditor : Scenario
             return;
         }
 
-        ColumnStyle style = _tableView.Style.GetOrCreateColumnStyle (_tableView.SelectedColumn);
+        ColumnStyle style = _tableView.Style.GetOrCreateColumnStyle (_tableView.Value?.Cursor.X ?? 0);
         style.Alignment = newAlignment;
 
         if (_miLeftCheckBox is { })
@@ -204,7 +205,7 @@ public class CsvEditor : Scenario
             return;
         }
 
-        if (_tableView.SelectedColumn == -1)
+        if (_tableView.Value is null)
         {
             MessageBox.ErrorQuery (_tableView!.App!, "No Column", "No column selected", "Ok");
 
@@ -213,7 +214,7 @@ public class CsvEditor : Scenario
 
         try
         {
-            _currentTable.Columns.RemoveAt (_tableView.SelectedColumn);
+            _currentTable.Columns.RemoveAt (_tableView.Value.Cursor.X);
             _tableView.Update ();
         }
         catch (Exception ex)
@@ -285,7 +286,7 @@ public class CsvEditor : Scenario
             return;
         }
 
-        if (_tableView.SelectedColumn == -1)
+        if (_tableView.Value is null)
         {
             MessageBox.ErrorQuery (_tableView!.App!, "No Column", "No column selected", "Ok");
 
@@ -294,7 +295,7 @@ public class CsvEditor : Scenario
 
         try
         {
-            DataColumn currentCol = _currentTable.Columns [_tableView.SelectedColumn];
+            DataColumn currentCol = _currentTable.Columns [_tableView.Value.Cursor.X];
 
             if (GetText ("Move Column", "New Index:", currentCol.Ordinal.ToString (), out string newOrdinal))
             {
@@ -302,7 +303,7 @@ public class CsvEditor : Scenario
 
                 currentCol.SetOrdinal (newIdx);
 
-                _tableView.SetSelection (newIdx, _tableView.SelectedRow, false);
+                _tableView.SetSelection (newIdx, _tableView.Value!.Cursor.Y, false);
                 _tableView.EnsureCursorIsVisible ();
                 _tableView.SetNeedsDraw ();
             }
@@ -320,7 +321,7 @@ public class CsvEditor : Scenario
             return;
         }
 
-        if (_tableView.SelectedRow == -1)
+        if (_tableView.Value is null)
         {
             MessageBox.ErrorQuery (_tableView!.App!, "No Rows", "No row selected", "Ok");
 
@@ -329,7 +330,7 @@ public class CsvEditor : Scenario
 
         try
         {
-            int oldIdx = _tableView.SelectedRow;
+            int oldIdx = _tableView.Value.Cursor.Y;
 
             DataRow currentRow = _currentTable.Rows [oldIdx];
 
@@ -351,7 +352,7 @@ public class CsvEditor : Scenario
 
                 _currentTable.Rows.InsertAt (newRow, newIdx);
 
-                _tableView.SetSelection (_tableView.SelectedColumn, newIdx, false);
+                _tableView.SetSelection (_tableView.Value!.Cursor.X, newIdx, false);
                 _tableView.EnsureCursorIsVisible ();
                 _tableView.SetNeedsDraw ();
             }
@@ -374,25 +375,28 @@ public class CsvEditor : Scenario
         return false;
     }
 
-    private void OnSelectedCellChanged (object? sender, SelectedCellChangedEventArgs e)
+    private void OnValueChanged (object? sender, ValueChangedEventArgs<TableSelection?> e)
     {
         if (_selectedCellTextField is null || _tableView is null)
         {
             return;
         }
 
+        int cursorRow = _tableView.Value?.Cursor.Y ?? 0;
+        int cursorCol = _tableView.Value?.Cursor.X ?? 0;
+
         // only update the text box if the user is not manually editing it
         if (!_selectedCellTextField.HasFocus)
         {
-            _selectedCellTextField.Text = $"{_tableView.SelectedRow},{_tableView.SelectedColumn}";
+            _selectedCellTextField.Text = $"{cursorRow},{cursorCol}";
         }
 
-        if (_tableView.Table is null || _tableView.SelectedColumn == -1)
+        if (_tableView.Table is null || _tableView.Value is null)
         {
             return;
         }
 
-        ColumnStyle? style = _tableView.Style.GetColumnStyleIfAny (_tableView.SelectedColumn);
+        ColumnStyle? style = _tableView.Style.GetColumnStyleIfAny (cursorCol);
 
         if (_miLeftCheckBox is { })
         {
@@ -488,7 +492,7 @@ public class CsvEditor : Scenario
             return;
         }
 
-        DataColumn currentCol = _currentTable.Columns [_tableView.SelectedColumn];
+        DataColumn currentCol = _currentTable.Columns [_tableView.Value?.Cursor.X ?? 0];
 
         if (GetText ("Rename Column", "Name:", currentCol.ColumnName, out string newName))
         {
@@ -544,8 +548,7 @@ public class CsvEditor : Scenario
 
         if (match.Success)
         {
-            _tableView.SelectedColumn = int.Parse (match.Groups [2].Value);
-            _tableView.SelectedRow = int.Parse (match.Groups [1].Value);
+            _tableView.SetSelection (int.Parse (match.Groups [2].Value), int.Parse (match.Groups [1].Value), false);
         }
     }
 
@@ -556,7 +559,7 @@ public class CsvEditor : Scenario
             return;
         }
 
-        DataColumn col = _currentTable.Columns [_tableView.SelectedColumn];
+        DataColumn col = _currentTable.Columns [_tableView.Value?.Cursor.X ?? 0];
 
         if (col.DataType == typeof (string))
         {
@@ -594,14 +597,14 @@ public class CsvEditor : Scenario
             return;
         }
 
-        if (_tableView.SelectedColumn == -1)
+        if (_tableView.Value is null)
         {
             MessageBox.ErrorQuery (_tableView!.App!, "No Column", "No column selected", "Ok");
 
             return;
         }
 
-        string colName = _tableView.Table!.ColumnNames [_tableView.SelectedColumn];
+        string colName = _tableView.Table!.ColumnNames [_tableView.Value.Cursor.X];
 
         _currentTable.DefaultView.Sort = colName + (asc ? " asc" : " desc");
         SetTable (_currentTable.DefaultView.ToTable ());

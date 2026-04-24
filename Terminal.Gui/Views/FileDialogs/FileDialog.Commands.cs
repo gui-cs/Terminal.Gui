@@ -141,7 +141,7 @@ public partial class FileDialog
 
         _tableView.EnsureValidSelection ();
 
-        if (_tableView.SelectedRow < 0)
+        if (_tableView.Value is null)
         {
             return null;
         }

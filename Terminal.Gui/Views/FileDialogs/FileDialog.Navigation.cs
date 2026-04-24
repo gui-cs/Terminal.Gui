@@ -31,7 +31,8 @@ public partial class FileDialog
     /// <param name="toRestore"></param>
     internal void RestoreSelection (IFileSystemInfo toRestore)
     {
-        _tableView.SelectedRow = State!.Children.IndexOf (r => r.FileSystemInfo == toRestore);
+        int row = State!.Children.IndexOf (r => r.FileSystemInfo == toRestore);
+        _tableView.SetSelection (0, row >= 0 ? row : 0, false);
         _tableView.EnsureCursorIsVisible ();
     }
 
@@ -128,7 +129,7 @@ public partial class FileDialog
             {
                 _tableView.Viewport = _tableView.Viewport with { X = 0 };
             }
-            _tableView.SelectedRow = 0;
+            _tableView.SetSelection (0, 0, false);
 
             SetNeedsDraw ();
             UpdateNavigationVisibility ();

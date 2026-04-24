@@ -304,9 +304,9 @@ public class DatePicker : View, IValue<DateTime>
         CreateCalendar ();
         SelectDayOnCalendar (Value.Day);
 
-        _calendar.Activated += (_, e) =>
+        _calendar.Activated += (_, _) =>
                               {
-                                  object dayValue = _table!.Rows [_calendar.SelectedRow] [_calendar.SelectedColumn];
+                                  object dayValue = _table!.Rows [_calendar.Value!.Cursor.Y] [_calendar.Value.Cursor.X];
 
                                   bool isDay = int.TryParse (dayValue.ToString (), out int day);
 

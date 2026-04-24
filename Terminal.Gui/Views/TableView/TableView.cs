@@ -375,8 +375,8 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
     private record TableViewSelectionSnapshot (int SelectedColumn, int SelectedRow, Rectangle [] MultiSelection);
 
     /// <summary>This event is raised when the selected cell in the table changes.</summary>
-    [Obsolete ("Use OnValueChanged instead.")]
-    public event EventHandler<SelectedCellChangedEventArgs>? SelectedCellChanged;
+    [Obsolete ("Use ValueChanged instead.")]
+    internal event EventHandler<SelectedCellChangedEventArgs>? SelectedCellChanged;
 
     /// <summary>
     ///     Updates the view to reflect changes to <see cref="Table"/> and to (<see cref="ColumnOffset"/> /

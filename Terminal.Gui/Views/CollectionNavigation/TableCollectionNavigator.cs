@@ -7,13 +7,13 @@ internal class TableCollectionNavigator : CollectionNavigatorBase
     private readonly TableView _tableView;
 
     /// <summary>Creates a new instance for navigating the data in the wrapped <paramref name="tableView"/>.</summary>
-    public TableCollectionNavigator (TableView tableView) { this._tableView = tableView; }
+    public TableCollectionNavigator (TableView tableView) => this._tableView = tableView;
 
     /// <inheritdoc/>
     protected override object ElementAt (int idx)
     {
-        int col = _tableView.FullRowSelect ? 0 : _tableView.SelectedColumn;
-        object rawValue = _tableView.Table [idx, col];
+        int col = _tableView.FullRowSelect ? 0 : (_tableView.Value?.Cursor.X ?? 0);
+        object rawValue = _tableView.Table? [idx, col];
 
         ColumnStyle style = _tableView.Style.GetColumnStyleIfAny (col);
 

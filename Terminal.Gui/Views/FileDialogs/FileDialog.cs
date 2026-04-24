@@ -192,7 +192,7 @@ public partial class FileDialog : Dialog, IDesignable
 
         _tableView.Accepted += TableViewOnAccepted;
         _tableView.KeyDown += (_, k) => k.Handled = TableView_KeyDown (k);
-        _tableView.SelectedCellChanged += TableViewOnSelectedCellChanged;
+        _tableView.ValueChanged += TableViewOnValueChanged;
 
         _tableView.KeyBindings.ReplaceCommands (Key.Home, Command.Start);
         _tableView.KeyBindings.ReplaceCommands (Key.End, Command.End);

@@ -7,6 +7,7 @@
 using System.Data;
 using JetBrains.Annotations;
 using UnitTests;
+#pragma warning disable xUnit2012
 
 namespace ViewsTests;
 
