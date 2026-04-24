@@ -10,10 +10,10 @@ public class TableViewTests : TestDriverBase
     [Fact]
     public void CanTabOutOfTableViewUsingCursor_Left ()
     {
-        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
+        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField _);
 
         // Make the selected cell one in
-        tableView.SelectedColumn = 1;
+        tableView.SetSelection (1, tableView.Value?.Cursor.Y ?? 0, false);
 
         // Pressing left should move us to the first column without changing focus
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorLeft);
@@ -33,10 +33,10 @@ public class TableViewTests : TestDriverBase
     [Fact]
     public void CanTabOutOfTableViewUsingCursor_Up ()
     {
-        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
+        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField _);
 
         // Make the selected cell one in
-        tableView.SelectedRow = 1;
+        tableView.SetSelection (tableView.Value?.Cursor.X ?? 0, 1, false);
 
         // First press should move us up
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorUp);
@@ -56,10 +56,10 @@ public class TableViewTests : TestDriverBase
     [Fact]
     public void CanTabOutOfTableViewUsingCursor_Right ()
     {
-        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
+        GetTableViewWithSiblings (out TextField _, out TableView tableView, out TextField tf2);
 
         // Make the selected cell one in from the rightmost column
-        tableView.SelectedColumn = tableView.Table!.Columns - 2;
+        tableView.SetSelection (tableView.Table!.Columns - 2, tableView.Value?.Cursor.Y ?? 0, false);
 
         // First press should move us to the rightmost column without changing focus
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorRight);
@@ -79,10 +79,10 @@ public class TableViewTests : TestDriverBase
     [Fact]
     public void CanTabOutOfTableViewUsingCursor_Down ()
     {
-        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
+        GetTableViewWithSiblings (out TextField _, out TableView tableView, out TextField tf2);
 
         // Make the selected cell one in from the bottommost row
-        tableView.SelectedRow = tableView.Table!.Rows - 2;
+        tableView.SetSelection (tableView.Value?.Cursor.X ?? 0, tableView.Table!.Rows - 2, false);
 
         // First press should move us to the bottommost row without changing focus
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorDown);
@@ -102,10 +102,10 @@ public class TableViewTests : TestDriverBase
     [Fact]
     public void CanTabOutOfTableViewUsingCursor_Left_ClearsSelectionFirst ()
     {
-        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2);
+        GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField _);
 
         // Make the selected cell one in
-        tableView.SelectedColumn = 1;
+        tableView.SetSelection (1, tableView.Value?.Cursor.Y ?? 0, false);
 
         // Pressing shift-left should give us a multi selection
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorLeft.WithShift);
@@ -135,16 +135,16 @@ public class TableViewTests : TestDriverBase
 
     /// <summary>
     ///     Creates 3 views on <see cref="Application.TopRunnableView"/> with the focus in the
-    ///     <see cref="TableView"/>.  This is a helper method to setup tests that want to
+    ///     <see cref="TableView"/>.  This is a helper method to set up tests that want to
     ///     explore moving input focus out of a tableview.
     /// </summary>
-    /// <param name="tv"></param>
     /// <param name="tf1"></param>
+    /// <param name="tableView"></param>
     /// <param name="tf2"></param>
-    private void GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2)
+    private static void GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField tf2)
     {
-        IApplication? app = Application.Create ();
-        Runnable<bool>? runnable = new ();
+        IApplication app = Application.Create ();
+        Runnable<bool> runnable = new ();
         app.Begin (runnable);
 
         tableView = new TableView ();
@@ -170,6 +170,7 @@ public class TableViewTests : TestDriverBase
     /// <summary>Builds a simple table of string columns with the requested number of columns and rows</summary>
     /// <param name="cols"></param>
     /// <param name="rows"></param>
+    /// <param name="dt"></param>
     /// <returns></returns>
     public static DataTableSource BuildTable (int cols, int rows, out DataTable dt)
     {
@@ -213,20 +214,19 @@ public class TableViewTests : TestDriverBase
         tableView.HasFocus = true;
         tableView.KeyBindings.Add (Key.B, Command.Down);
 
-        Assert.Equal (0, tableView.SelectedRow);
+        Assert.Equal (0, tableView.Value!.Cursor.Y);
 
         // Keys should be consumed to move down the navigation i.e. to apricot
         Assert.True (tableView.NewKeyDownEvent (Key.B));
-        Assert.Equal (1, tableView.SelectedRow);
+        Assert.Equal (1, tableView.Value!.Cursor.Y);
 
         Assert.True (tableView.NewKeyDownEvent (Key.B));
-        Assert.Equal (2, tableView.SelectedRow);
+        Assert.Equal (2, tableView.Value!.Cursor.Y);
 
         // There is no keybinding for Key.C so it hits collection navigator i.e. we jump to candle
         Assert.True (tableView.NewKeyDownEvent (Key.C));
-        Assert.Equal (5, tableView.SelectedRow);
+        Assert.Equal (5, tableView.Value!.Cursor.Y);
     }
-
 
     [Fact]
     public void TableView_CollectionNavigatorMatcher_HotKey_Finds_Item ()
@@ -246,14 +246,16 @@ public class TableViewTests : TestDriverBase
         tableView.Table = new DataTableSource (dt);
         tableView.HasFocus = true;
 
-        Assert.Equal (0, tableView.SelectedRow);
+        Assert.Equal (0, tableView.Value!.Cursor.Y);
 
         Assert.True (tableView.NewKeyDownEvent (Key.B));
-        Assert.Equal (2, tableView.SelectedRow);
+        Assert.Equal (2, tableView.Value!.Cursor.Y);
     }
 
-    [Fact (Skip = "Until TableView is refactored to have sane flow, this is skipped.")]
-    public void TableView_Command_Activate_TogglesSelection ()
+    // Copilot
+    // Behavior: Space toggles multi-selection via ToggleExtend command
+    [Fact]
+    public void TableView_ToggleExtend_TogglesSelection ()
     {
         var dt = new DataTable ();
         dt.Columns.Add ("Col1");
@@ -264,44 +266,36 @@ public class TableViewTests : TestDriverBase
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        var cellToggledCount = 0;
-        tableView.CellToggled += (_, _) => { cellToggledCount++; };
+        tableView.InvokeCommand (Command.ToggleExtend);
 
-        // Space toggles cell selection (Activate command)
-        tableView.InvokeCommand (Command.Activate);
-
-        Assert.Equal (1, cellToggledCount);
+        Assert.True (tableView.MultiSelectedRegions.Count > 0);
 
         tableView.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
+    // Copilot
     [Fact]
-    public void TableView_Command_Accept_FiresCellActivated ()
+    public void TableView_Command_Accept_FiresAccepted ()
     {
         var dt = new DataTable ();
         dt.Columns.Add ("Col1");
         dt.Rows.Add ("Data1");
 
         TableView tableView = new () { Table = new DataTableSource (dt) };
-        var cellActivatedFired = false;
+        var acceptedFired = false;
 
-        tableView.CellActivated += (_, _) => cellActivatedFired = true;
+        tableView.Accepted += (_, _) => acceptedFired = true;
 
         tableView.InvokeCommand (Command.Accept);
 
-        Assert.True (cellActivatedFired);
+        Assert.True (acceptedFired);
 
         tableView.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
+    // Copilot
     [Fact]
-    public void TableView_Space_TogglesSelection ()
+    public void TableView_Space_AddsToMultiSelectedRegions ()
     {
         var dt = new DataTable ();
         dt.Columns.Add ("Col1");
@@ -311,35 +305,29 @@ public class TableViewTests : TestDriverBase
         tableView.BeginInit ();
         tableView.EndInit ();
 
-        var cellToggledCount = 0;
-        tableView.CellToggled += (_, _) => { cellToggledCount++; };
-
         tableView.NewKeyDownEvent (Key.Space);
 
-        Assert.Equal (1, cellToggledCount);
+        Assert.True (tableView.MultiSelectedRegions.Count > 0);
 
         tableView.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
+    // Copilot
     [Fact]
-    public void TableView_Enter_FiresCellActivated ()
+    public void TableView_Enter_FiresAccepted ()
     {
         var dt = new DataTable ();
         dt.Columns.Add ("Col1");
         dt.Rows.Add ("Data1");
 
         TableView tableView = new () { Table = new DataTableSource (dt) };
-        var cellActivatedFired = false;
+        var acceptedFired = false;
 
-        tableView.CellActivated += (_, _) => cellActivatedFired = true;
+        tableView.Accepted += (_, _) => acceptedFired = true;
 
-        // Enter should trigger CellActivated via Accept command
         tableView.NewKeyDownEvent (Key.Enter);
 
-        Assert.True (cellActivatedFired);
+        Assert.True (acceptedFired);
 
         tableView.Dispose ();
     }
@@ -384,13 +372,17 @@ public class TableViewTests : TestDriverBase
         tableView.Draw ();
 
         // verify
-        var actual = driver.ToString ()!;
+        var actual = driver.ToString ();
         string [] lines = actual.Replace ("\r\n", "\n").Split ('\n');
         string headerRow = lines.First (l => l.Contains ('A') && l.Contains ('B'));
         int separatorIndex = headerRow.IndexOf ('│', 1);
         int separatorColumn = headerRow [..separatorIndex].GetColumns ();
 
         Assert.True (separatorColumn <= 5,
-                     $"Column A should be narrow (grapheme width 2), but separator at column {separatorColumn} suggests over-sized column. Header: '{headerRow}'");
+                     $"Column A should be narrow (grapheme width 2), but separator at column {
+                         separatorColumn
+                     } suggests over-sized column. Header: '{
+                         headerRow
+                     }'");
     }
 }

@@ -587,7 +587,7 @@ public sealed class UICatalogRunnable : Runnable
 
         scenarioList.Style.ColumnStyles.Add (0, new ColumnStyle { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
         scenarioList.Style.ColumnStyles.Add (1, new ColumnStyle { MaxWidth = 1 });
-        scenarioList.CellActivated += ScenarioView_OpenSelectedItem;
+        scenarioList.Accepted += ScenarioView_OpenSelectedItem;
 
         // TableView typically is a grid where nav keys are biased for moving left/right.
         scenarioList.KeyBindings.Remove (Key.Home);
@@ -607,7 +607,7 @@ public sealed class UICatalogRunnable : Runnable
     /// <summary>Launches the selected scenario, setting the global _selectedScenario</summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void ScenarioView_OpenSelectedItem (object? sender, EventArgs? e)
+    private void ScenarioView_OpenSelectedItem (object? sender, CommandEventArgs e)
     {
         // Save selected item state
         _cachedCategoryIndex = _categoryList?.SelectedItem;

@@ -71,12 +71,6 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
     ///         Do not set in parallelizable unit tests.
     ///     </para>
     /// </summary>
-    /// <remarks>
-    ///     <para>
-    ///         The <see cref="CellActivationKey"/> binding (<see cref="Command.Accept"/>) is instance-dependent
-    ///         and is added directly in the constructor.
-    ///     </para>
-    /// </remarks>
     public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
         // Emacs navigation
@@ -250,14 +244,9 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
                         return true;
                     });
 
-        //AddCommand (Command.Accept, () => OnCellActivated (new CellActivatedEventArgs (Table!, SelectedColumn, SelectedRow)));
-
         // Apply configurable key bindings (base View layer + TableView-specific layer)
         ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
 
-        // CellActivationKey is instance-dependent, so it stays as a direct binding
-        KeyBindings.Remove (CellActivationKey);
-        KeyBindings.Add (CellActivationKey, Command.Accept);
         MouseBindings.ReplaceCommands (MouseFlags.WheeledRight, Command.Right);
         MouseBindings.ReplaceCommands (MouseFlags.WheeledLeft, Command.Left);
         MouseBindings.ReplaceCommands (MouseFlags.WheeledDown, Command.Down);
@@ -361,22 +350,9 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
 
     private bool _inCalculatingContentSize;
 
-    /// <summary>
-    ///     This event is raised when a cell is accepted e.g. by double-clicking or pressing
-    ///     <see cref="CellActivationKey"/>
-    /// </summary>
-    [Obsolete ("Use OnAccepted instead.")]
-    public event EventHandler<CellActivatedEventArgs>? CellActivated;
 
-    /// <summary>This event is raised when a cell's selection state changes.</summary>
-    [Obsolete ("Use Activated instead.")]
-    public event EventHandler<CellToggledEventArgs>? CellToggled;
 
-    private record TableViewSelectionSnapshot (int SelectedColumn, int SelectedRow, Rectangle [] MultiSelection);
 
-    /// <summary>This event is raised when the cursor position in the table changes.</summary>
-    [Obsolete ("Use ValueChanged instead.")]
-    internal event EventHandler<CursorChangedEventArgs>? CursorChanged;
 
     /// <summary>
     ///     Updates the view to reflect changes to <see cref="Table"/> and to (<see cref="ColumnOffset"/> /
@@ -400,21 +376,7 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
         SetNeedsDraw ();
     }
 
-    /// <summary>Invokes the <see cref="CellActivated"/> event</summary>
-    /// <param name="args"></param>
-    /// <returns><see langword="true"/> if the CellActivated event was raised.</returns>
-    [Obsolete ("Use OnAccepted instead.")]
-    protected virtual bool OnCellActivated (CellActivatedEventArgs args)
-    {
-        CellActivated?.Invoke (this, args);
 
-        return CellActivated is { };
-    }
-
-    /// <summary>Invokes the <see cref="CellToggled"/> event</summary>
-    /// <param name="args"></param>
-    [Obsolete ("Use OnActivated instead.")]
-    protected virtual void OnCellToggled (CellToggledEventArgs args) => CellToggled?.Invoke (this, args);
 
     /// <summary>Returns the amount of vertical space required to display the header</summary>
     /// <returns></returns>
@@ -590,7 +552,7 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
                         }
                     }
 
-                    columnsToRender.Add (new ColumnToRender (colIdx, contentSize.Width, colWidth + 1, maxContentSize, lastColIdx == colIdx));
+                    columnsToRender.Add (new ColumnToRender (colIdx, contentSize.Width, colWidth + 1, lastColIdx == colIdx));
 
                     contentSize.Width += colWidth;
 
@@ -815,7 +777,7 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
     }
 
     /// <summary>Describes a desire to render a column at a given horizontal position in the UI</summary>
-    internal class ColumnToRender (int col, int x, int width, int maxContentSize, bool isVeryLast)
+    internal class ColumnToRender (int col, int x, int width, bool isVeryLast)
     {
         /// <summary>The column to render</summary>
         public int Column { get; set; } = col;
@@ -839,40 +801,6 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
         Table = new DataTableSource (dt);
 
         return true;
-    }
-
-    /// <summary>The key which when pressed should trigger <see cref="CellActivated"/> event.  Defaults to Enter.</summary>
-    [Obsolete ("Use DefaultKeyBindings instead.")]
-    public KeyCode CellActivationKey
-    {
-        get;
-        set
-        {
-            if (field == value)
-            {
-                return;
-            }
-
-            if (KeyBindings.TryGet (field, out _))
-            {
-                KeyBindings.Replace (field, value);
-            }
-            else
-            {
-                KeyBindings.Add (value, Command.Accept);
-            }
-
-            field = value;
-        }
-    } = KeyCode.Enter;
-
-    /// <inheritdoc />
-    protected override void OnAccepted (ICommandContext? ctx)
-    {
-        base.OnAccepted (ctx);
-
-        // Legacy support for CellActivated event via Command.Accept.
-        OnCellActivated (new CellActivatedEventArgs (Table!, SelectedColumn, SelectedRow));
     }
 
     /// <inheritdoc />

@@ -25,8 +25,8 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     ///     Getter methods for each additional property you want to present in the table. For example:
     ///     <code>
     ///  new () {
-    ///     { "Colname1", (t)=>t.SomeField},
-    ///     { "Colname2", (t)=>t.SomeOtherField}
+    ///     { "Col name1", (t)=>t.SomeField},
+    ///     { "Col name2", (t)=>t.SomeOtherField}
     /// }
     ///  </code>
     /// </param>

@@ -45,9 +45,9 @@ public partial class TableView
         {
             // Render something like:
             /*
-                ┌────────────────────┬──────────┬───────────┬──────────────┬─────────┐
-                │ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
-                └────────────────────┴──────────┴───────────┴──────────────┴─────────┘
+                ┌────────────────────┬─────────┬────────────┬──────────────┬──────────┐
+                │ArithmeticComparator│chi      │Health board│Interpretation│Lab number│
+                └────────────────────┴─────────┴────────────┴──────────────┴──────────┘
             */
 
             bool ShouldRenderNextHeaderLine () =>
@@ -211,7 +211,7 @@ public partial class TableView
     private void RenderHeaderMidline (int row, int availableWidth, ColumnToRender [] columnsToRender)
     {
         // Renders something like:
-        // │ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
+        // │ArithmeticComparator│chi       │Health board│Interpretation│Lab number│
         ClearLine (row, Viewport.Width);
 
         // render start of line
@@ -305,7 +305,6 @@ public partial class TableView
                 // if the next column is the start of a header
                 else if (columnsToRender.Any (r => r.X == c + 1))
                 {
-                    /*TODO: is ┼ symbol in Driver?*/
                     rune = Style.ShowVerticalCellLines ? Glyphs.Cross : Glyphs.BottomTee;
                 }
                 else if (c == availableWidth - 1)
@@ -379,8 +378,8 @@ public partial class TableView
             Attribute cellColor = isSelectedCell ? focused ? scheme.Focus : scheme.Active : Enabled ? scheme.Normal : scheme.Disabled;
             string render = TruncateOrPad (val, representation, current.Width, colStyle);
 
-            // While many cells can be selected (see MultiSelectedRegions) only one cell is the primary (drives navigation etc)
-            bool isPrimaryCell = current.Column == SelectedColumn && rowToRender == SelectedRow;
+            // While many cells can be selected (see MultiSelectedRegions) only one cell is the primary (drives navigation etc.)
+            bool isPrimaryCell = current.Column == _selectedColumn && rowToRender == _selectedRow;
             Move (current.X - Viewport.X, row);
             RenderCell (cellColor, render, isPrimaryCell);
 
@@ -454,8 +453,6 @@ public partial class TableView
     ///     (old implementation needed this logic to decide if the header is in current view (RowOffset))
     /// </summary>
     /// <returns></returns>
-
-    // TODO: a candidate to remove
     private bool ShouldRenderHeaders ()
     {
         if (TableIsNullOrInvisible ())

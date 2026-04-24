@@ -1,5 +1,5 @@
 // Copilot
-#nullable enable
+
 using System.Data;
 using UnitTests;
 
@@ -32,13 +32,13 @@ public class TableViewLegacyTests : TestDriverBase
             dt.Rows.Add (newRow);
         }
 
-        return new (dt);
+        return new DataTableSource (dt);
     }
 
     [Fact]
     public void DeleteRow_SelectAll_AdjustsSelectionToPreventOverrun ()
     {
-        TableView tableView = new () { Table = BuildTable (4, 4, out DataTable dt), MultiSelect = true, Viewport = new (0, 0, 10, 5) };
+        TableView tableView = new () { Table = BuildTable (4, 4, out DataTable dt), MultiSelect = true, Viewport = new Rectangle (0, 0, 10, 5) };
         tableView.BeginInit ();
         tableView.EndInit ();
 
@@ -55,13 +55,13 @@ public class TableViewLegacyTests : TestDriverBase
     [Fact]
     public void DeleteRow_SelectLastRow_AdjustsSelectionToPreventOverrun ()
     {
-        TableView tableView = new () { Table = BuildTable (4, 4, out DataTable dt), MultiSelect = true, Viewport = new (0, 0, 10, 5) };
+        TableView tableView = new () { Table = BuildTable (4, 4, out DataTable dt), MultiSelect = true, Viewport = new Rectangle (0, 0, 10, 5) };
         tableView.BeginInit ();
         tableView.EndInit ();
 
         tableView.ChangeSelectionToEndOfTable (false, null);
         tableView.MultiSelectedRegions.Clear ();
-        tableView.MultiSelectedRegions.Push (new (new (0, 3), new (0, 3, 4, 1)));
+        tableView.MultiSelectedRegions.Push (new TableSelectionRegion (new Point (0, 3), new Rectangle (0, 3, 4, 1)));
 
         Assert.Equal (4, tableView.GetAllSelectedCells ().Count ());
 
@@ -77,7 +77,7 @@ public class TableViewLegacyTests : TestDriverBase
         TableView tableView = new ();
         tableView.BeginInit ();
         tableView.EndInit ();
-        tableView.Viewport = new (0, 0, 25, 10);
+        tableView.Viewport = new Rectangle (0, 0, 25, 10);
 
         tableView.Table = BuildTable (25, 50);
         tableView.RowOffset = 20;
@@ -97,7 +97,7 @@ public class TableViewLegacyTests : TestDriverBase
     public void EnsureValidScrollOffsets_WithNoCells ()
     {
         TableView tableView = new ();
-        tableView.Table = new DataTableSource (new ());
+        tableView.Table = new DataTableSource (new DataTable ());
 
         tableView.EnsureValidScrollOffsets ();
 
@@ -108,25 +108,24 @@ public class TableViewLegacyTests : TestDriverBase
     [Fact]
     public void GetAllSelectedCells_TwoIsolatedSelections_ReturnsSix ()
     {
-        TableView tableView = new () { Table = BuildTable (20, 20), MultiSelect = true, Viewport = new (0, 0, 10, 5) };
+        TableView tableView = new () { Table = BuildTable (20, 20), MultiSelect = true, Viewport = new Rectangle (0, 0, 10, 5) };
         tableView.BeginInit ();
         tableView.EndInit ();
 
         tableView.MultiSelectedRegions.Clear ();
-        tableView.MultiSelectedRegions.Push (new (new (1, 1), new (1, 1, 2, 2)));
-        tableView.MultiSelectedRegions.Push (new (new (7, 3), new (7, 3, 2, 1)));
-        tableView.SelectedColumn = 8;
-        tableView.SelectedRow = 3;
+        tableView.MultiSelectedRegions.Push (new TableSelectionRegion (new Point (1, 1), new Rectangle (1, 1, 2, 2)) { IsExtended = true });
+        tableView.MultiSelectedRegions.Push (new TableSelectionRegion (new Point (7, 3), new Rectangle (7, 3, 2, 1)) { IsExtended = true });
+        tableView.SetSelection (8, 3, false);
 
         Point [] selected = tableView.GetAllSelectedCells ().ToArray ();
 
         Assert.Equal (6, selected.Length);
-        Assert.Equal (new (1, 1), selected [0]);
-        Assert.Equal (new (2, 1), selected [1]);
-        Assert.Equal (new (1, 2), selected [2]);
-        Assert.Equal (new (2, 2), selected [3]);
-        Assert.Equal (new (7, 3), selected [4]);
-        Assert.Equal (new (8, 3), selected [5]);
+        Assert.Equal (new Point (1, 1), selected [0]);
+        Assert.Equal (new Point (2, 1), selected [1]);
+        Assert.Equal (new Point (1, 2), selected [2]);
+        Assert.Equal (new Point (2, 2), selected [3]);
+        Assert.Equal (new Point (7, 3), selected [4]);
+        Assert.Equal (new Point (8, 3), selected [5]);
     }
 
     [Fact]
@@ -147,35 +146,36 @@ public class TableViewLegacyTests : TestDriverBase
     }
 
     [Fact]
-    public void CursorChanged_NotFiredForSameValue ()
+    public void ValueChanged_NotFiredForSameValue ()
     {
         TableView tableView = new () { Table = BuildTable (25, 50) };
 
-        bool called = false;
-        tableView.CursorChanged += (_, _) => { called = true; };
+        var called = false;
+        tableView.ValueChanged += (_, _) => { called = true; };
 
-        tableView.SelectedColumn = 0;
+        // Initial value is already at (0,0), setting same should not fire
+        tableView.SetSelection (0, 0, false);
         Assert.False (called);
 
-        tableView.SelectedColumn = 10;
+        tableView.SetSelection (10, 0, false);
         Assert.True (called);
     }
 
     [Fact]
-    public void CursorChanged_SelectedColumnIndexesCorrect ()
+    public void ValueChanged_CursorIndexesCorrect ()
     {
         TableView tableView = new () { Table = BuildTable (25, 50) };
 
-        bool called = false;
+        var called = false;
 
-        tableView.CursorChanged += (_, e) =>
-                                         {
-                                             called = true;
-                                             Assert.Equal (0, e.OldCol);
-                                             Assert.Equal (10, e.NewCol);
-                                         };
+        tableView.ValueChanged += (_, e) =>
+                                  {
+                                      called = true;
+                                      Assert.Equal (0, e.OldValue!.Cursor.X);
+                                      Assert.Equal (10, e.NewValue!.Cursor.X);
+                                  };
 
-        tableView.SelectedColumn = 10;
+        tableView.SetSelection (10, 0, false);
         Assert.True (called);
     }
 
@@ -200,7 +200,7 @@ public class TableViewLegacyTests : TestDriverBase
     [InlineData (false, 1, 0)]
     public void TableCollectionNavigator_FullRowSelect_True_False (bool fullRowSelect, int selectedCol, int expectedRow)
     {
-        TableView tableView = new () { FullRowSelect = fullRowSelect, SelectedColumn = selectedCol };
+        TableView tableView = new () { FullRowSelect = fullRowSelect };
         tableView.BeginInit ();
         tableView.EndInit ();
 
@@ -210,7 +210,7 @@ public class TableViewLegacyTests : TestDriverBase
         dt.Rows.Add (1, 2);
         dt.Rows.Add (3, 4);
         tableView.Table = new DataTableSource (dt);
-        tableView.SelectedColumn = selectedCol;
+        tableView.SetSelection (selectedCol, tableView.Value?.Cursor.Y ?? 0, false);
 
         Assert.Equal (expectedRow, tableView.CollectionNavigator.GetNextMatchingItem (0, "3".ToCharArray () [0]));
     }
@@ -218,10 +218,8 @@ public class TableViewLegacyTests : TestDriverBase
     [Fact]
     public void EnumerableTableSource_ColumnNamesAndRowCount ()
     {
-        EnumerableTableSource<Type> source = new (
-                                                   [typeof (string), typeof (int), typeof (float)],
-                                                   new () { { "Name", t => t.Name }, { "Namespace", t => t.Namespace! } }
-                                                  );
+        EnumerableTableSource<Type> source = new ([typeof (string), typeof (int), typeof (float)],
+                                                  new Dictionary<string, Func<Type, object>> { { "Name", t => t.Name }, { "Namespace", t => t.Namespace! } });
 
         Assert.Equal (2, source.Columns);
         Assert.Equal (3, source.Rows);
@@ -239,7 +237,7 @@ public class TableViewLegacyTests : TestDriverBase
         dt.Rows.Add (1);
         dt.Rows.Add (2);
 
-        TableView tv = new () { Viewport = new (0, 0, 20, 5) };
+        TableView tv = new () { Viewport = new Rectangle (0, 0, 20, 5) };
         tv.BeginInit ();
         tv.EndInit ();
         tv.Table = new DataTableSource (dt);
@@ -264,7 +262,7 @@ public class TableViewLegacyTests : TestDriverBase
 
     private static DataTableSource BuildTable (int cols, int rows, out DataTable dt)
     {
-        dt = new ();
+        dt = new DataTable ();
 
         for (var c = 0; c < cols; c++)
         {
@@ -283,6 +281,6 @@ public class TableViewLegacyTests : TestDriverBase
             dt.Rows.Add (newRow);
         }
 
-        return new (dt);
+        return new DataTableSource (dt);
     }
 }

@@ -1,5 +1,4 @@
-#nullable enable
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary>Describes a single contiguous rectangular selection region within a <see cref="TableView"/>.</summary>
 public class TableSelectionRegion : IEquatable<TableSelectionRegion>
@@ -59,7 +58,7 @@ public class TableSelection : IEquatable<TableSelection>
     /// <summary>Creates a new <see cref="TableSelection"/> with the specified cursor and regions.</summary>
     /// <param name="cursor">The active cell position (navigation anchor). Must not be <see langword="null"/>.</param>
     /// <param name="regions">All extended selection regions (may be empty for cursor-only selection).</param>
-    public TableSelection (Point cursor, IReadOnlyList<TableSelectionRegion> regions)
+    public TableSelection (Point cursor, IReadOnlyList<TableSelectionRegion>? regions)
     {
         Cursor = cursor;
         Regions = regions ?? [];
@@ -76,18 +75,7 @@ public class TableSelection : IEquatable<TableSelection>
     public IReadOnlyList<TableSelectionRegion> Regions { get; }
 
     /// <summary>Returns <see langword="true"/> if the given cell is within any of the <see cref="Regions"/>.</summary>
-    public bool Contains (int col, int row)
-    {
-        for (var i = 0; i < Regions.Count; i++)
-        {
-            if (Regions [i].Rectangle.Contains (col, row))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    public bool Contains (int col, int row) => Regions.Any (t => t.Rectangle.Contains (col, row));
 
     /// <inheritdoc/>
     public bool Equals (TableSelection? other)

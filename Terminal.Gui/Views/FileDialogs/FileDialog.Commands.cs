@@ -119,7 +119,6 @@ public partial class FileDialog
             MultiSelected = string.IsNullOrWhiteSpace (Path) ? Enumerable.Empty<string> ().ToList ().AsReadOnly () : new List<string> { Path }.AsReadOnly ();
         }
 
-        // TODO: TableView should not always return true from OnCellActivated.
         Result = 2; // Ok button index
 
         if (!IsModal)

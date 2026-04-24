@@ -28,7 +28,7 @@ public partial class TableView
             }
             else
             {
-                SetSelection (0, 0, false, null);
+                SetSelection (0, 0, false);
             }
 
             RefreshContentSize ();
@@ -78,11 +78,11 @@ public partial class TableView
 
     private bool? HandleRight (ICommandContext? ctx)
     {
-        int oldSelectedCol = SelectedColumn;
+        int oldSelectedCol = _selectedColumn;
         int oldViewportX = Viewport.X;
         bool result = ChangeSelectionByOffsetWithReturn (1, 0, ctx);
 
-        if (oldSelectedCol != SelectedColumn || Viewport.X >= MaxViewPort ().X)
+        if (oldSelectedCol != _selectedColumn || Viewport.X >= MaxViewPort ().X)
         {
             return result;
         }
@@ -94,7 +94,7 @@ public partial class TableView
 
     private bool? HandleUp (ICommandContext? ctx)
     {
-        if (SelectedRow != 0)
+        if (_selectedRow != 0)
         {
             return ChangeSelectionByOffsetWithReturn (0, -1, ctx);
         }
@@ -110,7 +110,7 @@ public partial class TableView
 
     private bool? HandleDown (ICommandContext? ctx)
     {
-        if (Table == null || SelectedRow < Table.Rows - 1)
+        if (Table == null || _selectedRow < Table.Rows - 1)
         {
             return ChangeSelectionByOffsetWithReturn (0, 1, ctx);
         }
@@ -130,11 +130,11 @@ public partial class TableView
     /// <param name="ctx">The command context</param>
     public void PageDown (bool extend, ICommandContext? ctx)
     {
-        int oldSelectedRow = SelectedRow;
+        int oldSelectedRow = _selectedRow;
         ChangeSelectionByOffset (0, Viewport.Height /* - CurrentHeaderHeightVisible ()*/, extend, ctx);
 
         //after scrolling the cells, also scroll to lower line
-        int remainingJump = Viewport.Height - (SelectedRow - oldSelectedRow);
+        int remainingJump = Viewport.Height - (_selectedRow - oldSelectedRow);
         Point maxViewPort = MaxViewPort ();
 
         if (remainingJump > 0 && Viewport.Y < maxViewPort.Y)
@@ -150,11 +150,11 @@ public partial class TableView
     /// <param name="ctx">The command context</param>
     public void PageUp (bool extend, ICommandContext? ctx)
     {
-        int oldSelectedRow = SelectedRow;
+        int oldSelectedRow = _selectedRow;
         ChangeSelectionByOffset (0, -Viewport.Height /* - CurrentHeaderHeightVisible ()*/, extend, ctx);
 
         //after scrolling the cells, also scroll to header
-        int remainingJump = Viewport.Height - (oldSelectedRow - SelectedRow);
+        int remainingJump = Viewport.Height - (oldSelectedRow - _selectedRow);
 
         if (remainingJump > 0 && Viewport.Y > 0)
         {
@@ -166,7 +166,7 @@ public partial class TableView
 
     /// <summary>
     ///     Moves or extends the selection to the final cell in the table (nX,nY). If <see cref="FullRowSelect"/> is
-    ///     enabled then selection instead moves to ( <see cref="SelectedColumn"/>,nY) i.e. no horizontal scrolling.
+    ///     enabled then selection instead moves to ( <see cref="_selectedColumn"/>,nY) i.e. no horizontal scrolling.
     /// </summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     /// <param name="ctx">The command context</param>
@@ -178,13 +178,13 @@ public partial class TableView
         }
 
         int finalColumn = Table!.Columns - 1;
-        SetSelection (FullRowSelect ? SelectedColumn : finalColumn, Table.Rows - 1, extend, ctx);
+        SetSelection (FullRowSelect ? _selectedColumn : finalColumn, Table.Rows - 1, extend, ctx);
         Update ();
     }
 
     /// <summary>
     ///     Moves or extends the selection to the first cell in the table (0,0). If <see cref="FullRowSelect"/> is enabled
-    ///     then selection instead moves to ( <see cref="SelectedColumn"/>,0) i.e. no horizontal scrolling.
+    ///     then selection instead moves to ( <see cref="_selectedColumn"/>,0) i.e. no horizontal scrolling.
     /// </summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     /// <param name="ctx">The command context</param>
@@ -195,7 +195,7 @@ public partial class TableView
             return;
         }
 
-        SetSelection (FullRowSelect ? SelectedColumn : 0, 0, extend, ctx);
+        SetSelection (FullRowSelect ? _selectedColumn : 0, 0, extend, ctx);
         Update ();
     }
 
@@ -228,7 +228,7 @@ public partial class TableView
 
     private bool CycleToNextTableEntryBeginningWith (Key key)
     {
-        int row = SelectedRow;
+        int row = _selectedRow;
 
         // There is a multi select going on and not just for the current row
         if (GetAllSelectedCells ().Any (c => c.Y != row))
@@ -243,7 +243,8 @@ public partial class TableView
             return false;
         }
 
-        SelectedRow = match.Value;
+        _selectedRow = match.Value;
+        CommitSelectionState ();
         EnsureValidSelection ();
         EnsureCursorIsVisible ();
         SetNeedsDraw ();

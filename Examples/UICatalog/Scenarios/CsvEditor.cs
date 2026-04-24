@@ -100,7 +100,7 @@ public class CsvEditor : Scenario
         appWindow.Add (menu, _tableView, statusBar);
 
         _tableView.ValueChanged += OnValueChanged;
-        _tableView.CellActivated += EditCurrentCell;
+        _tableView.Accepted += EditCurrentCell;
         _tableView.KeyDown += TableViewKeyPress;
 
         app.Run (appWindow);
@@ -113,46 +113,47 @@ public class CsvEditor : Scenario
             return;
         }
 
-        if (GetText ("Enter column name", "Name:", "", out string colName))
+        if (!GetText ("Enter column name", "Name:", "", out string colName))
         {
-            DataColumn col = new (colName);
-
-            int newColIdx = Math.Min (Math.Max (0, (_tableView.Value?.Cursor.X ?? 0) + 1), _tableView.Table!.Columns);
-
-            int? result = MessageBox.Query (_tableView.App!, "Column Type", "Pick a data type for the column", "Date", "Integer", "Double", "Text", "Cancel");
-
-            if (result is null || result >= 4)
-            {
-                return;
-            }
-
-            switch (result)
-            {
-                case 0:
-                    col.DataType = typeof (DateTime);
-
-                    break;
-
-                case 1:
-                    col.DataType = typeof (int);
-
-                    break;
-
-                case 2:
-                    col.DataType = typeof (double);
-
-                    break;
-
-                case 3:
-                    col.DataType = typeof (string);
-
-                    break;
-            }
-
-            _currentTable.Columns.Add (col);
-            col.SetOrdinal (newColIdx);
-            _tableView.Update ();
+            return;
         }
+        DataColumn col = new (colName);
+
+        int newColIdx = Math.Min (Math.Max (0, (_tableView.Value?.Cursor.X ?? 0) + 1), _tableView.Table!.Columns);
+
+        int? result = MessageBox.Query (_tableView.App!, "Column Type", "Pick a data type for the column", "Date", "Integer", "Double", "Text", "Cancel");
+
+        if (result is null or >= 4)
+        {
+            return;
+        }
+
+        switch (result)
+        {
+            case 0:
+                col.DataType = typeof (DateTime);
+
+                break;
+
+            case 1:
+                col.DataType = typeof (int);
+
+                break;
+
+            case 2:
+                col.DataType = typeof (double);
+
+                break;
+
+            case 3:
+                col.DataType = typeof (string);
+
+                break;
+        }
+
+        _currentTable.Columns.Add (col);
+        col.SetOrdinal (newColIdx);
+        _tableView.Update ();
     }
 
     private void AddRow ()
@@ -180,20 +181,11 @@ public class CsvEditor : Scenario
         ColumnStyle style = _tableView.Style.GetOrCreateColumnStyle (_tableView.Value?.Cursor.X ?? 0);
         style.Alignment = newAlignment;
 
-        if (_miLeftCheckBox is { })
-        {
-            _miLeftCheckBox.Value = style.Alignment == Alignment.Start ? CheckState.Checked : CheckState.UnChecked;
-        }
+        _miLeftCheckBox?.Value = style.Alignment == Alignment.Start ? CheckState.Checked : CheckState.UnChecked;
 
-        if (_miRightCheckBox is { })
-        {
-            _miRightCheckBox.Value = style.Alignment == Alignment.End ? CheckState.Checked : CheckState.UnChecked;
-        }
+        _miRightCheckBox?.Value = style.Alignment == Alignment.End ? CheckState.Checked : CheckState.UnChecked;
 
-        if (_miCenteredCheckBox is { })
-        {
-            _miCenteredCheckBox.Value = style.Alignment == Alignment.Center ? CheckState.Checked : CheckState.UnChecked;
-        }
+        _miCenteredCheckBox?.Value = style.Alignment == Alignment.Center ? CheckState.Checked : CheckState.UnChecked;
 
         _tableView.Update ();
     }
@@ -223,28 +215,33 @@ public class CsvEditor : Scenario
         }
     }
 
-    private void EditCurrentCell (object? sender, CellActivatedEventArgs e)
+    private void EditCurrentCell (object? sender, CommandEventArgs e)
     {
-        if (e.Table is null || _currentTable is null || _tableView is null)
+        if (_tableView?.Table is null || _currentTable is null)
         {
             return;
         }
 
-        var oldValue = _currentTable.Rows [e.Row] [e.Col].ToString ();
+        int col = _tableView.Value?.Cursor.X ?? 0;
+        int row = _tableView.Value?.Cursor.Y ?? 0;
 
-        if (GetText ("Enter new value", _currentTable.Columns [e.Col].ColumnName, oldValue ?? "", out string newText))
+        var oldValue = _currentTable.Rows [row] [col].ToString ();
+
+        if (!GetText ("Enter new value", _currentTable.Columns [col].ColumnName, oldValue ?? "", out string newText))
         {
-            try
-            {
-                _currentTable.Rows [e.Row] [e.Col] = string.IsNullOrWhiteSpace (newText) ? DBNull.Value : newText;
-            }
-            catch (Exception ex)
-            {
-                MessageBox.ErrorQuery (_tableView!.App!, "Failed to set text", ex.Message, "Ok");
-            }
-
-            _tableView.Update ();
+            return;
         }
+
+        try
+        {
+            _currentTable.Rows [row] [col] = string.IsNullOrWhiteSpace (newText) ? DBNull.Value : newText;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.ErrorQuery (_tableView!.App!, "Failed to set text", ex.Message, "Ok");
+        }
+
+        _tableView.Update ();
     }
 
     private bool GetText (string title, string label, string initialText, out string enteredText)
@@ -297,16 +294,17 @@ public class CsvEditor : Scenario
         {
             DataColumn currentCol = _currentTable.Columns [_tableView.Value.Cursor.X];
 
-            if (GetText ("Move Column", "New Index:", currentCol.Ordinal.ToString (), out string newOrdinal))
+            if (!GetText ("Move Column", "New Index:", currentCol.Ordinal.ToString (), out string newOrdinal))
             {
-                int newIdx = Math.Min (Math.Max (0, int.Parse (newOrdinal)), _tableView.Table!.Columns - 1);
-
-                currentCol.SetOrdinal (newIdx);
-
-                _tableView.SetSelection (newIdx, _tableView.Value!.Cursor.Y, false);
-                _tableView.EnsureCursorIsVisible ();
-                _tableView.SetNeedsDraw ();
+                return;
             }
+            int newIdx = Math.Min (Math.Max (0, int.Parse (newOrdinal)), _tableView.Table!.Columns - 1);
+
+            currentCol.SetOrdinal (newIdx);
+
+            _tableView.SetSelection (newIdx, _tableView.Value!.Cursor.Y, false);
+            _tableView.EnsureCursorIsVisible ();
+            _tableView.SetNeedsDraw ();
         }
         catch (Exception ex)
         {
@@ -334,28 +332,29 @@ public class CsvEditor : Scenario
 
             DataRow currentRow = _currentTable.Rows [oldIdx];
 
-            if (GetText ("Move Row", "New Row:", oldIdx.ToString (), out string newOrdinal))
+            if (!GetText ("Move Row", "New Row:", oldIdx.ToString (), out string newOrdinal))
             {
-                int newIdx = Math.Min (Math.Max (0, int.Parse (newOrdinal)), _tableView.Table!.Rows - 1);
-
-                if (newIdx == oldIdx)
-                {
-                    return;
-                }
-
-                object? [] arrayItems = currentRow.ItemArray;
-                _currentTable.Rows.Remove (currentRow);
-
-                // Removing and Inserting the same DataRow seems to result in it loosing its values so we have to create a new instance
-                DataRow newRow = _currentTable.NewRow ();
-                newRow.ItemArray = arrayItems;
-
-                _currentTable.Rows.InsertAt (newRow, newIdx);
-
-                _tableView.SetSelection (_tableView.Value!.Cursor.X, newIdx, false);
-                _tableView.EnsureCursorIsVisible ();
-                _tableView.SetNeedsDraw ();
+                return;
             }
+            int newIdx = Math.Min (Math.Max (0, int.Parse (newOrdinal)), _tableView.Table!.Rows - 1);
+
+            if (newIdx == oldIdx)
+            {
+                return;
+            }
+
+            object? [] arrayItems = currentRow.ItemArray;
+            _currentTable.Rows.Remove (currentRow);
+
+            // Removing and Inserting the same DataRow seems to result in it loosing its values so we have to create a new instance
+            DataRow newRow = _currentTable.NewRow ();
+            newRow.ItemArray = arrayItems;
+
+            _currentTable.Rows.InsertAt (newRow, newIdx);
+
+            _tableView.SetSelection (_tableView.Value!.Cursor.X, newIdx, false);
+            _tableView.EnsureCursorIsVisible ();
+            _tableView.SetNeedsDraw ();
         }
         catch (Exception ex)
         {
@@ -365,14 +364,13 @@ public class CsvEditor : Scenario
 
     private bool NoTableLoaded ()
     {
-        if (_tableView?.Table is null)
+        if (_tableView?.Table is { })
         {
-            MessageBox.ErrorQuery (_tableView!.App!, "No Table Loaded", "No table has currently be opened", "Ok");
-
-            return true;
+            return false;
         }
+        MessageBox.ErrorQuery (_tableView!.App!, "No Table Loaded", "No table has currently be opened", "Ok");
 
-        return false;
+        return true;
     }
 
     private void OnValueChanged (object? sender, ValueChangedEventArgs<TableSelection?> e)
@@ -398,20 +396,11 @@ public class CsvEditor : Scenario
 
         ColumnStyle? style = _tableView.Style.GetColumnStyleIfAny (cursorCol);
 
-        if (_miLeftCheckBox is { })
-        {
-            _miLeftCheckBox.Value = style?.Alignment == Alignment.Start ? CheckState.Checked : CheckState.UnChecked;
-        }
+        _miLeftCheckBox?.Value = style?.Alignment == Alignment.Start ? CheckState.Checked : CheckState.UnChecked;
 
-        if (_miRightCheckBox is { })
-        {
-            _miRightCheckBox.Value = style?.Alignment == Alignment.End ? CheckState.Checked : CheckState.UnChecked;
-        }
+        _miRightCheckBox?.Value = style?.Alignment == Alignment.End ? CheckState.Checked : CheckState.UnChecked;
 
-        if (_miCenteredCheckBox is { })
-        {
-            _miCenteredCheckBox.Value = style?.Alignment == Alignment.Center ? CheckState.Checked : CheckState.UnChecked;
-        }
+        _miCenteredCheckBox?.Value = style?.Alignment == Alignment.Center ? CheckState.Checked : CheckState.UnChecked;
     }
 
     private void Open ()
@@ -467,15 +456,9 @@ public class CsvEditor : Scenario
             // Only set the current filename if we successfully loaded the entire file
             _currentFile = filename;
 
-            if (_selectedCellTextField?.SuperView is { })
-            {
-                _selectedCellTextField.SuperView.Enabled = true;
-            }
+            _selectedCellTextField?.SuperView?.Enabled = true;
 
-            if (_app?.TopRunnableView is { })
-            {
-                _app.TopRunnableView.Title = $"{GetName ()} - {Path.GetFileName (_currentFile)}";
-            }
+            _app?.TopRunnableView?.Title = $"{GetName ()} - {Path.GetFileName (_currentFile)}";
         }
         catch (Exception ex)
         {
@@ -494,11 +477,12 @@ public class CsvEditor : Scenario
 
         DataColumn currentCol = _currentTable.Columns [_tableView.Value?.Cursor.X ?? 0];
 
-        if (GetText ("Rename Column", "Name:", currentCol.ColumnName, out string newName))
+        if (!GetText ("Rename Column", "Name:", currentCol.ColumnName, out string newName))
         {
-            currentCol.ColumnName = newName;
-            _tableView.Update ();
+            return;
         }
+        currentCol.ColumnName = newName;
+        _tableView.Update ();
     }
 
     private void Save ()
@@ -573,22 +557,15 @@ public class CsvEditor : Scenario
 
         ColumnStyle style = _tableView.Style.GetOrCreateColumnStyle (col.Ordinal);
 
-        if (GetText ("Format", "Pattern:", style.Format ?? "", out string newPattern))
-        {
-            style.Format = newPattern;
-            _tableView.Update ();
-        }
-    }
-
-    private void SetTable (DataTable dataTable)
-    {
-        if (_tableView is null)
+        if (!GetText ("Format", "Pattern:", style.Format ?? "", out string newPattern))
         {
             return;
         }
-
-        _tableView.Table = new DataTableSource (_currentTable = dataTable);
+        style.Format = newPattern;
+        _tableView.Update ();
     }
+
+    private void SetTable (DataTable dataTable) => _tableView?.Table = new DataTableSource (_currentTable = dataTable);
 
     private void Sort (bool asc)
     {
@@ -617,27 +594,29 @@ public class CsvEditor : Scenario
             return;
         }
 
-        if (e.KeyCode == Key.Delete)
+        if (e.KeyCode != Key.Delete)
         {
-            if (_tableView.FullRowSelect)
-            {
-                // Delete button deletes all rows when in full row mode
-                foreach (int toRemove in _tableView.GetAllSelectedCells ().Select (p => p.Y).Distinct ().OrderByDescending (i => i))
-                {
-                    _currentTable.Rows.RemoveAt (toRemove);
-                }
-            }
-            else
-            {
-                // otherwise set all selected cells to null
-                foreach (Point pt in _tableView.GetAllSelectedCells ())
-                {
-                    _currentTable.Rows [pt.Y] [pt.X] = DBNull.Value;
-                }
-            }
-
-            _tableView.Update ();
-            e.Handled = true;
+            return;
         }
+
+        if (_tableView.FullRowSelect)
+        {
+            // Delete button deletes all rows when in full row mode
+            foreach (int toRemove in _tableView.GetAllSelectedCells ().Select (p => p.Y).Distinct ().OrderByDescending (i => i))
+            {
+                _currentTable.Rows.RemoveAt (toRemove);
+            }
+        }
+        else
+        {
+            // otherwise set all selected cells to null
+            foreach (Point pt in _tableView.GetAllSelectedCells ())
+            {
+                _currentTable.Rows [pt.Y] [pt.X] = DBNull.Value;
+            }
+        }
+
+        _tableView.Update ();
+        e.Handled = true;
     }
 }
