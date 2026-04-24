@@ -325,6 +325,7 @@ public class KittyKeyboardPipelineTests
         Assert.Single (down);
         Assert.True (down [0].IsModifierOnly);
         Assert.Equal (ModifierKey.LeftShift, down [0].ModifierKey);
+        Assert.True (down [0].IsShift);
         Assert.Equal (KeyEventType.Press, down [0].EventType);
 
         Assert.Single (up);
@@ -382,6 +383,55 @@ public class KittyKeyboardPipelineTests
         Assert.Empty (up);
     }
 
+    [Fact]
+    public void Pipeline_ModifierPress_SetsImplicitModifierState ()
+    {
+        (List<Key> down, List<Key> up) = InjectRawSequence ("\x1b[57441u",
+                                                            "\x1b[57442u",
+                                                            "\x1b[57443u");
+
+        Assert.Equal (3, down.Count);
+        Assert.True (down [0].IsShift);
+        Assert.True (down [1].IsCtrl);
+        Assert.True (down [2].IsAlt);
+        Assert.Empty (up);
+    }
+
+    [Theory]
+    [InlineData ("\x1b[57358u", ModifierKey.CapsLock, false, false, false)]
+    [InlineData ("\x1b[57359u", ModifierKey.ScrollLock, false, false, false)]
+    [InlineData ("\x1b[57360u", ModifierKey.NumLock, false, false, false)]
+    [InlineData ("\x1b[57441u", ModifierKey.LeftShift, true, false, false)]
+    [InlineData ("\x1b[57442u", ModifierKey.LeftCtrl, false, false, true)]
+    [InlineData ("\x1b[57443u", ModifierKey.LeftAlt, false, true, false)]
+    [InlineData ("\x1b[57444u", ModifierKey.LeftSuper, false, false, false)]
+    [InlineData ("\x1b[57445u", ModifierKey.LeftHyper, false, false, false)]
+    [InlineData ("\x1b[57447u", ModifierKey.RightShift, true, false, false)]
+    [InlineData ("\x1b[57448u", ModifierKey.RightCtrl, false, false, true)]
+    [InlineData ("\x1b[57449u", ModifierKey.RightAlt, false, true, false)]
+    [InlineData ("\x1b[57450u", ModifierKey.RightSuper, false, false, false)]
+    [InlineData ("\x1b[57451u", ModifierKey.RightHyper, false, false, false)]
+    [InlineData ("\x1b[57453u", ModifierKey.AltGr, false, true, false)]
+    public void Pipeline_AllMappedModifierPresses_RaiseExpectedImplicitState (
+        string sequence,
+        ModifierKey expectedModifier,
+        bool expectedShift,
+        bool expectedAlt,
+        bool expectedCtrl
+    )
+    {
+        (List<Key> down, List<Key> up) = InjectRawSequence (sequence);
+
+        Assert.Single (down);
+        Assert.True (down [0].IsModifierOnly);
+        Assert.Equal (expectedModifier, down [0].ModifierKey);
+        Assert.Equal (expectedShift, down [0].IsShift);
+        Assert.Equal (expectedAlt, down [0].IsAlt);
+        Assert.Equal (expectedCtrl, down [0].IsCtrl);
+        Assert.Equal (KeyEventType.Press, down [0].EventType);
+        Assert.Empty (up);
+    }
+
     // Copilot - Opus 4.6
     [Theory]
     [InlineData ("\x1b[57441;1:3u", ModifierKey.LeftShift)]
@@ -403,6 +453,7 @@ public class KittyKeyboardPipelineTests
         Assert.Equal (KeyEventType.Release, up [0].EventType);
     }
 
+
     [Fact]
     public void Pipeline_LeftAltPress_WithCtrlModifier_PreservesBothStates ()
     {
@@ -413,6 +464,36 @@ public class KittyKeyboardPipelineTests
         Assert.Equal (ModifierKey.LeftAlt, down [0].ModifierKey);
         Assert.True (down [0].IsCtrl);
         Assert.False (down [0].IsAlt);
+        Assert.Empty (up);
+    }
+
+    [Fact]
+    public void Pipeline_LeftCtrlPress_WithCapsLockModifier_PreservesCtrlState ()
+    {
+        (List<Key> down, List<Key> up) = InjectRawSequence ("\x1b[57442;65u");
+
+        Assert.Single (down);
+        Assert.True (down [0].IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftCtrl, down [0].ModifierKey);
+        Assert.True (down [0].IsCtrl);
+        Assert.False (down [0].IsAlt);
+        Assert.False (down [0].IsShift);
+        Assert.Equal (KeyEventType.Press, down [0].EventType);
+        Assert.Empty (up);
+    }
+
+    [Fact]
+    public void Pipeline_LeftShiftPress_WithCapsLockModifier_PreservesShiftState ()
+    {
+        (List<Key> down, List<Key> up) = InjectRawSequence ("\x1b[57441;65u");
+
+        Assert.Single (down);
+        Assert.True (down [0].IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftShift, down [0].ModifierKey);
+        Assert.True (down [0].IsShift);
+        Assert.False (down [0].IsAlt);
+        Assert.False (down [0].IsCtrl);
+        Assert.Equal (KeyEventType.Press, down [0].EventType);
         Assert.Empty (up);
     }
 
