@@ -374,9 +374,9 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
 
     private record TableViewSelectionSnapshot (int SelectedColumn, int SelectedRow, Rectangle [] MultiSelection);
 
-    /// <summary>This event is raised when the selected cell in the table changes.</summary>
+    /// <summary>This event is raised when the cursor position in the table changes.</summary>
     [Obsolete ("Use ValueChanged instead.")]
-    internal event EventHandler<SelectedCellChangedEventArgs>? SelectedCellChanged;
+    internal event EventHandler<CursorChangedEventArgs>? CursorChanged;
 
     /// <summary>
     ///     Updates the view to reflect changes to <see cref="Table"/> and to (<see cref="ColumnOffset"/> /
@@ -828,12 +828,6 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
         ///     that this includes space for padding i.e. the separator between columns.
         /// </summary>
         public int Width { get; internal set; } = width;
-
-        /// <summary>
-        ///     The maximum size of the content that will be rendered in this column as calculated by
-        ///     <see cref="CalculateMaxCellWidth(int, ColumnStyle, int, int)"/>.
-        /// </summary>
-        public int MaxContentSize { get; internal set; } = maxContentSize;
 
         /// <summary>The horizontal position to begin rendering the column at</summary>
         public int X { get; set; } = x;

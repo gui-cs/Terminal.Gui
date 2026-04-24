@@ -1,18 +1,18 @@
 #nullable enable
 ﻿namespace Terminal.Gui.Views;
 
-/// <summary>Defines the event arguments for <see cref="TableView.SelectedCellChanged"/></summary>
-public class SelectedCellChangedEventArgs : EventArgs
+/// <summary>Defines the event arguments for <see cref="TableView.CursorChanged"/></summary>
+public class CursorChangedEventArgs : EventArgs
 {
     /// <summary>
-    ///     Creates a new instance of arguments describing a change in selected cell in a <see cref="TableView"/>
+    ///     Creates a new instance of arguments describing a change in cursor position in a <see cref="TableView"/>
     /// </summary>
     /// <param name="t"></param>
     /// <param name="oldCol"></param>
     /// <param name="newCol"></param>
     /// <param name="oldRow"></param>
     /// <param name="newRow"></param>
-    public SelectedCellChangedEventArgs (ITableSource t, int oldCol, int newCol, int oldRow, int newRow)
+    public CursorChangedEventArgs (ITableSource t, int oldCol, int newCol, int oldRow, int newRow)
     {
         Table = t;
         OldCol = oldCol;

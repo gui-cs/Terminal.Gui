@@ -143,7 +143,7 @@ public partial class TableView
 
             if (oldValue != _selectedColumn)
             {
-                RaiseSelectedCellChanged (new SelectedCellChangedEventArgs (Table!, oldValue, _selectedColumn, _selectedRow, _selectedRow));
+                RaiseCursorChanged (new CursorChangedEventArgs (Table!, oldValue, _selectedColumn, _selectedRow, _selectedRow));
             }
         }
     }
@@ -167,7 +167,7 @@ public partial class TableView
 
             if (oldValue != _selectedRow)
             {
-                RaiseSelectedCellChanged (new SelectedCellChangedEventArgs (Table!, _selectedColumn, _selectedColumn, oldValue, _selectedRow));
+                RaiseCursorChanged (new CursorChangedEventArgs (Table!, _selectedColumn, _selectedColumn, oldValue, _selectedRow));
             }
         }
     }
@@ -532,11 +532,11 @@ public partial class TableView
     }
 
     // TODO: Refactor to use CWP
-    /// <summary>Invokes the <see cref="SelectedCellChanged"/> event and updates <see cref="Value"/>.</summary>
-    private void RaiseSelectedCellChanged (SelectedCellChangedEventArgs args)
+    /// <summary>Invokes the <see cref="CursorChanged"/> event and updates <see cref="Value"/>.</summary>
+    private void RaiseCursorChanged (CursorChangedEventArgs args)
     {
         // Legacy
-        SelectedCellChanged?.Invoke (this, args);
+        CursorChanged?.Invoke (this, args);
 
         UpdateValueFromInternalState ();
     }

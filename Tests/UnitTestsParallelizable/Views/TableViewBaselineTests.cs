@@ -269,14 +269,14 @@ public class TableViewBaselineTests : TestDriverBase
     #region C. Selection Changed Events
 
     [Fact]
-    public void ArrowDown_FiresSelectedCellChanged ()
+    public void ArrowDown_FiresCursorChanged ()
     {
         TableView tv = CreateTableView (5, 10);
         var fired = false;
         int oldRow = -1;
         int newRow = -1;
 
-        tv.SelectedCellChanged += (_, e) =>
+        tv.CursorChanged += (_, e) =>
                                   {
                                       fired = true;
                                       oldRow = e.OldRow;
@@ -294,7 +294,7 @@ public class TableViewBaselineTests : TestDriverBase
     {
         TableView tv = CreateTableView (5, 10);
         var fireCount = 0;
-        tv.SelectedCellChanged += (_, _) => fireCount++;
+        tv.CursorChanged += (_, _) => fireCount++;
 
         // Setting to same value should not fire
         tv.SetSelection (0, 0, false);
@@ -302,22 +302,22 @@ public class TableViewBaselineTests : TestDriverBase
     }
 
     [Fact]
-    public void SelectedColumn_Set_FiresSelectedCellChanged ()
+    public void SelectedColumn_Set_FiresCursorChanged ()
     {
         TableView tv = CreateTableView (5, 10);
         var fired = false;
-        tv.SelectedCellChanged += (_, _) => fired = true;
+        tv.CursorChanged += (_, _) => fired = true;
 
         tv.SelectedColumn = 2;
         Assert.True (fired);
     }
 
     [Fact]
-    public void SelectedRow_Set_FiresSelectedCellChanged ()
+    public void SelectedRow_Set_FiresCursorChanged ()
     {
         TableView tv = CreateTableView (5, 10);
         var fired = false;
-        tv.SelectedCellChanged += (_, _) => fired = true;
+        tv.CursorChanged += (_, _) => fired = true;
 
         tv.SelectedRow = 3;
         Assert.True (fired);

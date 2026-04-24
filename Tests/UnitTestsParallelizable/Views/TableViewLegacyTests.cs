@@ -147,12 +147,12 @@ public class TableViewLegacyTests : TestDriverBase
     }
 
     [Fact]
-    public void SelectedCellChanged_NotFiredForSameValue ()
+    public void CursorChanged_NotFiredForSameValue ()
     {
         TableView tableView = new () { Table = BuildTable (25, 50) };
 
         bool called = false;
-        tableView.SelectedCellChanged += (_, _) => { called = true; };
+        tableView.CursorChanged += (_, _) => { called = true; };
 
         tableView.SelectedColumn = 0;
         Assert.False (called);
@@ -162,13 +162,13 @@ public class TableViewLegacyTests : TestDriverBase
     }
 
     [Fact]
-    public void SelectedCellChanged_SelectedColumnIndexesCorrect ()
+    public void CursorChanged_SelectedColumnIndexesCorrect ()
     {
         TableView tableView = new () { Table = BuildTable (25, 50) };
 
         bool called = false;
 
-        tableView.SelectedCellChanged += (_, e) =>
+        tableView.CursorChanged += (_, e) =>
                                          {
                                              called = true;
                                              Assert.Equal (0, e.OldCol);
