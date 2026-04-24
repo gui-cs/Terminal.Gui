@@ -463,7 +463,7 @@ public class KittyKeyboardPipelineTests
         Assert.True (down [0].IsModifierOnly);
         Assert.Equal (ModifierKey.LeftAlt, down [0].ModifierKey);
         Assert.True (down [0].IsCtrl);
-        Assert.False (down [0].IsAlt);
+        Assert.True (down [0].IsAlt);
         Assert.Empty (up);
     }
 
