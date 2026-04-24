@@ -2,8 +2,8 @@ namespace Terminal.Gui.Views;
 
 public partial class TableView
 {
-    private int _selectedColumn = -1;
-    private int _selectedRow = -1;
+    private int _cursorColumn = -1;
+    private int _cursorRow = -1;
 
     /// <summary>
     ///     Moves the cursor by the provided offsets. Optionally starting a box selection (see <see cref="MultiSelect"/>).
@@ -12,44 +12,50 @@ public partial class TableView
     /// <param name="offsetY">Offset in number of rows</param>
     /// <param name="extendExistingSelection">True to create a multi cell selection or adjust an existing one</param>
     /// <param name="ctx">The command context.</param>
-    public void ChangeSelectionByOffset (int offsetX, int offsetY, bool extendExistingSelection, ICommandContext? ctx)
+    public bool MoveCursorByOffset (int offsetX, int offsetY, bool extendExistingSelection, ICommandContext? ctx)
     {
-        SetSelection (_selectedColumn + offsetX, _selectedRow + offsetY, extendExistingSelection, ctx);
+        SetSelection (_cursorColumn + offsetX, _cursorRow + offsetY, extendExistingSelection, ctx);
         Update ();
+
+        return true;
     }
 
-    /// <summary>Moves or extends the selection to the last cell in the current row</summary>
+    /// <summary>Moves the cursor (or extends the selection) to the last cell in the current row.</summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     /// <param name="ctx">The command context</param>
-    public void ChangeSelectionToEndOfRow (bool extend, ICommandContext? ctx)
+    public bool MoveCursorToEndOfRow (bool extend, ICommandContext? ctx)
     {
         if (TableIsNullOrInvisible ())
         {
-            return;
+            return false;
         }
 
-        SetSelection (Table!.Columns - 1, _selectedRow, extend, ctx);
+        SetSelection (Table!.Columns - 1, _cursorRow, extend, ctx);
         Update ();
+
+        return true;
     }
 
-    /// <summary>Moves or extends the selection to the first cell in the current row</summary>
+    /// <summary>Moves the cursor (or extends the selection) to the first cell in the current row.</summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     /// <param name="ctx">The command context</param>
-    public void ChangeSelectionToStartOfRow (bool extend, ICommandContext? ctx)
+    public bool MoveCursorToStartOfRow (bool extend, ICommandContext? ctx)
     {
         if (TableIsNullOrInvisible ())
         {
-            return;
+            return false;
         }
 
-        SetSelection (0, _selectedRow, extend, ctx);
+        SetSelection (0, _cursorRow, extend, ctx);
         Update ();
+
+        return true;
     }
 
     #region Cursor
 
     /// <summary>
-    ///     Updates scroll offsets to ensure that the selected cell is visible.  Has no effect if <see cref="Table"/> has
+    ///     Updates scroll offsets to ensure that the cursor cell is visible.  Has no effect if <see cref="Table"/> has
     ///     not been set.
     /// </summary>
     /// <remarks>
@@ -65,9 +71,9 @@ public partial class TableView
         ColumnToRender [] cellInfos = NonHiddenCellInfos ();
         int headerHeight = GetHeaderHeightIfAny ();
 
-        ColumnToRender? selectedColToRender = cellInfos.FirstOrDefault (c => c.Column == _selectedColumn);
+        ColumnToRender? cursorColToRender = cellInfos.FirstOrDefault (c => c.Column == _cursorColumn);
 
-        if (_selectedColumn < 0 || selectedColToRender == null || _selectedRow < 0 || _selectedRow >= Table.Rows)
+        if (_cursorColumn < 0 || cursorColToRender == null || _cursorRow < 0 || _cursorRow >= Table.Rows)
         {
             return;
         }
@@ -80,14 +86,14 @@ public partial class TableView
             return;
         }
 
-        if (_selectedRow < rowStart)
+        if (_cursorRow < rowStart)
         {
-            Viewport = Viewport with { Y = Viewport.Y - (rowStart - _selectedRow) };
+            Viewport = Viewport with { Y = Viewport.Y - (rowStart - _cursorRow) };
         }
 
-        if (_selectedRow > rowEnd)
+        if (_cursorRow > rowEnd)
         {
-            Viewport = Viewport with { Y = Viewport.Y + (_selectedRow - rowEnd) };
+            Viewport = Viewport with { Y = Viewport.Y + (_cursorRow - rowEnd) };
         }
 
         //first column that is visible from start
@@ -96,34 +102,34 @@ public partial class TableView
         //last column that is visible (at least the start)
         ColumnToRender? colEnd = cellInfos.LastOrDefault (c => c.X < Viewport.Right);
 
-        if (colEnd is { } && _selectedColumn >= colEnd.Column)
+        if (colEnd is { } && _cursorColumn >= colEnd.Column)
         {
             if (Style.SmoothHorizontalScrolling)
             {
-                //bring selected col into view
-                Viewport = Viewport with { X = Math.Min (selectedColToRender.X, selectedColToRender.X + selectedColToRender.Width - Viewport.Width) };
+                //bring cursor col into view
+                Viewport = Viewport with { X = Math.Min (cursorColToRender.X, cursorColToRender.X + cursorColToRender.Width - Viewport.Width) };
             }
             else
             {
-                //bring selected col to start of viewport
-                Viewport = Viewport with { X = selectedColToRender.X };
+                //bring cursor col to start of viewport
+                Viewport = Viewport with { X = cursorColToRender.X };
             }
         }
 
-        if (colStart is { } && _selectedColumn >= colStart.Column)
+        if (colStart is { } && _cursorColumn >= colStart.Column)
         {
             return;
         }
 
         if (Style.SmoothHorizontalScrolling)
         {
-            //bring selected col into view
-            Viewport = Viewport with { X = selectedColToRender.X - 1 };
+            //bring cursor col into view
+            Viewport = Viewport with { X = cursorColToRender.X - 1 };
         }
         else
         {
-            //bring selected col to end of viewport
-            Viewport = Viewport with { X = selectedColToRender.X - Math.Max (Viewport.Width - selectedColToRender.Width, 0) };
+            //bring cursor col to end of viewport
+            Viewport = Viewport with { X = cursorColToRender.X - Math.Max (Viewport.Width - cursorColToRender.Width, 0) };
         }
     }
 
@@ -134,15 +140,15 @@ public partial class TableView
     {
         if (_value is null)
         {
-            _selectedColumn = -1;
-            _selectedRow = -1;
+            _cursorColumn = -1;
+            _cursorRow = -1;
             MultiSelectedRegions.Clear ();
 
             return;
         }
 
-        _selectedColumn = _value.Cursor.X;
-        _selectedRow = _value.Cursor.Y;
+        _cursorColumn = _value.Cursor.X;
+        _cursorRow = _value.Cursor.Y;
 
         // Rebuild MultiSelectedRegions from Value.Regions (deep copy)
         MultiSelectedRegions.Clear ();
@@ -173,11 +179,11 @@ public partial class TableView
             return;
         }
 
-        _selectedColumn = Math.Max (Math.Min (_selectedColumn, Table!.Columns - 1), 0);
-        _selectedRow = Math.Max (Math.Min (_selectedRow, Table.Rows - 1), 0);
+        _cursorColumn = Math.Max (Math.Min (_cursorColumn, Table!.Columns - 1), 0);
+        _cursorRow = Math.Max (Math.Min (_cursorRow, Table.Rows - 1), 0);
 
-        // If _selectedColumn is invisible move it to a visible one
-        _selectedColumn = GetNearestVisibleColumn (_selectedColumn, true, true);
+        // If _cursorColumn is invisible move it to a visible one
+        _cursorColumn = GetNearestVisibleColumn (_cursorColumn, true, true);
         IEnumerable<TableSelectionRegion> oldRegions = MultiSelectedRegions.ToArray ().Reverse ();
         MultiSelectedRegions.Clear ();
 
@@ -213,9 +219,8 @@ public partial class TableView
 
     /// <summary>
     ///     Returns all cells in any <see cref="MultiSelectedRegions"/> (if <see cref="MultiSelect"/> is enabled) and the
-    ///     selected cell
+    ///     cursor cell.
     /// </summary>
-    /// <returns></returns>
     public IEnumerable<Point> GetAllSelectedCells ()
     {
         if (TableIsNullOrInvisible () || Table!.Rows == 0)
@@ -227,7 +232,7 @@ public partial class TableView
         HashSet<Point> toReturn = [];
 
         // If there are one or more rectangular selections
-        if (MultiSelect && MultiSelectedRegions.Count == 0)
+        if (MultiSelect && MultiSelectedRegions.Count > 0)
         {
             // Quiz any cells for whether they are selected.  For performance, we only need to check those between the top left and lower right vertex of
             // selection regions
@@ -248,20 +253,20 @@ public partial class TableView
             }
         }
 
-        // if there are no region selections then it is just the active cell
+        // if there are no region selections then it is just the cursor cell
         // if we are selecting the full row
         if (FullRowSelect)
         {
-            // all cells in active row are selected
+            // all cells in cursor row are selected
             for (var x = 0; x < Table.Columns; x++)
             {
-                toReturn.Add (new Point (x, _selectedRow));
+                toReturn.Add (new Point (x, _cursorRow));
             }
         }
         else
         {
             // Not full row select and no multi selections
-            toReturn.Add (new Point (_selectedColumn, _selectedRow));
+            toReturn.Add (new Point (_cursorColumn, _cursorRow));
         }
 
         return toReturn;
@@ -269,7 +274,7 @@ public partial class TableView
 
     /// <summary>
     ///     <para>
-    ///         Returns true if the given cell is selected either because it is the active cell or part of a multi cell
+    ///         Returns true if the given cell is selected either because it is the cursor cell or part of a multi cell
     ///         selection (e.g. <see cref="FullRowSelect"/>).
     ///     </para>
     ///     <remarks>Returns <see langword="false"/> if <see cref="ColumnStyle.Visible"/> is <see langword="false"/>.</remarks>
@@ -289,7 +294,7 @@ public partial class TableView
             return true;
         }
 
-        return row == _selectedRow && (col == _selectedColumn || FullRowSelect);
+        return row == _cursorRow && (col == _cursorColumn || FullRowSelect);
     }
 
     /// <summary>True to allow multi-cell region selections. Defaults to <see langword="true"/>.</summary>
@@ -306,20 +311,22 @@ public partial class TableView
     ///     When <see cref="MultiSelect"/> is on, creates selection over all cells in the table (replacing any old
     ///     selection regions)
     /// </summary>
-    public void SelectAll ()
+    public bool SelectAll ()
     {
         if (TableIsNullOrInvisible () || !MultiSelect || Table!.Rows == 0)
         {
-            return;
+            return false;
         }
 
         ClearMultiSelectedRegions (true);
 
-        // Create a single region over entire table, set the origin of the selection to the active cell so that a followup spread selection e.g. shift-right
+        // Create a single region over entire table, set the origin to the cursor cell so that a followup spread selection e.g. shift-right
         // behaves properly
-        MultiSelectedRegions.Push (new TableSelectionRegion (new Point (_selectedColumn, _selectedRow), new Rectangle (0, 0, Table.Columns, _table!.Rows)));
+        MultiSelectedRegions.Push (new TableSelectionRegion (new Point (_cursorColumn, _cursorRow), new Rectangle (0, 0, Table.Columns, _table!.Rows)));
         CommitSelectionState ();
         Update ();
+
+        return true;
     }
 
     /// <summary>
@@ -334,7 +341,7 @@ public partial class TableView
     {
         // if we are trying to increase the column index then
         // we are moving right otherwise we are moving left
-        bool lookRight = col > _selectedColumn;
+        bool lookRight = col > _cursorColumn;
         col = GetNearestVisibleColumn (col, lookRight, true);
 
         if (!MultiSelect || !extendExistingSelection)
@@ -347,8 +354,8 @@ public partial class TableView
             // If we are extending current selection but there isn't one
             if (MultiSelectedRegions.Count == 0 || MultiSelectedRegions.All (m => m.IsExtended))
             {
-                // Create a new region between the old active cell and the new cell
-                TableSelectionRegion rect = CreateTableSelectionRegion (_selectedColumn, _selectedRow, col, row);
+                // Create a new region between the old cursor cell and the new cell
+                TableSelectionRegion rect = CreateTableSelectionRegion (_cursorColumn, _cursorRow, col, row);
                 MultiSelectedRegions.Push (rect);
             }
             else
@@ -361,23 +368,23 @@ public partial class TableView
         }
 
         // Write backing fields directly and commit once to avoid double-fire
-        _selectedColumn = TableIsNullOrInvisible () ? 0 : Math.Min (Table!.Columns - 1, Math.Max (0, col));
-        _selectedRow = TableIsNullOrInvisible () ? 0 : Math.Min (Table!.Rows - 1, Math.Max (0, row));
+        _cursorColumn = TableIsNullOrInvisible () ? 0 : Math.Min (Table!.Columns - 1, Math.Max (0, col));
+        _cursorRow = TableIsNullOrInvisible () ? 0 : Math.Min (Table!.Rows - 1, Math.Max (0, row));
         CommitSelectionState ();
     }
 
     /// <summary>
-    ///     Private override of <see cref="ChangeSelectionByOffset"/> that returns <see langword="true"/> if the
-    ///     <see cref="Value"/> changed as a result of moving the selection.
+    ///     Private override of <see cref="MoveCursorByOffset"/> that returns <see langword="true"/> if the
+    ///     <see cref="Value"/> changed as a result of moving the cursor.
     /// </summary>
     /// <param name="offsetX"></param>
     /// <param name="offsetY"></param>
     /// <param name="ctx">The command context.</param>
     /// <returns></returns>
-    private bool ChangeSelectionByOffsetWithReturn (int offsetX, int offsetY, ICommandContext? ctx)
+    private bool MoveCursorByOffsetWithReturn (int offsetX, int offsetY, ICommandContext? ctx)
     {
         TableSelection? oldValue = Value;
-        SetSelection (_selectedColumn + offsetX, _selectedRow + offsetY, false, ctx);
+        SetSelection (_cursorColumn + offsetX, _cursorRow + offsetY, false, ctx);
         Update ();
 
         return !Equals (oldValue, Value);
@@ -445,43 +452,40 @@ public partial class TableView
             return null;
         }
 
-        TableSelectionRegion [] regions = GetMultiSelectedRegionsContaining (_selectedColumn, _selectedRow).ToArray ();
-        TableSelectionRegion [] toggles = regions.Where (s => s.IsExtended).ToArray ();
+        TableSelectionRegion [] regions = GetMultiSelectedRegionsContaining (_cursorColumn, _cursorRow).ToArray ();
+        TableSelectionRegion [] extendedAtCursor = regions.Where (s => s.IsExtended).ToArray ();
 
-        // Toggle it off
-        if (toggles.Length == 0)
+        if (extendedAtCursor.Length > 0)
         {
+            // Toggle OFF: remove extended regions that contain the cursor cell
             IEnumerable<TableSelectionRegion> oldRegions = MultiSelectedRegions.ToArray ().Reverse ();
             MultiSelectedRegions.Clear ();
 
             foreach (TableSelectionRegion region in oldRegions)
             {
-                if (!toggles.Contains (region))
+                if (!extendedAtCursor.Contains (region))
                 {
                     MultiSelectedRegions.Push (region);
                 }
             }
         }
+        else if (regions.Length > 0)
+        {
+            // Cursor is inside a non-extended rectangular region — mark matching regions as extended
+            IEnumerable<TableSelectionRegion> oldRegions = MultiSelectedRegions.ToArray ().Reverse ();
+            MultiSelectedRegions.Clear ();
+
+            foreach (TableSelectionRegion region in oldRegions)
+            {
+                MultiSelectedRegions.Push (regions.Contains (region)
+                                               ? new TableSelectionRegion (region.Origin, region.Rectangle) { IsExtended = true }
+                                               : region);
+            }
+        }
         else
         {
-            // User is toggling selection within a rectangular select — mark the matching regions as extended
-            if (regions.Length == 0)
-            {
-                IEnumerable<TableSelectionRegion> oldRegions = MultiSelectedRegions.ToArray ().Reverse ();
-                MultiSelectedRegions.Clear ();
-
-                foreach (TableSelectionRegion region in oldRegions)
-                {
-                    MultiSelectedRegions.Push (regions.Contains (region)
-                                                   ? new TableSelectionRegion (region.Origin, region.Rectangle) { IsExtended = true }
-                                                   : region);
-                }
-            }
-            else
-            {
-                // Toggle on a single cell selection
-                MultiSelectedRegions.Push (CreateTableSelectionRegion (_selectedColumn, _selectedRow, _selectedColumn, _selectedRow, true));
-            }
+            // No region contains the cursor — toggle ON a single-cell extended region
+            MultiSelectedRegions.Push (CreateTableSelectionRegion (_cursorColumn, _cursorRow, _cursorColumn, _cursorRow, true));
         }
 
         return true;
@@ -518,7 +522,7 @@ public partial class TableView
         return false;
     }
 
-    /// <summary>Unions the current selected cell (and/or regions) with the provided cell and makes it the active one.</summary>
+    /// <summary>Unions the current cursor cell (and/or regions) with the provided cell and makes it the cursor.</summary>
     private void UnionSelection (int col, int row)
     {
         if (!MultiSelect || TableIsNullOrInvisible ())
@@ -527,12 +531,12 @@ public partial class TableView
         }
 
         EnsureValidSelection ();
-        int oldColumn = _selectedColumn;
-        int oldRow = _selectedRow;
+        int oldColumn = _cursorColumn;
+        int oldRow = _cursorRow;
 
-        // move us to the new cell
-        _selectedColumn = col;
-        _selectedRow = row;
+        // move cursor to the new cell
+        _cursorColumn = col;
+        _cursorRow = row;
         MultiSelectedRegions.Push (CreateTableSelectionRegion (col, row));
 
         // if the old cell was not part of a rectangular select
@@ -623,9 +627,9 @@ public partial class TableView
         List<TableSelectionRegion> regions = MultiSelectedRegions.Reverse ()
                                                                  .Select (r => new TableSelectionRegion (r.Origin, r.Rectangle) { IsExtended = r.IsExtended })
                                                                  .ToList ();
-        TableSelection newSelection = new (new Point (_selectedColumn, _selectedRow), regions);
+        TableSelection newSelection = new (new Point (_cursorColumn, _cursorRow), regions);
         Value = newSelection;
     }
 
-    #endregion
+    #endregion IValue<TableSelection?> Implementation
 }

@@ -203,55 +203,55 @@ public class TableViewBaselineTests : TestDriverBase
     }
 
     [Fact]
-    public void ChangeSelectionToStartOfTable_MovesToOrigin ()
+    public void MoveCursorToStartOfTable_MovesToOrigin ()
     {
         TableView tv = CreateTableView (5, 10);
         tv.SetSelection (3, 7, false);
 
-        tv.ChangeSelectionToStartOfTable (false, null);
+        tv.MoveCursorToStartOfTable (false, null);
         Assert.Equal (0, tv.Value!.Cursor.X);
         Assert.Equal (0, tv.Value!.Cursor.Y);
     }
 
     [Fact]
-    public void ChangeSelectionToEndOfTable_MovesToLastCell ()
+    public void MoveCursorToEndOfTable_MovesToLastCell ()
     {
         TableView tv = CreateTableView (5, 10);
-        tv.ChangeSelectionToEndOfTable (false, null);
+        tv.MoveCursorToEndOfTable (false, null);
         Assert.Equal (4, tv.Value!.Cursor.X);
         Assert.Equal (9, tv.Value!.Cursor.Y);
     }
 
     [Fact]
-    public void ChangeSelectionToEndOfTable_FullRowSelect_KeepsColumn ()
+    public void MoveCursorToEndOfTable_FullRowSelect_KeepsColumn ()
     {
         TableView tv = CreateTableView (5, 10);
         tv.FullRowSelect = true;
         tv.SetSelection (2, tv.Value?.Cursor.Y ?? 0, false);
 
-        tv.ChangeSelectionToEndOfTable (false, null);
+        tv.MoveCursorToEndOfTable (false, null);
         Assert.Equal (2, tv.Value!.Cursor.X); // column preserved with FullRowSelect
         Assert.Equal (9, tv.Value!.Cursor.Y);
     }
 
     [Fact]
-    public void ChangeSelectionToStartOfRow_API ()
+    public void MoveCursorToStartOfRow_API ()
     {
         TableView tv = CreateTableView (5, 10);
         tv.SetSelection (3, 5, false);
 
-        tv.ChangeSelectionToStartOfRow (false, null);
+        tv.MoveCursorToStartOfRow (false, null);
         Assert.Equal (0, tv.Value!.Cursor.X);
         Assert.Equal (5, tv.Value!.Cursor.Y); // row unchanged
     }
 
     [Fact]
-    public void ChangeSelectionToEndOfRow_API ()
+    public void MoveCursorToEndOfRow_API ()
     {
         TableView tv = CreateTableView (5, 10);
         tv.SetSelection (1, 5, false);
 
-        tv.ChangeSelectionToEndOfRow (false, null);
+        tv.MoveCursorToEndOfRow (false, null);
         Assert.Equal (4, tv.Value!.Cursor.X);
         Assert.Equal (5, tv.Value!.Cursor.Y);
     }
@@ -433,7 +433,7 @@ public class TableViewBaselineTests : TestDriverBase
         TableView tv = CreateTableView (5, 10);
         tv.SetSelection (1, 1, false);
 
-        tv.ChangeSelectionByOffset (1, 0, true, null);
+        tv.MoveCursorByOffset (1, 0, true, null);
 
         Assert.True (tv.IsSelected (1, 1), "Origin cell should be selected");
         Assert.True (tv.IsSelected (2, 1), "Extended cell should be selected");
@@ -446,7 +446,7 @@ public class TableViewBaselineTests : TestDriverBase
         TableView tv = CreateTableView (5, 10);
         tv.SetSelection (0, 0, false);
 
-        tv.ChangeSelectionByOffset (0, 2, true, null);
+        tv.MoveCursorByOffset (0, 2, true, null);
 
         Assert.True (tv.IsSelected (0, 0));
         Assert.True (tv.IsSelected (0, 1));
@@ -475,7 +475,7 @@ public class TableViewBaselineTests : TestDriverBase
     [Fact]
     public void NullTable_HomeEnd_DoesNotThrow ()
     {
-        // Previously this threw NullReferenceException because ChangeSelectionToEndOfRow
+        // Previously this threw NullReferenceException because MoveCursorToEndOfRow
         // used Table! without null check. Now fixed with null guard.
         TableView tv = new () { Viewport = new Rectangle (0, 0, 25, 5) };
         tv.BeginInit ();
@@ -720,33 +720,33 @@ public class TableViewBaselineTests : TestDriverBase
 
     #endregion
 
-    #region I. ChangeSelectionByOffset
+    #region I. MoveCursorByOffset
 
     [Fact]
-    public void ChangeSelectionByOffset_Positive_MovesRight ()
+    public void MoveCursorByOffset_Positive_MovesRight ()
     {
         TableView tv = CreateTableView (5, 10);
-        tv.ChangeSelectionByOffset (2, 0, false, null);
+        tv.MoveCursorByOffset (2, 0, false, null);
         Assert.Equal (2, tv.Value!.Cursor.X);
         Assert.Equal (0, tv.Value!.Cursor.Y);
     }
 
     [Fact]
-    public void ChangeSelectionByOffset_Negative_MovesLeft ()
+    public void MoveCursorByOffset_Negative_MovesLeft ()
     {
         TableView tv = CreateTableView (5, 10);
         tv.SetSelection (3, tv.Value?.Cursor.Y ?? 0, false);
-        tv.ChangeSelectionByOffset (-2, 0, false, null);
+        tv.MoveCursorByOffset (-2, 0, false, null);
         Assert.Equal (1, tv.Value!.Cursor.X);
     }
 
     [Fact]
-    public void ChangeSelectionByOffset_Extend_CreatesMultiSelectRegion ()
+    public void MoveCursorByOffset_Extend_CreatesMultiSelectRegion ()
     {
         TableView tv = CreateTableView (5, 10);
         tv.SetSelection (0, 0, false);
 
-        tv.ChangeSelectionByOffset (2, 2, true, null);
+        tv.MoveCursorByOffset (2, 2, true, null);
 
         Assert.Equal (2, tv.Value!.Cursor.X);
         Assert.Equal (2, tv.Value!.Cursor.Y);
@@ -756,12 +756,12 @@ public class TableViewBaselineTests : TestDriverBase
     }
 
     [Fact]
-    public void ChangeSelectionByOffset_ClampsAtBounds ()
+    public void MoveCursorByOffset_ClampsAtBounds ()
     {
         TableView tv = CreateTableView (3, 5);
         tv.SetSelection (2, 4, false);
 
-        tv.ChangeSelectionByOffset (5, 5, false, null);
+        tv.MoveCursorByOffset (5, 5, false, null);
         Assert.Equal (2, tv.Value!.Cursor.X); // clamped
         Assert.Equal (4, tv.Value!.Cursor.Y); // clamped
     }

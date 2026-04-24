@@ -375,7 +375,7 @@ public partial class TableView
             string render = TruncateOrPad (val, representation, current.Width, colStyle);
 
             // While many cells can be selected (see MultiSelectedRegions) only one cell is the primary (drives navigation etc.)
-            bool isPrimaryCell = current.Column == _selectedColumn && rowToRender == _selectedRow;
+            bool isPrimaryCell = current.Column == _cursorColumn && rowToRender == _cursorRow;
             Move (current.X - Viewport.X, row);
             RenderCell (cellColor, render, isPrimaryCell);
 

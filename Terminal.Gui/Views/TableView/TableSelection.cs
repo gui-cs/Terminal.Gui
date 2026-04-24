@@ -1,49 +1,5 @@
 namespace Terminal.Gui.Views;
 
-/// <summary>Describes a single contiguous rectangular selection region within a <see cref="TableView"/>.</summary>
-public class TableSelectionRegion : IEquatable<TableSelectionRegion>
-{
-    /// <summary>Creates a new selected area starting at the origin corner and covering the provided rectangular area.</summary>
-    /// <param name="origin">The corner where the selection began.</param>
-    /// <param name="rect">The rectangular area of the selection.</param>
-    public TableSelectionRegion (Point origin, Rectangle rect)
-    {
-        Origin = origin;
-        Rectangle = rect;
-    }
-
-    /// <summary>
-    ///     <see langword="true"/> if the selection was made through <see cref="Command.ToggleExtend"/> (e.g. Ctrl+Click)
-    ///     and therefore should persist even through keyboard navigation.
-    /// </summary>
-    public bool IsExtended { get; init; }
-
-    /// <summary>Corner of the <see cref="Rectangle"/> where selection began.</summary>
-    public Point Origin { get; init; }
-
-    /// <summary>Area selected.</summary>
-    public Rectangle Rectangle { get; init; }
-
-    /// <inheritdoc/>
-    public bool Equals (TableSelectionRegion? other)
-    {
-        if (other is null)
-        {
-            return false;
-        }
-
-        return Origin == other.Origin
-               && Rectangle == other.Rectangle
-               && IsExtended == other.IsExtended;
-    }
-
-    /// <inheritdoc/>
-    public override bool Equals (object? obj) => Equals (obj as TableSelectionRegion);
-
-    /// <inheritdoc/>
-    public override int GetHashCode () => HashCode.Combine (Origin, Rectangle, IsExtended);
-}
-
 /// <summary>
 ///     Represents the complete selection state of a <see cref="TableView"/>: the cursor position and all
 ///     extended selection regions. Used as the <c>T</c> in <see cref="IValue{T}"/>.
@@ -56,7 +12,7 @@ public class TableSelectionRegion : IEquatable<TableSelectionRegion>
 public class TableSelection : IEquatable<TableSelection>
 {
     /// <summary>Creates a new <see cref="TableSelection"/> with the specified cursor and regions.</summary>
-    /// <param name="cursor">The active cell position (navigation anchor). Must not be <see langword="null"/>.</param>
+    /// <param name="cursor">The cursor cell position (navigation anchor). Must not be <see langword="null"/>.</param>
     /// <param name="regions">All extended selection regions (may be empty for cursor-only selection).</param>
     public TableSelection (Point cursor, IReadOnlyList<TableSelectionRegion>? regions)
     {
@@ -65,10 +21,10 @@ public class TableSelection : IEquatable<TableSelection>
     }
 
     /// <summary>Creates a cursor-only <see cref="TableSelection"/> with no extended regions.</summary>
-    /// <param name="cursor">The active cell position.</param>
+    /// <param name="cursor">The cursor cell position.</param>
     public TableSelection (Point cursor) : this (cursor, []) { }
 
-    /// <summary>The active cell used for navigation. Always non-null on a non-null <see cref="TableSelection"/>.</summary>
+    /// <summary>The cursor cell used for navigation. Always non-null on a non-null <see cref="TableSelection"/>.</summary>
     public Point Cursor { get; }
 
     /// <summary>All extended selection regions. May be empty if only the cursor cell is selected.</summary>

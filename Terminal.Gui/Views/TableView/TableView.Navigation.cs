@@ -8,30 +8,6 @@ public partial class TableView
     /// <summary>The default minimum cell width for <see cref="ColumnStyle.MinAcceptableWidth"/></summary>
     public const int DEFAULT_MIN_ACCEPTABLE_WIDTH = 100;
 
-    private ITableSource? _table;
-
-    /// <summary>The data table to render in the view.  Setting this property automatically updates and redraws the control.</summary>
-    public ITableSource? Table
-    {
-        get => _table;
-        set
-        {
-            _table = value;
-
-            if (_table is null || _table.Columns <= 0 || _table.Rows <= 0)
-            {
-                Value = null;
-            }
-            else
-            {
-                SetSelection (0, 0, false);
-            }
-
-            RefreshContentSize ();
-            Update ();
-        }
-    }
-
     /// <summary>
     ///     Gets or sets whether all rows should be used when calculating content size. When <see langword="false"/>,
     ///     only visible rows are used for column width calculations.
@@ -74,11 +50,11 @@ public partial class TableView
 
     private bool? HandleRight (ICommandContext? ctx)
     {
-        int oldSelectedCol = _selectedColumn;
+        int oldCursorCol = _cursorColumn;
         int oldViewportX = Viewport.X;
-        bool result = ChangeSelectionByOffsetWithReturn (1, 0, ctx);
+        bool result = MoveCursorByOffsetWithReturn (1, 0, ctx);
 
-        if (oldSelectedCol != _selectedColumn || Viewport.X >= MaxViewPort ().X)
+        if (oldCursorCol != _cursorColumn || Viewport.X >= MaxViewPort ().X)
         {
             return result;
         }
@@ -90,9 +66,9 @@ public partial class TableView
 
     private bool? HandleUp (ICommandContext? ctx)
     {
-        if (_selectedRow != 0)
+        if (_cursorRow != 0)
         {
-            return ChangeSelectionByOffsetWithReturn (0, -1, ctx);
+            return MoveCursorByOffsetWithReturn (0, -1, ctx);
         }
 
         if (Viewport.Y <= 0)
@@ -106,9 +82,9 @@ public partial class TableView
 
     private bool? HandleDown (ICommandContext? ctx)
     {
-        if (Table == null || _selectedRow < Table.Rows - 1)
+        if (Table == null || _cursorRow < Table.Rows - 1)
         {
-            return ChangeSelectionByOffsetWithReturn (0, 1, ctx);
+            return MoveCursorByOffsetWithReturn (0, 1, ctx);
         }
 
         if (Viewport.Y >= GetContentHeight () - Viewport.Height)
@@ -118,19 +94,18 @@ public partial class TableView
         Viewport = Viewport with { Y = Viewport.Y + 1 };
 
         return true;
-
     }
 
-    /// <summary>Moves the selection down by one page</summary>
+    /// <summary>Moves the cursor down by one page.</summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     /// <param name="ctx">The command context</param>
-    public void PageDown (bool extend, ICommandContext? ctx)
+    public bool PageDown (bool extend, ICommandContext? ctx)
     {
-        int oldSelectedRow = _selectedRow;
-        ChangeSelectionByOffset (0, Viewport.Height /* - CurrentHeaderHeightVisible ()*/, extend, ctx);
+        int oldCursorRow = _cursorRow;
+        MoveCursorByOffset (0, Viewport.Height /* - CurrentHeaderHeightVisible ()*/, extend, ctx);
 
         //after scrolling the cells, also scroll to lower line
-        int remainingJump = Viewport.Height - (_selectedRow - oldSelectedRow);
+        int remainingJump = Viewport.Height - (_cursorRow - oldCursorRow);
         Point maxViewPort = MaxViewPort ();
 
         if (remainingJump > 0 && Viewport.Y < maxViewPort.Y)
@@ -139,18 +114,20 @@ public partial class TableView
         }
 
         Update ();
+
+        return true;
     }
 
-    /// <summary>Moves the selection up by one page</summary>
+    /// <summary>Moves the cursor up by one page.</summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     /// <param name="ctx">The command context</param>
-    public void PageUp (bool extend, ICommandContext? ctx)
+    public bool PageUp (bool extend, ICommandContext? ctx)
     {
-        int oldSelectedRow = _selectedRow;
-        ChangeSelectionByOffset (0, -Viewport.Height /* - CurrentHeaderHeightVisible ()*/, extend, ctx);
+        int oldCursorRow = _cursorRow;
+        MoveCursorByOffset (0, -Viewport.Height /* - CurrentHeaderHeightVisible ()*/, extend, ctx);
 
         //after scrolling the cells, also scroll to header
-        int remainingJump = Viewport.Height - (oldSelectedRow - _selectedRow);
+        int remainingJump = Viewport.Height - (oldCursorRow - _cursorRow);
 
         if (remainingJump > 0 && Viewport.Y > 0)
         {
@@ -158,41 +135,47 @@ public partial class TableView
         }
 
         Update ();
+
+        return true;
     }
 
     /// <summary>
-    ///     Moves or extends the selection to the final cell in the table (nX,nY). If <see cref="FullRowSelect"/> is
-    ///     enabled then selection instead moves to (cursor.X, nY) — no horizontal scrolling.
+    ///     Moves the cursor (or extends the selection) to the final cell in the table (nX,nY). If
+    ///     <see cref="FullRowSelect"/> is enabled then the cursor instead moves to (cursor.X, nY) — no horizontal scrolling.
     /// </summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     /// <param name="ctx">The command context</param>
-    public void ChangeSelectionToEndOfTable (bool extend, ICommandContext? ctx)
+    public bool MoveCursorToEndOfTable (bool extend, ICommandContext? ctx)
     {
         if (TableIsNullOrInvisible ())
         {
-            return;
+            return false;
         }
 
         int finalColumn = Table!.Columns - 1;
-        SetSelection (FullRowSelect ? _selectedColumn : finalColumn, Table.Rows - 1, extend, ctx);
+        SetSelection (FullRowSelect ? _cursorColumn : finalColumn, Table.Rows - 1, extend, ctx);
         Update ();
+
+        return true;
     }
 
     /// <summary>
-    ///     Moves or extends the selection to the first cell in the table (0,0). If <see cref="FullRowSelect"/> is enabled
-    ///     then selection instead moves to (cursor.X, 0) — no horizontal scrolling.
+    ///     Moves the cursor (or extends the selection) to the first cell in the table (0,0). If
+    ///     <see cref="FullRowSelect"/> is enabled then the cursor instead moves to (cursor.X, 0) — no horizontal scrolling.
     /// </summary>
     /// <param name="extend">true to extend the current selection (if any) instead of replacing</param>
     /// <param name="ctx">The command context</param>
-    public void ChangeSelectionToStartOfTable (bool extend, ICommandContext? ctx)
+    public bool MoveCursorToStartOfTable (bool extend, ICommandContext? ctx)
     {
         if (TableIsNullOrInvisible ())
         {
-            return;
+            return false;
         }
 
-        SetSelection (FullRowSelect ? _selectedColumn : 0, 0, extend, ctx);
+        SetSelection (FullRowSelect ? _cursorColumn : 0, 0, extend, ctx);
         Update ();
+
+        return true;
     }
 
     /// <summary>
@@ -224,7 +207,7 @@ public partial class TableView
 
     private bool CycleToNextTableEntryBeginningWith (Key key)
     {
-        int row = _selectedRow;
+        int row = _cursorRow;
 
         // There is a multi select going on and not just for the current row
         if (GetAllSelectedCells ().Any (c => c.Y != row))
@@ -239,7 +222,7 @@ public partial class TableView
             return false;
         }
 
-        _selectedRow = match.Value;
+        _cursorRow = match.Value;
         CommitSelectionState ();
         EnsureValidSelection ();
         EnsureCursorIsVisible ();

@@ -99,150 +99,27 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
 
         // Things this view knows how to do
         AddCommand (Command.Right, HandleRight);
-
-        AddCommand (Command.Left, (ctx) => ChangeSelectionByOffsetWithReturn (-1, 0, ctx));
-
+        AddCommand (Command.Left, (ctx) => MoveCursorByOffsetWithReturn (-1, 0, ctx));
         AddCommand (Command.Up, HandleUp);
-
         AddCommand (Command.Down, HandleDown);
-
-        AddCommand (Command.PageUp,
-                    (ctx) =>
-                    {
-                        PageUp (false, ctx);
-
-                        return true;
-                    });
-
-        AddCommand (Command.PageDown,
-                    (ctx) =>
-                    {
-                        PageDown (false, ctx);
-
-                        return true;
-                    });
-
-        AddCommand (Command.LeftStart,
-                    (ctx) =>
-                    {
-                        ChangeSelectionToStartOfRow (false, ctx);
-
-                        return true;
-                    });
-
-        AddCommand (Command.RightEnd,
-                    (ctx) =>
-                    {
-                        ChangeSelectionToEndOfRow (false, ctx);
-
-                        return true;
-                    });
-
-        AddCommand (Command.Start,
-                    (ctx) =>
-                    {
-                        ChangeSelectionToStartOfTable (false, ctx);
-
-                        return true;
-                    });
-
-        AddCommand (Command.End,
-                    (ctx) =>
-                    {
-                        ChangeSelectionToEndOfTable (false, ctx);
-
-                        return true;
-                    });
-
-        AddCommand (Command.RightExtend,
-                    (ctx) =>
-                    {
-                        ChangeSelectionByOffset (1, 0, true, ctx);
-
-                        return true;
-                    });
-
-        AddCommand (Command.LeftExtend,
-                    (ctx) =>
-                    {
-                        ChangeSelectionByOffset (-1, 0, true, ctx);
-
-                        return true;
-                    });
-
-        AddCommand (Command.UpExtend,
-                    (ctx) =>
-                    {
-                        ChangeSelectionByOffset (0, -1, true, ctx);
-
-                        return true;
-                    });
-
-        AddCommand (Command.DownExtend,
-                    (ctx) =>
-                    {
-                        ChangeSelectionByOffset (0, 1, true, ctx);
-
-                        return true;
-                    });
-
-        AddCommand (Command.PageUpExtend,
-                    (ctx) =>
-                    {
-                        PageUp (true, ctx);
-
-                        return true;
-                    });
-
-        AddCommand (Command.PageDownExtend,
-                    (ctx) =>
-                    {
-                        PageDown (true, ctx);
-
-                        return true;
-                    });
-
-        AddCommand (Command.LeftStartExtend,
-                    (ctx) =>
-                    {
-                        ChangeSelectionToStartOfRow (true, ctx);
-
-                        return true;
-                    });
-
-        AddCommand (Command.RightEndExtend,
-                    (ctx) =>
-                    {
-                        ChangeSelectionToEndOfRow (true, ctx);
-
-                        return true;
-                    });
-
-        AddCommand (Command.StartExtend,
-                    (ctx) =>
-                    {
-                        ChangeSelectionToStartOfTable (true, ctx);
-
-                        return true;
-                    });
-
-        AddCommand (Command.EndExtend,
-                    (ctx) =>
-                    {
-                        ChangeSelectionToEndOfTable (true, ctx);
-
-                        return true;
-                    });
-
+        AddCommand (Command.PageUp, ctx => PageUp (false, ctx));
+        AddCommand (Command.PageDown, ctx => PageDown (false, ctx));
+        AddCommand (Command.LeftStart, ctx => MoveCursorToStartOfRow (false, ctx));
+        AddCommand (Command.RightEnd, ctx => MoveCursorToEndOfRow (false, ctx));
+        AddCommand (Command.Start, ctx => MoveCursorToStartOfTable (false, ctx));
+        AddCommand (Command.End, ctx => MoveCursorToEndOfTable (false, ctx));
+        AddCommand (Command.RightExtend, ctx => MoveCursorByOffset (1, 0, true, ctx));
+        AddCommand (Command.LeftExtend, ctx => MoveCursorByOffset (-1, 0, true, ctx));
+        AddCommand (Command.UpExtend, ctx => MoveCursorByOffset (0, -1, true, ctx));
+        AddCommand (Command.DownExtend, ctx => MoveCursorByOffset (0, 1, true, ctx));
+        AddCommand (Command.PageUpExtend, ctx => PageUp (true, ctx));
+        AddCommand (Command.PageDownExtend, ctx => PageDown (true, ctx));
+        AddCommand (Command.LeftStartExtend, ctx => MoveCursorToStartOfRow (true, ctx));
+        AddCommand (Command.RightEndExtend, ctx => MoveCursorToEndOfRow (true, ctx));
+        AddCommand (Command.StartExtend, ctx => MoveCursorToStartOfTable (true, ctx));
+        AddCommand (Command.EndExtend, ctx => MoveCursorToEndOfTable (true, ctx));
         AddCommand (Command.ToggleExtend, ToggleExtend);
-
-        AddCommand (Command.SelectAll,
-                    () =>
-                    {
-                        SelectAll ();
-
-                        return true;
-                    });
+        AddCommand (Command.SelectAll, _ => SelectAll ());
 
         // Apply configurable key bindings (base View layer + TableView-specific layer)
         ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
@@ -256,6 +133,30 @@ public partial class TableView : View, IValue<TableSelection?>, IDesignable
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Ctrl, Command.ToggleExtend);
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked | MouseFlags.Alt, Command.ToggleExtend);
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonDoubleClicked, Command.Accept);
+    }
+
+    private ITableSource? _table;
+
+    /// <summary>The data table to render in the view.  Setting this property automatically updates and redraws the control.</summary>
+    public ITableSource? Table
+    {
+        get => _table;
+        set
+        {
+            _table = value;
+
+            if (_table is null || _table.Columns <= 0 || _table.Rows <= 0)
+            {
+                Value = null;
+            }
+            else
+            {
+                SetSelection (0, 0, false);
+            }
+
+            RefreshContentSize ();
+            Update ();
+        }
     }
 
     /// <summary>Navigator for cycling the selected item in the table by typing. Set to null to disable this feature.</summary>
