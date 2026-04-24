@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using System.Data;
 using System.Globalization;
@@ -303,7 +303,7 @@ public class CsvEditor : Scenario
                 currentCol.SetOrdinal (newIdx);
 
                 _tableView.SetSelection (newIdx, _tableView.SelectedRow, false);
-                _tableView.EnsureSelectedCellIsVisible ();
+                _tableView.EnsureCursorIsVisible ();
                 _tableView.SetNeedsDraw ();
             }
         }
@@ -352,7 +352,7 @@ public class CsvEditor : Scenario
                 _currentTable.Rows.InsertAt (newRow, newIdx);
 
                 _tableView.SetSelection (_tableView.SelectedColumn, newIdx, false);
-                _tableView.EnsureSelectedCellIsVisible ();
+                _tableView.EnsureCursorIsVisible ();
                 _tableView.SetNeedsDraw ();
             }
         }

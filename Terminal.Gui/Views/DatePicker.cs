@@ -6,7 +6,6 @@
 
 using System.Data;
 using System.Globalization;
-using Markdig.Extensions.Tables;
 
 namespace Terminal.Gui.Views;
 

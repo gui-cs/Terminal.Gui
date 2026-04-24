@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using System.Globalization;
 using System.Text;
@@ -243,7 +243,7 @@ public class CharacterMap : Scenario
                                              .FirstOrDefault (x => x.item.Start <= result && x.item.End >= result)
                                              ?.index
                                         ?? -1;
-            _categoryList.EnsureSelectedCellIsVisible ();
+            _categoryList.EnsureCursorIsVisible ();
 
             // Ensure the typed glyph is selected
             _charMap.SelectedCodePoint = (int)result;

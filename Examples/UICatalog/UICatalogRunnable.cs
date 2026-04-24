@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
@@ -93,7 +93,7 @@ public sealed class UICatalogRunnable : Runnable
         }
 
         _categoryList?.EnsureSelectedItemVisible ();
-        _scenarioList?.EnsureSelectedCellIsVisible ();
+        _scenarioList?.EnsureCursorIsVisible ();
 
         if (ShowStatusBar)
         {

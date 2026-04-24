@@ -55,7 +55,7 @@ public delegate Scheme? RowColorGetterDelegate (RowColorGetterArgs args);
 ///         </item>
 ///     </list>
 /// </remarks>
-public partial class TableView : View, IValue<Point?>, IDesignable
+public partial class TableView : View, IValue<TableSelection?>, IDesignable
 {
     /// <summary>
     ///     The default maximum cell width for <see cref="TableView.MaxCellWidth"/> and <see cref="ColumnStyle.MaxWidth"/>
@@ -87,7 +87,7 @@ public partial class TableView : View, IValue<Point?>, IDesignable
         // Add Home/End as additional Start/End bindings (the base layer also provides Ctrl+Home/Ctrl+End)
         [Command.Start] = Bind.All (Key.Home),
         [Command.End] = Bind.All (Key.End),
-        [Command.Toggle] = Bind.All (Key.Space)
+        [Command.ToggleExtend] = Bind.All (Key.Space)
     };
 
     /// <summary>Initializes a <see cref="TableView"/> class.</summary>
@@ -240,7 +240,7 @@ public partial class TableView : View, IValue<Point?>, IDesignable
                         return true;
                     });
 
-        AddCommand (Command.ToggleExtend, ExtendSelection);
+        AddCommand (Command.ToggleExtend, ToggleExtend);
 
         AddCommand (Command.SelectAll,
                     () =>
@@ -251,8 +251,6 @@ public partial class TableView : View, IValue<Point?>, IDesignable
                     });
 
         //AddCommand (Command.Accept, () => OnCellActivated (new CellActivatedEventArgs (Table!, SelectedColumn, SelectedRow)));
-
-        AddCommand (Command.Toggle, _ => ToggleCurrentCellSelection () is true);
 
         // Apply configurable key bindings (base View layer + TableView-specific layer)
         ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
@@ -398,7 +396,7 @@ public partial class TableView : View, IValue<Point?>, IDesignable
 
         EnsureValidScrollOffsets ();
         EnsureValidSelection ();
-        EnsureSelectedCellIsVisible ();
+        EnsureCursorIsVisible ();
         SetNeedsDraw ();
     }
 
@@ -899,7 +897,7 @@ public partial class TableView : View, IValue<Point?>, IDesignable
     {
         if (ctx?.Binding is KeyBinding { Key: { } } keyBinding && keyBinding.Key == Key.Space)
         {
-            ToggleCurrentCellSelection ();
+            ToggleExtend (ctx);
 
             return;
         }

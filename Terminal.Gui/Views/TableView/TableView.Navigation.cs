@@ -21,8 +21,16 @@ public partial class TableView
         set
         {
             _table = value;
-            SetSelection (0, 0, false, null);
-            Value = new Point (0, 0);
+
+            if (_table is null || _table.Columns <= 0 || _table.Rows <= 0)
+            {
+                Value = null;
+            }
+            else
+            {
+                SetSelection (0, 0, false, null);
+            }
+
             RefreshContentSize ();
             Update ();
         }
@@ -164,8 +172,13 @@ public partial class TableView
     /// <param name="ctx">The command context</param>
     public void ChangeSelectionToEndOfTable (bool extend, ICommandContext? ctx)
     {
+        if (TableIsNullOrInvisible ())
+        {
+            return;
+        }
+
         int finalColumn = Table!.Columns - 1;
-        SetSelection (FullRowSelect ? SelectedColumn : finalColumn, Table.Rows - 1, extend,ctx);
+        SetSelection (FullRowSelect ? SelectedColumn : finalColumn, Table.Rows - 1, extend, ctx);
         Update ();
     }
 
@@ -177,13 +190,18 @@ public partial class TableView
     /// <param name="ctx">The command context</param>
     public void ChangeSelectionToStartOfTable (bool extend, ICommandContext? ctx)
     {
+        if (TableIsNullOrInvisible ())
+        {
+            return;
+        }
+
         SetSelection (FullRowSelect ? SelectedColumn : 0, 0, extend, ctx);
         Update ();
     }
 
     /// <summary>
     ///     Returns a new rectangle between the two points with positive width/height regardless of relative positioning
-    ///     of the points.  pt1 is always considered the <see cref="TableSelection.Origin"/> point
+    ///     of the points.  pt1 is always considered the <see cref="TableSelectionRegion.Origin"/> point
     /// </summary>
     /// <param name="pt1X">Origin point for the selection in X</param>
     /// <param name="pt1Y">Origin point for the selection in Y</param>
@@ -191,7 +209,7 @@ public partial class TableView
     /// <param name="pt2Y">End point for the selection in Y</param>
     /// <param name="toggle">True if selection is result of <see cref="Command.Activate"/></param>
     /// <returns></returns>
-    private TableSelection CreateTableSelection (int pt1X, int pt1Y, int pt2X, int pt2Y, bool toggle = false)
+    private TableSelectionRegion CreateTableSelectionRegion (int pt1X, int pt1Y, int pt2X, int pt2Y, bool toggle = false)
     {
         int top = Math.Max (Math.Min (pt1Y, pt2Y), 0);
         int bot = Math.Max (Math.Max (pt1Y, pt2Y), 0);
@@ -199,14 +217,14 @@ public partial class TableView
         int right = Math.Max (Math.Max (pt1X, pt2X), 0);
 
         // Rect class is inclusive of Top Left but exclusive of Bottom Right so extend by 1
-        return new TableSelection (new Point (pt1X, pt1Y), new Rectangle (left, top, right - left + 1, bot - top + 1)) { IsToggled = toggle };
+        return new TableSelectionRegion (new Point (pt1X, pt1Y), new Rectangle (left, top, right - left + 1, bot - top + 1)) { IsExtended = toggle };
     }
 
-    /// <summary>Returns a single point as a <see cref="TableSelection"/></summary>
+    /// <summary>Returns a single point as a <see cref="TableSelectionRegion"/></summary>
     /// <param name="x"></param>
     /// <param name="y"></param>
     /// <returns></returns>
-    private TableSelection CreateTableSelection (int x, int y) => CreateTableSelection (x, y, x, y);
+    private TableSelectionRegion CreateTableSelectionRegion (int x, int y) => CreateTableSelectionRegion (x, y, x, y);
 
     private bool CycleToNextTableEntryBeginningWith (Key key)
     {
@@ -227,7 +245,7 @@ public partial class TableView
 
         SelectedRow = match.Value;
         EnsureValidSelection ();
-        EnsureSelectedCellIsVisible ();
+        EnsureCursorIsVisible ();
         SetNeedsDraw ();
 
         return true;

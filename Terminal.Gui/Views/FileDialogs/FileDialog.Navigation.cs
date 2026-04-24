@@ -32,7 +32,7 @@ public partial class FileDialog
     internal void RestoreSelection (IFileSystemInfo toRestore)
     {
         _tableView.SelectedRow = State!.Children.IndexOf (r => r.FileSystemInfo == toRestore);
-        _tableView.EnsureSelectedCellIsVisible ();
+        _tableView.EnsureCursorIsVisible ();
     }
 
     private bool CancelSearch ()

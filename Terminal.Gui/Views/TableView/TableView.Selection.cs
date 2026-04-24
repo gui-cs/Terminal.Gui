@@ -8,70 +8,103 @@ namespace Terminal.Gui.Views;
 /// </summary>
 public partial class TableView
 {
-    #region IValue<Point?> Implementation
+    #region IValue<TableSelection?> Implementation
 
     /// <inheritdoc/>
     public event EventHandler<ValueChangedEventArgs<object?>>? ValueChangedUntyped;
 
-    /// <summary>
-    ///     Raises the <see cref="ValueChanging"/> event.
-    /// </summary>
-    /// <returns><see langword="true"/> if the change was cancelled.</returns>
-    protected bool RaiseValueChanging (Point? currentValue, Point? newValue)
-    {
-        ValueChangingEventArgs<Point?> args = new (currentValue, newValue);
-        ValueChanging?.Invoke (this, args);
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangingEventArgs<TableSelection?>>? ValueChanging;
 
-        return args.Handled;
-    }
+    /// <inheritdoc/>
+    public event EventHandler<ValueChangedEventArgs<TableSelection?>>? ValueChanged;
 
     /// <summary>
-    ///     Raises the <see cref="ValueChanged"/> event.
+    ///     Called when <see cref="Value"/> is about to change. Return <see langword="true"/> to cancel the change.
     /// </summary>
-    /// <param name="previousValue">The value before the change.</param>
-    /// <param name="newValue">The value after the change.</param>
-    protected void RaiseValueChanged (Point? previousValue, Point? newValue)
-    {
-        //_value = newValue;
-
-        OnValueChanged (newValue, previousValue);
-        ValueChanged?.Invoke (this, new ValueChangedEventArgs<Point?> (previousValue, newValue));
-        ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (previousValue, newValue));
-    }
+    protected virtual bool OnValueChanging (ValueChangingEventArgs<TableSelection?> args) => false;
 
     /// <summary>
     ///     Called when <see cref="Value"/> has changed.
     /// </summary>
-    protected virtual void OnValueChanged (Point? value, Point? previousValue) { }
+    protected virtual void OnValueChanged (ValueChangedEventArgs<TableSelection?> args) { }
+
+    private TableSelection? _value;
 
     /// <inheritdoc />
-    public Point? Value
+    public TableSelection? Value
     {
-        get;
+        get => _value;
         set
         {
-            if (field == value)
+            if (Equals (_value, value))
             {
                 return;
             }
 
-            Point? previousValue = field;
+            TableSelection? oldValue = _value;
+            ValueChangingEventArgs<TableSelection?> changingArgs = new (oldValue, value);
 
-            if (RaiseValueChanging (field, value))
+            if (OnValueChanging (changingArgs) || changingArgs.Handled)
             {
                 return;
             }
 
-            field = value;
-            RaiseValueChanged (previousValue, field);
+            ValueChanging?.Invoke (this, changingArgs);
+
+            if (changingArgs.Handled)
+            {
+                return;
+            }
+
+            _value = changingArgs.NewValue;
+            SetNeedsDraw ();
+
+            // Sync internal cursor state from Value
+            SyncCursorFromValue ();
+
+            ValueChangedEventArgs<TableSelection?> changedArgs = new (oldValue, _value);
+            OnValueChanged (changedArgs);
+            ValueChanged?.Invoke (this, changedArgs);
+            ValueChangedUntyped?.Invoke (this, new ValueChangedEventArgs<object?> (oldValue, _value));
         }
-    } = new Point (-1, -1);
+    }
 
-    /// <inheritdoc/>
-    public event EventHandler<ValueChangingEventArgs<Point?>>? ValueChanging;
+    /// <summary>
+    ///     Syncs the internal <see cref="SelectedColumn"/>/<see cref="SelectedRow"/> and <see cref="MultiSelectedRegions"/>
+    ///     from the current <see cref="Value"/>. This bridges the new <see cref="IValue{T}"/> model with the legacy
+    ///     internal state during the transition.
+    /// </summary>
+    private void SyncCursorFromValue ()
+    {
+        if (_value is null)
+        {
+            _selectedColumn = -1;
+            _selectedRow = -1;
 
-    /// <inheritdoc/>
-    public event EventHandler<ValueChangedEventArgs<Point?>>? ValueChanged;
+            return;
+        }
+
+        _selectedColumn = _value.Cursor.X;
+        _selectedRow = _value.Cursor.Y;
+    }
+
+    /// <summary>
+    ///     Builds a <see cref="TableSelection"/> from the current internal state and sets <see cref="Value"/>.
+    /// </summary>
+    private void UpdateValueFromInternalState ()
+    {
+        if (TableIsNullOrInvisible ())
+        {
+            Value = null;
+
+            return;
+        }
+
+        List<TableSelectionRegion> regions = [.. MultiSelectedRegions.Reverse ()];
+        TableSelection newSelection = new (new Point (SelectedColumn, SelectedRow), regions);
+        Value = newSelection;
+    }
 
     #endregion
 
@@ -87,50 +120,54 @@ public partial class TableView
     ///     describe column/rows selected in <see cref="Table"/> (not screen coordinates)
     /// </summary>
     /// <returns></returns>
-    public Stack<TableSelection> MultiSelectedRegions { get; } = new ();
+    public Stack<TableSelectionRegion> MultiSelectedRegions { get; } = new ();
 
     /// <summary>The index of <see cref="DataTable.Columns"/> in <see cref="Table"/> that the user has currently selected. This is the cursor.</summary>
     public int SelectedColumn
     {
-        get;
+        get => _selectedColumn;
         set
         {
-            if (field == value)
+            if (_selectedColumn == value)
             {
                 return;
             }
-            int oldValue = field;
+
+            int oldValue = _selectedColumn;
 
             // try to prevent this being set to an out-of-bounds column
-            field = TableIsNullOrInvisible () ? 0 : Math.Min (Table!.Columns - 1, Math.Max (0, value));
+            _selectedColumn = TableIsNullOrInvisible () ? 0 : Math.Min (Table!.Columns - 1, Math.Max (0, value));
 
-            if (oldValue != field)
+            if (oldValue != _selectedColumn)
             {
-                RaiseSelectedCellChanged (new SelectedCellChangedEventArgs (Table!, oldValue, SelectedColumn, SelectedRow, SelectedRow));
+                RaiseSelectedCellChanged (new SelectedCellChangedEventArgs (Table!, oldValue, _selectedColumn, _selectedRow, _selectedRow));
             }
         }
-    } = -1;
+    }
 
     /// <summary>The index of <see cref="DataTable.Rows"/> in <see cref="Table"/> that the user has currently selected. This is the cursor.</summary>
     public int SelectedRow
     {
-        get;
+        get => _selectedRow;
         set
         {
-            if (value == field)
+            if (value == _selectedRow)
             {
                 return;
             }
 
-            int oldValue = field;
-            field = TableIsNullOrInvisible () ? 0 : Math.Min (Table!.Rows - 1, Math.Max (0, value));
+            int oldValue = _selectedRow;
+            _selectedRow = TableIsNullOrInvisible () ? 0 : Math.Min (Table!.Rows - 1, Math.Max (0, value));
 
-            if (oldValue != field)
+            if (oldValue != _selectedRow)
             {
-                RaiseSelectedCellChanged (new SelectedCellChangedEventArgs (Table!, SelectedColumn, SelectedColumn, oldValue, field));
+                RaiseSelectedCellChanged (new SelectedCellChangedEventArgs (Table!, _selectedColumn, _selectedColumn, oldValue, _selectedRow));
             }
         }
-    } = -1;
+    }
+
+    private int _selectedColumn = -1;
+    private int _selectedRow = -1;
 
     /// <summary>
     ///     Private override of <see cref="ChangeSelectionByOffset"/> that returns true if the selection has
@@ -139,6 +176,7 @@ public partial class TableView
     /// </summary>
     /// <param name="offsetX"></param>
     /// <param name="offsetY"></param>
+    /// <param name="ctx">The command context.</param>
     /// <returns></returns>
     private bool ChangeSelectionByOffsetWithReturn (int offsetX, int offsetY, ICommandContext? ctx)
     {
@@ -167,6 +205,7 @@ public partial class TableView
     /// <param name="offsetX">Offset in number of columns</param>
     /// <param name="offsetY">Offset in number of rows</param>
     /// <param name="extendExistingSelection">True to create a multi cell selection or adjust an existing one</param>
+    /// <param name="ctx">The command context.</param>
     public void ChangeSelectionByOffset (int offsetX, int offsetY, bool extendExistingSelection, ICommandContext? ctx)
     {
         SetSelection (SelectedColumn + offsetX, SelectedRow + offsetY, extendExistingSelection, ctx);
@@ -178,6 +217,11 @@ public partial class TableView
     /// <param name="ctx">The command context</param>
     public void ChangeSelectionToEndOfRow (bool extend, ICommandContext? ctx)
     {
+        if (TableIsNullOrInvisible ())
+        {
+            return;
+        }
+
         SetSelection (Table!.Columns - 1, SelectedRow, extend, ctx);
         Update ();
     }
@@ -187,6 +231,11 @@ public partial class TableView
     /// <param name="ctx">The command context</param>
     public void ChangeSelectionToStartOfRow (bool extend, ICommandContext? ctx)
     {
+        if (TableIsNullOrInvisible ())
+        {
+            return;
+        }
+
         SetSelection (0, SelectedRow, extend, ctx);
         Update ();
     }
@@ -198,7 +247,7 @@ public partial class TableView
     /// <remarks>
     ///     Changes will not be immediately visible in the display until you call <see cref="View.SetNeedsDraw()"/>
     /// </remarks>
-    public void EnsureSelectedCellIsVisible ()
+    public void EnsureCursorIsVisible ()
     {
         if (Table is null || Table.Columns <= 0)
         {
@@ -304,11 +353,11 @@ public partial class TableView
 
         // If SelectedColumn is invisible move it to a visible one
         SelectedColumn = GetNearestVisibleColumn (SelectedColumn, true, true);
-        IEnumerable<TableSelection> oldRegions = MultiSelectedRegions.ToArray ().Reverse ();
+        IEnumerable<TableSelectionRegion> oldRegions = MultiSelectedRegions.ToArray ().Reverse ();
         MultiSelectedRegions.Clear ();
 
         // evaluate
-        foreach (TableSelection region in oldRegions)
+        foreach (TableSelectionRegion region in oldRegions)
         {
             // ignore regions entirely below current table state
             if (region.Rectangle.Top >= Table.Rows)
@@ -430,7 +479,7 @@ public partial class TableView
 
         // Create a single region over entire table, set the origin of the selection to the active cell so that a followup spread selection e.g. shift-right
         // behaves properly
-        MultiSelectedRegions.Push (new TableSelection (new Point (SelectedColumn, SelectedRow), new Rectangle (0, 0, Table.Columns, _table!.Rows)));
+        MultiSelectedRegions.Push (new TableSelectionRegion (new Point (SelectedColumn, SelectedRow), new Rectangle (0, 0, Table.Columns, _table!.Rows)));
         Update ();
     }
 
@@ -441,6 +490,7 @@ public partial class TableView
     /// <param name="col"></param>
     /// <param name="row"></param>
     /// <param name="extendExistingSelection">True to create a multi cell selection or adjust an existing one</param>
+    /// <param name="ctx">The command context.</param>
     public void SetSelection (int col, int row, bool extendExistingSelection, ICommandContext? ctx = null)
     {
         // if we are trying to increase the column index then
@@ -456,17 +506,17 @@ public partial class TableView
         if (extendExistingSelection)
         {
             // If we are extending current selection but there isn't one
-            if (MultiSelectedRegions.Count == 0 || MultiSelectedRegions.All (m => m.IsToggled))
+            if (MultiSelectedRegions.Count == 0 || MultiSelectedRegions.All (m => m.IsExtended))
             {
                 // Create a new region between the old active cell and the new cell
-                TableSelection rect = CreateTableSelection (SelectedColumn, SelectedRow, col, row);
+                TableSelectionRegion rect = CreateTableSelectionRegion (SelectedColumn, SelectedRow, col, row);
                 MultiSelectedRegions.Push (rect);
             }
             else
             {
                 // Extend the current head selection to include the new cell
-                TableSelection head = MultiSelectedRegions.Pop ();
-                TableSelection newRect = CreateTableSelection (head.Origin.X, head.Origin.Y, col, row);
+                TableSelectionRegion head = MultiSelectedRegions.Pop ();
+                TableSelectionRegion newRect = CreateTableSelectionRegion (head.Origin.X, head.Origin.Y, col, row);
                 MultiSelectedRegions.Push (newRect);
             }
         }
@@ -476,13 +526,13 @@ public partial class TableView
     }
 
     // TODO: Refactor to use CWP
-    /// <summary>Invokes the <see cref="SelectedCellChanged"/> event</summary>
+    /// <summary>Invokes the <see cref="SelectedCellChanged"/> event and updates <see cref="Value"/>.</summary>
     private void RaiseSelectedCellChanged (SelectedCellChangedEventArgs args)
     {
         // Legacy
         SelectedCellChanged?.Invoke (this, args);
 
-        Value = new Point (SelectedColumn, SelectedRow);
+        UpdateValueFromInternalState ();
     }
 
     private void ClearMultiSelectedRegions (bool keepToggledSelections)
@@ -494,23 +544,23 @@ public partial class TableView
             return;
         }
 
-        IEnumerable<TableSelection> oldRegions = MultiSelectedRegions.ToArray ().Reverse ();
+        IEnumerable<TableSelectionRegion> oldRegions = MultiSelectedRegions.ToArray ().Reverse ();
         MultiSelectedRegions.Clear ();
 
-        foreach (TableSelection region in oldRegions)
+        foreach (TableSelectionRegion region in oldRegions)
         {
-            if (region.IsToggled)
+            if (region.IsExtended)
             {
                 MultiSelectedRegions.Push (region);
             }
         }
     }
 
-    private IEnumerable<TableSelection> GetMultiSelectedRegionsContaining (int col, int row)
+    private IEnumerable<TableSelectionRegion> GetMultiSelectedRegionsContaining (int col, int row)
     {
         if (!MultiSelect)
         {
-            return Enumerable.Empty<TableSelection> ();
+            return Enumerable.Empty<TableSelectionRegion> ();
         }
 
         if (FullRowSelect)
@@ -521,9 +571,28 @@ public partial class TableView
         return MultiSelectedRegions.Where (r => r.Rectangle.Contains (col, row));
     }
 
-    private bool? ToggleCurrentCellSelection ()
+    /// <summary>
+    ///     Handles <see cref="Command.ToggleExtend"/>: extends or un-extends a cell from the multi-selection.
+    ///     For keyboard (Space): toggles the current cell's extended state.
+    ///     For mouse with Ctrl: unions the clicked cell into the selection.
+    ///     For mouse with Alt: extends/creates a rectangular region to the clicked cell.
+    /// </summary>
+    private bool? ToggleExtend (ICommandContext? ctx)
     {
-        var e = new CellToggledEventArgs (Table!, SelectedColumn, SelectedRow);
+        // Mouse-based extend (Ctrl+Click or Alt+Click)
+        if (ctx?.Binding is MouseBinding mouseBinding && mouseBinding.MouseEvent is not null)
+        {
+            return ToggleExtendMouse (mouseBinding);
+        }
+
+        // Keyboard-based toggle (Space)
+        return ToggleExtendKeyboard ();
+    }
+
+    /// <summary>Handles keyboard-based ToggleExtend (Space key): toggles the current cell's extended state.</summary>
+    private bool? ToggleExtendKeyboard ()
+    {
+        CellToggledEventArgs e = new (Table!, SelectedColumn, SelectedRow);
         OnCellToggled (e);
 
         if (e.Cancel)
@@ -536,16 +605,16 @@ public partial class TableView
             return null;
         }
 
-        TableSelection [] regions = GetMultiSelectedRegionsContaining (SelectedColumn, SelectedRow).ToArray ();
-        TableSelection [] toggles = regions.Where (s => s.IsToggled).ToArray ();
+        TableSelectionRegion [] regions = GetMultiSelectedRegionsContaining (SelectedColumn, SelectedRow).ToArray ();
+        TableSelectionRegion [] toggles = regions.Where (s => s.IsExtended).ToArray ();
 
         // Toggle it off
         if (toggles.Any ())
         {
-            IEnumerable<TableSelection> oldRegions = MultiSelectedRegions.ToArray ().Reverse ();
+            IEnumerable<TableSelectionRegion> oldRegions = MultiSelectedRegions.ToArray ().Reverse ();
             MultiSelectedRegions.Clear ();
 
-            foreach (TableSelection region in oldRegions)
+            foreach (TableSelectionRegion region in oldRegions)
             {
                 if (!toggles.Contains (region))
                 {
@@ -555,59 +624,28 @@ public partial class TableView
         }
         else
         {
-            // user is toggling selection within a rectangular
-            // select.  So toggle the full region
+            // User is toggling selection within a rectangular select — toggle the full region
             if (regions.Any ())
             {
-                foreach (TableSelection r in regions)
+                foreach (TableSelectionRegion r in regions)
                 {
-                    r.IsToggled = true;
+                    r.IsExtended = true;
                 }
             }
             else
             {
                 // Toggle on a single cell selection
-                MultiSelectedRegions.Push (CreateTableSelection (SelectedColumn, SelectedRow, SelectedColumn, SelectedRow, true));
+                MultiSelectedRegions.Push (CreateTableSelectionRegion (SelectedColumn, SelectedRow, SelectedColumn, SelectedRow, true));
             }
         }
 
         return true;
     }
 
-    /// <summary>Unions the current selected cell (and/or regions) with the provided cell and makes it the active one.</summary>
-    /// <param name="col"></param>
-    /// <param name="row"></param>
-    private void UnionSelection (int col, int row)
+    /// <summary>Handles mouse-based ToggleExtend: Ctrl+Click unions, Alt+Click extends.</summary>
+    private bool? ToggleExtendMouse (MouseBinding mouseBinding)
     {
-        if (!MultiSelect || TableIsNullOrInvisible ())
-        {
-            return;
-        }
-
-        EnsureValidSelection ();
-        int oldColumn = SelectedColumn;
-        int oldRow = SelectedRow;
-
-        // move us to the new cell
-        SelectedColumn = col;
-        SelectedRow = row;
-        MultiSelectedRegions.Push (CreateTableSelection (col, row));
-
-        // if the old cell was not part of a rectangular select
-        // or otherwise selected we need to retain it in the selection
-        if (!IsSelected (oldColumn, oldRow))
-        {
-            MultiSelectedRegions.Push (CreateTableSelection (oldColumn, oldRow));
-        }
-    }
-
-    private bool? ExtendSelection (ICommandContext? ctx)
-    {
-        if (ctx?.Binding is not MouseBinding mouseBinding || mouseBinding.MouseEvent is null)
-        {
-            return false;
-        }
-        int boundsX = mouseBinding.MouseEvent.Position!.Value.X;
+        int boundsX = mouseBinding.MouseEvent!.Position!.Value.X;
         int boundsY = mouseBinding.MouseEvent.Position!.Value.Y;
         Point? hit = ScreenToCell (boundsX, boundsY);
 
@@ -628,9 +666,35 @@ public partial class TableView
         {
             return false;
         }
-        SetSelection (hit.Value.X, hit.Value.Y, mouseBinding.MouseEvent.Flags.FastHasFlags (MouseFlags.Alt), ctx);
+
+        SetSelection (hit.Value.X, hit.Value.Y, true, null);
         Update ();
 
         return false;
+    }
+
+    /// <summary>Unions the current selected cell (and/or regions) with the provided cell and makes it the active one.</summary>
+    private void UnionSelection (int col, int row)
+    {
+        if (!MultiSelect || TableIsNullOrInvisible ())
+        {
+            return;
+        }
+
+        EnsureValidSelection ();
+        int oldColumn = SelectedColumn;
+        int oldRow = SelectedRow;
+
+        // move us to the new cell
+        SelectedColumn = col;
+        SelectedRow = row;
+        MultiSelectedRegions.Push (CreateTableSelectionRegion (col, row));
+
+        // if the old cell was not part of a rectangular select
+        // or otherwise selected we need to retain it in the selection
+        if (!IsSelected (oldColumn, oldRow))
+        {
+            MultiSelectedRegions.Push (CreateTableSelectionRegion (oldColumn, oldRow));
+        }
     }
 }

@@ -333,7 +333,7 @@ public class TableViewBaselineTests : TestDriverBase
         tv.SelectedColumn = 1;
         tv.SelectedRow = 2;
 
-        tv.InvokeCommand (Command.Toggle);
+        tv.InvokeCommand (Command.ToggleExtend);
         Assert.True (tv.IsSelected (1, 2));
         Assert.Single (tv.MultiSelectedRegions);
     }
@@ -345,13 +345,13 @@ public class TableViewBaselineTests : TestDriverBase
         tv.SelectedColumn = 1;
         tv.SelectedRow = 2;
 
-        tv.InvokeCommand (Command.Toggle);
-        Assert.True (tv.MultiSelectedRegions.Any (r => r.IsToggled));
+        tv.InvokeCommand (Command.ToggleExtend);
+        Assert.True (tv.MultiSelectedRegions.Any (r => r.IsExtended));
 
-        tv.InvokeCommand (Command.Toggle);
+        tv.InvokeCommand (Command.ToggleExtend);
 
         // After toggling off, the toggled region should be removed
-        Assert.DoesNotContain (tv.MultiSelectedRegions, r => r.IsToggled && r.Rectangle.Contains (1, 2));
+        Assert.DoesNotContain (tv.MultiSelectedRegions, r => r.IsExtended && r.Rectangle.Contains (1, 2));
     }
 
     [Fact]
@@ -362,7 +362,7 @@ public class TableViewBaselineTests : TestDriverBase
         tv.SelectedColumn = 1;
         tv.SelectedRow = 2;
 
-        tv.InvokeCommand (Command.Toggle);
+        tv.InvokeCommand (Command.ToggleExtend);
 
         // With MultiSelect=false, toggle should not add regions
         Assert.Empty (tv.MultiSelectedRegions);
@@ -377,7 +377,7 @@ public class TableViewBaselineTests : TestDriverBase
 
         tv.CellToggled += (_, e) => e.Cancel = true;
 
-        tv.InvokeCommand (Command.Toggle);
+        tv.InvokeCommand (Command.ToggleExtend);
 
         // Cancelled — no toggle should have occurred
         Assert.Empty (tv.MultiSelectedRegions);
@@ -506,10 +506,10 @@ public class TableViewBaselineTests : TestDriverBase
     }
 
     [Fact]
-    public void NullTable_HomeEnd_ThrowsNullReference ()
+    public void NullTable_HomeEnd_DoesNotThrow ()
     {
-        // BUG: ChangeSelectionToEndOfRow/StartOfRow use Table! without null check.
-        // This documents the current broken behavior. The redesign should fix this.
+        // Previously this threw NullReferenceException because ChangeSelectionToEndOfRow
+        // used Table! without null check. Now fixed with null guard.
         TableView tv = new ()
         {
             Viewport = new Rectangle (0, 0, 25, 5)
@@ -517,7 +517,8 @@ public class TableViewBaselineTests : TestDriverBase
         tv.BeginInit ();
         tv.EndInit ();
 
-        Assert.Throws<NullReferenceException> (() => tv.NewKeyDownEvent (Key.End));
+        tv.NewKeyDownEvent (Key.Home);
+        tv.NewKeyDownEvent (Key.End);
     }
 
     [Fact]
@@ -617,13 +618,10 @@ public class TableViewBaselineTests : TestDriverBase
 
         tv.Table = null;
 
-        // HACK: With null Table, SelectedColumn/SelectedRow retain last value
-        // because the setter's clamp logic uses TableIsNullOrInvisible() → clamps to 0.
-        // The Table setter calls SetSelection(0,0,...) which goes through SelectedColumn/SelectedRow
-        // setters, and those clamp to 0 when Table is null.
-        // This is the current behavior being locked in — the redesign will change to null.
-        Assert.Equal (0, tv.SelectedColumn);
-        Assert.Equal (0, tv.SelectedRow);
+        // With null Table, Value becomes null and cursor resets to -1.
+        Assert.Null (tv.Value);
+        Assert.Equal (-1, tv.SelectedColumn);
+        Assert.Equal (-1, tv.SelectedRow);
     }
 
     [Fact]
@@ -647,19 +645,20 @@ public class TableViewBaselineTests : TestDriverBase
 
     #endregion
 
-    #region F. IValue<Point?> Baseline
+    #region F. IValue<TableSelection?> Baseline
 
     [Fact]
     public void Value_ReflectsCursorPosition ()
     {
         TableView tv = CreateTableView (5, 10);
-        Assert.Equal (new Point (0, 0), tv.Value);
+        Assert.NotNull (tv.Value);
+        Assert.Equal (new Point (0, 0), tv.Value!.Cursor);
 
         tv.SelectedColumn = 2;
-        Assert.Equal (new Point (2, 0), tv.Value);
+        Assert.Equal (new Point (2, 0), tv.Value!.Cursor);
 
         tv.SelectedRow = 3;
-        Assert.Equal (new Point (2, 3), tv.Value);
+        Assert.Equal (new Point (2, 3), tv.Value!.Cursor);
     }
 
     [Fact]
@@ -668,7 +667,8 @@ public class TableViewBaselineTests : TestDriverBase
         TableView tv = CreateTableView (5, 10);
         tv.NewKeyDownEvent (Key.CursorRight);
         tv.NewKeyDownEvent (Key.CursorDown);
-        Assert.Equal (new Point (1, 1), tv.Value);
+        Assert.NotNull (tv.Value);
+        Assert.Equal (new Point (1, 1), tv.Value!.Cursor);
     }
 
     [Fact]
@@ -676,12 +676,12 @@ public class TableViewBaselineTests : TestDriverBase
     {
         TableView tv = new ();
 
-        // HACK: Before Table is set, Value is initialized to (-1,-1) in the field initializer.
-        // This is the current behavior; the redesign will use null.
-        Assert.Equal (new Point (-1, -1), tv.Value);
+        // Before Table is set, Value is null (no selection).
+        Assert.Null (tv.Value);
 
         tv.Table = BuildTable (5, 10);
-        Assert.Equal (new Point (0, 0), tv.Value);
+        Assert.NotNull (tv.Value);
+        Assert.Equal (new Point (0, 0), tv.Value!.Cursor);
     }
 
     [Fact]
@@ -689,8 +689,8 @@ public class TableViewBaselineTests : TestDriverBase
     {
         TableView tv = CreateTableView (5, 10);
         var fired = false;
-        Point? oldVal = null;
-        Point? newVal = null;
+        TableSelection? oldVal = null;
+        TableSelection? newVal = null;
 
         tv.ValueChanged += (_, e) =>
                            {
@@ -701,8 +701,10 @@ public class TableViewBaselineTests : TestDriverBase
 
         tv.NewKeyDownEvent (Key.CursorDown);
         Assert.True (fired);
-        Assert.Equal (new Point (0, 0), oldVal);
-        Assert.Equal (new Point (0, 1), newVal);
+        Assert.NotNull (oldVal);
+        Assert.Equal (new Point (0, 0), oldVal!.Cursor);
+        Assert.NotNull (newVal);
+        Assert.Equal (new Point (0, 1), newVal!.Cursor);
     }
 
     #endregion
@@ -744,10 +746,10 @@ public class TableViewBaselineTests : TestDriverBase
 
     #endregion
 
-    #region H. EnsureSelectedCellIsVisible
+    #region H. EnsureCursorIsVisible
 
     [Fact]
-    public void EnsureSelectedCellIsVisible_NullTable_DoesNotThrow ()
+    public void EnsureCursorIsVisible_NullTable_DoesNotThrow ()
     {
         TableView tv = new ()
         {
@@ -755,17 +757,17 @@ public class TableViewBaselineTests : TestDriverBase
         };
 
         // Should not throw
-        tv.EnsureSelectedCellIsVisible ();
+        tv.EnsureCursorIsVisible ();
     }
 
     [Fact]
-    public void EnsureSelectedCellIsVisible_ScrollsRowIntoView ()
+    public void EnsureCursorIsVisible_ScrollsRowIntoView ()
     {
         TableView tv = CreateTableView (3, 50, viewportHeight: 5);
 
         // Move to a row that is beyond viewport
         tv.SelectedRow = 20;
-        tv.EnsureSelectedCellIsVisible ();
+        tv.EnsureCursorIsVisible ();
 
         // After ensuring visibility, Viewport.Y should have adjusted
         // so that row 20 is visible (i.e., Viewport.Y <= 20 < Viewport.Y + Viewport.Height)
