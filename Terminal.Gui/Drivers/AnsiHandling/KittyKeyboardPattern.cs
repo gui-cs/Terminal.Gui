@@ -122,6 +122,7 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
         }
 
         string modifierField = match.Groups [4].Value;
+        modifierField = ApplyImplicitModifierState (key, modifierField);
 
         if (!string.IsNullOrEmpty (modifierField))
         {
@@ -168,6 +169,61 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
         }
 
         return builder.ToString ();
+    }
+
+    private static string ApplyImplicitModifierState (Key key, string modifierField)
+    {
+        if (!key.IsModifierOnly)
+        {
+            return modifierField;
+        }
+
+        int implicitEncodedModifiers = key.ModifierKey switch
+        {
+            ModifierKey.Shift or ModifierKey.LeftShift or ModifierKey.RightShift => 2,
+            ModifierKey.Ctrl or ModifierKey.LeftCtrl or ModifierKey.RightCtrl => 5,
+            ModifierKey.Alt or ModifierKey.LeftAlt or ModifierKey.RightAlt or ModifierKey.AltGr => 3,
+            _ => 1
+        };
+
+        if (string.IsNullOrEmpty (modifierField))
+        {
+            return implicitEncodedModifiers.ToString (CultureInfo.InvariantCulture);
+        }
+
+        string [] parts = modifierField.Split (':');
+
+        // Check for release event BEFORE parsing modifiers, to handle case where modifierField is just the event type
+        bool isRelease = parts.Length > 1 && parts [1] == "3";
+
+        if (!int.TryParse (parts [0], CultureInfo.InvariantCulture, out int encodedModifiers) || encodedModifiers < 1)
+        {
+            parts [0] = implicitEncodedModifiers.ToString (CultureInfo.InvariantCulture);
+
+            return string.Join (':', parts);
+        }
+
+        // If it's a release event, preserve the event type and don't try to merge implicit modifiers
+        if (isRelease)
+        {
+            // For release events of modifier-only keys, ensure explicit modifiers are correct
+            int explicitModifiers = encodedModifiers - 1;
+            int implicitModifiers = implicitEncodedModifiers - 1;
+
+            // Only merge modifiers if the explicit modifiers don't already match the implicit ones
+            if (explicitModifiers != implicitModifiers)
+            {
+                parts [0] = ((explicitModifiers | implicitModifiers) + 1).ToString (CultureInfo.InvariantCulture);
+            }
+
+            return string.Join (':', parts);
+        }
+
+        int explicitModifiersPress = encodedModifiers - 1;
+        int implicitModifiersPress = implicitEncodedModifiers - 1;
+        parts [0] = ((explicitModifiersPress | implicitModifiersPress) + 1).ToString (CultureInfo.InvariantCulture);
+
+        return string.Join (':', parts);
     }
 
     private static (Key Key, string ModifierField) NormalizeShiftedPrintableKey (Key key, string modifierField)
@@ -222,6 +278,7 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
 
         Key printableKey = new (printableRune.Value)
         {
+            ModifierKey = key.ModifierKey,
             ShiftedKeyCode = key.ShiftedKeyCode,
             BaseLayoutKeyCode = key.BaseLayoutKeyCode,
             AssociatedText = key.AssociatedText
