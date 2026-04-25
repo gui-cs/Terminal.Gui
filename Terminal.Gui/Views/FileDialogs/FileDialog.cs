@@ -26,7 +26,13 @@ public partial class FileDialog : Dialog, IDesignable
     private readonly IFileSystem? _fileSystem;
 
     private readonly Button _btnBack;
-    private readonly Button _btnCancel;
+
+    /// <summary>
+    ///     Gets the cancel button for the dialog. This is useful for checking if the user canceled the dialog by comparing
+    ///     the <see cref="Dialog.Result"/> to the index of this button in the <see cref="Dialog.Buttons"/> array.
+    /// </summary>
+    public Button CancelButton { get; }
+
     private readonly Button _btnForward;
     private readonly Button _btnOk;
     private readonly Button _btnUp;
@@ -71,7 +77,7 @@ public partial class FileDialog : Dialog, IDesignable
         // Ensure we get Accept for any subviews; esp TreeView
         CommandsToBubbleUp = [Command.Accept];
 
-        _btnCancel = new Button { Text = Strings.btnCancel };
+        CancelButton = new Button { Text = Strings.btnCancel };
 
         _btnOk = new Button { Text = Style.OkButtonText };
 
@@ -254,7 +260,7 @@ public partial class FileDialog : Dialog, IDesignable
 #if FILEDIALOG_ENABLE_TREE
         AddButton (_btnTreeToggle);
 #endif
-        AddButton (_btnCancel);
+        AddButton (CancelButton);
         AddButton (_btnOk);
 
         Add (_tbPath);
@@ -385,7 +391,7 @@ public partial class FileDialog : Dialog, IDesignable
 
         // May have been updated after instance was constructed
         _btnOk.Text = Style.OkButtonText;
-        _btnCancel.Text = Style.CancelButtonText;
+        CancelButton.Text = Style.CancelButtonText;
         _btnUp.Text = GetUpButtonText ();
         _btnBack.Text = GetBackButtonText ();
         _btnForward.Text = GetForwardButtonText ();
