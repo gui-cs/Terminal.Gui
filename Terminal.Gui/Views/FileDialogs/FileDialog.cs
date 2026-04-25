@@ -158,8 +158,8 @@ public partial class FileDialog : Dialog, IDesignable
         {
             X = 0,
             Y = Pos.Bottom (_btnBack),
-            Width = Dim.Fill (30, _tableViewContainer),
-            Height = Dim.Height (_tableViewContainer),
+            Width = Dim.Fill (30, tableViewContainer),
+            Height = Dim.Height (tableViewContainer),
             Visible = true
         };
 #endif
