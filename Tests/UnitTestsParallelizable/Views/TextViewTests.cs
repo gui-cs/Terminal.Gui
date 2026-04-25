@@ -14,6 +14,33 @@ public class TextViewTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void LoadFile_Should_Release_File_Lock_After_Return ()
+    {
+        // Arrange
+        string tempFile = Path.GetTempFileName ();
+        File.WriteAllText (tempFile, "test content");
+
+        TextView tv = new ();
+
+        // Act
+        Assert.True (tv.Load (tempFile));
+        Assert.Equal ("test content", tv.Text);
+
+        // Assert
+        // Try to reopen the file with NO sharing (exclusive lock)
+        // This will fail if the previous stream is still open
+        Exception exception = Record.Exception (() =>
+                                                {
+                                                    using FileStream stream = new (tempFile, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                                                });
+
+        Assert.Null (exception);
+
+        // Cleanup
+        File.Delete (tempFile);
+    }
+
+    [Fact]
     public void ContentsChanged_Event_Fires_ClearHistoryChanges ()
     {
         var eventcount = 0;
