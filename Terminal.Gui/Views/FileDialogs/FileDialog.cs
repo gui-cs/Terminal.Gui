@@ -23,20 +23,24 @@ public partial class FileDialog : Dialog, IDesignable
     /// <summary>Locking object for ensuring only a single <see cref="SearchState"/> executes at once.</summary>
     internal readonly object _onlyOneSearchLock = new ();
 
+    private readonly IFileSystem? _fileSystem;
+
     private readonly Button _btnBack;
     private readonly Button _btnCancel;
     private readonly Button _btnForward;
     private readonly Button _btnOk;
     private readonly Button _btnUp;
-    private readonly Button _btnTreeToggle;
-    private readonly IFileSystem? _fileSystem;
     private readonly FileDialogHistory _history;
     private readonly SpinnerView _spinnerView;
-    private readonly View _tableViewContainer;
     private readonly TableView _tableView;
     private readonly TextField _tbFind;
     private readonly TextField _tbPath;
+#if FILEDIALOG_ENABLE_TREE
+// The FileDialog TreeView has too many issues and is currently disabled
+    private readonly Button _btnTreeToggle;
     private readonly TreeView<IFileSystemInfo> _treeView;
+    private Dictionary<IDirectoryInfo, string> _treeRoots = new ();
+#endif
     private DropDownList? _typeFilterDropDown;
     private int _currentSortColumn;
     private bool _currentSortIsAsc = true;
@@ -44,7 +48,6 @@ public partial class FileDialog : Dialog, IDesignable
     private string? _feedback;
 
     private bool _pushingState;
-    private Dictionary<IDirectoryInfo, string> _treeRoots = new ();
 
     /// <summary>Initializes a new instance of the <see cref="FileDialog"/> class.</summary>
     public FileDialog () : this (new FileSystem ()) { }
@@ -53,12 +56,15 @@ public partial class FileDialog : Dialog, IDesignable
     /// <remarks>This overload is mainly useful for testing.</remarks>
     internal FileDialog (IFileSystem? fileSystem)
     {
-        // Scrollbars are disabled by default (VisibilityMode.Manual and Visible = false)
-        // No need to explicitly set them
+        Height = Dim.Percent (80);
+        Width = Dim.Percent (80);
 
         _fileSystem = fileSystem;
+#if FILEDIALOG_ENABLE_TREE
         Style = new FileDialogStyle (fileSystem);
-
+#else
+        Style = new FileDialogStyle ();
+#endif
         ButtonAlignment = Alignment.End;
         ButtonAlignmentModes = AlignmentModes.IgnoreFirstOrLast;
 
@@ -68,15 +74,6 @@ public partial class FileDialog : Dialog, IDesignable
         _btnCancel = new Button { Text = Strings.btnCancel };
 
         _btnOk = new Button { Text = Style.OkButtonText };
-
-        // Tree toggle button - Goes in Dialog Button Area
-        _btnTreeToggle = new Button { NoPadding = true };
-
-        _btnTreeToggle.Accepting += (_, e) =>
-                                    {
-                                        e.Handled = true;
-                                        ToggleTreeVisibility ();
-                                    };
 
         _btnUp = new Button { X = 0, Y = 1, NoPadding = true };
         _btnUp.Text = GetUpButtonText ();
@@ -108,7 +105,7 @@ public partial class FileDialog : Dialog, IDesignable
         _tbPath = new TextField
         {
             // This sets the default width of the FileDialog as it is the widest subview
-            Width = Dim.Fill (0, 75)
+            Width = Dim.Fill ()
         };
 
         _tbPath.KeyDown += (_, k) =>
@@ -124,19 +121,31 @@ public partial class FileDialog : Dialog, IDesignable
         _tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator ();
 
         // Create table view container (right pane)
-        _tableViewContainer = new View
+        var tableViewContainer = new View
         {
             X = 0,
             Y = Pos.Bottom (_btnBack),
             Width = Dim.Fill (),
-            Height = Dim.Fill (0, 15),
+            Height = Dim.Fill (),
+#if FILEDIALOG_ENABLE_TREE
             Arrangement = ViewArrangement.LeftResizable,
             BorderStyle = LineStyle.Dashed,
             SuperViewRendersLineCanvas = true,
+#endif
             TabStop = TabBehavior.TabStop,
             CanFocus = true,
             Id = "_tableViewContainer"
         };
+
+#if FILEDIALOG_ENABLE_TREE
+        // Tree toggle button - Goes in Dialog Button Area
+        _btnTreeToggle = new Button { NoPadding = true };
+
+        _btnTreeToggle.Accepting += (_, e) =>
+                                    {
+                                        e.Handled = true;
+                                        ToggleTreeVisibility ();
+                                    };
 
         // Create tree view container (left pane)
         _treeView = new TreeView<IFileSystemInfo>
@@ -145,13 +154,14 @@ public partial class FileDialog : Dialog, IDesignable
             Y = Pos.Bottom (_btnBack),
             Width = Dim.Fill (30, _tableViewContainer),
             Height = Dim.Height (_tableViewContainer),
-            Visible = false
+            Visible = true
         };
-
-        _tableView = new TableView { Width = Dim.Fill (), Height = Dim.Fill (_tbFind!), FullRowSelect = true, Id = "_tableView" };
+#endif
+        _tableView = new TableView { Width = Dim.Fill (), Height = Dim.Fill (_tbFind!) - 1, FullRowSelect = true, Id = "_tableView" };
         _tableView.CollectionNavigator = new FileDialogCollectionNavigator (this, _tableView);
         _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
         _tableView.Activating += OnTableViewActivating;
+        _tableView.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
         Style.TableStyle = _tableView.Style;
 
         ColumnStyle nameStyle = Style.TableStyle.GetOrCreateColumnStyle (0);
@@ -170,21 +180,23 @@ public partial class FileDialog : Dialog, IDesignable
         typeStyle.MinWidth = 6;
         typeStyle.ColorGetter = ColorGetter;
 
-        var fileDialogTreeBuilder = new FileSystemTreeBuilder ();
+#if FILEDIALOG_ENABLE_TREE
+        var fileDialogTreeBuilder = new FileSystemTreeBuilder () { IncludeFiles = false };
         _treeView.TreeBuilder = fileDialogTreeBuilder;
         _treeView.AspectGetter = AspectGetter;
         Style.TreeStyle = _treeView.Style;
 
         _treeView.SelectionChanged += TreeView_SelectionChanged;
         _treeView.KeystrokeNavigator.Matcher = new FileSystemCollectionNavigationMatcher ();
-
-        _tableViewContainer.Add (_tableView);
+#endif
+        tableViewContainer.Add (_tableView);
 
         _tableView.Style.ShowHorizontalHeaderOverline = true;
         _tableView.Style.ShowVerticalCellLines = true;
         _tableView.Style.ShowVerticalHeaderLines = true;
         _tableView.Style.AlwaysShowHeaders = true;
         _tableView.Style.ShowHorizontalHeaderUnderline = true;
+        _tableView.Style.ShowHorizontalBottomLine = true;
 
         _history = new FileDialogHistory (this);
 
@@ -206,14 +218,14 @@ public partial class FileDialog : Dialog, IDesignable
         _tableView.KeyBindings.Add (Key.Space.WithCtrl, Command.Context);
         _tableView.MouseBindings.Add (MouseFlags.RightButtonClicked, Command.Context);
 
-        _tbFind = new TextField { X = 0, Width = Dim.Width (_tableView), Y = Pos.AnchorEnd (), Id = "_tbFind" };
+        _tbFind = new TextField { X = 1, Width = Dim.Width (_tableView) - 1, Y = Pos.AnchorEnd (), Id = "_tbFind" };
 
         _spinnerView = new SpinnerView
         {
             // The spinner view is positioned over the last column of _tbFind
-            X = Pos.AnchorEnd (),
+            X = Pos.Right (_tbFind) - 8,
             Y = Pos.Top (_tbFind),
-            Width = Dim.Auto(),
+            Width = Dim.Auto (),
             Visible = false,
             Style = new SpinnerStyle.Aesthetic (),
             Arrangement = ViewArrangement.Overlapped
@@ -239,7 +251,9 @@ public partial class FileDialog : Dialog, IDesignable
         UpdateNavigationVisibility ();
 
         // Add the toggle along with OK/Cancel so they align as a group
+#if FILEDIALOG_ENABLE_TREE
         AddButton (_btnTreeToggle);
+#endif
         AddButton (_btnCancel);
         AddButton (_btnOk);
 
@@ -247,13 +261,14 @@ public partial class FileDialog : Dialog, IDesignable
         Add (_btnUp);
         Add (_btnBack);
         Add (_btnForward);
+#if FILEDIALOG_ENABLE_TREE
         Add (_treeView);
-        Add (_tableViewContainer);
-        _tableViewContainer.Add (_tbFind);
-        _tableViewContainer.Add (_spinnerView);
-
         // Default: Tree hidden and splitter hidden
         SetTreeVisible (false);
+#endif
+        Add (tableViewContainer);
+        tableViewContainer.Add (_tbFind);
+        tableViewContainer.Add (_spinnerView);
     }
 
     /// <summary>
@@ -319,6 +334,17 @@ public partial class FileDialog : Dialog, IDesignable
         {
             _tbPath.Text = value;
             _tbPath.MoveEnd ();
+
+            //IDirectoryInfo dir = StringToDirectoryInfo (value);
+
+            //StringComparison comparison = OperatingSystem.IsWindows () ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+
+            //if (_treeView.ExpandParents (dir, (left, right) => string.Equals (left.FullName, right.FullName, comparison), out IFileSystemInfo? matched)
+            //    && matched is { })
+            //{
+            //  //  _treeView.EnsureVisible (matched);
+            //   // _treeView.SelectedObject = matched;
+            //}
         }
     }
 
@@ -372,10 +398,11 @@ public partial class FileDialog : Dialog, IDesignable
             Normal = new Attribute (Color.Black, _tbPath.GetAttributeForRole (VisualRole.Normal).Background)
         };
 
+#if FILEDIALOG_ENABLE_TREE
         _treeRoots = Style.TreeRootGetter ();
         Style.IconProvider.IsOpenGetter = _treeView.IsExpanded;
-
         _treeView.AddObjects (_treeRoots.Keys);
+#endif
 
         // if filtering on file type is configured then create the DropDownList and establish
         // initial filtering by extension(s)
@@ -410,9 +437,10 @@ public partial class FileDialog : Dialog, IDesignable
             Title = GetDefaultTitle ();
         }
 
+#if FILEDIALOG_ENABLE_TREE
         // Ensure toggle button text matches current state after sizing
         SetTreeVisible (false);
-
+#endif
         SetNeedsDraw ();
         SetNeedsLayout ();
     }

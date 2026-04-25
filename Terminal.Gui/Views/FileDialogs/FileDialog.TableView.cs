@@ -101,6 +101,7 @@ public partial class FileDialog
         ApplySort ();
     }
 
+#if FILEDIALOG_ENABLE_TREE
     private string AspectGetter (object o)
     {
         var fsi = (IFileSystemInfo)o;
@@ -113,6 +114,7 @@ public partial class FileDialog
 
         return (Style.IconProvider.GetIconWithOptionalSpace (fsi) + fsi.Name).Trim ();
     }
+#endif
 
     private void TableViewOnAccepted (object? sender, CommandEventArgs e)
     {

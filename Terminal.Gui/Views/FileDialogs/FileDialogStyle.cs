@@ -1,24 +1,27 @@
-#nullable disable
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Abstractions;
-using static System.Environment;
 
 namespace Terminal.Gui.Views;
 
 /// <summary>Stores style settings for <see cref="FileDialog"/>.</summary>
 public class FileDialogStyle
 {
+#if FILEDIALOG_ENABLE_TREE
     private readonly IFileSystem _fileSystem;
 
     /// <summary>Creates a new instance of the <see cref="FileDialogStyle"/> class.</summary>
     public FileDialogStyle (IFileSystem fileSystem)
     {
         _fileSystem = fileSystem;
+
         TreeRootGetter = DefaultTreeRootGetter;
 
-        DateFormat = CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern;
+    DateFormat = CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern;
     }
+#else
+    /// <summary>Creates a new instance of the <see cref="FileDialogStyle"/> class.</summary>
+    public FileDialogStyle () => DateFormat = CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern;
+#endif
 
     /// <summary>Gets or sets the text on the 'Cancel' button.</summary>
     public string CancelButtonText { get; set; } = Strings.btnCancel;
@@ -107,8 +110,9 @@ public class FileDialogStyle
     public string SizeColumnName { get; set; } = Strings.fdSize;
 
     /// <summary>Gets the style settings for the table of files (in currently selected directory).</summary>
-    public TableStyle TableStyle { get; internal set; }
+    public TableStyle? TableStyle { get; internal set; }
 
+#if FILEDIALOG_ENABLE_TREE
     /// <summary>
     ///     Gets or Sets the method for getting the root tree objects that are displayed in the collapse-able tree in the
     ///     <see cref="FileDialog"/>.  Defaults to all accessible <see cref="System.Environment.GetLogicalDrives"/> and unique
@@ -118,7 +122,8 @@ public class FileDialogStyle
     public Func<Dictionary<IDirectoryInfo, string>> TreeRootGetter { get; set; }
 
     /// <summary>Gets the style settings for the collapse-able directory/places tree</summary>
-    public TreeStyle TreeStyle { get; internal set; }
+    public TreeStyle? TreeStyle { get; internal set; }
+#endif
 
     /// <summary>Gets or sets the header text displayed in the Type column of the files table.</summary>
     public string TypeColumnName { get; set; } = Strings.fdType;
@@ -138,22 +143,26 @@ public class FileDialogStyle
     /// </summary>
     public string WrongFileTypeFeedback { get; set; } = Strings.fdWrongFileTypeFeedback;
 
-
     /// <summary>
-    /// <para>
-    /// Gets or sets a flag that determines behaviour when opening (double click/enter) or selecting a
-    /// directory in a <see cref="FileDialog"/>.
-    /// </para>
-    /// <para>If <see langword="false"/> (the default) then the <see cref="FileDialog.Path"/> is simply
-    /// updated to the new directory path.</para>
-    /// <para>If <see langword="true"/> then any typed or previously selected file
-    /// name is preserved (e.g. "c:/hello.csv" when opening "temp" becomes "c:/temp/hello.csv").
-    /// </para>
+    ///     <para>
+    ///         Gets or sets a flag that determines behaviour when opening (double click/enter) or selecting a
+    ///         directory in a <see cref="FileDialog"/>.
+    ///     </para>
+    ///     <para>
+    ///         If <see langword="false"/> (the default) then the <see cref="FileDialog.Path"/> is simply
+    ///         updated to the new directory path.
+    ///     </para>
+    ///     <para>
+    ///         If <see langword="true"/> then any typed or previously selected file
+    ///         name is preserved (e.g. "c:/hello.csv" when opening "temp" becomes "c:/temp/hello.csv").
+    ///     </para>
     /// </summary>
     public bool PreserveFilenameOnDirectoryChanges { get; set; }
 
-
-    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
+#if FILEDIALOG_ENABLE_TREE
+    [UnconditionalSuppressMessage ("AOT",
+                                   "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+                                   Justification = "<Pending>")]
     private Dictionary<IDirectoryInfo, string> DefaultTreeRootGetter ()
     {
         Dictionary<IDirectoryInfo, string> roots = new ();
@@ -206,4 +215,5 @@ public class FileDialogStyle
 
         return roots;
     }
+#endif
 }
