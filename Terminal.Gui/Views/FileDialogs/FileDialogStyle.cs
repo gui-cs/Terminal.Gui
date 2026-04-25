@@ -16,7 +16,7 @@ public class FileDialogStyle
 
         TreeRootGetter = DefaultTreeRootGetter;
 
-    DateFormat = CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern;
+        DateFormat = CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern;
     }
 #else
     /// <summary>Creates a new instance of the <see cref="FileDialogStyle"/> class.</summary>
