@@ -322,4 +322,75 @@ public class MouseTests (ITestOutputHelper output) : TestsAllViews
         Assert.False (me.Handled);
         view.Dispose ();
     }
+
+    [Fact]
+    public void NewMouseEnterEvent_SubView_CanFocus_False_With_Two_Overlapped_Views_SetFocus_To_SuperView ()
+    {
+        // This view will be behind and start with CanFocus = false and Enabled = false, proving that the focus can't be set to it
+        View superView1 = new () { CanFocus = false, Enabled = false, Width = 20, Height = 3 };
+        View view1 = new () { CanFocus = false, Width = 20, Height = 1, MouseHighlightStates = MouseState.Pressed };
+        superView1.Add (view1);
+        View superView2 = new () { CanFocus = true, X = 10, Width = 20, Height = 3 };
+        View view2 = new ()
+        {
+            CanFocus = false, Width = 20, Height = 1, Y = 1,
+            MouseHighlightStates = MouseState.Pressed
+        };
+        superView2.Add (view2);
+        Runnable runnable = new ();
+        runnable.Add (superView1, superView2);
+        runnable.BeginInit ();
+        runnable.EndInit ();
+
+        // Set focus to superView2
+        superView2.SetFocus ();
+
+        Assert.False (superView1.HasFocus);
+        Assert.False (view1.HasFocus);
+        Assert.True (superView2.HasFocus);
+        Assert.False (view2.HasFocus);
+        Assert.Equal (superView2, runnable.MostFocused);
+
+        view1.NewMouseEvent (new Mouse { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonPressed });
+
+        Assert.False (superView1.HasFocus);
+        Assert.False (view1.HasFocus);
+        Assert.True (superView2.HasFocus);
+        Assert.False (view2.HasFocus);
+        Assert.Equal (superView2, runnable.MostFocused);
+
+        // Now set the behind view to CanFocus = true, and verify that it doesn't get focus yet because Enabled is still false
+        superView1.CanFocus = true;
+
+        view1.NewMouseEvent (new Mouse { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonPressed });
+
+        Assert.False (superView1.HasFocus);
+        Assert.False (view1.HasFocus);
+        Assert.True (superView2.HasFocus);
+        Assert.False (view2.HasFocus);
+        Assert.Equal (superView2, runnable.MostFocused);
+
+        // Now set the behind view to Enabled = true, and verify that it gets focus on mouse event
+        superView1.Enabled = true;
+
+        view1.NewMouseEvent (new Mouse { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonPressed });
+
+        Assert.True (superView1.HasFocus);
+        Assert.False (view1.HasFocus);
+        Assert.False (superView2.HasFocus);
+        Assert.False (view2.HasFocus);
+        Assert.Equal (superView1, runnable.MostFocused);
+
+        // Now set focus back to the front view, and verify that it gets focus on mouse event
+        view2.NewMouseEvent (new Mouse { Timestamp = DateTime.Now, Flags = MouseFlags.LeftButtonPressed });
+
+        Assert.False (superView1.HasFocus);
+        Assert.False (view1.HasFocus);
+        Assert.True (superView2.HasFocus);
+        Assert.False (view2.HasFocus);
+        Assert.Equal (superView2, runnable.MostFocused);
+
+        superView1.Dispose ();
+        superView2.Dispose ();
+    }
 }
