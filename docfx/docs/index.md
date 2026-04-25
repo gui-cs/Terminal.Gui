@@ -1,5 +1,7 @@
 # Terminal.Gui Deep Dives 
 
+![Terminal.Gui — cross-platform TUI toolkit for .NET. Build full-featured terminal UIs with menus, forms, tables, charts, wizards and file dialogs. 30+ views, Windows / macOS / Linux, MIT-licensed.](../images/hero.gif)
+
 > [!IMPORTANT]
 > Terminal.Gui v2 "Beta" has been released.
 
