@@ -146,6 +146,7 @@ public class FileDialogTests : TestsAllDrivers
 
     private string GetFileSystemRoot (IFileSystem fs) => RuntimeInformation.IsOSPlatform (OSPlatform.Windows) ? $@"C:{fs.Path.DirectorySeparatorChar}" : "/";
 
+#if FILEDIALOG_ENABLE_TREE
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
     public void SaveFileDialog_PressingPopTree_ShouldNotChangeCancel (string d)
@@ -264,6 +265,7 @@ public class FileDialogTests : TestsAllDrivers
                                     .AssertFalse (sd!.Canceled)
                                     .AssertContains ("empty-dir", sd!.FileName);
     }
+#endif
 
     /// <summary>
     ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4950
