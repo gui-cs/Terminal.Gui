@@ -1,12 +1,13 @@
 // Claude - Opus 4.7
 using System.Reflection;
+using Terminal.Gui.Configuration;
 
 namespace ConfigurationTests;
 
 public class ConfigPropertyHostTypesTests
 {
     /// <summary>
-    ///     Guard-rail test: the hard-coded list in <c>ConfigPropertyHostTypes</c> must exhaustively cover every type in
+    ///     Guard-rail test: the hard-coded list in <see cref="ConfigPropertyHostTypes"/> must exhaustively cover every type in
     ///     the Terminal.Gui assembly that declares a <see cref="ConfigurationPropertyAttribute"/> property. Drift between
     ///     the list and the attribute usage would silently reintroduce the trim/AOT failure fixed by
     ///     <see href="https://github.com/gui-cs/Terminal.Gui/issues/5069"/>.
@@ -22,10 +23,8 @@ public class ConfigPropertyHostTypesTests
                                   .Where (HasConfigurationProperty)
                                   .ToHashSet ();
 
-        // Act: invoke via reflection because ConfigPropertyHostTypes is internal.
-        Type hostTypesType = terminalGuiAssembly.GetType ("Terminal.Gui.Configuration.ConfigPropertyHostTypes")!;
-        MethodInfo getTypes = hostTypesType.GetMethod ("GetTypes", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static)!;
-        HashSet<Type> registered = ((Type [])getTypes.Invoke (null, null)!).ToHashSet ();
+        // Act
+        HashSet<Type> registered = ConfigPropertyHostTypes.GetTypes ().ToHashSet ();
 
         // Assert
         Type [] missing = reflected.Except (registered).ToArray ();
@@ -38,7 +37,10 @@ public class ConfigPropertyHostTypesTests
 
     private static bool HasConfigurationProperty (Type type)
     {
-        PropertyInfo [] properties = type.GetProperties (BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+        // Mirror the production scan in ConfigProperty.Initialize (), which uses type.GetProperties () —
+        // public instance properties only. Widening the binding flags here would flag types that the
+        // production scan could never discover and the trimmer wouldn't preserve via PublicProperties.
+        PropertyInfo [] properties = type.GetProperties ();
 
         foreach (PropertyInfo property in properties)
         {
