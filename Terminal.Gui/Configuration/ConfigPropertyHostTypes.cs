@@ -37,37 +37,6 @@ internal static class ConfigPropertyHostTypes
 {
     private const DynamicallyAccessedMemberTypes PreservedMembers = DynamicallyAccessedMemberTypes.PublicProperties;
 
-    [DynamicDependency (PreservedMembers, typeof (Application))]
-    [DynamicDependency (PreservedMembers, typeof (ConfigurationManager))]
-    [DynamicDependency (PreservedMembers, typeof (SchemeManager))]
-    [DynamicDependency (PreservedMembers, typeof (ThemeManager))]
-    [DynamicDependency (PreservedMembers, typeof (Color))]
-    [DynamicDependency (PreservedMembers, typeof (Glyphs))]
-    [DynamicDependency (PreservedMembers, typeof (Driver))]
-    [DynamicDependency (PreservedMembers, typeof (Key))]
-    [DynamicDependency (PreservedMembers, typeof (NerdFonts))]
-    [DynamicDependency (PreservedMembers, typeof (Trace))]
-    [DynamicDependency (PreservedMembers, typeof (View))]
-    [DynamicDependency (PreservedMembers, typeof (Button))]
-    [DynamicDependency (PreservedMembers, typeof (CharMap))]
-    [DynamicDependency (PreservedMembers, typeof (CheckBox))]
-    [DynamicDependency (PreservedMembers, typeof (Dialog))]
-    [DynamicDependency (PreservedMembers, typeof (FileDialog))]
-    [DynamicDependency (PreservedMembers, typeof (FileDialogStyle))]
-    [DynamicDependency (PreservedMembers, typeof (FrameView))]
-    [DynamicDependency (PreservedMembers, typeof (HexView))]
-    [DynamicDependency (PreservedMembers, typeof (LinearRange))]
-    [DynamicDependency (PreservedMembers, typeof (Menu))]
-    [DynamicDependency (PreservedMembers, typeof (MenuBar))]
-    [DynamicDependency (PreservedMembers, typeof (MessageBox))]
-    [DynamicDependency (PreservedMembers, typeof (PopoverMenu))]
-    [DynamicDependency (PreservedMembers, typeof (SelectorBase))]
-    [DynamicDependency (PreservedMembers, typeof (StatusBar))]
-    [DynamicDependency (PreservedMembers, typeof (TextField))]
-    [DynamicDependency (PreservedMembers, typeof (TextView))]
-    [DynamicDependency (PreservedMembers, typeof (Window))]
-    internal static Type [] GetTypes () => _types;
-
     private static readonly Type [] _types =
     [
         typeof (Application),
@@ -100,4 +69,35 @@ internal static class ConfigPropertyHostTypes
         typeof (TextView),
         typeof (Window)
     ];
+
+    [DynamicDependency (PreservedMembers, typeof (Application))]
+    [DynamicDependency (PreservedMembers, typeof (ConfigurationManager))]
+    [DynamicDependency (PreservedMembers, typeof (SchemeManager))]
+    [DynamicDependency (PreservedMembers, typeof (ThemeManager))]
+    [DynamicDependency (PreservedMembers, typeof (Color))]
+    [DynamicDependency (PreservedMembers, typeof (Glyphs))]
+    [DynamicDependency (PreservedMembers, typeof (Driver))]
+    [DynamicDependency (PreservedMembers, typeof (Key))]
+    [DynamicDependency (PreservedMembers, typeof (NerdFonts))]
+    [DynamicDependency (PreservedMembers, typeof (Trace))]
+    [DynamicDependency (PreservedMembers, typeof (View))]
+    [DynamicDependency (PreservedMembers, typeof (Button))]
+    [DynamicDependency (PreservedMembers, typeof (CharMap))]
+    [DynamicDependency (PreservedMembers, typeof (CheckBox))]
+    [DynamicDependency (PreservedMembers, typeof (Dialog))]
+    [DynamicDependency (PreservedMembers, typeof (FileDialog))]
+    [DynamicDependency (PreservedMembers, typeof (FileDialogStyle))]
+    [DynamicDependency (PreservedMembers, typeof (FrameView))]
+    [DynamicDependency (PreservedMembers, typeof (HexView))]
+    [DynamicDependency (PreservedMembers, typeof (LinearRange))]
+    [DynamicDependency (PreservedMembers, typeof (Menu))]
+    [DynamicDependency (PreservedMembers, typeof (MenuBar))]
+    [DynamicDependency (PreservedMembers, typeof (MessageBox))]
+    [DynamicDependency (PreservedMembers, typeof (PopoverMenu))]
+    [DynamicDependency (PreservedMembers, typeof (SelectorBase))]
+    [DynamicDependency (PreservedMembers, typeof (StatusBar))]
+    [DynamicDependency (PreservedMembers, typeof (TextField))]
+    [DynamicDependency (PreservedMembers, typeof (TextView))]
+    [DynamicDependency (PreservedMembers, typeof (Window))]
+    internal static Type [] GetTypes () => _types;
 }

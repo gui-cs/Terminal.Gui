@@ -534,10 +534,14 @@ public class ConfigProperty
                         }
                     }
 
-                    if (hasConfigProp)
+                    if (!hasConfigProp)
                     {
-                        dict [type.Name] = type;
+                        continue;
                     }
+
+                    // TryAdd — never overwrite a statically-registered Terminal.Gui host. An external assembly
+                    // with a same-named type (e.g. a consumer's own `Window`) must not displace the built-in entry.
+                    dict.TryAdd (type.Name, type);
                 }
             }
 
