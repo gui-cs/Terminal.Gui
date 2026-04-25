@@ -133,6 +133,7 @@ public class KittyKeyboardParsingTests
         Assert.NotNull (key);
         Assert.True (key.IsModifierOnly);
         Assert.Equal (ModifierKey.LeftShift, key.ModifierKey);
+        Assert.True (key.IsShift);
     }
 
     [Fact]
@@ -144,6 +145,7 @@ public class KittyKeyboardParsingTests
         Assert.NotNull (key);
         Assert.True (key.IsModifierOnly);
         Assert.Equal (ModifierKey.LeftCtrl, key.ModifierKey);
+        Assert.True (key.IsCtrl);
     }
 
     [Fact]
@@ -155,6 +157,7 @@ public class KittyKeyboardParsingTests
         Assert.NotNull (key);
         Assert.True (key.IsModifierOnly);
         Assert.Equal (ModifierKey.LeftAlt, key.ModifierKey);
+        Assert.True (key.IsAlt);
     }
 
     [Fact]
@@ -250,13 +253,15 @@ public class KittyKeyboardParsingTests
     [Fact]
     public void KittyPattern_LeftAlt_WithCtrlModifier_PreservesBothStates ()
     {
+        // ESC[57443;5u = LeftAlt (implicit Alt) with Ctrl held (explicit Ctrl=5)
+        // After the fix, implicit Alt is combined with explicit Ctrl
         Key? key = _pattern.GetKey ("\u001b[57443;5u");
 
         Assert.NotNull (key);
         Assert.True (key.IsModifierOnly);
         Assert.Equal (ModifierKey.LeftAlt, key.ModifierKey);
         Assert.True (key.IsCtrl);
-        Assert.False (key.IsAlt);
+        Assert.True (key.IsAlt);
         Assert.Equal (KeyEventType.Press, key.EventType);
     }
 
@@ -287,6 +292,68 @@ public class KittyKeyboardParsingTests
     }
 
     [Fact]
+    public void KittyPattern_LeftCtrl_WithCapsLockModifier_PreservesCtrlState ()
+    {
+        Key? key = _pattern.GetKey ("\u001b[57442;65u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftCtrl, key.ModifierKey);
+        Assert.True (key.IsCtrl);
+        Assert.False (key.IsAlt);
+        Assert.False (key.IsShift);
+        Assert.Equal (KeyEventType.Press, key.EventType);
+    }
+
+    [Fact]
+    public void KittyPattern_LeftShift_WithCapsLockModifier_PreservesShiftState ()
+    {
+        Key? key = _pattern.GetKey ("\u001b[57441;65u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftShift, key.ModifierKey);
+        Assert.True (key.IsShift);
+        Assert.False (key.IsAlt);
+        Assert.False (key.IsCtrl);
+        Assert.Equal (KeyEventType.Press, key.EventType);
+    }
+
+    // Regression test for issue where modifier combinations weren't being combined correctly
+    [Fact]
+    public void KittyPattern_LeftCtrl_WithShiftModifier_CombinesImplicitAndExplicit ()
+    {
+        // ESC[57442;2u = LeftCtrl (implicit Ctrl) with Shift held (explicit Shift=2)
+        // Should combine to Ctrl+Shift, not just Shift
+        Key? key = _pattern.GetKey ("\u001b[57442;2u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftCtrl, key.ModifierKey);
+        Assert.True (key.IsCtrl);
+        Assert.True (key.IsShift);
+        Assert.False (key.IsAlt);
+        Assert.Equal (KeyEventType.Press, key.EventType);
+    }
+
+    // Regression test for issue where modifier combinations weren't being combined correctly
+    [Fact]
+    public void KittyPattern_LeftAlt_WithShiftAndCtrlModifiers_CombinesAllModifiers ()
+    {
+        // ESC[57443;6u = LeftAlt (implicit Alt) with Shift+Ctrl held (explicit Shift+Ctrl=6)
+        // Should combine to Alt+Shift+Ctrl, not just Shift+Ctrl
+        Key? key = _pattern.GetKey ("\u001b[57443;6u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (ModifierKey.LeftAlt, key.ModifierKey);
+        Assert.True (key.IsAlt);
+        Assert.True (key.IsShift);
+        Assert.True (key.IsCtrl);
+        Assert.Equal (KeyEventType.Press, key.EventType);
+    }
+
+    [Fact]
     public void KittyPattern_NonModifierKey_IsNotModifierOnly ()
     {
         // ESC[97u = 'a'
@@ -306,6 +373,40 @@ public class KittyKeyboardParsingTests
         Assert.NotNull (key);
         Assert.True (key.IsModifierOnly);
         Assert.Equal (ModifierKey.LeftSuper, key.ModifierKey);
+    }
+
+    [Theory]
+    [InlineData ("\u001b[57358u", ModifierKey.CapsLock, false, false, false)]
+    [InlineData ("\u001b[57359u", ModifierKey.ScrollLock, false, false, false)]
+    [InlineData ("\u001b[57360u", ModifierKey.NumLock, false, false, false)]
+    [InlineData ("\u001b[57441u", ModifierKey.LeftShift, true, false, false)]
+    [InlineData ("\u001b[57442u", ModifierKey.LeftCtrl, false, false, true)]
+    [InlineData ("\u001b[57443u", ModifierKey.LeftAlt, false, true, false)]
+    [InlineData ("\u001b[57444u", ModifierKey.LeftSuper, false, false, false)]
+    [InlineData ("\u001b[57445u", ModifierKey.LeftHyper, false, false, false)]
+    [InlineData ("\u001b[57447u", ModifierKey.RightShift, true, false, false)]
+    [InlineData ("\u001b[57448u", ModifierKey.RightCtrl, false, false, true)]
+    [InlineData ("\u001b[57449u", ModifierKey.RightAlt, false, true, false)]
+    [InlineData ("\u001b[57450u", ModifierKey.RightSuper, false, false, false)]
+    [InlineData ("\u001b[57451u", ModifierKey.RightHyper, false, false, false)]
+    [InlineData ("\u001b[57453u", ModifierKey.AltGr, false, true, false)]
+    public void KittyPattern_AllMappedModifierPresses_ParseWithExpectedImplicitState (
+        string sequence,
+        ModifierKey expectedModifier,
+        bool expectedShift,
+        bool expectedAlt,
+        bool expectedCtrl
+    )
+    {
+        Key? key = _pattern.GetKey (sequence);
+
+        Assert.NotNull (key);
+        Assert.True (key.IsModifierOnly);
+        Assert.Equal (expectedModifier, key.ModifierKey);
+        Assert.Equal (expectedShift, key.IsShift);
+        Assert.Equal (expectedAlt, key.IsAlt);
+        Assert.Equal (expectedCtrl, key.IsCtrl);
+        Assert.Equal (KeyEventType.Press, key.EventType);
     }
 
     #endregion
@@ -507,9 +608,30 @@ public class KittyKeyboardParsingTests
 
         Assert.NotNull (key);
         Assert.True (key.IsAlt);
+        Assert.Equal (Key.T.WithAlt, key);
         Assert.Equal (Key.T.WithAlt.KeyCode, key.KeyCode);
         Assert.Equal (string.Empty, key.AssociatedText);
         Assert.Equal (string.Empty, key.GetPrintableText ());
+        Assert.Equal (string.Empty, key.AsGrapheme);
+        Assert.Equal (0, key.AsRune.Value);
+    }
+
+    [Fact]
+    public void KittyPattern_AssociatedText_ShiftAltModifiedPrintableKey_IsSuppressed ()
+    {
+        // ESC[116:84;4;84u = Shift+Alt+T with shifted key 'T' and associated text 'T'
+        Key? key = _pattern.GetKey ("\u001b[116:84;4;84u");
+
+        Assert.NotNull (key);
+        Assert.True (key.IsShift);
+        Assert.True (key.IsAlt);
+        Assert.Equal (Key.T.WithShift.WithAlt, key);
+        Assert.Equal (Key.T.WithShift.WithAlt.KeyCode, key.KeyCode);
+        Assert.Equal ((KeyCode)'T', key.ShiftedKeyCode);
+        Assert.Equal (string.Empty, key.AssociatedText);
+        Assert.Equal (string.Empty, key.GetPrintableText ());
+        Assert.Equal (string.Empty, key.AsGrapheme);
+        Assert.Equal (0, key.AsRune.Value);
     }
 
     [Fact]
