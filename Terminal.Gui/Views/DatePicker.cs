@@ -304,21 +304,26 @@ public class DatePicker : View, IValue<DateTime>
         CreateCalendar ();
         SelectDayOnCalendar (Value.Day);
 
-        _calendar.CellActivated += (_, e) =>
-                                   {
-                                       object dayValue = _table!.Rows [e.Row] [e.Col];
+        _calendar.Activated += (_, _) =>
+                              {
+                                  object dayValue = _table!.Rows [_calendar.Value!.Cursor.Y] [_calendar.Value.Cursor.X];
 
-                                       bool isDay = int.TryParse (dayValue.ToString (), out int day);
+                                  bool isDay = int.TryParse (dayValue.ToString (), out int day);
 
-                                       if (!isDay)
-                                       {
-                                           return;
-                                       }
+                                  if (!isDay)
+                                  {
+                                      return;
+                                  }
 
-                                       ChangeDayDate (day);
-                                       SelectDayOnCalendar (day);
-                                       Text = Value.ToString (Format);
-                                   };
+                                  ChangeDayDate (day);
+                                  SelectDayOnCalendar (day);
+                                  Text = Value.ToString (Format);
+                              };
+
+        _calendar.Accepted += (_, e) =>
+                              {
+                                  RaiseAccepted (e.Context);
+                              };
 
         Width = Dim.Auto (DimAutoStyle.Content);
         Height = Dim.Auto (DimAutoStyle.Content);

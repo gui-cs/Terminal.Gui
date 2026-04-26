@@ -1,20 +1,19 @@
-#nullable disable
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO.Abstractions;
-using static System.Environment;
 
 namespace Terminal.Gui.Views;
 
 /// <summary>Stores style settings for <see cref="FileDialog"/>.</summary>
 public class FileDialogStyle
 {
-    private readonly IFileSystem _fileSystem;
+    private readonly IFileSystem? _fileSystem;
 
     /// <summary>Creates a new instance of the <see cref="FileDialogStyle"/> class.</summary>
-    public FileDialogStyle (IFileSystem fileSystem)
+    public FileDialogStyle (IFileSystem? fileSystem)
     {
         _fileSystem = fileSystem;
+
         TreeRootGetter = DefaultTreeRootGetter;
 
         DateFormat = CultureInfo.CurrentCulture.DateTimeFormat.SortableDateTimePattern;
@@ -46,7 +45,7 @@ public class FileDialogStyle
     ///     files via <see cref="ConfigurationManager"/>
     /// </summary>
     [ConfigurationProperty (Scope = typeof (SettingsScope))]
-    public static bool DefaultUseColors { get; set; }
+    public static bool DefaultUseColors { get; set; } = true;
 
     /// <summary>
     ///     Gets or sets the default value to use for <see cref="UseUnicodeCharacters"/>. This can be populated from .tui
@@ -107,7 +106,7 @@ public class FileDialogStyle
     public string SizeColumnName { get; set; } = Strings.fdSize;
 
     /// <summary>Gets the style settings for the table of files (in currently selected directory).</summary>
-    public TableStyle TableStyle { get; internal set; }
+    public TableStyle? TableStyle { get; internal set; }
 
     /// <summary>
     ///     Gets or Sets the method for getting the root tree objects that are displayed in the collapse-able tree in the
@@ -118,7 +117,7 @@ public class FileDialogStyle
     public Func<Dictionary<IDirectoryInfo, string>> TreeRootGetter { get; set; }
 
     /// <summary>Gets the style settings for the collapse-able directory/places tree</summary>
-    public TreeStyle TreeStyle { get; internal set; }
+    public TreeStyle? TreeStyle { get; internal set; }
 
     /// <summary>Gets or sets the header text displayed in the Type column of the files table.</summary>
     public string TypeColumnName { get; set; } = Strings.fdType;
@@ -138,24 +137,31 @@ public class FileDialogStyle
     /// </summary>
     public string WrongFileTypeFeedback { get; set; } = Strings.fdWrongFileTypeFeedback;
 
-
     /// <summary>
-    /// <para>
-    /// Gets or sets a flag that determines behaviour when opening (double click/enter) or selecting a
-    /// directory in a <see cref="FileDialog"/>.
-    /// </para>
-    /// <para>If <see langword="false"/> (the default) then the <see cref="FileDialog.Path"/> is simply
-    /// updated to the new directory path.</para>
-    /// <para>If <see langword="true"/> then any typed or previously selected file
-    /// name is preserved (e.g. "c:/hello.csv" when opening "temp" becomes "c:/temp/hello.csv").
-    /// </para>
+    ///     <para>
+    ///         Gets or sets a flag that determines behaviour when opening (double click/enter) or selecting a
+    ///         directory in a <see cref="FileDialog"/>.
+    ///     </para>
+    ///     <para>
+    ///         If <see langword="false"/> (the default) then the <see cref="FileDialog.Path"/> is simply
+    ///         updated to the new directory path.
+    ///     </para>
+    ///     <para>
+    ///         If <see langword="true"/> then any typed or previously selected file
+    ///         name is preserved (e.g. "c:/hello.csv" when opening "temp" becomes "c:/temp/hello.csv").
+    ///     </para>
     /// </summary>
     public bool PreserveFilenameOnDirectoryChanges { get; set; }
 
-
-    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "<Pending>")]
+    [UnconditionalSuppressMessage ("AOT",
+                                   "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
+                                   Justification = "<Pending>")]
     private Dictionary<IDirectoryInfo, string> DefaultTreeRootGetter ()
     {
+        if (_fileSystem is null)
+        {
+            return [];
+        }
         Dictionary<IDirectoryInfo, string> roots = new ();
 
         try
@@ -174,11 +180,11 @@ public class FileDialogStyle
 
         try
         {
-            foreach (SpecialFolder special in Enum.GetValues (typeof (SpecialFolder)).Cast<SpecialFolder> ())
+            foreach (Environment.SpecialFolder special in Enum.GetValues (typeof (Environment.SpecialFolder)).Cast<Environment.SpecialFolder> ())
             {
                 try
                 {
-                    string path = GetFolderPath (special);
+                    string path = Environment.GetFolderPath (special);
 
                     if (string.IsNullOrWhiteSpace (path))
                     {

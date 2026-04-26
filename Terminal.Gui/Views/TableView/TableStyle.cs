@@ -22,25 +22,23 @@ public class TableStyle
     public Dictionary<int, ColumnStyle> ColumnStyles { get; set; } = new ();
 
     /// <summary>
-    ///     Determines rendering when the last column in the table is visible, but it's content or
+    ///     Determines rendering when the last column in the table is visible, but its content or
     ///     <see cref="ColumnStyle.MaxWidth"/> is less than the remaining space in the control.  True (the default) will expand
     ///     the column to fill the remaining bounds of the control.  False will draw a column ending line and leave a blank
     ///     column that cannot be selected in the remaining space.
     /// </summary>
-    /// <value></value>
     public bool ExpandLastColumn { get; set; } = true;
 
     /// <summary>
     ///     True to invert the colors of the first symbol of the selected cell in the <see cref="TableView"/>. This gives
-    ///     the appearance of a cursor for when the <see cref="IDriver"/> doesnt otherwise show this
+    ///     the appearance of a cursor for when the <see cref="IDriver"/> doesn't otherwise show this.
     /// </summary>
     public bool InvertSelectedCellFirstCharacter { get; set; }
 
     /// <summary>
-    ///     Delegate for coloring specific rows in a different color.  For cell color
-    ///     <see cref="ColumnStyle.ColorGetter"/>
+    ///     Delegate for coloring specific rows in a different color.  For cell color see
+    ///     <see cref="ColumnStyle.ColorGetter"/>.
     /// </summary>
-    /// <value></value>
     public RowColorGetterDelegate? RowColorGetter { get; set; }
 
     /// <summary>

@@ -55,14 +55,12 @@ public class ColumnStyle
     /// </summary>
     public int MinWidth { get; set; }
 
-    private bool _visible = true;
-
     /// <summary>
     ///     Gets or Sets a value indicating whether the column should be visible to the user. This affects both whether it
     ///     is rendered and whether it can be selected. Defaults to true.
     /// </summary>
     /// <remarks>If <see cref="MaxWidth"/> is 0 then <see cref="Visible"/> will always return false.</remarks>
-    public bool Visible { get => MaxWidth >= 0 && _visible; set => _visible = value; }
+    public bool Visible { get => MaxWidth >= 0 && field; set; } = true;
 
     /// <summary>
     ///     Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/
