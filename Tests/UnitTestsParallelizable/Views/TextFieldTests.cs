@@ -1612,4 +1612,24 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
          Assert.Equal (0, tf.InsertionPoint);
          Assert.Equal (0, tf.ScrollOffset);
      }
+
+     [Fact]
+     public void ReadOnly_ShouldSetInsertionPointAndScrollOffsetToZero_AfterCopyingText ()
+     {
+         TextField tf = new () { Width = 5, ReadOnly = true, Text = "hello world" };
+         tf.BeginInit ();
+         tf.EndInit ();
+
+         // Select all text
+         tf.SelectAll ();
+         Assert.Equal (11, tf.InsertionPoint);
+         Assert.Equal (7, tf.ScrollOffset);
+         Assert.Equal ("hello world", tf.SelectedText);
+
+         // Copy text and verify insertion point and scroll offset are still at zero
+         tf.Copy ();
+         Assert.Equal (0, tf.InsertionPoint);
+         Assert.Equal (0, tf.ScrollOffset);
+         Assert.Null (tf.SelectedText);
+     }
 }
