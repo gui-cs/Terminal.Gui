@@ -182,8 +182,7 @@ public partial class TableView
                 int lastColIdx = nonHiddenColumns.Any () ? nonHiddenColumns.Last ().colIdx : -1;
 
                 //right border
-                int borderWidth = Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
-                contentSize.Width += borderWidth;
+                contentSize.Width += Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
 
                 var startRow = 0;
                 int rowsToRender = Table.Rows;
@@ -196,9 +195,10 @@ public partial class TableView
                 }
 
                 // Calculate the content size based on the table's data
-                for (var i = 0; i < nonHiddenColumns.Count; i++)
+                var columnIndex = 0;
+
+                foreach ((int colIdx, ColumnStyle? colStyle) in nonHiddenColumns)
                 {
-                    (int colIdx, ColumnStyle? colStyle) = nonHiddenColumns [i];
                     int maxContentSize = CalculateMaxCellWidth (colIdx, colStyle, startRow, rowsToRender) + padding;
                     int colWidth = maxContentSize + padding;
 
@@ -218,8 +218,8 @@ public partial class TableView
 
                     if (isVeryLast)
                     {
-                        // remaining space for last column
-                        int remainingSpace = Viewport.Width - contentSize.Width - borderWidth;
+                        //remaining space for last column
+                        int remainingSpace = Viewport.Width - contentSize.Width - (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0);
 
                         if (Style.ExpandLastColumn && colWidth < remainingSpace)
                         {
@@ -231,7 +231,8 @@ public partial class TableView
                         // Reserve at least the header width for each subsequent visible column so that a wide
                         // column does not consume all viewport space and push later columns off-screen. This is
                         // O(columns) — we never iterate cell rows here. See issue #5072.
-                        int reservedForRemaining = ReserveSpaceForRemainingColumns (nonHiddenColumns, i + 1);
+                        int reservedForRemaining = ReserveSpaceForRemainingColumns (nonHiddenColumns, columnIndex + 1);
+                        int borderWidth = Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
                         int availableForThisCol = Viewport.Width - contentSize.Width - reservedForRemaining - borderWidth - 1; // -1 for this column's separator
 
                         // Don't shrink below this column's own minimum (header width or configured minimum)
@@ -252,10 +253,12 @@ public partial class TableView
                         // for separator symbols between columns
                         contentSize.Width += 1;
                     }
+
+                    columnIndex++;
                 }
 
                 // for left border
-                contentSize.Width += borderWidth;
+                contentSize.Width += Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
             }
             else
             {
