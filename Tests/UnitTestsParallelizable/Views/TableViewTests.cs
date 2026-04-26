@@ -408,6 +408,48 @@ public class TableViewTests : TestDriverBase
         public string [] ColumnNames => ["Col1"];
     }
 
+    // Copilot - regression: ColumnOffset setter must not throw when all columns are hidden (0 visible columns)
+    [Fact]
+    public void ColumnOffset_AllColumnsHidden_DoesNotThrow ()
+    {
+        DataTable dt = new ();
+        dt.Columns.Add ("Col1");
+        dt.Rows.Add ("a");
+
+        TableView tableView = new () { Table = new DataTableSource (dt) };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+
+        // Hide the only column — this makes the cache empty (0 visible columns)
+        tableView.Style.GetOrCreateColumnStyle (0).Visible = false;
+        tableView.RefreshContentSize ();
+
+        // Setting ColumnOffset=0 with an empty render cache previously computed value=-1
+        // and then indexed _columnsToRenderCache![-1], causing IndexOutOfRangeException
+        Exception? ex = Record.Exception (() => tableView.ColumnOffset = 0);
+
+        Assert.Null (ex);
+        Assert.Equal (0, tableView.ColumnOffset);
+
+        tableView.Dispose ();
+    }
+
+    // Copilot - regression: ColumnOffset setter must not throw when table is null
+    [Fact]
+    public void ColumnOffset_NullTable_DoesNotThrow ()
+    {
+        TableView tableView = new ();
+        tableView.BeginInit ();
+        tableView.EndInit ();
+
+        Exception? ex = Record.Exception (() => tableView.ColumnOffset = 0);
+
+        Assert.Null (ex);
+        Assert.Equal (0, tableView.ColumnOffset);
+
+        tableView.Dispose ();
+    }
+
     [Fact]
     public void Test_SumColumnWidth_GraphemeClusters ()
     {

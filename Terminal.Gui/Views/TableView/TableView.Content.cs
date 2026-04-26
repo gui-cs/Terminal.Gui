@@ -38,10 +38,19 @@ public partial class TableView
                 CalculateContentSize ();
             }
 
-            if (value >= (_columnsToRenderCache?.Length ?? 0))
+            int cacheLength = _columnsToRenderCache?.Length ?? 0;
+
+            if (cacheLength == 0)
             {
-                value = (_columnsToRenderCache?.Length ?? 0) - 1;
+                // No visible columns — nothing to scroll to
+                return;
             }
+
+            if (value >= cacheLength)
+            {
+                value = cacheLength - 1;
+            }
+
             int prev = ColumnOffset;
             Viewport = Viewport with { X = _columnsToRenderCache! [value].X };
 
