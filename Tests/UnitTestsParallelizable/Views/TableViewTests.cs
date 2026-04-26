@@ -391,9 +391,15 @@ public class TableViewTests : TestDriverBase
     /// <summary>A minimal <see cref="ITableSource"/> that returns <see langword="null"/> for the first cell.</summary>
     private sealed class NullCellTableSource : ITableSource
     {
-        private readonly string?[] _data = [null, "apple", "apricot"];
+        // Row 0 intentionally holds null to exercise null-cell handling in TableCollectionNavigator
+        private readonly object? [] _data = [null, "apple", "apricot"];
 
-        public object this [int row, int col] => _data [row]!;
+        public object this [int row, int col]
+        {
+#pragma warning disable CS8603 // Possible null reference return - intentional for testing null-cell handling
+            get => _data [row];
+#pragma warning restore CS8603
+        }
 
         public int Rows => _data.Length;
 

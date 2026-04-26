@@ -28,4 +28,3 @@ internal class TableCollectionNavigator : CollectionNavigatorBase
     /// <inheritdoc/>
     protected override int GetCollectionLength () => _tableView.Table?.Rows ?? 0;
 }
-
