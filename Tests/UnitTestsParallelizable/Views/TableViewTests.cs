@@ -586,11 +586,11 @@ public class TableViewTests : TestDriverBase
         Assert.True (owner.X > status.X);
 
         // Every column's right edge must lie within the viewport
-        Assert.True (description.X + description.Width - 1 <= tableView.Viewport.Width,
+        Assert.True (description.X + description.Width - 1 < tableView.Viewport.Width,
                      $"Description right edge {description.X + description.Width - 1} exceeds viewport {tableView.Viewport.Width}");
-        Assert.True (status.X + status.Width - 1 <= tableView.Viewport.Width,
+        Assert.True (status.X + status.Width - 1 < tableView.Viewport.Width,
                      $"Status right edge {status.X + status.Width - 1} exceeds viewport {tableView.Viewport.Width}");
-        Assert.True (owner.X + owner.Width - 1 <= tableView.Viewport.Width,
+        Assert.True (owner.X + owner.Width - 1 < tableView.Viewport.Width,
                      $"Owner right edge {owner.X + owner.Width - 1} exceeds viewport {tableView.Viewport.Width}");
 
         // Status and Owner each must have at least header-width room (excluding separator)
