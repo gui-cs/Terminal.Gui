@@ -182,7 +182,8 @@ public partial class TableView
                 int lastColIdx = nonHiddenColumns.Any () ? nonHiddenColumns.Last ().colIdx : -1;
 
                 //right border
-                contentSize.Width += Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
+                int borderWidth = Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
+                contentSize.Width += borderWidth;
 
                 var startRow = 0;
                 int rowsToRender = Table.Rows;
@@ -195,8 +196,9 @@ public partial class TableView
                 }
 
                 // Calculate the content size based on the table's data
-                foreach ((int colIdx, ColumnStyle? colStyle) in nonHiddenColumns)
+                for (var i = 0; i < nonHiddenColumns.Count; i++)
                 {
+                    (int colIdx, ColumnStyle? colStyle) = nonHiddenColumns [i];
                     int maxContentSize = CalculateMaxCellWidth (colIdx, colStyle, startRow, rowsToRender) + padding;
                     int colWidth = maxContentSize + padding;
 
@@ -212,19 +214,32 @@ public partial class TableView
                         }
                     }
 
-                    // ToDo: MinAcceptableWidth handling?
-                    // if (colStyle is { MinAcceptableWidth: > 0 }
-
                     bool isVeryLast = colIdx == lastColIdx;
 
                     if (isVeryLast)
                     {
-                        //remaining space for last column
-                        int remainingSpace = Viewport.Width - contentSize.Width - (Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0);
+                        // remaining space for last column
+                        int remainingSpace = Viewport.Width - contentSize.Width - borderWidth;
 
                         if (Style.ExpandLastColumn && colWidth < remainingSpace)
                         {
                             colWidth = remainingSpace;
+                        }
+                    }
+                    else if (Viewport.Width > 0)
+                    {
+                        // Reserve at least the header width for each subsequent visible column so that a wide
+                        // column does not consume all viewport space and push later columns off-screen. This is
+                        // O(columns) — we never iterate cell rows here. See issue #5072.
+                        int reservedForRemaining = ReserveSpaceForRemainingColumns (nonHiddenColumns, i + 1);
+                        int availableForThisCol = Viewport.Width - contentSize.Width - reservedForRemaining - borderWidth - 1; // -1 for this column's separator
+
+                        // Don't shrink below this column's own minimum (header width or configured minimum)
+                        int thisColMin = MinimumWidthFor (colIdx, colStyle);
+
+                        if (colWidth > availableForThisCol && availableForThisCol >= thisColMin)
+                        {
+                            colWidth = availableForThisCol;
                         }
                     }
 
@@ -240,7 +255,7 @@ public partial class TableView
                 }
 
                 // for left border
-                contentSize.Width += Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
+                contentSize.Width += borderWidth;
             }
             else
             {
@@ -266,5 +281,74 @@ public partial class TableView
         }
 
         return contentSize;
+    }
+
+    /// <summary>
+    ///     Returns the minimum render width to reserve for a column that has not yet been laid out, based on its header
+    ///     width and any configured minimum (clamped to <see cref="MaxCellWidth"/> and
+    ///     <see cref="ColumnStyle.MaxWidth"/>). This intentionally does not inspect cell data — it is O(1) per column to
+    ///     keep large or paginated <see cref="ITableSource"/> implementations performant.
+    /// </summary>
+    private int MinimumWidthFor (int colIdx, ColumnStyle? colStyle)
+    {
+        int min = _table!.ColumnNames [colIdx].GetColumns ();
+
+        if (min < 1)
+        {
+            min = 1;
+        }
+
+        if (colStyle is { MinWidth: > 0 } && colStyle.MinWidth > min)
+        {
+            min = colStyle.MinWidth;
+        }
+
+        if (MinCellWidth > 0 && MinCellWidth > min)
+        {
+            min = MinCellWidth;
+        }
+
+        // Don't reserve more than the column's own ceiling
+        int ceiling = MaxCellWidth;
+
+        if (colStyle is { } && colStyle.MaxWidth < ceiling)
+        {
+            ceiling = colStyle.MaxWidth;
+        }
+
+        if (ceiling < 1)
+        {
+            ceiling = 1;
+        }
+
+        if (min > ceiling)
+        {
+            min = ceiling;
+        }
+
+        return min;
+    }
+
+    /// <summary>
+    ///     Returns the total horizontal space (including inter-column separators) that should be reserved for the
+    ///     visible columns starting at <paramref name="startIndex"/> in <paramref name="nonHiddenColumns"/>.
+    /// </summary>
+    private int ReserveSpaceForRemainingColumns (List<(int colIdx, ColumnStyle? colStyle)> nonHiddenColumns, int startIndex)
+    {
+        var reserved = 0;
+
+        for (int j = startIndex; j < nonHiddenColumns.Count; j++)
+        {
+            (int otherColIdx, ColumnStyle? otherColStyle) = nonHiddenColumns [j];
+            reserved += MinimumWidthFor (otherColIdx, otherColStyle);
+
+            // Separator between this reserved column and the next reserved column
+            if (j < nonHiddenColumns.Count - 1)
+            {
+                reserved += 1;
+            }
+        }
+
+        return reserved;
     }
 }
