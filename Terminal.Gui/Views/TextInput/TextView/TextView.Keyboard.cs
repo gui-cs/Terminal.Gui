@@ -142,6 +142,12 @@ public partial class TextView
             return Autocomplete.ProcessKey (a);
         }
 
+        if (a.IsAlt || a.IsCtrl)
+        {
+            // Never insert modified keys
+            return false;
+        }
+
         if (a.AsRune is { } rune && rune != default (Rune) && Rune.IsControl (rune))
         {
             return false;

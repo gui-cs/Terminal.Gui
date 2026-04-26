@@ -3920,4 +3920,39 @@ public class TextViewTests (ITestOutputHelper output)
                        """;
         DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
     }
+
+    /// <summary>
+    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     When Kitty keyboard protocol sets AssociatedText on Alt+letter keys,
+    ///     TextView must not insert the text. Alt-modified keys are never text input.
+    /// </summary>
+    [Fact]
+    public void AltKey_With_AssociatedText_Does_Not_Insert_Into_TextView ()
+    {
+        // Copilot
+        TextView tv = new () { Width = 20, Height = 5 };
+        tv.SetFocus ();
+
+        Key altT = new (Key.T.WithAlt) { AssociatedText = "t" };
+        tv.NewKeyDownEvent (altT);
+
+        Assert.Equal ("", tv.Text);
+    }
+
+    /// <summary>
+    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     Ctrl-modified keys with AssociatedText must not be inserted as text.
+    /// </summary>
+    [Fact]
+    public void CtrlKey_With_AssociatedText_Does_Not_Insert_Into_TextView ()
+    {
+        // Copilot
+        TextView tv = new () { Width = 20, Height = 5 };
+        tv.SetFocus ();
+
+        Key ctrlT = new (Key.T.WithCtrl) { AssociatedText = "t" };
+        tv.NewKeyDownEvent (ctrlT);
+
+        Assert.Equal ("", tv.Text);
+    }
 }
