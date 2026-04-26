@@ -152,16 +152,16 @@ public partial class FileDialog
             return _tableView.GetScheme ();
         }
 
-        Color color = Style.ColorProvider.GetColor (stats.FileSystemInfo!) ?? new Color (Color.White);
-        var black = new Color (Color.Black);
+        Color foreground = Style.ColorProvider.GetColor (stats.FileSystemInfo!) ?? GetAttributeForRole (VisualRole.Normal).Foreground;
+        Color background = GetAttributeForRole (VisualRole.Normal).Background;
 
         // TODO: Add some kind of cache for this
         return new Scheme
         {
-            Normal = new Attribute (color, black),
-            HotNormal = new Attribute (color, black),
-            Focus = new Attribute (black, color),
-            HotFocus = new Attribute (black, color)
+            Normal = new Attribute (foreground, background),
+            HotNormal = new Attribute (foreground, background),
+            Focus = new Attribute (background, foreground),
+            HotFocus = new Attribute (background, foreground)
         };
     }
 

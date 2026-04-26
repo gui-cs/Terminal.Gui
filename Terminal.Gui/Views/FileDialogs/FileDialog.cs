@@ -123,7 +123,7 @@ public partial class FileDialog : Dialog, IDesignable
         // Create table view container (right pane)
         _tableViewContainer = new View
         {
-            X = 0,
+            X = -1,
             Y = Pos.Bottom (_btnBack),
             Width = Dim.Fill (),
             Height = Dim.Fill (),
@@ -154,11 +154,20 @@ public partial class FileDialog : Dialog, IDesignable
             Visible = true
         };
 
+        var fileDialogTreeBuilder = new FileSystemTreeBuilder { IncludeFiles = false };
+        _treeView.TreeBuilder = fileDialogTreeBuilder;
+        _treeView.AspectGetter = AspectGetter;
+        Style.TreeStyle = _treeView.Style;
+
+        _treeView.SelectionChanged += TreeView_SelectionChanged;
+        _treeView.KeystrokeNavigator.Matcher = new FileSystemCollectionNavigationMatcher ();
+
         _tableView = new TableView { Width = Dim.Fill (), Height = Dim.Fill (_tbFind!) - 1, FullRowSelect = true, Id = "_tableView" };
         _tableView.CollectionNavigator = new FileDialogCollectionNavigator (this, _tableView);
         _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
         _tableView.Activating += OnTableViewActivating;
         _tableView.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
+
         Style.TableStyle = _tableView.Style;
 
         ColumnStyle nameStyle = Style.TableStyle.GetOrCreateColumnStyle (0);
@@ -177,27 +186,14 @@ public partial class FileDialog : Dialog, IDesignable
         typeStyle.MinWidth = 6;
         typeStyle.ColorGetter = ColorGetter;
 
-        var fileDialogTreeBuilder = new FileSystemTreeBuilder { IncludeFiles = false };
-        _treeView.TreeBuilder = fileDialogTreeBuilder;
-        _treeView.AspectGetter = AspectGetter;
-        Style.TreeStyle = _treeView.Style;
-
-        _treeView.SelectionChanged += TreeView_SelectionChanged;
-        _treeView.KeystrokeNavigator.Matcher = new FileSystemCollectionNavigationMatcher ();
-
         _tableViewContainer.Add (_tableView);
 
-        _tableView.Style.ShowHorizontalHeaderOverline = true;
+        _tableView.Style.ShowHorizontalHeaderOverline = false;
         _tableView.Style.ShowVerticalCellLines = true;
-        _tableView.Style.ShowVerticalHeaderLines = true;
+        _tableView.Style.ShowVerticalHeaderLines = false;
         _tableView.Style.AlwaysShowHeaders = true;
-        _tableView.Style.ShowHorizontalHeaderUnderline = true;
-        _tableView.Style.ShowHorizontalBottomLine = true;
-
-        _history = new FileDialogHistory (this);
-
-        _tbPath.TextChanged += (_, _) => PathChanged ();
-
+        _tableView.Style.ShowHorizontalHeaderUnderline = false;
+        _tableView.Style.ShowHorizontalBottomLine = false;
         _tableView.Accepted += TableViewOnAccepted;
         _tableView.KeyDown += (_, k) => k.Handled = TableView_KeyDown (k);
         _tableView.ValueChanged += TableViewOnValueChanged;
@@ -205,7 +201,7 @@ public partial class FileDialog : Dialog, IDesignable
         _tableView.KeyBindings.ReplaceCommands (Key.Home, Command.Start);
         _tableView.KeyBindings.ReplaceCommands (Key.End, Command.End);
         _tableView.KeyBindings.ReplaceCommands (Key.Home.WithShift, Command.StartExtend);
-        _tableView.KeyBindings.ReplaceCommands (Key.End.WithShift, Command.EndExtend);
+        _tableView.KeyBindings.ReplaceCommands (Key.End.WithShift, Command.EndExtend); _history = new FileDialogHistory (this);
 
         // Changing the key-bindings of a View is not allowed, however,
         // by default, Runnable doesn't bind to Command.Context, so
@@ -213,6 +209,8 @@ public partial class FileDialog : Dialog, IDesignable
         _tableView.CommandNotBound += TableViewHandleCommandNotBound;
         _tableView.KeyBindings.Add (Key.Space.WithCtrl, Command.Context);
         _tableView.MouseBindings.Add (MouseFlags.RightButtonClicked, Command.Context);
+
+        _tbPath.TextChanged += (_, _) => PathChanged ();
 
         _tbFind = new TextField { X = 1, Width = Dim.Width (_tableView) - 1, Y = Pos.AnchorEnd (), Id = "_tbFind" };
 
@@ -242,6 +240,7 @@ public partial class FileDialog : Dialog, IDesignable
                                    o.Handled = true;
                                }
                            };
+
         AllowsMultipleSelection = false;
 
         UpdateNavigationVisibility ();

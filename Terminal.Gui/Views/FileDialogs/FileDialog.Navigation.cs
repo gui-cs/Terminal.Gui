@@ -267,7 +267,7 @@ public partial class FileDialog
             _tableViewContainer.X = 0;
             _tableViewContainer.Width = Dim.Fill ();
             _tableViewContainer.Arrangement = ViewArrangement.Fixed;
-            _tableViewContainer.Border.Thickness = new Thickness (0);
+            _tableViewContainer.Border.Thickness = new Thickness (1, 0, 0, 0);
         }
         _btnTreeToggle.Text = GetTreeToggleText (visible);
 
