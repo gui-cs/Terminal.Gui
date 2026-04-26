@@ -14,16 +14,18 @@ internal class TableCollectionNavigator : CollectionNavigatorBase
         int col = _tableView.FullRowSelect ? 0 : _tableView.Value?.Cursor.X ?? 0;
         object? rawValue = _tableView.Table? [idx, col];
 
-        ColumnStyle? style = _tableView.Style.GetColumnStyleIfAny (col);
-
-        if (rawValue is { })
+        if (rawValue is null or DBNull)
         {
-            return (style?.RepresentationGetter?.Invoke (rawValue) ?? rawValue) ?? throw new InvalidOperationException ();
+            return string.Empty;
         }
 
-        throw new InvalidOperationException ();
+        ColumnStyle? style = _tableView.Style.GetColumnStyleIfAny (col);
+        string? representation = style?.RepresentationGetter?.Invoke (rawValue);
+
+        return representation ?? rawValue;
     }
 
     /// <inheritdoc/>
-    protected override int GetCollectionLength () => _tableView.Table?.Rows ?? throw new InvalidOperationException ();
+    protected override int GetCollectionLength () => _tableView.Table?.Rows ?? 0;
 }
+

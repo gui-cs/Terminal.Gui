@@ -109,7 +109,9 @@ public partial class TableView
             return false;
         }
 
-        int? match = CollectionNavigator.GetNextMatchingItem (row, (char)key);
+        // Pass null when there is no valid selection (row < 0), so the navigator starts from the beginning
+        int? rowForNavigator = row < 0 ? null : row;
+        int? match = CollectionNavigator.GetNextMatchingItem (rowForNavigator, (char)key);
 
         if (match == null)
         {

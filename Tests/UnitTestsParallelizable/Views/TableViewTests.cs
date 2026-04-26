@@ -332,6 +332,76 @@ public class TableViewTests : TestDriverBase
         tableView.Dispose ();
     }
 
+    // Copilot - regression: TableCollectionNavigator must not throw when table is null and view is focused
+    [Fact]
+    public void TableCollectionNavigator_NullTable_HasFocus_DoesNotThrow ()
+    {
+        TableView tableView = new ();
+        tableView.HasFocus = true;
+
+        // Table is null + HasFocus=true - keystroke navigation reached via OnKeyDownNotHandled
+        // should not throw InvalidOperationException from GetCollectionLength
+        Exception? ex = Record.Exception (() => tableView.NewKeyDownEvent (Key.A));
+
+        Assert.Null (ex);
+    }
+
+    // Copilot - regression: TableCollectionNavigator must not throw when a cell value is null (custom ITableSource)
+    [Fact]
+    public void TableCollectionNavigator_NullCellValue_DoesNotThrow ()
+    {
+        // Use a custom ITableSource that can return null for cell values
+        // (DataTable wraps null as DBNull.Value, so we need a custom source to test actual null)
+        TableView tableView = new () { Table = new NullCellTableSource () };
+        tableView.HasFocus = true;
+
+        // Pressing 'a' triggers keystroke navigation; row 0 has null cell, row 1 has "apple"
+        // Should not throw InvalidOperationException from ElementAt
+        Exception? ex = Record.Exception (() => tableView.NewKeyDownEvent (Key.A));
+
+        Assert.Null (ex);
+
+        // Should land on "apple" (row 1), skipping the null-cell row gracefully
+        Assert.Equal (1, tableView.Value!.Cursor.Y);
+
+        tableView.Dispose ();
+    }
+
+    // Copilot - regression: TableCollectionNavigator returns string.Empty for DBNull cells
+    [Fact]
+    public void TableCollectionNavigator_DBNullCellValue_DoesNotThrow ()
+    {
+        DataTable dt = new ();
+        dt.Columns.Add ("Col1");
+        dt.Rows.Add (DBNull.Value); // DataTable stores this as DBNull.Value
+        dt.Rows.Add ("banana");
+        dt.Rows.Add ("berry");
+
+        TableView tableView = new () { Table = new DataTableSource (dt) };
+        tableView.HasFocus = true;
+
+        Exception? ex = Record.Exception (() => tableView.NewKeyDownEvent (Key.B));
+
+        Assert.Null (ex);
+        Assert.Equal (1, tableView.Value!.Cursor.Y);
+
+        tableView.Dispose ();
+    }
+
+    /// <summary>A minimal <see cref="ITableSource"/> that returns <see langword="null"/> for the first cell.</summary>
+    private sealed class NullCellTableSource : ITableSource
+    {
+        private readonly string?[] _data = [null, "apple", "apricot"];
+
+        public object this [int row, int col] => _data [row]!;
+
+        public int Rows => _data.Length;
+
+        public int Columns => 1;
+
+        public string [] ColumnNames => ["Col1"];
+    }
+
     [Fact]
     public void Test_SumColumnWidth_GraphemeClusters ()
     {
