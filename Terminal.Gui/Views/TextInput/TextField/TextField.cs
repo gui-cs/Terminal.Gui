@@ -164,6 +164,11 @@ public partial class TextField : View, IDesignable, IValue<string>
             ScrollOffset = 0;
         }
 
+        if (ReadOnly && SelectedLength > 0)
+        {
+            ClearAllSelection ();
+        }
+
         // Reset the flag after handling focus change
         _focusSetByMouse = false;
 

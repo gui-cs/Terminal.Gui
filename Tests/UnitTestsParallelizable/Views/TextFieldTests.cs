@@ -1632,4 +1632,32 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
          Assert.Equal (0, tf.ScrollOffset);
          Assert.Null (tf.SelectedText);
      }
+
+     [Fact]
+     public void ReadOnly_ShouldSetInsertionPointAndScrollOffsetToZeroAndClearAllSelection_OnLeavingFocus ()
+     {
+         TextField tf = new () { Width = 5, ReadOnly = true, Text = "hello world" };
+
+         // Create another view to take focus away
+         View otherView = new () { CanFocus = true };
+
+         // Create a container to hold both views
+         Runnable container = new () { Id = "container", Width = 20, Height = 5 };
+         container.Add (tf, otherView);
+         container.BeginInit ();
+         container.EndInit ();
+
+         // Set focus to TextField and select all text
+         tf.SetFocus ();
+         tf.SelectAll ();
+         Assert.Equal (11, tf.InsertionPoint);
+         Assert.Equal (7, tf.ScrollOffset);
+         Assert.Equal ("hello world", tf.SelectedText);
+
+         // Move focus away and verify insertion point and scroll offset are at zero and selection is cleared
+         otherView.SetFocus ();
+         Assert.Equal (0, tf.InsertionPoint);
+         Assert.Equal (0, tf.ScrollOffset);
+         Assert.Null (tf.SelectedText);
+     }
 }
