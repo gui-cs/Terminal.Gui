@@ -1551,4 +1551,19 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (0, tf.ScrollOffset);
         Assert.Null (tf.SelectedText);
     }
+
+    [Fact]
+    public void ReadOnly_ShouldNotSelectAllText_OnFocus ()
+    {
+        TextField tf = new () { Width = 5, ReadOnly = true, Text = "hello world" };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        tf.SetFocus ();
+
+        Assert.Equal (0, tf.InsertionPoint);
+        Assert.Equal (0, tf.ScrollOffset);
+        Assert.Null (tf.SelectedText);
+    }
+
 }

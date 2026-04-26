@@ -148,8 +148,8 @@ public partial class TextField : View, IDesignable, IValue<string>
             App.Mouse.UngrabMouse ();
         }
 
-        // If gaining focus via keyboard (not mouse), select all text
-        if (newHasFocus && !_focusSetByMouse && _text.Count > 0)
+        // If gaining focus via keyboard (not mouse), select all text if not ReadOnly
+        if (newHasFocus && !ReadOnly && !_focusSetByMouse && _text.Count > 0)
         {
             SelectAll ();
         }
