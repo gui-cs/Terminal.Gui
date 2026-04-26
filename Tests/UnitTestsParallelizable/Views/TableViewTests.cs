@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Reflection;
 using JetBrains.Annotations;
 using UnitTests;
 
@@ -342,6 +343,51 @@ public class TableViewTests : TestDriverBase
         var technologist = "\U0001F469\u200D\U0001F4BB"; // 👩‍💻
         Assert.Equal (4, technologist.EnumerateRunes ().Sum (c => c.GetColumns ()));
         Assert.Equal (2, technologist.GetColumns ());
+    }
+
+    // Copilot
+    [Fact]
+    public void TruncateOrPad_SurrogatePairs_DoesNotThrowOrCorrupt ()
+    {
+        // TruncateOrPad iterates `char` values and casts each to `Rune`.
+        // Surrogate pairs (emoji, CJK supplementary) are two `char`s in UTF-16.
+        // Casting an isolated high/low surrogate to Rune throws ArgumentOutOfRangeException.
+        const string CELL_VALUE = "\U0001F389Hello"; // 🎉Hello — emoji is a surrogate pair
+
+        // Sanity checks
+        Assert.True (char.IsHighSurrogate (CELL_VALUE [0]));
+        Assert.True (char.IsLowSurrogate (CELL_VALUE [1]));
+        Assert.Equal (7, CELL_VALUE.GetColumns ()); // emoji=2 + Hello=5
+
+        // Call private static TruncateOrPad via reflection with availableHorizontalSpace < string width
+        MethodInfo? method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static);
+        Assert.NotNull (method);
+
+        // availableHorizontalSpace=4 forces the truncation branch (7 >= 4)
+        Exception? ex = Record.Exception (() => method.Invoke (null, [CELL_VALUE, CELL_VALUE, 4, null]));
+
+        // Bug: this throws TargetInvocationException wrapping ArgumentOutOfRangeException
+        // because (Rune)highSurrogate is invalid
+        Assert.Null (ex);
+
+        var result = (string)method.Invoke (null, [CELL_VALUE, CELL_VALUE, 4, null])!;
+
+        // Result must not contain isolated surrogates (paired surrogates in emoji are fine)
+        for (var i = 0; i < result.Length; i++)
+        {
+            if (char.IsHighSurrogate (result [i]))
+            {
+                Assert.True (i + 1 < result.Length && char.IsLowSurrogate (result [i + 1]), $"Isolated high surrogate at index {i}");
+                i++; // skip the low surrogate
+            }
+            else
+            {
+                Assert.False (char.IsLowSurrogate (result [i]), $"Isolated low surrogate 0x{(int)result [i]:X4} at index {i}");
+            }
+        }
+
+        // Result width should not exceed available space
+        Assert.True (result.GetColumns () <= 4, $"Truncated result '{result}' exceeds available space");
     }
 
     [Fact]

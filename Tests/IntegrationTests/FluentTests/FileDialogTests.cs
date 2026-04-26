@@ -146,7 +146,7 @@ public class FileDialogTests : TestsAllDrivers
 
     private string GetFileSystemRoot (IFileSystem fs) => RuntimeInformation.IsOSPlatform (OSPlatform.Windows) ? $@"C:{fs.Path.DirectorySeparatorChar}" : "/";
 
-#if FILEDIALOG_ENABLE_TREE
+#if !FILEDIALOG_ENABLE_TREE
     [Theory]
     [MemberData (nameof (GetAllDriverNames))]
     public void SaveFileDialog_PressingPopTree_ShouldNotChangeCancel (string d)

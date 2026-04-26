@@ -562,10 +562,26 @@ public partial class TableView
             return new string (' ', availableHorizontalSpace);
         }
 
-        // if value is too wide
+        // if value is too wide, truncate by grapheme cluster to avoid splitting surrogate pairs
         if (representation.GetColumns () >= availableHorizontalSpace)
         {
-            return new string (representation.TakeWhile (c => (availableHorizontalSpace -= ((Rune)c).GetColumns ()) > 0).ToArray ());
+            StringBuilder sb = new ();
+            int remaining = availableHorizontalSpace;
+
+            foreach (string grapheme in GraphemeHelper.GetGraphemes (representation))
+            {
+                int w = grapheme.GetColumns ();
+
+                if (remaining - w <= 0)
+                {
+                    break;
+                }
+
+                sb.Append (grapheme);
+                remaining -= w;
+            }
+
+            return sb.ToString ();
         }
 
         // pad it out with spaces to the given alignment

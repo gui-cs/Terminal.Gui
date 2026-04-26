@@ -242,7 +242,7 @@ public partial class FileDialog
         _btnUp.Visible = _history.CanUp ();
     }
 
-#if FILEDIALOG_ENABLE_TREE
+#if !FILEDIALOG_ENABLE_TREE
     // --- Tree visibility management ---
 
     private void ToggleTreeVisibility () => SetTreeVisible (!_treeView.Visible);

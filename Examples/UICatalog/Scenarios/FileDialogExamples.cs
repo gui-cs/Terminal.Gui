@@ -206,8 +206,8 @@ public class FileDialogExamples : Scenario
         fd.Style.UseColors = _cbUseColors.Value == CheckState.Checked;
 
         fd.Style.TableStyle?.AlwaysShowHeaders = _cbAlwaysTableShowHeaders.Value == CheckState.Checked;
-#if FILEDIALOG_ENABLE_TREEVIEW
-        fd.Style.TreeStyle.ShowBranchLines = _cbShowTreeBranchLines.Value == CheckState.Checked;
+#if !FILEDIALOG_ENABLE_TREE
+        fd.Style.TreeStyle?.ShowBranchLines = _cbShowTreeBranchLines.Value == CheckState.Checked;
 
         IDirectoryInfoFactory dirInfoFactory = new FileSystem ().DirectoryInfo;
 

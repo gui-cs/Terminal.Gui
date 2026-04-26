@@ -101,7 +101,7 @@ public partial class FileDialog
         ApplySort ();
     }
 
-#if FILEDIALOG_ENABLE_TREE
+#if !FILEDIALOG_ENABLE_TREE
     private string AspectGetter (object o)
     {
         var fsi = (IFileSystemInfo)o;
