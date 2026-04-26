@@ -112,9 +112,12 @@ public partial class TextField : View, IDesignable, IValue<string>
 
     private void TextField_Initialized (object? sender, EventArgs e)
     {
-        _insertionPoint = GraphemeHelper.GetGraphemeCount (Text);
+        if (!ReadOnly)
+        {
+            _insertionPoint = GraphemeHelper.GetGraphemeCount (Text);
+        }
 
-        if (Viewport.Width > 0)
+        if (!ReadOnly && Viewport.Width > 0)
         {
             int colsWidth = Text.GetColumns ();
             ScrollOffset = colsWidth > Viewport.Width + 1 ? colsWidth - Viewport.Width + 1 : 0;
