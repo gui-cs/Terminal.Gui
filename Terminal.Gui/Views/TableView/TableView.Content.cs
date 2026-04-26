@@ -42,7 +42,7 @@ public partial class TableView
 
             if (cacheLength == 0)
             {
-                // No visible columns — nothing to scroll to
+                // No visible columns — early return leaves Viewport.X unchanged
                 return;
             }
 

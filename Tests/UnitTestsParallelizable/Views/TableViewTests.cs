@@ -422,7 +422,7 @@ public class TableViewTests : TestDriverBase
 
         // Hide the only column — this makes the cache empty (0 visible columns)
         tableView.Style.GetOrCreateColumnStyle (0).Visible = false;
-        tableView.RefreshContentSize ();
+        tableView.Update ();
 
         // Setting ColumnOffset=0 with an empty render cache previously computed value=-1
         // and then indexed _columnsToRenderCache![-1], causing IndexOutOfRangeException
