@@ -333,6 +333,124 @@ public class TableViewTests : TestDriverBase
         tableView.Dispose ();
     }
 
+    // Copilot - regression: TableCollectionNavigator must not throw when table is null and view is focused
+    [Fact]
+    public void TableCollectionNavigator_NullTable_HasFocus_DoesNotThrow ()
+    {
+        TableView tableView = new ();
+        tableView.HasFocus = true;
+
+        // Table is null + HasFocus=true - keystroke navigation reached via OnKeyDownNotHandled
+        // should not throw InvalidOperationException from GetCollectionLength
+        Exception? ex = Record.Exception (() => tableView.NewKeyDownEvent (Key.A));
+
+        Assert.Null (ex);
+    }
+
+    // Copilot - regression: TableCollectionNavigator must not throw when a cell value is null (custom ITableSource)
+    [Fact]
+    public void TableCollectionNavigator_NullCellValue_DoesNotThrow ()
+    {
+        // Use a custom ITableSource that can return null for cell values
+        // (DataTable wraps null as DBNull.Value, so we need a custom source to test actual null)
+        TableView tableView = new () { Table = new NullCellTableSource () };
+        tableView.HasFocus = true;
+
+        // Pressing 'a' triggers keystroke navigation; row 0 has null cell, row 1 has "apple"
+        // Should not throw InvalidOperationException from ElementAt
+        Exception? ex = Record.Exception (() => tableView.NewKeyDownEvent (Key.A));
+
+        Assert.Null (ex);
+
+        // Should land on "apple" (row 1), skipping the null-cell row gracefully
+        Assert.Equal (1, tableView.Value!.Cursor.Y);
+
+        tableView.Dispose ();
+    }
+
+    // Copilot - regression: TableCollectionNavigator returns string.Empty for DBNull cells
+    [Fact]
+    public void TableCollectionNavigator_DBNullCellValue_DoesNotThrow ()
+    {
+        DataTable dt = new ();
+        dt.Columns.Add ("Col1");
+        dt.Rows.Add (DBNull.Value); // DataTable stores this as DBNull.Value
+        dt.Rows.Add ("banana");
+        dt.Rows.Add ("berry");
+
+        TableView tableView = new () { Table = new DataTableSource (dt) };
+        tableView.HasFocus = true;
+
+        Exception? ex = Record.Exception (() => tableView.NewKeyDownEvent (Key.B));
+
+        Assert.Null (ex);
+        Assert.Equal (1, tableView.Value!.Cursor.Y);
+
+        tableView.Dispose ();
+    }
+
+    /// <summary>A minimal <see cref="ITableSource"/> that returns <see langword="null"/> for the first cell.</summary>
+    private sealed class NullCellTableSource : ITableSource
+    {
+        // Row 0 intentionally holds null to exercise null-cell handling in TableCollectionNavigator
+        private readonly object? [] _data = [null, "apple", "apricot"];
+
+        public object this [int row, int col]
+        {
+#pragma warning disable CS8603 // Possible null reference return - intentional for testing null-cell handling
+            get => _data [row];
+#pragma warning restore CS8603
+        }
+
+        public int Rows => _data.Length;
+
+        public int Columns => 1;
+
+        public string [] ColumnNames => ["Col1"];
+    }
+
+    // Copilot - regression: ColumnOffset setter must not throw when all columns are hidden (0 visible columns)
+    [Fact]
+    public void ColumnOffset_AllColumnsHidden_DoesNotThrow ()
+    {
+        DataTable dt = new ();
+        dt.Columns.Add ("Col1");
+        dt.Rows.Add ("a");
+
+        TableView tableView = new () { Table = new DataTableSource (dt) };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+
+        // Hide the only column — this makes the cache empty (0 visible columns)
+        tableView.Style.GetOrCreateColumnStyle (0).Visible = false;
+        tableView.Update ();
+
+        // Setting ColumnOffset=0 with an empty render cache previously computed value=-1
+        // and then indexed _columnsToRenderCache![-1], causing IndexOutOfRangeException
+        Exception? ex = Record.Exception (() => tableView.ColumnOffset = 0);
+
+        Assert.Null (ex);
+        Assert.Equal (0, tableView.ColumnOffset);
+
+        tableView.Dispose ();
+    }
+
+    // Copilot - regression: ColumnOffset setter must not throw when table is null
+    [Fact]
+    public void ColumnOffset_NullTable_DoesNotThrow ()
+    {
+        TableView tableView = new ();
+        tableView.BeginInit ();
+        tableView.EndInit ();
+
+        Exception? ex = Record.Exception (() => tableView.ColumnOffset = 0);
+
+        Assert.Null (ex);
+        Assert.Equal (0, tableView.ColumnOffset);
+
+        tableView.Dispose ();
+    }
+
     [Fact]
     public void Test_SumColumnWidth_GraphemeClusters ()
     {
