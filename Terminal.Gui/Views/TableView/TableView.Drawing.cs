@@ -1,16 +1,12 @@
 namespace Terminal.Gui.Views;
 
-/// <summary>
-///     Displays and enables infinite scrolling through tabular data based on a <see cref="ITableSource"/>.
-///     <a href="../docs/tableview.md">See the TableView Deep Dive for more</a>.
-/// </summary>
 public partial class TableView
 {
     /// <summary>
-    ///     calculates the current header height based on what is visible
-    ///     This respects the viewport Y position and the AlwaysShowHeaders style
+    ///     Calculates the current header height based on what is visible.
+    ///     This respects the viewport Y position and the <see cref="TableStyle.AlwaysShowHeaders"/> style.
     /// </summary>
-    /// <returns>height</returns>
+    /// <returns>Header height in rows.</returns>
     protected int CurrentHeaderHeightVisible ()
     {
         if (!ShouldRenderHeaders ())
@@ -25,6 +21,29 @@ public partial class TableView
 
         return Math.Min (Math.Max (GetHeaderHeight () - Viewport.Y, 0), Viewport.Height);
     }
+
+    /// <summary>Returns the amount of vertical space required to display the header</summary>
+    /// <returns></returns>
+    internal int GetHeaderHeight ()
+    {
+        int heightRequired = Style.ShowHeaders ? 1 : 0;
+
+        if (Style.ShowHorizontalHeaderOverline)
+        {
+            heightRequired++;
+        }
+
+        if (Style.ShowHorizontalHeaderUnderline)
+        {
+            heightRequired++;
+        }
+
+        return heightRequired;
+    }
+
+    /// <summary>Returns the amount of vertical space currently occupied by the header or 0 if it is not visible.</summary>
+    /// <returns></returns>
+    internal int GetHeaderHeightIfAny () => ShouldRenderHeaders () ? GetHeaderHeight () : 0;
 
     ///<inheritdoc/>
     protected override bool OnDrawingContent (DrawContext? context)
@@ -45,9 +64,9 @@ public partial class TableView
         {
             // Render something like:
             /*
-                ┌────────────────────┬──────────┬───────────┬──────────────┬─────────┐
-                │ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
-                └────────────────────┴──────────┴───────────┴──────────────┴─────────┘
+                ┌────────────────────┬─────────┬────────────┬──────────────┬──────────┐
+                │ArithmeticComparator│chi      │Health board│Interpretation│Lab number│
+                └────────────────────┴─────────┴────────────┴──────────────┴──────────┘
             */
 
             bool ShouldRenderNextHeaderLine () =>
@@ -123,14 +142,14 @@ public partial class TableView
 
     /// <summary>
     ///     Override to provide custom multi-coloring to cells. Use methods like <see cref="View.AddStr(string)"/>.
-    ///     The cursor will already be in the correct position when rendering. You must render the full
+    ///     The terminal cursor will already be in the correct position when rendering. You must render the full
     ///     <paramref name="render"/> or the view will not look right. For simpler color provision use
     ///     <see cref="ColumnStyle.ColorGetter"/>. For changing the content that is rendered use
     ///     <see cref="ColumnStyle.RepresentationGetter"/>.
     /// </summary>
-    /// <param name="cellAttribute"></param>
+    /// <param name="cellAttribute">The <see cref="Attribute"/> to use for the cell.</param>
     /// <param name="render"></param>
-    /// <param name="isPrimaryCell"></param>
+    /// <param name="isPrimaryCell">True if this cell is the cursor cell (used for inversion).</param>
     protected virtual void RenderCell (Attribute cellAttribute, string render, bool isPrimaryCell)
     {
         // If the cell is the selected col/row then draw the first rune in inverted colors
@@ -211,7 +230,7 @@ public partial class TableView
     private void RenderHeaderMidline (int row, int availableWidth, ColumnToRender [] columnsToRender)
     {
         // Renders something like:
-        // │ArithmeticComparator│chi       │Healthboard│Interpretation│Labnumber│
+        // │ArithmeticComparator│chi       │Health board│Interpretation│Lab number│
         ClearLine (row, Viewport.Width);
 
         // render start of line
@@ -305,7 +324,6 @@ public partial class TableView
                 // if the next column is the start of a header
                 else if (columnsToRender.Any (r => r.X == c + 1))
                 {
-                    /*TODO: is ┼ symbol in Driver?*/
                     rune = Style.ShowVerticalCellLines ? Glyphs.Cross : Glyphs.BottomTee;
                 }
                 else if (c == availableWidth - 1)
@@ -379,8 +397,8 @@ public partial class TableView
             Attribute cellColor = isSelectedCell ? focused ? scheme.Focus : scheme.Active : Enabled ? scheme.Normal : scheme.Disabled;
             string render = TruncateOrPad (val, representation, current.Width, colStyle);
 
-            // While many cells can be selected (see MultiSelectedRegions) only one cell is the primary (drives navigation etc)
-            bool isPrimaryCell = current.Column == _selectedColumn && rowToRender == _selectedRow;
+            // While many cells can be selected (see MultiSelectedRegions) only one cell is the primary (drives navigation etc.)
+            bool isPrimaryCell = current.Column == _cursorColumn && rowToRender == _cursorRow;
             Move (current.X - Viewport.X, row);
             RenderCell (cellColor, render, isPrimaryCell);
 
@@ -449,20 +467,190 @@ public partial class TableView
     }
 
     /// <summary>
-    ///     This decides if we should render headers at all (no matter what the style settings are)
-    ///     This may be a candidate to remove in future
-    ///     (old implementation needed this logic to decide if the header is in current view (RowOffset))
+    ///     Determines whether headers should be rendered based on current viewport state.
+    /// </summary>
+    private bool ShouldRenderHeaders () => !TableIsNullOrInvisible ();
+
+
+    private void AddRuneAt (int col, int row, Rune ch)
+    {
+        Move (col, row);
+        AddRune (ch);
+    }
+
+    /// <summary>
+    ///     Returns the maximum of the <paramref name="col"/> name and the maximum length of data that will be rendered
+    ///     starting at <see cref="RowOffset"/> and rendering <paramref name="rowsToRender"/>
+    /// </summary>
+    /// <param name="col">ColumnIndex</param>
+    /// <param name="colStyle"></param>
+    /// <param name="startRow">index of first row</param>
+    /// <param name="rowsToRender">Count of rows to inspect</param>
+    /// <returns></returns>
+    private int CalculateMaxCellWidth (int col, ColumnStyle? colStyle, int startRow, int rowsToRender)
+    {
+        int spaceRequired = _table!.ColumnNames [col].GetColumns ();
+
+        // if table has no rows
+        if (Table is not { Rows: > 0 })
+        {
+            return spaceRequired;
+        }
+
+        for (int i = startRow; i < startRow + rowsToRender; i++)
+        {
+            // expand required space if cell is bigger than the last biggest cell or header
+            spaceRequired = Math.Max (spaceRequired, GetRepresentation (Table [i, col], colStyle).GetColumns ());
+        }
+
+        // Don't require more space than the style allows
+        if (colStyle is { })
+        {
+            // enforce maximum cell width based on style
+            if (spaceRequired > colStyle.MaxWidth)
+            {
+                spaceRequired = colStyle.MaxWidth;
+            }
+
+            // enforce minimum cell width based on style
+            if (spaceRequired < colStyle.MinWidth)
+            {
+                spaceRequired = colStyle.MinWidth;
+            }
+        }
+
+        // enforce maximum cell width based on global table style
+        if (spaceRequired > MaxCellWidth)
+        {
+            spaceRequired = MaxCellWidth;
+        }
+
+        return spaceRequired;
+    }
+
+    /// <summary>
+    ///     Returns the value that should be rendered to best represent a strongly typed <paramref name="value"/> read
+    ///     from <see cref="Table"/>
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="colStyle">Optional style defining how to represent cell values</param>
+    /// <returns></returns>
+    private string GetRepresentation (object value, ColumnStyle? colStyle)
+    {
+        if (value == DBNull.Value)
+        {
+            return NullSymbol;
+        }
+
+        return colStyle is { } ? colStyle.GetRepresentation (value) : value.ToString () ?? string.Empty;
+    }
+
+    /// <summary>
+    ///     Truncates or pads <paramref name="representation"/> so that it occupies exactly
+    ///     <paramref name="availableHorizontalSpace"/> using the alignment specified in <paramref name="colStyle"/> (or left
+    ///     if no style is defined)
+    /// </summary>
+    /// <param name="originalCellValue">The object in this cell of the <see cref="Table"/></param>
+    /// <param name="representation">The string representation of <paramref name="originalCellValue"/></param>
+    /// <param name="availableHorizontalSpace"></param>
+    /// <param name="colStyle">Optional style indicating custom alignment for the cell</param>
+    /// <returns></returns>
+    private static string TruncateOrPad (object originalCellValue, string representation, int availableHorizontalSpace, ColumnStyle? colStyle)
+    {
+        if (string.IsNullOrEmpty (representation))
+        {
+            return new string (' ', availableHorizontalSpace);
+        }
+
+        // if value is too wide, truncate by grapheme cluster to avoid splitting surrogate pairs
+        if (representation.GetColumns () >= availableHorizontalSpace)
+        {
+            StringBuilder sb = new ();
+            int remaining = availableHorizontalSpace;
+
+            foreach (string grapheme in GraphemeHelper.GetGraphemes (representation))
+            {
+                int w = grapheme.GetColumns ();
+
+                if (remaining - w <= 0)
+                {
+                    break;
+                }
+
+                sb.Append (grapheme);
+                remaining -= w;
+            }
+
+            return sb.ToString ();
+        }
+
+        // pad it out with spaces to the given alignment
+        int toPad = availableHorizontalSpace - (representation.GetColumns () + 1 /*leave 1 space for cell boundary*/);
+
+        return (colStyle?.GetAlignment (originalCellValue) ?? Alignment.Start) switch
+        {
+            Alignment.Start => representation + new string (' ', toPad),
+            Alignment.End => new string (' ', toPad) + representation,
+
+            // TODO: With single line cells, centered and justified are the same right?
+            Alignment.Center or Alignment.Fill => new string (' ', (int)Math.Floor (toPad / 2.0))
+                                                  + // round down
+                                                  representation
+                                                  + new string (' ', (int)Math.Ceiling (toPad / 2.0)), // round up
+            _ => representation + new string (' ', toPad)
+        };
+    }
+
+    /// <summary>
+    ///     Returns the cells that shall be shown (all cells except the hidden ones)
     /// </summary>
     /// <returns></returns>
-
-    // TODO: a candidate to remove
-    private bool ShouldRenderHeaders ()
+    private ColumnToRender [] NonHiddenCellInfos ()
     {
         if (TableIsNullOrInvisible ())
         {
-            return false;
+            return [];
         }
 
-        return true;
+        if (_columnsToRenderCache == null)
+        {
+            RefreshContentSize ();
+        }
+
+        return _columnsToRenderCache ?? [];
+    }
+
+    /// <summary>Clears a line of the console by filling it with spaces</summary>
+    /// <param name="row"></param>
+    /// <param name="width"></param>
+    private void ClearLine (int row, int width)
+    {
+        if (App?.Screen.Height == 0)
+        {
+            return;
+        }
+
+        Move (0, row);
+        SetAttribute (GetAttributeForRole (VisualRole.Normal));
+        AddStr (new string (' ', width));
+    }
+
+    /// <summary>Describes a desire to render a column at a given horizontal position in the UI</summary>
+    internal class ColumnToRender (int col, int x, int width, bool isVeryLast)
+    {
+        /// <summary>The column to render</summary>
+        public int Column { get; set; } = col;
+
+        /// <summary>True if this column is the very last column in the <see cref="Table"/> (not just the last visible column)</summary>
+        public bool IsVeryLast { get; } = isVeryLast;
+
+        /// <summary>
+        ///     The width that the column should occupy as calculated by <see cref="TableView.CalculateContentSize"/>.  Note
+        ///     that this includes space for padding i.e. the separator between columns.
+        /// </summary>
+        public int Width { get; internal set; } = width;
+
+        /// <summary>The horizontal position to begin rendering the column at</summary>
+        public int X { get; set; } = x;
     }
 }

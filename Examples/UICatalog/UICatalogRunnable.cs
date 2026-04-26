@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Collections.ObjectModel;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
@@ -49,7 +49,7 @@ public sealed class UICatalogRunnable : Runnable
         {
             _categoryList.SelectedItem = null;
         }
-        _scenarioList.SelectedRow = _cachedScenarioIndex;
+        _scenarioList.SetSelection (0, _cachedScenarioIndex, false);
 
         base.BeginInit ();
     }
@@ -93,7 +93,7 @@ public sealed class UICatalogRunnable : Runnable
         }
 
         _categoryList?.EnsureSelectedItemVisible ();
-        _scenarioList?.EnsureSelectedCellIsVisible ();
+        _scenarioList?.EnsureCursorIsVisible ();
 
         if (ShowStatusBar)
         {
@@ -119,7 +119,7 @@ public sealed class UICatalogRunnable : Runnable
             if (_scenarioList is { } && App is { } && _scenarioList.Table is { })
             {
                 ShowScenarioErrorsDialog (App,
-                                          _scenarioList.Table [_scenarioList.SelectedRow, 0].ToString () ?? string.Empty,
+                                          _scenarioList.Table [_scenarioList.Value?.Cursor.Y ?? 0, 0].ToString () ?? string.Empty,
                                           UICatalog.LogCapture.GetScenarioLogs ());
             }
 
@@ -150,17 +150,17 @@ public sealed class UICatalogRunnable : Runnable
                                    new MenuBarItem (Strings.menuFile,
                                                     [
                                                         new MenuItem
-                                                         {
-                                                             Title = Strings.cmdQuit,
-                                                             HelpText = "Quit UI Catalog",
-                                                             Key = Application.GetDefaultKey (Command.Quit),
-                                                             Action = RequestStop,
-                                                             Command = Command.Quit
-                                                         }
-                                                     ]),
+                                                        {
+                                                            Title = Strings.cmdQuit,
+                                                            HelpText = "Quit UI Catalog",
+                                                            Key = Application.GetDefaultKey (Command.Quit),
+                                                            Action = RequestStop,
+                                                            Command = Command.Quit
+                                                        }
+                                                    ]),
                                    new MenuBarItem ("_Themes", CreateThemeMenuItems ()),
                                    new MenuBarItem ("Diag_nostics", CreateDiagnosticMenuItems ()),
-                                   new MenuBarItem ("_Logging", CreateLoggingMenuItems ()!),
+                                   new MenuBarItem ("_Logging", CreateLoggingMenuItems ()),
                                    new MenuBarItem (Strings.menuHelp,
                                                     [
                                                         new MenuItem ("_Documentation",
@@ -587,7 +587,7 @@ public sealed class UICatalogRunnable : Runnable
 
         scenarioList.Style.ColumnStyles.Add (0, new ColumnStyle { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
         scenarioList.Style.ColumnStyles.Add (1, new ColumnStyle { MaxWidth = 1 });
-        scenarioList.CellActivated += ScenarioView_OpenSelectedItem;
+        scenarioList.Accepted += ScenarioView_OpenSelectedItem;
 
         // TableView typically is a grid where nav keys are biased for moving left/right.
         scenarioList.KeyBindings.Remove (Key.Home);
@@ -607,17 +607,17 @@ public sealed class UICatalogRunnable : Runnable
     /// <summary>Launches the selected scenario, setting the global _selectedScenario</summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void ScenarioView_OpenSelectedItem (object? sender, EventArgs? e)
+    private void ScenarioView_OpenSelectedItem (object? sender, CommandEventArgs e)
     {
         // Save selected item state
         _cachedCategoryIndex = _categoryList?.SelectedItem;
 
         if (_scenarioList is { })
         {
-            _cachedScenarioIndex = _scenarioList.SelectedRow;
+            _cachedScenarioIndex = _scenarioList.Value?.Cursor.Y ?? 0;
 
             // Set the Result to the selected scenario name
-            Result = _scenarioList.Table? [_scenarioList.SelectedRow, 0];
+            Result = _scenarioList.Table? [_scenarioList.Value?.Cursor.Y ?? 0, 0];
         }
         Logging.Information ($"Scenario Selected; Stopping {GetType ().Name}: {Result}");
         App?.RequestStop ();

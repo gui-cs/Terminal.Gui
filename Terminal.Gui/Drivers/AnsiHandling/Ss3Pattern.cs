@@ -9,11 +9,11 @@ namespace Terminal.Gui.Drivers;
 public class Ss3Pattern : AnsiKeyboardParserPattern
 {
 #pragma warning disable IDE1006 // Naming Styles
-    private static readonly Regex _pattern = new (@"^\u001bO([PQRStDCABOHFwqysu])$");
+    private static readonly Regex _pattern = new Regex (@"^\u001bO([PQRStDCABOHFwqysu])$");
 #pragma warning restore IDE1006 // Naming Styles
 
     /// <inheritdoc/>
-    public override bool IsMatch (string? input) { return _pattern.IsMatch (input!); }
+    public override bool IsMatch (string? input) => _pattern.IsMatch (input!);
 
     /// <summary>
     ///     Returns the ss3 key that corresponds to the provided input escape sequence

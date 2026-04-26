@@ -1,22 +1,13 @@
-#nullable disable
 namespace Terminal.Gui.Views;
 
 internal class FileDialogCollectionNavigator (FileDialog fileDialog, TableView tableView) : CollectionNavigatorBase
 {
     protected override object ElementAt (int idx)
     {
-        object val = FileDialogTableSource.GetRawColumnValue (
-                                                              tableView.SelectedColumn,
-                                                              fileDialog.State?.Children [idx]
-                                                             );
+        object val = FileDialogTableSource.GetRawColumnValue (tableView.Value?.Cursor.X ?? 0, fileDialog.State?.Children [idx]);
 
-        if (val is null)
-        {
-            return string.Empty;
-        }
-
-        return val.ToString ().Trim ('.');
+        return val.ToString ()?.Trim ('.') ?? string.Empty;
     }
 
-    protected override int GetCollectionLength () { return fileDialog.State?.Children.Length ?? 0; }
+    protected override int GetCollectionLength () => fileDialog.State?.Children.Length ?? 0;
 }

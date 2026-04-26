@@ -1,5 +1,4 @@
-#nullable disable
-﻿// 
+// 
 // FileDialog.cs: File system dialogs for open and save
 //
 // TODO:
@@ -18,28 +17,24 @@ namespace Terminal.Gui.Views;
 /// <remarks>
 ///     <para>
 ///         To use, create an instance of <see cref="SaveDialog"/>, and pass it to
-///         <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>. This will run the dialog modally, and when this returns,
+///         <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>. This will run the dialog modally, and when
+///         this returns,
 ///         the <see cref="FileName"/>property will contain the selected file name or null if the user canceled.
 ///     </para>
 /// </remarks>
 public class SaveDialog : FileDialog
 {
     /// <summary>Initializes a new <see cref="SaveDialog"/>.</summary>
-    public SaveDialog ()
-    {
-        Style.OkButtonText = Strings.btnSave;
-    }
+    public SaveDialog () => Style.OkButtonText = Strings.btnSave;
 
-    internal SaveDialog (IFileSystem fileSystem) : base (fileSystem)
-    {
-        Style.OkButtonText = Strings.btnSave;
-    }
+    internal SaveDialog (IFileSystem fileSystem) : base (fileSystem) => Style.OkButtonText = Strings.btnSave;
+
     /// <summary>
     ///     Gets the name of the file the user selected for saving, or null if the user canceled the
     ///     <see cref="SaveDialog"/>.
     /// </summary>
     /// <value>The name of the file.</value>
-    public string FileName => ((IRunnable)this).Result is null || Result == 1 ? null : Path;
+    public string? FileName => (this as IRunnable).Result is null || Result == Buttons.IndexOf (CancelButton) ? null : Path;
 
     /// <summary>Gets the default title for the <see cref="SaveDialog"/>.</summary>
     /// <returns></returns>
@@ -58,6 +53,7 @@ public class SaveDialog : FileDialog
                 titleParts.Add (Strings.fdFile);
 
                 break;
+
             case OpenMode.Directory:
                 titleParts.Add (Strings.fdDirectory);
 

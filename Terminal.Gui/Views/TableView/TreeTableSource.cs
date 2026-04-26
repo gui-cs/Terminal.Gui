@@ -25,8 +25,8 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
     ///     Getter methods for each additional property you want to present in the table. For example:
     ///     <code>
     ///  new () {
-    ///     { "Colname1", (t)=>t.SomeField},
-    ///     { "Colname2", (t)=>t.SomeOtherField}
+    ///     { "Col name1", (t)=>t.SomeField},
+    ///     { "Col name2", (t)=>t.SomeOtherField}
     /// }
     ///  </code>
     /// </param>
@@ -114,7 +114,7 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
             return true;
         }
 
-        // we cannot just check that SelectedColumn is 0 because source may
+        // we cannot just check that the cursor column is 0 because source may
         // be wrapped e.g. with a CheckBoxTableSourceWrapperBase
         return colNames [column] == ColumnNames [0];
     }
@@ -123,12 +123,12 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
     private void Table_KeyPress (object? sender, Key e)
     {
-        if (!IsInTreeColumn (_tableView.SelectedColumn, true))
+        if (!IsInTreeColumn (_tableView.Value?.Cursor.X ?? 0, true))
         {
             return;
         }
 
-        T? obj = _tree.GetObjectOnRow (_tableView.SelectedRow);
+        T? obj = _tree.GetObjectOnRow (_tableView.Value?.Cursor.Y ?? 0);
 
         if (obj is null)
         {
