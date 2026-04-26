@@ -154,6 +154,16 @@ public partial class TextField : View, IDesignable, IValue<string>
             SelectAll ();
         }
 
+        if (ReadOnly && InsertionPoint > 0)
+        {
+            _insertionPoint = 0;
+        }
+
+        if (ReadOnly && ScrollOffset > 0)
+        {
+            ScrollOffset = 0;
+        }
+
         // Reset the flag after handling focus change
         _focusSetByMouse = false;
 

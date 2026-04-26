@@ -1566,4 +1566,21 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Null (tf.SelectedText);
     }
 
+     [Fact]
+     public void ReadOnly_ShouldSetInsertionPointAndScrollOffsetToZero_OnFocus ()
+     {
+         TextField tf = new () { Width = 5, ReadOnly = true, Text = "hello world" };
+         tf.BeginInit ();
+         tf.EndInit ();
+
+         // Move insertion point to end of text
+         tf.InsertionPoint = tf.Text.Length;
+         Assert.Equal (11, tf.InsertionPoint);
+         Assert.Equal (7, tf.ScrollOffset);
+
+         // Set focus and verify insertion point is still at zero
+         tf.SetFocus ();
+         Assert.Equal (0, tf.InsertionPoint);
+         Assert.Equal (0, tf.ScrollOffset);
+     }
 }
