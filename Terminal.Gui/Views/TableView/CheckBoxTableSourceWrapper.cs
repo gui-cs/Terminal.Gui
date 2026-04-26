@@ -21,15 +21,16 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
     ///     registration.
     /// </param>
     /// <param name="toWrap">The original data source of the <see cref="TableView"/> that you want to add checkboxes to.</param>
-    public CheckBoxTableSourceWrapperBase (TableView tableView, ITableSource toWrap)
+    protected CheckBoxTableSourceWrapperBase (TableView tableView, ITableSource toWrap)
     {
         Wrapping = toWrap;
         _tableView = tableView;
 
-        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
+        _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.ToggleExtend);
 
+        // Intercept ToggleExtend before it reaches the default handler
+        _tableView.KeyDown += HandleSpaceKeyDown;
         _tableView.Activating += TableView_Activating;
-        _tableView.CellToggled += TableView_CellToggled;
     }
 
     /// <summary>
@@ -65,17 +66,17 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
     {
         get
         {
-            if (col == 0)
+            if (col != 0)
             {
-                if (UseRadioButtons)
-                {
-                    return IsChecked (row) ? RadioCheckedRune : RadioUnCheckedRune;
-                }
-
-                return IsChecked (row) ? CheckedRune : UnCheckedRune;
+                return Wrapping [row, col - 1];
             }
 
-            return Wrapping [row, col - 1];
+            if (UseRadioButtons)
+            {
+                return IsChecked (row) ? RadioCheckedRune : RadioUnCheckedRune;
+            }
+
+            return IsChecked (row) ? CheckedRune : UnCheckedRune;
         }
     }
 
@@ -111,7 +112,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
     /// </summary>
     protected abstract void ToggleAllRows ();
 
-    /// <summary>Flips the checked state of the given <paramref name="row"/>/</summary>
+    /// <summary>Flips the checked state of the given <paramref name="row"/>.</summary>
     /// <param name="row"></param>
     protected abstract void ToggleRow (int row);
 
@@ -122,18 +123,20 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
     /// <param name="range"></param>
     protected abstract void ToggleRows (int [] range);
 
-    private void TableView_CellToggled (object? sender, CellToggledEventArgs e)
+    private void HandleSpaceKeyDown (object? sender, Key e)
     {
-        // Suppress default toggle behavior when using checkboxes
-        // and instead handle ourselves
+        if (e != Key.Space)
+        {
+            return;
+        }
+
         int [] range = _tableView.GetAllSelectedCells ().Select (c => c.Y).Distinct ().ToArray ();
 
         if (UseRadioButtons)
         {
-            // multi selection makes it unclear what to toggle in this situation
             if (range.Length != 1)
             {
-                e.Cancel = true;
+                e.Handled = true;
 
                 return;
             }
@@ -146,7 +149,7 @@ public abstract class CheckBoxTableSourceWrapperBase : ITableSource
             ToggleRows (range);
         }
 
-        e.Cancel = true;
+        e.Handled = true;
         _tableView.SetNeedsDraw ();
     }
 

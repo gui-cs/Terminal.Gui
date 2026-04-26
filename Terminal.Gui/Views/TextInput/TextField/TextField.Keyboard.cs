@@ -73,6 +73,12 @@ public partial class TextField
             return false;
         }
 
+        if (a.IsAlt || a.IsCtrl)
+        {
+            // Never insert modified keys
+            return false;
+        }
+
         // Ignore other control characters.
         if (string.IsNullOrEmpty (a.AsGrapheme) && a is { IsKeyCodeAtoZ: false, KeyCode: < KeyCode.Space or > KeyCode.CharMask })
         {

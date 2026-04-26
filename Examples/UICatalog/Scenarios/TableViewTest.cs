@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using Terminal.Gui.Views;
-
-namespace UICatalog.Scenarios;
+﻿namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("TableViewTest", "Demonstrates and tests TableView.")]
 [ScenarioCategory ("TableView")]
 [ScenarioCategory ("Controls")]
 [ScenarioCategory ("Dialogs")]
-
 public class TableViewTest : Scenario
 {
     private TableView tableView;
@@ -29,79 +23,56 @@ public class TableViewTest : Scenario
             Height = Dim.Fill (1) // status bar
         };
 
-        optionsView = new View ()
+        optionsView = new View
         {
-            Y = 0, X = 0,
-            Width = Dim.Fill (), Height = Dim.Auto(),
+            Y = 0,
+            X = 0,
+            Width = Dim.Fill (),
+            Height = Dim.Auto (),
             BorderStyle = LineStyle.Single,
-            Title = "Options",
+            Title = "Options"
         };
 
-        var offsetLabel = new Label ()
-        {
-            X = 0, Y = Pos.Bottom (optionsView),
-            Text = "Offset",
-        };
+        var offsetLabel = new Label { X = 0, Y = Pos.Bottom (optionsView), Text = "Offset" };
 
-        var colOffsetUpDown = new NumericUpDown<int> ()
-        {
-            X = Pos.Right (offsetLabel), Y = Pos.Bottom (optionsView),
-        };
+        NumericUpDown<int> colOffsetUpDown = new() { X = Pos.Right (offsetLabel), Y = Pos.Bottom (optionsView) };
         colOffsetUpDown.Padding.Thickness = new Thickness (1, 0, 1, 0);
 
-        var setColOffsetButton = new Button ()
-        {
-            X = Pos.Right (colOffsetUpDown), Y = Pos.Bottom (optionsView),
-            Text = "Set",
-        };
-        setColOffsetButton.Padding.Thickness = new Thickness (1,0,1,0);
+        var setColOffsetButton = new Button { X = Pos.Right (colOffsetUpDown), Y = Pos.Bottom (optionsView), Text = "Set" };
+        setColOffsetButton.Padding.Thickness = new Thickness (1, 0, 1, 0);
         setColOffsetButton.Accepting += (sender, args) => tableView.ColumnOffset = colOffsetUpDown.Value;
 
-        var rowOffsetUpDown = new NumericUpDown<int> ()
-        {
-            X = Pos.Right (setColOffsetButton), Y = Pos.Bottom (optionsView),
-        };
+        NumericUpDown<int> rowOffsetUpDown = new() { X = Pos.Right (setColOffsetButton), Y = Pos.Bottom (optionsView) };
         rowOffsetUpDown.Padding.Thickness = new Thickness (1, 0, 1, 0);
 
-        var setRowOffsetButton = new Button ()
-        {
-            X = Pos.Right (rowOffsetUpDown), Y = Pos.Bottom (optionsView),
-            Text = "Set",
-        };
+        var setRowOffsetButton = new Button { X = Pos.Right (rowOffsetUpDown), Y = Pos.Bottom (optionsView), Text = "Set" };
         setRowOffsetButton.Padding.Thickness = new Thickness (1, 0, 1, 0);
         setRowOffsetButton.Accepting += (sender, args) => tableView.RowOffset = rowOffsetUpDown.Value;
 
-        var selectedRowUpDown = new NumericUpDown<int> ()
-        {
-            X = Pos.Right (setRowOffsetButton), Y = Pos.Bottom (optionsView),
-        };
+        NumericUpDown<int> selectedRowUpDown = new() { X = Pos.Right (setRowOffsetButton), Y = Pos.Bottom (optionsView) };
         selectedRowUpDown.Padding.Thickness = new Thickness (1, 0, 1, 0);
 
-        var setSelectedRowButton = new Button ()
-        {
-            X = Pos.Right (selectedRowUpDown), Y = Pos.Bottom (optionsView),
-            Text = "Set",
-        };
+        var setSelectedRowButton = new Button { X = Pos.Right (selectedRowUpDown), Y = Pos.Bottom (optionsView), Text = "Set" };
         setSelectedRowButton.Padding.Thickness = new Thickness (1, 0, 1, 0);
-        setSelectedRowButton.Accepting += (sender, args) => tableView.SelectedRow = selectedRowUpDown.Value;
+        setSelectedRowButton.Accepting += (sender, args) => tableView.SetSelection (tableView.Value?.Cursor.X ?? 0, selectedRowUpDown.Value, false);
 
         tableView = new TableView
         {
-            X = 0, Y = Pos.Bottom(offsetLabel),
-            Width = Dim.Fill (), Height = Dim.Fill (),
-
+            X = 0,
+            Y = Pos.Bottom (offsetLabel),
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
             Table = new DataTableSource (TableView.BuildDemoDataTable (6, 30))
         };
 
         tableView.DrawComplete += (sender, args) => offsetLabel.Text = $"{tableView.ColumnOffset} - {tableView.RowOffset}  {tableView.Viewport.Location}";
 
-        tableView.Style.ColumnStyles [2] = new ColumnStyle () {Alignment = Alignment.End};
+        tableView.Style.ColumnStyles [2] = new ColumnStyle { Alignment = Alignment.End };
         tableView.Style.ColumnStyles [6] = new ColumnStyle ();
 
         (string text, Func<bool> iv, Action<bool> hndlr) [] options =
         [
-            ("Scrollbars Auto", () => tableView.ViewportSettings.HasFlag (ViewportSettingsFlags.HasScrollBars),
-             b =>
+            ("Scrollbars Auto", () => tableView.ViewportSettings.HasFlag (ViewportSettingsFlags.HasScrollBars), b =>
              {
                  if (b)
                  {
@@ -118,24 +89,27 @@ public class TableViewTest : Scenario
             ("ShowVerticalHeaderLines", () => tableView.Style.ShowVerticalHeaderLines, b => tableView.Style.ShowVerticalHeaderLines = b),
             ("ShowHorizontalHeaderUnderline", () => tableView.Style.ShowHorizontalHeaderUnderline, b => tableView.Style.ShowHorizontalHeaderUnderline = b),
             ("ShowVerticalCellLines", () => tableView.Style.ShowVerticalCellLines, b => tableView.Style.ShowVerticalCellLines = b),
-            ("InvertSelectedCellFirstCharacter", () => tableView.Style.InvertSelectedCellFirstCharacter, b => tableView.Style.InvertSelectedCellFirstCharacter = b),
+            ("InvertSelectedCellFirstCharacter", () => tableView.Style.InvertSelectedCellFirstCharacter,
+             b => tableView.Style.InvertSelectedCellFirstCharacter = b),
             ("ShowHorizontalBottomline", () => tableView.Style.ShowHorizontalBottomLine, b => tableView.Style.ShowHorizontalBottomLine = b),
             ("ExpandLastColumn", () => tableView.Style.ExpandLastColumn, b => tableView.Style.ExpandLastColumn = b),
             ("FullRowSelect", () => tableView.FullRowSelect, b => tableView.FullRowSelect = b),
             ("SmoothHorizontalScrolling", () => tableView.Style.SmoothHorizontalScrolling, b => tableView.Style.SmoothHorizontalScrolling = b),
             ("UseAllRowsForContentCalculation", () => tableView.UseAllRowsForContentCalculation, b => tableView.UseAllRowsForContentCalculation = b),
-            ("MinAcceptableWidth (limit col 6 = 15)", () => tableView.Style.ColumnStyles[6].MinAcceptableWidth < TableView.DEFAULT_MIN_ACCEPTABLE_WIDTH, b => tableView.Style.ColumnStyles[6].MinAcceptableWidth = b ? 15 : TableView.DEFAULT_MIN_ACCEPTABLE_WIDTH),
+            ("MinAcceptableWidth (limit col 6 = 15)", () => tableView.Style.ColumnStyles [6].MinAcceptableWidth < TableView.DEFAULT_MIN_ACCEPTABLE_WIDTH,
+             b => tableView.Style.ColumnStyles [6].MinAcceptableWidth = b ? 15 : TableView.DEFAULT_MIN_ACCEPTABLE_WIDTH)
         ];
 
         View priorView = null;
 
         foreach ((string text, Func<bool> iv, Action<bool> hndlr) tuple in options)
         {
-            CheckBox cb = new CheckBox()
+            var cb = new CheckBox
             {
-                X = 0, Y = priorView != null ? Pos.Bottom(priorView) : 0,
+                X = 0,
+                Y = priorView != null ? Pos.Bottom (priorView) : 0,
                 Text = tuple.text,
-                Value = tuple.iv () ? CheckState.Checked : CheckState.UnChecked,
+                Value = tuple.iv () ? CheckState.Checked : CheckState.UnChecked
             };
 
             cb.ValueChanged += (s, e) =>
@@ -146,15 +120,21 @@ public class TableViewTest : Scenario
                                    // without it some changes do not reflect until the next user interaction
                                    // some cases here might work, but only because a redraw is forced when Clicking the checkbox
                                    // which seems to be not correct! Changing the checkbox should redraw the checkbox, but not all views
-                                   tableView.Update();
+                                   tableView.Update ();
                                };
             priorView = cb;
             optionsView.Add (cb);
         }
 
-
-
-        win.Add (optionsView, offsetLabel, colOffsetUpDown, setColOffsetButton, rowOffsetUpDown, setRowOffsetButton, selectedRowUpDown, setSelectedRowButton, tableView);
+        win.Add (optionsView,
+                 offsetLabel,
+                 colOffsetUpDown,
+                 setColOffsetButton,
+                 rowOffsetUpDown,
+                 setRowOffsetButton,
+                 selectedRowUpDown,
+                 setSelectedRowButton,
+                 tableView);
 
         app.Run (win);
     }
@@ -162,7 +142,7 @@ public class TableViewTest : Scenario
 
 public class RedrawLabel : View
 {
-    int redrawCount = 0;
+    private int redrawCount;
 
     ///// <inheritdoc />
     //public override string Text
@@ -180,7 +160,7 @@ public class RedrawLabel : View
     //    redrawCount++;
     //    return base.OnDrawingContent (context);
     //}
-    /// <inheritdoc />
+    /// <inheritdoc/>
     protected override bool OnDrawingContent (DrawContext context)
     {
         base.OnDrawingContent (context);

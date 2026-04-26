@@ -31,8 +31,9 @@ public partial class FileDialog
     /// <param name="toRestore"></param>
     internal void RestoreSelection (IFileSystemInfo toRestore)
     {
-        _tableView.SelectedRow = State!.Children.IndexOf (r => r.FileSystemInfo == toRestore);
-        _tableView.EnsureSelectedCellIsVisible ();
+        int row = State!.Children.IndexOf (r => r.FileSystemInfo == toRestore);
+        _tableView.SetSelection (0, row >= 0 ? row : 0, false);
+        _tableView.EnsureCursorIsVisible ();
     }
 
     private bool CancelSearch ()
@@ -123,7 +124,12 @@ public partial class FileDialog
             {
                 _tableView.Viewport = _tableView.Viewport with { Y = 0 };
             }
-            _tableView.SelectedRow = 0;
+
+            if (_tableView.Viewport.X != 0)
+            {
+                _tableView.Viewport = _tableView.Viewport with { X = 0 };
+            }
+            _tableView.SetSelection (0, 0, false);
 
             SetNeedsDraw ();
             UpdateNavigationVisibility ();
@@ -218,6 +224,13 @@ public partial class FileDialog
             }
         }
 
+        string path = _tbPath.Text;
+
+        if (string.IsNullOrWhiteSpace (path))
+        {
+            return;
+        }
+
         Path = selected.FullName;
     }
 
@@ -254,7 +267,7 @@ public partial class FileDialog
             _tableViewContainer.X = 0;
             _tableViewContainer.Width = Dim.Fill ();
             _tableViewContainer.Arrangement = ViewArrangement.Fixed;
-            _tableViewContainer.Border.Thickness = new Thickness (0);
+            _tableViewContainer.Border.Thickness = new Thickness (1, 0, 0, 0);
         }
         _btnTreeToggle.Text = GetTreeToggleText (visible);
 
