@@ -1,4 +1,3 @@
-using System.Collections;
 using System.IO.Abstractions;
 using System.Text.RegularExpressions;
 
@@ -242,7 +241,6 @@ public partial class FileDialog
         _btnUp.Visible = _history.CanUp ();
     }
 
-#if !FILEDIALOG_ENABLE_TREE
     // --- Tree visibility management ---
 
     private void ToggleTreeVisibility () => SetTreeVisible (!_treeView.Visible);
@@ -278,5 +276,4 @@ public partial class FileDialog
     }
 
     private string GetTreeToggleText (bool visible) => visible ? $"{Glyphs.LeftArrow}{Strings.fdTree}" : $"{Glyphs.RightArrow}{Strings.fdTree}";
-#endif
 }

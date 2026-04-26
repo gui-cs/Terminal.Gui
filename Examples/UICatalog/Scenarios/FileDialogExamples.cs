@@ -206,7 +206,6 @@ public class FileDialogExamples : Scenario
         fd.Style.UseColors = _cbUseColors.Value == CheckState.Checked;
 
         fd.Style.TableStyle?.AlwaysShowHeaders = _cbAlwaysTableShowHeaders.Value == CheckState.Checked;
-#if !FILEDIALOG_ENABLE_TREE
         fd.Style.TreeStyle?.ShowBranchLines = _cbShowTreeBranchLines.Value == CheckState.Checked;
 
         IDirectoryInfoFactory dirInfoFactory = new FileSystem ().DirectoryInfo;
@@ -215,7 +214,6 @@ public class FileDialogExamples : Scenario
         {
             fd.Style.TreeRootGetter = () => { return Environment.GetLogicalDrives ().ToDictionary (dirInfoFactory.New, k => k); };
         }
-#endif
 
         fd.Style.PreserveFilenameOnDirectoryChanges = _cbPreserveFilenameOnDirectoryChanges.Value == CheckState.Checked;
 

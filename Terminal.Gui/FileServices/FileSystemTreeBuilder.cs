@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using System.IO;
 using System.IO.Abstractions;
 
 namespace Terminal.Gui.FileServices;
@@ -29,7 +28,12 @@ public class FileSystemTreeBuilder : ITreeBuilder<IFileSystemInfo>, IComparer<IF
             return 1;
         }
 
-        return x.Name.CompareTo (y.Name);
+        if (x is { } && y is { })
+        {
+            return string.Compare (x.Name, y.Name, StringComparison.Ordinal);
+        }
+
+        return 0;
     }
 
     /// <inheritdoc/>
@@ -67,7 +71,7 @@ public class FileSystemTreeBuilder : ITreeBuilder<IFileSystemInfo>, IComparer<IF
             return Enumerable.Empty<IFileSystemInfo> ();
         }
 
-        IDirectoryInfo dir = (IDirectoryInfo)entry;
+        var dir = (IDirectoryInfo)entry;
 
         try
         {
@@ -79,6 +83,5 @@ public class FileSystemTreeBuilder : ITreeBuilder<IFileSystemInfo>, IComparer<IF
         }
     }
 
-    private static bool IsReparsePoint (IFileSystemInfo entry) =>
-        (entry.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint;
+    private static bool IsReparsePoint (IFileSystemInfo entry) => (entry.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint;
 }

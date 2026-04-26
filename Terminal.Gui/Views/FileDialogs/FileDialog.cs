@@ -42,13 +42,9 @@ public partial class FileDialog : Dialog, IDesignable
     private readonly TableView _tableView;
     private readonly TextField _tbFind;
     private readonly TextField _tbPath;
-#if !FILEDIALOG_ENABLE_TREE
-
-// The FileDialog TreeView has too many issues and is currently disabled
     private readonly Button _btnTreeToggle;
     private readonly TreeView<IFileSystemInfo> _treeView;
     private Dictionary<IDirectoryInfo, string> _treeRoots = new ();
-#endif
     private DropDownList? _typeFilterDropDown;
     private int _currentSortColumn;
     private bool _currentSortIsAsc = true;
@@ -68,11 +64,7 @@ public partial class FileDialog : Dialog, IDesignable
         Width = Dim.Percent (80);
 
         _fileSystem = fileSystem;
-#if !FILEDIALOG_ENABLE_TREE
         Style = new FileDialogStyle (fileSystem);
-#else
-        Style = new FileDialogStyle ();
-#endif
         ButtonAlignment = Alignment.End;
         ButtonAlignmentModes = AlignmentModes.IgnoreFirstOrLast;
 
@@ -135,17 +127,13 @@ public partial class FileDialog : Dialog, IDesignable
             Y = Pos.Bottom (_btnBack),
             Width = Dim.Fill (),
             Height = Dim.Fill (),
-#if !FILEDIALOG_ENABLE_TREE
             Arrangement = ViewArrangement.LeftResizable,
             BorderStyle = LineStyle.Dashed,
             SuperViewRendersLineCanvas = true,
-#endif
             TabStop = TabBehavior.TabStop,
             CanFocus = true,
             Id = "_tableViewContainer"
         };
-
-#if !FILEDIALOG_ENABLE_TREE
 
         // Tree toggle button - Goes in Dialog Button Area
         _btnTreeToggle = new Button { NoPadding = true };
@@ -165,7 +153,7 @@ public partial class FileDialog : Dialog, IDesignable
             Height = Dim.Height (_tableViewContainer),
             Visible = true
         };
-#endif
+
         _tableView = new TableView { Width = Dim.Fill (), Height = Dim.Fill (_tbFind!) - 1, FullRowSelect = true, Id = "_tableView" };
         _tableView.CollectionNavigator = new FileDialogCollectionNavigator (this, _tableView);
         _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
@@ -189,7 +177,6 @@ public partial class FileDialog : Dialog, IDesignable
         typeStyle.MinWidth = 6;
         typeStyle.ColorGetter = ColorGetter;
 
-#if !FILEDIALOG_ENABLE_TREE
         var fileDialogTreeBuilder = new FileSystemTreeBuilder { IncludeFiles = false };
         _treeView.TreeBuilder = fileDialogTreeBuilder;
         _treeView.AspectGetter = AspectGetter;
@@ -197,7 +184,7 @@ public partial class FileDialog : Dialog, IDesignable
 
         _treeView.SelectionChanged += TreeView_SelectionChanged;
         _treeView.KeystrokeNavigator.Matcher = new FileSystemCollectionNavigationMatcher ();
-#endif
+
         _tableViewContainer.Add (_tableView);
 
         _tableView.Style.ShowHorizontalHeaderOverline = true;
@@ -260,9 +247,7 @@ public partial class FileDialog : Dialog, IDesignable
         UpdateNavigationVisibility ();
 
         // Add the toggle along with OK/Cancel so they align as a group
-#if !FILEDIALOG_ENABLE_TREE
         AddButton (_btnTreeToggle);
-#endif
         AddButton (CancelButton);
         AddButton (_btnOk);
 
@@ -270,12 +255,11 @@ public partial class FileDialog : Dialog, IDesignable
         Add (_btnUp);
         Add (_btnBack);
         Add (_btnForward);
-#if !FILEDIALOG_ENABLE_TREE
         Add (_treeView);
 
         // Default: Tree hidden and splitter hidden
         SetTreeVisible (false);
-#endif
+
         Add (_tableViewContainer);
         _tableViewContainer.Add (_tbFind);
         _tableViewContainer.Add (_spinnerView);
@@ -408,11 +392,9 @@ public partial class FileDialog : Dialog, IDesignable
             Normal = new Attribute (Color.Black, _tbPath.GetAttributeForRole (VisualRole.Normal).Background)
         };
 
-#if !FILEDIALOG_ENABLE_TREE
         _treeRoots = Style.TreeRootGetter ();
         Style.IconProvider.IsOpenGetter = _treeView.IsExpanded;
         _treeView.AddObjects (_treeRoots.Keys);
-#endif
 
         // if filtering on file type is configured then create the DropDownList and establish
         // initial filtering by extension(s)
@@ -447,11 +429,9 @@ public partial class FileDialog : Dialog, IDesignable
             Title = GetDefaultTitle ();
         }
 
-#if !FILEDIALOG_ENABLE_TREE
-
         // Ensure toggle button text matches current state after sizing
         SetTreeVisible (false);
-#endif
+
         SetNeedsDraw ();
         SetNeedsLayout ();
     }
