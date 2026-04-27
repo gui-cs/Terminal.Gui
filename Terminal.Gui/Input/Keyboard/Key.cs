@@ -210,6 +210,11 @@ public class Key : EventArgs, IEquatable<Key>
                 return GetSingleGraphemeOrEmpty (AssociatedText);
             }
 
+            if (IsAlt || IsCtrl)
+            {
+                return string.Empty;
+            }
+
             if (IsShift && ShiftedKeyCode != KeyCode.Null)
             {
                 Rune shiftedRune = ToRune (ShiftedKeyCode);
@@ -264,6 +269,11 @@ public class Key : EventArgs, IEquatable<Key>
                 Rune associatedRune = enumerator.Current;
 
                 return enumerator.MoveNext () ? default (Rune) : associatedRune;
+            }
+
+            if (IsAlt || IsCtrl)
+            {
+                return default (Rune);
             }
 
             if (IsShift && ShiftedKeyCode != KeyCode.Null)

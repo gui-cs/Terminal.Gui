@@ -635,10 +635,17 @@ public partial class View // Mouse APIs
         {
             App?.Mouse.GrabMouse (this);
 
-            if (!HasFocus && CanFocus)
+            if (!HasFocus)
             {
-                // Set the focus, but don't invoke Accept
-                SetFocus ();
+                if (CanFocus)
+                {
+                    // Set the focus, but don't invoke Accept
+                    SetFocus ();
+                }
+                else if (SuperView is { CanFocus: true, HasFocus: false, Enabled: true } superView)
+                {
+                    superView.SetFocus ();
+                }
             }
         }
 

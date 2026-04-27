@@ -356,6 +356,25 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void KittyAltModifiedPrintableKey_DoesNotInsertAssociatedText ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 10 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        Key? key = new KittyKeyboardPattern ().GetKey ("\u001b[116;3;116u");
+
+        Assert.NotNull (key);
+        Assert.False (top.NewKeyDownEvent (key));
+        Assert.Equal (string.Empty, tf.Text);
+
+        top.Dispose ();
+    }
+
+    [Fact]
     public void ShiftedDigitKey_WithoutKittyMetadata_InsertsBaseDigit ()
     {
         Runnable top = new ();
@@ -1484,5 +1503,40 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         container.Width = 30;
         Assert.Equal (0, tf.ScrollOffset);
         Assert.Equal (15, tf.Viewport.Width);
+    }
+
+    /// <summary>
+    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     When Kitty keyboard protocol sets AssociatedText on Alt+letter keys,
+    ///     TextField must not insert the text. Alt-modified keys are never text input.
+    /// </summary>
+    [Fact]
+    public void AltKey_With_AssociatedText_Does_Not_Insert_Into_TextField ()
+    {
+        // Copilot
+        TextField tf = new () { Width = 20 };
+        tf.SetFocus ();
+
+        Key altT = new (Key.T.WithAlt) { AssociatedText = "t" };
+        tf.NewKeyDownEvent (altT);
+
+        Assert.Equal ("", tf.Text);
+    }
+
+    /// <summary>
+    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     Ctrl-modified keys with AssociatedText must not be inserted as text.
+    /// </summary>
+    [Fact]
+    public void CtrlKey_With_AssociatedText_Does_Not_Insert_Into_TextField ()
+    {
+        // Copilot
+        TextField tf = new () { Width = 20 };
+        tf.SetFocus ();
+
+        Key ctrlT = new (Key.T.WithCtrl) { AssociatedText = "t" };
+        tf.NewKeyDownEvent (ctrlT);
+
+        Assert.Equal ("", tf.Text);
     }
 }

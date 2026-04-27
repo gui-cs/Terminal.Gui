@@ -2,6 +2,7 @@
 using System.Data;
 using System.Globalization;
 using System.Text;
+// ReSharper disable StringLiteralTypo
 
 namespace UICatalog.Scenarios;
 
@@ -169,8 +170,8 @@ public class TableEditor : Scenario
     private TableView? _tableView;
 
     /// <summary>
-    ///     Builds a simple table in which cell values contents are the index of the cell.  This helps testing that
-    ///     scrolling etc is working correctly and not skipping out any rows/columns when paging
+    ///     Builds a simple table in which cell values contents are the index of the cell.  This helps to test that
+    ///     scrolling etc. is working correctly and not skipping out any rows/columns when paging
     /// </summary>
     /// <param name="cols"></param>
     /// <param name="rows"></param>
@@ -253,8 +254,8 @@ public class TableEditor : Scenario
 
         appWindow.Add (_tableView);
 
-        _tableView!.SelectedCellChanged += (_, _) => { selectedCellLabel.Text = $"{_tableView!.SelectedRow},{_tableView!.SelectedColumn}"; };
-        _tableView!.CellActivated += EditCurrentCell;
+        _tableView!.ValueChanged += (_, _) => { selectedCellLabel.Text = $"{_tableView!.Value?.Cursor.Y ?? 0},{_tableView!.Value?.Cursor.X ?? 0}"; };
+        _tableView!.Accepted += EditCurrentCell;
         _tableView!.KeyDown += TableViewKeyPress;
 
         //SetupScrollBar ();
@@ -316,8 +317,6 @@ public class TableEditor : Scenario
                                       }
                                   };
 
-        _tableView!.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
-
         // Run - Start the application.
         app.Run (appWindow);
     }
@@ -369,7 +368,7 @@ public class TableEditor : Scenario
                                                                                _tableView!.Style.ShowHorizontalHeaderUnderline = state;
                                                                                _tableView!.Update ();
                                                                            }),
-                                                   CreateCheckBoxMenuItem ("Bottomline",
+                                                   CreateCheckBoxMenuItem ("BottomLine",
                                                                            "_BottomLine",
                                                                            _tableView!.Style.ShowHorizontalBottomLine,
                                                                            state =>
@@ -722,30 +721,33 @@ public class TableEditor : Scenario
 
     private void CloseExample () => _tableView!.Table = null;
 
-    private void EditCurrentCell (object? sender, CellActivatedEventArgs e)
+    private void EditCurrentCell (object? sender, CommandEventArgs args)
     {
-        if (e.Table is not DataTableSource || _currentTable == null)
+        if (_tableView?.Table is not DataTableSource || _currentTable == null)
         {
             return;
         }
 
-        int tableCol = ToTableCol (e.Col);
+        int col = _tableView.Value?.Cursor.X ?? 0;
+        int row = _tableView.Value?.Cursor.Y ?? 0;
+
+        int tableCol = ToTableCol (col);
 
         if (tableCol < 0)
         {
             return;
         }
 
-        object o = _currentTable.Rows [e.Row] [tableCol];
+        object o = _currentTable.Rows [row] [tableCol];
 
         string title = o is uint u ? GetUnicodeCategory (u) + $"(0x{o:X4})" : "Enter new value";
 
-        var oldValue = _currentTable.Rows [e.Row] [tableCol].ToString ();
+        var oldValue = _currentTable.Rows [row] [tableCol].ToString ();
 
         var ok = new Button { Text = Strings.btnOk };
         var cancel = new Button { Text = Strings.btnCancel };
         var d = new Dialog { Title = title, Buttons = [cancel, ok] };
-        var lbl = new Label { X = 0, Y = 1, Text = _tableView!.Table!.ColumnNames [e.Col] };
+        var lbl = new Label { X = 0, Y = 1, Text = _tableView!.Table!.ColumnNames [col] };
         var tf = new TextField { Text = oldValue!, X = 0, Y = 2, Width = Dim.Fill (0, 50) };
 
         d.Add (lbl, tf);
@@ -762,7 +764,7 @@ public class TableEditor : Scenario
 
         try
         {
-            _currentTable.Rows [e.Row] [tableCol] = string.IsNullOrWhiteSpace (tf.Text) ? DBNull.Value : tf.Text;
+            _currentTable.Rows [row] [tableCol] = string.IsNullOrWhiteSpace (tf.Text) ? DBNull.Value : tf.Text;
         }
         catch (Exception ex)
         {
@@ -792,12 +794,12 @@ public class TableEditor : Scenario
             return null;
         }
 
-        if (_tableView!.SelectedColumn < 0 || _tableView!.SelectedColumn > _tableView!.Table.Columns)
+        if (_tableView!.Value is null || _tableView!.Value.Cursor.X > _tableView!.Table.Columns)
         {
             return null;
         }
 
-        return _tableView!.SelectedColumn;
+        return _tableView!.Value.Cursor.X;
     }
 
     private string GetHumanReadableFileSize (FileSystemInfo fsi)
@@ -885,7 +887,7 @@ public class TableEditor : Scenario
     {
         _tableView!.Style.ColumnStyles.Clear ();
 
-        TreeView<FileSystemInfo> tree = new () { AspectGetter = f => f.Name, TreeBuilder = new DelegateTreeBuilder<FileSystemInfo> (GetChildren, f => false) };
+        TreeView<FileSystemInfo> tree = new () { AspectGetter = f => f.Name, TreeBuilder = new DelegateTreeBuilder<FileSystemInfo> (GetChildren, _ => false) };
 
         TreeTableSource<FileSystemInfo> source = new (_tableView,
                                                       "Name",

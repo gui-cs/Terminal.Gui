@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Terminal.Gui\Terminal.Gui.csproj" />
-    <TrimmerRootAssembly Include="Terminal.Gui" />
   </ItemGroup>
 
 </Project>

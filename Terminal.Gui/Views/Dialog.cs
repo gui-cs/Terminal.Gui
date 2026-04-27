@@ -102,7 +102,7 @@ public class Dialog : Dialog<int>
         get => ((IRunnable)this).Result is int value ? value : null;
         set
         {
-            if (value > Buttons.Length - 1 || value < 0)
+            if (value >= Buttons.Length || value < 0)
             {
                 throw new ArgumentOutOfRangeException (nameof (value), @"Result value must be a valid button index or null.");
             }

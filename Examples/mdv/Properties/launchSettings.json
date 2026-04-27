@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "mdv": {
-      "commandName": "Project",
-      "commandLineArgs": "../../../../../docfx/docs/cursor.md"
-    }
-  }
-}

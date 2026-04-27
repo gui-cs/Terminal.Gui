@@ -177,16 +177,12 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         RequestStop ();
 
         return sourceView is IAcceptTarget { IsDefault: false };
-
     }
 
     /// <inheritdoc/>
     protected override void OnViewportChanged (DrawEventArgs e)
     {
-        //if (!IsInitialized)
-        {
-            SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, Viewport.Width), Math.Max (_minimumButtonsSize.Height, Viewport.Height)));
-        }
+        SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, Viewport.Width), Math.Max (_minimumButtonsSize.Height, Viewport.Height)));
         base.OnViewportChanged (e);
     }
 
