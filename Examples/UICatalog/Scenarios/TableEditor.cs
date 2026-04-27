@@ -221,6 +221,7 @@ public class TableEditor : Scenario
                                    [
                                        new MenuItem { Title = "_OpenBigExample", Action = () => OpenExample (true) },
                                        new MenuItem { Title = "_OpenSmallExample", Action = () => OpenExample (false) },
+                                       new MenuItem { Title = "Open_WideColumnExample", Action = OpenWideColumnExample },
                                        new MenuItem { Title = "OpenCharacter_Map", Action = OpenUnicodeMap },
                                        new MenuItem { Title = "OpenTreeExample", Action = OpenTreeExample },
                                        new MenuItem { Title = "_CloseExample", Action = CloseExample },
@@ -882,6 +883,36 @@ public class TableEditor : Scenario
     }
 
     private void OpenSimple (bool big) => SetTable (BuildSimpleDataTable (big ? 30 : 5, big ? 1000 : 5));
+
+    // Demonstrates the fix for #5072: a column with very wide content used to consume all viewport
+    // space and push later columns off-screen. With the fix, "Description" is clamped so "Status" and
+    // "Owner" remain visible at their header widths.
+    private void OpenWideColumnExample ()
+    {
+        DataTable dt = new ();
+        dt.Columns.Add ("Id", typeof (int));
+        dt.Columns.Add ("Description", typeof (string));
+        dt.Columns.Add ("Status", typeof (string));
+        dt.Columns.Add ("Owner", typeof (string));
+
+        string [] statuses = ["Open", "InProgress", "Blocked", "Done"];
+        string [] owners = ["Alice", "Bob", "Carol", "Dan"];
+
+        for (var i = 0; i < 25; i++)
+        {
+            dt.Rows.Add (
+                         i,
+                         $"Row {i}: " + new string ('x', 120 + i % 40),
+                         statuses [i % statuses.Length],
+                         owners [i % owners.Length]);
+        }
+
+        SetTable (dt);
+
+        // Clear any styles inherited from a previous example
+        _tableView!.Style.ColumnStyles.Clear ();
+        _tableView!.Update ();
+    }
 
     private void OpenTreeExample ()
     {

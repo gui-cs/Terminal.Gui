@@ -181,6 +181,24 @@ public partial class TableView
 
                 int lastColIdx = nonHiddenColumns.Any () ? nonHiddenColumns.Last ().colIdx : -1;
 
+                // Precompute per-column minimum widths and a suffix sum so that "space reserved for remaining
+                // columns" is O(1) per column. The whole layout pass stays O(columns)
+                int columnCount = nonHiddenColumns.Count;
+                int [] minWidths = new int [columnCount];
+                int [] reservedFromIndex = new int [columnCount + 1];
+
+                for (var i = 0; i < columnCount; i++)
+                {
+                    (int colIdx, ColumnStyle? colStyle) = nonHiddenColumns [i];
+                    minWidths [i] = MinimumWidthFor (colIdx, colStyle);
+                }
+
+                for (int i = columnCount - 1; i >= 0; i--)
+                {
+                    int separator = i < columnCount - 1 ? 1 : 0;
+                    reservedFromIndex [i] = minWidths [i] + separator + reservedFromIndex [i + 1];
+                }
+
                 //right border
                 contentSize.Width += Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
 
@@ -229,14 +247,13 @@ public partial class TableView
                     else if (Viewport.Width > 0)
                     {
                         // Reserve at least the header width for each subsequent visible column so that a wide
-                        // column does not consume all viewport space and push later columns off-screen. This is
-                        // O(columns) — we never iterate cell rows here. See issue #5072.
-                        int reservedForRemaining = ReserveSpaceForRemainingColumns (nonHiddenColumns, columnIndex + 1);
+                        // column does not consume all viewport space and push later columns off-screen.
+                        int reservedForRemaining = reservedFromIndex [columnIndex + 1];
                         int borderWidth = Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
                         int availableForThisCol = Viewport.Width - contentSize.Width - reservedForRemaining - borderWidth - 1; // -1 for this column's separator
 
                         // Don't shrink below this column's own minimum (header width or configured minimum)
-                        int thisColMin = MinimumWidthFor (colIdx, colStyle);
+                        int thisColMin = minWidths [columnIndex];
 
                         if (colWidth > availableForThisCol && availableForThisCol >= thisColMin)
                         {
@@ -330,28 +347,5 @@ public partial class TableView
         }
 
         return min;
-    }
-
-    /// <summary>
-    ///     Returns the total horizontal space (including inter-column separators) that should be reserved for the
-    ///     visible columns starting at <paramref name="startIndex"/> in <paramref name="nonHiddenColumns"/>.
-    /// </summary>
-    private int ReserveSpaceForRemainingColumns (List<(int colIdx, ColumnStyle? colStyle)> nonHiddenColumns, int startIndex)
-    {
-        var reserved = 0;
-
-        for (int j = startIndex; j < nonHiddenColumns.Count; j++)
-        {
-            (int otherColIdx, ColumnStyle? otherColStyle) = nonHiddenColumns [j];
-            reserved += MinimumWidthFor (otherColIdx, otherColStyle);
-
-            // Separator between this reserved column and the next reserved column
-            if (j < nonHiddenColumns.Count - 1)
-            {
-                reserved += 1;
-            }
-        }
-
-        return reserved;
     }
 }
