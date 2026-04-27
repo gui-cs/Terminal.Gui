@@ -154,16 +154,10 @@ public partial class FileDialog
                          .ToArray ();
     }
 
-    private bool IsCompatibleWithAllowedExtensions (string path)
-    {
-        // no restrictions
-        if (!AllowedTypes.Any ())
-        {
-            return true;
-        }
+    private bool IsCompatibleWithAllowedExtensions (string path) =>
 
-        return AllowedTypes.Any (t => t.IsAllowed (path));
-    }
+        // no restrictions
+        AllowedTypes.Count == 0 || AllowedTypes.Any (t => t.IsAllowed (path));
 
     private bool IsCompatibleWithOpenMode (string s, out string reason)
     {

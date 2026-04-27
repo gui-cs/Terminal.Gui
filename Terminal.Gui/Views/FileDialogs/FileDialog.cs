@@ -207,7 +207,7 @@ public partial class FileDialog : Dialog, IDesignable
         // by default, Runnable doesn't bind to Command.Context, so
         // we can take advantage of the CommandNotBound event to handle it
         _tableView.CommandNotBound += TableViewHandleCommandNotBound;
-        _tableView.KeyBindings.Add (Key.Space.WithCtrl, Command.Context);
+        _tableView.KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
         _tableView.MouseBindings.Add (MouseFlags.RightButtonClicked, Command.Context);
 
         _tbPath.TextChanged += (_, _) => PathChanged ();
@@ -397,7 +397,7 @@ public partial class FileDialog : Dialog, IDesignable
 
         // if filtering on file type is configured then create the DropDownList and establish
         // initial filtering by extension(s)
-        if (AllowedTypes.Any ())
+        if (AllowedTypes.Count > 0)
         {
             CurrentFilter = AllowedTypes [0];
 
