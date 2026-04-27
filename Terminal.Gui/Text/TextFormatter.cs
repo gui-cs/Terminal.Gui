@@ -12,6 +12,10 @@ public class TextFormatter
     // Utilized in CRLF related helper methods for faster newline char index search.
     private static readonly SearchValues<char> NewlineSearchValues = SearchValues.Create (['\r', '\n']);
 
+    // New architecture components
+    private readonly ITextFormatter _formatter;
+    private readonly ITextRenderer _renderer;
+
     private Key _hotKey = new ();
     private int _hotKeyPos = -1;
     private List<string> _lines = new ();
@@ -24,12 +28,32 @@ public class TextFormatter
     private Alignment _textVerticalAlignment = Alignment.Start;
     private bool _wordWrap = true;
 
+    /// <summary>
+    ///     Gets or sets whether to use the new architecture for drawing.
+    ///     When true, the Draw method will use the new separated formatter/renderer architecture.
+    ///     This provides better performance and addresses Format/Draw coupling issues.
+    /// </summary>
+    public bool UseNewArchitecture { get; set; } = true;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="TextFormatter"/> class.
+    /// </summary>
+    public TextFormatter()
+    {
+        _formatter = new StandardTextFormatter();
+        _renderer = new StandardTextRenderer();
+    }
+
     /// <summary>Get or sets the horizontal text alignment.</summary>
     /// <value>The text alignment.</value>
     public Alignment Alignment
     {
         get => _textAlignment;
-        set => _textAlignment = EnableNeedsFormat (value);
+        set
+        {
+            _textAlignment = EnableNeedsFormat(value);
+            _formatter.Alignment = value;
+        }
     }
 
     /// <summary>
@@ -43,7 +67,11 @@ public class TextFormatter
     public TextDirection Direction
     {
         get => _textDirection;
-        set => _textDirection = EnableNeedsFormat (value);
+        set
+        {
+            _textDirection = EnableNeedsFormat(value);
+            _formatter.Direction = value;
+        }
     }
 
     /// <summary>Draws the text held by <see cref="TextFormatter"/> to <see cref="IDriver"/> using the colors specified.</summary>
@@ -57,6 +85,73 @@ public class TextFormatter
     /// <param name="hotColor">The color to use to draw the hotkey</param>
     /// <param name="maximum">Specifies the screen-relative location and maximum container size.</param>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
+    
+    /// <summary>
+    ///     Draws the text using the new architecture (formatter + renderer separation).
+    ///     This method demonstrates the improved design with better performance and extensibility.
+    /// </summary>
+    /// <param name="screen">The screen bounds for drawing.</param>
+    /// <param name="normalColor">The color for normal text.</param>
+    /// <param name="hotColor">The color for HotKey text.</param>
+    /// <param name="maximum">The maximum container bounds.</param>
+    /// <param name="driver">The console driver to use for drawing.</param>
+    public void DrawWithNewArchitecture(
+        Rectangle screen,
+        Attribute normalColor,
+        Attribute hotColor,
+        Rectangle maximum = default,
+        IConsoleDriver? driver = null)
+    {
+        // Sync properties with the new formatter
+        SyncFormatterProperties();
+        
+        // Format the text using the new architecture
+        FormattedText formattedText = _formatter.Format();
+        
+        // Render using the new renderer
+        _renderer.Draw(formattedText, screen, normalColor, hotColor, FillRemaining, maximum, driver);
+    }
+
+    /// <summary>
+    ///     Gets the draw region using the new architecture.
+    ///     This provides the same functionality as GetDrawRegion but with improved performance.
+    /// </summary>
+    /// <param name="screen">The screen bounds.</param>
+    /// <param name="maximum">The maximum container bounds.</param>
+    /// <returns>A region representing the areas that would be drawn.</returns>
+    public Region GetDrawRegionWithNewArchitecture(Rectangle screen, Rectangle maximum = default)
+    {
+        SyncFormatterProperties();
+        FormattedText formattedText = _formatter.Format();
+        return _renderer.GetDrawRegion(formattedText, screen, maximum);
+    }
+
+    /// <summary>
+    ///     Gets the formatted size using the new architecture.
+    ///     This addresses the Format/Draw decoupling issues mentioned in the architectural problems.
+    /// </summary>
+    /// <returns>The size required for the formatted text.</returns>
+    public Size GetFormattedSizeWithNewArchitecture()
+    {
+        SyncFormatterProperties();
+        return _formatter.GetFormattedSize();
+    }
+
+    private void SyncFormatterProperties()
+    {
+        // Ensure the new formatter has all the current property values
+        _formatter.Text = _text ?? string.Empty;
+        _formatter.Alignment = _textAlignment;
+        _formatter.VerticalAlignment = _textVerticalAlignment;
+        _formatter.Direction = _textDirection;
+        _formatter.WordWrap = _wordWrap;
+        _formatter.MultiLine = _multiLine;
+        _formatter.HotKeySpecifier = HotKeySpecifier;
+        _formatter.TabWidth = _tabWidth;
+        _formatter.PreserveTrailingSpaces = _preserveTrailingSpaces;
+        _formatter.ConstrainToSize = ConstrainToSize;
+    }
+
     public void Draw (
         IDriver? driver,
         Rectangle screen,
@@ -65,6 +160,14 @@ public class TextFormatter
         Rectangle maximum = default
     )
     {
+        // If using new architecture, delegate to the improved implementation
+        if (UseNewArchitecture)
+        {
+            DrawWithNewArchitecture(screen, normalColor, hotColor, maximum, driver);
+            return;
+        }
+
+        // Original implementation follows...
         ArgumentNullException.ThrowIfNull (driver);
 
         // With this check, we protect against subclasses with overrides of Text (like Button)
@@ -870,7 +973,11 @@ public class TextFormatter
     public string Text
     {
         get => _text!;
-        set => _text = EnableNeedsFormat (value);
+        set
+        {
+            _text = EnableNeedsFormat(value);
+            _formatter.Text = value ?? string.Empty;
+        }
     }
 
     /// <summary>Gets or sets the vertical text-alignment.</summary>
@@ -878,7 +985,11 @@ public class TextFormatter
     public Alignment VerticalAlignment
     {
         get => _textVerticalAlignment;
-        set => _textVerticalAlignment = EnableNeedsFormat (value);
+        set
+        {
+            _textVerticalAlignment = EnableNeedsFormat(value);
+            _formatter.VerticalAlignment = value;
+        }
     }
 
     /// <summary>Gets or sets whether word wrap will be used to fit <see cref="Text"/> to <see cref="ConstrainToSize"/>.</summary>
