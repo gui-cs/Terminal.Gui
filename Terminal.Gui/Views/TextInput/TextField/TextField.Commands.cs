@@ -522,6 +522,14 @@ public partial class TextField
 
         App?.Clipboard?.SetClipboardData (SelectedText);
 
+        if (!ReadOnly)
+        {
+            return true;
+        }
+        _insertionPoint = 0;
+        ScrollOffset = 0;
+        ClearAllSelection ();
+
         return true;
     }
 
