@@ -182,7 +182,8 @@ public partial class TableView
                 int lastColIdx = nonHiddenColumns.Any () ? nonHiddenColumns.Last ().colIdx : -1;
 
                 // Precompute per-column minimum widths and a suffix sum so that "space reserved for remaining
-                // columns" is O(1) per column. The whole layout pass stays O(columns)
+                // columns" is O(1) per column during reservation/min-width bookkeeping. Later width calculations
+                // may still inspect row data.
                 int columnCount = nonHiddenColumns.Count;
                 int [] minWidths = new int [columnCount];
                 int [] reservedFromIndex = new int [columnCount + 1];

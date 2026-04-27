@@ -550,7 +550,7 @@ public class TableViewTests : TestDriverBase
                      }'");
     }
 
-    // Claude - Opus 4.5
+    // Copilot
     // Verifies fix for #5072: a column with very wide content must not consume all viewport space
     // and push later columns off-screen. Each subsequent visible column should be reserved at least
     // its header width.
@@ -563,7 +563,7 @@ public class TableViewTests : TestDriverBase
         dt.Columns.Add ("Owner");
         dt.Rows.Add (new string ('x', 200), "ok", "me");
 
-        TableView tableView = new ()
+        using TableView tableView = new ()
         {
             Table = new DataTableSource (dt),
             Viewport = new Rectangle (0, 0, 40, 5)
@@ -598,7 +598,7 @@ public class TableViewTests : TestDriverBase
         Assert.True (owner.Width - 1 >= "Owner".Length, $"Owner got width {owner.Width - 1}");
     }
 
-    // Claude - Opus 4.5
+    // Copilot
     // When the viewport is too small to fit even minimum widths for every column, layout falls back
     // to the prior left-to-right packing (columns may extend past the viewport, accessible via
     // horizontal scrolling).
@@ -611,7 +611,7 @@ public class TableViewTests : TestDriverBase
         dt.Columns.Add ("Owner");
         dt.Rows.Add (new string ('x', 50), "ok", "me");
 
-        TableView tableView = new ()
+        using TableView tableView = new ()
         {
             Table = new DataTableSource (dt),
             Viewport = new Rectangle (0, 0, 10, 5)
@@ -628,7 +628,7 @@ public class TableViewTests : TestDriverBase
         Assert.All (columns, c => Assert.True (c.Width > 0, $"Column {c.Column} got non-positive width {c.Width}"));
     }
 
-    // Claude - Opus 4.5
+    // Copilot
     // Single-column tables should still expand to fill the viewport when ExpandLastColumn is true.
     [Fact]
     public void Calculate_SingleColumn_StillExpandsLastColumn ()
@@ -637,7 +637,7 @@ public class TableViewTests : TestDriverBase
         dt.Columns.Add ("Only");
         dt.Rows.Add ("hi");
 
-        TableView tableView = new ()
+        using TableView tableView = new ()
         {
             Table = new DataTableSource (dt),
             Viewport = new Rectangle (0, 0, 30, 5)
