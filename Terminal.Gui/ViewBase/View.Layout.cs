@@ -18,7 +18,7 @@ public partial class View // Layout APIs
     private Rectangle? _frame;
 
     /// <summary>
-    ///     Gets or sets the resolved absolute location and dimension of the view.
+    ///     Gets or sets the resolved location and dimension of the view.
     /// </summary>
     /// <value>
     ///     The rectangle describing absolute location and dimension of the view, in coordinates relative to the

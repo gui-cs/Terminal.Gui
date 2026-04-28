@@ -1,6 +1,6 @@
 # Layout
 
-Terminal.Gui layout is declarative and responsive. Instead of hard-coding every `Frame`, you describe how a [View](View.md) should relate to its `SuperView`, its content, and sibling views. Terminal.Gui then recalculates the final `Frame` whenever layout runs, including after terminal resizes.
+Terminal.Gui layout is declarative and responsive. Instead of hard-coding every `Frame`, you describe how a [View](View.md) should relate to its `SuperView`, its content, and sibling views. Terminal.Gui then resolves the final `Frame` whenever layout runs, including after terminal resizes.
 
 If you have used responsive web or React-style layouts before, the mental model is similar: declare relationships such as "center this", "fill the remaining space", "stay 1 cell to the right of that view", or "use 50% of the available width", and let the layout engine resolve the actual coordinates.
 
@@ -266,6 +266,7 @@ superView.Add (label, textField, btn);
 ```
 
 The text field expands and contracts automatically as the available width changes.
+Here `to: btn` names the `Dim.Fill` parameter that tells the text field where its fill should stop.
 
 ### Align Multiple Views (Like Dialog Buttons)
 

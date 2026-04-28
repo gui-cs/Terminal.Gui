@@ -17,8 +17,8 @@ namespace Terminal.Gui.ViewBase;
 ///     </para>
 ///     <para>
 ///         <see cref="Pos"/> values can be combined to produce more useful layouts, such as
-///         <c>Pos.Center () - 3</c>, which shifts the position of the <see cref="View"/> 3 columns to the left after
-///         centering.
+///         <c>Pos.Center () - 3</c>, which shifts the resolved position of the <see cref="View"/> 3 cells earlier on
+///         the axis after centering.
 ///     </para>
 ///     <para>
 ///         Reference coordinates of another view by using <see cref="Left(View)"/>, <see cref="Right(View)"/>,
