@@ -158,7 +158,7 @@ Label absoluteLabel = new () { X = 1, Y = 2, Width = 12, Height = 1, Text = "Abs
 Label responsiveLabel = new ()
 {
     Text = "Responsive",
-    X = Pos.Right (otherView),
+    X = Pos.Right (absoluteLabel),
     Y = Pos.Center (),
     Width = Dim.Fill (),
     Height = Dim.Percent (50)
