@@ -128,7 +128,7 @@ public class ShadowTests (ITestOutputHelper output)
         Assert.Equal (new Thickness (0, 0, 2, 2), view.Margin.Thickness);
 
         view.ShadowStyle = null;
-        Assert.Equal (new Size (2, 2), (view.Margin.View as MarginView)?.ShadowSize);
+        Assert.Equal (Size.Empty, (view.Margin.View as MarginView)?.ShadowSize);
         Assert.Equal (new Thickness (0, 0, 0, 0), view.Margin.Thickness);
 
         view.ShadowStyle = ShadowStyles.Opaque;
