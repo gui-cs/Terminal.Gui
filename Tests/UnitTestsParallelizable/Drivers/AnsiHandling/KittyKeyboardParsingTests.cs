@@ -881,8 +881,8 @@ public class KittyKeyboardParsingTests
 
     // Copilot - ChatGPT v4
     /// <summary>
-    /// Regression test for Ctrl+Alt+A (without Shift).
-    /// This should remain as Ctrl+Alt+A, not regress.
+    /// Regression test for Alt+A (without Shift and Ctrl).
+    /// This should remain as Alt+A, not regress.
     /// Input: ESC[97;3;97u = 'a', modifiers 3 (0b010 = Alt, no Shift)
     /// </summary>
     [Fact]
@@ -890,7 +890,7 @@ public class KittyKeyboardParsingTests
     {
         // ESC[97;3;97u = 'a', modifiers 3 (0b010 = Alt, no Shift)
         // mask = 3 - 1 = 2 which means 2 = 2 (Alt)
-        Key? key = _pattern.GetKey ("\u001b[97;3u");
+        Key? key = _pattern.GetKey ("\u001b[97;3;97u");
 
         Assert.NotNull (key);
         Assert.Equal (Key.A.WithAlt, key);
