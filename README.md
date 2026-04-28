@@ -69,7 +69,7 @@ window.Add (label);
 app.Run (window);
 ```
 
-See the [Examples](Examples/) directory for more.
+See the [Examples](Examples/README.md) for more.
 
 # Documentation 
 
