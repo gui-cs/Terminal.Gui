@@ -169,13 +169,13 @@ Label responsiveLabel = new ()
 
 <xref:Terminal.Gui.ViewBase.Pos> is the type of `View.X` and `View.Y`. To make a view's position respond to available space or other views instead of using a fixed coordinate, use it.
 
-* Absolute position, by passing an integer - `Pos.Absolute ()`
-* Percentage of the `SuperView` size - `Pos.Percent ()`
-* Anchored from the end of the dimension - `Pos.AnchorEnd ()`
+* Absolute position, by passing an integer - `Pos.Absolute (10)` or simply `X = 10`
+* Percentage of the `SuperView` size - `Pos.Percent (50)`
+* Anchored from the end of the dimension - `Pos.AnchorEnd (10)`
 * Centered - `Pos.Center ()`
-* Tracking another view - `Pos.Left ()`, `Pos.Right ()`, `Pos.Top ()`, `Pos.Bottom ()`
-* Aligning as a group - `Pos.Align ()`
-* Computing from a function - `Pos.Func ()`
+* Tracking another view - `Pos.Left (otherView)`, `Pos.Right (otherView)`, `Pos.Top (otherView)`, `Pos.Bottom (otherView)`
+* Aligning as a group - `Pos.Align (...)`
+* Computing from a function - `Pos.Func (...)`
 
 All <xref:Terminal.Gui.ViewBase.Pos> coordinates are relative to the SuperView's content area.
 
