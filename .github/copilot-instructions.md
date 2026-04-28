@@ -237,3 +237,8 @@ public string Name
 - PRs must not introduce new compiler warnings (fix warnings in files you modify)
 - Title format: `Fixes #issue. Terse description`
 - Update `Examples/UICatalog` scenarios when adding user-visible features 
+
+## Documentation Style
+
+- In reference/how-to/API docs, write instructions as `To [goal], [imperative action].`
+- Avoid `When/If you want/need to ...` unless describing a real condition.
