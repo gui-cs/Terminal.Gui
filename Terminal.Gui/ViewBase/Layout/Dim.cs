@@ -13,9 +13,8 @@ namespace Terminal.Gui.ViewBase;
 ///         rather than using a fixed number of cells, use <see cref="Dim"/>.
 ///     </para>
 ///     <para>
-///         This is the primary API for responsive sizing in Terminal.Gui. Instead of hard-coding a final width or
-///         height, you describe the relationship that should be maintained and the layout engine resolves the final
-///         <see cref="View.Frame"/> whenever layout runs.
+///         To define responsive sizing in Terminal.Gui, describe the relationship that should be maintained and let the
+///         layout engine resolve the final <see cref="View.Frame"/> whenever layout runs.
 ///     </para>
 ///     <para>
 ///         <list type="table">

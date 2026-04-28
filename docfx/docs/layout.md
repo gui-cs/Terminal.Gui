@@ -1,8 +1,8 @@
 # Layout
 
-Terminal.Gui layout is declarative and responsive. Instead of hard-coding every `Frame`, you describe how a [View](View.md) should relate to its `SuperView`, its content, and sibling views. Terminal.Gui then resolves the final `Frame` whenever layout runs, including after terminal resizes.
+Terminal.Gui layout is declarative and responsive. To define layout, describe how a [View](View.md) should relate to its `SuperView`, its content, and sibling views. To inspect the resolved result, read the final `Frame` after layout runs, including after terminal resizes.
 
-If you have used responsive web or React-style layouts before, the mental model is similar: declare relationships such as "center this", "fill the remaining space", "stay 1 cell to the right of that view", or "use 50% of the available width", and let the layout engine resolve the actual coordinates.
+To apply a mental model similar to responsive web or React-style layouts, declare relationships such as "center this", "fill the remaining space", "stay 1 cell to the right of that view", or "use 50% of the available width", and let the layout engine resolve the actual coordinates.
 
 See [View Deep Dive](View.md), [Arrangement Deep Dive](arrangement.md), [Scrolling Deep Dive](scrolling.md), and [Drawing Deep Dive](drawing.md) for more.
 
@@ -101,7 +101,7 @@ The flags are organized into categories:
 
 ## Responsive Mental Model
 
-Think of Terminal.Gui layout as a small responsive layout language for TUIs:
+To reason about Terminal.Gui layout, think of it as a small responsive layout language for TUIs:
 
 - `X` and `Y` answer **where should this view start?**
 - `Width` and `Height` answer **how much space should it take?**
@@ -244,7 +244,7 @@ classDiagram
 
 ## How To
 
-This section provides solutions to common layout scenarios.
+To solve common layout scenarios, use this section.
 
 ### Stretch a View Between Fixed Elements
 
