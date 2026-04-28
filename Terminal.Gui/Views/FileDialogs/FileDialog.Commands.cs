@@ -212,7 +212,7 @@ public partial class FileDialog
 
                 return false;
 
-            default: throw new InvalidEnumArgumentException (nameof (OpenMode));
+            default: throw new InvalidEnumArgumentException (nameof (OpenMode), (int)OpenMode, typeof (OpenMode));
         }
     }
 
