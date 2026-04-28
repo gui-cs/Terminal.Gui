@@ -114,27 +114,11 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         SetStyle ();
     }
 
-    private Size _minimumSubViewsSize;
-
     /// <inheritdoc/>
     public override void EndInit ()
     {
         base.EndInit ();
         UpdateSizes ();
-
-#if DIALOG_SCROLLBARS
-        // Don't enable scrollbars until after initialized; otherwise they get created before
-        // our frame has dimensions.
-        ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
-#endif
-    }
-
-    /// <inheritdoc/>
-    protected override void OnSubViewAdded (View view)
-    {
-        _minimumSubViewsSize = new Size (GetWidthRequiredForSubViews (), GetHeightRequiredForSubViews ());
-        UpdateSizes ();
-        base.OnSubViewAdded (view);
     }
 
     /// <inheritdoc/>
@@ -196,13 +180,8 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         }
 
         // Always floor at Viewport size — the content area should never be smaller
-        // than what's visible. For DimAuto dialogs, the Frame may be larger than
-        // _minimumSubViewsSize (e.g. due to title width), so the content area
-        // should reflect the actual available space.
-        int subViewsWidth = Math.Max (_minimumSubViewsSize.Width, Viewport.Width);
-        int subViewsHeight = Math.Max (_minimumSubViewsSize.Height, Viewport.Height);
-
-        SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, subViewsWidth), Math.Max (_minimumButtonsSize.Height, subViewsHeight)));
+        // than what's visible.
+        SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, Viewport.Width), Math.Max (_minimumButtonsSize.Height, Viewport.Height)));
     }
 
     /// <summary>
@@ -212,10 +191,10 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <returns></returns>
     private int GetMinimumDialogWidth ()
     {
-        int minSize = Math.Max (Math.Max (_minimumSubViewsSize.Width,
+        int minSize = Math.Max (
 
-                                          // Ensure space for title + borders
-                                          Title.GetColumns () + 4),
+                                // Ensure space for title + borders
+                                Title.GetColumns () + 4,
                                 _minimumButtonsSize.Width);
 
         return minSize;
@@ -228,7 +207,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <returns></returns>
     private int GetMinimumDialogHeight ()
     {
-        int minSize = Math.Max (_minimumSubViewsSize.Height, _minimumButtonsSize.Height - Border.Thickness.Vertical - Margin.Thickness.Vertical);
+        int minSize = _minimumButtonsSize.Height - Border.Thickness.Vertical - Margin.Thickness.Vertical;
 
         return minSize;
     }
