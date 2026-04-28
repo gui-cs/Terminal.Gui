@@ -79,5 +79,5 @@ internal class FileDialogState
     protected bool MatchesApiFilter (FileSystemInfoStats arg) =>
         Parent.CurrentFilter is { } && (arg.IsDir || (arg.FileSystemInfo is IFileInfo f && Parent.CurrentFilter.IsAllowed (f.FullName)));
 
-    internal virtual void RefreshChildren () { Children = GetChildren (Directory).ToArray (); }
+    internal virtual void RefreshChildren () => Children = GetChildren (Directory).ToArray ();
 }

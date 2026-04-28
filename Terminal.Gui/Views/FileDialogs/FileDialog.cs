@@ -455,6 +455,7 @@ public partial class FileDialog : Dialog, IDesignable
             parent.SearchMatcher.Initialize (searchTerms);
             Children = [];
             BeginSearch ();
+            RefreshChildren ();
         }
 
         /// <summary>
@@ -471,8 +472,6 @@ public partial class FileDialog : Dialog, IDesignable
 
             return !alreadyCancelled;
         }
-
-        internal override void RefreshChildren () { }
 
         private void BeginSearch ()
         {
