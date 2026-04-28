@@ -197,12 +197,12 @@ myView.Y = Pos.Bottom (anotherView) + 5;
 <xref:Terminal.Gui.ViewBase.Dim> is the type of `View.Width` and `View.Height`. To make size respond to content, terminal size, or sibling views instead of using a fixed number of cells, use it.
 
 * Automatic size based on the view's content - `Dim.Auto ()` - See [Dim.Auto Deep Dive](dimauto.md)
-* Absolute size, by passing an integer - `Dim.Absolute ()`
-* Percentage of the `SuperView` content area - `Dim.Percent ()`
+* Absolute size, by passing an integer - `Dim.Absolute (10)`
+* Percentage of the `SuperView` content area - `Dim.Percent (50)`
 * Fill the remaining space - `Dim.Fill ()`
 * Fill up to another view - `Dim.Fill (to: otherView)`
-* Track another view's size - `Dim.Width ()`, `Dim.Height ()`
-* Compute from a function - `Dim.Func ()`
+* Track another view's size - `Dim.Width (otherView)`, `Dim.Height (otherView)`
+* Compute from a function - `Dim.Func (() => 10)`
 
 `Dim.Fill ()` is especially useful for responsive forms and panes. **Note:** `Dim.Fill` does not contribute to a `SuperView`'s `Dim.Auto ()` sizing unless `minimumContentDim` is specified. See [Dim.Auto Deep Dive](dimauto.md) for details.
 
