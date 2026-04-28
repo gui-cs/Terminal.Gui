@@ -213,7 +213,7 @@ public class Notepad : Scenario
             AllowedTypes =
             [
                 new AllowedType ("Markdown", ".md", ".markdown"),
-                new AllowedType ("Text ", ".txt", ".csv", ".tsv"),
+                new AllowedType ("Text", ".txt", ".csv", ".tsv"),
                 new AllowedType ("Code", ".c", ".h", ".js", ".cs", ".json", ".yml"),
                 new AllowedTypeAny ()
             ],
