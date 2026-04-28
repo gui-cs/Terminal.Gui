@@ -30,6 +30,16 @@ namespace Terminal.Gui.Views;
 ///         Subclasses should set <see cref="IRunnable{TResult}.Result"/> before calling <see cref="Runnable.RequestStop"/>
 ///         to return a value. If Result is not set (remains <c>null</c>), the dialog is considered canceled.
 ///     </para>
+///     <para>
+///         The dialog is positioned at <see cref="Pos.Center"/> with <see cref="Dim.Auto"/> sizing,
+///         limited to 100% of <see cref="IApplication.TopRunnableView"/> (or screen dimensions).
+///     </para>
+///     <para>
+///         <b>NOTE </b> - Setting <see cref="View.ViewportSettings"/> to
+///         <see cref="ViewportSettingsFlags.HasHorizontalScrollBar"/> or
+///         <see cref="ViewportSettingsFlags.HasVerticalScrollBar"/>
+///         is not supported and may cause layout issues.
+///     </para>
 /// </remarks>
 /// <example>
 ///     <code>
@@ -69,10 +79,6 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <summary>
     ///     Initializes a new instance of the <see cref="Dialog{TResult}"/> class with no buttons.
     /// </summary>
-    /// <remarks>
-    ///     The dialog is positioned at <see cref="Pos.Center"/> with <see cref="Dim.Auto"/> sizing,
-    ///     limited to 100% of <see cref="IApplication.TopRunnableView"/> (or screen dimensions).
-    /// </remarks>
     public Dialog ()
     {
         X = Pos.Center ();
