@@ -1,26 +1,9 @@
-
 namespace Terminal.Gui.Views;
 
-internal class FileDialogTableSource (
-    FileDialog? dlg,
-    FileDialogState? state,
-    FileDialogStyle? style,
-    int currentSortColumn,
-    bool currentSortIsAsc)
+internal class FileDialogTableSource (FileDialog? dlg, FileDialogState? state, FileDialogStyle? style, int currentSortColumn, bool currentSortIsAsc)
     : ITableSource
 {
-    public object this [int row, int col]
-    {
-        get
-        {
-            if (state is { })
-            {
-                return GetColumnValue (col, state.Children [row]);
-            }
-
-            return string.Empty;
-        }
-    }
+    public object this [int row, int col] => state is { } ? GetColumnValue (col, state.Children [row]) : string.Empty;
 
     public int Rows => state is { } ? state.Children.Count () : 0;
 
@@ -39,8 +22,11 @@ internal class FileDialogTableSource (
         switch (col)
         {
             case 0: return stats!.FileSystemInfo!.Name;
+
             case 1: return stats!.MachineReadableLength;
+
             case 2: return stats!.LastWriteTime ?? default (DateTime);
+
             case 3: return stats!.Type;
         }
 
@@ -60,9 +46,11 @@ internal class FileDialogTableSource (
 
                 string icon = dlg!.Style.IconProvider.GetIconWithOptionalSpace (stats!.FileSystemInfo);
 
-                return (icon + (stats?.Name ?? string.Empty)).Trim ();
+                return (icon + stats.Name).Trim ();
+
             case 1:
                 return stats?.HumanReadableLength ?? string.Empty;
+
             case 2:
                 if (stats is null || stats.IsParent || stats.LastWriteTime is null)
                 {
@@ -70,8 +58,10 @@ internal class FileDialogTableSource (
                 }
 
                 return stats.LastWriteTime.Value.ToString (style!.DateFormat);
+
             case 3:
                 return stats?.Type ?? string.Empty;
+
             default:
                 throw new ArgumentOutOfRangeException (nameof (col));
         }

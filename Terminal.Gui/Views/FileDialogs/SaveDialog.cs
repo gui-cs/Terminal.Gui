@@ -1,13 +1,4 @@
 // 
-// FileDialog.cs: File system dialogs for open and save
-//
-// TODO:
-//   * Add directory selector
-//   * Implement subclasses
-//   * Figure out why message text does not show
-//   * Remove the extra space when message does not show
-//   * Use a line separator to show the file listing, so we can use same colors as the rest
-//   * DirListView: Add mouse support
 
 using System.IO.Abstractions;
 
@@ -34,7 +25,7 @@ public class SaveDialog : FileDialog
     ///     <see cref="SaveDialog"/>.
     /// </summary>
     /// <value>The name of the file.</value>
-    public string? FileName => (this as IRunnable).Result is null || Result == Buttons.IndexOf (CancelButton) ? null : Path;
+    public string? FileName => (this as IRunnable).Result is null || Result == CancelButtonIndex ? null : Path;
 
     /// <summary>Gets the default title for the <see cref="SaveDialog"/>.</summary>
     /// <returns></returns>
