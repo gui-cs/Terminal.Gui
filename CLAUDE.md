@@ -127,6 +127,7 @@ See `Tests/README.md` for the full list of test projects (including `Integration
 8. **Unused lambda params** - use `_`: `(_, _) => { }`
 9. **Early return / guard clauses** - ALWAYS invert conditions and return/continue early. Never wrap the happy path in a conditional. Applies to methods, lambdas, and loops. See `.claude/rules/early-return.md`.
 10. **One type per file** - Public and internal types each get their own file
+11. **Docs instruction style** - In reference/how-to/API docs, write `To [goal], [imperative action].` Avoid `When/If you want/need to ...` unless describing a real condition.
 
 ## Testing
 

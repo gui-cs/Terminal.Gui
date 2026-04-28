@@ -118,6 +118,7 @@ dotnet test --project Tests/UnitTestsParallelizable --no-build --filter-method "
 7. **Backing fields** - Place immediately before their property
 8. **Early return / guard clauses (CRITICAL)** - ALWAYS prefer guard clauses over nested `if`/`else`. Invert the condition, return/continue early, keep happy path at lowest indentation. This applies to methods, lambdas, loops — everywhere. See [early-return.md](/.claude/rules/early-return.md) for detailed examples.
 9. **One type per file** - Public and internal types each get their own file
+10. **Docs instruction style** - In reference/how-to/API docs, write `To [goal], [imperative action].` Avoid `When/If you want/need to ...` unless describing a real condition.
 
 ## Detailed Coding Rules
 
@@ -472,7 +473,6 @@ See `.claude/cookbook/` for common UI patterns:
 |IFileOperations|Interface|GetFiles,GetDirectories,Exists
 |FileSystemTreeBuilder|Class|Build file trees
 ```
-
 
 
 
