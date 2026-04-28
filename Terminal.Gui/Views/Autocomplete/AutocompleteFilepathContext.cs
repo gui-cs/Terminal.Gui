@@ -36,7 +36,7 @@ internal class FilepathSuggestionGenerator : ISuggestionGenerator
             return [];
         }
 
-        if (term.Equals (_state?.Directory?.Name))
+        if (term.Equals (_state?.Directory.Name))
         {
             // Clear suggestions
             return [];
