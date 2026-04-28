@@ -1,4 +1,3 @@
-#nullable disable
 using System.ComponentModel;
 
 namespace Terminal.Gui.ViewBase;
@@ -9,8 +8,6 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 public class Aligner : INotifyPropertyChanged
 {
-    private Alignment _alignment;
-
     /// <summary>
     ///     Gets or sets how the <see cref="Aligner"/> aligns items within a container.
     /// </summary>
@@ -21,11 +18,11 @@ public class Aligner : INotifyPropertyChanged
     /// </remarks>
     public Alignment Alignment
     {
-        get => _alignment;
+        get;
         set
         {
-            _alignment = value;
-            PropertyChanged?.Invoke (this, new (nameof (Alignment)));
+            field = value;
+            PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (nameof (Alignment)));
         }
     }
 
@@ -38,7 +35,7 @@ public class Aligner : INotifyPropertyChanged
         set
         {
             field = value;
-            PropertyChanged?.Invoke (this, new (nameof (AlignmentModes)));
+            PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (nameof (AlignmentModes)));
         }
     } = AlignmentModes.StartToEnd;
 
@@ -51,12 +48,12 @@ public class Aligner : INotifyPropertyChanged
         set
         {
             field = value;
-            PropertyChanged?.Invoke (this, new (nameof (ContainerSize)));
+            PropertyChanged?.Invoke (this, new PropertyChangedEventArgs (nameof (ContainerSize)));
         }
     }
 
     /// <inheritdoc/>
-    public event PropertyChangedEventHandler PropertyChanged;
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
     ///     Takes a list of item sizes and returns a list of the positions of those items when aligned within

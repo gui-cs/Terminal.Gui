@@ -11,7 +11,7 @@ public partial class FileDialog
             return;
         }
 
-        if (e.Context.Binding is MouseBinding { MouseEvent: { } mouse })
+        if (e.Context.Binding is MouseBinding { MouseEvent: { Flags: MouseFlags.RightButtonClicked } mouse })
         {
             Point? clickedCell = _tableView.ScreenToCell (mouse.Position!.Value.X, mouse.Position!.Value.Y, out int? clickedCol);
 
@@ -258,6 +258,7 @@ public partial class FileDialog
 
     private static string StripArrows (string columnName) => columnName.Replace (" (▼)", string.Empty).Replace (" (▲)", string.Empty);
 
+    // TODO: Port this to use key bindings
     private bool TableView_KeyDown (Key keyEvent)
     {
         switch (keyEvent.KeyCode)
@@ -285,7 +286,7 @@ public partial class FileDialog
         }
     }
 
-    //    private void TableViewOnActivated (object? sender, EventArgs<ICommandContext?> e)
+    // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/5087#issuecomment-4328093883
     private void TableViewOnValueChanged (object? sender, ValueChangedEventArgs<TableSelection?> e)
     {
         if (!_tableView.HasFocus || _tableView.Value is null || _tableView.Table?.Rows == 0)

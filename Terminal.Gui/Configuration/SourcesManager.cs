@@ -158,8 +158,14 @@ public class SourcesManager
             stream.Position = 0;
             Debug.Assert (json != null);
 #endif
-            var scope = JsonSerializer.Deserialize (stream, typeof (SettingsScope), ConfigurationManager.SerializerContext.Options) as SettingsScope;
-            settingsScope.UpdateFrom (scope!);
+            SettingsScope? scope = JsonSerializer.Deserialize (stream, typeof (SettingsScope), ConfigurationManager.SerializerContext.Options) as SettingsScope;
+
+            if (scope is null)
+            {
+                throw new JsonException ("Configuration JSON root must not be null.");
+            }
+
+            settingsScope.UpdateFrom (scope);
             ConfigurationManager.OnUpdated ();
 
             AddSource (location, source);

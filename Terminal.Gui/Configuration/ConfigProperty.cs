@@ -3,6 +3,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -457,14 +458,27 @@ public class ConfigProperty
     private static ImmutableSortedDictionary<string, Type>? _classesWithConfigProps;
 
     /// <summary>
-    /// INTERNAL: Called from the <see cref="ModuleInitializers.InitializeConfigurationManager"/> method to initialize the
-    /// _classesWithConfigProps dictionary.
+    ///     INTERNAL: Called from the <see cref="ModuleInitializers.InitializeConfigurationManager"/> method to initialize the
+    ///     <see cref="_classesWithConfigProps"/> dictionary.
     /// </summary>
-    [RequiresDynamicCode ("Uses reflection to scan assemblies for configuration properties. " +
-                        "Only called during initialization and not needed during normal operation. " +
-                        "In AOT environments, ensure all types with ConfigurationPropertyAttribute are preserved.")]
-    [RequiresUnreferencedCode ("Reflection requires all types with ConfigurationPropertyAttribute to be preserved in AOT. " +
-                             "Use the SourceGenerationContext to register all configuration property types.")]
+    /// <remarks>
+    ///     <para>
+    ///         The set of <see cref="ConfigurationPropertyAttribute"/> host types that ship in Terminal.Gui is declared statically in
+    ///         <see cref="ConfigPropertyHostTypes"/> and registered unconditionally. Declaring the set statically keeps initialization
+    ///         trim- and AOT-safe without requiring consumer apps to carry <c>&lt;TrimmerRootAssembly Include="Terminal.Gui" /&gt;</c>.
+    ///         See <see href="https://github.com/gui-cs/Terminal.Gui/issues/5069"/>.
+    ///     </para>
+    ///     <para>
+    ///         Additional host types defined outside Terminal.Gui (test suites, plugins, embedding apps) are picked up via a
+    ///         runtime assembly scan when dynamic code is supported. The scan is a no-op under AOT where dynamic code is disabled,
+    ///         and any types it would find would have been trimmed anyway unless the consumer roots them.
+    ///     </para>
+    /// </remarks>
+    [RequiresDynamicCode ("Uses reflection to scan assemblies for configuration properties. "
+                          + "Only called during initialization and not needed during normal operation. "
+                          + "In AOT environments, ensure all types with ConfigurationPropertyAttribute are preserved.")]
+    [RequiresUnreferencedCode ("Reflection requires all types with ConfigurationPropertyAttribute to be preserved in AOT. "
+                               + "Use the SourceGenerationContext to register all configuration property types.")]
     internal static void Initialize ()
     {
         if (_classesWithConfigProps is { })
@@ -474,8 +488,28 @@ public class ConfigProperty
 
         Dictionary<string, Type> dict = new (StringComparer.InvariantCultureIgnoreCase);
 
-        // Process assemblies directly to avoid LINQ overhead
+        // Trim/AOT-safe: statically-rooted host types that ship with Terminal.Gui.
+        foreach (Type type in ConfigPropertyHostTypes.GetTypes ())
+        {
+            dict [type.Name] = type;
+        }
+
+        // JIT-only supplement: discover host types defined outside Terminal.Gui (test suites, plugins).
+        // Under AOT, RuntimeFeature.IsDynamicCodeSupported is false and we skip the scan entirely.
+        if (RuntimeFeature.IsDynamicCodeSupported)
+        {
+            ScanLoadedAssembliesForConfigPropertyHosts (dict);
+        }
+
+        _classesWithConfigProps = dict.ToImmutableSortedDictionary ();
+    }
+
+    [RequiresDynamicCode ("Uses reflection to scan assemblies for configuration properties.")]
+    [RequiresUnreferencedCode ("Scanning for types via reflection is not trim-safe.")]
+    private static void ScanLoadedAssembliesForConfigPropertyHosts (Dictionary<string, Type> dict)
+    {
         Assembly [] assemblies = AppDomain.CurrentDomain.GetAssemblies ();
+
         foreach (Assembly assembly in assemblies)
         {
             try
@@ -488,24 +522,29 @@ public class ConfigProperty
                 foreach (Type type in assembly.GetTypes ())
                 {
                     PropertyInfo [] properties = type.GetProperties ();
-
-                    // Check if any property has the ConfigurationPropertyAttribute
                     var hasConfigProp = false;
+
                     foreach (PropertyInfo prop in properties)
                     {
                         if (HasConfigurationPropertyAttribute (prop))
                         {
                             hasConfigProp = true;
+
                             break;
                         }
                     }
 
-                    if (hasConfigProp)
+                    if (!hasConfigProp)
                     {
-                        dict [type.Name] = type;
+                        continue;
                     }
+
+                    // TryAdd — never overwrite a statically-registered Terminal.Gui host. An external assembly
+                    // with a same-named type (e.g. a consumer's own `Window`) must not displace the built-in entry.
+                    dict.TryAdd (type.Name, type);
                 }
             }
+
             // Skip problematic assemblies that can't be loaded or analyzed
             catch (ReflectionTypeLoadException)
             {
@@ -516,8 +555,6 @@ public class ConfigProperty
                 continue;
             }
         }
-
-        _classesWithConfigProps = dict.ToImmutableSortedDictionary ();
     }
 
     /// <summary>

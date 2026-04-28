@@ -8,16 +8,27 @@
 
 Cross-platform UI toolkit for building sophisticated terminal UI (TUI) applications on Windows, macOS, and Linux/Unix.
 
-![Terminal.Gui — cross-platform TUI toolkit for .NET. Build full-featured terminal UIs with menus, forms, tables, charts, wizards and file dialogs. 30+ views, Windows / macOS / Linux, MIT-licensed.](docfx/images/hero.gif)
+![Terminal.Gui — cross-platform TUI toolkit for .NET. Build full-featured terminal UIs with menus, forms, tables, charts, wizards and file dialogs. 30+ stars, Windows / macOS / Linux, MIT-licensed.](docfx/images/hero.gif)
 
-![logo](docfx/images/logo.png)
 
-* **v2** (Current): ![NuGet Version](https://img.shields.io/nuget/v/Terminal.Gui) - Stable release
-* **v1 (Legacy)**: ![NuGet Version](https://img.shields.io/nuget/v/Terminal.Gui/1.19.0) - Maintenance mode only
+# Version 2.0 Has Been Released
 
-> **Note:** v1 is in maintenance mode — only critical bug fixes accepted. v2 is recommended for all projects.
+Terminal.Gui enables building sophisticated console applications with modern UIs:
 
-![Sample app](docfx/images/sample.gif)
+- **Responsive TUI** - Easy to use, innovative, layout system enables console apps as responsive as any responsive web page.
+- **Performant and Scalable** - Built for modern TUIs - fast, double-buffering-based rendering; Tables and Tree Views scale to infinite elements with sorting and filtering.
+- **Keyboard First; Mouse First Too** - Optimized for TUI experiences where the user's hands never need to leave the keyboard; full mouse support too.
+- **Rich Built-in Widgets (Views)** - Text editors, buttons, checkboxes, trees, tables, markdown, linear ranges, menus, selectors, and more.
+- **Visualizations** - Charts, graphs, progress indicators, and color pickers with TrueColor support.
+- **Text Editors** - Full-featured text editing with clipboard, undo/redo, and Unicode support
+- **Fully Configurable** - Themes, colors, key bindings, and settings are all customizable and persistable.
+- **File Management** - File and directory browsers with search and filtering, supporting Nerdfonts and coloring.
+- **Wizards and Multi-Step Processes** - Guided workflows with navigation and validation.
+- **Cross-Platform** - Consistent experience on Windows, macOS, and Linux.
+- **Apps Work In-line or Full Screen** - Build CLI tools like Claude Code/Copilot/Codex CLI that scroll with the terminal (in-line) or full screen.
+
+See the [Views Overview](https://gui-cs.github.io/Terminal.Gui/docs/views) for available controls and [What's New in v2](https://gui-cs.github.io/Terminal.Gui/docs/newinv2) for architectural improvements.
+
 
 # Quick Start
 
@@ -58,24 +69,7 @@ window.Add (label);
 app.Run (window);
 ```
 
-See the [Examples](Examples/) directory for more.
-
-# Build Powerful Terminal Applications
-
-Terminal.Gui enables building sophisticated console applications with modern UIs:
-
-- **Rich Forms and Dialogs** - Text fields, buttons, checkboxes, radio buttons, and data validation
-- **Interactive Data Views** - Tables, lists, and trees with sorting, filtering, and in-place editing  
-- **Visualizations** - Charts, graphs, progress indicators, and color pickers with TrueColor support
-- **Text Editors** - Full-featured text editing with clipboard, undo/redo, and Unicode support
-- **File Management** - File and directory browsers with search and filtering
-- **Wizards and Multi-Step Processes** - Guided workflows with navigation and validation
-- **System Monitoring Tools** - Real-time dashboards with scrollable, resizable views
-- **Configuration UIs** - Settings editors with persistent themes and user preferences
-- **Cross-Platform CLI Tools** - Consistent experience on Windows, macOS, and Linux
-- **Server Management Interfaces** - SSH-compatible UIs for remote administration
-
-See the [Views Overview](https://gui-cs.github.io/Terminal.Gui/docs/views) for available controls and [What's New in v2](https://gui-cs.github.io/Terminal.Gui/docs/newinv2) for architectural improvements.
+See the [Examples](Examples/README.md) for more.
 
 # Documentation 
 
@@ -100,8 +94,6 @@ See the [documentation index](https://gui-cs.github.io/Terminal.Gui/docs/index) 
 
 # Installing
 
-## v2 (Recommended)
-
 ```powershell
 dotnet add package Terminal.Gui
 ```
@@ -110,12 +102,6 @@ Or use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templ
 
 ```powershell
 dotnet new install Terminal.Gui.Templates
-```
-
-## v1 Legacy
-
-```powershell
-dotnet add package Terminal.Gui --version "1.*"
 ```
 
 # Contributing
