@@ -1,4 +1,3 @@
-#nullable disable
 using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 
@@ -12,7 +11,7 @@ internal class AutocompleteFilepathContext (string currentLine, int cursorPositi
 
 internal class FilepathSuggestionGenerator : ISuggestionGenerator
 {
-    private FileDialogState _state;
+    private FileDialogState? _state;
 
     public IEnumerable<Suggestion> GenerateSuggestions (AutocompleteContext context)
     {
@@ -21,74 +20,50 @@ internal class FilepathSuggestionGenerator : ISuggestionGenerator
             _state = fileState.State;
         }
 
-        if (_state is null)
-        {
-            return Enumerable.Empty<Suggestion> ();
-        }
-
         var path = Cell.ToString (context.CurrentLine);
         int last = path.LastIndexOfAny (FileDialog.Separators);
 
-        if (string.IsNullOrWhiteSpace (path) || !Path.IsPathRooted (path))
+        if (string.IsNullOrWhiteSpace (path) || !Path.IsPathRooted (path) || _state is null)
         {
-            return Enumerable.Empty<Suggestion> ();
+            return [];
         }
 
-        string term = path.Substring (last + 1);
+        string term = path [(last + 1)..];
 
         // If path is /tmp/ then don't just list everything in it
         if (string.IsNullOrWhiteSpace (term))
         {
-            return Enumerable.Empty<Suggestion> ();
+            return [];
         }
 
         if (term.Equals (_state?.Directory?.Name))
         {
             // Clear suggestions
-            return Enumerable.Empty<Suggestion> ();
+            return [];
         }
 
         bool isWindows = RuntimeInformation.IsOSPlatform (OSPlatform.Windows);
 
-        string [] suggestions = _state!.Children.Where (d => !d.IsParent)
-                                       .Select (
-                                                e => e.FileSystemInfo is IDirectoryInfo d
-                                                         ? d.Name + Path.DirectorySeparatorChar
-                                                         : e.FileSystemInfo.Name
-                                               )
-                                       .ToArray ();
+        string? [] suggestions = _state?.Children.Where (d => !d.IsParent)
+                                       .Select (e => e.FileSystemInfo is IDirectoryInfo d ? d.Name + Path.DirectorySeparatorChar : e.FileSystemInfo?.Name)
+                                       .ToArray ()
+                                 ?? [];
 
-        string [] validSuggestions = suggestions
-                                     .Where (
-                                             s => s.StartsWith (
-                                                                term,
-                                                                isWindows
-                                                                    ? StringComparison.InvariantCultureIgnoreCase
-                                                                    : StringComparison.InvariantCulture
-                                                               )
-                                            )
-                                     .OrderBy (m => m.Length)
-                                     .ToArray ();
+        string? [] validSuggestions = suggestions
+                                      .Where (s => s?.StartsWith (term,
+                                                                  isWindows ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture)
+                                                   == true)
+                                      .OrderBy (m => m?.Length)
+                                      .ToArray ();
 
         // nothing to suggest
-        if (validSuggestions.Length == 0 || validSuggestions [0].Length == term.Length)
+        if (validSuggestions.Length == 0 || validSuggestions [0]?.Length == term.Length)
         {
-            return Enumerable.Empty<Suggestion> ();
+            return [];
         }
 
-        return validSuggestions.Select (
-                                        f => new Suggestion (term.Length, f, f)
-                                       )
-                               .ToList ();
+        return validSuggestions.Select (f => new Suggestion (term.Length, f, f)).ToList ();
     }
 
-    public bool IsWordChar (string text)
-    {
-        if (text == "\n")
-        {
-            return false;
-        }
-
-        return true;
-    }
+    public bool IsWordChar (string text) => text != "\n";
 }

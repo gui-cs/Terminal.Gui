@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System.IO.Abstractions;
+﻿using System.IO.Abstractions;
 
 namespace Terminal.Gui.FileServices;
 
@@ -16,7 +15,7 @@ public class FileSystemTreeBuilder : ITreeBuilder<IFileSystemInfo>, IComparer<IF
     public IComparer<IFileSystemInfo> Sorter { get; set; }
 
     /// <inheritdoc/>
-    public int Compare (IFileSystemInfo x, IFileSystemInfo y)
+    public int Compare (IFileSystemInfo? x, IFileSystemInfo? y)
     {
         if (x is IDirectoryInfo && y is not IDirectoryInfo)
         {
@@ -28,12 +27,7 @@ public class FileSystemTreeBuilder : ITreeBuilder<IFileSystemInfo>, IComparer<IF
             return 1;
         }
 
-        if (x is { } && y is { })
-        {
-            return string.Compare (x.Name, y.Name, StringComparison.Ordinal);
-        }
-
-        return 0;
+        return string.Compare (x?.Name, y?.Name, StringComparison.Ordinal);
     }
 
     /// <inheritdoc/>
@@ -47,12 +41,7 @@ public class FileSystemTreeBuilder : ITreeBuilder<IFileSystemInfo>, IComparer<IF
             return false;
         }
 
-        if (IsReparsePoint (toExpand))
-        {
-            return false;
-        }
-
-        return TryGetChildren (toExpand).Any ();
+        return !IsReparsePoint (toExpand) && TryGetChildren (toExpand).Any ();
     }
 
     /// <inheritdoc/>
@@ -62,16 +51,16 @@ public class FileSystemTreeBuilder : ITreeBuilder<IFileSystemInfo>, IComparer<IF
     {
         if (entry is IFileInfo)
         {
-            return Enumerable.Empty<IFileSystemInfo> ();
+            return [];
         }
 
         // Prevent traversal cycles through symlinks/junctions/mount points.
         if (IsReparsePoint (entry))
         {
-            return Enumerable.Empty<IFileSystemInfo> ();
+            return [];
         }
 
-        var dir = (IDirectoryInfo)entry;
+        IDirectoryInfo dir = (IDirectoryInfo)entry;
 
         try
         {

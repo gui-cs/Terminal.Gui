@@ -27,13 +27,16 @@ public partial class FileDialog : Dialog, IDesignable
 
     private readonly Button _btnBack;
 
+    private readonly Button _btnForward;
+    private readonly Button _btnCancel;
+
     /// <summary>
-    ///     Gets the cancel button for the dialog. This is useful for checking if the user canceled the dialog by comparing
+    ///     Gets the index of the cancel button for the dialog. This is useful for checking if the user canceled the dialog by
+    ///     comparing
     ///     the <see cref="Dialog.Result"/> to the index of this button in the <see cref="Dialog.Buttons"/> array.
     /// </summary>
-    public Button CancelButton { get; }
+    public int CancelButtonIndex => Buttons.IndexOf (_btnCancel);
 
-    private readonly Button _btnForward;
     private readonly Button _btnOk;
     private readonly Button _btnUp;
     private readonly FileDialogHistory _history;
@@ -45,7 +48,7 @@ public partial class FileDialog : Dialog, IDesignable
     private readonly Button _btnTreeToggle;
     private readonly TreeView<IFileSystemInfo> _treeView;
     private Dictionary<IDirectoryInfo, string> _treeRoots = new ();
-    private DropDownList? _typeFilterDropDown;
+    private readonly DropDownList? _typeFilterDropDown;
     private int _currentSortColumn;
     private bool _currentSortIsAsc = true;
     private bool _disposed;
@@ -71,7 +74,7 @@ public partial class FileDialog : Dialog, IDesignable
         // Ensure we get Accept for any subviews; esp TreeView
         CommandsToBubbleUp = [Command.Accept];
 
-        CancelButton = new Button { Text = Strings.btnCancel };
+        _btnCancel = new Button { Text = Strings.btnCancel };
 
         _btnOk = new Button { Text = Style.OkButtonText };
 
@@ -119,6 +122,14 @@ public partial class FileDialog : Dialog, IDesignable
 
         _tbPath.Autocomplete = new AppendAutocomplete (_tbPath);
         _tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator ();
+
+        _typeFilterDropDown = new DropDownList
+        {
+            X = Pos.AnchorEnd (),
+            Y = 1,
+            Visible = false
+        };
+        Add (_typeFilterDropDown);
 
         // Create table view container (right pane)
         _tableViewContainer = new View
@@ -201,7 +212,8 @@ public partial class FileDialog : Dialog, IDesignable
         _tableView.KeyBindings.ReplaceCommands (Key.Home, Command.Start);
         _tableView.KeyBindings.ReplaceCommands (Key.End, Command.End);
         _tableView.KeyBindings.ReplaceCommands (Key.Home.WithShift, Command.StartExtend);
-        _tableView.KeyBindings.ReplaceCommands (Key.End.WithShift, Command.EndExtend); _history = new FileDialogHistory (this);
+        _tableView.KeyBindings.ReplaceCommands (Key.End.WithShift, Command.EndExtend);
+        _history = new FileDialogHistory (this);
 
         // Changing the key-bindings of a View is not allowed, however,
         // by default, Runnable doesn't bind to Command.Context, so
@@ -212,7 +224,7 @@ public partial class FileDialog : Dialog, IDesignable
 
         _tbPath.TextChanged += (_, _) => PathChanged ();
 
-        _tbFind = new TextField { X = 1, Width = Dim.Width (_tableView) - 1, Y = Pos.AnchorEnd (), Id = "_tbFind" };
+        _tbFind = new TextField { X = 0, Width = Dim.Width (_tableView) - 1, Y = Pos.AnchorEnd (), Id = "_tbFind" };
 
         _spinnerView = new SpinnerView
         {
@@ -247,7 +259,7 @@ public partial class FileDialog : Dialog, IDesignable
 
         // Add the toggle along with OK/Cancel so they align as a group
         AddButton (_btnTreeToggle);
-        AddButton (CancelButton);
+        AddButton (_btnCancel);
         AddButton (_btnOk);
 
         Add (_tbPath);
@@ -256,12 +268,58 @@ public partial class FileDialog : Dialog, IDesignable
         Add (_btnForward);
         Add (_treeView);
 
-        // Default: Tree hidden and splitter hidden
-        SetTreeVisible (false);
-
         Add (_tableViewContainer);
         _tableViewContainer.Add (_tbFind);
         _tableViewContainer.Add (_spinnerView);
+
+        // to streamline user experience and allow direct typing of paths
+        // with zero navigation we start with focus in the text box and any
+        // default/current path fully selected and ready to be overwritten
+        _tbPath.SetFocus ();
+
+        SetTreeVisible (false);
+    }
+
+    /// <inheritdoc/>
+    public override void EndInit ()
+    {
+        base.EndInit ();
+
+        // Style may have been updated after instance was constructed
+        _btnOk.Text = Style.OkButtonText;
+        _btnCancel.Text = Style.CancelButtonText;
+        _btnUp.Text = GetUpButtonText ();
+        _btnBack.Text = GetBackButtonText ();
+        _btnForward.Text = GetForwardButtonText ();
+        _tbPath.Title = Style.PathCaption;
+        _tbFind.Title = Style.SearchCaption;
+        _treeRoots = Style.TreeRootGetter ();
+        Style.IconProvider.IsOpenGetter = _treeView.IsExpanded;
+        _treeView.AddObjects (_treeRoots.Keys);
+
+        // if filtering on file type is configured then create the DropDownList and establish
+        // initial filtering by extension(s)
+        if (AllowedTypes.Count > 0)
+        {
+            CurrentFilter = AllowedTypes [0];
+
+            _typeFilterDropDown?.Visible = true;
+            _typeFilterDropDown?.Source = new ListWrapper<string> (new ObservableCollection<string> (AllowedTypes.Select (a => a.ToString ()!).ToList ()));
+            _typeFilterDropDown?.Value = AllowedTypes [0].ToString () ?? string.Empty;
+        }
+
+        // if no path has been provided
+        if (Path.Length <= 0)
+        {
+            Path = _fileSystem!.Directory.GetCurrentDirectory ();
+        }
+
+        _tbPath.SelectAll ();
+
+        if (string.IsNullOrEmpty (Title))
+        {
+            Title = GetDefaultTitle ();
+        }
     }
 
     /// <summary>
@@ -327,17 +385,6 @@ public partial class FileDialog : Dialog, IDesignable
         {
             _tbPath.Text = value;
             _tbPath.MoveEnd ();
-
-            //IDirectoryInfo dir = StringToDirectoryInfo (value);
-
-            //StringComparison comparison = OperatingSystem.IsWindows () ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-
-            //if (_treeView.ExpandParents (dir, (left, right) => string.Equals (left.FullName, right.FullName, comparison), out IFileSystemInfo? matched)
-            //    && matched is { })
-            //{
-            //  //  _treeView.EnsureVisible (matched);
-            //   // _treeView.SelectedObject = matched;
-            //}
         }
     }
 
@@ -363,86 +410,6 @@ public partial class FileDialog : Dialog, IDesignable
 
     // TODO: Refactor to use CWP
     public event EventHandler<FilesSelectedEventArgs>? FilesSelected;
-
-    /// <inheritdoc/>
-    protected override void OnIsRunningChanged (bool newIsRunning)
-    {
-        base.OnIsRunningChanged (newIsRunning);
-
-        if (!newIsRunning)
-        {
-            return;
-        }
-
-        Arrangement |= ViewArrangement.Resizable;
-
-        // May have been updated after instance was constructed
-        _btnOk.Text = Style.OkButtonText;
-        CancelButton.Text = Style.CancelButtonText;
-        _btnUp.Text = GetUpButtonText ();
-        _btnBack.Text = GetBackButtonText ();
-        _btnForward.Text = GetForwardButtonText ();
-
-        _tbPath.Title = Style.PathCaption;
-        _tbFind.Title = Style.SearchCaption;
-
-        _tbPath.Autocomplete?.Scheme = new Scheme (_tbPath.GetScheme ())
-        {
-            Normal = new Attribute (Color.Black, _tbPath.GetAttributeForRole (VisualRole.Normal).Background)
-        };
-
-        _treeRoots = Style.TreeRootGetter ();
-        Style.IconProvider.IsOpenGetter = _treeView.IsExpanded;
-        _treeView.AddObjects (_treeRoots.Keys);
-
-        // if filtering on file type is configured then create the DropDownList and establish
-        // initial filtering by extension(s)
-        if (AllowedTypes.Count > 0)
-        {
-            CurrentFilter = AllowedTypes [0];
-
-            _typeFilterDropDown = new DropDownList
-            {
-                X = Pos.AnchorEnd (),
-                Y = 1,
-                Source = new ListWrapper<string> (new ObservableCollection<string> (AllowedTypes.Select (a => a.ToString ()!).ToList ())),
-                Value = AllowedTypes [0].ToString () ?? string.Empty
-            };
-            Add (_typeFilterDropDown);
-        }
-
-        // if no path has been provided
-        if (_tbPath.Text.Length <= 0)
-        {
-            Path = _fileSystem!.Directory.GetCurrentDirectory ();
-        }
-
-        // to streamline user experience and allow direct typing of paths
-        // with zero navigation we start with focus in the text box and any
-        // default/current path fully selected and ready to be overwritten
-        _tbPath.SetFocus ();
-        _tbPath.SelectAll ();
-
-        if (string.IsNullOrEmpty (Title))
-        {
-            Title = GetDefaultTitle ();
-        }
-
-        // Ensure toggle button text matches current state after sizing
-        SetTreeVisible (false);
-
-        SetNeedsDraw ();
-        SetNeedsLayout ();
-    }
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        _disposed = true;
-        base.Dispose (disposing);
-
-        CancelSearch ();
-    }
 
     /// <summary>
     ///     Gets a default dialog title, when <see cref="View.Title"/> is not set or empty, result of the function will be
@@ -474,7 +441,7 @@ public partial class FileDialog : Dialog, IDesignable
     }
 
     /// <summary>State representing a recursive search from <see cref="FileDialogState.Directory"/> downwards.</summary>
-    internal class SearchState : FileDialogState
+    internal sealed class SearchState : FileDialogState
     {
         // TODO: Add thread safe child adding
         private readonly List<FileSystemInfoStats> _found = [];
@@ -488,6 +455,7 @@ public partial class FileDialog : Dialog, IDesignable
             parent.SearchMatcher.Initialize (searchTerms);
             Children = [];
             BeginSearch ();
+            RefreshChildren ();
         }
 
         /// <summary>
@@ -504,8 +472,6 @@ public partial class FileDialog : Dialog, IDesignable
 
             return !alreadyCancelled;
         }
-
-        internal override void RefreshChildren () { }
 
         private void BeginSearch ()
         {
@@ -614,5 +580,14 @@ public partial class FileDialog : Dialog, IDesignable
         OnIsRunningChanged (true);
 
         return true;
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        _disposed = true;
+        base.Dispose (disposing);
+
+        CancelSearch ();
     }
 }

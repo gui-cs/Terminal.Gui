@@ -212,10 +212,13 @@ public class Notepad : Scenario
             AllowsMultipleSelection = true,
             AllowedTypes =
             [
-                new AllowedType ("Text", ".txt", ".md", ".csv", ".log"),
-                new AllowedType ("Code", ".c", ".h", ".js", ".cs", ".json"),
+                new AllowedType ("Markdown", ".md", ".markdown"),
+                new AllowedType ("Text ", ".txt", ".csv", ".tsv"),
+                new AllowedType ("Code", ".c", ".h", ".js", ".cs", ".json", ".yml"),
                 new AllowedTypeAny ()
-            ]
+            ],
+            MustExist = true,
+            OpenMode = OpenMode.File
         };
 
         if (_lastDirectory is { })
