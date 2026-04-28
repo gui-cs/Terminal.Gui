@@ -49,15 +49,16 @@ internal class FilepathSuggestionGenerator : ISuggestionGenerator
                                        .ToArray ()
                                  ?? [];
 
-        string? [] validSuggestions = suggestions
+        string [] validSuggestions = suggestions
                                       .Where (s => s?.StartsWith (term,
                                                                   isWindows ? StringComparison.InvariantCultureIgnoreCase : StringComparison.InvariantCulture)
                                                    == true)
-                                      .OrderBy (m => m?.Length)
+                                      .OfType<string> ()
+                                      .OrderBy (m => m.Length)
                                       .ToArray ();
 
         // nothing to suggest
-        if (validSuggestions.Length == 0 || validSuggestions [0]?.Length == term.Length)
+        if (validSuggestions.Length == 0 || validSuggestions [0].Length == term.Length)
         {
             return [];
         }
