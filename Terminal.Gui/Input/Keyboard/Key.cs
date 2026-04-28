@@ -217,7 +217,7 @@ public class Key : EventArgs, IEquatable<Key>
 
             if (IsShift && ShiftedKeyCode != KeyCode.Null)
             {
-                Rune shiftedRune = ToRune (ShiftedKeyCode);
+                Rune shiftedRune = ToRune (ShiftedKeyCode | KeyCode.ShiftMask);
 
                 if (shiftedRune != default (Rune))
                 {
@@ -278,7 +278,7 @@ public class Key : EventArgs, IEquatable<Key>
 
             if (IsShift && ShiftedKeyCode != KeyCode.Null)
             {
-                Rune shiftedRune = ToRune (ShiftedKeyCode);
+                Rune shiftedRune = ToRune (ShiftedKeyCode | KeyCode.ShiftMask);
 
                 if (shiftedRune != default (Rune))
                 {
