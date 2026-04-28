@@ -7,8 +7,8 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Use <see cref="Pos"/> with <see cref="View.X"/> and <see cref="View.Y"/> to describe where a view should be,
-///         relative to its <see cref="View.SuperView"/>, its available space, or its sibling views.
+///         To describe where a view should be, relative to its <see cref="View.SuperView"/>, its available space, or its
+///         sibling views, use <see cref="Pos"/> with <see cref="View.X"/> and <see cref="View.Y"/>.
 ///     </para>
 ///     <para>
 ///         This is the primary API for responsive horizontal and vertical placement in Terminal.Gui. Instead of
@@ -21,7 +21,7 @@ namespace Terminal.Gui.ViewBase;
 ///         the axis after centering.
 ///     </para>
 ///     <para>
-///         Reference coordinates of another view by using <see cref="Left(View)"/>, <see cref="Right(View)"/>,
+///         To reference coordinates of another view, use <see cref="Left(View)"/>, <see cref="Right(View)"/>,
 ///         <see cref="Bottom(View)"/>, and <see cref="Top(View)"/>. <see cref="X(View)"/> and <see cref="Y(View)"/> are
 ///         aliases to <see cref="Left(View)"/> and <see cref="Top(View)"/> respectively.
 ///     </para>

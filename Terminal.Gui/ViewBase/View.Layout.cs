@@ -30,9 +30,9 @@ public partial class View // Layout APIs
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
-    ///         <see cref="Frame"/> is typically the output of Terminal.Gui's responsive layout system. In most cases you
-    ///         describe layout using <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/>,
-    ///         then read <see cref="Frame"/> after layout has resolved those relationships.
+    ///         <see cref="Frame"/> is typically the output of Terminal.Gui's responsive layout system. To describe layout,
+    ///         use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/>. To inspect the
+    ///         resolved result, read <see cref="Frame"/> after layout has resolved those relationships.
     ///     </para>
     ///     <para>
     ///         Frame is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>
@@ -224,8 +224,8 @@ public partial class View // Layout APIs
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
-    ///         Use <see cref="X"/> with <see cref="Pos"/> to express responsive relationships such as "center this view",
-    ///         "anchor it to the end", or "place it to the right of another view".
+    ///         To express responsive relationships such as "center this view", "anchor it to the end", or "place it to
+    ///         the right of another view", use <see cref="X"/> with <see cref="Pos"/>.
     ///     </para>
     ///     <para>
     ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by
@@ -275,8 +275,8 @@ public partial class View // Layout APIs
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
-    ///         Use <see cref="Y"/> with <see cref="Pos"/> to express responsive relationships such as "center this view",
-    ///         "anchor it to the bottom", or "place it below another view".
+    ///         To express responsive relationships such as "center this view", "anchor it to the bottom", or "place it
+    ///         below another view", use <see cref="Y"/> with <see cref="Pos"/>.
     ///     </para>
     ///     <para>
     ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by
@@ -325,8 +325,8 @@ public partial class View // Layout APIs
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
-    ///         Use <see cref="Height"/> with <see cref="Dim"/> to express responsive sizing such as filling remaining
-    ///         space, using a percentage of the available height, or growing to fit content with <c>Dim.Auto ()</c>.
+    ///         To express responsive sizing such as filling remaining space, using a percentage of the available height,
+    ///         or growing to fit content with <c>Dim.Auto ()</c>, use <see cref="Height"/> with <see cref="Dim"/>.
     ///     </para>
     ///     <para>
     ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by
@@ -418,8 +418,8 @@ public partial class View // Layout APIs
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
-    ///         Use <see cref="Width"/> with <see cref="Dim"/> to express responsive sizing such as filling remaining
-    ///         space, using a percentage of the available width, or growing to fit content with <c>Dim.Auto ()</c>.
+    ///         To express responsive sizing such as filling remaining space, using a percentage of the available width,
+    ///         or growing to fit content with <c>Dim.Auto ()</c>, use <see cref="Width"/> with <see cref="Dim"/>.
     ///     </para>
     ///     <para>
     ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by
@@ -581,8 +581,8 @@ public partial class View // Layout APIs
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
-    ///         This overload uses the current container size, making it a convenient way to force a responsive layout pass
-    ///         after changing <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, or <see cref="Height"/>.
+    ///         To force a responsive layout pass after changing <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, or
+    ///         <see cref="Height"/>, call this overload.
     ///     </para>
     ///     <para>
     ///         This method is intended to be called by the layout engine to prepare the view for layout and is exposed as

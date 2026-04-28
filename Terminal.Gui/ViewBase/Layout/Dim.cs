@@ -9,8 +9,8 @@ namespace Terminal.Gui.ViewBase;
 /// </summary>
 /// <remarks>
 ///     <para>
-///         Use <see cref="Dim"/> when a view's size should respond to the available space, its content, or the size and
-///         position of other views rather than being a fixed number of cells.
+///         To make a view's size respond to the available space, its content, or the size and position of other views
+///         rather than using a fixed number of cells, use <see cref="Dim"/>.
 ///     </para>
 ///     <para>
 ///         This is the primary API for responsive sizing in Terminal.Gui. Instead of hard-coding a final width or
@@ -112,8 +112,8 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///     <para>
     ///         SubViews that use <see cref="Dim.Fill()"/> do not contribute to the auto-sizing calculation unless
     ///         <see cref="DimFill.MinimumContentDim"/> is specified. Without it, a <see cref="DimFill"/> SubView will
-    ///         receive a size of 0. Use <see cref="Dim.Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> to ensure
-    ///         the SubView contributes a minimum size.
+    ///         receive a size of 0. To ensure the SubView contributes a minimum size, use
+    ///         <see cref="Dim.Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c>.
     ///     </para>
     /// </remarks>
     /// <example>
@@ -144,9 +144,9 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///     </para>
     ///     <para>
     ///         If the SuperView uses <see cref="Dim.Auto"/>, a <see cref="DimFill"/> SubView does <b>not</b>
-    ///         contribute to the auto-sizing calculation and will receive a size of 0. Use
-    ///         <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> or <see cref="Fill(View)"/> with
-    ///         a <c>to</c> parameter to ensure the SubView contributes to auto-sizing.
+    ///         contribute to the auto-sizing calculation and will receive a size of 0. To make the SubView contribute to
+    ///         auto-sizing, use <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> or <see cref="Fill(View)"/>
+    ///         with a <c>to</c> parameter.
     ///         See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for details.
     ///     </para>
     /// </remarks>
@@ -165,9 +165,9 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// <remarks>
     ///     <para>
     ///         If the SuperView uses <see cref="Dim.Auto"/>, a <see cref="DimFill"/> SubView does <b>not</b>
-    ///         contribute to the auto-sizing calculation and will receive a size of 0. Use
-    ///         <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> or <see cref="Fill(View)"/> with
-    ///         a <c>to</c> parameter to ensure the SubView contributes to auto-sizing.
+    ///         contribute to the auto-sizing calculation and will receive a size of 0. To make the SubView contribute to
+    ///         auto-sizing, use <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> or <see cref="Fill(View)"/>
+    ///         with a <c>to</c> parameter.
     ///         See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for details.
     ///     </para>
     /// </remarks>

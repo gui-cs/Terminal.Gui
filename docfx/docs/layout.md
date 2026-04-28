@@ -109,7 +109,7 @@ Think of Terminal.Gui layout as a small responsive layout language for TUIs:
 - `Dim` expresses size relationships.
 - `Frame` is the resolved result after layout runs.
 
-That means you usually work with `Pos` and `Dim`, not `Frame`, when building adaptive UIs.
+To build adaptive UIs, work with `Pos` and `Dim`, not `Frame`.
 
 Common patterns include:
 
@@ -167,7 +167,7 @@ Label responsiveLabel = new ()
 
 ### Pos
 
-<xref:Terminal.Gui.ViewBase.Pos> is the type of `View.X` and `View.Y`. Use it when a view's position should respond to available space or to other views instead of being a fixed coordinate.
+<xref:Terminal.Gui.ViewBase.Pos> is the type of `View.X` and `View.Y`. To make a view's position respond to available space or other views instead of using a fixed coordinate, use it.
 
 * Absolute position, by passing an integer - `Pos.Absolute ()`
 * Percentage of the `SuperView` size - `Pos.Percent ()`
@@ -194,7 +194,7 @@ myView.Y = Pos.Bottom (anotherView) + 5;
 ```
 ### Dim
 
-<xref:Terminal.Gui.ViewBase.Dim> is the type of `View.Width` and `View.Height`. Use it when size should respond to content, terminal size, or sibling views instead of being a fixed number of cells.
+<xref:Terminal.Gui.ViewBase.Dim> is the type of `View.Width` and `View.Height`. To make size respond to content, terminal size, or sibling views instead of using a fixed number of cells, use it.
 
 * Automatic size based on the view's content - `Dim.Auto ()` - See [Dim.Auto Deep Dive](dimauto.md)
 * Absolute size, by passing an integer - `Dim.Absolute ()`
