@@ -144,7 +144,7 @@ public partial class TextView
 
         // Never insert modified keys, except for AltGr combinations with associated text of the unmodified key.
         // This allows users to input characters that require AltGr (e.g. '@' on a Portuguese keyboard which is AltGr+2 with associated text "@"),
-        // while still preventing most modified keys from being inserted into the TextField.
+        // while still preventing most modified keys from being inserted into the TextView.
         if ((a.IsAlt && string.IsNullOrEmpty (a.AsGrapheme)) || a.IsCtrl)
         {
             // Never insert modified keys
