@@ -34,7 +34,7 @@ branches:
     # Matches the main branch
     regex: ^main$
     # Uses 'alpha' as pre-release label before `beta`
-    label: rc
+    label: ''
     # Increments patch version (x.y.z+1) on commits
     increment: Patch
     # Specifies develop as the source branch
