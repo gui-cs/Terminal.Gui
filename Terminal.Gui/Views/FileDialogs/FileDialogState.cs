@@ -8,8 +8,19 @@ internal class FileDialogState
     {
         Parent = parent;
         Directory = dir;
-        Children = GetChildren (Directory).ToArray ();
         Path = parent.Path;
+        Children = GetChildren (Directory).ToArray ();
+    }
+
+    /// <summary>
+    ///     Constructor for subclasses that manage their own Children population (e.g. <see cref="FileDialog.SearchState"/>).
+    /// </summary>
+    protected FileDialogState (IDirectoryInfo dir, FileDialog parent, bool skipInitialEnumeration)
+    {
+        Parent = parent;
+        Directory = dir;
+        Path = parent.Path;
+        Children = skipInitialEnumeration ? [] : GetChildren (Directory).ToArray ();
     }
 
     protected FileDialog Parent { get; }
@@ -68,5 +79,5 @@ internal class FileDialogState
     protected bool MatchesApiFilter (FileSystemInfoStats arg) =>
         Parent.CurrentFilter is { } && (arg.IsDir || (arg.FileSystemInfo is IFileInfo f && Parent.CurrentFilter.IsAllowed (f.FullName)));
 
-    internal virtual void RefreshChildren () => Children = GetChildren (Directory).ToArray ();
+    internal virtual void RefreshChildren () { Children = GetChildren (Directory).ToArray (); }
 }

@@ -450,12 +450,11 @@ public partial class FileDialog : Dialog, IDesignable
         private bool _cancel;
         private bool _finished;
 
-        public SearchState (IDirectoryInfo dir, FileDialog parent, string searchTerms) : base (dir, parent)
+        public SearchState (IDirectoryInfo dir, FileDialog parent, string searchTerms) : base (dir, parent, skipInitialEnumeration: true)
         {
             parent.SearchMatcher.Initialize (searchTerms);
             Children = [];
             BeginSearch ();
-            RefreshChildren ();
         }
 
         /// <summary>
@@ -472,6 +471,8 @@ public partial class FileDialog : Dialog, IDesignable
 
             return !alreadyCancelled;
         }
+
+        internal override void RefreshChildren () { }
 
         private void BeginSearch ()
         {
