@@ -91,7 +91,7 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
             return null;
         }
 
-        var baseKeyCode = "";
+        string baseKeyCode = "";
 
         if (key.KeyCode < KeyCode.CharMask && (key.KeyCode & (KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask)) == 0)
         {
@@ -99,8 +99,8 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
         }
 
         // Extract alternate key codes (kitty flag 4: report alternate keys)
-        var shiftedKeyCode = KeyCode.Null;
-        var baseLayoutKeyCode = KeyCode.Null;
+        KeyCode shiftedKeyCode = KeyCode.Null;
+        KeyCode baseLayoutKeyCode = KeyCode.Null;
 
         if (match.Groups [2].Success && int.TryParse (match.Groups [2].Value, CultureInfo.InvariantCulture, out int shiftedCode) && shiftedCode > 0)
         {
@@ -112,7 +112,7 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
             baseLayoutKeyCode = (KeyCode)baseCode;
         }
 
-        var associatedText = string.Empty;
+        string associatedText = string.Empty;
 
         if (match.Groups [5].Success)
         {
