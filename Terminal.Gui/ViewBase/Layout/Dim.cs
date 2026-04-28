@@ -3,17 +3,20 @@ using System.Numerics;
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
-///     <para>
-///         A Dim object describes the dimensions of a <see cref="View"/>. Dim is the type of the
-///         <see cref="View.Width"/> and <see cref="View.Height"/> properties of <see cref="View"/>.
-///     </para>
-///     <para>
-///         Integer values are implicitly convertible to an absolute <see cref="Dim"/>. These objects are created using
-///         the static methods described below. The <see cref="Dim"/> objects can be combined with the addition and
-///         subtraction operators.
-///     </para>
+///     Describes a declarative, responsive dimension for a <see cref="View"/>.
+///     <see cref="Dim"/> is the type of <see cref="View.Width"/> and <see cref="View.Height"/>.
+///     Integer values are implicitly convertible to an absolute <see cref="Dim"/>.
 /// </summary>
 /// <remarks>
+///     <para>
+///         Use <see cref="Dim"/> when a view's size should respond to the available space, its content, or the size and
+///         position of other views rather than being a fixed number of cells.
+///     </para>
+///     <para>
+///         This is the primary API for responsive sizing in Terminal.Gui. Instead of hard-coding a final width or
+///         height, you describe the relationship that should be maintained and the layout engine resolves the final
+///         <see cref="View.Frame"/> whenever layout runs.
+///     </para>
 ///     <para>
 ///         <list type="table">
 ///             <listheader>

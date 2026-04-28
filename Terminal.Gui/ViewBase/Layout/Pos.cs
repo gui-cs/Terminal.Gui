@@ -1,22 +1,29 @@
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
-///     Describes the position of a <see cref="View"/> which can be an absolute value, a percentage, centered, or
-///     relative to the ending dimension. Integer values are implicitly convertible to an absolute <see cref="Pos"/>. These
-///     objects are created using the static methods Percent, AnchorEnd, and Center. The <see cref="Pos"/> objects can be
-///     combined with the addition and subtraction operators.
+///     Describes a declarative, responsive position for a <see cref="View"/>.
+///     A <see cref="Pos"/> can be absolute, percentage-based, centered, anchored to an edge, or relative to another
+///     <see cref="View"/>. Integer values are implicitly convertible to an absolute <see cref="Pos"/>.
 /// </summary>
 /// <remarks>
-///     <para>Use the <see cref="Pos"/> objects on the X or Y properties of a view to control the position.</para>
 ///     <para>
-///         These can be used to set the absolute position, when merely assigning an integer value (via the implicit
-///         integer to <see cref="Pos"/> conversion), and they can be combined to produce more useful layouts, like:
-///         Pos.Center - 3, which would shift the position of the <see cref="View"/> 3 characters to the left after
-///         centering for example.
+///         Use <see cref="Pos"/> with <see cref="View.X"/> and <see cref="View.Y"/> to describe where a view should be,
+///         relative to its <see cref="View.SuperView"/>, its available space, or its sibling views.
 ///     </para>
 ///     <para>
-///         Reference coordinates of another view by using the methods Left(View), Right(View), Bottom(View), Top(View).
-///         The X(View) and Y(View) are aliases to Left(View) and Top(View) respectively.
+///         This is the primary API for responsive horizontal and vertical placement in Terminal.Gui. Instead of
+///         hard-coding a final coordinate, you describe the relationship that should be maintained and the layout engine
+///         resolves the final <see cref="View.Frame"/> whenever layout runs.
+///     </para>
+///     <para>
+///         <see cref="Pos"/> values can be combined to produce more useful layouts, such as
+///         <c>Pos.Center () - 3</c>, which shifts the position of the <see cref="View"/> 3 columns to the left after
+///         centering.
+///     </para>
+///     <para>
+///         Reference coordinates of another view by using <see cref="Left(View)"/>, <see cref="Right(View)"/>,
+///         <see cref="Bottom(View)"/>, and <see cref="Top(View)"/>. <see cref="X(View)"/> and <see cref="Y(View)"/> are
+///         aliases to <see cref="Left(View)"/> and <see cref="Top(View)"/> respectively.
 ///     </para>
 ///     <para>
 ///         <list type="table">
