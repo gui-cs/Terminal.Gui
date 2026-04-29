@@ -286,11 +286,183 @@ public class ApplicationPopoverTests
         top.Dispose ();
     }
 
+    // CoPilot - ChatGPT v4
+    [Fact]
+    public void LayoutAndDraw_VisibleIdlePopover_DoesNotRaiseLayoutAndDrawComplete ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (80, 25);
+
+        Runnable top = new () { App = app };
+        SessionToken? token = app.Begin (top);
+
+        PopoverTestClass popover = new ()
+        {
+            App = app,
+            Width = 10,
+            Height = 5
+        };
+        app.Popovers!.Register (popover);
+        app.Popovers.Show (popover);
+
+        // Clear the initial invalidation caused by showing the popover.
+        app.LayoutAndDraw ();
+
+        int layoutAndDrawCompleteCount = 0;
+        app.LayoutAndDrawComplete += CountLayoutAndDrawComplete;
+
+        // Act
+        app.LayoutAndDraw ();
+
+        // Assert
+        Assert.Equal (0, layoutAndDrawCompleteCount);
+
+        app.LayoutAndDrawComplete -= CountLayoutAndDrawComplete;
+        app.End (token!);
+        top.Dispose ();
+
+        return;
+
+        void CountLayoutAndDrawComplete (object? _, EventArgs __) => layoutAndDrawCompleteCount++;
+    }
+
+    // CoPilot - ChatGPT v4
+    [Fact]
+    public void LayoutAndDraw_VisiblePopoverNeedingDraw_RaisesLayoutAndDrawComplete ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (80, 25);
+
+        Runnable top = new () { App = app };
+        SessionToken? token = app.Begin (top);
+
+        PopoverTestClass popover = new ()
+        {
+            App = app,
+            Width = 10,
+            Height = 5
+        };
+        app.Popovers!.Register (popover);
+        app.Popovers.Show (popover);
+        app.LayoutAndDraw ();
+
+        int layoutAndDrawCompleteCount = 0;
+        app.LayoutAndDrawComplete += CountLayoutAndDrawComplete;
+        popover.SetNeedsDraw ();
+
+        // Act
+        app.LayoutAndDraw ();
+
+        // Assert
+        Assert.Equal (1, layoutAndDrawCompleteCount);
+
+        app.LayoutAndDrawComplete -= CountLayoutAndDrawComplete;
+        app.End (token!);
+        top.Dispose ();
+
+        return;
+
+        void CountLayoutAndDrawComplete (object? _, EventArgs __) => layoutAndDrawCompleteCount++;
+    }
+
+    // CoPilot - ChatGPT v4
+    [Fact]
+    public void LayoutAndDraw_VisiblePopoverNeedingLayout_RaisesLayoutAndDrawComplete ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (80, 25);
+
+        Runnable top = new () { App = app };
+        SessionToken? token = app.Begin (top);
+
+        PopoverTestClass popover = new ()
+        {
+            App = app,
+            Width = 10,
+            Height = 5
+        };
+        app.Popovers!.Register (popover);
+        app.Popovers.Show (popover);
+        app.LayoutAndDraw ();
+
+        int layoutAndDrawCompleteCount = 0;
+        app.LayoutAndDrawComplete += CountLayoutAndDrawComplete;
+        popover.SetNeedsLayout ();
+
+        // Act
+        app.LayoutAndDraw ();
+
+        // Assert
+        Assert.Equal (1, layoutAndDrawCompleteCount);
+
+        app.LayoutAndDrawComplete -= CountLayoutAndDrawComplete;
+        app.End (token!);
+        top.Dispose ();
+
+        return;
+
+        void CountLayoutAndDrawComplete (object? _, EventArgs __) => layoutAndDrawCompleteCount++;
+    }
+
+    // CoPilot - ChatGPT v4
+    [Fact]
+    public void LayoutAndDraw_UnderlyingViewNeedsDraw_RedrawsPopoverWithoutLayout ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (80, 25);
+
+        Runnable top = new () { App = app };
+
+        View content = new ()
+        {
+            Width = 10,
+            Height = 5
+        };
+        top.Add (content);
+
+        SessionToken? token = app.Begin (top);
+
+        PopoverTestClass popover = new ()
+        {
+            App = app,
+            Width = 10,
+            Height = 5
+        };
+        app.Popovers!.Register (popover);
+        app.Popovers.Show (popover);
+
+        app.LayoutAndDraw ();
+        popover.DrawCompleteCount = 0;
+        popover.LayoutPassCount = 0;
+
+        content.SetNeedsDraw ();
+
+        // Act
+        app.LayoutAndDraw ();
+
+        // Assert
+        Assert.Equal (1, popover.DrawCompleteCount);
+        Assert.Equal (0, popover.LayoutPassCount);
+
+        app.End (token!);
+        top.Dispose ();
+    }
+
     public class PopoverTestClass : View, IPopoverView
     {
         public List<Key> HandledKeys { get; } = [];
 
         public int NewCommandInvokeCount { get; private set; }
+
+        public int DrawCompleteCount { get; set; }
 
         public int LayoutPassCount { get; set; }
 
@@ -378,6 +550,12 @@ public class ApplicationPopoverTests
             }
 
             return false;
+        }
+
+        protected override void OnDrawComplete (DrawContext? context)
+        {
+            DrawCompleteCount++;
+            base.OnDrawComplete (context);
         }
 
         protected override void OnSubViewLayout (LayoutEventArgs args)
