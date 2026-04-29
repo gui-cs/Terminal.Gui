@@ -365,7 +365,7 @@ public partial class Editor : Scenario
         _app?.Run (sd);
         bool canceled = sd.Canceled;
         string path = sd.Path;
-        string fileName = sd.FileName;
+        string fileName = sd.FileName ?? string.Empty;
         sd.Dispose ();
 
         if (canceled)

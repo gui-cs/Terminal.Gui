@@ -108,7 +108,7 @@ public class KittyAlternateKeyTests
 
         // View level — same alternate key fields must arrive
         Assert.Single (viewDown);
-        Assert.Equal (new Key ('@'), viewDown [0]);
+        Assert.Equal (new Key ('@').WithShift, viewDown [0]);
         Assert.Equal ((KeyCode)64, viewDown [0].ShiftedKeyCode);
         Assert.Equal (KeyCode.Null, viewDown [0].BaseLayoutKeyCode);
         Assert.Equal ("@", viewDown [0].AssociatedText);
@@ -125,7 +125,7 @@ public class KittyAlternateKeyTests
         Assert.Equal ("!", appDown [0].GetPrintableText ());
 
         Assert.Single (viewDown);
-        Assert.Equal (new Key ('!'), viewDown [0]);
+        Assert.Equal (new Key ('!').WithShift, viewDown [0]);
         Assert.Equal ("!", viewDown [0].AssociatedText);
         Assert.Equal ("!", viewDown [0].GetPrintableText ());
     }
@@ -178,7 +178,7 @@ public class KittyAlternateKeyTests
         (_, List<Key> viewDown, _) = InjectRawSequenceToView ("\x1b[50:64;6:1u");
 
         Assert.Single (viewDown);
-        Assert.Equal (new Key ('@').WithCtrl, viewDown [0]);
+        Assert.Equal (new Key ('@').WithCtrl.WithShift, viewDown [0]);
         Assert.Equal ((KeyCode)64, viewDown [0].ShiftedKeyCode);
         Assert.Equal (KeyCode.Null, viewDown [0].BaseLayoutKeyCode);
         Assert.Equal (KeyEventType.Press, viewDown [0].EventType);
@@ -194,7 +194,7 @@ public class KittyAlternateKeyTests
         // Release events go to KeyUp, not KeyDown
         Assert.Empty (viewDown);
         Assert.Single (viewUp);
-        Assert.Equal (new Key ('@'), viewUp [0]);
+        Assert.Equal (new Key ('@').WithShift, viewUp [0]);
         Assert.Equal ((KeyCode)64, viewUp [0].ShiftedKeyCode);
         Assert.Equal (KeyCode.Null, viewUp [0].BaseLayoutKeyCode);
         Assert.Equal (KeyEventType.Release, viewUp [0].EventType);

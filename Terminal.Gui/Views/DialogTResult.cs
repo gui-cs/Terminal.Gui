@@ -30,6 +30,16 @@ namespace Terminal.Gui.Views;
 ///         Subclasses should set <see cref="IRunnable{TResult}.Result"/> before calling <see cref="Runnable.RequestStop"/>
 ///         to return a value. If Result is not set (remains <c>null</c>), the dialog is considered canceled.
 ///     </para>
+///     <para>
+///         The dialog is positioned at <see cref="Pos.Center"/> with <see cref="Dim.Auto"/> sizing,
+///         limited to 100% of <see cref="IApplication.TopRunnableView"/> (or screen dimensions).
+///     </para>
+///     <para>
+///         <b>NOTE </b> - Setting <see cref="View.ViewportSettings"/> to
+///         <see cref="ViewportSettingsFlags.HasHorizontalScrollBar"/> or
+///         <see cref="ViewportSettingsFlags.HasVerticalScrollBar"/>
+///         is not supported and may cause layout issues.
+///     </para>
 /// </remarks>
 /// <example>
 ///     <code>
@@ -69,10 +79,6 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <summary>
     ///     Initializes a new instance of the <see cref="Dialog{TResult}"/> class with no buttons.
     /// </summary>
-    /// <remarks>
-    ///     The dialog is positioned at <see cref="Pos.Center"/> with <see cref="Dim.Auto"/> sizing,
-    ///     limited to 100% of <see cref="IApplication.TopRunnableView"/> (or screen dimensions).
-    /// </remarks>
     public Dialog ()
     {
         X = Pos.Center ();
@@ -114,27 +120,11 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         SetStyle ();
     }
 
-    private Size _minimumSubViewsSize;
-
     /// <inheritdoc/>
     public override void EndInit ()
     {
         base.EndInit ();
         UpdateSizes ();
-
-#if DIALOG_SCROLLBARS
-        // Don't enable scrollbars until after initialized; otherwise they get created before
-        // our frame has dimensions.
-        ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
-#endif
-    }
-
-    /// <inheritdoc/>
-    protected override void OnSubViewAdded (View view)
-    {
-        _minimumSubViewsSize = new Size (GetWidthRequiredForSubViews (), GetHeightRequiredForSubViews ());
-        UpdateSizes ();
-        base.OnSubViewAdded (view);
     }
 
     /// <inheritdoc/>
@@ -196,13 +186,8 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
         }
 
         // Always floor at Viewport size — the content area should never be smaller
-        // than what's visible. For DimAuto dialogs, the Frame may be larger than
-        // _minimumSubViewsSize (e.g. due to title width), so the content area
-        // should reflect the actual available space.
-        int subViewsWidth = Math.Max (_minimumSubViewsSize.Width, Viewport.Width);
-        int subViewsHeight = Math.Max (_minimumSubViewsSize.Height, Viewport.Height);
-
-        SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, subViewsWidth), Math.Max (_minimumButtonsSize.Height, subViewsHeight)));
+        // than what's visible.
+        SetContentSize (new Size (Math.Max (_minimumButtonsSize.Width, Viewport.Width), Math.Max (_minimumButtonsSize.Height, Viewport.Height)));
     }
 
     /// <summary>
@@ -212,10 +197,10 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <returns></returns>
     private int GetMinimumDialogWidth ()
     {
-        int minSize = Math.Max (Math.Max (_minimumSubViewsSize.Width,
+        int minSize = Math.Max (
 
-                                          // Ensure space for title + borders
-                                          Title.GetColumns () + 4),
+                                // Ensure space for title + borders
+                                Title.GetColumns () + 4,
                                 _minimumButtonsSize.Width);
 
         return minSize;
@@ -228,7 +213,7 @@ public class Dialog<TResult> : Runnable<TResult>, IDesignable
     /// <returns></returns>
     private int GetMinimumDialogHeight ()
     {
-        int minSize = Math.Max (_minimumSubViewsSize.Height, _minimumButtonsSize.Height - Border.Thickness.Vertical - Margin.Thickness.Vertical);
+        int minSize = _minimumButtonsSize.Height - Border.Thickness.Vertical - Margin.Thickness.Vertical;
 
         return minSize;
     }
