@@ -158,7 +158,7 @@ Label absoluteLabel = new () { X = 1, Y = 2, Width = 12, Height = 1, Text = "Abs
 Label responsiveLabel = new ()
 {
     Text = "Responsive",
-    X = Pos.Right (absoluteLabel),
+    X = Pos.Right (otherView),
     Y = Pos.Center (),
     Width = Dim.Fill (),
     Height = Dim.Percent (50)
@@ -169,13 +169,13 @@ Label responsiveLabel = new ()
 
 <xref:Terminal.Gui.ViewBase.Pos> is the type of `View.X` and `View.Y`. To make a view's position respond to available space or other views instead of using a fixed coordinate, use it.
 
-* Absolute position, by passing an integer - `Pos.Absolute (10)` or simply `X = 10`
-* Percentage of the `SuperView` size - `Pos.Percent (50)`
-* Anchored from the end of the dimension - `Pos.AnchorEnd (10)`
+* Absolute position, by passing an integer - `Pos.Absolute ()`
+* Percentage of the `SuperView` size - `Pos.Percent ()`
+* Anchored from the end of the dimension - `Pos.AnchorEnd ()`
 * Centered - `Pos.Center ()`
-* Tracking another view - `Pos.Left (otherView)`, `Pos.Right (otherView)`, `Pos.Top (otherView)`, `Pos.Bottom (otherView)`
-* Aligning as a group - `Pos.Align (...)`
-* Computing from a function - `Pos.Func (...)`
+* Tracking another view - `Pos.Left ()`, `Pos.Right ()`, `Pos.Top ()`, `Pos.Bottom ()`
+* Aligning as a group - `Pos.Align ()`
+* Computing from a function - `Pos.Func ()`
 
 All <xref:Terminal.Gui.ViewBase.Pos> coordinates are relative to the SuperView's content area.
 
@@ -197,12 +197,12 @@ myView.Y = Pos.Bottom (anotherView) + 5;
 <xref:Terminal.Gui.ViewBase.Dim> is the type of `View.Width` and `View.Height`. To make size respond to content, terminal size, or sibling views instead of using a fixed number of cells, use it.
 
 * Automatic size based on the view's content - `Dim.Auto ()` - See [Dim.Auto Deep Dive](dimauto.md)
-* Absolute size, by passing an integer - `Dim.Absolute (10)`
-* Percentage of the `SuperView` content area - `Dim.Percent (50)`
+* Absolute size, by passing an integer - `Dim.Absolute ()`
+* Percentage of the `SuperView` content area - `Dim.Percent ()`
 * Fill the remaining space - `Dim.Fill ()`
 * Fill up to another view - `Dim.Fill (to: otherView)`
-* Track another view's size - `Dim.Width (otherView)`, `Dim.Height (otherView)`
-* Compute from a function - `Dim.Func (() => 10)`
+* Track another view's size - `Dim.Width ()`, `Dim.Height ()`
+* Compute from a function - `Dim.Func ()`
 
 `Dim.Fill ()` is especially useful for responsive forms and panes. **Note:** `Dim.Fill` does not contribute to a `SuperView`'s `Dim.Auto ()` sizing unless `minimumContentDim` is specified. See [Dim.Auto Deep Dive](dimauto.md) for details.
 
