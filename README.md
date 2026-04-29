@@ -8,7 +8,7 @@
 
 Cross-platform UI toolkit for building sophisticated terminal UI (TUI) applications on Windows, macOS, and Linux/Unix.
 
-![Terminal.Gui — cross-platform TUI toolkit for .NET. Build full-featured terminal UIs with menus, forms, tables, charts, wizards and file dialogs. 30+ stars, Windows / macOS / Linux, MIT-licensed.](docfx/images/hero.gif)
+![Terminal.Gui — cross-platform TUI toolkit for .NET. Build full-featured terminal UIs with menus, forms, tables, charts, wizards and file dialogs. +11k stars, +50 built-in views, +1.7M downloads, TrueColor with Unicode and mouse — Windows / macOS / Linux, MIT-licensed.](docfx/images/hero.gif)
 
 
 # Version 2.0 Has Been Released
