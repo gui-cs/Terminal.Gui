@@ -33,7 +33,7 @@ public partial class FileDialog : Dialog, IDesignable
     /// <summary>
     ///     Gets the index of the cancel button for the dialog. This is useful for checking if the user canceled the dialog by
     ///     comparing
-    ///     the <see cref="Dialog.Result"/> to the index of this button in the <see cref="Dialog.Buttons"/> array.
+    ///     the <see cref="Dialog.Result"/> to the index of this button in the <see cref="Dialog{TResult}.Buttons"/> array.
     /// </summary>
     public int CancelButtonIndex => Buttons.IndexOf (_btnCancel);
 
