@@ -292,6 +292,8 @@ public class ApplicationPopoverTests
 
         public int NewCommandInvokeCount { get; private set; }
 
+        public int LayoutPassCount { get; set; }
+
         public bool HandleNewCommand { get; set; }
 
         /// <summary>
@@ -376,6 +378,12 @@ public class ApplicationPopoverTests
             }
 
             return false;
+        }
+
+        protected override void OnSubViewLayout (LayoutEventArgs args)
+        {
+            LayoutPassCount++;
+            base.OnSubViewLayout (args);
         }
 
         /// <inheritdoc/>
