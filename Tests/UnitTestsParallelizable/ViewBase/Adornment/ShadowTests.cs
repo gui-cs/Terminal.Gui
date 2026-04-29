@@ -587,7 +587,7 @@ public class ShadowTests (ITestOutputHelper output)
     [Fact]
     public void ShadowStyle_Getter_Does_Not_Inherit_From_SuperView ()
     {
-        // A Window sets DefaultShadow = Transparent in its ctor, so it will have a shadow.
+        // Explicitly give the SuperView a transparent shadow for this inheritance test.
         Window superView = new () { Width = 20, Height = 10, ShadowStyle = ShadowStyles.Transparent };
 
         View child = new () { Width = 5, Height = 3 };
