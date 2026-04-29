@@ -250,11 +250,49 @@ public class ApplicationPopoverTests
         Assert.Equal (initialVisibleState, popover2.Visible);
     }
 
+    // CoPilot - ChatGPT v4
+    [Fact]
+    public void LayoutAndDraw_ScreenResize_LayoutsVisiblePopover ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (80, 25);
+
+        Runnable top = new () { App = app };
+        SessionToken? token = app.Begin (top);
+
+        PopoverTestClass popover = new ()
+        {
+            App = app,
+            Width = 10,
+            Height = 5
+        };
+        app.Popovers!.Register (popover);
+        app.Popovers.Show (popover);
+
+        app.LayoutAndDraw ();
+        popover.LayoutPassCount = 0;
+
+        app.Driver.SetScreenSize (100, 30);
+
+        // Act
+        app.LayoutAndDraw ();
+
+        // Assert
+        Assert.True (popover.LayoutPassCount > 0);
+
+        app.End (token!);
+        top.Dispose ();
+    }
+
     public class PopoverTestClass : View, IPopoverView
     {
         public List<Key> HandledKeys { get; } = [];
 
         public int NewCommandInvokeCount { get; private set; }
+
+        public int LayoutPassCount { get; set; }
 
         public bool HandleNewCommand { get; set; }
 
@@ -340,6 +378,12 @@ public class ApplicationPopoverTests
             }
 
             return false;
+        }
+
+        protected override void OnSubViewLayout (LayoutEventArgs args)
+        {
+            LayoutPassCount++;
+            base.OnSubViewLayout (args);
         }
 
         /// <inheritdoc/>
