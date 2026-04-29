@@ -554,6 +554,10 @@ public class ConfigProperty
             {
                 continue;
             }
+            catch (TypeLoadException)
+            {
+                continue;
+            }
         }
     }
 
