@@ -900,6 +900,120 @@ public class DropDownListTests (ITestOutputHelper output)
         app.End (token!);
     }
 
+    // CoPilot - ChatGPT v4
+    [Fact]
+    public void VisiblePopover_Repositions_WhenTerminalIsResized ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (40, 15);
+
+        using Runnable top = new ();
+        SessionToken? token = app.Begin (top);
+
+        ObservableCollection<string> items = ["Alpha", "Beta", "Gamma"];
+
+        DropDownList dropdown = new ()
+        {
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Width = 12,
+            Source = new ListWrapper<string> (items),
+            ReadOnly = true
+        };
+
+        top.Add (dropdown);
+        app.LayoutAndDraw ();
+
+        dropdown.SetFocus ();
+        app.InjectKey (Key.F4);
+        app.LayoutAndDraw ();
+
+        Popover<ListView, string?>? popover = FindDropDownPopover (app) as Popover<ListView, string?>;
+        Assert.NotNull (popover);
+        Assert.True (popover.Visible);
+
+        Rectangle initialListFrame = popover.ContentView!.FrameToScreen ();
+        Rectangle initialDropDownFrame = dropdown.FrameToScreen ();
+
+        // Act
+        app.Driver.SetScreenSize (60, 25);
+        app.LayoutAndDraw ();
+
+        // Assert
+        Rectangle resizedListFrame = popover.ContentView.FrameToScreen ();
+        Rectangle resizedDropDownFrame = dropdown.FrameToScreen ();
+
+        Assert.NotEqual (initialDropDownFrame.Location, resizedDropDownFrame.Location);
+        Assert.Equal (resizedDropDownFrame.X, resizedListFrame.X);
+        Assert.Equal (resizedDropDownFrame.Bottom, resizedListFrame.Y);
+        Assert.NotEqual (initialListFrame.Location, resizedListFrame.Location);
+
+        app.End (token!);
+    }
+
+    // CoPilot - ChatGPT v4
+    [Fact]
+    public void VisiblePopover_LayoutsHeight_WhenTerminalIsResized ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (30, 10);
+
+        using Runnable top = new ();
+        SessionToken? token = app.Begin (top);
+
+        ObservableCollection<string> items =
+        [
+            "Item_00",
+            "Item_01",
+            "Item_02",
+            "Item_03",
+            "Item_04",
+            "Item_05",
+            "Item_06",
+            "Item_07",
+            "Item_08",
+            "Item_09"
+        ];
+
+        DropDownList dropdown = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 12,
+            Source = new ListWrapper<string> (items),
+            ReadOnly = true
+        };
+
+        top.Add (dropdown);
+        app.LayoutAndDraw ();
+
+        dropdown.SetFocus ();
+        app.InjectKey (Key.F4);
+        app.LayoutAndDraw ();
+
+        Popover<ListView, string?>? popover = FindDropDownPopover (app) as Popover<ListView, string?>;
+        Assert.NotNull (popover);
+        Assert.True (popover.Visible);
+
+        int initialHeight = popover.ContentView!.Frame.Height;
+        Assert.Equal (9, initialHeight);
+
+        // Act
+        app.Driver.SetScreenSize (30, 5);
+        app.LayoutAndDraw ();
+
+        // Assert
+        int resizedHeight = popover.ContentView.Frame.Height;
+        Assert.Equal (4, resizedHeight);
+        Assert.NotEqual (initialHeight, resizedHeight);
+
+        app.End (token!);
+    }
+
     // Helper to find the DropDownList popover (excludes the context menu popover)
     private static IPopoverView? FindDropDownPopover (IApplication app) => app.Popovers?.Popovers.OfType<Popover<ListView, string?>> ().FirstOrDefault ();
 }
