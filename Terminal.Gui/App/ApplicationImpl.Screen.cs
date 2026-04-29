@@ -65,6 +65,11 @@ internal partial class ApplicationImpl
                 runnableView.SetNeedsLayout ();
             }
         }
+
+        if (Popovers?.GetActivePopover () is View { Visible: true } visiblePopover)
+        {
+            visiblePopover.SetNeedsLayout ();
+        }
     }
 
     private void Driver_SizeChanged (object? sender, SizeChangedEventArgs e)
