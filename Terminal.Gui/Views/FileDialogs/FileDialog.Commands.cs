@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.IO.Abstractions;
 
 namespace Terminal.Gui.Views;
@@ -10,18 +11,10 @@ public partial class FileDialog
     /// </summary>
     /// <param name="file"></param>
     /// <returns></returns>
-    public bool IsCompatibleWithAllowedExtensions (IFileInfo file) => !AllowedTypes.Any () || MatchesAllowedTypes (file);
+    public bool IsCompatibleWithAllowedExtensions (IFileInfo file) => AllowedTypes.Count == 0 || MatchesAllowedTypes (file);
 
     /// <inheritdoc/>
-    protected override bool OnAccepting (CommandEventArgs args)
-    {
-        if (Accept (true))
-        {
-            return base.OnAccepting (args);
-        }
-
-        return false;
-    }
+    protected override bool OnAccepting (CommandEventArgs args) => Accept (true) && base.OnAccepting (args);
 
     private void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)
     {
@@ -154,16 +147,10 @@ public partial class FileDialog
                          .ToArray ();
     }
 
-    private bool IsCompatibleWithAllowedExtensions (string path)
-    {
-        // no restrictions
-        if (!AllowedTypes.Any ())
-        {
-            return true;
-        }
+    private bool IsCompatibleWithAllowedExtensions (string path) =>
 
-        return AllowedTypes.Any (t => t.IsAllowed (path));
-    }
+        // no restrictions
+        AllowedTypes.Count == 0 || AllowedTypes.Any (t => t.IsAllowed (path));
 
     private bool IsCompatibleWithOpenMode (string s, out string reason)
     {
@@ -225,7 +212,7 @@ public partial class FileDialog
 
                 return false;
 
-            default: throw new ArgumentOutOfRangeException (nameof (OpenMode));
+            default: throw new InvalidEnumArgumentException (nameof (OpenMode), (int)OpenMode, typeof (OpenMode));
         }
     }
 
@@ -241,9 +228,9 @@ public partial class FileDialog
     /// <returns></returns>
     private IEnumerable<FileSystemInfoStats> MultiRowToStats ()
     {
-        HashSet<FileSystemInfoStats> toReturn = new ();
+        HashSet<FileSystemInfoStats> toReturn = [];
 
-        if (!AllowsMultipleSelection || !_tableView.MultiSelectedRegions.Any ())
+        if (!AllowsMultipleSelection || _tableView.MultiSelectedRegions.Count == 0)
         {
             return toReturn;
         }
@@ -260,7 +247,11 @@ public partial class FileDialog
 
     private void New ()
     {
-        IFileSystemInfo created = FileOperationsHandler.New (App, _fileSystem!, State!.Directory);
+        if (_fileSystem is null)
+        {
+            return;
+        }
+        IFileSystemInfo? created = FileOperationsHandler.New (App, _fileSystem, State!.Directory);
 
         RefreshState ();
         RestoreSelection (created);
@@ -275,7 +266,7 @@ public partial class FileDialog
             return;
         }
 
-        IFileSystemInfo newNamed = FileOperationsHandler.Rename (app, _fileSystem!, toRename.Single ()!);
+        IFileSystemInfo? newNamed = FileOperationsHandler.Rename (app, _fileSystem!, toRename.Single ()!);
 
         RefreshState ();
         RestoreSelection (newNamed);

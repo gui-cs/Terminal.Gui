@@ -28,6 +28,16 @@ namespace Terminal.Gui.Views;
 ///         becomes the default (<see cref="Button.IsDefault"/>). Button alignment is controlled by
 ///         <see cref="Dialog{TResult}.ButtonAlignment"/> and <see cref="Dialog{TResult}.ButtonAlignmentModes"/>.
 ///     </para>
+///     <para>
+///         The dialog is positioned at <see cref="Pos.Center"/> with <see cref="Dim.Auto"/> sizing,
+///         limited to 100% of <see cref="IApplication.TopRunnableView"/> (or screen dimensions).
+///     </para>
+///     <para>
+///         <b>NOTE </b> - Setting <see cref="View.ViewportSettings"/> to
+///         <see cref="ViewportSettingsFlags.HasHorizontalScrollBar"/> or
+///         <see cref="ViewportSettingsFlags.HasVerticalScrollBar"/>
+///         is not supported and may cause layout issues.
+///     </para>
 /// </remarks>
 /// <example>
 ///     <code>

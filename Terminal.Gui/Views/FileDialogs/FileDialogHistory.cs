@@ -1,24 +1,21 @@
-#nullable disable
-﻿using System.IO.Abstractions;
+using System.IO.Abstractions;
 
 namespace Terminal.Gui.Views;
 
-internal class FileDialogHistory
+internal class FileDialogHistory (FileDialog dlg)
 {
-    private readonly Stack<FileDialogState> back = new ();
-    private readonly FileDialog dlg;
-    private readonly Stack<FileDialogState> forward = new ();
-    public FileDialogHistory (FileDialog dlg) { this.dlg = dlg; }
+    private readonly Stack<FileDialogState> _back = new ();
+    private readonly Stack<FileDialogState> _forward = new ();
 
     public bool Back ()
     {
-        IDirectoryInfo goTo = null;
-        FileSystemInfoStats restoreSelection = null;
-        string restorePath = null;
+        IDirectoryInfo? goTo = null;
+        FileSystemInfoStats? restoreSelection = null;
+        string? restorePath = null;
 
         if (CanBack ())
         {
-            FileDialogState backTo = back.Pop ();
+            FileDialogState backTo = _back.Pop ();
             goTo = backTo.Directory;
             restoreSelection = backTo.Selected;
             restorePath = backTo.Path;
@@ -34,7 +31,7 @@ internal class FileDialogHistory
             return false;
         }
 
-        forward.Push (dlg.State);
+        _forward.Push (dlg.State ?? throw new InvalidOperationException ());
         dlg.PushState (goTo, false, true, false, restorePath);
 
         if (restoreSelection is { })
@@ -45,24 +42,23 @@ internal class FileDialogHistory
         return true;
     }
 
-    internal bool CanBack () { return back.Count > 0; }
-    internal bool CanForward () { return forward.Count > 0; }
-    internal bool CanUp () { return dlg.State?.Directory.Parent != null; }
-    internal void ClearForward () { forward.Clear (); }
+    internal bool CanBack () => _back.Count > 0;
+    internal bool CanForward () => _forward.Count > 0;
+    internal bool CanUp () => dlg.State?.Directory.Parent != null;
+    internal void ClearForward () => _forward.Clear ();
 
     internal bool Forward ()
     {
-        if (forward.Count > 0)
+        if (_forward.Count <= 0)
         {
-            dlg.PushState (forward.Pop ().Directory, true, true, false);
-
-            return true;
+            return false;
         }
+        dlg.PushState (_forward.Pop ().Directory, true, true, false);
 
-        return false;
+        return true;
     }
 
-    internal void Push (FileDialogState state, bool clearForward)
+    internal void Push (FileDialogState? state, bool clearForward)
     {
         if (state is null)
         {
@@ -70,29 +66,29 @@ internal class FileDialogHistory
         }
 
         // if changing to a new directory push onto the Back history
-        if (back.Count == 0 || back.Peek ().Directory.FullName != state.Directory.FullName)
+        if (_back.Count != 0 && _back.Peek ().Directory.FullName == state.Directory.FullName)
         {
-            back.Push (state);
+            return;
+        }
+        _back.Push (state);
 
-            if (clearForward)
-            {
-                ClearForward ();
-            }
+        if (clearForward)
+        {
+            ClearForward ();
         }
     }
 
     internal bool Up ()
     {
-        IDirectoryInfo parent = dlg.State?.Directory.Parent;
+        IDirectoryInfo? parent = dlg.State?.Directory.Parent;
 
-        if (parent is { })
+        if (parent is null)
         {
-            back.Push (new FileDialogState (parent, dlg));
-            dlg.PushState (parent, false);
-
-            return true;
+            return false;
         }
+        _back.Push (new FileDialogState (parent, dlg));
+        dlg.PushState (parent, false);
 
-        return false;
+        return true;
     }
 }

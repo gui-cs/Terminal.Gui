@@ -3,17 +3,19 @@ using System.Numerics;
 namespace Terminal.Gui.ViewBase;
 
 /// <summary>
-///     <para>
-///         A Dim object describes the dimensions of a <see cref="View"/>. Dim is the type of the
-///         <see cref="View.Width"/> and <see cref="View.Height"/> properties of <see cref="View"/>.
-///     </para>
-///     <para>
-///         Integer values are implicitly convertible to an absolute <see cref="Dim"/>. These objects are created using
-///         the static methods described below. The <see cref="Dim"/> objects can be combined with the addition and
-///         subtraction operators.
-///     </para>
+///     Describes a declarative, responsive dimension for a <see cref="View"/>.
+///     <see cref="Dim"/> is the type of <see cref="View.Width"/> and <see cref="View.Height"/>.
+///     Integer values are implicitly convertible to an absolute <see cref="Dim"/>.
 /// </summary>
 /// <remarks>
+///     <para>
+///         To make a view's size respond to the available space, its content, or the size and position of other views
+///         rather than using a fixed number of cells, use <see cref="Dim"/>.
+///     </para>
+///     <para>
+///         To define responsive sizing in Terminal.Gui, describe the relationship that should be maintained and let the
+///         layout engine resolve the final <see cref="View.Frame"/> whenever layout runs.
+///     </para>
 ///     <para>
 ///         <list type="table">
 ///             <listheader>
@@ -109,8 +111,8 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///     <para>
     ///         SubViews that use <see cref="Dim.Fill()"/> do not contribute to the auto-sizing calculation unless
     ///         <see cref="DimFill.MinimumContentDim"/> is specified. Without it, a <see cref="DimFill"/> SubView will
-    ///         receive a size of 0. Use <see cref="Dim.Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> to ensure
-    ///         the SubView contributes a minimum size.
+    ///         receive a size of 0. To ensure the SubView contributes a minimum size, use
+    ///         <see cref="Dim.Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c>.
     ///     </para>
     /// </remarks>
     /// <example>
@@ -141,9 +143,9 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     ///     </para>
     ///     <para>
     ///         If the SuperView uses <see cref="Dim.Auto"/>, a <see cref="DimFill"/> SubView does <b>not</b>
-    ///         contribute to the auto-sizing calculation and will receive a size of 0. Use
-    ///         <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> or <see cref="Fill(View)"/> with
-    ///         a <c>to</c> parameter to ensure the SubView contributes to auto-sizing.
+    ///         contribute to the auto-sizing calculation and will receive a size of 0. To make the SubView contribute to
+    ///         auto-sizing, use <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> or <see cref="Fill(View)"/>
+    ///         with a <c>to</c> parameter.
     ///         See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for details.
     ///     </para>
     /// </remarks>
@@ -162,9 +164,9 @@ public abstract record Dim : IEqualityOperators<Dim, Dim, bool>
     /// <remarks>
     ///     <para>
     ///         If the SuperView uses <see cref="Dim.Auto"/>, a <see cref="DimFill"/> SubView does <b>not</b>
-    ///         contribute to the auto-sizing calculation and will receive a size of 0. Use
-    ///         <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> or <see cref="Fill(View)"/> with
-    ///         a <c>to</c> parameter to ensure the SubView contributes to auto-sizing.
+    ///         contribute to the auto-sizing calculation and will receive a size of 0. To make the SubView contribute to
+    ///         auto-sizing, use <see cref="Fill(Dim, Dim?)"/> with a <c>minimumContentDim</c> or <see cref="Fill(View)"/>
+    ///         with a <c>to</c> parameter.
     ///         See the <a href="../docs/dimauto.md">Dim.Auto Deep Dive</a> for details.
     ///     </para>
     /// </remarks>
