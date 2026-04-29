@@ -11,7 +11,7 @@ public partial class FileDialog
             return;
         }
 
-        if (e.Context.Binding is MouseBinding { MouseEvent: { } mouse })
+        if (e.Context.Binding is MouseBinding { MouseEvent: { Flags: MouseFlags.RightButtonClicked } mouse })
         {
             Point? clickedCell = _tableView.ScreenToCell (mouse.Position!.Value.X, mouse.Position!.Value.Y, out int? clickedCol);
 
@@ -33,16 +33,16 @@ public partial class FileDialog
         }
 
         PopoverMenu contextMenu = new ([
-                                            new MenuItem (Strings.fdCtxNew, string.Empty, New),
-                                            new MenuItem (Strings.fdCtxRename, string.Empty, () => Rename (App)),
-                                            new MenuItem (Strings.fdCtxDelete, string.Empty, Delete)
-                                        ]);
+                                           new MenuItem (Strings.fdCtxNew, string.Empty, New),
+                                           new MenuItem (Strings.fdCtxRename, string.Empty, () => Rename (App)),
+                                           new MenuItem (Strings.fdCtxDelete, string.Empty, Delete)
+                                       ]);
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
         App!.Popovers?.Register (contextMenu);
 
-        Point pos = new (_tableView.FrameToScreen ().X + 15, _tableView.FrameToScreen ().Y + _tableView.SelectedRow + _tableView.GetHeaderHeight ());
+        Point pos = new (_tableView.FrameToScreen ().X + 15, _tableView.FrameToScreen ().Y + (_tableView.Value?.Cursor.Y ?? 0) + _tableView.GetHeaderHeight ());
         contextMenu.MakeVisible (pos);
     }
 
@@ -101,28 +101,6 @@ public partial class FileDialog
         ApplySort ();
     }
 
-#if MENU_V1
-    private void AllowedTypeMenuClicked (int idx)
-    {
-        IAllowedType allow = AllowedTypes [idx];
-
-        for (var i = 0; i < AllowedTypes.Count; i++)
-        {
-            _allowedTypeMenuItems! [i].Checked = i == idx;
-        }
-
-        _allowedTypeMenu!.Title = allow.ToString ()!;
-
-        CurrentFilter = allow;
-
-        _tbPath.ClearAllSelection ();
-        _tbPath.Autocomplete.ClearSuggestions ();
-
-        State?.RefreshChildren ();
-        WriteStateToTableView ();
-    }
-#endif
-
     private string AspectGetter (object o)
     {
         var fsi = (IFileSystemInfo)o;
@@ -136,14 +114,14 @@ public partial class FileDialog
         return (Style.IconProvider.GetIconWithOptionalSpace (fsi) + fsi.Name).Trim ();
     }
 
-    private void CellActivate (object? sender, CellActivatedEventArgs obj)
+    private void TableViewOnAccepted (object? sender, CommandEventArgs e)
     {
         if (TryAcceptMulti ())
         {
             return;
         }
 
-        FileSystemInfoStats stats = RowToStats (obj.Row);
+        FileSystemInfoStats stats = RowToStats (_tableView.Value!.Cursor.Y);
 
         if (stats.FileSystemInfo is IDirectoryInfo d)
         {
@@ -174,16 +152,16 @@ public partial class FileDialog
             return _tableView.GetScheme ();
         }
 
-        Color color = Style.ColorProvider.GetColor (stats.FileSystemInfo!) ?? new Color (Color.White);
-        var black = new Color (Color.Black);
+        Color foreground = Style.ColorProvider.GetColor (stats.FileSystemInfo!) ?? GetAttributeForRole (VisualRole.Normal).Foreground;
+        Color background = GetAttributeForRole (VisualRole.Normal).Background;
 
         // TODO: Add some kind of cache for this
         return new Scheme
         {
-            Normal = new Attribute (color, black),
-            HotNormal = new Attribute (color, black),
-            Focus = new Attribute (black, color),
-            HotFocus = new Attribute (black, color)
+            Normal = new Attribute (foreground, background),
+            HotNormal = new Attribute (foreground, background),
+            Focus = new Attribute (background, foreground),
+            HotFocus = new Attribute (background, foreground)
         };
     }
 
@@ -238,10 +216,10 @@ public partial class FileDialog
         }
 
         PopoverMenu contextMenu = new ([
-                                            new MenuItem (Strings.fdCtxNew, string.Empty, New),
-                                            new MenuItem (Strings.fdCtxRename, string.Empty, () => Rename (App)),
-                                            new MenuItem (Strings.fdCtxDelete, string.Empty, Delete)
-                                        ]);
+                                           new MenuItem (Strings.fdCtxNew, string.Empty, New),
+                                           new MenuItem (Strings.fdCtxRename, string.Empty, () => Rename (App)),
+                                           new MenuItem (Strings.fdCtxDelete, string.Empty, Delete)
+                                       ]);
 
         _tableView.SetSelection (clickedCell.Value.X, clickedCell.Value.Y, false);
 
@@ -257,11 +235,11 @@ public partial class FileDialog
         string sort = GetProposedNewSortOrder (clickedCol, out bool isAsc);
 
         PopoverMenu contextMenu = new ([
-                                            new MenuItem (string.Format (Strings.fdCtxHide, StripArrows (_tableView.Table!.ColumnNames [clickedCol])),
-                                                          string.Empty,
-                                                          () => HideColumn (clickedCol)),
-                                            new MenuItem (StripArrows (sort), string.Empty, () => SortColumn (clickedCol, isAsc))
-                                        ]);
+                                           new MenuItem (string.Format (Strings.fdCtxHide, StripArrows (_tableView.Table!.ColumnNames [clickedCol])),
+                                                         string.Empty,
+                                                         () => HideColumn (clickedCol)),
+                                           new MenuItem (StripArrows (sort), string.Empty, () => SortColumn (clickedCol, isAsc))
+                                       ]);
 
         // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
         // and the context menu is disposed when it is closed.
@@ -280,6 +258,7 @@ public partial class FileDialog
 
     private static string StripArrows (string columnName) => columnName.Replace (" (▼)", string.Empty).Replace (" (▲)", string.Empty);
 
+    // TODO: Port this to use key bindings
     private bool TableView_KeyDown (Key keyEvent)
     {
         switch (keyEvent.KeyCode)
@@ -307,9 +286,10 @@ public partial class FileDialog
         }
     }
 
-    private void TableView_SelectedCellChanged (object? sender, SelectedCellChangedEventArgs obj)
+    // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/5087#issuecomment-4328093883
+    private void TableViewOnValueChanged (object? sender, ValueChangedEventArgs<TableSelection?> e)
     {
-        if (!_tableView.HasFocus || obj.NewRow == -1 || obj.Table.Rows == 0)
+        if (!_tableView.HasFocus || _tableView.Value is null || _tableView.Table?.Rows == 0)
         {
             return;
         }
@@ -319,7 +299,7 @@ public partial class FileDialog
             return;
         }
 
-        FileSystemInfoStats stats = RowToStats (obj.NewRow);
+        FileSystemInfoStats stats = RowToStats (_tableView.Value.Cursor.Y);
 
         IFileSystemInfo? dest = stats.IsParent ? State!.Directory : stats.FileSystemInfo;
 

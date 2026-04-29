@@ -263,6 +263,18 @@ public class ViewCommandTests (ITestOutputHelper output)
         }
     }
 
+    [Fact]
+    public void HotKey_Command_Returns_True ()
+    {
+        View view = new ();
+
+        bool? result = view.InvokeCommand (Command.HotKey);
+
+        Assert.True (result);
+
+        view.Dispose ();
+    }
+
     #endregion HotKey tests
 
     #region InvokeCommand Tests

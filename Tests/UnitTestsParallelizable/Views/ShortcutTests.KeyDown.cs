@@ -245,7 +245,7 @@ public partial class ShortcutTests
         // The default CommandView does not have a HotKey, so only the Shortcut's Key should trigger activation, not the CommandView's HotKey
         Assert.Equal (Key.A, shortcut.Key);
         Assert.Equal (Key.C, shortcut.HotKey);
-        Assert.Equal (Key.Empty, shortcut.CommandView.HotKey);
+        Assert.Equal (Key.Empty, shortcut.CommandView?.HotKey);
 
         runnable.Add (shortcut);
 
@@ -290,7 +290,7 @@ public partial class ShortcutTests
 
         // Verify layout created gaps
         Assert.True (shortcut.Frame.Width >= 40, "Shortcut should be wide enough for gaps");
-        Assert.True (shortcut.CommandView.Frame.Width > 0, "CommandView should be visible");
+        Assert.True (shortcut.CommandView?.Frame.Width > 0, "CommandView should be visible");
         Assert.True (shortcut.HelpView.Frame.Width > 0, "HelpView should be visible");
         Assert.True (shortcut.KeyView.Frame.Width > 0, "KeyView should be visible");
 
@@ -334,7 +334,7 @@ public partial class ShortcutTests
 
         // Verify layout created gaps
         Assert.True (shortcut.Frame.Width >= 40, "Shortcut should be wide enough for gaps");
-        Assert.True (shortcut.CommandView.Frame.Width > 0, "CommandView should be visible");
+        Assert.True (shortcut.CommandView?.Frame.Width > 0, "CommandView should be visible");
         Assert.True (shortcut.HelpView.Frame.Width > 0, "HelpView should be visible");
         Assert.True (shortcut.KeyView.Frame.Width > 0, "KeyView should be visible");
 
@@ -378,7 +378,7 @@ public partial class ShortcutTests
 
         // Verify layout created gaps
         Assert.True (shortcut.Frame.Width >= 40, "Shortcut should be wide enough for gaps");
-        Assert.True (shortcut.CommandView.Frame.Width > 0, "CommandView should be visible");
+        Assert.True (shortcut.CommandView?.Frame.Width > 0, "CommandView should be visible");
         Assert.True (shortcut.HelpView.Frame.Width > 0, "HelpView should be visible");
         Assert.True (shortcut.KeyView.Frame.Width > 0, "KeyView should be visible");
 
@@ -426,7 +426,7 @@ public partial class ShortcutTests
 
         // Verify layout created gaps
         Assert.True (shortcut.Frame.Width >= 40, "Shortcut should be wide enough for gaps");
-        Assert.True (shortcut.CommandView.Frame.Width > 0, "CommandView should be visible");
+        Assert.True (shortcut.CommandView?.Frame.Width > 0, "CommandView should be visible");
         Assert.True (shortcut.HelpView.Frame.Width > 0, "HelpView should be visible");
         Assert.True (shortcut.KeyView.Frame.Width > 0, "KeyView should be visible");
 

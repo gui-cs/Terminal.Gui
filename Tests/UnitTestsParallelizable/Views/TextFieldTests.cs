@@ -356,6 +356,25 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
     }
 
     [Fact]
+    public void KittyAltModifiedPrintableKey_DoesNotInsertAssociatedText ()
+    {
+        Runnable top = new ();
+        TextField tf = new () { Width = 10 };
+        top.Add (tf);
+        tf.SetFocus ();
+        tf.ClearAllSelection ();
+        tf.InsertionPoint = 0;
+
+        Key? key = new KittyKeyboardPattern ().GetKey ("\u001b[116;3;116u");
+
+        Assert.NotNull (key);
+        Assert.False (top.NewKeyDownEvent (key));
+        Assert.Equal (string.Empty, tf.Text);
+
+        top.Dispose ();
+    }
+
+    [Fact]
     public void ShiftedDigitKey_WithoutKittyMetadata_InsertsBaseDigit ()
     {
         Runnable top = new ();
@@ -1485,4 +1504,162 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (0, tf.ScrollOffset);
         Assert.Equal (15, tf.Viewport.Width);
     }
+
+    /// <summary>
+    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     When Kitty keyboard protocol sets AssociatedText on Alt+letter keys,
+    ///     TextField must not insert the text. Alt-modified keys are never text input.
+    /// </summary>
+    [Fact]
+    public void AltKey_With_AssociatedText_Does_Not_Insert_Into_TextField ()
+    {
+        // Copilot
+        TextField tf = new () { Width = 20 };
+        tf.SetFocus ();
+
+        // Simulate Alt+T with AssociatedText set by Kitty keyboard protocol which in a real scenario would be set AssociatedText as empty string
+        // for Alt+letter keys, with the exception of AltGr+key which would set AssociatedText to "key" (e.g. "€" for AltGr+E)
+        Key altT = new (Key.T.WithAlt) { AssociatedText = "" };
+        tf.NewKeyDownEvent (altT);
+
+        Assert.Equal ("", tf.Text);
+    }
+
+    /// <summary>
+    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     Ctrl-modified keys with AssociatedText must not be inserted as text.
+    /// </summary>
+    [Fact]
+    public void CtrlKey_With_AssociatedText_Does_Not_Insert_Into_TextField ()
+    {
+        // Copilot
+        TextField tf = new () { Width = 20 };
+        tf.SetFocus ();
+
+        Key ctrlT = new (Key.T.WithCtrl) { AssociatedText = "t" };
+        tf.NewKeyDownEvent (ctrlT);
+
+        Assert.Equal ("", tf.Text);
+    }
+
+    [Fact]
+    public void ReadOnly_ShouldNotAllowAutomaticallyScrolling_AndMustSetInsertionPointToZeroAtInitialization ()
+    {
+        TextField tf = new () { Width = 5, ReadOnly = true, Text = "hello world" };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        Assert.Equal (0, tf.InsertionPoint);
+        Assert.Equal (0, tf.ScrollOffset);
+        Assert.Null (tf.SelectedText);
+    }
+
+    [Fact]
+    public void ReadOnly_ShouldNotSelectAllText_OnFocus ()
+    {
+        TextField tf = new () { Width = 5, ReadOnly = true, Text = "hello world" };
+        tf.BeginInit ();
+        tf.EndInit ();
+
+        tf.SetFocus ();
+
+        Assert.Equal (0, tf.InsertionPoint);
+        Assert.Equal (0, tf.ScrollOffset);
+        Assert.Null (tf.SelectedText);
+    }
+
+     [Fact]
+     public void ReadOnly_ShouldSetInsertionPointAndScrollOffsetToZero_OnFocus ()
+     {
+         TextField tf = new () { Width = 5, ReadOnly = true, Text = "hello world" };
+         tf.BeginInit ();
+         tf.EndInit ();
+
+         // Move insertion point to end of text
+         tf.InsertionPoint = tf.Text.Length;
+         Assert.Equal (11, tf.InsertionPoint);
+         Assert.Equal (7, tf.ScrollOffset);
+
+         // Set focus and verify insertion point is still at zero
+         tf.SetFocus ();
+         Assert.Equal (0, tf.InsertionPoint);
+         Assert.Equal (0, tf.ScrollOffset);
+     }
+
+     [Fact]
+     public void ReadOnly_ShouldSetInsertionPointAndScrollOffsetToZero_LeavingFocus ()
+     {
+         TextField tf = new () { Width = 5, ReadOnly = true, Text = "hello world" };
+
+         // Create another view to take focus away
+         View otherView = new () { CanFocus = true };
+
+         // Create a container to hold both views
+         Runnable container = new () { Id = "container", Width = 20, Height = 5 };
+         container.Add (tf, otherView);
+         container.BeginInit ();
+         container.EndInit ();
+
+         // Set focus to TextField and verify insertion point and scroll offset are at zero
+         tf.SetFocus ();
+         Assert.Equal (0, tf.InsertionPoint);
+         Assert.Equal (0, tf.ScrollOffset);
+
+         // Move insertion point to end of text and then move focus away to verify insertion point is still at zero
+         tf.InsertionPoint = tf.Text.Length;
+         Assert.Equal (11, tf.InsertionPoint);
+         Assert.Equal (7, tf.ScrollOffset);
+
+         otherView.SetFocus ();
+         Assert.Equal (0, tf.InsertionPoint);
+         Assert.Equal (0, tf.ScrollOffset);
+     }
+
+     [Fact]
+     public void ReadOnly_ShouldSetInsertionPointAndScrollOffsetToZero_AfterCopyingText ()
+     {
+         TextField tf = new () { Width = 5, ReadOnly = true, Text = "hello world" };
+         tf.BeginInit ();
+         tf.EndInit ();
+
+         // Select all text
+         tf.SelectAll ();
+         Assert.Equal (11, tf.InsertionPoint);
+         Assert.Equal (7, tf.ScrollOffset);
+         Assert.Equal ("hello world", tf.SelectedText);
+
+         // Copy text and verify insertion point and scroll offset are still at zero
+         tf.Copy ();
+         Assert.Equal (0, tf.InsertionPoint);
+         Assert.Equal (0, tf.ScrollOffset);
+         Assert.Null (tf.SelectedText);
+     }
+
+     [Fact]
+     public void ReadOnly_ShouldSetInsertionPointAndScrollOffsetToZeroAndClearAllSelection_OnLeavingFocus ()
+     {
+         TextField tf = new () { Width = 5, ReadOnly = true, Text = "hello world" };
+
+         // Create another view to take focus away
+         View otherView = new () { CanFocus = true };
+
+         // Create a container to hold both views
+         Runnable container = new () { Id = "container", Width = 20, Height = 5 };
+         container.Add (tf, otherView);
+         container.BeginInit ();
+         container.EndInit ();
+
+         // Set focus to TextField and select all text
+         tf.SetFocus ();
+         tf.SelectAll ();
+         Assert.Equal (11, tf.InsertionPoint);
+         Assert.Equal (7, tf.ScrollOffset);
+         Assert.Equal ("hello world", tf.SelectedText);
+
+         // Move focus away and verify insertion point and scroll offset are at zero and selection is cleared
+         otherView.SetFocus ();
+         Assert.Equal (0, tf.InsertionPoint);
+         Assert.Equal (0, tf.ScrollOffset);
+         Assert.Null (tf.SelectedText);
+     }
 }

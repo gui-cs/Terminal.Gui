@@ -1,15 +1,3 @@
-#nullable disable
-﻿// 
-// FileDialog.cs: File system dialogs for open and save
-//
-// TODO:
-//   * Add directory selector
-//   * Implement subclasses
-//   * Figure out why message text does not show
-//   * Remove the extra space when message does not show
-//   * Use a line separator to show the file listing, so we can use same colors as the rest
-//   * DirListView: Add mouse support
-
 using System.Collections.ObjectModel;
 
 namespace Terminal.Gui.Views;
@@ -26,7 +14,7 @@ namespace Terminal.Gui.Views;
 ///         <see cref="IApplication.Run(IRunnable, Func{Exception, bool})"/>. This will run the dialog modally, and when this returns,
 ///         the list of files will be available on the <see cref="FilePaths"/> property.
 ///     </para>
-///     <para>To select more than one file, users can use the space key, or CTRL-T.</para>
+///     <para>Use `Ctrl-click` or `Space` to select multiple files. `Alt-Click` extends the selection.</para>
 /// </remarks>
 public class OpenDialog : FileDialog
 {
@@ -36,7 +24,7 @@ public class OpenDialog : FileDialog
     /// <summary>Returns the selected files, or an empty list if nothing has been selected</summary>
     /// <value>The file paths.</value>
     public IReadOnlyList<string> FilePaths =>
-        ((IRunnable)this).Result is null || Result == 1 ? Enumerable.Empty<string> ().ToList ().AsReadOnly () :
+        ((IRunnable)this).Result is null || Result == CancelButtonIndex ? Enumerable.Empty<string> ().ToList ().AsReadOnly () :
         AllowsMultipleSelection ? MultiSelected : new ReadOnlyCollection<string> ([Path]);
 
     /// <inheritdoc/>

@@ -89,9 +89,21 @@ When in planning mode:
 ```bash
 dotnet restore
 dotnet build --no-restore
+
+# Preferred: parallelizable tests (no static state)
 dotnet test --project Tests/UnitTestsParallelizable --no-build
-dotnet test --project Tests/UnitTests --no-build
+
+# Tests that require process-wide static state (Application.Init, etc.)
+dotnet test --project Tests/UnitTests.NonParallelizable --no-build
+
+# Legacy tests — do NOT add new tests here; candidates for rewrite/deletion
+dotnet test --project Tests/UnitTests.Legacy --no-build
+
+# Run a single test by fully-qualified name
+dotnet test --project Tests/UnitTestsParallelizable --no-build --filter "FullyQualifiedName~MyTestClass.MyTestMethod"
 ```
+
+See `Tests/README.md` for the full list of test projects (including `IntegrationTests`, `StressTests`, `Benchmarks`) and the static-state classification that determines where a new test belongs.
 
 ## Key Concepts
 
@@ -115,10 +127,11 @@ dotnet test --project Tests/UnitTests --no-build
 8. **Unused lambda params** - use `_`: `(_, _) => { }`
 9. **Early return / guard clauses** - ALWAYS invert conditions and return/continue early. Never wrap the happy path in a conditional. Applies to methods, lambdas, and loops. See `.claude/rules/early-return.md`.
 10. **One type per file** - Public and internal types each get their own file
+11. **Docs instruction style** - In reference/how-to/API docs, write `To [goal], [imperative action].` Avoid `When/If you want/need to ...` unless describing a real condition.
 
 ## Testing
 
-- Prefer `UnitTestsParallelizable` over `UnitTests`
+- Add new tests to `UnitTestsParallelizable`; use `UnitTests.NonParallelizable` only when static state is unavoidable. Never add to `UnitTests.Legacy`.
 - Add comment: `// Claude - Opus 4.5`
 - Never decrease coverage
 - Avoid `Application.Init` in tests

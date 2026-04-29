@@ -14,6 +14,33 @@ public class TextViewTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void LoadFile_Should_Release_File_Lock_After_Return ()
+    {
+        // Arrange
+        string tempFile = Path.GetTempFileName ();
+        File.WriteAllText (tempFile, "test content");
+
+        TextView tv = new ();
+
+        // Act
+        Assert.True (tv.Load (tempFile));
+        Assert.Equal ("test content", tv.Text);
+
+        // Assert
+        // Try to reopen the file with NO sharing (exclusive lock)
+        // This will fail if the previous stream is still open
+        Exception exception = Record.Exception (() =>
+                                                {
+                                                    using FileStream stream = new (tempFile, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                                                });
+
+        Assert.Null (exception);
+
+        // Cleanup
+        File.Delete (tempFile);
+    }
+
+    [Fact]
     public void ContentsChanged_Event_Fires_ClearHistoryChanges ()
     {
         var eventcount = 0;
@@ -3919,5 +3946,42 @@ public class TextViewTests (ITestOutputHelper output)
                           👨‍👩‍👧‍👦  🍎
                        """;
         DriverAssert.AssertDriverContentsAre (expected, output, app.Driver);
+    }
+
+    /// <summary>
+    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     When Kitty keyboard protocol sets AssociatedText on Alt+letter keys,
+    ///     TextView must not insert the text. Alt-modified keys are never text input.
+    /// </summary>
+    [Fact]
+    public void AltKey_With_AssociatedText_Does_Not_Insert_Into_TextView ()
+    {
+        // Copilot
+        TextView tv = new () { Width = 20, Height = 5 };
+        tv.SetFocus ();
+
+        // Simulate Alt+T with AssociatedText set by Kitty keyboard protocol which in a real scenario would be set AssociatedText as empty string
+        // for Alt+letter keys, with the exception of AltGr+key which would set AssociatedText to "key" (e.g. "€" for AltGr+E)
+        Key altT = new (Key.T.WithAlt) { AssociatedText = "" };
+        tv.NewKeyDownEvent (altT);
+
+        Assert.Equal ("", tv.Text);
+    }
+
+    /// <summary>
+    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     Ctrl-modified keys with AssociatedText must not be inserted as text.
+    /// </summary>
+    [Fact]
+    public void CtrlKey_With_AssociatedText_Does_Not_Insert_Into_TextView ()
+    {
+        // Copilot
+        TextView tv = new () { Width = 20, Height = 5 };
+        tv.SetFocus ();
+
+        Key ctrlT = new (Key.T.WithCtrl) { AssociatedText = "t" };
+        tv.NewKeyDownEvent (ctrlT);
+
+        Assert.Equal ("", tv.Text);
     }
 }

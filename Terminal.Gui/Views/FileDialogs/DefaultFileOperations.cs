@@ -1,4 +1,3 @@
-#nullable disable
 using System.IO.Abstractions;
 
 namespace Terminal.Gui.Views;
@@ -7,18 +6,20 @@ namespace Terminal.Gui.Views;
 public class DefaultFileOperations : IFileOperations
 {
     /// <inheritdoc/>
-    public bool Delete (IApplication app, IEnumerable<IFileSystemInfo> toDelete)
+    public bool Delete (IApplication? app, IEnumerable<IFileSystemInfo> toDelete)
     {
         // Default implementation does not allow deleting multiple files
-        if (toDelete.Count () != 1)
+        IEnumerable<IFileSystemInfo> fileSystemInfos = toDelete as IFileSystemInfo [] ?? toDelete.ToArray ();
+
+        if (fileSystemInfos.Count () != 1)
         {
             return false;
         }
 
-        IFileSystemInfo d = toDelete.Single ();
+        IFileSystemInfo d = fileSystemInfos.Single ();
         string adjective = d.Name;
 
-        int? result = MessageBox.Query (app,
+        int? result = MessageBox.Query (app ?? throw new ArgumentNullException (nameof (app)),
                                         string.Format (Strings.fdDeleteTitle, adjective),
                                         string.Format (Strings.fdDeleteBody, adjective),
                                         Strings.btnYes,
@@ -49,52 +50,61 @@ public class DefaultFileOperations : IFileOperations
     }
 
     /// <inheritdoc/>
-    public IFileSystemInfo Rename (IApplication app, IFileSystem fileSystem, IFileSystemInfo toRename)
+    public IFileSystemInfo? Rename (IApplication? app, IFileSystem fileSystem, IFileSystemInfo toRename)
     {
         // Don't allow renaming C: or D: or / (on linux) etc
-        if (toRename is IDirectoryInfo dir && dir.Parent is null)
+        if (toRename is IDirectoryInfo { Parent: null })
         {
             return null;
         }
 
-        if (Prompt (app, Strings.fdRenameTitle, toRename.Name, out string newName))
+        if (!Prompt (app ?? throw new ArgumentNullException (nameof (app)), Strings.fdRenameTitle, toRename.Name, out string newName))
         {
-            if (!string.IsNullOrWhiteSpace (newName))
+            return null;
+        }
+
+        if (string.IsNullOrWhiteSpace (newName))
+        {
+            return null;
+        }
+
+        try
+        {
+            if (toRename is IFileInfo f)
             {
-                try
-                {
-                    if (toRename is IFileInfo f)
-                    {
-                        IFileInfo newLocation = fileSystem.FileInfo.New (Path.Combine (f.Directory.FullName, newName));
-                        f.MoveTo (newLocation.FullName);
+                IFileInfo newLocation = fileSystem.FileInfo.New (Path.Combine (f.Directory?.FullName ?? throw new InvalidOperationException (), newName));
+                f.MoveTo (newLocation.FullName);
 
-                        return newLocation;
-                    }
-                    else
-                    {
-                        var d = (IDirectoryInfo)toRename;
-
-                        IDirectoryInfo newLocation = fileSystem.DirectoryInfo.New (Path.Combine (d.Parent.FullName, newName));
-                        d.MoveTo (newLocation.FullName);
-
-                        return newLocation;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.ErrorQuery (app, Strings.fdRenameFailedTitle, ex.Message, Strings.btnOk);
-                }
+                return newLocation;
             }
+            else
+            {
+                var d = (IDirectoryInfo)toRename;
+
+                IDirectoryInfo newLocation =
+                    fileSystem.DirectoryInfo.New (Path.Combine (d.Parent?.FullName ?? throw new InvalidOperationException (), newName));
+                d.MoveTo (newLocation.FullName);
+
+                return newLocation;
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.ErrorQuery (app, Strings.fdRenameFailedTitle, ex.Message, Strings.btnOk);
         }
 
         return null;
     }
 
     /// <inheritdoc/>
-    public IFileSystemInfo New (IApplication app, IFileSystem fileSystem, IDirectoryInfo inDirectory)
+    public IFileSystemInfo? New (IApplication? app, IFileSystem fileSystem, IDirectoryInfo inDirectory)
     {
+        if (app is null)
+        {
+            ArgumentNullException.ThrowIfNull (app);
+        }
         var tv = new TextField { Width = Dim.Fill (0, 50), Height = 1 };
-        string result = app?.TopRunnable?.Prompt<TextField, string> (tv, beginInitHandler: prompt => { prompt.Title = Strings.fdNewTitle; });
+        string? result = app.TopRunnable?.Prompt<TextField, string> (tv, beginInitHandler: prompt => { prompt.Title = Strings.fdNewTitle; });
 
         if (string.IsNullOrWhiteSpace (result))
         {

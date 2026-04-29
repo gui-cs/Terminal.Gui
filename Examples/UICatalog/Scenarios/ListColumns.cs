@@ -53,21 +53,17 @@ public class ListColumns : Scenario
         app.Init ();
         _app = app;
 
-        using Window appWindow = new ()
-        {
-            Title = GetQuitKeyAndName (),
-            BorderStyle = LineStyle.None
-        };
+        using Window appWindow = new () { Title = GetQuitKeyAndName (), BorderStyle = LineStyle.None };
 
         // MenuBar
         MenuBar menuBar = new ();
 
-        _listColView = new ()
+        _listColView = new TableView
         {
             Y = Pos.Bottom (menuBar),
             Width = Dim.Fill (),
             Height = Dim.Fill (1),
-            Style = new ()
+            Style = new TableStyle
             {
                 ShowHeaders = false,
                 ShowHorizontalHeaderOverline = false,
@@ -78,16 +74,13 @@ public class ListColumns : Scenario
         };
         ListColumnStyle listColStyle = new ();
 
-
         // Status Bar
-        StatusBar statusBar = new (
-                                   [
-                                       new (Key.F2, "OpenBigListEx", () => OpenSimpleList (true)),
-                                       new (Key.F3, "CloseExample", CloseExample),
-                                       new (Key.F4, "OpenSmListEx", () => OpenSimpleList (false)),
-                                       new (Application.GetDefaultKey (Command.Quit), "Quit", Quit)
-                                   ]
-                                  );
+        StatusBar statusBar = new ([
+                                       new Shortcut (Key.F2, "OpenBigListEx", () => OpenSimpleList (true)),
+                                       new Shortcut (Key.F3, "CloseExample", CloseExample),
+                                       new Shortcut (Key.F4, "OpenSmListEx", () => OpenSimpleList (false)),
+                                       new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", Quit)
+                                   ]);
 
         // Selected cell label
         Label selectedCellLabel = new ()
@@ -99,188 +92,109 @@ public class ListColumns : Scenario
             TextAlignment = Alignment.End
         };
 
-        _listColView.SelectedCellChanged += (s, e) =>
-                                            {
-                                                if (_listColView is not null)
-                                                {
-                                                    selectedCellLabel.Text = $"{_listColView.SelectedRow},{_listColView.SelectedColumn}";
-                                                }
-                                            };
+        _listColView.ValueChanged += (s, e) =>
+                                     {
+                                         if (_listColView is { })
+                                         {
+                                             selectedCellLabel.Text = $"{_listColView.Value?.Cursor.Y ?? 0},{_listColView.Value?.Cursor.X ?? 0}";
+                                         }
+                                     };
         _listColView.KeyDown += TableViewKeyPress;
 
-        _alternatingScheme = new ()
+        _alternatingScheme = new Scheme
         {
             Disabled = appWindow.GetAttributeForRole (VisualRole.Disabled),
             HotFocus = appWindow.GetAttributeForRole (VisualRole.HotFocus),
             Focus = appWindow.GetAttributeForRole (VisualRole.Focus),
-            Normal = new (Color.White, Color.BrightBlue)
+            Normal = new Attribute (Color.White, Color.BrightBlue)
         };
 
         _listColView.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
 
         // Setup menu checkboxes
-        _topLineCheckBox = new ()
+        _topLineCheckBox = new CheckBox
         {
-            Title = "_TopLine",
-            Value = _listColView.Style.ShowHorizontalHeaderOverline ? CheckState.Checked : CheckState.UnChecked
+            Title = "_TopLine", Value = _listColView.Style.ShowHorizontalHeaderOverline ? CheckState.Checked : CheckState.UnChecked
         };
         _topLineCheckBox.ValueChanged += (s, e) => ToggleTopline ();
 
-        _bottomLineCheckBox = new ()
+        _bottomLineCheckBox = new CheckBox
         {
-            Title = "_BottomLine",
-            Value = _listColView.Style.ShowHorizontalBottomLine ? CheckState.Checked : CheckState.UnChecked
+            Title = "_BottomLine", Value = _listColView.Style.ShowHorizontalBottomLine ? CheckState.Checked : CheckState.UnChecked
         };
         _bottomLineCheckBox.ValueChanged += (s, e) => ToggleBottomline ();
 
-        _cellLinesCheckBox = new ()
+        _cellLinesCheckBox = new CheckBox
         {
-            Title = "_CellLines",
-            Value = _listColView.Style.ShowVerticalCellLines ? CheckState.Checked : CheckState.UnChecked
+            Title = "_CellLines", Value = _listColView.Style.ShowVerticalCellLines ? CheckState.Checked : CheckState.UnChecked
         };
         _cellLinesCheckBox.ValueChanged += (s, e) => ToggleCellLines ();
 
-        _expandLastColumnCheckBox = new ()
+        _expandLastColumnCheckBox = new CheckBox
         {
-            Title = "_ExpandLastColumn",
-            Value = _listColView.Style.ExpandLastColumn ? CheckState.Checked : CheckState.UnChecked
+            Title = "_ExpandLastColumn", Value = _listColView.Style.ExpandLastColumn ? CheckState.Checked : CheckState.UnChecked
         };
         _expandLastColumnCheckBox.ValueChanged += (s, e) => ToggleExpandLastColumn ();
 
-        _alwaysUseNormalColorForVerticalCellLinesCheckBox = new ()
+        _alwaysUseNormalColorForVerticalCellLinesCheckBox = new CheckBox
         {
             Title = "_AlwaysUseNormalColorForVerticalCellLines",
             Value = _listColView.Style.AlwaysUseNormalColorForVerticalCellLines ? CheckState.Checked : CheckState.UnChecked
         };
         _alwaysUseNormalColorForVerticalCellLinesCheckBox.ValueChanged += (s, e) => ToggleAlwaysUseNormalColorForVerticalCellLines ();
 
-        _smoothScrollingCheckBox = new ()
+        _smoothScrollingCheckBox = new CheckBox
         {
-            Title = "_SmoothHorizontalScrolling",
-            Value = _listColView.Style.SmoothHorizontalScrolling ? CheckState.Checked : CheckState.UnChecked
+            Title = "_SmoothHorizontalScrolling", Value = _listColView.Style.SmoothHorizontalScrolling ? CheckState.Checked : CheckState.UnChecked
         };
         _smoothScrollingCheckBox.ValueChanged += (s, e) => ToggleSmoothScrolling ();
 
-        _alternatingColorsCheckBox = new ()
-        {
-            Title = "Alternating Colors"
-        };
+        _alternatingColorsCheckBox = new CheckBox { Title = "Alternating Colors" };
         _alternatingColorsCheckBox.ValueChanged += (s, e) => ToggleAlternatingColors ();
 
-        _cursorCheckBox = new ()
+        _cursorCheckBox = new CheckBox
         {
             Title = "Invert Selected Cell First Character",
             Value = _listColView.Style.InvertSelectedCellFirstCharacter ? CheckState.Checked : CheckState.UnChecked
         };
         _cursorCheckBox.ValueChanged += (s, e) => ToggleInvertSelectedCellFirstCharacter ();
 
-        _orientVerticalCheckBox = new ()
+        _orientVerticalCheckBox = new CheckBox
         {
-            Title = "_OrientVertical",
-            Value = listColStyle.Orientation == Orientation.Vertical ? CheckState.Checked : CheckState.UnChecked
+            Title = "_OrientVertical", Value = listColStyle.Orientation == Orientation.Vertical ? CheckState.Checked : CheckState.UnChecked
         };
         _orientVerticalCheckBox.ValueChanged += (s, e) => ToggleVerticalOrientation ();
 
-        _scrollParallelCheckBox = new ()
-        {
-            Title = "_ScrollParallel",
-            Value = listColStyle.ScrollParallel ? CheckState.Checked : CheckState.UnChecked
-        };
+        _scrollParallelCheckBox = new CheckBox { Title = "_ScrollParallel", Value = listColStyle.ScrollParallel ? CheckState.Checked : CheckState.UnChecked };
         _scrollParallelCheckBox.ValueChanged += (s, e) => ToggleScrollParallel ();
 
-        menuBar.Add (
-                  new MenuBarItem (
-                                   Strings.menuFile,
-                                   [
-                                       new MenuItem
-                                       {
-                                           Title = "Open_BigListExample",
-                                           Action = () => OpenSimpleList (true)
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = "Open_SmListExample",
-                                           Action = () => OpenSimpleList (false)
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = "_CloseExample",
-                                           Action = CloseExample
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = Strings.cmdQuit,
-                                           Action = Quit
-                                       }
-                                   ]
-                                  )
-                 );
+        menuBar.Add (new MenuBarItem (Strings.menuFile,
+                                      [
+                                          new MenuItem { Title = "Open_BigListExample", Action = () => OpenSimpleList (true) },
+                                          new MenuItem { Title = "Open_SmListExample", Action = () => OpenSimpleList (false) },
+                                          new MenuItem { Title = "_CloseExample", Action = CloseExample },
+                                          new MenuItem { Title = Strings.cmdQuit, Action = Quit }
+                                      ]));
 
-        menuBar.Add (
-                  new MenuBarItem (
-                                   "_View",
-                                   [
-                                       new MenuItem
-                                       {
-                                           CommandView = _topLineCheckBox
-                                       },
-                                       new MenuItem
-                                       {
-                                           CommandView = _bottomLineCheckBox
-                                       },
-                                       new MenuItem
-                                       {
-                                           CommandView = _cellLinesCheckBox
-                                       },
-                                       new MenuItem
-                                       {
-                                           CommandView = _expandLastColumnCheckBox
-                                       },
-                                       new MenuItem
-                                       {
-                                           CommandView = _alwaysUseNormalColorForVerticalCellLinesCheckBox
-                                       },
-                                       new MenuItem
-                                       {
-                                           CommandView = _smoothScrollingCheckBox
-                                       },
-                                       new MenuItem
-                                       {
-                                           CommandView = _alternatingColorsCheckBox
-                                       },
-                                       new MenuItem
-                                       {
-                                           CommandView = _cursorCheckBox
-                                       }
-                                   ]
-                                  )
-                 );
+        menuBar.Add (new MenuBarItem ("_View",
+                                      [
+                                          new MenuItem { CommandView = _topLineCheckBox },
+                                          new MenuItem { CommandView = _bottomLineCheckBox },
+                                          new MenuItem { CommandView = _cellLinesCheckBox },
+                                          new MenuItem { CommandView = _expandLastColumnCheckBox },
+                                          new MenuItem { CommandView = _alwaysUseNormalColorForVerticalCellLinesCheckBox },
+                                          new MenuItem { CommandView = _smoothScrollingCheckBox },
+                                          new MenuItem { CommandView = _alternatingColorsCheckBox },
+                                          new MenuItem { CommandView = _cursorCheckBox }
+                                      ]));
 
-        menuBar.Add (
-                  new MenuBarItem (
-                                   "_List",
-                                   [
-                                       new MenuItem
-                                       {
-                                           CommandView = _orientVerticalCheckBox
-                                       },
-                                       new MenuItem
-                                       {
-                                           CommandView = _scrollParallelCheckBox
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = "Set _Max Cell Width",
-                                           Action = SetListMaxWidth
-                                       },
-                                       new MenuItem
-                                       {
-                                           Title = "Set Mi_n Cell Width",
-                                           Action = SetListMinWidth
-                                       }
-                                   ]
-                                  )
-                 );
+        menuBar.Add (new MenuBarItem ("_List",
+                                      [
+                                          new MenuItem { CommandView = _orientVerticalCheckBox },
+                                          new MenuItem { CommandView = _scrollParallelCheckBox },
+                                          new MenuItem { Title = "Set _Max Cell Width", Action = SetListMaxWidth },
+                                          new MenuItem { Title = "Set Mi_n Cell Width", Action = SetListMinWidth }
+                                      ]));
 
         // Add views in order of visual appearance
         appWindow.Add (menuBar, _listColView, selectedCellLabel, statusBar);
@@ -290,15 +204,15 @@ public class ListColumns : Scenario
 
     private void CloseExample ()
     {
-        if (_listColView is not null)
+        if (_listColView is { })
         {
             _listColView.Table = null;
         }
     }
 
-    private void OpenSimpleList (bool big) { SetTable (BuildSimpleList (big ? 1023 : 31)); }
+    private void OpenSimpleList (bool big) => SetTable (BuildSimpleList (big ? 1023 : 31));
 
-    private void Quit () { _listColView?.App?.RequestStop (); }
+    private void Quit () => _listColView?.App?.RequestStop ();
 
     private void RunListWidthDialog (string prompt, Action<TableView, int> setter, Func<TableView, int> getter)
     {
@@ -308,13 +222,9 @@ public class ListColumns : Scenario
         }
 
         var accepted = false;
-        Dialog d = new Dialog
-        {
-            Title = prompt,
-            Buttons = [new () { Title = Strings.btnCancel }, new () { Title = Strings.btnOk }]
-        };
+        var d = new Dialog { Title = prompt, Buttons = [new Button { Title = Strings.btnCancel }, new Button { Title = Strings.btnOk }] };
 
-        TextField tf = new () { Text = getter (_listColView).ToString (), X = 0, Y = 0, Width = Dim.Fill (0, minimumContentDim: 50) };
+        TextField tf = new () { Text = getter (_listColView).ToString (), X = 0, Y = 0, Width = Dim.Fill (0, 50) };
 
         d.Add (tf);
         tf.SetFocus ();
@@ -409,8 +319,7 @@ public class ListColumns : Scenario
             return;
         }
 
-        _listColView.Style.AlwaysUseNormalColorForVerticalCellLines =
-            _alwaysUseNormalColorForVerticalCellLinesCheckBox.Value == CheckState.Checked;
+        _listColView.Style.AlwaysUseNormalColorForVerticalCellLines = _alwaysUseNormalColorForVerticalCellLinesCheckBox.Value == CheckState.Checked;
 
         _listColView.Update ();
     }
@@ -501,9 +410,7 @@ public class ListColumns : Scenario
             return;
         }
 
-        listTableSource.Style.Orientation = _orientVerticalCheckBox.Value == CheckState.Checked
-                                                ? Orientation.Vertical
-                                                : Orientation.Horizontal;
+        listTableSource.Style.Orientation = _orientVerticalCheckBox.Value == CheckState.Checked ? Orientation.Vertical : Orientation.Horizontal;
         _listColView.SetNeedsDraw ();
     }
 }
