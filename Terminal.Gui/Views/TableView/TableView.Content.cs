@@ -181,6 +181,25 @@ public partial class TableView
 
                 int lastColIdx = nonHiddenColumns.Any () ? nonHiddenColumns.Last ().colIdx : -1;
 
+                // Precompute per-column minimum widths and a suffix sum so that "space reserved for remaining
+                // columns" is O(1) per column during reservation/min-width bookkeeping. Later width calculations
+                // may still inspect row data.
+                int columnCount = nonHiddenColumns.Count;
+                int [] minWidths = new int [columnCount];
+                int [] reservedFromIndex = new int [columnCount + 1];
+
+                for (var i = 0; i < columnCount; i++)
+                {
+                    (int colIdx, ColumnStyle? colStyle) = nonHiddenColumns [i];
+                    minWidths [i] = MinimumWidthFor (colIdx, colStyle);
+                }
+
+                for (int i = columnCount - 1; i >= 0; i--)
+                {
+                    int separator = i < columnCount - 1 ? 1 : 0;
+                    reservedFromIndex [i] = minWidths [i] + separator + reservedFromIndex [i + 1];
+                }
+
                 //right border
                 contentSize.Width += Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
 
@@ -195,6 +214,8 @@ public partial class TableView
                 }
 
                 // Calculate the content size based on the table's data
+                var columnIndex = 0;
+
                 foreach ((int colIdx, ColumnStyle? colStyle) in nonHiddenColumns)
                 {
                     int maxContentSize = CalculateMaxCellWidth (colIdx, colStyle, startRow, rowsToRender) + padding;
@@ -212,9 +233,6 @@ public partial class TableView
                         }
                     }
 
-                    // ToDo: MinAcceptableWidth handling?
-                    // if (colStyle is { MinAcceptableWidth: > 0 }
-
                     bool isVeryLast = colIdx == lastColIdx;
 
                     if (isVeryLast)
@@ -227,6 +245,22 @@ public partial class TableView
                             colWidth = remainingSpace;
                         }
                     }
+                    else if (Viewport.Width > 0)
+                    {
+                        // Reserve at least the header width for each subsequent visible column so that a wide
+                        // column does not consume all viewport space and push later columns off-screen.
+                        int reservedForRemaining = reservedFromIndex [columnIndex + 1];
+                        int borderWidth = Style.ShowVerticalHeaderLines || Style.ShowVerticalCellLines ? 1 : 0;
+                        int availableForThisCol = Viewport.Width - contentSize.Width - reservedForRemaining - borderWidth - 1; // -1 for this column's separator
+
+                        // Don't shrink below this column's own minimum (header width or configured minimum)
+                        int thisColMin = minWidths [columnIndex];
+
+                        if (colWidth > availableForThisCol && availableForThisCol >= thisColMin)
+                        {
+                            colWidth = availableForThisCol;
+                        }
+                    }
 
                     columnsToRender.Add (new ColumnToRender (colIdx, contentSize.Width, colWidth + 1, lastColIdx == colIdx));
 
@@ -237,6 +271,8 @@ public partial class TableView
                         // for separator symbols between columns
                         contentSize.Width += 1;
                     }
+
+                    columnIndex++;
                 }
 
                 // for left border
@@ -266,5 +302,51 @@ public partial class TableView
         }
 
         return contentSize;
+    }
+
+    /// <summary>
+    ///     Returns the minimum render width to reserve for a column that has not yet been laid out, based on its header
+    ///     width and any configured minimum (clamped to <see cref="MaxCellWidth"/> and
+    ///     <see cref="ColumnStyle.MaxWidth"/>). This intentionally does not inspect cell data — it is O(1) per column to
+    ///     keep large or paginated <see cref="ITableSource"/> implementations performant.
+    /// </summary>
+    private int MinimumWidthFor (int colIdx, ColumnStyle? colStyle)
+    {
+        int min = _table!.ColumnNames [colIdx].GetColumns ();
+
+        if (min < 1)
+        {
+            min = 1;
+        }
+
+        if (colStyle is { MinWidth: > 0 } && colStyle.MinWidth > min)
+        {
+            min = colStyle.MinWidth;
+        }
+
+        if (MinCellWidth > 0 && MinCellWidth > min)
+        {
+            min = MinCellWidth;
+        }
+
+        // Don't reserve more than the column's own ceiling
+        int ceiling = MaxCellWidth;
+
+        if (colStyle is { } && colStyle.MaxWidth < ceiling)
+        {
+            ceiling = colStyle.MaxWidth;
+        }
+
+        if (ceiling < 1)
+        {
+            ceiling = 1;
+        }
+
+        if (min > ceiling)
+        {
+            min = ceiling;
+        }
+
+        return min;
     }
 }
