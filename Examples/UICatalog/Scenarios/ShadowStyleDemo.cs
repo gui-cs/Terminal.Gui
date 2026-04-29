@@ -12,30 +12,31 @@ public class ShadowStyleDemo : Scenario
         using IApplication app = Application.Create ();
         app.Init ();
 
-        using Window window = new ()
-        {
-            Id = "app",
-            Title = GetQuitKeyAndName ()
-        };
+        using Window window = new ();
+        window.Id = "app";
+        window.Title = GetQuitKeyAndName ();
+        window.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
 
         AdornmentsEditor editor = new ()
         {
-            Id = "editor",
+            BorderStyle = LineStyle.Single,
             AutoSelectViewToEdit = true,
-            ShowViewIdentifier = true
-        };
-        editor.Initialized += (_, _) => editor.MarginEditor!.ExpanderButton!.Collapsed = false;
 
-        window.Add (editor);
+            // This is for giggles, to show that the editor can be moved around.
+            Arrangement = ViewArrangement.Movable,
+            Id = "editor"
+        };
+        editor.Border.Thickness = new Thickness (1, 2, 1, 1);
 
         Window shadowWindow = new ()
         {
             Id = "shadowWindow",
-            X = Pos.Right (editor),
+            X = Pos.Center (),
             Y = 0,
             Width = Dim.Percent (30),
             Height = Dim.Percent (30),
             Title = "Shadow Window",
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent),
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped,
             BorderStyle = LineStyle.Double,
             ShadowStyle = ShadowStyles.Transparent
@@ -51,11 +52,11 @@ public class ShadowStyleDemo : Scenario
         {
             Id = "buttonInWin",
             X = Pos.Center (),
-            Y = Pos.Center (), Text = "Button in Window",
+            Y = Pos.Center (),
+            Text = "Button in Window",
             ShadowStyle = ShadowStyles.Opaque
         };
         shadowWindow.Add (buttonInWin);
-        window.Add (shadowWindow);
 
         Window shadowWindow2 = new ()
         {
@@ -65,17 +66,18 @@ public class ShadowStyleDemo : Scenario
             Width = Dim.Percent (30),
             Height = Dim.Percent (30),
             Title = "Shadow Window #2",
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Error),
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped,
             BorderStyle = LineStyle.Double,
             ShadowStyle = ShadowStyles.Transparent
         };
-        window.Add (shadowWindow2);
 
         Button button = new ()
         {
             Id = "button",
             X = Pos.Right (editor) + 10,
-            Y = Pos.Center (), Text = "Button",
+            Y = Pos.Center (),
+            Text = "Button",
             ShadowStyle = ShadowStyles.Opaque
         };
         button.Accepting += ButtonOnAccepting;
@@ -84,7 +86,7 @@ public class ShadowStyleDemo : Scenario
         {
             Title = "ColorPicker to illustrate highlight (currently broken)",
             BorderStyle = LineStyle.Dotted,
-            Id = "colorPicker16",
+            Id = "colorPicker",
             X = Pos.Center (),
             Y = Pos.AnchorEnd (),
             Width = Dim.Percent (80)
@@ -93,13 +95,18 @@ public class ShadowStyleDemo : Scenario
         colorPicker.ValueChanged += (_, args) =>
                                     {
                                         Attribute normal = window.GetScheme ().Normal;
-                                        window.SetScheme (window.GetScheme () with { Normal = new (normal.Foreground, args.NewValue ?? Color.Black) });
-                                    };
-        window.Add (button, colorPicker);
 
+                                        window.SetScheme (window.GetScheme () with
+                                        {
+                                            Normal = new Attribute (normal.Foreground, args.NewValue ?? Color.Black)
+                                        });
+                                    };
+        window.Add (button, colorPicker, editor, shadowWindow, shadowWindow2);
+
+        editor.ShowViewIdentifier = true;
         editor.AutoSelectViewToEdit = true;
         editor.AutoSelectSuperView = window;
-        editor.AutoSelectAdornments = false;
+        editor.AutoSelectAdornments = true;
 
         app.Run (window);
     }
