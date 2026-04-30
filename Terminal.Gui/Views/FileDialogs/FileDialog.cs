@@ -200,7 +200,7 @@ public partial class FileDialog : Dialog, IDesignable
         _tableViewContainer.Add (_tableView);
 
         _tableView.Style.ShowHorizontalHeaderOverline = false;
-        _tableView.Style.ShowVerticalCellLines = true;
+        _tableView.Style.ShowVerticalCellLines = false;
         _tableView.Style.ShowVerticalHeaderLines = false;
         _tableView.Style.AlwaysShowHeaders = true;
         _tableView.Style.ShowHorizontalHeaderUnderline = false;
