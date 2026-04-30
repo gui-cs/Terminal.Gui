@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Terminal.Gui;
 
@@ -13,10 +12,8 @@ internal static class ModuleInitializers
     /// Ensures configuration properties are loaded deterministically before any part
     /// of the library is used.
     /// </summary>
-    [RequiresUnreferencedCode ("AOT")]
 #pragma warning disable CA2255
     [ModuleInitializer]
-    [RequiresDynamicCode ("Calls Terminal.Gui.ConfigurationManager.Initialize()")]
 #pragma warning restore CA2255
     internal static void InitializeConfigurationManager ()
     {

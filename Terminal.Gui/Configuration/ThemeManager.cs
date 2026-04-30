@@ -112,9 +112,7 @@ public static class ThemeManager
     ///     hard-coded themes.
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
-#pragma warning disable IL2026 // ConcurrentDictionaryJsonConverter is AOT-compatible
     [JsonConverter (typeof (ConcurrentDictionaryJsonConverter<ThemeScope>))]
-#pragma warning restore IL2026
     [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     public static ConcurrentDictionary<string, ThemeScope>? Themes
     {
@@ -219,8 +217,6 @@ public static class ThemeManager
             throw new InvalidOperationException ("Settings is null.");
         }
 
-        [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigurationManager.Settings")]
-        [RequiresDynamicCode ("Calls Terminal.Gui.ConfigurationManager.Settings")]
         set
         {
             if (!ConfigurationManager.IsInitialized ())

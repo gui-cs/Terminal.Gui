@@ -1,7 +1,11 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
+using Terminal.Gui.Drawing;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.Configuration;
 
@@ -10,14 +14,14 @@ namespace Terminal.Gui.Configuration;
 ///     data to/from <see cref="ConfigurationManager"/> JSON documents.
 /// </summary>
 /// <typeparam name="TScopeT"></typeparam>
-[RequiresUnreferencedCode ("AOT")]
-internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] TScopeT> : JsonConverter<TScopeT>
+internal class ScopeJsonConverter<
+    [DynamicallyAccessedMembers (
+                                    DynamicallyAccessedMemberTypes.PublicParameterlessConstructor
+                                    | DynamicallyAccessedMemberTypes.PublicProperties)]
+    TScopeT> : JsonConverter<TScopeT>
     where TScopeT : Scope<TScopeT>
 {
-    [RequiresDynamicCode ("Calls System.Type.MakeGenericType(params Type[])")]
-#pragma warning disable IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
     public override TScopeT Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
-#pragma warning restore IL3051 // 'RequiresDynamicCodeAttribute' annotations must match across all interface implementations or overrides.
     {
         if (reader.TokenType != JsonTokenType.StartObject)
         {
@@ -59,45 +63,22 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                 // Figure out if it needs a JsonConverter and if so, create one
                 Type? propertyType = configProperty?.PropertyInfo?.PropertyType!;
 
-                if (configProperty?.PropertyInfo?.GetCustomAttribute (typeof (JsonConverterAttribute)) is
-                    JsonConverterAttribute jca)
+                if (configProperty?.ConverterType is { } converterType)
                 {
-                    object? converter = Activator.CreateInstance (jca.ConverterType!)!;
-
-                    if (converter.GetType ().BaseType == typeof (JsonConverterFactory))
+                    if (TryReadWithKnownConverter (ref reader, propertyType!, converterType, options, out object? convertedValue))
                     {
-                        var factory = (JsonConverterFactory)converter;
+                        scope! [propertyName].PropertyValue = convertedValue;
 
-                        if (factory.CanConvert (propertyType))
-                        {
-                            converter = factory.CreateConverter (propertyType, options);
-                        }
+                        continue;
                     }
 
-                    try
-                    {
-                        var type = (Type?)typeof (ReadHelper<>).MakeGenericType (typeof (TScopeT), propertyType!);
-                        var readHelper = Activator.CreateInstance (type!, converter) as ReadHelper;
-
-                        scope! [propertyName].PropertyValue = readHelper?.Read (ref reader, propertyType!, options);
-                    }
-                    catch (NotSupportedException e)
-                    {
-                        throw new JsonException (
-                                                 $"{propertyName}: Error reading property of type \"{propertyType?.Name}\".",
-                                                 e
-                                                );
-                    }
-                    catch (TargetInvocationException)
-                    {
-                        // QUESTION: Should we try/catch here?
-                        scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, options);
-                    }
+                    throw new JsonException (
+                                             $"{propertyName}: Unsupported configuration converter type \"{converterType.FullName}\"."
+                                            );
                 }
                 else
                 {
-                    // QUESTION: Should we try/catch here?
-                    scope! [propertyName].PropertyValue = JsonSerializer.Deserialize (ref reader, propertyType!, ConfigurationManager.SerializerContext);
+                    scope! [propertyName].PropertyValue = DeserializePropertyValue (ref reader, propertyType!, options);
                 }
 
                 //Logging.Warning ($"{propertyName} = {scope! [propertyName].PropertyValue}");
@@ -109,11 +90,11 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                 // If so, don't add it to the dictionary but apply it to the underlying property on
                 // the scopeT.
                 // BUGBUG: This is terrible design. The only time it's used is for $schema though.
-                PropertyInfo? property = scope!.GetType ()
+                PropertyInfo? property = typeof (TScopeT)
                                                .GetProperties ()
                                                .Where (p =>
                                                        {
-                                                           if (p.GetCustomAttribute (typeof (JsonIncludeAttribute)) is JsonIncludeAttribute { } jia)
+                                                            if (p.GetCustomAttribute (typeof (JsonIncludeAttribute)) is JsonIncludeAttribute { } jia)
                                                            {
                                                                var jsonPropertyNameAttribute =
                                                                    p.GetCustomAttribute (
@@ -140,7 +121,7 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                 if (property is { })
                 {
                     // Set the value of propertyName on the scopeT.
-                    PropertyInfo prop = scope.GetType ().GetProperty (propertyName!)!;
+                    PropertyInfo prop = typeof (TScopeT).GetProperty (propertyName!)!;
 
                     prop.SetValue (scope, JsonSerializer.Deserialize (ref reader, prop.PropertyType, ConfigurationManager.SerializerContext));
                 }
@@ -157,15 +138,11 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
         throw new JsonException ($"{propertyName}: Json error in ScopeJsonConverter");
     }
 
-    [UnconditionalSuppressMessage (
-                                      "AOT",
-                                      "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
-                                      Justification = "<Pending>")]
     public override void Write (Utf8JsonWriter writer, TScopeT scope, JsonSerializerOptions options)
     {
         writer.WriteStartObject ();
 
-        IEnumerable<PropertyInfo> properties = scope!.GetType ()
+        IEnumerable<PropertyInfo> properties = typeof (TScopeT)
                                                      .GetProperties ()
                                                      .Where (p => p.GetCustomAttribute (typeof (JsonIncludeAttribute))
                                                                   != null
@@ -174,48 +151,36 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
         foreach (PropertyInfo p in properties)
         {
             writer.WritePropertyName (ConfigProperty.GetJsonPropertyName (p));
-            object? prop = scope.GetType ().GetProperty (p.Name)?.GetValue (scope);
+            object? prop = typeof (TScopeT).GetProperty (p.Name)?.GetValue (scope);
             JsonSerializer.Serialize (writer, prop, prop!.GetType (), ConfigurationManager.SerializerContext);
         }
 
         foreach (KeyValuePair<string, ConfigProperty> p in from p in scope
-                                                               .Where (cp =>
-                                                                           cp.Value.PropertyInfo?.GetCustomAttribute (
-                                                                                    typeof (
-                                                                                        ConfigurationPropertyAttribute)
-                                                                                   )
-                                                                               is
-                                                                               ConfigurationPropertyAttribute scp
-                                                                           && scp?.Scope == typeof (TScopeT)
-                                                                      )
-                                                           where p.Value.HasValue
-                                                           select p)
+                                                               .Where (cp => cp.Value.ScopeType == typeof (TScopeT).Name)
+                                                             where p.Value.HasValue
+                                                             select p)
         {
             writer.WritePropertyName (p.Key);
             Type? propertyType = p.Value.PropertyInfo?.PropertyType;
 
             if (propertyType != null
-                && p.Value.PropertyInfo?.GetCustomAttribute (typeof (JsonConverterAttribute)) is JsonConverterAttribute
-                    jca)
+                && p.Value.ConverterType is { } converterType)
             {
-                object converter = Activator.CreateInstance (jca.ConverterType!)!;
-
-                if (converter.GetType ().BaseType == typeof (JsonConverterFactory))
+                if (p.Value.PropertyValue is null)
                 {
-                    var factory = (JsonConverterFactory)converter;
+                    writer.WriteNullValue ();
 
-                    if (factory.CanConvert (propertyType))
-                    {
-                        converter = factory.CreateConverter (propertyType, options)!;
-                    }
+                    continue;
                 }
 
-                if (p.Value.PropertyValue is { })
+                if (TryWriteWithKnownConverter (writer, propertyType, converterType, p.Value.PropertyValue, options))
                 {
-                    converter.GetType ()
-                             .GetMethod ("Write")
-                             ?.Invoke (converter, [writer, p.Value.PropertyValue, options]);
+                    continue;
                 }
+
+                throw new JsonException (
+                                         $"{p.Key}: Unsupported configuration converter type \"{converterType.FullName}\"."
+                                        );
             }
             else
             {
@@ -227,7 +192,19 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
                 }
                 else
                 {
-                    JsonSerializer.Serialize (writer, prop, prop.GetType (), ConfigurationManager.SerializerContext);
+                    if (TryWriteEnumValue (writer, prop.GetType (), prop))
+                    {
+                        continue;
+                    }
+
+                    JsonTypeInfo? jsonTypeInfo = ConfigurationManager.SerializerContext.GetTypeInfo (prop.GetType ());
+
+                    if (jsonTypeInfo is null)
+                    {
+                        throw new JsonException ($"{p.Key}: No source-generated JsonTypeInfo is registered for {prop.GetType ().FullName}.");
+                    }
+
+                    JsonSerializer.Serialize (writer, prop, jsonTypeInfo);
                 }
             }
         }
@@ -235,22 +212,113 @@ internal class ScopeJsonConverter<[DynamicallyAccessedMembers (DynamicallyAccess
         writer.WriteEndObject ();
     }
 
-    // See: https://stackoverflow.com/questions/60830084/how-to-pass-an-argument-by-reference-using-reflection
-    internal abstract class ReadHelper
+    private static bool TryReadWithKnownConverter (
+        ref Utf8JsonReader reader,
+        Type propertyType,
+        Type converterType,
+        JsonSerializerOptions options,
+        out object? value)
     {
-        public abstract object? Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options);
-    }
-
-    [method: RequiresUnreferencedCode ("Calls System.Delegate.CreateDelegate(Type, Object, String)")]
-    internal class ReadHelper<TConverter> (object converter) : ReadHelper
-    {
-        private readonly ReadDelegate _readDelegate = (ReadDelegate)Delegate.CreateDelegate (typeof (ReadDelegate), converter, "Read");
-
-        public override object? Read (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
+        if (converterType == typeof (ConcurrentDictionaryJsonConverter<ThemeScope>))
         {
-            return _readDelegate.Invoke (ref reader, type, options);
+            value = new ConcurrentDictionaryJsonConverter<ThemeScope> ().Read (ref reader, propertyType, options);
+
+            return true;
         }
 
-        private delegate TConverter ReadDelegate (ref Utf8JsonReader reader, Type type, JsonSerializerOptions options);
+        if (converterType == typeof (DictionaryJsonConverter<Scheme?>))
+        {
+            value = new DictionaryJsonConverter<Scheme?> ().Read (ref reader, propertyType, options);
+
+            return true;
+        }
+
+        if (converterType == typeof (TraceCategoryJsonConverter))
+        {
+            value = new TraceCategoryJsonConverter ().Read (ref reader, propertyType, options);
+
+            return true;
+        }
+
+        value = null;
+
+        return false;
+    }
+
+    private static bool TryWriteWithKnownConverter (
+        Utf8JsonWriter writer,
+        Type propertyType,
+        Type converterType,
+        object? value,
+        JsonSerializerOptions options)
+    {
+        if (converterType == typeof (ConcurrentDictionaryJsonConverter<ThemeScope>))
+        {
+            new ConcurrentDictionaryJsonConverter<ThemeScope> ().Write (
+                                                                   writer,
+                                                                   (ConcurrentDictionary<string, ThemeScope>)value!,
+                                                                   options
+                                                                  );
+
+            return true;
+        }
+
+        if (converterType == typeof (DictionaryJsonConverter<Scheme?>))
+        {
+            new DictionaryJsonConverter<Scheme?> ().Write (writer, (Dictionary<string, Scheme?>)value!, options);
+
+            return true;
+        }
+
+        if (converterType == typeof (TraceCategoryJsonConverter))
+        {
+            new TraceCategoryJsonConverter ().Write (writer, (TraceCategory)value!, options);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private static object? DeserializePropertyValue (ref Utf8JsonReader reader, Type propertyType, JsonSerializerOptions options)
+    {
+        Type? nullableType = Nullable.GetUnderlyingType (propertyType);
+        Type enumType = nullableType ?? propertyType;
+
+        if (enumType.IsEnum)
+        {
+            if (reader.TokenType == JsonTokenType.String)
+            {
+                return Enum.Parse (enumType, reader.GetString ()!, ignoreCase: true);
+            }
+
+            if (reader.TokenType == JsonTokenType.Null && nullableType is not null)
+            {
+                return null;
+            }
+        }
+
+        JsonTypeInfo? jsonTypeInfo = ConfigurationManager.SerializerContext.GetTypeInfo (propertyType);
+
+        if (jsonTypeInfo is null)
+        {
+            throw new JsonException ($"{propertyType.FullName}: No source-generated JsonTypeInfo is registered for this configuration property type.");
+        }
+
+        return JsonSerializer.Deserialize (ref reader, jsonTypeInfo);
+    }
+
+    private static bool TryWriteEnumValue (Utf8JsonWriter writer, Type propertyType, object value)
+    {
+        Type enumType = Nullable.GetUnderlyingType (propertyType) ?? propertyType;
+
+        if (!enumType.IsEnum)
+        {
+            return false;
+        }
+
+        writer.WriteStringValue (value.ToString ());
+
+        return true;
     }
 }

@@ -18,8 +18,6 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
     ///     Creates a new instance. The dictionary will be populated with uninitialized (<see cref="ConfigProperty.HasValue"/>
     ///     will be <see langword="false"/>).
     /// </summary>
-    [RequiresUnreferencedCode (
-                                  "Uses cached configuration properties filtered by type T. This is AOT-safe as long as T is one of the known scope types (SettingsScope, ThemeScope, AppSettingsScope).")]
     public Scope () : base (StringComparer.InvariantCultureIgnoreCase) { }
 
     /// <summary>
@@ -80,7 +78,6 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
     ///     INTERNAL: Updates the values of the properties of this scope to their corresponding static
     ///     <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
-    [RequiresDynamicCode ("Uses reflection to retrieve property values")]
     internal void UpdateToCurrentValues ()
     {
         foreach (KeyValuePair<string, ConfigProperty> validProperties in this.Where (cp => cp.Value.PropertyInfo is { }))
@@ -107,8 +104,6 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
     /// </summary>
     /// <param name="scope"></param>
     /// <returns>The updated scope (this).</returns>
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
-    [RequiresDynamicCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
     internal Scope<T>? UpdateFrom (Scope<T> scope)
     {
         foreach (KeyValuePair<string, ConfigProperty> prop in scope)
@@ -143,8 +138,6 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
     ///     <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
     /// <returns><see langword="true"/> if one or more property value was applied; <see langword="false"/> otherwise.</returns>
-    [RequiresDynamicCode ("Uses reflection to get and set property values")]
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.DeepCloner.DeepClone<T>(T)")]
     internal bool Apply ()
     {
         if (!ConfigurationManager.IsEnabled)

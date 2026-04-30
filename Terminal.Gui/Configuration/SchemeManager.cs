@@ -31,15 +31,11 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
     ///     <see cref="GetSchemesForCurrentTheme"/>, etc... instead.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
-#pragma warning disable IL2026 // DictionaryJsonConverter is AOT-compatible
     [JsonConverter (typeof (DictionaryJsonConverter<Scheme?>))]
-#pragma warning restore IL2026
     [UsedImplicitly]
     public static Dictionary<string, Scheme?>? Schemes
     {
         get => GetSchemes ();
-        [RequiresUnreferencedCode ("Calls Terminal.Gui.SchemeManager.SetSchemes(Dictionary<String, Scheme>)")]
-        [RequiresDynamicCode ("Calls Terminal.Gui.SchemeManager.SetSchemes(Dictionary<String, Scheme>)")]
         private set => SetSchemes (value);
     }
 
@@ -57,8 +53,6 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
     }
 
     /// <summary>INTERNAL: The set method for <see cref="Schemes"/>.</summary>
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
-    [RequiresDynamicCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
     internal static void SetSchemes (Dictionary<string, Scheme?>? value)
     {
         lock (_schemesLock)
