@@ -508,6 +508,163 @@ public class TableViewTests : TestDriverBase
         Assert.True (result.GetColumns () <= 4, $"Truncated result '{result}' exceeds available space");
     }
 
+    // Claude - Opus 4.7
+    [Fact]
+    public void TruncationIndicator_DefaultIsHorizontalEllipsis ()
+    {
+        ColumnStyle style = new ();
+
+        Assert.Equal (Glyphs.HorizontalEllipsis.ToString (), style.TruncationIndicator);
+    }
+
+    // Claude - Opus 4.7
+    // Verifies fix for #5068: TableView appends a truncation indicator (default "…")
+    // when cell content exceeds the available column width.
+    [Fact]
+    public void TruncateOrPad_DefaultIndicator_AppendsEllipsisWhenTruncated ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+        ColumnStyle style = new ();
+
+        // "Hello" is 5 cols wide, available space is 5 → truncation branch (5 >= 5).
+        // Visible budget is availableHorizontalSpace - 1 = 4 (1 cell reserved for boundary).
+        // With 1-col indicator, content budget is 3 → "Hel" + "…" = "Hel…" (4 cols).
+        var result = (string)method.Invoke (null, ["Hello", "Hello", 5, style])!;
+
+        Assert.Equal ("Hel…", result);
+        Assert.Equal (4, result.GetColumns ());
+    }
+
+    // Claude - Opus 4.7
+    [Fact]
+    public void TruncateOrPad_NullIndicator_SilentlyClips ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+        ColumnStyle style = new () { TruncationIndicator = null };
+
+        var result = (string)method.Invoke (null, ["Hello", "Hello", 5, style])!;
+
+        Assert.Equal ("Hell", result);
+    }
+
+    // Claude - Opus 4.7
+    [Fact]
+    public void TruncateOrPad_EmptyIndicator_SilentlyClips ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+        ColumnStyle style = new () { TruncationIndicator = string.Empty };
+
+        var result = (string)method.Invoke (null, ["Hello", "Hello", 5, style])!;
+
+        Assert.Equal ("Hell", result);
+    }
+
+    // Claude - Opus 4.7
+    // When colStyle is null no indicator is configured so existing silent-clip behavior is preserved.
+    [Fact]
+    public void TruncateOrPad_NullColumnStyle_SilentlyClips ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+
+        var result = (string)method.Invoke (null, ["Hello", "Hello", 5, null])!;
+
+        Assert.Equal ("Hell", result);
+    }
+
+    // Claude - Opus 4.7
+    [Fact]
+    public void TruncateOrPad_CustomMultiColumnIndicator_Appended ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+        ColumnStyle style = new () { TruncationIndicator = "..." };
+
+        // availableHorizontalSpace=8, "Hello World" is 11 cols → truncation branch.
+        // Visible budget is 7 (8-1). Reserve 3 for "...". Content budget = 4 → "Hell" + "..." = "Hell..." (7 cols).
+        var result = (string)method.Invoke (null, ["Hello World", "Hello World", 8, style])!;
+
+        Assert.Equal ("Hell...", result);
+        Assert.Equal (7, result.GetColumns ());
+    }
+
+    // Claude - Opus 4.7
+    // When the indicator is wider than the visible column budget, fall back to silent clipping
+    // rather than producing an oversize result.
+    [Fact]
+    public void TruncateOrPad_IndicatorTooWide_SilentlyClips ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+        ColumnStyle style = new () { TruncationIndicator = "..." };
+
+        // availableHorizontalSpace=3 → visible budget is 2 → 3-col indicator does not fit.
+        var result = (string)method.Invoke (null, ["Hello", "Hello", 3, style])!;
+
+        Assert.Equal ("He", result);
+        Assert.True (result.GetColumns () <= 2);
+    }
+
+    // Claude - Opus 4.7
+    [Fact]
+    public void TruncateOrPad_IndicatorEqualsBudget_SilentlyClips ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+        ColumnStyle style = new () { TruncationIndicator = "…" };
+
+        // availableHorizontalSpace=2 → visible budget is 1 → indicator (1 col) would consume the entire
+        // budget and leave nothing for content. Falls back to silent clip.
+        var result = (string)method.Invoke (null, ["Hello", "Hello", 2, style])!;
+
+        Assert.Equal ("H", result);
+    }
+
+    // Claude - Opus 4.7
+    // No truncation occurs when content fits, so the indicator should not appear and the value
+    // should be padded according to the column style alignment.
+    [Fact]
+    public void TruncateOrPad_ContentFits_NoIndicatorAdded ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+        ColumnStyle style = new ();
+
+        // "Hi" is 2 cols, availableHorizontalSpace=10 → no truncation, padded to 9 cols (10-1 boundary).
+        var result = (string)method.Invoke (null, ["Hi", "Hi", 10, style])!;
+
+        Assert.DoesNotContain ('…', result);
+        Assert.StartsWith ("Hi", result);
+    }
+
+    // Claude - Opus 4.7
+    // Indicator must be appended after a complete grapheme cluster and must not split surrogate pairs
+    // or combining sequences.
+    [Fact]
+    public void TruncateOrPad_GraphemeContent_IndicatorAppendedCleanly ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+        ColumnStyle style = new ();
+
+        // "🎉Hello" is 7 cols (emoji=2 + Hello=5). availableHorizontalSpace=5 → truncation.
+        // Visible budget = 4. Reserve 1 for indicator → content budget = 3.
+        // Add 🎉 (w=2, remaining content budget=1), add 'H' (w=1, content budget=0), break.
+        // Result = "🎉H" + "…" = "🎉H…" (4 cols).
+        var result = (string)method.Invoke (null, ["\U0001F389Hello", "\U0001F389Hello", 5, style])!;
+
+        Assert.Equal ("\U0001F389H…", result);
+        Assert.Equal (4, result.GetColumns ());
+
+        // No isolated surrogates
+        for (var i = 0; i < result.Length; i++)
+        {
+            if (char.IsHighSurrogate (result [i]))
+            {
+                Assert.True (i + 1 < result.Length && char.IsLowSurrogate (result [i + 1]));
+                i++;
+            }
+            else
+            {
+                Assert.False (char.IsLowSurrogate (result [i]));
+            }
+        }
+    }
+
     [Fact]
     public void Test_CalculateMaxCellWidth_UsesGraphemeWidth ()
     {

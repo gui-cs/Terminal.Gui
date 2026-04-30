@@ -565,6 +565,14 @@ public partial class TableView
         // if value is too wide, truncate by grapheme cluster to avoid splitting surrogate pairs
         if (representation.GetColumns () >= availableHorizontalSpace)
         {
+            string indicator = colStyle?.TruncationIndicator ?? string.Empty;
+            int indicatorWidth = indicator.GetColumns ();
+
+            // Only draw the indicator if it leaves room for at least one cell of content
+            // (otherwise fall back to silent clipping)
+            bool useIndicator = indicatorWidth > 0 && indicatorWidth < availableHorizontalSpace - 1;
+            int reserve = useIndicator ? indicatorWidth : 0;
+
             StringBuilder sb = new ();
             int remaining = availableHorizontalSpace;
 
@@ -572,13 +580,18 @@ public partial class TableView
             {
                 int w = grapheme.GetColumns ();
 
-                if (remaining - w <= 0)
+                if (remaining - w - reserve <= 0)
                 {
                     break;
                 }
 
                 sb.Append (grapheme);
                 remaining -= w;
+            }
+
+            if (useIndicator)
+            {
+                sb.Append (indicator);
             }
 
             return sb.ToString ();
