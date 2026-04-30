@@ -262,8 +262,6 @@ public static class ThemeManager
     ///     INTERNAL: Updates <see cref="Themes"/> to the current values of the static
     ///     <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.ThemeManager.Themes")]
-    [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
     internal static void UpdateToCurrentValues ()
     {
         // BUGBUG: This corrupts _hardCodedDefaults. See #4288
@@ -273,9 +271,6 @@ public static class ThemeManager
     /// <summary>
     ///     INTERNAL: Loads all Themes to their hard-coded default values.
     /// </summary>
-    [RequiresUnreferencedCode ("Calls SchemeManager.LoadToHardCodedDefaults")]
-    [RequiresDynamicCode ("Calls SchemeManager.LoadToHardCodedDefaults")]
-
     internal static void LoadHardCodedDefaults ()
     {
         if (!ConfigurationManager.IsInitialized ())
