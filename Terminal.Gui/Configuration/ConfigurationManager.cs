@@ -162,13 +162,8 @@ public static class ConfigurationManager
     ///     For ConfigurationManager to access config resources, <see cref="IsEnabled"/> needs to be
     ///     set to <see langword="true"/> after this method has been called.
     /// </summary>
-    [RequiresDynamicCode (
-                             "Uses reflection to scan assemblies for configuration properties. "
-                             + "Only called during initialization and not needed during normal operation. "
-                             + "In AOT environments, ensure all types with ConfigurationPropertyAttribute are preserved.")]
-    [RequiresUnreferencedCode (
-                                  "Reflection requires all types with ConfigurationPropertyAttribute to be preserved in AOT. "
-                                  + "Use the SourceGenerationContext to register all configuration property types.")]
+    [UnconditionalSuppressMessage ("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "All config property host types are statically rooted via ConfigPropertyHostTypes and registered in SourceGenerationContext. DeepCloner and Apply use source-generated serialization for known types.")]
+    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "Reflection-heavy paths are guarded by RuntimeFeature.IsDynamicCodeSupported and are dead code under AOT.")]
     internal static void Initialize ()
     {
         lock (_initializedLock)
@@ -199,13 +194,16 @@ public static class ConfigurationManager
 
             foreach (KeyValuePair<string, ConfigProperty> hardCodedProperty in _hardCodedConfigPropertyCache)
             {
-                // Set the PropertyValue to the hard coded value.
-                // Deep-clone the value to ensure the cache stores independent copies of reference types
-                // (e.g. Dictionary<,>). Without cloning, in-place mutations to a static property like
-                // Application.DefaultKeyBindings (e.g. dict[cmd] = ...) would silently corrupt the
-                // cached "hard-coded default", causing test-order-dependent failures.
                 hardCodedProperty.Value.Immutable = false;
                 hardCodedProperty.Value.UpdateToCurrentValue ();
+            }
+
+            foreach (KeyValuePair<string, ConfigProperty> hardCodedProperty in _hardCodedConfigPropertyCache)
+            {
+                // Deep-clone after every cache entry has been populated from its current static value.
+                // Some getters (notably ThemeManager.Themes while uninitialized) synthesize composite
+                // objects from other configuration properties, so a single populate-and-clone pass can
+                // observe half-initialized cache entries and persist null/default values into the clone.
                 hardCodedProperty.Value.PropertyValue = DeepCloner.DeepClone (hardCodedProperty.Value.PropertyValue);
                 hardCodedProperty.Value.Immutable = true;
             }
@@ -555,14 +553,14 @@ public static class ConfigurationManager
                                                                                   AllowTrailingCommas = true,
 
                                                                                   Converters =
-                                                                                  {
-                                                                                      // We override the standard Rune converter to support specifying Glyphs in
-                                                                                      // a flexible way
-                                                                                      new RuneJsonConverter (),
+                                                                                   {
+                                                                                       // We override the standard Rune converter to support specifying Glyphs in
+                                                                                       // a flexible way
+                                                                                       new RuneJsonConverter (),
 
-                                                                                      // Override Key to support "Ctrl+Q" format.
-                                                                                      new KeyJsonConverter ()
-                                                                                  },
+                                                                                       // Override Key to support "Ctrl+Q" format.
+                                                                                       new KeyJsonConverter ()
+                                                                                   },
 
                                                                                   // Enables Key to be "Ctrl+Q" vs "Ctrl\u002BQ"
                                                                                   Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
@@ -632,8 +630,7 @@ public static class ConfigurationManager
     [JsonPropertyName ("AppSettings")]
     public static AppSettingsScope? AppSettings
     {
-        [RequiresUnreferencedCode ("AOT")]
-        [RequiresDynamicCode ("AOT")]
+        [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "UpdateToCurrentValues uses reflection only to read static property values from types preserved by ConfigPropertyHostTypes.")]
         get
         {
             if (!IsInitialized ())
@@ -663,8 +660,6 @@ public static class ConfigurationManager
                 return (appSettingsConfigProperty.PropertyValue as AppSettingsScope)!;
             }
         }
-        [RequiresUnreferencedCode ("AOT")]
-        [RequiresDynamicCode ("AOT")]
         set
         {
             if (!IsInitialized ())

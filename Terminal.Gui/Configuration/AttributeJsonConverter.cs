@@ -1,12 +1,9 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui.Configuration;
 
 /// <summary>Json converter from the <see cref="Attribute"/> class.</summary>
-[RequiresUnreferencedCode ("AOT")]
-
 internal class AttributeJsonConverter : JsonConverter<Attribute>
 {
     private static AttributeJsonConverter? _instance;
@@ -80,7 +77,12 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
 
                         break;
                     case "style":
-                        style = JsonSerializer.Deserialize (property, ConfigurationManager.SerializerContext.TextStyle);
+                        if (reader.TokenType != JsonTokenType.String)
+                        {
+                            throw new JsonException ($"{propertyName}: Expected a string value.");
+                        }
+
+                        style = Enum.Parse<TextStyle> (reader.GetString ()!, ignoreCase: true);
 
                         break;
 
@@ -107,7 +109,7 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
         if (value.Style != TextStyle.None)
         {
             writer.WritePropertyName (nameof (Attribute.Style));
-            JsonSerializer.Serialize (writer, value.Style, ConfigurationManager.SerializerContext.TextStyle);
+            writer.WriteStringValue (value.Style.ToString ());
         }
 
         writer.WriteEndObject ();

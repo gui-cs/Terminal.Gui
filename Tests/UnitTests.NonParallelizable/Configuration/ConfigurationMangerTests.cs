@@ -50,6 +50,33 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
     }
 
     [Fact]
+    public void HardCoded_Default_Theme_Uses_Fully_Populated_Cache_Values ()
+    {
+        // Copilot
+        Assert.False (IsEnabled);
+
+        try
+        {
+            Enable (ConfigLocations.HardCoded);
+
+            ThemeScope defaultTheme = ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME];
+
+            Assert.Equal (
+                          MouseState.PressedOutside | MouseState.Pressed | MouseState.In,
+                          (MouseState)defaultTheme ["CheckBox.DefaultMouseHighlightStates"].PropertyValue!
+                         );
+            Assert.Equal (
+                          CursorStyle.BlinkingBlock,
+                          (CursorStyle)defaultTheme ["LinearRange.DefaultCursorStyle"].PropertyValue!
+                         );
+        }
+        finally
+        {
+            Disable (true);
+        }
+    }
+
+    [Fact]
     public void GetHardCodedDefaultCache_Always_Returns_Same_Ref ()
     {
         // It's important it always returns the same cache ref, so no copies are made

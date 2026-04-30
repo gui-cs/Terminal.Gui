@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
 
@@ -35,48 +36,48 @@ public static class DeepCloner
     /// <typeparam name="T">The type of the object to clone.</typeparam>
     /// <param name="source">The object to clone.</param>
     /// <returns>A deep copy of the source object, or default if source is null.</returns>
-    [RequiresUnreferencedCode (
-                                  "Deep cloning may use reflection which might be incompatible with AOT compilation if types aren't registered in SourceGenerationContext")]
-    [RequiresDynamicCode ("Deep cloning may use reflection that requires runtime code generation if source generation fails")]
     public static T? DeepClone<T> (T? source)
     {
         if (source is null)
         {
             return default (T?);
         }
-        //// For AOT environments, use source generation exclusively
-        //if (IsAotEnvironment ())
-        //{
-        //    if (TryUseSourceGeneratedCloner<T> (source, out T? result))
-        //    {
-        //        return result;
-        //    }
-
-        //    // If in AOT but source generation failed, throw an exception
-        //    // instead of silently falling back to reflection
-        //    //throw new InvalidOperationException (
-        //    //                                     $"Type {typeof (T).FullName} is not properly registered in SourceGenerationContext " +
-        //    //                                     $"for AOT-compatible cloning.");
-        //    Logging.Error ($"Type {typeof (T).FullName} is not properly registered in SourceGenerationContext " +
-        //                  $"for AOT-compatible cloning.");
-        //}
-
-        // Use reflection-based approach, which should have better performance in non-AOT environments
         ConcurrentDictionary<object, object> visited = new (ReferenceEqualityComparer.Instance);
 
         return (T?)DeepCloneInternal (source, visited);
     }
 
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.DeepCloner.CreateInstance(Type)")]
-    [UnconditionalSuppressMessage (
-                                      "AOT",
-                                      "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
-                                      Justification = "<Pending>")]
+    [UnconditionalSuppressMessage ("Trimming", "IL2075", Justification = "DeepCloner reflects over writable properties of runtime configuration/test types to preserve object graphs, circular references, and non-public setters.")]
     private static object? DeepCloneInternal (object? source, ConcurrentDictionary<object, object> visited)
     {
         if (source is null)
         {
             return null;
+        }
+
+        if (source is Drawing.Attribute attribute)
+        {
+            return attribute;
+        }
+
+        if (source is Drawing.Scheme scheme)
+        {
+            return new Drawing.Scheme (scheme);
+        }
+
+        if (source is ThemeScope themeScope)
+        {
+            return CloneScope (themeScope, visited);
+        }
+
+        if (source is AppSettingsScope appSettingsScope)
+        {
+            return CloneScope (appSettingsScope, visited);
+        }
+
+        if (source is SettingsScope settingsScope)
+        {
+            return CloneScope (settingsScope, visited);
         }
 
         // Handle already visited objects to avoid circular references
@@ -89,12 +90,6 @@ public static class DeepCloner
 
         // Handle immutable or simple types
         if (IsSimpleType (type))
-        {
-            return source;
-        }
-
-        // Handle strings explicitly
-        if (type == typeof (string))
         {
             return source;
         }
@@ -136,10 +131,11 @@ public static class DeepCloner
         return clone;
     }
 
-    private static bool IsSimpleType ([DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicProperties)] Type type)
+    private static bool IsSimpleType (Type type)
     {
         if (type.IsPrimitive
             || type.IsEnum
+            || type.IsValueType
             || type == typeof (decimal)
             || type == typeof (DateTime)
             || type == typeof (DateTimeOffset)
@@ -151,17 +147,8 @@ public static class DeepCloner
             return true;
         }
 
-        // Treat structs with no writable public properties as simple types (immutable structs)
-        if (type.IsValueType)
-        {
-            IEnumerable<PropertyInfo> writableProperties = type.GetProperties (BindingFlags.Instance | BindingFlags.Public)
-                                                               .Where (p => p is { CanRead: true, CanWrite: true } && p.GetIndexParameters ().Length == 0);
-
-            return !writableProperties.Any ();
-        }
-
-        // Treat PropertyInfo (e.g., RuntimePropertyInfo) as a simple type since it's metadata and shouldn't be cloned
-        if (typeof (PropertyInfo).IsAssignableFrom (type))
+        // Treat Type and PropertyInfo as simple metadata objects that should not be cloned.
+        if (typeof (Type).IsAssignableFrom (type) || typeof (PropertyInfo).IsAssignableFrom (type))
         {
             return true;
         }
@@ -169,9 +156,9 @@ public static class DeepCloner
         return false;
     }
 
-    [RequiresUnreferencedCode ("Calls System.Text.Json.JsonSerializer.Deserialize(String, Type, JsonSerializerOptions)")]
-    [RequiresDynamicCode ("Calls System.Text.Json.JsonSerializer.Deserialize(String, Type, JsonSerializerOptions)")]
-    private static object CreateInstance ([DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type type)
+    [UnconditionalSuppressMessage ("Trimming", "IL2067", Justification = "DeepCloner creates only runtime configuration/test types with parameterless constructors, and this path is covered by unit tests and NativeAOT validation.")]
+    [UnconditionalSuppressMessage ("Trimming", "IL2070", Justification = "DeepCloner probes for a public parameterless constructor on runtime configuration/test types before instantiating them.")]
+    private static object CreateInstance (Type type)
     {
         try
         {
@@ -181,16 +168,15 @@ public static class DeepCloner
                 return Activator.CreateInstance (type)!;
             }
 
-            // Record support
-            if (type.GetMethod ("<Clone>$") != null)
-            {
-                return Activator.CreateInstance (type)!;
-            }
-
             // In AOT, try using the JsonSerializer if available
-            if (IsAotEnvironment () && CanSerializeWithJson (type))
+            if (IsAotEnvironment ())
             {
-                return JsonSerializer.Deserialize (JsonSerializer.Serialize (new object (), type), type, ConfigurationManager.SerializerContext.Options)!;
+                JsonTypeInfo? jsonTypeInfo = ConfigurationManager.SerializerContext.GetTypeInfo (type);
+
+                if (jsonTypeInfo is not null)
+                {
+                    return JsonSerializer.Deserialize ("{}", jsonTypeInfo)!;
+                }
             }
 
             throw new InvalidOperationException ($"Cannot create instance of type {type.FullName}. No parameterless constructor or clone method found.");
@@ -202,13 +188,10 @@ public static class DeepCloner
         }
     }
 
-    [RequiresDynamicCode ("Calls System.Array.CreateInstance(Type, Int32)")]
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.DeepCloner.DeepCloneInternal(Object, ConcurrentDictionary<Object, Object>)")]
     private static object CloneArray (object source, ConcurrentDictionary<object, object> visited)
     {
-        var array = (Array)source;
-        Type elementType = array.GetType ().GetElementType ()!;
-        var newArray = Array.CreateInstance (elementType, array.Length);
+        Array array = (Array)source;
+        Array newArray = (Array)array.Clone ();
         visited.TryAdd (source, newArray);
 
         for (var i = 0; i < array.Length; i++)
@@ -221,12 +204,10 @@ public static class DeepCloner
         return newArray;
     }
 
-    [RequiresDynamicCode ("Calls System.Type.MakeGenericType(params Type[])")]
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.DeepCloner.DeepCloneInternal(Object, ConcurrentDictionary<Object, Object>)")]
+    [UnconditionalSuppressMessage ("Trimming", "IL2072", Justification = "Collection cloning only instantiates the runtime collection type after filtering to supported IList implementations.")]
     private static object CloneCollection (object source, ConcurrentDictionary<object, object> visited)
     {
         Type type = source.GetType ();
-        Type elementType = type.GetGenericArguments ().FirstOrDefault () ?? typeof (object);
 
         // Check for immutable collections and throw if found
         if (type.IsGenericType)
@@ -239,8 +220,15 @@ public static class DeepCloner
             }
         }
 
-        Type listType = typeof (List<>).MakeGenericType (elementType);
-        var tempList = (IList)Activator.CreateInstance (listType)!;
+        if (source is not IList)
+        {
+            throw new NotSupportedException ($"Cloning of collection type {type.Name} is not supported unless it implements IList.");
+        }
+
+        if (Activator.CreateInstance (type) is not IList tempList)
+        {
+            throw new NotSupportedException ($"Cloning of collection type {type.Name} is not supported without a parameterless constructor.");
+        }
 
         // Add to visited before cloning contents to prevent circular reference issues
         visited.TryAdd (source, tempList);
@@ -251,25 +239,50 @@ public static class DeepCloner
             tempList.Add (clonedItem);
         }
 
-        // Try to create the original collection type if possible
-        if (type != listType && type.GetConstructor ([listType]) != null)
-        {
-            object result = Activator.CreateInstance (type, tempList)!;
-            visited [source] = result;
-
-            return result;
-        }
-
         return tempList;
     }
 
     #region Dictionary Support
 
-    [RequiresDynamicCode ("Calls System.Type.MakeGenericType(params Type[])")]
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.DeepCloner.DeepCloneInternal(Object, ConcurrentDictionary<Object, Object>)")]
+    [UnconditionalSuppressMessage ("AOT", "IL3050", Justification = "Dictionary cloning constructs supported runtime dictionary shapes (Dictionary<,> and ConcurrentDictionary<,>) via MakeGenericType, which is validated by NativeAOT publish tests.")]
+    [UnconditionalSuppressMessage ("Trimming", "IL2075", Justification = "Dictionary cloning reads the runtime dictionary comparer from supported dictionary types to preserve comparer semantics.")]
     private static object CloneDictionary (object source, ConcurrentDictionary<object, object> visited)
     {
-        var sourceDict = (IDictionary)source;
+        if (source is ConcurrentDictionary<string, ThemeScope> themeSource)
+        {
+            ConcurrentDictionary<string, ThemeScope> clonedThemes = new (StringComparer.InvariantCultureIgnoreCase);
+            visited.TryAdd (source, clonedThemes);
+
+            foreach (KeyValuePair<string, ThemeScope> kvp in themeSource)
+            {
+                object? clonedThemeObject = DeepCloneInternal (kvp.Value, visited);
+
+                if (clonedThemeObject is not ThemeScope clonedTheme)
+                {
+                    throw new InvalidOperationException (
+                                                         $"Expected cloned theme scope to be {typeof (ThemeScope).FullName}, but got {clonedThemeObject?.GetType ().FullName ?? "<null>"}.");
+                }
+
+                clonedThemes [kvp.Key] = clonedTheme;
+            }
+
+            return clonedThemes;
+        }
+
+        if (source is Dictionary<string, Scheme?> schemeSource)
+        {
+            Dictionary<string, Scheme?> clonedSchemes = new (schemeSource.Comparer);
+            visited.TryAdd (source, clonedSchemes);
+
+            foreach (KeyValuePair<string, Scheme?> kvp in schemeSource)
+            {
+                clonedSchemes [kvp.Key] = (Scheme?)DeepCloneInternal (kvp.Value, visited);
+            }
+
+            return clonedSchemes;
+        }
+
+        IDictionary sourceDict = (IDictionary)source;
         Type type = source.GetType ();
 
         // Check for frozen or immutable dictionaries and throw if found
@@ -278,7 +291,6 @@ public static class DeepCloner
             CheckForUnsupportedDictionaryTypes (type);
         }
 
-        // Determine dictionary type and comparer
         Type [] genericArgs = type.GetGenericArguments ();
         Type dictType;
 
@@ -305,7 +317,6 @@ public static class DeepCloner
 
         object? comparer = type.GetProperty ("Comparer")?.GetValue (source);
 
-        // Create a temporary dictionary to hold cloned key-value pairs
         IDictionary tempDict = CreateDictionaryInstance (dictType, comparer);
         visited.TryAdd (source, tempDict);
 
@@ -319,6 +330,20 @@ public static class DeepCloner
                 lastKey = key;
                 object? clonedKey = DeepCloneInternal (key, visited);
                 object? clonedValue = DeepCloneInternal (sourceDict [key], visited);
+
+                if (tempDict is ConcurrentDictionary<string, ThemeScope> themeDict)
+                {
+                    themeDict [(string)clonedKey!] = (ThemeScope)clonedValue!;
+
+                    continue;
+                }
+
+                if (tempDict is Dictionary<string, Scheme?> schemeDict)
+                {
+                    schemeDict [(string)clonedKey!] = (Scheme?)clonedValue;
+
+                    continue;
+                }
 
                 if (tempDict.Contains (clonedKey!))
                 {
@@ -338,20 +363,32 @@ public static class DeepCloner
                                                  ex);
         }
 
-        // If the original dictionary type has a parameterless constructor, create a new instance
-        if (type.GetConstructor (Type.EmptyTypes) != null)
-        {
-            return CreateFinalDictionary (type, comparer, tempDict, source, visited);
-        }
-
         return tempDict;
     }
 
-    private static IDictionary CreateDictionaryInstance (
-        [DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicConstructors)] Type dictType,
-        object? comparer
-    )
+    [UnconditionalSuppressMessage ("Trimming", "IL2067", Justification = "Dictionary cloning only instantiates supported dictionary runtime types and falls back safely when comparer constructors are unavailable.")]
+    private static IDictionary CreateDictionaryInstance (Type dictType, object? comparer)
     {
+        if (dictType == typeof (ConcurrentDictionary<string, ThemeScope>))
+        {
+            if (comparer is IEqualityComparer<string> stringComparer)
+            {
+                return new ConcurrentDictionary<string, ThemeScope> (stringComparer);
+            }
+
+            return new ConcurrentDictionary<string, ThemeScope> ();
+        }
+
+        if (dictType == typeof (Dictionary<string, Scheme?>))
+        {
+            if (comparer is IEqualityComparer<string> stringComparer)
+            {
+                return new Dictionary<string, Scheme?> (stringComparer);
+            }
+
+            return new Dictionary<string, Scheme?> ();
+        }
+
         try
         {
             // Try to create the dictionary with the comparer
@@ -387,160 +424,36 @@ public static class DeepCloner
         }
     }
 
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.DeepCloner.DeepCloneInternal(Object, ConcurrentDictionary<Object, Object>)")]
-    private static object CreateFinalDictionary (
-        [DynamicallyAccessedMembers (
-                                        DynamicallyAccessedMemberTypes.NonPublicConstructors
-                                        | DynamicallyAccessedMemberTypes.PublicConstructors
-                                        | DynamicallyAccessedMemberTypes.PublicProperties
-                                        | DynamicallyAccessedMemberTypes.NonPublicProperties)]
-        Type type,
-        object? comparer,
-        IDictionary tempDict,
-        object source,
-        ConcurrentDictionary<object, object> visited
-    )
-    {
-        IDictionary newDict;
-
-        try
-        {
-            // Try to create the dictionary with the comparer
-            newDict = comparer != null
-                          ? (IDictionary)Activator.CreateInstance (type, comparer)!
-                          : (IDictionary)Activator.CreateInstance (type)!;
-        }
-        catch (MissingMethodException)
-        {
-            // Fallback to parameterless constructor if comparer constructor is not available
-            newDict = (IDictionary)Activator.CreateInstance (type)!;
-        }
-
-        newDict.Clear ();
-        visited [source] = newDict;
-
-        // Copy cloned key-value pairs to the new dictionary
-        foreach (object? key in tempDict.Keys)
-        {
-            if (newDict.Contains (key))
-            {
-                newDict [key] = tempDict [key];
-            }
-            else
-            {
-                newDict.Add (key, tempDict [key]);
-            }
-        }
-
-        // Clone additional properties of the derived dictionary type
-        foreach (PropertyInfo prop in type.GetProperties (BindingFlags.Instance | BindingFlags.Public)
-                                          .Where (p => p.CanRead && p.CanWrite && p.GetIndexParameters ().Length == 0))
-        {
-            object? value = prop.GetValue (source);
-            object? clonedValue = DeepCloneInternal (value, visited);
-            prop.SetValue (newDict, clonedValue);
-        }
-
-        return newDict;
-    }
-
     #endregion Dictionary Support
 
     #region AOT Support
 
-    /// <summary>
-    ///     Determines if a type can be serialized using System.Text.Json based on the types
-    ///     registered in the SourceGenerationContext.
-    /// </summary>
-    /// <param name="type">The type to check</param>
-    /// <returns>True if the type can be serialized using System.Text.Json; otherwise, false.</returns>
-    private static bool CanSerializeWithJson (Type type)
+    private static TScopeT CloneScope<TScopeT> (TScopeT scope, ConcurrentDictionary<object, object> visited)
+        where TScopeT : Scope<TScopeT>, new ()
     {
-        // Check if the type or any of its base types is registered in SourceGenerationContext
-        return typeof (SourceGenerationContext)
-               .GetProperties (BindingFlags.Public | BindingFlags.Static)
-               .Any (p => p.PropertyType.IsGenericType
-                          && p.PropertyType.GetGenericTypeDefinition () == typeof (JsonTypeInfo<>)
-                          && (p.PropertyType.GetGenericArguments () [0] == type || p.PropertyType.GetGenericArguments () [0].IsAssignableFrom (type)));
+        TScopeT clonedScope = new ();
+        visited.TryAdd (scope, clonedScope);
+
+        foreach (KeyValuePair<string, ConfigProperty> kvp in scope)
+        {
+            ConfigProperty clonedProperty = ConfigProperty.CreateCopy (kvp.Value);
+            clonedProperty.Immutable = kvp.Value.Immutable;
+
+            if (kvp.Value.HasValue)
+            {
+                clonedProperty.PropertyValue = DeepCloneInternal (kvp.Value.PropertyValue, visited);
+            }
+
+            clonedScope.TryAdd (kvp.Key, clonedProperty);
+        }
+
+        return clonedScope;
     }
 
     private static bool IsAotEnvironment () =>
 
         // Check if running in an AOT environment
         Type.GetType ("System.Runtime.CompilerServices.RuntimeFeature")?.GetProperty ("IsDynamicCodeSupported")?.GetValue (null) is bool and false;
-
-    /// <summary>
-    ///     Attempts to clone an object using source-generated serialization from System.Text.Json.
-    ///     This provides an AOT-compatible alternative to reflection-based deep cloning.
-    /// </summary>
-    /// <typeparam name="T">The type of the object to clone</typeparam>
-    /// <param name="source">The source object to clone</param>
-    /// <param name="result">The cloned result, if successful</param>
-    /// <returns>True if cloning succeeded using source generation; otherwise, false</returns>
-    private static bool TryUseSourceGeneratedCloner<T> (T source, [NotNullWhen (true)] out T? result)
-    {
-        result = default (T);
-
-        try
-        {
-            // Check if the type has a JsonTypeInfo in our SourceGenerationContext
-            JsonTypeInfo<T>? jsonTypeInfo = GetJsonTypeInfo<T> ();
-
-            if (jsonTypeInfo != null)
-            {
-                // Use JSON serialization for deep cloning
-                string json = JsonSerializer.Serialize (source, jsonTypeInfo);
-                result = JsonSerializer.Deserialize (json, jsonTypeInfo);
-
-                return result is { };
-            }
-
-            return false;
-        }
-        catch
-        {
-            // If any exception occurs during serialization/deserialization,
-            // return false to fall back to reflection-based approach
-            return false;
-        }
-    }
-
-    /// <summary>
-    ///     Gets JsonTypeInfo for a type from the SourceGenerationContext, if available.
-    /// </summary>
-    /// <typeparam name="T">The type to get JsonTypeInfo for</typeparam>
-    /// <returns>JsonTypeInfo if found; otherwise, null</returns>
-    private static JsonTypeInfo<T>? GetJsonTypeInfo<T> ()
-    {
-        // Try to find a matching JsonTypeInfo property in the SourceGenerationContext
-        Type contextType = typeof (SourceGenerationContext);
-
-        // First try for an exact type match
-        PropertyInfo? exactProperty = contextType.GetProperty (typeof (T).Name);
-
-        if (exactProperty != null
-            && exactProperty.PropertyType.IsGenericType
-            && exactProperty.PropertyType.GetGenericTypeDefinition () == typeof (JsonTypeInfo<>)
-            && exactProperty.PropertyType.GetGenericArguments () [0] == typeof (T))
-        {
-            return (JsonTypeInfo<T>?)exactProperty.GetValue (null);
-        }
-
-        // Then look for any compatible JsonTypeInfo
-        foreach (PropertyInfo prop in contextType.GetProperties (BindingFlags.Public | BindingFlags.Static))
-        {
-            if (prop.PropertyType.IsGenericType
-                && prop.PropertyType.GetGenericTypeDefinition () == typeof (JsonTypeInfo<>)
-                && prop.PropertyType.GetGenericArguments () [0].IsAssignableFrom (typeof (T)))
-            {
-                // This is a bit tricky - we've found a compatible type but need to cast it
-                // Warning: This might not work for all types and is a bit of a hack
-                return (JsonTypeInfo<T>?)prop.GetValue (null);
-            }
-        }
-
-        return null;
-    }
 
     #endregion AOT Support
 }
