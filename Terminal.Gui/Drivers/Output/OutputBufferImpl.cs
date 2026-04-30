@@ -10,14 +10,32 @@ namespace Terminal.Gui.Drivers;
 public class OutputBufferImpl : IOutputBuffer
 {
     /// <summary>
+    ///     Stable lock object for synchronizing access to <see cref="Contents"/>, <see cref="DirtyLines"/>,
+    ///     <see cref="Clip"/>, and related state. Unlike locking on <c>Contents</c> itself, this object is
+    ///     never replaced, guaranteeing mutual exclusion across <see cref="ClearContents()"/>,
+    ///     <see cref="AddGrapheme"/>, and <see cref="FillRect(Rectangle, Rune)"/>.
+    /// </summary>
+    private readonly Lock _contentsLock = new ();
+
+    private int _cols;
+    private int _rows;
+
+    /// <summary>
+    ///     Maps cell positions to URLs for OSC 8 hyperlink support.
+    ///     Only stores entries for cells that actually have URLs, minimizing memory overhead.
+    /// </summary>
+    private Dictionary<Point, string>? _urlMap;
+
+    private Rune _column1ReplacementChar = Glyphs.WideGlyphReplacement;
+
+    private Region? _clip;
+
+    /// <summary>
     ///     The contents of the application output. The driver outputs this buffer to the terminal when
     ///     UpdateScreen is called.
     ///     <remarks>The format of the array is rows, columns. The first index is the row, the second index is the column.</remarks>
     /// </summary>
     public Cell [,]? Contents { get; set; } = new Cell [0, 0];
-
-    private int _cols;
-    private int _rows;
 
     /// <summary>
     ///     The <see cref="Attribute"/> that will be used for the next <see cref="AddRune(Rune)"/> or <see cref="AddStr"/>
@@ -33,29 +51,17 @@ public class OutputBufferImpl : IOutputBuffer
     public string? CurrentUrl { get; set; }
 
     /// <summary>
-    ///     Maps cell positions to URLs for OSC 8 hyperlink support.
-    ///     Only stores entries for cells that actually have URLs, minimizing memory overhead.
-    /// </summary>
-    private Dictionary<Point, string>? _urlMap;
-
-    /// <summary>
     ///     Gets the URL associated with the cell at the specified position.
     /// </summary>
     /// <param name="col">The column.</param>
     /// <param name="row">The row.</param>
     /// <returns>The URL if one exists, otherwise null.</returns>
-    public string? GetCellUrl (int col, int row) => _urlMap?.TryGetValue (new Point (col, row), out string? url) == true ? url : null;
-
-    /// <summary>
-    ///     Sets the URL for the cell at the specified position.
-    /// </summary>
-    /// <param name="col">The column.</param>
-    /// <param name="row">The row.</param>
-    /// <param name="url">The URL to associate with this cell.</param>
-    private void SetCellUrl (int col, int row, string url)
+    public string? GetCellUrl (int col, int row)
     {
-        _urlMap ??= [];
-        _urlMap [new Point (col, row)] = url;
+        lock (_contentsLock)
+        {
+            return _urlMap?.TryGetValue (new Point (col, row), out string? url) == true ? url : null;
+        }
     }
 
     /// <summary>The leftmost column in the terminal.</summary>
@@ -98,8 +104,6 @@ public class OutputBufferImpl : IOutputBuffer
     /// <summary>The topmost row in the terminal.</summary>
     public virtual int Top { get; set; } = 0;
 
-    private Rune _column1ReplacementChar = Glyphs.WideGlyphReplacement;
-
     /// <inheritdoc/>
     public void SetWideGlyphReplacement (Rune column1ReplacementChar) => _column1ReplacementChar = column1ReplacementChar;
 
@@ -107,12 +111,6 @@ public class OutputBufferImpl : IOutputBuffer
     ///     Indicates which lines have been modified and need to be redrawn.
     /// </summary>
     public bool [] DirtyLines { get; set; } = [];
-
-    // QUESTION: When non-full screen apps are supported, will this represent the app size, or will that be in Application?
-    /// <summary>Gets the location and size of the terminal screen.</summary>
-    internal Rectangle Screen => new (0, 0, Cols, Rows);
-
-    private Region? _clip;
 
     /// <summary>
     ///     Gets or sets the clip rectangle that <see cref="AddRune(Rune)"/> and <see cref="AddStr(string)"/> are subject
@@ -177,223 +175,8 @@ public class OutputBufferImpl : IOutputBuffer
         }
     }
 
-    /// <summary>
-    ///     Adds a single grapheme to the display at the current cursor position.
-    /// </summary>
-    /// <param name="grapheme">The grapheme to add.</param>
-    private void AddGrapheme (string grapheme)
-    {
-        if (Contents is null)
-        {
-            return;
-        }
-
-        Clip ??= new Region (Screen);
-        Rectangle clipRect = Clip!.GetBounds ();
-
-        int printableGraphemeWidth = -1;
-
-        lock (Contents)
-        {
-            if (IsValidLocation (grapheme, Col, Row))
-            {
-                // Set attribute and mark dirty for current cell
-                SetAttributeAndDirty (Col, Row);
-                InvalidateOverlappedWideGlyph (Col, Row);
-
-                string printableGrapheme = grapheme.MakePrintable ();
-                printableGraphemeWidth = printableGrapheme.GetColumns ();
-                WriteGraphemeByWidth (Col, Row, printableGrapheme, printableGraphemeWidth, clipRect);
-
-                DirtyLines [Row] = true;
-            }
-
-            // Always advance cursor (even if location was invalid)
-            // Keep Col/Row updates inside the lock to prevent race conditions
-            Col++;
-
-            if (printableGraphemeWidth <= 1)
-            {
-                return;
-            }
-
-            // Skip the second column of a wide character
-            // See issue: https://github.com/gui-cs/Terminal.Gui/issues/4492
-            // Test: AddStr_WideGlyph_Second_Column_Attribute_Outputs_Correctly
-            // Test: AddStr_WideGlyph_Second_Column_Attribute_Set_When_In_Clip
-            if (Clip.Contains (Col, Row))
-            {
-                // Mark dirty only if the attribute is actually changing, to avoid
-                // invalidating overlapped content unnecessarily (see #4258).
-                if (Contents [Row, Col].Attribute != CurrentAttribute)
-                {
-                    Contents [Row, Col].Attribute = CurrentAttribute;
-                    Contents [Row, Col].IsDirty = true;
-                }
-            }
-
-            // Advance cursor again for wide character
-            Col++;
-        }
-    }
-
-    /// <summary>
-    ///     INTERNAL: Helper to set the attribute and mark the cell as dirty.
-    /// </summary>
-    /// <param name="col">The column.</param>
-    /// <param name="row">The row.</param>
-    private void SetAttributeAndDirty (int col, int row)
-    {
-        Contents! [row, col].Attribute = CurrentAttribute;
-        Contents [row, col].IsDirty = true;
-
-        // If CurrentUrl is set, store it in the URL map
-        if (!string.IsNullOrEmpty (CurrentUrl))
-        {
-            SetCellUrl (col, row, CurrentUrl);
-        }
-    }
-
-    /// <summary>
-    ///     INTERNAL: If we're writing at an odd column and there's a wide glyph to our left,
-    ///     invalidate it since we're overwriting the second half.
-    /// </summary>
-    /// <param name="col">The column.</param>
-    /// <param name="row">The row.</param>
-    private void InvalidateOverlappedWideGlyph (int col, int row)
-    {
-        if (col <= 0 || Contents! [row, col - 1].Grapheme.GetColumns () <= 1)
-        {
-            return;
-        }
-        Contents [row, col - 1].Grapheme = _column1ReplacementChar.ToString ();
-        Contents [row, col - 1].IsDirty = true;
-    }
-
-    /// <summary>
-    ///     INTERNAL: Writes a Grapheme to the buffer based on its width (0, 1, or 2 columns).
-    /// </summary>
-    /// <param name="col">The column.</param>
-    /// <param name="row">The row.</param>
-    /// <param name="text">The printable text to write.</param>
-    /// <param name="textWidth">The column width of the text.</param>
-    /// <param name="clipRect">The clipping rectangle.</param>
-    private void WriteGraphemeByWidth (int col, int row, string text, int textWidth, Rectangle clipRect)
-    {
-        switch (textWidth)
-        {
-            case 0:
-            case 1:
-                WriteGrapheme (col, row, text, clipRect);
-
-                break;
-
-            case 2:
-                WriteWideGrapheme (col, row, text);
-
-                break;
-
-            default:
-                // Negative width or non-spacing character (shouldn't normally occur)
-                Contents! [row, col].Grapheme = " ";
-                Contents [row, col].IsDirty = false;
-
-                break;
-        }
-    }
-
-    /// <summary>
-    ///     INTERNAL: Writes a (0 or 1 column wide) Grapheme.
-    /// </summary>
-    /// <param name="col">The column.</param>
-    /// <param name="row">The row.</param>
-    /// <param name="grapheme">The single-width Grapheme to write.</param>
-    /// <param name="clipRect">The clipping rectangle.</param>
-    private void WriteGrapheme (int col, int row, string grapheme, Rectangle clipRect)
-    {
-        Debug.Assert (grapheme.GetColumns () < 2);
-        Contents! [row, col].Grapheme = grapheme;
-
-        // Mark the next cell as dirty to ensure proper rendering of adjacent content
-        if (col < clipRect.Right - 1 && col + 1 < Cols)
-        {
-            Contents [row, col + 1].IsDirty = true;
-        }
-    }
-
-    /// <summary>
-    ///     INTERNAL: Writes a wide Grapheme (2 columns wide) handling clipping and partial overlap cases.
-    /// </summary>
-    /// <param name="col">The column.</param>
-    /// <param name="row">The row.</param>
-    /// <param name="grapheme">The wide Grapheme to write.</param>
-    private void WriteWideGrapheme (int col, int row, string grapheme)
-    {
-        Debug.Assert (grapheme.GetColumns () == 2);
-
-        if (!Clip!.Contains (col + 1, row))
-        {
-            // Second column is outside clip - can't fit wide char here
-            Contents! [row, col].Grapheme = _column1ReplacementChar.ToString ();
-        }
-        else
-        {
-            // Both columns are in bounds - write the wide character
-            // It will naturally render across both columns when output to the terminal
-            Contents! [row, col].Grapheme = grapheme;
-
-            // DO NOT modify column N+1 here!
-            // The wide glyph will naturally render across both columns.
-            // If we set column N+1 to replacement char, we would overwrite
-            // any content that was intentionally drawn there (like borders at odd columns).
-            // See: https://github.com/gui-cs/Terminal.Gui/issues/4258
-        }
-    }
-
-    /// <summary>
-    ///     Gets or sets a value indicating whether this buffer is operating in inline mode.
-    ///     When <see langword="true"/>, <see cref="ClearContents()"/> initialises cells with
-    ///     <c>IsDirty = false</c> so that only cells explicitly drawn are flushed to the
-    ///     terminal, leaving the rest of the visible terminal untouched.
-    /// </summary>
-    public bool InlineMode { get; set; }
-
     /// <summary>Clears the <see cref="Contents"/> of the driver.</summary>
     public void ClearContents () => ClearContents (!InlineMode);
-
-    /// <summary>Clears the <see cref="Contents"/> of the driver.</summary>
-    /// <param name="initiallyDirty">
-    ///     When <see langword="true"/> (the default), all cells are marked dirty so the first render
-    ///     overwrites the entire screen. When <see langword="false"/> (used in inline mode), cells start
-    ///     clean so only cells that are explicitly drawn will be flushed, leaving the rest of the terminal
-    ///     untouched.
-    /// </param>
-    public void ClearContents (bool initiallyDirty)
-    {
-        Contents = new Cell [Rows, Cols];
-
-        // CONCURRENCY: Unsynchronized access to Clip isn't safe.
-        // TODO: ClearContents should not clear the clip; it should only clear the contents. Move clearing it elsewhere.
-        Clip = new Region (Screen);
-
-        DirtyLines = new bool [Rows];
-
-        // Clear the URL map
-        _urlMap?.Clear ();
-
-        lock (Contents)
-        {
-            for (var row = 0; row < Rows; row++)
-            {
-                for (var c = 0; c < Cols; c++)
-                {
-                    Contents [row, c] = new Cell { Grapheme = " ", Attribute = new Attribute (Color.White, Color.Black), IsDirty = initiallyDirty };
-                }
-
-                DirtyLines [row] = initiallyDirty;
-            }
-        }
-    }
 
     /// <summary>Tests whether the specified coordinate are valid for drawing the specified Text.</summary>
     /// <param name="text">Used to determine if one or two columns are required.</param>
@@ -413,21 +196,29 @@ public class OutputBufferImpl : IOutputBuffer
     /// <inheritdoc/>
     public void SetSize (int cols, int rows)
     {
-        Cols = cols;
-        Rows = rows;
-        ClearContents ();
+        lock (_contentsLock)
+        {
+            _cols = cols;
+            _rows = rows;
+            ClearContentsCore (!InlineMode);
+        }
     }
 
     /// <inheritdoc/>
     public void FillRect (Rectangle rect, Rune rune)
     {
-        Rectangle clipBounds = Clip?.GetBounds () ?? Screen;
-
-        // BUGBUG: This should be a method on Region
-        rect = Rectangle.Intersect (rect, clipBounds);
-
-        lock (Contents!)
+        lock (_contentsLock)
         {
+            if (Contents is null)
+            {
+                return;
+            }
+
+            Clip ??= new Region (Screen);
+            Rectangle clipBounds = Clip!.GetBounds ();
+
+            rect = Rectangle.Intersect (rect, clipBounds);
+
             for (int r = rect.Y; r < rect.Y + rect.Height; r++)
             {
                 for (int c = rect.X; c < rect.X + rect.Width; c++)
@@ -478,5 +269,243 @@ public class OutputBufferImpl : IOutputBuffer
     {
         Col = col;
         Row = row;
+    }
+
+    /// <summary>Clears the <see cref="Contents"/> of the driver.</summary>
+    /// <param name="initiallyDirty">
+    ///     When <see langword="true"/> (the default), all cells are marked dirty so the first render
+    ///     overwrites the entire screen. When <see langword="false"/> (used in inline mode), cells start
+    ///     clean so only cells that are explicitly drawn will be flushed, leaving the rest of the terminal
+    ///     untouched.
+    /// </param>
+    public void ClearContents (bool initiallyDirty)
+    {
+        lock (_contentsLock)
+        {
+            ClearContentsCore (initiallyDirty);
+        }
+    }
+
+    /// <summary>
+    ///     Non-locking implementation of <see cref="ClearContents(bool)"/>.
+    ///     Caller must already hold <see cref="_contentsLock"/>.
+    /// </summary>
+    private void ClearContentsCore (bool initiallyDirty)
+    {
+        Contents = new Cell [Rows, Cols];
+
+        // TODO: ClearContents should not clear the clip; it should only clear the contents. Move clearing it elsewhere.
+        Clip = new Region (Screen);
+
+        DirtyLines = new bool [Rows];
+
+        // Clear the URL map
+        _urlMap?.Clear ();
+
+        for (var row = 0; row < Rows; row++)
+        {
+            for (var c = 0; c < Cols; c++)
+            {
+                Contents [row, c] = new Cell { Grapheme = " ", Attribute = new Attribute (Color.White, Color.Black), IsDirty = initiallyDirty };
+            }
+
+            DirtyLines [row] = initiallyDirty;
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets a value indicating whether this buffer is operating in inline mode.
+    ///     When <see langword="true"/>, <see cref="ClearContents()"/> initialises cells with
+    ///     <c>IsDirty = false</c> so that only cells explicitly drawn are flushed to the
+    ///     terminal, leaving the rest of the visible terminal untouched.
+    /// </summary>
+    public bool InlineMode { get; set; }
+
+    /// <summary>Gets the location and size of the terminal screen.</summary>
+    internal Rectangle Screen => new (0, 0, Cols, Rows);
+
+    /// <summary>
+    ///     Adds a single grapheme to the display at the current cursor position.
+    /// </summary>
+    /// <param name="grapheme">The grapheme to add.</param>
+    private void AddGrapheme (string grapheme)
+    {
+        lock (_contentsLock)
+        {
+            if (Contents is null)
+            {
+                return;
+            }
+
+            Clip ??= new Region (Screen);
+            Rectangle clipRect = Clip!.GetBounds ();
+
+            int printableGraphemeWidth = -1;
+
+            if (IsValidLocation (grapheme, Col, Row))
+            {
+                // Set attribute and mark dirty for current cell
+                SetAttributeAndDirty (Col, Row);
+                InvalidateOverlappedWideGlyph (Col, Row);
+
+                string printableGrapheme = grapheme.MakePrintable ();
+                printableGraphemeWidth = printableGrapheme.GetColumns ();
+                WriteGraphemeByWidth (Col, Row, printableGrapheme, printableGraphemeWidth, clipRect);
+
+                DirtyLines [Row] = true;
+            }
+
+            // Always advance cursor (even if location was invalid)
+            // Keep Col/Row updates inside the lock to prevent race conditions
+            Col++;
+
+            if (printableGraphemeWidth <= 1)
+            {
+                return;
+            }
+
+            // Skip the second column of a wide character
+            // See issue: https://github.com/gui-cs/Terminal.Gui/issues/4492
+            // Test: AddStr_WideGlyph_Second_Column_Attribute_Outputs_Correctly
+            // Test: AddStr_WideGlyph_Second_Column_Attribute_Set_When_In_Clip
+            if (Clip.Contains (Col, Row))
+            {
+                // Mark dirty only if the attribute is actually changing, to avoid
+                // invalidating overlapped content unnecessarily (see #4258).
+                if (Contents [Row, Col].Attribute != CurrentAttribute)
+                {
+                    Contents [Row, Col].Attribute = CurrentAttribute;
+                    Contents [Row, Col].IsDirty = true;
+                }
+            }
+
+            // Advance cursor again for wide character
+            Col++;
+        }
+    }
+
+    /// <summary>
+    ///     INTERNAL: If we're writing at an odd column and there's a wide glyph to our left,
+    ///     invalidate it since we're overwriting the second half.
+    /// </summary>
+    /// <param name="col">The column.</param>
+    /// <param name="row">The row.</param>
+    private void InvalidateOverlappedWideGlyph (int col, int row)
+    {
+        if (col <= 0 || Contents! [row, col - 1].Grapheme.GetColumns () <= 1)
+        {
+            return;
+        }
+        Contents [row, col - 1].Grapheme = _column1ReplacementChar.ToString ();
+        Contents [row, col - 1].IsDirty = true;
+    }
+
+    /// <summary>
+    ///     INTERNAL: Helper to set the attribute and mark the cell as dirty.
+    /// </summary>
+    /// <param name="col">The column.</param>
+    /// <param name="row">The row.</param>
+    private void SetAttributeAndDirty (int col, int row)
+    {
+        Contents! [row, col].Attribute = CurrentAttribute;
+        Contents [row, col].IsDirty = true;
+
+        // If CurrentUrl is set, store it in the URL map
+        if (!string.IsNullOrEmpty (CurrentUrl))
+        {
+            SetCellUrl (col, row, CurrentUrl);
+        }
+    }
+
+    /// <summary>
+    ///     Sets the URL for the cell at the specified position.
+    /// </summary>
+    /// <param name="col">The column.</param>
+    /// <param name="row">The row.</param>
+    /// <param name="url">The URL to associate with this cell.</param>
+    private void SetCellUrl (int col, int row, string url)
+    {
+        _urlMap ??= [];
+        _urlMap [new Point (col, row)] = url;
+    }
+
+    /// <summary>
+    ///     INTERNAL: Writes a (0 or 1 column wide) Grapheme.
+    /// </summary>
+    /// <param name="col">The column.</param>
+    /// <param name="row">The row.</param>
+    /// <param name="grapheme">The single-width Grapheme to write.</param>
+    /// <param name="clipRect">The clipping rectangle.</param>
+    private void WriteGrapheme (int col, int row, string grapheme, Rectangle clipRect)
+    {
+        Debug.Assert (grapheme.GetColumns () < 2);
+        Contents! [row, col].Grapheme = grapheme;
+
+        // Mark the next cell as dirty to ensure proper rendering of adjacent content
+        if (col < clipRect.Right - 1 && col + 1 < Cols)
+        {
+            Contents [row, col + 1].IsDirty = true;
+        }
+    }
+
+    /// <summary>
+    ///     INTERNAL: Writes a Grapheme to the buffer based on its width (0, 1, or 2 columns).
+    /// </summary>
+    /// <param name="col">The column.</param>
+    /// <param name="row">The row.</param>
+    /// <param name="text">The printable text to write.</param>
+    /// <param name="textWidth">The column width of the text.</param>
+    /// <param name="clipRect">The clipping rectangle.</param>
+    private void WriteGraphemeByWidth (int col, int row, string text, int textWidth, Rectangle clipRect)
+    {
+        switch (textWidth)
+        {
+            case 0:
+            case 1:
+                WriteGrapheme (col, row, text, clipRect);
+
+                break;
+
+            case 2:
+                WriteWideGrapheme (col, row, text);
+
+                break;
+
+            default:
+                // Negative width or non-spacing character (shouldn't normally occur)
+                Contents! [row, col].Grapheme = " ";
+                Contents [row, col].IsDirty = false;
+
+                break;
+        }
+    }
+
+    /// <summary>
+    ///     INTERNAL: Writes a wide Grapheme (2 columns wide) handling clipping and partial overlap cases.
+    /// </summary>
+    /// <param name="col">The column.</param>
+    /// <param name="row">The row.</param>
+    /// <param name="grapheme">The wide Grapheme to write.</param>
+    private void WriteWideGrapheme (int col, int row, string grapheme)
+    {
+        Debug.Assert (grapheme.GetColumns () == 2);
+
+        if (!Clip!.Contains (col + 1, row))
+        {
+            // Second column is outside clip - can't fit wide char here
+            Contents! [row, col].Grapheme = _column1ReplacementChar.ToString ();
+        }
+        else
+        {
+            // Both columns are in bounds - write the wide character
+            // It will naturally render across both columns when output to the terminal
+            Contents! [row, col].Grapheme = grapheme;
+
+            // DO NOT modify column N+1 here!
+            // The wide glyph will naturally render across both columns.
+            // If we set column N+1 to replacement char, we would overwrite
+            // any content that was intentionally drawn there (like borders at odd columns).
+            // See: https://github.com/gui-cs/Terminal.Gui/issues/4258
+        }
     }
 }

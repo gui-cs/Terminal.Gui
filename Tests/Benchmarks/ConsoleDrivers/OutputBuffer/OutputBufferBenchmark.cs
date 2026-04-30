@@ -27,7 +27,7 @@ public class OutputBufferBenchmark
     [GlobalSetup]
     public void Setup ()
     {
-        _buffer = new OutputBufferImpl ();
+        _buffer = new ();
         _buffer.SetSize (Cols, Rows);
         _buffer.CurrentAttribute = new Attribute (Color.White, Color.Black);
     }
