@@ -344,6 +344,7 @@ public sealed class FormWindow : Runnable
 3. **Instance-based app** — `Application.Create ().Init ()` returns `IApplication`
 4. **`App!.RequestStop ()`** — Not `Application.RequestStop ()`
 5. **SubView/SuperView** — Never "child"/"parent"/"container" in docs/discussion
+6. **Docs instruction style** — In reference/how-to/API docs, write `To [goal], [imperative action].` Avoid `When/If you want/need to ...` unless describing a real condition.
 
 ### Code Style (Library Contributors Only)
 

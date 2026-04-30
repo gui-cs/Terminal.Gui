@@ -1,6 +1,26 @@
-Terminal.Gui is a cross-platform UI toolkit for building sophisticated terminal UI (TUI) applications on Windows, macOS, and Linux/Unix.
+# Terminal.Gui
 
-![Sample app](~/images/sample.gif)
+Cross-platform UI toolkit for building sophisticated terminal UI (TUI) applications on Windows, macOS, and Linux/Unix.
+
+![Terminal.Gui — cross-platform TUI toolkit for .NET. Build full-featured terminal UIs with menus, forms, tables, charts, wizards and file dialogs. 30+ stars, Windows / macOS / Linux, MIT-licensed.](~/images/hero.gif)
+
+# Version 2.0 Has Been Released
+
+Terminal.Gui enables building sophisticated console applications with modern UIs:
+
+- **Responsive TUI** - Easy to use, innovative, layout system enables console apps as responsive as any responsive web page.
+- **Performant and Scalable** - Built for modern TUIs - fast, double-buffering-based rendering; Tables and Tree Views scale to infinite elements with sorting and filtering.
+- **Keyboard First; Mouse First Too** - Optimized for TUI experiences where the user's hands never need to leave the keyboard; full mouse support too.
+- **Rich Built-in Widgets (Views)** - Text editors, buttons, checkboxes, trees, tables, markdown, linear ranges, menus, selectors, and more.
+- **Visualizations** - Charts, graphs, progress indicators, and color pickers with TrueColor support.
+- **Text Editors** - Full-featured text editing with clipboard, undo/redo, and Unicode support
+- **Fully Configurable** - Themes, colors, key bindings, and settings are all customizable and persistable.
+- **File Management** - File and directory browsers with search and filtering, supporting Nerdfonts and coloring.
+- **Wizards and Multi-Step Processes** - Guided workflows with navigation and validation.
+- **Cross-Platform** - Consistent experience on Windows, macOS, and Linux.
+- **Apps Work In-line or Full Screen** - Build CLI tools like Claude Code/Copilot/Codex CLI that scroll with the terminal (in-line) or full screen.
+
+See the [Views Overview](https://gui-cs.github.io/Terminal.Gui/docs/views) for available controls and [What's New in v2](https://gui-cs.github.io/Terminal.Gui/docs/newinv2) for architectural improvements.
 
 ## Quick Start
 
@@ -37,55 +57,23 @@ app.Run (window);
 
 See the [Examples](https://github.com/gui-cs/Terminal.Gui/tree/develop/Examples) directory for more.
 
-## Build Powerful Terminal Applications
+# Documentation 
 
-Terminal.Gui enables building sophisticated console applications with modern UIs:
+Comprehensive documentation is at [gui-cs.github.io/Terminal.Gui](https://gui-cs.github.io/Terminal.Gui).
 
-- **Rich Forms and Dialogs** - Text fields, buttons, checkboxes, radio buttons, and data validation
-- **Interactive Data Views** - Tables, lists, and trees with sorting, filtering, and in-place editing  
-- **Visualizations** - Charts, graphs, progress indicators, and color pickers with TrueColor support
-- **Text Editors** - Full-featured text editing with clipboard, undo/redo, and Unicode support
-- **File Management** - File and directory browsers with search and filtering
-- **Wizards and Multi-Step Processes** - Guided workflows with navigation and validation
-- **System Monitoring Tools** - Real-time dashboards with scrollable, resizable views
-- **Configuration UIs** - Settings editors with persistent themes and user preferences
-- **Cross-Platform CLI Tools** - Consistent experience on Windows, macOS, and Linux
-- **Server Management Interfaces** - SSH-compatible UIs for remote administration
+## Getting Started
 
-## Key Features
+- **[Getting Started Guide](https://gui-cs.github.io/Terminal.Gui/docs/getting-started)** - First Terminal.Gui application
+- **[API Reference](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.App.html)** - Complete API documentation
+- **[What's New in v2](https://gui-cs.github.io/Terminal.Gui/docs/newinv2)** - New features and improvements
 
-* **[Dozens of Built-in Views](~/docs/views.md)** - Rich set of controls for building complex user interfaces
+## Migration & Deep Dives
 
-* **[Cross Platform](~/docs/drivers.md)** - Windows, Mac, and Linux with terminal drivers that work on color and monochrome terminals, including over SSH
+- **[Migrating from v1 to v2](https://gui-cs.github.io/Terminal.Gui/docs/migratingfromv1)** - Complete migration guide
+- **[Application Architecture](https://gui-cs.github.io/Terminal.Gui/docs/application)** - Instance-based model and IRunnable pattern
+- **[Layout System](https://gui-cs.github.io/Terminal.Gui/docs/layout)** - Positioning, sizing, and adornments
+- **[Keyboard Handling](https://gui-cs.github.io/Terminal.Gui/docs/keyboard)** - Key bindings and commands
+- **[View Documentation](https://gui-cs.github.io/Terminal.Gui/docs/View)** - View hierarchy and lifecycle
+- **[Configuration](https://gui-cs.github.io/Terminal.Gui/docs/config)** - Themes and persistent settings
 
-* **[Powerful Layout Engine](~/docs/layout.md)** - Relative positioning, automatic sizing, and dynamic terminal UIs
-
-* **[Keyboard](~/docs/keyboard.md) and [Mouse](~/docs/mouse.md) Input** - Complete input handling with simple event-based API
-
-* **[Configuration System](~/docs/config.md)** - Machine, user, and app-level settings with themes and key bindings
-
-* **[Clipboard Support](~/api/Terminal.Gui.App.Clipboard.yml)** - Cut, Copy, and Paste across platforms
-
-* **[Multi-tasking](~/docs/multitasking.md)** - Event processing, idle handlers, timers, and thread-safe classes
-
-* **[Reactive Extensions](https://github.com/dotnet/reactive)** - MVVM pattern support with ReactiveUI data bindings
-
-## Installing
-
-### v2 Alpha (Recommended for new projects)
-
-```powershell
-dotnet add package Terminal.Gui --version "2.0.0-alpha.*"
-```
-
-### v2 Develop (Latest)
-
-```powershell
-dotnet add package Terminal.Gui --version "2.0.0-develop.*"
-```
-
-Or use the [Terminal.Gui.Templates](https://github.com/gui-cs/Terminal.Gui.templates):
-
-```powershell
-dotnet new install Terminal.Gui.Templates
-```
+See the [documentation index](https://gui-cs.github.io/Terminal.Gui/docs/index) for all topics.

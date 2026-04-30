@@ -1517,7 +1517,9 @@ public class TextFieldTests (ITestOutputHelper output) : TestDriverBase
         TextField tf = new () { Width = 20 };
         tf.SetFocus ();
 
-        Key altT = new (Key.T.WithAlt) { AssociatedText = "t" };
+        // Simulate Alt+T with AssociatedText set by Kitty keyboard protocol which in a real scenario would be set AssociatedText as empty string
+        // for Alt+letter keys, with the exception of AltGr+key which would set AssociatedText to "key" (e.g. "€" for AltGr+E)
+        Key altT = new (Key.T.WithAlt) { AssociatedText = "" };
         tf.NewKeyDownEvent (altT);
 
         Assert.Equal ("", tf.Text);

@@ -3960,7 +3960,9 @@ public class TextViewTests (ITestOutputHelper output)
         TextView tv = new () { Width = 20, Height = 5 };
         tv.SetFocus ();
 
-        Key altT = new (Key.T.WithAlt) { AssociatedText = "t" };
+        // Simulate Alt+T with AssociatedText set by Kitty keyboard protocol which in a real scenario would be set AssociatedText as empty string
+        // for Alt+letter keys, with the exception of AltGr+key which would set AssociatedText to "key" (e.g. "€" for AltGr+E)
+        Key altT = new (Key.T.WithAlt) { AssociatedText = "" };
         tv.NewKeyDownEvent (altT);
 
         Assert.Equal ("", tv.Text);

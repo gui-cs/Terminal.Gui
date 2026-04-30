@@ -508,6 +508,113 @@ public class TableViewTests : TestDriverBase
         Assert.True (result.GetColumns () <= 4, $"Truncated result '{result}' exceeds available space");
     }
 
+    // Claude - Opus 4.5 — regression for issue #5075
+    // When ShowVerticalCellLines is false AND a custom ColorGetter is used, the position between cells
+    // (the separator column, current.X - 1) was being overdrawn with a space using the row's normal
+    // scheme. This punched a 1-cell hole in the cell's custom color. The fix skips the separator draw
+    // when the symbol would be the default space and lines are off — the cell padding has already
+    // filled that position with the cell's color.
+    [Fact]
+    public void ShowVerticalCellLines_False_WithCustomColorGetter_PreservesCellColorAtSeparator ()
+    {
+        IDriver driver = CreateTestDriver (40, 5);
+
+        TableView tableView = new () { Driver = driver };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
+        tableView.Viewport = new Rectangle (0, 0, 40, 5);
+
+        tableView.Style.ShowHeaders = true;
+        tableView.Style.ShowHorizontalHeaderUnderline = false;
+        tableView.Style.ShowHorizontalHeaderOverline = false;
+        tableView.Style.AlwaysShowHeaders = true;
+        tableView.Style.ShowVerticalCellLines = false;
+        tableView.Style.ShowVerticalHeaderLines = false;
+        tableView.Style.ExpandLastColumn = false;
+        tableView.FullRowSelect = false;
+
+        // A custom scheme that is visibly distinct from the row scheme.
+        Scheme customScheme = new ()
+        {
+            Normal = new Attribute (Color.White, Color.Red),
+            Focus = new Attribute (Color.Red, Color.White),
+            HotNormal = new Attribute (Color.White, Color.Red),
+            HotFocus = new Attribute (Color.Red, Color.White),
+            Disabled = new Attribute (Color.White, Color.Red),
+            Active = new Attribute (Color.White, Color.Red)
+        };
+
+        tableView.Style.GetOrCreateColumnStyle (0).ColorGetter = _ => customScheme;
+        tableView.Style.GetOrCreateColumnStyle (1).ColorGetter = _ => customScheme;
+
+        DataTable dt = new ();
+        dt.Columns.Add ("A");
+        dt.Columns.Add ("B");
+        dt.Rows.Add ("aa", "bb");
+        tableView.Table = new DataTableSource (dt);
+
+        tableView.Layout ();
+        tableView.SetClipToScreen ();
+        tableView.Draw ();
+
+        // Find the row that contains the data ("aa" then "bb").
+        Cell [,] contents = driver.Contents!;
+        var dataRow = -1;
+
+        for (var r = 0; r < 5; r++)
+        {
+            var rowText = string.Empty;
+
+            for (var c = 0; c < 10; c++)
+            {
+                rowText += contents [r, c].Grapheme;
+            }
+
+            if (rowText.Contains ("aa") && rowText.Contains ("bb"))
+            {
+                dataRow = r;
+
+                break;
+            }
+        }
+
+        Assert.True (dataRow >= 0, "Expected a rendered data row containing 'aa' and 'bb'");
+
+        // Locate the columns for "aa" and "bb".
+        var aaCol = -1;
+        var bbCol = -1;
+
+        for (var c = 0; c < 39; c++)
+        {
+            if (aaCol < 0 && contents [dataRow, c].Grapheme == "a" && contents [dataRow, c + 1].Grapheme == "a")
+            {
+                aaCol = c;
+            }
+
+            if (bbCol < 0 && contents [dataRow, c].Grapheme == "b" && contents [dataRow, c + 1].Grapheme == "b")
+            {
+                bbCol = c;
+            }
+        }
+
+        Assert.True (aaCol >= 0 && bbCol > aaCol + 1, $"Expected 'aa' before 'bb'. aaCol={aaCol}, bbCol={bbCol}");
+
+        // The cells "aa" and "bb" must use the custom red background.
+        Assert.Equal (customScheme.Normal, contents [dataRow, aaCol].Attribute);
+        Assert.Equal (customScheme.Normal, contents [dataRow, bbCol].Attribute);
+
+        // The separator position is the gap between the end of "aa" and the start of "bb".
+        // Before the fix, this position was overdrawn with the row scheme attribute.
+        // After the fix, the cell padding's custom red attribute remains.
+        for (int c = aaCol + 2; c < bbCol; c++)
+        {
+            Assert.Equal (customScheme.Normal, contents [dataRow, c].Attribute);
+        }
+
+        tableView.Dispose ();
+    }
+
     [Fact]
     public void Test_CalculateMaxCellWidth_UsesGraphemeWidth ()
     {
@@ -548,5 +655,116 @@ public class TableViewTests : TestDriverBase
                      } suggests over-sized column. Header: '{
                          headerRow
                      }'");
+    }
+
+    // Copilot
+    // Verifies fix for #5072: a column with very wide content must not consume all viewport space
+    // and push later columns off-screen. Each subsequent visible column should be reserved at least
+    // its header width.
+    [Fact]
+    public void Calculate_WideColumn_DoesNotStarveLaterColumns ()
+    {
+        DataTable dt = new ();
+        dt.Columns.Add ("Description");
+        dt.Columns.Add ("Status");
+        dt.Columns.Add ("Owner");
+        dt.Rows.Add (new string ('x', 200), "ok", "me");
+
+        using TableView tableView = new ()
+        {
+            Table = new DataTableSource (dt),
+            Viewport = new Rectangle (0, 0, 40, 5)
+        };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.RefreshContentSize ();
+
+        TableView.ColumnToRender [] columns = GetColumnsToRender (tableView);
+
+        Assert.Equal (3, columns.Length);
+
+        // Description must be clamped so that Status and Owner fit
+        TableView.ColumnToRender description = columns [0];
+        TableView.ColumnToRender status = columns [1];
+        TableView.ColumnToRender owner = columns [2];
+
+        Assert.True (description.X >= 0);
+        Assert.True (status.X > description.X);
+        Assert.True (owner.X > status.X);
+
+        // Every column's right edge must lie within the viewport
+        Assert.True (description.X + description.Width - 1 < tableView.Viewport.Width,
+                     $"Description right edge {description.X + description.Width - 1} exceeds viewport {tableView.Viewport.Width}");
+        Assert.True (status.X + status.Width - 1 < tableView.Viewport.Width,
+                     $"Status right edge {status.X + status.Width - 1} exceeds viewport {tableView.Viewport.Width}");
+        Assert.True (owner.X + owner.Width - 1 < tableView.Viewport.Width,
+                     $"Owner right edge {owner.X + owner.Width - 1} exceeds viewport {tableView.Viewport.Width}");
+
+        // Status and Owner each must have at least header-width room (excluding separator)
+        Assert.True (status.Width - 1 >= "Status".Length, $"Status got width {status.Width - 1}");
+        Assert.True (owner.Width - 1 >= "Owner".Length, $"Owner got width {owner.Width - 1}");
+    }
+
+    // Copilot
+    // When the viewport is too small to fit even minimum widths for every column, layout falls back
+    // to the prior left-to-right packing (columns may extend past the viewport, accessible via
+    // horizontal scrolling).
+    [Fact]
+    public void Calculate_NarrowViewport_StillProducesLayout ()
+    {
+        DataTable dt = new ();
+        dt.Columns.Add ("Description");
+        dt.Columns.Add ("Status");
+        dt.Columns.Add ("Owner");
+        dt.Rows.Add (new string ('x', 50), "ok", "me");
+
+        using TableView tableView = new ()
+        {
+            Table = new DataTableSource (dt),
+            Viewport = new Rectangle (0, 0, 10, 5)
+        };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.RefreshContentSize ();
+
+        TableView.ColumnToRender [] columns = GetColumnsToRender (tableView);
+
+        Assert.Equal (3, columns.Length);
+
+        // Each column should have a positive width
+        Assert.All (columns, c => Assert.True (c.Width > 0, $"Column {c.Column} got non-positive width {c.Width}"));
+    }
+
+    // Copilot
+    // Single-column tables should still expand to fill the viewport when ExpandLastColumn is true.
+    [Fact]
+    public void Calculate_SingleColumn_StillExpandsLastColumn ()
+    {
+        DataTable dt = new ();
+        dt.Columns.Add ("Only");
+        dt.Rows.Add ("hi");
+
+        using TableView tableView = new ()
+        {
+            Table = new DataTableSource (dt),
+            Viewport = new Rectangle (0, 0, 30, 5)
+        };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.RefreshContentSize ();
+
+        TableView.ColumnToRender [] columns = GetColumnsToRender (tableView);
+
+        Assert.Single (columns);
+        Assert.True (columns [0].Width >= tableView.Viewport.Width - 2,
+                     $"Single column width {columns [0].Width} should fill viewport {tableView.Viewport.Width}");
+    }
+
+    private static TableView.ColumnToRender [] GetColumnsToRender (TableView tableView)
+    {
+        FieldInfo? field = typeof (TableView).GetField ("_columnsToRenderCache", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull (field);
+
+        return (TableView.ColumnToRender []?)field!.GetValue (tableView) ?? [];
     }
 }

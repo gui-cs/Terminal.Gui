@@ -29,7 +29,7 @@ public partial class FileDialog
 
     /// <summary>Select <paramref name="toRestore"/> in the table view (if present)</summary>
     /// <param name="toRestore"></param>
-    internal void RestoreSelection (IFileSystemInfo toRestore)
+    internal void RestoreSelection (IFileSystemInfo? toRestore)
     {
         int row = State!.Children.IndexOf (r => r.FileSystemInfo == toRestore);
         _tableView.SetSelection (0, row >= 0 ? row : 0, false);
@@ -78,7 +78,10 @@ public partial class FileDialog
             PushState (dir.Parent, true, false);
         }
 
-        _tbPath.Autocomplete?.GenerateSuggestions (new AutocompleteFilepathContext (_tbPath.Text, _tbPath.InsertionPoint, State));
+        if (State is { })
+        {
+            _tbPath.Autocomplete?.GenerateSuggestions (new AutocompleteFilepathContext (_tbPath.Text, _tbPath.InsertionPoint, State));
+        }
     }
 
     private void PushState (FileDialogState newState, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true, string? pathText = null)
@@ -189,7 +192,7 @@ public partial class FileDialog
         return _fileSystem!.DirectoryInfo.New (path);
     }
 
-    private void SuppressIfBadChar (Key k)
+    private static void SuppressIfBadChar (Key k)
     {
         // don't let user type bad letters
         var ch = (char)k;
@@ -211,7 +214,7 @@ public partial class FileDialog
 
         if (selected is IDirectoryInfo && Style.PreserveFilenameOnDirectoryChanges)
         {
-            if (!string.IsNullOrWhiteSpace (Path) && !_fileSystem!.Directory.Exists (Path))
+            if (!string.IsNullOrWhiteSpace (Path) && _fileSystem is { } && !_fileSystem.Directory.Exists (Path))
             {
                 string currentFile = _fileSystem.Path.GetFileName (Path);
 

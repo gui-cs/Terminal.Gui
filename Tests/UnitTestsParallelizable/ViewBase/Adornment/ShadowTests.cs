@@ -128,7 +128,7 @@ public class ShadowTests (ITestOutputHelper output)
         Assert.Equal (new Thickness (0, 0, 2, 2), view.Margin.Thickness);
 
         view.ShadowStyle = null;
-        Assert.Equal (new Size (2, 2), (view.Margin.View as MarginView)?.ShadowSize);
+        Assert.Equal (Size.Empty, (view.Margin.View as MarginView)?.ShadowSize);
         Assert.Equal (new Thickness (0, 0, 0, 0), view.Margin.Thickness);
 
         view.ShadowStyle = ShadowStyles.Opaque;
@@ -576,5 +576,63 @@ public class ShadowTests (ITestOutputHelper output)
                                            """,
                                            output,
                                            app.Driver);
+    }
+
+    /// <summary>
+    ///     Proves Issue #5088: ShadowStyle getter returns an inherited value from
+    ///     SuperView even though no shadow was ever set on the view itself. Reading the
+    ///     value and writing it back should be a no-op, but instead it creates a
+    ///     MarginView and adds shadow thickness.
+    /// </summary>
+    [Fact]
+    public void ShadowStyle_Getter_Does_Not_Inherit_From_SuperView ()
+    {
+        // Explicitly give the SuperView a transparent shadow for this inheritance test.
+        Window superView = new () { Width = 20, Height = 10, ShadowStyle = ShadowStyles.Transparent };
+
+        View child = new () { Width = 5, Height = 3 };
+        superView.Add (child);
+
+        // The subview was never assigned a ShadowStyle - it must be null.
+        Assert.Null (child.Margin.ShadowStyle);
+        Assert.Null (child.ShadowStyle);
+
+        // Round-trip: reading and writing back should be a safe no-op.
+        ShadowStyles? readBack = child.ShadowStyle;
+        child.ShadowStyle = readBack;
+
+        // After the round-trip the subview must still have no shadow and no Margin thickness.
+        Assert.Null (child.ShadowStyle);
+        Assert.Equal (Thickness.Empty, child.Margin.Thickness);
+
+        // MarginView should NOT have been created by a no-op assignment.
+        Assert.Null (child.Margin.View);
+
+        child.Dispose ();
+        superView.Dispose ();
+    }
+
+    /// <summary>
+    ///     Proves that setting ShadowStyle to null resets ShadowSize on the MarginView
+    ///     to <see cref="Size.Empty"/>, so that state is consistent when no shadow is active.
+    /// </summary>
+    [Fact]
+    public void Setting_ShadowStyle_Null_Resets_ShadowSize ()
+    {
+        View view = new ();
+
+        // Set a shadow - this creates a MarginView with ShadowSize {1,1}.
+        view.ShadowStyle = ShadowStyles.Transparent;
+        var marginView = view.Margin.View as MarginView;
+        Assert.NotNull (marginView);
+        Assert.Equal (new Size (1, 1), marginView.ShadowSize);
+
+        // Now clear the shadow.
+        view.ShadowStyle = null;
+
+        // ShadowSize should be reset to Empty - no residual state.
+        Assert.Equal (Size.Empty, marginView.ShadowSize);
+
+        view.Dispose ();
     }
 }
