@@ -508,6 +508,113 @@ public class TableViewTests : TestDriverBase
         Assert.True (result.GetColumns () <= 4, $"Truncated result '{result}' exceeds available space");
     }
 
+    // Claude - Opus 4.5 — regression for issue #5075
+    // When ShowVerticalCellLines is false AND a custom ColorGetter is used, the position between cells
+    // (the separator column, current.X - 1) was being overdrawn with a space using the row's normal
+    // scheme. This punched a 1-cell hole in the cell's custom color. The fix skips the separator draw
+    // when the symbol would be the default space and lines are off — the cell padding has already
+    // filled that position with the cell's color.
+    [Fact]
+    public void ShowVerticalCellLines_False_WithCustomColorGetter_PreservesCellColorAtSeparator ()
+    {
+        IDriver driver = CreateTestDriver (40, 5);
+
+        TableView tableView = new () { Driver = driver };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
+        tableView.Viewport = new Rectangle (0, 0, 40, 5);
+
+        tableView.Style.ShowHeaders = true;
+        tableView.Style.ShowHorizontalHeaderUnderline = false;
+        tableView.Style.ShowHorizontalHeaderOverline = false;
+        tableView.Style.AlwaysShowHeaders = true;
+        tableView.Style.ShowVerticalCellLines = false;
+        tableView.Style.ShowVerticalHeaderLines = false;
+        tableView.Style.ExpandLastColumn = false;
+        tableView.FullRowSelect = false;
+
+        // A custom scheme that is visibly distinct from the row scheme.
+        Scheme customScheme = new ()
+        {
+            Normal = new Attribute (Color.White, Color.Red),
+            Focus = new Attribute (Color.Red, Color.White),
+            HotNormal = new Attribute (Color.White, Color.Red),
+            HotFocus = new Attribute (Color.Red, Color.White),
+            Disabled = new Attribute (Color.White, Color.Red),
+            Active = new Attribute (Color.White, Color.Red)
+        };
+
+        tableView.Style.GetOrCreateColumnStyle (0).ColorGetter = _ => customScheme;
+        tableView.Style.GetOrCreateColumnStyle (1).ColorGetter = _ => customScheme;
+
+        DataTable dt = new ();
+        dt.Columns.Add ("A");
+        dt.Columns.Add ("B");
+        dt.Rows.Add ("aa", "bb");
+        tableView.Table = new DataTableSource (dt);
+
+        tableView.Layout ();
+        tableView.SetClipToScreen ();
+        tableView.Draw ();
+
+        // Find the row that contains the data ("aa" then "bb").
+        Cell [,] contents = driver.Contents!;
+        var dataRow = -1;
+
+        for (var r = 0; r < 5; r++)
+        {
+            var rowText = string.Empty;
+
+            for (var c = 0; c < 10; c++)
+            {
+                rowText += contents [r, c].Grapheme;
+            }
+
+            if (rowText.Contains ("aa") && rowText.Contains ("bb"))
+            {
+                dataRow = r;
+
+                break;
+            }
+        }
+
+        Assert.True (dataRow >= 0, "Expected a rendered data row containing 'aa' and 'bb'");
+
+        // Locate the columns for "aa" and "bb".
+        var aaCol = -1;
+        var bbCol = -1;
+
+        for (var c = 0; c < 39; c++)
+        {
+            if (aaCol < 0 && contents [dataRow, c].Grapheme == "a" && contents [dataRow, c + 1].Grapheme == "a")
+            {
+                aaCol = c;
+            }
+
+            if (bbCol < 0 && contents [dataRow, c].Grapheme == "b" && contents [dataRow, c + 1].Grapheme == "b")
+            {
+                bbCol = c;
+            }
+        }
+
+        Assert.True (aaCol >= 0 && bbCol > aaCol + 1, $"Expected 'aa' before 'bb'. aaCol={aaCol}, bbCol={bbCol}");
+
+        // The cells "aa" and "bb" must use the custom red background.
+        Assert.Equal (customScheme.Normal, contents [dataRow, aaCol].Attribute);
+        Assert.Equal (customScheme.Normal, contents [dataRow, bbCol].Attribute);
+
+        // The separator position is the gap between the end of "aa" and the start of "bb".
+        // Before the fix, this position was overdrawn with the row scheme attribute.
+        // After the fix, the cell padding's custom red attribute remains.
+        for (int c = aaCol + 2; c < bbCol; c++)
+        {
+            Assert.Equal (customScheme.Normal, contents [dataRow, c].Attribute);
+        }
+
+        tableView.Dispose ();
+    }
+
     [Fact]
     public void Test_CalculateMaxCellWidth_UsesGraphemeWidth ()
     {
