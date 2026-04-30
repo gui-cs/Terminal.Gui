@@ -236,8 +236,6 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
         }
     }
 
-    [RequiresUnreferencedCode ("Calls SetSchemes")]
-    [RequiresDynamicCode ("Calls SetSchemes")]
     internal static void LoadToHardCodedDefaults () =>
 
         // BUGBUG: SchemeManager is broken and needs to be fixed to not have the hard coded schemes get overwritten.

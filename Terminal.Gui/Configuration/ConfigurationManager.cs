@@ -256,8 +256,6 @@ public static class ConfigurationManager
     ///     ConfigurationManager will be enabled and the configuration will be loaded from the specified locations and applied.
     /// </summary>
     /// <param name="locations"></param>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     public static void Enable (ConfigLocations locations)
     {
         if (IsEnabled)
@@ -291,8 +289,6 @@ public static class ConfigurationManager
     ///     initial, hard-coded
     ///     defaults.
     /// </param>
-    [RequiresUnreferencedCode ("Calls ResetToHardCodedDefaults")]
-    [RequiresDynamicCode ("Calls ResetToHardCodedDefaults")]
     public static void Disable (bool resetToHardCodedDefaults = false)
     {
         lock (_enabledLock)
@@ -319,8 +315,6 @@ public static class ConfigurationManager
     ///     INTERNAL: Updates <see cref="ConfigurationManager"/> to the settings from the current
     ///     values of the static <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     internal static void UpdateToCurrentValues ()
     {
         if (!IsInitialized ())
@@ -349,8 +343,6 @@ public static class ConfigurationManager
     ///     INTERNAL: Loads the hard-coded values of the
     ///     <see cref="ConfigurationPropertyAttribute"/> properties and applies them.
     /// </summary>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     internal static void ResetToHardCodedDefaults ()
     {
         LoadHardCodedDefaults ();
@@ -376,8 +368,6 @@ public static class ConfigurationManager
     ///         Only call this when you want to completely reset configuration to hard-coded defaults.
     ///     </para>
     /// </summary>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     internal static void LoadHardCodedDefaults ()
     {
         if (!IsInitialized ())
@@ -400,8 +390,6 @@ public static class ConfigurationManager
     ///     be applied to the running application.
     /// </summary>
     /// <exception cref="ConfigurationManagerNotEnabledException">Configuration manager is not enabled.</exception>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     public static void Load (ConfigLocations locations)
     {
         if (!IsEnabled)
@@ -461,8 +449,6 @@ public static class ConfigurationManager
     ///     ConfigurationManager must be Enabled.
     /// </summary>
     /// <exception cref="ConfigurationManagerNotEnabledException">Configuration Manager is not enabled.</exception>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     public static void Apply ()
     {
         if (!IsEnabled)
@@ -473,8 +459,6 @@ public static class ConfigurationManager
         InternalApply ();
     }
 
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.Scope<T>.Apply()")]
-    [RequiresDynamicCode ("Calls Terminal.Gui.Scope<T>.Apply()")]
     private static void InternalApply ()
     {
         Trace.Configuration ("ConfigurationManager", "Apply", "Start");
