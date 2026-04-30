@@ -656,4 +656,115 @@ public class TableViewTests : TestDriverBase
                          headerRow
                      }'");
     }
+
+    // Copilot
+    // Verifies fix for #5072: a column with very wide content must not consume all viewport space
+    // and push later columns off-screen. Each subsequent visible column should be reserved at least
+    // its header width.
+    [Fact]
+    public void Calculate_WideColumn_DoesNotStarveLaterColumns ()
+    {
+        DataTable dt = new ();
+        dt.Columns.Add ("Description");
+        dt.Columns.Add ("Status");
+        dt.Columns.Add ("Owner");
+        dt.Rows.Add (new string ('x', 200), "ok", "me");
+
+        using TableView tableView = new ()
+        {
+            Table = new DataTableSource (dt),
+            Viewport = new Rectangle (0, 0, 40, 5)
+        };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.RefreshContentSize ();
+
+        TableView.ColumnToRender [] columns = GetColumnsToRender (tableView);
+
+        Assert.Equal (3, columns.Length);
+
+        // Description must be clamped so that Status and Owner fit
+        TableView.ColumnToRender description = columns [0];
+        TableView.ColumnToRender status = columns [1];
+        TableView.ColumnToRender owner = columns [2];
+
+        Assert.True (description.X >= 0);
+        Assert.True (status.X > description.X);
+        Assert.True (owner.X > status.X);
+
+        // Every column's right edge must lie within the viewport
+        Assert.True (description.X + description.Width - 1 < tableView.Viewport.Width,
+                     $"Description right edge {description.X + description.Width - 1} exceeds viewport {tableView.Viewport.Width}");
+        Assert.True (status.X + status.Width - 1 < tableView.Viewport.Width,
+                     $"Status right edge {status.X + status.Width - 1} exceeds viewport {tableView.Viewport.Width}");
+        Assert.True (owner.X + owner.Width - 1 < tableView.Viewport.Width,
+                     $"Owner right edge {owner.X + owner.Width - 1} exceeds viewport {tableView.Viewport.Width}");
+
+        // Status and Owner each must have at least header-width room (excluding separator)
+        Assert.True (status.Width - 1 >= "Status".Length, $"Status got width {status.Width - 1}");
+        Assert.True (owner.Width - 1 >= "Owner".Length, $"Owner got width {owner.Width - 1}");
+    }
+
+    // Copilot
+    // When the viewport is too small to fit even minimum widths for every column, layout falls back
+    // to the prior left-to-right packing (columns may extend past the viewport, accessible via
+    // horizontal scrolling).
+    [Fact]
+    public void Calculate_NarrowViewport_StillProducesLayout ()
+    {
+        DataTable dt = new ();
+        dt.Columns.Add ("Description");
+        dt.Columns.Add ("Status");
+        dt.Columns.Add ("Owner");
+        dt.Rows.Add (new string ('x', 50), "ok", "me");
+
+        using TableView tableView = new ()
+        {
+            Table = new DataTableSource (dt),
+            Viewport = new Rectangle (0, 0, 10, 5)
+        };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.RefreshContentSize ();
+
+        TableView.ColumnToRender [] columns = GetColumnsToRender (tableView);
+
+        Assert.Equal (3, columns.Length);
+
+        // Each column should have a positive width
+        Assert.All (columns, c => Assert.True (c.Width > 0, $"Column {c.Column} got non-positive width {c.Width}"));
+    }
+
+    // Copilot
+    // Single-column tables should still expand to fill the viewport when ExpandLastColumn is true.
+    [Fact]
+    public void Calculate_SingleColumn_StillExpandsLastColumn ()
+    {
+        DataTable dt = new ();
+        dt.Columns.Add ("Only");
+        dt.Rows.Add ("hi");
+
+        using TableView tableView = new ()
+        {
+            Table = new DataTableSource (dt),
+            Viewport = new Rectangle (0, 0, 30, 5)
+        };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.RefreshContentSize ();
+
+        TableView.ColumnToRender [] columns = GetColumnsToRender (tableView);
+
+        Assert.Single (columns);
+        Assert.True (columns [0].Width >= tableView.Viewport.Width - 2,
+                     $"Single column width {columns [0].Width} should fill viewport {tableView.Viewport.Width}");
+    }
+
+    private static TableView.ColumnToRender [] GetColumnsToRender (TableView tableView)
+    {
+        FieldInfo? field = typeof (TableView).GetField ("_columnsToRenderCache", BindingFlags.Instance | BindingFlags.NonPublic);
+        Assert.NotNull (field);
+
+        return (TableView.ColumnToRender []?)field!.GetValue (tableView) ?? [];
+    }
 }

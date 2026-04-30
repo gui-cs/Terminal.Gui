@@ -350,6 +350,19 @@ public class Popover<TView, TResult> : PopoverImpl, IDesignable where TView : Vi
         base.OnVisibleChanged (); // PopoverImpl handles Hide
     }
 
+    /// <inheritdoc />
+    protected override void OnFrameChanged (in Rectangle frame)
+    {
+        base.OnFrameChanged (in frame);
+
+        if (!Visible || Anchor is null || ContentView is null)
+        {
+            return;
+        }
+
+        SetPosition (anchor: Anchor ());
+    }
+
     /// <summary>
     ///     Extracts the result from the content view using <see cref="ResultExtractor"/> or <see cref="IValue{TResult}"/>.
     /// </summary>
