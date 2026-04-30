@@ -1,34 +1,33 @@
 using System.Collections.Concurrent;
+using System.Text;
 
 namespace DriverTests.Output;
 
 /// <summary>
-///     Proves the race condition in <see cref="OutputBufferImpl"/> where
+///     Proves the race conditions in <see cref="OutputBufferImpl"/> where
 ///     <see cref="OutputBufferImpl.ClearContents()"/> replaces the <c>Contents</c>
-///     reference while <see cref="OutputBufferImpl.AddStr"/> is concurrently iterating.
+///     reference while other methods are concurrently operating on it.
 ///     See: https://github.com/gui-cs/Terminal.Gui/issues/5130
 /// </summary>
 public class OutputBufferImplConcurrencyTests
 {
+    // Copilot
+
+    private const int ITERATIONS = 5_000;
+
     /// <summary>
-    ///     Concurrently calls <see cref="OutputBufferImpl.AddStr"/> and
-    ///     <see cref="OutputBufferImpl.ClearContents()"/> from separate threads.
-    ///     With the current broken <c>lock (Contents)</c> pattern this reproduces
-    ///     crashes (AccessViolationException, NullReferenceException, or
-    ///     IndexOutOfRangeException) within a few hundred iterations.
+    ///     Runs a writer action and a clearer action concurrently, collecting any exceptions.
+    ///     Returns the collected exceptions for assertion.
     /// </summary>
-    [Fact]
-    public void AddStr_And_ClearContents_Concurrent_DoesNotThrow ()
+    private static ConcurrentBag<Exception> RunConcurrent (Action<OutputBufferImpl, int, CancellationToken> writerAction,
+                                                           Action<OutputBufferImpl, int, CancellationToken> clearerAction)
     {
-        // Arrange
         OutputBufferImpl buffer = new ();
         buffer.SetSize (80, 25);
 
         ConcurrentBag<Exception> exceptions = [];
-        const int ITERATIONS = 5_000;
         CancellationTokenSource cts = new ();
 
-        // Writer thread — continuously writes strings
         Thread writer = new (() =>
                               {
                                   try
@@ -37,8 +36,7 @@ public class OutputBufferImplConcurrencyTests
                                       {
                                           try
                                           {
-                                              buffer.Move (0, i % 25);
-                                              buffer.AddStr (new string ('A', 80));
+                                              writerAction (buffer, i, cts.Token);
                                           }
                                           catch (Exception ex) when (ex is not OutOfMemoryException)
                                           {
@@ -54,7 +52,6 @@ public class OutputBufferImplConcurrencyTests
                                   }
                               }) { IsBackground = true };
 
-        // Resizer/clearer thread — continuously replaces Contents
         Thread clearer = new (() =>
                                {
                                    try
@@ -63,8 +60,7 @@ public class OutputBufferImplConcurrencyTests
                                        {
                                            try
                                            {
-                                               // Alternate sizes to maximize chance of IndexOutOfRange
-                                               buffer.SetSize (i % 2 == 0 ? 80 : 40, i % 2 == 0 ? 25 : 10);
+                                               clearerAction (buffer, i, cts.Token);
                                            }
                                            catch (Exception ex) when (ex is not OutOfMemoryException)
                                            {
@@ -80,7 +76,6 @@ public class OutputBufferImplConcurrencyTests
                                    }
                                }) { IsBackground = true };
 
-        // Act
         writer.Start ();
         clearer.Start ();
 
@@ -88,10 +83,184 @@ public class OutputBufferImplConcurrencyTests
         clearer.Join (TimeSpan.FromSeconds (10));
         cts.Cancel ();
 
-        // Assert — with the bug present, we expect exceptions to have been collected.
-        // Once fixed this test should pass with zero exceptions.
+        return exceptions;
+    }
+
+    private static void AssertNoExceptions (ConcurrentBag<Exception> exceptions)
+    {
         Assert.True (exceptions.IsEmpty,
                      $"Caught {exceptions.Count} exception(s) during concurrent access. "
                      + $"First: {exceptions.FirstOrDefault ()?.GetType ().Name}: {exceptions.FirstOrDefault ()?.Message}");
+    }
+
+    /// <summary>
+    ///     Concurrently calls <see cref="OutputBufferImpl.AddStr"/> and
+    ///     <see cref="OutputBufferImpl.ClearContents()"/> from separate threads.
+    ///     With the current broken <c>lock (Contents)</c> pattern this reproduces
+    ///     crashes (AccessViolationException, NullReferenceException, or
+    ///     IndexOutOfRangeException) within a few hundred iterations.
+    /// </summary>
+    [Fact]
+    public void AddStr_And_ClearContents_Concurrent_DoesNotThrow ()
+    {
+        ConcurrentBag<Exception> exceptions = RunConcurrent (
+                                                             (buffer, i, _) =>
+                                                             {
+                                                                 buffer.Move (0, i % 25);
+                                                                 buffer.AddStr (new string ('A', 80));
+                                                             },
+                                                             (buffer, i, _) =>
+                                                             {
+                                                                 // Alternate sizes to maximize chance of IndexOutOfRange
+                                                                 buffer.SetSize (i % 2 == 0 ? 80 : 40, i % 2 == 0 ? 25 : 10);
+                                                             });
+
+        AssertNoExceptions (exceptions);
+    }
+
+    /// <summary>
+    ///     Concurrently calls <see cref="OutputBufferImpl.FillRect(Rectangle, Rune)"/> and
+    ///     <see cref="OutputBufferImpl.ClearContents()"/> from separate threads.
+    ///     The <c>FillRect(Rectangle, Rune)</c> overload has the same broken <c>lock (Contents!)</c> pattern.
+    /// </summary>
+    [Fact]
+    public void FillRect_And_ClearContents_Concurrent_DoesNotThrow ()
+    {
+        ConcurrentBag<Exception> exceptions = RunConcurrent (
+                                                             (buffer, i, _) =>
+                                                             {
+                                                                 // Fill a region that fits within the smallest size (40x10)
+                                                                 buffer.FillRect (new Rectangle (0, 0, 30, 8), new Rune ('B'));
+                                                             },
+                                                             (buffer, i, _) =>
+                                                             {
+                                                                 buffer.SetSize (i % 2 == 0 ? 80 : 40, i % 2 == 0 ? 25 : 10);
+                                                             });
+
+        AssertNoExceptions (exceptions);
+    }
+
+    /// <summary>
+    ///     Concurrently calls <see cref="OutputBufferImpl.Move"/>, <see cref="OutputBufferImpl.AddStr"/>,
+    ///     and <see cref="OutputBufferImpl.ClearContents()"/> from separate threads to verify that
+    ///     interleaved Move + AddStr doesn't corrupt state when Contents is being replaced.
+    /// </summary>
+    [Fact]
+    public void Move_AddStr_And_ClearContents_Concurrent_DoesNotThrow ()
+    {
+        ConcurrentBag<Exception> exceptions = RunConcurrent (
+                                                             (buffer, i, _) =>
+                                                             {
+                                                                 // Rapidly move around and write short strings
+                                                                 buffer.Move (i % 40, i % 10);
+                                                                 buffer.AddStr ("Hello");
+                                                                 buffer.Move ((i + 20) % 40, (i + 5) % 10);
+                                                                 buffer.AddStr ("World!");
+                                                             },
+                                                             (buffer, i, _) =>
+                                                             {
+                                                                 buffer.SetSize (i % 2 == 0 ? 80 : 40, i % 2 == 0 ? 25 : 10);
+                                                             });
+
+        AssertNoExceptions (exceptions);
+    }
+
+    /// <summary>
+    ///     Runs <see cref="OutputBufferImpl.AddStr"/> and <see cref="OutputBufferImpl.FillRect(Rectangle, Rune)"/>
+    ///     concurrently with <see cref="OutputBufferImpl.ClearContents()"/> to exercise all three write paths
+    ///     simultaneously.
+    /// </summary>
+    [Fact]
+    public void AddStr_FillRect_And_ClearContents_ThreeWay_Concurrent_DoesNotThrow ()
+    {
+        OutputBufferImpl buffer = new ();
+        buffer.SetSize (80, 25);
+
+        ConcurrentBag<Exception> exceptions = [];
+        CancellationTokenSource cts = new ();
+
+        Thread addStrThread = new (() =>
+                                   {
+                                       try
+                                       {
+                                           for (var i = 0; i < ITERATIONS && !cts.IsCancellationRequested; i++)
+                                           {
+                                               try
+                                               {
+                                                   buffer.Move (0, i % 25);
+                                                   buffer.AddStr (new string ('X', 40));
+                                               }
+                                               catch (Exception ex) when (ex is not OutOfMemoryException)
+                                               {
+                                                   exceptions.Add (ex);
+
+                                                   break;
+                                               }
+                                           }
+                                       }
+                                       catch (Exception ex)
+                                       {
+                                           exceptions.Add (ex);
+                                       }
+                                   }) { IsBackground = true };
+
+        Thread fillRectThread = new (() =>
+                                     {
+                                         try
+                                         {
+                                             for (var i = 0; i < ITERATIONS && !cts.IsCancellationRequested; i++)
+                                             {
+                                                 try
+                                                 {
+                                                     buffer.FillRect (new Rectangle (0, 0, 20, 5), new Rune ('Z'));
+                                                 }
+                                                 catch (Exception ex) when (ex is not OutOfMemoryException)
+                                                 {
+                                                     exceptions.Add (ex);
+
+                                                     break;
+                                                 }
+                                             }
+                                         }
+                                         catch (Exception ex)
+                                         {
+                                             exceptions.Add (ex);
+                                         }
+                                     }) { IsBackground = true };
+
+        Thread clearerThread = new (() =>
+                                    {
+                                        try
+                                        {
+                                            for (var i = 0; i < ITERATIONS && !cts.IsCancellationRequested; i++)
+                                            {
+                                                try
+                                                {
+                                                    buffer.SetSize (i % 2 == 0 ? 80 : 40, i % 2 == 0 ? 25 : 10);
+                                                }
+                                                catch (Exception ex) when (ex is not OutOfMemoryException)
+                                                {
+                                                    exceptions.Add (ex);
+
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            exceptions.Add (ex);
+                                        }
+                                    }) { IsBackground = true };
+
+        addStrThread.Start ();
+        fillRectThread.Start ();
+        clearerThread.Start ();
+
+        addStrThread.Join (TimeSpan.FromSeconds (10));
+        fillRectThread.Join (TimeSpan.FromSeconds (10));
+        clearerThread.Join (TimeSpan.FromSeconds (10));
+        cts.Cancel ();
+
+        AssertNoExceptions (exceptions);
     }
 }
