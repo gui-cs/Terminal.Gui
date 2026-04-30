@@ -78,6 +78,8 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
     ///     INTERNAL: Updates the values of the properties of this scope to their corresponding static
     ///     <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
+    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "ConfigProperty.PropertyInfo values originate from ConfigPropertyHostTypes, whose public properties are statically rooted via DynamicDependency.")]
+    [UnconditionalSuppressMessage ("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "ConfigProperty.PropertyInfo values originate from ConfigPropertyHostTypes, whose public properties are statically rooted via DynamicDependency.")]
     internal void UpdateToCurrentValues ()
     {
         foreach (KeyValuePair<string, ConfigProperty> validProperties in this.Where (cp => cp.Value.PropertyInfo is { }))
@@ -138,6 +140,8 @@ public class Scope<T> : ConcurrentDictionary<string, ConfigProperty>
     ///     <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
     /// <returns><see langword="true"/> if one or more property value was applied; <see langword="false"/> otherwise.</returns>
+    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "ConfigProperty.PropertyInfo values originate from ConfigPropertyHostTypes, whose public properties are statically rooted via DynamicDependency.")]
+    [UnconditionalSuppressMessage ("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "ConfigProperty.PropertyInfo values originate from ConfigPropertyHostTypes, whose public properties are statically rooted via DynamicDependency.")]
     internal bool Apply ()
     {
         if (!ConfigurationManager.IsEnabled)

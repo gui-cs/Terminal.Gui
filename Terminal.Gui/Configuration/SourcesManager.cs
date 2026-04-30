@@ -158,7 +158,7 @@ public class SourcesManager
             stream.Position = 0;
             Debug.Assert (json != null);
 #endif
-            SettingsScope? scope = JsonSerializer.Deserialize (stream, typeof (SettingsScope), ConfigurationManager.SerializerContext.Options) as SettingsScope;
+            SettingsScope? scope = JsonSerializer.Deserialize (stream, ConfigurationManager.SerializerContext.SettingsScope);
 
             if (scope is null)
             {
@@ -313,7 +313,7 @@ public class SourcesManager
     [RequiresDynamicCode ("AOT")]
     internal string ToJson (SettingsScope? scope)
     {
-        return JsonSerializer.Serialize (scope, typeof (SettingsScope), ConfigurationManager.SerializerContext);
+        return JsonSerializer.Serialize (scope, ConfigurationManager.SerializerContext.SettingsScope);
     }
 
     /// <summary>
@@ -324,7 +324,7 @@ public class SourcesManager
     [RequiresDynamicCode ("AOT")]
     internal Stream ToStream (SettingsScope? scope)
     {
-        string json = JsonSerializer.Serialize (scope, typeof (SettingsScope), ConfigurationManager.SerializerContext);
+        string json = JsonSerializer.Serialize (scope, ConfigurationManager.SerializerContext.SettingsScope);
 
         // turn it into a stream
         var stream = new MemoryStream ();
