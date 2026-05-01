@@ -63,6 +63,22 @@ public class ColumnStyle
     public bool Visible { get => MaxWidth >= 0 && field; set; } = true;
 
     /// <summary>
+    ///     Gets or sets the string appended to a cell value (or column header) when its rendered representation does
+    ///     not fit in the available column width. Defaults to <see cref="Glyphs.HorizontalEllipsis"/> ("…").
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Set to <see langword="null"/> or an empty string to suppress the indicator and silently clip the value at
+    ///         the available width.
+    ///     </para>
+    ///     <para>
+    ///         If the indicator itself is wider than the available column width the value is silently clipped (no
+    ///         indicator is drawn).
+    ///     </para>
+    /// </remarks>
+    public string? TruncationIndicator { get; set; } = Glyphs.HorizontalEllipsis.ToString ();
+
+    /// <summary>
     ///     Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/
     ///     <see cref="Alignment"/>
     /// </summary>
