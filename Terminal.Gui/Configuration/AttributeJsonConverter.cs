@@ -84,14 +84,14 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
                             throw new JsonException ($"{propertyName}: Expected a string value.");
                         }
 
-                        string styleValue = reader.GetString ()!;
-
-                        if (!TryParseNamedTextStyle (styleValue, out TextStyle parsedStyle))
+                        try
                         {
-                            throw new JsonException ("Expected a valid text style value.");
+                            style = Enum.Parse<TextStyle> (reader.GetString ()!, ignoreCase: true);
                         }
-
-                        style = parsedStyle;
+                        catch (ArgumentException ex)
+                        {
+                            throw new JsonException ("Expected a valid text style value.", ex);
+                        }
 
                         break;
 
@@ -122,38 +122,5 @@ internal class AttributeJsonConverter : JsonConverter<Attribute>
         }
 
         writer.WriteEndObject ();
-    }
-
-    private static bool TryParseNamedTextStyle (string styleValue, out TextStyle parsedStyle)
-    {
-        parsedStyle = TextStyle.None;
-        string[] parts = styleValue.Split (',', StringSplitOptions.TrimEntries);
-
-        if (parts.Length == 0)
-        {
-            return false;
-        }
-
-        foreach (string part in parts)
-        {
-            if (string.IsNullOrWhiteSpace (part))
-            {
-                return false;
-            }
-
-            if (part [0] == '+' || part [0] == '-' || char.IsDigit (part [0]))
-            {
-                return false;
-            }
-
-            if (!Enum.TryParse (part, ignoreCase: true, out TextStyle parsedPart))
-            {
-                return false;
-            }
-
-            parsedStyle |= parsedPart;
-        }
-
-        return true;
     }
 }

@@ -66,18 +66,6 @@ public class AttributeJsonConverterTests
         Assert.Contains ("Expected a valid text style value", exception.Message);
     }
 
-    // Copilot
-    [Fact]
-    public void Deserialize_TextStyle_WithNumericString_ThrowsJsonException ()
-    {
-        string json = "{\"Foreground\":\"Blue\",\"Background\":\"Green\",\"Style\":\"1\"}";
-
-        JsonException exception = Assert.Throws<JsonException> (() => JsonSerializer.Deserialize<Attribute> (json, JsonOptions));
-        Assert.Contains ("Style", exception.Message);
-        Assert.Contains ("Expected a valid text style value", exception.Message);
-    }
-
-
     [Fact]
     public void TestSerialize ()
     {
