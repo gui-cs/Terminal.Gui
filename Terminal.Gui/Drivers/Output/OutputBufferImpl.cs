@@ -431,6 +431,11 @@ public class OutputBufferImpl : IOutputBuffer
     /// <param name="clipRect">The clipping rectangle.</param>
     private void WriteGrapheme (int col, int row, string grapheme, Rectangle clipRect)
     {
+        if (grapheme is null)
+        {
+            return;
+        }
+
         Debug.Assert (grapheme.GetColumns () < 2);
         Contents! [row, col].Grapheme = grapheme;
 
