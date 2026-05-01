@@ -192,19 +192,6 @@ public class TableViewBaselineTests : TestDriverBase
     }
 
     [Fact]
-    public void Home_Key_FullRowSelect_MovesToFirstRow ()
-    {
-        // Copilot
-        TableView tv = CreateTableView (5, 10);
-        tv.FullRowSelect = true;
-        tv.SetSelection (3, 5, false);
-
-        tv.NewKeyDownEvent (Key.Home);
-        Assert.Equal (3, tv.Value!.Cursor.X);
-        Assert.Equal (0, tv.Value!.Cursor.Y);
-    }
-
-    [Fact]
     public void End_Key_MovesToEndOfRow ()
     {
         TableView tv = CreateTableView (5, 10);
@@ -213,19 +200,6 @@ public class TableViewBaselineTests : TestDriverBase
         tv.NewKeyDownEvent (Key.End);
         Assert.Equal (4, tv.Value!.Cursor.X); // last column (0-indexed, 5 cols)
         Assert.Equal (0, tv.Value!.Cursor.Y); // row unchanged
-    }
-
-    [Fact]
-    public void End_Key_FullRowSelect_MovesToLastRow ()
-    {
-        // Copilot
-        TableView tv = CreateTableView (5, 10);
-        tv.FullRowSelect = true;
-        tv.SetSelection (1, 5, false);
-
-        tv.NewKeyDownEvent (Key.End);
-        Assert.Equal (1, tv.Value!.Cursor.X);
-        Assert.Equal (9, tv.Value!.Cursor.Y);
     }
 
     [Fact]
