@@ -124,6 +124,20 @@ Extended regions (`IsExtended = true`) persist through keyboard navigation. Non-
 
 When `FullRowSelect` is `true`, entire rows are selected instead of individual cells. All cells in the cursor's row are reported as selected by `GetAllSelectedCells ()` and `IsSelected ()`.
 
+> **Tip — Home/End with FullRowSelect:** By default, `Home` and `End` navigate to the
+> start/end of the current *row* (i.e. first/last column). To make `Home`/`End` jump to
+> the first/last *row* instead (which is often more useful in full-row mode), rebind them
+> to `Command.Start` and `Command.End`:
+>
+> ```csharp
+> tableView.KeyBindings.Remove (Key.Home);
+> tableView.KeyBindings.Add (Key.Home, Command.Start);
+> tableView.KeyBindings.Remove (Key.End);
+> tableView.KeyBindings.Add (Key.End, Command.End);
+> ```
+>
+> This is the pattern used by `UICatalogRunnable` for its scenario list.
+
 ### Reading the Selection
 
 ```csharp
