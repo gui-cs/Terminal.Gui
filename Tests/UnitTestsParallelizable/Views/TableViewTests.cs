@@ -924,4 +924,140 @@ public class TableViewTests : TestDriverBase
 
         return (TableView.ColumnToRender []?)field!.GetValue (tableView) ?? [];
     }
+
+    // Copilot
+    [Fact]
+    public void HeaderColorGetter_AppliesCustomSchemeToColumnHeader ()
+    {
+        IDriver driver = CreateTestDriver (40, 5);
+
+        TableView tableView = new () { Driver = driver };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
+        tableView.Viewport = new Rectangle (0, 0, 40, 5);
+
+        tableView.Style.ShowHeaders = true;
+        tableView.Style.ShowHorizontalHeaderUnderline = false;
+        tableView.Style.ShowHorizontalHeaderOverline = false;
+        tableView.Style.AlwaysShowHeaders = true;
+        tableView.Style.ShowVerticalCellLines = true;
+        tableView.Style.ShowVerticalHeaderLines = true;
+
+        Scheme headerScheme = new ()
+        {
+            Normal = new Attribute (Color.BrightYellow, Color.DarkGray),
+            Focus = new Attribute (Color.BrightYellow, Color.DarkGray)
+        };
+
+        // Only column 0 gets custom header color
+        tableView.Style.GetOrCreateColumnStyle (0).HeaderColorGetter = _ => headerScheme;
+
+        DataTable dt = new ();
+        dt.Columns.Add ("Name");
+        dt.Columns.Add ("Value");
+        dt.Rows.Add ("test", "123");
+        tableView.Table = new DataTableSource (dt);
+
+        tableView.Layout ();
+        tableView.SetClipToScreen ();
+        tableView.Draw ();
+
+        Cell [,] contents = driver.Contents!;
+
+        // Find row 0 which has headers (since overline is off, headers are on line 0)
+        // Look for 'N' from "Name" header
+        var nameCol = -1;
+        var valueCol = -1;
+
+        for (var c = 0; c < 40; c++)
+        {
+            if (nameCol < 0 && contents [0, c].Grapheme == "N")
+            {
+                nameCol = c;
+            }
+
+            if (valueCol < 0 && contents [0, c].Grapheme == "V")
+            {
+                valueCol = c;
+            }
+        }
+
+        Assert.True (nameCol >= 0, "Expected to find 'N' from 'Name' header");
+        Assert.True (valueCol >= 0, "Expected to find 'V' from 'Value' header");
+
+        // Column 0 header should use the custom scheme
+        Assert.Equal (headerScheme.Normal, contents [0, nameCol].Attribute);
+
+        // Column 1 header should NOT use the custom scheme (no HeaderColorGetter set)
+        Assert.NotEqual (headerScheme.Normal, contents [0, valueCol].Attribute);
+
+        tableView.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void TableStyle_HeaderScheme_AppliesBaseSchemeToAllHeaders ()
+    {
+        IDriver driver = CreateTestDriver (40, 5);
+
+        TableView tableView = new () { Driver = driver };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
+        tableView.Viewport = new Rectangle (0, 0, 40, 5);
+
+        tableView.Style.ShowHeaders = true;
+        tableView.Style.ShowHorizontalHeaderUnderline = false;
+        tableView.Style.ShowHorizontalHeaderOverline = false;
+        tableView.Style.AlwaysShowHeaders = true;
+        tableView.Style.ShowVerticalCellLines = true;
+        tableView.Style.ShowVerticalHeaderLines = true;
+
+        Scheme globalHeaderScheme = new ()
+        {
+            Normal = new Attribute (Color.Green, Color.Black),
+            Focus = new Attribute (Color.Green, Color.Black)
+        };
+
+        tableView.Style.HeaderScheme = globalHeaderScheme;
+
+        DataTable dt = new ();
+        dt.Columns.Add ("Name");
+        dt.Columns.Add ("Value");
+        dt.Rows.Add ("test", "123");
+        tableView.Table = new DataTableSource (dt);
+
+        tableView.Layout ();
+        tableView.SetClipToScreen ();
+        tableView.Draw ();
+
+        Cell [,] contents = driver.Contents!;
+
+        // Find header characters
+        var nameCol = -1;
+        var valueCol = -1;
+
+        for (var c = 0; c < 40; c++)
+        {
+            if (nameCol < 0 && contents [0, c].Grapheme == "N")
+            {
+                nameCol = c;
+            }
+
+            if (valueCol < 0 && contents [0, c].Grapheme == "V")
+            {
+                valueCol = c;
+            }
+        }
+
+        Assert.True (nameCol >= 0, "Expected to find 'N' from 'Name' header");
+        Assert.True (valueCol >= 0, "Expected to find 'V' from 'Value' header");
+
+        // Both headers should use the global header scheme
+        Assert.Equal (globalHeaderScheme.Normal, contents [0, nameCol].Attribute);
+        Assert.Equal (globalHeaderScheme.Normal, contents [0, valueCol].Attribute);
+
+        tableView.Dispose ();
+    }
 }

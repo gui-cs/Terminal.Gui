@@ -20,6 +20,12 @@ public class ColumnStyle
     public CellColorGetterDelegate? ColorGetter { get; set; }
 
     /// <summary>
+    ///     Defines a delegate for returning a custom scheme for this column's header. Return <see langword="null"/> to
+    ///     fall back to <see cref="TableStyle.HeaderScheme"/> or the view's default scheme.
+    /// </summary>
+    public HeaderColorGetterDelegate? HeaderColorGetter { get; set; }
+
+    /// <summary>
     ///     Defines a delegate for returning custom representations of cell values. If not set then
     ///     <see cref="object.ToString()"/> is used. Return values from your delegate may be truncated e.g. based on
     ///     <see cref="MaxWidth"/>

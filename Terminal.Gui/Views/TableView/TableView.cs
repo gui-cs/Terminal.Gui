@@ -13,6 +13,11 @@ public delegate Scheme? CellColorGetterDelegate (CellColorGetterArgs args);
 /// <returns></returns>
 public delegate Scheme? RowColorGetterDelegate (RowColorGetterArgs args);
 
+/// <summary>Delegate for providing color to <see cref="TableView"/> column headers based on contextual information.</summary>
+/// <param name="args">Contains information about the column header for which color is needed.</param>
+/// <returns>A <see cref="Scheme"/> to use for rendering the header, or <see langword="null"/> to use the default.</returns>
+public delegate Scheme? HeaderColorGetterDelegate (HeaderColorGetterArgs args);
+
 /// <summary>
 ///     Displays and enables infinite scrolling through tabular data based on a <see cref="ITableSource"/>.
 ///     <a href="../docs/tableview.md">See the TableView Deep Dive for more</a>.
