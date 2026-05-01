@@ -148,7 +148,7 @@ bool sel = tv.IsSelected (col, row);
 | Arrow keys | Move cursor one cell |
 | Shift+Arrow | Extend selection |
 | PageUp / PageDown | Move one page |
-| Home / End | Move to start/end of row |
+| Home / End | Move to start/end of row. With `FullRowSelect`, move to first/last row |
 | Ctrl+Home / Ctrl+End | Move to first/last row |
 | Shift+Home/End/Ctrl+Home/Ctrl+End | Extend selection to row/table boundary |
 | Ctrl+A | Select all |
