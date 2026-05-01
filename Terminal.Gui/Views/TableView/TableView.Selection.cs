@@ -32,11 +32,6 @@ public partial class TableView
             return false;
         }
 
-        if (FullRowSelect)
-        {
-            return MoveCursorToEndOfTable (extend, ctx);
-        }
-
         SetSelection (Table!.Columns - 1, _cursorRow, extend, ctx);
         Update ();
 
@@ -51,11 +46,6 @@ public partial class TableView
         if (TableIsNullOrInvisible ())
         {
             return false;
-        }
-
-        if (FullRowSelect)
-        {
-            return MoveCursorToStartOfTable (extend, ctx);
         }
 
         SetSelection (0, _cursorRow, extend, ctx);
