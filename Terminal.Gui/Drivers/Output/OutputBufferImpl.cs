@@ -242,14 +242,7 @@ public class OutputBufferImpl : IOutputBuffer
     /// <inheritdoc/>
     public void FillRect (Rectangle rect, char rune)
     {
-        for (int y = rect.Top; y < rect.Top + rect.Height; y++)
-        {
-            for (int x = rect.Left; x < rect.Left + rect.Width; x++)
-            {
-                Move (x, y);
-                AddRune (rune);
-            }
-        }
+        FillRect (rect, new Rune (rune));
     }
 
     /// <summary>
