@@ -170,8 +170,8 @@ internal class ScopeJsonConverter<
         foreach (PropertyInfo p in properties)
         {
             writer.WritePropertyName (ConfigProperty.GetJsonPropertyName (p));
-            object? prop = typeof (TScopeT).GetProperty (p.Name)?.GetValue (scope);
-            JsonSerializer.Serialize (writer, prop, prop!.GetType (), ConfigurationManager.SerializerContext);
+            object? prop = p.GetValue (scope);
+            JsonSerializer.Serialize (writer, prop, p.PropertyType, ConfigurationManager.SerializerContext);
         }
 
         foreach (KeyValuePair<string, ConfigProperty> p in from p in scope
