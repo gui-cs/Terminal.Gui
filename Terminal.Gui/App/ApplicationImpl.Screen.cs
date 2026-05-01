@@ -1,8 +1,7 @@
+using System.Diagnostics;
 using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.App;
-
-using Trace = Trace;
 
 internal partial class ApplicationImpl
 {
@@ -102,7 +101,7 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public void LayoutAndDraw (bool forceRedraw = false)
     {
-        Trace.Draw ("ApplicationImpl", "Start", $"forceRedraw={forceRedraw}, Screen={Screen}, _inlineScreenSized={_inlineScreenSized}");
+        Tracing.Trace.Draw ("ApplicationImpl", "Start", $"forceRedraw={forceRedraw}, Screen={Screen}, _inlineScreenSized={_inlineScreenSized}");
 
         if (ClearScreenNextIteration)
         {
@@ -284,7 +283,7 @@ internal partial class ApplicationImpl
         {
             LayoutAndDrawComplete?.Invoke (this, EventArgs.Empty);
         }
-        Trace.Draw ("ApplicationImpl", "End", $"neededLayout={neededLayout}, needsDraw={needsDraw}");
+        Tracing.Trace.Draw ("ApplicationImpl", "End", $"neededLayout={neededLayout}, needsDraw={needsDraw}");
     }
 
     /// <inheritdoc />
