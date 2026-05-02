@@ -4,7 +4,7 @@ internal class FileDialogCollectionNavigator (FileDialog fileDialog, TableView t
 {
     protected override object ElementAt (int idx)
     {
-        object val = FileDialogTableSource.GetRawColumnValue (tableView.Value?.Cursor.X ?? 0, fileDialog.State?.Children [idx]);
+        object val = FileDialogTableSource.GetRawColumnValue (tableView.Value?.SelectedCell.X ?? 0, fileDialog.State?.Children [idx]);
 
         return val.ToString ()?.Trim ('.') ?? string.Empty;
     }

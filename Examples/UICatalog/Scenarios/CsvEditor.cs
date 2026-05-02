@@ -119,7 +119,7 @@ public class CsvEditor : Scenario
         }
         DataColumn col = new (colName);
 
-        int newColIdx = Math.Min (Math.Max (0, (_tableView.Value?.Cursor.X ?? 0) + 1), _tableView.Table!.Columns);
+        int newColIdx = Math.Min (Math.Max (0, (_tableView.Value?.SelectedCell.X ?? 0) + 1), _tableView.Table!.Columns);
 
         int? result = MessageBox.Query (_tableView.App!, "Column Type", "Pick a data type for the column", "Date", "Integer", "Double", "Text", "Cancel");
 
@@ -165,7 +165,7 @@ public class CsvEditor : Scenario
 
         DataRow newRow = _currentTable.NewRow ();
 
-        int newRowIdx = Math.Min (Math.Max (0, (_tableView.Value?.Cursor.Y ?? 0) + 1), _tableView.Table!.Rows);
+        int newRowIdx = Math.Min (Math.Max (0, (_tableView.Value?.SelectedCell.Y ?? 0) + 1), _tableView.Table!.Rows);
 
         _currentTable.Rows.InsertAt (newRow, newRowIdx);
         _tableView.Update ();
@@ -178,7 +178,7 @@ public class CsvEditor : Scenario
             return;
         }
 
-        ColumnStyle style = _tableView.Style.GetOrCreateColumnStyle (_tableView.Value?.Cursor.X ?? 0);
+        ColumnStyle style = _tableView.Style.GetOrCreateColumnStyle (_tableView.Value?.SelectedCell.X ?? 0);
         style.Alignment = newAlignment;
 
         _miLeftCheckBox?.Value = style.Alignment == Alignment.Start ? CheckState.Checked : CheckState.UnChecked;
@@ -206,7 +206,7 @@ public class CsvEditor : Scenario
 
         try
         {
-            _currentTable.Columns.RemoveAt (_tableView.Value.Cursor.X);
+            _currentTable.Columns.RemoveAt (_tableView.Value.SelectedCell.X);
             _tableView.Update ();
         }
         catch (Exception ex)
@@ -222,8 +222,8 @@ public class CsvEditor : Scenario
             return;
         }
 
-        int col = _tableView.Value?.Cursor.X ?? 0;
-        int row = _tableView.Value?.Cursor.Y ?? 0;
+        int col = _tableView.Value?.SelectedCell.X ?? 0;
+        int row = _tableView.Value?.SelectedCell.Y ?? 0;
 
         var oldValue = _currentTable.Rows [row] [col].ToString ();
 
@@ -292,7 +292,7 @@ public class CsvEditor : Scenario
 
         try
         {
-            DataColumn currentCol = _currentTable.Columns [_tableView.Value.Cursor.X];
+            DataColumn currentCol = _currentTable.Columns [_tableView.Value.SelectedCell.X];
 
             if (!GetText ("Move Column", "New Index:", currentCol.Ordinal.ToString (), out string newOrdinal))
             {
@@ -302,7 +302,7 @@ public class CsvEditor : Scenario
 
             currentCol.SetOrdinal (newIdx);
 
-            _tableView.SetSelection (newIdx, _tableView.Value!.Cursor.Y, false);
+            _tableView.SetSelection (newIdx, _tableView.Value!.SelectedCell.Y, false);
             _tableView.EnsureCursorIsVisible ();
             _tableView.SetNeedsDraw ();
         }
@@ -328,7 +328,7 @@ public class CsvEditor : Scenario
 
         try
         {
-            int oldIdx = _tableView.Value.Cursor.Y;
+            int oldIdx = _tableView.Value.SelectedCell.Y;
 
             DataRow currentRow = _currentTable.Rows [oldIdx];
 
@@ -352,7 +352,7 @@ public class CsvEditor : Scenario
 
             _currentTable.Rows.InsertAt (newRow, newIdx);
 
-            _tableView.SetSelection (_tableView.Value!.Cursor.X, newIdx, false);
+            _tableView.SetSelection (_tableView.Value!.SelectedCell.X, newIdx, false);
             _tableView.EnsureCursorIsVisible ();
             _tableView.SetNeedsDraw ();
         }
@@ -380,8 +380,8 @@ public class CsvEditor : Scenario
             return;
         }
 
-        int cursorRow = _tableView.Value?.Cursor.Y ?? 0;
-        int cursorCol = _tableView.Value?.Cursor.X ?? 0;
+        int cursorRow = _tableView.Value?.SelectedCell.Y ?? 0;
+        int cursorCol = _tableView.Value?.SelectedCell.X ?? 0;
 
         // only update the text box if the user is not manually editing it
         if (!_selectedCellTextField.HasFocus)
@@ -475,7 +475,7 @@ public class CsvEditor : Scenario
             return;
         }
 
-        DataColumn currentCol = _currentTable.Columns [_tableView.Value?.Cursor.X ?? 0];
+        DataColumn currentCol = _currentTable.Columns [_tableView.Value?.SelectedCell.X ?? 0];
 
         if (!GetText ("Rename Column", "Name:", currentCol.ColumnName, out string newName))
         {
@@ -543,7 +543,7 @@ public class CsvEditor : Scenario
             return;
         }
 
-        DataColumn col = _currentTable.Columns [_tableView.Value?.Cursor.X ?? 0];
+        DataColumn col = _currentTable.Columns [_tableView.Value?.SelectedCell.X ?? 0];
 
         if (col.DataType == typeof (string))
         {
@@ -581,7 +581,7 @@ public class CsvEditor : Scenario
             return;
         }
 
-        string colName = _tableView.Table!.ColumnNames [_tableView.Value.Cursor.X];
+        string colName = _tableView.Table!.ColumnNames [_tableView.Value.SelectedCell.X];
 
         _currentTable.DefaultView.Sort = colName + (asc ? " asc" : " desc");
         SetTable (_currentTable.DefaultView.ToTable ());

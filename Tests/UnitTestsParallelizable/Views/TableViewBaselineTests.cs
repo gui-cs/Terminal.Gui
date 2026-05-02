@@ -62,12 +62,12 @@ public class TableViewBaselineTests : TestDriverBase
         TableView tv = CreateTableView (5, 10);
 
         // Table setter puts us at (0,0)
-        Assert.Equal (0, tv.Value!.Cursor.X);
-        Assert.Equal (0, tv.Value!.Cursor.Y);
+        Assert.Equal (0, tv.Value!.SelectedCell.X);
+        Assert.Equal (0, tv.Value!.SelectedCell.Y);
 
         tv.NewKeyDownEvent (Key.CursorRight);
-        Assert.Equal (1, tv.Value!.Cursor.X);
-        Assert.Equal (0, tv.Value!.Cursor.Y);
+        Assert.Equal (1, tv.Value!.SelectedCell.X);
+        Assert.Equal (0, tv.Value!.SelectedCell.Y);
     }
 
     [Fact]
@@ -75,49 +75,49 @@ public class TableViewBaselineTests : TestDriverBase
     {
         TableView tv = CreateTableView (5, 10);
         tv.NewKeyDownEvent (Key.CursorDown);
-        Assert.Equal (0, tv.Value!.Cursor.X);
-        Assert.Equal (1, tv.Value!.Cursor.Y);
+        Assert.Equal (0, tv.Value!.SelectedCell.X);
+        Assert.Equal (1, tv.Value!.SelectedCell.Y);
     }
 
     [Fact]
     public void ArrowLeft_AtColumn0_DoesNotGoNegative ()
     {
         TableView tv = CreateTableView (5, 10);
-        Assert.Equal (0, tv.Value!.Cursor.X);
+        Assert.Equal (0, tv.Value!.SelectedCell.X);
 
         // Left at col 0 — should not go negative
         // HACK: Without Application/focus context, the command returns false
         // and doesn't transfer focus. The key assertion is column stays at 0.
         tv.NewKeyDownEvent (Key.CursorLeft);
-        Assert.Equal (0, tv.Value!.Cursor.X);
+        Assert.Equal (0, tv.Value!.SelectedCell.X);
     }
 
     [Fact]
     public void ArrowUp_AtRow0_DoesNotGoNegative ()
     {
         TableView tv = CreateTableView (5, 10);
-        Assert.Equal (0, tv.Value!.Cursor.Y);
+        Assert.Equal (0, tv.Value!.SelectedCell.Y);
 
         tv.NewKeyDownEvent (Key.CursorUp);
-        Assert.Equal (0, tv.Value!.Cursor.Y);
+        Assert.Equal (0, tv.Value!.SelectedCell.Y);
     }
 
     [Fact]
     public void ArrowRight_AtLastColumn_ClampsToLastColumn ()
     {
         TableView tv = CreateTableView (3, 5);
-        tv.SetSelection (2, tv.Value?.Cursor.Y ?? 0, false); // last column (0-indexed)
+        tv.SetSelection (2, tv.Value?.SelectedCell.Y ?? 0, false); // last column (0-indexed)
         tv.NewKeyDownEvent (Key.CursorRight);
-        Assert.Equal (2, tv.Value!.Cursor.X);
+        Assert.Equal (2, tv.Value!.SelectedCell.X);
     }
 
     [Fact]
     public void ArrowDown_AtLastRow_ClampsToLastRow ()
     {
         TableView tv = CreateTableView (3, 5);
-        tv.SetSelection (tv.Value?.Cursor.X ?? 0, 4, false); // last row (0-indexed)
+        tv.SetSelection (tv.Value?.SelectedCell.X ?? 0, 4, false); // last row (0-indexed)
         tv.NewKeyDownEvent (Key.CursorDown);
-        Assert.Equal (4, tv.Value!.Cursor.Y);
+        Assert.Equal (4, tv.Value!.SelectedCell.Y);
     }
 
     [Fact]
@@ -132,8 +132,8 @@ public class TableViewBaselineTests : TestDriverBase
         tv.NewKeyDownEvent (Key.CursorDown);
         tv.NewKeyDownEvent (Key.CursorDown);
 
-        Assert.Equal (2, tv.Value!.Cursor.X);
-        Assert.Equal (3, tv.Value!.Cursor.Y);
+        Assert.Equal (2, tv.Value!.SelectedCell.X);
+        Assert.Equal (3, tv.Value!.SelectedCell.Y);
     }
 
     #endregion
@@ -144,62 +144,62 @@ public class TableViewBaselineTests : TestDriverBase
     public void PageDown_MovesByViewportHeight ()
     {
         TableView tv = CreateTableView (3, 50, viewportHeight: 10);
-        Assert.Equal (0, tv.Value!.Cursor.Y);
+        Assert.Equal (0, tv.Value!.SelectedCell.Y);
 
         tv.PageDown (false, null);
-        Assert.Equal (10, tv.Value!.Cursor.Y);
+        Assert.Equal (10, tv.Value!.SelectedCell.Y);
     }
 
     [Fact]
     public void PageUp_MovesByViewportHeight ()
     {
         TableView tv = CreateTableView (3, 50, viewportHeight: 10);
-        tv.SetSelection (tv.Value?.Cursor.X ?? 0, 20, false);
+        tv.SetSelection (tv.Value?.SelectedCell.X ?? 0, 20, false);
 
         tv.PageUp (false, null);
-        Assert.Equal (10, tv.Value!.Cursor.Y);
+        Assert.Equal (10, tv.Value!.SelectedCell.Y);
     }
 
     [Fact]
     public void PageDown_ClampsAtLastRow ()
     {
         TableView tv = CreateTableView (3, 5, viewportHeight: 10);
-        Assert.Equal (0, tv.Value!.Cursor.Y);
+        Assert.Equal (0, tv.Value!.SelectedCell.Y);
 
         tv.PageDown (false, null);
-        Assert.Equal (4, tv.Value!.Cursor.Y); // last row is 4 (0-indexed, 5 rows)
+        Assert.Equal (4, tv.Value!.SelectedCell.Y); // last row is 4 (0-indexed, 5 rows)
     }
 
     [Fact]
     public void PageUp_ClampsAtRow0 ()
     {
         TableView tv = CreateTableView (3, 50, viewportHeight: 10);
-        tv.SetSelection (tv.Value?.Cursor.X ?? 0, 3, false);
+        tv.SetSelection (tv.Value?.SelectedCell.X ?? 0, 3, false);
 
         tv.PageUp (false, null);
-        Assert.Equal (0, tv.Value!.Cursor.Y);
+        Assert.Equal (0, tv.Value!.SelectedCell.Y);
     }
 
     [Fact]
     public void Home_Key_MovesToStartOfRow ()
     {
         TableView tv = CreateTableView (5, 10);
-        tv.SetSelection (3, tv.Value?.Cursor.Y ?? 0, false);
+        tv.SetSelection (3, tv.Value?.SelectedCell.Y ?? 0, false);
 
         tv.NewKeyDownEvent (Key.Home);
-        Assert.Equal (0, tv.Value!.Cursor.X);
-        Assert.Equal (0, tv.Value!.Cursor.Y); // row unchanged
+        Assert.Equal (0, tv.Value!.SelectedCell.X);
+        Assert.Equal (0, tv.Value!.SelectedCell.Y); // row unchanged
     }
 
     [Fact]
     public void End_Key_MovesToEndOfRow ()
     {
         TableView tv = CreateTableView (5, 10);
-        tv.SetSelection (1, tv.Value?.Cursor.Y ?? 0, false);
+        tv.SetSelection (1, tv.Value?.SelectedCell.Y ?? 0, false);
 
         tv.NewKeyDownEvent (Key.End);
-        Assert.Equal (4, tv.Value!.Cursor.X); // last column (0-indexed, 5 cols)
-        Assert.Equal (0, tv.Value!.Cursor.Y); // row unchanged
+        Assert.Equal (4, tv.Value!.SelectedCell.X); // last column (0-indexed, 5 cols)
+        Assert.Equal (0, tv.Value!.SelectedCell.Y); // row unchanged
     }
 
     [Fact]
@@ -209,8 +209,8 @@ public class TableViewBaselineTests : TestDriverBase
         tv.SetSelection (3, 7, false);
 
         tv.MoveCursorToStartOfTable (false, null);
-        Assert.Equal (0, tv.Value!.Cursor.X);
-        Assert.Equal (0, tv.Value!.Cursor.Y);
+        Assert.Equal (0, tv.Value!.SelectedCell.X);
+        Assert.Equal (0, tv.Value!.SelectedCell.Y);
     }
 
     [Fact]
@@ -218,8 +218,8 @@ public class TableViewBaselineTests : TestDriverBase
     {
         TableView tv = CreateTableView (5, 10);
         tv.MoveCursorToEndOfTable (false, null);
-        Assert.Equal (4, tv.Value!.Cursor.X);
-        Assert.Equal (9, tv.Value!.Cursor.Y);
+        Assert.Equal (4, tv.Value!.SelectedCell.X);
+        Assert.Equal (9, tv.Value!.SelectedCell.Y);
     }
 
     [Fact]
@@ -227,11 +227,11 @@ public class TableViewBaselineTests : TestDriverBase
     {
         TableView tv = CreateTableView (5, 10);
         tv.FullRowSelect = true;
-        tv.SetSelection (2, tv.Value?.Cursor.Y ?? 0, false);
+        tv.SetSelection (2, tv.Value?.SelectedCell.Y ?? 0, false);
 
         tv.MoveCursorToEndOfTable (false, null);
-        Assert.Equal (2, tv.Value!.Cursor.X); // column preserved with FullRowSelect
-        Assert.Equal (9, tv.Value!.Cursor.Y);
+        Assert.Equal (2, tv.Value!.SelectedCell.X); // column preserved with FullRowSelect
+        Assert.Equal (9, tv.Value!.SelectedCell.Y);
     }
 
     [Fact]
@@ -241,8 +241,8 @@ public class TableViewBaselineTests : TestDriverBase
         tv.SetSelection (3, 5, false);
 
         tv.MoveCursorToStartOfRow (false, null);
-        Assert.Equal (0, tv.Value!.Cursor.X);
-        Assert.Equal (5, tv.Value!.Cursor.Y); // row unchanged
+        Assert.Equal (0, tv.Value!.SelectedCell.X);
+        Assert.Equal (5, tv.Value!.SelectedCell.Y); // row unchanged
     }
 
     [Fact]
@@ -252,8 +252,8 @@ public class TableViewBaselineTests : TestDriverBase
         tv.SetSelection (1, 5, false);
 
         tv.MoveCursorToEndOfRow (false, null);
-        Assert.Equal (4, tv.Value!.Cursor.X);
-        Assert.Equal (5, tv.Value!.Cursor.Y);
+        Assert.Equal (4, tv.Value!.SelectedCell.X);
+        Assert.Equal (5, tv.Value!.SelectedCell.Y);
     }
 
     #endregion
@@ -271,8 +271,8 @@ public class TableViewBaselineTests : TestDriverBase
         tv.ValueChanged += (_, e) =>
                            {
                                fired = true;
-                               oldCursor = e.OldValue?.Cursor;
-                               newCursor = e.NewValue?.Cursor;
+                               oldCursor = e.OldValue?.SelectedCell;
+                               newCursor = e.NewValue?.SelectedCell;
                            };
 
         tv.NewKeyDownEvent (Key.CursorDown);
@@ -417,7 +417,7 @@ public class TableViewBaselineTests : TestDriverBase
     {
         TableView tv = CreateTableView (5, 10);
         tv.FullRowSelect = true;
-        tv.SetSelection (tv.Value?.Cursor.X ?? 0, 3, false);
+        tv.SetSelection (tv.Value?.SelectedCell.X ?? 0, 3, false);
 
         for (var col = 0; col < 5; col++)
         {
@@ -437,7 +437,7 @@ public class TableViewBaselineTests : TestDriverBase
 
         Assert.True (tv.IsSelected (1, 1), "Origin cell should be selected");
         Assert.True (tv.IsSelected (2, 1), "Extended cell should be selected");
-        Assert.Equal (2, tv.Value!.Cursor.X);
+        Assert.Equal (2, tv.Value!.SelectedCell.X);
     }
 
     [Fact]
@@ -451,7 +451,7 @@ public class TableViewBaselineTests : TestDriverBase
         Assert.True (tv.IsSelected (0, 0));
         Assert.True (tv.IsSelected (0, 1));
         Assert.True (tv.IsSelected (0, 2));
-        Assert.Equal (2, tv.Value!.Cursor.Y);
+        Assert.Equal (2, tv.Value!.SelectedCell.Y);
     }
 
     #endregion
@@ -566,47 +566,47 @@ public class TableViewBaselineTests : TestDriverBase
     public void SingleCell_Table_BoundaryNavigation ()
     {
         TableView tv = CreateTableView (1, 1);
-        Assert.Equal (0, tv.Value!.Cursor.X);
-        Assert.Equal (0, tv.Value!.Cursor.Y);
+        Assert.Equal (0, tv.Value!.SelectedCell.X);
+        Assert.Equal (0, tv.Value!.SelectedCell.Y);
 
         // Can't move anywhere
         tv.NewKeyDownEvent (Key.CursorRight);
-        Assert.Equal (0, tv.Value!.Cursor.X);
+        Assert.Equal (0, tv.Value!.SelectedCell.X);
 
         tv.NewKeyDownEvent (Key.CursorDown);
-        Assert.Equal (0, tv.Value!.Cursor.Y);
+        Assert.Equal (0, tv.Value!.SelectedCell.Y);
     }
 
     [Fact]
     public void SelectedColumn_SetBeyondBounds_Clamped ()
     {
         TableView tv = CreateTableView (5, 10);
-        tv.SetSelection (100, tv.Value?.Cursor.Y ?? 0, false);
-        Assert.Equal (4, tv.Value!.Cursor.X); // clamped to last column
+        tv.SetSelection (100, tv.Value?.SelectedCell.Y ?? 0, false);
+        Assert.Equal (4, tv.Value!.SelectedCell.X); // clamped to last column
     }
 
     [Fact]
     public void SelectedRow_SetBeyondBounds_Clamped ()
     {
         TableView tv = CreateTableView (5, 10);
-        tv.SetSelection (tv.Value?.Cursor.X ?? 0, 100, false);
-        Assert.Equal (9, tv.Value!.Cursor.Y); // clamped to last row
+        tv.SetSelection (tv.Value?.SelectedCell.X ?? 0, 100, false);
+        Assert.Equal (9, tv.Value!.SelectedCell.Y); // clamped to last row
     }
 
     [Fact]
     public void SelectedColumn_SetNegative_ClampedToZero ()
     {
         TableView tv = CreateTableView (5, 10);
-        tv.SetSelection (-5, tv.Value?.Cursor.Y ?? 0, false);
-        Assert.Equal (0, tv.Value!.Cursor.X);
+        tv.SetSelection (-5, tv.Value?.SelectedCell.Y ?? 0, false);
+        Assert.Equal (0, tv.Value!.SelectedCell.X);
     }
 
     [Fact]
     public void SelectedRow_SetNegative_ClampedToZero ()
     {
         TableView tv = CreateTableView (5, 10);
-        tv.SetSelection (tv.Value?.Cursor.X ?? 0, -5, false);
-        Assert.Equal (0, tv.Value!.Cursor.Y);
+        tv.SetSelection (tv.Value?.SelectedCell.X ?? 0, -5, false);
+        Assert.Equal (0, tv.Value!.SelectedCell.Y);
     }
 
     [Fact]
@@ -618,8 +618,8 @@ public class TableViewBaselineTests : TestDriverBase
         tv.Table = BuildTable (5, 10);
 
         // Table setter calls SetSelection(0, 0, false)
-        Assert.Equal (0, tv.Value!.Cursor.X);
-        Assert.Equal (0, tv.Value!.Cursor.Y);
+        Assert.Equal (0, tv.Value!.SelectedCell.X);
+        Assert.Equal (0, tv.Value!.SelectedCell.Y);
     }
 
     [Fact]
@@ -659,13 +659,13 @@ public class TableViewBaselineTests : TestDriverBase
     {
         TableView tv = CreateTableView (5, 10);
         Assert.NotNull (tv.Value);
-        Assert.Equal (new Point (0, 0), tv.Value!.Cursor);
+        Assert.Equal (new Point (0, 0), tv.Value!.SelectedCell);
 
-        tv.SetSelection (2, tv.Value?.Cursor.Y ?? 0, false);
-        Assert.Equal (new Point (2, 0), tv.Value!.Cursor);
+        tv.SetSelection (2, tv.Value?.SelectedCell.Y ?? 0, false);
+        Assert.Equal (new Point (2, 0), tv.Value!.SelectedCell);
 
-        tv.SetSelection (tv.Value?.Cursor.X ?? 0, 3, false);
-        Assert.Equal (new Point (2, 3), tv.Value!.Cursor);
+        tv.SetSelection (tv.Value?.SelectedCell.X ?? 0, 3, false);
+        Assert.Equal (new Point (2, 3), tv.Value!.SelectedCell);
     }
 
     [Fact]
@@ -675,7 +675,7 @@ public class TableViewBaselineTests : TestDriverBase
         tv.NewKeyDownEvent (Key.CursorRight);
         tv.NewKeyDownEvent (Key.CursorDown);
         Assert.NotNull (tv.Value);
-        Assert.Equal (new Point (1, 1), tv.Value!.Cursor);
+        Assert.Equal (new Point (1, 1), tv.Value!.SelectedCell);
     }
 
     [Fact]
@@ -688,7 +688,7 @@ public class TableViewBaselineTests : TestDriverBase
 
         tv.Table = BuildTable (5, 10);
         Assert.NotNull (tv.Value);
-        Assert.Equal (new Point (0, 0), tv.Value!.Cursor);
+        Assert.Equal (new Point (0, 0), tv.Value!.SelectedCell);
     }
 
     [Fact]
@@ -709,9 +709,9 @@ public class TableViewBaselineTests : TestDriverBase
         tv.NewKeyDownEvent (Key.CursorDown);
         Assert.True (fired);
         Assert.NotNull (oldVal);
-        Assert.Equal (new Point (0, 0), oldVal!.Cursor);
+        Assert.Equal (new Point (0, 0), oldVal!.SelectedCell);
         Assert.NotNull (newVal);
-        Assert.Equal (new Point (0, 1), newVal!.Cursor);
+        Assert.Equal (new Point (0, 1), newVal!.SelectedCell);
     }
 
     #endregion
@@ -759,7 +759,7 @@ public class TableViewBaselineTests : TestDriverBase
         TableView tv = CreateTableView (3, 50, viewportHeight: 5);
 
         // Move to a row that is beyond viewport
-        tv.SetSelection (tv.Value?.Cursor.X ?? 0, 20, false);
+        tv.SetSelection (tv.Value?.SelectedCell.X ?? 0, 20, false);
         tv.EnsureCursorIsVisible ();
 
         // After ensuring visibility, Viewport.Y should have adjusted
@@ -781,17 +781,17 @@ public class TableViewBaselineTests : TestDriverBase
     {
         TableView tv = CreateTableView (5, 10);
         tv.MoveCursorByOffset (2, 0, false, null);
-        Assert.Equal (2, tv.Value!.Cursor.X);
-        Assert.Equal (0, tv.Value!.Cursor.Y);
+        Assert.Equal (2, tv.Value!.SelectedCell.X);
+        Assert.Equal (0, tv.Value!.SelectedCell.Y);
     }
 
     [Fact]
     public void MoveCursorByOffset_Negative_MovesLeft ()
     {
         TableView tv = CreateTableView (5, 10);
-        tv.SetSelection (3, tv.Value?.Cursor.Y ?? 0, false);
+        tv.SetSelection (3, tv.Value?.SelectedCell.Y ?? 0, false);
         tv.MoveCursorByOffset (-2, 0, false, null);
-        Assert.Equal (1, tv.Value!.Cursor.X);
+        Assert.Equal (1, tv.Value!.SelectedCell.X);
     }
 
     [Fact]
@@ -802,8 +802,8 @@ public class TableViewBaselineTests : TestDriverBase
 
         tv.MoveCursorByOffset (2, 2, true, null);
 
-        Assert.Equal (2, tv.Value!.Cursor.X);
-        Assert.Equal (2, tv.Value!.Cursor.Y);
+        Assert.Equal (2, tv.Value!.SelectedCell.X);
+        Assert.Equal (2, tv.Value!.SelectedCell.Y);
         Assert.True (tv.IsSelected (0, 0), "Origin should still be selected");
         Assert.True (tv.IsSelected (2, 2), "New position should be selected");
         Assert.True (tv.IsSelected (1, 1), "Cell in between should be selected");
@@ -816,8 +816,8 @@ public class TableViewBaselineTests : TestDriverBase
         tv.SetSelection (2, 4, false);
 
         tv.MoveCursorByOffset (5, 5, false, null);
-        Assert.Equal (2, tv.Value!.Cursor.X); // clamped
-        Assert.Equal (4, tv.Value!.Cursor.Y); // clamped
+        Assert.Equal (2, tv.Value!.SelectedCell.X); // clamped
+        Assert.Equal (4, tv.Value!.SelectedCell.Y); // clamped
     }
 
     #endregion
@@ -830,8 +830,8 @@ public class TableViewBaselineTests : TestDriverBase
         TableView tv = CreateTableView (5, 10);
         tv.SetSelection (3, 7, false);
 
-        Assert.Equal (3, tv.Value!.Cursor.X);
-        Assert.Equal (7, tv.Value!.Cursor.Y);
+        Assert.Equal (3, tv.Value!.SelectedCell.X);
+        Assert.Equal (7, tv.Value!.SelectedCell.Y);
     }
 
     [Fact]
@@ -841,8 +841,8 @@ public class TableViewBaselineTests : TestDriverBase
         tv.SetSelection (1, 1, false);
         tv.SetSelection (3, 3, true);
 
-        Assert.Equal (3, tv.Value!.Cursor.X);
-        Assert.Equal (3, tv.Value!.Cursor.Y);
+        Assert.Equal (3, tv.Value!.SelectedCell.X);
+        Assert.Equal (3, tv.Value!.SelectedCell.Y);
         Assert.True (tv.IsSelected (1, 1), "Origin of extend should be selected");
         Assert.True (tv.IsSelected (2, 2), "Interior cell should be selected");
         Assert.True (tv.IsSelected (3, 3), "End of extend should be selected");

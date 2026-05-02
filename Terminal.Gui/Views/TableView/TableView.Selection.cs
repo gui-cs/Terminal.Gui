@@ -203,8 +203,8 @@ public partial class TableView
             return;
         }
 
-        _cursorColumn = _value.Cursor.X;
-        _cursorRow = _value.Cursor.Y;
+        _cursorColumn = _value.SelectedCell.X;
+        _cursorRow = _value.SelectedCell.Y;
 
         // Rebuild MultiSelectedRegions from Value.Regions (deep copy)
         MultiSelectedRegions.Clear ();
