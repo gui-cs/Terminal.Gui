@@ -20,7 +20,6 @@ namespace Terminal.Gui.Configuration;
 /// </code>
 /// </example>
 /// <remarks></remarks>
-#pragma warning disable IL2026 // ScopeJsonConverter and Scope<T> are AOT-compatible for known scope types
 [JsonConverter (typeof (ScopeJsonConverter<SettingsScope>))]
 public class SettingsScope : Scope<SettingsScope>
 {
@@ -29,7 +28,6 @@ public class SettingsScope : Scope<SettingsScope>
     ///     <see cref="ConfigProperty.HasValue"/>
     /// </summary>
     public SettingsScope ()
-#pragma warning restore IL2026
     {
         ConfigProperty? configProperty = GetUninitializedProperty ("Theme");
 

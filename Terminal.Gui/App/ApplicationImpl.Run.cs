@@ -187,8 +187,6 @@ internal partial class ApplicationImpl
     #region Session Lifecycle - Run
 
     /// <inheritdoc/>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new ()
     {
         if (!Initialized)

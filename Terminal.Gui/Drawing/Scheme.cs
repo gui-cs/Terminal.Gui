@@ -167,9 +167,7 @@ namespace Terminal.Gui.Drawing;
 ///         the fallback is White for foreground and Black for background.
 ///     </para>
 /// </remarks>
-#pragma warning disable IL2026 // SchemeJsonConverter is AOT-compatible
 [JsonConverter (typeof (SchemeJsonConverter))]
-#pragma warning restore IL2026
 public record Scheme : IEqualityOperators<Scheme, Scheme, bool>
 {
     /// <summary>
