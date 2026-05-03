@@ -7,7 +7,7 @@ namespace Terminal.Gui.Views;
 /// <remarks>
 ///     <para>A <see langword="null"/> <see cref="TableSelection"/> (as the value of <see cref="TableView.Value"/>) means
 ///     "no selection" — either no <see cref="TableView.Table"/> is assigned or the selection was explicitly cleared.</para>
-///     <para>A non-null <see cref="TableSelection"/> always has a non-null <see cref="Cursor"/>.</para>
+///     <para>A non-null <see cref="TableSelection"/> always has a non-null <see cref="SelectedCell"/>.</para>
 /// </remarks>
 public class TableSelection : IEquatable<TableSelection>
 {
@@ -16,7 +16,7 @@ public class TableSelection : IEquatable<TableSelection>
     /// <param name="regions">All extended selection regions (may be empty for cursor-only selection).</param>
     public TableSelection (Point cursor, IReadOnlyList<TableSelectionRegion>? regions)
     {
-        Cursor = cursor;
+        SelectedCell = cursor;
         Regions = regions ?? [];
     }
 
@@ -24,8 +24,8 @@ public class TableSelection : IEquatable<TableSelection>
     /// <param name="cursor">The cursor cell position.</param>
     public TableSelection (Point cursor) : this (cursor, []) { }
 
-    /// <summary>The cursor cell used for navigation. Always non-null on a non-null <see cref="TableSelection"/>.</summary>
-    public Point Cursor { get; }
+    /// <summary>The selected cell used for navigation. Always non-null on a non-null <see cref="TableSelection"/>.</summary>
+    public Point SelectedCell { get; }
 
     /// <summary>All extended selection regions. May be empty if only the cursor cell is selected.</summary>
     public IReadOnlyList<TableSelectionRegion> Regions { get; }
@@ -41,7 +41,7 @@ public class TableSelection : IEquatable<TableSelection>
             return false;
         }
 
-        if (Cursor != other.Cursor)
+        if (SelectedCell != other.SelectedCell)
         {
             return false;
         }
@@ -69,7 +69,7 @@ public class TableSelection : IEquatable<TableSelection>
     public override int GetHashCode ()
     {
         HashCode hash = new ();
-        hash.Add (Cursor);
+        hash.Add (SelectedCell);
 
         foreach (TableSelectionRegion region in Regions)
         {
