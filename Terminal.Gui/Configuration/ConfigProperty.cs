@@ -3,9 +3,9 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.Configuration;
 
@@ -29,6 +29,10 @@ public class ConfigProperty
 
     /// <summary>INTERNAL: Cached value of ConfigurationPropertyAttribute.Scope; makes more AOT friendly.</summary>
     internal string? ScopeType { get; set; }
+
+    /// <summary>INTERNAL: Cached value of JsonConverterAttribute.ConverterType; makes more AOT friendly.</summary>
+    [DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+    internal Type? ConverterType { get; set; }
 
     private object? _propertyValue;
 
@@ -65,8 +69,6 @@ public class ConfigProperty
 
     /// <summary>Applies the <see cref="PropertyValue"/> to the static property described by <see cref="PropertyInfo"/>.</summary>
     /// <returns></returns>
-    [RequiresDynamicCode ("Uses reflection to get and set property values")]
-    [RequiresUnreferencedCode ("Uses DeepCloner which requires types to be registered in SourceGenerationContext")]
     public bool Apply ()
     {
         try
@@ -117,6 +119,7 @@ public class ConfigProperty
             PropertyInfo = source.PropertyInfo,
             OmitClassName = source.OmitClassName,
             ScopeType = source.ScopeType,
+            ConverterType = source.ConverterType,
             HasValue = false
         };
     }
@@ -126,19 +129,43 @@ public class ConfigProperty
     /// </summary>
     /// <param name="propertyInfo">The PropertyInfo to create from</param>
     /// <returns>A new ConfigProperty with attribute data cached</returns>
-    [RequiresDynamicCode ("Uses reflection to access custom attributes")]
     internal static ConfigProperty CreateImmutableWithAttributeInfo (PropertyInfo propertyInfo)
     {
         var attr = propertyInfo.GetCustomAttribute (typeof (ConfigurationPropertyAttribute)) as ConfigurationPropertyAttribute;
+        var jsonConverterAttribute = propertyInfo.GetCustomAttribute (typeof (JsonConverterAttribute)) as JsonConverterAttribute;
 
         return new ConfigProperty
         {
             PropertyInfo = propertyInfo,
             OmitClassName = attr?.OmitClassName ?? false,
             ScopeType = attr?.Scope!.Name,
+            ConverterType = jsonConverterAttribute?.ConverterType ?? InferConverterType (propertyInfo),
             // By default, properties are immutable
             Immutable = true
         };
+    }
+
+    [return: DynamicallyAccessedMembers (DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
+    private static Type? InferConverterType (PropertyInfo propertyInfo)
+    {
+        Type propertyType = propertyInfo.PropertyType;
+
+        if (propertyType == typeof (ConcurrentDictionary<string, ThemeScope>))
+        {
+            return typeof (ConcurrentDictionaryJsonConverter<ThemeScope>);
+        }
+
+        if (propertyType == typeof (Dictionary<string, Scheme?>))
+        {
+            return typeof (DictionaryJsonConverter<Scheme?>);
+        }
+
+        if (propertyInfo.DeclaringType == typeof (Terminal.Gui.Tracing.Trace) && propertyType == typeof (TraceCategory))
+        {
+            return typeof (TraceCategoryJsonConverter);
+        }
+
+        return null;
     }
 
     /// <summary>
@@ -146,7 +173,6 @@ public class ConfigProperty
     /// </summary>
     /// <param name="propertyInfo">The PropertyInfo to get the attribute from</param>
     /// <returns>The ConfigurationPropertyAttribute if found; otherwise, null</returns>
-    [RequiresDynamicCode ("Uses reflection to access custom attributes")]
     internal static ConfigurationPropertyAttribute? GetConfigurationPropertyAttribute (PropertyInfo propertyInfo)
     {
         return propertyInfo.GetCustomAttribute (typeof (ConfigurationPropertyAttribute)) as ConfigurationPropertyAttribute;
@@ -157,7 +183,6 @@ public class ConfigProperty
     /// </summary>
     /// <param name="propertyInfo">The PropertyInfo to check</param>
     /// <returns>True if the PropertyInfo has a ConfigurationPropertyAttribute; otherwise, false</returns>
-    [RequiresDynamicCode ("Uses reflection to access custom attributes")]
     internal static bool HasConfigurationPropertyAttribute (PropertyInfo propertyInfo)
     {
         return propertyInfo.GetCustomAttribute (typeof (ConfigurationPropertyAttribute)) != null;
@@ -169,7 +194,6 @@ public class ConfigProperty
     /// </summary>
     /// <param name="pi"></param>
     /// <returns></returns>
-    [RequiresDynamicCode ("Uses reflection to access custom attributes")]
     internal static string GetJsonPropertyName (PropertyInfo pi)
     {
         var attr = pi.GetCustomAttribute (typeof (JsonPropertyNameAttribute)) as JsonPropertyNameAttribute;
@@ -182,7 +206,6 @@ public class ConfigProperty
     ///     property described in <see cref="PropertyInfo"/>.
     /// </summary>
     /// <returns></returns>
-    [RequiresDynamicCode ("Uses reflection to retrieve property values")]
     public object? UpdateToCurrentValue ()
     {
         return PropertyValue = PropertyInfo!.GetValue (null);
@@ -195,8 +218,6 @@ public class ConfigProperty
     /// <param name="source">The source object to copy values from.</param>
     /// <returns>The updated property value.</returns>
     /// <exception cref="ArgumentException">Thrown when the source type doesn't match the property type.</exception>
-    [RequiresUnreferencedCode ("Uses DeepCloner which requires types to be registered in SourceGenerationContext")]
-    [RequiresDynamicCode ("Calls Terminal.Gui.DeepCloner.DeepClone<T>(T)")]
     internal object? UpdateFrom (object? source)
     {
         // If the source (higher-priority layer) doesn't provide a value, keep the existing value
@@ -345,8 +366,6 @@ public class ConfigProperty
     /// </summary>
     /// <param name="source">The source ThemeScope dictionary.</param>
     /// <param name="destination">The destination ThemeScope dictionary.</param>
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.Scope<T>.UpdateFrom(Scope<T>)")]
-    [RequiresDynamicCode ("Calls Terminal.Gui.Scope<T>.UpdateFrom(Scope<T>)")]
     private static void UpdateThemeScopeDictionary (
         ConcurrentDictionary<string, ThemeScope> source,
         ConcurrentDictionary<string, ThemeScope> destination)
@@ -368,8 +387,6 @@ public class ConfigProperty
     /// </summary>
     /// <param name="source">The source ConfigProperty dictionary.</param>
     /// <param name="destination">The destination ConfigProperty dictionary.</param>
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
-    [RequiresDynamicCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
     private static void UpdateConfigPropertyConcurrentDictionary (
         ConcurrentDictionary<string, ConfigProperty> source,
         ConcurrentDictionary<string, ConfigProperty> destination)
@@ -399,8 +416,6 @@ public class ConfigProperty
     /// </summary>
     /// <param name="source">The source ConfigProperty dictionary.</param>
     /// <param name="destination">The destination ConfigProperty dictionary.</param>
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
-    [RequiresDynamicCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
     private static void UpdateConfigPropertyDictionary (
         Dictionary<string, ConfigProperty> source,
         Dictionary<string, ConfigProperty> destination)
@@ -470,15 +485,13 @@ public class ConfigProperty
     ///     </para>
     ///     <para>
     ///         Additional host types defined outside Terminal.Gui (test suites, plugins, embedding apps) are picked up via a
-    ///         runtime assembly scan when dynamic code is supported. The scan is a no-op under AOT where dynamic code is disabled,
-    ///         and any types it would find would have been trimmed anyway unless the consumer roots them.
+    ///         runtime assembly scan. Under NativeAOT this still works for consumer-rooted metadata, so initialization must not
+    ///         treat "no dynamic code" as "no reflection". Consumers that define their own
+    ///         <see cref="ConfigurationPropertyAttribute"/> hosts are responsible for preserving those types for trimming/AOT.
     ///     </para>
     /// </remarks>
-    [RequiresDynamicCode ("Uses reflection to scan assemblies for configuration properties. "
-                          + "Only called during initialization and not needed during normal operation. "
-                          + "In AOT environments, ensure all types with ConfigurationPropertyAttribute are preserved.")]
-    [RequiresUnreferencedCode ("Reflection requires all types with ConfigurationPropertyAttribute to be preserved in AOT. "
-                               + "Use the SourceGenerationContext to register all configuration property types.")]
+    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "The runtime scan is required to discover consumer-defined configuration hosts outside Terminal.Gui. Reflection works under NativeAOT when the consumer roots those types.")]
+    [UnconditionalSuppressMessage ("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "The runtime scan is required to discover consumer-defined configuration hosts outside Terminal.Gui. Consumers must preserve their config host types for trimming/AOT.")]
     internal static void Initialize ()
     {
         if (_classesWithConfigProps is { })
@@ -494,12 +507,10 @@ public class ConfigProperty
             dict [type.Name] = type;
         }
 
-        // JIT-only supplement: discover host types defined outside Terminal.Gui (test suites, plugins).
-        // Under AOT, RuntimeFeature.IsDynamicCodeSupported is false and we skip the scan entirely.
-        if (RuntimeFeature.IsDynamicCodeSupported)
-        {
-            ScanLoadedAssembliesForConfigPropertyHosts (dict);
-        }
+        // Supplement the built-in list by discovering host types defined outside Terminal.Gui
+        // (test suites, plugins, embedding apps). This remains important under NativeAOT for
+        // consumer-rooted host types such as app-defined AppSettingsScope entries.
+        ScanLoadedAssembliesForConfigPropertyHosts (dict);
 
         _classesWithConfigProps = dict.ToImmutableSortedDictionary ();
     }
@@ -563,11 +574,9 @@ public class ConfigProperty
     /// The <see cref="ConfigProperty"/> items have <see cref="PropertyInfo"/> set, but not <see cref="PropertyValue"/>. 
     /// <see cref="Immutable"/> is set to <see langword="true"/>.
     /// </summary>
-    [RequiresDynamicCode ("Uses reflection to scan assemblies for configuration properties. " +
-                         "Only called during initialization and not needed during normal operation. " +
-                         "In AOT environments, ensure all types with ConfigurationPropertyAttribute are preserved.")]
-    [RequiresUnreferencedCode ("Reflection requires all types with ConfigurationPropertyAttribute to be preserved in AOT. " +
-                              "Use the SourceGenerationContext to register all configuration property types.")]
+    [UnconditionalSuppressMessage ("AOT", "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.", Justification = "Called only on types preserved by ConfigPropertyHostTypes. HasConfigurationPropertyAttribute and CreateImmutableWithAttributeInfo operate only on statically-rooted types.")]
+    [UnconditionalSuppressMessage ("Trimming", "IL2026:Members annotated with 'RequiresUnreferencedCodeAttribute' require dynamic access otherwise can break functionality when trimming application code", Justification = "GetProperties is called only on types preserved by ConfigPropertyHostTypes via DynamicDependency(PublicProperties).")]
+    [UnconditionalSuppressMessage ("Trimming", "IL2075:'this' argument does not satisfy 'DynamicallyAccessedMemberTypes' in call to 'Type' member. The return value of the source method does not have matching annotations.", Justification = "GetProperties is called only on types whose PublicProperties are preserved by ConfigPropertyHostTypes via DynamicDependency.")]
     internal static ImmutableSortedDictionary<string, ConfigProperty> GetAllConfigProperties ()
     {
         if (_classesWithConfigProps is null)

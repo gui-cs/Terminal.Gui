@@ -227,12 +227,9 @@ A **Theme** is a named collection of visual settings bundled together. Terminal.
 // Get current theme
 ThemeScope currentTheme = ThemeManager.GetCurrentTheme();
 
-// Get all available themes (null if ConfigurationManager not yet initialized)
-ConcurrentDictionary<string, ThemeScope>? themes = ThemeManager.Themes;
-if (themes is null)
-{
-    return; // ConfigurationManager not yet initialized
-}
+// Get all available themes. Before ConfigurationManager is initialized,
+// this falls back to the hard-coded Default theme.
+ConcurrentDictionary<string, ThemeScope> themes = ThemeManager.Themes!;
 
 // Get theme names
 ImmutableList<string> themeNames = ThemeManager.GetThemeNames();
@@ -506,6 +503,13 @@ This:
 1. Enables ConfigurationManager
 2. Loads configuration from all locations
 3. Applies settings to the application
+
+### Configuration Gotchas
+
+- `ConfigurationManager.Initialize()` is internal and runs automatically when the module loads. Do not call it directly.
+- Initialization discovers configuration properties and caches hard-coded defaults, but it does **not** enable resource-backed configuration.
+- To load `Resources/config.json`, home/current-directory config files, `TUI_CONFIG`, or `RuntimeConfig`, call `ConfigurationManager.Enable(...)`.
+- `ThemeManager.Themes` falls back to the hard-coded `Default` theme before configuration is initialized. After initialization, it expects a `Themes` entry in settings and can throw if that entry is unavailable.
 
 ### Granular Control
 
