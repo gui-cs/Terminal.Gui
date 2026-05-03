@@ -99,13 +99,13 @@ TableView implements `IValue<TableSelection?>` to expose the complete selection 
 
 | Type | Description |
 |------|-------------|
-| `TableSelection` | Immutable snapshot: `Cursor` (a `Point`) + `Regions` (an `IReadOnlyList<TableSelectionRegion>`) |
+| `TableSelection` | Immutable snapshot: `SelectedCell` (a `Point`) + `Regions` (an `IReadOnlyList<TableSelectionRegion>`) |
 | `TableSelectionRegion` | A contiguous rectangular selection. Has `Origin`, `Rectangle`, and `IsExtended` |
 | `Value` property | The current `TableSelection?`. `null` means no table is set or selection was cleared |
 
-### Cursor
+### SelectedCell
 
-The cursor is the active cell — the anchor for navigation. Access it via `Value.Cursor` (`Point` where `X` = column index, `Y` = row index).
+The selected cell is the active cell — the anchor for navigation. Access it via `Value.SelectedCell` (`Point` where `X` = column index, `Y` = row index).
 
 Move the cursor programmatically with `SetSelection (col, row, extend)`.
 
@@ -124,11 +124,25 @@ Extended regions (`IsExtended = true`) persist through keyboard navigation. Non-
 
 When `FullRowSelect` is `true`, entire rows are selected instead of individual cells. All cells in the cursor's row are reported as selected by `GetAllSelectedCells ()` and `IsSelected ()`.
 
+> **Tip — Home/End with FullRowSelect:** By default, `Home` and `End` navigate to the
+> start/end of the current *row* (i.e. first/last column). To make `Home`/`End` jump to
+> the first/last *row* instead (which is often more useful in full-row mode), rebind them
+> to `Command.Start` and `Command.End`:
+>
+> ```csharp
+> tableView.KeyBindings.Remove (Key.Home);
+> tableView.KeyBindings.Add (Key.Home, Command.Start);
+> tableView.KeyBindings.Remove (Key.End);
+> tableView.KeyBindings.Add (Key.End, Command.End);
+> ```
+>
+> This is the pattern used by `UICatalogRunnable` for its scenario list.
+
 ### Reading the Selection
 
 ```csharp
-// Cursor position
-Point cursor = tv.Value!.Cursor; // (col, row)
+// Selected cell position
+Point selectedCell = tv.Value!.SelectedCell; // (col, row)
 
 // All selected cell coordinates
 IEnumerable<Point> cells = tv.GetAllSelectedCells ();
@@ -304,18 +318,18 @@ TableView uses the standard `IValue<T>` and `View` event patterns:
 | Event | When |
 |-------|------|
 | `ValueChanging` | Before `Value` changes. Set `Handled = true` to cancel. |
-| `ValueChanged` | After `Value` changed. Use this to react to cursor/selection changes. |
+| `ValueChanged` | After `Value` changed. Use this to react to selection changes. |
 | `Accepted` | User double-clicks or presses the Accept key on a cell. |
 | `Activating` | User clicks a cell (`Command.Activate`). |
 
-### Example: Reacting to Cursor Movement
+### Example: Reacting to Selection Changes
 
 ```csharp
 tv.ValueChanged += (sender, e) =>
 {
     if (e.NewValue is { } sel)
     {
-        statusBar.Text = $"Row {sel.Cursor.Y}, Col {sel.Cursor.X}";
+        statusBar.Text = $"Row {sel.SelectedCell.Y}, Col {sel.SelectedCell.X}";
     }
 };
 ```
@@ -325,8 +339,8 @@ tv.ValueChanged += (sender, e) =>
 ```csharp
 tv.Accepted += (sender, e) =>
 {
-    Point cursor = tv.Value!.Cursor;
-    object cellValue = tv.Table! [cursor.Y, cursor.X];
+    Point selectedCell = tv.Value!.SelectedCell;
+    object cellValue = tv.Table! [selectedCell.Y, selectedCell.X];
     MessageBox.Query ("Cell", $"Value: {cellValue}", "OK");
 };
 ```

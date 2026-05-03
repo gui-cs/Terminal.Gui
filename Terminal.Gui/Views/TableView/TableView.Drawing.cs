@@ -434,6 +434,23 @@ public partial class TableView
             {
                 RenderSeparator (current.X + current.Width - 1, row, false);
             }
+
+            // When vertical cell lines are not rendered AND the separator symbol is the default
+            // invisible space, extend the cell's background color into the 1-char gap at the
+            // cell's right edge. The cell render itself only fills (Width - 1) chars (TruncateOrPad
+            // intentionally leaves 1 char for the cell boundary). Without this, the gap retains
+            // the row-clear's rowScheme color, producing visible "stripes" between cells when a
+            // custom ColumnStyle.ColorGetter is in use (e.g. FileDialog). See issue #5075.
+            if (!_style.ShowVerticalCellLines && SeparatorSymbol == ' ')
+            {
+                int gapX = current.X + current.Width - 1;
+
+                if (gapX >= Viewport.X && gapX < Viewport.X + Viewport.Width)
+                {
+                    SetAttribute (cellColor);
+                    AddRuneAt (gapX - Viewport.X, row, (Rune)' ');
+                }
+            }
         }
 
         if (!_style.ShowVerticalCellLines)
@@ -462,6 +479,16 @@ public partial class TableView
         }
 
         bool renderLines = isHeader ? _style.ShowVerticalHeaderLines : _style.ShowVerticalCellLines;
+
+        // When vertical lines are not rendered AND the separator symbol is the default space,
+        // skip drawing here. RenderRow handles the gap between cells separately by extending
+        // the cell's own background into the gap position (preserves custom ColorGetter colors).
+        // Drawing a space here with the row's normal scheme would overwrite that. See issue #5075.
+        if (!renderLines && SeparatorSymbol == ' ')
+        {
+            return;
+        }
+
         Rune symbol = renderLines ? Glyphs.VLine : (Rune)SeparatorSymbol;
         RenderRune (col, row, symbol);
     }
@@ -565,6 +592,14 @@ public partial class TableView
         // if value is too wide, truncate by grapheme cluster to avoid splitting surrogate pairs
         if (representation.GetColumns () >= availableHorizontalSpace)
         {
+            string indicator = colStyle?.TruncationIndicator ?? string.Empty;
+            int indicatorWidth = indicator.GetColumns ();
+
+            // Only draw the indicator if it leaves room for at least one cell of content
+            // (otherwise fall back to silent clipping)
+            bool useIndicator = indicatorWidth > 0 && indicatorWidth < availableHorizontalSpace - 1;
+            int reserve = useIndicator ? indicatorWidth : 0;
+
             StringBuilder sb = new ();
             int remaining = availableHorizontalSpace;
 
@@ -572,13 +607,18 @@ public partial class TableView
             {
                 int w = grapheme.GetColumns ();
 
-                if (remaining - w <= 0)
+                if (remaining - w - reserve <= 0)
                 {
                     break;
                 }
 
                 sb.Append (grapheme);
                 remaining -= w;
+            }
+
+            if (useIndicator)
+            {
+                sb.Append (indicator);
             }
 
             return sb.ToString ();

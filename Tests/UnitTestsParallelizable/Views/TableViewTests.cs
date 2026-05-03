@@ -14,7 +14,7 @@ public class TableViewTests : TestDriverBase
         GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField _);
 
         // Make the selected cell one in
-        tableView.SetSelection (1, tableView.Value?.Cursor.Y ?? 0, false);
+        tableView.SetSelection (1, tableView.Value?.SelectedCell.Y ?? 0, false);
 
         // Pressing left should move us to the first column without changing focus
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorLeft);
@@ -37,7 +37,7 @@ public class TableViewTests : TestDriverBase
         GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField _);
 
         // Make the selected cell one in
-        tableView.SetSelection (tableView.Value?.Cursor.X ?? 0, 1, false);
+        tableView.SetSelection (tableView.Value?.SelectedCell.X ?? 0, 1, false);
 
         // First press should move us up
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorUp);
@@ -60,7 +60,7 @@ public class TableViewTests : TestDriverBase
         GetTableViewWithSiblings (out TextField _, out TableView tableView, out TextField tf2);
 
         // Make the selected cell one in from the rightmost column
-        tableView.SetSelection (tableView.Table!.Columns - 2, tableView.Value?.Cursor.Y ?? 0, false);
+        tableView.SetSelection (tableView.Table!.Columns - 2, tableView.Value?.SelectedCell.Y ?? 0, false);
 
         // First press should move us to the rightmost column without changing focus
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorRight);
@@ -83,7 +83,7 @@ public class TableViewTests : TestDriverBase
         GetTableViewWithSiblings (out TextField _, out TableView tableView, out TextField tf2);
 
         // Make the selected cell one in from the bottommost row
-        tableView.SetSelection (tableView.Value?.Cursor.X ?? 0, tableView.Table!.Rows - 2, false);
+        tableView.SetSelection (tableView.Value?.SelectedCell.X ?? 0, tableView.Table!.Rows - 2, false);
 
         // First press should move us to the bottommost row without changing focus
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorDown);
@@ -106,7 +106,7 @@ public class TableViewTests : TestDriverBase
         GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField _);
 
         // Make the selected cell one in
-        tableView.SetSelection (1, tableView.Value?.Cursor.Y ?? 0, false);
+        tableView.SetSelection (1, tableView.Value?.SelectedCell.Y ?? 0, false);
 
         // Pressing shift-left should give us a multi selection
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorLeft.WithShift);
@@ -215,18 +215,18 @@ public class TableViewTests : TestDriverBase
         tableView.HasFocus = true;
         tableView.KeyBindings.Add (Key.B, Command.Down);
 
-        Assert.Equal (0, tableView.Value!.Cursor.Y);
+        Assert.Equal (0, tableView.Value!.SelectedCell.Y);
 
         // Keys should be consumed to move down the navigation i.e. to apricot
         Assert.True (tableView.NewKeyDownEvent (Key.B));
-        Assert.Equal (1, tableView.Value!.Cursor.Y);
+        Assert.Equal (1, tableView.Value!.SelectedCell.Y);
 
         Assert.True (tableView.NewKeyDownEvent (Key.B));
-        Assert.Equal (2, tableView.Value!.Cursor.Y);
+        Assert.Equal (2, tableView.Value!.SelectedCell.Y);
 
         // There is no keybinding for Key.C so it hits collection navigator i.e. we jump to candle
         Assert.True (tableView.NewKeyDownEvent (Key.C));
-        Assert.Equal (5, tableView.Value!.Cursor.Y);
+        Assert.Equal (5, tableView.Value!.SelectedCell.Y);
     }
 
     [Fact]
@@ -247,10 +247,10 @@ public class TableViewTests : TestDriverBase
         tableView.Table = new DataTableSource (dt);
         tableView.HasFocus = true;
 
-        Assert.Equal (0, tableView.Value!.Cursor.Y);
+        Assert.Equal (0, tableView.Value!.SelectedCell.Y);
 
         Assert.True (tableView.NewKeyDownEvent (Key.B));
-        Assert.Equal (2, tableView.Value!.Cursor.Y);
+        Assert.Equal (2, tableView.Value!.SelectedCell.Y);
     }
 
     // Copilot
@@ -363,7 +363,7 @@ public class TableViewTests : TestDriverBase
         Assert.Null (ex);
 
         // Should land on "apple" (row 1), skipping the null-cell row gracefully
-        Assert.Equal (1, tableView.Value!.Cursor.Y);
+        Assert.Equal (1, tableView.Value!.SelectedCell.Y);
 
         tableView.Dispose ();
     }
@@ -384,7 +384,7 @@ public class TableViewTests : TestDriverBase
         Exception? ex = Record.Exception (() => tableView.NewKeyDownEvent (Key.B));
 
         Assert.Null (ex);
-        Assert.Equal (1, tableView.Value!.Cursor.Y);
+        Assert.Equal (1, tableView.Value!.SelectedCell.Y);
 
         tableView.Dispose ();
     }
@@ -506,6 +506,270 @@ public class TableViewTests : TestDriverBase
 
         // Result width should not exceed available space
         Assert.True (result.GetColumns () <= 4, $"Truncated result '{result}' exceeds available space");
+    }
+
+    // Claude - Opus 4.7
+    [Fact]
+    public void TruncationIndicator_DefaultIsHorizontalEllipsis ()
+    {
+        ColumnStyle style = new ();
+
+        Assert.Equal (Glyphs.HorizontalEllipsis.ToString (), style.TruncationIndicator);
+    }
+
+    // Claude - Opus 4.7
+    // Verifies fix for #5068: TableView appends a truncation indicator (default "…")
+    // when cell content exceeds the available column width.
+    [Fact]
+    public void TruncateOrPad_DefaultIndicator_AppendsEllipsisWhenTruncated ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+        ColumnStyle style = new ();
+
+        // "Hello" is 5 cols wide, available space is 5 → truncation branch (5 >= 5).
+        // Visible budget is availableHorizontalSpace - 1 = 4 (1 cell reserved for boundary).
+        // With 1-col indicator, content budget is 3 → "Hel" + "…" = "Hel…" (4 cols).
+        var result = (string)method.Invoke (null, ["Hello", "Hello", 5, style])!;
+
+        Assert.Equal ("Hel…", result);
+        Assert.Equal (4, result.GetColumns ());
+    }
+
+    // Claude - Opus 4.7
+    [Fact]
+    public void TruncateOrPad_NullIndicator_SilentlyClips ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+        ColumnStyle style = new () { TruncationIndicator = null };
+
+        var result = (string)method.Invoke (null, ["Hello", "Hello", 5, style])!;
+
+        Assert.Equal ("Hell", result);
+    }
+
+    // Claude - Opus 4.7
+    [Fact]
+    public void TruncateOrPad_EmptyIndicator_SilentlyClips ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+        ColumnStyle style = new () { TruncationIndicator = string.Empty };
+
+        var result = (string)method.Invoke (null, ["Hello", "Hello", 5, style])!;
+
+        Assert.Equal ("Hell", result);
+    }
+
+    // Claude - Opus 4.7
+    // When colStyle is null no indicator is configured so existing silent-clip behavior is preserved.
+    [Fact]
+    public void TruncateOrPad_NullColumnStyle_SilentlyClips ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+
+        var result = (string)method.Invoke (null, ["Hello", "Hello", 5, null])!;
+
+        Assert.Equal ("Hell", result);
+    }
+
+    // Claude - Opus 4.7
+    [Fact]
+    public void TruncateOrPad_CustomMultiColumnIndicator_Appended ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+        ColumnStyle style = new () { TruncationIndicator = "..." };
+
+        // availableHorizontalSpace=8, "Hello World" is 11 cols → truncation branch.
+        // Visible budget is 7 (8-1). Reserve 3 for "...". Content budget = 4 → "Hell" + "..." = "Hell..." (7 cols).
+        var result = (string)method.Invoke (null, ["Hello World", "Hello World", 8, style])!;
+
+        Assert.Equal ("Hell...", result);
+        Assert.Equal (7, result.GetColumns ());
+    }
+
+    // Claude - Opus 4.7
+    // When the indicator is wider than the visible column budget, fall back to silent clipping
+    // rather than producing an oversize result.
+    [Fact]
+    public void TruncateOrPad_IndicatorTooWide_SilentlyClips ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+        ColumnStyle style = new () { TruncationIndicator = "..." };
+
+        // availableHorizontalSpace=3 → visible budget is 2 → 3-col indicator does not fit.
+        var result = (string)method.Invoke (null, ["Hello", "Hello", 3, style])!;
+
+        Assert.Equal ("He", result);
+        Assert.True (result.GetColumns () <= 2);
+    }
+
+    // Claude - Opus 4.7
+    [Fact]
+    public void TruncateOrPad_IndicatorEqualsBudget_SilentlyClips ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+        ColumnStyle style = new () { TruncationIndicator = "…" };
+
+        // availableHorizontalSpace=2 → visible budget is 1 → indicator (1 col) would consume the entire
+        // budget and leave nothing for content. Falls back to silent clip.
+        var result = (string)method.Invoke (null, ["Hello", "Hello", 2, style])!;
+
+        Assert.Equal ("H", result);
+    }
+
+    // Claude - Opus 4.7
+    // No truncation occurs when content fits, so the indicator should not appear and the value
+    // should be padded according to the column style alignment.
+    [Fact]
+    public void TruncateOrPad_ContentFits_NoIndicatorAdded ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+        ColumnStyle style = new ();
+
+        // "Hi" is 2 cols, availableHorizontalSpace=10 → no truncation, padded to 9 cols (10-1 boundary).
+        var result = (string)method.Invoke (null, ["Hi", "Hi", 10, style])!;
+
+        Assert.DoesNotContain ('…', result);
+        Assert.StartsWith ("Hi", result);
+    }
+
+    // Claude - Opus 4.7
+    // Indicator must be appended after a complete grapheme cluster and must not split surrogate pairs
+    // or combining sequences.
+    [Fact]
+    public void TruncateOrPad_GraphemeContent_IndicatorAppendedCleanly ()
+    {
+        MethodInfo method = typeof (TableView).GetMethod ("TruncateOrPad", BindingFlags.NonPublic | BindingFlags.Static)!;
+        ColumnStyle style = new ();
+
+        // "🎉Hello" is 7 cols (emoji=2 + Hello=5). availableHorizontalSpace=5 → truncation.
+        // Visible budget = 4. Reserve 1 for indicator → content budget = 3.
+        // Add 🎉 (w=2, remaining content budget=1), add 'H' (w=1, content budget=0), break.
+        // Result = "🎉H" + "…" = "🎉H…" (4 cols).
+        var result = (string)method.Invoke (null, ["\U0001F389Hello", "\U0001F389Hello", 5, style])!;
+
+        Assert.Equal ("\U0001F389H…", result);
+        Assert.Equal (4, result.GetColumns ());
+
+        // No isolated surrogates
+        for (var i = 0; i < result.Length; i++)
+        {
+            if (char.IsHighSurrogate (result [i]))
+            {
+                Assert.True (i + 1 < result.Length && char.IsLowSurrogate (result [i + 1]));
+                i++;
+            }
+            else
+            {
+                Assert.False (char.IsLowSurrogate (result [i]));
+            }
+        }
+    }
+
+    // Claude - Opus 4.5 — regression for issue #5075
+    // When ShowVerticalCellLines is false AND a custom ColorGetter is used, the position between cells
+    // (the separator column, current.X - 1) was being overdrawn with a space using the row's normal
+    // scheme. This punched a 1-cell hole in the cell's custom color. The fix skips the separator draw
+    // when the symbol would be the default space and lines are off — the cell padding has already
+    // filled that position with the cell's color.
+    [Fact]
+    public void ShowVerticalCellLines_False_WithCustomColorGetter_PreservesCellColorAtSeparator ()
+    {
+        IDriver driver = CreateTestDriver (40, 5);
+
+        TableView tableView = new () { Driver = driver };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
+        tableView.Viewport = new Rectangle (0, 0, 40, 5);
+
+        tableView.Style.ShowHeaders = true;
+        tableView.Style.ShowHorizontalHeaderUnderline = false;
+        tableView.Style.ShowHorizontalHeaderOverline = false;
+        tableView.Style.AlwaysShowHeaders = true;
+        tableView.Style.ShowVerticalCellLines = false;
+        tableView.Style.ShowVerticalHeaderLines = false;
+        tableView.Style.ExpandLastColumn = false;
+        tableView.FullRowSelect = false;
+
+        // A custom scheme that is visibly distinct from the row scheme.
+        Scheme customScheme = new ()
+        {
+            Normal = new Attribute (Color.White, Color.Red),
+            Focus = new Attribute (Color.Red, Color.White),
+            HotNormal = new Attribute (Color.White, Color.Red),
+            HotFocus = new Attribute (Color.Red, Color.White),
+            Disabled = new Attribute (Color.White, Color.Red),
+            Active = new Attribute (Color.White, Color.Red)
+        };
+
+        tableView.Style.GetOrCreateColumnStyle (0).ColorGetter = _ => customScheme;
+        tableView.Style.GetOrCreateColumnStyle (1).ColorGetter = _ => customScheme;
+
+        DataTable dt = new ();
+        dt.Columns.Add ("A");
+        dt.Columns.Add ("B");
+        dt.Rows.Add ("aa", "bb");
+        tableView.Table = new DataTableSource (dt);
+
+        tableView.Layout ();
+        tableView.SetClipToScreen ();
+        tableView.Draw ();
+
+        // Find the row that contains the data ("aa" then "bb").
+        Cell [,] contents = driver.Contents!;
+        var dataRow = -1;
+
+        for (var r = 0; r < 5; r++)
+        {
+            var rowText = string.Empty;
+
+            for (var c = 0; c < 10; c++)
+            {
+                rowText += contents [r, c].Grapheme;
+            }
+
+            if (rowText.Contains ("aa") && rowText.Contains ("bb"))
+            {
+                dataRow = r;
+
+                break;
+            }
+        }
+
+        Assert.True (dataRow >= 0, "Expected a rendered data row containing 'aa' and 'bb'");
+
+        // Locate the columns for "aa" and "bb".
+        var aaCol = -1;
+        var bbCol = -1;
+
+        for (var c = 0; c < 39; c++)
+        {
+            if (aaCol < 0 && contents [dataRow, c].Grapheme == "a" && contents [dataRow, c + 1].Grapheme == "a")
+            {
+                aaCol = c;
+            }
+
+            if (bbCol < 0 && contents [dataRow, c].Grapheme == "b" && contents [dataRow, c + 1].Grapheme == "b")
+            {
+                bbCol = c;
+            }
+        }
+
+        Assert.True (aaCol >= 0 && bbCol > aaCol + 1, $"Expected 'aa' before 'bb'. aaCol={aaCol}, bbCol={bbCol}");
+
+        // The cells "aa" and "bb" must use the custom red background.
+        Assert.Equal (customScheme.Normal, contents [dataRow, aaCol].Attribute);
+        Assert.Equal (customScheme.Normal, contents [dataRow, bbCol].Attribute);
+
+        // The separator position is the gap between the end of "aa" and the start of "bb".
+        // Before the fix, this position was overdrawn with the row scheme attribute.
+        // After the fix, the cell padding's custom red attribute remains.
+        for (int c = aaCol + 2; c < bbCol; c++)
+        {
+            Assert.Equal (customScheme.Normal, contents [dataRow, c].Attribute);
+        }
+
+        tableView.Dispose ();
     }
 
     [Fact]

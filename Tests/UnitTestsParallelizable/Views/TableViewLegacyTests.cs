@@ -171,8 +171,8 @@ public class TableViewLegacyTests : TestDriverBase
         tableView.ValueChanged += (_, e) =>
                                   {
                                       called = true;
-                                      Assert.Equal (0, e.OldValue!.Cursor.X);
-                                      Assert.Equal (10, e.NewValue!.Cursor.X);
+                                      Assert.Equal (0, e.OldValue!.SelectedCell.X);
+                                      Assert.Equal (10, e.NewValue!.SelectedCell.X);
                                   };
 
         tableView.SetSelection (10, 0, false);
@@ -210,7 +210,7 @@ public class TableViewLegacyTests : TestDriverBase
         dt.Rows.Add (1, 2);
         dt.Rows.Add (3, 4);
         tableView.Table = new DataTableSource (dt);
-        tableView.SetSelection (selectedCol, tableView.Value?.Cursor.Y ?? 0, false);
+        tableView.SetSelection (selectedCol, tableView.Value?.SelectedCell.Y ?? 0, false);
 
         Assert.Equal (expectedRow, tableView.CollectionNavigator.GetNextMatchingItem (0, "3".ToCharArray () [0]));
     }

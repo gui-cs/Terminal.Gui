@@ -42,7 +42,7 @@ public partial class FileDialog
         // and the context menu is disposed when it is closed.
         App!.Popovers?.Register (contextMenu);
 
-        Point pos = new (_tableView.FrameToScreen ().X + 15, _tableView.FrameToScreen ().Y + (_tableView.Value?.Cursor.Y ?? 0) + _tableView.GetHeaderHeight ());
+        Point pos = new (_tableView.FrameToScreen ().X + 15, _tableView.FrameToScreen ().Y + (_tableView.Value?.SelectedCell.Y ?? 0) + _tableView.GetHeaderHeight ());
         contextMenu.MakeVisible (pos);
     }
 
@@ -121,7 +121,7 @@ public partial class FileDialog
             return;
         }
 
-        FileSystemInfoStats stats = RowToStats (_tableView.Value!.Cursor.Y);
+        FileSystemInfoStats stats = RowToStats (_tableView.Value!.SelectedCell.Y);
 
         if (stats.FileSystemInfo is IDirectoryInfo d)
         {
@@ -299,7 +299,7 @@ public partial class FileDialog
             return;
         }
 
-        FileSystemInfoStats stats = RowToStats (_tableView.Value.Cursor.Y);
+        FileSystemInfoStats stats = RowToStats (_tableView.Value.SelectedCell.Y);
 
         IFileSystemInfo? dest = stats.IsParent ? State!.Directory : stats.FileSystemInfo;
 

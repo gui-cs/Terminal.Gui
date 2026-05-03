@@ -1,5 +1,6 @@
 using System.ComponentModel;
-using Terminal.Gui.Tracing;
+using System.Diagnostics;
+using Trace = Terminal.Gui.Tracing.Trace;
 
 namespace Terminal.Gui.App;
 
@@ -20,21 +21,6 @@ internal class ApplicationMouse : IMouse, IDisposable
 
         // Subscribe to Application static property change events
         Application.IsMouseDisabledChanged += OnIsMouseDisabledChanged;
-
-    /// <inheritdoc/>
-    public IApplication? App { get; set; }
-
-    /// <inheritdoc/>
-    public Point? LastMousePosition { get; set; }
-
-    /// <inheritdoc/>
-    public bool IsMouseDisabled { get; set; }
-
-    // Event handler for Application static property changes
-    private void OnIsMouseDisabledChanged (object? sender, ValueChangedEventArgs<bool> e) => IsMouseDisabled = e.NewValue;
-
-    /// <inheritdoc/>
-    public List<View?> CachedViewsUnderMouse { get; } = [];
 
     /// <summary>
     ///     The popover that was just dismissed by a mouse-press-outside event.
@@ -58,12 +44,26 @@ internal class ApplicationMouse : IMouse, IDisposable
     /// </summary>
     private bool _isDismissRecursing;
 
-    /// <summary>
-    ///     Gets the popover that was just dismissed by a mouse-press-outside event, if any.
-    ///     Checked by <see cref="ApplicationPopover.Show"/> to suppress re-show during the
-    ///     same press → release → click cycle.
-    /// </summary>
-    internal IPopoverView? DismissedByMousePress => _dismissedByMousePress;
+    /// <inheritdoc/>
+    public void Dispose ()
+    {
+        ResetState ();
+
+        // Unsubscribe from Application static property change events
+        Application.IsMouseDisabledChanged -= OnIsMouseDisabledChanged;
+    }
+
+    /// <inheritdoc/>
+    public IApplication? App { get; set; }
+
+    /// <inheritdoc/>
+    public Point? LastMousePosition { get; set; }
+
+    /// <inheritdoc/>
+    public bool IsMouseDisabled { get; set; }
+
+    /// <inheritdoc/>
+    public List<View?> CachedViewsUnderMouse { get; } = [];
 
     /// <inheritdoc/>
     public event EventHandler<Mouse>? MouseEvent;
@@ -288,13 +288,6 @@ internal class ApplicationMouse : IMouse, IDisposable
         }
     }
 
-    /// <summary>
-    ///     Returns <see langword="true"/> when the mouse is currently grabbed by a view
-    ///     that belongs to <paramref name="hierarchyRoot"/>'s view hierarchy.
-    /// </summary>
-    private bool IsGrabbedByViewInHierarchy (View hierarchyRoot) =>
-        _mouseGrabViewRef?.TryGetTarget (out View? grabbed) is true && View.IsInHierarchy (hierarchyRoot, grabbed, true);
-
     /// <inheritdoc/>
     public void RaiseMouseEnterLeaveEvents (Point screenPosition, List<View?> currentViewsUnderMouse)
     {
@@ -363,6 +356,34 @@ internal class ApplicationMouse : IMouse, IDisposable
             }
         }
     }
+
+    /// <inheritdoc/>
+    public void ResetState ()
+    {
+        // Do not clear LastMousePosition; Popovers require it to stay set with last mouse pos.
+        CachedViewsUnderMouse.Clear ();
+        MouseEvent = null;
+        _mouseGrabViewRef = null;
+        _dismissedByMousePress = null;
+        _isDismissRecursing = false;
+    }
+
+    /// <summary>
+    ///     Gets the popover that was just dismissed by a mouse-press-outside event, if any.
+    ///     Checked by <see cref="ApplicationPopover.Show"/> to suppress re-show during the
+    ///     same press → release → click cycle.
+    /// </summary>
+    internal IPopoverView? DismissedByMousePress => _dismissedByMousePress;
+
+    /// <summary>
+    ///     Returns <see langword="true"/> when the mouse is currently grabbed by a view
+    ///     that belongs to <paramref name="hierarchyRoot"/>'s view hierarchy.
+    /// </summary>
+    private bool IsGrabbedByViewInHierarchy (View hierarchyRoot) =>
+        _mouseGrabViewRef?.TryGetTarget (out View? grabbed) is true && View.IsInHierarchy (hierarchyRoot, grabbed, true);
+
+    // Event handler for Application static property changes
+    private void OnIsMouseDisabledChanged (object? sender, ValueChangedEventArgs<bool> e) => IsMouseDisabled = e.NewValue;
 
     #region IMouseGrabHandler Implementation
 
@@ -546,24 +567,4 @@ internal class ApplicationMouse : IMouse, IDisposable
     }
 
     #endregion IMouseGrabHandler Implementation
-
-    /// <inheritdoc/>
-    public void ResetState ()
-    {
-        // Do not clear LastMousePosition; Popovers require it to stay set with last mouse pos.
-        CachedViewsUnderMouse.Clear ();
-        MouseEvent = null;
-        _mouseGrabViewRef = null;
-        _dismissedByMousePress = null;
-        _isDismissRecursing = false;
-    }
-
-    /// <inheritdoc/>
-    public void Dispose ()
-    {
-        ResetState ();
-
-        // Unsubscribe from Application static property change events
-        Application.IsMouseDisabledChanged -= OnIsMouseDisabledChanged;
-    }
 }

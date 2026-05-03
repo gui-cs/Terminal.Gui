@@ -7,6 +7,8 @@ namespace Terminal.Gui.Text;
 /// <summary>Extends <see cref="System.Text.Rune"/> to support TUI text manipulation.</summary>
 public static class RuneExtensions
 {
+    private static readonly Lock _wcwidthLock = new Lock ();
+
     /// <summary>Maximum Unicode code point.</summary>
     public static readonly int MaxUnicodeCodePoint = 0x10FFFF;
 
@@ -125,7 +127,13 @@ public static class RuneExtensions
     ///     The number of columns required to fit the rune, 0 if the argument is the null character, or -1 if the value is
     ///     not printable, otherwise the number of columns that the rune occupies.
     /// </returns>
-    public static int GetColumns (this Rune rune) { return UnicodeCalculator.GetWidth (rune); }
+    public static int GetColumns (this Rune rune)
+    {
+        lock (_wcwidthLock)
+        {
+            return UnicodeCalculator.GetWidth (rune);
+        }
+    }
 
     /// <summary>Get number of bytes required to encode the rune, based on the provided encoding.</summary>
     /// <remarks>This is a Terminal.Gui extension method to <see cref="System.Text.Rune"/> to support TUI text manipulation.</remarks>
