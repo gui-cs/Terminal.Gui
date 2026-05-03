@@ -119,7 +119,7 @@ public sealed class UICatalogRunnable : Runnable
             if (_scenarioList is { } && App is { } && _scenarioList.Table is { })
             {
                 ShowScenarioErrorsDialog (App,
-                                          _scenarioList.Table [_scenarioList.Value?.Cursor.Y ?? 0, 0].ToString () ?? string.Empty,
+                                          _scenarioList.Table [_scenarioList.Value?.SelectedCell.Y ?? 0, 0].ToString () ?? string.Empty,
                                           UICatalog.LogCapture.GetScenarioLogs ());
             }
 
@@ -614,10 +614,10 @@ public sealed class UICatalogRunnable : Runnable
 
         if (_scenarioList is { })
         {
-            _cachedScenarioIndex = _scenarioList.Value?.Cursor.Y ?? 0;
+            _cachedScenarioIndex = _scenarioList.Value?.SelectedCell.Y ?? 0;
 
             // Set the Result to the selected scenario name
-            Result = _scenarioList.Table? [_scenarioList.Value?.Cursor.Y ?? 0, 0];
+            Result = _scenarioList.Table? [_scenarioList.Value?.SelectedCell.Y ?? 0, 0];
         }
         Logging.Information ($"Scenario Selected; Stopping {GetType ().Name}: {Result}");
         App?.RequestStop ();

@@ -11,7 +11,7 @@ internal class TableCollectionNavigator : CollectionNavigatorBase
     /// <inheritdoc/>
     protected override object ElementAt (int idx)
     {
-        int col = _tableView.FullRowSelect ? 0 : _tableView.Value?.Cursor.X ?? 0;
+        int col = _tableView.FullRowSelect ? 0 : _tableView.Value?.SelectedCell.X ?? 0;
         object? rawValue = _tableView.Table? [idx, col];
 
         if (rawValue is null or DBNull)

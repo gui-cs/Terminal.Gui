@@ -14,7 +14,7 @@ public class TableViewTests : TestDriverBase
         GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField _);
 
         // Make the selected cell one in
-        tableView.SetSelection (1, tableView.Value?.Cursor.Y ?? 0, false);
+        tableView.SetSelection (1, tableView.Value?.SelectedCell.Y ?? 0, false);
 
         // Pressing left should move us to the first column without changing focus
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorLeft);
@@ -37,7 +37,7 @@ public class TableViewTests : TestDriverBase
         GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField _);
 
         // Make the selected cell one in
-        tableView.SetSelection (tableView.Value?.Cursor.X ?? 0, 1, false);
+        tableView.SetSelection (tableView.Value?.SelectedCell.X ?? 0, 1, false);
 
         // First press should move us up
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorUp);
@@ -60,7 +60,7 @@ public class TableViewTests : TestDriverBase
         GetTableViewWithSiblings (out TextField _, out TableView tableView, out TextField tf2);
 
         // Make the selected cell one in from the rightmost column
-        tableView.SetSelection (tableView.Table!.Columns - 2, tableView.Value?.Cursor.Y ?? 0, false);
+        tableView.SetSelection (tableView.Table!.Columns - 2, tableView.Value?.SelectedCell.Y ?? 0, false);
 
         // First press should move us to the rightmost column without changing focus
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorRight);
@@ -83,7 +83,7 @@ public class TableViewTests : TestDriverBase
         GetTableViewWithSiblings (out TextField _, out TableView tableView, out TextField tf2);
 
         // Make the selected cell one in from the bottommost row
-        tableView.SetSelection (tableView.Value?.Cursor.X ?? 0, tableView.Table!.Rows - 2, false);
+        tableView.SetSelection (tableView.Value?.SelectedCell.X ?? 0, tableView.Table!.Rows - 2, false);
 
         // First press should move us to the bottommost row without changing focus
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorDown);
@@ -106,7 +106,7 @@ public class TableViewTests : TestDriverBase
         GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField _);
 
         // Make the selected cell one in
-        tableView.SetSelection (1, tableView.Value?.Cursor.Y ?? 0, false);
+        tableView.SetSelection (1, tableView.Value?.SelectedCell.Y ?? 0, false);
 
         // Pressing shift-left should give us a multi selection
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorLeft.WithShift);
@@ -215,18 +215,18 @@ public class TableViewTests : TestDriverBase
         tableView.HasFocus = true;
         tableView.KeyBindings.Add (Key.B, Command.Down);
 
-        Assert.Equal (0, tableView.Value!.Cursor.Y);
+        Assert.Equal (0, tableView.Value!.SelectedCell.Y);
 
         // Keys should be consumed to move down the navigation i.e. to apricot
         Assert.True (tableView.NewKeyDownEvent (Key.B));
-        Assert.Equal (1, tableView.Value!.Cursor.Y);
+        Assert.Equal (1, tableView.Value!.SelectedCell.Y);
 
         Assert.True (tableView.NewKeyDownEvent (Key.B));
-        Assert.Equal (2, tableView.Value!.Cursor.Y);
+        Assert.Equal (2, tableView.Value!.SelectedCell.Y);
 
         // There is no keybinding for Key.C so it hits collection navigator i.e. we jump to candle
         Assert.True (tableView.NewKeyDownEvent (Key.C));
-        Assert.Equal (5, tableView.Value!.Cursor.Y);
+        Assert.Equal (5, tableView.Value!.SelectedCell.Y);
     }
 
     [Fact]
@@ -247,10 +247,10 @@ public class TableViewTests : TestDriverBase
         tableView.Table = new DataTableSource (dt);
         tableView.HasFocus = true;
 
-        Assert.Equal (0, tableView.Value!.Cursor.Y);
+        Assert.Equal (0, tableView.Value!.SelectedCell.Y);
 
         Assert.True (tableView.NewKeyDownEvent (Key.B));
-        Assert.Equal (2, tableView.Value!.Cursor.Y);
+        Assert.Equal (2, tableView.Value!.SelectedCell.Y);
     }
 
     // Copilot
@@ -363,7 +363,7 @@ public class TableViewTests : TestDriverBase
         Assert.Null (ex);
 
         // Should land on "apple" (row 1), skipping the null-cell row gracefully
-        Assert.Equal (1, tableView.Value!.Cursor.Y);
+        Assert.Equal (1, tableView.Value!.SelectedCell.Y);
 
         tableView.Dispose ();
     }
@@ -384,7 +384,7 @@ public class TableViewTests : TestDriverBase
         Exception? ex = Record.Exception (() => tableView.NewKeyDownEvent (Key.B));
 
         Assert.Null (ex);
-        Assert.Equal (1, tableView.Value!.Cursor.Y);
+        Assert.Equal (1, tableView.Value!.SelectedCell.Y);
 
         tableView.Dispose ();
     }

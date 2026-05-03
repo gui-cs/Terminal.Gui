@@ -71,8 +71,8 @@ public class MultiColouredTable : Scenario
             return;
         }
 
-        int col = _tableView.Value?.Cursor.X ?? 0;
-        int row = _tableView.Value?.Cursor.Y ?? 0;
+        int col = _tableView.Value?.SelectedCell.X ?? 0;
+        int row = _tableView.Value?.SelectedCell.Y ?? 0;
 
         var oldValue = _tableView.Table [row, col].ToString ();
 
