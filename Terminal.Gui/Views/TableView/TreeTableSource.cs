@@ -123,12 +123,12 @@ public class TreeTableSource<T> : IEnumerableTableSource<T>, IDisposable where T
 
     private void Table_KeyPress (object? sender, Key e)
     {
-        if (!IsInTreeColumn (_tableView.Value?.Cursor.X ?? 0, true))
+        if (!IsInTreeColumn (_tableView.Value?.SelectedCell.X ?? 0, true))
         {
             return;
         }
 
-        T? obj = _tree.GetObjectOnRow (_tableView.Value?.Cursor.Y ?? 0);
+        T? obj = _tree.GetObjectOnRow (_tableView.Value?.SelectedCell.Y ?? 0);
 
         if (obj is null)
         {
