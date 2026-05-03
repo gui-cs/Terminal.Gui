@@ -458,7 +458,12 @@ public class DropDownList : TextField
         }
 
         // Enable user to find & select an item by typing text
-        if (Source is null || !KeystrokeNavigator.Matcher.IsCompatibleKey (key))
+        if (Source is null)
+        {
+            return false;
+        }
+
+        if (!KeystrokeNavigator.Matcher.IsCompatibleKey (key))
         {
             return false;
         }
@@ -565,7 +570,12 @@ public class DropDownList : TextField
     {
         IList? items = Source?.ToList ();
 
-        if (items is null || index < 0 || index >= items.Count)
+        if (items is null)
+        {
+            return;
+        }
+
+        if (index < 0 || index >= items.Count)
         {
             return;
         }
