@@ -54,7 +54,7 @@ public class TableViewTest : Scenario
 
         var setSelectedRowButton = new Button { X = Pos.Right (selectedRowUpDown), Y = Pos.Bottom (optionsView), Text = "Set" };
         setSelectedRowButton.Padding.Thickness = new Thickness (1, 0, 1, 0);
-        setSelectedRowButton.Accepting += (sender, args) => tableView.SetSelection (tableView.Value?.Cursor.X ?? 0, selectedRowUpDown.Value, false);
+        setSelectedRowButton.Accepting += (sender, args) => tableView.SetSelection (tableView.Value?.SelectedCell.X ?? 0, selectedRowUpDown.Value, false);
 
         tableView = new TableView
         {

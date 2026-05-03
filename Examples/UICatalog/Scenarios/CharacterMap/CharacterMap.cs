@@ -138,7 +138,7 @@ public class CharacterMap : Scenario
                                             return;
                                         }
                                         EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table!;
-                                        string prevSelection = table.Data.ElementAt (_categoryList.Value?.Cursor.Y ?? 0).Category;
+                                        string prevSelection = table.Data.ElementAt (_categoryList.Value?.SelectedCell.Y ?? 0).Category;
                                         isDescending = !isDescending;
 
                                         _categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
@@ -169,7 +169,7 @@ public class CharacterMap : Scenario
                                           }
 
                                           EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table!;
-                                          _charMap.StartCodePoint = table.Data.ToArray () [args.NewValue.Cursor.Y].Start;
+                                          _charMap.StartCodePoint = table.Data.ToArray () [args.NewValue.SelectedCell.Y].Start;
                                           jumpEdit.Text = $"U+{_charMap.SelectedCodePoint:x5}";
                                       };
 
