@@ -112,6 +112,13 @@ public partial class Markdown
                         AddStr (drawCol, drawRow, grapheme);
                     }
                 }
+                else if (IsInSelection (contentRow, contentX))
+                {
+                    Attribute selAttr = GetAttributeForSegment (segment);
+                    Attribute reversed = new (selAttr.Background, selAttr.Foreground, selAttr.Style);
+                    SetAttribute (reversed);
+                    AddStr (drawCol, drawRow, grapheme);
+                }
                 else
                 {
                     DrawGrapheme (segment, grapheme, drawCol, drawRow);

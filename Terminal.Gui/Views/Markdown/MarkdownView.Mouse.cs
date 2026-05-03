@@ -43,6 +43,11 @@ public partial class Markdown
 
         AddCommand (Command.Accept, () => ActivateCurrentLink ());
 
+        // Selection and clipboard commands
+        AddCommand (Command.SelectAll, () => SelectAll ());
+        AddCommand (Command.Copy, () => Copy ());
+        AddCommand (Command.Context, () => ShowContextMenu ());
+
         // Apply default key bindings (maps CursorUp→Up, CursorDown→Down, etc.)
         ApplyKeyBindings (DefaultKeyBindings, DefaultKeyBindings);
 
@@ -52,13 +57,87 @@ public partial class Markdown
         MouseBindings.ReplaceCommands (MouseFlags.WheeledRight, Command.ScrollRight);
         MouseBindings.ReplaceCommands (MouseFlags.WheeledLeft, Command.ScrollLeft);
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
+        MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.Context);
+    }
+
+    /// <inheritdoc/>
+    protected override bool OnMouseEvent (Mouse mouse)
+    {
+        if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed) && !mouse.Flags.HasFlag (MouseFlags.PositionReport))
+        {
+            // Button-down: anchor the selection start
+            if (mouse.Position is { } pressPos)
+            {
+                int contentX = Viewport.X + pressPos.X;
+                int contentY = Math.Min (Viewport.Y + pressPos.Y, Math.Max (_renderedLines.Count - 1, 0));
+                _selectionAnchor = new Point (contentX, contentY);
+                _selectionCurrent = _selectionAnchor;
+            }
+
+            _isDragging = false;
+
+            if (App is { } && !App.Mouse.IsGrabbed (this))
+            {
+                App.Mouse.GrabMouse (this);
+            }
+
+            if (!HasFocus && CanFocus)
+            {
+                SetFocus ();
+            }
+
+            return false;
+        }
+
+        if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
+        {
+            // Drag: extend selection
+            if (mouse.Position is { } dragPos)
+            {
+                int contentX = Viewport.X + dragPos.X;
+                int contentY = Math.Min (Viewport.Y + dragPos.Y, Math.Max (_renderedLines.Count - 1, 0));
+                _selectionCurrent = new Point (contentX, contentY);
+                _isDragging = true;
+                _isSelecting = true;
+                SetNeedsDraw ();
+            }
+
+            return true;
+        }
+
+        if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonReleased))
+        {
+            if (App is { } && App.Mouse.IsGrabbed (this))
+            {
+                App.Mouse.UngrabMouse ();
+            }
+
+            return false;
+        }
+
+        return false;
     }
 
     /// <inheritdoc/>
     protected override void OnHasFocusChanged (bool newHasFocus, View? previousFocusedView, View? focusedView)
     {
-        if (!newHasFocus)
+        if (newHasFocus)
         {
+            CreateContextMenu ();
+
+            if (ContextMenu?.Key is { })
+            {
+                KeyBindings.Add (ContextMenu.Key, Command.Context);
+            }
+        }
+        else
+        {
+            if (ContextMenu?.Key is { })
+            {
+                KeyBindings.Remove (ContextMenu.Key);
+            }
+
+            DisposeContextMenu ();
             _activeLinkIndex = -1;
             SetNeedsDraw ();
         }
@@ -124,6 +203,17 @@ public partial class Markdown
         {
             return;
         }
+
+        // A drag ended: the click fires after release, but the user was selecting text — don't activate link.
+        if (_isDragging)
+        {
+            _isDragging = false;
+
+            return;
+        }
+
+        // Plain click clears any existing text selection.
+        ClearSelection ();
 
         if (!HasFocus && CanFocus)
         {

@@ -18,6 +18,42 @@ namespace Terminal.Gui.Views;
 ///         Hyperlinks raise the <see cref="LinkClicked"/> event. Anchor links (URLs beginning with
 ///         <c>#</c>) are handled automatically by scrolling to the matching heading.
 ///     </para>
+///     <para>Default key bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Key</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Ctrl+A</term> <description>Selects all rendered content (<see cref="Command.SelectAll"/>).</description>
+///         </item>
+///         <item>
+///             <term>Ctrl+C</term>
+///             <description>
+///                 Copies the current selection to the clipboard, or the entire markdown source if nothing is selected
+///                 (<see cref="Command.Copy"/>).
+///             </description>
+///         </item>
+///         <item>
+///             <term>Shift+F10 / Right-click</term>
+///             <description>Opens a context menu with <b>Select All</b> and <b>Copy</b> items.</description>
+///         </item>
+///     </list>
+///     <para>Default mouse bindings:</para>
+///     <list type="table">
+///         <listheader>
+///             <term>Mouse Event</term> <description>Action</description>
+///         </listheader>
+///         <item>
+///             <term>Left-button drag</term> <description>Selects text by dragging the mouse.</description>
+///         </item>
+///         <item>
+///             <term>Left-button click</term>
+///             <description>Clears the selection and activates a hyperlink if one is under the cursor.</description>
+///         </item>
+///         <item>
+///             <term>Right-button click</term> <description>Opens the context menu.</description>
+///         </item>
+///     </list>
 /// </remarks>
 public partial class Markdown : View, IDesignable
 {
@@ -249,6 +285,7 @@ public partial class Markdown : View, IDesignable
         RemoveTableViews ();
         RemoveThematicBreakViews ();
         _maxLineWidth = 0;
+        _isSelecting = false;
 
         SetNeedsLayout ();
         SetNeedsDraw ();
