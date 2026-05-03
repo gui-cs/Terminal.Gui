@@ -96,7 +96,7 @@ public class ListColumns : Scenario
                                      {
                                          if (_listColView is { })
                                          {
-                                             selectedCellLabel.Text = $"{_listColView.Value?.Cursor.Y ?? 0},{_listColView.Value?.Cursor.X ?? 0}";
+                                             selectedCellLabel.Text = $"{_listColView.Value?.SelectedCell.Y ?? 0},{_listColView.Value?.SelectedCell.X ?? 0}";
                                          }
                                      };
         _listColView.KeyDown += TableViewKeyPress;

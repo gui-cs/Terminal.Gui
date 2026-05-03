@@ -14,7 +14,7 @@ public class TableViewTests : TestDriverBase
         GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField _);
 
         // Make the selected cell one in
-        tableView.SetSelection (1, tableView.Value?.Cursor.Y ?? 0, false);
+        tableView.SetSelection (1, tableView.Value?.SelectedCell.Y ?? 0, false);
 
         // Pressing left should move us to the first column without changing focus
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorLeft);
@@ -37,7 +37,7 @@ public class TableViewTests : TestDriverBase
         GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField _);
 
         // Make the selected cell one in
-        tableView.SetSelection (tableView.Value?.Cursor.X ?? 0, 1, false);
+        tableView.SetSelection (tableView.Value?.SelectedCell.X ?? 0, 1, false);
 
         // First press should move us up
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorUp);
@@ -60,7 +60,7 @@ public class TableViewTests : TestDriverBase
         GetTableViewWithSiblings (out TextField _, out TableView tableView, out TextField tf2);
 
         // Make the selected cell one in from the rightmost column
-        tableView.SetSelection (tableView.Table!.Columns - 2, tableView.Value?.Cursor.Y ?? 0, false);
+        tableView.SetSelection (tableView.Table!.Columns - 2, tableView.Value?.SelectedCell.Y ?? 0, false);
 
         // First press should move us to the rightmost column without changing focus
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorRight);
@@ -83,7 +83,7 @@ public class TableViewTests : TestDriverBase
         GetTableViewWithSiblings (out TextField _, out TableView tableView, out TextField tf2);
 
         // Make the selected cell one in from the bottommost row
-        tableView.SetSelection (tableView.Value?.Cursor.X ?? 0, tableView.Table!.Rows - 2, false);
+        tableView.SetSelection (tableView.Value?.SelectedCell.X ?? 0, tableView.Table!.Rows - 2, false);
 
         // First press should move us to the bottommost row without changing focus
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorDown);
@@ -106,7 +106,7 @@ public class TableViewTests : TestDriverBase
         GetTableViewWithSiblings (out TextField tf1, out TableView tableView, out TextField _);
 
         // Make the selected cell one in
-        tableView.SetSelection (1, tableView.Value?.Cursor.Y ?? 0, false);
+        tableView.SetSelection (1, tableView.Value?.SelectedCell.Y ?? 0, false);
 
         // Pressing shift-left should give us a multi selection
         tableView.App!.Keyboard.RaiseKeyDownEvent (Key.CursorLeft.WithShift);
@@ -215,18 +215,18 @@ public class TableViewTests : TestDriverBase
         tableView.HasFocus = true;
         tableView.KeyBindings.Add (Key.B, Command.Down);
 
-        Assert.Equal (0, tableView.Value!.Cursor.Y);
+        Assert.Equal (0, tableView.Value!.SelectedCell.Y);
 
         // Keys should be consumed to move down the navigation i.e. to apricot
         Assert.True (tableView.NewKeyDownEvent (Key.B));
-        Assert.Equal (1, tableView.Value!.Cursor.Y);
+        Assert.Equal (1, tableView.Value!.SelectedCell.Y);
 
         Assert.True (tableView.NewKeyDownEvent (Key.B));
-        Assert.Equal (2, tableView.Value!.Cursor.Y);
+        Assert.Equal (2, tableView.Value!.SelectedCell.Y);
 
         // There is no keybinding for Key.C so it hits collection navigator i.e. we jump to candle
         Assert.True (tableView.NewKeyDownEvent (Key.C));
-        Assert.Equal (5, tableView.Value!.Cursor.Y);
+        Assert.Equal (5, tableView.Value!.SelectedCell.Y);
     }
 
     [Fact]
@@ -247,10 +247,10 @@ public class TableViewTests : TestDriverBase
         tableView.Table = new DataTableSource (dt);
         tableView.HasFocus = true;
 
-        Assert.Equal (0, tableView.Value!.Cursor.Y);
+        Assert.Equal (0, tableView.Value!.SelectedCell.Y);
 
         Assert.True (tableView.NewKeyDownEvent (Key.B));
-        Assert.Equal (2, tableView.Value!.Cursor.Y);
+        Assert.Equal (2, tableView.Value!.SelectedCell.Y);
     }
 
     // Copilot
@@ -363,7 +363,7 @@ public class TableViewTests : TestDriverBase
         Assert.Null (ex);
 
         // Should land on "apple" (row 1), skipping the null-cell row gracefully
-        Assert.Equal (1, tableView.Value!.Cursor.Y);
+        Assert.Equal (1, tableView.Value!.SelectedCell.Y);
 
         tableView.Dispose ();
     }
@@ -384,7 +384,7 @@ public class TableViewTests : TestDriverBase
         Exception? ex = Record.Exception (() => tableView.NewKeyDownEvent (Key.B));
 
         Assert.Null (ex);
-        Assert.Equal (1, tableView.Value!.Cursor.Y);
+        Assert.Equal (1, tableView.Value!.SelectedCell.Y);
 
         tableView.Dispose ();
     }
@@ -923,5 +923,141 @@ public class TableViewTests : TestDriverBase
         Assert.NotNull (field);
 
         return (TableView.ColumnToRender []?)field!.GetValue (tableView) ?? [];
+    }
+
+    // Copilot
+    [Fact]
+    public void HeaderColorGetter_AppliesCustomSchemeToColumnHeader ()
+    {
+        IDriver driver = CreateTestDriver (40, 5);
+
+        TableView tableView = new () { Driver = driver };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
+        tableView.Viewport = new Rectangle (0, 0, 40, 5);
+
+        tableView.Style.ShowHeaders = true;
+        tableView.Style.ShowHorizontalHeaderUnderline = false;
+        tableView.Style.ShowHorizontalHeaderOverline = false;
+        tableView.Style.AlwaysShowHeaders = true;
+        tableView.Style.ShowVerticalCellLines = true;
+        tableView.Style.ShowVerticalHeaderLines = true;
+
+        Scheme headerScheme = new ()
+        {
+            Normal = new Attribute (Color.BrightYellow, Color.DarkGray),
+            Focus = new Attribute (Color.BrightYellow, Color.DarkGray)
+        };
+
+        // Only column 0 gets custom header color
+        tableView.Style.GetOrCreateColumnStyle (0).HeaderColorGetter = _ => headerScheme;
+
+        DataTable dt = new ();
+        dt.Columns.Add ("Name");
+        dt.Columns.Add ("Value");
+        dt.Rows.Add ("test", "123");
+        tableView.Table = new DataTableSource (dt);
+
+        tableView.Layout ();
+        tableView.SetClipToScreen ();
+        tableView.Draw ();
+
+        Cell [,] contents = driver.Contents!;
+
+        // Find row 0 which has headers (since overline is off, headers are on line 0)
+        // Look for 'N' from "Name" header
+        var nameCol = -1;
+        var valueCol = -1;
+
+        for (var c = 0; c < 40; c++)
+        {
+            if (nameCol < 0 && contents [0, c].Grapheme == "N")
+            {
+                nameCol = c;
+            }
+
+            if (valueCol < 0 && contents [0, c].Grapheme == "V")
+            {
+                valueCol = c;
+            }
+        }
+
+        Assert.True (nameCol >= 0, "Expected to find 'N' from 'Name' header");
+        Assert.True (valueCol >= 0, "Expected to find 'V' from 'Value' header");
+
+        // Column 0 header should use the custom scheme
+        Assert.Equal (headerScheme.Normal, contents [0, nameCol].Attribute);
+
+        // Column 1 header should NOT use the custom scheme (no HeaderColorGetter set)
+        Assert.NotEqual (headerScheme.Normal, contents [0, valueCol].Attribute);
+
+        tableView.Dispose ();
+    }
+
+    // Copilot
+    [Fact]
+    public void TableStyle_HeaderScheme_AppliesBaseSchemeToAllHeaders ()
+    {
+        IDriver driver = CreateTestDriver (40, 5);
+
+        TableView tableView = new () { Driver = driver };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
+        tableView.Viewport = new Rectangle (0, 0, 40, 5);
+
+        tableView.Style.ShowHeaders = true;
+        tableView.Style.ShowHorizontalHeaderUnderline = false;
+        tableView.Style.ShowHorizontalHeaderOverline = false;
+        tableView.Style.AlwaysShowHeaders = true;
+        tableView.Style.ShowVerticalCellLines = true;
+        tableView.Style.ShowVerticalHeaderLines = true;
+
+        Scheme globalHeaderScheme = new ()
+        {
+            Normal = new Attribute (Color.Green, Color.Black),
+            Focus = new Attribute (Color.Green, Color.Black)
+        };
+
+        tableView.Style.HeaderScheme = globalHeaderScheme;
+
+        DataTable dt = new ();
+        dt.Columns.Add ("Name");
+        dt.Columns.Add ("Value");
+        dt.Rows.Add ("test", "123");
+        tableView.Table = new DataTableSource (dt);
+
+        tableView.Layout ();
+        tableView.SetClipToScreen ();
+        tableView.Draw ();
+
+        Cell [,] contents = driver.Contents!;
+
+        // Find header characters
+        var nameCol = -1;
+        var valueCol = -1;
+
+        for (var c = 0; c < 40; c++)
+        {
+            if (nameCol < 0 && contents [0, c].Grapheme == "N")
+            {
+                nameCol = c;
+            }
+
+            if (valueCol < 0 && contents [0, c].Grapheme == "V")
+            {
+                valueCol = c;
+            }
+        }
+
+        Assert.True (nameCol >= 0, "Expected to find 'N' from 'Name' header");
+        Assert.True (valueCol >= 0, "Expected to find 'V' from 'Value' header");
+
+        // Both headers should use the global header scheme
+        Assert.Equal (globalHeaderScheme.Normal, contents [0, nameCol].Attribute);
+        Assert.Equal (globalHeaderScheme.Normal, contents [0, valueCol].Attribute);
+
+        tableView.Dispose ();
     }
 }

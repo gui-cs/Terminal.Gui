@@ -243,6 +243,15 @@ public partial class TableView
         {
             ColumnStyle? colStyle = Style.GetColumnStyleIfAny (current.Column);
             string colName = _table!.ColumnNames [current.Column];
+
+            // Determine header color
+            Scheme baseScheme = Style.HeaderScheme ?? GetScheme ();
+            Scheme? headerScheme = colStyle?.HeaderColorGetter?.Invoke (
+                new HeaderColorGetterArgs (_table, current.Column, colName, baseScheme));
+            Scheme effectiveScheme = headerScheme ?? baseScheme;
+
+            SetAttribute (HasFocus ? effectiveScheme.Focus : effectiveScheme.Normal);
+
             RenderSeparator (current.X - 1, row, true);
             Move (current.X - Viewport.X, row);
             AddStr (TruncateOrPad (colName, colName, current.Width, colStyle));
@@ -252,6 +261,9 @@ public partial class TableView
                 RenderSeparator (current.X + current.Width - 1, row, true);
             }
         }
+
+        // Reset attribute after headers
+        SetAttribute (GetAttributeForRole (VisualRole.Normal));
 
         // render end of line
         if (_style.ShowVerticalHeaderLines)

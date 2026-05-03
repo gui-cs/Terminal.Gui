@@ -42,6 +42,12 @@ public class TableStyle
     public RowColorGetterDelegate? RowColorGetter { get; set; }
 
     /// <summary>
+    ///     Gets or sets a base <see cref="Scheme"/> applied to all column headers. Falls back to the view's scheme if
+    ///     <see langword="null"/>. Per-column overrides can be specified via <see cref="ColumnStyle.HeaderColorGetter"/>.
+    /// </summary>
+    public Scheme? HeaderScheme { get; set; }
+
+    /// <summary>
     ///     Gets or sets a flag indicating whether to render headers of a <see cref="TableView"/>. Defaults to
     ///     <see langword="true"/>.
     /// </summary>
