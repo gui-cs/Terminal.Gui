@@ -80,7 +80,7 @@ public partial class Markdown
 
             _isDragging = false;
 
-            if (App is not null && !App.Mouse.IsGrabbed (this))
+            if (App is { } && !App.Mouse.IsGrabbed (this))
             {
                 App.Mouse.GrabMouse (this);
             }
@@ -96,27 +96,28 @@ public partial class Markdown
         if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
         {
             // Drag: extend selection
-            if (mouse.Position is { } dragPos)
+            if (mouse.Position is not { } dragPos)
             {
-                int contentX = Viewport.X + dragPos.X;
-                int contentY = Math.Min (Viewport.Y + dragPos.Y, Math.Max (_renderedLines.Count - 1, 0));
-                _selectionCurrent = new Point (contentX, contentY);
-                _isDragging = true;
-                _isSelecting = true;
-                SetNeedsDraw ();
+                return true;
             }
+            int contentX = Viewport.X + dragPos.X;
+            int contentY = Math.Min (Viewport.Y + dragPos.Y, Math.Max (_renderedLines.Count - 1, 0));
+            _selectionCurrent = new Point (contentX, contentY);
+            _isDragging = true;
+            _isSelecting = true;
+            SetNeedsDraw ();
 
             return true;
         }
 
-        if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonReleased))
+        if (!mouse.Flags.FastHasFlags (MouseFlags.LeftButtonReleased))
         {
-            if (App is not null && App.Mouse.IsGrabbed (this))
-            {
-                App.Mouse.UngrabMouse ();
-            }
-
             return false;
+        }
+
+        if (App is { } && App.Mouse.IsGrabbed (this))
+        {
+            App.Mouse.UngrabMouse ();
         }
 
         return false;

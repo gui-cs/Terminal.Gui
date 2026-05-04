@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace Terminal.Gui.Views;
 
 public partial class Markdown
@@ -94,8 +92,7 @@ public partial class Markdown
 
     private (Point Start, Point End) GetNormalizedSelection ()
     {
-        if (_selectionAnchor.Y < _selectionCurrent.Y
-            || (_selectionAnchor.Y == _selectionCurrent.Y && _selectionAnchor.X <= _selectionCurrent.X))
+        if (_selectionAnchor.Y < _selectionCurrent.Y || (_selectionAnchor.Y == _selectionCurrent.Y && _selectionAnchor.X <= _selectionCurrent.X))
         {
             return (_selectionAnchor, _selectionCurrent);
         }
@@ -130,7 +127,7 @@ public partial class Markdown
 
     private static void AppendLineText (StringBuilder sb, RenderedLine line, int startX, int endX)
     {
-        int contentX = 0;
+        var contentX = 0;
 
         foreach (StyledSegment segment in line.Segments)
         {
@@ -170,10 +167,7 @@ public partial class Markdown
     {
         DisposeContextMenu ();
 
-        PopoverMenu menu = new ([
-                                    new MenuItem (this, Command.SelectAll),
-                                    new MenuItem (this, Command.Copy)
-                                ])
+        PopoverMenu menu = new ([new MenuItem (this, Command.SelectAll), new MenuItem (this, Command.Copy)])
         {
 #if DEBUG
             Id = "markdownContextMenu"
@@ -202,8 +196,7 @@ public partial class Markdown
         ContextMenu = null;
     }
 
-    private void ContextMenuOnKeyChanged (object? sender, KeyChangedEventArgs e) =>
-        KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode);
+    private void ContextMenuOnKeyChanged (object? sender, KeyChangedEventArgs e) => KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode);
 
     private bool ShowContextMenu (Point? screenPosition = null)
     {

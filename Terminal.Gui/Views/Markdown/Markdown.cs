@@ -24,7 +24,8 @@ namespace Terminal.Gui.Views;
 ///             <term>Key</term> <description>Action</description>
 ///         </listheader>
 ///         <item>
-///             <term>Ctrl+A</term> <description>Selects all rendered content (<see cref="Command.SelectAll"/>).</description>
+///             <term>Ctrl+A</term>
+///             <description>Selects all rendered content (<see cref="Command.SelectAll"/>).</description>
 ///         </item>
 ///         <item>
 ///             <term>Ctrl+C</term>
