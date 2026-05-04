@@ -114,9 +114,9 @@ public partial class Markdown
                 }
                 else if (IsInSelection (contentRow, contentX))
                 {
-                    Attribute selAttr = GetAttributeForSegment (segment);
-                    Attribute reversed = new (selAttr.Background, selAttr.Foreground, selAttr.Style);
-                    SetAttribute (reversed);
+                    // Use the scheme's Focus attribute for selection highlight — it provides
+                    // reliable contrast regardless of per-segment colours.
+                    SetAttribute (GetAttributeForRole (VisualRole.Focus));
                     AddStr (drawCol, drawRow, grapheme);
                 }
                 else

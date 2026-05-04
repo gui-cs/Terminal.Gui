@@ -56,6 +56,10 @@ public partial class Markdown
         MouseBindings.ReplaceCommands (MouseFlags.WheeledUp, Command.ScrollUp);
         MouseBindings.ReplaceCommands (MouseFlags.WheeledRight, Command.ScrollRight);
         MouseBindings.ReplaceCommands (MouseFlags.WheeledLeft, Command.ScrollLeft);
+
+        // The base class binds LeftButtonReleased → Activate; remove that so Activate
+        // fires only on LeftButtonClicked (not twice per click which would clear selection).
+        MouseBindings.Remove (MouseFlags.LeftButtonReleased);
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
         MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.Context);
     }

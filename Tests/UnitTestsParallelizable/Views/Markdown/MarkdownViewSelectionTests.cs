@@ -222,5 +222,44 @@ public class MarkdownViewSelectionTests
         window.Dispose ();
         app.Dispose ();
     }
+
+    // Copilot - verifies that mouse release does not clear an active selection
+    [Fact]
+    public void Selection_Persists_After_LeftButtonReleased ()
+    {
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv ("Hello World");
+
+        // Simulate a drag: press, drag, release
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (5, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+        mv.NewMouseEvent (new Mouse { Position = new Point (5, 0), Flags = MouseFlags.LeftButtonReleased });
+
+        // Selection should survive the release
+        Assert.True (mv.IsInSelection (0, 0));
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - verifies that a plain click (no drag) clears the selection
+    [Fact]
+    public void Plain_Click_Clears_Selection ()
+    {
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv ("Hello World");
+
+        mv.SelectAll ();
+        Assert.True (mv.IsInSelection (0, 0));
+
+        // Simulate a plain click (no PositionReport drag events)
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonReleased });
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonClicked });
+
+        // Selection should be cleared by the click
+        Assert.False (mv.IsInSelection (0, 0));
+
+        window.Dispose ();
+        app.Dispose ();
+    }
 }
 
