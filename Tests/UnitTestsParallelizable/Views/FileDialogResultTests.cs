@@ -125,6 +125,34 @@ public class FileDialogResultTests
         Assert.Contains ("/testdir/file2.txt", fd.Result);
     }
 
+    [Fact]
+    public void FileDialog_Cancel_ClearsResult_WhenPreviouslyAccepted ()
+    {
+        // Copilot
+        // This test validates that canceling a dialog after a previous acceptance
+        // correctly clears Result to null (so Canceled == true).
+        // Without the explicit `Result = null` in the Cancel path, this test would fail
+        // because Result would retain the previously accepted value.
+
+        // Arrange
+        MockFileSystem fs = new ();
+        fs.AddFile ("/testdir/file1.txt", new MockFileData ("hello"));
+        using SaveDialog sd = new TestableSaveDialog (fs);
+        sd.Path = "/testdir/file1.txt";
+
+        // Act - first accept the dialog to set Result
+        sd.InvokeCommand (Command.Accept);
+        Assert.False (sd.Canceled); // Result is set — not canceled
+
+        // Act - now simulate pressing Cancel button
+        Button cancelBtn = sd.Buttons [sd.CancelButtonIndex];
+        cancelBtn.InvokeCommand (Command.Accept);
+
+        // Assert - Result should be cleared, Canceled should be true
+        Assert.Null (sd.Result);
+        Assert.True (sd.Canceled);
+    }
+
     /// <summary>Testable subclass that exposes the internal file-system constructor.</summary>
     private sealed class TestableFileDialog : FileDialog
     {
