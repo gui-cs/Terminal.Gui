@@ -6,7 +6,7 @@ namespace Terminal.Gui.Views;
 /// <summary>
 ///     The base-class for <see cref="OpenDialog"/> and <see cref="SaveDialog"/>
 /// </summary>
-public partial class FileDialog : Dialog, IDesignable
+public partial class FileDialog : Dialog<IReadOnlyList<string>?>, IDesignable
 {
     /// <summary>Gets the Path separators for the operating system</summary>
 
@@ -31,9 +31,15 @@ public partial class FileDialog : Dialog, IDesignable
     private readonly Button _btnCancel;
 
     /// <summary>
-    ///     Gets the index of the cancel button for the dialog. This is useful for checking if the user canceled the dialog by
-    ///     comparing
-    ///     the <see cref="Dialog.Result"/> to the index of this button in the <see cref="Dialog{TResult}.Buttons"/> array.
+    ///     Gets whether the dialog was canceled (i.e., the user dismissed it without accepting a selection).
+    /// </summary>
+    /// <remarks>
+    ///     Returns <see langword="true"/> if <see cref="IRunnable{TResult}.Result"/> is <see langword="null"/>.
+    /// </remarks>
+    public bool Canceled => Result is null;
+
+    /// <summary>
+    ///     Gets the index of the cancel button for the dialog.
     /// </summary>
     public int CancelButtonIndex => Buttons.IndexOf (_btnCancel);
 

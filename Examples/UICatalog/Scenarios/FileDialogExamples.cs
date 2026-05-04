@@ -239,12 +239,12 @@ public class FileDialogExamples : Scenario
 
         fd.Path = Environment.GetFolderPath (Environment.SpecialFolder.UserProfile);
 
-        var result = app.Run (fd) as int?;
+        app.Run (fd);
 
         IReadOnlyList<string> multiSelected = fd.MultiSelected;
         string path = fd.Path;
 
-        if (result is null or 1)
+        if (fd.Canceled)
         {
             MessageBox.Query (app, "Canceled", "You canceled navigation and did not pick anything", Strings.btnOk);
         }
