@@ -134,6 +134,12 @@ public partial class Markdown
 
         string? currentCodeLanguage = null;
 
+        // Track the last table instance that was output.  All placeholder rows for the
+        // same table share the same TableData reference, so we use ReferenceEquals to
+        // emit the reconstructed table markdown exactly once even when the selection
+        // covers multiple placeholder rows belonging to the same table.
+        TableData? lastOutputtedTable = null;
+
         for (int lineIdx = start.Y; lineIdx <= Math.Min (end.Y, _renderedLines.Count - 1); lineIdx++)
         {
             RenderedLine line = _renderedLines [lineIdx];
@@ -168,10 +174,17 @@ public partial class Markdown
 
             if (line.IsTable && line.TableData is { } tableData)
             {
-                // Reconstruct GFM pipe-table markdown from the parsed TableData.
-                foreach (string tableLine in RenderTableAsMarkdown (tableData))
+                // Each table occupies several zero-width placeholder rows that all share the
+                // same TableData instance.  Only reconstruct the table markdown the first time
+                // we encounter each distinct instance; skip subsequent placeholder rows.
+                if (!ReferenceEquals (tableData, lastOutputtedTable))
                 {
-                    outputLines.Add (tableLine);
+                    foreach (string tableLine in RenderTableAsMarkdown (tableData))
+                    {
+                        outputLines.Add (tableLine);
+                    }
+
+                    lastOutputtedTable = tableData;
                 }
 
                 continue;
@@ -208,6 +221,11 @@ public partial class Markdown
 
         int lastLine = _renderedLines.Count - 1;
 
+        // For a document ending with a zero-width placeholder (table rows, thematic breaks),
+        // GetLineDisplayWidth(lastLine) returns 0, so end.X >= 0 is always satisfied.
+        // This is intentional: any position on a zero-width row is equivalent to the end of
+        // that row (there is no content there), so reaching the last row from (0,0) means the
+        // entire document is selected.
         return end.Y >= lastLine && end.X >= GetLineDisplayWidth (lastLine);
     }
 

@@ -206,11 +206,26 @@ public partial class Markdown
             return;
         }
 
-        // Drag: extend selection
+        // Drag: extend selection and auto-scroll when the pointer leaves the viewport.
         if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
         {
-            int contentX = Viewport.X + pos.X;
-            int contentY = Math.Min (Viewport.Y + pos.Y, Math.Max (_renderedLines.Count - 1, 0));
+            // Auto-scroll: if the pointer has left the top or bottom edge, scroll one line
+            // in that direction so the user can extend the selection beyond the visible area.
+            if (pos.Y < 0)
+            {
+                ScrollVertical (-1);
+            }
+            else if (pos.Y >= Viewport.Height)
+            {
+                ScrollVertical (1);
+            }
+
+            // Clamp both axes to the actual content bounds to prevent negative indices or
+            // indices beyond the last rendered line (possible when the mouse is grabbed and
+            // moves outside the view's frame).
+            int maxLine = Math.Max (_renderedLines.Count - 1, 0);
+            int contentX = Math.Max (Viewport.X + pos.X, 0);
+            int contentY = Math.Clamp (Viewport.Y + pos.Y, 0, maxLine);
             _selectionCurrent = new Point (contentX, contentY);
             _isDragging = true;
             _isSelecting = true;

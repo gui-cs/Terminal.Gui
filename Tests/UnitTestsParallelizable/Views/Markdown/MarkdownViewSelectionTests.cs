@@ -584,4 +584,197 @@ public class MarkdownViewSelectionTests
         window.Dispose ();
         app.Dispose ();
     }
+
+    // --- Drag clamping + auto-scroll tests (comment #3183635182) ---
+
+    // Copilot - dragging above the viewport (negative Y) must not produce a negative
+    // contentY that causes an IndexOutOfRangeException in GetSelectedText().
+    [Fact]
+    public void Drag_AboveViewport_ClampsToFirstLine ()
+    {
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv ("Hello\nWorld");
+
+        // Anchor at line 0 and then drag ABOVE the top of the view (pos.Y = -5).
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (3, -5), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+
+        // Copy should not throw even though the drag went above the viewport.
+        // Before the fix, contentY could be negative → IndexOutOfRangeException in GetSelectedText().
+        Exception? ex = Record.Exception (() => mv.Copy ());
+        Assert.Null (ex);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - dragging below the viewport must not produce a contentY beyond the last line.
+    [Fact]
+    public void Drag_BelowViewport_ClampsToLastLine ()
+    {
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv ("line0\nline1\nline2", height: 2);
+
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
+
+        // Drag to row 999 — well beyond the content
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 999), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+
+        // Copy must not throw
+        Exception? ex = Record.Exception (() => mv.Copy ());
+        Assert.Null (ex);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // --- Table-duplication fix tests (comment #3183635237) ---
+
+    // Copilot - a table with 2 body rows generates multiple placeholder RenderedLines;
+    // GetSelectedText() must output the reconstructed table exactly once, not once per
+    // placeholder row.
+    [Fact]
+    public void PartialSelection_TableWithMultipleRows_TableAppearsExactlyOnce ()
+    {
+        // 2 body rows → at least 2 (usually more) table placeholder lines
+        string md = "| H1 | H2 |\n|---|---|\n| A | B |\n| C | D |";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 15);
+
+        // Start at col 1 so IsFullDocumentSelected() returns false (forces the display-text path)
+        mv.NewMouseEvent (new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (100, 100), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+
+        string? selected = mv.SelectedText;
+
+        Assert.NotNull (selected);
+
+        // Header row should appear exactly once, not once per placeholder row.
+        int count = CountOccurrences (selected, "| H1 | H2 |");
+        Assert.Equal (1, count);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - two adjacent tables with the same structure should each appear exactly once.
+    [Fact]
+    public void PartialSelection_TwoAdjacentTables_EachTableAppearsOnce ()
+    {
+        // Two separate TableData instances → two independent tables
+        const string TABLE = "| H |\n|---|\n| R |";
+        string md = TABLE + "\n\n" + TABLE;
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 20);
+
+        mv.NewMouseEvent (new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (100, 100), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+
+        string? selected = mv.SelectedText;
+
+        Assert.NotNull (selected);
+
+        // The header appears in each table → should occur exactly twice in the output
+        int count = CountOccurrences (selected, "| H |");
+        Assert.Equal (2, count);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // --- Selection drawing over SubView rows (comment #3183635267) ---
+
+    // Copilot - after SelectAll() on a document that contains a code block, the ANSI output
+    // should contain the Focus-attribute escape codes (white-on-black) in the code-block rows,
+    // proving the selection overlay is drawn on top of the MarkdownCodeBlock SubView.
+    [Fact]
+    public void SelectAll_WithCodeBlock_DrawingContainsFocusAttributeOnCodeRows ()
+    {
+        const int WIDTH = 20;
+
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (WIDTH, 5);
+        app.Driver.Force16Colors = true;
+
+        Runnable window = new () { Width = Dim.Fill (), Height = Dim.Fill (), BorderStyle = LineStyle.None };
+
+        Scheme scheme = new (new Attribute (Color.Black, Color.White));
+        window.SetScheme (scheme);
+
+        Terminal.Gui.Views.Markdown mv = new () { Text = "```\nAB\n```", Width = Dim.Fill (), Height = Dim.Fill () };
+        mv.SchemeName = null;
+        mv.SetScheme (scheme);
+
+        window.Add (mv);
+        app.Begin (window);
+        app.LayoutAndDraw ();
+
+        mv.SelectAll ();
+        app.LayoutAndDraw ();
+        app.Driver.Refresh ();
+
+        string output = app.Driver.GetOutput ().GetLastOutput ();
+
+        // Focus attribute (Black-on-White scheme, Focus = swap → White fg = 97, Black bg = 40)
+        // must appear somewhere in the rendered output now that the overlay is drawn.
+        Assert.Contains ("\x1b[97m", output);
+        Assert.Contains ("\x1b[40m", output);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // --- IsFullDocumentSelected with zero-width last line (comment #3183635296) ---
+
+    // Copilot - SelectAll() on a document ending with a table (zero-width last rendered line)
+    // should correctly return the full source markdown via Copy().
+    [Fact]
+    public void SelectAll_DocEndingWithTable_CopyReturnsFullMarkdown ()
+    {
+        string md = "intro\n| H | B |\n|---|---|\n| A | C |";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 15);
+
+        mv.SelectAll ();
+        mv.Copy ();
+
+        app.Clipboard!.TryGetClipboardData (out string clipboard);
+        Assert.Equal (md, clipboard);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - a partial selection on a document ending with a table (starting from col 1)
+    // must NOT be treated as a full-document selection, even when the drag reaches the last row.
+    [Fact]
+    public void PartialSelection_DocEndingWithTable_NotTreatedAsFullDocument ()
+    {
+        string md = "intro\n| H | B |\n|---|---|\n| A | C |";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 15);
+
+        // Start at col 1 (not col 0) → IsFullDocumentSelected() must return false
+        mv.NewMouseEvent (new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (100, 100), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+
+        string? selected = mv.SelectedText;
+
+        Assert.NotNull (selected);
+
+        // Should NOT equal the full source markdown because the selection started at col 1
+        Assert.NotEqual (md, selected);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    private static int CountOccurrences (string text, string pattern)
+    {
+        var count = 0;
+        var idx = 0;
+
+        while ((idx = text.IndexOf (pattern, idx, StringComparison.Ordinal)) >= 0)
+        {
+            count++;
+            idx += pattern.Length;
+        }
+
+        return count;
+    }
 }
