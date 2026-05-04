@@ -149,6 +149,17 @@ public partial class Markdown
                 inCodeBlock = false;
             }
 
+            if (line.IsTable && line.TableData is { } tableData)
+            {
+                // Reconstruct GFM pipe-table markdown from the parsed TableData.
+                foreach (string tableLine in RenderTableAsMarkdown (tableData))
+                {
+                    outputLines.Add (tableLine);
+                }
+
+                continue;
+            }
+
             int lineStartX = lineIdx == start.Y ? start.X : 0;
             int lineEndX = lineIdx == end.Y ? end.X : int.MaxValue;
             StringBuilder lineSb = new ();
@@ -181,6 +192,29 @@ public partial class Markdown
         int lastLine = _renderedLines.Count - 1;
 
         return end.Y >= lastLine && end.X >= GetLineDisplayWidth (lastLine);
+    }
+
+    /// <summary>Reconstructs GFM pipe-table markdown lines from a <see cref="TableData"/> instance.</summary>
+    private static IEnumerable<string> RenderTableAsMarkdown (TableData tableData)
+    {
+        // Header row
+        yield return "| " + string.Join (" | ", tableData.Headers) + " |";
+
+        // Separator row — encode column alignment
+        IEnumerable<string> separators = tableData.ColumnAlignments.Select (
+            alignment => alignment switch
+            {
+                Alignment.Center => ":---:",
+                Alignment.End    => "---:",
+                _                => "---"
+            });
+        yield return "| " + string.Join (" | ", separators) + " |";
+
+        // Body rows
+        foreach (string [] row in tableData.Rows)
+        {
+            yield return "| " + string.Join (" | ", row) + " |";
+        }
     }
 
     private static void AppendLineText (StringBuilder sb, RenderedLine line, int startX, int endX)

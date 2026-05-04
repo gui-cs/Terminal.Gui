@@ -73,7 +73,7 @@ public partial class Markdown
                 // Reserve placeholder lines so content height is correct
                 for (var i = 0; i < tableHeight; i++)
                 {
-                    _renderedLines.Add (new RenderedLine ([new StyledSegment ("", MarkdownStyleRole.Table)], false, 0, isTable: true));
+                    _renderedLines.Add (new RenderedLine ([new StyledSegment ("", MarkdownStyleRole.Table)], false, 0, isTable: true, tableData: tableData));
                 }
 
                 continue;
