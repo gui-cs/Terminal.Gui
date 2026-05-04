@@ -766,8 +766,8 @@ public class MarkdownViewSelectionTests
 
     private static int CountOccurrences (string text, string pattern)
     {
-        var count = 0;
-        var idx = 0;
+        int count = 0;
+        int idx = 0;
 
         while ((idx = text.IndexOf (pattern, idx, StringComparison.Ordinal)) >= 0)
         {
