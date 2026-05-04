@@ -15,16 +15,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     [Obsolete ("The legacy static Application object is going away.")]
     public static void Run (IRunnable runnable, Func<Exception, bool>? errorHandler = null) => ApplicationImpl.Instance.Run (runnable, errorHandler);
 
-    /// <inheritdoc cref="IApplication.RunAsync(IRunnable, CancellationToken, Func{Exception, bool})"/>
-    [Obsolete ("The legacy static Application object is going away.")]
-    public static Task<object?> RunAsync (IRunnable runnable, CancellationToken cancellationToken, Func<Exception, bool>? errorHandler = null) =>
-        ApplicationImpl.Instance.RunAsync (runnable, cancellationToken, errorHandler);
-
-    /// <inheritdoc cref="IApplication.RunAsync{TRunnable}(CancellationToken, Func{Exception, bool}, string)"/>
-    [Obsolete ("The legacy static Application object is going away.")]
-    public static Task<IApplication> RunAsync<TRunnable> (CancellationToken cancellationToken, Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new () =>
-        ApplicationImpl.Instance.RunAsync<TRunnable> (cancellationToken, errorHandler, driverName);
-
     /// <inheritdoc cref="IApplication.AddTimeout"/>
     [Obsolete ("The legacy static Application object is going away.")]
     public static object? AddTimeout (TimeSpan time, Func<bool> callback) => ApplicationImpl.Instance.AddTimeout (time, callback);
