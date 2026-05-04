@@ -3,11 +3,13 @@
 // Renders an OptionSelector inline in the terminal with options from the command line.
 // Supports horizontal or vertical orientation via --horizontal / --vertical flags.
 // Hot keys are auto-assigned from option text.
+// Supports --timeout <seconds> to auto-cancel via CancellationToken (demonstrates RunAsync).
 //
 // Usage:
 //   dotnet run --project Examples/InlineSelect -- Apple Banana Cherry
 //   dotnet run --project Examples/InlineSelect -- --horizontal Red Green Blue Yellow
 //   dotnet run --project Examples/InlineSelect -- --vertical One Two Three
+//   dotnet run --project Examples/InlineSelect -- --timeout 10 Apple Banana Cherry
 
 using Terminal.Gui.App;
 using Terminal.Gui.Drawing;
@@ -17,9 +19,12 @@ using Terminal.Gui.Views;
 // Parse command-line arguments
 Orientation orientation = Orientation.Vertical;
 List<string> options = [];
+int? timeoutSeconds = null;
 
-foreach (string arg in args)
+for (int i = 0; i < args.Length; i++)
 {
+    string arg = args [i];
+
     if (arg is "--horizontal" or "-h")
     {
         orientation = Orientation.Horizontal;
@@ -27,6 +32,20 @@ foreach (string arg in args)
     else if (arg is "--vertical" or "-v")
     {
         orientation = Orientation.Vertical;
+    }
+    else if (arg is "--timeout" or "-t")
+    {
+        if (i + 1 < args.Length && int.TryParse (args [i + 1], out int seconds))
+        {
+            timeoutSeconds = seconds;
+            i++; // skip the next arg (the number)
+        }
+        else
+        {
+            Console.Error.WriteLine ("Error: --timeout requires a number of seconds.");
+
+            return 1;
+        }
     }
     else
     {
@@ -36,7 +55,7 @@ foreach (string arg in args)
 
 if (options.Count == 0)
 {
-    Console.Error.WriteLine ("Usage: InlineSelect [--horizontal|--vertical] <option1> <option2> ...");
+    Console.Error.WriteLine ("Usage: InlineSelect [--horizontal|--vertical] [--timeout <seconds>] <option1> <option2> ...");
 
     return 1;
 }
@@ -57,13 +76,46 @@ OptionSelector selector = new ()
 // Wrap in RunnableWrapper — auto-extracts Value via IValue<int?>
 RunnableWrapper<OptionSelector, int?> wrapper = new (selector)
 {
-    Title = "Select an option (Enter to accept, Esc to cancel)",
+    Title = timeoutSeconds.HasValue
+                ? $"Select an option (Enter to accept, Esc to cancel, {timeoutSeconds}s timeout)"
+                : "Select an option (Enter to accept, Esc to cancel)",
     Width = Dim.Fill (),
     BorderStyle = LineStyle.Rounded
 };
 
-// Run inline — blocks until user accepts or cancels
-app.Run (wrapper);
+// Run with optional timeout via RunAsync + CancellationToken
+if (timeoutSeconds.HasValue)
+{
+    // Use RunAsync with a CancellationToken for timeout-based cancellation
+    using CancellationTokenSource cts = new (TimeSpan.FromSeconds (timeoutSeconds.Value));
+
+    // Show terminal progress indicator counting down the timeout (OSC 9;4)
+    DateTime startTime = DateTime.UtcNow;
+    int totalMs = timeoutSeconds.Value * 1000;
+
+    using Timer progressTimer = new (
+        _ => app.Invoke (
+            _ =>
+            {
+                int elapsedMs = (int)(DateTime.UtcNow - startTime).TotalMilliseconds;
+                int percent = Math.Min (elapsedMs * 100 / totalMs, 100);
+                app.Driver?.ProgressIndicator?.SetValue (percent);
+            }),
+        null,
+        0,
+        250);
+
+    await app.RunAsync (wrapper, cts.Token);
+
+    // Clear the progress indicator when done
+    progressTimer.Change (System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+    app.Driver?.ProgressIndicator?.Clear ();
+}
+else
+{
+    // Run synchronously — blocks until user accepts or cancels
+    app.Run (wrapper);
+}
 
 int? result = wrapper.Result;
 
