@@ -223,6 +223,52 @@ public class MarkdownViewSelectionTests
         app.Dispose ();
     }
 
+    // Copilot - verifies that LeftButtonPressed is bound to Command.Activate
+    [Fact]
+    public void MouseBindings_LeftButtonPressed_IsBoundTo_Activate ()
+    {
+        Terminal.Gui.Views.Markdown mv = new ();
+
+        bool found = mv.MouseBindings.TryGet (MouseFlags.LeftButtonPressed, out MouseBinding binding);
+
+        Assert.True (found);
+        Assert.Contains (Command.Activate, binding.Commands);
+
+        mv.Dispose ();
+    }
+
+    // Copilot - verifies that LeftButtonPressed|PositionReport is bound to Command.Activate
+    [Fact]
+    public void MouseBindings_LeftButtonPressedPositionReport_IsBoundTo_Activate ()
+    {
+        Terminal.Gui.Views.Markdown mv = new ();
+
+        bool found = mv.MouseBindings.TryGet (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport, out MouseBinding binding);
+
+        Assert.True (found);
+        Assert.Contains (Command.Activate, binding.Commands);
+
+        mv.Dispose ();
+    }
+
+    // Copilot - verifies that a drag (press + position-report) activates the selection
+    [Fact]
+    public void Drag_Mouse_Creates_Selection ()
+    {
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv ("Hello World");
+
+        mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (5, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+
+        // After a drag the selection should span columns 0-4
+        Assert.True (mv.IsInSelection (0, 0));
+        Assert.True (mv.IsInSelection (0, 3));
+        Assert.False (mv.IsInSelection (0, 6));
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
     // Copilot - verifies that mouse release does not clear an active selection
     [Fact]
     public void Selection_Persists_After_LeftButtonReleased ()

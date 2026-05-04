@@ -62,54 +62,15 @@ public partial class Markdown
         MouseBindings.Remove (MouseFlags.LeftButtonReleased);
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
         MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.Context);
+
+        // Press anchors the drag-selection; drag extends it — both routed through OnActivated.
+        MouseBindings.Add (MouseFlags.LeftButtonPressed, Command.Activate);
+        MouseBindings.Add (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport, Command.Activate);
     }
 
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouse)
     {
-        if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed) && !mouse.Flags.HasFlag (MouseFlags.PositionReport))
-        {
-            // Button-down: anchor the selection start
-            if (mouse.Position is { } pressPos)
-            {
-                int contentX = Viewport.X + pressPos.X;
-                int contentY = Math.Min (Viewport.Y + pressPos.Y, Math.Max (_renderedLines.Count - 1, 0));
-                _selectionAnchor = new Point (contentX, contentY);
-                _selectionCurrent = _selectionAnchor;
-            }
-
-            _isDragging = false;
-
-            if (App is { } && !App.Mouse.IsGrabbed (this))
-            {
-                App.Mouse.GrabMouse (this);
-            }
-
-            if (!HasFocus && CanFocus)
-            {
-                SetFocus ();
-            }
-
-            return false;
-        }
-
-        if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
-        {
-            // Drag: extend selection
-            if (mouse.Position is not { } dragPos)
-            {
-                return true;
-            }
-            int contentX = Viewport.X + dragPos.X;
-            int contentY = Math.Min (Viewport.Y + dragPos.Y, Math.Max (_renderedLines.Count - 1, 0));
-            _selectionCurrent = new Point (contentX, contentY);
-            _isDragging = true;
-            _isSelecting = true;
-            SetNeedsDraw ();
-
-            return true;
-        }
-
         if (!mouse.Flags.FastHasFlags (MouseFlags.LeftButtonReleased))
         {
             return false;
@@ -203,13 +164,49 @@ public partial class Markdown
     /// <inheritdoc/>
     protected override void OnActivated (ICommandContext? ctx)
     {
-        // Only process mouse clicks — keyboard activation is handled via Command.Accept
-        if (ctx?.Binding is not MouseBinding { MouseEvent.Position: { } pos })
+        // Only process mouse input — keyboard activation is handled via Command.Accept
+        if (ctx?.Binding is not MouseBinding { MouseEvent: { } mouse, MouseEvent.Position: { } pos })
         {
             return;
         }
 
-        // A drag ended: the click fires after release, but the user was selecting text — don't activate link.
+        // Button-down: anchor the drag-selection start
+        if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed) && !mouse.Flags.HasFlag (MouseFlags.PositionReport))
+        {
+            int contentX = Viewport.X + pos.X;
+            int contentY = Math.Min (Viewport.Y + pos.Y, Math.Max (_renderedLines.Count - 1, 0));
+            _selectionAnchor = new Point (contentX, contentY);
+            _selectionCurrent = _selectionAnchor;
+            _isDragging = false;
+
+            if (App is { } && !App.Mouse.IsGrabbed (this))
+            {
+                App.Mouse.GrabMouse (this);
+            }
+
+            if (!HasFocus && CanFocus)
+            {
+                SetFocus ();
+            }
+
+            return;
+        }
+
+        // Drag: extend selection
+        if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonPressed | MouseFlags.PositionReport))
+        {
+            int contentX = Viewport.X + pos.X;
+            int contentY = Math.Min (Viewport.Y + pos.Y, Math.Max (_renderedLines.Count - 1, 0));
+            _selectionCurrent = new Point (contentX, contentY);
+            _isDragging = true;
+            _isSelecting = true;
+            SetNeedsDraw ();
+
+            return;
+        }
+
+        // LeftButtonClicked: a drag ended — the click fires after release, but the user was
+        // selecting text, so don't activate a link.
         if (_isDragging)
         {
             _isDragging = false;
@@ -225,19 +222,19 @@ public partial class Markdown
             SetFocus ();
         }
 
-        int contentX = Viewport.X + pos.X;
-        int contentY = Viewport.Y + pos.Y;
+        int clickX = Viewport.X + pos.X;
+        int clickY = Viewport.Y + pos.Y;
 
         for (var i = 0; i < _linkRegions.Count; i++)
         {
             MarkdownLinkRegion region = _linkRegions [i];
 
-            if (region.Line != contentY)
+            if (region.Line != clickY)
             {
                 continue;
             }
 
-            if (contentX < region.StartX || contentX >= region.EndXExclusive)
+            if (clickX < region.StartX || clickX >= region.EndXExclusive)
             {
                 continue;
             }
