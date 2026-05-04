@@ -88,7 +88,28 @@ if (timeoutSeconds.HasValue)
 {
     // Use RunAsync with a CancellationToken for timeout-based cancellation
     using CancellationTokenSource cts = new (TimeSpan.FromSeconds (timeoutSeconds.Value));
+
+    // Show terminal progress indicator counting down the timeout (OSC 9;4)
+    DateTime startTime = DateTime.UtcNow;
+    int totalMs = timeoutSeconds.Value * 1000;
+
+    using Timer progressTimer = new (
+        _ => app.Invoke (
+            _ =>
+            {
+                int elapsedMs = (int)(DateTime.UtcNow - startTime).TotalMilliseconds;
+                int percent = Math.Min (elapsedMs * 100 / totalMs, 100);
+                app.Driver?.ProgressIndicator?.SetValue (percent);
+            }),
+        null,
+        0,
+        250);
+
     await app.RunAsync (wrapper, cts.Token);
+
+    // Clear the progress indicator when done
+    progressTimer.Change (System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+    app.Driver?.ProgressIndicator?.Clear ();
 }
 else
 {
