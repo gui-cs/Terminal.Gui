@@ -73,6 +73,15 @@ namespace Terminal.Gui.Views;
 ///         <item>
 ///             <term>Alt+Down</term> <description>Toggles the dropdown list open or closed.</description>
 ///         </item>
+///         <item>
+///             <term>Space</term> <description>Toggles the dropdown list open or closed.</description>
+///         </item>
+///         <item>
+///             <term>Up</term> <description>Selects the previous item in the list (when closed).</description>
+///         </item>
+///         <item>
+///             <term>Down</term> <description>Selects the next item in the list (when closed).</description>
+///         </item>
 ///     </list>
 ///     <para>Default mouse bindings:</para>
 ///     <list type="table">
@@ -96,7 +105,9 @@ public class DropDownList : TextField
     /// </summary>
     public new static Dictionary<Command, PlatformKeyBinding>? DefaultKeyBindings { get; set; } = new ()
     {
-        [Command.Toggle] = Bind.All (Key.F4, Key.CursorDown.WithAlt)
+        [Command.Toggle] = Bind.All (Key.F4, Key.CursorDown.WithAlt, Key.Space),
+        [Command.Up] = Bind.All (Key.CursorUp),
+        [Command.Down] = Bind.All (Key.CursorDown)
     };
 
     private readonly Button? _toggleButton;
@@ -155,7 +166,7 @@ public class DropDownList : TextField
         // This ensures the Normal attribute is always that of the host
         _listPopover.GettingAttributeForRole += (sender, args) =>
                                                 {
-                                                    if (sender is not View view || args.Role != VisualRole.Normal)
+                                                    if (sender is not View || args.Role != VisualRole.Normal)
                                                     {
                                                         return;
                                                     }
@@ -184,6 +195,10 @@ public class DropDownList : TextField
 
         // Add command handler for toggle
         AddCommand (Command.Toggle, ToggleDropDown);
+
+        // Add command handlers for navigating items when dropdown is closed
+        AddCommand (Command.Up, MoveSelectionUp);
+        AddCommand (Command.Down, MoveSelectionDown);
 
         // Apply layered key bindings (base View layer + DropDownList-specific layer)
         ApplyKeyBindings (View.DefaultKeyBindings, DefaultKeyBindings);
@@ -340,7 +355,19 @@ public class DropDownList : TextField
     /// <remarks>
     ///     This property delegates to the <see cref="ListView.Source"/> property of the internal <see cref="ListView"/>.
     /// </remarks>
-    public IListDataSource? Source { get => _listPopover?.ContentView?.Source; set => _listPopover?.ContentView?.Source = value; }
+    public IListDataSource? Source
+    {
+        get => _listPopover?.ContentView?.Source;
+        set
+        {
+            if (_listPopover?.ContentView is { } contentView)
+            {
+                contentView.Source = value;
+            }
+
+            KeystrokeNavigator.Collection = value?.ToList ();
+        }
+    }
 
     /// <summary>
     ///     Provides the anchor rectangle for positioning the popover below the DropDownList.
@@ -407,6 +434,148 @@ public class DropDownList : TextField
 
         // Show the popover
         _listPopover.MakeVisible ();
+    }
+
+    /// <summary>
+    ///     Gets the <see cref="IListCollectionNavigator"/> that searches the <see cref="Source"/> collection as the
+    ///     user types when the dropdown is closed.
+    /// </summary>
+    public IListCollectionNavigator KeystrokeNavigator { get; } = new CollectionNavigator ();
+
+    /// <inheritdoc/>
+    protected override bool OnKeyDown (Key key)
+    {
+        // Only handle collection navigation when dropdown is closed and in ReadOnly mode
+        if (_listPopover is { Visible: true } || !ReadOnly)
+        {
+            return base.OnKeyDown (key);
+        }
+
+        // If the key is bound to a command, let normal processing happen
+        if (KeyBindings.TryGet (key, out _))
+        {
+            return false;
+        }
+
+        // Enable user to find & select an item by typing text
+        if (Source is null)
+        {
+            return false;
+        }
+
+        if (!KeystrokeNavigator.Matcher.IsCompatibleKey (key))
+        {
+            return false;
+        }
+
+        int currentIndex = GetCurrentSelectedIndex () ?? -1;
+        int? newItem = KeystrokeNavigator.GetNextMatchingItem (currentIndex >= 0 ? currentIndex : null, (char)key);
+
+        if (newItem is null or -1)
+        {
+            return false;
+        }
+
+        SelectItemAtIndex (newItem.Value);
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Moves the selection to the previous item in the list. Does nothing if already at the first item.
+    /// </summary>
+    private bool? MoveSelectionUp ()
+    {
+        // If the dropdown is open, let the popover handle it
+        if (_listPopover is { Visible: true })
+        {
+            return null;
+        }
+
+        int? currentIndex = GetCurrentSelectedIndex ();
+
+        if (currentIndex is null or <= 0)
+        {
+            return true; // At start or no source — do nothing but consume the key
+        }
+
+        SelectItemAtIndex (currentIndex.Value - 1);
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Moves the selection to the next item in the list. Does nothing if already at the last item.
+    /// </summary>
+    private bool? MoveSelectionDown ()
+    {
+        // If the dropdown is open, let the popover handle it
+        if (_listPopover is { Visible: true })
+        {
+            return null;
+        }
+
+        int? currentIndex = GetCurrentSelectedIndex ();
+        int count = Source?.Count ?? 0;
+
+        if (count == 0)
+        {
+            return true;
+        }
+
+        int nextIndex = (currentIndex ?? -1) + 1;
+
+        if (nextIndex >= count)
+        {
+            return true; // At end — do nothing but consume the key
+        }
+
+        SelectItemAtIndex (nextIndex);
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Gets the index of the currently selected item based on the current <see cref="TextField.Text"/>.
+    /// </summary>
+    private int? GetCurrentSelectedIndex ()
+    {
+        IList? items = Source?.ToList ();
+
+        if (items is null)
+        {
+            return null;
+        }
+
+        for (var i = 0; i < items.Count; i++)
+        {
+            if (string.Equals (items [i]?.ToString (), Text, StringComparison.Ordinal))
+            {
+                return i;
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    ///     Selects the item at the specified index, updating <see cref="TextField.Text"/>.
+    /// </summary>
+    private void SelectItemAtIndex (int index)
+    {
+        IList? items = Source?.ToList ();
+
+        if (items is null)
+        {
+            return;
+        }
+
+        if (index < 0 || index >= items.Count)
+        {
+            return;
+        }
+
+        Text = items [index]?.ToString () ?? string.Empty;
     }
 
     /// <summary>
