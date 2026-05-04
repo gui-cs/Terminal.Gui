@@ -188,7 +188,7 @@ public partial class Markdown
 
         int width = CalculateWidth (segments);
 
-        return new RenderedLine (segments, false, width, block.IsCodeBlock, block.IsThematicBreak);
+        return new RenderedLine (segments, false, width, block.IsCodeBlock, block.IsThematicBreak, codeLanguage: block.Language);
     }
 
     private static List<RenderedLine> WrapBlock (IntermediateBlock block, int viewportWidth)

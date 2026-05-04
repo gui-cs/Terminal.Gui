@@ -119,22 +119,68 @@ public partial class Markdown
             return string.Empty;
         }
 
+        // When the entire document is selected return the original source markdown.
+        // _renderedLines is a display buffer: it cannot carry inline formatting markers,
+        // heading hashes, table syntax, or thematic-break syntax.  Returning _markdown
+        // preserves everything and is always correct for a full-document selection.
+        if (IsFullDocumentSelected ())
+        {
+            return _markdown;
+        }
+
         (Point start, Point end) = GetNormalizedSelection ();
-        StringBuilder sb = new ();
+        List<string> outputLines = [];
+        bool inCodeBlock = false;
 
         for (int lineIdx = start.Y; lineIdx <= Math.Min (end.Y, _renderedLines.Count - 1); lineIdx++)
         {
-            if (lineIdx > start.Y)
+            RenderedLine line = _renderedLines [lineIdx];
+
+            if (line.IsCodeBlock && !inCodeBlock)
             {
-                sb.Append ('\n');
+                // Entering a code block: inject the opening fence with optional language tag
+                outputLines.Add ($"```{line.CodeLanguage ?? string.Empty}");
+                inCodeBlock = true;
+            }
+            else if (!line.IsCodeBlock && inCodeBlock)
+            {
+                // Leaving a code block: inject the closing fence
+                outputLines.Add ("```");
+                inCodeBlock = false;
             }
 
             int lineStartX = lineIdx == start.Y ? start.X : 0;
             int lineEndX = lineIdx == end.Y ? end.X : int.MaxValue;
-            AppendLineText (sb, _renderedLines [lineIdx], lineStartX, lineEndX);
+            StringBuilder lineSb = new ();
+            AppendLineText (lineSb, line, lineStartX, lineEndX);
+            outputLines.Add (lineSb.ToString ());
         }
 
-        return sb.ToString ();
+        if (inCodeBlock)
+        {
+            outputLines.Add ("```");
+        }
+
+        return string.Join ("\n", outputLines);
+    }
+
+    /// <summary>
+    ///     Returns <see langword="true"/> when the selection spans the entire rendered document
+    ///     from the first character to the last, so that <see cref="GetSelectedText"/> can
+    ///     return the original markdown source instead of the lossy display representation.
+    /// </summary>
+    private bool IsFullDocumentSelected ()
+    {
+        (Point start, Point end) = GetNormalizedSelection ();
+
+        if (start.X != 0 || start.Y != 0)
+        {
+            return false;
+        }
+
+        int lastLine = _renderedLines.Count - 1;
+
+        return end.Y >= lastLine && end.X >= GetLineDisplayWidth (lastLine);
     }
 
     private static void AppendLineText (StringBuilder sb, RenderedLine line, int startX, int endX)
@@ -143,7 +189,13 @@ public partial class Markdown
 
         foreach (StyledSegment segment in line.Segments)
         {
-            foreach (string grapheme in GraphemeHelper.GetGraphemes (segment.Text))
+            // Translate the display bullet character back to standard markdown list syntax.
+            // The ListMarker may be "• " (plain), "• [x] " (done task), or "• [ ] " (open task).
+            string text = segment.StyleRole == MarkdownStyleRole.ListMarker && segment.Text.StartsWith ("• ")
+                              ? "- " + segment.Text [2..]
+                              : segment.Text;
+
+            foreach (string grapheme in GraphemeHelper.GetGraphemes (text))
             {
                 int gw = Math.Max (grapheme.GetColumns (), 1);
 

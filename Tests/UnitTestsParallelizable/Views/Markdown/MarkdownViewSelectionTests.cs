@@ -307,9 +307,9 @@ public class MarkdownViewSelectionTests
         app.Dispose ();
     }
 
-    // --- Copy fidelity tests (these FAIL with the current implementation) ---
-    // The current GetSelectedText reads from rendered lines (display text),
-    // which loses markdown structure. These tests document the expected behaviour.
+    // --- Copy fidelity tests ---
+    // These use content from Markdown.DefaultMarkdownSample where possible, which contains
+    // Unicode characters (emoji), task-list markers, and fenced code blocks with language tags.
 
     // Copilot
     [Fact]
@@ -323,18 +323,38 @@ public class MarkdownViewSelectionTests
         app.Dispose ();
     }
 
-    // Copilot - FAILS: GetSelectedText returns "• foo" (Unicode bullet), not "- foo"
+    // Copilot - task-list items from DefaultMarkdownSample (includes emoji ✅ 🔧 🎉)
     [Fact]
-    public void SelectAll_BulletList_SelectedText_Preserves_Markdown_List_Markers ()
+    public void SelectAll_TaskList_SelectedText_Preserves_Markdown_List_Markers ()
     {
-        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv ("- foo\n- bar\n- baz", 40, 10);
+        // Source task-list lines taken from Markdown.DefaultMarkdownSample § Checklist
+        string md = "- [x] Bold & italic ✅\n- [x] Code blocks 🔧\n- [ ] Emojis 🎉";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
 
         mv.SelectAll ();
         string? selected = mv.SelectedText;
 
         Assert.NotNull (selected);
+        Assert.Contains ("- [x] Bold & italic ✅", selected);
+        Assert.Contains ("- [x] Code blocks 🔧", selected);
+        Assert.Contains ("- [ ] Emojis 🎉", selected);
 
-        // Expect standard markdown unordered list syntax, not Unicode bullets
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - plain bullet list (no task markers)
+    [Fact]
+    public void SelectAll_BulletList_SelectedText_Preserves_Markdown_List_Markers ()
+    {
+        string md = "- foo\n- bar\n- baz";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 40, height: 10);
+
+        mv.SelectAll ();
+        string? selected = mv.SelectedText;
+
+        Assert.NotNull (selected);
+        Assert.DoesNotContain ("•", selected);
         Assert.Contains ("- foo", selected);
         Assert.Contains ("- bar", selected);
         Assert.Contains ("- baz", selected);
@@ -343,53 +363,33 @@ public class MarkdownViewSelectionTests
         app.Dispose ();
     }
 
-    // Copilot - FAILS: GetSelectedText returns "• foo" (Unicode bullet), not "* foo"
-    [Fact]
-    public void SelectAll_AsteriskBulletList_SelectedText_Preserves_Markdown_List_Markers ()
-    {
-        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv ("* alpha\n* beta\n* gamma", 40, 10);
-
-        mv.SelectAll ();
-        string? selected = mv.SelectedText;
-
-        Assert.NotNull (selected);
-
-        // Expect recognisable markdown list syntax (- or *), not Unicode bullets
-        Assert.DoesNotContain ("•", selected);
-
-        window.Dispose ();
-        app.Dispose ();
-    }
-
-    // Copilot - FAILS: fenced code block fence lines are never added to _renderedLines
+    // Copilot - fenced code block from DefaultMarkdownSample (csharp, contains 🌍 emoji)
     [Fact]
     public void SelectAll_FencedCodeBlock_With_Language_SelectedText_Preserves_Fences ()
     {
-        var md = "```cs\nvar x = 1;\n```";
-        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md);
+        // Source taken from Markdown.DefaultMarkdownSample § Code Block (csharp)
+        string md = "```csharp\nConsole.WriteLine (\"Hello, Terminal.Gui! 🌍\");\nvar x = 42;\n```";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
 
         mv.SelectAll ();
         string? selected = mv.SelectedText;
 
         Assert.NotNull (selected);
-
-        // Must contain the opening fence with language tag and the code itself
-        Assert.Contains ("```cs", selected);
-        Assert.Contains ("var x = 1;", selected);
-
-        // Must contain the closing fence
-        Assert.Contains ("```", selected);
+        Assert.Contains ("```csharp", selected);
+        Assert.Contains ("Console.WriteLine", selected);
+        Assert.Contains ("🌍", selected);
+        Assert.Contains ("var x = 42;", selected);
 
         window.Dispose ();
         app.Dispose ();
     }
 
-    // Copilot - FAILS: fences lost even without a language specifier
+    // Copilot - fenced code block without language specifier
     [Fact]
     public void SelectAll_FencedCodeBlock_Without_Language_SelectedText_Preserves_Fences ()
     {
-        var md = "```\nhello world\n```";
-        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md);
+        string md = "```\nhello world\n```";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 40, height: 10);
 
         mv.SelectAll ();
         string? selected = mv.SelectedText;
@@ -402,83 +402,101 @@ public class MarkdownViewSelectionTests
         app.Dispose ();
     }
 
-    // Copilot - FAILS: Copy() calls GetSelectedText() even for SelectAll, losing bullet markers
+    // Copilot - Copy() after SelectAll with task list (includes emoji)
     [Fact]
-    public void Copy_After_SelectAll_BulletList_Clipboard_Contains_Markdown_Markers ()
+    public void Copy_After_SelectAll_TaskList_Clipboard_Contains_Markdown_Markers ()
     {
-        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv ("- one\n- two\n- three");
+        string md = "- [x] Bold & italic ✅\n- [x] Code blocks 🔧\n- [ ] Emojis 🎉";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
 
         mv.SelectAll ();
         mv.Copy ();
 
         app.Clipboard!.TryGetClipboardData (out string clipboard);
-        Assert.Contains ("- one", clipboard);
-        Assert.Contains ("- two", clipboard);
-        Assert.Contains ("- three", clipboard);
+        Assert.Contains ("- [x] Bold & italic ✅", clipboard);
+        Assert.Contains ("- [x] Code blocks 🔧", clipboard);
+        Assert.Contains ("- [ ] Emojis 🎉", clipboard);
 
         window.Dispose ();
         app.Dispose ();
     }
 
-    // Copilot - FAILS: Copy() loses code fences when selection is active
+    // Copilot - Copy() after SelectAll with csharp code block (includes 🌍)
     [Fact]
     public void Copy_After_SelectAll_FencedCodeBlock_Clipboard_Contains_Fences ()
     {
-        var md = "```python\nprint('hi')\n```";
-        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md);
+        string md = "```csharp\nConsole.WriteLine (\"Hello, Terminal.Gui! 🌍\");\nvar x = 42;\n```";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
 
         mv.SelectAll ();
         mv.Copy ();
 
         app.Clipboard!.TryGetClipboardData (out string clipboard);
-        Assert.Contains ("```python", clipboard);
-        Assert.Contains ("print('hi')", clipboard);
-        Assert.Contains ("```", clipboard);
+        Assert.Contains ("```csharp", clipboard);
+        Assert.Contains ("🌍", clipboard);
+        Assert.Contains ("var x = 42;", clipboard);
 
         window.Dispose ();
         app.Dispose ();
     }
 
-    // Copilot - FAILS: a partial selection of bullet items loses the list markers
+    // Copilot - partial drag selection spanning task-list items with emoji
     [Fact]
-    public void PartialSelection_BulletList_SelectedText_Preserves_Markdown_Markers ()
+    public void PartialSelection_TaskList_SelectedText_Preserves_Markdown_Markers ()
     {
-        // Two bullet items. We select both rendered lines (Y=0 and Y=1).
-        var md = "- alpha\n- beta";
-        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md);
+        string md = "- [x] Bold & italic ✅\n- [ ] Emojis 🎉";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
 
-        // Anchor at start of line 0, extend to end of line 1
+        // Press at start of line 0, drag to column 10 of line 1
         mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
         mv.NewMouseEvent (new Mouse { Position = new Point (10, 1), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
 
         string? selected = mv.SelectedText;
 
         Assert.NotNull (selected);
-        Assert.Contains ("- alpha", selected);
-        Assert.Contains ("- beta", selected);
+        Assert.Contains ("- [x] Bold & italic ✅", selected);
+        Assert.Contains ("- [ ]", selected);
 
         window.Dispose ();
         app.Dispose ();
     }
 
-    // Copilot - FAILS: partial selection inside a fenced code block loses fence context
+    // Copilot - partial drag selection spanning lines inside a csharp code block (with 🌍)
     [Fact]
     public void PartialSelection_FencedCodeBlock_SelectedText_Preserves_Fence_Context ()
     {
-        var md = "```cs\nint a = 1;\nint b = 2;\n```";
-        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md);
+        string md = "```csharp\nConsole.WriteLine (\"Hello, Terminal.Gui! 🌍\");\nvar x = 42;\n```";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
 
-        // Select both code lines (Y=0 and Y=1 in rendered output — fence lines don't appear)
+        // Select both code lines (rendered as lines 0 and 1 — fence lines are not in _renderedLines)
         mv.NewMouseEvent (new Mouse { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
-        mv.NewMouseEvent (new Mouse { Position = new Point (10, 1), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+        mv.NewMouseEvent (new Mouse { Position = new Point (12, 1), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
 
         string? selected = mv.SelectedText;
 
         Assert.NotNull (selected);
+        Assert.Contains ("```csharp", selected);
+        Assert.Contains ("Console.WriteLine", selected);
+        Assert.Contains ("🌍", selected);
 
-        // The selection is from inside a code block — the language tag must survive
-        Assert.Contains ("```cs", selected);
-        Assert.Contains ("int a = 1;", selected);
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - FAILS: inline formatting (**bold**, *italic*, `code`, ~~strike~~), heading
+    // markers (#), tables, thematic breaks, and link syntax ([text](url)) are all lost in
+    // the display representation — the selected text cannot equal the original markdown source.
+    [Fact]
+    public void SelectAll_DefaultMarkdownSample_SelectedText_RoundTrips ()
+    {
+        string md = Terminal.Gui.Views.Markdown.DefaultMarkdownSample;
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 120, height: 60);
+
+        mv.SelectAll ();
+        string? selected = mv.SelectedText;
+
+        Assert.NotNull (selected);
+        Assert.Equal (md, selected);
 
         window.Dispose ();
         app.Dispose ();
