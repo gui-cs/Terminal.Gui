@@ -132,21 +132,38 @@ public partial class Markdown
         List<string> outputLines = [];
         bool inCodeBlock = false;
 
+        string? currentCodeLanguage = null;
+
         for (int lineIdx = start.Y; lineIdx <= Math.Min (end.Y, _renderedLines.Count - 1); lineIdx++)
         {
             RenderedLine line = _renderedLines [lineIdx];
 
-            if (line.IsCodeBlock && !inCodeBlock)
+            if (line.IsCodeBlock)
             {
-                // Entering a code block: inject the opening fence with optional language tag
-                outputLines.Add ($"```{line.CodeLanguage ?? string.Empty}");
-                inCodeBlock = true;
+                string? nextCodeLanguage = line.CodeLanguage;
+
+                if (!inCodeBlock)
+                {
+                    // Entering a code block: inject the opening fence with optional language tag
+                    outputLines.Add ($"```{nextCodeLanguage ?? string.Empty}");
+                    inCodeBlock = true;
+                    currentCodeLanguage = nextCodeLanguage;
+                }
+                else if (!string.Equals (currentCodeLanguage, nextCodeLanguage, StringComparison.Ordinal))
+                {
+                    // Transitioning directly between two code blocks: close the current fence
+                    // and open the next one so adjacent fenced blocks are preserved.
+                    outputLines.Add ("```");
+                    outputLines.Add ($"```{nextCodeLanguage ?? string.Empty}");
+                    currentCodeLanguage = nextCodeLanguage;
+                }
             }
-            else if (!line.IsCodeBlock && inCodeBlock)
+            else if (inCodeBlock)
             {
                 // Leaving a code block: inject the closing fence
                 outputLines.Add ("```");
                 inCodeBlock = false;
+                currentCodeLanguage = null;
             }
 
             if (line.IsTable && line.TableData is { } tableData)
