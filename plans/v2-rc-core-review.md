@@ -8,6 +8,8 @@
 - **P1** — critical, but not a ship stopper
 - **P2** — nice to fix
 
+> **Note (verification pass against `origin/develop` at `ef9a96a`):** The branch this review was performed on is behind `develop` by ~30 commits. After re-checking each P0 against `develop`, several have already been fixed there (notably `#5131 OutputBufferImpl race`, `#5134 AOT config warning cleanup`, AttributeJsonConverter rewrite, DeepCloner visited-mapping ordering, and DictionaryJsonConverter duplicate-key handling). One P0 was a false positive on my part (`CommandContextExtensions` uses C# 14 extension-block syntax, which is valid for this `net10.0`/C# 14 project). See **Verification Status** at the bottom of this file for the per-finding outcome.
+
 ---
 
 ## Executive Summary
@@ -323,3 +325,78 @@ In rough order of risk × ease-of-fix:
 14. Fix `TextFormatter` vertical-height `line.Length` and grapheme-count gate.
 
 The remaining P1s should be triaged for a follow-on RC; P2s can land post-2.0.
+
+---
+
+## Verification Status Against `origin/develop` (`ef9a96a`)
+
+The original review was performed against `claude/review-core-v2-EKNyf`, which is ~30 commits behind `develop`. Each P0 was re-checked on `develop`. Outcomes:
+
+### P0s already fixed on `develop` — strike from action list
+
+| # | Finding | File | Status / Evidence |
+|---|---|---|---|
+| 8 | OutputBufferImpl `ClearContents` race | `Drivers/Output/OutputBufferImpl.cs` | **FIXED** — PR #5131. A new `private readonly Lock _contentsLock = new();` (line 18) is now held by `ClearContents`, `AddGrapheme`, `FillRect`, and `SetSize`; the doc-comment explicitly calls out "never replaced, guaranteeing mutual exclusion". |
+| 9 | OutputBufferImpl `Clip` lazy-init race | same file | **FIXED** — same `_contentsLock` covers `Clip` access in `FillRect`, `ClearContentsCore`, and `AddGrapheme`. |
+| 10 | `AttributeJsonConverter.Read()` re-quotes the value token | `Configuration/AttributeJsonConverter.cs` | **FIXED** — rewritten to call `JsonSerializer.Deserialize(ref reader, ConfigurationManager.SerializerContext.Color)` directly. The `$"\"{reader.GetString()}\""` is now only used to format error messages in the catch block. |
+| 13 | `DeepCloner` visited-mapping ordering | `Configuration/DeepCloner.cs` | **FIXED** — `visited.TryAdd(source, clone);` now runs immediately after `CreateInstance(type)`, with an explicit `// Add to visited before cloning properties` comment, before the property-clone loop. |
+| 14a | `DictionaryJsonConverter` silent duplicate-key drop | `Configuration/DictionaryJsonConverter.cs` | **FIXED** — switched from `TryAdd` to `dictionary.Add(key, (T)value)`, which throws on duplicates. (Note: see 14b below — the `ConcurrentDictionary` variant is *not* fixed.) |
+
+### P0 that was a false positive — withdraw
+
+| # | Finding | File | Status |
+|---|---|---|---|
+| 2 | `CommandContextExtensions.cs` "uses invalid C# extension syntax" | `Input/CommandContextExtensions.cs` | **NOT A BUG.** The file uses C# 14 extension-block syntax (`extension (ICommandContext? context) { ... }`), which is valid on this project (`net10.0` / C# 14 per CLAUDE.md). The original review subagent applied pre–C# 14 syntax expectations. Withdrawn. |
+
+### P0s partially addressed — re-audit needed before ship
+
+| # | Finding | File | Status |
+|---|---|---|---|
+| 12 | `SourceGenerationContext` missing types | `Configuration/SourceGenerationContext.cs` | **PARTIALLY FIXED** — PR #5134 added `Dictionary<string, object>`, `Dictionary<ColorName16, string>`, `Dictionary<Command, PlatformKeyBinding>`, and the nested `Dictionary<string, Dictionary<Command, PlatformKeyBinding>>`, plus `PlatformKeyBinding` itself. The original concern about `Dictionary<string, KeyCode>` is moot because that type is no longer used (replaced by `PlatformKeyBinding`). Re-audit `Rune` and `VisualRole` coverage; `Rune` has its own `JsonConverter` so likely fine, but a one-off AOT smoke test would close the loop. |
+| 14b | `ConcurrentDictionaryJsonConverter` silent duplicate-key drop | `Configuration/ConcurrentDictionaryJsonConverter.cs` | **STILL PRESENT** — still uses `dictionary.TryAdd(key, (T)value);` and ignores the return. Apply the same fix as `DictionaryJsonConverter`. |
+
+### P0s confirmed still present on `develop`
+
+| # | Finding | File | Notes |
+|---|---|---|---|
+| 1 | CWP: `SessionBegun` before `SetIsRunning`/`SetIsModal` | `App/ApplicationImpl.Run.cs` ~ line 155 | Still inside the lock and still raised before the state setters. |
+| 3 | `Invoke()` thread-affinity race | `App/ApplicationImpl.Run.cs` ~ lines 60, 80 | `MainThreadId == Thread.CurrentThread.ManagedThreadId` still unsynchronized. |
+| 4 | Unix raw mode not restored on input thread crash | `Drivers/UnixHelpers/UnixRawModeHelper.cs` | No diff vs branch. |
+| 5 | `AnsiOutput.Dispose()` doesn't flush | `Drivers/AnsiDriver/AnsiOutput.cs` | No diff vs branch. |
+| 6 | Inline-mode cursor parked one row past region | `Drivers/AnsiDriver/AnsiOutput.cs` ~ line 384 | No diff vs branch. |
+| 7 | `Region.XOR` produces non-XOR results | `Drawing/Region.cs:217-222` | No diff vs branch. |
+| 11 | `Region.DrawOuterBoundary` off-by-one (self-flagged BUGBUG) | `Drawing/Region.cs:986-1031` | No diff vs branch. |
+| 15 | `RuneJsonConverter.Write` uses `WriteRawValue` without escaping | `Configuration/RuneJsonConverter.cs:144` | Still present (the un-escaped `writer.WriteRawValue($"\"{value}\"")` path remains for the `Rune.MakePrintable() == ReplacementChar` case). |
+| 16 | `Key.Equals` includes `Handled`, `GetHashCode` does not | `Input/Keyboard/Key.cs:699,708` | Still present. |
+| 17 | `KeyBindings` factory lambda discards `key` | `Input/Keyboard/KeyBindings.cs:12` | Still present: `(commands, key, source) => new KeyBinding (commands, source)`. |
+| 18 | `TextFormatter.FormatAndGetSize` vertical height uses `line.Length` | `Text/TextFormatter.cs:556` | Still present. |
+| 19 | `TextFormatter.GetColumnsRequiredForVerticalText` `strings.Length` gate | `Text/TextFormatter.cs:2264` | Gate still uses UTF-16 char count. **Severity reconsidered:** practically a P2, not a P0 — for any non-empty string the gate is correct (an all-combining-mark string still has `.Length > 0`). The substantive grapheme-correctness work is finding 18, not this one. Recommend reclassifying to P2. |
+
+### Updated P0 ledger (post-verification)
+
+| Bucket | Count | Items |
+|---|---|---|
+| P0s genuinely outstanding | **11** | 1, 3, 4, 5, 6, 7, 11, 14b (ConcurrentDictionary half), 15, 16, 17, 18 |
+| P0s already fixed on develop | **5** | 8, 9, 10, 13, 14a |
+| P0s withdrawn (not a bug) | **1** | 2 (CommandContextExtensions) |
+| P0s partially fixed | **1** | 12 (SourceGenerationContext — re-audit Rune/VisualRole) |
+| P0 reclassified to P2 | **1** | 19 (vertical-text Length gate) |
+
+> Counts above add to 19, matching the original tally in the executive summary.
+
+### Revised pre-ship action list (P0s only)
+
+1. Drop `Handled` from `Key.Equals` (item 16).
+2. Pass `key` through the `KeyBindings` factory lambda (item 17).
+3. Fix `Region.XOR` (snapshot operands first) (item 7).
+4. Fix `Region.DrawOuterBoundary` line lengths (`-1` on lines 1116/1130) (item 11).
+5. Fix `TextFormatter.FormatAndGetSize` vertical height to use `GetColumns()` (item 18).
+6. Fix `RuneJsonConverter.Write` to use `WriteStringValue` unconditionally (item 15).
+7. Apply the `Add`-instead-of-`TryAdd` fix to `ConcurrentDictionaryJsonConverter` (item 14b).
+8. CWP order in `ApplicationImpl.Begin` — set `IsRunning`/`IsModal` before raising `SessionBegun` (item 1).
+9. Synchronize the `Invoke` thread-affinity check or remove the fast path (item 3).
+10. Flush + correct `lastInlineRow` in `AnsiOutput.Dispose` (items 5, 6).
+11. Add Unix raw-mode crash-restore safety net (item 4).
+12. Confirm `SourceGenerationContext` AOT coverage with a build-time smoke test (item 12).
+
+P1s and P2s above remain unchanged by this verification pass; spot checks suggest most are still present, but a full re-verification was out of scope for this pass.
