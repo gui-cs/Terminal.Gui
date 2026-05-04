@@ -29,6 +29,18 @@ public partial class Markdown
     }
 
     /// <summary>
+    ///     Gets the text that corresponds to the current selection, rendered as plain text from
+    ///     the displayed content.  Returns <see langword="null"/> when no selection is active.
+    /// </summary>
+    /// <remarks>
+    ///     The returned string reflects the on-screen representation (display text) of the selected
+    ///     region — not the original markdown source.  Markdown structure such as bullet-list
+    ///     markers (<c>- </c>), fenced code-block delimiters (<c>```</c>), and heading hashes
+    ///     (<c>#</c>) may differ from the source document.
+    /// </remarks>
+    public string? SelectedText => _isSelecting ? GetSelectedText () : null;
+
+    /// <summary>
     ///     Copies the current selection, or the entire markdown document if nothing is selected, to the clipboard.
     /// </summary>
     /// <returns><see langword="true"/> if the copy was performed.</returns>
