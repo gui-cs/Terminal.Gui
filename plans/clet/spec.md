@@ -1,11 +1,13 @@
 # `clet` Implementation Spec
 
-**Status:** draft v0.3 · for review · companion to the PR/FAQ in [issue #5155](https://github.com/gui-cs/Terminal.Gui/issues/5155)
+**Status:** draft v0.4 · for review · companion to the PR/FAQ in [issue #5155](https://github.com/gui-cs/Terminal.Gui/issues/5155)
 **Owner:** TBD · **Target:** v1.0 GA (matches Terminal.Gui v2 GA)
 
 This is the implementation spec. It assumes the PR/FAQ is broadly accepted and covers what to build, where it lives, what changes in Terminal.Gui to support it, how it ships, and how it's tested.
 
 No em-dashes. Parens or semicolons. Scope is v1.0; v2 (third-party plugin loading, password clet, additional viewer clets) is out of scope unless explicitly noted.
+
+**v0.4 change vs v0.3:** TG-side prerequisites filed as issues: #5156 (`Markdown` View golden-file rendering tests), #5157 (`Application.RunAsync(Toplevel, CancellationToken)` overload), #5158 (`FileDialog` typed-result refactor). The Markdown golden-file tests section moved out of clet's test suite into TG core (#5156); §6 is now eight layers, all clet-side. §7 milestone date column dropped (the schedule follows TG releases, not a calendar). §9 open questions trimmed (CM theme location and ARM64 packaging both resolved). §10 implementation order rewritten: TG-issue filing comes first; the first clet to build replicates `Examples/InlineSelect/Program.cs`. New §4.5 documents the implementation pattern using `RunnableWrapper<TView, TResult>` and notes that initial-value parsing uses .NET 7's `IParsable<T>` (no new interface).
 
 **v0.3 change vs v0.2:** five §3 TG-side workstreams dropped (inline rendering audit, AOT pre-emptive audit, `ConfigurationManager` path loading, `Markdown` View confirmation, terminal-driver inline detection) because each is already done or already tracked. §3 now lists two items: cancellation token plumbing (P0) and a `FileDialog` typed-result refactor (P1; change the base from `Dialog<int>` to `Dialog<List<string>?>`). AOT issues are discovered via §6.6 publish tests, not a separate audit. CLI surface trimmed: `--theme` removed (`ConfigurationManager` already exposes several ways to set themes); `--alt-screen` removed; `--inline` is the default and `--fullscreen` is the opt-out; `clet --help` and `clet help <alias>` render via Terminal.Gui's `Markdown` View, the same path `clet md` uses.
 
@@ -98,7 +100,7 @@ Most of what an early draft of this spec assumed would need to change in TG is a
 
 Two items remain. Each is a general TG improvement, not a clet-specific one.
 
-### 3.1 Cancellation token plumbing (P0)
+### 3.1 Cancellation token plumbing (P0) ; tracked as [#5157](https://github.com/gui-cs/Terminal.Gui/issues/5157)
 
 **Goal:** `IApplication.RunAsync(Toplevel, CancellationToken)` overload that cancels the run loop cleanly when the token is cancelled, returning whatever state the View has accumulated (so `IValue<T>.Value` is still readable for partial-result inspection if relevant).
 
@@ -110,7 +112,7 @@ Two items remain. Each is a general TG improvement, not a clet-specific one.
 
 **Why TG, not clet:** Cancellation must work for any TG app, not just clets. The hook belongs in core.
 
-### 3.2 FileDialog: typed result refactor (P1)
+### 3.2 FileDialog: typed result refactor (P1) ; tracked as [#5158](https://github.com/gui-cs/Terminal.Gui/issues/5158)
 
 **Background:** `FileDialog` currently inherits from `Dialog`, which inherits from `Dialog<int>`. The `int` result is an OK/Cancel sentinel; the actual selected paths are read off the dialog instance after the run completes. That shape doesn't compose with `IValue<T>` cleanly for clet's typed-result contract.
 
@@ -337,7 +339,69 @@ internal sealed class TextClet : IClet<string> { ... }
 
 The generator produces `BuiltInClets.RegisterAll(ICletRegistry registry)` which calls `registry.Register(new TextClet())` for each.
 
-### 4.5 `Program.Main` outline
+### 4.5 Built-in clet implementation pattern
+
+Each input clet wraps an existing TG View in `RunnableWrapper<TView, TResult>`, which auto-extracts the typed result via `IValue<TResult>`. The pattern mirrors `Examples/InlineSelect/Program.cs` in `gui-cs/Terminal.Gui` (the canonical inline-mode example).
+
+Sketch for `SelectClet` (the first clet to build; replicates `InlineSelect`):
+
+```csharp
+[Clet ("select", typeof (int?))]
+internal sealed class SelectClet : IClet<int?>
+{
+    public async Task<CletRunResult<int?>> RunAsync (
+        IApplication app,
+        string? initial,
+        CletRunOptions options,
+        CancellationToken cancellationToken)
+    {
+        string[] labels = options.CletOptions? ["options"]?.Split (',') ?? [];
+
+        OptionSelector selector = new ()
+        {
+            Labels = labels,
+            AssignHotKeys = true,
+        };
+
+        RunnableWrapper<OptionSelector, int?> wrapper = new (selector)
+        {
+            Title = options.Title ?? "Select an option (Enter to accept, Esc to cancel)",
+            Width = Dim.Fill (),
+            BorderStyle = LineStyle.Rounded,
+        };
+
+        await app.RunAsync (wrapper, cancellationToken);
+
+        return cancellationToken.IsCancellationRequested
+            ? new () { Status = CletRunStatus.Cancelled }
+            : new () { Status = CletRunStatus.Ok, Value = wrapper.Result };
+    }
+}
+```
+
+**Pattern observations:**
+- The clet does not own the run loop or the application lifecycle; the host (`Program.Main`) does.
+- `RunnableWrapper<TView, TResult>` is the existing TG primitive that bridges Views to typed results. Clet does not invent a new wrapper.
+- `await app.RunAsync(wrapper, ct)` requires §3.1 (#5157); without it, clet falls back to a `Task.Run` polling loop until the overload lands.
+- Viewer clets follow the same shape but use a Markdown-shaped View (or other read-only View) and return `CletRunResult` (no `T`).
+
+**Initial-value parsing.** When a clet's `TResult` implements `System.IParsable<TResult>` (or `System.ISpanParsable<TResult>`) from .NET 7+, the `--initial <string>` flag parses for free with no reflection:
+
+```csharp
+if (TResult.TryParse (initial, CultureInfo.InvariantCulture, out TResult parsed))
+{
+    selector.Value = parsed;  // or whatever IValue<T> setter the View exposes
+}
+```
+
+This is the standard .NET parsing contract; we don't invent a new interface. Most relevant types already implement it:
+- `int`, `decimal`, `bool`, `DateTime`, `DateOnly`, `TimeOnly`, `TimeSpan`, `Guid`, `IPAddress`: built-in.
+- `Color`: TG already implements `ISpanParsable<Color>` (`Terminal.Gui/Drawing/Color/Color.cs`).
+- Custom records and enums: trivially implementable (often a one-line `static abstract` override).
+
+For types where `IParsable` doesn't fit (collections like `List<string>`, multi-select results, free-form structured input), the clet registers a parser delegate as part of `[Clet]` registration. AOT-clean either way (static-abstract dispatch is an interface call resolved at link time).
+
+### 4.6 `Program.Main` outline
 
 ```csharp
 internal static class Program
@@ -357,7 +421,7 @@ internal static class Program
 }
 ```
 
-### 4.6 CLI surface
+### 4.7 CLI surface
 
 ```
 clet <alias> [initial] [--json] [--timeout 30s] [--fullscreen] [clet-specific options]
@@ -373,7 +437,7 @@ clet --version
 
 **Help rendering.** `clet --help` and `clet help <alias>` render their content via Terminal.Gui's `Markdown` View, the same code path `clet md` uses. Help content is authored as Markdown under `src/Clet/Help/` (one file per alias plus a top-level overview), embedded as resources, and surfaced through the same dismissable, themed, scrollable viewer experience as `mdv` and the help system in `Examples/UICatalog`. This means help is browsable with the keys the user already knows.
 
-### 4.7 Exit code mapping
+### 4.8 Exit code mapping
 
 | Status                | Exit |
 |-----------------------|-----:|
@@ -384,7 +448,7 @@ clet --version
 | I/O error             |   74 |
 | Cancelled             |  130 |
 
-### 4.8 NativeAOT publish settings
+### 4.9 NativeAOT publish settings
 
 In `Clet.csproj`:
 ```xml
@@ -509,7 +573,7 @@ The `Clet.csproj` `Version` property is set at build time from the dispatch payl
 
 ## 6. Testing Plan
 
-The user asked for thorough; this section is detailed accordingly. Eight test layers, each with a clear "what does this catch" purpose. All tests live in `gui-cs/clet/tests/` (Terminal.Gui core's test suite is unaffected by clet).
+The user asked for thorough; this section is detailed accordingly. Eight test layers, each with a clear "what does this catch" purpose. All tests live in `gui-cs/clet/tests/`. `Markdown` View rendering quality is tested in TG core, not here (#5156).
 
 ### 6.1 Unit tests (`tests/Clet.UnitTests`)
 
@@ -614,15 +678,7 @@ Run before every minor release (v1.0, v1.1, ...). Captured in a release checklis
 - `clet list --json` cold start: same budgets.
 - Tracked over time; regression alerts at +25% on a 7-day rolling baseline.
 
-### 6.8 Markdown rendering golden-file tests
-
-**What this catches:** `Markdown` View regressions visible to clet users specifically (where TG's own tests might pass but the rendered output for `clet md` looks wrong).
-
-**Corpus:** CommonMark spec examples + GFM table samples + a curated "real READMEs" set (TG's own README, .NET runtime README, a few popular OSS projects).
-
-**Method:** Render each to a fixed terminal size, capture as ANSI text, diff against golden. Updates require explicit reviewer approval.
-
-### 6.9 Release pipeline dry-run tests
+### 6.8 Release pipeline dry-run tests
 
 **What this catches:** Workflow regressions that would otherwise only surface during a real TG release (when the cost is high).
 
@@ -634,13 +690,15 @@ Run before every minor release (v1.0, v1.1, ...). Captured in a release checklis
 
 ## 7. Milestones
 
-| Milestone | Date target | Exit criteria |
-|-----------|-------------|---------------|
-| **v0.1 alpha** | T+4 weeks | `gui-cs/clet` repo bootstrapped; abstractions, registry, JSON in place; `text` and `confirm` clets working in unit + integration tests. |
-| **v0.3 alpha** | T+8 weeks | All 14 input clets functional. JSON schema drafted. AOT publish (§6.6) green on `gui-cs/clet` CI. |
-| **v0.5 beta** | T+14 weeks | Naming locked; JSON schema locked; exit-code table locked; inline rendering proven on the four-terminal matrix; v1.0 input and viewer lists locked; Markdown View integration verified end-to-end including link safety; threat model published; Homebrew tap and WinGet manifest in working draft form; the gui-cs/clet release workflow proven against a real TG release cut. |
-| **v0.9 RC** | T+18 weeks | All §6 test layers passing in CI. One real release cycle exercised end-to-end. |
-| **v1.0 GA** | T+20 weeks (matches TG v2 GA) | Brew, WinGet, NuGet channels live. Documentation published. Issue templates for clet bugs in place. |
+Schedule follows TG releases, not a calendar; no dates here.
+
+| Milestone | Exit criteria |
+|-----------|---------------|
+| **v0.1 alpha** | `gui-cs/clet` repo bootstrapped; abstractions, registry, JSON in place; `select` clet (replicating `Examples/InlineSelect`) working in unit + integration tests. |
+| **v0.3 alpha** | All 14 input clets functional. JSON schema drafted. AOT publish (§6.6) green on `gui-cs/clet` CI. |
+| **v0.5 beta** | Naming locked; JSON schema locked; exit-code table locked; inline rendering verified on the four-terminal matrix; v1.0 input and viewer lists locked; `Markdown` View integration verified end-to-end including link safety; threat model published; Homebrew tap and WinGet manifest in working draft form; the gui-cs/clet release workflow proven against a real TG release cut. |
+| **v0.9 RC** | All §6 test layers passing in CI. One real release cycle exercised end-to-end. |
+| **v1.0 GA** | Tied to TG v2 GA. Brew, WinGet, NuGet channels live. Documentation published. Issue templates for clet bugs in place. |
 
 ---
 
@@ -650,8 +708,8 @@ Run before every minor release (v1.0, v1.1, ...). Captured in a release checklis
 |------|-----------:|-------:|------------|
 | AOT issue surfaces during `gui-cs/clet` build or smoke test | Medium | Medium | §6.6 catches before publish; file against TG core; if blocking on a release, fall back to self-contained single-file (~30MB) and document. |
 | `FileDialog` typed-result refactor (§3.2) breaks downstream callers | Low | Medium | Coordinate with TG core team; flag as breaking in release notes; fix in-tree callers as part of the PR. |
-| Native installer pipeline (Homebrew/WinGet) ops cost | Medium | Medium | §5.3 smoke gate + §6.9 dry-runs catch most issues pre-publish; explicit on-call rotation for release weeks. |
-| Markdown View quality regression vs `glow` | Low | Medium | §6.8 golden-file corpus; quarterly comparison run. |
+| Native installer pipeline (Homebrew/WinGet) ops cost | Medium | Medium | §5.3 smoke gate + §6.8 dry-runs catch most issues pre-publish; explicit on-call rotation for release weeks. |
+| Markdown View quality regression vs `glow` | Low | Medium | TG-side golden-file corpus (#5156); quarterly comparison run. |
 | Cancellation tokens in TG core have unforeseen complexity | Medium | Medium | §3.1 spike at v0.1; if hard, ship clet with polling-based cancellation as fallback. |
 | Naming concerns about "clet" surfacing in support channels | Low | Low | Acknowledge in docs; outlast. |
 
@@ -659,14 +717,12 @@ Run before every minor release (v1.0, v1.1, ...). Captured in a release checklis
 
 ## 9. Open Questions
 
-1. **Theme location on disk.** The PR/FAQ says `ConfigurationManager` themes apply, but the search path for a system-wide theme isn't documented. Confirm with the TG core team before v0.5.
-2. **WinGet ARM64.** The `win-arm64` matrix entry assumes WinGet ARM64 publishing is supported; verify, and fall back to x64-only if not.
-3. **Telemetry.** The PR/FAQ mentions an opt-in usage ping. Spec deliberately does not include this in v1.0 scope; revisit at v1.1 with a privacy review.
-4. **Homebrew tap repo name.** `gui-cs/homebrew-tap` is assumed; confirm it exists or create.
-5. **Code signing certs.** Apple Developer ID and Authenticode certs are operational dependencies; confirm ownership/renewal process before v0.9.
-6. **`range` clet result type.** `(low, high)` tuple, named record, or two separate fields? Decide before locking the JSON schema at v0.5.
-7. **`md` content source.** File argument (`clet md README.md`), stdin (`cat README.md | clet md -`), or both? Both is implied; confirm CLI shape.
-8. **PR/FAQ update.** Issue #5155's PR/FAQ still references `Terminal.Gui.Clets` as a separate assembly (Tig's quote, the strategic FAQ). Update issue body to match this spec before v0.5.
+1. **Telemetry.** The PR/FAQ mentions an opt-in usage ping. Spec deliberately does not include this in v1.0 scope; revisit at v1.1 with a privacy review.
+2. **Homebrew tap repo name.** `gui-cs/homebrew-tap` is assumed; confirm it exists or create.
+3. **Code signing certs.** Apple Developer ID and Authenticode certs are operational dependencies; confirm ownership/renewal process before v0.9.
+4. **`range` clet result type.** `(low, high)` tuple, named record, or two separate fields? Decide before locking the JSON schema at v0.5.
+5. **`md` content source.** File argument (`clet md README.md`), stdin (`cat README.md | clet md -`), or both? Both is implied; confirm CLI shape.
+6. **PR/FAQ update.** Issue #5155's PR/FAQ still references `Terminal.Gui.Clets` as a separate assembly (Tig's quote, the strategic FAQ). Update issue body to match this spec before v0.5.
 
 ---
 
@@ -674,17 +730,24 @@ Run before every minor release (v1.0, v1.1, ...). Captured in a release checklis
 
 A suggested sequence (linear, not parallelizable until v0.3 except where noted):
 
-1. TG: §3.1 cancellation token PR against `develop`. §3.2 `FileDialog` typed-result refactor (coordinate with TG team; breaking change against any v2 caller of the old `int` shape).
-2. `gui-cs/clet` repo bootstrapped: solution layout, abstractions, registry, JSON, source generator.
-3. First two clets (`text`, `confirm`) end-to-end in unit + integration tests.
-4. CLI host: Program.Main, System.CommandLine, alias dispatch, output formatter.
-5. Smoke test harness (§6.3) running on a single RID.
-6. Remaining input clets, in order of complexity: `int`, `decimal`, `select`, `multi-select`, `range`, `date`, `time`, `duration`, `color`, `attribute-picker`, `pick-directory`, `pick-file`.
-7. `md` viewer clet (after §3.5 confirmation).
-8. Release pipeline: build matrix, signing, smoke gate.
-9. Publish channels: Homebrew first (lowest ops friction), then WinGet, then NuGet tool.
-10. v0.5 gate: four-terminal matrix run + threat model + locked schema.
-11. RC and GA.
+1. **File the TG-side prerequisite issues.** Done as part of the v0.4 spec drop:
+   - #5156 `Markdown` View golden-file rendering tests (covers what was previously §6.8 of this spec).
+   - #5157 `Application.RunAsync(Toplevel, CancellationToken)` overload (§3.1).
+   - #5158 `FileDialog` typed-result refactor (§3.2).
+
+   Track each through normal TG review. Land #5157 before clet's first integration test (it's the cancellation hook); #5158 before `pick-file`/`pick-directory`; #5156 anytime (independent quality work).
+
+2. **`gui-cs/clet` repo bootstrapped:** solution layout, abstractions, registry, JSON, source generator. CI on push (build, unit tests).
+3. **First clet: `select`.** A direct port of `Examples/InlineSelect/Program.cs` to a `SelectClet : IClet<int?>` using `RunnableWrapper<OptionSelector, int?>`. End-to-end through unit + integration tests + a manual run from a real shell. This proves the entire pipeline (registry, alias dispatch, output formatter, exit codes, JSON schema) on the simplest non-trivial clet shape.
+4. **CLI host.** Program.Main, System.CommandLine, alias dispatch, output formatter. Smoke test harness (§6.3) running on a single RID.
+5. **Second wave of clets:** `text`, `confirm`, `int`, `decimal`. These exercise `IParsable<T>`-based initial-value parsing across the most common scalar types.
+6. **Third wave:** `multi-select`, `range`, `date`, `time`, `duration`, `color`, `attribute-picker`. Covers more `IValue<T>` shapes and the more complex Views.
+7. **Fourth wave:** `pick-directory`, `pick-file`. Depends on #5158 (FileDialog refactor) landing in TG.
+8. **`md` viewer clet.** First viewer clet; exercises the `IViewerClet` contract and the help-rendering pipeline (§4.7).
+9. **Release pipeline:** build matrix, signing, smoke gate.
+10. **Publish channels:** Homebrew first (lowest ops friction), then WinGet, then NuGet tool.
+11. **v0.5 gate:** four-terminal matrix run + threat model + locked schema + #5156 Markdown rendering tests landed in TG.
+12. RC and GA.
 
 ---
 
