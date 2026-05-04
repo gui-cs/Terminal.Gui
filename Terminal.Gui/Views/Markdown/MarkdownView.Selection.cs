@@ -315,9 +315,9 @@ public partial class Markdown
 
     private Point GetContextMenuScreenPosition ()
     {
-        Point anchor = _isSelecting ? _selectionCurrent : new Point (0, 0);
+        Point viewportPosition = _isSelecting ? _selectionCurrent : new Point (0, 0);
 
-        return ViewportToScreen (anchor);
+        return ViewportToScreen (viewportPosition);
     }
 
     private bool ShowContextMenu (Point? screenPosition = null)

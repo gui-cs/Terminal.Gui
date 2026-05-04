@@ -530,4 +530,58 @@ public class MarkdownViewSelectionTests
         window.Dispose ();
         app.Dispose ();
     }
+
+    // Copilot - right-clicking an unfocused view should focus it and open the context menu
+    [Fact]
+    public void RightClick_On_Unfocused_View_Creates_And_Shows_ContextMenu ()
+    {
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv ("Hello");
+
+        // Add another focusable view and move focus there so the Markdown view is unfocused
+        Button btn = new () { Text = "OK", X = 0, Y = 5 };
+        window.Add (btn);
+        app.LayoutAndDraw ();
+        btn.SetFocus ();
+
+        Assert.False (mv.HasFocus);
+        Assert.Null (mv.ContextMenu);
+
+        // Simulate a right-click while the view is not focused
+        mv.NewMouseEvent (new Mouse
+        {
+            Position = new Point (0, 0),
+            ScreenPosition = new Point (0, 0),
+            Flags = MouseFlags.RightButtonClicked
+        });
+
+        // The view should now be focused and the context menu should be created
+        Assert.True (mv.HasFocus);
+        Assert.NotNull (mv.ContextMenu);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
+    // Copilot - right-clicking an already-focused view should still open the context menu
+    [Fact]
+    public void RightClick_On_Focused_View_Shows_ContextMenu ()
+    {
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv ("Hello");
+
+        mv.SetFocus ();
+        Assert.NotNull (mv.ContextMenu);
+
+        // Second right-click should not crash and context menu should remain
+        mv.NewMouseEvent (new Mouse
+        {
+            Position = new Point (0, 0),
+            ScreenPosition = new Point (0, 0),
+            Flags = MouseFlags.RightButtonClicked
+        });
+
+        Assert.NotNull (mv.ContextMenu);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
 }

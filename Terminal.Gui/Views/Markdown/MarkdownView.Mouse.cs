@@ -61,7 +61,9 @@ public partial class Markdown
         // fires only on LeftButtonClicked (not twice per click which would clear selection).
         MouseBindings.Remove (MouseFlags.LeftButtonReleased);
         MouseBindings.ReplaceCommands (MouseFlags.LeftButtonClicked, Command.Activate);
-        MouseBindings.ReplaceCommands (MouseFlags.RightButtonClicked, Command.Context);
+
+        // Right-click is handled directly in OnMouseEvent so that the view can be focused
+        // and the context menu created before trying to show it, even when not yet focused.
 
         // Press anchors the drag-selection; drag extends it — both routed through OnActivated.
         MouseBindings.Add (MouseFlags.LeftButtonPressed, Command.Activate);
@@ -71,15 +73,27 @@ public partial class Markdown
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouse)
     {
+        // Right-click: focus the view first (which creates ContextMenu) then show the menu at
+        // the click's screen position. Handled here rather than via a Command binding so that
+        // focus and menu creation are guaranteed even when the view is not yet focused.
+        if (mouse.Flags.FastHasFlags (MouseFlags.RightButtonClicked))
+        {
+            if (!HasFocus && CanFocus)
+            {
+                SetFocus ();
+            }
+
+            ShowContextMenu (mouse.ScreenPosition);
+
+            return true;
+        }
+
         if (!mouse.Flags.FastHasFlags (MouseFlags.LeftButtonReleased))
         {
             return false;
         }
 
-        if (App is { } && App.Mouse.IsGrabbed (this))
-        {
-            App.Mouse.UngrabMouse ();
-        }
+        App?.Mouse.UngrabMouse ();
 
         return false;
     }
