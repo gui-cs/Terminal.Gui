@@ -31,9 +31,6 @@
 
   // --------------- View Specific Settings ---------------
   "PopoverMenu.DefaultKey": "Shift+F10",
-  "FileDialog.MaxSearchResults": 10000,
-  "FileDialogStyle.DefaultUseColors": false,
-  "FileDialogStyle.DefaultUseUnicodeCharacters": false,
 
   // --------------- Themes -----------------
   "Themes": [

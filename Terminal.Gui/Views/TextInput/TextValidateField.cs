@@ -419,6 +419,12 @@ public class TextValidateField : View, IDesignable, IValue<string>
             return false;
         }
 
+        if (key.IsAlt || key.IsCtrl)
+        {
+            // Never insert modified keys
+            return false;
+        }
+
         if (key.AsRune == default (Rune) || key == Application.GetDefaultKey (Command.Quit))
         {
             return false;

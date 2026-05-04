@@ -25,7 +25,7 @@ public interface IFileOperations
     /// <remarks>
     ///     Ensure you use a try/catch block with appropriate error handling (e.g. showing a <see cref="MessageBox"/>
     /// </remarks>
-    IFileSystemInfo New (IApplication? app, IFileSystem fileSystem, IDirectoryInfo inDirectory);
+    IFileSystemInfo? New (IApplication? app, IFileSystem fileSystem, IDirectoryInfo inDirectory);
 
     /// <summary>Specifies how to handle file/directory rename attempts in <see cref="FileDialog"/>.</summary>
     /// <param name="app"></param>
@@ -35,5 +35,5 @@ public interface IFileOperations
     /// <remarks>
     ///     Ensure you use a try/catch block with appropriate error handling (e.g. showing a <see cref="MessageBox"/>
     /// </remarks>
-    IFileSystemInfo Rename (IApplication? app, IFileSystem fileSystem, IFileSystemInfo toRename);
+    IFileSystemInfo? Rename (IApplication? app, IFileSystem fileSystem, IFileSystemInfo toRename);
 }

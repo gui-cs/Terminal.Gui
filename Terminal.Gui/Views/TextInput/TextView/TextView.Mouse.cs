@@ -274,7 +274,7 @@ public partial class TextView
             if (newInsertionIndex >= r.Count || (IsSelecting && p.X >= Math.Max (Viewport.Width - 1, 0)))
             {
                 Viewport = Viewport with { X = Math.Max (0, colsWidth - Viewport.Width + 1) };
-                CurrentColumn = Math.Max (r.Count - (ReadOnly ? 1 : 0), 0);
+                CurrentColumn = r.Count;
             }
             else if (Viewport.X + p.X == 0 || (IsSelecting && p.X == 0))
             {

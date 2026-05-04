@@ -900,6 +900,285 @@ public class DropDownListTests (ITestOutputHelper output)
         app.End (token!);
     }
 
+    // CoPilot - ChatGPT v4
+    [Fact]
+    public void VisiblePopover_Repositions_WhenTerminalIsResized ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (40, 15);
+
+        using Runnable top = new ();
+        SessionToken? token = app.Begin (top);
+
+        ObservableCollection<string> items = ["Alpha", "Beta", "Gamma"];
+
+        DropDownList dropdown = new ()
+        {
+            X = Pos.Center (),
+            Y = Pos.Center (),
+            Width = 12,
+            Source = new ListWrapper<string> (items),
+            ReadOnly = true
+        };
+
+        top.Add (dropdown);
+        app.LayoutAndDraw ();
+
+        dropdown.SetFocus ();
+        app.InjectKey (Key.F4);
+        app.LayoutAndDraw ();
+
+        Popover<ListView, string?>? popover = FindDropDownPopover (app) as Popover<ListView, string?>;
+        Assert.NotNull (popover);
+        Assert.True (popover.Visible);
+
+        Rectangle initialListFrame = popover.ContentView!.FrameToScreen ();
+        Rectangle initialDropDownFrame = dropdown.FrameToScreen ();
+
+        // Act
+        app.Driver.SetScreenSize (60, 25);
+        app.LayoutAndDraw ();
+
+        // Assert
+        Rectangle resizedListFrame = popover.ContentView.FrameToScreen ();
+        Rectangle resizedDropDownFrame = dropdown.FrameToScreen ();
+
+        Assert.NotEqual (initialDropDownFrame.Location, resizedDropDownFrame.Location);
+        Assert.Equal (resizedDropDownFrame.X, resizedListFrame.X);
+        Assert.Equal (resizedDropDownFrame.Bottom, resizedListFrame.Y);
+        Assert.NotEqual (initialListFrame.Location, resizedListFrame.Location);
+
+        app.End (token!);
+    }
+
+    // CoPilot - ChatGPT v4
+    [Fact]
+    public void VisiblePopover_LayoutsHeight_WhenTerminalIsResized ()
+    {
+        // Arrange
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+        app.Driver!.SetScreenSize (30, 10);
+
+        using Runnable top = new ();
+        SessionToken? token = app.Begin (top);
+
+        ObservableCollection<string> items =
+        [
+            "Item_00",
+            "Item_01",
+            "Item_02",
+            "Item_03",
+            "Item_04",
+            "Item_05",
+            "Item_06",
+            "Item_07",
+            "Item_08",
+            "Item_09"
+        ];
+
+        DropDownList dropdown = new ()
+        {
+            X = 0,
+            Y = 0,
+            Width = 12,
+            Source = new ListWrapper<string> (items),
+            ReadOnly = true
+        };
+
+        top.Add (dropdown);
+        app.LayoutAndDraw ();
+
+        dropdown.SetFocus ();
+        app.InjectKey (Key.F4);
+        app.LayoutAndDraw ();
+
+        Popover<ListView, string?>? popover = FindDropDownPopover (app) as Popover<ListView, string?>;
+        Assert.NotNull (popover);
+        Assert.True (popover.Visible);
+
+        int initialHeight = popover.ContentView!.Frame.Height;
+        Assert.Equal (9, initialHeight);
+
+        // Act
+        app.Driver.SetScreenSize (30, 5);
+        app.LayoutAndDraw ();
+
+        // Assert
+        int resizedHeight = popover.ContentView.Frame.Height;
+        Assert.Equal (4, resizedHeight);
+        Assert.NotEqual (initialHeight, resizedHeight);
+
+        app.End (token!);
+    }
+
+    [Fact]
+    public void Space_OpensDropdown_WhenReadOnly ()
+    {
+        // Copilot
+        using IApplication app = Application.Create ();
+
+        DropDownList dropdown = new () { Source = new ListWrapper<string> (new ObservableCollection<string> (["Item1", "Item2"])), ReadOnly = true };
+        dropdown.App = app;
+        dropdown.BeginInit ();
+        dropdown.EndInit ();
+        dropdown.SetFocus ();
+
+        dropdown.NewKeyDownEvent (Key.Space);
+
+        IPopoverView? popover = FindDropDownPopover (app);
+        Assert.NotNull (popover);
+        Assert.True (popover.Visible);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void Down_SelectsNextItem_WhenClosed ()
+    {
+        // Copilot
+        using IApplication app = Application.Create ();
+
+        DropDownList dropdown = new ()
+        {
+            Source = new ListWrapper<string> (new ObservableCollection<string> (["Apple", "Banana", "Cherry"])),
+            ReadOnly = true,
+            Text = "Apple"
+        };
+        dropdown.App = app;
+        dropdown.BeginInit ();
+        dropdown.EndInit ();
+        dropdown.SetFocus ();
+
+        dropdown.NewKeyDownEvent (Key.CursorDown);
+
+        Assert.Equal ("Banana", dropdown.Text);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void Up_SelectsPreviousItem_WhenClosed ()
+    {
+        // Copilot
+        using IApplication app = Application.Create ();
+
+        DropDownList dropdown = new ()
+        {
+            Source = new ListWrapper<string> (new ObservableCollection<string> (["Apple", "Banana", "Cherry"])),
+            ReadOnly = true,
+            Text = "Banana"
+        };
+        dropdown.App = app;
+        dropdown.BeginInit ();
+        dropdown.EndInit ();
+        dropdown.SetFocus ();
+
+        dropdown.NewKeyDownEvent (Key.CursorUp);
+
+        Assert.Equal ("Apple", dropdown.Text);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void Down_DoesNothing_WhenAtEnd ()
+    {
+        // Copilot
+        using IApplication app = Application.Create ();
+
+        DropDownList dropdown = new ()
+        {
+            Source = new ListWrapper<string> (new ObservableCollection<string> (["Apple", "Banana", "Cherry"])),
+            ReadOnly = true,
+            Text = "Cherry"
+        };
+        dropdown.App = app;
+        dropdown.BeginInit ();
+        dropdown.EndInit ();
+        dropdown.SetFocus ();
+
+        dropdown.NewKeyDownEvent (Key.CursorDown);
+
+        Assert.Equal ("Cherry", dropdown.Text);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void Up_DoesNothing_WhenAtStart ()
+    {
+        // Copilot
+        using IApplication app = Application.Create ();
+
+        DropDownList dropdown = new ()
+        {
+            Source = new ListWrapper<string> (new ObservableCollection<string> (["Apple", "Banana", "Cherry"])),
+            ReadOnly = true,
+            Text = "Apple"
+        };
+        dropdown.App = app;
+        dropdown.BeginInit ();
+        dropdown.EndInit ();
+        dropdown.SetFocus ();
+
+        dropdown.NewKeyDownEvent (Key.CursorUp);
+
+        Assert.Equal ("Apple", dropdown.Text);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void CollectionNavigation_SelectsMatchingItem_WhenClosed ()
+    {
+        // Copilot
+        using IApplication app = Application.Create ();
+
+        DropDownList dropdown = new ()
+        {
+            Source = new ListWrapper<string> (new ObservableCollection<string> (["Apple", "Banana", "Cherry"])),
+            ReadOnly = true,
+            Text = "Apple"
+        };
+        dropdown.App = app;
+        dropdown.BeginInit ();
+        dropdown.EndInit ();
+        dropdown.SetFocus ();
+
+        // Type 'c' to navigate to "Cherry"
+        dropdown.NewKeyDownEvent (Key.C);
+
+        Assert.Equal ("Cherry", dropdown.Text);
+
+        dropdown.Dispose ();
+    }
+
+    [Fact]
+    public void Down_SelectsFirstItem_WhenNoSelection ()
+    {
+        // Copilot
+        using IApplication app = Application.Create ();
+
+        DropDownList dropdown = new ()
+        {
+            Source = new ListWrapper<string> (new ObservableCollection<string> (["Apple", "Banana", "Cherry"])),
+            ReadOnly = true
+        };
+        dropdown.App = app;
+        dropdown.BeginInit ();
+        dropdown.EndInit ();
+        dropdown.SetFocus ();
+
+        dropdown.NewKeyDownEvent (Key.CursorDown);
+
+        Assert.Equal ("Apple", dropdown.Text);
+
+        dropdown.Dispose ();
+    }
+
     // Helper to find the DropDownList popover (excludes the context menu popover)
     private static IPopoverView? FindDropDownPopover (IApplication app) => app.Popovers?.Popovers.OfType<Popover<ListView, string?>> ().FirstOrDefault ();
 }

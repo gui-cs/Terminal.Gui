@@ -1,4 +1,5 @@
 ﻿// ReSharper disable AccessToDisposedClosure
+
 #nullable enable
 
 namespace UICatalog.Scenarios;
@@ -146,7 +147,7 @@ public class Notepad : Scenario
 
         _lastDirectory = Path.GetDirectoryName (Path.GetFullPath (fd.Path));
         tab.File = new FileInfo (fd.Path);
-        tab.Title = fd.FileName;
+        tab.Title = fd.FileName ?? throw new InvalidOperationException ();
         tab.Save ();
 
         fd.Dispose ();
@@ -205,7 +206,20 @@ public class Notepad : Scenario
 
     private void Open ()
     {
-        OpenDialog open = new () { Title = "Open", AllowsMultipleSelection = true };
+        OpenDialog open = new ()
+        {
+            Title = "Open",
+            AllowsMultipleSelection = true,
+            AllowedTypes =
+            [
+                new AllowedType ("Markdown", ".md", ".markdown"),
+                new AllowedType ("Text", ".txt", ".csv", ".tsv"),
+                new AllowedType ("Code", ".c", ".h", ".js", ".cs", ".json", ".yml"),
+                new AllowedTypeAny ()
+            ],
+            MustExist = true,
+            OpenMode = OpenMode.File
+        };
 
         if (_lastDirectory is { })
         {

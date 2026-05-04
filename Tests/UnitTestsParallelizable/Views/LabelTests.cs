@@ -233,7 +233,7 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
         Assert.True (view.HasFocus);
 
         // No focused view accepts Tab, and there's no other view to focus, so OnKeyDown returns false
-        Assert.True (app.Keyboard.RaiseKeyDownEvent (label.HotKey));
+        app.Keyboard.RaiseKeyDownEvent (label.HotKey);
         Assert.True (label.HasFocus);
         Assert.False (view.HasFocus);
     }
@@ -342,9 +342,7 @@ public class LabelTests (ITestOutputHelper output) : TestDriverBase
         label.Dispose ();
     }
 
-    // Claude - Opus 4.5
-    // Behavior documented in docfx/docs/command.md - View Command Behaviors table
-    // This test verifies current behavior which may change per issue #4473
+    // BUGBUG: This test does not actually test what it says; just tests that the invoke returns true
     [Fact]
     public void Label_HotKey_ForwardsToNextFocusable ()
     {

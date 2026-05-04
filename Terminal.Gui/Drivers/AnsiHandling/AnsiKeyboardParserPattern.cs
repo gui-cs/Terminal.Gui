@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Terminal.Gui.Drivers;
 
 /// <summary>
@@ -29,7 +31,7 @@ public abstract class AnsiKeyboardParserPattern
     /// <summary>
     ///     Creates a new instance of the class.
     /// </summary>
-    protected AnsiKeyboardParserPattern () { _name = GetType ().Name; }
+    protected AnsiKeyboardParserPattern () => _name = GetType ().Name;
 
     /// <summary>
     ///     Returns the <see cref="Key"/> described by the escape sequence.
@@ -39,9 +41,14 @@ public abstract class AnsiKeyboardParserPattern
     public Key? GetKey (string? input)
     {
         Key? key = GetKeyImpl (input);
-        //Logging.Trace ($"{nameof (AnsiKeyboardParser)} interpreted {input} as {key} using {_name}");
 
-        return key;
+        // See https://github.com/gui-cs/Terminal.Gui/issues/5067
+        Debug.Assert (key is { Handled: false });
+
+        // Create a copy just to be safe; the patterns are supposed to create new Key instances,
+        // but we don't want to accidentally share references
+        // See https://github.com/gui-cs/Terminal.Gui/issues/5067
+        return new Key (key);
     }
 
     /// <summary>
@@ -69,7 +76,7 @@ public abstract class AnsiKeyboardParserPattern
             return key;
         }
 
-        int modifiers = System.Math.Max (0, encodedModifiers - 1);
+        int modifiers = Math.Max (0, encodedModifiers - 1);
 
         if ((modifiers & 0b1) != 0)
         {

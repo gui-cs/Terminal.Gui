@@ -220,12 +220,14 @@ public class Navigation : Scenario
             Id = $"Overlapped{id}",
             ShadowStyle = ShadowStyles.Transparent,
             BorderStyle = LineStyle.Double,
-            CanFocus = true, // Can't drag without this? BUGBUG
+            CanFocus = true, // At least the container needs to be focusable to drag, even if the first button inside isn't
             TabStop = TabBehavior.TabGroup,
             Arrangement = ViewArrangement.Movable | ViewArrangement.Overlapped | ViewArrangement.Resizable
         };
 
-        Button button = new () { Title = $"Button{id} _{GetNextHotKey ()}" };
+        // Set the first button to CanFocus = false to test that the container can still be focused
+        // and dragged even if it contains non-focusable views
+        Button button = new () { Title = $"Button{id} _{GetNextHotKey ()}", CanFocus = false };
         overlapped.Add (button);
 
         button = new () { Y = Pos.Bottom (button), Title = $"Button{id} _{GetNextHotKey ()}" };

@@ -161,7 +161,7 @@ public enum Command
     /// <summary>Extends the selection to the right on the current row/line.</summary>
     RightEndExtend,
 
-    /// <summary>Toggles the selection.</summary>
+    /// <summary>Toggles the selection (or a specific element of the selection).</summary>
     ToggleExtend,
 
     #endregion

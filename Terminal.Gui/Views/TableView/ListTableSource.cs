@@ -41,13 +41,13 @@ public class ListTableSource : ITableSource
         tableView.DrawingContent += TableView_DrawContent;
     }
 
-    /// <inheritdoc/>
+    /// <summary>Creates a new instance with default <see cref="ListColumnStyle"/>.</summary>
     public ListTableSource (IList list, TableView tableView) : this (list, tableView, new ListColumnStyle ()) { }
 
-    /// <summary>The number of items in the IList source</summary>
+    /// <summary>The number of items in the <see cref="IList"/> source.</summary>
     public int Count => List.Count;
 
-    /// <summary>The data table this source wraps.</summary>
+    /// <summary>The <see cref="System.Data.DataTable"/> this source wraps.</summary>
     public DataTable DataTable { get; private set; }
 
     /// <inheritdoc/>
@@ -153,7 +153,7 @@ public class ListTableSource : ITableSource
         return maxLength;
     }
 
-    /// <summary>Creates a DataTable from an IList to display in a <see cref="TableView"/></summary>
+    /// <summary>Creates a <see cref="DataTable"/> from an <see cref="IList"/> to display in a <see cref="TableView"/>.</summary>
     private DataTable CreateTable (int cols = 1)
     {
         var table = new DataTable ();
@@ -189,7 +189,7 @@ public class ListTableSource : ITableSource
         }
 
         _lastBounds = _tableView.Viewport;
-        _lastMinCellWidth = _tableView.MaxCellWidth;
+        _lastMinCellWidth = _tableView.MinCellWidth;
         _lastMaxCellWidth = _tableView.MaxCellWidth;
         _lastStyle = Style;
         _lastList = List;

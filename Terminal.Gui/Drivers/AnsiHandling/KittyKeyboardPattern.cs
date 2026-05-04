@@ -1,5 +1,5 @@
+using System.Diagnostics;
 using System.Globalization;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Terminal.Gui.Drivers;
@@ -91,20 +91,23 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
             return null;
         }
 
+        string baseKeyCode = "";
+
+        if (key.KeyCode < KeyCode.CharMask && (key.KeyCode & (KeyCode.ShiftMask | KeyCode.AltMask | KeyCode.CtrlMask)) == 0)
+        {
+            baseKeyCode = new Rune ((uint)key.KeyCode).ToString ();
+        }
+
         // Extract alternate key codes (kitty flag 4: report alternate keys)
         KeyCode shiftedKeyCode = KeyCode.Null;
         KeyCode baseLayoutKeyCode = KeyCode.Null;
 
-        if (match.Groups [2].Success
-            && int.TryParse (match.Groups [2].Value, CultureInfo.InvariantCulture, out int shiftedCode)
-            && shiftedCode > 0)
+        if (match.Groups [2].Success && int.TryParse (match.Groups [2].Value, CultureInfo.InvariantCulture, out int shiftedCode) && shiftedCode > 0)
         {
             shiftedKeyCode = (KeyCode)shiftedCode;
         }
 
-        if (match.Groups [3].Success
-            && int.TryParse (match.Groups [3].Value, CultureInfo.InvariantCulture, out int baseCode)
-            && baseCode > 0)
+        if (match.Groups [3].Success && int.TryParse (match.Groups [3].Value, CultureInfo.InvariantCulture, out int baseCode) && baseCode > 0)
         {
             baseLayoutKeyCode = (KeyCode)baseCode;
         }
@@ -121,8 +124,8 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
             key = new Key (key) { ShiftedKeyCode = shiftedKeyCode, BaseLayoutKeyCode = baseLayoutKeyCode, AssociatedText = associatedText };
         }
 
-        string modifierField = match.Groups [4].Value;
-        modifierField = ApplyImplicitModifierState (key, modifierField);
+        string originalModifierField = match.Groups [4].Value;
+        string modifierField = ApplyImplicitModifierState (key, originalModifierField);
 
         if (!string.IsNullOrEmpty (modifierField))
         {
@@ -131,10 +134,10 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
 
         if (!string.IsNullOrEmpty (modifierField))
         {
-            key = ApplyModifiersAndEventType (modifierField, key);
+            key = ApplyModifiersAndEventType (MaxModifierFieldValue (originalModifierField, modifierField), key);
         }
 
-        if ((key.IsAlt || key.IsCtrl) && !string.IsNullOrEmpty (key.AssociatedText))
+        if ((key.IsAlt || key.IsCtrl) && (key.ShiftedKeyCode != KeyCode.Null || baseKeyCode.Equals (key.AssociatedText, StringComparison.OrdinalIgnoreCase)) && !string.IsNullOrEmpty (key.AssociatedText))
         {
             key = new Key (key) { AssociatedText = string.Empty };
         }
@@ -226,13 +229,43 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
         return string.Join (':', parts);
     }
 
+    private static string MaxModifierFieldValue (string modifierField1, string modifierField2)
+    {
+        if (string.IsNullOrEmpty (modifierField1))
+        {
+            return modifierField2;
+        }
+
+        if (string.IsNullOrEmpty (modifierField2))
+        {
+            return modifierField1;
+        }
+
+        string [] parts1 = modifierField1.Split (':');
+        string [] parts2 = modifierField2.Split (':');
+
+        if (parts1.Length == 0 || parts2.Length == 0)
+        {
+            return modifierField1;
+        }
+
+        if (!int.TryParse (parts1 [0], CultureInfo.InvariantCulture, out int encodedModifiers1)
+            || !int.TryParse (parts2 [0], CultureInfo.InvariantCulture, out int encodedModifiers2))
+        {
+            return modifierField1;
+        }
+
+        int maxEncodedModifiers = Math.Max (encodedModifiers1, encodedModifiers2);
+        parts1 [0] = maxEncodedModifiers.ToString (CultureInfo.InvariantCulture);
+
+        return string.Join (':', parts1);
+    }
+
     private static (Key Key, string ModifierField) NormalizeShiftedPrintableKey (Key key, string modifierField)
     {
         string [] parts = modifierField.Split (':');
 
-        if (parts.Length == 0
-            || !int.TryParse (parts [0], CultureInfo.InvariantCulture, out int encodedModifiers)
-            || encodedModifiers <= 1)
+        if (parts.Length == 0 || !int.TryParse (parts [0], CultureInfo.InvariantCulture, out int encodedModifiers) || encodedModifiers <= 1)
         {
             return (key, modifierField);
         }
@@ -244,7 +277,7 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
             return (key, modifierField);
         }
 
-        Rune printableRune = default (Rune);
+        var printableRune = default (Rune);
 
         if (!string.IsNullOrEmpty (key.AssociatedText))
         {
@@ -263,7 +296,7 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
 
         if (printableRune == default (Rune) && key.ShiftedKeyCode != KeyCode.Null)
         {
-            Rune shiftedRune = Key.ToRune (key.ShiftedKeyCode);
+            var shiftedRune = Key.ToRune (key.ShiftedKeyCode);
 
             if (!Rune.IsControl (shiftedRune))
             {
@@ -308,6 +341,7 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
         { 57447, ModifierKey.RightShift },
         { 57448, ModifierKey.RightCtrl },
         { 57449, ModifierKey.RightAlt },
+
         // 57453 = ISO_Level3_Shift (AltGr). Treat it as a dedicated modifier so
         // standalone AltGr does not fall through as a printable Private Use Area rune.
         { 57453, ModifierKey.AltGr },
@@ -321,7 +355,10 @@ public class KittyKeyboardPattern : AnsiKeyboardParserPattern
     {
         if (_functionalKeyMap.TryGetValue (kittyCode, out Key? functionalKey))
         {
-            return functionalKey;
+            // See https://github.com/gui-cs/Terminal.Gui/issues/5067
+            Debug.Assert (!functionalKey.Handled);
+
+            return new Key (functionalKey);
         }
 
         if (_modifierKeyMap.TryGetValue (kittyCode, out ModifierKey modifierKey))

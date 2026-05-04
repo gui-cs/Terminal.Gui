@@ -65,8 +65,6 @@ public class CharMap : View, IDesignable, IValue<Rune>
     /// <summary>
     ///     Initializes a new instance.
     /// </summary>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     public CharMap ()
     {
         CanFocus = true;

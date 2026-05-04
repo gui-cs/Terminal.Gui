@@ -71,8 +71,6 @@ public interface IApplication : IDisposable
     ///         must be disposed by the caller.
     ///     </para>
     /// </remarks>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     public IApplication Init (string? driverName = null);
 
     /// <summary>
@@ -265,8 +263,6 @@ public interface IApplication : IDisposable
     ///         The caller is responsible for disposing the object returned by this method.
     ///     </para>
     /// </remarks>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     public IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new ();
 
     #region Iteration & Invoke

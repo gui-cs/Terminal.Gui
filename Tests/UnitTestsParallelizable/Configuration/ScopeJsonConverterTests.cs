@@ -30,4 +30,20 @@ public class ScopeJsonConverterTests
         // Assert
         Assert.Contains (configPropertyJson, json);
     }
+
+    [Fact]
+    public void RoundTripConversion_JsonIncludeProperty_WithNullValue_WritesNull ()
+    {
+        // Copilot
+        // Arrange
+        SettingsScope settingsScope = new () { Schema = null! };
+
+        // Act
+        string json = JsonSerializer.Serialize (settingsScope, ConfigurationManager.SerializerContext.SettingsScope);
+        JsonDocument document = JsonDocument.Parse (json);
+
+        // Assert
+        Assert.True (document.RootElement.TryGetProperty ("$schema", out JsonElement schema));
+        Assert.Equal (JsonValueKind.Null, schema.ValueKind);
+    }
 }

@@ -2,6 +2,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.IO.Abstractions;
+// ReSharper disable StringLiteralTypo
 
 namespace Terminal.Gui.FileServices;
 
@@ -289,7 +290,8 @@ public class FileSystemColorProvider
         { ".epp", StringToColor ("#FFA61A") },
         { ".scala", StringToColor ("#DE3423") },
         { ".sc", StringToColor ("#DE3423") },
-        { ".iLogicVb", StringToColor ("#A63B22") }
+        { ".iLogicVb", StringToColor ("#A63B22") },
+        { ".lnk", StringToColor ("#696969") }
     };
 
     /// <summary>Mapping of file/dir name to color.</summary>

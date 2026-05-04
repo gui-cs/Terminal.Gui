@@ -17,7 +17,9 @@ public partial class View // Layout APIs
 
     private Rectangle? _frame;
 
-    /// <summary>Gets or sets the absolute location and dimension of the view.</summary>
+    /// <summary>
+    ///     Gets or sets the resolved location and dimension of the view.
+    /// </summary>
     /// <value>
     ///     The rectangle describing absolute location and dimension of the view, in coordinates relative to the
     ///     <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>.
@@ -26,6 +28,11 @@ public partial class View // Layout APIs
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
+    ///         <see cref="Frame"/> is typically the output of Terminal.Gui's responsive layout system. To describe layout,
+    ///         use <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/>. To inspect the
+    ///         resolved result, read <see cref="Frame"/> after layout has resolved those relationships.
     ///     </para>
     ///     <para>
     ///         Frame is relative to the <see cref="SuperView"/>'s Content, which is bound by <see cref="GetContentSize ()"/>
@@ -207,12 +214,18 @@ public partial class View // Layout APIs
 
     private Pos _x = Pos.Absolute (0);
 
-    /// <summary>Gets or sets the X position for the view (the column).</summary>
+    /// <summary>
+    ///     Gets or sets the declarative horizontal position for the view.
+    /// </summary>
     /// <value>The <see cref="Pos"/> object representing the X position.</value>
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
+    ///         To express responsive relationships such as "center this view", "anchor it to the end", or "place it to
+    ///         the right of another view", use <see cref="X"/> with <see cref="Pos"/>.
     ///     </para>
     ///     <para>
     ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by
@@ -230,7 +243,7 @@ public partial class View // Layout APIs
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
     ///     </para>
-    ///     <para>The default value is <c>Pos.At (0)</c>.</para>
+    ///     <para>The default value is <c>Pos.Absolute (0)</c>.</para>
     /// </remarks>
     public Pos X
     {
@@ -252,12 +265,18 @@ public partial class View // Layout APIs
 
     private Pos _y = Pos.Absolute (0);
 
-    /// <summary>Gets or sets the Y position for the view (the row).</summary>
+    /// <summary>
+    ///     Gets or sets the declarative vertical position for the view.
+    /// </summary>
     /// <value>The <see cref="Pos"/> object representing the Y position.</value>
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
+    ///         To express responsive relationships such as "center this view", "anchor it to the bottom", or "place it
+    ///         below another view", use <see cref="Y"/> with <see cref="Pos"/>.
     ///     </para>
     ///     <para>
     ///         The position is relative to the <see cref="SuperView"/>'s Content, which is bound by
@@ -275,7 +294,7 @@ public partial class View // Layout APIs
     ///     <para>
     ///         Changing this property will cause <see cref="Frame"/> to be updated.
     ///     </para>
-    ///     <para>The default value is <c>Pos.At (0)</c>.</para>
+    ///     <para>The default value is <c>Pos.Absolute (0)</c>.</para>
     /// </remarks>
     public Pos Y
     {
@@ -296,12 +315,18 @@ public partial class View // Layout APIs
 
     private Dim _height = Dim.Absolute (0);
 
-    /// <summary>Gets or sets the height dimension of the view.</summary>
+    /// <summary>
+    ///     Gets or sets the declarative height for the view.
+    /// </summary>
     /// <value>The <see cref="Dim"/> object representing the height of the view (the number of rows).</value>
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
+    ///         To express responsive sizing such as filling remaining space, using a percentage of the available height,
+    ///         or growing to fit content with <c>Dim.Auto ()</c>, use <see cref="Height"/> with <see cref="Dim"/>.
     ///     </para>
     ///     <para>
     ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by
@@ -383,12 +408,18 @@ public partial class View // Layout APIs
 
     private Dim _width = Dim.Absolute (0);
 
-    /// <summary>Gets or sets the width dimension of the view.</summary>
+    /// <summary>
+    ///     Gets or sets the declarative width for the view.
+    /// </summary>
     /// <value>The <see cref="Dim"/> object representing the width of the view (the number of columns).</value>
     /// <remarks>
     ///     <para>
     ///         See the View Layout Deep Dive for more information:
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
+    ///     </para>
+    ///     <para>
+    ///         To express responsive sizing such as filling remaining space, using a percentage of the available width,
+    ///         or growing to fit content with <c>Dim.Auto ()</c>, use <see cref="Width"/> with <see cref="Dim"/>.
     ///     </para>
     ///     <para>
     ///         The dimension is relative to the <see cref="SuperView"/>'s Content, which is bound by
@@ -507,7 +538,7 @@ public partial class View // Layout APIs
     }
 
     /// <summary>
-    ///     Performs layout of the view and its subviews within the specified content size.
+    ///     Resolves the view's declarative layout and then lays out its subviews within the specified content size.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -515,8 +546,12 @@ public partial class View // Layout APIs
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
-    ///         This method is intended to be called by the layout engine to
-    ///         prepare the view for layout and is exposed as a public API primarily for testing purposes.
+    ///         This method turns responsive <see cref="Pos"/> and <see cref="Dim"/> expressions into an absolute
+    ///         <see cref="Frame"/>, then recursively lays out SubViews.
+    ///     </para>
+    ///     <para>
+    ///         This method is intended to be called by the layout engine to prepare the view for layout and is exposed as
+    ///         a public API primarily for testing purposes.
     ///     </para>
     /// </remarks>
     /// <param name="contentSize"></param>
@@ -537,8 +572,8 @@ public partial class View // Layout APIs
     }
 
     /// <summary>
-    ///     Performs layout of the view and its subviews using the content size of either the <see cref="SuperView"/> or
-    ///     <see cref="IApplication.Screen"/>.
+    ///     Resolves the view's declarative layout and then lays out its subviews using the content size of either the
+    ///     <see cref="SuperView"/> or <see cref="IApplication.Screen"/>.
     /// </summary>
     /// <remarks>
     ///     <para>
@@ -546,20 +581,26 @@ public partial class View // Layout APIs
     ///         <see href="https://gui-cs.github.io/Terminal.Gui/docs/layout.html"/>
     ///     </para>
     ///     <para>
-    ///         This method is intended to be called by the layout engine to
-    ///         prepare the view for layout and is exposed as a public API primarily for testing purposes.
+    ///         To force a responsive layout pass after changing <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, or
+    ///         <see cref="Height"/>, call this overload.
+    ///     </para>
+    ///     <para>
+    ///         This method is intended to be called by the layout engine to prepare the view for layout and is exposed as
+    ///         a public API primarily for testing purposes.
     ///     </para>
     /// </remarks>
     /// <returns><see langword="false"/>If the view could not be laid out (typically because dependency was not ready). </returns>
     public bool Layout () => Layout (GetContainerSize ());
 
     /// <summary>
-    ///     Sets the position and size of this view, relative to the SuperView's ContentSize (nominally the same as
-    ///     <c>this.SuperView.GetContentSize ()</c>) based on the values of <see cref="X"/>, <see cref="Y"/>,
-    ///     <see cref="Width"/>,
-    ///     and <see cref="Height"/>.
+    ///     Resolves this view's declarative layout into a concrete position and size, relative to the SuperView's
+    ///     content size, based on <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, and <see cref="Height"/>.
     /// </summary>
     /// <remarks>
+    ///     <para>
+    ///         This method is the core step that turns responsive <see cref="Pos"/> and <see cref="Dim"/> expressions
+    ///         into the view's absolute <see cref="Frame"/>.
+    ///     </para>
     ///     <para>
     ///         If <see cref="X"/>, <see cref="Y"/>, <see cref="Width"/>, or <see cref="Height"/> are
     ///         absolute, they will be updated to reflect the new size and position of the view. Otherwise, they
