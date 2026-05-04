@@ -129,6 +129,8 @@ internal class RuneJsonConverter : JsonConverter<Rune>
 
                     throw new JsonException ($"{num}: Invalid Rune (not a scalar Unicode value).");
                 }
+            case JsonTokenType.Null:
+                return default;
             default:
                 throw new JsonException ($"Unexpected token when parsing Rune: {reader.TokenType}.");
         }

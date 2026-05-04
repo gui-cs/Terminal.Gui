@@ -112,9 +112,7 @@ public static class ThemeManager
     ///     hard-coded themes.
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
-#pragma warning disable IL2026 // ConcurrentDictionaryJsonConverter is AOT-compatible
     [JsonConverter (typeof (ConcurrentDictionaryJsonConverter<ThemeScope>))]
-#pragma warning restore IL2026
     [ConfigurationProperty (Scope = typeof (SettingsScope), OmitClassName = true)]
     public static ConcurrentDictionary<string, ThemeScope>? Themes
     {
@@ -219,8 +217,6 @@ public static class ThemeManager
             throw new InvalidOperationException ("Settings is null.");
         }
 
-        [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigurationManager.Settings")]
-        [RequiresDynamicCode ("Calls Terminal.Gui.ConfigurationManager.Settings")]
         set
         {
             if (!ConfigurationManager.IsInitialized ())
@@ -266,8 +262,6 @@ public static class ThemeManager
     ///     INTERNAL: Updates <see cref="Themes"/> to the current values of the static
     ///     <see cref="ConfigurationPropertyAttribute"/> properties.
     /// </summary>
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.ThemeManager.Themes")]
-    [RequiresDynamicCode ("Calls Terminal.Gui.ThemeManager.Themes")]
     internal static void UpdateToCurrentValues ()
     {
         // BUGBUG: This corrupts _hardCodedDefaults. See #4288
@@ -277,9 +271,6 @@ public static class ThemeManager
     /// <summary>
     ///     INTERNAL: Loads all Themes to their hard-coded default values.
     /// </summary>
-    [RequiresUnreferencedCode ("Calls SchemeManager.LoadToHardCodedDefaults")]
-    [RequiresDynamicCode ("Calls SchemeManager.LoadToHardCodedDefaults")]
-
     internal static void LoadHardCodedDefaults ()
     {
         if (!ConfigurationManager.IsInitialized ())

@@ -1,12 +1,10 @@
 #nullable disable
 using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui.Configuration;
 
-[RequiresUnreferencedCode("AOT")]
 internal class ConcurrentDictionaryJsonConverter<T> : JsonConverter<ConcurrentDictionary<string, T>>
 {
     public override ConcurrentDictionary<string, T> Read(
