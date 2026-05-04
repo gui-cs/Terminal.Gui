@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using Wcwidth;
 using Trace = Terminal.Gui.Tracing.Trace;
 
@@ -17,8 +16,6 @@ internal partial class ApplicationImpl
     public event EventHandler<EventArgs<bool>>? InitializedChanged;
 
     /// <inheritdoc/>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     public IApplication Init (string? driverName = null)
     {
         if (Initialized)

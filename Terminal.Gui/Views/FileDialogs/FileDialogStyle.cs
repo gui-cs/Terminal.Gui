@@ -153,9 +153,6 @@ public class FileDialogStyle
     /// </summary>
     public bool PreserveFilenameOnDirectoryChanges { get; set; }
 
-    [UnconditionalSuppressMessage ("AOT",
-                                   "IL3050:Calling members annotated with 'RequiresDynamicCodeAttribute' may break functionality when AOT compiling.",
-                                   Justification = "<Pending>")]
     private Dictionary<IDirectoryInfo, string> DefaultTreeRootGetter ()
     {
         if (_fileSystem is null)
@@ -180,7 +177,7 @@ public class FileDialogStyle
 
         try
         {
-            foreach (Environment.SpecialFolder special in Enum.GetValues (typeof (Environment.SpecialFolder)).Cast<Environment.SpecialFolder> ())
+            foreach (Environment.SpecialFolder special in Enum.GetValues<Environment.SpecialFolder> ())
             {
                 try
                 {

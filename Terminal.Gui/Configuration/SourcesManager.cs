@@ -49,8 +49,6 @@ public class SourcesManager
     /// </summary>
     /// <param name="settingsScope">The Settings Scope object that will be updated.</param>
     /// <param name="locations">The locations to load from.</param>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     internal void LoadFromLocations (SettingsScope? settingsScope, ConfigLocations locations)
     {
         if (settingsScope is null)
@@ -141,8 +139,6 @@ public class SourcesManager
     /// <param name="source">The source (filename/resource name) the Json document was read from.</param>
     /// <param name="location">The Config Location corresponding to <paramref name="source"/></param>
     /// <returns><see langword="true"/> if the settingsScope was updated.</returns>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     internal bool Load (SettingsScope? settingsScope, Stream stream, string source, ConfigLocations location)
     {
         if (settingsScope is null)
@@ -158,7 +154,7 @@ public class SourcesManager
             stream.Position = 0;
             Debug.Assert (json != null);
 #endif
-            SettingsScope? scope = JsonSerializer.Deserialize (stream, typeof (SettingsScope), ConfigurationManager.SerializerContext.Options) as SettingsScope;
+            SettingsScope? scope = JsonSerializer.Deserialize (stream, ConfigurationManager.SerializerContext.SettingsScope);
 
             if (scope is null)
             {
@@ -204,8 +200,6 @@ public class SourcesManager
     /// <param name="filePath">Json document to update the settings with.</param>
     /// <param name="location">The Config Location corresponding to <paramref name="filePath"/></param>
     /// <returns><see langword="true"/> if the settingsScope was updated.</returns>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     internal bool Load (SettingsScope? settingsScope, string filePath, ConfigLocations location)
     {
         string realPath = filePath.Replace ("~", Environment.GetFolderPath (Environment.SpecialFolder.UserProfile));
@@ -253,8 +247,6 @@ public class SourcesManager
     /// <param name="source">The source (filename/resource name) the Json document was read from.</param>
     /// <param name="location">The Config Location corresponding to <paramref name="json"/></param>
     /// <returns><see langword="true"/> if the settingsScope was updated.</returns>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     internal bool Load (SettingsScope? settingsScope, string? json, string source, ConfigLocations location)
     {
         Debug.Assert (location != ConfigLocations.All);
@@ -282,8 +274,6 @@ public class SourcesManager
     /// <param name="resourceName">The name of the resource containing the Json document was read from.</param>
     /// <param name="location">The Config Location corresponding to <paramref name="resourceName"/></param>
     /// <returns><see langword="true"/> if the settingsScope was updated.</returns>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     internal bool Load (SettingsScope? settingsScope, Assembly assembly, string resourceName, ConfigLocations location)
     {
         if (string.IsNullOrEmpty (resourceName))
@@ -309,22 +299,18 @@ public class SourcesManager
     ///     INTERNAL: Returns a JSON document with the configuration specified.
     /// </summary>
     /// <param name="scope"></param>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     internal string ToJson (SettingsScope? scope)
     {
-        return JsonSerializer.Serialize (scope, typeof (SettingsScope), ConfigurationManager.SerializerContext);
+        return JsonSerializer.Serialize (scope, ConfigurationManager.SerializerContext.SettingsScope);
     }
 
     /// <summary>
     ///     INTERNAL: Returns a stream with the configuration specified.
     /// </summary>
     /// <param name="scope"></param>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     internal Stream ToStream (SettingsScope? scope)
     {
-        string json = JsonSerializer.Serialize (scope, typeof (SettingsScope), ConfigurationManager.SerializerContext);
+        string json = JsonSerializer.Serialize (scope, ConfigurationManager.SerializerContext.SettingsScope);
 
         // turn it into a stream
         var stream = new MemoryStream ();
