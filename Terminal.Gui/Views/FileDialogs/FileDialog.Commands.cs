@@ -33,7 +33,7 @@ public partial class FileDialog
 
         if (Accept (true))
         {
-            return true;
+            return base.OnAccepting (args);
         }
 
         return false;
