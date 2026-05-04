@@ -483,6 +483,35 @@ public class MarkdownViewSelectionTests
         app.Dispose ();
     }
 
+    // Copilot - FAILS: a table is rendered as a single placeholder RenderedLine (IsTable=true)
+    // with no text content.  When the selection is partial (start.X > 0, so IsFullDocumentSelected
+    // short-circuit does not fire) and covers the table rows, the pipe-row syntax is completely
+    // absent from GetSelectedText().
+    [Fact]
+    public void PartialSelection_IncludingTable_SelectedText_Preserves_Table_Markdown ()
+    {
+        // Content taken from DefaultMarkdownSample § Table (uses ✅ emoji).
+        // "After." is appended so the last rendered line is text, not the table placeholder,
+        // which makes the drag a genuine partial selection (end.Y < lastLine is NOT required —
+        // starting at col 1 is enough to skip the IsFullDocumentSelected shortcut).
+        string md = "## Table\n\n| Feature | Status |\n|---|---|\n| A | ✅ |\n\nAfter.";
+        (IApplication app, Runnable window, Terminal.Gui.Views.Markdown mv) = CreateMv (md, width: 60, height: 10);
+
+        // Start at column 1 — IsFullDocumentSelected() requires start==(0,0), so this forces
+        // the partial-selection (display-text) code path.  Drag far right/down to cover the table.
+        mv.NewMouseEvent (new Mouse { Position = new Point (1, 0), Flags = MouseFlags.LeftButtonPressed });
+        mv.NewMouseEvent (new Mouse { Position = new Point (100, 100), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+
+        string? selected = mv.SelectedText;
+
+        Assert.NotNull (selected);
+        Assert.Contains ("| Feature | Status |", selected);
+        Assert.Contains ("| A | ✅ |", selected);
+
+        window.Dispose ();
+        app.Dispose ();
+    }
+
     // Copilot - FAILS: inline formatting (**bold**, *italic*, `code`, ~~strike~~), heading
     // markers (#), tables, thematic breaks, and link syntax ([text](url)) are all lost in
     // the display representation — the selected text cannot equal the original markdown source.
