@@ -76,7 +76,7 @@ public partial class Markdown
 
             _isDragging = false;
 
-            if (App is { } && !App.Mouse.IsGrabbed (this))
+            if (App is not null && !App.Mouse.IsGrabbed (this))
             {
                 App.Mouse.GrabMouse (this);
             }
@@ -107,7 +107,7 @@ public partial class Markdown
 
         if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonReleased))
         {
-            if (App is { } && App.Mouse.IsGrabbed (this))
+            if (App is not null && App.Mouse.IsGrabbed (this))
             {
                 App.Mouse.UngrabMouse ();
             }

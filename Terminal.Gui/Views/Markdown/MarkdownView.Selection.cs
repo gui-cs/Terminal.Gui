@@ -130,7 +130,7 @@ public partial class Markdown
 
     private static void AppendLineText (StringBuilder sb, RenderedLine line, int startX, int endX)
     {
-        var contentX = 0;
+        int contentX = 0;
 
         foreach (StyledSegment segment in line.Segments)
         {
