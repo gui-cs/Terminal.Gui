@@ -166,7 +166,7 @@ public class DropDownList : TextField
         // This ensures the Normal attribute is always that of the host
         _listPopover.GettingAttributeForRole += (sender, args) =>
                                                 {
-                                                    if (sender is not View view || args.Role != VisualRole.Normal)
+                                                    if (sender is not View || args.Role != VisualRole.Normal)
                                                     {
                                                         return;
                                                     }
@@ -540,12 +540,7 @@ public class DropDownList : TextField
     /// </summary>
     private int? GetCurrentSelectedIndex ()
     {
-        if (Source is null)
-        {
-            return null;
-        }
-
-        IList? items = Source.ToList ();
+        IList? items = Source?.ToList ();
 
         if (items is null)
         {
