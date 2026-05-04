@@ -296,9 +296,17 @@ public partial class Markdown
 
     private void ContextMenuOnKeyChanged (object? sender, KeyChangedEventArgs e) => KeyBindings.Replace (e.OldKey.KeyCode, e.NewKey.KeyCode);
 
+    private Point GetContextMenuScreenPosition ()
+    {
+        Point anchor = _isSelecting ? _selectionCurrent : new Point (0, 0);
+
+        return ViewportToScreen (anchor);
+    }
+
     private bool ShowContextMenu (Point? screenPosition = null)
     {
-        ContextMenu?.MakeVisible (screenPosition);
+        Point menuPosition = screenPosition ?? GetContextMenuScreenPosition ();
+        ContextMenu?.MakeVisible (menuPosition);
 
         return true;
     }
