@@ -14,7 +14,32 @@ public partial class FileDialog
     public bool IsCompatibleWithAllowedExtensions (IFileInfo file) => AllowedTypes.Count == 0 || MatchesAllowedTypes (file);
 
     /// <inheritdoc/>
-    protected override bool OnAccepting (CommandEventArgs args) => Accept (true) && base.OnAccepting (args);
+    protected override bool OnAccepting (CommandEventArgs args)
+    {
+        // Check if the source is the Cancel button - if so, leave Result as null and stop
+        View? sourceView = null;
+        args.Context?.Source?.TryGetTarget (out sourceView);
+
+        if (sourceView == _btnCancel)
+        {
+            // Explicitly clear Result so Canceled == true even if the dialog was previously accepted
+            Result = null;
+
+            if (IsModal)
+            {
+                App?.RequestStop ();
+            }
+
+            return true;
+        }
+
+        if (Accept (true))
+        {
+            return base.OnAccepting (args);
+        }
+
+        return false;
+    }
 
     private void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)
     {
@@ -112,7 +137,15 @@ public partial class FileDialog
             MultiSelected = string.IsNullOrWhiteSpace (Path) ? Enumerable.Empty<string> ().ToList ().AsReadOnly () : new List<string> { Path }.AsReadOnly ();
         }
 
-        Result = 2; // Ok button index
+        // Set the typed result to the selected paths
+        if (AllowsMultipleSelection)
+        {
+            Result = MultiSelected;
+        }
+        else
+        {
+            Result = string.IsNullOrWhiteSpace (Path) ? new List<string> ().AsReadOnly () : new List<string> { Path }.AsReadOnly ();
+        }
 
         if (!IsModal)
         {
