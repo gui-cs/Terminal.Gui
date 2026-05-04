@@ -59,10 +59,10 @@ public class FileDialogResultTests
         sd.Path = "/testdir/file1.txt";
 
         // Act
-        bool accepted = sd.InvokeCommand (Command.Accept);
+        bool? accepted = sd.InvokeCommand (Command.Accept);
 
         // Assert
-        Assert.True (accepted);
+        Assert.True (accepted is true);
         Assert.False (sd.Canceled);
         Assert.NotNull (sd.Result);
         Assert.Single (sd.Result);

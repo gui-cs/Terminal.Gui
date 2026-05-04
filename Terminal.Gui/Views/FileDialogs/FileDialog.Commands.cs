@@ -22,7 +22,9 @@ public partial class FileDialog
 
         if (sourceView == _btnCancel)
         {
-            // Result stays null → Canceled == true
+            // Explicitly clear Result so Canceled == true even if the dialog was previously accepted
+            Result = null;
+
             if (IsModal)
             {
                 App?.RequestStop ();
