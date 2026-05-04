@@ -220,6 +220,64 @@ public interface IApplication : IDisposable
     object? Run (IRunnable runnable, Func<Exception, bool>? errorHandler = null);
 
     /// <summary>
+    ///     Asynchronously runs a new Session with the provided runnable view, observing a <see cref="CancellationToken"/>.
+    /// </summary>
+    /// <param name="runnable">The runnable to execute.</param>
+    /// <param name="cancellationToken">
+    ///     A cancellation token that, when cancelled, will call <see cref="RequestStop(IRunnable)"/> to cleanly stop the run
+    ///     loop.
+    /// </param>
+    /// <param name="errorHandler">Optional handler for unhandled exceptions (resumes when returns true, rethrows when null).</param>
+    /// <returns>
+    ///     A <see cref="Task{Object}"/> that completes when the session ends. The result is the value returned by
+    ///     <see cref="Run(IRunnable, Func{Exception, bool})"/>.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method wraps <see cref="Run(IRunnable, Func{Exception, bool})"/> and registers the
+    ///         <paramref name="cancellationToken"/> so that cancellation triggers <see cref="RequestStop(IRunnable)"/>.
+    ///     </para>
+    ///     <para>
+    ///         If the token is already cancelled when this method is called, it returns immediately without starting the
+    ///         session.
+    ///     </para>
+    ///     <para>
+    ///         Cancellation is idempotent: if both the token and an internal <see cref="RequestStop()"/> fire, only a single
+    ///         shutdown occurs.
+    ///     </para>
+    /// </remarks>
+    Task<object?> RunAsync (IRunnable runnable, CancellationToken cancellationToken, Func<Exception, bool>? errorHandler = null);
+
+    /// <summary>
+    ///     Asynchronously runs a new Session creating a <see cref="IRunnable"/>-derived object of type
+    ///     <typeparamref name="TRunnable"/>, observing a <see cref="CancellationToken"/>.
+    /// </summary>
+    /// <typeparam name="TRunnable">The type of runnable to create and run.</typeparam>
+    /// <param name="cancellationToken">
+    ///     A cancellation token that, when cancelled, will call <see cref="RequestStop(IRunnable)"/> to cleanly stop the run
+    ///     loop.
+    /// </param>
+    /// <param name="errorHandler">Optional handler for unhandled exceptions (resumes when returns true, rethrows when null).</param>
+    /// <param name="driverName">
+    ///     The driver name. If not specified the default driver for the platform will be used.
+    /// </param>
+    /// <returns>
+    ///     A <see cref="Task"/> representing the asynchronous operation. The <see cref="IApplication"/> instance is returned
+    ///     for fluent chaining.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method wraps <see cref="Run{TRunnable}(Func{Exception, bool}, string)"/> and registers the
+    ///         <paramref name="cancellationToken"/> so that cancellation triggers <see cref="RequestStop()"/>.
+    ///     </para>
+    ///     <para>
+    ///         If the token is already cancelled when this method is called, it returns immediately without starting the
+    ///         session.
+    ///     </para>
+    /// </remarks>
+    Task<IApplication> RunAsync<TRunnable> (CancellationToken cancellationToken, Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new ();
+
+    /// <summary>
     ///     Runs a new Session creating a <see cref="IRunnable"/>-derived object of type <typeparamref name="TRunnable"/>
     ///     and calling <see cref="Run(IRunnable, Func{Exception, bool})"/>. When the session is stopped,
     ///     <see cref="End(SessionToken)"/> will be called.
