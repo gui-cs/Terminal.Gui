@@ -24,7 +24,7 @@ public class FileDialogResultTests
     }
 
     [Fact]
-    public void FileDialog_Result_IsPopulated_OnSingleSelection ()
+    public void FileDialog_Result_IsNull_BeforeAcceptance ()
     {
         // Arrange
         MockFileSystem fs = new ();
@@ -32,8 +32,7 @@ public class FileDialogResultTests
         using SaveDialog sd = new TestableSaveDialog (fs);
         sd.Path = "/testdir/file1.txt";
 
-        // Act - simulate acceptance by calling FinishAccept indirectly through reflection
-        // We set path and call the internal accept logic
+        // Assert - Result should be null before any acceptance
         Assert.True (sd.Canceled);
         Assert.Null (sd.Result);
     }
@@ -83,9 +82,7 @@ public class FileDialogResultTests
     public void OpenDialog_FilePaths_IsEmpty_WhenCanceled ()
     {
         // Arrange
-        MockFileSystem fs = new ();
-        fs.AddDirectory ("/testdir");
-        using OpenDialog od = new TestableOpenDialog (fs);
+        using OpenDialog od = new TestableOpenDialog ();
 
         // Assert - Result is null → Canceled → FilePaths empty
         Assert.True (od.Canceled);
@@ -134,7 +131,7 @@ public class FileDialogResultTests
     /// <summary>Testable subclass for OpenDialog.</summary>
     private sealed class TestableOpenDialog : OpenDialog
     {
-        public TestableOpenDialog (MockFileSystem fs) { }
+        public TestableOpenDialog () { }
     }
 
     /// <summary>Testable subclass for SaveDialog.</summary>
