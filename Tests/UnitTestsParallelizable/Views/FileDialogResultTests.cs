@@ -50,20 +50,23 @@ public class FileDialogResultTests
     }
 
     [Fact]
-    public void FileDialog_Canceled_IsFalse_WhenResultIsSet ()
+    public void FileDialog_Canceled_IsFalse_WhenAccepted_ThroughCommandPipeline ()
     {
         // Arrange
         MockFileSystem fs = new ();
-        fs.AddDirectory ("/testdir");
-        using FileDialog fd = new TestableFileDialog (fs);
+        fs.AddFile ("/testdir/file1.txt", new MockFileData ("hello"));
+        using SaveDialog sd = new TestableSaveDialog (fs);
+        sd.Path = "/testdir/file1.txt";
 
         // Act
-        fd.Result = new List<string> { "/testdir" }.AsReadOnly ();
+        bool accepted = sd.InvokeCommand (Command.Accept);
 
         // Assert
-        Assert.False (fd.Canceled);
-        Assert.Single (fd.Result);
-        Assert.Equal ("/testdir", fd.Result [0]);
+        Assert.True (accepted);
+        Assert.False (sd.Canceled);
+        Assert.NotNull (sd.Result);
+        Assert.Single (sd.Result);
+        Assert.Equal ("/testdir/file1.txt", sd.Result [0]);
     }
 
     [Fact]
