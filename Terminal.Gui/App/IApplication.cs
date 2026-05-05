@@ -135,12 +135,31 @@ public interface IApplication : IDisposable
     ConcurrentStack<SessionToken>? SessionStack { get; }
 
     /// <summary>
-    ///     Raised when <see cref="Begin(IRunnable)"/> has been called and has created a new <see cref="SessionToken"/>.
+    ///     Raised by <see cref="Begin(IRunnable)"/> after the new <see cref="SessionToken"/> has been pushed onto
+    ///     <see cref="SessionStack"/> and <see cref="TopRunnable"/> has been set, but before
+    ///     <see cref="IRunnable.IsRunningChanged"/> and <see cref="IRunnable.IsModalChanged"/> fire. This event
+    ///     reports a token-lifecycle moment, not a state transition on the <see cref="IRunnable"/>.
     /// </summary>
     /// <remarks>
-    ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/>, callers to <see cref="Begin(IRunnable)"/>
-    ///     must also subscribe to <see cref="SessionEnded"/> and manually dispose of the <see cref="SessionToken"/> token
-    ///     when the application is done.
+    ///     <para>
+    ///         To observe the runnable transitioning to the running state, subscribe to
+    ///         <see cref="IRunnable.IsRunningChanged"/>. <see cref="SessionBegun"/> is not a substitute: at the moment
+    ///         it fires, the cached <see cref="IRunnable.IsRunning"/> value is still <see langword="false"/> because
+    ///         <see cref="IRunnable.SetIsRunning"/> has not yet been called. Subscribers that need post-state-change
+    ///         semantics must use <see cref="IRunnable.IsRunningChanged"/>.
+    ///     </para>
+    ///     <para>
+    ///         <see cref="SessionBegun"/> and <see cref="SessionEnded"/> are intentionally NOT a symmetric
+    ///         before/after pair. <see cref="SessionBegun"/> fires early — after the token has been pushed onto
+    ///         <see cref="SessionStack"/> but before the runnable's running/modal state has been published.
+    ///         <see cref="SessionEnded"/> fires late — after all state has unwound. This asymmetry is deliberate:
+    ///         the events mark token-lifecycle boundaries, not runnable-state transitions.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="StopAfterFirstIteration"/> is <see langword="true"/>, callers to
+    ///         <see cref="Begin(IRunnable)"/> must also subscribe to <see cref="SessionEnded"/> and call
+    ///         <see cref="End(SessionToken)"/> themselves to complete the session.
+    ///     </para>
     /// </remarks>
     public event EventHandler<SessionTokenEventArgs>? SessionBegun;
 
@@ -422,7 +441,8 @@ public interface IApplication : IDisposable
     /// <remarks>
     ///     <para>
     ///         This method removes the <see cref="IRunnable"/> from the <see cref="SessionStack"/>,
-    ///         raises the lifecycle events, and disposes the <paramref name="sessionToken"/>.
+    ///         raises the lifecycle events, and clears <see cref="SessionToken.Runnable"/> on
+    ///         <paramref name="sessionToken"/>.
     ///     </para>
     ///     <para>
     ///         Raises <see cref="IRunnable.IsRunningChanging"/>, <see cref="IRunnable.IsRunningChanged"/>,
@@ -432,14 +452,37 @@ public interface IApplication : IDisposable
     void End (SessionToken sessionToken);
 
     /// <summary>
-    ///     Raised when <see cref="End(SessionToken)"/> was called and the session is stopping. The event args contain a
-    ///     reference to the <see cref="IRunnable"/>
-    ///     that was active during the session. This can be used to ensure the Runnable is disposed of properly.
+    ///     Raised by <see cref="End(SessionToken)"/> after the runnable's state has fully unwound — including
+    ///     <see cref="IRunnable.IsRunningChanged"/> firing with <c>false</c> — and after <see cref="End(SessionToken)"/>
+    ///     has finished its state-unwinding work. The <see cref="SessionToken.Runnable"/> reference is
+    ///     <see langword="null"/> at this point. This event reports a token-lifecycle moment, not a state transition
+    ///     on the <see cref="IRunnable"/>.
     /// </summary>
     /// <remarks>
-    ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/>, callers to <see cref="Begin(IRunnable)"/>
-    ///     must also subscribe to <see cref="SessionEnded"/> and manually dispose of the <see cref="SessionToken"/> token
-    ///     when the application is done.
+    ///     <para>
+    ///         At the moment <see cref="SessionEnded"/> fires, all state has already unwound:
+    ///         <see cref="IRunnable.IsRunning"/> is <see langword="false"/> and
+    ///         <see cref="IRunnable.IsRunningChanged"/> has already fired with <c>false</c>. To observe the runnable
+    ///         transitioning out of the running state, subscribe to <see cref="IRunnable.IsRunningChanged"/> instead.
+    ///     </para>
+    ///     <para>
+    ///         The token's <see cref="SessionToken.Runnable"/> property is <see langword="null"/> at this point — it
+    ///         is cleared immediately before the event is raised. Subscribers that need the session result must read
+    ///         <see cref="SessionToken.Result"/> from the token; they must not attempt to access
+    ///         <see cref="SessionToken.Runnable"/>.
+    ///     </para>
+    ///     <para>
+    ///         <see cref="SessionEnded"/> and <see cref="SessionBegun"/> are intentionally NOT a symmetric
+    ///         before/after pair. <see cref="SessionBegun"/> fires early — after the token has been pushed onto
+    ///         <see cref="SessionStack"/> but before the runnable's running/modal state has been published.
+    ///         <see cref="SessionEnded"/> fires late — after all state has unwound. This asymmetry is deliberate:
+    ///         the events mark token-lifecycle boundaries, not runnable-state transitions.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="StopAfterFirstIteration"/> is <see langword="true"/>, callers to
+    ///         <see cref="Begin(IRunnable)"/> must also subscribe to <see cref="SessionEnded"/> and call
+    ///         <see cref="End(SessionToken)"/> themselves to complete the session.
+    ///     </para>
     /// </remarks>
     public event EventHandler<SessionTokenEventArgs>? SessionEnded;
 
