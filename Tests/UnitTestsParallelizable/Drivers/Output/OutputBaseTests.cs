@@ -231,6 +231,113 @@ public class OutputBaseTests
         Assert.False (buffer.Contents! [0, 2].IsDirty);
     }
 
+    // Copilot
+    [Fact]
+    public void ToAnsi_CellsWithUrl_EmitsOsc8Sequences ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (5, 1);
+
+        buffer.CurrentUrl = "https://example.com";
+        buffer.AddStr ("Hello");
+        buffer.CurrentUrl = null;
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert
+        string expectedStart = EscSeqUtils.OSC_StartHyperlink ("https://example.com");
+        string expectedEnd = EscSeqUtils.OSC_EndHyperlink ();
+
+        Assert.Contains (expectedStart, ansi);
+        Assert.Contains (expectedEnd, ansi);
+        Assert.Contains ("Hello", ansi);
+    }
+
+    // Copilot
+    [Fact]
+    public void ToAnsi_CellsWithDifferentUrls_EmitsCorrectTransitions ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (6, 1);
+
+        buffer.CurrentUrl = "https://one.com";
+        buffer.AddStr ("AB");
+        buffer.CurrentUrl = "https://two.com";
+        buffer.AddStr ("CD");
+        buffer.CurrentUrl = null;
+        buffer.AddStr ("EF");
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert: should contain both hyperlink starts and ends
+        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://one.com"), ansi);
+        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://two.com"), ansi);
+
+        // Should contain at least 2 end sequences (one for each URL transition)
+        int endCount = ansi.Split (EscSeqUtils.OSC_EndHyperlink ()).Length - 1;
+        Assert.True (endCount >= 2, $"Expected at least 2 OSC 8 end sequences, got {endCount}");
+    }
+
+    // Copilot
+    [Fact]
+    public void ToAnsi_CellsWithUrl_ThenNoUrl_ClosesHyperlink ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (6, 1);
+
+        buffer.CurrentUrl = "https://example.com";
+        buffer.AddStr ("Link");
+        buffer.CurrentUrl = null;
+        buffer.AddStr ("  ");
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert: hyperlink is opened and closed
+        string start = EscSeqUtils.OSC_StartHyperlink ("https://example.com");
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+
+        int startIdx = ansi.IndexOf (start, StringComparison.Ordinal);
+        int endIdx = ansi.IndexOf (end, startIdx + start.Length, StringComparison.Ordinal);
+
+        Assert.True (startIdx >= 0, "OSC 8 start not found");
+        Assert.True (endIdx > startIdx, "OSC 8 end not found after start");
+
+        // "Link" text should be between start and end
+        int textIdx = ansi.IndexOf ("Link", startIdx, StringComparison.Ordinal);
+        Assert.True (textIdx > startIdx && textIdx < endIdx, "Link text should be between OSC 8 sequences");
+    }
+
+    // Copilot
+    [Fact]
+    public void ToAnsi_LegacyConsole_NoOsc8 ()
+    {
+        // Arrange
+        AnsiOutput output = new () { IsLegacyConsole = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (5, 1);
+
+        buffer.CurrentUrl = "https://example.com";
+        buffer.AddStr ("Hello");
+        buffer.CurrentUrl = null;
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert: legacy console should NOT contain OSC 8 sequences
+        Assert.DoesNotContain (EscSeqUtils.OSC_StartHyperlink ("https://example.com"), ansi);
+        Assert.DoesNotContain (EscSeqUtils.OSC_EndHyperlink (), ansi);
+        Assert.Contains ("Hello", ansi);
+    }
+
     [Theory]
     [InlineData (true)]
     [InlineData (false)]

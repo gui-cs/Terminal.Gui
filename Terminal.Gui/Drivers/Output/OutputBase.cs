@@ -311,6 +311,7 @@ public abstract class OutputBase
                                        bool addNewlines = true)
     {
         var redrawTextStyle = TextStyle.None;
+        string? lastUrl = null;
 
         for (int row = startRow; row < endRow; row++)
         {
@@ -321,9 +322,34 @@ public abstract class OutputBase
                     continue;
                 }
 
+                // Handle OSC 8 hyperlink state transitions
+                string? cellUrl = buffer.GetCellUrl (col, row);
+
+                if (cellUrl != lastUrl)
+                {
+                    if (lastUrl is { })
+                    {
+                        output.Append (EscSeqUtils.OSC_EndHyperlink ());
+                    }
+
+                    if (!string.IsNullOrEmpty (cellUrl))
+                    {
+                        output.Append (EscSeqUtils.OSC_StartHyperlink (cellUrl));
+                    }
+
+                    lastUrl = cellUrl;
+                }
+
                 Cell cell = buffer.Contents! [row, col];
                 int outputWidth = -1;
                 AppendCellAnsi (cell, output, ref lastAttr, ref redrawTextStyle, endCol, ref col, ref outputWidth);
+            }
+
+            // Close any open hyperlink at end of row
+            if (lastUrl is { })
+            {
+                output.Append (EscSeqUtils.OSC_EndHyperlink ());
+                lastUrl = null;
             }
 
             // Add newline at end of row if requested
