@@ -49,6 +49,15 @@ public class MyDialog : Runnable<string?>
 
 **Disposal**: "Whoever creates it, owns it" - `Run<T>()` auto-disposes, `Run(instance)` requires manual disposal.
 
+### RunnableWrapper<TView, TResult>
+
+`RunnableWrapper<TView, TResult>` wraps a `View` as a runnable without adding prompt buttons.
+
+- Clears wrapper `KeyBindings` and `MouseBindings` so the wrapped view handles input.
+- Sets `CommandsToBubbleUp = [Command.Accept]`.
+- On accept, extracts result via `ResultExtractor` if set, otherwise from `IValue<TResult>.Value` when implemented.
+- Unlike `Prompt`, it does not add OK/Cancel buttons.
+
 ---
 
 ## View Hierarchy
@@ -443,6 +452,24 @@ using (IApplication app = Application.Create ().Init ())
 
 ## Quick Reference
 
+### IValue<T> Pattern
+
+All typed views expose values through `IValue<T>.Value`. Avoid guessing member names like `.Date`, `.Time`, or `.Color`.
+
+| View | IValue<T> |
+|------|-----------|
+| TextField | `IValue<string>` |
+| NumericUpDown<T> | `IValue<T>` |
+| DatePicker | `IValue<DateTime>` |
+| TimeEditor | `IValue<TimeSpan>` |
+| ColorPicker | `IValue<Color?>` |
+| AttributePicker | `IValue<Attribute?>` |
+| CheckBox | `IValue<CheckState>` |
+| OptionSelector | `IValue<int?>` |
+| FlagSelector | `IValue<int?>` |
+
+Implementing `IValue<T>` requires `ValueChanging`, `ValueChanged`, and `ValueChangedUntyped`.
+
 ### View Properties
 
 | Property | Purpose |
@@ -478,3 +505,9 @@ DriverRegistry.Names.WINDOWS // "windows"
 DriverRegistry.Names.UNIX    // "unix"
 DriverRegistry.Names.DOTNET  // "dotnet"
 ```
+
+### Gotchas
+
+- `Terminal.Gui.Drawing.Attribute` may conflict with `System.Attribute` with implicit usings. Use `using TgAttribute = Terminal.Gui.Drawing.Attribute;` or fully qualify.
+- `Color.TryParse (string, out Color?)` uses nullable out; `Color.TryParse (string?, IFormatProvider?, out Color)` uses non-nullable out.
+- `OpenDialog` results are exposed through `FilePaths`; related state includes `AllowsMultipleSelection`, `Canceled`, and `OpenMode`.
