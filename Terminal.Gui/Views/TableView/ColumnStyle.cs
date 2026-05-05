@@ -20,6 +20,12 @@ public class ColumnStyle
     public CellColorGetterDelegate? ColorGetter { get; set; }
 
     /// <summary>
+    ///     Defines a delegate for returning a custom scheme for this column's header. Return <see langword="null"/> to
+    ///     fall back to <see cref="TableStyle.HeaderScheme"/> or the view's default scheme.
+    /// </summary>
+    public HeaderColorGetterDelegate? HeaderColorGetter { get; set; }
+
+    /// <summary>
     ///     Defines a delegate for returning custom representations of cell values. If not set then
     ///     <see cref="object.ToString()"/> is used. Return values from your delegate may be truncated e.g. based on
     ///     <see cref="MaxWidth"/>
@@ -55,14 +61,28 @@ public class ColumnStyle
     /// </summary>
     public int MinWidth { get; set; }
 
-    private bool _visible = true;
-
     /// <summary>
     ///     Gets or Sets a value indicating whether the column should be visible to the user. This affects both whether it
     ///     is rendered and whether it can be selected. Defaults to true.
     /// </summary>
     /// <remarks>If <see cref="MaxWidth"/> is 0 then <see cref="Visible"/> will always return false.</remarks>
-    public bool Visible { get => MaxWidth >= 0 && _visible; set => _visible = value; }
+    public bool Visible { get => MaxWidth >= 0 && field; set; } = true;
+
+    /// <summary>
+    ///     Gets or sets the string appended to a cell value (or column header) when its rendered representation does
+    ///     not fit in the available column width. Defaults to <see cref="Glyphs.HorizontalEllipsis"/> ("…").
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         Set to <see langword="null"/> or an empty string to suppress the indicator and silently clip the value at
+    ///         the available width.
+    ///     </para>
+    ///     <para>
+    ///         If the indicator itself is wider than the available column width the value is silently clipped (no
+    ///         indicator is drawn).
+    ///     </para>
+    /// </remarks>
+    public string? TruncationIndicator { get; set; } = Glyphs.HorizontalEllipsis.ToString ();
 
     /// <summary>
     ///     Returns the alignment for the cell based on <paramref name="cellValue"/> and <see cref="AlignmentGetter"/>/

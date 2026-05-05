@@ -1,11 +1,9 @@
 ﻿#nullable disable
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Terminal.Gui.Configuration;
 
-[RequiresUnreferencedCode ("AOT")]
 internal class DictionaryJsonConverter<T> : JsonConverter<Dictionary<string, T>>
 {
     public override Dictionary<string, T> Read (

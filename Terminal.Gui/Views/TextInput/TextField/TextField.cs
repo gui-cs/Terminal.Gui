@@ -112,9 +112,12 @@ public partial class TextField : View, IDesignable, IValue<string>
 
     private void TextField_Initialized (object? sender, EventArgs e)
     {
-        _insertionPoint = GraphemeHelper.GetGraphemeCount (Text);
+        if (!ReadOnly)
+        {
+            _insertionPoint = GraphemeHelper.GetGraphemeCount (Text);
+        }
 
-        if (Viewport.Width > 0)
+        if (!ReadOnly && Viewport.Width > 0)
         {
             int colsWidth = Text.GetColumns ();
             ScrollOffset = colsWidth > Viewport.Width + 1 ? colsWidth - Viewport.Width + 1 : 0;
@@ -145,10 +148,25 @@ public partial class TextField : View, IDesignable, IValue<string>
             App.Mouse.UngrabMouse ();
         }
 
-        // If gaining focus via keyboard (not mouse), select all text
-        if (newHasFocus && !_focusSetByMouse && _text.Count > 0)
+        // If gaining focus via keyboard (not mouse), select all text if not ReadOnly
+        if (newHasFocus && !ReadOnly && !_focusSetByMouse && _text.Count > 0)
         {
             SelectAll ();
+        }
+
+        if (ReadOnly && InsertionPoint > 0)
+        {
+            _insertionPoint = 0;
+        }
+
+        if (ReadOnly && ScrollOffset > 0)
+        {
+            ScrollOffset = 0;
+        }
+
+        if (ReadOnly && SelectedLength > 0)
+        {
+            ClearAllSelection ();
         }
 
         // Reset the flag after handling focus change

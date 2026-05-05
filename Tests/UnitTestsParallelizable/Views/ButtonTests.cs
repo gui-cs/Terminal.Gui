@@ -117,7 +117,7 @@ public class ButtonTests
 
         bool? result = button.InvokeCommand (Command.HotKey);
 
-        // HotKey should raise only Accepting, not Activating
+        // HotKey should raise Accepting and Activating
         Assert.True (activatingFired);
         Assert.True (acceptingFired);
         Assert.True (result);

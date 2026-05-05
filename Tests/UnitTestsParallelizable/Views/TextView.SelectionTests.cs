@@ -302,4 +302,45 @@ public class TextViewSelectionTests
         Assert.Equal (28, tv.SelectionStartColumn);
         Assert.Equal (2, tv.SelectionStartRow);
     }
+
+    [Fact]
+    public void Mouse_Selection_ToTheEndOfLine_With_ReadOnly_FalseOrTrue_Works_Correctly ()
+    {
+        // // Test that mouse selection to the end of line works correctly with ReadOnly false or true
+        TextView tv = new ()
+        {
+            Width = 10,
+            Height = 2,
+            Text = "This is the first line.\nThis is the second line.\nThis is the third line.first"
+        };
+
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        Assert.False (tv.ReadOnly);
+
+        // Simulate mouse selection from (0,0) to end of first line
+        tv.NewMouseEvent (new Mouse () { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        tv.NewMouseEvent (new Mouse () { Position = new Point (23, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+        tv.NewMouseEvent (new Mouse () { Position = new Point (23, 0), Flags = MouseFlags.LeftButtonReleased });
+
+        Assert.Equal (new Point (23, 0), tv.InsertionPoint);
+        Assert.Equal (23, tv.SelectedLength);
+        Assert.Equal ("This is the first line.", tv.SelectedText);
+        Assert.True (tv.IsSelecting);
+
+        // Now set ReadOnly to true, reset position and repeat
+        tv.ReadOnly = true;
+        tv.InsertionPoint = Point.Empty;
+
+        // Simulate mouse selection from (0,0) to end of first line again
+        tv.NewMouseEvent (new Mouse () { Position = new Point (0, 0), Flags = MouseFlags.LeftButtonPressed });
+        tv.NewMouseEvent (new Mouse () { Position = new Point (23, 0), Flags = MouseFlags.LeftButtonPressed | MouseFlags.PositionReport });
+        tv.NewMouseEvent (new Mouse () { Position = new Point (23, 0), Flags = MouseFlags.LeftButtonReleased });
+
+        Assert.Equal (new Point (23, 0), tv.InsertionPoint);
+        Assert.Equal (23, tv.SelectedLength);
+        Assert.Equal ("This is the first line.", tv.SelectedText);
+        Assert.True (tv.IsSelecting);
+    }
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace Terminal.Gui.Drivers;
@@ -34,7 +35,7 @@ public class CsiKeyPattern : AnsiKeyboardParserPattern
     };
 
     /// <inheritdoc/>
-    public override bool IsMatch (string? input) { return _pattern.IsMatch (input!); }
+    public override bool IsMatch (string? input) => _pattern.IsMatch (input!);
 
     /// <inheritdoc/>
     protected override Key? GetKeyImpl (string? input)
@@ -59,14 +60,17 @@ public class CsiKeyPattern : AnsiKeyboardParserPattern
             return null;
         }
 
+        // See https://github.com/gui-cs/Terminal.Gui/issues/5067
+        Debug.Assert (!key.Handled);
+
         // If there's no modifier, just return the key.
         string modifierField = match.Groups [2].Value;
 
         if (string.IsNullOrEmpty (modifierField))
         {
-            return key;
+            return new Key (key);
         }
 
-        return ApplyModifiersAndEventType (modifierField, key);
+        return ApplyModifiersAndEventType (modifierField, new Key (key));
     }
 }

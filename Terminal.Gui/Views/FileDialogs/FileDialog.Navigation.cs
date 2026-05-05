@@ -29,10 +29,11 @@ public partial class FileDialog
 
     /// <summary>Select <paramref name="toRestore"/> in the table view (if present)</summary>
     /// <param name="toRestore"></param>
-    internal void RestoreSelection (IFileSystemInfo toRestore)
+    internal void RestoreSelection (IFileSystemInfo? toRestore)
     {
-        _tableView.SelectedRow = State!.Children.IndexOf (r => r.FileSystemInfo == toRestore);
-        _tableView.EnsureSelectedCellIsVisible ();
+        int row = State!.Children.IndexOf (r => r.FileSystemInfo == toRestore);
+        _tableView.SetSelection (0, row >= 0 ? row : 0, false);
+        _tableView.EnsureCursorIsVisible ();
     }
 
     private bool CancelSearch ()
@@ -77,7 +78,10 @@ public partial class FileDialog
             PushState (dir.Parent, true, false);
         }
 
-        _tbPath.Autocomplete?.GenerateSuggestions (new AutocompleteFilepathContext (_tbPath.Text, _tbPath.InsertionPoint, State));
+        if (State is { })
+        {
+            _tbPath.Autocomplete?.GenerateSuggestions (new AutocompleteFilepathContext (_tbPath.Text, _tbPath.InsertionPoint, State));
+        }
     }
 
     private void PushState (FileDialogState newState, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true, string? pathText = null)
@@ -123,7 +127,12 @@ public partial class FileDialog
             {
                 _tableView.Viewport = _tableView.Viewport with { Y = 0 };
             }
-            _tableView.SelectedRow = 0;
+
+            if (_tableView.Viewport.X != 0)
+            {
+                _tableView.Viewport = _tableView.Viewport with { X = 0 };
+            }
+            _tableView.SetSelection (0, 0, false);
 
             SetNeedsDraw ();
             UpdateNavigationVisibility ();
@@ -183,7 +192,7 @@ public partial class FileDialog
         return _fileSystem!.DirectoryInfo.New (path);
     }
 
-    private void SuppressIfBadChar (Key k)
+    private static void SuppressIfBadChar (Key k)
     {
         // don't let user type bad letters
         var ch = (char)k;
@@ -205,7 +214,7 @@ public partial class FileDialog
 
         if (selected is IDirectoryInfo && Style.PreserveFilenameOnDirectoryChanges)
         {
-            if (!string.IsNullOrWhiteSpace (Path) && !_fileSystem!.Directory.Exists (Path))
+            if (!string.IsNullOrWhiteSpace (Path) && _fileSystem is { } && !_fileSystem.Directory.Exists (Path))
             {
                 string currentFile = _fileSystem.Path.GetFileName (Path);
 
@@ -216,6 +225,13 @@ public partial class FileDialog
                     return;
                 }
             }
+        }
+
+        string path = _tbPath.Text;
+
+        if (string.IsNullOrWhiteSpace (path))
+        {
+            return;
         }
 
         Path = selected.FullName;
@@ -254,7 +270,7 @@ public partial class FileDialog
             _tableViewContainer.X = 0;
             _tableViewContainer.Width = Dim.Fill ();
             _tableViewContainer.Arrangement = ViewArrangement.Fixed;
-            _tableViewContainer.Border.Thickness = new Thickness (0);
+            _tableViewContainer.Border.Thickness = new Thickness (1, 0, 0, 0);
         }
         _btnTreeToggle.Text = GetTreeToggleText (visible);
 

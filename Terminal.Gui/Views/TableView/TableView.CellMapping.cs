@@ -17,7 +17,7 @@ public partial class TableView
     public Point? ScreenToCell (int clientX, int clientY) => ScreenToCell (clientX, clientY, out _, out _);
 
     /// <summary>
-    ///     . Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
+    ///     Returns the column and row of <see cref="Table"/> that corresponds to a given point on the screen (relative
     ///     to the control client area).  Returns null if the point is in the header, no table is loaded or outside the control
     ///     bounds.
     /// </summary>

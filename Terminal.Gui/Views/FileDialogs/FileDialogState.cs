@@ -1,20 +1,29 @@
-#nullable disable
-﻿using System.IO.Abstractions;
+using System.IO.Abstractions;
 
 namespace Terminal.Gui.Views;
 
 internal class FileDialogState
 {
-    protected readonly FileDialog Parent;
-
     public FileDialogState (IDirectoryInfo dir, FileDialog parent)
     {
-        Directory = dir;
         Parent = parent;
+        Directory = dir;
         Path = parent.Path;
-
-        RefreshChildren ();
+        Children = GetChildren (Directory).ToArray ();
     }
+
+    /// <summary>
+    ///     Constructor for subclasses that manage their own Children population (e.g. <see cref="FileDialog.SearchState"/>).
+    /// </summary>
+    protected FileDialogState (IDirectoryInfo dir, FileDialog parent, bool skipInitialEnumeration)
+    {
+        Parent = parent;
+        Directory = dir;
+        Path = parent.Path;
+        Children = skipInitialEnumeration ? [] : GetChildren (Directory).ToArray ();
+    }
+
+    protected FileDialog Parent { get; }
 
     public FileSystemInfoStats [] Children { get; internal set; }
     public IDirectoryInfo Directory { get; }
@@ -22,9 +31,9 @@ internal class FileDialogState
     /// <summary>Gets what was entered in the path text box of the dialog when the state was active.</summary>
     public string Path { get; }
 
-    public FileSystemInfoStats Selected { get; set; }
+    public FileSystemInfoStats? Selected { get; set; }
 
-    protected virtual IEnumerable<FileSystemInfoStats> GetChildren (IDirectoryInfo dir)
+    protected IEnumerable<FileSystemInfoStats> GetChildren (IDirectoryInfo dir)
     {
         try
         {
@@ -33,26 +42,17 @@ internal class FileDialogState
             // if directories only
             if (Parent.OpenMode == OpenMode.Directory)
             {
-                children = dir.GetDirectories ()
-                              .Select (e => new FileSystemInfoStats (e, Parent.Style.Culture))
-                              .ToList ();
+                children = dir.GetDirectories ().Select (e => new FileSystemInfoStats (e, Parent.Style.Culture)).ToList ();
             }
             else
             {
-                children = dir.GetFileSystemInfos ()
-                              .Select (e => new FileSystemInfoStats (e, Parent.Style.Culture))
-                              .ToList ();
+                children = dir.GetFileSystemInfos ().Select (e => new FileSystemInfoStats (e, Parent.Style.Culture)).ToList ();
             }
 
             // if only allowing specific file types
-            if (Parent.AllowedTypes.Any () && Parent.OpenMode == OpenMode.File)
+            if (Parent.AllowedTypes.Count > 0 && Parent.OpenMode == OpenMode.File)
             {
-                children = children.Where (
-                                           c => c.IsDir
-                                                || (c.FileSystemInfo is IFileInfo f
-                                                    && Parent.IsCompatibleWithAllowedExtensions (f))
-                                          )
-                                   .ToList ();
+                children = children.Where (c => c.IsDir || (c.FileSystemInfo is IFileInfo f && Parent.IsCompatibleWithAllowedExtensions (f))).ToList ();
             }
 
             // if there's a UI filter in place too
@@ -72,20 +72,12 @@ internal class FileDialogState
         catch (Exception)
         {
             // Access permissions Exceptions, Dir not exists etc
-            return Enumerable.Empty<FileSystemInfoStats> ();
+            return [];
         }
     }
 
-    protected bool MatchesApiFilter (FileSystemInfoStats arg)
-    {
-        return arg.IsDir
-               || (arg.FileSystemInfo is IFileInfo f
-                   && Parent.CurrentFilter.IsAllowed (f.FullName));
-    }
+    protected bool MatchesApiFilter (FileSystemInfoStats arg) =>
+        Parent.CurrentFilter is { } && (arg.IsDir || (arg.FileSystemInfo is IFileInfo f && Parent.CurrentFilter.IsAllowed (f.FullName)));
 
-    internal virtual void RefreshChildren ()
-    {
-        IDirectoryInfo dir = Directory;
-        Children = GetChildren (dir).ToArray ();
-    }
+    internal virtual void RefreshChildren () => Children = GetChildren (Directory).ToArray ();
 }
