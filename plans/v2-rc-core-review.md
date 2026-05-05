@@ -409,7 +409,7 @@ Issues filed and PRs opened against `gui-cs/Terminal.Gui` (one PR per issue, eac
 
 | P0 | Issue | PR | Subject |
 |---|---|---|---|
-| 1 | [#5162](https://github.com/gui-cs/Terminal.Gui/issues/5162) | [#5184](https://github.com/gui-cs/Terminal.Gui/pull/5184) | CWP: `Begin()` raises `SessionBegun` after `IsRunning`/`IsModal` set |
+| 1 | [#5162](https://github.com/gui-cs/Terminal.Gui/issues/5162) | [#5184](https://github.com/gui-cs/Terminal.Gui/pull/5184) → [#5188](https://github.com/gui-cs/Terminal.Gui/pull/5188) | **Reframed**: original CWP-violation framing was wrong. `SessionBegun` is a token-creation hook, `SessionEnded` is a token-disposal hook — not paired before/after state-change events. Issue #5162 closed `not_planned`; PR #5184 closed unmerged; replaced by doc-only PR #5188 tightening XML on `IApplication.cs` to make the semantics explicit. |
 | 2 | [#5163](https://github.com/gui-cs/Terminal.Gui/issues/5163) | [#5185](https://github.com/gui-cs/Terminal.Gui/pull/5185) | `Invoke()` throws `NotInitializedException` after `Dispose` (deeper race deferred) |
 | 3 | [#5164](https://github.com/gui-cs/Terminal.Gui/issues/5164) | [#5186](https://github.com/gui-cs/Terminal.Gui/pull/5186) | `UnixRawModeHelper` saved-state guard, finalizer, `ProcessExit`/`CancelKeyPress` hooks |
 | 4 | [#5165](https://github.com/gui-cs/Terminal.Gui/issues/5165) | [#5187](https://github.com/gui-cs/Terminal.Gui/pull/5187) | `AnsiOutput.Dispose` flushes after cleanup writes (stacked on #5182) |
@@ -422,4 +422,4 @@ Issues filed and PRs opened against `gui-cs/Terminal.Gui` (one PR per issue, eac
 | 11 | [#5172](https://github.com/gui-cs/Terminal.Gui/issues/5172) | [#5180](https://github.com/gui-cs/Terminal.Gui/pull/5180) | `TextFormatter` vertical-height uses `GetColumns()` |
 | 12 | [#5173](https://github.com/gui-cs/Terminal.Gui/issues/5173) | [#5181](https://github.com/gui-cs/Terminal.Gui/pull/5181) | `ConcurrentDictionaryJsonConverter` rejects duplicate keys |
 
-**Summary:** 12 P0 issues filed, 11 PRs opened (1 withdrawn after follow-up analysis showed the bug as filed wasn't reachable). Each PR contains a unit test that fails on `develop` and passes with the fix.
+**Summary:** 12 P0 issues filed; final state — 10 fix PRs open (#5177–#5183, #5185–#5187), 1 doc-only PR (#5188), 1 withdrawn (#5169 — branch unreachable), 1 reframed (#5162 → doc-only #5188; original PR #5184 closed unmerged). Each fix PR contains a unit test that fails on `develop` and passes with the fix.
