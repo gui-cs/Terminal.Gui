@@ -618,9 +618,9 @@ public class KeyTests
         Key b = Key.A;
         Assert.True (a.Equals (b));
 
+        // Handled is per-event state and not part of Key identity (see issue #5170).
         b.Handled = true;
-        Assert.False (a.Equals (b));
-
+        Assert.True (a.Equals (b));
     }
 
     [Fact]
@@ -634,12 +634,13 @@ public class KeyTests
     }
 
     [Fact]
-    public void Equals_Handled_Changed_ShouldReturnFalse_WhenNotEqual ()
+    public void Equals_Handled_Changed_ShouldReturnTrue_WhenHandledDiffers ()
     {
+        // Handled is per-event state and is intentionally excluded from Key identity (see issue #5170).
         Key a = Key.A;
         a.Handled = true;
         Key b = Key.A;
-        Assert.False (a.Equals (b));
+        Assert.True (a.Equals (b));
     }
 
 
