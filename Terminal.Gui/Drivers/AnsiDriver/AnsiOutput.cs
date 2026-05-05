@@ -359,15 +359,35 @@ public class AnsiOutput : OutputBase, IOutput
         }
     }
 
+    /// <summary>
+    ///     Computes the 1-indexed terminal row of the last row of the inline application region.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         <see cref="Rectangle.Height"/> is exclusive: <c>Y + Height</c> is the row immediately
+    ///         <em>after</em> the region. The last row inside the region is <c>Y + Height - 1</c>.
+    ///         ANSI cursor-positioning sequences are 1-indexed, but <see cref="Rectangle.Y"/> is already
+    ///         the 1-indexed terminal row offset for the inline region, so no additional adjustment is
+    ///         required.
+    ///     </para>
+    ///     <para>
+    ///         Used by <see cref="Dispose"/> to park the cursor on the final row of the inline region
+    ///         on shutdown. See issue #5166.
+    ///     </para>
+    /// </remarks>
+    /// <param name="appScreen">The inline application region rectangle.</param>
+    /// <returns>The 1-indexed terminal row of the last row of the region.</returns>
+    internal static int GetInlineLastRow (Rectangle appScreen) => appScreen.Y + appScreen.Height - 1;
+
     /// <inheritdoc/>
     public void Dispose ()
     {
         try
         {
-            if (_platform == AnsiPlatform.Degraded)
-            {
-                return;
-            }
+            // Note: each Write below short-circuits the platform-specific output path when
+            // <see cref="_platform"/> is <see cref="AnsiPlatform.Degraded"/>, but still
+            // appends to the buffered last-output (see <see cref="OutputBase.Write(StringBuilder)"/>),
+            // which keeps shutdown sequences observable to tests.
 
             // Restore terminal state: disable mouse, reset attributes, show cursor
             Write (EscSeqUtils.CSI_DisableMouseEvents);
@@ -380,7 +400,7 @@ public class AnsiOutput : OutputBase, IOutput
                 // Position to the last row of the inline region (guaranteed to exist),
                 // then write \n to scroll the terminal if at the bottom edge.
                 Rectangle appScreen = AppScreenGetter?.Invoke () ?? default;
-                int lastInlineRow = appScreen.Y + appScreen.Height; // 1-indexed last row
+                int lastInlineRow = GetInlineLastRow (appScreen);
                 Write (EscSeqUtils.CSI_SetCursorPosition (lastInlineRow, 1));
                 Write ("\n");
             }
