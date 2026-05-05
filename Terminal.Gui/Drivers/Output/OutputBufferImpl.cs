@@ -66,7 +66,7 @@ public class OutputBufferImpl : IOutputBuffer
 
         lock (_contentsLock)
         {
-            return _urlMap.TryGetValue (new Point (col, row), out string? url) ? url : null;
+            return _urlMap?.TryGetValue (new Point (col, row), out string? url) == true ? url : null;
         }
     }
 
