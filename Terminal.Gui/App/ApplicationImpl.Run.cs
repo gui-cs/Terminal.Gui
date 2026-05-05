@@ -151,7 +151,7 @@ internal partial class ApplicationImpl
             TopRunnable = runnable;
 
             // Update cached state atomically - IsRunning and IsModal are now consistent
-            SessionBegun?.Invoke (this, new SessionTokenEventArgs (token));
+            // (CWP: state mutations happen BEFORE the SessionBegun notification below)
             runnable.SetIsRunning (true);
             runnable.SetIsModal (true);
 
@@ -160,6 +160,10 @@ internal partial class ApplicationImpl
         }
 
         // END CRITICAL SECTION - IsRunning/IsModal now thread-safe
+
+        // CWP: Raise SessionBegun AFTER all state mutations so subscribers
+        // observe a fully-consistent session token (IsRunning/IsModal == true).
+        SessionBegun?.Invoke (this, new SessionTokenEventArgs (token));
 
         // Fire events AFTER lock released (avoid deadlocks in event handlers)
         previousTop?.RaiseIsModalChangedEvent (false);
