@@ -10,6 +10,30 @@ public partial class Markdown
 
         int viewportWidth = Math.Max (GetEffectiveLayoutWidth (), MIN_WRAP_WIDTH);
 
+        // Pre-scan: compute _maxLineWidth from unwrapped blocks so that tables can be
+        // sized using the final content width (which may be wider than the viewport when
+        // long unwrapped lines — e.g. code — expand the content area).
+        foreach (IntermediateBlock block in _blocks)
+        {
+            if (block.IsThematicBreak || block.IsTable || block.Wrap)
+            {
+                continue;
+            }
+
+            int width = CalculateWidth (block.Runs.Select (r => new StyledSegment (r.Text, r.StyleRole, r.Url, r.ImageSource, r.Attribute)).ToList ());
+
+            if (!string.IsNullOrEmpty (block.Prefix))
+            {
+                width += block.Prefix.GetColumns ();
+            }
+
+            _maxLineWidth = Math.Max (_maxLineWidth, width);
+        }
+
+        // The effective width for table layout: tables use Dim.Fill() against content width,
+        // so if unwrapped lines expand the content beyond the viewport, tables get that width.
+        int tableLayoutWidth = Math.Max (viewportWidth, _maxLineWidth);
+
         foreach (IntermediateBlock block in _blocks)
         {
             // Record heading anchor → rendered-line index before adding lines
@@ -62,13 +86,13 @@ public partial class Markdown
                     Y = startLine,
                     Width = Dim.Fill ()
                 };
-                tableView.Recalculate (viewportWidth);
+                tableView.Recalculate (tableLayoutWidth);
 
                 _tableViews.Add (tableView);
                 Add (tableView);
 
-                // Use actual table height (accounts for word-wrapped rows)
-                int tableHeight = tableView.Frame.Height;
+                // Use actual table height (accounts for word-wrapped rows at current width)
+                int tableHeight = tableView.RenderedHeight;
 
                 // Reserve placeholder lines so content height is correct
                 for (var i = 0; i < tableHeight; i++)

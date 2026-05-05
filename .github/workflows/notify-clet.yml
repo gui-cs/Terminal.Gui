@@ -1,0 +1,44 @@
+name: Notify clet
+
+# Fires repository_dispatch to gui-cs/clet so that every TG develop NuGet
+# publish and every TG release tag drives a matching clet build/publish.
+# See gui-cs/clet#30 and gui-cs/clet D-020 for context.
+
+on:
+  release:
+    types: [published]
+  # Hooks the workflow that publishes the develop NuGet.
+  workflow_run:
+    workflows: ["Publish Terminal.Gui to Nuget"]
+    types: [completed]
+
+permissions:
+  contents: read
+
+jobs:
+  notify-clet:
+    runs-on: ubuntu-latest
+    # On release: always fire.
+    # On workflow_run: only fire on success (don't ship a clet build if the
+    # TG develop publish itself failed).
+    if: ${{ github.event_name == 'release' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Determine TG version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "tg_version=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+            echo "event_type=tg-released" >> "$GITHUB_OUTPUT"
+          else
+            # Develop channel. Read the just-published version straight from NuGet.
+            TG_VER=$(dotnet package search "Terminal.Gui" --prerelease --format json | jq -r '.searchResult[0].packages[0].latestVersion')
+            echo "tg_version=$TG_VER" >> "$GITHUB_OUTPUT"
+            echo "event_type=tg-develop-published" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.CLET_DISPATCH_PAT }}
+          repository: gui-cs/clet
+          event-type: ${{ steps.version.outputs.event_type }}
+          client-payload: |
+            {"tg_version": "${{ steps.version.outputs.tg_version }}"}
