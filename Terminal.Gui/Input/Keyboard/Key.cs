@@ -692,11 +692,16 @@ public class Key : EventArgs, IEquatable<Key>
     public static implicit operator string (Key key) => key.ToString ();
 
     /// <inheritdoc/>
+    /// <remarks>
+    ///     Two <see cref="Key"/> instances are considered equal when their <see cref="KeyCode"/> values match.
+    ///     <see cref="Handled"/> is per-event state and is intentionally excluded from identity so that
+    ///     <see cref="Equals(object?)"/> remains consistent with <see cref="GetHashCode"/>.
+    /// </remarks>
     public override bool Equals (object? obj)
     {
         if (obj is Key other)
         {
-            return other._keyCode == _keyCode && other.Handled == Handled;
+            return other._keyCode == _keyCode;
         }
 
         return false;
