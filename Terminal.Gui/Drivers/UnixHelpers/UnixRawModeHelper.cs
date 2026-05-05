@@ -20,16 +20,47 @@ namespace Terminal.Gui.Drivers;
 ///     </list>
 ///     This allows the application to receive raw keyboard input and process all keys,
 ///     including control sequences and special keys as ANSI escape sequences.
+///     <para>
+///         To guarantee the terminal is restored even when the input thread crashes or the
+///         process exits abnormally, this class registers a process-exit hook, a
+///         <see cref="Console.CancelKeyPress"/> handler, and a finalizer that all call
+///         <see cref="Restore"/>. See issue #5164.
+///     </para>
 /// </remarks>
 internal sealed class UnixRawModeHelper : IDisposable
 {
     private Termios _originalTermios;
+    private bool _haveSavedTermios;
     private bool _disposed;
+    private EventHandler? _processExitHandler;
+    private ConsoleCancelEventHandler? _cancelKeyHandler;
 
     /// <summary>
     ///     Gets whether raw mode was successfully enabled.
     /// </summary>
     public bool IsRawModeEnabled { get; private set; }
+
+    /// <summary>
+    ///     Finalizer. Acts as a last-resort restore in case neither <see cref="Dispose"/>
+    ///     nor the process-exit hook ran (e.g. fatal native crash, immediate process abort).
+    /// </summary>
+    ~UnixRawModeHelper ()
+    {
+        // Only attempt syscalls if we actually saved a valid termios.
+        if (!_haveSavedTermios)
+        {
+            return;
+        }
+
+        try
+        {
+            tcsetattr (STDIN_FILENO, TCSANOW, ref _originalTermios);
+        }
+        catch
+        {
+            // Finalizers must never throw.
+        }
+    }
 
     /// <summary>
     ///     Attempts to enable raw mode on the terminal.
@@ -61,6 +92,11 @@ internal sealed class UnixRawModeHelper : IDisposable
                 return false;
             }
 
+            // Mark that _originalTermios contains a valid snapshot. Without this guard,
+            // a later Restore() (after a TryEnable failure path or before any successful
+            // call) could write uninitialized struct contents back to the terminal.
+            _haveSavedTermios = true;
+
             // Create modified attributes for raw mode
             Termios raw = _originalTermios;
 
@@ -91,6 +127,11 @@ internal sealed class UnixRawModeHelper : IDisposable
             }
 
             IsRawModeEnabled = true;
+
+            // Wire safety nets so the terminal is restored even if the input thread
+            // crashes or the process exits without going through Dispose().
+            HookProcessExit ();
+
             Logging.Information ("Unix raw mode enabled successfully.");
 
             return true;
@@ -111,9 +152,16 @@ internal sealed class UnixRawModeHelper : IDisposable
     /// <summary>
     ///     Restores the terminal to its original state.
     /// </summary>
+    /// <remarks>
+    ///     A no-op if raw mode was never successfully enabled, if the original
+    ///     <c>termios</c> snapshot was never captured, or if the helper has already
+    ///     been disposed. This guard prevents writing an uninitialized
+    ///     <c>termios</c> struct back to the terminal after a failed
+    ///     <see cref="TryEnable"/>.
+    /// </remarks>
     public void Restore ()
     {
-        if (!IsRawModeEnabled || _disposed)
+        if (_disposed || !_haveSavedTermios || !IsRawModeEnabled)
         {
             return;
         }
@@ -138,8 +186,66 @@ internal sealed class UnixRawModeHelper : IDisposable
             return;
         }
 
+        UnhookProcessExit ();
         Restore ();
         _disposed = true;
+
+        GC.SuppressFinalize (this);
+    }
+
+    private void HookProcessExit ()
+    {
+        if (_processExitHandler is not null)
+        {
+            return;
+        }
+
+        _processExitHandler = (_, _) => Restore ();
+        AppDomain.CurrentDomain.ProcessExit += _processExitHandler;
+
+        try
+        {
+            _cancelKeyHandler = (_, _) => Restore ();
+            Console.CancelKeyPress += _cancelKeyHandler;
+        }
+        catch (Exception ex)
+        {
+            // Console.CancelKeyPress may throw on some hosts (e.g. when stdin is
+            // redirected in unusual ways). The ProcessExit hook is still in place.
+            Logging.Warning ($"Could not hook Console.CancelKeyPress: {ex.Message}");
+            _cancelKeyHandler = null;
+        }
+    }
+
+    private void UnhookProcessExit ()
+    {
+        if (_processExitHandler is not null)
+        {
+            try
+            {
+                AppDomain.CurrentDomain.ProcessExit -= _processExitHandler;
+            }
+            catch
+            {
+                // Ignore: nothing useful we can do here.
+            }
+
+            _processExitHandler = null;
+        }
+
+        if (_cancelKeyHandler is not null)
+        {
+            try
+            {
+                Console.CancelKeyPress -= _cancelKeyHandler;
+            }
+            catch
+            {
+                // Ignore: nothing useful we can do here.
+            }
+
+            _cancelKeyHandler = null;
+        }
     }
 
     #region P/Invoke Declarations
