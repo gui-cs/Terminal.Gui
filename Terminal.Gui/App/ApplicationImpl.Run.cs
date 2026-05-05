@@ -55,6 +55,11 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public void Invoke (Action<IApplication>? action)
     {
+        if (!Initialized)
+        {
+            throw new NotInitializedException (@"Init must be called before Invoke.");
+        }
+
         // If we are already on the main UI thread
         if (TopRunnableView is IRunnable { IsRunning: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
@@ -75,6 +80,11 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public void Invoke (Action action)
     {
+        if (!Initialized)
+        {
+            throw new NotInitializedException (@"Init must be called before Invoke.");
+        }
+
         // If we are already on the main UI thread
         if (TopRunnableView is IRunnable { IsRunning: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {

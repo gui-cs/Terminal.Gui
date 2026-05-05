@@ -354,6 +354,9 @@ public interface IApplication : IDisposable
     ///         iteration.
     ///     </para>
     /// </remarks>
+    /// <exception cref="NotInitializedException">
+    ///     Thrown when <see cref="Init"/> has not been called or after <see cref="IDisposable.Dispose"/> has been called.
+    /// </exception>
     void Invoke (Action<IApplication>? action);
 
     /// <summary>Runs <paramref name="action"/> on the main UI loop thread.</summary>
@@ -365,6 +368,9 @@ public interface IApplication : IDisposable
     ///         iteration.
     ///     </para>
     /// </remarks>
+    /// <exception cref="NotInitializedException">
+    ///     Thrown when <see cref="Init"/> has not been called or after <see cref="IDisposable.Dispose"/> has been called.
+    /// </exception>
     void Invoke (Action action);
 
     #endregion Iteration & Invoke
