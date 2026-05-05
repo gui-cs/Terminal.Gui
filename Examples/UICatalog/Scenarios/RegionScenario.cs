@@ -107,7 +107,45 @@ public class RegionScenario : Scenario
                                                 break;
 
                                             case RegionDrawStyles.OuterBoundary:
-                                                _region.DrawOuterBoundary (sendingView.LineCanvas, LineStyle.Single, tools.CurrentAttribute);
+                                                // Demo simplification: iterate the region's rectangles and add the four edges of each
+                                                // to the LineCanvas. Shared edges between adjacent rectangles will overlap; LineCanvas's
+                                                // line-style joining handles the visual result, matching how Border/Adornment draw.
+                                                foreach (Rectangle rect in _region.GetRectangles ())
+                                                {
+                                                    if (rect.IsEmpty || rect.Width <= 0 || rect.Height <= 0)
+                                                    {
+                                                        continue;
+                                                    }
+
+                                                    sendingView.LineCanvas.AddLine (
+                                                                                    new (rect.Left, rect.Top),
+                                                                                    rect.Width,
+                                                                                    Orientation.Horizontal,
+                                                                                    LineStyle.Single,
+                                                                                    tools.CurrentAttribute);
+
+                                                    sendingView.LineCanvas.AddLine (
+                                                                                    new (rect.Left, rect.Bottom - 1),
+                                                                                    rect.Width,
+                                                                                    Orientation.Horizontal,
+                                                                                    LineStyle.Single,
+                                                                                    tools.CurrentAttribute);
+
+                                                    sendingView.LineCanvas.AddLine (
+                                                                                    new (rect.Left, rect.Top),
+                                                                                    rect.Height,
+                                                                                    Orientation.Vertical,
+                                                                                    LineStyle.Single,
+                                                                                    tools.CurrentAttribute);
+
+                                                    sendingView.LineCanvas.AddLine (
+                                                                                    new (rect.Right - 1, rect.Top),
+                                                                                    rect.Height,
+                                                                                    Orientation.Vertical,
+                                                                                    LineStyle.Single,
+                                                                                    tools.CurrentAttribute);
+                                                }
+
                                                 _region.FillRectangles (sendingView.App?.Driver, tools.CurrentAttribute!.Value, (Rune)' ');
 
                                                 break;
