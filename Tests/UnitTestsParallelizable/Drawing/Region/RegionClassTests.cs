@@ -1103,4 +1103,30 @@ public class RegionClassTests
         Assert.Null (exception);
     }
 
+    // Claude - Opus 4.7
+    [Fact]
+    public void Combine_XOR_ProducesSymmetricDifference ()
+    {
+        // Issue #5167: XOR mutated `this` before computing `region - this`,
+        // producing a non-symmetric result. With A=(0,0,2,2) and B=(1,1,2,2)
+        // the only intersecting cell is (1,1); XOR(A,B) must contain every
+        // other cell from A and B but NOT (1,1).
+        Region a = new (new (0, 0, 2, 2));
+        Region b = new (new (1, 1, 2, 2));
+
+        a.Combine (b, RegionOp.XOR);
+
+        // Cells exclusive to A
+        Assert.True (a.Contains (0, 0));
+        Assert.True (a.Contains (1, 0));
+        Assert.True (a.Contains (0, 1));
+
+        // Cells exclusive to B
+        Assert.True (a.Contains (2, 1));
+        Assert.True (a.Contains (1, 2));
+        Assert.True (a.Contains (2, 2));
+
+        // The intersecting cell must be excluded from a symmetric difference.
+        Assert.False (a.Contains (1, 1));
+    }
 }
