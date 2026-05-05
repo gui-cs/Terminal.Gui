@@ -179,8 +179,8 @@ public sealed class MarkdownTable : View, IDesignable
     }
 
     /// <summary>
-    ///     Gets the last computed rendered height (in lines) after <see cref="Recalculate"/> runs.
-    ///     Unlike <see cref="View.Frame"/>, this value is always up-to-date even before a layout pass.
+    ///     Gets the computed rendered height (in lines) after <see cref="Recalculate"/> runs.
+    ///     This value is always current, unlike <see cref="View.Frame"/> which updates only after layout.
     /// </summary>
     internal int RenderedHeight { get; private set; }
 
