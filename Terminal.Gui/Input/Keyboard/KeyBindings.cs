@@ -9,7 +9,8 @@ namespace Terminal.Gui.Input;
 public class KeyBindings : CommandBindingsBase<Key, KeyBinding>
 {
     /// <summary>Initializes a new instance.</summary>
-    public KeyBindings () : base ((commands, key, source) => new KeyBinding (commands, source), new KeyEqualityComparer ()) { }
+    public KeyBindings ()
+        : base ((commands, key, source) => new KeyBinding (commands, key, source, null, null), new KeyEqualityComparer ()) { }
 
     /// <inheritdoc/>
     public override bool IsValid (Key eventArgs) => eventArgs.IsValid;

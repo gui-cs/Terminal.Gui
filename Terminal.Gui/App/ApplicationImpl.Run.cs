@@ -55,6 +55,11 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public void Invoke (Action<IApplication>? action)
     {
+        if (!Initialized)
+        {
+            throw new NotInitializedException (nameof (Invoke));
+        }
+
         // If we are already on the main UI thread
         if (TopRunnableView is IRunnable { IsRunning: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
@@ -75,6 +80,13 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public void Invoke (Action action)
     {
+        ArgumentNullException.ThrowIfNull (action);
+
+        if (!Initialized)
+        {
+            throw new NotInitializedException (nameof (Invoke));
+        }
+
         // If we are already on the main UI thread
         if (TopRunnableView is IRunnable { IsRunning: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
@@ -263,6 +275,95 @@ internal partial class ApplicationImpl
         }
 
         return token.Result;
+    }
+
+    /// <inheritdoc/>
+    public Task<object?> RunAsync (IRunnable runnable, CancellationToken cancellationToken, Func<Exception, bool>? errorHandler = null)
+    {
+        ArgumentNullException.ThrowIfNull (runnable);
+
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return Task.FromResult<object?> (null);
+        }
+
+        TaskCompletionSource<object?> tcs = new (TaskCreationOptions.RunContinuationsAsynchronously);
+
+        // Register the cancellation token to request stop on the main loop via Invoke.
+        CancellationTokenRegistration registration = cancellationToken.Register (() => Invoke (() => RequestStop (runnable)));
+
+        try
+        {
+            object? result = Run (runnable, errorHandler);
+            tcs.TrySetResult (result);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            tcs.TrySetCanceled (cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            tcs.TrySetException (ex);
+        }
+        finally
+        {
+            registration.Dispose ();
+        }
+
+        return tcs.Task;
+    }
+
+    /// <inheritdoc/>
+    public Task<IApplication> RunAsync<TRunnable> (CancellationToken cancellationToken, Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new ()
+    {
+        if (cancellationToken.IsCancellationRequested)
+        {
+            return Task.FromResult<IApplication> (this);
+        }
+
+        if (!Initialized)
+        {
+            // Init() has NOT been called. Auto-initialize as per interface contract.
+            Init (driverName);
+        }
+
+        if (Driver is null)
+        {
+            throw new InvalidOperationException (@"Driver is null after Init.");
+        }
+
+        TRunnable runnable = new ();
+
+        TaskCompletionSource<IApplication> tcs = new (TaskCreationOptions.RunContinuationsAsynchronously);
+
+        // Register the cancellation token to request stop on the main loop via Invoke.
+        CancellationTokenRegistration registration = cancellationToken.Register (() => Invoke (() => RequestStop (runnable)));
+
+        try
+        {
+            Run (runnable, errorHandler);
+            tcs.TrySetResult (this);
+        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            tcs.TrySetCanceled (cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            tcs.TrySetException (ex);
+        }
+        finally
+        {
+            registration.Dispose ();
+
+            // We created the runnable, so dispose it if it's disposable
+            if (runnable is IDisposable disposable)
+            {
+                disposable.Dispose ();
+            }
+        }
+
+        return tcs.Task;
     }
 
     private void RunLoop (IRunnable runnable, Func<Exception, bool>? errorHandler)

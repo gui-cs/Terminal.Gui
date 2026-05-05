@@ -534,7 +534,7 @@ public partial class Markdown
     {
         if (codeLines.Count == 0)
         {
-            _blocks.Add (new IntermediateBlock ([new InlineRun ("", MarkdownStyleRole.CodeBlock)], false, isCodeBlock: true));
+            _blocks.Add (new IntermediateBlock ([new InlineRun ("", MarkdownStyleRole.CodeBlock)], false, isCodeBlock: true, language: language));
 
             return;
         }
@@ -563,7 +563,7 @@ public partial class Markdown
                 runs = converted;
             }
 
-            _blocks.Add (new IntermediateBlock (runs, false, isCodeBlock: true));
+            _blocks.Add (new IntermediateBlock (runs, false, isCodeBlock: true, language: language));
         }
     }
 

@@ -135,12 +135,31 @@ public interface IApplication : IDisposable
     ConcurrentStack<SessionToken>? SessionStack { get; }
 
     /// <summary>
-    ///     Raised when <see cref="Begin(IRunnable)"/> has been called and has created a new <see cref="SessionToken"/>.
+    ///     Raised by <see cref="Begin(IRunnable)"/> after the new <see cref="SessionToken"/> has been pushed onto
+    ///     <see cref="SessionStack"/> and <see cref="TopRunnable"/> has been set, but before
+    ///     <see cref="IRunnable.IsRunningChanged"/> and <see cref="IRunnable.IsModalChanged"/> fire. This event
+    ///     reports a token-lifecycle moment, not a state transition on the <see cref="IRunnable"/>.
     /// </summary>
     /// <remarks>
-    ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/>, callers to <see cref="Begin(IRunnable)"/>
-    ///     must also subscribe to <see cref="SessionEnded"/> and manually dispose of the <see cref="SessionToken"/> token
-    ///     when the application is done.
+    ///     <para>
+    ///         To observe the runnable transitioning to the running state, subscribe to
+    ///         <see cref="IRunnable.IsRunningChanged"/>. <see cref="SessionBegun"/> is not a substitute: at the moment
+    ///         it fires, the cached <see cref="IRunnable.IsRunning"/> value is still <see langword="false"/> because
+    ///         <see cref="IRunnable.SetIsRunning"/> has not yet been called. Subscribers that need post-state-change
+    ///         semantics must use <see cref="IRunnable.IsRunningChanged"/>.
+    ///     </para>
+    ///     <para>
+    ///         <see cref="SessionBegun"/> and <see cref="SessionEnded"/> are intentionally NOT a symmetric
+    ///         before/after pair. <see cref="SessionBegun"/> fires early — after the token has been pushed onto
+    ///         <see cref="SessionStack"/> but before the runnable's running/modal state has been published.
+    ///         <see cref="SessionEnded"/> fires late — after all state has unwound. This asymmetry is deliberate:
+    ///         the events mark token-lifecycle boundaries, not runnable-state transitions.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="StopAfterFirstIteration"/> is <see langword="true"/>, callers to
+    ///         <see cref="Begin(IRunnable)"/> must also subscribe to <see cref="SessionEnded"/> and call
+    ///         <see cref="End(SessionToken)"/> themselves to complete the session.
+    ///     </para>
     /// </remarks>
     public event EventHandler<SessionTokenEventArgs>? SessionBegun;
 
@@ -220,6 +239,64 @@ public interface IApplication : IDisposable
     object? Run (IRunnable runnable, Func<Exception, bool>? errorHandler = null);
 
     /// <summary>
+    ///     Asynchronously runs a new Session with the provided runnable view, observing a <see cref="CancellationToken"/>.
+    /// </summary>
+    /// <param name="runnable">The runnable to execute.</param>
+    /// <param name="cancellationToken">
+    ///     A cancellation token that, when cancelled, will call <see cref="RequestStop(IRunnable)"/> to cleanly stop the run
+    ///     loop.
+    /// </param>
+    /// <param name="errorHandler">Optional handler for unhandled exceptions (resumes when returns true, rethrows when null).</param>
+    /// <returns>
+    ///     A <see cref="Task{Object}"/> that completes when the session ends. The result is the value returned by
+    ///     <see cref="Run(IRunnable, Func{Exception, bool})"/>.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method wraps <see cref="Run(IRunnable, Func{Exception, bool})"/> and registers the
+    ///         <paramref name="cancellationToken"/> so that cancellation triggers <see cref="RequestStop(IRunnable)"/>.
+    ///     </para>
+    ///     <para>
+    ///         If the token is already cancelled when this method is called, it returns immediately without starting the
+    ///         session.
+    ///     </para>
+    ///     <para>
+    ///         Cancellation is idempotent: if both the token and an internal <see cref="RequestStop()"/> fire, only a single
+    ///         shutdown occurs.
+    ///     </para>
+    /// </remarks>
+    Task<object?> RunAsync (IRunnable runnable, CancellationToken cancellationToken, Func<Exception, bool>? errorHandler = null);
+
+    /// <summary>
+    ///     Asynchronously runs a new Session creating a <see cref="IRunnable"/>-derived object of type
+    ///     <typeparamref name="TRunnable"/>, observing a <see cref="CancellationToken"/>.
+    /// </summary>
+    /// <typeparam name="TRunnable">The type of runnable to create and run.</typeparam>
+    /// <param name="cancellationToken">
+    ///     A cancellation token that, when cancelled, will call <see cref="RequestStop(IRunnable)"/> to cleanly stop the run
+    ///     loop.
+    /// </param>
+    /// <param name="errorHandler">Optional handler for unhandled exceptions (resumes when returns true, rethrows when null).</param>
+    /// <param name="driverName">
+    ///     The driver name. If not specified the default driver for the platform will be used.
+    /// </param>
+    /// <returns>
+    ///     A <see cref="Task"/> representing the asynchronous operation. The <see cref="IApplication"/> instance is returned
+    ///     for fluent chaining.
+    /// </returns>
+    /// <remarks>
+    ///     <para>
+    ///         This method wraps <see cref="Run{TRunnable}(Func{Exception, bool}, string)"/> and registers the
+    ///         <paramref name="cancellationToken"/> so that cancellation triggers <see cref="RequestStop()"/>.
+    ///     </para>
+    ///     <para>
+    ///         If the token is already cancelled when this method is called, it returns immediately without starting the
+    ///         session.
+    ///     </para>
+    /// </remarks>
+    Task<IApplication> RunAsync<TRunnable> (CancellationToken cancellationToken, Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new ();
+
+    /// <summary>
     ///     Runs a new Session creating a <see cref="IRunnable"/>-derived object of type <typeparamref name="TRunnable"/>
     ///     and calling <see cref="Run(IRunnable, Func{Exception, bool})"/>. When the session is stopped,
     ///     <see cref="End(SessionToken)"/> will be called.
@@ -296,6 +373,9 @@ public interface IApplication : IDisposable
     ///         iteration.
     ///     </para>
     /// </remarks>
+    /// <exception cref="NotInitializedException">
+    ///     Thrown when <see cref="Init"/> has not been called or after <see cref="IDisposable.Dispose"/> has been called.
+    /// </exception>
     void Invoke (Action<IApplication>? action);
 
     /// <summary>Runs <paramref name="action"/> on the main UI loop thread.</summary>
@@ -307,6 +387,9 @@ public interface IApplication : IDisposable
     ///         iteration.
     ///     </para>
     /// </remarks>
+    /// <exception cref="NotInitializedException">
+    ///     Thrown when <see cref="Init"/> has not been called or after <see cref="IDisposable.Dispose"/> has been called.
+    /// </exception>
     void Invoke (Action action);
 
     #endregion Iteration & Invoke
@@ -364,7 +447,8 @@ public interface IApplication : IDisposable
     /// <remarks>
     ///     <para>
     ///         This method removes the <see cref="IRunnable"/> from the <see cref="SessionStack"/>,
-    ///         raises the lifecycle events, and disposes the <paramref name="sessionToken"/>.
+    ///         raises the lifecycle events, and clears <see cref="SessionToken.Runnable"/> on
+    ///         <paramref name="sessionToken"/>.
     ///     </para>
     ///     <para>
     ///         Raises <see cref="IRunnable.IsRunningChanging"/>, <see cref="IRunnable.IsRunningChanged"/>,
@@ -374,14 +458,37 @@ public interface IApplication : IDisposable
     void End (SessionToken sessionToken);
 
     /// <summary>
-    ///     Raised when <see cref="End(SessionToken)"/> was called and the session is stopping. The event args contain a
-    ///     reference to the <see cref="IRunnable"/>
-    ///     that was active during the session. This can be used to ensure the Runnable is disposed of properly.
+    ///     Raised by <see cref="End(SessionToken)"/> after the runnable's state has fully unwound — including
+    ///     <see cref="IRunnable.IsRunningChanged"/> firing with <c>false</c> — and after <see cref="End(SessionToken)"/>
+    ///     has finished its state-unwinding work. The <see cref="SessionToken.Runnable"/> reference is
+    ///     <see langword="null"/> at this point. This event reports a token-lifecycle moment, not a state transition
+    ///     on the <see cref="IRunnable"/>.
     /// </summary>
     /// <remarks>
-    ///     If <see cref="StopAfterFirstIteration"/> is <see langword="true"/>, callers to <see cref="Begin(IRunnable)"/>
-    ///     must also subscribe to <see cref="SessionEnded"/> and manually dispose of the <see cref="SessionToken"/> token
-    ///     when the application is done.
+    ///     <para>
+    ///         At the moment <see cref="SessionEnded"/> fires, all state has already unwound:
+    ///         <see cref="IRunnable.IsRunning"/> is <see langword="false"/> and
+    ///         <see cref="IRunnable.IsRunningChanged"/> has already fired with <c>false</c>. To observe the runnable
+    ///         transitioning out of the running state, subscribe to <see cref="IRunnable.IsRunningChanged"/> instead.
+    ///     </para>
+    ///     <para>
+    ///         The token's <see cref="SessionToken.Runnable"/> property is <see langword="null"/> at this point — it
+    ///         is cleared immediately before the event is raised. Subscribers that need the session result must read
+    ///         <see cref="SessionToken.Result"/> from the token; they must not attempt to access
+    ///         <see cref="SessionToken.Runnable"/>.
+    ///     </para>
+    ///     <para>
+    ///         <see cref="SessionEnded"/> and <see cref="SessionBegun"/> are intentionally NOT a symmetric
+    ///         before/after pair. <see cref="SessionBegun"/> fires early — after the token has been pushed onto
+    ///         <see cref="SessionStack"/> but before the runnable's running/modal state has been published.
+    ///         <see cref="SessionEnded"/> fires late — after all state has unwound. This asymmetry is deliberate:
+    ///         the events mark token-lifecycle boundaries, not runnable-state transitions.
+    ///     </para>
+    ///     <para>
+    ///         If <see cref="StopAfterFirstIteration"/> is <see langword="true"/>, callers to
+    ///         <see cref="Begin(IRunnable)"/> must also subscribe to <see cref="SessionEnded"/> and call
+    ///         <see cref="End(SessionToken)"/> themselves to complete the session.
+    ///     </para>
     /// </remarks>
     public event EventHandler<SessionTokenEventArgs>? SessionEnded;
 

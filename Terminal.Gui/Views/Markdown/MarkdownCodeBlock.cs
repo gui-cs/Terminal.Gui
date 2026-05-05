@@ -240,7 +240,7 @@ public class MarkdownCodeBlock : View, IDesignable
 
         int copyGlyphX = Viewport.Width - 2;
 
-        if (pos.X != copyGlyphX && pos.X != copyGlyphX + 1 || pos.Y != 0)
+        if ((pos.X != copyGlyphX && pos.X != copyGlyphX + 1) || pos.Y != 0)
         {
             return false;
         }
