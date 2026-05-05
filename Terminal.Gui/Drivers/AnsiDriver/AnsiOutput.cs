@@ -411,6 +411,14 @@ public class AnsiOutput : OutputBase, IOutput
             }
 
             Write (EscSeqUtils.CSI_ShowCursor);
+
+            // Flush the native stdout to ensure all cleanup sequences (mouse-off, SGR reset,
+            // alt-buffer restore, cursor show, etc.) reach the terminal before we return.
+            // Mirrors the FlushNative call in the constructor after init sequences are written.
+            // Without this, buffered cleanup bytes may be discarded when the process exits or
+            // when the underlying handle is closed by <see cref="WindowsVTOutputHelper.Dispose"/>.
+            // See issue #5165.
+            AnsiTerminalHelper.FlushNative (_platform);
         }
         catch
         {
