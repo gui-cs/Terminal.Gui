@@ -1817,5 +1817,91 @@ public class MarkdownViewTests (ITestOutputHelper output)
         host120.Dispose ();
         host80.Dispose ();
     }
+
+    // Copilot - regression test: table height accounts for content width expansion from long code lines
+    [Fact]
+    public void GetContentHeight_Table_With_Wide_Code_Block_Does_Not_Overestimate ()
+    {
+        // When a long unwrapped code line makes contentWidth > viewportWidth, the table
+        // (which uses Dim.Fill) renders at the wider content width and may need fewer
+        // wrapped rows. The content height must reflect the table at its actual render width.
+        string longCodeLine = new ('x', 150);
+
+        string mdWithCode = $"""
+                             # Title
+
+                             | Column A | Column B with a fairly long header | Column C header |
+                             |----------|-------------------------------------|-----------------|
+                             | Row 1 A  | This cell has content that is long enough to wrap when rendered at 80 columns width | Cell C1 value |
+                             | Row 2 A  | More long content in column B that should wrap around when available width is 80 cols | Cell C2 value |
+                             | Row 3 A  | Third row with plenty of descriptive text to demonstrate the wrapping at narrow width | Cell C3 value |
+                             | Row 4 A  | Fourth row B column content that is quite verbose and will cause word wrapping to occur | Cell C4 value |
+                             | Row 5 A  | Fifth row B demonstrating word wrap behavior at narrow terminal widths but not at wide | Cell C5 value |
+
+                             ```
+                             {longCodeLine}
+                             ```
+
+                             # End
+                             """;
+
+        string mdNoCode = """
+                          # Title
+
+                          | Column A | Column B with a fairly long header | Column C header |
+                          |----------|-------------------------------------|-----------------|
+                          | Row 1 A  | This cell has content that is long enough to wrap when rendered at 80 columns width | Cell C1 value |
+                          | Row 2 A  | More long content in column B that should wrap around when available width is 80 cols | Cell C2 value |
+                          | Row 3 A  | Third row with plenty of descriptive text to demonstrate the wrapping at narrow width | Cell C3 value |
+                          | Row 4 A  | Fourth row B column content that is quite verbose and will cause word wrapping to occur | Cell C4 value |
+                          | Row 5 A  | Fifth row B demonstrating word wrap behavior at narrow terminal widths but not at wide | Cell C5 value |
+
+                          # End
+                          """;
+
+        // Both at 80 col viewport
+        Terminal.Gui.Views.Markdown mvCode = new () { Width = 80, Height = 50, Text = mdWithCode };
+        View hostCode = new () { Width = 80, Height = 50 };
+        hostCode.Add (mvCode);
+        hostCode.BeginInit ();
+        hostCode.EndInit ();
+        hostCode.Layout ();
+
+        Terminal.Gui.Views.Markdown mvNoCode = new () { Width = 80, Height = 50, Text = mdNoCode };
+        View hostNoCode = new () { Width = 80, Height = 50 };
+        hostNoCode.Add (mvNoCode);
+        hostNoCode.BeginInit ();
+        hostNoCode.EndInit ();
+        hostNoCode.Layout ();
+
+        int heightWithCode = mvCode.GetContentSize ().Height;
+        int heightNoCode = mvNoCode.GetContentSize ().Height;
+        int contentWidthWithCode = mvCode.GetContentSize ().Width;
+
+        // Precondition: the code line expands content width beyond viewport
+        Assert.True (contentWidthWithCode > 80, "Code line should expand content width beyond viewport");
+
+        // The version with the code block has the table rendered at the wider content width
+        // (less wrapping needed), so the table is shorter. The code block adds a few lines,
+        // but the table savings should partially or fully offset that.
+        // Key assertion: heightWithCode must be LESS than heightNoCode + code_block_lines.
+        // If the bug exists (table placeholder uses viewport width), heightWithCode =
+        //   heightNoCode + code_block_lines (table not re-sized, just code added).
+        // If the fix works, heightWithCode < heightNoCode + code_block_lines
+        //   (table shrinks because it renders wider).
+
+        // The code block adds 1 rendered line of content. Count actual code block lines.
+        int codeBlockRenderedLines = mvCode.SubViews
+                                           .Where (v => v.GetType ().Name == "MarkdownCodeBlock")
+                                           .Sum (v => v.Frame.Height);
+
+        // With the fix: table is shorter at content width, so total is less than naive sum
+        Assert.True (
+            heightWithCode < heightNoCode + codeBlockRenderedLines,
+            $"Content height with code ({heightWithCode}) should be less than no-code height ({heightNoCode}) + code lines ({codeBlockRenderedLines}) = {heightNoCode + codeBlockRenderedLines}, because the wider content width makes the table shorter");
+
+        hostCode.Dispose ();
+        hostNoCode.Dispose ();
+    }
 }
 
