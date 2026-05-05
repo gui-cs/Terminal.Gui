@@ -71,6 +71,21 @@ jobs:
         
     - name: Publish Terminal.Gui.${{ steps.gitversion.outputs.SemVer }} to NuGet.org
       run: dotnet nuget push Terminal.Gui/bin/Release/Terminal.Gui.${{ steps.gitversion.outputs.SemVer }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }}
+
+    # Deterministic version handoff to notify-clet.yml. Avoids the NuGet
+    # search-API indexing lag that caused gui-cs/clet to skip TG develop.37
+    # (see clet workflow run 25406348354). notify-clet.yml downloads this
+    # artifact via workflow_run + actions/download-artifact and then polls
+    # NuGet flat-container until the version is restorable.
+    - name: Record published version for notify-clet
+      run: echo "${{ steps.gitversion.outputs.SemVer }}" > version.txt
+
+    - name: Upload published-version artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: published-version
+        path: version.txt
+        retention-days: 7
     
     # - name: Delist old NuGet packages
     #   if: startsWith(github.ref, 'refs/tags/v')
