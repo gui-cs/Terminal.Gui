@@ -400,3 +400,26 @@ The original review was performed against `claude/review-core-v2-EKNyf`, which i
 12. Confirm `SourceGenerationContext` AOT coverage with a build-time smoke test (item 12).
 
 P1s and P2s above remain unchanged by this verification pass; spot checks suggest most are still present, but a full re-verification was out of scope for this pass.
+
+---
+
+## Issue & PR Tracker
+
+Issues filed and PRs opened against `gui-cs/Terminal.Gui` (one PR per issue, each containing a fix plus a unit test that fails before the fix and passes after):
+
+| P0 | Issue | PR | Subject |
+|---|---|---|---|
+| 1 | [#5162](https://github.com/gui-cs/Terminal.Gui/issues/5162) | [#5184](https://github.com/gui-cs/Terminal.Gui/pull/5184) | CWP: `Begin()` raises `SessionBegun` after `IsRunning`/`IsModal` set |
+| 2 | [#5163](https://github.com/gui-cs/Terminal.Gui/issues/5163) | [#5185](https://github.com/gui-cs/Terminal.Gui/pull/5185) | `Invoke()` throws `NotInitializedException` after `Dispose` (deeper race deferred) |
+| 3 | [#5164](https://github.com/gui-cs/Terminal.Gui/issues/5164) | [#5186](https://github.com/gui-cs/Terminal.Gui/pull/5186) | `UnixRawModeHelper` saved-state guard, finalizer, `ProcessExit`/`CancelKeyPress` hooks |
+| 4 | [#5165](https://github.com/gui-cs/Terminal.Gui/issues/5165) | [#5187](https://github.com/gui-cs/Terminal.Gui/pull/5187) | `AnsiOutput.Dispose` flushes after cleanup writes (stacked on #5182) |
+| 5 | [#5166](https://github.com/gui-cs/Terminal.Gui/issues/5166) | [#5182](https://github.com/gui-cs/Terminal.Gui/pull/5182) | Inline-mode cursor parks on last row of region (off-by-one fix) |
+| 6 | [#5167](https://github.com/gui-cs/Terminal.Gui/issues/5167) | [#5178](https://github.com/gui-cs/Terminal.Gui/pull/5178) | `Region.XOR` snapshot operands; produces correct symmetric difference |
+| 7 | [#5168](https://github.com/gui-cs/Terminal.Gui/issues/5168) | [#5183](https://github.com/gui-cs/Terminal.Gui/pull/5183) | `Region.DrawOuterBoundary` draws within bounds (drops `+1` and shifts bottom/right edges) |
+| 8 | [#5169](https://github.com/gui-cs/Terminal.Gui/issues/5169) | — | **Withdrawn**: `WriteRawValue` branch unreachable; commented with analysis recommending defensive cleanup or close. |
+| 9 | [#5170](https://github.com/gui-cs/Terminal.Gui/issues/5170) | [#5179](https://github.com/gui-cs/Terminal.Gui/pull/5179) | `Key.Equals` drops `Handled`; `GetHashCode` contract restored |
+| 10 | [#5171](https://github.com/gui-cs/Terminal.Gui/issues/5171) | [#5177](https://github.com/gui-cs/Terminal.Gui/pull/5177) | `KeyBindings` factory lambda passes `key` through (also fixes silent `source`-into-`Data` bug) |
+| 11 | [#5172](https://github.com/gui-cs/Terminal.Gui/issues/5172) | [#5180](https://github.com/gui-cs/Terminal.Gui/pull/5180) | `TextFormatter` vertical-height uses `GetColumns()` |
+| 12 | [#5173](https://github.com/gui-cs/Terminal.Gui/issues/5173) | [#5181](https://github.com/gui-cs/Terminal.Gui/pull/5181) | `ConcurrentDictionaryJsonConverter` rejects duplicate keys |
+
+**Summary:** 12 P0 issues filed, 11 PRs opened (1 withdrawn after follow-up analysis showed the bug as filed wasn't reachable). Each PR contains a unit test that fails on `develop` and passes with the fix.
