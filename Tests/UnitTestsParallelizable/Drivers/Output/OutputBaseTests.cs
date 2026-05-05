@@ -275,13 +275,22 @@ public class OutputBaseTests
         // Act
         string ansi = output.ToAnsi (buffer);
 
-        // Assert: should contain both hyperlink starts and ends
-        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://one.com"), ansi);
-        Assert.Contains (EscSeqUtils.OSC_StartHyperlink ("https://two.com"), ansi);
+        // Assert: verify hyperlink transitions are emitted in order
+        string startOne = EscSeqUtils.OSC_StartHyperlink ("https://one.com");
+        string startTwo = EscSeqUtils.OSC_StartHyperlink ("https://two.com");
+        string end = EscSeqUtils.OSC_EndHyperlink ();
 
-        // Should contain at least 2 end sequences (one for each URL transition)
-        int endCount = ansi.Split (EscSeqUtils.OSC_EndHyperlink ()).Length - 1;
-        Assert.True (endCount >= 2, $"Expected at least 2 OSC 8 end sequences, got {endCount}");
+        int startOneIdx = ansi.IndexOf (startOne, StringComparison.Ordinal);
+        int endOneIdx = ansi.IndexOf (end, startOneIdx + startOne.Length, StringComparison.Ordinal);
+        int startTwoIdx = ansi.IndexOf (startTwo, endOneIdx + end.Length, StringComparison.Ordinal);
+        int endTwoIdx = ansi.IndexOf (end, startTwoIdx + startTwo.Length, StringComparison.Ordinal);
+        int nonUrlTextIdx = ansi.IndexOf ("EF", endTwoIdx + end.Length, StringComparison.Ordinal);
+
+        Assert.True (startOneIdx >= 0, "First OSC 8 start not found");
+        Assert.True (endOneIdx > startOneIdx, "First OSC 8 end not found after first start");
+        Assert.True (startTwoIdx > endOneIdx, "Second OSC 8 start should appear after first OSC 8 end");
+        Assert.True (endTwoIdx > startTwoIdx, "Second OSC 8 end not found after second start");
+        Assert.True (nonUrlTextIdx > endTwoIdx, "Non-URL text should appear after second OSC 8 end");
     }
 
     // Copilot
