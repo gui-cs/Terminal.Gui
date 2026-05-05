@@ -215,9 +215,24 @@ public class Region
                 break;
 
             case RegionOp.XOR:
-                Exclude (region);
-                region.Combine (this, RegionOp.Difference);
-                _rectangles.AddRange (region._rectangles);
+
+                // Snapshot both operands before mutating either, so the symmetric
+                // difference is computed as (thisOriginal \ regionOriginal) ∪
+                // (regionOriginal \ thisOriginal) rather than against a partially
+                // mutated `this`.
+                Region thisOriginal = Clone ();
+                Region regionOriginal = region.Clone ();
+
+                // Reuse `thisOriginal` to hold (thisOriginal \ regionOriginal).
+                thisOriginal.Combine (regionOriginal, RegionOp.Difference);
+
+                // Reuse a fresh clone of the unmodified `this` for (regionOriginal \ thisOriginal).
+                Region regionMinusThis = region.Clone ();
+                regionMinusThis.Combine (Clone (), RegionOp.Difference);
+
+                _rectangles.Clear ();
+                _rectangles.AddRange (thisOriginal._rectangles);
+                _rectangles.AddRange (regionMinusThis._rectangles);
 
                 break;
 
