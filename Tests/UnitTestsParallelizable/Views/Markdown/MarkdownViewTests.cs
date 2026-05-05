@@ -1892,7 +1892,7 @@ public class MarkdownViewTests (ITestOutputHelper output)
 
         // The code block adds 1 rendered line of content. Count actual code block lines.
         int codeBlockRenderedLines = mvCode.SubViews
-                                           .Where (v => v.GetType ().Name == "MarkdownCodeBlock")
+                                           .OfType<MarkdownCodeBlock> ()
                                            .Sum (v => v.Frame.Height);
 
         // With the fix: table is shorter at content width, so total is less than naive sum
