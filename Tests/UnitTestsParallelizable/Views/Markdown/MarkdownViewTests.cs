@@ -1765,4 +1765,57 @@ public class MarkdownViewTests (ITestOutputHelper output)
     }
 
     #endregion
+
+    // Copilot - regression test: GetContentHeight should not overestimate when content includes tables
+    [Fact]
+    public void GetContentHeight_Does_Not_Overestimate_With_Tables ()
+    {
+        // Wide cells that WILL wrap at 80 columns but fit single-line at 120
+        string md = """
+                    # Before
+
+                    | Column A | Column B with a long header name | Column C also has a longish header | Column D |
+                    |----------|----------------------------------|-------------------------------------|----------|
+                    | Row 1 A  | This cell has content that is definitely long enough to wrap when columns are narrow at 80 | Another cell with enough text to cause wrapping at narrow widths | Value D1 |
+                    | Row 2 A  | More long content in column B that should wrap around when the available width is restricted | Cell C2 also has substantial text that would need multiple lines | Value D2 |
+                    | Row 3 A  | Third row with plenty of descriptive text to demonstrate the wrapping | Third row C column with lots of text content | Value D3 |
+                    | Row 4 A  | Fourth row B column content that is quite verbose and will cause word wrap | Fourth row C with more text | Value D4 |
+                    | Row 5 A  | Fifth row B demonstrating word wrap behavior at different terminal widths | Fifth row C also long enough to wrap | Value D5 |
+
+                    # After
+                    """;
+
+        // At wide width (120), table cells don't wrap → fewer placeholder lines needed
+        Terminal.Gui.Views.Markdown mv120 = new () { Width = 120, Height = 50, Text = md };
+
+        View host120 = new () { Width = 120, Height = 50 };
+        host120.Add (mv120);
+        host120.BeginInit ();
+        host120.EndInit ();
+        host120.Layout ();
+
+        int contentHeight120 = mv120.GetContentSize ().Height;
+
+        // At narrow width (80), table cells wrap → more placeholder lines needed
+        Terminal.Gui.Views.Markdown mv80 = new () { Width = 80, Height = 50, Text = md };
+
+        View host80 = new () { Width = 80, Height = 50 };
+        host80.Add (mv80);
+        host80.BeginInit ();
+        host80.EndInit ();
+        host80.Layout ();
+
+        int contentHeight80 = mv80.GetContentSize ().Height;
+
+        // Content height at 120 cols should be LESS than at 80 cols because table rows
+        // don't wrap at wider widths. Before the fix, Frame.Height was stale from the
+        // initial Recalculate(80) in the TableData setter, causing overestimation.
+        Assert.True (
+            contentHeight120 < contentHeight80,
+            $"Content height at 120 cols ({contentHeight120}) should be less than at 80 cols ({contentHeight80}) since table rows don't wrap at wider widths");
+
+        host120.Dispose ();
+        host80.Dispose ();
+    }
 }
+

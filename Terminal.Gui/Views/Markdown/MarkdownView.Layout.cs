@@ -67,8 +67,8 @@ public partial class Markdown
                 _tableViews.Add (tableView);
                 Add (tableView);
 
-                // Use actual table height (accounts for word-wrapped rows)
-                int tableHeight = tableView.Frame.Height;
+                // Use actual table height (accounts for word-wrapped rows at current width)
+                int tableHeight = tableView.RenderedHeight;
 
                 // Reserve placeholder lines so content height is correct
                 for (var i = 0; i < tableHeight; i++)

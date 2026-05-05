@@ -174,8 +174,15 @@ public sealed class MarkdownTable : View, IDesignable
             _bodyRowHeights [r] = ComputeRowHeight (_rowSegments [r], _columnWidths);
         }
 
-        Height = CalculateTableHeightWrapped (_headerRowHeight, _bodyRowHeights);
+        RenderedHeight = CalculateTableHeightWrapped (_headerRowHeight, _bodyRowHeights);
+        Height = RenderedHeight;
     }
+
+    /// <summary>
+    ///     Gets the last computed rendered height (in lines) after <see cref="Recalculate"/> runs.
+    ///     Unlike <see cref="View.Frame"/>, this value is always up-to-date even before a layout pass.
+    /// </summary>
+    internal int RenderedHeight { get; private set; }
 
     /// <summary>Gets the total rendered height of this table in lines (simple estimate).</summary>
     /// <remarks>
