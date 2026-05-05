@@ -45,8 +45,15 @@ public class ApplicationInvokeLifecycleTests
     public void Invoke_Action_AfterDispose_Throws_NotInitializedException ()
     {
         IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-        app.Dispose ();
+
+        try
+        {
+            app.Init (DriverRegistry.Names.ANSI);
+        }
+        finally
+        {
+            app.Dispose ();
+        }
 
         Assert.Throws<NotInitializedException> (() => app.Invoke (() => { }));
     }
@@ -55,8 +62,15 @@ public class ApplicationInvokeLifecycleTests
     public void Invoke_ActionOfApplication_AfterDispose_Throws_NotInitializedException ()
     {
         IApplication app = Application.Create ();
-        app.Init (DriverRegistry.Names.ANSI);
-        app.Dispose ();
+
+        try
+        {
+            app.Init (DriverRegistry.Names.ANSI);
+        }
+        finally
+        {
+            app.Dispose ();
+        }
 
         Assert.Throws<NotInitializedException> (() => app.Invoke (static _ => { }));
     }

@@ -57,7 +57,7 @@ internal partial class ApplicationImpl
     {
         if (!Initialized)
         {
-            throw new NotInitializedException (@"Init must be called before Invoke.");
+            throw new NotInitializedException (nameof (Invoke));
         }
 
         // If we are already on the main UI thread
@@ -80,9 +80,11 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public void Invoke (Action action)
     {
+        ArgumentNullException.ThrowIfNull (action);
+
         if (!Initialized)
         {
-            throw new NotInitializedException (@"Init must be called before Invoke.");
+            throw new NotInitializedException (nameof (Invoke));
         }
 
         // If we are already on the main UI thread
