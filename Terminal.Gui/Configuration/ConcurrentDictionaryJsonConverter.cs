@@ -7,7 +7,7 @@ namespace Terminal.Gui.Configuration;
 
 internal class ConcurrentDictionaryJsonConverter<T> : JsonConverter<ConcurrentDictionary<string, T>>
 {
-    public override ConcurrentDictionary<string, T> Read(
+    public override ConcurrentDictionary<string, T> Read (
         ref Utf8JsonReader reader,
         Type typeToConvert,
         JsonSerializerOptions options
@@ -15,7 +15,7 @@ internal class ConcurrentDictionaryJsonConverter<T> : JsonConverter<ConcurrentDi
     {
         if (reader.TokenType != JsonTokenType.StartArray)
         {
-            throw new JsonException($"Expected a JSON array (\"[ {{ ... }} ]\"), but got \"{reader.TokenType}\".");
+            throw new JsonException ($"Expected a JSON array (\"[ {{ ... }} ]\"), but got \"{reader.TokenType}\".");
         }
 
         // If the Json options indicate ignoring case, use the invariant culture ignore case comparer
@@ -24,17 +24,17 @@ internal class ConcurrentDictionaryJsonConverter<T> : JsonConverter<ConcurrentDi
                                                               ? StringComparer.InvariantCultureIgnoreCase
                                                               : StringComparer.InvariantCulture);
 
-        while (reader.Read())
+        while (reader.Read ())
         {
             if (reader.TokenType == JsonTokenType.StartObject)
             {
-                reader.Read();
+                reader.Read ();
 
                 if (reader.TokenType == JsonTokenType.PropertyName)
                 {
-                    string key = reader.GetString();
-                    reader.Read();
-                    object value = JsonSerializer.Deserialize(ref reader, typeof(T), ConfigurationManager.SerializerContext);
+                    string key = reader.GetString ();
+                    reader.Read ();
+                    object value = JsonSerializer.Deserialize (ref reader, typeof (T), ConfigurationManager.SerializerContext);
 
                     if (!dictionary.TryAdd (key, (T)value))
                     {
