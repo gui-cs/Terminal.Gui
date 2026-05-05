@@ -1989,6 +1989,24 @@ public class TextFormatterTests (ITestOutputHelper output) : TestDriverBase
         Assert.Equal (new (expectedWidth, expectedHeight), tf.FormatAndGetSize ());
     }
 
+    // Claude - Opus 4.7
+    [Theory]
+    [InlineData ("ABC", 3)] // ASCII sanity
+    [InlineData ("中文字", 6)] // CJK: 3 ideographs x 2 columns each
+    [InlineData ("🙂", 2)] // emoji surrogate pair
+    public void FormatAndGetSize_VerticalHeight_UsesDisplayColumns (string line, int expectedHeight)
+    {
+        TextFormatter tf = new ()
+        {
+            Direction = TextDirection.TopBottom_LeftRight,
+            Text = line
+        };
+
+        Size size = tf.FormatAndGetSize ();
+
+        Assert.Equal (expectedHeight, size.Height);
+    }
+
     [Fact]
     public void WordWrap_BigWidth ()
     {
