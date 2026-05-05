@@ -327,6 +327,41 @@ public class OutputBaseTests
 
     // Copilot
     [Fact]
+    public void ToAnsi_UrlAtEndOfRow_ClosedBeforeNewline ()
+    {
+        // Arrange: 2-row buffer, URL at end of row 0, plain text on row 1
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 2);
+
+        // Row 0: "Link" with URL
+        buffer.CurrentUrl = "https://example.com";
+        buffer.AddStr ("Link");
+        buffer.CurrentUrl = null;
+
+        // Row 1: "Text" without URL
+        buffer.Move (0, 1);
+        buffer.AddStr ("Text");
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert: OSC 8 end appears before the newline that precedes row 1 text
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+        int endIdx = ansi.IndexOf (end, StringComparison.Ordinal);
+        int textIdx = ansi.IndexOf ("Text", StringComparison.Ordinal);
+
+        Assert.True (endIdx >= 0, "OSC 8 end not found");
+        Assert.True (textIdx > endIdx, "Row 1 text should appear after OSC 8 end (hyperlink closed at row boundary)");
+
+        // Verify no OSC 8 start appears on row 1
+        string start = EscSeqUtils.OSC_StartHyperlink ("https://example.com");
+        int secondStart = ansi.IndexOf (start, endIdx + end.Length, StringComparison.Ordinal);
+        Assert.True (secondStart < 0, "No OSC 8 start should appear on row 1");
+    }
+
+    // Copilot
+    [Fact]
     public void ToAnsi_LegacyConsole_NoOsc8 ()
     {
         // Arrange
