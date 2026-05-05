@@ -55,6 +55,11 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public void Invoke (Action<IApplication>? action)
     {
+        if (!Initialized)
+        {
+            throw new NotInitializedException (nameof (Invoke));
+        }
+
         // If we are already on the main UI thread
         if (TopRunnableView is IRunnable { IsRunning: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
@@ -75,6 +80,13 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public void Invoke (Action action)
     {
+        ArgumentNullException.ThrowIfNull (action);
+
+        if (!Initialized)
+        {
+            throw new NotInitializedException (nameof (Invoke));
+        }
+
         // If we are already on the main UI thread
         if (TopRunnableView is IRunnable { IsRunning: true } && MainThreadId == Thread.CurrentThread.ManagedThreadId)
         {
