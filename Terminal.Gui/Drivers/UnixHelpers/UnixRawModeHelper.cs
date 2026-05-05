@@ -24,7 +24,11 @@ namespace Terminal.Gui.Drivers;
 ///         To guarantee the terminal is restored even when the input thread crashes or the
 ///         process exits abnormally, this class registers a process-exit hook, a
 ///         <see cref="Console.CancelKeyPress"/> handler, and a finalizer that all call
-///         <see cref="Restore"/>. See issue #5164.
+///         <see cref="Restore"/>. See issue #5164. Note that disabling ISIG means a keyboard
+///         Ctrl+C is delivered as a 0x03 byte rather than SIGINT, so the
+///         <see cref="Console.CancelKeyPress"/> hook is unlikely to fire while raw mode is
+///         active; the primary safety nets are <see cref="AppDomain.ProcessExit"/> and the
+///         finalizer.
 ///     </para>
 /// </remarks>
 internal sealed class UnixRawModeHelper : IDisposable
@@ -54,7 +58,15 @@ internal sealed class UnixRawModeHelper : IDisposable
 
         try
         {
-            tcsetattr (STDIN_FILENO, TCSANOW, ref _originalTermios);
+            int result = tcsetattr (STDIN_FILENO, TCSANOW, ref _originalTermios);
+
+            if (result != 0)
+            {
+                int errno = Marshal.GetLastWin32Error ();
+
+                // Best-effort log only; finalizers must never throw.
+                Logging.Warning ($"tcsetattr failed during finalizer (errno={errno}). Terminal may still be in raw mode.");
+            }
         }
         catch
         {
@@ -168,7 +180,18 @@ internal sealed class UnixRawModeHelper : IDisposable
 
         try
         {
-            tcsetattr (STDIN_FILENO, TCSANOW, ref _originalTermios);
+            int result = tcsetattr (STDIN_FILENO, TCSANOW, ref _originalTermios);
+
+            if (result != 0)
+            {
+                int errno = Marshal.GetLastWin32Error ();
+                Logging.Warning ($"tcsetattr failed during restore (errno={errno}). Terminal may still be in raw mode.");
+
+                // Leave IsRawModeEnabled set to true so callers (and the finalizer) know
+                // the terminal was not successfully restored.
+                return;
+            }
+
             IsRawModeEnabled = false;
             Logging.Information ("Unix terminal settings restored.");
         }
@@ -205,6 +228,11 @@ internal sealed class UnixRawModeHelper : IDisposable
 
         try
         {
+            // Belt-and-braces: most Unix raw-mode entry disables ISIG, so Ctrl+C produces a
+            // literal 0x03 byte on stdin rather than a SIGINT, meaning this handler is unlikely
+            // to fire from a keyboard Ctrl+C while raw mode is active. It still helps for
+            // externally-delivered SIGINT/CTRL_C events and for hosts that do not disable ISIG.
+            // The primary safety nets are <see cref="AppDomain.ProcessExit"/> and the finalizer.
             _cancelKeyHandler = (_, _) => Restore ();
             Console.CancelKeyPress += _cancelKeyHandler;
         }
