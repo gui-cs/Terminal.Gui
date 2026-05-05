@@ -231,6 +231,157 @@ public class OutputBaseTests
         Assert.False (buffer.Contents! [0, 2].IsDirty);
     }
 
+    // Copilot
+    [Fact]
+    public void ToAnsi_CellsWithUrl_EmitsOsc8Sequences ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (5, 1);
+
+        buffer.CurrentUrl = "https://example.com";
+        buffer.AddStr ("Hello");
+        buffer.CurrentUrl = null;
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert
+        string expectedStart = EscSeqUtils.OSC_StartHyperlink ("https://example.com");
+        string expectedEnd = EscSeqUtils.OSC_EndHyperlink ();
+
+        Assert.Contains (expectedStart, ansi);
+        Assert.Contains (expectedEnd, ansi);
+        Assert.Contains ("Hello", ansi);
+    }
+
+    // Copilot
+    [Fact]
+    public void ToAnsi_CellsWithDifferentUrls_EmitsCorrectTransitions ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (6, 1);
+
+        buffer.CurrentUrl = "https://one.com";
+        buffer.AddStr ("AB");
+        buffer.CurrentUrl = "https://two.com";
+        buffer.AddStr ("CD");
+        buffer.CurrentUrl = null;
+        buffer.AddStr ("EF");
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert: verify hyperlink transitions are emitted in order
+        string startOne = EscSeqUtils.OSC_StartHyperlink ("https://one.com");
+        string startTwo = EscSeqUtils.OSC_StartHyperlink ("https://two.com");
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+
+        int startOneIdx = ansi.IndexOf (startOne, StringComparison.Ordinal);
+        int endOneIdx = ansi.IndexOf (end, startOneIdx + startOne.Length, StringComparison.Ordinal);
+        int startTwoIdx = ansi.IndexOf (startTwo, endOneIdx + end.Length, StringComparison.Ordinal);
+        int endTwoIdx = ansi.IndexOf (end, startTwoIdx + startTwo.Length, StringComparison.Ordinal);
+        int nonUrlTextIdx = ansi.IndexOf ("EF", endTwoIdx + end.Length, StringComparison.Ordinal);
+
+        Assert.True (startOneIdx >= 0, "First OSC 8 start not found");
+        Assert.True (endOneIdx > startOneIdx, "First OSC 8 end not found after first start");
+        Assert.True (startTwoIdx > endOneIdx, "Second OSC 8 start should appear after first OSC 8 end");
+        Assert.True (endTwoIdx > startTwoIdx, "Second OSC 8 end not found after second start");
+        Assert.True (nonUrlTextIdx > endTwoIdx, "Non-URL text should appear after second OSC 8 end");
+    }
+
+    // Copilot
+    [Fact]
+    public void ToAnsi_CellsWithUrl_ThenNoUrl_ClosesHyperlink ()
+    {
+        // Arrange
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (6, 1);
+
+        buffer.CurrentUrl = "https://example.com";
+        buffer.AddStr ("Link");
+        buffer.CurrentUrl = null;
+        buffer.AddStr ("  ");
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert: hyperlink is opened and closed
+        string start = EscSeqUtils.OSC_StartHyperlink ("https://example.com");
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+
+        int startIdx = ansi.IndexOf (start, StringComparison.Ordinal);
+        int endIdx = ansi.IndexOf (end, startIdx + start.Length, StringComparison.Ordinal);
+
+        Assert.True (startIdx >= 0, "OSC 8 start not found");
+        Assert.True (endIdx > startIdx, "OSC 8 end not found after start");
+
+        // "Link" text should be between start and end
+        int textIdx = ansi.IndexOf ("Link", startIdx, StringComparison.Ordinal);
+        Assert.True (textIdx > startIdx && textIdx < endIdx, "Link text should be between OSC 8 sequences");
+    }
+
+    // Copilot
+    [Fact]
+    public void ToAnsi_UrlAtEndOfRow_ClosedBeforeNewline ()
+    {
+        // Arrange: 2-row buffer, URL at end of row 0, plain text on row 1
+        AnsiOutput output = new ();
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (4, 2);
+
+        // Row 0: "Link" with URL
+        buffer.CurrentUrl = "https://example.com";
+        buffer.AddStr ("Link");
+        buffer.CurrentUrl = null;
+
+        // Row 1: "Text" without URL
+        buffer.Move (0, 1);
+        buffer.AddStr ("Text");
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert: OSC 8 end appears before the newline that precedes row 1 text
+        string end = EscSeqUtils.OSC_EndHyperlink ();
+        int endIdx = ansi.IndexOf (end, StringComparison.Ordinal);
+        int textIdx = ansi.IndexOf ("Text", StringComparison.Ordinal);
+
+        Assert.True (endIdx >= 0, "OSC 8 end not found");
+        Assert.True (textIdx > endIdx, "Row 1 text should appear after OSC 8 end (hyperlink closed at row boundary)");
+
+        // Verify no OSC 8 start appears on row 1
+        string start = EscSeqUtils.OSC_StartHyperlink ("https://example.com");
+        int secondStart = ansi.IndexOf (start, endIdx + end.Length, StringComparison.Ordinal);
+        Assert.True (secondStart < 0, "No OSC 8 start should appear on row 1");
+    }
+
+    // Copilot
+    [Fact]
+    public void ToAnsi_LegacyConsole_NoOsc8 ()
+    {
+        // Arrange
+        AnsiOutput output = new () { IsLegacyConsole = true };
+        IOutputBuffer buffer = output.GetLastBuffer ()!;
+        buffer.SetSize (5, 1);
+
+        buffer.CurrentUrl = "https://example.com";
+        buffer.AddStr ("Hello");
+        buffer.CurrentUrl = null;
+
+        // Act
+        string ansi = output.ToAnsi (buffer);
+
+        // Assert: legacy console should NOT contain OSC 8 sequences
+        Assert.DoesNotContain (EscSeqUtils.OSC_StartHyperlink ("https://example.com"), ansi);
+        Assert.DoesNotContain (EscSeqUtils.OSC_EndHyperlink (), ansi);
+        Assert.Contains ("Hello", ansi);
+    }
+
     [Theory]
     [InlineData (true)]
     [InlineData (false)]
