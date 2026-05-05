@@ -73,7 +73,7 @@ public partial class Markdown
                 // Reserve placeholder lines so content height is correct
                 for (var i = 0; i < tableHeight; i++)
                 {
-                    _renderedLines.Add (new RenderedLine ([new StyledSegment ("", MarkdownStyleRole.Table)], false, 0, isTable: true));
+                    _renderedLines.Add (new RenderedLine ([new StyledSegment ("", MarkdownStyleRole.Table)], false, 0, isTable: true, tableData: tableData));
                 }
 
                 continue;
@@ -188,7 +188,7 @@ public partial class Markdown
 
         int width = CalculateWidth (segments);
 
-        return new RenderedLine (segments, false, width, block.IsCodeBlock, block.IsThematicBreak);
+        return new RenderedLine (segments, false, width, block.IsCodeBlock, block.IsThematicBreak, codeLanguage: block.Language);
     }
 
     private static List<RenderedLine> WrapBlock (IntermediateBlock block, int viewportWidth)
