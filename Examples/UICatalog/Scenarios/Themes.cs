@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using System.Collections.ObjectModel;
+// ReSharper disable AccessToDisposedClosure
 
 namespace UICatalog.Scenarios;
 

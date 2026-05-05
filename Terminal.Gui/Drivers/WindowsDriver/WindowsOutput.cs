@@ -630,6 +630,9 @@ internal partial class WindowsOutput : OutputBase, IOutput
             {
                 //Disable alternative screen buffer.
                 Console.Out.Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
+
+                //Set cursor key to cursor.
+                Write (EscSeqUtils.CSI_ShowCursor);
             }
             else
             {

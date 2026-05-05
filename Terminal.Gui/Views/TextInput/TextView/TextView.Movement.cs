@@ -108,7 +108,7 @@ public partial class TextView
 
             CurrentRow++;
 
-            if (CurrentRow >= Viewport.Y + Viewport.Height)
+            if (CurrentRow >= Viewport.Y + Viewport.Height || CurrentRow < Viewport.Y)
             {
                 SetNeedsDraw ();
             }
@@ -145,8 +145,9 @@ public partial class TextView
         List<Cell> currentLine = GetCurrentLine ();
         CurrentColumn = currentLine.Count;
 
-        if (CurrentColumn >= Viewport.X + Viewport.Width || TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _) - Viewport.X >= Viewport.Width)
-{
+        if (CurrentColumn >= Viewport.X + Viewport.Width
+            || TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _) - Viewport.X >= Viewport.Width)
+        {
             SetNeedsDraw ();
         }
         DoNeededAction ();
@@ -160,7 +161,10 @@ public partial class TextView
         {
             CurrentColumn--;
 
-            if (Viewport.X > 0 && CurrentColumn <= Viewport.X)
+            List<Cell> currentLine = GetCurrentLine ();
+            int cursorColumn = TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _);
+
+            if ((Viewport.X > 0 && cursorColumn <= Viewport.X) || cursorColumn - Viewport.X >= Viewport.Width)
             {
                 SetNeedsDraw ();
             }
@@ -296,7 +300,9 @@ public partial class TextView
         {
             CurrentColumn++;
 
-            if (CurrentColumn >= currentLine.Count || TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _) >= Viewport.Width)
+            int cursorColumn = TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _);
+
+            if (cursorColumn >= currentLine.Count || (Viewport.X > 0 && cursorColumn < Viewport.X) || cursorColumn >= Viewport.X + Viewport.Width)
             {
                 SetNeedsDraw ();
             }
@@ -346,16 +352,19 @@ public partial class TextView
 
     private bool MoveUp ()
     {
-        if (CurrentRow > 0)
+        if (CurrentRow > 0 || (CurrentRow == 0 && CurrentRow < Viewport.Y))
         {
             if (_columnTrack == -1)
             {
                 _columnTrack = CurrentColumn;
             }
 
-            CurrentRow--;
+            if (CurrentRow > 0)
+            {
+                CurrentRow--;
+            }
 
-            if (CurrentRow < Viewport.Y)
+            if (CurrentRow < Viewport.Y || CurrentRow >= Viewport.Y + Viewport.Height)
             {
                 SetNeedsDraw ();
             }
@@ -393,6 +402,14 @@ public partial class TextView
             CurrentRow = newPos.Value.row;
         }
 
+        List<Cell> currentLine = GetCurrentLine ();
+        int cursorColumn = TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _);
+
+        if (CurrentRow < Viewport.Y || cursorColumn < Viewport.X || cursorColumn >= Viewport.X + Viewport.Width)
+        {
+            SetNeedsDraw ();
+        }
+
         DoNeededAction ();
 
         return true;
@@ -406,6 +423,14 @@ public partial class TextView
         {
             CurrentColumn = newPos.Value.col;
             CurrentRow = newPos.Value.row;
+        }
+
+        List<Cell> currentLine = GetCurrentLine ();
+        int cursorColumn = TextModel.CursorColumn (TextModel.CellsToStringList (currentLine), CurrentColumn, TabWidth, out _, out _);
+
+        if (CurrentRow >= Viewport.Y + Viewport.Height || cursorColumn >= Viewport.X + Viewport.Width || cursorColumn < Viewport.X)
+        {
+            SetNeedsDraw ();
         }
 
         DoNeededAction ();

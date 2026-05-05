@@ -2,7 +2,9 @@ name: Publish Terminal.Gui to Nuget
 
 on:
   push:
-    branches: [ main, develop ]
+    # Main releases are triggered only by pushing a v* tag (e.g., v2.0.0).
+    # Develop pushes publish pre-release packages (e.g., 2.1.0-develop.1).
+    branches: [ develop ]
     tags:
       - v*
     paths-ignore:
@@ -19,6 +21,9 @@ jobs:
       with:
         fetch-depth: 0 # fetch-depth is needed for GitVersion https://github.com/GitTools/actions/blob/main/docs/cloning.md
 
+    # GitVersion.MsBuild (in Terminal.Gui.csproj) automatically computes the version
+    # from git history + GitVersion.yml during build. We still run the CLI here to
+    # capture the SemVer for use in subsequent steps (push, template dispatch).
     - name: Install GitVersion
       uses: gittools/actions/gitversion/setup@v4.5.0
       with:
@@ -28,7 +33,6 @@ jobs:
       uses: gittools/actions/gitversion/execute@v4.5.0
       with:
         useConfigFile: true
-        updateAssemblyInfo: true
       id: gitversion # step id used as reference for output values
 
     - name: Setup dotnet
@@ -41,7 +45,7 @@ jobs:
       run: dotnet build Terminal.Gui/Terminal.Gui.csproj --no-incremental --nologo --force --configuration Release
 
     - name: Pack Release Terminal.Gui ${{ steps.gitversion.outputs.SemVer }} for Nuget
-      run: dotnet pack Terminal.Gui/Terminal.Gui.csproj -c Release --include-symbols -p:Version='${{ steps.gitversion.outputs.SemVer }}' 
+      run: dotnet pack Terminal.Gui/Terminal.Gui.csproj -c Release --include-symbols --no-build
 
     # - name: Test to generate Code Coverage Report
     #   run: |
@@ -69,7 +73,7 @@ jobs:
       run: dotnet nuget push Terminal.Gui/bin/Release/Terminal.Gui.${{ steps.gitversion.outputs.SemVer }}.nupkg --skip-duplicate --api-key ${{ secrets.NUGET_API_KEY }}
     
     # - name: Delist old NuGet packages
-    #   if: github.ref == 'refs/heads/main'
+    #   if: startsWith(github.ref, 'refs/tags/v')
     #   shell: pwsh
     #   run: |
     #     $version = "${{ steps.gitversion.outputs.SemVer }}"
@@ -77,13 +81,13 @@ jobs:
     #     ./Scripts/delist-nuget.ps1 -ApiKey "${{ secrets.NUGET_API_KEY }}" -JustPublishedVersion "$version"
     
     - name: Prepare payload for template dispatch
-      if: github.ref == 'refs/heads/main'
+      if: startsWith(github.ref, 'refs/tags/v')
       id: payload
       run: |
         echo "json={\"version\":\"${{ steps.gitversion.outputs.SemVer }}\"}" >> $GITHUB_OUTPUT
     
     - name: Trigger Terminal.Gui.templates update
-      if: github.ref == 'refs/heads/main'
+      if: startsWith(github.ref, 'refs/tags/v')
       uses: peter-evans/repository-dispatch@v4
       with:
         token: ${{ secrets.TEMPLATE_REPO_TOKEN }}

@@ -73,8 +73,19 @@ public partial class TextView
             return;
         }
 
-        HorizontalScrollBar.Visible = ScrollBars && !WordWrap && Viewport.Width < GetContentSize ().Width;
-        VerticalScrollBar.Visible = ScrollBars && Viewport.Height < GetContentSize ().Height;
+        // Only directly manage Visible when VisibilityMode is Manual.
+        // When Auto/Always/None, ScrollBar.ShowHide() is the sole authority;
+        // setting Visible here would fight with it and cause Padding.Thickness
+        // to drift (issue #4890).
+        if (HorizontalScrollBar.VisibilityMode == ScrollBarVisibilityMode.Manual)
+        {
+            HorizontalScrollBar.Visible = ScrollBars && !WordWrap && Viewport.Width < GetContentSize ().Width;
+        }
+
+        if (VerticalScrollBar.VisibilityMode == ScrollBarVisibilityMode.Manual)
+        {
+            VerticalScrollBar.Visible = ScrollBars && Viewport.Height < GetContentSize ().Height;
+        }
     }
 
     private void AdjustViewport ()
@@ -104,9 +115,14 @@ public partial class TextView
             }
             need = true;
         }
-        else if (!_wordWrap && (CurrentColumn - Viewport.X + 1 > Viewport.Width || dSize.size + 1 >= Viewport.Width))
+        else if (!_wordWrap && (CurrentColumn - Viewport.X + 1 > Viewport.Width || dSize.size - Viewport.X + 1 >= Viewport.Width))
         {
             Viewport = Viewport with { X = TextModel.CalculateLeftColumn (line, Viewport.X, CurrentColumn, Viewport.Width, TabWidth) };
+            need = true;
+        }
+        else if (tSize.size - Viewport.X + 1 <= Viewport.Width)
+        {
+            Viewport = Viewport with { X = Math.Max (0, tSize.size - Viewport.Width + 1) };
             need = true;
         }
         else if ((_wordWrap && Viewport.X > 0) || (dSize.size < Viewport.Width && tSize.size < Viewport.Width))
@@ -127,11 +143,6 @@ public partial class TextView
         else if (CurrentRow - Viewport.Y >= Viewport.Height)
         {
             Viewport = Viewport with { Y = Math.Min (Math.Max (CurrentRow - Viewport.Height + 1, 0), CurrentRow) };
-            need = true;
-        }
-        else if (!WordWrap && Viewport.Y > 0 && CurrentRow - Viewport.Height + 1 < Viewport.Y)
-        {
-            Viewport = Viewport with { Y = Math.Max (Viewport.Y - 1, 0) };
             need = true;
         }
 

@@ -1,12 +1,11 @@
 # Terminal.Gui Deep Dives 
 
+![Terminal.Gui — cross-platform TUI toolkit for .NET. Build full-featured terminal UIs with menus, forms, tables, charts, wizards and file dialogs. 30+ views, Windows / macOS / Linux, MIT-licensed.](../images/hero.gif)
+
 > [!IMPORTANT]
-> Terminal.Gui v2 "Beta" has been released.
+> Terminal.Gui v2 has been released
 
 Welcome to the Terminal.Gui documentation! This comprehensive guide covers everything you need to know about building modern terminal user interfaces with Terminal.Gui.
-
-> [!NOTE]
-> This is the v2 API documentation. For v1 go here: https://gui-cs.github.io/Terminal.GuiV1Docs/
 
 ## Getting Started
 

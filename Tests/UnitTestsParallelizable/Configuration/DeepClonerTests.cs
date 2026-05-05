@@ -208,6 +208,25 @@ public class DeepClonerTests
         Assert.Equal (source, result);
     }
 
+    [Fact]
+    public void Dictionary_Of_Schemes_Preserves_Styled_Normal_Attribute ()
+    {
+        // Copilot
+        Dictionary<string, Scheme?> source = new ()
+        {
+            ["Base"] = new Scheme
+            {
+                Normal = new Attribute (Color.White, Color.Black, TextStyle.Bold)
+            }
+        };
+
+        Dictionary<string, Scheme?>? result = DeepCloner.DeepClone (source);
+
+        Assert.NotNull (result);
+        Assert.Equal (TextStyle.Bold, result ["Base"]!.Normal.Style);
+        Assert.Equal (source, result);
+    }
+
     // Simple Reference Types
 
     [Fact]

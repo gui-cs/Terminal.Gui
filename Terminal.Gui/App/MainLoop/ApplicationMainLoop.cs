@@ -21,9 +21,6 @@ namespace Terminal.Gui.App;
 /// <typeparam name="TInputRecord">Type of raw input events, e.g. <see cref="ConsoleKeyInfo"/> for .NET driver</typeparam>
 public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputRecord> where TInputRecord : struct
 {
-    private bool _firstRenderCompleted;
-    private bool _startupWaitLogged;
-
     /// <inheritdoc/>
     public IApplication? App { get; private set; }
 
@@ -110,6 +107,9 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         }
     }
 
+    private bool _startupWaitLogged;
+    private bool _firstLayoutAndDrawComplete;
+
     internal void IterationImpl ()
     {
         // Pull any input events from the input queue and process them
@@ -125,7 +125,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         IDriver? driver = App?.Driver;
 
         // First-render deferral: wait for the ANSI startup gate unless bypassed.
-        if (!_firstRenderCompleted
+        if (!_firstLayoutAndDrawComplete
             && driver?.AnsiStartupGate is { IsReady: false } startupGate)
         {
             // ForceInlinePosition bypasses the gate for inline mode testing.
@@ -157,7 +157,7 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         }
 
         // Startup gate just became ready — set up inline state if needed.
-        if (!_firstRenderCompleted)
+        if (!_firstLayoutAndDrawComplete)
         {
             if (_startupWaitLogged)
             {
@@ -178,8 +178,9 @@ public class ApplicationMainLoop<TInputRecord> : IApplicationMainLoop<TInputReco
         Trace.Draw (nameof (ApplicationMainLoop<TInputRecord>), "IterationDraw", $"Screen={App?.Screen}");
 
         // Layout and draw any views that need it
+        // This will raise IApplication.LayoutAndDrawComplete
         App?.LayoutAndDraw (false);
-        _firstRenderCompleted = true;
+        _firstLayoutAndDrawComplete = true;
 
         // Update the cursor
         App?.Navigation?.UpdateCursor ();

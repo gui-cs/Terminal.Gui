@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Terminal.Gui.App;
 
 public static partial class Application // Legacy Lifecycle 
@@ -21,8 +19,6 @@ public static partial class Application // Legacy Lifecycle
     public static IApplication Instance => ApplicationImpl.Instance;
 
     /// <inheritdoc cref="IApplication.Init"/>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     [Obsolete ("The legacy static Application object is going away.")]
     public static void Init (string? driverName = null) =>
 

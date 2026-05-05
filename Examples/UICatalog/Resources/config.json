@@ -1,18 +1,12 @@
 {
   "$schema": "https://gui-cs.github.io/Terminal.Gui/schemas/tui-config-schema.json",
-  "FileDialog.MaxSearchResults": 10000,
-  "FileDialogStyle.DefaultUseColors": false,
-  "FileDialogStyle.DefaultUseUnicodeCharacters": false,
-  "AppSettings": {
-    "UICatalog.StatusBar": true
-  },
   "Themes": [
     {
       "Hot Dog Stand": {
         "Glyphs.WideGlyphReplacement": "①",
         "Schemes": [
           {
-            "Runnable": {
+            "Accent": {
               "Normal": {
                 "Foreground": "Black",
                 "Background": "#FFFF00"
@@ -175,7 +169,7 @@
             }
           },
           {
-            "Runnable": {
+            "Accent": {
               "Normal": {
                 "Foreground": "DarkGray",
                 "Background": "White"

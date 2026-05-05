@@ -18,7 +18,7 @@
 # - develop: Develop branch for V2
 #
 # Package Naming:
-# - from develop: 2.1.0-develop.1 (minor version increments)
+# - from develop: 2.0.0-develop.1 (patch version increments)
 # - from main (pre-release): 2.0.0-prealpha.1 or 2.0.0-beta.1
 # - from main (release): 2.0.0 (patch version increments)
 #
@@ -33,8 +33,8 @@ branches:
   main:
     # Matches the main branch
     regex: ^main$
-    # Uses 'alpha' as pre-release label before `beta`
-    label: beta
+    # Uses an empty label for stable releases
+    label: ''
     # Increments patch version (x.y.z+1) on commits
     increment: Patch
     # Specifies develop as the source branch
@@ -46,8 +46,8 @@ branches:
     regex: develop
     # Adds 'develop' as pre-release label (e.g., 2.1.0-develop.1)
     label: develop
-    # Increments minor version (x.y+1.z) on commits
-    increment: Minor
+    # Increments patch version (x.y.z+1) on commits
+    increment: Patch
     # No source branches specified as this is the root of development
     source-branches: []
     # Indicates this branch feeds into release branches
@@ -70,19 +70,27 @@ branches:
   #   source-branches: ['v1_develop']
 
   # Pull Request Branches
-  # Configures versioning for PRs (e.g., 2.0.0-pr.feature-123.1)
+  # Configures versioning for PRs (e.g., 2.0.0-PullRequest5009.1)
   pull-request:
-    # Matches typical PR branch names
-    regex: ^(pull|pull\-requests|pr)[/-]
-    # Uses 'pr' prefix with branch name in the label (e.g., pr.feature-123)
-    label: pr.{BranchName}
-    # Inherits increment strategy from source branch
+    regex: "^(pull|pull\\-requests|pr)[\\/-](?<Number>\\d+)"
+    label: "PullRequest{Number}"
     increment: Inherit
     source-branches:
       - develop
       - main
-    # High weight ensures PR versions sort after regular pre-releases
+      - feature
     pre-release-weight: 30000
+
+  # Feature / Fix / Topic Branches
+  # Matches branches like feature/*, fix/*, issue/*, etc.
+  # Inherits version from develop and uses the branch name as pre-release label.
+  # e.g., if develop is at 2.2.0, fix/foobar produces 2.2.0-fix-foobar.1
+  feature:
+    regex: "^(feature|fix|issue|dependabot|copilot)[\\/-](?<BranchName>.+)"
+    label: "{BranchName}"
+    increment: Inherit
+    source-branches:
+      - develop
 
 # Ignore specific commits if needed (currently empty)
 ignore:

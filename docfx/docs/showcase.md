@@ -35,6 +35,8 @@
 - **[TermKeyVault](https://github.com/MaciekWin3/TermKeyVault)** - Terminal based password manager built with F# and Terminal.Gui.
   ![TermKeyVault](https://github.com/user-attachments/assets/c40e17ed-2614-4ad4-8547-e93c1b1d8937)
 
+- **[mdv](https://github.com/gui-cs/mdv)** - A Terminal.Gui-based Markdown viewer for the terminal. Supports full-screen interactive mode and print-to-terminal mode.
+
 ## Examples
 
 - **[See all Examples here](https://github.com/gui-cs/Terminal.Gui/tree/master/Examples)**

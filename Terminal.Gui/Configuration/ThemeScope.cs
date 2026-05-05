@@ -15,7 +15,7 @@ namespace Terminal.Gui.Configuration;
 /// 	"Default": {
 /// 		"Schemes": [
 /// 		{
-/// 		"Runnable": {
+/// 		"Accent": {
 /// 		"Normal": {
 /// 			"Foreground": "BrightGreen",
 /// 			"Background": "Black"
@@ -42,10 +42,8 @@ namespace Terminal.Gui.Configuration;
 /// 	}
 /// </code>
 /// </example>
-#pragma warning disable IL2026 // ScopeJsonConverter and Scope<T> are AOT-compatible for known scope types
 [JsonConverter (typeof (ScopeJsonConverter<ThemeScope>))]
 public class ThemeScope : Scope<ThemeScope>
-#pragma warning restore IL2026
 {
 }
 

@@ -55,7 +55,7 @@ public class FileSystemCollectionNavigationMatcherTests
             Width = 20,
             Height = 10
         };
-        tv.TreeBuilder = new DelegateTreeBuilder<IFileSystemInfo> (_ => null!);
+        tv.TreeBuilder = new DelegateTreeBuilder<IFileSystemInfo> (_ => null!, o => false);
         tv.AspectGetter = fsi => $"[ICON] {fsi.Name}";
         tv.KeystrokeNavigator.Matcher = new FileSystemCollectionNavigationMatcher ();
 

@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Terminal.Gui.App;
 
 public static partial class Application // Run (Begin -> Run -> Layout/Draw -> End -> Stop)
@@ -9,8 +7,6 @@ public static partial class Application // Run (Begin -> Run -> Layout/Draw -> E
     public static SessionToken Begin (IRunnable runnable) => ApplicationImpl.Instance.Begin (runnable)!;
 
     /// <inheritdoc cref="IApplication.Run{TRunnable}(Func{Exception, bool}, string)"/>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     [Obsolete ("The legacy static Application object is going away.")]
     public static IApplication Run<TRunnable> (Func<Exception, bool>? errorHandler = null, string? driverName = null) where TRunnable : IRunnable, new () =>
         ApplicationImpl.Instance.Run<TRunnable> (errorHandler, driverName);

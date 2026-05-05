@@ -1,5 +1,5 @@
-﻿using System.Collections;
 using System.Collections.Concurrent;
+using System.Text;
 using Moq;
 
 namespace TextTests;
@@ -15,10 +15,6 @@ public class CollectionNavigatorTests
         "candle" // 4
     };
 
-    private readonly ITestOutputHelper _output;
-
-    public CollectionNavigatorTests (ITestOutputHelper output) { _output = output; }
-
     [Fact]
     public void AtSymbol ()
     {
@@ -28,6 +24,24 @@ public class CollectionNavigatorTests
         Assert.Equal (3, n.GetNextMatchingItem (0, '@'));
         Assert.Equal (3, n.GetNextMatchingItem (3, 'b'));
         Assert.Equal (4, n.GetNextMatchingItem (3, 'b'));
+    }
+
+    [Fact]
+    public void CustomMatcher_NeverMatches ()
+    {
+        var strings = new [] { "apricot", "arm", "bat", "batman", "bates hotel", "candle" };
+        int? current = 0;
+        var n = new CollectionNavigator (strings);
+
+        Mock<ICollectionNavigatorMatcher> matchNone = new ();
+
+        matchNone.Setup (m => m.IsMatch (It.IsAny<string> (), It.IsAny<object> ())).Returns (false);
+
+        n.Matcher = matchNone.Object;
+
+        Assert.Equal (0, current = n.GetNextMatchingItem (current, 'b')); // no matches
+        Assert.Equal (0, current = n.GetNextMatchingItem (current, 'a')); // no matches
+        Assert.Equal (0, current = n.GetNextMatchingItem (current, 't')); // no matches
     }
 
     [Fact]
@@ -42,7 +56,7 @@ public class CollectionNavigatorTests
         Assert.Equal (2, n.GetNextMatchingItem (4, 'b'));
 
         // cycling with 'a'
-        n = new (simpleStrings);
+        n = new CollectionNavigator (simpleStrings);
         Assert.Equal (0, n.GetNextMatchingItem (null, 'a'));
         Assert.Equal (1, n.GetNextMatchingItem (0, 'a'));
 
@@ -65,7 +79,7 @@ public class CollectionNavigatorTests
         Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, '$'));
         Assert.Equal ("$$", n.SearchString);
 
-        // Delay 
+        // Delay
         Thread.Sleep (n.TypingDelay + 10);
         Assert.Equal (strings.IndexOf ("apricot"), current = n.GetNextMatchingItem (current, 'a'));
         Assert.Equal ("a", n.SearchString);
@@ -134,10 +148,54 @@ public class CollectionNavigatorTests
         Assert.Equal (compatible, m.IsCompatibleKey (keyCode));
     }
 
+    // Copilot - Opus 4.6
+
+    /// <summary>
+    ///     Verifies that when AssociatedText is set (e.g. Kitty keyboard protocol),
+    ///     Alt/Ctrl keys are still rejected even though AsRune returns a valid rune.
+    /// </summary>
+    [Theory]
+    [InlineData (KeyCode.A | KeyCode.AltMask, "a", false)]
+    [InlineData (KeyCode.Z | KeyCode.AltMask, "z", false)]
+    [InlineData (KeyCode.A | KeyCode.CtrlMask, "a", false)]
+    [InlineData (KeyCode.Z | KeyCode.CtrlMask, "z", false)]
+    [InlineData (KeyCode.A | KeyCode.CtrlMask | KeyCode.AltMask, "a", false)]
+    [InlineData (KeyCode.A, "a", true)]
+    [InlineData (KeyCode.A | KeyCode.ShiftMask, "A", true)]
+    [InlineData (KeyCode.Space, " ", true)]
+    public void IsCompatibleKey_WithAssociatedText_RejectsAltAndCtrl (KeyCode keyCode, string associatedText, bool expected)
+    {
+        DefaultCollectionNavigatorMatcher matcher = new ();
+        Key key = new (keyCode) { AssociatedText = associatedText };
+
+        // Confirm the rune is valid (non-default, non-control) — this is the scenario
+        // where the old code (checking only the rune) would have incorrectly returned true.
+        Rune rune = key.AsRune;
+
+        if (!expected)
+        {
+            Assert.NotEqual (default (Rune), rune);
+            Assert.False (Rune.IsControl (rune));
+        }
+
+        Assert.Equal (expected, matcher.IsCompatibleKey (key));
+    }
+
     [Fact]
     public void MinimizeMovement_False_ShouldMoveIfMultipleMatches ()
     {
-        var strings = new [] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "apricot", "c", "car", "cart" };
+        var strings = new []
+        {
+            "$$",
+            "$100.00",
+            "$101.00",
+            "$101.10",
+            "$200.00",
+            "apricot",
+            "c",
+            "car",
+            "cart"
+        };
         int? current = 0;
         var n = new CollectionNavigator (strings);
         Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$"));
@@ -173,7 +231,18 @@ public class CollectionNavigatorTests
     [Fact]
     public void MinimizeMovement_True_ShouldStayOnCurrentIfMultipleMatches ()
     {
-        var strings = new [] { "$$", "$100.00", "$101.00", "$101.10", "$200.00", "apricot", "c", "car", "cart" };
+        var strings = new []
+        {
+            "$$",
+            "$100.00",
+            "$101.00",
+            "$101.10",
+            "$200.00",
+            "apricot",
+            "c",
+            "car",
+            "cart"
+        };
         int? current = 0;
         var n = new CollectionNavigator (strings);
         Assert.Equal (strings.IndexOf ("$$"), current = n.GetNextMatchingItem (current, "$$", true));
@@ -326,39 +395,11 @@ public class CollectionNavigatorTests
         Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 'a')); // match bat
         Assert.Equal (strings.IndexOf ("bat"), current = n.GetNextMatchingItem (current, 't')); // match bat
 
-        Assert.Equal (
-                      strings.IndexOf ("bates hotel"),
-                      current = n.GetNextMatchingItem (current, 'e')
-                     ); // match bates hotel
+        Assert.Equal (strings.IndexOf ("bates hotel"), current = n.GetNextMatchingItem (current, 'e')); // match bates hotel
 
-        Assert.Equal (
-                      strings.IndexOf ("bates hotel"),
-                      current = n.GetNextMatchingItem (current, 's')
-                     ); // match bates hotel
+        Assert.Equal (strings.IndexOf ("bates hotel"), current = n.GetNextMatchingItem (current, 's')); // match bates hotel
 
-        Assert.Equal (
-                      strings.IndexOf ("bates hotel"),
-                      current = n.GetNextMatchingItem (current, ' ')
-                     ); // match bates hotel
-    }
-
-    [Fact]
-    public void CustomMatcher_NeverMatches ()
-    {
-        var strings = new [] { "apricot", "arm", "bat", "batman", "bates hotel", "candle" };
-        int? current = 0;
-        var n = new CollectionNavigator (strings);
-
-        Mock<ICollectionNavigatorMatcher> matchNone = new ();
-
-        matchNone.Setup (m => m.IsMatch (It.IsAny<string> (), It.IsAny<object> ()))
-                 .Returns (false);
-
-        n.Matcher = matchNone.Object;
-
-        Assert.Equal (0, current = n.GetNextMatchingItem (current, 'b')); // no matches
-        Assert.Equal (0, current = n.GetNextMatchingItem (current, 'a')); // no matches
-        Assert.Equal (0, current = n.GetNextMatchingItem (current, 't')); // no matches
+        Assert.Equal (strings.IndexOf ("bates hotel"), current = n.GetNextMatchingItem (current, ' ')); // match bates hotel
     }
 
     #region Thread Safety Tests
@@ -371,21 +412,20 @@ public class CollectionNavigatorTests
         var numTasks = 20;
         ConcurrentBag<Exception> exceptions = new ();
 
-        Parallel.For (
-                      0,
+        Parallel.For (0,
                       numTasks,
                       i =>
                       {
                           try
                           {
                               // Read SearchString concurrently
-                              string searchString = navigator.SearchString;
+                              _ = navigator.SearchString;
 
                               // Perform navigation operations concurrently
-                              int? result = navigator.GetNextMatchingItem (0, 'a');
+                              _ = navigator.GetNextMatchingItem (0, 'a');
 
                               // Read SearchString again
-                              searchString = navigator.SearchString;
+                              _ = navigator.SearchString;
                           }
                           catch (Exception ex)
                           {
@@ -404,18 +444,17 @@ public class CollectionNavigatorTests
         var numTasks = 20;
         ConcurrentBag<Exception> exceptions = new ();
 
-        Parallel.For (
-                      0,
+        Parallel.For (0,
                       numTasks,
                       i =>
                       {
                           try
                           {
                               // Access Collection property concurrently
-                              IList collection = navigator.Collection;
+                              _ = navigator.Collection;
 
                               // Perform navigation
-                              int? result = navigator.GetNextMatchingItem (0, (char)('a' + i % 3));
+                              _ = navigator.GetNextMatchingItem (0, (char)('a' + i % 3));
                           }
                           catch (Exception ex)
                           {
@@ -435,8 +474,7 @@ public class CollectionNavigatorTests
         ConcurrentBag<int?> results = new ();
         ConcurrentBag<Exception> exceptions = new ();
 
-        Parallel.For (
-                      0,
+        Parallel.For (0,
                       numTasks,
                       i =>
                       {
@@ -475,8 +513,8 @@ public class CollectionNavigatorTests
                                      {
                                          for (var j = 0; j < 100; j++)
                                          {
-                                             int? result = navigator.GetNextMatchingItem (0, 'a');
-                                             string searchString = navigator.SearchString;
+                                             _ = navigator.GetNextMatchingItem (0, 'a');
+                                             _ = navigator.SearchString;
                                          }
                                      }
                                      catch (Exception ex)
@@ -523,16 +561,27 @@ public class CollectionNavigatorTests
     [Fact]
     public void ThreadSafety_ConcurrentSearchStringChanges ()
     {
-        var strings = new [] { "apricot", "arm", "bat", "batman", "candle", "cat", "dog", "elephant", "fox", "goat" };
+        var strings = new []
+        {
+            "apricot",
+            "arm",
+            "bat",
+            "batman",
+            "candle",
+            "cat",
+            "dog",
+            "elephant",
+            "fox",
+            "goat"
+        };
         var navigator = new CollectionNavigator (strings);
         var numTasks = 30;
         ConcurrentBag<Exception> exceptions = new ();
         ConcurrentBag<string> searchStrings = new ();
 
-        Parallel.For (
-                      0,
+        Parallel.For (0,
                       numTasks,
-                      i =>
+                      _ =>
                       {
                           try
                           {
@@ -570,8 +619,7 @@ public class CollectionNavigatorTests
         var operationsPerTask = 1000;
         ConcurrentBag<Exception> exceptions = new ();
 
-        Parallel.For (
-                      0,
+        Parallel.For (0,
                       numTasks,
                       i =>
                       {
@@ -588,7 +636,7 @@ public class CollectionNavigatorTests
 
                                   if (j % 100 == 0)
                                   {
-                                      string searchString = navigator.SearchString;
+                                      _ = navigator.SearchString;
                                   }
                               }
                           }

@@ -27,7 +27,7 @@ public class MenuBars : Scenario
             Id = "eventLog",
             X = Pos.AnchorEnd (),
             Height = Dim.Fill (),
-            SchemeName = "Runnable",
+            SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent),
             BorderStyle = LineStyle.Double,
             Title = "E_vents",
             Arrangement = ViewArrangement.LeftResizable

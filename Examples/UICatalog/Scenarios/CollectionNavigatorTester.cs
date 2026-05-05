@@ -235,7 +235,7 @@ public class CollectionNavigatorTester : Scenario
         };
         _top.Add (label);
 
-        _treeView = new ()
+        _treeView = new TreeView
         {
             X = Pos.Right (_listView) + 1,
             Y = Pos.Bottom (label),
@@ -245,17 +245,17 @@ public class CollectionNavigatorTester : Scenario
         _treeView.Style.HighlightModelTextOnly = true;
         _top.Add (_treeView);
 
-        TreeNode root = new ("IsLetterOrDigit examples");
+        TreeNode root = new () { Text = "IsLetterOrDigit examples" };
 
         root.Children = _items.Where (i => char.IsLetterOrDigit (i [0]))
-                              .Select (i => new TreeNode (i))
+                              .Select (i => new TreeNode () { Text = i })
                               .Cast<ITreeNode> ()
                               .ToList ();
         _treeView.AddObject (root);
-        root = new ("Non-IsLetterOrDigit examples");
+        root = new () { Text = "Non-IsLetterOrDigit examples" };
 
         root.Children = _items.Where (i => !char.IsLetterOrDigit (i [0]))
-                              .Select (i => new TreeNode (i))
+                              .Select (i => new TreeNode () { Text = i })
                               .Cast<ITreeNode> ()
                               .ToList ();
         _treeView.AddObject (root);

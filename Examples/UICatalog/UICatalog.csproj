@@ -2,13 +2,7 @@
     <PropertyGroup>
 	    <StartupObject>UICatalog.UICatalog</StartupObject>
         <OutputType>Exe</OutputType>
-        <!-- Version numbers are automatically updated by gitversion when a release is released -->
-        <!-- In the source tree the version will always be 2.0 for all projects. -->
-        <!-- Do not modify these. -->
-        <AssemblyVersion>2.0</AssemblyVersion>
-        <FileVersion>2.0</FileVersion>
-        <Version>2.0</Version>
-        <InformationalVersion>2.0</InformationalVersion>
+        <!-- Version numbers are automatically set by GitVersion.MsBuild from git history + GitVersion.yml -->
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
@@ -22,6 +16,7 @@
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="Resources\config.json" />
+        <EmbeddedResource Include="README.md" />
     </ItemGroup>
     <ItemGroup>
         <None Update="Scenarios\AnimationScenario\Spinning_globe_dark_small.gif" CopyToOutputDirectory="PreserveNewest" />

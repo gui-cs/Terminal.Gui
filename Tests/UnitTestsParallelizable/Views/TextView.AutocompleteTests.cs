@@ -352,4 +352,35 @@ public class TextViewAutocompleteTests (ITestOutputHelper output) : TestDriverBa
             }
         }
     }
+
+    [Fact]
+    public void Autocomplete_Popup_Sets_Visible_To_False_When_Clicked_Outside_Of_Popup ()
+    {
+        TextView tv = new () { Width = Dim.Fill (), Height = 10, Text = " some text" };
+        using IApplication testApp = RunTestApplication (50, 15, DoTest, false, output);
+
+        return;
+
+        void DoTest (object? _, EventArgs<IApplication?> args)
+        {
+            IApplication app = args.Value!;
+
+            (app.TopRunnable as View)!.Add (tv);
+
+            SingleWordSuggestionGenerator g = (SingleWordSuggestionGenerator)tv.Autocomplete.SuggestionGenerator;
+            g.AllSuggestions = ["item"];
+
+            tv.SetFocus ();
+
+            app.InjectKey (Key.I);
+            Assert.Equal ("i some text", tv.Text);
+            Assert.True (tv.Autocomplete.Visible);
+
+            // Click outside of popup
+            app.InjectMouse (new Mouse { ScreenPosition = new Point (5, 1), Flags = MouseFlags.LeftButtonClicked });
+
+            Assert.False (tv.Autocomplete.Visible);
+            app.RequestStop ();
+        }
+    }
 }

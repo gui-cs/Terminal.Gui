@@ -4,6 +4,10 @@ namespace Terminal.Gui.ViewBase;
 
 public partial class View
 {
+    // Cached scheme name strings used on the draw path to avoid repeated Enum.GetName allocations.
+    private static readonly string _accentSchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent)!;
+    private static readonly string _baseSchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base)!;
+
     #region Get
 
     /// <summary>Gets the current <see cref="System.Attribute"/> used by <see cref="AddRune(System.Text.Rune)"/>.</summary>
@@ -48,7 +52,20 @@ public partial class View
         }
         else
         {
-            schemeAttribute = GetScheme ().GetAttributeForRole (role, App?.Driver?.DefaultAttribute);
+            Scheme scheme = GetScheme ();
+            Attribute? defaultAttr = App?.Driver?.DefaultAttribute;
+
+            // If this view uses the Accent scheme and its Normal still has Color.None (the sentinel),
+            // derive an opaque Accent scheme from Base at draw time.
+            if (SchemeName == _accentSchemeName
+                && scheme.Normal.Foreground == Color.None
+                && scheme.Normal.Background == Color.None
+                && SchemeManager.TryGetScheme (_baseSchemeName, out Scheme? baseScheme))
+            {
+                scheme = Scheme.DeriveAccent (baseScheme, defaultAttr);
+            }
+
+            schemeAttribute = scheme.GetAttributeForRole (role, defaultAttr);
         }
 
         if (OnGettingAttributeForRole (role, ref schemeAttribute))

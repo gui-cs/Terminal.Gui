@@ -1,8 +1,9 @@
 ﻿namespace Terminal.Gui.Views;
 
 /// <summary>
-///     Raises the <see cref="View.Accepting"/> and <see cref="View.Accepted"/> events when the user presses <see cref="View.HotKey"/>,
-///         <c>Enter</c>, or <c>Space</c> or clicks with the mouse.
+///     Raises the <see cref="View.Accepting"/> and <see cref="View.Accepted"/> events when the user presses
+///     <see cref="View.HotKey"/>,
+///     <c>Enter</c>, or <c>Space</c> or clicks with the mouse.
 /// </summary>
 /// <remarks>
 ///     <para>Use <see cref="View.HotKeySpecifier"/> to change the hot key specifier from the default of ('_').</para>
@@ -84,8 +85,49 @@ public class Button : View, IDesignable, IAcceptTarget
 
         TitleChanged += Button_TitleChanged;
 
-        base.ShadowStyle = DefaultShadow;
+        // Determine and apply the initial shadow via the CWP InitializingShadowStyle event, so that
+        // subclasses and external subscribers can change or suppress the default allocation
+        // before any shadow infrastructure is created.
+        RaiseInitializingShadowStyle ();
         MouseHighlightStates = DefaultMouseHighlightStates;
+    }
+
+    /// <summary>
+    ///     Called before the Button's initial <see cref="View.ShadowStyle"/> is applied during construction.
+    ///     Override to change or suppress the default shadow — set <see cref="ValueChangingEventArgs{T}.NewValue"/>
+    ///     to the desired style, or set <see cref="ValueChangingEventArgs{T}.Handled"/> to
+    ///     <see langword="true"/> to skip applying any shadow.
+    /// </summary>
+    /// <param name="args">
+    ///     Event args whose <see cref="ValueChangingEventArgs{T}.NewValue"/> is pre-set to
+    ///     <see cref="DefaultShadow"/>. Subclasses that never display a shadow
+    ///     (e.g. <see cref="ScrollButton"/> or internal buttons used by arrangement UI)
+    ///     should set <c>args.NewValue = null</c> to avoid the create-then-destroy allocation pattern.
+    /// </param>
+    protected virtual void OnInitializingShadowStyle (ValueChangingEventArgs<ShadowStyles?> args) { }
+
+    /// <summary>
+    ///     Fired before the Button's initial <see cref="View.ShadowStyle"/> is applied during construction.
+    ///     Subscribers can modify <see cref="ValueChangingEventArgs{T}.NewValue"/> or set
+    ///     <see cref="ValueChangingEventArgs{T}.Handled"/> to <see langword="true"/> to suppress the shadow.
+    /// </summary>
+    public event EventHandler<ValueChangingEventArgs<ShadowStyles?>>? InitializingShadowStyle;
+
+    private void RaiseInitializingShadowStyle ()
+    {
+        ValueChangingEventArgs<ShadowStyles?> args = new (null, DefaultShadow);
+
+        // 1. Virtual method — subclasses override to change/suppress the default shadow.
+        OnInitializingShadowStyle (args);
+
+        // 2. Event — external subscribers get a chance to customize.
+        InitializingShadowStyle?.Invoke (this, args);
+
+        // 3. Apply the (potentially modified) shadow style unless already handled.
+        if (!args.Handled)
+        {
+            base.ShadowStyle = args.NewValue;
+        }
     }
 
     /// <inheritdoc/>
@@ -118,11 +160,8 @@ public class Button : View, IDesignable, IAcceptTarget
         }
     }
 
-    /// <inheritdoc />
-    protected override void OnHotKeyCommand (ICommandContext? commandContext)
-    {
-        InvokeCommand (Command.Accept);
-    }
+    /// <inheritdoc/>
+    protected override void OnHotKeyCommand (ICommandContext? commandContext) => InvokeCommand (Command.Accept);
 
     private void Button_TitleChanged (object? sender, EventArgs<string> e)
     {
@@ -136,7 +175,7 @@ public class Button : View, IDesignable, IAcceptTarget
     /// <inheritdoc/>
     public override Rune HotKeySpecifier { get => base.HotKeySpecifier; set => TextFormatter.HotKeySpecifier = base.HotKeySpecifier = value; }
 
-    /// <inheritdoc />
+    /// <inheritdoc/>
     public bool IsDefault
     {
         get;

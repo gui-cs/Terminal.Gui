@@ -56,7 +56,7 @@ public class Margin : AdornmentImpl
     /// </summary>
     public ShadowStyles? ShadowStyle
     {
-        get => field ?? Parent?.SuperView?.ShadowStyle ?? null;
+        get => field;
         set
         {
             if (field == value)
@@ -68,7 +68,11 @@ public class Margin : AdornmentImpl
             if (field is null)
             {
                 // null means no shadow and no thickness
-                (View as MarginView)?.SetShadow (null);
+                if (View is MarginView mv)
+                {
+                    mv.SetShadow (null);
+                    mv.ShadowSize = Size.Empty;
+                }
 
                 return;
             }

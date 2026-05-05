@@ -151,6 +151,11 @@ public interface IDriver : IDisposable
     Attribute? DefaultAttribute { get; }
 
     /// <summary>
+    ///     Raised when <see cref="DefaultAttribute"/> changes (e.g. after terminal color detection completes).
+    /// </summary>
+    event EventHandler<ValueChangedEventArgs<Attribute?>>? DefaultAttributeChanged;
+
+    /// <summary>
     ///     Gets the terminal's color capabilities as detected from environment variables.
     ///     <see langword="null"/> if detection has not been performed.
     /// </summary>

@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using System.Globalization;
 using System.Text;
@@ -23,6 +23,7 @@ public class CharacterMap : Scenario
     private TableView? _categoryList;
     private CharMap? _charMap;
     private OptionSelector? _unicodeCategorySelector;
+    private int _sortedColumn;
 
     public override List<Key> GetDemoKeyStrokes (IApplication? app)
     {
@@ -69,7 +70,10 @@ public class CharacterMap : Scenario
             Menus =
             [
                 new MenuBarItem (Strings.menuFile,
-                                 new MenuItem [] { new (Strings.cmdQuit, $"{Application.GetDefaultKey (Command.Quit)}", () => _charMap?.App?.RequestStop ()) }),
+                                 new MenuItem []
+                                 {
+                                     new (Strings.cmdQuit, $"{Application.GetDefaultKey (Command.Quit)}", () => _charMap?.App?.RequestStop ())
+                                 }),
                 new MenuBarItem ("_Options", [CreateMenuShowWidth (), CreateMenuUnicodeCategorySelector ()])
             ]
         };
@@ -116,6 +120,7 @@ public class CharacterMap : Scenario
         _categoryList.Style.AlwaysShowHeaders = true;
 
         var isDescending = false;
+        _sortedColumn = 0;
 
         _categoryList.Table = CreateCategoryTable (0, isDescending);
 
@@ -135,34 +140,58 @@ public class CharacterMap : Scenario
                                             return;
                                         }
                                         EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table!;
-                                        string prevSelection = table.Data.ElementAt (_categoryList.SelectedRow).Category;
+                                        string prevSelection = table.Data.ElementAt (_categoryList.Value?.SelectedCell.Y ?? 0).Category;
                                         isDescending = !isDescending;
+                                        _sortedColumn = clickedCol.Value;
 
                                         _categoryList.Table = CreateCategoryTable (clickedCol.Value, isDescending);
 
                                         table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table!;
 
-                                        _categoryList.SelectedRow =
-                                            table.Data.Select ((item, index) => new { item, index })
-                                                 .FirstOrDefault (x => x.item.Category == prevSelection)
-                                                 ?.index
-                                            ?? -1;
+                                        _categoryList.SetSelection (0,
+                                                                    table.Data.Select ((item, index) => new { item, index })
+                                                                         .FirstOrDefault (x => x.item.Category == prevSelection)
+                                                                         ?.index
+                                                                    ?? 0,
+                                                                    false);
                                     };
 
         int longestName = UnicodeRange.Ranges.Max (r => r.Category.GetColumns ());
 
-        _categoryList.Style.ColumnStyles.Add (0, new ColumnStyle { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName });
-        _categoryList.Style.ColumnStyles.Add (1, new ColumnStyle { MaxWidth = 1, MinWidth = 6 });
-        _categoryList.Style.ColumnStyles.Add (2, new ColumnStyle { MaxWidth = 1, MinWidth = 6 });
+        // Apply italic styling to the sorted column header
+        HeaderColorGetterDelegate headerColorGetter = args =>
+                                                      {
+                                                          if (args.Column != _sortedColumn)
+                                                          {
+                                                              return null;
+                                                          }
+
+                                                          Scheme baseScheme = args.RowScheme;
+
+                                                          return new Scheme
+                                                          {
+                                                              Normal = new Attribute (baseScheme.Normal.Foreground, baseScheme.Normal.Background, TextStyle.Italic),
+                                                              Focus = new Attribute (baseScheme.Focus.Foreground, baseScheme.Focus.Background, TextStyle.Italic)
+                                                          };
+                                                      };
+
+        _categoryList.Style.ColumnStyles.Add (0, new ColumnStyle { MaxWidth = longestName, MinWidth = longestName, MinAcceptableWidth = longestName, HeaderColorGetter = headerColorGetter });
+        _categoryList.Style.ColumnStyles.Add (1, new ColumnStyle { MaxWidth = 1, MinWidth = 6, HeaderColorGetter = headerColorGetter });
+        _categoryList.Style.ColumnStyles.Add (2, new ColumnStyle { MaxWidth = 1, MinWidth = 6, HeaderColorGetter = headerColorGetter });
 
         _categoryList.Width = _categoryList.Style.ColumnStyles.Sum (c => c.Value.MinWidth) + 4;
 
-        _categoryList.SelectedCellChanged += (_, args) =>
-                                             {
-                                                 EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table!;
-                                                 _charMap.StartCodePoint = table.Data.ToArray () [args.NewRow].Start;
-                                                 jumpEdit.Text = $"U+{_charMap.SelectedCodePoint:x5}";
-                                             };
+        _categoryList.ValueChanged += (_, args) =>
+                                      {
+                                          if (args.NewValue is null)
+                                          {
+                                              return;
+                                          }
+
+                                          EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList.Table!;
+                                          _charMap.StartCodePoint = table.Data.ToArray () [args.NewValue.SelectedCell.Y].Start;
+                                          jumpEdit.Text = $"U+{_charMap.SelectedCodePoint:x5}";
+                                      };
 
         top.Add (menu, _charMap, jumpLabel, jumpEdit, _errorLabel, _categoryList);
 
@@ -239,11 +268,13 @@ public class CharacterMap : Scenario
 
             EnumerableTableSource<UnicodeRange> table = (EnumerableTableSource<UnicodeRange>)_categoryList!.Table!;
 
-            _categoryList.SelectedRow = table.Data.Select ((item, index) => new { item, index })
+            _categoryList.SetSelection (0,
+                                        table.Data.Select ((item, index) => new { item, index })
                                              .FirstOrDefault (x => x.item.Start <= result && x.item.End >= result)
                                              ?.index
-                                        ?? -1;
-            _categoryList.EnsureSelectedCellIsVisible ();
+                                        ?? 0,
+                                        false);
+            _categoryList.EnsureCursorIsVisible ();
 
             // Ensure the typed glyph is selected
             _charMap.SelectedCodePoint = (int)result;

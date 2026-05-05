@@ -199,21 +199,6 @@ internal partial class ApplicationImpl
         Driver.MouseEvent += Driver_MouseEvent;
     }
 
-    internal void UnsubscribeDriverEvents ()
-    {
-        if (Driver is null)
-        {
-            Logging.Error ("Driver is null");
-
-            return;
-        }
-
-        Driver.SizeChanged -= Driver_SizeChanged;
-        Driver.KeyDown -= Driver_KeyDown;
-        Driver.KeyUp -= Driver_KeyUp;
-        Driver.MouseEvent -= Driver_MouseEvent;
-    }
-
     private void Driver_KeyDown (object? sender, Key e) => Keyboard.RaiseKeyDownEvent (e);
 
     private void Driver_KeyUp (object? sender, Key e) => Keyboard.RaiseKeyUpEvent (e);

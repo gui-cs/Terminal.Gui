@@ -1,7 +1,6 @@
-#nullable disable
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
-/// <summary>Event args for the <see cref="TreeView{T}.ObjectActivated"/> event</summary>
+/// <summary>Event args for object activation in <see cref="TreeView{T}"/></summary>
 /// <typeparam name="T"></typeparam>
 public class ObjectActivatedEventArgs<T> where T : class
 {
@@ -14,11 +13,9 @@ public class ObjectActivatedEventArgs<T> where T : class
         ActivatedObject = activated;
     }
 
-    /// <summary>The object that was selected at the time of activation</summary>
-    /// <value></value>
+    /// <summary>The object that was selected at the time of activation.</summary>
     public T ActivatedObject { get; }
 
-    /// <summary>The tree in which the activation occurred</summary>
-    /// <value></value>
+    /// <summary>The tree in which the activation occurred.</summary>
     public TreeView<T> Tree { get; }
 }

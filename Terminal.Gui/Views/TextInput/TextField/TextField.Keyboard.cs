@@ -73,6 +73,15 @@ public partial class TextField
             return false;
         }
 
+        // Never insert modified keys, except for AltGr combinations with associated text of the unmodified key.
+        // This allows users to input characters that require AltGr (e.g. '@' on a Portuguese keyboard which is AltGr+2 with associated text "@"),
+        // while still preventing most modified keys from being inserted into the TextField.
+        if ((a.IsAlt && string.IsNullOrEmpty (a.AsGrapheme)) || a.IsCtrl)
+        {
+            // Never insert modified keys
+            return false;
+        }
+
         // Ignore other control characters.
         if (string.IsNullOrEmpty (a.AsGrapheme) && a is { IsKeyCodeAtoZ: false, KeyCode: < KeyCode.Space or > KeyCode.CharMask })
         {

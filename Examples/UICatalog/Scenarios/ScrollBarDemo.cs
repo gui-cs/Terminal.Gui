@@ -64,8 +64,8 @@ public class ScrollBarDemo : Scenario
                                                if (e.NewValue < 1
                                                    || e.NewValue
                                                    > (scrollBar.Orientation == Orientation.Vertical
-                                                          ? scrollBar.SuperView?.GetContentSize ().Width
-                                                          : scrollBar.SuperView?.GetContentSize ().Height))
+                                                          ? scrollBar.SuperView?.GetContentWidth ()
+                                                          : scrollBar.SuperView?.GetContentHeight ()))
                                                {
                                                    e.Handled = true;
 

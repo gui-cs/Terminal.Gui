@@ -1,5 +1,3 @@
-#nullable disable
-﻿
 namespace Terminal.Gui.Views;
 
 /// <summary>Event args for the <see cref="FileDialog.FilesSelected"/> event</summary>
@@ -7,7 +5,7 @@ public class FilesSelectedEventArgs : EventArgs
 {
     /// <summary>Creates a new instance of the <see cref="FilesSelectedEventArgs"/></summary>
     /// <param name="dialog"></param>
-    public FilesSelectedEventArgs (FileDialog dialog) { Dialog = dialog; }
+    public FilesSelectedEventArgs (FileDialog dialog) => Dialog = dialog;
 
     /// <summary>
     ///     Set to true if you want to prevent the selection going ahead (this will leave the <see cref="FileDialog"/>

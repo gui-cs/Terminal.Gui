@@ -1,9 +1,10 @@
-﻿using System.Collections.Frozen;
+using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using static Terminal.Gui.Configuration.ConfigurationManager;
 using File = System.IO.File;
 using SourcesManager = Terminal.Gui.Configuration.SourcesManager;
@@ -14,6 +15,10 @@ namespace UnitTests.NonParallelizable.ConfigurationTests;
 
 public class ConfigurationMangerTests (ITestOutputHelper output)
 {
+    [ConfigurationProperty (Scope = typeof (AppSettingsScope))]
+    [JsonConverter (typeof (YesNoBooleanJsonConverter))]
+    public static bool? CustomConvertedBoolean { get; set; }
+
     [Fact]
     public void ModuleInitializer_Was_Called ()
     {
@@ -47,6 +52,33 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
         // Assert
         Assert.NotEqual (fromCache, fromSettings);
         Disable (true);
+    }
+
+    [Fact]
+    public void HardCoded_Default_Theme_Uses_Fully_Populated_Cache_Values ()
+    {
+        // Copilot
+        Assert.False (IsEnabled);
+
+        try
+        {
+            Enable (ConfigLocations.HardCoded);
+
+            ThemeScope defaultTheme = ThemeManager.Themes! [ThemeManager.DEFAULT_THEME_NAME];
+
+            Assert.Equal (
+                          MouseState.PressedOutside | MouseState.Pressed | MouseState.In,
+                          (MouseState)defaultTheme ["CheckBox.DefaultMouseHighlightStates"].PropertyValue!
+                         );
+            Assert.Equal (
+                          CursorStyle.BlinkingBlock,
+                          (CursorStyle)defaultTheme ["LinearRange.DefaultCursorStyle"].PropertyValue!
+                         );
+        }
+        finally
+        {
+            Disable (true);
+        }
     }
 
     [Fact]
@@ -561,7 +593,7 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
         ""MessageBox.DefaultButtonAlignment"": ""End"",
         ""Schemes"": [
           {
-            ""Runnable"": {
+            ""Accent"": {
               ""Normal"": {
                 ""Foreground"": ""BrightGreen"",
                 ""Background"": ""Black""
@@ -883,6 +915,69 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
         finally
         {
             Disable (true);
+        }
+    }
+
+    [Fact]
+    public void Save_HardCodedDefaults_ToJson_Omits_Invalid_Null_ValueType_Entries_And_RoundTrips ()
+    {
+        Assert.False (IsEnabled);
+
+        try
+        {
+            Enable (ConfigLocations.HardCoded);
+            ResetToHardCodedDefaults ();
+
+            string? json = ConfigurationManager.SourcesManager?.ToJson (Settings);
+
+            Assert.NotNull (json);
+            Assert.DoesNotContain ("\"MessageBox.DefaultBorderStyle\": null", json);
+            Assert.DoesNotContain ("\"Button.DefaultShadow\": null", json);
+
+            SettingsScope? roundTripped = JsonSerializer.Deserialize (json, SerializerContext.SettingsScope);
+
+            Assert.NotNull (roundTripped);
+            Assert.NotNull (roundTripped! ["Themes"].PropertyValue);
+        }
+        finally
+        {
+            Disable (true);
+        }
+    }
+
+    [Fact]
+    public void Load_And_Save_AppSettings_With_Custom_Property_Converter_Works_In_Jit ()
+    {
+        Assert.False (IsEnabled);
+
+        try
+        {
+            CustomConvertedBoolean = false;
+            ThrowOnJsonErrors = true;
+            Enable (ConfigLocations.HardCoded);
+
+            RuntimeConfig = """
+                            {
+                              "AppSettings": {
+                                "ConfigurationMangerTests.CustomConvertedBoolean": "yes"
+                              }
+                            }
+                            """;
+
+            Load (ConfigLocations.Runtime);
+            Apply ();
+
+            Assert.True (CustomConvertedBoolean);
+
+            string? json = ConfigurationManager.SourcesManager?.ToJson (Settings);
+
+            Assert.NotNull (json);
+            Assert.Contains ("\"ConfigurationMangerTests.CustomConvertedBoolean\": \"yes\"", json);
+        }
+        finally
+        {
+            Disable (true);
+            CustomConvertedBoolean = false;
         }
     }
 
@@ -1263,7 +1358,7 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
         ""MessageBox.DefaultButtonAlignment"": ""End"",
         ""Schemes"": [
           {
-            ""Runnable"": {
+            ""Accent"": {
               ""Normal"": {
                 ""Foreground"": ""BrightGreen"",
                 ""Background"": ""Black""
@@ -1655,6 +1750,26 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
         {
             Environment.SetEnvironmentVariable (SourcesManager.TUI_CONFIG_ENV_S, null);
             Disable (true);
+        }
+    }
+
+    private sealed class YesNoBooleanJsonConverter : JsonConverter<bool?>
+    {
+        public override bool? Read (ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        {
+            string? value = reader.GetString ();
+
+            return value?.ToLowerInvariant () switch
+            {
+                "yes" => true,
+                "no" => false,
+                _ => throw new JsonException ($"Unexpected boolean token '{value}'.")
+            };
+        }
+
+        public override void Write (Utf8JsonWriter writer, bool? value, JsonSerializerOptions options)
+        {
+            writer.WriteStringValue (value == true ? "yes" : "no");
         }
     }
 }

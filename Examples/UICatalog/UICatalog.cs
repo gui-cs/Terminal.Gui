@@ -12,6 +12,7 @@ global using Terminal.Gui.FileServices;
 global using Terminal.Gui.Resources;
 using System.CommandLine;
 using System.CommandLine.Help;
+using System.CommandLine.Invocation;
 using System.CommandLine.Parsing;
 using System.Diagnostics;
 using System.Globalization;
@@ -22,6 +23,7 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
+using TextMateSharp.Grammars;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 #nullable enable
@@ -175,7 +177,7 @@ public class UICatalog
                                         DontEnableConfigurationManagement = context.GetRequiredValue (disableConfigManagement),
                                         Benchmark = context.GetRequiredValue (benchmarkFlag),
                                         BenchmarkTimeout = context.GetRequiredValue (benchmarkTimeout),
-                                        ResultsFile = context.GetRequiredValue (resultsFile) ?? string.Empty,
+                                        ResultsFile = context.GetRequiredValue (resultsFile),
                                         DebugLogLevel = context.GetRequiredValue (debugLogLevel),
 
                                         // Only set Force16Colors if explicitly specified on command line
@@ -186,31 +188,52 @@ public class UICatalog
                                     Options = options;
                                 });
 
-        var helpShown = false;
+        // Capture terminal dimensions before any driver changes them
+        int terminalWidth;
+        int terminalHeight;
+
+        try
+        {
+            terminalWidth = Console.WindowWidth;
+            terminalHeight = Console.WindowHeight;
+        }
+        catch (IOException)
+        {
+            // Console dimensions unavailable (e.g. output is piped)
+            terminalWidth = 120;
+            terminalHeight = 40;
+        }
+
+        // Override --help to render the embedded README.md as formatted markdown
+        HelpOption helpOption = rootCommand.Options.OfType<HelpOption> ().First ();
+        helpOption.Action = new MarkdownHelpAction (() => RenderMarkdown (ReadEmbeddedReadme (), terminalWidth, terminalHeight));
+
+        // Override --version to show the Terminal.Gui library version
+        VersionOption versionOption = rootCommand.Options.OfType<VersionOption> ().First ();
+        versionOption.Action = new VersionAction (() => Console.WriteLine (GetLibraryVersion ()));
 
         ParseResult parseResult = rootCommand.Parse (args);
 
-        // Check if the analysis results indicate that help should be displayed
-        if (parseResult.Errors.Count == 0 && parseResult.Action is HelpAction)
-        {
-            helpShown = true;
-        }
-
-        parseResult.Invoke ();
-
-        if (helpShown)
-        {
-            return 0;
-        }
-
+        // If there are parse errors, show README then print diagnostics underneath
         if (parseResult.Errors.Count > 0)
         {
+            RenderMarkdown (ReadEmbeddedReadme (), terminalWidth, terminalHeight);
+
             foreach (ParseError error in parseResult.Errors)
             {
                 Console.Error.WriteLine (error.Message);
             }
 
-            return 1; // Non-zero exit code for error
+            return 1;
+        }
+
+        parseResult.Invoke ();
+
+        // If our SetAction callback wasn't invoked (--help, --version, etc.),
+        // Options won't have been initialized — return early.
+        if (Options.DebugLogLevel is null)
+        {
+            return 0;
         }
 
         Scenario.BenchmarkTimeout = Options.BenchmarkTimeout;
@@ -323,5 +346,105 @@ public class UICatalog
         }
 
         runner.RunInteractive<UICatalogRunnable> (!Options.DontEnableConfigurationManagement);
+    }
+
+    /// <summary>
+    ///     Renders markdown content to the terminal using the ANSI driver and exits.
+    /// </summary>
+    private static void RenderMarkdown (string markdown, int width, int height)
+    {
+        // Prevent the ANSI driver from trying to read/write real terminal size or capabilities
+        Environment.SetEnvironmentVariable ("DisableRealDriverIO", "1");
+        IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        app.Driver?.SetScreenSize (width, height);
+
+        Markdown markdownView = new ()
+        {
+            App = app,
+            UseThemeBackground = true,
+            ShowCopyButtons = false,
+            Width = Dim.Fill (),
+            Height = Dim.Fill (),
+            SyntaxHighlighter = new TextMateSyntaxHighlighter (ThemeName.Dracula),
+            Text = markdown
+        };
+
+        // Layout to get natural content height
+        markdownView.SetRelativeLayout (app.Screen.Size);
+        markdownView.Layout ();
+
+        // Resize to the full content height but keep the terminal width
+        int contentHeight = markdownView.GetContentHeight ();
+        app.Driver?.SetScreenSize (width, contentHeight);
+        markdownView.SetRelativeLayout (app.Screen.Size);
+
+        markdownView.Frame = app.Screen with { X = 0, Y = 0 };
+        markdownView.Layout ();
+
+        app.Driver?.ClearContents ();
+        markdownView.Draw ();
+        Console.WriteLine (app.Driver?.ToAnsi ());
+    }
+
+    /// <summary>
+    ///     Gets the Terminal.Gui library version from its assembly metadata.
+    /// </summary>
+    public static string GetLibraryVersion ()
+    {
+        Assembly libAssembly = typeof (View).Assembly;
+
+        string? informationalVersion = libAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute> ()?.InformationalVersion;
+
+        if (informationalVersion is { })
+        {
+            // Strip build metadata (everything after '+') for a terse SemVer
+            int plusIndex = informationalVersion.IndexOf ('+');
+
+            return plusIndex >= 0 ? informationalVersion [..plusIndex] : informationalVersion;
+        }
+
+        return libAssembly.GetName ().Version?.ToString () ?? "unknown";
+    }
+
+    /// <summary>
+    ///     Reads the embedded README.md resource from the assembly.
+    /// </summary>
+    private static string ReadEmbeddedReadme ()
+    {
+        Assembly assembly = Assembly.GetExecutingAssembly ();
+        string resourceName = assembly.GetManifestResourceNames ().First (n => n.EndsWith ("README.md", StringComparison.Ordinal));
+
+        using Stream stream = assembly.GetManifestResourceStream (resourceName)!;
+        using StreamReader reader = new (stream);
+
+        return reader.ReadToEnd ();
+    }
+}
+
+/// <summary>
+///     Custom help action that renders the embedded README.md as formatted markdown.
+/// </summary>
+internal sealed class MarkdownHelpAction (Action renderHelp) : SynchronousCommandLineAction
+{
+    public override int Invoke (ParseResult parseResult)
+    {
+        renderHelp ();
+
+        return 0;
+    }
+}
+
+/// <summary>
+///     Custom version action that displays the Terminal.Gui library version.
+/// </summary>
+internal sealed class VersionAction (Action printVersion) : SynchronousCommandLineAction
+{
+    public override int Invoke (ParseResult parseResult)
+    {
+        printVersion ();
+
+        return 0;
     }
 }

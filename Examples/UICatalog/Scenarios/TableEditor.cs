@@ -3,6 +3,8 @@ using System.Data;
 using System.Globalization;
 using System.Text;
 
+// ReSharper disable StringLiteralTypo
+
 namespace UICatalog.Scenarios;
 
 [ScenarioMetadata ("TableEditor", "Implements data table editor using the TableView control.")]
@@ -12,7 +14,6 @@ namespace UICatalog.Scenarios;
 [ScenarioCategory ("Text and Formatting")]
 public class TableEditor : Scenario
 {
-    private IApplication? _app;
     private readonly HashSet<FileSystemInfo>? _checkedFileSystemInfos = [];
     private readonly List<IDisposable>? _toDispose = [];
 
@@ -162,6 +163,8 @@ public class TableEditor : Scenario
         new UnicodeRange (0xE0000, 0xE007F, "Tags")
     ];
 
+    private IApplication? _app;
+
     private Scheme? _alternatingScheme;
     private DataTable? _currentTable;
     private Scheme? _redScheme;
@@ -169,8 +172,8 @@ public class TableEditor : Scenario
     private TableView? _tableView;
 
     /// <summary>
-    ///     Builds a simple table in which cell values contents are the index of the cell.  This helps testing that
-    ///     scrolling etc is working correctly and not skipping out any rows/columns when paging
+    ///     Builds a simple table in which cell values contents are the index of the cell.  This helps to test that
+    ///     scrolling etc. is working correctly and not skipping out any rows/columns when paging
     /// </summary>
     /// <param name="cols"></param>
     /// <param name="rows"></param>
@@ -220,6 +223,7 @@ public class TableEditor : Scenario
                                    [
                                        new MenuItem { Title = "_OpenBigExample", Action = () => OpenExample (true) },
                                        new MenuItem { Title = "_OpenSmallExample", Action = () => OpenExample (false) },
+                                       new MenuItem { Title = "Open_WideColumnExample", Action = OpenWideColumnExample },
                                        new MenuItem { Title = "OpenCharacter_Map", Action = OpenUnicodeMap },
                                        new MenuItem { Title = "OpenTreeExample", Action = OpenTreeExample },
                                        new MenuItem { Title = "_CloseExample", Action = CloseExample },
@@ -253,11 +257,11 @@ public class TableEditor : Scenario
 
         appWindow.Add (_tableView);
 
-        _tableView!.SelectedCellChanged += (_, _) => { selectedCellLabel.Text = $"{_tableView!.SelectedRow},{_tableView!.SelectedColumn}"; };
-        _tableView!.CellActivated += EditCurrentCell;
+        _tableView!.ValueChanged += (_, _) => { selectedCellLabel.Text = $"{_tableView!.Value?.SelectedCell.Y ?? 0},{_tableView!.Value?.SelectedCell.X ?? 0}"; };
+        _tableView!.Accepted += EditCurrentCell;
         _tableView!.KeyDown += TableViewKeyPress;
 
-        //SetupScrollBar ();
+        // SetupScrollBar ();
 
         _redScheme = new Scheme
         {
@@ -316,11 +320,86 @@ public class TableEditor : Scenario
                                       }
                                   };
 
-        _tableView!.KeyBindings.ReplaceCommands (Key.Space, Command.Accept);
-
         // Run - Start the application.
         app.Run (appWindow);
     }
+
+    protected override void Dispose (bool disposing)
+    {
+        base.Dispose (disposing);
+
+        foreach (IDisposable d in _toDispose!)
+        {
+            d.Dispose ();
+        }
+    }
+
+    private DataTable BuildUnicodeMap ()
+    {
+        var dt = new DataTable ();
+
+        // add cols called 0 to 9
+        for (var i = 0; i < 10; i++)
+        {
+            DataColumn col = dt.Columns.Add (i.ToString (), typeof (uint));
+            ColumnStyle style = _tableView!.Style.GetOrCreateColumnStyle (col.Ordinal);
+
+            style.RepresentationGetter = RuneToString;
+        }
+
+        // add cols called a to z
+        for (int i = 'a'; i < 'a' + 26; i++)
+        {
+            DataColumn col = dt.Columns.Add (((char)i).ToString (), typeof (uint));
+            ColumnStyle style = _tableView!.Style.GetOrCreateColumnStyle (col.Ordinal);
+            style.RepresentationGetter = RuneToString;
+        }
+
+        // now add table contents
+        List<uint> runes = [];
+
+        foreach (UnicodeRange range in _ranges!)
+        {
+            for (uint i = range.Start; i <= range.End; i++)
+            {
+                runes.Add (i);
+            }
+        }
+
+        DataRow? dr = null;
+
+        for (var i = 0; i < runes.Count; i++)
+        {
+            if (dr == null || i % dt.Columns.Count == 0)
+            {
+                dr = dt.Rows.Add ();
+            }
+
+            dr [i % dt.Columns.Count] = runes [i];
+        }
+
+        return dt;
+    }
+
+    private void CheckOrUncheckFile (FileSystemInfo info, bool check)
+    {
+        if (check)
+        {
+            _checkedFileSystemInfos!.Add (info);
+        }
+        else
+        {
+            _checkedFileSystemInfos!.Remove (info);
+        }
+    }
+
+    private void ClearColumnStyles ()
+    {
+        _tableView!.Style.ColumnStyles.Clear ();
+        _tableView!.Update ();
+    }
+
+    private void CloseExample () => _tableView!.Table = null;
 
     private MenuBarItem CreateViewMenu ()
     {
@@ -369,7 +448,7 @@ public class TableEditor : Scenario
                                                                                _tableView!.Style.ShowHorizontalHeaderUnderline = state;
                                                                                _tableView!.Update ();
                                                                            }),
-                                                   CreateCheckBoxMenuItem ("Bottomline",
+                                                   CreateCheckBoxMenuItem ("BottomLine",
                                                                            "_BottomLine",
                                                                            _tableView!.Style.ShowHorizontalBottomLine,
                                                                            state =>
@@ -643,109 +722,33 @@ public class TableEditor : Scenario
         }
     }
 
-    protected override void Dispose (bool disposing)
+    private void EditCurrentCell (object? sender, CommandEventArgs args)
     {
-        base.Dispose (disposing);
-
-        foreach (IDisposable d in _toDispose!)
-        {
-            d.Dispose ();
-        }
-    }
-
-    private DataTable BuildUnicodeMap ()
-    {
-        var dt = new DataTable ();
-
-        // add cols called 0 to 9
-        for (var i = 0; i < 10; i++)
-        {
-            DataColumn col = dt.Columns.Add (i.ToString (), typeof (uint));
-            ColumnStyle style = _tableView!.Style.GetOrCreateColumnStyle (col.Ordinal);
-
-            style.RepresentationGetter = RuneToString;
-        }
-
-        // add cols called a to z
-        for (int i = 'a'; i < 'a' + 26; i++)
-        {
-            DataColumn col = dt.Columns.Add (((char)i).ToString (), typeof (uint));
-            ColumnStyle style = _tableView!.Style.GetOrCreateColumnStyle (col.Ordinal);
-            style.RepresentationGetter = RuneToString;
-        }
-
-        // now add table contents
-        List<uint> runes = new ();
-
-        foreach (UnicodeRange range in _ranges!)
-        {
-            for (uint i = range.Start; i <= range.End; i++)
-            {
-                runes.Add (i);
-            }
-        }
-
-        DataRow? dr = null;
-
-        for (var i = 0; i < runes.Count; i++)
-        {
-            if (dr == null || i % dt.Columns.Count == 0)
-            {
-                dr = dt.Rows.Add ();
-            }
-
-            dr [i % dt.Columns.Count] = runes [i].ToString ();
-        }
-
-        return dt;
-    }
-
-    private string RuneToString (object o) => Rune.TryCreate ((uint)o, out Rune rune) ? rune.ToString () : " ";
-
-    private void CheckOrUncheckFile (FileSystemInfo info, bool check)
-    {
-        if (check)
-        {
-            _checkedFileSystemInfos!.Add (info);
-        }
-        else
-        {
-            _checkedFileSystemInfos!.Remove (info);
-        }
-    }
-
-    private void ClearColumnStyles ()
-    {
-        _tableView!.Style.ColumnStyles.Clear ();
-        _tableView!.Update ();
-    }
-
-    private void CloseExample () => _tableView!.Table = null;
-
-    private void EditCurrentCell (object? sender, CellActivatedEventArgs e)
-    {
-        if (e.Table is not DataTableSource || _currentTable == null)
+        if (_tableView?.Table is not DataTableSource || _currentTable == null)
         {
             return;
         }
 
-        int tableCol = ToTableCol (e.Col);
+        int col = _tableView.Value?.SelectedCell.X ?? 0;
+        int row = _tableView.Value?.SelectedCell.Y ?? 0;
+
+        int tableCol = ToTableCol (col);
 
         if (tableCol < 0)
         {
             return;
         }
 
-        object o = _currentTable.Rows [e.Row] [tableCol];
+        object o = _currentTable.Rows [row] [tableCol];
 
         string title = o is uint u ? GetUnicodeCategory (u) + $"(0x{o:X4})" : "Enter new value";
 
-        var oldValue = _currentTable.Rows [e.Row] [tableCol].ToString ();
+        var oldValue = _currentTable.Rows [row] [tableCol].ToString ();
 
         var ok = new Button { Text = Strings.btnOk };
         var cancel = new Button { Text = Strings.btnCancel };
         var d = new Dialog { Title = title, Buttons = [cancel, ok] };
-        var lbl = new Label { X = 0, Y = 1, Text = _tableView!.Table!.ColumnNames [e.Col] };
+        var lbl = new Label { X = 0, Y = 1, Text = _tableView!.Table!.ColumnNames [col] };
         var tf = new TextField { Text = oldValue!, X = 0, Y = 2, Width = Dim.Fill (0, 50) };
 
         d.Add (lbl, tf);
@@ -762,7 +765,7 @@ public class TableEditor : Scenario
 
         try
         {
-            _currentTable.Rows [e.Row] [tableCol] = string.IsNullOrWhiteSpace (tf.Text) ? DBNull.Value : tf.Text;
+            _currentTable.Rows [row] [tableCol] = string.IsNullOrWhiteSpace (tf.Text) ? DBNull.Value : tf.Text;
         }
         catch (Exception ex)
         {
@@ -792,12 +795,12 @@ public class TableEditor : Scenario
             return null;
         }
 
-        if (_tableView!.SelectedColumn < 0 || _tableView!.SelectedColumn > _tableView!.Table.Columns)
+        if (_tableView!.Value is null || _tableView!.Value.SelectedCell.X > _tableView!.Table.Columns)
         {
             return null;
         }
 
-        return _tableView!.SelectedColumn;
+        return _tableView!.Value.SelectedCell.X;
     }
 
     private string GetHumanReadableFileSize (FileSystemInfo fsi)
@@ -885,7 +888,7 @@ public class TableEditor : Scenario
     {
         _tableView!.Style.ColumnStyles.Clear ();
 
-        TreeView<FileSystemInfo> tree = new () { AspectGetter = f => f.Name, TreeBuilder = new DelegateTreeBuilder<FileSystemInfo> (GetChildren) };
+        TreeView<FileSystemInfo> tree = new () { AspectGetter = f => f.Name, TreeBuilder = new DelegateTreeBuilder<FileSystemInfo> (GetChildren, _ => false) };
 
         TreeTableSource<FileSystemInfo> source = new (_tableView,
                                                       "Name",
@@ -927,6 +930,32 @@ public class TableEditor : Scenario
         _tableView?.Update ();
     }
 
+    // Demonstrates the fix for #5072: a column with very wide content used to consume all viewport
+    // space and push later columns off-screen. With the fix, "Description" is clamped so "Status" and
+    // "Owner" remain visible at their header widths.
+    private void OpenWideColumnExample ()
+    {
+        DataTable dt = new ();
+        dt.Columns.Add ("Id", typeof (int));
+        dt.Columns.Add ("Description", typeof (string));
+        dt.Columns.Add ("Status", typeof (string));
+        dt.Columns.Add ("Owner", typeof (string));
+
+        string [] statuses = ["Open", "InProgress", "Blocked", "Done"];
+        string [] owners = ["Alice", "Bob", "Carol", "Dan"];
+
+        for (var i = 0; i < 25; i++)
+        {
+            dt.Rows.Add (i, $"Row {i}: " + new string ('x', 120 + i % 40), statuses [i % statuses.Length], owners [i % owners.Length]);
+        }
+
+        SetTable (dt);
+
+        // Clear any styles inherited from a previous example
+        _tableView!.Style.ColumnStyles.Clear ();
+        _tableView!.Update ();
+    }
+
     private void Quit () => _tableView?.App?.RequestStop ();
 
     private void RunColumnWidthDialog (int? col, string prompt, Action<ColumnStyle, int> setter, Func<ColumnStyle, int> getter)
@@ -966,6 +995,8 @@ public class TableEditor : Scenario
 
         _tableView!.Update ();
     }
+
+    private string RuneToString (object o) => Rune.TryCreate ((uint)o, out Rune rune) ? rune.ToString () : " ";
 
     private void SetDemoTableStyles ()
     {
@@ -1051,8 +1082,8 @@ public class TableEditor : Scenario
 
     private void SetTable (DataTable dataTable) => _tableView!.Table = new DataTableSource (_currentTable = dataTable);
 
-    //private void SetupScrollBar ()
-    //{
+    // private void SetupScrollBar ()
+    // {
     //    var scrollBar = new ScrollBarView (_tableView, true);
 
     //    scrollBar.ChangedPosition += (s, e) =>
@@ -1084,7 +1115,7 @@ public class TableEditor : Scenario
     //                                  //scrollBar.OtherScrollBarView.Position = tableView.LeftItem;
     //                                  scrollBar.Refresh ();
     //                              };
-    //}
+    // }
 
     private void ShowAllColumns ()
     {

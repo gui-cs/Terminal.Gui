@@ -53,12 +53,12 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 
 - **Triggers**: `workflow_dispatch` (manual trigger from GitHub Actions UI)
 - **Inputs**:
-  - `release_type`: Choose from `prealpha`, `alpha`, `beta`, `rc`, or `stable`
+  - `release_type`: Choose from `beta`, `rc`, or `stable`
   - `version_override`: (Optional) Specify exact version number, otherwise GitVersion calculates it
 - **Process**:
   1. Checks out `main` branch
   2. Determines version using GitVersion or override
-  3. Creates annotated git tag (e.g., `v2.0.0-prealpha` or `v2.0.0`)
+  3. Creates annotated git tag (e.g., `v2.0.1-rc.1` or `v2.1.0`)
   4. Creates release commit with message
   5. Pushes tag and commit to repository
   6. Creates GitHub Release (marked as pre-release if not stable)
@@ -72,14 +72,14 @@ The repository uses multiple GitHub Actions workflows. What runs and when:
 - **Automatically triggered** by the Create Release workflow when a new tag is pushed
 - **Additional actions on main branch**:
   - Delists old NuGet packages to keep package list clean:
-    - Keeps only the most recent `2.0.0-develop.*` package
-    - Keeps only the just-published `2.0.0-alpha.*` or `2.0.0-beta.*` package
+    - Keeps only the most recent `*-develop.*` package
+    - Keeps only the just-published `*-beta.*` or `*-rc.*` package
   - Triggers Terminal.Gui.templates repository update via repository_dispatch (requires `PAT_FOR_TEMPLATES` secret)
 
 ### 6) Build and publish API docs (`.github/workflows/api-docs.yml`)
 
-- **Triggers**: push to `v1_release` and `develop`
-- Builds DocFX site on Windows and deploys to GitHub Pages when `ref_name` is `main` or `develop`
+- **Triggers**: push to `main`
+- Builds DocFX site on Windows and deploys to GitHub Pages
 
 
 ### Replicating CI Locally

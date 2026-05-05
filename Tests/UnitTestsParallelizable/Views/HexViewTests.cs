@@ -449,4 +449,73 @@ public class HexViewTests : TestDriverBase
 
         hexView.Dispose ();
     }
+
+    /// <summary>
+    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     Ctrl-modified keys must not edit hex data even when they look like valid hex digits.
+    /// </summary>
+    [Fact]
+    public void CtrlKey_Does_Not_Edit_HexView ()
+    {
+        // Copilot
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        HexView hexView = new (new MemoryStream ([0x00, 0x01, 0x02, 0x03]))
+        {
+            Width = 80,
+            Height = 10
+        };
+
+        Window win = new ();
+        win.Add (hexView);
+
+        SessionToken? token = app.Begin (win);
+        hexView.SetFocus ();
+        Assert.True (hexView.HasFocus);
+
+        // Ctrl+A with AssociatedText — 'A' is a valid hex digit but should NOT be inserted
+        Key ctrlA = new (Key.A.WithCtrl) { AssociatedText = "a" };
+        hexView.NewKeyDownEvent (ctrlA);
+
+        Assert.Empty (hexView.Edits);
+
+        app.End (token!);
+        win.Dispose ();
+    }
+
+    /// <summary>
+    ///     Regression test for https://github.com/gui-cs/Terminal.Gui/issues/4963
+    ///     Alt-modified keys on the right (text) side must not edit data.
+    /// </summary>
+    [Fact]
+    public void AltKey_Does_Not_Edit_HexView_RightSide ()
+    {
+        // Copilot
+        using IApplication app = Application.Create ();
+        app.Init (DriverRegistry.Names.ANSI);
+
+        HexView hexView = new (new MemoryStream ([0x00, 0x01, 0x02, 0x03]))
+        {
+            Width = 80,
+            Height = 10
+        };
+
+        Window win = new ();
+        win.Add (hexView);
+
+        SessionToken? token = app.Begin (win);
+        hexView.SetFocus ();
+
+        // Switch to right side by pressing Tab
+        hexView.NewKeyDownEvent (Key.Tab);
+
+        Key altT = new (Key.T.WithAlt) { AssociatedText = "t" };
+        hexView.NewKeyDownEvent (altT);
+
+        Assert.Empty (hexView.Edits);
+
+        app.End (token!);
+        win.Dispose ();
+    }
 }

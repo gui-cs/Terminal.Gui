@@ -309,7 +309,7 @@ public class MenuBar : Menu, IDesignable
                                                           ]) { Id = "Preferences" }
                                   },
                                   new Line (),
-                                  new MenuItem { TargetView = targetView as View, Key = Application.GetDefaultKey (Command.Quit), Command = Command.Quit }
+                                  new MenuItem { TargetView = targetView as View, Command = Command.Quit }
                               ]));
 
         Add (new MenuBarItem ("_Edit",

@@ -1,8 +1,7 @@
+using System.Diagnostics;
 using Terminal.Gui.Tracing;
 
 namespace Terminal.Gui.App;
-
-using Trace = Trace;
 
 internal partial class ApplicationImpl
 {
@@ -65,6 +64,11 @@ internal partial class ApplicationImpl
                 runnableView.SetNeedsLayout ();
             }
         }
+
+        if (Popovers?.GetActivePopover () is View { Visible: true } visiblePopover)
+        {
+            visiblePopover.SetNeedsLayout ();
+        }
     }
 
     private void Driver_SizeChanged (object? sender, SizeChangedEventArgs e)
@@ -97,7 +101,7 @@ internal partial class ApplicationImpl
     /// <inheritdoc/>
     public void LayoutAndDraw (bool forceRedraw = false)
     {
-        Trace.Draw ("ApplicationImpl", "Start", $"forceRedraw={forceRedraw}, Screen={Screen}, _inlineScreenSized={_inlineScreenSized}");
+        Tracing.Trace.Draw ("ApplicationImpl", "Start", $"forceRedraw={forceRedraw}, Screen={Screen}, _inlineScreenSized={_inlineScreenSized}");
 
         if (ClearScreenNextIteration)
         {
@@ -117,16 +121,9 @@ internal partial class ApplicationImpl
 
         List<View?> views = [.. SessionStack.Select (r => r.Runnable! as View)!];
 
-        if (Popovers?.GetActivePopover () is { Visible: true } visiblePopover)
+        if (Popovers?.GetActivePopover () is View { Visible: true, NeedsLayout: true } visiblePopoverNeedingLayout)
         {
-            visiblePopover.SetNeedsDraw ();
-            visiblePopover.SetNeedsLayout ();
-
-            // Need View for views.Insert
-            if (visiblePopover is View popoverView)
-            {
-                views.Insert (0, popoverView);
-            }
+            views.Insert (0, visiblePopoverNeedingLayout);
         }
 
         // Layout
@@ -240,12 +237,36 @@ internal partial class ApplicationImpl
         // Draw
         bool needsDraw = forceRedraw || views.Any (v => v is { NeedsDraw: true } or { SubViewNeedsDraw: true });
 
+        if (Popovers?.GetActivePopover () is View { Visible: true } visiblePopover)
+        {
+            if (needsDraw)
+            {
+                visiblePopover.SetNeedsDraw ();
+
+                if (!views.Contains (visiblePopover))
+                {
+                    views.Insert (0, visiblePopover);
+                }
+            }
+            else if (visiblePopover.NeedsDraw || visiblePopover.SubViewNeedsDraw)
+            {
+                visiblePopover.SetNeedsDraw ();
+
+                if (!views.Contains (visiblePopover))
+                {
+                    views.Insert (0, visiblePopover);
+                }
+
+                needsDraw = true;
+            }
+        }
+
         if (Driver is { } && (neededLayout || needsDraw))
         {
             Logging.Redraws.Add (1);
 
             // Clip uses the output buffer dimensions (0-indexed), not the terminal offset.
-            Rectangle clipRect = new (0, 0, Screen.Width, Screen.Height);
+            Rectangle clipRect = Screen with { X = 0, Y = 0 };
             Driver.Clip = new Region (clipRect);
 
             // Only force a complete redraw if needed (needsLayout or forceRedraw).
@@ -258,6 +279,13 @@ internal partial class ApplicationImpl
             Driver?.Refresh ();
         }
 
-        Trace.Draw ("ApplicationImpl", "End", $"neededLayout={neededLayout}, needsDraw={needsDraw}");
+        if (neededLayout || needsDraw)
+        {
+            LayoutAndDrawComplete?.Invoke (this, EventArgs.Empty);
+        }
+        Tracing.Trace.Draw ("ApplicationImpl", "End", $"neededLayout={neededLayout}, needsDraw={needsDraw}");
     }
+
+    /// <inheritdoc />
+    public event EventHandler<EventArgs>? LayoutAndDrawComplete;
 }

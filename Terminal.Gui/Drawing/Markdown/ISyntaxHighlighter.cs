@@ -23,6 +23,11 @@ public interface ISyntaxHighlighter
     void ResetState ();
 
     /// <summary>
+    ///     Gets the name of the currently active syntax highlighting theme.
+    /// </summary>
+    string ThemeName { get; }
+
+    /// <summary>
     ///     Gets the default background color from the active syntax highlighting theme.
     ///     Used by code block views to fill their viewport background consistently with
     ///     per-token backgrounds. Returns <see langword="null"/> if no theme background is available.

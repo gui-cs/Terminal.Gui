@@ -8,7 +8,7 @@ A Scheme defines how Views look based on their semantic purpose. The following s
 | **Dialog** | The dialog scheme; used for Dialog, MessageBox, and other views dialog-like views. |
 | **Error** | The scheme for showing errors, such as in `ErrorQuery`. |
 | **Menu** | The menu scheme; used for Terminal.Gui.Menu, MenuBar, and StatusBar. |
-| **TopLevel** | The application `TopLevel` scheme; used for the `TopLevel` View. |
+| **Accent** | The accent scheme; a secondary/alternate scheme for visual distinction. Used for panels, event logs, and any view that needs visual separation. |
 
 @Terminal.Gui.SchemeManager manages the set of available schemes and provides a set of convenience methods for getting the current scheme and for overriding the default values for these schemes.
 

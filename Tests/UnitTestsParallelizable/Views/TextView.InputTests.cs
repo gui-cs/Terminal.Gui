@@ -468,6 +468,54 @@ public class TextViewInputTests
     }
 
     [Fact]
+    public void Typing_Tab_At_End_Of_Line_With_Wrap_Disabled_Should_Scroll_Horizontally_And_Update_Content_Size ()
+    {
+        TextView tv = new ()
+        {
+            Width = 5,
+            Height = 2,
+            Text = "Line1\nLine2\nLine3"
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        tv.InsertionPoint = new Point (6, 0);
+        Assert.Equal (new Point (1, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (5, 0), tv.InsertionPoint);
+        Assert.Equal (new Size (6, 3), tv.GetContentSize ());
+
+        tv.NewKeyDownEvent (Key.Tab);
+
+        Assert.Equal (new Point (4, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (6, 0), tv.InsertionPoint);
+        Assert.Equal (new Size (9, 3), tv.GetContentSize ());
+    }
+
+    [Fact]
+    public void Typing_ShiftTab_At_End_Of_Line_With_Wrap_Disabled_Should_Scroll_Horizontally_And_Update_Content_Size ()
+    {
+        TextView tv = new ()
+        {
+            Width = 5,
+            Height = 2,
+            Text = "Line1\t\nLine2\nLine3"
+        };
+        tv.BeginInit ();
+        tv.EndInit ();
+
+        tv.InsertionPoint = new Point (9, 0);
+        Assert.Equal (new Point (4, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (6, 0), tv.InsertionPoint);
+        Assert.Equal (new Size (9, 3), tv.GetContentSize ());
+
+        tv.NewKeyDownEvent (Key.Tab.WithShift);
+
+        Assert.Equal (new Point (1, 0), tv.Viewport.Location);
+        Assert.Equal (new Point (5, 0), tv.InsertionPoint);
+        Assert.Equal (new Size (6, 3), tv.GetContentSize ());
+    }
+
+    [Fact]
     public void EnterKeyAddsLine_Setter_Should_Not_Scroll_View ()
     {
         using IApplication app = Application.Create ();

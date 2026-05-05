@@ -1,8 +1,4 @@
-// Copilot
-
-using Terminal.Gui.ViewBase;
-
-namespace UnitTests.Parallelizable.ViewBase.EnumExtensions;
+namespace EnumExtensionsTests;
 
 /// <summary>
 ///     Tests for the source-generated enum extension methods produced by

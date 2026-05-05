@@ -1,92 +1,77 @@
 # Terminal.Gui UI Catalog
 
-UI Catalog is a comprehensive sample library for Terminal.Gui. It attempts to satisfy the following goals:
+UI Catalog is a comprehensive sample library for Terminal.Gui. It provides:
 
-1. Be an easy-to-use showcase for Terminal.Gui concepts and features.
-2. Provide sample code that illustrates how to properly implement 
-said concepts & features.
-3. Make it easy for contributors to add additional samples in a structured way.
+1. An easy-to-use, interactive, showcase for Terminal.Gui concepts and features.
+2. Sample code that illustrates how to properly implement said concepts & features.
+3. A structured way for contributors to add additional samples.
 
-![screenshot](screenshot.png)
-
-## Motivation
-
-The original `demo.cs` sample app for Terminal.Gui is neither good to showcase, nor does it explain different concepts. In addition, because it is built on a single source file, it has proven to cause friction when multiple contributors are simultaneously working on different aspects of Terminal.Gui. 
-See [Issue #368](https://github.com/giu-cs/Terminal.Gui/issues/368) for more background.
+![uicatalog](../../docfx/images/uicatalog.gif)
 
 ## How To Use
 
-Build and run UI Catalog by typing `dotnet run` from the `UI Catalog` folder or by using the `Terminal.Gui` Visual Studio solution.
+```
+dotnet run --project ./Examples/UICatalog/UICatalog.csproj
+```
 
-`Program.cs` is the main **UI Catalog** app and provides a UI for selecting and running **Scenarios**. Each **Scenario* is implemented as a class derived from `Scenario` and `Program.cs` uses reflection to dynamically build the UI.
+or
+
+```
+dotnet build
+./Examples/UICatalog/bin/Debug/net10.0/UICatalog.exe
+```
+
+## Implementing a Scenario
 
 **Scenarios** are tagged with categories using the `[ScenarioCategory]` attribute. The left pane of the main screen lists the categories. Clicking on a category shows all the scenarios in that category.
 
-**Scenarios** can be run either from the **UICatalog.exe** app UI or by being specified on the command line:
+To add a new **Scenario**:
 
-```
-UICatalog.exe <Scenario Name>
-```
-
-e.g.
-
-```
-UICatalog.exe Buttons
-```
-
-Hitting ENTER on a selected Scenario or double-clicking on a Scenario runs that scenario as though it were a stand-alone Terminal.Gui app.
-
-When a **Scenario** is run, it runs as though it were a standalone `Terminal.Gui` app. However, scaffolding is provided (in the `Scenario` base class) that (optionally) takes care of `Terminal.Gui` initialization.
-
-## Contributing by Adding Scenarios
-
-To add a new **Scenario** simply:
-
-1. Create a new `.cs` file in the `Scenarios` directory that derives from `Scenario`.
-2. Add a `[ScenarioMetaData]` attribute to the class specifying the scenario's name and description.
-3. Add one or more `[ScenarioCategory]` attributes to the class specifying which categories the sceanrio belongs to. If you don't specify a category the sceanrio will show up in "All".
+1. Create a new `.cs` file in `./Examples/UICatalog/Scenarios` that derives from `Scenario`.
+2. Add a `[ScenarioMetaData]` attribute specifying the scenario's name and description.
+3. Add one or more `[ScenarioCategory]` attributes specifying which categories the scenario belongs to. If you don't specify a category, the scenario will show up in "All".
 4. Implement the `Setup` override which will be called when a user selects the scenario to run.
 5. Optionally, implement the `Init` and/or `Run` overrides to provide a custom implementation.
 
-The sample below is provided in the `.\UICatalog\Scenarios` directory as a generic sample that can be copied and re-named:
+See `./Examples/UICatalog/Scenarios/Generic.cs` for a starting point.
 
-```csharp
-
-namespace UICatalog {
-	[ScenarioMetadata (Name: "Generic", Description: "Generic sample - A template for creating new Scenarios")]
-	[ScenarioCategory ("Controls")]
-	class MyScenario : Scenario {
-		public override void Setup ()
-		{
-			// Put your scenario code here, e.g.
-			Win.Add (new Button () { 
-Text = "Press me!", 
-				X = Pos.Center (),
-				Y = Pos.Center (),
-				Clicked = () => MessageBox.Query (20, 7, "Hi", "Neat?", Strings.btnNo, Strings.btnYes)
-			});
-		}
-	}
-}
-```
-
-`Scenario` provides `Win`, a `Window` object that provides a canvas for the Scenario to operate. 
-
-The default `Window` shows the Scenario name and supports exiting the Scenario through the `Esc` key. 
-
-![screenshot](generic_screenshot.png)
-
-To build a more advanced scenario, where control of the `Runnable` and `Window` is needed (e.g. for scenarios using `MenuBar` or `StatusBar`), simply use `Application.Top` per normal Terminal.Gui programming, as seen in the `Notepad` scenario.
-
-For complete control, the `Init` and `Run` overrides can be implemented. The `base.Init` creates `Win`. The `base.Run` simply calls `Application.Run(Application.Top)`.
-
-## Contribution Guidelines
+### Contribution Guidelines
 
 - Provide a terse, descriptive `Name` for `Scenarios`. Keep them short.
 - Provide a clear `Description`.
 - Comment `Scenario` code to describe to others why it's a useful `Scenario`.
 - Annotate `Scenarios` with `[ScenarioCategory]` attributes. Minimize the number of new categories created.
-- Use the `Bug Repo` Category for `Scenarios` that reproduce bugs. 
-	- Include the Github Issue # in the Description.
-	- Once the bug has been fixed in `develop` submit another PR to remove the `Scenario` (or modify it to provide a good regression test/sample).
-- Tag bugs or suggestions for `UI Catalog` as [`Terminal.Gui` Github Issues](https://github.com/gui-cs/Terminal.Gui/issues) with "UICatalog: ".
+
+
+## Command Line Arguments
+
+Usage: `UICatalog [<scenario>] [options]`
+
+| Option | Description |
+|--------|-------------|
+| `<scenario>` | The name of the Scenario to run. If not provided, the interactive UI will be shown. |
+| `-dl`, `--debug-log-level` | The log level (`Trace`, `Debug`, `Information`, `Warning`, `Error`, `Critical`, `None`). Default: `Warning`. |
+| `-b`, `--benchmark` | Enables benchmarking. If a Scenario is specified, just that Scenario will be benchmarked. |
+| `-t`, `--timeout <ms>` | Max time in milliseconds per benchmark. Default: `2500`. |
+| `-f`, `--file <path>` | File to save benchmark results to. If omitted, results are displayed in a `TableView`. |
+| `-d`, `--driver <name>` | The `IDriver` to use (`ansi`, `dotnet`, `windows`). |
+| `-dcm`, `--disable-cm` | Disables Configuration Management. Only `ConfigLocations.HardCoded` settings will be loaded. |
+| `-16`, `--force-16-colors` | Forces 16-color mode instead of TrueColor. |
+| `--help` | Show help (renders this README as formatted markdown). |
+| `--version` | Show version information. |
+
+### Examples
+
+```bash
+# Show formatted help
+./Examples/UICatalog/bin/Debug/net10.0/UICatalog.exe --help
+
+# Run a specific scenario
+./Examples/UICatalog/bin/Debug/net10.0/UICatalog.exe "All Views Tester"
+
+# Benchmark all scenarios
+./Examples/UICatalog/bin/Debug/net10.0/UICatalog.exe --benchmark
+
+# Run with a specific driver and debug logging
+./Examples/UICatalog/bin/Debug/net10.0/UICatalog.exe -d ansi -dl Debug
+```

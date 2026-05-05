@@ -284,7 +284,7 @@ public class MarkdownCodeBlock : View, IDesignable
 
             foreach (StyledSegment segment in segments)
             {
-                Attribute attr = MarkdownAttributeHelper.GetAttributeForSegment (this, segment, SyntaxHighlighter);
+                Attribute attr = MarkdownAttributeHelper.GetAttributeForSegment (this, segment, SyntaxHighlighter, codeBg);
                 SetAttribute (attr);
 
                 foreach (string grapheme in GraphemeHelper.GetGraphemes (segment.Text))

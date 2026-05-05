@@ -15,7 +15,7 @@ namespace Terminal.Gui.Configuration;
 public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<string, Scheme?>
 {
 #pragma warning disable IDE1006 // Naming Styles
-    private static readonly object _schemesLock = new ();
+    private static readonly Lock _schemesLock = new ();
 #pragma warning restore IDE1006 // Naming Styles
 
     /// <summary>
@@ -24,22 +24,18 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
     ///     but are hard-coded in the source code. Used for unit testing when ConfigurationManager is not initialized.
     /// </summary>
     /// <returns></returns>
-    internal static ImmutableSortedDictionary<string, Scheme?>? GetHardCodedSchemes () { return Scheme.GetHardCodedSchemes ()!; }
+    internal static ImmutableSortedDictionary<string, Scheme?> GetHardCodedSchemes () => Scheme.GetHardCodedSchemes ()!;
 
     /// <summary>
     ///     Use <see cref="AddScheme"/>, <see cref="GetScheme(Drawing.Schemes)"/>, <see cref="GetSchemeNames"/>,
     ///     <see cref="GetSchemesForCurrentTheme"/>, etc... instead.
     /// </summary>
     [ConfigurationProperty (Scope = typeof (ThemeScope), OmitClassName = true)]
-#pragma warning disable IL2026 // DictionaryJsonConverter is AOT-compatible
     [JsonConverter (typeof (DictionaryJsonConverter<Scheme?>))]
-#pragma warning restore IL2026
     [UsedImplicitly]
     public static Dictionary<string, Scheme?>? Schemes
     {
         get => GetSchemes ();
-        [RequiresUnreferencedCode ("Calls Terminal.Gui.SchemeManager.SetSchemes(Dictionary<String, Scheme>)")]
-        [RequiresDynamicCode ("Calls Terminal.Gui.SchemeManager.SetSchemes(Dictionary<String, Scheme>)")]
         private set => SetSchemes (value);
     }
 
@@ -50,15 +46,13 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
         {
             // We're being called from the module initializer.
             // Hard coded default value
-            return GetHardCodedSchemes ()!.ToDictionary (StringComparer.InvariantCultureIgnoreCase);
+            return GetHardCodedSchemes ().ToDictionary (StringComparer.InvariantCultureIgnoreCase);
         }
 
         return GetSchemesForCurrentTheme ();
     }
 
     /// <summary>INTERNAL: The set method for <see cref="Schemes"/>.</summary>
-    [RequiresUnreferencedCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
-    [RequiresDynamicCode ("Calls Terminal.Gui.ConfigProperty.UpdateFrom(Object)")]
     internal static void SetSchemes (Dictionary<string, Scheme?>? value)
     {
         lock (_schemesLock)
@@ -74,7 +68,7 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
             ThemeManager.GetCurrentTheme () ["Schemes"].UpdateFrom (value);
         }
 
-        //Instance.OnThemeChanged (prevousValue);
+        //Instance.OnThemeChanged (previousValue);
     }
 
     /// <summary>
@@ -86,7 +80,7 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
     /// <returns></returns>
     public static void AddScheme (string schemeName, Scheme scheme)
     {
-        if (!GetSchemes ()!.TryAdd (schemeName, scheme))
+        if (!GetSchemes ().TryAdd (schemeName, scheme))
         {
             GetSchemes () [schemeName] = scheme;
         }
@@ -123,12 +117,7 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
         // Convert schemeName to string via Enum api
         string? schemeNameString = SchemesToSchemeName (schemeName);
 
-        if (schemeNameString is null)
-        {
-            throw new ArgumentException ($"Invalid scheme name: {schemeName}");
-        }
-
-        return GetSchemesForCurrentTheme ()! [schemeNameString]!;
+        return schemeNameString is null ? throw new ArgumentException ($"Invalid scheme name: {schemeName}") : GetSchemesForCurrentTheme () [schemeNameString]!;
     }
 
     /// <summary>
@@ -137,7 +126,7 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
     /// <param name="schemeName"></param>
     /// <returns></returns>
     /// <exception cref="KeyNotFoundException">If <paramref name="schemeName"/> is not found in the current theme.</exception>
-    public static Scheme GetScheme (string schemeName) { return GetSchemesForCurrentTheme ()! [schemeName]!; }
+    public static Scheme GetScheme (string schemeName) => GetSchemesForCurrentTheme () [schemeName]!;
 
     /// <summary>
     ///     Attempts to get the <see cref="Scheme"/> for the specified name without throwing.
@@ -159,22 +148,14 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
             if (!ConfigurationManager.IsInitialized ())
             {
                 // Module initializer / unit-test path — fall back to hard-coded defaults.
-                ImmutableSortedDictionary<string, Scheme?>? hardCoded = GetHardCodedSchemes ();
-
-                if (hardCoded is null)
-                {
-                    scheme = null;
-
-                    return false;
-                }
+                ImmutableSortedDictionary<string, Scheme?> hardCoded = GetHardCodedSchemes ();
 
                 schemes = hardCoded.ToDictionary (StringComparer.InvariantCultureIgnoreCase);
             }
             else
             {
                 // Avoid GetSchemesForCurrentTheme() — it throws if the Schemes property is absent.
-                if (ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue
-                    is not Dictionary<string, Scheme?> themeSchemes)
+                if (ThemeManager.GetCurrentTheme () ["Schemes"].PropertyValue is not Dictionary<string, Scheme?> themeSchemes)
                 {
                     scheme = null;
 
@@ -184,7 +165,7 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
                 schemes = themeSchemes;
             }
 
-            if (schemes.TryGetValue (schemeName, out Scheme? s) && s is not null)
+            if (schemes.TryGetValue (schemeName, out Scheme? s) && s is { })
             {
                 scheme = s;
 
@@ -203,7 +184,7 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
     /// </summary>
     /// <param name="schemeName"></param>
     /// <returns>The name of scheme.</returns>
-    public static string? SchemesToSchemeName (Schemes schemeName) { return Enum.GetName (typeof (Schemes), schemeName); }
+    public static string? SchemesToSchemeName (Schemes schemeName) => Enum.GetName (typeof (Schemes), schemeName);
 
     /// <summary>
     ///     Converts a string to a <see cref="Schemes"/> enum value.
@@ -214,7 +195,7 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
     {
         if (Enum.TryParse (typeof (Schemes), schemeName, out object? value))
         {
-            return value?.ToString ();
+            return value.ToString ();
         }
 
         return null;
@@ -239,7 +220,7 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
                 throw new InvalidOperationException ("Current Theme does not have a Scheme.");
             }
 
-            return schemes!;
+            return schemes;
         }
     }
 
@@ -251,17 +232,14 @@ public sealed class SchemeManager // : INotifyCollectionChanged, IDictionary<str
     {
         lock (_schemesLock)
         {
-            return GetSchemes ()!.Keys.ToImmutableList ();
+            return GetSchemes ().Keys.ToImmutableList ();
         }
     }
 
-    [RequiresUnreferencedCode ("Calls SetSchemes")]
-    [RequiresDynamicCode ("Calls SetSchemes")]
-    internal static void LoadToHardCodedDefaults ()
-    {
+    internal static void LoadToHardCodedDefaults () =>
+
         // BUGBUG: SchemeManager is broken and needs to be fixed to not have the hard coded schemes get overwritten.
         // BUGBUG: This is a partial workaround
         // BUGBUG: See https://github.com/gui-cs/Terminal.Gui/issues/4288
-        SetSchemes (GetHardCodedSchemes ()!.ToDictionary ());
-    }
+        SetSchemes (GetHardCodedSchemes ().ToDictionary ());
 }

@@ -290,6 +290,18 @@ public class KeyTests
         Assert.Equal (default (Rune), key.AsRune);
     }
 
+    [Fact]
+    public void AsGrapheme_And_AsRune_Suppress_ModifiedPrintableFallback_WithoutAssociatedText ()
+    {
+        Key key = new (Key.T.WithShift.WithAlt) { ShiftedKeyCode = (KeyCode)'T' };
+
+        Assert.Equal (string.Empty, key.AsGrapheme);
+        Assert.Equal (default (Rune), key.AsRune);
+        Assert.Equal (string.Empty, key.GetPrintableText ());
+        Assert.False (key.TryGetPrintableRune (out Rune rune));
+        Assert.Equal (default (Rune), rune);
+    }
+
     [Theory]
     [InlineData ("Barf")]
     public void Constructor_String_Invalid_Throws (string keyString) { Assert.Throws<ArgumentException> (() => new Key (keyString)); }

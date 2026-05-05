@@ -6,8 +6,6 @@ namespace Terminal.Gui.FileServices;
 public class FileSystemIconProvider
 {
     private readonly NerdFonts _nerd = new ();
-    private bool _useNerdIcons = NerdFonts.Enable;
-    private bool _useUnicodeCharacters;
 
     /// <summary>
     ///     Returns the character to use to represent <paramref name="fileSystemInfo"/> or an empty space if no icon
@@ -19,20 +17,15 @@ public class FileSystemIconProvider
     {
         if (UseNerdIcons)
         {
-            return new (
-                        _nerd.GetNerdIcon (
-                                           fileSystemInfo,
-                                           fileSystemInfo is IDirectoryInfo dir && IsOpenGetter (dir)
-                                          )
-                       );
+            return new Rune (_nerd.GetNerdIcon (fileSystemInfo, fileSystemInfo is IDirectoryInfo dir && IsOpenGetter (dir)));
         }
 
         if (fileSystemInfo is IDirectoryInfo)
         {
-            return UseUnicodeCharacters ? Glyphs.Folder : new (Path.DirectorySeparatorChar);
+            return UseUnicodeCharacters ? Glyphs.Folder : new Rune (Path.DirectorySeparatorChar);
         }
 
-        return UseUnicodeCharacters ? Glyphs.File : new (' ');
+        return UseUnicodeCharacters ? Glyphs.File : new Rune (' ');
     }
 
     /// <summary>
@@ -62,25 +55,25 @@ public class FileSystemIconProvider
     /// </summary>
     public bool UseNerdIcons
     {
-        get => _useNerdIcons;
+        get;
         set
         {
-            _useNerdIcons = value;
+            field = value;
 
             if (value)
             {
                 UseUnicodeCharacters = false;
             }
         }
-    }
+    } = NerdFonts.Enable;
 
     /// <summary>Gets or sets a flag indicating whether to use common unicode characters for file/directory icons.</summary>
     public bool UseUnicodeCharacters
     {
-        get => _useUnicodeCharacters;
+        get;
         set
         {
-            _useUnicodeCharacters = value;
+            field = value;
 
             if (value)
             {

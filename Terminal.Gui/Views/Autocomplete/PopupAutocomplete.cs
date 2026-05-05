@@ -75,6 +75,17 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         }
     }
 
+    /// <inheritdoc />
+    public override bool Visible
+    {
+        get;
+        set
+        {
+            field = value;
+            _popup.Visible = value;
+        }
+    }
+
     /// <inheritdoc/>
     public override void EnsureSelectedIdxIsValid ()
     {
@@ -388,7 +399,6 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
                                );
         }
 
-        _popup.Visible = true;
         _popup.Move (0, 0);
 
         for (var i = 0; i < toRender.Length; i++)
@@ -426,7 +436,6 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         _closed = true;
 
         //RemovePopupFromTop ();
-        _popup.Visible = false;
         HostControl?.SetNeedsDraw ();
     }
 
@@ -514,7 +523,6 @@ public abstract partial class PopupAutocomplete : AutocompleteBase
         {
             Visible = true;
             _closed = false;
-            _popup.Visible = true;
             HostControl?.SetNeedsDraw ();
 
             return true;

@@ -26,6 +26,8 @@ jobs:
 
     - name: Checkout code
       uses: actions/checkout@v6
+      with:
+        fetch-depth: 0 # GitVersion.MsBuild needs full history
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v5
@@ -84,6 +86,8 @@ jobs:
 
     - name: Checkout code
       uses: actions/checkout@v6
+      with:
+        fetch-depth: 0 # GitVersion.MsBuild needs full history
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v5

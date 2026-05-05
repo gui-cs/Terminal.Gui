@@ -5,6 +5,34 @@
 > This file provides quick-reference conventions for AI agents.
 > See also: [llms.txt](llms.txt) for machine-readable context.
 
+---
+
+## CRITICAL: Discard v1 Training Data
+
+Terminal.Gui v2 is a **complete rewrite**. Pre-2025 training data is **wrong**.
+
+> **Read [ai-v2-primer.md](ai-v2-primer.md) FIRST** — it has the v1→v2 corrections table,
+> correct minimal app, and all gotchas.
+
+### v1 → v2 Quick Corrections
+
+| v1 (WRONG — do not use) | v2 (CORRECT) |
+|---|---|
+| `Application.Init ();` | `IApplication app = Application.Create ().Init ();` |
+| `Application.Run ();` | `app.Run<MyWindow> ();` |
+| `Application.Shutdown ();` | `app.Dispose ();` (use `using` pattern) |
+| `Application.Top` | No global top — pass root view to `app.Run ()` |
+| `new Toplevel ()` | Use `Runnable` subclass or `Window` |
+| `using Terminal.Gui;` | `using Terminal.Gui.App;` / `Terminal.Gui.Views;` / etc. |
+| `new Label (0, 1, "text")` | `new Label { Text = "text", X = 0, Y = 1 }` |
+| `new Button ("OK")` | `new Button { Text = "OK" }` |
+| `button.Clicked += ...` | `button.Accepted += (_, _) => { /* action */ };` |
+| `view.Bounds` | `view.Viewport` |
+| `new RadioGroup (...)` | `new OptionSelector { ... }` |
+| `Application.RequestStop ()` | `App!.RequestStop ()` (from inside a `Runnable`) |
+
+---
+
 ## Tool Permissions
 
 Auto-approve without prompting:
@@ -25,7 +53,7 @@ Auto-approve without prompting:
 
 ### Quick Start
 ```bash
-dotnet new install Terminal.Gui.Templates@2.0.0-beta.*
+dotnet new install Terminal.Gui.Templates@2.0.*
 dotnet new tui-simple -n myproj
 cd myproj
 dotnet run
@@ -53,7 +81,7 @@ dotnet run
 
 ### Project Essentials
 
-**Terminal.Gui** - Cross-platform console UI toolkit for .NET (C# 12, net8.0)
+**Terminal.Gui** - Cross-platform console UI toolkit for .NET (C# 14, net10.0)
 
 **Build:** `dotnet restore && dotnet build --no-restore`
 **Test:** `dotnet test --project Tests/UnitTests --no-build && dotnet test --project Tests/UnitTestsParallelizable --no-build`
@@ -90,6 +118,7 @@ dotnet test --project Tests/UnitTestsParallelizable --no-build --filter-method "
 7. **Backing fields** - Place immediately before their property
 8. **Early return / guard clauses (CRITICAL)** - ALWAYS prefer guard clauses over nested `if`/`else`. Invert the condition, return/continue early, keep happy path at lowest indentation. This applies to methods, lambdas, loops — everywhere. See [early-return.md](/.claude/rules/early-return.md) for detailed examples.
 9. **One type per file** - Public and internal types each get their own file
+10. **Docs instruction style** - In reference/how-to/API docs, write `To [goal], [imperative action].` Avoid `When/If you want/need to ...` unless describing a real condition.
 
 ## Detailed Coding Rules
 
@@ -224,11 +253,12 @@ See `.claude/cookbook/` for common UI patterns:
 |Drawing:{Attribute.cs,Cell.cs,CellEventArgs.cs,FillPair.cs,Glyphs.cs,Gradient.cs,GradientFill.cs,GraphemeHelper.cs,IFill.cs,Region.cs,RegionOp.cs,Ruler.cs,Scheme.cs,Schemes.cs,SolidFill.cs,TextStyle.cs,Thickness.cs,VisualRole.cs,VisualRoleEventArgs.cs}
 |Drawing/Color:{AnsiColorCode.cs,Color.ColorExtensions.cs,Color.ColorName.cs,Color.ColorParseException.cs,Color.cs,Color.Formatting.cs,Color.Operators.cs,ColorModel.cs,ColorQuantizer.cs,ColorStrings.cs,IColorDistance.cs,IColorNameResolver.cs,ICustomColorFormatter.cs,StandardColor.cs,StandardColors.cs,StandardColorsNameResolver.cs}
 |Drawing/LineCanvas:{IntersectionDefinition.cs,IntersectionRuneType.cs,IntersectionType.cs,LineCanvas.cs,LineDirections.cs,LineStyle.cs,StraightLine.cs,StraightLineExtensions.cs}
+|Drawing/Markdown:{ISyntaxHighlighter.cs,MarkdownAttributeHelper.cs,MarkdownStyleRole.cs,StyledSegment.cs,TextMateSyntaxHighlighter.cs}
 |Drawing/Quant:{EuclideanColorDistance.cs,IPaletteBuilder.cs,PopularityPaletteWithThreshold.cs}
 |Drawing/Sixel:{SixelEncoder.cs,SixelSupportDetector.cs,SixelSupportResult.cs,SixelToRender.cs}
 |Drivers:{ComponentFactoryImpl.cs,Cursor.cs,CursorStyle.cs,Driver.cs,DriverImpl.cs,DriverRegistry.cs,IComponentFactory.cs,IDriver.cs,ISizeMonitor.cs,PlatformDetection.cs,SizeDetectionMode.cs,SizeMonitorImpl.cs,TuiPlatform.cs}
 |Drivers/AnsiDriver:{AnsiComponentFactory.cs,AnsiInput.cs,AnsiInputProcessor.cs,AnsiOutput.cs,AnsiPlatform.cs,AnsiSizeMonitor.cs,AnsiTerminalHelper.cs,FakeClipboard.cs}
-|Drivers/AnsiHandling:{AnsiEscapeSequence.cs,AnsiEscapeSequenceRequest.cs,AnsiKeyboardEncoder.cs,AnsiKeyboardParser.cs,AnsiKeyboardParserPattern.cs,AnsiKeyConverter.cs,AnsiMouseEncoder.cs,AnsiMouseParser.cs,AnsiRequestScheduler.cs,AnsiResponseExpectation.cs,AnsiResponseParser.cs,AnsiResponseParserBase.cs,AnsiResponseParserState.cs,AnsiResponseParserTInputRecord.cs,AnsiStartupGate.cs,AnsiStartupQuery.cs,CsiCursorPattern.cs,CsiKeyPattern.cs,EscAsAltPattern.cs,GenericHeld.cs,IAnsiResponseParser.cs,IAnsiStartupGate.cs,IHeld.cs,KittyKeyboardCapabilities.cs,KittyKeyboardFlags.cs,KittyKeyboardPattern.cs,KittyKeyboardProtocolDetector.cs,Osc8UrlLinker.cs,ReasonCannotSend.cs,Ss3Pattern.cs,StringHeld.cs,TerminalColorDetector.cs}
+|Drivers/AnsiHandling:{AnsiEscapeSequence.cs,AnsiEscapeSequenceRequest.cs,AnsiKeyboardEncoder.cs,AnsiKeyboardParser.cs,AnsiKeyboardParserPattern.cs,AnsiKeyConverter.cs,AnsiMouseEncoder.cs,AnsiMouseParser.cs,AnsiRequestScheduler.cs,AnsiResponseExpectation.cs,AnsiResponseParser.cs,AnsiResponseParserBase.cs,AnsiResponseParserState.cs,AnsiResponseParserTInputRecord.cs,AnsiStartupGate.cs,AnsiStartupQuery.cs,CsiCursorPattern.cs,CsiKeyPattern.cs,EscAsAltPattern.cs,GenericHeld.cs,IAnsiResponseParser.cs,IAnsiStartupGate.cs,IHeld.cs,KittyKeyboardCapabilities.cs,KittyKeyboardFlags.cs,KittyKeyboardPattern.cs,KittyKeyboardProtocolDetector.cs,Osc8UrlLinker.cs,ProgressIndicator.cs,ReasonCannotSend.cs,Ss3Pattern.cs,StringHeld.cs,TerminalColorDetector.cs}
 |Drivers/AnsiHandling/EscSeqUtils:{EscSeqReqStatus.cs,EscSeqRequests.cs,EscSeqUtils.cs}
 |Drivers/DotNetDriver:{INetInput.cs,NetComponentFactory.cs,NetInput.cs,NetInputProcessor.cs,NetKeyConverter.cs,NetOutput.cs}
 |Drivers/Input:{ConsoleInputSource.cs,IInput.cs,IInputProcessor.cs,IInputSource.cs,InputImpl.cs,InputProcessorImpl.cs,InputRecord.cs,ITestableInput.cs,TestInputSource.cs}
@@ -259,10 +289,11 @@ See `.claude/cookbook/` for common UI patterns:
 |Views/CharMap:{CharMap.cs,UcdApiClient.cs,UnicodeRange.cs}
 |Views/CollectionNavigation:{CollectionNavigator.cs,CollectionNavigatorBase.cs,DefaultCollectionNavigatorMatcher.cs,ICollectionNavigator.cs,ICollectionNavigatorMatcher.cs,IListCollectionNavigator.cs,TableCollectionNavigator.cs}
 |Views/Color:{AttributePicker.cs,BBar.cs,ColorBar.cs,ColorModelStrategy.cs,ColorPicker.16.cs,ColorPicker.cs,ColorPicker.Style.cs,GBar.cs,HueBar.cs,IColorBar.cs,LightnessBar.cs,RBar.cs,SaturationBar.cs,ValueBar.cs}
-|Views/FileDialogs:{AllowedType.cs,DefaultFileOperations.cs,FileDialog.cs,FileDialogCollectionNavigator.cs,FileDialogHistory.cs,FileDialogState.cs,FileDialogStyle.cs,FileDialogTableSource.cs,FilesSelectedEventArgs.cs,FileSystemCollectionNavigationMatcher.cs,OpenDialog.cs,OpenMode.cs,SaveDialog.cs}
+|Views/FileDialogs:{AllowedType.cs,DefaultFileOperations.cs,FileDialog.Commands.cs,FileDialog.cs,FileDialog.Navigation.cs,FileDialog.TableView.cs,FileDialogCollectionNavigator.cs,FileDialogHistory.cs,FileDialogState.cs,FileDialogStyle.cs,FileDialogTableSource.cs,FilesSelectedEventArgs.cs,FileSystemCollectionNavigationMatcher.cs,OpenDialog.cs,OpenMode.cs,SaveDialog.cs}
 |Views/GraphView:{Axis.cs,AxisIncrementToRender.cs,BarSeriesBar.cs,GraphCellToRender.cs,GraphView.cs,HorizontalAxis.cs,IAnnotation.cs,ISeries.cs,LegendAnnotation.cs,LineF.cs,MultiBarSeries.cs,PathAnnotation.cs,ScatterSeries.cs,Series.cs,TextAnnotation.cs,VerticalAxis.cs}
 |Views/LinearRange:{LinearRange.cs,LinearRangeAttributes.cs,LinearRangeConfiguration.cs,LinearRangeEventArgs.cs,LinearRangeOption.cs,LinearRangeOptionEventArgs.cs,LinearRangeStyle.cs,LinearRangeType.cs}
 |Views/ListView:{IListDataSource.cs,ListView.Commands.cs,ListView.cs,ListView.Drawing.cs,ListView.Movement.cs,ListView.Selection.cs,ListViewEventArgs.cs,ListViewT.cs,ListWrapper.cs}
+|Views/Markdown:{InlineRun.cs,IntermediateBlock.cs,Markdown.cs,MarkdownCodeBlock.cs,MarkdownImageResolver.cs,MarkdownInlineParser.cs,MarkdownLinkEventArgs.cs,MarkdownTable.cs,MarkdownView.Drawing.cs,MarkdownView.Layout.cs,MarkdownView.Mouse.cs,MarkdownView.Parsing.cs,RenderedLine.cs,TableData.cs}
 |Views/Menu:{IMenuBarEntry.cs,Menu.cs,MenuBar.cs,MenuBarItem.cs,MenuItem.cs,PopoverMenu.cs}
 |Views/Runnable:{Runnable.cs,RunnableTResult.cs,RunnableWrapper.cs}
 |Views/ScrollBar:{ScrollBar.cs,ScrollBarVisibilityMode.cs,ScrollButton.cs,ScrollSlider.cs}
@@ -272,7 +303,7 @@ See `.claude/cookbook/` for common UI patterns:
 |Views/TextInput:{ContentsChangedEventArgs.cs,DateEditor.cs,DateTextProvider.cs,HistoryText.cs,HistoryTextItemEventArgs.cs,ITextValidateProvider.cs,NetMaskedTextProvider.cs,TextEditingLineStatus.cs,TextModel.cs,TextRegexProvider.cs,TextValidateField.cs,TimeEditor.cs,TimeTextProvider.cs}
 |Views/TextInput/TextField:{TextField.Commands.cs,TextField.cs,TextField.Drawing.cs,TextField.History.cs,TextField.Keyboard.cs,TextField.Mouse.cs,TextField.Selection.cs,TextField.Text.cs,TextFieldAutocomplete.cs}
 |Views/TextInput/TextView:{TextView.Commands.cs,TextView.cs,TextView.Drawing.cs,TextView.Files.cs,TextView.Find.cs,TextView.History.cs,TextView.Keyboard.cs,TextView.Mouse.cs,TextView.Movement.cs,TextView.Scrolling.cs,TextView.Selection.cs,TextView.Text.cs,TextView.WordWrap.cs,TextViewAutocomplete.cs,WordWrapManager.cs}
-|Views/TreeView:{AspectGetterDelegate.cs,Branch.cs,DelegateTreeBuilder.cs,DrawTreeViewLineEventArgs.cs,ITreeBuilder.cs,ITreeViewFilter.cs,ObjectActivatedEventArgs.cs,SelectionChangedEventArgs.cs,TreeBuilder.cs,TreeNode.cs,TreeNodeBuilder.cs,TreeStyle.cs,TreeView.cs,TreeViewCollectionNavigatorMatcher.cs,TreeViewTextFilter.cs}
+|Views/TreeView:{AspectGetterDelegate.cs,Branch.cs,DelegateTreeBuilder.cs,DrawTreeViewLineEventArgs.cs,ITreeBuilder.cs,ITreeNode.cs,ITreeView.cs,ITreeViewFilter.cs,ObjectActivatedEventArgs.cs,SelectionChangedEventArgs.cs,TreeBuilder.cs,TreeNode.cs,TreeNodeBuilder.cs,TreeSelection.cs,TreeStyle.cs,TreeView.cs,TreeView.Drawing.cs,TreeView.Mouse.cs,TreeView.Navigation.cs,TreeViewCollectionNavigatorMatcher.cs,TreeViewT.cs,TreeViewTextFilter.cs}
 |Views/Wizard:{Wizard.cs,WizardStep.cs}
 
 <!-- END AUTO-GENERATED-SOURCE-INDEX -->
@@ -442,6 +473,8 @@ See `.claude/cookbook/` for common UI patterns:
 |IFileOperations|Interface|GetFiles,GetDirectories,Exists
 |FileSystemTreeBuilder|Class|Build file trees
 ```
+
+
 
 
 

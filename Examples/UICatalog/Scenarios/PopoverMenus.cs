@@ -32,7 +32,7 @@ public class PopoverMenus : Scenario
         _appWindow = new Window ();
         _appWindow.Title = GetQuitKeyAndName ();
         _appWindow.Arrangement = ViewArrangement.Fixed;
-        _appWindow.SchemeName = "Runnable";
+        _appWindow.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent);
 
         // Changing the key-bindings of a View is not allowed, however,
         // by default, Runnable doesn't bind to Command.Context, so
@@ -68,7 +68,7 @@ public class PopoverMenus : Scenario
                 X = Pos.AnchorEnd (),
                 Y = 3,
                 Height = Dim.Fill (3),
-                SchemeName = "Runnable",
+                SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Accent),
                 BorderStyle = LineStyle.Double,
                 Title = "E_vents",
                 Arrangement = ViewArrangement.LeftResizable
@@ -400,8 +400,7 @@ public class PopoverMenus : Scenario
 
                                   foreach (MenuItem item in cultures)
                                   {
-                                      ((CheckBox)item.CommandView).Value =
-                                          Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;
+                                      (item.CommandView as CheckBox)?.Value = Thread.CurrentThread.CurrentUICulture.Name == item.HelpText ? CheckState.Checked : CheckState.UnChecked;
                                   }
                               };
     }

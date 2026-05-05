@@ -65,8 +65,6 @@ public class CharMap : View, IDesignable, IValue<Rune>
     /// <summary>
     ///     Initializes a new instance.
     /// </summary>
-    [RequiresUnreferencedCode ("AOT")]
-    [RequiresDynamicCode ("AOT")]
     public CharMap ()
     {
         CanFocus = true;
@@ -115,7 +113,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
         HorizontalScrollBar.Increment = COLUMN_WIDTH;
 
         // This prevents scrolling past the last column
-        HorizontalScrollBar.ScrollableContentSize = GetContentSize ().Width - RowLabelWidth;
+        HorizontalScrollBar.ScrollableContentSize = GetContentWidth () - RowLabelWidth;
         HorizontalScrollBar.X = RowLabelWidth;
         HorizontalScrollBar.Y = Pos.AnchorEnd ();
         HorizontalScrollBar.Width = Dim.Fill (1);
@@ -130,7 +128,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
         // So, we do it manually on ViewportChanged events.
         ViewportChanged += (_, _) =>
                            {
-                               HorizontalScrollBar.Visible = Viewport.Width < GetContentSize ().Width;
+                               HorizontalScrollBar.Visible = Viewport.Width < GetContentWidth ();
                                UpdateCursor ();
                            };
 
@@ -213,7 +211,7 @@ public class CharMap : View, IDesignable, IValue<Rune>
         SetContentSize (new Size (COLUMN_WIDTH * 16 + RowLabelWidth, _visibleRowStarts.Count * _rowHeight + HEADER_HEIGHT));
 
         // Keep vertical scrollbar aligned with new content size
-        VerticalScrollBar.ScrollableContentSize = GetContentSize ().Height;
+        VerticalScrollBar.ScrollableContentSize = GetContentHeight ();
     }
 
     private int VisibleRowIndexForCodePoint (int codePoint)

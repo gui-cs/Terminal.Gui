@@ -210,9 +210,14 @@ public class Key : EventArgs, IEquatable<Key>
                 return GetSingleGraphemeOrEmpty (AssociatedText);
             }
 
+            if (IsAlt || IsCtrl)
+            {
+                return string.Empty;
+            }
+
             if (IsShift && ShiftedKeyCode != KeyCode.Null)
             {
-                Rune shiftedRune = ToRune (ShiftedKeyCode);
+                Rune shiftedRune = ToRune (ShiftedKeyCode | KeyCode.ShiftMask);
 
                 if (shiftedRune != default (Rune))
                 {
@@ -266,9 +271,14 @@ public class Key : EventArgs, IEquatable<Key>
                 return enumerator.MoveNext () ? default (Rune) : associatedRune;
             }
 
+            if (IsAlt || IsCtrl)
+            {
+                return default (Rune);
+            }
+
             if (IsShift && ShiftedKeyCode != KeyCode.Null)
             {
-                Rune shiftedRune = ToRune (ShiftedKeyCode);
+                Rune shiftedRune = ToRune (ShiftedKeyCode | KeyCode.ShiftMask);
 
                 if (shiftedRune != default (Rune))
                 {

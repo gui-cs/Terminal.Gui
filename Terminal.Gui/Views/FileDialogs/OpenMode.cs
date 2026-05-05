@@ -1,5 +1,4 @@
-#nullable disable
-﻿namespace Terminal.Gui.Views;
+namespace Terminal.Gui.Views;
 
 /// <summary>Determine which <see cref="System.IO"/> type to open.</summary>
 public enum OpenMode

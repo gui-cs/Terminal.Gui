@@ -255,9 +255,9 @@ public class PopoverMenuTests (ITestOutputHelper output)
             // Act: Activate the second CheckBox (Schemes.Menu)
             secondCheckBox.InvokeCommand (Command.Activate);
 
-            // Assert: Value should have changed exactly once to Schemes.Menu (index 1)
+            // Assert: Value should have changed exactly once to Schemes.Accent (index 1)
             Assert.Equal (1, valueChangedCount);
-            Assert.Equal (Schemes.Menu, selector.Value);
+            Assert.Equal (Schemes.Accent, selector.Value);
 
             popoverMenu.Dispose ();
         }

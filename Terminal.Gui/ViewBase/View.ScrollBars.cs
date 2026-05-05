@@ -101,13 +101,13 @@ public partial class View
         scrollBar.Y = Pos.Func (_ => Padding.Thickness.Top);
 
         scrollBar.Height = Dim.Fill (Dim.Func (_ => Padding.Thickness.Bottom));
-        scrollBar.ScrollableContentSize = GetContentSize ().Height;
+        scrollBar.ScrollableContentSize = GetContentHeight ();
 
         ViewportChanged += (_, _) => { scrollBar.Value = Viewport.Y; };
 
-        ContentSizeChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Height; };
+        ContentSizeChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentHeight (); };
 
-        FrameChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Height; };
+        FrameChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentHeight (); };
     }
 
     private void ConfigureHorizontalScrollBar (ScrollBar scrollBar)
@@ -119,13 +119,13 @@ public partial class View
         scrollBar.Y = Pos.AnchorEnd () - Pos.Func (_ => Padding.Thickness.Bottom - 1);
 
         scrollBar.Width = Dim.Fill (Dim.Func (_ => Padding.Thickness.Right));
-        scrollBar.ScrollableContentSize = GetContentSize ().Width;
+        scrollBar.ScrollableContentSize = GetContentWidth ();
 
         ViewportChanged += (_, _) => { scrollBar.Value = Viewport.X; };
 
-        ContentSizeChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Width; };
+        ContentSizeChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentWidth (); };
 
-        FrameChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentSize ().Width; };
+        FrameChanged += (_, _) => { scrollBar.ScrollableContentSize = GetContentWidth (); };
     }
 
     private void OnScrollBarInitialized (object? sender, EventArgs e)
@@ -143,6 +143,21 @@ public partial class View
                                   {
                                       Viewport = Viewport with { Y = Math.Min (args.NewValue, scrollBar.ScrollableContentSize - scrollBar.VisibleContentSize) };
                                   };
+
+        scrollBar.VisibleChanging += (_, args) =>
+                                     {
+                                         if (!args.NewValue)
+                                         {
+                                             return;
+                                         }
+                                         int width = Frame.Size.Width - GetAdornmentsThickness ().Horizontal;
+
+                                         if (width < 1 || Viewport.Height < 2)
+                                         {
+                                             // Prevent scrollbar from becoming visible if it would cause negative available space for content
+                                             args.Cancel = true;
+                                         }
+                                     };
 
         scrollBar.VisibleChanged += (_, _) =>
                                     {
@@ -165,6 +180,21 @@ public partial class View
                                   {
                                       Viewport = Viewport with { X = Math.Min (args.NewValue, scrollBar.ScrollableContentSize - scrollBar.VisibleContentSize) };
                                   };
+
+        scrollBar.VisibleChanging += (_, args) =>
+                                     {
+                                         if (!args.NewValue)
+                                         {
+                                             return;
+                                         }
+                                         int height = Frame.Size.Height - GetAdornmentsThickness ().Vertical;
+
+                                         if (Viewport.Width < 2 || height < 1)
+                                         {
+                                             // Prevent scrollbar from becoming visible if it would cause negative available space for content
+                                             args.Cancel = true;
+                                         }
+                                     };
 
         scrollBar.VisibleChanged += (_, _) =>
                                     {

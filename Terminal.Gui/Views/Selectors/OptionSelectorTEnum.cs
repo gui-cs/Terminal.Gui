@@ -10,7 +10,18 @@ public sealed class OptionSelector<TEnum> : OptionSelector, IValue where TEnum :
     /// <summary>
     ///     Initializes a new instance of the <see cref="OptionSelector{TEnum}"/> class.
     /// </summary>
-    public OptionSelector () => Labels = Enum.GetValues<TEnum> ().Select (f => f.ToString ()).ToArray ();
+    public OptionSelector ()
+    {
+        // Reset Value so that the Values setter can auto-set it to the first actual enum value.
+        // The base OptionSelector constructor sets Value = 0, which may not be a valid enum member.
+        base.Value = null;
+
+        // Set actual enum int values (bypass the throwing override via base).
+        base.Values = Enum.GetValues<TEnum> ().Select (f => Convert.ToInt32 (f)).ToList ().AsReadOnly ();
+
+        // Set labels, which triggers CreateSubViews + UpdateChecked.
+        Labels = Enum.GetNames<TEnum> ();
+    }
 
     /// <summary>
     ///     Gets or sets the value of the selected option.

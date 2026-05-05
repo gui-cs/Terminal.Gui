@@ -369,8 +369,9 @@ public class AnsiOutput : OutputBase, IOutput
                 return;
             }
 
-            // Restore terminal state: disable mouse, show cursor
+            // Restore terminal state: disable mouse, reset attributes, show cursor
             Write (EscSeqUtils.CSI_DisableMouseEvents);
+            Write (EscSeqUtils.CSI_ResetAttributes);
 
             if (AppModel == AppModel.Inline)
             {
@@ -382,14 +383,14 @@ public class AnsiOutput : OutputBase, IOutput
                 int lastInlineRow = appScreen.Y + appScreen.Height; // 1-indexed last row
                 Write (EscSeqUtils.CSI_SetCursorPosition (lastInlineRow, 1));
                 Write ("\n");
-                Write (EscSeqUtils.CSI_ShowCursor);
             }
             else
             {
                 // FullScreen mode: restore alternate buffer and show cursor
                 Write (EscSeqUtils.CSI_RestoreCursorAndRestoreAltBufferWithBackscroll);
-                Write (EscSeqUtils.CSI_ShowCursor);
             }
+
+            Write (EscSeqUtils.CSI_ShowCursor);
         }
         catch
         {

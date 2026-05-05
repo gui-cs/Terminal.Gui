@@ -224,7 +224,7 @@ public partial class TextView
             int desiredInsertionY = Math.Clamp (Viewport.Y + p.Y, 0, _model.Count);
             int movementY = desiredInsertionY - _lastMouseInsertionPointY;
 
-            if (Viewport.Y + p.Y > _model.Count || (IsSelecting && p.Y >= Math.Max (Viewport.Height - 1, 0)))
+            if (Viewport.Y + p.Y >= _model.Count || (IsSelecting && p.Y >= Math.Max (Viewport.Height - 1, 0)))
             {
                 CurrentRow = _model.Count - 1;
             }
@@ -274,7 +274,7 @@ public partial class TextView
             if (newInsertionIndex >= r.Count || (IsSelecting && p.X >= Math.Max (Viewport.Width - 1, 0)))
             {
                 Viewport = Viewport with { X = Math.Max (0, colsWidth - Viewport.Width + 1) };
-                CurrentColumn = Math.Max (r.Count - (ReadOnly ? 1 : 0), 0);
+                CurrentColumn = r.Count;
             }
             else if (Viewport.X + p.X == 0 || (IsSelecting && p.X == 0))
             {

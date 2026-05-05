@@ -1,18 +1,17 @@
 using System.Collections.ObjectModel;
 using System.IO.Abstractions;
-using System.Text.RegularExpressions;
 
 namespace Terminal.Gui.Views;
 
 /// <summary>
 ///     The base-class for <see cref="OpenDialog"/> and <see cref="SaveDialog"/>
 /// </summary>
-public class FileDialog : Dialog, IDesignable
+public partial class FileDialog : Dialog<IReadOnlyList<string>?>, IDesignable
 {
     /// <summary>Gets the Path separators for the operating system</summary>
 
     // ReSharper disable once InconsistentNaming
-    internal static char [] Separators = [System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar];
+    internal static readonly char [] Separators = [System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar];
 
     /// <summary>
     ///     Characters to prevent entry into <see cref="_tbPath"/>. Note that this is not using
@@ -22,30 +21,46 @@ public class FileDialog : Dialog, IDesignable
     private static readonly char [] _badChars = ['"', '<', '>', '|', '*', '?'];
 
     /// <summary>Locking object for ensuring only a single <see cref="SearchState"/> executes at once.</summary>
-    internal object _onlyOneSearchLock = new ();
+    internal readonly object _onlyOneSearchLock = new ();
+
+    private readonly IFileSystem? _fileSystem;
 
     private readonly Button _btnBack;
-    private readonly Button _btnCancel;
+
     private readonly Button _btnForward;
+    private readonly Button _btnCancel;
+
+    /// <summary>
+    ///     Gets whether the dialog was canceled (i.e., the user dismissed it without accepting a selection).
+    /// </summary>
+    /// <remarks>
+    ///     Returns <see langword="true"/> if <see cref="IRunnable{TResult}.Result"/> is <see langword="null"/>.
+    /// </remarks>
+    public bool Canceled => Result is null;
+
+    /// <summary>
+    ///     Gets the index of the cancel button for the dialog.
+    /// </summary>
+    public int CancelButtonIndex => Buttons.IndexOf (_btnCancel);
+
     private readonly Button _btnOk;
     private readonly Button _btnUp;
-    private readonly Button _btnTreeToggle;
-    private readonly IFileSystem? _fileSystem;
     private readonly FileDialogHistory _history;
     private readonly SpinnerView _spinnerView;
     private readonly View _tableViewContainer;
     private readonly TableView _tableView;
     private readonly TextField _tbFind;
     private readonly TextField _tbPath;
+    private readonly Button _btnTreeToggle;
     private readonly TreeView<IFileSystemInfo> _treeView;
-    private DropDownList? _typeFilterDropDown;
+    private Dictionary<IDirectoryInfo, string> _treeRoots = new ();
+    private readonly DropDownList? _typeFilterDropDown;
     private int _currentSortColumn;
     private bool _currentSortIsAsc = true;
     private bool _disposed;
     private string? _feedback;
 
     private bool _pushingState;
-    private Dictionary<IDirectoryInfo, string> _treeRoots = new ();
 
     /// <summary>Initializes a new instance of the <see cref="FileDialog"/> class.</summary>
     public FileDialog () : this (new FileSystem ()) { }
@@ -54,32 +69,25 @@ public class FileDialog : Dialog, IDesignable
     /// <remarks>This overload is mainly useful for testing.</remarks>
     internal FileDialog (IFileSystem? fileSystem)
     {
-        // Scrollbars are disabled by default (VisibilityMode.Manual and Visible = false)
-        // No need to explicitly set them
+        Height = Dim.Percent (80);
+        Width = Dim.Percent (80);
 
         _fileSystem = fileSystem;
         Style = new FileDialogStyle (fileSystem);
-
         ButtonAlignment = Alignment.End;
         ButtonAlignmentModes = AlignmentModes.IgnoreFirstOrLast;
+
+        // Ensure we get Accept for any subviews; esp TreeView
+        CommandsToBubbleUp = [Command.Accept];
 
         _btnCancel = new Button { Text = Strings.btnCancel };
 
         _btnOk = new Button { Text = Style.OkButtonText };
 
-        // Tree toggle button - Goes in Dialog Button Area
-        _btnTreeToggle = new Button { NoPadding = true };
-
-        _btnTreeToggle.Accepting += (s, e) =>
-                                    {
-                                        e.Handled = true;
-                                        ToggleTreeVisibility ();
-                                    };
-
         _btnUp = new Button { X = 0, Y = 1, NoPadding = true };
         _btnUp.Text = GetUpButtonText ();
 
-        _btnUp.Accepting += (s, e) =>
+        _btnUp.Accepting += (_, e) =>
                             {
                                 _history?.Up ();
                                 e.Handled = true;
@@ -88,7 +96,7 @@ public class FileDialog : Dialog, IDesignable
         _btnBack = new Button { X = Pos.Right (_btnUp) + 1, Y = 1, NoPadding = true };
         _btnBack.Text = GetBackButtonText ();
 
-        _btnBack.Accepting += (s, e) =>
+        _btnBack.Accepting += (_, e) =>
                               {
                                   _history?.Back ();
                                   e.Handled = true;
@@ -97,7 +105,7 @@ public class FileDialog : Dialog, IDesignable
         _btnForward = new Button { X = Pos.Right (_btnBack) + 1, Y = 1, NoPadding = true };
         _btnForward.Text = GetForwardButtonText ();
 
-        _btnForward.Accepting += (s, e) =>
+        _btnForward.Accepting += (_, e) =>
                                  {
                                      _history?.Forward ();
                                      e.Handled = true;
@@ -106,10 +114,10 @@ public class FileDialog : Dialog, IDesignable
         _tbPath = new TextField
         {
             // This sets the default width of the FileDialog as it is the widest subview
-            Width = Dim.Fill (0, 75)
+            Width = Dim.Fill ()
         };
 
-        _tbPath.KeyDown += (s, k) =>
+        _tbPath.KeyDown += (_, k) =>
                            {
                                ClearFeedback ();
 
@@ -121,34 +129,62 @@ public class FileDialog : Dialog, IDesignable
         _tbPath.Autocomplete = new AppendAutocomplete (_tbPath);
         _tbPath.Autocomplete.SuggestionGenerator = new FilepathSuggestionGenerator ();
 
+        _typeFilterDropDown = new DropDownList
+        {
+            X = Pos.AnchorEnd (),
+            Y = 1,
+            Visible = false
+        };
+        Add (_typeFilterDropDown);
+
         // Create table view container (right pane)
         _tableViewContainer = new View
         {
-            X = 0,
+            X = -1,
             Y = Pos.Bottom (_btnBack),
             Width = Dim.Fill (),
-            Height = Dim.Fill (0, 15),
+            Height = Dim.Fill (),
             Arrangement = ViewArrangement.LeftResizable,
             BorderStyle = LineStyle.Dashed,
             SuperViewRendersLineCanvas = true,
+            TabStop = TabBehavior.TabStop,
             CanFocus = true,
             Id = "_tableViewContainer"
         };
+
+        // Tree toggle button - Goes in Dialog Button Area
+        _btnTreeToggle = new Button { NoPadding = true };
+
+        _btnTreeToggle.Accepting += (_, e) =>
+                                    {
+                                        e.Handled = true;
+                                        ToggleTreeVisibility ();
+                                    };
 
         // Create tree view container (left pane)
         _treeView = new TreeView<IFileSystemInfo>
         {
             X = 0,
             Y = Pos.Bottom (_btnBack),
-            Width = Dim.Fill (30, _tableViewContainer!),
+            Width = Dim.Fill (30, _tableViewContainer),
             Height = Dim.Height (_tableViewContainer),
-            Visible = false
+            Visible = true
         };
 
-        _tableView = new TableView { Width = Dim.Fill (), Height = Dim.Fill (1), FullRowSelect = true, Id = "_tableView" };
+        var fileDialogTreeBuilder = new FileSystemTreeBuilder { IncludeFiles = false };
+        _treeView.TreeBuilder = fileDialogTreeBuilder;
+        _treeView.AspectGetter = AspectGetter;
+        Style.TreeStyle = _treeView.Style;
+
+        _treeView.SelectionChanged += TreeView_SelectionChanged;
+        _treeView.KeystrokeNavigator.Matcher = new FileSystemCollectionNavigationMatcher ();
+
+        _tableView = new TableView { Width = Dim.Fill (), Height = Dim.Fill (_tbFind!) - 1, FullRowSelect = true, Id = "_tableView" };
         _tableView.CollectionNavigator = new FileDialogCollectionNavigator (this, _tableView);
         _tableView.KeyBindings.ReplaceCommands (Key.Space, Command.Toggle);
         _tableView.Activating += OnTableViewActivating;
+        _tableView.ViewportSettings |= ViewportSettingsFlags.HasScrollBars;
+
         Style.TableStyle = _tableView.Style;
 
         ColumnStyle nameStyle = Style.TableStyle.GetOrCreateColumnStyle (0);
@@ -167,53 +203,49 @@ public class FileDialog : Dialog, IDesignable
         typeStyle.MinWidth = 6;
         typeStyle.ColorGetter = ColorGetter;
 
-        var fileDialogTreeBuilder = new FileSystemTreeBuilder ();
-        _treeView.TreeBuilder = fileDialogTreeBuilder;
-        _treeView.AspectGetter = AspectGetter;
-        Style.TreeStyle = _treeView.Style;
-
-        _treeView.SelectionChanged += TreeView_SelectionChanged;
-        _treeView.KeystrokeNavigator.Matcher = new FileSystemCollectionNavigationMatcher ();
-
         _tableViewContainer.Add (_tableView);
 
-        _tableView.Style.ShowHorizontalHeaderOverline = true;
-        _tableView.Style.ShowVerticalCellLines = true;
-        _tableView.Style.ShowVerticalHeaderLines = true;
+        _tableView.Style.ShowHorizontalHeaderOverline = false;
+        _tableView.Style.ShowVerticalCellLines = false;
+        _tableView.Style.ShowVerticalHeaderLines = false;
         _tableView.Style.AlwaysShowHeaders = true;
-        _tableView.Style.ShowHorizontalHeaderUnderline = true;
-
-        _history = new FileDialogHistory (this);
-
-        _tbPath.TextChanged += (s, e) => PathChanged ();
-
-        _tableView.CellActivated += CellActivate;
-        _tableView.KeyDown += (s, k) => k.Handled = TableView_KeyDown (k);
-        _tableView.SelectedCellChanged += TableView_SelectedCellChanged;
+        _tableView.Style.ShowHorizontalHeaderUnderline = false;
+        _tableView.Style.ShowHorizontalBottomLine = false;
+        _tableView.Accepted += TableViewOnAccepted;
+        _tableView.KeyDown += (_, k) => k.Handled = TableView_KeyDown (k);
+        _tableView.ValueChanged += TableViewOnValueChanged;
 
         _tableView.KeyBindings.ReplaceCommands (Key.Home, Command.Start);
         _tableView.KeyBindings.ReplaceCommands (Key.End, Command.End);
         _tableView.KeyBindings.ReplaceCommands (Key.Home.WithShift, Command.StartExtend);
         _tableView.KeyBindings.ReplaceCommands (Key.End.WithShift, Command.EndExtend);
+        _history = new FileDialogHistory (this);
 
         // Changing the key-bindings of a View is not allowed, however,
         // by default, Runnable doesn't bind to Command.Context, so
         // we can take advantage of the CommandNotBound event to handle it
         _tableView.CommandNotBound += TableViewHandleCommandNotBound;
-        _tableView.KeyBindings.Add (Key.Space.WithCtrl, Command.Context);
+        _tableView.KeyBindings.Add (PopoverMenu.DefaultKey, Command.Context);
         _tableView.MouseBindings.Add (MouseFlags.RightButtonClicked, Command.Context);
 
-        _tbFind = new TextField { X = 0, Width = Dim.Width (_tableView), Y = Pos.Bottom (_tableView), Id = "_tbFind" };
+        _tbPath.TextChanged += (_, _) => PathChanged ();
+
+        _tbFind = new TextField { X = 0, Width = Dim.Width (_tableView) - 1, Y = Pos.AnchorEnd (), Id = "_tbFind" };
 
         _spinnerView = new SpinnerView
         {
             // The spinner view is positioned over the last column of _tbFind
-            X = Pos.Right (_tbFind) - 1, Y = Pos.Top (_tbFind), Visible = false
+            X = Pos.Right (_tbFind) - 8,
+            Y = Pos.Top (_tbFind),
+            Width = Dim.Auto (),
+            Visible = false,
+            Style = new SpinnerStyle.Aesthetic (),
+            Arrangement = ViewArrangement.Overlapped
         };
 
-        _tbFind.TextChanged += (s, o) => RestartSearch ();
+        _tbFind.TextChanged += (_, _) => RestartSearch ();
 
-        _tbFind.KeyDown += (s, o) =>
+        _tbFind.KeyDown += (_, o) =>
                            {
                                if (o.KeyCode == KeyCode.Enter)
                                {
@@ -221,14 +253,12 @@ public class FileDialog : Dialog, IDesignable
                                    o.Handled = true;
                                }
 
-                               if (o.KeyCode == KeyCode.Esc)
+                               if (o.KeyCode == KeyCode.Esc && CancelSearch ())
                                {
-                                   if (CancelSearch ())
-                                   {
-                                       o.Handled = true;
-                                   }
+                                   o.Handled = true;
                                }
                            };
+
         AllowsMultipleSelection = false;
 
         UpdateNavigationVisibility ();
@@ -243,51 +273,58 @@ public class FileDialog : Dialog, IDesignable
         Add (_btnBack);
         Add (_btnForward);
         Add (_treeView);
+
         Add (_tableViewContainer);
         _tableViewContainer.Add (_tbFind);
         _tableViewContainer.Add (_spinnerView);
 
-        // Default: Tree hidden and splitter hidden
+        // to streamline user experience and allow direct typing of paths
+        // with zero navigation we start with focus in the text box and any
+        // default/current path fully selected and ready to be overwritten
+        _tbPath.SetFocus ();
+
         SetTreeVisible (false);
     }
 
-    private void TableViewHandleCommandNotBound (object? sender, CommandEventArgs e)
+    /// <inheritdoc/>
+    public override void EndInit ()
     {
-        if (e.Context!.Command != Command.Context)
+        base.EndInit ();
+
+        // Style may have been updated after instance was constructed
+        _btnOk.Text = Style.OkButtonText;
+        _btnCancel.Text = Style.CancelButtonText;
+        _btnUp.Text = GetUpButtonText ();
+        _btnBack.Text = GetBackButtonText ();
+        _btnForward.Text = GetForwardButtonText ();
+        _tbPath.Title = Style.PathCaption;
+        _tbFind.Title = Style.SearchCaption;
+        _treeRoots = Style.TreeRootGetter ();
+        Style.IconProvider.IsOpenGetter = _treeView.IsExpanded;
+        _treeView.AddObjects (_treeRoots.Keys);
+
+        // if filtering on file type is configured then create the DropDownList and establish
+        // initial filtering by extension(s)
+        if (AllowedTypes.Count > 0)
         {
-            return;
+            CurrentFilter = AllowedTypes [0];
+
+            _typeFilterDropDown?.Visible = true;
+            _typeFilterDropDown?.Source = new ListWrapper<string> (new ObservableCollection<string> (AllowedTypes.Select (a => a.ToString ()!).ToList ()));
+            _typeFilterDropDown?.Value = AllowedTypes [0].ToString () ?? string.Empty;
         }
 
-        if (e.Context.Binding is MouseBinding { MouseEvent: { } mouse })
+        // if no path has been provided
+        if (Path.Length <= 0)
         {
-            Point? clickedCell = _tableView.ScreenToCell (mouse.Position!.Value.X, mouse.Position!.Value.Y, out int? clickedCol);
-
-            if (clickedCol is { })
-            {
-                // right click in a header
-                ShowHeaderContextMenu (clickedCol.Value, mouse);
-            }
-            else if (clickedCell is { })
-            {
-                // right click in rest of table
-                ShowCellContextMenu (clickedCell, mouse);
-            }
+            Path = _fileSystem!.Directory.GetCurrentDirectory ();
         }
 
-        if (e.Context.Binding is KeyBinding)
+        _tbPath.SelectAll ();
+
+        if (string.IsNullOrEmpty (Title))
         {
-            PopoverMenu? contextMenu = new ([
-                                                new MenuItem (Strings.fdCtxNew, string.Empty, New),
-                                                new MenuItem (Strings.fdCtxRename, string.Empty, () => Rename (App)),
-                                                new MenuItem (Strings.fdCtxDelete, string.Empty, Delete)
-                                            ]);
-
-            // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
-            // and the context menu is disposed when it is closed.
-            App!.Popovers?.Register (contextMenu);
-
-            var pos = new Point (_tableView.FrameToScreen ().X + 15, _tableView.FrameToScreen ().Y + _tableView.SelectedRow + _tableView.GetHeaderHeight ());
-            contextMenu?.MakeVisible (pos);
+            Title = GetDefaultTitle ();
         }
     }
 
@@ -376,131 +413,9 @@ public class FileDialog : Dialog, IDesignable
     ///     Event fired when user attempts to confirm a selection (or multi selection). Allows you to cancel the selection
     ///     or undertake alternative behavior e.g. open a dialog "File already exists, Overwrite? yes/no".
     /// </summary>
+
+    // TODO: Refactor to use CWP
     public event EventHandler<FilesSelectedEventArgs>? FilesSelected;
-
-    /// <summary>
-    ///     Returns true if there are no <see cref="AllowedTypes"/> or one of them agrees that <paramref name="file"/>
-    ///     <see cref="IAllowedType.IsAllowed(string)"/>.
-    /// </summary>
-    /// <param name="file"></param>
-    /// <returns></returns>
-    public bool IsCompatibleWithAllowedExtensions (IFileInfo file)
-    {
-        // no restrictions
-        if (!AllowedTypes.Any ())
-        {
-            return true;
-        }
-
-        return MatchesAllowedTypes (file);
-    }
-
-    /// <inheritdoc/>
-    protected override bool OnDrawingContent (DrawContext? context)
-    {
-        if (!string.IsNullOrWhiteSpace (_feedback))
-        {
-            int feedbackWidth = _feedback.GetColumns ();
-            int feedbackPadLeft = (Viewport.Width - feedbackWidth) / 2 - 1;
-
-            feedbackPadLeft = Math.Min (Viewport.Width, feedbackPadLeft);
-            feedbackPadLeft = Math.Max (0, feedbackPadLeft);
-
-            int feedbackPadRight = Viewport.Width - (feedbackPadLeft + feedbackWidth + 2);
-            feedbackPadRight = Math.Min (Viewport.Width, feedbackPadRight);
-            feedbackPadRight = Math.Max (0, feedbackPadRight);
-
-            Move (0, Viewport.Height / 2);
-
-            SetAttribute (new Attribute (Color.Red, GetAttributeForRole (VisualRole.Normal).Background));
-            AddStr (new string (' ', feedbackPadLeft));
-            AddStr (_feedback);
-            AddStr (new string (' ', feedbackPadRight));
-        }
-
-        return true;
-    }
-
-    /// <inheritdoc/>
-    protected override void OnIsRunningChanged (bool newIsRunning)
-    {
-        base.OnIsRunningChanged (newIsRunning);
-
-        if (!newIsRunning)
-        {
-            return;
-        }
-
-        Arrangement |= ViewArrangement.Resizable;
-
-        // May have been updated after instance was constructed
-        _btnOk.Text = Style.OkButtonText;
-        _btnCancel.Text = Style.CancelButtonText;
-        _btnUp.Text = GetUpButtonText ();
-        _btnBack.Text = GetBackButtonText ();
-        _btnForward.Text = GetForwardButtonText ();
-
-        _tbPath.Title = Style.PathCaption;
-        _tbFind.Title = Style.SearchCaption;
-
-        _tbPath.Autocomplete?.Scheme = new Scheme (_tbPath.GetScheme ())
-        {
-            Normal = new Attribute (Color.Black, _tbPath.GetAttributeForRole (VisualRole.Normal).Background)
-        };
-
-        _treeRoots = Style.TreeRootGetter ();
-        Style.IconProvider.IsOpenGetter = _treeView.IsExpanded;
-
-        _treeView.AddObjects (_treeRoots.Keys);
-
-        // if filtering on file type is configured then create the DropDownList and establish
-        // initial filtering by extension(s)
-        if (AllowedTypes.Any ())
-        {
-            CurrentFilter = AllowedTypes [0];
-
-            _typeFilterDropDown = new DropDownList
-            {
-                X = Pos.AnchorEnd (),
-                Y = 1,
-                Source = new ListWrapper<string> (new ObservableCollection<string> (AllowedTypes.Select (a => a.ToString ()!).ToList ())),
-                Value = AllowedTypes [0].ToString () ?? string.Empty
-            };
-            Add (_typeFilterDropDown);
-        }
-
-        // if no path has been provided
-        if (_tbPath.Text.Length <= 0)
-        {
-            Path = _fileSystem!.Directory.GetCurrentDirectory ();
-        }
-
-        // to streamline user experience and allow direct typing of paths
-        // with zero navigation we start with focus in the text box and any
-        // default/current path fully selected and ready to be overwritten
-        _tbPath.SetFocus ();
-        _tbPath.SelectAll ();
-
-        if (string.IsNullOrEmpty (Title))
-        {
-            Title = GetDefaultTitle ();
-        }
-
-        // Ensure toggle button text matches current state after sizing
-        SetTreeVisible (false);
-
-        SetNeedsDraw ();
-        SetNeedsLayout ();
-    }
-
-    /// <inheritdoc/>
-    protected override void Dispose (bool disposing)
-    {
-        _disposed = true;
-        base.Dispose (disposing);
-
-        CancelSearch ();
-    }
 
     /// <summary>
     ///     Gets a default dialog title, when <see cref="View.Title"/> is not set or empty, result of the function will be
@@ -531,870 +446,22 @@ public class FileDialog : Dialog, IDesignable
         return string.Join (' ', titleParts);
     }
 
-    internal void ApplySort ()
-    {
-        FileSystemInfoStats [] stats = State?.Children ?? [];
-
-        // This portion is never reordered (always .. at top then folders)
-        IOrderedEnumerable<FileSystemInfoStats> forcedOrder = stats.OrderByDescending (f => f.IsParent).ThenBy (f => f.IsDir ? -1 : 100);
-
-        // This portion is flexible based on the column clicked (e.g. alphabetical)
-        IOrderedEnumerable<FileSystemInfoStats> ordered = _currentSortIsAsc
-                                                              ? forcedOrder.ThenBy (f => FileDialogTableSource.GetRawColumnValue (_currentSortColumn, f))
-                                                              : forcedOrder.ThenByDescending (f => FileDialogTableSource.GetRawColumnValue (_currentSortColumn,
-                                                                                                  f));
-
-        if (State is { })
-        {
-            State.Children = ordered.ToArray ();
-        }
-
-        _tableView.Update ();
-    }
-
-    /// <summary>Changes the dialog such that <paramref name="d"/> is being explored.</summary>
-    /// <param name="d"></param>
-    /// <param name="addCurrentStateToHistory"></param>
-    /// <param name="setPathText"></param>
-    /// <param name="clearForward"></param>
-    /// <param name="pathText">Optional alternate string to set path to.</param>
-    internal void PushState (IDirectoryInfo d, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true, string? pathText = null)
-    {
-        // no change of state
-        if (d == State?.Directory)
-        {
-            return;
-        }
-
-        if (d.FullName == State?.Directory.FullName)
-        {
-            return;
-        }
-
-        PushState (new FileDialogState (d, this), addCurrentStateToHistory, setPathText, clearForward, pathText);
-    }
-
-    /// <summary>Select <paramref name="toRestore"/> in the table view (if present)</summary>
-    /// <param name="toRestore"></param>
-    internal void RestoreSelection (IFileSystemInfo toRestore)
-    {
-        _tableView.SelectedRow = State!.Children.IndexOf (r => r.FileSystemInfo == toRestore);
-        _tableView.EnsureSelectedCellIsVisible ();
-    }
-
-    internal void SortColumn (int col, bool isAsc)
-    {
-        // set a sort order
-        _currentSortColumn = col;
-        _currentSortIsAsc = isAsc;
-
-        ApplySort ();
-    }
-
-    /// <inheritdoc/>
-    protected override bool OnAccepting (CommandEventArgs args)
-    {
-        if (Accept (true))
-        {
-            return base.OnAccepting (args);
-        }
-
-        return false;
-    }
-
-    private void Accept (IEnumerable<FileSystemInfoStats> toMultiAccept)
-    {
-        if (!AllowsMultipleSelection)
-        {
-            return;
-        }
-
-        // Don't include ".." (IsParent) in multi-selections
-        MultiSelected = toMultiAccept.Where (s => !s.IsParent).Select (s => s.FileSystemInfo!.FullName).ToList ().AsReadOnly ();
-
-        Path = MultiSelected.Count == 1 ? MultiSelected [0] : string.Empty;
-
-        FinishAccept ();
-    }
-
-    private void Accept (IFileInfo f)
-    {
-        if (!IsCompatibleWithOpenMode (f.FullName, out string reason))
-        {
-            _feedback = reason;
-            SetNeedsDraw ();
-
-            return;
-        }
-
-        Path = f.FullName;
-
-        if (AllowsMultipleSelection)
-        {
-            MultiSelected = new List<string> { f.FullName }.AsReadOnly ();
-        }
-
-        FinishAccept ();
-    }
-
-    private bool Accept (bool allowMulti)
-    {
-        if (allowMulti && TryAcceptMulti ())
-        {
-            return false;
-        }
-
-        if (!IsCompatibleWithOpenMode (_tbPath.Text, out string reason))
-        {
-            _feedback = reason;
-            SetNeedsDraw ();
-
-            return false;
-        }
-
-        return FinishAccept ();
-    }
-
-    private void AcceptIf (Key key, KeyCode isKey)
-    {
-        if (!key.Handled && key.KeyCode == isKey)
-        {
-            key.Handled = true;
-
-            // User hit Enter in text box so probably wants the
-            // contents of the text box as their selection not
-            // whatever lingering selection is in TableView
-            Accept (false);
-        }
-    }
-#if MENU_V1
-    private void AllowedTypeMenuClicked (int idx)
-    {
-        IAllowedType allow = AllowedTypes [idx];
-
-        for (var i = 0; i < AllowedTypes.Count; i++)
-        {
-            _allowedTypeMenuItems! [i].Checked = i == idx;
-        }
-
-        _allowedTypeMenu!.Title = allow.ToString ()!;
-
-        CurrentFilter = allow;
-
-        _tbPath.ClearAllSelection ();
-        _tbPath.Autocomplete.ClearSuggestions ();
-
-        State?.RefreshChildren ();
-        WriteStateToTableView ();
-    }
-#endif
-
-    private string AspectGetter (object o)
-    {
-        var fsi = (IFileSystemInfo)o;
-
-        if (o is IDirectoryInfo dir && _treeRoots.ContainsKey (dir))
-        {
-            // Directory has a special name e.g. 'Pictures'
-            return _treeRoots [dir];
-        }
-
-        return (Style.IconProvider.GetIconWithOptionalSpace (fsi) + fsi.Name).Trim ();
-    }
-
-    private bool CancelSearch ()
-    {
-        if (State is SearchState search)
-        {
-            return search.Cancel ();
-        }
-
-        return false;
-    }
-
-    private void CellActivate (object? sender, CellActivatedEventArgs obj)
-    {
-        if (TryAcceptMulti ())
-        {
-            return;
-        }
-
-        FileSystemInfoStats stats = RowToStats (obj.Row);
-
-        if (stats.FileSystemInfo is IDirectoryInfo d)
-        {
-            PushState (d, true);
-
-            //if (d == State?.Directory || d.FullName == State?.Directory.FullName)
-            //{
-            //    FinishAccept ();
-            //}
-
-            return;
-        }
-
-        if (stats.FileSystemInfo is IFileInfo f)
-        {
-            Accept (f);
-        }
-    }
-
-    private void ClearFeedback () => _feedback = null;
-
-    private Scheme ColorGetter (CellColorGetterArgs args)
-    {
-        FileSystemInfoStats stats = RowToStats (args.RowIndex);
-
-        if (!Style.UseColors)
-        {
-            return _tableView.GetScheme ();
-        }
-
-        Color color = Style.ColorProvider.GetColor (stats.FileSystemInfo!) ?? new Color (Color.White);
-        var black = new Color (Color.Black);
-
-        // TODO: Add some kind of cache for this
-        return new Scheme
-        {
-            Normal = new Attribute (color, black),
-            HotNormal = new Attribute (color, black),
-            Focus = new Attribute (black, color),
-            HotFocus = new Attribute (black, color)
-        };
-    }
-
-    private void Delete ()
-    {
-        IFileSystemInfo [] toDelete = GetFocusedFiles ()!;
-
-        if (FileOperationsHandler.Delete (App, toDelete))
-        {
-            RefreshState ();
-        }
-    }
-
-    private bool FinishAccept ()
-    {
-        var e = new FilesSelectedEventArgs (this);
-
-        FilesSelected?.Invoke (this, e);
-
-        if (e.Cancel)
-        {
-            return false;
-        }
-
-        // if user uses Path selection mode (e.g. Enter in text box)
-        // then also copy to MultiSelected
-        if (AllowsMultipleSelection && !MultiSelected.Any ())
-        {
-            MultiSelected = string.IsNullOrWhiteSpace (Path) ? Enumerable.Empty<string> ().ToList ().AsReadOnly () : new List<string> { Path }.AsReadOnly ();
-        }
-
-        // TODO: TableView should not always return true from OnCellActivated.
-        Result = 2; // Ok button index
-
-        if (IsModal)
-        {
-            App?.RequestStop ();
-
-            return true;
-        }
-
-        return false;
-    }
-
-    private string GetBackButtonText () => Glyphs.LeftArrow + "-";
-
-    private IFileSystemInfo? []? GetFocusedFiles ()
-    {
-        if (!_tableView.HasFocus || !_tableView.CanFocus)
-        {
-            return null;
-        }
-
-        _tableView.EnsureValidSelection ();
-
-        if (_tableView.SelectedRow < 0)
-        {
-            return null;
-        }
-
-        return _tableView.GetAllSelectedCells ()
-                         .Select (c => c.Y)
-                         .Distinct ()
-                         .Select (RowToStats)
-                         .Where (s => !s.IsParent)
-                         .Select (d => d.FileSystemInfo)
-                         .ToArray ();
-    }
-
-    private string GetForwardButtonText () => "-" + Glyphs.RightArrow;
-
-    private string GetProposedNewSortOrder (int clickedCol, out bool isAsc)
-    {
-        // work out new sort order
-        if (_currentSortColumn == clickedCol && _currentSortIsAsc)
-        {
-            isAsc = false;
-
-            return string.Format (Strings.fdCtxSortDesc, _tableView.Table!.ColumnNames [clickedCol]);
-        }
-
-        isAsc = true;
-
-        return string.Format (Strings.fdCtxSortAsc, _tableView.Table!.ColumnNames [clickedCol]);
-    }
-
-    private string GetUpButtonText () => Style.UseUnicodeCharacters ? "◭" : "▲";
-
-    private void HideColumn (int clickedCol)
-    {
-        ColumnStyle style = _tableView.Style.GetOrCreateColumnStyle (clickedCol);
-        style.Visible = false;
-        _tableView.Update ();
-    }
-
-    private bool IsCompatibleWithAllowedExtensions (string path)
-    {
-        // no restrictions
-        if (!AllowedTypes.Any ())
-        {
-            return true;
-        }
-
-        return AllowedTypes.Any (t => t.IsAllowed (path));
-    }
-
-    private bool IsCompatibleWithOpenMode (string s, out string reason)
-    {
-        reason = string.Empty;
-
-        if (string.IsNullOrWhiteSpace (s))
-        {
-            return false;
-        }
-
-        if (!IsCompatibleWithAllowedExtensions (s))
-        {
-            reason = Style.WrongFileTypeFeedback;
-
-            return false;
-        }
-
-        switch (OpenMode)
-        {
-            case OpenMode.Directory:
-                if (MustExist && !Directory.Exists (s))
-                {
-                    reason = Style.DirectoryMustExistFeedback;
-
-                    return false;
-                }
-
-                if (File.Exists (s))
-                {
-                    reason = Style.FileAlreadyExistsFeedback;
-
-                    return false;
-                }
-
-                return true;
-
-            case OpenMode.File:
-
-                if (MustExist && !File.Exists (s))
-                {
-                    reason = Style.FileMustExistFeedback;
-
-                    return false;
-                }
-
-                if (Directory.Exists (s))
-                {
-                    reason = Style.DirectoryAlreadyExistsFeedback;
-
-                    return false;
-                }
-
-                return true;
-
-            case OpenMode.Mixed:
-                if (MustExist && !File.Exists (s) && !Directory.Exists (s))
-                {
-                    reason = Style.FileOrDirectoryMustExistFeedback;
-
-                    return false;
-                }
-
-                return true;
-
-            default: throw new ArgumentOutOfRangeException (nameof (OpenMode));
-        }
-    }
-
-    /// <summary>Returns true if any <see cref="AllowedTypes"/> matches <paramref name="file"/>.</summary>
-    /// <param name="file"></param>
-    /// <returns></returns>
-    private bool MatchesAllowedTypes (IFileInfo file) => AllowedTypes.Any (t => t.IsAllowed (file.FullName));
-
-    /// <summary>
-    ///     If <see cref="TableView.MultiSelect"/> is this returns a union of all <see cref="FileSystemInfoStats"/> in the
-    ///     selection.
-    /// </summary>
-    /// <returns></returns>
-    private IEnumerable<FileSystemInfoStats> MultiRowToStats ()
-    {
-        HashSet<FileSystemInfoStats> toReturn = new ();
-
-        if (AllowsMultipleSelection && _tableView.MultiSelectedRegions.Any ())
-        {
-            foreach (Point p in _tableView.GetAllSelectedCells ())
-            {
-                FileSystemInfoStats add = State?.Children [p.Y]!;
-
-                toReturn.Add (add);
-            }
-        }
-
-        return toReturn;
-    }
-
-    private void New ()
-    {
-        {
-            IFileSystemInfo created = FileOperationsHandler.New (App, _fileSystem!, State!.Directory);
-
-            RefreshState ();
-            RestoreSelection (created);
-        }
-    }
-
-    private void OnTableViewActivating (object? sender, CommandEventArgs e)
-    {
-        // Only handle mouse clicks, not keyboard selections
-        if (e.Context?.Binding is not MouseBinding { MouseEvent: { } mouse })
-        {
-            return;
-        }
-
-        _tableView.ScreenToCell (mouse.Position!.Value.X, mouse.Position!.Value.Y, out int? clickedCol);
-
-        if (clickedCol is { })
-        {
-            if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonClicked))
-            {
-                // left click in a header
-                SortColumn (clickedCol.Value);
-            }
-        }
-    }
-
-    private void PathChanged ()
-    {
-        // avoid re-entry
-        if (_pushingState)
-        {
-            return;
-        }
-
-        string path = _tbPath.Text;
-
-        if (string.IsNullOrWhiteSpace (path))
-        {
-            return;
-        }
-
-        IDirectoryInfo dir = StringToDirectoryInfo (path);
-
-        if (dir.Exists)
-        {
-            PushState (dir, true, false);
-        }
-        else if (dir.Parent?.Exists ?? false)
-        {
-            PushState (dir.Parent, true, false);
-        }
-
-        _tbPath.Autocomplete?.GenerateSuggestions (new AutocompleteFilepathContext (_tbPath.Text, _tbPath.InsertionPoint, State));
-    }
-
-    private void PushState (FileDialogState newState, bool addCurrentStateToHistory, bool setPathText = true, bool clearForward = true, string? pathText = null)
-    {
-        if (State is SearchState search)
-        {
-            search.Cancel ();
-        }
-
-        try
-        {
-            _pushingState = true;
-
-            // push the old state to history
-            if (addCurrentStateToHistory)
-            {
-                _history.Push (State, clearForward);
-            }
-
-            _tbPath.Autocomplete?.ClearSuggestions ();
-
-            if (pathText is { })
-            {
-                Path = pathText;
-            }
-            else if (setPathText)
-            {
-                SetPathToSelectedObject (newState.Directory);
-            }
-
-            State = newState;
-
-            _tbPath.Autocomplete.GenerateSuggestions (new AutocompleteFilepathContext (_tbPath.Text, _tbPath.InsertionPoint, State));
-
-            WriteStateToTableView ();
-
-            if (clearForward)
-            {
-                _history.ClearForward ();
-            }
-
-            if (_tableView.Viewport.Y != 0)
-            {
-                _tableView.Viewport = _tableView.Viewport with { Y = 0 };
-            }
-            _tableView.SelectedRow = 0;
-
-            SetNeedsDraw ();
-            UpdateNavigationVisibility ();
-        }
-        finally
-        {
-            _pushingState = false;
-        }
-
-        ClearFeedback ();
-    }
-
-    private void RefreshState ()
-    {
-        State!.RefreshChildren ();
-        PushState (State, false, false, false);
-    }
-
-    private void Rename (IApplication? app)
-    {
-        IFileSystemInfo [] toRename = GetFocusedFiles ()!;
-
-        if (toRename?.Length == 1)
-        {
-            IFileSystemInfo newNamed = FileOperationsHandler.Rename (app, _fileSystem!, toRename.Single ());
-
-            if (newNamed is { })
-            {
-                RefreshState ();
-                RestoreSelection (newNamed);
-            }
-        }
-    }
-
-    private void RestartSearch ()
-    {
-        if (_disposed || State?.Directory is null)
-        {
-            return;
-        }
-
-        if (State is SearchState oldSearch)
-        {
-            oldSearch.Cancel ();
-        }
-
-        // user is clearing search terms
-        if (_tbFind.Text is null || _tbFind.Text.Length == 0)
-        {
-            // Wait for search cancellation (if any) to finish
-            // then push the current dir state
-            lock (_onlyOneSearchLock)
-            {
-                PushState (new FileDialogState (State.Directory, this), false);
-            }
-
-            return;
-        }
-
-        PushState (new SearchState (State?.Directory!, this, _tbFind.Text), true);
-    }
-
-    private FileSystemInfoStats RowToStats (int rowIndex) => State?.Children [rowIndex]!;
-
-    private void ShowCellContextMenu (Point? clickedCell, Mouse e)
-    {
-        if (clickedCell is null)
-        {
-            return;
-        }
-
-        PopoverMenu? contextMenu = new ([
-                                            new MenuItem (Strings.fdCtxNew, string.Empty, New),
-                                            new MenuItem (Strings.fdCtxRename, string.Empty, () => Rename (App)),
-                                            new MenuItem (Strings.fdCtxDelete, string.Empty, Delete)
-                                        ]);
-
-        _tableView.SetSelection (clickedCell.Value.X, clickedCell.Value.Y, false);
-
-        // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
-        // and the context menu is disposed when it is closed.
-        App!.Popovers?.Register (contextMenu);
-
-        contextMenu?.MakeVisible (e.ScreenPosition);
-    }
-
-    private void ShowHeaderContextMenu (int clickedCol, Mouse e)
-    {
-        string sort = GetProposedNewSortOrder (clickedCol, out bool isAsc);
-
-        PopoverMenu? contextMenu = new ([
-                                            new MenuItem (string.Format (Strings.fdCtxHide, StripArrows (_tableView.Table!.ColumnNames [clickedCol])),
-                                                          string.Empty,
-                                                          () => HideColumn (clickedCol)),
-                                            new MenuItem (StripArrows (sort), string.Empty, () => SortColumn (clickedCol, isAsc))
-                                        ]);
-
-        // Registering with the PopoverManager will ensure that the context menu is closed when the view is no longer focused
-        // and the context menu is disposed when it is closed.
-        App!.Popovers?.Register (contextMenu);
-
-        contextMenu?.MakeVisible (e.ScreenPosition);
-    }
-
-    private void SortColumn (int clickedCol)
-    {
-        GetProposedNewSortOrder (clickedCol, out bool isAsc);
-        SortColumn (clickedCol, isAsc);
-
-        _tableView.Table = new FileDialogTableSource (this, State, Style, _currentSortColumn, _currentSortIsAsc);
-    }
-
-    private IDirectoryInfo StringToDirectoryInfo (string path)
-    {
-        // if you pass new DirectoryInfo("C:") you get a weird object
-        // where the FullName is in fact the current working directory.
-        // really not what most users would expect
-        if (Regex.IsMatch (path, "^\\w:$"))
-        {
-            return _fileSystem!.DirectoryInfo.New (path + _fileSystem.Path.DirectorySeparatorChar);
-        }
-
-        return _fileSystem!.DirectoryInfo.New (path);
-    }
-
-    private static string StripArrows (string columnName) => columnName.Replace (" (▼)", string.Empty).Replace (" (▲)", string.Empty);
-
-    private void SuppressIfBadChar (Key k)
-    {
-        // don't let user type bad letters
-        var ch = (char)k;
-
-        if (_badChars.Contains (ch))
-        {
-            k.Handled = true;
-        }
-    }
-
-    private bool TableView_KeyDown (Key keyEvent)
-    {
-        if (keyEvent.KeyCode == KeyCode.Backspace)
-        {
-            return _history.Back ();
-        }
-
-        if (keyEvent.KeyCode == (KeyCode.ShiftMask | KeyCode.Backspace))
-        {
-            return _history.Forward ();
-        }
-
-        if (keyEvent.KeyCode == KeyCode.Delete)
-        {
-            Delete ();
-
-            return true;
-        }
-
-        if (keyEvent.KeyCode == (KeyCode.CtrlMask | KeyCode.R))
-        {
-            Rename (App);
-
-            return true;
-        }
-
-        if (keyEvent.KeyCode == (KeyCode.CtrlMask | KeyCode.N))
-        {
-            New ();
-
-            return true;
-        }
-
-        return false;
-    }
-
-    private void TableView_SelectedCellChanged (object? sender, SelectedCellChangedEventArgs obj)
-    {
-        if (!_tableView.HasFocus || obj.NewRow == -1 || obj.Table.Rows == 0)
-        {
-            return;
-        }
-
-        if (_tableView.MultiSelect && _tableView.MultiSelectedRegions.Any ())
-        {
-            return;
-        }
-
-        FileSystemInfoStats? stats = RowToStats (obj.NewRow);
-
-        IFileSystemInfo? dest;
-
-        if (stats.IsParent)
-        {
-            dest = State!.Directory;
-        }
-        else
-        {
-            dest = stats.FileSystemInfo;
-        }
-
-        try
-        {
-            _pushingState = true;
-
-            SetPathToSelectedObject (dest);
-            State!.Selected = stats;
-            _tbPath.Autocomplete?.ClearSuggestions ();
-        }
-        finally
-        {
-            _pushingState = false;
-        }
-    }
-
-    private void TreeView_SelectionChanged (object? sender, SelectionChangedEventArgs<IFileSystemInfo> e) => SetPathToSelectedObject (e.NewValue);
-
-    private void SetPathToSelectedObject (IFileSystemInfo? selected)
-    {
-        if (selected is null)
-        {
-            return;
-        }
-
-        if (selected is IDirectoryInfo && Style.PreserveFilenameOnDirectoryChanges)
-        {
-            if (!string.IsNullOrWhiteSpace (Path) && !_fileSystem!.Directory.Exists (Path))
-            {
-                string currentFile = _fileSystem.Path.GetFileName (Path);
-
-                if (!string.IsNullOrWhiteSpace (currentFile))
-                {
-                    Path = _fileSystem.Path.Combine (selected.FullName, currentFile);
-
-                    return;
-                }
-            }
-        }
-
-        Path = selected.FullName;
-    }
-
-    private bool TryAcceptMulti ()
-    {
-        IEnumerable<FileSystemInfoStats> multi = MultiRowToStats ();
-        string? reason = null;
-
-        IEnumerable<FileSystemInfoStats> fileSystemInfoStatsEnumerable = multi as FileSystemInfoStats [] ?? multi.ToArray ();
-
-        if (!fileSystemInfoStatsEnumerable.Any ())
-        {
-            return false;
-        }
-
-        if (fileSystemInfoStatsEnumerable.All (m => m.FileSystemInfo is { } && IsCompatibleWithOpenMode (m.FileSystemInfo.FullName, out reason)))
-        {
-            Accept (fileSystemInfoStatsEnumerable);
-
-            return true;
-        }
-
-        if (reason is { })
-        {
-            _feedback = reason;
-            SetNeedsDraw ();
-        }
-
-        return false;
-    }
-
-    private void UpdateNavigationVisibility ()
-    {
-        _btnBack.Visible = _history.CanBack ();
-        _btnForward.Visible = _history.CanForward ();
-        _btnUp.Visible = _history.CanUp ();
-    }
-
-    private void WriteStateToTableView ()
-    {
-        _tableView.Table = new FileDialogTableSource (this, State, Style, _currentSortColumn, _currentSortIsAsc);
-
-        ApplySort ();
-        _tableView.Update ();
-    }
-
-    // --- Tree visibility management ---
-
-    private void ToggleTreeVisibility () => SetTreeVisible (!_treeView.Visible);
-
-    private void SetTreeVisible (bool visible)
-    {
-        _treeView.Enabled = visible;
-        _treeView.Visible = visible;
-
-        if (visible)
-        {
-            // When visible, the table view's left edge is a splitter next to the tree
-            _treeView.Width = Dim.Fill (_tableViewContainer);
-            _tableViewContainer.X = 30;
-            _tableViewContainer.Arrangement = ViewArrangement.LeftResizable;
-            _tableViewContainer.Border.Thickness = new Thickness (1, 0, 0, 0);
-        }
-        else
-        {
-            // When hidden, table occupies full width and splitter is hidden/disabled
-            _treeView.Width = 0;
-            _tableViewContainer.X = 0;
-            _tableViewContainer.Width = Dim.Fill ();
-            _tableViewContainer.Arrangement = ViewArrangement.Fixed;
-            _tableViewContainer.Border.Thickness = new Thickness (0);
-        }
-        _btnTreeToggle.Text = GetTreeToggleText (visible);
-
-        SetNeedsLayout ();
-        SetNeedsDraw ();
-    }
-
-    private string GetTreeToggleText (bool visible) => visible ? $"{Glyphs.LeftArrow}{Strings.fdTree}" : $"{Glyphs.RightArrow}{Strings.fdTree}";
-
     /// <summary>State representing a recursive search from <see cref="FileDialogState.Directory"/> downwards.</summary>
-    internal class SearchState : FileDialogState
+    internal sealed class SearchState : FileDialogState
     {
         // TODO: Add thread safe child adding
         private readonly List<FileSystemInfoStats> _found = [];
-        private readonly object _oLockFound = new ();
+        private readonly Lock _oLockFound = new ();
         private readonly CancellationTokenSource _token = new ();
         private bool _cancel;
         private bool _finished;
 
-        public SearchState (IDirectoryInfo dir, FileDialog parent, string searchTerms) : base (dir, parent)
+        public SearchState (IDirectoryInfo dir, FileDialog parent, string searchTerms) : base (dir, parent, skipInitialEnumeration: true)
         {
             parent.SearchMatcher.Initialize (searchTerms);
             Children = [];
             BeginSearch ();
+            RefreshChildren ();
         }
 
         /// <summary>
@@ -1411,8 +478,6 @@ public class FileDialog : Dialog, IDesignable
 
             return !alreadyCancelled;
         }
-
-        internal override void RefreshChildren () { }
 
         private void BeginSearch ()
         {
@@ -1506,10 +571,10 @@ public class FileDialog : Dialog, IDesignable
             Parent.App?.Invoke (_ =>
                                 {
                                     Parent._tbPath.Autocomplete?.GenerateSuggestions (new AutocompleteFilepathContext (Parent._tbPath.Text,
-                                                                                         Parent._tbPath.InsertionPoint,
-                                                                                         this));
+                                                                                          Parent._tbPath.InsertionPoint,
+                                                                                          this));
                                     Parent.WriteStateToTableView ();
-
+                                    Parent._spinnerView.AutoSpin = true;
                                     Parent._spinnerView.Visible = true;
                                     Parent._spinnerView.SetNeedsDraw ();
                                 });
@@ -1521,5 +586,14 @@ public class FileDialog : Dialog, IDesignable
         OnIsRunningChanged (true);
 
         return true;
+    }
+
+    /// <inheritdoc/>
+    protected override void Dispose (bool disposing)
+    {
+        _disposed = true;
+        base.Dispose (disposing);
+
+        CancelSearch ();
     }
 }
