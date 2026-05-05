@@ -35,7 +35,11 @@ internal class ConcurrentDictionaryJsonConverter<T> : JsonConverter<ConcurrentDi
                     string key = reader.GetString();
                     reader.Read();
                     object value = JsonSerializer.Deserialize(ref reader, typeof(T), ConfigurationManager.SerializerContext);
-                    dictionary.TryAdd(key, (T)value);
+
+                    if (!dictionary.TryAdd (key, (T)value))
+                    {
+                        throw new JsonException ($"Duplicate key '{key}' in dictionary.");
+                    }
                 }
             }
             else if (reader.TokenType == JsonTokenType.EndArray)
