@@ -21,14 +21,15 @@ namespace Terminal.Gui.Drivers;
 ///     This allows the application to receive raw keyboard input and process all keys,
 ///     including control sequences and special keys as ANSI escape sequences.
 ///     <para>
-///         To guarantee the terminal is restored even when the input thread crashes or the
-///         process exits abnormally, this class registers a process-exit hook, a
-///         <see cref="Console.CancelKeyPress"/> handler, and a finalizer that all call
-///         <see cref="Restore"/>. See issue #5164. Note that disabling ISIG means a keyboard
-///         Ctrl+C is delivered as a 0x03 byte rather than SIGINT, so the
-///         <see cref="Console.CancelKeyPress"/> hook is unlikely to fire while raw mode is
-///         active; the primary safety nets are <see cref="AppDomain.ProcessExit"/> and the
-///         finalizer.
+///         The primary restore path is an explicit call to <see cref="Dispose"/> (or
+///         <see cref="Restore"/>). To guarantee the terminal is restored when the process
+///         exits without disposing the helper, <see cref="TryEnable"/> also registers an
+///         <see cref="AppDomain.ProcessExit"/> hook that calls <see cref="Restore"/>. See
+///         issue #5164. A <see cref="Console.CancelKeyPress"/> handler is registered as a
+///         best-effort safety net, but disabling ISIG means a keyboard Ctrl+C is delivered
+///         as a 0x03 byte rather than SIGINT, so that handler is unlikely to fire while
+///         raw mode is active; it still helps for externally-delivered SIGINT/CTRL_C events
+///         and for hosts that do not disable ISIG.
 ///     </para>
 /// </remarks>
 internal sealed class UnixRawModeHelper : IDisposable
@@ -43,36 +44,6 @@ internal sealed class UnixRawModeHelper : IDisposable
     ///     Gets whether raw mode was successfully enabled.
     /// </summary>
     public bool IsRawModeEnabled { get; private set; }
-
-    /// <summary>
-    ///     Finalizer. Acts as a last-resort restore in case neither <see cref="Dispose"/>
-    ///     nor the process-exit hook ran (e.g. fatal native crash, immediate process abort).
-    /// </summary>
-    ~UnixRawModeHelper ()
-    {
-        // Only attempt syscalls if we actually saved a valid termios.
-        if (!_haveSavedTermios)
-        {
-            return;
-        }
-
-        try
-        {
-            int result = tcsetattr (STDIN_FILENO, TCSANOW, ref _originalTermios);
-
-            if (result != 0)
-            {
-                int errno = Marshal.GetLastWin32Error ();
-
-                // Best-effort log only; finalizers must never throw.
-                Logging.Warning ($"tcsetattr failed during finalizer (errno={errno}). Terminal may still be in raw mode.");
-            }
-        }
-        catch
-        {
-            // Finalizers must never throw.
-        }
-    }
 
     /// <summary>
     ///     Attempts to enable raw mode on the terminal.
@@ -187,8 +158,8 @@ internal sealed class UnixRawModeHelper : IDisposable
                 int errno = Marshal.GetLastWin32Error ();
                 Logging.Warning ($"tcsetattr failed during restore (errno={errno}). Terminal may still be in raw mode.");
 
-                // Leave IsRawModeEnabled set to true so callers (and the finalizer) know
-                // the terminal was not successfully restored.
+                // Leave IsRawModeEnabled set to true so callers know the terminal was not
+                // successfully restored.
                 return;
             }
 
@@ -212,8 +183,6 @@ internal sealed class UnixRawModeHelper : IDisposable
         UnhookProcessExit ();
         Restore ();
         _disposed = true;
-
-        GC.SuppressFinalize (this);
     }
 
     private void HookProcessExit ()
@@ -232,7 +201,7 @@ internal sealed class UnixRawModeHelper : IDisposable
             // literal 0x03 byte on stdin rather than a SIGINT, meaning this handler is unlikely
             // to fire from a keyboard Ctrl+C while raw mode is active. It still helps for
             // externally-delivered SIGINT/CTRL_C events and for hosts that do not disable ISIG.
-            // The primary safety nets are <see cref="AppDomain.ProcessExit"/> and the finalizer.
+            // The primary safety net is the AppDomain.ProcessExit hook.
             _cancelKeyHandler = (_, _) => Restore ();
             Console.CancelKeyPress += _cancelKeyHandler;
         }

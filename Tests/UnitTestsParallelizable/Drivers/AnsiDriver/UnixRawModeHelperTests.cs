@@ -2,7 +2,6 @@
 // Tests UnixRawModeHelper safety guarantees from issue #5164:
 //   - Restore() is a no-op when TryEnable() never succeeded (no syscall risk).
 //   - Restore() is idempotent.
-//   - A finalizer exists as a last-resort restore path.
 //   - Dispose() unhooks the ProcessExit handler it registered in TryEnable().
 // These tests are observable on any platform: the platform gate inside TryEnable
 // short-circuits non-Unix runs to a "never enabled" state, which is exactly the
@@ -59,20 +58,6 @@ public class UnixRawModeHelperTests
         // Second dispose should also be a no-op.
         Exception? second = Record.Exception (() => helper.Dispose ());
         Assert.Null (second);
-    }
-
-    [Fact]
-    public void Type_HasFinalizer_AsLastResortRestore ()
-    {
-        // The Finalize override is the last line of defense when an unhandled
-        // native crash bypasses Dispose() and ProcessExit. Its presence is part
-        // of the issue #5164 contract.
-        MethodInfo? finalizer = typeof (UnixRawModeHelper).GetMethod (
-                                                                     "Finalize",
-                                                                     BindingFlags.Instance | BindingFlags.NonPublic);
-
-        Assert.NotNull (finalizer);
-        Assert.Equal (typeof (UnixRawModeHelper), finalizer!.DeclaringType);
     }
 
     [Fact]
