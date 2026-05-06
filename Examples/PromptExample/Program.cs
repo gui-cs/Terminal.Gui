@@ -1,4 +1,7 @@
 // Example demonstrating the Prompt API for getting typed input from users
+// NOTE: See https://github.com/gui-cs/clet that turns every Terminal.Gui View into a CLI command
+// NOTE: — typed inputs, a real file picker, a Markdown viewer — with consistent JSON output,
+// NOTE: predictable exit codes, and full keyboard/mouse support. Works for humans and AI agents alike.
 
 using Terminal.Gui.App;
 using Terminal.Gui.Configuration;
@@ -8,6 +11,7 @@ using Terminal.Gui.Resources;
 using Terminal.Gui.ViewBase;
 using Terminal.Gui.Views;
 using Color = Terminal.Gui.Drawing.Color;
+
 // ReSharper disable AccessToDisposedClosure
 
 ConfigurationManager.Enable (ConfigLocations.All);
@@ -19,7 +23,18 @@ mainWindow.Title = "Prompt API Examples (Esc to quit)";
 mainWindow.Text = "This example demonstrates various uses of the Prompt API.\nPress the buttons to try different prompt types.\nPress Esc to quit.";
 mainWindow.TextAlignment = Alignment.Center;
 
-int buttonY = 0;
+// Initial Value TextField — entered text is applied to prompt views via IValue.TrySetValueFromString
+TextField initialValueField = new ()
+{
+    Title = "Initial _Value (TrySetValueFromString)",
+    X = 0,
+    Y = 0,
+    Width = Dim.Fill (),
+    BorderStyle = LineStyle.Dotted
+};
+mainWindow.Add (initialValueField);
+
+var buttonY = 2;
 
 // Example 1: TextField with string result using auto-Text extraction
 Button textFieldButton = new () { Title = "TextField (Auto-Text)", X = Pos.Center (), Y = buttonY++ };
@@ -31,6 +46,12 @@ textFieldButton.Accepting += (_, _) =>
                                                                                             prompt.Title = textFieldButton.Title;
                                                                                             prompt.GetWrappedView ().Width = 40;
                                                                                             prompt.GetWrappedView ().Text = "Default name";
+
+                                                                                            if (!string.IsNullOrEmpty (initialValueField.Text))
+                                                                                            {
+                                                                                                ((IValue)prompt.GetWrappedView ())
+                                                                                                    .TrySetValueFromString (initialValueField.Text);
+                                                                                            }
                                                                                         });
 
                                  MessageBox.Query (app, textFieldButton.Title, result is { } ? $"You entered: {result}" : "Canceled", Strings.btnOk);
@@ -51,6 +72,13 @@ textViewButton.Accepting += (_, _) =>
                                                                                                                 "Some text\nis nice.";
                                                                                                             prompt.GetWrappedView ().Width = Dim.Fill (0, 40);
                                                                                                             prompt.GetWrappedView ().Height = Dim.Fill (0, 8);
+
+                                                                                                            if (!string.IsNullOrEmpty (initialValueField.Text))
+                                                                                                            {
+                                                                                                                ((IValue)prompt.GetWrappedView ())
+                                                                                                                    .TrySetValueFromString (initialValueField
+                                                                                                                        .Text);
+                                                                                                            }
                                                                                                         });
 
                                 MessageBox.Query (app, textViewButton.Title, result is { } ? $"You entered: {result}" : "Canceled", Strings.btnOk);
@@ -68,6 +96,12 @@ datePickerButton.Accepting += (_, _) =>
                                                                                               {
                                                                                                   prompt.Title = "Select a Date";
                                                                                                   prompt.GetWrappedView ().Value = DateTime.Now;
+
+                                                                                                  if (!string.IsNullOrEmpty (initialValueField.Text))
+                                                                                                  {
+                                                                                                      ((IValue)prompt.GetWrappedView ())
+                                                                                                          .TrySetValueFromString (initialValueField.Text);
+                                                                                                  }
                                                                                               });
 
                                   if (result is { } selectedDate)
@@ -88,7 +122,16 @@ Button colorPickerButton = new () { Title = "ColorPicker (Typed Result)", X = Po
 colorPickerButton.Accepting += (_, _) =>
                                {
                                    Color? result = mainWindow.Prompt<ColorPicker, Color?> (input: null,
-                                                                                           beginInitHandler: prompt => { prompt.Title = "Pick a Color"; });
+                                                                                           beginInitHandler: prompt =>
+                                                                                           {
+                                                                                               prompt.Title = "Pick a Color";
+
+                                                                                               if (!string.IsNullOrEmpty (initialValueField.Text))
+                                                                                               {
+                                                                                                   ((IValue)prompt.GetWrappedView ())
+                                                                                                       .TrySetValueFromString (initialValueField.Text);
+                                                                                               }
+                                                                                           });
 
                                    if (result is { } selectedColor)
                                    {
@@ -111,6 +154,12 @@ colorTextButton.Accepting += (_, _) =>
                                                                                           {
                                                                                               prompt.Title = "Pick a Color (as text)";
                                                                                               prompt.GetWrappedView ().SelectedColor = Color.Red;
+
+                                                                                              if (!string.IsNullOrEmpty (initialValueField.Text))
+                                                                                              {
+                                                                                                  ((IValue)prompt.GetWrappedView ())
+                                                                                                      .TrySetValueFromString (initialValueField.Text);
+                                                                                              }
                                                                                           });
 
                                  MessageBox.Query (app, colorTextButton.Title, result is { } ? $"Color as text: {result}" : "Canceled", Strings.btnOk);
@@ -178,6 +227,14 @@ flagSelectorButton.Accepting += (_, _) =>
                                                                                                          beginInitHandler: prompt =>
                                                                                                          {
                                                                                                              prompt.Title = "Choose Selector Styles";
+
+                                                                                                             if (!string.IsNullOrEmpty (initialValueField
+                                                                                                                 .Text))
+                                                                                                             {
+                                                                                                                 ((IValue)prompt.GetWrappedView ())
+                                                                                                                     .TrySetValueFromString (initialValueField
+                                                                                                                         .Text);
+                                                                                                             }
                                                                                                          });
 
                                     if (result is { } styles)
