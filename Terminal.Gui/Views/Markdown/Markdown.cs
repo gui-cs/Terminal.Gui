@@ -411,6 +411,9 @@ public partial class Markdown : View, IDesignable
         SyntaxHighlighter = new TextMateSyntaxHighlighter ();
         Text = DefaultMarkdownSample;
 
+        // Opt-in: prevent Link.OpenUrl from being called in the designer.
+        LinkClicked += (_, e) => e.Handled = true;
+
         return true;
     }
 
@@ -465,7 +468,7 @@ public partial class Markdown : View, IDesignable
 
                                                           | Feature       | Status        |
                                                           |---------------|---------------|
-                                                          | Markdown      | ✅ Totally!   |
+                                                          | [Markdown](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) | ✅ Totally! |
                                                           | Tables        | ✅ For sure!  |
                                                           | Code blocks   | ✅ Awesome!   |
                                                           | Emojis 🎉    | ✅ Whoa!      |

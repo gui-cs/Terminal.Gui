@@ -971,10 +971,13 @@ public sealed class MarkdownTable : View, IDesignable
         Text = """
                | Feature | *Status (centered)* | **Owner** |
                |---------|:-----------------:|-------|
-               | **Markdown** | ✅ Totally! | @tig |
+               | [Markdown](https://gui-cs.github.io/Terminal.Gui/api/Terminal.Gui.Views.MarkdownTable.html) | ✅ Totally! | @tig |
                | *Tables*     | ✅ For **sure!** | [tig](https://github.com/tig) |
                | `Code`       | ✅ `printf ("Awesome!");` | ??? |
                """;
+
+        // Opt-in: prevent Link.OpenUrl from being called in the designer.
+        LinkClicked += (_, e) => e.Handled = true;
 
         return true;
     }

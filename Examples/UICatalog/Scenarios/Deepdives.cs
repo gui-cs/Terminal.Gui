@@ -24,8 +24,6 @@ public class Deepdives : Scenario
     private Shortcut? _statusShortcut;
     private SpinnerView? _spinner;
     private NumericUpDown? _contentWidthUpDown;
-    private Link? _linkView;
-    private Shortcut? _linkShortcut;
     private bool _updatingContentWidth;
 
     private List<DocEntry> _docs = [];
@@ -66,15 +64,7 @@ public class Deepdives : Scenario
 
         _markdownView.LinkClicked += (_, e) =>
                                      {
-                                         if (_linkView is { })
-                                         {
-                                             _linkView.Text = e.Url;
-                                         }
-
-                                         if (_linkShortcut is { })
-                                         {
-                                             _linkShortcut.MouseHighlightStates = MouseState.In;
-                                         }
+                                         _statusShortcut?.Title = e.Url;
 
                                          e.Handled = true;
                                      };
@@ -168,17 +158,13 @@ public class Deepdives : Scenario
 
         Shortcut themeBgShortcut = new () { CommandView = themeBgCheckBox };
 
-        _linkView = new Link { Text = "" };
-        _linkShortcut = new Shortcut { CommandView = _linkView, Title = "", MouseHighlightStates = MouseState.None };
-
         StatusBar statusBar = new ([
                                        new Shortcut (Application.GetDefaultKey (Command.Quit), "Quit", window.RequestStop),
                                        contentWidthShortcut,
                                        themeShortcut,
                                        themeBgShortcut,
                                        _statusShortcut,
-                                       spinnerShortcut,
-                                       _linkShortcut
+                                       spinnerShortcut
                                    ]) { AlignmentModes = AlignmentModes.IgnoreFirstOrLast };
 
         window.Add (listFrame, _viewerFrame, statusBar);
