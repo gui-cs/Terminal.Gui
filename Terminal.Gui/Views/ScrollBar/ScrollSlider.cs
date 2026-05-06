@@ -266,7 +266,8 @@ public sealed class ScrollSlider : View, IOrientation, IDesignable, IValue<int>
     #region IValue<int> Implementation
 
     /// <summary>
-    ///     Gets or sets the position of the ScrollSlider. This is an alias for <see cref="Position"/>.
+    ///     Gets or sets the position of the ScrollSlider. This is an alias for <see cref="Position"/>
+    ///     provided to satisfy the <see cref="IValue{TValue}"/> interface.
     /// </summary>
     public int Value
     {
