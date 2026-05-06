@@ -6,12 +6,18 @@ namespace Terminal.Gui.Views;
 /// <typeparam name="T">The data type of the options.</typeparam>
 /// <remarks>
 ///     <para>
-///         Exposes the current selection through <see cref="Value"/> as <typeparamref name="T"/>?,
-///         which is <see langword="null"/> when no option is selected.
+///         Exposes the current selection through <see cref="Value"/>. When <typeparamref name="T"/> is a
+///         reference type, <see langword="null"/> unambiguously represents "no selection". When
+///         <typeparamref name="T"/> is a value type, <see cref="Value"/> is <c>default(T)</c> when no
+///         option is selected — which can be indistinguishable from a legitimately selected default value
+///         (e.g. <c>0</c> for <see cref="int"/>). To test for empty selection unambiguously for both
+///         reference and value types, use <see cref="SelectedIndex"/>, which is <see langword="null"/>
+///         only when nothing is selected.
 ///     </para>
 ///     <para>
-///         To switch the current selection programmatically, set <see cref="Value"/>. To observe
-///         selection changes, subscribe to <see cref="LinearRangeViewBase{TOption,TValue}.ValueChanged"/>.
+///         To switch the current selection programmatically, set <see cref="Value"/> or
+///         <see cref="SelectedIndex"/>. To observe selection changes, subscribe to
+///         <see cref="LinearRangeViewBase{TOption,TValue}.ValueChanged"/>.
 ///     </para>
 /// </remarks>
 public class LinearSelector<T> : LinearRangeViewBase<T, T>, IDesignable
@@ -68,6 +74,68 @@ public class LinearSelector<T> : LinearRangeViewBase<T, T>, IDesignable
             }
 
             RaiseValueChanged (current, _value);
+        }
+    }
+
+    /// <summary>
+    ///     Gets or sets the index of the currently selected option, or <see langword="null"/> if no option is
+    ///     selected. This is the unambiguous "no selection" surface for both reference and value types
+    ///     (compare with <see cref="Value"/>, where <c>default(T)</c> for value types may collide with a
+    ///     legitimately selected option).
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         To clear the selection, set to <see langword="null"/>. Requires
+    ///         <see cref="LinearRangeViewBase{TOption,TValue}.AllowEmpty"/> to be <see langword="true"/>;
+    ///         otherwise the clear is silently ignored (mirrors how <see cref="Value"/> behaves).
+    ///     </para>
+    ///     <para>
+    ///         To select an option, set to its index in <see cref="LinearRangeViewBase{TOption,TValue}.Options"/>.
+    ///         Out-of-range values throw <see cref="ArgumentOutOfRangeException"/>.
+    ///     </para>
+    /// </remarks>
+    public int? SelectedIndex
+    {
+        get => SelectedIndices.Count > 0 ? SelectedIndices [0] : null;
+        set
+        {
+            if (value is null)
+            {
+                if (!AllowEmpty)
+                {
+                    return;
+                }
+
+                _value = default;
+                ApplySelectedIndices ([]);
+
+                return;
+            }
+
+            if (Options is null || value < 0 || value >= Options.Count)
+            {
+                throw new ArgumentOutOfRangeException (nameof (value));
+            }
+
+            // Sync indices first so SelectedIndex can select an option whose Data equals the current
+            // _value (e.g. selecting option 0 in a value-type selector where _value is already
+            // default(int)=0 — Value setter would short-circuit on equality, leaving SelectedIndex null).
+            T? newValue = Options [value.Value].Data;
+            T? current = _value;
+            bool valueChanged = !EqualityComparer<T?>.Default.Equals (current, newValue);
+
+            if (valueChanged && RaiseValueChanging (current, newValue))
+            {
+                return;
+            }
+
+            _value = newValue;
+            ApplySelectedIndices ([value.Value]);
+
+            if (valueChanged)
+            {
+                RaiseValueChanged (current, _value);
+            }
         }
     }
 

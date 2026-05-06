@@ -246,4 +246,120 @@ public class LinearSelectorTests : TestDriverBase
         Assert.Equal (6, sel.Options.Count);
         Assert.Equal ("M", sel.Value);
     }
+
+    // Copilot - Sonnet 4.5 - SelectedIndex coverage for "no selection" representation across
+    // value-type and reference-type T (addresses bot review comment 3196703096).
+
+    [Fact]
+    public void SelectedIndex_Is_Null_When_No_Selection ()
+    {
+        LinearSelector<int> sel = new ([10, 20, 30]);
+
+        // Constructor does not auto-select; SelectedIndex is null until something is selected.
+        Assert.Null (sel.SelectedIndex);
+    }
+
+    [Fact]
+    public void SelectedIndex_Is_Null_When_No_Selection_For_ValueType_T ()
+    {
+        LinearSelector<int> sel = new ([0, 1, 2]) { AllowEmpty = true, Value = 1 };
+        Assert.Equal (1, sel.SelectedIndex);
+
+        sel.SelectedIndex = null;
+
+        // Value collapses to default(int)=0, which is also a legitimate option:
+        // SelectedIndex is the only unambiguous "no selection" surface.
+        Assert.Null (sel.SelectedIndex);
+        Assert.Equal (0, sel.Value);
+    }
+
+    [Fact]
+    public void SelectedIndex_Is_Null_When_No_Selection_For_ReferenceType_T ()
+    {
+        LinearSelector<string> sel = new (["a", "b", "c"]) { AllowEmpty = true };
+        sel.Value = null;
+
+        Assert.Null (sel.SelectedIndex);
+        Assert.Null (sel.Value);
+    }
+
+    [Fact]
+    public void SelectedIndex_Setter_Selects_Option_By_Index ()
+    {
+        LinearSelector<int> sel = new ([10, 20, 30]);
+        sel.SelectedIndex = 2;
+
+        Assert.Equal (2, sel.SelectedIndex);
+        Assert.Equal (30, sel.Value);
+    }
+
+    [Fact]
+    public void SelectedIndex_Setter_Null_Clears_Selection_When_AllowEmpty ()
+    {
+        LinearSelector<int> sel = new ([10, 20, 30]) { AllowEmpty = true, Value = 20 };
+        Assert.Equal (1, sel.SelectedIndex);
+
+        sel.SelectedIndex = null;
+
+        Assert.Null (sel.SelectedIndex);
+    }
+
+    [Fact]
+    public void SelectedIndex_Setter_Null_Ignored_When_AllowEmpty_False ()
+    {
+        LinearSelector<int> sel = new ([10, 20, 30]) { Value = 20 };
+        Assert.False (sel.AllowEmpty);
+
+        sel.SelectedIndex = null;
+
+        // Selection unchanged because AllowEmpty=false.
+        Assert.Equal (1, sel.SelectedIndex);
+        Assert.Equal (20, sel.Value);
+    }
+
+    [Fact]
+    public void SelectedIndex_Setter_OutOfRange_Throws ()
+    {
+        LinearSelector<int> sel = new ([10, 20, 30]);
+
+        Assert.Throws<ArgumentOutOfRangeException> (() => sel.SelectedIndex = -1);
+        Assert.Throws<ArgumentOutOfRangeException> (() => sel.SelectedIndex = 3);
+    }
+
+    [Fact]
+    public void SelectedIndex_Disambiguates_Default_Value_From_Empty_Selection ()
+    {
+        // Tests the core motivation for SelectedIndex: for value types, Value=default(T)
+        // can mean either "option with default value selected" or "no selection".
+        // Note: assigning Value=0 to a fresh selector is a no-op because the equality guard
+        // sees the field already at default(int)=0. SelectedIndex is the only way to
+        // unambiguously select option 0 (or distinguish it from "nothing selected").
+        LinearSelector<int> sel = new ([0, 1, 2]) { AllowEmpty = true };
+
+        // Initial state: nothing selected.
+        Assert.Null (sel.SelectedIndex);
+        Assert.Equal (0, sel.Value); // default(int)
+
+        // Explicitly select option 0 via SelectedIndex:
+        sel.SelectedIndex = 0;
+        Assert.Equal (0, sel.SelectedIndex); // not null — option 0 is selected
+        Assert.Equal (0, sel.Value);
+
+        // Now clear:
+        sel.SelectedIndex = null;
+        Assert.Equal (0, sel.Value); // still default(int)
+        Assert.Null (sel.SelectedIndex); // unambiguously empty
+    }
+
+    [Fact]
+    public void SelectedIndex_Tracks_Value_Setter_Roundtrip ()
+    {
+        LinearSelector<int> sel = new ([10, 20, 30]);
+
+        sel.Value = 30;
+        Assert.Equal (2, sel.SelectedIndex);
+
+        sel.Value = 10;
+        Assert.Equal (0, sel.SelectedIndex);
+    }
 }
