@@ -13,6 +13,13 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
     private const char BEL = '\a';
 
     /// <summary>
+    ///     Maximum number of characters that can be accumulated in held content before the parser
+    ///     abandons the current escape sequence and releases buffered content. This prevents unbounded
+    ///     memory growth from malformed or malicious unterminated escape sequences.
+    /// </summary>
+    internal const int MaxHeldLength = 8 * 1024;
+
+    /// <summary>
     ///     Tracks whether the parser is currently inside an OSC (Operating System Command) sequence.
     ///     OSC responses can be terminated by ST (ESC \) which requires special handling because
     ///     ESC normally starts a new sequence in the parser.
@@ -163,6 +170,15 @@ internal abstract class AnsiResponseParserBase (IHeld heldContent, ITimeProvider
                     break;
 
                 case AnsiResponseParserState.InResponse:
+
+                    // Guard against unbounded memory growth from malformed/unterminated sequences
+                    if (_heldContent.Length >= MaxHeldLength)
+                    {
+                        ReleaseHeld (appendOutput);
+                        appendOutput (currentObj);
+
+                        break;
+                    }
 
                     if (_inOscSequence)
                     {
