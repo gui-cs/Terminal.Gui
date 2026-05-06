@@ -238,7 +238,7 @@ public class OutputBufferImpl : IOutputBuffer
                     // So we inline the logic instead.
                     SetAttributeAndDirty (c, r);
                     InvalidateOverlappedWideGlyph (c, r);
-                    string grapheme = rune != default (Rune) ? rune.ToString () : " ";
+                    string grapheme = rune != default (Rune) ? rune.ToString ().MakePrintable () : " ";
                     WriteGraphemeByWidth (c, r, grapheme, grapheme.GetColumns (), clipBounds);
                 }
             }
