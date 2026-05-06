@@ -160,9 +160,12 @@ public static class StringExtensions
             {
                 // Map C0 controls (0x00–0x1F) and DEL (0x7F) to Unicode Control Pictures (U+2400–U+2421).
                 // Map C1 controls (0x80–0x9F) to a replacement space since there are no standard pictures.
-                return first <= '\x7F'
-                           ? new string ((char)(first + 0x2400), 1)
-                           : " ";
+                if (first <= '\x7F')
+                {
+                    return new string ((char)(first + 0x2400), 1);
+                }
+
+                return " ";
             }
 
             return str;

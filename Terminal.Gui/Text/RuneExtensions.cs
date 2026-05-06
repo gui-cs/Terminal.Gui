@@ -218,8 +218,11 @@ public static class RuneExtensions
 
         // Map C0 controls (0x00–0x1F) and DEL (0x7F) to Unicode Control Pictures (U+2400–U+2421).
         // Map C1 controls (0x80–0x9F) to space since there are no standard pictures.
-        return rune.Value <= 0x7F
-                   ? new (rune.Value + 0x2400)
-                   : new (' ');
+        if (rune.Value <= 0x7F)
+        {
+            return new (rune.Value + 0x2400);
+        }
+
+        return new (' ');
     }
 }
