@@ -1277,18 +1277,15 @@ public abstract class LinearRangeViewBase<TOption, TValue> : View, IOrientation,
     {
         // Attributes
         var normalAttr = new Attribute (Color.White, Color.Black);
-        var setAttr = new Attribute (Color.Black, Color.White);
         Attribute spaceAttr = normalAttr;
 
         if (IsInitialized)
         {
             normalAttr = Style.LegendAttributes.NormalAttribute ?? GetAttributeForRole (VisualRole.Normal);
-            setAttr = Style.LegendAttributes.SetAttribute ?? GetAttributeForRole (VisualRole.HotNormal);
             spaceAttr = Style.LegendAttributes.EmptyAttribute ?? normalAttr;
         }
 
         bool isTextVertical = _config._legendsOrientation == Orientation.Vertical;
-        bool isSet = _setOptions.Count > 0;
 
         var x = 0;
         var y = 0;
@@ -1320,56 +1317,6 @@ public abstract class LinearRangeViewBase<TOption, TValue> : View, IOrientation,
 
         for (var i = 0; i < _options!.Count; i++)
         {
-            var isOptionSet = false;
-
-            // Check if the Option is Set.
-            switch (_config._renderMode)
-            {
-                case LinearRangeRenderMode.Single:
-                case LinearRangeRenderMode.Multiple:
-                    if (isSet && _setOptions.Contains (i))
-                    {
-                        isOptionSet = true;
-                    }
-
-                    break;
-
-                case LinearRangeRenderMode.LeftSpan:
-                    if (isSet && i <= _setOptions [0])
-                    {
-                        isOptionSet = true;
-                    }
-
-                    break;
-
-                case LinearRangeRenderMode.RightSpan:
-                    if (isSet && i >= _setOptions [0])
-                    {
-                        isOptionSet = true;
-                    }
-
-                    break;
-
-                case LinearRangeRenderMode.Span when _setOptions.Count == 1:
-                    if (isSet && i == _setOptions [0])
-                    {
-                        isOptionSet = true;
-                    }
-
-                    break;
-
-                case LinearRangeRenderMode.Span:
-                    if (isSet && ((i >= _setOptions [0] && i <= _setOptions [1]) || (i >= _setOptions [1] && i <= _setOptions [0])))
-                    {
-                        isOptionSet = true;
-                    }
-
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException ();
-            }
-
             // Text || Abbreviation
 
             string text = (_config._showLegendsAbbr ? _options [i].LegendAbbr.ToString () : _options [i].Legend)!;
@@ -1443,8 +1390,8 @@ public abstract class LinearRangeViewBase<TOption, TValue> : View, IOrientation,
                 }
             }
 
-            // Legend
-            SetAttribute (isOptionSet ? setAttr : normalAttr);
+            // Legend - no special styling for set/focused options; the range bar itself indicates selection.
+            SetAttribute (normalAttr);
 
             foreach (Rune c in text.EnumerateRunes ())
             {
@@ -1525,6 +1472,32 @@ public abstract class LinearRangeViewBase<TOption, TValue> : View, IOrientation,
                 _dragPosition = mouse.Position;
                 _moveRenderPosition = ClampMovePosition ((Point)_dragPosition!);
                 App?.Mouse.GrabMouse (this);
+
+                // Anchor the selection at the press position so a subsequent drag can extend a range.
+                // Resolve the option under the press position and set it as the focused option.
+                bool pressSuccess;
+                int pressOption;
+
+                if (Orientation == Orientation.Horizontal)
+                {
+                    pressSuccess = TryGetOptionByPosition (mouse.Position!.Value.X, 0, Math.Max (0, _config._cachedInnerSpacing / 2), out pressOption);
+                }
+                else
+                {
+                    pressSuccess = TryGetOptionByPosition (0, mouse.Position!.Value.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out pressOption);
+                }
+
+                if (pressSuccess)
+                {
+                    if (!OnOptionFocused (pressOption, new LinearRangeEventArgs<TOption> (GetSetOptionDictionary (), FocusedOption)))
+                    {
+                        SetFocusedOption ();
+                    }
+                }
+
+                // Mark handled so the View pipeline does not later invoke Command.Activate
+                // on the synthesized Released/Clicked events (which would re-toggle the selection).
+                mouse.Handled = true;
             }
 
             SetNeedsDraw ();
@@ -1551,7 +1524,9 @@ public abstract class LinearRangeViewBase<TOption, TValue> : View, IOrientation,
                 success = TryGetOptionByPosition (0, mouse.Position!.Value.Y, Math.Max (0, _config._cachedInnerSpacing / 2), out option);
             }
 
-            if (!_config._allowEmpty && success)
+            // Update the selection on drag regardless of AllowEmpty so the user can drag the
+            // end of a range (or move a single selection) continuously.
+            if (success)
             {
                 if (!OnOptionFocused (option, new LinearRangeEventArgs<TOption> (GetSetOptionDictionary (), FocusedOption)))
                 {
@@ -1564,8 +1539,25 @@ public abstract class LinearRangeViewBase<TOption, TValue> : View, IOrientation,
             return true;
         }
 
-        if ((_dragPosition.HasValue && mouse.Flags.FastHasFlags (MouseFlags.LeftButtonReleased)) || mouse.Flags.FastHasFlags (MouseFlags.LeftButtonClicked))
+        if (_dragPosition.HasValue && mouse.Flags.FastHasFlags (MouseFlags.LeftButtonReleased))
         {
+            // End of a drag we initiated. Selection was already updated during drag continues;
+            // just release the grab. Mark the event handled so the View pipeline does not
+            // re-invoke Command.Activate (which would toggle the selection back off).
+            App?.Mouse.UngrabMouse ();
+            _dragPosition = null;
+            _moveRenderPosition = null;
+            mouse.Handled = true;
+            SetNeedsDraw ();
+
+            return true;
+        }
+
+        if (mouse.Flags.FastHasFlags (MouseFlags.LeftButtonClicked))
+        {
+            // Click events from the synthesizer that follow a drag are redundant — the drag
+            // already updated selection. Otherwise (a "real" click without prior press),
+            // let the View pipeline raise Command.Activate via the default mouse bindings.
             return mouse.Handled;
         }
 
