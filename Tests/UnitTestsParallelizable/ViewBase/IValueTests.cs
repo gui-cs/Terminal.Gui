@@ -454,7 +454,7 @@ public class IValueTests
         Assert.Equal ("hello", view.Value);
     }
 
-    // Copilot - test view exposing IValue<DateTime> for IParsable verification.
+    // Copilot - Test view implementing IValue<DateTime> to verify IParsable parsing.
     private sealed class TestDateValueView : View, IValue<DateTime>
     {
         private DateTime _value;
@@ -491,7 +491,7 @@ public class IValueTests
         Assert.Equal (new DateTime (2024, 6, 15), view.Value);
     }
 
-    // Copilot - test view exposing IValue<DayOfWeek?> for enum + nullable verification.
+    // Copilot - Test view implementing IValue<DayOfWeek?> to verify nullable enum parsing.
     private sealed class TestEnumValueView : View, IValue<DayOfWeek?>
     {
         private DayOfWeek? _value;
@@ -542,7 +542,7 @@ public class IValueTests
         Assert.Equal (DayOfWeek.Sunday, view.Value);
     }
 
-    // Copilot - test view exposing IValue<object> for unsupported-type verification.
+    // Copilot - Test view implementing IValue<object?> to verify unsupported type handling.
     private sealed class TestObjectValueView : View, IValue<object?>
     {
         private object? _value;
@@ -594,7 +594,7 @@ public class IValueTests
         Assert.Equal (99, view.Value);
     }
 
-    // Copilot - integration with real Views
+    // Copilot - Verifies TrySetValueFromString integration with real Views.
     [Fact]
     public void TrySetValueFromString_NumericUpDown_Int_Parses ()
     {
