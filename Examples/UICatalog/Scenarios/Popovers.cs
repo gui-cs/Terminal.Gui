@@ -16,6 +16,7 @@ public class Popovers : Scenario
     private EventLog? _eventLog;
     private Button? _activateButton;
     private TextField? _resultTextField;
+    private TextField? _initialValueTextField;
 
     private readonly Dictionary<int, IPopoverView> _popoverInstances = [];
 
@@ -83,15 +84,23 @@ public class Popovers : Scenario
 
         _activateButton.Accepting += ShowPopover;
 
-        _resultTextField = new TextField
+        _initialValueTextField = new TextField
         {
             Y = Pos.Bottom (_activateButton),
+            Width = Dim.Fill (),
+            Title = "_Initial Value (TrySetValueFromString)",
+            BorderStyle = LineStyle.Dotted
+        };
+
+        _resultTextField = new TextField
+        {
+            Y = Pos.Bottom (_initialValueTextField),
             Width = Dim.Fill (),
             ReadOnly = true,
             Title = "Result",
             BorderStyle = LineStyle.Dotted
         };
-        _popoverTargetFrame.Add (_activateButton, _resultTextField);
+        _popoverTargetFrame.Add (_activateButton, _initialValueTextField, _resultTextField);
 
         _eventLog.SetViewToLog (window);
         window.Add (_viewListView, _popoverTargetFrame, _eventLog);
@@ -134,6 +143,22 @@ public class Popovers : Scenario
         }
 
         args.Handled = true;
+
+        // Apply initial value via IValue.TrySetValueFromString if the TextField has content
+        if (!string.IsNullOrEmpty (_initialValueTextField?.Text))
+        {
+            View? contentView = (popover as View)?.SubViews.FirstOrDefault ();
+
+            if (contentView is IValue iValue)
+            {
+                bool success = iValue.TrySetValueFromString (_initialValueTextField.Text);
+                _eventLog?.Log ($"TrySetValueFromString(\"{_initialValueTextField.Text}\") on {contentView.GetType ().Name}: {(success ? "succeeded" : "failed")}");
+            }
+            else
+            {
+                _eventLog?.Log ($"Content view does not implement IValue; cannot apply initial value.");
+            }
+        }
 
         try
         {
