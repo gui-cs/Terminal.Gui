@@ -91,10 +91,12 @@ public partial class Markdown
                 // Forward link clicks from the table to this Markdown view's LinkClicked event.
                 tableView.LinkClicked += (_, e) =>
                                          {
-                                             if (RaiseLinkClicked (e.Url))
+                                             if (!RaiseLinkClicked (e.Url))
                                              {
-                                                 e.Handled = true;
+                                                 return;
                                              }
+
+                                             e.Handled = true;
                                          };
 
                 _tableViews.Add (tableView);
