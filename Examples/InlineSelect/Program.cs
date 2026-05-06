@@ -24,7 +24,7 @@ using Terminal.Gui.Views;
 using Timeout = System.Threading.Timeout;
 
 // Parse command-line arguments
-var orientation = Orientation.Vertical;
+Orientation orientation = Orientation.Vertical;
 List<string> options = [];
 int? timeoutSeconds = null;
 string? initialValue = null;
@@ -33,44 +33,31 @@ for (var i = 0; i < args.Length; i++)
 {
     string arg = args [i];
 
-    if (arg is "--horizontal" or "-h")
+    switch (arg)
     {
-        orientation = Orientation.Horizontal;
-    }
-    else if (arg is "--vertical" or "-v")
-    {
-        orientation = Orientation.Vertical;
-    }
-    else if (arg is "--timeout" or "-t")
-    {
-        if (i + 1 < args.Length && int.TryParse (args [i + 1], out int seconds))
-        {
+        case "--horizontal" or "-h": orientation = Orientation.Horizontal; break;
+
+        case "--vertical" or "-v": orientation = Orientation.Vertical; break;
+
+        case "--timeout" or "-t" when i + 1 < args.Length && int.TryParse (args [i + 1], out int seconds):
             timeoutSeconds = seconds;
             i++; // skip the next arg (the number)
-        }
-        else
-        {
+
+            break;
+
+        case "--timeout" or "-t":
             Console.Error.WriteLine ("Error: --timeout requires a number of seconds.");
 
             return 1;
-        }
-    }
-    else if (arg is "--initial" or "-i")
-    {
-        if (i + 1 < args.Length)
-        {
-            initialValue = args [++i];
-        }
-        else
-        {
+
+        case "--initial" or "-i" when i + 1 < args.Length: initialValue = args [++i]; break;
+
+        case "--initial" or "-i":
             Console.Error.WriteLine ("Error: --initial requires an index value.");
 
             return 1;
-        }
-    }
-    else
-    {
-        options.Add (arg);
+
+        default: options.Add (arg); break;
     }
 }
 
