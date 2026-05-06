@@ -247,4 +247,25 @@ public class LinearRangeRangeTests : TestDriverBase
         Assert.False (ok);
         Assert.Empty (r.Options);
     }
+
+    // Copilot
+    [Fact]
+    public void NonGeneric_LinearRange_Activator_CreateInstance_And_EnableForDesign_Populates ()
+    {
+        Type type = typeof (LinearRange);
+        Assert.False (type.ContainsGenericParameters);
+
+        View view = (View)Activator.CreateInstance (type)!;
+        Assert.IsType<LinearRange> (view);
+
+        var demoText = "demo";
+        bool ok = ((IDesignable)view).EnableForDesign (ref demoText);
+
+        Assert.True (ok);
+        LinearRange r = (LinearRange)view;
+        Assert.Equal (11, r.Options.Count);
+        Assert.Equal (LinearRangeSpanKind.Closed, r.Value.Kind);
+        Assert.Equal ("9 AM", r.Value.Start);
+        Assert.Equal ("5 PM", r.Value.End);
+    }
 }

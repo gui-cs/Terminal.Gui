@@ -224,4 +224,26 @@ public class LinearSelectorTests : TestDriverBase
         Assert.False (ok);
         Assert.Empty (sel.Options);
     }
+
+    // Copilot
+    [Fact]
+    public void NonGeneric_LinearSelector_Activator_CreateInstance_And_EnableForDesign_Populates ()
+    {
+        // AllViewsTester reflects over public, non-abstract, non-generic View subclasses and
+        // instantiates them via Activator.CreateInstance, then calls IDesignable.EnableForDesign.
+        // The non-generic LinearSelector exists so this discovery path works.
+        Type type = typeof (LinearSelector);
+        Assert.False (type.ContainsGenericParameters);
+
+        View view = (View)Activator.CreateInstance (type)!;
+        Assert.IsType<LinearSelector> (view);
+
+        var demoText = "demo";
+        bool ok = ((IDesignable)view).EnableForDesign (ref demoText);
+
+        Assert.True (ok);
+        LinearSelector sel = (LinearSelector)view;
+        Assert.Equal (6, sel.Options.Count);
+        Assert.Equal ("M", sel.Value);
+    }
 }

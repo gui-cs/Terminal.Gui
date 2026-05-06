@@ -153,4 +153,23 @@ public class LinearMultiSelectorTests : TestDriverBase
         Assert.False (ok);
         Assert.Empty (ms.Options);
     }
+
+    // Copilot
+    [Fact]
+    public void NonGeneric_LinearMultiSelector_Activator_CreateInstance_And_EnableForDesign_Populates ()
+    {
+        Type type = typeof (LinearMultiSelector);
+        Assert.False (type.ContainsGenericParameters);
+
+        View view = (View)Activator.CreateInstance (type)!;
+        Assert.IsType<LinearMultiSelector> (view);
+
+        var demoText = "demo";
+        bool ok = ((IDesignable)view).EnableForDesign (ref demoText);
+
+        Assert.True (ok);
+        LinearMultiSelector ms = (LinearMultiSelector)view;
+        Assert.Equal (7, ms.Options.Count);
+        Assert.Equal (["Mon", "Tue", "Wed", "Thu", "Fri"], ms.Value!);
+    }
 }
