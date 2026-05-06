@@ -72,5 +72,5 @@ public class FileSystemTreeBuilder : ITreeBuilder<IFileSystemInfo>, IComparer<IF
         }
     }
 
-    private static bool IsReparsePoint (IFileSystemInfo entry) => (entry.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint;
+    internal static bool IsReparsePoint (IFileSystemInfo entry) => (entry.Attributes & FileAttributes.ReparsePoint) == FileAttributes.ReparsePoint;
 }
