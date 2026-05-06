@@ -110,7 +110,10 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
         try
         {
-            InputHandle = GetStdHandle (STD_INPUT_HANDLE);
+            // Use the controlling terminal input handle: when stdin is redirected (e.g. piping
+            // input into the app) this is the handle obtained from CONIN$ rather than the
+            // standard input handle, so VT input still reaches the real console.
+            InputHandle = TerminalDevice.InputHandle;
 
             if (InputHandle == nint.Zero || InputHandle == new nint (-1))
             {

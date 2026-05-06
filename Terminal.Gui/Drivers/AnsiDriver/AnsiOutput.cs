@@ -111,8 +111,20 @@ public class AnsiOutput : OutputBase, IOutput
             }
             else if (PlatformDetection.IsUnixLike ())
             {
-                // duplicate stdout so we don't mess with Console.Out's FD
-                int fdCopy = UnixIOHelper.dup (UnixIOHelper.STDOUT_FILENO);
+                // duplicate the controlling terminal output fd so we don't mess with it.
+                // When stdout is redirected this is /dev/tty rather than STDOUT_FILENO,
+                // allowing TUI rendering to appear on the real terminal even when the
+                // app's stdout participates in a shell pipeline.
+                int outputFd = TerminalDevice.OutputFd;
+
+                if (outputFd < 0)
+                {
+                    Trace.Lifecycle (nameof (AnsiOutput), "Init", "Console output stream is not writable. Running in degraded mode.");
+
+                    return;
+                }
+
+                int fdCopy = UnixIOHelper.dup (outputFd);
 
                 if (fdCopy == -1)
                 {
