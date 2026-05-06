@@ -315,7 +315,7 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
                 kvp.Value.Text = kvp.Key.Value.ToString ();
             }
 
-            var colorHex = _selectedColor.ToString ($"#{SelectedColor.R:X2}{SelectedColor.G:X2}{SelectedColor.B:X2}");
+            string colorHex = _selectedColor.ToString ($"#{SelectedColor.R:X2}{SelectedColor.G:X2}{SelectedColor.B:X2}");
 
             if (_ddlName is { })
             {
