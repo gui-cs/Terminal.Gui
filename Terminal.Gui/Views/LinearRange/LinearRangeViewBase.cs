@@ -273,8 +273,8 @@ public abstract class LinearRangeViewBase<TOption, TValue> : View, IOrientation,
                 return;
             }
 
+            ApplySelectedIndices ([]);
             _config._renderMode = value;
-            _setOptions.Clear ();
             SetNeedsDraw ();
         }
     }
