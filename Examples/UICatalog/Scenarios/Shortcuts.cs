@@ -205,24 +205,24 @@ public class Shortcuts : Scenario
             Y = Pos.Bottom (diagnosticShortcut),
             Width = Dim.Fill (eventLog),
             HelpText = "LinearRanges work!",
-            CommandView = new LinearRange<string> { Id = "sliderLR", Orientation = Orientation.Horizontal, AllowEmpty = true },
+            CommandView = new LinearMultiSelector<string> { Id = "sliderLR", Orientation = Orientation.Horizontal, AllowEmpty = true },
             Key = Key.F5
         };
 
-        ((LinearRange<string>)sliderShortcut.CommandView).Options =
+        ((LinearMultiSelector<string>)sliderShortcut.CommandView).Options =
         [
             new LinearRangeOption<string> { Legend = "A" }, new LinearRangeOption<string> { Legend = "B" }, new LinearRangeOption<string> { Legend = "C" }
         ];
-        ((LinearRange<string>)sliderShortcut.CommandView).SetOption (0);
+        ((LinearMultiSelector<string>)sliderShortcut.CommandView).Value = ["A"];
 
-        ((LinearRange<string>)sliderShortcut.CommandView).OptionsChanged += (send, _) =>
+        ((LinearMultiSelector<string>)sliderShortcut.CommandView).ValueChanged += (send, args) =>
                                                                             {
-                                                                                if (send is LinearRange<string> lr)
+                                                                                if (send is LinearMultiSelector<string> lr)
                                                                                 {
-                                                                                    eventLog.Log ($"OptionsChanged: {
+                                                                                    eventLog.Log ($"ValueChanged: {
                                                                                         lr.GetType ().Name
                                                                                     } - {
-                                                                                        string.Join (",", lr.GetSetOptions ())
+                                                                                        string.Join (",", args.NewValue ?? [])
                                                                                     }");
                                                                                 }
                                                                             };
