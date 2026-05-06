@@ -199,6 +199,9 @@
   <data name="fdNewFailed" xml:space="preserve">
     <value>New Failed</value>
   </data>
+  <data name="fdPathTraversalError" xml:space="preserve">
+    <value>Name must not contain path separators or navigate outside the current directory.</value>
+  </data>
   <data name="fdNewTitle" xml:space="preserve">
     <value>New Folder</value>
   </data>

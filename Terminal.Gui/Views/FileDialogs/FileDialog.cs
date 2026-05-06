@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.IO.Abstractions;
+using Terminal.Gui.FileServices;
 
 namespace Terminal.Gui.Views;
 
@@ -522,7 +523,7 @@ public partial class FileDialog : Dialog<IReadOnlyList<string>?>, IDesignable
                     }
                 }
 
-                if (f.FileSystemInfo is IDirectoryInfo sub)
+                if (f.FileSystemInfo is IDirectoryInfo sub && !FileSystemTreeBuilder.IsReparsePoint (sub))
                 {
                     RecursiveFind (sub);
                 }

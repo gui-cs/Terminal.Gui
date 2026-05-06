@@ -637,6 +637,15 @@ namespace Terminal.Gui.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Name must not contain path separators or navigate outside the current directory..
+        /// </summary>
+        public static string fdPathTraversalError {
+            get {
+                return ResourceManager.GetString("fdPathTraversalError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to New Folder.
         /// </summary>
         public static string fdNewTitle {

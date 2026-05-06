@@ -5,6 +5,36 @@ namespace Terminal.Gui.Views;
 /// <summary>Default file operation handlers using modal dialogs.</summary>
 public class DefaultFileOperations : IFileOperations
 {
+    /// <summary>
+    ///     Determines whether a candidate path is safely contained within the specified root directory.
+    ///     Returns <see langword="false"/> if the name contains path-traversal sequences that escape the root.
+    /// </summary>
+    internal static bool IsContainedIn (string root, string candidate)
+    {
+        string rootFull = Path.GetFullPath (root)
+                              .TrimEnd (Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                          + Path.DirectorySeparatorChar;
+
+        string candidateFull = Path.GetFullPath (candidate);
+
+        return candidateFull.StartsWith (rootFull, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    ///     Returns <see langword="true"/> if the name contains characters that are not valid in a file or directory name,
+    ///     including path separators, null characters, and control characters.
+    /// </summary>
+    internal static bool ContainsInvalidNameCharacters (string name)
+    {
+        if (string.IsNullOrWhiteSpace (name))
+        {
+            return true;
+        }
+
+        char [] invalidChars = Path.GetInvalidFileNameChars ();
+
+        return name.IndexOfAny (invalidChars) >= 0;
+    }
     /// <inheritdoc/>
     public bool Delete (IApplication? app, IEnumerable<IFileSystemInfo> toDelete)
     {
@@ -72,7 +102,17 @@ public class DefaultFileOperations : IFileOperations
         {
             if (toRename is IFileInfo f)
             {
-                IFileInfo newLocation = fileSystem.FileInfo.New (Path.Combine (f.Directory?.FullName ?? throw new InvalidOperationException (), newName));
+                string parentDir = f.Directory?.FullName ?? throw new InvalidOperationException ();
+                string combined = Path.Combine (parentDir, newName);
+
+                if (ContainsInvalidNameCharacters (newName) || !IsContainedIn (parentDir, combined))
+                {
+                    MessageBox.ErrorQuery (app, Strings.fdRenameFailedTitle, Strings.fdPathTraversalError, Strings.btnOk);
+
+                    return null;
+                }
+
+                IFileInfo newLocation = fileSystem.FileInfo.New (combined);
                 f.MoveTo (newLocation.FullName);
 
                 return newLocation;
@@ -80,9 +120,17 @@ public class DefaultFileOperations : IFileOperations
             else
             {
                 var d = (IDirectoryInfo)toRename;
+                string parentDir = d.Parent?.FullName ?? throw new InvalidOperationException ();
+                string combined = Path.Combine (parentDir, newName);
 
-                IDirectoryInfo newLocation =
-                    fileSystem.DirectoryInfo.New (Path.Combine (d.Parent?.FullName ?? throw new InvalidOperationException (), newName));
+                if (ContainsInvalidNameCharacters (newName) || !IsContainedIn (parentDir, combined))
+                {
+                    MessageBox.ErrorQuery (app, Strings.fdRenameFailedTitle, Strings.fdPathTraversalError, Strings.btnOk);
+
+                    return null;
+                }
+
+                IDirectoryInfo newLocation = fileSystem.DirectoryInfo.New (combined);
                 d.MoveTo (newLocation.FullName);
 
                 return newLocation;
@@ -113,7 +161,16 @@ public class DefaultFileOperations : IFileOperations
 
         try
         {
-            IDirectoryInfo newDir = fileSystem.DirectoryInfo.New (Path.Combine (inDirectory.FullName, result));
+            string combined = Path.Combine (inDirectory.FullName, result);
+
+            if (ContainsInvalidNameCharacters (result) || !IsContainedIn (inDirectory.FullName, combined))
+            {
+                MessageBox.ErrorQuery (app, Strings.fdNewFailed, Strings.fdPathTraversalError, Strings.btnOk);
+
+                return null;
+            }
+
+            IDirectoryInfo newDir = fileSystem.DirectoryInfo.New (combined);
             newDir.Create ();
 
             return newDir;
