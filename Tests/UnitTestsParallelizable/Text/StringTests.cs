@@ -217,19 +217,29 @@ public class StringTests
     [Theory]
     // Control characters (should be replaced with the "Control Pictures" block)
     [InlineData ("\u0000", "\u2400")]  // NULL → ␀
-    [InlineData ("\u0009", "\u2409")]  // TAB → ␉
+    [InlineData ("\u0009", "\u0009")]  // TAB → preserved (handled elsewhere)
     [InlineData ("\u000A", "\u240A")]  // LF → ␊
     [InlineData ("\u000D", "\u240D")]  // CR → ␍
+    [InlineData ("\u001B", "\u241B")]  // ESC → ␛
+
+    // C1 controls (should be replaced with space)
+    [InlineData ("\u007F", "\u247F")]  // DEL → Control Picture
+    [InlineData ("\u0080", " ")]       // C1 control → space
+    [InlineData ("\u009F", " ")]       // C1 control → space
 
     // Printable characters (should remain unchanged)
     [InlineData ("A", "A")]
     [InlineData (" ", " ")]
     [InlineData ("~", "~")]
 
-    // Multi-character string (should return unchanged)
+    // Multi-character string with control char at start (should be sanitized)
     [InlineData ("AB", "AB")]
     [InlineData ("Hello", "Hello")]
-    [InlineData ("\u0009A", "\u0009A")] // includes a control char, but length > 1
+    [InlineData ("\u0009A", "\u0009A")] // TAB + A: TAB is allowed, so preserved
+
+    // Copilot - Security fix: multi-char graphemes starting with control chars are sanitized
+    [InlineData ("\u001BA", " ")]       // ESC + A → space (unsafe control at start)
+    [InlineData ("A\u001B", " ")]       // A + ESC → space (embedded control)
     public void MakePrintable_ReturnsExpected (string input, string expected)
     {
         // Act

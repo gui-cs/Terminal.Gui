@@ -132,22 +132,65 @@ public static class StringExtensions
     }
 
     /// <summary>
-    ///     Ensures the text is not a control character and can be displayed by translating characters below 0x20 to
-    ///     equivalent, printable, Unicode chars.
+    ///     Ensures the text does not contain control characters that could be emitted verbatim to the terminal,
+    ///     by translating C0 controls (U+0000–U+001F, except TAB U+0009) and C1 controls (U+007F–U+009F) to
+    ///     equivalent, printable, Unicode Control Pictures (U+2400–U+243F) or space.
     /// </summary>
     /// <remarks>This is a Terminal.Gui extension method to <see cref="string"/> to support TUI text manipulation.</remarks>
     /// <param name="str">The text.</param>
-    /// <returns></returns>
+    /// <returns>A string safe for terminal display.</returns>
     public static string MakePrintable (this string str)
     {
-        if (str.Length > 1)
+        if (string.IsNullOrEmpty (str))
         {
             return str;
         }
 
-        char ch = str [0];
+        char first = str [0];
 
-        return char.IsControl (ch) ? new string ((char)(ch + 0x2400), 1) : str;
+        // Fast path: single-char grapheme with no control character
+        if (str.Length == 1)
+        {
+            if (first == '\t')
+            {
+                return str; // TAB is allowed — handled elsewhere
+            }
+
+            if (char.IsControl (first))
+            {
+                // Map C0 controls (0x00–0x1F) and DEL (0x7F) to Unicode Control Pictures (U+2400–U+2421).
+                // Map C1 controls (0x80–0x9F) to a replacement space since there are no standard pictures.
+                return first <= '\x7F'
+                           ? new string ((char)(first + 0x2400), 1)
+                           : " ";
+            }
+
+            return str;
+        }
+
+        // Multi-char grapheme: check if first char is a control character
+        if (first == '\t')
+        {
+            return str; // TAB is allowed
+        }
+
+        if (char.IsControl (first))
+        {
+            // The grapheme starts with a control character — replace entirely with space
+            return " ";
+        }
+
+        // Check for embedded control characters within the grapheme cluster
+        for (int i = 1; i < str.Length; i++)
+        {
+            if (char.IsControl (str [i]) && str [i] != '\t')
+            {
+                // Replace the entire grapheme with space — it contains embedded controls
+                return " ";
+            }
+        }
+
+        return str;
     }
 
     /// <summary>Repeats the string <paramref name="n"/> times.</summary>

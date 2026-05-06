@@ -313,7 +313,7 @@ public class RuneTests
     [Theory]
     [InlineData (0x0000001F, 0x241F)]
     [InlineData (0x0000007F, 0x247F)]
-    [InlineData (0x0000009F, 0x249F)]
+    [InlineData (0x0000009F, 0x20)]   // C1 control → space (no standard Control Picture)
     [InlineData (0x0001001A, 0x1001A)]
     public void MakePrintable_Converts_Control_Chars_To_Proper_Unicode (int code, int expected)
     {
@@ -368,9 +368,10 @@ public class RuneTests
     [Theory]
     // Control characters (should be mapped to Control Pictures)
     [InlineData ('\u0000', 0x2400)]  // NULL → ␀
-    [InlineData ('\u0009', 0x2409)]  // TAB → ␉
+    [InlineData ('\u0009', 0x0009)]  // TAB → preserved (handled elsewhere)
     [InlineData ('\u000A', 0x240A)]  // LF → ␊
     [InlineData ('\u000D', 0x240D)]  // CR → ␍
+    [InlineData ('\u001B', 0x241B)]  // ESC → ␛
 
     // Printable characters (should remain unchanged)
     [InlineData ('A', 'A')]
