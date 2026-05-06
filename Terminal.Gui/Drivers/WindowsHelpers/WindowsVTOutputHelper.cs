@@ -20,10 +20,6 @@ internal sealed class WindowsVTOutputHelper : IDisposable
 
     private const uint ENABLE_VIRTUAL_TERMINAL_PROCESSING = 4;
     private const uint ENABLE_PROCESSED_OUTPUT = 1;
-    private const int STD_OUTPUT_HANDLE = -11;
-
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern nint GetStdHandle (int nStdHandle);
 
     [DllImport ("kernel32.dll")]
     private static extern bool SetConsoleMode (nint hConsoleHandle, uint dwMode);
@@ -81,7 +77,10 @@ internal sealed class WindowsVTOutputHelper : IDisposable
 
         try
         {
-            OutputHandle = GetStdHandle (STD_OUTPUT_HANDLE);
+            // Use the controlling terminal output handle: when stdout is redirected (e.g.
+            // `myapp | jq`) this is the handle obtained from CONOUT$ rather than the standard
+            // output handle, so VT sequences still reach the real console.
+            OutputHandle = TerminalDevice.OutputHandle;
 
             if (OutputHandle == nint.Zero || OutputHandle == new nint (-1))
             {
@@ -177,11 +176,12 @@ internal sealed class WindowsVTOutputHelper : IDisposable
     }
 
     /// <summary>
-    ///     Flushes the stdout handle via <c>FlushFileBuffers</c>.
+    ///     Flushes the controlling console output handle via <c>FlushFileBuffers</c>.
+    ///     No-op when no terminal output device is available.
     /// </summary>
     public static void FlushStdout ()
     {
-        nint h = GetStdHandle (STD_OUTPUT_HANDLE);
+        nint h = TerminalDevice.OutputHandle;
 
         if (h != nint.Zero && h != new nint (-1))
         {
