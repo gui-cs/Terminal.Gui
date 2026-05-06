@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Terminal.Gui.Drivers;
+﻿namespace Terminal.Gui.Drivers;
 
 /// <summary>
 ///     Holds global driver settings and cross-driver utility methods.
@@ -45,18 +43,27 @@ public sealed class Driver
     public static SizeDetectionMode SizeDetection { get; set; } = SizeDetectionMode.AnsiQuery;
 
     /// <summary>
-    ///     Determines whether the process is attached to a real terminal (i.e. stdin/stdout
-    ///     are connected to a console device rather than redirected or running inside a test harness). Set the environment
-    ///     variable "DisableRealDriverIO=1" to skip real terminal detection and force this method to return false, which is
-    ///     required for running in test harnesses that do not have a real terminal attached.
+    ///     Determines whether the process has a controlling terminal usable for TUI rendering and input.
+    ///     Returns <see langword="true"/> when either:
+    ///     <list type="bullet">
+    ///         <item>stdin/stdout are connected to a console device, or</item>
+    ///         <item>
+    ///             stdin/stdout are redirected (e.g. via a shell pipeline such as
+    ///             <c>result=$(myapp)</c> or <c>myapp | jq</c>) but a controlling terminal is available
+    ///             via <c>/dev/tty</c> on Unix or <c>CONIN$</c>/<c>CONOUT$</c> on Windows.
+    ///         </item>
+    ///     </list>
+    ///     Set the environment variable <c>DisableRealDriverIO=1</c> to skip real terminal detection and
+    ///     force this method to return false, which is required for running in test harnesses that do not
+    ///     have a real terminal attached.
     /// </summary>
     /// <param name="inputAttached">
-    ///     When this method returns, <see langword="true"/> if standard input is connected to a console device;
-    ///     otherwise <see langword="false"/>.
+    ///     When this method returns, <see langword="true"/> if a terminal device is available for input
+    ///     (either stdin or the controlling terminal); otherwise <see langword="false"/>.
     /// </param>
     /// <param name="outputAttached">
-    ///     When this method returns, <see langword="true"/> if standard output is connected to a console device;
-    ///     otherwise <see langword="false"/>.
+    ///     When this method returns, <see langword="true"/> if a terminal device is available for output
+    ///     (either stdout or the controlling terminal); otherwise <see langword="false"/>.
     /// </param>
     /// <returns><see langword="true"/> if both input and output are attached to a terminal; otherwise <see langword="false"/>.</returns>
     public static bool IsAttachedToTerminal (out bool inputAttached, out bool outputAttached)
@@ -69,13 +76,8 @@ public sealed class Driver
             return false;
         }
 
-        if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
-        {
-            return WindowsConsoleHelper.IsAttachedToTerminal (out inputAttached, out outputAttached);
-        }
-
-        inputAttached = UnixIOHelper.IsTerminal (UnixIOHelper.STDIN_FILENO);
-        outputAttached = UnixIOHelper.IsTerminal (UnixIOHelper.STDOUT_FILENO);
+        inputAttached = TerminalDevice.IsInputAttached;
+        outputAttached = TerminalDevice.IsOutputAttached;
 
         return inputAttached && outputAttached;
     }

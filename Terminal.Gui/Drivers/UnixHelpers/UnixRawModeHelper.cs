@@ -37,6 +37,7 @@ internal sealed class UnixRawModeHelper : IDisposable
     private Termios _originalTermios;
     private bool _haveSavedTermios;
     private bool _disposed;
+    private int _termiosFd = -1;
     private EventHandler? _processExitHandler;
     private ConsoleCancelEventHandler? _cancelKeyHandler;
 
@@ -64,8 +65,22 @@ internal sealed class UnixRawModeHelper : IDisposable
 
         try
         {
+            // Use the controlling terminal input fd: when stdin is redirected (e.g. `myapp | jq`)
+            // this is /dev/tty rather than STDIN_FILENO, so termios settings still apply to the
+            // real terminal device.
+            int fd = TerminalDevice.InputFd;
+
+            if (fd < 0)
+            {
+                Logging.Warning ("No terminal input device available. Cannot enable raw mode.");
+
+                return false;
+            }
+
+            _termiosFd = fd;
+
             // Get current terminal attributes
-            int result = tcgetattr (STDIN_FILENO, out _originalTermios);
+            int result = tcgetattr (_termiosFd, out _originalTermios);
 
             if (result != 0)
             {
@@ -99,7 +114,7 @@ internal sealed class UnixRawModeHelper : IDisposable
             }
 
             // Apply raw mode settings
-            result = tcsetattr (STDIN_FILENO, TCSANOW, ref raw);
+            result = tcsetattr (_termiosFd, TCSANOW, ref raw);
 
             if (result != 0)
             {
@@ -151,7 +166,7 @@ internal sealed class UnixRawModeHelper : IDisposable
 
         try
         {
-            int result = tcsetattr (STDIN_FILENO, TCSANOW, ref _originalTermios);
+            int result = tcsetattr (_termiosFd, TCSANOW, ref _originalTermios);
 
             if (result != 0)
             {
