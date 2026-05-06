@@ -70,6 +70,9 @@ public class MarkdownTester : Scenario
 
         previewFrame.Add (preview);
 
+        // Opt-in: handle link clicks so Link.OpenUrl is not called in this demo scenario.
+        preview.LinkClicked += (_, e) => e.Handled = true;
+
         // Update preview when editor text changes
         editor.ContentsChanged += (_, _) => { preview.Text = editor.Text; };
 
@@ -117,17 +120,7 @@ public class MarkdownTester : Scenario
 
         Shortcut themeBgShortcut = new () { CommandView = themeBgCheckBox };
 
-        Link linkView = new () { Text = "" };
-        Shortcut linkShortcut = new () { CommandView = linkView, Title = "", MouseHighlightStates = MouseState.None };
-
-        preview.LinkClicked += (_, e) =>
-                                {
-                                    linkView.Text = e.Url;
-                                    linkShortcut.MouseHighlightStates = MouseState.In;
-                                    e.Handled = true;
-                                };
-
-        statusBar.Add (themeShortcut, themeBgShortcut, linkShortcut, quitShortcut);
+        statusBar.Add (themeShortcut, themeBgShortcut, quitShortcut);
         window.Add (statusBar);
 
         preview.Text = editor.Text;
