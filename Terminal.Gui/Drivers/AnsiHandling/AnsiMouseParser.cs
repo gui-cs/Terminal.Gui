@@ -63,6 +63,13 @@ public class AnsiMouseParser
     private readonly Regex _mouseEventPattern = new (@"\u001b\[<(\d+);(\d+);(\d+)(M|m)", RegexOptions.Compiled);
 
     /// <summary>
+    ///     Maximum input length for mouse escape sequences. Real mouse sequences are short
+    ///     (typically under 20 characters). This guard prevents regex evaluation against
+    ///     pathologically large inputs accumulated by the parser.
+    /// </summary>
+    internal const int MaxMouseSequenceLength = 64;
+
+    /// <summary>
     ///     Returns true if it is a mouse event
     /// </summary>
     /// <param name="cur"></param>
@@ -71,7 +78,7 @@ public class AnsiMouseParser
 
         // Typically in this format
         // ESC [ < {button_code};{x_pos};{y_pos}{final_byte}
-        cur!.EndsWith ('M') || cur.EndsWith ('m');
+        cur is { Length: <= MaxMouseSequenceLength } && (cur.EndsWith ('M') || cur.EndsWith ('m'));
 
     /// <summary>
     ///     Parses a mouse ansi escape sequence into a mouse event. Returns null if input
@@ -81,8 +88,13 @@ public class AnsiMouseParser
     /// <returns></returns>
     public Mouse? ProcessMouseInput (string? input)
     {
+        if (input is null || input.Length > MaxMouseSequenceLength)
+        {
+            return null;
+        }
+
         // Match mouse wheel events first
-        Match match = _mouseEventPattern.Match (input!);
+        Match match = _mouseEventPattern.Match (input);
 
         if (!match.Success)
         {
