@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace Terminal.Gui.Views;
 
 /// <summary>
@@ -40,10 +42,11 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
     private TextField? _tfHex;
     private Label? _lbHex;
 
-    private TextField? _tfName;
+    private DropDownList? _ddlName;
     private Label? _lbName;
 
     private Color _selectedColor = Color.Black;
+    private bool _syncingSubViews;
 
     // TODO: Add interface
     private readonly IColorNameResolver _colorNameResolver = new StandardColorsNameResolver ();
@@ -172,23 +175,19 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
     {
         _lbName = new Label { Text = "Name:", X = 0, Y = 3 };
 
-        _tfName = new TextField
+        ObservableCollection<string> colorNames = new (_colorNameResolver.GetColorNames ());
+
+        _ddlName = new DropDownList
         {
-            Y = 3, X = 6, Width = 20 // width of "LightGoldenRodYeexllow" - the longest w3c color name
+            Y = 3, X = 6, Width = 20, // width of "LightGoldenRodYellow" - the longest w3c color name
+            ReadOnly = true,
+            Source = new ListWrapper<string> (colorNames)
         };
 
         Add (_lbName);
-        Add (_tfName);
+        Add (_ddlName);
 
-        AppendAutocomplete auto = new (_tfName)
-        {
-            SuggestionGenerator = new SingleWordSuggestionGenerator { AllSuggestions = _colorNameResolver.GetColorNames ().ToList () }
-        };
-
-        _tfName.Autocomplete = auto;
-
-        _tfName.HasFocusChanged += UpdateValueFromName;
-        _tfName.Accepting += (_, _) => UpdateValueFromName ();
+        _ddlName.ValueChanged += (_, _) => UpdateValueFromName ();
     }
 
     private void CreateTextField ()
@@ -251,11 +250,11 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
             _lbName = null;
         }
 
-        if (_tfName != null)
+        if (_ddlName != null)
         {
-            Remove (_tfName);
-            _tfName.Dispose ();
-            _tfName = null;
+            Remove (_ddlName);
+            _ddlName.Dispose ();
+            _ddlName = null;
         }
     }
 
@@ -302,23 +301,35 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
 
     private void SyncSubViewValues (bool syncBars)
     {
-        if (syncBars)
+        _syncingSubViews = true;
+
+        try
         {
-            _strategy.SetBarsToColor (_bars, _selectedColor, Style.ColorModel);
-        }
+            if (syncBars)
+            {
+                _strategy.SetBarsToColor (_bars, _selectedColor, Style.ColorModel);
+            }
 
-        foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
+            foreach (KeyValuePair<IColorBar, TextField> kvp in _textFields)
+            {
+                kvp.Value.Text = kvp.Key.Value.ToString ();
+            }
+
+            var colorHex = _selectedColor.ToString ($"#{SelectedColor.R:X2}{SelectedColor.G:X2}{SelectedColor.B:X2}");
+
+            if (_ddlName is { })
+            {
+                _ddlName.Text = _colorNameResolver.TryNameColor (_selectedColor, out string? name) ? name : string.Empty;
+            }
+
+            _tfHex?.Text = colorHex;
+
+            SetNeedsLayout ();
+        }
+        finally
         {
-            kvp.Value.Text = kvp.Key.Value.ToString ();
+            _syncingSubViews = false;
         }
-
-        var colorHex = _selectedColor.ToString ($"#{SelectedColor.R:X2}{SelectedColor.G:X2}{SelectedColor.B:X2}");
-
-        _tfName?.Text = _colorNameResolver.TryNameColor (_selectedColor, out string? name) ? name : string.Empty;
-
-        _tfHex?.Text = colorHex;
-
-        SetNeedsLayout ();
     }
 
     private void UpdateSingleBarValueFromTextField (object? sender, HasFocusEventArgs e)
@@ -349,26 +360,14 @@ public class ColorPicker : View, IValue<Color?>, IDesignable
         }
     }
 
-    private void UpdateValueFromName (object? sender, HasFocusEventArgs e)
-    {
-        // if the new value of Focused is true then it is an enter event so ignore
-        if (e.NewValue)
-        {
-            return;
-        }
-
-        // it is a leave event so update
-        UpdateValueFromName ();
-    }
-
     private void UpdateValueFromName ()
     {
-        if (_tfName == null)
+        if (_ddlName == null || _syncingSubViews)
         {
             return;
         }
 
-        if (_colorNameResolver.TryParseColor (_tfName.Text, out Color newColor))
+        if (_colorNameResolver.TryParseColor (_ddlName.Text, out Color newColor))
         {
             SelectedColor = newColor;
         }
