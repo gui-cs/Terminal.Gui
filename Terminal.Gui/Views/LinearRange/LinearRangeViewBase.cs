@@ -137,7 +137,7 @@ public abstract class LinearRangeViewBase<TOption, TValue> : View, IOrientation,
         Style.RangeChar = new Cell { Grapheme = Glyphs.Stipple.ToString () }; // ░ ▒ ▓   // Medium shade not blinking on curses.
         Style.StartRangeChar = new Cell { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
         Style.EndRangeChar = new Cell { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
-        Style.DragChar = new Cell { Grapheme = Glyphs.Diamond.ToString () };
+        Style.DragChar = new Cell { Grapheme = Glyphs.ContinuousMeterSegment.ToString () };
     }
 
     #endregion
