@@ -58,13 +58,15 @@ public class LinearMultiSelector<T> : LinearRangeViewBase<T, IReadOnlyList<T>>, 
             _value = incoming;
 
             // Sync indices: find the option index for each element of incoming.
+            // Use a HashSet to dedupe in O(1) per item rather than O(n) List.Contains scans.
             List<int> indices = new (incoming.Count);
+            HashSet<int> seen = new (incoming.Count);
 
             foreach (T item in incoming)
             {
                 int idx = IndexOfData (item);
 
-                if (idx >= 0 && !indices.Contains (idx))
+                if (idx >= 0 && seen.Add (idx))
                 {
                     indices.Add (idx);
                 }
