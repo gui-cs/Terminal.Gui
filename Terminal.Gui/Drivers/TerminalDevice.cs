@@ -252,8 +252,9 @@ internal static class TerminalDevice
                 return;
             }
 
-            // At this point we know at least one of (_inputFd, _outputFd) is -1 (otherwise the
-            // early return above already fired), so ttyFd is guaranteed to be adopted below.
+            // Since we reached this point, at least one of (_inputFd, _outputFd) is -1 (the
+            // early return above would have fired otherwise), guaranteeing that ttyFd is
+            // assigned below.
             if (_inputFd == -1)
             {
                 // stdin was redirected: claim the /dev/tty fd we just opened for input.
@@ -373,6 +374,10 @@ internal static class TerminalDevice
             _ownedInputFd = -1;
         }
 
+        // Guard against double-closing: when stdin and stdout both fall back to /dev/tty we
+        // share a single fd between them, so it is recorded as the owned fd for both ends.
+        // _ownedInputFd was already closed above (and reset to -1 there), so we only need to
+        // close _ownedOutputFd when it refers to a distinct descriptor.
         if (_ownedOutputFd != -1 && _ownedOutputFd != _ownedInputFd)
         {
             try

@@ -441,6 +441,13 @@ internal static class UnixIOHelper
     /// <summary>
     ///     Creates a poll map for monitoring terminal input (stdin or the controlling TTY when stdin is redirected).
     /// </summary>
+    /// <remarks>
+    ///     When <see cref="TerminalDevice.InputFd"/> reports no terminal device (-1), this method
+    ///     still returns a poll map populated with <see cref="STDIN_FILENO"/> rather than returning
+    ///     <see langword="null"/>. The fd will be invalid and <c>poll</c> will report
+    ///     <c>POLLNVAL</c>, so no input will be consumed; this preserves the non-null contract
+    ///     callers (e.g. <c>AnsiInput</c>) rely on for the lifetime of the input loop.
+    /// </remarks>
     /// <returns>Initialized Pollfd array</returns>
     public static Pollfd [] CreateStdinPollMap ()
     {
