@@ -90,12 +90,11 @@ public class ViewportSettings : Scenario
 
         List<object> options = ["Option 1", "Option 2", "Option 3"];
 
-        LinearRange linearRange = new (options)
+        LinearMultiSelector<object> linearRange = new (options)
         {
             X = 0,
             Y = Pos.Bottom (textField) + 1,
             Orientation = Orientation.Vertical,
-            Type = LinearRangeType.Multiple,
             AllowEmpty = false,
             BorderStyle = LineStyle.Double,
             Title = "_LinearRange"

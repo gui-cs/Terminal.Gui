@@ -72,7 +72,7 @@ public class ConfigurationMangerTests (ITestOutputHelper output)
                          );
             Assert.Equal (
                           CursorStyle.BlinkingBlock,
-                          (CursorStyle)defaultTheme ["LinearRange.DefaultCursorStyle"].PropertyValue!
+                          (CursorStyle)defaultTheme ["LinearRangeDefaults.DefaultCursorStyle"].PropertyValue!
                          );
         }
         finally
