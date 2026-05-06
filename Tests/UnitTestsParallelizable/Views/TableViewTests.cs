@@ -1060,4 +1060,85 @@ public class TableViewTests : TestDriverBase
 
         tableView.Dispose ();
     }
+
+    // Copilot
+    [Fact]
+    public void HeaderSeparatorLines_DoNotUseFocusAttribute_WhenTableHasFocus ()
+    {
+        IDriver driver = CreateTestDriver (40, 5);
+
+        TableView tableView = new () { Driver = driver };
+        tableView.BeginInit ();
+        tableView.EndInit ();
+        tableView.SchemeName = SchemeManager.SchemesToSchemeName (Schemes.Base);
+        tableView.Viewport = new Rectangle (0, 0, 40, 5);
+
+        tableView.Style.ShowHeaders = true;
+        tableView.Style.ShowHorizontalHeaderUnderline = false;
+        tableView.Style.ShowHorizontalHeaderOverline = false;
+        tableView.Style.AlwaysShowHeaders = true;
+        tableView.Style.ShowVerticalCellLines = true;
+        tableView.Style.ShowVerticalHeaderLines = true;
+
+        DataTable dt = new ();
+        dt.Columns.Add ("Name");
+        dt.Columns.Add ("Value");
+        dt.Rows.Add ("test", "123");
+        tableView.Table = new DataTableSource (dt);
+
+        // Simulate focus so headers render with Focus attribute
+        tableView.HasFocus = true;
+
+        tableView.Layout ();
+        tableView.SetClipToScreen ();
+        tableView.Draw ();
+
+        Cell [,] contents = driver.Contents!;
+
+        // Find the separator column (│) between the two headers on row 0
+        var separatorCol = -1;
+
+        for (var c = 1; c < 39; c++)
+        {
+            if (contents [0, c].Grapheme == Glyphs.VLine.ToString ())
+            {
+                separatorCol = c;
+
+                break;
+            }
+        }
+
+        Assert.True (separatorCol >= 0, "Expected to find a vertical separator '│' between headers");
+
+        // The separator should use Normal attribute, not Focus
+        Scheme viewScheme = tableView.GetScheme ();
+        Attribute normalAttr = viewScheme.Normal;
+        Attribute focusAttr = viewScheme.Focus;
+
+        Attribute? separatorAttribute = contents [0, separatorCol].Attribute;
+
+        // The separator must NOT use focus colors
+        Assert.NotEqual (focusAttr, separatorAttribute);
+
+        // The separator should use normal attribute
+        Assert.Equal (normalAttr, separatorAttribute);
+
+        // Also verify that actual header text DOES use focus attribute
+        var nameCol = -1;
+
+        for (var c = 0; c < 40; c++)
+        {
+            if (contents [0, c].Grapheme == "N")
+            {
+                nameCol = c;
+
+                break;
+            }
+        }
+
+        Assert.True (nameCol >= 0, "Expected to find 'N' from 'Name' header");
+        Assert.Equal (focusAttr, contents [0, nameCol].Attribute);
+
+        tableView.Dispose ();
+    }
 }

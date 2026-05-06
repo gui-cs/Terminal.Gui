@@ -250,14 +250,18 @@ public partial class TableView
                 new HeaderColorGetterArgs (_table, current.Column, colName, baseScheme));
             Scheme effectiveScheme = headerScheme ?? baseScheme;
 
-            SetAttribute (HasFocus ? effectiveScheme.Focus : effectiveScheme.Normal);
-
+            // Draw separator lines with normal attribute so focus colors don't bleed into lines
+            SetAttribute (GetAttributeForRole (VisualRole.Normal));
             RenderSeparator (current.X - 1, row, true);
+
+            // Now set the header text attribute
+            SetAttribute (HasFocus ? effectiveScheme.Focus : effectiveScheme.Normal);
             Move (current.X - Viewport.X, row);
             AddStr (TruncateOrPad (colName, colName, current.Width, colStyle));
 
             if (!Style.ExpandLastColumn && current.IsVeryLast)
             {
+                SetAttribute (GetAttributeForRole (VisualRole.Normal));
                 RenderSeparator (current.X + current.Width - 1, row, true);
             }
         }

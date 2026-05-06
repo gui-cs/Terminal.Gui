@@ -31,9 +31,6 @@ internal sealed class WindowsVTInputHelper : IDisposable
     // to use GetNumberOfConsoleInputEvents to poll for availability. With such APIs, this helper class would be unnecessary.
     // If this were the case, the only API the ANSI driver would require on Windows is GetStdHandle and ReadFile.
 
-    [DllImport ("kernel32.dll", SetLastError = true)]
-    private static extern nint GetStdHandle (int nStdHandle);
-
     [DllImport ("kernel32.dll")]
     private static extern bool GetConsoleMode (nint hConsoleHandle, out uint lpMode);
 
@@ -54,7 +51,6 @@ internal sealed class WindowsVTInputHelper : IDisposable
     #endregion
 
     // Console mode flags
-    private const int STD_INPUT_HANDLE = -10;
     private const uint ENABLE_VIRTUAL_TERMINAL_INPUT = 0x0200;
     private const uint ENABLE_PROCESSED_INPUT = 0x0001;
     private const uint ENABLE_LINE_INPUT = 0x0002;
@@ -110,7 +106,10 @@ internal sealed class WindowsVTInputHelper : IDisposable
 
         try
         {
-            InputHandle = GetStdHandle (STD_INPUT_HANDLE);
+            // Use the controlling terminal input handle: when stdin is redirected (e.g. piping
+            // input into the app) this is the handle obtained from CONIN$ rather than the
+            // standard input handle, so VT input still reaches the real console.
+            InputHandle = TerminalDevice.InputHandle;
 
             if (InputHandle == nint.Zero || InputHandle == new nint (-1))
             {
