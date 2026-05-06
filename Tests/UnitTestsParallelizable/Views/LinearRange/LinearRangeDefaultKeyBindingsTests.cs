@@ -5,17 +5,17 @@ using System.Reflection;
 namespace ViewsTests;
 
 /// <summary>
-///     Tests for <see cref="LinearRange{T}.DefaultKeyBindings"/> static property.
+///     Tests for <see cref="LinearRangeViewBase{TOption,TValue}.DefaultKeyBindings"/> static property.
 /// </summary>
 public class LinearRangeDefaultKeyBindingsTests
 {
     [Fact]
-    public void LinearRange_DefaultKeyBindings_IsNotNull () => Assert.NotNull (LinearRange<object>.DefaultKeyBindings);
+    public void LinearRange_DefaultKeyBindings_IsNotNull () => Assert.NotNull (LinearSelector<object>.DefaultKeyBindings);
 
     [Fact]
     public void LinearRange_DefaultKeyBindings_AllKeyStringsParseable ()
     {
-        foreach ((Command command, PlatformKeyBinding platformBinding) in LinearRange<object>.DefaultKeyBindings!)
+        foreach ((Command command, PlatformKeyBinding platformBinding) in LinearSelector<object>.DefaultKeyBindings!)
         {
             Key [] [] allKeyArrays = [platformBinding.All ?? [], platformBinding.Windows ?? [], platformBinding.Linux ?? [], platformBinding.Macos ?? []];
 
@@ -32,7 +32,7 @@ public class LinearRangeDefaultKeyBindingsTests
     [Fact]
     public void LinearRange_DefaultKeyBindings_AllCommandNamesParseable ()
     {
-        foreach (Command command in LinearRange<object>.DefaultKeyBindings!.Keys)
+        foreach (Command command in LinearSelector<object>.DefaultKeyBindings!.Keys)
         {
             Assert.True (Enum.IsDefined (command), $"Command name '{command}' should parse to a Command enum value.");
         }
@@ -41,8 +41,11 @@ public class LinearRangeDefaultKeyBindingsTests
     [Fact]
     public void LinearRange_DefaultKeyBindings_DoesNotHaveConfigurationPropertyAttribute ()
     {
+        // DefaultKeyBindings is declared on the abstract base LinearRangeViewBase<TOption, TValue>.
         PropertyInfo? property =
-            typeof (LinearRange<object>).GetProperty (nameof (LinearRange<object>.DefaultKeyBindings), BindingFlags.Public | BindingFlags.Static);
+            typeof (LinearRangeViewBase<object, object>).GetProperty (
+                                                                      nameof (LinearRangeViewBase<object, object>.DefaultKeyBindings),
+                                                                      BindingFlags.Public | BindingFlags.Static);
 
         Assert.NotNull (property);
 
@@ -55,5 +58,5 @@ public class LinearRangeDefaultKeyBindingsTests
     [InlineData (Command.Accept)]
     [InlineData (Command.Activate)]
     public void LinearRange_DefaultKeyBindings_ContainsUniqueCommands (Command command) =>
-        Assert.True (LinearRange<object>.DefaultKeyBindings!.ContainsKey (command));
+        Assert.True (LinearSelector<object>.DefaultKeyBindings!.ContainsKey (command));
 }
