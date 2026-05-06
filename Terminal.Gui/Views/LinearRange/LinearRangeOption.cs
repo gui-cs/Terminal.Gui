@@ -25,7 +25,7 @@ namespace Terminal.Gui.Views;
     public string? Legend { get; set; }
 
     /// <summary>
-    ///     Abbreviation of the Legend. When the <see cref="LinearRange{T}.MinimumInnerSpacing"/> too small to fit
+    ///     Abbreviation of the Legend. Used when the inner spacing is too small to fit
     ///     <see cref="Legend"/>.
     /// </summary>
     public Rune LegendAbbr { get; set; }

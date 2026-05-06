@@ -1,7 +1,9 @@
 # LinearRange `IValue<T>` Refactor and `linear-range` Clet
 
 Tracking: [Terminal.Gui#5202](https://github.com/gui-cs/Terminal.Gui/issues/5202)
-Downstream consumer: [gui-cs/clet](https://github.com/gui-cs/clet)
+Status: Terminal.Gui side **landed in #5204** (on `develop`). Clet drop-in
+is in [`./clet/`](./clet/). See [`./clet/INTEGRATION.md`](./clet/INTEGRATION.md)
+for how to land it in [gui-cs/clet](https://github.com/gui-cs/clet).
 
 ## 1. Problem
 
