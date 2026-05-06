@@ -14,7 +14,7 @@ namespace Terminal.Gui.Views;
 ///         selection changes, subscribe to <see cref="LinearRangeViewBase{TOption,TValue}.ValueChanged"/>.
 ///     </para>
 /// </remarks>
-public class LinearSelector<T> : LinearRangeViewBase<T, T>
+public class LinearSelector<T> : LinearRangeViewBase<T, T>, IDesignable
 {
     private T? _value;
 
@@ -84,5 +84,34 @@ public class LinearSelector<T> : LinearRangeViewBase<T, T>
 
         _value = newValue;
         RaiseValueChanged (previous, newValue);
+    }
+
+    /// <summary>
+    ///     Loads demo data suitable for a designer preview: a single-select <see cref="LinearSelector{T}"/>
+    ///     of T-shirt sizes (XS through XXL) with "M" preselected. Only populated when
+    ///     <typeparamref name="T"/> is <see cref="string"/>; for any other type, the view is left untouched
+    ///     and <see langword="false"/> is returned.
+    /// </summary>
+    /// <returns><see langword="true"/> if demo data was loaded.</returns>
+    public virtual bool EnableForDesign ()
+    {
+        if (typeof (T) != typeof (string))
+        {
+            return false;
+        }
+
+        Title = "T-Shirt Size";
+        AssignHotKeys = true;
+        ShowLegends = true;
+
+        string [] sizes = ["XS", "S", "M", "L", "XL", "XXL"];
+
+        Options = sizes.Select (
+                                s => new LinearRangeOption<T> (s, (Rune)s [0], (T)(object)s))
+                       .ToList ();
+
+        Value = (T)(object)"M";
+
+        return true;
     }
 }

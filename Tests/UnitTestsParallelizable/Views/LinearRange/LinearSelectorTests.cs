@@ -198,4 +198,30 @@ public class LinearSelectorTests : TestDriverBase
         // Index 2 from previous selection no longer exists.
         Assert.Empty (sel.SelectedIndices);
     }
+
+    [Fact]
+    public void EnableForDesign_String_Populates_TShirt_Sizes_With_M_Selected ()
+    {
+        // Copilot
+        LinearSelector<string> sel = new ();
+
+        bool ok = sel.EnableForDesign ();
+
+        Assert.True (ok);
+        Assert.Equal (6, sel.Options.Count);
+        Assert.Equal (["XS", "S", "M", "L", "XL", "XXL"], sel.Options.Select (o => o.Legend));
+        Assert.Equal ("M", sel.Value);
+    }
+
+    [Fact]
+    public void EnableForDesign_NonString_Returns_False_And_Leaves_Options_Empty ()
+    {
+        // Copilot
+        LinearSelector<int> sel = new ();
+
+        bool ok = sel.EnableForDesign ();
+
+        Assert.False (ok);
+        Assert.Empty (sel.Options);
+    }
 }

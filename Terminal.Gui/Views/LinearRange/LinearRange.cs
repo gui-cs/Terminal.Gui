@@ -19,7 +19,7 @@ namespace Terminal.Gui.Views;
 ///         <see cref="LinearRangeSpanKind"/> with no matching options.
 ///     </para>
 /// </remarks>
-public class LinearRange<T> : LinearRangeViewBase<T, LinearRangeSpan<T>>
+public class LinearRange<T> : LinearRangeViewBase<T, LinearRangeSpan<T>>, IDesignable
 {
     private LinearRangeSpan<T> _value = LinearRangeSpan<T>.Empty;
     private LinearRangeSpanKind _rangeKind = LinearRangeSpanKind.Closed;
@@ -263,5 +263,46 @@ public class LinearRange<T> : LinearRangeViewBase<T, LinearRangeSpan<T>>
                                                   : new LinearRangeSpan<T> (LinearRangeSpanKind.Closed, value.Start, value.Start, value.StartIndex, value.StartIndex),
             _ => value
         };
+    }
+
+    /// <summary>
+    ///     Loads demo data suitable for a designer preview: a closed range of work hours
+    ///     (8 AM through 6 PM in one-hour increments) with the range preset to "9 AM"–"5 PM".
+    ///     Only populated when <typeparamref name="T"/> is <see cref="string"/>; for any other type,
+    ///     the view is left untouched and <see langword="false"/> is returned.
+    /// </summary>
+    /// <returns><see langword="true"/> if demo data was loaded.</returns>
+    public virtual bool EnableForDesign ()
+    {
+        if (typeof (T) != typeof (string))
+        {
+            return false;
+        }
+
+        Title = "Work Hours";
+        AssignHotKeys = true;
+        ShowLegends = true;
+        RangeKind = LinearRangeSpanKind.Closed;
+        RangeAllowSingle = true;
+
+        string [] hours =
+        [
+            "8 AM", "9 AM", "10 AM", "11 AM", "12 PM",
+            "1 PM", "2 PM", "3 PM", "4 PM", "5 PM", "6 PM"
+        ];
+
+        Options = hours.Select (h => new LinearRangeOption<T> (h, (Rune)h [0], (T)(object)h)).ToList ();
+
+        const int startIdx = 1; // "9 AM"
+        const int endIdx = 9;   // "5 PM"
+
+        Value = new LinearRangeSpan<T> (
+                                        LinearRangeSpanKind.Closed,
+                                        (T)(object)hours [startIdx],
+                                        (T)(object)hours [endIdx],
+                                        startIdx,
+                                        endIdx);
+
+        return true;
     }
 }

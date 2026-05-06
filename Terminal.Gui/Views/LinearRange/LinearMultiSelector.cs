@@ -17,7 +17,7 @@ namespace Terminal.Gui.Views;
 ///         so two distinct list instances with the same elements in the same order are considered equal.
 ///     </para>
 /// </remarks>
-public class LinearMultiSelector<T> : LinearRangeViewBase<T, IReadOnlyList<T>>
+public class LinearMultiSelector<T> : LinearRangeViewBase<T, IReadOnlyList<T>>, IDesignable
 {
     private static readonly IReadOnlyList<T> _emptyList = new List<T> (0).AsReadOnly ();
 
@@ -128,6 +128,35 @@ public class LinearMultiSelector<T> : LinearRangeViewBase<T, IReadOnlyList<T>>
                 return false;
             }
         }
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Loads demo data suitable for a designer preview: a multi-select
+    ///     <see cref="LinearMultiSelector{T}"/> of the seven days of the week, with the five weekdays
+    ///     (Mon–Fri) preselected. Only populated when <typeparamref name="T"/> is <see cref="string"/>;
+    ///     for any other type, the view is left untouched and <see langword="false"/> is returned.
+    /// </summary>
+    /// <returns><see langword="true"/> if demo data was loaded.</returns>
+    public virtual bool EnableForDesign ()
+    {
+        if (typeof (T) != typeof (string))
+        {
+            return false;
+        }
+
+        Title = "Active Days";
+        AssignHotKeys = true;
+        ShowLegends = true;
+
+        string [] days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+        Options = days.Select (
+                               d => new LinearRangeOption<T> (d, (Rune)d [0], (T)(object)d))
+                      .ToList ();
+
+        Value = days.Take (5).Select (d => (T)(object)d).ToList ();
 
         return true;
     }

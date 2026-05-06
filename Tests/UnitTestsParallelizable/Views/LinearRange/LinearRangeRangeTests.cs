@@ -217,4 +217,34 @@ public class LinearRangeRangeTests : TestDriverBase
         Assert.IsType<LinearRangeSpan<int>> (boxed);
         Assert.Equal (r.Value, (LinearRangeSpan<int>)boxed!);
     }
+
+    [Fact]
+    public void EnableForDesign_String_Populates_WorkHours_Closed_Range ()
+    {
+        // Copilot
+        LinearRange<string> r = new ();
+
+        bool ok = r.EnableForDesign ();
+
+        Assert.True (ok);
+        Assert.Equal (11, r.Options.Count);
+        Assert.Equal (LinearRangeSpanKind.Closed, r.RangeKind);
+        Assert.Equal (LinearRangeSpanKind.Closed, r.Value.Kind);
+        Assert.Equal ("9 AM", r.Value.Start);
+        Assert.Equal ("5 PM", r.Value.End);
+        Assert.Equal (1, r.Value.StartIndex);
+        Assert.Equal (9, r.Value.EndIndex);
+    }
+
+    [Fact]
+    public void EnableForDesign_NonString_Returns_False_And_Leaves_Options_Empty ()
+    {
+        // Copilot
+        LinearRange<int> r = new ();
+
+        bool ok = r.EnableForDesign ();
+
+        Assert.False (ok);
+        Assert.Empty (r.Options);
+    }
 }

@@ -126,4 +126,31 @@ public class LinearMultiSelectorTests : TestDriverBase
         Assert.Single (list!);
         Assert.Equal ("A", list! [0]);
     }
+
+    [Fact]
+    public void EnableForDesign_String_Populates_Days_With_Weekdays_Selected ()
+    {
+        // Copilot
+        LinearMultiSelector<string> ms = new ();
+
+        bool ok = ms.EnableForDesign ();
+
+        Assert.True (ok);
+        Assert.Equal (7, ms.Options.Count);
+        Assert.Equal (["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], ms.Options.Select (o => o.Legend));
+        Assert.NotNull (ms.Value);
+        Assert.Equal (["Mon", "Tue", "Wed", "Thu", "Fri"], ms.Value!);
+    }
+
+    [Fact]
+    public void EnableForDesign_NonString_Returns_False_And_Leaves_Options_Empty ()
+    {
+        // Copilot
+        LinearMultiSelector<int> ms = new ();
+
+        bool ok = ms.EnableForDesign ();
+
+        Assert.False (ok);
+        Assert.Empty (ms.Options);
+    }
 }
