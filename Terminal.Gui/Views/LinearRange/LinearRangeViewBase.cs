@@ -1074,8 +1074,11 @@ public abstract class LinearRangeViewBase<TOption, TValue> : View, IOrientation,
 
     private void DrawLinearRange ()
     {
-        // TODO: be more surgical on clear
-        ClearViewport ();
+        // The base View pipeline already calls ClearViewport before OnDrawingContent
+        // (see View.DoClearViewport). DrawLinearRange + DrawLegends together repaint every cell
+        // in the Viewport, so a second ClearViewport here is redundant work that — because
+        // ClearViewport calls SetNeedsDraw — also triggered another draw cycle, causing visible
+        // flicker during mouse drag on the LinearRange family.
 
         // Attributes
         var normalAttr = new Attribute (Color.White, Color.Black);
