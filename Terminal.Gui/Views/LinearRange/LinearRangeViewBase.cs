@@ -1452,6 +1452,10 @@ public abstract class LinearRangeViewBase<TOption, TValue> : View, IOrientation,
     // Coordinates of where the "move cursor" is drawn (in OnDrawContent)
     private Point? _moveRenderPosition;
 
+    // For Span (Closed) drag: the option that stays fixed while dragging the active end.
+    // -1 means no drag in progress.
+    private int _dragAnchorOption = -1;
+
     /// <inheritdoc/>
     protected override bool OnMouseEvent (Mouse mouse)
     {
@@ -1491,7 +1495,7 @@ public abstract class LinearRangeViewBase<TOption, TValue> : View, IOrientation,
                 {
                     if (!OnOptionFocused (pressOption, new LinearRangeEventArgs<TOption> (GetSetOptionDictionary (), FocusedOption)))
                     {
-                        SetFocusedOption ();
+                        ApplyMouseSelection (pressOption, dragStart: true);
                     }
                 }
 
@@ -1530,7 +1534,7 @@ public abstract class LinearRangeViewBase<TOption, TValue> : View, IOrientation,
             {
                 if (!OnOptionFocused (option, new LinearRangeEventArgs<TOption> (GetSetOptionDictionary (), FocusedOption)))
                 {
-                    SetFocusedOption ();
+                    ApplyMouseSelection (option, dragStart: false);
                 }
             }
 
@@ -1547,6 +1551,7 @@ public abstract class LinearRangeViewBase<TOption, TValue> : View, IOrientation,
             App?.Mouse.UngrabMouse ();
             _dragPosition = null;
             _moveRenderPosition = null;
+            _dragAnchorOption = -1;
             mouse.Handled = true;
             SetNeedsDraw ();
 
@@ -1565,6 +1570,7 @@ public abstract class LinearRangeViewBase<TOption, TValue> : View, IOrientation,
         App?.Mouse.UngrabMouse ();
         _dragPosition = null;
         _moveRenderPosition = null;
+        _dragAnchorOption = -1;
 
         switch (Orientation)
         {
@@ -1678,6 +1684,285 @@ public abstract class LinearRangeViewBase<TOption, TValue> : View, IOrientation,
     }
 
     private Dictionary<int, LinearRangeOption<TOption>> GetSetOptionDictionary () => _setOptions.ToDictionary (e => e, e => _options! [e]);
+
+    /// <summary>
+    ///     Applies a mouse-press or mouse-drag selection at <paramref name="option"/>. Unlike
+    ///     <see cref="SetFocusedOption"/> (which has toggle/extend/shrink semantics designed
+    ///     for keyboard activation), this performs <em>set</em> semantics suitable for a continuous
+    ///     mouse drag: a single-bounded view's endpoint follows the cursor without toggling off
+    ///     when the cursor returns to the existing value, and a Closed range tracks an anchor on
+    ///     the opposite end so the range never collapses unexpectedly while dragging.
+    /// </summary>
+    /// <param name="option">The option index under the mouse.</param>
+    /// <param name="dragStart">
+    ///     <see langword="true"/> for the initial press of a drag;
+    ///     <see langword="false"/> for subsequent drag-continue events.
+    /// </param>
+    private void ApplyMouseSelection (int option, bool dragStart)
+    {
+        if (_options is null or { Count: 0 } || option < 0 || option >= _options.Count)
+        {
+            return;
+        }
+
+        var changed = false;
+
+        switch (_config._renderMode)
+        {
+            case LinearRangeRenderMode.Single:
+            case LinearRangeRenderMode.LeftSpan:
+            case LinearRangeRenderMode.RightSpan:
+                changed = ApplyMouseSelectionSingle (option);
+
+                break;
+
+            case LinearRangeRenderMode.Multiple:
+                if (dragStart)
+                {
+                    // Toggle on the press option.
+                    changed = ToggleSetOption (option);
+                }
+                else
+                {
+                    // During drag, only ensure the option becomes set (don't toggle it off
+                    // each time the cursor revisits a previously-set option).
+                    if (!_setOptions.Contains (option))
+                    {
+                        _setOptions.Add (option);
+                        _options [option].OnSet ();
+                        changed = true;
+                    }
+                }
+
+                break;
+
+            case LinearRangeRenderMode.Span:
+                changed = ApplyMouseSelectionSpan (option, dragStart);
+
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException (_config._renderMode.ToString ());
+        }
+
+        if (changed)
+        {
+            RaiseSelectionChanged ();
+        }
+    }
+
+    private bool ApplyMouseSelectionSingle (int option)
+    {
+        if (_setOptions.Count == 1 && _setOptions [0] == option)
+        {
+            // Already the single set option; no change. Critically, do NOT toggle off here:
+            // a drag through the same option must not clear the selection.
+            return false;
+        }
+
+        foreach (int existing in _setOptions)
+        {
+            _options! [existing].OnUnSet ();
+        }
+
+        _setOptions.Clear ();
+        _setOptions.Add (option);
+        _options! [option].OnSet ();
+
+        return true;
+    }
+
+    private bool ToggleSetOption (int option)
+    {
+        if (_setOptions.Contains (option))
+        {
+            if (!_config._allowEmpty && _setOptions.Count == 1)
+            {
+                return false;
+            }
+
+            _setOptions.Remove (option);
+            _options! [option].OnUnSet ();
+        }
+        else
+        {
+            _setOptions.Add (option);
+            _options! [option].OnSet ();
+        }
+
+        return true;
+    }
+
+    private bool ApplyMouseSelectionSpan (int option, bool dragStart)
+    {
+        // Empty range: just place a single point at option.
+        if (_setOptions.Count == 0)
+        {
+            if (_config._rangeAllowSingle)
+            {
+                _setOptions.Add (option);
+                _options! [option].OnSet ();
+                _dragAnchorOption = option;
+
+                return true;
+            }
+
+            // Closed range with rangeAllowSingle = false: span [option, option+1] (or option-1).
+            int next = option < _options!.Count - 1 ? option + 1 : option - 1;
+            int lo = Math.Min (option, next);
+            int hi = Math.Max (option, next);
+            _setOptions.Add (lo);
+            _setOptions.Add (hi);
+            _options! [lo].OnSet ();
+            _options! [hi].OnSet ();
+
+            // Anchor at the press location so a subsequent drag moves the OTHER end.
+            _dragAnchorOption = option;
+
+            return true;
+        }
+
+        if (dragStart)
+        {
+            // Choose anchor for the upcoming drag.
+            if (_setOptions.Count == 1)
+            {
+                int existing = _setOptions [0];
+
+                if (option == existing)
+                {
+                    // Press on the single existing point: anchor stays here; no change yet.
+                    _dragAnchorOption = existing;
+
+                    return false;
+                }
+
+                int lo = Math.Min (existing, option);
+                int hi = Math.Max (existing, option);
+                _setOptions.Clear ();
+                _setOptions.Add (lo);
+                _setOptions.Add (hi);
+                _options! [option].OnSet ();
+                _dragAnchorOption = existing;
+
+                return true;
+            }
+
+            // Count == 2: pick anchor as the endpoint farther from the press; the closer
+            // endpoint becomes the active end and is moved to the press position.
+            int lowEnd = _setOptions [0];
+            int highEnd = _setOptions [1];
+
+            if (option <= lowEnd)
+            {
+                // Press at or to the left of the range: anchor=high, active=low.
+                _dragAnchorOption = highEnd;
+
+                if (option == lowEnd)
+                {
+                    return false;
+                }
+
+                _options! [lowEnd].OnUnSet ();
+                _setOptions [0] = option;
+                _options! [option].OnSet ();
+
+                return true;
+            }
+
+            if (option >= highEnd)
+            {
+                _dragAnchorOption = lowEnd;
+
+                if (option == highEnd)
+                {
+                    return false;
+                }
+
+                _options! [highEnd].OnUnSet ();
+                _setOptions [1] = option;
+                _options! [option].OnSet ();
+
+                return true;
+            }
+
+            // Inside the range: pick the closer endpoint as active; the other is the anchor.
+            int distLow = option - lowEnd;
+            int distHigh = highEnd - option;
+
+            if (distLow <= distHigh)
+            {
+                _options! [lowEnd].OnUnSet ();
+                _setOptions [0] = option;
+                _options! [option].OnSet ();
+                _dragAnchorOption = highEnd;
+            }
+            else
+            {
+                _options! [highEnd].OnUnSet ();
+                _setOptions [1] = option;
+                _options! [option].OnSet ();
+                _dragAnchorOption = lowEnd;
+            }
+
+            return true;
+        }
+
+        // Drag continue: keep _dragAnchorOption fixed, move the active end to option.
+        if (_dragAnchorOption < 0)
+        {
+            // Anchor was never set (e.g. drag without prior press in our pipeline). Treat as start.
+            return ApplyMouseSelectionSpan (option, dragStart: true);
+        }
+
+        int anchor = _dragAnchorOption;
+        int newLo = Math.Min (anchor, option);
+        int newHi = Math.Max (anchor, option);
+
+        if (newLo == newHi)
+        {
+            // Collapsed to a single point.
+            if (!_config._rangeAllowSingle)
+            {
+                // Closed range with rangeAllowSingle=false cannot collapse; keep current state.
+                return false;
+            }
+
+            if (_setOptions.Count == 1 && _setOptions [0] == newLo)
+            {
+                return false;
+            }
+
+            foreach (int s in _setOptions)
+            {
+                _options! [s].OnUnSet ();
+            }
+
+            _setOptions.Clear ();
+            _setOptions.Add (newLo);
+            _options! [newLo].OnSet ();
+
+            return true;
+        }
+
+        if (_setOptions.Count == 2 && _setOptions [0] == newLo && _setOptions [1] == newHi)
+        {
+            return false;
+        }
+
+        foreach (int s in _setOptions)
+        {
+            _options! [s].OnUnSet ();
+        }
+
+        _setOptions.Clear ();
+        _setOptions.Add (newLo);
+        _setOptions.Add (newHi);
+        _options! [newLo].OnSet ();
+        _options! [newHi].OnSet ();
+
+        return true;
+    }
 
     private bool SetFocusedOption ()
     {
