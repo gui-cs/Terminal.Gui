@@ -1,4 +1,4 @@
-// Copilot
+// Copilot - Claude Sonnet 4
 
 using System.Text;
 
